@@ -509,10 +509,10 @@ static void svi318_80col_init(running_machine *machine)
 {
 	/* 2K RAM, but allocating 4KB to make banking easier */
 	/* The upper 2KB will be set to FFs and will never be written to */
-	svi.svi806_ram = new_memory_region( machine, REGION_GFX2, 0x1000, 0 );
+	svi.svi806_ram = memory_region_alloc( machine, "gfx2", 0x1000, 0 );
 	memset( svi.svi806_ram, 0x00, 0x800 );
 	memset( svi.svi806_ram + 0x800, 0xFF, 0x800 );
-	svi.svi806_gfx = memory_region(machine, REGION_GFX1);
+	svi.svi806_gfx = memory_region(machine, "gfx1");
 
 	timer_set( attotime_zero, NULL, 0, svi318_80col_init_registers );
 }
@@ -722,7 +722,7 @@ static void svi318_set_banks(running_machine *machine)
 
 	switch( svi.bankLow ) {
 	case SVI_INTERNAL:
-		svi.bankLow_ptr = memory_region(machine, REGION_CPU1);
+		svi.bankLow_ptr = memory_region(machine, "|");
 		break;
 	case SVI_CART:
 		if ( pcart ) {

@@ -675,7 +675,7 @@ MACHINE_DRIVER_END
 
 ROM_START(ti99_4)
 	/*CPU memory space*/
-	ROM_REGION16_BE(region_cpu1_len, REGION_CPU1, 0)
+	ROM_REGION16_BE(region_cpu1_len, "main", 0)
 	ROM_LOAD16_BYTE("u610.bin", 0x0000, 0x1000, CRC(6fcf4b15) SHA1(d085213c64701d429ae535f9a4ac8a50427a8343)) /* CPU ROMs high */
 	ROM_LOAD16_BYTE("u611.bin", 0x0001, 0x1000, CRC(491c21d1) SHA1(7741ae9294c51a44a78033d1b77c01568a6bbfb9)) /* CPU ROMs low */
 
@@ -705,7 +705,7 @@ ROM_END
 
 ROM_START(ti99_4a)
 	/*CPU memory space*/
-	ROM_REGION16_BE(region_cpu1_len, REGION_CPU1, 0)
+	ROM_REGION16_BE(region_cpu1_len, "main", 0)
 	ROM_LOAD16_WORD("994arom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
 
 	/*GROM memory space*/
@@ -732,7 +732,7 @@ ROM_END
 
 ROM_START(ti99_4ev)
 	/*CPU memory space*/
-	ROM_REGION16_BE(region_cpu1_len, REGION_CPU1, 0)
+	ROM_REGION16_BE(region_cpu1_len, "main", 0)
 	ROM_LOAD16_WORD("994arom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
 
 	/*GROM memory space*/

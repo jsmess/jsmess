@@ -843,7 +843,7 @@ static void c64_common_driver_init (running_machine *machine)
 
 	/*    memset(c64_memory, 0, 0xfd00); */
 	if (!ultimax) {
-		UINT8 *mem = memory_region(machine, REGION_CPU1);
+		UINT8 *mem = memory_region(machine, "|");
 		c64_basic=mem+0x10000;
 		c64_kernal=mem+0x12000;
 		c64_chargen=mem+0x14000;

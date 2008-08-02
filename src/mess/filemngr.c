@@ -124,12 +124,12 @@ static void input_character(char *buffer, size_t buffer_length, unicode_char uni
 
 static void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
 {
-	float width, maxwidth;
+	float width, maxwidth, height;
 	float x1, y1, x2, y2, temp;
 
 	/* get the size of the text */
 	ui_draw_text_full(text, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, &height);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
 
@@ -623,7 +623,7 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 				case SELECTOR_ENTRY_TYPE_CREATE:
 					/* create */
 					child_menu = ui_menu_alloc(machine, menu_file_create, NULL);
-					child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate));
+					child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 					child_menustate->manager_menustate = menustate->manager_menustate;
 					ui_menu_stack_push(child_menu);
 					break;
@@ -733,6 +733,23 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 
 
 /*-------------------------------------------------
+    file_manager_destroy_state - state destructor
+-------------------------------------------------*/
+
+static void file_manager_destroy_state(ui_menu *menu, void *state)
+{
+	file_manager_menu_state *menustate = (file_manager_menu_state *) state;
+
+	if (menustate->current_directory != NULL)
+		astring_free(menustate->current_directory);
+
+	if (menustate->current_file != NULL)
+		astring_free(menustate->current_file);
+}
+
+
+
+/*-------------------------------------------------
     menu_file_manager - main file manager menu
 -------------------------------------------------*/
 
@@ -745,20 +762,14 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 
 	/* if no state, allocate now */
 	if (state == NULL)
-		state = ui_menu_alloc_state(menu, sizeof(*menustate));
-	menustate = (file_manager_menu_state *) state;
+	{
+		state = ui_menu_alloc_state(menu, sizeof(*menustate), file_manager_destroy_state);
+		menustate = (file_manager_menu_state *) state;
 
-	/* possible cleanups from the file selector - ugly global variable usage */
-	if (menustate->current_directory != NULL)
-	{
-		astring_free(menustate->current_directory);
-		menustate->current_directory = NULL;
+		menustate->current_directory = astring_alloc();
+		menustate->current_file = astring_alloc();
 	}
-	if (menustate->current_file != NULL)
-	{
-		astring_free(menustate->current_file);
-		menustate->current_file = NULL;
-	}
+	menustate = (file_manager_menu_state *) state;
 
 	/* update the selected device */
 	menustate->selected_device = (const device_config *) ui_menu_get_selection(menu);
@@ -778,16 +789,15 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 			fix_working_directory(menustate->selected_device);
 
 			/* set up current_directory and current_file - depends on whether we have an image */
-			menustate->current_directory = astring_cpyc(astring_alloc(), image_working_directory(menustate->selected_device));
-			menustate->current_file = astring_cpyc(astring_alloc(),
-				image_exists(menustate->selected_device) ? image_basename(menustate->selected_device) : "");
+			astring_cpyc(menustate->current_directory, image_working_directory(menustate->selected_device));
+			astring_cpyc(menustate->current_file, image_exists(menustate->selected_device) ? image_basename(menustate->selected_device) : "");
 
 			/* reset the existing menu */
 			ui_menu_reset(menu, 0);
 
 			/* push the menu */
 			child_menu = ui_menu_alloc(machine, menu_file_selector, NULL);
-			child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate));
+			child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->manager_menustate = menustate;
 			ui_menu_stack_push(child_menu);
 		}

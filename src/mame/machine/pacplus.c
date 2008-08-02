@@ -46,7 +46,7 @@ void pacplus_decode(running_machine *machine)
 
 	/* CPU ROMs */
 
-	RAM = memory_region(machine, REGION_CPU1);
+	RAM = memory_region(machine, "main");
 	for (i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = decrypt(i,RAM[i]);

@@ -1099,8 +1099,8 @@ DRIVER_INIT( bebox )
 		pci_add_device(0, 12, &scsi53c810_callbacks);
 
 	/* set up boot and flash ROM */
-	memory_set_bankptr(2, memory_region(machine, REGION_USER2));
-	intelflash_init(0, FLASH_FUJITSU_29F016A, memory_region(machine, REGION_USER1));
+	memory_set_bankptr(2, memory_region(machine, "user2"));
+	intelflash_init(0, FLASH_FUJITSU_29F016A, memory_region(machine, "user1"));
 
 	/* install MESS managed RAM */
 	for (cpu = 0; cpu < 2; cpu++)

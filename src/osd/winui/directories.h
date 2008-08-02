@@ -24,6 +24,7 @@
 #define DIRDLG_CTRLR        0x1000
 #define DIRDLG_SOFTWARE		0x2000
 #define DIRDLG_COMMENT      0x4000
+#define DIRDLG_CHEAT        0x8000
 
 #define DIRLIST_NEWENTRYTEXT "<               >"
 

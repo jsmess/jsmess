@@ -102,6 +102,7 @@ DIRECTORYINFO g_directoryInfo[] =
 	{ "Config",                GetCfgDir,       SetCfgDir,       FALSE, DIRDLG_CFG },
 	{ "Snapshots",             GetImgDir,       SetImgDir,       FALSE, DIRDLG_IMG },
 	{ "Input files",           GetInpDir,       SetInpDir,       FALSE, DIRDLG_INP },
+	{ "Cheats",			       GetCheatDir,     SetCheatDir,     FALSE, DIRDLG_CHEAT },
 	{ "State",                 GetStateDir,     SetStateDir,     FALSE, 0 },
 	{ "Artwork",               GetArtDir,       SetArtDir,       FALSE, 0 },
 	{ "Memory Card",           GetMemcardDir,   SetMemcardDir,   FALSE, 0 },
@@ -149,6 +150,7 @@ const PROPERTYSHEETINFO g_propSheets[] =
 	{ TRUE,		NULL,					IDD_PROP_INPUT,			GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_CONTROLLER,	GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_MISC,			GameOptionsProc },
+	{ TRUE,		NULL,					IDD_PROP_DEBUG,			GameOptionsProc },
 	{ TRUE,		PropSheetFilter_Vector,	IDD_PROP_VECTOR,		GameOptionsProc },
 	{ FALSE }
 };

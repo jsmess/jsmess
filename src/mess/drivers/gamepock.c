@@ -63,11 +63,11 @@ static MACHINE_DRIVER_START( gamepock )
 MACHINE_DRIVER_END
 
 static DEVICE_START(gamepock_cart) {
-	memory_set_bankptr( 1, memory_region(device->machine,  REGION_USER1 ) );
+	memory_set_bankptr( 1, memory_region(device->machine,  "user1" ) );
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
-	UINT8 *cart = memory_region(image->machine,  REGION_USER1 );
+	UINT8 *cart = memory_region(image->machine,  "user1" );
 	int size = image_length( image );
 
 	if ( image_fread( image, cart, size ) != size ) {
@@ -75,7 +75,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 		return INIT_FAIL;
 	}
 
-	memory_set_bankptr( 1, memory_region(image->machine,  REGION_USER1 ) );
+	memory_set_bankptr( 1, memory_region(image->machine,  "user1" ) );
 
 	return INIT_PASS;
 }
@@ -96,9 +96,9 @@ static SYSTEM_CONFIG_START(gamepock)
 SYSTEM_CONFIG_END
 
 ROM_START( gamepock )
-	ROM_REGION( 0x1000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "main", ROMREGION_ERASEFF )
 	ROM_LOAD( "egpcboot.bin", 0x0000, 0x1000, CRC(ee1ea65d) SHA1(9c7731b5ead721d2cc7f7e2655c5fed9e56db8b0) )
-	ROM_REGION( 0x8000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 CONS( 1984, gamepock, 0, 0, gamepock, gamepock, 0, gamepock, "Epoch", "Game Pocket Computer", 0 )

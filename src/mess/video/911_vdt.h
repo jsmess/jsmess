@@ -1,8 +1,5 @@
 
-enum
-{
-	vdt911_chr_region = REGION_GFX1
-};
+#define vdt911_chr_region "gfx1"
 
 enum
 {

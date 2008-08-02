@@ -1026,7 +1026,7 @@ static UINT16 *rozbank16;
 static UINT16 *rozvideoram16;
 static UINT16 *rozcontrol16;
 static int mRozGfxBank;
-static int mRozMaskRegion;
+static const char * mRozMaskRegion;
 
 /**
  * Graphics ROM addressing varies across games.
@@ -1119,7 +1119,7 @@ TILEMAP_MAPPER( namco_roz_scan )
 } /* namco_roz_scan*/
 
 void
-namco_roz_init( int gfxbank, int maskregion )
+namco_roz_init( int gfxbank, const char * maskregion )
 {
 	int i;
 	static const tile_get_info_func roz_info[ROZ_TILEMAP_COUNT] =
@@ -1647,7 +1647,7 @@ namco_road_set_transparent_color(pen_t pen)
 void
 namco_road_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	const UINT8 *clut = (void *)memory_region(machine, REGION_USER3);
+	const UINT8 *clut = (void *)memory_region(machine, "user3");
 	bitmap_t *pSourceBitmap;
 	unsigned yscroll;
 	int i;

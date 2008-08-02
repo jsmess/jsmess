@@ -119,7 +119,7 @@ int pc1401_reset(void)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1401 )
 {
-	UINT8 *ram=memory_region(machine, REGION_CPU1)+0x2000,
+	UINT8 *ram=memory_region(machine, "|")+0x2000,
 		*cpu=sc61860_internal_ram();
 
 	if (read_or_write)
@@ -147,7 +147,7 @@ static TIMER_CALLBACK(pc1401_power_up)
 DRIVER_INIT( pc1401 )
 {
 	int i;
-	UINT8 *gfx=memory_region(machine, REGION_GFX1);
+	UINT8 *gfx=memory_region(machine, "gfx1");
 #if 0
 	char sucker[]={
 		/* this routine dump the memory (start 0)

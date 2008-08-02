@@ -275,7 +275,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START (compis)
-     ROM_REGION (0x100000, REGION_CPU1, 0)
+     ROM_REGION (0x100000, "main", 0)
      ROM_LOAD ("compis.rom", 0xf0000, 0x10000, CRC(89877688) SHA1(7daa1762f24e05472eafc025879da90fe61d0225))
 ROM_END
 

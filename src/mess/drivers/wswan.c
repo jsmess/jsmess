@@ -202,12 +202,12 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 ROM_START( wswan )
-	ROM_REGION( 0x100000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "main", ROMREGION_ERASEFF )
 //  ROM_LOAD_OPTIONAL( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 ROM_START( wscolor )
-	ROM_REGION( 0x100000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "main", ROMREGION_ERASEFF )
 //  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 

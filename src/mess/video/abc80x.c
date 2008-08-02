@@ -425,7 +425,7 @@ static TIMER_CALLBACK( abc802_flash_tick )
 static MC6845_UPDATE_ROW( abc800m_update_row )
 {
 	int column;
-	const UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
+	const UINT8 *charrom = memory_region(device->machine, "gfx1");
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -465,7 +465,7 @@ static MC6845_UPDATE_ROW( abc800c_update_row )
 static MC6845_UPDATE_ROW( abc802_update_row )
 {
 	int column;
-	const UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
+	const UINT8 *charrom = memory_region(device->machine, "gfx1");
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -563,7 +563,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	// DEN+3, CUR+4
 
 	int column;
-	const UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
+	const UINT8 *charrom = memory_region(device->machine, "gfx1");
 
 	for (column = 0; column < x_count; column++)
 	{

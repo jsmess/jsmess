@@ -71,7 +71,7 @@ static MACHINE_RESET( exelv )
 {
 	tms3556_reset();
 	io_reset();
-	memory_set_bankptr( 1, memory_region(machine, REGION_USER1) + 0x0200 );
+	memory_set_bankptr( 1, memory_region(machine, "user1") + 0x0200 );
 }
 
 static INTERRUPT_GEN( exelv_hblank_interrupt )
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(REGION_CPU1,0x0000)		/* tms7020 internal ROM */
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("|main|",0x0000)		/* tms7020 internal ROM */
 
 ADDRESS_MAP_END
 
@@ -535,7 +535,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(exelv_tms7040_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(REGION_CPU2,0x0000)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("|tms7040|",0x0000)
 ADDRESS_MAP_END
 
 
@@ -585,25 +585,25 @@ MACHINE_DRIVER_END
   ROM loading
 */
 ROM_START(exl100)
-	ROM_REGION(0x800, REGION_CPU1, 0)
+	ROM_REGION(0x800, "main", 0)
 	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, BAD_DUMP CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
 
-	ROM_REGION(0x1000, REGION_CPU2, 0)
+	ROM_REGION(0x1000, "tms7040", 0)
 	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, NO_DUMP)			/* TMS7041 internal ROM. Max 4KB rom, could also be 2KB */
 
-	ROM_REGION(0x10000, REGION_USER1, ROMREGION_ERASEFF)			/* cartridge area */
+	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)			/* cartridge area */
 ROM_END
 
 
 ROM_START(exeltel)
 	/*CPU memory space*/
-	ROM_REGION(0x1000, REGION_CPU1, 0)
+	ROM_REGION(0x1000, "|main|", 0)
 	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, BAD_DUMP CRC(c12f24b5))		/* TMS7020 internal ROM */
 
-	ROM_REGION(0x1000, REGION_CPU2, 0)
+	ROM_REGION(0x1000, "|tms7040|", 0)
 	ROM_LOAD("exeltel_7041.bin", 0x0000, 0x1000, NO_DUMP)			/* TMS7041 internal ROM. Max 4KB ROM, could also be 2KB */
 
-	ROM_REGION(0x10000,REGION_USER1,0)
+	ROM_REGION(0x10000,"user1",0)
 	ROM_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89))	/* system ROM */
 ROM_END
 

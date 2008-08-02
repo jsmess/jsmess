@@ -152,14 +152,14 @@ static WRITE32_HANDLER( speedup_w );
  *
  *************************************/
 
-void cage_init(running_machine *machine, int boot_region, offs_t speedup)
+void cage_init(running_machine *machine, offs_t speedup)
 {
 	attotime cage_cpu_clock_period;
 
 	cage_irqhandler = NULL;
 
-	memory_set_bankptr(10, memory_region(machine, boot_region));
-	memory_set_bankptr(11, memory_region(machine, boot_region + 1));
+	memory_set_bankptr(10, memory_region(machine, "cageboot"));
+	memory_set_bankptr(11, memory_region(machine, "cage"));
 
 	cage_cpu = mame_find_cpu_index(machine, "cage");
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpunum_get_clock(cage_cpu));
@@ -643,7 +643,6 @@ MACHINE_DRIVER_START( cage )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cage", TMS32031, 33868800)
-	/* audio CPU */
 	MDRV_CPU_CONFIG(cage_config)
 	MDRV_CPU_PROGRAM_MAP(cage_map,0)
 

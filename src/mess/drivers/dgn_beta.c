@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 MACHINE_DRIVER_END
 
 ROM_START(dgnbeta)
-	ROM_REGION(0x4000,REGION_CPU1,0)
+	ROM_REGION(0x4000,"main",0)
     ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon beta OS9 boot rom (1984)" )
 	ROMX_LOAD("beta_bt.rom"		,0x0000	,0x4000	,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(1))
     ROM_SYSTEM_BIOS( 1, "testrom", "Dragon beta test rom (1984?)" )
@@ -352,7 +352,7 @@ ROM_START(dgnbeta)
     ROM_SYSTEM_BIOS( 3, "dfiles", "dfiles rom" )
 	ROMX_LOAD("beta_dfi.rom"	,0x2000	,0x2000	,CRC(c4ad7f64) SHA1(50aa92a1c383321485d5a1aa41dfe4f90b3beaed), ROM_BIOS(4))
 
-	ROM_REGION (0x2000, REGION_GFX1, 0)
+	ROM_REGION (0x2000, "gfx1", 0)
 	ROM_LOAD("betachar.rom"	,0x0000	,0x2000	,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 

@@ -120,7 +120,7 @@ static const gfx_layout nascom1_charlayout =
 
 
 static GFXDECODE_START( nascom1 )
-	GFXDECODE_ENTRY(REGION_GFX1, 0x0000, nascom1_charlayout, 0, 1)
+	GFXDECODE_ENTRY("gfx1", 0x0000, nascom1_charlayout, 0, 1)
 GFXDECODE_END
 
 
@@ -138,7 +138,7 @@ static const gfx_layout nascom2_charlayout =
 
 
 static GFXDECODE_START( nascom2 )
-	GFXDECODE_ENTRY(REGION_GFX1, 0x0000, nascom2_charlayout, 0, 1)
+	GFXDECODE_ENTRY("gfx1", 0x0000, nascom2_charlayout, 0, 1)
 GFXDECODE_END
 
 
@@ -294,27 +294,27 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START(nascom1)
-	ROM_REGION(0x10000, REGION_CPU1,0)
+	ROM_REGION(0x10000, "main",0)
 	ROM_SYSTEM_BIOS(0, "T4", "NasBug T4")
 	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "T1", "NasBug T1")
 	ROMX_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "T2", "NasBug T2")
 	ROMX_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(3))
-	ROM_REGION(0x0800, REGION_GFX1, 0)
+	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("nascom1.chr",   0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
 ROM_END
 
 
 ROM_START(nascom2)
-	ROM_REGION(0x10000, REGION_CPU1,0)
+	ROM_REGION(0x10000, "main",0)
 	ROM_SYSTEM_BIOS( 0, "NS3", "NasSys 3")
 	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "NS1", "NasSys 1")
 	ROMX_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(2))
 	ROM_LOAD("nasdos.rom",   0xd000, 0x1000, CRC(54a36f6d) SHA1(1d063d04be5024f128bd589e6edc066e9a63fc1b))
 	ROM_LOAD("basic.rom",    0xe000, 0x2000, CRC(5cb5197b) SHA1(c41669c2b6d6dea808741a2738426d97bccc9b07))
-	ROM_REGION(0x1000, REGION_GFX1, 0)
+	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD("nascom1.chr",  0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
 	ROM_LOAD("nasgra.chr",   0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
 ROM_END

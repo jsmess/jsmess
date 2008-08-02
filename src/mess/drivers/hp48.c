@@ -801,7 +801,7 @@ static kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byte };
    no extension may be physically present).
  */
 ROM_START ( hp48gx )
-        ROM_REGION( 0x80000, REGION_CPU1, 0 ) 
+        ROM_REGION( 0x80000, "main", 0 ) 
 
 	/* latest revision (preferred) */
 	ROM_SYSTEM_BIOS( 0, "r", "Version R" )
@@ -850,7 +850,7 @@ ROM_END
  */
 
 ROM_START ( hp48sx )
-        ROM_REGION( 0x40000, REGION_CPU1, 0 ) 
+        ROM_REGION( 0x40000, "main", 0 ) 
 
 	/* latest revision (preferred) */
 	ROM_SYSTEM_BIOS( 0, "j", "Version J" )

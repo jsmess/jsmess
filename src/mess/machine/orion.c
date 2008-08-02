@@ -38,7 +38,7 @@ UINT8 orion_video_mode_mask;
 
 static READ8_HANDLER (orion_romdisk_porta_r )
 {
-	UINT8 *romdisk = memory_region(machine, REGION_CPU1) + 0x10000;		
+	UINT8 *romdisk = memory_region(machine, "|") + 0x10000;		
 	return romdisk[romdisk_msb*256+romdisk_lsb];	
 }
 
@@ -163,7 +163,7 @@ MACHINE_RESET ( orion128 )
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orion128_memory_page = -1;
-	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0xf800);
+	memory_set_bankptr(1, memory_region(machine, "|") + 0xf800);
 	memory_set_bankptr(2, mess_ram + 0xf000);
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
@@ -327,7 +327,7 @@ static void orionz80_switch_bank(running_machine *machine)
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 		
 		memory_set_bankptr(3, mess_ram + 0xf000);				
-		memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0xf800);		
+		memory_set_bankptr(5, memory_region(machine, "|") + 0xf800);		
 		
 	} else {
 		/* if it is full memory access */
@@ -370,10 +370,10 @@ MACHINE_RESET ( orionz80 )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 	
 	
-	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0xf800);		
+	memory_set_bankptr(1, memory_region(machine, "|") + 0xf800);		
 	memory_set_bankptr(2, mess_ram + 0x4000);		
 	memory_set_bankptr(3, mess_ram + 0xf000);		
-	memory_set_bankptr(5, memory_region(machine, REGION_CPU1) + 0xf800);		
+	memory_set_bankptr(5, memory_region(machine, "|") + 0xf800);		
 	
 	wd17xx_reset(machine);
 	orion128_video_page = 0;
@@ -469,11 +469,11 @@ static void orionpro_bank_switch(running_machine *machine)
 	}
 	if ((orionpro_dispatcher & 0x10)==0x10) {	// ROM1 enabled		
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x20000);		
+		memory_set_bankptr(1, memory_region(machine, "|") + 0x20000);		
 	}
 	if ((orionpro_dispatcher & 0x08)==0x08) {	// ROM2 enabled
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x22000 + (orionpro_rom2_segment & 7) * 0x2000);		
+		memory_set_bankptr(2, memory_region(machine, "|") + 0x22000 + (orionpro_rom2_segment & 7) * 0x2000);		
 	}
 
 	if ((orionpro_dispatcher & 0x02)==0x00) {	// RAM1 segment disabled

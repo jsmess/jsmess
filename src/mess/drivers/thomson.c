@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 
 
 ROM_START ( to7 )
-     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, "main", 0 )
      ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
 		CRC(0e7826da)
 		MD5(5bf18521bf35293de942645f690b2845)
@@ -511,7 +511,7 @@ ROM_START ( to7 )
 ROM_END
 
 ROM_START ( t9000 )
-     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, "main", 0 )
      ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
 		CRC(daa8cfbf)
 		MD5(b3007f26e7b621c1a4f0fd2c287f80b9)
@@ -854,7 +854,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to770 )
-     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, "main", 0 )
      ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
 		CRC(89518862)
 		MD5(61402c35b75faeb4b74b815f323fff3d)
@@ -864,7 +864,7 @@ ROM_START ( to770 )
 ROM_END
 
 ROM_START ( to770a )
-     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, "main", 0 )
      ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
 		CRC(378ea808)
 		MD5(6b63aa135107beee243967a2da0e5453)
@@ -1048,7 +1048,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5 )
-     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, "main", 0 )
      ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
 		CRC(f0ea9140)
 		MD5(ab3533a7132f90933acce80e256ae459)
@@ -1061,7 +1061,7 @@ ROM_START ( mo5 )
 ROM_END
 
 ROM_START ( mo5e )
-     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, "main", 0 )
      ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
 		CRC(6520213a)
 		MD5(434c42b96c31a341e13085048cdc8eae)
@@ -1269,7 +1269,7 @@ ADDRESS_MAP_END
  */
 
 ROM_START ( to9 )
-     ROM_REGION ( 0x44800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x44800, "main", 0 )
      ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
 		MD5(507f0c482462b70b816fd23cf6791179)
@@ -1591,7 +1591,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to8 )
-     ROM_REGION ( 0x38800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x38800, "main", 0 )
 
      /* BIOS & floppy */
      ROM_LOAD ( "to8-0.rom", 0x30000, 0x2000,
@@ -1627,7 +1627,7 @@ ROM_START ( to8 )
 ROM_END
 
 ROM_START ( to8d )
-     ROM_REGION ( 0x38800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x38800, "main", 0 )
 
      /* BIOS & floppy */
      ROM_LOAD ( "to8d-0.rom", 0x30000, 0x2000,
@@ -1803,7 +1803,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to9p )
-     ROM_REGION ( 0x38800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x38800, "main", 0 )
 
      /* BIOS & floppy */
      ROM_LOAD ( "to9p-0.rom", 0x30000, 0x2000,
@@ -1967,7 +1967,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo6 )
-     ROM_REGION ( 0x34800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x34800, "main", 0 )
 
      /* BIOS */
      ROM_LOAD ( "mo6-0.rom", 0x23000, 0x1000,
@@ -2002,7 +2002,7 @@ ROM_START ( mo6 )
 ROM_END
 
 ROM_START ( pro128 )
-     ROM_REGION ( 0x34800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x34800, "main", 0 )
 
      /* BIOS */
      ROM_LOAD ( "pro128-0.rom", 0x23000, 0x1000,
@@ -2288,7 +2288,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5nr )
-     ROM_REGION ( 0x34800, REGION_CPU1, 0 )
+     ROM_REGION ( 0x34800, "main", 0 )
 
      /* BIOS */
      ROM_LOAD ( "mo5nr-0.rom", 0x23000, 0x1000,

@@ -467,7 +467,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(ti99_8)
 	/*CPU memory space*/
-	ROM_REGION(region_cpu1_len_8,REGION_CPU1,0)
+	ROM_REGION(region_cpu1_len_8,"main",0)
 	ROM_LOAD("998rom.bin", 0x0000, 0x8000, NO_DUMP)		/* system ROMs */
 
 	/*GROM memory space*/

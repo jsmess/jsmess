@@ -181,7 +181,7 @@ static WRITE8_HANDLER( scrambler_w )
 
 	*/
 
-	UINT8 *ROM = memory_region(machine, REGION_CPU1) + 0xc000;
+	UINT8 *ROM = memory_region(machine, "|main|") + 0xc000;
 	UINT16 addr;
 
 	scrambler = data;
@@ -321,7 +321,7 @@ static const gfx_layout aquarius_charlayout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( aquarius )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, aquarius_charlayout, 0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
 /* Interrupt Generator */
@@ -436,11 +436,11 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( aquarius )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 //	ROM_LOAD( "aquarius.u2", 0x0000, 0x2000, CRC(5cfa5b42) SHA1(02c8ee11e911d1aa346812492d14284b6870cb3e) )
 	ROM_LOAD( "aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6) )
 	
-	ROM_REGION( 0x0800, REGION_GFX1, 0 )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "aq2.u5", 0x0000, 0x0800, BAD_DUMP CRC(0b3edeed) SHA1(d2509839386b852caddcaa89cd376be647ba1492) )
 ROM_END
 
@@ -449,7 +449,7 @@ ROM_END
 static DEVICE_IMAGE_LOAD( aquarius_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, REGION_CPU1) + 0xc000;
+	UINT8 *ptr = memory_region(image->machine, "|main|") + 0xc000;
 
 	if (image_fread(image, ptr, size) != size)
 	{

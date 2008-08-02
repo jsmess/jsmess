@@ -334,7 +334,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START (a7800)
-    ROM_REGION(0x30000,REGION_CPU1,0)
+    ROM_REGION(0x30000,"main",0)
 	ROM_FILL( 0x0000, 0x30000, 0xFF )
     ROM_LOAD ("7800.rom", 0xf000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43))
 /*      ROM_LOAD ("7800a.rom", 0xc000, 0x4000, CRC(649913e5)) */
@@ -342,7 +342,7 @@ ROM_START (a7800)
 ROM_END
 
 ROM_START (a7800p)
-    ROM_REGION(0x30000,REGION_CPU1,0)
+    ROM_REGION(0x30000,"main",0)
 	ROM_FILL( 0x0000, 0x30000, 0xFF )
     //ROM_LOAD ("7800pal.rom", 0xF000, 0x1000, CRC(d5b61170 ))
     ROM_LOAD ("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))

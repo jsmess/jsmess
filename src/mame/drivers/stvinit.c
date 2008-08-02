@@ -21,7 +21,7 @@ We need to remove this and add the whole thing into the ROM loading structure...
 */
 static void ic13_shifter(running_machine *machine)
 {
-	UINT32 *rom = (UINT32 *)memory_region(machine, REGION_USER1);
+	UINT32 *rom = (UINT32 *)memory_region(machine, "user1");
 	UINT32 i;
 	UINT32 *tmp = malloc_or_die(0x80000*2);
 
@@ -740,13 +740,14 @@ static READ32_HANDLER( groovef_speedup_r )
 
 	return stv_workram_h[0x0c64ec/4];
 }
-/*
+
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( groovef_second_cpu_off_r )
 {
     if (activecpu_get_pc()==0x060060c2)     cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
     return 0;
 }
-*/
+#endif
 
 static void groovef_slave_speedup( UINT32 data )
 {

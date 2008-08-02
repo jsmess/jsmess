@@ -194,13 +194,13 @@ static void partner_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 
 /* ROM definition */
 ROM_START( partner )
-	ROM_REGION( 0x1A000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x1A000, "main", ROMREGION_ERASEFF )
 	ROM_LOAD( "bios.rom", 0x10000, 0x2000, CRC(be1eaa10) SHA1(f9658d8055bf434240ec020d7892ea98cb5cbb76))
 	ROM_LOAD( "basic.rom",0x12000, 0x2000, CRC(1e9be0ec) SHA1(2c431f487cffddaac8413efddfc0527ad595f03b))
 	ROM_LOAD( "mcpg.rom", 0x14000, 0x0800, CRC(3401225c) SHA1(6c252393ee73ed1a53d3e583547d86ab6718a533))
 	ROM_LOAD( "fdd.rom",  0x16000, 0x0800, CRC(8ca350b5) SHA1(76fc92298726fb2840f4c19d7edc860d1ed86356))
 	ROM_LOAD( "font.rom", 0x18000, 0x2000, CRC(dc4f1723) SHA1(6b8d5efb403cf0aeb3fd3197a0529d23c8e2f93c))
-	ROM_REGION(0x2000, REGION_GFX1,0)
+	ROM_REGION(0x2000, "gfx1",0)
 	ROM_LOAD ("partner.fnt", 0x0000, 0x2000, CRC(2705F726) SHA1(3d7b33901ef098a405d7ddad924ba9677f6a9b15))
 ROM_END
 

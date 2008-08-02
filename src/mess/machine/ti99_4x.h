@@ -8,15 +8,12 @@
 #define HAS_99CCFDC 0
 
 /* region identifiers */
-enum
-{
-	region_grom = REGION_USER1,
-	region_dsr = REGION_USER2,
-	region_hsgpl = REGION_USER3,
-	region_speech_rom = REGION_SOUND1
-};
+#define region_grom "user1"
+#define region_dsr "user2"
+#define region_hsgpl "user3"
+#define region_speech_rom "soundfixme(1)|"
 
-/* offsets for REGION_CPU1 */
+/* offsets for "|" */
 enum
 {
 	offset_sram = 0x2000,		/* scratch RAM (256 bytes) */

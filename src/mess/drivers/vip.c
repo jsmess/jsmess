@@ -190,7 +190,7 @@ static CDP1802_INTERFACE( vip_config )
 
 static MACHINE_START( vip )
 {
-	UINT8 *ram = memory_region(machine, REGION_CPU1);
+	UINT8 *ram = memory_region(machine, "|main|");
 	UINT16 addr;
 
 	state_save_register_global(keylatch);
@@ -211,7 +211,7 @@ static MACHINE_START( vip )
 		ram[addr] = mame_rand(machine) & 0xff;
 	}
 
-	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1), 0x8000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, "|main|"), 0x8000);
 }
 
 static MACHINE_RESET( vip )
@@ -257,7 +257,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( vip )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "cdpr566.u10", 0x8000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
 ROM_END
 
@@ -269,7 +269,7 @@ static QUICKLOAD_LOAD( vip )
 
 	if (size < 0x8000)
 	{
-		if (image_fread(image, memory_region(image->machine, REGION_CPU1), size) != size)
+		if (image_fread(image, memory_region(image->machine, "|main|"), size) != size)
 		{
 			return INIT_FAIL;
 		}

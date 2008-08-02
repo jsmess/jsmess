@@ -14,33 +14,19 @@
 #include "includes/beezer.h"
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xd000, 0xffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK(1)
+	AM_RANGE(0xd000, 0xffff) AM_ROM AM_WRITE(beezer_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_BANK1)
-	AM_RANGE(0xd000, 0xffff) AM_WRITE(beezer_bankswitch_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-//  AM_RANGE(0x1000, 0x10ff) AM_READ(beezer_6840_r)
-	AM_RANGE(0x1800, 0x18ff) AM_READ(via_1_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0x1000, 0x10ff) AM_WRITE(beezer_6840_w)
-	AM_RANGE(0x1800, 0x18ff) AM_WRITE(via_1_w)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+//  AM_RANGE(0x1000, 0x10ff) AM_READWRITE(beezer_6840_r, beezer_6840_w)
+	AM_RANGE(0x1800, 0x18ff) AM_READWRITE(via_1_r, via_1_w)
 //  AM_RANGE(0x8000, 0x9fff) AM_WRITE(beezer_dac_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( beezer )
@@ -90,11 +76,11 @@ static MACHINE_DRIVER_START( beezer )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
 
 	MDRV_CPU_ADD("audio", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -121,7 +107,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( beezer )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "g1",   0x0d000, 0x1000, CRC(3467a0ec) SHA1(0b094a9bf772b101acd26cf09009c67dd4785ed2) )
 	ROM_LOAD( "g3",   0x0e000, 0x1000, CRC(9950cdf2) SHA1(b2b59cc1080357de6ba297392881d626157df809) )
 	ROM_LOAD( "g5",   0x0f000, 0x1000, CRC(a4b09879) SHA1(69739dd1d3c88ee6ab310ca3c71b3b50d8ec618f) )
@@ -134,16 +120,16 @@ ROM_START( beezer )
 	ROM_LOAD( "f5",   0x1c000, 0x1000, CRC(4b11f572) SHA1(4f283c98a7f1bcf534921b4a54cf564335c53e37) )
 	ROM_LOAD( "f7",   0x1e000, 0x1000, CRC(bef67473) SHA1(5759ceeca0bb677cee97b74f1a1087d53c25463a) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "d7",   0xf000, 0x1000, CRC(23b0782e) SHA1(7751327b84235a2e2700e4bdd21adec205c54f0e) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "d1.cpu", 0x000, 0x0100, CRC(8db17a40) SHA1(0e04a4f5f99b302dbbbfda438808d549f8680fe2) )
 	ROM_LOAD( "e1.cpu", 0x100, 0x0100, CRC(3c775c5e) SHA1(ac86f45938c0c9d5fec1245bf86718442baf445b) )
 ROM_END
 
 ROM_START( beezer1 )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "g1.32",   0x0d000, 0x1000, CRC(3134cb93) SHA1(7d4a484378b66ccf2fded31885d6dfb2abae9317) )
 	ROM_LOAD( "g3.32",   0x0e000, 0x1000, CRC(a3cb2c2d) SHA1(1e17eb0eaf02f86865845a065a5f714fc51aa7d6) )
 	ROM_LOAD( "g5.32",   0x0f000, 0x1000, CRC(5e559bf9) SHA1(cd3713f3ed1215ea5c5640474ba6f005242cd093) )
@@ -156,10 +142,10 @@ ROM_START( beezer1 )
 	ROM_LOAD( "f5",      0x1c000, 0x1000, CRC(4b11f572) SHA1(4f283c98a7f1bcf534921b4a54cf564335c53e37) )
 	ROM_LOAD( "f7",      0x1e000, 0x1000, CRC(bef67473) SHA1(5759ceeca0bb677cee97b74f1a1087d53c25463a) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "d7.32",   0xf000, 0x1000, CRC(b11028b5) SHA1(db8958f0bb12e333ce056da3338f1a824dda36e0) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "d1.cpu", 0x000, 0x0100, CRC(8db17a40) SHA1(0e04a4f5f99b302dbbbfda438808d549f8680fe2) )
 	ROM_LOAD( "e1.cpu", 0x100, 0x0100, CRC(3c775c5e) SHA1(ac86f45938c0c9d5fec1245bf86718442baf445b) )
 ROM_END

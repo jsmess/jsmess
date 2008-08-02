@@ -2,7 +2,7 @@
 
 <test name="mc10_000" driver="mc10">
 	<wait time="2"/>	
-	<memverify region="RAM" start="0">"MICROCOLOR"</memverify>
+	<memverify region="ram" start="0">"MICROCOLOR"</memverify>
 </test>
 
 </tests>

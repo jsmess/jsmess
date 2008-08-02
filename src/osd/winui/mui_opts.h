@@ -347,8 +347,8 @@ void SetFolderDir(const char* path);
 const char* GetFontDir(void);
 void  SetFontDir(const char* paths);
 
-const char* GetCheatFileName(void);
-void SetCheatFileName(const char* path);
+const char* GetCheatDir(void);
+void SetCheatDir(const char* path);
 
 const char* GetHistoryFileName(void);
 void SetHistoryFileName(const char* path);

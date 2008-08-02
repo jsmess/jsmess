@@ -444,7 +444,7 @@ static int internal_pc_cga_video_start(running_machine *machine, int personality
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
-	cga.chr_gen = memory_region( machine, REGION_GFX1 ) + 0x1000;
+	cga.chr_gen = memory_region( machine, "gfx1" ) + 0x1000;
 
 	state_save_register_item("pccga", 0, cga.mode_control);
 	state_save_register_item("pccga", 0, cga.color_select);
@@ -510,7 +510,7 @@ static VIDEO_START( pc_cga )
 
 static VIDEO_UPDATE( mc6845_cga )
 {
-	UINT8 *gfx = memory_region(screen->machine, REGION_GFX1);
+	UINT8 *gfx = memory_region(screen->machine, "gfx1");
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
@@ -1635,7 +1635,7 @@ static VIDEO_START( pc1512 )
 
 static VIDEO_UPDATE( mc6845_pc1512 )
 {
-	UINT8 *gfx = memory_region(screen->machine, REGION_GFX1);
+	UINT8 *gfx = memory_region(screen->machine, "gfx1");
 	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 

@@ -632,7 +632,7 @@ static MACHINE_START( tmc2000 )
 
 	// RAM banking
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &mess_ram, 0);
 
 	switch (mess_ram_size)
@@ -661,7 +661,7 @@ static MACHINE_START( tmc2000 )
 
 	state->colorram = auto_malloc(0x200);
 
-	memory_configure_bank(2, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
+	memory_configure_bank(2, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
 	memory_configure_bank(2, 1, 1, state->colorram, 0);
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
@@ -697,7 +697,7 @@ static MACHINE_START( oscnano )
 
 	// RAM banking
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &mess_ram, 0);
 }
 
@@ -818,21 +818,21 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( tmc1800 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "|main|", 0 )
 	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
 ROM_END
 
 ROM_START( osc1000b )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "|main|", 0 )
 	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
 
-	ROM_REGION( 0x400, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mmi6349.5d",	0x0000, 0x0200, NO_DUMP ) // equivalent to 82S147
 	ROM_LOAD( "mmi6349.5c",	0x0200, 0x0200, NO_DUMP ) // equivalent to 82S147
 ROM_END
 
 ROM_START( tmc2000 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "default",  "PROM N:o 200" )
 	ROMX_LOAD( "200.m5",    0x8000, 0x0200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(1) ) // typed in from the manual
 	ROM_SYSTEM_BIOS( 1, "prom202",  "PROM N:o 202" )
@@ -842,7 +842,7 @@ ROM_START( tmc2000 )
 ROM_END
 
 ROM_START( oscnano )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "mmi6349.ic", 0x8000, 0x0200, BAD_DUMP CRC(1ec1b432) SHA1(ac41f5e38bcd4b80bd7a5b277a2c600899fd5fb8) ) // equivalent to 82S141
 ROM_END
 

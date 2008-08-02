@@ -280,39 +280,39 @@ INPUT_PORTS_END
 
   Game driver(s)
 
-  The Mac driver uses a convention of placing the BIOS in REGION_USER1
+  The Mac driver uses a convention of placing the BIOS in "user1"
 
 ***************************************************************************/
 
 ROM_START( mac128k )
-	ROM_REGION16_BE(0x20000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x20000, "user1", 0)
 	ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
 ROM_END
 
 ROM_START( mac512k )
-	ROM_REGION16_BE(0x20000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x20000, "user1", 0)
 	ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
 ROM_END
 
 ROM_START( mac512ke )
-	ROM_REGION16_BE(0x20000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x20000, "user1", 0)
 	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
 ROM_END
 
 
 ROM_START( macplus )
-	ROM_REGION16_BE(0x20000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x20000, "user1", 0)
 	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
 ROM_END
 
 
 ROM_START( macse )
-	ROM_REGION16_BE(0x40000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x40000, "user1", 0)
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
 ROM_END
 
 ROM_START( macclasc )
-	ROM_REGION16_BE(0x40000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x40000, "user1", 0)
 	ROM_LOAD16_WORD( "classic.rom",  0x00000, 0x40000, CRC(b14ddcde) SHA1(f710e73e8e0f99d9d0e9e79e71f67a6c3648bf06) )
 ROM_END
 
@@ -410,7 +410,7 @@ ADDRESS_MAP_END
 
 static void mac2_init_machine( void )
 {
-	memset(memory_region(machine, REGION_CPU1), 0, 0x800000);
+	memset(memory_region(machine, "|main|"), 0, 0x800000);
 }
 
 
@@ -460,7 +460,7 @@ static INPUT_PORTS_START( mac2 )
 INPUT_PORTS_END
 
 ROM_START( mac2 )
-	ROM_REGION(0x00900000,REGION_CPU1,0) /* for ram, etc */
+	ROM_REGION(0x00900000,"|main|",0) /* for ram, etc */
 	ROM_LOAD_WIDE( "256k.rom",  0x800000, 0x40000, NO_DUMP)
 ROM_END
 

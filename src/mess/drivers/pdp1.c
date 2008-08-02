@@ -138,7 +138,7 @@ static DRIVER_INIT( pdp1 )
 	};
 
 	/* set up our font */
-	dst = memory_region(machine, REGION_GFX1);
+	dst = memory_region(machine, "gfx1");
 
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 }
@@ -372,7 +372,7 @@ static const UINT8 pdp1_palette[] =
 static UINT8 total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
 
 static GFXDECODE_START( pdp1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, pen_crt_num_levels + sizeof(pdp1_colors) / 3, 3 )
+	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(pdp1_colors) / 3, 3 )
 GFXDECODE_END
 
 /* Initialise the palette */
@@ -498,7 +498,7 @@ MACHINE_DRIVER_END
     pdp1 can address up to 65336 18 bit words when extended (4096 otherwise).
 */
 ROM_START(pdp1)
-	ROM_REGION(pdp1_fontdata_size, REGION_GFX1, ROMREGION_ERASEFF)
+	ROM_REGION(pdp1_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 

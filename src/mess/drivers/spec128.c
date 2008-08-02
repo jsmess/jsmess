@@ -219,7 +219,7 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
-	ChosenROM = memory_region(machine, REGION_CPU1) + 0x010000 + (ROMSelection<<14);
+	ChosenROM = memory_region(machine, "|main|") + 0x010000 + (ROMSelection<<14);
 
 	memory_set_bankptr(1, ChosenROM);
 
@@ -301,7 +301,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(spec128)
-	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_REGION(0x18000,"main",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
 	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(1))
 	ROMX_LOAD("zx128_1.rom",0x14000,0x4000, CRC(b96a36be) SHA1(80080644289ed93d71a1103992a154cc9802b2fa), ROM_BIOS(1))	
@@ -312,7 +312,7 @@ ROM_START(spec128)
 ROM_END
 
 ROM_START(specpls2)
-	ROM_REGION(0x18000,REGION_CPU1,0)
+	ROM_REGION(0x18000,"main",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
 	ROMX_LOAD("zxp2_0.rom",0x10000,0x4000, CRC(5d2e8c66) SHA1(72703f9a3e734f3c23ec34c0727aae4ccbef9a91), ROM_BIOS(1))
 	ROMX_LOAD("zxp2_1.rom",0x14000,0x4000, CRC(98b1320b) SHA1(de8b0d2d0379cfe7c39322a086ca6da68c7f23cb), ROM_BIOS(1))

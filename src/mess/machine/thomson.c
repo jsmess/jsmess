@@ -261,7 +261,7 @@ static UINT8 thom_cart_bank;     /* current bank */
 DEVICE_IMAGE_LOAD( to7_cartridge )
 {
 	int i,j;
-	UINT8* pos = memory_region(image->machine,  REGION_CPU1 ) + 0x10000;
+	UINT8* pos = memory_region(image->machine,  "|" ) + 0x10000;
 	offs_t size = image_length ( image );
 	char name[129];
 
@@ -345,7 +345,7 @@ WRITE8_HANDLER ( to7_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to7_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, REGION_CPU1 ) + 0x10000;
+	UINT8* pos = memory_region( machine, "|" ) + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to7_update_cart_bank(machine);
@@ -1295,7 +1295,7 @@ MACHINE_RESET ( to7 )
 
 MACHINE_START ( to7 )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "to7: machine start called\n" ));
 
@@ -1546,7 +1546,7 @@ MACHINE_RESET( to770 )
 
 MACHINE_START ( to770 )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "to770: machine start called\n" ));
 
@@ -1737,7 +1737,7 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 
 DEVICE_IMAGE_LOAD( mo5_cartridge )
 {
-	UINT8* pos = memory_region(image->machine, REGION_CPU1) + 0x10000;
+	UINT8* pos = memory_region(image->machine, "|") + 0x10000;
 	UINT64 size = image_length ( image );
 	int i,j;
 	char name[129];
@@ -1848,7 +1848,7 @@ WRITE8_HANDLER ( mo5_cartridge_w )
 /* read signal to bffc-bfff generates a bank switch */
 READ8_HANDLER ( mo5_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, REGION_CPU1 ) + 0x10000;
+	UINT8* pos = memory_region( machine, "|" ) + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	mo5_update_cart_bank(machine);
@@ -1907,7 +1907,7 @@ MACHINE_RESET( mo5 )
 
 MACHINE_START ( mo5 )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "mo5: machine start called\n" ));
 
@@ -2221,7 +2221,7 @@ WRITE8_HANDLER ( to9_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to9_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, REGION_CPU1 ) + 0x10000;
+	UINT8* pos = memory_region( machine, "|" ) + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to9_update_cart_bank(machine);
@@ -2874,7 +2874,7 @@ MACHINE_RESET ( to9 )
 
 MACHINE_START ( to9 )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "to9: machine start called\n" ));
 
@@ -3436,7 +3436,7 @@ WRITE8_HANDLER ( to8_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to8_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, REGION_CPU1 ) + 0x10000;
+	UINT8* pos = memory_region( machine, "|" ) + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to8_update_cart_bank(machine);
@@ -3450,7 +3450,7 @@ READ8_HANDLER ( to8_cartridge_r )
 
 static void to8_floppy_init( running_machine *machine )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 	to7_floppy_init( machine, mem + 0x34000 );
 }
 
@@ -3458,7 +3458,7 @@ static void to8_floppy_init( running_machine *machine )
 
 static void to8_floppy_reset( running_machine *machine )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 	to7_floppy_reset(machine);
 	if ( THOM_FLOPPY_INT )
 		thmfc_floppy_reset(machine);
@@ -3845,7 +3845,7 @@ MACHINE_RESET ( to8 )
 
 MACHINE_START ( to8 )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "to8: machine start called\n" ));
 
@@ -4012,7 +4012,7 @@ MACHINE_RESET ( to9p )
 
 MACHINE_START ( to9p )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "to9p: machine start called\n" ));
 
@@ -4203,7 +4203,7 @@ WRITE8_HANDLER ( mo6_cartridge_w )
 /* read signal generates a bank switch */
 READ8_HANDLER ( mo6_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, REGION_CPU1 ) + 0x10000;
+	UINT8* pos = memory_region( machine, "|" ) + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	mo6_update_cart_bank(machine);
@@ -4601,7 +4601,7 @@ MACHINE_RESET ( mo6 )
 
 MACHINE_START ( mo6 )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "mo6: machine start called\n" ));
 
@@ -4875,7 +4875,7 @@ MACHINE_RESET ( mo5nr )
 
 MACHINE_START ( mo5nr )
 {
-	UINT8* mem = memory_region(machine, REGION_CPU1);
+	UINT8* mem = memory_region(machine, "|");
 
 	LOG (( "mo5nr: machine start called\n" ));
 

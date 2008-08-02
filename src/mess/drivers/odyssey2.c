@@ -153,14 +153,13 @@ static const gfx_layout odyssey2_spritelayout =
 };
 
 static GFXDECODE_START( odyssey2 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, odyssey2_graphicslayout, 0, 2 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, odyssey2_spritelayout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_graphicslayout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
 
 static const struct sp0256_interface the_voice_sp0256 = {
 	the_voice_lrq_callback,
-	0,
-	REGION_SOUND1
+	0
 };
 
 static MACHINE_DRIVER_START( odyssey2 )
@@ -257,14 +256,14 @@ static MACHINE_DRIVER_START( g7400 )
 MACHINE_DRIVER_END
 
 ROM_START (odyssey2)
-    ROM_REGION(0x10000,REGION_CPU1,0)    /* safer for the memory handler/bankswitching??? */
+    ROM_REGION(0x10000,"main",0)    /* safer for the memory handler/bankswitching??? */
     ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
-    ROM_REGION(0x100, REGION_GFX1, ROMREGION_ERASEFF)
+    ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 
-    ROM_REGION(0x4000, REGION_USER1, 0)
+    ROM_REGION(0x4000, "user1", 0)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
 
-	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x10000, "soundfixme(1)|custom|sp0256|", 0 )
 	/* SP0256B-019 mask rom */
 	ROM_LOAD( "0256b019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
 	/* External ROM from The Voice */
@@ -274,17 +273,17 @@ ROM_START (odyssey2)
 ROM_END
 
 ROM_START (videopac)
-	ROM_REGION(0x10000,REGION_CPU1,0)    /* safer for the memory handler/bankswitching??? */
+	ROM_REGION(0x10000,"main",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_SYSTEM_BIOS( 0, "g7000", "g7000" )
 	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "c52", "c52" )
 	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(2))
-	ROM_REGION(0x100, REGION_GFX1, ROMREGION_ERASEFF)
+	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x4000, REGION_USER1, 0)
+	ROM_REGION(0x4000, "user1", 0)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
 
-	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x10000, "soundfixme(1)|custom|sp0256|", 0 )
 	/* SP0256B-019 mask rom */
 	ROM_LOAD( "0256b019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
 	/* External ROM from The Voice */
@@ -294,11 +293,11 @@ ROM_START (videopac)
 ROM_END
 
 ROM_START (g7400)
-	ROM_REGION(0x10000,REGION_CPU1,0)    /* safer for the memory handler/bankswitching??? */
+	ROM_REGION(0x10000,"|main|",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_LOAD ("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
-	ROM_REGION(0x100, REGION_GFX1, ROMREGION_ERASEFF)
+	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x4000, REGION_USER1, 0)
+	ROM_REGION(0x4000, "user1", 0)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
 ROM_END
 

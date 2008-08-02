@@ -206,7 +206,6 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_CPU_PROGRAM_MAP(kinstb_map, 0)
 
 	MDRV_CPU_ADD("sound", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
 
 	MDRV_INTERLEAVE(400)
@@ -234,7 +233,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT(kinstb)
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, REGION_USER3);
+	UINT8 *rom = memory_region(machine, "user3");
 
 	for(i=0;i<0x400000;i++)
 	{
@@ -244,16 +243,16 @@ static DRIVER_INIT(kinstb)
 }
 
 ROM_START( kinstb )
-	ROM_REGION( 0x400000, REGION_USER3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "1.u14", 0x000000, 0x100000, CRC(70889919) SHA1(1451714cbdacb7f6ced2bc7afa478ad7264cf3b7) )
 	ROM_LOAD( "2.u15", 0x100000, 0x100000, CRC(e4a5d1da) SHA1(6ae566bd2f740a251d7a81b8ebb92a651cfaac8d) )
 	ROM_LOAD( "3.u16", 0x200000, 0x100000, CRC(7a40f7dd) SHA1(cebe632e8d2d68d0619077cc1e931af73c9a723b) )
 	ROM_LOAD( "4.u17", 0x300000, 0x100000, CRC(3d7564c1) SHA1(392b513991897668d5dd469ac84a34f785895774) )
 
-	ROM_REGION(0x100,           REGION_USER5, 0)
+	ROM_REGION(0x100,           "user5", 0)
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
 
-	ROM_REGION(0x800,           REGION_USER6, ROMREGION_ERASEFF)
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 
 ROM_END
 

@@ -46,13 +46,13 @@ static PALETTE_INIT( electron )
 }
 
 static ADDRESS_MAP_START(electron_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION(REGION_CPU1,  0x00000)	/* 32KB of RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION("|main|",  0x00000)	/* 32KB of RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)								/* Banked ROM pages */
-	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION(REGION_USER1, 0x40000)	/* OS ROM */
+	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("user1", 0x40000)	/* OS ROM */
 	AM_RANGE(0xfc00, 0xfcff) AM_READWRITE( electron_jim_r, electron_jim_w )			/* JIM pages */
 	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE( electron_1mhz_r, electron_1mhz_w )		/* 1MHz bus */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( electron_ula_r, electron_ula_w )			/* Electron ULA */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_USER1, 0x43f00)	/* OS ROM continued */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)	/* OS ROM continued */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( electron )
@@ -145,8 +145,8 @@ INPUT_PORTS_END
 
 /* Electron Rom Load */
 ROM_START(electron)
-	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
-	ROM_REGION( 0x44000, REGION_USER1, 0 ) /* OS Rom */
+	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x44000, "user1", 0 ) /* OS Rom */
 	ROM_LOAD( "os.rom", 0x40000, 0x4000, CRC(bf63fb1f) SHA1(a48b8fa0cfb09140e808ac8a187316c605a0b32e) ) /* Os rom */
 	/* 00000 0 */
         /* 04000 1 */
@@ -159,7 +159,7 @@ ROM_START(electron)
         /* 20000 8 */
         /* 24000 9 */
 	ROM_LOAD( "basic.rom", 0x28000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) ) /* page 10, Basic rom */
-	ROM_COPY( REGION_USER1, 0x28000, 0x2c000, 0x4000 ) /* page 11, Basic rom mirror */
+	ROM_COPY( "user1", 0x28000, 0x2c000, 0x4000 ) /* page 11, Basic rom mirror */
         /* 30000 12 */
         /* 34000 13 */
         /* 38000 14 */

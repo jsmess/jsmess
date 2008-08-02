@@ -35,9 +35,9 @@
 #include "devices/harddriv.h"
 
 static ADDRESS_MAP_START(concept_memmap, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(REGION_CPU1, 0x010000) 	/* boot ROM mirror */
+	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("|main|", 0x010000) 	/* boot ROM mirror */
 	AM_RANGE(0x000008, 0x000fff) AM_RAM										/* static RAM */
-	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION(REGION_CPU1, 0x010000)	/* boot ROM */
+	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("|main|", 0x010000)	/* boot ROM */
 	AM_RANGE(0x020000, 0x021fff) AM_ROM										/* macsbugs ROM (optional) */
 	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)	/* I/O space */
 
@@ -224,7 +224,7 @@ INPUT_PORTS_END
 
 
 ROM_START( concept )
-	ROM_REGION16_BE(0x100000,REGION_CPU1,0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x100000,"main",0)	/* 68k rom and ram */
 
 	// concept boot ROM
 #if 0

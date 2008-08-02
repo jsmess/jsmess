@@ -165,9 +165,9 @@ static void mikrosha_cassette_getinfo(const mess_device_class *devclass, UINT32 
 
 /* ROM definition */
 ROM_START( mikrosha )
-	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
 	ROM_LOAD( "mikrosha.rom", 0xf800, 0x0800, CRC(86A83556))
-	ROM_REGION(0x0800, REGION_GFX1,0)
+	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikrosha.fnt", 0x0000, 0x0800, CRC(B315DA1C))
 ROM_END
 

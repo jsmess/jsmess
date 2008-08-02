@@ -224,9 +224,6 @@ file_error osd_get_full_path(char **dst, const char *path);
 ***************************************************************************/
 
 
-/* returns 1 if input of type IPT_KEYBOARD should be supressed */
-int osd_keyboard_disabled(void);
-
 /* reads text from the clipboard - the returned string needs to be free()-ed! */
 char *osd_get_clipboard_text(void);
 

@@ -666,7 +666,7 @@ static void NESPSG_update_sound(void *param, stream_sample_t **inputs, stream_sa
 
 
 /* INITIALIZE APU SYSTEM */
-static void *nesapu_start(int sndindex, int clock, const void *config)
+static void *nesapu_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct NESinterface *intf = config;
 	struct nesapu_info *info;

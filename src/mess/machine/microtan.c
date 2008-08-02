@@ -709,7 +709,7 @@ static void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
 
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
-    UINT8 *RAM = memory_region(machine, REGION_CPU1);
+    UINT8 *RAM = memory_region(machine, "|");
 
     /* check for .DMP file format */
     if (snapshot_size == 8263)
@@ -859,7 +859,7 @@ QUICKLOAD_LOAD( microtan_hexfile )
 
 DRIVER_INIT( microtan )
 {
-    UINT8 *dst = memory_region(machine, REGION_GFX2);
+    UINT8 *dst = memory_region(machine, "gfx2");
     int i;
 
     for (i = 0; i < 256; i++)

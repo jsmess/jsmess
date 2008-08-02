@@ -563,13 +563,28 @@ static WRITE64_HANDLER( naomi_unknown1_w )
     the BOARDID regs access the password protected eeprom in the game board. the main board eeprom is read through port 0x1F800030
 
     To access the board using DMA, use the DMA_OFFSETL/H. DMA_COUNT is in units of 0x20 bytes. Then trigger a GDROM DMA request.
+
+    Dimm board registers (add more information if you find it):
+
+    NAOMI_DIMM_COMMAND = 5f703c (16 bit):
+        if bits all 1 no dimm board present and other registers not used
+        bit 15: during an interrupt is 1 if the dimm board has a command to be executed
+        bit 14-9: 6 bit command number (naomi bios understands 0 1 3 4 5 6 8 9 a)
+        bit 8-0: higher 9 bits of 25 bit offset parameter
+    NAOMI_DIMM_OFFSETL = 5f7040 (16 bit):
+        bit 15-0: lower 16 bits of 25 bit offset parameter
+    NAOMI_DIMM_PARAMETERL = 5f7044 (16 bit)
+    NAOMI_DIMM_PARAMETERH = 5f7048 (16 bit)
+    NAOMI_DIMM_STATUS = 5f704c (16 bit):
+        bit 0: when read as 1 means something has happened write it to 0 to clear
+        bit 8: written to 1 at the end of the interrupt routine (signals command response available to dimm board ?)
 */
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
 
 static READ64_HANDLER( naomi_rom_board_r )
 {
-	UINT8 *ROM = (UINT8 *)memory_region(machine, REGION_USER1);
+	UINT8 *ROM = (UINT8 *)memory_region(machine, "user1");
 
 	// ROM_DATA
 	if ((offset == 1) && ACCESSING_BITS_0_15)
@@ -581,6 +596,36 @@ static READ64_HANDLER( naomi_rom_board_r )
 		rom_offset += 2;
 
 		return ret;
+	}
+	else if ((offset == 7) && ACCESSING_BITS_32_47)
+	{
+		// 5f703c
+		mame_printf_verbose("ROM: read 5f703c\n");
+		return (UINT64)0xffff << 32;
+	}
+	else if ((offset == 8) && ACCESSING_BITS_0_15)
+	{
+		// 5f7040
+		mame_printf_verbose("ROM: read 5f7040\n");
+		return 0;
+	}
+	else if ((offset == 8) && ACCESSING_BITS_32_47)
+	{
+		// 5f7044
+		mame_printf_verbose("ROM: read 5f7044\n");
+		return 0;
+	}
+	else if ((offset == 9) && ACCESSING_BITS_0_15)
+	{
+		// 5f7048
+		mame_printf_verbose("ROM: read 5f7048\n");
+		return 0;
+	}
+	else if ((offset == 9) && ACCESSING_BITS_32_47)
+	{
+		// 5f704c
+		mame_printf_verbose("ROM: read 5f704c\n");
+		return (UINT64)1 << 32;
 	}
 	else if ((offset == 15) && ACCESSING_BITS_32_47) // boardid read
 	{
@@ -622,7 +667,7 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 	{
 		// ROM_OFFSETL
 		rom_offset &= 0xffff0000;
-		rom_offset |= (data & 0xffff);
+		rom_offset |= ((data >> 32) & 0xffff);
 	}
 	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
@@ -636,6 +681,26 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 	{
 		// NAOMI_DMA_COUNT
 		dma_count = data >> 32;
+	}
+	else if ((offset == 7) && ACCESSING_BITS_32_47)
+	{
+		mame_printf_verbose("ROM: write 5f703c\n");
+	}
+	else if ((offset == 8) && ACCESSING_BITS_0_15)
+	{
+		mame_printf_verbose("ROM: write 5f7040\n");
+	}
+	else if ((offset == 8) && ACCESSING_BITS_32_47)
+	{
+		mame_printf_verbose("ROM: write 5f7044\n");
+	}
+	else if ((offset == 9) && ACCESSING_BITS_0_15)
+	{
+		mame_printf_verbose("ROM: write 5f7048\n");
+	}
+	else if ((offset == 9) && ACCESSING_BITS_32_47)
+	{
+		mame_printf_verbose("ROM: write 5f704c\n");
 	}
 	else
 	{
@@ -701,7 +766,7 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION(REGION_CPU1, 0)
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("main", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( naomi_port, ADDRESS_SPACE_IO, 64 )
@@ -756,7 +821,6 @@ INPUT_PORTS_END
 
 static const struct AICAinterface aica_interface =
 {
-	REGION_CPU1,		// dummy, is fixed up in the reset handler
 	0,
 	aica_irq
 };
@@ -915,7 +979,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 
 /* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
 #define NAOMIGD_BIOS \
-	ROM_REGION( 0x200000, REGION_CPU1, 0) \
+	ROM_REGION( 0x200000, "main", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21578e (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21578d (Export)" ) \
@@ -932,7 +996,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
 	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21576d (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
-	ROM_REGION( 0x200000, REGION_USER2, 0) \
+	ROM_REGION( 0x200000, "user2", 0) \
 	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) ) \
 
 /* NAOMI2 BIOS:
@@ -985,37 +1049,37 @@ Region byte encoding is as follows:
 
 
 ROM_START( naomi )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
 
 ROM_START( naomigd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
 
 ROM_START( hod2bios )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	HOTD2_BIOS
 
-	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
 
 ROM_START( naomi2 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI2_BIOS
 
-	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
 
 ROM_START( awbios )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	AW_BIOS
 
-	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
 
 /* Info above each set is automatically generated from the IC22 rom and may not be accurate */
@@ -1043,13 +1107,13 @@ IC12    64M     BA24    102F
 */
 
 ROM_START( cspike )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr23210.22", 0x00000, 0x400000,  CRC(a15c54b5) SHA1(5c7872244d3d648e4c04751f120d0e9d47239921) )
 
-	ROM_REGION( 0x8000000, REGION_USER2, 0)
+	ROM_REGION( 0x8000000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1090,13 +1154,13 @@ IC13    64M     A12E    8DE4
 */
 
 ROM_START( capsnk )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr23511a.ic22", 0x00000, 0x400000,  CRC(fe00650f) SHA1(ca8e9e9178ed2b6598bdea83be1bf0dd7aa509f9) )
 
-	ROM_REGION( 0x8000000, REGION_USER2, 0)
+	ROM_REGION( 0x8000000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1135,10 +1199,10 @@ Serial: BCHE-01A0803
 */
 
 ROM_START( csmash )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x4800000, REGION_USER1, ROMREGION_ERASE00)
+	ROM_REGION( 0x4800000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD("epr23428a.22", 0x0000000, 0x400000, CRC(d628dbce) SHA1(91ec1296ead572a64c37f8ac2c1a96742f19d50b) )
 	ROM_RELOAD( 0x400000, 0x400000)
 	ROM_LOAD("mpr23420.1", 0x0800000, 0x0800000, CRC(9d5991f2) SHA1(c75871db314b01935d1daaacf1a762e73e5fd411) )
@@ -1152,10 +1216,10 @@ ROM_START( csmash )
 ROM_END
 
 ROM_START( csmasho )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x4800000, REGION_USER1, ROMREGION_ERASE00)
+	ROM_REGION( 0x4800000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD("epr23428.22", 0x0000000, 0x400000, CRC(f8597496) SHA1(2bb9f25b63b7410934ae4b1e052e1308a5c5a57f) )
 	ROM_RELOAD( 0x400000, 0x400000)
 	ROM_LOAD("mpr23420.1", 0x0800000, 0x0800000, CRC(9d5991f2) SHA1(c75871db314b01935d1daaacf1a762e73e5fd411) )
@@ -1197,13 +1261,13 @@ Serial: BAXE-02A1386
 */
 
 ROM_START( derbyoc )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22099b.22", 0x0000000, 0x0400000,  CRC(5e708879) SHA1(fada4f4bf29fc8f77f354167f8db4f904610fe1a) )
 
-	ROM_REGION( 0x8000000, REGION_USER2, 0)
+	ROM_REGION( 0x8000000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1254,13 +1318,13 @@ Serial: BBDE-01A0097
 */
 
 ROM_START( dybb99 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22141b.22", 0x0000000, 0x0200000,  CRC(6d0e0785) SHA1(aa19e7bac4c266771d1e65cffa534a49d7566f51) )
 
-	ROM_REGION( 0x9800000, REGION_USER2, 0)
+	ROM_REGION( 0x9800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1318,13 +1382,13 @@ Serial: BCCG-21A0451
 */
 
 ROM_START( gram2000 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr23377.22", 0x0000000, 0x0400000,  CRC(4ca3149c) SHA1(9d25fc659658b416202b033754669be2f3abcdbe) )
 
-	ROM_REGION( 0xa800000, REGION_USER2, 0)
+	ROM_REGION( 0xa800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1362,13 +1426,13 @@ Serial: BAJE-01A0021
 */
 
 ROM_START( ggram2 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr21820.22", 0x0000000, 0x0200000,  CRC(0a198278) SHA1(0df5fc8b56ddafc66d92cb3923b851a5717b551d) )
 
-	ROM_REGION( 0x0800000, REGION_USER2, 0)
+	ROM_REGION( 0x0800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 ROM_END
 
@@ -1397,13 +1461,13 @@ IC11    64M     4F77    EEFE
 
 
 ROM_START( hmgeo )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr23716a.22", 0x0000000, 0x0400000,  CRC(c5cb0d3b) SHA1(20de8f5ee183e996ccde77b10564a302939662db) )
 
-	ROM_REGION( 0x5800000, REGION_USER2, 0)
+	ROM_REGION( 0x5800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1440,13 +1504,13 @@ IC10    64M     1E43    0F1A
 */
 
 ROM_START( gwing2 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22270.22", 0x0000000, 0x0200000,  CRC(876b3c97) SHA1(eb171d4a0521c3bea42b4aae3607faec63e10581) )
 
-	ROM_REGION( 0x5800000, REGION_USER2, 0)
+	ROM_REGION( 0x5800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1484,10 +1548,10 @@ IC14    32M     81F9    DA1B
 */
 
 ROM_START( suchie3 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x8000000, REGION_USER1, 0)
+	ROM_REGION( 0x8000000, "user1", 0)
 	ROM_LOAD("epr21979.22",   0x0000000, 0x0200000, CRC(335c9e25) SHA1(476790fdd99a8c13336e795b4a39b071ed86a97c) )
 
 	ROM_LOAD("mpr-21980.ic1", 0x0800000, 0x0800000, CRC(2b5f958a) SHA1(609585dda27c5e111378a92f04fa03ae11d42540) )
@@ -1510,10 +1574,10 @@ ROM_END
 /* toy fighter - 1999 sega */
 
 ROM_START( toyfight )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x8000000, REGION_USER1, 0)
+	ROM_REGION( 0x8000000, "user1", 0)
 	ROM_LOAD("epr-22035.ic22",   0x0000000, 0x0400000, CRC(dbc76493) SHA1(a9772bdb62610a39adf2b9f397781bcddda3e635) )
 
 	ROM_LOAD("mpr-22025.ic1", 0x0800000, 0x0800000, CRC(30237202) SHA1(e229a7671b3a34b26a461716bd7b437da100e1c8) )
@@ -1564,13 +1628,13 @@ Serial: BCLE-01A2130
 */
 
 ROM_START( pjustic )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr23548a.22", 0x0000000, 0x0400000,  CRC(f4ccf1ec) SHA1(97485b2a4b9452ffeea2501f42d20d718410e716) )
 
-	ROM_REGION( 0xa800000, REGION_USER2, 0)
+	ROM_REGION( 0xa800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1615,13 +1679,13 @@ IC8 64M C529    0501
 */
 
 ROM_START( pstone )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr21597.22", 0x0000000, 0x0200000,  CRC(62c7acc0) SHA1(bb61641a7f3650757132cde379447bdc9bd91c78) )
 
-	ROM_REGION( 0x4000000, REGION_USER2, 0)
+	ROM_REGION( 0x4000000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1656,13 +1720,13 @@ Serial: BBJE-01A1613
 */
 
 ROM_START( pstone2 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr23127.22", 0x0000000, 0x0400000,  CRC(185761d6) SHA1(8c91b594dd59313d249c9da7b39dee21d3c9082e) )
 
-	ROM_REGION( 0x4800000, REGION_USER2, 0)
+	ROM_REGION( 0x4800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1709,13 +1773,13 @@ Serial (from 2 carts): BAZE-01A0288
 */
 
 ROM_START( otrigger )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22163.22", 0x0000000, 0x0400000, CRC(3bdafb6a) SHA1(c4c5a4ba94d85c4353df22d70bb08be67e9c22c3) )
 
-	ROM_REGION( 0x9800000, REGION_USER2, 0)
+	ROM_REGION( 0x9800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1766,13 +1830,13 @@ IC16    64M     A10B    DDB4
 */
 
 ROM_START( samba )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22966b.ic22", 0x0000000, 0x0400000,  CRC(893116b8) SHA1(35cb4f40690ff21af5ab7cc5adbc53228d6fb0b3) )
 
-	ROM_REGION( 0x8000000, REGION_USER2, 0)
+	ROM_REGION( 0x8000000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1821,13 +1885,13 @@ IC17 64M    6586    1F3F
 */
 
 ROM_START( slasho )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr23341.22", 0x0000000, 0x0400000,  CRC(477fa123) SHA1(d2474766dcd0b0e5fe317a858534829eb1c26789) )
 
-	ROM_REGION( 0x8800000, REGION_USER2, 0)
+	ROM_REGION( 0x8800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1872,13 +1936,13 @@ Serial: BAVE-02A1305
 */
 
 ROM_START( spawn )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22977b.22", 0x0000000, 0x0400000,  CRC(814ff5d1) SHA1(5a0a9e55878927f98750000eb7d9391cbecfe21d) )
 
-	ROM_REGION( 0x5000000, REGION_USER2, 0)
+	ROM_REGION( 0x5000000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1925,13 +1989,13 @@ IC21    64M AD60    2F74
 */
 
 ROM_START( virnba )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22949.22", 0x0000000, 0x0400000,  CRC(fd91447e) SHA1(0759d6517aeb684d0cb809c1ae1350615cc0aecc) )
 
-	ROM_REGION( 0xa800000, REGION_USER2, 0)
+	ROM_REGION( 0xa800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -1983,10 +2047,10 @@ IC15    32M     0DF9    FC01    MPR21928
 */
 
 ROM_START( vs2_2k )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x8000000, REGION_USER1, 0)
+	ROM_REGION( 0x8000000, "user1", 0)
 	ROM_LOAD("epr21929c.22", 0x0000000, 0x0400000, CRC(831af08a) SHA1(af4c74623be823fd061765cede354c6a9722fd10) )
 	ROM_LOAD("mpr21914.u1",  0x0800000, 0x0800000, CRC(f91ef69b) SHA1(4ed23091efad7ddf1878a0bfcdcbba3cf151af84) )
 	ROM_LOAD("mpr21915.u2",  0x1000000, 0x0800000, CRC(40128a67) SHA1(9d191c4ec33465f29bbc09491dde62f354a9ab15) )
@@ -2008,10 +2072,10 @@ ROM_END
 /* Sega Marine Fishing */
 
 ROM_START( smarinef )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x8000000, REGION_USER1, 0)
+	ROM_REGION( 0x8000000, "user1", 0)
 	ROM_LOAD("epr-22221.ic22", 0x0000000, 0x0400000, CRC(9d984375) SHA1(fe1185d70b4bc1529e3579fd6b2b678c7d548400) )
 	ROM_LOAD("mpr-22208.ic1", 0x0800000, 0x0800000, CRC(6a1e418c) SHA1(7092c6a34ac0c2c6fb2b4b78415d08ef473785d9) )
 	ROM_LOAD("mpr-22209.ic2", 0x1000000, 0x0800000, CRC(ecf5be54) SHA1(d7c264da4e232ce6f9b05c9920394f8027fa4a1d) )
@@ -2052,13 +2116,13 @@ IC11    64M F590    D280
 */
 
 ROM_START( vtennis )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22927.22", 0x0000000, 0x0400000,  CRC(89781723) SHA1(cf644aa66abcec6964d77485a0292f11ba80dd0d) )
 
-	ROM_REGION( 0x5800000, REGION_USER2, 0)
+	ROM_REGION( 0x5800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -2104,13 +2168,13 @@ IC19    64M 04B8    49FB
 */
 
 ROM_START( zombrvn )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr21707.22", 0x0000000, 0x0200000,  CRC(4daa11e9) SHA1(2dc219a5e0d0b41cce6d07631baff0495c479e13) )
 
-	ROM_REGION( 0x9800000, REGION_USER2, 0)
+	ROM_REGION( 0x9800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -2166,13 +2230,13 @@ IC21    64M     002C    8ECA
 */
 
 ROM_START( doa2 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr22121.22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) )
 
-	ROM_REGION( 0xa800000, REGION_USER2, 0)
+	ROM_REGION( 0xa800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -2232,13 +2296,13 @@ Serial: BALH-13A0175
 */
 
 ROM_START( doa2m )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("doa2verm.22", 0x0000000, 0x0400000,  CRC(94b16f08) SHA1(225cd3e5dd5f21facf0a1d5e66fa17db8497573d) )
 
-	ROM_REGION( 0xa800000, REGION_USER2, 0)
+	ROM_REGION( 0xa800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -2298,13 +2362,13 @@ Serial: ??? (sticker removed)
 */
 
 ROM_START( dybbnao )
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, "main", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, REGION_USER1, 0)
+	ROM_REGION( 0x400000, "user1", 0)
 	ROM_LOAD("epr21575.22", 0x0000000, 0x0200000, CRC(ba61e248) SHA1(3cce5d8b307038515d7da7ec567bfa2e3aafc274) )
 
-	ROM_REGION( 0xa800000, REGION_USER2, 0)
+	ROM_REGION( 0xa800000, "user2", 0)
 	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
@@ -2330,50 +2394,166 @@ ROM_END
 
 /* GD-ROM titles - a PIC supplies a decryption key
 
-(information based on forum post)
-The PIC supplies an 8 byte key, this gets written to a hardware register.
-DES keys are 56-bit, not 64-bit. Each byte of the key provided by the PIC contains
-a parity byte for verification (8*7 = 56, 8*8 = 64)
+PIC stuff
+
+command             response                   comment
+
+kayjyo!?          ->:\x70\x1f\x71\x1f\0\0\0    (unlock gdrom)
+C1strdf0          ->5BDA.BIN                   (lower part of boot filename string, BDA.BIN in this example)
+D1strdf1          ->6\0\0\0\0\0\0\0            (upper part of filename string)
+bsec_ver          ->8VER0001                   (always the same? )
+atestpic          ->7TEST_OK                   (always the same? )
+AKEYCODE          ->3.......                   (high 7 bytes of des key)
+Bkeycode          ->4.\0\0\0\0\0\0             (low byte of des key, then \0 fill)
+!.......          ->0DIMMID0                   (redefine upper 7 bytes of session key)
+".......          ->1DIMMID1                   (redefine next 7 bytes)
+#..               ->2DIMMID2                   (last 2 bytes)
+
+
+default session key is
+"NAOMIGDROMSYSTEM"
+
+info from Elsemi:
+
+it sends bsec_ver, and if it's ok, then the next commands are the session key changes
+if you want to have the encryption described somewhere so it's not lost. it's simple:
+unsigned char Enc(unsigned char val,unsigned char n)
+{
+    val^=Key[8+n];
+    val+=Key[n];
+
+    return val;
+}
+
+do for each value in the message to send
+that will encrypt the char in the nth position in the packet to send
+time to go to sleep
+
 
 */
+
+// rather crude function to write out a key file
+void naomi_write_keyfile(void)
+{
+	// default key structure
+	UINT8 response[10][8] = {
+	{ ':', 0x70, 0x1f, 0x71, 0x1f, 0x00, 0x00, 0x00 }, // response to kayjyo!?
+	{ '8', 'V',  'E',  'R',  '0',  '0',  '0',  '1'  }, // response to bsec_ver
+	{ '7', 'T',  'E',  'S',  'T',  '_',  'O',  'K'  }, // response to atestpic
+	{ '6', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to D1strdf1 (upper part of filename)
+	{ '5', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to C1strdf0 (lower part of filename)
+	{ '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to Bkeycode (lower byte of DES key)
+	{ '3', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to AKEYCODE (high 7 bytes of DES key)
+	{ '2', 'D',  'I',  'M',  'M',  'I',  'D',  '2'  }, // response to #..      (rewrite low 2 bytes of session key)
+	{ '1', 'D',  'I',  'M',  'M',  'I',  'D',  '1'  }, // response to "....... (rewrite middle 7 bytes of session key)
+	{ '0', 'D',  'I',  'M',  'M',  'I',  'D',  '0'  }, // response to !....... (rewrite upper 7 bytes of session key)
+	};
+
+	int i;
+	char bootname[256];
+	char picname[256];
+
+	// ######### edit this ###########
+	UINT64 key = 0x4FF16D1A9E0BFBCDULL;
+
+	memset(bootname,0x00,14);
+	memset(picname,0x00,256);
+
+	// ######### edit this ###########
+	strcpy(picname,"317-5072-com.data");
+	strcpy(bootname,"BCY.BIN");
+
+	for (i=0;i<14;i++)
+	{
+		if (i<7)
+		{
+			response[4][i+1] = bootname[i];
+		}
+		else
+		{
+			response[3][i-6] = bootname[i];
+		}
+	}
+
+	for (i=0;i<8;i++)
+	{
+		UINT8 keybyte = (key>>(7-i)*8)&0xff;
+
+		if (i<7)
+		{
+			response[6][i+1] = keybyte;
+		}
+		else
+		{
+			response[5][1] = keybyte;
+		}
+	}
+
+
+	{
+		FILE *fp;
+		fp=fopen(picname, "w+b");
+		if (fp)
+		{
+			fwrite(response, 10*8, 1, fp);
+			fclose(fp);
+		}
+	}
+
+
+}
 
 ROM_START( sfz3ugd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xac00000, REGION_USER1, ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_REGION( 0xac00000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
 	ROM_LOAD_OPTIONAL("zero3rom.bin", 0x0000000, 0xac00000, CRC(4eabda58) SHA1(e70db0e93c821838c77510fd47c91f0c4cfb09c9) )
 
 	/* GD-ROM dump, this will be replaced once an appropriate CHD format has been decided upon for the GD images*/
-	ROM_REGION( 0x3d8ab000, REGION_USER3, ROMREGION_ERASE)
+	ROM_REGION( 0x3d8ab000, "user3", ROMREGION_ERASE)
 	ROM_LOAD("track.txt",  0x0000000, 0x000000ad, CRC(bf017e1d) SHA1(0345310b6982f818a07dec8739efe1709281f1e6) )
 	ROM_LOAD("track01.iso",0x0000000, 0x000e1000, CRC(8af2e370) SHA1(0f359d423f72055e6a5c81e7075df1ffd3ccfa5c) )
 	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(c5628df6) SHA1(0d1a24e6271c3b0ef92c55ec9d63e2326892f1d8) )
 	ROM_LOAD("track03.iso",0x0000000, 0x3d8ab000, CRC(195f0d93) SHA1(183412704bd90750355e7af019b78541328fe633) )
 
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	ROM_LOAD("317-5072-com.data", 0x00, 0x50, CRC(6d2992b9) SHA1(88e6dc6711f9f883362ba1217a3350d452a70896) )
 ROM_END
 
 extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
 
 DRIVER_INIT( cvs2gd )
 {
-	// move key to game.key file?
-	naomi_game_decrypt( 0x2f3226165b9e407cULL, memory_region(machine,REGION_USER1), memory_region_length(machine,REGION_USER1));
+	// get from key file instead
+	naomi_game_decrypt( 0x2f3226165b9e407cULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
 }
+
+DRIVER_INIT( sfz3ugd )
+{
+	// get from key file instead
+	naomi_game_decrypt( 0x4FF16D1A9E0BFBCDULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+//  naomi_write_keyfile();
+}
+
 
 
 ROM_START( cvs2gd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x9800000, REGION_USER1, ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_REGION( 0x9800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
 	ROM_LOAD("snkgd_sl.bin", 0x0000000, 0x9800000,  CRC(f153421d) SHA1(0c2b935ae3cfb6c85410a209fec4eab497066d84) )
 
 	/* GD-ROM dump, this will be replaced once an appropriate CHD format has been decided upon for the GD images*/
-	ROM_REGION( 0x26ad4620, REGION_USER3, ROMREGION_ERASE)
+	ROM_REGION( 0x26ad4620, "user3", ROMREGION_ERASE)
 	ROM_LOAD("capcom_vs_snk2.txt",  0x0000000, 0x00000141, CRC(0db478be) SHA1(a18f87b76139e4a845ecc1456b6195574110e30c) )
 	ROM_LOAD("track01.bin",0x0000000, 0x00ac440,  CRC(d48bd072) SHA1(2fc840586c655dee2686ee3b520c7760bd3b8dcb) )
 	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(3b3a2e7b) SHA1(fd8e5cac5bd387229f4ffbe05d1bf2fabf7ea3f9) )
 	ROM_LOAD("track03.bin",0x0000000, 0x26ad4620, CRC(670d2182) SHA1(a99ceb7bb74e4a0fe6ae80b33cd2963465ae9d14) )
 	ROM_CONTINUE(0x0000000, 0x20000000)
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	ROM_LOAD("317-5078-com.data", 0x00, 0x50, CRC(1c8d94ee) SHA1(bec4a6901f62dc8f76f7b9d72284b3eaac340bf3) )
 ROM_END
 
 
@@ -2435,7 +2615,7 @@ GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            
 
 /* No GD-Rom Sets Supported */
 GAME( 2001, naomigd,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    0, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    sfz3ugd, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, cvs2gd,    naomigd,  naomi,    naomi,    cvs2gd, ROT0, "Capcom",          "Capcom Vs. SNK 2", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 

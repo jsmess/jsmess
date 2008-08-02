@@ -806,42 +806,42 @@ MACHINE_DRIVER_END
 
 
 ROM_START(a400)
-	ROM_REGION(0x14000,REGION_CPU1,0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari400.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a400pal)
-	ROM_REGION(0x14000,REGION_CPU1,0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari400.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a800)
-	ROM_REGION(0x14000,REGION_CPU1,0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari800.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a800pal)
-	ROM_REGION(0x14000,REGION_CPU1,0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari800.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a800xl)
-	ROM_REGION(0x18000,REGION_CPU1,0) /* 64K for the CPU + 16K + 2 * 8K for cartridges */
+	ROM_REGION(0x18000,"main",0) /* 64K for the CPU + 16K + 2 * 8K for cartridges */
 	ROM_LOAD("basic.rom",   0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0))
 	ROM_LOAD("atarixl.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
 ROM_END
 
 ROM_START(a5200)
-	ROM_REGION(0x14000,REGION_CPU1,0) /* 64K for the CPU + 16K for cartridges */
+	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 16K for cartridges */
 	ROM_LOAD("5200.rom", 0xf800, 0x0800, CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530))
 ROM_END
 
 ROM_START(a5200a)
-	ROM_REGION(0x14000,REGION_CPU1,0) /* 64K for the CPU + 16K for cartridges */
+	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 16K for cartridges */
 	ROM_LOAD("5200a.rom", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5))
 ROM_END
 

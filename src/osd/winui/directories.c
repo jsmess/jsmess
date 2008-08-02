@@ -201,7 +201,7 @@ static TCHAR * FixSlash(TCHAR *s)
 	if (s)
 		len = _tcslen(s);
 
-	if (len && s[len - 1] == '\\')
+	if (len>3 && s[len - 1] == '\\')
 		s[len - 1] = '\0';
 
 	return s;

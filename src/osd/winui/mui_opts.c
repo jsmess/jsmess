@@ -1488,14 +1488,14 @@ void SetFolderDir(const char* path)
 	options_set_string(settings, MUIOPTION_FOLDER_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
-const char* GetCheatFileName(void)
+const char* GetCheatDir(void)
 {
-	return options_get_string(global, OPTION_CHEAT_FILE);
+	return options_get_string(global, OPTION_CHEATPATH);
 }
 
-void SetCheatFileName(const char* path)
+void SetCheatDir(const char* path)
 {
-	options_set_string(global, OPTION_CHEAT_FILE, path, OPTION_PRIORITY_CMDLINE);
+	options_set_string(global, OPTION_CHEATPATH, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetHistoryFileName(void)

@@ -265,7 +265,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( gat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_WRITE(gat_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
 	AM_RANGE(0xa000, 0xa000) AM_NOP	/* unknown writes */
 	AM_RANGE(0xe000, 0xe000) AM_NOP /* watchdog? */
@@ -391,7 +391,7 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( gat )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -436,21 +436,21 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( poker41 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "poker.u00",		0x0000, 0x2000, CRC(8361fccd) SHA1(4faae6bb3104c1f4a0939d613966085d7e34c1df))
 	ROM_LOAD( "poker-4-1.u08",	0x2000, 0x1000, CRC(61e71f31) SHA1(b8d162a47752cff7412b3920ec9dd7a469e81e62) )
 
-	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "black.u33",		0x0000, 0x1000, CRC(3f8a2d59) SHA1(d61dce33aa8637105905830e2f37c1052c441194) )
 	ROM_LOAD( "poker-g.u32",	0x1000, 0x1000, CRC(3e7772b2) SHA1(c7499ff148e5a9cbf0958820c41ea09a843ab355) )
 	ROM_LOAD( "poker-r.u31",	0x2000, 0x1000, CRC(18d090ec) SHA1(3504f18b3984d16545dbe61a03fbf6b8e2027150) )
 ROM_END
 
 ROM_START( pulltabs )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "pull-tabs-1-90.u00",	0x0000, 0x2000, CRC(7cfd490d) SHA1(8eb360f8f4806a4281dae12236d30aa86d00993d) )
 
-	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pt-3b-v.u33",	0x0000, 0x1000, CRC(3505cec1) SHA1(98ab0383c4be382aea81ab93433f2f29a075f65d) )
 	ROM_LOAD( "pt-2g-v.u32",	0x1000, 0x1000, CRC(4a3f4f36) SHA1(3dc29f78b7df1a433d0b39bfeaa227615e70ceed) )
 	ROM_LOAD( "pt-1r-v.u31",	0x2000, 0x1000, CRC(6d1b80f4) SHA1(f2da4b4ae1eb05f9ea02e7495ee8110698cc5d1b) )

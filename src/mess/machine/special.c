@@ -29,7 +29,7 @@ static int specialist_8255_portc;
 DRIVER_INIT(special)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);	
+	UINT8 *RAM = memory_region(machine, "|");	
 	memset(RAM,0x0000,0x3000); // make frist page empty by default
 	memory_configure_bank(1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(1, 0, 2, RAM, 0xc000);	
@@ -184,8 +184,8 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_UNMAP);
 				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
 			
-				memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000);
-				memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0x19000);
+				memory_set_bankptr(1, memory_region(machine, "|") + 0x10000);
+				memory_set_bankptr(2, memory_region(machine, "|") + 0x19000);
 			  if (data & 0x80) {
 					memory_set_bankptr(3, mess_ram + 0x1c000);					
 				} else {
@@ -332,7 +332,7 @@ static void erik_set_bank(running_machine *machine) {
 	UINT8 bank2 = ((RR_register >> 2) & 3);
 	UINT8 bank3 = ((RR_register >> 4) & 3);
 	UINT8 bank4 = ((RR_register >> 6) & 3);
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(machine, "|");
 
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK2);

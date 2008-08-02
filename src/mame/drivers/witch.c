@@ -27,7 +27,7 @@ GFX
 
     In (assumed) order of priority :
         - Top layer @0xc000-0xc3ff(vram) + 0xc400-0xc7ff(cram) apparently not scrollable (gfx0)
-            Uses tiles from REGION_GFX2
+            Uses tiles from "gfx2"
 
             tileno =    vram | ((cram & 0xe0) << 3)
             color  =    cram & 0x0f
@@ -36,7 +36,7 @@ GFX
         - Sprites @0xd000-0xd7ff + 0xd800-0xdfff
                 One sprite every 0x20 bytes
                 0x40 sprites
-                Tiles are from REGION_GFX2
+                Tiles are from "gfx2"
                 Seems to be only 16x16 sprites (2x2 tiles)
                 xflip and yflip available
 
@@ -46,11 +46,11 @@ GFX
                 flags+colors    = sprite_ram[i*0x20+3];
 
         - Background layer @0xc800-0xcbff(vram) + 0xcc00-0xcfff(cram) (gfx1)
-                Uses tiles from REGION_GFX1
+                Uses tiles from "gfx1"
                     tileno = vram | ((cram & 0xf0) << 4),
                     color  = cram & 0x0f
 
-                The background is scrolled via 2 registers accessed through one of the ym2203,PORT A&B
+                The background is scrolled via 2 registers accessed through one of the ym2203, port A&B
                 The scrolling is set by CPU2 in its interrupt handler.
                 CPU1 doesn't seem to offset vram accesses for the scrolling, so it's assumed to be done
                 in hardware.
@@ -80,13 +80,13 @@ Sound
 
     Mapped @0x8010-0x8016
     Had to patch es8712.c to start playing on 0x8016 write and to prevent continuous looping.
-    There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind ofPORT.
+    There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind of port.
     For now reading at 8010 always reports ready.
 
 
 Ports
 
-    0xA000-0xA00f : VariousPORTs yet to figure out...
+    0xA000-0xA00f : Various ports yet to figure out...
 
       - 0xA000 : unknown ; seems muxed with a002
       - 0xA002 : banking?
@@ -94,7 +94,7 @@ Ports
                  mapped 0x0800-0x7fff?
                  0x0000-0x07ff ignored?
                  see code @ 61d
-                 lower bits seems to muxPORT A000 reads
+                 lower bits seems to mux port A000 reads
       - 0xA003 : ?
       - 0xA004 : dipswitches
       - 0xA005 : dipswitches
@@ -122,7 +122,7 @@ Memory
         we may suppose that this memory range (0xf000-0xf0ff) is shared too.
 
         Moreover, range 0xf100-0xf17f is checked after reset without prior initialization and
-        is being reset ONLY by changing a particularPORT bit whose modification ends up with
+        is being reset ONLY by changing a particular port bit whose modification ends up with
         a soft reboot. This looks like a good candidate for an NVRAM segment.
         Whether CPU2 can access the NVRAM or not is still a mystery considering that it never
         attempts to do so.
@@ -133,7 +133,7 @@ Memory
   CPU1:
       The ROM segment (0x0000-0x7fff) is banked, but the 0x0000-0x07ff region does not look
       like being affected (the SEGA Master System did something similar IIRC). A particular
-      bank is selected by changing the two most significant bits ofPORT 0xa002 (swapped?).
+      bank is selected by changing the two most significant bits of port 0xa002 (swapped?).
 
   CPU2:
             No banking
@@ -153,12 +153,12 @@ Interesting memory locations
                              d    = DOUBLE UP | ON ; OFF
                              cccc = COIN IN1 | 1-1 ; 1-2 ; 1-3 ; 1-4 ; 1-5 ; 1-6 ; 1-7 ; 1-8 ; 1-9 ; 1-10 ; 1-15 ; 1-20 ; 1-25 ; 1-30 ; 1-40 ; 1-50
 
-            *f182   : sttpcccc /PORTA
+            *f182   : sttpcccc / portA
                              cccc = COIN IN2 | 1-1 ; 1-2 ; 1-3 ; 1-4 ; 1-5 ; 1-6 ; 1-7 ; 1-8 ; 1-9 ; 1-10 ; 2-1 ; 3-1 ; 4-1 ; 5-1 ; 6-1 ; 10-1
                              p    = PAYOUT SWITCH | ON ; OFF
                              tt   = TIME | 40 ; 45 ; 50 ; 55
                              s    = DEMO SOUND | ON ; OFF
-            *f183 : xxxxhllb /PORTB
+            *f183 : xxxxhllb / portB
                              b    = AUTO BET | ON ; OFF
                              ll   = GAME LIMIT | 500 ; 1000 ; 5000 ; 990000
                              h    = HOPPER ACTIVE | LOW ; HIGH
@@ -175,7 +175,7 @@ Interesting memory locations
         +f192-f194 : credits (bcd)
 
         +fd00 = cpu2 ready
-        +f211 = inputPORT cache?
+        +f211 = input port cache?
 
     CPU2 Commands :
         -0xfd01 start music
@@ -186,7 +186,7 @@ Interesting memory locations
 
 
 TODO :
-    - Figure out thePORTs for the "PayOut" stuff (a006/a00c?)
+    - Figure out the ports for the "PayOut" stuff (a006/a00c?)
 */
 
 #include "driver.h"
@@ -353,7 +353,7 @@ static WRITE8_HANDLER(write_a00x)
 
 			if(newbank != bank)
 			{
-				UINT8 *ROM = memory_region(machine, REGION_CPU1);
+				UINT8 *ROM = memory_region(machine, "main");
 				bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
 				memory_set_bankptr(1,ROM);
@@ -392,7 +392,7 @@ static READ8_HANDLER(prot_read_700x)
   	case 0x25e:
 		return offset;//enough to pass...
    }
-  return memory_region(machine, REGION_CPU2)[0x7000+offset];
+  return memory_region(machine, "sub")[0x7000+offset];
 }
 
 /*
@@ -662,12 +662,6 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x00, DEF_STR(High) )
 INPUT_PORTS_END
 
-static const struct ES8712interface es8712_interface =
-{
-	REGION_SOUND1
-};
-
-
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
@@ -680,8 +674,8 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( witch )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static VIDEO_START(witch)
@@ -803,7 +797,6 @@ static MACHINE_DRIVER_START( witch )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("es", ES8712, 8000)
-	MDRV_SOUND_CONFIG(es8712_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
@@ -818,45 +811,45 @@ MACHINE_DRIVER_END
 
 /* this set has (c)1992 Sega / Vic Tokai in the roms? */
 ROM_START( witch )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788)  )
-	ROM_COPY( REGION_CPU1 , 0x10000, 0x0000, 0x8000 )
+	ROM_COPY( "main" , 0x10000, 0x0000, 0x8000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "rom.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
 
-	ROM_REGION( 0x20000, REGION_GFX1, 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "rom.u3", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada)  )
 
-	ROM_REGION( 0x40000, REGION_GFX2, 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "rom.a1", 0x00000, 0x40000,  CRC(512300a5) SHA1(1e9ba58d1ddbfb8276c68f6d5c3591e6b77abf21)  )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, "es", 0 )
 	ROM_LOAD( "rom.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
 ROM_END
 
 /* no sega logo? a bootleg? */
 ROM_START( pbchmp95 )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433)  )
-	ROM_COPY( REGION_CPU1 , 0x10000, 0x0000, 0x8000 )
+	ROM_COPY( "main" , 0x10000, 0x0000, 0x8000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
 
-	ROM_REGION( 0x20000, REGION_GFX1, 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "2.bin", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada)  )
 
-	ROM_REGION( 0x40000, REGION_GFX2, 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x40000,  CRC(f6cf7ed6) SHA1(327580a17eb2740fad974a01d97dad0a4bef9881)  )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, "es", 0 )
 	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
 ROM_END
 
 static DRIVER_INIT(witch)
 {
- 	UINT8 *ROM = (UINT8 *)memory_region(machine, REGION_CPU1);
+ 	UINT8 *ROM = (UINT8 *)memory_region(machine, "main");
 	memory_set_bankptr(1,&ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7000, 0x700f, 0, 0, prot_read_700x);

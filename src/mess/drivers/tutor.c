@@ -104,8 +104,8 @@ static DRIVER_INIT(tutor)
 {
 	tape_interrupt_timer = timer_alloc(tape_interrupt_handler, NULL);
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + basic_base, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_CPU1) + cartridge_base, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + basic_base, 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "|main|") + cartridge_base, 0);
 	memory_set_bank(1, 0);
 }
 
@@ -178,13 +178,13 @@ static READ8_HANDLER(read_keyboard)
 
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
-	image_fread(image, memory_region(image->machine, REGION_CPU1) + cartridge_base, 0x6000);
+	image_fread(image, memory_region(image->machine, "|main|") + cartridge_base, 0x6000);
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
-	memset(memory_region(image->machine, REGION_CPU1) + cartridge_base, 0, 0x6000);
+	memset(memory_region(image->machine, "|main|") + cartridge_base, 0, 0x6000);
 }
 
 /*
@@ -569,7 +569,7 @@ INPUT_PORTS_END
 static const struct tms9995reset_param tutor_processor_config =
 {
 #if 0
-	REGION_CPU1,/* region for processor RAM */
+	"|main|",/* region for processor RAM */
 	0xf000,     /* offset : this area is unused in our region, and matches the processor address */
 	0xf0fc,		/* offset for the LOAD vector */
 	1,          /* use fast IDLE */
@@ -611,7 +611,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(tutor)
 	/*CPU memory space*/
-	ROM_REGION(0x14000,REGION_CPU1,0)
+	ROM_REGION(0x14000,"main",0)
 	ROM_LOAD("tutor1.bin", 0x0000, 0x8000, CRC(702c38ba) SHA1(ce60607c3038895e31915d41bb5cf71cb8522d7a))      /* system ROM */
 	ROM_LOAD("tutor2.bin", 0x8000, 0x4000, CRC(05f228f5) SHA1(46a14a45f6f9e2c30663a2b87ce60c42768a78d0))      /* BASIC ROM */
 ROM_END

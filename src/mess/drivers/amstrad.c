@@ -470,7 +470,7 @@ void amstrad_setLowerRom(running_machine *machine)
 	if(amstrad_system_type == SYSTEM_CPC)
 	{
 		if ((amstrad_GateArray_ModeAndRomConfiguration & (1<<2)) == 0) {
-			BankBase = &memory_region(machine, REGION_CPU1)[0x010000];
+			BankBase = &memory_region(machine, "|main|")[0x010000];
 		} else 
 		{
 			if(aleste_mode & 0x04)
@@ -506,7 +506,7 @@ void amstrad_setLowerRom(running_machine *machine)
 		if(amstrad_plus_lower_enabled == 1)
 		{  // ASIC secondary lower ROM selection (bit 5: 1 = enabled)
 //          logerror("L-ROM: Lower ROM enabled, cart bank %i\n",amstrad_plus_lower);
-			BankBase = &memory_region(machine, REGION_CPU1)[0x4000 * amstrad_plus_lower];
+			BankBase = &memory_region(machine, "|main|")[0x4000 * amstrad_plus_lower];
 			if(BankBase != NULL)
 			{
 				switch(amstrad_plus_lower_addr)
@@ -1655,7 +1655,7 @@ static void multiface_rethink_memory(running_machine *machine)
 	if (!multiface_hardware_enabled(machine))
 		return;
 
-	multiface_rom = &memory_region(machine, REGION_CPU1)[0x01C000];
+	multiface_rom = &memory_region(machine, "|main|")[0x01C000];
 
 	if (
 		((multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0) &&
@@ -2075,7 +2075,7 @@ The Gate-Array fetches two bytes for each address*/
 static MACHINE_RESET( amstrad )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, "|main|");
 
 	amstrad_system_type = SYSTEM_CPC;
 
@@ -2096,7 +2096,7 @@ static MACHINE_RESET( amstrad )
 static MACHINE_RESET( plus )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, "|main|");
 
 	amstrad_system_type = SYSTEM_PLUS;
 
@@ -2140,13 +2140,13 @@ static MACHINE_RESET( plus )
 
 static MACHINE_START( plus )
 {
-	amstrad_plus_asic_ram = memory_region(machine, REGION_USER1);  // 16kB RAM for ASIC, memory-mapped registers.
+	amstrad_plus_asic_ram = memory_region(machine, "user1");  // 16kB RAM for ASIC, memory-mapped registers.
 }
 
 static MACHINE_RESET( gx4000 )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, "|main|");
 
 	amstrad_system_type = SYSTEM_GX4000;
 
@@ -2191,7 +2191,7 @@ static MACHINE_RESET( gx4000 )
 static MACHINE_RESET( kccomp )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, "|main|");
 
 	amstrad_system_type = SYSTEM_CPC;
 
@@ -2220,7 +2220,7 @@ static DRIVER_INIT( aleste )
 static MACHINE_RESET( aleste )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, "|main|");
 
 	amstrad_system_type = SYSTEM_CPC;
 
@@ -2876,7 +2876,7 @@ static const gfx_layout asic_sprite_layout =
 };
 
 static GFXDECODE_START( asic_sprite )
-	GFXDECODE_ENTRY( REGION_USER1, 0, asic_sprite_layout, 32, 1 )
+	GFXDECODE_ENTRY( "user1", 0, asic_sprite_layout, 32, 1 )
 GFXDECODE_END
 
 
@@ -3022,7 +3022,7 @@ MACHINE_DRIVER_END
 are banked. */
 ROM_START( cpc6128 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
-	ROM_REGION(0x020000, REGION_CPU1, 0)
+	ROM_REGION(0x020000, "main", 0)
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128.rom", 0x10000, 0x8000, CRC(9e827fe1) SHA1(5977adbad3f7c1e0e082cd02fe76a700d9860c30))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
@@ -3034,7 +3034,7 @@ ROM_END
 
 ROM_START( cpc6128f )
 	/* this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k*/
-	ROM_REGION(0x020000, REGION_CPU1, 0)
+	ROM_REGION(0x020000, "main", 0)
 
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128f.rom", 0x10000, 0x8000, CRC(1574923b) SHA1(200d59076dfef36db061d6d7d21d80021cab1237))
@@ -3047,7 +3047,7 @@ ROM_END
 
 ROM_START( cpc464 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
-	ROM_REGION(0x01c000, REGION_CPU1, 0)
+	ROM_REGION(0x01c000, "main", 0)
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc464.rom",  0x10000, 0x8000, CRC(40852f25) SHA1(56d39c463da60968d93e58b4ba0e675829412a20))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
@@ -3056,7 +3056,7 @@ ROM_END
 
 ROM_START( cpc664 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
-	ROM_REGION(0x01c000, REGION_CPU1, 0)
+	ROM_REGION(0x01c000, "main", 0)
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc664.rom",  0x10000, 0x8000, CRC(9AB5A036) SHA1(073a7665527b5bd8a148747a3947dbd3328682c8))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
@@ -3064,22 +3064,22 @@ ROM_END
 
 
 ROM_START( kccomp )
-	ROM_REGION(0x018000, REGION_CPU1, 0)
+	ROM_REGION(0x018000, "main", 0)
 	ROM_LOAD("kccos.rom",  0x10000, 0x4000, CRC(7f9ab3f7) SHA1(f828045e98e767f737fd93df0af03917f936ad08))
 	ROM_LOAD("kccbas.rom", 0x14000, 0x4000, CRC(ca6af63d) SHA1(d7d03755099d0aff501fa5fffc9c0b14c0825448))
 
-	ROM_REGION(0x018000+0x0800, REGION_PROMS, 0)
+	ROM_REGION(0x018000+0x0800, "proms", 0)
 	ROM_LOAD("farben.rom", 0x18000, 0x0800, CRC(a50fa3cf) SHA1(2f229ac9f62d56973139dad9992c208421bc0f51))
 
 	/* fake region - required by graphics decode structure */
-	/*ROM_REGION(0x0c00, REGION_GFX1) */
+	/*ROM_REGION(0x0c00, "gfx1") */
 ROM_END
 
 
 /* this system must have a cartridge installed to run */
 ROM_START(cpc6128p)
-	ROM_REGION(0x80000, REGION_CPU1, ROMREGION_ERASEFF)
-	ROM_REGION(0x04000, REGION_USER1, ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "main", ROMREGION_ERASEFF)
+	ROM_REGION(0x04000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
 
@@ -3088,22 +3088,22 @@ ROM_END
 
 
 ROM_START( al520ex )
-	ROM_REGION(0x80000, REGION_CPU1, 0)
+	ROM_REGION(0x80000, "main", 0)
 	ROM_LOAD("al512.bin", 0x10000, 0x10000, CRC(e8c2a9a1) SHA1(ad5827582cb19eaaae1b76e67df62d96da6ad96b))
 
-	ROM_REGION(0x20, REGION_USER2, 0)
+	ROM_REGION(0x20, "user2", 0)
 	ROM_LOAD("af.bin", 0x00, 0x20, CRC(c81fb524) SHA1(17738d0603915a67ec1fddc4cbf7d6b98cdeb8f6))
 
-	ROM_REGION(0x100, REGION_USER3, 0)  // RAM bank mappings
+	ROM_REGION(0x100, "user3", 0)  // RAM bank mappings
 	ROM_LOAD("mapper.bin", 0x00, 0x100, CRC(0daebd80) SHA1(8633073cba752c38c5dc912ff9f6a3c89357539b))
 
-	ROM_REGION(0x800, REGION_USER4, 0)  // Colour data
+	ROM_REGION(0x800, "user4", 0)  // Colour data
 	ROM_LOAD("rfcoldat.bin", 0x00, 0x800, CRC(c6ace0e6) SHA1(2f4c51fcfaacb8deed68f6ae9388b870bc962cef))
 
-	ROM_REGION(0x800, REGION_USER5, 0)  // Keyboard / Video
+	ROM_REGION(0x800, "user5", 0)  // Keyboard / Video
 	ROM_LOAD("rfvdkey.bin", 0x00, 0x800, CRC(cf2aa4b0) SHA1(20f37da3bc3c377b1c47ae4d9ab8d150faae19a0))
 
-	ROM_REGION(0x100, REGION_USER6, 0)
+	ROM_REGION(0x100, "user6", 0)
 	ROM_LOAD("romram.bin", 0x00, 0x100, CRC(b3ea95d7) SHA1(1252390737a7ead4ecec988c873181798fbc291b))
 ROM_END
 

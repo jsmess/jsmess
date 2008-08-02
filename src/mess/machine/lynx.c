@@ -716,7 +716,7 @@ static void lynx_multiply(void)
 		break;
 	case 0xb1: data=input_port_read(machine, "PAUSE");break;
 	case 0xb2:
-		data=*(memory_region(machine, REGION_USER1)+(suzy.high*lynx_granularity)+suzy.low);
+		data=*(memory_region(machine, "user1")+(suzy.high*lynx_granularity)+suzy.low);
 		suzy.low=(suzy.low+1)&(lynx_granularity-1);
 		break;
 	default:
@@ -1216,9 +1216,9 @@ MACHINE_START( lynx )
 	state_save_register_global_pointer(lynx_mem_fe00, lynx_mem_fe00_size);
 	state_save_register_postload(machine, lynx_postload, NULL);
 
-	memory_configure_bank(3, 0, 1, memory_region(machine, REGION_CPU1) + 0x0000, 0);
+	memory_configure_bank(3, 0, 1, memory_region(machine, "|") + 0x0000, 0);
 	memory_configure_bank(3, 1, 1, lynx_mem_fe00, 0);
-	memory_configure_bank(4, 0, 1, memory_region(machine, REGION_CPU1) + 0x01fa, 0);
+	memory_configure_bank(4, 0, 1, memory_region(machine, "|") + 0x01fa, 0);
 	memory_configure_bank(4, 1, 1, lynx_mem_fffa, 0);
 
 	memset(&suzy, 0, sizeof(suzy));

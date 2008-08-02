@@ -67,9 +67,9 @@ static const gfx_layout saa5050_lolayout =
 };
 
 static GFXDECODE_START( saa5050 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_charlayout, 0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_hilayout, 0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_lolayout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, saa5050_charlayout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, saa5050_hilayout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, saa5050_lolayout, 0, 64 )
 GFXDECODE_END
 
 static const UINT8 saa5050_colors[8 * 3] =

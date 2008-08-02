@@ -330,7 +330,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		}
 
 		/* initialize the video ROM portion, if available */
-		if ( ( intf->vrom_region[i] != REGION_INVALID ) && ( memory_region( machine, intf->vrom_region[i] ) != 0 ) )
+		if ( ( intf->vrom_region[i] != NULL ) && ( memory_region( machine, intf->vrom_region[i] ) != 0 ) )
 		{
 			/* mark that we have a videorom */
 			chips[i].has_videorom = 1;

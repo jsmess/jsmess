@@ -2805,6 +2805,7 @@ V-V                           TP-027
 	DRIVER( beastrzb )	/* Beastorizer (USA Bootleg) */
 	DRIVER( bldyror2 )	/* Bloody Roar 2 (JAPAN) */
 	DRIVER( brvblade )	/* Brave Blade (JAPAN) */
+	DRIVER( bam2 )		/* Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00) */
 
 	/* Atari PSX */
 	DRIVER( atpsx )
@@ -6867,6 +6868,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vivdolls )	/* (c) 1998 Visco */
 	DRIVER( srmvs )		/* (c) 1999 Seta */
 	DRIVER( twrshaft )	/* (c) 2003 Aruze */
+	DRIVER( hipai )
+	DRIVER( doncdoon )
+	DRIVER( kurufev )
+	DRIVER( mayjin3 )
 
 	/* Atlus games */
 	DRIVER( powerins )	/* (c) 1993 Atlus (Japan) */
@@ -7394,8 +7399,9 @@ Other Sun games
 	DRIVER( kinst13 )	/* (c) 1994 Rare */
 	DRIVER( kinstp )	/* (c) 1994 Rare */
 	DRIVER( kinst2 )	/* (c) 1995 Rare */
-	DRIVER( kinst2k )	/* (c) 1995 Rare */
+	DRIVER( kinst2k4 )	/* (c) 1995 Rare */
 	DRIVER( kinst213 )	/* (c) 1995 Rare */
+	DRIVER( kinst2k3 )	/* (c) 1995 Rare */
 	DRIVER( kinst211 )	/* (c) 1995 Rare */
 	DRIVER( kinst210 )	/* (c) 1995 Rare */
 
@@ -7939,6 +7945,7 @@ Other Sun games
 	DRIVER( elephfmb )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10 )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10b )	/* (c) 1996 C.M.C. */
+	DRIVER( pool10c )	/* (c) 1996 C.M.C. */
 	DRIVER( tortufam )	/* (c) 1997 C.M.C. */
 	DRIVER( potgame )	/* (c) 1996 C.M.C. */
 	DRIVER( royalcrd )	/* (c) 1991 TAB-Austria */
@@ -8003,6 +8010,7 @@ Other Sun games
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic102 )	/* (c) 1997 ABM Games */
 	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
+	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */

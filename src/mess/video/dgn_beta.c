@@ -385,7 +385,7 @@ static void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, b
 static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t *bitmap)
 {
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
-	unsigned char *data 	= memory_region(machine, REGION_GFX1);		// ptr to char rom
+	unsigned char *data 	= memory_region(machine, "gfx1");		// ptr to char rom
 	int Dot;
 	unsigned char data_byte;
 	int char_code;

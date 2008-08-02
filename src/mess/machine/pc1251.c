@@ -96,7 +96,7 @@ int pc1251_reset(void)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1251 )
 {
-	UINT8 *ram = memory_region(machine, REGION_CPU1)+0x8000,
+	UINT8 *ram = memory_region(machine, "|")+0x8000,
 		*cpu = sc61860_internal_ram();
 
 	if (read_or_write)
@@ -124,7 +124,7 @@ static TIMER_CALLBACK(pc1251_power_up)
 DRIVER_INIT( pc1251 )
 {
 	int i;
-	UINT8 *gfx = memory_region(machine, REGION_GFX1);
+	UINT8 *gfx = memory_region(machine, "gfx1");
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1251_power_up);
@@ -134,7 +134,7 @@ DRIVER_INIT( pc1251 )
 	// 11 kb ram: program stored at 8000
 #if 1
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xc7ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x8000);
+	memory_set_bankptr(1, memory_region(machine, "|") + 0x8000);
 #else
 	if ((input_port_read(machine, "DSW0") & 0xc0) == 0xc0)
 	{

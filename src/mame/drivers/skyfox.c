@@ -12,6 +12,9 @@ Other:  2 HM6116LP-3 (one on each board)
 
 To Do:  The background rendering is entirely guesswork
 
+2008-07
+Verified Dip locations and recommended settings with manual
+
 ***************************************************************************/
 #include "driver.h"
 #include "sound/2203intf.h"
@@ -45,12 +48,12 @@ VIDEO_UPDATE( skyfox );
 ***************************************************************************/
 
 static ADDRESS_MAP_START( skyfox_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r		)	// Input Ports
-	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_1_r		)	//
-	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_2_r		)	//
-	AM_RANGE(0xf001, 0xf001) AM_READ(input_port_3_r		)	//
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM			)	// ROM
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM			)	// RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")			// Input Ports
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")			//
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")			//
+	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")			//
 //  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r     )   // fake to read the vregs
 ADDRESS_MAP_END
 
@@ -112,19 +115,17 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( skyfox )
+	PORT_START_TAG("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN0")	// Player 1
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2        )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON1        )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_START1         )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2         )
-
-
-	PORT_START_TAG("IN1")	// DSW
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-0" )		// rest unused?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -134,38 +135,40 @@ static INPUT_PORTS_START( skyfox )
 	PORT_DIPNAME( 0x04, 0x04, "Unknown 1-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, "20K" )
 	PORT_DIPSETTING(    0x08, "30K" )
 	PORT_DIPSETTING(    0x10, "40K" )
 	PORT_DIPSETTING(    0x18, "50K" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
+	PORT_START_TAG("DSW1")	// Coins, DSW + Vblank
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK  )
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	/* According to manual, there is also "SW2:4" which has to be always OFF */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	// Coins, DSW + Vblank
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_VBLANK  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED   )			// was IPT_COIN1, but does not trigger coin
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit  2C/1C" )	// coin A & B
-	PORT_DIPSETTING(    0x04, "1 Coin/2 Credits 3C/1C" )
-	PORT_DIPSETTING(    0x08, "1 Coin/3 Credits 4C/1C" )
-	PORT_DIPSETTING(    0x0c, "1 Coin/4 Credits 5C/1C" )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-
-	PORT_START_TAG("IN3")	// DSW
-	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
+	PORT_START_TAG("DSW2")	// DSW
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
@@ -174,17 +177,15 @@ static INPUT_PORTS_START( skyfox )
 //  PORT_DIPSETTING(    0x05, "5" )
 //  PORT_DIPSETTING(    0x06, "5" )
 	PORT_DIPSETTING( 	0x07, "Infinite (Cheat)")
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// Fake input port, polled every VBLANK to generate an NMI upon coin insertion
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-
-
+	PORT_START_TAG("COINS")	// Fake input port, polled every VBLANK to generate an NMI upon coin insertion
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 
@@ -218,7 +219,7 @@ static const gfx_layout layout_8x8x8 =
 ***************************************************************************/
 
 static GFXDECODE_START( skyfox )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8,   0, 1 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,   0, 1 ) // [0] Sprites
 GFXDECODE_END
 
 
@@ -248,7 +249,7 @@ static INTERRUPT_GEN( skyfox_interrupt )
 	skyfox_bg_pos += (skyfox_bg_ctrl >> 1) & 0x7;	// maybe..
 
 	/* Check coin 1 & 2 */
-	if ((input_port_read(machine, "IN4") & 3) != 3) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if ((input_port_read(machine, "COINS") & 3) != 3) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( skyfox )
@@ -359,14 +360,14 @@ Sound processor - Z80  1.748MHz
 
 
 ROM_START( skyfox )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x10000, "main", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "skyfox1.bin", 0x00000, 0x8000, CRC(b4d4bb6f) SHA1(ed1cf6d91ca7170cb7d1c80b586c11164430fd49) )
 	ROM_LOAD( "skyfox2.bin", 0x08000, 0x8000, CRC(e15e0263) SHA1(005934327834aed46b17161aef82117ee508e9c4) )	// identical halves
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "skyfox9.bin", 0x00000, 0x8000, CRC(0b283bf5) SHA1(5b14d0beea689ee7e9174017e5a127435df4fbe3) )
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "skyfox3.bin", 0x00000, 0x10000, CRC(3a17a929) SHA1(973fb36af416161e04a83d7869819d9b13df18cd) )
 	ROM_LOAD( "skyfox4.bin", 0x10000, 0x10000, CRC(358053bb) SHA1(589e3270eda0d44e73fbc7ac06e782f332920b39) )
 	ROM_LOAD( "skyfox5.bin", 0x20000, 0x10000, CRC(c1215a6e) SHA1(5ca30be8a68ac6a00907cc9e47ede0acec980f46) )
@@ -374,24 +375,24 @@ ROM_START( skyfox )
 	ROM_LOAD( "skyfox7.bin", 0x40000, 0x10000, CRC(fa2ab5b4) SHA1(c0878b25dae28f7d49e14376ff885d1d4e3d5dfe) )
 	ROM_LOAD( "skyfox8.bin", 0x50000, 0x10000, CRC(0e3edc49) SHA1(3d1c59ecaabe1c9517203b7e814db41d5cff0cd4) )
 
-	ROM_REGION( 0x08000, REGION_GFX2, 0 )	/* Background - do not dispose */
+	ROM_REGION( 0x08000, "gfx2", 0 )	/* Background - do not dispose */
 	ROM_LOAD( "skyfox10.bin", 0x0000, 0x8000, CRC(19f58f9c) SHA1(6887216243b47152129448cbb4c7d52309feed03) )
 
-	ROM_REGION( 0x300, REGION_PROMS, 0 )	/* Color Proms */
+	ROM_REGION( 0x300, "proms", 0 )	/* Color Proms */
 	ROM_LOAD( "sfoxrprm.bin", 0x000, 0x100, CRC(79913c7f) SHA1(e64e6a3eb55f37984cb2597c8ffba6bc3bad49c7) )	// R
 	ROM_LOAD( "sfoxgprm.bin", 0x100, 0x100, CRC(fb73d434) SHA1(4a9bd61fbdce9441753c5921f95ead5c4655957e) )	// G
 	ROM_LOAD( "sfoxbprm.bin", 0x200, 0x100, CRC(60d2ab41) SHA1(e58a54f2aaee5c07136d5437e513d61fb18fbd9f) )	// B
 ROM_END
 
 ROM_START( exerizrb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x10000, "main", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "1-a",         0x00000, 0x8000, CRC(5df72a5d) SHA1(ca35ac06f3702fd650a584da2f442fbc61c00fce) )
 	ROM_LOAD( "skyfox2.bin", 0x08000, 0x8000, CRC(e15e0263) SHA1(005934327834aed46b17161aef82117ee508e9c4) )	// 1-b
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "skyfox9.bin", 0x00000, 0x8000, CRC(0b283bf5) SHA1(5b14d0beea689ee7e9174017e5a127435df4fbe3) )	// 1-i
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "1-c",         0x00000, 0x10000, CRC(450e9381) SHA1(f99b2ca73f1e4ba91b8066bb6d28d33b66a3ee81) )
 	ROM_LOAD( "skyfox4.bin", 0x10000, 0x10000, CRC(358053bb) SHA1(589e3270eda0d44e73fbc7ac06e782f332920b39) )	// 1-d
 	ROM_LOAD( "1-e",         0x20000, 0x10000, CRC(50a38c60) SHA1(a4b8d530914d6c85b15940a7821b4365068de668) )
@@ -399,10 +400,10 @@ ROM_START( exerizrb )
 	ROM_LOAD( "1-g",         0x40000, 0x10000, CRC(c9bbfe5c) SHA1(ce3f7d32baa8bb0bfc110877b5b5f4648ee959ac) )
 	ROM_LOAD( "skyfox8.bin", 0x50000, 0x10000, CRC(0e3edc49) SHA1(3d1c59ecaabe1c9517203b7e814db41d5cff0cd4) )	// 1-h
 
-	ROM_REGION( 0x08000, REGION_GFX2, 0 )	/* Background - do not dispose */
+	ROM_REGION( 0x08000, "gfx2", 0 )	/* Background - do not dispose */
 	ROM_LOAD( "skyfox10.bin", 0x0000, 0x8000, CRC(19f58f9c) SHA1(6887216243b47152129448cbb4c7d52309feed03) )	// 1-j
 
-	ROM_REGION( 0x300, REGION_PROMS, 0 )	/* Color Proms */
+	ROM_REGION( 0x300, "proms", 0 )	/* Color Proms */
 	ROM_LOAD( "sfoxrprm.bin", 0x000, 0x100, CRC(79913c7f) SHA1(e64e6a3eb55f37984cb2597c8ffba6bc3bad49c7) )	// 2-bpr
 	ROM_LOAD( "sfoxgprm.bin", 0x100, 0x100, CRC(fb73d434) SHA1(4a9bd61fbdce9441753c5921f95ead5c4655957e) )	// 3-bpr
 	ROM_LOAD( "sfoxbprm.bin", 0x200, 0x100, CRC(60d2ab41) SHA1(e58a54f2aaee5c07136d5437e513d61fb18fbd9f) )	// 1-bpr
@@ -414,8 +415,8 @@ ROM_END
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
 static DRIVER_INIT( skyfox )
 {
-	UINT8 *RAM = memory_region(machine, REGION_GFX1);
-	UINT8 *end = RAM + memory_region_length(machine, REGION_GFX1);
+	UINT8 *RAM = memory_region(machine, "gfx1");
+	UINT8 *end = RAM + memory_region_length(machine, "gfx1");
 	UINT8 buf[32*32];
 
 	while (RAM < end)

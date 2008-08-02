@@ -154,7 +154,7 @@ static WRITE8_HANDLER( abc806_bankswitch_w )
 		}
 		else
 		{
-			// deallocate back to REGION_CPU1
+			// deallocate back to "|main|"
 			memory_set_bank(bank + 1, 0);
 
 			if (bank < 7)
@@ -721,7 +721,7 @@ static MACHINE_START( abc802 )
 
 	z80dart_init(0, &abc802_dart_intf);
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1), 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|"), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 }
 
@@ -761,7 +761,7 @@ static MACHINE_START( abc806 )
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK15, SMH_BANK15);
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, SMH_BANK16, SMH_BANK16);
 
-	mem = memory_region(machine, REGION_CPU1);
+	mem = memory_region(machine, "|main|");
 	for (bank = 1; bank < 17; bank++)
 	{
 		if (bank != 8)
@@ -887,23 +887,23 @@ MACHINE_DRIVER_END
 */
 
 #define ROM_ABC77 \
-	ROM_REGION( 0x1000, REGION_CPU2, 0 ) \
+	ROM_REGION( 0x1000, "|keyboard|", 0 ) \
 	ROM_LOAD( "65-02486.z10", 0x0000, 0x0800, NO_DUMP ) /* 2716 ABC55/77 keyboard controller Swedish EPROM */ \
 	ROM_LOAD( "keyboard.z14", 0x0800, 0x0800, NO_DUMP ) /* 2716 ABC55/77 keyboard controller non-Swedish EPROM */
 
 #define ROM_ABC99 \
-	ROM_REGION( 0x1000, REGION_CPU2, 0 ) \
+	ROM_REGION( 0x1000, "|keyboard|", 0 ) \
 	ROM_LOAD( "abc99.bin", 0x0000, 0x0800, CRC(d48310fc) SHA1(17a2ffc0ec00d395c2b9caf3d57fed575ba2b137) )
 
 #define ROM_ABC99_2 \
-	ROM_REGION( 0x1800, REGION_CPU2, 0 ) \
+	ROM_REGION( 0x1800, "|keyboard|", 0 ) \
 	ROM_LOAD( "10681909", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7) ) \
 	ROM_LOAD( "10726864", 0x1000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3) )
 
 #define ROM_KEYBOARD ROM_ABC77
 
 ROM_START( abc800c )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "abcc.1m",    0x0000, 0x1000, NO_DUMP )
 	ROM_LOAD( "abc1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
 	ROM_LOAD( "abc2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
@@ -915,10 +915,10 @@ ROM_START( abc800c )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "vuc-se.7c",  0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x2000, REGION_USER1, 0 )
+	ROM_REGION( 0x2000, "user1", 0 )
 	// Fast Controller
 	ROM_LOAD( "fast108.bin",  0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
 	ROM_LOAD( "fast207.bin",  0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
@@ -949,7 +949,7 @@ ROM_START( abc800c )
 ROM_END
 
 ROM_START( abc800m )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "abcm.1m",    0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
 	ROM_LOAD( "abc1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
 	ROM_LOAD( "abc2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
@@ -961,12 +961,12 @@ ROM_START( abc800m )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x0800, REGION_GFX1, 0 )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 ROM_END
 
 ROM_START( abc802 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD(  "abc02-11.9f",  0x0000, 0x2000, CRC(b86537b2) SHA1(4b7731ef801f9a03de0b5acd955f1e4a1828355d) )
 	ROM_LOAD(  "abc12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
 	ROM_LOAD(  "abc22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
@@ -979,15 +979,15 @@ ROM_START( abc802 )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x2000, REGION_GFX1, 0 )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "abct2-11.3g",  0x0000, 0x2000, CRC(e21601ee) SHA1(2e838ebd7692e5cb9ba4e80fe2aa47ea2584133a) )
 
-	ROM_REGION( 0x400, REGION_PLDS, 0 )
+	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "abcp2-11.2g", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
 ROM_END
 
 ROM_START( abc806 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "abc06-11.1m",  0x0000, 0x1000, CRC(27083191) SHA1(9b45592273a5673e4952c6fe7965fc9398c49827) )
 	ROM_LOAD( "abc16-11.1l",  0x1000, 0x1000, CRC(eb0a08fd) SHA1(f0b82089c5c8191fbc6a3ee2c78ce730c7dd5145) )
 	ROM_LOAD( "abc26-11.1k",  0x2000, 0x1000, CRC(97a95c59) SHA1(013bc0a2661f4630c39b340965872bf607c7bd45) )
@@ -1006,16 +1006,16 @@ ROM_START( abc806 )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "abct6-11.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) ) // 6490243-01
 
-	ROM_REGION( 0x620, REGION_PROMS, 0 )
+	ROM_REGION( 0x620, "proms", 0 )
 	ROM_LOAD( "rad.9b",		 0x0000, 0x0200, NO_DUMP ) // 7621/7643 (82S131/82S137)
 	ROM_LOAD( "hrui.6e",	 0x0200, 0x0020, NO_DUMP ) // 7603 (82S123)
 	ROM_LOAD( "hruii.12g",	 0x0220, 0x0200, NO_DUMP ) // 7621 (82S131)
 	ROM_LOAD( "v50.7e",		 0x0420, 0x0200, NO_DUMP ) // 7621 (82S131)
 
-	ROM_REGION( 0x400, REGION_PLDS, 0 )
+	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "atthand.11c", 0x0000, 0x0400, NO_DUMP ) // 40033A (?)
 	ROM_LOAD( "abcp3-11.1b", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
 	ROM_LOAD( "abcp4-11.2d", 0x0000, 0x0400, NO_DUMP ) // PAL16L8
@@ -1119,7 +1119,7 @@ static OPBASE_HANDLER( abc800_opbase_handler )
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		opbase->rom = opbase->ram = memory_region(machine, REGION_CPU1);
+		opbase->rom = opbase->ram = memory_region(machine, "|main|");
 		return ~0;
 	}
 

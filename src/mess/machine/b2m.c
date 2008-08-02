@@ -69,7 +69,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 	memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x7000, 0xdfff, 0, 0, SMH_BANK4);
 	memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK5);
 
-	rom = memory_region(machine, REGION_CPU1);
+	rom = memory_region(machine, "|");
 	switch(bank) {
 		case 0 :
 		case 1 :
@@ -284,7 +284,7 @@ const ppi8255_interface b2m_ppi8255_interface_2 =
 
 static READ8_HANDLER (b2m_romdisk_porta_r )
 {
-	UINT8 *romdisk = memory_region(machine, REGION_CPU1) + 0x12000;		
+	UINT8 *romdisk = memory_region(machine, "|") + 0x12000;		
 	return romdisk[b2m_romdisk_msb*256+b2m_romdisk_lsb];	
 }
 

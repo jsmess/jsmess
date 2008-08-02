@@ -72,10 +72,10 @@ static const device_config *cartslot_image(void)
 static void init_nes_core (running_machine *machine)
 {
 	/* We set these here in case they weren't set in the cart loader */
-	nes.rom = memory_region(machine, REGION_CPU1);
-	nes.vrom = memory_region(machine, REGION_GFX1);
-	nes.vram = memory_region(machine, REGION_GFX2);
-	nes.wram = memory_region(machine, REGION_USER1);
+	nes.rom = memory_region(machine, "|");
+	nes.vrom = memory_region(machine, "gfx1");
+	nes.vram = memory_region(machine, "gfx2");
+	nes.wram = memory_region(machine, "user1");
 
 	/* Brutal hack put in as a consequence of the new memory system; we really
 	 * need to fix the NES code */
@@ -464,18 +464,18 @@ DEVICE_IMAGE_LOAD(nes_cart)
 	if (nes.four_screen_vram) logerror("-- 4-screen VRAM\n");
 
 	/* Free the regions that were allocated by the ROM loader */
-	free_memory_region (image->machine, REGION_CPU1);
-	free_memory_region (image->machine, REGION_GFX1);
+	memory_region_free (image->machine, "|");
+	memory_region_free (image->machine, "gfx1");
 
 	/* Allocate them again with the proper size */
-	new_memory_region(image->machine, REGION_CPU1, 0x10000 + (nes.prg_chunks+1) * 0x4000,0);
+	memory_region_alloc(image->machine, "|", 0x10000 + (nes.prg_chunks+1) * 0x4000,0);
 	if (nes.chr_chunks)
-		new_memory_region(image->machine, REGION_GFX1, nes.chr_chunks * 0x2000,0);
+		memory_region_alloc(image->machine, "gfx1", nes.chr_chunks * 0x2000,0);
 
-	nes.rom = memory_region(image->machine, REGION_CPU1);
-	nes.vrom = memory_region(image->machine, REGION_GFX1);
-	nes.vram = memory_region(image->machine, REGION_GFX2);
-	nes.wram = memory_region(image->machine, REGION_USER1);
+	nes.rom = memory_region(image->machine, "|");
+	nes.vrom = memory_region(image->machine, "gfx1");
+	nes.vram = memory_region(image->machine, "gfx2");
+	nes.wram = memory_region(image->machine, "user1");
 
 	/* Position past the header */
 	image_fseek (image, 16, SEEK_SET);

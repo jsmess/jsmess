@@ -269,21 +269,21 @@ MACHINE_DRIVER_END
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 ROM_START(lynx)
-	ROM_REGION(0x200,REGION_CPU1, 0)
+	ROM_REGION(0x200,"main", 0)
 	ROM_SYSTEM_BIOS( 0, "default",   "rom save" )
 	MYROM_LOAD_BIOS( 0, "lynx.bin",    0x00000, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
 	ROM_SYSTEM_BIOS( 1, "a", "alternate rom save" )
 	MYROM_LOAD_BIOS( 1, "lynxa.bin",    0x00000, 0x200, CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb))
 //  ROM_LOAD("lynx.bin", 0, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
-	ROM_REGION(0x100,REGION_GFX1, ROMREGION_ERASE00)
-	ROM_REGION(0x100000, REGION_USER1, ROMREGION_ERASEFF)
+	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
+	ROM_REGION(0x100000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(lynx2)
-	ROM_REGION(0x200,REGION_CPU1, 0)
+	ROM_REGION(0x200,"main", 0)
 	ROM_LOAD("lynx2.bin", 0, 0x200, NO_DUMP)
-	ROM_REGION(0x100,REGION_GFX1, ROMREGION_ERASE00)
-	ROM_REGION(0x100000, REGION_USER1, ROMREGION_ERASEFF)
+	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
+	ROM_REGION(0x100000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
 
@@ -329,7 +329,7 @@ static void lynx_crc_keyword(const device_config *image)
 
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
-	UINT8 *rom = memory_region(image->machine, REGION_USER1);
+	UINT8 *rom = memory_region(image->machine, "user1");
 	int size;
 	UINT8 header[0x40];
 /* 64 byte header
@@ -372,7 +372,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 
 static QUICKLOAD_LOAD( lynx )
 {
-	UINT8 *rom = memory_region(image->machine, REGION_CPU1);
+	UINT8 *rom = memory_region(image->machine, "|main|");
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	// maybe the first 2 bytes must be used to identify the endianess of the file
 	UINT16 start;

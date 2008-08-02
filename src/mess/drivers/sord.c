@@ -479,7 +479,7 @@ static MACHINE_RESET( sord_m5 )
 	z80ctc_reset(0);
 
 	/* should be done in a special callback to work properly! */
-	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
+	memory_set_bankptr(1, memory_region(machine, "user1"));
 
 	centronics_config(0, sordm5_cent_config);
 	/* assumption: select is tied low */
@@ -676,19 +676,19 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(sordm5)
-	ROM_REGION(0x010000, REGION_CPU1, 0)
+	ROM_REGION(0x010000, "main", 0)
 	ROM_LOAD("sordint.rom",0x0000, 0x02000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
-	ROM_REGION(0x5000, REGION_USER1, 0)
+	ROM_REGION(0x5000, "user1", 0)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x5000, ROM_NOMIRROR)
 ROM_END
 
 
 ROM_START(srdm5fd5)
-	ROM_REGION(0x10000, REGION_CPU1, 0)
+	ROM_REGION(0x10000, "main", 0)
 	ROM_LOAD("sordint.rom",0x0000, 0x02000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
-	ROM_REGION(0x10000, REGION_CPU2, 0)
+	ROM_REGION(0x10000, "floppy", 0)
 	ROM_LOAD("sordfd5.rom",0x0000, 0x04000, NO_DUMP)
-	ROM_REGION(0x5000, REGION_USER1, 0)
+	ROM_REGION(0x5000, "user1", 0)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 

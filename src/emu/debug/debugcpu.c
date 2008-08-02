@@ -98,31 +98,31 @@ static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address,
 static void check_hotspots(int cpunum, int spacenum, offs_t address);
 
 /* expression handlers */
-static UINT64 expression_read_memory(int space, int index, UINT32 address, int size);
+static UINT64 expression_read_memory(const char *name, int space, UINT32 address, int size);
 static UINT64 expression_read_address_space(int cpuindex, int space, offs_t address, int size);
 static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t address, int size);
-static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t address, int size);
+static UINT64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
 static UINT64 expression_read_eeprom(offs_t address, int size);
-static void expression_write_memory(int space, int index, UINT32 address, int size, UINT64 data);
+static void expression_write_memory(const char *name, int space, UINT32 address, int size, UINT64 data);
 static void expression_write_address_space(int cpuindex, int space, offs_t address, int size, UINT64 data);
 static void expression_write_program_direct(int cpuindex, int opcode, offs_t address, int size, UINT64 data);
-static void expression_write_memory_region(int rgnindex, int rgntype, offs_t address, int size, UINT64 data);
+static void expression_write_memory_region(const char *rgntag, offs_t address, int size, UINT64 data);
 static void expression_write_eeprom(offs_t address, int size, UINT64 data);
 
 /* variable getters/setters */
-static UINT64 get_wpaddr(UINT32 ref);
-static UINT64 get_wpdata(UINT32 ref);
-static UINT64 get_cycles(UINT32 ref);
-static UINT64 get_cpunum(UINT32 ref);
-static UINT64 get_tempvar(UINT32 ref);
-static UINT64 get_logunmap(UINT32 ref);
-static UINT64 get_beamx(UINT32 ref);
-static UINT64 get_beamy(UINT32 ref);
-static void set_tempvar(UINT32 ref, UINT64 value);
-static void set_logunmap(UINT32 ref, UINT64 value);
-static UINT64 get_current_pc(UINT32 ref);
-static UINT64 get_cpu_reg(UINT32 ref);
-static void set_cpu_reg(UINT32 ref, UINT64 value);
+static UINT64 get_wpaddr(void *ref);
+static UINT64 get_wpdata(void *ref);
+static UINT64 get_cycles(void *ref);
+static UINT64 get_cpunum(void *ref);
+static UINT64 get_tempvar(void *ref);
+static UINT64 get_logunmap(void *ref);
+static UINT64 get_beamx(void *ref);
+static UINT64 get_beamy(void *ref);
+static void set_tempvar(void *ref, UINT64 value);
+static void set_logunmap(void *ref, UINT64 value);
+static UINT64 get_current_pc(void *ref);
+static UINT64 get_cpu_reg(void *ref);
+static void set_cpu_reg(void *ref, UINT64 value);
 
 
 /***************************************************************************
@@ -188,22 +188,22 @@ void debug_cpu_init(running_machine *machine)
 	global_symtable = symtable_alloc(NULL);
 
 	/* add "wpaddr", "wpdata", "cycles", "cpunum", "logunmap" to the global symbol table */
-	symtable_add_register(global_symtable, "wpaddr", 0, get_wpaddr, NULL);
-	symtable_add_register(global_symtable, "wpdata", 0, get_wpdata, NULL);
-	symtable_add_register(global_symtable, "cycles", 0, get_cycles, NULL);
-	symtable_add_register(global_symtable, "cpunum", 0, get_cpunum, NULL);
-	symtable_add_register(global_symtable, "logunmap", ADDRESS_SPACE_PROGRAM, get_logunmap, set_logunmap);
-	symtable_add_register(global_symtable, "logunmapd", ADDRESS_SPACE_DATA, get_logunmap, set_logunmap);
-	symtable_add_register(global_symtable, "logunmapi", ADDRESS_SPACE_IO, get_logunmap, set_logunmap);
-	symtable_add_register(global_symtable, "beamx", 0, get_beamx, NULL);
-	symtable_add_register(global_symtable, "beamy", 0, get_beamy, NULL);
+	symtable_add_register(global_symtable, "wpaddr", NULL, get_wpaddr, NULL);
+	symtable_add_register(global_symtable, "wpdata", NULL, get_wpdata, NULL);
+	symtable_add_register(global_symtable, "cycles", NULL, get_cycles, NULL);
+	symtable_add_register(global_symtable, "cpunum", NULL, get_cpunum, NULL);
+	symtable_add_register(global_symtable, "logunmap", (void *)ADDRESS_SPACE_PROGRAM, get_logunmap, set_logunmap);
+	symtable_add_register(global_symtable, "logunmapd", (void *)ADDRESS_SPACE_DATA, get_logunmap, set_logunmap);
+	symtable_add_register(global_symtable, "logunmapi", (void *)ADDRESS_SPACE_IO, get_logunmap, set_logunmap);
+	symtable_add_register(global_symtable, "beamx", NULL, get_beamx, NULL);
+	symtable_add_register(global_symtable, "beamy", NULL, get_beamy, NULL);
 
 	/* add the temporary variables to the global symbol table */
 	for (regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
 	{
 		char symname[10];
 		sprintf(symname, "temp%d", regnum);
-		symtable_add_register(global_symtable, symname, regnum, get_tempvar, set_tempvar);
+		symtable_add_register(global_symtable, symname, &global.tempvar, get_tempvar, set_tempvar);
 	}
 
 	/* loop over CPUs and build up their info */
@@ -233,7 +233,7 @@ void debug_cpu_init(running_machine *machine)
 		info->symtable = symtable_alloc(global_symtable);
 
 		/* add a global symbol for the current instruction pointer */
-		symtable_add_register(info->symtable, "curpc", 0, get_current_pc, 0);
+		symtable_add_register(info->symtable, "curpc", NULL, get_current_pc, 0);
 
 		/* add all registers into it */
 		for (regnum = 0; regnum < MAX_REGS; regnum++)
@@ -259,7 +259,7 @@ void debug_cpu_init(running_machine *machine)
 			symname[charnum] = 0;
 
 			/* add the symbol to the table */
-			symtable_add_register(info->symtable, symname, regnum, get_cpu_reg, set_cpu_reg);
+			symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
 		}
 
 		/* loop over address spaces and get info */
@@ -891,8 +891,7 @@ void debug_cpu_trace(int cpunum, FILE *file, int trace_over, const char *action)
 	if (action != NULL)
 	{
 		info->trace.action = malloc_or_die(strlen(action) + 1);
-		if (info->trace.action != NULL)
-			strcpy(info->trace.action, action);
+		strcpy(info->trace.action, action);
 	}
 
 	/* update flags */
@@ -2137,7 +2136,7 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
     space
 -------------------------------------------------*/
 
-static UINT64 expression_read_memory(int space, int index, UINT32 address, int size)
+static UINT64 expression_read_memory(const char *name, int space, UINT32 address, int size)
 {
 	int cpuindex;
 
@@ -2146,26 +2145,27 @@ static UINT64 expression_read_memory(int space, int index, UINT32 address, int s
 		case EXPSPACE_PROGRAM:
 		case EXPSPACE_DATA:
 		case EXPSPACE_IO:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			return expression_read_address_space(cpuindex, space, address, size);
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
+			return expression_read_address_space(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM), address, size);
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
+			if (name == NULL)
+				name = Machine->config->cpu[cpu_getactivecpu()].tag;
 			return expression_read_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size);
 
 		case EXPSPACE_EEPROM:
 			return expression_read_eeprom(address, size);
 
-		case EXPSPACE_CPU:
-		case EXPSPACE_USER:
-		case EXPSPACE_GFX:
-		case EXPSPACE_SOUND:
-			if (index < 1)
+		case EXPSPACE_REGION:
+			if (name == NULL)
 				break;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			return expression_read_memory_region(index, space, address, size);
+			return expression_read_memory_region(name, address, size);
 	}
 	return ~(UINT64)0 >> (64 - 8*size);
 }
@@ -2268,61 +2268,46 @@ static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t ad
     from a memory region
 -------------------------------------------------*/
 
-static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t address, int size)
+static UINT64 expression_read_memory_region(const char *rgntag, offs_t address, int size)
 {
+	UINT8 *base = memory_region(Machine, rgntag);
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
-	int rgnnum = -1;
 
-	/* convert to a region number */
-	switch (rgntype)
+	/* make sure we get a valid base before proceeding */
+	if (base != NULL)
 	{
-		case EXPSPACE_CPU:		rgnnum = REGION_CPU1 + (rgnindex - 1);		break;
-		case EXPSPACE_USER:		rgnnum = REGION_USER1 + (rgnindex - 1);		break;
-		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
-		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
-	}
+		UINT32 length = memory_region_length(Machine, rgntag);
+		UINT32 flags = memory_region_flags(Machine, rgntag);
 
-	/* process if it exists */
-	if (rgnnum != -1)
-	{
-		UINT8 *base = memory_region(Machine, rgnnum);
-
-		/* make sure we get a valid base before proceeding */
-		if (base != NULL)
+		/* call ourself recursively until we are byte-sized */
+		if (size > 1)
 		{
-			UINT32 length = memory_region_length(Machine, rgnnum);
-			UINT32 flags = memory_region_flags(Machine, rgnnum);
+			int halfsize = size / 2;
+			UINT64 r0, r1;
 
-			/* call ourself recursively until we are byte-sized */
-			if (size > 1)
-			{
-				int halfsize = size / 2;
-				UINT64 r0, r1;
+			/* read each half, from lower address to upper address */
+			r0 = expression_read_memory_region(rgntag, address + 0, halfsize);
+			r1 = expression_read_memory_region(rgntag, address + halfsize, halfsize);
 
-				/* read each half, from lower address to upper address */
-				r0 = expression_read_memory_region(rgnindex, rgntype, address + 0, halfsize);
-				r1 = expression_read_memory_region(rgnindex, rgntype, address + halfsize, halfsize);
+			/* assemble based on the target endianness */
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+				result = r0 | (r1 << (8 * halfsize));
+			else
+				result = r1 | (r0 << (8 * halfsize));
+		}
 
-				/* assemble based on the target endianness */
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-					result = r0 | (r1 << (8 * halfsize));
-				else
-					result = r1 | (r0 << (8 * halfsize));
-			}
+		/* only process if we're within range */
+		else if (address < length)
+		{
+			/* lowmask specified which address bits are within the databus width */
+			UINT32 lowmask = (1 << ((flags & ROMREGION_WIDTHMASK) >> 8)) - 1;
+			base += address & ~lowmask;
 
-			/* only process if we're within range */
-			else if (address < length)
-			{
-				/* lowmask specified which address bits are within the databus width */
-				UINT32 lowmask = (1 << (flags & ROMREGION_WIDTHMASK)) - 1;
-				base += address & ~lowmask;
-
-				/* if we have a valid base, return the appropriate byte */
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-					result = base[BYTE8_XOR_LE(address) & lowmask];
-				else
-					result = base[BYTE8_XOR_BE(address) & lowmask];
-			}
+			/* if we have a valid base, return the appropriate byte */
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+				result = base[BYTE8_XOR_LE(address) & lowmask];
+			else
+				result = base[BYTE8_XOR_BE(address) & lowmask];
 		}
 	}
 	return result;
@@ -2360,7 +2345,7 @@ static UINT64 expression_read_eeprom(offs_t address, int size)
     space
 -------------------------------------------------*/
 
-static void expression_write_memory(int space, int index, UINT32 address, int size, UINT64 data)
+static void expression_write_memory(const char *name, int space, UINT32 address, int size, UINT64 data)
 {
 	int cpuindex;
 
@@ -2369,14 +2354,17 @@ static void expression_write_memory(int space, int index, UINT32 address, int si
 		case EXPSPACE_PROGRAM:
 		case EXPSPACE_DATA:
 		case EXPSPACE_IO:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			expression_write_address_space(cpuindex, space, address, size, data);
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
+			expression_write_address_space(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM), address, size, data);
 			break;
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
 			expression_write_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size, data);
 			break;
 
@@ -2384,14 +2372,10 @@ static void expression_write_memory(int space, int index, UINT32 address, int si
 			expression_write_eeprom(address, size, data);
 			break;
 
-		case EXPSPACE_CPU:
-		case EXPSPACE_USER:
-		case EXPSPACE_GFX:
-		case EXPSPACE_SOUND:
-			if (index < 1)
+		case EXPSPACE_REGION:
+			if (name == NULL)
 				break;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			expression_write_memory_region(index, space, address, size, data);
+			expression_write_memory_region(name, address, size, data);
 			break;
 	}
 }
@@ -2498,68 +2482,53 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
     from a memory region
 -------------------------------------------------*/
 
-static void expression_write_memory_region(int rgnindex, int rgntype, offs_t address, int size, UINT64 data)
+static void expression_write_memory_region(const char *rgntag, offs_t address, int size, UINT64 data)
 {
-	int rgnnum = -1;
+	UINT8 *base = memory_region(Machine, rgntag);
 
-	/* convert to a region number */
-	switch (rgntype)
+	/* make sure we get a valid base before proceeding */
+	if (base != NULL)
 	{
-		case EXPSPACE_CPU:		rgnnum = REGION_CPU1 + (rgnindex - 1);		break;
-		case EXPSPACE_USER:		rgnnum = REGION_USER1 + (rgnindex - 1);		break;
-		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
-		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
-	}
+		UINT32 length = memory_region_length(Machine, rgntag);
+		UINT32 flags = memory_region_flags(Machine, rgntag);
 
-	/* process if it exists */
-	if (rgnnum != -1)
-	{
-		UINT8 *base = memory_region(Machine, rgnnum);
-
-		/* make sure we get a valid base before proceeding */
-		if (base != NULL)
+		/* call ourself recursively until we are byte-sized */
+		if (size > 1)
 		{
-			UINT32 length = memory_region_length(Machine, rgnnum);
-			UINT32 flags = memory_region_flags(Machine, rgnnum);
+			int halfsize = size / 2;
+			UINT64 r0, r1, halfmask;
 
-			/* call ourself recursively until we are byte-sized */
-			if (size > 1)
+			/* break apart based on the target endianness */
+			halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
 			{
-				int halfsize = size / 2;
-				UINT64 r0, r1, halfmask;
-
-				/* break apart based on the target endianness */
-				halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-				{
-					r0 = data & halfmask;
-					r1 = (data >> (8 * halfsize)) & halfmask;
-				}
-				else
-				{
-					r0 = (data >> (8 * halfsize)) & halfmask;
-					r1 = data & halfmask;
-				}
-
-				/* write each half, from lower address to upper address */
-				expression_write_memory_region(rgnindex, rgntype, address + 0, halfsize, r0);
-				expression_write_memory_region(rgnindex, rgntype, address + halfsize, halfsize, r1);
+				r0 = data & halfmask;
+				r1 = (data >> (8 * halfsize)) & halfmask;
+			}
+			else
+			{
+				r0 = (data >> (8 * halfsize)) & halfmask;
+				r1 = data & halfmask;
 			}
 
-			/* only process if we're within range */
-			else if (address < length)
-			{
-				/* lowmask specified which address bits are within the databus width */
-				UINT32 lowmask = (1 << (flags & ROMREGION_WIDTHMASK)) - 1;
-				base += address & ~lowmask;
+			/* write each half, from lower address to upper address */
+			expression_write_memory_region(rgntag, address + 0, halfsize, r0);
+			expression_write_memory_region(rgntag, address + halfsize, halfsize, r1);
+		}
 
-				/* if we have a valid base, set the appropriate byte */
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-					base[BYTE8_XOR_LE(address) & lowmask] = data;
-				else
-					base[BYTE8_XOR_BE(address) & lowmask] = data;
-				global.memory_modified = TRUE;
-			}
+		/* only process if we're within range */
+		else if (address < length)
+		{
+			/* lowmask specified which address bits are within the databus width */
+			UINT32 lowmask = (1 << ((flags & ROMREGION_WIDTHMASK) >> 8)) - 1;
+			base += address & ~lowmask;
+
+			/* if we have a valid base, set the appropriate byte */
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+				base[BYTE8_XOR_LE(address) & lowmask] = data;
+			else
+				base[BYTE8_XOR_BE(address) & lowmask] = data;
+			global.memory_modified = TRUE;
 		}
 	}
 }
@@ -2677,7 +2646,7 @@ void debug_cpu_flush_traces(void)
     'wpaddr' symbol
 -------------------------------------------------*/
 
-static UINT64 get_wpaddr(UINT32 ref)
+static UINT64 get_wpaddr(void *ref)
 {
 	return global.wpaddr;
 }
@@ -2688,7 +2657,7 @@ static UINT64 get_wpaddr(UINT32 ref)
     'wpdata' symbol
 -------------------------------------------------*/
 
-static UINT64 get_wpdata(UINT32 ref)
+static UINT64 get_wpdata(void *ref)
 {
 	return global.wpdata;
 }
@@ -2699,7 +2668,7 @@ static UINT64 get_wpdata(UINT32 ref)
     'cycles' symbol
 -------------------------------------------------*/
 
-static UINT64 get_cycles(UINT32 ref)
+static UINT64 get_cycles(void *ref)
 {
 	return activecpu_get_icount();
 }
@@ -2710,7 +2679,7 @@ static UINT64 get_cycles(UINT32 ref)
     'cpunum' symbol
 -------------------------------------------------*/
 
-static UINT64 get_cpunum(UINT32 ref)
+static UINT64 get_cpunum(void *ref)
 {
 	return cpu_getactivecpu();
 }
@@ -2721,9 +2690,9 @@ static UINT64 get_cpunum(UINT32 ref)
     'tempX' symbols
 -------------------------------------------------*/
 
-static UINT64 get_tempvar(UINT32 ref)
+static UINT64 get_tempvar(void *ref)
 {
-	return global.tempvar[ref];
+	return *(UINT64 *)ref;
 }
 
 
@@ -2732,9 +2701,9 @@ static UINT64 get_tempvar(UINT32 ref)
     'tempX' symbols
 -------------------------------------------------*/
 
-static void set_tempvar(UINT32 ref, UINT64 value)
+static void set_tempvar(void *ref, UINT64 value)
 {
-	global.tempvar[ref] = value;
+	*(UINT64 *)ref = value;
 }
 
 
@@ -2743,9 +2712,9 @@ static void set_tempvar(UINT32 ref, UINT64 value)
     symbols
 -------------------------------------------------*/
 
-static UINT64 get_logunmap(UINT32 ref)
+static UINT64 get_logunmap(void *ref)
 {
-	return memory_get_log_unmap(ref);
+	return memory_get_log_unmap((FPTR)ref);
 }
 
 
@@ -2753,10 +2722,10 @@ static UINT64 get_logunmap(UINT32 ref)
     get_beamx - get beam horizontal position
 -------------------------------------------------*/
 
-static UINT64 get_beamx(UINT32 ref)
+static UINT64 get_beamx(void *ref)
 {
 	UINT64 ret = 0;
-	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, ref);
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, 0);
 
 	if (screen != NULL)
 		ret = video_screen_get_hpos(screen);
@@ -2769,10 +2738,10 @@ static UINT64 get_beamx(UINT32 ref)
     get_beamy - get beam vertical position
 -------------------------------------------------*/
 
-static UINT64 get_beamy(UINT32 ref)
+static UINT64 get_beamy(void *ref)
 {
 	UINT64 ret = 0;
-	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, ref);
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, 0);
 
 	if (screen != NULL)
 		ret = video_screen_get_vpos(screen);
@@ -2786,9 +2755,9 @@ static UINT64 get_beamy(UINT32 ref)
     symbols
 -------------------------------------------------*/
 
-static void set_logunmap(UINT32 ref, UINT64 value)
+static void set_logunmap(void *ref, UINT64 value)
 {
-	memory_set_log_unmap(ref, value ? 1 : 0);
+	memory_set_log_unmap((FPTR)ref, value ? 1 : 0);
 }
 
 
@@ -2797,7 +2766,7 @@ static void set_logunmap(UINT32 ref, UINT64 value)
     current instruction pointer
 -------------------------------------------------*/
 
-static UINT64 get_current_pc(UINT32 ref)
+static UINT64 get_current_pc(void *ref)
 {
 	return activecpu_get_pc();
 }
@@ -2808,9 +2777,9 @@ static UINT64 get_current_pc(UINT32 ref)
     register symbols
 -------------------------------------------------*/
 
-static UINT64 get_cpu_reg(UINT32 ref)
+static UINT64 get_cpu_reg(void *ref)
 {
-	return activecpu_get_reg(ref);
+	return activecpu_get_reg((FPTR)ref);
 }
 
 
@@ -2819,7 +2788,7 @@ static UINT64 get_cpu_reg(UINT32 ref)
     register symbols
 -------------------------------------------------*/
 
-static void set_cpu_reg(UINT32 ref, UINT64 value)
+static void set_cpu_reg(void *ref, UINT64 value)
 {
-	activecpu_set_reg(ref, value);
+	activecpu_set_reg((FPTR)ref, value);
 }

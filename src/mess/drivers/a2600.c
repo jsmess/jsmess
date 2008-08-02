@@ -14,7 +14,7 @@
 #include "video/tia.h"
 
 
-#define CART memory_region(machine, REGION_USER1)
+#define CART memory_region(machine, "user1")
 
 #define MASTER_CLOCK_NTSC	3579545
 #define MASTER_CLOCK_PAL	3546894
@@ -765,12 +765,12 @@ static READ8_HANDLER(modeSS_r)
 		switch ( modeSS_byte & 0x1C ) {
 		case 0x00:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
 			bank_base[1] = extra_RAM;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
@@ -785,12 +785,12 @@ static READ8_HANDLER(modeSS_r)
 			break;
 		case 0x10:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
 			bank_base[1] = extra_RAM + 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, REGION_CPU1) + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "|main|") + 0x1800 : CART;
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:
@@ -1437,7 +1437,7 @@ static MACHINE_START( a2600 )
 {
 	const device_config *screen = video_screen_first(machine->config);
 	current_screen_height = video_screen_get_height(screen);
-	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
+	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
@@ -1447,7 +1447,7 @@ static MACHINE_START( a2600p )
 {
 	const device_config *screen = video_screen_first(machine->config);
 	current_screen_height = video_screen_get_height(screen);
-	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
+	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface_pal );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
@@ -2023,9 +2023,9 @@ MACHINE_DRIVER_END
 
 
 ROM_START( a2600 )
-	ROM_REGION( 0x2000, REGION_CPU1, 0 )
+	ROM_REGION( 0x2000, "main", 0 )
 	ROM_FILL( 0x0000, 0x2000, 0xFF )
-	ROM_REGION( 0x80000, REGION_USER1, 0 )
+	ROM_REGION( 0x80000, "user1", 0 )
 	ROM_FILL( 0x00000, 0x80000, 0xFF )
 ROM_END
 

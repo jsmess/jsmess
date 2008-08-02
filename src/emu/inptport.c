@@ -103,8 +103,8 @@
 #include <stdarg.h>
 
 #ifdef MESS
-#include "inputx.h"
-#endif
+#include "uimess.h"
+#endif /* MESS */
 
 
 /***************************************************************************
@@ -1138,6 +1138,9 @@ int input_type_group(running_machine *machine, int type, int player)
 const input_seq *input_type_seq(running_machine *machine, int type, int player, input_seq_type seqtype)
 {
 	static const input_seq ip_none = SEQ_DEF_0;
+
+	assert((type >= 0) && (type < __ipt_max));
+	assert((player >= 0) && (player < MAX_PLAYERS));
 
 	/* if we have a machine, use the live state and quick lookup */
 	if (machine != NULL)
@@ -2297,7 +2300,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 
 #ifdef MESS
 	/* (MESS-specific) check for disabled keyboard */
-	if (field->type == IPT_KEYBOARD && osd_keyboard_disabled())
+	if (field->type == IPT_KEYBOARD && ui_mess_keyboard_disabled(field->port->machine))
 		return FALSE;
 #endif /* MESS */
 

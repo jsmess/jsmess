@@ -76,10 +76,10 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up memory regions */
-	tx0_memory = (UINT32 *) memory_region(machine, REGION_CPU1);
+	tx0_memory = (UINT32 *) memory_region(machine, "|main|");
 
 	/* set up our font */
-	dst = memory_region(machine, REGION_GFX1);
+	dst = memory_region(machine, "gfx1");
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }
@@ -242,7 +242,7 @@ static const UINT8 tx0_palette[] =
 static UINT8 total_colors_needed = pen_crt_num_levels + sizeof(tx0_colors) / 3;
 
 static GFXDECODE_START( tx0 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, pen_crt_num_levels + sizeof(tx0_colors) / 3, 3 )
+	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(tx0_colors) / 3, 3 )
 GFXDECODE_END
 
 /* Initialise the palette */
@@ -380,19 +380,19 @@ MACHINE_DRIVER_END
 
 ROM_START(tx0_64kw)
 	/*CPU memory space*/
-	ROM_REGION(0x10000 * sizeof(UINT32),REGION_CPU1,ROMREGION_ERASEFF)
+	ROM_REGION(0x10000 * sizeof(UINT32),"main",ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
-	ROM_REGION(tx0_fontdata_size, REGION_GFX1, ROMREGION_ERASEFF)
+	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 
 ROM_START(tx0_8kw)
 	/*CPU memory space*/
-	ROM_REGION(0x2000 * sizeof(UINT32),REGION_CPU1,ROMREGION_ERASEFF)
+	ROM_REGION(0x2000 * sizeof(UINT32),"main",ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
-	ROM_REGION(tx0_fontdata_size, REGION_GFX1, ROMREGION_ERASEFF)
+	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 

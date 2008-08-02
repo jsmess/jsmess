@@ -191,7 +191,7 @@ static void svision_update (void *param,stream_sample_t **inputs, stream_sample_
 			UINT16 addr = svision_dma.start + (unsigned) svision_dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
-				sample = memory_region(Machine, REGION_USER1)[(addr & 0x3fff) | svision_dma.ca14to16];
+				sample = memory_region(Machine, "user1")[(addr & 0x3fff) | svision_dma.ca14to16];
 			}
 			else
 			{

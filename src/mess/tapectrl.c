@@ -139,7 +139,7 @@ void menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter,
 
 	/* if no state, allocate some */
 	if (state == NULL)
-		state = ui_menu_alloc_state(menu, sizeof(*menustate));
+		state = ui_menu_alloc_state(menu, sizeof(*menustate), NULL);
 	menustate = (tape_control_menu_state *) state;
 
 	/* do we have to load the device? */

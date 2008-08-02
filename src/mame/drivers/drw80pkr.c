@@ -175,7 +175,7 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( drw80pkr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -198,12 +198,12 @@ static ADDRESS_MAP_START( drw80pkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_RAM AM_READWRITE(drw80pkr_cmos_r, drw80pkr_cmos_w) AM_BASE(&pkr_cmos_ram)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_cmos_r, drw80pkr_cmos_w) AM_BASE(&pkr_cmos_ram)
 	AM_RANGE(I8039_t1, I8039_t1) AM_RAM
-	AM_RANGE(I8039_p1, I8039_p1) AM_RAM AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_RAM AM_READWRITE(p2_r, p2_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(p1_r, p1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(p2_r, p2_w)
     AM_RANGE(I8039_p4, I8039_p4) AM_RAM_WRITE(p4_w)
-    AM_RANGE(I8039_bus, I8039_bus) AM_RAM AM_READWRITE(bus_r, bus_w)
+    AM_RANGE(I8039_bus, I8039_bus) AM_READWRITE(bus_r, bus_w)
 ADDRESS_MAP_END
 
 /*************************
@@ -252,15 +252,15 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( drw80pkr )
-	ROM_REGION( 0x2000, REGION_CPU1, 0 )
+	ROM_REGION( 0x2000, "main", 0 )
 	ROM_LOAD( "pm0.u81",   0x0000, 0x1000, CRC(0f3e97d2) SHA1(aa9e4015246284f32435d7320de667e075412e5b) )
     ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg0-a.u74",	 0x0000, 0x1000, CRC(97f5eb92) SHA1(f6c7bb42ccef8a78e8d56104ad942ae5b8e5b0df) )
 	ROM_LOAD( "cg1-a.u76",	 0x1000, 0x1000, CRC(2a3a750d) SHA1(db6183d11b2865b011c3748dc472cf5858dde78f) )
 
-	ROM_REGION( 0x100, REGION_PROMS, 0 ) // WRONG CAP
+	ROM_REGION( 0x100, "proms", 0 ) // WRONG CAP
 	ROM_LOAD( "cap13.u92", 0x0000, 0x0100, CRC(42d6e973) SHA1(5c2983d5c80333ca45033070a2296fe58c339ee1) )
 ROM_END
 

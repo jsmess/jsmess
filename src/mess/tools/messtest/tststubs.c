@@ -14,11 +14,6 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 {
 }
 
-int osd_keyboard_disabled(void)
-{
-	return 0;
-}
-
 void osd_wait_for_debugger(running_machine *machine, int firststop)
 {
 }

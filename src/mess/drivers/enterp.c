@@ -194,10 +194,10 @@ static void enterprise_reset(running_machine *machine)
 
 	/* set read pointers */
 	/* exos */
-	Enterprise_Pages_Read[MEM_EXOS_0] = &memory_region(machine, REGION_CPU1)[0x010000];
-	Enterprise_Pages_Read[MEM_EXOS_1] = &memory_region(machine, REGION_CPU1)[0x014000];
+	Enterprise_Pages_Read[MEM_EXOS_0] = &memory_region(machine, "|main|")[0x010000];
+	Enterprise_Pages_Read[MEM_EXOS_1] = &memory_region(machine, "|main|")[0x014000];
 	/* basic */
-	Enterprise_Pages_Read[MEM_CART_0] = &memory_region(machine, REGION_CPU1)[0x018000];
+	Enterprise_Pages_Read[MEM_CART_0] = &memory_region(machine, "|main|")[0x018000];
 	/* ram */
 	Enterprise_Pages_Read[MEM_RAM_0] = mess_ram;
 	Enterprise_Pages_Read[MEM_RAM_1] = mess_ram + 0x04000;
@@ -208,8 +208,8 @@ static void enterprise_reset(running_machine *machine)
 	Enterprise_Pages_Read[MEM_RAM_6] = mess_ram + 0x018000;
 	Enterprise_Pages_Read[MEM_RAM_7] = mess_ram + 0x01c000;
 	/* exdos */
-	Enterprise_Pages_Read[MEM_EXDOS_0] = &memory_region(machine, REGION_CPU1)[0x01c000];
-	Enterprise_Pages_Read[MEM_EXDOS_1] = &memory_region(machine, REGION_CPU1)[0x020000];
+	Enterprise_Pages_Read[MEM_EXDOS_0] = &memory_region(machine, "|main|")[0x01c000];
+	Enterprise_Pages_Read[MEM_EXDOS_1] = &memory_region(machine, "|main|")[0x020000];
 
 	/* set write pointers */
 	Enterprise_Pages_Write[MEM_RAM_0] = mess_ram;
@@ -567,7 +567,7 @@ MACHINE_DRIVER_END
 
 ROM_START( ep128 )
 		/* 128k ram + 32k rom (OS) + 16k rom (BASIC) + 32k rom (EXDOS) */
-		ROM_REGION( 0x24000, REGION_CPU1, 0 )
+		ROM_REGION( 0x24000, "main", 0 )
 		ROM_SYSTEM_BIOS( 0, "default", "EXOS 2.1" )
 		ROMX_LOAD("exos21.rom", 0x10000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e), ROM_BIOS(1) )
 		ROM_SYSTEM_BIOS( 1, "exos20", "EXOS 2.0" )

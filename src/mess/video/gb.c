@@ -1167,8 +1167,8 @@ void gb_video_init( running_machine *machine, int mode ) {
 	switch( mode ) {
 	case GB_VIDEO_CGB:	vram_size = 0x4000; break;
 	}
-	gb_vram = new_memory_region( machine, REGION_GFX1, vram_size, 0 );
-	gb_oam = new_memory_region( machine, REGION_GFX2, 0x100, 0 );
+	gb_vram = memory_region_alloc( machine, "gfx1", vram_size, 0 );
+	gb_oam = memory_region_alloc( machine, "gfx2", 0x100, 0 );
 	memset( gb_vram, 0, vram_size );
 	memset( &gb_lcd, 0, sizeof(gb_lcd) );
 

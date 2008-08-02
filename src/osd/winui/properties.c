@@ -201,6 +201,10 @@ static void OptionsToProp(HWND hWnd, core_options *o);
 static void SetPropEnabledControls(HWND hWnd);
 static BOOL SelectEffect(HWND hWnd);
 static BOOL ResetEffect(HWND hWnd);
+static BOOL SelectJoystickMap(HWND hWnd);
+static BOOL ResetJoystickMap(HWND hWnd);
+static BOOL SelectDebugscript(HWND hWnd);
+static BOOL ResetDebugscript(HWND hWnd);
 
 static void BuildDataMap(void);
 static void ResetDataMap(HWND hWnd);
@@ -234,6 +238,7 @@ static int  g_nPropertyMode    = 0;
 static BOOL g_bUseDefaults     = FALSE;
 static BOOL g_bReset           = FALSE;
 static BOOL  g_bAutoAspect[MAX_SCREENS] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
+static BOOL  g_bAutoSnapSize = FALSE;
 static HICON g_hIcon = NULL;
 
 /* Property sheets */
@@ -261,6 +266,7 @@ static struct ComboBoxVideo
 	const char*		m_pData;
 } g_ComboBoxVideo[] = 
 {
+	{ TEXT("None"),                 "none"    },
 	{ TEXT("GDI"),                  "gdi"    },
 	{ TEXT("DirectDraw"),           "ddraw"   },
 	{ TEXT("Direct3D"),             "d3d"     },
@@ -321,6 +327,21 @@ static struct ComboBoxDevices
 };
 
 #define NUMDEVICES (sizeof(g_ComboBoxDevice) / sizeof(g_ComboBoxDevice[0]))
+
+static struct ComboBoxSnapView
+{
+	const TCHAR*	m_pText;
+	const char*		m_pData;
+} g_ComboBoxSnapView[] = 
+{
+	{ TEXT("Internal"),	        "internal"    },
+	{ TEXT("Auto"),		        "auto"        },
+	{ TEXT("Standard"),         "standard"    }, 
+	{ TEXT("Pixel Aspect"),     "pixel"       }, 
+	{ TEXT("Cocktail"),         "cocktail"    },
+};
+#define NUMSNAPVIEW (sizeof(g_ComboBoxSnapView) / sizeof(g_ComboBoxSnapView[0]))
+
 
 /***************************************************************
  * Public functions
@@ -1064,12 +1085,37 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				}
 				break;
 
+			case IDC_SNAPSIZE:
+				nCurSelection = Button_GetCheck( GetDlgItem(hDlg, IDC_SNAPSIZE));
+				if( g_bAutoSnapSize != nCurSelection )
+				{
+					changed = TRUE;
+					g_bAutoSnapSize = nCurSelection;
+				}
+				break;
+
 			case IDC_SELECT_EFFECT:
 				changed = SelectEffect(hDlg);
 				break;
 
 			case IDC_RESET_EFFECT:
 				changed = ResetEffect(hDlg);
+				break;
+
+			case IDC_SELECT_JOYSTICKMAP:
+				changed = SelectJoystickMap(hDlg);
+				break;
+
+			case IDC_RESET_JOYSTICKMAP:
+				changed = ResetJoystickMap(hDlg);
+				break;
+
+			case IDC_SELECT_DEBUGSCRIPT:
+				changed = SelectDebugscript(hDlg);
+				break;
+
+			case IDC_RESET_DEBUGSCRIPT:
+				changed = ResetDebugscript(hDlg);
 				break;
 
 			case IDC_PROP_RESET:
@@ -1427,6 +1473,39 @@ static void PropToOptions(HWND hWnd, core_options *o)
 			options_set_string(o, aspect_option, buffer2, OPTION_PRIORITY_CMDLINE);
 		}
 	}
+	/* aspect ratio */
+	hCtrl  = GetDlgItem(hWnd, IDC_SNAPSIZEWIDTH);
+	hCtrl2 = GetDlgItem(hWnd, IDC_SNAPSIZEHEIGHT);
+	hCtrl3 = GetDlgItem(hWnd, IDC_SNAPSIZE);
+	if (hCtrl && hCtrl2 && hCtrl3)
+	{
+		if (Button_GetCheck(hCtrl3))
+		{
+			options_set_string(o, OPTION_SNAPSIZE, "auto", OPTION_PRIORITY_CMDLINE);
+		}
+		else
+		{
+			int width = 0;
+			int height = 0;
+			TCHAR buffer[200];
+			char buffer2[200];
+
+			Edit_GetText(hCtrl,buffer,sizeof(buffer));
+			_stscanf(buffer,TEXT("%d"),&width);
+
+			Edit_GetText(hCtrl2,buffer,sizeof(buffer));
+			_stscanf(buffer,TEXT("%d"),&height);
+
+			if (width == 0 || height == 0)
+			{
+				width = 640;
+				height = 480;
+			}
+
+			snprintf(buffer2,sizeof(buffer2),"%dx%d",width,height);
+			options_set_string(o, OPTION_SNAPSIZE, buffer2, OPTION_PRIORITY_CMDLINE);
+		}
+	}
 }
 
 /* Update options from the dialog */
@@ -1454,6 +1533,8 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 	TCHAR buf[100];
 	int  n = 0;
 	int  d = 0;
+	int  width = 0;
+	int  height = 0;
 
 	/* video */
 
@@ -1466,6 +1547,12 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 	if (hCtrl)
 	{
 		Button_SetCheck(hCtrl, g_bAutoAspect[GetSelectedScreen(hWnd)] )	;
+	}
+
+	hCtrl = GetDlgItem(hWnd, IDC_SNAPSIZE);
+	if (hCtrl)
+	{
+		Button_SetCheck(hCtrl, g_bAutoSnapSize )	;
 	}
 
 	/* Bios select list */
@@ -1545,6 +1632,48 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 		}
 		win_set_window_text_utf8(hCtrl, effect);
 	}
+	hCtrl = GetDlgItem(hWnd, IDC_SNAPSIZE);
+	if (hCtrl)
+	{
+		if( strcmp(options_get_string(o, OPTION_SNAPSIZE), "auto") == 0)
+		{
+			Button_SetCheck(hCtrl, TRUE);
+			g_bAutoSnapSize = TRUE;
+		}
+		else
+		{
+			Button_SetCheck(hCtrl, FALSE);
+			g_bAutoSnapSize = FALSE;
+		}
+	}
+	/* snapshot size */
+	hCtrl  = GetDlgItem(hWnd, IDC_SNAPSIZEWIDTH);
+	hCtrl2 = GetDlgItem(hWnd, IDC_SNAPSIZEHEIGHT);
+	if (hCtrl && hCtrl2)
+	{
+		n = 0;
+		d = 0;
+		if (options_get_string(o, OPTION_SNAPSIZE))
+		{
+			if (sscanf(options_get_string(o, OPTION_SNAPSIZE), "%dx%d", &width, &height) == 2 && width != 0 && height != 0)
+			{
+				_stprintf(buf, TEXT("%d"), width);
+				Edit_SetText(hCtrl, buf);
+				_stprintf(buf, TEXT("%d"), height);
+				Edit_SetText(hCtrl2, buf);
+			}
+			else
+			{
+				Edit_SetText(hCtrl,  TEXT("640"));
+				Edit_SetText(hCtrl2, TEXT("480"));
+			}
+		}
+		else
+		{
+			Edit_SetText(hCtrl,  TEXT("640"));
+			Edit_SetText(hCtrl2, TEXT("480"));
+		}
+	}
 }
 
 /* Adjust controls - tune them to the currently selected game */
@@ -1592,6 +1721,12 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_ASPECTRATIOTEXT), !g_bAutoAspect[GetSelectedScreen(hWnd)]);
 	EnableWindow(GetDlgItem(hWnd, IDC_ASPECTRATION), !g_bAutoAspect[GetSelectedScreen(hWnd)]);
 	EnableWindow(GetDlgItem(hWnd, IDC_ASPECTRATIOD), !g_bAutoAspect[GetSelectedScreen(hWnd)]);
+
+	EnableWindow(GetDlgItem(hWnd, IDC_SNAPSIZETEXT), !g_bAutoSnapSize);
+	EnableWindow(GetDlgItem(hWnd, IDC_SNAPSIZEHEIGHT), !g_bAutoSnapSize);
+	EnableWindow(GetDlgItem(hWnd, IDC_SNAPSIZEWIDTH), !g_bAutoSnapSize);
+	EnableWindow(GetDlgItem(hWnd, IDC_SNAPSIZEX), !g_bAutoSnapSize);
+
 
 	EnableWindow(GetDlgItem(hWnd,IDC_D3D_FILTER),d3d);
 	EnableWindow(GetDlgItem(hWnd,IDC_D3D_VERSION),d3d);
@@ -1823,8 +1958,6 @@ static void ViewSetOptionName(datamap *map, HWND dialog, HWND control, char *buf
 	snprintf(buffer, buffer_size, "view%d", GetSelectedScreen(dialog));
 }
 
-
-
 static BOOL ViewPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
 	int i;
@@ -1843,6 +1976,28 @@ static BOOL ViewPopulateControl(datamap *map, HWND dialog, HWND control, core_op
 		(void)ComboBox_SetItemData(control, i, g_ComboBoxView[i].m_pData);
 
 		if (!strcmp(view, g_ComboBoxView[i].m_pData))
+			selected_index = i;
+	}
+	(void)ComboBox_SetCurSel(control, selected_index);
+	return FALSE;
+}
+
+static BOOL SnapViewPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+{
+	int i;
+	int selected_index = 0;
+	const char *snapview;
+
+	// determine the snapview option value
+	snapview = options_get_string(opts, OPTION_SNAPVIEW);
+
+	(void)ComboBox_ResetContent(control);
+	for (i = 0; i < NUMSNAPVIEW; i++)
+	{
+		(void)ComboBox_InsertString(control, i, g_ComboBoxSnapView[i].m_pText);
+		(void)ComboBox_SetItemData(control, i, g_ComboBoxSnapView[i].m_pData);
+
+		if (!strcmp(snapview, g_ComboBoxSnapView[i].m_pData))
 			selected_index = i;
 	}
 	(void)ComboBox_SetCurSel(control, selected_index);
@@ -2097,18 +2252,22 @@ static void BuildDataMap(void)
 
 	// core state options
 	datamap_add(properties_datamap, IDC_ENABLE_AUTOSAVE,		DM_BOOL,	OPTION_AUTOSAVE);
+	datamap_add(properties_datamap, IDC_SNAPVIEW,				DM_STRING,	OPTION_SNAPVIEW);
+	datamap_add(properties_datamap, IDC_SNAPSIZEWIDTH,			DM_STRING,	NULL);
+	datamap_add(properties_datamap, IDC_SNAPSIZEHEIGHT,			DM_STRING,	NULL);
 
 	// core performance options
     datamap_add(properties_datamap, IDC_AUTOFRAMESKIP,			DM_BOOL,	OPTION_AUTOFRAMESKIP);
 	datamap_add(properties_datamap, IDC_FRAMESKIP,				DM_INT,		OPTION_FRAMESKIP);
-	// Missing -seconds_to_run OPTION_SECONDS_TO_RUN
+	datamap_add(properties_datamap, IDC_SECONDSTORUN,			DM_INT,		OPTION_SECONDS_TO_RUN);
+	datamap_add(properties_datamap, IDC_SECONDSTORUNDISP,		DM_INT,		OPTION_SECONDS_TO_RUN);
 	datamap_add(properties_datamap, IDC_THROTTLE,				DM_BOOL,	OPTION_THROTTLE);
 	datamap_add(properties_datamap, IDC_SLEEP,					DM_BOOL,	OPTION_SLEEP);
 	datamap_add(properties_datamap, IDC_SPEED,				    DM_FLOAT,	OPTION_SPEED);
 	datamap_add(properties_datamap, IDC_SPEEDDISP,				DM_FLOAT,	OPTION_SPEED);
 	datamap_add(properties_datamap, IDC_REFRESHSPEED,			DM_BOOL,	OPTION_REFRESHSPEED);
 
-	// Ccore retation options
+	// core retation options
 	datamap_add(properties_datamap, IDC_ROTATE,					DM_INT,		NULL);
 	// ror, rol, autoror, autorol handled by callback
 	datamap_add(properties_datamap, IDC_FLIPX,					DM_BOOL,	OPTION_FLIPX);
@@ -2154,11 +2313,12 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_MULTIKEYBOARD,			DM_BOOL,	OPTION_MULTIKEYBOARD);
 	datamap_add(properties_datamap, IDC_MULTIMOUSE,				DM_BOOL,	OPTION_MULTIMOUSE);
 	datamap_add(properties_datamap, IDC_RELOAD,					DM_BOOL,	OPTION_OFFSCREEN_RELOAD);
-	//  missing joystick_map
+
 	datamap_add(properties_datamap, IDC_JDZ,					DM_FLOAT,	OPTION_JOYSTICK_DEADZONE);
 	datamap_add(properties_datamap, IDC_JDZDISP,				DM_FLOAT,	OPTION_JOYSTICK_DEADZONE);
 	datamap_add(properties_datamap, IDC_JSAT,					DM_FLOAT,	OPTION_JOYSTICK_SATURATION);
 	datamap_add(properties_datamap, IDC_JSATDISP,				DM_FLOAT,	OPTION_JOYSTICK_SATURATION);
+	datamap_add(properties_datamap, IDC_JOYSTICKMAP,			DM_STRING,	OPTION_JOYSTICK_MAP);
 
 	// core input automatic enable options
 	datamap_add(properties_datamap, IDC_PADDLE,					DM_STRING,	OPTION_PADDLE_DEVICE);
@@ -2173,14 +2333,17 @@ static void BuildDataMap(void)
 	// core debugging options
 	datamap_add(properties_datamap, IDC_LOG,					DM_BOOL,	OPTION_LOG);
 	datamap_add(properties_datamap, IDC_DEBUG,					DM_BOOL,	OPTION_DEBUG);
+	datamap_add(properties_datamap, IDC_VERBOSE,				DM_BOOL,	OPTION_VERBOSE);
+	datamap_add(properties_datamap, IDC_UPDATEINPAUSE,			DM_BOOL,	OPTION_UPDATEINPAUSE);
+	datamap_add(properties_datamap, IDC_DEBUGSCRIPT,			DM_STRING,	OPTION_DEBUGSCRIPT);
 
 	// core misc options
 	datamap_add(properties_datamap, IDC_BIOS,					DM_STRING,	OPTION_BIOS);
 	datamap_add(properties_datamap, IDC_CHEAT,					DM_BOOL,	OPTION_CHEAT);
 	datamap_add(properties_datamap, IDC_SKIP_GAME_INFO,			DM_BOOL,	OPTION_SKIP_GAMEINFO);
 
-	// windows debuggin options
-	// oslog?  missing
+	// windows debugging options
+	datamap_add(properties_datamap, IDC_OSLOG,					DM_BOOL,	WINOPTION_OSLOG);
 
 	// windows performance options
 	datamap_add(properties_datamap, IDC_HIGH_PRIORITY,			DM_INT,		WINOPTION_PRIORITY);
@@ -2244,10 +2407,13 @@ static void BuildDataMap(void)
 	datamap_set_callback(properties_datamap, IDC_SIZES,			DCT_READ_CONTROL,		ResolutionReadControl);
 	datamap_set_callback(properties_datamap, IDC_SIZES,			DCT_POPULATE_CONTROL,	ResolutionPopulateControl);
 	datamap_set_callback(properties_datamap, IDC_DEFAULT_INPUT,	DCT_POPULATE_CONTROL,	DefaultInputPopulateControl);
+	datamap_set_callback(properties_datamap, IDC_SNAPVIEW,		DCT_POPULATE_CONTROL,	SnapViewPopulateControl);
 
 	datamap_set_option_name_callback(properties_datamap, IDC_VIEW,		ViewSetOptionName);
+	//missing population of views with per game defined additional views
 	datamap_set_option_name_callback(properties_datamap, IDC_REFRESH,	ResolutionSetOptionName);
 	datamap_set_option_name_callback(properties_datamap, IDC_SIZES,		ResolutionSetOptionName);
+
 
 	// formats
 	datamap_set_int_format(properties_datamap, IDC_VOLUMEDISP,			"%ddB");
@@ -2272,6 +2438,7 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_SPEED,       0.00, 3.00,  (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_BEAM,        (float)0.10, 10.00, (float)0.10);
 	datamap_set_trackbar_range(properties_datamap, IDC_VOLUME,      -32,  0, 1);
+	datamap_set_trackbar_range(properties_datamap, IDC_SECONDSTORUN, 0,  60, 1);
 
 #ifdef MESS
 	// MESS specific stuff
@@ -2837,6 +3004,73 @@ static BOOL ResetEffect(HWND hWnd)
 	return changed;
 }
 
+static BOOL SelectJoystickMap(HWND hWnd)
+{
+	char filename[MAX_PATH];
+	BOOL changed = FALSE;
+
+	*filename = 0;
+	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_JOYMAP_FILES))
+	{
+		if (strcmp(filename, options_get_string(pCurrentOpts, OPTION_JOYSTICK_MAP)))
+		{
+			HWND control = GetDlgItem(hWnd, IDC_JOYSTICKMAP);
+			options_set_string(pCurrentOpts, OPTION_JOYSTICK_MAP, filename, OPTION_PRIORITY_CMDLINE);
+			win_set_window_text_utf8(control, filename);
+			changed = TRUE;
+		}
+	}
+	return changed;
+}
+
+static BOOL ResetJoystickMap(HWND hWnd)
+{
+	BOOL changed = FALSE;
+	const char *new_value = "auto";
+
+	if (strcmp(new_value, options_get_string(pCurrentOpts, OPTION_JOYSTICK_MAP)))
+	{
+		HWND control = GetDlgItem(hWnd, IDC_JOYSTICKMAP);
+		options_set_string(pCurrentOpts, OPTION_JOYSTICK_MAP, new_value, OPTION_PRIORITY_CMDLINE);
+		win_set_window_text_utf8(control, new_value);
+		changed = TRUE;
+	}
+	return changed;
+}
+
+static BOOL SelectDebugscript(HWND hWnd)
+{
+	char filename[MAX_PATH];
+	BOOL changed = FALSE;
+
+	*filename = 0;
+	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_DEBUGSCRIPT_FILES))
+	{
+		if (strcmp(filename, options_get_string(pCurrentOpts, OPTION_DEBUGSCRIPT)))
+		{
+			HWND control = GetDlgItem(hWnd, IDC_DEBUGSCRIPT);
+			options_set_string(pCurrentOpts, OPTION_DEBUGSCRIPT, filename, OPTION_PRIORITY_CMDLINE);
+			win_set_window_text_utf8(control, filename);
+			changed = TRUE;
+		}
+	}
+	return changed;
+}
+
+static BOOL ResetDebugscript(HWND hWnd)
+{
+	BOOL changed = FALSE;
+	const char *new_value = "";
+
+	if (strcmp(new_value, options_get_string(pCurrentOpts, OPTION_DEBUGSCRIPT)))
+	{
+		HWND control = GetDlgItem(hWnd, IDC_DEBUGSCRIPT);
+		options_set_string(pCurrentOpts, OPTION_DEBUGSCRIPT, new_value, OPTION_PRIORITY_CMDLINE);
+		win_set_window_text_utf8(control, new_value);
+		changed = TRUE;
+	}
+	return changed;
+}
 
 void UpdateBackgroundBrush(HWND hwndTab)
 {

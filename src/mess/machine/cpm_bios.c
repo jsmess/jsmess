@@ -639,7 +639,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 
 		/* copy the CP/M 2.2 image to Z80 memory space */
 		for (i = 0; i < 0x1600; i++)
-			RAM[CCP + i] = memory_region(machine, 2)[i];
+			RAM[CCP + i] = memory_region(machine, "cpu1")[i];
 
 		/* build the bios jump table */
 		cpm_jumptable();

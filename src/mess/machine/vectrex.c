@@ -74,7 +74,7 @@ static int vectrex_verify_cart (char *data)
 
 DEVICE_IMAGE_LOAD( vectrex_cart )
 {
-	UINT8 *mem = memory_region(image->machine, REGION_CPU1);
+	UINT8 *mem = memory_region(image->machine, "|");
 	image_fread(image, mem, 0x8000);
 
 	/* check image! */

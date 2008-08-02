@@ -541,7 +541,7 @@ MACHINE_DRIVER_END
 	and in the second half, the case of the "plc" in the company string differs.
 */
 ROM_START( samcoupe )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0,  "31",  "v3.1" )
 	ROMX_LOAD( "rom31.z5",  0x0000, 0x8000, CRC(0b7e3585) SHA1(c86601633fb61a8c517f7657aad9af4e6870f2ee), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1,  "30",  "v3.0" )

@@ -164,11 +164,11 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
 			memory_set_bankptr( 1, namcofl_workram );
-			memory_set_bankptr( 2, memory_region(machine, REGION_CPU1) );
+			memory_set_bankptr( 2, memory_region(machine, "main") );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) );
+			memory_set_bankptr( 1, memory_region(machine, "main") );
 			memory_set_bankptr( 2, namcofl_workram );
 		}
 	}
@@ -191,7 +191,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
 	AM_RANGE(0x10000000, 0x100fffff) AM_READWRITE(SMH_BANK2, SMH_BANK2)
-	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* data */
+	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("user1", 0)	/* data */
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM	AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) /* nvram */
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
 	AM_RANGE(0x30284000, 0x3028bfff) AM_RAM	AM_BASE(&namcofl_mcuram) /* shared RAM with C75 MCU */
@@ -308,7 +308,7 @@ static const gfx_layout roz_layout =
 static GFXDECODE_START( 2 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,	0, tile_layout,	0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,	0, obj_layout,		0x0000, 0x10 )
-	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION,	0, roz_layout,		0x1800, 0x08 )
+	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION,	    0, roz_layout,		0x1800, 0x08 )
 GFXDECODE_END
 
 
@@ -348,8 +348,6 @@ static MACHINE_RESET( namcofl )
 
 
 
-NAMCO_C7X_HARDWARE
-
 static MACHINE_DRIVER_START( namcofl )
 	MDRV_CPU_ADD("main", I960, 20000000)	// i80960KA-20 == 20 MHz part
 	MDRV_CPU_PROGRAM_MAP(namcofl_mem, 0)
@@ -378,11 +376,11 @@ static MACHINE_DRIVER_START( namcofl )
 MACHINE_DRIVER_END
 
 ROM_START( speedrcr )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // i960 program
+	ROM_REGION( 0x200000, "main", 0 ) // i960 program
 	ROM_LOAD32_WORD("se2mpea4.19a",   0x000000, 0x080000, CRC(95ab3fd7) SHA1(273a536f8512f3c55260ac1b78533bc35b8390ed) )
 	ROM_LOAD32_WORD("se2mpoa4.18a",   0x000002, 0x080000, CRC(5b5ef1eb) SHA1(3e9e4abb1a32269baef772079de825dfe1ea230c) )
 
-	ROM_REGION( 0x200000, REGION_USER1, 0 ) // Data
+	ROM_REGION( 0x200000, "user1", 0 ) // Data
 	ROM_LOAD32_BYTE("se1_dat0.13a",   0x000000, 0x080000, CRC(cc5d6ff5) SHA1(6fad40a1fac75bc64d3b7a7562cf7ce2a3abd36a) )
 	ROM_LOAD32_BYTE("se1_dat1.14a",   0x000001, 0x080000, CRC(ddc8b306) SHA1(f169d521b800c108deffdef9fc6b0058621ee909) )
 	ROM_LOAD32_BYTE("se1_dat2.15a",   0x000002, 0x080000, CRC(2a29abbb) SHA1(945419ed61e9a656a340214a63a01818396fbe98) )
@@ -410,20 +408,20 @@ ROM_START( speedrcr )
 	ROM_REGION( 0x100000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("se1_ssh.18u",    0x000000, 0x100000, CRC(7a8e0bda) SHA1(f6a508d90274d0205fec0c46f5f783a2715c0c6e) )
 
-	ROM_REGION( 0x100000, REGION_USER4, 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("se1_spr.21l",   0x000000,  0x80000, CRC(850a27ac) SHA1(7d5db840ec67659a1f2e69a62cdb03ce6ee0b47b) )
 	NAMCO_C7X_BIOS
 
-	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x400000, "c352", 0 ) // Samples
 	ROM_LOAD("se1_voi.23s",   0x000000, 0x400000, CRC(b95e2ffb) SHA1(7669232d772caa9afa4c7593d018e8b6e534114a) )
 ROM_END
 
 ROM_START( finalapb )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // i960 program
+	ROM_REGION( 0x200000, "main", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpeb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2mpob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
 
-	ROM_REGION( 0x200000, REGION_USER1, ROMREGION_ERASEFF ) // Data
+	ROM_REGION( 0x200000, "user1", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTGFXREGION, 0 )	// "RCHAR" (roz characters)
 	ROM_LOAD("flr1rch0.19j",   0x000000, 0x100000, CRC(f413f50d) SHA1(cdd8073dda4feaea78e3b94520cf20a9799fd04d) )
@@ -447,20 +445,20 @@ ROM_START( finalapb )
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x100000, REGION_USER4, 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 	NAMCO_C7X_BIOS
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 ROM_END
 
 ROM_START( finalapo )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // i960 program
+	ROM_REGION( 0x200000, "main", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpe.19a",   0x000000, 0x080000, CRC(cc8961ae) SHA1(08ce4d27a723101370d1c536b26256ce0d8a1b6c) )
 	ROM_LOAD32_WORD("flr2mpo.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
 
-	ROM_REGION( 0x200000, REGION_USER1, ROMREGION_ERASEFF ) // Data
+	ROM_REGION( 0x200000, "user1", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTGFXREGION, 0 )	// "RCHAR" (roz characters)
 	ROM_LOAD("flr1rch0.19j",   0x000000, 0x100000, CRC(f413f50d) SHA1(cdd8073dda4feaea78e3b94520cf20a9799fd04d) )
@@ -484,20 +482,20 @@ ROM_START( finalapo )
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x100000, REGION_USER4, 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 	NAMCO_C7X_BIOS
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 ROM_END
 
 ROM_START( finalapr )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // i960 program
+	ROM_REGION( 0x200000, "main", 0 ) // i960 program
         ROM_LOAD32_WORD("flr1_mpec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
         ROM_LOAD32_WORD("flr1_mpoc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
 
-	ROM_REGION( 0x200000, REGION_USER1, ROMREGION_ERASEFF ) // Data
+	ROM_REGION( 0x200000, "user1", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTGFXREGION, 0 )	// "RCHAR" (roz characters)
 	ROM_LOAD("flr1rch0.19j",   0x000000, 0x100000, CRC(f413f50d) SHA1(cdd8073dda4feaea78e3b94520cf20a9799fd04d) )
@@ -521,11 +519,11 @@ ROM_START( finalapr )
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x100000, REGION_USER4, 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 	NAMCO_C7X_BIOS
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 ROM_END
 
@@ -533,7 +531,7 @@ static void namcofl_common_init(running_machine *machine)
 {
 	namcofl_workram = auto_malloc(0x100000);
 
-	memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) );
+	memory_set_bankptr( 1, memory_region(machine, "main") );
 	memory_set_bankptr( 2, namcofl_workram );
 
 	namcoc7x_on_driver_init(machine);

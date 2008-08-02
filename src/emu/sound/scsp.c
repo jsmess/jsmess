@@ -185,7 +185,7 @@ struct _SCSP
 		UINT8 datab[0x30];
 	} udata;
 	struct _SLOT Slots[32];
-	signed short RINGBUF[64];
+	signed short RINGBUF[128];
 	unsigned char BUFPTR;
 #if FM_DELAY
 	signed short DELAYBUF[FM_DELAY];
@@ -507,7 +507,7 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((double)(n))/log(2.0))
 
-static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int sndindex)
+static void SCSP_Init(const char *tag, struct _SCSP *SCSP, const struct SCSPinterface *intf, int sndindex)
 {
 	int i;
 
@@ -528,10 +528,10 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 			SCSP->Master=0;
 		}
 
-		if (intf->region)
+		SCSP->SCSPRAM = memory_region(Machine, tag);
+		if (SCSP->SCSPRAM)
 		{
-			SCSP->SCSPRAM = memory_region(Machine, intf->region);
-			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, intf->region);
+			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, tag);
 			SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
 			SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
 			SCSP->SCSPRAM += intf->roffset;
@@ -1218,7 +1218,7 @@ static void SCSP_Update(void *param, stream_sample_t **inputs, stream_sample_t *
 	SCSP_DoMasterSamples(SCSP, samples);
 }
 
-static void *scsp_start(int sndindex, int clock, const void *config)
+static void *scsp_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct SCSPinterface *intf;
 
@@ -1230,7 +1230,7 @@ static void *scsp_start(int sndindex, int clock, const void *config)
 	intf = config;
 
 	// init the emulation
-	SCSP_Init(SCSP, intf, sndindex);
+	SCSP_Init(tag, SCSP, intf, sndindex);
 
 	// set up the IRQ callbacks
 	{
@@ -1250,6 +1250,8 @@ void SCSP_set_ram_base(int which, void *base)
 	{
 		SCSP->SCSPRAM = base;
 		SCSP->DSP.SCSPRAM = base;
+		SCSP->SCSPRAM_LENGTH = 0x80000;
+		SCSP->DSP.SCSPRAM_LENGTH = 0x80000/2;
 	}
 }
 

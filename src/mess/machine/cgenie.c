@@ -117,7 +117,7 @@ static UINT8 *image_buff;
 
 static OPBASE_HANDLER (opbaseoverride)
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, "|");
 	const device_config *img;
 	UINT8 *buff, *s, data;
 	UINT16 size, entry = 0, block_len, block_ofs = 0;
@@ -214,7 +214,7 @@ static void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, 
 
 MACHINE_RESET( cgenie )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, "|");
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
 	AYWriteReg(0, 0, 0);
@@ -267,7 +267,7 @@ MACHINE_RESET( cgenie )
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 		logerror("cgenie DOS disabled\n");
-		memset(&memory_region(machine, REGION_CPU1)[0x0c000], 0x00, 0x2000);
+		memset(&memory_region(machine, "|")[0x0c000], 0x00, 0x2000);
 	}
 
 	/* copy EXT ROM, if enabled or wipe out that memory area */
@@ -276,15 +276,15 @@ MACHINE_RESET( cgenie )
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_ROM);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_ROM);
 		logerror("cgenie EXT enabled\n");
-		memcpy(&memory_region(machine, REGION_CPU1)[0x0e000],
-			   &memory_region(machine, REGION_CPU1)[0x12000], 0x1000);
+		memcpy(&memory_region(machine, "|")[0x0e000],
+			   &memory_region(machine, "|")[0x12000], 0x1000);
 	}
 	else
 	{
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);
 		logerror("cgenie EXT disabled\n");
-		memset(&memory_region(machine, REGION_CPU1)[0x0e000], 0x00, 0x1000);
+		memset(&memory_region(machine, "|")[0x0e000], 0x00, 0x1000);
 	}
 
 	cgenie_load_cas = 1;
@@ -293,7 +293,7 @@ MACHINE_RESET( cgenie )
 
 MACHINE_START( cgenie )
 {
-	UINT8 *gfx = memory_region(machine, REGION_GFX2);
+	UINT8 *gfx = memory_region(machine, "gfx2");
 	int i;
 
 	/* initialize static variables */
@@ -393,7 +393,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 				spt = pd_list[i].SPT / heads;
 				dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
 				dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-				memcpy(memory_region(image->machine, REGION_CPU1) + 0x5A71 + image_index_in_device(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
+				memcpy(memory_region(image->machine, "|") + 0x5A71 + image_index_in_device(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
 				break;
 			}
 		}
@@ -493,7 +493,7 @@ static void tape_put_bit(running_machine *machine)
 {
 	int now_cycles = activecpu_gettotalcycles();
 	int diff = now_cycles - put_cycles;
-	int limit = 12 * (memory_region(machine, REGION_CPU1)[0x4310] + memory_region(machine, REGION_CPU1)[0x4311]);
+	int limit = 12 * (memory_region(machine, "|")[0x4310] + memory_region(machine, "|")[0x4311]);
 	UINT8 value;
 
 	/* overrun since last write ? */
@@ -642,7 +642,7 @@ static void tape_get_open(running_machine *machine)
 	if( !tape_get_file )
 	{
 		char buffer[sizeof(TAPE_HEADER)];
-		UINT8 *ram = memory_region(machine, REGION_CPU1);
+		UINT8 *ram = memory_region(machine, "|");
 		char *p;
 
 		sprintf(tape_name, "%-6.6s", ram + 0x41e8);
@@ -680,7 +680,7 @@ static void tape_get_open(running_machine *machine)
 static void tape_get_bit(running_machine *machine)
 {
 	int now_cycles = activecpu_gettotalcycles();
-	int limit = 10 * memory_region(machine, REGION_CPU1)[0x4312];
+	int limit = 10 * memory_region(machine, "|")[0x4312];
 	int diff = now_cycles - get_cycles;
 
 	/* overrun since last read ? */

@@ -43,7 +43,7 @@
 
 static ADDRESS_MAP_START( nitedrvr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100) // SCRAM
-	AM_RANGE(0x0200, 0x027f) AM_RAM AM_MIRROR(0x180) AM_WRITE(nitedrvr_videoram_w) AM_BASE(&videoram) // PFW
+	AM_RANGE(0x0200, 0x027f) AM_RAM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_BASE(&videoram) // PFW
 	AM_RANGE(0x0400, 0x05ff) AM_WRITE(nitedrvr_hvc_w) AM_BASE(&nitedrvr_hvc) // POSH, POSV, CHAR, Watchdog
 	AM_RANGE(0x0600, 0x07ff) AM_READ(nitedrvr_in0_r)
 	AM_RANGE(0x0800, 0x09ff) AM_READ(nitedrvr_in1_r)
@@ -126,7 +126,7 @@ static const gfx_layout charlayout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( nitedrvr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 /* Machine Initialization */
@@ -181,7 +181,7 @@ MACHINE_DRIVER_END
 
 /*
 ROM_START( nitedrvo )       // early revision has the program code stored in 8 chips
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "006560-01.h1", 0x9000, 0x0200, NO_DUMP ) // PROM 1
     ROM_LOAD( "006561-01.c1", 0x9200, 0x0200, NO_DUMP ) // PROM 2
     ROM_LOAD( "006562-01.j1", 0x9400, 0x0200, NO_DUMP ) // PROM 3
@@ -194,15 +194,15 @@ ROM_END
 */
 
 ROM_START( nitedrvr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "006569-01.d2", 0x9000, 0x0800, CRC(7afa7542) SHA1(81018e25ebdeae1daf1308676661063b6fd7fd22) ) // MASK ROM 1
 	ROM_LOAD( "006570-01.f2", 0x9800, 0x0800, CRC(bf5d77b1) SHA1(6f603f8b0973bd89e0e721b66944aac8e9f904d9) ) // MASK ROM 2
 	ROM_RELOAD( 			  0xf800, 0x0800 ) // vectors
 
-	ROM_REGION( 0x200, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "006568-01.p2", 0x0000, 0x0200, CRC(f80d8889) SHA1(ca573543dcce1221459d5693c476cef14bfac4f4) ) // PROM, Alpha-Numeric
 
-	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "006559-01.h7", 0x0000, 0x0100, CRC(5a8d0e42) SHA1(772220c4c24f18769696ddba26db2bc2e5b0909d) ) // PROM, Sync
 ROM_END
 

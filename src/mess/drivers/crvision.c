@@ -441,12 +441,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( crvision )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "crvision.rom", 0xc000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
 ROM_END
 
 ROM_START( fnvision )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "funboot.rom", 0xc000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 
@@ -456,7 +456,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 {
 	int size = image_length(image);
 	running_machine *machine = image->machine;
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(machine, "|main|");
 
 	switch (size)
 	{

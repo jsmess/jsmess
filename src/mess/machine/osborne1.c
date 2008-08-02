@@ -177,7 +177,7 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 		break;
 	}
 	if ( osborne1.bank2_enabled ) {
-		memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) );
+		memory_set_bankptr( 1, memory_region(machine, "|") );
 		memory_set_bankptr( 2, osborne1.empty_4K );
 		memory_set_bankptr( 3, osborne1.empty_4K );
 	} else {
@@ -435,7 +435,7 @@ MACHINE_RESET( osborne1 ) {
 	osborne1.pia_0_irq_state = FALSE;
 	osborne1.pia_1_irq_state = FALSE;
 
-	osborne1.charrom = memory_region( machine, REGION_GFX1 );
+	osborne1.charrom = memory_region( machine, "gfx1" );
 
 	memset( mess_ram + 0x10000, 0xFF, 0x1000 );
 

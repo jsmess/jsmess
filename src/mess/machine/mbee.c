@@ -185,7 +185,7 @@ DEVICE_IMAGE_LOAD( mbee_cart )
 	{
 		if( image_fread(image, mem, size) == size )
 		{
-			memcpy(memory_region(image->machine, REGION_CPU1)+0x8000, mem, size);
+			memcpy(memory_region(image->machine, "|")+0x8000, mem, size);
 		}
 		free(mem);
 	}

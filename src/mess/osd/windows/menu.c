@@ -105,7 +105,6 @@ enum
 //	LOCAL VARIABLES
 //============================================================
 
-static int win_use_natural_keyboard;
 static HICON device_icons[IO_COUNT];
 static int use_input_categories;
 static int joystick_menu_setup;
@@ -1315,9 +1314,9 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 #endif
 
 	set_command_state(menu_bar, ID_KEYBOARD_EMULATED,		(has_keyboard) ?
-																(!win_use_natural_keyboard					? MFS_CHECKED : MFS_ENABLED)
+																(!ui_mess_get_use_natural_keyboard(machine)					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
-	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(machine)) ?																(win_use_natural_keyboard					? MFS_CHECKED : MFS_ENABLED)
+	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(machine)) ?																(ui_mess_get_use_natural_keyboard(machine)					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
 	set_command_state(menu_bar, ID_KEYBOARD_CUSTOMIZE,		has_keyboard								? MFS_ENABLED : MFS_GRAYED);
 
@@ -1726,11 +1725,11 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			break;
 
 		case ID_KEYBOARD_NATURAL:
-			win_use_natural_keyboard = 1;
+			ui_mess_set_use_natural_keyboard(machine, TRUE);
 			break;
 
 		case ID_KEYBOARD_EMULATED:
-			win_use_natural_keyboard = 0;
+			ui_mess_set_use_natural_keyboard(machine, FALSE);
 			break;
 
 		case ID_KEYBOARD_CUSTOMIZE:
@@ -2068,10 +2067,7 @@ int win_create_menu(running_machine *machine, HMENU *menus)
 	HMENU menu_bar = NULL;
 	HMODULE module;
 
-	// determine whether we are using the natural keyboard or not
-	win_use_natural_keyboard = options_get_bool(mame_options(), "natural");
-
-	if (mess_use_new_ui())
+	if (ui_mess_use_new_ui(machine))
 	{
 		module = win_resource_module();
 		menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));
@@ -2100,86 +2096,14 @@ error:
 
 LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	int i;
-	MSG msg;
-
-	static const WPARAM keytrans[][2] =
-	{
-		{ VK_ESCAPE,	UCHAR_MAMEKEY(ESC) },
-		{ VK_F1,		UCHAR_MAMEKEY(F1) },
-		{ VK_F2,		UCHAR_MAMEKEY(F2) },
-		{ VK_F3,		UCHAR_MAMEKEY(F3) },
-		{ VK_F4,		UCHAR_MAMEKEY(F4) },
-		{ VK_F5,		UCHAR_MAMEKEY(F5) },
-		{ VK_F6,		UCHAR_MAMEKEY(F6) },
-		{ VK_F7,		UCHAR_MAMEKEY(F7) },
-		{ VK_F8,		UCHAR_MAMEKEY(F8) },
-		{ VK_F9,		UCHAR_MAMEKEY(F9) },
-		{ VK_F10,		UCHAR_MAMEKEY(F10) },
-		{ VK_F11,		UCHAR_MAMEKEY(F11) },
-		{ VK_F12,		UCHAR_MAMEKEY(F12) },
-		{ VK_NUMLOCK,	UCHAR_MAMEKEY(F12) },
-		{ VK_SCROLL,	UCHAR_MAMEKEY(F12) },
-		{ VK_NUMPAD0,	UCHAR_MAMEKEY(0_PAD) },
-		{ VK_NUMPAD1,	UCHAR_MAMEKEY(1_PAD) },
-		{ VK_NUMPAD2,	UCHAR_MAMEKEY(2_PAD) },
-		{ VK_NUMPAD3,	UCHAR_MAMEKEY(3_PAD) },
-		{ VK_NUMPAD4,	UCHAR_MAMEKEY(4_PAD) },
-		{ VK_NUMPAD5,	UCHAR_MAMEKEY(5_PAD) },
-		{ VK_NUMPAD6,	UCHAR_MAMEKEY(6_PAD) },
-		{ VK_NUMPAD7,	UCHAR_MAMEKEY(7_PAD) },
-		{ VK_NUMPAD8,	UCHAR_MAMEKEY(8_PAD) },
-		{ VK_NUMPAD9,	UCHAR_MAMEKEY(9_PAD) },
-		{ VK_DECIMAL,	UCHAR_MAMEKEY(DEL_PAD) },
-		{ VK_ADD,		UCHAR_MAMEKEY(PLUS_PAD) },
-		{ VK_SUBTRACT,	UCHAR_MAMEKEY(MINUS_PAD) },
-		{ VK_INSERT,	UCHAR_MAMEKEY(INSERT) },
-		{ VK_DELETE,	UCHAR_MAMEKEY(DEL) },
-		{ VK_HOME,		UCHAR_MAMEKEY(HOME) },
-		{ VK_END,		UCHAR_MAMEKEY(END) },
-		{ VK_PRIOR,		UCHAR_MAMEKEY(PGUP) },
-		{ VK_NEXT,		UCHAR_MAMEKEY(PGDN) },
-		{ VK_UP,		UCHAR_MAMEKEY(UP) },
-		{ VK_DOWN,		UCHAR_MAMEKEY(DOWN) },
-		{ VK_LEFT,		UCHAR_MAMEKEY(LEFT) },
-		{ VK_RIGHT,		UCHAR_MAMEKEY(RIGHT) },
-		{ VK_PAUSE,		UCHAR_MAMEKEY(PAUSE) },
-		{ VK_CANCEL,	UCHAR_MAMEKEY(CANCEL) }
-	};
-
-	if (win_use_natural_keyboard && (message == WM_KEYDOWN))
-	{
-		for (i = 0; i < sizeof(keytrans) / sizeof(keytrans[0]); i++)
-		{
-			if (wparam == keytrans[i][0])
-			{
-				inputx_postc(Machine, keytrans[i][1]);
-				message = WM_NULL;
-
-				/* check to see if there is a corresponding WM_CHAR in our
-				 * future.  If so, remove it
-				 */
-				PeekMessage(&msg, wnd, 0, 0, PM_NOREMOVE);
-				if ((msg.message == WM_CHAR) && (msg.lParam == lparam))
-					PeekMessage(&msg, wnd, 0, 0, PM_REMOVE);
-				break;
-			}
-		}
-	}
-
 	switch(message)
 	{
 		case WM_INITMENU:
 			prepare_menus(Machine, wnd);
 			break;
 
-		case WM_CHAR:
-			if (win_use_natural_keyboard)
-				inputx_postc(Machine, wparam);
-			break;
-
 		case WM_PASTE:
-			ui_paste(Machine);
+			ui_mess_paste(Machine);
 			break;
 
 		case WM_COMMAND:
@@ -2191,13 +2115,4 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 			return winwindow_video_window_proc(wnd, message, wparam, lparam);
 	}
 	return 0;
-}
-
-//============================================================
-//	osd_keyboard_disabled
-//============================================================
-
-int osd_keyboard_disabled(void)
-{
-	return win_use_natural_keyboard;
 }

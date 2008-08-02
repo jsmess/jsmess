@@ -271,48 +271,48 @@ INPUT_PORTS_END
 
 
 ROM_START( lisa2 )
-	ROM_REGION16_BE(0x204000,REGION_CPU1,0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x204000,"main",0)	/* 68k rom and ram */
 	ROM_LOAD16_BYTE( "booth.hi", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914))
 	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
 
-	ROM_REGION(0x2000,REGION_CPU2,0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdc",0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "ioa8.rom", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa))
 
-	ROM_REGION(0x100,REGION_GFX1,0)		/* video ROM (includes S/N) */
+	ROM_REGION(0x100,"gfx1",0)		/* video ROM (includes S/N) */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
 ROM_START( lisa210 )
-	ROM_REGION16_BE(0x204000,REGION_CPU1, 0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x204000,"main", 0)	/* 68k rom and ram */
 	ROM_LOAD16_BYTE( "booth.hi", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914))
 	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
 
 #if 1
-	ROM_REGION(0x2000,REGION_CPU2, 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88.rom", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef))
 #else
-	ROM_REGION(0x2000,REGION_CPU2, 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88800k.rom", 0x1000, 0x1000, CRC(8c67959a))
 #endif
 
-	ROM_REGION(0x100,REGION_GFX1, 0)		/* video ROM (includes S/N) */
+	ROM_REGION(0x100,"gfx1", 0)		/* video ROM (includes S/N) */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 
 ROM_START( macxl )
-	ROM_REGION16_BE(0x204000,REGION_CPU1, 0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x204000,"main", 0)	/* 68k rom and ram */
 	ROM_LOAD16_BYTE( "boot3a.hi", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f))
 	ROM_LOAD16_BYTE( "boot3a.lo", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76))
 
 #if 1
-	ROM_REGION(0x2000,REGION_CPU2, 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88.rom", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef))
 #else
-	ROM_REGION(0x2000,REGION_CPU2, 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88800k.rom", 0x1000, 0x1000, CRC(8c67959a))
 #endif
 
-	ROM_REGION(0x100,REGION_GFX1, 0)		/* video ROM (includes S/N) ; no dump known, although Lisa ROM works fine at our level of emulation */
+	ROM_REGION(0x100,"gfx1", 0)		/* video ROM (includes S/N) ; no dump known, although Lisa ROM works fine at our level of emulation */
 	ROM_LOAD( "vidstatem.rom", 0x00, 0x100, BAD_DUMP CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
 ROM_END
 

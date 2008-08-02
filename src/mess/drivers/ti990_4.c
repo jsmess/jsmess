@@ -269,7 +269,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(ti990_4)
 	/*CPU memory space*/
-	ROM_REGION16_BE(0x10000, REGION_CPU1,0)
+	ROM_REGION16_BE(0x10000, "main",0)
 
 #if 0
 	/* ROM set 945121-5: "733 ASR ROM loader with self test (prototyping)"

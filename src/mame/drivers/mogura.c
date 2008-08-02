@@ -198,7 +198,7 @@ INPUT_PORTS_END
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	0x1000*8/(16*8),
 	2,
 	{ 0, 1 },
 	{ 0, 2, 4, 6, 8, 10, 12, 14 },
@@ -207,7 +207,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( mogura )
-	GFXDECODE_ENTRY( 0, 0, tiles8x8_layout, 0, 8 )
+	GFXDECODE_ENTRY( NULL, 0, tiles8x8_layout, 0, 8 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( mogura )
@@ -244,10 +244,10 @@ static MACHINE_DRIVER_START( mogura )
 MACHINE_DRIVER_END
 
 ROM_START( mogura )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "gx141.5n", 0x00000, 0x08000, CRC(98e6120d) SHA1(45cdb2d78224a7c44fff8cd3487f33c57669a06c)  )
 
-	ROM_REGION( 0x20, REGION_PROMS, 0 )
+	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "gx141.7j", 0x00, 0x20,  CRC(b21c5d5f) SHA1(6913c840dd69a7d4687f4c4cbe3ff12300f62bc2) )
 ROM_END
 

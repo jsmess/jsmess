@@ -90,7 +90,7 @@
         through the given callback handler. Special static values representing
         RAM, ROM, or BANKs are also allowed here.
 
-    AM_REGION(region, offs)
+    AM_REGION(class, tag, offs)
         Only useful if AM_READ/WRITE point to RAM, ROM, or BANK memory. By
         default, memory is allocated to back each bucket. By specifying
         AM_REGION, you can tell the memory system to point the base of the
@@ -280,6 +280,7 @@ struct _addrspace_data
 typedef struct _cpu_data cpu_data;
 struct _cpu_data
 {
+	const char *			tag;					/* CPU's tag */
 	UINT8 *					region;					/* pointer to memory region */
 	size_t					regionsize;				/* size of region, in bytes */
 
@@ -372,10 +373,10 @@ const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void address_map_detokenize(address_map *map, const addrmap_token *tokens);
+static void address_map_detokenize(address_map *map, const game_driver *driver, const addrmap_token *tokens);
 
 static void memory_init_cpudata(running_machine *machine);
-static void memory_init_preflight(const machine_config *config);
+static void memory_init_preflight(running_machine *machine);
 static void memory_init_populate(running_machine *machine);
 static void space_map_range_private(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
 static void space_map_range(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
@@ -391,8 +392,8 @@ static int subtable_merge(table_data *tabledata);
 static void subtable_release(table_data *tabledata, UINT8 subentry);
 static UINT8 *subtable_open(table_data *tabledata, offs_t l1index);
 static void subtable_close(table_data *tabledata, offs_t l1index);
-static void memory_init_allocate(const machine_config *config);
-static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory);
+static void memory_init_allocate(running_machine *machine);
+static void *allocate_memory_block(running_machine *machine, int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory);
 static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *base, size_t numbytes);
 static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs_t bytestart, offs_t byteend, UINT8 *base);
 static void memory_init_locate(running_machine *machine);
@@ -729,13 +730,13 @@ void memory_init(running_machine *machine)
 	memory_init_cpudata(machine);
 
 	/* preflight the memory handlers and check banks */
-	memory_init_preflight(machine->config);
+	memory_init_preflight(machine);
 
 	/* then fill in the tables */
 	memory_init_populate(machine);
 
 	/* allocate any necessary memory */
-	memory_init_allocate(machine->config);
+	memory_init_allocate(machine);
 
 	/* find all the allocated pointers */
 	memory_init_locate(machine);
@@ -857,7 +858,7 @@ const data_accessors *memory_get_accessors(int spacenum, int databits, int endia
     address map for a CPU's address space
 -------------------------------------------------*/
 
-address_map *address_map_alloc(const machine_config *config, int cpunum, int spacenum)
+address_map *address_map_alloc(const machine_config *config, const game_driver *driver, int cpunum, int spacenum)
 {
 	int cputype = config->cpu[cpunum].type;
 	const addrmap_token *internal_map = (const addrmap_token *)cputype_get_info_ptr(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
@@ -868,13 +869,13 @@ address_map *address_map_alloc(const machine_config *config, int cpunum, int spa
 
 	/* start by constructing the internal CPU map */
 	if (internal_map != NULL)
-		address_map_detokenize(map, internal_map);
+		address_map_detokenize(map, driver, internal_map);
 
 	/* construct the standard map */
 	if (config->cpu[cpunum].address_map[spacenum][0] != NULL)
-		address_map_detokenize(map, config->cpu[cpunum].address_map[spacenum][0]);
+		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][0]);
 	if (config->cpu[cpunum].address_map[spacenum][1] != NULL)
-		address_map_detokenize(map, config->cpu[cpunum].address_map[spacenum][1]);
+		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][1]);
 
 	return map;
 }
@@ -917,29 +918,43 @@ const address_map *memory_get_address_map(int cpunum, int spacenum)
     of address map tokens
 -------------------------------------------------*/
 
-static void address_map_detokenize(address_map *map, const addrmap_token *tokens)
+#define check_map(field) do { \
+	if (map->field != 0 && map->field != tmap.field) \
+		fatalerror("%s: %s included a mismatched address map (%s %d) for an existing map with %s %d!\n", driver->source_file, driver->name, #field, tmap.field, #field, map->field); \
+	} while (0)
+
+
+#define check_entry_handler(handler) do { \
+	if (entry->handler.generic != NULL && entry->handler.generic != SMH_RAM) \
+		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) %s handler already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #handler); \
+	} while (0)
+
+#define check_entry_field(field) do { \
+	if (entry->field != 0) \
+		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
+	} while (0)
+
+static void address_map_detokenize(address_map *map, const game_driver *driver, const addrmap_token *tokens)
 {
 	address_map_entry **entryptr;
 	address_map_entry *entry;
-	UINT8 spacenum, databits;
+	address_map tmap = {0};
 	UINT32 entrytype;
 
 	/* check the first token */
-	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, spacenum, 8, databits, 8);
+	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, tmap.spacenum, 8, tmap.databits, 8);
 	if (entrytype != ADDRMAP_TOKEN_START)
-		fatalerror("Address map missing ADDRMAP_TOKEN_START!");
-	if (spacenum >= ADDRESS_SPACES)
-		fatalerror("Invalid address space %d for memory map!", spacenum);
-	if (databits != 8 && databits != 16 && databits != 32 && databits != 64)
-		fatalerror("Invalid data bits %d for memory map!", databits);
-	if (map->spacenum != 0 && map->spacenum != spacenum)
-		fatalerror("Included a mismatched address map (space %d) for an existing map of type %d!\n", spacenum, map->spacenum);
-	if (map->databits != 0 && map->databits != databits)
-		fatalerror("Included a mismatched address map (databits %d) for an existing map with databits %d!\n", databits, map->databits);
+		fatalerror("%s: %s Address map missing ADDRMAP_TOKEN_START!\n", driver->source_file, driver->name);
+	if (tmap.spacenum >= ADDRESS_SPACES)
+		fatalerror("%s: %s Invalid address space %d for memory map!\n", driver->source_file, driver->name, tmap.spacenum);
+	if (tmap.databits != 8 && tmap.databits != 16 && tmap.databits != 32 && tmap.databits != 64)
+		fatalerror("%s: %s Invalid data bits %d for memory map!\n", driver->source_file, driver->name, tmap.databits);
+	check_map(spacenum);
+	check_map(databits);
 
 	/* fill in the map values */
-	map->spacenum = spacenum;
-	map->databits = databits;
+	map->spacenum = tmap.spacenum;
+	map->databits = tmap.databits;
 
 	/* find the end of the list */
 	for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
@@ -958,7 +973,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				address_map_detokenize(map, TOKEN_GET_PTR(tokens, tokenptr));
+				address_map_detokenize(map, driver, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -966,12 +981,16 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 			/* global flags */
 			case ADDRMAP_TOKEN_GLOBAL_MASK:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, map->globalmask, 32);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, tmap.globalmask, 32);
+				check_map(globalmask);
+				map->globalmask = tmap.globalmask;
 				break;
 
 			case ADDRMAP_TOKEN_UNMAP_VALUE:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, map->unmapval, 1);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, tmap.unmapval, 1);
+				check_map(unmapval);
+				map->unmapval = tmap.unmapval;
 				break;
 
 			/* start a new range */
@@ -983,16 +1002,19 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_MASK:
+				check_entry_field(addrmask);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmask, 32);
 				break;
 
 			case ADDRMAP_TOKEN_MIRROR:
+				check_entry_field(addrmirror);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmirror, 32);
 				break;
 
 			case ADDRMAP_TOKEN_READ:
+				check_entry_handler(read);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
@@ -1000,6 +1022,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_WRITE:
+				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
@@ -1007,6 +1030,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_READ:
+				check_entry_handler(read);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
@@ -1016,6 +1040,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_WRITE:
+				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
@@ -1025,34 +1050,42 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_READ_PORT:
+				check_entry_field(read_porttag);
 				entry->read_porttag = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_REGION:
+				check_entry_field(region);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, entry->region, 24, entry->region_offs, 32);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
+				entry->region = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:
+				check_entry_field(share);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->share, 24);
 				break;
 
 			case ADDRMAP_TOKEN_BASEPTR:
+				check_entry_field(baseptr);
 				entry->baseptr = (void **)TOKEN_GET_PTR(tokens, voidptr);
 				break;
 
 			case ADDRMAP_TOKEN_BASE_MEMBER:
+				check_entry_field(baseptroffs_plus1);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->baseptroffs_plus1, 24);
 				entry->baseptroffs_plus1++;
 				break;
 
 			case ADDRMAP_TOKEN_SIZEPTR:
+				check_entry_field(sizeptr);
 				entry->sizeptr = TOKEN_GET_PTR(tokens, sizeptr);
 				break;
 
 			case ADDRMAP_TOKEN_SIZE_MEMBER:
+				check_entry_field(sizeptroffs_plus1);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->sizeptroffs_plus1, 24);
 				entry->sizeptroffs_plus1++;
@@ -1615,8 +1648,9 @@ static void memory_init_cpudata(running_machine *machine)
 		cpu_data *cpu = &cpudata[cpunum];
 
 		/* get pointers to the CPU's memory region */
-		cpu->region = memory_region(Machine, REGION_CPU1 + cpunum);
-		cpu->regionsize = memory_region_length(Machine, REGION_CPU1 + cpunum);
+		cpu->tag = config->cpu[cpunum].tag;
+		cpu->region = memory_region(machine, cpu->tag);
+		cpu->regionsize = memory_region_length(machine, cpu->tag);
 
 		/* initialize each address space, and build up a mask of spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
@@ -1666,10 +1700,10 @@ static void memory_init_cpudata(running_machine *machine)
 		}
 
 		/* set the RAM/ROM base */
-		cpu->opbase.ram = cpu->opbase.rom = memory_region(Machine, REGION_CPU1 + cpunum);
+		cpu->opbase.ram = cpu->opbase.rom = cpu->region;
 		cpu->opbase.mask = cpu->space[ADDRESS_SPACE_PROGRAM].bytemask;
 		cpu->opbase.mem_min = 0;
-		cpu->opbase.mem_max = memory_region_length(Machine, REGION_CPU1 + cpunum);
+		cpu->opbase.mem_max = cpu->regionsize;
 		cpu->opbase.entry = STATIC_UNMAP;
 		cpu->opbase_handler = NULL;
 	}
@@ -1681,7 +1715,7 @@ static void memory_init_cpudata(running_machine *machine)
     and track which banks are referenced
 -------------------------------------------------*/
 
-static void memory_init_preflight(const machine_config *config)
+static void memory_init_preflight(running_machine *machine)
 {
 	int cpunum;
 
@@ -1703,7 +1737,7 @@ static void memory_init_preflight(const machine_config *config)
 				int entrynum;
 
 				/* allocate the address map */
-				space->map = address_map_alloc(config, cpunum, spacenum);
+				space->map = address_map_alloc(machine->config, machine->gamedrv, cpunum, spacenum);
 
 				/* extract global parameters specified by the map */
 				space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
@@ -1724,32 +1758,32 @@ static void memory_init_preflight(const machine_config *config)
 					adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
 
 					/* if this is a ROM handler without a specified region, attach it to the implicit region */
-					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == 0)
+					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == NULL)
 					{
 						/* make sure it fits within the memory region before doing so, however */
 						if (entry->byteend < cpu->regionsize)
 						{
-							entry->region = REGION_CPU1 + cpunum;
-							entry->region_offs = entry->bytestart;
+							entry->region = cpu->tag;
+							entry->rgnoffs = entry->bytestart;
 						}
 					}
 
 					/* validate adjusted addresses against implicit regions */
-					if (entry->region != 0 && entry->share == 0 && entry->baseptr == NULL)
+					if (entry->region != NULL && entry->share == 0 && entry->baseptr == NULL)
 					{
-						UINT8 *base = memory_region(Machine, entry->region);
-						offs_t length = memory_region_length(Machine, entry->region);
+						UINT8 *base = memory_region(machine, entry->region);
+						offs_t length = memory_region_length(machine, entry->region);
 
 						/* validate the region */
 						if (base == NULL)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region %d", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
-						if (entry->region_offs + (entry->byteend - entry->bytestart + 1) > length)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
+							fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region \"%s\"", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
+						if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
+							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region \"%s\" size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
 					}
 
 					/* convert any region-relative entries to their memory pointers */
-					if (entry->region != 0)
-						entry->memory = memory_region(Machine, entry->region) + entry->region_offs;
+					if (entry->region != NULL)
+						entry->memory = memory_region(machine, entry->region) + entry->rgnoffs;
 
 					/* assign static banks for explicitly specified entries */
 					if (HANDLER_IS_BANK(entry->read.generic))
@@ -2436,7 +2470,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 	FPTR handler;
 
 	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0)
-		return 1;
+		return TRUE;
 
 	handler = (FPTR)entry->write.generic;
 	if (handler < STATIC_COUNT)
@@ -2445,7 +2479,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 			handler != STATIC_ROM &&
 			handler != STATIC_NOP &&
 			handler != STATIC_UNMAP)
-			return 1;
+			return TRUE;
 	}
 
 	handler = (FPTR)entry->read.generic;
@@ -2453,13 +2487,13 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 	{
 		if (handler != STATIC_INVALID &&
 			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
-			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= memory_region_length(Machine, REGION_CPU1 + cpunum)) &&
+			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= cpudata[cpunum].regionsize) &&
 			handler != STATIC_NOP &&
 			handler != STATIC_UNMAP)
-			return 1;
+			return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
 
 
@@ -2468,7 +2502,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
     CPU address spaces
 -------------------------------------------------*/
 
-static void memory_init_allocate(const machine_config *config)
+static void memory_init_allocate(running_machine *machine)
 {
 	int cpunum, spacenum;
 
@@ -2487,7 +2521,7 @@ static void memory_init_allocate(const machine_config *config)
 				/* we do this to make sure they are found by memory_find_base first */
 				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 					if (entry->memory != NULL)
-						allocate_memory_block(cpunum, spacenum, entry->bytestart, entry->byteend, entry->memory);
+						allocate_memory_block(machine, cpunum, spacenum, entry->bytestart, entry->byteend, entry->memory);
 
 				/* loop over all blocks just allocated and assign pointers from them */
 				for (memblock = memory_block_list; memblock != prev_memblock_head; memblock = memblock->next)
@@ -2537,7 +2571,7 @@ static void memory_init_allocate(const machine_config *config)
 					/* we now have a block to allocate; do it */
 					curbytestart = curblockstart * MEMORY_BLOCK_CHUNK;
 					curbyteend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
-					block = allocate_memory_block(cpunum, spacenum, curbytestart, curbyteend, NULL);
+					block = allocate_memory_block(machine, cpunum, spacenum, curbytestart, curbyteend, NULL);
 
 					/* assign memory that intersected the new block */
 					unassigned = assign_intersecting_blocks(space, curbytestart, curbyteend, block);
@@ -2551,12 +2585,12 @@ static void memory_init_allocate(const machine_config *config)
     memory block of data
 -------------------------------------------------*/
 
-static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory)
+static void *allocate_memory_block(running_machine *machine, int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory)
 {
 	int allocatemem = (memory == NULL);
 	memory_block *block;
 	size_t bytestoalloc;
-	int region;
+	const char *region;
 
 	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, bytestart, byteend, memory));
 
@@ -2572,7 +2606,7 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, o
 		memory = block + 1;
 
 	/* register for saving, but only if we're not part of a memory region */
-	for (region = 0; region < MAX_MEMORY_REGIONS; region++)
+	for (region = memory_region_next(machine, NULL); region != NULL; region = memory_region_next(machine, region))
 	{
 		UINT8 *region_base = memory_region(Machine, region);
 		UINT32 region_length = memory_region_length(Machine, region);
@@ -2582,7 +2616,7 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, o
 			break;
 		}
 	}
-	if (region == MAX_MEMORY_REGIONS)
+	if (region == NULL)
 		register_for_save(cpunum, spacenum, bytestart, memory, byteend - bytestart + 1);
 
 	/* fill in the tracking block */

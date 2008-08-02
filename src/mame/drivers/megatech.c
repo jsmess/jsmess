@@ -224,7 +224,7 @@ static UINT8 mt_cart_select_reg;
 
 static READ8_HANDLER( megatech_instr_r )
 {
-	UINT8* instr = memory_region(machine, REGION_CPU3)+0x8000;
+	UINT8* instr = memory_region(machine, "megatech_bios")+0x8000;
 
 	return instr[offset/2];
 //  else
@@ -277,13 +277,13 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, memory_region(machine, REGION_CPU1)+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, memory_region(machine, "main")+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, memory_region(machine, REGION_CPU1)+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, memory_region(machine, "main")+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, memory_region(machine, REGION_CPU1)+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, memory_region(machine, "main")+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -333,7 +333,7 @@ static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
 	memory_set_bankptr( 5, sms_rom );
 
-	memcpy(sms_rom, memory_region(machine, REGION_CPU1), 0x400000);
+	memcpy(sms_rom, memory_region(machine, "main"), 0x400000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x2000); // 8kb of main ram
@@ -354,6 +354,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 {
 	UINT8* game_region;
 	UINT8* bios_region;
+	char tempname[20];
 
 	printf("game 0 selected\n");
 
@@ -363,8 +364,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	sndti_reset(SOUND_YM2612, 0);
 
-	game_region = memory_region(machine, REGION_USER1 + (gameno*2) + 0);
-	bios_region = memory_region(machine, REGION_USER1 + (gameno*2) + 1);
+	sprintf(tempname, "game%d", gameno);
+	game_region = memory_region(machine, tempname);
+	sprintf(tempname, "inst%d", gameno);
+	bios_region = memory_region(machine, tempname);
 
 	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
 	segae_md_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
@@ -373,8 +376,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	/* if the regions exist we're fine */
 	if (game_region && bios_region)
 	{
-		memcpy(memory_region(machine, REGION_CPU3)+0x8000, bios_region, 0x8000);
-		memcpy(memory_region(machine, REGION_CPU1), game_region, 0x300000);
+		memcpy(memory_region(machine, "megatech_bios")+0x8000, bios_region, 0x8000);
+		memcpy(memory_region(machine, "main"), game_region, 0x300000);
 
 		// I store an extra byte at the end of the instruction rom region when loading
 		// to indicate if the current cart is an SMS cart.. the original hardware
@@ -410,8 +413,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	//  cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
-		memset(memory_region(machine, REGION_CPU3)+0x8000, 0x00, 0x8000);
-		memset(memory_region(machine, REGION_CPU1), 0x00, 0x300000);
+		memset(memory_region(machine, "megatech_bios")+0x8000, 0x00, 0x8000);
+		memset(memory_region(machine, "main"), 0x00, 0x300000);
 	}
 
 	return;
@@ -435,21 +438,21 @@ static WRITE8_HANDLER( megatech_cart_select_w )
     if (mt_cart_select_reg==2)
     {
         printf("game 2 selected\n");
-        memcpy(memory_region(machine, REGION_CPU3)+0x8000, memory_region(machine, REGION_USER2), 0x8000);
+        memcpy(memory_region(machine, "megatech_bios")+0x8000, memory_region(machine, "inst0"), 0x8000);
     }
 //  else if (mt_cart_select_reg==0)
 //  {
 //      printf("game 0 selected\n");
-//      memcpy(memory_region(machine, REGION_CPU3)+0x8000, memory_region(machine, REGION_USER4), 0x8000);
+//      memcpy(memory_region(machine, "megatech_bios")+0x8000, memory_region(machine, "inst2"), 0x8000);
 //  }
     else if (mt_cart_select_reg==6)
     {
         printf("game 6 selected\n");
-        memcpy(memory_region(machine, REGION_CPU3)+0x8000, memory_region(machine, REGION_USER6), 0x8000);
+        memcpy(memory_region(machine, "megatech_bios")+0x8000, memory_region(machine, "user6"), 0x8000);
     }
     else
     {
-        memset(memory_region(machine, REGION_CPU3)+0x8000, 0x00, 0x8000);
+        memset(memory_region(machine, "megatech_bios")+0x8000, 0x00, 0x8000);
     }
 */
 
@@ -653,8 +656,8 @@ MACHINE_DRIVER_END
 	ROM_FILL(0x8000, 2, FLAG) \
 
 #define MEGATECH_BIOS \
-	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_ERASEFF ) \
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) \
+	ROM_REGION( 0x400000, "main", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x10000, "megatech_bios", 0 ) \
 	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) ) \
 
 /* no games */
@@ -672,7 +675,7 @@ ROM_END
 
 ROM_START( mt_beast )
 	MEGATECH_BIOS
-	MEGATECH_GAME01(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME01("game0", "inst0")
 ROM_END
 
 /* Game 06 - Out Run (SMS) */
@@ -686,7 +689,7 @@ ROM_END
 
 ROM_START( mt_orun ) /* Outrun */
 	MEGATECH_BIOS
-	MEGATECH_GAME06(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME06("game0", "inst0")
 ROM_END
 
 /* Game 13 - Astro Warrior (SMS) */
@@ -698,7 +701,7 @@ ROM_END
 
 ROM_START( mt_astro )
 	MEGATECH_BIOS
-	MEGATECH_GAME13(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME13("game0", "inst0")
 ROM_END
 
 /* Game 21 - World Cup Soccer (Genesis) */
@@ -710,7 +713,7 @@ ROM_END
 
 ROM_START( mt_wcsoc )
 	MEGATECH_BIOS
-	MEGATECH_GAME21(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME21("game0", "inst0")
 ROM_END
 
 /* Game 23 - Ghouls and Ghosts (Genesis) */
@@ -724,7 +727,7 @@ ROM_END
 
 ROM_START( mt_gng )
 	MEGATECH_BIOS
-	MEGATECH_GAME23(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME23("game0", "inst0")
 ROM_END
 
 /* Game 24 - Super Hang On (Genesis) */
@@ -737,7 +740,7 @@ ROM_END
 
 ROM_START( mt_shang ) /* Super HangOn */
 	MEGATECH_BIOS
-	MEGATECH_GAME24(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME24("game0", "inst0")
 ROM_END
 
 /* Game 25 - Golden Axe (Genesis) */
@@ -750,7 +753,7 @@ ROM_END
 
 ROM_START( mt_gaxe )
 	MEGATECH_BIOS
-	MEGATECH_GAME25(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME25("game0", "inst0")
 ROM_END
 
 /* Game 39 - Super Monaco Grand Prix (Genesis) */
@@ -763,7 +766,7 @@ ROM_END
 
 ROM_START( mt_smgp ) /* Super Monaco Grand Prix */
 	MEGATECH_BIOS
-	MEGATECH_GAME39(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME39("game0", "inst0")
 ROM_END
 
 /* Game 52 - Sonic (Genesis) */
@@ -775,7 +778,7 @@ ROM_END
 
 ROM_START( mt_sonic )
 	MEGATECH_BIOS
-	MEGATECH_GAME52(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME52("game0", "inst0")
 ROM_END
 
 #define MEGATECH_GAME52ALT(GAME_REGION, INSTRUCTION_REGION) \
@@ -786,7 +789,7 @@ ROM_END
 
 ROM_START( mt_sonia ) /* Sonic  (alt)*/
 	MEGATECH_BIOS
-	MEGATECH_GAME52ALT(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME52ALT("game0", "inst0")
 ROM_END
 
 /* Game 57 - Golden Axe 2 (Genesis) */
@@ -798,7 +801,7 @@ ROM_END
 
 ROM_START( mt_gaxe2 ) /* Golden Axe 2 */
 	MEGATECH_BIOS
-	MEGATECH_GAME57(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME57("game0", "inst0")
 ROM_END
 
 /* Game 58 - Sports Talk Football */
@@ -810,7 +813,7 @@ ROM_END
 
 ROM_START( mt_stf ) /* Sports Talk Football */
 	MEGATECH_BIOS
-	MEGATECH_GAME58(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME58("game0", "inst0")
 ROM_END
 
 /* Game 53 - Fire Shark */
@@ -826,7 +829,7 @@ ROM_END
 
 ROM_START( mt_fshrk ) /* Fire Shark */
 	MEGATECH_BIOS
-	MEGATECH_GAME53(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME53("game0", "inst0")
 ROM_END
 
 /* Game 38 - E-Swat */
@@ -838,7 +841,7 @@ ROM_END
 
 ROM_START( mt_eswat ) /* E-Swat */
 	MEGATECH_BIOS
-	MEGATECH_GAME38(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME38("game0", "inst0")
 ROM_END
 
 /* Game 49 - Bonanza Bros */
@@ -851,7 +854,7 @@ ROM_END
 
 ROM_START( mt_bbros ) /* Bonanza Bros */
 	MEGATECH_BIOS
-	MEGATECH_GAME49(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME49("game0", "inst0")
 ROM_END
 
 /* Game 48 - Wrestle War */
@@ -864,7 +867,7 @@ ROM_END
 
 ROM_START( mt_wwar ) /* Wrestle War */
 	MEGATECH_BIOS
-	MEGATECH_GAME48(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME48("game0", "inst0")
 ROM_END
 
 /* Game 62 - Sonic 2 */
@@ -878,7 +881,7 @@ ROM_END
 
 ROM_START( mt_soni2 ) /* Sonic 2 */
 	MEGATECH_BIOS
-	MEGATECH_GAME62(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME62("game0", "inst0")
 ROM_END
 
 /* Game 59 - Mario Lemieux Hockey */
@@ -891,7 +894,7 @@ ROM_END
 
 ROM_START( mt_mlh )
 	MEGATECH_BIOS
-	MEGATECH_GAME59(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME59("game0", "inst0")
 ROM_END
 
 /* Game 60 - Kid Chameleon */
@@ -905,7 +908,7 @@ ROM_END
 
 ROM_START( mt_kcham ) /* Kid Chameleon */
 	MEGATECH_BIOS
-	MEGATECH_GAME60(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME60("game0", "inst0")
 ROM_END
 
 /* Game 20 - Last Battle */
@@ -918,7 +921,7 @@ ROM_END
 
 ROM_START( mt_lastb ) /* Last Battle */
 	MEGATECH_BIOS
-	MEGATECH_GAME20(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME20("game0", "inst0")
 ROM_END
 
 /* Game 40 - Moon Walker */
@@ -932,7 +935,7 @@ ROM_END
 
 ROM_START( mt_mwalk ) /* Moon Walker */
 	MEGATECH_BIOS
-	MEGATECH_GAME40(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME40("game0", "inst0")
 ROM_END
 
 /* Game 41 - Crackdown */
@@ -946,7 +949,7 @@ ROM_END
 
 ROM_START( mt_crack )
 	MEGATECH_BIOS
-	MEGATECH_GAME41(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME41("game0", "inst0")
 ROM_END
 
 
@@ -960,7 +963,7 @@ ROM_END
 
 ROM_START( mt_mystd ) /* Mystic Defender */
 	MEGATECH_BIOS
-	MEGATECH_GAME27(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME27("game0", "inst0")
 ROM_END
 
 /* Game 02 - Space Harrier 2 */
@@ -973,7 +976,7 @@ ROM_END
 
 ROM_START( mt_shar2 ) /* Space Harrier 2 */
 	MEGATECH_BIOS
-	MEGATECH_GAME02(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME02("game0", "inst0")
 ROM_END
 
 /* Game 03 - Super Thunder Blade */
@@ -986,7 +989,7 @@ ROM_END
 
 ROM_START( mt_stbld ) /* Super Thunder Blade */
 	MEGATECH_BIOS
-	MEGATECH_GAME03(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME03("game0", "inst0")
 ROM_END
 
 /* Game 22 - Tetris */
@@ -999,7 +1002,7 @@ ROM_END
 
 ROM_START( mt_tetri ) /* Tetris */
 	MEGATECH_BIOS
-	MEGATECH_GAME22(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME22("game0", "inst0")
 ROM_END
 
 /* Game 11 - Thunder Force 2 */
@@ -1012,7 +1015,7 @@ ROM_END
 
 ROM_START( mt_tfor2 ) /* Thunder Force 2 */
 	MEGATECH_BIOS
-	MEGATECH_GAME11(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME11("game0", "inst0")
 ROM_END
 
 /* Game 35 - Tommy Lasorda Baseball */
@@ -1026,7 +1029,7 @@ ROM_END
 
 ROM_START( mt_tlbba ) /* Tommy Lasorda Baseball */
 	MEGATECH_BIOS
-	MEGATECH_GAME35(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME35("game0", "inst0")
 ROM_END
 
 /* Game 36 - Columns */
@@ -1039,7 +1042,7 @@ ROM_END
 
 ROM_START( mt_cols ) /* Columns */
 	MEGATECH_BIOS
-	MEGATECH_GAME36(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME36("game0", "inst0")
 ROM_END
 
 /* Game 04 - Great Golf (SMS) */
@@ -1053,7 +1056,7 @@ ROM_END
 
 ROM_START( mt_ggolf )
 	MEGATECH_BIOS
-	MEGATECH_GAME04(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME04("game0", "inst0")
 ROM_END
 
 /* Game 05 - Great Soccer (SMS) - bad dump */
@@ -1066,7 +1069,7 @@ ROM_END
 
 ROM_START( mt_gsocr )
 	MEGATECH_BIOS
-	MEGATECH_GAME05(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME05("game0", "inst0")
 ROM_END
 
 /* Game 07 - Alien Syndrome (SMS) */
@@ -1079,7 +1082,7 @@ ROM_END
 
 ROM_START( mt_asyn ) /* Alien Syndrome (SMS based) */
 	MEGATECH_BIOS
-	MEGATECH_GAME07(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME07("game0", "inst0")
 ROM_END
 
 /* Game 29 - Parlour Games (SMS) */
@@ -1092,7 +1095,7 @@ ROM_END
 
 ROM_START( mt_parlg ) /* Parlour Games (SMS Based)  */
 	MEGATECH_BIOS
-	MEGATECH_GAME29(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME29("game0", "inst0")
 ROM_END
 
 /* Game 08 - Shinobi (SMS) */
@@ -1105,7 +1108,7 @@ ROM_END
 
 ROM_START( mt_shnbi ) /* Shinobi. */
 	MEGATECH_BIOS
-	MEGATECH_GAME08(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME08("game0", "inst0")
 ROM_END
 
 /* Game 10 - AFterburner (SMS) */
@@ -1118,7 +1121,7 @@ ROM_END
 
 ROM_START( mt_aftrb ) /* Afterburner. */
 	MEGATECH_BIOS
-	MEGATECH_GAME10(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME10("game0", "inst0")
 ROM_END
 
 /* Game 28 - Revenge of Shinobi */
@@ -1132,7 +1135,7 @@ ROM_END
 
 ROM_START( mt_revsh ) /* The Revenge Of Shinobi. */
 	MEGATECH_BIOS
-	MEGATECH_GAME28(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME28("game0", "inst0")
 ROM_END
 
 /* Game 31 - Arnold Palmer Tournament Gold */
@@ -1146,7 +1149,7 @@ ROM_END
 
 ROM_START( mt_tgolf ) /* Arnold Palmer Tournament Golf */
 	MEGATECH_BIOS
-	MEGATECH_GAME31(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME31("game0", "inst0")
 ROM_END
 
 
@@ -1160,7 +1163,7 @@ ROM_END
 
 ROM_START( mt_astrm ) /* Alien Storm. */
 	MEGATECH_BIOS
-	MEGATECH_GAME47(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME47("game0", "inst0")
 ROM_END
 
 /* Game 44 - Arrow Flash */
@@ -1174,7 +1177,7 @@ ROM_END
 
 ROM_START( mt_arrow ) /* Arrow Flash */
 	MEGATECH_BIOS
-	MEGATECH_GAME44(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME44("game0", "inst0")
 ROM_END
 
 /* Game 32 - Super Real Basketball */
@@ -1187,7 +1190,7 @@ ROM_END
 
 ROM_START( mt_srbb ) /* Super Real Basketball */
 	MEGATECH_BIOS
-	MEGATECH_GAME32(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME32("game0", "inst0")
 ROM_END
 
 /* Game 26 - Forgotten Worlds */
@@ -1201,34 +1204,34 @@ ROM_END
 
 ROM_START( mt_fwrld ) /* Forgotten Worlds */
 	MEGATECH_BIOS
-	MEGATECH_GAME26(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME26("game0", "inst0")
 ROM_END
 
 /* Compilations of games to show the multi-cart support */
 
 ROM_START( mt_comp1 )
 	MEGATECH_BIOS
-	MEGATECH_GAME01(REGION_USER1, REGION_USER2)
-	MEGATECH_GAME13(REGION_USER3, REGION_USER4)
-	MEGATECH_GAME21(REGION_USER5, REGION_USER6)
-	MEGATECH_GAME06(REGION_USER7, REGION_USER8)
-	MEGATECH_GAME08(REGION_USER9, REGION_USER10)
-	MEGATECH_GAME28(REGION_USER11, REGION_USER12)
-	MEGATECH_GAME49(REGION_USER13, REGION_USER14)
-	MEGATECH_GAME60(REGION_USER15, REGION_USER16)
+	MEGATECH_GAME01("game0", "inst0")
+	MEGATECH_GAME13("game1", "inst1")
+	MEGATECH_GAME21("game2", "inst2")
+	MEGATECH_GAME06("game3", "inst3")
+	MEGATECH_GAME08("game4", "inst4")
+	MEGATECH_GAME28("game5", "inst5")
+	MEGATECH_GAME49("game6", "inst6")
+	MEGATECH_GAME60("game7", "inst7")
 ROM_END
 
 
 ROM_START( mt_comp2 )
 	MEGATECH_BIOS
-	MEGATECH_GAME10(REGION_USER1, REGION_USER2)
-	MEGATECH_GAME39(REGION_USER3, REGION_USER4)
-	MEGATECH_GAME24(REGION_USER5, REGION_USER6)
-	MEGATECH_GAME52(REGION_USER7, REGION_USER8)
-	MEGATECH_GAME29(REGION_USER9, REGION_USER10)
-	MEGATECH_GAME36(REGION_USER11, REGION_USER12)
-	MEGATECH_GAME40(REGION_USER13, REGION_USER14)
-	MEGATECH_GAME57(REGION_USER15, REGION_USER16)
+	MEGATECH_GAME10("game0", "inst0")
+	MEGATECH_GAME39("game1", "inst1")
+	MEGATECH_GAME24("game2", "inst2")
+	MEGATECH_GAME52("game3", "inst3")
+	MEGATECH_GAME29("game4", "inst4")
+	MEGATECH_GAME36("game5", "inst5")
+	MEGATECH_GAME40("game6", "inst6")
+	MEGATECH_GAME57("game7", "inst7")
 ROM_END
 
 

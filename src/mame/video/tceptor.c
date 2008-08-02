@@ -244,7 +244,7 @@ WRITE8_HANDLER( tceptor_bg_scroll_w )
 
 /*******************************************************************/
 
-static void decode_bg(running_machine *machine, int region)
+static void decode_bg(running_machine *machine, const char * region)
 {
 	static const gfx_layout bg_layout =
 	{
@@ -296,7 +296,7 @@ static void decode_sprite(running_machine *machine, int gfx_index, const gfx_lay
 }
 
 // fix sprite order
-static void decode_sprite16(running_machine *machine, int region)
+static void decode_sprite16(running_machine *machine, const char * region)
 {
 	static const gfx_layout spr16_layout =
 	{
@@ -345,7 +345,7 @@ static void decode_sprite16(running_machine *machine, int region)
 }
 
 // fix sprite order
-static void decode_sprite32(running_machine *machine, int region)
+static void decode_sprite32(running_machine *machine, const char * region)
 {
 	static const gfx_layout spr32_layout =
 	{
@@ -409,13 +409,13 @@ VIDEO_START( tceptor )
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
 	bg = gfx_index++;
-	decode_bg(machine, REGION_GFX2);
+	decode_bg(machine, "gfx2");
 
 	sprite16 = gfx_index++;
-	decode_sprite16(machine, REGION_GFX3);
+	decode_sprite16(machine, "gfx3");
 
 	sprite32 = gfx_index++;
-	decode_sprite32(machine, REGION_GFX4);
+	decode_sprite32(machine, "gfx4");
 
 	/* allocate temp bitmaps */
 	temp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

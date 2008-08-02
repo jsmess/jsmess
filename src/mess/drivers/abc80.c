@@ -378,8 +378,8 @@ static const gfx_layout charlayout_abc80 =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( abc80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc80, 0, 2 )		// normal characters
-	GFXDECODE_ENTRY( REGION_GFX1, 0x500, charlayout_abc80, 0, 2 )	// graphics characters
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_abc80, 0, 2 )		// normal characters
+	GFXDECODE_ENTRY( "gfx1", 0x500, charlayout_abc80, 0, 2 )	// graphics characters
 GFXDECODE_END
 
 /* Sound Interface */
@@ -579,7 +579,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( abc80 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "za3508.a2", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9) )
 	ROM_LOAD( "za3509.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1) )
 	ROM_LOAD( "za3506.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b) )
@@ -596,11 +596,11 @@ ROM_START( abc80 )
 	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
 	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
 
-	ROM_REGION( 0x0a00, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0a00, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sn74s262.h2", 0x0000, 0x0a00, NO_DUMP ) // UK charset
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0080, NO_DUMP ) // 82S129 256x4 address decoder
 	ROM_LOAD( "abc80_11.k5", 0x0080, 0x0080, NO_DUMP ) // 82S129 256x4 horizontal sync
 	ROM_LOAD( "abc80_12.j3", 0x0100, 0x0080, NO_DUMP ) // 82S129 256x4 chargen 74S263 column address

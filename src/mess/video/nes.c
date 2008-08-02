@@ -41,7 +41,7 @@ static void nes_vh_start(running_machine *machine, ppu_t ppu_type, double scanli
 	memset(&ppu_interface, 0, sizeof(ppu_interface));
 	ppu_interface.type				= ppu_type;
 	ppu_interface.num				= 1;
-	ppu_interface.vrom_region[0]	= nes.chr_chunks ? REGION_GFX1 : REGION_INVALID;
+	ppu_interface.vrom_region[0]	= nes.chr_chunks ? "gfx1" : NULL;
 	ppu_interface.mirroring[0]		= PPU_MIRROR_NONE;
 	ppu_interface.nmi_handler[0]	= ppu_nmi;
 

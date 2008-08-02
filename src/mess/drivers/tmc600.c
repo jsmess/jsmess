@@ -344,26 +344,26 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( tmc600s1 )
-	ROM_REGION( 0x5000, REGION_CPU1, 0 )
+	ROM_REGION( 0x5000, "|main|", 0 )
 	ROM_LOAD( "sb20",		0x0000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb21",		0x1000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb22",		0x2000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb23",		0x3000, 0x1000, NO_DUMP )
 	ROM_LOAD( "190482_2",	0x4000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "chargen",	0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 ROM_START( tmc600s2 )
-	ROM_REGION( 0x5000, REGION_CPU1, 0 )
+	ROM_REGION( 0x5000, "main", 0 )
 	ROM_LOAD( "sb30",		0x0000, 0x1000, CRC(95d1292a) SHA1(1fa52d59d3005f8ac74a32c2164fdb22947c2748) )
 	ROM_LOAD( "sb31",		0x1000, 0x1000, CRC(2c8f3d17) SHA1(f14e8adbcddeaeaa29b1e7f3dfa741f4e230f599) )
 	ROM_LOAD( "sb32",		0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
 	ROM_LOAD( "sb33",		0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
 	ROM_LOAD( "151182",		0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "chargen",	0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
 ROM_END
 
@@ -371,7 +371,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc600 )
 {
-	image_fread(image, memory_region(image->machine, REGION_CPU1) + 0x6300, 0x9500);
+	image_fread(image, memory_region(image->machine, "|main|") + 0x6300, 0x9500);
 
 	return INIT_PASS;
 }

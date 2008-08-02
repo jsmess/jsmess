@@ -144,10 +144,10 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( advision )
-	ROM_REGION( 0x2800, REGION_CPU1, 0 )
+	ROM_REGION( 0x2800, "main", 0 )
     ROM_LOAD( "avbios.rom", 0x1000, 0x0400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
 	ROM_CART_LOAD( 0, "bin", 0x0000, 0x1000, ROM_NOMIRROR | ROM_FULLSIZE )
-	ROM_REGION( 0x0400, REGION_CPU2, 0 )
+	ROM_REGION( 0x0400, "sound", 0 )
 	ROM_LOAD( "avsound.bin", 0x0000, 0x0200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) )
 ROM_END
 

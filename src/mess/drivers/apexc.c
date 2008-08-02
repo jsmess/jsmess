@@ -52,13 +52,13 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 	if (apexc_cylinder.fd)
 	{	/* load RAM contents */
 
-		image_fread(apexc_cylinder.fd, memory_region(image->machine, REGION_CPU1), /*0x8000*/0x1000);
+		image_fread(apexc_cylinder.fd, memory_region(image->machine, "|main|"), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 		{	/* fix endianness */
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(image->machine, REGION_CPU1);
+			RAM = (UINT32 *) memory_region(image->machine, "|main|");
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -83,14 +83,14 @@ static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(image->machine, REGION_CPU1);
+			RAM = (UINT32 *) memory_region(image->machine, "|main|");
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		image_fwrite(apexc_cylinder.fd, memory_region(image->machine, REGION_CPU1), /*0x8000*/0x1000);
+		image_fwrite(apexc_cylinder.fd, memory_region(image->machine, "|main|"), /*0x8000*/0x1000);
 	}
 }
 
@@ -753,7 +753,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = memory_region(machine, REGION_GFX1);
+	dst = memory_region(machine, "gfx1");
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }
@@ -770,7 +770,7 @@ static const gfx_layout fontlayout =
 };
 
 static GFXDECODE_START( apexc )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -822,10 +822,10 @@ MACHINE_DRIVER_END
 
 ROM_START(apexc)
 	/*CPU memory space*/
-	ROM_REGION32_BE(0x10000, REGION_CPU1, ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x10000, "main", ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
-	ROM_REGION(apexcfontdata_size, REGION_GFX1, ROMREGION_ERASEFF)
+	ROM_REGION(apexcfontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 

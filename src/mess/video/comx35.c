@@ -133,8 +133,8 @@ static VIDEO_UPDATE( comx35 )
 static MC6845_UPDATE_ROW( comx35_update_row )
 {
 	int column;
-	const UINT8 *charrom = memory_region(device->machine, REGION_GFX1);
-	const UINT8 *usr1 = memory_region(device->machine, REGION_USER1);
+	const UINT8 *charrom = memory_region(device->machine, "gfx1");
+	const UINT8 *usr1 = memory_region(device->machine, "user1");
 
 	for (column = 0; column < x_count; column++)
 	{

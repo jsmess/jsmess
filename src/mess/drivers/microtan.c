@@ -197,8 +197,8 @@ static const gfx_layout chunky_layout =
 };
 
 static GFXDECODE_START( microtan )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, chunky_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, chunky_layout, 0, 1 )
 GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
@@ -252,7 +252,7 @@ static MACHINE_DRIVER_START( microtan )
 MACHINE_DRIVER_END
 
 ROM_START( microtan )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "tanex_j2.rom", 0xc000, 0x1000, CRC(3e09d384) SHA1(15a98941a672ff16242cc73f1dcf1d81fccd8910) )
     ROM_LOAD( "tanex_h2.rom", 0xd000, 0x1000, CRC(75105113) SHA1(c6fea4d65b7c52f43aa1589cace9467349a0f290) )
     ROM_LOAD( "tanex_d3.rom", 0xe000, 0x0800, CRC(ee6e8412) SHA1(7e1bca84bab79d94a4ab8554d23e2bc28ccd0384) )
@@ -261,10 +261,10 @@ ROM_START( microtan )
     ROM_LOAD( "tanbug_2.rom", 0xf800, 0x0400, CRC(7e215313) SHA1(c8fb3d33ce2beaf624dc75ec57d34c216b086274) )
     ROM_LOAD( "tanbug.rom",   0xfc00, 0x0400, CRC(c8221d9e) SHA1(c7fe4c174523aaaab30be7a8c9baf2bc08b33968) )
 
-	ROM_REGION( 0x00800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x00800, "gfx1", ROMREGION_DISPOSE )
     ROM_LOAD( "charset.rom",  0x0000, 0x0800, CRC(3b3c5360) SHA1(a3a2f74149107f8b8f35b15069c71f3aa843d12f) )
 
-	ROM_REGION( 0x01000, REGION_GFX2, ROMREGION_ERASEFF )
+	ROM_REGION( 0x01000, "gfx2", ROMREGION_ERASEFF )
     // initialized in init_microtan
 ROM_END
 

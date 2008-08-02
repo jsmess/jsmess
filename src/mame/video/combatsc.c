@@ -291,6 +291,7 @@ VIDEO_START( combascb )
 
 		tilemap_set_transparent_pen(bg_tilemap[0],0);
 		tilemap_set_transparent_pen(bg_tilemap[1],0);
+		tilemap_set_transparent_pen(textlayer,0);
 
 		tilemap_set_scroll_rows(bg_tilemap[0],32);
 		tilemap_set_scroll_rows(bg_tilemap[1],32);
@@ -357,7 +358,7 @@ static WRITE8_HANDLER( combascb_priority_w )
 
 WRITE8_HANDLER( combasc_bankselect_w )
 {
-	UINT8 *page = memory_region(machine, REGION_CPU1) + 0x10000;
+	UINT8 *page = memory_region(machine, "main") + 0x10000;
 
 	if (data & 0x40)
 	{
@@ -400,7 +401,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 	data = data & 0x1f;
 	if( data != combasc_bank_select )
 	{
-		UINT8 *page = memory_region(machine, REGION_CPU1) + 0x10000;
+		UINT8 *page = memory_region(machine, "main") + 0x10000;
 		combasc_bank_select = data;
 
 		if (data & 0x10)
@@ -429,7 +430,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 
 MACHINE_RESET( combasc )
 {
-	UINT8 *MEM = memory_region(machine, REGION_CPU1) + 0x38000;
+	UINT8 *MEM = memory_region(machine, "main") + 0x38000;
 
 
 	combasc_io_ram  = MEM + 0x0000;
@@ -659,14 +660,16 @@ VIDEO_UPDATE( combascb )
 	if (priority == 0)
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],TILEMAP_DRAW_OPAQUE,0);
-		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
-		tilemap_draw( bitmap,cliprect,bg_tilemap[0],0 ,0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[1], 1 );
+
+		tilemap_draw( bitmap,cliprect,bg_tilemap[0],0 ,0);
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
 	}
 	else
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[0],TILEMAP_DRAW_OPAQUE,0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
+
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],0 ,0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[1], 1 );
 	}

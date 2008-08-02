@@ -95,13 +95,13 @@ static DRIVER_INIT( ti99_2_32 )
 	ROM_paged = 1;
 }
 
-#define TI99_2_32_ROMPAGE0 (memory_region(machine, REGION_CPU1)+0x4000)
-#define TI99_2_32_ROMPAGE1 (memory_region(machine, REGION_CPU1)+0x10000)
+#define TI99_2_32_ROMPAGE0 (memory_region(machine, "|")+0x4000)
+#define TI99_2_32_ROMPAGE1 (memory_region(machine, "|")+0x10000)
 
 static MACHINE_RESET( ti99_2 )
 {
 	if (! ROM_paged)
-		memory_set_bankptr(1, memory_region(machine, REGION_CPU1)+0x4000);
+		memory_set_bankptr(1, memory_region(machine, "|")+0x4000);
 	else
 		memory_set_bankptr(1, TI99_2_32_ROMPAGE0);
 }
@@ -171,7 +171,7 @@ static const gfx_layout ti99_2_charlayout =
 };
 
 static GFXDECODE_START( ti99_2 )
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1c00,  ti99_2_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "|", 0x1c00,  ti99_2_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -347,7 +347,7 @@ INPUT_PORTS_END
 static const struct tms9995reset_param ti99_2_processor_config =
 {
 #if 0
-	REGION_CPU1,/* region for processor RAM */
+	"|",/* region for processor RAM */
 	0xf000,     /* offset : this area is unused in our region, and matches the processor address */
 	0xf0fc,		/* offset for the LOAD vector */
 	NULL,       /* no IDLE callback */
@@ -388,13 +388,13 @@ MACHINE_DRIVER_END
 */
 ROM_START(ti99_224)
 	/*CPU memory space*/
-	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_REGION(0x10000,"|",0)
 	ROM_LOAD("992rom.bin", 0x0000, 0x6000, NO_DUMP)      /* system ROMs */
 ROM_END
 
 ROM_START(ti99_232)
 	/*64kb CPU memory space + 8kb to read the extra ROM page*/
-	ROM_REGION(0x12000,REGION_CPU1,0)
+	ROM_REGION(0x12000,"|",0)
 	ROM_LOAD("992rom32.bin", 0x0000, 0x6000, NO_DUMP)    /* system ROM - 32kb */
 	ROM_CONTINUE(0x10000,0x2000)
 ROM_END

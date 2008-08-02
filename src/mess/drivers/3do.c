@@ -120,11 +120,11 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( 3do )
 {
-	memory_set_bankptr(2,memory_region(machine, REGION_USER1));
+	memory_set_bankptr(2,memory_region(machine, "user1"));
 
 	/* configure overlay */
 	memory_configure_bank(1, 0, 1, dram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* start with overlay enabled */
 	memory_set_bank(1, 1);
@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( 3do_pal )
 MACHINE_DRIVER_END
 
 ROM_START(3do)
-	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 )
+	ROM_REGION32_BE( 0x100000, "user1", 0 )
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
 	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
@@ -182,7 +182,7 @@ ROM_START(3do)
 ROM_END
 
 ROM_START(3do_pal)
-    ROM_REGION32_BE( 0x100000, REGION_USER1, 0 )
+    ROM_REGION32_BE( 0x100000, "user1", 0 )
     ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
     ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )

@@ -266,7 +266,7 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 ROM_START( pce )
-	ROM_REGION( PCE_ROM_MAXSIZE, REGION_USER1, 0 )		/* Cartridge ROM area */
+	ROM_REGION( PCE_ROM_MAXSIZE, "user1", 0 )		/* Cartridge ROM area */
 	ROM_FILL( 0, PCE_ROM_MAXSIZE, 0xFF )
 ROM_END
 

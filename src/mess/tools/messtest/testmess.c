@@ -90,7 +90,7 @@ struct _messtest_command
 		} input_args;
 		struct
 		{
-			int mem_region;
+			const char *mem_region;
 			offs_t start;
 			offs_t end;
 			const void *verify_data;
@@ -844,7 +844,7 @@ static void command_verify_memory(running_machine *machine)
 	size_t verify_data_size;
 	const UINT8 *target_data;
 	size_t target_data_size;
-	int region;
+	const char *region;
 
 	offset_start = current_command->u.verify_args.start;
 	offset_end = current_command->u.verify_args.end;
@@ -895,8 +895,8 @@ static void command_verify_memory(running_machine *machine)
 		if (verify_data[i] != target_data[offset])
 		{
 			state = STATE_ABORTED;
-			report_message(MSG_FAILURE, "Failed verification step (REGION_%s; 0x%x-0x%x)",
-				memory_region_to_string(region), offset_start, offset_end);
+			report_message(MSG_FAILURE, "Failed verification step (region %s; 0x%x-0x%x)",
+				region, offset_start, offset_end);
 			break;
 		}
 		i = (i + 1) % verify_data_size;
@@ -1371,8 +1371,6 @@ static void node_memverify(xml_data_node *node)
 	xml_attribute_node *attr_node;
 	const char *s1;
 	const char *s2;
-	const char *s3;
-	int region;
 	void *new_buffer;
 	mess_pile pile;
 
@@ -1391,20 +1389,12 @@ static void node_memverify(xml_data_node *node)
 		s2 = "0";
 
 	attr_node = xml_get_attribute(node, "region");
-	s3 = attr_node ? attr_node->value : NULL;
+	new_command.u.verify_args.mem_region = attr_node ? attr_node->value : NULL;
 
 	memset(&new_command, 0, sizeof(new_command));
 	new_command.command_type = MESSTEST_COMMAND_VERIFY_MEMORY;
 	new_command.u.verify_args.start = parse_offset(s1);
 	new_command.u.verify_args.end = parse_offset(s2);
-
-	if (s3)
-	{
-		region = memory_region_from_string(s3);
-		if (region == REGION_INVALID)
-			error_invalidmemregion(s3);
-		new_command.u.verify_args.mem_region = region;
-	}
 
 	pile_init(&pile);
 	messtest_get_data(node, &pile);

@@ -431,7 +431,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 		{
 			/* lower 4 banks are write protected. Use the rom
             loaded */
-			mem_ptr = &memory_region(machine, REGION_CPU1)[0x010000];
+			mem_ptr = &memory_region(machine, "|main|")[0x010000];
 		}
 		else
 		{
@@ -1444,7 +1444,7 @@ static DRIVER_INIT( pcw16 )
 /* the lower 64k of the flash-file memory is write protected. This contains the boot
     rom. The boot rom is also on the OS rescue disc. Handy! */
 ROM_START(pcw16)
-	ROM_REGION((0x010000+524288), REGION_CPU1,0)
+	ROM_REGION((0x010000+524288), "main",0)
 	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498) SHA1(8a5c05de92e7b2c5acdfb038217503ad363285b5))
 ROM_END
 

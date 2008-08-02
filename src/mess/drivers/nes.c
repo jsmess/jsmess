@@ -174,48 +174,48 @@ static const struct NESinterface nespal_interface =
 };
 
 ROM_START( nes )
-    ROM_REGION( 0x10000, REGION_CPU1,0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  REGION_GFX1,0 )  /* VROM */
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  REGION_GFX2,0 )  /* VRAM */
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, REGION_USER1,0 ) /* WRAM */
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( nespal )
-    ROM_REGION( 0x10000, REGION_CPU1,0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
-    ROM_REGION( 0x2000,  REGION_GFX1,0 )  /* VROM */
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  REGION_GFX2,0 )  /* VRAM */
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, REGION_USER1,0 ) /* WRAM */
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( famicom )
-    ROM_REGION( 0x10000, REGION_CPU1,0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
     ROM_LOAD_OPTIONAL ("disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62))
 
-    ROM_REGION( 0x2000,  REGION_GFX1,0 )  /* VROM */
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  REGION_GFX2,0 )  /* VRAM */
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, REGION_USER1,0 ) /* WRAM */
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
 ROM_START( famitwin )
-    ROM_REGION( 0x10000, REGION_CPU1,0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
     ROM_LOAD_OPTIONAL ("disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1))
 
-    ROM_REGION( 0x2000,  REGION_GFX1,0 )  /* VROM */
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x2000,  REGION_GFX2,0 )  /* VRAM */
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
-    ROM_REGION( 0x10000, REGION_USER1,0 ) /* WRAM */
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 

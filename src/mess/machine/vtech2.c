@@ -99,14 +99,14 @@ static const write8_machine_func mwa_bank_hard[4] =
 
 DRIVER_INIT(laser)
 {
-    UINT8 *gfx = memory_region(machine, REGION_GFX2);
+    UINT8 *gfx = memory_region(machine, "gfx2");
     int i;
 
 	for (i = 0; i < 256; i++)
         gfx[i] = i;
 
 	laser_latch = -1;
-    mem = memory_region(machine, REGION_CPU1);
+    mem = memory_region(machine, "|");
 
 	for (i = 0; i < sizeof(laser_bank) / sizeof(laser_bank[0]); i++)
 		laser_bank[i] = -1;

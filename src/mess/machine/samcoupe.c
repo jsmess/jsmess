@@ -64,7 +64,7 @@ static void samcoupe_install_ext_mem(running_machine *machine)
 void samcoupe_update_memory(running_machine *machine)
 {
 	const int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, "|");
 	UINT8 *memory;
 	int is_readonly;
 

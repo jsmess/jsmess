@@ -393,7 +393,7 @@ VIDEO_START( hyprduel_14220 )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const int region		=	REGION_GFX1;
+	const char * region		=	"gfx1";
 
 	UINT8 *base_gfx	=	memory_region(machine, region);
 	UINT8 *gfx_max	=	base_gfx + memory_region_length(machine, region);

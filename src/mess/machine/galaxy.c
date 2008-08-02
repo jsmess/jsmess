@@ -175,7 +175,7 @@ MACHINE_RESET( galaxy )
 	/* ROM 2 enable/disable */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, input_port_read(machine, "ROM2") ? SMH_BANK10 : SMH_NOP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
-	memory_set_bankptr(10, memory_region(machine, REGION_CPU1) + 0x1000);
+	memory_set_bankptr(10, memory_region(machine, "|") + 0x1000);
 
 	cpunum_set_irq_callback(0, galaxy_irq_callback);
 	galaxy_interrupts_enabled = TRUE;
@@ -191,7 +191,7 @@ DRIVER_INIT( galaxyp )
 
 MACHINE_RESET( galaxyp )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, "|");
 
 	cpunum_set_irq_callback(0, galaxy_irq_callback);
 
@@ -202,7 +202,7 @@ MACHINE_RESET( galaxyp )
 
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK11);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);
-	memory_set_bankptr(11, memory_region(machine, REGION_CPU1) + 0xe000);
+	memory_set_bankptr(11, memory_region(machine, "|") + 0xe000);
 	galaxy_interrupts_enabled = TRUE;
 
 	gal_video_timer = timer_alloc(gal_video, NULL);

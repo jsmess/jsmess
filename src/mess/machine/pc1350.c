@@ -92,7 +92,7 @@ int pc1350_brk(void)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1350 )
 {
-	UINT8 *ram=memory_region(machine, REGION_CPU1)+0x2000,
+	UINT8 *ram=memory_region(machine, "|")+0x2000,
 		*cpu=sc61860_internal_ram();
 
 	if (read_or_write)

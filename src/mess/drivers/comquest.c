@@ -198,13 +198,13 @@ static const gfx_layout comquest_charlayout =
 };
 
 static GFXDECODE_START( comquest )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, comquest_charlayout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, comquest_charlayout, 0, 2 )
 GFXDECODE_END
 
 
 static MACHINE_RESET( comquest )
 {
-//  UINT8 *mem=memory_region(machine, REGION_USER1);
+//  UINT8 *mem=memory_region(machine, "user1");
 //  memory_set_bankptr(1,mem+0x00000);
 }
 
@@ -265,9 +265,9 @@ static MACHINE_DRIVER_START( comquest )
 MACHINE_DRIVER_END
 
 ROM_START(comquest)
-//  ROM_REGION(0x10000,REGION_CPU1,0)
-//  ROM_REGION(0x80000,REGION_USER1,0)
-	ROM_REGION(0x100000,REGION_CPU1,0)
+//  ROM_REGION(0x10000,"|",0)
+//  ROM_REGION(0x80000,"user1",0)
+	ROM_REGION(0x100000,"|",0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 /*
 000 +16kbyte graphics data? (first bytes: 80 0d 04 00 00 08 04 00 0f 02 04 01 00 10 04 01)
@@ -294,8 +294,8 @@ ROM_START(comquest)
 7c0 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 4f c7 f1 6e c7)
  */
 
-//  ROM_REGION(0x100,REGION_GFX1,0)
-	ROM_REGION(0x80000,REGION_GFX1,0)
+//  ROM_REGION(0x100,"gfx1",0)
+	ROM_REGION(0x80000,"gfx1",0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 ROM_END
 

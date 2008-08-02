@@ -397,7 +397,7 @@ static MACHINE_START( coleco )
 static MACHINE_RESET( coleco )
 {
     cpunum_set_input_line_vector(0, INPUT_LINE_IRQ0, 0xff);
-	memset(&memory_region(machine, REGION_CPU1)[0x6000], 0xff, 0x400);	// initialize RAM
+	memset(&memory_region(machine, "|main|")[0x6000], 0xff, 0x400);	// initialize RAM
     timer_pulse(ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }
 
@@ -456,26 +456,26 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START (coleco)
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "coleco.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
 	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecoa)
     // differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59) )
 	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecob)
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "svi603.rom", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78) )
 	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( czz50 )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "czz50.rom", 0x0000, 0x2000, CRC(4999abc6) SHA1(96aecec3712c94517103d894405bc98a7dafa440) )
     ROM_CONTINUE(		  0x8000, 0x2000 )
 ROM_END
@@ -517,7 +517,7 @@ SYSTEM_CONFIG_END
 static DEVICE_IMAGE_LOAD( czz50_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, REGION_CPU1) + 0x8000;
+	UINT8 *ptr = memory_region(image->machine, "|main|") + 0x8000;
 
 	if (image_fread(image, ptr, size ) != size)
 	{

@@ -1956,7 +1956,7 @@ static MACHINE_RESET( x68000 )
        more or less do the same job */
 
 	int drive;
-	UINT8* romdata = memory_region(machine, REGION_USER2);
+	UINT8* romdata = memory_region(machine, "user2");
 	attotime irq_time;
 
 	memset(mess_ram,0,mess_ram_size);
@@ -2020,7 +2020,7 @@ static MACHINE_RESET( x68000 )
 static MACHINE_START( x68000 )
 {
 	/*  Install RAM handlers  */
-	x68k_spriteram = (UINT16*)memory_region(machine, REGION_USER1);
+	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_machine_func)1);
 	memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_machine_func)1);
 	memory_set_bankptr(1,mess_ram);
@@ -2050,8 +2050,8 @@ static MACHINE_START( x68000 )
 
 static DRIVER_INIT( x68000 )
 {
-	unsigned char* rom = memory_region(machine, REGION_CPU1);
-	unsigned char* user2 = memory_region(machine, REGION_USER2);
+	unsigned char* rom = memory_region(machine, "|main|");
+	unsigned char* user2 = memory_region(machine, "user2");
 	gvram = auto_malloc(0x200000);
 	memset(gvram,0,0x200000);
 	tvram = auto_malloc(0x080000);
@@ -2064,7 +2064,7 @@ static DRIVER_INIT( x68000 )
 
 #ifdef USE_PREDEFINED_SRAM
 	{
-		unsigned char* ramptr = memory_region(machine, REGION_USER3);
+		unsigned char* ramptr = memory_region(machine, "user3");
 		memcpy(sram,ramptr,0x4000);
 	}
 #endif
@@ -2161,7 +2161,7 @@ static SYSTEM_CONFIG_START(x68000)
 SYSTEM_CONFIG_END
 
 ROM_START( x68000 )
-	ROM_REGION16_BE(0x1000000, REGION_CPU1, 0)  // 16MB address space
+	ROM_REGION16_BE(0x1000000, "main", 0)  // 16MB address space
 	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0")
 	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
@@ -2171,9 +2171,9 @@ ROM_START( x68000 )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
-	ROM_REGION(0x8000, REGION_USER1,0)  // For Background/Sprite decoding
+	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
 	ROM_FILL(0x0000,0x8000,0x00)
-	ROM_REGION(0x20000, REGION_USER2, 0)
+	ROM_REGION(0x20000, "user2", 0)
 	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 

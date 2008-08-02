@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by mameui.rc
 //
 #define IDPAUSE                         3
@@ -98,6 +98,7 @@
 #define IDD_PROP_DIRECT3D               184
 #define IDD_PROP_CONTROLLER             185
 #define IDD_PROP_SCREEN                 187
+#define IDD_PROP_DEBUG                  188
 #define IDI_SOUNDTAB                    666
 #define IDC_LIST                        1000
 #define IDC_PLAY                        1001
@@ -139,10 +140,12 @@
 #define IDB_WEB_PAGE                    1037
 #define IDC_FSCONTRAST                  1038
 #define IDC_ROMS_PROGRESS               1039
+#define IDC_SECONDSTORUN                1039
 #define IDC_CONTRASTDISP                1040
 #define IDC_ROMS_CORRECT                1041
 #define IDC_FSCONTRASTDISP              1042
 #define IDC_ROMS_INCORRECT              1043
+#define IDC_SECONDSTORUNDISP            1043
 #define IDC_NUMSCREENSDISP              1044
 #define IDC_ROMS_TOTAL                  1045
 #define IDC_SAMPLES_PROGRESS            1046
@@ -300,6 +303,8 @@
 #define IDC_NOOFFSET_CLONES             1200
 #define IDC_BIOS                        1201
 #define IDC_HISTORY_TAB                 1202
+#define IDC_BIOS2                       1202
+#define IDC_SNAPVIEW                    1202
 #define IDC_SCREENSHOT_BORDERSIZE       1204
 #define IDC_SCREENSHOT_BORDERCOLOR      1205
 #define IDC_CYCLETIMESECTXT             1206
@@ -334,6 +339,21 @@
 #define IDC_FILTER_VERTICAL             1236
 #define IDC_SNAPNAME                    1237
 #define IDC_COINLOCKOUT                 1238
+#define IDC_SECONDSTORUNTEXT            1239
+#define IDC_OSLOG                       1240
+#define IDC_VERBOSE                     1241
+#define IDC_UPDATEINPAUSE               1242
+#define IDC_DEBUGSCRIPT                 1243
+#define IDC_SELECT_DEBUGSCRIPT          1244
+#define IDC_RESET_DEBUGSCRIPT           1245
+#define IDC_SELECT_JOYSTICKMAP          1246
+#define IDC_RESET_JOYSTICKMAP           1247
+#define IDC_JOYSTICKMAP                 1248
+#define IDC_SNAPSIZE                    1249
+#define IDC_SNAPSIZEWIDTH               1250
+#define IDC_SNAPSIZEHEIGHT              1251
+#define IDC_SNAPSIZETEXT                1252
+#define IDC_SNAPSIZEX                   1253
 #define ID_CONTEXT_SHOW_FOLDER_START    39000
 #define ID_CONTEXT_SHOW_FOLDER_END      39200
 #define ID_FILE_EXIT                    40001
@@ -424,6 +444,9 @@
 #define ID_FOLDER_SOURCEPROPERTIES      40096
 #define ID_FOLDER_VECTORPROPERTIES      40097
 #define ID_ARRANGE_ICONS                40098
+#define ID_OPTIONS_CHEAT                40099
+#define ID_OPTIONS_MAMEINFO             40101
+#define ID_OPTIONS_HISTORY              40102
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -432,9 +455,9 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        188
-#define _APS_NEXT_COMMAND_VALUE         40099
-#define _APS_NEXT_CONTROL_VALUE         1238
+#define _APS_NEXT_RESOURCE_VALUE        189
+#define _APS_NEXT_COMMAND_VALUE         40103
+#define _APS_NEXT_CONTROL_VALUE         1254
 #define _APS_NEXT_SYMED_VALUE           93
 #endif
 #endif

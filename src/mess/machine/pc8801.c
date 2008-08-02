@@ -565,7 +565,7 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 	no4throm2=0;
 	port71_save=0xff;
 	port32_save=0x80;
-	mainROM = memory_region(machine, REGION_CPU1);
+	mainROM = memory_region(machine, "|");
 	pc8801_mainRAM = (UINT8 *) auto_malloc (0x10000);
 	memset(pc8801_mainRAM, 0, 0x10000);
 
@@ -871,9 +871,9 @@ WRITE8_HANDLER(pc8801_write_kanji1)
 {
   switch(offset) {
   case 0:
-    return *(memory_region(machine, REGION_GFX1)+kanji_high*0x200+kanji_low*0x2+1);
+    return *(memory_region(machine, "gfx1")+kanji_high*0x200+kanji_low*0x2+1);
   case 1:
-    return *(memory_region(machine, REGION_GFX1)+kanji_high*0x200+kanji_low*0x2+0);
+    return *(memory_region(machine, "gfx1")+kanji_high*0x200+kanji_low*0x2+0);
   default:
     return 0xff;
   }
@@ -897,9 +897,9 @@ WRITE8_HANDLER(pc8801_write_kanji2)
 {
   switch(offset) {
   case 0:
-    return *(memory_region(machine, REGION_GFX1)+kanji_high2*0x200+kanji_low2*0x2+1+0x20000);
+    return *(memory_region(machine, "gfx1")+kanji_high2*0x200+kanji_low2*0x2+1+0x20000);
   case 1:
-    return *(memory_region(machine, REGION_GFX1)+kanji_high2*0x200+kanji_low2*0x2+0+0x20000);
+    return *(memory_region(machine, "gfx1")+kanji_high2*0x200+kanji_low2*0x2+0+0x20000);
   default:
     return 0xff;
   }

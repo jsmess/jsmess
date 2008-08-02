@@ -198,7 +198,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( kaypro )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
 static const unsigned char kaypro_palette[] =
@@ -261,13 +261,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START (kaypro)
-    ROM_REGION(0x10000,REGION_CPU1,ROMREGION_ERASEFF) /* 64K for the Z80 */
+    ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* 64K for the Z80 */
     /* totally empty :) */
 
-    ROM_REGION(0x04000,REGION_GFX1,0)  /* 4 * 4K font ram */
+    ROM_REGION(0x04000,"gfx1",0)  /* 4 * 4K font ram */
     ROM_LOAD ("kaypro2x.fnt", 0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7))
 
-    ROM_REGION(0x01600,REGION_CPU2,0)  /* 5,5K for CCP and BDOS buffer */
+    ROM_REGION(0x01600,"cpu1",0)  /* 5,5K for CCP and BDOS buffer */
     ROM_LOAD ("cpm62k.sys",   0x0000, 0x1600, CRC(d10cd036) SHA1(68c04701711fcb5ac1586eb8f060f3f0e02ba3dd))
 ROM_END
 

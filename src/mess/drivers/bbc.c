@@ -117,7 +117,7 @@ static ADDRESS_MAP_START(bbca_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfec0, 0xfedf) AM_NOP													/*    fec0-fedf  uPD7002        1 Analogue to digital converter */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ     (return8_FE    	                	)	/*    fee0-feff  Tube ULA       1 Tube system interface         */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_USER1, 0x13f00)				/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x13f00)				/*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START(bbcb_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(uPD7002_r			, uPD7002_w		 	)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ	 (return8_FE						 	)	/*    fee0-feff  Tube ULA       Tube system interface           */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_USER1, 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START(bbcbp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(uPD7002_r			, uPD7002_w			)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ	 (return8_FE							)	/*    fee0-feff  Tube ULA       Tube system interface           */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_USER1, 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START(bbcbp128_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(uPD7002_r			, uPD7002_w			)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ	 (return8_FE							)	/*    fee0-feff  Tube ULA       Tube system interface           */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_USER1, 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START(bbcm_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x9000, 0xbfff) AM_READWRITE(SMH_BANK5		, memorybm5_w		)	/*    9000-bfff                 Rest of paged ROM/RAM area      */
 
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(SMH_BANK7		, memorybm7_w		)	/*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
-	AM_RANGE(0xe000, 0xfbff) AM_ROM AM_REGION(REGION_USER1, 0x42000)				/*    e000-fbff                 OS ROM                          */
+	AM_RANGE(0xe000, 0xfbff) AM_ROM AM_REGION("user1", 0x42000)				/*    e000-fbff                 OS ROM                          */
 
 	AM_RANGE(0xfc00, 0xfeff) AM_READWRITE(bbcm_r			, bbcm_w			)   /*    this is now processed directly because it can be ROM or hardware */
 	/*
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START(bbcm_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE(0xfee0, 0xfeff) AM_READ     (return8_FE                            )         fee0-feff  Tube ULA       Tube system interface
     */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_USER1, 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -480,9 +480,9 @@ INPUT_PORTS_END
 /* model B driver */
 
 ROM_START(bbca)
-	ROM_REGION(0x04000,REGION_CPU1,ROMREGION_ERASEFF) /* RAM */
+	ROM_REGION(0x04000,"main",ROMREGION_ERASEFF) /* RAM */
 
-	ROM_REGION(0x14000,REGION_USER1,0) /* ROM */
+	ROM_REGION(0x14000,"user1",0) /* ROM */
 	ROM_LOAD("os12.rom",    0x10000,  0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
 
 														  /* rom page 0  00000 */
@@ -499,9 +499,9 @@ ROM_END
 
 
 ROM_START(bbcb)
-	ROM_REGION(0x08000,REGION_CPU1,ROMREGION_ERASEFF) /* RAM */
+	ROM_REGION(0x08000,"main",ROMREGION_ERASEFF) /* RAM */
 
-	ROM_REGION(0x44000,REGION_USER1,0) /* ROM */
+	ROM_REGION(0x44000,"user1",0) /* ROM */
 
 	ROM_LOAD("os12.rom", 0x40000,0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
 
@@ -530,7 +530,7 @@ ROM_START(bbcb)
 														  /* rom page 12 30000 */
 														  /* rom page 13 34000 */
 
-	ROM_REGION(0x20000,REGION_USER2,0) /* DFS ROMS */
+	ROM_REGION(0x20000,"user2",0) /* DFS ROMS */
 
 	ROM_LOAD("dfs09.rom",    0x00000, 0x2000, CRC(3ce609cf) SHA1(5cc0f14b8f46855c70eaa653cca4ad079b458732))
 	ROM_RELOAD(              0x02000, 0x2000                )
@@ -543,15 +543,15 @@ ROM_START(bbcb)
 	ROM_LOAD("ch103.rom",    0x18000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33))
    /*NONE*/
 
-	ROM_REGION(0x80000,REGION_DISKS,ROMREGION_ERASEFF) /* Opus Ram Disc Space */
+	ROM_REGION(0x80000, "disks", ROMREGION_ERASEFF) /* Opus Ram Disc Space */
 
 ROM_END
 
 
 ROM_START(bbcbcsw)
-	ROM_REGION(0x08000,REGION_CPU1,ROMREGION_ERASEFF) /* RAM */
+	ROM_REGION(0x08000,"|main|",ROMREGION_ERASEFF) /* RAM */
 
-	ROM_REGION(0x44000,REGION_USER1,0) /* ROM */
+	ROM_REGION(0x44000,"user1",0) /* ROM */
 
 	ROM_LOAD("os12.rom", 0x40000,0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
 
@@ -580,7 +580,7 @@ ROM_START(bbcbcsw)
 														  /* rom page 12 30000 */
 														  /* rom page 13 34000 */
 
-	ROM_REGION(0x20000,REGION_USER2,0) /* DFS ROMS */
+	ROM_REGION(0x20000,"user2",0) /* DFS ROMS */
 
 	ROM_LOAD("dfs09.rom",    0x00000, 0x2000, CRC(3ce609cf) SHA1(5cc0f14b8f46855c70eaa653cca4ad079b458732))
 	ROM_RELOAD(              0x02000, 0x2000                )
@@ -593,15 +593,15 @@ ROM_START(bbcbcsw)
 	ROM_LOAD("ch103.rom",    0x18000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33))
    /*NONE*/
 
-	ROM_REGION(0x80000,REGION_DISKS,ROMREGION_ERASEFF) /* Opus Ram Disc Space */
+	ROM_REGION(0x80000, "disks", ROMREGION_ERASEFF) /* Opus Ram Disc Space */
 
 ROM_END
 
 
 ROM_START(bbcbp)
-	ROM_REGION(0x10000,REGION_CPU1,ROMREGION_ERASEFF) /* ROM MEMORY */
+	ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,REGION_USER1,0) /* ROM */
+	ROM_REGION(0x44000,"user1",0) /* ROM */
 	ROM_LOAD("bpos2.rom",   0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))  /* basic rom */
 	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
 
@@ -627,9 +627,9 @@ ROM_END
 
 
 ROM_START(bbcbp128)
-	ROM_REGION(0x10000,REGION_CPU1,ROMREGION_ERASEFF) /* ROM MEMORY */
+	ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,REGION_USER1,0) /* ROM */
+	ROM_REGION(0x44000,"user1",0) /* ROM */
 	ROM_LOAD("bpos2.rom",   0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))  /* basic rom */
 	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
 
@@ -656,9 +656,9 @@ ROM_END
 
 /* BBC Master Rom Load */
 ROM_START(bbcm)
-	ROM_REGION(0x10000,REGION_CPU1,ROMREGION_ERASEFF) /* ROM MEMORY */
+	ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* ROM MEMORY */
 
-	ROM_REGION(0x44000,REGION_USER1,0) /* ROM */
+	ROM_REGION(0x44000,"user1",0) /* ROM */
 	ROM_LOAD("mos+3.50.rom",0x40000, 0x4000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803))
 	ROM_CONTINUE(           0x24000, 0x1c000)
 

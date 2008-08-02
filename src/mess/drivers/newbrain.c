@@ -785,7 +785,7 @@ static MACHINE_START( newbrain )
 
 	/* memory banking */
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0xa000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0xa000, 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0x6000, SMH_BANK1, SMH_UNMAP);
@@ -879,7 +879,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( newbrain )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "ROM 2.0" )
 	ROMX_LOAD( "aben20.rom", 0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(1) )
 	ROMX_LOAD( "cd20tci.rom", 0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(1) )
@@ -896,30 +896,30 @@ ROM_START( newbrain )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
 	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(4) )
 
-	ROM_REGION( 0x400, REGION_CPU2, 0 )
+	ROM_REGION( 0x400, "cop", 0 )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, "fdc", 0 )
 	ROM_LOAD( "d417-2.417", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 #define rom_newbraid rom_newbrain
 
 ROM_START( newbramd )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "cdmd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a) )
 	ROM_LOAD( "efmd.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6) )
 
-	ROM_REGION( 0x400, REGION_CPU2, 0 )
+	ROM_REGION( 0x400, "cop", 0 )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) // TODO: remove this
+	ROM_REGION( 0x10000, "fdc", 0 ) // TODO: remove this
 	ROM_LOAD( "d417-2.417", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 

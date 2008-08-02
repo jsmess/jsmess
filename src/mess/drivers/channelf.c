@@ -259,7 +259,7 @@ static MACHINE_DRIVER_START( channelf )
 MACHINE_DRIVER_END
 
 ROM_START( channelf )
-	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_REGION(0x10000,"main",0)
 	ROM_SYSTEM_BIOS( 0, "sl90025", "Luxor Video Entertainment System" )
 	ROMX_LOAD("sl90025.rom",  0x0000, 0x0400, CRC(015c1e38) SHA1(759e2ed31fbde4a2d8daf8b9f3e0dffebc90dae2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sl31253", "Channel F" )

@@ -233,7 +233,7 @@ static READ32_HANDLER(logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)memory_region(machine, REGION_CPU1);
+		rom = (UINT32 *)memory_region(machine, "|");
 
 		return rom[offset & 0x1fffff];
 	}
@@ -300,7 +300,7 @@ static OPBASE_HANDLER( a310_setopbase )
 		opbase->mask = 0x1fffff;
 		opbase->mem_min = 0;
 		opbase->mem_max = 0x1fffff;
-		opbase->rom = opbase->ram = memory_region(machine, REGION_CPU1);
+		opbase->rom = opbase->ram = memory_region(machine, "|");
 	}
 	else	// executing from logical memory
 	{
@@ -741,7 +741,7 @@ static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(ioc_r, ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(vidc_r, vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(memc_r, memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION(REGION_CPU1, 0) AM_WRITE(memc_page_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("|", 0) AM_WRITE(memc_page_w)
 ADDRESS_MAP_END
 
 
@@ -884,12 +884,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START(a310)
-	ROM_REGION(0x800000, REGION_CPU1, 0)
+	ROM_REGION(0x800000, "|", 0)
 	ROM_LOAD("ic24.rom", 0x000000, 0x80000, CRC(c1adde84) SHA1(12d060e0401dd0523d44453f947bdc55dd2c3240))
 	ROM_LOAD("ic25.rom", 0x080000, 0x80000, CRC(15d89664) SHA1(78f5d0e6f1e8ee603317807f53ff8fe65a3b3518))
 	ROM_LOAD("ic26.rom", 0x100000, 0x80000, CRC(a81ceb7c) SHA1(46b870876bc1f68f242726415f0c49fef7be0c72))
 	ROM_LOAD("ic27.rom", 0x180000, 0x80000, CRC(707b0c6c) SHA1(345199a33fed23996374b9db8170a52ab63f0380))
-	ROM_REGION(0x00800, REGION_GFX1, 0)
+	ROM_REGION(0x00800, "gfx1", 0)
 ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT     INIT  CONFIG  COMPANY  FULLNAME */

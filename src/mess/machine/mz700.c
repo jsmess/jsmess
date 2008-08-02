@@ -418,7 +418,7 @@ WRITE8_HANDLER ( mz700_bank_w )
     static int mz700_locked = 0;
 	static int vio_mode = 0;
 	static int vio_lock = 0;
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(machine, "|");
 
     switch (offset)
 	{
@@ -519,7 +519,7 @@ static UINT8 mz800_palette_bank;
         break;
 
 	default:
-		data = memory_region(machine, REGION_CPU1)[0x16000 + offset];
+		data = memory_region(machine, "|")[0x16000 + offset];
         break;
     }
     return data;
@@ -528,7 +528,7 @@ static UINT8 mz800_palette_bank;
 /* port E0 - E9 */
 READ8_HANDLER( mz800_bank_r )
 {
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(machine, "|");
     UINT8 data = 0xff;
 
     switch (offset)
@@ -590,7 +590,7 @@ READ8_HANDLER( mz800_bank_r )
 /* port EA */
  READ8_HANDLER( mz800_ramdisk_r )
 {
-	UINT8 *mem = memory_region(machine, REGION_USER1);
+	UINT8 *mem = memory_region(machine, "user1");
 	UINT8 data = mem[mz800_ramaddr];
 	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", mz800_ramaddr, data));
 	if (mz800_ramaddr++ == 0)
@@ -618,7 +618,7 @@ WRITE8_HANDLER( mz800_read_format_w )
  */
 WRITE8_HANDLER( mz800_display_mode_w )
 {
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(machine, "|");
 	LOG(1,"mz800_display_mode_w",("%02X\n", data));
     mz800_display_mode = data;
 	if ((mz800_display_mode & 0x08) == 0)
@@ -646,7 +646,7 @@ WRITE8_HANDLER ( mz800_bank_w )
     static int mz800_locked = 0;
     static int vio_mode = 0;
     static int vio_lock = 0;
-    UINT8 *mem = memory_region(machine, REGION_CPU1);
+    UINT8 *mem = memory_region(machine, "|");
 
     switch (offset)
     {
@@ -729,7 +729,7 @@ WRITE8_HANDLER ( mz800_bank_w )
 /* port EA */
 WRITE8_HANDLER( mz800_ramdisk_w )
 {
-	UINT8 *mem = memory_region(machine, REGION_USER1);
+	UINT8 *mem = memory_region(machine, "user1");
 	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", mz800_ramaddr, data));
 	mem[mz800_ramaddr] = data;
 	if (mz800_ramaddr++ == 0)
@@ -763,7 +763,7 @@ WRITE8_HANDLER( mz800_palette_w )
 
 DRIVER_INIT( mz800 )
 {
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(machine, "|");
 
 	videoram_size = 0x5000;
 	videoram = auto_malloc(videoram_size);
@@ -773,7 +773,7 @@ DRIVER_INIT( mz800 )
 	mem[0x10002] = 0x00;
     memcpy(&mem[0x00000], &mem[0x10000], 0x02000);
 
-    mem = memory_region(machine, REGION_USER1);
+    mem = memory_region(machine, "user1");
 	memset(&mem[0x00000], 0xff, 0x10000);
 
     mz800_display_mode_w(machine, 0, 0x08);   /* set MZ700 mode */

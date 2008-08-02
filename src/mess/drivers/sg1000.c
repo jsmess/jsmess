@@ -582,7 +582,7 @@ static MACHINE_START( sf7000 )
 	msm8251_init(&sf7000_uart_interface);
 	centronics_config(1, sf7000_centronics_config);
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1), 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "|main|"), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 	memory_configure_bank(2, 0, 1, mess_ram, 0);
 }
@@ -678,21 +678,21 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( sg1000 )
-    ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "main", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( sg1000m2 )
-    ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "main", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( sc3000 )
-    ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "main", ROMREGION_ERASE00 )
 ROM_END
 
 #define rom_sc3000h rom_sc3000
 
 ROM_START( sf7000 )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
 ROM_END
 
@@ -703,13 +703,13 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 	if (size == 40 * 1024)
 	{
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
+		memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}
 	else if (size == 48 * 1024)
 	{
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x8000, 0);
+		memory_configure_bank(1, 0, 1, memory_region(machine, "|main|") + 0x8000, 0);
 		memory_set_bank(1, 0);
 	}
 	else if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
@@ -732,7 +732,7 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, REGION_CPU1);
+	UINT8 *ptr = memory_region(image->machine, "|main|");
 
 	if (image_fread(image, ptr, size ) != size)
 	{
@@ -786,7 +786,7 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr)
 static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, REGION_CPU1);
+	UINT8 *ptr = memory_region(image->machine, "|main|");
 
 	if (image_fread(image, ptr, size ) != size)
 	{

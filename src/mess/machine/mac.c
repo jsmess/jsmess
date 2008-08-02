@@ -210,8 +210,8 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		if (overlay)
 		{
 			/* ROM mirror */
-			memory_size = memory_region_length(machine, REGION_USER1);
-			memory_data = memory_region(machine, REGION_USER1);
+			memory_size = memory_region_length(machine, "user1");
+			memory_data = memory_region(machine, "user1");
 			is_rom = TRUE;
 
 			/* HACK! - copy in the initial reset/stack */
@@ -1346,7 +1346,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 	mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
-		memory_region_length(machine, REGION_USER1), memory_region(machine, REGION_USER1), TRUE, 3);
+		memory_region_length(machine, "user1"), memory_region(machine, "user1"), TRUE, 3);
 
 	set_memory_overlay(machine, 1);
 

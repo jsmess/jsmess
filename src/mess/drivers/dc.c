@@ -80,7 +80,7 @@ static WRITE64_HANDLER( dc_arm_w )
 
 static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
-	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION(REGION_CPU1, 0x200000)	// flash
+	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("|main|", 0x200000)	// flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE( dc_gdrom_r, dc_gdrom_w )
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)	// another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION(REGION_CPU1, 0)
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("|main|", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_port, ADDRESS_SPACE_IO, 64 )
@@ -124,7 +124,6 @@ static void aica_irq(running_machine *machine, int irq)
 
 static const struct AICAinterface aica_interface =
 {
-	REGION_CPU1,		// temporary
 	0,
 	aica_irq
 };
@@ -165,25 +164,25 @@ static MACHINE_DRIVER_START( dc )
 MACHINE_DRIVER_END
 
 ROM_START(dc)
-	ROM_REGION(0x220000, REGION_CPU1, 0)
+	ROM_REGION(0x220000, "main", 0)
         ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )	// BIOS
         ROM_LOAD( "dcus_ntsc.bin", 0x200000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )	// Flash
 ROM_END
 
 ROM_START( dceu )
-	ROM_REGION(0x220000, REGION_CPU1, 0)
+	ROM_REGION(0x220000, "main", 0)
         ROM_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )	// BIOS
         ROM_LOAD( "dceu_pal.bin", 0x200000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )	// Flash
 ROM_END
 
 ROM_START( dcjp )
-	ROM_REGION(0x220000, REGION_CPU1, 0)
+	ROM_REGION(0x220000, "main", 0)
         ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )	// BIOS
         ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )	// Flash
 ROM_END
 
 ROM_START( dcdev )
-	ROM_REGION(0x220000, REGION_CPU1, 0)
+	ROM_REGION(0x220000, "main", 0)
         ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186E0E5) SHA1(6BD18FB83F8FDB56F1941E079580E5DD672A6DAD) )		// BIOS
         ROM_LOAD( "hkt-0120-flash.bin", 0x200000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )	// Flash
 ROM_END

@@ -67,7 +67,7 @@ static bitmap_t *effect_bitmap;
 //  PROTOTYPES
 //============================================================
 
-static void video_exit(running_machine *machine);
+static void winvideo_exit(running_machine *machine);
 static void init_monitors(void);
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(int index);
@@ -90,7 +90,7 @@ void winvideo_init(running_machine *machine)
 	int index;
 
 	// ensure we get called on the way out
-	add_exit_callback(machine, video_exit);
+	add_exit_callback(machine, winvideo_exit);
 
 	// extract data from the options
 	extract_video_config(machine);
@@ -114,19 +114,15 @@ void winvideo_init(running_machine *machine)
 
 
 //============================================================
-//  video_exit
+//  winvideo_exit
 //============================================================
 
-static void video_exit(running_machine *machine)
+static void winvideo_exit(running_machine *machine)
 {
 	// free the overlay effect
 	if (effect_bitmap != NULL)
 		bitmap_free(effect_bitmap);
 	effect_bitmap = NULL;
-
-	// possibly kill the debug window
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
-		debugwin_destroy_windows();
 
 	// free all of our monitor information
 	while (win_monitor_list != NULL)

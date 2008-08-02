@@ -477,7 +477,7 @@ INLINE int addr_is_valid(UINT32 addr, UINT32 flags)
     fd1094_init_debugging - set up debugging
 -----------------------------------------------*/
 
-void fd1094_init_debugging(running_machine *machine, int cpureg, int keyreg, int statreg, void (*changed)(void))
+void fd1094_init_debugging(running_machine *machine, const char *cpureg, const char *keyreg, const char *statreg, void (*changed)(void))
 {
 	/* set the key changed callback */
 	key_changed = changed;

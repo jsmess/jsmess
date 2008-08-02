@@ -18,10 +18,6 @@
 
 // undef WINNT for dinput.h to prevent duplicate definition
 #undef WINNT
-#ifdef DIRECTINPUT_VERSION
-#undef DIRECTINPUT_VERSION
-#endif
-#define DIRECTINPUT_VERSION 0x0700
 #include <dinput.h>
 
 // standard C headers
@@ -746,7 +742,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 
 #ifdef MESS
 			case IPT_OSD_2:
-				if (mess_use_new_ui())
+				if (ui_mess_use_new_ui(Machine))
 				{
 					typedesc->token = "TOGGLE_MENUBAR";
 					typedesc->name = "Toggle Menubar";
@@ -1054,6 +1050,22 @@ static void win32_lightgun_poll(device_info *devinfo)
 static void dinput_init(running_machine *machine)
 {
 	HRESULT result;
+#if DIRECTINPUT_VERSION >= 0x800
+	int didevtype_keyboard = DI8DEVCLASS_KEYBOARD;
+	int didevtype_mouse = DI8DEVCLASS_POINTER;
+	int didevtype_joystick = DI8DEVCLASS_GAMECTRL;
+
+	dinput_version = DIRECTINPUT_VERSION;
+	result = DirectInput8Create(GetModuleHandle(NULL), dinput_version, &IID_IDirectInput8, (void *)&dinput, NULL);
+	if (result != DI_OK)
+	{
+		dinput_version = 0;
+		return;
+	}
+#else
+	int didevtype_keyboard = DIDEVTYPE_KEYBOARD;
+	int didevtype_mouse = DIDEVTYPE_MOUSE;
+	int didevtype_joystick = DIDEVTYPE_JOYSTICK;
 
 	// first attempt to initialize DirectInput at the current version
 	dinput_version = DIRECTINPUT_VERSION;
@@ -1075,6 +1087,8 @@ static void dinput_init(running_machine *machine)
 			}
 		}
 	}
+#endif
+
 	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
 
 	// we need an exit callback
@@ -1084,7 +1098,7 @@ static void dinput_init(running_machine *machine)
 	if (keyboard_list == NULL)
 	{
 		// enumerate the ones we have
-		result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_KEYBOARD, dinput_keyboard_enum, 0, DIEDFL_ATTACHEDONLY);
+		result = IDirectInput_EnumDevices(dinput, didevtype_keyboard, dinput_keyboard_enum, 0, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", (UINT32)result);
 	}
@@ -1093,13 +1107,13 @@ static void dinput_init(running_machine *machine)
 	if (mouse_list == NULL)
 	{
 		// enumerate the ones we have
-		result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_MOUSE, dinput_mouse_enum, 0, DIEDFL_ATTACHEDONLY);
+		result = IDirectInput_EnumDevices(dinput, didevtype_mouse, dinput_mouse_enum, 0, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate mice (result=%08X)\n", (UINT32)result);
 	}
 
 	// initialize joystick devices
-	result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_JOYSTICK, dinput_joystick_enum, 0, DIEDFL_ATTACHEDONLY);
+	result = IDirectInput_EnumDevices(dinput, didevtype_joystick, dinput_joystick_enum, 0, DIEDFL_ATTACHEDONLY);
 	if (result != DI_OK)
 		fatalerror("DirectInput: Unable to enumerate joysticks (result=%08X)\n", (UINT32)result);
 }

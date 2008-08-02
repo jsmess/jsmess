@@ -1,26 +1,208 @@
-0.125u8
+0.126u3
 -------
 
 
 MAMETesters Bugs Fixed
 ----------------------
-- 01935: [Core] All output commands (-listxml, -cc, -listfull, ETC) 
-         crash with error (couriersud)
+- 02023: [Crash/Freeze] irobot: hang (Aaron Giles)
+- 02043: [Crash/Freeze] All games in cps2.c: All Parent Sets for CPS2 
+         Games Abort (Firewave)
+- 02046: [DIP/Input] cachat, tubeit: screen upsidedown (Fabio Priuli)
+- 00456: [Graphics] combascb: Missing Most Graphics (Fabio Priuli)
+- 02050: [DIP/Input] skyfox, exerizrb: Issue with credits input 
+         (Fabio Priuli)
+- 02045: [DIP/Input] wofhfh: Player 3 inputs aren't working (stephh)
 
 
 
 Source Changes
 --------------
-Updated config.txt to describe debugger. Turned off debugger flag by
-default. [Aaron Giles]
+More documentation on the Kiki KaiKai MCU. [Guru, Brian Troha]
 
-Fixed input port read during init on most (Super) System 22 games.
-[R. Belmont]
+A bit more cleanup in the gottlieb driver, still incomplete.
+[Aaron Giles]
 
-Fixed dip switches and added dip locations. [Brian Troha]
+Verified Free Kick PROMs and improved documentation. [Brian Troha]
+
+Added the ability to pass an optional destructor to 
+ui_menu_alloc_state(). [Nathan Woods]
+
+Updated to build with the latest DirectX SDK, which doesn't support 
+Direct 3D 8 & Direct Input 7. By default, the makefile is set up to
+compile the old way, but you can set DIRECT3D=9 and DIRECTINPUT=8 in
+windows.mak or on the command-line to build with a more modern SDK.
+[smf, RansAckeR, uRebelScum]
+
+Irem m63 - adjusted AY frequencies to proper 1.5 MHz [Stefan Lindberg]
+
+DSP56156 CPU Core updates [Andrew Gardner]
+ - Rewrote core logic, communications, and interfaces.
+ - Added three parallel memory moves to the disassembler.
+ - Initial interrupt logic in place.
+
+Plygonet.c updates [Andrew Gardner]
+ - All communication hacks have been removed.
+ - Memory maps have been temporarily reverted while new DSP56k cpu 
+    core catches up.
+
+Merged memory maps for beezer.c, bishi.c, and bladestl.c. 
+[Andrew Gardner]
+
+AICA updates [Deunan Knute, ajax16384, R. Belmont]
+ - Fixed ADPCM decoder to remove bad optimization and match YMZ280B. 
+    DC offset is fixed and output quality is higher
+ - Improved handling of slot monitor and timers B and C
+ - Simplified interpolation code
+
+SH2DRC: Add PC-relative load optimization and ability to disable if 
+necessary [R. Belmont, based on an idea by Mariusz Wojcieszek]
+
+Changed the way memory regions are referenced. Instead of a single
+integer value, regions are now referred to by a region tag. The
+region tag must be unique among all regions defined for a given
+game. This change required updating all the ROM region definitions 
+in the project to specify the tag instead of region number.
+[Aaron Giles]
+
+Updated the core memory_region_* functions to accept a tag instead 
+of an integer. Added new memory_region_next() function to allow for 
+iteration over all memory regions. [Aaron Giles]
+
+Changed the auto-binding behavior of CPU regions. Previously, the
+first CPU would auto-bind to REGION_CPU1 (that is, any ROM references
+would automatically assume that they lived in the corresponding
+region). Now, each CPU automatically binds to the region with the 
+same tag as the CPU itself. This behavior required ensuring that
+all previous REGION_CPU* regions were changed to regions with the
+same tag as the CPU. [Aaron Giles]
+
+Introduced a new auto-binding mechanism for sound cores. This works
+similarly to the CPU binding. Each sound core that requires a memory
+region now auto-binds to the region with the same tag as the sound 
+core. In almost all cases, this allowed for the removal of the 
+explicit region item in the sound configuration, which in turn 
+allowed for many sound configurations to removed altogether.
+[Aaron Giles]
+
+Updated the expression engine's memory reference behavior. A recent
+update expanded the scope of memory references to allow for referencing
+data in non-active CPU spaces, in memory regions, and in EEPROMs.
+However, this previous update required an index, which is no longer
+appropriate for regions and will become increasingly less appropriate
+for CPUs over time. Instead, a new syntax is supported, of the form:
+"[tag.][space]size@addr", where 'tag' is an optional tag for the CPU
+or memory region you wish to access, followed by a period as a 
+separator; 'space' is the memory address space or memory class you
+wish to access (p/d/i for program/data/I/O spaces; o for opcode space;
+r for direct RAM; m for memory regions; e for EEPROMs); and 'size' is 
+the usual b/w/d/q for byte/word/dword/qword. [Aaron Giles]
+
+Cleaned up ROM definition flags and removed some ugly hacks that had
+existed previously. Expanded to support up to 256 BIOSes. Updated
+ROM_COPY to support specifying a tag for the source region. Also 
+updated the address map AM_REGION macro to support specifying a
+tag for the region. [Aaron Giles]
+
+Updated debugger windows to display the CPU and region tags where
+appropriate. [Aaron Giles]
+
+Updated -listxml to output region class and tag for each ROM entry.
+[Aaron Giles]
+
+Changes to lucky74.c driver: [Roberto Fresca]
+ - Pre-defined CPU and SND clocks.
+ - Switched the color system to RESNET calculations.
+ - Completed the remaining DIP switches.
+ - Added lamps support. Created a layout to show them.
+ - Changes on the interrupt system (need to be verified on the PCB).
+ - Renamed the graphics regions to more descriptive names.
+ - Corrected the manufacturer's name.
+ - Splitted the driver to driver + video.
+ - Updated technical notes.
+
+Changed unmapped read for mspacman to see if it changes tunnel 
+behavior. [David Haywood, as suggested by dwidel]
+
+SH2DRC: add SUBV, replace ADDV with C version as a precaution. (Fixes 
+most of Mantis #2026, except the part which is a separate bug). Added
+new implementation which uses flags directly, keeping the C versions
+in reserve in case they are needed. [R. Belmont, Aaron Giles]
+
+Added more validation to the address map detokenization, in order to
+catch cases where multiple read/write handlers are assigned to a range.
+Fixed cases in the code that failed these checks. [Atari Ace]
+
+i8051 cpu core timer updates: [Wilbert Pol]
+ - Added support for timer mode 0 (13 bit timer)
+ - Cleaned up timer code a bit, fixing some off-by-one errors when 
+    timers overflow.
+
+Naomi updates [Samuele Zannoli]
+ 1) refactors many global and static variables in video\dc.c into a
+     structure to hold the tile accelerator state
+ 2) textures should be better decoded with more pixel formats
+ 3) adds placeholders for some register probably used by the dimm board
+ 4) corrects a little error in a rom board register (very important, 
+     now at least the gdrom games try to start)
+
+Added region and regionbytes fields to the deviceconfig, which are
+auto-filled by the device manager before starting the device. This
+simplifies the auto-binding process for devices. Added new selector 
+for device-specific ROM regions. Not yet wired up in the ROM loader.
+[Aaron Giles]
+
+Simplified SH2 DRC shift/rotate instruction implementations.
+[Aaron Giles]
+
+Fixed menu handling so it doesn't swallow the tab key. [Aaron Giles]
+
+Changed symbol table reference parameters to void * from UINT32.
+[Aaron Giles]
+
+Enable strict PC relative loads for ST-V games; at least Cotton 
+Boomerang needs them. [R. Belmont]
+
+Added new option 'cheatpath' to specify one or more paths for cheat
+files. Removed old option 'cheat_file'. [Aaron Giles]
+
+Updated xmlfile.c to specify the line number for each node, for more
+accurate error reporting. [Aaron Giles]
+
+Removed old cheat.c/.h and replaced them with code that will read and
+write the new XML-based cheat format using the new cheatpath option
+(cheats still need to be enabled in order to load at all). Note that
+the cheats are not implemented yet, but they are fully parsed. To test
+saving, whenever a cheat file is successfully loaded, it is immediately
+written back out as 'output.xml' to the cheat directory for validation.
+[Aaron Giles]
+
+Minor cleanups: [Oliver Stoenberg]
+ - removed of unprintable chars (newlines) in SH-2 disassembler
+ - removed a few unnecessary checks after malloc_ort_die() calls
+ - changed two romload.c warnings to use GAMENOUN instead
+ - added "deprecat.h" in a  few src/mame/drivers files
+ - cleaned up the mame.mak by adding all missing defines and grouping 
+    them based on cpu.mak
+ - renamed video_exit() to winvideo_exit() for consistency in function 
+    names
+
+Changed commented-out functions to #ifdefs. [Atari Ace]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+Galaxi [Luca Elia]
 
 
 
 New clones added
 ----------------
-Mahjong Electron Base (parts 2 & 4, Japan, BOOTLEG) [XingXing]
+Pool 10 (italian, set 3) [Roberto Fresca]
+Killer Instinct 2 (v1.3k, upgrade kit) [Brian Troha] (NOT WORKING)
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00) [R. Belmont]

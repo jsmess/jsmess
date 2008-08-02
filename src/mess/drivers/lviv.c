@@ -478,7 +478,7 @@ static void lviv_cassette_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 ROM_START(lviv)
-	ROM_REGION(0x14000,REGION_CPU1,0)
+	ROM_REGION(0x14000,"main",0)
 	ROM_SYSTEM_BIOS( 0, "lviv", "Lviv/L'vov" )
 	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "lviva", "Lviv/L'vov (alternate)" )

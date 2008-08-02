@@ -38,7 +38,7 @@
     0000|-------|
 
 
-    Bank REGION_CPU1       Contents
+    Bank "|main|"       Contents
     0    0x00000 - 0x03fff ROM 1st half
     1    0x04000 - 0x07fff ROM 2nd half
     2           n/a        I/O 2KB area (mirrored 8 times?)
@@ -342,13 +342,13 @@ static const gfx_layout gfxlayout_4bpp_dh =
 };
 
 static GFXDECODE_START( vtech2 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_80, 0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_40, 0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_1bpp, 0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_1bpp_dw, 0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_1bpp_qw, 0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_4bpp, 2*256, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_4bpp_dh, 2*256, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_80, 0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_40, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_1bpp, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_1bpp_dw, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_1bpp_qw, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_4bpp, 2*256, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_4bpp_dh, 2*256, 1 )
 GFXDECODE_END
 
 
@@ -444,30 +444,30 @@ MACHINE_DRIVER_END
 
 
 ROM_START(laser350)
-	ROM_REGION(0x40000,REGION_CPU1,0)
+	ROM_REGION(0x40000,"main",0)
 	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
-	ROM_REGION(0x00800,REGION_GFX1,0)
+	ROM_REGION(0x00800,"gfx1",0)
 	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
-	ROM_REGION(0x00100,REGION_GFX2,ROMREGION_ERASEFF)
+	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
     /* initialized in init_laser */
 ROM_END
 
 
 ROM_START(laser500)
-	ROM_REGION(0x40000,REGION_CPU1,0)
+	ROM_REGION(0x40000,"main",0)
 	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
-	ROM_REGION(0x00800,REGION_GFX1,0)
+	ROM_REGION(0x00800,"gfx1",0)
 	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
-	ROM_REGION(0x00100,REGION_GFX2,ROMREGION_ERASEFF)
+	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 
 ROM_START(laser700)
-	ROM_REGION(0x40000,REGION_CPU1,0)
+	ROM_REGION(0x40000,"main",0)
 	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
-	ROM_REGION(0x00800,REGION_GFX1,0)
+	ROM_REGION(0x00800,"gfx1",0)
 	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
-	ROM_REGION(0x00100,REGION_GFX2,ROMREGION_ERASEFF)
+	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 

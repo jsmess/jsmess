@@ -228,6 +228,9 @@ static int MIN_HEIGHT = DBU_MIN_HEIGHT;
 
 #define NO_FOLDER -1
 #define STATESAVE_VERSION 1
+//I could not find a predefined value for this event and docs just say it has 1 for the parameter
+#define TOOLBAR_EDIT_ACCELERATOR_PRESSED 1
+
 
 /***************************************************************************
  externally defined global variables
@@ -763,10 +766,20 @@ static const int s_nPickers[] =
 #endif
 };
 
+
+/* How to resize toolbar sub window */
+static ResizeItem toolbar_resize_items[] =
+{
+	{ RA_ID,   { ID_TOOLBAR_EDIT },  TRUE, RA_RIGHT | RA_TOP,     NULL },
+	{ RA_END,  { 0 },            FALSE, 0,                                 NULL }
+};
+
+static Resize toolbar_resize = { {0, 0, 0, 0}, toolbar_resize_items };
+
 /* How to resize main window */
 static ResizeItem main_resize_items[] =
 {
-	{ RA_HWND, { 0 },            FALSE, RA_LEFT  | RA_RIGHT  | RA_TOP,     NULL },
+	{ RA_HWND, { 0 },            FALSE, RA_LEFT  | RA_RIGHT  | RA_TOP,     &toolbar_resize },
 	{ RA_HWND, { 0 },            FALSE, RA_LEFT  | RA_RIGHT  | RA_BOTTOM,  NULL },
 	{ RA_ID,   { IDC_DIVIDER },  FALSE, RA_LEFT  | RA_RIGHT  | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_TREE },     TRUE,	RA_LEFT  | RA_BOTTOM | RA_TOP,     NULL },
@@ -1939,7 +1952,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 			DeleteFont(hFont);
 		}
 		hFont = CreateFontIndirect(&logfont);
-		if (hFont != NULL)
+		if (hFont != NULL) 
 			SetAllWindowsFont(hMain, &main_resize, hFont, FALSE);
 	}
 
@@ -2708,11 +2721,15 @@ static void SetAllWindowsFont(HWND hParent, const Resize *r, HFONT hTheFont, BOO
 
 	for (i = 0; r->items[i].type != RA_END; i++)
 	{
+		hControl = GetResizeItemWindow(hParent, &r->items[i]);
 		if (r->items[i].setfont)
 		{
-			hControl = GetResizeItemWindow(hParent, &r->items[i]);
 			SetWindowFont(hControl, hTheFont, bRedraw);
 		}
+		/* Take care of subcontrols, if appropriate */
+		if (r->items[i].subwindow != NULL)
+			SetAllWindowsFont(hControl, r->items[i].subwindow, hTheFont, bRedraw);
+		
 	}
 }
 
@@ -2720,7 +2737,7 @@ static void SetAllWindowsFont(HWND hParent, const Resize *r, HFONT hTheFont, BOO
 
 static void ResizeWindow(HWND hParent, Resize *r)
 {
-	int cmkindex = 0, dx, dy, dx1, dtempx;
+	int cmkindex = 0, dx, dy;
 	HWND hControl;
 	RECT parent_rect, rect;
 	const ResizeItem *ri;
@@ -2731,15 +2748,13 @@ static void ResizeWindow(HWND hParent, Resize *r)
 
 	/* Calculate change in width and height of parent window */
 	GetClientRect(hParent, &parent_rect);
-	//dx = parent_rect.right - r->rect.right;
-	dtempx = parent_rect.right - r->rect.right;
 	dy = parent_rect.bottom - r->rect.bottom;
-	dx = dtempx/2;
-	dx1 = dtempx - dx;
+	dx = parent_rect.right - r->rect.right;
 	ClientToScreen(hParent, &p);
 
 	while (r->items[cmkindex].type != RA_END)
 	{
+		int width, height;
 		ri = &r->items[cmkindex];
 		if (ri->type == RA_ID)
 			hControl = GetDlgItem(hParent, ri->u.id);
@@ -2755,6 +2770,8 @@ static void ResizeWindow(HWND hParent, Resize *r)
 		/* Get control's rectangle relative to parent */
 		GetWindowRect(hControl, &rect);
 		OffsetRect(&rect, -p.x, -p.y);
+		width = rect.right - rect.left;
+		height = rect.bottom - rect.top;
 
 		if (!(ri->action & RA_LEFT))
 			rect.left += dx;
@@ -2767,7 +2784,27 @@ static void ResizeWindow(HWND hParent, Resize *r)
 
 		if (ri->action & RA_BOTTOM)
 			rect.bottom += dy;
-
+		//Sanity Check the child rect
+		if (parent_rect.top > rect.top)
+			rect.top = parent_rect.top;
+		if (parent_rect.left > rect.left)
+			rect.left = parent_rect.left;
+		if (parent_rect.bottom < rect.bottom) {
+			rect.bottom = parent_rect.bottom;
+			//ensure we have at least a minimal height
+			rect.top = rect.bottom - height;
+			if (rect.top < parent_rect.top) {
+				rect.top = parent_rect.top;
+			}
+		}
+		if (parent_rect.right < rect.right) {
+			rect.right = parent_rect.right;
+			//ensure we have at least a minimal width
+			rect.left = rect.right - width;
+			if (rect.left < parent_rect.left) {
+				rect.left = parent_rect.left;
+			}
+		}
 		MoveWindow(hControl, rect.left, rect.top,
 				   (rect.right - rect.left),
 				   (rect.bottom - rect.top), TRUE);
@@ -4153,10 +4190,15 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 	case ID_TOOLBAR_EDIT:
 		{
 			char buf[256];
+			HWND hToolbarEdit;
 
 			win_get_window_text_utf8(hwndCtl, buf, sizeof(buf));
 			switch (codeNotify)
 			{
+			case TOOLBAR_EDIT_ACCELERATOR_PRESSED: 
+				hToolbarEdit = GetDlgItem( hToolBar, ID_TOOLBAR_EDIT);
+				SetFocus(hToolbarEdit);
+				break;
 			case EN_CHANGE:
 				//put search routine here first, add a 200ms timer later.
 				if ((!_stricmp(buf, SEARCH_PROMPT) && !_stricmp(g_SearchText, "")) ||
@@ -4517,6 +4559,27 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				  hMain,
 				  LanguageDialogProc);
 		return TRUE;
+
+	case ID_OPTIONS_HISTORY:
+		{
+			char filename[MAX_PATH];
+			_tcscpy(filename, GetHistoryFileName());
+			if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_HISTORY_FILE))
+			{
+				SetHistoryFileName(filename);
+			}
+			return TRUE;
+		}
+	case ID_OPTIONS_MAMEINFO:
+		{
+			char filename[MAX_PATH];
+			_tcscpy(filename, GetMAMEInfoFileName());
+			if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_MAMEINFO_FILE))
+			{
+				SetMAMEInfoFileName(filename);
+			}
+			return TRUE;
+		}
 
 	case ID_HELP_ABOUT:
 		DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUT),
@@ -5346,6 +5409,21 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	case FILETYPE_EFFECT_FILES :
 		of.lpstrFilter   = TEXT("effects (*.png)\0*.png;\0All files (*.*)\0*.*\0");
 		break;
+	case FILETYPE_JOYMAP_FILES :
+		of.lpstrFilter   = TEXT("maps (*.map,*.txt)\0*.map;*.txt;\0All files (*.*)\0*.*\0");
+		break;
+	case FILETYPE_DEBUGSCRIPT_FILES :
+		of.lpstrFilter   = TEXT("scripts (*.txt,*.dat)\0*.txt;*.dat;\0All files (*.*)\0*.*\0");
+		break;
+	case FILETYPE_CHEAT_FILE :
+		of.lpstrFilter   = TEXT("cheats (*.dat)\0*.dat;\0All files (*.*)\0*.*\0");
+		break;
+	case FILETYPE_HISTORY_FILE :
+		of.lpstrFilter   = TEXT("history (*.dat)\0*.dat;\0All files (*.*)\0*.*\0");
+		break;
+	case FILETYPE_MAMEINFO_FILE :
+		of.lpstrFilter   = TEXT("mameinfo (*.dat)\0*.dat;\0All files (*.*)\0*.*\0");
+		break;
 	}
 	of.lpstrCustomFilter = NULL;
 	of.nMaxCustFilter    = 0;
@@ -5404,6 +5482,17 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		break;
 	case FILETYPE_EFFECT_FILES :
 		of.lpstrDefExt       = TEXT("png");
+		break;
+	case FILETYPE_JOYMAP_FILES :
+		of.lpstrDefExt       = TEXT("map");
+		break;
+	case FILETYPE_DEBUGSCRIPT_FILES :
+		of.lpstrDefExt       = TEXT("txt");
+		break;
+	case FILETYPE_CHEAT_FILE :
+	case FILETYPE_HISTORY_FILE :
+	case FILETYPE_MAMEINFO_FILE :
+		of.lpstrDefExt       = TEXT("dat");
 		break;
 	}
 	of.lCustData         = 0;

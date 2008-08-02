@@ -483,7 +483,7 @@ WRITE8_HANDLER( vc20_6000_w ) {
 static void vc20_memory_init(running_machine *machine)
 {
 	static int inited=0;
-	UINT8 *memory = memory_region (machine, REGION_CPU1);
+	UINT8 *memory = memory_region (machine, "|");
 
 	if (inited) return;
 	/* power up values are random (more likely bit set)
@@ -532,11 +532,11 @@ static void vc20_common_driver_init (running_machine *machine)
 	via_config (1, &via1);
 
 	/* Set up memory banks */
-	memory_set_bankptr( 1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, REGION_CPU1) ) + 0x0400 );
-	memory_set_bankptr( 2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(machine, REGION_CPU1) ) + 0x2000 ) );
-	memory_set_bankptr( 3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(machine, REGION_CPU1) ) + 0x4000 ) );
-	memory_set_bankptr( 4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(machine, REGION_CPU1) ) + 0x6000 ) );
-	memory_set_bankptr( 5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, REGION_CPU1) + 0xa000 ) );
+	memory_set_bankptr( 1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, "|") ) + 0x0400 );
+	memory_set_bankptr( 2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(machine, "|") ) + 0x2000 ) );
+	memory_set_bankptr( 3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(machine, "|") ) + 0x4000 ) );
+	memory_set_bankptr( 4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(machine, "|") ) + 0x6000 ) );
+	memory_set_bankptr( 5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "|") + 0xa000 ) );
 }
 
 /* currently not used, but when time comes */
@@ -697,26 +697,26 @@ DEVICE_IMAGE_LOAD(vc20_rom)
 	}
 
 	logerror("loading rom %s at %.4x size:%.4x\n",image_filename(image), addr, size);
-	read_ = image_fread(image, new_memory_region( image->machine, REGION_USER1, ( size & 0x1FFF ) ? ( size + 0x2000 ) : size, 0 ), size);
+	read_ = image_fread(image, memory_region_alloc( image->machine, "user1", ( size & 0x1FFF ) ? ( size + 0x2000 ) : size, 0 ), size);
 	if (read_ != size)
 		return 1;
 
 	/* Perform banking for the cartridge */
 	switch( addr ) {
 	case 0x2000:
-		vc20_rom_2000 = memory_region(image->machine,  REGION_USER1 );
+		vc20_rom_2000 = memory_region(image->machine,  "user1" );
 		break;
 	case 0x4000:
-		vc20_rom_4000 = memory_region(image->machine,  REGION_USER1 );
+		vc20_rom_4000 = memory_region(image->machine,  "user1" );
 		if ( size > 0x2000 ) {
-			vc20_rom_6000 = memory_region(image->machine,  REGION_USER1 ) + 0x2000;
+			vc20_rom_6000 = memory_region(image->machine,  "user1" ) + 0x2000;
 		}
 		break;
 	case 0x6000:
-		vc20_rom_6000 = memory_region(image->machine,  REGION_USER1 );
+		vc20_rom_6000 = memory_region(image->machine,  "user1" );
 		break;
 	case 0xa000:
-		vc20_rom_a000 = memory_region(image->machine,  REGION_USER1 );
+		vc20_rom_a000 = memory_region(image->machine,  "user1" );
 		break;
 	}
 	return 0;

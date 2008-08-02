@@ -47,7 +47,7 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 				bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 }
 
-void deco102_decrypt(running_machine *machine, int region, int address_xor, int data_select_xor, int opcode_select_xor)
+void deco102_decrypt_cpu(running_machine *machine, const char *region, int address_xor, int data_select_xor, int opcode_select_xor)
 {
 	int i;
 	UINT16 *rom = (UINT16 *)memory_region(machine, region);

@@ -19,7 +19,7 @@ VIDEO_START( mikro80 )
  
 VIDEO_UPDATE( mikro80 )
 {
-	UINT8 *gfx = memory_region(screen->machine, REGION_GFX1);
+	UINT8 *gfx = memory_region(screen->machine, "gfx1");
 	int x,y,b;
 
 	for(y = 0; y < 32*8; y++ )

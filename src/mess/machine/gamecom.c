@@ -71,7 +71,7 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 
 MACHINE_RESET( gamecom )
 {
-	UINT8 *rom = memory_region(machine, REGION_USER1);
+	UINT8 *rom = memory_region(machine, "user1");
 	memory_set_bankptr( 1, rom );
 	memory_set_bankptr( 2, rom );
 	memory_set_bankptr( 3, rom );
@@ -98,7 +98,7 @@ MACHINE_RESET( gamecom )
 static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data ) {
 	if ( data < 32 ) {
 		/* select internal ROM bank */
-		memory_set_bankptr( mmu, memory_region(machine, REGION_USER1) + (data << 13) );
+		memory_set_bankptr( mmu, memory_region(machine, "user1") + (data << 13) );
 	} else {
 		/* select cartridge bank */
 		if ( cartridge == NULL ) {
@@ -443,11 +443,11 @@ static void gamecom_dma_init(running_machine *machine) {
 //		logerror( "DMA DMBR = %X\n", internal_registers[SM8521_DMBR] );
 		gamecom_dma.source_width = 64;
 		if ( internal_registers[SM8521_DMBR] < 16 ) {
-			gamecom_dma.source_bank = memory_region(machine, REGION_USER1) + (internal_registers[SM8521_DMBR] << 14);
+			gamecom_dma.source_bank = memory_region(machine, "user1") + (internal_registers[SM8521_DMBR] << 14);
 			gamecom_dma.source_mask = 0x3FFF;
 		} else {
 			logerror( "TODO: Reading from external ROMs not supported yet\n" );
-			gamecom_dma.source_bank = memory_region(machine, REGION_USER1);
+			gamecom_dma.source_bank = memory_region(machine, "user1");
 		}
 		gamecom_dma.dest_bank = &gamecom_vram[(internal_registers[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;

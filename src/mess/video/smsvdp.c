@@ -190,11 +190,11 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	smsvdp.int_callback = config->int_callback;
 
 	/* Allocate video RAM
-	   In theory the driver could have a REGION_GFX1 and/or REGION_GFX2 memory region
+	   In theory the driver could have a "gfx1" and/or "gfx2" memory region
 	   of it's own. So this code could potentially cause a clash.
 	*/
-	smsvdp.VRAM = new_memory_region( machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
-	smsvdp.CRAM = new_memory_region( machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
+	smsvdp.VRAM = memory_region_alloc( machine, "gfx1", VRAM_SIZE, ROM_REQUIRED );
+	smsvdp.CRAM = memory_region_alloc( machine, "gfx2", MAX_CRAM_SIZE, ROM_REQUIRED );
 	smsvdp.line_buffer = auto_malloc( 256 * 5 * sizeof(int) );
 	memset( smsvdp.line_buffer, 0, 256 * 5 * sizeof(int) );
 

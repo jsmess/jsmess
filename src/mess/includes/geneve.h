@@ -12,7 +12,7 @@
 
 /* defines */
 
-/* offsets for REGION_CPU1 */
+/* offsets for "|" */
 enum
 {
 	offset_rom_geneve = 0x0000,			/* boot ROM (16 kbytes) */

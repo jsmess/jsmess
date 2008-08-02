@@ -492,7 +492,7 @@ MACHINE_DRIVER_END
 
 ROM_START(geneve)
 	/*CPU memory space*/
-	ROM_REGION(region_cpu1_len_geneve, REGION_CPU1, 0)
+	ROM_REGION(region_cpu1_len_geneve, "main", 0)
 	ROM_LOAD("genbt100.bin", offset_rom_geneve, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
 
 	/*DSR ROM space*/
@@ -512,7 +512,7 @@ ROM_END
 
 ROM_START(genmod)
 	/*CPU memory space*/
-	ROM_REGION(region_cpu1_len_geneve, REGION_CPU1, 0)
+	ROM_REGION(region_cpu1_len_geneve, "main", 0)
 	ROM_LOAD("gnmbt100.bin", offset_rom_geneve, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
 
 	/*DSR ROM space*/

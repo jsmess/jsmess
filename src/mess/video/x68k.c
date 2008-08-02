@@ -895,8 +895,8 @@ static const gfx_layout x68k_pcg_16 =
 
 #if 0
 static GFXDECODEINFO_START( x68k )
-	GFXDECODE_ENTRY( REGION_USER1, 0, x68k_pcg_8, 0x100, 16 )  // 8x8 sprite tiles
-	GFXDECODE_ENTRY( REGION_USER1, 0, x68k_pcg_16, 0x100, 16 )  // 16x16 sprite tiles
+	GFXDECODE_ENTRY( "user1", 0, x68k_pcg_8, 0x100, 16 )  // 8x8 sprite tiles
+	GFXDECODE_ENTRY( "user1", 0, x68k_pcg_16, 0x100, 16 )  // 16x16 sprite tiles
 GFXDECODEINFO_END
 #endif
 
@@ -951,13 +951,13 @@ VIDEO_START( x68000 )
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_8);
-	decodegfx(machine->gfx[gfx_index] , memory_region(machine, REGION_USER1), 0, 256);
+	decodegfx(machine->gfx[gfx_index] , memory_region(machine, "user1"), 0, 256);
 	machine->gfx[gfx_index]->total_colors = 32;
 
 	gfx_index++;
 
 	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_16);
-	decodegfx(machine->gfx[gfx_index] , memory_region(machine, REGION_USER1), 0, 256);
+	decodegfx(machine->gfx[gfx_index] , memory_region(machine, "user1"), 0, 256);
 	machine->gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
@@ -1011,7 +1011,7 @@ VIDEO_UPDATE( x68000 )
 		rect.max_y = cliprect->max_y;
 
 	// update tiles
-	rom = memory_region(screen->machine, REGION_USER1);
+	rom = memory_region(screen->machine, "user1");
 	for(x=0;x<256;x++)
 	{
 		if(sys.video.tile16_dirty[x] != 0)

@@ -79,8 +79,8 @@ static const gfx_layout apple2gs_dbltext_layout =
 };
 
 static GFXDECODE_START( apple2gs )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2gs_text_layout, 0, 2 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2gs_dbltext_layout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_text_layout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_dbltext_layout, 0, 2 )
 GFXDECODE_END
 
 static const unsigned char apple2gs_palette[] =
@@ -195,26 +195,26 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(apple2gs)
-	ROM_REGION(0x1000,REGION_GFX1,0)
+	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x40000,REGION_CPU1,0)
+	ROM_REGION(0x40000,"main",0)
 	ROM_LOAD("rom03", 0x0000, 0x40000, CRC(de7ddf29) SHA1(bc32bc0e8902946663998f56aea52be597d9e361))
 ROM_END
 
 ROM_START(apple2g1)
-	ROM_REGION(0x1000,REGION_GFX1,0)
+	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x20000,REGION_CPU1,0)
+	ROM_REGION(0x20000,"main",0)
 	ROM_LOAD("rom01", 0x0000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37))
 ROM_END
 
 ROM_START(apple2g0)
-	ROM_REGION(0x1000,REGION_GFX1,0)
+	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x20000,REGION_CPU1,0)
+	ROM_REGION(0x20000,"main",0)
 	ROM_LOAD("rom0a.bin", 0x0000,  0x8000, CRC(9cc78238) SHA1(0ea82e10720a01b68722ab7d9f66efec672a44d3))
 	ROM_LOAD("rom0b.bin", 0x8000,  0x8000, CRC(8baf2a79) SHA1(91beeb11827932fe10475252d8036a63a2edbb1c))
 	ROM_LOAD("rom0c.bin", 0x10000, 0x8000, CRC(94c32caa) SHA1(4806d50d676b06f5213b181693fc1585956b98bb))

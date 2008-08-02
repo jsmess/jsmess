@@ -258,7 +258,7 @@ static void cbmb_change_font(running_machine *machine, int level)
 
 static void cbmb_common_driver_init(running_machine *machine)
 {
-	cbmb_chargen=memory_region(machine, REGION_CPU1)+0x100000;
+	cbmb_chargen=memory_region(machine, "|")+0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
 	cia_config(machine, 0, &cbmb_cia);

@@ -35,6 +35,8 @@
 #define DISABLE_FAST_REGISTERS				(0)	// set to 1 to turn off usage of register caching
 #define SINGLE_INSTRUCTION_MODE				(0)
 
+#define ADDSUBV_DIRECT				(0)
+
 #define VERBOSE 0
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
@@ -538,6 +540,94 @@ static void cfunc_DIV1(void *param)
 	else
 		sh2->sr &= ~T;
 }
+
+#if (!ADDSUBV_DIRECT)
+/*-------------------------------------------------
+    cfunc_ADDV - implementation of ADDV Rm,Rn
+-------------------------------------------------*/
+static void cfunc_ADDV(void *param)
+{
+	INT32 dest, src, ans;
+	UINT16 *opptr, opcode;
+	int n, m;
+
+	// recover the opcode
+	opptr = (UINT16 *)param;
+	opcode = *opptr;
+
+	// extract the operands
+	n = Rn;
+	m = Rm;
+
+	if ((INT32) sh2->r[n] >= 0)
+		dest = 0;
+	else
+		dest = 1;
+	if ((INT32) sh2->r[m] >= 0)
+		src = 0;
+	else
+		src = 1;
+	src += dest;
+	sh2->r[n] += sh2->r[m];
+	if ((INT32) sh2->r[n] >= 0)
+		ans = 0;
+	else
+		ans = 1;
+	ans += dest;
+	if (src == 0 || src == 2)
+	{
+		if (ans == 1)
+			sh2->sr |= T;
+		else
+			sh2->sr &= ~T;
+	}
+	else
+		sh2->sr &= ~T;
+}
+
+/*-------------------------------------------------
+    cfunc_SUBV - implementation of SUBV Rm,Rn
+-------------------------------------------------*/
+static void cfunc_SUBV(void *param)
+{
+	INT32 dest, src, ans;
+	UINT16 *opptr, opcode;
+	int n, m;
+
+	// recover the opcode
+	opptr = (UINT16 *)param;
+	opcode = *opptr;
+
+	// extract the operands
+	n = Rn;
+	m = Rm;
+
+	if ((INT32) sh2->r[n] >= 0)
+		dest = 0;
+	else
+		dest = 1;
+	if ((INT32) sh2->r[m] >= 0)
+		src = 0;
+	else
+		src = 1;
+	src += dest;
+	sh2->r[n] -= sh2->r[m];
+	if ((INT32) sh2->r[n] >= 0)
+		ans = 0;
+	else
+		ans = 1;
+	ans += dest;
+	if (src == 1)
+	{
+		if (ans == 1)
+			sh2->sr |= T;
+		else
+			sh2->sr &= ~T;
+	}
+	else
+		sh2->sr &= ~T;
+}
+#endif
 
 /*-------------------------------------------------
     sh2_init - initialize the processor
@@ -1509,10 +1599,19 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case  9: 	// MOVWI
 			scratch = (desc->pc + 2) + ((opcode & 0xff) * 2) + 2;
-			UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
-			SETEA(0);						// set ea for debug
-			UML_CALLH(block, sh2->read16);				// read16(r0, r1)
-			UML_SEXT(block, R32(Rn), IREG(0), WORD);      		// sext Rn, r0, WORD
+
+			if (sh2->drcoptions & SH2DRC_STRICT_PCREL)
+			{
+				UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
+				SETEA(0);						// set ea for debug
+				UML_CALLH(block, sh2->read16);				// read16(r0, r1)
+				UML_SEXT(block, R32(Rn), IREG(0), WORD);      		// sext Rn, r0, WORD
+			}
+			else
+			{
+				scratch2 = (UINT32)(INT32)(INT16) RW(scratch);
+				UML_MOV(block, R32(Rn), IMM(scratch2));			// mov Rn, scratch2
+			}
 
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 2), TRUE);
@@ -1550,9 +1649,18 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 13: 	// MOVLI
 			scratch = ((desc->pc + 4) & ~3) + ((opcode & 0xff) * 4);
-			UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
-			UML_CALLH(block, sh2->read32);				// read32(r0, r1)
-			UML_MOV(block, R32(Rn), IREG(0));			// mov Rn, r0
+
+			if (sh2->drcoptions & SH2DRC_STRICT_PCREL)
+			{
+				UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
+				UML_CALLH(block, sh2->read32);				// read32(r0, r1)
+				UML_MOV(block, R32(Rn), IREG(0));			// mov Rn, r0
+			}
+			else
+			{
+				scratch2 = RL(scratch);
+				UML_MOV(block, R32(Rn), IMM(scratch2));			// mov Rn, scratch2
+			}
 
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 2), TRUE);
@@ -2105,45 +2213,44 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 10: // SUBC(Rm, Rn);
-
-		UML_MOV(block, IREG(0), MEM(&sh2->sr));		// mov r0, sr (save SR)
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
-		UML_CARRY(block, IREG(0), IMM(0));	// carry = T (T is bit 0 of SR)
-		UML_SUBB(block, R32(Rn), R32(Rn), R32(Rm));	// subb Rn, Rn, Rm
-
-		UML_JMPc(block, IF_NC, compiler->labelnum);	// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
-
+		UML_CARRY(block, MEM(&sh2->sr), IMM(0));	// carry = T (T is bit 0 of SR)
+		UML_SUBB(block, R32(Rn), R32(Rn), R32(Rm));	// addc Rn, Rn, Rm
+		UML_SETc(block, IF_C, IREG(0));				// setc    i0, C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
 
 	case 11: // SUBV(Rm, Rn);
+#if ADDSUBV_DIRECT
+		UML_SUB(block, R32(Rn), R32(Rn), R32(Rm));		// sub Rn, Rn, Rm
+		UML_SETc(block, IF_V, IREG(0));					// setc    i0, V
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
+#else
+		save_fast_iregs(block);
+		UML_CALLC(block, cfunc_SUBV, desc->opptr.w);
+		load_fast_iregs(block);
+#endif
+		return TRUE;
 		break;
 
 	case 14: // ADDC(Rm, Rn);
-		UML_MOV(block, IREG(0), MEM(&sh2->sr));		// mov r0, sr (save SR)
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
-		UML_CARRY(block, IREG(0), IMM(0));	// carry = T (T is bit 0 of SR)
+		UML_CARRY(block, MEM(&sh2->sr), IMM(0));	// carry = T (T is bit 0 of SR)
 		UML_ADDC(block, R32(Rn), R32(Rn), R32(Rm));	// addc Rn, Rn, Rm
-		UML_JMPc(block, IF_NC, compiler->labelnum);	// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
+		UML_SETc(block, IF_C, IREG(0));				// setc    i0, C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
 
 	case 15: // ADDV(Rm, Rn);
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
+#if ADDSUBV_DIRECT
 		UML_ADD(block, R32(Rn), R32(Rn), R32(Rm));		// add Rn, Rn, Rm
-		UML_JMPc(block, IF_NV, compiler->labelnum);		// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
+		UML_SETc(block, IF_V, IREG(0));					// setc    i0, V
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
+#else
+		save_fast_iregs(block);
+		UML_CALLC(block, cfunc_ADDV, desc->opptr.w);
+		load_fast_iregs(block);
+#endif
 		return TRUE;
 		break;
 	}
@@ -2155,47 +2262,30 @@ static int generate_group_4(drcuml_block *block, compiler_state *compiler, const
 	switch (opcode & 0x3F)
 	{
 	case 0x00: // SHLL(Rn);
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_SHR(block, IREG(1), R32(Rn), IMM(31));		// shr r1, Rn, 31
-		UML_AND(block, IREG(1), IREG(1), IMM(T));		// and r1, r1, T
-		UML_OR(block, MEM(&sh2->sr), IREG(1), IREG(0));		// or sr, r1, r0
 		UML_SHL(block, R32(Rn), R32(Rn), IMM(1));		// shl Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
 	case 0x01: // SHLR(Rn);
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_AND(block, IREG(1), R32(Rn), IMM(T));		// and r1, Rn, T
-		UML_OR(block, MEM(&sh2->sr), IREG(0), IREG(1));		// or sr, r0, r1
 		UML_SHR(block, R32(Rn), R32(Rn), IMM(1));		// shr Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
 	case 0x04: // ROTL(Rn);
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
-		UML_CARRY(block, R32(Rn), IMM(31));	// carry = high bit of source
-		UML_ROLC(block, R32(Rn), R32(Rn), IMM(1));	// rolc Rn, Rn, #1
-
-		UML_JMPc(block, IF_NC, compiler->labelnum);	// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
-
+		UML_ROL(block, R32(Rn), R32(Rn), IMM(1));		// rol Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
 	case 0x05: // ROTR(Rn);
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
-		UML_CARRY(block, R32(Rn), IMM(0));	// carry = low bit of source
-		UML_RORC(block, R32(Rn), R32(Rn), IMM(1));	// rorc Rn, Rn, #1
-
-		UML_JMPc(block, IF_NC, compiler->labelnum);	// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
-
+		UML_ROR(block, R32(Rn), R32(Rn), IMM(1));		// ror Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
@@ -2478,36 +2568,18 @@ static int generate_group_4(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 0x24: // ROTCL(Rn);
-		UML_SHR(block, IREG(0), R32(Rn), IMM(31));		// shr r0, Rn, 31
-		UML_AND(block, IREG(0), IREG(0), IMM(T));		// and r0, r0, T
-
-		UML_AND(block, IREG(1), MEM(&sh2->sr), IMM(T));		// and r1, sr, T
-
-		UML_SHL(block, R32(Rn), R32(Rn), IMM(1));		// shl Rn, Rn, 1
-		UML_OR(block, R32(Rn), R32(Rn), IREG(1));		// or Rn, Rn, r1
-
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IREG(0));	// or sr, sr, r0
+		UML_CARRY(block, MEM(&sh2->sr), IMM(0));			// carry sr,0
+		UML_ROLC(block, R32(Rn), R32(Rn), IMM(1));			// rolc  Rn,Rn,1
+		UML_SETc(block, IF_C, IREG(0));						// set   i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
 
 	case 0x25: // ROTCR(Rn);
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(T));		// and r0, sr, T
-		UML_SHL(block, IREG(0), IREG(0), IMM(31));		// shl r0, r0, #31 (r0 = temp)
-
-		UML_AND(block, IREG(1), R32(Rn), IMM(T));		// and r1, Rn, T  (r1 = Rn & T)
-
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T
-
-		UML_CMP(block, IREG(1), IMM(0));			// cmp r1, #0
-		UML_JMPc(block, IF_Z, compiler->labelnum);		// jz labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);			// labelnum:
-
-		UML_SHR(block, R32(Rn), R32(Rn), IMM(1));		// shr Rn, Rn, #1
-		UML_OR(block, R32(Rn), R32(Rn), IREG(0));		// or Rn, Rn, r0
+		UML_CARRY(block, MEM(&sh2->sr), IMM(0));			// carry sr,0
+		UML_RORC(block, R32(Rn), R32(Rn), IMM(1));			// rorc  Rn,Rn,1
+		UML_SETc(block, IF_C, IREG(0));						// set   i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
 

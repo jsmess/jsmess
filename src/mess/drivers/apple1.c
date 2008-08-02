@@ -123,7 +123,7 @@ const gfx_layout apple1_charlayout =
 };
 
 static GFXDECODE_START( apple1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple1_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, apple1_charlayout, 0, 1 )
 GFXDECODE_END
 
 /* keyboard input */
@@ -245,12 +245,12 @@ static MACHINE_DRIVER_START( apple1 )
 MACHINE_DRIVER_END
 
 ROM_START(apple1)
-	ROM_REGION(0x10000, REGION_CPU1,0)
+	ROM_REGION(0x10000, "main",0)
 	ROM_LOAD("apple1.rom", 0xff00, 0x0100, CRC(a30b6af5) SHA1(224767aa499dc98767e042f375ced1359be8a35f))
 	/* 256-byte cassette interface ROM: */
 	ROM_LOAD("cassette.rom", 0xc100, 0x0100, CRC(11da1692) SHA1(2c536977bd85797453dba0646e3e94e9ff4f9236))
 	/* 512-byte Signetics 2513 character generator ROM: */
-	ROM_REGION(0x0200, REGION_GFX1,0)
+	ROM_REGION(0x0200, "gfx1",0)
 	ROM_LOAD("apple1.vid", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
 ROM_END
 

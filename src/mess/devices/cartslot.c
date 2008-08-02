@@ -32,13 +32,15 @@ static int parse_rom_name(const rom_entry *roment, int *position, const char **e
 
 static int load_cartridge(running_machine *machine, const rom_entry *romrgn, const rom_entry *roment, const device_config *image)
 {
-	UINT32 region, flags;
+	const char *region;
+	const char *type;
+	UINT32 flags;
 	offs_t offset, length, read_length, pos = 0, len;
 	UINT8 *ptr;
 	UINT8 clear_val;
-	int type, datawidth, littleendian, i, j;
+	int datawidth, littleendian, cpunum, i, j;
 
-	region = ROMREGION_GETTYPE(romrgn);
+	region = ROMREGION_GETTAG(romrgn);
 	offset = ROM_GETOFFSET(roment);
 	length = ROM_GETLENGTH(roment);
 	flags = ROM_GETFLAGS(roment);
@@ -68,14 +70,15 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 		}
 
 		/* postprocess this region */
-		type = ROMREGION_GETTYPE(romrgn);
+		type = ROMREGION_GETTAG(romrgn);
 		littleendian = ROMREGION_ISLITTLEENDIAN(romrgn);
 		datawidth = ROMREGION_GETWIDTH(romrgn) / 8;
 
 		/* if the region is inverted, do that now */
-		if (type >= REGION_CPU1 && type < REGION_CPU1 + MAX_CPU)
+		cpunum = mame_find_cpu_index(machine, type);
+		if (cpunum >= 0)
 		{
-			int cputype = image->machine->config->cpu[type - REGION_CPU1].type;
+			int cputype = image->machine->config->cpu[cpunum].type;
 			if (cputype != 0)
 			{
 				datawidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;
@@ -167,7 +170,7 @@ void cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 
 	/* try to find ROM_CART_LOADs in the ROM declaration */
 	romrgn = rom_first_region(devclass->gamedrv);
-	while(romrgn)
+	while(romrgn != NULL)
 	{
 		roment = romrgn + 1;
 		while(!ROMENTRY_ISREGIONEND(roment))
@@ -179,7 +182,7 @@ void cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 				/* reject any unsupported flags */
 				if (flags & (ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK
 					| ROM_BITWIDTHMASK | ROM_BITSHIFTMASK
-					| ROM_INHERITFLAGSMASK | ROM_BIOSFLAGSMASK))
+					| ROM_INHERITFLAGSMASK))
 				{
 					fatalerror("Unsupported ROM cart flags 0x%08X", flags);
 				}

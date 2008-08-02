@@ -22,7 +22,7 @@ struct ym2413_info
 	void *			chip;
 };
 
-/*
+#ifdef UNUSED_FUNCTION
 void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
 {
     INT16 *buffer = _buffer[0];
@@ -34,7 +34,7 @@ void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buff
     }
     while (length--) *(buffer++) = out;
 }
-*/
+#endif
 
 static void ym2413_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
@@ -48,7 +48,7 @@ static void _stream_update(void *param, int interval)
 	stream_update(info->stream);
 }
 
-static void *ym2413_start(int sndindex, int clock, const void *config)
+static void *ym2413_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int rate = clock/72;
 	struct ym2413_info *info;

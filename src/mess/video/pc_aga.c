@@ -707,8 +707,8 @@ VIDEO_START( pc_aga )
 	memset( &aga, 0, sizeof( aga ) );
 
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = memory_region(machine, REGION_GFX1) + 0x1000;
-	aga.cga_chr_gen = memory_region(machine, REGION_GFX1);
+	aga.mda_chr_gen = memory_region(machine, "gfx1") + 0x1000;
+	aga.cga_chr_gen = memory_region(machine, "gfx1");
 }
 
 

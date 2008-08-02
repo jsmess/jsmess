@@ -177,13 +177,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( astrocde )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc))
     ROM_CART_LOAD(0, "bin", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START( astrocdw )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf))
     ROM_CART_LOAD(0, "bin", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END

@@ -63,7 +63,7 @@ static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xc80000, 0xcfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)	/* see Note 1 above */
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* System ROM - mirror */
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* System ROM - mirror */
 ADDRESS_MAP_END
 
 /*
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* CDTV & System ROM */
+	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* CDTV & System ROM */
 ADDRESS_MAP_END
 
 
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START(a1000_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) /* See Note 1 above */
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xf80000, 0xfbffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* Bootstrap ROM */
+	AM_RANGE(0xf80000, 0xfbffff) AM_ROM AM_REGION("user1", 0)	/* Bootstrap ROM */
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK(2)	/* Writable Control Store RAM */
 ADDRESS_MAP_END
 
@@ -392,7 +392,7 @@ static DRIVER_INIT( amiga )
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine);
@@ -425,7 +425,7 @@ static DRIVER_INIT( amiga_ecs )
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize Action Replay (if present) */
 	amiga_cart_init(machine);
@@ -458,7 +458,7 @@ static DRIVER_INIT( cdtv )
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize the cdrom controller */
 	amigacd_init();
@@ -469,12 +469,12 @@ static DRIVER_INIT( cdtv )
 ***************************************************************************/
 
 #define AMIGA_BIOS			\
-	ROM_REGION16_BE(0x080000, REGION_USER1, 0)	\
+	ROM_REGION16_BE(0x080000, "user1", 0)	\
 	ROM_SYSTEM_BIOS(0, "kick13",  "Kickstart 1.3 (34.5)")	\
 	ROMX_LOAD("315093-02.u6", 0x000000, 0x040000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD | ROM_BIOS(1))	\
 	ROM_SYSTEM_BIOS(1, "kick12",  "Kickstart 1.2 (33.180)")	\
 	ROMX_LOAD("315093-01.u6", 0x000000, 0x040000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88), ROM_GROUPWORD | ROM_BIOS(2))	\
-	ROM_COPY(REGION_USER1, 0x000000, 0x040000, 0x040000)	\
+	ROM_COPY("user1", 0x000000, 0x040000, 0x040000)	\
 	ROM_SYSTEM_BIOS(2, "kick204", "Kickstart 2.04 (37.175)")	\
 	ROMX_LOAD("390979-01.u6", 0x000000, 0x080000, CRC(c3bdb240) SHA1(c5839f5cb98a7a8947065c3ed2f14f5f42e334a1), ROM_GROUPWORD | ROM_BIOS(3))	/* identical to 363968.01 */	\
 	ROM_SYSTEM_BIOS(3, "kick31",  "Kickstart 3.1 (40.63)")	\
@@ -482,7 +482,7 @@ static DRIVER_INIT( cdtv )
 
 
 #define AMIGA_CART			\
-	ROM_REGION16_BE(0x080000, REGION_USER2, 0)	\
+	ROM_REGION16_BE(0x080000, "user2", 0)	\
 	ROM_CART_LOAD(0, "rom,bin", 0x0000, 0x080000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)	\
 
 
@@ -495,7 +495,7 @@ ROM_END
 #define rom_a500p    rom_a500n
 
 ROM_START(a1000n)
-	ROM_REGION16_BE(0x080000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x080000, "user1", 0)
 	ROM_LOAD16_BYTE("252179-01.u5n", 0x000000, 0x001000, CRC(42553bc4) SHA1(8855a97f7a44e3f62d1c88d938fee1f4c606af5b))
 	ROM_LOAD16_BYTE("252180-01.u5p", 0x000001, 0x001000, CRC(8e5b9a37) SHA1(d10f1564b99f5ffe108fa042362e877f569de2c3))
 ROM_END
@@ -503,12 +503,12 @@ ROM_END
 #define rom_a1000p    rom_a1000n
 
 ROM_START(cdtv)
-	ROM_REGION16_BE(0x100000, REGION_USER1, 0)
+	ROM_REGION16_BE(0x100000, "user1", 0)
 	ROM_LOAD16_BYTE("391008-01.u34", 0x000000, 0x020000, CRC(791cb14b) SHA1(277a1778924496353ffe56be68063d2a334360e4))
 	ROM_LOAD16_BYTE("391009-01.u35", 0x000001, 0x020000, CRC(accbbc2e) SHA1(41b06d1679c6e6933c3378b7626025f7641ebc5c))
-	ROM_COPY(REGION_USER1, 0x000000, 0x040000, 0x040000)
+	ROM_COPY("user1", 0x000000, 0x040000, 0x040000)
 	ROMX_LOAD(      "315093-02.u13", 0x080000, 0x040000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD)
-	ROM_COPY(REGION_USER1, 0x080000, 0x0c0000, 0x040000)
+	ROM_COPY("user1", 0x080000, 0x0c0000, 0x040000)
 ROM_END
 
 

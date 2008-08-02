@@ -147,7 +147,7 @@ static struct
 
 static VIDEO_START( pc_t1t )
 {
-	pcjr.chr_gen = memory_region(machine, REGION_GFX1);
+	pcjr.chr_gen = memory_region(machine, "gfx1");
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.chr_size = 16;
@@ -158,7 +158,7 @@ static VIDEO_START( pc_t1t )
 
 static VIDEO_START( pc_pcjr )
 {
-	pcjr.chr_gen = memory_region(machine, REGION_GFX1);
+	pcjr.chr_gen = memory_region(machine, "gfx1");
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.mode_control = 0x08;
@@ -669,7 +669,7 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 {
 	if (pcjr.bank != data)
 	{
-		UINT8 *ram = memory_region(machine, REGION_CPU1);
+		UINT8 *ram = memory_region(machine, "|");
 		int dram, vram;
 		pcjr.bank = data;
 	/* it seems the video ram is mapped to the last 128K of main memory */
@@ -717,8 +717,8 @@ static void pc_pcjr_bank_w(running_machine *machine, int data)
 		dram = (data & 0x07) << 14;
 		vram = (data & 0x38) << (14-3);
 #endif
-		videoram = &memory_region(machine, REGION_CPU1)[vram];
-		pcjr.displayram = &memory_region(machine, REGION_CPU1)[dram];
+		videoram = &memory_region(machine, "|")[vram];
+		pcjr.displayram = &memory_region(machine, "|")[dram];
 	}
 	pc_pcjr_mode_switch();
 }

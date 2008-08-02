@@ -60,7 +60,7 @@ VIDEO_UPDATE( dai )
 {
 	int i, j, k, l;
 
-	UINT8* char_rom = memory_region(screen->machine, REGION_GFX1);
+	UINT8* char_rom = memory_region(screen->machine, "gfx1");
 
 	UINT16 dai_video_memory_start = 0xbfff;
 	UINT16 dai_scan_lines = 604;	/* scan lines of PAL tv */

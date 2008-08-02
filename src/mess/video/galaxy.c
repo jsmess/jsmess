@@ -22,7 +22,7 @@ TIMER_CALLBACK( gal_video )
 {	
 	int y,x;
 	if (galaxy_interrupts_enabled==TRUE) {
-		UINT8 *gfx = memory_region(machine, REGION_GFX1);
+		UINT8 *gfx = memory_region(machine, "gfx1");
 		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
 		if ((gal_cnt >= 48 * 2) && (gal_cnt < 48 * 210)) { // display on screen just first 208 lines
 			UINT8 mode = (gal_latch_value >> 1) & 1; // bit 2 latch represents mode

@@ -285,9 +285,9 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		"UNKNOWN"
 	};
 
-	new_memory_region(machine, REGION_CPU1, 0x1000000,0);
+	memory_region_alloc(machine, "|main|", 0x1000000,0);
 
-	snes_ram = memory_region( machine, REGION_CPU1 );
+	snes_ram = memory_region( machine, "|main|" );
 	memset( snes_ram, 0, 0x1000000 );
 
 	/* Check for a header (512 bytes) */
@@ -509,16 +509,16 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 ROM_START(snes)
-	ROM_REGION(0x100,           REGION_USER5, 0)		/* IPL ROM */
+	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0))	/* boot rom */
-	ROM_REGION(0x800,           REGION_USER6, 0)		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION(0x800,           "user6", 0)		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))
 ROM_END
 
 ROM_START(snespal)
-	ROM_REGION(0x100,           REGION_USER5, 0)		/* IPL ROM */
+	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0))	/* boot rom */
-	ROM_REGION(0x800,           REGION_USER6, 0)		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION(0x800,           "user6", 0)		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))
 ROM_END
 

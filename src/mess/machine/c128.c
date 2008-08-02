@@ -795,8 +795,8 @@ static int c128_dma_read_color (int offset)
 
 static void c128_common_driver_init(running_machine *machine)
 {
-	UINT8 *gfx=memory_region(machine, REGION_GFX1);
-	UINT8 *ram = memory_region(machine, REGION_CPU1);
+	UINT8 *gfx=memory_region(machine, "gfx1");
+	UINT8 *ram = memory_region(machine, "|");
 	int i;
 
 	/* configure the M6510 port */

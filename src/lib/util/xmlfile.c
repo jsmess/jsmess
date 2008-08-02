@@ -620,6 +620,9 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 	if (newnode == NULL)
 		return;
 
+	/* remember the line number */
+	newnode->line = XML_GetCurrentLineNumber(parse_info->parser);
+
 	/* add all the attributes as well */
 	for (attr = 0; attributes[attr]; attr += 2)
 		add_attribute(newnode, attributes[attr+0], attributes[attr+1]);
