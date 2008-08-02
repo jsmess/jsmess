@@ -121,9 +121,9 @@ void apple2_update_memory(running_machine *machine)
 	}
 
 	/* get critical info */
-	rom = memory_region(machine, "|");
-	rom_length = memory_region_length(machine, "|") & ~0xFFF;
-	slot_length = memory_region_length(machine, "|") - rom_length;
+	rom = memory_region(machine, "main");
+	rom_length = memory_region_length(machine, "main") & ~0xFFF;
+	slot_length = memory_region_length(machine, "main") - rom_length;
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	/* loop through the entire memory map */
@@ -1285,7 +1285,7 @@ void apple2_init_common(running_machine *machine)
 	a2_set = 0;
 
 	/* disable VAR_ROMSWITCH if the ROM is only 16k */
-	if (memory_region_length(machine, "|") < 0x8000)
+	if (memory_region_length(machine, "main") < 0x8000)
 		a2_mask &= ~VAR_ROMSWITCH;
 
 	if (mess_ram_size <= 64*1024)
