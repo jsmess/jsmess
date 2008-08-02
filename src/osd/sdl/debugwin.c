@@ -119,7 +119,8 @@ static void memory_determine_combo_items(running_machine *machine)
 {
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
-	int rgnnum, itemnum;
+	int itemnum;
+	const char *rgnname;
 
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -141,36 +142,42 @@ static void memory_determine_combo_items(running_machine *machine)
 	}
 
 	// then add all the memory regions
-	for (rgnnum = 0; rgnnum < MAX_MEMORY_REGIONS; rgnnum++)
+	rgnname = memory_region_next(machine, NULL);
+	while (rgnname != NULL)
 	{
-		UINT8 *base = memory_region(machine, rgnnum);
-		UINT32 type = memory_region_type(machine, rgnnum);
-		if (base != NULL && type > REGION_INVALID && (type - REGION_INVALID) < ARRAY_LENGTH(memory_region_names))
+		UINT8 *base = memory_region(machine, rgnname);
+		memorycombo_item *ci = malloc_or_die(sizeof(*ci));
+		UINT32 flags = memory_region_flags(machine, rgnname);
+		UINT8 width = 0, little_endian;
+
+		memset(ci, 0, sizeof(*ci));
+		ci->base = base;
+		ci->length = memory_region_length(machine, rgnname);
+		little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+		switch (flags & ROMREGION_WIDTHMASK)
 		{
-			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			UINT32 flags = memory_region_flags(machine, rgnnum);
-			UINT8 width, little_endian;
-			memset(ci, 0, sizeof(*ci));
-			ci->base = base;
-			ci->length = memory_region_length(machine, rgnnum);
-			width = 1 << (flags & ROMREGION_WIDTHMASK);
-			little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-			if (type >= REGION_CPU1 && type <= REGION_CPU8)
-			{
-				const debug_cpu_info *cpuinfo = debug_get_cpu_info(type - REGION_CPU1);
-				if (cpuinfo)
-				{
-					width = cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes;
-					little_endian = (cpuinfo->endianness == CPU_IS_LE);
-				}
-			}
-			ci->prefsize = MIN(width, 4);
-			ci->offset_xor = width - 1;
-			ci->little_endian = little_endian;
-			strcpy(ci->name, memory_region_names[type - REGION_INVALID]);
-			*tail = ci;
-			tail = &ci->next;
+			case ROMREGION_8BIT:
+				width = 8;
+				break;
+			case ROMREGION_16BIT:
+				width = 16;
+				break;
+			case ROMREGION_32BIT:
+				width = 32;
+				break;
+			case ROMREGION_64BIT:
+				width = 64;
+				break;
 		}
+		ci->prefsize = MIN(width, 4);
+		ci->offset_xor = width - 1;
+		ci->little_endian = little_endian;
+		strcpy(ci->name, rgnname);
+		*tail = ci;
+		tail = &ci->next;
+
+		// and get the next region
+		rgnname = memory_region_next(machine, rgnname);
 	}
 
 	// finally add all global array symbols
