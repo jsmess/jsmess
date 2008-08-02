@@ -1155,7 +1155,7 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	/* ROM load */
 	rom_size = HP48_S_SERIES ? (256 * 1024) : (512 * 1024);
 	rom = auto_malloc( 2 * rom_size );
-	hp48_decode_nibble( rom, memory_region( machine, "|" ), rom_size );
+	hp48_decode_nibble( rom, memory_region( machine, "main" ), rom_size );
 
 	/* init state */
 	memset( generic_nvram, 0, generic_nvram_size );
