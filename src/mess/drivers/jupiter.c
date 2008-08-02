@@ -84,7 +84,7 @@ static PALETTE_INIT( jupiter )
 }
 
 static GFXDECODE_START( jupiter )
-	GFXDECODE_ENTRY( "|main|", 0x2c00, jupiter_charlayout, 0, 2 )
+	GFXDECODE_ENTRY( "main", 0x2c00, jupiter_charlayout, 0, 2 )
 GFXDECODE_END
 
 

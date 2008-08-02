@@ -878,7 +878,7 @@ static GFXDECODE_START( super80m )
 GFXDECODE_END
 
 static GFXDECODE_START( super80v )
-	GFXDECODE_ENTRY( "|main|", 0xf000, super80v_charlayout, 0, 256 )
+	GFXDECODE_ENTRY( "main", 0xf000, super80v_charlayout, 0, 256 )
 GFXDECODE_END
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
@@ -1013,7 +1013,7 @@ MACHINE_DRIVER_END
 
 static void driver_init_common( running_machine *machine )
 {
-	UINT8 *RAM = memory_region(machine, "|main|");
+	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xc000);
 	timer_pulse(ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
 }
@@ -1034,9 +1034,9 @@ static DRIVER_INIT( super80d )
 
 static DRIVER_INIT( super80v )
 {
-	pcgram = memory_region(machine, "|main|")+0xf000;
-	videoram = memory_region(machine, "|main|")+0x18000;
-	colorram = memory_region(machine, "|main|")+0x1C000;
+	pcgram = memory_region(machine, "main")+0xf000;
+	videoram = memory_region(machine, "main")+0x18000;
+	colorram = memory_region(machine, "main")+0x1C000;
 	driver_init_common(machine);
 }
 
@@ -1117,7 +1117,7 @@ ROM_END
 
 static DEVICE_IMAGE_LOAD( super80_cart )
 {
-	image_fread(image, memory_region(image->machine, "|main|") + 0xc000, 0x3000);
+	image_fread(image, memory_region(image->machine, "main") + 0xc000, 0x3000);
 
 	return INIT_PASS;
 }

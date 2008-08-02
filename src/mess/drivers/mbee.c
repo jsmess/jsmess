@@ -234,11 +234,11 @@ static const gfx_layout mbee_charlayout =
 };
 
 static GFXDECODE_START( mbee )
-	GFXDECODE_ENTRY( "|main|", 0x11000, mbee_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "main", 0x11000, mbee_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( mbeeic )
-	GFXDECODE_ENTRY( "|main|", 0x11000, mbee_charlayout, 0, 4096 )
+	GFXDECODE_ENTRY( "main", 0x11000, mbee_charlayout, 0, 4096 )
 GFXDECODE_END
 
 static PALETTE_INIT( mbee )
@@ -369,7 +369,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( mbee )
 {
-	UINT8 *RAM = memory_region(machine, "|main|");
+	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0x8000);
 	memory_configure_bank(2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(3, 0, 2, &RAM[0x11800], 0x4000);
@@ -379,7 +379,7 @@ static DRIVER_INIT( mbee )
 
 static DRIVER_INIT( mbee56 )
 {
-	UINT8 *RAM = memory_region(machine, "|main|");
+	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xe000);
 	memory_configure_bank(2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(3, 0, 2, &RAM[0x11800], 0x4000);

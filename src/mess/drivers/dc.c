@@ -80,7 +80,7 @@ static WRITE64_HANDLER( dc_arm_w )
 
 static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
-	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("|main|", 0x200000)	// flash
+	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("main", 0x200000)	// flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE( dc_gdrom_r, dc_gdrom_w )
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)	// another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("|main|", 0)
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("main", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_port, ADDRESS_SPACE_IO, 64 )

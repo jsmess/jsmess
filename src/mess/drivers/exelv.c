@@ -522,7 +522,7 @@ static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("|main|",0x0000)		/* tms7020 internal ROM */
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("main",0x0000)		/* tms7020 internal ROM */
 
 ADDRESS_MAP_END
 
@@ -535,7 +535,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(exelv_tms7040_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("|tms7040|",0x0000)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7040",0x0000)
 ADDRESS_MAP_END
 
 
@@ -597,7 +597,7 @@ ROM_END
 
 ROM_START(exeltel)
 	/*CPU memory space*/
-	ROM_REGION(0x1000, "|main|", 0)
+	ROM_REGION(0x1000, "main", 0)
 	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, BAD_DUMP CRC(c12f24b5))		/* TMS7020 internal ROM */
 
 	ROM_REGION(0x1000, "|tms7040|", 0)

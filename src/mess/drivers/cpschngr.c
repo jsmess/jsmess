@@ -123,11 +123,11 @@ ROM_START( sfzch )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x8000 )	/* stars */
 
-	ROM_REGION( 0x28000, "sound",0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x28000, "audio",0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "sfz09",         0x00000, 0x08000, CRC(c772628b) SHA1(ebc5b7c173caf1e151f733f23c1b20abec24e16d))
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
-	ROM_REGION( 0x40000, "soundfixme(1)|okim|",0 )	/* Samples */
+	ROM_REGION( 0x40000, "qsound",0 )	/* Samples */
 	ROM_LOAD( "sfz18",         0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5))
 	ROM_LOAD( "sfz19",         0x20000, 0x20000, CRC(3b5886d5) SHA1(7e1b7d40ef77b5df628dd663d45a9a13c742cf58))
 ROM_END

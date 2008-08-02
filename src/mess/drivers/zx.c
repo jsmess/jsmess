@@ -321,11 +321,11 @@ static const gfx_layout zx_char_layout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( zx80 )
-	GFXDECODE_ENTRY( "|main|", 0x0e00, zx_char_layout, 0, 2 )
+	GFXDECODE_ENTRY( "main", 0x0e00, zx_char_layout, 0, 2 )
 GFXDECODE_END
 
 static GFXDECODE_START( zx81 )
-	GFXDECODE_ENTRY( "|main|", 0x1e00, zx_char_layout, 0, 2 )
+	GFXDECODE_ENTRY( "main", 0x1e00, zx_char_layout, 0, 2 )
 GFXDECODE_END
 
 static GFXDECODE_START( pc8300 )
