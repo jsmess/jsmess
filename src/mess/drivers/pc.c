@@ -26,6 +26,7 @@ IBM PC 5150
 - Total RAM (using 5161 expansion chassis or ISA memory board): 512KB (rev 1 or rev 2 bios) or 640KB (rev 3 bios)
 - Graphics: MDA, CGA, or MDA and CGA
 - Cassette port
+- Five ISA expansion slots (short type)
 - Optional 8087 co-processor
 - Optional up to 4 (2 internal, 2 external) 160KB single-sided or 360KB double-sided 5 1/4" floppy drives
 - Optional 10MB hard disk (using 5161 expansion chassis)
@@ -41,9 +42,10 @@ IBM PC-JR
 IBM PC-XT 5160
 ==============
 
-- Intel 8086 at 4.77 MHz derived from a 14.31818 MHz crystal
+- Intel 8088 at 4.77 MHz derived from a 14.31818 MHz crystal
 - RAM: min. 128KB, max. 640KB
 - Graphics: MDA, CGA, or MDA and CGA
+- Eight ISA expansion slots (short type)
 - Optional 8087 co-processor
 - One 360KB double-sided 5 1/4" floppy drive
 - 10MB or 20MB Seagate ST-412 hard disk
@@ -1619,7 +1621,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibm5160 )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc16, pc16, I8086, XTAL_14_31818MHz/3, pc_frame_interrupt)
+	MDRV_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3, pc_frame_interrupt)
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
