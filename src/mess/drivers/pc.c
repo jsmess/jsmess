@@ -21,12 +21,17 @@ IBM PC 5150
 ===========
 
 - Intel 8088 at 4.77 MHz derived from a 14.31818 MHz crystal
-- RAM: min. 16KB, max. 256KB
+- Onboard RAM: Revision A mainboard - min. 16KB, max. 64KB
+               Revision B mainboard - min. 64KB, max. 256KB
+- Total RAM (using 5161 expansion chassis or ISA memory board): 512KB (rev 1 or rev 2 bios) or 640KB (rev 3 bios)
 - Graphics: MDA, CGA, or MDA and CGA
 - Cassette port
 - Optional 8087 co-processor
-- Optional up to 2 160KB single-sided or 360KB double-sided 5 1/4" floppy drives
-- Optional 10MB hard disk
+- Optional up to 4 (2 internal, 2 external) 160KB single-sided or 360KB double-sided 5 1/4" floppy drives
+- Optional 10MB hard disk (using 5161 expansion chassis)
+- Optional Game port joystick ISA card (two analog joysticks with 2 buttons each)
+- Optional Parallel port ISA card
+- Optional Serial port ISA card
 
 
 IBM PC-JR
