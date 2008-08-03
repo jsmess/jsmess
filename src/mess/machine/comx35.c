@@ -50,7 +50,7 @@ static const device_config *printer_device(running_machine *machine)
 
 static int expansion_box_installed(running_machine *machine)
 {
-	return (memory_region(machine, "|")[0xe800] != 0xff);
+	return (memory_region(machine, "main")[0xe800] != 0xff);
 }
 
 static int dos_card_active(running_machine *machine)
@@ -529,7 +529,7 @@ MACHINE_START( comx35p )
 
 	// card slot banking
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, "|"), 0xc000);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "main"), 0xc000);
 	memory_configure_bank(1, BANK_FLOPPY, 7, memory_region(machine, "user1"), 0x2000);
 	memory_configure_bank(1, BANK_RAMCARD, 4, mess_ram, 0x2000);
 

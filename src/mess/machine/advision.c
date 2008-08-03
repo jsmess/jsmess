@@ -27,13 +27,13 @@ static int Gvalue;
 
 DRIVER_INIT( advision )
 {
-	memory_configure_bank(1, 0, 2, memory_region(machine, "|"), 0x1000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, "main"), 0x1000);
 }
 
 
 MACHINE_RESET( advision )
 {
-	advision_ram = memory_region(machine, "|") + 0x2000;
+	advision_ram = memory_region(machine, "main") + 0x2000;
 	advision_rambank = 0x300;
 	memory_set_bank(1, 1);
 	advision_framestart = 0;

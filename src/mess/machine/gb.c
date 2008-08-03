@@ -287,7 +287,7 @@ MACHINE_RESET( gb )
 	gb_video_init( machine, GB_VIDEO_DMG );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(5, memory_region(machine, "|") );
+	memory_set_bankptr(5, memory_region(machine, "main") );
 	memory_set_bankptr(10, ROMMap[ROMBank00] + 0x0100 );
 
 	gb_timer.divcount = 0x0004;

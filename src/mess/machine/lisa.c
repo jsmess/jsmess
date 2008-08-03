@@ -53,7 +53,7 @@
 static UINT8 *lisa_ram_ptr;
 static UINT8 *lisa_rom_ptr;
 
-/* offsets in "|" */
+/* offsets in "main" */
 #define RAM_OFFSET 0x004000
 #define ROM_OFFSET 0x000000
 
@@ -1120,8 +1120,8 @@ MACHINE_RESET( lisa )
 {
 	mouse_timer = timer_alloc(handle_mouse, NULL);
 
-	lisa_ram_ptr = memory_region(machine, "|") + RAM_OFFSET;
-	lisa_rom_ptr = memory_region(machine, "|") + ROM_OFFSET;
+	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
 
 	videoROM_ptr = memory_region(machine, "gfx1");
 

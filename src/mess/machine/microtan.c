@@ -709,7 +709,7 @@ static void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
 
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
-    UINT8 *RAM = memory_region(machine, "|");
+    UINT8 *RAM = memory_region(machine, "main");
 
     /* check for .DMP file format */
     if (snapshot_size == 8263)

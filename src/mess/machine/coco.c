@@ -514,7 +514,7 @@ static int generic_pak_load(const device_config *image, int rambase_index, int r
 	pak_decodedtrailer trailer;
 	int trailer_load = 0;
 
-	ROM = memory_region(image->machine, "|");
+	ROM = memory_region(image->machine, "main");
 	rambase = &mess_ram[rambase_index];
 	rombase = &ROM[rombase_index];
 	pakbase = &ROM[pakbase_index];
@@ -705,25 +705,25 @@ static int generic_rom_load(const device_config *image, UINT8 *dest, UINT16 dest
 
 DEVICE_IMAGE_LOAD(coco_rom)
 {
-	UINT8 *ROM = memory_region(image->machine, "|");
+	UINT8 *ROM = memory_region(image->machine, "main");
 	return generic_rom_load(image, &ROM[0x4000], 0x4000);
 }
 
 DEVICE_IMAGE_UNLOAD(coco_rom)
 {
-	UINT8 *ROM = memory_region(image->machine, "|");
+	UINT8 *ROM = memory_region(image->machine, "main");
 	memset(&ROM[0x4000], 0, 0x4000);
 }
 
 DEVICE_IMAGE_LOAD(coco3_rom)
 {
-	UINT8 *ROM = memory_region(image->machine, "|");
+	UINT8 *ROM = memory_region(image->machine, "main");
 	return generic_rom_load(image, &ROM[0x8000], 0x8000);
 }
 
 DEVICE_IMAGE_UNLOAD(coco3_rom)
 {
-	UINT8 *ROM = memory_region(image->machine, "|");
+	UINT8 *ROM = memory_region(image->machine, "main");
 	memset(&ROM[0x8000], 0, 0x8000);
 }
 

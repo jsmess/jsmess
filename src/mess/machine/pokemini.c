@@ -1424,7 +1424,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 	image_fseek( image, 0x2100, SEEK_SET );
 	size -= 0x2100;
 
-	if ( size != image_fread( image, memory_region(image->machine, "|") + 0x2100, size ) )
+	if ( size != image_fread( image, memory_region(image->machine, "main") + 0x2100, size ) )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Error occured while reading ROM image" );
 		return INIT_FAIL;

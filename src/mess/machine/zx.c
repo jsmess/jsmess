@@ -24,7 +24,7 @@ static UINT8 zx_tape_bit = 0x80;
 
 static WRITE8_HANDLER( zx_ram_w )
 {
-	UINT8 *rom = memory_region(machine, "|");
+	UINT8 *rom = memory_region(machine, "main");
 
 	rom[offset | 0x4000] = data;
 
@@ -41,7 +41,7 @@ DRIVER_INIT ( zx )
 {
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, zx_ram_w);
-	memory_set_bankptr(1, memory_region(machine, "|") + 0x4000);
+	memory_set_bankptr(1, memory_region(machine, "main") + 0x4000);
 }
 
 #if 0
@@ -56,7 +56,7 @@ static OPBASE_HANDLER ( zx_setopbase )
 		else
 			program_write_byte( address, 0 );
 
-		zx_ula_r(machine, address, "|");
+		zx_ula_r(machine, address, "main");
 	}
 	return address;
 }
@@ -65,7 +65,7 @@ static OPBASE_HANDLER ( zx_setopbase )
 static OPBASE_HANDLER ( zx_setopbase )
 {
 	if (address & 0x8000)
-		zx_ula_r(machine, address, "|");
+		zx_ula_r(machine, address, "main");
 	return address;
 }
 

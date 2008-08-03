@@ -979,7 +979,7 @@ DRIVER_INIT( pcmda )
 DRIVER_INIT( europc )
 {
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
-	UINT8 *rom = &memory_region(machine, "|")[0];
+	UINT8 *rom = &memory_region(machine, "main")[0];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1021,7 +1021,7 @@ DRIVER_INIT( pc200 )
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
 	videoram_size=0x10000;
-	videoram=memory_region(machine, "|")+0xb0000;
+	videoram=memory_region(machine, "main")+0xb0000;
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc200_16le_port378_r );
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
@@ -1195,7 +1195,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 	}
 
 	/* Read the cartridge contents */
-	if ( ( size - 0x200 ) != image_fread( image, memory_region(image->machine, "|") + address, size - 0x200 ) )
+	if ( ( size - 0x200 ) != image_fread( image, memory_region(image->machine, "main") + address, size - 0x200 ) )
 	{
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 		return 1;

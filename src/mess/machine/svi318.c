@@ -722,7 +722,7 @@ static void svi318_set_banks(running_machine *machine)
 
 	switch( svi.bankLow ) {
 	case SVI_INTERNAL:
-		svi.bankLow_ptr = memory_region(machine, "|");
+		svi.bankLow_ptr = memory_region(machine, "main");
 		break;
 	case SVI_CART:
 		if ( pcart ) {

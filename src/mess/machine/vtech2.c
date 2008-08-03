@@ -106,7 +106,7 @@ DRIVER_INIT(laser)
         gfx[i] = i;
 
 	laser_latch = -1;
-    mem = memory_region(machine, "|");
+    mem = memory_region(machine, "main");
 
 	for (i = 0; i < sizeof(laser_bank) / sizeof(laser_bank[0]); i++)
 		laser_bank[i] = -1;

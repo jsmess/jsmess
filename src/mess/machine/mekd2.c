@@ -564,7 +564,7 @@ DEVICE_IMAGE_LOAD( mekd2_cart )
 	const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
-	UINT8 ident, *RAM = memory_region(image->machine, "|");
+	UINT8 ident, *RAM = memory_region(image->machine, "main");
 
 	image_fread(image, buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))

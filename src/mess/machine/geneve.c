@@ -224,9 +224,9 @@ MACHINE_RESET( geneve )
 	memset(page_lookup, 0, sizeof(page_lookup));
 
 	/* set up RAM pointers */
-	ROM_ptr = memory_region(machine, "|") + offset_rom_geneve;
-	SRAM_ptr = memory_region(machine, "|") + offset_sram_geneve;
-	DRAM_ptr = memory_region(machine, "|") + offset_dram_geneve;
+	ROM_ptr = memory_region(machine, "main") + offset_rom_geneve;
+	SRAM_ptr = memory_region(machine, "main") + offset_sram_geneve;
+	DRAM_ptr = memory_region(machine, "main") + offset_dram_geneve;
 
 	/* Initialize GROMs */
 	memset(& GPL_port, 0, sizeof(GPL_port));

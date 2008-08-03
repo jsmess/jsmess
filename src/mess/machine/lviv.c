@@ -171,7 +171,7 @@ WRITE8_HANDLER ( lviv_io_w )
 		memory_set_bankptr(1, mess_ram);
 		memory_set_bankptr(2, mess_ram + 0x4000);
 		memory_set_bankptr(3, mess_ram + 0x8000);
-		memory_set_bankptr(4, memory_region(machine, "|") + 0x010000);
+		memory_set_bankptr(4, memory_region(machine, "main") + 0x010000);
 	}
 	else
 	{
@@ -227,10 +227,10 @@ MACHINE_RESET( lviv )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
 
-	memory_set_bankptr(1, memory_region(machine, "|") + 0x010000);
-	memory_set_bankptr(2, memory_region(machine, "|") + 0x010000);
-	memory_set_bankptr(3, memory_region(machine, "|") + 0x010000);
-	memory_set_bankptr(4, memory_region(machine, "|") + 0x010000);
+	memory_set_bankptr(1, memory_region(machine, "main") + 0x010000);
+	memory_set_bankptr(2, memory_region(machine, "main") + 0x010000);
+	memory_set_bankptr(3, memory_region(machine, "main") + 0x010000);
+	memory_set_bankptr(4, memory_region(machine, "main") + 0x010000);
 
 	/*timer_pulse(TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
 

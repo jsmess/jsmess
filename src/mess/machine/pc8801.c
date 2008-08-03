@@ -565,7 +565,7 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 	no4throm2=0;
 	port71_save=0xff;
 	port32_save=0x80;
-	mainROM = memory_region(machine, "|");
+	mainROM = memory_region(machine, "main");
 	pc8801_mainRAM = (UINT8 *) auto_malloc (0x10000);
 	memset(pc8801_mainRAM, 0, 0x10000);
 

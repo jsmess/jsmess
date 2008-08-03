@@ -155,7 +155,7 @@ static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 }
 static void partner_bank_switch(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "|");
+	UINT8 *rom = memory_region(machine, "main");
 	
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, SMH_BANK2);

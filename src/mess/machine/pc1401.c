@@ -119,7 +119,7 @@ int pc1401_reset(void)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1401 )
 {
-	UINT8 *ram=memory_region(machine, "|")+0x2000,
+	UINT8 *ram=memory_region(machine, "main")+0x2000,
 		*cpu=sc61860_internal_ram();
 
 	if (read_or_write)

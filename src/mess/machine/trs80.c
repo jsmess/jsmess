@@ -461,7 +461,7 @@ static void tape_get_byte(running_machine *machine)
 static void tape_get_open(running_machine *machine)
 {
 	/* TODO: remove this */
-	unsigned char *RAM = memory_region(machine, "|");
+	unsigned char *RAM = memory_region(machine, "main");
 
 	if (!tape_get_file)
 	{

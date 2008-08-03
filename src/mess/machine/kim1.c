@@ -602,7 +602,7 @@ static void set_chip_clock(int chip, int data)
 
 MACHINE_RESET( kim1 )
 {
-	UINT8 *RAM = memory_region(machine, "|");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	/* setup RAM IRQ vector */
 	if (RAM[0x17fa] == 0x00 && RAM[0x17fb] == 0x00)
@@ -638,7 +638,7 @@ static DEVICE_IMAGE_LOAD( kim1_cassette )
 	const char magic[] = "KIM1";
 	char buff[4];
 	UINT16 addr, size;
-	UINT8 ident, *RAM = memory_region(image->machine, "|");
+	UINT8 ident, *RAM = memory_region(image->machine, "main");
 
 	image_fread(image, buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))

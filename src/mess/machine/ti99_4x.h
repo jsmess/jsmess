@@ -13,7 +13,7 @@
 #define region_hsgpl "user3"
 #define region_speech_rom "soundfixme(1)|"
 
-/* offsets for "|" */
+/* offsets for "main" */
 enum
 {
 	offset_sram = 0x2000,		/* scratch RAM (256 bytes) */

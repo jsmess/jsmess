@@ -177,7 +177,7 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 		break;
 	}
 	if ( osborne1.bank2_enabled ) {
-		memory_set_bankptr( 1, memory_region(machine, "|") );
+		memory_set_bankptr( 1, memory_region(machine, "main") );
 		memory_set_bankptr( 2, osborne1.empty_4K );
 		memory_set_bankptr( 3, osborne1.empty_4K );
 	} else {

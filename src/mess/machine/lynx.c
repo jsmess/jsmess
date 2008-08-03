@@ -1216,9 +1216,9 @@ MACHINE_START( lynx )
 	state_save_register_global_pointer(lynx_mem_fe00, lynx_mem_fe00_size);
 	state_save_register_postload(machine, lynx_postload, NULL);
 
-	memory_configure_bank(3, 0, 1, memory_region(machine, "|") + 0x0000, 0);
+	memory_configure_bank(3, 0, 1, memory_region(machine, "main") + 0x0000, 0);
 	memory_configure_bank(3, 1, 1, lynx_mem_fe00, 0);
-	memory_configure_bank(4, 0, 1, memory_region(machine, "|") + 0x01fa, 0);
+	memory_configure_bank(4, 0, 1, memory_region(machine, "main") + 0x01fa, 0);
 	memory_configure_bank(4, 1, 1, lynx_mem_fffa, 0);
 
 	memset(&suzy, 0, sizeof(suzy));
