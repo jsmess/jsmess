@@ -43,13 +43,20 @@ IBM PC-XT 5160
 ==============
 
 - Intel 8088 at 4.77 MHz derived from a 14.31818 MHz crystal
-- RAM: min. 128KB, max. 640KB
-- Graphics: MDA, CGA, or MDA and CGA
+- Onboard RAM: Revision A mainboard - min. 64KB, max. 256KB (4x 64KB banks); could be upgraded to 640KB with a hack)
+               Revision B mainboard - min. 256KB, max 640KB (2x 256KB, 2x 64KB banks)
+- Total RAM (using 5161 expansion chassis, ISA memory board, or rev B mainboard): 640KB
+- Graphics: MDA, CGA, MDA and CGA, EGA, EGA and MDA, or EGA and CGA
+- One internal 360KB double-sided 5 1/4" floppy drive
+- PC/XT keyboard 'IBM Model F' (BIOS revisions 1 and 2)
+- AT/Enhanced keyboard or 'IBM Model M' (BIOS revisions 3 and 4)
 - Eight ISA expansion slots (short type)
 - Optional 8087 co-processor
-- One 360KB double-sided 5 1/4" floppy drive
-- 10MB or 20MB Seagate ST-412 hard disk
-- Optional second 360KB double-sided 5 1/4" floppy drive
+- Optional second internal 360KB double-sided 5 1/4" floppy drive, if no internal hard disk
+- Optional 'half height' 720KB double density 3 1/2" floppy drive
+- Optional 10MB hard disk via 5161 expansion chassis
+- Optional 10MB or 20MB Seagate ST-412 hard disk
+- Optional up to 2 external 360KB double-sided 5 1/4" floppy drive
 
 
 Tandy 1000
