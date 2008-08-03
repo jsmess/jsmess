@@ -20,11 +20,37 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 IBM PC 5150
 ===========
 
+- Intel 8088 at 4.77 MHz derived from a 14.31818 MHz crystal
+- RAM: min. 16KB, max. 256KB
+- Graphics: MDA, CGA, or MDA and CGA
+- Cassette port
+- Optional 8087 co-processor
+- Optional up to 2 160KB single-sided or 360KB double-sided 5 1/4" floppy drives
+- Optional 10MB hard disk
+
+
 IBM PC-JR
 =========
 
+
 IBM PC-XT 5160
 ==============
+
+- Intel 8086 at 4.77 MHz derived from a 14.31818 MHz crystal
+- RAM: min. 128KB, max. 640KB
+- Graphics: MDA, CGA, or MDA and CGA
+- Optional 8087 co-processor
+- One 360KB double-sided 5 1/4" floppy drive
+- 10MB or 20MB Seagate ST-412 hard disk
+- Optional second 360KB double-sided 5 1/4" floppy drive
+
+
+Tandy 1000
+==========
+
+Tandy 1000 machines are similar to the IBM 5160s with CGA graphics. Tandy
+added some additional graphic capabilities similar, but not equal, to
+those added for the IBM PC Jr.
 
 Tandy 1000 (8086/8088) variations:
 1000				128KB-640KB RAM		4.77 MHz		v01.00.00, v01.01.00
@@ -99,6 +125,8 @@ TODO: Which clock signals are available in a PC Jr?
 #include "machine/8237dma.h"
 #include "sound/sn76496.h"
 #include "sound/3812intf.h"
+
+#include "machine/kb_keytro.h"
 
 
 #define ym3812_StdClock 3579545
@@ -543,6 +571,83 @@ static INPUT_PORTS_START( pccga )
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 	PORT_INCLUDE( pc_keyboard )		/* IN4 - IN11 */
+	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
+	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
+	PORT_INCLUDE( pcvideo_cga )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ibm5150 )
+	PORT_START_TAG("IN0") /* IN0 */
+	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
+	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
+	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
+
+	PORT_START_TAG("DSW0") /* IN1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(	0x40, "2" )
+	PORT_DIPSETTING(	0x80, "3" )
+	PORT_DIPSETTING(	0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x20, "Graphics adapter")
+	PORT_DIPSETTING(	0x00, "EGA/VGA" )
+	PORT_DIPSETTING(	0x10, "Color 40x25" )
+	PORT_DIPSETTING(	0x20, "Color 80x25" )
+	PORT_DIPSETTING(	0x30, "Monochrome" )
+	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
+	PORT_DIPSETTING(	0x00, "1 - 16  64 256K" )
+	PORT_DIPSETTING(	0x04, "2 - 32 128 512K" )
+	PORT_DIPSETTING(	0x08, "3 - 48 192 576K" )
+	PORT_DIPSETTING(	0x0c, "4 - 64 256 640K" )
+	PORT_DIPNAME( 0x02, 0x00, "80387 installed")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
+
+	PORT_START_TAG("DSW1") /* IN2 */
+	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "COM3: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x00, "COM4: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, "LPT2: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_START_TAG("DSW2") /* IN3 */
+	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
+	PORT_DIPSETTING(	0x80, "COM1" )
+	PORT_DIPSETTING(	0x40, "COM2" )
+	PORT_DIPSETTING(	0x20, "COM3" )
+	PORT_DIPSETTING(	0x10, "COM4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
+	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
+
+	PORT_INCLUDE( kb_keytronic )		/* IN4 - IN11 */
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
@@ -1201,6 +1306,8 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_CPU_IO_MAP(pc8_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
 
+	MDRV_INTERLEAVE(1)
+
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
@@ -1319,9 +1426,14 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_DEVICE_ADD("printer3", PRINTER)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( pccga )
+static MACHINE_DRIVER_START( ibm5150 )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc8, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 Mhz */
+	MDRV_CPU_ADD("main", I8088, XTAL_14_31818MHz/3)
+	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
+	MDRV_CPU_IO_MAP(pc8_io, 0)
+	MDRV_CPU_CONFIG(i86_address_mask)
+
+	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
@@ -1356,6 +1468,69 @@ static MACHINE_DRIVER_START( pccga )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
 
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#ifdef ADLIB
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#endif
+#ifdef GAMEBLASTER
+	MDRV_SOUND_ADD("saa1099.1", SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ADD("saa1099.2", SAA1099, 4772720)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+#endif
+
+	MDRV_IMPORT_FROM( kb_keytronic )
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_DEVICE_ADD("printer2", PRINTER)
+	MDRV_DEVICE_ADD("printer3", PRINTER)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pccga )
+	/* basic machine hardware */
+	MDRV_CPU_PC(pc8, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 Mhz */
+
+	MDRV_INTERLEAVE(1)
+
+	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_RESET(pc)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+
+	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
+	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
+	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
+
+	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
+
+	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
+
+	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
+
+	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
+	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_cga )
+
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
@@ -1371,6 +1546,8 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_SOUND_ADD("saa1099.2", SAA1099, 4772720)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+
+//	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1437,7 +1614,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibm5160 )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
+	MDRV_CPU_PC(pc16, pc16, I8086, XTAL_14_31818MHz/3, pc_frame_interrupt)
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
@@ -1487,6 +1664,8 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_SOUND_ADD("saa1099.2", SAA1099, 4772720)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+
+//	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1897,6 +2076,10 @@ ROM_START( ibm5150 )
 	/* Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 ROM_START( ibmpca )
@@ -2261,7 +2444,7 @@ static void pcjr_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static SYSTEM_CONFIG_START(ibmpc)
+static SYSTEM_CONFIG_START(ibm5150)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 	CONFIG_DEVICE(ibmpc_cassette_getinfo)
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
@@ -2290,28 +2473,28 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP(  1981,	ibm5150,	0,			0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1984,	dgone,		ibm5150,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1987,	pc,			ibm5150,	0,		pccga,      pccga,		pccga,	    ibmpc,   "",  "PC (CGA)" , 0)
-COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
-COMP(  1988,	europc,		ibm5150,	0,		europc,     europc,		europc,     ibmpc,   "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
+COMP(  1981,	ibm5150,	0,			0,		ibm5150,    ibm5150,    ibm5150,    ibm5150, "International Business Machines",  "IBM PC 5150" , 0)
+COMP(  1984,	dgone,		ibm5150,	0,		pccga,      pccga,	    pccga,	    ibm5160, "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1987,	pc,			ibm5150,	0,		pccga,      pccga,		pccga,	    ibm5160, "",  "PC (CGA)" , 0)
+COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibm5160, "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
+COMP(  1988,	europc,		ibm5150,	0,		europc,     europc,		europc,     ibm5160, "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
 COMP(  1983,	ibmpcjr,	ibm5150,	0,		ibmpcjr,    tandy1t,	pcjr,       pcjr,    "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
-COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibmpc,   "Tandy Radio Shack",  "Tandy 1000SX", 0)
+COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000HX", 0)
+COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000SX", 0)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,	ibm5150,	0,		ibm5160,    xtcga,		pccga,		ibm5160,   "International Business Machines",  "IBM XT 5160" , 0)
-COMP(  1988,	pc200,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc20,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC512", 0)
-COMP(  1987,	ppc640,		ibm5150,	0,		pc200,		pc200,		pc200,		ibmpc,   "Amstrad plc",  "Amstrad PPC640", 0)
-COMP(  1986,	pc1512,		ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibmpc,   "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
-COMP(  198?,	pc1512v2,	ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibmpc,   "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
-COMP(  1987,	pc1640,		ibm5150,	0,		pc1640,     pc1640,		pc1640,		ibmpc,   "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
+COMP(  1982,	ibm5160,	ibm5150,	0,		ibm5160,    xtcga,		pccga,		ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1988,	pc200,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc20,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1987,	ppc512,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC512", 0)
+COMP(  1987,	ppc640,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC640", 0)
+COMP(  1986,	pc1512,		ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
+COMP(  198?,	pc1512v2,	ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
+COMP(  1987,	pc1640,		ibm5150,	0,		pc1640,     pc1640,		pc1640,		ibm5160, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP ( 1987,	pcmda,		ibm5150,	0,		pcmda,      pcmda,		pcmda,	    ibmpc,   "",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,     ibm5150,	0,      pcherc,     pcmda,      pcmda,      ibmpc,   "MESS",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,		ibm5150,	0,		xtvga,      xtvga,		pc_vga,     ibmpc,   "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
+COMP ( 1987,	pcmda,		ibm5150,	0,		pcmda,      pcmda,		pcmda,	    ibm5160, "",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,     ibm5150,	0,      pcherc,     pcmda,      pcmda,      ibm5160, "MESS",  "PC (Hercules)" , 0)
+COMP ( 1987,	xtvga,		ibm5150,	0,		xtvga,      xtvga,		pc_vga,     ibm5160, "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 

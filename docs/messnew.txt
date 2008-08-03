@@ -11,6 +11,11 @@ System Driver Changes:
 - [DRAGON] Fixed crash that could occur when accessing the printer.  (bug
   #1643)  [Nate Woods]
 
+- [IBM5150] Implemented low-level keyboard interface to allow real
+  emulation of pc keyboards. Hooked up emulation of a Keytronic
+  KB3270/PC keyboard to this driver.
+  [Wilbert Pol]
+
 - [IBM5170] Added support for the 8042 keyboard controller dumped
   by Kevtris.  [Wilbert Pol]
 

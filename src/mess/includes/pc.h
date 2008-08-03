@@ -35,6 +35,7 @@ READ8_HANDLER( pcjr_nmi_enable_r );
 READ8_HANDLER( pc_page_r );
 WRITE8_HANDLER( pc_page_w );
 
+DRIVER_INIT( ibm5150 );
 DRIVER_INIT( pccga );
 DRIVER_INIT( pcmda );
 DRIVER_INIT( europc );

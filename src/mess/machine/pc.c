@@ -48,6 +48,8 @@
 
 #include "machine/8237dma.h"
 
+#include "machine/kb_keytro.h"
+
 
 #define VERBOSE_PIO 0	/* PIO (keyboard controller) */
 
@@ -292,13 +294,13 @@ const struct pit8253_config ibm5150_pit8253_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			XTAL_14_31818MHz/12,				/* heartbeat IRQ */
 			ibm5150_timer0_w
 		}, {
-			4772720/4,				/* dram refresh */
+			XTAL_14_31818MHz/12,				/* dram refresh */
 			ibm5150_pit8253_out1_changed
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
 			ibm5150_pit8253_out2_changed
 		}
 	}
@@ -315,13 +317,13 @@ const struct pit8253_config pcjr_pit8253_config =
 {
 	{
 		{
-			4772720/4,              /* heartbeat IRQ */
+			XTAL_14_31818MHz/12,              /* heartbeat IRQ */
 			ibm5150_timer0_w
 		}, {
-			4772720/4,              /* dram refresh */
+			XTAL_14_31818MHz/12,              /* dram refresh */
 			NULL
 		}, {
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
+			XTAL_14_31818MHz/12,              /* pio port c pin 4, and speaker polling enough */
 			ibm5150_pit8253_out2_changed
 		}
 	}
@@ -594,7 +596,11 @@ static void pcjr_keyb_init(void)
  * 4 - PB4 - ENBRAMPCK   - Enable ram parity check
  * 5 - PB5 - ENABLEI/OCK - Enable expansion I/O check
  * 6 - PB6 -             - Connected to keyboard clock signal
+ *                         0 = ignore keyboard signals
+ *                         1 = accept keyboard signals
  * 7 - PB7 -             - Clear/disable shift register and IRQ1 line
+ *                         0 = normal operation
+ *                         1 = clear and disable shift register and clear IRQ1 flip flop
  *
  * PORT C
  * 0 - PC0 -         - Dipswitch 0/4
@@ -609,20 +615,26 @@ static void pcjr_keyb_init(void)
  **********************************************************/
 
 static struct {
-	int portc_switch_high;
-	int speaker;
-	int keyboard_disabled;
-	UINT8	keyb_clock;
-	UINT8	portb;
+	int						portc_switch_high;
+	int						speaker;
+	int						keyboard_clear;
+	UINT8					keyb_clock;
+	UINT8					portb;
+	UINT8					clock_signal;
+	UINT8					data_signal;
+	UINT8					shift_register;
+	UINT8					shift_enable;
+	write8_machine_func		clock_callback;
+	write8_machine_func		data_callback;
 } pc_ppi={ 0 };
 
 
-static READ8_HANDLER (pc_ppi_porta_r)
+static READ8_HANDLER (ibm5150_ppi_porta_r)
 {
 	int data = 0xFF;
 
 	/* KB port A */
-	if (pc_ppi.keyboard_disabled)
+	if (pc_ppi.keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
 		 *   1  Not used
@@ -637,17 +649,14 @@ static READ8_HANDLER (pc_ppi_porta_r)
 	}
 	else
 	{
-		if ( pc_ppi.keyb_clock )
-		{
-			data = pc_keyb_read();
-		}
+		data = pc_ppi.shift_register;
 	}
     PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
     return data;
 }
 
 
-static READ8_HANDLER (pc_ppi_portb_r )
+static READ8_HANDLER (ibm5150_ppi_portb_r )
 {
 	int data;
 
@@ -657,7 +666,7 @@ static READ8_HANDLER (pc_ppi_portb_r )
 }
 
 
-static READ8_HANDLER ( pc_ppi_portc_r )
+static READ8_HANDLER ( ibm5150_ppi_portc_r )
 {
 	int timer2_output = pit8253_get_output( pc_devices.pit8253, 2 );
 	int data=0xff;
@@ -665,7 +674,6 @@ static READ8_HANDLER ( pc_ppi_portc_r )
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
 	/* KB port C: equipment flags */
-//	if (pc_port[0x61] & 0x08)
 	if (pc_ppi.portc_switch_high)
 	{
 		/* read hi nibble of S2 */
@@ -705,35 +713,89 @@ static READ8_HANDLER ( pc_ppi_portc_r )
 }
 
 
-static WRITE8_HANDLER ( pc_ppi_porta_w )
+static WRITE8_HANDLER ( ibm5150_ppi_porta_w )
 {
 	/* KB controller port A */
 	PIO_LOG(1,"PIO_A_w",("$%02x\n", data));
 }
 
 
-static WRITE8_HANDLER ( pc_ppi_portb_w )
+static WRITE8_HANDLER ( ibm5150_ppi_portb_w )
 {
 	/* KB controller port B */
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
-	pc_ppi.keyboard_disabled = data & 0x80;
+	pc_ppi.keyboard_clear = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
-	pc_keyb_set_clock( pc_ppi.keyb_clock );
 
 	cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
-	if (data & 0x80)
-		pc_keyb_clear();
+	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
+
+	pc_ppi.clock_callback( machine, 0, pc_ppi.clock_signal );
+
+	/* If PB7 is set clear the shift register and reset the IRQ line */
+	if ( pc_ppi.keyboard_clear )
+	{
+		pic8259_set_irq_line(pc_devices.pic8259_master, 1, 0);
+		pc_ppi.shift_register = 0;
+		pc_ppi.shift_enable = 1;
+	}
 }
 
 
-static WRITE8_HANDLER ( pc_ppi_portc_w )
+static WRITE8_HANDLER ( ibm5150_ppi_portc_w )
 {
 	/* KB controller port C */
 	PIO_LOG(1,"PIO_C_w",("$%02x\n", data));
+}
+
+
+static WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
+{
+	if ( pc_ppi.clock_signal != data )
+	{
+		if ( pc_ppi.keyb_clock && pc_ppi.shift_enable )
+		{
+			pc_ppi.clock_signal = data;
+			if ( ! pc_ppi.keyboard_clear )
+			{
+				/* Data is clocked in on a high->low transition */
+				if ( ! data )
+				{
+					UINT8	trigger_irq = pc_ppi.shift_register & 0x01;
+
+					pc_ppi.shift_register = ( pc_ppi.shift_register >> 1 ) | ( pc_ppi.data_signal << 7 );
+					if ( trigger_irq )
+					{
+						pic8259_set_irq_line(pc_devices.pic8259_master, 1, 1);
+						pc_ppi.shift_enable = 0;
+						pc_ppi.clock_signal = 0;
+						pc_ppi.clock_callback( machine, 0, 0 );
+					}
+				}
+			}
+		}
+	}
+
+	pc_ppi.clock_callback( machine, 0, pc_ppi.clock_signal );
+}
+
+
+static WRITE8_HANDLER( ibm5150_kb_set_data_signal )
+{
+	pc_ppi.data_signal = data;
+
+	pc_ppi.data_callback( machine, 0, pc_ppi.data_signal );
+}
+
+
+static void ibm5150_set_keyboard_interface( running_machine *machine, write8_machine_func clock_cb, write8_machine_func data_cb )
+{
+	pc_ppi.clock_callback = clock_cb;
+	pc_ppi.data_callback = data_cb;
 }
 
 
@@ -741,13 +803,43 @@ static WRITE8_HANDLER ( pc_ppi_portc_w )
 status information */
 const ppi8255_interface ibm5150_ppi8255_interface =
 {
-	pc_ppi_porta_r,
-	pc_ppi_portb_r,
-	pc_ppi_portc_r,
-	pc_ppi_porta_w,
-	pc_ppi_portb_w,
-	pc_ppi_portc_w
+	ibm5150_ppi_porta_r,
+	ibm5150_ppi_portb_r,
+	ibm5150_ppi_portc_r,
+	ibm5150_ppi_porta_w,
+	ibm5150_ppi_portb_w,
+	ibm5150_ppi_portc_w
 };
+
+
+static READ8_HANDLER (ibm5160_ppi_porta_r)
+{
+	int data = 0xFF;
+
+	/* KB port A */
+	if (pc_ppi.keyboard_clear)
+	{
+		/*   0  0 - no floppy drives
+		 *   1  Not used
+		 * 2-3  The number of memory banks on the system board
+		 * 4-5  Display mode
+		 *	    11 = monochrome
+		 *      10 - color 80x25
+		 *      01 - color 40x25
+		 * 6-7  The number of floppy disk drives
+		 */
+		data = input_port_read(machine, "DSW0");
+	}
+	else
+	{
+		if ( pc_ppi.keyb_clock )
+		{
+			data = pc_keyb_read();
+		}
+	}
+    PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
+    return data;
+}
 
 
 static READ8_HANDLER ( ibm5160_ppi_portc_r )
@@ -786,25 +878,25 @@ static WRITE8_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
-	pc_ppi.keyboard_disabled = data & 0x80;
+	pc_ppi.keyboard_clear = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 0x01 );
 	pc_speaker_set_spkrdata( data & 0x02 );
 	pc_keyb_set_clock( pc_ppi.keyb_clock );
 
-	if ( data & 0x80 )
+	if ( pc_ppi.keyboard_clear )
 		pc_keyb_clear();
 }
 
 
 const ppi8255_interface ibm5160_ppi8255_interface =
 {
-	pc_ppi_porta_r,
-	pc_ppi_portb_r,
+	ibm5160_ppi_porta_r,
+	ibm5150_ppi_portb_r,
 	ibm5160_ppi_portc_r,
-	pc_ppi_porta_w,
+	ibm5150_ppi_porta_w,
 	ibm5160_ppi_portb_w,
-	pc_ppi_portc_w
+	ibm5150_ppi_portc_w
 };
 
 
@@ -882,11 +974,11 @@ static READ8_HANDLER ( pcjr_ppi_portc_r )
 const ppi8255_interface pcjr_ppi8255_interface =
 {
 	pcjr_ppi_porta_r,
-	pc_ppi_portb_r,
+	ibm5150_ppi_portb_r,
 	pcjr_ppi_portc_r,
-	pc_ppi_porta_w,
+	ibm5150_ppi_porta_w,
 	pcjr_ppi_portb_w,
-	pc_ppi_portc_w
+	ibm5150_ppi_portc_w
 };
 
 
@@ -959,11 +1051,24 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 	pc_mouse_initialise();
 }
 
+
+DRIVER_INIT( ibm5150 )
+{
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	pc_rtc_init();
+
+	/* Attach keyboard to the keyboard controller */
+	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( machine, ibm5150_kb_set_clock_signal, ibm5150_kb_set_data_signal );
+}
+
+
 DRIVER_INIT( pccga )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	pc_rtc_init();
 }
+
 
 DRIVER_INIT( bondwell )
 {
