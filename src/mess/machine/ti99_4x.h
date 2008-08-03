@@ -11,7 +11,7 @@
 #define region_grom "user1"
 #define region_dsr "user2"
 #define region_hsgpl "user3"
-#define region_speech_rom "soundfixme(1)|"
+#define region_speech_rom "tms5220"
 
 /* offsets for "main" */
 enum
