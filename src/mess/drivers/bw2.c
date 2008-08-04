@@ -509,6 +509,11 @@ static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
 	msm8251_receive_clock();
 }
 
+static PIT8253_OUTPUT_CHANGED( bw2_timer1_w )
+{
+	pit8253_set_clock_signal( device, 2, state );
+}
+
 static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
 {
 	bw2_mtron = state;
@@ -530,10 +535,10 @@ static const struct pit8253_config bw2_pit8253_interface =
 		},
 		{
 			11000,		/* LCD controller */
-			NULL
+			bw2_timer1_w
 		},
 		{
-			3,		/* Floppy /MTRON */
+			0,		/* Floppy /MTRON */
 			bw2_timer2_w
 		}
 	}
