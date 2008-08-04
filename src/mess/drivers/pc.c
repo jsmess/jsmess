@@ -305,7 +305,7 @@ static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
 #endif
-//  AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,   pc16le_parallelport0_w)
+//	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,   pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE(INS8250, "ins8250_0", ins8250_r, ins8250_w)
@@ -466,7 +466,7 @@ static INPUT_PORTS_START( pcmda )
 	PORT_DIPSETTING(	0x00, DEF_STR(No) )
 	PORT_DIPSETTING(	0x01, DEF_STR(Yes) )
 
-    PORT_START_TAG("DSW1") /* IN2 */
+	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR(No) )
 	PORT_DIPSETTING(	0x80, DEF_STR(Yes) )
@@ -498,7 +498,7 @@ static INPUT_PORTS_START( pcmda )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
@@ -519,7 +519,7 @@ static INPUT_PORTS_START( pccga )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -566,20 +566,20 @@ static INPUT_PORTS_START( pccga )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
@@ -673,7 +673,7 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 
 	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
@@ -699,20 +699,20 @@ static INPUT_PORTS_START( europc )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
@@ -729,7 +729,7 @@ static INPUT_PORTS_START( bondwell )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -776,20 +776,20 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, "Turbo Switch" )
 	PORT_DIPSETTING(	0x00, "Off (4.77 MHz)" )
@@ -807,7 +807,7 @@ static INPUT_PORTS_START( xtcga )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -854,20 +854,20 @@ static INPUT_PORTS_START( xtcga )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 //	PORT_DIPNAME( 0x02, 0x02, "Turbo Switch" )
 //	PORT_DIPSETTING(	0x00, "Off (4.77 MHz)" )
@@ -886,10 +886,10 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_BIT ( 0xff, 0xff,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW1") /* IN2 */
+	PORT_START_TAG("DSW1") /* IN2 */
 	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
@@ -903,20 +903,20 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_BIT ( 0x06, 0x00,	 IPT_UNUSED )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
@@ -932,7 +932,7 @@ static INPUT_PORTS_START( pc200 )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPSETTING(	0x00, "English/less checks" )
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
@@ -962,7 +962,7 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_DIPSETTING(	0xc0, DEF_STR( Mono ) )
 
 	PORT_START_TAG("DSW1") /* IN2 */
-PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
+	PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
@@ -975,26 +975,26 @@ PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
+	PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x00, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
@@ -1003,17 +1003,17 @@ PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 
-    PORT_START_TAG("VIDEO") /* IN20 */
+	PORT_START_TAG("VIDEO") /* IN20 */
 	PORT_CONFNAME( 0x03, 0x03, "IDA character set")
 	PORT_CONFSETTING(0x00, "Greek")
 	PORT_CONFSETTING(0x01, "Norwegian (Codepage 860)")
 	PORT_CONFSETTING(0x02, "Portugese (Codepage 865)")
-    PORT_CONFSETTING(0x03, "Default (Codepage 437)")
+	PORT_CONFSETTING(0x03, "Default (Codepage 437)")
 	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
 	PORT_CONFSETTING(0x00, "Colour RGB")
 	PORT_CONFSETTING(0x04, "Mono RGB")
-    PORT_CONFSETTING(0x0C, "Television")
-    PORT_BIT ( 0xE0, 0x40, IPT_UNUSED )	/* Chipset is always PPC512 */
+	PORT_CONFSETTING(0x0C, "Television")
+	PORT_BIT ( 0xE0, 0x40, IPT_UNUSED )	/* Chipset is always PPC512 */
 
 INPUT_PORTS_END
 
@@ -1023,7 +1023,7 @@ static INPUT_PORTS_START( pc1512 )
 	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
 	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPSETTING(	0x00, "English/less checks" )
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
@@ -1039,7 +1039,7 @@ static INPUT_PORTS_START( pc1512 )
 	PORT_BIT( 0xe000, 0x00,	IPT_UNUSED ) // not used in pc1512
 
 	PORT_START_TAG("DSW1") /* IN2 */
-PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
+	PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
@@ -1052,26 +1052,26 @@ PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
+	PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x00, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
@@ -1110,9 +1110,9 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
-//  PORT_DIPSETTING(    0x00, "PC 512k" ) // machine crashes with ega bios at 0xc0000
+//	PORT_DIPSETTING(    0x00, "PC 512k" ) // machine crashes with ega bios at 0xc0000
 	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
 	PORT_DIPSETTING(	0x02, "V.g. v\xC3\xA4nta" )
 	PORT_DIPSETTING(	0x03, "Vent et cjeblik" ) // seldom c
@@ -1162,7 +1162,7 @@ static INPUT_PORTS_START( pc1640 )
 #endif
 
 	PORT_START_TAG("DSW1") /* IN2 */
-PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
+	PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
@@ -1175,33 +1175,33 @@ PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
+	PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x00, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 	PORT_INCLUDE( amstrad_keyboard )	/* IN4 - IN14 */
 
-//  PORT_INCLUDE( pc_mouse_microsoft )  /* IN12 - IN14 */
+//	PORT_INCLUDE( pc_mouse_microsoft )  /* IN12 - IN14 */
 
 INPUT_PORTS_END
 
@@ -1220,7 +1220,7 @@ static INPUT_PORTS_START( xtvga )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-    PORT_START_TAG("DSW0") /* IN1 */
+	PORT_START_TAG("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(	0x00, "1" )
 	PORT_DIPSETTING(	0x40, "2" )
@@ -1267,20 +1267,20 @@ static INPUT_PORTS_START( xtvga )
 	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-    PORT_START_TAG("DSW2") /* IN3 */
+	PORT_START_TAG("DSW2") /* IN3 */
 	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
 	PORT_DIPSETTING(	0x80, "COM1" )
 	PORT_DIPSETTING(	0x40, "COM2" )
 	PORT_DIPSETTING(	0x20, "COM3" )
 	PORT_DIPSETTING(	0x10, "COM4" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
-    PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, "Turbo Switch" )
 	PORT_DIPSETTING(	0x00, "Off (4.77 MHz)" )
@@ -1355,7 +1355,7 @@ static MACHINE_DRIVER_START( pcmda )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1545,7 +1545,7 @@ static MACHINE_DRIVER_START( pccga )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1607,7 +1607,7 @@ static MACHINE_DRIVER_START( europc )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1663,7 +1663,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1725,7 +1725,7 @@ static MACHINE_DRIVER_START( pc200 )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1774,7 +1774,7 @@ static MACHINE_DRIVER_START( pc1512 )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1828,7 +1828,7 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1882,7 +1882,7 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1931,7 +1931,7 @@ static MACHINE_DRIVER_START( t1000hx )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1978,7 +1978,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pcjr )
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2098,12 +2098,12 @@ ROM_END
 
 ROM_START( ibmpca )
 	ROM_REGION(0x100000,"main",0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	/* WDC Expansion ROM C8000-C9FFF */
-    ROM_LOAD("basicc11.f6", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
-    ROM_LOAD("basicc11.f8", 0xf8000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731))
-    ROM_LOAD("basicc11.fa", 0xfa000, 0x2000, CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74))
-    ROM_LOAD("basicc11.fc", 0xfc000, 0x2000, CRC(3062b3fc) SHA1(5134dd64721cbf093d059ee5d3fd09c7f86604c7))
-    ROM_LOAD("pc081682.bin", 0xfe000, 0x2000, CRC(5c3f0256) SHA1(b42c78abd0a9c630a2f972ad2bae46d83c3a2a09))
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	/* WDC Expansion ROM C8000-C9FFF */
+	ROM_LOAD("basicc11.f6", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
+	ROM_LOAD("basicc11.f8", 0xf8000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731))
+	ROM_LOAD("basicc11.fa", 0xfa000, 0x2000, CRC(aac3fc37) SHA1(c9e0529470edf04da093bb8c8ae2536c688c1a74))
+	ROM_LOAD("basicc11.fc", 0xfc000, 0x2000, CRC(3062b3fc) SHA1(5134dd64721cbf093d059ee5d3fd09c7f86604c7))
+	ROM_LOAD("pc081682.bin", 0xfe000, 0x2000, CRC(5c3f0256) SHA1(b42c78abd0a9c630a2f972ad2bae46d83c3a2a09))
 
 	/* Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
@@ -2112,7 +2112,7 @@ ROM_END
 
 ROM_START( bondwell )
 	ROM_REGION(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) // taken from other machine
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) // taken from other machine
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
 
 	/* Character rom */
@@ -2121,11 +2121,11 @@ ROM_START( bondwell )
 ROM_END
 
 ROM_START( pcmda )
-    ROM_REGION(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	/* WDC Expansion ROM C8000-C9FFF */
-    ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
+	ROM_REGION(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	/* WDC Expansion ROM C8000-C9FFF */
+	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("mda.rom",     0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) // taken from original IBM MDA
+	ROM_LOAD("mda.rom",     0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) // taken from original IBM MDA
 ROM_END
 
 ROM_START( pcherc )
@@ -2138,10 +2138,10 @@ ROM_END
 
 
 ROM_START( pc )
-    ROM_REGION(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	/* WDC Expansion ROM C8000-C9FFF */
-//    ROM_LOAD("xthdd.rom",  0xc8000, 0x02000, CRC(a96317da))
-    ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
+	ROM_REGION(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	/* WDC Expansion ROM C8000-C9FFF */
+//	ROM_LOAD("xthdd.rom",  0xc8000, 0x02000, CRC(a96317da))
+	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 
 	/* Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
@@ -2149,20 +2149,20 @@ ROM_START( pc )
 ROM_END
 
 ROM_START( europc )
-    ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"main", 0)
 	// hdd bios integrated!
-    ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
+	ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("50146", 0x00000, 0x02000, CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //D1.0
+	ROM_LOAD("50146", 0x00000, 0x02000, CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //D1.0
 ROM_END
 
 
 ROM_START( ibmpcjr )
-    ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("bios.rom", 0xf0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
 
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
 ROM_START( t1000 )
@@ -2304,93 +2304,93 @@ ROM_END
 
 
 ROM_START( xtvga )
-    ROM_REGION(0x100000,"main", 0)
-    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
-    ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
+	ROM_REGION(0x100000,"main", 0)
+	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5))
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 ROM_END
 
 ROM_START( pc200 )
 //    ROM_REGION(0x100000,"main", 0)
-    ROM_REGION16_LE(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// special bios at 0xe0000 !?
-    ROM_LOAD16_BYTE("pc20v2.0", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
-    ROM_LOAD16_BYTE("pc20v2.1", 0xfc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24)) // v2
+	ROM_LOAD16_BYTE("pc20v2.0", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
+	ROM_LOAD16_BYTE("pc20v2.1", 0xfc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24)) // v2
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
+	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
 ROM_START( pc20 )
 //    ROM_REGION(0x100000,"main", 0)
-    ROM_REGION16_LE(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
 	// special bios at 0xe0000 !?
 	// This is probably referring to a check for the Amstrad RP5-2 diagnostic
 	// card, which can be plugged into an Amstrad XT for troubleshooting purposes.
 	// - John Elliott
-    ROM_LOAD16_BYTE("pc20v2.0", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
-    ROM_LOAD16_BYTE("pc20v2.1", 0xfc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24)) // v2
+	ROM_LOAD16_BYTE("pc20v2.0", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
+	ROM_LOAD16_BYTE("pc20v2.1", 0xfc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24)) // v2
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
+	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
 ROM_START( ppc512 )
 //    ROM_REGION(0x100000,"main", 0)
-    ROM_REGION16_LE(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// special bios at 0xe0000 !?
-    ROM_LOAD16_BYTE("40107.v1", 0xfc001, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
-    ROM_LOAD16_BYTE("40108.v1", 0xfc000, 0x2000, CRC(4f0302d9) SHA1(e4d69ca98c3b98f3705a2902b16746360043f039)) // v1.9
+	ROM_LOAD16_BYTE("40107.v1", 0xfc001, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
+	ROM_LOAD16_BYTE("40108.v1", 0xfc000, 0x2000, CRC(4f0302d9) SHA1(e4d69ca98c3b98f3705a2902b16746360043f039)) // v1.9
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
+	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
 ROM_START( ppc640 )
 //    ROM_REGION(0x100000,"main", 0)
-    ROM_REGION16_LE(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 	// special bios at 0xe0000 !?
-    ROM_LOAD16_BYTE("40107.v2", 0xfc001, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
-    ROM_LOAD16_BYTE("40108.v2", 0xfc000, 0x2000, CRC(5351cf8c) SHA1(b4dbf11b39378ab4afd2107d3fe54a99fffdedeb)) // v2.1
+	ROM_LOAD16_BYTE("40107.v2", 0xfc001, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
+	ROM_LOAD16_BYTE("40108.v2", 0xfc000, 0x2000, CRC(5351cf8c) SHA1(b4dbf11b39378ab4afd2107d3fe54a99fffdedeb)) // v2.1
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
+	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
 ROM_START( pc1512 )
 //    ROM_REGION(0x100000,"main", 0)
-    ROM_REGION16_LE(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
-    ROM_LOAD16_BYTE("40044.v1", 0xfc001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482)) // v1
-    ROM_LOAD16_BYTE("40043.v1", 0xfc000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247)) // v1
+	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_LOAD16_BYTE("40044.v1", 0xfc001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482)) // v1
+	ROM_LOAD16_BYTE("40043.v1", 0xfc000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247)) // v1
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
+	ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
 ROM_END
 
 ROM_START( pc1512v2 )
 //    ROM_REGION(0x100000,"main", 0)
-    ROM_REGION16_LE(0x100000,"main", 0)
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
-    ROM_LOAD16_BYTE("40043.v2", 0xfc001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb)) // v2
-    ROM_LOAD16_BYTE("40044.v2", 0xfc000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0)) // v2
+	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_LOAD16_BYTE("40043.v2", 0xfc001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb)) // v2
+	ROM_LOAD16_BYTE("40044.v2", 0xfc000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0)) // v2
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("40078.bin",     0x00000, 0x02000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd))
+	ROM_LOAD("40078.bin",     0x00000, 0x02000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd))
 ROM_END
 
 ROM_START( pc1640 )
 //    ROM_REGION(0x100000,"main", 0)
-    ROM_REGION16_LE(0x100000,"main", 0)
-    ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33)) // this bios seams to be made for the amstrad pc
-    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
-    ROM_LOAD16_BYTE("40043.v3", 0xfc001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8)) // v3
-    ROM_LOAD16_BYTE("40044.v3", 0xfc000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952))
+	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33)) // this bios seams to be made for the amstrad pc
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_LOAD16_BYTE("40043.v3", 0xfc001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8)) // v3
+	ROM_LOAD16_BYTE("40044.v3", 0xfc000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952))
 	ROM_REGION(0x08100,"gfx1", 0)
-    ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
+	ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
 ROM_END
 
 ROM_START( dgone )
@@ -2487,28 +2487,28 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
-COMP(  1981,	ibm5150,	0,			0,		ibm5150,    ibm5150,    ibm5150,    ibm5150, "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1984,	dgone,		ibm5150,	0,		pccga,      pccga,	    pccga,	    ibm5160, "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1987,	pc,			ibm5150,	0,		pccga,      pccga,		pccga,	    ibm5160, "",  "PC (CGA)" , 0)
-COMP(  1985,	bondwell,	ibm5150,	0,		pccga,		bondwell,   bondwell,	ibm5160, "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
-COMP(  1988,	europc,		ibm5150,	0,		europc,     europc,		europc,     ibm5160, "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
+COMP(  1981,	ibm5150,	0,			0,	ibm5150,    ibm5150,    ibm5150,    ibm5150, "International Business Machines",  "IBM PC 5150" , 0)
+COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	    pccga,	    ibm5160, "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1987,	pc,			ibm5150,	0,	pccga,      pccga,		pccga,	    ibm5160, "",  "PC (CGA)" , 0)
+COMP(  1985,	bondwell,	ibm5150,	0,	pccga,		bondwell,   bondwell,	ibm5160, "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
+COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     ibm5160, "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,	ibm5150,	0,		ibmpcjr,    tandy1t,	pcjr,       pcjr,    "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
-COMP(  1987,	t1000hx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,	ibm5150,	0,		t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000SX", 0)
+COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       pcjr,    "International Business Machines",  "IBM PC Jr", GAME_NOT_WORKING|GAME_IMPERFECT_COLORS )
+COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000HX", 0)
+COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000SX", 0)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,	ibm5150,	0,		ibm5160,    xtcga,		pccga,		ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
-COMP(  1988,	pc200,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc20,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC512", 0)
-COMP(  1987,	ppc640,		ibm5150,	0,		pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC640", 0)
-COMP(  1986,	pc1512,		ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
-COMP(  198?,	pc1512v2,	ibm5150,	0,		pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
-COMP(  1987,	pc1640,		ibm5150,	0,		pc1640,     pc1640,		pc1640,		ibm5160, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
+COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    xtcga,		pccga,		ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1988,	pc200,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc20,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1987,	ppc512,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC512", 0)
+COMP(  1987,	ppc640,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC640", 0)
+COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
+COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
+COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,		pc1640,		ibm5160, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP ( 1987,	pcmda,		ibm5150,	0,		pcmda,      pcmda,		pcmda,	    ibm5160, "",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,     ibm5150,	0,      pcherc,     pcmda,      pcmda,      ibm5160, "MESS",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,		ibm5150,	0,		xtvga,      xtvga,		pc_vga,     ibm5160, "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
+COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		pcmda,	    ibm5160, "",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      pcmda,      ibm5160, "MESS",  "PC (Hercules)" , 0)
+COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,		pc_vga,     ibm5160, "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 
