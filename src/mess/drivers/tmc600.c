@@ -351,7 +351,7 @@ ROM_START( tmc600s1 )
 	ROM_LOAD( "sb23",		0x3000, 0x1000, NO_DUMP )
 	ROM_LOAD( "190482_2",	0x4000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",	0x0000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -363,7 +363,7 @@ ROM_START( tmc600s2 )
 	ROM_LOAD( "sb33",		0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
 	ROM_LOAD( "151182",		0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",	0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
 ROM_END
 

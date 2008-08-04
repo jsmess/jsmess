@@ -378,8 +378,8 @@ static const gfx_layout charlayout_abc80 =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( abc80 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_abc80, 0, 2 )		// normal characters
-	GFXDECODE_ENTRY( "gfx1", 0x500, charlayout_abc80, 0, 2 )	// graphics characters
+	GFXDECODE_ENTRY( "chargen", 0, charlayout_abc80, 0, 2 )		// normal characters
+	GFXDECODE_ENTRY( "chargen", 0x500, charlayout_abc80, 0, 2 )	// graphics characters
 GFXDECODE_END
 
 /* Sound Interface */
@@ -596,7 +596,7 @@ ROM_START( abc80 )
 	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
 	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
 
-	ROM_REGION( 0x0a00, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0a00, "chargen", ROMREGION_DISPOSE )
 	ROM_LOAD( "sn74s262.h2", 0x0000, 0x0a00, NO_DUMP ) // UK charset
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) )
 

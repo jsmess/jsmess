@@ -915,7 +915,7 @@ ROM_START( abc800c )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "vuc-se.7c",  0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "user1", 0 )
@@ -961,7 +961,7 @@ ROM_START( abc800m )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 ROM_END
 
@@ -979,7 +979,7 @@ ROM_START( abc802 )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "abct2-11.3g",  0x0000, 0x2000, CRC(e21601ee) SHA1(2e838ebd7692e5cb9ba4e80fe2aa47ea2584133a) )
 
 	ROM_REGION( 0x400, "plds", 0 )
@@ -1006,7 +1006,7 @@ ROM_START( abc806 )
 
 	ROM_KEYBOARD
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "abct6-11.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) ) // 6490243-01
 
 	ROM_REGION( 0x620, "proms", 0 )

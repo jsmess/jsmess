@@ -605,7 +605,7 @@ static MACHINE_RESET( bw2 )
 		
 		memory_configure_bank(1, BANK_RAM1, 1, mess_ram, 0);
 		memory_configure_bank(1, BANK_VRAM, 1, videoram, 0);
-		memory_configure_bank(1, BANK_RAMCARD_ROM, 1, memory_region(machine, "user1"), 0);
+		memory_configure_bank(1, BANK_RAMCARD_ROM, 1, memory_region(machine, "ramcard"), 0);
 		memory_configure_bank(1, BANK_RAM3, 2, mess_ram + 0x8000, 0x8000);
 		memory_configure_bank(1, BANK_RAMCARD_RAM, 1, ramcard_ram, 0);
 		memory_configure_bank(1, BANK_RAM6, 1, mess_ram + 0x18000, 0);
@@ -862,7 +862,7 @@ ROM_START( bw2 )
 	ROM_SYSTEM_BIOS(1, "12", "BW 2 v1.2")
 	ROMX_LOAD("bw2-12.ic8", 0x0000, 0x1000, CRC(0ab42d10) SHA1(430b232631eee9b715151b8d191b7eb9449ac513), ROM_BIOS(2))
 
-	ROM_REGION(0x4000, "user1", 0)
+	ROM_REGION(0x4000, "ramcard", 0)
 	ROM_LOAD("ramcard-10.bin", 0x0000, 0x4000, CRC(68cde1ba) SHA1(a776a27d64f7b857565594beb63aa2cd692dcf04))
 ROM_END
 
