@@ -460,6 +460,9 @@ static DRIVER_INIT( cdtv )
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
 	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 
+	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
+	amigakbd_init();
+
 	/* initialize the cdrom controller */
 	amigacd_init();
 }

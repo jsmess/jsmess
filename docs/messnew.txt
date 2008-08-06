@@ -8,6 +8,9 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [AMIGA] Fixed crash in CDTV that when accessing the keyboard.
+  [Roberto Zandona']
+
 - [DRAGON] Fixed crash that could occur when accessing the printer.  (bug
   #1643)  [Nate Woods]
 
