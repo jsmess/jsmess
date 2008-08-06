@@ -907,8 +907,9 @@ TESTDRIVER( comxpl80 )
 
 	/* Grundy Business Systems Ltd */
 	DRIVER( newbrain )
-	DRIVER( newbraid )
-	DRIVER( newbramd )
+	DRIVER( newbraim )
+	DRIVER( newbraia )
+	DRIVER( newbraiv )
 
 /****************Games*******************************************************/
 	/* Computer Electronic */

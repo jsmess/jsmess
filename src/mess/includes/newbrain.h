@@ -3,11 +3,24 @@
 
 #define SCREEN_TAG			"main"
 
+#define NEWBRAIN_VIDEO_RV			0x01
+#define NEWBRAIN_VIDEO_FS			0x02
+#define NEWBRAIN_VIDEO_32_40		0x04
+#define NEWBRAIN_VIDEO_UCR			0x08
+#define NEWBRAIN_VIDEO_80L			0x40
+
 typedef struct _newbrain_state newbrain_state;
 struct _newbrain_state
 {
 	/* processor state */
 	int pwrup;				/* power up */
+	int userint;			/* user interrupt */
+	int clkint;				/* clock interrupt */
+	int aciaint;			/* ACIA interrupt */
+	int copint;				/* COP interrupt */
+	int bee;				/* identity */
+	UINT8 enrg1;			/* enable register 1 */
+	UINT8 enrg2;			/* enable register 2 */
 
 	/* COP420 state */
 	UINT8 cop_bus;			/* data bus */
@@ -17,25 +30,27 @@ struct _newbrain_state
 	int cop_rd;				/* memory read */
 	int cop_wr;				/* memory write */
 	int cop_access;			/* COP access */
-	int cop_int;			/* COP interrupt */
 
 	/* keyboard state */
 	int keylatch;			/* keyboard row */
 	int keydata;			/* keyboard column */
 
+	/* paging state */
+	UINT8 paging;			/* paging control register */
+	UINT8 pr[16];			/* expansion interface paging register */
+
 	/* floppy state */
 	int fdc_int;			/* interrupt */
+	int fdc_att;			/* attention */
 
 	/* video state */
 	int segment_data[16];	/* VF segment data */
-	int clk_int;			/* clock interrupt */
-	int clk;				/* clock interrupt enable */
-	int tvp;				/*  */
+	int tvcnsl;				/* TV console required */
+	int tvctl;				/* TV control register */
+	UINT16 tvram;			/* TV start address */
 
-	/* serial state */
-	int v24_rts;			/* V.24 ready to send */
-	int v24_txd;			/* V.24 transmit */
-	int prt_txd;			/* printer transmit */
+	/* user bus state */
+	UINT8 user;				
 
 	/* timers */
 	emu_timer *reset_timer;	/* power on reset timer */
