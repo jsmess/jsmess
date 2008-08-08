@@ -1374,7 +1374,7 @@ static MACHINE_RESET( pcw16 )
 }
 
 static INPUT_PORTS_START(pcw16)
-	PORT_START_TAG("EXTRA")
+	PORT_START("EXTRA")
 	/* vblank */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VBLANK)
 	/* power switch - default is on */

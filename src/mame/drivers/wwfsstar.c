@@ -10,6 +10,94 @@
 
 ********************************************************************************
 
+WWF Superstars
+Technos 1989
+
+PCB Layout
+----------
+
+TA-0024-P1-05
+|--------------------------------------------------------------------|
+|M51516   558     558   YM3012        M6295       YM2151  3.579545MHz|
+|                                1.056MHz                            |
+|         558     558                               6116             |
+|                              24A9-0.45                            |-|
+|                                                   Z80             | |
+|                              24J8-0.44                            | |
+|                                                   B.12            | |
+|                                                                   | |
+|               24AA-0.58                                           | |
+|                                                   6116            | |
+|                                                                   | |
+|J                                                                  | |
+|A                                                                  |-|
+|M                                                                   |
+|M                                                                   |
+|A    DSW1                                       6116 6116           |
+|     DSW2                                                           |
+|                                                                   |-|
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                 68000        24AD-04.35    6264                   |-|
+|                                                                    |
+|                              24AC-04.34    6264                    |
+|20MHz                                                               |
+|--------------------------------------------------------------------|
+Notes:
+      Z80    - 3.579545MHz
+      68000  - 10.000MHz [20/2]
+      M6295  - 1.056MHz (resonator)
+      YM2151 - 3.579545MHz
+      VSync  - 57.4447Hz
+
+
+Bottom Board
+
+TA-0024-P2-23
+|--------------------------------------------------------------------|
+|                                     2018                           |
+| IC119                                                              |
+|                                                                    |
+|                                                                   |-|
+| IC118                                                             | |
+|                                     2018                          | |
+|                                                                   | |
+| IC117                                                             | |
+|                                                                   | |
+|                                                                   | |
+| IC116                                         2018                | |
+|                                                                   | |
+|                                                                   |-|
+| IC115              2018             2018                           |
+|                                                                    |
+|                                     2018                           |
+| IC114                                                              |
+|                                                                   |-|
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+|                                                                   | |
+| IC113                                                             | |
+|                                                                   | |
+|                                                                   | |
+|                                       |-------|                   |-|
+| IC112                                 |TECHNOS|  24MHz             |
+|                                       |TJ-001 |                    |
+|                                       |-------|                    |
+|--------------------------------------------------------------------|
+Notes:
+      IC11x  - TC534000 MaskROMs
+      TJ-001 - Probably a microcontroller badged as a Technos Custom IC (QFP80).
+               Clocks: pin 1 - 24MHz, pin 3 - 24/2, pin 4 - 24/4, pin 5 - 24/8,
+               pin 6 - 24/16, pin 7 - 24/32, pin 8 - 24/64, pin 64,65 - 1.5MHz
+
  Hardware:
 
  Primary CPU : 68000
@@ -203,7 +291,7 @@ static READ16_HANDLER( input_port_2_word_r_cust )
 *******************************************************************************/
 
 static INPUT_PORTS_START( wwfsstar )
-	PORT_START_TAG("P1")
+	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -213,7 +301,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Button A (1P VS CPU - Power Up)")
 
-	PORT_START_TAG("P2")
+	PORT_START("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -223,7 +311,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Button C (1P/2P VS CPU)")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Button B (1P VS 2P - Buy-in)")
 
-	PORT_START_TAG("SYSTEM")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* VBlank */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -233,7 +321,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("DSW0")	/* DSW0 */
+	PORT_START("DSW0")	/* DSW0 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00,  DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01,  DEF_STR( 3C_1C ) )
@@ -259,7 +347,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW1")	/* DSW1 */
+	PORT_START("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )

@@ -15,7 +15,8 @@
 
 *********************************************************************/
 
-#include "mame.h"
+#include "driver.h"
+#include "deprecat.h"
 #include "harddisk.h"
 #include "harddriv.h"
 
@@ -306,13 +307,10 @@ void harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 	}
 }
 
-hard_disk_file *mess_hd_get_hard_disk_file_by_number(int drivenum)
+hard_disk_file *mess_hd_get_hard_disk_file_by_number(const char *diskregion)
 {
-	if ((drivenum < 0) || (drivenum > MAX_HARDDISKS))
-	{
-		return NULL;
-	}
-
-	return drive_handles[drivenum];
+	const device_config *device;
+	device = device_list_find_by_tag(Machine->config->devicelist, DEVICE_TYPE_WILDCARD, diskregion);
+	return mess_hd_get_hard_disk_file(device);
 }
 

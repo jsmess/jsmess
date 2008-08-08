@@ -1459,6 +1459,18 @@ int input_condition_true(running_machine *machine, const input_condition *condit
 
 		case PORTCOND_NOTEQUALS:
 			return ((condvalue & condition->mask) != condition->value);
+
+		case PORTCOND_GREATERTHAN:
+			return ((condvalue & condition->mask) > condition->value);
+
+		case PORTCOND_NOTGREATERTHAN:
+			return ((condvalue & condition->mask) <= condition->value);
+
+		case PORTCOND_LESSTHAN:
+			return ((condvalue & condition->mask) < condition->value);
+
+		case PORTCOND_NOTLESSTHAN:
+			return ((condvalue & condition->mask) >= condition->value);
 	}
 	return TRUE;
 }
@@ -2405,14 +2417,12 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 			/* start of a new input port */
 			case INPUT_TOKEN_START:
-			case INPUT_TOKEN_START_TAG:
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				maskbits = 0;
 
 				curport = port_config_alloc((const input_port_config **)&listhead);
-				if (entrytype == INPUT_TOKEN_START_TAG)
-					curport->tag = TOKEN_GET_STRING(ipt);
+				curport->tag = TOKEN_GET_STRING(ipt);
 				curfield = NULL;
 				cursetting = NULL;
 				break;
@@ -2859,6 +2869,9 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				temptoken.i = INPUT_STRING_On;
 				cursetting = setting_config_alloc(curfield, ~defval & mask, input_port_string_from_token(temptoken));
+
+				/* reset cursetting to NULL to allow subsequent conditions to apply to the field */
+				cursetting = NULL;
 				break;
 
 			/* configuration definition */

@@ -826,7 +826,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( turbo )
-	PORT_START_TAG("INPUT")	/* IN0 */
+	PORT_START("INPUT")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )				/* ACCEL B */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )				/* ACCEL A */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE	/* SHIFT */
@@ -836,7 +836,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("DSW1")	/* DSW 1 */
+	PORT_START("DSW1")	/* DSW 1 */
 	PORT_DIPNAME( 0x03, 0x03, "Car On Extended Play" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -861,7 +861,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW2")	/* DSW 2 */
+	PORT_START("DSW2")	/* DSW 2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "60 seconds" )
 	PORT_DIPSETTING(    0x01, "70 seconds" )
@@ -886,7 +886,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ))
 	PORT_DIPSETTING(	0x60, DEF_STR( 1C_6C ))
 
-	PORT_START_TAG("DSW3")	/* Collision and DSW 3 */
+	PORT_START("DSW3")	/* Collision and DSW 3 */
 	PORT_BIT( 0x0f,     0x00, IPT_SPECIAL )	/* Merged with collision bits */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -901,25 +901,25 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x00, "Cockpit")
 
-	PORT_START_TAG("DIAL")	/* IN0 */
+	PORT_START("DIAL")	/* IN0 */
 	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(30)
 
 	/* this is actually a variable resistor */
-	PORT_START_TAG("VR1")
+	PORT_START("VR1")
 	PORT_ADJUSTER(31, "Sprite scale offset")
 
 	/* this is actually a variable resistor */
-	PORT_START_TAG("VR2")
+	PORT_START("VR2")
 	PORT_ADJUSTER(91, "Sprite scale gain")
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( subroc3d )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -929,7 +929,7 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("DSW2")  /* DSW 2 */
+	PORT_START("DSW2")  /* DSW 2 */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
@@ -954,7 +954,7 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0xc0, "5" )
 
-	PORT_START_TAG("DSW3")  /* DSW 3 */
+	PORT_START("DSW3")  /* DSW 3 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x01, "40000" )
@@ -979,19 +979,19 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_DIPSETTING(    0x00, "Endless" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 
-	PORT_START_TAG("DSW1")  /* DSW 1 */					/* Unused */
+	PORT_START("DSW1")  /* DSW 1 */					/* Unused */
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( buckrog )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Accel Hi
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Accel Lo
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
-	PORT_START_TAG("IN1")	/* Inputs */
+	PORT_START("IN1")	/* Inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1001,7 +1001,7 @@ static INPUT_PORTS_START( buckrog )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("DSW1")  /* DSW 1 */
+	PORT_START("DSW1")  /* DSW 1 */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
@@ -1027,7 +1027,7 @@ static INPUT_PORTS_START( buckrog )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW2")  /* DSW 2 */
+	PORT_START("DSW2")  /* DSW 2 */
 	PORT_DIPNAME( 0x01, 0x00, "Collisions" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1471,6 +1471,140 @@ ROM_START( buckrogn )
 	ROM_LOAD( "pr-5199.cpu-ic95", 0x0700, 0x0400, CRC(45e997a8) SHA1(023703b90b503310351b12157b1e732e61430fa5) )  /* sprite color table */
 ROM_END
 
+
+/*
+Buck Rogers Zoom 909 (early version of Buck Rogers Planet of Zoom)
+Sega, 1982
+
+PCB Layouts
+-----------
+
+Top
+---
+834-5122 (Sound Board)
+|------------------------------------------------------|
+|                                                      |
+|             4066  555     LM324  LM324  LM324        |
+|                                                      |
+| 7404  7407  4066  555 555 MB4391                     |
+|                                                      |
+| 40175 40175 7438  7439    MB4391 MB4391 LM324        |
+|                                                      |
+| 53323   53323  IR3702     IR3702 LM324  LM324  P138MM|
+|                                                5837N |
+| 53323   53323  53323      IR3702                     |
+|                                           LA4460 VOL |
+|------------------------------------------------------|
+Notes:
+      All IC's shown.
+
+
+Middle
+------
+834-5120  171-5011  CPU BOARD  (sticker 834-5142)
+|------------------------------------------------------|
+|D8279    D8255  EPR-5200  Z80   20MHz    SEGA         |
+|    PR-5199     6116                     315-5014     |
+|                                                      |
+|    EPR-5203  8264                                    |
+|              8264                       6116         |
+|              8264                          EPR-5217B |
+|                                                      |
+|                                         *  EPR-5218B |
+|2                                                     |
+|2    PR-5198                                          |
+|W                                                     |
+|A                                              2148   |
+|Y         6116                                        |
+|                                               2148   |
+|                          PR-5195  PR-5194            |
+|               PR-5197                         2148   |
+|      EPR-5201                                        |
+|                                               2148   |
+|      EPR-5202                                        |
+|                                                      |
+| DSW2  DSW1                                   PR-5196 |
+|                                                      |
+| D8255                                                |
+|                                                      |
+|------------------------------------------------------|
+Notes:
+      6116          : 2K  x8 SRAM
+      8264          : 64K x4 DRAM
+      2148          : 1K  x4 SRAM
+      Z80 clock     : 5.000MHz
+      315-5014 clock: measured 3.766MHz to 3.815MHz on pin6; moving slowly!? (NOTE! This is an encrypted Z80)
+      VSync         : 60Hz
+      VCO voltage   : 1.43 Volts
+                      Note! This is guessed to make the sprites a reasonable size. A shot of the title screen
+                      after coinup from a real machine would help to fix the real voltage and give the correct
+                      sprite sizes. Note in MAME the Buck Rogers title isn't centered because of the guessed
+                      voltage, though I'm sure it's very close.
+                      Is it like that on the real machine?
+
+      Label           ROM Type
+      EPR-5200.66     2732
+      EPR-5201.102    2716
+      EPR-5202.103    2716
+      EPR-5203.91     2764
+      EPR-5217B.3     27128
+      EPR-5218B.4     27128
+      PR-5194.39      TBP18S030 (compatible with 82S123)
+      PR-5195.53      TBP18S030 (compatible with 82S123)
+      PR-5196.10      TBP28S46N (compatible with 82S141)
+      PR-5197.78      TBP28S46N (compatible with 82S141)
+      PR-5198.93      TBP28S46N (compatible with 82S141)
+      PR-5199.95      82S181
+      *               Empty socket
+
+
+Bottom
+------
+(sticker 834-5151)  171-5012  ROM BOARD
+|------------------------------------------------------|
+|                                                      |
+|                                                      |
+| EPR-5214  EPR-5211  EPR-5208      *                  |
+|                                                      |
+| EPR-5215  EPR-5212  EPR-5209  EPR-5206               |
+|                                                      |
+|                                                      |
+|                                                      |
+|                                                      |
+|                                          NEC         |
+|                                          uPC624      |
+|                                                      |
+|                                               NEC    |
+|                                               C159A  |
+|                                                      |
+|                                          TL084  TL084|
+|                                                      |
+|                                                 4066 |
+|                                                 4066 |
+| EPR-5216  EPR-5213  EPR-5231  EPR-5207               |
+|                                                75365 |
+|    *          *         *         *            75365 |
+|                                                      |
+|                                                      |
+|------------------------------------------------------|
+Notes:
+      Label          ROM Type
+      EPR-5206.43    27128
+      EPR-5207.52    27128
+      EPR-5208.58    2764
+      EPR-5209.59    27128
+      EPR-5211.74    2764
+      EPR-5212.75    27128
+      EPR-5213.84    2764
+      EPR-5214.90    2764
+      EPR-5215.91    27128
+      EPR-5216.100   2764
+      EPR-5231.68    27128
+      *              Empty socket
+
+      Note! On my PCB, ROMs 58 and 74 match. It could be
+      wrong, but the PCB appears to work perfectly.
+*/
 
 ROM_START( zoom909 )
 	ROM_REGION( 0xc000, "main", 0 )

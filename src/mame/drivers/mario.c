@@ -94,8 +94,8 @@ write:
 
 #include "mario.h"
 
-static READ8_HANDLER(mario_dma_read_byte);
-static WRITE8_HANDLER(mario_dma_write_byte);
+static READ8_DEVICE_HANDLER(mario_dma_read_byte);
+static WRITE8_DEVICE_HANDLER(mario_dma_write_byte);
 
 /*************************************
  *
@@ -125,7 +125,7 @@ static const z80dma_interface mario_dma =
  *
  *************************************/
 
-static READ8_HANDLER(mario_dma_read_byte)
+static READ8_DEVICE_HANDLER(mario_dma_read_byte)
 {
 	UINT8 result;
 
@@ -136,7 +136,7 @@ static READ8_HANDLER(mario_dma_read_byte)
 	return result;
 }
 
-static WRITE8_HANDLER(mario_dma_write_byte)
+static WRITE8_DEVICE_HANDLER(mario_dma_write_byte)
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
@@ -199,7 +199,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( mario )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( mario )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( mario )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )	/* doesn't work in game, but does in service mode */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -241,7 +241,7 @@ static INPUT_PORTS_START( mario )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
 
-	PORT_START_TAG("MONITOR")
+	PORT_START("MONITOR")
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
 	PORT_CONFSETTING(    0x00, "Nintendo" )
 	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )

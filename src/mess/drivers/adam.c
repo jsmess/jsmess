@@ -223,7 +223,7 @@ ADDRESS_MAP_END
 #endif
 
 static INPUT_PORTS_START( adam )
-    PORT_START_TAG( "controller1_keypad1" )  /* IN0 */
+    PORT_START( "controller1_keypad1" )  /* IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Keypad 0") PORT_CODE(KEYCODE_0)         PORT_PLAYER(1)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Keypad 1") PORT_CODE(KEYCODE_1)         PORT_PLAYER(1)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 Keypad 2") PORT_CODE(KEYCODE_2)         PORT_PLAYER(1)
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( adam )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON11) PORT_NAME("P1 Keypad 6") PORT_CODE(KEYCODE_6)         PORT_PLAYER(1)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("P1 Keypad 7") PORT_CODE(KEYCODE_7)         PORT_PLAYER(1)
 
-    PORT_START_TAG( "controller1_keypad2" )  /* IN1 */
+    PORT_START( "controller1_keypad2" )  /* IN1 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13) PORT_NAME("P1 Keypad 8") PORT_CODE(KEYCODE_8)         PORT_PLAYER(1)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14) PORT_NAME("P1 Keypad 9") PORT_CODE(KEYCODE_9)         PORT_PLAYER(1)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON15) PORT_NAME("P1 Keypad #") PORT_CODE(KEYCODE_MINUS)     PORT_PLAYER(1)
@@ -241,7 +241,7 @@ static INPUT_PORTS_START( adam )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2 (SAC Red Button)")             PORT_PLAYER(1)
     PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START_TAG( "controller1_joystick" )  /* IN2 */
+    PORT_START( "controller1_joystick" )  /* IN2 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                   PORT_PLAYER(1) PORT_8WAY
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                PORT_PLAYER(1) PORT_8WAY
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                                 PORT_PLAYER(1) PORT_8WAY
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( adam )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1 (SAC Yellow Button)")          PORT_PLAYER(1)
     PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START_TAG( "controller2_keypad1" )  /* IN3 */
+    PORT_START( "controller2_keypad1" )  /* IN3 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Keypad 0") PORT_CODE(KEYCODE_0_PAD)     PORT_PLAYER(2)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Keypad 1") PORT_CODE(KEYCODE_1_PAD)     PORT_PLAYER(2)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P2 Keypad 2") PORT_CODE(KEYCODE_2_PAD)     PORT_PLAYER(2)
@@ -259,7 +259,7 @@ static INPUT_PORTS_START( adam )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON11) PORT_NAME("P2 Keypad 6") PORT_CODE(KEYCODE_6_PAD)     PORT_PLAYER(2)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("P2 Keypad 7") PORT_CODE(KEYCODE_7_PAD)     PORT_PLAYER(2)
 
-    PORT_START_TAG( "controller2_keypad2" )  /* IN4 */
+    PORT_START( "controller2_keypad2" )  /* IN4 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13) PORT_NAME("P2 Keypad 8") PORT_CODE(KEYCODE_8_PAD)     PORT_PLAYER(2)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14) PORT_NAME("P2 Keypad 9") PORT_CODE(KEYCODE_9_PAD)     PORT_PLAYER(2)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON15) PORT_NAME("P2 Keypad #") PORT_CODE(KEYCODE_MINUS_PAD) PORT_PLAYER(2)
@@ -267,7 +267,7 @@ static INPUT_PORTS_START( adam )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2)  PORT_NAME("P2 Button 2 (SAC Red Button)")             PORT_PLAYER(2)
     PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-    PORT_START_TAG( "controller2_joystick" )  /* IN5 */
+    PORT_START( "controller2_joystick" )  /* IN5 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)                                                    PORT_PLAYER(2) PORT_8WAY
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)                                                 PORT_PLAYER(2) PORT_8WAY
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)                                                  PORT_PLAYER(2) PORT_8WAY
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( adam )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P2 Button 1 (SAC Yellow Button)")           PORT_PLAYER(2)
     PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START_TAG( "controllers" ) /* IN6 */
+    PORT_START( "controllers" ) /* IN6 */
     PORT_CONFNAME(0x0F, 0x00, "Controllers")
     PORT_CONFSETTING(0x00, DEF_STR( None ) )
     PORT_CONFSETTING(0x01, "Driving Controller" )
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( adam )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("P2 SAC Blue Button")   PORT_CODE(KEYCODE_Q) PORT_PLAYER(2)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("P2 SAC Purple Button") PORT_CODE(KEYCODE_W) PORT_PLAYER(2)
 
-    PORT_START_TAG( "controller1_analog" ) /* IN7, to emulate Extra Controls (Driving Controller, SAC P1 slider, Roller Controller X Axis) */
+    PORT_START( "controller1_analog" ) /* IN7, to emulate Extra Controls (Driving Controller, SAC P1 slider, Roller Controller X Axis) */
     PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X) \
               PORT_SENSITIVITY(20) \
               PORT_KEYDELTA(10) \
@@ -297,7 +297,7 @@ static INPUT_PORTS_START( adam )
               PORT_PLAYER(1) \
               PORT_RESET
 
-    PORT_START_TAG( "controller2_analog" ) /* IN8, to emulate Extra Controls (SAC P2 slider, Roller Controller Y Axis) */
+    PORT_START( "controller2_analog" ) /* IN8, to emulate Extra Controls (SAC P2 slider, Roller Controller Y Axis) */
     PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X) \
               PORT_SENSITIVITY(20) \
               PORT_KEYDELTA(10) \
@@ -308,7 +308,7 @@ static INPUT_PORTS_START( adam )
 
 /* Keyboard with 75 Keys - TODO: Discover if the keys are actually organized this way on real hardware */
 
-	PORT_START_TAG("keyboard_1") /* IN9 0*/
+	PORT_START("keyboard_1") /* IN9 0*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Escape/WP")    PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
@@ -318,7 +318,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
 
-	PORT_START_TAG("keyboard_2") /* IN10 1*/
+	PORT_START("keyboard_2") /* IN10 1*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(8)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I') PORT_CHAR(9)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
@@ -328,7 +328,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
 
-	PORT_START_TAG("keyboard_3") /* IN11 2*/
+	PORT_START("keyboard_3") /* IN11 2*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
@@ -338,7 +338,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
 
-	PORT_START_TAG("keyboard_4") /* IN12 3*/
+	PORT_START("keyboard_4") /* IN12 3*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
@@ -348,7 +348,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('`')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
 
-	PORT_START_TAG("keyboard_5") /* IN13 4*/
+	PORT_START("keyboard_5") /* IN13 4*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@')
@@ -358,7 +358,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('_')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')
 
-	PORT_START_TAG("keyboard_6") /* IN14 5*/
+	PORT_START("keyboard_6") /* IN14 5*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('\"')
@@ -368,7 +368,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
 
-	PORT_START_TAG("keyboard_7") /* IN15 6*/
+	PORT_START("keyboard_7") /* IN15 6*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA0") PORT_CODE(KEYCODE_F3)         PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA1") PORT_CODE(KEYCODE_F4)         PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA2") PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F3))
@@ -378,7 +378,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")        PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")       PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 
-	PORT_START_TAG("keyboard_8") /* IN16 7*/
+	PORT_START("keyboard_8") /* IN16 7*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wild Card")    PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F7))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Undo")         PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Move/Copy")    PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(PGUP))
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clear")        PORT_CODE(KEYCODE_PGUP)       PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete")       PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
-	PORT_START_TAG("keyboard_9") /* IN17 8*/
+	PORT_START("keyboard_9") /* IN17 8*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Home")         PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA7") PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA9") PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -398,7 +398,7 @@ static INPUT_PORTS_START( adam )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 
-	PORT_START_TAG("keyboard_10") /* IN18 9*/
+	PORT_START("keyboard_10") /* IN18 9*/
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace")    PORT_CODE(KEYCODE_F10)        PORT_CHAR(8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Lock")         PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE

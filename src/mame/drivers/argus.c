@@ -424,7 +424,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( argus )
-	PORT_START_TAG("SYSTEM")	/* System control */
+	PORT_START("SYSTEM")	/* System control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -435,7 +435,7 @@ static INPUT_PORTS_START( argus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("P1")	 /* Player 1 control */
+	PORT_START("P1")	 /* Player 1 control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -445,7 +445,7 @@ static INPUT_PORTS_START( argus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("P2")	/* Player 2 control */
+	PORT_START("P2")	/* Player 2 control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -455,7 +455,7 @@ static INPUT_PORTS_START( argus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -479,7 +479,7 @@ static INPUT_PORTS_START( argus )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_START_TAG("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:8" )			/* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:7" )			/* Listed as "Unused" */
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW2:4,5,6")
@@ -967,6 +967,75 @@ ROM_START( butasan )
 	ROM_LOAD( "buta-01.prm",  0x00000, 0x00100, CRC(45baedd0) SHA1(afdafb67d55007e6fb99518657e27ce61d2cb7e6) )
 	ROM_LOAD( "buta-02.prm",  0x00100, 0x00100, CRC(0dcb18fc) SHA1(0b097b873c9484981f87a5e3d1af767f901ae05f) )
 ROM_END
+
+
+/*
+Bombs Away
+Jaleco, 1988
+
+PCB Layout
+----------
+
+BB-8744
+|------------------------------------------|
+|         1      Z80(1)          4         |
+|         6116      5MHz                  |-|
+|VOL      YM2203                 5        | |
+|4558     YM2203      Z80(2)              | |
+|4558 YM3014                     6        | |
+|     YM3014                              | |
+|J          6116                6264      | |
+|A                                        |-|
+|M                                         |
+|M                                         |
+|A                                        |-|
+|                                         | |
+|                                         | |
+|                2   62256                | |
+| DSW1                                    | |
+|                3   62256                | |
+| DSW2    82S137                          |-|
+|                                          |
+|------------------------------------------|
+Notes:
+      Z80(1) clock - 5.000MHz
+      Z80(2) clock - 6.000MHz [12/2]
+      YM2203 clock - 1.500MHz [12/8, both]
+      VSync - 54Hz
+      HSync - 15.25kHz
+
+
+BB-8745
+|--------------------------------|
+|                                |
+|                      |-----|  |-|
+|                      |N8633|  | |
+|                      |-S   |  | |
+|                      |-----|  | |
+|  82S123                       | |
+|              |-----|          | |
+|              |N8633|          |-|
+|              |-V   |           |
+|2018          |     |           |
+|2018        7 |6116 |    12MHz |-|
+|              |-----|          | |
+|      |-----|                  | |
+|      |N8633|                  | |
+|      |-V64 |                  | |
+|      |     |                  | |
+| 9  8 |6264 |                  |-|
+|      |-----|                   |
+|--------------------------------|
+Notes:
+      3 soldered-in 'modules' are located on this PCB.
+      N-8633-V 6-7 TOYOCOM
+      N-8633-V64 6-7 TOYOCOM
+      N-8633-S 6-7 TOYOCOM
+      The 2 larger ones have 62 pins, 31 pins on each side of a small PCB. The PCB contains some
+      surface mounted logic chips and some surface mounted RAM.
+      The smaller module has 40 pins, 20 pins on each side of a small PCB. The PCB contains only
+      logic on both sides.
+*/
 
 ROM_START( bombsa )
 	ROM_REGION( 0x30000, "main", 0 )					/* Main CPU */

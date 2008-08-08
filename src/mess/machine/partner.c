@@ -367,11 +367,21 @@ WRITE8_HANDLER (partner_mem_page_w )
 	partner_bank_switch(machine);
 }
 
-WRITE8_HANDLER(partner_dma_write_byte)
+WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset,data);
 	cpuintrf_pop_context();
+}
+
+static READ8_DEVICE_HANDLER ( partner_wd17xx_data_r )
+{
+	return wd17xx_data_r(device->machine, offset);
+}
+
+static WRITE8_DEVICE_HANDLER ( partner_wd17xx_data_w )
+{
+	wd17xx_data_w(device->machine, offset, data);
 }
 
 const dma8257_interface partner_dma =
@@ -382,8 +392,8 @@ const dma8257_interface partner_dma =
 	radio86_dma_read_byte,
 	partner_dma_write_byte,
 
-	{ wd17xx_data_r,  0, 0, 0 },
-	{ wd17xx_data_w, 0, radio86_write_video, 0 },
+	{ partner_wd17xx_data_r,  0, 0, 0 },
+	{ partner_wd17xx_data_w, 0, radio86_write_video, 0 },
 	{ 0, 0, 0, 0 }
 };
 

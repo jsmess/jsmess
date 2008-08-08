@@ -267,7 +267,7 @@ enum
 /* fake input ports with keyboard keys */
 static INPUT_PORTS_START(apexc)
 
-	PORT_START_TAG("panel")	/* 0 : panel control */
+	PORT_START("panel")	/* 0 : panel control */
 	PORT_BIT(panel_run, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Run/Stop")                PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(panel_CR,  IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Read CR")                 PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(panel_A,   IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Read A")                  PORT_CODE(KEYCODE_2_PAD)
@@ -277,7 +277,7 @@ static INPUT_PORTS_START(apexc)
 	PORT_BIT(panel_mem, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Read mem")                PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(panel_write, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Write instead of read") PORT_CODE(KEYCODE_LSHIFT)
 
-	PORT_START_TAG("data1")	/* 1 : data edit #1 */
+	PORT_START("data1")	/* 1 : data edit #1 */
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #1")              PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #2")              PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #3")              PORT_CODE(KEYCODE_3)
@@ -295,7 +295,7 @@ static INPUT_PORTS_START(apexc)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #15")             PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #16")             PORT_CODE(KEYCODE_Y)
 
-	PORT_START_TAG("data2")	/* 2 : data edit #2 */
+	PORT_START("data2")	/* 2 : data edit #2 */
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #17")             PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #18")             PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #19")             PORT_CODE(KEYCODE_O)

@@ -14,6 +14,7 @@
 #include "avcomp.h"
 #include "profiler.h"
 #include "streams.h"
+#include "vbiparse.h"
 #include "sound/custom.h"
 
 
@@ -23,6 +24,8 @@
 ***************************************************************************/
 
 #define PRINTF_COMMANDS				1
+
+#define LOG_POSITION(x)				/*printf x*/
 
 #define CMDPRINTF(x)				do { if (PRINTF_COMMANDS) mame_printf_debug x; } while (0)
 
@@ -87,7 +90,7 @@ typedef enum _playstate playstate;
 #define STOP_SPEED					INT_TO_FRAC(0)		/* no movement */
 #define PLAY_SPEED					INT_TO_FRAC(1)		/* regular playback speed */
 
-#define GENERIC_SPINUP_TIME			(attotime_make(3, 0))
+#define GENERIC_SPINUP_TIME			(attotime_make(5, 0))
 #define GENERIC_LOAD_TIME			(attotime_make(10, 0))
 #define GENERIC_RESET_SPEED			INT_TO_FRAC(5000)
 
@@ -99,10 +102,6 @@ typedef enum _playstate playstate;
 #define PR7820_SEARCH_SPEED			INT_TO_FRAC(5000)
 
 /* Pioneer PR-8210/LD-V1100 specific states */
-#define PR8210_MODE_GET_1ST			0
-#define PR8210_MODE_GET_2ND			1
-#define PR8210_MODE_GET_3RD			2
-
 #define PR8210_SCAN_SPEED			(INT_TO_FRAC(2000) / 30)
 #define PR8210_FAST_SPEED			(PLAY_SPEED * 3)
 #define PR8210_SLOW_SPEED			(PLAY_SPEED / 5)
@@ -156,9 +155,10 @@ typedef struct _pr8210_info pr8210_info;
 struct _pr8210_info
 {
 	UINT8				mode;					/* current mode */
-	UINT16				commandtriplet[3];		/* current command triplet */
-	attotime			commandtime;			/* command time */
-	UINT8				commandbits;			/* command bit count */
+	UINT8				lastcommand;			/* last command byte received */
+	UINT16				accumulator;			/* bit accumulator */
+	attotime			lastbittime;			/* time of last bit received */
+	attotime			firstbittime;			/* time of first bit in command */
 	UINT8				seekstate;				/* state of the seek command */
 };
 
@@ -173,7 +173,6 @@ struct _ldv1000_info
 	UINT32				readpos;				/* current read position */
 	UINT32				readtotal;				/* current read position */
 	UINT8				readbuf[256];			/* temporary read buffer */
-	UINT8				statusmask;				/* status bits mask */
 };
 
 
@@ -198,19 +197,6 @@ struct _vp932_info
 };
 
 
-/* per-field metadata */
-typedef struct _field_metadata field_metadata;
-struct _field_metadata
-{
-	UINT8				version;				/* version of the data */
-	UINT8				frameflags;				/* per-frame flags */
-	UINT8				whiteflag;				/* white flag */
-	UINT32				line16;					/* line 16 Philips code */
-	UINT32				line17;					/* line 17 Philips code */
-	UINT32				line18;					/* line 18 Philips code */
-};
-
-
 /* generic data */
 typedef struct _laserdisc_state laserdisc_state;
 struct _laserdisc_state
@@ -224,21 +210,24 @@ struct _laserdisc_state
 	UINT32				fieldnum;				/* field number (0 or 1) */
 
 	/* video data */
-	bitmap_t *			videoframe[2];			/* currently cached frames */
-	UINT8				videofields[2];			/* number of fields in each frame */
-	UINT32				videoframenum[2];		/* frame number contained in each frame */
+	bitmap_t *			videoframe[3];			/* currently cached frames */
+	bitmap_t *			videovisframe[3];		/* wrapper around videoframe with only visible lines */
+	UINT8				videofields[3];			/* number of fields in each frame */
+	UINT32				videoframenum[3];		/* frame number contained in each frame */
 	UINT8				videoindex;				/* index of the current video buffer */
 	bitmap_t *			emptyframe;				/* blank frame */
 
 	/* audio data */
+	laserdisc_audio_func audiocallback;			/* callback function for audio processing */
 	INT16 *				audiobuffer[2];			/* buffer for audio samples */
 	UINT32				audiobufsize;			/* size of buffer */
 	UINT32				audiobufin;				/* input index */
 	UINT32				audiobufout;			/* output index */
 	int					audiocustom;			/* custom sound index */
+	int					samplerate;				/* playback samplerate */
 
 	/* metadata */
-	field_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
+	vbi_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
 	int					last_frame;				/* last seen frame number */
 	int					last_chapter;			/* last seen chapter number */
 
@@ -274,6 +263,7 @@ struct _laserdisc_state
 
 	/* debugging */
 	char				text[100];				/* buffer for the state */
+	UINT8				lastbackslash;			/* state of last backslash key check */
 
 	/* filled in by player-specific init */
 	void 				(*writedata)(laserdisc_state *ld, UINT8 prev, UINT8 new); /* write callback */
@@ -311,8 +301,9 @@ struct _sound_token
 /* generic helper functions */
 static int update_position(laserdisc_state *ld);
 static void read_track_data(laserdisc_state *ld);
-static void process_track_data(laserdisc_state *ld);
-static int parse_metadata(const UINT8 *rawdata, UINT32 track, UINT8 which, field_metadata *metadata);
+static void process_track_data(const device_config *device);
+static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata);
+static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame);
 static void *custom_start(int clock, const struct CustomSound_interface *config);
 static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
@@ -363,6 +354,100 @@ static void vp932_state_changed(laserdisc_state *ld, UINT8 oldstate);
 const struct CustomSound_interface laserdisc_custom_interface =
 {
 	custom_start
+};
+
+static const UINT8 numberfont[10][8] =
+{
+	{
+		0x30,	// ..xx....
+		0x48,	// .x..x...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x48,	// .x..x...
+		0x30	// ..xx....
+	},
+	{
+		0x10,	// ...x....
+		0x30,	// ..xx....
+		0x50,	// .x.x....
+		0x10,	// ...x....
+		0x10,	// ...x....
+		0x10,	// ...x....
+		0x7c	// .xxxxx..
+	},
+	{
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x04,	// .....x..
+		0x38,	// ..xxx...
+		0x40,	// .x......
+		0x80,	// x.......
+		0xfc	// xxxxxx..
+	},
+	{
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x04,	// .....x..
+		0x38,	// ..xxx...
+		0x04,	// .....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0x08,	// ....x...
+		0x18,	// ...xx...
+		0x28,	// ..x.x...
+		0x48,	// .x..x...
+		0xfc,	// xxxxxx..
+		0x08,	// ....x...
+		0x08	// ....x...
+	},
+	{
+		0xfc,	// xxxxxx..
+		0x80,	// x.......
+		0x80,	// x.......
+		0xf8,	// xxxxx...
+		0x04,	// .....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0x38,	// ..xxx...
+		0x40,	// .x......
+		0x80,	// x.......
+		0xf8,	// xxxxx...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0xfc,	// xxxxxx..
+		0x04,	// .....x..
+		0x08,	// ....x...
+		0x10,	// ...x....
+		0x20,	// ..x.....
+		0x20,	// ..x.....
+		0x20	// ..x.....
+	},
+	{
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0x78,	// .xxxx..
+		0x84,	// x....x.
+		0x84,	// x....x.
+		0x7c,	// .xxxxx.
+		0x04,	// .....x.
+		0x08,	// ....x..
+		0x70,	// .xxx...
+	}
 };
 
 
@@ -566,6 +651,19 @@ INLINE void set_hold_state(laserdisc_state *ld, attotime holdtime, playstate sta
 
 
 /*-------------------------------------------------
+    reset_tracknum - reset the current track
+    number to 1 and clear out other state
+-------------------------------------------------*/
+
+INLINE void reset_tracknum(laserdisc_state *ld)
+{
+	ld->curfractrack = ONE_TRACK;
+	ld->last_frame = 0;
+	ld->last_chapter = 0;
+}
+
+
+/*-------------------------------------------------
     add_to_current_track - add a value to the
     current track, stopping if we hit the min or
     max
@@ -593,14 +691,16 @@ INLINE int add_to_current_track(laserdisc_state *ld, INT32 delta)
     encoded in the metadata, if present, or -1
 -------------------------------------------------*/
 
-INLINE int frame_from_metadata(const field_metadata *metadata)
+INLINE int frame_from_metadata(const vbi_metadata *metadata)
 {
 	UINT32 data;
 
-	if ((metadata->line17 & 0xf80000) == 0xf80000)
-		data = metadata->line17 & 0x7ffff;
-	else if ((metadata->line18 & 0xf80000) == 0xf80000)
-		data = metadata->line18 & 0x7ffff;
+	if ((metadata->line1718 & 0xf80000) == 0xf80000)
+		data = metadata->line1718 & 0x7ffff;
+	else if (metadata->line1718 == 0x88ffff)
+		return 0;
+	else if (metadata->line1718 == 0x80eeee)
+		return 99999;
 	else
 		return -1;
 
@@ -614,14 +714,12 @@ INLINE int frame_from_metadata(const field_metadata *metadata)
     or -1
 -------------------------------------------------*/
 
-INLINE int chapter_from_metadata(const field_metadata *metadata)
+INLINE int chapter_from_metadata(const vbi_metadata *metadata)
 {
 	UINT32 data;
 
-	if ((metadata->line17 & 0xf00fff) == 0x800ddd)
-		data = metadata->line17 & 0x7f000;
-	else if ((metadata->line18 & 0xf00fff) == 0x800ddd)
-		data = metadata->line18 & 0x7f000;
+	if ((metadata->line1718 & 0xf00fff) == 0x800ddd)
+		data = metadata->line1718 & 0x7f000;
 	else
 		return -1;
 
@@ -691,6 +789,13 @@ void laserdisc_vsync(const device_config *device)
 	laserdisc_state *ld = get_safe_token(device);
 	UINT8 origstate = ld->state;
 	UINT8 hittarget;
+	int backslash;
+
+	/* allow the backslash key to toggle the frame display */
+	backslash = input_code_pressed(KEYCODE_BACKSLASH);
+	if (!ld->lastbackslash && backslash)
+		ld->display ^= 1;
+	ld->lastbackslash = backslash;
 
 	/* remember the time */
 	ld->lastvsynctime = timer_get_time();
@@ -707,7 +812,7 @@ void laserdisc_vsync(const device_config *device)
 	}
 
 	/* wait for previous read and decode to finish */
-	process_track_data(ld);
+	process_track_data(device);
 
 	/* update our position for this field */
 	hittarget = update_position(ld);
@@ -937,7 +1042,7 @@ UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
 	/* determine the most recent live set of frames */
 	frameindex = ld->videoindex;
 	if (ld->videofields[frameindex] < 2)
-		frameindex ^= 1;
+		frameindex = (frameindex + ARRAY_LENGTH(ld->videofields) - 1) % ARRAY_LENGTH(ld->videofields);
 
 	/* if no video present, return the empty frame */
 	if (!video_active(ld) || ld->videofields[frameindex] < 2)
@@ -947,7 +1052,7 @@ UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
 	}
 	else
 	{
-		*bitmap = ld->videoframe[frameindex];
+		*bitmap = ld->videovisframe[frameindex];
 		return ld->videoframenum[frameindex];
 	}
 }
@@ -969,11 +1074,8 @@ UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code)
 
 	switch (code)
 	{
-		case LASERDISC_CODE_FRAME_FLAGS:
-			return ld->metadata[field].frameflags;
-
 		case LASERDISC_CODE_WHITE_FLAG:
-			return ld->metadata[field].whiteflag;
+			return ld->metadata[field].white;
 
 		case LASERDISC_CODE_LINE16:
 			return ld->metadata[field].line16;
@@ -1039,30 +1141,52 @@ static int update_position(laserdisc_state *ld)
 		if (ld->targetframe == 0)
 			return TRUE;
 
-		/* if we didn't get any frame information this field, move onto the next */
-		if (frame == -1)
-		{
-			/* if we're in the lead-in section, advance more aggressively */
-			if (ld->metadata[fieldnum].line17 == 0x88ffff || ld->metadata[fieldnum].line18 == 0x88ffff)
-				add_to_current_track(ld, 10 * ONE_TRACK);
+		LOG_POSITION(("%d:track=%5d frame=%5d target=%5d ... ", fieldnum, tracknum, frame, ld->targetframe));
 
-			/* if we're on the second field of a frame, the next frame is on the next track */
-			/* but don't do it if we're seeking to frame 1, since that might be the very first frame */
-			else if (fieldnum == 1 && (ld->last_frame == 1 || ld->targetframe != 1))
-				add_to_current_track(ld, ONE_TRACK);
-			return FALSE;
-		}
-
-		/* if we hit our frame, we're done */
-		if (frame == ld->targetframe)
+		/* if we hit the first field of our frame, we're done */
+		if (ld->last_frame == ld->targetframe && frame_from_metadata(&ld->metadata[fieldnum ^ 1]) == ld->targetframe && ld->metadata[fieldnum ^ 1].white)
 		{
 			ld->curfractrack = INT_TO_FRAC(tracknum);
+			LOG_POSITION(("hit target\n"));
 			return TRUE;
 		}
 
-		/* determine the frame delta and direction */
-		framedelta = ld->targetframe - frame;
-		direction = (framedelta < 0) ? -1 : 1;
+		/* if we didn't get any frame information this field, move onto the next */
+		if (frame == -1)
+		{
+			/* if we're on the second field of a frame, the next frame is on the next track */
+			/* but don't do it if we're seeking to frame 1, since that might be the very first frame */
+			if (fieldnum == 1)
+			{
+				add_to_current_track(ld, ONE_TRACK);
+				LOG_POSITION(("on 2nd field, going to next track\n"));
+			}
+			else
+				LOG_POSITION(("no metadata; waiting for next field\n"));
+			return FALSE;
+		}
+
+		/* if we're in the lead-in or lead-out sections, advance more aggressively */
+		if (frame == 0)
+		{
+			LOG_POSITION(("in lead-in, advancing by 1\n"));
+			if (fieldnum == 1)
+				add_to_current_track(ld, 1 * ONE_TRACK);
+			return FALSE;
+		}
+		if (frame == 99999)
+		{
+			LOG_POSITION(("in lead-out, advancing by 10\n"));
+			add_to_current_track(ld, -10 * ONE_TRACK);
+			return FALSE;
+		}
+
+		/* determine the frame delta and direction; for backwards seeks, aim to overshoot by 1 frame */
+		if (ld->targetframe < frame && ld->targetframe != 1)
+			framedelta = ld->targetframe - 1 - frame;
+		else
+			framedelta = ld->targetframe - frame;
+		direction = (framedelta <= 0) ? -1 : 1;
 
 		/* if we're going backwards, go back at least 2 frames since we tend to move forward */
 		if (framedelta == -1)
@@ -1077,6 +1201,7 @@ static int update_position(laserdisc_state *ld)
 		framedelta = INT_TO_FRAC(abs(framedelta));
 
 		/* determine the stepdelta */
+		LOG_POSITION(("advancing by %08X\n", MIN(framedelta, speed / 2) * direction));
 		add_to_current_track(ld, MIN(framedelta, speed / 2) * direction);
 		return FALSE;
 	}
@@ -1137,30 +1262,24 @@ static void read_track_data(laserdisc_state *ld)
 	chd_error err;
 
 	/* initialize the decompression structure */
-	ld->avconfig.decode_mask = AVCOMP_DECODE_META;
-	ld->avconfig.video_buffer = NULL;
+	ld->avconfig.decode_mask = AVCOMP_DECODE_VIDEO;
 	ld->avconfig.video_xor = BYTE_XOR_LE(0);
 	ld->avconfig.audio_xor = BYTE_XOR_BE(0);
 
-	/* if video is active, enable video decoding */
-	if (video_active(ld))
-	{
-		/* if the flags on the previous field indicate that the next field
-           is part of the same frame, then keep steady; otherwise, bump to
-           the next videoindex */
-		if (ld->videofields[ld->videoindex] > 0 && !(ld->metadata[fieldnum ^ 1].frameflags & FRAMEFLAG_NEXT_SAME_FRAME))
-		{
-			ld->videoindex ^= 1;
-			ld->videofields[ld->videoindex] = 0;
-		}
+	/* if the previous field had the white flag, force the new field to pair with it */
+	if (ld->metadata[fieldnum ^ 1].white)
+		ld->videofields[ld->videoindex] = 1;
 
-		/* enable video and configure it to read into the videoframe */
-		ld->avconfig.decode_mask |= AVCOMP_DECODE_VIDEO;
-		ld->avconfig.video_buffer = (UINT8 *)BITMAP_ADDR16(ld->videoframe[ld->videoindex], fieldnum, 0);
-		ld->avconfig.video_stride = 4 * ld->videoframe[ld->videoindex]->rowpixels;
+	/* if we already have both fields on the current videoindex, advance */
+	if (ld->videofields[ld->videoindex] >= 2)
+	{
+		ld->videoindex = (ld->videoindex + 1) % ARRAY_LENGTH(ld->videofields);
+		ld->videofields[ld->videoindex] = 0;
 	}
-	else
-		ld->videofields[0] = ld->videofields[1] = 0;
+
+	/* set the video buffer information */
+	ld->avconfig.video_buffer = (UINT8 *)BITMAP_ADDR16(ld->videoframe[ld->videoindex], fieldnum, 0);
+	ld->avconfig.video_stride = 4 * ld->videoframe[ld->videoindex]->rowpixels;
 
 	/* if audio is active, enable audio decoding */
 	if (audio_channel_active(ld, 0))
@@ -1186,8 +1305,9 @@ static void read_track_data(laserdisc_state *ld)
     track after it has been read
 -------------------------------------------------*/
 
-static void process_track_data(laserdisc_state *ld)
+static void process_track_data(const device_config *device)
 {
+	laserdisc_state *ld = get_safe_token(device);
 	UINT32 tracknum = FRAC_TO_INT(ld->curfractrack);
 	UINT32 fieldnum = ld->fieldnum & 1;
 	const UINT8 *rawdata = NULL;
@@ -1207,15 +1327,23 @@ static void process_track_data(laserdisc_state *ld)
 	ld->readpending = FALSE;
 
 	/* parse the metadata */
-	parse_metadata(rawdata, tracknum, fieldnum, &ld->metadata[fieldnum]);
+	if (ld->disc != NULL && ld->avconfig.video_buffer != NULL)
+		vbi_parse_all((const UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, 8, &ld->metadata[fieldnum]);
+	else
+		fake_metadata(tracknum, fieldnum, &ld->metadata[fieldnum]);
+//  printf("Track %5d: Metadata = %d %08X %08X %08X %08X\n", tracknum, ld->metadata[fieldnum].white, ld->metadata[fieldnum].line16, ld->metadata[fieldnum].line17, ld->metadata[fieldnum].line18, ld->metadata[fieldnum].line1718);
 
 	/* update the last seen frame and chapter */
 	frame = frame_from_metadata(&ld->metadata[fieldnum]);
-	if (frame != -1)
+	if (frame >= 1 && frame < 99999)
 		ld->last_frame = frame;
 	chapter = chapter_from_metadata(&ld->metadata[fieldnum]);
 	if (chapter != -1)
 		ld->last_chapter = chapter;
+
+	/* render the display if present */
+	if (ld->display)
+		render_display((UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, ld->last_frame);
 
 	/* update video ld */
 	if (rawdata != NULL && (ld->avconfig.decode_mask & AVCOMP_DECODE_VIDEO))
@@ -1230,6 +1358,10 @@ static void process_track_data(laserdisc_state *ld)
 		samples = (rawdata[6] << 8) + rawdata[7];
 		sampsource[0] = (const INT16 *)(rawdata + 12 + rawdata[4]) + 0 * samples;
 		sampsource[1] = sampsource[0] + samples;
+
+		/* let the audio callback at it first */
+		if (ld->audiocallback != NULL)
+			(*ld->audiocallback)(device, ld->samplerate, samples, sampsource[0], sampsource[1]);
 
 		/* loop until all samples are copied */
 		while (samples != 0)
@@ -1268,49 +1400,82 @@ static void process_track_data(laserdisc_state *ld)
 
 
 /*-------------------------------------------------
-    parse_metadata - parse raw metadata into
-    something more useful
+    fake_metadata - fake metadata when there's
+    no disc present
 -------------------------------------------------*/
 
-static int parse_metadata(const UINT8 *rawdata, UINT32 track, UINT8 which, field_metadata *metadata)
+static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata)
 {
-	/* verify we have data to parse */
-	if (rawdata == NULL || rawdata[4] < 1)
-		goto fakeit;
-
-	/* first byte is the version */
-	metadata->version = rawdata[12+0];
-
-	/* version 1 data */
-	if (metadata->version == 2 && rawdata[4] == 12)
-	{
-		/*
-            1 byte = version
-            1 byte = internal flags
-               D0 = prev field is same frame
-               D1 = next field is same frame
-            1 byte = white flag
-            3 bytes = line 16 Philips code
-            3 bytes = line 17 Philips code
-            3 bytes = line 18 Philips code
-        */
-		metadata->frameflags = rawdata[12+1];
-		metadata->whiteflag = rawdata[12+2];
-		metadata->line16 = (rawdata[12+3] << 16) | (rawdata[12+4] << 8) | rawdata[12+5];
-		metadata->line17 = (rawdata[12+6] << 16) | (rawdata[12+7] << 8) | rawdata[12+8];
-		metadata->line18 = (rawdata[12+9] << 16) | (rawdata[12+10] << 8) | rawdata[12+11];
-		return TRUE;
-	}
-
-fakeit:
-	metadata->frameflags = (which == 0) ? 0x02 : 0x01;
-	metadata->whiteflag = (which == 0) ? 1 : 0;
-	metadata->line16 = 0x000000;
 	if (which == 0)
-		metadata->line17 = metadata->line18 = 0xf80000 | (((track / 10000) % 10) << 16) | (((track / 1000) % 10) << 12) | (((track / 100) % 10) << 8) | (((track / 10) % 10) << 4) | (track % 10);
+	{
+		metadata->white = 1;
+		metadata->line16 = 0;
+		metadata->line17 = metadata->line18 = 0xf80000 |
+				(((track / 10000) % 10) << 16) |
+				(((track / 1000) % 10) << 12) |
+				(((track / 100) % 10) << 8) |
+				(((track / 10) % 10) << 4) |
+				(((track / 1) % 10) << 0);
+	}
 	else
-		metadata->line17 = metadata->line18 = 0x000000;
-	return FALSE;
+		memset(metadata, 0, sizeof(*metadata));
+}
+
+
+/*-------------------------------------------------
+    render_display - draw the frame display
+-------------------------------------------------*/
+
+static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame)
+{
+	const int xscale = 4, yscale = 2;
+	char buffer[10];
+	int x = width / 10;
+	int y = 50;
+	int ch;
+	int delta;
+
+	/* do nothing if no data */
+	if (videodata == NULL)
+		return;
+
+	/* convert to a character string and render */
+	sprintf(buffer, "%5d", frame);
+
+	/* iterate over 5 positions: (-1,-1), (-1,1), (1,-1), (1,1) and (0,0) */
+	/* render all in black except the last one */
+	for (delta = 0; delta < 5; delta++)
+	{
+		int color = (delta < 4) ? 0x0080 : 0xff80;
+		int dx = (delta < 4) ? ((delta & 1) ? -1 : 1) : 0;
+		int dy = (delta < 4) ? ((delta & 2) ? -1 : 1) : 0;
+
+		/* iterate over 5 characters */
+		for (ch = 0; ch < 5; ch++)
+			if (buffer[ch] >= '0' && buffer[ch] <= '9')
+			{
+				const UINT8 *fontdata = &numberfont[buffer[ch] - '0'][0];
+				int cy, cx;
+
+				/* iterate over the rows of the character */
+				for (cy = 0; cy < 8; cy++)
+				{
+					UINT8 bits = *fontdata++;
+
+					/* and over the columns */
+					for (cx = 0; cx < 8; cx++)
+						if (bits & (0x80 >> cx))
+						{
+							int ix, iy;
+
+							/* fill in an xscale x yscale pixel */
+							for (iy = 0; iy < yscale; iy++)
+								for (ix = 0; ix < xscale; ix++)
+									videodata[(y + cy * yscale + iy + dy) * rowpixels + (x + (ch * 9 + cx) * xscale + ix + dx)] = color;
+						}
+				}
+			}
+	}
 }
 
 
@@ -1322,7 +1487,7 @@ fakeit:
 static void *custom_start(int clock, const struct CustomSound_interface *config)
 {
 	sound_token *token = auto_malloc(sizeof(*token));
-	token->stream = stream_create(0, 2, 44100, token, custom_stream_callback);
+	token->stream = stream_create(0, 2, 48000, token, custom_stream_callback);
 	token->ld = NULL;
 	return token;
 }
@@ -1400,22 +1565,25 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
     device start callback
 -------------------------------------------------*/
 
-static DEVICE_START( laserdisc )
+static DEVICE_START(laserdisc)
 {
-	int fps = 30, fpsfrac = 0, width = 720, height = 240, interlaced = 1, channels = 2, rate = 44100, metabytes = 0;
+	int fps = 30, fpsfrac = 0, width = 720, height = 240, interlaced = 1, channels = 2, rate = 44100;
 	const laserdisc_config *config = device->inline_config;
 	UINT32 fps_times_1million, max_samples_per_track;
 	laserdisc_state *ld = get_safe_token(device);
 	char metadata[256];
 	chd_error err;
-	int sndnum;
+	int sndnum, index;
 
 	/* copy config data to the live state */
 	ld->type = config->type;
-	ld->disc = get_disk_handle(config->disknum);
+	ld->audiocallback = config->audio;
+
+	/* find the disc */
+	ld->disc = get_disk_handle(device->tag);
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, config->soundtag) == 0)
-			ld->audiocustom = sndnum;
+		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, device->tag) == 0)
+			sndnum_to_sndti(sndnum, &ld->audiocustom);
 
 	/* get the disc metadata and extract the ld */
 	if (ld->disc != NULL)
@@ -1428,7 +1596,7 @@ static DEVICE_START( laserdisc )
 		err = chd_get_metadata(ld->disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
 		if (err != CHDERR_NONE)
 			fatalerror("Non-A/V CHD file specified");
-		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate, &metabytes) != 8)
+		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 			fatalerror("Invalid metadata in CHD file");
 
 		/* require interlaced video */
@@ -1443,10 +1611,15 @@ static DEVICE_START( laserdisc )
 		ld->maxfractrack = INT_TO_FRAC(54000);
 
 	/* allocate video frames */
-	ld->videoframe[0] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
-	fillbitmap_yuy16(ld->videoframe[0], 40, 109, 240);
-	ld->videoframe[1] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
-	fillbitmap_yuy16(ld->videoframe[1], 40, 109, 240);
+	for (index = 0; index < ARRAY_LENGTH(ld->videofields); index++)
+	{
+		ld->videoframe[index] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
+		ld->videovisframe[index] = auto_malloc(sizeof(*ld->videovisframe[index]));
+		*ld->videovisframe[index] = *ld->videoframe[index];
+		ld->videovisframe[index]->base = BITMAP_ADDR16(ld->videovisframe[index], 44, 0);
+		ld->videovisframe[index]->height -= 44;
+		fillbitmap_yuy16(ld->videoframe[index], 40, 109, 240);
+	}
 	ld->emptyframe = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
 	fillbitmap_yuy16(ld->emptyframe, 0, 128, 128);
 
@@ -1456,14 +1629,7 @@ static DEVICE_START( laserdisc )
 	ld->audiobufsize = max_samples_per_track * 4;
 	ld->audiobuffer[0] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[0][0]));
 	ld->audiobuffer[1] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[1][0]));
-
-	/* attempt to wire up the audio */
-	if (sndti_exists(SOUND_CUSTOM, ld->audiocustom))
-	{
-		sound_token *token = custom_get_token(ld->audiocustom);
-		token->ld = ld;
-		stream_set_sample_rate(token->stream, rate);
-	}
+	ld->samplerate = rate;
 }
 
 
@@ -1471,7 +1637,7 @@ static DEVICE_START( laserdisc )
     device exit callback
 -------------------------------------------------*/
 
-static DEVICE_STOP( laserdisc )
+static DEVICE_STOP(laserdisc)
 {
 	laserdisc_state *ld = get_safe_token(device);
 
@@ -1489,6 +1655,14 @@ static DEVICE_RESET( laserdisc )
 {
 	laserdisc_state *ld = get_safe_token(device);
 	int i;
+
+	/* attempt to wire up the audio */
+	if (sndti_exists(SOUND_CUSTOM, ld->audiocustom))
+	{
+		sound_token *token = custom_get_token(ld->audiocustom);
+		token->ld = ld;
+		stream_set_sample_rate(token->stream, ld->samplerate);
+	}
 
 	/* set up the general ld */
 	ld->video = VIDEO_ENABLE;
@@ -1540,7 +1714,7 @@ static DEVICE_RESET( laserdisc )
 	}
 
 	/* default to track 1 */
-	ld->curfractrack = ONE_TRACK;
+	reset_tracknum(ld);
 }
 
 
@@ -1548,7 +1722,7 @@ static DEVICE_RESET( laserdisc )
     device set info callback
 -------------------------------------------------*/
 
-static DEVICE_SET_INFO( laserdisc )
+static DEVICE_SET_INFO(laserdisc)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	switch (state)
@@ -1569,7 +1743,7 @@ static DEVICE_SET_INFO( laserdisc )
     device get info callback
 -------------------------------------------------*/
 
-DEVICE_GET_INFO( laserdisc )
+DEVICE_GET_INFO(laserdisc)
 {
 	const laserdisc_config *config = (device != NULL) ? device->inline_config : NULL;
 	switch (state)
@@ -1910,8 +2084,7 @@ static void pr7820_enter_w(laserdisc_state *ld, UINT8 newstate)
 					set_state(ld, LASERDISC_LOADING, STOP_SPEED, NULL_TARGET_FRAME);
 					set_hold_state(ld, GENERIC_LOAD_TIME, LASERDISC_PLAYING_FORWARD, PLAY_SPEED);
 				}
-
-				ld->curfractrack = ONE_TRACK;
+				reset_tracknum(ld);
 			}
 			break;
 
@@ -2044,10 +2217,9 @@ static void pr8210_soft_reset(laserdisc_state *ld)
 
 	ld->audio = AUDIO_CH1_ENABLE  | AUDIO_CH2_ENABLE;
 	ld->display = 0;
-	pr8210->mode = PR8210_MODE_GET_1ST;
-	pr8210->commandtime = timer_get_time();
-	pr8210->commandbits = 0;
-	memset( pr8210->commandtriplet, 0, 3*sizeof(UINT16) );
+	pr8210->firstbittime = pr8210->lastbittime = timer_get_time();
+	pr8210->accumulator = 0;
+	pr8210->lastcommand = 0;
 	pr8210->seekstate = 0;
 }
 
@@ -2059,187 +2231,156 @@ static void pr8210_soft_reset(laserdisc_state *ld)
 
 static void pr8210_command(laserdisc_state *ld)
 {
+	static const UINT8 numbers[10] = { 0x01,0x11,0x09,0x19,0x05,0x15,0x0d,0x1d,0x03,0x13 };
 	pr8210_info *pr8210 = &ld->u.pr8210;
+	UINT8 cmd = pr8210->lastcommand;
 
-	/* if we don't have the entire command triplet yet, keep going */
-	if ( pr8210->mode < PR8210_MODE_GET_3RD )
+	/* look for and process numbers */
+	if (!process_number(ld, cmd, numbers))
 	{
-		/* do some sanity checks on the command data */
-		if ( pr8210->mode == PR8210_MODE_GET_2ND )
+		switch(cmd)
 		{
-			/* if the commands don't match, then reassign the new command to the first word, then keep fetching */
-			if ( pr8210->commandtriplet[PR8210_MODE_GET_1ST] != pr8210->commandtriplet[PR8210_MODE_GET_2ND] )
-			{
-				pr8210->commandtriplet[PR8210_MODE_GET_1ST] = pr8210->commandtriplet[PR8210_MODE_GET_2ND];
-				pr8210->mode = PR8210_MODE_GET_2ND;
-				return;
-			}
-		}
+			case 0x00:	CMDPRINTF(("pr8210: EOC\n"));
+				/* EOC marker - can be safely ignored */
+				break;
 
-		pr8210->mode++;
-	}
-	else /* we're ready to process the command */
-	{
-		/* do some sanity checks on the command data */
-		static const UINT8 numbers[10] = { 0x01,0x11,0x09,0x19,0x05,0x15,0x0d,0x1d,0x03,0x13 };
-		UINT16	cmd = pr8210->commandtriplet[PR8210_MODE_GET_1ST];
+			case 0x02:	CMDPRINTF(("pr8210: Slow reverse\n"));
+				/* slow reverse */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_PLAYING_SLOW_REVERSE, -PR8210_SLOW_SPEED, NULL_TARGET_FRAME);
+				break;
 
-		/* more sanity checking: bit 7 must be set for a valid command */
-		if ( cmd & 0x80 )
-		{
-			/* extract the actual command number */
-			cmd = ( cmd >> 2 ) & 0x1f;
+			case 0x04:	CMDPRINTF(("pr8210: Step forward\n"));
+				/* step forward */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_STEPPING_FORWARD, PR8210_STEP_SPEED, NULL_TARGET_FRAME);
+				break;
 
-			/* look for and process numbers */
-			if (!process_number(ld, cmd, numbers))
-			{
-				switch( cmd )
+			case 0x06 :	CMDPRINTF(("pr8210: Chapter\n"));
+				/* chapter -- not implemented */
+				break;
+
+			case 0x08:	CMDPRINTF(("pr8210: Scan forward\n"));
+				/* scan forward */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_SCANNING_FORWARD, PR8210_SCAN_SPEED, NULL_TARGET_FRAME);
+				break;
+
+			case 0x0a:	CMDPRINTF(("pr8210: Pause\n"));
+				/* still picture */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_STOPPED, STOP_SPEED, NULL_TARGET_FRAME);
+				break;
+
+			case 0x0b :	CMDPRINTF(("pr8210: Frame\n"));
+				/* frame -- not implemented */
+				break;
+
+			case 0x0c:	CMDPRINTF(("pr8210: Fast reverse\n"));
+				/* play reverse fast speed */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_PLAYING_FAST_REVERSE, -PR8210_FAST_SPEED, NULL_TARGET_FRAME);
+				break;
+
+			case 0x0e:	CMDPRINTF(("pr8210: Ch1 toggle\n"));
+				/* channel 1 audio toggle */
+				ld->audio ^= AUDIO_CH1_ENABLE;
+				break;
+
+			case 0x10:	CMDPRINTF(("pr8210: Fast forward\n"));
+				/* play forward fast speed */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_PLAYING_FAST_FORWARD, PR8210_FAST_SPEED, NULL_TARGET_FRAME);
+				break;
+
+			case 0x12:	CMDPRINTF(("pr8210: Step reverse\n"));
+				/* step backwards one frame */
+				if (laserdisc_ready(ld))
 				{
-					case 0x00:	CMDPRINTF(("pr8210: EOC\n"));
-						/* EOC marker - can be safely ignored */
-						break;
-
-					case 0x02:	CMDPRINTF(("pr8210: Slow reverse\n"));
-						/* slow reverse */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_PLAYING_SLOW_REVERSE, -PR8210_SLOW_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x04:	CMDPRINTF(("pr8210: Step forward\n"));
-						/* step forward */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_STEPPING_FORWARD, PR8210_STEP_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x06 :	CMDPRINTF(("pr8210: Chapter\n"));
-						/* chapter -- not implemented */
-						break;
-
-					case 0x08:	CMDPRINTF(("pr8210: Scan forward\n"));
-						/* scan forward */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_SCANNING_FORWARD, PR8210_SCAN_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x0a:	CMDPRINTF(("pr8210: Pause\n"));
-						/* still picture */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_STOPPED, STOP_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x0b :	CMDPRINTF(("pr8210: Frame\n"));
-						/* frame -- not implemented */
-						break;
-
-					case 0x0c:	CMDPRINTF(("pr8210: Fast reverse\n"));
-						/* play reverse fast speed */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_PLAYING_FAST_REVERSE, -PR8210_FAST_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x0e:	CMDPRINTF(("pr8210: Ch1 toggle\n"));
-						/* channel 1 audio toggle */
-						ld->audio ^= AUDIO_CH1_ENABLE;
-						break;
-
-					case 0x10:	CMDPRINTF(("pr8210: Fast forward\n"));
-						/* play forward fast speed */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_PLAYING_FAST_FORWARD, PR8210_FAST_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x12:	CMDPRINTF(("pr8210: Step reverse\n"));
-						/* step backwards one frame */
-						if (laserdisc_ready(ld))
-						{
-							set_state(ld, LASERDISC_STEPPING_REVERSE, STOP_SPEED, NULL_TARGET_FRAME);
-							add_to_current_track(ld, -ONE_TRACK);
-						}
-						break;
-
-					case 0x14:  CMDPRINTF(("pr8210: Play\n"));
-						/* begin playing at regular speed, or load the disc if it is parked */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_PLAYING_FORWARD, PLAY_SPEED, NULL_TARGET_FRAME);
-						else
-						{
-							/* if we're already spinning up or loading, ignore */
-							if (ld->state != LASERDISC_SPINUP && ld->state != LASERDISC_LOADING)
-							{
-								if (ld->state == LASERDISC_PARKED)
-								{
-									set_state(ld, LASERDISC_SPINUP, STOP_SPEED, NULL_TARGET_FRAME);
-									set_hold_state(ld, GENERIC_SPINUP_TIME, LASERDISC_PLAYING_FORWARD, PLAY_SPEED);
-								}
-								else
-								{
-									set_state(ld, LASERDISC_LOADING, STOP_SPEED, NULL_TARGET_FRAME);
-									set_hold_state(ld, GENERIC_LOAD_TIME, LASERDISC_PLAYING_FORWARD, PLAY_SPEED);
-								}
-
-								ld->curfractrack = ONE_TRACK;
-							}
-						}
-						break;
-
-					case 0x16:	CMDPRINTF(("pr8210: Ch2 toggle\n"));
-						/* channel 1 audio toggle */
-						ld->audio ^= AUDIO_CH2_ENABLE;
-						break;
-
-					case 0x18:	CMDPRINTF(("pr8210: Slow forward\n"));
-						/* slow forward */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_PLAYING_SLOW_FORWARD, PR8210_SLOW_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x1a:	CMDPRINTF(("pr8210: Seek\n"));
-						/* seek */
-						if ( pr8210->seekstate )
-						{
-							CMDPRINTF(("pr8210: Seeking to frame:%d\n", ld->parameter));
-							/* we're ready to seek */
-							set_state(ld, LASERDISC_SEARCHING_FRAME, PR8210_SEARCH_SPEED, ld->parameter);
-						}
-						else
-						{
-							/* waiting for digits indicating position */
-							ld->parameter = 0;
-						}
-						pr8210->seekstate ^=1 ;
-						break;
-
-					case 0x1c:	CMDPRINTF(("pr8210: Scan reverse\n"));
-						/* scan reverse */
-						if (laserdisc_ready(ld))
-							set_state(ld, LASERDISC_SCANNING_REVERSE, -PR8210_SCAN_SPEED, NULL_TARGET_FRAME);
-						break;
-
-					case 0x1e:	CMDPRINTF(("pr8210: Reject\n"));
-						/* eject the disc */
-						if (laserdisc_ready(ld))
-						{
-							set_state(ld, LASERDISC_EJECTING, STOP_SPEED, NULL_TARGET_FRAME);
-							set_hold_state(ld, GENERIC_LOAD_TIME, LASERDISC_EJECTED, STOP_SPEED);
-						}
-						break;
-
-					default:	CMDPRINTF(("pr8210: Unknown command %02X\n", cmd));
-						/* unknown command */
-						break;
+					set_state(ld, LASERDISC_STEPPING_REVERSE, STOP_SPEED, NULL_TARGET_FRAME);
+					add_to_current_track(ld, -ONE_TRACK);
 				}
-			}
-		}
+				break;
 
-		/* reset our command data */
-		memset( pr8210->commandtriplet, 0, 3*sizeof(UINT16) );
-		pr8210->mode = PR8210_MODE_GET_1ST;
+			case 0x14:  CMDPRINTF(("pr8210: Play\n"));
+				/* begin playing at regular speed, or load the disc if it is parked */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_PLAYING_FORWARD, PLAY_SPEED, NULL_TARGET_FRAME);
+				else
+				{
+					/* if we're already spinning up or loading, ignore */
+					if (ld->state != LASERDISC_SPINUP && ld->state != LASERDISC_LOADING)
+					{
+						if (ld->state == LASERDISC_PARKED)
+						{
+							set_state(ld, LASERDISC_SPINUP, STOP_SPEED, NULL_TARGET_FRAME);
+							set_hold_state(ld, GENERIC_SPINUP_TIME, LASERDISC_PLAYING_FORWARD, PLAY_SPEED);
+						}
+						else
+						{
+							set_state(ld, LASERDISC_LOADING, STOP_SPEED, NULL_TARGET_FRAME);
+							set_hold_state(ld, GENERIC_LOAD_TIME, LASERDISC_PLAYING_FORWARD, PLAY_SPEED);
+						}
+						reset_tracknum(ld);
+					}
+				}
+				break;
+
+			case 0x16:	CMDPRINTF(("pr8210: Ch2 toggle\n"));
+				/* channel 1 audio toggle */
+				ld->audio ^= AUDIO_CH2_ENABLE;
+				break;
+
+			case 0x18:	CMDPRINTF(("pr8210: Slow forward\n"));
+				/* slow forward */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_PLAYING_SLOW_FORWARD, PR8210_SLOW_SPEED, NULL_TARGET_FRAME);
+				break;
+
+			case 0x1a:	CMDPRINTF(("pr8210: Seek\n"));
+				/* seek */
+				if (pr8210->seekstate)
+				{
+					CMDPRINTF(("pr8210: Seeking to frame:%d\n", ld->parameter));
+					/* we're ready to seek */
+					set_state(ld, LASERDISC_SEARCHING_FRAME, PR8210_SEARCH_SPEED, ld->parameter);
+					/* before seeking, we hold in the searching state for 150usec, even if seeking to the same frame */
+					/* Us vs. Them requires at least this much "non-video" time in order to work */
+					set_hold_state(ld, ATTOTIME_IN_MSEC(150), LASERDISC_SEARCHING_FRAME, PR8210_SEARCH_SPEED);
+				}
+				else
+				{
+					/* waiting for digits indicating position */
+					ld->parameter = 0;
+				}
+				pr8210->seekstate ^= 1;
+				break;
+
+			case 0x1c:	CMDPRINTF(("pr8210: Scan reverse\n"));
+				/* scan reverse */
+				if (laserdisc_ready(ld))
+					set_state(ld, LASERDISC_SCANNING_REVERSE, -PR8210_SCAN_SPEED, NULL_TARGET_FRAME);
+				break;
+
+			case 0x1e:	CMDPRINTF(("pr8210: Reject\n"));
+				/* eject the disc */
+				if (laserdisc_ready(ld))
+				{
+					set_state(ld, LASERDISC_EJECTING, STOP_SPEED, NULL_TARGET_FRAME);
+					set_hold_state(ld, GENERIC_LOAD_TIME, LASERDISC_EJECTED, STOP_SPEED);
+				}
+				break;
+
+			default:	CMDPRINTF(("pr8210: Unknown command %02X\n", cmd));
+				/* unknown command */
+				break;
+		}
 	}
 }
 
 
 /*-------------------------------------------------
-    pr8210_command_w - write callback when the
+    pr8210_control_w - write callback when the
     CONTROL line is toggled
 -------------------------------------------------*/
 
@@ -2247,42 +2388,53 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 data)
 {
 	pr8210_info *pr8210 = &ld->u.pr8210;
 
-	if ( data == ASSERT_LINE )
+	if (data == ASSERT_LINE)
 	{
-		/* get the time difference from the last assert */
-		attotime delta = attotime_sub(timer_get_time(), pr8210->commandtime);
+		attotime curtime = timer_get_time();
+		attotime delta;
+		int longpulse;
 
+		/* if we timed out, reset the accumulator */
+		delta = attotime_sub(curtime, pr8210->firstbittime);
+		if (delta.attoseconds > ATTOTIME_IN_USEC(25320).attoseconds)
+		{
+			pr8210->firstbittime = curtime;
+			pr8210->accumulator = 0x5555;
+//          printf("Reset accumulator\n");
+		}
+
+		/* get the time difference from the last assert */
 		/* and update our internal command time */
-		pr8210->commandtime = timer_get_time();
+		delta = attotime_sub(curtime, pr8210->lastbittime);
+		pr8210->lastbittime = curtime;
+
+		/* 0 bit delta is 1.05 msec, 1 bit delta is 2.11 msec */
+		longpulse = (delta.attoseconds < ATTOTIME_IN_USEC(1500).attoseconds) ? 0 : 1;
+		pr8210->accumulator = (pr8210->accumulator << 1) | longpulse;
 
 #if 0
 		{
 			int usecdiff = (int)(delta.attoseconds / ATTOSECONDS_IN_USEC(1));
-
-			printf( "bitdelta = %d\n", usecdiff );
+			printf("bitdelta = %5d (%d) - accum = %04X\n", usecdiff, longpulse, pr8210->accumulator);
 		}
 #endif
 
-		/* if the delay is less than 3 msec, we're receiving data */
-		if ( delta.attoseconds < ATTOTIME_IN_MSEC(3).attoseconds )
+		/* if we have a complete command, signal it */
+		/* a complete command is 0,0,1 followed by 5 bits, followed by 0,0 */
+		if ((pr8210->accumulator & 0x383) == 0x80)
 		{
-			/* 0 bit delta is 1.05 msec, 1 bit delta is 2.11 msec */
-			int longpulse = ( delta.attoseconds < ATTOTIME_IN_USEC(1500).attoseconds ) ? 0 : 1;
-			pr8210->commandtriplet[pr8210->mode] <<= 1;
-			pr8210->commandtriplet[pr8210->mode] |= longpulse;
+			UINT8 newcommand = (pr8210->accumulator >> 2) & 0x1f;
 
-			/* if we received 10 bits, see what we need to do */
-			if ( ++pr8210->commandbits >= 10 )
+//printf("New command = %02X (last=%02X)\n", newcommand, pr8210->lastcommand);
+
+			/* if we got a double command, act on it */
+			if (newcommand == pr8210->lastcommand)
 			{
-				/* reset bit shift count */
-				pr8210->commandbits = 0;
-
-				/* mask just the 10 bits */
-				pr8210->commandtriplet[pr8210->mode] &= 0x3ff;
-
-				/* execute command */
-				pr8210_command( ld );
+				pr8210_command(ld);
+				pr8210->lastcommand = 0;
 			}
+			else
+				pr8210->lastcommand = newcommand;
 		}
 	}
 }
@@ -2326,7 +2478,6 @@ static void ldv1000_soft_reset(laserdisc_state *ld)
 	ld->display = FALSE;
 	ldv1000->mode = LDV1000_MODE_STATUS;
 	ldv1000->activereg = 0;
-	ldv1000->statusmask = 0xff;
 	write_16bits_to_ram_be(ldv1000->ram, 0, 1);
 }
 
@@ -2343,15 +2494,7 @@ static void ldv1000_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 
 	/* 0xFF bytes are used for synchronization */
 	if (data == 0xff)
-	{
-		ldv1000->statusmask = 0xff;	/* EHC 012207: reset our status mask */
 		return;
-	}
-
-	/* if we're not ready, return, otherwise signal ourselves busy */
-	if (ldv1000->statusmask == 0x7f)
-		return;
-	ldv1000->statusmask = 0x7f;
 
 	/* look for and process numbers */
 	if (process_number(ld, data, numbers))
@@ -2621,8 +2764,7 @@ static void ldv1000_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 					set_state(ld, LASERDISC_LOADING, STOP_SPEED, NULL_TARGET_FRAME);
 					set_hold_state(ld, GENERIC_LOAD_TIME, LASERDISC_PLAYING_FORWARD, PLAY_SPEED);
 				}
-
-				ld->curfractrack = ONE_TRACK;
+				reset_tracknum(ld);
 			}
 			break;
 
@@ -2750,7 +2892,7 @@ static UINT8 ldv1000_status_r(laserdisc_state *ld)
 	}
 
 	/* bit 7 indicates our busy status */
-	return status & ldv1000->statusmask;
+	return status;
 }
 
 
@@ -2791,7 +2933,7 @@ static void ldp1450_soft_reset(laserdisc_state *ld)
 	ld->audio = AUDIO_CH1_ENABLE | AUDIO_CH2_ENABLE;
 	ld->display = FALSE;
 	set_state(ld, LASERDISC_STOPPED, STOP_SPEED, NULL_TARGET_FRAME);
-	ld->curfractrack = ONE_TRACK;
+	reset_tracknum(ld);
 }
 
 
@@ -2992,8 +3134,7 @@ static void ldp1450_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 					set_state(ld, LASERDISC_LOADING, STOP_SPEED, NULL_TARGET_FRAME);
 					set_hold_state(ld, GENERIC_LOAD_TIME, LASERDISC_PLAYING_FORWARD, PLAY_SPEED);
 				}
-
-				ld->curfractrack = ONE_TRACK;
+				reset_tracknum(ld);
 			}
 			break;
 

@@ -400,7 +400,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 #define COMMON_IN0\
-	PORT_START_TAG("IN0")\
+	PORT_START("IN0")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY\
@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define COMMON_IN1\
-	PORT_START_TAG("IN1")\
+	PORT_START("IN1")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL\
@@ -422,7 +422,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define COMMON_IN2\
-	PORT_START_TAG("IN2")\
+	PORT_START("IN2")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )\
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 #define COMMON_IN3(coin3state)\
-	PORT_START_TAG("IN3")      /* Service */\
+	PORT_START("IN3")      /* Service */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )\
@@ -444,7 +444,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define WWEST_INPUT1\
-	PORT_START_TAG("IN0")\
+	PORT_START("IN0")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY\
@@ -453,7 +453,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )\
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_START_TAG("IN1")\
+	PORT_START("IN1")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_COCKTAIL\
@@ -464,7 +464,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define WWEST_INPUT2\
-	PORT_START_TAG("IN3")      /* Service */\
+	PORT_START("IN3")      /* Service */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY\
@@ -473,7 +473,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )\
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_START_TAG("IN4")\
+	PORT_START("IN4")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_COCKTAIL\
@@ -489,11 +489,11 @@ static INPUT_PORTS_START( spaceskr )
 
 	COMMON_IN3(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -516,10 +516,10 @@ static INPUT_PORTS_START( spaceskr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -547,7 +547,7 @@ static INPUT_PORTS_START( spaceskr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacecr )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -557,7 +557,7 @@ static INPUT_PORTS_START( spacecr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -571,11 +571,11 @@ static INPUT_PORTS_START( spacecr )
 
 	COMMON_IN3(IP_ACTIVE_LOW)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -600,10 +600,10 @@ static INPUT_PORTS_START( spacecr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -631,7 +631,7 @@ static INPUT_PORTS_START( spacecr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( junglek )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -641,7 +641,7 @@ static INPUT_PORTS_START( junglek )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -655,11 +655,11 @@ static INPUT_PORTS_START( junglek )
 
 	COMMON_IN3(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Finish Bonus" )
 	PORT_DIPSETTING(    0x03, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x02, "Timer x1" )
@@ -681,10 +681,10 @@ static INPUT_PORTS_START( junglek )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x02, "10000" )
 	PORT_DIPSETTING(    0x01, "20000" )
@@ -719,11 +719,11 @@ static INPUT_PORTS_START( piratpet )
 
 	COMMON_IN3(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Finish Bonus" )
 	PORT_DIPSETTING(    0x03, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x02, "Timer x1" )
@@ -745,10 +745,10 @@ static INPUT_PORTS_START( piratpet )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x02, "10000" )
 	PORT_DIPSETTING(    0x01, "20000" )
@@ -775,7 +775,7 @@ static INPUT_PORTS_START( piratpet )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( alpine )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -785,7 +785,7 @@ static INPUT_PORTS_START( alpine )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -795,7 +795,7 @@ static INPUT_PORTS_START( alpine )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x1e, 0x00, IPT_UNUSED )						/* protection read */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -804,11 +804,11 @@ static INPUT_PORTS_START( alpine )
 
 	COMMON_IN3(IP_ACTIVE_LOW) //Tilt flips screen
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Jump Bonus" )
 	PORT_DIPSETTING(    0x00, "500-1500" )
 	PORT_DIPSETTING(    0x01, "800-2000" )
@@ -830,10 +830,10 @@ static INPUT_PORTS_START( alpine )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "1st Extended Time" )
 	PORT_DIPSETTING(    0x00, "10k" )
 	PORT_DIPSETTING(    0x01, "15k" )
@@ -860,7 +860,7 @@ static INPUT_PORTS_START( alpine )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( alpinea )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -870,7 +870,7 @@ static INPUT_PORTS_START( alpinea )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -880,7 +880,7 @@ static INPUT_PORTS_START( alpinea )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x0f, 0x00, IPT_UNUSED )						/* protection read */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -889,11 +889,11 @@ static INPUT_PORTS_START( alpinea )
 
 	COMMON_IN3(IP_ACTIVE_LOW) //Tilt flips screen
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Jump Bonus" )
 	PORT_DIPSETTING(    0x00, "500-1500" )
 	PORT_DIPSETTING(    0x01, "800-2000" )
@@ -913,10 +913,10 @@ static INPUT_PORTS_START( alpinea )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "1st Extended Time" )
 	PORT_DIPSETTING(    0x00, "10k" )
 	PORT_DIPSETTING(    0x01, "15k" )
@@ -943,7 +943,7 @@ static INPUT_PORTS_START( alpinea )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( timetunl )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -953,7 +953,7 @@ static INPUT_PORTS_START( timetunl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -967,11 +967,11 @@ static INPUT_PORTS_START( timetunl )
 
 	COMMON_IN3(IP_ACTIVE_LOW)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -996,10 +996,10 @@ static INPUT_PORTS_START( timetunl )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1029,7 +1029,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( wwestern )
 	WWEST_INPUT1
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1c, 0x18, IPT_UNUSED )					/* protection read, the game resets after a while without it */
@@ -1039,7 +1039,7 @@ static INPUT_PORTS_START( wwestern )
 
 	WWEST_INPUT2
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x03, "10000" )
 	PORT_DIPSETTING(    0x02, "30000" )
@@ -1061,10 +1061,10 @@ static INPUT_PORTS_START( wwestern )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1094,7 +1094,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( frontlin )
 	WWEST_INPUT1
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1106,7 +1106,7 @@ static INPUT_PORTS_START( frontlin )
 
 	WWEST_INPUT2
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x03, "10000" )
 	PORT_DIPSETTING(    0x02, "20000" )
@@ -1128,10 +1128,10 @@ static INPUT_PORTS_START( frontlin )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1167,11 +1167,11 @@ static INPUT_PORTS_START( elevator )
 
 	COMMON_IN3(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x03, "10000" )
 	PORT_DIPSETTING(    0x02, "15000" )
@@ -1195,10 +1195,10 @@ static INPUT_PORTS_START( elevator )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
@@ -1227,7 +1227,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tinstar )
 	WWEST_INPUT1
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1237,7 +1237,7 @@ static INPUT_PORTS_START( tinstar )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN3")      /* Service */
+	PORT_START("IN3")      /* Service */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
@@ -1247,14 +1247,14 @@ static INPUT_PORTS_START( tinstar )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Bonus Life?" )
 	PORT_DIPSETTING(    0x03, "10000?" )
 	PORT_DIPSETTING(    0x02, "20000?" )
@@ -1278,10 +1278,10 @@ static INPUT_PORTS_START( tinstar )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1309,7 +1309,7 @@ static INPUT_PORTS_START( tinstar )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( waterski )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1319,7 +1319,7 @@ static INPUT_PORTS_START( waterski )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1333,11 +1333,11 @@ static INPUT_PORTS_START( waterski )
 
 	COMMON_IN3(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1362,10 +1362,10 @@ static INPUT_PORTS_START( waterski )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1393,7 +1393,7 @@ static INPUT_PORTS_START( waterski )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bioatack )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -1403,7 +1403,7 @@ static INPUT_PORTS_START( bioatack )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -1413,7 +1413,7 @@ static INPUT_PORTS_START( bioatack )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1422,11 +1422,11 @@ static INPUT_PORTS_START( bioatack )
 
 	COMMON_IN3(IP_ACTIVE_LOW)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")      /* d50a */
+	PORT_START("DSW1")      /* d50a */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x03, "5000" )
 	PORT_DIPSETTING(    0x02, "10000" )
@@ -1450,10 +1450,10 @@ static INPUT_PORTS_START( bioatack )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1489,11 +1489,11 @@ static INPUT_PORTS_START( sfposeid )
 
 	COMMON_IN3(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1518,10 +1518,10 @@ static INPUT_PORTS_START( sfposeid )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1557,11 +1557,11 @@ static INPUT_PORTS_START( hwrace )
 
 	COMMON_IN3(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, 0)	// from sound CPU
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1585,10 +1585,10 @@ static INPUT_PORTS_START( hwrace )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x03, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
@@ -1615,17 +1615,17 @@ static INPUT_PORTS_START( hwrace )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kikstart )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1635,7 +1635,7 @@ static INPUT_PORTS_START( kikstart )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN3")      /* Service */
+	PORT_START("IN3")      /* Service */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(kikstart_gear_r, (void *)0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* needs to be 0, otherwise cannot shift */
@@ -1644,13 +1644,13 @@ static INPUT_PORTS_START( kikstart )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(kikstart_gear_r, (void *)1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* needs to be 0, otherwise cannot shift */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME(0x03, 0x01, "Gate Bonus" )
 	PORT_DIPSETTING(   0x00, "5k Points" )
 	PORT_DIPSETTING(   0x01, "10k Points" )
@@ -1672,10 +1672,10 @@ static INPUT_PORTS_START( kikstart )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("DSW2")      /* Coinage */
+	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x08, 0x08, "Control Type" )
 	PORT_DIPSETTING(    0x08, "Revolve" )
 	PORT_DIPSETTING(    0x00, "Buttons" )
@@ -1693,12 +1693,12 @@ static INPUT_PORTS_START( kikstart )
 	PORT_DIPSETTING(    0x00, "A only" )
 
 	/* fake for handling the gears */
-	PORT_START_TAG("GEARP1")
+	PORT_START("GEARP1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 1st Gear")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 2nd Gear")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 3rd Gear")
 
-	PORT_START_TAG("GEARP2")
+	PORT_START("GEARP2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 1st Gear") PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 2nd Gear") PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 3rd Gear") PORT_COCKTAIL
@@ -2284,6 +2284,138 @@ ROM_START( frontlin )
 	ROM_REGION( 0x0100, "proms", 0 )      /* layer PROM */
 	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
+
+
+/*
+Elevator Action (4 Board Version, typical Taito SJ hardware)
+Taito, 1983
+
+Manual shows two versions, 4-board without protection, and
+5-board, using an additional 68705 MCU.
+
+PCB Layout
+----------
+
+Bottom Board (Main CPU)
+
+WWO70003A
+KNN00013 (sticker)
+|---------------------------------------------|
+|        IC64   IC52  Z80   2016              |
+|        IC65   *                            |-|
+|        IC66   IC54                         | |
+|        IC67   IC55                       P | |
+|        IC68   2016                         | |
+|        IC69   2016                         | |
+|1                                           |-|
+|8                                            |
+|W T                                          |
+|A                                            |
+|Y                                           |-|
+|                                            | |
+|         2114                             Q | |
+|         2114                               | |
+|                                            | |
+| 8MHz                                       |-|
+| 12MHz                                       |
+|---------------------------------------------|
+Notes:
+      T    - 18 way connector for power
+      IC*  - 2732 EPROMs
+      *    - Empty DIP24 socket
+      2016 - 2kx8 SRAM
+      2114 - 1kx4 SRAM
+      Z80  - clock 4MHz [8/2]
+      P, Q - Flat cable connectors joining to middle PCB
+
+
+Middle Board (Video)
+
+WWO70002A
+EBN00002 (sticker)
+ |---------------------------------------------|
+ |           AM93422   AM93422                 |
+|-|                                           |-|
+| |                                           | |
+| | P                                       R | |
+| |                              2114         | |
+| |                              2114         | |
+|-|                                           |-|
+ |                                             |
+ |                                             |
+ |                                             |
+|-|                                           |-|
+| |   2016                                    | |
+| | Q 2016                       IC22       S | |
+| |   2016                                    | |
+| |   2016                                    | |
+|-|   2016                                    |-|
+ |    2016                                     |
+ |---------------------------------------------|
+Notes:
+      Lots of logic chips, not much else....
+      2016    - 2kx8 SRAM
+      AM93422 - AMD AM93422 256x4 SRAM
+      2114    - 1kx4 SRAM
+      IC22    - MMI 6301 256x4 Bi-polar PROM
+      R,S,P,Q - Flat cable connectors joining to top and bottom PCB
+
+
+Top Board (Sound)
+
+WW070001A
+WWN00001A
+KNN00012 (sticker)
+KNK00504 (sticker)
+|---------------------------------------------|
+|VOL-BG VOL MB3730  Z80      2114      *      |
+|                  AY3-8910  2114      *     |-|
+|H                 AY3-8910                  | |
+|                  AY3-8910            IC71 S| |
+|                                            | |
+|                                      IC70  | |
+|2                                           |-|
+|2                                    NE555   |
+|W G                                          |
+|A               PAL                          |
+|Y                                           |-|
+|                                            | |
+|                                 82S09      | |
+|                                           R| |
+|                                            | |
+|                                AY3-8910    |-|
+|         6MHz        SWC   SWB   SWA         |
+|---------------------------------------------|
+Notes:
+      Board contains MANY resistors and capacitors in the sound section.
+      Z80 - clock 3MHz [6/2]
+      AY-3-8910 - clock 1.5MHz [6/4]
+      IC* - 2732 EPROMs
+      * - Empty DIP24 sockets
+      PAL - marked 'WW-15'. Chip is 'painted' black, under the paint it reads MMI PAL16L8 ;-)
+      82S09 - Signetics 82S09 576-bit (64x9) Bi-Polar RAM
+      G - 22-way edge connector
+      H - 12-pin power connector
+      R, S - Flat cable connectors joining to middle PCB
+      VSync - xx Hz
+      HSync - xx kHz
+
+
+ROM Daughterboard (on top of Sound PCB)
+
+WWO70004
+KNN00014
+|---------------------------|
+|              IC6    IC3   |
+|                           |
+|E       IC8   IC5    IC2   |
+|                           |
+|        IC7   IC4    IC1   |
+|---------------------------|
+Notes:
+      E - 30-pin connector joining to sound PCB.
+      IC* - 2732 EPROMs
+*/
 
 ROM_START( elevator )
 	ROM_REGION( 0x12000, "main", 0 )

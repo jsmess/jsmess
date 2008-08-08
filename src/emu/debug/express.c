@@ -518,8 +518,10 @@ static void print_tokens(FILE *out, parsed_expression *expr)
     forms of memory operators
 -------------------------------------------------*/
 
-static int parse_memory_operator(parsed_expression *expr, const char *buffer, token_info *flags)
+static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const char *buffer, token_info *flags)
 {
+	const char *startbuffer = buffer;
+	const char *namestring = NULL;
 	int space = 'p', size;
 	const char *dot;
 	int length;
@@ -531,8 +533,10 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 	if (dot != NULL)
 	{
 		UINT16 index;
-		if (!add_expression_string(expr, buffer, dot - buffer, &index))
-			return 0;
+
+		namestring = add_expression_string(expr, buffer, dot - buffer, &index);
+		if (namestring == NULL)
+			return MAKE_EXPRERR_OUT_OF_MEMORY(offset);
 		*flags |= index << TIN_MEMORY_INDEX_SHIFT;
 		buffer = dot + 1;
 	}
@@ -551,7 +555,7 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 
 	/* anything else is invalid */
 	else
-		return 0;
+		return MAKE_EXPRERR_INVALID_TOKEN(offset);
 
 	/* convert the space to flags */
 	switch (space)
@@ -563,7 +567,7 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;	break;
 		case 'e':	*flags |= TIN_MEMORY_EEPROM;	break;
 		case 'm':	*flags |= TIN_MEMORY_REGION;	break;
-		default:	return 0;
+		default:	return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
 	}
 
 	/* convert the size to flags */
@@ -573,10 +577,20 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 		case 'w':	*flags |= TIN_MEMORY_WORD;		break;
 		case 'd':	*flags |= TIN_MEMORY_DWORD;		break;
 		case 'q':	*flags |= TIN_MEMORY_QWORD;		break;
-		default:	return 0;
+		default:	return MAKE_EXPRERR_INVALID_MEMORY_SIZE(offset + (buffer - startbuffer) + length - 1);
 	}
 
-	return 1;
+	/* validate the name */
+	if (expr->callbacks.valid != NULL)
+	{
+		EXPRERR err = (*expr->callbacks.valid)(namestring, (*flags & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT);
+		if (err == EXPRERR_INVALID_MEMORY_SPACE)
+			return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
+		else if (err != EXPRERR_NONE)
+			return MAKE_EXPRERR(err, offset);
+	}
+
+	return EXPRERR_NONE;
 }
 
 
@@ -597,9 +611,6 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 
 	parse_token *token = expr->token;
 	const char *string = stringstart;
-
-	/* zap expression object */
-	memset(expr, 0, sizeof(*expr));
 
 	/* stash the symbol table pointer */
 	expr->table = table;
@@ -826,16 +837,56 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 				if (string[0] == '@')
 				{
 					token_info info;
-					if (parse_memory_operator(expr, buffer, &info))
-					{
-						SET_TOKEN_INFO(1, TOK_OPERATOR, TVL_MEMORYAT, TIN_PRECEDENCE_2 | info);
-						break;
-					}
+					EXPRERR err = parse_memory_operator(expr, token->offset, buffer, &info);
+					if (err != EXPRERR_NONE)
+						return err;
+					SET_TOKEN_INFO(1, TOK_OPERATOR, TVL_MEMORYAT, TIN_PRECEDENCE_2 | info);
+					break;
 				}
 
 				/* empty string is automatically invalid */
 				if (buffer[0] == 0)
 					return MAKE_EXPRERR_INVALID_TOKEN(token->offset);
+
+				/* check for wordy variants on standard operators */
+				else if (strcmp(buffer, "bnot") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_NOT, TIN_PRECEDENCE_2);
+				else if (strcmp(buffer, "plus") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_ADD, TIN_PRECEDENCE_4);
+				else if (strcmp(buffer, "minus") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_SUBTRACT, TIN_PRECEDENCE_4);
+				else if (strcmp(buffer, "times") == 0 || strcmp(buffer, "mul") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_MULTIPLY, TIN_PRECEDENCE_3);
+				else if (strcmp(buffer, "div") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_DIVIDE, TIN_PRECEDENCE_3);
+				else if (strcmp(buffer, "mod") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_MODULO, TIN_PRECEDENCE_3);
+				else if (strcmp(buffer, "lt") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LESS, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "le") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LESSOREQUAL, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "gt") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_GREATER, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "ge") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_GREATEROREQUAL, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "eq") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_EQUAL, TIN_PRECEDENCE_7);
+				else if (strcmp(buffer, "ne") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_NOTEQUAL, TIN_PRECEDENCE_7);
+				else if (strcmp(buffer, "not") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_COMPLEMENT, TIN_PRECEDENCE_2);
+				else if (strcmp(buffer, "and") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LAND, TIN_PRECEDENCE_8);
+				else if (strcmp(buffer, "band") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_BAND, TIN_PRECEDENCE_8);
+				else if (strcmp(buffer, "or") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LOR, TIN_PRECEDENCE_12);
+				else if (strcmp(buffer, "bor") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_BOR, TIN_PRECEDENCE_10);
+				else if (strcmp(buffer, "bxor") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_BXOR, TIN_PRECEDENCE_9);
+
+				/* process anything else as a number or string */
 				else
 				{
 					/* if we have a number prefix, assume it is a number */
@@ -1685,6 +1736,11 @@ EXPRERR expression_evaluate(const char *expression, const symbol_table *table, c
 	parsed_expression temp_expression;
 	EXPRERR exprerr;
 
+	/* zap expression object and copy the callbacks */
+	memset(&temp_expression, 0, sizeof(temp_expression));
+	if (callbacks != NULL)
+		temp_expression.callbacks = *callbacks;
+
 	/* first parse the tokens into the token array in order */
 	exprerr = parse_string_into_tokens(expression, &temp_expression, table);
 	if (exprerr != EXPRERR_NONE)
@@ -1700,10 +1756,6 @@ EXPRERR expression_evaluate(const char *expression, const symbol_table *table, c
 
 	/* debugging */
 	print_tokens(stdout, &temp_expression);
-
-	/* copy the callbacks */
-	if (callbacks != NULL)
-		temp_expression.callbacks = *callbacks;
 
 	/* execute the expression to get the result */
 	exprerr = execute_tokens(&temp_expression, result);
@@ -1724,6 +1776,11 @@ EXPRERR expression_parse(const char *expression, const symbol_table *table, cons
 	parsed_expression temp_expression;
 	EXPRERR exprerr;
 
+	/* zap expression object and copy the callbacks */
+	memset(&temp_expression, 0, sizeof(temp_expression));
+	if (callbacks != NULL)
+		temp_expression.callbacks = *callbacks;
+
 	/* first parse the tokens into the token array in order */
 	exprerr = parse_string_into_tokens(expression, &temp_expression, table);
 	if (exprerr != EXPRERR_NONE)
@@ -1741,10 +1798,6 @@ EXPRERR expression_parse(const char *expression, const symbol_table *table, cons
 		exprerr = MAKE_EXPRERR_OUT_OF_MEMORY(0);
 		goto cleanup;
 	}
-
-	/* copy the callbacks */
-	if (callbacks != NULL)
-		temp_expression.callbacks = *callbacks;
 
 	/* copy the final expression and return */
 	**result = temp_expression;
@@ -1822,6 +1875,11 @@ const char *exprerr_to_string(EXPRERR error)
 		case EXPRERR_INVALID_PARAM_COUNT:	return "invalid number of parameters";
 		case EXPRERR_UNBALANCED_QUOTES:		return "unbalanced quotes";
 		case EXPRERR_TOO_MANY_STRINGS:		return "too many strings";
+		case EXPRERR_INVALID_MEMORY_SIZE:	return "invalid memory size (b/w/d/q expected)";
+		case EXPRERR_NO_SUCH_MEMORY_SPACE:	return "non-existent memory space";
+		case EXPRERR_INVALID_MEMORY_SPACE:	return "invalid memory space (p/d/i/o/r/m expected)";
+		case EXPRERR_INVALID_MEMORY_NAME:	return "invalid memory name";
+		case EXPRERR_MISSING_MEMORY_NAME:	return "missing memory name";
 		default:							return "unknown error";
 	}
 }

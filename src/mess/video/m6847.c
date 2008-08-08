@@ -1415,7 +1415,7 @@ static INPUT_CHANGED( artifacting_changed )
 
 
 INPUT_PORTS_START( m6847_artifacting )
-	PORT_START_TAG("artifacting")
+	PORT_START("artifacting")
 	PORT_CONFNAME( 0x03, 0x01, "Artifacting" ) PORT_CHANGED(artifacting_changed, NULL)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Standard ) )

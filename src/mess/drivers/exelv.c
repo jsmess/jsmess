@@ -546,7 +546,7 @@ ADDRESS_MAP_END
 /* keyboard: ??? */
 static INPUT_PORTS_START(exelv)
 
-	PORT_START
+	PORT_START("exelv")
 
 INPUT_PORTS_END
 

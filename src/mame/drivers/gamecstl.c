@@ -522,25 +522,25 @@ GFXDECODE_END
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
 
 static INPUT_PORTS_START(gamecstl)
-	PORT_START_TAG("pc_keyboard_0")
+	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
-	PORT_START_TAG("pc_keyboard_1")
+	PORT_START("pc_keyboard_1")
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
 	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
 
-	PORT_START_TAG("pc_keyboard_2")
+	PORT_START("pc_keyboard_2")
 
-	PORT_START_TAG("pc_keyboard_3")
+	PORT_START("pc_keyboard_3")
 	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
 	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
 
-	PORT_START_TAG("pc_keyboard_4")
+	PORT_START("pc_keyboard_4")
 
-	PORT_START_TAG("pc_keyboard_5")
+	PORT_START("pc_keyboard_5")
 
-	PORT_START_TAG("pc_keyboard_6")
+	PORT_START("pc_keyboard_6")
 	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
 	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
 	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
@@ -549,7 +549,7 @@ static INPUT_PORTS_START(gamecstl)
 	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
 	AT_KEYB_HELPER( 0x4000, "Del",       		    KEYCODE_A           ) /* Delete                      6f  ef */
 
-	PORT_START_TAG("pc_keyboard_7")
+	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
 static IRQ_CALLBACK(irq_callback)
@@ -654,7 +654,7 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
 	MDRV_DEVICE_CONFIG( gamecstl_pic8259_2_config )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
+	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -740,7 +740,7 @@ ROM_START(gamecstl)
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "ide" )
 	DISK_IMAGE( "gamecstl", 0, MD5(501ddbebb530b8fd67eb64a4a2de3e35) SHA1(2477468ef1c1d4529057064a319ebfe9fd8facd7) )
 ROM_END
 

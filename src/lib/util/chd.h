@@ -126,7 +126,7 @@
 
 /* standard A/V metadata */
 #define AV_METADATA_TAG				0x41564156	/* 'AVAV' */
-#define AV_METADATA_FORMAT			"FPS:%d.%06d WIDTH:%d HEIGHT:%d INTERLACED:%d CHANNELS:%d SAMPLERATE:%d META:%d"
+#define AV_METADATA_FORMAT			"FPS:%d.%06d WIDTH:%d HEIGHT:%d INTERLACED:%d CHANNELS:%d SAMPLERATE:%d"
 
 /* CHD open values */
 #define CHD_OPEN_READ				1
@@ -237,6 +237,9 @@ void chd_close(chd_file *chd);
 
 /* return the associated core_file */
 core_file *chd_core_file(chd_file *chd);
+
+/* return an error string for the given CHD error */
+const char *chd_error_string(chd_error err);
 
 
 

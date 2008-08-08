@@ -755,6 +755,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/ddz.o \
 	$(DRIVERS)/dunhuang.o \
 	$(DRIVERS)/goldstar.o $(VIDEO)/goldstar.o \
+	$(DRIVERS)/igs009.o \
 	$(DRIVERS)/igs_blit.o \
 	$(DRIVERS)/igs_180.o \
 	$(DRIVERS)/igs_m027.o \
@@ -1614,6 +1615,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
 	$(DRIVERS)/quizo.o \
+	$(DRIVERS)/quizpun2.o \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/sfkick.o \

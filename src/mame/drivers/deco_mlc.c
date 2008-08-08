@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( mlc )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -347,7 +347,7 @@ static INPUT_PORTS_START( mlc )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -496,6 +496,21 @@ static MACHINE_DRIVER_START( mlc_5bpp )
 MACHINE_DRIVER_END
 
 /***************************************************************************/
+
+/*
+Marvel Comics Avengers In Galactic Storm (Japan)
+Data East, 1996
+
+This game is special because it uses a standard Hitachi SH2 CPU instead of the
+custom DE156 encrypted CPU.
+
+Notes:
+      - SH2 (QFP144) clock: 21.000MHz (42 / 2)
+      - All ROMs SD* are 4M x 16bit EPROMS (27C4096)
+      - All MCG* ROMs are surface mounted 16M MASK ROMs
+      - (mcg-01.1d read in 8 bit mode because this ROM had fixed bits when read in 16 bit
+        mode, reading as 8 bit gave a good read. Others read in 16 bit mode)
+*/
 
 ROM_START( avengrgs )
 	ROM_REGION( 0x100000, "main", 0 )

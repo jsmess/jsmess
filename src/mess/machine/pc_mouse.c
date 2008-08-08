@@ -251,7 +251,7 @@ INS8250_HANDSHAKE_OUT( pc_mouse_handshake_in )
  **************************************************************************/
 
 INPUT_PORTS_START( pc_mouse_mousesystems )
-	PORT_START_TAG( "pc_mouse_misc" )
+	PORT_START( "pc_mouse_misc" )
 	PORT_CONFNAME( 0x80, 0x80, "Mouse Protocol" )
 	PORT_CONFSETTING( 0x80, "Mouse Systems" )
 	PORT_CONFSETTING( 0x00, "Microsoft" )
@@ -259,17 +259,17 @@ INPUT_PORTS_START( pc_mouse_mousesystems )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 
-	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */
+	PORT_START( "pc_mouse_x" ) /* Mouse - X AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-	PORT_START_TAG( "pc_mouse_y" ) /* Mouse - Y AXIS */
+	PORT_START( "pc_mouse_y" ) /* Mouse - Y AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
 
 INPUT_PORTS_START( pc_mouse_microsoft )
-	PORT_START_TAG( "pc_mouse_misc" )
+	PORT_START( "pc_mouse_misc" )
 	PORT_CONFNAME( 0x80, 0x00, "Mouse Protocol" )
 	PORT_CONFSETTING( 0x00, "Microsoft" )
 	PORT_CONFSETTING( 0x80, "Mouse Systems" )
@@ -277,20 +277,20 @@ INPUT_PORTS_START( pc_mouse_microsoft )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 
-	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */
+	PORT_START( "pc_mouse_x" ) /* Mouse - X AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-	PORT_START_TAG( "pc_mouse_y" ) /* Mouse - Y AXIS */
+	PORT_START( "pc_mouse_y" ) /* Mouse - Y AXIS */
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
 
 INPUT_PORTS_START( pc_mouse_none )
-	PORT_START_TAG( "pc_mouse_misc" )      /* IN12 */
+	PORT_START( "pc_mouse_misc" )      /* IN12 */
 	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
-	PORT_START_TAG( "pc_mouse_x" )      /* IN13 */
+	PORT_START( "pc_mouse_x" )      /* IN13 */
 	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
-	PORT_START_TAG( "pc_mouse_y" )      /* IN14 */
+	PORT_START( "pc_mouse_y" )      /* IN14 */
 	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 INPUT_PORTS_END

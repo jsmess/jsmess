@@ -117,7 +117,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				protection_data = memory_region(machine, "main")[0x185+protection_index++];
+				protection_data = memory_region(machine, "cpu3")[0x185+protection_index++];
 			else
 				protection_data = 0xc9;
 
@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( thedeep )
-	PORT_START_TAG("e008")
+	PORT_START("e008")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )	// Up / down shown in service mode
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START1  )
 
-	PORT_START_TAG("e009")
+	PORT_START("e009")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2  )
 
-	PORT_START_TAG("e00a")
+	PORT_START("e00a")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -253,7 +253,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("e00b")
+	PORT_START("e00b")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("MCU")	// Read by the mcu
+	PORT_START("MCU")	// Read by the mcu
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
@@ -443,7 +443,7 @@ ROM_START( thedeep )
 	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
@@ -475,7 +475,7 @@ ROM_START( rundeep )
 	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */

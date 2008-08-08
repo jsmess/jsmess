@@ -117,7 +117,7 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_DEVICE_ADD( "ns16550_3", NS16550 )			/* TODO: Verify model */
 	MDRV_DEVICE_CONFIG( bebox_uart_inteface[3] )
 
-	MDRV_IDE_CONTROLLER_ADD( "ide", ~0, bebox_ide_interrupt )	/* FIXME */
+	MDRV_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )

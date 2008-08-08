@@ -617,7 +617,7 @@ static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 #define COMMON_IN2\
-	PORT_START_TAG("IN2")\
+	PORT_START("IN2")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )\
@@ -628,17 +628,17 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define COMMON_COIN1(coinstate)\
-	PORT_START_TAG("COIN1")\
+	PORT_START("COIN1")\
 	PORT_BIT( 0x01, coinstate, IPT_COIN1 )\
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 #define COMMON_COIN2(coinstate)\
-	PORT_START_TAG("COIN2")\
+	PORT_START("COIN2")\
 	PORT_BIT( 0x01, coinstate, IPT_COIN2 )\
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 static INPUT_PORTS_START( extrmatn )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -651,7 +651,7 @@ static INPUT_PORTS_START( extrmatn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -675,10 +675,10 @@ static INPUT_PORTS_START( extrmatn )
 	PORT_DIPSETTING(    0x40, "*2" )
 	PORT_DIPSETTING(    0x00, "*3" )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
@@ -687,7 +687,7 @@ static INPUT_PORTS_START( extrmatn )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( arknoid2 )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -700,7 +700,7 @@ static INPUT_PORTS_START( arknoid2 )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -723,7 +723,7 @@ static INPUT_PORTS_START( arknoid2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	PORT_START_TAG("IN0")		/* read at c000 (sound cpu) */
+	PORT_START("IN0")		/* read at c000 (sound cpu) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -733,21 +733,21 @@ static INPUT_PORTS_START( arknoid2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	COMMON_IN2
 	COMMON_COIN1(IP_ACTIVE_HIGH)
 	COMMON_COIN2(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("AN1")		/* spinner 1 - read at f000/1 */\
+	PORT_START("AN1")		/* spinner 1 - read at f000/1 */\
 	PORT_BIT   ( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15)\
 	PORT_BIT   ( 0x1000, IP_ACTIVE_LOW,  IPT_COIN2 )	/* Mirrored for service mode */\
 	PORT_BIT   ( 0x2000, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* Mirrored for service mode */\
 	PORT_BIT   ( 0x4000, IP_ACTIVE_LOW,  IPT_COIN1 )	/* Mirrored for service mode */\
 	PORT_BIT   ( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )\
 
-	PORT_START_TAG("AN2")		/* spinner 2 - read at f002/3 */\
+	PORT_START("AN2")		/* spinner 2 - read at f002/3 */\
 	PORT_BIT   ( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)\
 	PORT_BIT   ( 0xf000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -760,7 +760,7 @@ static INPUT_PORTS_START( arknid2u )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plumppop )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -773,7 +773,7 @@ static INPUT_PORTS_START( plumppop )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -796,7 +796,7 @@ static INPUT_PORTS_START( plumppop )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -806,7 +806,7 @@ static INPUT_PORTS_START( plumppop )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -816,7 +816,7 @@ static INPUT_PORTS_START( plumppop )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -829,33 +829,33 @@ static INPUT_PORTS_START( plumppop )
 	COMMON_COIN1(IP_ACTIVE_HIGH)
 	COMMON_COIN2(IP_ACTIVE_HIGH)
 
-	PORT_START_TAG("AN1")		/* spinner 1 - read at f000/1 */
+	PORT_START("AN1")		/* spinner 1 - read at f000/1 */
 	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15)
 
-	PORT_START_TAG("AN2")		/* spinner 2 - read at f002/3 */
+	PORT_START("AN2")		/* spinner 2 - read at f002/3 */
 	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jpopnics )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2 (Cheat)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 (Cheat)") PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
- 	PORT_START_TAG("DSWA")
+ 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -868,7 +868,7 @@ static INPUT_PORTS_START( jpopnics )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_OLD
 
-  	PORT_START_TAG("DSWB")
+  	PORT_START("DSWB")
   	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
   	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
   	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -891,21 +891,21 @@ static INPUT_PORTS_START( jpopnics )
   	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
   	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START_TAG("COIN1")
+	PORT_START("COIN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("COIN2")
+	PORT_START("COIN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("AN1")		/* spinner 1 - read at f000/1 */
+	PORT_START("AN1")		/* spinner 1 - read at f000/1 */
 	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15)
 
-	PORT_START_TAG("AN2")		/* spinner 2 - read at f002/3 */
+	PORT_START("AN2")		/* spinner 2 - read at f002/3 */
 	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drtoppel )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -918,7 +918,7 @@ static INPUT_PORTS_START( drtoppel )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -941,10 +941,10 @@ static INPUT_PORTS_START( drtoppel )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
@@ -960,7 +960,7 @@ static INPUT_PORTS_START( drtopplu )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chukatai )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -973,7 +973,7 @@ static INPUT_PORTS_START( chukatai )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -996,10 +996,10 @@ static INPUT_PORTS_START( chukatai )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
@@ -1015,7 +1015,7 @@ static INPUT_PORTS_START( chukatau )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tnzs )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1028,7 +1028,7 @@ static INPUT_PORTS_START( tnzs )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -1051,10 +1051,10 @@ static INPUT_PORTS_START( tnzs )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	COMMON_IN2
@@ -1107,7 +1107,7 @@ static INPUT_PORTS_START( tnzs2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kabukiz )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1131,7 +1131,7 @@ static INPUT_PORTS_START( kabukiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -1145,10 +1145,10 @@ static INPUT_PORTS_START( kabukiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
@@ -1158,7 +1158,7 @@ static INPUT_PORTS_START( kabukiz )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2)
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1171,7 +1171,7 @@ static INPUT_PORTS_START( kabukiz )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( insectx )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1184,7 +1184,7 @@ static INPUT_PORTS_START( insectx )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -1207,13 +1207,13 @@ static INPUT_PORTS_START( insectx )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1225,7 +1225,7 @@ static INPUT_PORTS_START( insectx )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kageki )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1238,7 +1238,7 @@ static INPUT_PORTS_START( kageki )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -1263,13 +1263,13 @@ static INPUT_PORTS_START( kageki )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2031,6 +2031,45 @@ ROM_START( kagekia )
 ROM_END
 
 
+/*
+Chuka Taisen
+Taito, 1988
+
+PCB Layout
+
+|--------------------------------------------------|
+|    SETA                     SETA         12MHz   |
+|    X1-003     6116          X1-001               |
+|               6116          YM3906               |
+|    SETA       6116                               |
+|    X1-006     6116                               |
+|                                                  |
+|                             SETA                 |
+|                             X1-002A              |
+|                                                  |
+|       DSWB                                       |
+|J                                   B44-01.8      |
+|A                      PRG10.32                   |
+|M      DSWA            PRG11.31     B44-05.7      |
+|M                      6264                       |
+|A                                   B44-02.6      |
+|     YM3014                                       |
+|                                    B44-06.5      |
+|             B06-101.36(PAL)                      |
+|                                    B44-03.4      |
+|       YM2203   Z80B                              |
+|                    B06-11.35(PAL)  B44-07.3      |
+|                B44_12.38                         |
+|   SETA                             B44-04.2      |
+|   X1-004         Z80B                            |
+|                    B06-12.26(PAL)  B44-08.1      |
+|                    B06-11.25(PAL)                |
+|--------------------------------------------------|
+Notes:
+      6264: 8K x8 SRAM
+      6116: 2K x8 SRAM
+*/
+
 ROM_START( chukatai )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b44-10", 0x00000, 0x08000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
@@ -2102,6 +2141,79 @@ ROM_START( chukataj )
 	ROM_LOAD( "b44-07.a04", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
 	ROM_LOAD( "b44-08.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
 ROM_END
+
+
+/*
+The New Zealand Story
+Taito, 1988
+
+This PCB runs on Taito/Seta hardware.
+
+PCB Layout
+----------
+
+M6100356A (on PCB)
+PO-043A (Seta number; on PCB)
+|---------------------------------------------------|
+|     VOL  HA17408           B53-26.U34  DSWB DSWA  |
+|      4558       YM2203 Z80  62256              Z80|
+|      4558 YM3014                                  |
+|                                                   |
+|                                  B06-13           |
+|                                   (PAL)           |
+|                                                   |
+|                                                   |
+|                               6264       B53-25.U3|
+|J     TESTSW                                       |
+|A                                                  |
+|M                                                  |
+|M                                 B06-101          |
+|A                                  (PAL)           |
+|---------------------------------------------------| <- ROM Board above
+|                                              DIP40|    main PCB
+|               X1-001A                             |
+|                                                   |
+|    X1-004                                         |
+|               X1-002A       12MHz                 |
+|                                                   |
+|                                                   |
+|   X1-006                              6264        |
+|X1-007     DIP40  DIP40  DIP40  DIP40     B53-24.U1|
+|---------------------------------------------------|
+Notes:
+      All Z80 CPU's running at 6.000MHz (12/2)
+      YM2203 running at 3.000MHz (12/4)
+      VSync 60Hz
+      DIP40 - Empty sockets used for connection of ROM board
+      Seta Custom IC's -
+                        X1-001A
+                        X1-002A
+                        X1-004
+                        X1-006
+                        X1-007
+
+
+ROM Board
+---------
+K9100209A
+J9100159A SUB PCB
+K9100209A N. Z. LAND STORY (sticker)
+|---------------------------------------------------|
+|                                  PAL(B53-15)      |
+|     B53_20     B53_18      B53_16     Z80B   DIP40|
+|B53_21    B53_19     B53_17                        |
+|                                                   |
+|                                                   |
+|                                                   |
+|B53_23                                             |
+|    B53_22                                         |
+|           DIP40  DIP40  DIP40  DIP40     62256    |
+|---------------------------------------------------|
+Notes:
+      Z80 clock 6.000MHz
+      DIP40 - connection pins joining to Main PCB DIP40 sockets
+      All ROMs are 27010 (DIP32)
+*/
 
 ROM_START( tnzs )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */

@@ -2303,7 +2303,7 @@ static READ8_HANDLER ( amstrad_psg_porta_read )
 
 static INPUT_PORTS_START( amstrad_keyboard )
 	/* keyboard row 0 */
-	PORT_START_TAG("keyboard_row_0")
+	PORT_START("keyboard_row_0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA7")          PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA8")          PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA9")          PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -2314,7 +2314,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .")              PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 
 	/* keyboard line 1 */
-	PORT_START_TAG("keyboard_row_1")
+	PORT_START("keyboard_row_1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA6")          PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy")                  PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(END))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 7")              PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -2325,7 +2325,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 0")              PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 
 	/* keyboard row 2 */
-	PORT_START_TAG("keyboard_row_2")
+	PORT_START("keyboard_row_2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr")                   PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[")                     PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter")                 PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
@@ -2336,7 +2336,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl")                  PORT_CODE(KEYCODE_RALT)       PORT_CHAR(UCHAR_SHIFT_2)
 
 	/* keyboard row 3 */
-	PORT_START_TAG("keyboard_row_3")
+	PORT_START("keyboard_row_3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91 \xC2\xA3") PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR(0xa3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@ \xC2\xA6")            PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@') PORT_CHAR('|')
@@ -2347,7 +2347,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
 
 	/* keyboard line 4 */
-	PORT_START_TAG("keyboard_row_4")
+	PORT_START("keyboard_row_4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('_')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
@@ -2358,7 +2358,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
 
 	/* keyboard line 5 */
-	PORT_START_TAG("keyboard_row_5")
+	PORT_START("keyboard_row_5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
@@ -2369,7 +2369,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")                 PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
 
 	/* keyboard line 6 */
-	PORT_START_TAG("keyboard_row_6")
+	PORT_START("keyboard_row_6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
@@ -2380,7 +2380,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
 
 	/* keyboard line 7 */
-	PORT_START_TAG("keyboard_row_7")
+	PORT_START("keyboard_row_7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
@@ -2391,7 +2391,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
 
 	/* keyboard line 8 */
-	PORT_START_TAG("keyboard_row_8")
+	PORT_START("keyboard_row_8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('\"') PORT_CHAR('~')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")                   PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(27)
@@ -2402,7 +2402,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 
 	/* keyboard line 9 */
-	PORT_START_TAG("keyboard_row_9")
+	PORT_START("keyboard_row_9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
@@ -2448,7 +2448,7 @@ lk4     Frequency
 0       60 Hz
 1       50 Hz
 */
-	PORT_START_TAG("solder_links")
+	PORT_START("solder_links")
 	PORT_DIPNAME(0x07, 0x07, "Manufacturer Name")
 	PORT_DIPLOCATION("LK:3,2,1")
 	PORT_DIPSETTING(0x00, "Isp")
@@ -2474,7 +2474,7 @@ lk4     Frequency
    Pre-ASIC??? Amstrad?     4 In the "cost-down" CPC6128, the CRTC functionality is integrated into a single ASIC IC. This ASIC is often refered to as the "Pre-ASIC" because it preceeded the CPC+ ASIC
 As far as I know, the KC compact used HD6845S only.
 */
-	PORT_START_TAG("crtc")
+	PORT_START("crtc")
 	PORT_CONFNAME( 0xFF, M6845_PERSONALITY_UM6845R, "CRTC Type")
 	PORT_CONFSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845")
 	PORT_CONFSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S")
@@ -2483,14 +2483,14 @@ As far as I know, the KC compact used HD6845S only.
 	PORT_CONFSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489")
 	PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
 
-	PORT_START_TAG("multiface")
+	PORT_START("multiface")
 	PORT_CONFNAME(0x01, 0x00, "Multiface Two" )
 	PORT_CONFSETTING(0x00, DEF_STR( Off) )
 	PORT_CONFSETTING(0x01, DEF_STR( On) )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Stop Button") PORT_CODE(KEYCODE_F1)
 //  PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Reset Button") PORT_CODE(KEYCODE_F3)  Not implemented
 
-	PORT_START_TAG("green_display")
+	PORT_START("green_display")
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
 	PORT_CONFSETTING(0x00, "CTM640 Colour Monitor" )
 	PORT_CONFSETTING(0x01, "GT64 Green Monitor" )
@@ -2678,50 +2678,50 @@ static INPUT_PORTS_START( plus )
 
     The connectors' description for both CPCs and CPC+'s can be found at http://www.hardwarebook.info/Category:Computer */
 
-	PORT_START_TAG("analog1")
+	PORT_START("analog1")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(1)
 
-	PORT_START_TAG("analog2")
+	PORT_START("analog2")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(1)
 
-	PORT_START_TAG("analog3")
+	PORT_START("analog3")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(2)
 
-	PORT_START_TAG("analog4")
+	PORT_START("analog4")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(2)
 
 // Not used, but are here for completeness
-	PORT_START_TAG("analog5")
+	PORT_START("analog5")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(3)
 
-	PORT_START_TAG("analog6")
+	PORT_START("analog6")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(3)
 
-	PORT_START_TAG("analog7")
+	PORT_START("analog7")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(4)
 
-	PORT_START_TAG("analog8")
+	PORT_START("analog8")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
@@ -2732,25 +2732,25 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gx4000 )
 
 	// The GX4000 is a console, so no keyboard access other than the joysticks.
-	PORT_START_TAG("keyboard_row_0")
+	PORT_START("keyboard_row_0")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_1")
+	PORT_START("keyboard_row_1")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_2")
+	PORT_START("keyboard_row_2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_3")
+	PORT_START("keyboard_row_3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_4")
+	PORT_START("keyboard_row_4")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_5")
+	PORT_START("keyboard_row_5")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_6")  // Joystick 2
+	PORT_START("keyboard_row_6")  // Joystick 2
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
@@ -2759,13 +2759,13 @@ static INPUT_PORTS_START( gx4000 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(2)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	
-	PORT_START_TAG("keyboard_row_7")
+	PORT_START("keyboard_row_7")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_8")
+	PORT_START("keyboard_row_8")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START_TAG("keyboard_row_9")  // Joystick 1
+	PORT_START("keyboard_row_9")  // Joystick 1
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
@@ -2776,50 +2776,50 @@ static INPUT_PORTS_START( gx4000 )
 
 	PORT_INCLUDE(crtc_links)  // included to keep the driver happy
 
-	PORT_START_TAG("analog1")
+	PORT_START("analog1")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(1)
 
-	PORT_START_TAG("analog2")
+	PORT_START("analog2")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(1)
 
-	PORT_START_TAG("analog3")
+	PORT_START("analog3")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(2)
 
-	PORT_START_TAG("analog4")
+	PORT_START("analog4")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(2)
 
 // Not used, but are here for completeness
-	PORT_START_TAG("analog5")
+	PORT_START("analog5")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(3)
 
-	PORT_START_TAG("analog6")
+	PORT_START("analog6")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(3)
 
-	PORT_START_TAG("analog7")
+	PORT_START("analog7")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
 	PORT_PLAYER(4)
 
-	PORT_START_TAG("analog8")
+	PORT_START("analog8")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_Y)
 	PORT_SENSITIVITY(100)
 	PORT_KEYDELTA(10)
@@ -2834,7 +2834,7 @@ static INPUT_PORTS_START( aleste )
 	/* Documentation marks this input as "R/L", it's purpose is unknown - I can't even find it on the keyboard */
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R  L")       PORT_CODE(KEYCODE_PGUP)
 
-	PORT_START_TAG( "keyboard_row_10" )
+	PORT_START( "keyboard_row_10" )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F1  F6")    PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F2  F7")    PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F3  F8")    PORT_CODE(KEYCODE_F3)

@@ -5,8 +5,7 @@
     driver by Zsolt Vasvari
 
     Games supported:
-        * Sprint 1
-        * Sprint 2
+        * Cops'n Robbers
 
     Known issues:
         * none at this time
@@ -49,6 +48,10 @@
     0b00-0bff Car Sync Area
     1000      Sound effect and start led triggers must be here - 1000: LED 2
     1001-1003 ???
+
+
+2008-08
+Added Dip locations according to manual.
 
 ***************************************************************************/
 
@@ -137,24 +140,24 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( copsnrob )
-	PORT_START_TAG("IN0")		/* IN0 */
+	PORT_START("IN0")		/* IN0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START_TAG("IN1")		/* IN1 */
+	PORT_START("IN1")		/* IN1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("IN2")		/* IN2 */
+	PORT_START("IN2")		/* IN2 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START_TAG("DSW")		/* DIP1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_START("DSW")		/* DIP1 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!2,!1")
 	PORT_DIPSETTING(    0x03, "1 Coin/1 Player" )
 	PORT_DIPSETTING(    0x02, "1 Coin/2 Players" )
 	PORT_DIPSETTING(    0x01, "1 Coin/Game" )
 	PORT_DIPSETTING(    0x00, "2 Coins/1 Player" )
-	PORT_DIPNAME( 0x0c, 0x00, "Time Limit" )
+	PORT_DIPNAME( 0x0c, 0x00, "Time Limit" ) PORT_DIPLOCATION("SW:!4,!3")
 	PORT_DIPSETTING(    0x0c, "1min" )
 	PORT_DIPSETTING(    0x08, "1min 45sec" )
 	PORT_DIPSETTING(    0x04, "2min 20sec" )
@@ -165,22 +168,22 @@ static INPUT_PORTS_START( copsnrob )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
 
 	/* These input ports are fake */
-	PORT_START_TAG("FAKE0")		/* IN3 */
+	PORT_START("FAKE0")		/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START_TAG("FAKE1")		/* IN4 */
+	PORT_START("FAKE1")		/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START_TAG("FAKE2")		/* IN5 */
+	PORT_START("FAKE2")		/* IN5 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 
-	PORT_START_TAG("FAKE3")		/* IN6 */
+	PORT_START("FAKE3")		/* IN6 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)

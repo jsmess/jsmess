@@ -100,7 +100,7 @@ static PALETTE_INIT( pc_cga );
 
 
 INPUT_PORTS_START( pcvideo_cga )
-	PORT_START_TAG( "pcvideo_cga_config" )
+	PORT_START( "pcvideo_cga_config" )
 	PORT_CONFNAME( 0x03, 0x00, "CGA character set")
 	PORT_CONFSETTING(0x00, DEF_STR( Normal ))
 	PORT_CONFSETTING(0x01, "Alternative")
@@ -120,7 +120,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( pcvideo_cga_at )
-	PORT_START_TAG( "pcvideo_cga_config" )
+	PORT_START( "pcvideo_cga_config" )
 	PORT_BIT( 0x03, 0x01, IPT_UNUSED )	/* Always use fat characters */
 	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
 	PORT_CONFSETTING(0x00, "Colour RGB")
@@ -138,7 +138,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( pcvideo_pc1512 )
-	PORT_START_TAG( "pcvideo_cga_config" )
+	PORT_START( "pcvideo_cga_config" )
 	PORT_CONFNAME( 0x03, 0x03, "CGA character set")
 	PORT_CONFSETTING(0x00, "Greek")
 	PORT_CONFSETTING(0x01, "Danish 2")

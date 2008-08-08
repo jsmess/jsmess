@@ -51,7 +51,6 @@
 #define DISCRETE_DEBUGLOG			(0)
 
 
-
 /*************************************
  *
  *  Global variables
@@ -169,10 +168,10 @@ static const discrete_module module_list[] =
 
 	/* from disc_inp.c */
 	{ DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  },
-	{ DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,NULL                  ,dss_constant_step    },
-	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
-	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
-	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
+	{ DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,dss_constant_reset    ,NULL                 },
+	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
+	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
+	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
 	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_pulse_step },
 	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,0                                      ,dss_input_stream_reset,dss_input_stream_step},
 
@@ -374,6 +373,34 @@ static void discrete_stop(void *chip)
 	discrete_info *info = chip;
 	int log_num;
 
+#if (DISCRETE_PROFILING)
+	{
+		int nodenum;
+		osd_ticks_t total = 0;
+		osd_ticks_t tresh;
+
+		/* calculate total time */
+		for (nodenum = 0; nodenum < info->node_count; nodenum++)
+		{
+			node_description *node = info->running_order[nodenum];
+
+			/* Now step the node */
+			total += node->run_time;
+		}
+		/* print statistics */
+		tresh = total / info->node_count;
+		for (nodenum = 0; nodenum < info->node_count; nodenum++)
+		{
+			node_description *node = info->running_order[nodenum];
+
+			if (node->run_time > tresh)
+				printf("%3d: %20s %8.2f\n", NODE_INDEX(node->node), node->module.name, (float) node->run_time / (float) total * 100.0);
+			/* Now step the node */
+			total += node->run_time;
+		}
+	}
+#endif
+
 	/* close any csv files */
 	for (log_num = 0; log_num < info->num_csvlogs; log_num++)
 		if (info->disc_csv_file[log_num])
@@ -459,8 +486,14 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 			node_description *node = info->running_order[nodenum];
 
 			/* Now step the node */
+#if (DISCRETE_PROFILING)
+			node->run_time -= osd_profiling_ticks();
+#endif
 			if (node->module.step)
 				(*node->module.step)(node);
+#if (DISCRETE_PROFILING)
+			node->run_time += osd_profiling_ticks();
+#endif
 		}
 
 		/* Add gain to the output and put into the buffers */

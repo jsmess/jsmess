@@ -600,7 +600,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( taitox_generic )
 	/* The Dip Switches will be filled for each game */
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -626,7 +626,7 @@ static INPUT_PORTS_START( taitox_generic )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -652,13 +652,13 @@ static INPUT_PORTS_START( taitox_generic )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1153,6 +1153,48 @@ MACHINE_DRIVER_END
   Game driver(s)
 
 ***************************************************************************/
+
+/*
+Superman
+Taito, 1988
+
+PCB Layout
+----------
+
+J1100145A
+K1100331A
+PO-039A
+|---------------------------------------------------|
+| VOL                        B50-07.U34  DSWB DSWA  |
+|      4558       YM2610 Z80  62256              Z80|
+|      4558 YM3014                                  |
+|                                                   |
+|                                  B06-13           |
+|                                   (PAL)           |
+|                                                   |
+|                                                   |
+|                               6264       B50-06.U3|
+|J     TESTSW                                       |
+|A                                                  |
+|M                                                  |
+|M                                                  |
+|A                                 B06-101          |
+|                                    (PAL)          |
+|                                                Z80|
+|               X1-001A                             |
+|                                                   |
+|    X1-004                                         |
+|               X1-002A       12MHz                 |
+|                                                   |
+|         B50-01.U46    B50-03.U39                  |
+|   X1-006                         6264             |
+|X1-007        B50-02.U43   B50-04.U35     B50-05.U1|
+|---------------------------------------------------|
+Notes:
+      All Z80 CPU's running at 6.000MHz (12/2)
+      YM2203 running at 3.000Mz (12/4)
+      VSync 60Hz
+*/
 
 ROM_START( superman )
 	ROM_REGION( 0x80000, "main", 0 )     /* 512k for 68000 code */

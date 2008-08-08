@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )
 
-    PORT_START_TAG("JOY")  /* Player 1 controls */
+    PORT_START("JOY")  /* Player 1 controls */
     /* II is left of I on the original pad so we map them in reverse order */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button I")
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button II")

@@ -36,6 +36,37 @@ CHIP #  POSITION   TYPE
 12       16E         "       "
 13       17E         "       "
 14       19E         "       "
+
+                Upright or Cocktail cabinet
+     Two 8-Way joysticks with three (3) fire buttons each
+
+    Button 1: Laser    Button 2: Missle    Button 3: Cutter
+
+                        44 Pin Edge Connector
+          Solder Side             |             Parts Side
+------------------------------------------------------------------
+             GND             |  1 | 2  |             GND
+             GND             |  3 | 4  |             GND
+             +5V             |  5 | 6  |             +5V
+             +5V             |  7 | 8  |             +5V
+             +12V            |  9 | 10 |             +5V
+         Speaker (-)         | 11 | 12 |        Speaker (+)
+       Player 1 - Up         | 13 | 14 |       Player 1 - Down
+       Player 1 - Left       | 15 | 16 |       Player 1 - Right
+       Player 1 - Laser      | 17 | 18 |       Player 1 - Missile
+       Player 1 - Cutter     | 19 | 20 |
+       Player 2 - Up         | 21 | 22 |       Player 2 - Down
+       Player 2 - Left       | 23 | 24 |       Player 2 - Right
+       Player 2 - Laser      | 25 | 26 |       Player 2 - Missile
+       Player 2 - Cutter     | 27 | 28 |
+        Coin Switch 1        | 29 | 30 |       Player 1 Start
+       Player 2 Start        | 31 | 32 |
+                             | 33 | 34 |
+       Coin Counter 1        | 35 | 36 |
+        Video Sync           | 37 | 38 |        Video Blue
+        Video Green          | 39 | 40 |        Video Red
+             GND             | 41 | 42 |           GND
+             GND             | 43 | 44 |           GND
 */
 
 #include "driver.h"
@@ -121,7 +152,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( flower )
-	PORT_START_TAG("IN0CPU0")
+	PORT_START("IN0CPU0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -141,7 +172,7 @@ static INPUT_PORTS_START( flower )
 	PORT_DIPSETTING(    0x80, "Short" )
 	PORT_DIPSETTING(    0x00, "Long" )
 
-	PORT_START_TAG("IN1CPU0")
+	PORT_START("IN1CPU0")
 	PORT_DIPNAME( 0x07, 0x05, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2,3") /* what should be the default value ? */
 	PORT_DIPSETTING(    0x07, "1" )
 	PORT_DIPSETTING(    0x06, "2" )
@@ -166,7 +197,7 @@ static INPUT_PORTS_START( flower )
 	PORT_DIPSETTING(    0x80, "30k, then every 50k" )
 	PORT_DIPSETTING(    0x00, "50k, then every 80k" )
 
-	PORT_START_TAG("IN0CPU1")
+	PORT_START("IN0CPU1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
@@ -176,7 +207,7 @@ static INPUT_PORTS_START( flower )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Cutter")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1CPU1")
+	PORT_START("IN1CPU1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL

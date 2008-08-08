@@ -77,7 +77,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( advision )
-    PORT_START_TAG("joystick")      /* IN0 */
+    PORT_START("joystick")      /* IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )       PORT_PLAYER(1)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )       PORT_PLAYER(1)
     PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )       PORT_PLAYER(1)

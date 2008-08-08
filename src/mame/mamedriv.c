@@ -2238,7 +2238,7 @@ V-V                           TP-027
 	/* Williams games */
 	DRIVER( defender )	/* (c) 1980 */
 	DRIVER( defendg )	/* (c) 1980 */
-	DRIVER( defendw )	/* (c) 1980 */
+	DRIVER( defendb )	/* (c) 1980 */
 	DRIVER( defndjeu )	/* bootleg */
 	DRIVER( tornado1 )	/* bootleg */
 	DRIVER( tornado2 )	/* bootleg */
@@ -3809,6 +3809,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( fvipers )	/* 1995 */
 	DRIVER( gunblade )	/* 1995 */
 	DRIVER( indy500 )	/* 1995 */
+	DRIVER( indy500d )	/* 1995 */
 	DRIVER( skytargt )	/* 1995 */
 	DRIVER( schamp )	/* 1996 */
 	DRIVER( lastbrnx )	/* 1996 */
@@ -5102,6 +5103,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ccastle3 )	/* 136022           (c) 1983 */
 	DRIVER( ccastle2 )	/* 136022           (c) 1983 */
 	DRIVER( ccastle1 )	/* 136022           (c) 1983 */
+	DRIVER( ccastlej )	/* 136022           (c) 1983 */
 	DRIVER( cloak )		/* 136023           (c) 1983 */
 	DRIVER( cloaksp )	/* 136023           (c) 1983 */
 	DRIVER( cloakfr )	/* 136023           (c) 1983 */
@@ -6229,6 +6231,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* TIA-MC1 hardware games */
 	DRIVER( konek )		/* (c) 1988 Terminal */
+	DRIVER( sosterm )		/* (c) 1988 Terminal */
 
 	/* Valadon Automation games */
 	DRIVER( bagman )	/* (c) 1982 */
@@ -7265,14 +7268,15 @@ Other Sun games
 	DRIVER( goldstar )	/* (c) 198? IGS */
 	DRIVER( goldstbl )	/* (c) 198? IGS */
 	DRIVER( moonlght )	/* bootleg */
- 	DRIVER( cpoker )	/* (c) 198? IGS */
+ 	DRIVER( cpoker )	/* (c) 1993? IGS */
+ 	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
 	DRIVER( csk234it )	/* (c) 198? IGS */
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
 	DRIVER( cabaret )
-	DRIVER( pokerigs )	/* (c) 1995 */
+	DRIVER( jingbell )	/* (c) 1995? */
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
@@ -7661,6 +7665,7 @@ Other Sun games
 	DRIVER( amspdwy )	/* no copyright notice, but (c) 1987 Enerdyne Technologies, Inc. */
 	DRIVER( amspdwya )	/* no copyright notice, but (c) 1987 Enerdyne Technologies, Inc. */
 	DRIVER( othldrby )	/* (c) 1995 Sunwise */
+	DRIVER( quizpun2 )	/* (c) 1989 Space Computer System of Korea */
 	DRIVER( mosaic )	/* (c) 1990 Space */
 	DRIVER( mosaica )	/* (c) 1990 Space + Fuuki license */
 	DRIVER( gfire2 )	/* (c) 1992 Topis Corp */
@@ -7893,7 +7898,8 @@ Other Sun games
 	DRIVER( pitbosss )	/* (c) 1990 Merit */
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
 	DRIVER( megat3 )	/* (c) 1996 Merit */
-	DRIVER( megat3a )	/* (c) 1995 Merit */
+	DRIVER( megat3a )	/* (c) 1996 Merit */
+	DRIVER( megat3b )	/* (c) 1995 Merit */
 	DRIVER( megat3te )	/* (c) 1996 Merit */
 	DRIVER( megat4 )	/* (c) 1996 Merit */
 	DRIVER( megat4a )	/* (c) 1996 Merit */

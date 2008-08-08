@@ -6,7 +6,8 @@
 
 *********************************************************************/
 
-#include "mame.h"
+#include "driver.h"
+#include "deprecat.h"
 #include "cdrom.h"
 #include "chd_cd.h"
 
@@ -232,12 +233,9 @@ void cdrom_device_getinfo(const mess_device_class *devclass, UINT32 state, union
 	}
 }
 
-cdrom_file *mess_cd_get_cdrom_file_by_number(int drivenum)
+cdrom_file *mess_cd_get_cdrom_file_by_number(const char *diskregion)
 {
-	if ((drivenum < 0) || (drivenum > MAX_CDROMS))
-	{
-		return NULL;
-	}
-
-	return drive_handles[drivenum];
+	const device_config *device;
+	device = device_list_find_by_tag(Machine->config->devicelist, DEVICE_TYPE_WILDCARD, diskregion);
+	return mess_cd_get_cdrom_file(device);
 }

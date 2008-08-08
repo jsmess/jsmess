@@ -39,7 +39,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.126u3.  This incorporates all features of the
+- The core is based on MAME 0.126u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Natural keyboard support is now implemented completely in the MESS core.

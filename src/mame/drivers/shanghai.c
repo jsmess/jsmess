@@ -13,9 +13,12 @@ to a NOP to jump to it immediately at the beginning of a round.
 I'm not sure about the refresh rate, 60Hz makes time match the dip switch
 settings, but music runs too fast.
 
-TS 20050212:
-- added Kyuukyoku no Othello - problems with gfx
-  (wrong data copied to HD63484 ?)
+
+* kothello
+
+Notes: If you use the key labeled as 'Service Coin' you can start the game
+with a single 'coin' no matter the Coingae Setting, but the credit is not
+displayed.
 
 ***************************************************************************/
 
@@ -144,16 +147,15 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 	switch (opcode & 0x0700)
 	{
 		default:
-		case 0x0000: dstep1 =  1; dstep2 = -384; break;
-		case 0x0100: dstep1 =  1; dstep2 =  384; break;
-		case 0x0200: dstep1 = -1; dstep2 = -384; break;
-		case 0x0300: dstep1 = -1; dstep2 =  384; break;
-		case 0x0400: dstep1 = -384; dstep2 =  1; break;
-		case 0x0500: dstep1 =  384; dstep2 =  1; break;
-		case 0x0600: dstep1 = -384; dstep2 = -1; break;
-		case 0x0700: dstep1 =  384; dstep2 = -1; break;
+		case 0x0000: dstep1 =  1; dstep2 = -384 - ax * dstep1; break;
+		case 0x0100: dstep1 =  1; dstep2 =  384 - ax * dstep1; break;
+		case 0x0200: dstep1 = -1; dstep2 = -384 + ax * dstep1; break;
+		case 0x0300: dstep1 = -1; dstep2 =  384 + ax * dstep1; break;
+		case 0x0400: dstep1 = -384; dstep2 =  1 - ay * dstep1; break;
+		case 0x0500: dstep1 =  384; dstep2 =  1 - ay * dstep1; break;
+		case 0x0600: dstep1 = -384; dstep2 = -1 + ay * dstep1; break;
+		case 0x0700: dstep1 =  384; dstep2 = -1 + ay * dstep1; break; // used by kothello
 	}
-	dstep2 -= ax * dstep1;
 
 	for (;;)
 	{
@@ -190,7 +192,7 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			if (opcode & 0x0800)
 			{
 				if (ay == 0) break;
-				else if (ay > 0)
+				if (_ay > 0)
 				{
 					src = (src - 384) & (HD63484_RAM_SIZE-1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE-1);
@@ -226,14 +228,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			ay = _ay;
 			if (_ax < 0)
 			{
-				src = (src - 1 - ay) & (HD63484_RAM_SIZE-1);
+				src = (src - 1 + ay * 384) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				src = (src + 1 - ay) & (HD63484_RAM_SIZE-1);
+				src = (src + 1 - ay * 384) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax--;
@@ -320,8 +322,9 @@ static void HD63484_command_w(UINT16 cmd)
 			logerror("%04x ",fifo[i]);
 		logerror("\n");
 
-		if (fifo[0] == 0x0400)	/* ORG */
+		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
+		}
 		else if ((fifo[0] & 0xffe0) == 0x0800)	/* WPR */
 		{
 			if (fifo[0] == 0x0800)
@@ -354,33 +357,91 @@ logerror("unsupported register\n");
 		}
 		else if (fifo[0] == 0x5800)	/* CLR */
 		{
-rwp *= 2;
-			doclr(fifo[0],fifo[1],&rwp,2*fifo[2]+1,fifo[3]);
-rwp /= 2;
+			int ax = 2*fifo[2];
+
+			rwp *= 2;
+			if (fifo[2] & 0x8000) { rwp += 1; ax -= 1; } else { ax += 1; }
+
+			doclr(fifo[0],fifo[1],&rwp,ax,fifo[3]);
+
+			if (fifo[2] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
-rwp *= 2;
-			doclr(fifo[0],fifo[1],&rwp,2*fifo[2]+1,fifo[3]);
-rwp /= 2;
+			int ax = 2*fifo[2];
+
+			rwp *= 2;
+			if (fifo[2] & 0x8000) { rwp += 1; ax -= 1; } else { ax += 1; }
+
+			doclr(fifo[0],fifo[1],&rwp,ax,fifo[3]);
+
+			if (fifo[2] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
-			int src;
+			int src,ax;
 
-			src = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
-rwp *= 2;
-			docpy(fifo[0],2*src,&rwp,2*fifo[3]+1,fifo[4]);
-rwp /= 2;
+			ax = 2*fifo[3];
+			src = (((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4))*2;
+			rwp *= 2;
+			if (fifo[3] & 0x8000) { rwp += 1; src += 1; ax -= 1; } else { ax += 1; }
+
+			docpy(fifo[0],src,&rwp,ax,fifo[4]);
+
+			if (fifo[3] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
-			int src;
+			int src,ax;
 
-			src = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
-rwp *= 2;
-			docpy(fifo[0],2*src,&rwp,2*fifo[3]+1,fifo[4]);
-rwp /= 2;
+			ax = 2*fifo[3];
+			src = (((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4))*2;
+			rwp *= 2;
+			if (fifo[3] & 0x8000) { rwp += 1; src += 1; ax -= 1; } else { ax += 1; }
+
+			docpy(fifo[0],src,&rwp,ax,fifo[4]);
+
+			if (fifo[3] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if (fifo[0] == 0x8000)	/* AMOVE */
 		{
@@ -590,6 +651,7 @@ rwp /= 2;
 
 			pcx = fifo[1];
 			pcy = fifo[2];
+
 			src = (2*org + pcx - pcy * 384) & (HD63484_RAM_SIZE-1);
 			dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
 
@@ -695,10 +757,10 @@ static VIDEO_UPDATE( shanghai )
 	int x,y,b;
 
 
-	b = 2 * (((HD63484_reg[0xcc/2] & 0x001f) << 16) + HD63484_reg[0xce/2]);
+	b = 2 * (((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2]);
 	for (y = 0;y < 280;y++)
 	{
-		for (x = 0;x < 384;x++)
+		for (x = 0 ; x<384 ; x++)
 		{
 			b &= (HD63484_RAM_SIZE-1);
 			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b];
@@ -714,19 +776,21 @@ static VIDEO_UPDATE( shanghai )
 		int w = (HD63484_reg[0x92/2] & 0xff) * 4;
 		if (sx < 0) sx = 0;	/* not sure about this (shangha2 title screen) */
 
-		b = 2 * (((HD63484_reg[0xdc/2] & 0x001f) << 16) + HD63484_reg[0xde/2]);
-		for (y = sy;y <= sy+h && y < 280;y++)
+		b = 2 * (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
+
+		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0;x < 384;x++)
+			for (x = 0 ; x < 384 ; x++)
 			{
-				b &= (HD63484_RAM_SIZE-1);
-				if (x <= w && x + sx >= 0 && x+sx < 384)
-					*BITMAP_ADDR16(bitmap, y, x+sx) = HD63484_ram[b];
+				b &= (HD63484_RAM_SIZE - 1);
+				if (x <= w && x + sx >= 0 && x + sx < 384)
+					*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b];
 
 				b++;
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -763,17 +827,17 @@ static ADDRESS_MAP_START( shanghai_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(YM2203_status_port_0_lsb_r, YM2203_control_port_0_lsb_w)
 	AM_RANGE(0x22, 0x23) AM_READWRITE(YM2203_read_port_0_lsb_r, YM2203_write_port_0_lsb_w)
-	AM_RANGE(0x40, 0x41) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x44, 0x45) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x48, 0x49) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
+	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
+	AM_RANGE(0x48, 0x49) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4c, 0x4d) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( shangha2_portmap, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x10, 0x11) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x20, 0x21) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
+	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
+	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x30, 0x31) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x32, 0x33) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(YM2203_status_port_0_lsb_r, YM2203_control_port_0_lsb_w)
@@ -781,25 +845,19 @@ static ADDRESS_MAP_START( shangha2_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
-
-
-
-
-static READ16_HANDLER(shanghai_rand_r)
-{
-	return mame_rand(machine);
-}
-
 static READ16_HANDLER( kothello_HD63484_status_r )
 {
-	return 0xff22;	/* write FIFO ready + command end    + read FIFO ready */
+	return 0xff22;	/* write FIFO ready + command end + read FIFO ready */
 }
 
 static ADDRESS_MAP_START( kothello_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 	AM_RANGE(0x08010, 0x08011) AM_READWRITE(kothello_HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x08012, 0x08013) AM_READWRITE(HD63484_data_r, HD63484_data_w)
-	AM_RANGE(0x09010, 0x0901f) AM_READWRITE(shanghai_rand_r, SMH_NOP) // unknown, sub cpu communication ?
+	AM_RANGE(0x09010, 0x09011) AM_READ_PORT("P1")
+	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
+	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x09016, 0x0901f) AM_WRITENOP // 0x9016 is set to 0 at the boot
 	AM_RANGE(0x0a000, 0x0a1ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0b010, 0x0b01f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
@@ -807,11 +865,70 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kothello )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( shanghai )
-	PORT_START	/* IN0 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -821,7 +938,7 @@ static INPUT_PORTS_START( shanghai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -831,7 +948,7 @@ static INPUT_PORTS_START( shanghai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN2 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -841,7 +958,7 @@ static INPUT_PORTS_START( shanghai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* DSW0 */
+	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -865,7 +982,7 @@ static INPUT_PORTS_START( shanghai )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 
-	PORT_START	/* DSW1 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Confirmation" )
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -890,7 +1007,7 @@ static INPUT_PORTS_START( shanghai )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shangha2 )
-	PORT_START	/* IN0 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -900,7 +1017,7 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -910,7 +1027,7 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN2 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -920,7 +1037,7 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* DSW0 */
+	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
@@ -941,7 +1058,7 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_DIPSETTING(    0x40, "90" )
 	PORT_DIPSETTING(    0x00, "120" )
 
-	PORT_START	/* DSW1 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Mystery Tiles" )
 	PORT_DIPSETTING(    0x03, "0" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -982,6 +1099,17 @@ static const struct YM2203interface sh_ym2203_interface =
 	NULL
 };
 
+
+const struct YM2203interface kothello_ym2203_interface =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_4_r,
+		NULL, NULL, NULL
+	},
+	seibu_ym2203_irqhandler
+};
 
 
 static MACHINE_DRIVER_START( shanghai )
@@ -1067,7 +1195,7 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 384)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MDRV_SCREEN_VISIBLE_AREA(8, 384-4-1, 0, 250-1)
 
 	MDRV_PALETTE_LENGTH(256)
 
@@ -1075,7 +1203,16 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_VIDEO_UPDATE(shanghai)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(14318180/4)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
+	MDRV_SOUND_ADD("ym1", YM2203, 14318180/4)
+	MDRV_SOUND_CONFIG(kothello_ym2203_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
+	MDRV_SOUND_ADD("ym2", YM2203, 14318180/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
 MACHINE_DRIVER_END
 
@@ -1176,4 +1313,4 @@ ROM_END
 
 GAME( 1988, shanghai, 0, shanghai, shanghai, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, shangha2, 0, shangha2, shangha2, 0, ROT0, "Sunsoft", "Shanghai II (Japan)", 0 )
-GAME( 1990, kothello, 0, kothello, kothello, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_NOT_WORKING )
+GAME( 1990, kothello, 0, kothello, kothello, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )

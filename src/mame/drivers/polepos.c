@@ -443,7 +443,7 @@ ADDRESS_MAP_END
  *********************************************************************/
 
 static INPUT_PORTS_START( polepos )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWA")	/* DSW A */
+	PORT_START("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )
@@ -477,7 +477,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 
-	PORT_START_TAG("DSWB")	/* DSW B */
+	PORT_START("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
 	PORT_DIPSETTING(	0x07, "A" )
 	PORT_DIPSETTING(	0x03, "B" )
@@ -503,19 +503,19 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("BRAKE") /* IN1 - Brake */
+	PORT_START("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("ACCEL") /* IN2 - Accel */
+	PORT_START("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("STEER") /* IN3 - Steering */
+	PORT_START("STEER") /* IN3 - Steering */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( poleposa )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
@@ -525,7 +525,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWA")	/* DSW A */
+	PORT_START("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0xc0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )
@@ -549,7 +549,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x01, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 
-	PORT_START_TAG("DSWB")	/* DSW B */
+	PORT_START("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0xe0, 0xe0, "Practice Rank" )
 	PORT_DIPSETTING(	0xe0, "A" )
 	PORT_DIPSETTING(	0x60, "B" )
@@ -575,20 +575,20 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("BRAKE") /* IN1 - Brake */
+	PORT_START("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("ACCEL") /* IN2 - Accel */
+	PORT_START("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("STEER") /* IN3 - Steering */
+	PORT_START("STEER") /* IN3 - Steering */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( topracra )
 	// no coins ?!
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
@@ -597,7 +597,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWA")	/* DSW A */
+	PORT_START("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )
@@ -621,7 +621,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 
-	PORT_START_TAG("DSWB")	/* DSW B */
+	PORT_START("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
 	PORT_DIPSETTING(	0x07, "A" )
 	PORT_DIPSETTING(	0x03, "B" )
@@ -647,19 +647,19 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("BRAKE") /* IN1 - Brake */
+	PORT_START("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("ACCEL") /* IN2 - Accel */
+	PORT_START("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("STEER") /* IN3 - Steering */
+	PORT_START("STEER") /* IN3 - Steering */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( polepos2 )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
@@ -669,7 +669,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWA")	/* DSW A */
+	PORT_START("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0xc0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )
@@ -694,7 +694,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSWB")	/* DSW B */
+	PORT_START("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Game_Time ) )
 	PORT_DIPSETTING(	0x80, "90 secs." )
 	PORT_DIPSETTING(	0x00, "120 secs." )
@@ -717,13 +717,13 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x01, "Average" )
 	PORT_DIPSETTING(	0x00, DEF_STR( High ) )
 
-	PORT_START_TAG("BRAKE") /* IN1 - Brake */
+	PORT_START("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("ACCEL") /* IN2 - Accel */
+	PORT_START("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START_TAG("STEER") /* IN3 - Steering */
+	PORT_START("STEER") /* IN3 - Steering */
 	PORT_BIT ( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
@@ -1148,7 +1148,104 @@ ROM_START( polepos1 )
 	ROM_LOAD( "136014.117",   0x0000, 0x0100, CRC(2401c817) SHA1(8991b7994513a469e64392fa8f233af5e5f06d54) )    /* sync chain */
 ROM_END
 
+/*
+Top Racer / Pole Position I/II (?)
 
+PCB Layouts
+===========
+
+Upper Board
+-----------
+PP-1126
+|----------------------------------------------------------------------------------|
+|                LM324   8A   9A                                                   |
+|1B DIP28  DIP28  DIP28                                                            |
+|                4066                                                              |
+|                                                                                  |
+|                LM324                                                             |
+|        DSW2            4066  4066                                                |
+|  MB8841  MB8841  MB8841                82S129.14C                                |
+|                                                                                  |
+|                                                                                  |
+|        DSW1                                                                      |
+|                  4066  4066                      82S153.16D                      |
+|                                                                                  |
+|                                                                                  |
+|  MB8842                                                                          |
+|           LM324           82S129.9E  2148 2148           Z80   Z8002    Z8002    |
+|                                                  |-----daughterboard-------|     |
+|                                                  |                         |     |
+|                                                  |  82S153.18E   82S153.21E|     |
+|                                                  |              20E        |     |
+|                                              6116|                         |     |
+|                                          ADC0804 |16F  17F      20F   21F  | 23F |
+|                                                  |-------------------------|     |
+|                                                   16F  17F                       |
+|                                          4066                                    |
+|                                                                                  |
+|                 4093                                                             |
+|                                               3.6V_BATT                          |
+|---------|----18-way-----|-----------------J2-------|----50-pin cable---|---------|
+          |---------------|                          |-------------------|
+Notes:
+      82S153  - Field Programmable Logic Array (DIP20)
+      2148    - 1K x4bit SRAM (DIP18)
+      6116    - 2K x8bit SRAM (DIP24)
+      ADC0804 - 8bit Microprocessor Compatible A/D Convertor (DIP20)
+      J2      - 3 Pin Power Connector
+      DIP28   - Unpopulated Sockets
+      MB8841  - Fujitsu 4bit Microcontroller (DIP40)
+      MB8842  - Fujitsu 4bit Microcontroller (DIP28)
+      LM324   - Low Power Quad Operational Amplifier (DIP14)
+
+      Note - All ROMs labelled PP2_U.* are located on the upper PCB.
+             All ROMs labelled PP2_D.* are located on the plug-in daughterboard.
+
+
+Lower Board
+-----------
+
+|----------------------------------------------------------------------------------|
+| 1A  2A  3A  4A  5A  6A  7A  8A  9A  10A                                          |
+|                                                                                  |
+|                                 9D                  82S129.13D                   |
+|                                                                                  |
+|                                                     82S129.13E                   |
+|     2148  2148                                                                   |
+|                                                     82S129.13F                   |
+|            6116  6116  82S137.7H                                                 |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|     2J     6116  6116                                                            |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|     2M                       8M  9M                                              |
+|                                                                                  |
+|                                                                                  |
+|    82S129.2N                                                                     |
+|                                                           2114  2114             |
+|    82S129.2P   82S137.5P     8P                                                  |
+|                                                           2114  2114  82S123.15R |
+|    82S129.2S                                                                     |
+|                                                           2114  2114  82S123.15S |
+|    82S129.2T                                                                     |
+|             MB3730 MB3730 MB3730 MB3730      24.576MHz    2114  2114             |
+|  82S129.2U   VOL    VOL    VOL    VOL                                            |
+|                                                                                  |
+|---------|----18-way-----|-----------------J2-------|----50-pin cable---|---------|
+          |---------------|                          |-------------------|
+Notes:
+      2114   - 1K x4bit SRAM (DIP18)
+      2148   - 1K x4bit SRAM (DIP18)
+      6116   - 2K x8bit SRAM (DIP24)
+      MB3730 - 12W Power Amp IC (SIP7)
+      J2     - 3 Pin Power Connector
+      VOL    - Volume Potentiometer
+
+      Note - All ROMs labelled PP2_L.* are located on the lower PCB.
+*/
 ROM_START( topracer )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, "main", 0 )

@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 	PORT_BIT( mask, IP_ACTIVE_LOW, IPT_UNUSED)
 
 static INPUT_PORTS_START( cybiko)
-	PORT_START_TAG("A1") // A1
+	PORT_START("A1") // A1
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "F7"    ) PORT_CODE( KEYCODE_F7        ) PORT_CHAR( UCHAR_MAMEKEY( F7    ))
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "Esc"   ) PORT_CODE( KEYCODE_ESC       ) PORT_CHAR( UCHAR_MAMEKEY( ESC   ))
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "Del"   ) PORT_CODE( KEYCODE_DEL       ) PORT_CHAR( UCHAR_MAMEKEY( DEL   ))
@@ -140,7 +140,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "A"     ) PORT_CODE( KEYCODE_A         ) PORT_CHAR( 'A'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "`"     )                                PORT_CHAR( '`'                   )
 	CYBIKO_PORT_BIT_K( 0x80) PORT_NAME( "Shift" ) PORT_CODE( KEYCODE_LSHIFT    ) PORT_CHAR( UCHAR_SHIFT_1         )
-	PORT_START_TAG("A2") // A2
+	PORT_START("A2") // A2
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "F6"    ) PORT_CODE( KEYCODE_F6        ) PORT_CHAR( UCHAR_MAMEKEY( F6    ))
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "Up"    ) PORT_CODE( KEYCODE_UP        ) PORT_CHAR( UCHAR_MAMEKEY( UP    ))
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "As"   ) PORT_CODE( KEYCODE_INSERT    ) PORT_CHAR( UCHAR_MAMEKEY( INSERT))
@@ -149,7 +149,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "S"     ) PORT_CODE( KEYCODE_S         ) PORT_CHAR( 'S'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "Z"     ) PORT_CODE( KEYCODE_Z         ) PORT_CHAR( 'Z'                   )
 	CYBIKO_PORT_BIT_K( 0x80) PORT_NAME( "Fn"    ) PORT_CODE( KEYCODE_LCONTROL  ) PORT_CHAR( UCHAR_SHIFT_2         )
-	PORT_START_TAG("A3") // A3
+	PORT_START("A3") // A3
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "F5"    ) PORT_CODE( KEYCODE_F5        ) PORT_CHAR( UCHAR_MAMEKEY( F5    ))
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "F3"    ) PORT_CODE( KEYCODE_F3        ) PORT_CHAR( UCHAR_MAMEKEY( F3    ))
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "Space" ) PORT_CODE( KEYCODE_SPACE     ) PORT_CHAR( ' '                   )
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "D"     ) PORT_CODE( KEYCODE_D         ) PORT_CHAR( 'D'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "X"     ) PORT_CODE( KEYCODE_X         ) PORT_CHAR( 'X'                   )
 	CYBIKO_PORT_BIT_K( 0x80) PORT_NAME( "Help"  ) PORT_CODE( KEYCODE_END       ) PORT_CHAR( UCHAR_MAMEKEY( END   ))
-	PORT_START_TAG("A4") // A4
+	PORT_START("A4") // A4
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "F4"    ) PORT_CODE( KEYCODE_F4        ) PORT_CHAR( UCHAR_MAMEKEY( F4    ))
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "1 !"   ) PORT_CODE( KEYCODE_1         ) PORT_CHAR( '1'                   ) PORT_CHAR( '!')
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "Tab"   ) PORT_CODE( KEYCODE_TAB       ) PORT_CHAR( 9                     )
@@ -167,7 +167,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "F"     ) PORT_CODE( KEYCODE_F         ) PORT_CHAR( 'F'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "C"     ) PORT_CODE( KEYCODE_C         ) PORT_CHAR( 'C'                   )
 	CYBIKO_PORT_BIT_K( 0x80) PORT_NAME( "[ {"   ) PORT_CODE( KEYCODE_OPENBRACE ) PORT_CHAR( '['                   )
-	PORT_START_TAG("A5") // A5
+	PORT_START("A5") // A5
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "Right" ) PORT_CODE( KEYCODE_RIGHT     ) PORT_CHAR( UCHAR_MAMEKEY( RIGHT ))
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "Down"  ) PORT_CODE( KEYCODE_DOWN      ) PORT_CHAR( UCHAR_MAMEKEY( DOWN  ))
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "Select") PORT_CODE( KEYCODE_HOME      ) PORT_CHAR( UCHAR_MAMEKEY( HOME  ))
@@ -176,7 +176,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "G"     ) PORT_CODE( KEYCODE_G         ) PORT_CHAR( 'G'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "V"     ) PORT_CODE( KEYCODE_V         ) PORT_CHAR( 'V'                   )
 	CYBIKO_PORT_BIT_K( 0x80) PORT_NAME( "] }"   ) PORT_CODE( KEYCODE_CLOSEBRACE) PORT_CHAR( ']'                   )
-	PORT_START_TAG("A6") // A6
+	PORT_START("A6") // A6
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "F2"    ) PORT_CODE( KEYCODE_F2        ) PORT_CHAR( UCHAR_MAMEKEY( F2    ))
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "; :"   ) PORT_CODE( KEYCODE_COLON     ) PORT_CHAR( ';'                   ) PORT_CHAR( ':')
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "Enter" ) PORT_CODE( KEYCODE_ENTER     ) PORT_CHAR( 13                    )
@@ -185,7 +185,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "H"     ) PORT_CODE( KEYCODE_H         ) PORT_CHAR( 'H'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "B"     ) PORT_CODE( KEYCODE_B         ) PORT_CHAR( 'B'                   )
 	CYBIKO_PORT_BIT_K( 0x80) PORT_NAME( "\\ |"  ) PORT_CODE( KEYCODE_BACKSLASH ) PORT_CHAR( '\\'                  ) PORT_CHAR( '|')
-	PORT_START_TAG("A7") // A7
+	PORT_START("A7") // A7
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "F1"    ) PORT_CODE( KEYCODE_F1        ) PORT_CHAR( UCHAR_MAMEKEY( F1    ))
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "/ ?"   ) PORT_CODE( KEYCODE_SLASH     ) PORT_CHAR( '/'                   ) PORT_CHAR( '?')
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "BkSp"  ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHAR( 8                     )
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "J"     ) PORT_CODE( KEYCODE_J         ) PORT_CHAR( 'J'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "N"     ) PORT_CODE( KEYCODE_N         ) PORT_CHAR( 'N'                   )
 	CYBIKO_PORT_BIT_U( 0x80)
-	PORT_START_TAG("A8") // A8
+	PORT_START("A8") // A8
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "- _"   ) PORT_CODE( KEYCODE_MINUS     ) PORT_CHAR( '-'                   ) PORT_CHAR( '_')
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( ". >"   )                                PORT_CHAR( '.'                   ) PORT_CHAR( '>')
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "0 )"   ) PORT_CODE( KEYCODE_0         ) PORT_CHAR( '0'                   ) PORT_CHAR( ')')
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( cybiko)
 	CYBIKO_PORT_BIT_K( 0x20) PORT_NAME( "K"     ) PORT_CODE( KEYCODE_K         ) PORT_CHAR( 'K'                   )
 	CYBIKO_PORT_BIT_K( 0x40) PORT_NAME( "M"     ) PORT_CODE( KEYCODE_M         ) PORT_CHAR( 'M'                   )
 	CYBIKO_PORT_BIT_U( 0x80)
-	PORT_START_TAG("A9") // A9
+	PORT_START("A9") // A9
 	CYBIKO_PORT_BIT_K( 0x01) PORT_NAME( "' \""  ) PORT_CODE( KEYCODE_QUOTE     ) PORT_CHAR( '\''                  ) PORT_CHAR( '"')
 	CYBIKO_PORT_BIT_K( 0x02) PORT_NAME( "= +"   ) PORT_CODE( KEYCODE_EQUALS    ) PORT_CHAR( '='                   ) PORT_CHAR( '+')
 	CYBIKO_PORT_BIT_K( 0x04) PORT_NAME( "9 ("   ) PORT_CODE( KEYCODE_9         ) PORT_CHAR( '9'                   ) PORT_CHAR( '(')
