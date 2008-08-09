@@ -454,7 +454,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 				{
 					printf("Error %d while waiting for pthread_cond_timedwait:  %s\n", ret, strerror(ret));
 				}
-					
+				
 			} while (TRUE);
 		}
 	}
@@ -471,7 +471,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 /*
  * The following code has been added
  * for demonstration purposes only.
- * It implements a events without the need
+ * It implements events without the need
  * for pthreads. However, it horribly fails, if
  * threads > num processors as is the case if you 
  * enable "-mt"

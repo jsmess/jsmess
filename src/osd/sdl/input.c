@@ -169,7 +169,7 @@ static void sdlinput_exit(running_machine *machine);
 
 // deivce list management
 static void device_list_reset_devices(device_info *devlist_head);
-static void device_list_free_devices(device_info *devlist_head);
+static void device_list_free_devices(device_info **devlist_head);
 
 // generic device management
 static device_info *generic_device_alloc(device_info **devlist_head_ptr, const char *name);
@@ -943,6 +943,7 @@ void sdlinput_init(running_machine *machine)
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
 	devinfo->device = input_device_add(DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
 
 	// add the axes
 	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
@@ -987,9 +988,9 @@ static void sdlinput_exit(running_machine *machine)
 	osd_lock_free(input_lock);
 
 	// free all devices
-	device_list_free_devices(keyboard_list);
-	device_list_free_devices(mouse_list);
-	device_list_free_devices(joystick_list);
+	device_list_free_devices(&keyboard_list);
+	device_list_free_devices(&mouse_list);
+	device_list_free_devices(&joystick_list);
 }
 
 
@@ -1031,6 +1032,10 @@ void sdlinput_process_events_buf(running_machine *machine)
 	SDL_Event event;
 
 	osd_lock_acquire(input_lock);
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	/* Make sure we get all pending events */
+	SDL_PumpEvents();
+#endif
 	while(SDL_PollEvent(&event)) 
 	{
 		if (event_buf_count < MAX_BUF_EVENTS)
@@ -1114,6 +1119,7 @@ void sdlinput_poll(running_machine *machine)
 			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jhat.which]);
 			if (devinfo)
 			{
+				// FIXME: change == to x & y != 0
 				if (event.jhat.value == SDL_HAT_UP)
 				{
 					devinfo->joystick.hatsU[event.jhat.hat] = 0x80;
@@ -1195,8 +1201,14 @@ void sdlinput_poll(running_machine *machine)
 			break;
 		case SDL_MOUSEMOTION:
 			devinfo = mouse_list;
+#if (SDL_VERSION_ATLEAST(1,3,0))
+			// FIXME: may apply to 1.2 as well ...
+			devinfo->mouse.lX += event.motion.xrel * INPUT_RELATIVE_PER_PIXEL; 
+			devinfo->mouse.lY += event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
+#else
 			devinfo->mouse.lX = event.motion.xrel * INPUT_RELATIVE_PER_PIXEL; 
-			devinfo->mouse.lY = event.motion.yrel * INPUT_RELATIVE_PER_PIXEL; 
+			devinfo->mouse.lY = event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
+#endif
 			{
 				int cx=-1, cy=-1;
 				sdl_window_info *window = GET_WINDOW(&event.motion);
@@ -1216,10 +1228,13 @@ void sdlinput_poll(running_machine *machine)
 		case SDL_TEXTINPUT:
 			if (*event.text.text)
 			{
-				sdl_window_info *w = GET_WINDOW(&event.text);
+				sdl_window_info *window = GET_WINDOW(&event.text);
 				unicode_char result;
-				osd_uchar_from_osdchar(&result, event.text.text, 1);
-				ui_input_push_char_event(machine, w->target, result);
+				if (window != NULL )
+				{
+					osd_uchar_from_osdchar(&result, event.text.text, 1);
+					ui_input_push_char_event(machine, window->target, result);
+				}
 			}
 			break;
 		case SDL_WINDOWEVENT:
@@ -1241,7 +1256,8 @@ void sdlinput_poll(running_machine *machine)
 				
 			}
 			case SDL_WINDOWEVENT_RESIZED:
-				sdlwindow_resize(window, event.window.data1, event.window.data2);
+				if (event.window.data1 != window->width || event.window.data2 != window->height)
+					sdlwindow_resize(window, event.window.data1, event.window.data2);
 				/* fall through break; */
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
 			case SDL_WINDOWEVENT_ENTER:
@@ -1258,6 +1274,23 @@ void sdlinput_poll(running_machine *machine)
 	}
 }
 
+//============================================================
+//  sdlinput_release_keys
+//============================================================
+
+void  sdlinput_release_keys(running_machine *machine)
+{
+	// FIXME: SDL >= 1.3 will nuke the window event buffer when
+	// a window is closed. This will leave keys in a pressed
+	// state when a window is destroyed and recreated.
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	device_info *devinfo;
+
+	devinfo = keyboard_list;
+	if (devinfo != NULL)
+		memset(&devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
+#endif	
+}
 
 //============================================================
 //  sdlinput_should_hide_mouse
@@ -1384,7 +1417,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 			
 			// LCTRL-F8 to decrease prescaling effect #
 			case IPT_OSD_8:
-				if (sdl_use_unsupported()) {
+				if (osd_use_unsupported()) {
 					typedesc->token = "DECREASE_EFFECT";
 					typedesc->name = "Decrease Effect";
 					input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F8, KEYCODE_LCONTROL);
@@ -1392,13 +1425,13 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 				break;
 			// add a Not lcrtl condition to frameskip decrease
 			case IPT_UI_FRAMESKIP_DEC:
-				if (sdl_use_unsupported())
+				if (osd_use_unsupported())
 					input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F8, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
 			// LCTRL-F9 to increase prescaling effect #
 			case IPT_OSD_9:
-				if (sdl_use_unsupported()) {
+				if (osd_use_unsupported()) {
 					typedesc->token = "INCREASE_EFFECT";
 					typedesc->name = "Increase Effect";
 					input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F9, KEYCODE_LCONTROL);
@@ -1406,7 +1439,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 				break;
 			// add a Not lcrtl condition to frameskip increase
 			case IPT_UI_FRAMESKIP_INC:
-				if (sdl_use_unsupported())
+				if (osd_use_unsupported())
 					input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F9, SEQCODE_NOT, KEYCODE_LCONTROL);
 				break;
 			
@@ -1446,16 +1479,17 @@ static void device_list_reset_devices(device_info *devlist_head)
 //  device_list_free_devices
 //============================================================
 
-static void device_list_free_devices(device_info *devlist_head)
+static void device_list_free_devices(device_info **devlist_head)
 {
 	device_info *curdev, *next;
 	
-	for (curdev = devlist_head; curdev != NULL; )
+	for (curdev = *devlist_head; curdev != NULL; )
 	{
 		next = curdev->next;
 		generic_device_free(curdev);
 		curdev = next;
 	}
+	*devlist_head = NULL;
 }
 
 //============================================================

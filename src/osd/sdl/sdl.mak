@@ -44,7 +44,7 @@ USE_DISPATCH_GL = 1
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-# SDL_INSTALL_ROOT = /usr/local/sdl13
+SDL_INSTALL_ROOT = /usr/local/sdl13
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -66,6 +66,11 @@ endif
 # OS/2 can't have OpenGL (aww)
 ifeq ($(TARGETOS),os2)
 NO_OPENGL = 1
+endif
+
+# additional definitions when we are on Solaris
+ifeq ($(TARGETOS),solaris)
+DEFS += -DSDLMAME_X11 -DSDLMAME_UNIX -DSDLMAME_SOLARIS
 endif
 
 #-------------------------------------------------
@@ -236,6 +241,14 @@ ifndef NO_X11
 LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
 endif
 endif # Unix
+
+# Solaris: add the necessary object
+ifeq ($(TARGETOS),solaris)
+OSDCOREOBJS += $(SDLOBJ)/debugwin.o
+
+# explicitly add some libs on Solaris
+LIBS += -lSDL -lX11 -lXinerama -lm
+endif # Solaris
 
 # Win32: add the necessary libraries
 ifeq ($(TARGETOS),win32)

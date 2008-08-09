@@ -16,7 +16,7 @@
 
 #ifndef SDLMAME_OS2
 
-#if (defined SDLMAME_MACOSX) || (defined SDLMAME_FREEBSD)
+#if (defined SDLMAME_MACOSX) || (defined SDLMAME_FREEBSD) || (defined SDLMAME_SOLARIS)
 #define THREAD_COOPERATIVE      (0)
 #else
 #define THREAD_COOPERATIVE		(1)

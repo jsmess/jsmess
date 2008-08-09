@@ -21,13 +21,6 @@
 #include <Carbon/Carbon.h>
 #endif
 
-#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX)
-#include <SDL_timer.h>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <SDL_syswm.h>
-#endif
-
 //============================================================
 //   osd_getcurdir
 //============================================================

@@ -24,15 +24,6 @@
 #define VIDEO_MODE_OPENGL			(1)
 
 #define VIDEO_SCALE_MODE_NONE		(0)
-#define VIDEO_SCALE_MODE_HWBLIT		(1)
-#define VIDEO_SCALE_MODE_YV12		(2)
-#define VIDEO_SCALE_MODE_YV12X2		(3)
-#define VIDEO_SCALE_MODE_YUY2		(4)
-#define VIDEO_SCALE_MODE_YUY2X2		(5)
-#define VIDEO_SCALE_MODE_MAX		VIDEO_SCALE_MODE_YUY2X2
-#define VIDEO_SCALE_MODE_MIN		VIDEO_SCALE_MODE_NONE
-
-#define IS_YUV_MODE(_m)				((_m) >= VIDEO_SCALE_MODE_YV12 && (_m) <= VIDEO_SCALE_MODE_YUY2X2)
 
 // texture formats
 // This used to be an enum, but these are now defines so we can use them as

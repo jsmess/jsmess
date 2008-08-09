@@ -3,6 +3,40 @@
 
 /* Notes
 
+	- Known bugs:
+	
+	  * SDL1.3/X11: Crash on switch to fullscreen. Bug fix submitted to SDL team.
+	  * SDL1.3/X11: Some compound keys, e.g. "'" are not supported by SDL driver
+	  * SDL1.3/X11: No -switchres because SDL does not support it right now.
+	  * SDL1.3/directfb: -switchres broken for directfb >= 1.2.0/works with 1.0.
+	  * Need to submit the directfb driver to the SDL team
+	  * SDL1.3: sdlvideofps does not take -numscreens>1 into account.
+
+	- replaced window->render_lock with event window->rendered_event
+	  for multiple windows and "-mt", the old code would allow filling up
+	  the workqueue with 1000s of entries, since the lock would not block while
+	  another window is rendered. The osd_event establishes a barrier which
+	  is only freed if the last window blit operation has finished.
+	- Set SDL_VIDEO_GL_DRIVER if -gl_lib is given. The SDL directfb driver is picky about
+	  this. Added reminder: FIXME: move lib loading code from drawogl.c here. This may be
+	  used to disable opengl if no library was loaded.
+	- SDL1.3/video=opengl: Fixed windows not being updated after another window was resized
+	- for -verbose, output some information about renderer (-video soft)
+	- initialize mouse_enabled with option "-mouse". Affects both SDL1.2 and SDL1.3
+	  This will hide the mouse if you specify "-mouse".
+	- SDL1.2: added blitmode "async" which sets SDL_ASYNCBLIT
+	- SDL1.2: removed blitmodes "hwbest" and "hwblit"
+	- added blitmode "hwbest" for antialiased and smoothed scaling now that the
+	  directfb driver supports it. This is also supported by the 1.3 opengl
+	  render backend
+	- added sdlinput_release_keys to cope with lost keyboard events in SDL1.3
+	- some identing in drawogl.c
+	- rename sdl_use_unsupported to osd_use_unsupported()
+	- rename SDL_* macros to SDLMAME_* (avoid name clashes)
+	- got rid of VIDEO_SCALE_MODE constants. Scale modes are now handled in drawsdl.c.
+	  Starting mame with eg. -video soft -sm yuy2 on X11 no longer crashes.
+	- some more changes to input.c to avoid resize loops (issue for directfb)
+
 	- working ui mouse inputs for SDL1.2 and SDL1.3 incl. yuv modes
 	- added blitmode "hwblit" (SDL1.3) for rgb hardware scaling
 	- rename "-yuvmode" option to "-scalemode"
@@ -161,7 +195,10 @@
 #define SDLOPTION_CENTERH				"centerh"
 #define SDLOPTION_CENTERV				"centerv"
 #define SDLOPTION_PRESCALE				"prescale"
+
+/* FIXME: seems to be donge for a long time */
 #define SDLOPTION_PRESCALE_EFFECT		"prescale_effect"
+
 #define SDLOPTION_SCALEMODE				"scalemode"
 #define SDLOPTION_MULTITHREADING		"multithreading"
 #define SDLOPTION_WAITVSYNC				"waitvsync"
@@ -195,20 +232,24 @@
 #define SDLOPTVAL_OPENGL16				"opengl16"
 #define SDLOPTVAL_SOFT					"soft"
 
+#if 0
+/* FIXME: Remove me */
 #define SDLOPTVAL_HWBLIT				"hwblit"
+#define SDLOPTVAL_HWBEST				"hwbest"
 #define SDLOPTVAL_YV12					"yv12"
 #define SDLOPTVAL_YV12x2				"yv12x2"
 #define SDLOPTVAL_YUY2					"yuy2"
 #define SDLOPTVAL_YUY2x2				"yuy2x2"
+#endif
 
-#define SDL_LED(x)						"led" #x
+#define SDLMAME_LED(x)						"led" #x
 
 // read by sdlmame
 
 #define SDLENV_DESKTOPDIM				"SDLMAME_DESKTOPDIM"
 #define SDLENV_VMWARE					"SDLMAME_VMWARE"
 
-#define sdl_use_unsupported()			(getenv("SDLMAME_UNSUPPORTED") != NULL)
+#define osd_use_unsupported()			(getenv("SDLMAME_UNSUPPORTED") != NULL)
 
 // set by sdlmame
 
@@ -217,7 +258,7 @@
 #define SDLENV_AUDIODRIVER				"SDL_AUDIODRIVER"
 #define SDLENV_RENDERDRIVER				"SDL_VIDEO_RENDERER"
 
-#define SDL_SOUND_LOG					"sound.log"
+#define SDLMAME_SOUND_LOG					"sound.log"
 
 #ifdef SDLMAME_MACOSX
 /* Vas Crabb: Default GL-lib for MACOSX */

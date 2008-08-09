@@ -99,9 +99,6 @@ static osd_work_queue *work_queue;
 static int main_threadid;
 static int window_threadid;
 
-static const char *scale_mode_names[] = { "none", "hwblit", "yv12", "yv12x2", "yuy2", "yuy2x2" };
-
-
 // debugger
 //static int in_background;
 
@@ -122,7 +119,7 @@ struct _worker_param {
 //============================================================
 
 static void sdlwindow_exit(running_machine *machine);
-static void sdlwindow_video_window_destroy(sdl_window_info *window);
+static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_info *window);
 static OSDWORK_CALLBACK( draw_video_contents_wt );
 static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
 static OSDWORK_CALLBACK( sdlwindow_resize_wt );
@@ -262,15 +259,19 @@ int sdlwindow_init(running_machine *machine)
 
 
 //============================================================
-//  sdlwindow_exit
-//  (main thread)
+//  sdlwindow_sync
 //============================================================
 
 static void sdlwindow_sync(void)
 {
 	if (multithreading_enabled)
 	{
-		osd_work_queue_wait(work_queue, osd_ticks_per_second()*10);
+		// Fallback
+		while (!osd_work_queue_wait(work_queue, osd_ticks_per_second()*10))
+		{
+			mame_printf_warning("sdlwindow_sync: Sleeping...\n");
+			osd_sleep(100000);
+		}
 	}
 }
 
@@ -299,7 +300,7 @@ static void sdlwindow_exit(running_machine *machine)
 	{
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->next;
-		sdlwindow_video_window_destroy(temp);
+		sdlwindow_video_window_destroy(machine, temp);
 	}
 	
 	// if we're multithreaded, clean up the window thread
@@ -400,8 +401,9 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 		newheight = target_height;
 	}
 
+    //FIXME: really necessary to distinguish for yuv_modes ?
 	if ((render_target_get_layer_config(window->target) & LAYER_CONFIG_ZOOM_TO_SCREEN)
-		&& (window->scale_mode == VIDEO_SCALE_MODE_NONE || (!SDL_VERSION_ATLEAST(1,3,0) && !IS_YUV_MODE(window->scale_mode))))
+		&& (window->scale_mode == VIDEO_SCALE_MODE_NONE ))
 		newwidth = window_width;
 
 	if ((window->blitwidth != newwidth) || (window->blitheight != newheight))
@@ -511,6 +513,7 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 	}
 
 	window->destroy(window);
+	sdlinput_release_keys(wp->machine);
 
 	// toggle the window mode
 	window->fullscreen = !window->fullscreen;	
@@ -528,37 +531,42 @@ void sdlwindow_toggle_full_screen(running_machine *machine, sdl_window_info *win
 
 	clear_worker_param(&wp);
 	wp.window = window;
+	wp.machine = machine;
 	
-	//FIMXE: Reset Key state ....
 	execute_async_wait(&sdlwindow_toggle_full_screen_wt, &wp);
 }
 
 static void sdlwindow_modify_yuv(running_machine *machine, sdl_window_info *window, int dir)
 {
 	int new_scale_mode = window->scale_mode;
-
-	if (dir > 0 && window->scale_mode < VIDEO_SCALE_MODE_MAX)
+	worker_param wp;
+	const char *stemp;
+	
+	if (dir > 0)
 		new_scale_mode = window->scale_mode + 1;
-	if (dir < 0 && window->scale_mode > VIDEO_SCALE_MODE_MIN)
+	if (dir < 0)
 		new_scale_mode = window->scale_mode - 1;
 	
-	// FIXME: Changing to yv12 mode from video_mode none does not work
-	if (new_scale_mode != window->scale_mode)
-	{
-		worker_param wp;
+	stemp = drawsdl_scale_mode_str(new_scale_mode);
+	
+	if (stemp==NULL)
+		return;
+	
+	clear_worker_param(&wp);
+	wp.window = window;
+	wp.machine = machine;
+	sdlwindow_sync();
+	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
+		
+	window->scale_mode = new_scale_mode;
+	
+	ui_popup_time(1, "Scale mode %s", stemp);
+	mame_printf_verbose("Scale mode %s\n", stemp);
 
-		clear_worker_param(&wp);
-		wp.window = window;
-		sdlwindow_sync();
-		execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
-			
-		window->scale_mode = new_scale_mode;
-		execute_async_wait(&complete_create_wt, &wp);
-		sdlwindow_sync();
+	sdlwindow_sync();
+	execute_async_wait(&complete_create_wt, &wp);
+	sdlwindow_sync();
 
-		ui_popup_time(1, "YUV mode %s", scale_mode_names[window->scale_mode]);
-		mame_printf_verbose("YUV mode %s\n", scale_mode_names[window->scale_mode]);
-	}
 }
 
 static OSDWORK_CALLBACK( destroy_all_textures_wt )
@@ -581,6 +589,7 @@ void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window
 	clear_worker_param(&wp);
 
 	wp.window = window;
+	wp.machine = machine;
 
 	if (dir > 0 && window->prescale < 3)
 		new_prescale = window->prescale + 1;
@@ -642,6 +651,8 @@ void sdlwindow_modify_effect(running_machine *machine, sdl_window_info *window, 
 void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
 {
 #if USE_OPENGL
+	//FIXME: Not yet working in 1.3
+#if (!SDL_VERSION_ATLEAST(1,3,0))
 	worker_param wp;
 
 	// If we are not fullscreen (windowed) remember our windowed size
@@ -654,6 +665,7 @@ void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
 	clear_worker_param(&wp);
 
 	wp.window = window;
+	wp.machine = machine;
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 
 	window->scale_mode = VIDEO_SCALE_MODE_NONE;
@@ -673,6 +685,7 @@ void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
 
 	execute_async_wait(&complete_create_wt, &wp);
 #endif
+#endif
 }
 
 
@@ -684,11 +697,12 @@ void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
 static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_info *window)
 {
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	// FIXME: belongs into callback
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 	{
+		//FIXME: SDL1.3: really broken: the whole SDL code
+		//       will only work correct with relative mouse movements ...
 		if (!window->fullscreen && !sdlinput_should_hide_mouse(machine))
 		{
 			SDL_ShowCursor(SDL_ENABLE);
@@ -701,7 +715,9 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 			if (!SDL_GetWindowGrab(window->window_id))
 				SDL_SetWindowGrab(window->window_id, 1);
 		}
+		SDL_SetCursor(NULL); // Force an update in case the underlying driver has changed visibility
 	}
+
 #else
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
@@ -726,6 +742,7 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 	}
 #endif
 }
+
 
 //============================================================
 //  sdlwindow_video_window_create
@@ -752,7 +769,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	
-	//FIXME: these should be per_window in config->
+	//FIXME: these should be per_window in config-> or even better a bit set
 	window->fullscreen = !video_config.windowed;
 	window->prescale = video_config.prescale;
 	window->prescale_effect = video_config.prescale_effect;
@@ -775,8 +792,8 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	draw.attach(&draw, window);
 	
-	// create a lock that we can use to skip blitting
-	window->render_lock = osd_lock_alloc();
+	// create an event that we can use to skip blitting
+	window->rendered_event = osd_event_alloc(FALSE, TRUE);
 
 	// load the layout
 	window->target = render_target_alloc(NULL, FALSE);
@@ -794,6 +811,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->gamedrv->description, machine->gamedrv->name, index);
 
 	wp->window = window;
+
 	if (multithreading_enabled)
 	{
 		osd_work_item *wi;		
@@ -813,9 +831,10 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	return 0;
 
 error:
-	sdlwindow_video_window_destroy(window);
+	sdlwindow_video_window_destroy(machine, window);
 	return 1;
 }
+
 
 //============================================================
 //  sdlwindow_video_window_destroy
@@ -832,11 +851,15 @@ static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt )
 	// free the textures etc
 	window->destroy(window);
 
+	// release all keys ...
+	sdlinput_release_keys(wp->machine);
+	
+
 	free(wp);
 	return NULL;
 }
 
-static void sdlwindow_video_window_destroy(sdl_window_info *window)
+static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_info *window)
 {
 	sdl_window_info **prevptr;
 	worker_param wp;
@@ -847,7 +870,7 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 		sdlwindow_sync();
 	}
 
-	osd_lock_acquire(window->render_lock);
+	//osd_event_wait(window->rendered_event, osd_ticks_per_second()*10);
 
 	// remove us from the list
 	for (prevptr = &sdl_window_list; *prevptr != NULL; prevptr = &(*prevptr)->next)
@@ -860,14 +883,15 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 	// free the textures etc
 	clear_worker_param(&wp);
 	wp.window = window;
+	wp.machine = machine;
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 
 	// free the render target, after the textures!
 	if (window->target != NULL)
 		render_target_free(window->target);
 
-	// free the lock
-	osd_lock_free(window->render_lock);
+	// free the event
+	osd_event_free(window->rendered_event);
 
 	// free the window itself
 	free(window);
@@ -953,14 +977,13 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 {
 
 	ASSERT_MAIN_THREAD();
-
+	
 	// adjust the cursor state
 	sdlwindow_update_cursor_state(machine, window);
 
 	// if we're visible and running and not in the middle of a resize, draw
 	if (window->target != NULL)
 	{
-		int got_lock = TRUE;
 		int tempwidth, tempheight;
 		
 		// see if the games video mode has changed
@@ -980,19 +1003,14 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 				sdlwindow_resize(window, tempwidth, tempheight);
 			}
 		}
-		
-		got_lock = osd_lock_try(window->render_lock);
 
-		// only render if we were able to get the lock
-		if (got_lock)
+		// only render if we have been signalled 
+		if (osd_event_wait(window->rendered_event, 0))
 		{
 			worker_param wp;
 			const render_primitive_list *primlist;
 
 			clear_worker_param(&wp);
-
-			// don't hold the lock; we just used it to see if rendering was still happening
-			osd_lock_release(window->render_lock);
 
 			// ensure the target bounds are up-to-date, and then get the primitives
 			primlist = window->get_primitives(window);
@@ -1090,6 +1108,10 @@ static OSDWORK_CALLBACK( complete_create_wt )
 	if (window->create(window, tempwidth, tempheight))
 		return (void *) &result[1];
 
+	// Make sure we have a consistent state
+	SDL_ShowCursor(0);
+	SDL_ShowCursor(1);
+
 	return (void *) &result[0];
 }
 
@@ -1171,7 +1193,6 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 	sdlinput_process_events_buf(wp->machine);
 
 	window->primlist = wp->list;
-	osd_lock_acquire(window->render_lock);
 
 	// if no bitmap, just fill
 	if (window->primlist == NULL)
@@ -1185,7 +1206,9 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 		else 
 			window->draw(window, dc, update);
 	}
-	osd_lock_release(window->render_lock);
+
+	/* all done, ready for next */
+	osd_event_set(window->rendered_event);
 	free(wp);
 	
 	return NULL;

@@ -89,7 +89,7 @@ static void			sdl_callback(void *userdata, Uint8 *stream, int len);
 void sdlaudio_init(running_machine *machine)
 {
 	if (LOG_SOUND)
-		sound_log = fopen(SDL_SOUND_LOG, "w");
+		sound_log = fopen(SDLMAME_SOUND_LOG, "w");
 
 	// skip if sound disabled
 	if (machine->sample_rate != 0)

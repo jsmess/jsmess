@@ -749,12 +749,10 @@ static void drawogl_window_resize(sdl_window_info *window, int width, int height
 	sdl_info *sdl = window->dxdata;
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
+	//SDL_GL_MakeCurrent(window->window_id, sdl->gl_context_id);
 	SDL_SetWindowSize(window->window_id, width, height);
 	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
-
-	//FIXME: no idea why, but this is necessary to avoid crashes with numscreen>1
-	SDL_GL_DeleteContext(sdl->gl_context_id);
-	sdl->gl_context_id = SDL_GL_CreateContext(window->window_id);
+	sdl->blittimer = 3;
 #else
 	SDL_FreeSurface(sdl->sdlsurf);
 
@@ -762,7 +760,6 @@ static void drawogl_window_resize(sdl_window_info *window, int width, int height
 			SDL_SWSURFACE | SDL_ANYFORMAT | sdl->extra_flags);
 	window->width = sdl->sdlsurf->w;
 	window->height = sdl->sdlsurf->h;
-
 #endif
 	sdl->init_context = 1;
 	
@@ -1587,6 +1584,10 @@ static void drawogl_window_destroy(sdl_window_info *window)
 	if (sdl == NULL)
 		return;
 
+	// free the memory in the window
+
+	drawogl_destroy_all_textures(window);
+
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_GL_DeleteContext(sdl->gl_context_id);
 	SDL_DestroyWindow(window->window_id);
@@ -1597,10 +1598,6 @@ static void drawogl_window_destroy(sdl_window_info *window)
 		sdl->sdlsurf = NULL;
 	}
 #endif
-
-	// free the memory in the window
-
-	drawogl_destroy_all_textures(window);
 
 	free(sdl);
 	window->dxdata = NULL;
@@ -1761,10 +1758,10 @@ static void texture_compute_size_type(sdl_window_info *window, const render_texi
 		texture->borderpix = 0;	// don't border the screen right now, there's a bug
 	}
 
-        texture_compute_type_subroutine(sdl, texsource, texture, flags);
-         
-        texture_compute_size_subroutine(window, texture, flags, texsource->width, texsource->height, 
-                                        &finalwidth, &finalheight, &finalwidth_create, &finalheight_create);
+	texture_compute_type_subroutine(sdl, texsource, texture, flags);
+	 
+	texture_compute_size_subroutine(window, texture, flags, texsource->width, texsource->height, 
+	                                &finalwidth, &finalheight, &finalwidth_create, &finalheight_create);
 
 	// if we added pixels for the border, and that just barely pushed us over, take it back
 	if (texture->borderpix &&
@@ -1773,43 +1770,43 @@ static void texture_compute_size_type(sdl_window_info *window, const render_texi
 	{
 		texture->borderpix = FALSE;
 
-                texture_compute_type_subroutine(sdl, texsource, texture, flags);
-                 
-                texture_compute_size_subroutine(window, texture, flags, texsource->width, texsource->height, 
-                                                &finalwidth, &finalheight, &finalwidth_create, &finalheight_create);
+		texture_compute_type_subroutine(sdl, texsource, texture, flags);
+		 
+		texture_compute_size_subroutine(window, texture, flags, texsource->width, texsource->height, 
+		                                &finalwidth, &finalheight, &finalwidth_create, &finalheight_create);
 	}
 
 	// if we're above the max width/height, do what?
-        if (finalwidth_create > sdl->texture_max_width || finalheight_create > sdl->texture_max_height)
-        {
-            static int printed = FALSE;
-            if (!printed) 
-            	mame_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, sdl->texture_max_width, sdl->texture_max_height);
-            printed = TRUE;
-        }
+	if (finalwidth_create > sdl->texture_max_width || finalheight_create > sdl->texture_max_height)
+	{
+		static int printed = FALSE;
+		if (!printed) 
+			mame_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, sdl->texture_max_width, sdl->texture_max_height);
+		printed = TRUE;
+	}
 
-        if(!texture->nocopy || texture->type==TEXTURE_TYPE_DYNAMIC || texture->type==TEXTURE_TYPE_SHADER ||
-            // any of the mame core's device generated bitmap types:
-            texture->format==SDL_TEXFORMAT_RGB32  ||
-            texture->format==SDL_TEXFORMAT_RGB32_PALETTED  ||
-            texture->format==SDL_TEXFORMAT_RGB15  ||
-            texture->format==SDL_TEXFORMAT_RGB15_PALETTED  ||
-            texture->format==SDL_TEXFORMAT_PALETTE16  ||
-            texture->format==SDL_TEXFORMAT_PALETTE16A
-            )
-        {
-        mame_printf_verbose("GL texture: copy %d, shader %d, dynamic %d, %dx%d %dx%d [%s, Equal: %d, Palette: %d,\n"
-	                    "            scale %dx%d (eff: %d), border %d, pitch %d,%d/%d], colors: %d, bytes/pix %d\n", 
-                !texture->nocopy, texture->type==TEXTURE_TYPE_SHADER, texture->type==TEXTURE_TYPE_DYNAMIC,
-                finalwidth, finalheight, finalwidth_create, finalheight_create, 
-                texfmt_to_string[texture->format], 
-                (int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST],
-                (int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE],
-                texture->xprescale, texture->yprescale, texture->prescale_effect,
-		texture->borderpix, texsource->rowpixels, finalwidth, sdl->texture_max_width,
-		sdl->totalColors, (int)texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]
-	      );
-        }
+	if(!texture->nocopy || texture->type==TEXTURE_TYPE_DYNAMIC || texture->type==TEXTURE_TYPE_SHADER ||
+	    // any of the mame core's device generated bitmap types:
+	    texture->format==SDL_TEXFORMAT_RGB32  ||
+	    texture->format==SDL_TEXFORMAT_RGB32_PALETTED  ||
+	    texture->format==SDL_TEXFORMAT_RGB15  ||
+	    texture->format==SDL_TEXFORMAT_RGB15_PALETTED  ||
+	    texture->format==SDL_TEXFORMAT_PALETTE16  ||
+	    texture->format==SDL_TEXFORMAT_PALETTE16A
+	    )
+	{
+		mame_printf_verbose("GL texture: copy %d, shader %d, dynamic %d, %dx%d %dx%d [%s, Equal: %d, Palette: %d,\n"
+	                "            scale %dx%d (eff: %d), border %d, pitch %d,%d/%d], colors: %d, bytes/pix %d\n", 
+			!texture->nocopy, texture->type==TEXTURE_TYPE_SHADER, texture->type==TEXTURE_TYPE_DYNAMIC,
+			finalwidth, finalheight, finalwidth_create, finalheight_create, 
+			texfmt_to_string[texture->format], 
+			(int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST],
+			(int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE],
+			texture->xprescale, texture->yprescale, texture->prescale_effect,
+			texture->borderpix, texsource->rowpixels, finalwidth, sdl->texture_max_width,
+			sdl->totalColors, (int)texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]
+			);
+	}
 
 	// set the final values
 	texture->rawwidth = finalwidth;
@@ -2309,20 +2306,19 @@ static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, cons
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-                        if (texsource->palette != NULL)
-                                texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
-                        else
-                                texture->format = SDL_TEXFORMAT_RGB32;
+            if (texsource->palette != NULL)
+                texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
+            else
+                texture->format = SDL_TEXFORMAT_RGB32;
 			break;
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
 			break;
 		case TEXFORMAT_RGB15:
-                        if (texsource->palette != NULL)
-                                texture->format = SDL_TEXFORMAT_RGB15_PALETTED;
-                        else
-                                texture->format = SDL_TEXFORMAT_RGB15;
-
+            if (texsource->palette != NULL)
+                texture->format = SDL_TEXFORMAT_RGB15_PALETTED;
+            else
+                texture->format = SDL_TEXFORMAT_RGB15;
 			break;
 		case TEXFORMAT_PALETTEA16:
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
@@ -2351,11 +2347,11 @@ static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, cons
 	if ( texture->type==TEXTURE_TYPE_SHADER )
 	{
 		if ( texture_shader_create(sdl, window, texsource, texture, flags) )
-                {
-                        free(texture);
-			return NULL;
-                }
-        } 
+        {
+            free(texture);
+            return NULL;
+        }
+	} 
 	else 
 	{
 		// get a name for this texture
@@ -2363,15 +2359,15 @@ static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, cons
 
 		glEnable(texture->texTarget);
 
-                // make sure we're operating on *this* texture
-                glBindTexture(texture->texTarget, texture->texture);
-
-                // this doesn't actually upload, it just sets up the PBO's parameters
-                glTexImage2D(texture->texTarget, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL], 
-                     texture->rawwidth_create, texture->rawheight_create, 
-                     texture->borderpix ? 1 : 0, 
-                     texture->texProperties[SDL_TEXFORMAT_FORMAT], 
-                     texture->texProperties[SDL_TEXFORMAT_TYPE], NULL);
+		// make sure we're operating on *this* texture
+		glBindTexture(texture->texTarget, texture->texture);
+		
+		// this doesn't actually upload, it just sets up the PBO's parameters
+		glTexImage2D(texture->texTarget, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL], 
+		     texture->rawwidth_create, texture->rawheight_create, 
+		     texture->borderpix ? 1 : 0, 
+		     texture->texProperties[SDL_TEXFORMAT_FORMAT], 
+		     texture->texProperties[SDL_TEXFORMAT_TYPE], NULL);
 
 		if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
 		{
@@ -2408,24 +2404,24 @@ static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, cons
 
 	if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
-                assert(sdl->usepbo);
+        assert(sdl->usepbo);
 
-                // create the PBO
-                pfn_glGenBuffers(1, (GLuint *)&texture->pbo);
+        // create the PBO
+        pfn_glGenBuffers(1, (GLuint *)&texture->pbo);
 
-                pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
+        pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
 
-                // set up the PBO dimension, ..
+        // set up the PBO dimension, ..
 		pfn_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, 
 		                 texture->rawwidth * texture->rawheight * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE],
 				 NULL, GL_STREAM_DRAW);
-        } 
+    } 
 
-        if ( !texture->nocopy && texture->type!=TEXTURE_TYPE_DYNAMIC )
-        {
-            texture->data = malloc(texture->rawwidth* texture->rawheight * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
-            texture->data_own=TRUE;
-        }
+    if ( !texture->nocopy && texture->type!=TEXTURE_TYPE_DYNAMIC )
+    {
+        texture->data = malloc(texture->rawwidth* texture->rawheight * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+        texture->data_own=TRUE;
+    }
 
 	if (texture->prescale_effect && !texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST])
 		texture->effectbuf = malloc_or_die(texsource->width * 3 * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
@@ -2442,7 +2438,9 @@ static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, cons
 		// Load The Data
 		pfn_glBufferData( GL_ARRAY_BUFFER_ARB, 4*2*sizeof(GLfloat), texture->texCoord, GL_STREAM_DRAW );
 		glTexCoordPointer( 2, GL_FLOAT, 0, (char *) NULL ); // we are using ARB VBO buffers
-        } else {
+	}
+	else
+	{
 		glTexCoordPointer(2, GL_FLOAT, 0, texture->texCoord);
 	}
 
@@ -2516,11 +2514,14 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 			glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight, 
 					texture->texProperties[SDL_TEXFORMAT_FORMAT], 
 					texture->texProperties[SDL_TEXFORMAT_TYPE], texture->data);
-		} else {
+		}
+		else
+		{
 			glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight, 
 					GL_ALPHA, GL_UNSIGNED_SHORT, texture->data);
 		}
-	} else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
+	} 
+	else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
 		glBindTexture(texture->texTarget, texture->texture);
 
@@ -2533,7 +2534,9 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight, 
 			        texture->texProperties[SDL_TEXFORMAT_FORMAT], 
 				texture->texProperties[SDL_TEXFORMAT_TYPE], NULL);
-	} else {
+	} 
+	else
+	{
 		glBindTexture(texture->texTarget, texture->texture);
 
 		// give the card a hint
@@ -2542,10 +2545,10 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 		else
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth);
 
-                // and upload the image 
-                glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight, 
-		                texture->texProperties[SDL_TEXFORMAT_FORMAT], 
-				texture->texProperties[SDL_TEXFORMAT_TYPE], texture->data);
+		// and upload the image 
+		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight, 
+		        texture->texProperties[SDL_TEXFORMAT_FORMAT], 
+		texture->texProperties[SDL_TEXFORMAT_TYPE], texture->data);
 	}
 }
 
@@ -2585,7 +2588,7 @@ static void texture_coord_update(sdl_info *sdl, sdl_window_info *window,
 
 	if ( texture->type != TEXTURE_TYPE_SHADER ||
 	     ( texture->type == TEXTURE_TYPE_SHADER && shaderIdx<=sdl->glsl_program_mb2sc ) )
-        {
+	{
 		// compute the U/V scale factors
 		if (texture->borderpix)
 		{
@@ -2603,7 +2606,8 @@ static void texture_coord_update(sdl_info *sdl, sdl_window_info *window,
 			vstart = 0.0f;
 			vstop  = (float)(prim->texture.height*texture->yprescale) / (float)texture->rawheight_create;
 		}
-	} else if ( texture->type == TEXTURE_TYPE_SHADER && shaderIdx>sdl->glsl_program_mb2sc )
+	}
+	else if ( texture->type == TEXTURE_TYPE_SHADER && shaderIdx>sdl->glsl_program_mb2sc )
 	{
 		int surf_w_pow2  = get_valid_pow2_value (window->width, texture->texpow2);
 		int surf_h_pow2  = get_valid_pow2_value (window->height, texture->texpow2);
@@ -2612,7 +2616,9 @@ static void texture_coord_update(sdl_info *sdl, sdl_window_info *window,
 		ustop  = (float)(window->width) / (float)surf_w_pow2;
 		vstart = 0.0f;
 		vstop  = (float)(window->height) / (float)surf_h_pow2;
-	} else {
+	}
+	else
+	{
 		assert(0); // ??
 	}
 
@@ -2639,7 +2645,9 @@ static void texture_coord_update(sdl_info *sdl, sdl_window_info *window,
 		texture->texCoord[5]=vstart + dv * 0.0f;
 		texture->texCoord[6]=ustart + du * 0.0f;
 		texture->texCoord[7]=vstart + dv * 0.0f;
-	} else {
+	}
+	else
+	{
 		// transformation: mamebm -> scrn
 		texture->texCoord[0]=ustart + du * prim->texcoords.tl.u;
 		texture->texCoord[1]=vstart + dv * prim->texcoords.tl.v;
@@ -2670,7 +2678,9 @@ static void texture_mpass_flip(sdl_info *sdl, texture_info *texture, int shaderI
 	if ( shaderIdx<=sdl->glsl_program_mb2sc )
 	{
 		glBindTexture(texture->texTarget, texture->mpass_texture_mamebm[mpass_src_idx]);
-	} else {
+	}
+	else
+	{
 		glBindTexture(texture->texTarget, texture->mpass_texture_scrn[mpass_src_idx]);
 	}
 	pfn_glActiveTexture(texture->mpass_textureunit[texture->mpass_dest_idx]);
@@ -2684,7 +2694,9 @@ static void texture_mpass_flip(sdl_info *sdl, texture_info *texture, int shaderI
 		{
 			glBindTexture(texture->texTarget, texture->mpass_texture_scrn[texture->mpass_dest_idx]);
 			pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_scrn[texture->mpass_dest_idx]);
-		} else {
+		}
+		else
+		{
 			glBindTexture(texture->texTarget, texture->mpass_texture_mamebm[texture->mpass_dest_idx]);
 			pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_mamebm[texture->mpass_dest_idx]);
 		}
@@ -2694,14 +2706,17 @@ static void texture_mpass_flip(sdl_info *sdl, texture_info *texture, int shaderI
 			glPushAttrib(GL_VIEWPORT_BIT); 
 			GL_CHECK_ERROR_NORMAL();
 			glViewport(0.0, 0.0, (GLsizei)texture->rawwidth, (GLsizei)texture->rawheight);
-		} else if ( shaderIdx==sdl->glsl_program_mb2sc )
+		}
+		else if ( shaderIdx==sdl->glsl_program_mb2sc )
 		{
 			assert ( sdl->glsl_program_mb2sc < sdl->glsl_program_num-1 );
 			glPopAttrib(); // glViewport(0.0, 0.0, (GLsizei)window->width, (GLsizei)window->height)
 			GL_CHECK_ERROR_NORMAL();
 		}
 		glClear(GL_COLOR_BUFFER_BIT); // make sure the whole texture is redrawn ..
-	} else {
+	}
+	else 
+	{
 		glBindTexture(texture->texTarget, 0);
 		pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 
@@ -2759,7 +2774,9 @@ static void texture_shader_update(sdl_info *sdl, sdl_window_info *window, textur
 			if ( GL_CHECK_ERROR_QUIET() ) {
 				mame_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
 			}
-		} else {
+		}
+		else
+		{
 			mame_printf_verbose("GLSL: could not get render container for screen %d\n", window->start_viewscreen);
 		}
 	}
@@ -2772,25 +2789,29 @@ static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, con
 
 	// if we didn't find one, create a new texture
 	if (texture == NULL && prim->texture.base != NULL)
-        {
-                texture = texture_create(sdl, window, &prim->texture, prim->flags); 
+    {
+            texture = texture_create(sdl, window, &prim->texture, prim->flags); 
 
-        } else if (texture != NULL)
-        {
+    } 
+	else if (texture != NULL)
+    {
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
 			pfn_glUseProgramObjectARB(sdl->glsl_program[shaderIdx]); // back to our shader
-                } else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
-                {
-		        assert ( sdl->usepbo ) ;
-                        pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo); 
-                        glEnable(texture->texTarget);
-		} else { 
-                        glEnable(texture->texTarget);
-                }
         }
+		else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
+        {
+	        assert ( sdl->usepbo ) ;
+            pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo); 
+            glEnable(texture->texTarget);
+		} 
+		else 
+		{ 
+            glEnable(texture->texTarget);
+        }
+    }
 
-        if (texture != NULL)
+    if (texture != NULL)
 	{
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
@@ -2825,7 +2846,9 @@ static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, con
 		    // Load The Data
 		    pfn_glBufferSubData( GL_ARRAY_BUFFER_ARB, 0, 4*2*sizeof(GLfloat), texture->texCoord );
 		    glTexCoordPointer( 2, GL_FLOAT, 0, (char *) NULL ); // we are using ARB VBO buffers 
-		} else {
+		}
+		else
+		{
 		    glTexCoordPointer(2, GL_FLOAT, 0, texture->texCoord);
 		}
 	} 
@@ -2889,90 +2912,91 @@ static void texture_all_disable(sdl_info *sdl)
 static void drawogl_destroy_all_textures(sdl_window_info *window)
 {
 	sdl_info *sdl = window->dxdata;
-    int lock=FALSE;
+	texture_info *next_texture=NULL, *texture = NULL;
+	int lock=FALSE;
 
-	if ( ! sdl->initialized )
-	{
+	if (sdl == NULL)
 		return;
+
+	if ( !sdl->initialized )
+		return;
+
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	SDL_GL_MakeCurrent(window->window_id, sdl->gl_context_id);
+#endif
+	
+	if(window->primlist && window->primlist->lock)
+	{ 
+		lock=TRUE; 
+		osd_lock_acquire(window->primlist->lock); 
 	}
 
-        if(window->primlist && window->primlist->lock) { lock=TRUE; osd_lock_acquire(window->primlist->lock); }
-        {
-                texture_info *next_texture=NULL, *texture = NULL;
-                sdl_info *sdl = window->dxdata;
+	texture = sdl->texlist;
+	glFinish();
 
-                if (sdl == NULL)
-                        goto exit;
+	texture_all_disable(sdl);
+	glFinish();
+	glDisableClientState(GL_VERTEX_ARRAY);
 
-                texture = sdl->texlist;
+	while (texture)
+	{
+		next_texture = texture->next;
 
-                glFinish();
-
-                texture_all_disable(sdl);
-
-                glFinish();
-
-                glDisableClientState(GL_VERTEX_ARRAY);
-
-                while (texture)
-                {
-                        next_texture = texture->next;
-
-                        if(sdl->usevbo)
-                        {
-                            pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
-                            texture->texCoordBufferName=0;
-                        }
-
-                        if(sdl->usepbo && texture->pbo)
-                        {
-                            pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
-                            texture->pbo=0;
-                        }
-
-			if( sdl->glsl_program_num > 1 )
-			{
-				assert(sdl->usefbo);
-				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
-				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
-			}
-
-			if ( sdl->glsl_program_mb2sc < sdl->glsl_program_num - 1 )
-			{
-				assert(sdl->usefbo);
-				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
-				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
-			}
-
-			if(texture->lut_texture)
-				glDeleteTextures(1, (GLuint *)&texture->lut_texture);
-
-                        glDeleteTextures(1, (GLuint *)&texture->texture);
-                        if ( texture->data_own )
-                        {
-                                free(texture->data);
-                                texture->data=NULL;
-                                texture->data_own=FALSE;
-                        }
-                        if (texture->effectbuf)
-                        {
-                                free(texture->effectbuf);
-                        }
-                        free(texture);
-                        texture = next_texture;
-                }
-                sdl->texlist = NULL;
-
-		if ( sdl->useglsl )
+		if(sdl->usevbo)
 		{
-			glsl_shader_free(sdl->glsl); 
-			sdl->glsl = NULL;
+			pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
+			texture->texCoordBufferName=0;
+    	}
+		
+		if(sdl->usepbo && texture->pbo)
+		{
+			pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
+			texture->pbo=0;
+		}
+		
+		if( sdl->glsl_program_num > 1 )
+		{
+			assert(sdl->usefbo);
+			pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
+			glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
+		}
+		
+		if ( sdl->glsl_program_mb2sc < sdl->glsl_program_num - 1 )
+		{
+			assert(sdl->usefbo);
+			pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
+			glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
 		}
 
-		sdl->initialized = 0;
-        }
-exit:
-        if(lock) { osd_lock_release(window->primlist->lock); }
+		if(texture->lut_texture)
+			glDeleteTextures(1, (GLuint *)&texture->lut_texture);
+
+		glDeleteTextures(1, (GLuint *)&texture->texture);
+		if ( texture->data_own )
+		{
+			free(texture->data);
+			texture->data=NULL;
+			texture->data_own=FALSE;
+		}
+		if (texture->effectbuf)
+		{
+			free(texture->effectbuf);
+		}
+		free(texture);
+		texture = next_texture;
+	}
+    sdl->texlist = NULL;
+
+	if ( sdl->useglsl )
+	{
+		glsl_shader_free(sdl->glsl); 
+		sdl->glsl = NULL;
+	}
+	
+	sdl->initialized = 0;
+
+	if (lock)
+		osd_lock_release(window->primlist->lock);
 }
 
 //============================================================

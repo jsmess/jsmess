@@ -15,6 +15,7 @@
 #include <SDL/SDL.h>
 #include "video.h"
 #include "render.h"
+#include "sdlsync.h"
 
 #include "osd_opengl.h"
 
@@ -115,7 +116,7 @@ struct _sdl_window_info
 	int					startmaximized;
 
 	// rendering info
-	osd_lock *			render_lock;
+	osd_event *			rendered_event;
 	render_target *		target;
 	const render_primitive_list *primlist;
 
@@ -182,6 +183,13 @@ void sdlwindow_resize(sdl_window_info *window, INT32 width, INT32 height);
 //============================================================
 
 int drawsdl_init(sdl_draw_info *callbacks);
+const char *drawsdl_scale_mode_str(int index);
+int drawsdl_scale_mode(const char *s);
+
+//============================================================
+// PROTOTYPES - drawsdl.c
+//============================================================
+
 int drawogl_init(sdl_draw_info *callbacks);
 
 #endif /* __SDLWINDOW__ */

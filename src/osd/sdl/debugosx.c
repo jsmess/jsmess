@@ -481,16 +481,16 @@ void debugwin_show(int type)
 //  debugwin_update_during_game
 //============================================================
 
-void debugwin_update_during_game(void)
+void debugwin_update_during_game(running_machine *machine)
 {
 	osx_init_debugger();
 
 	// if we're running live, do some checks
-	if ( ! debug_cpu_is_stopped(Machine) )
+	if ( ! debug_cpu_is_stopped(machine) )
 	{
 		// see if the interrupt key is pressed and break if it is
 		temporarily_fake_that_we_are_not_visible = TRUE;
-		if (ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK))
+		if (ui_input_pressed(machine, IPT_UI_DEBUG_BREAK))
 		{
 			debugwin_info *info;
 			HIViewRef	focuswnd;
@@ -500,7 +500,7 @@ void debugwin_update_during_game(void)
 				focuswnd = NULL;
 			}
 			
-			debugger_break(Machine);
+			debugger_break(machine);
 			debug_console_printf("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
@@ -519,28 +519,6 @@ void debugwin_update_during_game(void)
 		temporarily_fake_that_we_are_not_visible = FALSE;
 	}
 }
-
-
-#if 0
-//============================================================
-//  debugwin_is_debugger_visible
-//============================================================
-
-int debugwin_is_debugger_visible(void)
-{
-	debugwin_info *info;
-
-	// a bit of hackiness to allow us to check key sequences even if we are visible
-	if (temporarily_fake_that_we_are_not_visible)
-		return 0;
-
-	// if any one of our windows is visible, return true
-	for (info = window_list; info; info = info->next)
-		if (IsWindowVisible(info->wnd))
-			return 1;
-	return 0;
-}
-#endif
 
 
 //============================================================
@@ -1935,7 +1913,7 @@ static void generic_recompute_children(debugwin_info *info)
 //  log_create_window
 //============================================================
 
-static void log_create_window(void)
+static void log_create_window(running_machine *machine)
 {
 	debugwin_info *info;
 	char title[256];
@@ -1943,7 +1921,7 @@ static void log_create_window(void)
 	Rect bounds;
 
 	// create the window
-	snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
+	snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
 	info = debug_window_create(title, NULL);
 	if (!info || !debug_view_create(info, 0, DVT_LOG))
 		return;
@@ -1990,8 +1968,8 @@ static void memory_determine_combo_items(running_machine *machine)
 {
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
+	const char *rgntag;
 	int itemnum;
-	const char *rgnname;
 
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -2005,50 +1983,32 @@ static void memory_determine_combo_items(running_machine *machine)
 					memset(ci, 0, sizeof(*ci));
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
-					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 4);
-					sprintf(ci->name, "CPU #%d (%s) %s memory", cpunum, cpunum_name(cpunum), address_space_names[spacenum]);
+					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
+					snprintf(ci->name, ARRAY_LENGTH(ci->name), "CPU #%d \"%s\" (%s) %s memory", cpunum, machine->config->cpu[cpunum].tag, cpunum_name(cpunum), address_space_names[spacenum]);
 					*tail = ci;
 					tail = &ci->next;
 				}
 	}
 
 	// then add all the memory regions
-	rgnname = memory_region_next(machine, NULL);
-	while (rgnname != NULL)
+	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
 	{
-		UINT8 *base = memory_region(machine, rgnname);
 		memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-		UINT32 flags = memory_region_flags(machine, rgnname);
-		UINT8 width = 0, little_endian;
+		UINT32 flags = memory_region_flags(machine, rgntag);
+		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
 
 		memset(ci, 0, sizeof(*ci));
-		ci->base = base;
-		ci->length = memory_region_length(machine, rgnname);
-		little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-		switch (flags & ROMREGION_WIDTHMASK)
-		{
-			case ROMREGION_8BIT:
-				width = 8;
-				break;
-			case ROMREGION_16BIT:
-				width = 16;
-				break;
-			case ROMREGION_32BIT:
-				width = 32;
-				break;
-			case ROMREGION_64BIT:
-				width = 64;
-				break;
-		}
-		ci->prefsize = MIN(width, 4);
+		ci->base = memory_region(machine, rgntag);
+		ci->length = memory_region_length(machine, rgntag);
+		ci->prefsize = MIN(width, 8);
 		ci->offset_xor = width - 1;
 		ci->little_endian = little_endian;
-		strcpy(ci->name, rgnname);
+
+		snprintf(ci->name, ARRAY_LENGTH(ci->name), "Regio \"%s\"", rgntag);
+
 		*tail = ci;
 		tail = &ci->next;
-
-		// and get the next region
-		rgnname = memory_region_next(machine, rgnname);
 	}
 
 	// finally add all global array symbols
@@ -2070,7 +2030,7 @@ static void memory_determine_combo_items(running_machine *machine)
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
 			ci->length = valcount * valsize;
-			ci->prefsize = MIN(valsize, 4);
+			ci->prefsize = MIN(valsize, 8);
 			ci->little_endian = TRUE;
 			strcpy(ci->name, strrchr(name, '/') + 1);
 			*tail = ci;
@@ -2725,7 +2685,7 @@ static void disasm_create_window(void)
 				char			name[100];
 				UInt16			item;
 
-				snprintf(name, ARRAY_LENGTH(name), "CPU #%d (%s)", cpunum, cpunum_name(cpunum));
+				snprintf(name, ARRAY_LENGTH(name), "CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
 				
 				cfName = CFStringCreateWithCString( NULL, name, CFStringGetSystemEncoding() );
 				AppendMenuItemTextWithCFString( popupmenu, cfName, 0, 0, &item );
@@ -3134,7 +3094,7 @@ static void disasm_update_caption(debugwin_info *info)
 	cpunum = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Disassembly: %s (%d)", cpunum_name(cpunum), cpunum);
+	snprintf(title, ARRAY_LENGTH(title), "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
 
 	cftitle = CFStringCreateWithCString( NULL, title, CFStringGetSystemEncoding() );
 	
@@ -3444,7 +3404,7 @@ static void console_set_cpunum(running_machine *machine, int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpu_getactivecpu(), machine->config->cpu[cpu_getactivecpu()].tag, activecpu_name());
 	
 	cftitle = CFStringCreateWithCString( NULL, title, CFStringGetSystemEncoding() );
 	
@@ -3530,7 +3490,7 @@ static int global_handle_command(debugwin_info *info, EventRef inEvent)
 			return 1;
 
 		case ID_NEW_LOG_WND:
-			log_create_window();
+			log_create_window(Machine);
 			return 1;
 
 		case ID_RUN_AND_HIDE:
@@ -3664,7 +3624,7 @@ static int global_handle_key(debugwin_info *info, EventRef inEvent)
 				
 				case 'l':
 				case 'L':
-					log_create_window();
+					log_create_window(Machine);
 					return 1;
 			}
 		}

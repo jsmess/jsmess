@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_NO_X11) 
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_NO_X11) && !defined(SDLMAME_SOLARIS) 
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -119,8 +119,8 @@ static void memory_determine_combo_items(running_machine *machine)
 {
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
+	const char *rgntag;
 	int itemnum;
-	const char *rgnname;
 
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -134,50 +134,34 @@ static void memory_determine_combo_items(running_machine *machine)
 					memset(ci, 0, sizeof(*ci));
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
-					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 4);
-					sprintf(ci->name, "CPU #%d (%s) %s memory", cpunum, cpunum_name(cpunum), address_space_names[spacenum]);
+					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
+
+					snprintf(ci->name, ARRAY_LENGTH(ci->name), "CPU #%d \"%s\" (%s) %s memory", cpunum, machine->config->cpu[cpunum].tag, cpunum_name(cpunum), address_space_names[spacenum]);
+
 					*tail = ci;
 					tail = &ci->next;
 				}
 	}
 
 	// then add all the memory regions
-	rgnname = memory_region_next(machine, NULL);
-	while (rgnname != NULL)
+	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
 	{
-		UINT8 *base = memory_region(machine, rgnname);
 		memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-		UINT32 flags = memory_region_flags(machine, rgnname);
-		UINT8 width = 0, little_endian;
+		UINT32 flags = memory_region_flags(machine, rgntag);
+		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
 
 		memset(ci, 0, sizeof(*ci));
-		ci->base = base;
-		ci->length = memory_region_length(machine, rgnname);
-		little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-		switch (flags & ROMREGION_WIDTHMASK)
-		{
-			case ROMREGION_8BIT:
-				width = 8;
-				break;
-			case ROMREGION_16BIT:
-				width = 16;
-				break;
-			case ROMREGION_32BIT:
-				width = 32;
-				break;
-			case ROMREGION_64BIT:
-				width = 64;
-				break;
-		}
-		ci->prefsize = MIN(width, 4);
+		ci->base = memory_region(machine, rgntag);
+		ci->length = memory_region_length(machine, rgntag);
+		ci->prefsize = MIN(width, 8);
 		ci->offset_xor = width - 1;
 		ci->little_endian = little_endian;
-		strcpy(ci->name, rgnname);
+
+		snprintf(ci->name, ARRAY_LENGTH(ci->name), "Region \"%s\"", rgntag);
+
 		*tail = ci;
 		tail = &ci->next;
-
-		// and get the next region
-		rgnname = memory_region_next(machine, rgnname);
 	}
 
 	// finally add all global array symbols
@@ -199,7 +183,7 @@ static void memory_determine_combo_items(running_machine *machine)
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
 			ci->length = valcount * valsize;
-			ci->prefsize = MIN(valsize, 4);
+			ci->prefsize = MIN(valsize, 8);
 			ci->little_endian = TRUE;
 			strcpy(ci->name, strrchr(name, '/') + 1);
 			*tail = ci;
@@ -386,7 +370,7 @@ static void debugmain_set_cpunum(running_machine *machine, int cpunum)
 		debug_view_set_property_UINT32(dmain->registers, DVP_REGS_CPUNUM, cpunum);
 
 		// then update the caption
-		sprintf(title, "Debug: %s - CPU %d (%s)", machine->gamedrv->name, cpunum, cpunum_name(cpunum));
+		sprintf(title, "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpunum, machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		debugmain_update_checks(dmain);
 	}
@@ -411,7 +395,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 	gtk_main_iteration();
 }
 
-void debugwin_update_during_game(void)
+void debugwin_update_during_game(running_machine *machine)
 {
 	if(dmain)
 		gtk_main_iteration_do(FALSE);
@@ -594,7 +578,7 @@ static void disasmwin_update_selection(disasmwin_i *info, int cpunum)
 
 	disasmwin_update_checks(info);
 
-	sprintf(title, "Disassembly: %s (%d)", cpunum_name(cpunum), cpunum);
+	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
 	gtk_window_set_title(GTK_WINDOW(info->win), title);
 }
 
@@ -704,7 +688,7 @@ static void disasmwin_new(void)
 			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
 			{
 				char name[100];
-				sprintf(name, "CPU #%d (%s)", cpunum, cpunum_name(cpunum));
+				sprintf(name, "CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
 				gtk_combo_box_append_text(dis->cpu_w, name);
 				if(cpunum == curcpu)
 					citem = item;
@@ -900,7 +884,7 @@ void osd_wait_for_debugger(void)
 {
 }
 
-void debugwin_update_during_game(void)
+void debugwin_update_during_game(running_machine *machine)
 {
 }
 

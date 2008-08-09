@@ -20,9 +20,9 @@ void sdlled_init(void)
 	if ( SDL_GetWMInfo(&info) && (info.subsystem == SDL_SYSWM_X11) )
 	{
 		/* GRR leds 1 and 2 are swapped in X */
-		output_set_notifier(SDL_LED(0), led_change_notify, (void *)2);
-		output_set_notifier(SDL_LED(1), led_change_notify, (void *)1);
-		output_set_notifier(SDL_LED(2), led_change_notify, (void *)3);
+		output_set_notifier(SDLMAME_LED(0), led_change_notify, (void *)2);
+		output_set_notifier(SDLMAME_LED(1), led_change_notify, (void *)1);
+		output_set_notifier(SDLMAME_LED(2), led_change_notify, (void *)3);
 	}
 	#endif
 }

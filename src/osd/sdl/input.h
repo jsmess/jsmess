@@ -25,5 +25,6 @@ int  sdlinput_should_hide_mouse(running_machine *machine);
 sdl_window_info *sdlinput_get_focus_window(running_machine *machine);
 
 void  sdlinput_process_events_buf(running_machine *machine);
+void  sdlinput_release_keys(running_machine *machine);
 
 #endif /* __SDLINPUT_H__ */

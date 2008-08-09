@@ -111,7 +111,7 @@ int sdlvideo_init(running_machine *machine)
 
 	// extract data from the options
 	extract_video_config(machine);
-	
+
 	// ensure we get called on the way out
 	add_exit_callback(machine, video_exit);
 
@@ -221,7 +221,6 @@ static SDL_Rect **get_current_display_modes(void)
     return modes;
 }
 #endif
-
 
 
 //============================================================
@@ -409,7 +408,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 	check_osd_inputs(machine);
 
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
-		debugwin_update_during_game();
+		debugwin_update_during_game(machine);
 }
 
 
@@ -824,7 +823,7 @@ static void extract_video_config(running_machine *machine)
 			video_config.glsl_vid_attributes = 0;
 		}
 	
-		if (sdl_use_unsupported())
+		if (osd_use_unsupported())
 			video_config.prescale_effect = options_get_int(mame_options(), SDLOPTION_PRESCALE_EFFECT);
 		else
 			video_config.prescale_effect = 0;
@@ -847,19 +846,8 @@ static void extract_video_config(running_machine *machine)
 #endif
 	// yuv settings ...
 	stemp = options_get_string(mame_options(), SDLOPTION_SCALEMODE);
-	if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
-		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
-	else if (strcmp(stemp, SDLOPTVAL_HWBLIT) == 0)
-		video_config.scale_mode = VIDEO_SCALE_MODE_HWBLIT;
-	else if (strcmp(stemp, SDLOPTVAL_YV12) == 0)
-		video_config.scale_mode = VIDEO_SCALE_MODE_YV12;
-	else if (strcmp(stemp, SDLOPTVAL_YV12x2) == 0)
-		video_config.scale_mode = VIDEO_SCALE_MODE_YV12X2;
-	else if (strcmp(stemp, SDLOPTVAL_YUY2) == 0)
-		video_config.scale_mode = VIDEO_SCALE_MODE_YUY2;
-	else if (strcmp(stemp, SDLOPTVAL_YUY2x2) == 0)
-		video_config.scale_mode = VIDEO_SCALE_MODE_YUY2X2;
-	else
+	video_config.scale_mode = drawsdl_scale_mode(stemp);
+	if (video_config.scale_mode < 0)
 	{
 		mame_printf_warning("Invalid yuvmode value %s; reverting to none\n", stemp);
 		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
@@ -868,10 +856,6 @@ static void extract_video_config(running_machine *machine)
 	{
 		mame_printf_warning("scalemode is only for -video soft, overriding\n");
 		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
-	}
-	if ( !SDL_VERSION_ATLEAST(1,3,0) && (video_config.mode == VIDEO_MODE_SOFT) && (video_config.scale_mode == VIDEO_SCALE_MODE_HWBLIT) )
-	{
-		mame_printf_warning("scalemode 'hwblit' treated like 'none' in SDL1.2\n");
 	}
 }
 

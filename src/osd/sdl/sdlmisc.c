@@ -1,31 +1,17 @@
-/* Miscelancelous utility functions
+//============================================================
+//
+//  sdlmisc.c - SDL utility functions
+//
+//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//  SDLMAME by Olivier Galibert and R. Belmont
+//
+//  Note: previous versions of this file were from XMAME and marked as GPL.
+//        all of that code is now gone/rewritten so that attribution has been removed.
+//
+//============================================================
 
-   Copyright 2000 Hans de Goede
-
-   This file and the acompanying files in this directory are free software;
-   you can redistribute them and/or modify them under the terms of the GNU
-   Library General Public License as published by the Free Software Foundation;
-   either version 2 of the License, or (at your option) any later version.
-
-   These files are distributed in the hope that they will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public
-   License along with these files; see the file COPYING.LIB.  If not,
-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.
-*/
-/* Changelog
-Version 0.1, February 2000
--initial release (Hans de Goede)
-Version 0.2, May 2000
--moved time system headers from .h to .c to avoid header conflicts (Hans de Goede)
--made uclock a function on systems without gettimeofday too (Hans de Goede)
--UCLOCKS_PER_SECOND is now always 1000000, instead of making it depent on
- the system headers. (Hans de Goede)
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,10 +39,19 @@ Version 0.2, May 2000
 #include <os2.h>
 #endif
 
+//============================================================
+//  osd_alloc_executable
+//
+//  allocates "size" bytes of executable memory.  this must take
+//  things like NX support into account.
+//============================================================
+
 void *osd_alloc_executable(size_t size)
 {
 #if defined(SDLMAME_DARWIN)
 	return (void *)malloc(size);
+#elif defined(SDLMAME_FREEBSD)
+	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
 #elif defined(SDLMAME_UNIX)
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
 #elif defined(SDLMAME_WIN32)
@@ -70,6 +65,12 @@ void *osd_alloc_executable(size_t size)
 #error Undefined SDLMAME SUBARCH!
 #endif
 }
+
+//============================================================
+//  osd_free_executable
+//
+//  frees memory allocated with osd_alloc_executable
+//============================================================
 
 void osd_free_executable(void *ptr, size_t size)
 {

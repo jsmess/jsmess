@@ -110,7 +110,11 @@ static const options_entry mame_sdl_options[] =
 	#if (SDL_VERSION_ATLEAST(1,2,10))
 	{ SDLOPTION_WAITVSYNC,                    "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	#endif
-	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  0,                 "Scale mode: none, hwblit, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  0,                 "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+#else
+	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  0,                 "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+#endif
 #if USE_OPENGL
 	// OpenGL specific options
 	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
@@ -424,6 +428,7 @@ static void defines_verbose(void)
 //============================================================
 //	osd_init
 //============================================================
+
 void osd_init(running_machine *machine)
 {
 	const char *stemp;
@@ -453,6 +458,18 @@ void osd_init(running_machine *machine)
 		}
 	}
 
+	/* Set the SDL environment variable for drivers wanting to load the
+	 * lib at startup.
+	 */
+	/* FIXME: move lib loading code from drawogl.c here */
+
+	stemp = options_get_string(mame_options(), SDLOPTION_GL_LIB);
+	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+	{
+		setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
+		mame_printf_verbose("Setting SDL_VIDEO_GL_DRIVER = '%s' ...\n", stemp);
+	}
+	
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
 		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
@@ -482,7 +499,7 @@ void osd_init(running_machine *machine)
 		fflush(stdout);
 		exit(-1);
 	}
-	if (sdl_use_unsupported())
+	if (osd_use_unsupported())
 		sdlled_init();
 
 	sdlinput_init(machine);
