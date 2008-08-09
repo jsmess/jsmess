@@ -124,13 +124,14 @@ static void input_character(char *buffer, size_t buffer_length, unicode_char uni
 
 static void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
 {
-	float width, maxwidth, height;
+	float text_width, text_height;
+	float width, maxwidth;
 	float x1, y1, x2, y2, temp;
 
 	/* get the size of the text */
-	ui_draw_text_full(text, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, &height);
-	width += 2 * UI_BOX_LR_BORDER;
+	ui_draw_text_full(text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
+		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &text_width, &text_height);
+	width = text_width + (2 * UI_BOX_LR_BORDER);
 	maxwidth = MAX(width, origx2 - origx1);
 
 	/* compute our bounds */
@@ -156,7 +157,7 @@ static void extra_text_draw_box(float origx1, float origx2, float origy, float y
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	ui_draw_text_full(text, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui_draw_text_full(text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
 					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 }
 
