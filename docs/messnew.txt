@@ -11,6 +11,8 @@ System Driver Changes:
 - [AMIGA] Fixed crash in CDTV that when accessing the keyboard.
   [Roberto Zandona']
 
+- [COMX35] Fixed to boot again. (bug #1629)  [Curt Coder]
+
 - [DRAGON] Fixed crash that could occur when accessing the printer.  (bug
   #1643)  [Nate Woods]
 
@@ -21,7 +23,6 @@ System Driver Changes:
 
 - [IBM5170] Added support for the 8042 keyboard controller dumped
   by Kevtris.  [Wilbert Pol]
-
 
 
 User Interface Changes:
