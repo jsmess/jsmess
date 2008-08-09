@@ -57,7 +57,6 @@
 
 */
 
-static int acia_irq;
 static UINT8 acia_rxd = 1, acia_txd = 1;
 
 static const device_config *cassette_device_image(int index)
@@ -72,6 +71,8 @@ static const device_config *cassette_device_image(int index)
 #define NEWBRAIN_ENRG1_CTS	0x10
 #define NEWBRAIN_ENRG1_DO	0x20
 #define NEWBRAIN_ENRG1_PO	0x80
+#define NEWBRAIN_ENRG1_UST_BIT_1_MASK	0x30
+#define NEWBRAIN_ENRG1_UST_BIT_0_MASK	0xc0
 
 static WRITE8_HANDLER( enrg1_w )
 {
@@ -91,6 +92,8 @@ static WRITE8_HANDLER( enrg1_w )
 	*/
 
 	newbrain_state *state = machine->driver_data;
+
+	//logerror("ENRG1: %02x\n", data);
 
 	state->enrg1 = data;
 }
@@ -123,22 +126,22 @@ static READ8_HANDLER( ust_r )
 
 		bit		signal		description
 
-		0		
-		1		
-		2					mains present
-		3					user status
-		4					user interrupt
-		5					clock interrupt
-		6					ACIA interrupt
+		0		variable
+		1		variable
+		2		MNS			mains present
+		3		_USRINT0	user status
+		4		_USRINT		user interrupt
+		5		_CLKINT		clock interrupt
+		6		_ACINT		ACIA interrupt
 		7		_COPINT		COP interrupt
 
 	*/
 
 	newbrain_state *state = machine->driver_data;
 
-	UINT8 data = (state->copint << 7) | (state->aciaint << 6) | (state->clkint << 5) | (state->userint << 4) | 0x04;
+	UINT8 data = (state->copint << 7) | (state->aciaint << 6) | (state->clkint << 5) | (state->userint << 4);
 
-	switch (state->enrg1 >> 6)
+	switch ((state->enrg1 & NEWBRAIN_ENRG1_UST_BIT_0_MASK) >> 6)
 	{
 	case 0:
 		// excess, 1=24, 0=4
@@ -165,7 +168,7 @@ static READ8_HANDLER( ust_r )
 		break;
 	}
 
-	switch (state->enrg1 >> 4)
+	switch ((state->enrg1 & NEWBRAIN_ENRG1_UST_BIT_1_MASK) >> 4)
 	{
 	case 0:
 		// PWRUP, if set indicates that power is supplied to Z80 and memory
@@ -320,10 +323,9 @@ static WRITE8_HANDLER( newbrain_cop_g_w )
 
 	*/
 
-	// _Z80INT = ((_CLK | _CLKINT) & _COPINT)
-	//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, BIT(data, 0) ? HOLD_LINE : CLEAR_LINE);
-
 	newbrain_state *state = machine->driver_data;
+
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, BIT(data, 0) ? HOLD_LINE : CLEAR_LINE);
 
 	state->copint = BIT(data, 0);
 
@@ -721,7 +723,9 @@ static READ8_HANDLER( ei_st0_r )
 
 	*/
 
-	return acia_irq << 6;
+	newbrain_state *state = machine->driver_data;
+
+	return (state->copint << 7) | (state->aciaint << 6) | (state->clkint << 5) | (state->userint << 4) | (state->userint0 << 3) | (state->pwrup) << 1;
 }
 
 static READ8_HANDLER( ei_st1_r )
@@ -743,7 +747,7 @@ static READ8_HANDLER( ei_st1_r )
 
 	newbrain_state *state = machine->driver_data;
 
-	return (state->tvcnsl << 6);
+	return (state->tvcnsl << 6) | 0x10 | 0x08 | 0x04;
 }
 
 static READ8_HANDLER( ei_st2_r )
@@ -873,7 +877,7 @@ static ADDRESS_MAP_START( newbrain_m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xffc0) AM_WRITE(user_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xffc0) AM_READWRITE(clclk_r, clclk_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xffc0) AM_READWRITE(cop_r, cop_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xffc0) AM_WRITE(a_enrg1_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xffc0) AM_WRITE(enrg1_w)
 	AM_RANGE(0x08, 0x09) AM_MIRROR(0xffc2) AM_READWRITE(tvl_r, tvl_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xffc3) AM_WRITE(tvctl_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(ust_r)
@@ -1045,7 +1049,9 @@ INPUT_PORTS_END
 
 static void acia_interrupt(int state)
 {
-	acia_irq = state;
+	newbrain_state *driver_state = Machine->driver_data;
+
+	driver_state->aciaint = state;
 }
 
 static const struct acia6850_interface newbrain_acia_intf =
@@ -1083,10 +1089,20 @@ static z80ctc_interface newbrain_ctc_intf =
 	NULL					/* ZC/TO2 callback */
 };
 
+INLINE int get_reset_t(void)
+{
+	return RES_K(220) * CAP_U(10) * 1000; // t = R128 * C125 = 2.2s
+}
+
 static TIMER_CALLBACK( reset_tick )
 {
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+}
+
+INLINE int get_pwrup_t(void)
+{
+	return RES_K(560) * CAP_U(10) * 1000; // t = R129 * C127 = 5.6s
 }
 
 static TIMER_CALLBACK( pwrup_tick )
@@ -1094,23 +1110,13 @@ static TIMER_CALLBACK( pwrup_tick )
 	newbrain_state *state = machine->driver_data;
 	int bank;
 
-	state->pwrup = 0;
+	state->pwrup = 1;
 
 	for (bank = 1; bank < 9; bank++)
 	{
 		memory_configure_bank(bank, 0, 1, memory_region(machine, "main") + (bank - 1) * 0x2000, 0);
 		memory_set_bank(bank, 0);
 	}
-}
-
-INLINE int get_reset_t(void)
-{
-	return RES_K(220) * CAP_U(10) * 1000; // t = R128 * C125
-}
-
-INLINE int get_pwrup_t(void)
-{
-	return RES_K(560) * CAP_U(10) * 1000; // t = R129 * C127
 }
 
 static MACHINE_START( newbrain )
@@ -1135,12 +1141,13 @@ static MACHINE_START( newbrain )
 	/* allocate reset timer */
 	
 	state->reset_timer = timer_alloc(reset_tick, NULL);
+	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_USEC(get_reset_t()), 0);
 
 	/* allocate power up timer */
-	
+
 	state->pwrup_timer = timer_alloc(pwrup_tick, NULL);
-	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(get_pwrup_t()), 0);
-	state->pwrup = 1;
+	timer_adjust_oneshot(state->pwrup_timer, ATTOTIME_IN_USEC(get_pwrup_t()), 0);
+	state->pwrup = 0;
 
 	/* initialize variables */
 
@@ -1165,17 +1172,11 @@ static MACHINE_RESET( newbrain )
 	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(get_reset_t()), 0);
 }
 
-static const struct z80_irq_daisy_chain newbrain_daisy_chain[] =
-{
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
-	{ 0, 0, 0, 0, -1 }
-};
-
 static INTERRUPT_GEN( newbrain_interrupt )
 {
 	newbrain_state *state = machine->driver_data;
 	
-	if (state->enrg1 & NEWBRAIN_ENRG1_CLK)
+	if (!(state->enrg1 & NEWBRAIN_ENRG1_CLK))
 	{
 		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
 
@@ -1326,6 +1327,7 @@ ROM_START( newbraim )
 ROM_END
 
 ROM_START( newbraia )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_SYSTEM_BIOS( 0, "rom20", "ROM 2.0" )
 	ROMX_LOAD( "aben20.rom", 0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(1) )
 	ROMX_LOAD( "cd20tci.rom", 0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(1) )

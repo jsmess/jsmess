@@ -15,6 +15,7 @@ struct _newbrain_state
 	/* processor state */
 	int pwrup;				/* power up */
 	int userint;			/* user interrupt */
+	int userint0;			/* parallel port interrupt */
 	int clkint;				/* clock interrupt */
 	int aciaint;			/* ACIA interrupt */
 	int copint;				/* COP interrupt */
