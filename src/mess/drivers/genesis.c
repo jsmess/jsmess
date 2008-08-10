@@ -63,8 +63,8 @@ static UINT16 g_l3alt_pcmd;
 
 static int genesis_last_loaded_image_length = -1;
 
-static int megadrive_region_export = 0;
-static int megadrive_region_pal = 0;
+//static int megadrive_region_export = 0;
+//static int megadrive_region_pal = 0;
 
 /* where a fresh copy of rom is stashed for reset and banking setup */
 #define VIRGIN_COPY_GEN 0xd00000
@@ -1445,7 +1445,7 @@ static ADDRESS_MAP_START( _pico_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000 , 0x80001f) AM_READ(pico_68k_io_read)
 
-//	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
+	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
 	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
 ADDRESS_MAP_END
 
@@ -1454,7 +1454,7 @@ static ADDRESS_MAP_START( _pico_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000 , 0x80001f) AM_WRITE(pico_68k_io_write)
 
-//	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
+	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
 	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 

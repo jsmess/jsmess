@@ -53,8 +53,6 @@ Known Non-Issues (confirmed on Real Genesis)
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
-/* the same on all systems? */
-#define MASTER_CLOCK		53693100
 /* timing details */
 static int megadriv_framerate;
 static int megadrive_total_scanlines;
@@ -82,8 +80,8 @@ static UINT8 megadrive_vram_fill_pending = 0;
 static UINT16 megadrive_vram_fill_length = 0;
 static int genesis_scanline_counter = 0;
 static int megadrive_sprite_collision = 0;
-static int megadrive_region_export;
-static int megadrive_region_pal;
+int megadrive_region_export;
+int megadrive_region_pal;
 static int megadrive_max_hposition;
 
 
@@ -888,7 +886,7 @@ static void megadriv_vdp_ctrl_port_w(running_machine *machine, int data)
 	}
 }
 
-static WRITE16_HANDLER( megadriv_vdp_w )
+WRITE16_HANDLER( megadriv_vdp_w )
 {
 	switch (offset<<1)
 	{
@@ -1281,7 +1279,7 @@ static UINT16 megadriv_read_hv_counters(void)
 
 }
 
-static READ16_HANDLER( megadriv_vdp_r )
+READ16_HANDLER( megadriv_vdp_r )
 {
 	UINT16 retvalue = 0;
 
@@ -5248,4 +5246,3 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
-

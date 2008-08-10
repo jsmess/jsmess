@@ -119,6 +119,9 @@ const game_driver *const test_drivers[] =
 	DRIVER( genesis )	/* 1989 Sega Genesis (USA)							*/
 	DRIVER( gensvp )	/* 1993 Sega Genesis (USA w/SVP chip)				*/
 	DRIVER( megadriv )	/* 1990 Sega Mega Drive (Europe)					*/
+	DRIVER( picoe )		/* 1994 Sega Pico (Europe)							*/
+	DRIVER( picou )		/* 1994 Sega Pico (USA)								*/
+	DRIVER( picoj )		/* 1993 Sega Pico (Japan)							*/
 
 	DRIVER( saturnjp )	/* 1994 Sega Saturn (Japan)							*/
 	DRIVER( saturn )	/* 1995 Sega Saturn (USA)							*/
@@ -848,7 +851,7 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	/* Orao */
 	DRIVER( orao )
 	DRIVER( orao103 )
-		
+
 	/* UT-88 */
 	DRIVER( ut88 )
 	DRIVER( ut88mini )
@@ -870,12 +873,12 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( orionz80 )
 	DRIVER( orionzms )
 	DRIVER( orionpro )
-		
+
 	/* BK */
 	DRIVER( bk0010 )
 	DRIVER( bk001001 )
 	DRIVER( bk0010fd )
-		
+
 	/* Bashkiria-2M */
 	DRIVER( b2m )
 	DRIVER( b2mrom )
