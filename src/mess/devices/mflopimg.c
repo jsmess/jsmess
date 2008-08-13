@@ -441,19 +441,19 @@ void floppy_device_getinfo(const mess_device_class *devclass, UINT32 state, unio
 
 		default:
 			floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
-			if ((state >= MESS_DEVINFO_STR_CREATE_OPTNAME) && (state < MESS_DEVINFO_STR_CREATE_OPTNAME + MESS_DEVINFO_CREATE_OPTMAX))
+			if ((state >= MESS_DEVINFO_STR_CREATE_OPTNAME) && (state < MESS_DEVINFO_STR_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX))
 			{
 				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTNAME].name;
 			}
-			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTDESC) && (state < MESS_DEVINFO_STR_CREATE_OPTDESC + MESS_DEVINFO_CREATE_OPTMAX))
+			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTDESC) && (state < MESS_DEVINFO_STR_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX))
 			{
 				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTDESC].description;
 			}
-			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTEXTS) && (state < MESS_DEVINFO_STR_CREATE_OPTEXTS + MESS_DEVINFO_CREATE_OPTMAX))
+			else if ((state >= MESS_DEVINFO_STR_CREATE_OPTEXTS) && (state < MESS_DEVINFO_STR_CREATE_OPTEXTS + DEVINFO_CREATE_OPTMAX))
 			{
 				info->s = (void *) floppy_options[state - MESS_DEVINFO_STR_CREATE_OPTEXTS].extensions;
 			}
-			else if ((state >= MESS_DEVINFO_PTR_CREATE_OPTSPEC) && (state < MESS_DEVINFO_PTR_CREATE_OPTSPEC + MESS_DEVINFO_CREATE_OPTMAX))
+			else if ((state >= MESS_DEVINFO_PTR_CREATE_OPTSPEC) && (state < MESS_DEVINFO_PTR_CREATE_OPTSPEC + DEVINFO_CREATE_OPTMAX))
 			{
 				info->p = (void *) floppy_options[state - MESS_DEVINFO_PTR_CREATE_OPTSPEC].param_guidelines;
 			}

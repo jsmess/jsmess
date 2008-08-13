@@ -37,6 +37,9 @@ struct _image_slot_data
 	const device_config *dev;
 	image_device_info info;
 
+	/* creation info */
+	image_device_format *formatlist;
+
 	/* callbacks */
 	device_image_load_func load;
 	device_image_create_func create;
@@ -91,6 +94,7 @@ static void image_exit(running_machine *machine);
 static void image_clear(image_slot_data *image);
 static void image_clear_error(image_slot_data *image);
 static void image_unload_internal(image_slot_data *slot);
+static image_slot_data *find_image_slot(const device_config *image);
 
 
 
@@ -185,10 +189,12 @@ static void memory_error(const char *message)
 
 void image_init(running_machine *machine)
 {
-	int count, indx;
+	int count, indx, format_count, i;
 	const device_config *dev;
 	size_t private_size;
 	image_slot_data *slot;
+	image_device_format **formatptr;
+	image_device_format *format;
 
 	/* sanity checks */
 	assert(DEVINFO_FCT_IMAGE_FIRST > DEVINFO_FCT_FIRST);
@@ -224,6 +230,26 @@ void image_init(running_machine *machine)
 		slot->create = (device_image_create_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_CREATE);
 		slot->unload = (device_image_unload_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_UNLOAD);
 		slot->verify = (device_image_verify_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_VERIFY);
+
+		/* creation formats */
+		format_count = device_get_info_int(slot->dev, DEVINFO_INT_IMAGE_CREATE_OPTCOUNT);
+		formatptr = &slot->formatlist;
+		for (i = 0; i < format_count; i++)
+		{
+			/* allocate a new format */
+			format = auto_malloc(sizeof(*format));
+			memset(format, 0, sizeof(*format));
+
+			/* populate it */
+			format->name		= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
+			format->description	= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
+			format->extensions	= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
+			format->optspec		= device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
+
+			/* and append it to the list */
+			*formatptr = format;
+			formatptr = &format->next;
+		}
 
 		indx++;
 	}
@@ -561,6 +587,23 @@ void image_device_compute_hash(char *dest, const device_config *device,
 		partialhash(dest, data, length, functions);
 	else
 		hash_compute(dest, data, length, functions);
+}
+
+
+
+/****************************************************************************
+    CREATION FORMATS
+****************************************************************************/
+
+/*-------------------------------------------------
+    image_device_get_creatable_formats - accesses
+	the image formats available for image creation
+-------------------------------------------------*/
+
+const image_device_format *image_device_get_creatable_formats(const device_config *device)
+{
+	image_slot_data *slot = find_image_slot(device);
+	return slot->formatlist;
 }
 
 

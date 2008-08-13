@@ -35,7 +35,7 @@ struct _mess_device_config
 {
 	struct IODevice io_device;
 	char string_buffer[1024];
-	create_image_options createimage_options[MESS_DEVINFO_CREATE_OPTMAX + 1];
+	create_image_options createimage_options[DEVINFO_CREATE_OPTMAX + 1];
 };
 
 
@@ -235,6 +235,7 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_INT_IMAGE_TYPE:			info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_TYPE); break;
 		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:	info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_MUST_BE_LOADED); break;
 		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:	info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_RESET_ON_LOAD); break;
+		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:	info->i = mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_CREATE_OPTCOUNT); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:				/* Nothing */									break;
@@ -258,6 +259,17 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS); break;
 		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME + mess_device->io_device.index_in_device); break;
 		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME + mess_device->io_device.index_in_device); break;
+
+		default:
+			if ((state >= DEVINFO_PTR_IMAGE_CREATE_OPTSPEC) && (state < DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + DEVINFO_CREATE_OPTMAX))
+				info->p = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + MESS_DEVINFO_PTR_CREATE_OPTSPEC);
+			else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTNAME) && (state < DEVINFO_STR_IMAGE_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX))
+				info->s = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTNAME + MESS_DEVINFO_STR_CREATE_OPTNAME);
+			else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTDESC) && (state < DEVINFO_STR_IMAGE_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX))
+				info->s = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTDESC + MESS_DEVINFO_STR_CREATE_OPTDESC);
+			else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTEXTS) && (state < DEVINFO_STR_IMAGE_CREATE_OPTEXTS + DEVINFO_CREATE_OPTMAX))
+				info->s = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTEXTS + MESS_DEVINFO_STR_CREATE_OPTEXTS);
+			break;
 	}
 }
 
@@ -378,7 +390,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		createimage_optcount = (int) mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_CREATE_OPTCOUNT);
 		if (createimage_optcount > 0)
 		{
-			if (createimage_optcount > MESS_DEVINFO_CREATE_OPTMAX)
+			if (createimage_optcount > DEVINFO_CREATE_OPTMAX)
 				fatalerror("MESS_DEVINFO_INT_CREATE_OPTCOUNT: Too many options");
 
 			/* set up each option in the list */

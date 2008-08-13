@@ -141,7 +141,7 @@ static int validate_device(const mess_device_class *devclass)
 
 	/* check creation options */
 	optcount = mess_device_get_info_int(devclass, MESS_DEVINFO_INT_CREATE_OPTCOUNT);
-	if ((optcount < 0) || (optcount >= MESS_DEVINFO_CREATE_OPTMAX))
+	if ((optcount < 0) || (optcount >= DEVINFO_CREATE_OPTMAX))
 	{
 		mame_printf_error("%s: device type '%s' has an invalid creation optcount\n", devclass->gamedrv->name, device_typename(devtype));
 		error = 1;
