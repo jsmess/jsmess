@@ -63,8 +63,8 @@ static UINT16 g_l3alt_pcmd;
 
 static int genesis_last_loaded_image_length = -1;
 
-//static int megadrive_region_export = 0;
-//static int megadrive_region_pal = 0;
+static int megadrive_region_export = 0;
+static int megadrive_region_pal = 0;
 
 /* where a fresh copy of rom is stashed for reset and banking setup */
 #define VIRGIN_COPY_GEN 0xd00000
@@ -1368,11 +1368,8 @@ static READ16_HANDLER( pico_68k_io_read )
 
 	switch (offset)
 	  {
-	  case 0:	/* Version register ?XX?????? where ?? is 00 for japan, 01 for europe and 10 for USA*/
-	    /* NPW 14-Aug-2008 - What is this? How did this ever compile? */
-	    /* retdata = megadrive_region_export<<6 |
-		      megadrive_region_pal<<5;
-			  */
+	  case 0:	/* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
+		retdata = (megadrive_region_export << 6) | (megadrive_region_pal << 5);
 	    break;
 	  case 1:
 	    retdata = input_port_read_safe(Machine, "PAD", 0);
@@ -1447,8 +1444,7 @@ static ADDRESS_MAP_START( _pico_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000 , 0x80001f) AM_READ(pico_68k_io_read)
 
-	/* NPW 14-Aug-2008 - What is this?  This is not referencing anything */
-	/* AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r) */
+	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
 	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
 ADDRESS_MAP_END
 
@@ -1457,8 +1453,7 @@ static ADDRESS_MAP_START( _pico_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000 , 0x80001f) AM_WRITE(pico_68k_io_write)
 
-	/* NPW 14-Aug-2008 - What is this?  This is not referencing anything */
-	/* AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w) */
+	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
 	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 
@@ -1472,13 +1467,14 @@ INPUT_PORTS_START( pico )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("PEN BUTTON")
 
 	PORT_START("PAGE")
-        PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Increment Page")
-        PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Decrement Page")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Increment Page")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Decrement Page")
 
 	PORT_START("PENX")
-        PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN X")
+
 	PORT_START("PENY")
-        PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0,255 ) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0,255 ) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN Y")
 
 	PORT_START("REGION")	/* Buttons on Genesis Console */
 	/* Region setting for Console */
