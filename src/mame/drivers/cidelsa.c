@@ -93,15 +93,15 @@ static WRITE8_HANDLER( draco_sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		AY8910_write_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_write_port_0_w(machine, 0, state->draco_ay_latch);
 		break;
 
 	case 0x02:
-		state->draco_ay_latch = AY8910_read_port_0_r(machine, 0);
+		state->draco_ay_latch = ay8910_read_port_0_r(machine, 0);
 		break;
 
 	case 0x03:
-		AY8910_control_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_control_port_0_w(machine, 0, state->draco_ay_latch);
 		break;
 	}
 }
@@ -159,7 +159,7 @@ static WRITE8_HANDLER( draco_ay8910_port_b_w )
     */
 }
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_SINGLE_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -402,7 +402,7 @@ static INPUT_PORTS_START( destryer )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // LF
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // FR
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, NULL)
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -427,7 +427,7 @@ static INPUT_PORTS_START( destryer )
 	PORT_DIPSETTING(    0x00, "Slot A: 2.5  Slot B: 5" )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -442,7 +442,7 @@ static INPUT_PORTS_START( altair )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // LF
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // FR
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, NULL)
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -477,7 +477,7 @@ static INPUT_PORTS_START( altair )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -492,7 +492,7 @@ static INPUT_PORTS_START( draco )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, NULL)
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -529,7 +529,7 @@ static INPUT_PORTS_START( draco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -719,7 +719,7 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_SOUND_ADD("cdp", CDP1869, DRACO_CHR2)
 
 	MDRV_SOUND_ADD("ay", AY8910, DRACO_SND_CHR1)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

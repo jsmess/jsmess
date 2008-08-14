@@ -500,7 +500,7 @@ static WRITE8_HANDLER( mpf1_portc_w )
 	set_led_status(0, led_tone);
 
 	// speaker
-	DAC_data_w(0, 0xFF * led_tone);
+	dac_data_w(0, 0xFF * led_tone);
 
 	verboselog( 1, "PPI port C (LED/Kbd Col select) write: %02x\n", data );
 }

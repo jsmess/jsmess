@@ -51,12 +51,12 @@ static WRITE8_HANDLER( hcastle_coin_w )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0020, 0x003f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0220, 0x023f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0410, 0x0410) AM_READ(input_port_0_r)
-	AM_RANGE(0x0411, 0x0411) AM_READ(input_port_1_r)
-	AM_RANGE(0x0412, 0x0412) AM_READ(input_port_2_r)
-	AM_RANGE(0x0413, 0x0413) AM_READ(input_port_5_r) /* Dip 3 */
-	AM_RANGE(0x0414, 0x0414) AM_READ(input_port_4_r) /* Dip 2 */
-	AM_RANGE(0x0415, 0x0415) AM_READ(input_port_3_r) /* Dip 1 */
+	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0411, 0x0411) AM_READ_PORT("P1")
+	AM_RANGE(0x0412, 0x0412) AM_READ_PORT("P2")
+	AM_RANGE(0x0413, 0x0413) AM_READ_PORT("DSW3")
+	AM_RANGE(0x0414, 0x0414) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0415, 0x0415) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0418, 0x0418) AM_READ(hcastle_gfxbank_r)
 	AM_RANGE(0x0600, 0x06ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0700, 0x5fff) AM_READ(SMH_RAM)
@@ -90,34 +90,34 @@ static WRITE8_HANDLER( sound_bank_w )
 {
 	int bank_A=(data&0x3);
 	int bank_B=((data>>2)&0x3);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 }
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM3812_status_port_0_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym3812_status_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(K051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_WRITE(K051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_WRITE(K051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_WRITE(K051649_keyonoff_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)
+	AM_RANGE(0x9800, 0x987f) AM_WRITE(k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_WRITE(k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_WRITE(k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_WRITE(k051649_keyonoff_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_bank_w) /* 7232 bankswitch */
 ADDRESS_MAP_END
 
 /*****************************************************************************/
 
 static INPUT_PORTS_START( hcastle )
-	PORT_START("SYSTEM")	/* IN0 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -127,7 +127,7 @@ static INPUT_PORTS_START( hcastle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1")	/* IN1 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -137,7 +137,7 @@ static INPUT_PORTS_START( hcastle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2")	/* IN2 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -158,15 +158,15 @@ static INPUT_PORTS_START( hcastle )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )	// "Difficulty 1"
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )				// DEF_STR( Easy )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )			// "Nomal" !
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )				// "Difficult"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )			// "Very Difficult"
-	PORT_DIPNAME( 0x60, 0x40, "Damage" )			// "Difficulty 2"
-	PORT_DIPSETTING(    0x60, "Small" )				// "Strong"
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )			// "Nomal" !
-	PORT_DIPSETTING(    0x20, "Big" )				// "Weak"
-	PORT_DIPSETTING(    0x00, "Biggest" )			// "Very Weak"
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )			// DEF_STR( Easy )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		// "Nomal" !
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )			// "Difficult"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		// "Very Difficult"
+	PORT_DIPNAME( 0x60, 0x40, "Damage" )				// "Difficulty 2"
+	PORT_DIPSETTING(    0x60, "Small" )					// "Strong"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )		// "Nomal" !
+	PORT_DIPSETTING(    0x20, "Big" )					// "Weak"
+	PORT_DIPSETTING(    0x00, "Biggest" )				// "Very Weak"
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -248,16 +248,16 @@ static void irqhandler(running_machine *machine, int linestate)
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
@@ -293,12 +293,12 @@ static MACHINE_DRIVER_START( hcastle )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("konami1", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.44)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("konami2", K051649, 3579545/2)

@@ -557,10 +557,10 @@ static void equites_update_dac(void)
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
 	if (equites_8155_portb & 1)
-		DAC_signed_data_w(0, equites_dac_latch);
+		dac_signed_data_w(0, equites_dac_latch);
 
 	if (equites_8155_portb & 2)
-		DAC_signed_data_w(1, equites_dac_latch);
+		dac_signed_data_w(1, equites_dac_latch);
 }
 
 static WRITE8_HANDLER(equites_dac_latch_w)
@@ -753,9 +753,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc080, 0xc08d) AM_WRITE(MSM5232_0_w)
-	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xc080, 0xc08d) AM_WRITE(msm5232_0_w)
+	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B
@@ -852,7 +852,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gekisou_unknown_status, 0)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gekisou_unknown_status, NULL)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
@@ -1113,14 +1113,14 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const struct MSM5232interface equites_5232intf =
+static const msm5232_interface equites_5232intf =
 {
 	{ 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6 }, // verified
 	equites_msm5232_gate
 };
 
 
-static const struct AY8910interface equites_8910intf =
+static const ay8910_interface equites_8910intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1140,7 +1140,7 @@ static const char *const alphamc07_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface alphamc07_samples_interface =
+static const samples_interface alphamc07_samples_interface =
 {
 	3,	/* 3 channels */
 	alphamc07_sample_names

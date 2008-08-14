@@ -176,7 +176,7 @@ static TIMER_CALLBACK( update_nmi )
 {
 
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,PULSE_LINE);
-	// DAC_data_w(0,led_status&64?128:0);
+	// dac_data_w(0,led_status&64?128:0);
 	beep_set_state(0,led_status&64?1:0);
 
 }

@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
@@ -96,18 +96,18 @@ static WRITE8_HANDLER( redalert_AY8910_w )
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			ay8910_latch_1 = AY8910_read_port_0_r(machine, 0);
+			ay8910_latch_1 = ay8910_read_port_0_r(machine, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
 		case 0x02:
-			AY8910_write_port_0_w(machine, 0, ay8910_latch_2);
+			ay8910_write_port_0_w(machine, 0, ay8910_latch_2);
 			break;
 
 		/* BC1=1, BDIR=1 : latch address */
 		default:
 		case 0x03:
-			AY8910_control_port_0_w(machine, 0, ay8910_latch_2);
+			ay8910_control_port_0_w(machine, 0, ay8910_latch_2);
 			break;
 	}
 }
@@ -125,7 +125,7 @@ static WRITE8_HANDLER( redalert_ay8910_latch_2_w )
 }
 
 
-static const struct AY8910interface redalert_ay8910_interface =
+static const ay8910_interface redalert_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -271,28 +271,28 @@ static WRITE8_HANDLER( demoneye_ay8910_data_w )
 	{
 		case 0x00:
 			if (ay8910_latch_1 & 0x10)
-				AY8910_write_port_0_w(machine, 0, data);
+				ay8910_write_port_0_w(machine, 0, data);
 
 			if (ay8910_latch_1 & 0x20)
-				AY8910_write_port_1_w(machine, 0, data);
+				ay8910_write_port_1_w(machine, 0, data);
 
 			break;
 
 		case 0x01:
 			if (ay8910_latch_1 & 0x10)
-				ay8910_latch_2 = AY8910_read_port_0_r(machine, 0);
+				ay8910_latch_2 = ay8910_read_port_0_r(machine, 0);
 
 			if (ay8910_latch_1 & 0x20)
-				ay8910_latch_2 = AY8910_read_port_1_r(machine, 0);
+				ay8910_latch_2 = ay8910_read_port_1_r(machine, 0);
 
 			break;
 
 		case 0x03:
 			if (ay8910_latch_1 & 0x10)
-				AY8910_control_port_0_w(machine, 0, data);
+				ay8910_control_port_0_w(machine, 0, data);
 
 			if (ay8910_latch_1 & 0x20)
-				AY8910_control_port_1_w(machine, 0, data);
+				ay8910_control_port_1_w(machine, 0, data);
 
 			break;
 
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( demoneye_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static const struct AY8910interface demoneye_ay8910_interface =
+static const ay8910_interface demoneye_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

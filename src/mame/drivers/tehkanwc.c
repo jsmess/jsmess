@@ -209,7 +209,7 @@ static WRITE8_HANDLER( tehkanwc_portB_w )
 
 static WRITE8_HANDLER( msm_reset_w )
 {
-	MSM5205_reset_w(0,data ? 0 : 1);
+	msm5205_reset_w(0,data ? 0 : 1);
 }
 
 static void tehkanwc_adpcm_int(running_machine *machine, int data)
@@ -220,10 +220,10 @@ static void tehkanwc_adpcm_int(running_machine *machine, int data)
 	int msm_data = SAMPLES[msm_data_offs & 0x7fff];
 
 	if (toggle == 0)
-		MSM5205_data_w(0,(msm_data >> 4) & 0x0f);
+		msm5205_data_w(0,(msm_data >> 4) & 0x0f);
 	else
 	{
-		MSM5205_data_w(0,msm_data & 0x0f);
+		msm5205_data_w(0,msm_data & 0x0f);
 		msm_data_offs++;
 	}
 
@@ -286,10 +286,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -635,7 +635,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -645,7 +645,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	tehkanwc_portB_w
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -655,7 +655,7 @@ static const struct AY8910interface ay8910_interface_2 =
 	NULL
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	tehkanwc_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */
@@ -705,7 +705,7 @@ static MACHINE_DRIVER_START( tehkanwc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 

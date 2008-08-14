@@ -93,13 +93,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(soundlatch_r, SMH_NOP)	/* the write is a clear pending command */
-	AM_RANGE(0x08, 0x08) AM_WRITE(YM2608_control_port_0_A_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(YM2608_data_port_0_A_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(YM2608_control_port_0_B_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(YM2608_data_port_0_B_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ym2608_control_port_0_a_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ym2608_data_port_0_a_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2608_control_port_0_b_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2608_data_port_0_b_w)
 #if 0
-	AM_RANGE(0x18, 0x18) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x18, 0x18) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x1a, 0x1a) AM_READ(ym2610_status_port_0_b_r)
 #endif
 ADDRESS_MAP_END
 
@@ -221,7 +221,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2608interface ym2608_interface =
+static const ym2608_interface ym2608_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
@@ -267,7 +267,7 @@ static MACHINE_DRIVER_START( tail2nos )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2608, XTAL_8MHz)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2608_interface)
+	MDRV_SOUND_CONFIG(ym2608_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

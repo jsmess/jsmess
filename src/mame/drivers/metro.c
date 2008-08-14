@@ -370,9 +370,9 @@ static READ16_HANDLER( metro_soundstatus_r )
 	return (busy_sndcpu ? 0x00 : 0x01);
 }
 
-static READ16_HANDLER( daitorid_soundstatus_r )
+static CUSTOM_INPUT( custom_soundstatus_r )
 {
-	return input_port_read(machine, "IN0") | (busy_sndcpu ? 0x80 : 0x00);
+	return (busy_sndcpu ? 0x01 : 0x00);
 }
 
 static WRITE16_HANDLER( metro_soundstatus_w )
@@ -441,9 +441,9 @@ static WRITE8_HANDLER( metro_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				YM2413_data_port_0_w(machine,0,porta);
+				ym2413_data_port_0_w(machine,0,porta);
 			else
-				YM2413_register_port_0_w(machine,0,porta);
+				ym2413_register_port_0_w(machine,0,porta);
 		}
 		portb = data;
 		return;
@@ -453,7 +453,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			OKIM6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(machine,0,porta);
 	}
 	portb = data;
 }
@@ -485,15 +485,15 @@ static WRITE8_HANDLER( daitorid_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				YM2151_data_port_0_w(machine,0,porta);
+				ym2151_data_port_0_w(machine,0,porta);
 			else
-				YM2151_register_port_0_w(machine,0,porta);
+				ym2151_register_port_0_w(machine,0,porta);
 		}
 		if (!BIT(data,3))
 		{
 			/* read */
 			if (BIT(data,1))
-				porta = YM2151_status_port_0_r(machine,0);
+				porta = ym2151_status_port_0_r(machine,0);
 		}
 		portb = data;
 		return;
@@ -503,13 +503,13 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			OKIM6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(machine,0,porta);
 	}
 	if (BIT(portb,3) && !BIT(data,3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data,4))
-			porta = OKIM6295_status_0_r(machine,0);
+			porta = okim6295_status_0_r(machine,0);
 	}
 	portb = data;
 }
@@ -519,7 +519,7 @@ static void metro_sound_irq_handler(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	metro_sound_irq_handler	/* irq handler */
 };
@@ -527,7 +527,7 @@ static const struct YM2151interface ym2151_interface =
 
 static READ16_HANDLER( ymf278b_r )
 {
-	return YMF278B_status_port_0_r(machine, 0);
+	return ymf278b_status_port_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( ymf278b_w )
@@ -536,28 +536,28 @@ static WRITE16_HANDLER( ymf278b_w )
 		switch(offset)
 		{
 			case 0:
-				YMF278B_control_port_0_A_w(machine, 0, data);
+				ymf278b_control_port_0_a_w(machine, 0, data);
 				break;
 			case 1:
-				YMF278B_data_port_0_A_w(machine, 0, data);
+				ymf278b_data_port_0_a_w(machine, 0, data);
 				break;
 			case 2:
-				YMF278B_control_port_0_B_w(machine, 0, data);
+				ymf278b_control_port_0_b_w(machine, 0, data);
 				break;
 			case 3:
-				YMF278B_data_port_0_B_w(machine, 0, data);
+				ymf278b_data_port_0_b_w(machine, 0, data);
 				break;
 			case 4:
-				YMF278B_control_port_0_C_w(machine, 0, data);
+				ymf278b_control_port_0_c_w(machine, 0, data);
 				break;
 			case 5:
-				YMF278B_data_port_0_C_w(machine, 0, data);
+				ymf278b_data_port_0_c_w(machine, 0, data);
 				break;
 		}
 }
 
 
-static const struct YMF278B_interface ymf278b_interface =
+static const ymf278b_interface ymf278b_config =
 {
 	ymf278b_interrupt
 };
@@ -1083,10 +1083,10 @@ static ADDRESS_MAP_START( daitorid_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x474000, 0x474fff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(daitorid_soundstatus_r)	// Inputs
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")				//
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")				//
-	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("IN2")				//
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
+	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
+	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")
+	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daitorid_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1129,10 +1129,10 @@ static ADDRESS_MAP_START( dharma_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x874000, 0x874fff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0x878000, 0x8787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(daitorid_soundstatus_r)	// Inputs
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")				//
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")				//
-	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("IN2")				//
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
+	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
+	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")
+	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dharma_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1245,9 +1245,9 @@ static ADDRESS_MAP_START( kokushi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x877000, 0x877fff) AM_READ(karatour_vram_2_r		)	// Layer 2 (Part of)
 	AM_RANGE(0x878000, 0x8787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(daitorid_soundstatus_r)	// From Sound CPU
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")				// From Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")				// Inputs
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")				//
+	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kokushi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1381,7 +1381,7 @@ static int gakusai_oki_bank_lo, gakusai_oki_bank_hi;
 static void gakusai_oki_bank_set(void)
 {
 	int bank = (gakusai_oki_bank_lo & 7) + (gakusai_oki_bank_hi & 1) * 8;
-	OKIM6295_set_bank_base(0, bank * 0x40000);
+	okim6295_set_bank_base(0, bank * 0x40000);
 }
 
 static WRITE16_HANDLER( gakusai_oki_bank_hi_w )
@@ -1450,7 +1450,7 @@ static ADDRESS_MAP_START( gakusai_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x27880e, 0x27880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0x700000, 0x700001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0x700000, 0x700001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(gakusai_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1477,9 +1477,9 @@ static ADDRESS_MAP_START( gakusai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x279700, 0x279713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP						)	// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2413_data_port_0_lsb_w		)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(OKIM6295_data_0_lsb_w 		)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE(ym2413_data_port_0_lsb_w		)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(okim6295_data_0_lsb_w 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(gakusai_oki_bank_hi_w			)
 ADDRESS_MAP_END
@@ -1504,7 +1504,7 @@ static ADDRESS_MAP_START( gakusai2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x678880, 0x678881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x678882, 0x678883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x67880e, 0x67880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 	AM_RANGE(0xe00000, 0xe00001) AM_READ(gakusai_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1533,9 +1533,9 @@ static ADDRESS_MAP_START( gakusai2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP						)	// ? 5
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_hi_w			)
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(OKIM6295_data_0_lsb_w 		)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(okim6295_data_0_lsb_w 		)
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2413_data_port_0_lsb_w		)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1589,7 +1589,7 @@ static ADDRESS_MAP_START( dokyusp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x27880e, 0x27880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0x700000, 0x700001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0x700000, 0x700001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(dokyusp_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1616,9 +1616,9 @@ static ADDRESS_MAP_START( dokyusp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x279700, 0x279713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP						)	// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2413_data_port_0_lsb_w		)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(OKIM6295_data_0_lsb_w 		)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE(ym2413_data_port_0_lsb_w		)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(okim6295_data_0_lsb_w 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w		)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(dokyusp_eeprom_bit_w			)	// EEPROM
 ADDRESS_MAP_END
@@ -1643,7 +1643,7 @@ static ADDRESS_MAP_START( dokyusei_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")					// 2 x DSW
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")					//
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dokyusei_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1671,9 +1671,9 @@ static ADDRESS_MAP_START( dokyusei_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(gakusai_oki_bank_hi_w			)	// Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP						)	// ? 4
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Samples Bank
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)	// Sound
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)	//
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(OKIM6295_data_0_lsb_w			)	//
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2413_register_port_0_lsb_w	)	// Sound
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2413_data_port_0_lsb_w		)	//
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(okim6295_data_0_lsb_w			)	//
 ADDRESS_MAP_END
 
 
@@ -1742,10 +1742,10 @@ static ADDRESS_MAP_START( poitto_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc74000, 0xc74fff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
-	AM_RANGE(0x800000, 0x800001) AM_READ(daitorid_soundstatus_r)	// Inputs
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")				//
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW0")				//
-	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN2")				//
+	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0")
+	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")
+	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW0")
+	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poitto_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1838,10 +1838,10 @@ static ADDRESS_MAP_START( pururun_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc74000, 0xc74fff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
-	AM_RANGE(0x400000, 0x400001) AM_READ(daitorid_soundstatus_r)	// Inputs
-	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")				//
-	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("DSW0")				//
-	AM_RANGE(0x400006, 0x400007) AM_READ_PORT("IN2")				//
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")
+	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")
+	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("DSW0")
+	AM_RANGE(0x400006, 0x400007) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pururun_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1884,10 +1884,10 @@ static ADDRESS_MAP_START( toride2g_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc74000, 0xc74fff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
-	AM_RANGE(0x800000, 0x800001) AM_READ(daitorid_soundstatus_r)	// Inputs
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")				//
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW0")				//
-	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN2")				//
+	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0")
+	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")
+	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW0")
+	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( toride2g_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1939,7 +1939,7 @@ static void blzntrnd_irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface blzntrnd_ym2610_interface =
+static const ym2610_interface blzntrnd_ym2610_interface =
 {
 	blzntrnd_irqhandler
 };
@@ -1959,18 +1959,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blzntrnd_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x80, 0x80) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x82, 0x82) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x80, 0x80) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x82, 0x82) AM_READ(ym2610_status_port_0_b_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x83, 0x83) AM_WRITE(ym2610_data_port_0_b_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2026,7 +2026,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( mouja_sound_rombank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_set_bank_base(0, ((data >> 3) & 0x07) * 0x40000);
+		okim6295_set_bank_base(0, ((data >> 3) & 0x07) * 0x40000);
 }
 
 static ADDRESS_MAP_START( mouja_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2043,7 +2043,7 @@ static ADDRESS_MAP_START( mouja_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN1")				//
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")				//
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")				//
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(okim6295_status_0_lsb_r)
 #if 0
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r		)	// Banked ROM
 #endif
@@ -2069,10 +2069,10 @@ static ADDRESS_MAP_START( mouja_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478850, 0x47885b) AM_WRITE(SMH_RAM) AM_BASE(&metro_scroll		)	// Scroll Regs
 	AM_RANGE(0x478888, 0x478889) AM_WRITE(SMH_NOP)								// ??
 	AM_RANGE(0x479700, 0x479713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2413_data_port_0_lsb_w		)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(mouja_sound_rombank_w			)
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(OKIM6295_data_0_msb_w  		)
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(okim6295_data_0_msb_w  		)
 
 #if 0
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs	)	// Tiles Blitter
@@ -2086,11 +2086,6 @@ ADDRESS_MAP_END
                                 Puzzlet
 ***************************************************************************/
 
-static READ16_HANDLER( puzzlet_dsw_r )
-{
-	return input_port_read(machine, "DSW0");
-}
-
 static WRITE16_HANDLER( puzzlet_irq_enable_w )
 {
 	if (ACCESSING_BITS_0_7)
@@ -2103,9 +2098,9 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x430000, 0x433fff ) AM_RAM
 	AM_RANGE( 0x470000, 0x47dfff ) AM_RAM
 
-	AM_RANGE( 0x500000, 0x500001 ) AM_READWRITE( OKIM6295_status_0_msb_r, OKIM6295_data_0_msb_w )
-	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE( YM2413_register_port_0_msb_w )
-	AM_RANGE( 0x580002, 0x580003 ) AM_WRITE( YM2413_data_port_0_msb_w )
+	AM_RANGE( 0x500000, 0x500001 ) AM_READWRITE( okim6295_status_0_msb_r, okim6295_data_0_msb_w )
+	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE( ym2413_register_port_0_msb_w )
+	AM_RANGE( 0x580002, 0x580003 ) AM_WRITE( ym2413_data_port_0_msb_w )
 
 	AM_RANGE( 0x700000, 0x71ffff ) AM_READWRITE( SMH_RAM, metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
 	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( SMH_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
@@ -2134,21 +2129,12 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x7f2000, 0x7f3fff ) AM_RAM
 
 	AM_RANGE( 0x7f8880, 0x7f8881 ) AM_READ_PORT("IN1")
-	AM_RANGE( 0x7f8884, 0x7f8885 ) AM_READ( puzzlet_dsw_r )
-	AM_RANGE( 0x7f8886, 0x7f8887 ) AM_READ( puzzlet_dsw_r )
+	AM_RANGE( 0x7f8884, 0x7f8885 ) AM_READ_PORT("DSW0")
+	AM_RANGE( 0x7f8886, 0x7f8887 ) AM_READ_PORT("DSW0")
 
 	AM_RANGE( 0x7f88a2, 0x7f88a3 ) AM_READ( metro_irq_cause_r )	// IRQ Cause
 ADDRESS_MAP_END
 
-static READ8_HANDLER( puzzlet_port7_r )
-{
-	return input_port_read(machine, "IN2");
-}
-
-static READ8_HANDLER( puzzlet_serB_r )
-{
-	return input_port_read(machine, "IN0");		// coin
-}
 
 static WRITE8_HANDLER( puzzlet_portb_w )
 {
@@ -2156,8 +2142,8 @@ static WRITE8_HANDLER( puzzlet_portb_w )
 }
 
 static ADDRESS_MAP_START( puzzlet_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE( H8_PORT7,		H8_PORT7	)	AM_READ( puzzlet_port7_r )
-	AM_RANGE( H8_SERIAL_B,	H8_SERIAL_B	)	AM_READ( puzzlet_serB_r )
+	AM_RANGE( H8_PORT7,		H8_PORT7	)	AM_READ_PORT("IN2")
+	AM_RANGE( H8_SERIAL_B,	H8_SERIAL_B	)	AM_READ_PORT("IN0")		// coin
 	AM_RANGE( H8_PORTB,		H8_PORTB	)	AM_READ_PORT("DSW0") AM_WRITE( puzzlet_portb_w )
 ADDRESS_MAP_END
 
@@ -2201,7 +2187,17 @@ ADDRESS_MAP_END
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
 	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) /* From Sound CPU in some games */
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+
+#define COINS_SOUND \
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW,  IPT_SERVICE1 ) \
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW,  IPT_TILT     ) \
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(2) \
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_IMPULSE(2) \
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
+	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM(custom_soundstatus_r, NULL)	/* From Sound CPU */
 
 
 #define COINAGE_DSW \
@@ -2693,7 +2689,7 @@ INPUT_PORTS_END
 */
 static INPUT_PORTS_START( daitorid )
 	PORT_START("IN0") // $c00000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") // $c00002
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)		// BUTTON2 and BUTTON3 in "test mode" only
@@ -2744,7 +2740,7 @@ INPUT_PORTS_END
    contains the same values for the timer. */
 static INPUT_PORTS_START( dharma )
 	PORT_START("IN0") //$c00000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") //$c00002
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)		// BUTTON2 and BUTTON3 in "test mode" only
@@ -2786,7 +2782,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gunmast )
 	PORT_START("IN0") //$400000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") //$400002
 	JOY_LSB(1, BUTTON1, BUTTON2, BUTTON3, UNKNOWN)
@@ -3302,7 +3298,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( poitto )
 	PORT_START("IN0") //$800000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") //$800002
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)		// BUTTON2 and BUTTON3 in "test mode" only
@@ -3346,14 +3342,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( puzzlet )
 	PORT_START("IN0")		// IN0 - ser B
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")		// IN1 - 7f8880.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3411,7 +3407,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( puzzli )
 	PORT_START("IN0") //$c00000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") //$c00002
 	JOY_LSB(1, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)		// BUTTON3 in "test mode" only
@@ -3455,7 +3451,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( 3kokushi )
 	PORT_START("IN0") //$c00000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") //$c00002
 	JOY_LSB(1, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)
@@ -3517,7 +3513,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pururun )
 	PORT_START("IN0") //$400000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") //$400002
 	JOY_LSB(1, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)		// BUTTON3 in "test mode" only
@@ -3625,7 +3621,7 @@ INPUT_PORTS_END
    than another. */
 static INPUT_PORTS_START( toride2g )
 	PORT_START("IN0") //$800000
-	COINS
+	COINS_SOUND
 
 	PORT_START("IN1") //$800002
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)		// BUTTON2 and BUTTON3 in "test mode" only
@@ -3782,7 +3778,7 @@ static MACHINE_DRIVER_START( balcube )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -3815,7 +3811,7 @@ static MACHINE_DRIVER_START( bangball )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -3848,7 +3844,7 @@ static MACHINE_DRIVER_START( batlbubl )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -3885,7 +3881,7 @@ static MACHINE_DRIVER_START( daitorid )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
@@ -4384,7 +4380,7 @@ static MACHINE_DRIVER_START( pururun )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 

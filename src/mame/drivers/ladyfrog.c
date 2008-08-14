@@ -121,7 +121,7 @@ static WRITE8_HANDLER(unk_w)
 
 }
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -131,7 +131,7 @@ static const struct AY8910interface ay8910_interface =
 	unk_w
 };
 
-static const struct MSM5232interface msm5232_interface =
+static const msm5232_interface msm5232_config =
 {
 	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }
 };
@@ -147,10 +147,10 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc080, 0xc87f) AM_READ(ladyfrog_videoram_r)
 	AM_RANGE(0xd400, 0xd400) AM_READ(from_snd_r)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(input_port_0_r)
-	AM_RANGE(0xd801, 0xd801) AM_READ(input_port_1_r)
-	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_2_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ(input_port_3_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW1")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("INPUTS")
+	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xdc00, 0xdc9f) AM_READ(ladyfrog_spriteram_r)
 	AM_RANGE(0xdca0, 0xdcbf) AM_READ(ladyfrog_scrlram_r)
 	AM_RANGE(0xdcc0, 0xdcff) AM_READ(SMH_RAM)
@@ -188,9 +188,9 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc803, 0xc803) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xc900, 0xc90d) AM_WRITE(MSM5232_0_w)
+	AM_RANGE(0xc802, 0xc802) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc803, 0xc803) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc900, 0xc90d) AM_WRITE(msm5232_0_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(SMH_NOP)
@@ -237,7 +237,7 @@ static INPUT_PORTS_START( ladyfrog )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP 	 ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 
 	PORT_START("SYSTEM")
@@ -245,7 +245,6 @@ static INPUT_PORTS_START( ladyfrog )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
 INPUT_PORTS_END
 
 
@@ -314,11 +313,11 @@ static MACHINE_DRIVER_START( ladyfrog )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1

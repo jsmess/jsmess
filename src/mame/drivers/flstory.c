@@ -84,11 +84,11 @@ static ADDRESS_MAP_START( flstory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd403, 0xd403) AM_NOP	/* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("IN0")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN1")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN2")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("IN3")
+	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
@@ -111,10 +111,10 @@ static ADDRESS_MAP_START( onna34ro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
+	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(onna34ro_mcu_status_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("IN2")
+	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
@@ -124,9 +124,9 @@ static ADDRESS_MAP_START( onna34ro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM	AM_BASE(&onna34ro_workram) /* work RAM */
 ADDRESS_MAP_END
 
-static READ8_HANDLER( victnine_port_5_r )
+static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
-	return (victnine_mcu_status_r(machine,0) & 3) | (input_port_read(machine, "IN2") & ~3);
+	return (victnine_mcu_status_r(field->port->machine,0) & 3);
 }
 
 static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -142,11 +142,11 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
-	AM_RANGE(0xd805, 0xd805) AM_READ(victnine_port_5_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("IN3")
-	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("IN4")
+	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
+	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")	/* also mcu */
+	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
+	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
@@ -230,15 +230,15 @@ static WRITE8_HANDLER( sound_control_3_w ) /* unknown */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xca00, 0xca0d) AM_WRITE(MSM5232_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xca00, 0xca0d) AM_WRITE(msm5232_0_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READWRITE(SMH_NOP, nmi_enable_w)			/* unknown read*/
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READWRITE(SMH_NOP, DAC_0_signed_data_w)	/* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xde00, 0xde00) AM_READWRITE(SMH_NOP, dac_0_signed_data_w)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
@@ -325,7 +325,7 @@ static INPUT_PORTS_START( flstory )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START("IN0")      /* D802 */
+	PORT_START("DSW2")      /* D802 */
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -333,8 +333,8 @@ static INPUT_PORTS_START( flstory )
 	PORT_DIPNAME( 0x10, 0x10, "Attract Animation" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Leave Off")		// Check code at 0x7859
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )		// (must be OFF or the game will
+	PORT_DIPNAME( 0x20, 0x20, "Leave Off")				// Check code at 0x7859
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )			// (must be OFF or the game will
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )			// hang after the game is over !)
 	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -343,7 +343,7 @@ static INPUT_PORTS_START( flstory )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 
-	PORT_START("IN1")      /* D803 */
+	PORT_START("SYSTEM")      /* D803 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -353,14 +353,14 @@ static INPUT_PORTS_START( flstory )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
 
-	PORT_START("IN2")      /* D804:P1 */
+	PORT_START("P1")      /* D804 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")      /* D806:P2 */
+	PORT_START("P2")      /* D806 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( onna34ro )
 	PORT_DIPSETTING(   0x80, "A and B" )
 	PORT_DIPSETTING(   0x00, "A only" )
 
-	PORT_START("IN0")      /* D803: START BUTTONS */
+	PORT_START("SYSTEM")      /* D803 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -464,7 +464,7 @@ static INPUT_PORTS_START( onna34ro )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
 
-	PORT_START("IN1")      /* D804: P1 */
+	PORT_START("P1")      /* D804 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -474,7 +474,7 @@ static INPUT_PORTS_START( onna34ro )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")      /* D806: P2 */
+	PORT_START("P2")      /* D806 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -551,7 +551,7 @@ static INPUT_PORTS_START( victnine )
 	PORT_DIPSETTING(   0x80, "A and B" )
 	PORT_DIPSETTING(   0x00, "A only" )
 
-	PORT_START("IN0")      /* D803: START BUTTONS */
+	PORT_START("SYSTEM")      /* D803 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -561,7 +561,7 @@ static INPUT_PORTS_START( victnine )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")      /* D804: P1 */
+	PORT_START("P1")      /* D804 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// C
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -571,9 +571,11 @@ static INPUT_PORTS_START( victnine )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")      /* D805: 1P a/b/c/d BUTTONS */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )	// mcu is ready to receive data from main cpu
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	// mcu has sent data to the main cpu
+	PORT_START("EXTRA_P1")      /* D805 */
+	/* bits 0,1 are MCU related:
+        - bit 0: mcu is ready to receive data from main cpu
+        - bit 1: mcu has sent data to the main cpu       */
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(victnine_mcu_status_bit01_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
@@ -581,7 +583,7 @@ static INPUT_PORTS_START( victnine )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")      /* D806: P2 */
+	PORT_START("P2")      /* D806 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL	// C
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -591,7 +593,7 @@ static INPUT_PORTS_START( victnine )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")      /* D807: 2P a/b/c/d BUTTONS */
+	PORT_START("EXTRA_P2")      /* D807 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
@@ -633,7 +635,7 @@ static GFXDECODE_START( flstory )
 GFXDECODE_END
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -643,7 +645,7 @@ static const struct AY8910interface ay8910_interface =
 	sound_control_3_w
 };
 
-static const struct MSM5232interface msm5232_interface =
+static const msm5232_interface msm5232_config =
 {
 	{ 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6 }	/* 1.0 uF capacitors (verified on real PCB) */
 };
@@ -686,11 +688,11 @@ static MACHINE_DRIVER_START( flstory )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
@@ -743,11 +745,11 @@ static MACHINE_DRIVER_START( onna34ro )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
@@ -800,11 +802,11 @@ static MACHINE_DRIVER_START( victnine )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1

@@ -371,7 +371,7 @@ static WRITE8_HANDLER ( to7_timer_port_out )
 
 static WRITE8_HANDLER ( to7_timer_cp2_out )
 {
-	DAC_data_w( THOM_SOUND_BUZ, data ? 0x80 : 0); /* 1-bit buzzer */
+	dac_data_w( THOM_SOUND_BUZ, data ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -849,7 +849,7 @@ static UINT8 to7_get_mouse_signal( running_machine *machine )
 
 static void to7_game_sound_update ( void )
 {
-	DAC_data_w( THOM_SOUND_GAME, to7_game_mute ? 0 : (to7_game_sound << 2) );
+	dac_data_w( THOM_SOUND_GAME, to7_game_mute ? 0 : (to7_game_sound << 2) );
 }
 
 
@@ -1660,7 +1660,7 @@ static READ8_HANDLER ( mo5_sys_porta_in )
 
 static WRITE8_HANDLER ( mo5_sys_portb_out )
 {
-	DAC_data_w( THOM_SOUND_BUZ, (data & 1) ? 0x80 : 0); /* 1-bit buzzer */
+	dac_data_w( THOM_SOUND_BUZ, (data & 1) ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -4358,7 +4358,7 @@ static WRITE8_HANDLER ( mo6_sys_porta_out )
 
 static WRITE8_HANDLER ( mo6_sys_portb_out )
 {
-	DAC_data_w( THOM_SOUND_BUZ, (data & 1) ? 0x80 : 0); /* bit 0: buzzer */
+	dac_data_w( THOM_SOUND_BUZ, (data & 1) ? 0x80 : 0); /* bit 0: buzzer */
 }
 
 

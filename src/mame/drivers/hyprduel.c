@@ -472,10 +472,10 @@ static ADDRESS_MAP_START( hyprduel_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478000, 0x4787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READ(hyprduel_irq_cause_r	)	// IRQ Cause
 	AM_RANGE(0xc00000, 0xc07fff) AM_READ(SMH_RAM				)	// (sound driver controls)
-	AM_RANGE(0xe00000, 0xe00001) AM_READ(input_port_0_word_r	)	// Inputs
-	AM_RANGE(0xe00002, 0xe00003) AM_READ(input_port_1_word_r	)	//
-	AM_RANGE(0xe00004, 0xe00005) AM_READ(input_port_2_word_r	)	//
-	AM_RANGE(0xe00006, 0xe00007) AM_READ(input_port_3_word_r	)	//
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
+	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM				)
 ADDRESS_MAP_END
 
@@ -509,8 +509,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprduel_readmem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0x004000, 0x007fff) AM_READ(SMH_RAM						)
-	AM_RANGE(0x400002, 0x400003) AM_READ(YM2151_status_port_0_lsb_r	)
-	AM_RANGE(0x400004, 0x400005) AM_READ(OKIM6295_status_0_lsb_r		)
+	AM_RANGE(0x400002, 0x400003) AM_READ(ym2151_status_port_0_lsb_r	)
+	AM_RANGE(0x400004, 0x400005) AM_READ(okim6295_status_0_lsb_r		)
 	AM_RANGE(0xc00000, 0xc07fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM						)
 ADDRESS_MAP_END
@@ -518,9 +518,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprduel_writemem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_2	)	// shadow ($c00000 - $c03fff : vector, write ok)
 	AM_RANGE(0x004000, 0x007fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_2	)	// shadow ($fe4000 - $fe7fff : read only)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(YM2151_register_port_0_lsb_w	)
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(YM2151_data_port_0_lsb_w		)
-	AM_RANGE(0x400004, 0x400005) AM_WRITE(OKIM6295_data_0_lsb_w			)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(ym2151_register_port_0_lsb_w	)
+	AM_RANGE(0x400002, 0x400003) AM_WRITE(ym2151_data_port_0_lsb_w		)
+	AM_RANGE(0x400004, 0x400005) AM_WRITE(okim6295_data_0_lsb_w			)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP						)
 	AM_RANGE(0xc00000, 0xc07fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_1	)	// (sound driver)
 	AM_RANGE(0xfe0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_1	)
@@ -540,10 +540,10 @@ static ADDRESS_MAP_START( magerror_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x878000, 0x8787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READ(hyprduel_irq_cause_r	)	// IRQ Cause
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READ(SMH_RAM				)	// (sound driver controls) ?
-	AM_RANGE(0xe00000, 0xe00001) AM_READ(input_port_0_word_r	)	// Inputs
-	AM_RANGE(0xe00002, 0xe00003) AM_READ(input_port_1_word_r	)	//
-	AM_RANGE(0xe00004, 0xe00005) AM_READ(input_port_2_word_r	)	//
-	AM_RANGE(0xe00006, 0xe00007) AM_READ(input_port_3_word_r	)	//
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
+	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM				)
 ADDRESS_MAP_END
 
@@ -577,8 +577,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magerror_readmem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0x004000, 0x007fff) AM_READ(SMH_RAM						)
-//  AM_RANGE(0x400002, 0x400003) AM_READ(YM2151_status_port_0_lsb_r )
-	AM_RANGE(0x400004, 0x400005) AM_READ(OKIM6295_status_0_lsb_r		)
+//  AM_RANGE(0x400002, 0x400003) AM_READ(ym2151_status_port_0_lsb_r )
+	AM_RANGE(0x400004, 0x400005) AM_READ(okim6295_status_0_lsb_r		)
 	AM_RANGE(0xc00000, 0xc07fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM						)
 ADDRESS_MAP_END
@@ -586,9 +586,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magerror_writemem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_2	)	// shadow ($c00000 - $c03fff : vector, write ok)
 	AM_RANGE(0x004000, 0x007fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_2	)	// shadow ($fe4000 - $fe7fff : read only)
-  	AM_RANGE(0x400000, 0x400001) AM_WRITE(YM2413_register_port_0_lsb_w  )
-  	AM_RANGE(0x400002, 0x400003) AM_WRITE(YM2413_data_port_0_lsb_w      )
-	AM_RANGE(0x400004, 0x400005) AM_WRITE(OKIM6295_data_0_lsb_w			)
+  	AM_RANGE(0x400000, 0x400001) AM_WRITE(ym2413_register_port_0_lsb_w  )
+  	AM_RANGE(0x400002, 0x400003) AM_WRITE(ym2413_data_port_0_lsb_w      )
+	AM_RANGE(0x400004, 0x400005) AM_WRITE(okim6295_data_0_lsb_w			)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP						)
 	AM_RANGE(0xc00000, 0xc07fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_1	)	// (sound driver)
 	AM_RANGE(0xfe0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_1	)
@@ -707,7 +707,7 @@ static void sound_irq(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
@@ -746,7 +746,7 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 

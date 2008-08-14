@@ -129,10 +129,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x8c, 0x8c) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8d, 0x8d) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x8e, 0x8e) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8c, 0x8c) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8d, 0x8d) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x90, 0x96) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x97, 0x97) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x98, 0x98) AM_WRITE(SMH_NOP)
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x8f, 0x8f) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x8f, 0x8f) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 
@@ -242,7 +242,7 @@ static const gfx_layout charlayout =
 	8*8*2
 };
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -293,11 +293,11 @@ static MACHINE_DRIVER_START( pitnrun )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)		 /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)		 /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

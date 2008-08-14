@@ -98,7 +98,7 @@ static WRITE16_HANDLER( gotcha_oki_bank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		OKIM6295_set_bank_base(0,(((~data & 0x0100) >> 8) * 0x40000));
+		okim6295_set_bank_base(0,(((~data & 0x0100) >> 8) * 0x40000));
 	}
 }
 
@@ -109,9 +109,9 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x12ffff) AM_READ(SMH_RAM)
 	AM_RANGE(0x140000, 0x1405ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x160000, 0x1607ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x180000, 0x180001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x180002, 0x180003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x180004, 0x180005) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -133,16 +133,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xc002, 0xc003) AM_WRITE(OKIM6295_data_0_w)	// TWO addresses!
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xc002, 0xc003) AM_WRITE(okim6295_data_0_w)	// TWO addresses!
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -264,7 +264,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irqhandler
 };
@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( gotcha )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.80)
 	MDRV_SOUND_ROUTE(1, "mono", 0.80)
 

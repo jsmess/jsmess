@@ -449,11 +449,11 @@ static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 
 static const UINT16 cgb_cpu_regs[6] = { 0x11B0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };	/* Game Boy Color  / Game Boy Advance */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };	/* Megaduck */
 
-static const LR35902_CONFIG dmg_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const LR35902_CONFIG sgb_cpu_reset = { sgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const LR35902_CONFIG mgb_cpu_reset = { mgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const LR35902_CONFIG cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback };
-static const LR35902_CONFIG megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const lr35902_cpu_core dmg_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const lr35902_cpu_core sgb_cpu_reset = { sgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const lr35902_cpu_core mgb_cpu_reset = { mgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
+static const lr35902_cpu_core cgb_cpu_reset = { cgb_cpu_regs, 0, gb_timer_callback };
+static const lr35902_cpu_core megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
 
 static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -547,7 +547,7 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-static const struct CustomSound_interface gameboy_sound_interface =
+static const custom_sound_interface gameboy_sound_interface =
 { gameboy_sh_start, 0, 0 };
 
 

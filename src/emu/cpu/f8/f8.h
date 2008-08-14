@@ -19,7 +19,9 @@
  *
  *****************************************************************************/
 
-#ifndef _F8_H
+#pragma once
+
+#ifndef __F8_H__
 #define _F8_H
 
 #include "cpuintrf.h"
@@ -28,7 +30,8 @@
 extern "C" {
 #endif
 
-enum {
+enum
+{
 	F8_PC0=1, F8_PC1, F8_DC0, F8_DC1, F8_W, F8_A, F8_IS,
         F8_J, F8_HU, F8_HL, F8_KU, F8_KL, F8_QU, F8_QL,
 
@@ -50,6 +53,4 @@ void f8_get_info(UINT32 state, cpuinfo *info);
 }
 #endif
 
-#endif /* _F8_H */
-
-
+#endif /* __F8_H__ */

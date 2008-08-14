@@ -160,7 +160,7 @@ static READ32_HANDLER(io32_1_r)
 
 static READ32_HANDLER(silk_6295_0_r)
 {
-	return OKIM6295_status_0_r(machine, 0)<<16;
+	return okim6295_status_0_r(machine, 0)<<16;
 }
 
 static WRITE32_HANDLER(silk_6295_0_w)
@@ -168,13 +168,13 @@ static WRITE32_HANDLER(silk_6295_0_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		logerror("OKI0: write %x mem_mask %8x\n", data>>16, mem_mask);
-		OKIM6295_data_0_w(machine, 0, (data>>16) & 0xff);
+		okim6295_data_0_w(machine, 0, (data>>16) & 0xff);
 	}
 }
 
 static READ32_HANDLER(silk_6295_1_r)
 {
-	return OKIM6295_status_1_r(machine, 0)<<16;
+	return okim6295_status_1_r(machine, 0)<<16;
 }
 
 static WRITE32_HANDLER(silk_6295_1_w)
@@ -182,20 +182,20 @@ static WRITE32_HANDLER(silk_6295_1_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		logerror("OKI1: write %x mem_mask %8x\n", data>>16, mem_mask);
-		OKIM6295_data_1_w(machine, 0, (data>>16) & 0xff);
+		okim6295_data_1_w(machine, 0, (data>>16) & 0xff);
 	}
 }
 
 static READ32_HANDLER(silk_ym_r)
 {
-	return YM2151_status_port_0_r(machine, 0)<<16;
+	return ym2151_status_port_0_r(machine, 0)<<16;
 }
 
 static WRITE32_HANDLER(silk_ym_regport_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		YM2151_register_port_0_w(machine, 0, (data>>16) & 0xff);
+		ym2151_register_port_0_w(machine, 0, (data>>16) & 0xff);
 	}
 }
 
@@ -203,7 +203,7 @@ static WRITE32_HANDLER(silk_ym_dataport_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		YM2151_data_port_0_w(machine, 0, (data>>16) & 0xff);
+		ym2151_data_port_0_w(machine, 0, (data>>16) & 0xff);
 	}
 }
 

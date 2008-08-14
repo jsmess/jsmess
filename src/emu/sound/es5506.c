@@ -822,7 +822,7 @@ static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 static void *es5506_start_common(sound_type sndtype, const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct ES5506interface *intf = config;
+	const es5506_interface *intf = config;
 	struct ES5506Chip *chip;
 	int j;
 	UINT32 accum_mask;
@@ -1424,26 +1424,26 @@ static UINT8 es5506_reg_read(struct ES5506Chip *chip, offs_t offset)
 
 /**********************************************************************************************
 
-     ES5506_data_0_r/ES5506_data_1_r -- handle a read from the status register
+     es5506_data_0_r/es5506_data_1_r -- handle a read from the status register
 
 **********************************************************************************************/
 
-READ8_HANDLER( ES5506_data_0_r )
+READ8_HANDLER( es5506_data_0_r )
 {
 	return es5506_reg_read(sndti_token(SOUND_ES5506, 0), offset);
 }
 
-READ8_HANDLER( ES5506_data_1_r )
+READ8_HANDLER( es5506_data_1_r )
 {
 	return es5506_reg_read(sndti_token(SOUND_ES5506, 1), offset);
 }
 
-READ16_HANDLER( ES5506_data_0_word_r )
+READ16_HANDLER( es5506_data_0_word_r )
 {
 	return es5506_reg_read(sndti_token(SOUND_ES5506, 0), offset);
 }
 
-READ16_HANDLER( ES5506_data_1_word_r )
+READ16_HANDLER( es5506_data_1_word_r )
 {
 	return es5506_reg_read(sndti_token(SOUND_ES5506, 1), offset);
 }
@@ -1452,27 +1452,27 @@ READ16_HANDLER( ES5506_data_1_word_r )
 
 /**********************************************************************************************
 
-     ES5506_data_0_w/ES5506_data_1_w -- handle a write to the current register
+     es5506_data_0_w/es5506_data_1_w -- handle a write to the current register
 
 ***********************************************************************************************/
 
-WRITE8_HANDLER( ES5506_data_0_w )
+WRITE8_HANDLER( es5506_data_0_w )
 {
 	es5506_reg_write(sndti_token(SOUND_ES5506, 0), offset, data);
 }
 
-WRITE8_HANDLER( ES5506_data_1_w )
+WRITE8_HANDLER( es5506_data_1_w )
 {
 	es5506_reg_write(sndti_token(SOUND_ES5506, 1), offset, data);
 }
 
-WRITE16_HANDLER( ES5506_data_0_word_w )
+WRITE16_HANDLER( es5506_data_0_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 		es5506_reg_write(sndti_token(SOUND_ES5506, 0), offset, data);
 }
 
-WRITE16_HANDLER( ES5506_data_1_word_w )
+WRITE16_HANDLER( es5506_data_1_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 		es5506_reg_write(sndti_token(SOUND_ES5506, 1), offset, data);
@@ -1480,13 +1480,13 @@ WRITE16_HANDLER( ES5506_data_1_word_w )
 
 
 
-void ES5506_voice_bank_0_w(int voice, int bank)
+void es5506_voice_bank_0_w(int voice, int bank)
 {
 	struct ES5506Chip *chip = sndti_token(SOUND_ES5506, 0);
 	chip->voice[voice].exbank=bank;
 }
 
-void ES5506_voice_bank_1_w(int voice, int bank)
+void es5506_voice_bank_1_w(int voice, int bank)
 {
 	struct ES5506Chip *chip = sndti_token(SOUND_ES5506, 1);
 	chip->voice[voice].exbank=bank;
@@ -1501,8 +1501,8 @@ void ES5506_voice_bank_1_w(int voice, int bank)
 
 static void *es5505_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct ES5505interface *intf = config;
-	struct ES5506interface es5506intf;
+	const es5505_interface *intf = config;
+	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));
 
@@ -2084,37 +2084,37 @@ static UINT16 es5505_reg_read(struct ES5506Chip *chip, offs_t offset)
 
 /**********************************************************************************************
 
-     ES5505_data_0_r/ES5505_data_1_r -- handle a read from the status register
+     es5505_data_0_r/es5505_data_1_r -- handle a read from the status register
 
 ***********************************************************************************************/
 
-READ16_HANDLER( ES5505_data_0_r )
+READ16_HANDLER( es5505_data_0_r )
 {
 	return es5505_reg_read(sndti_token(SOUND_ES5505, 0), offset);
 }
 
-READ16_HANDLER( ES5505_data_1_r )
+READ16_HANDLER( es5505_data_1_r )
 {
 	return es5505_reg_read(sndti_token(SOUND_ES5505, 1), offset);
 }
 
 /**********************************************************************************************
 
-     ES5505_data_0_w/ES5505_data_1_w -- handle a write to the current register
+     es5505_data_0_w/es5505_data_1_w -- handle a write to the current register
 
 ***********************************************************************************************/
 
-WRITE16_HANDLER( ES5505_data_0_w )
+WRITE16_HANDLER( es5505_data_0_w )
 {
 	es5505_reg_write(sndti_token(SOUND_ES5505, 0), offset, data, mem_mask);
 }
 
-WRITE16_HANDLER( ES5505_data_1_w )
+WRITE16_HANDLER( es5505_data_1_w )
 {
 	es5505_reg_write(sndti_token(SOUND_ES5505, 1), offset, data, mem_mask);
 }
 
-void ES5505_voice_bank_0_w(int voice, int bank)
+void es5505_voice_bank_0_w(int voice, int bank)
 {
 	struct ES5506Chip *chip = sndti_token(SOUND_ES5505, 0);
 #if RAINE_CHECK
@@ -2123,7 +2123,7 @@ void ES5505_voice_bank_0_w(int voice, int bank)
 	chip->voice[voice].exbank=bank;
 }
 
-void ES5505_voice_bank_1_w(int voice, int bank)
+void es5505_voice_bank_1_w(int voice, int bank)
 {
 	struct ES5506Chip *chip = sndti_token(SOUND_ES5505, 1);
 #if RAINE_CHECK

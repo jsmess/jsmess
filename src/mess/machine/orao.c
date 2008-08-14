@@ -73,6 +73,6 @@ READ8_HANDLER( orao_io_r )
 WRITE8_HANDLER( orao_io_w )
 {	 
 	if (offset == 0x0800) {		
-		DAC_data_w(0,data); //beeper
+		dac_data_w(0,data); //beeper
 	}
 }

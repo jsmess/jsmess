@@ -135,9 +135,9 @@ static READ8_HANDLER( samples_r )
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	MSM5205_data_w(0,data);         /* bit0..3  */
-	MSM5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	MSM5205_vclk_w (0,(data>>4)&1); /* bit4     */
+	msm5205_data_w(0,data);         /* bit0..3  */
+	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w (0,(data>>4)&1); /* bit4     */
 }
 
 static WRITE8_HANDLER( ctrl_w )
@@ -202,14 +202,14 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r)
 	AM_RANGE(0x8001, 0x8001) AM_READ(SMH_NOP)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x8020, 0x8020) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP)	// ??
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(keyboard_w)
-	AM_RANGE(0x8020, 0x8020) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8021, 0x8021) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8020, 0x8020) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8021, 0x8021) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(SMH_NOP)	// ??
@@ -221,8 +221,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( themj_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP)	// ??
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(keyboard_w)
-	AM_RANGE(0x8020, 0x8020) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8021, 0x8021) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8020, 0x8020) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8021, 0x8021) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(SMH_NOP)	// ??
@@ -430,7 +430,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -438,7 +438,7 @@ static const struct AY8910interface ay8910_interface =
 	input_port_1_r
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* vclk input mode    */
@@ -473,11 +473,11 @@ static MACHINE_DRIVER_START( rmhaihai )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 20000000/16)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 500000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

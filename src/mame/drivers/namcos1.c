@@ -384,7 +384,7 @@ static WRITE8_HANDLER( namcos1_coin_w )
 
 static void namcos1_update_DACs(void)
 {
-	DAC_signed_data_16_w(0,0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
+	dac_signed_data_16_w(0,0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
 }
 
 void namcos1_init_DACs(void)
@@ -464,9 +464,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(17)	/* Banked ROMs */
-	AM_RANGE(0x4000, 0x4001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x4000, 0x4001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0x5000, 0x53ff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) AM_BASE(&namco_wavedata) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK(18)	/* TRIRAM (shared) */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM	/* Sound RAM 3 */
@@ -952,12 +952,12 @@ static void namcos1_sound_interrupt( running_machine *machine, int irq )
 	cpunum_set_input_line(machine, 2, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	namcos1_sound_interrupt
 };
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	8,          /* number of voices */
 	1           /* stereo */
@@ -1016,12 +1016,12 @@ static MACHINE_DRIVER_START( ns1 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579580)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048/2)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
@@ -2379,7 +2379,43 @@ ROM_START( soukobdx )
 	ROM_LOAD( "sb1_obj0.bin",       0x00000, 0x10000, CRC(ed810da4) SHA1(b3172b50b15d0e2fd40d38d32abf4de22b6f7a85) )
 ROM_END
 
-/* Puzzle Club */
+
+/*
+Puzzle Club
+Yunsung, 2000
+
+PCB Layout
+----------
+
+YS-2113
+|----------------------------------------------|
+|ROM1.128 ROM2.137 ROM3.7  62256  ROM5.97      |
+|  6116 Z80  6295  ROM4.2  62256  ROM6.95      |
+|  YMXXXX   16MHz     PAL         ROM7.105     |
+|  YM3014             PAL  PAL    ROM8.83      |
+|          62256    68000         ROM9.82      |
+|          62256           6116     14.38383MHz|
+|                          6116   PAL     PAL  |
+|J           6116   QL2003        PAL          |
+|A           6116                 PAL          |
+|M           6116   QL12X16B      PAL          |
+|M DIP1      6116                 PAL          |
+|A DIP2                                        |
+|            62256  QL2003                     |
+|            62256                             |
+|                                              |
+|  ROM11.166  ROM10.167                        |
+|                   QL2003        PAL          |
+|  ROM13.164  ROM12.165           PAL          |
+|----------------------------------------------|
+Notes:
+      68000 clock : 16.000MHz
+      Z80 clock   : 4.000MHz (16/4)
+      M6295 clock : 1.000MHz (16/16). Sample Rate = 1000000 / 132
+      YMXXXX clock: 4.000MHz (16/4). Chip is either YM2151 or YM3812
+      VSync       : 60Hz
+*/
+
 ROM_START( puzlclub )
 	ROM_REGION( 0x2c000, "audio", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "pc1_s0.bin",         0x0c000, 0x10000, CRC(44737c02) SHA1(bcacfed1c3522d6ecddd3ac79ded620e5334df35) )

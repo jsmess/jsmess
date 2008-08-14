@@ -866,7 +866,7 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				sndglu_dummy_read = ES5503_reg_0_r(machine, sndglu_addr);
+				sndglu_dummy_read = es5503_reg_0_r(machine, sndglu_addr);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment
@@ -905,7 +905,7 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				ES5503_reg_0_w(machine, sndglu_addr, data);
+				es5503_reg_0_w(machine, sndglu_addr, data);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment

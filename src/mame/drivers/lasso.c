@@ -70,10 +70,10 @@ static WRITE8_HANDLER( sound_select_w )
 	UINT8 to_write = BITSWAP8(*lasso_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		SN76496_0_w(machine, 0, to_write);
+		sn76496_0_w(machine, 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		SN76496_1_w(machine, 0, to_write);
+		sn76496_1_w(machine, 0, to_write);
 }
 
 
@@ -86,10 +86,10 @@ static ADDRESS_MAP_START( lasso_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(SMH_RAM) AM_BASE(&lasso_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
-	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
-	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
-	AM_RANGE(0x1806, 0x1806) AM_READWRITE(input_port_2_r, SMH_NOP)  /* game uses 'lsr' to read port */
-	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
+	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
+	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806") AM_WRITENOP	/* game uses 'lsr' to read port */
+	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
 ADDRESS_MAP_END
 
@@ -122,10 +122,10 @@ static ADDRESS_MAP_START( chameleo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(SMH_RAM) AM_BASE(&lasso_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
-	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
-	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
-	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
-	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
+	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
+	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
+	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("main", 0xa000)
 ADDRESS_MAP_END
@@ -151,10 +151,10 @@ static ADDRESS_MAP_START( wwjgtin_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(SMH_RAM) AM_BASE(&lasso_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(wwjgtin_video_control_w	)
-	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
-	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
-	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
-	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
+	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
+	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
+	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
 	AM_RANGE(0x1c00, 0x1c03) AM_WRITE(SMH_RAM) AM_BASE(&wwjgtin_last_colors)
 	AM_RANGE(0x1c04, 0x1c07) AM_WRITE(SMH_RAM) AM_BASE(&wwjgtin_track_scroll)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_RAM) AM_BASE(&lasso_chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -180,10 +180,10 @@ static ADDRESS_MAP_START( pinbo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
-	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
-	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
-	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
-	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
+	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
+	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
+	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("main", 0xa000)
@@ -198,12 +198,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pinbo_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_1_r)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(soundlatch_r, SMH_NOP) /* ??? */
 	AM_RANGE(0x14, 0x14) AM_WRITE(SMH_NOP)	/* ??? */
 ADDRESS_MAP_END

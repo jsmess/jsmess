@@ -111,7 +111,7 @@ static WRITE8_HANDLER( mcu_irq_disable_w )
 
 static WRITE8_HANDLER( voice_w )
 {
-	DAC_signed_data_16_w(0, data ? (data + 1) * 0x100 : 0x8000);
+	dac_signed_data_16_w(0, data ? (data + 1) * 0x100 : 0x8000);
 }
 
 
@@ -200,8 +200,8 @@ static ADDRESS_MAP_START( m6502_a_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
 	AM_RANGE(0x0300, 0x030f) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x2001, 0x2001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE(3)
 	AM_RANGE(0x3c01, 0x3c01) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -350,7 +350,7 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	8,			/* number of voices */
 	1			/* stereo */
@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( tceptor )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.40)
 	MDRV_SOUND_ROUTE(1, "right", 0.40)
 

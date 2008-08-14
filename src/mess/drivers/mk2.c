@@ -202,7 +202,7 @@ static int mk2_read_b(int chip)
 static void mk2_write_b(int chip, int value)
 {
 	if (value&0x80)
-		DAC_data_w(0,value&1?80:0);
+		dac_data_w(0,value&1?80:0);
 	mk2_led[4]|=value;
 }
 

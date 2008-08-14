@@ -76,7 +76,7 @@ static void toki_adpcm_int (running_machine *machine, int data)
 {
 	static int toggle=0;
 
-	MSM5205_data_w (0,msm5205next);
+	msm5205_data_w (0,msm5205next);
 	msm5205next>>=4;
 
 	toggle ^= 1;
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( toki_adpcm_control_w )
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
 
-	MSM5205_reset_w(0,data & 0x08);
+	msm5205_reset_w(0,data & 0x08);
 }
 
 static WRITE8_HANDLER( toki_adpcm_data_w )
@@ -151,10 +151,10 @@ static ADDRESS_MAP_START( tokib_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
-	AM_RANGE(0xec00, 0xec00) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0xec08, 0xec08) AM_WRITE(YM3812_control_port_0_w)	/* mirror address, it seems */
-	AM_RANGE(0xec09, 0xec09) AM_WRITE(YM3812_write_port_0_w)	/* mirror address, it seems */
+	AM_RANGE(0xec00, 0xec00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xec08, 0xec08) AM_WRITE(ym3812_control_port_0_w)	/* mirror address, it seems */
+	AM_RANGE(0xec09, 0xec09) AM_WRITE(ym3812_write_port_0_w)	/* mirror address, it seems */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -425,7 +425,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	toki_adpcm_int,	/* interrupt function */
 	MSM5205_S96_4B	/* 4KHz               */
@@ -497,7 +497,7 @@ static MACHINE_DRIVER_START( tokib )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

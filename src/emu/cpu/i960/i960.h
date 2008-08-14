@@ -1,9 +1,12 @@
-#ifndef __I960_H
-#define __I960_H
+#pragma once
+
+#ifndef __I960_H__
+#define __I960_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
   I960_PFP = 0,
   I960_SP  = 1,
   I960_RIP = 2,
@@ -50,7 +53,8 @@ enum {
   I960_PIP = 37
 };
 
-enum {
+enum
+{
   I960_IRQ0 = 0,
   I960_IRQ1 = 1,
   I960_IRQ2 = 2,
@@ -61,4 +65,4 @@ void i960_get_info(UINT32 state, cpuinfo *info);
 void i960_noburst(void);
 void i960_stall(void);
 
-#endif
+#endif /* __I960_H__ */

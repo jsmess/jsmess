@@ -140,24 +140,24 @@ static READ8_HANDLER( punchout_input_3_r )
 {
 	int data = input_port_read(machine, "DSW1");
 	/* bit 4 is busy pin level */
-	if( VLM5030_BSY() ) data &= ~0x10;
+	if( vlm5030_bsy() ) data &= ~0x10;
 	else data |= 0x10;
 	return data;
 }
 
 static WRITE8_HANDLER( punchout_speech_reset_w )
 {
-	VLM5030_RST( data&0x01 );
+	vlm5030_rst( data&0x01 );
 }
 
 static WRITE8_HANDLER( punchout_speech_st_w )
 {
-	VLM5030_ST( data&0x01 );
+	vlm5030_st( data&0x01 );
 }
 
 static WRITE8_HANDLER( punchout_speech_vcu_w )
 {
-	VLM5030_VCU( data & 0x01 );
+	vlm5030_vcu( data & 0x01 );
 }
 
 static WRITE8_HANDLER( punchout_2a03_reset_w )
@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(SMH_NOP)	/* the 2A03 #1 is not present */
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(VLM5030_data_w)	/* VLM5030 */
+	AM_RANGE(0x04, 0x04) AM_WRITE(vlm5030_data_w)	/* VLM5030 */
 	AM_RANGE(0x05, 0x05) AM_WRITE(SMH_NOP)	/* unused */
 	AM_RANGE(0x08, 0x08) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(SMH_NOP)	/* watchdog reset, seldom used because 08 clears the watchdog as well */
@@ -480,13 +480,13 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_0_r)
+	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_0_r)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_0_w)
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_0_w)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -683,7 +683,7 @@ GFXDECODE_END
 
 
 
-static const struct NESinterface nes_interface =
+static const nes_interface nes_config =
 {
 	"audio"
 };
@@ -729,7 +729,7 @@ static MACHINE_DRIVER_START( punchout )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(nes_interface)
+	MDRV_SOUND_CONFIG(nes_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)

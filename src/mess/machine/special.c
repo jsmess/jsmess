@@ -101,7 +101,7 @@ static WRITE8_HANDLER (specialist_8255_portc_w )
 	
 	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x80 ? 1 : -1);	
 
-	DAC_data_w(0,data & 0x20); //beeper
+	dac_data_w(0,data & 0x20); //beeper
 	
 }
 

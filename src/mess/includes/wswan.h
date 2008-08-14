@@ -109,7 +109,7 @@ extern void wswan_refresh_scanline( void );
 /*----------- defined in audio/wswan.c -----------*/
 
 extern WRITE8_HANDLER( wswan_sound_port_w );
-extern void *wswan_sh_start(int clock, const struct CustomSound_interface *config);
+extern void *wswan_sh_start(int clock, const custom_sound_interface *config);
 
 
 #endif /* WSWAN_H_ */

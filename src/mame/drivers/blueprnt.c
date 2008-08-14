@@ -115,12 +115,12 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x6002, 0x6002) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x8002, 0x8002) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6001, 0x6001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x6002, 0x6002) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x8002, 0x8002) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -248,7 +248,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static const struct AY8910interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -258,7 +258,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

@@ -40,7 +40,7 @@ extern READ8_HANDLER( gb_sound_r );
 extern WRITE8_HANDLER( gb_sound_w );
 extern READ8_HANDLER( gb_wave_r );
 extern WRITE8_HANDLER( gb_wave_w );
-void *gameboy_sh_start(int clock, const struct CustomSound_interface *config);
+void *gameboy_sh_start(int clock, const custom_sound_interface *config);
 
 
 /*----------- defined in machine/gb.c -----------*/

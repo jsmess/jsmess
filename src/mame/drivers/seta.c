@@ -1415,11 +1415,11 @@ static WRITE16_HANDLER( timer_regs_w )
 
 ***************************************************************************/
 
-static const struct x1_010_interface seta_sound_intf =
+static const x1_010_interface seta_sound_intf =
 {
 	0x0000,		/* address */
 };
-static const struct x1_010_interface seta_sound_intf2 =
+static const x1_010_interface seta_sound_intf2 =
 {
 	0x1000,		/* address */
 };
@@ -1429,7 +1429,7 @@ static void utoukond_ym3438_interrupt(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, linestate);
 }
 
-static const struct YM3438interface utoukond_ym3438_intf =
+static const ym3438_interface utoukond_ym3438_intf =
 {
 	utoukond_ym3438_interrupt	// IRQ handler
 };
@@ -2554,7 +2554,7 @@ static ADDRESS_MAP_START( triplfun_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x500006, 0x500007) AM_READ(OKIM6295_status_0_lsb_r) // tfun sound
+	AM_RANGE(0x500006, 0x500007) AM_READ(okim6295_status_0_lsb_r) // tfun sound
 	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM				)	// old sound
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM				)	// VRAM 0&1
 	AM_RANGE(0x880000, 0x883fff) AM_READ(SMH_RAM				)	// VRAM 2&3
@@ -2572,7 +2572,7 @@ static ADDRESS_MAP_START( triplfun_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP						)	// ? IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
-	AM_RANGE(0x500006, 0x500007) AM_WRITE(OKIM6295_data_0_lsb_w)  // tfun sound
+	AM_RANGE(0x500006, 0x500007) AM_WRITE(okim6295_data_0_lsb_w)  // tfun sound
 	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM						)	// old sound
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2	)	// VRAM 2
@@ -2718,14 +2718,14 @@ static WRITE16_HANDLER( wiggie_soundlatch_w )
 static ADDRESS_MAP_START( wiggie_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(wiggie_soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wiggie_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2842,7 +2842,7 @@ static ADDRESS_MAP_START( tndrcade_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x2001, 0x2001) AM_READ(YM2203_read_port_0_r	)
+	AM_RANGE(0x2001, 0x2001) AM_READ(ym2203_read_port_0_r	)
 	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM				)	// Shared RAM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1				)	// Banked ROM
@@ -2852,10 +2852,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tndrcade_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w	)	// ROM Bank + Coin Lockout
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2203_control_port_0_w	)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2203_write_port_0_w		)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(YM3812_control_port_0_w	)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(YM3812_write_port_0_w		)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2203_control_port_0_w	)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2203_write_port_0_w		)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(ym3812_control_port_0_w	)
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(ym3812_write_port_0_w		)
 	AM_RANGE(0x5000, 0x57ff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram		)	// Shared RAM
 	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM					)	// ROM
 ADDRESS_MAP_END
@@ -3006,15 +3006,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( utoukond_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM3438_status_port_0_A_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym3438_status_port_0_a_r)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( utoukond_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM3438_control_port_0_A_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM3438_data_port_0_A_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM3438_control_port_0_B_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM3438_data_port_0_B_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym3438_control_port_0_a_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym3438_data_port_0_a_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym3438_control_port_0_b_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym3438_data_port_0_b_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(SMH_NOP) //?
 ADDRESS_MAP_END
 
@@ -3076,8 +3076,8 @@ ADDRESS_MAP_END
                             Crazy Fight
 ***************************************************************************/
 
-static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_BITS_0_7)	YM3812_control_port_0_w(machine, 0, data & 0xff);	}
-static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_BITS_0_7)	YM3812_write_port_0_w(machine, 0, data & 0xff);		}
+static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_BITS_0_7)	ym3812_control_port_0_w(machine, 0, data & 0xff);	}
+static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_BITS_0_7)	ym3812_write_port_0_w(machine, 0, data & 0xff);		}
 
 static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -3091,7 +3091,7 @@ static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x640400, 0x640fff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x650000, 0x650001) AM_WRITE(YM3812_control_port_0_lsb_w)
 	AM_RANGE(0x650002, 0x650003) AM_WRITE(YM3812_write_port_0_lsb_w)
-	AM_RANGE(0x658000, 0x658001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x658000, 0x658001) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x670000, 0x670001) AM_READNOP		// watchdog?
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2) // VRAM 2
 	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0) // VRAM 0
@@ -6689,7 +6689,7 @@ static INTERRUPT_GEN( seta_sub_interrupt )
                                 Thundercade
 ***************************************************************************/
 
-static const struct YM2203interface tndrcade_ym2203_interface =
+static const ym2203_interface tndrcade_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

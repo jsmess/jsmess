@@ -856,7 +856,7 @@ static INT32 oki_bank = 0;
 
 static void reset_driveout_sound_region(void)
 {
-	OKIM6295_set_bank_base(0, oki_bank*0x40000);
+	okim6295_set_bank_base(0, oki_bank*0x40000);
 }
 
 static WRITE8_HANDLER (oki_bank_w)
@@ -1676,9 +1676,9 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(YM2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
+	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -1687,10 +1687,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1706,28 +1706,28 @@ static ADDRESS_MAP_START( camltrya_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)	// I can't see a bank control, but there ARE some bytes past 0x8000
 //  AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camltrya_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driveout_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(driveout_sound_command_r)
 ADDRESS_MAP_END
 
@@ -1735,7 +1735,7 @@ static ADDRESS_MAP_START( driveout_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -3684,7 +3684,7 @@ static void irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irq_handler
 };
@@ -3695,7 +3695,7 @@ static WRITE8_HANDLER( camltrya_porta_w )
 	// Implement //
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -3761,7 +3761,7 @@ static MACHINE_DRIVER_START( taito_f2 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
@@ -4212,7 +4212,7 @@ static MACHINE_DRIVER_START( camltrya )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 24000000/8) /* verified on pcb  */
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
@@ -4874,6 +4874,72 @@ ROM_START( majest12 )
 
 	/* no Delta-T samples */
 ROM_END
+
+
+/*
+Gun & Frontier
+Taito, 1990
+
+This game runs on Taito F2 hardware.
+
+
+PCB Layout
+
+K1100624A
+J1100251A  (sticker K1100629A)
+
+|-----------------------------------------------------|
+|          TL074  YM3016F  C71-01.29  TC51832  TC51832|
+|  MB3737  TL074                      TC51832  TC51832|
+|                 YM2610   TCO530SYC                  |
+|                                     TC51832  TC51832|
+|   C71-12.49   Z80B  24MHz           TC51832  TC51832|
+|   5563                                              |
+|                                     TC51832  TC51832|
+|     TCO260DAR           TCO520TBC   TC51832  TC51832|
+|J              TCO360PRI                             |
+|A                                    TC51832  TC51832|
+|M  2088                              TC51832  TC51832|
+|M                         TCO540OBN                  |
+|A  TC51832                                C71-03.19  |
+|                                                     |
+|   TC51832                                           |
+|              TCO100SCN                              |
+|                    66256      66256    66256  66256 |
+|   C71-02.59                                         |
+|          MB3771    C71-16.38  C71-15.37             |
+|   TCO510NIO        C71-10.40  C71-14.39             |
+|         26.686MHz  C71-09.42  C71-08.41    68000    |
+|   DSWB  DSWA                           PAL1    PAL2 |
+|-----------------------------------------------------|
+Notes:
+      Clocks:
+             68000 clock : 12.000MHz
+             Z80 clock   : 4.000MHz
+             YM2610 clock: 8.000MHz
+             VSync       : 60Hz
+
+      Taito Custom Chips:
+                         TCO530SYC - Sound Communication  (QFP160)
+                         TCO260DAR - Palette Controller   (QFP100)
+                         TCO360PRI - Priority Controller  (QFP100)
+                         TCO520TBC - \ Sprite Controllers (QFP100)
+                         TCO540OBN - /                    (QFP160)
+                         TCO100SCN - Tilemap Controller   (QFP160)
+                         TCO510NIO - I/O                  (QFP100)
+
+      RAM:
+          62256  : 32K x8 SRAM
+          TC51832: 32K x8 SRAM
+          2088   : 8K x8 SRAM
+          5563   : 8K x8 SRAM
+
+      OTHER:
+            PAL1  : PAL16L8 labelled 'C71-06' at location IC28
+            PAL2  : PAL16L8 labelled 'C71-07' at location IC27
+            TL074 : Quad JFET Op AMP
+            MB3737: Main power AMP
+*/
 
 ROM_START( gunfront )
 	ROM_REGION( 0xc0000, "main", 0 )     /* 768k for 68000 code */

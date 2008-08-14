@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( splash_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_READ(SMH_ROM)					/* ROM */
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)				/* Sound latch */
-	AM_RANGE(0xf000, 0xf000) AM_READ(YM3812_status_port_0_r)		/* YM3812 */
+	AM_RANGE(0xf000, 0xf000) AM_READ(ym3812_status_port_0_r)		/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
@@ -145,7 +145,7 @@ static WRITE8_HANDLER( splash_adpcm_data_w ){
 
 static void splash_msm5205_int(running_machine *machine, int data)
 {
-	MSM5205_data_w(0,adpcm_data >> 4);
+	msm5205_data_w(0,adpcm_data >> 4);
 	adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
@@ -154,8 +154,8 @@ static ADDRESS_MAP_START( splash_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_WRITE(SMH_ROM)					/* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)		/* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP)                 /* ??? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM3812_control_port_0_w)	/* YM3812 */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM3812_write_port_0_w)		/* YM3812 */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym3812_control_port_0_w)	/* YM3812 */
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym3812_write_port_0_w)		/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
@@ -214,8 +214,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roldf_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x12) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_NOP	/* NMI ack */
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -423,7 +423,7 @@ static GFXDECODE_START( splash )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16,0,128 )
 GFXDECODE_END
 
-static const struct MSM5205interface splash_msm5205_interface =
+static const msm5205_interface splash_msm5205_interface =
 {
 	splash_msm5205_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8KHz */
@@ -471,7 +471,7 @@ static void ym_irq(running_machine *machine, int state)
 	logerror("2203 IRQ: %d\n", state);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -511,7 +511,7 @@ static MACHINE_DRIVER_START( roldfrog )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 	MDRV_SOUND_ROUTE(2, "mono", 0.60)
@@ -551,7 +551,7 @@ static MACHINE_DRIVER_START( funystrp )
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 //  MDRV_SOUND_ADD("msm", MSM5205, 384000)
-//  MDRV_SOUND_CONFIG(msm5205_interface)
+//  MDRV_SOUND_CONFIG(msm5205_config)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

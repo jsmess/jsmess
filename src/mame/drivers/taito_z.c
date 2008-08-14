@@ -1687,9 +1687,9 @@ static ADDRESS_MAP_START( bshark_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10bfff) AM_READ(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_READ(sharedram_r)
 //  AM_RANGE(0x40000a, 0x40000b) AM_READ(taitoz_unknown_r)  // ???
-	AM_RANGE(0x600000, 0x600001) AM_READ(YM2610_status_port_0_A_lsb_r)
-	AM_RANGE(0x600002, 0x600003) AM_READ(YM2610_read_port_0_lsb_r)
-	AM_RANGE(0x600004, 0x600005) AM_READ(YM2610_status_port_0_B_lsb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(ym2610_status_port_0_a_lsb_r)
+	AM_RANGE(0x600002, 0x600003) AM_READ(ym2610_read_port_0_lsb_r)
+	AM_RANGE(0x600004, 0x600005) AM_READ(ym2610_status_port_0_b_lsb_r)
 	AM_RANGE(0x60000c, 0x60000d) AM_READ(SMH_NOP)
 	AM_RANGE(0x60000e, 0x60000f) AM_READ(SMH_NOP)
 	AM_RANGE(0x800000, 0x801fff) AM_READ(TC0150ROD_word_r)	/* "root ram" */
@@ -1700,10 +1700,10 @@ static ADDRESS_MAP_START( bshark_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(spacegun_pancontrol)  /* pan */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2610_control_port_0_A_lsb_w)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2610_data_port_0_A_lsb_w)
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(YM2610_control_port_0_B_lsb_w)
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(YM2610_data_port_0_B_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(ym2610_control_port_0_a_lsb_w)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE(ym2610_data_port_0_a_lsb_w)
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(ym2610_control_port_0_b_lsb_w)
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(ym2610_data_port_0_b_lsb_w)
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(SMH_NOP)	// interrupt controller?
 	AM_RANGE(0x60000e, 0x60000f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x800000, 0x801fff) AM_WRITE(TC0150ROD_word_w)	/* "root ram" */
@@ -1869,9 +1869,9 @@ static ADDRESS_MAP_START( spacegun_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20c000, 0x20ffff) AM_READ(SMH_RAM)	/* local CPUB ram */
 	AM_RANGE(0x210000, 0x21ffff) AM_READ(sharedram_r)
 	AM_RANGE(0x800000, 0x80000f) AM_READ(spacegun_input_bypass_r)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(YM2610_status_port_0_A_lsb_r)
-	AM_RANGE(0xc00002, 0xc00003) AM_READ(YM2610_read_port_0_lsb_r)
-	AM_RANGE(0xc00004, 0xc00005) AM_READ(YM2610_status_port_0_B_lsb_r)
+	AM_RANGE(0xc00000, 0xc00001) AM_READ(ym2610_status_port_0_a_lsb_r)
+	AM_RANGE(0xc00002, 0xc00003) AM_READ(ym2610_read_port_0_lsb_r)
+	AM_RANGE(0xc00004, 0xc00005) AM_READ(ym2610_status_port_0_b_lsb_r)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ(SMH_NOP)
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(SMH_NOP)
 	AM_RANGE(0xf00000, 0xf00007) AM_READ(spacegun_lightgun_r)
@@ -1882,10 +1882,10 @@ static ADDRESS_MAP_START( spacegun_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20c000, 0x20ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x210000, 0x21ffff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x800000, 0x80000f) AM_WRITE(spacegun_output_bypass_w)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2610_control_port_0_A_lsb_w)
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2610_data_port_0_A_lsb_w)
-	AM_RANGE(0xc00004, 0xc00005) AM_WRITE(YM2610_control_port_0_B_lsb_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_WRITE(YM2610_data_port_0_B_lsb_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2610_control_port_0_a_lsb_w)
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2610_data_port_0_a_lsb_w)
+	AM_RANGE(0xc00004, 0xc00005) AM_WRITE(ym2610_control_port_0_b_lsb_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_WRITE(ym2610_data_port_0_b_lsb_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(SMH_NOP)	// interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xc20000, 0xc20007) AM_WRITE(spacegun_pancontrol)  /* pan */
@@ -1991,9 +1991,9 @@ static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(YM2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
+	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -2002,10 +2002,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(taitoz_pancontrol) /* pan */
@@ -3048,12 +3048,12 @@ static void irqhandlerb(running_machine *machine, int irq)
 //  cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
 
-static const struct YM2610interface ym2610_interfaceb =
+static const ym2610_interface ym2610_interfaceb =
 {
 	irqhandlerb
 };
@@ -3078,7 +3078,7 @@ static int subwoofer_sh_start(const sound_config *msound)
 	return 0;
 }
 
-static const struct CustomSound_interface subwoofer_interface =
+static const custom_sound_interface subwoofer_interface =
 {
 	subwoofer_sh_start,
 	0, /* none */
@@ -3157,7 +3157,7 @@ static MACHINE_DRIVER_START( contcirc )
 	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3213,7 +3213,7 @@ static MACHINE_DRIVER_START( chasehq )
 	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 1.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 1.0)
@@ -3267,7 +3267,7 @@ static MACHINE_DRIVER_START( enforce )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 20.0)
@@ -3376,7 +3376,7 @@ static MACHINE_DRIVER_START( sci )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3433,7 +3433,7 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3487,7 +3487,7 @@ static MACHINE_DRIVER_START( aquajack )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3594,7 +3594,7 @@ static MACHINE_DRIVER_START( dblaxle )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3648,7 +3648,7 @@ static MACHINE_DRIVER_START( racingb )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 8.0)

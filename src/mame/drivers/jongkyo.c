@@ -182,9 +182,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jongkyo_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// R 01 keyboard
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_0_w)
 
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE(keyboard_select_w)
@@ -579,7 +579,7 @@ static PALETTE_INIT(jongkyo)
 	}
 }
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -612,7 +612,7 @@ static MACHINE_DRIVER_START( jongkyo )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay", AY8910, JONGKYO_CLOCK/8)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
@@ -648,7 +648,7 @@ static DRIVER_INIT( jongkyo )
 	}
 
 	/* then do the standard Sega decryption */
-	jongkyo_decode(machine);
+	jongkyo_decode(machine, "main");
 
 	videoram2 = auto_malloc(0x4000);
 	state_save_register_global_pointer(videoram2, 0x4000);

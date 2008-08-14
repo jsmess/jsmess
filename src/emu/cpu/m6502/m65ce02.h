@@ -19,12 +19,15 @@
  *
  *****************************************************************************/
 
-#ifndef _M65CE02_H
-#define _M65CE02_H
+#pragma once
+
+#ifndef __M65CE02_H__
+#define __M65CE02_H__
 
 #include "m6502.h"
 
-enum {
+enum
+{
 	M65CE02_PC=1, M65CE02_S, M65CE02_P, M65CE02_A, M65CE02_X, M65CE02_Y,
 	M65CE02_Z, M65CE02_B, M65CE02_EA, M65CE02_ZP,
 	M65CE02_NMI_STATE, M65CE02_IRQ_STATE
@@ -36,6 +39,4 @@ void m65ce02_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned m65ce02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _M65CE02_H */
-
-
+#endif /* __M65CE02_H__ */

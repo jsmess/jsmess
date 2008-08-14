@@ -155,7 +155,7 @@ static INPUT_PORTS_START( snes )
 #endif
 INPUT_PORTS_END
 
-static const struct CustomSound_interface snes_sound_interface =
+static const custom_sound_interface snes_sound_interface =
 { snes_sh_start, 0, 0 };
 
 /* Loads the battery backed RAM into the appropriate memory area */

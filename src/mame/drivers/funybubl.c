@@ -85,7 +85,7 @@ static WRITE8_HANDLER( funybubl_soundcommand_w )
 
 static WRITE8_HANDLER( funybubl_oki_bank_sw )
 {
-	OKIM6295_set_bank_base(0, ((data & 1) * 0x40000));
+	okim6295_set_bank_base(0, ((data & 1) * 0x40000));
 }
 
 
@@ -108,10 +108,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x06) AM_READ(SMH_NOP)		/* Nothing is done with the data read */
 ADDRESS_MAP_END
 
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soundreadmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( soundwritemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(funybubl_oki_bank_sw)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 

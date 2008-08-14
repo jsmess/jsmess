@@ -50,10 +50,10 @@ static WRITE16_HANDLER( lastduel_sound_w )
 static ADDRESS_MAP_START( lastduel_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0xfc0800, 0xfc0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfc4000, 0xfc4001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfc4004, 0xfc4005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfc4006, 0xfc4007) AM_READ(input_port_3_word_r)
+	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfcc000, 0xfcdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xfd0000, 0xfd3fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xfd4000, 0xfd7fff) AM_READ(SMH_RAM)
@@ -78,10 +78,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( madgear_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0xfc1800, 0xfc1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfc4000, 0xfc4001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfc4004, 0xfc4005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfc4006, 0xfc4007) AM_READ(input_port_3_word_r)
+	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2")
+	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfc8000, 0xfc9fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xfcc000, 0xfcc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xfd4000, 0xfd7fff) AM_READ(SMH_RAM)
@@ -107,18 +107,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe800, 0xe800) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(YM2203_status_port_1_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ(ym2203_status_port_1_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2203_write_port_1_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mg_bankswitch_w )
@@ -134,19 +134,19 @@ static ADDRESS_MAP_START( mg_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xcfff) AM_READ(SMH_BANK3)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(YM2203_status_port_1_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ(ym2203_status_port_1_r)
 	AM_RANGE(0xf006, 0xf006) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mg_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -237,7 +237,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 			AY8910_LEGACY_OUTPUT,
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( lastduel )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 3579545)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("ym2", YM2203, 3579545)
@@ -333,7 +333,7 @@ static MACHINE_DRIVER_START( madgear )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
@@ -496,7 +496,7 @@ static INPUT_PORTS_START( madgear )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2") /* Dip switch C, free play is COIN B all off, COIN A all on */
+	PORT_START("DSW2") /* Free play is COIN B all off, COIN A all on */
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 5C_1C ) )

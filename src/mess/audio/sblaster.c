@@ -162,7 +162,7 @@ WRITE8_HANDLER( soundblaster_w )
 			blaster.output_state=0;
 			break;
 		case 10:
-			DAC_data_w(0, data);
+			dac_data_w(0, data);
 			blaster.output_state=0;
 			break;
 		}
@@ -171,7 +171,7 @@ WRITE8_HANDLER( soundblaster_w )
 }
 
 #if 0
-const struct CustomSound_interface soundblaster_interface = {
+const custom_sound_interface soundblaster_interface = {
 	soundblaster_start,
 	soundblaster_stop,
 	soundblaster_update

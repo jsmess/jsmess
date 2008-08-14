@@ -6,6 +6,32 @@ the hardware seems to fall somewhere between the
 hardware playmark commonly used and the hardware
 unico used for zero point etc.
 
+PCB Layout
+----------
+
+  DM1001    DM1002   6116   6116     DM1003
+    6295 6295        6116   *PLCC84  DM1004
+                     6116            DM1005
+     PIC16C55                        DM1006
+
+       6116            6116          DM1007
+       6116            6116          DM1008
+                       6116
+                       6116
+                                     TPC1020
+DSW1 62256   62256                   (PLCC84)
+    DM1000A DM1000B
+DSW2    68000      TPC1020           62256
+                   (PLCC84)          62256
+12MHz 32MHz
+
+
+Notes:
+          *: Unknown PLCC84 chip (surface scratched)
+      VSync: 60Hz
+      HSync: 15.625kHz
+  68K clock: 16MHz
+
 */
 
 #include "driver.h"
@@ -70,8 +96,8 @@ static READ8_HANDLER( drgnmst_snd_command_r )
 
 	switch (drgnmst_oki_control & 0x1f)
 	{
-		case 0x12:	data = (OKIM6295_status_1_r(machine, 0) & 0x0f); break;
-		case 0x16:	data = (OKIM6295_status_0_r(machine, 0) & 0x0f); break;
+		case 0x12:	data = (okim6295_status_1_r(machine, 0) & 0x0f); break;
+		case 0x16:	data = (okim6295_status_0_r(machine, 0) & 0x0f); break;
 		case 0x0b:
 		case 0x0f:	data = drgnmst_snd_command; break;
 		default:	break;
@@ -138,12 +164,12 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 	if (oki_new_bank != drgnmst_oki0_bank) {
 		drgnmst_oki0_bank = oki_new_bank;
 		if (drgnmst_oki0_bank) oki_new_bank--;
-		OKIM6295_set_bank_base(0, (oki_new_bank * 0x40000));
+		okim6295_set_bank_base(0, (oki_new_bank * 0x40000));
 	}
 	oki_new_bank = ((pic16c5x_port0 & 0x3) >> 0) | ((drgnmst_oki_control & 0x20) >> 3);
 	if (oki_new_bank != drgnmst_oki1_bank) {
 		drgnmst_oki1_bank = oki_new_bank;
-		OKIM6295_set_bank_base(1, (oki_new_bank * 0x40000));
+		okim6295_set_bank_base(1, (oki_new_bank * 0x40000));
 	}
 
 	switch(drgnmst_oki_control & 0x1f)
@@ -151,12 +177,12 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 		case 0x11:
 //                  logerror("Writing %02x to OKI1",drgnmst_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n",drgnmst_oki_control,drgnmst_snd_command,drgnmst_oki0_bank,drgnmst_oki1_bank);
-					OKIM6295_data_1_w(machine, 0, drgnmst_oki_command);
+					okim6295_data_1_w(machine, 0, drgnmst_oki_command);
 					break;
 		case 0x15:
 //                  logerror("Writing %02x to OKI0",drgnmst_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n",drgnmst_oki_control,drgnmst_snd_command,drgnmst_oki0_bank,drgnmst_oki1_bank);
-					OKIM6295_data_0_w(machine, 0, drgnmst_oki_command);
+					okim6295_data_0_w(machine, 0, drgnmst_oki_command);
 					break;
 		default:	break;
 	}

@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( laserbat_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( catnmous_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 // the same as in zaccaria.c ?
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( laserbat )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
-	PORT_START("SENSE")	/* SENSE */
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
@@ -374,7 +374,7 @@ static INPUT_PORTS_START( lazarian )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
-	PORT_START("SENSE")	/* SENSE */
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
@@ -457,7 +457,7 @@ static INPUT_PORTS_START( catnmous )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SENSE")	/* SENSE */
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
@@ -565,7 +565,7 @@ static VIDEO_UPDATE( laserbat )
 
 /* Laser Battle sound **********************************/
 
-static const struct SN76477interface sn76477_interface =
+static const sn76477_interface laserbat_sn76477_interface =
 {
 	RES_K(47), 		/*  4 noise_res         R21    47K */
 	0,				/*  5 filter_res (variable) */
@@ -602,9 +602,9 @@ static int active_8910,port0a;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return AY8910_read_port_0_r(machine,0);
+		return ay8910_read_port_0_r(machine,0);
 	else
-		return AY8910_read_port_1_r(machine,0);
+		return ay8910_read_port_1_r(machine,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -622,9 +622,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			AY8910_control_port_0_w(machine,0,port0a);
+			ay8910_control_port_0_w(machine,0,port0a);
 		else
-			AY8910_write_port_0_w(machine,0,port0a);
+			ay8910_write_port_0_w(machine,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -637,9 +637,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			AY8910_control_port_1_w(machine,0,port0a);
+			ay8910_control_port_1_w(machine,0,port0a);
 		else
-			AY8910_write_port_1_w(machine,0,port0a);
+			ay8910_write_port_1_w(machine,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -658,7 +658,7 @@ static const pia6821_interface pia_0_intf =
 	/*irqs   : A/B             */ zaccaria_irq0a, zaccaria_irq0b
 };
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -718,7 +718,7 @@ static MACHINE_DRIVER_START( laserbat )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("sn", SN76477, 0) // output not connected
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(laserbat_sn76477_interface)
 
 	MDRV_SOUND_ADD("tms1", TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out
 	MDRV_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
@@ -759,7 +759,7 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 3580000/2) // ?

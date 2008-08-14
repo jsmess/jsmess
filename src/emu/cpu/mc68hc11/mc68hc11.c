@@ -7,7 +7,8 @@
 #include "debugger.h"
 #include "mc68hc11.h"
 
-enum {
+enum
+{
 	HC11_PC = 1,
 	HC11_SP,
 	HC11_A,
@@ -323,7 +324,7 @@ static void hc11_init(int index, int clock, const void *config, int (*irqcallbac
 		hc11_optable_page4[i] = HC11OP(invalid);
 	}
 	/* fill the opcode tables */
-	for(i=0; i < sizeof(hc11_opcode_list)/sizeof(HC11_OPCODE_LIST); i++)
+	for(i=0; i < sizeof(hc11_opcode_list)/sizeof(hc11_opcode_list_struct); i++)
 	{
 		switch(hc11_opcode_list[i].page)
 		{

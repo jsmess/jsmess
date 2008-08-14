@@ -150,17 +150,11 @@ static DRIVER_INIT( inufuku )
 
 ******************************************************************************/
 
-static READ16_HANDLER( inufuku_eeprom_r )
+static CUSTOM_INPUT( soundflag_r )
 {
-	UINT16 soundflag;
-	UINT16 eeprom;
-	UINT16 inputport;
+	UINT16 soundflag = pending_command ? 0 : 1;
 
-	soundflag = pending_command ? 0x0000 : 0x0080;	// bit7
-	eeprom = (eeprom_read_bit() & 1) << 6;			// bit6
-	inputport = input_port_read(machine, "IN1") & 0xff3f;	// bit5-0
-
-	return (soundflag | eeprom | inputport);
+	return soundflag;
 }
 
 static WRITE16_HANDLER( inufuku_eeprom_w )
@@ -185,12 +179,12 @@ static WRITE16_HANDLER( inufuku_eeprom_w )
 static ADDRESS_MAP_START( inufuku_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)				// main rom
 
-	AM_RANGE(0x180000, 0x180001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x180002, 0x180003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x180004, 0x180005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x180006, 0x180007) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x180008, 0x180009) AM_READ(inufuku_eeprom_r)		// eeprom + input_port_4_word_r
-	AM_RANGE(0x18000a, 0x18000b) AM_READ(input_port_5_word_r)
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1")
+	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P2")
+	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P4")
+	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("EXTRA")
+	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
 
 	AM_RANGE(0x300000, 0x301fff) AM_READ(SMH_RAM)				// palette ram
 	AM_RANGE(0x400000, 0x401fff) AM_READ(inufuku_bg_videoram_r)	// bg ram
@@ -246,19 +240,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( inufuku_readport_sound, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-	AM_RANGE(0x08, 0x08) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x09, 0x09) AM_READ(YM2610_read_port_0_r)
-	AM_RANGE(0x0a, 0x0a) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x08, 0x08) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x09, 0x09) AM_READ(ym2610_read_port_0_r)
+	AM_RANGE(0x0a, 0x0a) AM_READ(ym2610_status_port_0_b_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inufuku_writeport_sound, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2610_data_port_0_b_w)
 ADDRESS_MAP_END
 
 
@@ -269,7 +263,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 static INPUT_PORTS_START( inufuku )
-	PORT_START("P1")	// 0
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -279,7 +273,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
-	PORT_START("P2")	// 1
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -289,7 +283,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
-	PORT_START("IN0")	// 2
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -299,7 +293,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P4")	// 3
+	PORT_START("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
@@ -309,7 +303,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
-	PORT_START("IN1")	// 4
+	PORT_START("EXTRA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
@@ -318,10 +312,10 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// pending sound command
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundflag_r, NULL)	// pending sound command
 
-	PORT_START("P3")	// 5
+	PORT_START("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
@@ -381,7 +375,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
@@ -426,7 +420,7 @@ static MACHINE_DRIVER_START( inufuku )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2610, 32000000/4)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.75)
 	MDRV_SOUND_ROUTE(2, "mono", 0.75)

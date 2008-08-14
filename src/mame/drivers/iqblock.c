@@ -130,10 +130,10 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
 	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE(PPI8255, "ppi8255", ppi8255_w)
 	AM_RANGE(0x5080, 0x5083) AM_DEVREAD(PPI8255, "ppi8255", ppi8255_r)
-	AM_RANGE(0x5090, 0x5090) AM_READ(input_port_3_r)
-	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_4_r)
-	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w) // UM3567_register_port_0_w
-	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w) // UM3567_data_port_0_w
+	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("SW0")
+	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("SW1")
+	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(ym2413_register_port_0_w) // UM3567_register_port_0_w
+	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(ym2413_data_port_0_w) // UM3567_data_port_0_w
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(iqblock_irqack_w)
 	AM_RANGE(0x7000, 0x7fff) AM_READ(iqblock_bgvideoram_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(extrarom_r)
@@ -339,6 +339,48 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+/*
+IQ Block
+IGS, 1996
+
+PCB Layout
+----------
+
+IGS PCB N0- 0131-4
+|---------------------------------------|
+|uPD1242H     VOL    U3567   3.579545MHz|
+|                               AR17961 |
+|   HD64180RP8                          |
+|  16MHz                         BATTERY|
+|                                       |
+|                         SPEECH.U17    |
+|                                       |
+|J                        6264          |
+|A                                      |
+|M      8255              V.U18         |
+|M                                      |
+|A                                      |
+|                                       |
+|                                       |
+|                      |-------|        |
+|                      |       |        |
+|       CG.U7          |IGS017 |        |
+|                      |       |        |
+|       TEXT.U8        |-------|   PAL  |
+|            22MHz               61256  |
+|                   DSW1  DSW2  DSW3    |
+|---------------------------------------|
+Notes:
+      HD64180RP8 - Hitachi HD64180 CPU. Clocks 16MHz (pins 2 & 3), 8MHz (pin 64)
+      61256   - 32k x8 SRAM (DIP28)
+      6264    - 8k x8 SRAM (DIP28)
+      IGS017  - Custom IGS IC (QFP208)
+      AR17961 - == Oki M6295 (QFP44). Clock 1.000MHz [16/16]. pin 7 = high
+      U3567   - == YM2413. Clock 3.579545MHz
+      VSync   - 60Hz
+      HSync   - 15.31kHz
+*/
+
 ROM_START( iqblock )
 	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "u7.v5",        0x0000, 0x10000, CRC(811f306e) SHA1(d0aef80f1624002d05721276358f26a3ef69a3f6) )
@@ -355,6 +397,49 @@ ROM_START( iqblock )
 	ROM_LOAD( "u25.4",        0x0000, 0x4000, CRC(8fc222af) SHA1(ac1fb5e6caec391a76e3af51e133aecc65cd5aed) )
 	ROM_LOAD( "u24.5",        0x4000, 0x4000, CRC(61050e1e) SHA1(1f7185b2a5a2e237120276c95344744b146b4bf6) )
 ROM_END
+
+
+/*
+Grand Tour
+IGS, 1993
+
+This game probably runs on the same board as IGS's IQ Block.
+Two of the PALs are labelled GRAND3 and GRAND4. However, there may be other
+games that run on this same PCB also, since three of the PALs are
+labelled AF1, AF2 and AF3, meaning the main/first game to run on this
+hardware was called A-something F-something.
+
+
+PCB Layout
+----------
+
+IGS PCB N0. 0036-5
+----------------------------------------------
+|                                 6264       |
+|  UM3567                        GRAND6      |
+|    3.579545MHz   GRAND1                    |
+|                                GRAND7      |
+|                  GRAND2                    |
+|J                                           |
+|A                 GRAND3                    |
+|M                                    Z80    |
+|M                 GRAND4                    |
+|A                                    PAL    |
+|    6116          GRAND5                    |
+|    6116  IGS001          IGS002     PAL    |
+|                  6264                      |
+|                                     PAL    |
+|  8255      PAL                             |
+|                            PAL      12MHz  |
+| DSW2(8) DSW1(8)                            |
+----------------------------------------------
+
+Notes:
+      Z80 clock: 5.997MHz
+          VSync: 60Hz
+          HSync: 15.21kHz
+          UM3567 compatible with YM2413
+*/
 
 ROM_START( grndtour )
 	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64K for extra RAM */

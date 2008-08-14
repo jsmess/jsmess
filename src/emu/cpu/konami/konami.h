@@ -1,13 +1,17 @@
 /*** konami: Portable Konami cpu emulator ******************************************/
 
-#ifndef _KONAMI_H
-#define _KONAMI_H
+#pragma once
+
+#ifndef __KONAMI_H__
+#define __KONAMI_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	KONAMI_PC=1, KONAMI_S, KONAMI_CC ,KONAMI_A, KONAMI_B, KONAMI_U, KONAMI_X, KONAMI_Y,
-	KONAMI_DP };
+	KONAMI_DP
+};
 
 enum
 {
@@ -53,4 +57,4 @@ void konami_get_info(UINT32 state, cpuinfo *info);
 
 offs_t konami_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _KONAMI_H */
+#endif /* __KONAMI_H__ */

@@ -93,21 +93,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(YM2203_status_port_1_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2203_read_port_1_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xa001, 0xa001) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(ym2203_status_port_1_r)
+	AM_RANGE(0xc001, 0xc001) AM_READ(ym2203_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(SMH_NOP) /* unknown */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP) /* unknown */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2203_write_port_1_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -243,7 +243,7 @@ GFXDECODE_END
 
 /****************************************************************************/
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( momoko )
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
 	MDRV_SOUND_ADD("ym2", YM2203, 1250000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)

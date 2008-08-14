@@ -1365,6 +1365,66 @@ ROM_START( dungenmu )
 	ROM_LOAD16_BYTE("d69-02.bin", 0x400000, 0x200000, CRC(dce28dd7) SHA1(eacfc98349b0608fc1a944c11f0483fb6caa4445) )	// CC CD -std-
 ROM_END
 
+
+/*
+Light Bringer
+Taito, 1993
+
+This game runs on Taito F3 hardware (single PCB)
+
+
+PCB Layout
+----------
+
+F3 MAIN PCB  K1100746A  J1100318A
+|------------------------------------------------------|
+| TDA1543  MC33274 MB87078                D29-11       |
+|26.686MHz  D49-12-1            HM511664  D29-13 D29-12|
+|                     TCO630FDP                        |
+|                               HM511664    68000      |
+|                                                      |
+|             D69-05   TC518128 HM511664 D69-19 D69-18 |
+|J       2088          TC518128         TC15832 TC15832|
+|        2088 D69-04            HM511664               |
+|A       2088                               68681      |
+|   TC0650FDA D69-03     30.47618MHz 16MHz        PAL  |
+|M                                  MB8421             |
+|    D69-11   D69-08  TCO660FCM             MB8421     |
+|M                             D29-15                  |
+|    D69-10   D69-07           D29-14       5510-ESP   |
+|A                    TC51832  TC51832                 |
+|    D69-09   D69-06  D69-15   D69-13   HM511664   5701|
+|                                                      |
+|           MC68EC020 TC51832  TC51832   D53-12 D69-02 |
+|     TCO640FIO       D69-14   D69-20           D69-01 |
+|                                        D29-17-1      |
+|  SW1  93C46 3771                            5505-OTIS|
+|------------------------------------------------------|
+
+Notes:
+      68020 clock    : 15.23809 (30.47618 / 2)
+      68000 clock    : 15.23809 (30.47618 / 2)
+      68681 clocks   : pin2- 500kHz, pin32- 4.000MHz, pin36- 1.000MHz, pin38- 1.000MHz, pin39- 500kHz
+      5505 clock     : 15.23809MHz [30.47618/2]
+      5510 ESP clocks: pin1- 8.000MHz, pins4-6- 2.6686MHz, pins9-10- 29.7623kHz, pin16- 3.8095225MHz
+      VSync          : 59Hz
+      HSync          : 15.97kHz
+
+      D29* /D49* /D53* = PALs
+                         D53-12         PAL16L8B
+                         D29-17-1       PALCE16V8H
+                         D29-14,D29-15  PALCE20V8H
+                         D29-12,D29-11  PALCE20V8H
+                         D29-13         PAL20L8B
+                         PAL.7          PALCE16V8H
+                         D49-12-1       PAL16L8B
+
+      D69-01 to D69-08          16M MASKROM (DIP42)
+      d69-09 to d69-11          8M MASKROM  (DIP42)
+      D69-13 to D69-15/D69-20   27C040 EPROM (DIP32)
+      D69-18/D69-19             27C1001 EPROM (DIP32)
+*/
+
 ROM_START( lightbr )
 	ROM_REGION(0x200000, "main", 0) /* 68020 code */
  	ROM_LOAD32_BYTE("d69-20.bin", 0x000000, 0x80000, CRC(33650fe4) SHA1(df8b775749b1f0f02d0df6141597cc49fb3ae227) )
@@ -2197,6 +2257,91 @@ ROM_START( akkanvdr )
 	ROM_LOAD16_BYTE("e06-04", 0x000000, 0x200000, CRC(1dac29df) SHA1(ed68a41def148dcf4057cfac87a2a563c6882e1d) )	// C8 C9 CA CB
  	ROM_LOAD16_BYTE("e06-05", 0x400000, 0x200000, CRC(f370ff15) SHA1(4bc464d1c3a28326c8b1ae2036387954cb1dd813) )	// CC CD CE CF
 ROM_END
+
+
+/*
+Elevator Action Returns (Asia)
+Taito, 1994
+
+This game runs on Taito F3 System (F3 Motherboard and game cart)
+
+PCB Layout
+----------
+
+Main Board
+NEW F3 MOTHER (ASIA) M20A0001B MOTHER PCB J1100335B
+|------------------------------------------------------|
+| MB87078 51832       D77-07 D77-05                    |
+| MC33274 51832       68000  D77-04            HM511664|
+| TDA1543 D77-08             D77-03  TCO630FDP         |
+|                                              HM511664|
+|    HM511664                                  HM511664|
+|    5510-ESPR5                      TC518128  HM511664|
+|J                    MB8421         TC518128          |
+|                                                      |
+|A       TC0650FDA    MB8421                           |
+|                                                      |
+|M                                   16MHz             |
+|         2088        D77-06                  TC0660FCM|
+|M        2088                       30.4761MHz        |
+|         2088                                         |
+|A                    68681          26.686MHz         |
+|                                                      |
+|  JP3                                          D77-02 |
+|                                                      |
+|                     ENSONIC                          |
+|        TCO640FIO    5701                             |
+|                                               D77-01 |
+|                                51832                 |
+|                                                      |
+|                                51832                 |
+|                  ENSONIC                             |
+|                  5505-OTISR2   51832                 |
+|  SW1  93C46 3771                          68EC020    |
+|                                51832                 |
+|------------------------------------------------------|
+
+Notes:
+      68020 clock    : 15.23809 (30.47618 / 2)
+      68000 clock    : 15.23809 (30.47618 / 2)
+      68681 clocks   : pin2- 500kHz, pin32- 4.000MHz, pin36- 1.000MHz, pin38- 1.000MHz, pin39- 500kHz,
+      5505 clocks    : pin12- 2.6686MHz, pin34- 15.23809MHz,
+      5510 clocks    : pin1- 8.000MHz, pins4-6- 2.6686MHz, pin16- 2.6686MHz
+      VSync          : 59Hz
+      HSync          : 15.78kHz
+
+      D77* = PALs
+
+
+ROM Board
+
+J9100361A ROM PCB (sticker M20A0112A  223101651)
+|-------------------------------------------------------|
+|D77-09  E02-03.12  IC10*  E02-02.8 IC6*  E02-01.4 IC2* |
+|             IC11*    IC9*     IC7*   IC5*    IC3* IC1*|
+|                                                       |
+|                                                       |
+|                                                       |
+|                                                       |
+|                                                       |
+| E02-14.33          D77-15    E02-12.20   E02-10.18    |
+|      E02-13.32  D77-10           E02-11.19   E02-16.17|
+|                                                       |
+|                                                       |
+|                                                       |
+|                                                       |
+|D77-12                                                 |
+|  E02-08.47 E02-07.45 E02-06.43  IC40*  E02-05.39      |
+|      IC46*     IC44*    IC42* IC41*     E02-04.38     |
+|                                               D77-11  |
+|-------------------------------------------------------|
+Notes:
+      *: Unpopulated socket
+      D77* = PALs
+      E02-13/14 = 27C020 EPROMs
+      E02-10/11/12/16 = 27C4001 EPROMs
+      Remainder of ROMs are 42 pin 16M MASK or 8M MASK.
+*/
 
 ROM_START( elvactr )
 	ROM_REGION(0x200000, "main", 0) /* 68020 code */
@@ -3126,6 +3271,48 @@ ROM_START( popnpopu )
 	ROM_LOAD( "palce16v8q-d77-15.ic21", 0x0800, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
+
+/*
+Landmaker
+Taito, 1998
+
+PCB Layouts
+-----------
+
+Top board
+
+TK8X3004A
+NICEB PCB
+|--------------------------------------------------------------|
+| |-----------------|   |-----------------| PAL16L8.24         |
+| |-----------------|   |-----------------|                    |
+|                                                              |
+| |------------------|                                         |
+| |     68000        |   SND-3.46  SND-7.35 SND-11.23 SND-15.11|
+| |                  |   SND-2.45  SND-6.34 SND-10.22 SND-14.10|
+| |------------------|   SND-1.44  SND-5.33 SND-9.21  SND-13.9 |
+|                        SND-0.43  SND-4.32 SND-8.20  SND-12.8 |
+| SPRO-1.66  PAL16L8.58  SCR3-0.42                             |
+| SPRO-0.65  PAL16L8.57  SCR3-1.41                             |
+| PAL16L8.64             SCR3-2.40                             |
+|                        SCR3-3.39                             |
+|                        SCR3-4.38                             |
+| MPRO-0.63              SCR3-5.37                             |
+| MPRO-1.62                                                    |
+| MPRO-2.61                                                    |
+| MPRO-3.60     |---------|    |---------|                     |
+|               |MC68EC020|    |         |                     |
+| PAL16L8.59    |RP25     |    |    *    |                     |
+|               |         |    |         |                     |
+|               |         |    |         |                     |
+|               |---------|    |---------|                     |
+| |-----------------|   |-----------------|                    |
+| |-----------------|   |-----------------|                    |
+|--------------------------------------------------------------|
+Notes:
+      * - Empty PGA socket
+*/
+
 ROM_START( landmakr )
 	ROM_REGION(0x200000, "main", 0) /* 68020 code */
  	ROM_LOAD32_BYTE("e61-13.20", 0x000000, 0x80000, CRC(0af756a2) SHA1(2dadac6873f2491ee77703f07f00dde2aa909355) )
@@ -3464,13 +3651,13 @@ static DRIVER_INIT( bubsymph )
 
 static READ32_HANDLER( bubsympb_oki_r )
 {
-	return OKIM6295_status_0_r(machine,0);
+	return okim6295_status_0_r(machine,0);
 }
 static WRITE32_HANDLER( bubsympb_oki_w )
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) OKIM6295_data_0_w(machine,0,data&0xff);
-	//if (mem_mask==0x000000ff) OKIM6295_data_0_w(machine,0,data&0xff);
+	if (ACCESSING_BITS_0_7) okim6295_data_0_w(machine,0,data&0xff);
+	//if (mem_mask==0x000000ff) okim6295_data_0_w(machine,0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
 		UINT8 *snd = memory_region(machine, "oki");

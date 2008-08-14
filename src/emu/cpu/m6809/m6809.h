@@ -1,13 +1,17 @@
 /*** m6809: Portable 6809 emulator ******************************************/
 
-#ifndef _M6809_H
-#define _M6809_H
+#pragma once
+
+#ifndef __M6809_H__
+#define __M6809_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	M6809_PC=1, M6809_S, M6809_CC ,M6809_A, M6809_B, M6809_U, M6809_X, M6809_Y,
-	M6809_DP };
+	M6809_DP
+};
 
 #define M6809_IRQ_LINE	0	/* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
@@ -47,4 +51,4 @@ void m6809e_get_info(UINT32 state, cpuinfo *info);
 #    define TRUE (!FALSE)
 #endif
 
-#endif /* _M6809_H */
+#endif /* __M6809_H__ */

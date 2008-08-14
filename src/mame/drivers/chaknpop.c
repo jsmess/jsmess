@@ -44,8 +44,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_READ(chaknpop_mcu_portA_r)
 	AM_RANGE(0x8801, 0x8801) AM_READ(chaknpop_mcu_portB_r)
 	AM_RANGE(0x8802, 0x8802) AM_READ(chaknpop_mcu_portC_r)
-	AM_RANGE(0x8805, 0x8805) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x8807, 0x8807) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x8805, 0x8805) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x8807, 0x8807) AM_READ(ay8910_read_port_1_r)
 	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSWC")
 	AM_RANGE(0x8809, 0x8809) AM_READ_PORT("P1")
 	AM_RANGE(0x880a, 0x880a) AM_READ_PORT("SYSTEM")
@@ -64,10 +64,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(chaknpop_mcu_portA_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(chaknpop_mcu_portB_w)
 	AM_RANGE(0x8802, 0x8802) AM_WRITE(chaknpop_mcu_portC_w)
-	AM_RANGE(0x8804, 0x8804) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8805, 0x8805) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x8806, 0x8806) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8807, 0x8807) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x8804, 0x8804) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8805, 0x8805) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x8806, 0x8806) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8807, 0x8807) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0x880c, 0x880c) AM_WRITE(chaknpop_gfxmode_w)
 	AM_RANGE(0x880D, 0x880D) AM_WRITE(coinlock_w)			// coin lock out
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(chaknpop_txram_w) AM_BASE(&chaknpop_txram)
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_BANK1)			// bitmap plane 1-4
 ADDRESS_MAP_END
 
-static const struct AY8910interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -87,7 +87,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

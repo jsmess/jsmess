@@ -165,7 +165,7 @@ static void renegade_adpcm_callback(void *param, stream_sample_t **inputs, strea
 	}
 }
 
-static void *renegade_adpcm_start(int clock, const struct CustomSound_interface *config)
+static void *renegade_adpcm_start(int clock, const custom_sound_interface *config)
 {
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;
@@ -556,7 +556,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(YM3526_status_port_0_r)
+	AM_RANGE(0x2801, 0x2801) AM_READ(ym3526_status_port_0_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -564,8 +564,8 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP) // this gets written the same values as 0x2000
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(YM3526_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(ym3526_control_port_0_w)
+	AM_RANGE(0x2801, 0x2801) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP) /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -770,12 +770,12 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, linestate);
 }
 
-static const struct YM3526interface ym3526_interface =
+static const ym3526_interface ym3526_config =
 {
 	irqhandler
 };
 
-static const struct CustomSound_interface adpcm_interface =
+static const custom_sound_interface adpcm_interface =
 {
 	renegade_adpcm_start
 };
@@ -819,7 +819,7 @@ static MACHINE_DRIVER_START( renegade )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3526, 12000000/4)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("adpcm", CUSTOM, 8000)

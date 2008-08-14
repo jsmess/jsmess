@@ -22,7 +22,12 @@ standard Konami sound hardware of that era (slave Z80 + 2xAY-3-8910).
 Also, the Konami design includes an optional starfield generator, only used
 by Tactician.
 
-Rally X has a chip that appears to be DIP28 Fujitsu MB884x with 2K internal ROM stamped NVC285
+Rally X has two Namco customs. They are nothing more than simple logic and can
+be replaced by daughter boards with TTL parts.
+NVC285 (DIP28): Z-80 Sync buss controller. Can be replaced by plug-in board
+A082-91383-B000
+NVC293 (DIP18): Video shifter. Can be replaced by plug-in board A082-91388-A000.
+
 
 Rally X Memory map:
 ------------------
@@ -816,7 +821,7 @@ static GFXDECODE_START( jungler )
 GFXDECODE_END
 
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	3,				/* number of voices */
 	0				/* stereo */
@@ -829,7 +834,7 @@ static const char *const rallyx_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface rallyx_samples_interface =
 {
 	1,	/* 1 channel */
 	rallyx_sample_names
@@ -866,11 +871,11 @@ static MACHINE_DRIVER_START( rallyx )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(rallyx_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

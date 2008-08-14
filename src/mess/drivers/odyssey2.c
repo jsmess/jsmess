@@ -157,7 +157,7 @@ static GFXDECODE_START( odyssey2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
 
-static const struct sp0256_interface the_voice_sp0256 = {
+static const sp0256_interface the_voice_sp0256 = {
 	the_voice_lrq_callback,
 	0
 };

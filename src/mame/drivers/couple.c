@@ -119,7 +119,7 @@ static WRITE8_HANDLER( merit_prot_w )
 }
 
 #if 0
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	input_port_4_r,
 };
@@ -164,8 +164,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merit_io, ADDRESS_SPACE_IO, 8 )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc10c, 0xc10c) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 static PALETTE_INIT( couple )
@@ -386,7 +386,7 @@ static MACHINE_DRIVER_START( couple )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 4000000)
-//  MDRV_SOUND_CONFIG(ay8910_interface)
+//  MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

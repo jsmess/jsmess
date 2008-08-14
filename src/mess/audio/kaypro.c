@@ -48,7 +48,7 @@ static void kaypro_sound_update(void *param,stream_sample_t **inputs, stream_sam
 }
 
 
-static int kaypro_sh_start(int clock, const struct CustomSound_interface *config)
+static int kaypro_sh_start(int clock, const custom_sound_interface *config)
 {
 	channel = stream_create(0, 1, Machine->sample_rate, 0, kaypro_sound_update);
 	return 0;

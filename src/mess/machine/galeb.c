@@ -31,5 +31,5 @@ READ8_HANDLER( galeb_keyboard_r )
 
 WRITE8_HANDLER( galeb_speaker_w )
 {	 
-	DAC_data_w(0,data);
+	dac_data_w(0,data);
 }

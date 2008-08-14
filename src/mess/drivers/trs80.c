@@ -345,7 +345,7 @@ GFXDECODE_END
 
 static const INT16 speaker_levels[3] = {0.0*32767,0.46*32767,0.85*32767};
 
-static const struct Speaker_interface speaker_interface =
+static const speaker_interface trs80_speaker_interface =
 {
 	3,				/* optional: number of different levels */
 	speaker_levels	/* optional: level lookup table */
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( level1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-	MDRV_SOUND_CONFIG(speaker_interface)
+	MDRV_SOUND_CONFIG(trs80_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */

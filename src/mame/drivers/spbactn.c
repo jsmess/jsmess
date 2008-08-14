@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(SMH_NOP)	/* irq ack ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -209,9 +209,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0xf810, 0xf810) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xf811, 0xf811) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xf810, 0xf810) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xf811, 0xf811) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(SMH_NOP)	/* irq ack ?? */
 ADDRESS_MAP_END
 
@@ -346,7 +346,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( spbactn )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)

@@ -157,10 +157,6 @@ static MACHINE_RESET( megasys1_hachoo )
                         [ Main CPU - System A / Z ]
 ***************************************************************************/
 
-static READ16_HANDLER( coins_r )	{return input_port_read(machine, "IN0");}		// < 00 | Coins >
-static READ16_HANDLER( player1_r )	{return input_port_read(machine, "IN1");}		// < 00 | Player 1 >
-static READ16_HANDLER( player2_r )	{return input_port_read(machine, "IN2") * 256 +
-									        input_port_read(machine, "IN3");}		// < Reserve | Player 2 >
 static READ16_HANDLER( dsw1_r )		{return input_port_read(machine, "DSW1");}		//   DSW 1
 static READ16_HANDLER( dsw2_r )		{return input_port_read(machine, "DSW2");}		//   DSW 2
 static READ16_HANDLER( dsw_r )		{return input_port_read(machine, "DSW1") * 256 +
@@ -182,9 +178,9 @@ static INTERRUPT_GEN( interrupt_A )
 static ADDRESS_MAP_START( readmem_A, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x080001) AM_READ(coins_r)
-	AM_RANGE(0x080002, 0x080003) AM_READ(player1_r)
-	AM_RANGE(0x080004, 0x080005) AM_READ(player2_r)
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("P1")
+	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P2")
 	AM_RANGE(0x080006, 0x080007) AM_READ(dsw_r)
 	AM_RANGE(0x080008, 0x080009) AM_READ(soundlatch2_word_r)	/* from sound cpu */
 	AM_RANGE(0x084000, 0x084fff) AM_READ(SMH_RAM)
@@ -256,9 +252,9 @@ static READ16_HANDLER( ip_select_r )
 
 	switch (i)
 	{
-			case 0 :	return coins_r(machine,0,0xffff);	break;
-			case 1 :	return player1_r(machine,0,0xffff);	break;
-			case 2 :	return player2_r(machine,0,0xffff);	break;
+			case 0 :	return input_port_read(machine, "SYSTEM");	break;
+			case 1 :	return input_port_read(machine, "P1");	break;
+			case 2 :	return input_port_read(machine, "P2");	break;
 			case 3 :	return dsw1_r(machine,0,0xffff);	break;
 			case 4 :	return dsw2_r(machine,0,0xffff);	break;
 			default	 :	return 0x0006;
@@ -357,8 +353,8 @@ static ADDRESS_MAP_START( readmem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_READ(SMH_RAM)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(dsw_r)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(coins_r) /* Coins + P1&P2 Buttons */
-	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(okim6295_status_0_lsb_r)
 //  { 0x100000, 0x100001  protection
 	AM_RANGE(0x1f0000, 0x1fffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -371,7 +367,7 @@ static ADDRESS_MAP_START( writemem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d4000, 0x0d7fff) AM_WRITE(megasys1_scrollram_2_w) AM_BASE(&megasys1_scrollram[2])
 	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_WRITE(megasys1_scrollram_0_w) AM_BASE(&megasys1_scrollram[0])
-	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(okim6295_data_0_lsb_w)
 //  { 0x100000, 0x100001  protection
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(SMH_RAM) AM_BASE(&megasys1_ram)
 ADDRESS_MAP_END
@@ -449,7 +445,7 @@ static READ16_HANDLER( oki_status_0_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return OKIM6295_status_0_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_0_lsb_r(machine,offset,mem_mask);
 }
 
 static READ16_HANDLER( oki_status_1_r )
@@ -457,7 +453,7 @@ static READ16_HANDLER( oki_status_1_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return OKIM6295_status_1_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_1_lsb_r(machine,offset,mem_mask);
 }
 
 /***************************************************************************
@@ -468,7 +464,7 @@ static READ16_HANDLER( oki_status_1_r )
 static ADDRESS_MAP_START( sound_readmem_A, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
-	AM_RANGE(0x080002, 0x080003) AM_READ(YM2151_status_port_0_lsb_r)
+	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(oki_status_0_r)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(oki_status_1_r)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ(SMH_RAM)
@@ -477,10 +473,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem_A, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(OKIM6295_data_1_lsb_w)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w)
+	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -498,7 +494,7 @@ static ADDRESS_MAP_START( sound_readmem_B, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)	/* from main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_READ(soundlatch_word_r)	/* from main cpu */
-	AM_RANGE(0x080002, 0x080003) AM_READ(YM2151_status_port_0_lsb_r)
+	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(oki_status_0_r)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(oki_status_1_r)
 	AM_RANGE(0x0e0000, 0x0effff) AM_READ(SMH_RAM)
@@ -508,10 +504,10 @@ static ADDRESS_MAP_START( sound_writemem_B, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM	)
 	AM_RANGE(0x040000, 0x040001) AM_WRITE(soundlatch2_word_w)	/* to main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	/* to main cpu */
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(OKIM6295_data_1_lsb_w)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w)
+	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w)
 	AM_RANGE(0x0e0000, 0x0effff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -541,13 +537,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -608,7 +604,7 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	megasys1_sound_irq
 };
@@ -646,7 +642,7 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
@@ -774,7 +770,7 @@ static void irq_handler(running_machine *machine, int irq)
 }
 
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -813,7 +809,7 @@ static MACHINE_DRIVER_START( system_Z )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -941,14 +937,15 @@ ROM_END
 
 
 static INPUT_PORTS_START( 64street )
+	PORT_START("SYSTEM")
 	COINS
-//  fire    jump
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)
-	PORT_START("IN2")
-	RESERVE				// Unused
-	PORT_START("IN3")
+
+	PORT_START("P1")
+	JOY_2BUTTONS(1)		//  fire    jump
+
+	PORT_START("P2")
 	JOY_2BUTTONS(2)
+	RESERVE				// Unused
 
 	PORT_START("DSW1")
 	COINAGE_8BITS
@@ -974,7 +971,6 @@ static INPUT_PORTS_START( 64street )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
 INPUT_PORTS_END
 
 
@@ -1077,14 +1073,15 @@ ROM_END
 
 
 static INPUT_PORTS_START( astyanax )
-	COINS						/* IN0 0x80001.b */
-//  fire    jump    magic
-	PORT_START("IN1")
-	JOY_3BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_3BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
+
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_3BUTTONS(1)		//  fire    jump    magic
+
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_3BUTTONS(2)
+	RESERVE
 
 	PORT_START("DSW1") /* 0x80006.b */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
@@ -1328,13 +1325,15 @@ ROM_END
 
 
 static INPUT_PORTS_START( avspirit )
+	PORT_START("SYSTEM")
 	COINS
-	PORT_START("IN1")
+
+	PORT_START("P1")
 	JOY_2BUTTONS(1)
-	PORT_START("IN2")
-	RESERVE
-	PORT_START("IN3")
+
+	PORT_START("P2")
 	JOY_2BUTTONS(2)
+	RESERVE
 
 	PORT_START("DSW1")
 	COINAGE_8BITS
@@ -1427,14 +1426,15 @@ ROM_END
 
 
 static INPUT_PORTS_START( bigstrik )
+	PORT_START("SYSTEM")
 	COINS
-//  pass    shoot   feint
-	PORT_START("IN1")
-	JOY_3BUTTONS(1)
-	PORT_START("IN2")
-	RESERVE
-	PORT_START("IN3")
+
+	PORT_START("P1")
+	JOY_3BUTTONS(1)		//  pass    shoot   feint
+
+	PORT_START("P2")
 	JOY_3BUTTONS(2)
+	RESERVE
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
@@ -1545,15 +1545,15 @@ ROM_START( chimerab )
 ROM_END
 
 static INPUT_PORTS_START( chimerab )
-
+	PORT_START("SYSTEM")
 	COINS
-//  fire    jump    unused?(shown in service mode, but not in instructions)
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)
-	PORT_START("IN2")
-	RESERVE				// Unused
-	PORT_START("IN3")
+
+	PORT_START("P1")
+	JOY_2BUTTONS(1)		//  fire    jump    unused?(shown in service mode, but not in instructions)
+
+	PORT_START("P2")
 	JOY_2BUTTONS(2)
+	RESERVE				// Unused
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
@@ -1579,7 +1579,6 @@ static INPUT_PORTS_START( chimerab )
 
 	PORT_START("DSW2")
 	COINAGE_8BITS
-
 INPUT_PORTS_END
 
 
@@ -1671,17 +1670,17 @@ ROM_START( cybattlr )
 ROM_END
 
 static INPUT_PORTS_START( cybattlr )
-
+	PORT_START("SYSTEM")
 	COINS
-//  fire    sword
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)
-	PORT_START("IN2")
-	RESERVE				// Unused
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)
 
-	PORT_START("DSW1") /*1fd2d9.b, !1fd009.b */
+	PORT_START("P1")
+	JOY_2BUTTONS(1)		//  fire    sword
+
+	PORT_START("P2")
+	JOY_2BUTTONS(2)
+	RESERVE				// Unused
+
+	PORT_START("DSW1")		/*1fd2d9.b, !1fd009.b */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -1705,7 +1704,7 @@ static INPUT_PORTS_START( cybattlr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")			/* 1fd2d7.b, !1fd007.b */
+	PORT_START("DSW2")		/* 1fd2d7.b, !1fd007.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -1830,14 +1829,15 @@ ROM_START( edfu )
 ROM_END
 
 static INPUT_PORTS_START( edf )
+	PORT_START("SYSTEM")
 	COINS
-//  fire    unfold_weapons
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)
-	PORT_START("IN2")
-	RESERVE
-	PORT_START("IN3")
+
+	PORT_START("P1")
+	JOY_2BUTTONS(1)		//  fire    unfold_weapons
+
+	PORT_START("P2")
 	JOY_2BUTTONS(2)
+	RESERVE
 
 	PORT_START("DSW1")
 	COINAGE_6BITS
@@ -1870,7 +1870,6 @@ static INPUT_PORTS_START( edf )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -1930,16 +1929,17 @@ ROM_END
 
 
 static INPUT_PORTS_START( hachoo )
-	COINS						/* 0x80001.b */
-//  fire    jump
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  fire    jump
+
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1948,7 +1948,7 @@ static INPUT_PORTS_START( hachoo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) /* Manual states dips 1-4 & 6 are "Unused" */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1972,7 +1972,6 @@ static INPUT_PORTS_START( hachoo )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -2051,38 +2050,38 @@ ROM_START( hayaosi1 )
 ROM_END
 
 static INPUT_PORTS_START( hayaosi1 )
-	PORT_START("IN0")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START1   )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_SERVICE_NO_TOGGLE(  0x08, IP_ACTIVE_LOW )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_START3   )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN2    )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	RESERVE
-
-	PORT_START("IN3")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	COINAGE_8BITS
@@ -2208,17 +2207,17 @@ ROM_END
 
 
 static INPUT_PORTS_START( kazan )
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	COINS						/* IN0 0x80001.b */
-//  fire    jump
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  fire    jump
 
-	PORT_START("DSW1") 			/* 0x80006.b */
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1") 	/* 0x80006.b */
 	COINAGE_6BITS
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -2227,7 +2226,7 @@ static INPUT_PORTS_START( kazan )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -2250,7 +2249,6 @@ static INPUT_PORTS_START( kazan )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -2313,17 +2311,17 @@ ROM_END
 
 
 static INPUT_PORTS_START( jitsupro )
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	COINS						/* 0x80001.b */
-	//  shoot   change view     change bat
-	PORT_START("IN1")
-	JOY_3BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_3BUTTONS(2)	/* 0x80005.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_3BUTTONS(1)		//  shoot   change view     change bat
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_3BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -2332,7 +2330,7 @@ static INPUT_PORTS_START( jitsupro )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x01, 0x01, "2 Player Innings per Credit" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -2438,16 +2436,17 @@ ROM_START( kickoff )
 ROM_END
 
 static INPUT_PORTS_START( kickoff )
-	COINS						/* 0x80001.b ->  !f0008/a.w  */
-//  shoot   pass
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b ->  !f000c/e.w  */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b --> !f0010/11.w */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b ->  !f0008/a.w  */
+	COINS
 
-	PORT_START("DSW1") /* 0x80006.b */
+	PORT_START("P1")	/* 0x80003.b ->  !f000c/e.w  */
+	JOY_2BUTTONS(1)		//  shoot   pass
+
+	PORT_START("P2")	/* 0x80004.b --> !f0010/11.w */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -2473,7 +2472,7 @@ static INPUT_PORTS_START( kickoff )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )	// show "Japan Only" warning
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x03, "Time" )	// -> !f0082.w
 	PORT_DIPSETTING(    0x03, "3'" )
 	PORT_DIPSETTING(    0x02, "4'" )
@@ -2496,7 +2495,6 @@ static INPUT_PORTS_START( kickoff )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -2557,16 +2555,17 @@ ROM_START( makaiden )
 ROM_END
 
 static INPUT_PORTS_START( lomakai )
-	COINS						/* 0x80001.b */
-//  fire    jump
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  fire    jump
+
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS_2
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -2575,7 +2574,7 @@ static INPUT_PORTS_START( lomakai )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -2598,7 +2597,6 @@ static INPUT_PORTS_START( lomakai )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -2739,17 +2737,17 @@ ROM_START( p47j )
 ROM_END
 
 static INPUT_PORTS_START( p47 )
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	COINS						/* 0x80001.b */
-//  fire    bomb
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  fire    bomb
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS_2
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2758,7 +2756,7 @@ static INPUT_PORTS_START( p47 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -2781,7 +2779,6 @@ static INPUT_PORTS_START( p47 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -2906,38 +2903,36 @@ ROM_START( peekaboo )
 	ROM_LOAD( "priority.69",    0x000000, 0x200, CRC(b40bff56) SHA1(39c95eed79328ef2df754988db83e07909e848f8) )
 ROM_END
 
-static INPUT_PORTS_START( peekaboo )
-
-	PORT_START("IN0")		/* COINS + P1&P2 Buttons - .b */
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN3 )		// called "service"
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN4 )		// called "test"
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )		// called "stage clear"
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 )		// called "option"
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 #define PEEKABOO_PADDLE(_FLAG_)	\
 	PORT_BIT( 0x00ff, 0x0080, IPT_PADDLE ) PORT_PLAYER(_FLAG_) PORT_MINMAX(0x0018,0x00e0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 
-	PORT_START("IN1")      	/* paddle p1 */
+static INPUT_PORTS_START( peekaboo )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN3 )		// called "service"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )		// called "test"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )		// called "stage clear"
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 )		// called "option"
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1")
 	PEEKABOO_PADDLE(1)
 
-	PORT_START("IN2")
-	RESERVE				/* fake port */
-	PORT_START("IN3")      	/* paddle p2 */
+	PORT_START("P2")
 	PEEKABOO_PADDLE(2) PORT_COCKTAIL
+	RESERVE
 
-	PORT_START("DSW1")			/* 1f003a.b<-e0000.b */
+	PORT_START("DSW1")	/* 1f003a.b<-e0000.b */
 	COINAGE_6BITS_2
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )		// 1f0354<-
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2946,7 +2941,7 @@ static INPUT_PORTS_START( peekaboo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 1f003b.b<-e0001.b */
+	PORT_START("DSW2")	/* 1f003b.b<-e0001.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )				// 1f0358<-!
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -2967,7 +2962,6 @@ static INPUT_PORTS_START( peekaboo )
 	PORT_DIPNAME( 0x80, 0x80, "Number of controllers" )	// 1f0074<-!
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-
 INPUT_PORTS_END
 
 
@@ -2980,8 +2974,8 @@ static READ16_HANDLER( protection_peekaboo_r )
 	switch (protection_val)
 	{
 		case 0x02:	return 0x03;
-		case 0x51:	return player1_r(machine,0,0xffff);
-		case 0x52:	return player2_r(machine,0,0xffff);
+		case 0x51:	return input_port_read(machine, "P1");
+		case 0x52:	return input_port_read(machine, "P2");
 		default:	return protection_val;
 	}
 }
@@ -3064,16 +3058,17 @@ ROM_START( plusalph )
 ROM_END
 
 static INPUT_PORTS_START( plusalph )
-	COINS						/* IN0 0x80001.b */
-//  fire    bomb
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  fire    bomb
+
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -3082,7 +3077,7 @@ static INPUT_PORTS_START( plusalph )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -3105,7 +3100,6 @@ static INPUT_PORTS_START( plusalph )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -3256,24 +3250,24 @@ ROM_END
 
 
 static INPUT_PORTS_START( rodland )
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	COINS						/* 0x80001.b */
-//  fire    ladder
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  fire    ladder
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) /* according to manual */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3296,7 +3290,6 @@ static INPUT_PORTS_START( rodland )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -3353,16 +3346,17 @@ ROM_START( stdragon )
 ROM_END
 
 static INPUT_PORTS_START( stdragon )
-	COINS						/* 0x80001.b */
-//  fire    fire
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  fire    fire
+
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS_2
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -3371,7 +3365,7 @@ static INPUT_PORTS_START( stdragon )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -3394,7 +3388,6 @@ static INPUT_PORTS_START( stdragon )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -3445,23 +3438,24 @@ ROM_START( soldamj )
 ROM_END
 
 static INPUT_PORTS_START( soldamj )
-	COINS						/* 0x80001.b */
-	//  turn    turn    (3rd button is shown in service mode, but seems unused)
-	PORT_START("IN1")
-	JOY_2BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_2BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_2BUTTONS(1)		//  turn    turn    (3rd button is shown in service mode, but seems unused)
+
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_2BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS_2
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On )  )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy )   )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -3484,7 +3478,6 @@ static INPUT_PORTS_START( soldamj )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On )  )
-
 INPUT_PORTS_END
 
 static READ16_HANDLER( soldamj_spriteram16_r )
@@ -3583,16 +3576,17 @@ ROM_START( tshingna )
 ROM_END
 
 static INPUT_PORTS_START( tshingen )
-	COINS						/* 0x80001.b */
-	// sword_left   sword_right     jump
-	PORT_START("IN1")
-	JOY_3BUTTONS(1)	/* 0x80003.b */
-	PORT_START("IN2")
-	RESERVE						/* 0x80004.b */
-	PORT_START("IN3")
-	JOY_3BUTTONS(2)	/* 0x80005.b */
+	PORT_START("SYSTEM")	/* 0x80001.b */
+	COINS
 
-	PORT_START("DSW1")			/* 0x80006.b */
+	PORT_START("P1")	/* 0x80003.b */
+	JOY_3BUTTONS(1)		// sword_left   sword_right     jump
+
+	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
+	JOY_3BUTTONS(2)
+	RESERVE
+
+	PORT_START("DSW1")	/* 0x80006.b */
 	COINAGE_6BITS
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -3601,7 +3595,7 @@ static INPUT_PORTS_START( tshingen )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On )  )
 
-	PORT_START("DSW2")			/* 0x80007.b */
+	PORT_START("DSW2")	/* 0x80007.b */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -3612,18 +3606,17 @@ static INPUT_PORTS_START( tshingen )
 	PORT_DIPSETTING(    0x04, "30k" )
 	PORT_DIPSETTING(    0x08, "40k" )
 	PORT_DIPSETTING(    0x00, "50k" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) ) // damage when hit
-	PORT_DIPSETTING(    0x30, DEF_STR( Easy )    ) // 0
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal )  ) // 1
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard )    ) // 2
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) ) // 3
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )	// damage when hit
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy )    )		// 0
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal )  )		// 1
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard )    )		// 2
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		// 3
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On )  )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On )  )
-
 INPUT_PORTS_END
 
 
@@ -3906,15 +3899,15 @@ static DRIVER_INIT( iganinju )
 								// not like lev 3 interrupts
 }
 
-static WRITE16_HANDLER( OKIM6295_data_0_both_w )
+static WRITE16_HANDLER( okim6295_data_0_both_w )
 {
-	if (ACCESSING_BITS_0_7)	OKIM6295_data_0_w(machine, 0, (data >> 0) & 0xff );
-	else				OKIM6295_data_0_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_0_w(machine, 0, (data >> 0) & 0xff );
+	else				okim6295_data_0_w(machine, 0, (data >> 8) & 0xff );
 }
-static WRITE16_HANDLER( OKIM6295_data_1_both_w )
+static WRITE16_HANDLER( okim6295_data_1_both_w )
 {
-	if (ACCESSING_BITS_0_7)	OKIM6295_data_1_w(machine, 0, (data >> 0) & 0xff );
-	else				OKIM6295_data_1_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_1_w(machine, 0, (data >> 0) & 0xff );
+	else				okim6295_data_1_w(machine, 0, (data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )
@@ -3930,8 +3923,8 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xa0003, 0, 0, OKIM6295_data_0_both_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc0003, 0, 0, OKIM6295_data_1_both_w);
+	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xa0003, 0, 0, okim6295_data_0_both_w);
+	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc0003, 0, 0, okim6295_data_1_both_w);
 }
 
 static DRIVER_INIT( peekaboo )

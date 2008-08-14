@@ -704,7 +704,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_coin_w(machine, offset, data & 0xff);
-		OKIM6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
+		okim6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -1044,7 +1044,7 @@ static WRITE16_HANDLER( oki_bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
+		okim6295_set_bank_base(0, (data & 1) * 0x40000);
 	}
 }
 
@@ -1495,8 +1495,8 @@ static ADDRESS_MAP_START( kbash2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x200020, 0x200021) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w)
-	AM_RANGE(0x200024, 0x200025) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x200020, 0x200021) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
+	AM_RANGE(0x200024, 0x200025) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x200028, 0x200029) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x20002c, 0x20002d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
@@ -1528,9 +1528,9 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("IN1")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN2")
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("SYS")
-	AM_RANGE(0x700010, 0x700011) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x700014, 0x700015) AM_WRITE(YM2151_register_port_0_lsb_w)
-	AM_RANGE(0x700016, 0x700017) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
+	AM_RANGE(0x700010, 0x700011) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x700014, 0x700015) AM_WRITE(ym2151_register_port_0_lsb_w)
+	AM_RANGE(0x700016, 0x700017) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_data_port_0_lsb_w)
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
 ADDRESS_MAP_END
 
@@ -1632,7 +1632,7 @@ static ADDRESS_MAP_START( fixeighb_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSWB")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x200014, 0x200015) AM_WRITE(fixeighb_oki_bankswitch_w)	/* Sound banking. Code at $4084c, $5070 */
-	AM_RANGE(0x200018, 0x200019) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x200018, 0x200019) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x20001c, 0x20001d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1767,9 +1767,9 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(YM2151_register_port_0_lsb_w)
-	AM_RANGE(0x500002, 0x500003) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
-	AM_RANGE(0x600000, 0x600001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(ym2151_register_port_0_lsb_w)
+	AM_RANGE(0x500002, 0x500003) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_data_port_0_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("JMPR")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSWB")
@@ -1928,17 +1928,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&toaplan2_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3812_write_port_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raizing_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xe004, 0xe004) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0xe004, 0xe004) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(toaplan2_coin_w)
 ADDRESS_MAP_END
 
@@ -1947,9 +1947,9 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xe004, 0xe004) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0xe004, 0xe004) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(raizing_okim6295_bankselect_0)
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(raizing_okim6295_bankselect_1)
 	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(bgaregga_bankswitch_w)
@@ -1974,10 +1974,10 @@ static ADDRESS_MAP_START( batrider_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0x82, 0x82) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
-	AM_RANGE(0x84, 0x84) AM_READWRITE(OKIM6295_status_1_r, OKIM6295_data_1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x81, 0x81) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x82, 0x82) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x84, 0x84) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
 	AM_RANGE(0x88, 0x88) AM_WRITE(batrider_bankswitch_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(raizing_okim6295_bankselect_0)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(raizing_okim6295_bankselect_1)
@@ -2001,8 +2001,8 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YMZ280B_register_0_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE(YMZ280B_status_0_r, YMZ280B_data_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ymz280b_register_0_w)
+	AM_RANGE(0x81, 0x81) AM_READWRITE(ymz280b_status_0_r, ymz280b_data_0_w)
 ADDRESS_MAP_END
 
 
@@ -2022,9 +2022,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 //  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
-	AM_RANGE(0x04000, 0x04000) AM_READWRITE(YM2151_status_port_0_r, YM2151_register_port_0_w)
-	AM_RANGE(0x04001, 0x04001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x04002, 0x04002) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x04000, 0x04000) AM_READWRITE(ym2151_status_port_0_r, ym2151_register_port_0_w)
+	AM_RANGE(0x04001, 0x04001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x04002, 0x04002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 //  AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
 	AM_RANGE(0x0400a, 0x0400a) AM_READ_PORT("IN2")
@@ -2053,8 +2053,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x00000) AM_WRITE( YM2151_register_port_0_w )
-	AM_RANGE(0x00001, 0x00001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x00000, 0x00000) AM_WRITE( ym2151_register_port_0_w )
+	AM_RANGE(0x00001, 0x00001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 
 	AM_RANGE(0x07800, 0x07fff) AM_RAM AM_SHARE(6)
 
@@ -3413,12 +3413,12 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
 
-static const struct YMZ280Binterface ymz280b_interface =
+static const ymz280b_interface ymz280b_config =
 {
 	bbakraid_irqhandler
 };
@@ -3460,7 +3460,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3698,7 +3698,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)			/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3738,7 +3738,7 @@ static MACHINE_DRIVER_START( whoopee )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3777,7 +3777,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3910,7 +3910,7 @@ static void batsugun_ym2151_irqhandler(running_machine *machine, int linestate)
 //  update_irq_lines(machine, linestate ? assert : clear);
 }
 
-static const struct YM2151interface batsugun_ym2151_interface =
+static const ym2151_interface batsugun_ym2151_interface =
 {
 	batsugun_ym2151_irqhandler
 };
@@ -4203,7 +4203,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_CONFIG(ymz280b_interface)
+	MDRV_SOUND_CONFIG(ymz280b_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -4317,6 +4317,46 @@ ROM_START( kbash )
 	ROM_LOAD( "kbash07.bin", 0x00000, 0x40000, CRC(3732318f) SHA1(f0768459f5ad2dee53d408a0a5ae3a314864e667) )
 ROM_END
 
+
+/*
+Knuckle Bash 2
+This is a hacked version of Knuckle Bash on bootleg/Korean/Chinese
+hardware showing (C)Toaplan 1999 Licensed to Charterfield
+
+PCB Layout
+----------
+
+|--------------------------------------------|
+|UPC1241  EPROM  MECAT-S                     |
+|  LM324                                     |
+|        M6295  M6295                        |
+| PAL   62256                      M5M51008  |
+|       62256    MECAT-M           M5M51008  |
+|        6116                      M5M51008  |
+|J       6116         14.31818MHz  M5M51008  |
+|A             68000                         |
+|M                    16MHz                  |
+|M                  PAL                      |
+|A             PAL                           |
+|        |-------|                           |
+|        |ACTEL  |         PAL               |
+|        |A40MX04|         PAL               |
+|        |       |                           |
+|   DSW1 |-------|         050917-10         |
+|        |ACTEL  |                           |
+|   DSW2 |A40MX04| MECAT-12                  |
+|62256   |       |                           |
+|62256   |-------| MECAT-34                  |
+|--------------------------------------------|
+Notes:
+      68000 clock 16.000MHz
+      M6295 clock 1.000MHz [16/16]. Sample rate (Hz) 16000000/16/132
+      M5M51008 - Mitsubishi M5M51008 128k x8 SRAM (SOP32)
+      62256    - 32k x8 SRAM
+      6116     - 2k x8 SRAM
+      VSync 60Hz
+      HSync 15.68kHz
+*/
 
 ROM_START( kbash2 )
 	ROM_REGION( 0x80000, "main", 0 )			/* Main 68K code */
@@ -4877,6 +4917,54 @@ ROM_START( batridrk )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
+
+/*
+Battle Bakraid
+Raizing/8ing, 1999
+
+PCB Layout
+----------
+
+ET68-V99
+|-----------------------------------------------------|
+|TA8201  16.93MHz     ROM-6                   6264    |
+|  YAC516                                             |
+|       YMZ280B-F     ROM-7               SND_U0720   |
+|                                                     |
+| VOL                 ROM-8                 Z80       |
+|                                                     |
+|                   341256                            |
+|                                               93C66 |
+|                   341256               XILINX       |
+|J                                       XC95108      |
+|A                  27MHz     32MHz                   |
+|M                                                    |
+|M          DIPSW1                      341256  341256|
+|A                  XILINX    XILINK                  |
+|           DIPSW2  XC95144   XC95108   341256  341256|
+|                                                     |
+|           DIPSW3                                    |
+|                                MACH211    PRG1_U023 |
+| TEST_SW            68000                            |
+|                                           PRG0_U022 |
+|                                                     |
+|                                           PRG3_U024 |
+|                             L7A0498                 |
+|                             GP9001        PRG2_U021 |
+| ROM-0       ROM-1           (QFP208)                |
+|                                                     |
+|                               6264       MN414260   |
+| ROM-2       ROM-3                                   |
+|                               6264       MN414260   |
+|-----------------------------------------------------|
+Notes:
+      ROM-0 to ROM-3 - 32M DIP42
+      ROM-6 to ROM-8 - 32M DIP42 Byte Mode
+      68000 clock - 16.000MHz (32/2)
+      Z80 clock - 5.33333MHz (32/6)
+      VSync - 60Hz
+      HSync - 15.39kHz
+*/
 
 ROM_START( bbakraid )
 	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */

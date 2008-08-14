@@ -44,9 +44,9 @@ static ADDRESS_MAP_START( svi318_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
 	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
 	AM_RANGE( 0x85, 0x85) AM_READ( TMS9928A_register_r )
-	AM_RANGE( 0x88, 0x88) AM_WRITE( AY8910_control_port_0_w )
-	AM_RANGE( 0x8c, 0x8c) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x90, 0x90) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x88, 0x88) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x8c, 0x8c) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x90, 0x90) AM_READ( ay8910_read_port_0_r )
 	AM_RANGE( 0x96, 0x97) AM_DEVWRITE( PPI8255, "ppi8255", svi318_ppi_w )
 	AM_RANGE( 0x98, 0x9a) AM_DEVREAD( PPI8255, "ppi8255", svi318_ppi_r )
 ADDRESS_MAP_END
@@ -59,9 +59,9 @@ static ADDRESS_MAP_START( svi328_806_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
 	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
 	AM_RANGE( 0x85, 0x85) AM_READ( TMS9928A_register_r )
-	AM_RANGE( 0x88, 0x88) AM_WRITE( AY8910_control_port_0_w )
-	AM_RANGE( 0x8c, 0x8c) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x90, 0x90) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x88, 0x88) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x8c, 0x8c) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x90, 0x90) AM_READ( ay8910_read_port_0_r )
 	AM_RANGE( 0x96, 0x97) AM_DEVWRITE( PPI8255, "ppi8255", svi318_ppi_w )
 	AM_RANGE( 0x98, 0x9a) AM_DEVREAD( PPI8255, "ppi8255", svi318_ppi_r )
 ADDRESS_MAP_END
@@ -250,7 +250,7 @@ static INPUT_PORTS_START( svi328 )
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_DEL_PAD)
 INPUT_PORTS_END
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface svi318_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -287,7 +287,7 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(svi318_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(svi318_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */

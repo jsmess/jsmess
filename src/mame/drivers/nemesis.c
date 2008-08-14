@@ -319,16 +319,16 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( salamand_speech_start_w )
 {
-        VLM5030_ST ( 1 );
-        VLM5030_ST ( 0 );
+        vlm5030_st ( 1 );
+        vlm5030_st ( 0 );
 }
 
 static WRITE8_HANDLER( gx400_speech_start_w )
 {
 	/* the voice data is not in a rom but in sound RAM at $8000 */
-	VLM5030_set_rom (gx400_shared_ram + 0x4000);
-	VLM5030_ST (1);
-	VLM5030_ST (0);
+	vlm5030_set_rom (gx400_shared_ram + 0x4000);
+	vlm5030_st (1);
+	vlm5030_st (0);
 }
 
 static READ8_HANDLER( nemesis_portA_r )
@@ -344,7 +344,7 @@ static READ8_HANDLER( nemesis_portA_r )
 
 	res |= 0xd0;
 
-	if (sndti_exists(SOUND_VLM5030, 0) && VLM5030_BSY())
+	if (sndti_exists(SOUND_VLM5030, 0) && vlm5030_bsy())
 		res |= 0x20;
 
 	return res;
@@ -354,8 +354,8 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_r)
-	AM_RANGE(0xe086, 0xe086) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xe205, 0xe205) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0xe086, 0xe086) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xe205, 0xe205) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -365,10 +365,10 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(k005289_pitch_B_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(k005289_keylatch_A_w)
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(k005289_keylatch_B_w)
-	AM_RANGE(0xe005, 0xe005) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xe106, 0xe106) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xe405, 0xe405) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0xe005, 0xe005) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xe006, 0xe006) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe106, 0xe106) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xe405, 0xe405) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konamigt_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -540,8 +540,8 @@ static ADDRESS_MAP_START( gx400_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_r)
-	AM_RANGE(0xe086, 0xe086) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xe205, 0xe205) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0xe086, 0xe086) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xe205, 0xe205) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx400_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -549,14 +549,14 @@ static ADDRESS_MAP_START( gx400_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&gx400_shared_ram)
 	AM_RANGE(0xa000, 0xafff) AM_WRITE(k005289_pitch_A_w)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(k005289_pitch_B_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(VLM5030_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(vlm5030_data_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(k005289_keylatch_A_w)
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(k005289_keylatch_B_w)
-	AM_RANGE(0xe005, 0xe005) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xe005, 0xe005) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xe006, 0xe006) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xe030, 0xe030) AM_WRITE(gx400_speech_start_w)
-	AM_RANGE(0xe106, 0xe106) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xe405, 0xe405) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0xe106, 0xe106) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xe405, 0xe405) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -753,46 +753,46 @@ static WRITE8_HANDLER( city_sound_bank_w )
 {
 	int bank_A=(data&0x3);
 	int bank_B=((data>>2)&0x3);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 }
 
 static ADDRESS_MAP_START( sal_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
+	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sal_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(VLM5030_data_w)
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(vlm5030_data_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(salamand_speech_start_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( city_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM3812_status_port_0_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym3812_status_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( city_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(K051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_WRITE(K051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_WRITE(K051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_WRITE(K051649_keyonoff_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)
+	AM_RANGE(0x9800, 0x987f) AM_WRITE(k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_WRITE(k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_WRITE(k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_WRITE(k051649_keyonoff_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(city_sound_bank_w) /* 7232 bankswitch */
 ADDRESS_MAP_END
 
@@ -2086,7 +2086,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const struct AY8910interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -2096,7 +2096,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -2112,23 +2112,23 @@ static void sound_irq(running_machine *machine, int state)
 /*cpunum_set_input_line(machine, 1,0,HOLD_LINE);*/
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	sound_irq
 };
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
@@ -2259,14 +2259,14 @@ static MACHINE_DRIVER_START( salamand )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(0, "right", 0.10)
 	MDRV_SOUND_ROUTE(1, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -2304,14 +2304,14 @@ static MACHINE_DRIVER_START( blkpnthr )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(0, "right", 0.10)
 	MDRV_SOUND_ROUTE(1, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -2349,14 +2349,14 @@ static MACHINE_DRIVER_START( citybomb )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami1", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(0, "right", 0.30)
 	MDRV_SOUND_ROUTE(1, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
@@ -2398,14 +2398,14 @@ static MACHINE_DRIVER_START( nyanpani )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami1", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(0, "right", 0.30)
 	MDRV_SOUND_ROUTE(1, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
@@ -2540,14 +2540,14 @@ static MACHINE_DRIVER_START( hcrash )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(0, "right", 0.10)
 	MDRV_SOUND_ROUTE(1, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

@@ -7,6 +7,8 @@
 #ifndef b2m_H_
 #define b2m_H_
 
+#include "mame.h"
+#include "sound/custom.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
@@ -24,7 +26,7 @@ extern const ppi8255_interface b2m_ppi8255_interface_1;
 extern const ppi8255_interface b2m_ppi8255_interface_2;
 extern const ppi8255_interface b2m_ppi8255_interface_3;
 
-extern const struct CustomSound_interface b2m_sound_interface;
+extern const custom_sound_interface b2m_sound_interface;
 extern void b2m_sh_change_clock(double);
 
 extern DRIVER_INIT( b2m );

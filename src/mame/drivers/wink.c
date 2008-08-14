@@ -132,8 +132,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wink_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wink )
@@ -298,7 +298,7 @@ static READ8_HANDLER( sound_r )
 	return sound_flag;
 }
 
-static const struct AY8910interface ay8912_interface =
+static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

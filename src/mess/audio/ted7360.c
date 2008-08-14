@@ -144,7 +144,7 @@ static void ted7360_update (void *param,stream_sample_t **inputs, stream_sample_
 /************************************/
 /* Sound handler start              */
 /************************************/
-void *ted7360_custom_start (int clock, const struct CustomSound_interface *config)
+void *ted7360_custom_start (int clock, const custom_sound_interface *config)
 {
 	int i;
 

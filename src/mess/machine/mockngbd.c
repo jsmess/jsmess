@@ -161,10 +161,10 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 				case 0x04: /* make inactive */
 					break;
 				case 0x06: /* write data */
-					AY8910_write_port_0_w(device->machine, 0, token->latch0);
+					ay8910_write_port_0_w(device->machine, 0, token->latch0);
 					break;
 				case 0x07: /* set register */
-					AY8910_control_port_0_w(device->machine, 0, token->latch0);
+					ay8910_control_port_0_w(device->machine, 0, token->latch0);
 					break;
 			}
 			break;
@@ -186,10 +186,10 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 				case 0x04: /* make inactive */
 					break;
 				case 0x06: /* write data */
-					AY8910_write_port_1_w(device->machine, 0, token->latch1);
+					ay8910_write_port_1_w(device->machine, 0, token->latch1);
 					break;
 				case 0x07: /* set register */
-					AY8910_control_port_1_w(device->machine, 0, token->latch1);
+					ay8910_control_port_1_w(device->machine, 0, token->latch1);
 					break;
 			}
 			break;

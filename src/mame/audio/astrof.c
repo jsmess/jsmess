@@ -174,7 +174,7 @@ static const char *const astrof_sample_names[] =
 };
 
 
-static const struct Samplesinterface astrof_samples_interface =
+static const samples_interface astrof_samples_interface =
 {
 	4,	/* 4 channels */
 	astrof_sample_names
@@ -228,7 +228,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 	/* D4 - UFO */
 
 	/* D5 - UFO under water */
-	SN76477_enable_w(0, (~data >> 5) & 0x01);
+	sn76477_enable_w(0, (~data >> 5) & 0x01);
 
 	/* D6 - explosion */
 
@@ -237,7 +237,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 }
 
 
-static const struct SN76477interface tomahawk_sn76477_interface =
+static const sn76477_interface tomahawk_sn76477_interface =
 {
 	0,				/*  4 noise_res (N/C)        */
 	0,				/*  5 filter_res (N/C)       */

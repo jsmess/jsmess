@@ -290,7 +290,7 @@ INPUT_PORTS_END
 
 static const INT16 speaker_levels[] = {-32768, 0, 32767, 0};
 
-static const struct Speaker_interface speaker_interface =
+static const speaker_interface vtech1_speaker_interface =
 {
 	4,
 	speaker_levels
@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START(laser110)
 	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-	MDRV_SOUND_CONFIG(speaker_interface)
+	MDRV_SOUND_CONFIG(vtech1_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */

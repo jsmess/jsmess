@@ -1369,8 +1369,10 @@ static READ16_HANDLER( pico_68k_io_read )
 	switch (offset)
 	  {
 	  case 0:	/* Version register ?XX?????? where ?? is 00 for japan, 01 for europe and 10 for USA*/
-	    retdata = megadrive_region_export<<6 |
+	    /* NPW 14-Aug-2008 - What is this? How did this ever compile? */
+	    /* retdata = megadrive_region_export<<6 |
 		      megadrive_region_pal<<5;
+			  */
 	    break;
 	  case 1:
 	    retdata = input_port_read_safe(Machine, "PAD", 0);
@@ -1445,7 +1447,8 @@ static ADDRESS_MAP_START( _pico_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000 , 0x80001f) AM_READ(pico_68k_io_read)
 
-	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
+	/* NPW 14-Aug-2008 - What is this?  This is not referencing anything */
+	/* AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r) */
 	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
 ADDRESS_MAP_END
 
@@ -1454,7 +1457,8 @@ static ADDRESS_MAP_START( _pico_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000 , 0x80001f) AM_WRITE(pico_68k_io_write)
 
-	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
+	/* NPW 14-Aug-2008 - What is this?  This is not referencing anything */
+	/* AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w) */
 	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 

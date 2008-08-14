@@ -51,10 +51,10 @@
 static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xbc01, 0xbc01) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0xbc02, 0xbc02) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xbc03, 0xbc03) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xbc01, 0xbc01) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0xbc02, 0xbc02) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xbc03, 0xbc03) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 	AM_RANGE(0xbfc0, 0xbfcf) AM_READWRITE(via_0_r, via_0_w)
 	AM_RANGE(0xbfd0, 0xbfd3) AM_READWRITE(acia_6551_r, acia_6551_w)
 	AM_RANGE(0xbfe0, 0xbfef) AM_READWRITE(via_1_r, via_1_w)
@@ -201,7 +201,7 @@ static GFXDECODE_START( microtan )
 	GFXDECODE_ENTRY( "gfx2", 0, chunky_layout, 0, 1 )
 GFXDECODE_END
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface microtan_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -240,10 +240,10 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910.1", AY8910, 1000000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(microtan_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("ay8910.2", AY8910, 1000000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(microtan_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// snapshot/quickload

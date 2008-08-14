@@ -98,7 +98,7 @@ static const char *const carnival_sample_names[] =
 };
 
 
-static const struct Samplesinterface carnival_samples_interface =
+static const samples_interface carnival_samples_interface =
 {
 	10,
 	carnival_sample_names
@@ -273,11 +273,11 @@ static WRITE8_HANDLER( carnival_music_port_2_w )
 			break;
 
 		case PSG_BC_WRITE:
-			AY8910_write_port_0_w( machine, 0, psgData );
+			ay8910_write_port_0_w( machine, 0, psgData );
 			break;
 
 		case PSG_BC_LATCH_ADDRESS:
-			AY8910_control_port_0_w( machine, 0, psgData );
+			ay8910_control_port_0_w( machine, 0, psgData );
 			break;
 		}
 	}

@@ -211,9 +211,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_2_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_2_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
@@ -276,9 +276,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( starforb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_2_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_2_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
@@ -635,7 +635,7 @@ static const struct z80_irq_daisy_chain daisy_chain[] =
 
 
 
-static const struct Samplesinterface senjyo_samples_interface =
+static const samples_interface senjyo_samples_interface =
 {
 	1,
 	NULL,
@@ -994,7 +994,7 @@ DRIVER_INIT( starforc )
 DRIVER_INIT( starfore )
 {
 	/* encrypted CPU */
-	suprloco_decode(machine);
+	suprloco_decode(machine, "main");
 
 	is_senjyo = 0;
 	senjyo_scrollhack = 0;
@@ -1003,7 +1003,7 @@ DRIVER_INIT( starfore )
 DRIVER_INIT( starfora )
 {
 	/* encrypted CPU */
-	yamato_decode(machine);
+	yamato_decode(machine, "main");
 
 	is_senjyo = 0;
 	senjyo_scrollhack = 1;

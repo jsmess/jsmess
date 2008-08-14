@@ -411,17 +411,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sngkace_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2610_status_port_0_A_r		)
-	AM_RANGE(0x02, 0x02) AM_READ(YM2610_status_port_0_B_r		)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2610_status_port_0_a_r		)
+	AM_RANGE(0x02, 0x02) AM_READ(ym2610_status_port_0_b_r		)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r			)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sngkace_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2610_control_port_0_A_w		)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2610_data_port_0_A_w		)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM2610_control_port_0_B_w		)
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM2610_data_port_0_B_w		)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2610_control_port_0_a_w		)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w		)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym2610_control_port_0_b_w		)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w		)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w	)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w			)
 ADDRESS_MAP_END
@@ -457,18 +457,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunbird_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_READ(YM2610_status_port_0_A_r		)
-	AM_RANGE(0x06, 0x06) AM_READ(YM2610_status_port_0_B_r		)
+	AM_RANGE(0x04, 0x04) AM_READ(ym2610_status_port_0_a_r		)
+	AM_RANGE(0x06, 0x06) AM_READ(ym2610_status_port_0_b_r		)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r			)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunbird_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w	)
-	AM_RANGE(0x04, 0x04) AM_WRITE(YM2610_control_port_0_A_w		)
-	AM_RANGE(0x05, 0x05) AM_WRITE(YM2610_data_port_0_A_w		)
-	AM_RANGE(0x06, 0x06) AM_WRITE(YM2610_control_port_0_B_w		)
-	AM_RANGE(0x07, 0x07) AM_WRITE(YM2610_data_port_0_B_w		)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ym2610_control_port_0_a_w		)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ym2610_data_port_0_a_w		)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ym2610_control_port_0_b_w		)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ym2610_data_port_0_b_w		)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w			)
 ADDRESS_MAP_END
 
@@ -479,7 +479,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s1945_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ(YMF278B_status_port_0_r		)
+	AM_RANGE(0x08, 0x08) AM_READ(ymf278b_status_port_0_r		)
 	AM_RANGE(0x10, 0x10) AM_READ(psikyo_soundlatch_r			)
 ADDRESS_MAP_END
 
@@ -487,12 +487,12 @@ static ADDRESS_MAP_START( s1945_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w	)
 	AM_RANGE(0x02, 0x03) AM_WRITE(SMH_NOP						)
-	AM_RANGE(0x08, 0x08) AM_WRITE(YMF278B_control_port_0_A_w	)
-	AM_RANGE(0x09, 0x09) AM_WRITE(YMF278B_data_port_0_A_w		)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(YMF278B_control_port_0_B_w	)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(YMF278B_data_port_0_B_w		)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(YMF278B_control_port_0_C_w	)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(YMF278B_data_port_0_C_w		)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ymf278b_control_port_0_a_w	)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ymf278b_data_port_0_a_w		)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ymf278b_control_port_0_b_w	)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ymf278b_data_port_0_b_w		)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(ymf278b_control_port_0_c_w	)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(ymf278b_data_port_0_c_w		)
 	AM_RANGE(0x18, 0x18) AM_WRITE(psikyo_clear_nmi_w			)
 ADDRESS_MAP_END
 
@@ -1552,7 +1552,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static const struct YM2610interface sngkace_ym2610_interface =
+static const ym2610_interface sngkace_ym2610_interface =
 {
 	sound_irq
 };
@@ -1603,7 +1603,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static const struct YM2610interface gunbird_ym2610_interface =
+static const ym2610_interface gunbird_ym2610_interface =
 {
 	sound_irq	/* irq */
 };
@@ -1663,7 +1663,7 @@ static void irqhandler(running_machine *machine, int linestate)
 		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
-static const struct YMF278B_interface ymf278b_interface =
+static const ymf278b_interface ymf278b_config =
 {
 	irqhandler
 };
@@ -1702,7 +1702,7 @@ static MACHINE_DRIVER_START( s1945 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -2044,24 +2044,76 @@ static DRIVER_INIT( s1945jn )
 
 /***************************************************************************
 
-                            Strikers 1945 (Japan)
+Strikers 1945
+1995, Psikyo
 
-Board:  SH404
+PCB Layout
+----------
+
+SH404
+|----------------------------------------------------------|
+|HA1388  2058D   62256 6264  62256  16MHz PAL1 * 3.U63 U61 |
+|       YAC513-M 62256 62256 6264   14.31818MHz  33.8688MHz|
+|  VOL                                                     |
+|                         |------|62256 |-------||-------| |
+|      4MHz   LH5168      |PS3204|62256 |LZ8420M||YMF278B| |
+|     16C57   LH5168      |------|      |-------||-------| |
+|         PAL2                                             |
+|                                                          |
+|J                                          |--------|     |
+|A           |------| 5.U41   62256  62256  |        |     |
+|M           |68020 | 4.U40   62256  62256  | PS3103 | U34 |
+|M           |------|                       |        |     |
+|A  |------|                                |--------|     |
+|   |PS3305|                                               |
+|   |------|              |--------|                       |
+|                         |        |      U23 U22 U21 U20  |
+| MB3771                  |PS2001B |                       |
+|    6264   62256 62256   |        |                       |
+|    6264   62256 62256   |--------|                       |
+|                                                          |
+|DIP1                     6116  6116                       |
+|DIP2                     6116  6116        LH5168     U1  |
+|----------------------------------------------------------|
+Notes:
+      68020    - Motorola MC68EC020 CPU (QFP100, running at 16.000MHz)
+      PS3305   - Psikyo Custom (QFP100)
+      PS3204   - Psikyo Custom (QFP100)
+      PS2001B  - Psikyo Custom (QFP160)
+      PS3103   - Psikyo Custom (QFP160)
+      6116     - 2k x8 SRAM (x4, DIP24)
+      LH5168   - Sharp LH5168 2k x8 SRAM (x3, DIP24)
+      62256    - NKK N341256 32k x8 SRAM (x14, DIP28)
+      6264     - ISSI IS61C64 8k x8 SRAM (x4, DIP28)
+      MB3771   - Fujitsu MB3771 Master Reset IC (DIP8)
+      DIP1     - 8 position DIP Switch
+      DIP2     - 8 position DIP Switch
+      PAL1     - AMD PALCE 16V8H (DIP20, stamped '4041')
+      PAL2     - AMD PALCE 16V8H (DIP20, stamped '4040')
+      YMF278B  - Yamaha YMF278B-F Sound Chip, running at 33.8688MHz (QFP64)
+      3.U63    - Macronix MX27C1000 128k x8 EPROM (Sound Program, DIP32, labelled '3')
+      4.U40    - AMD AM27C2048 256k x16 EPROM (Main Program, DIP40, labelled '4' & '5')
+      5.U41    /
+      16C57    - Microchip PIC16C57 Microcontroller (DIP24, running at 4.000MHz, labelled '1')
+      YAC513   - Yamaha YAC513-M D/A Converter (SOIC16)
+      LZ8420M  - Sharp LZ8420M Z80-core CPU (QFP64, running at 4.000MHz)
+      HA1388   - Hitachi HA1388 Sound Amp
+      2058D    - JRC 2058 Op Amp
+      U61, U34,\
+      U20, U21,- 16M MASKROM (SOP44)
+      U22, U23 /
+      U1       - 4M MASKROM (SOP44)
+      VOL      - Master Volume Potentiometer
+      *        - Unpopulated position for 16M SOP44 MASKROM
+
+
 CPU:    MC68EC020FG16
-Sound:  LZ8420M (Z80 core)
-        YMF278B-F
 OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
 
-Chips:  PS2001B
-        PS3103
-        PS3204
-        PS3305
-
-
-1-U59      security (PIC16C57; not dumped)
+1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/
 

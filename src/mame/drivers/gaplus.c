@@ -516,7 +516,7 @@ static GFXDECODE_START( gaplus )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout, 64*4, 64 )
 GFXDECODE_END
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	8,	 			/* number of voices */
 	0				/* stereo */
@@ -529,7 +529,7 @@ static const char *const gaplus_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface gaplus_samples_interface =
 {
 	1,	/* one channel */
 	gaplus_sample_names
@@ -575,11 +575,11 @@ static MACHINE_DRIVER_START( gaplus )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO_15XX, 24576000/1024)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(gaplus_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

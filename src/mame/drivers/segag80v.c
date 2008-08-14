@@ -840,7 +840,7 @@ static const char *const elim_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface elim2_samples_interface =
+static const samples_interface elim2_samples_interface =
 {
 	8,	/* 8 channels */
 	elim_sample_names
@@ -872,7 +872,7 @@ static const char *const spacfury_sample_names[] =
 };
 
 
-static const struct Samplesinterface spacfury_samples_interface =
+static const samples_interface spacfury_samples_interface =
 {
 	8,	/* 8 channels */
 	spacfury_sample_names
@@ -903,7 +903,7 @@ static const char *const zektor_sample_names[] =
 };
 
 
-static const struct Samplesinterface zektor_samples_interface =
+static const samples_interface zektor_samples_interface =
 {
 	8,
 	zektor_sample_names
@@ -1372,8 +1372,8 @@ static DRIVER_INIT( zektor )
 	has_usb = FALSE;
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x38, 0x38, 0, 0, sega_speech_data_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b, 0x3b, 0, 0, sega_speech_control_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c, 0x3c, 0, 0, AY8910_control_port_0_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d, 0x3d, 0, 0, AY8910_write_port_0_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c, 0x3c, 0, 0, ay8910_control_port_0_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d, 0x3d, 0, 0, ay8910_write_port_0_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3e, 0x3e, 0, 0, zektor1_sh_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3f, 0x3f, 0, 0, zektor2_sh_w);
 

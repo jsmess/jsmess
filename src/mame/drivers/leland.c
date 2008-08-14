@@ -682,7 +682,7 @@ INPUT_PORTS_END
    register.
 */
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -693,19 +693,19 @@ static const struct AY8910interface ay8910_interface =
 };
 
 
-static const struct CustomSound_interface dac_custom_interface =
+static const custom_sound_interface dac_custom_interface =
 {
     leland_sh_start
 };
 
 
-static const struct CustomSound_interface i80186_custom_interface =
+static const custom_sound_interface i80186_custom_interface =
 {
     leland_80186_sh_start
 };
 
 
-static const struct CustomSound_interface redline_custom_interface =
+static const custom_sound_interface redline_custom_interface =
 {
   	redline_80186_sh_start
 };
@@ -741,11 +741,11 @@ static MACHINE_DRIVER_START( leland )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay8910.1", AY8910, 10000000/6)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("ay8910.2", AY8910, 10000000/6)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)
@@ -2309,8 +2309,8 @@ static DRIVER_INIT( teamqb )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2339,8 +2339,8 @@ static DRIVER_INIT( aafb )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2369,8 +2369,8 @@ static DRIVER_INIT( aafbb )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2399,8 +2399,8 @@ static DRIVER_INIT( aafbd2p )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2505,7 +2505,7 @@ static DRIVER_INIT( pigout )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_4_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
 }
 
 

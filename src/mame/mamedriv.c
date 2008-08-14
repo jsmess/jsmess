@@ -1104,6 +1104,8 @@ const game_driver * const drivers[] =
 
 	/* SNES-based hacks */
 	DRIVER( kinstb )	/* bootleg */
+	DRIVER( ffight2b )	/* bootleg */
+	DRIVER( sblast2b )	/* bootleg */
 
 	/* Midway 8080 b/w games */
 	DRIVER( seawolf )	/* 596 [1976] */
@@ -2239,6 +2241,7 @@ V-V                           TP-027
 	DRIVER( defender )	/* (c) 1980 */
 	DRIVER( defendg )	/* (c) 1980 */
 	DRIVER( defendb )	/* (c) 1980 */
+	DRIVER( defendw )	/* (c) 1980 */
 	DRIVER( defndjeu )	/* bootleg */
 	DRIVER( tornado1 )	/* bootleg */
 	DRIVER( tornado2 )	/* bootleg */
@@ -2387,6 +2390,7 @@ V-V                           TP-027
 	DRIVER( ghouls )	/* 12/1988 (c) 1988 (World) */
 	DRIVER( ghoulsu )	/* 12/1988 (c) 1988 (US) */
 	DRIVER( daimakai )	/* 12/1988 (c) 1988 (Japan) */
+	DRIVER( daimakr2 )	/* unknown release date, still (c) 1988 (Japan) */
 	DRIVER( strider )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
 	DRIVER( stridrua )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
 	DRIVER( striderj )	/*  3/1989 (c) 1989 */
@@ -7290,6 +7294,7 @@ Other Sun games
 	DRIVER( drgnwrld )	/* (c) 1997 */
 	DRIVER( drgwrld3 )	/* (c) 1995 */
 	DRIVER( chindrac )	/* (c) 1995 */
+	DRIVER( chindrah )	/* (c) 1995 */
 
 	DRIVER( lordgun )	/* (c) 1994 */
 	DRIVER( hfh )		/* (c) 199? */
@@ -7417,6 +7422,7 @@ Other Sun games
 	DRIVER( pbillrds )	/* (c) 1988 Nihon System (+ optional Sega) */
 	DRIVER( freekick )	/* (c) 1988 Nihon System (+ optional Sega) */
 	DRIVER( freekckb )	/* (c) 1987 bootleg */
+	DRIVER( freekcb2 )	/* (c) 1987 bootleg */
 	DRIVER( countrun )	/* (c) 1988 Nihon System (+ optional Sega) */
 	DRIVER( countrnb )	/* (c) 1988 bootleg */
 	DRIVER( countrb2 )	/* (c) 1988 bootleg */
@@ -8167,8 +8173,8 @@ Other Sun games
 	DRIVER( vcombat )	/* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )	/* (c) 1989 Sega? */
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
-	DRIVER( lucky74s )	/* (c) 1988 Wing */
-	DRIVER( lucky74b )	/* (c) 1988 Wing */
+	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
+	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
 
 	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */

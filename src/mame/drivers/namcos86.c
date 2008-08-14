@@ -413,9 +413,9 @@ static ADDRESS_MAP_START( NAME##_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )					\
 	AM_RANGE(0x0080, 0x00ff) AM_RAM														\
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(namcos1_cus30_r,namcos1_cus30_w) /* PSG device, shared RAM */	\
 	AM_RANGE(0x1400, 0x1fff) AM_RAM														\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_READ(YM2151_status_port_0_r)			\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x00) AM_WRITE(YM2151_register_port_0_w)		\
-	AM_RANGE(ADDR_INPUT+0x01, ADDR_INPUT+0x01) AM_WRITE(YM2151_data_port_0_w)			\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_READ(ym2151_status_port_0_r)			\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x00) AM_WRITE(ym2151_register_port_0_w)		\
+	AM_RANGE(ADDR_INPUT+0x01, ADDR_INPUT+0x01) AM_WRITE(ym2151_data_port_0_w)			\
 	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ(input_port_0_r)					\
 	AM_RANGE(ADDR_INPUT+0x21, ADDR_INPUT+0x21) AM_READ(input_port_1_r)					\
 	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ(dsw0_r)							\
@@ -1046,7 +1046,7 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	8,		/* number of voices */
 	0		/* stereo */
@@ -1097,7 +1097,7 @@ static MACHINE_DRIVER_START( hopmappy )
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)	/* only right channel is connected */
 
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

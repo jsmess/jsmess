@@ -143,7 +143,7 @@ static READ8_HANDLER( apple2gs_adc_read )
 	return 0x80;
 }
 
-static const struct ES5503interface es5503_interface =
+static const es5503_interface apple2gs_es5503_interface =
 {
 	apple2gs_doc_irq,
 	apple2gs_adc_read,
@@ -173,7 +173,7 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("es5503", ES5503, APPLE2GS_7M)
-	MDRV_SOUND_CONFIG(es5503_interface)
+	MDRV_SOUND_CONFIG(apple2gs_es5503_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 

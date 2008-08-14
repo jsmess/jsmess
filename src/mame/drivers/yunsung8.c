@@ -141,7 +141,7 @@ static WRITE8_HANDLER( yunsung8_sound_bankswitch_w )
 
 	memory_set_bankptr(2, RAM);
 
-	MSM5205_reset_w(0,data & 0x20);
+	msm5205_reset_w(0,data & 0x20);
 }
 
 static WRITE8_HANDLER( yunsung8_adpcm_w )
@@ -157,8 +157,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK2,SMH_ROM		)	// Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(yunsung8_sound_bankswitch_w	)	// ROM Bank
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w				)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_control_port_0_w		)	// YM3812
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM3812_write_port_0_w			)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_control_port_0_w		)	// YM3812
+	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w			)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r					)	// From Main CPU
 ADDRESS_MAP_END
@@ -488,7 +488,7 @@ static void yunsung8_adpcm_int(running_machine *machine, int irq)
 {
 	static int toggle=0;
 
-	MSM5205_data_w (0,adpcm>>4);
+	msm5205_data_w (0,adpcm>>4);
 	adpcm<<=4;
 
 	toggle ^= 1;
@@ -496,7 +496,7 @@ static void yunsung8_adpcm_int(running_machine *machine, int irq)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface yunsung8_msm5205_interface =
+static const msm5205_interface yunsung8_msm5205_interface =
 {
 	yunsung8_adpcm_int,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz, 4 Bits */

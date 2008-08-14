@@ -122,7 +122,7 @@ static PALETTE_INIT( wscolor ) {
 	}
 }
 
-static const struct CustomSound_interface wswan_sound_interface =
+static const custom_sound_interface wswan_sound_interface =
 {
 	wswan_sh_start
 };

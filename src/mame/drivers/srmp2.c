@@ -207,7 +207,7 @@ static WRITE16_HANDLER( srmp2_adpcm_code_w )
 	srmp2_adpcm_sptr += (srmp2_adpcm_bank * 0x10000);
 	srmp2_adpcm_eptr += (srmp2_adpcm_bank * 0x10000);
 
-	MSM5205_reset_w(0, 0);
+	msm5205_reset_w(0, 0);
 	srmp2_adpcm_data = -1;
 }
 
@@ -230,7 +230,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
 	srmp2_adpcm_sptr += (srmp2_adpcm_bank * 0x10000);
 	srmp2_adpcm_eptr += (srmp2_adpcm_bank * 0x10000);
 
-	MSM5205_reset_w(0, 0);
+	msm5205_reset_w(0, 0);
 	srmp2_adpcm_data = -1;
 }
 
@@ -247,25 +247,25 @@ static void srmp2_adpcm_int(running_machine *machine, int num)
 
 			if (srmp2_adpcm_sptr >= srmp2_adpcm_eptr)
 			{
-				MSM5205_reset_w(0, 1);
+				msm5205_reset_w(0, 1);
 				srmp2_adpcm_data = 0;
 				srmp2_adpcm_sptr = 0;
 			}
 			else
 			{
-				MSM5205_data_w(0, ((srmp2_adpcm_data >> 4) & 0x0f));
+				msm5205_data_w(0, ((srmp2_adpcm_data >> 4) & 0x0f));
 			}
 		}
 		else
 		{
-			MSM5205_data_w(0, ((srmp2_adpcm_data >> 0) & 0x0f));
+			msm5205_data_w(0, ((srmp2_adpcm_data >> 0) & 0x0f));
 			srmp2_adpcm_sptr++;
 			srmp2_adpcm_data = -1;
 		}
 	}
 	else
 	{
-		MSM5205_reset_w(0, 1);
+		msm5205_reset_w(0, 1);
 	}
 }
 
@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( srmp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(srmp2_cchip_status_0_r)	/* Custom chip status ??? */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ(srmp2_cchip_status_1_r)	/* Custom chip status ??? */
-	AM_RANGE(0xf00000, 0xf00001) AM_READ(AY8910_read_port_0_lsb_r)
+	AM_RANGE(0xf00000, 0xf00001) AM_READ(ay8910_read_port_0_lsb_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -411,8 +411,8 @@ static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)					/* ??? */
-	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(AY8910_control_port_0_lsb_w)
-	AM_RANGE(0xf00002, 0xf00003) AM_WRITE(AY8910_write_port_0_lsb_w)
+	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(ay8910_control_port_0_lsb_w)
+	AM_RANGE(0xf00002, 0xf00003) AM_WRITE(ay8910_write_port_0_lsb_w)
 ADDRESS_MAP_END
 
 
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( mjyuugi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900002, 0x900003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_cchip_status_1_r)	/* custom chip status ??? */
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(AY8910_read_port_0_lsb_r)
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(ay8910_read_port_0_lsb_r)
 	AM_RANGE(0xd00000, 0xd00609) AM_READ(SMH_RAM)				/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_READ(SMH_RAM)				/* ??? */
 	AM_RANGE(0xe00000, 0xe03fff) AM_READ(SMH_RAM)				/* Sprites Code + X + Attr */
@@ -445,8 +445,8 @@ static ADDRESS_MAP_START( mjyuugi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(AY8910_control_port_0_lsb_w)
-	AM_RANGE(0xb00002, 0xb00003) AM_WRITE(AY8910_write_port_0_lsb_w)
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(ay8910_control_port_0_lsb_w)
+	AM_RANGE(0xb00002, 0xb00003) AM_WRITE(ay8910_write_port_0_lsb_w)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xd00000, 0xd00609) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_WRITE(SMH_RAM)					/* ??? only writes $00fa */
@@ -588,7 +588,7 @@ static ADDRESS_MAP_START( srmp3_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
 	AM_RANGE(0xc0, 0xc0) AM_READ(srmp3_input_r)						/* key matrix */
 	AM_RANGE(0xc1, 0xc1) AM_READ(srmp3_cchip_status_1_r)				/* custom chip status ??? */
-	AM_RANGE(0xe2, 0xe2) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0xe2, 0xe2) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_writeport, ADDRESS_SPACE_IO, 8 )
@@ -599,8 +599,8 @@ static ADDRESS_MAP_START( srmp3_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(srmp3_adpcm_code_w)					/* ADPCM number */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(srmp3_input_1_w)					/* I/O ??? */
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(srmp3_input_2_w)					/* I/O ??? */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -1024,7 +1024,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const struct AY8910interface srmp2_ay8910_interface =
+static const ay8910_interface srmp2_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1035,7 +1035,7 @@ static const struct AY8910interface srmp2_ay8910_interface =
 };
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	srmp2_adpcm_int,			/* IRQ handler */
 	MSM5205_S48_4B				/* 8 KHz, 4 Bits  */
@@ -1095,7 +1095,7 @@ static MACHINE_DRIVER_START( srmp2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 
@@ -1135,7 +1135,7 @@ static MACHINE_DRIVER_START( srmp3 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 
@@ -1171,7 +1171,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 

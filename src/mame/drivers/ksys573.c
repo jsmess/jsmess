@@ -1532,7 +1532,7 @@ static MACHINE_RESET( konami573 )
 	flash_bank = -1;
 }
 
-static const struct PSXSPUinterface konami573_psxspu_interface =
+static const psx_spu_interface konami573_psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,
@@ -2872,7 +2872,7 @@ static INPUT_PORTS_START( ddr )
 	PORT_INCLUDE( konami573 )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gn845pwbb_read,0)
+	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gn845pwbb_read, NULL)
 
 	PORT_START( "STAGE" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER(1)

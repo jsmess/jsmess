@@ -208,7 +208,7 @@ static ADDRESS_MAP_START ( adam_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x80, 0x9F) AM_WRITE( adam_paddle_toggle_off )
 	AM_RANGE(0xA0, 0xBF) AM_READWRITE( adam_video_r, adam_video_w )
 	AM_RANGE(0xC0, 0xDF) AM_WRITE( adam_paddle_toggle_on )
-	AM_RANGE(0xE0, 0xFF) AM_READWRITE( adam_paddle_r, SN76496_0_w )
+	AM_RANGE(0xE0, 0xFF) AM_READWRITE( adam_paddle_r, sn76496_0_w )
 ADDRESS_MAP_END
 
 #ifdef UNUSED_FUNCTION

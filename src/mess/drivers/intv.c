@@ -88,7 +88,7 @@ static PALETTE_INIT( intv )
 	}
 }
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface intv_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -391,7 +391,7 @@ static MACHINE_DRIVER_START( intv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(intv_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

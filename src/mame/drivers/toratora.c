@@ -169,7 +169,7 @@ static WRITE8_HANDLER( clear_timer_w )
  *
  *************************************/
 
-static const struct SN76477interface sn76477_interface =
+static const sn76477_interface sn76477_intf =
 {
 	RES_K(47),	/*  4 noise_res                */
 //  RES_K(120), /*  5 filter_res               */
@@ -200,8 +200,8 @@ static const struct SN76477interface sn76477_interface =
 
 static void port_a_u2_u3_w(int which, UINT8 data)
 {
-	SN76477_vco_voltage_w(which, 2.35 * (data & 0x7f) / 128.0);
-	SN76477_enable_w(which, (data >> 7) & 0x01);
+	sn76477_vco_voltage_w(which, 2.35 * (data & 0x7f) / 128.0);
+	sn76477_enable_w(which, (data >> 7) & 0x01);
 }
 
 
@@ -219,18 +219,18 @@ static void port_b_u2_u3_w(int which, UINT8 data)
 	  RES_K(47)
 	};
 
-	SN76477_mixer_a_w      (which, (data >> 0) & 0x01);
-	SN76477_mixer_b_w      (which, (data >> 1) & 0x01);
-	SN76477_mixer_c_w      (which, (data >> 2) & 0x01);
-	SN76477_envelope_1_w   (which, (data >> 3) & 0x01);
-	SN76477_envelope_2_w   (which, (data >> 4) & 0x01);
-	SN76477_amplitude_res_w(which, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+	sn76477_mixer_a_w      (which, (data >> 0) & 0x01);
+	sn76477_mixer_b_w      (which, (data >> 1) & 0x01);
+	sn76477_mixer_c_w      (which, (data >> 2) & 0x01);
+	sn76477_envelope_1_w   (which, (data >> 3) & 0x01);
+	sn76477_envelope_2_w   (which, (data >> 4) & 0x01);
+	sn76477_amplitude_res_w(which, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
 }
 
 
 static void ca2_u2_u3_w(int which, UINT8 data)
 {
-	SN76477_vco_w(which, data);
+	sn76477_vco_w(which, data);
 }
 
 
@@ -420,11 +420,11 @@ static MACHINE_DRIVER_START( toratora )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("sn1", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("sn2", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_DRIVER_END

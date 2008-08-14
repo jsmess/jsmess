@@ -324,13 +324,13 @@ static WRITE8_HANDLER( sindbadm_misc_w )
 /* the data lines are flipped */
 static WRITE8_HANDLER( sindbadm_SN76496_0_w )
 {
-	SN76496_0_w(machine, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+	sn76496_0_w(machine, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 
 
 static WRITE8_HANDLER( sindbadm_SN76496_1_w )
 {
-	SN76496_1_w(machine, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+	sn76496_1_w(machine, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 
 
@@ -1499,7 +1499,7 @@ static DRIVER_INIT( monsterb )
 static DRIVER_INIT( monster2 )
 {
 	/* configure the 315-5006 security chip */
-	spatter_decode(machine);
+	spatter_decode(machine, "main");
 	sega_security(0);
 
 	/* configure video */
@@ -1536,7 +1536,7 @@ static DRIVER_INIT( pignewt )
 static DRIVER_INIT( sindbadm )
 {
 	/* configure the encrypted Z80 */
-	sindbadm_decode(machine);
+	sindbadm_decode(machine, "main");
 	sega_security(0);
 
 	/* configure video */

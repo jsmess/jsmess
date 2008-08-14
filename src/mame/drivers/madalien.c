@@ -12,7 +12,7 @@
 #include "madalien.h"
 
 
-#define SOUND_CLOCK 4000000
+#define SOUND_CLOCK XTAL_4MHz
 
 
 static UINT8 *shift_hi;
@@ -71,11 +71,11 @@ static READ8_HANDLER(madalien_sound_command_r )
 
 static WRITE8_HANDLER( madalien_portA_w )
 {
-	/* not emulated - amplification? */
+	discrete_sound_w(machine, MADALIEN_8910_PORTA, data);
 }
 static WRITE8_HANDLER( madalien_portB_w )
 {
-	/* not emulated - motor sound? */
+	discrete_sound_w(machine, MADALIEN_8910_PORTB, data);
 }
 
 
@@ -99,9 +99,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x800e, 0x800e) AM_MIRROR(0x07f0) AM_WRITE(SMH_RAM) AM_BASE(&madalien_edge2_pos)
 	AM_RANGE(0x800f, 0x800f) AM_MIRROR(0x07f0) AM_WRITE(SMH_RAM) AM_BASE(&madalien_scroll)
 
-	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ff0) AM_READ(input_port_0_r)
-	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ff0) AM_READ(input_port_1_r)
-	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ff0) AM_READ(input_port_2_r)
+	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ff0) AM_READ_PORT("PLAYER1")
+	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ff0) AM_READ_PORT("DSW")
+	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ff0) AM_READ_PORT("PLAYER2")
 
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -111,8 +111,8 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_READ(madalien_sound_command_r)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x1ffc) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -129,7 +129,7 @@ static INPUT_PORTS_START( madalien )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DIP")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives )) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x01, "4" )
@@ -161,7 +161,7 @@ static INPUT_PORTS_START( madalien )
 INPUT_PORTS_END
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -180,7 +180,7 @@ static MACHINE_DRIVER_START( madalien )
 
 	MDRV_CPU_ADD("audio", M6502, SOUND_CLOCK / 8)   /* 512kHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 800)    /* unknown due to incomplete schematics */
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(madalien_video)
@@ -189,8 +189,15 @@ static MACHINE_DRIVER_START( madalien )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, SOUND_CLOCK / 4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(madalien)
+
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -227,6 +234,153 @@ ROM_START( madalien )
 	ROM_LOAD( "mg.7f",	0x0000, 0x0020, CRC(3395b31f) SHA1(26235fb448a4180c58f0887e53a29c17857b3b34) )
 ROM_END
 
+
+/***************************************************************************
+
+Mad Rider / Mad Alien
+Data East, 1980
+
+This game runs on 4 boards that plug into a PCB containing slots. The whole
+thing is housed in a metal box. All of the PCBs in this box are labelled
+'MAD RIDER'. The actual game appears to be Highway Chase on a Mad Alien PCB
+and might have been converted from Mad Alien. However, the title screen still
+says 'Mad Alien'. The graphics are bad on the edge of the road because one
+PROM at 3K is incorrect. If you have access to a Mad Rider PCB, please dump
+the PROM at 3K or contact us.
+
+
+PCB Layouts
+-----------
+
+Top board
+
+DE-0048B-1 CPU
+|-----------------------------------|
+|                                   |
+|                   10.595MHz       |
+|           DIP8(?)                 |
+|                                   |
+|                                   |
+|     DSW(8)                        |
+|                                   |
+|     DIP40                         |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|-----------------------------------|
+Notes:
+      This is joined to the PCB below with 4 small flat cables
+      All of the part numbers are scratched out on this PCB
+      DIP40 is a 6502 @ 1.324375MHz [10.595 / 8]
+
+
+DE-0044B
+ |-------------------------------------|
+ |                                     |
+|-|                                    |
+| |     DIP40                          |-|
+| |      M5L8216P  2114 2114             |
+| |*                                     |
+| |      M5L8216P  2114 2114             |
+|-|                                      |
+ |   2114 M5L8216P  2114 2114  MG-1.7F   |
+ |                                       |
+ |   2114 M5L8216P  2114 2114            |
+ |                                       |
+ |   2114 M5L8216P  2114 2114          |-|
+ |                                     |
+ |   2114 M5L8216P  2114 2114          |
+ |-------------------------------------|
+Notes:
+      * - Flat cable joined to next PCB down
+  DIP40 - probably 6845 video chip (surface scratched)
+   MG-1 - 82S123 Bipolar PROM
+
+
+DE-0045B-1
+ |-------------------------------------|
+ |            MD-1.3M                  |
+|-|           ME-1.3L                  |
+| |           MC-1.3K                  |-|
+| |                                      |
+| |*               MF-1.4H               |
+| |                                      |
+|-|                                      |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                       MB.5C           |
+ |                                     |-|
+ |      MA.2B                          |
+ |                                     |
+ |-------------------------------------|
+Notes:
+      * - Flat cable joined to above PCB
+     MA - 2708 EPROM
+     MB - 2716 EPROM
+MC / MD \
+ME / MF - uPB426 or 82S137 Bipolar PROMs
+
+
+DE-0047B-1
+|-------------------------------------|
+|                       DIP16         |
+|   555                4MHz           |
+|                 8910                |-|
+|   4066                6502            |
+|                                       |
+|                                       |
+|*                                      |
+|   555        9_2708.3D                |
+|                      8_2708.4D        |
+|                                       |
+|          LM348                        |
+|                 4066  2114          |-|
+|   555                               |
+|          LM348  4066  2114          |
+|-------------------------------------|
+Notes:
+      * - 3 pin sound output connector
+   6502 - 6502 CPU running at 0.500MHz [4/8]
+          NMI on pin 6 measured 50.0Hz
+   8910 - AY3-8910 sound chip running at 1.000MHz [4/4]
+  DIP16 - socket for small plug-in board containing 3 chips
+          which is covered with epoxy resin
+
+
+Bottom board
+
+DE-0046B-1 ROM
+ |-------------------------------------|
+ |                                  @  |
+ |             2716.3L   2716.4L       |
+ |                                     |-|
+|-|            2716.3K   2716.4K         |
+| |                                      |
+| |            2716.3H   2716.4H         |
+| |                                  #   |
+| |            2716.3F   2716.4F         |
+| |                                      |
+| |                      2716.4E         |
+| |                                      |
+|-|                      2716.4C       |-|
+ |                                     |
+ |    &                             %  |
+ |-------------------------------------|
+Notes:
+      * - 50 pin flat cable connector for controls and video output
+      & - 4 wire jumpers
+      % - 4 wire jumpers
+      # - 6 wire jumpers
+      @ - 3 wire jumpers
+      All ROMs type 2716
+      VSync - 55Hz
+      HSync - 15.43kHz
+
+***************************************************************************/
 
 ROM_START( madalina )
 	ROM_REGION( 0x10000, "main", 0 )                   /* main CPU */
@@ -265,5 +419,5 @@ ROM_END
 
 
 /*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, madalina, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, madalien, 0,        madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1980, madalina, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

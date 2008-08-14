@@ -328,9 +328,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_READ(SMH_NOP)
-	AM_RANGE(0x110000, 0x110001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x120000, 0x120001) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0x130000, 0x130001) AM_READ(OKIM6295_status_1_r)
+	AM_RANGE(0x110000, 0x110001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x120000, 0x120001) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x130000, 0x130001) AM_READ(okim6295_status_1_r)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
@@ -338,12 +338,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(YM2151_word_0_w)
-	AM_RANGE(0x120000, 0x120001) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x130000, 0x130001) AM_WRITE(OKIM6295_data_1_w)
+	AM_RANGE(0x110000, 0x110001) AM_WRITE(ym2151_word_0_w)
+	AM_RANGE(0x120000, 0x120001) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x130000, 0x130001) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
-	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(H6280_timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -799,11 +799,11 @@ static void sound_irq(running_machine *machine, int state)
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	OKIM6295_set_bank_base(0, ((data & 1)>>0) * 0x40000);
-	OKIM6295_set_bank_base(1, ((data & 2)>>1) * 0x40000);
+	okim6295_set_bank_base(0, ((data & 1)>>0) * 0x40000);
+	okim6295_set_bank_base(1, ((data & 2)>>1) * 0x40000);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq,
 	sound_bankswitch_w
@@ -841,7 +841,7 @@ static MACHINE_DRIVER_START( rohga )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.78)
 	MDRV_SOUND_ROUTE(1, "right", 0.78)
 
@@ -886,7 +886,7 @@ static MACHINE_DRIVER_START( wizdfire )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
@@ -931,7 +931,7 @@ static MACHINE_DRIVER_START( nitrobal )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
@@ -976,7 +976,7 @@ static MACHINE_DRIVER_START( schmeisr )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
@@ -1112,6 +1112,32 @@ ROM_START( rohga2 ) /* Asia/Europe v3.0 Alternate Set */
 	ROM_REGION( 512, "proms", 0 )
 	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
 ROM_END
+
+
+/*
+PCB No: DE-0353-3
+Mask ROM code: MAM
+Sound : 45 (HuC6280 CPU), OKI M6295 (x2), YM2151, YM3012
+RAM   : 6264 (x4 near 113 + x1 near 18P - 5 total)
+Xtals: 32.200MHz, 28.000MHz
+DIPSW: 8 position x3
+PALs: PAL16L8 x4 labelled TP-00 (near MAM-07), TP-01, TP-02 (both near 68000),
+      TP-04 (near 113 and HB-00)
+DE ICs:
+59 (CPU, 68000)
+55, 56 (BG)
+52 x2, 71 (Sprites)
+104 (I/O+Protection)
+113 (Linked to 104, Alpha Blending)
+
+ROMs:
+JD00-2.2A  \
+JD03-2.2D  / Main Program
+HB-00.11P  - PROM located near 113 and 4x 6264 RAMs
+MAM-13.15P - Oki Samples, this was missing from existing archive
+
+Sound out is stereo, there is a jumper to select Mono or Stereo output.
+*/
 
 ROM_START( rohgah ) /* Hong Kong v3.0 */
 	ROM_REGION(0x200000, "main", 0 ) /* 68000 code */

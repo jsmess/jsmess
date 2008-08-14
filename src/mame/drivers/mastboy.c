@@ -608,7 +608,7 @@ static WRITE8_HANDLER( backupram_enable_w )
 static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 {
 	mastboy_m5205_sambit0 = data & 1;
-	MSM5205_playmode_w(0,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
+	msm5205_playmode_w(0,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
@@ -617,15 +617,15 @@ static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 {
 	mastboy_m5205_sambit1 = data & 1;
 
-	MSM5205_playmode_w(0,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
+	msm5205_playmode_w(0,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-static WRITE8_HANDLER( msm5205_reset_w )
+static WRITE8_HANDLER( mastboy_msm5205_reset_w )
 {
 	mastboy_m5205_part = 0;
-	MSM5205_reset_w(0,data&1);
+	msm5205_reset_w(0,data&1);
 }
 
 static WRITE8_HANDLER( mastboy_msm5205_data_w )
@@ -635,7 +635,7 @@ static WRITE8_HANDLER( mastboy_msm5205_data_w )
 
 static void mastboy_adpcm_int(running_machine *machine, int data)
 {
-	MSM5205_data_w (0,mastboy_m5205_next);
+	msm5205_data_w (0,mastboy_m5205_next);
 	mastboy_m5205_next>>=4;
 
 	mastboy_m5205_part ^= 1;
@@ -644,7 +644,7 @@ static void mastboy_adpcm_int(running_machine *machine, int data)
 }
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	mastboy_adpcm_int,	/* interrupt function */
 	MSM5205_SEX_4B		/* 4KHz 4-bit */
@@ -677,10 +677,10 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READ(banked_ram_r) // mastboy bank area read
 
 	AM_RANGE(0xff000, 0xff7ff) AM_READ(mastboy_backupram_r)
-	AM_RANGE(0xff800, 0xff807) AM_READ(input_port_0_r) // P1
-	AM_RANGE(0xff808, 0xff80f) AM_READ(input_port_1_r) // P2
-	AM_RANGE(0xff810, 0xff817) AM_READ(input_port_2_r) // DSW1
-	AM_RANGE(0xff818, 0xff81f) AM_READ(input_port_3_r) // DSW2
+	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
+	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
+	AM_RANGE(0xff810, 0xff817) AM_READ_PORT("DSW1")
+	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffc00, 0xfffff) AM_READ(SMH_RAM) // Internal RAM
 ADDRESS_MAP_END
 
@@ -701,7 +701,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff838, 0xff838) AM_WRITE(mastboy_irq0_ack_w)
 	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_mastboy_m5205_sambit0_w)
 	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_mastboy_m5205_sambit1_w)
-	AM_RANGE(0xff83b, 0xff83b) AM_WRITE(msm5205_reset_w)
+	AM_RANGE(0xff83b, 0xff83b) AM_WRITE(mastboy_msm5205_reset_w)
 	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(backupram_enable_w)
 	AM_RANGE(0xffc00, 0xfffff) AM_WRITE(SMH_RAM) // Internal RAM
 ADDRESS_MAP_END
@@ -728,18 +728,18 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mastboy )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x1e, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT( 0x1e, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Game Mode" )
@@ -806,7 +806,6 @@ static INPUT_PORTS_START( mastboy )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ) )
-
 INPUT_PORTS_END
 
 /* GFX Decodes */
@@ -851,7 +850,7 @@ static MACHINE_RESET( mastboy )
 	memset( mastboy_vram, 0x00, 0x10000);
 
 	mastboy_m5205_part = 0;
-	MSM5205_reset_w(0,1);
+	msm5205_reset_w(0,1);
 	mastboy_irq0_ack = 0;
 }
 
@@ -887,7 +886,7 @@ static MACHINE_DRIVER_START( mastboy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

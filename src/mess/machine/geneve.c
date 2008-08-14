@@ -713,7 +713,7 @@ WRITE8_HANDLER ( geneve_w )
 				return*/
 
 			case 0xf120:
-				SN76496_0_w(machine, 0, data);
+				sn76496_0_w(machine, 0, data);
 				break;
 
 			case 0xf130:
@@ -797,7 +797,7 @@ WRITE8_HANDLER ( geneve_w )
 			{
 			case 1:
 				/* sound write */
-				SN76496_0_w(machine, 0, data);
+				sn76496_0_w(machine, 0, data);
 				return;
 
 			case 3:

@@ -385,7 +385,7 @@ static INTERRUPT_GEN( pasogo_interrupt )
 }
 
 #if 0
-static const struct CustomSound_interface gmaster_sound_interface =
+static const custom_sound_interface gmaster_sound_interface =
 {
 	gmaster_custom_start
 };

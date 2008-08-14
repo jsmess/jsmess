@@ -18,8 +18,8 @@
 
 
 #define AYWriteReg(chip,port,value) \
-	AY8910_control_port_0_w(machine, 0,port);  \
-	AY8910_write_port_0_w(machine, 0,value)
+	ay8910_control_port_0_w(machine, 0,port);  \
+	ay8910_write_port_0_w(machine, 0,value)
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"
 
@@ -748,7 +748,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 		if( input_port_read(machine, "DSW0") & 0x08 )
 			tape_put_bit(machine);
 		else
-			DAC_data_w(0,(data & FF_CAS) ? 127:0 );
+			dac_data_w(0,(data & FF_CAS) ? 127:0 );
 	}
 
 	/* background bits changed ? */

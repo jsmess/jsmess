@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0")
 	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
-	AM_RANGE(0xd1, 0xd1) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0xd1, 0xd1) AM_READ(ym2203_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
@@ -98,8 +98,8 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_WRITE(bank_sel_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
 	AM_RANGE(0xc3, 0xc3) AM_WRITE(SMH_NOP)		// 0xc0-c3 8255ppi
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xd1, 0xd1) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xd0, 0xd0) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xd1, 0xd1) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -266,7 +266,7 @@ static GFXDECODE_START( mayumi )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 32 )
 GFXDECODE_END
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( mayumi )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, MCLK/4)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)

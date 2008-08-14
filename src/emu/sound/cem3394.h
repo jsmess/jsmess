@@ -1,12 +1,15 @@
-#ifndef cem3394_h
-#define cem3394_h
+#pragma once
+
+#ifndef __CEM3394_H__
+#define __CEM3394_H__
 
 
 #define CEM3394_SAMPLE_RATE		(44100*4)
 
 
 /* interface */
-struct cem3394_interface
+typedef struct _cem3394_interface cem3394_interface;
+struct _cem3394_interface
 {
 	double vco_zero_freq;				/* frequency at 0V for VCO */
 	double filter_zero_freq;			/* frequency at 0V for filter */
@@ -41,5 +44,4 @@ void cem3394_set_voltage(int chip, int input, double voltage);
 double cem3394_get_parameter(int chip, int input);
 
 
-#endif
-
+#endif /* __CEM3394_H__ */

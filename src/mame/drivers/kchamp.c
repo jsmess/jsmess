@@ -122,7 +122,7 @@ static WRITE8_HANDLER( sound_reset_w ) {
 }
 
 static WRITE8_HANDLER( sound_control_w ) {
-	MSM5205_reset_w( 0, !( data & 1 ) );
+	msm5205_reset_w( 0, !( data & 1 ) );
 	sound_nmi_enable = ( ( data >> 1 ) & 1 );
 }
 
@@ -141,10 +141,10 @@ static WRITE8_HANDLER( sound_msm_w ) {
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) /* Player 1 controls - ACTIVE LOW */
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_1_r) /* Player 2 controls - ACTIVE LOW */
-	AM_RANGE(0x80, 0x80) AM_READ(input_port_2_r) /* Coins & Start - ACTIVE LOW */
-	AM_RANGE(0xC0, 0xC0) AM_READ(input_port_3_r) /* Dipswitch */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2")
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xC0, 0xC0) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
@@ -162,10 +162,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
@@ -216,10 +216,10 @@ static WRITE8_HANDLER( kc_sound_control_w ) {
 
 static ADDRESS_MAP_START( kc_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x90, 0x90) AM_READ(input_port_0_r) /* Player 1 controls - ACTIVE LOW */
-	AM_RANGE(0x98, 0x98) AM_READ(input_port_1_r) /* Player 2 controls - ACTIVE LOW */
-	AM_RANGE(0xa0, 0xa0) AM_READ(input_port_2_r) /* Coins & Start - ACTIVE LOW */
-	AM_RANGE(0x80, 0x80) AM_READ(input_port_3_r) /* Dipswitch */
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("P1")
+	AM_RANGE(0x98, 0x98) AM_READ_PORT("P2")
+	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW")
 	AM_RANGE(0xa8, 0xa8) AM_READ(sound_reset_r)
 ADDRESS_MAP_END
 
@@ -237,17 +237,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kc_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( kchampvs )
-	PORT_START("P1")	/* IN0 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( kchampvs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY
 
-	PORT_START("P2")	/* IN1 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY PORT_PLAYER(2)
@@ -267,7 +267,7 @@ static INPUT_PORTS_START( kchampvs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY PORT_PLAYER(2)
 
-	PORT_START("SYSTEM")	/* IN2 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -277,7 +277,7 @@ static INPUT_PORTS_START( kchampvs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")	/* DSW0 */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -307,7 +307,7 @@ INPUT_PORTS_END
 ********************/
 
 static INPUT_PORTS_START( kchamp )
-	PORT_START("P1")	/* IN0 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY
@@ -317,7 +317,7 @@ static INPUT_PORTS_START( kchamp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY
 
-	PORT_START("P2")	/* IN1 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY PORT_PLAYER(2)
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( kchamp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY PORT_PLAYER(2)
 
-	PORT_START("SYSTEM")	/* IN2 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -337,7 +337,7 @@ static INPUT_PORTS_START( kchamp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")	/* DSW0 */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -407,9 +407,9 @@ static void msmint( running_machine *machine, int data ) {
 	static int counter = 0;
 
 	if ( msm_play_lo_nibble )
-		MSM5205_data_w( 0, msm_data & 0x0f );
+		msm5205_data_w( 0, msm_data & 0x0f );
 	else
-		MSM5205_data_w( 0, ( msm_data >> 4 ) & 0x0f );
+		msm5205_data_w( 0, ( msm_data >> 4 ) & 0x0f );
 
 	msm_play_lo_nibble ^= 1;
 
@@ -420,7 +420,7 @@ static void msmint( running_machine *machine, int data ) {
 	}
 }
 
-static const struct MSM5205interface msm_interface =
+static const msm5205_interface msm_interface =
 {
 	msmint,			/* interrupt function */
 	MSM5205_S96_4B	/* 1 / 96 = 3906.25Hz playback */

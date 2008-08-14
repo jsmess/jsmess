@@ -22,8 +22,10 @@
  *****************************************************************************/
 /* 2.February 2000 PeT added 65sc02 subtype */
 
-#ifndef _M6502_H
-#define _M6502_H
+#pragma once
+
+#ifndef __M6502_H__
+#define __M6502_H__
 
 #include "cpuintrf.h"
 
@@ -47,7 +49,8 @@
 #define SUBTYPE_DECO16	5
 #endif
 
-enum {
+enum
+{
 	M6502_PC=1, M6502_S, M6502_P, M6502_A, M6502_X, M6502_Y,
 	M6502_EA, M6502_ZP,
 	M6502_SUBTYPE
@@ -245,5 +248,4 @@ extern void deco16_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned deco16_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _M6502_H */
-
+#endif /* __M6502_H__ */

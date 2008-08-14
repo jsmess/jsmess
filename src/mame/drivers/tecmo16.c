@@ -148,8 +148,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xfbff) AM_READ(SMH_RAM)	/* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0xfc05, 0xfc05) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xfc05, 0xfc05) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_READ(SMH_NOP)
 	AM_RANGE(0xfffe, 0xffff) AM_READ(SMH_RAM)
@@ -158,9 +158,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xfbff) AM_WRITE(SMH_RAM)	/* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0xfc04, 0xfc04) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xfc05, 0xfc05) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xfc04, 0xfc04) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xfc05, 0xfc05) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xfffe, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
@@ -430,7 +430,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irqhandler
 };
@@ -467,7 +467,7 @@ static MACHINE_DRIVER_START( fstarfrc )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 8000000/2)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
@@ -507,7 +507,7 @@ static MACHINE_DRIVER_START( ginkun )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 8000000/2)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 

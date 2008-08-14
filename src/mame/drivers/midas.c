@@ -178,11 +178,6 @@ static VIDEO_UPDATE( livequiz )
 	return 0;
 }
 
-static READ16_HANDLER( livequiz_eeprom_r )
-{
-	return input_port_read(machine, "IN2") | (eeprom_read_bit() << 3);
-}
-
 static WRITE16_HANDLER( livequiz_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
@@ -226,7 +221,7 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("IN5")
-	AM_RANGE(0x920000, 0x920001) AM_READ( livequiz_eeprom_r )
+	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("IN2")
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("IN1")
 
@@ -242,8 +237,8 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb40000, 0xb40001) AM_READ( ret_ffff )
 	AM_RANGE(0xb60000, 0xb60001) AM_READ( ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb80009) AM_WRITE( YMZ280B_register_0_lsb_w )
-	AM_RANGE(0xb8000a, 0xb8000b) AM_READWRITE( YMZ280B_status_0_lsb_r, YMZ280B_data_0_lsb_w )
+	AM_RANGE(0xb80008, 0xb80009) AM_WRITE( ymz280b_register_0_lsb_w )
+	AM_RANGE(0xb8000a, 0xb8000b) AM_READWRITE( ymz280b_status_0_lsb_r, ymz280b_data_0_lsb_w )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN4")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("IN3")
@@ -335,7 +330,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) // EEPROM
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -431,7 +426,7 @@ static void livequiz_irqhandler(running_machine *machine, int state)
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
-static const struct YMZ280Binterface ymz280b_interface =
+static const ymz280b_interface ymz280b_config =
 {
 	livequiz_irqhandler
 };
@@ -462,7 +457,7 @@ static MACHINE_DRIVER_START( livequiz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_CONFIG(ymz280b_interface)
+	MDRV_SOUND_CONFIG(ymz280b_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 MACHINE_DRIVER_END

@@ -86,10 +86,10 @@ static void start_talking (running_machine *machine)
 #endif
 
 	speech_rom_address = 0x0;
-	tms5110_CTL_w(machine,0,TMS5110_CMD_SPEAK);
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_ctl_w(machine,0,TMS5110_CMD_SPEAK);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 }
 
 static void reset_talking (running_machine *machine)
@@ -98,18 +98,18 @@ static void reset_talking (running_machine *machine)
   the function calls below. In real they happen with the frequency of 160 kHz.
 */
 
-	tms5110_CTL_w(machine,0,TMS5110_CMD_RESET);
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_ctl_w(machine,0,TMS5110_CMD_RESET);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 
 	speech_rom_address = 0x0;
 }
@@ -230,15 +230,15 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
 
 	/* guess */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(ay8910_read_port_0_r)
 	//AM_RANGE(0x56, 0x56) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
@@ -429,7 +429,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -439,7 +439,7 @@ static const struct AY8910interface ay8910_interface =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -449,7 +449,7 @@ static const struct AY8910interface ay8910_interface_2 =
 	NULL
 };
 
-static const struct TMS5110interface tms5110_interface =
+static const tms5110_interface bagman_tms5110_interface =
 {
 	bagman_speech_rom_read_bit	/*M0 callback function. Called whenever chip requests a single bit of data*/
 };
@@ -482,11 +482,11 @@ static MACHINE_DRIVER_START( bagman )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("tms", TMS5110A, 640000)
-	MDRV_SOUND_CONFIG(tms5110_interface)
+	MDRV_SOUND_CONFIG(bagman_tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -518,7 +518,7 @@ static MACHINE_DRIVER_START( pickin )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* maybe */
@@ -573,7 +573,7 @@ static MACHINE_DRIVER_START( botanic )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)

@@ -923,7 +923,8 @@ ADDRESS_MAP_END
 
 /********************** Saturn's I/O *******************************/
 
-static const SATURN_CONFIG hp48_config = {
+static const saturn_cpu_core hp48_config =
+{
 	hp48_reg_out, hp48_reg_in,
 	hp48_mem_reset, hp48_mem_config, hp48_mem_unconfig, hp48_mem_id,
 	hp48_mem_crc, 

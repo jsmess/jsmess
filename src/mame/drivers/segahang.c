@@ -433,9 +433,9 @@ static ADDRESS_MAP_START( sound_map_2203, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x0ffe) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x0ffe) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_READWRITE(SegaPCM_r, SegaPCM_w)
+	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x0ffe) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x0ffe) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_READWRITE(sega_pcm_r, sega_pcm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap_2203, ADDRESS_SPACE_IO, 8 )
@@ -448,26 +448,26 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_2151, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_READWRITE(SegaPCM_r, SegaPCM_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_READWRITE(sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap_2151, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap_2203x2, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3e) AM_READWRITE(YM2203_status_port_1_r, YM2203_control_port_1_w)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3e) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3e) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3e) AM_WRITE(ym2203_write_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -813,7 +813,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -824,13 +824,13 @@ static const struct YM2203interface ym2203_interface =
 };
 
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
 
 
-static const struct SEGAPCMinterface segapcm_interface =
+static const sega_pcm_interface segapcm_interface =
 {
 	BANK_512
 };
@@ -925,7 +925,7 @@ static MACHINE_DRIVER_START( sound_board_2203 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.13)
 	MDRV_SOUND_ROUTE(0, "right", 0.13)
 	MDRV_SOUND_ROUTE(1, "left",  0.13)
@@ -953,7 +953,7 @@ static MACHINE_DRIVER_START( sound_board_2203x2 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.13)
 	MDRV_SOUND_ROUTE(0, "right", 0.13)
 	MDRV_SOUND_ROUTE(1, "left",  0.13)
@@ -991,7 +991,7 @@ static MACHINE_DRIVER_START( sound_board_2151 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.43)
 	MDRV_SOUND_ROUTE(1, "right", 0.43)
 

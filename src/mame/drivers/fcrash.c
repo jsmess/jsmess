@@ -65,7 +65,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 
 static void m5205_int1(running_machine *machine, int data)
 {
-	MSM5205_data_w(0, sample_buffer1 & 0x0F);
+	msm5205_data_w(0, sample_buffer1 & 0x0F);
 	sample_buffer1 >>= 4;
 	sample_select1 ^= 1;
 	if (sample_select1 == 0)
@@ -74,7 +74,7 @@ static void m5205_int1(running_machine *machine, int data)
 
 static void m5205_int2(running_machine *machine, int data)
 {
-	MSM5205_data_w(1, sample_buffer2 & 0x0F);
+	msm5205_data_w(1, sample_buffer2 & 0x0F);
 	sample_buffer2 >>= 4;
 	sample_select2 ^= 1;
 }
@@ -363,10 +363,10 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0xd801, 0xd801) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
-	AM_RANGE(0xdc00, 0xdc00) AM_READWRITE(YM2203_status_port_1_r, YM2203_control_port_1_w)
-	AM_RANGE(0xdc01, 0xdc01) AM_READWRITE(YM2203_read_port_1_r, YM2203_write_port_1_w)
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0xd801, 0xd801) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0xdc00, 0xdc00) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
+	AM_RANGE(0xdc01, 0xdc01) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(fcrash_snd_bankswitch_w)
 	AM_RANGE(0xe400, 0xe400) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcrash_msm5205_0_data_w)
@@ -646,13 +646,13 @@ static INPUT_PORTS_START( kodb )
 INPUT_PORTS_END
 
 
-static const struct MSM5205interface msm5205_interface1 =
+static const msm5205_interface msm5205_interface1 =
 {
 	m5205_int1,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */
 };
 
-static const struct MSM5205interface msm5205_interface2 =
+static const msm5205_interface msm5205_interface2 =
 {
 	m5205_int2,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */
@@ -737,7 +737,7 @@ static MACHINE_DRIVER_START( kodb )
 //  MDRV_SPEAKER_STANDARD_MONO("mono")
 
 //  MDRV_SOUND_ADD("2151", YM2151, 3579545)
-//  MDRV_SOUND_CONFIG(ym2151_interface)
+//  MDRV_SOUND_CONFIG(ym2151_config)
 //  MDRV_SOUND_ROUTE(0, "mono", 0.35)
 //  MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
@@ -763,7 +763,7 @@ ROM_START( fcrash )
 	ROM_LOAD( "1.bin",   0x00000, 0x20000, CRC(5b276c14) SHA1(73e53c077d4e3c1b919eee28b29e34176ee204f8) )
 	ROM_RELOAD(          0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROMX_LOAD( "18.bin",     0x000000, 0x20000, CRC(f1eee6d9) SHA1(bee95efbff49c582cff1cc6d9bb5ef4ea5c4a074) , ROM_SKIP(3) )
 	ROMX_LOAD( "20.bin",     0x000001, 0x20000, CRC(675f4537) SHA1(acc68822da3aafbb62f76cbffa5f3389fcc91447) , ROM_SKIP(3) )
 	ROMX_LOAD( "22.bin",     0x000002, 0x20000, CRC(db8a32ac) SHA1(b95f73dff291acee239e22e5fd7efe15d0de23be) , ROM_SKIP(3) )
@@ -782,7 +782,7 @@ ROM_START( fcrash )
 	ROMX_LOAD( "17.bin",     0x180003, 0x20000, CRC(c59a4d6c) SHA1(59e49c7d24dd333007de4bb621050011a5392bcc) , ROM_SKIP(3) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x8000 )	/* stars */
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )	/* stars */
 ROM_END
 
 /*
@@ -828,7 +828,7 @@ ROM_START( kodb )
 	ROM_LOAD( "1.ic28",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx", 0 )
 	ROMX_LOAD( "cp.ic90",   0x000000, 0x80000, CRC(e3b8589e) SHA1(775f97e43cb995b93da40063a1f1e4d73b34437c), ROM_SKIP(7) )
 	ROMX_LOAD( "dp.ic89",   0x000001, 0x80000, CRC(3eec9580) SHA1(3d8d0cfbeae077544e514a5eb96cc83f716e494f), ROM_SKIP(7) )
 	ROMX_LOAD( "ap.ic88",   0x000002, 0x80000, CRC(fdf5f163) SHA1(271ee96886c958accaca9a82484ab80fe32bd38e), ROM_SKIP(7) )
@@ -839,7 +839,7 @@ ROM_START( kodb )
 	ROMX_LOAD( "bi.ic94",   0x000007, 0x80000, CRC(4a1b43fe) SHA1(7957f45b2862825c9509043c63c7da7108bd251b), ROM_SKIP(7) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x8000 )	/* stars */
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )	/* stars */
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "2.ic19",      0x00000, 0x40000, CRC(a2db1575) SHA1(1a4a29e4b045af50700adf1665697feab12cc234) )

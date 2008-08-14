@@ -149,13 +149,13 @@ static MACHINE_START( exctsccr )
 // Champion Baseball has only one DAC
 static WRITE8_HANDLER( champbas_dac_w )
 {
-	DAC_signed_data_w(0, data << 2);
+	dac_signed_data_w(0, data << 2);
 }
 
 // Exciting Soccer has two
 static WRITE8_HANDLER( exctsccr_DAC_data_w )
 {
-	DAC_signed_data_w(offset, data << 2);
+	dac_signed_data_w(offset, data << 2);
 }
 
 
@@ -217,8 +217,8 @@ AB 1010_1011
 static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) /* MCU shared RAM */
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -245,8 +245,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -278,8 +278,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // MCU not used (though it's present on the board)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
@@ -349,14 +349,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x82, 0x82) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x87, 0x87) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8a, 0x8a) AM_WRITE(AY8910_write_port_2_w)
-	AM_RANGE(0x8b, 0x8b) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x8e, 0x8e) AM_WRITE(AY8910_write_port_3_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(AY8910_control_port_3_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x86, 0x86) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x87, 0x87) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8a, 0x8a) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0x8b, 0x8b) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_write_port_3_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_control_port_3_w)
 ADDRESS_MAP_END
 
 
@@ -403,7 +403,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, 0)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( champbas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, 0)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exctsccr )
@@ -476,7 +476,7 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_DIPSETTING(    0x00, "2 Min." )
 	PORT_DIPSETTING(    0x60, "3 Min." )
 	PORT_DIPSETTING(    0x40, "4 Min." )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, 0)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 
@@ -838,8 +838,9 @@ ROM_START( champbb2 )
 	ROM_LOAD( "epr5934", 0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "epr5935", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
 
+	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "MCU", 0 )
-	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
@@ -865,8 +866,9 @@ ROM_START( champb2a )
 	ROM_LOAD( "epr5934", 0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "epr5935", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
 
+	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "MCU", 0 )
-	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )

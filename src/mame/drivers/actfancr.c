@@ -107,19 +107,19 @@ static ADDRESS_MAP_START( triothep_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(&actfancr_ram) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x3800, 0x3800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -281,7 +281,7 @@ static void sound_irq(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate); /* IRQ */
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	sound_irq
 };
@@ -323,7 +323,7 @@ static MACHINE_DRIVER_START( actfancr )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1024188)
@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( triothep )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz) /* verified on pcb */

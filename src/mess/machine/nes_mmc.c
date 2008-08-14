@@ -901,7 +901,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
 	{
-		NESPSG_0_w (machine, offset & 0x1f, data);
+		nes_psg_0_w (machine, offset & 0x1f, data);
 		return;
 	}
 

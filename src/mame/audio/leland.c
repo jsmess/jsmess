@@ -133,7 +133,7 @@ static void leland_update(void *param, stream_sample_t **inputs, stream_sample_t
 }
 
 
-void *leland_sh_start(int clock, const struct CustomSound_interface *config)
+void *leland_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* reset globals */
 	dac_buffer[0] = dac_buffer[1] = NULL;
@@ -502,7 +502,7 @@ static void leland_80186_extern_update(void *param, stream_sample_t **inputs, st
 static TIMER_CALLBACK( internal_timer_int );
 static TIMER_CALLBACK( dma_timer_callback );
 
-void *leland_80186_sh_start(int clock, const struct CustomSound_interface *config)
+void *leland_80186_sh_start(int clock, const custom_sound_interface *config)
 {
 	int i;
 
@@ -543,7 +543,7 @@ void *leland_80186_sh_start(int clock, const struct CustomSound_interface *confi
 }
 
 
-void *redline_80186_sh_start(int clock, const struct CustomSound_interface *config)
+void *redline_80186_sh_start(int clock, const custom_sound_interface *config)
 {
 	void *result = leland_80186_sh_start(clock, config);
 	is_redline = 1;
@@ -2008,7 +2008,7 @@ static READ16_HANDLER( peripheral_r )
 			if (!has_ym2151)
 				return pit8254_r(machine, offset | 0x40, mem_mask);
 			else
-				return YM2151_status_port_0_lsb_r(machine, offset, mem_mask);
+				return ym2151_status_port_0_lsb_r(machine, offset, mem_mask);
 
 		case 4:
 			if (is_redline)
@@ -2044,9 +2044,9 @@ static WRITE16_HANDLER( peripheral_w )
 			if (!has_ym2151)
 				pit8254_w(machine, offset | 0x40, data, mem_mask);
 			else if (offset == 0)
-				YM2151_register_port_0_lsb_w(machine, offset, data, mem_mask);
+				ym2151_register_port_0_lsb_w(machine, offset, data, mem_mask);
 			else if (offset == 1)
-				YM2151_data_port_0_lsb_w(machine, offset, data, mem_mask);
+				ym2151_data_port_0_lsb_w(machine, offset, data, mem_mask);
 			break;
 
 		case 4:

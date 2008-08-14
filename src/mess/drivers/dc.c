@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( dc_console )
 {
 	MACHINE_RESET_CALL(dc);
-	AICA_set_ram_base(0, dc_sound_ram, 2*1024*1024);
+	aica_set_ram_base(0, dc_sound_ram, 2*1024*1024);
 }
 
 static void aica_irq(running_machine *machine, int irq)
@@ -122,7 +122,7 @@ static void aica_irq(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct AICAinterface aica_interface =
+static const aica_interface dc_aica_interface =
 {
 	0,
 	aica_irq
@@ -158,7 +158,7 @@ static MACHINE_DRIVER_START( dc )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("aica", AICA, 0)
-	MDRV_SOUND_CONFIG(aica_interface)
+	MDRV_SOUND_CONFIG(dc_aica_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END

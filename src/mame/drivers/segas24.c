@@ -594,7 +594,7 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		DAC_0_signed_data_w(machine, 0, data);
+		dac_0_signed_data_w(machine, 0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -608,7 +608,7 @@ static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		DAC_0_signed_data_w(machine,0, data);
+		dac_0_signed_data_w(machine,0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -738,19 +738,19 @@ static WRITE16_HANDLER( curbank_w )
 
 static READ16_HANDLER( ym_status_r )
 {
-	return YM2151_status_port_0_r(machine, 0);
+	return ym2151_status_port_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( ym_register_w )
 {
 	if(ACCESSING_BITS_0_7)
-		YM2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( ym_data_w )
 {
 	if(ACCESSING_BITS_0_7)
-		YM2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(machine, 0, data);
 }
 
 
@@ -1885,7 +1885,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irq_ym
 };
@@ -1927,7 +1927,7 @@ static MACHINE_DRIVER_START( system24 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 

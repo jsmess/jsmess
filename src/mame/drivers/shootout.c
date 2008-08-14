@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( readmem_alt, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1002, 0x1002) AM_READ(input_port_2_r)
 	AM_RANGE(0x1003, 0x1003) AM_READ(input_port_3_r)
 	AM_RANGE(0x2000, 0x21ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2800) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0x2800, 0x2800) AM_READ(ym2203_status_port_0_r)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)	/* foreground */
 	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM)	/* background */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
@@ -119,8 +119,8 @@ static ADDRESS_MAP_START( writemem_alt, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
 	AM_RANGE(0x2000, 0x21ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x2801, 0x2801) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(shootout_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
@@ -130,15 +130,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0x4000, 0x4000) AM_READ(ym2203_status_port_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -272,7 +272,7 @@ static void shootout_snd2_irq(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 0,0,linestate);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -282,7 +282,7 @@ static const struct YM2203interface ym2203_interface =
 	shootout_snd_irq
 };
 
-static const struct YM2203interface ym2203_interface2 =
+static const ym2203_interface ym2203_interface2 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( shootout )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

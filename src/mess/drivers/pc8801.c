@@ -416,8 +416,8 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x32, 0x32) AM_READWRITE( pc88sr_inport_32, pc88sr_outport_32 )
 	AM_RANGE(0x34, 0x35) AM_WRITE( pc88sr_ALU )
 	AM_RANGE(0x40, 0x40) AM_READWRITE( pc88sr_inport_40, pc88sr_outport_40 )
-	AM_RANGE(0x44, 0x44) AM_READWRITE( YM2203_status_port_0_r, YM2203_control_port_0_w )
-	AM_RANGE(0x45, 0x45) AM_READWRITE( YM2203_read_port_0_r, YM2203_write_port_0_w )
+	AM_RANGE(0x44, 0x44) AM_READWRITE( ym2203_status_port_0_r, ym2203_control_port_0_w )
+	AM_RANGE(0x45, 0x45) AM_READWRITE( ym2203_read_port_0_r, ym2203_write_port_0_w )
 	AM_RANGE(0x46, 0x47) AM_NOP										/* OPNA extra port (not yet) */
 	AM_RANGE(0x50, 0x51) AM_READWRITE( pc8801_crtc_read, pc8801_crtc_write )
 	AM_RANGE(0x52, 0x5b) AM_WRITE( pc8801_palette_out )
@@ -500,7 +500,7 @@ ROM_END
 
 static  READ8_HANDLER(opn_dummy_input){return 0xff;}
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface pc8801_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -557,7 +557,7 @@ static MACHINE_DRIVER_START( pc88srl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ym2203", YM2203, 3993600)
-	MDRV_SOUND_CONFIG(ym2203_interface)	/* Should be accurate */
+	MDRV_SOUND_CONFIG(pc8801_ym2203_interface)	/* Should be accurate */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)

@@ -507,7 +507,7 @@ static z80ctc_interface ctc_intf =
 };
 
 
-static const struct AY8910interface ay8912_interface =
+static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -716,9 +716,9 @@ static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x93) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
-	AM_RANGE(0x98, 0x98) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x98, 0x98) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x9a, 0x9a) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x98, 0x98) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x98, 0x98) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x9a, 0x9a) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -811,7 +811,7 @@ static INPUT_PORTS_START( ebases )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ebases_trackball_r, 0)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ebases_trackball_r, NULL)
 
 	PORT_START("P4HANDLE")
 	PORT_DIPNAME( 0x01, 0x00, "2 Players Game" )	PORT_DIPLOCATION( "S1:1" )
@@ -916,7 +916,7 @@ static INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wow_speech_status_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wow_speech_status_r, NULL)
 
 	PORT_START("P4HANDLE")
 	/* "If S1:1,2,3 are all ON or all OFF, only coin meter number 1 will count." */
@@ -976,7 +976,7 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gorf_speech_status_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gorf_speech_status_r, NULL)
 
 	PORT_START("P4HANDLE")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("S1:1")
@@ -1113,7 +1113,7 @@ static INPUT_PORTS_START( demndrgn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(demndragn_joystick_r, 0)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(demndragn_joystick_r, NULL)
 
 	PORT_START("P3HANDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1217,19 +1217,19 @@ static const char *const seawolf_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface seawolf2_samples_interface =
+static const samples_interface seawolf2_samples_interface =
 {
 	10,	/* 5*2 channels */
 	seawolf_sample_names
 };
 
-static const struct Samplesinterface wow_samples_interface =
+static const samples_interface wow_samples_interface =
 {
 	1,
 	wow_sample_names
 };
 
-static const struct Samplesinterface gorf_samples_interface =
+static const samples_interface gorf_samples_interface =
 {
 	1,
 	gorf_sample_names

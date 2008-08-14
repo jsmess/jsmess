@@ -219,7 +219,7 @@ static void wswan_sh_update(void *param,stream_sample_t **inputs, stream_sample_
 	}
 }
 
-void *wswan_sh_start(int clock, const struct CustomSound_interface *config)
+void *wswan_sh_start(int clock, const custom_sound_interface *config)
 {
 	channel = stream_create(0, 2, Machine->sample_rate, 0, wswan_sh_update);
 

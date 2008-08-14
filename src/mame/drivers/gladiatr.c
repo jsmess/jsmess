@@ -301,9 +301,9 @@ static WRITE8_HANDLER( glad_adpcm_w )
 	/* bit6 = bank offset */
 	memory_set_bankptr(2,rom + ((data & 0x40) ? 0xc000 : 0));
 
-	MSM5205_data_w(0,data);         /* bit0..3  */
-	MSM5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	MSM5205_vclk_w (0,(data>>4)&1); /* bit4     */
+	msm5205_data_w(0,data);         /* bit0..3  */
+	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w (0,(data>>4)&1); /* bit4     */
 }
 
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
@@ -414,8 +414,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2203_read_port_0_r) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READ(SMH_NOP)
 	AM_RANGE(0x60, 0x61) AM_READ(qx2_r) AM_WRITE(qx2_w)
@@ -462,8 +462,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_1_r, TAITO8741_1_w)
 	AM_RANGE(0x40, 0x40) AM_NOP	// WRITE(sub_irq_ack_w)
 	AM_RANGE(0x60, 0x61) AM_READWRITE(TAITO8741_2_r, TAITO8741_2_w)
@@ -653,7 +653,7 @@ static READ8_HANDLER(f1_r)
 	return mame_rand(machine);
 }
 
-static const struct YM2203interface ppking_ym2203_interface =
+static const ym2203_interface ppking_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -666,7 +666,7 @@ static const struct YM2203interface ppking_ym2203_interface =
 	NULL
 };
 
-static const struct YM2203interface gladiatr_ym2203_interface =
+static const ym2203_interface gladiatr_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -679,7 +679,7 @@ static const struct YM2203interface gladiatr_ym2203_interface =
 	gladiator_ym_irq          /* NMI request for 2nd cpu */
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* vclk input mode    */
@@ -733,7 +733,7 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -782,7 +782,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

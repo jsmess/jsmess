@@ -212,6 +212,93 @@ u25.bin |
 u26.bin |
 u27.bin /
 
+
+----------
+PCB Layout
+----------
+
+MOTHERBOARD
+|---------------------------------------------------------------|
+|TA8205AH  GAL16V8B(3)    |----------------|BP964A_U49          |
+|  VOL                    |----------------||-------|  TC55328  |
+| TL074    ES5506                           |AA005  |  TC55328  |
+|  D6376                                    |       |  TC55328  |
+|               TC55257    |-------------|  |       |  TC55328  |
+|               TC55257    |   68000     |  |-------|           |
+|     GAL16V8B(2)          |             |                      |
+|     50MHz     TC55257    |-------------|  |-------|           |
+|               TC55257                     |AA005  |       |-| |
+|                                           |       |       | | |
+|               TC55257                     |       |       | | |
+|      |-------|TC55257                     |-------|       | | |
+|      |68EC020|                                            | | |
+|      |       | GAL16V8B(1)                |-------|       | | |
+|      |-------|                            |AA0062 |       | | |
+|          MCM6206  MCM6206                 |       |       | | |
+|          MCM6206  MCM6206                 |       |       | | |
+|                                           |-------|       |-| |
+|          MCM6206  MCM6206                                     |
+|                                           |-------|  TC55328  |
+|          MCM6206  MCM6206                 |AA004  |  TC55328  |
+|          MCM6206  MCM6206                 |       |           |
+|          MCM6206  MCM6206                 |       |   32MHz   |
+|DSW1(8)                  |----------------||-------|   27MHz   |
+|DSW2(8)                  |----------------| TC55257  TC55257   |
+|---------------------------------------------------------------|
+Notes:
+      68020 clock 25.000MHz [50/2] (QFP100)
+      68000 clock 16.000MHz [32/2] (SDIP64)
+      ES5506 clock 16.000MHz [32/2] (PLCC68)
+      VSync 60Hz
+      HSync 15.83kHz
+      TC55257     - Toshiba TC55257CFL-85 32k x8 SRAM (SOJ28)
+      TC55328     - Toshiba TC55328AJ-15 32k x8 SRAM (SOP28)
+      MCM6206     - Motorola MCM6206BAEJ25 32k x8 SRAM (SOJ28)
+      GAL16V8B(1) - stamped 'U008' (DIP20)
+      GAL16V8B(2) - stamped 'U200' (DIP20)
+      GAL16V8B(3) - stamped 'U009' (DIP20)
+      D6376       - NEC uPD6376 Audio 2-Channel 16-Bit D/A Converter (SOIC16)
+      Custom ICs  -
+                   IKM-AA004 1633JF8433 (QFP208)
+                   IKM-AA0062 1633CF8461 (QFP208)
+                   IKM-AA005 1670F1541 (x2, QFP208)
+
+ROM Board
+---------
+
+MASK ROM BOARD
+|----------------------------------------|
+|  |----------------|                    |
+|  |----------------|                    |
+|                              U19       |
+| *U27    *U26                           |
+|                                        |
+|                                        |
+| *U25     U24        *U23    *U22       |
+|                                        |
+|                                    |-| |
+|  U18     U17         U21     U20   | | |
+|                                    | | |
+|                                    | | |
+|                                    | | |
+|  U16     U15         U14     U13   | | |
+|                                    | | |
+|                                    | | |
+|  U9      U10         U11     U12   | | |
+|                                    |-| |
+|                                        |
+| *U5     *U6         *U7     *U8        |
+|                                        |
+|  U1      U2          U3      U4        |
+|                                        |
+|  |----------------|                    |
+|  |----------------|                    |
+|----------------------------------------|
+Notes:
+      * - These locations not populated
+      ROMs at locations U1, U2, U3, U4, U19, U20 & U21 are 27C040 EPROMs
+      All other ROMs are surface mounted 32MBit SOP44 MaskROMs
+
 ******************************************************************************/
 
 extern UINT32 *macrossp_scra_videoram, *macrossp_scra_videoregs;
@@ -232,16 +319,6 @@ VIDEO_UPDATE(macrossp);
 VIDEO_EOF(macrossp);
 
 /*** VARIOUS READ / WRITE HANDLERS *******************************************/
-
-static READ32_HANDLER ( macrossp_ports1_r )
-{
-	return ((input_port_read(machine, "IN0") << 16) |  (input_port_read(machine, "KEYS") << 0));
-}
-
-static READ32_HANDLER ( macrossp_ports2_r )
-{
-	return ((input_port_read(machine, "DSW") << 16) |  (input_port_read(machine, "UNK") << 0));
-}
 
 static WRITE32_HANDLER( paletteram32_macrossp_w )
 {
@@ -307,9 +384,9 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0xa00000, 0xa03fff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0xb00000, 0xb00003) AM_READ(macrossp_ports1_r)
+	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r)
-	AM_RANGE(0xb0000c, 0xb0000f) AM_READ(macrossp_ports2_r)
+	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW")
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_READ(SMH_RAM)
 
@@ -356,122 +433,116 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x200000, 0x207fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x400000, 0x40007f) AM_READ(ES5506_data_0_word_r)
+	AM_RANGE(0x400000, 0x40007f) AM_READ(es5506_data_0_word_r)
 	AM_RANGE(0x600000, 0x600001) AM_READ(macrossp_soundcmd_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x200000, 0x207fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x400000, 0x40007f) AM_WRITE(ES5506_data_0_word_w)
+	AM_RANGE(0x400000, 0x40007f) AM_WRITE(es5506_data_0_word_w)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
 
 static INPUT_PORTS_START( macrossp )
-	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_START("INPUTS")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use */
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0000ffc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use */
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
-	PORT_START("KEYS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use */
-
-	PORT_START("DSW")	/* DSW */
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x0009, "1 Coins/7 Credits" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play) )
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0050, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(      0x00f0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(      0x0070, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(      0x00d0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x00b0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x0090, "1 Coins/7 Credits" )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPSETTING(      0x0c00, "3" )
-	PORT_DIPSETTING(      0x0800, "4" )
-	PORT_DIPSETTING(      0x0400, "5" )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")  /* See above for dips listing.... also in Quiz game's test screens */
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:7")  /* See title page for difference :-)  The Manual shows this as UNUSED */
-	PORT_DIPSETTING(      0x4000, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" )
-
-	PORT_START("UNK")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use, but not dipswitches */
-
+	PORT_START("DSW")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use, but not dipswitches */
+	PORT_DIPNAME( 0x000f0000, 0x000f0000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(          0x00020000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(          0x00050000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(          0x00080000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(          0x00040000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(          0x00010000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(          0x000f0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(          0x00030000, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(          0x00070000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(          0x000e0000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(          0x00060000, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(          0x000d0000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(          0x000c0000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(          0x000b0000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(          0x000a0000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(          0x00090000, "1 Coins/7 Credits" )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Free_Play) )
+	PORT_DIPNAME( 0x00f00000, 0x00f00000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(          0x00200000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(          0x00500000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(          0x00800000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(          0x00400000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(          0x00100000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(          0x00f00000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(          0x00300000, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(          0x00700000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(          0x00e00000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(          0x00600000, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(          0x00d00000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(          0x00c00000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(          0x00b00000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(          0x00a00000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(          0x00900000, "1 Coins/7 Credits" )
+	PORT_DIPNAME( 0x03000000, 0x03000000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(          0x02000000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(          0x03000000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(          0x01000000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c000000, 0x0c000000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(          0x00000000, "2" )
+	PORT_DIPSETTING(          0x0c000000, "3" )
+	PORT_DIPSETTING(          0x08000000, "4" )
+	PORT_DIPSETTING(          0x04000000, "5" )
+	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x10000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")  /* See above for dips listing.... also in Quiz game's test screens */
+	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40000000, 0x00000000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:7")  /* See title page for difference :-)  The Manual shows this as UNUSED */
+	PORT_DIPSETTING(          0x40000000, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( English ) )
+	PORT_SERVICE_DIPLOC(  0x80000000, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( quizmoon )
 	PORT_INCLUDE(macrossp)
 
-	PORT_MODIFY("KEYS")
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Test ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Tilt ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_MODIFY("INPUTS")
+	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Test ) )
+	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Tilt ) )
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" ) /* no Language dipswitch for this game */
-
+	PORT_DIPUNUSED_DIPLOC( 0x40000000, 0x40000000, "SW2:7" ) /* no Language dipswitch for this game */
 INPUT_PORTS_END
 
 /*** GFX DECODE **************************************************************/
@@ -519,7 +590,7 @@ static void irqhandler(running_machine *machine, int irq)
 //  cpunum_set_input_line(machine, 1,1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct ES5506interface es5506_interface =
+static const es5506_interface es5506_config =
 {
 	"ensoniq.0",
 	"ensoniq.1",
@@ -557,7 +628,7 @@ static MACHINE_DRIVER_START( macrossp )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ensoniq", ES5506, 16000000)
-	MDRV_SOUND_CONFIG(es5506_interface)
+	MDRV_SOUND_CONFIG(es5506_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

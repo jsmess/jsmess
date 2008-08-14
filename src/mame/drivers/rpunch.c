@@ -279,7 +279,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf001) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0xf000, 0xf001) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0xf200, 0xf200) AM_READ(sound_command_r)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -287,8 +287,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(upd_control_w)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(upd_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
@@ -482,7 +482,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	ym2151_irq_gen
 };
@@ -523,7 +523,7 @@ static MACHINE_DRIVER_START( rpunch )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 

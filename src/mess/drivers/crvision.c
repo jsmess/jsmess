@@ -356,7 +356,7 @@ static WRITE8_HANDLER( pia_portb_w )
         PB7     SN76489 data output
     */
 
-	SN76496_0_w(machine, 0, data);
+	sn76496_0_w(machine, 0, data);
 
 	sn76489_ready = 0;
 

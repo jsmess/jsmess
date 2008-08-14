@@ -17,12 +17,15 @@
  *
  *****************************************************************************/
 
-#ifndef _CP1610_H
-#define _CP1610_H
+#pragma once
+
+#ifndef __CP1610_H__
+#define __CP1610_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	CP1610_R0=1, CP1610_R1, CP1610_R2, CP1610_R3,
 	CP1610_R4, CP1610_R5, CP1610_R6, CP1610_R7
 };
@@ -42,4 +45,4 @@ unsigned cp1610_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *o
 #define cp1610_readmem16(A) program_read_word_16be((A)<<1)
 #define cp1610_writemem16(A,B) program_write_word_16be((A)<<1,B)
 
-#endif /* _CP1610_H */
+#endif /* __CP1610_H__ */

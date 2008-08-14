@@ -261,21 +261,21 @@ static READ8_HANDLER( avengers_soundlatch2_r )
 
 static WRITE8_HANDLER( msm5205_w )
 {
-	MSM5205_reset_w(offset,(data>>7)&1);
-	MSM5205_data_w(offset,data);
-	MSM5205_vclk_w(offset,1);
-	MSM5205_vclk_w(offset,0);
+	msm5205_reset_w(offset,(data>>7)&1);
+	msm5205_data_w(offset,data);
+	msm5205_vclk_w(offset,1);
+	msm5205_vclk_w(offset,0);
 }
 
 static ADDRESS_MAP_START( avengers_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf808, 0xf808) AM_READ(input_port_0_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(input_port_1_r)
-	AM_RANGE(0xf80a, 0xf80a) AM_READ(input_port_2_r)
-	AM_RANGE(0xf80b, 0xf80b) AM_READ(input_port_3_r)
-	AM_RANGE(0xf80c, 0xf80c) AM_READ(input_port_4_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
+	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
+	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWB")
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf80d, 0xf80d) AM_READ(avengers_protection_r)
 ADDRESS_MAP_END
 
@@ -303,11 +303,11 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 ) /* common to troja
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf808, 0xf808) AM_READ(input_port_0_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(input_port_1_r)
-	AM_RANGE(0xf80a, 0xf80a) AM_READ(input_port_2_r)
-	AM_RANGE(0xf80b, 0xf80b) AM_READ(input_port_3_r)
-	AM_RANGE(0xf80c, 0xf80c) AM_READ(input_port_4_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
+	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
+	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 ) /* lwings */
@@ -353,10 +353,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_RAM) AM_BASE(&avengers_soundlatch2)
 ADDRESS_MAP_END
 
@@ -557,7 +557,8 @@ static INPUT_PORTS_START( trojanls )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
-	PORT_START("DSWB")
+	/* DSW tags inverted to use lwings map */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:8,7")
 	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x02, "Upright 2 Players" )
@@ -576,7 +577,7 @@ static INPUT_PORTS_START( trojanls )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:1" )
 
-	PORT_START("DSWA")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -603,7 +604,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( trojan )
 	PORT_INCLUDE( trojanls )
 
-	PORT_MODIFY("DSWB")
+	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0xe0, 0xe0, "Starting Level" ) PORT_DIPLOCATION("SWB:3,2,1")
 	PORT_DIPSETTING(    0xe0, "1" )
 	PORT_DIPSETTING(    0xc0, "2" )
@@ -616,29 +617,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( avengers )
 	PORT_INCLUDE( lwings_generic )
-
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:6,5")
-	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:4,3")
-	PORT_DIPSETTING(    0x30, "20k 60k" )
-	PORT_DIPSETTING(    0x10, "20k 70k" )
-	PORT_DIPSETTING(    0x20, "20k 80k" )
-	PORT_DIPSETTING(    0x00, "30k 80k" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:2,1")
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPSETTING(    0x80, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
 
 	PORT_START("DSWA")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:8")
@@ -663,6 +641,29 @@ static INPUT_PORTS_START( avengers )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:6,5")
+	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:4,3")
+	PORT_DIPSETTING(    0x30, "20k 60k" )
+	PORT_DIPSETTING(    0x10, "20k 70k" )
+	PORT_DIPSETTING(    0x20, "20k 80k" )
+	PORT_DIPSETTING(    0x00, "30k 80k" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:2,1")
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
 /*************************************
@@ -741,7 +742,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* slave mode */
@@ -816,7 +817,7 @@ static MACHINE_DRIVER_START( trojan )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("5205", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

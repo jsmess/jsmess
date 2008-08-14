@@ -222,7 +222,7 @@ static WRITE8_HANDLER ( svi318_ppi_port_c_w )
 	/* key click */
 	val = (data & 0x80) ? 0x3e : 0;
 	val += (data & 0x40) ? 0x3e : 0;
-	DAC_signed_data_w (0, val);
+	dac_signed_data_w (0, val);
 
 	/* cassette motor on/off */
 	if (svi318_cassette_present(0))

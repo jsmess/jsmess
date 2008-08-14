@@ -443,13 +443,13 @@ static void csilver_adpcm_int(running_machine *machine, int data)
 	if (toggle)
 		cpunum_set_input_line(machine, 2,M6502_IRQ_LINE,HOLD_LINE);
 
-	MSM5205_data_w (0,msm5205next>>4);
+	msm5205_data_w (0,msm5205next>>4);
 	msm5205next<<=4;
 }
 
 static READ8_HANDLER( csilver_adpcm_reset_r )
 {
-	MSM5205_reset_w(0,0);
+	msm5205_reset_w(0,0);
 	return 0;
 }
 
@@ -962,20 +962,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dec8_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM3812_control_port_0_w) /* OPL */
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2203_control_port_0_w) /* OPN */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym3812_control_port_0_w) /* OPL */
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
 static ADDRESS_MAP_START( oscar_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM3526_control_port_0_w) /* OPL */
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2203_control_port_0_w) /* OPN */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym3526_control_port_0_w) /* OPL */
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -988,10 +988,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ym3526_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3526_control_port_0_w) /* OPL? */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w) /* OPN */
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w) /* OPL? */
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -1006,10 +1006,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3526_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
@@ -2019,22 +2019,22 @@ static void oscar_irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 2,0,linestate); /* M6502_IRQ_LINE */
 }
 
-static const struct YM3526interface ym3526_interface =
+static const ym3526_interface ym3526_config =
 {
 	irqhandler
 };
 
-static const struct YM3526interface oscar_ym3526_interface =
+static const ym3526_interface oscar_ym3526_interface =
 {
 	oscar_irqhandler
 };
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	csilver_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */
@@ -2118,7 +2118,7 @@ static MACHINE_DRIVER_START( cobracom )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2161,7 +2161,7 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2202,7 +2202,7 @@ static MACHINE_DRIVER_START( srdarwin )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2244,7 +2244,7 @@ static MACHINE_DRIVER_START( gondo )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2426,7 +2426,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
 MACHINE_DRIVER_END
 
@@ -2468,7 +2468,7 @@ static MACHINE_DRIVER_START( garyoret )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 

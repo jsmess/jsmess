@@ -25,7 +25,7 @@
 /* the state of the streamed output */
 struct tms5110_info
 {
-	const struct TMS5110interface *intf;
+	const tms5110_interface *intf;
 	const char *tag;
 	sound_stream *stream;
 	void *chip;
@@ -68,7 +68,7 @@ static void speech_rom_set_addr(int addr)
 
 static void *tms5110_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct TMS5110interface dummy = { 0 };
+	static const tms5110_interface dummy = { 0 };
 	struct tms5110_info *info;
 
 	info = auto_malloc(sizeof(*info));
@@ -173,12 +173,12 @@ static void tms5110_reset(void *chip)
 
 /******************************************************************************
 
-     tms5110_CTL_w -- write Control Command to the sound chip
+     tms5110_ctl_w -- write Control Command to the sound chip
 commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
-WRITE8_HANDLER( tms5110_CTL_w )
+WRITE8_HANDLER( tms5110_ctl_w )
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
 
@@ -189,11 +189,11 @@ WRITE8_HANDLER( tms5110_CTL_w )
 
 /******************************************************************************
 
-     tms5110_PDC_w -- write to PDC pin on the sound chip
+     tms5110_pdc_w -- write to PDC pin on the sound chip
 
 ******************************************************************************/
 
-WRITE8_HANDLER( tms5110_PDC_w )
+WRITE8_HANDLER( tms5110_pdc_w )
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
 

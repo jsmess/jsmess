@@ -205,7 +205,7 @@ static WRITE8_HANDLER( firetrap_sound_command_w )
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
 {
-	MSM5205_reset_w(offset,~data & 0x01);
+	msm5205_reset_w(offset,~data & 0x01);
 	firetrap_irq_enable = data & 0x02;
 }
 
@@ -224,7 +224,7 @@ static void firetrap_adpcm_int (running_machine *machine, int data)
 {
 	static int toggle=0;
 
-	MSM5205_data_w (0,msm5205next>>4);
+	msm5205_data_w (0,msm5205next>>4);
 	msm5205next<<=4;
 
 	toggle ^= 1;
@@ -316,8 +316,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3526_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
@@ -532,7 +532,7 @@ GFXDECODE_END
 
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	firetrap_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz ?             */
@@ -608,7 +608,7 @@ static MACHINE_DRIVER_START( firetrap )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -646,7 +646,7 @@ static MACHINE_DRIVER_START( firetpbl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

@@ -8,6 +8,38 @@ Supported:
 Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copyright, roms are the same
                                    on a version with the SM (c)
 
+|---------------------------------------|
+| VOL    4558    4MHz   PAL     62256   |
+| YM3812 YM3014                         |
+| 3.579545MHz    555    PAL     |------||
+| LM324     M6295        |----| |TV16B ||
+|          ROM.U3   PAL  |YBOX| |      ||
+|J   PAL                 |----| |      ||
+|A         PAL      PAL         |------||
+|M         PAL      PAL  PAL            |
+|M         PAL      PAL     53.693175MHz|
+|A   DSW2                               |
+|          PAL      PAL    |------|     |
+|    DSW1                  |TA06SD|     |
+|          ROM.U5   ROM.U4 |      |     |
+|                          |------|     |
+|          ROM.U8   ROM.U7 62256  D41264|
+|          *        *      62256  D41264|
+|---------------------------------------|
+Notes:
+      Main CPU is 68000-based, but actual CPU chip is not known
+      Master clock 53.693175MHz. CPU likely running at 53.693175/7 or /6 (??)
+      YM3812 clock 3.579545MHz
+      M6295 clock 1.000MHz (4/4]. Sample rate = 1000000/132
+      VSync 60Hz
+      HSync 16.24kHz
+      62256 - 8k x8 SRAM (DIP28)
+      D41264 - NEC D41264V-15V 64k x4 VRAM (ZIP24)
+      * Unpopulated DIP32 socket
+      Custom ICs -
+                  Y-BOX TA891945 (QFP100)
+                  TA-06SD 9933 B816453 (QFP128)
+                  TV16B 0010 ME251271 (QFP160)
 */
 
 #include "driver.h"
@@ -92,7 +124,7 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( puckpkmn_YM3438_r )
 {
-	return	YM3438_status_port_0_A_r(machine, 0) << 8;
+	return	ym3438_status_port_0_a_r(machine, 0) << 8;
 }
 
 static WRITE16_HANDLER( puckpkmn_YM3438_w )
@@ -100,12 +132,12 @@ static WRITE16_HANDLER( puckpkmn_YM3438_w )
 	switch (offset)
 	{
 		case 0:
-			if (ACCESSING_BITS_8_15)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
+			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_a_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				ym3438_data_port_0_a_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		case 1:
-			if (ACCESSING_BITS_8_15)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
+			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_b_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				ym3438_data_port_0_b_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 	}
 }
@@ -118,7 +150,7 @@ static ADDRESS_MAP_START( puckpkmn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700014, 0x700015) AM_READ(input_port_2_word_r)		/* Input (?) */
 	AM_RANGE(0x700016, 0x700017) AM_READ(input_port_3_word_r)		/* Input (DSW1) */
 	AM_RANGE(0x700018, 0x700019) AM_READ(input_port_4_word_r)		/* Input (DSW2) */
-	AM_RANGE(0x700022, 0x700023) AM_READ(OKIM6295_status_0_lsb_r)	/* M6295 Sound Chip Status Register */
+	AM_RANGE(0x700022, 0x700023) AM_READ(okim6295_status_0_lsb_r)	/* M6295 Sound Chip Status Register */
 	AM_RANGE(0xa04000, 0xa04001) AM_READ(puckpkmn_YM3438_r)			/* Ym3438 Sound Chip Status Register */
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
 	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(SMH_BANK1)				/* VDP sees the roms here */
@@ -133,7 +165,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( puckpkmn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)					/* Main 68k Program Roms */
-	AM_RANGE(0x700022, 0x700023) AM_WRITE(OKIM6295_data_0_lsb_w)		/* M6295 Sound Chip Writes */
+	AM_RANGE(0x700022, 0x700023) AM_WRITE(okim6295_data_0_lsb_w)		/* M6295 Sound Chip Writes */
 	AM_RANGE(0xa04000, 0xa04003) AM_WRITE(puckpkmn_YM3438_w)			/* Ym3438 Sound Chip Writes */
 	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&main_ram)		/* Main Ram */
@@ -148,7 +180,7 @@ static ADDRESS_MAP_START( puckpkmn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static const struct YM3438interface ym3438_intf =
+static const ym3438_interface ym3438_intf =
 {
 	genesis_irq2_interrupt		/* IRQ handler */
 };

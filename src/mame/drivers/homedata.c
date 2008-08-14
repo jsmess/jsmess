@@ -316,7 +316,7 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 	switch (offset & 0xff)
 	{
 		case 0x40:
-			DAC_signed_data_w(0,data);
+			dac_signed_data_w(0,data);
 			break;
 		default:
 			logerror("%04x: I/O write to port %04x\n",activecpu_get_pc(),offset);
@@ -373,17 +373,17 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
 	{
 		if (BIT(data,3))
-			YM2203_write_port_0_w(machine,0,upd7807_porta);
+			ym2203_write_port_0_w(machine,0,upd7807_porta);
 		else
-			YM2203_control_port_0_w(machine,0,upd7807_porta);
+			ym2203_control_port_0_w(machine,0,upd7807_porta);
 	}
 
 	if (BIT(upd7807_portc,4) && !BIT(data,4))	/* read clock 1->0 */
 	{
 		if (BIT(data,3))
-			upd7807_porta = YM2203_read_port_0_r(machine,0);
+			upd7807_porta = ym2203_read_port_0_r(machine,0);
 		else
-			upd7807_porta = YM2203_status_port_0_r(machine,0);
+			upd7807_porta = ym2203_status_port_0_r(machine,0);
 	}
 
 	upd7807_portc = data;
@@ -530,7 +530,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 	coin_counter_w(0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
-		SN76496_0_w(machine,0,upd7807_porta);
+		sn76496_0_w(machine,0,upd7807_porta);
 
 	upd7807_portc = data;
 }
@@ -590,7 +590,7 @@ static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
@@ -660,7 +660,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_WRITE(reikaids_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(DAC_0_signed_data_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
 ADDRESS_MAP_END
 
@@ -714,7 +714,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_WRITE(pteacher_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(DAC_0_signed_data_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(pteacher_upd7807_portc_w)
 ADDRESS_MAP_END
 
@@ -1264,7 +1264,7 @@ MACHINE_DRIVER_END
 /**************************************************************************/
 
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -1322,7 +1322,7 @@ static MACHINE_DRIVER_START( reikaids )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 	MDRV_SOUND_ROUTE(2, "mono", 0.25)

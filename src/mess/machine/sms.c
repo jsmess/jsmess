@@ -301,16 +301,16 @@ READ8_HANDLER(sms_input_port_0_r) {
 	}
 }
 
-WRITE8_HANDLER(sms_YM2413_register_port_0_w) {
+WRITE8_HANDLER(sms_ym2413_register_port_0_w) {
 	if ( HAS_FM ) {
-		YM2413_register_port_0_w(machine, offset, (data & 0x3F));
+		ym2413_register_port_0_w(machine, offset, (data & 0x3F));
 	}
 }
 
-WRITE8_HANDLER(sms_YM2413_data_port_0_w) {
+WRITE8_HANDLER(sms_ym2413_data_port_0_w) {
 	if ( HAS_FM ) {
 		logerror("data_port_0_w %x %x\n", offset, data);
-		YM2413_data_port_0_w(machine, offset, data);
+		ym2413_data_port_0_w(machine, offset, data);
 	}
 }
 

@@ -109,11 +109,11 @@ static void update_dac(void)
 	/*	logerror("Clock: %x D: %x  G:%x \n",activecpu_get_icount(),Dvalue, Gvalue); */
 
 	if (Gvalue == 0 && Dvalue == 0)
-		DAC_data_w(0, 0xff);
+		dac_data_w(0, 0xff);
 	else if (Gvalue == 1 && Dvalue == 1)
-		DAC_data_w(0, 0x80);
+		dac_data_w(0, 0x80);
 	else
-		DAC_data_w(0, 0x00);
+		dac_data_w(0, 0x00);
 }
 
 

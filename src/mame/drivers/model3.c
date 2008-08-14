@@ -1045,8 +1045,6 @@ static MACHINE_RESET(model3_15) { model3_init(machine, 0x15); }
 static MACHINE_RESET(model3_20) { model3_init(machine, 0x20); }
 static MACHINE_RESET(model3_21) { model3_init(machine, 0x21); }
 
-static UINT32 eeprom_bit = 0;
-
 static UINT64 controls_2;
 static UINT64 controls_3;
 static UINT8 model3_serial_fifo1;
@@ -1065,11 +1063,12 @@ static READ64_HANDLER( model3_ctrl_r )
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				if(model3_controls_bank & 0x1) {
-					eeprom_bit = eeprom_read_bit() << 5;
-					return ((input_port_read(machine, "IN1") & ~0x20) | eeprom_bit) << 24;
+				if(model3_controls_bank & 0x1)
+				{
+					return (input_port_read(machine, "IN1")) << 24;
 				}
-				else {
+				else
+				{
 					return (input_port_read(machine, "IN0")) << 24;
 				}
 			}
@@ -1343,7 +1342,7 @@ static WRITE64_HANDLER(model3_sound_w)
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
 	{
-		SCSP_MidiIn(machine, 0, (data>>56)&0xff, 0);
+		scsp_midi_in(machine, 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -1532,26 +1531,27 @@ static ADDRESS_MAP_START( model3_mem, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-#define MODEL3_SYSTEM_CONTROLS_1 \
-PORT_START("IN0") \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) \
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) /* Test Button A */ \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) /* Service Button A */ \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) \
+
+static INPUT_PORTS_START( common )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) /* Test Button A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) /* Service Button A */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-#define MODEL3_SYSTEM_CONTROLS_2 \
-PORT_START("IN1") \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7) \
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( model3 )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1571,8 +1571,7 @@ static INPUT_PORTS_START( model3 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lostwsga )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1601,8 +1600,7 @@ static INPUT_PORTS_START( lostwsga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scud )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Button 1 */
@@ -1631,8 +1629,7 @@ static INPUT_PORTS_START( scud )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bass )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		/* Cast */
@@ -1665,8 +1662,7 @@ static INPUT_PORTS_START( bass )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( harley )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Button 1 */
@@ -1695,8 +1691,7 @@ static INPUT_PORTS_START( harley )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daytona2 )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Button 1 */
@@ -1725,8 +1720,7 @@ static INPUT_PORTS_START( daytona2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swtrilgy )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1748,8 +1742,7 @@ static INPUT_PORTS_START( swtrilgy )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eca )
-	MODEL3_SYSTEM_CONTROLS_1
-	MODEL3_SYSTEM_CONTROLS_2
+	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Change */
@@ -1785,9 +1778,10 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )		/* Select 2 */
 
 	PORT_START("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* Pole Right */
@@ -4258,9 +4252,9 @@ static WRITE16_HANDLER( model3snd_ctrl )
 
 static ADDRESS_MAP_START( model3_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_BASE(&model3_soundram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
-	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(SCSP_1_r, SCSP_1_w)
+	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(scsp_1_r, scsp_1_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audio", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
@@ -4279,13 +4273,13 @@ static void scsp_irq(running_machine *machine, int irq)
 	}
 }
 
-static const struct SCSPinterface scsp_interface =
+static const scsp_interface scsp_config =
 {
 	0,
 	scsp_irq
 };
 
-static const struct SCSPinterface scsp2_interface =
+static const scsp_interface scsp2_interface =
 {
 	0,
 	NULL
@@ -4363,7 +4357,7 @@ static MACHINE_DRIVER_START( model3_10 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 
@@ -4401,7 +4395,7 @@ static MACHINE_DRIVER_START( model3_15 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 
@@ -4439,7 +4433,7 @@ static MACHINE_DRIVER_START( model3_20 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 
@@ -4478,7 +4472,7 @@ static MACHINE_DRIVER_START( model3_21 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 

@@ -404,8 +404,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(SN76496_0_w)    /* Choplifter writes to the four addresses */
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(SN76496_1_w)    /* in sequence */
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sn76496_0_w)    /* Choplifter writes to the four addresses */
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(sn76496_1_w)    /* in sequence */
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -4766,25 +4766,25 @@ ROM_START( noboranb )
 	ROM_LOAD( "nobo_pr.13a", 0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
-static DRIVER_INIT( regulus )	{ regulus_decode(machine); }
-static DRIVER_INIT( mrviking )	{ mrviking_decode(machine); }
-static DRIVER_INIT( swat )		{ swat_decode(machine); }
-static DRIVER_INIT( flicky )	{ flicky_decode(machine); }
-static DRIVER_INIT( wmatch )	{ wmatch_decode(machine); }
-static DRIVER_INIT( bullfgtj )	{ bullfgtj_decode(machine); }
-static DRIVER_INIT( spatter )	{ spatter_decode(machine); }
-static DRIVER_INIT( pitfall2 )	{ pitfall2_decode(machine); }
-static DRIVER_INIT( nprinces )	{ nprinces_decode(machine); }
-static DRIVER_INIT( seganinj )	{ seganinj_decode(machine); }
-static DRIVER_INIT( imsorry )	{ imsorry_decode(machine); }
-static DRIVER_INIT( teddybb )	{ teddybb_decode(machine); }
-static DRIVER_INIT( hvymetal )	{ hvymetal_decode(machine); }
-static DRIVER_INIT( myheroj )	{ myheroj_decode(machine); }
-static DRIVER_INIT( 4dwarrio )	{ fdwarrio_decode(machine); }
-static DRIVER_INIT( wboy )		{ astrofl_decode(machine); }
-static DRIVER_INIT( wboy2 )		{ wboy2_decode(machine); }
-static DRIVER_INIT( gardia )	{ gardia_decode(machine); }
-static DRIVER_INIT( gardiab )	{ gardiab_decode(machine); }
+static DRIVER_INIT( regulus )	{ regulus_decode(machine, "main"); }
+static DRIVER_INIT( mrviking )	{ mrviking_decode(machine, "main"); }
+static DRIVER_INIT( swat )		{ swat_decode(machine, "main"); }
+static DRIVER_INIT( flicky )	{ flicky_decode(machine, "main"); }
+static DRIVER_INIT( wmatch )	{ wmatch_decode(machine, "main"); }
+static DRIVER_INIT( bullfgtj )	{ bullfgtj_decode(machine, "main"); }
+static DRIVER_INIT( spatter )	{ spatter_decode(machine, "main"); }
+static DRIVER_INIT( pitfall2 )	{ pitfall2_decode(machine, "main"); }
+static DRIVER_INIT( nprinces )	{ nprinces_decode(machine, "main"); }
+static DRIVER_INIT( seganinj )	{ seganinj_decode(machine, "main"); }
+static DRIVER_INIT( imsorry )	{ imsorry_decode(machine, "main"); }
+static DRIVER_INIT( teddybb )	{ teddybb_decode(machine, "main"); }
+static DRIVER_INIT( hvymetal )	{ hvymetal_decode(machine, "main"); }
+static DRIVER_INIT( myheroj )	{ myheroj_decode(machine, "main"); }
+static DRIVER_INIT( 4dwarrio )	{ fdwarrio_decode(machine, "main"); }
+static DRIVER_INIT( wboy )		{ astrofl_decode(machine, "main"); }
+static DRIVER_INIT( wboy2 )		{ wboy2_decode(machine, "main"); }
+static DRIVER_INIT( gardia )	{ gardia_decode(machine, "main"); }
+static DRIVER_INIT( gardiab )	{ gardiab_decode(machine, "main"); }
 
 
 
@@ -4869,7 +4869,7 @@ static DRIVER_INIT( myherok )
 		}
 	}
 
-	myheroj_decode(machine);
+	myheroj_decode(machine, "main");
 }
 
 static DRIVER_INIT( noboranb )

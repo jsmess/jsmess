@@ -819,8 +819,8 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(AY8910_read_port_0_r, AY8910_control_port_0_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(AY8910_write_port_0_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(ay8910_read_port_0_r, ay8910_control_port_0_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(ay8910_write_port_0_w, 0xff00)
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE8(acia6850_0_stat_r, acia6850_0_ctrl_w, 0xff00)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE8(acia6850_0_data_r, acia6850_0_data_w, 0xff00)
@@ -844,8 +844,8 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(AY8910_read_port_0_r, AY8910_control_port_0_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(AY8910_write_port_0_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(ay8910_read_port_0_r, ay8910_control_port_0_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(ay8910_write_port_0_w, 0xff00)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(atarist_blitter_halftone_r, atarist_blitter_halftone_w)
 	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(atarist_blitter_src_inc_x_r, atarist_blitter_src_inc_x_w)
 	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(atarist_blitter_src_inc_y_r, atarist_blitter_src_inc_y_w)
@@ -886,8 +886,8 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(AY8910_read_port_0_r, AY8910_control_port_0_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(AY8910_write_port_0_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(ay8910_read_port_0_r, ay8910_control_port_0_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(ay8910_write_port_0_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -941,8 +941,8 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(AY8910_read_port_0_r, AY8910_control_port_0_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(AY8910_write_port_0_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(ay8910_read_port_0_r, ay8910_control_port_0_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(ay8910_write_port_0_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -996,8 +996,8 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(AY8910_read_port_0_r, AY8910_control_port_0_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(AY8910_write_port_0_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(ay8910_read_port_0_r, ay8910_control_port_0_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(ay8910_write_port_0_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -1293,7 +1293,7 @@ static WRITE8_HANDLER( ym2149_port_b_w )
 	centronics_write_data(0, data);
 }
 
-static const struct AY8910interface ym2149_interface =
+static const ay8910_interface ym2149_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1637,7 +1637,7 @@ static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 	// 0x80 = FDD_DENSE_SEL
 }
 
-static const struct AY8910interface stbook_ym2149_interface =
+static const ay8910_interface stbook_ym2149_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

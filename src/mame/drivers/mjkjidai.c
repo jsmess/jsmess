@@ -74,7 +74,7 @@ static void mjkjidai_adpcm_callback (void *param, stream_sample_t **inputs, stre
 	}
 }
 
-static void *mjkjidai_adpcm_start (int clock, const struct CustomSound_interface *config)
+static void *mjkjidai_adpcm_start (int clock, const custom_sound_interface *config)
 {
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;
@@ -186,8 +186,8 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x02) AM_WRITE(keyboard_select_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
-	AM_RANGE(0x20, 0x20) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(SN76496_1_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(sn76496_1_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
 ADDRESS_MAP_END
 
@@ -345,7 +345,7 @@ static GFXDECODE_START( mjkjidai )
 GFXDECODE_END
 
 
-static const struct CustomSound_interface adpcm_interface =
+static const custom_sound_interface adpcm_interface =
 {
 	mjkjidai_adpcm_start
 };

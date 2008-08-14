@@ -168,10 +168,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-    AM_RANGE(0x1000, 0x1000) AM_WRITE(YM2203_control_port_0_w)
-    AM_RANGE(0x1001, 0x1001) AM_WRITE(YM2203_write_port_0_w)
-    AM_RANGE(0x2000, 0x2000) AM_WRITE(YM3526_control_port_0_w)
-    AM_RANGE(0x2001, 0x2001) AM_WRITE(YM3526_write_port_0_w)
+    AM_RANGE(0x1000, 0x1000) AM_WRITE(ym2203_control_port_0_w)
+    AM_RANGE(0x1001, 0x1001) AM_WRITE(ym2203_write_port_0_w)
+    AM_RANGE(0x2000, 0x2000) AM_WRITE(ym3526_control_port_0_w)
+    AM_RANGE(0x2001, 0x2001) AM_WRITE(ym3526_write_port_0_w)
     AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -282,7 +282,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static const struct YM3526interface ym3526_interface =
+static const ym3526_interface ym3526_config =
 {
 	irqhandler
 };
@@ -322,7 +322,7 @@ static MACHINE_DRIVER_START( sidepckt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( sidepctj )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

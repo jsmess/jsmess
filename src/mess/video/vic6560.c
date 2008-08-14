@@ -38,7 +38,7 @@ const unsigned char vic6560_palette[] =
 	0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00, 0xa0, 0xff, 0xff, 0xff, 0x00
 };
 
-const struct CustomSound_interface vic6560_sound_interface =
+const custom_sound_interface vic6560_sound_interface =
 {
 	vic6560_custom_start
 };

@@ -111,7 +111,7 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	int status = OKIM6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(machine,0);
 
 	cpunum_set_input_line(machine, 0, cpu_getiloops() + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
 
@@ -119,8 +119,8 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x00)
 		{
-			OKIM6295_data_0_w(machine,0,0x80|sb3_music);
-			OKIM6295_data_0_w(machine,0,0x00|0x82);
+			okim6295_data_0_w(machine,0,0x80|sb3_music);
+			okim6295_data_0_w(machine,0,0x00|0x82);
 		}
 
 	}
@@ -128,7 +128,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x08)
 		{
-			OKIM6295_data_0_w(machine,0,0x40);		/* Stop playing music */
+			okim6295_data_0_w(machine,0,0x40);		/* Stop playing music */
 		}
 	}
 
@@ -196,14 +196,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(YM3812_status_port_0_r)
+	AM_RANGE(0x02, 0x02) AM_READ(ym3812_status_port_0_r)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -261,25 +261,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( honeydol_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe010, 0xe010) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xe010, 0xe010) AM_READ(okim6295_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe010, 0xe010) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xe010, 0xe010) AM_WRITE(okim6295_data_0_w)
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(YM3812_status_port_0_r) // not connected?
+	AM_RANGE(0x02, 0x02) AM_READ(ym3812_status_port_0_r) // not connected?
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM3812_control_port_0_w) // not connected?
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM3812_write_port_0_w) // not connected?
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym3812_control_port_0_w) // not connected?
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w) // not connected?
 	AM_RANGE(0x04, 0x04) AM_WRITE(soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -322,13 +322,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( twinadv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-//  AM_RANGE(0xe010, 0xe010) AM_READ(OKIM6295_status_0_r)
+//  AM_RANGE(0xe010, 0xe010) AM_READ(okim6295_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twinadv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0xe010, 0xe010) AM_WRITE(OKIM6295_data_0_w)
+//  AM_RANGE(0xe010, 0xe010) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( twinadv_oki_bank_w )
@@ -337,20 +337,20 @@ static WRITE8_HANDLER( twinadv_oki_bank_w )
 
 	if (data&0xfd) logerror ("Unused bank bits! %02x\n",data);
 
-	OKIM6295_set_bank_base(0, bank * 0x40000);
+	okim6295_set_bank_base(0, bank * 0x40000);
 }
 
 static ADDRESS_MAP_START( twinadv_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x06, 0x06) AM_READ(okim6295_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twinadv_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_w) // back to 68k?
 	AM_RANGE(0x04, 0x04) AM_WRITE(twinadv_oki_bank_w) // oki bank?
-	AM_RANGE(0x06, 0x06) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 
@@ -389,16 +389,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyperpac_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf001, 0xf001) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0xf001, 0xf001) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyperpac_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(okim6295_data_0_w)
 //  AM_RANGE(0xf006, 0xf006) ???
 ADDRESS_MAP_END
 
@@ -452,22 +452,22 @@ static void sb3_play_music(running_machine *machine, int data)
 
 static void sb3_play_sound (running_machine *machine, int data)
 {
-	int status = OKIM6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(machine,0);
 
 	if ((status&0x01)==0x00)
 	{
-		OKIM6295_data_0_w(machine,0,0x80|data);
-		OKIM6295_data_0_w(machine,0,0x00|0x12);
+		okim6295_data_0_w(machine,0,0x80|data);
+		okim6295_data_0_w(machine,0,0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		OKIM6295_data_0_w(machine,0,0x80|data);
-		OKIM6295_data_0_w(machine,0,0x00|0x22);
+		okim6295_data_0_w(machine,0,0x80|data);
+		okim6295_data_0_w(machine,0,0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		OKIM6295_data_0_w(machine,0,0x80|data);
-		OKIM6295_data_0_w(machine,0,0x00|0x42);
+		okim6295_data_0_w(machine,0,0x80|data);
+		okim6295_data_0_w(machine,0,0x00|0x42);
 	}
 
 
@@ -478,7 +478,7 @@ static WRITE16_HANDLER( sb3_sound_w )
 	if (data == 0x00fe)
 	{
 		sb3_music_is_playing = 0;
-		OKIM6295_data_0_w(machine,0,0x78);		/* Stop sounds */
+		okim6295_data_0_w(machine,0,0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -1519,14 +1519,14 @@ static void irqhandler(running_machine *machine, int irq)
 
 /* SnowBros Sound */
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
 
 /* SemiCom Sound */
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irqhandler
 };
@@ -1580,7 +1580,7 @@ static MACHINE_DRIVER_START( snowbros )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("3812", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1612,7 +1612,7 @@ static MACHINE_DRIVER_START( semicom )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("3812", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 
@@ -1676,7 +1676,7 @@ static MACHINE_DRIVER_START( honeydol )
 	/* sound hardware */
 
 	MDRV_SOUND_ADD("3812", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
@@ -1749,7 +1749,7 @@ static MACHINE_DRIVER_START( finalttr )
 	MDRV_MACHINE_RESET ( finalttr )
 
 	MDRV_SOUND_REPLACE("3812", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.08)
 	MDRV_SOUND_ROUTE(1, "mono", 0.08)
 

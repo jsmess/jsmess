@@ -332,10 +332,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		ym2151_register_port_0_w(0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		ym2151_data_port_0_w(0,data);
 		break;
 	}
 }
@@ -345,8 +345,8 @@ static WRITE8_HANDLER( YM2151_w )
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-//  AM_RANGE(0xa000, 0xa001) AM_READWRITE(YM2151_status_port_0_r,YM2151_w)
-//  AM_RANGE(0xb000, 0xb000) AM_READ(OKIM6295_status_0_r)
+//  AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,YM2151_w)
+//  AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r)
 //  AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -530,7 +530,7 @@ static void sound_irq(running_machine *machine, int irq)
 //  mame_printf_debug("sound irq\n");
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
@@ -564,7 +564,7 @@ static MACHINE_DRIVER_START( dblewing )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 32220000/32)

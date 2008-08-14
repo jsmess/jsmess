@@ -410,30 +410,30 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplep_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(triplep_pip_r)
 	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplep_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hotshock_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x40, 0x40) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x20, 0x20) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x40, 0x40) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotshock_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( scorpion_extra_sound_w )
@@ -453,12 +453,12 @@ static WRITE8_HANDLER( scorpion_sound_cmd_w )
 
 static ADDRESS_MAP_START( scorpion_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(AY8910_read_port_2_r, AY8910_write_port_2_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_2_r, ay8910_write_port_2_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( hncholms_prot_r )
@@ -1715,7 +1715,7 @@ static GFXDECODE_START( ad2083 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_spritelayout,  0, 8 )
 GFXDECODE_END
 
-static const struct AY8910interface scramble_ay8910_interface_2 =
+static const ay8910_interface scramble_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1725,7 +1725,7 @@ static const struct AY8910interface scramble_ay8910_interface_2 =
 	NULL
 };
 
-static const struct AY8910interface sfx_ay8910_interface_1 =
+static const ay8910_interface sfx_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1735,7 +1735,7 @@ static const struct AY8910interface sfx_ay8910_interface_1 =
 	sfx_sh_irqtrigger_w
 };
 
-static const struct AY8910interface explorer_ay8910_interface_1 =
+static const ay8910_interface explorer_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1745,7 +1745,7 @@ static const struct AY8910interface explorer_ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface explorer_ay8910_interface_2 =
+static const ay8910_interface explorer_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1755,7 +1755,7 @@ static const struct AY8910interface explorer_ay8910_interface_2 =
 	NULL
 };
 
-static const struct AY8910interface hotshock_ay8910_interface_2 =
+static const ay8910_interface hotshock_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1765,7 +1765,7 @@ static const struct AY8910interface hotshock_ay8910_interface_2 =
 	NULL
 };
 
-static const struct AY8910interface scorpion_ay8910_interface_1 =
+static const ay8910_interface scorpion_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1775,7 +1775,7 @@ static const struct AY8910interface scorpion_ay8910_interface_1 =
 	scorpion_sound_cmd_w,
 };
 
-static const struct AY8910interface triplep_ay8910_interface =
+static const ay8910_interface triplep_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1839,16 +1839,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scramble_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x20, 0x20) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x80, 0x80) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scramble_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -2919,8 +2919,8 @@ ROM_START( ad2083 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "prom-am27s19dc.1m", 0x0000, 0x0020, CRC(2759aebd) SHA1(644fd2c95ca49cbbc0ee1b88ca2563451ddd4fe0) )
 
-	ROM_REGION( 0x0020, "user1", 0 ) /* sample related? near TMS5110 and sample roms */
-	ROM_LOAD( "prom-sn74s188.8a",  0x0000, 0x0020, CRC(5e395112) SHA1(427d6a5b5d0837db4bf804f392d77ba5a86ffd72) )
+	ROM_REGION( 0x0020, "tms5110_ctrl", 0 ) /* data to program TMS5110 speech chip 3x Reset 1x speak */
+	ROM_LOAD( "prom-sn74s188.8a",  0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) )
 ROM_END
 
 

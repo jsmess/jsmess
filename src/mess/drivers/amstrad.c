@@ -265,17 +265,17 @@ static void update_psg(running_machine *machine)
 		} break;
   	case 1: 
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-  			ppi_port_inputs[amstrad_ppi_PortA] = AY8910_read_port_0_r(machine, 0);
+  			ppi_port_inputs[amstrad_ppi_PortA] = ay8910_read_port_0_r(machine, 0);
   		} 
 		break;
   	case 2: 
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-  			AY8910_write_port_0_w(machine, 0, ppi_port_outputs[amstrad_ppi_PortA]);
+  			ay8910_write_port_0_w(machine, 0, ppi_port_outputs[amstrad_ppi_PortA]);
   		} 
 		break;
   	case 3: 
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-  			AY8910_control_port_0_w(machine, 0, ppi_port_outputs[amstrad_ppi_PortA]);
+  			ay8910_control_port_0_w(machine, 0, ppi_port_outputs[amstrad_ppi_PortA]);
 			prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
   		} 
 		break;
@@ -2851,9 +2851,9 @@ INPUT_PORTS_END
 
 
 /* --------------------
-   - AY8910_interface -
+   - ay8910_interface -
    --------------------*/
-static const struct AY8910interface ay8912_interface =
+static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

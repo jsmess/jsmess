@@ -37,12 +37,15 @@
  *
  *****************************************************************************/
 
-#ifndef _DS5002FP_H
-#define _DS5002FP_H
+#pragma once
+
+#ifndef __DS5002FP_H__
+#define __DS5002FP_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	DS5002FP_PC=1, DS5002FP_SP, DS5002FP_PSW, DS5002FP_ACC, DS5002FP_B, DS5002FP_DPH, DS5002FP_DPL, DS5002FP_IE,
 	DS5002FP_PCON, DS5002FP_MCON, DS5002FP_RPCTL, DS5002FP_CRC,
 	DS5002FP_R0, DS5002FP_R1, DS5002FP_R2, DS5002FP_R3, DS5002FP_R4, DS5002FP_R5, DS5002FP_R6, DS5002FP_R7, DS5002FP_RB
@@ -136,6 +139,4 @@ extern offs_t ds5002fp_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const U
 
 void ds5002fp_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _DS5002FP_H */
-
-
+#endif /* __DS5002FP_H__ */

@@ -18,12 +18,12 @@ static INTERRUPT_GEN( kopunch_interrupt )
 {
 	if (cpu_getiloops() == 0)
 	{
-		if (~input_port_read(machine, "IN1") & 0x80)	/* coin 1 */
+		if (~input_port_read(machine, "SYSTEM") & 0x80)	/* coin 1 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xf7);	/* RST 30h */
 			return;
 		}
-		else if (~input_port_read(machine, "IN1") & 0x08)	/* coin 2 */
+		else if (~input_port_read(machine, "SYSTEM") & 0x08)	/* coin 2 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xef);	/* RST 28h */
 			return;
@@ -39,7 +39,7 @@ static READ8_HANDLER( kopunch_in_r )
 	if (offset == 0)
 		return mame_rand(machine);
 	else
-		return (mame_rand(machine) & 0x07) | input_port_read(machine, "IN1");
+		return (mame_rand(machine) & 0x07) | input_port_read(machine, "SYSTEM");
 }
 
 static WRITE8_HANDLER( kopunch_lamp_w )
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( kopunch_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kopunch_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0")
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("P1")
 	AM_RANGE(0x31, 0x32) AM_READ(kopunch_in_r)
 	AM_RANGE(0x33, 0x33) AM_WRITENOP
 	AM_RANGE(0x34, 0x34) AM_WRITE(kopunch_coin_w)
@@ -83,13 +83,13 @@ static ADDRESS_MAP_START( kopunch_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3b, 0x3b) AM_WRITENOP
 	AM_RANGE(0x3c, 0x3c) AM_WRITE(kopunch_scroll_x_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(kopunch_scroll_y_w)
-	AM_RANGE(0x3e, 0x3e) AM_READWRITE(input_port_3_r, kopunch_gfxbank_w)
+	AM_RANGE(0x3e, 0x3e) AM_READ_PORT("P2") AM_WRITE(kopunch_gfxbank_w)
 	AM_RANGE(0x3f, 0x3f) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( kopunch )
-	PORT_START("IN0")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -99,7 +99,7 @@ static INPUT_PORTS_START( kopunch )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START("IN1")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* punch strength (high 3 bits) */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -133,7 +133,7 @@ static INPUT_PORTS_START( kopunch )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN2")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
@@ -156,16 +156,27 @@ static const gfx_layout charlayout =
 	8*8
 };
 
+static const gfx_layout charlayoutbig =
+{
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ 7,7, 6,6, 5,5, 4,4, 3,3, 2,2, 1,1, 0,0 },
+	{ 0*8,0*8, 1*8,1*8, 2*8,2*8, 3*8,3*8, 4*8,4*8, 5*8,5*8, 6*8,6*8, 7*8,7*8 },
+	8*8
+};
+
 static GFXDECODE_START( kopunch )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayoutbig, 0, 1 )
 GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( kopunch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 4000000)	/* 4 MHz ???? appears to use 8080 instructions, not z80 */
+	MDRV_CPU_ADD("main", 8080, 4000000)	/* 4 MHz ???? uses 8080 instructions, not z80 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map,0)
 	MDRV_CPU_IO_MAP(kopunch_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(kopunch_interrupt,4)	/* ??? */
@@ -219,24 +230,4 @@ ROM_START( kopunch )
 	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) )	/* unknown */
 ROM_END
 
-
-static DRIVER_INIT( kopunch )
-{
-//  UINT8 *rom = memory_region(machine, "main");
-
-	/* It looks like there is a security chip, that changes instruction of the form:
-        0334: 3E 0C       ld   a,$0C
-        0336: 30 FB       jr   nc,$0333
-       into something else (maybe just a nop) with the effect of resuming execution
-       from the operand of the JR  NC instruction (in the example above, 0337).
-       For now, I'm just patching the affected instructions. */
-
-/*  rom[0x119] = 0;
-    rom[0x336] = 0;
-    rom[0x381] = 0;
-    rom[0xf0b] = 0;
-    rom[0xf33] = 0;*/
-}
-
-
-GAME( 1981, kopunch, 0, kopunch, kopunch, kopunch, ROT270, "Sega", "KO Punch", GAME_NO_SOUND | GAME_NOT_WORKING)
+GAME( 1981, kopunch, 0, kopunch, kopunch, 0, ROT270, "Sega", "KO Punch", GAME_NO_SOUND | GAME_NOT_WORKING)

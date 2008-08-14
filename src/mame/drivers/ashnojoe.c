@@ -151,8 +151,8 @@ static READ8_HANDLER(fake_6_r)
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	MSM5205_data_w(0, data & 0xf);
-	MSM5205_data_w(0, data>>4);
+	msm5205_data_w(0, data & 0xf);
+	msm5205_data_w(0, data>>4);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -163,8 +163,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r) //PC: 15D -> cp $7f
 	AM_RANGE(0x06, 0x06) AM_READ(fake_6_r/*soundlatch_r */) //PC: 14A -> and $1
@@ -298,7 +298,7 @@ static WRITE8_HANDLER(writeA)
 {
 	if (data == 0xff) return;	// this gets called at 8910 startup with 0xff before the 5205 exists, causing a crash
 
-	MSM5205_reset_w(0, !(data & 0x01));
+	msm5205_reset_w(0, !(data & 0x01));
 }
 
 static WRITE8_HANDLER(writeB)
@@ -311,13 +311,13 @@ static void ashnojoe_adpcm_int (running_machine *machine, int data)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	ashnojoe_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 4KHz 4-bit */
 };
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -364,11 +364,11 @@ static MACHINE_DRIVER_START( ashnojoe )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 4000000)  /* 4 MHz (verified on pcb) */
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

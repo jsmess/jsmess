@@ -363,19 +363,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki32_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ(YMF262_status_0_r)
+	AM_RANGE(0x40, 0x40) AM_READ(ymf262_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki32_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x40, 0x40) AM_WRITE(YMF262_register_A_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(YMF262_data_A_0_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(YMF262_register_B_0_w)
-	AM_RANGE(0x43, 0x43) AM_WRITE(YMF262_data_B_0_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(YMF278B_control_port_0_C_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(YMF278B_data_port_0_C_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ymf262_register_a_0_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE(ymf262_data_a_0_w)
+	AM_RANGE(0x42, 0x42) AM_WRITE(ymf262_register_b_0_w)
+	AM_RANGE(0x43, 0x43) AM_WRITE(ymf262_data_b_0_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(ymf278b_control_port_0_c_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE(ymf278b_data_port_0_c_w)
 ADDRESS_MAP_END
 
 
@@ -591,7 +591,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YMF262interface ymf262_interface =
+static const ymf262_interface fuuki32_ymf262_interface =
 {
 	irqhandler		/* irq */
 };
@@ -629,7 +629,7 @@ static MACHINE_DRIVER_START( fuuki32 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf1", YMF262, FM_SOUND_CLOCK) /* 33.8688MHz OSC divided by 2 is 16.9344MHz */
-	MDRV_SOUND_CONFIG(ymf262_interface)
+	MDRV_SOUND_CONFIG(fuuki32_ymf262_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "left", 0.50)

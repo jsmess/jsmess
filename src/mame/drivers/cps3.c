@@ -1052,7 +1052,7 @@ static VIDEO_UPDATE(cps3)
 			int ypos =  	cps3_spriteram[i+1]&0x000003ff;
 			int j;
 			int gscroll =      (cps3_spriteram[i+0]&0x70000000)>>28;
-			UINT8  length =    (cps3_spriteram[i+0]&0x00ff0000)>>16; // how many entries in the sprite table
+			int length =    (cps3_spriteram[i+0]&0x01ff0000)>>16; // how many entries in the sprite table
 			UINT32 start  =    (cps3_spriteram[i+0]&0x00007ff0)>>4;
 
 			int whichbpp =     (cps3_spriteram[i+2]&0x40000000)>>30; // not 100% sure if this is right, jojo title / characters
@@ -1165,7 +1165,7 @@ static VIDEO_UPDATE(cps3)
 					if (!flipx) xpos2-= ((xsize2+1)*16*xinc)>>16;
 					else  xpos2+= (xsize2*16*xinc)>>16;
 
-					if (flipy) ypos2-= ysize2*((16*yinc)>>16);
+					if (flipy) ypos2-= (ysize2*16*yinc)>>16;
 
 					{
 						count = 0;
@@ -1173,7 +1173,7 @@ static VIDEO_UPDATE(cps3)
 						{
 							int current_xpos;
 
-							if (!flipx) current_xpos = (xpos+xpos2+((xx*16*xinc)>>16)  );
+							if (!flipx) current_xpos = (xpos+xpos2+((xx*16*xinc)>>16));
 							else current_xpos = (xpos+xpos2-((xx*16*xinc)>>16));
 							//current_xpos +=  rand()&0x3ff;
 							current_xpos += gscrollx;
@@ -1186,8 +1186,8 @@ static VIDEO_UPDATE(cps3)
 								int current_ypos;
 								int actualpal;
 
-								if (flipy) current_ypos = (ypos+ypos2+yy*((16*yinc)>>16));
-								else current_ypos = (ypos+ypos2-yy*((16*yinc)>>16));
+								if (flipy) current_ypos = (ypos+ypos2+((yy*16*yinc)>>16));
+								else current_ypos = (ypos+ypos2-((yy*16*yinc)>>16));
 
 								current_ypos += gscrolly;
 								current_ypos = 0x3ff-current_ypos;
@@ -2412,10 +2412,10 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 }
 
 
-//static struct sh2_config sh2cp_conf_slave  = { 1 };
+//static sh2_cpu_core sh2cp_conf_slave  = { 1 };
 
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	cps3_sh_start
 };
@@ -2668,7 +2668,8 @@ static MACHINE_DRIVER_START( cps3 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.633333)	/* just a guess for now, based on previous games */
+										/* however Mantis bug 2110 suggests it may be slightly different */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 224*2)

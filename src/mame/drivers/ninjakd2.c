@@ -471,10 +471,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjakd2_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ym2203_write_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -902,7 +902,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -913,7 +913,7 @@ static const struct YM2203interface ym2203_interface =
 };
 
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface ninjakd2_samples_interface =
 {
 	1,	/* 1 channel */
 	NULL,
@@ -959,7 +959,7 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)		/* verified */
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("PCM", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(ninjakd2_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

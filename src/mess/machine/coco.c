@@ -1197,19 +1197,19 @@ static void coco_sound_update(void)
 	{
 		case SOUNDMUX_STATUS_ENABLE:
 			/* DAC */
-			DAC_data_w(0, pia1_pb1 + (dac >> 1) );  /* Mixing the two sources */
+			dac_data_w(0, pia1_pb1 + (dac >> 1) );  /* Mixing the two sources */
 			break;
 		case SOUNDMUX_STATUS_ENABLE | SOUNDMUX_STATUS_SEL1:
 			/* CSN */
-			DAC_data_w(0, pia1_pb1); /* Mixing happens elsewhere */
+			dac_data_w(0, pia1_pb1); /* Mixing happens elsewhere */
 			break;
 		case SOUNDMUX_STATUS_ENABLE | SOUNDMUX_STATUS_SEL2:
 			/* CART Sound */
-			DAC_data_w(0, pia1_pb1); /* To do: mix in cart signal */
+			dac_data_w(0, pia1_pb1); /* To do: mix in cart signal */
 			break;
 		default:
 			/* This pia line is always connected to the output */
-			DAC_data_w(0, pia1_pb1);
+			dac_data_w(0, pia1_pb1);
 			break;
 	}
 }
@@ -1611,13 +1611,13 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 		case 0x00	: 		/* Inactive, do nothing */
 			break;
 		case 0x01	: 		/* Write to selected port */
-			AY8910_write_port_0_w(machine, 0, pia_get_output_b(2));
+			ay8910_write_port_0_w(machine, 0, pia_get_output_b(2));
 			break;
 		case 0x02	: 		/* Read from selected port */
-			pia_set_input_b(2, AY8910_read_port_0_r(machine, 0));
+			pia_set_input_b(2, ay8910_read_port_0_r(machine, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
-			AY8910_control_port_0_w(machine, 0, pia_get_output_b(2));
+			ay8910_control_port_0_w(machine, 0, pia_get_output_b(2));
 			break;
 	}
 }

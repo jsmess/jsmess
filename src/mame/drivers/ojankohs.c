@@ -88,7 +88,7 @@ static WRITE8_HANDLER( ojankoy_rombank_w )
 	ojankohs_adpcm_reset = ((data & 0x20) >> 5);
 	if (!ojankohs_adpcm_reset) ojankohs_vclk_left = 0;
 
-	MSM5205_reset_w(0, !ojankohs_adpcm_reset);
+	msm5205_reset_w(0, !ojankohs_adpcm_reset);
 }
 
 static WRITE8_HANDLER( ojankohs_adpcm_reset_w )
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( ojankohs_adpcm_reset_w )
 	ojankohs_adpcm_reset = (data & 0x01);
 	ojankohs_vclk_left = 0;
 
-	MSM5205_reset_w(0, !ojankohs_adpcm_reset);
+	msm5205_reset_w(0, !ojankohs_adpcm_reset);
 }
 
 static WRITE8_HANDLER( ojankohs_msm5205_w )
@@ -113,7 +113,7 @@ static void ojankohs_adpcm_int(running_machine *machine, int irq)
 
 	/* clock the data through */
 	if (ojankohs_vclk_left) {
-		MSM5205_data_w(0, (ojankohs_adpcm_data >> 4));
+		msm5205_data_w(0, (ojankohs_adpcm_data >> 4));
 		ojankohs_adpcm_data <<= 4;
 		ojankohs_vclk_left--;
 	}
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 	memory_set_bankptr(1, &BANKROM[bank_address]);
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
-	MSM5205_reset_w(0, (!(data & 0x10) >> 4));
+	msm5205_reset_w(0, (!(data & 0x10) >> 4));
 	ojankoc_flipscreen(machine, data);
 }
 
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( readport_ojankohs, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(ojankohs_keymatrix_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankohs, ADDRESS_SPACE_IO, 8 )
@@ -296,8 +296,8 @@ static ADDRESS_MAP_START( writeport_ojankohs, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)				// unknown
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)				// unknown
 ADDRESS_MAP_END
@@ -309,8 +309,8 @@ static ADDRESS_MAP_START( writeport_ojankoy, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(ojankoy_coinctr_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_ccasino, ADDRESS_SPACE_IO, 8 )
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( readport_ccasino, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
 	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r)
 	AM_RANGE(0x04, 0x04) AM_READ(ccasino_dipsw4_r)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ccasino, ADDRESS_SPACE_IO, 8 )
@@ -331,8 +331,8 @@ static ADDRESS_MAP_START( writeport_ccasino, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w)		// 16bit address access
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)
@@ -341,7 +341,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport_ojankoc, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfc, 0xfd) AM_READ(ojankoc_keymatrix_r)
-	AM_RANGE(0xff, 0xff) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0xff, 0xff) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankoc, ADDRESS_SPACE_IO, 8 )
@@ -350,8 +350,8 @@ static ADDRESS_MAP_START( writeport_ojankoc, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0xfb, 0xfb) AM_WRITE(ojankoc_ctrl_w)
 	AM_RANGE(0xfd, 0xfd) AM_WRITE(ojankohs_portselect_w)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mahjong_p1 )
@@ -841,7 +841,7 @@ static GFXDECODE_START( ojankohs )
 GFXDECODE_END
 
 
-static const struct AY8910interface ojankohs_ay8910_interface =
+static const ay8910_interface ojankohs_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -849,7 +849,7 @@ static const struct AY8910interface ojankohs_ay8910_interface =
 	ojankohs_ay8910_1_r	/* read port #1 */
 };
 
-static const struct AY8910interface ojankoy_ay8910_interface =
+static const ay8910_interface ojankoy_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -857,7 +857,7 @@ static const struct AY8910interface ojankoy_ay8910_interface =
 	ojankoy_ay8910_1_r,		/* read port #1 */
 };
 
-static const struct AY8910interface ojankoc_ay8910_interface =
+static const ay8910_interface ojankoc_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -865,7 +865,7 @@ static const struct AY8910interface ojankoc_ay8910_interface =
 	input_port_1_r			/* read port #1 */
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	ojankohs_adpcm_int,		/* IRQ handler */
 	MSM5205_S48_4B			/* 8 KHz */
@@ -905,7 +905,7 @@ static MACHINE_DRIVER_START( ojankohs )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -943,7 +943,7 @@ static MACHINE_DRIVER_START( ojankoy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -980,7 +980,7 @@ static MACHINE_DRIVER_START( ccasino )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1016,7 +1016,7 @@ static MACHINE_DRIVER_START( ojankoc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 8000000/22)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

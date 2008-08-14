@@ -390,10 +390,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
-	AM_RANGE(0xa000, 0xa000 ) AM_READWRITE(Y8950_status_port_0_r,Y8950_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001 ) AM_READWRITE(soundport_r,Y8950_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000 ) AM_READWRITE(Y8950_status_port_1_r,Y8950_control_port_1_w)
-	AM_RANGE(0xc001, 0xc001 ) AM_WRITE(Y8950_write_port_1_w)
+	AM_RANGE(0xa000, 0xa000 ) AM_READWRITE(y8950_status_port_0_r,y8950_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001 ) AM_READWRITE(soundport_r,y8950_write_port_0_w)
+	AM_RANGE(0xc000, 0xc000 ) AM_READWRITE(y8950_status_port_1_r,y8950_control_port_1_w)
+	AM_RANGE(0xc001, 0xc001 ) AM_WRITE(y8950_write_port_1_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cybertnk )
@@ -556,7 +556,7 @@ static INTERRUPT_GEN( slave_irq )
 	}
 }
 
-static const struct Y8950interface y8950_interface = {
+static const y8950_interface y8950_config = {
 	0 /* TODO */
 };
 
@@ -592,12 +592,12 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym1", Y8950, 3579500)
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, 3579500)
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END

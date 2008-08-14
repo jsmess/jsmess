@@ -212,7 +212,7 @@ static UPD7810_CONFIG config={
     gmaster_io_callback
 };
 
-static const struct CustomSound_interface gmaster_sound_interface =
+static const custom_sound_interface gmaster_sound_interface =
 {
 	gmaster_custom_start
 };

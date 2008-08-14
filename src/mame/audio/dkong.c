@@ -996,7 +996,7 @@ Addresses found at @0x510, cpu2
         0
     };
 
-    static const struct Samplesinterface radarsc1_samples_interface =
+    static const samples_interface radarsc1_samples_interface =
     {
         8,
         radarsc1_sample_names
@@ -1008,8 +1008,8 @@ static WRITE8_HANDLER( M58817_command_w )
 {
 	logerror("PA Write %x\n", data);
 
-	tms5110_CTL_w(machine, 0, data & 0x0f);
-	tms5110_PDC_w(machine, 0, (data>>4) & 0x01);
+	tms5110_ctl_w(machine, 0, data & 0x0f);
+	tms5110_pdc_w(machine, 0, (data>>4) & 0x01);
 	// FIXME 0x20 is CS
 }
 
@@ -1268,16 +1268,16 @@ static ADDRESS_MAP_START( dkong3_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)		// overwrite default
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_0_r)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_0_w)
+	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_0_r)
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_0_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch3_r)		// overwrite default
-	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_1_r)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_1_w)
+	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_1_r)
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_1_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1287,8 +1287,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const struct NESinterface nes_interface_1 = { "n2a03a" };
-static const struct NESinterface nes_interface_2 = { "n2a03b" };
+static const nes_interface nes_interface_1 = { "n2a03a" };
+static const nes_interface nes_interface_2 = { "n2a03b" };
 
 /*************************************
  *

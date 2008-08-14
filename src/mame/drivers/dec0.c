@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( robocop_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_RAM) /* Main ram */
 	AM_RANGE(0x1f2000, 0x1f3fff) AM_WRITE(SMH_RAM) AM_BASE(&robocop_shared_ram) /* Shared ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hippodrm_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( hippodrm_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a1000, 0x1a17ff) AM_WRITE(dec0_pf3_data_8bit_w)
 	AM_RANGE(0x1d0000, 0x1d00ff) AM_WRITE(hippodrm_prot_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slyspy_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -294,10 +294,10 @@ static WRITE8_HANDLER( YM3812_w )
 {
 	switch (offset) {
 	case 0:
-		YM3812_control_port_0_w(machine,0,data);
+		ym3812_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM3812_write_port_0_w(machine,0,data);
+		ym3812_write_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -306,10 +306,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		YM2203_control_port_0_w(machine,0,data);
+		ym2203_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2203_write_port_0_w(machine,0,data);
+		ym2203_write_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -317,7 +317,7 @@ static WRITE8_HANDLER( YM2203_w )
 static ADDRESS_MAP_START( dec0_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x3800, 0x3800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( dec0_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0800, 0x0801) AM_WRITE(YM2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_WRITE(YM3812_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -333,7 +333,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slyspy_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(SMH_NOP) /* Protection counter */
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
@@ -342,14 +342,14 @@ static ADDRESS_MAP_START( slyspy_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x090000, 0x090001) AM_WRITE(YM3812_w)
 	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(YM2203_w)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x130000, 0x130001) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x130000, 0x130001) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
@@ -358,9 +358,9 @@ static ADDRESS_MAP_START( midres_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(YM3812_w)
 	AM_RANGE(0x118000, 0x118001) AM_WRITE(YM2203_w)
-	AM_RANGE(0x130000, 0x130001) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x130000, 0x130001) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -912,12 +912,12 @@ static void sound_irq2(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,1,linestate); /* IRQ2 */
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	sound_irq
 };
 
-static const struct YM3812interface ym3812b_interface =
+static const ym3812_interface ym3812b_interface =
 {
 	sound_irq2
 };
@@ -958,7 +958,7 @@ static MACHINE_DRIVER_START( hbarrel )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1000,7 +1000,7 @@ static MACHINE_DRIVER_START( baddudes )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1042,7 +1042,7 @@ static MACHINE_DRIVER_START( birdtry )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1089,7 +1089,7 @@ static MACHINE_DRIVER_START( robocop )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1131,7 +1131,7 @@ static MACHINE_DRIVER_START( robocopb )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1178,7 +1178,7 @@ static MACHINE_DRIVER_START( hippodrm )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)

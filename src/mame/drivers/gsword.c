@@ -331,12 +331,12 @@ static WRITE8_HANDLER( josvolly_nmi_enable_w )
 
 static WRITE8_HANDLER( gsword_AY8910_control_port_0_w )
 {
-	AY8910_control_port_0_w(machine,offset,data);
+	ay8910_control_port_0_w(machine,offset,data);
 	fake8910_0 = data;
 }
 static WRITE8_HANDLER( gsword_AY8910_control_port_1_w )
 {
-	AY8910_control_port_1_w(machine,offset,data);
+	ay8910_control_port_1_w(machine,offset,data);
 	fake8910_1 = data;
 }
 
@@ -351,9 +351,9 @@ static READ8_HANDLER( gsword_fake_1_r )
 
 static WRITE8_HANDLER( gsword_adpcm_data_w )
 {
-	MSM5205_data_w (0,data & 0x0f); /* bit 0..3 */
-	MSM5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	MSM5205_vclk_w(0,(data>>4)&1);  /* bit 4    */
+	msm5205_data_w (0,data & 0x0f); /* bit 0..3 */
+	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w(0,(data>>4)&1);  /* bit 4    */
 }
 
 static WRITE8_HANDLER( adpcm_soundcommand_w )
@@ -399,9 +399,9 @@ static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x21) AM_WRITE(TAITO8741_3_w) AM_READ(TAITO8741_3_r)
 	AM_RANGE(0x40, 0x41) AM_WRITE(TAITO8741_1_w) AM_READ(TAITO8741_1_r)
 	AM_RANGE(0x60, 0x60) AM_WRITE(gsword_AY8910_control_port_0_w) AM_READ(gsword_fake_0_r)
-	AM_RANGE(0x61, 0x61) AM_WRITE(AY8910_write_port_0_w)          AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x61, 0x61) AM_WRITE(ay8910_write_port_0_w)          AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x80, 0x80) AM_WRITE(gsword_AY8910_control_port_1_w) AM_READ(gsword_fake_1_r)
-	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_write_port_1_w)          AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_write_port_1_w)          AM_READ(ay8910_read_port_1_r)
 //
 	AM_RANGE(0xe0, 0xe0) AM_READ(SMH_NOP) /* ?? */
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP) /* ?? */
@@ -433,9 +433,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( josvolly_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gsword_AY8910_control_port_0_w) AM_READ(gsword_fake_0_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)          AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)          AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x40, 0x40) AM_WRITE(gsword_AY8910_control_port_1_w) AM_READ(gsword_fake_1_r)
-	AM_RANGE(0x41, 0x41) AM_WRITE(AY8910_write_port_1_w)          AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_1_w)          AM_READ(ay8910_read_port_1_r)
 
 	AM_RANGE(0x81, 0x81) AM_WRITE(josvolly_nmi_enable_w)
 	AM_RANGE(0xC1, 0xC1) AM_NOP // irq clear
@@ -675,7 +675,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -685,7 +685,7 @@ static const struct AY8910interface ay8910_interface =
 	NULL
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* vclk input mode    */
@@ -738,11 +738,11 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -784,12 +784,12 @@ static MACHINE_DRIVER_START( josvolly )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 #if 0
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif
 MACHINE_DRIVER_END

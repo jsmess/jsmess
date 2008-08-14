@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( surpratk_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ(input_port_4_r)
 	AM_RANGE(0x5f8f, 0x5f8f) AM_READ(input_port_2_r)
 	AM_RANGE(0x5f90, 0x5f90) AM_READ(input_port_3_r)
-//  AM_RANGE(0x5f91, 0x5f91) AM_READ(YM2151_status_port_0_r)    /* ? */
+//  AM_RANGE(0x5f91, 0x5f91) AM_READ(ym2151_status_port_0_r)    /* ? */
 	AM_RANGE(0x5fa0, 0x5faf) AM_READ(K053244_r)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(K052109_r)
@@ -108,8 +108,8 @@ static ADDRESS_MAP_START( surpratk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fa0, 0x5faf) AM_WRITE(K053244_w)
 	AM_RANGE(0x5fb0, 0x5fbf) AM_WRITE(K053251_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_WRITE(surpratk_5fc0_w)
-	AM_RANGE(0x5fd0, 0x5fd0) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x5fd1, 0x5fd1) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x5fd0, 0x5fd0) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x5fd1, 0x5fd1) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(K052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
@@ -227,7 +227,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 0,KONAMI_FIRQ_LINE,linestate);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irqhandler
 };
@@ -262,7 +262,7 @@ static MACHINE_DRIVER_START( surpratk )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

@@ -19,12 +19,15 @@
  *
  *****************************************************************************/
 
-#ifndef _M6509_H
+#pragma once
+
+#ifndef __M6509_H__
 #define _M6509_H
 
 #include "m6502.h"
 
-enum {
+enum
+{
 	M6509_PC=1, M6509_S, M6509_P, M6509_A, M6509_X, M6509_Y,
 	M6509_EA, M6509_ZP, M6509_NMI_STATE, M6509_IRQ_STATE, M6509_SO_STATE,
 	M6509_PC_BANK, M6509_IND_BANK
@@ -38,6 +41,4 @@ enum {
 
 void m6509_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _M6509_H */
-
-
+#endif /* __M6509_H__ */

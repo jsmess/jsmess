@@ -53,17 +53,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-//  AM_RANGE(0x4002, 0x4002) AM_READ(AY8910_read_port_0_r)  /* ?? */
-	AM_RANGE(0x6001, 0x6001) AM_READ(YM2203_read_port_0_r)
+//  AM_RANGE(0x4002, 0x4002) AM_READ(ay8910_read_port_0_r)  /* ?? */
+	AM_RANGE(0x6001, 0x6001) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x6001, 0x6001) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -189,7 +189,7 @@ GFXDECODE_END
 
 
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( citycon )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("ym", YM2203, 1250000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 	MDRV_SOUND_ROUTE(2, "mono", 0.40)

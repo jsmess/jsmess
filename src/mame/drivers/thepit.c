@@ -215,10 +215,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x8c, 0x8c) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8d, 0x8d) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x8e, 0x8e) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8f, 0x8f) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0x8c, 0x8c) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8d, 0x8d) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8f, 0x8f) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -636,7 +636,7 @@ static GFXDECODE_START( suprmous )
 GFXDECODE_END
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -675,7 +675,7 @@ static MACHINE_DRIVER_START( thepit )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)

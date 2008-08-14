@@ -13,6 +13,9 @@
 #ifndef TED7360_H_
 #define TED7360_H_
 
+#include "mame.h"
+#include "sound/custom.h"
+
 
 /*----------- defined in video/ted7360.c -----------*/
 
@@ -55,7 +58,7 @@ extern VIDEO_UPDATE( ted7360 );
 extern const unsigned char ted7360_palette[16 * 8 * 3];
 
 /* to be inserted in GameDriver-Structure */
-extern const struct CustomSound_interface ted7360_sound_interface;
+extern const custom_sound_interface ted7360_sound_interface;
 
 /* to be called when writting to port */
 extern WRITE8_HANDLER ( ted7360_port_w );
@@ -75,7 +78,7 @@ extern int ted7360_rom;
 
 /*----------- defined in audio/ted7360.c -----------*/
 
-void *ted7360_custom_start (int clock, const struct CustomSound_interface *config);
+void *ted7360_custom_start (int clock, const custom_sound_interface *config);
 void ted7360_soundport_w (running_machine *machine, int mode, int data);
 
 

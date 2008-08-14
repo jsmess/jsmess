@@ -1379,4 +1379,3 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  ***************************************************************/
 #define CSL														\
     h6280.clocks_per_cycle = 4;
-

@@ -54,7 +54,7 @@ static PALETTE_INIT( pokemini )
 }
 
 
-static const struct Speaker_interface speaker_interface =
+static const speaker_interface pokemini_speaker_interface =
 {
 	3,				/* optional: number of different levels */
 	NULL			/* optional: level lookup table */
@@ -89,7 +89,7 @@ static MACHINE_DRIVER_START( pokemini )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-	MDRV_SOUND_CONFIG(speaker_interface)
+	MDRV_SOUND_CONFIG(pokemini_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

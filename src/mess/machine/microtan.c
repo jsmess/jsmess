@@ -785,15 +785,15 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
         /* first set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            AY8910_control_port_0_w(machine, 0, i);
-            AY8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
+            ay8910_control_port_0_w(machine, 0, i);
+            ay8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
         }
 
         /* second set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            AY8910_control_port_0_w(machine, 0, i);
-            AY8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
+            ay8910_control_port_0_w(machine, 0, i);
+            ay8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
         }
 
         for (i = 0; i < 32*16; i++)

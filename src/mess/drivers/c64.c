@@ -497,7 +497,7 @@ ROM_END
 	 ROM_LOAD( "rom80.e0",    0x12000, 0x2000, CRC(e801dadc ))
 #endif
 
-static const SID6581_interface c64_sound_interface =
+static const sid6581_interface c64_sound_interface =
 {
 	c64_paddle_read
 };

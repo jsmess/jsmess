@@ -555,9 +555,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YMF262_status_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ymf262_status_0_r)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x60, 0x60) AM_READ(YMZ280B_status_0_r)
+	AM_RANGE(0x60, 0x60) AM_READ(ymz280b_status_0_r)
 ADDRESS_MAP_END
 
 
@@ -573,20 +573,20 @@ static WRITE8_HANDLER( tecmosys_oki_bank_w )
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YMF262_register_A_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YMF262_data_A_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YMF262_register_B_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(YMF262_data_B_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ymf262_register_a_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ymf262_data_a_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ymf262_register_b_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ymf262_data_b_0_w)
 
-	AM_RANGE(0x10, 0x10) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
 
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
 
-	AM_RANGE(0x60, 0x60) AM_WRITE(YMZ280B_register_0_w)
-	AM_RANGE(0x61, 0x61) AM_WRITE(YMZ280B_data_0_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(ymz280b_register_0_w)
+	AM_RANGE(0x61, 0x61) AM_WRITE(ymz280b_data_0_w)
 ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
@@ -904,7 +904,7 @@ static void sound_irq(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YMF262interface ymf262_interface =
+static const ymf262_interface tecmosys_ymf262_interface =
 {
 	sound_irq		/* irq */
 };
@@ -943,7 +943,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF262, 14318180)
-	MDRV_SOUND_CONFIG(ymf262_interface)
+	MDRV_SOUND_CONFIG(tecmosys_ymf262_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 	MDRV_SOUND_ROUTE(2, "left", 1.00)

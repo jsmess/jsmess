@@ -550,7 +550,7 @@ PALETTE_INIT( apple2 )
 	palette_set_colors(machine, 0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface apple2_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -583,10 +583,10 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_SOUND_ADD("A2DAC", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("ay8913.1", AY8913, 1022727)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(apple2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("ay8913.2", AY8913, 1022727)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(apple2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* slot devices */

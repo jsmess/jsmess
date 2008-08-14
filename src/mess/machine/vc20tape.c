@@ -227,7 +227,7 @@ static void vc20_wav_state (void)
 			wav.state = 1;
 			tape.play = 0;
 			tape.record = 0;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		if (tape.motor && tape.play)
@@ -248,7 +248,7 @@ static void vc20_wav_state (void)
 			wav.state = 1;
 			tape.play = 0;
 			tape.record = 0;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			timer_reset(wav.timer, attotime_never);
 			break;
 		}
@@ -256,7 +256,7 @@ static void vc20_wav_state (void)
 		{
 			wav.state = 2;
 			timer_reset(wav.timer, attotime_never);
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		break;
@@ -266,13 +266,13 @@ static void vc20_wav_state (void)
 			wav.state = 1;
 			tape.play = 0;
 			tape.record = 0;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		if (!tape.motor || !tape.record)
 		{
 			wav.state = 2;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		break;
@@ -299,7 +299,7 @@ static void vc20_wav_open(const device_config *image)
 static void vc20_wav_write (int data)
 {
 	if (tape.noise)
-		DAC_data_w (0, data);
+		dac_data_w (0, data);
 }
 
 static TIMER_CALLBACK(vc20_wav_timer)
@@ -327,7 +327,7 @@ static TIMER_CALLBACK(vc20_wav_timer)
 		}
 	}
 	if (tape.noise)
-		DAC_data_w (0, tape.data ? TONE_ON_VALUE : 0);
+		dac_data_w (0, tape.data ? TONE_ON_VALUE : 0);
 	if (tape.read_callback)
 		tape.read_callback (0, tape.data);
 	/*    vc20_wav_state(); // removing timer in timer puls itself hangs */
@@ -354,7 +354,7 @@ static void vc20_prg_state (void)
 			prg.state = 1;
 			tape.play = 0;
 			tape.record = 0;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		if (tape.motor && tape.play)
@@ -375,7 +375,7 @@ static void vc20_prg_state (void)
 			prg.state = 1;
 			tape.play = 0;
 			tape.record = 0;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			timer_reset(prg.timer, attotime_never);
 			break;
 		}
@@ -383,7 +383,7 @@ static void vc20_prg_state (void)
 		{
 			prg.state = 2;
 			timer_reset(prg.timer, attotime_never);
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		break;
@@ -393,13 +393,13 @@ static void vc20_prg_state (void)
 			prg.state = 1;
 			tape.play = 0;
 			tape.record = 0;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		if (!tape.motor || !tape.record)
 		{
 			prg.state = 2;
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 			break;
 		}
 		break;
@@ -531,7 +531,7 @@ static void vc20_prg_write (int data)
 	}
 #endif
 	if (tape.noise)
-		DAC_data_w (0, data ? TONE_ON_VALUE : 0);
+		dac_data_w (0, data ? TONE_ON_VALUE : 0);
 }
 
 static void vc20_tape_bit (int bit)
@@ -854,14 +854,14 @@ static TIMER_CALLBACK(vc20_prg_timer)
 	if (!tape.data)
 	{								   /* send the same low phase */
 		if (tape.noise)
-			DAC_data_w (0, 0);
+			dac_data_w (0, 0);
 		tape.data = 1;
 		timer_reset (prg.timer, prg.lasttime);
 	}
 	else
 	{
 		if (tape.noise)
-			DAC_data_w (0, TONE_ON_VALUE);
+			dac_data_w (0, TONE_ON_VALUE);
 		tape.data = 0;
 		if (prg.statebit)
 		{

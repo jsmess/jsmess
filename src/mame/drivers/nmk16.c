@@ -439,30 +439,30 @@ static ADDRESS_MAP_START( tharrier_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf400, 0xf400) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0xf500, 0xf500) AM_READ(OKIM6295_status_1_r)
+	AM_RANGE(0xf400, 0xf400) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xf500, 0xf500) AM_READ(okim6295_status_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(OKIM6295_data_1_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tharrier_oki6295_bankswitch_0_w)
 	AM_RANGE(0xf700, 0xf700) AM_WRITE(tharrier_oki6295_bankswitch_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -920,7 +920,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ssmissin_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -928,7 +928,7 @@ static ADDRESS_MAP_START( ssmissin_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ssmissin_soundbank_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 
@@ -1068,10 +1068,10 @@ static WRITE8_HANDLER( raphero_sound_rombank_w )
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xbfff ) AM_READ( SMH_BANK1 )
-	AM_RANGE( 0xc000, 0xc000 ) AM_READWRITE( YM2203_status_port_0_r, YM2203_control_port_0_w )
-	AM_RANGE( 0xc001, 0xc001 ) AM_READWRITE( YM2203_read_port_0_r, YM2203_write_port_0_w )
-	AM_RANGE( 0xc800, 0xc800 ) AM_READWRITE( OKIM6295_status_0_r, OKIM6295_data_0_w )
-	AM_RANGE( 0xc808, 0xc808 ) AM_READWRITE( OKIM6295_status_1_r, OKIM6295_data_1_w )
+	AM_RANGE( 0xc000, 0xc000 ) AM_READWRITE( ym2203_status_port_0_r, ym2203_control_port_0_w )
+	AM_RANGE( 0xc001, 0xc001 ) AM_READWRITE( ym2203_read_port_0_r, ym2203_write_port_0_w )
+	AM_RANGE( 0xc800, 0xc800 ) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
+	AM_RANGE( 0xc808, 0xc808 ) AM_READWRITE( okim6295_status_1_r, okim6295_data_1_w )
 	AM_RANGE( 0xc810, 0xc817 ) AM_WRITE( NMK112_okibank_w )
 //  AM_RANGE( 0xc810, 0xc817 ) AM_WRITE( okibank_w )
 	AM_RANGE( 0xd000, 0xd000 ) AM_WRITE( raphero_sound_rombank_w )
@@ -1096,18 +1096,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0x88, 0x88) AM_READ(OKIM6295_status_1_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0x80, 0x80) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x88, 0x88) AM_READ(okim6295_status_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x88, 0x88) AM_WRITE(OKIM6295_data_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x88, 0x88) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
 ADDRESS_MAP_END
 
@@ -1117,8 +1117,8 @@ static ADDRESS_MAP_START( bjtwin_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x084000, 0x084001) AM_READ(OKIM6295_status_0_lsb_r)
-	AM_RANGE(0x084010, 0x084011) AM_READ(OKIM6295_status_1_lsb_r)
+	AM_RANGE(0x084000, 0x084001) AM_READ(okim6295_status_0_lsb_r)
+	AM_RANGE(0x084010, 0x084011) AM_READ(okim6295_status_1_lsb_r)
 	AM_RANGE(0x088000, 0x0887ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x09c000, 0x09cfff) AM_READ(nmk_bgvideoram_r)
 	AM_RANGE(0x09d000, 0x09dfff) AM_READ(nmk_bgvideoram_r)	/* mirror */
@@ -1127,8 +1127,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bjtwin_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
-	AM_RANGE(0x084000, 0x084001) AM_WRITE(OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x084010, 0x084011) AM_WRITE(OKIM6295_data_1_lsb_w)
+	AM_RANGE(0x084000, 0x084001) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x084010, 0x084011) AM_WRITE(okim6295_data_1_lsb_w)
 	AM_RANGE(0x084020, 0x08402f) AM_WRITE(NMK112_okibank_lsb_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
@@ -3481,7 +3481,7 @@ GFXDECODE_END
 
 
 
-static const struct YM2203interface ym2203_nmk004_interface =
+static const ym2203_interface ym2203_nmk004_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -3496,7 +3496,7 @@ static void ym2203_irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -3547,7 +3547,7 @@ static MACHINE_DRIVER_START( tharrier )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
@@ -3593,7 +3593,7 @@ static MACHINE_DRIVER_START( manybloc )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
@@ -4232,7 +4232,7 @@ static MACHINE_DRIVER_START( macross2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 16000000/4)
@@ -4277,7 +4277,7 @@ static MACHINE_DRIVER_START( tdragon2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 16000000/4)
@@ -4321,7 +4321,7 @@ static MACHINE_DRIVER_START( raphero )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 16000000/4)
@@ -4709,9 +4709,9 @@ static WRITE16_HANDLER( twinactn_flipscreen_w )
 static WRITE8_HANDLER( spec2k_oki1_banking_w )
 {
  	if(data == 0xfe)
- 		OKIM6295_set_bank_base(1, 0);
+ 		okim6295_set_bank_base(1, 0);
  	else if(data == 0xff)
- 		OKIM6295_set_bank_base(1, 0x40000);
+ 		okim6295_set_bank_base(1, 0x40000);
 }
 
 static ADDRESS_MAP_START( afega_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4720,9 +4720,9 @@ static ADDRESS_MAP_START( afega_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM									// RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)					// From Main CPU
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(YM2151_register_port_0_w)		// YM2151
-	AM_RANGE(0xf809, 0xf809) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)	// YM2151
-	AM_RANGE(0xf80a, 0xf80a) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)		// M6295
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(ym2151_register_port_0_w)		// YM2151
+	AM_RANGE(0xf809, 0xf809) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)	// YM2151
+	AM_RANGE(0xf80a, 0xf80a) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)		// M6295
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( firehawk_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4730,15 +4730,15 @@ static ADDRESS_MAP_START( firehawk_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xfff0, 0xfff0) AM_READ(soundlatch_r)
 	AM_RANGE(0xfff2, 0xfff2) AM_WRITE(spec2k_oki1_banking_w )
-	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(OKIM6295_status_1_r, OKIM6295_data_1_w)
-	AM_RANGE(0xfffa, 0xfffa) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
+	AM_RANGE(0xfffa, 0xfffa) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM // not used, only tested
 ADDRESS_MAP_END
 
 
 static WRITE8_HANDLER( twinactn_oki_bank_w )
 {
-	OKIM6295_set_bank_base(0, (data & 3) * 0x40000);
+	okim6295_set_bank_base(0, (data & 3) * 0x40000);
 
 	if (data & (~3))
 		logerror("%04x: invalid oki bank %02x\n", activecpu_get_pc(), data);
@@ -4750,7 +4750,7 @@ static ADDRESS_MAP_START( twinactn_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(twinactn_oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)		// From Main CPU
 ADDRESS_MAP_END
 
@@ -4839,7 +4839,7 @@ static void irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface afega_ym2151_intf =
+static const ym2151_interface afega_ym2151_intf =
 {
 	irq_handler
 };
@@ -5782,16 +5782,77 @@ ROM_START( macross )
 	ROM_LOAD( "921a10",      0x0200, 0x0020, CRC(8371e42d) SHA1(6cfd70dfa00e85ec1df8832d41df331cc3e3733a) )	/* unknown */
 ROM_END
 
+
 /*
 Gunnail (JPN Ver.)
 (c)1992 NMK
-AK92077
 
-CPU  :MC68000P12
+Gun Nail
+NMK/Tecmo, 1993
+
+PCB Layout
+----------
+
+AK92077
+|-------------------------------------------------------------|
+|  LA4460  VOL YM2203  6116    92077-2.U10   62256    62256   |
+|-|                       16MHz |------|     62256    62256   |
+  |   4558   6295 92077-6.U57   |NMK004|     62256    62256   |
+|-|                       12MHz |      |     62256    62256   |
+|    YM3014  6295 92077-5.U56   |------|                      |
+|                 |------| DIP2             |------| |------| |
+|J                |NMK005|                  |NMK009| |NMK009| |
+|A                |      | DIP1             |      | |      | |
+|M                |------|     92077-10.U96 |------| |------| |
+|M                             6116                           |
+|A   |------| 6116             6116     |------| |----------| |
+|    |NMK111| 6116                      |NMK008| |  NMK214  | |
+|    |------|                           |      | |----------| |
+|-|      92077-8.U35 |------|92077-9.U72|------|              |
+  |                  |NMK902|       |----------|              |
+|-|         6116     |------|       |  NMK215  | 92077-7.U134 |
+|           6116         |------|   |----------|              |
+|  |------| 92077-1.U21  |NMK903|                92077-3O.U133|
+|  |NMK111| |----------| |------|         62256  92077-3E.U131|
+|  |------| |  NMK214  | |------|         62256               |
+|           |----------| |NMK903|          |----------------| |
+|  |------|              |------|    6116  |                | |
+|  |NMK111| 92077-4.U19  |------|          |     68000      | |
+|  |------|              |NMK901|    6116  |                | |
+|   6264                 |------|          |----------------| |
+|   6264                                               10MHz  |
+|-------------------------------------------------------------|
+Notes:
+      68000 - Motorola MC68000P12 CPU running at 10.000MHz (DIP64)
+      6116  - 2K x8 SRAM (x9, DIP24)
+      6264  - 8K x8 SRAM (x2, DIP28)
+      62256 - 32K x8 SRAM (x10, DIP28)
+      YM2203- Yamaha YM2203 (DIP40)
+      YM3014- Yamaha YM3014 (DIP8)
+      4558  - BA4558 Op Amp (DIP8)
+      LA4460- Power Amplifier
+      6295  - Oki M6295, running at MHz, sample rate  (x2, QFP44)
+      DIP1/2- 8 position Dip Switches
+      VOL   - Volume Potentiometer
+
+      NMK CUSTOM IC'S
+          - NMK004; Actually a TLCS90-based Toshiba TMP91P640F-10 MCU
+            with 16K internal OTP PROM, running at 8.000MHz [16 / 2] (QFP64)
+            Note that the internal ROM is secured :(
+          - NMK005 (x1, Square QFP64)
+          - NMK008 (x1, Square QFP84)
+          - NMK009 (x2, Square QFP100)
+          - NMK111 (x3, QFP64)
+          - NMK901 (x1, QFP80)
+          - NMK903 (x2, QFP44)
+          - NMK214 (x2, SDIP64)
+          - NMK215 (x1, SDIP64)
+
 Sound:YM2203C,OKI M6295 x2
 OSC  :12.0000MHz,16.0000MHz,10.0000MHz
 Other:NMK 111 x3,214 x2,901,903 x2,902,005,004,215,008,009 x2
 */
+
 ROM_START( gunnail )
 	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "3e.bin",  0x00000, 0x40000, CRC(61d985b2) SHA1(96daca603f18accb47f98a3e584b2c84fc5a2ca4) )
@@ -6626,8 +6687,8 @@ static DRIVER_INIT( bubl2000 )
 
 /*
 
-Fire Hawk - ESD
----------------
+Fire Hawk - ESD, 2001
+---------------------
 
 - To enter test mode, hold on button 1 at boot up
 

@@ -132,10 +132,10 @@ static UINT32 *workram,*textureram,*frameram;
 static UINT32 *sysregs,*vidregs;
 static UINT32 Bank;
 static UINT8 FlipCount,IntHigh;
-static UINT32 Timer0ctrl,Timer1ctrl,Timer2ctrl,Timer3ctrl;
-static void *Timer0,*Timer1,*Timer2,*Timer3;
+static UINT32 Timerctrl[4];
+static emu_timer *Timer[4];
 static UINT32 FlashCmd,PIO;
-static UINT32 DMA0ctrl,DMA1ctrl;
+static UINT32 DMActrl[2];
 static UINT8 OldPort4;
 static UINT32 *ResetPatch;
 
@@ -235,116 +235,70 @@ static WRITE32_HANDLER(Banksw_w)
 		memory_set_bankptr(1,memory_region(machine, "user2"));
 }
 
-static TIMER_CALLBACK( Timer0cb )
+static TIMER_CALLBACK( Timercb )
 {
-	if(!(Timer0ctrl&2))
-		Timer0ctrl&=~1;
-	IntReq(machine, 0);
+	int which = (int)ptr;
+	static const int num[] = { 0, 1, 9, 10 };
+
+	if(!(Timerctrl[which]&2))
+		Timerctrl[which]&=~1;
+	IntReq(machine, num[which]);
+}
+
+INLINE void Timer_w(int which, UINT32 data, UINT32 mem_mask)
+{
+	if(((data^Timerctrl[which])&1) && (data&1))	//Timer activate
+	{
+		int PD=(data>>8)&0xff;
+		int TCV=program_read_dword_32le(0x01801404+which*8);
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
+
+		if(Timerctrl[which]&2)
+			timer_adjust_periodic(Timer[which],period,0,period);
+		else
+			timer_adjust_oneshot(Timer[which],period,0);
+	}
+	COMBINE_DATA(&Timerctrl[which]);
 }
 
 static WRITE32_HANDLER(Timer0_w)
 {
-	if(((data^Timer0ctrl)&1) && (data&1))	//Timer activate
-	{
-		int PD=(data>>8)&0xff;
-		int TCV=program_read_dword_32le(0x01801404);
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
-
-		if(Timer0ctrl&2)
-			timer_adjust_periodic(Timer0,period,0,period);
-		else
-			timer_adjust_oneshot(Timer0,period,0);
-	}
-	COMBINE_DATA(&Timer0ctrl);
+	Timer_w(0, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer0_r)
 {
-	return Timer0ctrl;
-}
-
-static TIMER_CALLBACK( Timer1cb )
-{
-	if(!(Timer1ctrl&2))
-		Timer1ctrl&=~1;
-	IntReq(machine, 1);
+	return Timerctrl[0];
 }
 
 static WRITE32_HANDLER(Timer1_w)
 {
-	if(((data^Timer1ctrl)&1) && (data&1))	//Timer activate
-	{
-		int PD=(data>>8)&0xff;
-		int TCV=program_read_dword_32le(0x0180140C);
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
-
-		if(Timer1ctrl&2)
-			timer_adjust_periodic(Timer1,period,0,period);
-		else
-			timer_adjust_oneshot(Timer1,period,0);
-	}
-	COMBINE_DATA(&Timer1ctrl);
+	Timer_w(1, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer1_r)
 {
-	return Timer1ctrl;
-}
-
-static TIMER_CALLBACK( Timer2cb )
-{
-	if(!(Timer2ctrl&2))
-		Timer2ctrl&=~1;
-	IntReq(machine, 9);
+	return Timerctrl[1];
 }
 
 static WRITE32_HANDLER(Timer2_w)
 {
-	if(((data^Timer2ctrl)&1) && (data&1))	//Timer activate
-	{
-		int PD=(data>>8)&0xff;
-		int TCV=program_read_dword_32le(0x01801414);
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
-
-		if(Timer2ctrl&2)
-			timer_adjust_periodic(Timer2,period,0,period);
-		else
-			timer_adjust_oneshot(Timer2,period,0);
-	}
-	COMBINE_DATA(&Timer2ctrl);
+	Timer_w(2, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer2_r)
 {
-	return Timer2ctrl;
-}
-
-static TIMER_CALLBACK( Timer3cb )
-{
-	if(!(Timer3ctrl&2))
-		Timer3ctrl&=~1;
-	IntReq(machine, 10);
+	return Timerctrl[2];
 }
 
 static WRITE32_HANDLER(Timer3_w)
 {
-	if(((data^Timer3ctrl)&1) && (data&1))	//Timer activate
-	{
-		int PD=(data>>8)&0xff;
-		int TCV=program_read_dword_32le(0x0180141C);
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
-
-		if(Timer3ctrl&2)
-			timer_adjust_periodic(Timer3,period,0,period);
-		else
-			timer_adjust_oneshot(Timer3,period,0);
-	}
-	COMBINE_DATA(&Timer3ctrl);
+	Timer_w(3, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer3_r)
 {
-	return Timer3ctrl;
+	return Timerctrl[3];
 }
 
 static READ32_HANDLER(FlashCmd_r)
@@ -397,96 +351,65 @@ static WRITE32_HANDLER(PIO_w)
 	COMBINE_DATA(&PIO);
 }
 
+INLINE void DMA_w(running_machine *machine, int which, UINT32 data, UINT32 mem_mask)
+{
+	if(((data^DMActrl[which])&(1<<10)) && (data&(1<<10)))	//DMAOn
+	{
+		UINT32 CTR=data;
+		UINT32 SRC=program_read_dword_32le(0x01800804+which*0x10);
+		UINT32 DST=program_read_dword_32le(0x01800808+which*0x10);
+		UINT32 CNT=program_read_dword_32le(0x0180080C+which*0x10);
+		int i;
+
+		if(CTR&0x2)	//32 bits
+		{
+			for(i=0;i<CNT;++i)
+			{
+				UINT32 v=program_read_dword_32le(SRC+i*4);
+				program_write_dword_32le(DST+i*4,v);
+			}
+		}
+		else if(CTR&0x1)	//16 bits
+		{
+			for(i=0;i<CNT;++i)
+			{
+				UINT16 v=program_read_word_32le(SRC+i*2);
+				program_write_word_32le(DST+i*2,v);
+			}
+		}
+		else	//8 bits
+		{
+			for(i=0;i<CNT;++i)
+			{
+				UINT8 v=program_read_byte_32le(SRC+i);
+				program_write_byte_32le(DST+i,v);
+			}
+		}
+		data&=~(1<<10);
+		program_write_dword_32le(0x0180080C+which*0x10,0);
+		IntReq(machine, 7+which);
+	}
+	COMBINE_DATA(&DMActrl[which]);
+}
+
 static READ32_HANDLER(DMA0_r)
 {
-	return DMA0ctrl;
+	return DMActrl[0];
 }
 
 static WRITE32_HANDLER(DMA0_w)
 {
-	if(((data^DMA0ctrl)&(1<<10)) && (data&(1<<10)))	//DMAOn
-	{
-		UINT32 CTR=data;
-		UINT32 SRC=program_read_dword_32le(0x01800804);
-		UINT32 DST=program_read_dword_32le(0x01800808);
-		UINT32 CNT=program_read_dword_32le(0x0180080C);
-		int i;
-
-		if(CTR&0x2)	//32 bits
-		{
-			for(i=0;i<CNT;++i)
-			{
-				UINT32 v=program_read_dword_32le(SRC+i*4);
-				program_write_dword_32le(DST+i*4,v);
-			}
-		}
-		else if(CTR&0x1)	//16 bits
-		{
-			for(i=0;i<CNT;++i)
-			{
-				UINT16 v=program_read_word_32le(SRC+i*2);
-				program_write_word_32le(DST+i*2,v);
-			}
-		}
-		else	//8 bits
-		{
-			for(i=0;i<CNT;++i)
-			{
-				UINT8 v=program_read_byte_32le(SRC+i);
-				program_write_byte_32le(DST+i,v);
-			}
-		}
-		data&=~(1<<10);
-		program_write_dword_32le(0x0180080C,0);
-		IntReq(machine, 7);
-	}
-	COMBINE_DATA(&DMA0ctrl);
+	DMA_w(machine, 0, data, mem_mask);
 }
 
 static READ32_HANDLER(DMA1_r)
 {
-	return DMA1ctrl;
+	return DMActrl[1];
 }
 
 static WRITE32_HANDLER(DMA1_w)
 {
-	if(((data^DMA1ctrl)&(1<<10)) && (data&(1<<10)))	//DMAOn
-	{
-		UINT32 CTR=data;
-		UINT32 SRC=program_read_dword_32le(0x01800814);
-		UINT32 DST=program_read_dword_32le(0x01800818);
-		UINT32 CNT=program_read_dword_32le(0x0180081C);
-		int i;
-
-		if(CTR&0x2)	//32 bits
-		{
-			for(i=0;i<CNT;++i)
-			{
-				UINT32 v=program_read_dword_32le(SRC+i*4);
-				program_write_dword_32le(DST+i*4,v);
-			}
-		}
-		else if(CTR&0x1)	//16 bits
-		{
-			for(i=0;i<CNT;++i)
-			{
-				UINT16 v=program_read_word_32le(SRC+i*2);
-				program_write_word_32le(DST+i*2,v);
-			}
-		}
-		else	//8 bits
-		{
-			for(i=0;i<CNT;++i)
-			{
-				UINT8 v=program_read_byte_32le(SRC+i);
-				program_write_byte_32le(DST+i,v);
-			}
-		}
-		data&=~(1<<10);
-		program_write_dword_32le(0x0180081C,0);
-		IntReq(machine, 8);
-	}
-	COMBINE_DATA(&DMA1ctrl);
+	DMA_w(machine, 1, data, mem_mask);
 }
 
 
@@ -515,7 +438,7 @@ static ADDRESS_MAP_START( crystal_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_BASE(&vidregs)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_BASE(&textureram)
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&frameram)
-	AM_RANGE(0x04800000, 0x04800fff) AM_READ(VR0_Snd_Read) AM_WRITE(VR0_Snd_Write)
+	AM_RANGE(0x04800000, 0x04800fff) AM_READ(vr0_snd_read) AM_WRITE(vr0_snd_write)
 
 	AM_RANGE(0x05000000, 0x05000003) AM_READ(FlashCmd_r) AM_WRITE(FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_READ(SMH_BANK1)
@@ -572,8 +495,21 @@ loop:
 #endif
 }
 
+static MACHINE_START(crystal)
+{
+	int i;
+
+	cpunum_set_irq_callback(0,icallback);
+	for (i=0; i<4; i++)
+		Timer[i] = timer_alloc(Timercb, (void*)i);
+
+	PatchReset();
+}
+
 static MACHINE_RESET(crystal)
 {
+	int i;
+
 	memset(sysregs,0,0x10000);
 	memset(vidregs,0,0x10000);
 	FlipCount=0;
@@ -584,27 +520,16 @@ static MACHINE_RESET(crystal)
 	FlashCmd=0xff;
 	OldPort4=0;
 
-	DMA0ctrl=0;
-	DMA1ctrl=0;
+	DMActrl[0]=0;
+	DMActrl[1]=0;
 
-	Timer0ctrl=0;
-	Timer1ctrl=0;
-	Timer2ctrl=0;
-	Timer3ctrl=0;
+	for (i=0; i<4; i++)
+	{
+		Timerctrl[i]=0;
+		timer_adjust_oneshot(Timer[i],attotime_never,0);
+	}
 
-	Timer0=timer_alloc(Timer0cb, NULL);
-	timer_adjust_oneshot(Timer0,attotime_never,0);
-
-	Timer1=timer_alloc(Timer1cb, NULL);
-	timer_adjust_oneshot(Timer1,attotime_never,0);
-
-	Timer2=timer_alloc(Timer2cb, NULL);
-	timer_adjust_oneshot(Timer2,attotime_never,0);
-
-	Timer3=timer_alloc(Timer3cb, NULL);
-	timer_adjust_oneshot(Timer3,attotime_never,0);
-
-	VR0_Snd_Set_Areas(textureram,frameram);
+	vr0_snd_set_areas(textureram,frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	FlipCntRead=0;
 #endif
@@ -798,7 +723,7 @@ static INPUT_PORTS_START(crystal)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const struct VR0Interface vr0_interface =
+static const vr0_interface vr0_config =
 {
 	0x04800000
 };
@@ -809,6 +734,7 @@ static MACHINE_DRIVER_START( crystal )
 	MDRV_CPU_PROGRAM_MAP(crystal_mem,0)
  	MDRV_CPU_VBLANK_INT("main", crystal_interrupt)
 
+	MDRV_MACHINE_START(crystal)
 	MDRV_MACHINE_RESET(crystal)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -830,7 +756,7 @@ static MACHINE_DRIVER_START( crystal )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("vrender", VRENDER0, 0)
-	MDRV_SOUND_CONFIG(vr0_interface)
+	MDRV_SOUND_CONFIG(vr0_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

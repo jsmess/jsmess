@@ -122,13 +122,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x02, 0x02) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -289,7 +289,7 @@ static GFXDECODE_START( funkybee )
 GFXDECODE_END
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -327,7 +327,7 @@ static MACHINE_DRIVER_START( funkybee )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -374,6 +374,36 @@ ROM_START( funkbeeb )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "funkybee.clr",   0x0000, 0x0020, CRC(e2cf5fe2) SHA1(50b293f48f078cbcebccb045aa779ced2fb298c8) )
 ROM_END
+
+
+/*
+Sky Lancer PCB Layout
+---------------------
+
+  |--------------------------------------------|
+ _|                          ROM.U33           |
+|                                              |
+|                            ROM.U32           |
+|    WF19054                                   |
+|                                              |
+|_                                             |
+  |                                  6264      |
+  |                     |------|     6116      |
+ _|           DSW4(8)   |ACTEL |               |
+|             DSW3(8)   |A1010B|               |
+|             DSW2(8)   |      |          6264 |
+|             DSW1(8)   |------|               |
+|                                         6264 |
+|    M5M82C255                                 |
+|                                              |
+|       ROM.U35                                |
+|3.6V_BATT                                     |
+|_          6116              Z80        12MHz |
+  |--------------------------------------------|
+Notes:
+      Z80 @ 3.0MHz [12/4]
+      WF19054 = AY-3-8910 @ 1.5MHz [12/8]
+*/
 
 ROM_START( skylancr )
   	ROM_REGION( 0x10000, "main", 0 )

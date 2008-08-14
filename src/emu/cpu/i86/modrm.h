@@ -1,9 +1,12 @@
-static struct {
-	struct {
+static struct
+{
+	struct
+	{
 		WREGS w[256];
 		BREGS b[256];
 	} reg;
-	struct {
+	struct
+	{
 		WREGS w[256];
 		BREGS b[256];
 	} RM;
@@ -114,5 +117,3 @@ static struct {
 	unsigned src = FETCHOP; 				\
 	unsigned dst = I.regs.w[AX];			\
     src += (FETCH << 8)
-
-

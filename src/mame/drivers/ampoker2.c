@@ -593,9 +593,9 @@ static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x35, 0x35) AM_WRITE (ampoker2_port35_w)	/* see write handlers */
 	AM_RANGE(0x36, 0x36) AM_WRITE (ampoker2_port36_w)	/* see write handlers */
 	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
-	AM_RANGE(0x38, 0x38) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x39, 0x39) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x3A, 0x3A) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x38, 0x38) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x39, 0x39) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x3A, 0x3A) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 
@@ -1001,7 +1001,7 @@ GFXDECODE_END
 * AY8910 Interfase *
 *******************/
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1044,7 +1044,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay", AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

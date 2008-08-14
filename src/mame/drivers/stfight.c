@@ -267,8 +267,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0xc801, 0xc801) AM_READ(YM2203_read_port_1_r)
+	AM_RANGE(0xc001, 0xc001) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0xc801, 0xc801) AM_READ(ym2203_read_port_1_r)
 	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 
@@ -276,10 +276,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(stfight_e800_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 
@@ -445,7 +445,7 @@ static GFXDECODE_START( stfight )
 	GFXDECODE_ENTRY( "gfx4", 0x0000, spritelayout, 16*4+16*16+16*16, 16 )
 GFXDECODE_END
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	stfight_adpcm_int,  /* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */
@@ -497,7 +497,7 @@ static MACHINE_DRIVER_START( stfight )
 	MDRV_SOUND_ROUTE(3, "mono", 0.10)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

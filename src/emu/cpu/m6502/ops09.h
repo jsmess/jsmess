@@ -212,6 +212,3 @@
 #define KIL 													\
 	PCW--;														\
 	logerror("M6509 KILL opcode %05x: %02x\n", PCD, cpu_readop(PCD))
-
-
-

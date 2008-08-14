@@ -61,7 +61,7 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 	memory_set_bankptr(1,&RAM[bankaddress]);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
-	K007232_set_bank(1,0 + ((data & 0x10) >> 4),2 + ((data & 0x10) >> 4));
+	k007232_set_bank(1,0 + ((data & 0x10) >> 4),2 + ((data & 0x10) >> 4));
 
 	/* other bits seems to be unused */
 }
@@ -69,35 +69,35 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
 
-static READ8_HANDLER( fastlane_K007232_read_port_0_r )
+static READ8_HANDLER( fastlane_k007232_read_port_0_r )
 {
-	return K007232_read_port_0_r(machine, offset ^ 1);
+	return k007232_read_port_0_r(machine, offset ^ 1);
 }
-static WRITE8_HANDLER( fastlane_K007232_write_port_0_w )
+static WRITE8_HANDLER( fastlane_k007232_write_port_0_w )
 {
-	K007232_write_port_0_w(machine, offset ^ 1, data);
+	k007232_write_port_0_w(machine, offset ^ 1, data);
 }
-static READ8_HANDLER( fastlane_K007232_read_port_1_r )
+static READ8_HANDLER( fastlane_k007232_read_port_1_r )
 {
-	return K007232_read_port_1_r(machine, offset ^ 1);
+	return k007232_read_port_1_r(machine, offset ^ 1);
 }
-static WRITE8_HANDLER( fastlane_K007232_write_port_1_w )
+static WRITE8_HANDLER( fastlane_k007232_write_port_1_w )
 {
-	K007232_write_port_1_w(machine, offset ^ 1, data);
+	k007232_write_port_1_w(machine, offset ^ 1, data);
 }
 
 
 
 static ADDRESS_MAP_START( fastlane_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x005f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_READ(input_port_2_r) 	/* DIPSW #3 */
-	AM_RANGE(0x0801, 0x0801) AM_READ(input_port_5_r) 	/* 2P inputs */
-	AM_RANGE(0x0802, 0x0802) AM_READ(input_port_4_r) 	/* 1P inputs */
-	AM_RANGE(0x0803, 0x0803) AM_READ(input_port_3_r) 	/* COINSW */
-	AM_RANGE(0x0900, 0x0900) AM_READ(input_port_0_r) 	/* DIPSW #1 */
-	AM_RANGE(0x0901, 0x0901) AM_READ(input_port_1_r) 	/* DISPW #2 */
-	AM_RANGE(0x0d00, 0x0d0d) AM_READ(fastlane_K007232_read_port_0_r)/* 007232 registers (chip 1) */
-	AM_RANGE(0x0e00, 0x0e0d) AM_READ(fastlane_K007232_read_port_1_r)/* 007232 registers (chip 2) */
+	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
+	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
+	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("P1")
+	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0901, 0x0901) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0d00, 0x0d0d) AM_READ(fastlane_k007232_read_port_0_r)/* 007232 registers (chip 1) */
+	AM_RANGE(0x0e00, 0x0e0d) AM_READ(fastlane_k007232_read_port_1_r)/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_READ(K051733_r)			/* 051733 (protection) */
 	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM)			/* Palette RAM/Work RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)			/* Video RAM + Sprite RAM */
@@ -109,8 +109,8 @@ static ADDRESS_MAP_START( fastlane_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x005f) AM_WRITE(k007121_registers_w) AM_BASE(&fastlane_k007121_regs)/* 007121 registers */
 	AM_RANGE(0x0b00, 0x0b00) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)	/* bankswitch control */
-	AM_RANGE(0x0d00, 0x0d0d) AM_WRITE(fastlane_K007232_write_port_0_w)	/* 007232 registers (chip 1) */
-	AM_RANGE(0x0e00, 0x0e0d) AM_WRITE(fastlane_K007232_write_port_1_w)	/* 007232 registers (chip 2) */
+	AM_RANGE(0x0d00, 0x0d0d) AM_WRITE(fastlane_k007232_write_port_0_w)	/* 007232 registers (chip 1) */
+	AM_RANGE(0x0e00, 0x0e0d) AM_WRITE(fastlane_k007232_write_port_1_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)/* palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_WRITE(SMH_RAM)				/* Work RAM */
@@ -127,7 +127,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( fastlane )
-	PORT_START("DSW1")	/* DSW #1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
@@ -163,7 +163,7 @@ static INPUT_PORTS_START( fastlane )
 	PORT_DIPSETTING(	0x90, DEF_STR( 1C_7C ) )
 //  PORT_DIPSETTING(    0x00, "Invalid" )
 
-	PORT_START("DSW2")	/* DSW #2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x03, "2" )
 	PORT_DIPSETTING(	0x02, "3" )
@@ -187,7 +187,7 @@ static INPUT_PORTS_START( fastlane )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")	/* DSW #3 */
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -200,7 +200,7 @@ static INPUT_PORTS_START( fastlane )
 	PORT_DIPSETTING(	0x00, DEF_STR( Infinite ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM")	/* COINSW */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* service */
@@ -209,24 +209,23 @@ static INPUT_PORTS_START( fastlane )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1")	/* PLAYER 1 INPUTS */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2")	/* PLAYER 2 INPUTS */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
 INPUT_PORTS_END
 
 static const gfx_layout gfxlayout =
@@ -252,22 +251,22 @@ GFXDECODE_END
 
 static void volume_callback0(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
 static void volume_callback1(int v)
 {
-	K007232_set_volume(1,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(1,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(1,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(1,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface_1 =
+static const k007232_interface k007232_interface_1 =
 {
 	volume_callback0
 };
 
-static const struct K007232_interface k007232_interface_2 =
+static const k007232_interface k007232_interface_2 =
 {
 	volume_callback1
 };

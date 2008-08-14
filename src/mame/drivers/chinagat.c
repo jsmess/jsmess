@@ -189,7 +189,7 @@ static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
 	{
 		logerror("ADPCM output disabled\n");
 		saiyugb1_pcm_nibble = 0x0f;
-		MSM5205_reset_w(0,1);
+		msm5205_reset_w(0,1);
 	}
 	else
 	{
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
 
 		if ( ((saiyugb1_i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4) )
 		{
-			MSM5205_data_w (0, saiyugb1_pcm_nibble);
+			msm5205_data_w (0, saiyugb1_pcm_nibble);
 			logerror("Writing %02x to m5205\n",saiyugb1_pcm_nibble);
 		}
 		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n",saiyugb1_adpcm_addr,saiyugb1_i8748_P1,data,saiyugb1_i8748_P2,saiyugb1_pcm_shift,saiyugb1_pcm_nibble);
@@ -238,12 +238,12 @@ static WRITE8_HANDLER( saiyugb1_m5205_clk_w )
 	saiyugb1_m5205_clk++;
 	if (saiyugb1_m5205_clk == 8)
 	}
-		MSM5205_vclk_w (0, 1);		/* ??? */
+		msm5205_vclk_w (0, 1);		/* ??? */
 		saiyugb1_m5205_clk = 0;
 	}
 	else
 	}
-		MSM5205_vclk_w (0, 0);		/* ??? */
+		msm5205_vclk_w (0, 0);		/* ??? */
 	}
 #endif
 }
@@ -300,9 +300,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -312,26 +312,26 @@ static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 // 8804 and/or 8805 make a gong sound when the coin goes in
 // but only on the title screen....
 
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2203_write_port_0_w)
-//  AM_RANGE(0x8802, 0x8802) AM_READWRITE(OKIM6295_data_0_w, OKIM6295_status_0_r)
-//  AM_RANGE(0x8803, 0x8803) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x8804, 0x8804) AM_READWRITE(YM2203_status_port_1_r,  YM2203_control_port_1_w)
-	AM_RANGE(0x8805, 0x8805) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_WRITE(ym2203_write_port_0_w)
+//  AM_RANGE(0x8802, 0x8802) AM_READWRITE(okim6295_data_0_w, okim6295_status_0_r)
+//  AM_RANGE(0x8803, 0x8803) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x8804, 0x8804) AM_READWRITE(ym2203_status_port_1_r,  ym2203_control_port_1_w)
+	AM_RANGE(0x8805, 0x8805) AM_WRITE(ym2203_write_port_1_w)
 //  AM_RANGE(0x8804, 0x8804) AM_WRITE(SMH_RAM)
 //  AM_RANGE(0x8805, 0x8805) AM_WRITE(SMH_RAM)
 
-//  AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-//  AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
-//  AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+//  AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
+//  AM_RANGE(0x8801, 0x8801) AM_WRITE(ym2151_data_port_0_w)
+//  AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saiyugb1_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(saiyugb1_mcu_command_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -462,14 +462,14 @@ static void chinagat_irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	chinagat_irq_handler
 };
 
 
 /* This on the bootleg board, instead of the m6295 */
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	saiyugb1_m5205_irq_w,	/* Interrupt function */
 	MSM5205_S64_4B			/* vclk input mode (6030Hz, 4-bit) */
@@ -482,7 +482,7 @@ static INTERRUPT_GEN( chinagat_interrupt )
 }
 
 /* This is only on the second bootleg board */
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -527,7 +527,7 @@ static MACHINE_DRIVER_START( chinagat )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.80)
 	MDRV_SOUND_ROUTE(1, "mono", 0.80)
 
@@ -575,12 +575,12 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.80)
 	MDRV_SOUND_ROUTE(1, "mono", 0.80)
 
 	MDRV_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -619,7 +619,7 @@ static MACHINE_DRIVER_START( saiyugb2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 3579545)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)

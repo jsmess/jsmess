@@ -85,7 +85,7 @@ static WRITE8_HANDLER( aliens_snd_bankswitch_w )
 	int bank_A = ((data >> 1) & 0x01);
 	int bank_B = ((data) & 0x01);
 
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 }
 
 
@@ -107,10 +107,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aliens_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM g04_b03.bin */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)				/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)
+	AM_RANGE(0xe000, 0xe00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -217,16 +217,16 @@ INPUT_PORTS_END
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v & 0x0f) * 0x11,0);
-	K007232_set_volume(0,1,0,(v >> 4) * 0x11);
+	k007232_set_volume(0,0,(v & 0x0f) * 0x11,0);
+	k007232_set_volume(0,1,0,(v >> 4) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	0,
 	aliens_snd_bankswitch_w
@@ -266,12 +266,12 @@ static MACHINE_DRIVER_START( aliens )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_DRIVER_END

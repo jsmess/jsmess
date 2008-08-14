@@ -1,7 +1,9 @@
-#ifndef FLT_RC_H
+#pragma once
+
+#ifndef __FLT_RC_H__
 #define FLT_RC_H
 
-#include "rescap.h"
+#include "machine/rescap.h"
 
 #define FLT_RC_LOWPASS		0
 #define FLT_RC_HIGHPASS		1
@@ -56,4 +58,4 @@ extern const flt_rc_config flt_rc_ac_default;
 
 void filter_rc_set_RC(int num, int type, double R1, double R2, double R3, double C);
 
-#endif
+#endif /* __FLT_RC_H__ */

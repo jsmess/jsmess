@@ -179,18 +179,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( suprslam_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-	AM_RANGE(0x08, 0x08) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x0a, 0x0a) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x08, 0x08) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x0a, 0x0a) AM_READ(ym2610_status_port_0_b_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suprslam_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2610_data_port_0_b_w)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
@@ -316,7 +316,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( suprslam )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 8000000)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

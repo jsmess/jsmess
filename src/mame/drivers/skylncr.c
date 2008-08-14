@@ -182,8 +182,8 @@ static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x20, 0x20) AM_WRITE( skylncr_coin_w )
 
-	AM_RANGE(0x30, 0x30) AM_WRITE( AY8910_control_port_0_w )
-	AM_RANGE(0x31, 0x31) AM_READWRITE( AY8910_read_port_0_r , AY8910_write_port_0_w )
+	AM_RANGE(0x30, 0x30) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE(0x31, 0x31) AM_READWRITE( ay8910_read_port_0_r , ay8910_write_port_0_w )
 
 	AM_RANGE(0x40, 0x41) AM_WRITE( skylncr_paletteram_w )
 	AM_RANGE(0x50, 0x51) AM_WRITE( skylncr_paletteram2_w )
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( skylncr )
 
 INPUT_PORTS_END
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -451,7 +451,7 @@ static MACHINE_DRIVER_START( skylncr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -186,9 +186,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( chqflag_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0xa000, 0xa00d) AM_READ(K007232_read_port_0_r)	/* 007232 (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_1_r)	/* 007232 (chip 2) */
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)	/* YM2151 */
+	AM_RANGE(0xa000, 0xa00d) AM_READ(k007232_read_port_0_r)	/* 007232 (chip 1) */
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_1_r)	/* 007232 (chip 2) */
+	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
 	//AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)                /* ??? */
 ADDRESS_MAP_END
@@ -200,24 +200,24 @@ static WRITE8_HANDLER( k007232_bankswitch_w )
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	K007232_set_bank( 1, bank_A, bank_B );
+	k007232_set_bank( 1, bank_A, bank_B );
 }
 
 static ADDRESS_MAP_START( chqflag_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w)		/* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_WRITE(K007232_write_port_0_w)		/* 007232 (chip 1) */
+	AM_RANGE(0xa000, 0xa00d) AM_WRITE(k007232_write_port_0_w)		/* 007232 (chip 1) */
 	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)/* extra volume, goes to the 007232 w/ A11 */
 											/* selecting a different latch for the external port */
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_1_w)		/* 007232 (chip 2) */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)		/* YM2151 */
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_1_w)		/* 007232 (chip 2) */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)	/* YM2151 */
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)		/* YM2151 */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)					/* ??? */
 ADDRESS_MAP_END
 
@@ -240,8 +240,8 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -313,33 +313,33 @@ static void chqflag_ym2151_irq_w(running_machine *machine, int data)
 }
 
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	chqflag_ym2151_irq_w
 };
 
 static void volume_callback0(int v)
 {
-	K007232_set_volume(0,0,(v & 0x0f)*0x11,0);
-	K007232_set_volume(0,1,0,(v >> 4)*0x11);
+	k007232_set_volume(0,0,(v & 0x0f)*0x11,0);
+	k007232_set_volume(0,1,0,(v >> 4)*0x11);
 }
 
 static WRITE8_HANDLER( k007232_extvolume_w )
 {
-	K007232_set_volume(1,1,(data & 0x0f)*0x11/2,(data >> 4)*0x11/2);
+	k007232_set_volume(1,1,(data & 0x0f)*0x11/2,(data >> 4)*0x11/2);
 }
 
 static void volume_callback1(int v)
 {
-	K007232_set_volume(1,0,(v & 0x0f)*0x11/2,(v >> 4)*0x11/2);
+	k007232_set_volume(1,0,(v & 0x0f)*0x11/2,(v >> 4)*0x11/2);
 }
 
-static const struct K007232_interface k007232_interface_1 =
+static const k007232_interface k007232_interface_1 =
 {
 	volume_callback0
 };
 
-static const struct K007232_interface k007232_interface_2 =
+static const k007232_interface k007232_interface_2 =
 {
 	volume_callback1
 };
@@ -375,7 +375,7 @@ static MACHINE_DRIVER_START( chqflag )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 

@@ -114,7 +114,7 @@ extern VIDEO_UPDATE( vic6560 );
 extern const unsigned char vic6560_palette[16 * 3];
 
 /* to be inserted in GameDriver-Structure */
-extern const struct CustomSound_interface vic6560_sound_interface;
+extern const custom_sound_interface vic6560_sound_interface;
 
 extern INTERRUPT_GEN( vic656x_raster_interrupt );
 
@@ -128,7 +128,7 @@ extern  READ8_HANDLER ( vic6560_port_r );
 /*----------- defined in audio/vic6560.c -----------*/
 
 /* private area */
-void *vic6560_custom_start(int clock, const struct CustomSound_interface *config);
+void *vic6560_custom_start(int clock, const custom_sound_interface *config);
 void vic6560_soundport_w (running_machine *machine, int mode, int data);
 
 extern UINT8 vic6560[16];

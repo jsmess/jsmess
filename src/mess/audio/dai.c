@@ -16,7 +16,7 @@
 #include "streams.h"
 #include "deprecat.h"
 
-static void *dai_sh_start(int clock, const struct CustomSound_interface *config);
+static void *dai_sh_start(int clock, const custom_sound_interface *config);
 static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
 static sound_stream *mixer_channel;
@@ -35,7 +35,7 @@ static const UINT16 dai_noise_volume_table[] = {
 				           500, 1000, 1500, 2000,
 					  2500, 3000, 3500, 4000};
 
-const struct CustomSound_interface dai_sound_interface =
+const custom_sound_interface dai_sound_interface =
 {
 	dai_sh_start,
 	NULL,
@@ -51,7 +51,7 @@ void dai_set_input(int index, int state)
 }
 
 
-static void *dai_sh_start(int clock, const struct CustomSound_interface *config)
+static void *dai_sh_start(int clock, const custom_sound_interface *config)
 {
 	dai_input[0] = dai_input[1] = dai_input[2] = 0;
 

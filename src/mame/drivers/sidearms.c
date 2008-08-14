@@ -148,17 +148,17 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(YM2203_status_port_1_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ(ym2203_status_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE(ym2203_write_port_1_w)
 ADDRESS_MAP_END
 
 /* Whizz */
@@ -228,14 +228,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( whizz_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( whizz_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
@@ -701,7 +701,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 			AY8910_LEGACY_OUTPUT,
@@ -711,7 +711,7 @@ static const struct YM2203interface ym2203_interface =
 	irqhandler
 };
 
-static const struct YM2151interface whizz_ym2151_interface =
+static const ym2151_interface whizz_ym2151_interface =
 {
 	irqhandler
 };
@@ -747,7 +747,7 @@ static MACHINE_DRIVER_START( sidearms )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
@@ -792,7 +792,7 @@ static MACHINE_DRIVER_START( turtship )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)

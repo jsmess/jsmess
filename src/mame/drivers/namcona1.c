@@ -1081,19 +1081,19 @@ static WRITE16_HANDLER( na1mcu_shared_w )
 
 static READ16_HANDLER(snd_r)
 {
-	return C140_r(machine,offset*2+1) | C140_r(machine,offset*2)<<8;
+	return c140_r(machine,offset*2+1) | c140_r(machine,offset*2)<<8;
 }
 
 static WRITE16_HANDLER(snd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		C140_w(machine,(offset*2)+1, data);
+		c140_w(machine,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		C140_w(machine,(offset*2), data>>8);
+		c140_w(machine,(offset*2), data>>8);
 	}
 }
 
@@ -1194,7 +1194,7 @@ static WRITE8_HANDLER( port8_w )
 
 static MACHINE_START( namcona1 )
 {
-	C140_set_base(0, namcona1_workram);
+	c140_set_base(0, namcona1_workram);
 }
 
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
@@ -1273,7 +1273,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	}
 }
 
-static const struct C140interface C140_interface_typeA =
+static const c140_interface C140_interface_typeA =
 {
 	C140_TYPE_ASIC219
 };
@@ -1367,7 +1367,7 @@ static ADDRESS_MAP_START( namcona2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
 ADDRESS_MAP_END
 
-static struct NAMCONAinterface NAMCONA_interface =
+static namcona_interface NAMCONA_interface =
 {
 	NULL,
 	0x70000/2

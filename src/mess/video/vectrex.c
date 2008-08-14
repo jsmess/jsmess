@@ -352,7 +352,7 @@ static void vectrex_multiplexer (int mux)
 	timer_set(ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[mux], vectrex_via_out[PORTA], update_signal);
 
 	if (mux == A_AUDIO)
-		DAC_data_w(0, vectrex_via_out[PORTA]);
+		dac_data_w(0, vectrex_via_out[PORTA]);
 }
 
 static WRITE8_HANDLER ( v_via_pb_w )
@@ -421,9 +421,9 @@ static WRITE8_HANDLER ( v_via_pb_w )
 	if (data & 0x10)
 	{
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
-			AY8910_control_port_0_w(machine, 0, vectrex_via_out[PORTA]);
+			ay8910_control_port_0_w(machine, 0, vectrex_via_out[PORTA]);
 		else
-			AY8910_write_port_0_w(machine, 0, vectrex_via_out[PORTA]);
+			ay8910_write_port_0_w(machine, 0, vectrex_via_out[PORTA]);
 	}
 
 	if (!(data & 0x1) && (vectrex_via_out[PORTB] & 0x1))

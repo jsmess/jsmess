@@ -77,8 +77,8 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP) // ?
 
-	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -269,7 +269,7 @@ static READ8_HANDLER( unknown_r )
 }
 
 /* these are set as input, but I have no idea which input port it uses is for the AY */
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -315,7 +315,7 @@ static MACHINE_DRIVER_START( carrera )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/12)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

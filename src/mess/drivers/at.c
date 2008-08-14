@@ -118,15 +118,15 @@ static READ8_HANDLER(at_adlib_r)
 	if ( offset )
 		return 0xFF;
 	else
-		return YM3812_status_port_0_r( machine, 0 );
+		return ym3812_status_port_0_r( machine, 0 );
 }
 
 static WRITE8_HANDLER(at_adlib_w)
 {
 	if ( offset )
-		YM3812_write_port_0_w( machine, 0, data );
+		ym3812_write_port_0_w( machine, 0, data );
 	else
-		YM3812_control_port_0_w( machine, 0, data );
+		ym3812_control_port_0_w( machine, 0, data );
 }
 #endif
 
@@ -223,8 +223,8 @@ static ADDRESS_MAP_START(ps2m30286_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,		pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_READWRITE(YM3812_status_port_0_r,	YM3812_control_port_0_w)
-	AM_RANGE(0x0389, 0x0389) AM_WRITE(								YM3812_write_port_0_w)
+	AM_RANGE(0x0388, 0x0388) AM_READWRITE(ym3812_status_port_0_r,	ym3812_control_port_0_w)
+	AM_RANGE(0x0389, 0x0389) AM_WRITE(								ym3812_write_port_0_w)
 #endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,		pc_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,				uart8250_2_w)
@@ -402,7 +402,7 @@ static const unsigned i286_address_mask = 0x00ffffff;
 /* irq line not connected to pc on adlib cards (and compatibles) */
 static void irqhandler(running_machine *machine, int linestate) {}
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface at_ym3812_interface =
 {
 	irqhandler
 };
@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3813", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(at_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -589,7 +589,7 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(at_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -658,7 +658,7 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(at_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -726,7 +726,7 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(at_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER

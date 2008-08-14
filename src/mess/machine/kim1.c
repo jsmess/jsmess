@@ -855,7 +855,7 @@ static void m6530_w(int chip, int offset, int data)
 			{
 				/* This is the cassette output port */
 				logerror("write cassette port: %d\n", (which & 0x80) ? 1 : 0);
-				DAC_signed_data_w(0, (which & 0x80) ? 255 : 0);
+				dac_signed_data_w(0, (which & 0x80) ? 255 : 0);
 			}
 		}
 		break;

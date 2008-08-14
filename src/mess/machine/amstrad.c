@@ -144,12 +144,12 @@ void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 	/* PSG */
 	for (i=0; i<16; i++)
 	{
-		AY8910_control_port_0_w(machine, 0,i);
+		ay8910_control_port_0_w(machine, 0,i);
 
-		AY8910_write_port_0_w(machine, 0,pSnapshot[0x05b + i] & 0x0ff);
+		ay8910_write_port_0_w(machine, 0,pSnapshot[0x05b + i] & 0x0ff);
 	}
 
-	AY8910_control_port_0_w(machine, 0,pSnapshot[0x05a]);
+	ay8910_control_port_0_w(machine, 0,pSnapshot[0x05a]);
 
 	{
 		int MemSize;

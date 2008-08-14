@@ -188,8 +188,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
 	AM_RANGE(0x4005, 0x4006) AM_WRITE(seibu_adpcm_adr_1_w)
-	AM_RANGE(0x4008, 0x4008) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x4009, 0x4009) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x4008, 0x4008) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x4009, 0x4009) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
@@ -211,8 +211,8 @@ static ADDRESS_MAP_START( cabalbl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
 	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x400e, 0x400e) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x400f, 0x400f) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x400e, 0x400e) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x400f, 0x400f) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(SMH_NOP)  /* ??? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -221,20 +221,20 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( cabalbl_adpcm_0_w )
 {
-	MSM5205_reset_w(0,(data>>7)&1);
+	msm5205_reset_w(0,(data>>7)&1);
 	/* ?? bit 6?? */
-	MSM5205_data_w(0,data);
-	MSM5205_vclk_w(0,1);
-	MSM5205_vclk_w(0,0);
+	msm5205_data_w(0,data);
+	msm5205_vclk_w(0,1);
+	msm5205_vclk_w(0,0);
 }
 
 static WRITE8_HANDLER( cabalbl_adpcm_1_w )
 {
-	MSM5205_reset_w(1,(data>>7)&1);
+	msm5205_reset_w(1,(data>>7)&1);
 	/* ?? bit 6?? */
-	MSM5205_data_w(1,data);
-	MSM5205_vclk_w(1,1);
-	MSM5205_vclk_w(1,0);
+	msm5205_data_w(1,data);
+	msm5205_vclk_w(1,1);
+	msm5205_vclk_w(1,0);
 }
 
 static ADDRESS_MAP_START( cabalbl_talk1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -477,18 +477,18 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface cabalbl_ym2151_interface =
+static const ym2151_interface cabalbl_ym2151_interface =
 {
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface_1 =
+static const msm5205_interface msm5205_interface_1 =
 {
 	0,
 	MSM5205_SEX_4B
 };
 
-static const struct MSM5205interface msm5205_interface_2 =
+static const msm5205_interface msm5205_interface_2 =
 {
 	0,
 	MSM5205_SEX_4B

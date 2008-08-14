@@ -226,7 +226,7 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 
 static void *es5503_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct ES5503interface *intf;
+	const es5503_interface *intf;
 	int osc;
 	ES5503Chip *chip;
 
@@ -275,7 +275,7 @@ static void *es5503_start(const char *tag, int sndindex, int clock, const void *
 	return chip;
 }
 
-READ8_HANDLER(ES5503_reg_0_r)
+READ8_HANDLER(es5503_reg_0_r)
 {
 	UINT8 retval;
 	int i;
@@ -386,7 +386,7 @@ READ8_HANDLER(ES5503_reg_0_r)
 	return 0;
 }
 
-WRITE8_HANDLER(ES5503_reg_0_w)
+WRITE8_HANDLER(es5503_reg_0_w)
 {
 	ES5503Chip *chip = sndti_token(SOUND_ES5503, 0);
 
@@ -509,7 +509,7 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 	}
 }
 
-void ES5503_set_base_0(UINT8 *wavemem)
+void es5503_set_base_0(UINT8 *wavemem)
 {
 	ES5503Chip *chip = sndti_token(SOUND_ES5503, 0);
 

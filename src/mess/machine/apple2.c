@@ -966,7 +966,7 @@ READ8_HANDLER ( apple2_c03x_r )
 			a2_speaker_state = 0;
 		else
 			a2_speaker_state = 0xFF;
-		DAC_data_w(0, a2_speaker_state);
+		dac_data_w(0, a2_speaker_state);
 	}
 	return apple2_getfloatingbusvalue();
 }

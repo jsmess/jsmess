@@ -339,7 +339,7 @@ static  READ8_HANDLER (konami_scc_bank5)
 		return 0xff;
 	}
 	else {
-		return K051649_waveform_r (machine, offset & 0x7f);
+		return k051649_waveform_r (machine, offset & 0x7f);
 	}
 }
 
@@ -394,18 +394,18 @@ MSX_SLOT_WRITE(konami_scc)
 		int offset = addr & 0xff;
 
 		if (offset < 0x80) {
-			K051649_waveform_w (machine, offset, val);
+			k051649_waveform_w (machine, offset, val);
 		}
 		else if (offset < 0xa0) {
 			offset &= 0xf;
 			if (offset < 0xa) {
-				K051649_frequency_w (machine, offset, val);
+				k051649_frequency_w (machine, offset, val);
 			}
 			else if (offset < 0xf) {
-				K051649_volume_w (machine, offset - 0xa, val);
+				k051649_volume_w (machine, offset - 0xa, val);
 			}
 			else {
-				K051649_keyonoff_w (machine, 0, val);
+				k051649_keyonoff_w (machine, 0, val);
 			}
 		}
 #if 0
@@ -1370,7 +1370,7 @@ MSX_SLOT_MAP(synthesizer)
 MSX_SLOT_WRITE(synthesizer)
 {
 	if (addr >= 0x4000 && addr < 0x8000 && !(addr & 0x0010)) {
-		DAC_data_w (0, val);
+		dac_data_w (0, val);
 	}
 }
 
@@ -1422,7 +1422,7 @@ MSX_SLOT_MAP(majutsushi)
 MSX_SLOT_WRITE(majutsushi)
 {
 	if (addr >= 0x5000 && addr < 0x6000) {
-		DAC_data_w (0, val);
+		dac_data_w (0, val);
 	}
 	else if (addr >= 0x6000 && addr < 0x8000) {
 		state->banks[1] = val & 0x0f;
@@ -1536,12 +1536,12 @@ MSX_SLOT_WRITE(fmpac)
 	switch (addr) {
 	case 0x7ff4:
 		if (state->cart.fmpac.opll_active) {
-			YM2413_register_port_0_w (machine, 0, val);
+			ym2413_register_port_0_w (machine, 0, val);
 		}
 		break;
 	case 0x7ff5:
 		if (state->cart.fmpac.opll_active) {
-			YM2413_data_port_0_w (machine, 0, val);
+			ym2413_data_port_0_w (machine, 0, val);
 		}
 		break;
 	case 0x7ff6:
@@ -1984,14 +1984,14 @@ static  READ8_HANDLER (soundcartridge_scc)
 	reg = offset & 0xff;
 
 	if (reg < 0x80) {
-		return K051649_waveform_r (machine, reg);
+		return k051649_waveform_r (machine, reg);
 	}
 	else if (reg < 0xa0) {
 		/* nothing */
 	}
 	else if (reg < 0xc0) {
 		/* read wave 5 */
-		return K051649_waveform_r (machine, 0x80 + (reg & 0x1f));
+		return k051649_waveform_r (machine, 0x80 + (reg & 0x1f));
 	}
 #if 0
 	else if (reg < 0xe0) {
@@ -2014,7 +2014,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 	reg = offset & 0xff;
 
 	if (reg < 0xa0) {
-		return K051649_waveform_r (machine, reg);
+		return k051649_waveform_r (machine, reg);
 	}
 #if 0
 	else if (reg >= 0xc0 && reg < 0xe0) {
@@ -2103,19 +2103,19 @@ MSX_SLOT_WRITE(soundcartridge)
 			int offset = addr & 0xff;
 
 			if (offset < 0x80) {
-				K051649_waveform_w (machine, offset, val);
+				k051649_waveform_w (machine, offset, val);
 			}
 			else if (offset < 0xa0) {
 				offset &= 0xf;
 
 				if (offset < 0xa) {
-					K051649_frequency_w (machine, offset, val);
+					k051649_frequency_w (machine, offset, val);
 				}
 				else if (offset < 0x0f) {
-					K051649_volume_w (machine, offset - 0xa, val);
+					k051649_volume_w (machine, offset - 0xa, val);
 				}
 				else if (offset == 0x0f) {
-					K051649_keyonoff_w (machine, 0, val);
+					k051649_keyonoff_w (machine, 0, val);
 				}
 			}
 #if 0
@@ -2143,19 +2143,19 @@ MSX_SLOT_WRITE(soundcartridge)
 			int offset = addr & 0xff;
 
 			if (offset < 0xa0) {
-				K052539_waveform_w (machine, offset, val);
+				k052539_waveform_w (machine, offset, val);
 			}
 			else if (offset < 0xc0) {
 				offset &= 0x0f;
 
 				if (offset < 0x0a) {
-					K051649_frequency_w (machine, offset, val);
+					k051649_frequency_w (machine, offset, val);
 				}
 				else if (offset < 0x0f) {
-					K051649_volume_w (machine, offset - 0x0a, val);
+					k051649_volume_w (machine, offset - 0x0a, val);
 				}
 				else if (offset == 0x0f) {
-					K051649_keyonoff_w (machine, 0, val);
+					k051649_keyonoff_w (machine, 0, val);
 				}
 			}
 #if 0

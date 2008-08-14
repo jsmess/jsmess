@@ -466,13 +466,13 @@ static READ8_HANDLER( portB_r )
 static READ8_HANDLER( ym2203_data0_r )
 {
 	extport = 0;
-	return YM2203_read_port_0_r(machine,offset);
+	return ym2203_read_port_0_r(machine,offset);
 }
 
 static READ8_HANDLER( ym2203_data1_r )
 {
 	extport = 1;
-	return YM2203_read_port_0_r(machine,offset);
+	return ym2203_read_port_0_r(machine,offset);
 }
 
 static const UINT8 *mcu_reply;
@@ -583,14 +583,14 @@ static void champwr_msm5205_vck(running_machine *machine, int chip)
 
 	if (adpcm_data != -1)
 	{
-		MSM5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(0, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0x1ffff;
-		MSM5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(0, adpcm_data >> 4);
 	}
 }
 
@@ -606,12 +606,12 @@ static WRITE8_HANDLER( champwr_msm5205_hi_w )
 
 static WRITE8_HANDLER( champwr_msm5205_start_w )
 {
-	MSM5205_reset_w(0, 0);
+	msm5205_reset_w(0, 0);
 }
 
 static WRITE8_HANDLER( champwr_msm5205_stop_w )
 {
-	MSM5205_reset_w(0, 1);
+	msm5205_reset_w(0, 1);
 	adpcm_pos &= 0x1ff00;
 }
 
@@ -688,14 +688,14 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 	AM_RANGE(0xff08, 0xff08) AM_WRITE(rombankswitch_w)
 
 #define COMMON_SINGLE_READ \
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_0_r)	\
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_0_r)	\
 	AM_RANGE(0xa001, 0xa001) AM_READ(ym2203_data0_r)			\
 	AM_RANGE(0xa003, 0xa003) AM_READ(ym2203_data1_r)			\
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 
 #define COMMON_SINGLE_WRITE \
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_0_w)	\
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_0_w)		\
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_0_w)	\
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w)		\
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
 
 
@@ -742,7 +742,7 @@ static ADDRESS_MAP_START( fhawk_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)
 	AM_RANGE(0xe001, 0xe001) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ(ym2203_status_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -750,8 +750,8 @@ static ADDRESS_MAP_START( fhawk_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -790,9 +790,9 @@ static ADDRESS_MAP_START( raimais_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(YM2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
+	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -808,10 +808,10 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -864,7 +864,7 @@ static ADDRESS_MAP_START( champwr_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(SMH_NOP)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -872,8 +872,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champwr_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
@@ -904,7 +904,7 @@ static ADDRESS_MAP_START( kurikint_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)
-	AM_RANGE(0xe800, 0xe800) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(ym2203_status_port_0_r)
 #if 0
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
@@ -918,8 +918,8 @@ static ADDRESS_MAP_START( kurikint_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(ym2203_write_port_0_w)
 #if 0
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 #endif
@@ -1068,7 +1068,7 @@ static ADDRESS_MAP_START( evilston_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)//shared_r },
-	AM_RANGE(0xe800, 0xe800) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(ym2203_status_port_0_r)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK7)
 ADDRESS_MAP_END
 
@@ -1076,8 +1076,8 @@ static ADDRESS_MAP_START( evilston_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -2119,7 +2119,7 @@ static WRITE8_HANDLER( portA_w )
 	}
 }
 
-static const struct YM2203interface ym2203_interface_triple =
+static const ym2203_interface ym2203_interface_triple =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -2132,7 +2132,7 @@ static const struct YM2203interface ym2203_interface_triple =
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface_champwr =
+static const ym2203_interface ym2203_interface_champwr =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -2146,18 +2146,18 @@ static const struct YM2203interface ym2203_interface_champwr =
 };
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	champwr_msm5205_vck,/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface_single =
+static const ym2203_interface ym2203_interface_single =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -2240,7 +2240,7 @@ static MACHINE_DRIVER_START( champwr )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -2263,7 +2263,7 @@ static MACHINE_DRIVER_START( raimais )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym", YM2610, 8000000) /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
@@ -2744,7 +2744,7 @@ ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system
 	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
 
 	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
-	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 
@@ -2758,7 +2758,7 @@ ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo 
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
-	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
@@ -2771,7 +2771,7 @@ ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom num
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
-	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( plottinu ) /* The demo mode is 2 players */
@@ -2784,7 +2784,7 @@ ROM_START( plottinu ) /* The demo mode is 2 players */
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
-	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( flipull ) /* The demo mode is 1 player */
@@ -2795,6 +2795,9 @@ ROM_START( flipull ) /* The demo mode is 1 player */
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
 	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
+
+	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( puzznic )

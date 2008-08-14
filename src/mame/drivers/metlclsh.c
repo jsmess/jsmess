@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( metlclsh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 //  AM_RANGE(0xc800, 0xc82f) AM_READ(SMH_RAM                   )   // not actually read
 //  AM_RANGE(0xcc00, 0xcc2f) AM_READ(SMH_RAM                   )   // ""
-	AM_RANGE(0xd000, 0xd000) AM_READ(YM2203_status_port_0_r	)
+	AM_RANGE(0xd000, 0xd000) AM_READ(ym2203_status_port_0_r	)
 //  AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM                   )   // not actually read
 	AM_RANGE(0xe800, 0xe9ff) AM_READ(SMH_RAM					)
 	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM					)	// Reset/IRQ vectors
@@ -97,10 +97,10 @@ static ADDRESS_MAP_START( metlclsh_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi			)	// nmi ack
 	AM_RANGE(0xc800, 0xc82f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram		)
 	AM_RANGE(0xcc00, 0xcc2f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2	)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(YM2203_control_port_0_w	)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(YM2203_write_port_0_w		)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM3526_control_port_0_w	)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM3526_write_port_0_w		)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(ym2203_control_port_0_w	)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(ym2203_write_port_0_w		)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym3526_control_port_0_w	)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3526_write_port_0_w		)
 	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(metlclsh_fgram_w) AM_BASE(&metlclsh_fgram		)
 	AM_RANGE(0xfff0, 0xffff) AM_WRITE(SMH_ROM					)
@@ -292,7 +292,7 @@ static void metlclsh_irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,linestate);
 }
 
-static const struct YM3526interface ym3526_interface =
+static const ym3526_interface ym3526_config =
 {
 	metlclsh_irqhandler
 };
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( metlclsh )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

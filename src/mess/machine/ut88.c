@@ -86,7 +86,7 @@ WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
 
 WRITE8_HANDLER( ut88_sound_w )
 {
-	DAC_data_w(0,data); //beeper
+	dac_data_w(0,data); //beeper
 	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
 }
 

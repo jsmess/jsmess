@@ -480,7 +480,7 @@ const unsigned char ted7360_palette[] =
 	0xd1, 0xff, 0xff, 0xeb, 0xff, 0xff, 0xff, 0xf8, 0xff, 0xed, 0xff, 0xbc
 };
 
-const struct CustomSound_interface ted7360_sound_interface =
+const custom_sound_interface ted7360_sound_interface =
 {
 	ted7360_custom_start
 };

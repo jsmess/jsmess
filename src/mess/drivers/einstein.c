@@ -752,13 +752,13 @@ static WRITE8_HANDLER(einstein_psg_w)
 		/* case 0 and 1 are not handled */
 		case 2:
 		{
-			AY8910_control_port_0_w(machine, 0, data);
+			ay8910_control_port_0_w(machine, 0, data);
 		}
 		break;
 
 		case 3:
 		{
-			AY8910_write_port_0_w(machine, 0, data);
+			ay8910_write_port_0_w(machine, 0, data);
 		}
 		break;
 
@@ -775,7 +775,7 @@ static  READ8_HANDLER(einstein_psg_r)
 	{
 		/* case 0 and 1 are not handled */
 		case 2:
-			return AY8910_read_port_0_r(machine, 0);
+			return ay8910_read_port_0_r(machine, 0);
 
 		default:
 			break;
@@ -1605,7 +1605,7 @@ static READ8_HANDLER(einstein_port_b_read)
 	return einstein_keyboard_data;
 }
 
-static const struct AY8910interface einstein_ay_interface =
+static const ay8910_interface einstein_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

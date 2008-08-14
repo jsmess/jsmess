@@ -34,7 +34,7 @@ extern VIDEO_UPDATE( arcadia );
 
 /*----------- defined in audio/arcadia.c -----------*/
 
-extern const struct CustomSound_interface arcadia_sound_interface;
+extern const custom_sound_interface arcadia_sound_interface;
 extern void arcadia_soundport_w (running_machine *machine, int mode, int data);
 
 

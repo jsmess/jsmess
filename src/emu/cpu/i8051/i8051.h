@@ -30,12 +30,15 @@
  *
  *****************************************************************************/
 
-#ifndef _I8051_H
-#define _I8051_H
+#pragma once
+
+#ifndef __I8051_H__
+#define __I8051_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	I8051_PC=1, I8051_SP, I8051_PSW, I8051_ACC, I8051_B, I8051_DPH, I8051_DPL, I8051_IE,
 	I8051_R0, I8051_R1, I8051_R2, I8051_R3, I8051_R4, I8051_R5, I8051_R6, I8051_R7, I8051_RB
 };
@@ -144,6 +147,4 @@ void i8052_get_info(UINT32 state, cpuinfo *info);
 void i8751_get_info(UINT32 state, cpuinfo *info);
 void i8752_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _I8051_H */
-
-
+#endif /* __I8051_H__ */

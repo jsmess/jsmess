@@ -29,6 +29,10 @@
 /*       heard while missiles are seen to be moving.  When the red          */
 /*       missiles speed up, there should be more "klunks per second"        */
 /*       with the pitch staying constant.                                   */
+/*      8/8/8 D.R. - Who says?  According to the schematic the sounds are   */
+/*       correct.  Make a video showing otherwise or trace SX0 & SX1 on     */
+/*       a real PCB to find the difference.                                 */
+/*       Currently it beeps every time a player eats a dot.  Seems right.   */
 /*    2. If "Hard" mode is selected, numerous bugs appear which             */
 /*       could be either an emulation fault or a bad rom. Some              */
 /*       bugs are:                                                          */
@@ -113,7 +117,7 @@ static INPUT_PORTS_START( sicv )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in1_control_r, 0)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in1_control_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW0")
@@ -128,7 +132,7 @@ static INPUT_PORTS_START( sicv )
 	PORT_DIPSETTING(    0x00, "1500" )
 	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun.
     Be sure these are always ON */
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, 0) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, NULL) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" )				PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -810,8 +814,7 @@ static MACHINE_DRIVER_START( schaser )
 
 	MDRV_SOUND_ADD("sn", SN76477, 0)
 	MDRV_SOUND_CONFIG(schaser_sn76477_interface)
-	// This will be routed to the discrete system when that feature is working.
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(schaser)
@@ -886,12 +889,13 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-static int sfl_int=0;
+static UINT8 sfl_int = 0;
 
-static READ8_HANDLER( sfl_input_r )
+static CUSTOM_INPUT( sflush_80_r )
 {
-	sfl_int^=0x80;	//vblank flag ?
-	return sfl_int | input_port_read(machine, "DSW0");
+	sfl_int ^= 1;	/* vblank flag ? */
+
+	return sfl_int;
 }
 
 static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -899,7 +903,7 @@ static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
 	AM_RANGE(0x8008, 0x8008) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x8009, 0x8009) AM_READ(mb14241_0_shift_result_r)
-	AM_RANGE(0x800a, 0x800a) AM_READ(sfl_input_r)
+	AM_RANGE(0x800a, 0x800a) AM_READ_PORT("DSW0")
 	AM_RANGE(0x800b, 0x800b) AM_READ_PORT("IN0")
 	AM_RANGE(0x8018, 0x8018) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x8019, 0x8019) AM_WRITE(mb14241_0_shift_count_w)
@@ -945,6 +949,7 @@ static INPUT_PORTS_START( sflush )
 	PORT_DIPNAME( 0x40, 0x00, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sflush_80_r, NULL)	/* vblank? */
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x6a, IPT_PADDLE ) PORT_MINMAX(0x16,0xbf) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
@@ -1295,7 +1300,7 @@ static INPUT_PORTS_START( yosakdon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in1_control_r, 0)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in1_control_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -1310,7 +1315,7 @@ static INPUT_PORTS_START( yosakdon )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, 0)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* Dummy controls port, P1 */
@@ -2101,6 +2106,23 @@ ROM_START( lrescuem )
 	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+
+/*
+Cosmo
+TDS & Mints, 1979/80?
+
+Notes:
+This game runs on modified "original" Taito (3 board) Space Invaders hardware.
+There are approx. 70 (or more) wires tied to various parts of the boards, plus
+there is an extra board on top of the sound board with a *HUGE* amount of wires
+running to it from the main boards. There are 2 EPROMs on the top board that appear
+to be for use with colour generation or extra sounds(?) The PROMs on the middle board
+have been removed and in their place are a pile of wires that join to the top board.
+The remainder of the hardware is just standard Taito Space Invaders..... including
+a SN76477 and the discrete components for sound generation.
+Note that the sounds and gameplay of Cosmo are VERY different from Space Invaders.
+*/
+
 ROM_START( cosmo )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1.36",         0x0000, 0x0800, CRC(445c9a98) SHA1(89bce80a061e9c12544231f970d9dec801eb1b94) )
@@ -2413,8 +2435,8 @@ GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Desti
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", 0 )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Midway", "Space Invaders Deluxe", 0 )
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_IMPERFECT_SOUND )
-GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_IMPERFECT_SOUND| GAME_IMPERFECT_COLORS )
-GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_IMPERFECT_COLORS )
+GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_IMPERFECT_COLORS )
 GAME( 1979, sflush,   0,        sflush,   sflush,   0, ROT270, "Taito", "Straight Flush",GAME_NO_SOUND| GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
 GAME( 1980, lupin3,   0,        lupin3,   lupin3,   0, ROT270, "Taito", "Lupin III", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 1)", 0 )

@@ -71,12 +71,12 @@ static ADDRESS_MAP_START( lkage, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf061, 0xf061) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xf062, 0xf062) AM_READ(lkage_mcu_r) AM_WRITE(lkage_mcu_w)
 	AM_RANGE(0xf063, 0xf063) AM_WRITE(SMH_NOP) /* pulsed; nmi on sound cpu? */
-	AM_RANGE(0xf080, 0xf080) AM_READ(input_port_0_r) /* DSW1 */
-	AM_RANGE(0xf081, 0xf081) AM_READ(input_port_1_r) /* DSW2 (coinage) */
-	AM_RANGE(0xf082, 0xf082) AM_READ(input_port_2_r) /* DSW3 */
-	AM_RANGE(0xf083, 0xf083) AM_READ(input_port_3_r) /* start, insert coin, tilt */
-	AM_RANGE(0xf084, 0xf084) AM_READ(input_port_4_r) /* P1 controls */
-	AM_RANGE(0xf086, 0xf086) AM_READ(input_port_5_r) /* P2 controls */
+	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
+	AM_RANGE(0xf082, 0xf082) AM_READ_PORT("DSW3")
+	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("P1")
+	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
 	AM_RANGE(0xf087, 0xf087) AM_READ(lkage_mcu_status_r)
 	AM_RANGE(0xf0a0, 0xf0a3) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unknown */
 	AM_RANGE(0xf0c0, 0xf0c5) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&lkage_scroll)
@@ -122,8 +122,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_1_r)
+	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb001, 0xb001) AM_READ(SMH_NOP)	/* ??? */
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostic ROM? */
@@ -132,10 +132,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	/* ??? */
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( lkage )
 	PORT_DIPSETTING(    0x80, "A and B" )
 	PORT_DIPSETTING(    0x00, "A only" )
 
-	PORT_START("SERVICE")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -240,7 +240,7 @@ static INPUT_PORTS_START( lkage )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -250,7 +250,7 @@ static INPUT_PORTS_START( lkage )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -295,7 +295,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( lkage )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
@@ -379,7 +379,7 @@ static MACHINE_DRIVER_START( lkageb )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)

@@ -197,7 +197,7 @@ static const char *const astrob_sample_names[] =
 };
 
 
-static const struct Samplesinterface astrob_samples_interface =
+static const samples_interface astrob_samples_interface =
 {
 	11,
 	astrob_sample_names
@@ -339,7 +339,7 @@ WRITE8_HANDLER( astrob_sound_w )
  *************************************/
 
 static SOUND_START( 005 );
-static void *sega005_custom_start(int clock, const struct CustomSound_interface *config);
+static void *sega005_custom_start(int clock, const custom_sound_interface *config);
 static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 static TIMER_CALLBACK( sega005_auto_timer );
 
@@ -412,14 +412,14 @@ static const char *const sega005_sample_names[] =
 };
 
 
-static const struct Samplesinterface sega005_samples_interface =
+static const samples_interface sega005_samples_interface =
 {
 	7,
 	sega005_sample_names
 };
 
 
-static const struct CustomSound_interface sega005_custom_interface =
+static const custom_sound_interface sega005_custom_interface =
 {
 	sega005_custom_start
 };
@@ -576,7 +576,7 @@ WRITE8_HANDLER( sega005_sound_b_w )
  *
  *************************************/
 
-static void *sega005_custom_start(int clock, const struct CustomSound_interface *config)
+static void *sega005_custom_start(int clock, const custom_sound_interface *config)
 {
 	/* create the stream */
 	sega005_stream = stream_create(0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
@@ -653,7 +653,7 @@ static const char *const spaceod_sample_names[] =
 };
 
 
-static const struct Samplesinterface spaceod_samples_interface =
+static const samples_interface spaceod_samples_interface =
 {
 	11,
 	spaceod_sample_names
@@ -778,14 +778,14 @@ static const char *const monsterb_sample_names[] =
 };
 
 
-static const struct Samplesinterface monsterb_samples_interface =
+static const samples_interface monsterb_samples_interface =
 {
 	2,
 	monsterb_sample_names
 };
 
 
-static const struct TMS36XXinterface monsterb_tms3617_interface =
+static const tms36xx_interface monsterb_tms3617_interface =
 {
 	TMS3617,
 	{0.5,0.5,0.5,0.5,0.5,0.5}  /* decay times of voices */
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(n7751_t1_r)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READ(n7751_command_r)
 	AM_RANGE(I8039_bus, I8039_bus) AM_READ(n7751_rom_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(n7751_busy_w)
 	AM_RANGE(I8039_p4, I8039_p6) AM_WRITE(n7751_rom_offset_w)
 	AM_RANGE(I8039_p7, I8039_p7) AM_WRITE(n7751_rom_select_w)

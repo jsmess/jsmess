@@ -746,10 +746,10 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 			/* Only set up sound registers for 128K machine or TS2068! */
 			for (i = 0; i < 16; i++)
 			{
-				AY8910_control_port_0_w(machine, 0, i);
-				AY8910_write_port_0_w(machine, 0, pSnapshot[39 + i]);
+				ay8910_control_port_0_w(machine, 0, i);
+				ay8910_write_port_0_w(machine, 0, pSnapshot[39 + i]);
 			}
-			AY8910_control_port_0_w(machine, 0, pSnapshot[38]);
+			ay8910_control_port_0_w(machine, 0, pSnapshot[38]);
 		}
 
 		pSource = pSnapshot + header_size;

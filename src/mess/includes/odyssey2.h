@@ -42,7 +42,7 @@ WRITE8_HANDLER ( odyssey2_lum_w );
 
 void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length );
 
-extern const struct CustomSound_interface odyssey2_sound_interface;
+extern const custom_sound_interface odyssey2_sound_interface;
 
 void ef9341_w( int command, int b, UINT8 data );
 UINT8 ef9341_r( int command, int b );

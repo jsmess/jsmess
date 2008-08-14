@@ -851,11 +851,11 @@ static WRITE16_HANDLER( x68k_fm_w )
 	switch(offset)
 	{
 	case 0x00:
-		YM2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(machine, 0, data);
 		logerror("YM: Register select 0x%02x\n",data);
 		break;
 	case 0x01:
-		YM2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(machine, 0, data);
 		logerror("YM: Data write 0x%02x\n",data);
 		break;
 	}
@@ -864,7 +864,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return YM2151_status_port_0_r(machine, 0);
+		return ym2151_status_port_0_r(machine, 0);
 
 	return 0xff;
 }
@@ -1646,7 +1646,7 @@ static const nec765_interface fdc_interface =
 	fdc_drq
 };
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface x68k_ym2151_interface =
 {
 	x68k_fm_irq,
 	x68k_ct_w  // CT1, CT2 from YM2151 port 0x1b
@@ -2134,7 +2134,7 @@ static MACHINE_DRIVER_START( x68000 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ym2151", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(x68k_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 //  MDRV_SOUND_ADD("okim6295", OKIM6295, 0)
 //  MDRV_SOUND_CONFIG(oki_interface)

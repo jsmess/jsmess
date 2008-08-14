@@ -164,6 +164,42 @@
     Metal Maniax (prototype)
         - reworked hardware that is similar but not of the same layout
 
+****************************************************************************
+
+Race Drivin' Compact
+Atari, 1990
+
+PCB Layouts
+-----------
+
+Driver Sound
+A046491
+|------------------------------------------------------------------------------------------------------|
+|                     |---------------------|           J3                                             |
+|                     |---------------------|                                    SOCKET     SOCKET     |
+|                                                                                                      |
+|                                                                                SOCKET     SOCKET     |
+|                                                              6116                                    |
+|               |-----|                                                          SOCKET     136052-1126.30A
+|               |     |                                        6116                                    |
+|               |     |   136077-1033.45N        CY7C168                   136077-1017.45C  136052-3125.45A
+|               |  6  |                                                                                |
+|               |  8  |   6264                   CY7C168                         SOCKET     136052-1124.55A
+|      16MHz    |  0  |                                        |---|                                   |
+|               |  0  |   136077-1032-70N        CY7C168       |TMS|             SOCKET     136052-1123.65A
+|               |  0  |                                        |   |                                   |
+|               |     |   6264                   CY7C168       |320|
+|               |     |                                        |C10|                                   |
+|               |     |                                   20MHz|   |                                   |
+|               |-----|                                        |   |            95C           95A      |
+|                                                              |---|          GAL16V8       GAL16V8    |
+|                                                                           (136052-1140) (136052-1139)|
+|                                                                                                      |
+|                                                                                                      |
+|                                                                                                      |
+|  J2                                  J5                  TL084     TL084     TL084                   |
+|------------------------------------------------------------------------------------------------------|
+
 ****************************************************************************/
 
 
@@ -242,7 +278,7 @@ static const tms34010_config msp_config =
 };
 
 
-static const struct dsp32_config dsp32c_config =
+static const dsp32_config dsp32c_config =
 {
 	hddsk_update_pif				/* a change has occurred on an output pin */
 };
@@ -263,7 +299,7 @@ static ADDRESS_MAP_START( driver_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x60c000, 0x60ffff) AM_WRITE(hd68k_irq_ack_w)
 	AM_RANGE(0xa00000, 0xa7ffff) AM_WRITE(hd68k_wr0_write)
-	AM_RANGE(0xa80000, 0xafffff) AM_READWRITE(input_port_1_word_r, hd68k_wr1_write)
+	AM_RANGE(0xa80000, 0xafffff) AM_READ_PORT("a80000") AM_WRITE(hd68k_wr1_write)
 	AM_RANGE(0xb00000, 0xb7ffff) AM_READWRITE(hd68k_adc8_r, hd68k_wr2_write)
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(hd68k_gsp_io_r, hd68k_gsp_io_w)
@@ -311,7 +347,7 @@ static ADDRESS_MAP_START( multisync_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x60c000, 0x60ffff) AM_READWRITE(hd68k_port0_r, hd68k_irq_ack_w)
 	AM_RANGE(0xa00000, 0xa7ffff) AM_WRITE(hd68k_wr0_write)
-	AM_RANGE(0xa80000, 0xafffff) AM_READWRITE(input_port_1_word_r, hd68k_wr1_write)
+	AM_RANGE(0xa80000, 0xafffff) AM_READ_PORT("a80000") AM_WRITE(hd68k_wr1_write)
 	AM_RANGE(0xb00000, 0xb7ffff) AM_READWRITE(hd68k_adc8_r, hd68k_wr2_write)
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(hd68k_gsp_io_r, hd68k_gsp_io_w)
@@ -349,7 +385,7 @@ static ADDRESS_MAP_START( multisync2_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x60c000, 0x60ffff) AM_READWRITE(hd68k_port0_r, hd68k_irq_ack_w)
 	AM_RANGE(0xa00000, 0xa7ffff) AM_WRITE(hd68k_wr0_write)
-	AM_RANGE(0xa80000, 0xafffff) AM_READWRITE(input_port_1_word_r, hd68k_wr1_write)
+	AM_RANGE(0xa80000, 0xafffff) AM_READ_PORT("a80000") AM_WRITE(hd68k_wr1_write)
 	AM_RANGE(0xb00000, 0xb7ffff) AM_READWRITE(hd68k_adc8_r, hd68k_wr2_write)
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(hd68k_gsp_io_r, hd68k_gsp_io_w)

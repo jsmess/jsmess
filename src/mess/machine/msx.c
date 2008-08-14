@@ -427,15 +427,15 @@ INTERRUPT_GEN( msx_interrupt )
 
 READ8_HANDLER ( msx_psg_r )
 {
-	return AY8910_read_port_0_r (machine, offset);
+	return ay8910_read_port_0_r (machine, offset);
 }
 
 WRITE8_HANDLER ( msx_psg_w )
 {
 	if (offset & 0x01)
-		AY8910_write_port_0_w (machine, offset, data);
+		ay8910_write_port_0_w (machine, offset, data);
 	else
-		AY8910_control_port_0_w (machine, offset, data);
+		ay8910_control_port_0_w (machine, offset, data);
 }
 
 static const device_config *cassette_device_image(void)
@@ -541,7 +541,7 @@ WRITE8_HANDLER ( msx_printer_w )
 	{
 		/* SIMPL emulation */
 		if (offset == 1)
-			DAC_signed_data_w (0, data);
+			dac_signed_data_w (0, data);
 	}
 	else {
 
@@ -575,10 +575,10 @@ WRITE8_HANDLER (msx_fmpac_w)
 	if (msx1.opll_active) {
 
 		if (offset == 1) {
-			YM2413_data_port_0_w (machine, 0, data);
+			ym2413_data_port_0_w (machine, 0, data);
 		}
 		else {
-			YM2413_register_port_0_w (machine, 0, data);
+			ym2413_register_port_0_w (machine, 0, data);
 		}
 	}
 }
@@ -710,7 +710,7 @@ static WRITE8_HANDLER ( msx_ppi_port_c_w )
 
 	/* key click */
 	if ( (old_val ^ data) & 0x80)
-		DAC_signed_data_w (0, (data & 0x80 ? 0x7f : 0));
+		dac_signed_data_w (0, (data & 0x80 ? 0x7f : 0));
 
 	/* cassette motor on/off */
 	if ( (old_val ^ data) & 0x10)

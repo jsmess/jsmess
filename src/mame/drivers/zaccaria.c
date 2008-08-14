@@ -94,10 +94,10 @@ static WRITE8_HANDLER( ay8910_port0a_w )
 	{
 		/* TODO: is this right? it sound awful */
 		static const int table[4] = { 0x05, 0x1b, 0x0b, 0x55 };
-		DAC_signed_data_w(0,table[(data & 0x06) >> 1]);
+		dac_signed_data_w(0,table[(data & 0x06) >> 1]);
 	}
 	else
-		DAC_signed_data_w(0,0x80);
+		dac_signed_data_w(0,0x80);
 }
 
 
@@ -109,9 +109,9 @@ static int active_8910,port0a,acs;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return AY8910_read_port_0_r(machine,0);
+		return ay8910_read_port_0_r(machine,0);
 	else
-		return AY8910_read_port_1_r(machine,0);
+		return ay8910_read_port_1_r(machine,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -129,9 +129,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			AY8910_control_port_0_w(machine,0,port0a);
+			ay8910_control_port_0_w(machine,0,port0a);
 		else
-			AY8910_write_port_0_w(machine,0,port0a);
+			ay8910_write_port_0_w(machine,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -144,9 +144,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			AY8910_control_port_1_w(machine,0,port0a);
+			ay8910_control_port_1_w(machine,0,port0a);
 		else
-			AY8910_write_port_1_w(machine,0,port0a);
+			ay8910_write_port_1_w(machine,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -268,7 +268,7 @@ static WRITE8_HANDLER( sound1_command_w )
 
 static WRITE8_HANDLER( mc1408_data_w )
 {
-	DAC_data_w(1,data);
+	dac_data_w(1,data);
 }
 
 
@@ -542,7 +542,7 @@ static GFXDECODE_START( zaccaria )
 GFXDECODE_END
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -552,7 +552,7 @@ static const struct AY8910interface ay8910_interface =
 	NULL
 };
 
-static const struct TMS5220interface tms5220_interface =
+static const tms5220_interface tms5220_config =
 {
 	tms5220_irq_handler	/* IRQ handler */
 };
@@ -598,7 +598,7 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( zaccaria )
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
 	/* 162kHz measured on pin 3 20 minutesa fter power on. Clock would then be 162*4=648kHz. */
 	MDRV_SOUND_ADD("tms", TMS5200, 640000)
-	MDRV_SOUND_CONFIG(tms5220_interface)
+	MDRV_SOUND_CONFIG(tms5220_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

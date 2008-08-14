@@ -1878,14 +1878,14 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
 	offset <<= 1;
-	return (SCSP_0_r(machine, offset+1, 0xffff) | (SCSP_0_r(machine, offset, 0xffff)<<16));
+	return (scsp_0_r(machine, offset+1, 0xffff) | (scsp_0_r(machine, offset, 0xffff)<<16));
 }
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
 	offset <<= 1;
-	SCSP_0_w(machine, offset + 0, data >> 16, mem_mask >> 16);
-	SCSP_0_w(machine, offset + 1, data >>  0, mem_mask);
+	scsp_0_w(machine, offset + 0, data >> 16, mem_mask >> 16);
+	scsp_0_w(machine, offset + 1, data >>  0, mem_mask);
 }
 
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  *
@@ -1979,7 +1979,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( saturn )
@@ -2253,8 +2253,8 @@ static GFXDECODE_START( saturn )
 	GFXDECODE_ENTRY( NULL, 0, tiles16x16x8_layout, 0x00, 0x20 )
 GFXDECODE_END
 
-static const struct sh2_config sh2_conf_master = { 0 };
-static const struct sh2_config sh2_conf_slave  = { 1 };
+static const sh2_cpu_core sh2_conf_master = { 0 };
+static const sh2_cpu_core sh2_conf_slave  = { 1 };
 
 static void scsp_irq(running_machine *machine, int irq)
 {
@@ -2279,7 +2279,7 @@ static void scsp_irq(running_machine *machine, int irq)
 	}
 }
 
-static const struct SCSPinterface scsp_interface =
+static const scsp_interface saturn_scsp_interface =
 {
 	0,
 	scsp_irq
@@ -2322,7 +2322,7 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(saturn_scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

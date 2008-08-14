@@ -473,8 +473,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tx1_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -578,10 +578,10 @@ ADDRESS_MAP_END
 /* Common */
 static ADDRESS_MAP_START( buggyboy_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -617,7 +617,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct AY8910interface tx1_ay8910_interface =
+static const ay8910_interface tx1_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -629,7 +629,7 @@ static const struct AY8910interface tx1_ay8910_interface =
 
 
 /* YM2149 IC19 */
-static const struct AY8910interface buggyboy_ym2149_interface_1 =
+static const ay8910_interface buggyboy_ym2149_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -640,7 +640,7 @@ static const struct AY8910interface buggyboy_ym2149_interface_1 =
 };
 
 /* YM2149 IC24 */
-static const struct AY8910interface buggyboy_ym2149_interface_2 =
+static const ay8910_interface buggyboy_ym2149_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -666,7 +666,7 @@ static const ppi8255_interface tx1_ppi8255_intf =
 	tx1_coin_cnt
 };
 
-static const struct CustomSound_interface tx1_custom_interface =
+static const custom_sound_interface tx1_custom_interface =
 {
 	tx1_sh_start,
 	NULL,
@@ -684,7 +684,7 @@ static const ppi8255_interface buggyboy_ppi8255_intf =
 	NULL
 };
 
-static const struct CustomSound_interface bb_custom_interface =
+static const custom_sound_interface bb_custom_interface =
 {
 	buggyboy_sh_start,
 	NULL,

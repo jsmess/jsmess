@@ -665,7 +665,7 @@ static READ8_HANDLER( analog_7_r ) { return (UINT8) input_port_read(machine, "an
 
 
 
-static const struct POKEYinterface pokey_interface =
+static const pokey_interface atari_pokey_interface =
 {
 	{
 		analog_0_r,
@@ -703,7 +703,7 @@ static MACHINE_DRIVER_START( atari_common_nodac )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
-	MDRV_SOUND_CONFIG(pokey_interface)
+	MDRV_SOUND_CONFIG(atari_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

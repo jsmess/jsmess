@@ -264,7 +264,7 @@ static void dave_update_sound(void *param,stream_sample_t **inputs, stream_sampl
 
 /* dave has 3 tone channels and 1 noise channel.
 the volumes are mixed internally and output as left and right volume */
-void *Dave_sh_start(int clock, const struct CustomSound_interface *config)
+void *Dave_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* 3 tone channels + 1 noise channel */
 	dave.sound_stream = stream_create( 0, 2, Machine->sample_rate, NULL, dave_update_sound);

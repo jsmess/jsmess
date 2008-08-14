@@ -338,7 +338,7 @@ static int adpcm_data = 0x80;
 
 static void splash_msm5205_int(running_machine *machine, int data)
 {
-	MSM5205_data_w(0,adpcm_data >> 4);
+	msm5205_data_w(0,adpcm_data >> 4);
 //  adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
@@ -353,8 +353,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
@@ -465,7 +465,7 @@ GFXDECODE_END
 
 
 
-static const struct MSM5205interface discoboy_msm5205_interface =
+static const msm5205_interface discoboy_msm5205_interface =
 {
 	splash_msm5205_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* ??? unknown hz */

@@ -125,7 +125,7 @@ static WRITE16_HANDLER( control_w )
 
 	/* OKI banking here */
 	if (offset == 0)
-		OKIM6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(machine, "oki"));
+		okim6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(machine, "oki"));
 
 	logerror("%06X:control_w(%d) = %04X\n", activecpu_get_pc(), offset, data);
 }
@@ -376,9 +376,9 @@ static void stonebal_protection(running_machine *machine)
 }
 
 
-static READ16_HANDLER( special_port5_r )
+static CUSTOM_INPUT( prot_r )
 {
-	return input_port_read(machine, "300008") | prot_output_bit;
+	return prot_output_bit;
 }
 
 
@@ -422,10 +422,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
 	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ(special_port5_r)
+	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x360000, 0x360001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x360000, 0x360001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
@@ -439,12 +439,12 @@ static ADDRESS_MAP_START( stonebal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
 	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ(special_port5_r)
+	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
 	AM_RANGE(0x30000c, 0x30000d) AM_READ_PORT("30000c")
 	AM_RANGE(0x30000e, 0x30000f) AM_READ_PORT("30000e")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x340000, 0x340001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
@@ -575,7 +575,7 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("30000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection data */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)	/* protection data */
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -768,6 +768,46 @@ ROM_START( ultennis )
 	ROM_LOAD( "utu151.bin", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
 ROM_END
 
+
+/*
+Stone Ball
+Art & Magic, 1994
+
+PCB No: AM007B1094 0454
+CPUs  : TMS34010FNL-40, MC68000P12
+SND   : OKI M6295
+OSC   : 40.000MHz, 32.000MHz, 25.000MHz
+DIP SW: 8 position (x2)
+
+RAM   : MCM54260 (x2, 40 pin SOJ)
+        TMS44251 (x4, 28 pin ZIP)
+
+OTHER :
+        CSI CAT28C16 EEPROM (24 pin DIP)
+        ADV476KN80E (28 pin DIP)
+        8 PALs
+        1 PIC 16C54
+        Black Box - inside is....
+                                 XILINX XC3030 (x2, 84 Pin PLCC)
+                                 3V Battery (Suicidal?)
+                                 74HC14 Logic Chip
+                                 10 Pin header (probably for re-programming the XC3030's
+                                               after it suicides....)
+
+
+ROMs  :
+                             Byte
+Filename      Type           C'sum
+---------------------------------------------------
+u1801.bin     27C4001        344Eh     OKI Samples
+
+u101.bin      27C2001        617Ah  \  Main Program
+u102.bin      27C2001        8F04h  /
+
+u1600.bin     32M Mask       1105h  \
+u1601.bin     32M Mask       8642h  /  Gfx
+
+*/
 
 ROM_START( stonebal )
 	ROM_REGION( 0x80000, "main", 0 )	/* 64k for 68000 code */

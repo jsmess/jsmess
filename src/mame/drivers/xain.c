@@ -315,10 +315,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x2801, 0x2801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -437,7 +437,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 2,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( xsleena )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)

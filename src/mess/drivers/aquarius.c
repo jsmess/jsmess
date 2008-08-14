@@ -206,8 +206,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aquarius_io, ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
 //	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)
@@ -343,7 +343,7 @@ static READ8_HANDLER( aquarius_ay8910_port_b_r )
 	return input_port_read(machine, "LEFT");
 }
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface aquarius_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(aquarius_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */

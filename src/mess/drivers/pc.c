@@ -168,24 +168,24 @@ TODO: Which clock signals are available in a PC Jr?
 #define GAMEBLASTER
 
 
-static READ8_HANDLER( pc_YM3812_0_r )
+static READ8_HANDLER( pc_ym3812_0_r )
 {
 	if ((offset % 1) == 0)
-		return YM3812_status_port_0_r(machine, 0);
+		return ym3812_status_port_0_r(machine, 0);
 	else
 		return 0x00;
 }
 
-static WRITE8_HANDLER( pc_YM3812_0_w )
+static WRITE8_HANDLER( pc_ym3812_0_w )
 {
 	if ((offset % 1) == 0)
-		YM3812_control_port_0_w(machine, 0, data);
+		ym3812_control_port_0_w(machine, 0, data);
 	else
-		YM3812_write_port_0_w(machine, 0, data);
+		ym3812_write_port_0_w(machine, 0, data);
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_HANDLER( pc16le_SN76496_0_w ) { write16le_with_write8_handler(SN76496_0_w, machine, offset, data, mem_mask); }
+static WRITE16_HANDLER( pc16le_sn76496_0_w ) { write16le_with_write8_handler(sn76496_0_w, machine, offset, data, mem_mask); }
 #endif
 
 // IO Expansion, only a little bit for ibm bios self tests
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return8_FF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,	pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_ym3812_0_r,		pc_ym3812_0_w)
 #endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,	pc_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", ins8250_r, ins8250_w)
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return16_FFFF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc16le_parallelport1_r,	pc16le_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0389) AM_READWRITE8(pc_YM3812_0_r,			pc_YM3812_0_w, 0xffff)
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE8(pc_ym3812_0_r,			pc_ym3812_0_w, 0xffff)
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
@@ -303,7 +303,7 @@ static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc_parallelport1_r,	pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_ym3812_0_r,		pc_ym3812_0_w)
 #endif
 //	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,   pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", ins8250_r, ins8250_w)
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r,			tandy1000_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
-	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								SN76496_0_w)
+	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								sn76496_0_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", ins8250_r, ins8250_w)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc_HDC1_r,				pc_HDC1_w)
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_READWRITE( pcjr_nmi_enable_r, pc_nmi_enable_w )
-	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								SN76496_0_w)
+	AM_RANGE(0x00c0, 0x00c0) AM_WRITE(								sn76496_0_w)
 	AM_RANGE(0x00f0, 0x00f7) AM_READWRITE(pc_fdc_r,					pcjr_fdc_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE(INS8250, "ins8250_1", ins8250_r, ins8250_w)
@@ -1298,7 +1298,7 @@ static const unsigned i86_address_mask = 0x000fffff;
 /* irq line not connected to pc on adlib cards (and compatibles) */
 static void pc_irqhandler(running_machine *machine, int linestate) {}
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface pc_ym3812_interface =
 {
 	pc_irqhandler
 };
@@ -1361,7 +1361,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -1424,7 +1424,7 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -1488,7 +1488,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -1551,7 +1551,7 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -1613,7 +1613,7 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 
@@ -1669,7 +1669,7 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER
@@ -1888,7 +1888,7 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
 	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(pc_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 #ifdef GAMEBLASTER

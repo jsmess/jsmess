@@ -1,15 +1,19 @@
-#ifndef YM3812INTF_H
-#define YM3812INTF_H
+#pragma once
+
+#ifndef __3812INTF_H__
+#define __3812INTF_H__
 
 
-struct YM3812interface
+typedef struct _ym3812_interface ym3812_interface;
+struct _ym3812_interface
 {
 	void (*handler)(running_machine *machine, int linestate);
 };
 
-#define YM3526interface YM3812interface
+#define ym3526_interface ym3812_interface
 
-struct Y8950interface
+typedef struct _y8950_interface y8950_interface;
+struct _y8950_interface
 {
 	void (*handler)(running_machine *machine, int linestate);
 
@@ -21,38 +25,38 @@ struct Y8950interface
 
 
 /* YM3812 */
-READ8_HANDLER ( YM3812_status_port_0_r );
-WRITE8_HANDLER( YM3812_control_port_0_w );
-READ8_HANDLER( YM3812_read_port_0_r );
-WRITE8_HANDLER( YM3812_write_port_0_w );
+READ8_HANDLER ( ym3812_status_port_0_r );
+WRITE8_HANDLER( ym3812_control_port_0_w );
+READ8_HANDLER( ym3812_read_port_0_r );
+WRITE8_HANDLER( ym3812_write_port_0_w );
 
-READ8_HANDLER ( YM3812_status_port_1_r );
-WRITE8_HANDLER( YM3812_control_port_1_w );
-READ8_HANDLER( YM3812_read_port_1_r );
-WRITE8_HANDLER( YM3812_write_port_1_w );
+READ8_HANDLER ( ym3812_status_port_1_r );
+WRITE8_HANDLER( ym3812_control_port_1_w );
+READ8_HANDLER( ym3812_read_port_1_r );
+WRITE8_HANDLER( ym3812_write_port_1_w );
 
 
 /* YM3526 */
-READ8_HANDLER ( YM3526_status_port_0_r );
-WRITE8_HANDLER( YM3526_control_port_0_w );
-READ8_HANDLER( YM3526_read_port_0_r );
-WRITE8_HANDLER( YM3526_write_port_0_w );
+READ8_HANDLER ( ym3526_status_port_0_r );
+WRITE8_HANDLER( ym3526_control_port_0_w );
+READ8_HANDLER( ym3526_read_port_0_r );
+WRITE8_HANDLER( ym3526_write_port_0_w );
 
-READ8_HANDLER ( YM3526_status_port_1_r );
-WRITE8_HANDLER( YM3526_control_port_1_w );
-READ8_HANDLER( YM3526_read_port_1_r );
-WRITE8_HANDLER( YM3526_write_port_1_w );
+READ8_HANDLER ( ym3526_status_port_1_r );
+WRITE8_HANDLER( ym3526_control_port_1_w );
+READ8_HANDLER( ym3526_read_port_1_r );
+WRITE8_HANDLER( ym3526_write_port_1_w );
 
 
 /* Y8950 */
-READ8_HANDLER ( Y8950_status_port_0_r );
-WRITE8_HANDLER( Y8950_control_port_0_w );
-READ8_HANDLER ( Y8950_read_port_0_r );
-WRITE8_HANDLER( Y8950_write_port_0_w );
+READ8_HANDLER ( y8950_status_port_0_r );
+WRITE8_HANDLER( y8950_control_port_0_w );
+READ8_HANDLER ( y8950_read_port_0_r );
+WRITE8_HANDLER( y8950_write_port_0_w );
 
-READ8_HANDLER ( Y8950_status_port_1_r );
-WRITE8_HANDLER( Y8950_control_port_1_w );
-READ8_HANDLER ( Y8950_read_port_1_r );
-WRITE8_HANDLER( Y8950_write_port_1_w );
+READ8_HANDLER ( y8950_status_port_1_r );
+WRITE8_HANDLER( y8950_control_port_1_w );
+READ8_HANDLER ( y8950_read_port_1_r );
+WRITE8_HANDLER( y8950_write_port_1_w );
 
-#endif
+#endif /* __3812INTF_H__ */

@@ -96,7 +96,7 @@ WRITE8_HANDLER ( mc10_bfff_w )
      *   BIT 7 SOUND OUTPUT BIT
      */
 	mc10_bfff = data;
-	DAC_data_w(0, data & 0x80);
+	dac_data_w(0, data & 0x80);
 }
 
 

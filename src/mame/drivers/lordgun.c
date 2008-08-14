@@ -108,9 +108,9 @@ static WRITE8_HANDLER(fake2_w)
 //  popmessage("%02x",data);
 }
 
-static READ8_HANDLER( lordgun_eeprom_r )
+static READ8_HANDLER( lordgun_port_0_r )
 {
-	return input_port_read(machine, "IN0") | ((eeprom_read_bit() & 1) << 7);
+	return input_port_read(machine, "IN0");
 }
 
 static WRITE8_HANDLER( lordgun_eeprom_w )
@@ -240,15 +240,15 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( lordgun_okibank_w )
 {
-	OKIM6295_set_bank_base(0, (data & 2) ? 0x40000 : 0);
+	okim6295_set_bank_base(0, (data & 2) ? 0x40000 : 0);
 	if (data & ~3)	logerror("%04x: unknown okibank bits %02x\n", activecpu_get_pc(), data);
 //  popmessage("OKI %x", data);
 }
 
 static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x1000, 0x1000) AM_WRITE( YM3812_control_port_0_w )
-	AM_RANGE(0x1001, 0x1001) AM_WRITE( YM3812_write_port_0_w )
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE( OKIM6295_status_0_r, OKIM6295_data_0_w )
+	AM_RANGE(0x1000, 0x1000) AM_WRITE( ym3812_control_port_0_w )
+	AM_RANGE(0x1001, 0x1001) AM_WRITE( ym3812_write_port_0_w )
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
@@ -260,10 +260,10 @@ static ADDRESS_MAP_START( hfh_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
-	AM_RANGE(0x7000, 0x7000) AM_WRITE( YM3812_control_port_0_w )
-	AM_RANGE(0x7001, 0x7001) AM_WRITE( YM3812_write_port_0_w )
-	AM_RANGE(0x7400, 0x7400) AM_READWRITE( OKIM6295_status_0_r, OKIM6295_data_0_w )
-	AM_RANGE(0x7800, 0x7800) AM_READWRITE( OKIM6295_status_1_r, OKIM6295_data_1_w )
+	AM_RANGE(0x7000, 0x7000) AM_WRITE( ym3812_control_port_0_w )
+	AM_RANGE(0x7001, 0x7001) AM_WRITE( ym3812_write_port_0_w )
+	AM_RANGE(0x7400, 0x7400) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
+	AM_RANGE(0x7800, 0x7800) AM_READWRITE( okim6295_status_1_r, okim6295_data_1_w )
 ADDRESS_MAP_END
 
 
@@ -344,7 +344,7 @@ static INPUT_PORTS_START( lordgun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// eeprom
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1   )
@@ -409,7 +409,7 @@ INPUT_PORTS_END
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		lordgun_eeprom_r,			// Port A read
+		lordgun_port_0_r,			// Port A read
 		NULL,						// Port B read
 		input_port_3_r,				// Port C read
 		fake_w,						// Port A write
@@ -431,7 +431,7 @@ static void soundirq(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1, 0, state);
 }
 
-static const struct YM3812interface lordgun_ym3812_interface =
+static const ym3812_interface lordgun_ym3812_interface =
 {
 	soundirq
 };

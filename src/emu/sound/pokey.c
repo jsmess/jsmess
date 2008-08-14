@@ -199,7 +199,7 @@ struct POKEYregisters
 	UINT8 IRQEN;			/* IRQEN  (W/D20E) */
 	UINT8 SKSTAT;			/* SKSTAT (R/D20F) */
 	UINT8 SKCTL;			/* SKCTL  (W/D20F) */
-	struct POKEYinterface intf;
+	pokey_interface intf;
 	attotime clock_period;
 	attotime ad_time_fast;
 	attotime ad_time_slow;
@@ -610,12 +610,13 @@ static void *pokey_start(const char *tag, int sndindex, int clock, const void *c
 {
 	struct POKEYregisters *chip;
 	int sample_rate = clock;
+	int i;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
 	if (config)
-		memcpy(&chip->intf, config, sizeof(struct POKEYinterface));
+		memcpy(&chip->intf, config, sizeof(pokey_interface));
 	chip->clock_period = ATTOTIME_IN_HZ(clock);
 	chip->index = sndindex;
 
@@ -653,23 +654,11 @@ static void *pokey_start(const char *tag, int sndindex, int clock, const void *c
 	chip->timer[1] = timer_alloc(pokey_timer_expire, chip);
 	chip->timer[2] = timer_alloc(pokey_timer_expire, chip);
 
-	chip->ptimer[0] = timer_alloc(pokey_pot_trigger, chip);
-	chip->ptimer[1] = timer_alloc(pokey_pot_trigger, chip);
-	chip->ptimer[2] = timer_alloc(pokey_pot_trigger, chip);
-	chip->ptimer[3] = timer_alloc(pokey_pot_trigger, chip);
-	chip->ptimer[4] = timer_alloc(pokey_pot_trigger, chip);
-	chip->ptimer[5] = timer_alloc(pokey_pot_trigger, chip);
-	chip->ptimer[6] = timer_alloc(pokey_pot_trigger, chip);
-	chip->ptimer[7] = timer_alloc(pokey_pot_trigger, chip);
-
-	chip->pot_r[0] = chip->intf.pot_r[0];
-	chip->pot_r[1] = chip->intf.pot_r[1];
-	chip->pot_r[2] = chip->intf.pot_r[2];
-	chip->pot_r[3] = chip->intf.pot_r[3];
-	chip->pot_r[4] = chip->intf.pot_r[4];
-	chip->pot_r[5] = chip->intf.pot_r[5];
-	chip->pot_r[6] = chip->intf.pot_r[6];
-	chip->pot_r[7] = chip->intf.pot_r[7];
+	for (i=0; i<8; i++)
+	{
+		chip->ptimer[i] = timer_alloc(pokey_pot_trigger, chip);
+		chip->pot_r[i] = chip->intf.pot_r[i];
+	}
 	chip->allpot_r = chip->intf.allpot_r;
 	chip->serin_r = chip->intf.serin_r;
 	chip->serout_w = chip->intf.serout_w;

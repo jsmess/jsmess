@@ -135,10 +135,10 @@ static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x502000, 0x503fff) AM_RAM
 	AM_RANGE(0x700000, 0x70000f) AM_READ(drill_unk_r) AM_WRITE(SMH_NOP) // i/o
-	AM_RANGE(0x600000, 0x600001) AM_READ(YM2610_status_port_0_A_lsb_r) AM_WRITE(YM2610_control_port_0_A_lsb_w)
-	AM_RANGE(0x600002, 0x600003) AM_READ(YM2610_read_port_0_lsb_r) AM_WRITE(YM2610_data_port_0_A_lsb_w)
-	AM_RANGE(0x600004, 0x600005) AM_READ(YM2610_status_port_0_B_lsb_r) AM_WRITE(YM2610_control_port_0_B_lsb_w)
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(YM2610_data_port_0_B_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_READ(ym2610_status_port_0_a_lsb_r) AM_WRITE(ym2610_control_port_0_a_lsb_w)
+	AM_RANGE(0x600002, 0x600003) AM_READ(ym2610_read_port_0_lsb_r) AM_WRITE(ym2610_data_port_0_a_lsb_w)
+	AM_RANGE(0x600004, 0x600005) AM_READ(ym2610_status_port_0_b_lsb_r) AM_WRITE(ym2610_control_port_0_b_lsb_w)
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(ym2610_data_port_0_b_lsb_w)
 	AM_RANGE(0x60000c, 0x60000d) AM_READ(SMH_NOP) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x60000e, 0x60000f) AM_READ(SMH_NOP) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
@@ -184,7 +184,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 0,5,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
@@ -209,7 +209,7 @@ static MACHINE_DRIVER_START( drill )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

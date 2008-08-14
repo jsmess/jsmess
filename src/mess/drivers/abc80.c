@@ -115,17 +115,17 @@ static const device_config *cassette_device_image(void)
 
 static WRITE8_HANDLER( abc80_sound_w )
 {
-	SN76477_enable_w(0, ~data & 0x01);
+	sn76477_enable_w(0, ~data & 0x01);
 
-	SN76477_vco_voltage_w(0, (data & 0x02) ? 2.5 : 0);
-	SN76477_vco_w(0, (data & 0x04) ? 1 : 0);
+	sn76477_vco_voltage_w(0, (data & 0x02) ? 2.5 : 0);
+	sn76477_vco_w(0, (data & 0x04) ? 1 : 0);
 
-	SN76477_mixer_b_w(0, (data & 0x08) ? 1 : 0);
-	SN76477_mixer_a_w(0, (data & 0x10) ? 1 : 0);
-	SN76477_mixer_c_w(0, (data & 0x20) ? 1 : 0);
+	sn76477_mixer_b_w(0, (data & 0x08) ? 1 : 0);
+	sn76477_mixer_a_w(0, (data & 0x10) ? 1 : 0);
+	sn76477_mixer_c_w(0, (data & 0x20) ? 1 : 0);
 
-	SN76477_envelope_2_w(0, (data & 0x40) ? 1 : 0);
-	SN76477_envelope_1_w(0, (data & 0x80) ? 1 : 0);
+	sn76477_envelope_2_w(0, (data & 0x40) ? 1 : 0);
+	sn76477_envelope_1_w(0, (data & 0x80) ? 1 : 0);
 }
 
 // Keyboard
@@ -384,7 +384,7 @@ GFXDECODE_END
 
 /* Sound Interface */
 
-static const struct SN76477interface sn76477_interface =
+static const sn76477_interface abc80_sn76477_interface =
 {
 	RES_K(47),		//  4  noise_res        R26 47k
 	RES_K(330),		//  5  filter_res       R24 330k
@@ -569,7 +569,7 @@ static MACHINE_DRIVER_START( abc80 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76477", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(abc80_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// printer device

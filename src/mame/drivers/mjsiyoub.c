@@ -65,7 +65,7 @@ static INPUT_PORTS_START( mjsiyoub )
 INPUT_PORTS_END
 
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -75,7 +75,7 @@ static const struct AY8910interface ay8910_interface =
 	NULL
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,							/* IRQ handler */
 	MSM5205_S48_4B				/* 8 KHz, 4 Bits  ?? */
@@ -109,11 +109,11 @@ static MACHINE_DRIVER_START( mjsiyoub )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 18432000/16) // ??
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 18432000/32) // ??
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 

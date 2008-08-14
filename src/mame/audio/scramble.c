@@ -252,7 +252,7 @@ void sfx_sh_init(void)
     2x 74LS393 quad 4bit counters to address roms
     1x 74LS174 hex-d-flipflops to latch control byte
     2x 74LS139 decoder to decode rom selects
-    1x 74LS161 8bit input multiplexor to select sound bit from rom data
+    1x 74LS161 8bit input multiplexor to select sound bit for rom data read
     1x 74LS00  quad nand to decode signals (unknown) to latch control byte
                ==> 74LS139
     1x 74LS16  quad open collector inverters
@@ -265,8 +265,8 @@ void sfx_sh_init(void)
     Q0      ==> NC
     Q1      ==> PDC
     Q2      ==> CTL2/CTL8 (Speak/Reset)
-    Q7      ==> Reset Counters (LS393)
-    Q8      ==> Trigger Logic
+    Q6      ==> Reset Counters (LS393)
+    Q7      ==> Trigger Logic
 
   ***************************************************************************/
 
@@ -301,11 +301,15 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
-	/* only 16 bytes needed ... Stored here since
-     * prom is a bad dump
+	/* only 16 bytes needed ... The original dump is bad. This
+     * is what is needed to get speech to work. The prom data has
+     * been updated and marked as BAD_DUMP. The information below
+     * is given for reference once another dump should surface.
+     *
+     * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
+     *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
      */
-	static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
-			        0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
+	UINT8 *prom = memory_region(machine, "tms5110_ctrl");
 	UINT8 ctrl;
 
 	if (param == 0)
@@ -323,8 +327,8 @@ static TIMER_CALLBACK( ad2083_step )
 	if (ctrl & 0x40)
 		speech_rom_address = 0;
 
-	tms5110_CTL_w(machine, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
-	tms5110_PDC_w(machine, 0, ctrl & 0x02 ? 0 : 1);
+	tms5110_ctl_w(machine, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
+	tms5110_pdc_w(machine, 0, ctrl & 0x02 ? 0 : 1);
 
 	if (!(ctrl & 0x80))
 		timer_set(ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
@@ -368,13 +372,13 @@ static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
 	timer_set(attotime_zero,NULL,0,ad2083_step);
 }
 
-static const struct TMS5110interface ad2083_tms5110_interface =
+static const tms5110_interface ad2083_tms5110_interface =
 {
 	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
 };
 
 
-static const struct AY8910interface ad2083_ay8910_interface_1 =
+static const ay8910_interface ad2083_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -384,7 +388,7 @@ static const struct AY8910interface ad2083_ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ad2083_ay8910_interface_2 =
+static const ay8910_interface ad2083_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -402,10 +406,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ad2083_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
 static SOUND_START( ad2083 )

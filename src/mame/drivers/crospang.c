@@ -136,16 +136,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crospang_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM3812_status_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym3812_status_port_0_r)
+	AM_RANGE(0x02, 0x02) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crospang_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( crospang )
@@ -324,7 +324,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler	/* IRQ Line */
 };
@@ -358,7 +358,7 @@ static MACHINE_DRIVER_START( crospang )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 14318180/4)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
@@ -395,7 +395,7 @@ static MACHINE_DRIVER_START( bestri )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 14318180/4)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)

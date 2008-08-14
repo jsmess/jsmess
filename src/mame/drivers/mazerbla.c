@@ -1130,17 +1130,17 @@ static WRITE8_HANDLER( gg_led_ctrl_w )
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x4000, 0x4000) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM) /* main RAM (stack) */
 
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x6001, 0x6001) AM_WRITE(ay8910_write_port_1_w)
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
@@ -1470,7 +1470,7 @@ static MACHINE_RESET( greatgun )
 
 
 /* only Great Guns */
-static const struct AY8910interface ay8912_interface_1 =
+static const ay8910_interface ay8912_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1480,7 +1480,7 @@ static const struct AY8910interface ay8912_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ay8912_interface_2 =
+static const ay8910_interface ay8912_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

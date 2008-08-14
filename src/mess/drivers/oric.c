@@ -332,7 +332,7 @@ static PALETTE_INIT( oric )
 
 
 
-static const struct AY8910interface oric_ay_interface =
+static const ay8910_interface oric_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

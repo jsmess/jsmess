@@ -58,7 +58,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 	{
 		case 3:
 			adpcm_idle[chip] = 1;
-			MSM5205_reset_w(chip,1);
+			msm5205_reset_w(chip,1);
 			break;
 
 		case 2:
@@ -71,7 +71,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 
 		case 0:
 			adpcm_idle[chip] = 0;
-			MSM5205_reset_w(chip,0);
+			msm5205_reset_w(chip,0);
 			break;
 	}
 }
@@ -83,11 +83,11 @@ static void spd_adpcm_int(running_machine *machine, int chip)
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;
-		MSM5205_reset_w(chip,1);
+		msm5205_reset_w(chip,1);
 	}
 	else if (adpcm_data[chip] != -1)
 	{
-		MSM5205_data_w(chip,adpcm_data[chip] & 0x0f);
+		msm5205_data_w(chip,adpcm_data[chip] & 0x0f);
 		adpcm_data[chip] = -1;
 	}
 	else
@@ -95,7 +95,7 @@ static void spd_adpcm_int(running_machine *machine, int chip)
 		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
-		MSM5205_data_w(chip,adpcm_data[chip] >> 4);
+		msm5205_data_w(chip,adpcm_data[chip] >> 4);
 	}
 }
 
@@ -298,8 +298,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x2801, 0x2801) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(spd_adpcm_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -417,12 +417,12 @@ static void irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine,1,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irq_handler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	spd_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B	/* 8kHz? */
@@ -459,17 +459,17 @@ static MACHINE_DRIVER_START( spdodgeb )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
 	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
 	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END

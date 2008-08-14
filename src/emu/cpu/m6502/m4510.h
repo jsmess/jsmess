@@ -19,13 +19,16 @@
  *
  *****************************************************************************/
 
-#ifndef _M4510_H
-#define _M4510_H
+#pragma once
+
+#ifndef __M4510_H__
+#define __M4510_H__
 
 #include "m6502.h"
 
 
-enum {
+enum
+{
 	M4510_PC=1, M4510_S, M4510_P, M4510_A, M4510_X, M4510_Y,
 	M4510_Z, M4510_B, M4510_EA, M4510_ZP,
 	M4510_NMI_STATE, M4510_IRQ_STATE,
@@ -41,6 +44,4 @@ void m4510_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned m4510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
-
-
+#endif /* __M4510_H__ */

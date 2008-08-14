@@ -73,7 +73,7 @@ ADDRESS_MAP_END
     DEVICE CONFIG
 ***************************************************************************/
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	mac_sh_start
 };

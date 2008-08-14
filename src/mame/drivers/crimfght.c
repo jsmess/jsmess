@@ -46,7 +46,7 @@ static WRITE8_HANDLER( crimfght_snd_bankswitch_w )
 
 	int bank_A = ((data >> 1) & 0x01);
 	int bank_B = ((data) & 0x01);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 }
 
 
@@ -82,17 +82,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( crimfght_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0xa001, 0xa001) AM_READ(YM2151_status_port_0_r)	/* YM2151 */
+	AM_RANGE(0xa001, 0xa001) AM_READ(ym2151_status_port_0_r)	/* YM2151 */
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe00d) AM_READ(K007232_read_port_0_r)	/* 007232 registers */
+	AM_RANGE(0xe000, 0xe00d) AM_READ(k007232_read_port_0_r)	/* 007232 registers */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crimfght_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2151_data_port_0_w)		/* YM2151 */
-	AM_RANGE(0xe000, 0xe00d) AM_WRITE(K007232_write_port_0_w)		/* 007232 registers */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2151_register_port_0_w)	/* YM2151 */
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2151_data_port_0_w)		/* YM2151 */
+	AM_RANGE(0xe000, 0xe00d) AM_WRITE(k007232_write_port_0_w)		/* 007232 registers */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -264,7 +264,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	0,
 	crimfght_snd_bankswitch_w
@@ -272,11 +272,11 @@ static const struct YM2151interface ym2151_interface =
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v & 0x0f) * 0x11,0);
-	K007232_set_volume(0,1,0,(v >> 4) * 0x11);
+	k007232_set_volume(0,0,(v & 0x0f) * 0x11,0);
+	k007232_set_volume(0,1,0,(v >> 4) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
@@ -314,12 +314,12 @@ static MACHINE_DRIVER_START( crimfght )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)	/* verified with PCB */
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left", 0.20)

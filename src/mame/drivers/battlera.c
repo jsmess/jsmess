@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( battlera_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1fe000, 0x1fe001) AM_READWRITE(HuC6270_register_r, HuC6270_register_w)
 	AM_RANGE(0x1fe002, 0x1fe003) AM_WRITE(HuC6270_data_w)
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(control_data_r, control_data_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battlera_portmap, ADDRESS_SPACE_IO, 8 )
@@ -96,8 +96,8 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
-	case 0: YM2203_control_port_0_w(machine,0,data); break;
-	case 1: YM2203_write_port_0_w(machine,0,data); break;
+	case 0: ym2203_control_port_0_w(machine,0,data); break;
+	case 1: ym2203_write_port_0_w(machine,0,data); break;
 	}
 }
 
@@ -107,7 +107,7 @@ static void battlera_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle;
 
-	MSM5205_data_w(0,msm5205next >> 4);
+	msm5205_data_w(0,msm5205next >> 4);
 	msm5205next<<=4;
 
 	toggle = 1 - toggle;
@@ -122,17 +122,17 @@ static WRITE8_HANDLER( battlera_adpcm_data_w )
 
 static WRITE8_HANDLER( battlera_adpcm_reset_w )
 {
-	MSM5205_reset_w(0,0);
+	msm5205_reset_w(0,0);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_WRITE(YM2203_w)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
-	AM_RANGE(0x1fe800, 0x1fe80f) AM_WRITE(C6280_0_w)
+	AM_RANGE(0x1fe800, 0x1fe80f) AM_WRITE(c6280_0_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(soundlatch_r, battlera_adpcm_reset_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -234,7 +234,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	battlera_adpcm_int,/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz            */
@@ -274,7 +274,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.85)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.85)
 

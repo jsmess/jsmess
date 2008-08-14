@@ -63,16 +63,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(watchdog_reset_r)	/* ? */
-	AM_RANGE(0x04, 0x04) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x04, 0x04) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -280,7 +280,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -290,7 +290,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

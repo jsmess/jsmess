@@ -439,13 +439,13 @@ INPUT_PORTS_END
  *************************************/
 
 
-static const struct jaguar_config gpu_config =
+static const jaguar_cpu_core gpu_config =
 {
 	jaguar_gpu_cpu_int
 };
 
 
-static const struct jaguar_config dsp_config =
+static const jaguar_cpu_core dsp_config =
 {
 	jaguar_dsp_cpu_int
 };

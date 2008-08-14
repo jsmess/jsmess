@@ -461,17 +461,17 @@ DEVICE_IMAGE_LOAD( b2m_floppy )
 	return INIT_PASS;
 }
 
-static void *b2m_sh_start(int clock, const struct CustomSound_interface *config);
+static void *b2m_sh_start(int clock, const custom_sound_interface *config);
 static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
-const struct CustomSound_interface b2m_sound_interface =
+const custom_sound_interface b2m_sound_interface =
 {
 	b2m_sh_start,
 	NULL,
 	NULL
 };
 
-static void *b2m_sh_start(int clock, const struct CustomSound_interface *config)
+static void *b2m_sh_start(int clock, const custom_sound_interface *config)
 {
 	b2m_sound_input = 0;
 	mixer_channel = stream_create(0, 1, Machine->sample_rate, 0, b2m_sh_update);

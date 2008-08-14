@@ -310,8 +310,11 @@ static WRITE32_HANDLER( timers_w )
 	model2_timerrun[offset] = 1;
 }
 
-static void model2_timer_exp(running_machine *machine, int tnum, int bit)
+static TIMER_CALLBACK( model2_timer_cb )
 {
+	int tnum = (int)ptr;
+	int bit = tnum + 2;
+
 	timer_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
 
 	model2_intreq |= (1<<bit);
@@ -324,13 +327,10 @@ static void model2_timer_exp(running_machine *machine, int tnum, int bit)
 	model2_timerrun[tnum] = 0;
 }
 
-static TIMER_CALLBACK( model2_timer_0_cb ) { model2_timer_exp(machine, 0, 2); }
-static TIMER_CALLBACK( model2_timer_1_cb ) { model2_timer_exp(machine, 1, 3); }
-static TIMER_CALLBACK( model2_timer_2_cb ) { model2_timer_exp(machine, 2, 4); }
-static TIMER_CALLBACK( model2_timer_3_cb ) { model2_timer_exp(machine, 3, 5); }
-
 static MACHINE_RESET(model2_common)
 {
+	int i;
+
 	model2_intreq = 0;
 	model2_intena = 0;
 	model2_coproctl = 0;
@@ -347,15 +347,11 @@ static MACHINE_RESET(model2_common)
 
 	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
 
-	model2_timers[0] = timer_alloc(model2_timer_0_cb, NULL);
-	model2_timers[1] = timer_alloc(model2_timer_1_cb, NULL);
-	model2_timers[2] = timer_alloc(model2_timer_2_cb, NULL);
-	model2_timers[3] = timer_alloc(model2_timer_3_cb, NULL);
-
-	timer_adjust_oneshot(model2_timers[0], attotime_never, 0);
-	timer_adjust_oneshot(model2_timers[1], attotime_never, 0);
-	timer_adjust_oneshot(model2_timers[2], attotime_never, 0);
-	timer_adjust_oneshot(model2_timers[3], attotime_never, 0);
+	for (i=0; i<4; i++)
+	{
+		model2_timers[i] = timer_alloc(model2_timer_cb, (void*)i);
+		timer_adjust_oneshot(model2_timers[i], attotime_never, 0);
+	}
 }
 
 static MACHINE_RESET(model2o)
@@ -957,7 +953,7 @@ static WRITE32_HANDLER( model2_serial_w )
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		SCSP_MidiIn(machine, 0, data&0xff, 0);
+		scsp_midi_in(machine, 0, data&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -1617,37 +1613,37 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 
 static READ16_HANDLER( m1_snd_mpcm0_r )
 {
-	return MultiPCM_reg_0_r(machine, 0);
+	return multi_pcm_reg_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_w )
 {
-	MultiPCM_reg_0_w(machine, offset, data);
+	multi_pcm_reg_0_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
 {
-	multipcm_set_bank(0, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
+	multi_pcm_set_bank(0, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
 static READ16_HANDLER( m1_snd_mpcm1_r )
 {
-	return MultiPCM_reg_1_r(machine, 0);
+	return multi_pcm_reg_1_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_w )
 {
-	MultiPCM_reg_1_w(machine, offset, data);
+	multi_pcm_reg_1_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 {
-	multipcm_set_bank(1, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
+	multi_pcm_set_bank(1, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
 static READ16_HANDLER( m1_snd_ym_r )
 {
-	return YM3438_status_port_0_A_r(machine, 0);
+	return ym3438_status_port_0_a_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_ym_w )
@@ -1655,19 +1651,19 @@ static WRITE16_HANDLER( m1_snd_ym_w )
 	switch (offset)
 	{
 		case 0:
-			YM3438_control_port_0_A_w(machine, 0, data);
+			ym3438_control_port_0_a_w(machine, 0, data);
 			break;
 
 		case 1:
-			YM3438_data_port_0_A_w(machine, 0, data);
+			ym3438_data_port_0_a_w(machine, 0, data);
 			break;
 
 		case 2:
-			YM3438_control_port_0_B_w(machine, 0, data);
+			ym3438_control_port_0_b_w(machine, 0, data);
 			break;
 
 		case 3:
-			YM3438_data_port_0_B_w(machine, 0, data);
+			ym3438_data_port_0_b_w(machine, 0, data);
 			break;
 	}
 }
@@ -1717,7 +1713,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 
 static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audio", 0) AM_BASE(&model2_soundram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audio", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("scsp", 0)
@@ -1736,7 +1732,7 @@ static void scsp_irq(running_machine *machine, int irq)
 	}
 }
 
-static const struct SCSPinterface scsp_interface =
+static const scsp_interface scsp_config =
 {
 	0,
 	scsp_irq
@@ -1806,7 +1802,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static const struct mb86233_config tgp_config =
+static const mb86233_cpu_core tgp_config =
 {
 	copro_fifoin_pop,
 	copro_fifoout_push,
@@ -1893,7 +1889,7 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
@@ -1943,7 +1939,7 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
@@ -1977,7 +1973,7 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
@@ -4173,6 +4169,17 @@ ROM_START( daytonat )
 	ROM_REGION( 0x10000, "user7", 0 ) // Unknown ROM
 	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
 ROM_END
+
+
+/*
+Daytona "To The MAXX" upgrade.
+Unofficial Sega hack for Model 2 Daytona machines
+
+Kits contains 4 IC's
+3 of them are standard 27C1024 EPROMS
+1 of them is a PIC 16F84 mounted to a small board the size of an EPROM
+with a 40 pin socket mounted on it, which plugs into position IC15
+*/
 
 ROM_START( daytonam )
 	ROM_REGION( 0x200000, "main", 0 ) // i960 program

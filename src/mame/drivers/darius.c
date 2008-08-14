@@ -476,10 +476,10 @@ static WRITE8_HANDLER( darius_write_portB1 )
 static ADDRESS_MAP_START( darius_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x9001, 0x9001) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_1_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(YM2203_read_port_1_r)
+	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x9001, 0x9001) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_1_r)
+	AM_RANGE(0xa001, 0xa001) AM_READ(ym2203_read_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(SMH_NOP)
 	AM_RANGE(0xb001, 0xb001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -487,10 +487,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
@@ -520,7 +520,7 @@ static void darius_adpcm_int (running_machine *machine, int data)
 		cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	darius_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz   */
@@ -556,8 +556,8 @@ static WRITE8_HANDLER ( adpcm_nmi_enable )
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	MSM5205_data_w (0,   data         );
-	MSM5205_reset_w(0, !(data & 0x20) );	/* my best guess, but it could be output enable as well */
+	msm5205_data_w (0,   data         );
+	msm5205_reset_w(0, !(data & 0x20) );	/* my best guess, but it could be output enable as well */
 }
 
 static ADDRESS_MAP_START( darius_sound2_readport, ADDRESS_SPACE_IO, 8 )
@@ -803,7 +803,7 @@ static void irqhandler(running_machine *machine, int irq)	/* assumes Z80 sandwic
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface_1 =
+static const ym2203_interface ym2203_interface_1 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -816,7 +816,7 @@ static const struct YM2203interface ym2203_interface_1 =
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface_2 =
+static const ym2203_interface ym2203_interface_2 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -911,7 +911,7 @@ static MACHINE_DRIVER_START( darius )
 	MDRV_SOUND_ROUTE(3, "filter.2203.1.3r", 0.60)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 

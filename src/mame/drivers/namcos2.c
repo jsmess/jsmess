@@ -708,8 +708,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(BANKED_SOUND_ROM_R) /* banked */
-	AM_RANGE(0x4000, 0x4001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x5000, 0x6fff) AM_READ(C140_r)
+	AM_RANGE(0x4000, 0x4001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x5000, 0x6fff) AM_READ(c140_r)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(namcos2_dpram_byte_r)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(namcos2_dpram_byte_r) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
@@ -718,9 +718,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x5000, 0x6fff) AM_WRITE(C140_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x5000, 0x6fff) AM_WRITE(c140_w)
 	AM_RANGE(0x7000, 0x77ff) AM_WRITE(namcos2_dpram_byte_w) AM_BASE(&namcos2_dpram)
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(namcos2_dpram_byte_w)	/* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
@@ -1537,7 +1537,7 @@ static GFXDECODE_START( luckywld )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, chr_layout,				16*256, 16 )
 GFXDECODE_END
 
-static const struct C140interface C140_interface =
+static const c140_interface c140_config =
 {
 	C140_TYPE_SYSTEM2
 };
@@ -1615,7 +1615,7 @@ static MACHINE_DRIVER_START( default )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
 
@@ -1629,7 +1629,7 @@ static MACHINE_DRIVER_START( default2 )
 	MDRV_IMPORT_FROM(default)
 
 	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -1639,7 +1639,7 @@ static MACHINE_DRIVER_START( default3 )
 	MDRV_IMPORT_FROM(default)
 
 	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
@@ -1689,7 +1689,7 @@ static MACHINE_DRIVER_START( gollygho )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
 
@@ -1739,7 +1739,7 @@ static MACHINE_DRIVER_START( finallap )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
 
@@ -1789,7 +1789,7 @@ static MACHINE_DRIVER_START( sgunner )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
 
@@ -1839,7 +1839,7 @@ static MACHINE_DRIVER_START( luckywld )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
 
@@ -1889,7 +1889,7 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface)
+	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 

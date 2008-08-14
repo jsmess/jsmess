@@ -172,7 +172,7 @@ static  READ8_HANDLER ( oric_via_in_a_func )
 		/* if psg is in read register state return reg data */
 		if (oric_psg_control==0x01)
 		{
-			return AY8910_read_port_0_r(machine, 0);
+			return ay8910_read_port_0_r(machine, 0);
 		}
 
 		/* return high-impedance */
@@ -209,19 +209,19 @@ static void oric_psg_connection_refresh(running_machine *machine)
 			/* read register data */
 			case 1:
 			{
-				//oric_via_port_a_data = AY8910_read_port_0_r(machine, 0);
+				//oric_via_port_a_data = ay8910_read_port_0_r(machine, 0);
 			}
 			break;
 			/* write register data */
 			case 2:
 			{
-				AY8910_write_port_0_w(machine, 0, oric_via_port_a_data);
+				ay8910_write_port_0_w(machine, 0, oric_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				AY8910_control_port_0_w(machine, 0, oric_via_port_a_data);
+				ay8910_control_port_0_w(machine, 0, oric_via_port_a_data);
 			}
 			break;
 

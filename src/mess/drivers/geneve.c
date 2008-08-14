@@ -435,7 +435,7 @@ INPUT_PORTS_END
 
 
 
-static const struct TMS5220interface tms5220interface =
+static const tms5220_interface geneve_tms5220interface =
 {
 	NULL,						/* no IRQ callback */
 #if 1
@@ -476,7 +476,7 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
-	MDRV_SOUND_CONFIG(tms5220interface)
+	MDRV_SOUND_CONFIG(geneve_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */

@@ -915,7 +915,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_porta )
 	if (b0_sound==0)
 	{
  		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		SN76496_0_w(machine, 0,via_system_porta);
+		sn76496_0_w(machine, 0,via_system_porta);
 	}
 	if (b3_keyboard==0)
 	{
@@ -1010,7 +1010,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 		case 0:
 			if (b0_sound==1) {
 				b0_sound=0;
-				SN76496_0_w(machine, 0,via_system_porta);
+				sn76496_0_w(machine, 0,via_system_porta);
 			}
 			break;
 		case 1:

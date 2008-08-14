@@ -480,7 +480,7 @@ static MACHINE_RESET( tvlink )
 	tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
-static const struct CustomSound_interface svision_sound_interface =
+static const custom_sound_interface svision_sound_interface =
 {
 	svision_custom_start
 };

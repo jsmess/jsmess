@@ -568,7 +568,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct POKEYinterface pokey_interface =
+static const pokey_interface pokey_config =
 {
 	{ 0 },
 	input_port_3_r
@@ -632,7 +632,7 @@ static MACHINE_DRIVER_START( astdelux )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
-	MDRV_SOUND_CONFIG(pokey_interface)
+	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -874,7 +874,7 @@ ROM_END
 static DRIVER_INIT( asteroib )
 {
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, asteroib_IN0_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2003, 0x2003, 0, 0, input_port_3_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2003, 0x2003, 0, 0, input_port_read_handler8(machine->portconfig, "HS"));
 }
 
 

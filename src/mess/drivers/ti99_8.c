@@ -351,7 +351,7 @@ INPUT_PORTS_END
 /*
     TMS5220 speech synthesizer
 */
-static const struct TMS5220interface tms5220interface =
+static const tms5220_interface ti99_8_tms5220interface =
 {
 	NULL,						/* no IRQ callback */
 	spchroms_read,				/* speech ROM read handler */
@@ -422,7 +422,7 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
-	MDRV_SOUND_CONFIG(tms5220interface)
+	MDRV_SOUND_CONFIG(ti99_8_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -453,7 +453,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
-	MDRV_SOUND_CONFIG(tms5220interface)
+	MDRV_SOUND_CONFIG(ti99_8_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("wave", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)

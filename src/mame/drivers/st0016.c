@@ -405,7 +405,7 @@ static INTERRUPT_GEN(st0016_int)
 }
 
 extern UINT8 *st0016_charram;
-static const struct ST0016interface st0016_interface =
+static const st0016_interface st0016_config =
 {
 	&st0016_charram
 };
@@ -441,7 +441,7 @@ static MACHINE_DRIVER_START( st0016 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("st", ST0016, 0)
-	MDRV_SOUND_CONFIG(st0016_interface)
+	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -485,6 +485,10 @@ E51-00001-A
 |                                    |
 |  DSW1   DSW2        RENJYU-1  6264 |
 |------------------------------------|
+
+Note:
+      Unknown QFP (surface scratched off) is the CPU
+        + GFX generator - it's possibly NEC V70/V810
 */
 
 ROM_START( renju )

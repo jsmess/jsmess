@@ -188,17 +188,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dbz_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xd000, 0xd002) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xc000, 0xc001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xd000, 0xd002) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xd000, 0xd001) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xd000, 0xd001) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -311,7 +311,7 @@ INPUT_PORTS_END
 
 /**********************************************************************************/
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	dbz_sound_irq
 };
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( dbz )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 

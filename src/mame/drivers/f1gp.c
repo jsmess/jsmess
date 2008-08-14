@@ -105,12 +105,12 @@ static ADDRESS_MAP_START( f1gp_readmem1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffcfff) AM_READ(sharedram_r)
 	AM_RANGE(0xffd000, 0xffdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfff006, 0xfff007) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ(command_pending_r)
-	AM_RANGE(0xfff050, 0xfff051) AM_READ(input_port_3_word_r)
+	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gp_writemem1, ADDRESS_SPACE_PROGRAM, 16 )
@@ -144,12 +144,12 @@ static ADDRESS_MAP_START( f1gp2_readmem1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffcfff) AM_READ(sharedram_r)
 	AM_RANGE(0xffd000, 0xffdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfff006, 0xfff007) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ(command_pending_r)
-	AM_RANGE(0xfff00a, 0xfff00b) AM_READ(input_port_3_word_r)
+	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gp2_writemem1, ADDRESS_SPACE_PROGRAM, 16 )
@@ -194,8 +194,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_r)
-	AM_RANGE(0x18, 0x18) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x18, 0x18) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x1a, 0x1a) AM_READ(ym2610_status_port_0_b_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -203,10 +203,10 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp2
 	AM_RANGE(0x14, 0x14) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0x19, 0x19) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x19, 0x19) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0x1a, 0x1a) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x1b, 0x1b) AM_WRITE(ym2610_data_port_0_b_w)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( f1gpb_misc_w )
@@ -252,17 +252,17 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE(&f1gp_fgvideoram)
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfff006, 0xfff007) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
+	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
 	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_BASE(&f1gpb_fgregs)
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xfff00e, 0xfff00f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
 	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
 	AM_RANGE(0xfff020, 0xfff023) AM_RAM //?
-	AM_RANGE(0xfff050, 0xfff051) AM_READ(input_port_3_word_r)
+	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_BASE(&f1gpb_rozregs)
 ADDRESS_MAP_END
 
@@ -379,101 +379,16 @@ INPUT_PORTS_END
 
 /* the same as f1gp, but with an extra button */
 static INPUT_PORTS_START( f1gp2 )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_INCLUDE( f1gp )
+
+	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x6000, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x7000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "2 to Start, 1 to Cont." )	// Other desc. was too long !
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "Game Mode" )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Single ) )
-	PORT_DIPSETTING(      0x0000, "Multiple" )
-	PORT_DIPNAME( 0x0008, 0x0008, "Multi Player" )
-	PORT_DIPSETTING(      0x0008, "Type 1" )
-	PORT_DIPSETTING(      0x0000, "Type 2" )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("DSW3")
+	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0001, 0x0001, "Country" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( World ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japan ) )
+	PORT_DIPUNUSED( 0x001e, 0x001e )
 INPUT_PORTS_END
 
 
@@ -553,7 +468,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
@@ -594,7 +509,7 @@ static MACHINE_DRIVER_START( f1gp )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, XTAL_8MHz)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

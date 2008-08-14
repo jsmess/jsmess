@@ -62,12 +62,12 @@ static void orch90_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 	{
 		case 0x3A:
 			/* left channel write */
-			DAC_data_w(info->left_dac, data);
+			dac_data_w(info->left_dac, data);
 			break;
 
 		case 0x3B:
 			/* right channel write */
-			DAC_data_w(info->right_dac, data);
+			dac_data_w(info->right_dac, data);
 			break;
 	}
 }

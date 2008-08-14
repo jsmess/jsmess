@@ -56,15 +56,15 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(kncljoe_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_BASE(&kncljoe_scrollregs)
-	AM_RANGE(0xd800, 0xd800) AM_READ(input_port_0_r) /* IN 0 */
-	AM_RANGE(0xd801, 0xd801) AM_READ(input_port_1_r) /* IN 1 */
-	AM_RANGE(0xd802, 0xd802) AM_READ(input_port_2_r) /* IN 2 */
-	AM_RANGE(0xd803, 0xd803) AM_READ(input_port_3_r)	/* DSW A */
-	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_4_r)	/* DSW B */
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("P1")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("P2")
+	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("DSWA")
+	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
-	AM_RANGE(0xd802, 0xd802) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0xd803, 0xd803) AM_WRITE(SN76496_1_w)
+	AM_RANGE(0xd802, 0xd802) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0xd803, 0xd803) AM_WRITE(sn76496_1_w)
 	AM_RANGE(0xd807, 0xd807) AM_READ(SMH_NOP)		/* unknown read */
 	AM_RANGE(0xd817, 0xd817) AM_READ(SMH_NOP)		/* unknown read */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -86,12 +86,12 @@ static WRITE8_HANDLER( m6803_port2_w )
 		if (port2 & 0x04)
 		{
 			if (port2 & 0x08)
-				AY8910_control_port_0_w(machine, 0, port1);
+				ay8910_control_port_0_w(machine, 0, port1);
 		}
 		else
 		{
 			if (port2 & 0x08)
-				AY8910_write_port_0_w(machine, 0, port1);
+				ay8910_write_port_0_w(machine, 0, port1);
 		}
 	}
 	port2 = data;
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( m6803_port2_w )
 static READ8_HANDLER( m6803_port1_r )
 {
 	if (port2 & 0x08)
-		return AY8910_read_port_0_r(machine, 0);
+		return ay8910_read_port_0_r(machine, 0);
 	return 0xff;
 }
 
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( kncljoe )
-	PORT_START("IN0")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -145,7 +145,7 @@ static INPUT_PORTS_START( kncljoe )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -155,7 +155,7 @@ static INPUT_PORTS_START( kncljoe )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -244,7 +244,7 @@ static GFXDECODE_START( kncljoe )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x80, 16 )
 GFXDECODE_END
 
-static const struct AY8910interface ay8910_interface =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("sn1", SN76489, XTAL_3_579545MHz) /* verified on pcb */

@@ -1,15 +1,20 @@
-#ifndef lr35902_H
-#define lr35902_H
+#pragma once
+
+#ifndef __LR35902_H__
+#define __LR35902_H__
 
 #include "cpuintrf.h"
 
-typedef struct {
+typedef struct _lr35902_cpu_core lr35902_cpu_core;
+struct _lr35902_cpu_core
+{
 	const UINT16	*regs;
 	UINT8	features;
 	void	(*timer_fired_func)(int cycles);
-} LR35902_CONFIG;
+};
 
-enum {
+enum
+{
 	LR35902_PC=1, LR35902_SP, LR35902_AF, LR35902_BC, LR35902_DE, LR35902_HL,
 	LR35902_IRQ_STATE,
 	/* Pseudo registers to keep track of the interrupt statuses */
@@ -27,4 +32,4 @@ extern void lr35902_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned lr35902_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
 
-#endif
+#endif /* __LR35902_H__ */

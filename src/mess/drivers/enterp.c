@@ -528,7 +528,7 @@ static INPUT_PORTS_START( ep128 )
 
 INPUT_PORTS_END
 
-static const struct CustomSound_interface dave_custom_sound =
+static const custom_sound_interface dave_custom_sound =
 {
 	Dave_sh_start
 };

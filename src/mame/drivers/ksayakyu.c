@@ -109,9 +109,9 @@ static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_NOP)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_0_r)
-	AM_RANGE(0xa801, 0xa801) AM_READ(input_port_1_r)
-	AM_RANGE(0xa802, 0xa802) AM_READ(input_port_2_r)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
+	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("P2")
+	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("DSW")
 	AM_RANGE(0xa803, 0xa803) AM_READ(SMH_NOP) /* watchdog ? */
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(ksayakyu_videoctrl_w)
 	AM_RANGE(0xa805, 0xa805) AM_WRITE(latch_w)
@@ -125,11 +125,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa001, 0xa001) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0xa001, 0xa001) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xa008, 0xa008) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITE(SMH_NOP)
@@ -178,7 +178,7 @@ static WRITE8_HANDLER(dummy_w)
 	//DAC ? communication with main cpu ?
 }
 
-static const struct AY8910interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -188,7 +188,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	dummy_w
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

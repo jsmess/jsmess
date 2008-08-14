@@ -1,5 +1,7 @@
-#ifndef __I386_H_
-#define __I386_H_
+#pragma once
+
+#ifndef __I386_H__
+#define __I386_H__
 
 #include "cpuintrf.h"
 
@@ -15,7 +17,8 @@ extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 typedef enum { ES, CS, SS, DS, FS, GS } SREGS;
 
 #ifdef LSB_FIRST
-typedef enum {
+typedef enum
+{
 	AL = 0,
 	AH = 1,
 	CL = 4,
@@ -26,7 +29,8 @@ typedef enum {
 	BH = 13
 } BREGS;
 #else
-typedef enum {
+typedef enum
+{
 	AL = 3,
 	AH = 2,
 	CL = 7,
@@ -39,7 +43,8 @@ typedef enum {
 #endif
 
 #ifdef LSB_FIRST
-typedef enum {
+typedef enum
+{
 	AX = 0,
 	CX = 2,
 	DX = 4,
@@ -50,7 +55,8 @@ typedef enum {
 	DI = 14
 } WREGS;
 #else
-typedef enum {
+typedef enum
+{
 	AX = 1,
 	CX = 3,
 	DX = 5,
@@ -893,4 +899,4 @@ INLINE void BUMP_DI(int adjustment)
 #define WRITEPORT16(port, value)	(io_write_word_32le(port, value))
 #define WRITEPORT32(port, value)	(io_write_dword_32le(port, value))
 
-#endif
+#endif /* __I386_H__ */

@@ -9,6 +9,8 @@
 #ifndef PCE_H_
 #define PCE_H_
 
+#include "sound/msm5205.h"
+
 
 #define PCE_HEADER_SIZE		512
 
@@ -37,7 +39,7 @@ NVRAM_HANDLER( pce );
 WRITE8_HANDLER ( pce_joystick_w );
  READ8_HANDLER ( pce_joystick_r );
 
-extern const struct MSM5205interface pce_cd_msm5205_interface;
+extern const msm5205_interface pce_cd_msm5205_interface;
 WRITE8_HANDLER( pce_cd_bram_w );
 WRITE8_HANDLER( pce_cd_intf_w );
 READ8_HANDLER( pce_cd_intf_r );

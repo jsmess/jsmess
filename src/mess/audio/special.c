@@ -15,20 +15,20 @@
 #include "deprecat.h"
 #include "includes/special.h"
 
-static void *specimx_sh_start(int clock, const struct CustomSound_interface *config);
+static void *specimx_sh_start(int clock, const custom_sound_interface *config);
 static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
 static sound_stream *mixer_channel;
 static int specimx_input[3];
 
-const struct CustomSound_interface specimx_sound_interface =
+const custom_sound_interface specimx_sound_interface =
 {
 	specimx_sh_start,
 	NULL,
 	NULL
 };
 
-static void *specimx_sh_start(int clock, const struct CustomSound_interface *config)
+static void *specimx_sh_start(int clock, const custom_sound_interface *config)
 {
 	specimx_input[0] = specimx_input[1] = specimx_input[2] = 0;
 	mixer_channel = stream_create(0, 1, Machine->sample_rate, 0, specimx_sh_update);

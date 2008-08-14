@@ -53,6 +53,8 @@ Known Non-Issues (confirmed on Real Genesis)
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
+/* the same on all systems? */
+#define MASTER_CLOCK		53693100
 /* timing details */
 static int megadriv_framerate;
 static int megadrive_total_scanlines;
@@ -80,8 +82,8 @@ static UINT8 megadrive_vram_fill_pending = 0;
 static UINT16 megadrive_vram_fill_length = 0;
 static int genesis_scanline_counter = 0;
 static int megadrive_sprite_collision = 0;
-int megadrive_region_export;
-int megadrive_region_pal;
+static int megadrive_region_export;
+static int megadrive_region_pal;
 static int megadrive_max_hposition;
 
 
@@ -886,7 +888,7 @@ static void megadriv_vdp_ctrl_port_w(running_machine *machine, int data)
 	}
 }
 
-WRITE16_HANDLER( megadriv_vdp_w )
+static WRITE16_HANDLER( megadriv_vdp_w )
 {
 	switch (offset<<1)
 	{
@@ -922,8 +924,8 @@ WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) SN76496_0_w(machine, 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) SN76496_0_w(machine, 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_0_w(machine, 0, data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn76496_0_w(machine, 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -1279,7 +1281,7 @@ static UINT16 megadriv_read_hv_counters(void)
 
 }
 
-READ16_HANDLER( megadriv_vdp_r )
+static READ16_HANDLER( megadriv_vdp_r )
 {
 	UINT16 retvalue = 0;
 
@@ -1331,12 +1333,12 @@ static READ16_HANDLER( megadriv_68k_YM2612_read)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_BITS_8_15)	 return YM2612_status_port_0_A_r(machine, 0) << 8;
-				else 				 return YM2612_status_port_0_A_r(machine, 0);
+				if (ACCESSING_BITS_8_15)	 return ym2612_status_port_0_a_r(machine, 0) << 8;
+				else 				 return ym2612_status_port_0_a_r(machine, 0);
 				break;
 			case 1:
-				if (ACCESSING_BITS_8_15)	return YM2612_status_port_0_A_r(machine, 0) << 8;
-				else 				return YM2612_status_port_0_A_r(machine, 0);
+				if (ACCESSING_BITS_8_15)	return ym2612_status_port_0_a_r(machine, 0) << 8;
+				else 				return ym2612_status_port_0_a_r(machine, 0);
 				break;
 		}
 	}
@@ -1359,12 +1361,12 @@ static WRITE16_HANDLER( megadriv_68k_YM2612_write)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_BITS_8_15)	YM2612_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
-				else 				YM2612_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
+				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_a_w	(machine, 0,	(data >> 8) & 0xff);
+				else 				ym2612_data_port_0_a_w		(machine, 0,	(data >> 0) & 0xff);
 				break;
 			case 1:
-				if (ACCESSING_BITS_8_15)	YM2612_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
-				else 				YM2612_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
+				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_b_w	(machine, 0,	(data >> 8) & 0xff);
+				else 				ym2612_data_port_0_b_w		(machine, 0,	(data >> 0) & 0xff);
 				break;
 		}
 	}
@@ -1378,10 +1380,10 @@ static READ8_HANDLER( megadriv_z80_YM2612_read )
 {
 	switch (offset)
 	{
-		case 0: return YM2612_status_port_0_A_r(machine,0);
-		case 1: return YM2612_status_port_0_A_r(machine,0);
-		case 2: return YM2612_status_port_0_A_r(machine,0);
-		case 3: return YM2612_status_port_0_A_r(machine,0);
+		case 0: return ym2612_status_port_0_a_r(machine,0);
+		case 1: return ym2612_status_port_0_a_r(machine,0);
+		case 2: return ym2612_status_port_0_a_r(machine,0);
+		case 3: return ym2612_status_port_0_a_r(machine,0);
 
 	}
 
@@ -1393,10 +1395,10 @@ static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 	//mame_printf_debug("megadriv_z80_YM2612_write %02x %02x\n",offset,data);
 	switch (offset)
 	{
-		case 0: YM2612_control_port_0_A_w(machine, 0, data); break;
-		case 1: YM2612_data_port_0_A_w(machine, 0, data); break;
-		case 2: YM2612_control_port_0_B_w(machine, 0, data); break;
-		case 3: YM2612_data_port_0_B_w(machine, 0, data); break;
+		case 0: ym2612_control_port_0_a_w(machine, 0, data); break;
+		case 1: ym2612_data_port_0_a_w(machine, 0, data); break;
+		case 2: ym2612_control_port_0_b_w(machine, 0, data); break;
+		case 3: ym2612_data_port_0_b_w(machine, 0, data); break;
 	}
 }
 
@@ -1404,32 +1406,20 @@ static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 static emu_timer *io_timeout[3];
 static int io_stage[3];
 
-static TIMER_CALLBACK( io_timeout0_timer_callback )
+static TIMER_CALLBACK( io_timeout_timer_callback )
 {
-	io_stage[0] = -1;
+	io_stage[(int)ptr] = -1;
 }
-
-static TIMER_CALLBACK( io_timeout1_timer_callback )
-{
-	io_stage[1] = -1;
-}
-
-static TIMER_CALLBACK( io_timeout2_timer_callback )
-{
-	io_stage[2] = -1;
-}
-
 
 static void init_megadri6_io(void)
 {
-	io_timeout[0] = timer_alloc(io_timeout0_timer_callback, NULL);
-	io_stage[0] = -1;
+	int i;
 
-	io_timeout[1] = timer_alloc(io_timeout1_timer_callback, NULL);
-	io_stage[1] = -1;
-
-	io_timeout[2] = timer_alloc(io_timeout2_timer_callback, NULL);
-	io_stage[2] = -1;
+	for (i=0; i<3; i++)
+	{
+		io_timeout[i] = timer_alloc(io_timeout_timer_callback, (void*)i);
+		io_stage[i] = -1;
+	}
 }
 
 /* pointers to our io data read/write functions */
@@ -2385,7 +2375,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			SN76496_0_w(machine, 0, data);
+			sn76496_0_w(machine, 0, data);
 			break;
 
 		default:
@@ -2416,7 +2406,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else if (fulladdress == 0xc00011)
 	{
 		/* quite a few early games write here, most of the later ones don't */
-		SN76496_0_w(machine, 0, data);
+		sn76496_0_w(machine, 0, data);
 	}
 	else
 	{
@@ -5246,3 +5236,4 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
+

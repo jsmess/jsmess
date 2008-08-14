@@ -153,7 +153,7 @@ static WRITE8_HANDLER( adpcm_control_w )
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(3,&RAM[bankaddress]);
 
-	MSM5205_reset_w(0,data & 0x08);
+	msm5205_reset_w(0,data & 0x08);
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
@@ -199,8 +199,8 @@ static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0xe801, 0xe801) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0xe801, 0xe801) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -352,7 +352,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -366,7 +366,7 @@ static void adpcm_int(running_machine *machine, int data)
 {
 	static int toggle = 0;
 
-	MSM5205_data_w (0,msm5205next);
+	msm5205_data_w (0,msm5205next);
 	msm5205next>>=4;
 
 	toggle ^= 1;
@@ -375,7 +375,7 @@ static void adpcm_int(running_machine *machine, int data)
 
 }
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	adpcm_int,	            /* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */
@@ -414,11 +414,11 @@ static MACHINE_DRIVER_START( wc90b )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 2510000/2)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

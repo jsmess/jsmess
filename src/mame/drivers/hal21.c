@@ -62,7 +62,7 @@ static UINT8 *hal21_vreg, *hal21_sndfifo;
 static UINT8 *textram;
 static UINT8 *aso_scroll_sync;
 static int color[2];
-
+static int snk_blink_parity;	// FIXME likely wrong
 
 /**************************************************************************/
 // Test Handlers
@@ -116,7 +116,7 @@ static void hal21_sound_scheduler(running_machine *machine, int mode, int data)
 		return;
 	}
 
-	snk_sound_busy_bit = 0x20;
+	snk_sound_busy_bit = 0x01;
 	soundlatch_w(machine, 0, data);
 	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -348,18 +348,24 @@ static VIDEO_UPDATE( aso )
 }
 
 
+static CUSTOM_INPUT( sound_status_r )
+{
+	return snk_sound_busy_bit;
+}
+
+
 static INPUT_PORTS_START( hal21 )
-	PORT_START("IN0")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_status_r, NULL) /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("IN1") /* P1 controls */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -368,7 +374,7 @@ static INPUT_PORTS_START( hal21 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2") /* P2 controls */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -428,17 +434,17 @@ INPUT_PORTS_END
 /**************************************************************************/
 
 static INPUT_PORTS_START( aso )
-	PORT_START("IN0")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_status_r, NULL) /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -448,7 +454,7 @@ static INPUT_PORTS_START( aso )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -558,8 +564,6 @@ GFXDECODE_END
 
 static READ8_HANDLER( CPUC_ready_r ) { snk_sound_busy_bit = 0; return 0; }
 
-static READ8_HANDLER( hal21_input_port_0_r ) { return input_port_read(machine, "IN0") | snk_sound_busy_bit; }
-
 static WRITE8_HANDLER( hal21_soundcommand_w ) { hal21_sound_scheduler(machine, 1, data); }
 static WRITE8_HANDLER( hal21_soundack_w ) { hal21_sound_scheduler(machine,2, data); }
 
@@ -572,7 +576,7 @@ static READ8_HANDLER( hal21_soundcommand_r )
 
 static WRITE8_HANDLER( aso_soundcommand_w )
 {
-	snk_sound_busy_bit = 0x20;
+	snk_sound_busy_bit = 0x01;
 	soundlatch_w(machine, 0, data);
 	cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
 }
@@ -589,8 +593,8 @@ static ADDRESS_MAP_START( aso_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_READ(hal21_soundcommand_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(CPUC_ready_r)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(YM3526_status_port_0_r, YM3526_control_port_0_w) /* YM3526 #1 control port? */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM3526_write_port_0_w)   /* YM3526 #1 write port?  */
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w) /* YM3526 #1 control port? */
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym3526_write_port_0_w)   /* YM3526 #1 write port?  */
 	AM_RANGE(0xf002, 0xf002) AM_READNOP // unknown read
 	AM_RANGE(0xf004, 0xf004) AM_READNOP // unknown read
 	AM_RANGE(0xf006, 0xf006) AM_READNOP // unknown read
@@ -603,11 +607,11 @@ static ADDRESS_MAP_START( hal21_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(hal21_soundcommand_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(CPUC_ready_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(hal21_soundack_w) // bitfielded(0-5) acknowledge write, details unknown
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xe009, 0xe009) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0xe008, 0xe008) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xe009, 0xe009) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_sound_portmap, ADDRESS_SPACE_IO, 8 )
@@ -619,12 +623,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aso_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(hal21_input_port_0_r)	/* coin, start */
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")			/* P1 */
-	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")			/* P2 */
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("P1")
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P2")
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(aso_soundcommand_w)
-	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")			/* DSW1 */
-	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")			/* DSW2 */
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(hal21_vreg1_w)
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(hal21_vreg2_w)
@@ -654,12 +658,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(hal21_input_port_0_r)	/* coin, start */
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")			/* P1 */
-	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")			/* P2 */
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("P1")
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P2")
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(hal21_soundcommand_w)
-	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")			/* DSW1 */
-	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")			/* DSW2 */
+	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc600, 0xc600) AM_WRITE(hal21_vreg0_w)
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(hal21_vreg1_w)

@@ -1170,7 +1170,7 @@ WRITE16_HANDLER ( ti99_wsnd_w )
 {
 	activecpu_adjust_icount(-4);
 
-	SN76496_0_w(machine, offset, (data >> 8) & 0xff);
+	sn76496_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
 /*
@@ -1593,7 +1593,7 @@ WRITE8_HANDLER ( ti99_8_w )
 			case 1:
 				/* sound write + RAM */
 				if (offset < 0x8410)
-					SN76496_0_w(machine, offset, data);
+					sn76496_0_w(machine, offset, data);
 				else
 					sRAM_ptr_8[offset & 0x1fff] = data;
 				break;

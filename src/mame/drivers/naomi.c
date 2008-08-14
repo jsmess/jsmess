@@ -50,6 +50,9 @@ Notes:
       CN25/26         - Connectors for filter board
       EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
       315-6188.IC31   - Altera EPC1064 (DIP8)
+                        According to the datasheet, it's an FPGA Configuration
+                        Device which loads the Altera Flex EPF8452 with some info
+                        on power-up.
       JP1             - set to 2-3. Alt setting is 1-2
       JP4             - set to 2-3. Alt setting is 1-2
       93C46           - 128 bytes EEPROM
@@ -69,6 +72,7 @@ Notes:
       xMHz            - Small round XTAL (possibly 32.768kHz for a clock?)
       SH4             - Hitachi SH4 CPU (BGAxxx, with heatsink and fan)
       POWERVR2        - POWERVR2 video generator (BGAxxx, with heatsink)
+
 
 Filter Board
 ------------
@@ -819,7 +823,7 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
 INPUT_PORTS_END
 
-static const struct AICAinterface aica_interface =
+static const aica_interface aica_config =
 {
 	0,
 	aica_irq
@@ -828,7 +832,7 @@ static const struct AICAinterface aica_interface =
 static MACHINE_RESET( naomi )
 {
 	MACHINE_RESET_CALL(dc);
-	AICA_set_ram_base(0, dc_sound_ram, 8*1024*1024);
+	aica_set_ram_base(0, dc_sound_ram, 8*1024*1024);
 }
 
 static MACHINE_DRIVER_START( naomi )
@@ -862,7 +866,7 @@ static MACHINE_DRIVER_START( naomi )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("aica", AICA, 0)
-	MDRV_SOUND_CONFIG(aica_interface)
+	MDRV_SOUND_CONFIG(aica_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END

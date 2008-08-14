@@ -1,12 +1,14 @@
 /* C140.h */
 
-#ifndef _NAMCO_C140_
-#define _NAMCO_C140_
+#pragma once
 
-READ8_HANDLER( C140_r );
-WRITE8_HANDLER( C140_w );
+#ifndef __C140_H__
+#define __C140_H__
 
-void C140_set_base(int which, void *base);
+READ8_HANDLER( c140_r );
+WRITE8_HANDLER( c140_w );
+
+void c140_set_base(int which, void *base);
 
 enum
 {
@@ -16,8 +18,9 @@ enum
 	C140_TYPE_ASIC219
 };
 
-struct C140interface {
+typedef struct _c140_interface c140_interface;
+struct _c140_interface {
     int banking_type;
 };
 
-#endif
+#endif /* __C140_H__ */

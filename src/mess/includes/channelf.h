@@ -24,7 +24,7 @@ extern VIDEO_UPDATE( channelf );
 /*----------- defined in audio/channelf.c -----------*/
 
 void channelf_sound_w(int);
-void *channelf_sh_custom_start(int clock, const struct CustomSound_interface *config);
+void *channelf_sh_custom_start(int clock, const custom_sound_interface *config);
 
 
 #endif /* CHANNELF_H_ */

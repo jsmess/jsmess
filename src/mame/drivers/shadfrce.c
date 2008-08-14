@@ -284,14 +284,14 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( oki_bankswitch_w )
 {
-	OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
+	okim6295_set_bank_base(0, (data & 1) * 0x40000);
 }
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc801, 0xc801) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xc801, 0xc801) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -299,9 +299,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
@@ -537,7 +537,7 @@ static void irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irq_handler
 };
@@ -578,7 +578,7 @@ static MACHINE_DRIVER_START( shadfrce )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 

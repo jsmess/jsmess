@@ -2,7 +2,7 @@
 
     TS 2004.10.22. analog[at]op.pl
     - fixed sprite issues
-  - added backgrounds and terrain info (external roms)
+    - added backgrounds and terrain info (external roms)
 
     (press buttons 1+2 at the same time, to release 'army' ;)
 
@@ -10,7 +10,7 @@
         - fix colours (sprites , bg)
 */
 
-/* dump info
+/*
 
 Field Combat (c)1985 Jaleco
 
@@ -23,7 +23,6 @@ Other: Unmarked 24 pin near ROMs 2 & 3
 RAM: 6116 (x3)
 
 X-TAL: 20 MHz
-
 
 inputs + notes by stephh
 
@@ -220,15 +219,15 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8001, 0x8001) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_READ(AY8910_read_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xc001, 0xc001) AM_READ(AY8910_read_port_2_r)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(AY8910_write_port_2_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(AY8910_control_port_2_w)
+	AM_RANGE(0x8001, 0x8001) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x8002, 0x8002) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xc001, 0xc001) AM_READ(ay8910_read_port_2_r)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0xc003, 0xc003) AM_WRITE(ay8910_control_port_2_w)
 ADDRESS_MAP_END
 
 

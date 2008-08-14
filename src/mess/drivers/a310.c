@@ -221,7 +221,7 @@ static MACHINE_START( a310 )
 	timer_adjust_oneshot(snd_timer, attotime_never, 0);
 
 	// reset the DAC to centerline
-	DAC_signed_data_w(0, 0x80);
+	dac_signed_data_w(0, 0x80);
 }
 
 static READ32_HANDLER(logical_r)
@@ -641,7 +641,7 @@ static WRITE32_HANDLER(memc_w)
 				else
 				{
 					timer_adjust_oneshot(snd_timer, attotime_never, 0);
-					DAC_signed_data_w(0, 0x80);
+					dac_signed_data_w(0, 0x80);
 				}
 				break;
 
