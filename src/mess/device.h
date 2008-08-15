@@ -208,10 +208,6 @@ struct IODevice
 	unsigned int reset_on_load : 1;
 	unsigned int load_at_init : 1;
 	unsigned int multiple : 1;
-
-	/* image handling callbacks */
-	device_start_func start;
-	device_stop_func stop;
 };
 
 /* interoperability with MAME devices */

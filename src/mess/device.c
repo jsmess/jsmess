@@ -151,13 +151,15 @@ static DEVICE_START(mess_device)
 {
 	mess_device_config *mess_device = (mess_device_config *) device->inline_config;
 	mess_device_token *token = (mess_device_token *) device->token;
+	device_start_func inner_start;
 
 	/* initialize the tag pool */
 	tagpool_init(&token->tagpool);
 
 	/* if present, invoke the start handler */
-	if (mess_device->io_device.start != NULL)
-		(*mess_device->io_device.start)(device);
+	inner_start = (device_start_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_START);
+	if (inner_start != NULL)
+		(*inner_start)(device);
 }
 
 
@@ -171,10 +173,12 @@ static DEVICE_STOP(mess_device)
 {
 	mess_device_config *mess_device = (mess_device_config *) device->inline_config;
 	mess_device_token *token = (mess_device_token *) device->token;
+	device_stop_func inner_stop;
 
 	/* if present, invoke the stop handler */
-	if (mess_device->io_device.stop != NULL)
-		(*mess_device->io_device.stop)(device);
+	inner_stop = (device_stop_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_STOP);
+	if (inner_stop != NULL)
+		(*inner_stop)(device);
 
 	/* tear down the tag pool */
 	tagpool_exit(&token->tagpool);
@@ -382,9 +386,6 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 
 		mess_device->io_device.reset_on_load		= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_RESET_ON_LOAD) ? 1 : 0;
 		mess_device->io_device.load_at_init			= mess_device_get_info_int(&mess_device->io_device.devclass, MESS_DEVINFO_INT_LOAD_AT_INIT) ? 1 : 0;
-
-		mess_device->io_device.start				= (device_start_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_START);
-		mess_device->io_device.stop					= (device_stop_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_STOP);
 
 		/* determine the dispositions */
 		getdispositions = (device_getdispositions_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_GET_DISPOSITIONS);
