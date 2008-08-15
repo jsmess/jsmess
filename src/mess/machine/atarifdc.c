@@ -138,7 +138,7 @@ DEVICE_IMAGE_LOAD( a800_floppy )
 	{
 		int sector;
 		char buff[256];
-		memset(buff, 0, 256);
+		memset(buff, 0, sizeof(buff));
 		/* default to 720 sectors */
 		for( sector = 0; sector < 720; sector++ )
 			image_fwrite(image, buff, 256);

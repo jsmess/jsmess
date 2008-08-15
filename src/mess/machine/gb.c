@@ -313,8 +313,8 @@ MACHINE_RESET( sgb )
 	gb_sound_w(machine, 0x14,0x77);
 
 	sgb_window_mask = 0;
-	memset( sgb_pal_map, 0, 20*18 );
-	memset( sgb_atf_data, 0, 4050 );
+	memset( sgb_pal_map, 0, sizeof(sgb_pal_map) );
+	memset( sgb_atf_data, 0, sizeof(sgb_atf_data) );
 
 	/* HACKS for Donkey Kong Land 2 + 3.
 	   For some reason that I haven't figured out, they store the tile

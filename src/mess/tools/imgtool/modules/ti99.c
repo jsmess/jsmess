@@ -5293,7 +5293,7 @@ static imgtoolerr_t dsk_image_create(imgtool_image *image, imgtool_stream *f, op
 
 
 	/* now clear every other physrecs, including the FDIR record */
-	memset(empty_sec, 0, 256);
+	memset(empty_sec, 0, sizeof(empty_sec));
 
 	for (i=1; i<totphysrecs; i++)
 		if (write_absolute_physrec(& l1_img, i, empty_sec))

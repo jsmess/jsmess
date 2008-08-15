@@ -63,7 +63,7 @@ DEVICE_IMAGE_CREATE( sasihd )
 	int ret;
 	unsigned char sectordata[256];  // empty block data
 
-	memset(sectordata,0,256);
+	memset(sectordata,0,sizeof(sectordata));
 	for(x=0;x<0x013c98;x++)  // 0x13c98 = number of blocks on a 20MB HD
 	{
 		ret = image_fwrite(image,sectordata,256);
