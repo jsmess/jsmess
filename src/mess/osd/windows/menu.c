@@ -1540,7 +1540,7 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 						break;
 #else
 					case DEVOPTION_CASSETTE_REWIND:
-						cassette_seek(img, +1.0, SEEK_CUR);
+						cassette_seek(img, -1.0, SEEK_CUR);
 						break;
 
 					case DEVOPTION_CASSETTE_FASTFORWARD:
