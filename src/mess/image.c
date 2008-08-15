@@ -38,6 +38,7 @@ struct _image_slot_data
 	image_device_info info;
 
 	/* creation info */
+	const option_guide *create_option_guide;
 	image_device_format *formatlist;
 
 	/* callbacks */
@@ -231,6 +232,9 @@ void image_init(running_machine *machine)
 		slot->unload = (device_image_unload_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_UNLOAD);
 		slot->verify = (device_image_verify_func) device_get_info_fct(slot->dev, DEVINFO_FCT_IMAGE_VERIFY);
 
+		/* creation option guide */
+		slot->create_option_guide = (const option_guide *) device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE);
+
 		/* creation formats */
 		format_count = device_get_info_int(slot->dev, DEVINFO_INT_IMAGE_CREATE_OPTCOUNT);
 		formatptr = &slot->formatlist;
@@ -241,6 +245,7 @@ void image_init(running_machine *machine)
 			memset(format, 0, sizeof(*format));
 
 			/* populate it */
+			format->index		= i;
 			format->name		= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
 			format->description	= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
 			format->extensions	= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
@@ -596,6 +601,19 @@ void image_device_compute_hash(char *dest, const device_config *device,
 ****************************************************************************/
 
 /*-------------------------------------------------
+    image_device_get_creation_option_guide - accesses
+	the creation option guide
+-------------------------------------------------*/
+
+const option_guide *image_device_get_creation_option_guide(const device_config *device)
+{
+	image_slot_data *slot = find_image_slot(device);
+	return slot->create_option_guide;
+}
+
+
+
+/*-------------------------------------------------
     image_device_get_creatable_formats - accesses
 	the image formats available for image creation
 -------------------------------------------------*/
@@ -604,6 +622,38 @@ const image_device_format *image_device_get_creatable_formats(const device_confi
 {
 	image_slot_data *slot = find_image_slot(device);
 	return slot->formatlist;
+}
+
+
+
+/*-------------------------------------------------
+    image_device_get_indexed_creatable_format -
+	accesses a specific image format available for
+	image creation by index 
+-------------------------------------------------*/
+
+const image_device_format *image_device_get_indexed_creatable_format(const device_config *device, int index)
+{
+	const image_device_format *format = image_device_get_creatable_formats(device);
+	while(index-- && (format != NULL))
+		format = format->next;
+	return format;
+}
+
+
+
+/*-------------------------------------------------
+    image_device_get_named_creatable_format -
+	accesses a specific image format available for
+	image creation by name
+-------------------------------------------------*/
+
+const image_device_format *image_device_get_named_creatable_format(const device_config *device, const char *format_name)
+{
+	const image_device_format *format = image_device_get_creatable_formats(device);
+	while((format != NULL) && strcmp(format->name, format_name))
+		format = format->next;
+	return format;
 }
 
 
@@ -1052,9 +1102,10 @@ int image_load(const device_config *image, const char *path)
     image_create - create a MESS image
 -------------------------------------------------*/
 
-int image_create(const device_config *image, const char *path, int create_format, option_resolution *create_args)
+int image_create(const device_config *image, const char *path, const image_device_format *create_format, option_resolution *create_args)
 {
-	return image_load_internal(image, path, TRUE, create_format, create_args);
+	int format_index = (create_format != NULL) ? create_format->index : -1;
+	return image_load_internal(image, path, TRUE, format_index, create_args);
 }
 
 

@@ -212,10 +212,6 @@ struct IODevice
 	/* image handling callbacks */
 	device_start_func start;
 	device_stop_func stop;
-
-	/* image creation options */
-	const option_guide *createimage_optguide;
-	const create_image_options *createimage_options;
 };
 
 /* interoperability with MAME devices */

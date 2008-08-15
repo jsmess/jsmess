@@ -93,6 +93,7 @@ typedef struct _image_device_format image_device_format;
 struct _image_device_format
 {
 	image_device_format *next;
+	int index;
 	const char *name;
 	const char *description;
 	const char *extensions;
@@ -119,6 +120,7 @@ enum
 
 	/* --- the following bits of info are returned as pointers --- */
 	DEVINFO_PTR_IMAGE_FIRST = DEVINFO_PTR_FIRST + 0x7000,
+	DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE,
 	DEVINFO_PTR_IMAGE_CREATE_OPTSPEC,
 
 	/* --- the following bits of info are returned as pointers to functions --- */
@@ -181,7 +183,17 @@ void image_device_compute_hash(char *dest, const device_config *device,
 
 /* ----- creation formats ----- */
 
+/* accesses the creation option guide */
+const option_guide *image_device_get_creation_option_guide(const device_config *device);
+
+/* accesses the image formats available for image creation */
 const image_device_format *image_device_get_creatable_formats(const device_config *device);
+
+/* accesses a specific image format available for image creation by index */
+const image_device_format *image_device_get_indexed_creatable_format(const device_config *device, int index);
+
+/* accesses a specific image format available for image creation by name */
+const image_device_format *image_device_get_named_creatable_format(const device_config *device, const char *format_name);
 
 
 
@@ -195,7 +207,7 @@ const image_device_format *image_device_get_creatable_formats(const device_confi
 
 /* can be called by front ends */
 int image_load(const device_config *img, const char *name);
-int image_create(const device_config *img, const char *name, int create_format, option_resolution *create_args);
+int image_create(const device_config *img, const char *name, const image_device_format *create_format, option_resolution *create_args);
 void image_unload(const device_config *img);
 
 /* used to retrieve error information during image loading */

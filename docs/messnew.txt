@@ -46,6 +46,9 @@ Source Changes:
 - Natural keyboard support is now implemented completely in the MESS core.
   [Nate Woods]
 
+- Moved image creation format code to be based on the new device model.  [Nate
+  Woods]
+
 
 
 0.126
