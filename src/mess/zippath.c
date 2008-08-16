@@ -179,6 +179,78 @@ static int is_zip_file(const char *path)
 
 
 /*-------------------------------------------------
+    is_zip_separator - special check for path
+	separators
+-------------------------------------------------*/
+
+static int is_zip_separator(char c)
+{
+	return (c == '/') || osd_is_path_separator(c);
+}
+
+
+
+/*-------------------------------------------------
+    zippath_find_sub_path - attempts to identify the
+	type of a sub path in a zip file
+-------------------------------------------------*/
+
+const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
+{
+	int i, j;
+	const zip_file_header *header;
+
+	for (header = zip_file_first_file(zipfile); header != NULL; header = zip_file_next_file(zipfile))
+	{
+		/* special case */
+		if (subpath == NULL)
+		{
+			if (type != NULL)
+				*type = ENTTYPE_FILE;
+			return header;
+		}
+
+		i = 0;
+		j = 0;
+		do
+		{
+			while(header->filename[i] == '/')
+				i++;
+			while(is_zip_separator(subpath[j]))
+				j++;
+			while((header->filename[i] != '\0') && (tolower(header->filename[i]) == tolower(subpath[j])))
+			{
+				i++;
+				j++;
+			}
+		}
+		while((header->filename[i] == '/') && is_zip_separator(subpath[j]));
+
+		if (subpath[j] == '\0')
+		{
+			if (header->filename[i] == '\0')
+			{
+				if (type != NULL)
+					*type = ENTTYPE_FILE;
+				return header;
+			}
+			else if ((i == 0) || (header->filename[i] == '/'))
+			{
+				if (type != NULL)
+					*type = ENTTYPE_DIR;
+				return header;
+			}
+		}
+	}
+
+	if (type != NULL)
+		*type = ENTTYPE_NONE;
+	return NULL;
+}
+
+
+
+/*-------------------------------------------------
     zippath_resolve - separates a ZIP path out into
 	true path and ZIP entry components
 -------------------------------------------------*/
@@ -209,20 +281,19 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 
 		/* stat the path */
 		current_entry = osd_stat(astring_c(apath_trimmed));
-		if (current_entry == NULL)
+
+		/* did we find anything? */
+		if (current_entry != NULL)
 		{
-			err = FILERR_FAILURE;
-			goto done;
+			/* get the entry type and free the stat entry */
+			current_entry_type = current_entry->type;
+			free(current_entry);
+			current_entry = NULL;
 		}
-
-		/* get the entry type and free the stat entry */
-		current_entry_type = current_entry->type;
-		free(current_entry);
-		current_entry = NULL;
-
-		/* if we have not found the file or directory, go up */
-		if (current_entry_type == ENTTYPE_NONE)
+		else
 		{
+			/* if we have not found the file or directory, go up */
+			current_entry_type = ENTTYPE_NONE;
 			went_up = TRUE;
 			parent = zippath_parent(astring_alloc(), astring_c(apath));
 			astring_free(apath);
@@ -242,10 +313,14 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 	if ((current_entry_type == ENTTYPE_FILE) && is_zip_file(astring_c(apath_trimmed))
 		&& (zip_file_open(astring_c(apath_trimmed), zipfile) == ZIPERR_NONE))
 	{
-		/* this was a true ZIP path - copy out the sub path */
+		/* this was a true ZIP path - attempt to identify the type of path */
+		zippath_find_sub_path(*zipfile, path + astring_len(apath), &current_entry_type);
+		if (current_entry_type == ENTTYPE_NONE)
+		{
+			err = FILERR_NOT_FOUND;
+			goto done;
+		}
 		astring_cpyc(newpath, path + astring_len(apath));
-		*entry_type = (astring_len(newpath) == 0) || (astring_c(newpath)[astring_len(newpath)-1] == '/')
-			? ENTTYPE_DIR : ENTTYPE_FILE;
 	}
 	else
 	{
@@ -256,10 +331,10 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 			goto done;
 		}
 		astring_cpyc(newpath, path);
-		*entry_type = current_entry_type;
 	}
 
 	/* success! */
+	*entry_type = current_entry_type;
 	err = FILERR_NONE;
 
 done:
@@ -384,6 +459,8 @@ static const char *get_relative_path(zippath_directory *directory, const zip_fil
 		&& !strncmp(astring_c(directory->zipprefix), header->filename, len))
 	{
 		result = &header->filename[len];
+		while(*result == '/')
+			result++;
 	}
 
 	return result;

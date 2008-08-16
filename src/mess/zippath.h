@@ -13,6 +13,7 @@
 
 #include "corefile.h"
 #include "astring.h"
+#include "unzip.h"
 
 
 /***************************************************************************
@@ -27,6 +28,11 @@ typedef struct _zippath_directory zippath_directory;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+
+/* ----- zip support ----- */
+
+/* attempts to identify the	type of a sub path in a zip file */
+const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type);
 
 /* ----- path operations ----- */
 

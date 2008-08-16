@@ -22,6 +22,7 @@
 #include "mamecore.h"
 #include "messopts.h"
 #include "ui.h"
+#include "zippath.h"
 
 
 
@@ -811,18 +812,7 @@ static image_error_t load_zip_path(image_slot_data *image, const char *path)
 	if (ziperr == ZIPERR_NONE)
 	{
 		/* iterate through the zip file */
-		header = zip_file_first_file(zip);
-
-		/* if we specified a zip partial path, find it */
-		if (zip_entry != NULL)
-		{
-			while(header != NULL)
-			{
-				if (!mame_stricmp(header->filename, zip_entry))
-					break;
-				header = zip_file_next_file(zip);
-			}
-		}
+		header = zippath_find_sub_path(zip, zip_entry, NULL);
 
 		/* were we successful? */
 		if (header != NULL)
