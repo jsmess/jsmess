@@ -179,13 +179,25 @@ static int is_zip_file(const char *path)
 
 
 /*-------------------------------------------------
-    is_zip_separator - special check for path
-	separators
+    is_zip_file_separator - returns whether this
+	character is a path separator within a ZIP file
 -------------------------------------------------*/
 
-static int is_zip_separator(char c)
+static int is_zip_file_separator(char c)
 {
-	return (c == '/') || osd_is_path_separator(c);
+	return (c == '/') || (c == '\\');
+}
+
+
+
+/*-------------------------------------------------
+    is_zip_path_separator - returns whether this
+	character is a path separator within a ZIP path
+-------------------------------------------------*/
+
+static int is_zip_path_separator(char c)
+{
+	return is_zip_file_separator(c) || osd_is_path_separator(c);
 }
 
 
@@ -214,9 +226,9 @@ const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subp
 		j = 0;
 		do
 		{
-			while(header->filename[i] == '/')
+			while(is_zip_file_separator(header->filename[i]))
 				i++;
-			while(is_zip_separator(subpath[j]))
+			while(is_zip_path_separator(subpath[j]))
 				j++;
 			while((header->filename[i] != '\0') && (tolower(header->filename[i]) == tolower(subpath[j])))
 			{
@@ -224,7 +236,7 @@ const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subp
 				j++;
 			}
 		}
-		while((header->filename[i] == '/') && is_zip_separator(subpath[j]));
+		while(is_zip_file_separator(header->filename[i]) && is_zip_path_separator(subpath[j]));
 
 		if (subpath[j] == '\0')
 		{
@@ -234,7 +246,7 @@ const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subp
 					*type = ENTTYPE_FILE;
 				return header;
 			}
-			else if ((i == 0) || (header->filename[i] == '/'))
+			else if ((i == 0) || is_zip_file_separator(header->filename[i]))
 			{
 				if (type != NULL)
 					*type = ENTTYPE_DIR;
@@ -459,7 +471,7 @@ static const char *get_relative_path(zippath_directory *directory, const zip_fil
 		&& !strncmp(astring_c(directory->zipprefix), header->filename, len))
 	{
 		result = &header->filename[len];
-		while(*result == '/')
+		while(is_zip_file_separator(*result))
 			result++;
 	}
 
@@ -477,6 +489,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 	const zip_file_header *header;
 	const char *relpath;
 	const char *separator;
+	const char *s;
 	zippath_returned_directory *rdent;
 
 	if (!directory->returned_parent)
@@ -525,7 +538,10 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 			if (relpath != NULL)
 			{
 				/* we've found a ZIP entry; but this may be an entry deep within the target directory */
-				separator = strchr(relpath, '/');
+				for (s = relpath; *s && !is_zip_file_separator(*s); s++)
+					;
+				separator = *s ? s : NULL;
+				
 				if (separator != NULL)
 				{
 					/* a nested entry; loop through returned_dirlist to see if we've returned the parent directory */
