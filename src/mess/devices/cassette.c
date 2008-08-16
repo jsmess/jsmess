@@ -41,10 +41,9 @@ static struct mess_cassetteimg *get_cassimg(const device_config *image)
 
 
 
-static cassette_state get_default_state(const struct IODevice *dev)
+static cassette_state get_default_state(const device_config *dev)
 {
-	assert(dev->type == IO_CASSETTE);
-	return (cassette_state) (int) mess_device_get_info_int(&dev->devclass, MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE);
+	return (cassette_state) (int) mess_device_get_info_int(mess_devclass_from_core_device(dev), MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE);
 }
 
 
@@ -231,13 +230,10 @@ void cassette_seek(const device_config *cassette, double time, int origin)
 
 static DEVICE_START( cassette )
 {
-	const struct IODevice *dev;
-
 	image_alloctag(device, CASSETTE_TAG, sizeof(struct mess_cassetteimg));
 
 	/* set to default state */
-	dev = mess_device_from_core_device(device);
-	get_cassimg(device)->state = get_default_state(dev);
+	get_cassimg(device)->state = get_default_state(device);
 }
 
 
@@ -247,7 +243,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 	casserr_t err;
 	int cassette_flags;
 	struct mess_cassetteimg *tag;
-	const struct IODevice *dev;
+	const mess_device_class *devclass;
 	const struct CassetteFormat **formats;
 	const struct CassetteOptions *create_opts;
 	const char *extension;
@@ -256,13 +252,13 @@ static DEVICE_IMAGE_LOAD( cassette )
 	tag = get_cassimg(image);
 
 	/* figure out the cassette format */
-	dev = mess_device_from_core_device(image);
-	formats = mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_CASSETTE_FORMATS);
+	devclass = mess_devclass_from_core_device(image);
+	formats = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_CASSETTE_FORMATS);
 
 	if (image_has_been_created(image))
 	{
 		/* creating an image */
-		create_opts = (const struct CassetteOptions *) mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_CASSETTE_OPTIONS);
+		create_opts = (const struct CassetteOptions *) mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_CASSETTE_OPTIONS);
 		err = cassette_create((void *) image, &mess_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &tag->cassette);
 		if (err)
 			goto error;
@@ -288,7 +284,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 	}
 
 	/* set to default state, but only change the UI state */
-	cassette_change_state(image, get_default_state(dev), CASSETTE_MASK_UISTATE);
+	cassette_change_state(image, get_default_state(image), CASSETTE_MASK_UISTATE);
 
 	/* reset the position */
 	tag->position = 0.0;

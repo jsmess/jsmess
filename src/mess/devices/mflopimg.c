@@ -269,7 +269,7 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 {
 	floperr_t err;
 	mess_flopimg *flopimg;
-	const struct IODevice *dev;
+	const mess_device_class *devclass;
 	const struct FloppyFormat *floppy_options;
 	int floppy_flags, i;
 	const char *extension;
@@ -279,8 +279,8 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 	flopimg = get_flopimg(image);
 
 	/* figure out the floppy options */
-	dev = mess_device_from_core_device(image);
-	floppy_options = mess_device_get_info_ptr(&dev->devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
+	devclass = mess_devclass_from_core_device(image);
+	floppy_options = mess_device_get_info_ptr(devclass, MESS_DEVINFO_PTR_FLOPPY_OPTIONS);
 
 	if (image_has_been_created(image))
 	{
@@ -308,7 +308,7 @@ static int internal_floppy_device_load(const device_config *image, int create_fo
 	   apply double steps. Setting the track count of the drive to the 
 	   medium track count will then lead to unreachable tracks.
 	*/
-	keep_geometry = (int)mess_device_get_info_int(&mess_device_from_core_device(image)->devclass, MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY);
+	keep_geometry = (int)mess_device_get_info_int(mess_devclass_from_core_device(image), MESS_DEVINFO_INT_KEEP_DRIVE_GEOMETRY);
 
 	if (!keep_geometry 
             && floppy_callbacks(flopimg->floppy)->get_heads_per_disk

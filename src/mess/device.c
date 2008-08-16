@@ -29,6 +29,30 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+struct IODevice
+{
+	mess_device_class devclass;
+	const device_config *devconfig;
+
+	/* the basics */
+	const char *tag;
+	iodevice_t type;
+	int position;
+	int index_in_device;
+
+	/* open dispositions */
+	unsigned int readable : 1;
+	unsigned int writeable : 1;
+	unsigned int creatable : 1;
+
+	/* miscellaneous flags */
+	unsigned int reset_on_load : 1;
+	unsigned int load_at_init : 1;
+	unsigned int multiple : 1;
+};
+
+
+
 /* this is placed in the inline_config of the MAME device structure */
 typedef struct _mess_device_config mess_device_config;
 struct _mess_device_config
@@ -475,6 +499,14 @@ const struct IODevice *mess_device_from_core_device(const device_config *device)
 {
 	const mess_device_config *mess_device = (device != NULL) ? (const mess_device_config *) device->inline_config : NULL;
 	return (mess_device != NULL) ? &mess_device->io_device : NULL;
+}
+
+
+
+const mess_device_class *mess_devclass_from_core_device(const device_config *device)
+{
+	const struct IODevice *iodev = mess_device_from_core_device(device);
+	return (iodev != NULL) ? &iodev->devclass : NULL;
 }
 
 

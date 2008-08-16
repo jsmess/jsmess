@@ -188,32 +188,11 @@ struct _create_image_options
 	const char *optspec;
 };
 
-struct IODevice
-{
-	mess_device_class devclass;
-	const device_config *devconfig;
-
-	/* the basics */
-	const char *tag;
-	iodevice_t type;
-	int position;
-	int index_in_device;
-
-	/* open dispositions */
-	unsigned int readable : 1;
-	unsigned int writeable : 1;
-	unsigned int creatable : 1;
-
-	/* miscellaneous flags */
-	unsigned int reset_on_load : 1;
-	unsigned int load_at_init : 1;
-	unsigned int multiple : 1;
-};
-
 /* interoperability with MAME devices */
 DEVICE_GET_INFO(mess_device);
 struct _machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedrv);
 const struct IODevice *mess_device_from_core_device(const device_config *device);
+const mess_device_class *mess_devclass_from_core_device(const device_config *device);
 
 /* device naming */
 const char *device_uiname(iodevice_t devtype);

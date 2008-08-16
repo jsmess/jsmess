@@ -639,7 +639,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 	BOOL bSuccess;
 	int nCount;
 	BOOL bDone = FALSE;
-	iodevice_t type;
+	image_device_info info;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
@@ -688,8 +688,8 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		pFileInfo = pPickerInfo->file_index[pPickerInfo->current_position];
 		if (!pFileInfo->hash_realized)
 		{
-			type = mess_device_from_core_device(pFileInfo->device)->type;
-			if (hashfile_functions_used(pPickerInfo->config->hashfile, type))
+			info = image_device_getinfo(pPickerInfo->config->mconfig, pFileInfo->device);
+			if (hashfile_functions_used(pPickerInfo->config->hashfile, info.type))
 			{
 				// only calculate the hash if it is appropriate for this device
 				if (!SoftwarePicker_CalculateHash(hwndPicker, pPickerInfo->current_position))
