@@ -108,6 +108,14 @@ static const mess_device_type_info device_info_array[] =
 
 
 /***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static const struct IODevice *mess_device_from_core_device(const device_config *device);
+
+
+
+/***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
 
@@ -495,7 +503,7 @@ machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedr
  *
  *************************************/
 
-const struct IODevice *mess_device_from_core_device(const device_config *device)
+static const struct IODevice *mess_device_from_core_device(const device_config *device)
 {
 	const mess_device_config *mess_device = (device != NULL) ? (const mess_device_config *) device->inline_config : NULL;
 	return (mess_device != NULL) ? &mess_device->io_device : NULL;
@@ -610,13 +618,6 @@ int image_index_in_device(const device_config *image)
 	const struct IODevice *iodev = mess_device_from_core_device(image);
 	assert(iodev != NULL);
 	return iodev->index_in_device;
-}
-
-
-
-const device_config *image_from_device(const struct IODevice *device)
-{
-	return device->devconfig;
 }
 
 

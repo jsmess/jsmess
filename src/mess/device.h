@@ -83,10 +83,7 @@ enum
 };
 
 
-struct IODevice;
-
 typedef void (*device_getdispositions_func)(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
-typedef const char *(*device_getname_func)(const struct IODevice *dev, int id, char *buf, size_t bufsize);
 
 struct _mess_device_class;
 struct _machine_config;
@@ -110,7 +107,6 @@ union devinfo
 	device_getdispositions_func getdispositions;
 
 	device_display_func display;
-	device_getname_func name;
 
 	int (*validity_check)(const struct _mess_device_class *devclass);
 };
@@ -191,7 +187,6 @@ struct _create_image_options
 /* interoperability with MAME devices */
 DEVICE_GET_INFO(mess_device);
 struct _machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedrv);
-const struct IODevice *mess_device_from_core_device(const device_config *device);
 const mess_device_class *mess_devclass_from_core_device(const device_config *device);
 
 /* device naming */
@@ -216,7 +211,6 @@ void *image_lookuptag(const device_config *device, const char *tag);
 
 /* deprecated device access functions */
 int image_index_in_device(const device_config *device);
-const device_config *image_from_device(const struct IODevice *iodev);
 const device_config *image_from_devtag_and_index(running_machine *machine, const char *devtag, int id);
 
 /* deprecated device access functions that assume one device of any given type */
