@@ -1094,7 +1094,7 @@ int image_load(const device_config *image, const char *path)
 
 int image_create(const device_config *image, const char *path, const image_device_format *create_format, option_resolution *create_args)
 {
-	int format_index = (create_format != NULL) ? create_format->index : -1;
+	int format_index = (create_format != NULL) ? create_format->index : 0;
 	return image_load_internal(image, path, TRUE, format_index, create_args);
 }
 
