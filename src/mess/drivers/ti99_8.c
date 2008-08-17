@@ -641,7 +641,7 @@ static SYSTEM_CONFIG_START(ti99_8)
 #if 1
 	CONFIG_DEVICE(ti99_8_floppy_getinfo)
 	CONFIG_DEVICE(ti99_8_harddisk_getinfo)
-//	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)	/* save state error if both hard drives enabled */
+	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)
 	CONFIG_DEVICE(ti99_8_parallel_getinfo)
 	CONFIG_DEVICE(ti99_8_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/

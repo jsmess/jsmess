@@ -933,7 +933,7 @@ static SYSTEM_CONFIG_START(ti99_4)
 	CONFIG_DEVICE(ti99_4_cartslot_getinfo)
 	CONFIG_DEVICE(ti99_4_floppy_getinfo)
 	CONFIG_DEVICE(ti99_4_harddisk_getinfo)
-//	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)	/* causes a save state error */
+	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)
 	CONFIG_DEVICE(ti99_4_parallel_getinfo)
 	CONFIG_DEVICE(ti99_4_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_4_quickload_getinfo)*/

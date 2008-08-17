@@ -448,7 +448,7 @@ static SYSTEM_CONFIG_START(ti99_4p)
 	CONFIG_DEVICE(ti99_4p_floppy_getinfo)
 	CONFIG_DEVICE(ti99_4p_floppy_getinfo)
 	CONFIG_DEVICE(ti99_4p_harddisk_getinfo)
-//	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)
+	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)
 	CONFIG_DEVICE(ti99_4p_parallel_getinfo)
 	CONFIG_DEVICE(ti99_4p_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_4p_quickload_getinfo)*/
