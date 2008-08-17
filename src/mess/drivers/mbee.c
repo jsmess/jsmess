@@ -41,8 +41,7 @@
 
 
     These early colour computers have a PROM to create the foreground palette.
-	This PROM (82s123.ic7) is undumped, therefore the colours assigned are
-	an educated guess. Some information was obtained from magazines.
+	This PROM (82s123.ic7) is now dumped, but not yet merged into the code.
 
 ***************************************************************************/
 
@@ -414,7 +413,7 @@ ROM_START( mbeeic )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, NO_DUMP )	/* <-- needed colour prom */
+	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020, 0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 ROM_END
 
@@ -427,7 +426,7 @@ ROM_START( mbeepc85 )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, NO_DUMP )	/* <-- needed colour prom */
+	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020, 0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 ROM_END
 
@@ -441,7 +440,7 @@ ROM_START( mbeepc )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, NO_DUMP )	/* <-- needed colour prom */
+	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020, 0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 ROM_END
 
@@ -452,7 +451,7 @@ ROM_START( mbee56 )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, NO_DUMP )	/* <-- needed colour prom */
+	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020, 0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
 ROM_END
 
