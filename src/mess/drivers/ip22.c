@@ -1549,18 +1549,6 @@ static const mips3_config config =
 	32768	/* data cache size */
 };
 
-static void ip22_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* CHD CD-ROM */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default: cdrom_device_getinfo(devclass, state, info); break;
-	}
-}
-
 #ifdef UNUSED_FUNCTION
 static void ip22_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -1607,6 +1595,8 @@ static MACHINE_DRIVER_START( ip225015 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD( "cdda",  CDDA, 0 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ip224613 )
@@ -1635,7 +1625,6 @@ ROM_START( ip244415 )
 ROM_END
 
 static SYSTEM_CONFIG_START( ip225015 )
-	CONFIG_DEVICE(ip22_chdcd_getinfo)
 //  CONFIG_DEVICE(ip22_harddisk_getinfo)
 SYSTEM_CONFIG_END
 

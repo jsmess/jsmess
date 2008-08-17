@@ -196,6 +196,15 @@ INPUT_PORTS_END
   Machine drivers
 ***************************************************************************/
 
+static MACHINE_RESET( cdtv )
+{
+	MACHINE_RESET_CALL( amiga );
+
+	/* initialize the cdrom controller */
+	amigacd_init( machine );
+}
+
+
 static const custom_sound_interface amiga_custom_interface =
 {
 	amiga_sh_start
@@ -242,11 +251,15 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CPU_REPLACE("main", M68000, CDTV_CLOCK_X1 / 4)
 	MDRV_CPU_PROGRAM_MAP(cdtv_mem, 0)
 
+	MDRV_MACHINE_RESET( cdtv )
+
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+
+	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000n )
@@ -462,9 +475,6 @@ static DRIVER_INIT( cdtv )
 
 	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
 	amigakbd_init();
-
-	/* initialize the cdrom controller */
-	amigacd_init();
 }
 
 /***************************************************************************
@@ -528,22 +538,6 @@ static SYSTEM_CONFIG_START(a1000)
 	CONFIG_DEVICE(amiga_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-static void cdtv_cd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* CHD CD-ROM */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default: cdrom_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(cdtv)
-	CONFIG_DEVICE(cdtv_cd_getinfo)
-SYSTEM_CONFIG_END
-
 /***************************************************************************
   Game drivers
 ***************************************************************************/
@@ -553,4 +547,4 @@ COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  a1000,  "Commodore B
 COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  a1000,  "Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
 COMP( 1987, a500n,  0,      0,      ntsc,   amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
 COMP( 1987, a500p,  a500n,  0,      pal,    amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
-COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv,   cdtv,   cdtv,   "Commodore Business Machines Co.",  "CDTV (NTSC)",           GAME_IMPERFECT_GRAPHICS )
+COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv,   cdtv,   0,      "Commodore Business Machines Co.",  "CDTV (NTSC)",           GAME_IMPERFECT_GRAPHICS )

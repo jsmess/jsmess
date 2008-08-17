@@ -2179,7 +2179,7 @@ static MACHINE_RESET( saturn )
 	cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
 	cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
 
-	stvcd_reset();
+	stvcd_reset( machine );
 }
 
 static const gfx_layout tiles8x8x4_layout =
@@ -2325,6 +2325,8 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_SOUND_CONFIG(saturn_scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
 
 
@@ -2382,20 +2384,7 @@ ROM_START(hisaturn)
 ROM_END
 
 
-static void saturn_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* CHD CD-ROM */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default: cdrom_device_getinfo(devclass, state, info);
-	}
-}
-
 static SYSTEM_CONFIG_START( saturn )
-	CONFIG_DEVICE(saturn_chdcd_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

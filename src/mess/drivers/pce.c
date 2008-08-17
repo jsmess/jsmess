@@ -177,6 +177,8 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
+
+	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx )
@@ -247,16 +249,9 @@ static void pce_cartslot_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void pce_chdcd_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
-	switch( state ) {
-	case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
-	default:						cdrom_device_getinfo(devclass, state, info);
-	}
-}
 
 static SYSTEM_CONFIG_START(pce)
 	CONFIG_DEVICE(pce_cartslot_getinfo)
-	CONFIG_DEVICE(pce_chdcd_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************

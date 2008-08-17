@@ -94,14 +94,10 @@ static int joystick_port_select;        /* internal index of joystick ports */
 static int joystick_data_select;        /* which nibble of joystick data we want */
 
 /* prototypes */
-static void pce_cd_init( void );
+static void pce_cd_init( running_machine *machine );
 static void pce_cd_set_irq_line( running_machine *machine, int num, int state );
 static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
 
-
-static const device_config *cdrom_device_image( void ) {
-	return image_from_devtype_and_index( IO_CDROM, 0 );
-}
 
 static WRITE8_HANDLER( pce_sf2_banking_w ) {
 	memory_set_bankptr( 2, memory_region(machine, "user1") + offset * 0x080000 + 0x080000 );
@@ -238,7 +234,7 @@ DRIVER_INIT( sgx ) {
 }
 
 MACHINE_RESET( pce ) {
-	pce_cd_init();
+	pce_cd_init( machine );
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -517,16 +513,15 @@ static void pce_cd_nec_get_subq( void ) {
 /* 0xDE - GET DIR INFO (NEC) */
 static void pce_cd_nec_get_dir_info( void ) {
 	UINT32 frame, msf, track = 0;
-	const device_config *img = cdrom_device_image();
 	const cdrom_toc	*toc;
 	logerror("nec get dir info\n");
 
-	if ( ! image_exists( img ) ) {
+	if ( ! pce_cd.cd ) {
 		/* Throw some error here */
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 	}
 
-	toc = cdrom_get_toc( mess_cd_get_cdrom_file(img) );
+	toc = cdrom_get_toc( pce_cd.cd );
 
 	switch( pce_cd.command_buffer[1] ) {
 	case 0x00:		/* Get first and last track numbers */
@@ -795,7 +790,9 @@ static TIMER_CALLBACK( pce_cd_data_timer_callback ) {
 	}
 }
 
-static void pce_cd_init( void ) {
+static void pce_cd_init( running_machine *machine ) {
+	const device_config *device;
+
 	/* Initialize pce_cd struct */
 	memset( &pce_cd, 0, sizeof(pce_cd) );
 
@@ -823,13 +820,18 @@ static void pce_cd_init( void ) {
 
 	pce_cd.subcode_buffer = auto_malloc( 96 );
 
-	pce_cd.cd = mess_cd_get_cdrom_file_by_number( 0 );
-	if ( pce_cd.cd ) {
-		pce_cd.toc = cdrom_get_toc( pce_cd.cd );
-		cdda_set_cdrom( 0, pce_cd.cd );
-		pce_cd.last_frame = cdrom_get_track_start( pce_cd.cd, cdrom_get_last_track( pce_cd.cd ) - 1 );
-		pce_cd.last_frame += pce_cd.toc->tracks[ cdrom_get_last_track( pce_cd.cd ) - 1 ].frames;
-		pce_cd.end_frame = pce_cd.last_frame;
+	device = device_list_find_by_tag(machine->config->devicelist, CDROM, "cdrom" );
+	if ( device )
+	{
+		pce_cd.cd = mess_cd_get_cdrom_file(device);
+		if ( pce_cd.cd )
+		{
+			pce_cd.toc = cdrom_get_toc( pce_cd.cd );
+			cdda_set_cdrom( 0, pce_cd.cd );
+			pce_cd.last_frame = cdrom_get_track_start( pce_cd.cd, cdrom_get_last_track( pce_cd.cd ) - 1 );
+			pce_cd.last_frame += pce_cd.toc->tracks[ cdrom_get_last_track( pce_cd.cd ) - 1 ].frames;
+			pce_cd.end_frame = pce_cd.last_frame;
+		}
 	}
 
 	pce_cd.data_timer = timer_alloc( pce_cd_data_timer_callback , NULL);

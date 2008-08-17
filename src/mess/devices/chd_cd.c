@@ -12,8 +12,6 @@
 #include "chd_cd.h"
 
 
-#define MAX_CDROMS	(4)	// up to this many drives
-
 static const char *const error_strings[] =
 {
 	"no error",
@@ -40,7 +38,6 @@ static const char *const error_strings[] =
 	"unsupported CHD version"
 };
 
-static cdrom_file *drive_handles[MAX_CDROMS];
 
 static const char *chd_get_error_string(int chderr)
 {
@@ -48,7 +45,6 @@ static const char *chd_get_error_string(int chderr)
 		return NULL;
 	return error_strings[chderr];
 }
-
 
 
 static OPTION_GUIDE_START(mess_cd_option_guide)
@@ -59,116 +55,63 @@ static const char mess_cd_option_spec[] =
 	"K512/1024/2048/[4096]";
 
 
-#define MESSCDTAG "mess_cd"
-
-struct mess_cd
+typedef struct _dev_cdrom_t	dev_cdrom_t;
+struct _dev_cdrom_t
 {
-	cdrom_file *cdrom_handle;
+	cdrom_file	*cdrom_handle;
 };
 
-static struct mess_cd *get_drive(const device_config *img)
-{
-	return image_lookuptag(img, MESSCDTAG);
+
+INLINE dev_cdrom_t *get_safe_token(const device_config *device) {
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( ( device->type == DEVICE_GET_INFO_NAME(cdrom) ) );
+	return (dev_cdrom_t *)  device->token;
 }
 
 
-
-/*************************************
- *
- *  chdcd_create_ref()/chdcd_open_ref()
- *
- *  These are a set of wrappers that wrap the chd_open()
- *  and chd_create() functions to provide a way to open
- *  the images with a filename.  This is just a stopgap
- *  measure until I get the core CHD code changed.  For
- *  now, this is an ugly hack but it works very well
- *
- *  When these functions get moved into the core, it will
- *  remove the need to specify an 'open' function in the
- *  CHD interface
- *
- *************************************/
-
-/*************************************
- *
- *	DEVICE_START_NAME(mess_cd)
- *
- *	Device init
- *
- *************************************/
-
-static DEVICE_START( mess_cd )
+cdrom_file *mess_cd_get_cdrom_file_by_number(const char *diskregion)
 {
-	struct mess_cd *cd;
-	cd = image_alloctag(device, MESSCDTAG, sizeof(struct mess_cd));
-	cd->cdrom_handle = NULL;
+	const device_config *device;
+	device = device_list_find_by_tag(Machine->config->devicelist, DEVICE_TYPE_WILDCARD, diskregion);
+	return mess_cd_get_cdrom_file(device);
 }
 
 
-
-/*************************************
- *
- *	DEVICE_IMAGE_LOAD_NAME(mess_cd)
- *
- *	Device load
- *
- *************************************/
-
-static int internal_load_mess_cd(const device_config *image, const char *metadata)
+static DEVICE_IMAGE_LOAD(cdrom)
 {
-	chd_error err = 0;
-	struct mess_cd *cd;
-	chd_file *chd;
-	int id = image_index_in_device(image);
+	dev_cdrom_t	*cdrom = get_safe_token(image);
+	chd_error	err = 0;
+	chd_file	*chd = NULL;
 
-	cd = get_drive(image);
+	err = chd_open_file( image_core_file( image ), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
+	if ( err )
+		goto error;
 
 	/* open the CHD file */
-	err = chd_open_file(image_core_file(image), CHD_OPEN_READ, NULL, &chd);	/* CDs are never writable */
-	if (err)
+	cdrom->cdrom_handle = cdrom_open( chd );
+	if ( ! cdrom->cdrom_handle )
 		goto error;
 
-	/* open the CD-ROM file */
-	cd->cdrom_handle = cdrom_open(chd);
-	if (!cd->cdrom_handle)
-		goto error;
-
-	drive_handles[id] = cd->cdrom_handle;
 	return INIT_PASS;
 
 error:
-	if (chd)
-		chd_close(chd);
-	if (err)
-		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
+	if ( chd )
+		chd_close( chd );
+	if ( err )
+		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, chd_get_error_string( err ) );
 	return INIT_FAIL;
 }
 
 
-
-static DEVICE_IMAGE_LOAD( mess_cd )
+static DEVICE_IMAGE_UNLOAD(cdrom)
 {
-	return internal_load_mess_cd(image, NULL);
+	dev_cdrom_t	*cdrom = get_safe_token( image );
+
+	assert( cdrom->cdrom_handle );
+	cdrom_close( cdrom->cdrom_handle );
+	cdrom->cdrom_handle = NULL;
 }
-
-
-
-/*************************************
- *
- *	DEVICE_IMAGE_UNLOAD_NAME(mess_cd)
- *
- *	Device unload
- *
- *************************************/
-
-static DEVICE_IMAGE_UNLOAD( mess_cd )
-{
-	struct mess_cd *cd = get_drive(image);
-	assert(cd->cdrom_handle);
-	cdrom_close(cd->cdrom_handle);
-	cd->cdrom_handle = NULL;
-}
-
 
 
 /*************************************
@@ -180,62 +123,57 @@ static DEVICE_IMAGE_UNLOAD( mess_cd )
 
 cdrom_file *mess_cd_get_cdrom_file(const device_config *image)
 {
-	struct mess_cd *cd = get_drive(image);
-	return cd->cdrom_handle;
+	dev_cdrom_t	*cdrom = get_safe_token( image );
+
+	return cdrom->cdrom_handle;
 }
 
 
+/*-------------------------------------------------
+    DEVICE_START(cdrom)
+-------------------------------------------------*/
 
-/*************************************
- *
- *	Get the MESS/MAME CHD file (from the src/chd.c core)
- *  after an image has been opened with the mess_cd core
- *
- *************************************/
-
-chd_file *mess_cd_get_chd_file(const device_config *image)
+static DEVICE_START(cdrom)
 {
-	return NULL;	// not supported by the src/cdrom.c core at this time
+	dev_cdrom_t	*cdrom = get_safe_token( device );
+
+	cdrom->cdrom_handle = NULL;
 }
 
 
+/*-------------------------------------------------
+    DEVICE_GET_INFO(cdrom)
+-------------------------------------------------*/
 
-/*************************************
- *
- *	Device specification function
- *
- *************************************/
-
-void cdrom_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+DEVICE_GET_INFO(cdrom)
 {
-	switch(state)
+	switch( state )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:						info->i = IO_CDROM; break;
-		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:					info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:			info->i = 1; break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(dev_cdrom_t); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0; break;
+		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL; break;
+		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_CDROM; break;
+		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 0; break;
+		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(mess_cd); break;
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(mess_cd); break;
-		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(mess_cd); break;
-		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_cd_option_guide; break;
-		case MESS_DEVINFO_PTR_CREATE_OPTSPEC+0:			info->p = (void *) mess_cd_option_spec;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cdrom); break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cdrom); break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cdrom); break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *) mess_cd_option_guide; break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) mess_cd_option_spec; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "chd"); break;
-		case MESS_DEVINFO_STR_CREATE_OPTNAME+0:			strcpy(info->s = device_temp_str(), "chdcd"); break;
-		case MESS_DEVINFO_STR_CREATE_OPTDESC+0:			strcpy(info->s = device_temp_str(), "MAME/MESS CHD CD-ROM drive"); break;
-		case MESS_DEVINFO_STR_CREATE_OPTEXTS+0:			strcpy(info->s = device_temp_str(), "chd"); break;
+		case DEVINFO_STR_NAME:						info->s = "Cdrom"; break;
+		case DEVINFO_STR_FAMILY:					info->s = "Cdrom"; break;
+		case DEVINFO_STR_SOURCE_FILE:				info->s = __FILE__; break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		info->s = "chd"; break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	info->s = "chdcd"; break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	info->s = "MAME/MESS CHD CD-ROM drive"; break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	info->s = "chd"; break;
 	}
 }
 
-cdrom_file *mess_cd_get_cdrom_file_by_number(const char *diskregion)
-{
-	const device_config *device;
-	device = device_list_find_by_tag(Machine->config->devicelist, DEVICE_TYPE_WILDCARD, diskregion);
-	return mess_cd_get_cdrom_file(device);
-}

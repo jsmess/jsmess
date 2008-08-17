@@ -95,17 +95,21 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "includes/3do.h"
 #include "devices/chd_cd.h"
 
+
 /* The 3DO has an ARM6 core which is a bit different from the current
    ARM cpu cores. This define 'hack' can be removed once the ARM6 core
    is fully supported. */
 #define CPU_ARM6	CPU_ARM7
 
+
 #define X2_CLOCK_PAL	59000000
 #define X2_CLOCK_NTSC	49090000
 #define X601_CLOCK		XTAL_16_9344MHz
 
+
 static UINT32	*dram;
 static UINT32	*vram;
+
 
 static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK(1) AM_BASE(&dram)					/* DRAM */
@@ -117,6 +121,7 @@ static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(madam_r, madam_w)					/* address decoder */
 	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(clio_r, clio_w)					/* io controller */
 ADDRESS_MAP_END
+
 
 static MACHINE_RESET( 3do )
 {
@@ -133,6 +138,7 @@ static MACHINE_RESET( 3do )
 	clio_init();
 }
 
+
 static MACHINE_DRIVER_START( 3do )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "main", ARM6, XTAL_50MHz/4 )
@@ -148,7 +154,10 @@ static MACHINE_DRIVER_START( 3do )
 	MDRV_SCREEN_SIZE( 640, 525 )
 	MDRV_SCREEN_VISIBLE_AREA( 0,639,0,479 )
 	MDRV_SCREEN_REFRESH_RATE( 60 )
+
+	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( 3do_pal )
 	/* Basic machine hardware */
@@ -165,7 +174,10 @@ static MACHINE_DRIVER_START( 3do_pal )
 	MDRV_SCREEN_SIZE( 640, 625 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 	MDRV_SCREEN_REFRESH_RATE( 50 )
+
+	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
+
 
 ROM_START(3do)
 	ROM_REGION32_BE( 0x100000, "user1", 0 )
@@ -181,6 +193,7 @@ ROM_START(3do)
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, NO_DUMP, ROM_BIOS(5) )
 ROM_END
 
+
 ROM_START(3do_pal)
     ROM_REGION32_BE( 0x100000, "user1", 0 )
     ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
@@ -191,17 +204,6 @@ ROM_START(3do_pal)
     ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, NO_DUMP, ROM_BIOS(3) )
 ROM_END
 
-static void chdcd_3do_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
-	/* CHD CD-ROM */
-	switch( state ) {
-	case MESS_DEVINFO_INT_COUNT:		info->i = 1; break;
-	default:			cdrom_device_getinfo( devclass, state, info ); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( 3do )
-	CONFIG_DEVICE( chdcd_3do_getinfo )
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -210,5 +212,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME        FLAGS */
-CONS( 1991, 3do,        0,      0,      3do,        0,    	0,      3do,    "3DO",  "3DO",          GAME_NOT_WORKING )
-CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    0,    	0,      3do,    "3DO",  "3DO (PAL)",    GAME_NOT_WORKING )
+CONS( 1991, 3do,        0,      0,      3do,        0,    	0,      0,      "3DO",  "3DO",          GAME_NOT_WORKING )
+CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    0,    	0,      0,      "3DO",  "3DO (PAL)",    GAME_NOT_WORKING )

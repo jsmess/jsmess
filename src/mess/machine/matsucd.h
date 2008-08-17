@@ -5,7 +5,8 @@
 ***************************************************************************/
 
 /* initialization */
-extern void matsucd_init( void );
+void matsucd_init( const device_config *cdrom_device );
+
 
 /* signaling */
 extern void matsucd_enable_w( int level );	/* /ENABLE pin */

@@ -133,6 +133,8 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( bebox )
+
+	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bebox2 )
@@ -174,18 +176,6 @@ static void bebox_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void bebox_cdrom_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cdrom */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cdrom_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void bebox_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
@@ -203,7 +193,6 @@ static SYSTEM_CONFIG_START(bebox)
 	CONFIG_RAM(16 * 1024 * 1024)
 	CONFIG_RAM_DEFAULT(32 * 1024 * 1024)
 	CONFIG_DEVICE(bebox_floppy_getinfo)
-	CONFIG_DEVICE(bebox_cdrom_getinfo)
 	CONFIG_DEVICE(bebox_harddisk_getinfo)
 SYSTEM_CONFIG_END
 
