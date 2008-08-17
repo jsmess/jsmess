@@ -26,7 +26,11 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ITEMREF_CREATE	((void *) 0x0001)
+#define ENABLE_FORMATS			0
+
+#define ITEMREF_NEW_IMAGE_NAME	((void *) 0x0001)
+#define ITEMREF_CREATE			((void *) 0x0002)
+#define ITEMREF_FORMAT			((void *) 0x0003)
 
 
 
@@ -86,6 +90,7 @@ typedef struct _file_create_menu_state file_create_menu_state;
 struct _file_create_menu_state
 {
 	file_manager_menu_state *manager_menustate;
+	const image_device_format *current_format;
 	char filename_buffer[1024];
 };
 
@@ -218,20 +223,11 @@ static int is_valid_filename_char(unicode_char unichar)
 
 static void file_create_render_extra(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	astring *buffer;
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 
-	buffer = astring_assemble_4(astring_alloc(),
-		astring_c(menustate->manager_menustate->current_directory),
-		"\nNew Image Name: ",
-		menustate->filename_buffer,
-		"_");
-
 	extra_text_render(machine, menu, state, selectedref, top, bottom, origx1, origy1, origx2, origy2,
-		astring_c(buffer),
+		astring_c(menustate->manager_menustate->current_directory),
 		NULL);
-
-	astring_free(buffer);
 }
 
 
@@ -241,13 +237,47 @@ static void file_create_render_extra(running_machine *machine, ui_menu *menu, vo
 	creator menu
 -------------------------------------------------*/
 
-static void menu_file_create_populate(running_machine *machine, ui_menu *menu)
+static void menu_file_create_populate(running_machine *machine, ui_menu *menu, void *state)
 {
-	/* append menu items */
+	astring *buffer = astring_alloc();
+	file_create_menu_state *menustate = (file_create_menu_state *) state;
+	const device_config *device = menustate->manager_menustate->selected_device;
+	const image_device_format *format;
+	const char *new_image_name;
+	void *selection;
+
+	/* identify the selection */
+	selection = ui_menu_get_selection(menu);
+
+	/* append the "New Image Name" item */
+	if (selection == ITEMREF_NEW_IMAGE_NAME)
+	{
+		astring_assemble_2(buffer, menustate->filename_buffer, "_");
+		new_image_name = astring_c(buffer);
+	}
+	else
+	{
+		new_image_name = menustate->filename_buffer;
+	}
+	ui_menu_item_append(menu, "New Image Name:", new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
+
+	/* do we support multiple formats? */
+	format = image_device_get_creatable_formats(device);
+	if (ENABLE_FORMATS && (format != NULL))
+	{
+		ui_menu_item_append(menu, "Image Format:", menustate->current_format->description, 0, ITEMREF_FORMAT);
+		menustate->current_format = format;
+	}
+
+	/* finish up the menu */
+	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	ui_menu_item_append(menu, "Create", NULL, 0, ITEMREF_CREATE);
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_create_render_extra, (ui_get_line_height() * 2) + 3.0f * UI_BOX_TB_BORDER, 0);
+	ui_menu_set_custom_render(menu, file_create_render_extra, ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER, 0);
+
+	/* cleanup */
+	astring_free(buffer);
 }
 
 
@@ -262,9 +292,9 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 	const ui_menu_event *event;
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 
-	/* if the menu isn't built, populate now */
-	if (!ui_menu_populated(menu))
-		menu_file_create_populate(machine, menu);
+	/* rebuild the menu */
+	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
+	menu_file_create_populate(machine, menu, state);
 
 	/* process the menu */
 	event = ui_menu_process(menu, 0);
@@ -293,11 +323,14 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 				break;
 
 			case IPT_SPECIAL:
-				input_character(
-					menustate->filename_buffer,
-					ARRAY_LENGTH(menustate->filename_buffer),
-					event->unichar,
-					is_valid_filename_char);
+				if (ui_menu_get_selection(menu) == ITEMREF_NEW_IMAGE_NAME)
+				{
+					input_character(
+						menustate->filename_buffer,
+						ARRAY_LENGTH(menustate->filename_buffer),
+						event->unichar,
+						is_valid_filename_char);
+				}
 				break;
 		}
 	}
