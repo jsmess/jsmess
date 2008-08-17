@@ -547,7 +547,7 @@ ROM_START(bbcb)
 
 ROM_END
 
-
+#ifdef UNUSED_DEFINITION
 ROM_START(bbcbcsw)
 	ROM_REGION(0x08000,"main",ROMREGION_ERASEFF) /* RAM */
 
@@ -596,7 +596,7 @@ ROM_START(bbcbcsw)
 	ROM_REGION(0x80000, "disks", ROMREGION_ERASEFF) /* Opus Ram Disc Space */
 
 ROM_END
-
+#endif
 
 ROM_START(bbcbp)
 	ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* ROM MEMORY */

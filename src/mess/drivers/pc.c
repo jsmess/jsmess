@@ -2165,6 +2165,7 @@ ROM_START( ibmpcjr )
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
 
+#ifdef UNUSED_DEFINITION
 ROM_START( t1000 )
 	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
@@ -2200,6 +2201,7 @@ ROM_START( t1000ex )
 	// expects 8x9 charset!
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
+#endif
 
 ROM_START( t1000hx )
 	ROM_REGION(0x100000,"main", 0)
@@ -2212,6 +2214,7 @@ ROM_START( t1000hx )
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
 
+#ifdef UNUSED_DEFINITION
 ROM_START( t1000sl )
 	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
@@ -2240,6 +2243,7 @@ ROM_START( t1000sl2 )
 	// expects 8x9 charset!
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
+#endif
 
 ROM_START( t1000sx )
 	ROM_REGION(0x100000,"main", 0)
@@ -2252,6 +2256,7 @@ ROM_START( t1000sx )
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
 
+#ifdef UNUSED_DEFINITION
 ROM_START( t1000rl )
 	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))	// not sure about this one
@@ -2265,6 +2270,7 @@ ROM_START( t1000rl )
 	// expects 8x9 charset!
 	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
+#endif
 
 ROM_START( ibm5160 )
 	ROM_REGION16_LE(0x100000,"main", 0)
