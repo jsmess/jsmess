@@ -296,7 +296,6 @@ static TIMER_CALLBACK(tc8521_timer_callback)
 void tc8521_init(const struct tc8521_interface *intf)
 {
 	memset(&rtc, 0, sizeof(struct tc8521));
-	memset(&rtc.interface, 0, sizeof(struct tc8521_interface));
 	if (intf)
 		memcpy(&rtc.interface, intf, sizeof(struct tc8521_interface));
 	timer_pulse(ATTOTIME_IN_HZ(32), NULL, 0, tc8521_timer_callback);
