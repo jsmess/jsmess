@@ -7,7 +7,7 @@
 #include "video/cdp1869.h"
 #include "video/mc6845.h"
 #include "includes/comx35.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 
 enum
 {

@@ -36,7 +36,7 @@
 #include "devices/cassette.h"
 #include "video/cdp1864.h"
 #include "sound/beep.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 
 #define SCREEN_TAG "main"
 #define CDP1864_TAG "cdp1864"

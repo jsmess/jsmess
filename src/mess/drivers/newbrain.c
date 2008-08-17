@@ -11,7 +11,7 @@
 #include "includes/serial.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 
 /*
 

@@ -3,7 +3,7 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 #include "video/cdp1864.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 
 /* Telmac 1800 */
 
