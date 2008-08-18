@@ -258,12 +258,29 @@ PALETTE_INIT( amstrad_plus )
 }
 
 
-/* Aleste has a 6-bit RGB palette */
 PALETTE_INIT( aleste )
 {
 	int i;
 
-	palette_set_colors(machine, 0, amstrad_palette, sizeof(amstrad_palette) / 3);
+	/* CPC Colour data is stored in the colour ROM (RFCOLDAT.BIN) at 0x140-0x17f */
+	unsigned char* pal = memory_region(machine,"user4");
+
+	for(i=0; i<32; i++)
+	{
+		int r,g,b;
+		
+		b = (pal[0x140+i] >> 4) & 0x03;
+		g = (pal[0x140+i] >> 2) & 0x03;
+		r = pal[0x140+i] & 0x03;
+		
+		r = (r << 6);
+		g = (g << 6);
+		b = (b << 6);
+
+		palette_set_color_rgb(machine, i, r, g, b);
+	}
+	
+	/* MSX colour palette is 6-bit RGB */
 	for(i=0; i<64; i++)
 	{
 		int r,g,b;
