@@ -1,6 +1,7 @@
 #ifndef AMIGACD_H
 #define AMIGACD_H
 
-void amigacd_init( running_machine *machine );
+MACHINE_START( amigacd );
+MACHINE_RESET( amigacd );
 
 #endif /* AMIGACD_H */

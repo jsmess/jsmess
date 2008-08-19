@@ -196,12 +196,18 @@ INPUT_PORTS_END
   Machine drivers
 ***************************************************************************/
 
+static MACHINE_START( cdtv )
+{
+	MACHINE_START_CALL( amigacd );
+}
+
+
 static MACHINE_RESET( cdtv )
 {
 	MACHINE_RESET_CALL( amiga );
 
 	/* initialize the cdrom controller */
-	amigacd_init( machine );
+	MACHINE_RESET_CALL( amigacd );
 }
 
 
@@ -251,6 +257,7 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CPU_REPLACE("main", M68000, CDTV_CLOCK_X1 / 4)
 	MDRV_CPU_PROGRAM_MAP(cdtv_mem, 0)
 
+	MDRV_MACHINE_START( cdtv )
 	MDRV_MACHINE_RESET( cdtv )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
