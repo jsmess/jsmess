@@ -915,7 +915,7 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY   FULLNAME */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", 0 )
-CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sg1000,		"Sega",	"SG-1000 II", 0 )
+CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SG-1000 II", 0 )
 //CONS( 1983,	omv,        sg1000, 0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision", GAME_NOT_WORKING )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", 0 )
 COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000H", 0 )
