@@ -256,6 +256,7 @@ VIDEO_START( grdnstrm );
 VIDEO_START( firehawk );
 VIDEO_UPDATE( afega );
 VIDEO_UPDATE( redhawkb );
+VIDEO_UPDATE(redhawki );
 VIDEO_UPDATE( bubl2000 );
 VIDEO_UPDATE( firehawk );
 
@@ -1547,6 +1548,9 @@ static INPUT_PORTS_START( mustang )
 	PORT_DIPSETTING(      0xc000, "3" )
 	PORT_DIPSETTING(      0x8000, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
+
+	PORT_START("COIN")	/* referenced by seibu sound board */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hachamf )
@@ -2018,6 +2022,9 @@ static INPUT_PORTS_START( tdragonb )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) /* The manual states this dip is "Unused" */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("COIN")	/* referenced by seibu sound board */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ssmissin )
@@ -4885,6 +4892,13 @@ static MACHINE_DRIVER_START( stagger1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.70)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( redhawki )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(stagger1)
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(redhawki)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( redhawkb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(stagger1)
@@ -6351,6 +6365,43 @@ ROM_START( redhawke ) /* Excellent Co., Ldt license (no code scramble), (c) 1997
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+ROM_START( redhawki )
+	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "rhit-2.bin", 0x000000, 0x004000, CRC(30cade0e) SHA1(2123ca858bcaed5165739107ccc2830561af0b38) )
+	ROM_CONTINUE(0x20000,0x4000)
+	ROM_CONTINUE(0x10000,0x4000)
+	ROM_CONTINUE(0x30000,0x4000)
+	ROM_CONTINUE(0x08000,0x4000)
+	ROM_CONTINUE(0x28000,0x4000)
+	ROM_CONTINUE(0x18000,0x4000)
+	ROM_CONTINUE(0x38000,0x4000)
+
+	ROM_LOAD16_BYTE( "rhit-3.bin", 0x000001, 0x004000, CRC(37dbb3c2) SHA1(d1f8258f357b885d38f87d288f98046dbd7d56aa) )
+	ROM_CONTINUE(0x20001,0x4000)
+	ROM_CONTINUE(0x10001,0x4000)
+	ROM_CONTINUE(0x30001,0x4000)
+	ROM_CONTINUE(0x08001,0x4000)
+	ROM_CONTINUE(0x28001,0x4000)
+	ROM_CONTINUE(0x18001,0x4000)
+	ROM_CONTINUE(0x38001,0x4000)
+
+	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "rhit-6.bin", 0x000001, 0x080000, CRC(7cbd5c60) SHA1(69bd728861ea5a02f514d5aed837b549f3c86019) )
+	ROM_LOAD16_BYTE( "rhit-7.bin", 0x000000, 0x080000, CRC(bcb367c7) SHA1(a8f0527bf75a227cdfd98385549892fb16330aea) )
+
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0, 16x16x8 */
+	ROM_LOAD( "rhit-4.bin", 0x000000, 0x080000, CRC(aafb3cc4) SHA1(b5f6608c1e05470fdfb22e0a35a8a74974c4d3cf) )
+
+	ROM_REGION( 0x00100, "gfx3", ROMREGION_DISPOSE | ROMREGION_ERASEFF )	/* Layer 1, 8x8x4 */
+	// Unused
+
+	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
+	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
+
 static DRIVER_INIT( redhawk )
 {
 	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
@@ -6922,6 +6973,7 @@ GAME( 1996, airattca, airattck, ssmissin, airattck, ssmissin, ROT270, "Comad",  
 GAME( 1995, twinactn, 0,        twinactn, twinactn, 0,        ROT0,   "Afega",                         "Twin Action", 0 )
 GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270, "Afega",                         "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270, "Afega",                         "Red Hawk (US)", 0 )
+GAME( 1997, redhawki, stagger1, redhawki, stagger1, 0,        ROT0,   "Afega",                         "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Excellent Co. license)", "Red Hawk (Excellent Co., Ltd)", 0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,   "bootleg",                       "Red Hawk (bootleg)", 0 )
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270, "Afega",                         "Sen Jin - Guardian Storm (Korea)", 0 )

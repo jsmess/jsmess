@@ -872,53 +872,53 @@ const game_driver * const drivers[] =
 	DRIVER( cosmicg )	/* 7907 (c) 1979 */
 	DRIVER( cosmica )	/* 7910 (c) [1979] */
 	DRIVER( cosmica2 )	/* 7910 (c) 1979 */
-	DRIVER( panic )		/* (c) 1980 */
-	DRIVER( panic2 )	/* (c) 1980 */
-	DRIVER( panic3 )	/* (c) 1980 */
-	DRIVER( panich )	/* (c) 1980 */
-	DRIVER( panicger )	/* (c) 1980 */
+	DRIVER( nomnlnd )	/* 8003 (c) [1980?] */
+	DRIVER( nomnlndg )	/* 8003 (c) [1980?] + Gottlieb */
+	DRIVER( magspot )	/* ???? (c) [1980] */
+	DRIVER( magspot2 )	/* 8013 (c) [1980] */
+	DRIVER( panic )		/* 8015 (c) 1980 */
+	DRIVER( panic2 )	/* 8015 (c) 1980 */
+	DRIVER( panic3 )	/* 8015 (c) 1980 */
+	DRIVER( panich )	/* 8015 (c) 1980 */
+	DRIVER( panicger )	/* 8015 (c) 1980 */
+	DRIVER( devzone )	/* 8022 (c) [1980] */
+	DRIVER( devzone2 )	/* 8022 (c) [1980] */
+	DRIVER( cheekyms )	/* 8004 (c) [1980?] */
 	DRIVER( zerohour )	/* 8011 (c) Universal */
 	DRIVER( redclash )	/* (c) 1981 Tehkan */
 	DRIVER( redclsha )	/* (c) 1981 Tehkan */
 	DRIVER( redclask )	/* (c) Kaneko (bootleg?) */
-	DRIVER( magspot )	/* ???? (c) [1980] */
-	DRIVER( magspot2 )	/* 8013 (c) [1980] */
-	DRIVER( devzone )	/* 8022 (c) [1980] */
-	DRIVER( devzone2 )	/* 8022 (c) [1980] */
-	DRIVER( nomnlnd )	/* (c) [1980?] */
-	DRIVER( nomnlndg )	/* (c) [1980?] + Gottlieb */
-	DRIVER( cheekyms )	/* (c) [1980?] */
-	DRIVER( ladybug )	/* (c) 1981 */
+	DRIVER( cavenger )	/* 8106 (c) 1981 */
+	DRIVER( ladybug )	/* 8110 (c) 1981 */
 	DRIVER( ladybugb )	/* bootleg */
 	DRIVER( ladybgb2 )	/* bootleg */
-	DRIVER( snapjack )	/* (c) */
-	DRIVER( sraider )	/* (c) 1982 Universal */
-	DRIVER( cavenger )	/* (c) 1981 */
+	DRIVER( snapjack )	/* ???? (c) */
+	DRIVER( sraider )	/* ???? (c) 1982 Universal */
 	DRIVER( dorodon )	/* Falcon */
 	DRIVER( dorodon2 )	/* Falcon */
-	DRIVER( mrdo )		/* (c) 1982 */
-	DRIVER( mrdoy )		/* (c) 1982 */
-	DRIVER( mrdot )		/* (c) 1982 + Taito license */
-	DRIVER( mrdofix )	/* (c) 1982 + Taito license */
+	DRIVER( mrdo )		/* 8201 (c) 1982 */
+	DRIVER( mrdoy )		/* 8201 (c) 1982 */
+	DRIVER( mrdot )		/* 8201 (c) 1982 + Taito license */
+	DRIVER( mrdofix )	/* 8201 (c) 1982 + Taito license */
 	DRIVER( mrlo )		/* bootleg */
 	DRIVER( mrdu )		/* bootleg */
 	DRIVER( yankeedo )	/* bootleg */
-	DRIVER( docastle )	/* (c) 1983 */
-	DRIVER( docastl2 )	/* (c) 1983 */
-	DRIVER( docastlo )	/* (c) 1983 */
-	DRIVER( douni )		/* (c) 1983 */
-	DRIVER( dorunrun )	/* (c) 1984 */
-	DRIVER( dorunru2 )	/* (c) 1984 */
-	DRIVER( dorunruc )	/* (c) 1984 */
-	DRIVER( dorunrca )	/* (c) 1984 */
-	DRIVER( spiero )	/* (c) 1987 */
-	DRIVER( dowild )	/* (c) 1984 */
-	DRIVER( jjack )		/* (c) 1984 */
-	DRIVER( kickridr )	/* (c) 1984 */
-	DRIVER( idsoccer )	/* (c) 1985 */
-	DRIVER( superdq )	/* (c) 1984 */
-	DRIVER( superdqs )	/* (c) 1984 */
-	DRIVER( superdqa )	/* (c) 1984 */
+	DRIVER( docastle )	/* 8302 (c) 1983 */
+	DRIVER( docastl2 )	/* 8302 (c) 1983 */
+	DRIVER( docastlo )	/* 8302 (c) 1983 */
+	DRIVER( douni )		/* 8302 (c) 1983 */
+	DRIVER( dorunrun )	/* ???? (c) 1984 */
+	DRIVER( dorunru2 )	/* ???? (c) 1984 */
+	DRIVER( dorunruc )	/* ???? (c) 1984 */
+	DRIVER( dorunrca )	/* ???? (c) 1984 */
+	DRIVER( spiero )	/* ???? (c) 1987 */
+	DRIVER( dowild )	/* ???? (c) 1984 */
+	DRIVER( jjack )		/* ???? (c) 1984 */
+	DRIVER( kickridr )	/* ???? (c) 1984 */
+	DRIVER( idsoccer )	/* ???? (c) 1985 */
+	DRIVER( superdq )	/* ???? (c) 1984 */
+	DRIVER( superdqs )	/* ???? (c) 1984 */
+	DRIVER( superdqa )	/* ???? (c) 1984 */
 
 	/* Nintendo games */
 	DRIVER( spacefev )	/* (c) 1979 Nintendo */
@@ -1339,6 +1339,7 @@ const game_driver * const drivers[] =
 	/* trivia: IREM means "International Rental Electronics Machines" */
 	DRIVER( andromed )	/* (c) 1979 */
 	DRIVER( ipminvad )	/* M10 no copyright notice */
+	DRIVER( ipminva1 )	/* M10 incomplete dump */
 	DRIVER( skychut )	/* Irem [1980] */
 	DRIVER( spacbeam )	/* M15 no copyright notice */
 	DRIVER( greenber )	/* Irem */
@@ -1346,6 +1347,8 @@ const game_driver * const drivers[] =
 
 	DRIVER( redalert )	/* (c) 1981 + "GDI presents" */
 	DRIVER( demoneye )	/* (c) 1981 */
+	DRIVER( ww3 )		/* (c) 1981 */
+
 	DRIVER( olibochu )	/* M47 (c) 1981 + "GDI presents" */
 	DRIVER( mpatrol )	/* M52 (c) 1982 */
 	DRIVER( mpatrolw )	/* M52 (c) 1982 + Williams license */
@@ -2087,6 +2090,7 @@ const game_driver * const drivers[] =
 	DRIVER( snowbrob )	/* MIN16-02 (c) 1990 Toaplan + Romstar license */
 	DRIVER( snowbroc )	/* MIN16-02 (c) 1990 Toaplan + Romstar license */
 	DRIVER( snowbroj )	/* MIN16-02 (c) 1990 Toaplan */
+	DRIVER( snowbrod )	/* MIN16-02 (c) 1990 Toaplan + Dooyong license */
 	DRIVER( wintbob )	/* bootleg */
 	DRIVER( honeydol )	/* (c) 1995 Barko Corp */
 	DRIVER( twinadv )	/* (c) 1995 Barko Corp */
@@ -5940,6 +5944,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tinv2650 )	/* (c) 1978 */
 	DRIVER( dodgem )	/* (c) 1979 */
 	DRIVER( galaxia )	/* (c) 1979 */
+	DRIVER( astrowar )	/* (c) 1980 */
 	DRIVER( laserbat )	/* (c) 1981 */
 	DRIVER( lazarian )	/* (c) 1981 */
 	DRIVER( catnmous )	/* (c) 1982 */
@@ -6708,6 +6713,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( explbrkr )	/* (c) 1992 Kaneko */
 	DRIVER( bakubrkr )	/* (c) 1992 Kaneko */
 	DRIVER( shogwarr )	/* (c) 1992 Kaneko */
+	DRIVER( shogware )	/* (c) 1992 Kaneko */
 	DRIVER( fjbuster )	/* (c) 1992 Kaneko */
 	DRIVER( brapboys )	/* (c) 1992 Kaneko */
 	DRIVER( brapboyj )	/* (c) 1992 Kaneko */
@@ -7143,6 +7149,7 @@ Other Sun games
 	DRIVER( stagger1 )	/* (c) 1998 */
 	DRIVER( redhawk )	/* (c) 1997 */
 	DRIVER( redhawke )	/* (c) 1997 Excellent Co., Ltd license */
+	DRIVER( redhawki )	/* (c) 1997 Haedong Corp. license */
 	DRIVER( redhawkb )	/* (c) 1997 */
 	DRIVER( grdnstrm )	/* (c) 1998 */
 	DRIVER( bubl2000 )	/* (c) 1998 Tuning */
@@ -7936,6 +7943,7 @@ Other Sun games
 	DRIVER( ttchampa )
 	DRIVER( dreamwld )	/* (c) 2000 SemiCom */
 	DRIVER( cybertnk )	/* (c) 1990 Coreland */
+	DRIVER( cubeqst )	/* (c) 1983 Simutrek Inc. */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 
 	/* Funworld */
@@ -8021,7 +8029,9 @@ Other Sun games
 	DRIVER( magic10 )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic102 )	/* (c) 1997 ABM Games */
-	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
+	DRIVER( suprpool )	/* (c) 1997 ABM Games */
+	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */
+	DRIVER( mcolors )	/* 1999 unknown */
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */

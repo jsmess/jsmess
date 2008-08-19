@@ -269,6 +269,7 @@ static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
 		}
 	}
 	duart68681_update_interrupts(duart68681);
+
 	return r;
 };
 
@@ -321,8 +322,20 @@ READ8_DEVICE_HANDLER(duart68681_r)
 	offset &= 0xf;
 
 	LOG(( "Reading 68681 (%s) reg %x (%s) ", device->tag, offset, duart68681_reg_read_names[offset] ));
+
 	switch (offset)
 	{
+		case 0x00: /* MR1A/MR2A */
+			if ( duart68681->channel[0].MR_ptr == 0 )
+			{
+				r = duart68681->channel[0].MR1;
+				duart68681->channel[0].MR_ptr = 1;
+			}
+			else
+			{
+				r = duart68681->channel[0].MR2;
+			}
+			break;
 		case 0x01: /* SRA */
 			r = duart68681->channel[0].SR;
 			break;
@@ -346,6 +359,17 @@ READ8_DEVICE_HANDLER(duart68681_r)
 		case 0x05: /* ISR */
 			r = duart68681->ISR;
 			break;
+		case 0x08: /* MR1B/MR2B */
+			if ( duart68681->channel[1].MR_ptr == 0 )
+			{
+				r = duart68681->channel[1].MR1;
+				duart68681->channel[1].MR_ptr = 1;
+			}
+			else
+			{
+				r = duart68681->channel[1].MR2;
+			}
+			break;
 		case 0x09: /* SRB */
 			r = duart68681->channel[1].SR;
 			break;
@@ -356,7 +380,19 @@ READ8_DEVICE_HANDLER(duart68681_r)
 			if ( duart68681->duart_config->input_port_read != NULL )
 				r = duart68681->duart_config->input_port_read(duart68681->device);
 			else
-				r = 0x0;
+				{
+					r = 0xff;
+					/*
+                    if (input_code_pressed(KEYCODE_1)) r ^= 0x0001;
+                    if (input_code_pressed(KEYCODE_2)) r ^= 0x0002;
+                    if (input_code_pressed(KEYCODE_3)) r ^= 0x0004;
+                    if (input_code_pressed(KEYCODE_4)) r ^= 0x0008;
+                    if (input_code_pressed(KEYCODE_5)) r ^= 0x0010;
+                    if (input_code_pressed(KEYCODE_6)) r ^= 0x0020;
+                    if (input_code_pressed(KEYCODE_7)) r ^= 0x0040;
+                    if (input_code_pressed(KEYCODE_8)) r ^= 0x0080;
+                    */
+				}
 			break;
 		case 0x0e: /* Start counter command */
 			switch( (duart68681->ACR >> 4) & 0x07 )
@@ -381,6 +417,7 @@ READ8_DEVICE_HANDLER(duart68681_r)
 			break;
 	}
 	LOG(("returned %02x\n", r));
+
 	return r;
 }
 
@@ -390,6 +427,7 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 
 	offset &= 0x0f;
 	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", device->tag, offset, duart68681_reg_write_names[offset], data ));
+
 	switch(offset)
 	{
 		case 0x00: /* MRA */

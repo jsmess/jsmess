@@ -254,6 +254,23 @@ $(CPUOBJ)/jaguar/jaguar.o:	$(CPUSRC)/jaguar/jaguar.c \
 
 
 #-------------------------------------------------
+# Simutrek Cube Quest bit-sliced CPUs
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_CUBEQCPU=$(if $(filter CUBEQCPU,$(CPUS)),1,0)
+
+ifneq ($(filter CUBEQCPU,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/cubeqcpu
+CPUOBJS += $(CPUOBJ)/cubeqcpu/cubeqcpu.o
+#DBGOBJS += $(CPUOBJ)/cubeqcpu/cubedasm.o
+endif
+
+$(CPUOBJ)/cubeqcpu/cubeqcpu.o:	$(CPUSRC)/cubeqcpu/cubeqcpu.c \
+								$(CPUSRC)/cubeqcpu/cubeqcpu.h
+
+
+
+#-------------------------------------------------
 # RCA CDP1802
 #-------------------------------------------------
 
@@ -456,10 +473,17 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 								$(CPUSRC)/h83002/h8priv.h
 
 
+#-------------------------------------------------
+# Hitachi SH1/SH2
+#-------------------------------------------------
 
-#-------------------------------------------------
-# Hitachi SH2
-#-------------------------------------------------
+CPUDEFS += -DHAS_SH1=$(if $(filter SH1,$(CPUS)),1,0)
+
+ifneq ($(filter SH1,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/sh2
+CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o
+DBGOBJS += $(CPUOBJ)/sh2/sh2dasm.o
+endif
 
 CPUDEFS += -DHAS_SH2=$(if $(filter SH2,$(CPUS)),1,0)
 
@@ -493,12 +517,19 @@ CPUDEFS += -DHAS_SH4=$(if $(filter SH4,$(CPUS)),1,0)
 
 ifneq ($(filter SH4,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh4
-CPUOBJS += $(CPUOBJ)/sh4/sh4.o
+CPUOBJS += $(CPUOBJ)/sh4/sh4.o $(CPUOBJ)/sh4/sh4comn.o
 DBGOBJS += $(CPUOBJ)/sh4/sh4dasm.o
 endif
 
 $(CPUOBJ)/sh4/sh4.o:	$(CPUSRC)/sh4/sh4.c \
-						$(CPUSRC)/sh4/sh4.h
+			$(CPUSRC)/sh4/sh4.h \
+			$(CPUSRC)/sh4/sh4regs.h \
+			$(CPUSRC)/sh4/sh4comn.h
+
+$(CPUOBJ)/sh4/sh4comn.o:  $(CPUSRC)/sh4/sh4comn.c \
+			$(CPUSRC)/sh4/sh4comn.h \
+			$(CPUSRC)/sh4/sh4regs.h \
+			$(CPUSRC)/sh4/sh4.h
 
 #-------------------------------------------------
 # Hudsonsoft 6280

@@ -17,15 +17,16 @@ static int get_pixel(int x,int y);
 /* decoding of long commands. Commands can be up to 64KB long... but Shanghai */
 /* doesn't reach that length. */
 
-#define FIFO_LENGTH 50
+#define FIFO_LENGTH 256
 
 static int fifo_counter;
 static UINT16 fifo[FIFO_LENGTH];
 static UINT16 readfifo;
 UINT16 *HD63484_ram;
 UINT16 HD63484_reg[256/2];
+UINT16 pattern[16];
 static int org,org_dpd,rwp;
-static UINT16 cl0,cl1,ccmp,edg,mask,ppy,pzcy,ppx,pzcs,psy,psx,pey,pzy,pex,pzx,xmin,ymin,xmax,ymax,rwp_dn;
+static UINT16 cl0,cl1,ccmp,edg,mask,ppy,pzcy,ppx,pzcx,psy,psx,pey,pzy,pex,pzx,xmin,ymin,xmax,ymax,rwp_dn;
 static INT16 cpx,cpy;
 
 static const int instruction_length[64] =
@@ -71,8 +72,8 @@ static const char *const instruction_name[64] =
 void HD63484_start(void)
 {
 	fifo_counter = 0;
-	HD63484_ram = auto_malloc(HD63484_RAM_SIZE);
-	memset(HD63484_ram,0,HD63484_RAM_SIZE);
+	HD63484_ram = auto_malloc(HD63484_RAM_SIZE * sizeof(*HD63484_ram));
+	memset(HD63484_ram, 0, HD63484_RAM_SIZE * sizeof(*HD63484_ram));
 }
 
 static void doclr16(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
@@ -426,9 +427,44 @@ static int get_pixel(int x,int y)
 	return ((HD63484_ram[dst] & bitmask_shifted) >> (x_mod * bpp));
 }
 
+static int get_pixel_ptn(int x,int y)
+{
+	int dst, x_int, x_mod, bpp;
+	UINT16 bitmask, bitmask_shifted;
+
+	bpp = 1;
+	bitmask = 0x0001;
+
+	if (x >= 0)
+	{
+		x_int = x / (16 / bpp);
+		x_mod = x % (16 / bpp);
+	}
+	else
+	{
+		x_int = x / (16 / bpp);
+		x_mod = -1 * (x % (16 / bpp));
+		if (x_mod) {
+			x_int--;
+			x_mod = (16 / bpp) - x_mod;
+		}
+	}
+
+	bitmask_shifted = bitmask << (x_mod * bpp);
+
+	dst = (x_int + y * 1);
+
+	if ((pattern[dst] & bitmask_shifted) >> (x_mod * bpp))
+		return 1; //cl1
+	else
+		return 0; //cl0
+}
+
 static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,INT16 _ay)
 {
-	int step1_x,step1_y,step2_x,step2_y;
+	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
+	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
+	int ax_neg,ay_neg;
 	int ax = _ax;
 	int ay = _ay;
 	int xxs = src_x;
@@ -436,18 +472,58 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 	int xxd = dst_x;
 	int yyd = dst_y;
 
-	switch (opcode & 0x0700)
-	{
-		default:
-		case 0x0000: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =   1; break;
-		case 0x0100: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =  -1; break;
-		case 0x0200: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =   1; break;
-		case 0x0300: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =  -1; break;
-		case 0x0400: step1_x =  0; step1_y =  1; step2_x =   1; step2_y =  ay; break;
-		case 0x0500: step1_x =  0; step1_y = -1; step2_x =   1; step2_y = -ay; break;
-		case 0x0600: step1_x =  0; step1_y =  1; step2_x =  -1; step2_y =  ay; break;
-		case 0x0700: step1_x =  0; step1_y = -1; step2_x =  -1; step2_y = -ay; break;
-	}
+	if (ax < 0)
+		ax_neg = -1;
+	else
+		ax_neg = 1;
+	if (ay < 0)
+		ay_neg = -1;
+	else
+		ay_neg = 1;
+
+	if (opcode & 0x0800)
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ay_neg*ay; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y =  ay_neg*ay; break;
+		}
+	else
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+		}
+
+	if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
+	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
 
 	for (;;)
 	{
@@ -460,16 +536,18 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 				if (ay == 0) break;
 				if (_ay > 0)
 				{
-					yys++;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ay--;
 				}
 				else
 				{
-					yys--;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ay++;
 				}
 			}
@@ -478,16 +556,18 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 				if (ax == 0) break;
 				else if (ax > 0)
 				{
-					xxs++;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ax--;
 				}
 				else
 				{
-					xxs--;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ax++;
 				}
 			}
@@ -498,19 +578,19 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 			ay = _ay;
 			if (_ax < 0)
 			{
-				xxs--;
-				yys -= ay;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				xxs++;
-				yys += ay;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ax == 0) break;
 				ax--;
 			}
@@ -520,24 +600,236 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 			ax = _ax;
 			if (_ay < 0)
 			{
-				xxs -= ax;
-				yys--;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ay == 0) break;
 				ay++;
 			}
 			else
 			{
-				xxs -= ax;
-				yys++;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ay == 0) break;
 				ay--;
 			}
 		}
 	}
+}
+
+static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
+{
+	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
+	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
+	int ax = _ax;
+	int ay = _ay;
+	int ax_neg,ay_neg;
+	int xxs = src_x;
+	int yys = src_y;
+	int xxd = cpx;
+	int yyd = cpy;
+
+	if (ax < 0)
+		ax_neg = -1;
+	else
+		ax_neg = 1;
+	if (ay < 0)
+		ay_neg = -1;
+	else
+		ay_neg = 1;
+
+	if (opcode & 0x0800)
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ay_neg*ay; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y =  ay_neg*ay; break;
+		}
+	else
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+		}
+
+	if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
+	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
+
+	for (;;)
+	{
+		for (;;)
+		{
+			dot(xxd,yyd,opcode & 0x0007,get_pixel_ptn(xxs,yys));
+
+			if (opcode & 0x0800)
+			{
+				if (ay == 0) break;
+				if (_ay > 0)
+				{
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
+					ay--;
+				}
+				else
+				{
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
+					ay++;
+				}
+			}
+			else
+			{
+				if (ax == 0) break;
+				else if (ax > 0)
+				{
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
+					ax--;
+				}
+				else
+				{
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
+					ax++;
+				}
+			}
+		}
+
+		if (opcode & 0x0800)
+		{
+			ay = _ay;
+			if (_ax < 0)
+			{
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
+				if (ax == 0) break;
+				ax++;
+			}
+			else
+			{
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
+				if (ax == 0) break;
+				ax--;
+			}
+		}
+		else
+		{
+			ax = _ax;
+			if (_ay < 0)
+			{
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
+				if (ay == 0) break;
+				ay++;
+			}
+			else
+			{
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
+				if (ay == 0) break;
+				ay--;
+			}
+		}
+	}
+}
+
+void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
+{
+
+			INT16 ax,ay;
+
+			int cpx_t=sx;
+			int cpy_t=sy;
+
+			ax = ex - sx;
+			ay = ey - sy;
+
+			if (abs(ax) >= abs(ay))
+			{
+				while (ax)
+				{
+					dot(cpx_t,cpy_t,col,cl0);
+
+					if (ax > 0)
+					{
+						cpx_t++;
+						ax--;
+					}
+					else
+					{
+						cpx_t--;
+						ax++;
+					}
+					cpy_t = sy + ay * (cpx_t - sx) / (ex - sx);
+				}
+			}
+			else
+			{
+				while (ay)
+				{
+					dot(cpx_t,cpy_t,col,cl0);
+
+					if (ay > 0)
+					{
+						cpy_t++;
+						ay--;
+					}
+					else
+					{
+						cpy_t--;
+						ay++;
+					}
+					cpx_t = sx + ax * (cpy_t - sy) / (ey - sy);
+				}
+			}
+
 }
 
 static void HD63484_command_w(UINT16 cmd)
@@ -560,13 +852,14 @@ static void HD63484_command_w(UINT16 cmd)
 
 	if (fifo_counter >= len)
 	{
+/*
 		int i;
 
-		logerror("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
+		printf("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
 		for (i = 1;i < fifo_counter;i++)
-			logerror("%04x ",fifo[i]);
-		logerror("\n");
-
+			printf("%04x ",fifo[i]);
+		printf("\n");
+*/
 		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
 			org_dpd = fifo[2] & 0x000f;
@@ -588,7 +881,7 @@ static void HD63484_command_w(UINT16 cmd)
 					ppy  = (fifo[1] & 0xf000) >> 12;
 					pzcy = (fifo[1] & 0x0f00) >> 8;
 					ppx  = (fifo[1] & 0x00f0) >> 4;
-					pzcs = (fifo[1] & 0x000f) >> 0;
+					pzcx = (fifo[1] & 0x000f) >> 0;
 				}
 			else if (fifo[0] == 0x0806)
 				{
@@ -622,7 +915,11 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xfff0) == 0x1800)	/* WPTN */
 		{
-			/* pattern RAM not supported */
+			int i;
+			int start = fifo[0] & 0x000f;
+			int n = fifo[1];
+			for (i = 0; i < n; i++)
+				pattern[start + i] = fifo[2 + i];
 		}
 		else if (fifo[0] == 0x4400)	/* RD */
 		{
@@ -631,7 +928,7 @@ logerror("unsupported register\n");
 		}
 		else if (fifo[0] == 0x4800)	/* WT */
 		{
-			HD63484_ram[rwp] = fifo[1];
+			if (!input_code_pressed(KEYCODE_9)) HD63484_ram[rwp] = fifo[1];
 			rwp = (rwp + 1) & (HD63484_RAM_SIZE-1);
 		}
 		else if (fifo[0] == 0x5800)	/* CLR */
@@ -691,140 +988,56 @@ logerror("unsupported register\n");
 			cpx = fifo[1];
 			cpy = fifo[2];
 		}
-		else if ((fifo[0] & 0xfff8) == 0x8800)	/* ALINE */
+		else if (fifo[0] == 0x8400)	/* RMOVE */
 		{
-			INT16 ex,ey,sx,sy;
-			INT16 ax,ay;
-
-			sx = cpx;
-			sy = cpy;
-			ex = fifo[1];
-			ey = fifo[2];
-
-			ax = ex - sx;
-			ay = ey - sy;
-
-			if (abs(ax) >= abs(ay))
-			{
-				while (ax)
-				{
-					dot(cpx,cpy,fifo[0] & 0x0007,cl0);
-
-					if (ax > 0)
-					{
-						cpx++;
-						ax--;
-					}
-					else
-					{
-						cpx--;
-						ax++;
-					}
-					cpy = sy + ay * (cpx - sx) / (ex - sx);
-				}
-			}
-			else
-			{
-				while (ay)
-				{
-					dot(cpx,cpy,fifo[0] & 0x0007,cl0);
-
-					if (ay > 0)
-					{
-						cpy++;
-						ay--;
-					}
-					else
-					{
-						cpy--;
-						ay++;
-					}
-					cpx = sx + ax * (cpy - sy) / (ey - sy);
-				}
-			}
+			cpx += (INT16)fifo[1];
+			cpy += (INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xff00) == 0x8800)	/* ALINE */
+		{
+			line(cpx,cpy,fifo[1],fifo[2],fifo[0]&7);
+			cpx = (INT16)fifo[1];
+			cpy = (INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xff00) == 0x8c00)	/* RLINE */
+		{
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
+			cpx += (INT16)fifo[1];
+			cpy += (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9000)	/* ARCT */
 		{
-			INT16 pcx,pcy;
-			INT16 ax,ay,xx,yy;
+			line(cpx,cpy,(INT16)fifo[1],cpy,fifo[0]&7);
+			line((INT16)fifo[1],cpy,(INT16)fifo[1],(INT16)fifo[2],fifo[0]&7);
+			line((INT16)fifo[1],(INT16)fifo[2],cpx,(INT16)fifo[2],fifo[0]&7);
+			line(cpx,(INT16)fifo[2],cpx,cpy,fifo[0]&7);
+			cpx = (INT16)fifo[1];
+			cpy = (INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xfff8) == 0x9400)	/* RRCT  added*/
+		{
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
+			line(cpx+(INT16)fifo[1],cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
+			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0]&7);
+			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0]&7);
 
-			pcx = fifo[1];
-			pcy = fifo[2];
-
-			xx = cpx;
-			yy = cpy;
-
-			ax = pcx - cpx;
-			for (;;)
+			cpx += (INT16)fifo[1];
+			cpy += (INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xfff8) == 0xa400)	/* RPLG  added*/
+		{
+			int nseg,sx,sy,ex,ey;
+			sx = cpx;
+			sy = cpy;
+			for(nseg=0;nseg<fifo[1];nseg++)
 			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ax == 0) break;
-				else if (ax > 0)
-				{
-					xx++;
-					ax--;
-				}
-				else
-				{
-					xx--;
-					ax++;
-				}
+				ex = sx + (INT16)fifo[2+nseg*2];
+				ey = sy + (INT16)fifo[2+nseg*2+1];
+				line(sx,sy,ex,ey,fifo[0]&7);
+				sx = ex;
+				sy = ey;
 			}
-
-			ay = pcy - cpy;
-			for (;;)
-			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ay == 0) break;
-				else if (ay > 0)
-				{
-					yy++;
-					ay--;
-				}
-				else
-				{
-					yy--;
-					ay++;
-				}
-			}
-
-			ax = cpx - pcx;
-			for (;;)
-			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ax == 0) break;
-				else if (ax > 0)
-				{
-					xx++;
-					ax--;
-				}
-				else
-				{
-					xx--;
-					ax++;
-				}
-			}
-
-			ay = cpy - pcy;
-			for (;;)
-			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ay == 0) break;
-				else if (ay > 0)
-				{
-					yy++;
-					ay--;
-				}
-				else
-				{
-					yy--;
-					ay++;
-				}
-			}
+			line(sx,sy,cpx,cpy,fifo[0]&7);
 		}
 		else if ((fifo[0] & 0xfff8) == 0xc000)	/* AFRCT */
 		{
@@ -875,16 +1088,34 @@ logerror("unsupported register\n");
 				}
 			}
 		}
+		else if ((fifo[0] & 0xfff8) == 0xc400)	/* RFRCT  added TODO*/
+		{
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
+			line(cpx+fifo[1],cpy,cpx+fifo[1],cpy+fifo[2],fifo[0]&7);
+			line(cpx+fifo[1],cpy+fifo[2],cpx,cpy+fifo[2],fifo[0]&7);
+			line(cpx,cpy+fifo[2],cpx,cpy,fifo[0]&7);
+
+			cpx=cpx+(INT16)fifo[1];
+			cpy=cpy+(INT16)fifo[2];
+		}
 		else if ((fifo[0] & 0xfff8) == 0xcc00)	/* DOT */
 		{
 			dot(cpx,cpy,fifo[0] & 0x0007,cl0);
+		}
+		else if ((fifo[0] & 0xf000) == 0xd000)	/* PTN (to do) */
+		{
+			// if ((fifo[0] & 0x0700) == 0x0400) printf("4");
+			ptn(fifo[0] & 0x0007,psx,psy,pex - psx,pey - psy);
+
+			cpx += pex - psx;
+			cpy += pey - psy;
 		}
 		else if ((fifo[0] & 0xf0f8) == 0xe000)	/* AGCPY */
 		{
 			agcpy(fifo[0],fifo[1],fifo[2],cpx,cpy,fifo[3],fifo[4]);
 
-			cpx += fifo[3];
-			cpy += fifo[4];
+			cpx += fifo[4];
+			cpy += fifo[3];
 		}
 		else
 {
@@ -901,7 +1132,7 @@ static int regno;
 READ16_HANDLER( HD63484_status_r )
 {
 	if (activecpu_get_pc() != 0xfced6 && activecpu_get_pc() != 0xfe1d6) logerror("%05x: HD63484 status read\n",activecpu_get_pc());
-	return 0xff22|4;	/* write FIFO ready + command end    + read FIFO ready */
+	return 0xff22|(mame_rand(machine) & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }
 
 WRITE16_HANDLER( HD63484_address_w )

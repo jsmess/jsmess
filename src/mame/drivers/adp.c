@@ -137,40 +137,105 @@ There's also (external) JAMMA adapter - 4th board filled with resistors and diod
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
+#include "machine/microtch.h"
+#include "machine/68681.h"
+#include "deprecat.h"
 
+static struct
+{
+	const device_config *duart68681;
+} skattv_devices;
+
+/***************************************************************************
+
+    68681 DUART <-> Microtouch touch screen controller communication
+
+***************************************************************************/
+
+static void duart_irq_handler(const device_config *device, UINT8 vector)
+{
+	cpunum_set_input_line_and_vector(device->machine, 0, 4, HOLD_LINE, vector);
+};
+
+static void duart_tx(const device_config *device, int channel, UINT8 data)
+{
+	if ( channel == 0 )
+	{
+		microtouch_rx(1, &data);
+	}
+};
+
+static void microtouch_tx(UINT8 data)
+{
+	duart68681_rx_data(skattv_devices.duart68681, 0, data);
+}
+
+static UINT8 duart_input(const device_config *device)
+{
+	return input_port_read(Machine, "DSW1");
+}
+
+static MACHINE_START( skattv )
+{
+	microtouch_init(microtouch_tx, 0);
+}
+
+static MACHINE_RESET( skattv )
+{
+	skattv_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+}
+
+static const duart68681_config skattv_duart68681_config =
+{
+	XTAL_8_664MHz / 2, //??
+	duart_irq_handler,
+	duart_tx,
+	duart_input,
+	NULL
+};
+
+/*
 static PALETTE_INIT( adp )
 {
-	int i;
+    int i;
 
 
-	for (i = 0;i < machine->config->total_colors;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
+    for (i = 0;i < machine->config->total_colors;i++)
+    {
+        int bit0,bit1,bit2,r,g,b;
 
 
-		/* red component */
-		bit0 = (i >> 2) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 4) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (i >> 5) & 0x01;
-		bit1 = (i >> 6) & 0x01;
-		bit2 = (i >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = (i >> 0) & 0x01;
-		bit2 = (i >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        // red component
+        bit0 = (i >> 2) & 0x01;
+        bit1 = (i >> 3) & 0x01;
+        bit2 = (i >> 4) & 0x01;
+        r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        // green component
+        bit0 = (i >> 5) & 0x01;
+        bit1 = (i >> 6) & 0x01;
+        bit2 = (i >> 7) & 0x01;
+        g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        // blue component
+        bit0 = 0;
+        bit1 = (i >> 0) & 0x01;
+        bit2 = (i >> 1) & 0x01;
+        b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-	}
+        palette_set_color(machine,i,MAKE_RGB(r,g,b));
+    }
 }
+*/
 
 static VIDEO_START(adp)
 {
+//  UINT32 i;
+//  UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
+
 	HD63484_start();
+
+//  for (i = 0; i < 0x70000; i++)
+//      HD63484_ram[0x90000 + i] = prgrom[i];
+
 }
 
 static VIDEO_UPDATE(adp)
@@ -178,36 +243,65 @@ static VIDEO_UPDATE(adp)
 	int x,y,b;
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
+
+	if (input_code_pressed(KEYCODE_M)) b = 0;
+	if (input_code_pressed(KEYCODE_Q)) b += 0x060 * 280 * 1;
+	if (input_code_pressed(KEYCODE_W)) b += 0x060 * 280 * 2;
+	if (input_code_pressed(KEYCODE_E)) b += 0x060 * 280 * 3;
+	if (input_code_pressed(KEYCODE_R)) b += 0x060 * 280 * 4;
+	if (input_code_pressed(KEYCODE_T)) b += 0x060 * 280 * 5;
+	if (input_code_pressed(KEYCODE_Y)) b += 0x060 * 280 * 6;
+	if (input_code_pressed(KEYCODE_U)) b += 0x060 * 280 * 7;
+	if (input_code_pressed(KEYCODE_I)) b += 0x060 * 280 * 8;
+	if (input_code_pressed(KEYCODE_A)) b += 0x060 * 280 * 9;
+	if (input_code_pressed(KEYCODE_S)) b += 0x060 * 280 * 10;
+	if (input_code_pressed(KEYCODE_D)) b += 0x060 * 280 * 11;
+	if (input_code_pressed(KEYCODE_F)) b += 0x060 * 280 * 12;
+	if (input_code_pressed(KEYCODE_G)) b += 0x060 * 280 * 13;
+	if (input_code_pressed(KEYCODE_H)) b += 0x060 * 280 * 14;
+	if (input_code_pressed(KEYCODE_J)) b += 0x060 * 280 * 15;
+	if (input_code_pressed(KEYCODE_K)) b += 0x060 * 280 * 16;
+	if (input_code_pressed(KEYCODE_Z)) b += 0x060 * 280 * 17;
+	if (input_code_pressed(KEYCODE_X)) b += 0x060 * 280 * 18;
+	if (input_code_pressed(KEYCODE_C)) b += 0x060 * 280 * 19;
+	if (input_code_pressed(KEYCODE_V)) b += 0x060 * 280 * 20;
+	if (input_code_pressed(KEYCODE_B)) b += 0x060 * 280 * 21;
+	if (input_code_pressed(KEYCODE_N)) b += 0x060 * 280 * 22;
+
 	for (y = 0;y < 280;y++)
 	{
-		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
+		for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b] & 0x00ff;
-			*BITMAP_ADDR16(bitmap, y, x+1) = (HD63484_ram[b] & 0xff00) >> 8;
+			*BITMAP_ADDR16(bitmap, y, x    ) = (HD63484_ram[b] & 0x000f);
+			*BITMAP_ADDR16(bitmap, y, x + 1) = (HD63484_ram[b] & 0x00f0) >> 4;
+			*BITMAP_ADDR16(bitmap, y, x + 2) = (HD63484_ram[b] & 0x0f00) >> 8;
+			*BITMAP_ADDR16(bitmap, y, x + 3) = (HD63484_ram[b] & 0xf000) >> 12;
 			b++;
 		}
 	}
-
+if (!input_code_pressed(KEYCODE_O))
 	if ((HD63484_reg[0x06/2] & 0x0300) == 0x0300)
 	{
 		int sy = (HD63484_reg[0x94/2] & 0x0fff) - (HD63484_reg[0x88/2] >> 8);
 		int h = HD63484_reg[0x96/2] & 0x0fff;
-		int sx = ((HD63484_reg[0x92/2] >> 8) - (HD63484_reg[0x84/2] >> 8)) * 4;
-		int w = (HD63484_reg[0x92/2] & 0xff) * 4;
+		int sx = ((HD63484_reg[0x92/2] >> 8) - (HD63484_reg[0x84/2] >> 8)) * 2 * 2;
+		int w = (HD63484_reg[0x92/2] & 0xff) * 2;
 		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
 
 		b = (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
 
 		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
+			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
-				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 2)
+				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 4)
 					{
-						*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b] & 0x00ff;
-						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (HD63484_ram[b] & 0xff00) >> 8;
+						*BITMAP_ADDR16(bitmap, y, x + sx    ) = (HD63484_ram[b] & 0x000f);
+						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (HD63484_ram[b] & 0x00f0) >> 4;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 2) = (HD63484_ram[b] & 0x0f00) >> 8;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 3) = (HD63484_ram[b] & 0xf000) >> 12;
 					}
 				b++;
 			}
@@ -217,20 +311,71 @@ static VIDEO_UPDATE(adp)
 	return 0;
 }
 
+static READ16_HANDLER(test_r)
+{
+	switch (mame_rand(machine) & 3)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return 0xffff;
+		default:
+			return mame_rand(machine) % 0xffff;
+	}
+}
+
+static READ16_HANDLER(test1_r)
+{
+	if (input_code_pressed(KEYCODE_Q)) return 0x0001;
+	if (input_code_pressed(KEYCODE_W)) return 0x0002;
+	if (input_code_pressed(KEYCODE_E)) return 0x0004;
+	if (input_code_pressed(KEYCODE_R)) return 0x0008;
+	if (input_code_pressed(KEYCODE_T)) return 0x0010;
+	if (input_code_pressed(KEYCODE_Y)) return 0x0020;
+	if (input_code_pressed(KEYCODE_U)) return 0x0040;
+	if (input_code_pressed(KEYCODE_I)) return 0x0080;
+	if (input_code_pressed(KEYCODE_A)) return 0x0100;
+	if (input_code_pressed(KEYCODE_S)) return 0x0200;
+	if (input_code_pressed(KEYCODE_D)) return 0x0400;
+	if (input_code_pressed(KEYCODE_F)) return 0x0800;
+	if (input_code_pressed(KEYCODE_G)) return 0x1000;
+	if (input_code_pressed(KEYCODE_H)) return 0x2000;
+	if (input_code_pressed(KEYCODE_J)) return 0x4000;
+	if (input_code_pressed(KEYCODE_K)) return 0x8000;
+
+	switch (mame_rand(machine) & 3)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return 0xffff;
+		default:
+			return mame_rand(machine) % 0xffff;
+	}
+}
+
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x8000a0, 0x8000a1) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
-	AM_RANGE(0x8000a2, 0x8000a3) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
-	AM_RANGE(0x800100, 0x8001ff) AM_RAM // bad
+	AM_RANGE(0x400000, 0x4000ff) AM_READ(test_r) //18b too
+	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
+	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+//  AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
+//  AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
+//  AM_RANGE(0x800100, 0x80017f) AM_READ(test_r) //18b too
+	AM_RANGE(0x800100, 0x800101) AM_READ(test_r) //18b too
+	AM_RANGE(0x800140, 0x800141) AM_READ(test1_r) //18b too
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
+//  AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
+//  AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_RAM // bad
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
-	AM_RANGE(0x800100, 0x8001ff) AM_RAM // bad
+	AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -247,19 +392,47 @@ static INPUT_PORTS_START( adp )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( skattv )
+	PORT_INCLUDE(microtouch)
+
+	PORT_START("DSW1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+INPUT_PORTS_END
+
+/*
+static INTERRUPT_GEN( adp_int )
+{
+    cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+}
+*/
+
 static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
+//  MDRV_CPU_VBLANK_INT("main", adp_int)
+
+	MDRV_MACHINE_START(skattv)
+	MDRV_MACHINE_RESET(skattv)
+
+	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
+	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(384, 280)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_PALETTE_INIT(adp)
+//  MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -272,16 +445,23 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( skattv )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
+//  MDRV_CPU_VBLANK_INT("main", adp_int)
+
+	MDRV_MACHINE_START(skattv)
+	MDRV_MACHINE_RESET(skattv)
+
+	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
+	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(384, 280)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_PALETTE_INIT(adp)
+//  MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -303,7 +483,7 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_PALETTE_INIT(adp)
+//  MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -369,8 +549,8 @@ ROM_START( fashiong )
 ROM_END
 
 GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
-GAME( 1993, quickjac,        0, quickjac,    adp,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
-GAME( 1994, skattv,          0, skattv,      adp,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,    skattv, skattv,      adp,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
+GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
+GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
 

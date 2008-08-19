@@ -12,7 +12,7 @@ Die Diagram:
 
 The ROM is a 23128 wired as a 2364 by tying a13 to /ce
 The RAM is a 2016
-The Z80 is a ...Z80. go figure.
+The Z80 is an NMOS Z80
 Subdie A is a 7408 quad AND gate
 Subdie B is a 74245 bidirectional bus transciever
 Subdie C is a 74245 bidirectional bus transciever
@@ -22,6 +22,9 @@ Subdie F is a 74138 1 to 8 decoder/demultiplexer with active low outputs
 Subdie G is a 7408 quad AND gate
 Thanks to Kevin Horton for working out most of the logic gate types
 from the diagram.
+
+
+An updated version of Dox's t5182 pinout (originally from mustache.c) follows:
 
                        ______________________
                      _|*                     |_
@@ -65,7 +68,7 @@ from the diagram.
                      _|                      |_
           Z80 /NMI  |_|20                  31|_|  Z80 /BUSRQ Test pin
                      _|                      |_
- Shorted to pin 22  |_|21                  30|_|  74245 'A'+'B' DIR Test pin
+  Internal ROM /EN  |_|21                  30|_|  74245 'A'+'B' DIR Test pin
                      _|                      |_
  /EN 0x0000-0x1fff  |_|22                  29|_|  Z80 /BUSAK Test pin
                      _|                      |_
@@ -77,14 +80,38 @@ Z80 /IORQ Test pin  |_|24                  27|_|  Z80 /RD
                       |______________________|
 
 Based on sketch made by Tormod
-Note: all pins marked as 'Test pin' are disabled internally and cannot be used without removing the chip cover and soldering together test pads.
-Note: pins 21 and 22 are both shorted together, and go active (low) while the internal rom is being read. The internal rom can be disabled by pulling /IORQ or /MREQ low,
-      but both of those test pins are disabled, and also one would have to use the DIR test pin at the same time to feed the z80 a new internal rom (this is PROBABLY how
-      seibu prototyped the rom, they had an external rom connected to this enable, and the internal rom disabled somehow) This pin CAN however be used as an indicator as
-      to when the internal rom is being read, allowing one to snoop the address and data busses without fear of getting ram data as opposed to rom.
+
+Note: all pins marked as 'Test pin' are disabled internally and cannot be used
+      without removing the chip cover and soldering together test pads.
+Note: pins 21 and 22 are both shorted together on the pcb, and go active (low)
+      while the internal rom is being read. The internal rom can be disabled by
+      pulling /IORQ or /MREQ low, but both of those test pins are disabled, and
+      also one would have to use the DIR test pin at the same time to feed the
+      z80 a new internal rom. This is PROBABLY how Toshiba intended the t5182
+      to be prototyped: a special t5182 with the internal jumpers all connected
+      (except for the one between pins 21 and 22) would be given to a company
+      who wanted to prototype the internal rom, allowing an external rom to be
+      used instead of the internal one by using the test pins.
+
+      However, the fact that pins 21 and 22 were NOT internally connected
+      together by Toshiba on the *production* seibu t5182 means a huge
+      security hole is opened:
+
+      It is trivial, through external connections, without EVER opening the
+      chip, to connect pin 22 to a trojan rom /CE and hence have a user trojan
+      program run at 0x0000-0x1fff. Then, connect pin 21 to pin 34 to map the
+      internal rom at 0x4000-0x7fff so it can be serially bit-banged out, or,
+      even more easily, copied to an nvram chip attached to pin 35. Only 11
+      bytes of code in the trojan rom are needed to do this.
+
+      There is no internal protection in the chip at all which prevents the
+      internal rom from being connected to an enable other than pin 22, which
+      would have prevented this theoretical attack from working
+
 
 Z80 Memory Map:
-0x0000-0x1FFF - Internal ROM, also external space 0 (which is effectively disabled)
+0x0000-0x1FFF - external space 0 (connected to internal rom /enable outside the
+                chip)
 0x2000-0x3fff - Internal RAM, repeated/mirrored 4 times
 0x4000-0x7fff - external space 1 (used for communication shared memory?)
 0x8000-0xFFFF - external space 2 (used for sound rom)
@@ -100,7 +127,8 @@ xxxxxxxxx101xxxx i/o /EN 5 goes low
 xxxxxxxxx110xxxx i/o /EN 6\__ these two are unbonded pins, so are useless.
 xxxxxxxxx111xxxx i/o /EN 7/
 
-IMPORTANT: the data lines for the external rom on darkmist are scrambled on the SEI8608B board as such:
+IMPORTANT: the data lines for the external rom on darkmist are scrambled on the
+SEI8608B board as such:
 CPU:     ROM:
 D0       D0
 D1       D6
@@ -111,7 +139,8 @@ D5       D2
 D6       D1
 D7       D7
 Only the data lines are scrambled, the address lines are not.
-These lines are NOT scrambled to the ym2151 or anything else, just the external rom.
+These lines are NOT scrambled to the ym2151 or anything else, just the external
+rom.
 
 ***************************************************************************/
 

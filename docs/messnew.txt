@@ -1,4 +1,4 @@
-﻿0.126.1
+﻿0.127
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -40,7 +40,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.126u5.  This incorporates all features of the
+- The core is based on MAME 0.127.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Natural keyboard support is now implemented completely in the MESS core.

@@ -354,7 +354,7 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 	/* encode the video data */
 	if (width > 0 && height > 0)
 	{
-		UINT32 vidlength;
+		UINT32 vidlength = 0;
 
 		/* encode the video */
 		err = encode_video(state, width, height, videostart, videostride, videoxor, dest + dstoffs, &vidlength);

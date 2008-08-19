@@ -219,6 +219,7 @@ Notes:
 #include "itech32.h"
 #include "sound/es5506.h"
 #include "machine/timekpr.h"
+#include "memconv.h"
 
 
 #define FULL_LOGGING				0
@@ -760,6 +761,16 @@ static READ32_HANDLER( drivedge_tms2_speedup_r )
 static WRITE32_HANDLER( int1_ack32_w )
 {
 	int1_ack_w(machine, offset, data, mem_mask);
+}
+
+static WRITE32_HANDLER( timekeeper_0_32be_w )
+{
+	write32be_with_write8_handler( timekeeper_0_w, machine, offset, data, mem_mask );
+}
+
+static READ32_HANDLER( timekeeper_0_32be_r )
+{
+	return read32be_with_read8_handler( timekeeper_0_r, machine, offset, mem_mask );
 }
 
 

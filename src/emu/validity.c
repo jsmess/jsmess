@@ -94,7 +94,6 @@ static quark_table *source_table;
 static quark_table *name_table;
 static quark_table *description_table;
 static quark_table *roms_table;
-static quark_table *inputs_table;
 static quark_table *defstr_table;
 
 
@@ -199,7 +198,6 @@ static void quark_tables_create(void)
 	name_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
 	description_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
 	roms_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
-	inputs_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
 
 	/* build the quarks and the hash tables */
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
@@ -643,7 +641,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
     validate_cpu - validate CPUs and memory maps
 -------------------------------------------------*/
 
-static int validate_cpu(int drivnum, const machine_config *config, region_info *rgninfo)
+static int validate_cpu(int drivnum, const machine_config *config, const input_port_config *portlist, region_info *rgninfo)
 {
 	const game_driver *driver = drivers[drivnum];
 	cpu_validity_check_func cpu_validity_check;
@@ -812,6 +810,13 @@ static int validate_cpu(int drivnum, const machine_config *config, region_info *
 				if (entry->write_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtype, entry->write_devtag) == NULL)
 				{
 					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->write_devtype), entry->write_devtag);
+					error = TRUE;
+				}
+
+				/* make sure ports exist */
+				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
+				{
+					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant port tag %s\n", driver->source_file, driver->name, cpunum, spacenum, entry->read_porttag);
 					error = TRUE;
 				}
 			}
@@ -1286,34 +1291,22 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
     validate_inputs - validate input configuration
 -------------------------------------------------*/
 
-static int validate_inputs(int drivnum, const machine_config *config)
+static int validate_inputs(int drivnum, const machine_config *config, const input_port_config **portlistptr)
 {
-	const input_port_config *portlist;
 	const input_port_config *scanport;
 	const input_port_config *port;
 	const input_field_config *field;
 	const game_driver *driver = drivers[drivnum];
 	int empty_string_found = FALSE;
 	char errorbuf[1024];
-	quark_entry *entry;
 	int error = FALSE;
-	UINT32 crc;
 
 	/* skip if no ports */
 	if (driver->ipt == NULL)
 		return FALSE;
 
-	/* skip if we already validated these ports */
-	crc = (FPTR)driver->ipt;
-	for (entry = quark_table_get_first(inputs_table, crc); entry != NULL; entry = entry->next)
-		if (entry->crc == crc && driver->ipt == drivers[entry - inputs_table->entry]->ipt)
-			return FALSE;
-
-	/* otherwise, add ourself to the list */
-	quark_add(inputs_table, drivnum, crc);
-
 	/* allocate the input ports */
-	portlist = input_port_config_alloc(driver->ipt, errorbuf, sizeof(errorbuf));
+	*portlistptr = input_port_config_alloc(driver->ipt, errorbuf, sizeof(errorbuf));
 	if (errorbuf[0] != 0)
 	{
 		mame_printf_error("%s: %s has input port errors:\n%s\n", driver->source_file, driver->name, errorbuf);
@@ -1321,7 +1314,7 @@ static int validate_inputs(int drivnum, const machine_config *config)
 	}
 
 	/* check for duplicate tags */
-	for (port = portlist; port != NULL; port = port->next)
+	for (port = *portlistptr; port != NULL; port = port->next)
 		if (port->tag != NULL)
 			for (scanport = port->next; scanport != NULL; scanport = scanport->next)
 				if (scanport->tag != NULL && strcmp(port->tag, scanport->tag) == 0)
@@ -1331,9 +1324,10 @@ static int validate_inputs(int drivnum, const machine_config *config)
 				}
 
 	/* iterate over the results */
-	for (port = portlist; port != NULL; port = port->next)
+	for (port = *portlistptr; port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
+			const input_setting_config *setting;
 			int strindex = 0;
 
 			/* verify analog inputs */
@@ -1388,15 +1382,47 @@ static int validate_inputs(int drivnum, const machine_config *config)
 				/* look up the string and print an error if default strings are not used */
 				strindex = get_defstr_index(field->name, driver, &error);
 			}
+
+			/* verify conditions on the field */
+			if (field->condition.tag != NULL)
+			{
+				/* find a matching port */
+				for (scanport = *portlistptr; scanport != NULL; scanport = scanport->next)
+					if (scanport->tag != NULL && strcmp(field->condition.tag, scanport->tag) == 0)
+						break;
+
+				/* if none, error */
+				if (scanport == NULL)
+				{
+					mame_printf_error("%s: %s has a condition referencing non-existent input port tag \"%s\"\n", driver->source_file, driver->name, field->condition.tag);
+					error = TRUE;
+				}
+			}
+
+			/* verify conditions on the settings */
+			for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				if (setting->condition.tag != NULL)
+				{
+					/* find a matching port */
+					for (scanport = *portlistptr; scanport != NULL; scanport = scanport->next)
+						if (scanport->tag != NULL && strcmp(setting->condition.tag, scanport->tag) == 0)
+							break;
+
+					/* if none, error */
+					if (scanport == NULL)
+					{
+						mame_printf_error("%s: %s has a condition referencing non-existent input port tag \"%s\"\n", driver->source_file, driver->name, setting->condition.tag);
+						error = TRUE;
+					}
+				}
 		}
 
 #ifdef MESS
-	if (mess_validate_input_ports(drivnum, config, portlist))
+	if (mess_validate_input_ports(drivnum, config, *portlistptr))
 		error = TRUE;
 #endif /* MESS */
 
 	/* free the config */
-	input_port_config_free(portlist);
 	return error;
 }
 
@@ -1575,6 +1601,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
 	{
 		const game_driver *driver = drivers[drivnum];
+		const input_port_config *portlist = NULL;
 		machine_config *config;
 		region_info rgninfo;
 
@@ -1600,9 +1627,14 @@ int mame_validitychecks(const game_driver *curdriver)
 		error = validate_roms(drivnum, config, &rgninfo) || error;
 		rom_checks += osd_profiling_ticks();
 
+		/* validate input ports */
+		input_checks -= osd_profiling_ticks();
+		error = validate_inputs(drivnum, config, &portlist) || error;
+		input_checks += osd_profiling_ticks();
+
 		/* validate the CPU information */
 		cpu_checks -= osd_profiling_ticks();
-		error = validate_cpu(drivnum, config, &rgninfo) || error;
+		error = validate_cpu(drivnum, config, portlist, &rgninfo) || error;
 		cpu_checks += osd_profiling_ticks();
 
 		/* validate the display */
@@ -1615,11 +1647,6 @@ int mame_validitychecks(const game_driver *curdriver)
 		error = validate_gfx(drivnum, config, &rgninfo) || error;
 		gfx_checks += osd_profiling_ticks();
 
-		/* validate input ports */
-		input_checks -= osd_profiling_ticks();
-		error = validate_inputs(drivnum, config) || error;
-		input_checks += osd_profiling_ticks();
-
 		/* validate sounds and speakers */
 		sound_checks -= osd_profiling_ticks();
 		error = validate_sound(drivnum, config) || error;
@@ -1630,6 +1657,8 @@ int mame_validitychecks(const game_driver *curdriver)
 		error = validate_devices(drivnum, config) || error;
 		device_checks += osd_profiling_ticks();
 
+		if (portlist != NULL)
+			input_port_config_free(portlist);
 		machine_config_free(config);
 	}
 
