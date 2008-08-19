@@ -1481,7 +1481,7 @@ int input_category_active(running_machine *machine, int category)
 	for (port = machine->portconfig; !found && (port != NULL); port = port->next)
 	{
 		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
-			found = (field->type == IPT_CATEGORY) && (field->category == category);
+			found = (field->type == IPT_CATEGORY) && (field->defvalue == category);
 	}
 
 	if (field != NULL)

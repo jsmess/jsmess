@@ -175,22 +175,12 @@ INLINE char *device_temp_str(void)
  *
  *************************************/
 
-typedef struct _create_image_options create_image_options;
-struct _create_image_options
-{
-	const char *name;
-	const char *description;
-	const char *extensions;
-	const char *optspec;
-};
-
 /* interoperability with MAME devices */
 DEVICE_GET_INFO(mess_device);
 struct _machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedrv);
 const mess_device_class *mess_devclass_from_core_device(const device_config *device);
 
 /* device naming */
-const char *device_uiname(iodevice_t devtype);
 const char *device_typename(iodevice_t type);
 const char *device_brieftypename(iodevice_t type);
 iodevice_t device_typeid(const char *name);

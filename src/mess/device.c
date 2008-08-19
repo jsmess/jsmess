@@ -168,7 +168,7 @@ iodevice_t device_typeid(const char *name)
  *
  *************************************/
 
-const char *device_uiname(iodevice_t devtype)
+static const char *device_uiname(iodevice_t devtype)
 {
 	return ui_getstring((UI_cartridge - IO_CARTSLOT) + devtype);
 }

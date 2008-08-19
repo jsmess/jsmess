@@ -284,19 +284,6 @@ int mess_validitychecks(void)
 {
 	int i;
 	int error = 0;
-	iodevice_t devtype;
-	const char *name;
-
-	/* make sure that all of the UI_* strings are set for all devices */
-	for (devtype = 0; devtype < IO_COUNT; devtype++)
-	{
-		name = device_uiname(devtype);
-		if (!name || !name[0])
-		{
-			mame_printf_error("Device type %d does not have an associated UI string\n", devtype);
-			error = 1;
-		}
-	}
 
 	/* MESS specific driver validity checks */
 	for (i = 0; drivers[i]; i++)
