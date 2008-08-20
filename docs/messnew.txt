@@ -27,6 +27,9 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
+- Fixed bug that caused "categorized" inputs (used on Atari 2600, NES, SMS)
+  to not be remappable.  (bug #1614) [Nate Woods]
+
 - [Windows] Ensured that the "Debugger..." menu item is always present when
   the debugger is enabled in the New UI.  (bug #1636) [Nate Woods]
 

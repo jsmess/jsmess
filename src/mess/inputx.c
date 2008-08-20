@@ -1470,26 +1470,31 @@ int input_count_players(running_machine *machine)
 
 int input_category_active(running_machine *machine, int category)
 {
-	int found;
 	const input_port_config *port;
 	const input_field_config *field = NULL;
 	const input_setting_config *setting;
+	input_field_user_settings settings;
 
 	assert(category >= 1);
 
-	found = FALSE;
-	for (port = machine->portconfig; !found && (port != NULL); port = port->next)
+	/* loop through the input ports */
+	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
-		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
-			found = (field->type == IPT_CATEGORY) && (field->defvalue == category);
-	}
-
-	if (field != NULL)
-	{
-		for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			if (setting->value == field->defvalue)
-				return TRUE;
+			/* is this field a category? */
+			if (field->type == IPT_CATEGORY)
+			{
+				/* get the settings value */
+				input_field_get_user_settings(field, &settings);
+
+				for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				{
+					/* is this the category we want?  if so, is this settings value correct? */
+					if ((setting->category == category) && (settings.value == setting->value))
+						return TRUE;
+				}
+			}
 		}
 	}
 	return FALSE;
