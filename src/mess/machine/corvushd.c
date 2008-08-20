@@ -369,7 +369,7 @@ typedef struct {
 //
 // Prototypes
 //
-static hard_disk_file *corvus_hdc_file(int id);
+static hard_disk_file *corvus_hdc_file(running_machine *machine, int id);
 static TIMER_CALLBACK(corvus_hdc_callback);
 
 //
@@ -554,12 +554,7 @@ static UINT8 corvus_write_sector(running_machine *machine, UINT8 drv, UINT32 sec
 
 	LOG(("corvus_write_sector: Write Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
-	if(drv >= device_count(machine, IO_HARDDISK)) {
-		logerror("corvus_write_sector: Attempt to write to non-existant drive: %d\n", drv);
-		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
-	}
-
-	disk = corvus_hdc_file(drv);
+	disk = corvus_hdc_file(machine, drv);
 	if(!disk) {
 		logerror("corvus_write_sector: Failure returned by corvus_hdc_file(%d)\n", drv);
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
@@ -670,12 +665,7 @@ static UINT8 corvus_read_sector(running_machine *machine, UINT8 drv, UINT32 sect
 
 	LOG(("corvus_read_sector: Read Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
-	if(drv >= device_count(machine, IO_HARDDISK)) {
-		logerror("corvus_read_sector: Attempt to read from non-existant drive: %d\n", drv);
-		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
-	}
-
-	disk = corvus_hdc_file(drv);
+	disk = corvus_hdc_file(machine, drv);
 	if(!disk) {
 		logerror("corvus_read_sector: Failure returned by corvus_hdc_file(%d)\n", drv);
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
@@ -966,7 +956,8 @@ static UINT8 corvus_get_drive_parameters(running_machine *machine, UINT8 drv) {
 	//
 	drv -= 1;									// Internally, drives start at 0
 
-	if(drv >= device_count(machine, IO_HARDDISK)) {
+	if ( ! corvus_hdc_file( machine, drv ) )
+	{
 		logerror("corvus_get_drive_parameters: Attempt to retrieve parameters from non-existant drive: %d\n", drv);
 		c->xmit_bytes = 1;
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
@@ -1181,11 +1172,20 @@ static UINT8 corvus_format_drive(running_machine *machine, UINT8 *pattern, UINT1
 // Returns:
 //		hard_disk_file object
 //
-static hard_disk_file *corvus_hdc_file(int id) {
-
+static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
+	const char *tags[] = {
+		"harddisk1"
+	};
 	const device_config *img;
 
-	img = image_from_devtype_and_index(IO_HARDDISK, id);
+	/* Only one harddisk supported right now */
+	assert ( id == 0 );
+
+	img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, tags[id] );
+
+	if ( !img )
+		return NULL;
+
 	if (!image_exists(img))
 		return NULL;
 
@@ -1433,13 +1433,13 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 // Returns:
 //		NULL if there's no file to attach to
 //
-UINT8 corvus_hdc_init() {
+UINT8 corvus_hdc_init(running_machine *machine) {
 
 	corvus_hdc_t			*c = &corvus_hdc;	// Pick up global controller structure
 	hard_disk_file	*disk;				// Structures for interface to CHD routines
 	hard_disk_info	*info;
 
-	if((disk = corvus_hdc_file(0)))				// Attach to the CHD file
+	if((disk = corvus_hdc_file(machine, 0)))				// Attach to the CHD file
 		info = hard_disk_get_info(disk);		// Pick up the Head/Cylinder/Sector info
 	else
 		return 0;

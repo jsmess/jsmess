@@ -34,6 +34,7 @@
 #include "machine/8237dma.h"
 #include "devices/harddriv.h"
 #include "memconv.h"
+#include "deprecat.h"
 
 
 #define LOG_HDC_STATUS		0
@@ -210,9 +211,27 @@ void pc_hdc_set_dma8237_device( const device_config *dma8237 )
 
 static hard_disk_file *pc_hdc_file(int id)
 {
-	const device_config *img;
+	const device_config *img = NULL;
 
-	img = image_from_devtype_and_index(IO_HARDDISK, id);
+	switch( id )
+	{
+	case 0:
+		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk1" );
+		break;
+	case 1:
+		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk2" );
+		break;
+	case 2:
+		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk3" );
+		break;
+	case 3:
+		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk4" );
+		break;
+	}
+
+	if ( img == NULL )
+		return NULL;
+ 
 	if (!image_exists(img))
 		return NULL;
 
@@ -821,3 +840,14 @@ READ32_HANDLER ( pc32le_HDC1_r ) { return read32le_with_read8_handler(pc_HDC1_r,
 READ32_HANDLER ( pc32le_HDC2_r ) { return read32le_with_read8_handler(pc_HDC2_r, machine, offset, mem_mask); }
 WRITE32_HANDLER ( pc32le_HDC1_w ) { write32le_with_write8_handler(pc_HDC1_w, machine, offset, data, mem_mask); }
 WRITE32_HANDLER ( pc32le_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, machine, offset, data, mem_mask); }
+
+
+MACHINE_DRIVER_START( pc_hdc )
+	/* harddisk */
+	MDRV_DEVICE_ADD("harddisk1", HARDDISK)
+	MDRV_DEVICE_ADD("harddisk2", HARDDISK)
+	MDRV_DEVICE_ADD("harddisk3", HARDDISK)
+	MDRV_DEVICE_ADD("harddisk4", HARDDISK)
+MACHINE_DRIVER_END
+
+

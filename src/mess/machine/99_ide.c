@@ -19,7 +19,6 @@
 
 #include "driver.h"
 #include "machine/idectrl.h"
-#include "devices/idedrive.h"
 #include "machine/rtc65271.h"
 #include "ti99_4x.h"
 #include "99_peb.h"
@@ -364,21 +363,3 @@ static WRITE8_HANDLER(ide_mem_w)
 	}
 }
 
-
-
-void ti99_ide_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_IDEDRIVE_INTERFACE: info->p = (void *) ~0; /* FIXME */ break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_TAG:					strcpy(info->s = device_temp_str(), "99_ide"); break;
-
-		default: ide_harddisk_device_getinfo(devclass, state, info); break;
-	}
-}

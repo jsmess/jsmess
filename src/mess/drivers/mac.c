@@ -140,6 +140,9 @@ static MACHINE_DRIVER_START( macplus )
 	MDRV_CPU_PROGRAM_MAP(macplus_map, 0)
 
 	MDRV_MACHINE_START(macscsi)
+
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
 MACHINE_DRIVER_END
 
 
@@ -340,18 +343,6 @@ static void mac_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 	}
 }
 
-static void mac_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* harddisk */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		default: harddisk_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(mac128k)
 	CONFIG_DEVICE(mac128512_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(0x020000)
@@ -364,7 +355,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(macplus)
 	CONFIG_DEVICE(mac_floppy_getinfo)
-	CONFIG_DEVICE(mac_harddisk_getinfo)
 	CONFIG_RAM			(0x080000)
 	CONFIG_RAM_DEFAULT	(0x100000)
 	CONFIG_RAM			(0x200000)
@@ -374,7 +364,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(macse)
 	CONFIG_DEVICE(mac_floppy_getinfo)
-	CONFIG_DEVICE(mac_harddisk_getinfo)
 	CONFIG_RAM_DEFAULT	(0x100000)
 	CONFIG_RAM			(0x200000)
 	CONFIG_RAM			(0x280000)

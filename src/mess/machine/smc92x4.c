@@ -285,12 +285,36 @@ static struct
 	unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
 } hd[10];
 
-int smc92x4_hd_load(const device_config *image, int disk_unit)
+static int get_id_from_device( const device_config *device )
+{
+	int id = -1;
+
+	if ( ! strcmp( "harddisk1", device->tag ) )
+	{
+		id = 0;
+	}
+	else if ( ! strcmp( "harddisk2", device->tag ) )
+	{
+		id = 1;
+	}
+	else if ( ! strcmp( "harddisk3", device->tag ) )
+	{
+		id = 2;
+	}
+	assert( id >= 0 );
+
+	return id;
+}
+
+
+DEVICE_IMAGE_LOAD(smc92x4_hd)
 {
 	const hard_disk_info *info;
 
-	if (device_load_mess_hd(image) == INIT_PASS)
+	if ( mess_hd_get_hard_disk_file(image) )
 	{
+		int disk_unit = get_id_from_device( image );
+
 		hd[disk_unit].hd_handle = mess_hd_get_hard_disk_file(image);
 		hd[disk_unit].wp = !image_is_writable(image);
 		hd[disk_unit].current_cylinder = 0;
@@ -304,12 +328,12 @@ int smc92x4_hd_load(const device_config *image, int disk_unit)
 				|| (hd[disk_unit].sectors_per_track > 256)
 				|| (hd[disk_unit].bytes_per_sector > 2048))
 		{
-			smc92x4_hd_unload(image, disk_unit);
+			hd[disk_unit].hd_handle = NULL;
 			return INIT_FAIL;
 		}
 		if (hd[disk_unit].bytes_per_sector != 256)
 		{
-			smc92x4_hd_unload(image, disk_unit);
+			hd[disk_unit].hd_handle = NULL;
 			return INIT_FAIL;
 		}
 		return INIT_PASS;
@@ -318,9 +342,10 @@ int smc92x4_hd_load(const device_config *image, int disk_unit)
 	return INIT_FAIL;
 }
 
-void smc92x4_hd_unload(const device_config *image, int disk_unit)
+DEVICE_IMAGE_UNLOAD(smc92x4_hd)
 {
-	device_unload_mess_hd(image);
+	int disk_unit = get_id_from_device( image );
+
 	hd[disk_unit].hd_handle = NULL;
 }
 
@@ -1225,3 +1250,18 @@ WRITE8_HANDLER(smc92x4_0_w)
 	smc92x4_w(0, offset, data);
 }
 
+static const struct harddisk_callback_config smc92x4_harddisk_config =
+{
+	DEVICE_IMAGE_LOAD_NAME( smc92x4_hd ),
+	DEVICE_IMAGE_UNLOAD_NAME( smc92x4_hd )
+};
+
+
+MACHINE_DRIVER_START( smc92x4_hd )
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_DEVICE_CONFIG( smc92x4_harddisk_config )
+	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
+	MDRV_DEVICE_CONFIG( smc92x4_harddisk_config )
+	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+	MDRV_DEVICE_CONFIG( smc92x4_harddisk_config )
+MACHINE_DRIVER_END

@@ -576,7 +576,7 @@ static void scsi_irq(running_machine *machine, int state)
 static const SCSIConfigTable dev_table =
 {
         1,                                      /* 1 SCSI device */
-        { { SCSI_ID_6, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 6, using CHD 0, and it's a CD-ROM */
+        { { SCSI_ID_6, "cdrom", SCSI_DEVICE_CDROM } } /* SCSI ID 6, using CHD 0, and it's a CD-ROM */
 };
 
 static const struct WD33C93interface scsi_intf =

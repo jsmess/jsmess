@@ -147,9 +147,6 @@ DEVICE_START( ti99_cart );
 DEVICE_IMAGE_LOAD( ti99_cart );
 DEVICE_IMAGE_UNLOAD( ti99_cart );
 
-DEVICE_IMAGE_LOAD( ti99_hd );
-DEVICE_IMAGE_UNLOAD( ti99_hd );
-
 VIDEO_START( ti99_4ev );
 INTERRUPT_GEN( ti99_vblank_interrupt );
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt );

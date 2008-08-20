@@ -1,13 +1,18 @@
 /*
 	990_hd.h: include file for 990_hd.c
 */
+#ifndef __990_HD_H_
+#define __990_HD_H_
 
-DEVICE_START( ti990_hd );
-DEVICE_IMAGE_LOAD( ti990_hd );
-DEVICE_IMAGE_UNLOAD( ti990_hd );
+#include "devices/harddriv.h"
 
-void ti990_hdc_init(void (*interrupt_callback)(int state));
+MACHINE_START( ti990_hdc );
 
-extern READ16_HANDLER(ti990_hdc_r);
-extern WRITE16_HANDLER(ti990_hdc_w);
+void ti990_hdc_init(running_machine *machine, void (*interrupt_callback)(int state));
 
+READ16_HANDLER(ti990_hdc_r);
+WRITE16_HANDLER(ti990_hdc_w);
+
+MACHINE_DRIVER_EXTERN( ti990_hdc );
+
+#endif

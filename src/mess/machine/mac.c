@@ -1382,8 +1382,8 @@ static const SCSIConfigTable dev_table =
 {
 	1,                                      /* 2 SCSI devices */
 	{
-	 { SCSI_ID_5, "hard0", SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
-	 { SCSI_ID_6, "hard1", SCSI_DEVICE_HARDDISK }   /* SCSI ID 6, using CHD 0, and it's a harddisk */
+	 { SCSI_ID_5, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
+	 { SCSI_ID_6, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 6, using CHD 0, and it's a harddisk */
 	}
 };
 

@@ -1338,7 +1338,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
 	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
@@ -1375,6 +1375,9 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1401,7 +1404,7 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
 
 	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
 	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
@@ -1438,6 +1441,9 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibm5150 )
@@ -1504,6 +1510,9 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pccga )
@@ -1567,6 +1576,9 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1623,6 +1635,9 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1685,6 +1700,9 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1734,6 +1752,9 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1785,6 +1806,9 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1839,6 +1863,9 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1897,6 +1924,9 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_SOUND_ADD("saa1099.2", SAA1099, 4772720)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1944,6 +1974,9 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -2431,17 +2464,6 @@ static void ibmpc_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void ibmpc_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* harddisk */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		default:										harddisk_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void pcjr_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -2465,14 +2487,12 @@ static SYSTEM_CONFIG_START(ibm5150)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 	CONFIG_DEVICE(ibmpc_cassette_getinfo)
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
-	CONFIG_DEVICE(ibmpc_harddisk_getinfo)
 SYSTEM_CONFIG_END
 
 
 static SYSTEM_CONFIG_START(ibm5160)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
-	CONFIG_DEVICE(ibmpc_harddisk_getinfo)
 SYSTEM_CONFIG_END
 
 

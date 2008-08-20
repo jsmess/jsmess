@@ -478,6 +478,9 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_DEVICE_ADD("printer1", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -540,6 +543,9 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_DEVICE_ADD("printer1", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -609,6 +615,9 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_DEVICE_ADD("printer1", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -680,6 +689,9 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_DEVICE_ADD("printer1", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -748,6 +760,9 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_DEVICE_ADD("printer1", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
 
@@ -1029,22 +1044,10 @@ static void ibmat_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void ibmat_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* harddisk */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		default:										harddisk_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(ibmat)
 	CONFIG_RAM_DEFAULT( (640+1024) * 1024 )
 	CONFIG_DEVICE(ibmat_floppy_getinfo)
-	CONFIG_DEVICE(ibmat_harddisk_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************

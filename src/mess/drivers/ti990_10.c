@@ -75,6 +75,12 @@ TODO :
 #include "machine/990_tap.h"
 #include "video/911_vdt.h"
 
+static MACHINE_START( ti990_10 )
+{
+	MACHINE_START_CALL( ti990_hdc );
+}
+
+
 static MACHINE_RESET( ti990_10 )
 {
 	ti990_hold_load(machine);
@@ -82,7 +88,7 @@ static MACHINE_RESET( ti990_10 )
 	ti990_reset_int();
 
 	ti990_tpc_init(ti990_set_int9);
-	ti990_hdc_init(ti990_set_int13);
+	ti990_hdc_init(machine, ti990_set_int13);
 }
 
 static INTERRUPT_GEN( ti990_10_line_interrupt )
@@ -201,6 +207,7 @@ static MACHINE_DRIVER_START(ti990_10)
 	MDRV_CPU_IO_MAP(ti990_10_readcru, ti990_10_writecru)
 	MDRV_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
 
+	MDRV_MACHINE_START( ti990_10 )
 	MDRV_MACHINE_RESET( ti990_10 )
 
 	/* video hardware - we emulate a single 911 vdt display */
@@ -223,6 +230,8 @@ static MACHINE_DRIVER_START(ti990_10)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_IMPORT_FROM( ti990_hdc )
 MACHINE_DRIVER_END
 
 
@@ -285,27 +294,6 @@ static INPUT_PORTS_START(ti990_10)
 	VDT911_KEY_PORTS
 INPUT_PORTS_END
 
-static void ti990_10_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* harddisk */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_HARDDISK; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti990_hd); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti990_hd); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti990_hd); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "hd"); break;
-	}
-}
 
 static void ti990_10_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -330,7 +318,6 @@ static void ti990_10_cassette_getinfo(const mess_device_class *devclass, UINT32 
 }
 
 static SYSTEM_CONFIG_START(ti990_10)
-	CONFIG_DEVICE(ti990_10_harddisk_getinfo)
 	CONFIG_DEVICE(ti990_10_cassette_getinfo)
 SYSTEM_CONFIG_END
 

@@ -25,4 +25,6 @@ void pc_hdc_dack_w(int data);
 
 void pc_hdc_set_dma8237_device( const device_config *dma8237 );
 
+MACHINE_DRIVER_EXTERN( pc_hdc );
+
 #endif /* PC_HDC_H */

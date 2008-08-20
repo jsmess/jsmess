@@ -466,7 +466,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/basicdsk.o	\
 	$(MESS_DEVICES)/flopdrv.o	\
 	$(MESS_DEVICES)/harddriv.o	\
-	$(MESS_DEVICES)/idedrive.o	\
 	$(MESS_DEVICES)/dsk.o		\
 	$(MESS_DEVICES)/z80bin.o	\
 	$(MESS_DEVICES)/chd_cd.o	\

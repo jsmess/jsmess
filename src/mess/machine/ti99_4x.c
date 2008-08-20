@@ -689,18 +689,6 @@ DEVICE_IMAGE_UNLOAD( ti99_cart )
 	slot_type[id] = SLOT_EMPTY;
 }
 
-DEVICE_IMAGE_LOAD( ti99_hd )
-{
-	int id = image_index_in_device(image);
-	return smc92x4_hd_load(image, id);
-}
-
-DEVICE_IMAGE_UNLOAD( ti99_hd )
-{
-	int id = image_index_in_device(image);
-	smc92x4_hd_unload(image, id);
-}
-
 static const TMS9928a_interface tms9918_interface =
 {
 	TMS99x8,

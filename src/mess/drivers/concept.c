@@ -77,6 +77,8 @@ static MACHINE_DRIVER_START( concept )
 	MDRV_VIDEO_UPDATE(concept)
 
 	/* no sound? */
+
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
 MACHINE_DRIVER_END
 
 
@@ -314,22 +316,10 @@ static void concept_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static void concept_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* Hard Drive */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										harddisk_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(concept)
 	/* The concept should eventually support floppies, hard disks, etc. */
 	CONFIG_DEVICE(concept_floppy_getinfo)
-	CONFIG_DEVICE(concept_harddisk_getinfo)
 SYSTEM_CONFIG_END
 
 

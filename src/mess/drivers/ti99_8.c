@@ -427,6 +427,12 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+
+	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
 
 
@@ -460,6 +466,12 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+
+	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
 
 /*
@@ -543,29 +555,6 @@ static void ti99_8_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void ti99_8_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* harddisk */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_HARDDISK; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 3; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(mess_hd); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti99_hd); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti99_hd); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "hd"); break;
-		case MESS_DEVINFO_STR_DEV_TAG:						strcpy(info->s = device_temp_str(), "ti99_8_hd"); break;
-	}
-}
-
 static void ti99_8_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
@@ -640,8 +629,6 @@ static SYSTEM_CONFIG_START(ti99_8)
 	CONFIG_DEVICE(ti99_8_cartslot_getinfo)
 #if 1
 	CONFIG_DEVICE(ti99_8_floppy_getinfo)
-	CONFIG_DEVICE(ti99_8_harddisk_getinfo)
-	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)
 	CONFIG_DEVICE(ti99_8_parallel_getinfo)
 	CONFIG_DEVICE(ti99_8_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/

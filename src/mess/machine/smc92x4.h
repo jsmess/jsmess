@@ -41,8 +41,6 @@ typedef struct smc92x4_intf
 	void (*int_callback)(int which, int state);
 } smc92x4_intf;
 
-int smc92x4_hd_load(const device_config *image, int disk_unit);
-void smc92x4_hd_unload(const device_config *image, int disk_unit);
 
 void smc92x4_init(int which, const smc92x4_intf *intf);
 void smc92x4_reset(int which);
@@ -50,3 +48,6 @@ int smc92x4_r(int which, int offset);
 void smc92x4_w(int which, int offset, int data);
  READ8_HANDLER(smc92x4_0_r);
 WRITE8_HANDLER(smc92x4_0_w);
+
+MACHINE_DRIVER_EXTERN( smc92x4_hd );
+

@@ -35,6 +35,7 @@ Historical notes: TI made several last minute design changes.
 #include "machine/smartmed.h"
 #include "sound/5220intf.h"
 #include "machine/idectrl.h"
+#include "machine/smc92x4.h"
 
 /*
     memory map
@@ -530,6 +531,10 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+
+	MDRV_IMPORT_FROM( smc92x4_hd )
+
+	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4_50hz)
@@ -561,6 +566,10 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+
+	MDRV_IMPORT_FROM( smc92x4_hd )
+
+	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4a_60hz)
@@ -592,6 +601,10 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+
+	MDRV_IMPORT_FROM( smc92x4_hd )
+
+	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
 
 
@@ -624,6 +637,10 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+
+	MDRV_IMPORT_FROM( smc92x4_hd )
+
+	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
 
 
@@ -664,6 +681,10 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+
+	MDRV_IMPORT_FROM( smc92x4_hd )
+
+	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
 
 
@@ -820,29 +841,6 @@ static void ti99_4_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void ti99_4_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* harddisk */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_HARDDISK; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 3; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(mess_hd); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti99_hd); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti99_hd); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "hd"); break;
-		case MESS_DEVINFO_STR_DEV_TAG:						strcpy(info->s = device_temp_str(), "ti99_4x_hd"); break;
-	}
-}
-
 static void ti99_4_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
@@ -932,8 +930,6 @@ static SYSTEM_CONFIG_START(ti99_4)
 	CONFIG_DEVICE(ti99_4_cassette_getinfo)
 	CONFIG_DEVICE(ti99_4_cartslot_getinfo)
 	CONFIG_DEVICE(ti99_4_floppy_getinfo)
-	CONFIG_DEVICE(ti99_4_harddisk_getinfo)
-	CONFIG_DEVICE(ti99_ide_harddisk_getinfo)
 	CONFIG_DEVICE(ti99_4_parallel_getinfo)
 	CONFIG_DEVICE(ti99_4_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_4_quickload_getinfo)*/

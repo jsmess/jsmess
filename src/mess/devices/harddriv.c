@@ -21,9 +21,6 @@
 #include "harddriv.h"
 
 
-#define MAX_HARDDISKS	8
-#define USE_CHD_OPEN	0
-
 static const char *const error_strings[] =
 {
 	"no error",
@@ -50,8 +47,6 @@ static const char *const error_strings[] =
 	"unsupported CHD version"
 };
 
-static hard_disk_file *drive_handles[MAX_HARDDISKS];
-
 static const char *chd_get_error_string(int chderr)
 {
 	if ((chderr < 0 ) || (chderr >= (sizeof(error_strings) / sizeof(error_strings[0]))))
@@ -73,42 +68,29 @@ static const char *mess_hd_option_spec =
 	"C1-[512]-1024;H1/2/[4]/8;S1-[16]-64;L128/256/[512]/1024;K512/1024/2048/[4096]";
 
 
-#define MESSHDTAG "mess_hd"
-
-struct mess_hd
+typedef struct _dev_harddisk_t	dev_harddisk_t;
+struct _dev_harddisk_t
 {
-	chd_file *chd;
-	hard_disk_file *hard_disk_handle;
+	const struct harddisk_callback_config	*config;
+	chd_file		*chd;
+	hard_disk_file	*hard_disk_handle;
 };
 
-static struct mess_hd *get_drive(const device_config *img)
-{
-	return image_lookuptag(img, MESSHDTAG);
-}
 
+INLINE dev_harddisk_t *get_safe_token(const device_config *device)
+{
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( ( device->type == DEVICE_GET_INFO_NAME(mess_hd) ) ||
+	        ( device->type == DEVICE_GET_INFO_NAME(mess_ide) ) );
+	return (dev_harddisk_t *) device->token;
+}
 
 
 /*************************************
  *
- *	device_init_mess_hd()
- *
- *	Device init
- *
- *************************************/
-
-DEVICE_START( mess_hd )
-{
-	struct mess_hd *hd;
-	hd = image_alloctag(device, MESSHDTAG, sizeof(struct mess_hd));
-	hd->hard_disk_handle = NULL;
-}
-
-
-
-/*************************************
- *
- *	DEVICE_IMAGE_LOAD_NAME(mess_hd)
- *  DEVICE_IMAGE_CREATE_NAME(mess_hd)
+ *	DEVICE_IMAGE_LOAD(mess_hd)
+ *  DEVICE_IMAGE_CREATE(mess_hd)
  *
  *	Device load and create
  *
@@ -116,52 +98,47 @@ DEVICE_START( mess_hd )
 
 static int internal_load_mess_hd(const device_config *image, const char *metadata)
 {
-	chd_error err = 0;
-	struct mess_hd *hd;
-	int is_writeable;
-	int id = image_index_in_device(image);
-
-	hd = get_drive(image);
+	dev_harddisk_t	*harddisk = get_safe_token( image );
+	chd_error		err = 0;
+	int				is_writeable;
 
 	/* open the CHD file */
 	do
 	{
 		is_writeable = image_is_writable(image);
-		hd->chd = NULL;
-		err = chd_open_file(image_core_file(image), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &hd->chd);
+		harddisk->chd = NULL;
+		err = chd_open_file(image_core_file(image), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &harddisk->chd);
 
 		/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
 		 * image read only and repeat */
 		if (err == CHDERR_FILE_NOT_WRITEABLE)
 			image_make_readonly(image);
 	}
-	while(!hd->chd && is_writeable && (err == CHDERR_FILE_NOT_WRITEABLE));
-	if (!hd->chd)
+	while(!harddisk->chd && is_writeable && (err == CHDERR_FILE_NOT_WRITEABLE));
+	if (!harddisk->chd)
 		goto done;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	if (metadata)
 	{
-		err = chd_set_metadata(hd->chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+		err = chd_set_metadata(harddisk->chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
 		if (err != CHDERR_NONE)
 			goto done;
 	}
 
 	/* open the hard disk file */
-	hd->hard_disk_handle = hard_disk_open(hd->chd);
-	if (!hd->hard_disk_handle)
+	harddisk->hard_disk_handle = hard_disk_open(harddisk->chd);
+	if (!harddisk->hard_disk_handle)
 		goto done;
-
-	drive_handles[id] = hd->hard_disk_handle;
 
 done:
 	if (err)
 	{
 		/* if we had an error, close out the CHD */
-		if (hd->chd != NULL)
+		if (harddisk->chd != NULL)
 		{
-			chd_close(hd->chd);
-			hd->chd = NULL;
+			chd_close(harddisk->chd);
+			harddisk->chd = NULL;
 		}
 
 		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
@@ -173,7 +150,18 @@ done:
 
 DEVICE_IMAGE_LOAD( mess_hd )
 {
-	return internal_load_mess_hd(image, NULL);
+	dev_harddisk_t	*harddisk = get_safe_token( image );
+	int our_result;
+
+	our_result = internal_load_mess_hd(image, NULL);
+
+	/* Check if there is an image_load callback defined */
+	if ( harddisk->config && harddisk->config->device_image_load )
+	{
+		/* Let the override do some additional work/checks */
+		our_result = harddisk->config->device_image_load( image );
+	}
+	return our_result;
 }
 
 
@@ -208,7 +196,7 @@ error:
 
 /*************************************
  *
- *	DEVICE_IMAGE_UNLOAD_NAME(mess_hd)
+ *	DEVICE_IMAGE_UNLOAD(mess_hd)
  *
  *	Device unload
  *
@@ -216,38 +204,41 @@ error:
 
 DEVICE_IMAGE_UNLOAD( mess_hd )
 {
-	struct mess_hd *hd = get_drive(image);
+	dev_harddisk_t	*harddisk = get_safe_token( image );
 
-	if (hd->hard_disk_handle != NULL)
+	/* Check if there is an image_unload callback defined */
+	if ( harddisk->config && harddisk->config->device_image_unload )
 	{
-		hard_disk_close(hd->hard_disk_handle);
-		hd->hard_disk_handle = NULL;
+		harddisk->config->device_image_unload( image );
 	}
 
-	if (hd->chd != NULL)
+	if (harddisk->hard_disk_handle != NULL)
 	{
-		chd_close(hd->chd);
-		hd->chd = NULL;
+		hard_disk_close(harddisk->hard_disk_handle);
+		harddisk->hard_disk_handle = NULL;
 	}
 
-	drive_handles[image_index_in_device(image)] = NULL;
+	if (harddisk->chd != NULL)
+	{
+		chd_close(harddisk->chd);
+		harddisk->chd = NULL;
+	}
 }
-
 
 
 /*************************************
  *
- *	Get the MESS/MAME hard disk handle (from the src/harddisk.c core)
+ *  Get the MESS/MAME hard disk handle (from the src/harddisk.c core)
  *  after an image has been opened with the mess_hd core
  *
  *************************************/
 
-hard_disk_file *mess_hd_get_hard_disk_file(const device_config *image)
+hard_disk_file *mess_hd_get_hard_disk_file(const device_config *device)
 {
-	struct mess_hd *hd = get_drive(image);
-	return hd->hard_disk_handle;
-}
+	dev_harddisk_t	*harddisk = get_safe_token( device );
 
+	return harddisk->hard_disk_handle;
+}
 
 
 /*************************************
@@ -257,14 +248,14 @@ hard_disk_file *mess_hd_get_hard_disk_file(const device_config *image)
  *
  *************************************/
 
-chd_file *mess_hd_get_chd_file(const device_config *image)
+chd_file *mess_hd_get_chd_file(const device_config *device)
 {
 	chd_file *result = NULL;
 	hard_disk_file *hd_file;
 
-	if (image)
+	if (device)
 	{
-		hd_file = mess_hd_get_hard_disk_file(image);
+		hd_file = mess_hd_get_hard_disk_file(device);
 		if (hd_file)
 			result = hard_disk_get_chd(hd_file);
 	}
@@ -272,45 +263,179 @@ chd_file *mess_hd_get_chd_file(const device_config *image)
 }
 
 
+/*-------------------------------------------------
+    DEVICE_START(mess_hd)
+-------------------------------------------------*/
 
-/*************************************
- *
- *	Device specification function
- *
- *************************************/
-
-void harddisk_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static DEVICE_START(mess_hd)
 {
-	switch(state)
+	dev_harddisk_t	*harddisk = get_safe_token( device );
+
+	harddisk->config = device->static_config;
+	harddisk->chd = NULL;
+	harddisk->hard_disk_handle = NULL;
+}
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO(mess_hd)
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(mess_hd)
+{
+	switch( state )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:						info->i = IO_HARDDISK; break;
-		case MESS_DEVINFO_INT_READABLE:					info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:				info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATE_OPTCOUNT:			info->i = 1; break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(dev_harddisk_t); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0; break;
+		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL; break;
+		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_HARDDISK; break;
+		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
+		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
+		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 0; break;
+		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(mess_hd); break;
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(mess_hd); break;
-		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(mess_hd); break;
-		case MESS_DEVINFO_PTR_CREATE:					info->create = DEVICE_IMAGE_CREATE_NAME(mess_hd); break;
-		case MESS_DEVINFO_PTR_CREATE_OPTGUIDE:			info->p = (void *) mess_hd_option_guide; break;
-		case MESS_DEVINFO_PTR_CREATE_OPTSPEC+0:			info->p = (void *) mess_hd_option_spec;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(mess_hd); break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(mess_hd); break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(mess_hd); break;
+		case DEVINFO_FCT_IMAGE_CREATE:				info->f = (genf *) DEVICE_IMAGE_CREATE_NAME(mess_hd); break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *) mess_hd_option_guide; break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) mess_hd_option_spec; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "chd,hd"); break;
-		case MESS_DEVINFO_STR_CREATE_OPTNAME+0:			strcpy(info->s = device_temp_str(), "chd"); break;
-		case MESS_DEVINFO_STR_CREATE_OPTDESC+0:			strcpy(info->s = device_temp_str(), "MAME/MESS CHD Hard drive"); break;
-		case MESS_DEVINFO_STR_CREATE_OPTEXTS+0:			strcpy(info->s = device_temp_str(), "chd,hd"); break;
+		case DEVINFO_STR_NAME:						info->s = "Harddisk"; break;
+		case DEVINFO_STR_FAMILY:					info->s = "Harddisk"; break;
+		case DEVINFO_STR_SOURCE_FILE:				info->s = __FILE__; break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		info->s = "chd,hd"; break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	info->s = "chd"; break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	info->s = "MAME/MESS CHD Hard drive"; break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	info->s = "chd,hd"; break;
 	}
 }
 
-hard_disk_file *mess_hd_get_hard_disk_file_by_number(const char *diskregion)
+
+static DEVICE_START(mess_ide)
 {
-	const device_config *device;
-	device = device_list_find_by_tag(Machine->config->devicelist, DEVICE_TYPE_WILDCARD, diskregion);
-	return mess_hd_get_hard_disk_file(device);
+	/* old code from idedrive.c */
+#ifdef UNUSED_FUNCTION
+	int which_bus, which_address;
+	struct ide_interface *intf;
+	device_start_func parent_init;
+
+	/* get the basics */
+	ide_get_params(device, &which_bus, &which_address, &intf, &parent_init, NULL, NULL);
+
+	/* call the parent init function */
+	parent_init(device);
+
+	/* configure IDE */
+	/* FIXME IDE */
+	/* ide_controller_init_custom(which_bus, intf, NULL); */
+#endif
+
+	DEVICE_START_CALL(mess_hd);
+}
+
+
+static DEVICE_IMAGE_LOAD(mess_ide)
+{
+	/* old code from idedrive.c */
+#ifdef UNUSED_FUNCTION
+	int result, which_bus, which_address;
+	struct ide_interface *intf;
+	device_image_load_func parent_load;
+
+	/* get the basics */
+	ide_get_params(image, &which_bus, &which_address, &intf, NULL, &parent_load, NULL);
+
+	/* call the parent load function */
+	result = parent_load(image);
+	if (result != INIT_PASS)
+		return result;
+
+	/* configure IDE */
+	/* FIXME IDE */
+	/* ide_controller_init_custom(which_bus, intf, mess_hd_get_chd_file(image)); */
+	/* ide_controller_reset(which_bus); */
+	return INIT_PASS;
+#endif
+	return device_load_mess_hd( image );
+}
+
+
+static DEVICE_IMAGE_UNLOAD(mess_ide)
+{
+	/* old code from idedrive.c */
+#ifdef UNUSED_FUNCTION
+	int which_bus, which_address;
+	struct ide_interface *intf;
+	device_image_unload_func parent_unload;
+
+	/* get the basics */
+	ide_get_params(image, &which_bus, &which_address, &intf, NULL, NULL, &parent_unload);
+
+	/* call the parent unload function */
+	parent_unload(image);
+
+	/* configure IDE */
+	/* FIXME IDE */
+	/* ide_controller_init_custom(which_bus, intf, NULL); */
+	/* ide_controller_reset(which_bus); */
+#endif
+	device_unload_mess_hd( image );
+}
+
+
+#ifdef UNSUED_FUNCTION
+/*-------------------------------------------------
+    ide_hd_validity_check - check this device's validity
+-------------------------------------------------*/
+
+static int ide_hd_validity_check(const mess_device_class *devclass)
+{
+	int error = 0;
+	int which_address;
+	INT64 count;
+	struct ide_interface *intf;
+
+	which_address = (int) mess_device_get_info_int(devclass, DEVINFO_INT_IDEDRIVE_ADDRESS);
+	intf = (struct ide_interface *) mess_device_get_info_ptr(devclass, DEVINFO_PTR_IDEDRIVE_INTERFACE);
+	count = mess_device_get_info_int(devclass, MESS_DEVINFO_INT_COUNT);
+
+	if (which_address != 0)
+	{
+		mame_printf_error("%s: IDE device has non-zero address\n", devclass->gamedrv->name);
+		error = 1;
+	}
+
+	if (!intf)
+	{
+		mame_printf_error("%s: IDE device does not specify an interface\n", devclass->gamedrv->name);
+		error = 1;
+	}
+
+	return error;
+}
+#endif
+
+
+DEVICE_GET_INFO(mess_ide)
+{
+	switch( state )
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(mess_ide); break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(mess_ide); break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(mess_ide); break;
+//		case DEVINFO_FCT_IMAGE_VERIFY:				info->f = (genf *) ide_hd_validity_check; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:						info->s = "IDE harddisk"; break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:		info->s = "ideharddrive"; break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	info->s = "idehd"; break;
+
+		default:									DEVICE_GET_INFO_CALL( mess_hd ); break;
+	}
 }
 

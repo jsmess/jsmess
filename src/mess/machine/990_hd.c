@@ -159,30 +159,31 @@ static const UINT16 w_mask[8] =
 static hdc_t hdc;
 
 
-/*
-	Initialize hard disk unit
-*/
-DEVICE_START( ti990_hd )
+static int get_id_from_device( const device_config *device )
 {
-	hd_unit_t *d;
-	int id = image_index_in_device(device);
+	int id = -1;
 
-	assert ((id >= 0) && (id < MAX_DISK_UNIT));
+	if ( ! strcmp( "harddisk1", device->tag ) )
+	{
+		id = 0;
+	}
+	else if ( ! strcmp( "harddisk2", device->tag ) )
+	{
+		id = 1;
+	}
+	else if ( ! strcmp( "harddisk3", device->tag ) )
+	{
+		id = 2;
+	}
+	else if ( ! strcmp( "harddisk4", device->tag ) )
+	{
+		id = 3;
+	}
+	assert( id >= 0 );
 
-	d = &hdc.d[id];
-	memset(d, 0, sizeof(*d));
-
-	d->img = device;
-	d->format = format_mame;	/* don't care */
-	d->hd_handle = NULL;
-	d->wp = 1;
-	d->unsafe = 1;
-
-	/* clear attention line */
-	/*hdc.w[0] &= ~ (0x80 >> id);*/
-
-	DEVICE_START_CALL(mess_hd);
+	return id;
 }
+
 
 /*DEVICE_STOP( ti990_hd )
 {
@@ -194,55 +195,22 @@ DEVICE_START( ti990_hd )
 */
 DEVICE_IMAGE_LOAD( ti990_hd )
 {
-	int id = image_index_in_device(image);
+	int id = get_id_from_device( image );
 	hd_unit_t *d;
-	char tag[8];
-	const hard_disk_info *standard_header;
-	disk_image_header custom_header;
-	int bytes_read;
-
-
-	if ((id < 0) || (id >= MAX_DISK_UNIT))
-		return INIT_FAIL;
+	hard_disk_file	*hd_file;
 
 	d = &hdc.d[id];
+	d->img = image;
 
-	bytes_read = image_fread(image, tag, sizeof(tag));
-	if (bytes_read != sizeof(tag))
-		return INIT_FAIL;;
-	if (! strncmp(tag, "MComprHD", 8))
+	hd_file = mess_hd_get_hard_disk_file( image );
+
+	if ( hd_file )
 	{
-		/* standard hard disk format */
+		const hard_disk_info *standard_header;
 
-		/* open image */
-		if (device_load_mess_hd(image))
-			return INIT_FAIL;
-
-		/* set file descriptor */
 		d->format = format_mame;
-		d->hd_handle = mess_hd_get_hard_disk_file(image);
-		/* tell whether the image is writable */
-		d->wp = !image_is_writable(image);
-	}
-	else
-	{
-		/* older, custom format */
+		d->hd_handle = hd_file;
 
-		/* set file descriptor */
-		d->format = format_old;
-		d->hd_handle = NULL;
-		/* tell whether the image is writable */
-		d->wp = ! image_is_writable(image);
-	}
-
-	d->unsafe = 1;
-	/* set attention line */
-	hdc.w[0] |= (0x80 >> id);
-
-	/* read geometry */
-	switch (d->format)
-	{
-	case format_mame:
 		/* use standard hard disk image header. */
 		standard_header = hard_disk_get_info(d->hd_handle);
 
@@ -250,9 +218,17 @@ DEVICE_IMAGE_LOAD( ti990_hd )
 		d->heads = standard_header->heads;
 		d->sectors_per_track = standard_header->sectors;
 		d->bytes_per_sector = standard_header->sectorbytes;
-		break;
+	}
+	else
+	{
+		/* older, custom format */
+		disk_image_header custom_header;
+		int bytes_read;
 
-	case format_old:
+		/* set file descriptor */
+		d->format = format_old;
+		d->hd_handle = NULL;
+
 		/* use custom image header. */
 		/* to convert old header-less images to this format, insert a 16-byte
 		header as follow: 00 00 03 8f  00 00 00 05  00 00 00 21  00 00 01 00 */
@@ -260,7 +236,9 @@ DEVICE_IMAGE_LOAD( ti990_hd )
 		bytes_read = image_fread(d->img, &custom_header, sizeof(custom_header));
 		if (bytes_read != sizeof(custom_header))
 		{
-			device_unload_ti990_hd(image);
+			d->format = format_mame;    /* don't care */
+			d->wp = 1;
+			d->unsafe = 1;
 			return INIT_FAIL;
 		}
 
@@ -268,14 +246,23 @@ DEVICE_IMAGE_LOAD( ti990_hd )
 		d->heads = get_UINT32BE(custom_header.heads);
 		d->sectors_per_track = get_UINT32BE(custom_header.sectors_per_track);
 		d->bytes_per_sector = get_UINT32BE(custom_header.bytes_per_sector);
-		break;
 	}
 
 	if (d->bytes_per_sector > MAX_SECTOR_SIZE)
 	{
-		device_unload_ti990_hd(image);
+		d->format = format_mame;
+		d->hd_handle = NULL;
+		d->wp = 1;
+		d->unsafe = 1;
 		return INIT_FAIL;
 	}
+
+	/* tell whether the image is writable */
+	d->wp = ! image_is_writable( image );
+
+	d->unsafe = 1;
+	/* set attention line */
+	hdc.w[0] |= (0x80 >> id);
 
 	return INIT_PASS;
 }
@@ -285,24 +272,10 @@ DEVICE_IMAGE_LOAD( ti990_hd )
 */
 DEVICE_IMAGE_UNLOAD( ti990_hd )
 {
-	int id = image_index_in_device(image);
+	int id = get_id_from_device( image );
 	hd_unit_t *d;
 
-	if ((id < 0) || (id >= MAX_DISK_UNIT))
-		return;
-
 	d = &hdc.d[id];
-
-	switch (d->format)
-	{
-	case format_mame:
-		device_unload_mess_hd(image);
-		break;
-
-	case format_old:
-		/* no additional clean up is needed */
-		break;
-	}
 
 	d->format = format_mame;	/* don't care */
 	d->hd_handle = NULL;
@@ -337,22 +310,38 @@ INLINE int is_unit_loaded(int unit)
 /*
 	Init the hdc core
 */
-void ti990_hdc_init(void (*interrupt_callback)(int state))
+MACHINE_START(ti990_hdc)
 {
 	int i;
 
+	/* initialize harddisk information */
+	/* attention lines will be set by DEVICE_IMAGE_LOD */
+	for (i=0; i<MAX_DISK_UNIT; i++)
+	{
+		hdc.d[i].format = format_mame;
+		hdc.d[i].hd_handle = NULL;
+		hdc.d[i].wp = 1;
+		hdc.d[i].unsafe = 1;
+	}
+}
 
+
+void ti990_hdc_init(running_machine *machine, void (*interrupt_callback)(int state))
+{
 	memset(hdc.w, 0, sizeof(hdc.w));
 	hdc.w[7] = w7_idle;
-	/* set attention lines */
-	for (i=0; i<MAX_DISK_UNIT; i++)
-		if (is_unit_loaded(i))
-			hdc.w[0] |= (0x80 >> i);
+
+	/* get references to harddisk devices */
+	hdc.d[0].img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk1" );
+	hdc.d[1].img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk2" );
+	hdc.d[2].img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk3" );
+	hdc.d[3].img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk4" );
 
 	hdc.interrupt_callback = interrupt_callback;
 
 	update_interrupt();
 }
+
 
 /*
 	Parse the disk select lines, and return the corresponding tape unit.
@@ -1035,3 +1024,22 @@ WRITE16_HANDLER(ti990_hdc_w)
 		}
 	}
 }
+
+
+static const struct harddisk_callback_config ti990_harddisk_config =
+{
+	DEVICE_IMAGE_LOAD_NAME( ti990_hd ),
+	DEVICE_IMAGE_UNLOAD_NAME( ti990_hd )
+};
+
+MACHINE_DRIVER_START( ti990_hdc )
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
+	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
+	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
+	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
+	MDRV_DEVICE_ADD( "harddisk4", HARDDISK )
+	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
+MACHINE_DRIVER_END
+

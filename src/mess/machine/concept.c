@@ -82,7 +82,7 @@ static struct
 } expansion_slots[4];
 
 static void concept_fdc_init(running_machine *machine, int slot);
-static void concept_hdc_init(int slot);
+static void concept_hdc_init(running_machine *machine, int slot);
 
 MACHINE_START(concept)
 {
@@ -105,7 +105,7 @@ MACHINE_START(concept)
 	/* initialize expansion slots */
 	memset(expansion_slots, 0, sizeof(expansion_slots));
 
-	concept_hdc_init(1);	/* Flat cable Hard Disk Controller in Slot 2 */
+	concept_hdc_init(machine, 1);	/* Flat cable Hard Disk Controller in Slot 2 */
 	concept_fdc_init(machine, 2);	/* Floppy Disk Controller in Slot 3 */
 }
 
@@ -686,8 +686,6 @@ static  READ8_HANDLER(concept_fdc_rom_r)
  *	Concept Hard Disk Controller (hdc)
  */
 
-static void concept_hdc_init(int slot);
-
 static  READ8_HANDLER(concept_hdc_reg_r);
 static WRITE8_HANDLER(concept_hdc_reg_w);
 static  READ8_HANDLER(concept_hdc_rom_r);
@@ -696,9 +694,9 @@ static  READ8_HANDLER(concept_hdc_rom_r);
  *	Hook up the Register and ROM R/W routines into the Slot I/O Space
  */
 
-static void concept_hdc_init(int slot)
+static void concept_hdc_init(running_machine *machine, int slot)
 {
-	if(corvus_hdc_init())
+	if(corvus_hdc_init(machine))
 		install_expansion_slot(slot, concept_hdc_reg_r, concept_hdc_reg_w, concept_hdc_rom_r, NULL);
 }
 
