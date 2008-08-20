@@ -1340,17 +1340,10 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_mda )
@@ -1406,17 +1399,10 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_hercules )
@@ -1473,17 +1459,10 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1539,17 +1518,10 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1604,17 +1576,10 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_aga )
@@ -1663,17 +1628,10 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_cga )
@@ -1728,17 +1686,10 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc200 )
@@ -1780,17 +1731,10 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pc1512 )
@@ -1834,17 +1778,10 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(pcvideo_pc1640)
@@ -1891,17 +1828,10 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ins8250_2", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ins8250_3", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[3] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
@@ -1952,11 +1882,8 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_t1000 )
@@ -2002,11 +1929,8 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( pcjr_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ins8250_0", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ins8250_1", INS8250 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( ibm5150_com_interface[1] )
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_pcjr )

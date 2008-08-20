@@ -436,17 +436,10 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[3] )
+	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
@@ -511,17 +504,10 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[3] )
+	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
@@ -568,17 +554,10 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[3] )
+	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
@@ -640,17 +619,10 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[3] )
+	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
 	MDRV_IMPORT_FROM( pcvideo_vga )
 
@@ -718,17 +690,10 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ns16450_0", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[0] )
-
-	MDRV_DEVICE_ADD( "ns16450_1", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[1] )
-
-	MDRV_DEVICE_ADD( "ns16450_2", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[2] )
-
-	MDRV_DEVICE_ADD( "ns16450_3", NS16450 )			/* TODO: verify model */
-	MDRV_DEVICE_CONFIG( ibm5170_com_interface[3] )
+	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
+	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
 	MDRV_IMPORT_FROM( pcvideo_cga )
 

@@ -14,6 +14,18 @@
 #define NS16550A	DEVICE_GET_INFO_NAME(ns16550a)
 #define PC16550D	DEVICE_GET_INFO_NAME(pc16550d)
 
+#define UART8250_HANDSHAKE_OUT_DTR				0x01
+#define UART8250_HANDSHAKE_OUT_RTS				0x02
+
+#define UART8250_HANDSHAKE_IN_DSR				0x020
+#define UART8250_HANDSHAKE_IN_CTS				0x010
+#define UART8250_INPUTS_RING_INDICATOR			0x0040
+#define UART8250_INPUTS_DATA_CARRIER_DETECT		0x0080
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef void (*ins8250_interrupt_func)(const device_config *device, int state);
 typedef void (*ins8250_transmit_func)(const device_config *device, int data);
@@ -30,8 +42,6 @@ typedef struct
 	long clockin;
 	ins8250_interrupt_func			interrupt;
 
-#define UART8250_HANDSHAKE_OUT_DTR 0x01
-#define UART8250_HANDSHAKE_OUT_RTS 0x02
 	ins8250_transmit_func			transmit;
 	ins8250_handshake_out_func		handshake_out;
 
@@ -40,13 +50,31 @@ typedef struct
 } ins8250_interface;
 
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_INS8250_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, INS8250) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_INS8250_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, INS8250)
+
+
+#define MDRV_NS16450_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, NS16450) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NS16450_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, NS16450)
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
 void ins8250_receive(const device_config *device, int data);
-
-#define UART8250_HANDSHAKE_IN_DSR			0x020
-#define UART8250_HANDSHAKE_IN_CTS			0x010
-#define UART8250_INPUTS_RING_INDICATOR		0x0040
-#define UART8250_INPUTS_DATA_CARRIER_DETECT	0x0080
-
 void ins8250_handshake_in(const device_config *device, int new_msr);
 
 READ8_DEVICE_HANDLER( ins8250_r );
