@@ -1461,6 +1461,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( newbraiv )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
+	CONFIG_DEVICE(newbrain_cassette_getinfo)
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 
