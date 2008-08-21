@@ -237,17 +237,13 @@ static void file_create_render_extra(running_machine *machine, ui_menu *menu, vo
 	creator menu
 -------------------------------------------------*/
 
-static void menu_file_create_populate(running_machine *machine, ui_menu *menu, void *state)
+static void menu_file_create_populate(running_machine *machine, ui_menu *menu, void *state, void *selection)
 {
 	astring *buffer = astring_alloc();
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 	const device_config *device = menustate->manager_menustate->selected_device;
 	const image_device_format *format;
 	const char *new_image_name;
-	void *selection;
-
-	/* identify the selection */
-	selection = ui_menu_get_selection(menu);
 
 	/* append the "New Image Name" item */
 	if (selection == ITEMREF_NEW_IMAGE_NAME)
@@ -283,18 +279,84 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
 
 
 /*-------------------------------------------------
+    create_new_image - creates a new disk image
+-------------------------------------------------*/
+
+static int create_new_image(const device_config *device, const char *directory, const char *filename)
+{
+	astring *path;
+	osd_directory_entry *entry;
+	osd_dir_entry_type file_type;
+	int do_create, err;
+	int result = FALSE;
+
+	/* assemble the full path */
+	path = zippath_combine(astring_alloc(), directory, filename);
+
+	/* does a file or a directory exist at the path */
+	entry = osd_stat(astring_c(path));
+	file_type = (entry != NULL) ? entry->type : ENTTYPE_NONE;
+	if (entry != NULL)
+		free(entry);
+
+	switch(file_type)
+	{
+		case ENTTYPE_NONE:
+			/* no file/dir here - always create */
+			do_create = TRUE;
+			break;
+
+		case ENTTYPE_FILE:
+			/* TODO - we should be raising a warning here, not an error */
+			popmessage("Cannot save over file");
+			do_create = FALSE;
+			break;
+
+		case ENTTYPE_DIR:
+			popmessage("Cannot save over directory");
+			do_create = FALSE;
+			break;
+
+		default:
+			fatalerror("Unexpected");
+			do_create = FALSE;
+			break;
+	}
+
+	/* create the image, if appropriate */
+	if (do_create)
+	{
+		err = image_create(device, astring_c(path), 0, NULL);
+		if (err != 0)
+			popmessage("Error: %s", image_error(device));
+		else
+			result = TRUE;
+	}
+
+	/* free the path */
+	astring_free(path);
+
+	return result;
+}
+
+
+
+/*-------------------------------------------------
     menu_file_create - file creator menu
 -------------------------------------------------*/
 
 static void menu_file_create(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	astring *new_path;
+	void *selection;
 	const ui_menu_event *event;
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 
+	/* identify the selection */
+	selection = ui_menu_get_selection(menu);
+
 	/* rebuild the menu */
 	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
-	menu_file_create_populate(machine, menu, state);
+	menu_file_create_populate(machine, menu, state, selection);
 
 	/* process the menu */
 	event = ui_menu_process(menu, 0);
@@ -306,19 +368,17 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 		switch(event->iptkey)
 		{
 			case IPT_UI_SELECT:
-				if (event->itemref == ITEMREF_CREATE)
+				if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
 				{
-					/* create the image */
-					new_path = zippath_combine(
-						astring_alloc(),
-						astring_c(menustate->manager_menustate->current_directory), 
-						menustate->filename_buffer);
-					image_create(
+					if (create_new_image(
 						menustate->manager_menustate->selected_device,
-						astring_c(new_path),
-						0,
-						NULL);
-					astring_free(new_path);
+						astring_c(menustate->manager_menustate->current_directory),
+						menustate->filename_buffer))
+					{
+						/* success - pop out twice to device view */
+						ui_menu_stack_pop(machine);
+						ui_menu_stack_pop(machine);
+					}
 				}
 				break;
 
