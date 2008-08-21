@@ -555,20 +555,6 @@ static ADDRESS_MAP_START( ip204415_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0xbfc00000, 0xbfc7ffff ) AM_ROM AM_SHARE(2) /* BIOS Mirror */
 ADDRESS_MAP_END
 
-static MACHINE_RESET( ip204415 )
-{
-	mc_init(machine);
-
-	nHPC_MiscStatus = 0;
-	nHPC_ParBufPtr = 0;
-	nHPC_LocalIOReg0Mask = 0;
-	nHPC_LocalIOReg1Mask = 0;
-	nHPC_VMEIntMask0 = 0;
-	nHPC_VMEIntMask1 = 0;
-
-	nRTC_Temp = 0;
-}
-
 static void scsi_irq(running_machine *machine, int state)
 {
 }
@@ -592,8 +578,23 @@ static void ip204415_exit(running_machine *machine)
 
 static DRIVER_INIT( ip204415 )
 {
-	wd33c93_init(&scsi_intf);
 	add_exit_callback(machine, ip204415_exit);
+}
+
+static MACHINE_RESET( ip204415 )
+{
+	wd33c93_init(&scsi_intf);
+
+	mc_init(machine);
+
+	nHPC_MiscStatus = 0;
+	nHPC_ParBufPtr = 0;
+	nHPC_LocalIOReg0Mask = 0;
+	nHPC_LocalIOReg1Mask = 0;
+	nHPC_VMEIntMask0 = 0;
+	nHPC_VMEIntMask1 = 0;
+
+	nRTC_Temp = 0;
 }
 
 static INPUT_PORTS_START( ip204415 )
