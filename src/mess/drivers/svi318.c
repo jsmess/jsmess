@@ -274,6 +274,9 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( svi318_ppi8255_interface )
 
+	MDRV_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0] )
+	MDRV_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )
+
 	/* Video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("main")
