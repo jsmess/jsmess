@@ -52,6 +52,9 @@ Source Changes:
 - Moved image creation format code to be based on the new device model.  [Nate
   Woods]
 
+- Changed the cdrom and harddisk implementation into a mame device.  [Wilbert
+  Pol]
+
 
 
 0.126
