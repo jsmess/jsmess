@@ -2185,7 +2185,7 @@ static MACHINE_RESET( saturn )
 static const gfx_layout tiles8x8x4_layout =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	0x100000/(32*8/8),
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28 },
@@ -2196,7 +2196,7 @@ static const gfx_layout tiles8x8x4_layout =
 static const gfx_layout tiles16x16x4_layout =
 {
 	16,16,
-	RGN_FRAC(1,1),
+	0x100000/(32*32/8),
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
@@ -2213,7 +2213,7 @@ static const gfx_layout tiles16x16x4_layout =
 static const gfx_layout tiles8x8x8_layout =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	0x100000/(64*8/8),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56 },
@@ -2224,7 +2224,7 @@ static const gfx_layout tiles8x8x8_layout =
 static const gfx_layout tiles16x16x8_layout =
 {
 	16,16,
-	RGN_FRAC(1,1),
+	0x100000/(128*16/8),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56,
