@@ -2,6 +2,14 @@
 #define __NEWBRAIN__
 
 #define SCREEN_TAG			"main"
+#define Z80_TAG				"409"
+#define COP420_TAG			"419"
+#define MC6850_TAG			"459"
+#define ADC0809_TAG			"427"
+#define DAC0808_TAG			"461"
+#define Z80CTC_TAG			"458"
+#define FDC_Z80_TAG			"416"
+#define NEC765AC_TAG		"418"
 
 #define NEWBRAIN_VIDEO_RV			0x01
 #define NEWBRAIN_VIDEO_FS			0x02
@@ -19,6 +27,7 @@ struct _newbrain_state
 	int clkint;				/* clock interrupt */
 	int aciaint;			/* ACIA interrupt */
 	int copint;				/* COP interrupt */
+	int anint;				/* A/DC interrupt */
 	int bee;				/* identity */
 	UINT8 enrg1;			/* enable register 1 */
 	UINT8 enrg2;			/* enable register 2 */

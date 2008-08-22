@@ -4,6 +4,7 @@
 #include "cpu/cop400/cop400.h"
 #include "machine/nec765.h"
 #include "machine/6850acia.h"
+#include "machine/adc080x.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80sio.h"
@@ -833,6 +834,39 @@ static WRITE8_HANDLER( ei_paging_w )
 	}
 }
 
+/* A/D Converter */
+
+static ADC080X_ON_EOC_CHANGED( newbrain_adc_on_eoc_changed )
+{
+	newbrain_state *state = device->machine->driver_data;
+
+	state->anint = level;
+}
+
+static ADC080X_VREF_POSITIVE_READ( newbrain_adc_vref_pos_r )
+{
+	return 5.0;
+}
+
+static ADC080X_VREF_NEGATIVE_READ( newbrain_adc_vref_neg_r )
+{
+	return 0.0;
+}
+
+static ADC080X_INPUT_READ( newbrain_adc_input_r )
+{
+	return 0.0;
+}
+
+static ADC080X_INTERFACE( newbrain_adc0809_intf )
+{
+	500000,
+	newbrain_adc_on_eoc_changed,
+	newbrain_adc_vref_pos_r,
+	newbrain_adc_vref_neg_r,
+	newbrain_adc_input_r
+};
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( newbrain_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1114,7 +1148,7 @@ static TIMER_CALLBACK( pwrup_tick )
 
 	for (bank = 1; bank < 9; bank++)
 	{
-		memory_configure_bank(bank, 0, 1, memory_region(machine, "main") + (bank - 1) * 0x2000, 0);
+		memory_configure_bank(bank, 0, 1, memory_region(machine, Z80_TAG) + (bank - 1) * 0x2000, 0);
 		memory_set_bank(bank, 0);
 	}
 }
@@ -1128,7 +1162,7 @@ static MACHINE_START( newbrain )
 
 	for (bank = 1; bank < 9; bank++)
 	{
-		memory_configure_bank(bank, 0, 1, memory_region(machine, "main") + 0xe000, 0);
+		memory_configure_bank(bank, 0, 1, memory_region(machine, Z80_TAG) + 0xe000, 0);
 		memory_set_bank(bank, 0);
 	}
 
@@ -1198,22 +1232,27 @@ static MACHINE_DRIVER_START( newbrain )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", Z80, XTAL_16MHz/8)
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_ei_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
 
-	MDRV_CPU_ADD("cop", COP420, XTAL_16MHz/8) // COP420-GUW/M
+	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
 
-	MDRV_CPU_ADD("fdc", Z80, XTAL_4MHz)
+	MDRV_CPU_ADD(FDC_Z80_TAG, Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(newbrain_fdc_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_fdc_io_map, 0)
 
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
+
+	// A/D converter
+
+	MDRV_DEVICE_ADD(ADC0809_TAG, ADC0809)
+	MDRV_DEVICE_CONFIG(newbrain_adc0809_intf)
 
 	// video hardware
 
@@ -1225,12 +1264,12 @@ static MACHINE_DRIVER_START( newbraim )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", Z80, XTAL_16MHz/8)
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_m_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
 
-	MDRV_CPU_ADD("cop", COP420, XTAL_16MHz/8) // COP420-GUW/M
+	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
@@ -1248,12 +1287,12 @@ static MACHINE_DRIVER_START( newbraia )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", Z80, XTAL_16MHz/8)
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_a_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
 
-	MDRV_CPU_ADD("cop", COP420, XTAL_16MHz/8) // COP420-GUW/M
+	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
@@ -1271,12 +1310,12 @@ static MACHINE_DRIVER_START( newbraiv )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", Z80, XTAL_16MHz/8)
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_v_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
 
-	MDRV_CPU_ADD("cop", COP420, XTAL_16MHz/8) // COP420-GUW/M
+	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
@@ -1292,12 +1331,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( newbrain )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "d413-2.rom", 0x8000, 0x2000, CRC(097591f1) SHA1(c2aa1d27d4f3a24ab0c8135df746a4a44201a7f4) )
 	ROM_LOAD( "cdmd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a) )
 	ROM_LOAD( "efmd.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6) )
 
-	ROM_REGION( 0x400, "cop", 0 )
+	ROM_REGION( 0x400, COP420_TAG, 0 )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x10000, "eim", 0 ) // Expansion Interface Module
@@ -1306,7 +1345,7 @@ ROM_START( newbrain )
 	ROM_LOAD( "e416-3.rom", 0x6000, 0x2000, CRC(8b5099d8) SHA1(19b0cfce4c8b220eb1648b467f94113bafcb14e0) ) // 10/8/83.mtv
 	ROM_LOAD( "e417-2.rom", 0x8000, 0x2000, CRC(6a7afa20) SHA1(f90db4f8318777313a862b3d5bab83c2fd260010) )
 
-	ROM_REGION( 0x10000, "fdc", 0 ) // Floppy Disk Controller
+	ROM_REGION( 0x10000, FDC_Z80_TAG, 0 ) // Floppy Disk Controller
 	ROM_LOAD( "d417-1.rom", 0x0000, 0x2000, CRC(40fad31c) SHA1(5137be4cc026972c0ffd4fa6990e8583bdfce163) )
 	ROM_LOAD( "d417-2.rom", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c) )
 
@@ -1315,11 +1354,11 @@ ROM_START( newbrain )
 ROM_END
 
 ROM_START( newbraim )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "cdmd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a) )
 	ROM_LOAD( "efmd.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6) )
 
-	ROM_REGION( 0x400, "cop", 0 )
+	ROM_REGION( 0x400, COP420_TAG, 0 )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
@@ -1327,7 +1366,7 @@ ROM_START( newbraim )
 ROM_END
 
 ROM_START( newbraia )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "rom20", "ROM 2.0" )
 	ROMX_LOAD( "aben20.rom", 0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(1) )
 	ROMX_LOAD( "cd20tci.rom", 0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(1) )
@@ -1347,7 +1386,7 @@ ROM_START( newbraia )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
 	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(4) )
 
-	ROM_REGION( 0x400, "cop", 0 )
+	ROM_REGION( 0x400, COP420_TAG, 0 )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
