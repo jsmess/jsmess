@@ -65,7 +65,15 @@ file_error osd_get_full_path(char **dst, const char *path)
 	{
 		*dst = (char *)malloc(strlen(path_buffer)+strlen(path)+3);
 
-		sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
+		// if it's already a full path, just pass it through
+		if (path[0] == '/')
+		{
+			strcpy(*dst, path);
+		}
+		else
+		{
+			sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
+		}
 		printf("osd_get_full_path: cwd [%s] path [%s] out [%s]\n", path_buffer, path, *dst);
 	}
 
