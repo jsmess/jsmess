@@ -473,7 +473,12 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 
 	// guess the aspect ratio assuming square pixels
 	monitor->aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
-
+	
+	// SDL will crash if monitors are queried here
+	// This will be done in window.c (Ughh, ugly)
+	
+	monitor->modes = NULL;
+	
 	// save the primary monitor handle
 	if (info.dwFlags & MONITORINFOF_PRIMARY)
 		primary_monitor = monitor;
@@ -502,7 +507,6 @@ static void init_monitors(void)
 
 	#ifdef SDLMAME_WIN32
 	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
-	monitor->modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
 	#elif (SDL_VERSION_ATLEAST(1,3,0))
 	{
 		int i, temp;

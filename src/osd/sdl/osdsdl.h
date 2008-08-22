@@ -12,8 +12,21 @@
 	  * Need to submit the directfb driver to the SDL team
 	  * SDL1.3: sdlvideofps does not take -numscreens>1 into account.
 
+	- For DEBUG=1 builds, disable input grapping while windowed
+	- Fixed WIN32 compile
+	  Wrote setenv function since mingw does not provide one.
+	  Implemented osd_event_* as inline functions for win32 build.
+	  We should at some point merge sdlwork.c and winwork.c and push it
+	  to the core, letting sdlsync.c provide the necessary details.
+	- Removed keybled.c and references
+	- Added output.c and output.h. These will look for a fifo or file 
+	  /tmp/sdlmame_out and write output notifiers to it.
+	  Added a sample client ledutil.sh to src/osd/sdl which turns
+	  leds on and off and provides a debug (log) facility.
+	- removed os2work.c
+	
 	- replaced window->render_lock with event window->rendered_event
-	  for multiple windows and "-mt", the old code would allow filling up
+	  For multiple windows and "-mt", the old code would allow filling up
 	  the workqueue with 1000s of entries, since the lock would not block while
 	  another window is rendered. The osd_event establishes a barrier which
 	  is only freed if the last window blit operation has finished.
@@ -273,12 +286,5 @@
 //============================================================
 
 void sdlaudio_init(running_machine *machine);
-
-//============================================================
-// keybled.c
-//============================================================
-
-void sdlled_init(void);
-
 
 #endif

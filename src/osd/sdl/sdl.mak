@@ -44,7 +44,7 @@ USE_DISPATCH_GL = 1
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-SDL_INSTALL_ROOT = /usr/local/sdl13
+# SDL_INSTALL_ROOT = /usr/local/sdl13
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -166,7 +166,7 @@ OSDCOREOBJS = \
 OSDOBJS =  $(SDLOBJ)/sdlmain.o \
 	$(SDLOBJ)/input.o \
 	$(SDLOBJ)/sound.o  $(SDLOBJ)/video.o \
-	$(SDLOBJ)/drawsdl.o $(SDLOBJ)/window.o $(SDLOBJ)/keybled.o 
+	$(SDLOBJ)/drawsdl.o $(SDLOBJ)/window.o $(SDLOBJ)/output.o 
 
 
 ifndef NO_OPENGL
@@ -216,6 +216,7 @@ CFLAGS += `sdl-config --cflags`
 LIBS += -lm `sdl-config --libs` $(LIBGL)
 else
 CFLAGS += -I$(SDL_INSTALL_ROOT)/include
+#LIBS += -L/opt/intel/cce/9.1.051/lib  -limf -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
 LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
 endif
 
@@ -289,6 +290,8 @@ endif	# Mac OS X
 
 # OS2: add the necessary libraries
 ifeq ($(TARGETOS),os2)
+OSDCOREOBJS += $(SDLOBJ)/debugwin.o
+
 CFLAGS += `sdl-config --cflags`
 LIBS += `sdl-config --libs`
 endif # OS2

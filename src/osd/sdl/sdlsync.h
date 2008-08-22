@@ -14,9 +14,7 @@
 
 #ifndef SDLMAME_WIN32
 
-#ifndef SDLMAME_OS2
-
-#if (defined SDLMAME_MACOSX) || (defined SDLMAME_FREEBSD) || (defined SDLMAME_SOLARIS)
+#if (defined SDLMAME_MACOSX) || (defined SDLMAME_FREEBSD) || (defined SDLMAME_SOLARIS) || (defined SDLMAME_OS2)
 #define THREAD_COOPERATIVE      (0)
 #else
 #define THREAD_COOPERATIVE		(1)
@@ -191,7 +189,44 @@ void osd_thread_wait_free(osd_thread *thread);
 -----------------------------------------------------------------------------*/
 int osd_num_processors(void);
 
-#endif  /* SDLMAME_OS2 */
+#else
+
+// standard windows headers
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <process.h>
+
+/*-----------------------------------------------------------------------------
+    INLINE implementation of WIN events
+-----------------------------------------------------------------------------*/
+
+typedef void osd_event;
+
+INLINE osd_event *osd_event_alloc(int manualreset, int initialstate)
+{
+	return (void *) CreateEvent(NULL, manualreset, initialstate, NULL);
+}
+
+INLINE int osd_event_wait(osd_event *event, osd_ticks_t timeout)
+{
+	return WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
+}
+
+INLINE void osd_event_reset(osd_event *event)
+{
+	ResetEvent((HANDLE) event);
+}
+
+INLINE void osd_event_set(osd_event *event)
+{
+	SetEvent((HANDLE) event);
+}
+
+INLINE void osd_event_free(osd_event *event)
+{
+	CloseHandle((HANDLE) event);
+}
+
 
 #endif	/* SDLMAME_WIN32 */
 

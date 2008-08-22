@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_NO_X11) && !defined(SDLMAME_SOLARIS) 
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_NO_X11) && !defined(SDLMAME_SOLARIS) && !defined(SDLMAME_OS2)
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -879,8 +879,10 @@ void on_dbpl_activate(GtkMenuItem *item, gpointer user_data)
 
 #else
 
+#include "driver.h"
+
 // win32 stubs for linking
-void osd_wait_for_debugger(void)
+void osd_wait_for_debugger(running_machine *machine, int firststop)
 {
 }
 

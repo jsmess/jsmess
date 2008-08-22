@@ -139,6 +139,7 @@ static int					event_buf_count;
 static device_info *		keyboard_list;
 
 // mouse states
+static UINT8				app_has_mouse_focus;
 static UINT8				mouse_enabled;
 static device_info *		mouse_list;
 
@@ -895,6 +896,8 @@ void sdlinput_init(running_machine *machine)
 	joystick_list = NULL;
 	mouse_list = NULL;
 	lightgun_list = NULL;
+	
+	app_has_mouse_focus = 1;
 
 	// get Sixaxis special mode info
 	sixaxis_mode = options_get_bool(mame_options(), SDLOPTION_SIXAXIS);
@@ -943,7 +946,16 @@ void sdlinput_init(running_machine *machine)
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
 	devinfo->device = input_device_add(DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+
 	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
+	
+#ifdef MAME_DEBUG
+	if (mouse_enabled)
+	{
+		mame_printf_warning("Debug Build: Disabling input grab in window mode ...\n");
+		mouse_enabled = 0;
+	}
+#endif
 
 	// add the axes
 	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
@@ -1218,6 +1230,14 @@ void sdlinput_poll(running_machine *machine)
 			}
 			break;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
+		case SDL_APPMOUSEFOCUS:
+			app_has_mouse_focus = event.active.gain;
+			if (!event.active.gain)
+			{
+				sdl_window_info *window = GET_WINDOW(&event.motion);
+				ui_input_push_mouse_leave_event(machine, window->target);
+			}
+			break;
 		case SDL_QUIT:
 			mame_schedule_exit(machine);
 			break;
@@ -1252,15 +1272,19 @@ void sdlinput_poll(running_machine *machine)
 			case  SDL_WINDOWEVENT_LEAVE:
 			{
 				ui_input_push_mouse_leave_event(machine, window->target);
+				app_has_mouse_focus = 0;
 				break;
 				
 			}
 			case SDL_WINDOWEVENT_RESIZED:
 				if (event.window.data1 != window->width || event.window.data2 != window->height)
 					sdlwindow_resize(window, event.window.data1, event.window.data2);
-				/* fall through break; */
-			case SDL_WINDOWEVENT_FOCUS_GAINED:
+				focus_window = window;
+				break;
 			case SDL_WINDOWEVENT_ENTER:
+				app_has_mouse_focus = 1;
+				/* fall through */
+			case SDL_WINDOWEVENT_FOCUS_GAINED:
 			case SDL_WINDOWEVENT_EXPOSED:
 			case SDL_WINDOWEVENT_MAXIMIZED:  
 			case SDL_WINDOWEVENT_RESTORED:
@@ -1304,6 +1328,9 @@ int sdlinput_should_hide_mouse(running_machine *machine)
 	
 	// if neither mice nor lightguns enabled in the core, then no
 	if (!mouse_enabled && !lightgun_enabled)
+		return FALSE;
+	
+	if (!app_has_mouse_focus)
 		return FALSE;
 	
 	// otherwise, yes

@@ -723,20 +723,20 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 	// the possibility of losing control
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 	{
-		if (!window->fullscreen && !sdlinput_should_hide_mouse(machine))
-		{
-			SDL_ShowCursor(SDL_ENABLE);
-			if (SDL_WM_GrabInput(SDL_GRAB_QUERY))
-			{
-				SDL_WM_GrabInput(SDL_GRAB_OFF);
-			}
-		}
-		else
+		if ( window->fullscreen || sdlinput_should_hide_mouse(machine) )
 		{
 			SDL_ShowCursor(SDL_DISABLE);
 			if (!SDL_WM_GrabInput(SDL_GRAB_QUERY))
 			{
 				SDL_WM_GrabInput(SDL_GRAB_ON);
+			}
+		}
+		else
+		{
+			SDL_ShowCursor(SDL_ENABLE);
+			if (SDL_WM_GrabInput(SDL_GRAB_QUERY))
+			{
+				SDL_WM_GrabInput(SDL_GRAB_OFF);
 			}
 		}
 	}
@@ -922,7 +922,16 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		minimum_height -= 4;
 	}
 
+#if defined(SDLMAME_WIN32) && !SDL_VERSION_ATLEAST(1,3,0)
+	/*
+	 *  We need to do this here. If SDL_ListModes is
+	 * called in init_monitors, the call will crash
+	 * on win32
+	 */
+	modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
+#else
 	modes = window->monitor->modes;
+#endif
 	
 	if (modes == (SDL_Rect **)0)
 	{

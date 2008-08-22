@@ -36,6 +36,9 @@
 #include <errno.h>
 #include <sys/time.h>
 #else
+#define INCL_DOS
+#include <os2.h>
+
 #include <stdlib.h>
 #define pthread_t       int
 #define pthread_self    _gettid
@@ -69,6 +72,13 @@ struct _osd_event {
 #else
 	INT8				padding[48];	// A bit more padding
 #endif
+};
+#else
+struct _osd_event {
+    HMTX                hmtx;
+    HEV                 hev;
+    volatile INT32      autoreset;
+    INT8                padding[52];    // Fill a 64-byte cache line
 };
 #endif
 
@@ -314,11 +324,11 @@ void osd_lock_free(osd_lock *lock)
 }
 #endif
 
+#ifndef SDLMAME_OS2
 //============================================================
 //  osd_num_processors
 //============================================================
 
-#ifndef SDLMAME_OS2
 int osd_num_processors(void)
 {
 	int processors = 1;
@@ -612,6 +622,150 @@ void osd_thread_wait_free(osd_thread *thread)
 {
 	pthread_join(thread->thread, NULL);
 	free(thread);
+}
+
+#else
+
+//============================================================
+//  osd_num_processors
+//============================================================
+
+int osd_num_processors(void)
+{
+    ULONG numprocs = 1;
+
+    DosQuerySysInfo(QSV_NUMPROCESSORS, QSV_NUMPROCESSORS, &numprocs, sizeof(numprocs));
+
+    return numprocs;
+}
+
+//============================================================
+//  osd_event_alloc
+//============================================================
+
+osd_event *osd_event_alloc(int manualreset, int initialstate)
+{
+    osd_event *ev;
+
+    ev = (osd_event *)calloc(1, sizeof(osd_event));
+
+    DosCreateMutexSem(NULL, &ev->hmtx, 0, FALSE);
+    DosCreateEventSem(NULL, &ev->hev, 0, initialstate);
+    ev->autoreset = !manualreset;
+
+    return ev;
+}
+
+//============================================================
+//  osd_event_free
+//============================================================
+
+void osd_event_free(osd_event *event)
+{
+    DosCloseMutexSem(event->hmtx);
+    DosCloseEventSem(event->hev);
+    free(event);
+}
+
+//============================================================
+//  osd_event_set
+//============================================================
+
+void osd_event_set(osd_event *event)
+{
+    DosPostEventSem(event->hev);
+}
+
+//============================================================
+//  osd_event_reset
+//============================================================
+
+void osd_event_reset(osd_event *event)
+{
+    ULONG ulCount;
+
+    DosResetEventSem(event->hev, &ulCount);
+}
+
+//============================================================
+//  osd_event_wait
+//============================================================
+
+int osd_event_wait(osd_event *event, osd_ticks_t timeout)
+{
+    ULONG rc;
+
+    if(event->autoreset)
+        DosRequestMutexSem(event->hmtx, -1);
+
+    rc = DosWaitEventSem(event->hev, timeout * 1000 / osd_ticks_per_second());
+
+    if(event->autoreset)
+    {
+        ULONG ulCount;
+
+        DosResetEventSem(event->hev, &ulCount);
+        DosReleaseMutexSem(event->hmtx);
+    }
+
+    return (rc == 0);
+}
+
+//============================================================
+//  osd_thread_create
+//============================================================
+
+osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
+{
+    osd_thread *thread;
+
+    thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+    thread->thread = _beginthread(callback, NULL, 65535, cbparam);
+    if ( thread->thread == -1 )
+    {
+        free(thread);
+        return NULL;
+    }
+    return thread;
+}
+
+//============================================================
+//  osd_thread_adjust_priority
+//============================================================
+
+int osd_thread_adjust_priority(osd_thread *thread, int adjust)
+{
+    PTIB ptib;
+
+    DosGetInfoBlocks(&ptib, NULL);
+
+    if ( DosSetPriority(PRTYS_THREAD, PRTYC_NOCHANGE,
+                        ((BYTE)ptib->tib_ptib2->tib2_ulpri) + adjust, thread->thread ))
+        return FALSE;
+
+
+    return TRUE;
+}
+
+//============================================================
+//  osd_thread_cpu_affinity
+//============================================================
+
+int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
+{
+    return TRUE;
+}
+
+//============================================================
+//  osd_thread_wait_free
+//============================================================
+
+void osd_thread_wait_free(osd_thread *thread)
+{
+    TID tid = thread->thread;
+
+    DosWaitThread(&tid, 0);
+    free(thread);
 }
 
 #endif  /* SDLMAME_OS2 */

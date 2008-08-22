@@ -22,6 +22,7 @@
 // OSD headers
 #include "video.h"
 #include "input.h"
+#include "output.h"
 #include "osdsdl.h"
 
 // we override SDL's normal startup on Win32
@@ -219,6 +220,33 @@ static const options_entry mame_sdl_options[] =
 	// End of list
 	{ NULL }
 };
+
+#ifdef SDLMAME_WIN32
+
+/* mingw has no setenv */
+
+int setenv(const char *name, const char *value, int overwrite)
+{
+	char *buf;
+	int result;
+	
+	if (!overwrite)
+	{
+		if (getenv(name) != NULL)
+			return 0;
+	}
+	buf = malloc(strlen(name)+strlen(value)+2);
+	sprintf(buf, "%s=%s", name, value);
+	result = putenv(buf);
+	
+	/* will be referenced by environment 
+	 * Therefore it is not freed here
+	 */
+	
+	return result;
+}
+
+#endif
 
 //============================================================
 //	main
@@ -499,13 +527,13 @@ void osd_init(running_machine *machine)
 		fflush(stdout);
 		exit(-1);
 	}
-	if (osd_use_unsupported())
-		sdlled_init();
 
 	sdlinput_init(machine);
 	
 	sdlaudio_init(machine);
 
+	sdloutput_init(machine);
+	
 	if (options_get_bool(mame_options(), SDLOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);
 
