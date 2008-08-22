@@ -783,6 +783,8 @@ void msx_memory_init (running_machine *machine)
 		return;
 	}
 
+	msx1.layout = layout;
+
 	for (; layout->entry != MSX_LAYOUT_LAST; layout++) {
 
 		switch (layout->entry) {

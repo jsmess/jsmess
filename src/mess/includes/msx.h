@@ -27,7 +27,7 @@ typedef struct {
 	UINT8 *kanji_mem;
 	int kanji_latch;
 	/* memory */
-	msx_slot_layout *layout;
+	const msx_slot_layout *layout;
 	slot_state *cart_state[MSX_MAX_CARTS];
 	slot_state *state[4];
 	const msx_slot *slot[4];
