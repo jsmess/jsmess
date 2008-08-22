@@ -24,6 +24,9 @@ System Driver Changes:
 - [IBM5170] Added support for the 8042 keyboard controller dumped
   by Kevtris.  [Wilbert Pol]
 
+- [MSX Family] Fixed cartridge loading. (part of bug #1603)  [Wilbert
+  Pol]
+
 
 User Interface Changes:
 -----------------------
