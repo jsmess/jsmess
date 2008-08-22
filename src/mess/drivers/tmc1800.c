@@ -74,6 +74,7 @@ Notes:
 
 static QUICKLOAD_LOAD( tmc1800 );
 static QUICKLOAD_LOAD( tmc2000 );
+static QUICKLOAD_LOAD( oscnano );
 
 static MACHINE_RESET( tmc1800 );
 static MACHINE_RESET( tmc2000 );
@@ -812,7 +813,7 @@ static MACHINE_DRIVER_START( oscnano )
 
 	// quickload
 
-	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
+	MDRV_QUICKLOAD_ADD(oscnano, "bin", 0)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -878,6 +879,23 @@ static QUICKLOAD_LOAD( tmc2000 )
 	image_fread(image, &mess_ram, size);
 
 	MACHINE_RESET_CALL(tmc2000);
+
+	return INIT_PASS;
+}
+
+static QUICKLOAD_LOAD( oscnano )
+{
+	running_machine *machine = image->machine;
+	int size = image_length(image);
+
+	if (size > mess_ram_size)
+	{
+		return INIT_FAIL;
+	}
+
+	image_fread(image, &mess_ram, size);
+
+	MACHINE_RESET_CALL(oscnano);
 
 	return INIT_PASS;
 }
