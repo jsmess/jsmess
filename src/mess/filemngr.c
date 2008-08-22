@@ -865,12 +865,12 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 	}
 	menustate = (file_manager_menu_state *) state;
 
-	/* update the selected device */
-	menustate->selected_device = (const device_config *) ui_menu_get_selection(menu);
-
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 		menu_file_manager_populate(machine, menu, state);
+
+	/* update the selected device */
+	menustate->selected_device = (const device_config *) ui_menu_get_selection(menu);
 
 	/* process the menu */
 	event = ui_menu_process(menu, 0);
@@ -887,7 +887,7 @@ void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter,
 			astring_cpyc(menustate->current_file, image_exists(menustate->selected_device) ? image_basename(menustate->selected_device) : "");
 
 			/* reset the existing menu */
-			ui_menu_reset(menu, 0);
+			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
 
 			/* push the menu */
 			child_menu = ui_menu_alloc(machine, menu_file_selector, NULL);
