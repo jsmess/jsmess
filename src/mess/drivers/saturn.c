@@ -2072,6 +2072,10 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 
 	saturn_region = rgn;
 
+	// set compatible options
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	cpunum_set_info_int(1, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+
 	/* get the current date/time from the core */
 	mame_get_current_datetime(machine, &systime);
 
