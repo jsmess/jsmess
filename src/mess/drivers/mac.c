@@ -83,7 +83,7 @@ static const custom_sound_interface custom_interface =
 static const applefdc_interface mac_iwm_interface =
 {
 	sony_set_lines,
-	sony_set_enable_lines,
+	mac_fdc_set_enable_lines,
 
 	sony_read_data,
 	sony_write_data,
@@ -378,7 +378,7 @@ COMP( 1984,	mac128k,  0, 		0,	mac512ke, macplus,  mac128k512k,	mac128k,	"Apple C
 COMP( 1984,	mac512k,  mac128k,	0,	mac512ke, macplus,  mac128k512k,	mac512k,	"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986,	mac512ke, macplus,  0,		mac512ke, macplus,  mac512ke,		mac512k,	"Apple Computer",	"Macintosh 512ke", 0 )
 COMP( 1986,	macplus,  0,		0,	macplus,  macplus,  macplus,		macplus,	"Apple Computer",	"Macintosh Plus",  0 )
-COMP( 1987,	macse,    0,		0,	macplus,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  GAME_NOT_WORKING )
+COMP( 1987,	macse,    0,		0,	macplus,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  0 )
 COMP( 1990,	macclasc, 0,		0,	macplus,  macplus,  macclassic,		    macse,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
 
 

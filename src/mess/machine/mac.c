@@ -2,34 +2,58 @@
 
 	machine/mac.c
 
-	Mac hardware - Mac 128k, 512k, 512ke, Plus (SCSI, SCC, etc)
+	Mac hardware - Mac 128k, 512k, 512ke, Plus, SE, Classic, II (SCSI, SCC, ADB, etc)
 
 	Nate Woods
 	Ernesto Corvi
 	Raphael Nabet
+	R. Belmont
 
 	Mac Model Feature Summary:
 
-						CPU		FDC		Keyb	PRAM	ROMMir
-		 - Mac 128k		68k		IWM		orig	orig	???
-		 - Mac 512k		68k		IWM		orig	orig	???
-		 - Mac 512ke	68k		IWM		orig	orig	???
-		 - Mac Plus		68k		IWM		orig	ext		no
-		 - Mac SE		68k		IWM		ADB		ext		???
-		 - Mac Classic	68k		IWM		ADB		ext		???
+                                CPU             FDC     Kbd/Mouse  PRAM   Video
+                 - Mac 128k	68k             IWM	orig       orig   Original
+                 - Mac 512k	68k             IWM	orig       orig   Original
+                 - Mac 512ke	68k             IWM	orig       orig   Original
+                 - Mac Plus	68k             IWM	orig       ext    Original
+                 - Mac SE	68k             IWM	MacII ADB  ext    Original
+                 - Mac Classic	68k             SWIM	ADB-???    ext    Original
+                 - Mac Portable	68k (16 MHz)    SWIM	ADB-PMU    PMU    640x480 B&W
+                 - PwrBook 100  68k (16 MHz)    SWIM	ADB-PMU    PMU    640x480 B&W
+		 - Mac II       020             IWM	MacII ADB  ext    NuBus card
+		 - Mac IIx      030             SWIM	MacII ADB  ext    NuBus card
+		 - Mac IIfx     030             SWIM	ADB-IOP    ext    NuBus card
+		 - Mac SE/30    030             SWIM    MacII ADB  ext    Internal fake NuBus card (need video declaration ROM!)
+		 - Mac IIcx     030             SWIM	ADB-CUDA   ext    NuBus card
+		 - Mac IIci     030             SWIM	ADB-CUDA   ext    Internal "RBV" type
 
 	Notes:
 		- The Mac Plus boot code seems to check to see the extent of ROM
 		  mirroring to determine if SCSI is available.  If the ROM is mirrored,
 		  then SCSI is not available.  Thanks to R. Belmont for making this
 		  discovery.
+		- On the SE and most later Macs, the first access to 4xxxxx turns off the overlay.
+		  However, the Mac II has the old-style VIA overlay control bit!
+		- The Mac II can have either a 68551 PMMU fitted or an Apple custom that handles 24 vs. 32
+		  bit addressing mode.  The ROM is *not* 32-bit clean so Mac OS normally runs in 24 bit mode,
+		  but A/UX can run 32.
+		- There are 5 known kinds of host-side ADB hardware:
+		  * "Mac II ADB" used in the SE, II, IIx, IIcx, SE/30, IIci, Quadra 610, Quadra 650, Quadra 700, 
+		     Quadra 800, Centris 610 and Centris 650.  This is a dumb state machine using the VIA.
+		  * "ADB-PMU" used in the Mac Portable and all 680x0-based PowerBooks.
+		  * "ADB-EGRET" used in the IIsi, IIvi, IIvx, Classic II, LC, LC II, LC III, Performa 460, 
+		     and Performa 600.  This is a 68HC05 with a different internal ROM than CUDA.
+		  * "ADB-IOP" (ADB driven by a 6502 coprocessor, similar to Lisa) used in the IIfx, 
+		    Quadra 900, and Quadra 950.
+		  * "ADB-CUDA" (Apple's CUDA chip, which is a 68HC05 MCU) used in the Color Classic, LC 520,
+		    LC 55x, LC 57x, LC 58x, Quadra 630, Quadra 660AV, Quadra 840AV, PowerMac 6100/7100/8100,
+		    IIcx, IIci, and PowerMac 5200.
 
 	TODO:
+	        - Mac Portable and PowerBook 100 are similar to this hardware, but we need ROMs!
 		- Call the RTC timer
-
-		- Support Mac 128k, 512k (easy, we just need the ROM image)
-		- Support Mac SE, Classic (we need to find the ROMs and implement ADB;
-		  SE FDHD and Classic require SIWM support, too)
+		- SE FDHD and Classic require SWIM support.  SWIM is 100% IWM compatible with 800k drives, but
+		  becomes a different chip for 1.44MB.
 		- Check that 0x600000-0x6fffff still address RAM when overlay bit is off
 		  (IM-III seems to say it does not on Mac 128k, 512k, and 512ke).
 		- What on earth are 0x700000-0x7fffff mapped to ?
@@ -64,15 +88,30 @@
 #define LOG_MEMORY		0
 #endif
 
+#define LOG_ADB			0
+
+// ADB states
+#define ADB_STATE_NEW_COMMAND	(0)
+#define ADB_STATE_XFER_EVEN	(1)
+#define ADB_STATE_XFER_ODD	(2)
+#define ADB_STATE_IDLE		(3)
+
+// ADB commands
+#define ADB_CMD_RESET		(0)
+#define ADB_CMD_FLUSH		(1)
+
 static TIMER_CALLBACK(mac_scanline_tick);
-static emu_timer *mac_scanline_timer;
+static TIMER_CALLBACK(mac_adb_tick);
+static emu_timer *mac_scanline_timer, *mac_adb_timer;
 static int scan_keyboard(running_machine *machine);
 static TIMER_CALLBACK(inquiry_timeout_func);
 static void keyboard_receive(running_machine *machine, int val);
 static READ8_HANDLER(mac_via_in_a);
 static READ8_HANDLER(mac_via_in_b);
+static READ8_HANDLER(mac_adb_via_in_cb2);
 static WRITE8_HANDLER(mac_via_out_a);
 static WRITE8_HANDLER(mac_via_out_b);
+static WRITE8_HANDLER(mac_adb_via_out_cb2);
 static WRITE8_HANDLER(mac_via_out_cb2);
 static void mac_via_irq(running_machine *machine, int state);
 static offs_t mac_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
@@ -88,6 +127,17 @@ static const struct via6522_interface mac_via6522_intf =
 	mac_via_irq
 };
 
+static const struct via6522_interface mac_via6522_adb_intf =
+{
+	mac_via_in_a, mac_via_in_b,
+	NULL, NULL,
+	NULL, mac_adb_via_in_cb2,
+	mac_via_out_a, mac_via_out_b,
+	NULL, NULL,
+	NULL, mac_adb_via_out_cb2,
+	mac_via_irq
+};
+
 /* tells which model is being emulated (set by macxxx_init) */
 typedef enum
 {
@@ -100,8 +150,33 @@ typedef enum
 
 static UINT32 mac_overlay = 0;
 static mac_model_t mac_model;
+static int mac_drive_select = 0;
 
+// returns non-zero if this Mac has ADB
+static int has_adb(void)
+{
+	return mac_model >= MODEL_MAC_SE;
+}
 
+// handle disk enable lines
+void mac_fdc_set_enable_lines(int enable_mask)
+{
+	if (mac_model < MODEL_MAC_SE)
+	{
+		sony_set_enable_lines(enable_mask);
+	}
+	else
+	{
+		if (enable_mask)
+		{
+			sony_set_enable_lines(mac_drive_select ? 1 : 2);
+		}
+		else
+		{
+			sony_set_enable_lines(enable_mask);
+		}
+	}
+}
 
 static void mac_install_memory(running_machine *machine, offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, int bank)
@@ -1144,24 +1219,259 @@ WRITE16_HANDLER ( mac_iwm_w )
 }
 
 /* *************************************************************************
- * ADB
+ * ADB (Mac II-style)
  * *************************************************************************/
 
-static int adb_via_b3;
+// Mac ADB state
+static int adb_irq_pending, adb_waiting_cmd, adb_datasize, adb_buffer[8];
+static int adb_state, adb_command, adb_send, adb_timer_ticks, adb_extclock, adb_direction;
+static int adb_listenreg, adb_listenaddr;
 
-static int has_adb(void)
+// ADB mouse state
+static int adb_mouseaddr = 3;
+static int adb_lastmousex, adb_lastmousey;
+
+#if LOG_ADB
+static const char *adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
+#endif
+
+static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY )
 {
-	return mac_model >= MODEL_MAC_SE;
+	int MouseCountX = 0, MouseCountY = 0;
+	int NewX, NewY;
+
+	NewX = input_port_read(machine, "MOUSE2"); 
+	NewY = input_port_read(machine, "MOUSE1"); 
+
+	/* see if it moved in the x coord */
+	if (NewX != adb_lastmousex)
+	{
+		int diff = NewX - adb_lastmousex;
+
+		/* check for wrap */
+		if (diff > 0x80)
+			diff = 0x100-diff;
+		if  (diff < -0x80)
+			diff = -0x100-diff;
+
+		MouseCountX += diff;
+		adb_lastmousex = NewX;
+	}
+
+	/* see if it moved in the y coord */
+	if (NewY != adb_lastmousey)
+	{
+		int diff = NewY - adb_lastmousey;
+
+		/* check for wrap */
+		if (diff > 0x80)
+			diff = 0x100-diff;
+		if  (diff < -0x80)
+			diff = -0x100-diff;
+
+		MouseCountY += diff;
+		adb_lastmousey = NewY;
+	}
+
+	*MouseX = (UINT8)MouseCountX;
+	*MouseY = (UINT8)MouseCountY;
 }
 
+static void mac_adb_talk(running_machine *machine)
+{
+	int addr, reg;
 
+	addr = (adb_command>>4);
+	reg = (adb_command & 3);
+
+//	printf("Mac sent %x\n", adb_command);
+
+	if (adb_waiting_cmd)
+	{
+		switch ((adb_command>>2)&3)
+		{
+			case 0:
+			case 1:
+				switch (reg)
+				{
+					case ADB_CMD_RESET:
+						adb_direction = 0;
+						adb_send = 0;
+						break;
+
+					case ADB_CMD_FLUSH:
+						adb_direction = 0;
+						adb_send = 0;
+						break;
+
+					default:	// reserved/unused
+						break;
+				}
+				break;
+
+			case 2:	// listen
+//				printf("ADB LISTEN: reg %x address %x\n", reg, addr);
+				adb_direction = 1;	// input from Mac
+				adb_listenreg = reg;
+				adb_listenaddr = addr;
+				break;
+
+			case 3: // talk
+//				printf("ADB TALK: reg %x address %x\n", reg, addr);
+
+				adb_direction = 0;    	// output to Mac
+				if (addr == adb_mouseaddr)
+				{
+					UINT8 mouseX, mouseY;
+
+//					printf("Talking to mouse, register %x\n", reg);
+
+					switch (reg)
+					{
+						// read mouse
+						case 0:	
+							mac_adb_accummouse(machine, &mouseX, &mouseY);
+							adb_buffer[0] = (input_port_read(machine, "MOUSE0") & 0x01) ? 0x00 : 0x80;
+							adb_buffer[0] |= mouseX & 0x7f;
+							adb_buffer[1] = mouseY & 0x7f;
+							adb_datasize = 2;
+							break;
+
+						// get ID/handler
+						case 3:
+							adb_buffer[0] = 0x60 | ((adb_mouseaddr<<8)&0xf);	// SRQ enable, no exceptional event
+							adb_buffer[1] = 0x01;	// handler 1
+							adb_datasize = 2;
+							break;
+
+						default:
+							break;
+					}
+				}
+				break;
+		}
+
+		adb_waiting_cmd = 0;
+	}
+	else
+	{
+		printf("Got LISTEN data %x for device %x reg %x\n", adb_command, adb_listenreg, adb_listenaddr);
+	}
+}
+
+static TIMER_CALLBACK(mac_adb_tick)
+{
+	// do one clock transition on CB1 to advance the VIA shifter
+	adb_extclock ^= 1;
+	via_set_input_cb1(machine, 0, adb_extclock);
+	adb_extclock ^= 1;
+	via_set_input_cb1(machine, 0, adb_extclock);
+
+	adb_timer_ticks--;
+	if (!adb_timer_ticks)
+	{
+		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+
+		if (adb_direction)
+		{
+			mac_adb_talk(machine);
+		}
+	}
+	else
+	{
+		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.001)), 0);
+	}
+}
+
+static READ8_HANDLER(mac_adb_via_in_cb2)
+{
+	UINT8 ret;
+
+	ret = (adb_send & 0x80)>>7;
+	adb_send <<= 1;
+
+//	printf("IN CB2 = %x\n", ret);
+
+	return ret;
+}
+
+static WRITE8_HANDLER(mac_adb_via_out_cb2)
+{
+//	printf("OUT CB2 = %x\n", data);
+	adb_command <<= 1;
+	adb_command |= data & 1;
+}
 
 static void mac_adb_newaction(int state)
 {
-	adb_via_b3 = 1;
+	if (state != adb_state)
+	{
+		#if LOG_ADB
+		printf("New ADB state: %s\n", adb_statenames[state]);
+		#endif
+
+		adb_state = state;
+		adb_timer_ticks = 8;
+
+		switch (state)
+		{
+			case ADB_STATE_NEW_COMMAND:
+				adb_command = adb_send = 0;
+				adb_direction = 1;	// Mac is shifting us a command
+				adb_waiting_cmd = 1;	// we're going to get a command
+				break;
+
+			case ADB_STATE_XFER_EVEN:
+			case ADB_STATE_XFER_ODD:
+				if (adb_datasize > 0)
+				{
+					int i;
+
+					// is something trying to send to the Mac?
+					if (adb_direction == 0)
+					{
+						// set up the byte
+						adb_send = adb_buffer[0];
+						adb_datasize--;
+
+						// move down the rest of the buffer, if any
+						for (i = 0; i < adb_datasize; i++)
+						{
+							adb_buffer[i] = adb_buffer[i+1];
+						}
+					}
+				}
+				else
+				{
+					adb_send = 0;
+				}
+				break;
+
+			case ADB_STATE_IDLE:
+				break;
+		}
+
+		// no matter what, generate 8 clocks (should this happen on IDLE?)
+		timer_adjust_oneshot(mac_adb_timer, attotime_make(0, DOUBLE_TO_ATTOSECONDS(0.001)), 0);
+	}
 }
 
+static void adb_reset(void)
+{
+	adb_irq_pending = 0;		// no interrupt
+	adb_timer_ticks = 0;
+	adb_command = 0;
+	adb_extclock = 0;
+	adb_send = 0;
+	adb_waiting_cmd = 0;
+	adb_state = ADB_STATE_IDLE;
+	adb_direction = 0;
+	adb_datasize = 0;
 
+	// mouse
+	adb_mouseaddr = 3;
+	adb_lastmousex = adb_lastmousey = 0;
+}
 
 /* *************************************************************************
  * VIA
@@ -1209,8 +1519,12 @@ static READ8_HANDLER(mac_via_in_b)
 
 	if (has_adb())
 	{
-		if (adb_via_b3)
+		val |= adb_state<<4;
+
+		if (!adb_irq_pending)
+		{
 			val |= 0x08;
+		}
 	}
 	else
 	{
@@ -1232,7 +1546,15 @@ static WRITE8_HANDLER(mac_via_out_a)
 	set_scc_waitrequest((data & 0x80) >> 7);
 	mac_set_screen_buffer((data & 0x40) >> 6);
 	sony_set_sel_line((data & 0x20) >> 5);
-	mac_set_sound_buffer((data & 0x08) >> 3);
+	if (mac_model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
+	{
+		mac_drive_select = ((data & 0x10) >> 4);
+	}
+
+	if (mac_model < MODEL_MAC_SE)	// SE no longer has dual buffers
+	{
+		mac_set_sound_buffer((data & 0x08) >> 3);
+	}
 	mac_set_volume(data & 0x07);
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
@@ -1254,7 +1576,9 @@ static WRITE8_HANDLER(mac_via_out_b)
 	rtc_rTCClk = new_rtc_rTCClk;
 
 	if (has_adb())
+	{
 		mac_adb_newaction((data & 0x30) >> 4);
+	}
 }
 
 static void mac_via_irq(running_machine *machine, int state)
@@ -1318,8 +1642,18 @@ MACHINE_RESET(mac)
 	/* setup sound */
 	mac_set_sound_buffer(0);
 
+	if (has_adb())
+	{
+		adb_reset();
+
+		mac_adb_timer = timer_alloc(mac_adb_tick, NULL);
+		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
+	}
+
 	if (mac_model == MODEL_MAC_SE)
+	{
 		timer_set(attotime_zero, NULL, 0, set_memory_overlay_callback);
+	}
 
 	mac_scanline_timer = timer_alloc(mac_scanline_tick, NULL);
 	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
@@ -1351,7 +1685,14 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	set_memory_overlay(machine, 1);
 
 	/* configure via */
-	via_config(0, &mac_via6522_intf);
+	if (has_adb())
+	{
+		via_config(0, &mac_via6522_adb_intf);
+	}
+	else
+	{
+		via_config(0, &mac_via6522_intf);
+	}
 	via_set_clock(0, 1000000);	/* 6522 = 1 Mhz, 6522a = 2 Mhz */
 
 	/* setup keyboard */

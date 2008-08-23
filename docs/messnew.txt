@@ -24,6 +24,9 @@ System Driver Changes:
 - [IBM5170] Added support for the 8042 keyboard controller dumped
   by Kevtris.  [Wilbert Pol]
 
+- [Mac SE] Added preliminary ADB mouse emulation, system is now working [R. 
+  Belmont]
+
 - [MSX Family] Fixed cartridge loading. (part of bug #1603)  [Wilbert
   Pol]
 
