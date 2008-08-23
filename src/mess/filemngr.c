@@ -26,8 +26,14 @@
     CONSTANTS
 ***************************************************************************/
 
+/* conditional compilation to enable chosing of image formats - this is not
+ * yet fully implemented */
 #define ENABLE_FORMATS			0
 
+/* time (in seconds) to display errors */
+#define ERROR_MESSAGE_TIME		5
+
+/* itemrefs for key menu items */
 #define ITEMREF_NEW_IMAGE_NAME	((void *) 0x0001)
 #define ITEMREF_CREATE			((void *) 0x0002)
 #define ITEMREF_FORMAT			((void *) 0x0003)
@@ -308,12 +314,12 @@ static int create_new_image(const device_config *device, const char *directory, 
 
 		case ENTTYPE_FILE:
 			/* TODO - we should be raising a warning here, not an error */
-			popmessage("Cannot save over file");
+			ui_popup_time(ERROR_MESSAGE_TIME, "Cannot save over file");
 			do_create = FALSE;
 			break;
 
 		case ENTTYPE_DIR:
-			popmessage("Cannot save over directory");
+			ui_popup_time(ERROR_MESSAGE_TIME, "Cannot save over directory");
 			do_create = FALSE;
 			break;
 
