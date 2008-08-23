@@ -161,7 +161,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_irq)
 {
-	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"),1,state);	
+	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"),1,state);		
 }
 
 
@@ -173,10 +173,9 @@ static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
 	b2m_sound_input = state;
 }
 
-
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
 {
-	pit8253_set_clock_signal((device_config*)device_list_find_by_tag(device->machine->config->devicelist, PIT8253, "pit8253"),0,state);
+	pit8253_set_clock_signal( device, 0, state );
 }
 
 
@@ -184,11 +183,11 @@ const struct pit8253_config b2m_pit8253_intf =
 {
 	{
 		{
-			2000000,
+			0,
 			bm2_pit_irq
 		},
 		{
-			2000000,
+			0,
 			bm2_pit_out1
 		},
 		{
@@ -412,15 +411,24 @@ INTERRUPT_GEN (b2m_vblank_interrupt)
 	//if (vblank_state>1) vblank_state=0;
 	//pic8259_set_irq_line((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
 }
-static TIMER_CALLBACK (b2m_callback)
+/*static TIMER_CALLBACK (b2m_callback)
 {	
 	vblank_state++;
 	if (vblank_state>1) vblank_state=0;
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
+}*/
+
+static TIMER_CALLBACK( b2m_reset )
+{
+	program_write_byte(0xdfff,0x00);
 }
 
 MACHINE_RESET(b2m)
-{
+{	
+	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
+	
+	b2m_sound_input = 0;
+	
 	wd17xx_reset(machine);
 	msm8251_reset();
 	
@@ -432,7 +440,12 @@ MACHINE_RESET(b2m)
 	cpunum_set_irq_callback(0, b2m_irq_callback);
 	b2m_set_bank(machine,7);
 		
-	timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, b2m_callback);
+	pit8253_gate_w(pit8253, 0, 0);
+	pit8253_gate_w(pit8253, 1, 0);
+	pit8253_gate_w(pit8253, 2, 0);
+	
+	timer_set(ATTOTIME_IN_SEC(2), NULL, 0, b2m_reset);
+//	timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, b2m_callback);
 }
 
 DEVICE_IMAGE_LOAD( b2m_floppy )
