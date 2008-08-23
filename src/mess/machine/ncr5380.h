@@ -13,7 +13,7 @@
 struct NCR5380interface
 {
 	const SCSIConfigTable *scsidevs;		/* SCSI devices */
-	void (*irq_callback)(int state);	/* irq callback */
+	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };
 
 // 5380 registers
