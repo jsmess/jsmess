@@ -240,43 +240,43 @@ static GFXDECODE_START( mbeeic )
 	GFXDECODE_ENTRY( "main", 0x11000, mbee_charlayout, 0, 4096 )
 GFXDECODE_END
 
-static PALETTE_INIT( mbee )
+static PALETTE_INIT( mbeeic )
 {
 	UINT16 i;
-	UINT8 r, b, g; 
-	UINT8 level[] = { 0, 0x80, 0xff };	/* off, half, full intensity */
+	UINT8 r, b, g, k; 
+	UINT8 level[] = { 0, 0x80, 0xff, 0xff };	/* off, half, full intensity */
 
-	/* The foreground colours are determined by an undumped PROM, these are a best guess */
-	UINT8 fgt[] = { 0, 18, 6, 24, 2, 20, 8, 26,
-			0, 21, 15, 19, 11, 7, 5, 26,
-			0, 9, 3, 12, 1, 10, 4, 13,
-			0, 25, 23, 22, 17, 16, 14, 26 };
+	/* space for colortable (64 background and 32 foreground) */
+	machine->colortable = colortable_alloc(machine, 96);
 
-	UINT8 bgt[] = { 0, 1, 3, 4, 9, 10, 12, 13,	/* low intensity */
-			0, 2, 3, 5, 9, 11, 12, 14,	/* red at full */
-			0, 1, 6, 7, 9, 10, 15, 16,	/* green at full */
-			0, 2, 6, 8, 9, 11, 15, 17,	/* red and green at full */
-			0, 1, 3, 4, 18, 19, 21, 22,	/* blue at full */
-			0, 2, 3, 5, 18, 20, 21, 23,	/* blue and red at full */
-			0, 1, 6, 7, 18, 19, 24, 25,	/* blue and green at full */
-			0, 2, 6, 8, 18, 20, 24, 26 };	/* full intensity */
+	/* set up background colortable */
+	for (i = 0; i < 64; i++)
+	{
+		r = level[((i>>0)&1)|((i>>2)&2)];
+		g = level[((i>>1)&1)|((i>>3)&2)];
+		b = level[((i>>2)&1)|((i>>4)&2)];
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
 
-	/* space for colortable */
-	machine->colortable = colortable_alloc(machine, 27);
-
-	/* create 27 unique colours */
-	for (b = 0; b < 3; b++)
-		for (g = 0; g < 3; g++)
-			for (r = 0; r < 3; r++)
-				colortable_palette_set_color(machine->colortable, b*9+g*3+r, MAKE_RGB(level[r], level[g], level[b]));
-
-	/* set up foreground palette */
-	for (i = 1; i < 8192; i+=2) colortable_entry_set_value(machine->colortable, i, fgt[(i>>1)&0x1f]);
+	/* set up foreground colortable by reading the prom */
+	for (i = 0; i < 32; i++)
+	{
+		k = color_prom[i];
+		r = level[((k>>2)&1)|((k>>4)&2)];
+		g = level[((k>>1)&1)|((k>>3)&2)];
+		b = level[((k>>0)&1)|((k>>2)&2)];
+		colortable_palette_set_color(machine->colortable, i|64, MAKE_RGB(r, g, b));
+	}
 
 	/* set up background palette */
 	for (i = 0; i < 64; i++)
 		for (r = 0; r < 32; r++)
-			colortable_entry_set_value(machine->colortable, ((i<<5)|r)<<1, bgt[i]);
+			colortable_entry_set_value(machine->colortable, ((i<<5)|r)<<1, i);
+
+	/* set up foreground palette */
+	for (i = 0; i < 64; i++)
+		for (r = 0; r < 32; r++)
+			colortable_entry_set_value(machine->colortable, (((i<<5)|r)<<1)|1, r|64);
 }
 
 static const struct z80_irq_daisy_chain mbee_daisy_chain[] =
@@ -341,8 +341,8 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(70*8, 310)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 70*8-1, 0, 19*16-1)
-	MDRV_PALETTE_LENGTH(4096*2)
-	MDRV_PALETTE_INIT(mbee)
+	MDRV_PALETTE_LENGTH(0x1000)
+	MDRV_PALETTE_INIT(mbeeic)
 
 	MDRV_VIDEO_START(mbeeic)
 	MDRV_VIDEO_UPDATE(mbeeic)
