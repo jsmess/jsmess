@@ -1653,6 +1653,7 @@ MACHINE_RESET(mac)
 	if (mac_model == MODEL_MAC_SE)
 	{
 		timer_set(attotime_zero, NULL, 0, set_memory_overlay_callback);
+		mac_set_sound_buffer(1);
 	}
 
 	mac_scanline_timer = timer_alloc(mac_scanline_tick, NULL);
