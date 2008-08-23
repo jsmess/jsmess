@@ -33,6 +33,9 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
+- Major file manager improvements; much better experience for creating new
+  images.  (bugs #1653, #1654) [Nate Woods]
+
 - Fixed bug that caused "categorized" inputs (used on Atari 2600, NES, SMS)
   to not be remappable.  (bug #1614) [Nate Woods]
 

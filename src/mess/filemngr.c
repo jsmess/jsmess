@@ -37,6 +37,8 @@
 #define ITEMREF_NEW_IMAGE_NAME	((void *) 0x0001)
 #define ITEMREF_CREATE			((void *) 0x0002)
 #define ITEMREF_FORMAT			((void *) 0x0003)
+#define ITEMREF_NO				((void *) 0x0004)
+#define ITEMREF_YES				((void *) 0x0005)
 
 
 
@@ -97,7 +99,16 @@ struct _file_create_menu_state
 {
 	file_manager_menu_state *manager_menustate;
 	const image_device_format *current_format;
+	int confirm_save_as_yes;
 	char filename_buffer[1024];
+};
+
+
+/* state of the confirm save as menu */
+typedef struct _confirm_save_as_menu_state confirm_save_as_menu_state;
+struct _confirm_save_as_menu_state
+{
+	int *yes;
 };
 
 
@@ -190,6 +201,54 @@ static void extra_text_render(running_machine *machine, ui_menu *menu, void *sta
 		extra_text_draw_box(origx1, origx2, origy1, top, header, -1);
 	if (footer != NULL)
 		extra_text_draw_box(origx1, origx2, origy2, bottom, footer, +1);
+}
+
+
+
+/***************************************************************************
+    CONFIRM SAVE AS MENU
+***************************************************************************/
+
+/*-------------------------------------------------
+    menu_confirm_save_as_populate - populates the
+	confirm save as menu
+-------------------------------------------------*/
+
+static void menu_confirm_save_as_populate(running_machine *machine, ui_menu *menu, void *state)
+{
+	ui_menu_item_append(menu, "File Already Exists - Overide?", NULL, MENU_FLAG_DISABLE, NULL);
+	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, MENU_FLAG_DISABLE, NULL);
+	ui_menu_item_append(menu, "No", NULL, 0, ITEMREF_NO);
+	ui_menu_item_append(menu, "Yes", NULL, 0, ITEMREF_YES);
+}
+
+
+
+/*-------------------------------------------------
+    menu_confirm_save_as - confirm save as menu
+-------------------------------------------------*/
+
+static void menu_confirm_save_as(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *event;
+	confirm_save_as_menu_state *menustate = (confirm_save_as_menu_state *) state;
+
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+		menu_confirm_save_as_populate(machine, menu, state);
+
+	/* process the menu */
+	event = ui_menu_process(menu, 0);
+
+	/* process the event */
+	if ((event != NULL) && (event->iptkey == IPT_UI_SELECT))
+	{
+		if (event->itemref == ITEMREF_YES)
+			*menustate->yes = TRUE;
+
+		/* no matter what, pop out */
+		ui_menu_stack_pop(machine);
+	}
 }
 
 
@@ -288,13 +347,15 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
     create_new_image - creates a new disk image
 -------------------------------------------------*/
 
-static int create_new_image(const device_config *device, const char *directory, const char *filename)
+static int create_new_image(const device_config *device, const char *directory, const char *filename, int *yes)
 {
 	astring *path;
 	osd_directory_entry *entry;
 	osd_dir_entry_type file_type;
 	int do_create, err;
 	int result = FALSE;
+	ui_menu *child_menu;
+	confirm_save_as_menu_state *child_menustate;
 
 	/* assemble the full path */
 	path = zippath_combine(astring_alloc(), directory, filename);
@@ -305,6 +366,10 @@ static int create_new_image(const device_config *device, const char *directory, 
 	if (entry != NULL)
 		free(entry);
 
+	/* special case */
+	if ((file_type == ENTTYPE_FILE) && *yes)
+		file_type = ENTTYPE_NONE;
+
 	switch(file_type)
 	{
 		case ENTTYPE_NONE:
@@ -313,12 +378,16 @@ static int create_new_image(const device_config *device, const char *directory, 
 			break;
 
 		case ENTTYPE_FILE:
-			/* TODO - we should be raising a warning here, not an error */
-			ui_popup_time(ERROR_MESSAGE_TIME, "Cannot save over file");
+			/* a file exists here - ask for permission from the user */
+			child_menu = ui_menu_alloc(device->machine, menu_confirm_save_as, NULL);
+			child_menustate = ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+			child_menustate->yes = yes;
+			ui_menu_stack_push(child_menu);
 			do_create = FALSE;
 			break;
 
 		case ENTTYPE_DIR:
+			/* a directory exists here - we can't save over it */
 			ui_popup_time(ERROR_MESSAGE_TIME, "Cannot save over directory");
 			do_create = FALSE;
 			break;
@@ -355,6 +424,7 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 {
 	void *selection;
 	const ui_menu_event *event;
+	ui_menu_event fake_event;
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 
 	/* identify the selection */
@@ -364,8 +434,19 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
 	menu_file_create_populate(machine, menu, state, selection);
 
-	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	if (menustate->confirm_save_as_yes)
+	{
+		/* we just returned from a "confirm save as" dialog and the user said "yes" - fake an event */
+		memset(&fake_event, 0, sizeof(fake_event));
+		fake_event.iptkey = IPT_UI_SELECT;
+		fake_event.itemref = ITEMREF_CREATE;
+		event = &fake_event;
+	}
+	else
+	{
+		/* process the menu */
+		event = ui_menu_process(menu, 0);
+	}
 
 	/* process the event */
 	if (event != NULL)
@@ -379,7 +460,8 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 					if (create_new_image(
 						menustate->manager_menustate->selected_device,
 						astring_c(menustate->manager_menustate->current_directory),
-						menustate->filename_buffer))
+						menustate->filename_buffer,
+						&menustate->confirm_save_as_yes))
 					{
 						/* success - pop out twice to device view */
 						ui_menu_stack_pop(machine);
