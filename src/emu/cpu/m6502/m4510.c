@@ -172,8 +172,8 @@ INLINE int m4510_cpu_readop_arg(void)
 #define M4510
 #include "t65ce02.c"
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
-static WRITE8_HANDLER( default_wrmem_id ) { program_write_byte_8le(offset, data); }
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(M4510_MEM(offset)); }
+static WRITE8_HANDLER( default_wrmem_id ) { program_write_byte_8le(M4510_MEM(offset), data); }
 
 static void m4510_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
