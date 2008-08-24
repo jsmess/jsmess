@@ -38,11 +38,13 @@
 
 #undef NOP
 #define NOP       \
-  SEI;
+  m4510.interrupt_inhibit = 0; \
+  /* SEI */
 
 /* c65 docu says transfer of axyz to the mapper register
    so no readback!? */
-#define MAP 													\
+#define MAP 						\
+  m4510.interrupt_inhibit = 0;			\
   m4510.low=m4510.a|(m4510.x<<8); \
   m4510.high=m4510.y|(m4510.z<<8); \
   m4510.mem[0]=(m4510.low&0x1000) ?  (m4510.low&0xfff)<<8:0;  \
