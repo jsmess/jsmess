@@ -1,14 +1,17 @@
-#include <string.h>
-
 #include "formats/fmsx_cas.h"
 
 
 #define CAS_PERIOD        (16)
 #define CAS_HEADER_PERIODS (4000)
 #define CAS_EMPTY_PERIODS (1000)
-#define ALLOCATE_BLOCK    (1024*8)
 static const UINT8 CasHeader[8] = { 0x1F,0xA6,0xDE,0xBA,0xCC,0x13,0x7D,0x74 };
 
+static int cas_size;
+
+
+/*******************************************************************
+   Calculate the number of samples needed for this tape image
+********************************************************************/
 static int fmsx_cas_to_wav_size (const UINT8 *casdata, int caslen)
 {
 	int 	pos, size;
@@ -32,121 +35,68 @@ static int fmsx_cas_to_wav_size (const UINT8 *casdata, int caslen)
 		pos++;
 	}
 
+	cas_size = caslen;
+
 	return size;
 }
 
-static int fmsx_cas_to_wav (const UINT8 *casdata, int caslen, INT16 **wavdata, int *wavlen)
+
+/*******************************************************************
+   Generate samples for the tape image
+********************************************************************/
+static int fmsx_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 {
-	int cas_pos, samples_size, bit, state = 1, samples_pos, size, n, i, p;
-	INT16 *samples, *nsamples;
+	int cas_pos, bit, state = 1, samples_pos, size, n, i, p;
 
-	if (caslen < 8) return 1;
-	if (memcmp (casdata, CasHeader, sizeof (CasHeader) ) ) return 1;
-
-	cas_pos = 8;
-	samples_size = ALLOCATE_BLOCK * 2;
-	samples = (INT16*) malloc (samples_size);
-	if (!samples)
-		return 2;
-
+	cas_pos = 0;
 	samples_pos = 0;
 
-    while (cas_pos < caslen)
+    while (samples_pos < sample_count && cas_pos < cas_size)
+	{
+		/* Check if we need to output a header */
+		if ( cas_pos + 8 < cas_size )
 		{
-		/* check memory for entire header (silence + header itself) */
-		size = (CAS_EMPTY_PERIODS + CAS_HEADER_PERIODS) * CAS_PERIOD;
-		if ( (samples_pos + size) >= samples_size)
+			if ( ! memcmp( bytes + cas_pos, CasHeader, 8 ) )
 			{
-			samples_size += size;
-			nsamples = (INT16*) realloc (samples, samples_size * 2);
-			if (!nsamples)
+				/* Write CAS_EMPTY_PERIODS of silence */
+				n = CAS_EMPTY_PERIODS * CAS_PERIOD; while (n--) buffer[samples_pos++] = 0;
+
+				/* Write CAS_HEADER_PERIODS of header (high frequency) */
+				for (i=0;i<CAS_HEADER_PERIODS*4;i++)
 				{
-				free (samples);
-				return 2;
-				}
-			else samples = nsamples;
-			}
+					for (n=0;n<CAS_PERIOD / 4;n++)
+						buffer[samples_pos + n] = (state ? 32767 : -32767);
 
-		/* write CAS_EMPTY_PERIODS of silence */
-		memset (samples + samples_pos, 0, CAS_EMPTY_PERIODS * CAS_PERIOD * 2);
-		samples_pos += CAS_EMPTY_PERIODS * CAS_PERIOD;
-
-		/* write CAS_HEADER_PERIODS of header (high frequency) */
-		for (i=0;i<CAS_HEADER_PERIODS*4;i++)
-			{
-			for (n=0;n<CAS_PERIOD / 4;n++)
-				samples[samples_pos + n] = (state ? 32767 : -32767);
-
-			samples_pos += CAS_PERIOD / 4 ;
-			state = !state;
-			}
-
-		while (cas_pos < caslen)
-			{
-			/* check if we've hit a new header (or end of block) */
-			if ( (cas_pos + 8) < caslen)
-				{
-				if (!memcmp (casdata + cas_pos, CasHeader, 8) )
-					{
-					cas_pos += 8;
-					break; /* falls back to loop above; plays header again */
-					}
-				}
-
-			/* check if we've got enough memory for the next byte */
-			size = CAS_PERIOD * 11;
-			if ( (samples_pos + size) >= samples_size)
-				{
-				samples_size += ALLOCATE_BLOCK;
-				nsamples = (INT16*) realloc (samples, samples_size * 2);
-				if (!nsamples)
-					{
-					free (samples);
-					return 2;
-					}
-				else samples = nsamples;
-				}
-
-			for (i=0;i<=11;i++)
-				{
-				if (i == 0) bit = 0;
-				else if (i < 9) bit = (casdata[cas_pos] & (1 << (i - 1) ) );
-				else bit = 1;
-
-				/* write this one bit */
-				for (n=0;n<(bit ? 4 : 2);n++)
-					{
-					size = (bit ? CAS_PERIOD / 4 : CAS_PERIOD / 2);
-					for (p=0;p<size;p++)
-						{
-						samples[samples_pos + p] = (state ? 32767 : -32767);
-						}
+					samples_pos += CAS_PERIOD / 4 ;
 					state = !state;
-					samples_pos += size;
-					}
 				}
-			cas_pos++;
+
+				cas_pos += 8;
 			}
 		}
 
-	*wavdata = samples;
-	*wavlen = samples_pos;
+		for (i=0;i<=11;i++)
+		{
+			if (i == 0) bit = 0;
+			else if (i < 9) bit = (bytes[cas_pos] & (1 << (i - 1) ) );
+			else bit = 1;
 
-	return 0;
+			/* write this one bit */
+			for (n=0;n<(bit ? 4 : 2);n++)
+			{
+				size = (bit ? CAS_PERIOD / 4 : CAS_PERIOD / 2);
+				for (p=0;p<size;p++)
+				{
+					buffer[samples_pos + p] = (state ? 32767 : -32767);
+				}
+				state = !state;
+				samples_pos += size;
+			}
+		}
+		cas_pos++;
 	}
 
-
-static int fmsx_cas_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
-{
-	INT16 *wavdata;
-	int wavlen;
-
-	if (fmsx_cas_to_wav(bytes, length, &wavdata, &wavlen))
-		return -1;
-
-	memcpy(buffer, wavdata, wavlen * 2);
-	free(wavdata);
-	return 0;
+	return samples_pos;
 }
 
 
@@ -157,7 +107,7 @@ static const struct CassetteLegacyWaveFiller fmsx_legacy_fill_wave =
 	0,										/* chunk_samples */
 	fmsx_cas_to_wav_size,					/* chunk_sample_calc */
 	22050,									/* sample_frequency */
-	-1,										/* header_samples */
+	0,										/* header_samples */
 	0										/* trailer_samples */
 };
 
@@ -179,7 +129,7 @@ static casserr_t fmsx_cas_load(cassette_image *cassette)
 
 static const struct CassetteFormat fmsx_cas_format =
 {
-	"tap",
+	"tap,cas",
 	fmsx_cas_identify,
 	fmsx_cas_load,
 	NULL

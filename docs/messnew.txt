@@ -30,6 +30,9 @@ System Driver Changes:
 - [MSX Family] Fixed cartridge loading. (part of bug #1603)  [Wilbert
   Pol]
 
+- [MSX Family] Fixed fmsx cassette format handling. (part of bug #11)
+  [Wilbert Pol]
+
 - [SVI318] Fixed .cas format handling. (part of bug #11)  [Wilbert Pol]
 
 
