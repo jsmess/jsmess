@@ -37,29 +37,29 @@ static int svi_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 		{
 			/* write a "0" */
 			n = !(i % 4) ? 21 : 18;
-			while (n--) buffer[samples_pos++] = SMPLO;
-			n = 19; while (n--) buffer[samples_pos++] = SMPHI;
+			while (n--) buffer[samples_pos++] = SMPHI;
+			n = 19; while (n--) buffer[samples_pos++] = SMPLO;
 			/* write a "1" */
-			n = 9; while (n--) buffer[samples_pos++] = SMPLO;
 			n = 9; while (n--) buffer[samples_pos++] = SMPHI;
+			n = 9; while (n--) buffer[samples_pos++] = SMPLO;
 		}
 
 		/* write "0x7f" */
 		/* write a "0" */
-		n = 21; while (n--) buffer[samples_pos++] = SMPLO;
-		n = 19; while (n--) buffer[samples_pos++] = SMPHI;
+		n = 21; while (n--) buffer[samples_pos++] = SMPHI;
+		n = 19; while (n--) buffer[samples_pos++] = SMPLO;
 
 		for (i=0;i<7;i++)
 		{
 			/* write a "1" */
-			n = 9; while (n--) buffer[samples_pos++] = SMPLO;
 			n = 9; while (n--) buffer[samples_pos++] = SMPHI;
+			n = 9; while (n--) buffer[samples_pos++] = SMPLO;
 		}
 
 		while (samples_pos < sample_count && cas_pos < cas_size)
 		{
-			n = 21; while (n--) buffer[samples_pos++] = SMPLO;
-			n = 19; while (n--) buffer[samples_pos++] = SMPHI;
+			n = 21; while (n--) buffer[samples_pos++] = SMPHI;
+			n = 19; while (n--) buffer[samples_pos++] = SMPLO;
 
 			for (i=0;i<8;i++)
 			{
@@ -69,14 +69,14 @@ static int svi_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 				if (bit)
 				{
 					/* write a "1" */
-					n = 9; while (n--) buffer[samples_pos++] = SMPLO;
 					n = 9; while (n--) buffer[samples_pos++] = SMPHI;
+					n = 9; while (n--) buffer[samples_pos++] = SMPLO;
 				}
 				else
 				{
 					/* write a "0" */
-					n = 18; while (n--) buffer[samples_pos++] = SMPLO;
-					n = 19; while (n--) buffer[samples_pos++] = SMPHI;
+					n = 18; while (n--) buffer[samples_pos++] = SMPHI;
+					n = 19; while (n--) buffer[samples_pos++] = SMPLO;
 				}
 			}
 
