@@ -302,10 +302,11 @@ READ8_HANDLER(ncr5380_r)
 	switch( reg )
 	{
 		case R5380_CURDATA:
+		case R5380_INPUTDATA:
 			rv = n5380_Registers[reg];
 
-			// if we're in the data transfer phase, readback device data instead
-			if ((n5380_Registers[R5380_BUSSTATUS] & 0x1c) == 0x04)
+			// if we're in the data transfer phase or DMA, readback device data instead
+			if (((n5380_Registers[R5380_BUSSTATUS] & 0x1c) == 0x04) || (n5380_Registers[R5380_BUSSTATUS] & 0x40))
 			{
 				rv = n5380_Data[d_ptr];
 
@@ -332,6 +333,14 @@ READ8_HANDLER(ncr5380_r)
 						if (d_limit > 0)
 						{
 							ncr5380_read_data((d_limit < 512) ? d_limit : 512, n5380_Data);
+						}
+						else
+						{
+							// if this is DMA, signal DMA end
+							if (n5380_Registers[R5380_BUSSTATUS] & 0x40)
+							{
+								n5380_Registers[R5380_BUSSTATUS] |= 0x80;
+							}
 						}
 					}
 				}

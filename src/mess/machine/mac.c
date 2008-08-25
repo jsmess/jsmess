@@ -151,6 +151,7 @@ typedef enum
 static UINT32 mac_overlay = 0;
 static mac_model_t mac_model;
 static int mac_drive_select = 0;
+static int mac_scsiirq_enable = 0;
 
 // returns non-zero if this Mac has ADB
 static int has_adb(void)
@@ -211,12 +212,12 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 	Interrupt handling
 */
 
-static int scc_interrupt, via_interrupt;
+static int scc_interrupt, via_interrupt, scsi_interrupt;
 
 static void mac_field_interrupts(running_machine *machine)
 {
-	if (scc_interrupt)
-		/* SCC interrupt */
+	if ((scc_interrupt) || (scsi_interrupt))
+ 		/* SCC interrupt, SCSI on SE and Classic */
 		cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
 	else if (via_interrupt)
 		/* VIA interrupt */
@@ -782,6 +783,15 @@ WRITE16_HANDLER ( macplus_scsi_w )
 	}
 
 	ncr5380_w(machine, reg, data);
+}
+
+static void mac_scsi_irq(running_machine *machine, int state)
+{
+	if ((mac_scsiirq_enable) && ((mac_model == MODEL_MAC_SE) || (mac_model == MODEL_MAC_CLASSIC)))
+	{
+		scsi_interrupt = state;
+		mac_field_interrupts(machine);
+	}
 }
 
 /* *************************************************************************
@@ -1574,6 +1584,13 @@ static WRITE8_HANDLER(mac_via_out_b)
 	int new_rtc_rTCClk;
 
 	mac_enable_sound((data & 0x80) == 0);
+
+	// SE and Classic have SCSI enable/disable here
+	if (mac_model >= MODEL_MAC_SE)
+	{
+		mac_scsiirq_enable = (data & 0x40) ? 1 : 0;
+	}
+
 	rtc_write_rTCEnb(data & 0x04);
 	new_rtc_rTCClk = (data >> 1) & 0x01;
 	if ((! new_rtc_rTCClk) && (rtc_rTCClk))
@@ -1658,6 +1675,8 @@ MACHINE_RESET(mac)
 		memset(mess_ram, 0, mess_ram_size);
 	}
 
+	scsi_interrupt = 0;
+
 	mac_scanline_timer = timer_alloc(mac_scanline_tick, NULL);
 	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
@@ -1689,6 +1708,7 @@ static OPBASE_HANDLER (overlay_opbaseoverride)
 static void mac_driver_init(running_machine *machine, mac_model_t model)
 {
 	mac_overlay = -1;
+	scsi_interrupt = 0;
 	mac_model = model;
 
 	/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
@@ -1746,17 +1766,17 @@ DRIVER_INIT(mac512ke)
 
 static const SCSIConfigTable dev_table =
 {
-	1,                                      /* 2 SCSI devices */
+	2,                                      /* 2 SCSI devices */
 	{
 	 { SCSI_ID_5, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
 	 { SCSI_ID_6, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 6, using CHD 0, and it's a harddisk */
 	}
 };
-
+				       // 41a868	    41a5ac = data copy
 static const struct NCR5380interface macplus_5380intf =
 {
 	&dev_table,	// SCSI device table
-	NULL		// IRQ (unconnected on the Mac Plus)
+	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
 };
 
 static void macscsi_exit(running_machine *machine)
