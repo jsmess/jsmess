@@ -11,6 +11,8 @@ System Driver Changes:
 - [AMIGA] Fixed crash in CDTV that when accessing the keyboard.
   [Roberto Zandona']
 
+- [C65] Fixed regression introduced in 0.114. (bug #1244) [Roberto Zandona']
+
 - [COMX35] Fixed to boot again. (bug #1629)  [Curt Coder]
 
 - [DRAGON] Fixed crash that could occur when accessing the printer.  (bug
