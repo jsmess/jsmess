@@ -1506,6 +1506,11 @@ static void adb_reset(void)
 
 static READ8_HANDLER(mac_via_in_a)
 {
+	if (mac_model == MODEL_MAC_CLASSIC)
+	{
+		return 0x81;		// bit 0 must be set to avoid attempting to boot from AppleTalk
+	}
+
 	return 0x80;
 }
 
@@ -1620,11 +1625,6 @@ WRITE16_HANDLER ( mac_via_w )
  * Main
  * *************************************************************************/
 
-static TIMER_CALLBACK(set_memory_overlay_callback)
-{
-	set_memory_overlay(machine, param);
-}
-
 MACHINE_RESET(mac)
 {
 	/* initialize real-time clock */
@@ -1650,10 +1650,12 @@ MACHINE_RESET(mac)
 		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
 	}
 
-	if (mac_model == MODEL_MAC_SE)
+	if ((mac_model == MODEL_MAC_SE) || (mac_model == MODEL_MAC_CLASSIC))
 	{
-		timer_set(attotime_zero, NULL, 0, set_memory_overlay_callback);
 		mac_set_sound_buffer(1);
+
+		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
+		memset(mess_ram, 0, mess_ram_size);
 	}
 
 	mac_scanline_timer = timer_alloc(mac_scanline_tick, NULL);
@@ -1670,6 +1672,19 @@ static STATE_POSTLOAD( mac_state_load )
 }
 
 
+static OPBASE_HANDLER (overlay_opbaseoverride)
+{
+	if (mac_overlay != -1)
+	{
+		if ((address >= 0x400000) && (address <= 0x4fffff))
+		{
+			set_memory_overlay(machine, 0);		// kill the overlay
+			mac_overlay = -1;
+		}
+	}
+
+	return address;
+}
 
 static void mac_driver_init(running_machine *machine, mac_model_t model)
 {
@@ -1684,6 +1699,15 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 		memory_region_length(machine, "user1"), memory_region(machine, "user1"), TRUE, 3);
 
 	set_memory_overlay(machine, 1);
+
+	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC))
+	{
+		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
+		memset(mess_ram, 0, mess_ram_size);
+
+		memory_set_opbase_handler(0, overlay_opbaseoverride);
+		mac_overlay = 1;
+	}
 
 	/* configure via */
 	if (has_adb())
