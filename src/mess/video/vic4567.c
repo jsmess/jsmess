@@ -376,10 +376,15 @@ static void vic3_drawlines (int first, int last)
 
 		for (i = ybegin; i <= yend; i++)
 		{
+			plot_box(vic2.bitmap, 0, yoff+ybegin, xbegin, yend-ybegin+1, FRAMECOLOR);
+			plot_box(vic2.bitmap, xend, yoff+ybegin, vic2.bitmap->width - xend, yend-ybegin+1, FRAMECOLOR);
+
+			/*
 			memset16 (BITMAP_ADDR16(vic2.bitmap, yoff + 1, 0),
 						FRAMECOLOR, xbegin);
 			memset16 (BITMAP_ADDR16(vic2.bitmap, yoff + 1, xend),
 						FRAMECOLOR, vic2.bitmap->width - xend);
+			*/
 		}
 	}
 	if (last < vic2.bitmap->height)
