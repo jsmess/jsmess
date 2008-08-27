@@ -60,6 +60,8 @@ Notes:
 	- tape input/output
 	- tmc2000: add missing keys
 	- tmc2000: TOOL-2000 rom banking
+	- oscnano: implement Run/Monitor keys properly (both cause a reset when depressed, Monitor clears EF4 for a while)
+	- oscnano: video should be black & white, red signal is used as luminance output
 
 */
 
@@ -955,7 +957,7 @@ static DRIVER_INIT( tmc1800 )
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY         FULLNAME        FLAGS */
-COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    tmc1800,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    tmc1800,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    tmc1800,    tmc2000,    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	tmc1800,	oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
+COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800,    tmc1800,    tmc1800,    "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
+COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800,    tmc1800,    tmc1800,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
+COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000,    tmc1800,    tmc2000,    "Telercas Oy",  "Telmac 2000",  0 )
+COMP( 1980, oscnano,	tmc2000,0,		oscnano,	oscnano,	tmc1800,	oscnano,	"OSCOM Oy",		"OSCOM Nano",	GAME_NOT_WORKING )
