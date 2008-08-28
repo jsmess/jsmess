@@ -84,6 +84,48 @@ static VIDEO_UPDATE( tmc2000 )
 	return 0;
 }
 
+/* OSCOM Nano */
+
+static CDP1864_ON_INT_CHANGED( oscnano_int_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+}
+
+static CDP1864_ON_DMAO_CHANGED( oscnano_dmao_w )
+{
+	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+}
+
+static CDP1864_ON_EFX_CHANGED( oscnano_efx_w )
+{
+	oscnano_state *state = device->machine->driver_data;
+
+	state->cdp1864_efx = level;
+}
+
+static CDP1864_INTERFACE( oscnano_cdp1864_intf )
+{
+	SCREEN_TAG,
+	CDP1864_CLK_FREQ,
+	CDP1864_INTERLACED,
+	oscnano_int_w,
+	oscnano_dmao_w,
+	oscnano_efx_w,
+	RES_K(1.21), // R18 unconfirmed
+	0, // not connected
+	0, // not connected
+	0  // not connected
+};
+
+static VIDEO_UPDATE( oscnano )
+{
+	const device_config *cdp1864 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1864, CDP1864_TAG);
+
+	cdp1864_update(cdp1864, bitmap, cliprect);
+
+	return 0;
+}
+
 /* OSM-200 */
 
 static VIDEO_START( osm200 )
@@ -139,8 +181,8 @@ MACHINE_DRIVER_START( oscnano_video )
 	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(8+8)
-	MDRV_VIDEO_UPDATE(tmc2000)
+	MDRV_VIDEO_UPDATE(oscnano)
 
 	MDRV_DEVICE_ADD(CDP1864_TAG, CDP1864)
-	MDRV_DEVICE_CONFIG(tmc2000_cdp1864_intf)
+	MDRV_DEVICE_CONFIG(oscnano_cdp1864_intf)
 MACHINE_DRIVER_END

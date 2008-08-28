@@ -11,6 +11,12 @@
 
 	- interlace mode
     - connect to sound system when possible
+	- cpu synchronization
+
+		SC1 and SC0 are used to provide CDP1864C-to-CPU synchronization for a jitter-free display.
+		During every horizontal sync the CDP1864C samples SC0 and SC1 for SC0 = 1 and SC1 = 0
+		(CDP1800 execute state). Detection of a fetch cycle causes the CDP1864C to skip cycles to
+		attain synchronization. (i.e. picture moves 8 pixels to the right)
 
 */
 
@@ -192,7 +198,7 @@ void cdp1864_aoe_w(const device_config *device, int level)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
-	if (level == 0)
+	if (!level)
 	{
 		cdp1864->latch = CDP1864_DEFAULT_LATCH;
 	}
@@ -248,13 +254,20 @@ WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w )
 
 /* DMA Write */
 
-void cdp1864_dma_w(const device_config *device, UINT8 data, int rdata, int gdata, int bdata)
+void cdp1864_dma_w(const device_config *device, UINT8 data, int color_on, int rdata, int gdata, int bdata)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int sx = video_screen_get_hpos(cdp1864->screen) + 4;
 	int y = video_screen_get_vpos(cdp1864->screen);
 	int x;
+
+	if (color_on == CLEAR_LINE)
+	{
+		rdata = 1;
+		gdata = 1;
+		bdata = 1;
+	}
 
 	for (x = 0; x < 8; x++)
 	{

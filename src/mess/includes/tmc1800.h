@@ -17,6 +17,17 @@ struct _tmc1800_state
 	int reset;				/* reset activated */
 };
 
+typedef struct _osc1000b_state osc1000b_state;
+struct _osc1000b_state
+{
+	/* video state */
+	int cdp1861_efx;		/* EFx */
+
+	/* keyboard state */
+	int keylatch;			/* key latch */
+	int reset;				/* reset activated */
+};
+
 typedef struct _tmc2000_state tmc2000_state;
 struct _tmc2000_state
 {
@@ -28,6 +39,23 @@ struct _tmc2000_state
 	/* keyboard state */
 	int keylatch;			/* key latch */
 	int reset;				/* reset activated */
+};
+
+typedef struct _oscnano_state oscnano_state;
+struct _oscnano_state
+{
+	/* cpu state */
+	int monitor_ef4;		/* EF4 line */
+
+	/* video state */
+	int cdp1864_efx;		/* EFx */
+
+	/* keyboard state */
+	int keylatch;			/* key latch */
+	int reset;				/* reset activated */
+
+	/* timers */
+	emu_timer *ef4_timer;	/* EF4 line RC timer */
 };
 
 /* ---------- defined in video/tmc1800.c ---------- */

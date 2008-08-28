@@ -8,7 +8,11 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
+  black and white, and fixed quickloading. System is now fully 
+  working, including the "Säkkijärven polkka" program. [Curt Coder]
+
+- [TMC2000] Fixed quickloading. [Curt Coder]
 
 
 

@@ -242,7 +242,7 @@ static CDP1802_DMA_WRITE( tmc2000e_dma_w )
 	int gdata = BIT(color, 0);
 	int bdata = BIT(color, 1);
 
-	cdp1864_dma_w(cdp1864, data, rdata, gdata, bdata);
+	cdp1864_dma_w(cdp1864, data, ASSERT_LINE, rdata, gdata, bdata);
 }
 
 static CDP1802_INTERFACE( tmc2000e_config )
