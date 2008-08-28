@@ -807,6 +807,16 @@ ROM_START( ibm5170 )
 	/* 8051 keytronic keyboard controller */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
+
+	/* PALS */
+	ROM_REGION( 0x2000, "pals", 0 )
+	ROM_LOAD("1501824.pal14l4.u87", 0x0000, 0x0800, NO_DUMP) /* MMI 1501824 717750 // (C)1983 IBM(M) */
+	ROM_LOAD("1503135.pal14l4.u130", 0x0800, 0x0800, NO_DUMP) /* MMI 1503135 705075 // (C) IBM CORP 83 */
+
+	/* PROMS */
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD("1501814.82s123.u115", 0x0000, 0x0800, NO_DUMP) /* N82S123AN 8713 // SK-D 1501814 */
+	ROM_LOAD("55x8041.82s147.u72", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8709 // V-C55X8041 */
 ROM_END
 
 
@@ -818,8 +828,8 @@ ROM_START( ibm5170a )
 	ROMX_LOAD("61x9265.u47", 0xf0001, 0x8000, CRC(c32713e4) SHA1(22ed4e2be9f948682891e2fd056a97dbea01203c), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS( 1, "3270at", "IBM 3270 PC/AT 5281 11/15/85") /* pretty much just a part string and checksum change from the 5170 rev3 */
-	ROMX_LOAD("62x0820.u27", 0xf0000, 0x8000, CRC(e9cc3761) SHA1(ff9373c1a1f34a32fb6acdabc189c61b01acf9aa), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("62x0821.u47", 0xf0001, 0x8000, CRC(b5978ccb) SHA1(2a1aeb9ae3cd7e60fc4c383ca026208b82156810), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("62x0820.u27", 0xf0000, 0x8000, CRC(e9cc3761) SHA1(ff9373c1a1f34a32fb6acdabc189c61b01acf9aa), ROM_SKIP(1) | ROM_BIOS(2)) /* T 62X0820-U27 8714HAK // TMM23256P-6746 // (C)IBM CORP 1981,-1985 */
+	ROMX_LOAD("62x0821.u47", 0xf0001, 0x8000, CRC(b5978ccb) SHA1(2a1aeb9ae3cd7e60fc4c383ca026208b82156810), ROM_SKIP(1) | ROM_BIOS(2)) /* T 62X0821-U47 8715HAK // TMM23256P-6747 // (C)IBM CORP 1981,-1985 */
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
@@ -837,6 +847,16 @@ ROM_START( ibm5170a )
 	/* 8051 keytronic keyboard controller */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
+
+	/* PALS */
+	ROM_REGION( 0x2000, "pals", 0 )
+	ROM_LOAD("1501824.pal14l4.u87", 0x0000, 0x0800, NO_DUMP) /* MMI 1501824 717750 // (C)1983 IBM(M) */
+	ROM_LOAD("1503135.pal14l4.u130", 0x0800, 0x0800, NO_DUMP) /* MMI 1503135 705075 // (C) IBM CORP 83 */
+
+	/* PROMS */
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD("1501814.82s123.u115", 0x0000, 0x0800, NO_DUMP) /* N82S123AN 8713 // SK-D 1501814 */
+	ROM_LOAD("55x8041.82s147.u72", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8709 // V-C55X8041 */
 ROM_END
 
 
@@ -1030,7 +1050,7 @@ SYSTEM_CONFIG_END
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT        CONFIG   COMPANY     FULLNAME */
 COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,		atega,	    ibmat,   "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atega,      ibmat,   "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
-COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,      atcga,      ibmat,   "International Business Machines",  "IBM PC/XT 5162", GAME_NOT_WORKING )
+COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,      atcga,      ibmat,   "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,		ps2m30286,	ibmat,   "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5170a,  atcga,		atcga,	    ibmat,   "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       ibm5170a,  atcga,		atcga,	    ibmat,   "",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
