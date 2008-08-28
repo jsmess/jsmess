@@ -25,10 +25,10 @@ static ADDRESS_MAP_START(partner_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x4000, 0x5fff ) AM_RAMBANK(3)
 	AM_RANGE( 0x6000, 0x7fff ) AM_RAMBANK(4)
 	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK(5)
-	AM_RANGE( 0xa000, 0xb7ff ) AM_RAMBANK(6)	
+	AM_RANGE( 0xa000, 0xb7ff ) AM_RAMBANK(6)
 	AM_RANGE( 0xb800, 0xbfff ) AM_RAMBANK(7)
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK(8)
-	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK(9)		
+	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK(9)
 	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK(10)
 	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w)  // video
 	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
@@ -130,7 +130,7 @@ static MACHINE_DRIVER_START( partner )
     /* basic machine hardware */
     MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(partner_mem, 0)
-    
+
     MDRV_MACHINE_START( partner )
     MDRV_MACHINE_RESET( partner )
 
@@ -195,11 +195,11 @@ static void partner_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 /* ROM definition */
 ROM_START( partner )
 	ROM_REGION( 0x1A000, "main", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0x10000, 0x2000, CRC(be1eaa10) SHA1(f9658d8055bf434240ec020d7892ea98cb5cbb76))
-	ROM_LOAD( "basic.rom",0x12000, 0x2000, CRC(1e9be0ec) SHA1(2c431f487cffddaac8413efddfc0527ad595f03b))
-	ROM_LOAD( "mcpg.rom", 0x14000, 0x0800, CRC(3401225c) SHA1(6c252393ee73ed1a53d3e583547d86ab6718a533))
-	ROM_LOAD( "fdd.rom",  0x16000, 0x0800, CRC(8ca350b5) SHA1(76fc92298726fb2840f4c19d7edc860d1ed86356))
-	ROM_LOAD( "font.rom", 0x18000, 0x2000, CRC(dc4f1723) SHA1(6b8d5efb403cf0aeb3fd3197a0529d23c8e2f93c))
+	ROM_LOAD( "partner.rom", 0x10000, 0x2000, CRC(be1eaa10) SHA1(f9658d8055bf434240ec020d7892ea98cb5cbb76))
+	ROM_LOAD( "basic.rom",   0x12000, 0x2000, CRC(1e9be0ec) SHA1(2c431f487cffddaac8413efddfc0527ad595f03b))
+	ROM_LOAD( "mcpg.rom",    0x14000, 0x0800, CRC(3401225c) SHA1(6c252393ee73ed1a53d3e583547d86ab6718a533))
+	ROM_LOAD( "fdd.rom",     0x16000, 0x0800, CRC(8ca350b5) SHA1(76fc92298726fb2840f4c19d7edc860d1ed86356))
+	ROM_LOAD( "font.rom",    0x18000, 0x2000, CRC(dc4f1723) SHA1(6b8d5efb403cf0aeb3fd3197a0529d23c8e2f93c))
 	ROM_REGION(0x2000, "gfx1",0)
 	ROM_LOAD ("partner.fnt", 0x0000, 0x2000, CRC(2705F726) SHA1(3d7b33901ef098a405d7ddad924ba9677f6a9b15))
 ROM_END
