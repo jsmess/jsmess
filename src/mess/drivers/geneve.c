@@ -213,6 +213,7 @@
 #include "sound/5220intf.h"
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
+#include "machine/smc92x4.h" 
 
 /*
     memory map
@@ -482,9 +483,7 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
 
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
-	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
-	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
 MACHINE_DRIVER_END
