@@ -362,6 +362,7 @@ TESTDRIVER( c16v )		/* Commodore 16  vc1541								*/
 	DRIVER( plus4 )		/* Commodore +4  c1551								*/
 	DRIVER( plus4c )	/* Commodore +4  vc1541								*/
 TESTDRIVER( plus4v )	/* Commodore +4										*/
+	DRIVER( c232 )		/* Commodore 232 - Prototype						*/
 	DRIVER( c364 )		/* Commodore 364 - Prototype						*/
 
 	DRIVER( c128 )		/* Commodore 128 - NTSC								*/
