@@ -2025,7 +2025,7 @@ ROM_START( ibm5150 )
 
 	/* IBM PC 5150 (rev 1: 04/24/81) 2-screw case w/MDA Card, ROM Basic 1.0 */
 	/* ROM Basic 1.0 had a bug: Doing ".1 / 10" would result in the wrong answer. May have been fixed in 1.1 */
-	ROM_SYSTEM_BIOS( 1, "rev1", "IBM PC 5150 ??????? 02/24/81" )
+	ROM_SYSTEM_BIOS( 1, "rev1", "IBM PC 5150 ??????? 04/24/81" )
 	ROMX_LOAD("5700019.u29", 0xf6000, 0x2000, CRC(b59e8f6c) SHA1(7a5db95370194c73b7921f2d69267268c69d2511), ROM_BIOS(2))		/* ROM Basic 1.0 F6000-F7FFF */
 	ROMX_LOAD("5700027.u30", 0xf8000, 0x2000, CRC(bfff99b8) SHA1(ca2f126ba69c1613b7b5a4137d8d8cf1db36a8e6), ROM_BIOS(2))		/* ROM Basic 1.0 F8000-F9FFF */
 	ROMX_LOAD("5700035.u31", 0xfa000, 0x2000, CRC(9fe4ec11) SHA1(89af8138185938c3da3386f97d3b0549a51de5ef), ROM_BIOS(2))		/* ROM Basic 1.0 FA000-FBFFF */
