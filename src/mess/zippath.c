@@ -203,6 +203,48 @@ static int is_zip_path_separator(char c)
 
 
 /*-------------------------------------------------
+    next_path_char - lexes out the next path
+	character, normalizing separators as '/'
+-------------------------------------------------*/
+
+static char next_path_char(const char *s, int *pos)
+{
+	char result;
+
+	/* skip over any initial separators */
+	if (*pos == 0)
+	{
+		while(is_zip_file_separator(s[*pos]))
+			(*pos)++;
+	}
+
+	/* are we at a path separator? */
+	if (is_zip_file_separator(s[*pos]))
+	{
+		/* skip over path separators */
+		while(is_zip_file_separator(s[*pos]))
+			(*pos)++;
+
+		/* normalize as '/' */
+		result = '/';
+	}
+	else if (s[*pos] != '\0')
+	{
+		/* return character */
+		result = tolower(s[(*pos)++]);
+	}
+	else
+	{
+		/* return NUL */
+		result = '\0';
+	}
+	return result;
+}
+
+
+
+
+/*-------------------------------------------------
     zippath_find_sub_path - attempts to identify the
 	type of a sub path in a zip file
 -------------------------------------------------*/
@@ -210,6 +252,7 @@ static int is_zip_path_separator(char c)
 const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
 {
 	int i, j;
+	char c1, c2, last_char;
 	const zip_file_header *header;
 
 	for (header = zip_file_first_file(zipfile); header != NULL; header = zip_file_next_file(zipfile))
@@ -224,29 +267,19 @@ const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subp
 
 		i = 0;
 		j = 0;
-		do
-		{
-			while(is_zip_file_separator(header->filename[i]))
-				i++;
-			while(is_zip_path_separator(subpath[j]))
-				j++;
-			while((header->filename[i] != '\0') && (tolower(header->filename[i]) == tolower(subpath[j])))
-			{
-				i++;
-				j++;
-			}
-		}
-		while(is_zip_file_separator(header->filename[i]) && is_zip_path_separator(subpath[j]));
+		last_char = '/';
+		while((c1 = next_path_char(header->filename, &i)) == (c2 = next_path_char(subpath, &j)))
+			last_char = c2;
 
-		if (subpath[j] == '\0')
+		if (c2 == '\0')
 		{
-			if (header->filename[i] == '\0')
+			if (c1 == '\0')
 			{
 				if (type != NULL)
 					*type = ENTTYPE_FILE;
 				return header;
 			}
-			else if ((i == 0) || is_zip_file_separator(header->filename[i]))
+			else if ((last_char == '/') || (c1 == '/'))
 			{
 				if (type != NULL)
 					*type = ENTTYPE_DIR;
@@ -325,14 +358,18 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 	if ((current_entry_type == ENTTYPE_FILE) && is_zip_file(astring_c(apath_trimmed))
 		&& (zip_file_open(astring_c(apath_trimmed), zipfile) == ZIPERR_NONE))
 	{
+		i = strlen(path + astring_len(apath));
+		while((i > 0) && is_zip_path_separator(path[astring_len(apath) + i - 1]))
+			i--;
+		astring_cpych(newpath, path + astring_len(apath), i);
+
 		/* this was a true ZIP path - attempt to identify the type of path */
-		zippath_find_sub_path(*zipfile, path + astring_len(apath), &current_entry_type);
+		zippath_find_sub_path(*zipfile, astring_c(newpath), &current_entry_type);
 		if (current_entry_type == ENTTYPE_NONE)
 		{
 			err = FILERR_NOT_FOUND;
 			goto done;
 		}
-		astring_cpyc(newpath, path + astring_len(apath));
 	}
 	else
 	{

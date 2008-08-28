@@ -14,7 +14,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- Fixed a file manager bug that could cause the working directory to be lost
+  when inside ZIP files.  [Nate Woods]
 
 
 
