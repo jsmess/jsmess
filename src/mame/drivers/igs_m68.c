@@ -11,8 +11,6 @@ Others use
 IGS017
 IGS029
 
-All of these have encrypted program roms, which will need decrypting
-
 */
 
 #include "driver.h"
@@ -30,6 +28,9 @@ static VIDEO_UPDATE(igs_m68)
 
 static ADDRESS_MAP_START( igs_m68_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM //to test the decryption
+	AM_RANGE(0x300000, 0x303fff) AM_RAM //to test the decryption
+	AM_RANGE(0x500000, 0x503fff) AM_RAM //to test the decryption
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( igs_m68 )
@@ -112,7 +113,7 @@ Notes:
 
 ROM_START( lhzb2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
-	ROM_LOAD( "p1100.u30", 0x00000, 0x80000, CRC(68102b25) SHA1(6c1e8d204be0efda0e9b6c2f49b5c6760712475f) )
+	ROM_LOAD16_WORD_SWAP( "p1100.u30", 0x00000, 0x80000, CRC(68102b25) SHA1(6c1e8d204be0efda0e9b6c2f49b5c6760712475f) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
@@ -127,7 +128,7 @@ ROM_END
 
 ROM_START( lhzb2a )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
-	ROM_LOAD( "p-4096", 0x00000, 0x80000, CRC(41293f32) SHA1(df4e993f4a458729ade13981e58f32d8116c0082) )
+	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(41293f32) SHA1(df4e993f4a458729ade13981e58f32d8116c0082) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
@@ -184,7 +185,7 @@ Notes:
 
 ROM_START( mgcs )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
-	ROM_LOAD( "p1500.u8", 0x00000, 0x80000, CRC(a8cb5905) SHA1(37be7d926a1352869632d43943763accd4dec4b7) )
+	ROM_LOAD16_WORD_SWAP( "p1500.u8", 0x00000, 0x80000, CRC(a8cb5905) SHA1(37be7d926a1352869632d43943763accd4dec4b7) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s1502.u10", 0x00000, 0x80000, CRC(a8a6ba58) SHA1(59276a8ab4a31812600816c2a43b74bd71394419) )
@@ -239,7 +240,7 @@ Notes:
 
 ROM_START( slqz2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
-	ROM_LOAD( "p1100.u28", 0x00000, 0x80000, CRC(0b8e5c9e) SHA1(16572bd1163bba4da8a76b10649d2f71e50ad369) )
+	ROM_LOAD16_WORD_SWAP( "p1100.u28", 0x00000, 0x80000, CRC(0b8e5c9e) SHA1(16572bd1163bba4da8a76b10649d2f71e50ad369) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Mahjong Long Hu Zheng Ba 2
@@ -261,7 +262,7 @@ PCB Layout
 
 IGS PCB NO-0147-6
 |---------------------------------------|
-| UPC1242H          S0903.U15   BATTERY|
+| UPC1242H          S0903.U15   BATTERY |
 |          VOL               SPDT_SW    |
 |                                       |
 |        K668                    6264   |
@@ -297,7 +298,7 @@ Notes:
 
 ROM_START( sdmg2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
-	ROM_LOAD( "p0900.u25", 0x00000, 0x80000,CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
+	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
@@ -309,9 +310,339 @@ ROM_START( sdmg2 )
 ROM_END
 
 
-GAME( 1998, lhzb2,    0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 1)", GAME_NOT_WORKING )
-GAME( 1998, lhzb2a,   lhzb2,    igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 2)", GAME_NOT_WORKING )
-GAME( 1998, mgcs,     0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Man Guan Cai Shen", GAME_NOT_WORKING )
-GAME( 1998, slqz2,    0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Shuang Long Qiang Zhu 2", GAME_NOT_WORKING )
-GAME( 1997, sdmg2,    0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Super Da Man Guan 2", GAME_NOT_WORKING )
+static DRIVER_INIT( lhzb2 )
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		/* bit 0 xor layer */
+
+		if( i & 0x20/2 )
+		{
+			if( i & 0x02/2 )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if( !(i & 0x4000/2) )
+		{
+			if( !(i & 0x300/2) )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		/* bit 13 xor layer */
+
+		if( !(i & 0x1000/2) )
+		{
+			if( i & 0x2000/2 )
+			{
+				if( i & 0x8000/2 )
+				{
+					if( !(i & 0x100/2) )
+					{
+						if( i & 0x200/2 )
+						{
+							if( !(i & 0x40/2) )
+							{
+								x ^= 0x2000;
+							}
+						}
+						else
+						{
+							x ^= 0x2000;
+						}
+					}
+				}
+				else
+				{
+					if( !(i & 0x100/2) )
+					{
+						x ^= 0x2000;
+					}
+				}
+			}
+			else
+			{
+				if( i & 0x8000/2 )
+				{
+					if( i & 0x200/2 )
+					{
+						if( !(i & 0x40/2) )
+						{
+							x ^= 0x2000;
+						}
+					}
+					else
+					{
+						x ^= 0x2000;
+					}
+				}
+				else
+				{
+					x ^= 0x2000;
+				}
+			}
+		}
+
+		src[i] = x;
+	}
+
+
+}
+
+static DRIVER_INIT( lhzb2a )
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		/* bit 0 xor layer */
+
+		if( i & 0x20/2 )
+		{
+			if( i & 0x02/2 )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if( !(i & 0x4000/2) )
+		{
+			if( !(i & 0x300/2) )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		/* bit 5 xor layer */
+
+		if( i & 0x4000/2 )
+		{
+			if( i & 0x8000/2 )
+			{
+				if( i & 0x2000/2 )
+				{
+					if( i & 0x200/2 )
+					{
+						if( !(i & 0x40/2) || (i & 0x800/2) )
+						{
+							x ^= 0x0020;
+						}
+					}
+				}
+			}
+			else
+			{
+				if( !(i & 0x40/2) || (i & 0x800/2) )
+				{
+					x ^= 0x0020;
+				}
+			}
+		}
+
+		src[i] = x;
+	}
+
+}
+
+static DRIVER_INIT( mgcs )
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		/* bit 0 xor layer */
+
+		if( i & 0x20/2 )
+		{
+			if( i & 0x02/2 )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if( !(i & 0x4000/2) )
+		{
+			if( !(i & 0x300/2) )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		/* bit 8 xor layer */
+
+		if( (i & 0x2000/2) || !(i & 0x80/2) )
+		{
+			if( i & 0x100/2 )
+			{
+				if( !(i & 0x20/2) || (i & 0x400/2) )
+				{
+					x ^= 0x0100;
+				}
+			}
+		}
+		else
+		{
+			x ^= 0x0100;
+		}
+
+		src[i] = x;
+	}
+}
+
+static DRIVER_INIT( slqz2 )
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		/* bit 0 xor layer */
+
+		if( i & 0x20/2 )
+		{
+			if( i & 0x02/2 )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if( !(i & 0x4000/2) )
+		{
+			if( !(i & 0x300/2) )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		/* bit 14 xor layer */
+
+		if( i & 0x1000/2 )
+		{
+			if( i & 0x800/2 )
+			{
+				x ^= 0x4000;
+			}
+			else
+			{
+				if( i & 0x200/2 )
+				{
+					if( !(i & 0x100/2) )
+					{
+						if( i & 0x40/2 )
+						{
+							x ^= 0x4000;
+						}
+					}
+				}
+				else
+				{
+					x ^= 0x4000;
+				}
+			}
+		}
+		else
+		{
+			if( i & 0x800/2 )
+			{
+				x ^= 0x4000;
+			}
+			else
+			{
+				if( !(i & 0x100/2) )
+				{
+					if( i & 0x40/2 )
+					{
+						x ^= 0x4000;
+					}
+				}
+			}
+		}
+
+		src[i] = x;
+	}
+}
+
+static DRIVER_INIT( sdmg2 )
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		/* bit 0 xor layer */
+
+		if( i & 0x20/2 )
+		{
+			if( i & 0x02/2 )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if( !(i & 0x4000/2) )
+		{
+			if( !(i & 0x300/2) )
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		/* bit 9 xor layer */
+
+		if( i & 0x20000/2 )
+		{
+			x ^= 0x0200;
+		}
+		else
+		{
+			if( !(i & 0x400/2) )
+			{
+				x ^= 0x0200;
+			}
+		}
+
+		/* bit 12 xor layer */
+
+		if( i & 0x20000/2 )
+		{
+			x ^= 0x1000;
+		}
+
+		src[i] = x;
+	}
+}
+
+GAME( 1998, lhzb2,    0,        igs_m68,    igs_m68,    lhzb2,  ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 1)", GAME_NOT_WORKING )
+GAME( 1998, lhzb2a,   lhzb2,    igs_m68,    igs_m68,    lhzb2a, ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 2)", GAME_NOT_WORKING )
+GAME( 1998, mgcs,     0,        igs_m68,    igs_m68,    mgcs,   ROT0,  "IGS", "Mahjong Man Guan Cai Shen", GAME_NOT_WORKING )
+GAME( 1998, slqz2,    0,        igs_m68,    igs_m68,    slqz2,  ROT0,  "IGS", "Mahjong Shuang Long Qiang Zhu 2", GAME_NOT_WORKING )
+GAME( 1997, sdmg2,    0,        igs_m68,    igs_m68,    sdmg2,  ROT0,  "IGS", "Mahjong Super Da Man Guan 2", GAME_NOT_WORKING )
 

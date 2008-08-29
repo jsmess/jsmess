@@ -70,6 +70,7 @@ enum
 		DEVINFO_FCT_STOP,								/* R/O: device_stop_func */
 		DEVINFO_FCT_RESET,								/* R/O: device_reset_func */
 		DEVINFO_FCT_VALIDITY_CHECK,						/* R/O: device_validity_check_func */
+		DEVINFO_FCT_NVRAM,								/* R/O: device_nvram_func */
 
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				/* R/W: device-specific values start here */
 	DEVINFO_FCT_LAST = 0x2ffff,
@@ -113,6 +114,10 @@ enum
 #define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(const device_config *device)
 #define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(device)
 
+#define DEVICE_NVRAM_NAME(name)		device_NVRAM_##name
+#define DEVICE_NVRAM(name)			void DEVICE_NVRAM_NAME(name)(const device_config *device, mame_file *file, int read_or_write)
+#define DEVICE_NVRAM_CALL(name)		DEVICE_NVRAM_NAME(name)(device, file, read_or_write)
+
 #define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
 #define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device)
 #define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK(name)(driver, device)
@@ -134,6 +139,7 @@ typedef void (*device_set_info_func)(const device_config *device, UINT32 state, 
 typedef void (*device_start_func)(const device_config *device);
 typedef void (*device_stop_func)(const device_config *device);
 typedef void (*device_reset_func)(const device_config *device);
+typedef void (*device_nvram_func)(const device_config *device, mame_file *file, int read_or_write);
 typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
 
 
@@ -154,6 +160,7 @@ union _deviceinfo
 	device_stop_func		stop;					/* DEVINFO_FCT_STOP */
 	device_reset_func		reset;					/* DEVINFO_FCT_RESET */
 	device_validity_check_func validity_check;		/* DEVINFO_FCT_VALIDITY_CHECK */
+	device_nvram_func		nvram;					/* DEVINFO_FCT_NVRAM */
 	const rom_entry *		romregion;				/* DEVINFO_PTR_ROM_REGION */
 };
 
@@ -168,6 +175,7 @@ struct _device_config
 	device_start_func		start;					/* quick pointer to start callback */
 	device_stop_func		stop;					/* quick pointer to stop callback */
 	device_reset_func		reset;					/* quick pointer to reset callback */
+	device_nvram_func		nvram;					/* quick pointer to nvram callback */
 	const void *			static_config;			/* static device configuration */
 	void *					inline_config;			/* inline device configuration */
 
@@ -253,6 +261,9 @@ void devtag_reset(running_machine *machine, device_type type, const char *tag);
 
 
 /* ----- device information getters ----- */
+
+/* return the device associated with a tag */
+const device_config *devtag_get_device(running_machine *machine, device_type type, const char *tag);
 
 /* return the token associated with an allocated device */
 void *devtag_get_token(running_machine *machine, device_type type, const char *tag);

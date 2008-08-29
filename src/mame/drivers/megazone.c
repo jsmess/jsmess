@@ -9,7 +9,7 @@ To enter service mode, keep 1&2 pressed on reset
 #include "driver.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -156,8 +156,8 @@ static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dac_0_data_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(i8039_irqen_and_status_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( megazone )

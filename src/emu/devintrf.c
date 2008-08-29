@@ -132,6 +132,10 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	(*type)(NULL, DEVINFO_FCT_RESET, &info);
 	device->reset = info.reset;
 
+	info.nvram = NULL;
+	(*type)(NULL, DEVINFO_FCT_NVRAM, &info);
+	device->nvram = info.nvram;
+
 	/* link us to the end and return */
 	*devptr = device;
 	return device;
@@ -587,6 +591,26 @@ void *devtag_get_token(running_machine *machine, device_type type, const char *t
 	if (device == NULL)
 		fatalerror("devtag_get_token failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device->token;
+}
+
+
+/*-------------------------------------------------
+    devtag_get_device - return the device associated
+    with a tag
+-------------------------------------------------*/
+
+const device_config *devtag_get_device(running_machine *machine, device_type type, const char *tag)
+{
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	if (device == NULL)
+		fatalerror("devtag_get_device failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+	return device;
 }
 
 

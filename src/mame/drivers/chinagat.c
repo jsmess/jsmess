@@ -72,7 +72,7 @@ Dip locations and factory settings verified with China Gate US manual.
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/2151intf.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
@@ -342,11 +342,11 @@ static ADDRESS_MAP_START( i8748_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8748_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_bus, I8039_bus) AM_READ(saiyugb1_mcu_command_r)
-	AM_RANGE(I8039_t0, I8039_t0) AM_WRITE(saiyugb1_m5205_clk_w) 		/* Drives the clock on the m5205 at 1/8 of this frequency */
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(saiyugb1_m5205_irq_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(saiyugb1_adpcm_rom_addr_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(saiyugb1_adpcm_control_w)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugb1_mcu_command_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(saiyugb1_m5205_clk_w) 		/* Drives the clock on the m5205 at 1/8 of this frequency */
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugb1_m5205_irq_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugb1_adpcm_rom_addr_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(saiyugb1_adpcm_control_w)
 ADDRESS_MAP_END
 
 
@@ -549,7 +549,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_CPU_ADD("audio", Z80, 3579545)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(saiyugb1_sound_map,0)
 
-	MDRV_CPU_ADD("mcu", I8048,9263750/3)		/* 3.087916 MHz (9.263750 MHz oscillator) */
+	MDRV_CPU_ADD("mcu", I8048, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
 	MDRV_CPU_PROGRAM_MAP(i8748_map,0)
 	MDRV_CPU_IO_MAP(i8748_portmap,0)
 

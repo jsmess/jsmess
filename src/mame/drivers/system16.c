@@ -161,7 +161,7 @@ DIP locations verified from manual for:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "system16.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
@@ -183,21 +183,6 @@ static void sys16_video_config(void (*update)(void), int sprxoffs, const int *ba
 	sys16_sprxoffset = sprxoffs;
 	sys16_obj_bank = bank ? bank : bank_default;
 }
-
-/***************************************************************************/
-
-// 7751 emulation
-WRITE8_HANDLER( sys16_7751_audio_8255_w );
- READ8_HANDLER( sys16_7751_audio_8255_r );
- READ8_HANDLER( sys16_7751_sh_rom_r );
- READ8_HANDLER( sys16_7751_sh_t1_r );
- READ8_HANDLER( sys16_7751_sh_command_r );
-WRITE8_HANDLER( sys16_7751_sh_dac_w );
-WRITE8_HANDLER( sys16_7751_sh_busy_w );
-WRITE8_HANDLER( sys16_7751_sh_offset_a0_a3_w );
-WRITE8_HANDLER( sys16_7751_sh_offset_a4_a7_w );
-WRITE8_HANDLER( sys16_7751_sh_offset_a8_a11_w );
-WRITE8_HANDLER( sys16_7751_sh_rom_select_w );
 
 /***************************************************************************/
 

@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( namcond1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE(&namcond1_shared_ram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(ygv608_r,ygv608_w)
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE8(at28c16_0_r, at28c16_0_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(ygv608_debug_trigger)
 #endif
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static INPUT_PORTS_START( namcond1 )
-	PORT_START("P1_P2")      /* player 1 */
+	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -106,13 +106,13 @@ static INPUT_PORTS_START( namcond1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("DSW")  	/* dipswitches */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0100, 0x0100, "Freeze" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Test ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
@@ -251,8 +251,8 @@ static ADDRESS_MAP_START( nd1h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0xa00000, 0xa07fff) AM_READWRITE( c352_0_r, c352_0_w )
-	AM_RANGE(0xc00000, 0xc00001) AM_READ( input_port_1_word_r )
-	AM_RANGE(0xc00002, 0xc00003) AM_READ( input_port_0_word_r )
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00010, 0xc00011) AM_NOP
 	AM_RANGE(0xc00030, 0xc00031) AM_NOP
 	AM_RANGE(0xc00040, 0xc00041) AM_NOP
@@ -270,11 +270,6 @@ static INTERRUPT_GEN( mcu_interrupt )
     {
     	cpunum_set_input_line(machine, 1, H8_IRQ5, PULSE_LINE);
     }
-}
-
-static DRIVER_INIT( namcond1 )
-{
-	at28c16_init( 0, NULL, NULL );
 }
 
 /******************************************
@@ -302,7 +297,6 @@ static MACHINE_DRIVER_START( namcond1 )
 
 	MDRV_MACHINE_START(namcond1)
 	MDRV_MACHINE_RESET(namcond1)
-	MDRV_NVRAM_HANDLER(at28c16_0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -326,6 +320,8 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
 	MDRV_SOUND_ROUTE(2, "right", 1.00)
 	MDRV_SOUND_ROUTE(3, "left", 1.00)
+
+	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
 MACHINE_DRIVER_END
 
 ROM_START( ncv1 )
@@ -405,8 +401,8 @@ ROM_START( ncv2j )
     ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
-GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.1", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.2", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.2 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, ncv1,      0, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.1", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, ncv2,      0, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.2", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.2 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )

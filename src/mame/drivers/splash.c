@@ -56,6 +56,8 @@ extern UINT16 *splash_spriteram;
 extern UINT16 *splash_pixelram;
 extern UINT16 *roldfrog_bitmap_mode;
 static UINT16 *roldfrog_protdata;
+static int adpcm_data;
+static int ret;
 
 extern int splash_bitmap_type;
 extern int splash_sprite_attr2_shift;
@@ -88,10 +90,10 @@ static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 static ADDRESS_MAP_START( splash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_READ(SMH_ROM)			/* ROM */
 	AM_RANGE(0x800000, 0x83ffff) AM_READ(SMH_RAM)			/* Pixel Layer */
-	AM_RANGE(0x840000, 0x840001) AM_READ(input_port_0_word_r)/* DIPSW #1 */
-	AM_RANGE(0x840002, 0x840003) AM_READ(input_port_1_word_r)/* DIPSW #2 */
-	AM_RANGE(0x840004, 0x840005) AM_READ(input_port_2_word_r)/* INPUT #1 */
-	AM_RANGE(0x840006, 0x840007) AM_READ(input_port_3_word_r)/* INPUT #2 */
+	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
+	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x880000, 0x8817ff) AM_READ(splash_vram_r)		/* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_READ(SMH_RAM)			/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_READ(SMH_RAM)			/* Work RAM */
@@ -137,8 +139,6 @@ static ADDRESS_MAP_START( splash_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
-static int adpcm_data;
-
 static WRITE8_HANDLER( splash_adpcm_data_w ){
 	adpcm_data = data;
 }
@@ -165,7 +165,6 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( roldfrog_bombs_r )
 {
-	static int ret = 0x100;
 	ret ^= 0x100;
 	return ret;
 }
@@ -175,10 +174,10 @@ static ADDRESS_MAP_START( roldfrog_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x407fff) AM_ROM	AM_BASE(&roldfrog_protdata)					/* Protection Data */
 	AM_RANGE(0x408000, 0x4087ff) AM_READ(SMH_RAM)			/* Extra Ram */
 	AM_RANGE(0x800000, 0x83ffff) AM_READ(SMH_RAM)			/* Pixel Layer */
-	AM_RANGE(0x840000, 0x840001) AM_READ(input_port_0_word_r)/* DIPSW #1 */
-	AM_RANGE(0x840002, 0x840003) AM_READ(input_port_1_word_r)/* DIPSW #2 */
-	AM_RANGE(0x840004, 0x840005) AM_READ(input_port_2_word_r)/* INPUT #1 */
-	AM_RANGE(0x840006, 0x840007) AM_READ(input_port_3_word_r)/* INPUT #2 */
+	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
+	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x880000, 0x8817ff) AM_READ(splash_vram_r)		/* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_READ(SMH_RAM)			/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_READ(SMH_RAM)			/* Work RAM */
@@ -224,10 +223,10 @@ static ADDRESS_MAP_START( funystrp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)			/* ROM */
 	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_ROM)			/* protection? RAM */
 	AM_RANGE(0x800000, 0x83ffff) AM_READ(SMH_RAM)			/* Pixel Layer */
-	AM_RANGE(0x840000, 0x840001) AM_READ(input_port_0_word_r)/* DIPSW #1 */
-	AM_RANGE(0x840002, 0x840003) AM_READ(input_port_1_word_r)/* DIPSW #2 */
-	AM_RANGE(0x840004, 0x840005) AM_READ(input_port_2_word_r)/* INPUT #1 */
-	AM_RANGE(0x840006, 0x840007) AM_READ(input_port_3_word_r)/* INPUT #2 */
+	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
+	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x880000, 0x8817ff) AM_READ(splash_vram_r)		/* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_READ(SMH_RAM)			/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_READ(SMH_RAM)			/* Work RAM */
@@ -251,7 +250,7 @@ static ADDRESS_MAP_START( funystrp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( splash )
-	PORT_START("DSW1")	/* DSW #1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
@@ -279,7 +278,7 @@ static INPUT_PORTS_START( splash )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, "1C/1C or Free Play (if Coin A too)" )
 
-	PORT_START("DSW2")	/* DSW #2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -301,7 +300,7 @@ static INPUT_PORTS_START( splash )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("P1")	/* 1P INPUTS & COINSW */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -311,7 +310,7 @@ static INPUT_PORTS_START( splash )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("P2")	/* 2P INPUTS & STARTSW */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -323,7 +322,7 @@ static INPUT_PORTS_START( splash )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( funystrp )
-	PORT_START("DSW1")	/* DSW #1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
@@ -351,7 +350,7 @@ static INPUT_PORTS_START( funystrp )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, "1C/1C or Free Play (if Coin A too)" )
 
-	PORT_START("DSW2")	/* DSW #2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -375,7 +374,7 @@ static INPUT_PORTS_START( funystrp )
 	PORT_DIPSETTING(    0x80, "Soft" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 
-	PORT_START("P1")	/* 1P INPUTS & COINSW */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -385,7 +384,7 @@ static INPUT_PORTS_START( funystrp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("P2")	/* 2P INPUTS & STARTSW */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -429,6 +428,11 @@ static const msm5205_interface splash_msm5205_interface =
 	MSM5205_S48_4B		/* 8KHz */
 };
 
+static MACHINE_RESET( splash )
+{
+	adpcm_data = 0;
+	ret = 0x100;
+}
 
 static MACHINE_DRIVER_START( splash )
 
@@ -454,6 +458,8 @@ static MACHINE_DRIVER_START( splash )
 
 	MDRV_VIDEO_START(splash)
 	MDRV_VIDEO_UPDATE(splash)
+
+	MDRV_MACHINE_RESET( splash )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -508,6 +514,8 @@ static MACHINE_DRIVER_START( roldfrog )
 	MDRV_VIDEO_START(splash)
 	MDRV_VIDEO_UPDATE(splash)
 
+	MDRV_MACHINE_RESET( splash )
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 3000000)
@@ -543,6 +551,8 @@ static MACHINE_DRIVER_START( funystrp )
 
 	MDRV_VIDEO_START(splash)
 	MDRV_VIDEO_UPDATE(funystrp)
+
+	MDRV_MACHINE_RESET( splash )
 
 	/* sound hardware */
 //  MDRV_SPEAKER_STANDARD_MONO("mono")

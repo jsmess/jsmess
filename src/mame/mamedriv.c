@@ -2826,6 +2826,8 @@ V-V                           TP-027
 	DRIVER( jdreddb )	/* Judge Dredd (Rev B) */
 
 	/* Video System ZN1 */
+	DRIVER( vspsx )
+	DRIVER( aerofgts )	/* Aero Fighters Special (TAIWAN) */
 	DRIVER( sncwgltd )	/* Sonic Wings Limited (JAPAN) */
 
 	/* Taito FX1a */
@@ -3825,22 +3827,23 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( doa )		/* 1996 */
 	DRIVER( sgt24h )	/* 1996 */
 	DRIVER( von )		/* 1996 */
-	DRIVER( vonusa )	/* 1996 */
+	DRIVER( vonj )		/* 1996 */
 	DRIVER( dynabb )	/* 1996 */
 	DRIVER( zerogun )	/* 1997 */
 	DRIVER( zerogunj )	/* 1997 */
 	DRIVER( dynmcopb )	/* 1998 */
 	DRIVER( dyndek2b )	/* 1998 */
 	DRIVER( pltkids )	/* 1998 */
-	DRIVER( waverunr )	/* 199? */
 	DRIVER( rchase2 )	/* 199? */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
 	DRIVER( skisuprg )	/* 1996 */
 	DRIVER( stcc )		/* 1996 */
+	DRIVER( waverunr )	/* 1996 */
 	DRIVER( hotd )		/* 1997 */
 	DRIVER( overrev )	/* 1997 */
 	DRIVER( topskatr )	/* 1997 */
+	DRIVER( topskatu )	/* 1997 */
 	DRIVER( bel )		/* 1998 */
 	DRIVER( dynmcopc )	/* 1998 */
 
@@ -5455,12 +5458,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mnchmobl )	/* A2001      (c) 1983 + Centuri license */
 	DRIVER( marvins )	/* A2003      (c) 1983 */
 	DRIVER( madcrash )	/* A2005      (c) 1984 */
-	DRIVER( vangrd2 )	/*            (c) 1984 */
-	DRIVER( jcross )	/* .. */
+	DRIVER( vangrd2 )	/* A2005      (c) 1984 */
 	DRIVER( mainsnk )	/* fill in */
 	DRIVER( canvas )	/*            (c) 1985 */
+	DRIVER( jcross )	/* .. */
 	DRIVER( sgladiat )	/* A3006      (c) 1984 */
-	DRIVER( hal21 )		/*            (c) 1985 */
+	DRIVER( hal21 )		/* A4031      (c) 1985 */
 	DRIVER( hal21j )	/*            (c) 1985 (Japan) */
 	DRIVER( aso )		/*            (c) 1985 */
 	DRIVER( alphamis )	/*            (c) 1985 */
@@ -5470,21 +5473,22 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( athena )	/*       'UP' (c) 1986 */
 	DRIVER( fitegolf )	/*       'GU' (c) 1988 */
 	DRIVER( fitegol2 )	/*       'GU' (c) 1988 */
-	DRIVER( countryc )	/*       'CC' (c) 1988 */
+	DRIVER( countryc )	/* A7004 'CC' (c) 1988 */
 	DRIVER( ikari )		/* A5004 'IW' (c) 1986 */
+	DRIVER( ikaria )	/* A5004 'IW' (c) 1986 */
 	DRIVER( ikarijp )	/* A5004 'IW' (c) 1986 (Japan) */
 	DRIVER( ikarijpb )	/* bootleg */
-	DRIVER( victroad )	/*            (c) 1986 */
-	DRIVER( dogosoke )	/*            (c) 1986 */
-	DRIVER( dogosokj )	/* bootleg */
+	DRIVER( victroad )	/* A6002      (c) 1986 */
+	DRIVER( dogosoke )	/* A6002      (c) 1986 */
+	DRIVER( dogosokb )	/* bootleg */
 	DRIVER( gwar )		/* A7003 'GV' (c) 1987 */
 	DRIVER( gwarj )		/* A7003 'GV' (c) 1987 (Japan) */
 	DRIVER( gwara )		/* A7003 'GV' (c) 1987 */
 	DRIVER( gwarb )		/* bootleg */
-	DRIVER( bermudat )	/* A6003 'WW' (c) 1987 */
-	DRIVER( bermudao )	/* A6003 'WW' (c) 1987 */
-	DRIVER( bermudaa )	/* A6003 'WW' (c) 1987 */
-	DRIVER( worldwar )	/* A6003 'WW' (c) 1987 */
+	DRIVER( bermudat )	/*            (c) 1987 */
+	DRIVER( bermudaj )	/*            (c) 1987 */
+	DRIVER( bermudaa )	/* A6004 'WW' (c) 1987 */
+	DRIVER( worldwar )	/* A6004 'WW' (c) 1987 */
 	DRIVER( psychos )	/*       'PS' (c) 1987 */
 	DRIVER( psychosj )	/*       'PS' (c) 1987 (Japan) */
 	DRIVER( chopper )	/* A7003 'KK' (c) 1988 */
@@ -8028,6 +8032,7 @@ Other Sun games
 	DRIVER( egghunt )	/* (c) 1995 Invi Image */
 	DRIVER( magic10 )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
+	DRIVER( magic10b )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic102 )	/* (c) 1997 ABM Games */
 	DRIVER( suprpool )	/* (c) 1997 ABM Games */
 	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */

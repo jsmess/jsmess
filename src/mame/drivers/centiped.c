@@ -931,7 +931,7 @@ static INPUT_PORTS_START( centiped )
 	PORT_DIPNAME( 0x10, 0x00, "Left Coin" )	PORT_DIPLOCATION("N8:5")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x10, "*2" )
-	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("N8:6,7,8")		\
+	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("N8:6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "3 credits/2 coins" )
 	PORT_DIPSETTING(    0x40, "5 credits/4 coins" )
@@ -1633,7 +1633,7 @@ static MACHINE_DRIVER_START( centipdb )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 10.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
 
@@ -1646,7 +1646,7 @@ static MACHINE_DRIVER_START( magworm )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 15.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
 

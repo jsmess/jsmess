@@ -318,6 +318,9 @@ static void dot(int x, int y, int opm, UINT16 color)
 			logerror ("Graphic bit mode not supported\n");
 	}
 
+	// bpp = 4;          // for skattva
+	// bitmask = 0x000f; // for skattva
+
 	if (x >= 0)
 	{
 		x_int = x / (16 / bpp);
@@ -332,6 +335,7 @@ static void dot(int x, int y, int opm, UINT16 color)
 			x_mod = (16 / bpp) - x_mod;
 		}
 	}
+
 	color &= bitmask;
 
 	bitmask_shifted = bitmask << (x_mod * bpp);
@@ -455,9 +459,9 @@ static int get_pixel_ptn(int x,int y)
 	dst = (x_int + y * 1);
 
 	if ((pattern[dst] & bitmask_shifted) >> (x_mod * bpp))
-		return 1; //cl1
+		return 1;
 	else
-		return 0; //cl0
+		return 0;
 }
 
 static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,INT16 _ay)
@@ -622,7 +626,7 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 
 static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 {
-	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
+	int dst_step1_x = 0,dst_step1_y = 0,dst_step2_x = 0,dst_step2_y = 0;
 	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
 	int ax = _ax;
 	int ay = _ay;
@@ -631,6 +635,7 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 	int yys = src_y;
 	int xxd = cpx;
 	int yyd = cpy;
+	int getpixel;
 
 	if (ax < 0)
 		ax_neg = -1;
@@ -645,51 +650,56 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 		switch (opcode & 0x0700)
 		{
 			default:
-			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =   1; break;
-			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =  -1; break;
-			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =   1; break;
-			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =  -1; break;
-			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y = -ay_neg*ay; break;
-			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ay_neg*ay; break;
-			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ay_neg*ay; break;
-			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y =  ay_neg*ay; break;
+			case 0x0000: logerror("PTN: not supported"); break;
+			case 0x0100: logerror("PTN: not supported"); break;
+			case 0x0200: logerror("PTN: not supported"); break;
+			case 0x0300: logerror("PTN: not supported"); break;
+			case 0x0400: logerror("PTN: not supported"); break;
+ 			case 0x0500: logerror("PTN: not supported"); break;
+			case 0x0600: logerror("PTN: not supported"); break;
+			case 0x0700: logerror("PTN: not supported"); break;
 		}
 	else
 		switch (opcode & 0x0700)
 		{
 			default:
-			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =   1; break;
-			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  -1; break;
-			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =   1; break;
-			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =  -1; break;
-			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
-			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y = -ax_neg*ax; break;
-			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y =  ax_neg*ax; break;
-			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  1; break;
+			case 0x0100: logerror("PTN: not supported"); break;
+			case 0x0200: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0300: logerror("PTN: not supported"); break;
+			case 0x0400: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y = -1; break;
+			case 0x0500: logerror("PTN: not supported"); break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0700: logerror("PTN: not supported"); break;
 		}
 
-	if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
-	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
-	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
-	else if ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
-	else if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =   1; src_step2_y = -ay; }
-	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
-	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
-	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
+	src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  1;
 
 	for (;;)
 	{
 		for (;;)
 		{
-			dot(xxd,yyd,opcode & 0x0007,get_pixel_ptn(xxs,yys));
+			getpixel = get_pixel_ptn(xxs,yys);
+			switch ((opcode & 0x0018) >> 3)
+			{
+				case 0x0000:
+					if (getpixel)
+						dot(xxd,yyd,opcode & 0x0007,cl1);
+					else
+						dot(xxd,yyd,opcode & 0x0007,cl0);
+					break;
+				case 0x0001:
+					if (getpixel)
+						dot(xxd,yyd,opcode & 0x0007,cl1);
+					break;
+				case 0x0002:
+					if (getpixel == 0)
+						dot(xxd,yyd,opcode & 0x0007,cl0);
+					break;
+				case 0x0003:
+					logerror("PTN: not supported"); break;
+					break;
+			}
 
 			if (opcode & 0x0800)
 			{
@@ -782,7 +792,6 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 
 void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 {
-
 			INT16 ax,ay;
 
 			int cpx_t=sx;
@@ -795,7 +804,7 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 			{
 				while (ax)
 				{
-					dot(cpx_t,cpy_t,col,cl0);
+					dot(cpx_t,cpy_t,col & 7,cl0);
 
 					if (ax > 0)
 					{
@@ -814,7 +823,7 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 			{
 				while (ay)
 				{
-					dot(cpx_t,cpy_t,col,cl0);
+					dot(cpx_t,cpy_t,col & 7,cl0);
 
 					if (ay > 0)
 					{
@@ -830,6 +839,116 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 				}
 			}
 
+}
+
+void paint(int sx, int sy, int col)
+{
+	int getpixel;
+	dot(sx,sy,0,col);
+
+	getpixel = get_pixel(sx+1,sy);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sx++;
+			paint(sx,sy,col);
+			sx--;
+		}
+
+	getpixel = get_pixel(sx-1,sy);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sx--;
+			paint(sx,sy,col);
+			sx++;
+		}
+
+	getpixel = get_pixel(sx,sy+1);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sy++;
+			paint(sx,sy,col);
+			sy--;
+		}
+
+	getpixel = get_pixel(sx,sy-1);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sy--;
+			paint(sx,sy,col);
+			sy++;
+		}
 }
 
 static void HD63484_command_w(UINT16 cmd)
@@ -852,14 +971,13 @@ static void HD63484_command_w(UINT16 cmd)
 
 	if (fifo_counter >= len)
 	{
-/*
 		int i;
 
-		printf("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
+		logerror("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
 		for (i = 1;i < fifo_counter;i++)
-			printf("%04x ",fifo[i]);
-		printf("\n");
-*/
+			logerror("%04x ",fifo[i]);
+		logerror("\n");
+
 		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
 			org_dpd = fifo[2] & 0x000f;
@@ -909,9 +1027,11 @@ static void HD63484_command_w(UINT16 cmd)
 					rwp_dn = (fifo[1] & 0xc000) >> 14;
 				}
 			else if (fifo[0] == 0x080d)
-				rwp = (rwp & 0xff000) | ((fifo[1] & 0xfff0) >> 4);
+				{
+					rwp = (rwp & 0xff000) | ((fifo[1] & 0xfff0) >> 4);
+				}
 			else
-logerror("unsupported register\n");
+				logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xfff0) == 0x1800)	/* WPTN */
 		{
@@ -928,60 +1048,56 @@ logerror("unsupported register\n");
 		}
 		else if (fifo[0] == 0x4800)	/* WT */
 		{
-			if (!input_code_pressed(KEYCODE_9)) HD63484_ram[rwp] = fifo[1];
+			HD63484_ram[rwp] = fifo[1];
 			rwp = (rwp + 1) & (HD63484_RAM_SIZE-1);
 		}
 		else if (fifo[0] == 0x5800)	/* CLR */
 		{
 			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
 
-		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
 			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
 
-		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if ((fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
 			docpy16(fifo[0],((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4),&rwp,fifo[3],fifo[4]);
 
-		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
 			docpy16(fifo[0],((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4),&rwp,fifo[3],fifo[4]);
 
-		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if (fifo[0] == 0x8000)	/* AMOVE */
 		{
@@ -995,31 +1111,31 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xff00) == 0x8800)	/* ALINE */
 		{
-			line(cpx,cpy,fifo[1],fifo[2],fifo[0]&7);
+			line(cpx,cpy,fifo[1],fifo[2],fifo[0] & 0xff);
 			cpx = (INT16)fifo[1];
 			cpy = (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xff00) == 0x8c00)	/* RLINE */
 		{
-			line(cpx,cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0] & 0xff);
 			cpx += (INT16)fifo[1];
 			cpy += (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9000)	/* ARCT */
 		{
-			line(cpx,cpy,(INT16)fifo[1],cpy,fifo[0]&7);
-			line((INT16)fifo[1],cpy,(INT16)fifo[1],(INT16)fifo[2],fifo[0]&7);
-			line((INT16)fifo[1],(INT16)fifo[2],cpx,(INT16)fifo[2],fifo[0]&7);
-			line(cpx,(INT16)fifo[2],cpx,cpy,fifo[0]&7);
+			line(cpx,cpy,(INT16)fifo[1],cpy,fifo[0] & 0xff);
+			line((INT16)fifo[1],cpy,(INT16)fifo[1],(INT16)fifo[2],fifo[0] & 0xff);
+			line((INT16)fifo[1],(INT16)fifo[2],cpx,(INT16)fifo[2],fifo[0] & 0xff);
+			line(cpx,(INT16)fifo[2],cpx,cpy,fifo[0] & 0xff);
 			cpx = (INT16)fifo[1];
 			cpy = (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9400)	/* RRCT  added*/
 		{
-			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
-			line(cpx+(INT16)fifo[1],cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
-			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0]&7);
-			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0]&7);
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0] & 0xff);
+			line(cpx+(INT16)fifo[1],cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0] & 0xff);
+			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0] & 0xff);
+			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0] & 0xff);
 
 			cpx += (INT16)fifo[1];
 			cpy += (INT16)fifo[2];
@@ -1056,7 +1172,7 @@ logerror("unsupported register\n");
 			{
 				for (;;)
 				{
-					dot(xx,yy,fifo[0] & 0x0007,cl0);
+					dot(xx,yy,fifo[0] & 0x07,cl0);
 
 					if (ax == 0) break;
 					else if (ax > 0)
@@ -1090,38 +1206,132 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xfff8) == 0xc400)	/* RFRCT  added TODO*/
 		{
-			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
-			line(cpx+fifo[1],cpy,cpx+fifo[1],cpy+fifo[2],fifo[0]&7);
-			line(cpx+fifo[1],cpy+fifo[2],cpx,cpy+fifo[2],fifo[0]&7);
-			line(cpx,cpy+fifo[2],cpx,cpy,fifo[0]&7);
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0] & 0xff);
+			line(cpx+fifo[1],cpy,cpx+fifo[1],cpy+fifo[2],fifo[0] & 0xff);
+			line(cpx+fifo[1],cpy+fifo[2],cpx,cpy+fifo[2],fifo[0] & 0xff);
+			line(cpx,cpy+fifo[2],cpx,cpy,fifo[0] & 0xff);
 
 			cpx=cpx+(INT16)fifo[1];
 			cpy=cpy+(INT16)fifo[2];
 		}
+		else if (fifo[0] == 0xc800)	/* PAINT */
+		{
+			paint(cpx,cpy,cl0);
+		}
 		else if ((fifo[0] & 0xfff8) == 0xcc00)	/* DOT */
 		{
-			dot(cpx,cpy,fifo[0] & 0x0007,cl0);
+			dot(cpx,cpy,fifo[0] & 0xff,cl0);
 		}
 		else if ((fifo[0] & 0xf000) == 0xd000)	/* PTN (to do) */
 		{
-			// if ((fifo[0] & 0x0700) == 0x0400) printf("4");
-			ptn(fifo[0] & 0x0007,psx,psy,pex - psx,pey - psy);
+			ptn(fifo[0],psx,psy,pex - psx,pey - psy);
 
-			cpx += pex - psx;
-			cpy += pey - psy;
+			if ((fifo[0] & 0x0800) == 0x0000)
+				switch (fifo[0] & 0x0700)
+				{
+					case 0x0000:
+						if ((pey - psy) > 0)
+							cpy += (pey - psy);
+						else
+							cpy -= (pey - psy);
+						break;
+					case 0x0100:
+						// missing
+						break;
+					case 0x0200:
+						if ((pey - psy) > 0)
+							cpx += (pey - psy);
+						else
+							cpx -= (pey - psy);
+						break;
+					case 0x0300:
+						// missing
+						break;
+					case 0x0400:
+						if ((pey - psy) > 0)
+							cpy -= (pey - psy);
+						else
+							cpy += (pey - psy);
+						break;
+					case 0x0500:
+						// missing
+						break;
+					case 0x0600:
+						if ((pey - psy) > 0)
+							cpx -= (pey - psy);
+						else
+							cpx += (pey - psy);
+						break;
+					case 0x0700:
+						// missing
+						break;
+				}
+			else
+				{
+					// missing
+				}
 		}
-		else if ((fifo[0] & 0xf0f8) == 0xe000)	/* AGCPY */
+		else if ((fifo[0] & 0xf018) == 0xe000)	/* AGCPY */
 		{
-			agcpy(fifo[0],fifo[1],fifo[2],cpx,cpy,fifo[3],fifo[4]);
+			agcpy(fifo[0],(INT16)fifo[1],(INT16)fifo[2],cpx,cpy,fifo[3],fifo[4]);
 
-			cpx += fifo[4];
-			cpy += fifo[3];
+			switch (fifo[0] & 0x0700)
+			{
+				case 0x0000:
+					if (fifo[4] > 0)
+						cpy += fifo[4];
+					else
+						cpy -= fifo[4];
+					break;
+				case 0x0100:
+					if (fifo[4] > 0)
+						cpy -= fifo[4];
+					else
+						cpy += fifo[4];
+					break;
+				case 0x0200:
+					if (fifo[4] > 0)
+						cpy += fifo[4];
+					else
+						cpy -= fifo[4];
+					break;
+				case 0x0300:
+					if (fifo[4] > 0)
+						cpy -= fifo[4];
+					else
+						cpy += fifo[4];
+					break;
+				case 0x0400:
+					if (fifo[3] > 0)
+						cpx += fifo[3];
+					else
+						cpx -= fifo[3];
+					break;
+				case 0x0500:
+					if (fifo[3] > 0)
+						cpx += fifo[3];
+					else
+						cpx -= fifo[3];
+					break;
+				case 0x0600:
+					if (fifo[3] > 0)
+						cpx -= fifo[3];
+					else
+						cpx += fifo[3];
+					break;
+				case 0x0700:
+					if (fifo[3] > 0)
+						cpx -= fifo[3];
+					else
+						cpx += fifo[3];
+					break;
+			}
 		}
 		else
-{
-logerror("unsupported command\n");
-popmessage("unsupported command %s (%04x)",instruction_name[fifo[0]>>10],fifo[0]);
-}
+			{
+				logerror("unsupported command\n");
+				popmessage("unsupported command %s (%04x)",instruction_name[fifo[0]>>10],fifo[0]);
+			}
 
 		fifo_counter = 0;
 	}

@@ -1091,7 +1091,7 @@ static ADDRESS_MAP_START( namcos12_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READWRITE(SMH_NOP, bankoffset_w)			/* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&namcos12_sharedram) /* shared ram?? */
-	AM_RANGE(0x1f140000, 0x1f140fff) AM_READWRITE8(at28c16_0_r, at28c16_0_w, 0x00ff00ff) /* eeprom */
+	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE(dmaoffset_w)  /* dma */
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
@@ -1253,8 +1253,8 @@ static ADDRESS_MAP_START( s12h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_READWRITE( c352_0_r, c352_0_w )
-	AM_RANGE(0x300000, 0x300001) AM_READ( input_port_1_word_r )
-	AM_RANGE(0x300002, 0x300003) AM_READ( input_port_2_word_r )
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
+	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")
 	AM_RANGE(0x300010, 0x300011) AM_NOP	// golgo13 writes here a lot, possibly also a wait state generator?
 	AM_RANGE(0x300030, 0x300031) AM_NOP	// most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 ADDRESS_MAP_END
@@ -1437,8 +1437,6 @@ static DRIVER_INIT( namcos12 )
 
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 
-	at28c16_init( 0, NULL, NULL );
-
 	memory_configure_bank( 1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
 	m_n_bankoffset = 0;
 	memory_set_bank( 1, 0 );
@@ -1477,7 +1475,6 @@ static MACHINE_DRIVER_START( coh700 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
 
 	MDRV_MACHINE_RESET( namcos12 )
-	MDRV_NVRAM_HANDLER( at28c16_0 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1501,6 +1498,8 @@ static MACHINE_DRIVER_START( coh700 )
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
 	MDRV_SOUND_ROUTE(2, "right", 1.00)
 	MDRV_SOUND_ROUTE(3, "left", 1.00)
+
+	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( namcos12 )

@@ -606,21 +606,26 @@ $(CPUOBJ)/i8085/i8085.o:	$(CPUSRC)/i8085/i8085.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_I8035=$(if $(filter I8035,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8039=$(if $(filter I8039,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8041=$(if $(filter I8041,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8048=$(if $(filter I8048,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8648=$(if $(filter I8648,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8748=$(if $(filter I8748,$(CPUS)),1,0)
+CPUDEFS += -DHAS_MB8884=$(if $(filter MB8884,$(CPUS)),1,0)
+
+CPUDEFS += -DHAS_I8039=$(if $(filter I8039,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8049=$(if $(filter I8049,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8749=$(if $(filter I8749,$(CPUS)),1,0)
 CPUDEFS += -DHAS_N7751=$(if $(filter N7751,$(CPUS)),1,0)
-CPUDEFS += -DHAS_MB8884=$(if $(filter MB8884,$(CPUS)),1,0)
 CPUDEFS += -DHAS_M58715=$(if $(filter M58715,$(CPUS)),1,0)
 
-ifneq ($(filter I8035 I8039 I8048 I8749 N7751 MB8884 M58715,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/i8039
-CPUOBJS += $(CPUOBJ)/i8039/i8039.o
-DBGOBJS += $(CPUOBJ)/i8039/8039dasm.o
+ifneq ($(filter I8035 I8041 I8048 I8648 I8748 MB8884 I8039 I8049 I8749 N7751 M58715,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/mcs48
+CPUOBJS += $(CPUOBJ)/mcs48/mcs48.o
+DBGOBJS += $(CPUOBJ)/mcs48/mcs48dsm.o
 endif
 
-$(CPUOBJ)/i8039/i8039.o:	$(CPUSRC)/i8039/i8039.c \
-							$(CPUSRC)/i8039/i8039.h
+$(CPUOBJ)/mcs48/mcs48.o:	$(CPUSRC)/mcs48/mcs48.c \
+							$(CPUSRC)/mcs48/mcs48.h
 
 
 
@@ -1135,7 +1140,11 @@ $(M68KMAKE): $(CPUOBJ)/m68000/m68kmake.o $(LIBOCORE)
 endif
 
 # rule to ensure we build the header before building the core CPU file
-$(CPUOBJ)/m68000/m68kcpu.o: $(CPUOBJ)/m68000/m68kops.c
+$(CPUOBJ)/m68000/m68kcpu.o: 	$(CPUOBJ)/m68000/m68kops.c \
+								$(CPUSRC)/m68000/m68kcpu.h
+
+$(CPUOBJ)/m68000/m68kmame.o:	$(CPUSRC)/m68000/m68kmame.c \
+								$(CPUSRC)/m68000/m68kcpu.h
 
 
 

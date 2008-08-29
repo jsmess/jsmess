@@ -1280,7 +1280,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2v004",  CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2accp2", CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m1",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2m2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m2",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m3",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m4",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m5",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
@@ -1556,12 +1556,7 @@ READ16_HANDLER( cps1_cps_b_r )
 				cps1_cps_b_regs[cps1_game_config->mult_factor2/2]) >> 16;
 
 	if (offset == cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
-	{
-		if (cps1_game_config->bootleg_kludge == 1)
-			return input_port_read(machine, "IN2") << 8;
-		else
-			return input_port_read(machine, "IN2");
-	}
+		return input_port_read(machine, "IN2");
 
 	if (offset == cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
 		return input_port_read(machine, "IN3");

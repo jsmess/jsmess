@@ -10,7 +10,7 @@ driver by Nicola Salmoria
 #include "deprecat.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
 
@@ -143,13 +143,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(i8039_T1_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8039_T1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dac_0_data_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(i8039_irqen_w)
-	AM_RANGE(I8039_t0, I8039_t0) AM_WRITE(i8039_T0_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(i8039_T0_w)
 ADDRESS_MAP_END
 
 

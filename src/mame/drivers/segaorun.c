@@ -169,22 +169,12 @@ static void outrun_generic_init(running_machine *machine)
 
 static void update_main_irqs(running_machine *machine)
 {
-	int irq = 0;
+	cpunum_set_input_line(machine, 0, 2, irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 6, vblank_irq_state && irq2_state ? ASSERT_LINE : CLEAR_LINE);
 
-	/* the IRQs are effectively ORed together */
-	if (vblank_irq_state)
-		irq |= 4;
-	if (irq2_state)
-		irq |= 2;
-
-	/* assert the lines that are live, or clear everything if nothing is live */
-	if (irq != 0)
-	{
-		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
+	if(vblank_irq_state || irq2_state)
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
-	}
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -1554,6 +1544,9 @@ ROM_START( shangon3 )
 	ROM_RELOAD(               0x28000, 0x08000 )
 	ROM_LOAD( "epr-10646.69", 0x30000, 0x08000, CRC(473cc411) SHA1(04ca2d047eb59581cd5d76e0ac6eca8b19eef497) )
 	ROM_RELOAD(               0x38000, 0x08000 )
+
+	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -1612,6 +1605,9 @@ ROM_START( shangon2 )
 	ROM_RELOAD(               0x28000, 0x08000 )
 	ROM_LOAD( "epr-10646.69", 0x30000, 0x08000, CRC(473cc411) SHA1(04ca2d047eb59581cd5d76e0ac6eca8b19eef497) )
 	ROM_RELOAD(               0x38000, 0x08000 )
+
+	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -1670,6 +1666,9 @@ ROM_START( shangon1 )
 	ROM_RELOAD(               0x28000, 0x08000 )
 	ROM_LOAD( "epr-10646.69", 0x30000, 0x08000, CRC(473cc411) SHA1(04ca2d047eb59581cd5d76e0ac6eca8b19eef497) )
 	ROM_RELOAD(               0x38000, 0x08000 )
+
+	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -1800,7 +1799,7 @@ static DRIVER_INIT( shangon )
 static DRIVER_INIT( shangon3 )
 {
 	outrun_generic_init(machine);
-	fd1089_decrypt_0034(machine);
+	fd1089b_decrypt(machine);
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;
 }

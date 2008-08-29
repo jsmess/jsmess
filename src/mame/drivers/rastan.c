@@ -170,6 +170,10 @@ VIDEO_START( rastan );
 VIDEO_UPDATE( rastan );
 
 
+static int adpcm_pos;
+static int adpcm_data;
+
+
 static WRITE8_HANDLER( rastan_bankswitch_w )
 {
 	int offs;
@@ -182,12 +186,8 @@ static WRITE8_HANDLER( rastan_bankswitch_w )
 }
 
 
-static int adpcm_pos;
-
 static void rastan_msm5205_vck(running_machine *machine, int chip)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_data != -1)
 	{
 		msm5205_data_w(0, adpcm_data & 0x0f);
@@ -225,12 +225,12 @@ static ADDRESS_MAP_START( rastan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x350008, 0x350009) AM_WRITE(SMH_NOP)	/* 0 only (often) ? */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)	/* sprite palette bank, coin counters & lockout */
-	AM_RANGE(0x390000, 0x390001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x390002, 0x390003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x390004, 0x390005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x390006, 0x390007) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x390008, 0x390009) AM_READ(input_port_4_word_r)
-	AM_RANGE(0x39000a, 0x39000b) AM_READ(input_port_5_word_r)
+	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("P1")
+	AM_RANGE(0x390002, 0x390003) AM_READ_PORT("P2")
+	AM_RANGE(0x390004, 0x390005) AM_READ_PORT("SPECIAL")
+	AM_RANGE(0x390006, 0x390007) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x390008, 0x390009) AM_READ_PORT("DSWA")
+	AM_RANGE(0x39000a, 0x39000b) AM_READ_PORT("DSWB")
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
@@ -258,31 +258,31 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( rastan )
-	PORT_START("IN0")
+	PORT_START("P1")
 	TAITO_JOY_UDLR_2_BUTTONS( 1 )
 
-	PORT_START("IN1")
+	PORT_START("P2")
 	TAITO_JOY_UDLR_2_BUTTONS( 2 )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin A gets locked if 0)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin B gets locked if 0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (above 2 bits not checked when 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SPECIAL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin A gets locked if 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin B gets locked if 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (above 2 bits not checked when 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* 0x390008 -> 0x10c018 ($18,A5) */
 	PORT_START("DSWA")
@@ -373,6 +373,11 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
+static MACHINE_RESET( rastan )
+{
+	adpcm_pos = 0;
+	adpcm_data = -1;
+}
 
 
 static MACHINE_DRIVER_START( rastan )
@@ -400,6 +405,8 @@ static MACHINE_DRIVER_START( rastan )
 
 	MDRV_VIDEO_START(rastan)
 	MDRV_VIDEO_UPDATE(rastan)
+
+	MDRV_MACHINE_RESET(rastan)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
