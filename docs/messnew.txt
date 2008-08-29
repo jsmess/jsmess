@@ -14,6 +14,10 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
+- [VIP] Fixed memory banking, added discrete sound, added tape support,
+  and improved quickloading so that the CHIP-8 interpreter is automatically
+  loaded alongside .c8 files. [Curt Coder]
+
 
 
 User Interface Changes:
