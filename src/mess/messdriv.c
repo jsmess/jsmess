@@ -559,6 +559,7 @@ TESTDRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
 	DRIVER( trs80m4 )
 	DRIVER( ht1080z ) /* Híradástechnika Szövetkezet HT-1080Z */
+	DRIVER( ht1080z2 ) /* Híradástechnika Szövetkezet HT-1080Z Series II */
 	DRIVER( ht108064 ) /* Híradástechnika Szövetkezet HT-1080Z/64 */
 
 	DRIVER( coco )		/* Color Computer									*/
