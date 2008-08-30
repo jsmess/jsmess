@@ -27,6 +27,8 @@ MACHINE_START( trs80 );
 MACHINE_RESET( trs80 );
 DRIVER_INIT( trs80 );
 DRIVER_INIT( lnw80 );
+DRIVER_INIT( ht1080z );
+DRIVER_INIT( ht108064 );
 
 WRITE8_HANDLER ( trs80_port_ff_w );
 READ8_HANDLER ( trs80_port_ff_r );

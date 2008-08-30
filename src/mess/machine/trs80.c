@@ -350,6 +350,19 @@ DRIVER_INIT( lnw80 )
 	}
 }
 
+DRIVER_INIT( ht1080z )
+{
+}
+
+DRIVER_INIT( ht108064 )
+{
+	UINT8 *FNT = memory_region(machine, "gfx1");
+	int i;
+	for( i=0;i<0x800;i++) {
+		FNT[i] &= 0xf8;
+	}
+}
+
 MACHINE_START( trs80 )
 {
 	wd17xx_init(machine, WD_TYPE_179X,trs80_fdc_callback, NULL);

@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- HT-1080Z / HT-1080Z/64 [Miodrag Milanovic]
 
 
 
