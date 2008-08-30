@@ -186,13 +186,11 @@ static int genesis_isSMD(unsigned char *buf,unsigned int len)
 
 static DEVICE_IMAGE_LOAD( genesis_cart )
 {
-	unsigned char *tmpROMnew, *tmpROM;
-	unsigned char *secondhalf;
-	unsigned char *rawROM,fliptemp;
-	int relocate;
-	int length;
-	int ptr, x;
-	unsigned char *ROM;
+	unsigned char *ROM, *rawROM, *tmpROMnew, *tmpROM, *secondhalf;
+	int relocate, length, ptr, x;
+#ifdef LSB_FIRST
+	unsigned char fliptemp;
+#endif
 
 	genesis_sram = NULL;
 	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
