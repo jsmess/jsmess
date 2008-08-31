@@ -166,9 +166,9 @@ static void apogee_cassette_getinfo(const mess_device_class *devclass, UINT32 st
 /* ROM definition */
 ROM_START( apogee )
 	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
-	ROM_LOAD( "apogee.rom", 0xf000, 0x1000, CRC(a47383a7))
+	ROM_LOAD( "apogee.rom", 0xf000, 0x1000, CRC(a47383a7) SHA1(6a868371c7980f92c2fc9ced921517209f197375))
 	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("apogee.fnt", 0x0000, 0x0800, CRC(fe5867f0))
+	ROM_LOAD ("apogee.fnt", 0x0000, 0x0800, CRC(fe5867f0) SHA1(82c5aca63ada5e4533eb0516384aaa7b77a1f8e2))
 ROM_END
 
 static SYSTEM_CONFIG_START(apogee)
