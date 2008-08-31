@@ -55,6 +55,7 @@
 
     TODO:
 
+	- ABC77 i8035 EA line handling
     - ABC77 keyboard ROM dump is needed!
 	- refactor ABC77/99 keyboards into devices?
 	- rewrite Z80DART for bit level serial I/O
@@ -75,7 +76,7 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/centroni.h"
 #include "includes/serial.h"
 #include "machine/z80ctc.h"
@@ -299,11 +300,6 @@ static WRITE8_HANDLER( abc77_data_w )
 	// write abc77_txd to Z80DART TxD
 }
 
-static READ8_HANDLER( abc77_ea_r )
-{
-	return input_port_read(machine, "DSW") & 0x01;
-}
-
 /* Memory Maps */
 
 // ABC 77 keyboard
@@ -314,11 +310,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(I8039_p1, I8039_p1) AM_READ(abc77_data_r)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(abc77_data_w)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(abc77_clock_r)
-	AM_RANGE(I8039_bus, I8039_bus) AM_READ_PORT("DSW")
-	AM_RANGE(I8039_ea, I8039_ea) AM_READ(abc77_ea_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(abc77_data_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(abc77_data_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(abc77_clock_r)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 // ABC 800M
