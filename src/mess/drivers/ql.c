@@ -16,7 +16,7 @@
 */
 
 #include "driver.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/cartslot.h"
 #include "devices/microdrv.h"
@@ -202,13 +202,6 @@ static READ8_HANDLER( ipc_bus_r )
 	return data;
 }
 
-static READ8_HANDLER( ipc_ea_r )
-{
-	// connected to ground via a 10K resistor, but needs to be 1 because the logic is inverted in i8039.c
-
-	return 1;
-}
-
 /* Memory Maps */
 
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -238,11 +231,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ipc_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(ipc_port1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(ipc_t1_r)
-	AM_RANGE(I8039_bus, I8039_bus) AM_READ(ipc_bus_r)
-	AM_RANGE(I8039_ea, I8039_ea) AM_READ(ipc_ea_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(ipc_port1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(ipc_t1_r)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(ipc_bus_r)
 ADDRESS_MAP_END
 
 /* Input Ports */
