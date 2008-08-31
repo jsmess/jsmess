@@ -193,6 +193,7 @@ when problems start with -log and look into error.log file
 #include "driver.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
+#include "devices/cassette.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
@@ -200,9 +201,9 @@ when problems start with -log and look into error.log file
 #include "video/vic6567.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 
 #include "includes/c64.h"
+
 
 static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&c64_memory)
@@ -211,29 +212,16 @@ static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)
 	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, c64_colorram_write) AM_BASE(&c64_colorram) /* colorram  */
 	AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(cia_0_r, cia_0_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE( &c64_romh)	   /* ram or kernel rom */
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE(&c64_romh)	   /* ram or kernel rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c64_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&c64_memory)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK1, SMH_BANK2)	   /* ram or external roml */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK3, SMH_RAM)	   /* ram or basic rom or external romh */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK1, SMH_BANK2)		/* ram or external roml */
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(3) AM_WRITEONLY				/* ram or basic rom or external romh */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(c64_ioarea_r, c64_ioarea_w)
-//#if 1
-//  AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_BANK5, SMH_BANK6)
-//#else
-///* dram */
-///* or character rom */
-//  AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(SMH_BANK9, vic2_port_w)
-//  AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(SMH_BANK10, sid6581_0_port_w)
-//  AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_BANK11, c64_colorram_write)         /* colorram  */
-//  AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(SMH_BANK12, cia_0_w)
-//  AM_RANGE(0xdd00, 0xddff) AM_READWRITE(SMH_BANK13, cia_1_w)
-//  AM_RANGE(0xde00, 0xdeff) AM_READ(SMH_BANK14)          /* csline expansion port */
-//  AM_RANGE(0xdf00, 0xdfff) AM_READ(SMH_BANK15)          /* csline expansion port */
-//#endif
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(SMH_BANK7, SMH_BANK8)	   /* ram or kernel rom or external romh */
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK5)	   /* ram or kernel rom or external romh */
 ADDRESS_MAP_END
 
 
@@ -593,17 +581,6 @@ static void c64_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static SYSTEM_CONFIG_START(c64)
-	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
-	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(sx64)
-	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
-	CONFIG_DEVICE(vc1541_device_getinfo)
-SYSTEM_CONFIG_END
-
 static void ultimax_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
@@ -618,9 +595,33 @@ static void ultimax_cbmcartslot_getinfo(const mess_device_class *devclass, UINT3
 	}
 }
 
+static void datasette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+	case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
+
+	default:										cassette_device_getinfo( devclass, state, info ); break;
+	}
+}
+
+static SYSTEM_CONFIG_START(c64)
+	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
+	CONFIG_DEVICE(cbmfloppy_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
+SYSTEM_CONFIG_END
+
+static SYSTEM_CONFIG_START(sx64)
+	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
+	CONFIG_DEVICE(vc1541_device_getinfo)
+SYSTEM_CONFIG_END
+
 static SYSTEM_CONFIG_START(ultimax)
 	CONFIG_DEVICE(ultimax_cbmcartslot_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c64gs)
@@ -634,11 +635,11 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE         INPUT   INIT    CONFIG      COMPANY                            FULLNAME */
-COMP(1982, max,		0,		0,		ultimax,		ultimax,ultimax,ultimax,	"Commodore Business Machines Co.", "Commodore Max (Ultimax/VC10)", 0)
 COMP(1982, c64,		0,		0,		c64,			c64,	c64,	c64,		"Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
-COMP(1982, cbm4064,	c64,	0,		pet64,			c64,	c64,	c64,		"Commodore Business Machines Co.", "CBM4064/PET64/Educator64 (NTSC)", 0)
 COMP(1982, c64pal, 	c64,	0,		c64pal, 		c64,	c64pal, c64,		"Commodore Business Machines Co.", "Commodore 64/VC64/VIC64 (PAL)", 0)
+COMP(1982, cbm4064,	c64,	0,		pet64,			c64,	c64,	c64,		"Commodore Business Machines Co.", "CBM4064/PET64/Educator64 (NTSC)", 0)
 COMP(1982, vic64s, 	c64,	0,		c64pal, 		vic64s,	c64pal, c64,		"Commodore Business Machines Co.", "Commodore 64 Swedish (PAL)", 0)
+COMP(1982, max,		0,		0,		ultimax,		ultimax,ultimax,ultimax,	"Commodore Business Machines Co.", "Commodore Max (Ultimax/VC10)", 0)
 CONS(1987, c64gs,	c64,	0,		c64gs,			c64gs,	c64gs,	c64gs,		"Commodore Business Machines Co.", "C64GS (PAL)", 0)
 
 /* testdrivers */

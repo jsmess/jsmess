@@ -12,6 +12,17 @@
     (program write some short test code into the vic sprite register)
  */
 
+/* 
+	2008-08-31: Tape status [FP & RZ]
+	- tape loading works
+	
+	TODO:
+	* write to tape
+	* FFW & REW
+	* support for .tap files
+	* fix implementation for other CBM machines
+*/
+
 #include "driver.h"
 
 #include "cpu/m6502/m6502.h"
@@ -28,10 +39,10 @@
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
-#include "includes/c128.h"	/* we need c128_bankswitch_64 in c64_m6510_port_write */
 #include "includes/c64.h"
+#include "includes/c128.h"      /* we need c128_bankswitch_64 in MACHINE_START */
 
-static void c64_driver_shutdown (running_machine *machine);
+#include "devices/cassette.h"
 
 unsigned char c65_keyline = { 0xff };
 UINT8 c65_6511_port=0xff;
@@ -47,7 +58,7 @@ UINT8 c64_keyline[10] =
 
 /* expansion port lines input */
 int c64_pal = 0;
-UINT8 c64_game=1, c64_exrom=1;
+UINT8 c64_game = 1, c64_exrom = 1;
 
 /* cpu port */
 int c128_va1617;
@@ -323,11 +334,6 @@ static void c64_irq (running_machine *machine, int level)
 	}
 }
 
-WRITE8_HANDLER(c64_tape_read)
-{
-	cia_issue_index(machine, 0);
-}
-
 static void c64_cia0_interrupt (running_machine *machine, int level)
 {
 	c64_irq (machine, level || vicirq);
@@ -421,6 +427,10 @@ const cia6526_interface c64_cia1 =
 	}
 };
 
+
+static UINT8 *c64_io_ram_w_ptr;
+static UINT8 *c64_io_ram_r_ptr;
+
 WRITE8_HANDLER( c64_write_io )
 {
 	c64_io_mirror[ offset ] = data;
@@ -451,15 +461,15 @@ WRITE8_HANDLER( c64_write_io )
 	}
 }
 
-static UINT8 *c64_io_ram_w_ptr;
-static UINT8 *c64_io_ram_r_ptr;
-
 WRITE8_HANDLER(c64_ioarea_w)
 {
-	if ( c64_io_enabled ) {
-		c64_write_io( machine, offset, data );
-	} else {
-		c64_io_ram_w_ptr[ offset ] = data;
+	if (c64_io_enabled) 
+	{
+		c64_write_io(machine, offset, data);
+	} 
+	else 
+	{
+		c64_io_ram_w_ptr[offset] = data;
 	}
 }
 
@@ -491,162 +501,213 @@ READ8_HANDLER( c64_read_io )
 
 READ8_HANDLER(c64_ioarea_r)
 {
-	if ( c64_io_enabled ) {
-		return c64_read_io( machine, offset );
-	}
-	return c64_io_ram_r_ptr[ offset ];
+	return c64_io_enabled ? c64_read_io(machine, offset) : c64_io_ram_r_ptr[offset];
 }
 
+
+/* Info from http://unusedino.de/ec64/technical/misc/c64/64doc.html */
 /*
- * two devices access bus, cpu and vic
- *
- * romh, roml chip select lines on expansion bus
- * loram, hiram, charen bankswitching select by cpu
- * exrom, game bankswitching select by cartridge
- * va15, va14 bank select by cpu for vic
- *
- * exrom, game: normal c64 mode
- * exrom, !game: ultimax mode
- *
- * romh: 8k rom at 0xa000 (hiram && !game && exrom)
- * or 8k ram at 0xe000 (!game exrom)
- * roml: 8k rom at 0x8000 (loram hiram !exrom)
- * or 8k ram at 0x8000 (!game exrom)
- * roml vic: upper 4k rom at 0x3000, 0x7000, 0xb000, 0xd000 (!game exrom)
- *
- * basic rom: 8k rom at 0xa000 (loram hiram game)
- * kernal rom: 8k rom at 0xe000 (hiram !exrom, hiram game)
- * char rom: 4k rom at 0xd000 (!exrom charen hiram
- * game charen !hiram loram
- * game charen hiram)
- * cpu
- *
- * (write colorram)
- * gr_w = !read&&!cas&&((address&0xf000)==0xd000)
- *
- * i_o = !game exrom !read ((address&0xf000)==0xd000)
- * !game exrom ((address&0xf000)==0xd000)
- * charen !hiram loram !read ((address&0xf000)==0xd000)
- * charen !hiram loram ((address&0xf000)==0xd000)
- * charen hiram !read ((address&0xf000)==0xd000)
- * charen hiram ((address&0xf000)==0xd000)
- *
- * vic
- * char rom: x101 (game, !exrom)
- * romh: 0011 (!game, exrom)
- *
- * exrom !game (ultimax mode)
- * addr    CPU     VIC-II
- * ----    ---     ------
- * 0000    RAM     RAM
- * 1000    -       RAM
- * 2000    -       RAM
- * 3000    -       ROMH (upper half)
- * 4000    -       RAM
- * 5000    -       RAM
- * 6000    -       RAM
- * 7000    -       ROMH
- * 8000    ROML    RAM
- * 9000    ROML    RAM
- * A000    -       RAM
- * B000    -       ROMH
- * C000    -       RAM
- * D000    I/O     RAM
- * E000    ROMH    RAM
- * F000    ROMH    ROMH
- */
+
+  The leftmost column of the table contains addresses in hexadecimal
+notation. The columns aside it introduce all possible memory
+configurations. The default mode is on the left, and the absolutely
+most rarely used Ultimax game console configuration is on the right.
+(Has anybody ever seen any Ultimax games?) Each memory configuration
+column has one or more four-digit binary numbers as a title. The bits,
+from left to right, represent the state of the -LORAM, -HIRAM, -GAME
+and -EXROM lines, respectively. The bits whose state does not matter
+are marked with "x". For instance, when the Ultimax video game
+configuration is active (the -GAME line is shorted to ground), the
+-LORAM and -HIRAM lines have no effect.
+
+      default                      001x                       Ultimax
+       1111   101x   1000   011x   00x0   1110   0100   1100   xx01
+10000
+----------------------------------------------------------------------
+ F000
+       Kernal RAM    RAM    Kernal RAM    Kernal Kernal Kernal ROMH(*
+ E000
+----------------------------------------------------------------------
+ D000  IO/C   IO/C   IO/RAM IO/C   RAM    IO/C   IO/C   IO/C   I/O
+----------------------------------------------------------------------
+ C000  RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM     -
+----------------------------------------------------------------------
+ B000	     	   	    	   	  	 	       
+       BASIC  RAM    RAM    RAM    RAM    BASIC  ROMH   ROMH    -
+ A000	     	   	    	   	  	 	       
+----------------------------------------------------------------------
+ 9000	     	   	    	   	  	 	       
+       RAM    RAM    RAM    RAM    RAM    ROML   RAM    ROML   ROML(*
+ 8000	     	   	    	   	  	 	       
+----------------------------------------------------------------------
+ 7000	     	   	    	   	  	 	       
+	     	   	    	   	  	 	       
+ 6000	     	   	    	   	  	 	       
+       RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM     -
+ 5000	     	   	    	   	  	 	       
+	     	   	    	   	  	 	       
+ 4000	     	   	    	   	  	 	       
+----------------------------------------------------------------------
+ 3000        	   	    	   	  	 	       
+	     	   	    	   	  	 	       
+ 2000  RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM     -
+	     	   	    	   	  	 	       
+ 1000	     	   	    	   	  	 	       
+----------------------------------------------------------------------
+ 0000  RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM
+----------------------------------------------------------------------
+
+   *) Internal memory does not respond to write accesses to these
+       areas.
+
+
+    Legend: Kernal      E000-FFFF       Kernal ROM.
+
+            IO/C        D000-DFFF       I/O address space or Character
+                                        generator ROM, selected by
+                                        -CHAREN. If the CHAREN bit is
+                                        clear, the character generator
+                                        ROM will be selected. If it is
+                                        set, the I/O chips are
+                                        accessible.
+
+            IO/RAM      D000-DFFF       I/O address space or RAM,
+                                        selected by -CHAREN. If the
+                                        CHAREN bit is clear, the
+                                        character generator ROM will
+                                        be selected. If it is set, the
+                                        internal RAM is accessible.
+
+            I/O         D000-DFFF       I/O address space.
+                                        The -CHAREN line has no effect.
+
+            BASIC       A000-BFFF       BASIC ROM.
+
+            ROMH        A000-BFFF or    External ROM with the -ROMH line
+                        E000-FFFF       connected to its -CS line.
+
+            ROML        8000-9FFF       External ROM with the -ROML line
+                                        connected to its -CS line.
+
+            RAM         various ranges  Commodore 64's internal RAM.
+
+            -           1000-7FFF and   Open address space. 
+                        A000-CFFF       The Commodore 64's memory chips
+                                        do not detect any memory accesses
+                                        to this area except the VIC-II's
+                                        DMA and memory refreshes.
+
+    NOTE:   Whenever the processor tries to write to any ROM area
+            (Kernal, BASIC, CHAROM, ROML, ROMH), the data will get
+            "through the ROM" to the C64's internal RAM.
+
+            For this reason, you can easily copy data from ROM to RAM,
+            without any bank switching. But implementing external
+            memory expansions without DMA is very hard, as you have to
+            use a 256 byte window on the I/O1 or I/O2 area, like
+            GEORAM, or the Ultimax memory configuration, if you do not
+            want the data to be written both to internal and external
+            RAM.
+
+            However, this is not true for the Ultimax video game
+            configuration. In that mode, the internal RAM ignores all
+            memory accesses outside the area $0000-$0FFF, unless they
+            are performed by the VIC, and you can write to external
+            memory at $1000-$CFFF and $E000-$FFFF, if any, without
+            changing the contents of the internal RAM.
+
+*/
+
 static void c64_bankswitch(running_machine *machine, int reset)
 {
 	static int old = -1, exrom, game;
-	int data, loram, hiram, charen;
+	int loram, hiram, charen;
+	int ultimax_mode = 0;
+	int data = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT) & 0x07;
 
-	data = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT) & 7;
-	if ((data == old)&&(exrom==c64_exrom)&&(game==c64_game)&&!reset) return;
+	/* If nothing has changed or reset = 0, don't do anything */
+	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset) 
+		return;
+
+	/* Are we in Ultimax mode? */
+	if (!c64_game && c64_exrom)
+		ultimax_mode = 1;
 
 	DBG_LOG (1, "bankswitch", ("%d\n", data & 7));
-	loram = (data & 1) ? 1 : 0;
-	hiram = (data & 2) ? 1 : 0;
+	loram  = (data & 1) ? 1 : 0;
+	hiram  = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
 
-	if ((!c64_game && c64_exrom)
-	    || (loram && !c64_exrom)) // for omega race cartridge
-//	    || (loram && hiram && !c64_exrom))
+	if (ultimax_mode)
 	{
-		memory_set_bankptr (1, roml);
-		memory_set_bankptr (2, c64_memory + 0x8000);
-	}
-	else
-	{
-		memory_set_bankptr (1, c64_memory + 0x8000);
-		memory_set_bankptr (2, c64_memory + 0x8000);
-	}
+			c64_io_enabled = 1;		// charen has no effect in ultimax_mode
 
-#if 1
-	if ((!c64_game && !c64_exrom && hiram)
-	    /*|| (!c64_exrom)*/) // must be disabled for 8kb c64 cartridges! like space action, super expander, ...
-#else
-	if ((!c64_game && c64_exrom && hiram)
-	    || (!c64_exrom) )
-#endif
-	{
-		memory_set_bankptr (3, romh);
-	}
-	else if (loram && hiram &&c64_game)
-	{
-		memory_set_bankptr (3, c64_basic);
+			memory_set_bankptr (1, roml);
+			memory_set_bankptr (2, c64_memory + 0x8000);
+			memory_set_bankptr (3, c64_memory + 0xa000);
+			memory_set_bankptr (4, romh);
+			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_NOP);
 	}
 	else
 	{
-		memory_set_bankptr (3, c64_memory + 0xa000);
-	}
-
-	if ((!c64_game && c64_exrom)
-		|| (charen && (loram || hiram)))
-	{
-		c64_io_enabled = 1;
-//		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_read_io);
-//		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_write_io);
-//		if ( cpu_getactivecpu() >= 0 )
-//			memory_set_opbase(activecpu_get_physical_pc_byte());
-	}
-	else
-	{
-		c64_io_enabled = 0;
-		c64_io_ram_w_ptr = c64_memory + 0xd000;
-		if ( !charen && (loram || hiram)) {
-			c64_io_ram_r_ptr = c64_chargen;
-		} else {
-			c64_io_ram_r_ptr = c64_memory + 0xd000;
+		/* 0x8000-0x9000 */
+		if (loram && hiram && !c64_exrom)
+		{
+			memory_set_bankptr (1, roml);
+			memory_set_bankptr (2, c64_memory + 0x8000);
 		}
-//		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK5);
-//		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, SMH_BANK6);
-//		memory_set_bankptr (6, c64_memory + 0xd000);
-//		if (!charen && (loram || hiram))
-//		{
-//			memory_set_bankptr (5, c64_chargen);
-//		}
-//		else
-//		{
-//			memory_set_bankptr (5, c64_memory + 0xd000);
-//		}
+		else
+		{
+			memory_set_bankptr (1, c64_memory + 0x8000);
+			memory_set_bankptr (2, c64_memory + 0x8000);
+		}
+
+		/* 0xa000 */
+		if (hiram && !c64_game && !c64_exrom)
+			memory_set_bankptr (3, romh);
+
+		else if (loram && hiram && c64_game)
+			memory_set_bankptr (3, c64_basic);
+
+		else
+			memory_set_bankptr (3, c64_memory + 0xa000);
+
+		/* 0xd000 */
+		// RAM
+		if (!loram && !hiram && (c64_game || !c64_exrom))
+		{
+			c64_io_enabled = 0;
+			c64_io_ram_r_ptr = c64_memory + 0xd000;
+			c64_io_ram_w_ptr = c64_memory + 0xd000;
+		}
+		// IO/RAM
+		else if (loram && !hiram && !c64_game)	// remember we cannot be in ultimax_mode, no need of !c64_exrom
+		{
+			c64_io_enabled = 0;
+			c64_io_ram_w_ptr = c64_memory + 0xd000;
+			c64_io_ram_r_ptr = (!charen) ? c64_chargen : c64_memory + 0xd000;
+		}
+		// IO/C
+		else
+		{
+			c64_io_enabled = charen ? 1 : 0;
+
+			if (!charen)
+			{
+			c64_io_ram_w_ptr = c64_memory + 0xd000;
+			c64_io_ram_r_ptr = c64_chargen;
+			}
+		}
+
+		/* 0xe000-0xf000 */
+		memory_set_bankptr (4, hiram ? c64_kernal : c64_memory + 0xe000);
+		memory_set_bankptr (5, c64_memory + 0xe000);
 	}
 
-	if (!c64_game && c64_exrom)
-	{
-		memory_set_bankptr (7, romh);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_NOP);
-	}
-	else
-	{
-		if (hiram)
-			memory_set_bankptr (7, c64_kernal);
-		else
-			memory_set_bankptr (7, c64_memory + 0xe000);
-		memory_set_bankptr (8, c64_memory + 0xe000);
-	}
 	/* make sure the opbase function gets called each time */
 	/* NPW 15-May-2008 - Another hack in the C64 drivers broken! */
 	/* opbase->mem_max = 0xcfff; */
+
 	game = c64_game;
 	exrom = c64_exrom;
 	old = data;
@@ -664,45 +725,57 @@ static void c64_bankswitch(running_machine *machine, int reset)
   p5 output cassette motor
   p6,7 not available on M6510
  */
+
+static emu_timer *datasette_timer;
+
 void c64_m6510_port_write(UINT8 direction, UINT8 data)
 {
 	/* if line is marked as input then keep current value */
-	data = ( c64_port_data & ~direction ) | ( data & direction );
+	data = (c64_port_data & ~direction) | (data & direction);
 
-	/* resistor makes cassette sense go high when P4 changes to input */
-	if ( ! ( direction & 0x10 ) ) {
-		data |= 0x10;
-	}
 	/* resistors make P0,P1,P2 go high when respective line is changed to input */
-	if ( ! ( direction & 0x04 ) ) {
+	if (!(direction & 0x04)) 
 		data |= 0x04;
-	}
-	if ( ! ( direction & 0x02 ) ) {
+
+	if (!(direction & 0x02))
 		data |= 0x02;
-	}
-	if ( ! ( direction & 0x01 ) ) {
+
+	if (!(direction & 0x01))
 		data |= 0x01;
-	}
+
 	c64_port_data = data;
 
 	if (c64_tape_on)
 	{
-		if ( direction & 0x08 ) {
-			vc20_tape_write (!(data & 8));
+		if (direction & 0x08) 
+		{
+		/* CASSETTE_RECORD is not implemented yet */
 		}
-		if ( direction & 0x20 ) {
-			vc20_tape_motor (data & 0x20);
+
+		if (direction & 0x20)
+		{
+			if(!(data & 0x20))
+			{
+				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+			}
+			else
+			{
+				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+				timer_reset(datasette_timer, attotime_never);
+			}
 		}
 	}
-	if (is_c128(Machine))
-		c128_bankswitch_64 (Machine, 0);
-	else if (is_c65(Machine))
+
+	if (is_c65(Machine))
 	{
 		// NPW 8-Feb-2004 - Don't know why I have to do this
 		//c65_bankswitch(Machine);
 	}
+
 	else if (!ultimax)
 		c64_bankswitch(Machine, 0);
+
 	c64_memory[0x000] = program_read_byte( 0 );
 	c64_memory[0x001] = program_read_byte( 1 );
 }
@@ -712,28 +785,23 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
-	if (c64_tape_on && !vc20_tape_switch())
+	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 		data &= ~0x10;
-	/* WP: motor is always marked as on??? */
-	data &= ~0x20;
-	if (is_c128(machine)) {
+	else
+		data |=  0x10;
+
+	if (is_c65(machine)) 
+	{
 		if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
-		{
 			data &= ~0x40;
-		} else {
+
+		else 
 			data |=  0x40;
-		}
 	}
-	if (is_c65(machine)) {
-		if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
-		{
-			data &= ~0x40;
-		} else {
-			data |=  0x40;
-		}
-	}
+
 	return data;
 }
+
 
 int c64_paddle_read (int which)
 {
@@ -835,60 +903,59 @@ static int c64_dma_read_color (int offset)
 	return c64_colorram[offset & 0x3ff] & 0xf;
 }
 
+double last = 0;
+
+static TIMER_CALLBACK( c64_tape_timer )
+{
+	double tmp = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
+
+	if((last > +0.0) && (tmp < +0.0))
+		cia_issue_index(machine, 0);
+
+	last = tmp;
+}
+
 static void c64_common_driver_init (running_machine *machine)
 {
+	cia6526_interface cia_intf[2];
+
 	/* configure the M6510 port */
 	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
 	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
 
-	/*    memset(c64_memory, 0, 0xfd00); */
-	if (!ultimax) {
+	if (!ultimax) 
+	{
 		UINT8 *mem = memory_region(machine, "main");
-		c64_basic=mem+0x10000;
-		c64_kernal=mem+0x12000;
-		c64_chargen=mem+0x14000;
-		c64_colorram=mem+0x15000;
-		c64_roml=mem+0x15400;
-		c64_romh=mem+0x17400;
-#if 0
-	{0x10000, 0x11fff, SMH_ROM, &c64_basic},	/* basic at 0xa000 */
-	{0x12000, 0x13fff, SMH_ROM, &c64_kernal},	/* kernal at 0xe000 */
-	{0x14000, 0x14fff, SMH_ROM, &c64_chargen},	/* charrom at 0xd000 */
-	{0x15000, 0x153ff, SMH_RAM, &c64_colorram},		/* colorram at 0xd800 */
-	{0x15400, 0x173ff, SMH_ROM, &c64_roml},	/* basic at 0xa000 */
-	{0x17400, 0x193ff, SMH_ROM, &c64_romh},	/* kernal at 0xe000 */
-#endif
+		c64_basic    = mem + 0x10000;
+		c64_kernal   = mem + 0x12000;
+		c64_chargen  = mem + 0x14000;
+		c64_colorram = mem + 0x15000;
+		c64_roml     = mem + 0x15400;
+		c64_romh     = mem + 0x17400;
 	}
+
 	if (c64_tape_on)
-		vc20_tape_open (c64_tape_read);
+		datasette_timer = timer_alloc(c64_tape_timer, NULL);
 
+	/* CIA initialization */
+	cia_intf[0] = c64_cia0;
+	cia_intf[0].tod_clock = c64_pal ? 50 : 60;
+	cia_config(machine, 0, &cia_intf[0]);
+	
+	if (c64_cia1_on)
 	{
-		cia6526_interface cia_intf[2];
-
-		cia_intf[0] = c64_cia0;
-		cia_intf[0].tod_clock = c64_pal ? 50 : 60;
-		cia_config(machine, 0, &cia_intf[0]);
-
-		if (c64_cia1_on)
-		{
-			cia_intf[1] = c64_cia1;
-			cia_intf[1].tod_clock = c64_pal ? 50 : 60;
-			cia_config(machine, 1, &cia_intf[1]);
-		}
+		cia_intf[1] = c64_cia1;
+		cia_intf[1].tod_clock = c64_pal ? 50 : 60;
+		cia_config(machine, 1, &cia_intf[1]);
 	}
-
+	
+	
 	if (ultimax)
-	{
-		vic6567_init (0, c64_pal, c64_dma_read_ultimax, c64_dma_read_color,
-					  c64_vic_interrupt);
-	}
+		vic6567_init (0, c64_pal, c64_dma_read_ultimax, c64_dma_read_color, c64_vic_interrupt);
 	else
-	{
-		vic6567_init (0, c64_pal, c64_dma_read, c64_dma_read_color,
-					  c64_vic_interrupt);
-	}
+		vic6567_init (0, c64_pal, c64_dma_read, c64_dma_read_color, c64_vic_interrupt);
+
 	cia_reset();
-	add_exit_callback(machine, c64_driver_shutdown);
 }
 
 DRIVER_INIT( c64 )
@@ -926,12 +993,6 @@ DRIVER_INIT( sx64 )
 	vc1541_config (0, 0, &vc1541);
 }
 
-static void c64_driver_shutdown (running_machine *machine)
-{
-	if (c64_tape_on)
-		vc20_tape_close ();
-}
-
 void c64_common_init_machine (running_machine *machine)
 {
 #ifdef VC1541
@@ -949,16 +1010,21 @@ void c64_common_init_machine (running_machine *machine)
 	vicirq = 0;
 }
 
-static OPBASE_HANDLER( c64_opbase ) {
-	if ( ( address & 0xf000 ) == 0xd000 ) {
-		if ( c64_io_enabled ) {
+static OPBASE_HANDLER( c64_opbase ) 
+{
+	if ((address & 0xf000) == 0xd000) 
+	{
+		if (c64_io_enabled) 
+		{
 			opbase->mask = 0x0fff;
 			opbase->ram = c64_io_mirror;
 			opbase->rom = c64_io_mirror;
 			opbase->mem_min = 0x0000;
 			opbase->mem_max = 0xcfff;
 			c64_io_mirror[address & 0x0fff] = c64_read_io( machine, address & 0x0fff );
-		} else {
+		} 
+		else 
+		{
 			opbase->mask = 0x0fff;
 			opbase->ram = c64_io_ram_r_ptr;
 			opbase->rom = c64_io_ram_r_ptr;
@@ -1210,14 +1276,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		c65_keyline = value;
 	}
 
-
 	vic2_frame_interrupt (machine, cpunum);
-
-	if (c64_tape_on) 
-	{
-		vc20_tape_config (input_port_read(machine, "CFG") & 0x4000, input_port_read(machine, "DSW0") & 0x2000);		/* DATASSETTE, DATASSETTE_TONE */
-		vc20_tape_buttons (input_port_read(machine, "CFG") & 0x1000, input_port_read(machine, "DSW0") & 0x0800, input_port_read(machine, "DSW0") & 0x0400);	/* DATASETTE_PLAY, DATASETTE_RECORD, DATASETTE_STOP */
-	}
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
 	set_led_status (0, input_port_read(machine, "DSW0") & 0x0100 ? 1 : 0);		/*KB_NUMLOCK_FLAG */ 

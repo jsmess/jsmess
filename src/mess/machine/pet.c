@@ -10,7 +10,6 @@
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"
-#include "includes/vc20tape.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "includes/cbmserb.h"

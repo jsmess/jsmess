@@ -1144,7 +1144,7 @@ static void vic2_drawlines (int first, int last)
 	if (!SCREENON)
 	{
 		for (line = first; (line < last) && (line < vic2.bitmap->height); line++)
-			memset16 (BITMAP_ADDR16(vic2.bitmap, line, 0), 0, vic2.bitmap->width);
+			memset16 (BITMAP_ADDR16(vic2.bitmap, line, 0), FRAMECOLOR, vic2.bitmap->width);
 		return;
 	}
 

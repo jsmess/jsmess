@@ -1,4 +1,4 @@
-﻿0.127.1
+0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -8,6 +8,13 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+
+- [C64] added partial support to tape emulation (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
+
+- [C64] fixed border color during tape loading [Roberto Zandona']
+
+- [C64] partial cleanup of memory bankswitch, based on docs [Fabio Priuli]
+
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully 
   working, including the "Säkkijärven polkka" program. [Curt Coder]

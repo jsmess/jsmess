@@ -170,7 +170,6 @@ when problems start with -log and look into error.log file
 #include "video/mc6845.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 
 #include "includes/cbmb.h"
 

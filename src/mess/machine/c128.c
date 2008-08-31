@@ -14,6 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
+#include "deprecat.h"
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"
@@ -57,6 +58,8 @@ static int c64mode = 0, c128_write_io;
 
 static int c128_ram_bottom, c128_ram_top;
 static UINT8 *c128_ram;
+
+static UINT8 c64_port_data;
 
 static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, UINT16 end, read8_machine_func rh)
 {
@@ -793,6 +796,72 @@ static int c128_dma_read_color (int offset)
 		return c64_colorram[(offset & 0x3ff)|((c64_port6510&0x3)<<10)] & 0xf;
 }
 
+/* 2008-08-31
+	We need here the old m6510 port handlers from c64, until we update this driver
+	to the new tape code */
+
+static WRITE8_HANDLER(c64_tape_read)
+{
+	cia_issue_index(machine, 0);
+}
+
+static void c128_m6510_port_write(UINT8 direction, UINT8 data)
+{
+	/* if line is marked as input then keep current value */
+	data = ( c64_port_data & ~direction ) | ( data & direction );
+
+	/* resistor makes cassette sense go high when P4 changes to input */
+	if ( ! ( direction & 0x10 ) ) {
+		data |= 0x10;
+	}
+	/* resistors make P0,P1,P2 go high when respective line is changed to input */
+	if ( ! ( direction & 0x04 ) ) {
+		data |= 0x04;
+	}
+	if ( ! ( direction & 0x02 ) ) {
+		data |= 0x02;
+	}
+	if ( ! ( direction & 0x01 ) ) {
+		data |= 0x01;
+	}
+	c64_port_data = data;
+
+	if (c64_tape_on)
+	{
+		if ( direction & 0x08 ) {
+			vc20_tape_write (!(data & 8));
+		}
+		if ( direction & 0x20 ) {
+			vc20_tape_motor (data & 0x20);
+		}
+	}
+
+	c128_bankswitch_64 (Machine, 0);
+
+	c64_memory[0x000] = program_read_byte( 0 );
+	c64_memory[0x001] = program_read_byte( 1 );
+}
+
+static UINT8 c128_m6510_port_read(UINT8 direction)
+{
+	running_machine *machine = Machine;
+	UINT8 data = c64_port_data;
+
+	if (c64_tape_on && !vc20_tape_switch())
+		data &= ~0x10;
+	/* WP: motor is always marked as on??? */
+	data &= ~0x20;
+
+	if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
+	{
+		data &= ~0x40;
+	} else {
+		data |=  0x40;
+	}
+
+	return data;
+}
+
 static void c128_common_driver_init(running_machine *machine)
 {
 	UINT8 *gfx=memory_region(machine, "gfx1");
@@ -800,8 +869,8 @@ static void c128_common_driver_init(running_machine *machine)
 	int i;
 
 	/* configure the M6510 port */
-	cpunum_set_info_fct(1, CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
-	cpunum_set_info_fct(1, CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
+	cpunum_set_info_fct(1, CPUINFO_PTR_M6510_PORTREAD, (genf *) c128_m6510_port_read);
+	cpunum_set_info_fct(1, CPUINFO_PTR_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
 
 	c64_memory = ram;
 

@@ -361,7 +361,6 @@ Video part
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
 #include "includes/c16.h"
-#include "includes/vc20tape.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 
