@@ -747,8 +747,8 @@ TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 	DRIVER( primoa32 )	/* Primo A-32										*/
 	DRIVER( primoa48 )	/* Primo A-48										*/
 	DRIVER( primoa64 )	/* Primo A-64										*/
-TESTDRIVER( primob32 )	/* Primo B-32										*/
-TESTDRIVER( primob48 )	/* Primo B-48										*/
+  DRIVER( primob32 )	/* Primo B-32										*/
+  DRIVER( primob48 )	/* Primo B-48										*/
 	DRIVER( primob64 )	/* Primo B-64										*/
 
 	/* Team Concepts */

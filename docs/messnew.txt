@@ -3,7 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - HT-1080Z / HT-1080Z/64 [Miodrag Milanovic]
-
+- Primo B32/ Primo B48 [Miodrag Milanovic]
 
 
 System Driver Changes:
