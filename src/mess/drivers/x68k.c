@@ -647,7 +647,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 				sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;
 				current_irq_line = 5;
-				cpunum_set_input_line_and_vector(machine, 0,5,HOLD_LINE,0x54);
+				cpunum_set_input_line_and_vector(machine, 0,5,ASSERT_LINE,0x54);
 			}
 		}
 	}
@@ -822,7 +822,7 @@ static void fdc_irq(int state)
 		sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cpunum_set_input_line_and_vector(Machine, 0,1,HOLD_LINE,current_vector[1]);
+		cpunum_set_input_line_and_vector(Machine, 0,1,ASSERT_LINE,current_vector[1]);
 	}
 }
 
@@ -1503,8 +1503,8 @@ static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 	static int prev;
 	if(prev == CLEAR_LINE && level == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
-	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
-		return;
+//	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+//		return;
 	cpunum_set_input_line(device->machine, 0, 6, level);
 	prev = level;
 }
@@ -1555,7 +1555,7 @@ static IRQ_CALLBACK(x68k_int_ack)
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
 		return current_vector[6];
 	}
-
+	
 	cpunum_set_input_line_and_vector(machine, 0,irqline,CLEAR_LINE,current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
