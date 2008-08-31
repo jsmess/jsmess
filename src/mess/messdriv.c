@@ -750,6 +750,7 @@ TESTDRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
   DRIVER( primob32 )	/* Primo B-32										*/
   DRIVER( primob48 )	/* Primo B-48										*/
 	DRIVER( primob64 )	/* Primo B-64										*/
+	DRIVER( primoc64 )	/* Primo C-64										*/
 
 	/* Team Concepts */
 	/* CPU not known, else should be easy, look into drivers/comquest.c */
@@ -900,6 +901,11 @@ TESTDRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 	DRIVER( mikrosha )
 	DRIVER( partner )
 
+  /* Homelab */  
+	DRIVER (homelab2)
+	DRIVER (homelab3)
+	DRIVER (homelab4)
+	
 	/* Bondwell */
 	DRIVER( bw2 )
 

@@ -384,6 +384,7 @@ DRVLIBS = \
 	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/hp48.a \
+	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kaypro.a \
@@ -1275,6 +1276,11 @@ $(MESSOBJ)/comx.a:				\
 	
 $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o \
+
+$(MESSOBJ)/homelab.a: \
+	$(MESS_DRIVERS)/homelab.o \
+	$(MESS_VIDEO)/homelab.o		\
+	$(MESS_MACHINE)/homelab.o	\
 
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
