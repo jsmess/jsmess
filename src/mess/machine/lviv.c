@@ -41,10 +41,15 @@ static void lviv_update_memory (void)
 	}
 }
 
+static TIMER_CALLBACK( lviv_reset )
+{
+	mame_schedule_soft_reset(machine);
+}
+
 static OPBASE_HANDLER(lviv_opbaseoverride)
 {
 	if (input_port_read(machine, "RESET") & 0x01)
-		mame_schedule_soft_reset(machine);
+		timer_set(ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
 	return address;
 }
 

@@ -811,17 +811,20 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 	}
 }
 
+static TIMER_CALLBACK( pmd_reset )
+{
+	mame_schedule_soft_reset(machine);
+}
+
 static OPBASE_HANDLER(pmd85_opbaseoverride)
 {
 	if (input_port_read(machine, "RESET") & 0x01) 
-		mame_schedule_soft_reset(machine);
+		timer_set(ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
 	return address;
 }
 
 static void pmd85_common_driver_init (running_machine *machine)
 {
-	memory_set_opbase_handler(0, pmd85_opbaseoverride);
-
 	msm8251_init(&pmd85_msm8251_interface);
 
 	pmd85_cassette_timer = timer_alloc(pmd85_cassette_timer_callback, NULL);
@@ -865,7 +868,6 @@ DRIVER_INIT ( mato )
 {
 	pmd85_model = MATO;
 	pmd85_update_memory = mato_update_memory;
-	memory_set_opbase_handler(0, pmd85_opbaseoverride);
 }
 
 
@@ -912,4 +914,6 @@ MACHINE_RESET( pmd85 )
 	}
 
 	timer_set( attotime_zero, NULL, 0, setup_pit8253_gates );
+
+	memory_set_opbase_handler(0, pmd85_opbaseoverride);	
 }
