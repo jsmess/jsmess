@@ -67,7 +67,7 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
 		*endpos = pos;
 
 	/* now skip until we find a path separator */
-	while((pos > 0) && !osd_is_path_separator(path[pos]))
+	while((pos >= 0) && !osd_is_path_separator(path[pos]))
 		pos--;
 
 	/* return beginpos */
@@ -87,7 +87,7 @@ astring *zippath_parent(astring *dst, const char *path)
 	parse_parent_path(path, &pos, NULL);
 
 	/* return the result */
-	return (pos > 0) ? astring_cpych(dst, path, pos + 1) : NULL;
+	return (pos >= 0) ? astring_cpych(dst, path, pos + 1) : NULL;
 }
 
 
@@ -320,7 +320,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 	{
 		/* trim the path of trailing path separators */
 		i = astring_len(apath);
-		while((i > 0) && osd_is_path_separator(astring_c(apath)[i - 1]))
+		while((i > 1) && osd_is_path_separator(astring_c(apath)[i - 1]))
 			i--;
 		apath_trimmed = astring_cpysubstr(apath_trimmed, apath, 0, i);
 
