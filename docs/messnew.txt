@@ -1,4 +1,4 @@
-0.127.1
+﻿0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -9,10 +9,10 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 
-- [C16] added preliminary support for tape emulation using MESS core 
-  functions (only loading and only .wav) [Fabio Priuli]
+- [C16] added partial support for tape emulation using MESS core 
+  functions (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
 
-- [C128] added preliminary support for tape emulation using MESS core 
+- [C128] added partial support for tape emulation using MESS core 
   functions (only loading and only .wav) [Fabio Priuli]
 
 - [C64] added partial support for tape emulation using MESS core 
@@ -28,7 +28,7 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
-- [VC20] added preliminary support for tape emulation using MESS core 
+- [VC20] added partial support for tape emulation using MESS core 
   functions (only loading and only .wav) [Fabio Priuli]
 
 - [VIP] Fixed memory banking, added discrete sound, added tape support,

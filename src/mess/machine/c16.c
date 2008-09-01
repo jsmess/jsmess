@@ -91,7 +91,7 @@ static UINT8 read_cfg1(running_machine *machine)
 	return result;
 }
 
-/**
+/*
   ddr bit 1 port line is output
   port bit 1 port line is high
 
@@ -113,7 +113,8 @@ static UINT8 read_cfg1(running_machine *machine)
   p5 not connected (or not available on MOS7501?)
   p6 serial clock in
   p7 serial data in, serial bus 5
- */
+*/
+
 void c16_m7501_port_write(UINT8 data)
 {
 	int dat, atn, clk;
@@ -122,12 +123,8 @@ void c16_m7501_port_write(UINT8 data)
 	cbm_serial_atn_write (atn = !(data & 4));
 	cbm_serial_clock_write (clk = !(data & 2));
 	cbm_serial_data_write (dat = !(data & 1));
-//	vc20_tape_write (!(data & 2));		// CASSETTE_RECORD not implemented yet
 
-//	Fix Me!
-//	HACK! we need to set the motor always ON, because !(data & 0x08) seems always 0
-//	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), !(data & 0x08) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+//	vc20_tape_write (!(data & 2));		// CASSETTE_RECORD not implemented yet
 }
 
 UINT8 c16_m7501_port_read(void)
@@ -141,12 +138,14 @@ UINT8 c16_m7501_port_read(void)
 	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read())
 		data &= ~0x40;
 
-/*	data &= ~0x20; //port bit not in pinout */
+//	data &= ~0x20; // port bit not in pinout
 
 	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0)
 		data |=  0x10;
 	else
 		data &= ~0x10;
+
+	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	return data;
 }
