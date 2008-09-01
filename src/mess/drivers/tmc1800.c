@@ -55,6 +55,53 @@ Notes:
 
 /*
 
+OSCOM Nano
+
+PCB Layout
+----------
+
+OK 30379
+
+|-------------------------------------------------|
+|	CN1		CN2		CN3					7805	  |
+|						1.75MHz					  |
+|								741				  |
+|				  		|-------------|			- |
+|	741	    741	  4011	|   CDP1864   |			| |
+|						|-------------|			| |
+|				  4013	|-------------|			| |
+|						|   CDP1802   |			| |
+|				  4093	|-------------|			| |
+|												C |
+|			 4051 	4042	4017		4042	N |	
+|							|-------|			4 |
+|							|  ROM  |	14556	| |
+|							|-------|			| |
+|							2114	2114		| |
+|												| |
+|							2114	2114		| |
+|												- |
+|							2114	2114		  |
+|												  |
+|							2114	2114		  |
+|-------------------------------------------------|
+
+Notes:
+    All IC's shown.
+	
+    ROM		- Intersil 5504?
+	2114	- 2114UCB 4096 Bit (1024x4) NMOS Static RAM
+	CDP1802	- RCA CDP1802E CMOS 8-Bit Microprocessor @ 1.75 MHz
+	CDP1864	- RCA CDP1864CE COS/MOS PAL Compatible Color TV Interface @ 1.75 MHz
+	CN1		- tape connector
+	CN2		- video connector
+	CN3		- power connector
+	CN4		- expansion connector
+
+*/
+
+/*
+
 	TODO:
 
 	- tape input/output
