@@ -252,4 +252,4 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY     FULLNAME */
-CONS( 1977, mekd2,	0,		0,		mekd2,	  mekd2,	mekd2,	mekd2,	"Motorola",	"MEK6800D2" , 0)
+CONS( 1977, mekd2,	0,		0,		mekd2,	  mekd2,	mekd2,	mekd2,	"Motorola",	"MEK6800D2" , GAME_NOT_WORKING )

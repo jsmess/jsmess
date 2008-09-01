@@ -539,4 +539,4 @@ static DRIVER_INIT( mpt02 )
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978,	m9016tc,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978,	m9016tc,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )

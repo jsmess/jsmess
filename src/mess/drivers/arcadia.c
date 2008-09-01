@@ -602,4 +602,4 @@ CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	arcadia,	"Emerson",		"
 
 // different cartridge connector (same size as mpt03, but different pinout!)
 // 16 keys instead of 12
-CONS(198?, vcg,		arcadia,	0,		arcadia,  vcg,		arcadia,	arcadia,	"Palladium",		"Video-Computer-Game", GAME_IMPERFECT_SOUND )
+CONS(198?, vcg,		arcadia,	0,		arcadia,  vcg,		arcadia,	arcadia,	"Palladium",		"Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

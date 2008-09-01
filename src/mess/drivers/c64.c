@@ -630,7 +630,6 @@ COMP(1982, vic64s, 	c64,	0,		c64pal, 		vic64s,	c64pal, c64,		"Commodore Business
 COMP(1982, max,		0,		0,		ultimax,		ultimax,ultimax,ultimax,	"Commodore Business Machines Co.", "Commodore Max (Ultimax/VC10)", 0)
 CONS(1987, c64gs,	c64,	0,		c64gs,			c64gs,	c64gs,	c64gs,		"Commodore Business Machines Co.", "C64GS (PAL)", 0)
 
-/* testdrivers */
 COMP(1983, sx64,	c64,	0,		sx64,			sx64,	sx64,	sx64,		"Commodore Business Machines Co.", "SX64 (PAL)",                      GAME_NOT_WORKING)
 COMP(1983, vip64,	c64,	0,		sx64,			vip64,	sx64,	sx64,		"Commodore Business Machines Co.", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
 // sx64 with second disk drive

@@ -790,5 +790,4 @@ COMP (1981,	cbm80ger,	0,		pet,	pet80pal,	cbm8096, cbm80,   pet4_32,	"Commodore B
 COMP (1981,	cbm80swe,	0,		pet,	pet80pal,	cbm8096, cbm80,   pet4_32,	"Commodore Business Machines Co.",  "Commodore 80xx Swedish (50Hz)",               GAME_NO_SOUND)
 COMP (1981,	superpet,	0,		pet,	superpet,	superpet,superpet,pet4_32,	"Commodore Business Machines Co.",  "Commodore SP9000/MMF9000 (50Hz)",             GAME_NO_SOUND|GAME_NOT_WORKING)
 
-// please leave the following as testdriver only
-COMP (198?, 	mmf9000,	0,		pet,	superpet,	superpet,superpet,pet4,		"Commodore Business Machines Co.",  "MMF9000 (50Hz) Swedish", 0)
+COMP (198?, 	mmf9000,	0,		pet,	superpet,	superpet,superpet,pet4,		"Commodore Business Machines Co.",  "MMF9000 (50Hz) Swedish", GAME_NOT_WORKING)

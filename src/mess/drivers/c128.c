@@ -930,7 +930,6 @@ COMP (1985, c128fra,	c128,	0,		c128pal,	c128fra,	c128pal,	c128,	"Commodore Busin
 COMP (1985, c128ita,	c128,	0,		c128pal,	c128ita,	c128pal,	c128,	"Commodore Business Machines Co.","Commodore 128 Italian (PAL)", 0)
 COMP (1985, c128swe,	c128,	0,		c128pal,	c128swe,	c128pal,	c128,	"Commodore Business Machines Co.","Commodore 128 Swedish (PAL)", 0)
 /* other countries spanish, belgium, norwegian */
-/* please leave the following as testdriver */
 COMP (1985, c128nor,	c128,	0,		c128pal,	c128ita,	c128pal,	c128,	"Commodore Business Machines Co.","Commodore 128 Norwegian (PAL)", GAME_NOT_WORKING)
 COMP (1985, c128d,		c128,	0,		c128d,		c128,		c128,		c128d,	"Commodore Business Machines Co.","Commodore 128D NTSC", GAME_NOT_WORKING)
 //COMP(1985,c128dita,   c128,   0,      c128d,      c128,       c128,       c128d,  "Commodore Business Machines Co.","Commodore 128D Italian (PAL)", GAME_NOT_WORKING)

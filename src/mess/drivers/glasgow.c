@@ -959,7 +959,7 @@ ROM_END
 CONS(  1984, glasgow,  0,        0,    glasgow,       old_keyboard,   0,		NULL,   "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", 0)
 CONS(  1984, amsterd,  0,        0,    amsterd,       new_keyboard,   0,		NULL,   "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     0)
 CONS(  1984, dallas,   0,        0,    glasgow,       old_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas",        0)
-CONS(  1984, roma,     0,        0,    glasgow,       new_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma",          0)
+CONS(  1984, roma,     0,        0,    glasgow,       new_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma",          GAME_NOT_WORKING)
 CONS(  1984, dallas32, 0,        0,    dallas32,      new_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", 0)
 CONS(  1984, roma32,   0,        0,    dallas32,      new_keyboard,   0,	    NULL,   "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   0)
 CONS(  1984, dallas16, 0,        0,    amsterd,       new_keyboard,   0,		NULL,   "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", 0)
