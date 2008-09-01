@@ -6,7 +6,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "cpu/i8039/i8039.h"
 #include "includes/odyssey2.h"
 
 
