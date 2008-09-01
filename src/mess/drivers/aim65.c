@@ -36,14 +36,14 @@ ToDo:
 
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
-static ADDRESS_MAP_START( aim65_mem , ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( aim65_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_READWRITE( via_1_r, via_1_w ) /* User VIA */
+	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_READWRITE(via_1_r, via_1_w) /* User VIA */
 	AM_RANGE( 0xa400, 0xa47f ) AM_RAM /* RIOT RAM */
 	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
-	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_READWRITE( via_0_r, via_0_w )
-	AM_RANGE( 0xac00, 0xac03 ) AM_READWRITE( pia_0_r, pia_0_w )
+	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE( 0xac00, 0xac03 ) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
 	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
 	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */
@@ -157,6 +157,16 @@ static const dl1416_interface dl1416_ds3 = { DL1416T, aim65_update_ds3 };
 static const dl1416_interface dl1416_ds4 = { DL1416T, aim65_update_ds4 };
 static const dl1416_interface dl1416_ds5 = { DL1416T, aim65_update_ds5 };
 
+/* riot interface */
+static const riot6532_interface aim65_r6532_interface =
+{
+	NULL,
+	aim65_riot_b_r,
+	aim65_riot_a_w,
+	NULL,
+	aim65_riot_irq
+};
+
 
 
 /******************************************************************************
@@ -171,6 +181,7 @@ static MACHINE_DRIVER_START( aim65 )
 
 	MDRV_DEFAULT_LAYOUT(layout_aim65)
 
+	/* alpha-numeric display */
 	MDRV_DEVICE_ADD("ds1", DL1416)
 	MDRV_DEVICE_CONFIG(dl1416_ds1)
 	MDRV_DEVICE_ADD("ds2", DL1416)
@@ -184,7 +195,7 @@ static MACHINE_DRIVER_START( aim65 )
 
 	MDRV_VIDEO_START(aim65)
 
-	/* devices */
+	/* other devices */
 	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_r6532_interface)
 MACHINE_DRIVER_END
 
@@ -211,18 +222,19 @@ ROM_END
 
 /* Currently dumped and available software:
  *
- * Name        Loc  CRC32     SHA1
- * -------------------------------------------------------------------
- * Assembler   Z24  0878b399  483e92b57d64be51643a9f6490521a8572aa2f68
- * Basic V1.1  Z25  d7b42d2a  4bbdb28d332429825adea0266ed9192786d9e392
- * Basic V1.1  Z26  36a61f39  f5ce0126cb594a565e730973fd140d03c298cefa
- * Forth V1.3  Z25  0671d019  dd2a1613e435c833634100cf4a22c6cff70c7a26
- * Forth V1.3  Z26  a80ad472  42a2e8c86829a2fe48090e6665ff9fe25b12b070
- * Mathpack    Z24  4889af55  5e9541ddfc06e3802d09b30d1bd89c5da914c76e
- * Monitor     Z22  d01914b0  e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf
- * Monitor     Z23  90e44afe  78e38601edf6bfc787b58750555a636b0cf74c5c
- * PL/65 V1.0  Z25  76dcf864  e937c54ed109401f796640cd45b27dfefb76667e
- * PL/65 V1.0  Z26  2ac71abd  6df5e3125bebefac80d51d9337555f54bdf0d8ea
+ * Name             Loc  CRC32     SHA1
+ * ------------------------------------------------------------------------
+ * Assembler        Z24  0878b399  483e92b57d64be51643a9f6490521a8572aa2f68
+ * Basic V1.1       Z25  d7b42d2a  4bbdb28d332429825adea0266ed9192786d9e392
+ * Basic V1.1       Z26  36a61f39  f5ce0126cb594a565e730973fd140d03c298cefa
+ * Forth V1.3       Z25  0671d019  dd2a1613e435c833634100cf4a22c6cff70c7a26
+ * Forth V1.3       Z26  a80ad472  42a2e8c86829a2fe48090e6665ff9fe25b12b070
+ * Mathpack         Z24  4889af55  5e9541ddfc06e3802d09b30d1bd89c5da914c76e
+ * Monitor          Z22  d01914b0  e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf
+ * Monitor          Z23  90e44afe  78e38601edf6bfc787b58750555a636b0cf74c5c
+ * Monitor Dynatem  Z22  83e1c6e7  444134043edd83385bd70434cb100269901c4417
+ * PL/65 V1.0       Z25  76dcf864  e937c54ed109401f796640cd45b27dfefb76667e
+ * PL/65 V1.0       Z26  2ac71abd  6df5e3125bebefac80d51d9337555f54bdf0d8ea
  *
  */
 

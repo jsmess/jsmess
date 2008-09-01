@@ -11,7 +11,6 @@
 /* Peripheral chips */
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
-#include "machine/6532riot.h"
 
 /* DL1416A display chip */
 #include "video/dl1416.h"
@@ -132,14 +131,18 @@ void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit 
 ******************************************************************************/
 
 
-static UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata)
+UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata)
 {
-	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
-										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+	static const char *keynames[] =
+	{
+		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
+		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
+	};
+
 	int row, data = 0xff;
 
 	/* scan keyboard rows */
-	for (row = 0; row < 8; row++) 
+	for (row = 0; row < 8; row++)
 	{
 		if (!(riot_port_a & (1 << row)))
 			data &= input_port_read(device->machine, keynames[row]);
@@ -149,26 +152,16 @@ static UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata)
 }
 
 
-static void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata)
+void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata)
 {
 	riot_port_a = data;
 }
 
 
-static void aim65_riot_irq(const device_config *device, int state)
+void aim65_riot_irq(const device_config *device, int state)
 {
 	cpunum_set_input_line(device->machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
-
-
-const riot6532_interface aim65_r6532_interface =
-{
-	NULL,
-	aim65_riot_b_r,
-	aim65_riot_a_w,
-	NULL,
-	aim65_riot_irq
-};
 
 
 
