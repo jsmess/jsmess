@@ -924,6 +924,10 @@ TESTDRIVER( comxpl80 )
 	DRIVER( newbraia )
 	DRIVER( newbraiv )
 
+	/* Votrax */
+//	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
+	DRIVER( votrpss ) /* Votrax Personal Speech System */
+
 /****************Games*******************************************************/
 	/* Computer Electronic */
 	DRIVER( mk1 )		/* Chess Champion MK I								*/

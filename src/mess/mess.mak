@@ -446,6 +446,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vc4000.a \
 	$(MESSOBJ)/veb.a \
+	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
 
@@ -1286,6 +1287,9 @@ $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
 	$(MESS_VIDEO)/newbrain.o \
 	$(MESS_MACHINE)/adc080x.o
+
+$(MESSOBJ)/votrax.a: \
+	$(MESS_DRIVERS)/votrpss.o \
 
 #-------------------------------------------------
 # layout dependencies
