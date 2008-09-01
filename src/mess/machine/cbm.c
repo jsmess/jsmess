@@ -4,6 +4,14 @@
 #include "driver.h"
 #include "includes/cbm.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
+
+
+/***********************************************
+
+	CBM Quickloads
+
+***********************************************/
 
 
 static int general_cbm_loadsnap(const device_config *image, const char *file_type, int snapshot_size,
@@ -156,7 +164,13 @@ QUICKLOAD_LOAD( cbm_c65 )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_c65_quick_sethiaddress);
 }
 
-/* ----------------------------------------------------------------------- */
+
+/***********************************************
+
+	CBM Cartridges
+
+***********************************************/
+
 
 INT8 cbm_c64_game;
 INT8 cbm_c64_exrom;
@@ -333,3 +347,22 @@ void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
+
+/***********************************************
+
+	CBM Datasette Tapes
+
+***********************************************/
+
+void datasette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+	case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
+
+	default:										cassette_device_getinfo( devclass, state, info ); break;
+	}
+}

@@ -193,7 +193,6 @@ when problems start with -log and look into error.log file
 #include "driver.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
-#include "devices/cassette.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
@@ -595,18 +594,7 @@ static void ultimax_cbmcartslot_getinfo(const mess_device_class *devclass, UINT3
 	}
 }
 
-static void datasette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-	case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
 
-	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
-
-	default:										cassette_device_getinfo( devclass, state, info ); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(c64)
 	CONFIG_DEVICE(c64_cbmcartslot_getinfo)

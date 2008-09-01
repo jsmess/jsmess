@@ -9,7 +9,14 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 
-- [C64] added partial support to tape emulation (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
+- [C16] added preliminary support for tape emulation using MESS core 
+  functions (only loading and only .wav) [Fabio Priuli]
+
+- [C128] added preliminary support for tape emulation using MESS core 
+  functions (only loading and only .wav) [Fabio Priuli]
+
+- [C64] added partial support for tape emulation using MESS core 
+  functions (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
 
 - [C64] fixed border color during tape loading [Roberto Zandona']
 
@@ -20,6 +27,9 @@ System Driver Changes:
   working, including the "Säkkijärven polkka" program. [Curt Coder]
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
+
+- [VC20] added preliminary support for tape emulation using MESS core 
+  functions (only loading and only .wav) [Fabio Priuli]
 
 - [VIP] Fixed memory banking, added discrete sound, added tape support,
   and improved quickloading so that the CHIP-8 interpreter is automatically

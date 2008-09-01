@@ -155,14 +155,15 @@ when problems start with -log and look into error.log file
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/vc20.h"
 #include "machine/6522via.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 #include "machine/cbmipt.h"
 #include "video/vic6560.h"
 #include "devices/cartslot.h"
+
+#include "includes/vc20.h"
+
 
 static ADDRESS_MAP_START( vc20_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
@@ -241,8 +242,6 @@ static INPUT_PORTS_START (vic20)
 	/* Lightpen 6560 */
 	PORT_INCLUDE( vic_lightpen_6560 )	/* LIGHTX, LIGHTY */
 
-	PORT_INCLUDE( vic_devices )			/* DEVS */
-
 	PORT_INCLUDE( vic_expansion )		/* EXP */
 
 	PORT_INCLUDE( vic_config )			/* CFG */
@@ -284,8 +283,6 @@ static INPUT_PORTS_START (vc20)
 		
 	/* Lightpen 6561 */
 	PORT_INCLUDE( vic_lightpen_6561 )	/* LIGHTX, LIGHTY */
-
-	PORT_INCLUDE( vic_devices )			/* DEVS */
 
 	PORT_INCLUDE( vic_expansion )		/* EXP */
 
@@ -514,10 +511,11 @@ static void cbmvc20_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
+
 static SYSTEM_CONFIG_START(vc20)
 	CONFIG_DEVICE(cbmvc20_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
 	CONFIG_RAM(8 * 1024)
 	CONFIG_RAM(16 * 1024)
@@ -527,7 +525,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(vc20v)
 	CONFIG_DEVICE(cbmvc20_cartslot_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
 	CONFIG_RAM(8 * 1024)

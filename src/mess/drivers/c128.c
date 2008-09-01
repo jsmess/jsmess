@@ -294,9 +294,6 @@ U102 23256 (read compatible 27256?) 32kB 1571 system rom
 */
 
 #include "driver.h"
-#include "includes/c128.h"
-#include "includes/c64.h"
-
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
@@ -307,7 +304,9 @@ U102 23256 (read compatible 27256?) 32kB 1571 system rom
 #include "video/vdc8563.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
+
+#include "includes/c128.h"
+#include "includes/c64.h"
 
 
 /* shares ram with m8502
@@ -916,10 +915,12 @@ static void c128_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 s
 static SYSTEM_CONFIG_START(c128)
 	CONFIG_DEVICE(c128_cbmcartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c128d)
 	CONFIG_DEVICE(c1571_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY   FULLNAME */

@@ -225,16 +225,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( c64_config )
 	PORT_START( "CFG" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Quickload")  PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_DIPNAME( 0x4000, 0x4000, "Tape Drive/Device 1")									
 	PORT_DIPSETTING(	0x0000, DEF_STR( Off ) )											
 	PORT_DIPSETTING(	0x4000, DEF_STR( On ) )												
 	PORT_DIPNAME( 0x2000, 0x0000, "Tape Sound")											
 	PORT_DIPSETTING(	0x0000, DEF_STR( Off ) )											
 	PORT_DIPSETTING(	0x2000, DEF_STR( On ) )												
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Play")				
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Record")			
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Stop")				
 	PORT_DIPNAME( 0x80, 0x00, "Sid Chip Type")											
 	PORT_DIPSETTING(	0x00, "MOS6581" )													
 	PORT_DIPSETTING(	0x80, "MOS8580" )													
@@ -366,10 +362,6 @@ INPUT_PORTS_START( c16_config )
 	PORT_DIPNAME( 0x10, 0x00, "Tape Sound")			
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )		
 	PORT_DIPSETTING(	0x10, DEF_STR( On ) )		
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Quickload")  PORT_CODE(KEYCODE_SLASH_PAD)		
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Play") 
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Record") 
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Stop")
 
 	PORT_START("CFG0")
 	PORT_BIT( 0xc0, 0x00, IPT_UNUSED )								
@@ -448,16 +440,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( c128_config )
 	PORT_START("CFG") 
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Quickload") PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_DIPNAME( 0x4000, 0x4000, "Tape Drive / Device 1")									
 	PORT_DIPSETTING(	0x0000, DEF_STR( Off ) )											
 	PORT_DIPSETTING(	0x4000, DEF_STR( On ) )												
 	PORT_DIPNAME( 0x2000, 0x00, "Tape Sound")												
 	PORT_DIPSETTING(	0x0000, DEF_STR( Off ) )											
 	PORT_DIPSETTING(	0x2000, DEF_STR( On ) )												
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Play")				
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Record")			
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Stop")				
 	PORT_DIPNAME( 0x0300, 0x0000, "Main Memory / MMU Version")								
 	PORT_DIPSETTING(	0x0000, "128 KByte" )												
 	PORT_DIPSETTING(	0x0100, "256 KByte" )												
@@ -1008,7 +996,6 @@ INPUT_PORTS_END
  *	- vic_keyboard: basic Vic 20 keyboard
  *  - vic_special: input port for the Shift Lock Switch
  *	- vic_controls: joypads and paddles
- *	- vic_devices: quickload and tapes (to be removed when fixed vc20tape.c)
  *	- vic_expansion: RAM expansions
  *	- vic_config: controllers, tape and serial configurations
  *	- VIC20 also has 2 lightpen ports, vic_lightpen_6560 & vic_lightpen_6561
@@ -1135,31 +1122,43 @@ INPUT_PORTS_START( vic_special )
 INPUT_PORTS_END
 
 
+/* Paddle buttons are read in the same bits as some joystick inputs */
+static CUSTOM_INPUT( vic_custom_inputs )
+{
+	int bit_mask = (FPTR)param;
+	UINT8 port = 0;
+	
+	if (input_port_read(field->port->machine, "CFG") & 0x40)
+		port |= (input_port_read(field->port->machine, "FAKE0") & bit_mask) ? 1 : 0;
+
+	if (input_port_read(field->port->machine, "CFG") & 0x80)
+		port |= (input_port_read(field->port->machine, "FAKE1") & bit_mask) ? 1 : 0;
+
+	return port;
+}
+	
 INPUT_PORTS_START( vic_controls )
 	PORT_START( "JOY" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)	PORT_NAME("Joystick Up")		PORT_8WAY				
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)	PORT_NAME("Joystick Down")		PORT_8WAY			
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)	PORT_NAME("Joystick Left")		PORT_8WAY			
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)	PORT_NAME("Joystick Right")		PORT_8WAY			
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)		PORT_NAME("Joystick Button")							
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1)		PORT_NAME("Paddle 1 Button")	PORT_CODE(KEYCODE_INSERT)	
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2)		PORT_NAME("Paddle 2 Button")	PORT_CODE(KEYCODE_DEL)	
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1)		PORT_NAME("Lightpen Signal")	PORT_CODE(KEYCODE_LALT)	
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vic_custom_inputs, (void *)0x02)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightpen Signal") PORT_CODE(KEYCODE_LALT)	
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vic_custom_inputs, (void *)0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY			
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY			
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY				
+
+	PORT_START( "FAKE0" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Paddle 2 Button") PORT_CODE(KEYCODE_DEL)	
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paddle 1 Button") PORT_CODE(KEYCODE_INSERT)	
+
+	PORT_START( "FAKE1" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY			
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START( "PADDLE0" )
 	PORT_BIT( 0xff,128,IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_PGUP) PORT_REVERSE
 
 	PORT_START( "PADDLE1" )
 	PORT_BIT( 0xff,128,IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_END) PORT_CODE_INC(KEYCODE_PGDN) PORT_PLAYER(2) PORT_REVERSE
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( vic_devices )
-	PORT_START( "DEVS" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Quickload") PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Play")						
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Record")						
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tape Drive Stop")
 INPUT_PORTS_END
 
 

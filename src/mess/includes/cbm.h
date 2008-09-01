@@ -9,31 +9,15 @@
 
 #include "devices/snapquik.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-
-/* must be defined until some driver init problems are solved */
-#define NEW_GAMEDRIVER
-
-
-/*----------- defined in machine/cbm.c -----------*/
-
-/* global header file for
- * vc20
- * c16
- * c64
- * c128
- * c65*/
-
-void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+/* global header file for c16, c64, c65, c128, vc20 */
 
 /**************************************************************************
  * Logging
  * call the XXX_LOG with XXX_LOG("info",("%fmt\n",args));
  * where "info" can also be 0 to append .."%fmt",args to a line.
  **************************************************************************/
+
 #define LOG(LEVEL,N,M,A)  \
         { \
 	  if(LEVEL>=N) { \
@@ -57,6 +41,13 @@ void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state,
 
 #define DBG_LOG(n,m,a) LOG(VERBOSE_DBG,n,m,a)
 
+
+/***********************************************
+
+	CBM Quickloads
+
+***********************************************/
+
 QUICKLOAD_LOAD( cbm_pet1 );
 QUICKLOAD_LOAD( cbm_pet );
 QUICKLOAD_LOAD( cbm_c16 );
@@ -77,6 +68,14 @@ typedef struct {
 } CBM_ROM;
 
 
+
+/***********************************************
+
+	CBM Cartridges
+
+***********************************************/
+
+
 extern INT8 cbm_c64_game;
 extern INT8 cbm_c64_exrom;
 extern CBM_ROM cbm_rom[0x20];
@@ -95,9 +94,17 @@ extern CBM_ROM cbm_rom[0x20];
  * 0x001a lsb 16bit address
  * 0x001c data */
 
+void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
-#ifdef __cplusplus
-}
-#endif
+
+
+/***********************************************
+
+	CBM Datasette Tapes
+
+***********************************************/
+
+void datasette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+
 
 #endif /* CBM_H_ */

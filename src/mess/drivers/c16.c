@@ -158,13 +158,14 @@ when problems start with -log and look into error.log file
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/c16.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
 #include "devices/cartslot.h"
+
+#include "includes/c16.h"
+
 
 /*
  * commodore c16/c116/plus 4
@@ -702,10 +703,11 @@ static void c16cart_device_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
+
 static SYSTEM_CONFIG_START(c16)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
 	CONFIG_RAM_DEFAULT(64 * 1024)
@@ -713,7 +715,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16c)
 	CONFIG_DEVICE(c16cart_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
@@ -722,7 +724,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16v)
 	CONFIG_DEVICE(c16cart_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
@@ -732,20 +734,20 @@ SYSTEM_CONFIG_END
 static SYSTEM_CONFIG_START(plus)
 	CONFIG_DEVICE(c16cart_device_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusc)
 	CONFIG_DEVICE(c16cart_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusv)
 	CONFIG_DEVICE(c16cart_device_getinfo)
-	CONFIG_DEVICE(vc20tape_device_getinfo)
+	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END

@@ -21,12 +21,14 @@
 #include "includes/cbm.h"
 #include "machine/6522via.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
 #include "video/vic6560.h"
 
 #include "includes/vc20.h"
+
+#include "devices/cassette.h"
+
 
 static UINT8 keyboard[8] =
 {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -40,7 +42,10 @@ static UINT8 *vc20_rom_4000;
 static UINT8 *vc20_rom_6000;
 static UINT8 *vc20_rom_a000;
 
+static emu_timer *datasette_timer;
+
 UINT8 *vc20_memory_9400;
+
 
 /** via 0 addr 0x9110
  ca1 restore key (low)
@@ -74,40 +79,40 @@ static READ8_HANDLER( vc20_via0_read_ca2 )
 
 static WRITE8_HANDLER( vc20_via0_write_ca2 )
 {
-	via0_ca2 = data ? 1 : 0;
-	vc20_tape_motor (via0_ca2);
+	via0_ca2 = data ? 0 : 1;
+
+	if(via0_ca2)
+	{
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+	}
+	else
+	{
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		timer_reset(datasette_timer, attotime_never);
+	}
 }
 
 static  READ8_HANDLER( vc20_via0_read_porta )
 {
 	UINT8 value = 0xff;
 
-	if (input_port_read(machine, "CFG") & 0x80)		/* JOYSTICK */
-	{
-		if (input_port_read(machine, "JOY") & 0x10) /* JOY_BUTTON */
-			value&=~0x20;
-		if (input_port_read(machine, "JOY") & 4)	/* JOY_LEFT */
-			value&=~0x10;
-		if (input_port_read(machine, "JOY") & 2)	/* JOY_DOWN */
-			value&=~0x8;
-		if (input_port_read(machine, "JOY") & 1)	/* JOY_UP */
-			value&=~0x4;
-	}
-	if (input_port_read(machine, "CFG") & 0x40)		 /* PADDLE */
-	{
-		if (input_port_read(machine, "JOY") & 0x20)  /* PUDDLE1_BUTTON */
-			value&=~0x10;
-	}
+	value &= ~(input_port_read(machine, "JOY") & 0x3c);
+
 	/* to short to be recognized normally */
 	/* should be reduced to about 1 or 2 microseconds */
-	/*  if ((input_port_read(machine, "CFG") & 0x20 ) && (input_port_read(machine, "JOY") & 0x80) )  // i.e. LIGHTPEN_BUTTON
+	/*  if ((input_port_read(machine, "CFG") & 0x20 ) && (input_port_read(machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
 		value&=~0x20; */
 	if (!serial_clock || !cbm_serial_clock_read ())
 		value &= ~1;
 	if (!serial_data || !cbm_serial_data_read ())
 		value &= ~2;
-	if (!vc20_tape_switch ())
+
+	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 		value &= ~0x40;
+	else
+		value |=  0x40;
+
 	return value;
 }
 
@@ -166,7 +171,8 @@ static READ8_HANDLER( vc20_via1_read_porta )
 
 static  READ8_HANDLER( vc20_via1_read_ca1 )
 {
-	return vc20_tape_read ();
+	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	return data;
 }
 
 static WRITE8_HANDLER( vc20_via1_write_ca2 )
@@ -275,17 +281,7 @@ static  READ8_HANDLER( vc20_via1_read_portb )
 	value &=t;
     }
 
-	if (input_port_read(machine, "CFG") & 0x80)		/* JOYSTICK */
-	{
-		if (input_port_read(machine, "JOY") & 8) 	/* JOY_RIGHT */
-			value &= ~0x80;
-	}
-	
-	if (input_port_read(machine, "CFG") & 0x40) 	/* PADDLE */
-	{
-		if (input_port_read(machine, "JOY") & 0x40)  /* PUDDLE2_BUTTON */
-			value &= ~0x80;
-	}
+	value &= ~(input_port_read(machine, "JOY") & 0x80);
 
 	return value;
 }
@@ -299,7 +295,7 @@ static WRITE8_HANDLER( vc20_via1_write_porta )
 static WRITE8_HANDLER( vc20_via1_write_portb )
 {
 /*  logerror("via1_write_portb: $%02X\n", data); */
-	vc20_tape_write (data & 8 ? 1 : 0);
+//	vc20_tape_write (data & 8 ? 1 : 0);		// CASSETTE_RECORD not implemeted yet!
 	via1_portb = data;
 }
 
@@ -480,6 +476,7 @@ WRITE8_HANDLER( vc20_6000_w ) {
 	}
 }
 
+
 static void vc20_memory_init(running_machine *machine)
 {
 	static int inited=0;
@@ -516,6 +513,13 @@ static void vc20_memory_init(running_machine *machine)
 	inited=1;
 }
 
+
+TIMER_CALLBACK( vc20_tape_timer )
+{
+	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	via_1_ca1_w(machine, 0, data);
+}
+
 static void vc20_common_driver_init (running_machine *machine)
 {
 #ifdef VC1541
@@ -523,7 +527,7 @@ static void vc20_common_driver_init (running_machine *machine)
 #endif
 	vc20_memory_init(machine);
 
-	vc20_tape_open (via_1_ca1_w);
+	datasette_timer = timer_alloc(vc20_tape_timer, NULL);
 
 #ifdef VC1541
 	vc1541_config (0, 0, &vc1541);
@@ -539,11 +543,6 @@ static void vc20_common_driver_init (running_machine *machine)
 	memory_set_bankptr( 5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "main") + 0xa000 ) );
 }
 
-/* currently not used, but when time comes */
-void vc20_driver_shutdown (void)
-{
-	vc20_tape_close ();
-}
 
 DRIVER_INIT( vc20 )
 {
@@ -734,8 +733,5 @@ INTERRUPT_GEN( vc20_frame_interrupt )
 	keyboard[6] = input_port_read(machine, "ROW6");
 	keyboard[7] = input_port_read(machine, "ROW7");
 
-	vc20_tape_config (input_port_read(machine, "CFG") & 0x08, input_port_read(machine, "CFG") & 0x04);	/* DATASSETTE, DATASSETTE_TONE */
-	vc20_tape_buttons (input_port_read(machine, "DEVS") & 4, input_port_read(machine, "DEVS") & 2, input_port_read(machine, "DEVS") & 1);	/* DATASSETTE_PLAY, DATASSETTE_RECORD, DATASSETTE_STOP */
-	
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
 }

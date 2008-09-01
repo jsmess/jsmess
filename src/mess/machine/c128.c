@@ -20,12 +20,13 @@
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
 #include "includes/c128.h"
 #include "includes/c64.h"
+
+#include "devices/cassette.h"
 
 
 /*
@@ -796,43 +797,50 @@ static int c128_dma_read_color (int offset)
 		return c64_colorram[(offset & 0x3ff)|((c64_port6510&0x3)<<10)] & 0xf;
 }
 
-/* 2008-08-31
-	We need here the old m6510 port handlers from c64, until we update this driver
-	to the new tape code */
+/* 2008-09-01
+	We need here the m6510 port handlers from c64, otherwise c128_common_driver_init
+	seems unable to use correctly the timer.
+	This will be probably fixed in a future clean up.
+*/
 
-static WRITE8_HANDLER(c64_tape_read)
-{
-	cia_issue_index(machine, 0);
-}
+static emu_timer *datasette_timer;
 
 static void c128_m6510_port_write(UINT8 direction, UINT8 data)
 {
 	/* if line is marked as input then keep current value */
-	data = ( c64_port_data & ~direction ) | ( data & direction );
+	data = (c64_port_data & ~direction) | (data & direction);
 
-	/* resistor makes cassette sense go high when P4 changes to input */
-	if ( ! ( direction & 0x10 ) ) {
-		data |= 0x10;
-	}
 	/* resistors make P0,P1,P2 go high when respective line is changed to input */
-	if ( ! ( direction & 0x04 ) ) {
+	if (!(direction & 0x04)) 
 		data |= 0x04;
-	}
-	if ( ! ( direction & 0x02 ) ) {
+
+	if (!(direction & 0x02))
 		data |= 0x02;
-	}
-	if ( ! ( direction & 0x01 ) ) {
+
+	if (!(direction & 0x01))
 		data |= 0x01;
-	}
+
 	c64_port_data = data;
 
 	if (c64_tape_on)
 	{
-		if ( direction & 0x08 ) {
-			vc20_tape_write (!(data & 8));
+		if (direction & 0x08) 
+		{
+		/* CASSETTE_RECORD is not implemented yet */
 		}
-		if ( direction & 0x20 ) {
-			vc20_tape_motor (data & 0x20);
+
+		if (direction & 0x20)
+		{
+			if(!(data & 0x20))
+			{
+				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+			}
+			else
+			{
+				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+				timer_reset(datasette_timer, attotime_never);
+			}
 		}
 	}
 
@@ -847,10 +855,10 @@ static UINT8 c128_m6510_port_read(UINT8 direction)
 	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
-	if (c64_tape_on && !vc20_tape_switch())
+	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 		data &= ~0x10;
-	/* WP: motor is always marked as on??? */
-	data &= ~0x20;
+	else
+		data |=  0x10;
 
 	if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
 	{
@@ -867,6 +875,8 @@ static void c128_common_driver_init(running_machine *machine)
 	UINT8 *gfx=memory_region(machine, "gfx1");
 	UINT8 *ram = memory_region(machine, "main");
 	int i;
+
+	cia6526_interface cia_intf[2];
 
 	/* configure the M6510 port */
 	cpunum_set_info_fct(1, CPUINFO_PTR_M6510_PORTREAD, (genf *) c128_m6510_port_read);
@@ -890,22 +900,22 @@ static void c128_common_driver_init(running_machine *machine)
 	for (i=0; i<0x100; i++)
 		gfx[i]=i;
 
-	vc20_tape_open (c64_tape_read);
+	if (c64_tape_on)
+		datasette_timer = timer_alloc(c64_tape_timer, NULL);
 
-	{
-		cia6526_interface cia_intf[2];
-		cia_intf[0] = c64_cia0;
-		cia_intf[1] = c64_cia1;
-		cia_intf[0].tod_clock = c64_pal ? 50 : 60;
-		cia_intf[1].tod_clock = c64_pal ? 50 : 60;
+	/* CIA initialization */
+	cia_intf[0] = c64_cia0;
+	cia_intf[1] = c64_cia1;
+	cia_intf[0].tod_clock = c64_pal ? 50 : 60;
+	cia_intf[1].tod_clock = c64_pal ? 50 : 60;
 
-		cia_config(machine, 0, &cia_intf[0]);
-		cia_config(machine, 1, &cia_intf[1]);
-	}
+	cia_config(machine, 0, &cia_intf[0]);
+	cia_config(machine, 1, &cia_intf[1]);
 }
 
 DRIVER_INIT( c128 )
 {
+	c64_tape_on = 1;
 	c128_common_driver_init(machine);
 	vic6567_init (1, c64_pal,
 				  c128_dma_read, c128_dma_read_color, c64_vic_interrupt);
@@ -916,6 +926,7 @@ DRIVER_INIT( c128 )
 
 DRIVER_INIT( c128pal )
 {
+	c64_tape_on = 1;
 	c64_pal = 1;
 	c128_common_driver_init(machine);
 	vic6567_init (1, c64_pal,

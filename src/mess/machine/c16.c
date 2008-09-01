@@ -17,11 +17,12 @@
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 #include "machine/tpi6525.h"
 #include "video/ted7360.h"
 
 #include "includes/c16.h"
+
+#include "devices/cassette.h"
 
 static UINT8 keyline[10] =
 {
@@ -121,8 +122,12 @@ void c16_m7501_port_write(UINT8 data)
 	cbm_serial_atn_write (atn = !(data & 4));
 	cbm_serial_clock_write (clk = !(data & 2));
 	cbm_serial_data_write (dat = !(data & 1));
-	vc20_tape_write (!(data & 2));
-	vc20_tape_motor (data & 8);
+//	vc20_tape_write (!(data & 2));		// CASSETTE_RECORD not implemented yet
+
+//	Fix Me!
+//	HACK! we need to set the motor always ON, because !(data & 0x08) seems always 0
+//	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), !(data & 0x08) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 UINT8 c16_m7501_port_read(void)
@@ -136,10 +141,13 @@ UINT8 c16_m7501_port_read(void)
 	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read())
 		data &= ~0x40;
 
-	if (!vc20_tape_read())
+/*	data &= ~0x20; //port bit not in pinout */
+
+	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0)
+		data |=  0x10;
+	else
 		data &= ~0x10;
 
-/*	data &= ~0x20; //port bit not in pinout */
 	return data;
 }
 
@@ -293,7 +301,7 @@ WRITE8_HANDLER(plus4_6529_port_w)
 {
 	int data = 0;
 
-	if (vc20_tape_switch ())
+	if (!((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 4;
 	return data;
 }
@@ -302,7 +310,7 @@ WRITE8_HANDLER(plus4_6529_port_w)
 {
 	int data = 0;
 
-	if (vc20_tape_switch ())
+	if (!((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 4;
 	return data;
 }
@@ -467,8 +475,6 @@ static void c16_common_driver_init (running_machine *machine)
 
 
 	memset(mess_ram + (0xfd40 % mess_ram_size), 0xff, 0x20);
-
-	c16_tape_open ();
 
 	if ((read_cfg0(machine) & 0xc0 ) == 0x40)		/* C1551 */
 		c1551_config (0, 0, &config);
@@ -706,9 +712,6 @@ INTERRUPT_GEN( c16_frame_interrupt )
 	}
 
 	ted7360_frame_interrupt (machine, cpunum);
-
-	vc20_tape_config (input_port_read(machine, "DSW0") & 0x20, input_port_read(machine, "DSW0") & 0x10);	/* DATASSETTE, DATASSETTE_TONE */
-	vc20_tape_buttons (input_port_read(machine, "DSW0") & 0x04, input_port_read(machine, "DSW0") & 0x02, input_port_read(machine, "DSW0") & 0x01);	/* DATASETTE_PLAY, DATASETTE_RECORD, DATASETTE_STOP */
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x80 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
 	set_led_status (0, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/*KB_NUMLOCK_FLAG */

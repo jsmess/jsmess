@@ -35,7 +35,6 @@
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
-#include "includes/vc20tape.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
@@ -684,8 +683,8 @@ static void c64_bankswitch(running_machine *machine, int reset)
 		else if (loram && !hiram && !c64_game)	// remember we cannot be in ultimax_mode, no need of !c64_exrom
 		{
 			c64_io_enabled = 0;
-			c64_io_ram_w_ptr = c64_memory + 0xd000;
 			c64_io_ram_r_ptr = (!charen) ? c64_chargen : c64_memory + 0xd000;
+			c64_io_ram_w_ptr = c64_memory + 0xd000;
 		}
 		// IO/C
 		else
@@ -694,8 +693,8 @@ static void c64_bankswitch(running_machine *machine, int reset)
 
 			if (!charen)
 			{
-			c64_io_ram_w_ptr = c64_memory + 0xd000;
 			c64_io_ram_r_ptr = c64_chargen;
+			c64_io_ram_w_ptr = c64_memory + 0xd000;
 			}
 		}
 
@@ -756,12 +755,12 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 		{
 			if(!(data & 0x20))
 			{
-				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 			}
 			else
 			{
-				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 				timer_reset(datasette_timer, attotime_never);
 			}
 		}
@@ -905,7 +904,7 @@ static int c64_dma_read_color (int offset)
 
 double last = 0;
 
-static TIMER_CALLBACK( c64_tape_timer )
+TIMER_CALLBACK( c64_tape_timer )
 {
 	double tmp = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
 

@@ -45,6 +45,7 @@ void c64_common_init_machine (running_machine *machine);
 
 MACHINE_START( c64 );
 INTERRUPT_GEN( c64_frame_interrupt );
+TIMER_CALLBACK( c64_tape_timer );
 
 void c64_rom_load(running_machine *machine);
 void c64_rom_recognition (void);
