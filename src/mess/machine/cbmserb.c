@@ -45,6 +45,11 @@ static void cbm_drive_close (void)
 	for (i = 0; i < sizeof (cbm_drive) / sizeof (CBM_Drive); i++)
 	{
 		cbm_drive[i].interface = 0;
+		
+		if( cbm_drive[i].buffer ) {
+			free(cbm_drive[i].buffer);
+			cbm_drive[i].buffer = NULL;
+		}
 
 		if (cbm_drive[i].drive == D64_IMAGE)
 			cbm_drive[i].image = NULL;
