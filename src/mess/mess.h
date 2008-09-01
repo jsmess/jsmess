@@ -34,12 +34,6 @@ struct SystemConfigurationParamBlock;
 
 /**************************************************************************/
 
-/* MESS_DEBUG is a debug switch (for developers only) for
-   debug code, which should not be found in distributions, like testdrivers,...
-   contrary to MAME_DEBUG, NDEBUG it should not be found in the makefiles of distributions
-   use it in your private root makefile */
-/* #define MESS_DEBUG */
-
 /* Win32 defines this for vararg functions */
 #ifndef DECL_SPEC
 #define DECL_SPEC
