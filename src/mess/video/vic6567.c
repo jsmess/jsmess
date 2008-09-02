@@ -1348,10 +1348,10 @@ INTERRUPT_GEN( vic2_raster_irq )
 	int i;
 
 	vic2.rasterline++;
+
 	if (vic2.rasterline >= vic2.lines)
 	{
 		vic2.rasterline = 0;
-		if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines);
 
 		for (i = 0; i < 8; i++)
 			vic2.sprites[i].repeat = vic2.sprites[i].line = 0;
@@ -1362,10 +1362,11 @@ INTERRUPT_GEN( vic2_raster_irq )
 			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 	}
+
+	if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
+
 	if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
 	{
-		if (vic2.on)
-			vic2_drawlines (vic2.lastline, vic2.rasterline);
 		vic2_set_interrupt (1);
 	}
 }

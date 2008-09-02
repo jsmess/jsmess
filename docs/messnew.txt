@@ -22,6 +22,9 @@ System Driver Changes:
 
 - [C64] partial cleanup of memory bankswitch, based on docs [Fabio Priuli]
 
+- [C64] modified VIC II implementation: for every raster interrupt
+  the chip draw only one line. [Roberto Zandona']
+
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully 
   working, including the "Säkkijärven polkka" program. [Curt Coder]
