@@ -8,195 +8,180 @@
 
 #include "driver.h"
 #include "includes/advision.h"
+#include "cpu/mcs48/mcs48.h"
 #include "devices/cartslot.h"
 #include "sound/dac.h"
 
+/*
+    8048 Ports:
+    
+    P1  Bit 0..1  - RAM bank select
+        Bit 3..7  - Keypad input
 
-static unsigned char *advision_ram;
-static int advision_rambank;
-int advision_framestart;
-static int advision_videoenable;
-int advision_videobank;
-static int Lvalue[3];
-static int wLpointer;
-static int rLpointer;
-static int Dvalue;
-static int Gvalue;
+    P2  Bit 0..3  - A8-A11
+        Bit 4..7  - Sound control/Video write address
 
+    T1  Mirror sync pulse
+*/
 
+/* Machine Initialization */
 
-DRIVER_INIT( advision )
+MACHINE_START( advision )
 {
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main"), 0x1000);
+	/* configure EA banking */
+	memory_configure_bank(MCS48_INTERNAL_ROMBANK, 0, 1, memory_region(machine, "bios"), 0);
+	memory_configure_bank(MCS48_INTERNAL_ROMBANK, 1, 1, memory_region(machine, "main"), 0);
 }
-
 
 MACHINE_RESET( advision )
 {
-	advision_ram = memory_region(machine, "main") + 0x2000;
-	advision_rambank = 0x300;
-	memory_set_bank(1, 1);
-	advision_framestart = 0;
-	advision_videoenable = 0;
-	wLpointer = 0;
-	rLpointer = 0;
+	advision_state *state = machine->driver_data;
+
+	/* allocate external RAM */
+	state->extram = auto_malloc(0x400);
+
+	/* enable internal ROM */
+	cpunum_set_input_line(machine, 0, MCS48_INPUT_EA, CLEAR_LINE);
+
+	/* reset sound CPU */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
+	state->rambank = 0x300;
+	state->frame_start = 0;
+	state->video_enable = 0;
+	state->sound_cmd = 0;
 }
 
+/* Bank Switching */
 
-/****** External RAM ******************************/
-
-READ8_HANDLER( advision_MAINRAM_r )
+WRITE8_HANDLER( advision_bankswitch_w )
 {
-	int d;
+	advision_state *state = machine->driver_data;
 
-	d = advision_ram[advision_rambank + offset];
+	cpunum_set_input_line(machine, 0, MCS48_INPUT_EA, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* the video hardware interprets reads as writes */
-	if (!advision_videoenable)
-		advision_vh_write(d);
+	state->rambank = (data & 0x03) << 8;
+}
 
-	if (advision_videobank == 0x06)
+/* External RAM */
+
+READ8_HANDLER( advision_extram_r )
+{
+	advision_state *state = machine->driver_data;
+
+	UINT8 data = state->extram[state->rambank + offset];
+
+	if (!state->video_enable)
 	{
-		if (d & 0x01)
-		{
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
-			/*	logerror("RELEASE RESET\n"); */
-			wLpointer = 0;
-			rLpointer = 0;
-		}
-		else
-		{
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-			/*	logerror("SET RESET\n");*/
-		}
-
+		/* the video hardware interprets reads as writes */
+		advision_vh_write(machine, data);
 	}
 
-	return d;
+	if (state->video_bank == 0x06)
+	{
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	}
+
+	return data;
 }
 
- 
-WRITE8_HANDLER( advision_MAINRAM_w )
+WRITE8_HANDLER( advision_extram_w )
 {
-	advision_ram[advision_rambank + offset] = data;
+	advision_state *state = machine->driver_data;
+
+	state->extram[state->rambank + offset] = data;
 }
 
+/* Sound */
 
-READ8_HANDLER( advision_getL )
+READ8_HANDLER( advision_sound_cmd_r )
 {
-	int d = 0;
+	advision_state *state = machine->driver_data;
 
-	d = Lvalue[rLpointer];
-	if (rLpointer < 3)
-		rLpointer++;
-
-	/*	if (rLpointer == 0) {d = 0x0f; }
-	 if (rLpointer == 1) {d = 0x01; }
-	 rLpointer++;
-
-	 if (rLpointer > 1) rLpointer = 0; */
-
-	/* logerror("READ L: %x\n",d); */
-
-	return d;
+	return state->sound_cmd;
 }
 
-
-static void update_dac(void)
+static void update_dac(running_machine *machine)
 {
-	/*	logerror("Clock: %x D: %x  G:%x \n",activecpu_get_icount(),Dvalue, Gvalue); */
+	advision_state *state = machine->driver_data;
 
-	if (Gvalue == 0 && Dvalue == 0)
+	if (state->sound_g == 0 && state->sound_d == 0)
 		dac_data_w(0, 0xff);
-	else if (Gvalue == 1 && Dvalue == 1)
+	else if (state->sound_g == 1 && state->sound_d == 1)
 		dac_data_w(0, 0x80);
 	else
 		dac_data_w(0, 0x00);
 }
 
-
-WRITE8_HANDLER( advision_putG )
+WRITE8_HANDLER( advision_sound_g_w )
 {
-	Gvalue = data & 0x01;
-	update_dac();
+	advision_state *state = machine->driver_data;
+	state->sound_g = data & 0x01;
+	update_dac(machine);
 }
 
 
-WRITE8_HANDLER( advision_putD )
+WRITE8_HANDLER( advision_sound_d_w )
 {
-	Dvalue = data & 0x01;
-	update_dac();
+	advision_state *state = machine->driver_data;
+	state->sound_d = data & 0x01;
+	update_dac(machine);
 }
 
-
-static void sound_write(int data)
-{
-	Lvalue[wLpointer] = ((data & 0xf0) >> 4);
-	if (wLpointer < 3)
-		wLpointer++;
-	/* logerror("WRITE L: %x\n",data); */
-}
-
-
-
-/***** 8048 Ports ************************/
-
-WRITE8_HANDLER( advision_bankswitch_w )
-{
-	memory_set_bank(1, (data & 0x04) ? 0 : 1); /* BIOS enable */
-	advision_rambank = (data & 0x03) << 8;
-}
-
+/* Video */
 
 WRITE8_HANDLER( advision_av_control_w )
 {
-	sound_write(data);
+	advision_state *state = machine->driver_data;
 
-	if ((advision_videoenable == 0x00) && (data & 0x10))
+	state->sound_cmd = data >> 4;
+
+	if ((state->video_enable == 0x00) && (data & 0x10))
 	{
-		advision_vh_update(advision_vh_hpos);
-		advision_vh_hpos++;
-		if (advision_vh_hpos > 255)
+		advision_vh_update(machine, state->video_hpos);
+		
+		state->video_hpos++;
+		
+		if (state->video_hpos > 255)
 		{
-			advision_vh_hpos = 0;
+			state->video_hpos = 0;
 			logerror("HPOS OVERFLOW\n");
 		}
 	}
 	
-	advision_videoenable = data & 0x10;
-	advision_videobank = (data & 0xe0) >> 5;
+	state->video_enable = data & 0x10;
+	state->video_bank = (data & 0xe0) >> 5;
 }
 
-
-READ8_HANDLER( advision_controller_r )
+READ8_HANDLER( advision_vsync_r )
 {
-	int d, in;
+	advision_state *state = machine->driver_data;
 
-	// Get joystick switches
-	in = input_port_read(machine, "joystick");
-	d = in | 0x0f;
-
-	// Get buttons
-	if (in & 0x02) d = d & 0xf7; /* Button 3 */
-	if (in & 0x08) d = d & 0xcf; /* Button 1 */
-	if (in & 0x04) d = d & 0xaf; /* Button 2 */
-	if (in & 0x01) d = d & 0x6f; /* Button 4 */
-
-	return d & 0xf8;
-}
-
-
-READ8_HANDLER( advision_gett1 )
-{
-	if (advision_framestart)
+	if (state->frame_start)
 	{
-		advision_framestart = 0;
+		state->frame_start = 0;
+
 		return 0;
 	}
 	else
 	{
 		return 1;
 	}
+}
+
+/* Input */
+
+READ8_HANDLER( advision_controller_r )
+{
+	// Get joystick switches
+	UINT8 in = input_port_read(machine, "joystick");
+	UINT8 data = in | 0x0f;
+
+	// Get buttons
+	if (in & 0x02) data = data & 0xf7; /* Button 3 */
+	if (in & 0x08) data = data & 0xcf; /* Button 1 */
+	if (in & 0x04) data = data & 0xaf; /* Button 2 */
+	if (in & 0x01) data = data & 0x6f; /* Button 4 */
+
+	return data & 0xf8;
 }

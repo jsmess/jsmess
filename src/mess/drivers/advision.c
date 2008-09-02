@@ -6,78 +6,48 @@
 
 **************************************************************************/
 
-/* Core includes */
-#include "driver.h"
-#include "includes/advision.h"
-
-/* Components */
-#include "cpu/i8039/i8039.h"
-#include "cpu/cop400/cop400.h"
-
-/* Devices */
-#include "devices/cartslot.h"
-
-
-
-#define MAIN_CLOCK  XTAL_11MHz
-
-
-
-/*************************************
- *
- *  Memory maps
- *
- *************************************/
-
-static ADDRESS_MAP_START( advision_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(SMH_BANK1, SMH_ROM)
-	AM_RANGE(0x0400, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM	/* MAINRAM four banks */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( advision_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
-
-
 /*
-    8048 Ports:
-    
-    P1  Bit 0..1  - RAM bank select
-        Bit 3..7  - Keypad input
 
-    P2  Bit 0..3  - A8-A11
-        Bit 4..7  - Sound control/Video write address
+	TODO:
 
-    T1  Mirror sync pulse
+	- Turtles music is monotonous
+	- convert to discrete sound
+	- screen pincushion distortion
+
 */
 
-static ADDRESS_MAP_START( advision_ports, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff)         AM_READWRITE(advision_MAINRAM_r, advision_MAINRAM_w)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(advision_controller_r, advision_bankswitch_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(advision_av_control_w)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(advision_gett1)
+#include "driver.h"
+#include "includes/advision.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/cop400/cop400.h"
+#include "devices/cartslot.h"
+
+/* Memory Maps */
+ 
+static ADDRESS_MAP_START( program_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK(MCS48_INTERNAL_ROMBANK)
+	AM_RANGE(0x0400, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( advision_sound_ports, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff)                   AM_RAM
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READ(advision_getL)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(advision_putG)
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(advision_putD)
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0xff) AM_READWRITE(advision_extram_r, advision_extram_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(advision_controller_r, advision_bankswitch_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(advision_av_control_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(advision_vsync_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READ(advision_sound_cmd_r)
+	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(advision_sound_g_w)
+	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(advision_sound_d_w)
+	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_NOP
+	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_NOP
+ADDRESS_MAP_END
 
-
-/*************************************
- *
- *  Input ports
- *
- *************************************/
+/* Input Ports */
 
 static INPUT_PORTS_START( advision )
-    PORT_START("joystick")      /* IN0 */
+    PORT_START("joystick")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )       PORT_PLAYER(1)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )       PORT_PLAYER(1)
     PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )       PORT_PLAYER(1)
@@ -88,32 +58,28 @@ static INPUT_PORTS_START( advision )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 INPUT_PORTS_END
 
-
-
-/*************************************
- *
- *  Machine drivers
- *
- *************************************/
+/* Machine Driver */
 
 static COP400_INTERFACE( advision_cop411_interface )
 {
-	1
+	COP400_CKI_DIVISOR_4,
+	COP400_CKO_RAM_POWER_SUPPLY, // ??? or not connected
+	COP400_MICROBUS_DISABLED
 };
 
 static MACHINE_DRIVER_START( advision )
+	MDRV_DRIVER_DATA(advision_state)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8048, MAIN_CLOCK/15)
-	MDRV_CPU_PROGRAM_MAP(advision_mem, 0)
-	MDRV_CPU_IO_MAP(advision_ports, 0)
+	MDRV_CPU_ADD("main", I8048, XTAL_11MHz)
+	MDRV_CPU_PROGRAM_MAP(program_map, 0)
+	MDRV_CPU_IO_MAP(io_map, 0)
 
-	MDRV_CPU_ADD("sound", COP411, 52631)
+	MDRV_CPU_ADD("sound", COP411, 52631*16) // COP411L-KCN/N
 	MDRV_CPU_CONFIG(advision_cop411_interface)
-	MDRV_CPU_PROGRAM_MAP(advision_sound_mem, 0)
-	MDRV_CPU_IO_MAP(advision_sound_ports, 0)
+	MDRV_CPU_IO_MAP(sound_io_map, 0)
 
-	MDRV_INTERLEAVE(10)
-
+	MDRV_MACHINE_START( advision )
 	MDRV_MACHINE_RESET( advision )
 
     /* video hardware */
@@ -123,7 +89,7 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(8+2)
+	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(advision)
 
 	MDRV_VIDEO_START(advision)
@@ -135,41 +101,26 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-
-
-/*************************************
- *
- *  ROM definitions
- *
- *************************************/
+/* ROMs */
 
 ROM_START( advision )
-	ROM_REGION( 0x2800, "main", 0 )
-    ROM_LOAD( "avbios.rom", 0x1000, 0x0400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
+	ROM_REGION( 0x1000, "main", 0 )
 	ROM_CART_LOAD( 0, "bin", 0x0000, 0x1000, ROM_NOMIRROR | ROM_FULLSIZE )
-	ROM_REGION( 0x0400, "sound", 0 )
-	ROM_LOAD( "avsound.bin", 0x0000, 0x0200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) )
+
+	ROM_REGION( 0x400, "bios", 0 )
+    ROM_LOAD( "avbios.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
+
+	ROM_REGION( 0x200, "sound", 0 )
+	ROM_LOAD( "avsound.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) )
 ROM_END
 
-
-
-/*************************************
- *
- *  System config
- *
- *************************************/
+/* System Configuration */
 
 static SYSTEM_CONFIG_START( advision )
 	CONFIG_DEVICE( cartslot_device_getinfo )
 SYSTEM_CONFIG_END
 
-
-
-/*************************************
- *
- *  Game drivers
- *
- *************************************/
-
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY   FULLNAME */
-CONS( 1982, advision,	0,		0,		advision, advision,	advision,	advision,	"Entex",  "Adventure Vision", 0 )
+/* Game Driver */
+	
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY					FULLNAME			FLAGS */
+CONS( 1982, advision,	0,		0,		advision, advision,	0,			advision,	"Entex Electronics",	"Adventure Vision", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

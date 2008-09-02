@@ -12,12 +12,6 @@
 #include "driver.h"
 #include "includes/advision.h"
 
-static UINT8 advision_led_latch[8];
-static UINT8 *advision_display;
-
-int advision_vh_hpos;
-
-
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -25,9 +19,11 @@ int advision_vh_hpos;
 ***************************************************************************/
 VIDEO_START( advision )
 {
-    advision_vh_hpos = 0;
-	advision_display = (UINT8 *)auto_malloc(8 * 8 * 256);
-	memset(advision_display, 0, 8 * 8 * 256);
+	advision_state *state = machine->driver_data;
+
+    state->video_hpos = 0;
+	state->display = auto_malloc(8 * 8 * 256);
+	memset(state->display, 0, 8 * 8 * 256);
 }
 
 /***************************************************************************
@@ -39,32 +35,35 @@ VIDEO_START( advision )
 PALETTE_INIT( advision )
 {
 	int i;
+
 	for( i = 0; i < 8; i++ )
 	{
 		/* 8 shades of RED */
 		palette_set_color_rgb(machine, i, i * 0x22, 0x00, 0x00);
 	}
-
-	palette_set_color_rgb(machine, 8, 0x55, 0x55, 0x55);	/* DK GREY - for MAME text only */
-	palette_set_color_rgb(machine, 9, 0xf0, 0xf0, 0xf0);	/* LT GREY - for MAME text only */
 }
 
-void advision_vh_write(int data)
+void advision_vh_write(running_machine *machine, int data)
 {
-	if (advision_videobank >= 1 && advision_videobank <=5)
+	advision_state *state = machine->driver_data;
+
+	if (state->video_bank >= 1 && state->video_bank <=5)
 	{
-		advision_led_latch[advision_videobank] = data;
+		state->led_latch[state->video_bank] = data;
 	}
 }
 
-void advision_vh_update(int x)
+void advision_vh_update(running_machine *machine, int x)
 {
-    UINT8 *dst = &advision_display[x];
+	advision_state *state = machine->driver_data;
+
+    UINT8 *dst = &state->display[x];
 	int y;
 
 	for( y = 0; y < 8; y++ )
 	{
-		UINT8 data = advision_led_latch[7-y];
+		UINT8 data = state->led_latch[7-y];
+
 		if( (data & 0x80) == 0 ) dst[0 * 256] = 8;
 		if( (data & 0x40) == 0 ) dst[1 * 256] = 8;
 		if( (data & 0x20) == 0 ) dst[2 * 256] = 8;
@@ -73,7 +72,9 @@ void advision_vh_update(int x)
 		if( (data & 0x04) == 0 ) dst[5 * 256] = 8;
 		if( (data & 0x02) == 0 ) dst[6 * 256] = 8;
 		if( (data & 0x01) == 0 ) dst[7 * 256] = 8;
-		advision_led_latch[7-y] = 0xff;
+
+		state->led_latch[7-y] = 0xff;
+
 		dst += 8 * 256;
     }
 }
@@ -87,25 +88,29 @@ void advision_vh_update(int x)
 
 VIDEO_UPDATE( advision )
 {
+	advision_state *state = screen->machine->driver_data;
+
 	int x, y, bit;
 
     static int framecount = 0;
 
     if( (framecount++ % 8) == 0 )
 	{
-		advision_framestart = 1;
-		advision_vh_hpos = 0;
+		state->frame_start = 1;
+		state->video_hpos = 0;
     }
 
-	for( x = (framecount%2)*128; x < (framecount%2)*128+128; x++ )
+	for( x = (framecount % 2) * 128; x < (framecount % 2) * 128+128; x++ )
 	{
-		UINT8 *led = &advision_display[x];
+		UINT8 *led = &state->display[x];
+		
 		for( y = 0; y < 8; y++ )
 		{
 			for( bit = 0; bit < 8; bit++ )
 			{
 				if( *led > 0 )
 					*BITMAP_ADDR16(bitmap, 30 + 2 *( y * 8 + bit), 85 + x) = --(*led);
+
 				led += 256;
 			}
 		}
