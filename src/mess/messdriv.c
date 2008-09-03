@@ -492,7 +492,7 @@ XL/XE 16kB OS roms
 	DRIVER( ti86 )		/* 1997 TI-86 (Z80 6 MHz)							*/
 	DRIVER( ti83p )		/* 1999 TI-83 Plus (Z80 6 MHz)						*/
 //	DRIVER( ti83pse )	/* 2001 TI-83 Plus Silver Edition					*/
-//	DRIVER( ti84p )	/* 2004 TI-84 Plus									*/
+//	DRIVER( ti84p )		/* 2004 TI-84 Plus									*/
 //	DRIVER( ti84pse )	/* 2004 TI-84 Plus Silver Edition					*/
 
 	/* NEC */
@@ -675,11 +675,9 @@ XL/XE 16kB OS roms
 	DRIVER( phc70fd2 )	/* 1988 MSX2+ Japan									*/
 	DRIVER( phc35j )	/* 1989 MSX2+ Japan									*/
 
-
 	/* NASCOM MICROCOMPUTERS */
 	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
 	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
-
 
 	/* MILES GORDON TECHNOLOGY */
 	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
@@ -729,8 +727,8 @@ XL/XE 16kB OS roms
 	DRIVER( primoa32 )	/* Primo A-32										*/
 	DRIVER( primoa48 )	/* Primo A-48										*/
 	DRIVER( primoa64 )	/* Primo A-64										*/
-  DRIVER( primob32 )	/* Primo B-32										*/
-  DRIVER( primob48 )	/* Primo B-48										*/
+	DRIVER( primob32 )	/* Primo B-32										*/
+	DRIVER( primob48 )	/* Primo B-48										*/
 	DRIVER( primob64 )	/* Primo B-64										*/
 	DRIVER( primoc64 )	/* Primo C-64										*/
 
@@ -820,9 +818,9 @@ XL/XE 16kB OS roms
 	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
-//	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
-//	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
-//	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
+	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
+	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
+	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
 	DRIVER( super80 )

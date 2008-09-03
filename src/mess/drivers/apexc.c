@@ -876,5 +876,5 @@ static SYSTEM_CONFIG_START(apexc)
 SYSTEM_CONFIG_END
 
 /*         YEAR     NAME        PARENT          COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-/*COMP( c. 1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,  apexc,  "Booth",    "APEXC (as described in 1953)" , 0)*/
+//COMP(      1951,    apexc53,    0,              0,      apexc53,    apexc,  apexc,  apexc,  "Booth",    "APEXC (as described in 1953)" , GAME_NOT_WORKING)
 COMP(      1955,	apexc,		/*apexc53*/0,	0,		apexc,		apexc,	apexc,	apexc,	"Booth",	"APEXC (as described in 1957)" , 0)

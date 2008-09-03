@@ -266,9 +266,7 @@ static DRIVER_INIT( mephisto )
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY             FULLNAME                            FLAGS */
-#if 0
-CONS( 1983, mephisto,   0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto Schach Computer",         0 )
-#endif
+//CONS( 1983, mephisto,   0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto Schach Computer",         GAME_NOT_WORKING )
 CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       0 )
 CONS( 1990, mm5,        0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     0 )
 CONS( 1990, mm50,       0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     0 )
