@@ -259,8 +259,8 @@ SYSTEM_CONFIG_END
 static MACHINE_DRIVER_START( cybikov1 )
 	// cpu
 	//MDRV_CPU_ADD( "main", H8S2241, 11059200)
-	MDRV_CPU_PROGRAM_MAP( cybikov1_mem, 0)
-	MDRV_CPU_IO_MAP( cybikov1_io, 0)
+	//MDRV_CPU_PROGRAM_MAP( cybikov1_mem, 0)
+	//MDRV_CPU_IO_MAP( cybikov1_io, 0)
 	// screen
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60)
@@ -289,8 +289,8 @@ static MACHINE_DRIVER_START( cybikov2 )
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu
 	//MDRV_CPU_REPLACE( "main", H8S2246, 11059200)
-	MDRV_CPU_PROGRAM_MAP( cybikov2_mem, 0)
-	MDRV_CPU_IO_MAP( cybikov2_io, 0)
+	//MDRV_CPU_PROGRAM_MAP( cybikov2_mem, 0)
+	//MDRV_CPU_IO_MAP( cybikov2_io, 0)
 	// machine
 	MDRV_MACHINE_START( cybikov2)
 	MDRV_MACHINE_RESET( cybikov2)
@@ -303,8 +303,8 @@ static MACHINE_DRIVER_START( cybikoxt )
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu
 	//MDRV_CPU_REPLACE( "main", H8S2323, 18432000)
-	MDRV_CPU_PROGRAM_MAP( cybikoxt_mem, 0)
-	MDRV_CPU_IO_MAP( cybikoxt_io, 0)
+	//MDRV_CPU_PROGRAM_MAP( cybikoxt_mem, 0)
+	//MDRV_CPU_IO_MAP( cybikoxt_io, 0)
 	// sound
 	MDRV_SPEAKER_REMOVE( "mono")
 	MDRV_SOUND_REMOVE( "speaker")
