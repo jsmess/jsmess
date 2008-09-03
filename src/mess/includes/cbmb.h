@@ -32,7 +32,7 @@ DRIVER_INIT( cbm600hu );
 DRIVER_INIT( cbm700 );
 MACHINE_RESET( cbmb );
 
-void cbmb_rom_load(void);
+void cbmb_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 /*----------- defined in video/cbmb.c -----------*/

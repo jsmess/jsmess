@@ -12,11 +12,14 @@
 
 /* global header file for c16, c64, c65, c128, vc20 */
 
-/**************************************************************************
- * Logging
- * call the XXX_LOG with XXX_LOG("info",("%fmt\n",args));
- * where "info" can also be 0 to append .."%fmt",args to a line.
- **************************************************************************/
+/***********************************************
+
+	CBM Debug Logging Macro
+
+***********************************************/
+
+/* call the XXX_LOG with XXX_LOG("info",("%fmt\n",args));			*
+ * where "info" can also be 0 to append .."%fmt",args to a line.	*/
 
 #define LOG(LEVEL,N,M,A)  \
         { \
@@ -59,15 +62,6 @@ QUICKLOAD_LOAD( cbm_c65 );
 
 #define CBM_QUICKLOAD_DELAY_SECONDS 3
 
-typedef struct {
-#define CBM_ROM_ADDR_UNKNOWN 0
-#define CBM_ROM_ADDR_LO -1
-#define CBM_ROM_ADDR_HI -2
-	int addr, size;
-	UINT8 *chip;
-} CBM_ROM;
-
-
 
 /***********************************************
 
@@ -76,9 +70,16 @@ typedef struct {
 ***********************************************/
 
 
-extern INT8 cbm_c64_game;
-extern INT8 cbm_c64_exrom;
-extern CBM_ROM cbm_rom[0x20];
+#define CBM_ROM_ADDR_UNKNOWN 0
+#define CBM_ROM_ADDR_LO -1
+#define CBM_ROM_ADDR_HI -2
+
+typedef struct {
+	int addr, size /*, bank*/;	// mi serve prob questo per implementare il corretto caricamento delle cart tipo >0!
+	UINT8 *chip;
+} CBM_ROM;
+
+
 
 /* prg file format
  * sfx file format
@@ -93,9 +94,6 @@ extern CBM_ROM cbm_rom[0x20];
  * 0x0018 0 0
  * 0x001a lsb 16bit address
  * 0x001c data */
-
-void cbmcartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-
 
 
 /***********************************************

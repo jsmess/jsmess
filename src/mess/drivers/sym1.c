@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "includes/sym1.h"
-#include "includes/cbm.h"
 
 /* Peripheral chips */
 #include "machine/6532riot.h"
@@ -155,19 +154,8 @@ ROM_END
 ******************************************************************************/
 
 
-static void sym1_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "60,0080,c0"); break;
-
-		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( sym1 )
-	CONFIG_DEVICE(sym1_cbmcartslot_getinfo)
+	CONFIG_DEVICE(sym1_cartslot_getinfo)
 	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
 	CONFIG_RAM        (3 * 1024) /* 3KB RAM */
 	CONFIG_RAM        (2 * 1024) /* 2KB RAM */

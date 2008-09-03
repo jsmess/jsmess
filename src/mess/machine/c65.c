@@ -777,7 +777,7 @@ static void c65_common_driver_init (running_machine *machine)
 	memory_set_bankptr(14, c64_memory + 0x0c000);
 	memory_set_bankptr(15, c64_memory + 0x0e000);
 
-	c64_tape_on = 0;
+	c64_tape_on = 1;
 	/*memset(c64_memory+0x40000, 0, 0x800000-0x40000); */
 
 	{
@@ -821,9 +821,6 @@ MACHINE_START( c65 )
 	c64_vicaddr = c64_memory;
 
 	c64mode = 0;
-
-	c64_rom_recognition ();
-	c64_rom_load(machine);
 
 	c65_bankswitch_interface(0xff);
 	c65_bankswitch (machine);

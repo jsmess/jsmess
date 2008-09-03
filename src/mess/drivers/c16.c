@@ -162,7 +162,6 @@ when problems start with -log and look into error.log file
 #include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
-#include "devices/cartslot.h"
 
 #include "includes/c16.h"
 
@@ -618,7 +617,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c16v )
 	MDRV_IMPORT_FROM( c16 )
-	MDRV_IMPORT_FROM( cpu_vc1541 )
+//	MDRV_IMPORT_FROM( cpu_vc1541 )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
 #else
@@ -653,7 +652,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( plus4v )
 	MDRV_IMPORT_FROM( plus4 )
-	MDRV_IMPORT_FROM( cpu_vc1541 )
+//	MDRV_IMPORT_FROM( cpu_vc1541 )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -686,26 +685,9 @@ DRIVER_INIT( plus4v )	{ c16_driver_init(machine); }
 DRIVER_INIT( c364 )		{ c16_driver_init(machine); }
 #endif
 
-static void c16cart_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(c16_rom); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,rom"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 
 static SYSTEM_CONFIG_START(c16)
-	CONFIG_DEVICE(c16cart_device_getinfo)
+	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM(16 * 1024)
@@ -714,7 +696,7 @@ static SYSTEM_CONFIG_START(c16)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16c)
-	CONFIG_DEVICE(c16cart_device_getinfo)
+	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
 	CONFIG_RAM(16 * 1024)
@@ -723,7 +705,7 @@ static SYSTEM_CONFIG_START(c16c)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16v)
-	CONFIG_DEVICE(c16cart_device_getinfo)
+	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM(16 * 1024)
@@ -732,21 +714,21 @@ static SYSTEM_CONFIG_START(c16v)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plus)
-	CONFIG_DEVICE(c16cart_device_getinfo)
+	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusc)
-	CONFIG_DEVICE(c16cart_device_getinfo)
+	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusv)
-	CONFIG_DEVICE(c16cart_device_getinfo)
+	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)

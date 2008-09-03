@@ -219,7 +219,8 @@ static MACHINE_DRIVER_START( c65pal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 MACHINE_DRIVER_END
 
-static SYSTEM_CONFIG_START(c65)
+static SYSTEM_CONFIG_START( c65 )
+	CONFIG_DEVICE(c64_cartslot_getinfo)	// to investigate which carts could work in the c65 expansion port!
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_RAM((128 + 512) * 1024)

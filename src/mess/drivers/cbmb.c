@@ -608,24 +608,13 @@ static MACHINE_DRIVER_START( cbm500 )
 	MDRV_QUICKLOAD_ADD(cbm500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 MACHINE_DRIVER_END
 
-static void cbmb_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,10,20,40,60"); break;
-
-		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 
 static SYSTEM_CONFIG_START(cbmb)
-	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
+	CONFIG_DEVICE(cbmb_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(cbm500)
-	CONFIG_DEVICE(cbmb_cbmcartslot_getinfo)
+	CONFIG_DEVICE(cbmb_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /*     YEAR     NAME      PARENT    COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY                             FULLNAME */

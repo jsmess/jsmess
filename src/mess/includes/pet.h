@@ -42,7 +42,8 @@ DRIVER_INIT( superpet );
 MACHINE_RESET( pet );
 INTERRUPT_GEN( pet_frame_interrupt );
 
-void pet_rom_load(void);
+void pet_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void pet4_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 #endif /* PET_H_ */

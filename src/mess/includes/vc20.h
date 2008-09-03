@@ -30,17 +30,14 @@ int vic6560_dma_read_color (int offset);
 /* VIC reads bits 0 till 7 */
 int vic6560_dma_read (int offset);
 
-DEVICE_START(vc20_rom);
-DEVICE_IMAGE_LOAD(vc20_rom);
-
 DRIVER_INIT( vc20 );
 DRIVER_INIT( vic20 );
 DRIVER_INIT( vic20i );
 DRIVER_INIT( vic1001 );
-void vc20_driver_shutdown (void);
 
-MACHINE_RESET( vc20 );
-INTERRUPT_GEN( vc20_frame_interrupt );
+MACHINE_RESET( vic20 );
+INTERRUPT_GEN( vic20_frame_interrupt );
 
+void vic20_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 #endif /* VC20_H_ */

@@ -18,9 +18,7 @@
 	
 	TODO:
 	* write to tape
-	* FFW & REW
 	* support for .tap files
-	* fix implementation for other CBM machines
 */
 
 #include "driver.h"
@@ -42,6 +40,7 @@
 #include "includes/c128.h"      /* we need c128_bankswitch_64 in MACHINE_START */
 
 #include "devices/cassette.h"
+#include "devices/cartslot.h"
 
 unsigned char c65_keyline = { 0xff };
 UINT8 c65_6511_port=0xff;
@@ -67,26 +66,18 @@ UINT8 *c64_colorram;
 UINT8 *c64_basic;
 UINT8 *c64_kernal;
 UINT8 *c64_chargen;
-UINT8 *c64_roml=0;
-UINT8 *c64_romh=0;
+UINT8 *c64_roml = 0;
+UINT8 *c64_romh = 0;
 static UINT8 *c64_io_mirror = NULL;
 
 static UINT8 c64_port_data;
 
-static UINT8 *roml=0, *romh=0;
+static UINT8 *roml = 0, *romh = 0;
 static int ultimax = 0;
 int c64_tape_on = 1;
 static int c64_cia1_on = 1;
-static UINT8 cartridge = 0;
 static int c64_io_enabled = 0;
 
-static enum
-{
-	CartridgeAuto = 0, 
-	CartridgeUltimax, 
-	CartridgeC64
-}
-cartridgetype = CartridgeAuto;
 
 static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq = 0;
@@ -110,7 +101,7 @@ static void c64_nmi(running_machine *machine)
 	{
 		if (is_c128(machine))
 		{
-			if (cpu_getactivecpu()==0)
+			if (cpu_getactivecpu() == 0)
 			{
 				/* z80 */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
@@ -152,109 +143,116 @@ static UINT8 c64_cia0_port_a_r (void)
 	UINT8 value = 0xff;
 	UINT8 cia0portb = cia_get_output_b(0);
 
-	if (!(cia0portb&0x80))
+	if (!(cia0portb & 0x80))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x80)) t&=~0x80;
-		if (!(c64_keyline[6]&0x80)) t&=~0x40;
-		if (!(c64_keyline[5]&0x80)) t&=~0x20;
-		if (!(c64_keyline[4]&0x80)) t&=~0x10;
-		if (!(c64_keyline[3]&0x80)) t&=~0x08;
-		if (!(c64_keyline[2]&0x80)) t&=~0x04;
-		if (!(c64_keyline[1]&0x80)) t&=~0x02;
-		if (!(c64_keyline[0]&0x80)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x80)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x80)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x80)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x80)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x80)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x80)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x80)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x80)) t &= ~0x01;
+		value &= t;
 	}
-	if (!(cia0portb&0x40))
+
+	if (!(cia0portb & 0x40))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x40)) t&=~0x80;
-		if (!(c64_keyline[6]&0x40)) t&=~0x40;
-		if (!(c64_keyline[5]&0x40)) t&=~0x20;
-		if (!(c64_keyline[4]&0x40)) t&=~0x10;
-		if (!(c64_keyline[3]&0x40)) t&=~0x08;
-		if (!(c64_keyline[2]&0x40)) t&=~0x04;
-		if (!(c64_keyline[1]&0x40)) t&=~0x02;
-		if (!(c64_keyline[0]&0x40)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x40)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x40)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x40)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x40)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x40)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x40)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x40)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x40)) t &= ~0x01;
+		value &= t;
 	}
-	if (!(cia0portb&0x20))
+
+	if (!(cia0portb & 0x20))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x20)) t&=~0x80;
-		if (!(c64_keyline[6]&0x20)) t&=~0x40;
-		if (!(c64_keyline[5]&0x20)) t&=~0x20;
-		if (!(c64_keyline[4]&0x20)) t&=~0x10;
-		if (!(c64_keyline[3]&0x20)) t&=~0x08;
-		if (!(c64_keyline[2]&0x20)) t&=~0x04;
-		if (!(c64_keyline[1]&0x20)) t&=~0x02;
-		if (!(c64_keyline[0]&0x20)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x20)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x20)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x20)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x20)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x20)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x20)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x20)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x20)) t &= ~0x01;
+		value &= t;
 	}
-	if (!(cia0portb&0x10))
+
+	if (!(cia0portb & 0x10))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x10)) t&=~0x80;
-		if (!(c64_keyline[6]&0x10)) t&=~0x40;
-		if (!(c64_keyline[5]&0x10)) t&=~0x20;
-		if (!(c64_keyline[4]&0x10)) t&=~0x10;
-		if (!(c64_keyline[3]&0x10)) t&=~0x08;
-		if (!(c64_keyline[2]&0x10)) t&=~0x04;
-		if (!(c64_keyline[1]&0x10)) t&=~0x02;
-		if (!(c64_keyline[0]&0x10)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x10)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x10)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x10)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x10)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x10)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x10)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x10)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x10)) t &= ~0x01;
+		value &= t;
 	}
-	if (!(cia0portb&0x08))
+
+	if (!(cia0portb & 0x08))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x08)) t&=~0x80;
-		if (!(c64_keyline[6]&0x08)) t&=~0x40;
-		if (!(c64_keyline[5]&0x08)) t&=~0x20;
-		if (!(c64_keyline[4]&0x08)) t&=~0x10;
-		if (!(c64_keyline[3]&0x08)) t&=~0x08;
-		if (!(c64_keyline[2]&0x08)) t&=~0x04;
-		if (!(c64_keyline[1]&0x08)) t&=~0x02;
-		if (!(c64_keyline[0]&0x08)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x08)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x08)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x08)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x08)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x08)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x08)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x08)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x08)) t &= ~0x01;
+		value &= t;
 	}
-	if (!(cia0portb&0x04))
+
+	if (!(cia0portb & 0x04))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x04)) t&=~0x80;
-		if (!(c64_keyline[6]&0x04)) t&=~0x40;
-		if (!(c64_keyline[5]&0x04)) t&=~0x20;
-		if (!(c64_keyline[4]&0x04)) t&=~0x10;
-		if (!(c64_keyline[3]&0x04)) t&=~0x08;
-		if (!(c64_keyline[2]&0x04)) t&=~0x04;
-		if (!(c64_keyline[1]&0x04)) t&=~0x02;
-		if (!(c64_keyline[0]&0x04)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x04)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x04)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x04)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x04)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x04)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x04)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x04)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x04)) t &= ~0x01;
+		value &= t;
 	}
-	if (!(cia0portb&0x02))
+
+	if (!(cia0portb & 0x02))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x02)) t&=~0x80;
-		if (!(c64_keyline[6]&0x02)) t&=~0x40;
-		if (!(c64_keyline[5]&0x02)) t&=~0x20;
-		if (!(c64_keyline[4]&0x02)) t&=~0x10;
-		if (!(c64_keyline[3]&0x02)) t&=~0x08;
-		if (!(c64_keyline[2]&0x02)) t&=~0x04;
-		if (!(c64_keyline[1]&0x02)) t&=~0x02;
-		if (!(c64_keyline[0]&0x02)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x02)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x02)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x02)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x02)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x02)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x02)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x02)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x02)) t &= ~0x01;
+		value &= t;
 	}
-	if (!(cia0portb&0x01))
+
+	if (!(cia0portb & 0x01))
 	{
-		UINT8 t=0xff;
-		if (!(c64_keyline[7]&0x01)) t&=~0x80;
-		if (!(c64_keyline[6]&0x01)) t&=~0x40;
-		if (!(c64_keyline[5]&0x01)) t&=~0x20;
-		if (!(c64_keyline[4]&0x01)) t&=~0x10;
-		if (!(c64_keyline[3]&0x01)) t&=~0x08;
-		if (!(c64_keyline[2]&0x01)) t&=~0x04;
-		if (!(c64_keyline[1]&0x01)) t&=~0x02;
-		if (!(c64_keyline[0]&0x01)) t&=~0x01;
-		value &=t;
+		UINT8 t = 0xff;
+		if (!(c64_keyline[7] & 0x01)) t &= ~0x80;
+		if (!(c64_keyline[6] & 0x01)) t &= ~0x40;
+		if (!(c64_keyline[5] & 0x01)) t &= ~0x20;
+		if (!(c64_keyline[4] & 0x01)) t &= ~0x10;
+		if (!(c64_keyline[3] & 0x01)) t &= ~0x08;
+		if (!(c64_keyline[2] & 0x01)) t &= ~0x04;
+		if (!(c64_keyline[1] & 0x01)) t &= ~0x02;
+		if (!(c64_keyline[0] & 0x01)) t &= ~0x01;
+		value &= t;
 	}
 
 	if ( input_port_read(Machine, "DSW0") & 0x0100 )
@@ -295,8 +293,8 @@ static UINT8 c64_cia0_port_b_r (void)
     }
     if (is_c65(Machine))
 	{
-		if (!(c65_6511_port&2))
-			value&=c65_keyline;
+		if (!(c65_6511_port & 0x02))
+			value &= c65_keyline;
     }
 
     return value;
@@ -316,7 +314,7 @@ static void c64_irq (running_machine *machine, int level)
 		DBG_LOG (3, "mos6510", ("irq %s\n", level ? "start" : "end"));
 		if (is_c128(machine))
 		{
-			if (0&&(cpu_getactivecpu()==0))
+			if (0 && (cpu_getactivecpu() == 0))
 			{
 				cpunum_set_input_line(machine, 0, 0, level);
 			}
@@ -378,8 +376,10 @@ static UINT8 c64_cia1_port_a_r (void)
 
 	if (!serial_clock || !cbm_serial_clock_read ())
 		value &= ~0x40;
+
 	if (!serial_data || !cbm_serial_data_read ())
 		value &= ~0x80;
+
 	return value;
 }
 
@@ -389,11 +389,11 @@ static void c64_cia1_port_a_w (UINT8 data)
 
 	cbm_serial_clock_write (serial_clock = !(data & 0x10));
 	cbm_serial_data_write (serial_data = !(data & 0x20));
-	cbm_serial_atn_write (serial_atn = !(data & 8));
-	c64_vicaddr = c64_memory + helper[data & 3];
+	cbm_serial_atn_write (serial_atn = !(data & 0x08));
+	c64_vicaddr = c64_memory + helper[data & 0x03];
 	if (is_c128(Machine))
 	{
-		c128_vicaddr = c64_memory + helper[data & 3] + c128_va1617;
+		c128_vicaddr = c64_memory + helper[data & 0x03] + c128_va1617;
 	}
 }
 
@@ -476,25 +476,33 @@ READ8_HANDLER( c64_read_io )
 {
 	if (offset < 0x400)
 		return vic2_port_r (machine, offset & 0x3ff);
+
 	else if (offset < 0x800)
 		return sid6581_0_port_r (machine, offset & 0x3ff);
+
 	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];
+
 	else if (offset == 0xc00)
 		{
 			cia_set_port_mask_value(0, 0, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[8] : c64_keyline[9] );
 			return cia_0_r(machine, offset);
 		}
+
 	else if (offset == 0xc01)
 		{
 			cia_set_port_mask_value(0, 1, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[9] : c64_keyline[8] );
 			return cia_0_r(machine, offset);
 		}
+
 	else if (offset < 0xd00)
 		return cia_0_r(machine, offset);
+
 	else if (c64_cia1_on && (offset < 0xe00))
 		return cia_1_r(machine, offset);
+
 	DBG_LOG (1, "io read", ("%.3x\n", offset));
+
 	return 0xff;
 }
 
@@ -636,6 +644,8 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	loram  = (data & 1) ? 1 : 0;
 	hiram  = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
+	logerror("Bankswitch mode || charen, ultimax\n");
+	logerror("%d, %d, %d, %d  ||   %d,      %d  \n", loram, hiram, c64_game, c64_exrom, charen, ultimax_mode);
 
 	if (ultimax_mode)
 	{
@@ -784,10 +794,13 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
-	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
-		data &= ~0x10;
-	else
-		data |=  0x10;
+	if (c64_tape_on)
+	{
+		if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+			data &= ~0x10;
+		else
+			data |=  0x10;
+	}
 
 	if (is_c65(machine)) 
 	{
@@ -804,59 +817,93 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 
 int c64_paddle_read (int which)
 {
-	int pot1=0xff, pot2=0xff, pot3=0xff, pot4=0xff, temp;
+	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = cia_get_output_a(0);
+	int controller = input_port_read(Machine, "DSW0") & 0x0e00;
 
-	if ((input_port_read(Machine, "DSW0") & 0x0e00 ) == 0x0400)					/* Paddle_2 and Paddle_3 */
+	if (which)
 	{
-		if (which) 
-			pot4 = (input_port_read(Machine, "PADDLE3") & 0xff);
-		else 
-			pot3 = (input_port_read(Machine, "PADDLE2") & 0xff);
+		switch (controller)
+		{
+			case 0x0400:
+				pot4 = (input_port_read(Machine, "PADDLE3") & 0xff);
+				break;
+
+			case 0x0600:
+				if (input_port_read(Machine, "JOY1") & 0x20)	/* Joy1 Button 2 */
+					pot4 = 0x00;
+				break;
+			
+			case 0x0800:
+				pot4 = input_port_read(Machine, "TRACKY");
+				break;
+
+			case 0x4000:
+				pot2 = (input_port_read(Machine, "PADDLE1") & 0xff);
+				break;
+
+			case 0x6000:
+				if (input_port_read(Machine, "JOY0") & 0x20)	/* Joy0 Button 2 */
+					pot1 = 0x00;
+				break;
+			
+			case 0x8000:
+				pot2 = input_port_read(Machine, "TRACKY");
+				break;
+		
+			case 0xa000:
+				break;
+		
+			default:
+				logerror("Invalid Controller Setting %d\n", controller);
+				break;
+		}
 	}
-	if (( (input_port_read(Machine, "DSW0") & 0x0e00) == 0x0600 ) && which)		/* 2 Buttons Joystick_2 */
+	else
 	{
-		if (input_port_read(Machine, "JOY1") & 0x20 )
-			pot4 = 0x00;
+		switch (controller)
+		{
+			case 0x0400:
+				pot3 = (input_port_read(Machine, "PADDLE2") & 0xff);
+				break;
+			
+			case 0x0800:
+				pot3 = input_port_read(Machine, "TRACKX");
+				break;
+
+			case 0x4000:
+				pot1 = (input_port_read(Machine, "PADDLE0") & 0xff);
+				break;
+
+			case 0x8000:
+				pot1 = input_port_read(Machine, "TRACKX");
+				break;
+				
+			case 0x0600:
+			case 0x6000:
+			case 0xa000:
+				break;
+		
+			default:
+				logerror("Invalid Controller Setting %d\n", controller);
+				break;
+		}
 	}
-	if ( (input_port_read(Machine, "DSW0") & 0x0e00) == 0x0800 )				/* Mouse_2 */
-	{
-		if (which) 
-			pot4 = input_port_read(Machine, "TRACKY");
-		else 
-			pot3 = input_port_read(Machine, "TRACKX");
-	}
-	if ((input_port_read(Machine, "DSW0") & 0xe000 ) == 0x4000)					/* Paddle_0 & Paddle_1 */
-	{
-		if (which) 
-			pot2 = (input_port_read(Machine, "PADDLE1") & 0xff);
-		else 
-			pot1 = (input_port_read(Machine, "PADDLE0") & 0xff);
-	}
-	if (( (input_port_read(Machine, "DSW0") & 0xe000) == 0x6000 ) && which)		/* 2 Buttons Joystick_1 */
-	{
-		if (input_port_read(Machine, "JOY0") & 0x20 )
-			pot1 = 0x00;
-	}
-	if (( input_port_read(Machine, "DSW0") & 0xe000 ) == 0x8000 )				/* Mouse_1 */
-	{	
-		if (which) 
-			pot2 = input_port_read(Machine, "TRACKY");
-		else 
-			pot1 = input_port_read(Machine, "TRACKX");
-	}
-	if (input_port_read(Machine, "DSW0") & 0x0100)								/* Swap */
+
+	if (input_port_read(Machine, "DSW0") & 0x0100)		/* Swap */
 	{
 		temp = pot1; pot1 = pot2; pot2 = pot1;
 		temp = pot3; pot3 = pot4; pot4 = pot3;
 	}
-	switch (cia0porta & 0xc0) {
+
+	switch (cia0porta & 0xc0) 
+	{
 	case 0x40:
-		if (which) return pot2;
-		return pot1;
+		return which ? pot2 : pot1;
+
 	case 0x80:
-		if (which) return pot4;
-			return pot3;
+		return which ? pot4 : pot3;
+
 	default:
 		return 0;
 	}
@@ -877,27 +924,31 @@ WRITE8_HANDLER( c64_colorram_write )
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-static int c64_dma_read (int offset)
+static int c64_dma_read( int offset )
 {
 	if (!c64_game && c64_exrom)
 	{
 		if (offset < 0x3000)
 			return c64_memory[offset];
+
 		return c64_romh[offset & 0x1fff];
 	}
+
 	if (((c64_vicaddr - c64_memory + offset) & 0x7000) == 0x1000)
 		return c64_chargen[offset & 0xfff];
+
 	return c64_vicaddr[offset];
 }
 
-static int c64_dma_read_ultimax (int offset)
+static int c64_dma_read_ultimax( int offset )
 {
 	if (offset < 0x3000)
 		return c64_memory[offset];
+
 	return c64_romh[offset & 0x1fff];
 }
 
-static int c64_dma_read_color (int offset)
+static int c64_dma_read_color( int offset )
 {
 	return c64_colorram[offset & 0x3ff] & 0xf;
 }
@@ -1005,6 +1056,7 @@ void c64_common_init_machine (running_machine *machine)
 		cbm_drive_1_config (SERIAL, is_c65(machine) ? 11 : 9);
 		serial_clock = serial_data = serial_atn = 1;
 	}
+
 	c64_vicaddr = c64_memory;
 	vicirq = 0;
 }
@@ -1035,6 +1087,7 @@ static OPBASE_HANDLER( c64_opbase )
 	return address;
 }
 
+
 MACHINE_START( c64 )
 {
 	c64_port_data = 0x17;
@@ -1042,144 +1095,22 @@ MACHINE_START( c64 )
 	c64_io_mirror = auto_malloc( 0x1000 );
 	c64_common_init_machine (machine);
 
-	c64_rom_recognition ();
-	c64_rom_load(machine);
-
 	if (is_c128(machine))
 		c128_bankswitch_64(machine, 1);
+
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
+
 	memory_set_opbase_handler( 0, c64_opbase );
 }
 
 
-
-#define BETWEEN(value1,value2,bottom,top) \
-    ( ((value2)>=(bottom))&&((value1)<(top)) )
-
-void c64_rom_recognition (void)
-{
-    int i;
-	
-    cartridgetype=CartridgeAuto;
-    
-	for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0])) && (cbm_rom[i].size!=0); i++) 
-	{
-		cartridge=1;
-		if ( BETWEEN(0xa000, 0xbfff, cbm_rom[i].addr, cbm_rom[i].addr+cbm_rom[i].size) ) 
-		{
-			cartridgetype=CartridgeC64;
-		} 
-		else if ( BETWEEN(0xe000, 0xffff, cbm_rom[i].addr, cbm_rom[i].addr+cbm_rom[i].size) ) 
-		{
-			cartridgetype=CartridgeUltimax;
-		}
-    }
-}
-
-void c64_rom_load(running_machine *machine)
-{
-    int i;
-
-    c64_exrom = 1;
-    c64_game = 1;
-    if (cartridge)
-    {
-		if (((input_port_read(machine, "CFG") & 0x1c ) == 0) && (cartridgetype == CartridgeAuto))	// AUTO_MODULE
-		{
-			logerror("Cartridge type not recognized using machine type\n");
-		}
-	
-		if (((input_port_read(machine, "CFG") & 0x1c ) == 8) && (cartridgetype == CartridgeUltimax))// C64_MODULE
-		{
-			logerror("Cartridge could be ultimax type!?\n");
-		}
-	
-		if (((input_port_read(machine, "CFG") & 0x1c ) == 4) && (cartridgetype == CartridgeC64))	// ULTIMAX_MODULE
-		{
-			logerror("Cartridge could be c64 type!?\n");
-		}
-
-		if ((input_port_read(machine, "CFG") & 0x1c ) == 8)			// C64_MODULE
-			cartridgetype = CartridgeC64;
-
-		else if ((input_port_read(machine, "CFG") & 0x1c ) == 4)	// ULTIMAX_MODULE
-			cartridgetype = CartridgeUltimax;
-
-		if ((cbm_c64_exrom!=-1)&&(cbm_c64_game!=-1)) 
-		{
-			c64_exrom=cbm_c64_exrom;
-			c64_game=cbm_c64_game;
-		} 
-	
-		else if (ultimax || (cartridgetype == CartridgeUltimax)) 
-		{
-			c64_game = 0;
-		} 
-	
-		else 
-		{
-			c64_exrom = 0;
-		}
-	
-		if (ultimax) 
-		{
-			for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
-				&&(cbm_rom[i].size!=0); i++) 
-			{
-				if (cbm_rom[i].addr==CBM_ROM_ADDR_LO) 
-				{
-					memcpy(c64_memory+0x8000+0x2000-cbm_rom[i].size,
-					cbm_rom[i].chip, cbm_rom[i].size);
-				} 
-				else if ((cbm_rom[i].addr==CBM_ROM_ADDR_HI)
-				       ||(cbm_rom[i].addr==CBM_ROM_ADDR_UNKNOWN)) 
-				{
-					memcpy(c64_memory+0xe000+0x2000-cbm_rom[i].size,
-					cbm_rom[i].chip, cbm_rom[i].size);
-				} 
-				else 
-				{
-					memcpy(c64_memory+cbm_rom[i].addr, cbm_rom[i].chip,
-					cbm_rom[i].size);
-				}
-			}
-        } 
-		
-		else /*if ((cartridgetype == CartridgeC64) || (cartridgetype == CartridgeUltimax) )*/
-		{
-			roml=c64_roml;
-			romh=c64_romh;
-			memset(roml, 0, 0x2000);
-			memset(romh, 0, 0x2000);
-			for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0])) && (cbm_rom[i].size!=0); i++) 
-			{
-				if ((cbm_rom[i].addr==CBM_ROM_ADDR_UNKNOWN) ||(cbm_rom[i].addr==CBM_ROM_ADDR_LO) ) 
-				{
-					memcpy(roml+0x2000-cbm_rom[i].size, cbm_rom[i].chip, cbm_rom[i].size);
-				} 
-				else if ( ((cartridgetype == CartridgeC64) && (cbm_rom[i].addr == CBM_ROM_ADDR_HI))
-			       ||((cartridgetype == CartridgeUltimax) && (cbm_rom[i].addr == CBM_ROM_ADDR_HI)) ) 
-				{
-					memcpy(romh+0x2000-cbm_rom[i].size, cbm_rom[i].chip, cbm_rom[i].size);
-				} 
-				else if (cbm_rom[i].addr<0xc000) 
-				{
-					memcpy(roml+cbm_rom[i].addr-0x8000, cbm_rom[i].chip, cbm_rom[i].size);
-				} 
-				else 
-				{
-					memcpy(romh+cbm_rom[i].addr-0xe000, cbm_rom[i].chip, cbm_rom[i].size);
-				}
-			}
-		}
-    }
-}
-
 INTERRUPT_GEN( c64_frame_interrupt )
 {
-	static int monitor=-1;
+	static int monitor = -1;
 	int value, i;
+	int controller1 = input_port_read(Machine, "DSW0") & 0xe000;
+	int controller2 = input_port_read(Machine, "DSW0") & 0x0e00;
 	static const char *c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 	static const char *c128ports[] = { "KP0", "KP1", "KP2" };
 
@@ -1213,46 +1144,67 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		c64_keyline[i] = value;
 	}
 
-	value = 0xff;
-	if ( ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x2000) || ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x6000) ) 
-	{
-		value &= ~(input_port_read(machine, "JOY0") & 0x1f);
-	} 
-	else if ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x4000)
-	{
-		if (input_port_read(machine, "PADDLE1") & 0x100)
-			value &= ~8;
-		if (input_port_read(machine, "PADDLE0") & 0x100)
-			value &= ~4;
-	} 
-	else if (( input_port_read(machine, "DSW0") & 0xe000 ) == 0x8000 )
-	{
-			if (input_port_read(machine, "TRACKIPT") & 0x02)
-				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)
-				value &= ~1;
-	}
-	c64_keyline[8] = value;
 
 	value = 0xff;
-	if ( ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0200) || ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0600) ) 
+	switch(controller1)
 	{
-		value &= ~(input_port_read(machine, "JOY1") & 0x1f);
-	} 
-	else if ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0400)
-	{
-		if (input_port_read(machine, "PADDLE3") & 0x100)
-			value &= ~8;
-		if (input_port_read(machine, "PADDLE2") & 0x100)
-			value &= ~4;
-	} 
-	else if (( input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0800 )
-	{
-			if (input_port_read(machine, "TRACKIPT") & 0x02)
+		case 0x2000:
+		case 0x6000:
+			value &= ~(input_port_read(machine, "JOY0") & 0x1f);	/* Joy0 Directions + Button 1 */
+			break;
+		
+		case 0x4000:
+			if (input_port_read(machine, "PADDLE1") & 0x100)		/* Paddle1 Button */
+				value &= ~0x08;
+			if (input_port_read(machine, "PADDLE0") & 0x100)		/* Paddle0 Button */
+				value &= ~0x04;
+			break;
+
+		case 0x8000:
+			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)
-				value &= ~1;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+				value &= ~0x01;
+			break;
+			
+		case 0xa000:
+			break;
+
+		default:
+			logerror("Invalid Controller 1 Setting %d\n", controller1);
+			break;
 	}
+
+	c64_keyline[8] = value;
+
+
+	value = 0xff;
+	switch(controller2)
+	{
+		case 0x0200:
+		case 0x0600:
+			value &= ~(input_port_read(machine, "JOY1") & 0x1f);	/* Joy1 Directions + Button 1 */
+			break;
+		
+		case 0x0400:
+			if (input_port_read(machine, "PADDLE3") & 0x100)		/* Paddle3 Button */
+				value &= ~0x08;
+			if (input_port_read(machine, "PADDLE2") & 0x100)		/* Paddle2 Button */
+				value &= ~0x04;
+			break;
+
+		case 0x0800:
+			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
+				value &= ~0x10;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+				value &= ~0x01;
+			break;
+
+		default:
+			logerror("Invalid Controller 2 Setting %d\n", controller2);
+			break;
+	}
+
 	c64_keyline[9] = value;
 
 	/* C128 only : keypad input ports */
@@ -1279,4 +1231,375 @@ INTERRUPT_GEN( c64_frame_interrupt )
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
 	set_led_status (0, input_port_read(machine, "DSW0") & 0x0100 ? 1 : 0);		/*KB_NUMLOCK_FLAG */ 
+}
+
+
+/***********************************************
+
+	C64 Cartridges
+
+***********************************************/
+
+/* Info based on http://ist.uwaterloo.ca/~schepers/formats/CRT.TXT	    */
+/* Please refer to the webpage for the latest version and for a very 
+   complete listing of various cart types and their bankswitch tricks 	*/
+/*
+  Cartridge files were introduced in the CCS64  emulator,  written  by  Per
+Hakan Sundell, and use the ".CRT" file extension. This format  was  created
+to handle the various ROM cartridges that exist, such as Action Replay, the
+Power cartridge, and the Final Cartridge.
+
+  Normal game cartridges can load  into  several  different  memory  ranges
+($8000-9FFF,  $A000-BFFF  or  $E000-FFFF).  Newer   utility   and   freezer
+cartridges were less intrusive, hiding themselves until  called  upon,  and
+still others used bank-switching techniques to allow much larger ROM's than
+normal. Because of these "stealthing" and bank-switching methods, a special
+cartridge format  was  necessary,  to  let  the  emulator  know  where  the
+cartridge should reside, the control line  states  to  enable  it  and  any
+special hardware features it uses.
+
+(...)
+
+[ A .CRT file consists of
+
+	$0000-0040 :	Header of the whole .crt files
+	$0040-EOF :		Blocks of data
+
+  Each block of data, called 'CHIP', can be of variable size. The first
+0x10 bytes of each CHIP block is the block header, and it contains various 
+informations on the block itself, as its size (both with and without the 
+header), the loading address and an index to identify which memory bank
+the data must be loaded to.  FP ]
+
+.CRT header description
+-----------------------
+
+ Bytes: $0000-000F - 16-byte cartridge signature  "C64  CARTRIDGE"  (padded
+                     with space characters)
+         0010-0013 - File header length  ($00000040,  in  high/low  format,
+                     calculated from offset $0000). The default  (also  the
+                     minimum) value is $40.  Some  cartridges  exist  which
+                     show a value of $00000020 which is wrong.
+         0014-0015 - Cartridge version (high/low, presently 01.00)
+         0016-0017 - Cartridge hardware type ($0000, high/low)
+              0018 - Cartridge port EXROM line status
+                      0 - inactive
+                      1 - active
+              0019 - Cartridge port GAME line status
+                      0 - inactive
+                      1 - active
+         001A-001F - Reserved for future use
+         0020-003F - 32-byte cartridge  name  "CCSMON"  (uppercase,  padded
+                     with null characters)
+         0040-xxxx - Cartridge contents (called CHIP PACKETS, as there  can
+                     be more than one  per  CRT  file).  See  below  for  a
+                     breakdown of the CHIP format.
+
+CHIP content description
+------------------------
+
+[ Addresses shifted back to $0000.  FP ]
+
+ Bytes: $0000-0003 - Contained ROM signature "CHIP" (note there can be more
+                     than one image in a .CRT file)
+         0004-0007 - Total packet length (ROM  image  size  and
+                     header combined) (high/low format)
+         0008-0009 - Chip type
+                      0 - ROM
+                      1 - RAM, no ROM data
+                      2 - Flash ROM
+         000A-000B - Bank number
+         000C-000D - Starting load address (high/low format)
+         000E-000F - ROM image size in bytes  (high/low  format,  typically
+                     $2000 or $4000)
+         0010-xxxx - ROM data
+
+
+*/
+
+static CBM_ROM c64_cbm_cart[0x20] = { {0} };
+static INT8 cbm_c64_game;
+static INT8 cbm_c64_exrom;
+
+static DEVICE_IMAGE_UNLOAD(c64_cart)
+{
+	int index = image_index_in_device(image);
+	c64_cbm_cart[index].size = 0;
+	c64_cbm_cart[index].chip = 0;
+}
+
+static DEVICE_START(c64_cart)
+{
+	int index = image_index_in_device(device);
+	if (index == 0)
+	{
+		cbm_c64_game = -1;
+		cbm_c64_exrom = -1;
+	}
+}
+
+/* Hardware Types for C64 carts */
+enum {
+	GENERIC_CRT = 0,	/* 00 - Normal cartridge					*/
+	ACTION_REPLAY,		/* 01 - Action Replay						*/
+	KCS_PC,				/* 02 - KCS Power Cartridge					*/
+	FINAL_CART_III,		/* 03 - Final Cartridge III					*/
+	SIMONS_BASIC,		/* 04 - Simons Basic						*/
+	OCEAN_1,			/* 05 - Ocean type 1 (1)					*/
+	EXPERT,				/* 06 - Expert Cartridge					*/
+	FUN_PLAY,			/* 07 - Fun Play, Power Play				*/
+	SUPER_GAMES,		/* 08 - Super Games							*/
+	ATOMIC_POWER,		/* 09 - Atomic Power						*/
+	EPYX_FASTLOAD,		/* 10 - Epyx Fastload						*/
+	WESTERMANN,			/* 11 - Westermann Learning					*/
+	REX,				/* 12 - Rex Utility							*/
+	FINAL_CART_I,		/* 13 - Final Cartridge I					*/
+	MAGIC_FORMEL,		/* 14 - Magic Formel						*/
+	C64GS,				/* 15 - C64 Game System, System 3			*/
+	WARPSPEED,			/* 16 - WarpSpeed							*/
+	DINAMIC,			/* 17 - Dinamic (2)							*/
+	ZAXXON,				/* 18 - Zaxxon, Super Zaxxon (SEGA)			*/
+	DOMARK,				/* 19 - Magic Desk, Domark, HES Australia	*/
+	SUPER_SNAP_5,		/* 20 - Super Snapshot 5					*/
+	COMAL_80,			/* 21 - Comal-80							*/
+	STRUCT_BASIC,		/* 22 - Structured Basic					*/
+	ROSS,				/* 23 - Ross								*/
+	DELA_EP64,			/* 24 - Dela EP64							*/
+	DELA_EP7X8,			/* 25 - Dela EP7x8							*/
+	DELA_EP256,			/* 26 - Dela EP256							*/
+	REX_EP256,			/* 27 - Rex EP256							*/
+	MIKRO_ASSMBLR,		/* 28 - Mikro Assembler						*/
+	REAL_FC_I,			/* 29 - (3)									*/
+	ACTION_REPLAY_4,	/* 30 - Action Replay 4						*/
+	STARDOS,			/* 31 - StarDOS								*/
+	/* 
+	(1) Ocean type 1 includes Navy Seals, Robocop 2 & 3,  Shadow  of 
+	the Beast, Toki, Terminator 2 and more. Both 256 and 128 Kb images.
+	(2) Dinamic includes Narco Police and more.
+	(3) Type 29 is reserved for the real Final Cartridge I, the one 
+	above (Type 13) will become Final Cartridge II.					*/
+	/****************************************
+	Vice also defines the following types: 
+	#define CARTRIDGE_ACTION_REPLAY3    -29
+	#define CARTRIDGE_IEEE488           -11
+	#define CARTRIDGE_IDE64             -7
+	#define CARTRIDGE_RETRO_REPLAY      -5
+	#define CARTRIDGE_SUPER_SNAPSHOT    -4
+
+	Can we support these as well?			
+	*****************************************/
+};
+
+static DEVICE_IMAGE_LOAD(c64_cart)
+{
+	int size = image_length(image), test, i;
+	const char *filetype;
+	int address = 0;
+
+	filetype = image_filetype(image);
+
+	/* We support .crt files */
+	if (!mame_stricmp (filetype, "crt"))
+	{
+		int j;
+		unsigned short cart_type;
+
+		for (i=0; (i<sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size!=0); i++)
+		;
+
+		if (i >= sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0]))
+			return INIT_FAIL;
+
+		/* Start to parse the .crt header */
+		/* 0x16-0x17 is Hardware type */
+		image_fseek(image, 0x16, SEEK_SET);
+		image_fread(image, &cart_type, 2);
+		cart_type = BIG_ENDIANIZE_INT16(cart_type);
+
+		/* If it is unsupported cart type, warn the user */
+		switch (cart_type)
+		{
+			case GENERIC_CRT:
+				break;
+
+			default:
+				logerror("Currently unsupported cart type (Type %d)\n", cart_type);
+				break;
+		}
+
+		/* 0x18 is EXROM */
+		image_fseek(image, 0x18, SEEK_SET);
+		image_fread(image, &cbm_c64_exrom, 1);
+
+		/* 0x19 is GAME */
+		image_fread(image, &cbm_c64_game, 1);
+
+		/* We can pass to the data: it starts from 0x40 */
+		image_fseek(image, 0x40, SEEK_SET);
+		j = 0x40;
+
+		logerror("Loading cart %s size:%.4x\n", image_filename(image), size);
+		logerror("Header info: EXROM %d, GAME %d, Cart Type %d \n", cbm_c64_exrom, cbm_c64_game, cart_type);
+
+
+		/* Data in a .crt image are organized in blocks called 'CHIP':
+		   each 'CHIP' consists of a 0x10 header, which contains the 
+		   actual size of the block, the loading address and info on 
+		   the bankswitch, followed by the actual data					*/
+		while (j < size)
+		{
+			unsigned short chip_size, chip_bank_index, chip_data_size;
+			unsigned char buffer[10];
+			
+			/* Start to parse the CHIP header */
+			/* First 4 bytes are the string 'CHIP' */
+			image_fread(image, buffer, 6);
+
+			/* 0x06-0x07 is the size of the CHIP block (header + data) */
+			image_fread(image, &chip_size, 2);
+			chip_size = BIG_ENDIANIZE_INT16(chip_size);
+
+			/* 0x08-0x09 chip type (ROM, RAM + no ROM, Flash ROM) */
+			image_fread(image, buffer + 6, 2);
+
+			/* 0x0a-0x0b is the bank number of the CHIP block */ 
+			/* We currently don't use this, but it is needed to support more cart types. */
+			image_fread(image, &chip_bank_index, 2);
+			chip_bank_index = BIG_ENDIANIZE_INT16(chip_bank_index);
+
+			/* 0x0c-0x0d is the loading address of the CHIP block */ 
+			image_fread(image, &address, 2);
+			address = BIG_ENDIANIZE_INT16(address);
+
+			/* 0x0e-0x0f is the data size of the CHIP block (without header) */ 
+			image_fread(image, &chip_data_size, 2);
+			chip_data_size = BIG_ENDIANIZE_INT16(chip_data_size);
+
+			/* Print out the CHIP header! */
+			logerror("%.4s %.2x %.2x %.4x %.2x %.2x %.4x %.4x:%.4x\n",
+				buffer, buffer[4], buffer[5], chip_size,
+				buffer[6], buffer[7], chip_bank_index,
+				address, chip_data_size);
+			logerror("Loading CHIP data at %.4x size:%.4x\n", address, chip_data_size);
+
+			/* Does CHIP contain any data? */
+			c64_cbm_cart[i].chip = (UINT8*) image_malloc(image, chip_data_size);
+			if (!c64_cbm_cart[i].chip)
+				return INIT_FAIL;
+
+			/* Store data, address & size of the CHIP block */
+			c64_cbm_cart[i].addr = address;
+			c64_cbm_cart[i].size = chip_data_size;
+			test = image_fread(image, c64_cbm_cart[i].chip, chip_data_size);
+
+			if (test != chip_data_size)
+				return INIT_FAIL;
+
+			/* Advance to the next CHIP block */
+			i++;
+			j += chip_size;
+		}
+	}
+
+	/* We also support .80 files for c64 & .e0/.f0 for max */
+	else 
+	{
+		/* Assign loading address according to extension */
+		if (!mame_stricmp (filetype, "80"))
+			address = 0x8000;
+
+		if (!mame_stricmp (filetype, "e0"))
+			address = 0xe000;
+
+		if (!mame_stricmp (filetype, "f0"))
+			address = 0xf000;
+
+		logerror("loading %s rom at %.4x size:%.4x\n", image_filename(image), address, size);
+
+		/* Does cart contain any data? */
+		c64_cbm_cart[0].chip = (UINT8*) image_malloc(image, size);
+		if (!c64_cbm_cart[0].chip)
+			return INIT_FAIL;
+
+		/* Store data, address & size */
+		c64_cbm_cart[0].addr = address;
+		c64_cbm_cart[0].size = size;
+		test = image_fread(image, c64_cbm_cart[0].chip, c64_cbm_cart[0].size);
+
+		if (test != c64_cbm_cart[0].size)
+			return INIT_FAIL;
+	}
+
+	/* If we load a .crt file, use EXROM & GAME from the header! */
+	if ((cbm_c64_exrom != -1) && (cbm_c64_game != -1)) 
+	{
+		c64_exrom = cbm_c64_exrom;
+		c64_game  = cbm_c64_game;
+	}
+
+	/* Finally load the cart */
+	if (ultimax) 
+	{
+		for (i=0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++) 
+				memcpy(c64_memory + c64_cbm_cart[i].addr, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
+	}
+
+	else
+	{
+		roml = c64_roml;
+		romh = c64_romh;
+
+		memset(roml, 0, 0x2000);
+		memset(romh, 0, 0x2000);
+
+		for (i=0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++) 
+		{
+			if (c64_cbm_cart[i].addr < 0xc000) 
+				memcpy(roml + c64_cbm_cart[i].addr - 0x8000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
+
+			else 
+				memcpy(romh + c64_cbm_cart[i].addr - 0xe000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
+		}
+	}
+
+	return INIT_PASS;
+}
+
+void c64_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,80"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(c64_cart); break;
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(c64_cart); break;
+		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(c64_cart); break;
+
+		default:									cartslot_device_getinfo(devclass, state, info);
+	}
+}
+
+void ultimax_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,e0,f0"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(c64_cart); break;
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(c64_cart); break;
+		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(c64_cart); break;
+
+		default:									cartslot_device_getinfo(devclass, state, info); break;
+	}
 }

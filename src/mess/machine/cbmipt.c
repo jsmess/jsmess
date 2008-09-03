@@ -217,7 +217,7 @@ INPUT_PORTS_START( c64_control_cfg )
 	PORT_DIPSETTING(	0x0400, "Paddles 3, 4" )	
 	PORT_DIPSETTING(	0x0600, "Mouse Joystick Emulation/2 Button Joystick" )
 	PORT_DIPSETTING(	0x0800, "Mouse" )			
-	PORT_DIPNAME( 0x0100, IP_ACTIVE_HIGH, "Swap Gameport 1 and 2") PORT_CODE(KEYCODE_NUMLOCK)
+	PORT_DIPNAME( 0x0100, 0x0000, "Swap Gameport 1 and 2") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_DIPSETTING(	0x0000, DEF_STR( No ) )		
 	PORT_DIPSETTING(	0x0100, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -325,7 +325,7 @@ keys were simply wired to the lines of regular number keys of the keyboard).
 INPUT_PORTS_START( c16_special )
 	PORT_START("SPECIAL")																
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_DIPNAME( 0x40, 0x00, "Swap Gameport 1 and 2") PORT_CODE(KEYCODE_NUMLOCK)			
+	PORT_DIPNAME( 0x40, 0x00, "Swap Gameport 1 and 2") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )												
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 INPUT_PORTS_END

@@ -31,5 +31,7 @@ extern const riot6532_interface sym1_r6532_interface;
 DRIVER_INIT( sym1 );
 MACHINE_RESET( sym1 );
 
+void sym1_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+
 
 #endif /* SYM1_H_ */

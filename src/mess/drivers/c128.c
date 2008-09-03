@@ -901,19 +901,9 @@ static MACHINE_DRIVER_START( c128pal )
 	MDRV_SOUND_CONFIG(c128_sound_interface)
 MACHINE_DRIVER_END
 
-static void c128_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,80"); break;
-
-		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(c128)
-	CONFIG_DEVICE(c128_cbmcartslot_getinfo)
+	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END

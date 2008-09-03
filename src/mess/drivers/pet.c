@@ -722,19 +722,8 @@ MACHINE_DRIVER_END
 #define rom_cbm80 rom_pet80
 #define rom_cbm80pal rom_pet80pal
 
-static void pet_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,a0,b0"); break;
-
-		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(pet)
-	CONFIG_DEVICE(pet_cbmcartslot_getinfo)
+	CONFIG_DEVICE(pet_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM(8 * 1024)
@@ -743,7 +732,7 @@ static SYSTEM_CONFIG_START(pet)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pet2)
-	CONFIG_DEVICE(pet_cbmcartslot_getinfo)
+	CONFIG_DEVICE(pet_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM(8 * 1024)
@@ -751,19 +740,8 @@ static SYSTEM_CONFIG_START(pet2)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END
 
-static void pet4_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,a0"); break;
-
-		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(pet4)
-	CONFIG_DEVICE(pet4_cbmcartslot_getinfo)
+	CONFIG_DEVICE(pet4_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM(8 * 1024)
@@ -772,7 +750,7 @@ static SYSTEM_CONFIG_START(pet4)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pet4_32)
-	CONFIG_DEVICE(pet4_cbmcartslot_getinfo)
+	CONFIG_DEVICE(pet4_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END

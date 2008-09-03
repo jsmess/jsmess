@@ -44,7 +44,7 @@ extern void c16_driver_init(running_machine *machine);
 extern MACHINE_RESET( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 
-extern DEVICE_IMAGE_LOAD(c16_rom);
+void c16_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 /*----------- defined in audio/t6721.c -----------*/

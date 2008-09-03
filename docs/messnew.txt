@@ -1,4 +1,4 @@
-﻿0.127.1
+0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -9,30 +9,80 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 
-- [C16] added partial support for tape emulation using MESS core 
+- [C16] Added partial support for tape emulation using MESS core 
   functions (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
 
-- [C128] added partial support for tape emulation using MESS core 
+- [C16] Refactored cartridge code to rely on MESS core functions. As
+  a result carts are now working. Also removed -cart2 device, since
+  C16 / C116 / Plus4 had only a single cartridge port. [Fabio Priuli]
+
+- [C16] Fixed behavior of Joystick Ports Swapping: if you press F1 in 
+  partial keyboard emulation, Joy1 keys will go to Joy2 port (as if you
+  had plugged your joystick in port 2). This helps with games which expect 
+  joystick inputs from port 2 of the C16 [Fabio Priuli]
+
+- [C128] Added partial support for tape emulation using MESS core 
   functions (only loading and only .wav) [Fabio Priuli]
 
-- [C64] added partial support for tape emulation using MESS core 
+- [C128] Refactored cartridge code to rely on MESS core functions. 
+  Currently, .crt emulation uses C64 cart code and therefore support has 
+  not improved (yet) [Fabio Priuli]
+
+- [C64] Added partial support for tape emulation using MESS core 
   functions (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
 
-- [C64] fixed border color during tape loading [Roberto Zandona']
+- [C64] Fixed border color during tape loading [Roberto Zandona']
 
-- [C64] partial cleanup of memory bankswitch, based on docs [Fabio Priuli]
+- [C64] Partial cleanup of memory bankswitch, based on docs [Fabio Priuli]
 
-- [C64] modified VIC II implementation: for every raster interrupt
-  the chip draw only one line. [Roberto Zandona']
+- [C64] Modified VIC II implementation: for every raster interrupt
+  the chip draws only one line. [Roberto Zandona']
+
+- [C64] Refactored cartridge code to rely on MESS core functions and
+  generally cleaned up cart code. Support is still limited to Type 0 Carts
+  (8k and 16k images) [Fabio Priuli]
+
+- [C64] Fixed behavior of Joystick Ports Swapping: if you press F1 in 
+  partial keyboard emulation, Joy1 keys will go to Joy2 port (as if you
+  had plugged your joystick in port 2). This helps with games which expect 
+  joystick inputs from port 2 of the C64 [Fabio Priuli]
+
+- [C65] Added preliminary cartridge support through MESS core functions. 
+  Currently, .crt emulation uses C64 cart code and therefore is not 
+  working [Fabio Priuli]
+
+- [CBMB] Refactored cartridge code to rely on MESS core functions. Disabled
+  .crt support (.10, .20, .40 and .60 files working as before) since I 
+  doubt these CBM-II computers used the same format as C64. More work 
+  when/if more documents will be available [Fabio Priuli]
+
+- [COMMODORE] Temporarily commented out VC1540 / VC1541 floppy support from
+  systems which had been promoted from TESTDRIVER status. This fixed asserts 
+  and freezes. [Fabio Priuli]
 
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully 
   working, including the "Säkkijärven polkka" program. [Curt Coder]
 
+- [PET] Refactored cartridge code to rely on MESS core functions. Disabled
+  .crt support (.a0 and .b0 files working as before) since I doubt these 
+  computers used the same format as C64. More work when/if more documents 
+  will be available [Fabio Priuli]
+
+- [SYM1] Refactored cartridge code to rely on MESS core functions. Code to
+  load cartridges has never been present apparently, but now it only miss
+  memory addresses to be working. More work when/if more documents will 
+  be available [Fabio Priuli]
+
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
-- [VC20] added partial support for tape emulation using MESS core 
+- [VIC20] Added partial support for tape emulation using MESS core 
   functions (only loading and only .wav) [Fabio Priuli]
+
+- [VIC20] Refactored cartridge code to rely on MESS core functions. As
+  a result carts are now working (fixed remaining half of bug #1603). Also
+  added proper banking for cart2, making defender, submarin and other 
+  multifile carts work [Fabio Priuli]
 
 - [VIP] Fixed memory banking, added discrete sound, added tape support,
   and improved quickloading so that the CHIP-8 interpreter is automatically

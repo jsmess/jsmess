@@ -17,13 +17,15 @@
 
 #include "includes/pet.h"
 
+#include "devices/cartslot.h"
+
 /* keyboard lines */
-static int pet_basic1=0; /* basic version 1 for quickloader */
-static int superpet=0;
-static int cbm8096=0;
+static int pet_basic1 = 0; /* basic version 1 for quickloader */
+static int superpet = 0;
+static int cbm8096 = 0;
 static int pet_keyline_select;
 
-int pet_font=0;
+int pet_font = 0;
 UINT8 *pet_memory;
 UINT8 *superpet_memory;
 UINT8 *pet_videoram;
@@ -63,8 +65,10 @@ static WRITE8_HANDLER( pet_mc6845_address_w )
 */
 static  READ8_HANDLER ( pet_pia0_port_a_read )
 {
-	int data=0xf0 | pet_keyline_select;
-	if (!cbm_ieee_eoi_r()) data&=~0x40;
+	int data = 0xf0 | pet_keyline_select;
+
+	if (!cbm_ieee_eoi_r()) 
+		data&=~0x40;
 	return data;
 }
 
@@ -80,14 +84,12 @@ static  READ8_HANDLER ( pet_pia0_port_b_read )
 	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 	
-	if ( pet_keyline_select < 10 ) 
+	if (pet_keyline_select < 10) 
 	{
 		data = input_port_read(machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
-		if ( pet_keyline_select == 8 && ( input_port_read(machine, "SPECIAL") & 0x80 ) ) 
-		{
-			data &= 0xFE;
-		}
+		if ((pet_keyline_select == 8) && (input_port_read(machine, "SPECIAL") & 0x80)) 
+			data &= 0xfe;
 	}
 	return data;
 }
@@ -99,7 +101,7 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 	
-	if ( pet_keyline_select < 10 ) 
+	if (pet_keyline_select < 10) 
 	{
 		data = input_port_read(machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
@@ -107,17 +109,13 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 		/* While waiting for confirmation from docs, we add a workaround here. */
 		if (superpet)
 		{
-			if (pet_keyline_select == 6 && !(input_port_read(machine, "SPECIAL") & 0x80)) 
-			{
-				data &= 0xFE;
-			}
+			if ((pet_keyline_select == 6) && !(input_port_read(machine, "SPECIAL") & 0x80)) 
+				data &= 0xfe;
 		}		
 		else
 		{
-			if (pet_keyline_select == 6 && (input_port_read(machine, "SPECIAL") & 0x80)) 
-			{
-				data &= 0xFE;
-			}
+			if ((pet_keyline_select == 6) && (input_port_read(machine, "SPECIAL") & 0x80)) 
+				data &= 0xfe;
 		}
 	}
 	return data;
@@ -167,12 +165,12 @@ static  READ8_HANDLER ( pet_pia1_ca1_read )
 
 static WRITE8_HANDLER ( pet_pia1_ca2_write )
 {
-	cbm_ieee_ndac_w(0,data);
+	cbm_ieee_ndac_w(0, data);
 }
 
 static WRITE8_HANDLER ( pet_pia1_cb2_write )
 {
-	cbm_ieee_dav_w(0,data);
+	cbm_ieee_dav_w(0, data);
 }
 
 static  READ8_HANDLER ( pet_pia1_cb1_read )
@@ -229,8 +227,8 @@ static const pia6821_interface pet_pia1 =
 static WRITE8_HANDLER( pet_address_line_11 )
 {
 	DBG_LOG (1, "address line", ("%d\n", data));
-	if (data) pet_font|=1;
-	else pet_font&=~1;
+	if (data) pet_font |= 1;
+	else pet_font &= ~1;
 }
 
 /* userport, cassettes, rest ieee488
@@ -252,17 +250,21 @@ static WRITE8_HANDLER( pet_address_line_11 )
  */
 static  READ8_HANDLER( pet_via_port_b_r )
 {
-	UINT8 data=0;
-	if (cbm_ieee_ndac_r()) data|=1;
-	if (cbm_ieee_nrfd_r()) data|=0x40;
-	if (cbm_ieee_dav_r()) data|=0x80;
+	UINT8 data = 0;
+
+	if (cbm_ieee_ndac_r()) data |= 1;
+
+	if (cbm_ieee_nrfd_r()) data |= 0x40;
+
+	if (cbm_ieee_dav_r()) data |= 0x80;
+
 	return data;
 }
 
 static WRITE8_HANDLER( pet_via_port_b_w )
 {
-	cbm_ieee_nrfd_w(0, data&2);
-	cbm_ieee_atn_w(0, data&4);
+	cbm_ieee_nrfd_w(0, data & 2);
+	cbm_ieee_atn_w(0, data & 4);
 }
 
 
@@ -286,28 +288,28 @@ static struct {
 
 static WRITE8_HANDLER(cbm8096_io_w)
 {
-	if (offset<0x10) ;
-	else if (offset<0x14) pia_0_w(machine, offset&3,data);
-	else if (offset<0x20) ;
-	else if (offset<0x24) pia_1_w(machine, offset&3,data);
-	else if (offset<0x40) ;
-	else if (offset<0x50) via_0_w(machine, offset&0xf,data);
-	else if (offset<0x80) ;
+	if (offset < 0x10) ;
+	else if (offset < 0x14) pia_0_w(machine, offset & 3, data);
+	else if (offset < 0x20) ;
+	else if (offset < 0x24) pia_1_w(machine, offset & 3, data);
+	else if (offset < 0x40) ;
+	else if (offset < 0x50) via_0_w(machine, offset & 0xf, data);
+	else if (offset < 0x80) ;
 	else if (offset == 0x80) pet_mc6845_address_w(machine, offset, data);
 	else if (offset == 0x81) pet_mc6845_register_w(machine, offset, data);
 }
 
 static READ8_HANDLER(cbm8096_io_r)
 {
-	int data=0xff;
-	if (offset<0x10) ;
-	else if (offset<0x14) data=pia_0_r(machine, offset&3);
-	else if (offset<0x20) ;
-	else if (offset<0x24) data=pia_1_r(machine, offset&3);
-	else if (offset<0x40) ;
-	else if (offset<0x50) data=via_0_r(machine, offset&0xf);
-	else if (offset<0x80) ;
-	else if (offset == 0x81) data=pet_mc6845_register_r(machine, offset);
+	int data = 0xff;
+	if (offset < 0x10) ;
+	else if (offset < 0x14) data = pia_0_r(machine, offset & 3);
+	else if (offset < 0x20) ;
+	else if (offset < 0x24) data = pia_1_r(machine, offset & 3);
+	else if (offset < 0x40) ;
+	else if (offset < 0x50) data = via_0_r(machine, offset & 0xf);
+	else if (offset < 0x80) ;
+	else if (offset == 0x81) data = pet_mc6845_register_r(machine, offset);
 	return data;
 }
 
@@ -331,9 +333,9 @@ WRITE8_HANDLER(cbm8096_w)
 	read8_machine_func rh;
 	write8_machine_func wh;
 
-	if (data&0x80)
+	if (data & 0x80)
 	{
-		if (data&0x40)
+		if (data & 0x40)
 		{
 			rh = cbm8096_io_r;
 			wh = cbm8096_io_w;
@@ -341,7 +343,7 @@ WRITE8_HANDLER(cbm8096_w)
 		else
 		{
 			rh = SMH_BANK7;
-			if (!(data&2))
+			if (!(data & 2))
 				wh = SMH_BANK7;
 			else
 				wh = SMH_NOP;
@@ -353,7 +355,7 @@ WRITE8_HANDLER(cbm8096_w)
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffef, 0, 0, (data & 2) == 0 ? SMH_BANK8 : SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff1, 0xffff, 0, 0, (data & 2) == 0 ? SMH_BANK9 : SMH_NOP);
 
-		if (data&0x20)
+		if (data & 0x20)
 		{
 			pet80_bank1_base = pet_memory + 0x8000;
 			memory_set_bankptr(1, pet80_bank1_base);
@@ -361,7 +363,7 @@ WRITE8_HANDLER(cbm8096_w)
 		}
 		else
 		{
-			if (!(data&1))
+			if (!(data & 1))
 				wh = SMH_BANK1;
 			else
 				wh = SMH_NOP;
@@ -373,37 +375,48 @@ WRITE8_HANDLER(cbm8096_w)
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, (data & 1) == 0 ? SMH_BANK4 : SMH_NOP);
 
 
-		if (data&4) {
-			if (!(data&0x20)) {
+		if (data & 4) 
+		{
+			if (!(data & 0x20)) 
+			{
 				pet80_bank1_base = pet_memory + 0x14000;
-				memory_set_bankptr(1,pet80_bank1_base);
+				memory_set_bankptr(1, pet80_bank1_base);
 			}
-			memory_set_bankptr(2,pet_memory+0x15000);
-			memory_set_bankptr(3,pet_memory+0x16000);
-			memory_set_bankptr(4,pet_memory+0x17000);
-		} else {
-			if (!(data&0x20)) {
+			memory_set_bankptr(2, pet_memory + 0x15000);
+			memory_set_bankptr(3, pet_memory + 0x16000);
+			memory_set_bankptr(4, pet_memory + 0x17000);
+		} 
+		else 
+		{
+			if (!(data & 0x20)) 
+			{
 				pet80_bank1_base = pet_memory + 0x10000;
-				memory_set_bankptr(1,pet80_bank1_base);
+				memory_set_bankptr(1, pet80_bank1_base);
 			}
-			memory_set_bankptr(2,pet_memory+0x11000);
-			memory_set_bankptr(3,pet_memory+0x12000);
-			memory_set_bankptr(4,pet_memory+0x13000);
+			memory_set_bankptr(2, pet_memory + 0x11000);
+			memory_set_bankptr(3, pet_memory + 0x12000);
+			memory_set_bankptr(4, pet_memory + 0x13000);
 		}
-		if (data&8) {
-			if (!(data&0x40)) {
-				memory_set_bankptr(7,pet_memory+0x1e800);
+
+		if (data & 8) 
+		{
+			if (!(data & 0x40)) 
+			{
+				memory_set_bankptr(7, pet_memory + 0x1e800);
 			}
-			memory_set_bankptr(6, pet_memory+0x1c000);
-			memory_set_bankptr(8, pet_memory+0x1f000);
-			memory_set_bankptr(9, pet_memory+0x1fff1);
-		} else {
-			if (!(data&0x40)) {
-				memory_set_bankptr(7,pet_memory+0x1a800);
+			memory_set_bankptr(6, pet_memory + 0x1c000);
+			memory_set_bankptr(8, pet_memory + 0x1f000);
+			memory_set_bankptr(9, pet_memory + 0x1fff1);
+		} 
+		else 
+		{
+			if (!(data & 0x40)) 
+			{
+				memory_set_bankptr(7, pet_memory+ 0x1a800);
 			}
-			memory_set_bankptr(6, pet_memory+0x18000);
-			memory_set_bankptr(8, pet_memory+0x1b000);
-			memory_set_bankptr(9, pet_memory+0x1bff1);
+			memory_set_bankptr(6, pet_memory + 0x18000);
+			memory_set_bankptr(8, pet_memory + 0x1b000);
+			memory_set_bankptr(9, pet_memory + 0x1bff1);
 		}
 	}
 	else
@@ -418,19 +431,19 @@ WRITE8_HANDLER(cbm8096_w)
 		memory_set_bankptr(3, pet_memory + 0xa000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(4,pet_memory+0xb000);
+		memory_set_bankptr(4, pet_memory + 0xb000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(6,pet_memory+0xc000);
+		memory_set_bankptr(6, pet_memory + 0xc000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xe7ff, 0, 0, SMH_UNMAP);
 
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, cbm8096_io_r);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, cbm8096_io_w);
 
-		memory_set_bankptr(8,pet_memory+0xf000);
+		memory_set_bankptr(8, pet_memory + 0xf000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffef, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(9,pet_memory+0xfff1);
+		memory_set_bankptr(9, pet_memory + 0xfff1);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff1, 0xffff, 0, 0, SMH_UNMAP);
 	}
 }
@@ -470,10 +483,10 @@ WRITE8_HANDLER(superpet_w)
 
 static TIMER_CALLBACK(pet_interrupt)
 {
-	static int level=0;
+	static int level = 0;
 
-	pia_0_cb1_w(machine, 0,level);
-	level=!level;
+	pia_0_cb1_w(machine, 0, level);
+	level = !level;
 }
 
 static void pet_common_driver_init(running_machine *machine)
@@ -572,7 +585,7 @@ MACHINE_RESET( pet )
 	if (superpet)
 	{
 		spet.rom = 0;
-		if (input_port_read(machine, "CFG") & 4)
+		if (input_port_read(machine, "CFG") & 0x04)
 		{
 			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
 			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
@@ -588,7 +601,7 @@ MACHINE_RESET( pet )
 
 	if (cbm8096)
 	{
-		if (input_port_read(machine, "CFG") & 8)
+		if (input_port_read(machine, "CFG") & 0x08)
 		{
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff0, 0xfff0, 0, 0, cbm8096_w);
 		}
@@ -601,27 +614,14 @@ MACHINE_RESET( pet )
 
 	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
 	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
-
-	pet_rom_load();
 }
 
-
-
-void pet_rom_load(void)
-{
-	int i;
-
-	for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
-			 &&(cbm_rom[i].size!=0); i++) {
-		memcpy(pet_memory+cbm_rom[i].addr, cbm_rom[i].chip, cbm_rom[i].size);
-	}
-}
 
 INTERRUPT_GEN( pet_frame_interrupt )
 {
 	if (superpet)
 	{
-		if (input_port_read(machine, "CFG") & 4) 
+		if (input_port_read(machine, "CFG") & 0x04) 
 		{
 			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
 			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
@@ -636,4 +636,99 @@ INTERRUPT_GEN( pet_frame_interrupt )
 	}
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x80 ? 1 : 0);	/*KB_CAPSLOCK_FLAG */
+}
+
+
+/***********************************************
+
+	PET Cartridges
+
+***********************************************/
+
+
+static CBM_ROM pet_cbm_cart[0x20] = { {0} };
+
+
+static DEVICE_IMAGE_LOAD(pet_cart)
+{
+	int size = image_length(image), test;
+	const char *filetype;
+	int address = 0;
+
+	filetype = image_filetype(image);
+
+ 	if (!mame_stricmp (filetype, "crt"))
+	{
+	/* We temporarily remove .crt loading. Previous versions directly used 
+	the same routines used to load C64 .crt file, but I seriously doubt the
+	formats are compatible. While waiting for confirmation about .crt dumps
+	for PET machines, we simply do not load .crt files */
+	}
+	else 
+	{
+		/* Assign loading address according to extension */
+		if (!mame_stricmp (filetype, "a0"))
+			address = 0xa000;
+
+		else if (!mame_stricmp (filetype, "b0"))
+			address = 0xb000;
+
+		logerror("Loading cart %s at %.4x size:%.4x\n", image_filename(image), address, size);
+
+		/* Does cart contain any data? */
+		pet_cbm_cart[0].chip = (UINT8*) image_malloc(image, size);
+		if (!pet_cbm_cart[0].chip)
+			return INIT_FAIL;
+
+		/* Store data, address & size */
+		pet_cbm_cart[0].addr = address;
+		pet_cbm_cart[0].size = size;
+		test = image_fread(image, pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
+
+		if (test != pet_cbm_cart[0].size)
+			return INIT_FAIL;
+	}
+
+	/* Finally load the cart */
+//	This could be needed with .crt support
+//	for (i = 0; (i < sizeof(pet_cbm_cart) / sizeof(pet_cbm_cart[0])) && (pet_cbm_cart[i].size != 0); i++) 
+//		memcpy(pet_memory + pet_cbm_cart[i].addr, pet_cbm_cart[i].chip, pet_cbm_cart[i].size);
+	memcpy(pet_memory + pet_cbm_cart[0].addr, pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
+
+	return INIT_PASS;
+}
+
+
+void pet_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,a0,b0"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(pet_cart); break;
+
+		default:									cartslot_device_getinfo(devclass, state, info); break;
+	}
+}
+
+void pet4_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,a0"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(pet_cart); break;
+
+		default:									cartslot_device_getinfo(devclass, state, info); break;
+	}
 }

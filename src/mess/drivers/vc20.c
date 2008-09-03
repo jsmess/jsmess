@@ -160,7 +160,6 @@ when problems start with -log and look into error.log file
 #include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/vic6560.h"
-#include "devices/cartslot.h"
 
 #include "includes/vc20.h"
 
@@ -413,11 +412,11 @@ static MACHINE_DRIVER_START( vic20 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, VIC6560_CLOCK)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(vc20_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", vc20_frame_interrupt)
+	MDRV_CPU_VBLANK_INT("main", vic20_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)
 	MDRV_INTERLEAVE(0)
 
-	MDRV_MACHINE_RESET( vc20 )
+	MDRV_MACHINE_RESET( vic20 )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -447,7 +446,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vic20v )
 	MDRV_IMPORT_FROM( vic20 )
-	MDRV_IMPORT_FROM( cpu_vc1540 )
+//	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
 #else
@@ -485,7 +484,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vc20v )
 	MDRV_IMPORT_FROM( vc20 )
-	MDRV_IMPORT_FROM( cpu_vc1540 )
+//	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
 #else
@@ -493,27 +492,9 @@ static MACHINE_DRIVER_START( vc20v )
 #endif
 MACHINE_DRIVER_END
 
-static void cbmvc20_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(vc20_rom); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(vc20_rom); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "a0,20,40,60,rom,bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(vc20)
-	CONFIG_DEVICE(cbmvc20_cartslot_getinfo)
+static SYSTEM_CONFIG_START(vic20)
+	CONFIG_DEVICE(vic20_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
@@ -523,8 +504,8 @@ static SYSTEM_CONFIG_START(vc20)
 	CONFIG_RAM(32 * 1024)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(vc20v)
-	CONFIG_DEVICE(cbmvc20_cartslot_getinfo)
+static SYSTEM_CONFIG_START(vic20v)
+	CONFIG_DEVICE(vic20_cartslot_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
@@ -535,10 +516,10 @@ static SYSTEM_CONFIG_START(vc20v)
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME        PARENT  COMPAT  MACHINE INPUT       INIT    CONFIG     COMPANY                          FULLNAME */
-COMP ( 1981,	vic20,		0,		0,		vic20,	vic20,		vic20,	vc20,      "Commodore Business Machines Co.",  "VIC20 (NTSC)", GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic20i, 	vic20,	0,		vic20i, vic20i, 	vic20i, vc20,      "Commodore Business Machines Co.",  "VIC20 (NTSC), IEEE488 Interface (SYS45065)",   GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic1001,	vic20,	0,		vic20,	vic1001,	vic20,	vc20,      "Commodore Business Machines Co.",  "VIC1001 (NTSC)", GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vc20,		vic20,	0,		vc20,	vc20,		vc20,	vc20,      "Commodore Business Machines Co.",  "VIC20/VC20(German) PAL",       GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic20swe,	vic20,	0,		vc20,	vic20swe,	vc20,	vc20,      "Commodore Business Machines Co.",  "VIC20 PAL, Swedish Expansion Kit", GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic20v, 	vic20,	0,		vic20v, vic20,		vic20,	vc20v,     "Commodore Business Machines Co.",  "VIC20 (NTSC), VC1540", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-COMP ( 1981,	vc20v,		vic20,	0,		vc20v,	vic20,		vc20,	vc20v,     "Commodore Business Machines Co.",  "VC20 (PAL), VC1541", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP ( 1981,	vic20,		0,		0,		vic20,	vic20,		vic20,	vic20,      "Commodore Business Machines Co.",  "VIC20 (NTSC)", GAME_IMPERFECT_SOUND)
+COMP ( 1981,	vic20i, 	vic20,	0,		vic20i, vic20i, 	vic20i, vic20,      "Commodore Business Machines Co.",  "VIC20 (NTSC), IEEE488 Interface (SYS45065)",   GAME_IMPERFECT_SOUND)
+COMP ( 1981,	vic1001,	vic20,	0,		vic20,	vic1001,	vic20,	vic20,      "Commodore Business Machines Co.",  "VIC1001 (NTSC)", GAME_IMPERFECT_SOUND)
+COMP ( 1981,	vc20,		vic20,	0,		vc20,	vc20,		vc20,	vic20,      "Commodore Business Machines Co.",  "VIC20/VC20(German) PAL",       GAME_IMPERFECT_SOUND)
+COMP ( 1981,	vic20swe,	vic20,	0,		vc20,	vic20swe,	vc20,	vic20,      "Commodore Business Machines Co.",  "VIC20 PAL, Swedish Expansion Kit", GAME_IMPERFECT_SOUND)
+COMP ( 1981,	vic20v, 	vic20,	0,		vic20v, vic20,		vic20,	vic20v,     "Commodore Business Machines Co.",  "VIC20 (NTSC), VC1540", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP ( 1981,	vc20v,		vic20,	0,		vc20v,	vic20,		vc20,	vic20v,     "Commodore Business Machines Co.",  "VC20 (PAL), VC1541", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

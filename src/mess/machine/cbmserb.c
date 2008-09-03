@@ -6,7 +6,7 @@
 #include "image.h"
 
 #define VERBOSE_DBG 0				   /* general debug messages */
-#include "includes/cbm.h"
+//#include "includes/cbm.h"
 #include "includes/cbmdrive.h"
 
 #include "includes/cbmserb.h"

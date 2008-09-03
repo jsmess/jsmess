@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "includes/sym1.h"
+#include "includes/cbm.h"
 
 /* M6502 CPU */
 #include "cpu/m6502/m6502.h"
@@ -18,6 +19,8 @@
 #include "machine/6532riot.h"
 #include "machine/74145.h"
 #include "sound/speaker.h"
+
+#include "devices/cartslot.h"
 
 
 #define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
@@ -106,13 +109,13 @@ static UINT8 sym1_riot_b_r(const device_config *device, UINT8 olddata)
 
 	/* determine column */
 	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-1") ^ 0xff)) & 0x7f )
-		data &= ~1;
+		data &= ~0x01;
 
 	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-2") ^ 0xff)) & 0x3f )
-		data &= ~2;
+		data &= ~0x02;
 
 	if ( ((riot_port_a ^ 0xff) & (input_port_read(device->machine, "ROW-3") ^ 0xff)) & 0x1f )
-		data &= ~4;
+		data &= ~0x04;
 
 	data &= ~0x80; // else hangs 8b02
 
@@ -200,13 +203,13 @@ static WRITE8_HANDLER( sym1_via2_a_w )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa600, 0xa67f, 0, 0,
 		((input_port_read(machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,	0x0400, 0x07ff, 0, 0,
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0x07ff, 0, 0,
 		((input_port_read(machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,	0x0800, 0x0bff, 0, 0,
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0bff, 0, 0,
 		((input_port_read(machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,	0x0c00, 0x0fff, 0, 0,
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c00, 0x0fff, 0, 0,
 		((input_port_read(machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
 }
 
@@ -303,4 +306,65 @@ MACHINE_RESET( sym1 )
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0xf800, 0xffff, 0, 0, SMH_BANK1, SMH_NOP);
 	memory_set_bankptr(1, sym1_monitor + 0x800);
+}
+
+
+/******************************************************************************
+Cartridge Support
+******************************************************************************/
+
+static CBM_ROM sym1_cbm_cart = { 0 };
+
+static DEVICE_IMAGE_LOAD(sym_cart)
+{
+	int size = image_length(image), test;
+	const char *filetype;
+	int address = 0;
+
+	filetype = image_filetype(image);
+
+	/* Assign loading address according to extension */
+	if (!mame_stricmp (filetype, "60"))
+		address = 0x6000;
+	else if (!mame_stricmp (filetype, "c0"))
+		address = 0xc000;
+	else		// which address for .0080 files?!?
+		;
+
+	logerror("Loading cart %s at %.4x size:%.4x\n", image_filename(image), address, size);
+
+	/* Does cart contain any data? */
+	sym1_cbm_cart.chip = (UINT8*) image_malloc(image, size);
+	if (!sym1_cbm_cart.chip)
+		return INIT_FAIL;
+
+	/* Store data, address & size */
+	sym1_cbm_cart.addr = address;
+	sym1_cbm_cart.size = size;
+	test = image_fread(image, sym1_cbm_cart.chip, sym1_cbm_cart.size);
+
+	if (test != sym1_cbm_cart.size)
+		return INIT_FAIL;
+				
+	/* Finally load the cart */
+//	memcpy(/* where?  base + sym1_cbm_cart.addr */, sym1_cbm_cart.chip, sym1_cbm_cart.size);
+
+	return INIT_PASS;
+}
+
+void sym1_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "60,0080,c0"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(sym_cart); break;
+
+		default:									cartslot_device_getinfo(devclass, state, info); break;
+	}
 }

@@ -20,6 +20,8 @@
 
 #include "includes/cbmb.h"
 
+#include "devices/cartslot.h"
+
 /* 2008-05 FP: Were these added as a reminder to add configs of 
 drivers 8 & 9 as in pet.c ? */
 #define IEEE8ON 0
@@ -30,7 +32,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt);
 /* keyboard lines */
 static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
 
-static int cbm500=0;
+static int cbm500 = 0;
 static int cbm700;
 static int cbm_ntsc;
 UINT8 *cbmb_basic;
@@ -63,25 +65,25 @@ UINT8 *cbmb_memory;
  */
 static int cbmb_tpi0_port_a_r(void)
 {
-	int data=0;
-	if (cbm_ieee_nrfd_r()) data|=0x80;
-	if (cbm_ieee_ndac_r()) data|=0x40;
-	if (cbm_ieee_eoi_r()) data|=0x20;
-	if (cbm_ieee_dav_r()) data|=0x10;
-	if (cbm_ieee_atn_r()) data|=8;
-/*	if (cbm_ieee_ren_r()) data|=4; */
+	int data = 0;
+	if (cbm_ieee_nrfd_r()) data |= 0x80;
+	if (cbm_ieee_ndac_r()) data |= 0x40;
+	if (cbm_ieee_eoi_r()) data |= 0x20;
+	if (cbm_ieee_dav_r()) data |= 0x10;
+	if (cbm_ieee_atn_r()) data |= 0x08;
+/*	if (cbm_ieee_ren_r()) data |= 0x04; */
 	return data;
 }
 
 static void cbmb_tpi0_port_a_w(int data)
 {
-	cbm_ieee_nrfd_w(0,data&0x80);
-	cbm_ieee_ndac_w(0,data&0x40);
-	cbm_ieee_eoi_w(0,data&0x20);
-	cbm_ieee_dav_w(0,data&0x10);
-	cbm_ieee_atn_w(0,data&8);
-/*	cbm_ieee_ren_w(0,data&4); */
-	logerror("cbm ieee %d %d\n",data&2, data&1);
+	cbm_ieee_nrfd_w(0, data & 0x80);
+	cbm_ieee_ndac_w(0, data & 0x40);
+	cbm_ieee_eoi_w(0, data & 0x20);
+	cbm_ieee_dav_w(0, data & 0x10);
+	cbm_ieee_atn_w(0, data & 0x08);
+/*	cbm_ieee_ren_w(0, data & 0x04); */
+	logerror("cbm ieee %d %d\n", data & 0x02, data & 0x01);
 }
 
 /* tpi at 0xfdf00
@@ -115,73 +117,89 @@ static int cbmb_keyboard_line_a(void)
 {
 	int data = 0;
 	
-	if (!(cbmb_keyline_c & 1)) 
+	if (!(cbmb_keyline_c & 0x01)) 
 		data |= input_port_read(Machine, "ROW0");
-	if (!(cbmb_keyline_c & 2)) 
+
+	if (!(cbmb_keyline_c & 0x02)) 
 		data |= input_port_read(Machine, "ROW2");
-	if (!(cbmb_keyline_c & 4)) 
+
+	if (!(cbmb_keyline_c & 0x04)) 
 		data |= input_port_read(Machine, "ROW4");
-	if (!(cbmb_keyline_c & 8)) 
+
+	if (!(cbmb_keyline_c & 0x08)) 
 		data |= input_port_read(Machine, "ROW6");
+
 	if (!(cbmb_keyline_c & 0x10)) 
 		data |= input_port_read(Machine, "ROW8");
+
 	if (!(cbmb_keyline_c & 0x20)) 
 		data |= input_port_read(Machine, "ROW10");
 
-	return data^0xff;
+	return data ^0xff;
 }
 
 static int cbmb_keyboard_line_b(void)
 {
-	int data=0;
+	int data = 0;
 	
-	if (!(cbmb_keyline_c & 1)) 
+	if (!(cbmb_keyline_c & 0x01)) 
 		data |= input_port_read(Machine, "ROW1");
-	if (!(cbmb_keyline_c & 2)) 
+
+	if (!(cbmb_keyline_c & 0x02)) 
 		data |= input_port_read(Machine, "ROW3");
-	if (!(cbmb_keyline_c & 4)) 
+
+	if (!(cbmb_keyline_c & 0x04)) 
 		data |= input_port_read(Machine, "ROW5");
-	if (!(cbmb_keyline_c & 8)) 
+
+	if (!(cbmb_keyline_c & 0x08)) 
 		data |= input_port_read(Machine, "ROW7");
+
 	if (!(cbmb_keyline_c & 0x10)) 
 		data |= input_port_read(Machine, "ROW9") | ((input_port_read(Machine, "SPECIAL") & 0x04) ? 1 : 0 );
+
 	if (!(cbmb_keyline_c & 0x20)) 
 		data |= input_port_read(Machine, "ROW11");
 
-	return data^0xff;
+	return data ^0xff;
 }
 
 static int cbmb_keyboard_line_c(void)
 {
-	int data=0;
+	int data = 0;
 
-	if ( (input_port_read(Machine, "ROW0") & ~cbmb_keyline_a)||
-		 (input_port_read(Machine, "ROW1") & ~cbmb_keyline_b)) 
-		 data |= 1;
-	if ( (input_port_read(Machine, "ROW2") & ~cbmb_keyline_a)||
-		 (input_port_read(Machine, "ROW3") & ~cbmb_keyline_b)) 
-		 data |= 2;
-	if ( (input_port_read(Machine, "ROW4") & ~cbmb_keyline_a)||
-		 (input_port_read(Machine, "ROW5") & ~cbmb_keyline_b)) 
-		 data |= 4;
-	if ( (input_port_read(Machine, "ROW6") & ~cbmb_keyline_a)||
-		 (input_port_read(Machine, "ROW7") & ~cbmb_keyline_b)) 
-		 data |= 8;
-	if ( (input_port_read(Machine, "ROW8") & ~cbmb_keyline_a)||
-		 ((input_port_read(Machine, "ROW9")|((input_port_read(Machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~cbmb_keyline_b)) 
+	if ((input_port_read(Machine, "ROW0") & ~cbmb_keyline_a) || 
+				(input_port_read(Machine, "ROW1") & ~cbmb_keyline_b)) 
+		 data |= 0x01;
+
+	if ((input_port_read(Machine, "ROW2") & ~cbmb_keyline_a) || 
+				(input_port_read(Machine, "ROW3") & ~cbmb_keyline_b)) 
+		 data |= 0x02;
+
+	if ((input_port_read(Machine, "ROW4") & ~cbmb_keyline_a) || 
+				(input_port_read(Machine, "ROW5") & ~cbmb_keyline_b)) 
+		 data |= 0x04;
+
+	if ((input_port_read(Machine, "ROW6") & ~cbmb_keyline_a) || 
+				(input_port_read(Machine, "ROW7") & ~cbmb_keyline_b)) 
+		 data |= 0x08;
+
+	if ((input_port_read(Machine, "ROW8") & ~cbmb_keyline_a) || 
+				((input_port_read(Machine, "ROW9") | ((input_port_read(Machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~cbmb_keyline_b)) 
 		 data |= 0x10;
-	if ( (input_port_read(Machine, "ROW10") & ~cbmb_keyline_a)||
-		 (input_port_read(Machine, "ROW11") & ~cbmb_keyline_b)) 
+
+	if ((input_port_read(Machine, "ROW10") & ~cbmb_keyline_a) || 
+				(input_port_read(Machine, "ROW11") & ~cbmb_keyline_b)) 
 		 data |= 0x20;
 
 	if (!cbm500) 
 	{
 		if (!cbm_ntsc) 
 			data |= 0x40;
+
 		if (!cbm700) 
 			data |= 0x80;
 	}
-	return data^0xff;
+	return data ^0xff;
 }
 
 static void cbmb_irq (running_machine *machine, int level)
@@ -217,7 +235,7 @@ static void cbmb_cia_port_a_w(UINT8 data)
 
 static void cbmb_tpi6525_0_irq2_level( running_machine *machine, int level )
 {
-	tpi6525_0_irq2_level( machine, level );
+	tpi6525_0_irq2_level(machine, level);
 }
 
 static const cia6526_interface cbmb_cia =
@@ -234,20 +252,20 @@ static const cia6526_interface cbmb_cia =
 
 WRITE8_HANDLER ( cbmb_colorram_w )
 {
-	cbmb_colorram[offset]=data|0xf0;
+	cbmb_colorram[offset] = data | 0xf0;
 }
 
 static int cbmb_dma_read(int offset)
 {
-	if (offset>=0x1000)
-		return cbmb_videoram[offset&0x3ff];
+	if (offset >= 0x1000)
+		return cbmb_videoram[offset & 0x3ff];
 	else
-		return cbmb_chargen[offset&0xfff];
+		return cbmb_chargen[offset & 0xfff];
 }
 
 static int cbmb_dma_read_color(int offset)
 {
-	return cbmb_colorram[offset&0x3ff];
+	return cbmb_colorram[offset & 0x3ff];
 }
 
 static void cbmb_change_font(running_machine *machine, int level)
@@ -257,21 +275,22 @@ static void cbmb_change_font(running_machine *machine, int level)
 
 static void cbmb_common_driver_init(running_machine *machine)
 {
-	cbmb_chargen=memory_region(machine, "main")+0x100000;
+	cbmb_chargen=memory_region(machine, "main") + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
 	cia_config(machine, 0, &cbmb_cia);
 
-	tpi6525[0].a.read=cbmb_tpi0_port_a_r;
-	tpi6525[0].a.output=cbmb_tpi0_port_a_w;
-	tpi6525[0].ca.output=cbmb_change_font;
-	tpi6525[0].interrupt.output=cbmb_irq;
-	tpi6525[1].a.read=cbmb_keyboard_line_a;
-	tpi6525[1].b.read=cbmb_keyboard_line_b;
-	tpi6525[1].c.read=cbmb_keyboard_line_c;
-	tpi6525[1].a.output=cbmb_keyboard_line_select_a;
-	tpi6525[1].b.output=cbmb_keyboard_line_select_b;
-	tpi6525[1].c.output=cbmb_keyboard_line_select_c;
+	tpi6525[0].a.read = cbmb_tpi0_port_a_r;
+	tpi6525[0].a.output = cbmb_tpi0_port_a_w;
+	tpi6525[0].ca.output = cbmb_change_font;
+	tpi6525[0].interrupt.output = cbmb_irq;
+	tpi6525[1].a.read = cbmb_keyboard_line_a;
+	tpi6525[1].b.read = cbmb_keyboard_line_b;
+	tpi6525[1].c.read = cbmb_keyboard_line_c;
+	tpi6525[1].a.output = cbmb_keyboard_line_select_a;
+	tpi6525[1].b.output = cbmb_keyboard_line_select_b;
+	tpi6525[1].c.output = cbmb_keyboard_line_select_c;
+
 	timer_pulse(ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);
 
 	cbm500 = 0;
@@ -310,9 +329,9 @@ DRIVER_INIT( cbm700 )
 DRIVER_INIT( cbm500 )
 {
 	cbmb_common_driver_init(machine);
-	cbm500=1;
+	cbm500 = 1;
 	cbm_ntsc = 1;
-	vic6567_init (0, 0, cbmb_dma_read, cbmb_dma_read_color, NULL);
+	vic6567_init(0, 0, cbmb_dma_read, cbmb_dma_read_color, NULL);
 }
 
 MACHINE_RESET( cbmb )
@@ -324,69 +343,81 @@ MACHINE_RESET( cbmb )
 
 	cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);
 	cbm_drive_1_config (IEEE9ON ? IEEE : 0, 9);
-	cbmb_rom_load();
 }
 
-void cbmb_rom_load(void)
-{
-	int i;
-
-	for (i=0; (i<sizeof(cbm_rom)/sizeof(cbm_rom[0]))
-			 &&(cbm_rom[i].size!=0); i++) {
-		memcpy(cbmb_memory+cbm_rom[i].addr+0xf0000, cbm_rom[i].chip, cbm_rom[i].size);
-	}
-}
 
 static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
+#if 0
+	int controller1 = input_port_read(Machine, "DSW0") & 0xe000;
+	int controller2 = input_port_read(Machine, "DSW0") & 0x0e00;
+#endif
 
 	tpi6525_0_irq0_level(machine, level);
-	level=!level;
+	level = !level;
 	if (level) return ;
 
 #if 0
 	value = 0xff;
-	if ( ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x2000) || ((input_port_read(machine, "DSW0") & 0xe000 ) == 0x6000) ) 
+	switch(controller1)
 	{
-		value &= ~(input_port_read(machine, "JOY0") & 0x1f);
-	} 
-	else if (input_port_read(machine, "DSW0") & 0xe000 ) == 0x4000)
-	{
-		if (input_port_read(machine, "PADDLE1") & 0x100)
-			value &= ~8;
-		if (input_port_read(machine, "PADDLE0") & 0x100)
-			value &= ~4;
-	} 
-	else if (( input_port_read(machine, "DSW0") & 0xe000 ) == 0x8000 )
-	{
-			if (input_port_read(machine, "TRACKIPT") & 0x02)
+		case 0x2000:
+		case 0x6000:
+			value &= ~(input_port_read(machine, "JOY0") & 0x1f);	/* Joy0 Directions + Button 1 */
+			break;
+		
+		case 0x4000:
+			if (input_port_read(machine, "PADDLE1") & 0x100)		/* Paddle1 Button */
+				value &= ~0x08;
+			if (input_port_read(machine, "PADDLE0") & 0x100)		/* Paddle0 Button */
+				value &= ~0x04;
+			break;
+
+		case 0x8000:
+			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)
-				value &= ~1;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+				value &= ~0x01;
+			break;
+			
+		case 0xa000:
+			break;
+
+		default:
+			logerror("Invalid Controller 1 Setting %d\n", controller1);
+			break;
 	}
+
 	cbmb_keyline[8] = value;
 
 	value = 0xff;
-	if ( ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0200) || ((input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0600) ) 
+	switch(controller2)
 	{
-		value &= ~(input_port_read(machine, "JOY1") & 0x1f);		// joy2: everything but button2
-	} 
-	else if (input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0400)	// pad3-4
-	{
-		if (input_port_read(machine, "PADDLE3") & 0x100)
-			value &= ~8;
-		if (input_port_read(machine, "PADDLE2") & 0x100)
-			value &= ~4;
-	} 
-	else if (( input_port_read(machine, "DSW0") & 0x0e00 ) == 0x0800 )	//mouse2
-	{
-			if (input_port_read(machine, "TRACKIPT") & 0x02)	//mouse2_button1 = mouse1_button1
+		case 0x0200:
+		case 0x0600:
+			value &= ~(input_port_read(machine, "JOY1") & 0x1f);	/* Joy1 Directions + Button 1 */
+			break;
+		
+		case 0x0400:
+			if (input_port_read(machine, "PADDLE3") & 0x100)		/* Paddle3 Button */
+				value &= ~0x08;
+			if (input_port_read(machine, "PADDLE2") & 0x100)		/* Paddle2 Button */
+				value &= ~0x04;
+			break;
+
+		case 0x0800:
+			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)	//mouse2_button2 = mouse1_button2
-				value &= ~1;
+			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+				value &= ~0x01;
+			break;
+
+		default:
+			logerror("Invalid Controller 2 Setting %d\n", controller2);
+			break;
 	}
-	}
+
 	cbmb_keyline[9] = value;
 #endif
 
@@ -396,4 +427,86 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 #if 0
 	set_led_status (0, input_port_read(machine, "DSW0") & 0x100 ? 1 : 0);		/*KB_NUMLOCK_FLAG */
 #endif
+}
+
+
+/***********************************************
+
+	CBM Business Computers Cartridges
+
+***********************************************/
+
+
+static CBM_ROM cbmb_cbm_cart[0x20]= { {0} };
+
+static DEVICE_IMAGE_LOAD(cbmb_cart)
+{
+	int size = image_length(image), test;
+	const char *filetype;
+	int address = 0;
+
+	filetype = image_filetype(image);
+
+ 	if (!mame_stricmp (filetype, "crt"))
+	{
+	/* We temporarily remove .crt loading. Previous versions directly used 
+	the same routines used to load C64 .crt file, but I seriously doubt the
+	formats are compatible. While waiting for confirmation about .crt dumps
+	for CBMB machines, we simply do not load .crt files */
+	}
+	else 
+	{
+		/* Assign loading address according to extension */
+		if (!mame_stricmp (filetype, "10"))
+			address = 0x1000;
+
+		else if (!mame_stricmp (filetype, "20"))
+			address = 0x2000;
+
+		else if (!mame_stricmp (filetype, "40"))
+			address = 0x4000;
+
+		else if (!mame_stricmp (filetype, "60"))
+			address = 0x6000;
+
+		logerror("Loading cart %s at %.4x size:%.4x\n", image_filename(image), address, size);
+
+		/* Does cart contain any data? */
+		cbmb_cbm_cart[0].chip = (UINT8*) image_malloc(image, size);
+		if (!cbmb_cbm_cart[0].chip)
+			return INIT_FAIL;
+
+		/* Store data, address & size */
+		cbmb_cbm_cart[0].addr = address;
+		cbmb_cbm_cart[0].size = size;
+		test = image_fread(image, cbmb_cbm_cart[0].chip, cbmb_cbm_cart[0].size);
+
+		if (test != cbmb_cbm_cart[0].size)
+			return INIT_FAIL;
+	}
+				
+	/* Finally load the cart */
+//	This could be needed with .crt support
+//	for (i = 0; (i < sizeof(pet_cbm_cart) / sizeof(pet_cbm_cart[0])) && (pet_cbm_cart[i].size != 0); i++) 
+//		memcpy(cbmb_memory + cbmb_cbm_cart[i].addr + 0xf0000, cbmb_cbm_cart[i].chip, cbmb_cbm_cart[i].size);
+	memcpy(cbmb_memory + cbmb_cbm_cart[0].addr + 0xf0000, cbmb_cbm_cart[0].chip, cbmb_cbm_cart[0].size);
+
+	return INIT_PASS;
+}
+
+void cbmb_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,10,20,40,60"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(cbmb_cart); break;
+
+		default:									cartslot_device_getinfo(devclass, state, info); break;
+	}
 }

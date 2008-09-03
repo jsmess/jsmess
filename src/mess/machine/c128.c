@@ -943,9 +943,6 @@ MACHINE_RESET( c128 )
 
 	sndti_reset(SOUND_SID6581, 0);
 
-	c64_rom_recognition ();
-	c64_rom_load(machine);
-
 	c64mode = 0;
 	c128_mmu8722_reset (machine);
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);

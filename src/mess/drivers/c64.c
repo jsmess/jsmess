@@ -557,7 +557,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sx64 )
 	MDRV_IMPORT_FROM( c64pal )
-	MDRV_IMPORT_FROM( cpu_vc1541 )
+//	MDRV_IMPORT_FROM( cpu_vc1541 )
 	MDRV_SOUND_REMOVE( "dac" )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
@@ -569,51 +569,25 @@ MACHINE_DRIVER_END
 #define rom_max rom_ultimax
 #define rom_cbm4064 rom_pet64
 
-static void c64_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,80"); break;
-
-		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void ultimax_cbmcartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crt,e0,f0"); break;
-
-		default:										cbmcartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 
 static SYSTEM_CONFIG_START(c64)
-	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
+	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(sx64)
-	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
+	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(ultimax)
-	CONFIG_DEVICE(ultimax_cbmcartslot_getinfo)
+	CONFIG_DEVICE(ultimax_cartslot_getinfo)
 	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c64gs)
-	CONFIG_DEVICE(c64_cbmcartslot_getinfo)
+	CONFIG_DEVICE(c64_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
@@ -630,10 +604,10 @@ COMP(1982, vic64s, 	c64,	0,		c64pal, 		vic64s,	c64pal, c64,		"Commodore Business
 COMP(1982, max,		0,		0,		ultimax,		ultimax,ultimax,ultimax,	"Commodore Business Machines Co.", "Commodore Max (Ultimax/VC10)", 0)
 CONS(1987, c64gs,	c64,	0,		c64gs,			c64gs,	c64gs,	c64gs,		"Commodore Business Machines Co.", "C64GS (PAL)", 0)
 
-COMP(1983, sx64,	c64,	0,		sx64,			sx64,	sx64,	sx64,		"Commodore Business Machines Co.", "SX64 (PAL)",                      GAME_NOT_WORKING)
+COMP(1983, sx64,	c64,	0,		sx64,			sx64,	sx64,	sx64,		"Commodore Business Machines Co.", "SX64 (PAL)", GAME_NOT_WORKING)
 COMP(1983, vip64,	c64,	0,		sx64,			vip64,	sx64,	sx64,		"Commodore Business Machines Co.", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
 // sx64 with second disk drive
-COMP(198?, dx64,	c64,	0,		sx64,			sx64,	sx64,	sx64,		"Commodore Business Machines Co.", "DX64 (Prototype, PAL)",                      GAME_NOT_WORKING)
+COMP(198?, dx64,	c64,	0,		sx64,			sx64,	sx64,	sx64,		"Commodore Business Machines Co.", "DX64 (Prototype, PAL)", GAME_NOT_WORKING)
 /*c64 II (cbm named it still c64) */
 /*c64c (bios in 1 chip) */
 /*c64g late 8500/8580 based c64, sold at aldi/germany */
