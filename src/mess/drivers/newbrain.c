@@ -1235,7 +1235,7 @@ static MACHINE_DRIVER_START( newbrain )
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_ei_io_map, 0)
-	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
@@ -1267,7 +1267,7 @@ static MACHINE_DRIVER_START( newbraim )
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_m_io_map, 0)
-	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
@@ -1290,7 +1290,7 @@ static MACHINE_DRIVER_START( newbraia )
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_a_io_map, 0)
-	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
@@ -1313,7 +1313,7 @@ static MACHINE_DRIVER_START( newbraiv )
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_v_io_map, 0)
-	MDRV_CPU_VBLANK_INT(Z80_TAG, newbrain_interrupt)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
 	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
