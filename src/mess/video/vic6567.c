@@ -1259,9 +1259,9 @@ static void vic2_drawlines (int first, int last)
 				}
 			}
 			// sprite wrap y at the top of the screen
-			else if (SPRITEON (i) && (yoff == 1 + yend - ybegin) && (SPRITE_Y_POS (i) < 1 + yend - ybegin))
+			else if (SPRITEON (i) && (SPRITE_Y_POS (i) < yoff) && (yoff == 8))
 			{
-				int wrapped = 1 + yend - ybegin - SPRITE_Y_POS (i);
+				int wrapped = yoff - SPRITE_Y_POS (i);
 				syend = yend;
 
 				if (SPRITE_Y_EXPAND (i))
