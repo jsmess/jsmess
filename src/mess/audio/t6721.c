@@ -19,8 +19,6 @@
 
 #include "machine/tpi6525.h"
 
-#include "includes/c16.h"
-
 /*
  c364 speech
  say 0 .. 10
@@ -184,5 +182,3 @@ WRITE8_HANDLER(c364_speech_w)
 	mame_printf_debug("port read %.2x %.2x\n", offset, data);
 	return data;
 }
-
-

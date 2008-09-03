@@ -11,7 +11,6 @@
 #include "streams.h"
 #include "deprecat.h"
 
-#include "includes/c16.h"
 #include "video/ted7360.h"
 
 
@@ -186,4 +185,3 @@ void *ted7360_custom_start (int clock, const custom_sound_interface *config)
 	}
 	return (void *) ~0;
 }
-
