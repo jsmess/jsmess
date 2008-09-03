@@ -17,6 +17,17 @@
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
 
 /* usage of GFX system for lightpenpointer drawing,
  * needs little more testing with working dipswitches */
@@ -185,8 +196,7 @@ VIDEO_START( vic6560 )
 
 WRITE8_HANDLER ( vic6560_port_w )
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560_port_w");
-	mame_printf_debug("%.4x:%.2x\n", offset, data);
+	DBG_LOG (1, "vic6560_port_w", ("%.4x:%.2x\n", offset, data));
 	switch (offset)
 	{
 	case 0xa:
@@ -290,8 +300,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 		val = vic6560[offset];
 		break;
 	}
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560_port_r");
-	mame_printf_debug("%.4x:%.2x\n", offset, val);
+	DBG_LOG (3, "vic6560_port_r", ("%.4x:%.2x\n", offset, val));
 	return val;
 }
 

@@ -65,6 +65,20 @@
 /* lightpen values */
 #include "includes/c64.h"
 
+
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
+
+
 /*#define GFX */
 
 #define VREFRESHINLINES 28
@@ -289,8 +303,7 @@ static void vic2_set_interrupt (int mask)
 	{
 		if (!(vic2.reg[0x19] & 0x80))
 		{
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic2");
-			mame_printf_debug("irq start %.2x\n", mask);
+			DBG_LOG (2, "vic2", ("irq start %.2x\n", mask));
 			vic2.reg[0x19] |= 0x80;
 			vic2.interrupt (1);
 		}
@@ -303,8 +316,7 @@ static void vic2_clear_interrupt (int mask)
 	vic2.reg[0x19] &= ~mask;
 	if ((vic2.reg[0x19] & 0x80) && !(vic2.reg[0x19] & vic2.reg[0x1a] & 0xf))
 	{
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic2");
-		mame_printf_debug("irq end %.2x\n", mask);
+		DBG_LOG (2, "vic2", ("irq end %.2x\n", mask));
 		vic2.reg[0x19] &= ~0x80;
 		vic2.interrupt (0);
 	}
@@ -318,8 +330,7 @@ void vic2_lightpen_write (int level)
 static TIMER_CALLBACK(vic2_timer_timeout)
 {
 	int which = param;
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic2");
-	mame_printf_debug("timer %d timeout\n", which);
+	DBG_LOG (3, "vic2 ", ("timer %d timeout\n", which));
 	switch (which)
 	{
 	case 1:						   /* light pen */
@@ -340,9 +351,7 @@ INTERRUPT_GEN( vic2_frame_interrupt )
 
 WRITE8_HANDLER ( vic2_port_w )
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic write");
-	mame_printf_debug("%.2x:%.2x\n", offset, data);
-
+	DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;
 	switch (offset)
 	{
@@ -524,8 +533,7 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x2f:
 		if (vic2.vic2e)
 		{
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic write");
-			mame_printf_debug("%.2x:%.2x\n", offset, data);
+			DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 			vic2.reg[offset] = data;
 		}
 		break;
@@ -551,8 +559,7 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x3e:
 	case 0x3f:
 		vic2.reg[offset] = data;
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic write");
-		mame_printf_debug("%.2x:%.2x\n", offset, data);
+		DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 		break;
 	default:
 		vic2.reg[offset] = data;
@@ -618,8 +625,7 @@ READ8_HANDLER ( vic2_port_r )
 	case 0x30:
 		if (vic2.vic2e) {
 			val = vic2.reg[offset];
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic read");
-			mame_printf_debug("%.2x:%.2x\n", offset, val);
+			DBG_LOG (2, "vic read", ("%.2x:%.2x\n", offset, val));
 		} else
 			val = 0xff;
 		break;
@@ -639,15 +645,13 @@ READ8_HANDLER ( vic2_port_r )
 	case 0x3e:
 	case 0x3f:						   /* not used */
 		val = vic2.reg[offset];
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic read");
-		mame_printf_debug("%.2x:%.2x\n", offset, val);
+		DBG_LOG (2, "vic read", ("%.2x:%.2x\n", offset, val));
 		break;
 	default:
 		val = vic2.reg[offset];
 	}
 	if ((offset != 0x11) && (offset != 0x12))
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic read");
-		mame_printf_debug("%.2x:%.2x\n", offset, val);
+		DBG_LOG (2, "vic read", ("%.2x:%.2x\n", offset, val));
 	return val;
 }
 

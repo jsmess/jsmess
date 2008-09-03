@@ -9,6 +9,18 @@
 
 #include "includes/cbmdrive.h"
 
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
+
 /* tracks 1 to 35
  * sectors number from 0
  * each sector holds 256 data bytes
@@ -137,8 +149,7 @@ static void d64_readprg (CBM_Drive * c1551, int pos)
 	}
 	c1551->size += c1551->image[i + 1];
 
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "d64 readprg");
-	mame_printf_debug("size %d\n", c1551->size);
+	DBG_LOG (3, "d64 readprg", ("size %d\n", c1551->size));
 
 	c1551->buffer = (UINT8*)realloc (c1551->buffer, c1551->size);
 	if (!c1551->buffer)
@@ -146,8 +157,9 @@ static void d64_readprg (CBM_Drive * c1551, int pos)
 
 	c1551->size--;
 
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "d64 readprg");
-	mame_printf_debug("track: %d sector: %d\n", c1551->image[pos + 1], c1551->image[pos + 2]);
+	DBG_LOG (3, "d64 readprg", ("track: %d sector: %d\n",
+								c1551->image[pos + 1],
+								c1551->image[pos + 2]));
 
 	for (i = 0; i < c1551->size; i += 254)
 	{
@@ -156,9 +168,9 @@ static void d64_readprg (CBM_Drive * c1551, int pos)
 			memcpy (c1551->buffer + i, c1551->image + pos + 2, 254);
 			pos = d64_tracksector2offset (c1551->image[pos + 0],
 									  c1551->image[pos + 1]);
-
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "d64 readprg");
-			mame_printf_debug("track: %d sector: %d\n", c1551->image[pos], c1551->image[pos + 1]);
+			DBG_LOG (3, "d64 readprg", ("track: %d sector: %d\n",
+										c1551->image[pos],
+										c1551->image[pos + 1]));
 		}
 		else
 		{
@@ -430,9 +442,8 @@ static void cbm_command (CBM_Drive * drive)
 			drive->state = OPEN;
 			drive->pos = 0;
 		}
-
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm_open");
-		mame_printf_debug("%s %s type:%c %c\n", name, rc ? "failed" : "success", type, mode ? mode : ' ');
+		DBG_LOG (1, "cbm_open", ("%s %s type:%c %c\n", name,
+								 rc ? "failed" : "success", type, mode ? mode : ' '));
 	}
 	else if ((drive->cmdpos == 1) && (drive->cmdbuffer[0] == 0x5f))
 	{
@@ -554,10 +565,7 @@ void c1551_state (CBM_Drive * c1551)
 		if (!c1551->i.iec.handshakein)
 		{
 			c1551->i.iec.state++;
-
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551");
-			mame_printf_debug("taken data %.2x\n", c1551->i.iec.datain);
-
+			DBG_LOG(1,"c1551",("taken data %.2x\n",c1551->i.iec.datain));
 			if (c1551->cmdpos < sizeof (c1551->cmdbuffer))
 				c1551->cmdbuffer[c1551->cmdpos++] = c1551->i.iec.datain;
 			if ((c1551->i.iec.datain == 0x3f) || (c1551->i.iec.datain == 0x5f))
@@ -645,16 +653,14 @@ void c1551_state (CBM_Drive * c1551)
 			c1551->i.iec.state++;
 			if ((c1551->state == 0) || (c1551->state == OPEN))
 			{
-				mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551");
-				mame_printf_debug("taken data %.2x\n", c1551->i.iec.datain);
-
+				DBG_LOG (1, "c1551", ("taken data %.2x\n",
+									  c1551->i.iec.datain));
 				if (c1551->cmdpos < sizeof (c1551->cmdbuffer))
 					c1551->cmdbuffer[c1551->cmdpos++] = c1551->i.iec.datain;
 			}
 			else if (c1551->state == WRITING)
 			{
-				mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551");
-				mame_printf_debug("written data %.2x\n", c1551->i.iec.datain);
+				DBG_LOG (1, "c1551", ("written data %.2x\n", c1551->i.iec.datain));
 			}
 			c1551->i.iec.handshakeout = 1;
 		}
@@ -674,7 +680,7 @@ void c1551_state (CBM_Drive * c1551)
 	}
 
 	if (oldstate != c1551->i.iec.state)
-		mame_printf_debug("state %d->%d %d\n", oldstate, c1551->i.iec.state, c1551->state);
+		if (VERBOSE_LEVEL >= 1) logerror("state %d->%d %d\n", oldstate, c1551->i.iec.state, c1551->state);
 }
 
 static int vc1541_time_greater(CBM_Drive * vc1541, attotime threshold)
@@ -820,10 +826,10 @@ void vc1541_state (CBM_Drive * vc1541)
 			{
 				if (vc1541->cmdpos < sizeof (vc1541->cmdbuffer))
 					vc1541->cmdbuffer[vc1541->cmdpos++] = vc1541->i.serial.value;
-
-				mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "serial read");
-				mame_printf_debug("%s %s %.2x\n", vc1541->i.serial.broadcast ? "broad" : "",
-							vc1541->i.serial.last ? "last" : "", vc1541->i.serial.value);
+				DBG_LOG (1, "serial read", ("%s %s %.2x\n",
+							vc1541->i.serial.broadcast ? "broad" : "",
+							vc1541->i.serial.last ? "last" : "",
+											vc1541->i.serial.value));
 			}
 			vc1541->i.serial.state++;
 		}
@@ -1176,9 +1182,7 @@ void vc1541_state (CBM_Drive * vc1541)
 		}
 		if (vc1541_time_greater(vc1541, ATTOTIME_IN_USEC(20)))
 		{
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541");
-			mame_printf_debug("%.2x written\n", vc1541->i.serial.value);
-
+			DBG_LOG (1, "vc1541", ("%.2x written\n", vc1541->i.serial.value));
 			vc1541->i.serial.data = 1;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
@@ -1289,9 +1293,12 @@ void vc1541_state (CBM_Drive * vc1541)
 	}
 
 	if (oldstate != vc1541->i.serial.state)
-		mame_printf_debug("%d state %d->%d %d %s %s %s\n",
-				 vc1541->i.serial.device, oldstate, vc1541->i.serial.state, vc1541->state,
-				 cbm_serial.atn[0] ? "ATN" : "atn", cbm_serial.clock[0] ? "CLOCK" : "clock", 
+		if (VERBOSE_LEVEL >= 1) logerror("%d state %d->%d %d %s %s %s\n",
+				 vc1541->i.serial.device,
+				 oldstate,
+				 vc1541->i.serial.state, vc1541->state,
+				 cbm_serial.atn[0] ? "ATN" : "atn",
+				 cbm_serial.clock[0] ? "CLOCK" : "clock",
 				 cbm_serial.data[0] ? "DATA" : "data");
 }
 
@@ -1441,6 +1448,9 @@ void c2031_state(CBM_Drive *drive)
 	}
 
 	if (oldstate != drive->i.ieee.state)
-		mame_printf_debug("%d state %d->%d %d\n", drive->i.ieee.device, oldstate,
-				 drive->i.ieee.state, drive->state);
+		if (VERBOSE_LEVEL >= 1) logerror("%d state %d->%d %d\n",
+				 drive->i.ieee.device,
+				 oldstate,
+				 drive->i.ieee.state, drive->state
+				 );
 }

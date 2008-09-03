@@ -19,6 +19,16 @@
 #include "includes/c65.h"
 #include "includes/c64.h"
 
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
 
 static int c65_charset_select=0;
 
@@ -116,12 +126,10 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 		case 0:
 			if (src.d==0x3ffff) dump=1;
 			if (dump)
-			{
-				mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma copy job");
-				mame_printf_debug("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
+				DBG_LOG(1,"dma copy job",
+						("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
 						 len.w.l, src.d, dst.d, c65_read_mem(machine, pair.d),
-						 c65_read_mem(machine, pair.d+1));
-			}
+						 c65_read_mem(machine, pair.d+1) ) );
 			if ( (dma.version==1)
 				 &&( (src.d&0x400000)||(dst.d&0x400000)) ) {
 				if ( !(src.d&0x400000) ) {
@@ -144,31 +152,30 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 			}
 			break;
 		case 3:
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma fill job");
-			mame_printf_debug("len:%.4x value:%.2x dst:%.6x sub:%.2x modrm:%.2x\n",
+			DBG_LOG(3,"dma fill job",
+					("len:%.4x value:%.2x dst:%.6x sub:%.2x modrm:%.2x\n",
 					 len.w.l, fill, dst.d, c65_read_mem(machine, pair.d),
-					 c65_read_mem(machine, pair.d+1));
-			for (i=0; i<len.w.l; i++)
-				c65_write_mem(machine, dst.d++,fill);
-			break;
+					 c65_read_mem(machine, pair.d+1)));
+				for (i=0; i<len.w.l; i++)
+					c65_write_mem(machine, dst.d++,fill);
+				break;
 		case 0x30:
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma copy down");
-			mame_printf_debug("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
+			DBG_LOG(1,"dma copy down",
+					("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
 					 len.w.l, src.d, dst.d, c65_read_mem(machine, pair.d),
-					 c65_read_mem(machine, pair.d+1));
+					 c65_read_mem(machine, pair.d+1) ) );
 			for (i=0; i<len.w.l; i++)
 				c65_write_mem(machine, dst.d--,c65_read_mem(machine, src.d--));
 			break;
 		default:
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma job");
-			mame_printf_debug("cmd:%.2x len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
+			DBG_LOG(1,"dma job",
+					("cmd:%.2x len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
 					 cmd,len.w.l, src.d, dst.d, c65_read_mem(machine, pair.d),
-					 c65_read_mem(machine, pair.d+1));
+					 c65_read_mem(machine, pair.d+1)));
 		}
 		break;
 	default:
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma chip write");
-		mame_printf_debug("%.3x %.2x\n", offset,value);
+		DBG_LOG (1, "dma chip write", ("%.3x %.2x\n", offset,value));
 		break;
 	}
 }
@@ -176,8 +183,7 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 static int c65_dma_port_r(running_machine *machine, int offset)
 {
 	/* offset 3 bit 7 in progress ? */
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma chip read");
-	mame_printf_debug("%.3x\n", offset);
+	DBG_LOG (2, "dma chip read", ("%.3x\n", offset));
     return 0x7f;
 }
 
@@ -187,8 +193,7 @@ static void c65_6511_port_w(running_machine *machine, int offset, int value)
 	{
 		c65_6511_port=value;
 	}
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "r6511 write");
-	mame_printf_debug("%.2x %.2x\n", offset, value);
+	DBG_LOG (2, "r6511 write", ("%.2x %.2x\n", offset, value));
 }
 
 static int c65_6511_port_r(running_machine *machine, int offset)
@@ -200,8 +205,7 @@ static int c65_6511_port_r(running_machine *machine, int offset)
 		if (input_port_read(machine, "SPECIAL") & 0x20) 
 			data &= ~1;
 	}
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "r6511 read");
-	mame_printf_debug("%.2x\n", offset);
+	DBG_LOG (2, "r6511 read", ("%.2x\n", offset));
 
 	return data;
 }
@@ -332,9 +336,7 @@ static void c65_fdc_state(void)
 
 static void c65_fdc_w(running_machine *machine, int offset, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "fdc write");
-	mame_printf_debug("%.5x %.2x %.2x\n", activecpu_get_pc(), offset, data);
-
+	DBG_LOG (1, "fdc write", ("%.5x %.2x %.2x\n", activecpu_get_pc(), offset, data));
 	switch (offset&0xf) {
 	case 0:
 		c65_fdc.reg[0]=data;
@@ -415,9 +417,7 @@ static int c65_fdc_r(running_machine *machine, int offset)
 		data=c65_fdc.reg[offset&0xf];
 		break;
 	}
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "fdc read");
-	mame_printf_debug("%.5x %.2x %.2x\n", activecpu_get_pc(), offset, data);
-
+	DBG_LOG (1, "fdc read", ("%.5x %.2x %.2x\n", activecpu_get_pc(), offset, data));
 	return data;
 }
 
@@ -492,12 +492,10 @@ static WRITE8_HANDLER ( c65_write_io )
 		else if (offset<0x440)
 			sid6581_1_port_w(machine, offset&0x3f, data);
 		else
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io write");
-			mame_printf_debug("%.3x %.2x\n", offset, data);
+			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
 	case 0x500:
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io write");
-		mame_printf_debug("%.3x %.2x\n", offset, data);
+		DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
 	case 0x600:
 		c65_6511_port_w(machine, offset&0xff,data);
@@ -519,8 +517,7 @@ static WRITE8_HANDLER ( c65_write_io_dc00 )
 		break;
 	case 0x200:
 	case 0x300:
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io write");
-		mame_printf_debug("%.3x %.2x\n", offset+0xc00, data);
+		DBG_LOG (1, "io write", ("%.3x %.2x\n", offset+0xc00, data));
 		break;
 	}
 }
@@ -540,20 +537,17 @@ static READ8_HANDLER ( c65_read_io )
 		break;
 	case 0x100:case 0x200: case 0x300:
 	/* read only !? */
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io read");
-		mame_printf_debug("%.3x\n", offset);
+		DBG_LOG (1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x400:
 		if (offset<0x420)
 			return sid6581_0_port_r(machine, offset & 0x3f);
 		if (offset<0x440)
 			return sid6581_1_port_r(machine, offset&0x3f);
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io read");
-		mame_printf_debug("%.3x\n", offset);
+		DBG_LOG (1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x500:
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io read");
-		mame_printf_debug("%.3x\n", offset);
+		DBG_LOG (1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x600:
 		return c65_6511_port_r(machine, offset&0xff);
@@ -572,8 +566,7 @@ static READ8_HANDLER ( c65_read_io_dc00 )
 		return cia_1_r(machine, offset);
 	case 0x200:
 	case 0x300:
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io read");
-		mame_printf_debug("%.3x\n", offset+0xc00);
+		DBG_LOG (1, "io read", ("%.3x\n", offset+0xc00));
 		break;
 	}
 	return 0xff;
@@ -596,8 +589,7 @@ static void c65_bankswitch_interface(int value)
 	read8_machine_func rh;
 	write8_machine_func wh;
 
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c65 bankswitch");
-	mame_printf_debug("%.2x\n",value);
+	DBG_LOG (2, "c65 bankswitch", ("%.2x\n",value));
 
 	if (c65_io_on)
 	{
@@ -649,12 +641,10 @@ void c65_bankswitch (running_machine *machine)
 	if (data == old)
 		return;
 
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "bankswitch");
-	mame_printf_debug("%d\n", data & 0x07);
-
-	loram  = (data & 0x01) ? 1 : 0;
-	hiram  = (data & 0x02) ? 1 : 0;
-	charen = (data & 0x04) ? 1 : 0;
+	DBG_LOG (1, "bankswitch", ("%d\n", data & 7));
+	loram = (data & 1) ? 1 : 0;
+	hiram = (data & 2) ? 1 : 0;
+	charen = (data & 4) ? 1 : 0;
 
 	if ((!c64_game && c64_exrom)
 		|| (loram && hiram && !c64_exrom))

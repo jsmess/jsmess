@@ -26,6 +26,16 @@
 
 #include "devices/cassette.h"
 
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
 
 /*
  two cpus share 1 memory system, only 1 cpu can run
@@ -69,14 +79,12 @@ static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, 
 
 static WRITE8_HANDLER(c128_dma8726_port_w)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma write");
-	mame_printf_debug("%.3x %.2x\n",offset,data);
+	DBG_LOG(1,"dma write",("%.3x %.2x\n",offset,data));
 }
 
 static  READ8_HANDLER(c128_dma8726_port_r)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "dma read");
-	mame_printf_debug("%.3x\n",offset);
+	DBG_LOG(1,"dma read",("%.3x\n",offset));
 	return 0xff;
 }
 
@@ -126,8 +134,7 @@ WRITE8_HANDLER( c128_write_d000 )
 			c128_dma8726_port_w(machine, offset&0xff,data);
 			break;
 		case 0xe:
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io write");
-			mame_printf_debug("%.3x %.2x\n", offset, data);
+			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 			break;
 		}
 	}
@@ -163,8 +170,7 @@ static READ8_HANDLER( c128_read_io )
 		return cia_1_r(machine, offset);
 	else if ((offset >= 0xf00) & (offset <= 0xfff))
 		return c128_dma8726_port_r(machine, offset&0xff);
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io read");
-	mame_printf_debug("%.3x\n", offset);
+	DBG_LOG (1, "io read", ("%.3x\n", offset));
 	return 0xff;
 }
 
@@ -177,16 +183,14 @@ void c128_bankswitch_64 (running_machine *machine, int reset)
 	if (!c64mode)
 		return;
 
-	data = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT) & 0x07;
-	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
+	data = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT) & 7;
+	if ((data == old)&&(exrom==c64_exrom)&&(game==c64_game)&&!reset)
 		return;
 
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "bankswitch");
-	mame_printf_debug("%d\n", data & 0x07);
-
-	loram  = (data & 0x01) ? 1 : 0;
-	hiram  = (data & 0x02) ? 1 : 0;
-	charen = (data & 0x04) ? 1 : 0;
+	DBG_LOG (1, "bankswitch", ("%d\n", data & 7));
+	loram = (data & 1) ? 1 : 0;
+	hiram = (data & 2) ? 1 : 0;
+	charen = (data & 4) ? 1 : 0;
 
 	if ((!c64_game && c64_exrom)
 		|| (loram && hiram && !c64_exrom))
@@ -546,9 +550,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 	{
 		if (!MMU_CPU8502)
 		{
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "switching to z80");
-			mame_printf_debug("active %d\n",cpu_getactivecpu());
-
+			DBG_LOG (1, "switching to z80",
+						("active %d\n",cpu_getactivecpu()) );
 			memory_set_context(0);
 			c128_bankswitch_z80(machine);
 			memory_set_context(1);
@@ -557,9 +560,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 		}
 		else
 		{
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "switching to m6502");
-			mame_printf_debug("active %d\n",cpu_getactivecpu());
-
+			DBG_LOG (1, "switching to m6502",
+						("active %d\n",cpu_getactivecpu()) );
 			memory_set_context(1);
 			c128_bankswitch_128(machine, reset);
 			memory_set_context(0);

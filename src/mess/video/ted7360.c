@@ -364,6 +364,19 @@ Video part
 
 #include "ted7360.h"
 
+
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
+
 /*#define GFX */
 
 #define VREFRESHINLINES 28
@@ -552,9 +565,7 @@ static void ted7360_set_interrupt (running_machine *machine, int mask)
 	{
 		if (!(ted7360[9] & 0x80))
 		{
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360");
-			mame_printf_debug("irq start %.2x\n", mask);
-
+			DBG_LOG (1, "ted7360", ("irq start %.2x\n", mask));
 			ted7360[9] |= 0x80;
 			c16_interrupt (machine, 1);
 		}
@@ -567,9 +578,7 @@ static void ted7360_clear_interrupt (running_machine *machine, int mask)
 	ted7360[9] &= ~mask;
 	if ((ted7360[9] & 0x80) && !(ted7360[9] & ted7360[0xa] & 0x5e))
 	{
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360");
-		mame_printf_debug("irq end %.2x\n", mask);
-
+		DBG_LOG (1, "ted7360", ("irq end %.2x\n", mask));
 		ted7360[9] &= ~0x80;
 		c16_interrupt (machine, 0);
 	}
@@ -584,10 +593,7 @@ static int ted7360_rastercolumn (void)
 static TIMER_CALLBACK(ted7360_timer_timeout)
 {
 	int which = param;
-
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360");
-	mame_printf_debug("timer %d timeout\n", which);
-
+	DBG_LOG (3, "ted7360 ", ("timer %d timeout\n", which));
 	switch (which)
 	{
 	case 1:
@@ -630,10 +636,8 @@ WRITE8_HANDLER ( ted7360_port_w )
 
 	if ((offset != 8) && ((offset < 0x15) || (offset > 0x19)))
 	{
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-		mame_printf_debug("%.2x:%.2x\n", offset, data);
+		DBG_LOG (1, "ted7360_port_w", ("%.2x:%.2x\n", offset, data));
 	}
-
 	switch (offset)
 	{
 	case 0xe:
@@ -721,9 +725,8 @@ WRITE8_HANDLER ( ted7360_port_w )
 				x_begin = HORICONTALPOS;
 				x_end = x_begin + 320;
 			}
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-			mame_printf_debug("%s %s\n", data & 0x40 ? "ntsc" : "pal", data & 0x20 ? "hori freeze" : "");
-
+			DBG_LOG (3, "ted7360_port_w", ("%s %s\n", data & 0x40 ? "ntsc" : "pal",
+										   data & 0x20 ? "hori freeze" : ""));
 			chargenaddr = CHARGENADDR;
 		}
 		break;
@@ -750,8 +753,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 #endif
 		if ((data ^ old) & 1)
 		{
-//			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "set rasterline hi");
-//			mame_printf_debug("soll:%d\n",RASTERLINE); 
+/*    DBG_LOG(1,"set rasterline hi",("soll:%d\n",RASTERLINE)); */
 		}
 		break;
 	case 0xb:
@@ -759,9 +761,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		{
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
-
-//			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "set rasterline lo");
-//			mame_printf_debug("soll:%d\n",RASTERLINE);
+			/*  DBG_LOG(1,"set rasterline lo",("soll:%d\n",RASTERLINE)); */
 		}
 		break;
 	case 0xc:
@@ -779,9 +779,8 @@ WRITE8_HANDLER ( ted7360_port_w )
 			ted7360[offset] = data;
 			bitmapaddr = BITMAPADDR;
 			chargenaddr = CHARGENADDR;
-
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-			mame_printf_debug("bitmap %.4x %s\n", BITMAPADDR, INROM ? "rom" : "ram");
+			DBG_LOG (3, "ted7360_port_w", ("bitmap %.4x %s\n",
+										   BITMAPADDR, INROM ? "rom" : "ram"));
 		}
 		break;
 	case 0x13:
@@ -790,9 +789,9 @@ WRITE8_HANDLER ( ted7360_port_w )
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
 			chargenaddr = CHARGENADDR;
-
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-			mame_printf_debug("chargen %.4x %s %d\n", CHARGENADDR, data & 2 ? "" : "doubleclock", data & 1);
+			DBG_LOG (3, "ted7360_port_w", ("chargen %.4x %s %d\n",
+										   CHARGENADDR, data & 2 ? "" : "doubleclock",
+										   data & 1));
 		}
 		break;
 	case 0x14:
@@ -801,9 +800,8 @@ WRITE8_HANDLER ( ted7360_port_w )
 			ted7360_drawlines (machine, lastline, rasterline);
 			ted7360[offset] = data;
 			videoaddr = VIDEOADDR;
-
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-			mame_printf_debug("videoram %.4x\n", VIDEOADDR);
+			DBG_LOG (3, "ted7360_port_w", ("videoram %.4x\n",
+										   VIDEOADDR));
 		}
 		break;
 	case 0x15:						   /* backgroundcolor */
@@ -849,13 +847,12 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 0x1c:
 		ted7360[offset] = data;		   /*? */
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-		mame_printf_debug("write to rasterline high %.2x\n", data);
+		DBG_LOG (1, "ted7360_port_w", ("write to rasterline high %.2x\n",
+									   data));
 		break;
 	case 0x1f:
 		ted7360[offset] = data;
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-		mame_printf_debug("write to cursorblink %.2x\n", data);
+		DBG_LOG (1, "ted7360_port_w", ("write to cursorblink %.2x\n", data));
 		break;
 	default:
 		ted7360[offset] = data;
@@ -940,8 +937,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 0x1f:
 		val = ((rasterline & 7) << 4) | (ted7360[offset] & 0x0f);
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_w");
-		mame_printf_debug("read from cursorblink %.2x\n", val);
+		DBG_LOG (1, "ted7360_port_w", ("read from cursorblink %.2x\n", val));
 		break;
 	default:
 		val = ted7360[offset];
@@ -950,8 +946,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	if ((offset != 8) && (offset >= 6) && (offset != 0x1c) && (offset != 0x1d) && (offset != 9)
 		&& ((offset < 0x15) || (offset > 0x19)))
 	{
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360_port_r");
-		mame_printf_debug("%.2x:%.2x\n", offset, val);
+		DBG_LOG (1, "ted7360_port_r", ("%.2x:%.2x\n", offset, val));
 	}
 	return val;
 }

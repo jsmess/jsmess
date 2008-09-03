@@ -305,6 +305,18 @@ Pin  Signal              Abbreviation  Source
 
 #include "includes/cbmieeeb.h"
 
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
+
 /*
  data 8 bit input/output
 
@@ -349,54 +361,42 @@ void cbm_ieee_open(void)
 
 void cbm_ieee_dav_w(int device, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee dav");
-	mame_printf_debug("%.4x dev:%d %d\n", activecpu_get_pc(), device, data);
-
+	DBG_LOG(1,"cbm ieee dav",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].dav=data;
 	if (device==0) c2031_state(cbm_drive);
 }
 
 void cbm_ieee_nrfd_w(int device, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee nrfd");
-	mame_printf_debug("%.4x dev:%d %d\n", activecpu_get_pc(), device, data);
-
+	DBG_LOG(1,"cbm ieee nrfd",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].nrfd=data;
 	if (device==0) c2031_state(cbm_drive);
 }
 
 void cbm_ieee_ndac_w(int device, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee ndac");
-	mame_printf_debug("%.4x dev:%d %d\n", activecpu_get_pc(), device, data);
-
+	DBG_LOG(1,"cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].ndac=data;
 	if (device==0) c2031_state(cbm_drive);
 }
 
 void cbm_ieee_atn_w(int device, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee atn");
-	mame_printf_debug("%.4x dev:%d %d\n", activecpu_get_pc(), device, data);
-
+	DBG_LOG(1,"cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].atn=data;
 	if (device==0) c2031_state(cbm_drive);
 }
 
 void cbm_ieee_eoi_w(int device, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee eoi");
-	mame_printf_debug("%.4x dev:%d %d\n", activecpu_get_pc(), device, data);
-
+	DBG_LOG(1,"cbm ieee eoi",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].eoi=data;
 	if (device==0) c2031_state(cbm_drive);
 }
 
 void cbm_ieee_data_w(int device, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee data");
-	mame_printf_debug("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data);
-
+	DBG_LOG(1,"cbm ieee data",("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].data=data;
 	if (device==0) c2031_state(cbm_drive);
 }
@@ -404,70 +404,49 @@ void cbm_ieee_data_w(int device, int data)
 int cbm_ieee_srq_r(void)
 {
 	int data=cbmieee.bus[1].srq;
-
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee srq");
-	mame_printf_debug("read %d\n", data);
-
+	DBG_LOG(1,"cbm ieee srq",("read %d\n", data));
 	return data;
 }
 
 int cbm_ieee_dav_r(void)
 {
 	int data=cbmieee.bus[0].dav&&cbmieee.bus[1].dav;
-
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee dav");
-	mame_printf_debug("read %d\n", data);
-
+	DBG_LOG(1,"cbm ieee dav",("read %d\n", data));
 	return data;
 }
 
 int cbm_ieee_nrfd_r(void)
 {
 	int data=cbmieee.bus[0].nrfd && cbmieee.bus[1].nrfd;
-
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee nrfd");
-	mame_printf_debug("read %d\n", data);
-
+	DBG_LOG(1,"cbm ieee nrfd",("read %d\n", data));
 	return data;
 }
 
 int cbm_ieee_ndac_r(void)
 {
 	int data=cbmieee.bus[0].ndac&&cbmieee.bus[1].ndac;
-
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee ndac");
-	mame_printf_debug("read %d\n", data);
-
+	DBG_LOG(1,"cbm ieee ndac",("read %d\n", data));
 	return data;
 }
 
 int cbm_ieee_atn_r(void)
 {
 	int data=cbmieee.bus[0].atn&&cbmieee.bus[1].atn;
-
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee atn");
-	mame_printf_debug("read %d\n", data);
-
+	DBG_LOG(1,"cbm ieee atn",("read %d\n", data));
 	return data;
 }
 
 int cbm_ieee_eoi_r(void)
 {
 	int data=cbmieee.bus[0].eoi&&cbmieee.bus[1].eoi;
-
-//	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee eoi");
-//	mame_printf_debug("read %d\n", data));
-
+/*	DBG_LOG(1,"cbm ieee eoi",("read %d\n", data)); */
 	return data;
 }
 
 int cbm_ieee_data_r(void)
 {
 	int data=cbmieee.bus[0].data&cbmieee.bus[1].data;
-
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "cbm ieee data");
-	mame_printf_debug("read %.2x\n", data);
-
+	DBG_LOG(1,"cbm ieee data",("read %.2x\n", data));
 	return data;
 }
 

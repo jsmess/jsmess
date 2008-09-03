@@ -70,9 +70,9 @@ WRITE8_HANDLER(kc85_ctc_w);
 
 
 /*** MODULE SYSTEM ***/
-/*READ from xx80 port */
+/* read from xx80 port */
 READ8_HANDLER(kc85_module_r);
-/*WRITE to xx80 port */
+/* write to xx80 port */
 WRITE8_HANDLER(kc85_module_w);
 
 
@@ -99,7 +99,7 @@ WRITE8_HANDLER(kc85_module_w);
 READ8_HANDLER(kc85_disk_hw_ctc_r);
 /* disc hardware internal i/o */
 WRITE8_HANDLER(kc85_disk_hw_ctc_w);
-/* 4-bit input latch: DMA Data Request, FDC Int, FDDREADy.. */
+/* 4-bit input latch: DMA Data Request, FDC Int, FDD Ready.. */
 READ8_HANDLER(kc85_disc_hw_input_gate_r);
 /* output port to set NEC765 terminal count input */
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w);
@@ -107,9 +107,9 @@ WRITE8_HANDLER(kc85_disc_hw_terminal_count_w);
 /* these are used by the kc85 to control the disc interface */
 /* xxf4 - latch used to reset cpu in disc interface */
 WRITE8_HANDLER(kc85_disc_interface_latch_w);
-/* xxf0-xxf3WRITE to kc85 disc interface ram */
+/* xxf0-xxf3 write to kc85 disc interface ram */
 WRITE8_HANDLER(kc85_disc_interface_ram_w);
-/* xxf0-xxf3READ from kc85 disc interface ram */
+/* xxf0-xxf3 read from kc85 disc interface ram */
 READ8_HANDLER(kc85_disc_interface_ram_r);
 
 
