@@ -149,9 +149,9 @@ void menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter,
 		ui_menu_reset(menu, 0);
 	}
 
-	/* if the menu isn't built, populate now */
-	if (!ui_menu_populated(menu))
-		menu_tape_control_populate(machine, menu, state);
+	/* rebuild the menu - we have to do this so that the counter updates */
+	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
+	menu_tape_control_populate(machine, menu, state);
 
 	/* process the menu */
 	event = ui_menu_process(menu, 0);

@@ -44,6 +44,9 @@ User Interface Changes:
 -----------------------
 - Fixed a file manager bug that could cause the working directory to be lost
   when inside ZIP files.  [Nate Woods]
+  
+- Fixed a tape control bug that caused the counter to fail to update.  [Nate
+  Woods]
 
 
 
