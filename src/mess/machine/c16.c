@@ -13,8 +13,6 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 
-#define VERBOSE_DBG 1
-#include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "machine/tpi6525.h"
@@ -361,7 +359,8 @@ WRITE8_HANDLER(plus4_6529_port_w)
 WRITE8_HANDLER(c16_6551_port_w)
 {
 	offset &= 0x03;
-	DBG_LOG (3, "6551", ("port write %.2x %.2x\n", offset, data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "6551");
+	mame_printf_debug("port write %.2x %.2x\n", offset, data);
 	port6529 = data;
 }
 
@@ -370,7 +369,8 @@ WRITE8_HANDLER(c16_6551_port_w)
 	int data = 0x00;
 
 	offset &= 0x03;
-	DBG_LOG (3, "6551", ("port read %.2x %.2x\n", offset, data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "6551");
+	mame_printf_debug("port read %.2x %.2x\n", offset, data);
 	return data;
 }
 
@@ -423,7 +423,8 @@ void c16_interrupt (running_machine *machine, int level)
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos7501", ("irq %s\n", level ? "start" : "end"));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "mos7501");
+		mame_printf_debug("irq %s\n", level ? "start" : "end");
 		cpunum_set_input_line(machine, 0, M6510_IRQ_LINE, level);
 		old_level = level;
 	}

@@ -106,8 +106,6 @@ FF00-FFFF       Jump table, vectors
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 
-#define VERBOSE_DBG 1
-#include "includes/cbm.h"
 #include "includes/cbmdrive.h"
 #include "machine/tpi6525.h"
 
@@ -402,7 +400,9 @@ static TIMER_CALLBACK(vc1541_timer)
 static void vc1541_via0_irq (running_machine *machine, int level)
 {
 	vc1541->via0irq = level;
-	DBG_LOG(2, "vc1541 via0 irq",("level %d %d\n",vc1541->via0irq,vc1541->via1irq));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 via0 irq");
+	mame_printf_debug("level %d %d\n",vc1541->via0irq,vc1541->via1irq);
+
 	cpunum_set_input_line (machine, vc1541->cpunumber,
 					  M6502_IRQ_LINE, vc1541->via1irq || vc1541->via0irq);
 }
@@ -432,17 +432,14 @@ static READ8_HANDLER( vc1541_via0_read_portb )
 	case 11:
 		break;
 	}
-	if (value!=old) {
+	if (value!=old) 
+	{
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 serial read");
+		mame_printf_debug("%s %s %s\n", serial.atn[0]?"ATN":"atn", serial.clock[0]?"CLOCK":"clock", serial.data[0]?"DATA":"data");
 
-		DBG_LOG(2, "vc1541 serial read",("%s %s %s\n",
-										 serial.atn[0]?"ATN":"atn",
-										 serial.clock[0]?"CLOCK":"clock",
-										 serial.data[0]?"DATA":"data"));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 serial read");
+		mame_printf_debug("%s %s %s\n", value&0x80?"ATN":"atn", value&4?"CLOCK":"clock", value&1?"DATA":"data");
 
-		DBG_LOG(2, "vc1541 serial read",("%s %s %s\n",
-										 value&0x80?"ATN":"atn",
-										 value&4?"CLOCK":"clock",
-										 value&1?"DATA":"data"));
 		old=value;
 	}
 
@@ -451,10 +448,8 @@ static READ8_HANDLER( vc1541_via0_read_portb )
 
 static WRITE8_HANDLER( vc1541_via0_write_portb )
 {
-	DBG_LOG(2, "vc1541 serial write",("%s %s %s\n",
-									 data&0x10?"ATN":"atn",
-									 data&8?"CLOCK":"clock",
-									 data&2?"DATA":"data"));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 serial write");
+	mame_printf_debug("%s %s %s\n", data&0x10?"ATN":"atn", data&8?"CLOCK":"clock", data&2?"DATA":"data");
 
 	vc1541->drive.serial.data=data&2?0:1;
 	vc1541->drive.serial.acka=(data&0x10)?1:0;
@@ -501,7 +496,10 @@ static WRITE8_HANDLER( vc1541_via0_write_portb )
 static void vc1541_via1_irq (running_machine *machine, int level)
 {
 	vc1541->via1irq = level;
-	DBG_LOG(2, "vc1541 via1 irq",("level %d %d\n",vc1541->via0irq,vc1541->via1irq));
+
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 via1 irq");
+	mame_printf_debug("level %d %d\n",vc1541->via0irq,vc1541->via1irq);
+
 	cpunum_set_input_line (machine, vc1541->cpunumber,
 					  M6502_IRQ_LINE, vc1541->via1irq || vc1541->via0irq);
 }
@@ -509,13 +507,16 @@ static void vc1541_via1_irq (running_machine *machine, int level)
 static READ8_HANDLER( vc1541_via1_read_porta )
 {
 	int data=vc1541->head.data[vc1541->d64.pos];
-	DBG_LOG(2, "vc1541 drive",("port a read %.2x\n", data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 drive");
+	mame_printf_debug("port a read %.2x\n", data);
+
 	return data;
 }
 
 static WRITE8_HANDLER( vc1541_via1_write_porta )
 {
-	DBG_LOG(1, "vc1541 drive",("port a write %.2x\n", data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 drive");
+	mame_printf_debug("port a write %.2x\n", data);
 }
 
 static  READ8_HANDLER( vc1541_via1_read_portb )
@@ -536,8 +537,11 @@ static  READ8_HANDLER( vc1541_via1_read_portb )
 static WRITE8_HANDLER( vc1541_via1_write_portb )
 {
 	static int old=0;
-	if (data!=old) {
-		DBG_LOG(1, "vc1541 drive",("%.2x\n", data));
+	if (data!=old) 
+	{
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 drive");
+		mame_printf_debug("%.2x\n", data);
+
 		if ((old&3)!=(data&3)) {
 			switch (old&3) {
 			case 0:
@@ -666,7 +670,7 @@ void vc1541_reset (void)
 /* delivers status for displaying */
 void vc1541_drive_status (char *text, int size)
 {
-#if 1||VERBOSE_DBG
+#if 1
 	if (vc1541->type==TypeVC1541) {
 		snprintf (text, size, "%s %4.1f %s %.2x %s %s %s",
 				  vc1541->led ? "LED" : "led",
@@ -717,10 +721,9 @@ void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 			serial.atn[0] = serial.atn[1] && serial.atn[2];
 			if (serial.atn[0] == level)
 			{
-				DBG_LOG(1, "vc1541",("%d:%.4x atn %s\n",
-									 cpu_getactivecpu (),
-									 activecpu_get_pc(),
-									 serial.atn[0]?"ATN":"atn"));
+				mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541");
+				mame_printf_debug("%d:%.4x atn %s\n", cpu_getactivecpu (), activecpu_get_pc(), serial.atn[0]?"ATN":"atn");
+
 				via_set_input_ca1 (machine, 2, !level);
 #if 0
 				value=vc1541->drive.serial.data;
@@ -758,10 +761,8 @@ void vc1541_serial_data_write (int which, int level)
 			serial.data[0] = serial.data[1] && serial.data[2];
 			if (serial.data[0] == level)
 			{
-				DBG_LOG(1, "vc1541",("%d:%.4x data %s\n",
-									 cpu_getactivecpu (),
-									 activecpu_get_pc(),
-									 serial.data[0]?"DATA":"data"));
+				mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541");
+				mame_printf_debug("%d:%.4x data %s\n", cpu_getactivecpu (), activecpu_get_pc(), serial.data[0]?"DATA":"data");
 			}
 		}
 	}
@@ -788,10 +789,8 @@ void vc1541_serial_clock_write (int which, int level)
 			serial.clock[0] = serial.clock[1] && serial.clock[2];
 			if (serial.clock[0] == level)
 			{
-				DBG_LOG(1, "vc1541",("%d:%.4x clock %s\n",
-									 cpu_getactivecpu (),
-									 activecpu_get_pc(),
-									 serial.clock[0]?"CLOCK":"clock"));
+				mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541");
+				mame_printf_debug("%d:%.4x clock %s\n", cpu_getactivecpu (), activecpu_get_pc(), serial.clock[0]?"CLOCK":"clock");
 			}
 		}
 	}
@@ -827,12 +826,17 @@ static TIMER_CALLBACK(c1551_timer)
 static WRITE8_HANDLER ( c1551_port_w )
 {
 	static int old=0;
-	if (offset) {
-		DBG_LOG(1, "c1551 port",("write %.2x\n",data));
+	if (offset) 
+	{
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 port");
+		mame_printf_debug("write %.2x\n",data);
+
 		vc1541->drive.c1551.cpu_port=data;
 
-		if (data!=old) {
-			DBG_LOG(1, "vc1541 drive",("%.2x\n", data));
+		if (data!=old) 
+		{
+			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vc1541 drive");
+			mame_printf_debug("%.2x\n", data);
 			if ((old&3)!=(data&3)) {
 				switch (old&3) {
 				case 0:
@@ -877,7 +881,9 @@ static WRITE8_HANDLER ( c1551_port_w )
 		vc1541->led = data & 8;
 	} else {
 		vc1541->drive.c1551.cpu_ddr=data;
-		DBG_LOG(1, "c1551 ddr",("write %.2x\n",data));
+
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 ddr");
+		mame_printf_debug("write %.2x\n",data);
 	}
 }
 
@@ -897,10 +903,14 @@ static  READ8_HANDLER ( c1551_port_r )
 		}
 		data&=~vc1541->drive.c1551.cpu_ddr;
 		data|=vc1541->drive.c1551.cpu_ddr&vc1541->drive.c1551.cpu_port;
-		DBG_LOG(3, "c1551 port",("read %.2x\n", data));
+
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 port");
+		mame_printf_debug("read %.2x\n", data);
 	} else {
 		data=vc1541->drive.c1551.cpu_ddr;
-		DBG_LOG(3, "c1551 ddr",("read %.2x\n", data));
+
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 ddr");
+	mame_printf_debug("read %.2x\n", data);
 	}
 	return data;
 }
@@ -932,7 +942,8 @@ static int c1551_port_c_r(void)
 static int c1551_port_b_r (void)
 {
 	int data=vc1541->head.data[vc1541->d64.pos];
-	DBG_LOG(2, "c1551 drive",("port a read %.2x\n", data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 drive");
+	mame_printf_debug("port a read %.2x\n", data);
 	return data;
 }
 
@@ -961,8 +972,8 @@ ADDRESS_MAP_END
 
 static void c1551x_write_data (running_machine *machine, TPI6525 *This, int data)
 {
-	DBG_LOG(1, "c1551 cpu", ("%d write data %.2x\n",
-						 cpu_getactivecpu (), data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 cpu");
+	mame_printf_debug("%d write data %.2x\n", cpu_getactivecpu (), data);
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
@@ -976,15 +987,17 @@ static int c1551x_read_data (running_machine *machine, TPI6525 *This)
 	cpu_sync ();
 #endif
 	data=tpi6525_0_port_a_r(machine, 0);
-	DBG_LOG(2, "c1551 cpu",("%d read data %.2x\n",
-						 cpu_getactivecpu (), data));
+
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 cpu");
+	mame_printf_debug("%d read data %.2x\n", cpu_getactivecpu (), data);
+
 	return data;
 }
 
 static void c1551x_write_handshake (running_machine *machine, TPI6525 *This, int data)
 {
-	DBG_LOG(1, "c1551 cpu",("%d write handshake %.2x\n",
-						 cpu_getactivecpu (), data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 cpu");
+	mame_printf_debug("%d write handshake %.2x\n", cpu_getactivecpu (), data);
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
@@ -998,8 +1011,10 @@ static int c1551x_read_handshake (running_machine *machine, TPI6525 *This)
 	cpu_sync();
 #endif
 	data=tpi6525_0_port_c_r(machine, 0)&8?0x80:0;
-	DBG_LOG(2, "c1551 cpu",("%d read handshake %.2x\n",
-						 cpu_getactivecpu (), data));
+
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 cpu");
+	mame_printf_debug("%d read handshake %.2x\n", cpu_getactivecpu (), data);
+
 	return data;
 }
 
@@ -1010,8 +1025,10 @@ static int c1551x_read_status (running_machine *machine, TPI6525 *This)
 	cpu_sync();
 #endif
 	data=tpi6525_0_port_c_r(machine, 0)&3;
-	DBG_LOG(1, "c1551 cpu",("%d read status %.2x\n",
-						 cpu_getactivecpu (), data));
+
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "c1551 cpu");
+	mame_printf_debug("%d read status %.2x\n", cpu_getactivecpu (), data);
+
 	return data;
 }
 

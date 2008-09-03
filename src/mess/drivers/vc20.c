@@ -153,7 +153,6 @@ when problems start with -log and look into error.log file
 
 #include "driver.h"
 
-#define VERBOSE_DBG 0
 #include "includes/cbm.h"
 #include "machine/6522via.h"
 #include "includes/cbmserb.h"

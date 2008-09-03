@@ -55,7 +55,9 @@ void vic4567_init (int pal, int (*dma_read) (int),
 
 WRITE8_HANDLER ( vic3_port_w )
 {
-	DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic write");
+	mame_printf_debug("%.2x:%.2x\n", offset, data);
+
 	offset &= 0x7f;
 	switch (offset)
 	{
@@ -68,13 +70,16 @@ WRITE8_HANDLER ( vic3_port_w )
 		vic2_port_w(machine, offset,data);
 		break;
 	case 0x2f:
-		DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic write");
+		mame_printf_debug("%.2x:%.2x\n", offset, data);
 		vic2.reg[offset] = data;
 		break;
 	case 0x30:
 		vic2.reg[offset] = data;
-		if (vic2.port_changed!=NULL) {
-			DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
+		if (vic2.port_changed!=NULL) 
+		{
+			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic write");
+			mame_printf_debug("%.2x:%.2x\n", offset, data);
 			vic2.reg[offset] = data;
 			vic2.port_changed(data);
 		}
@@ -99,7 +104,8 @@ WRITE8_HANDLER ( vic3_port_w )
 	case 0x3e:
 	case 0x3f:
 		vic2.reg[offset] = data;
-		DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic write");
+		mame_printf_debug("%.2x:%.2x\n", offset, data);
 		break;
 	case 0x40:
 	case 0x41:
@@ -109,7 +115,8 @@ WRITE8_HANDLER ( vic3_port_w )
 	case 0x45:
 	case 0x46:
 	case 0x47:
-		DBG_LOG (2, "vic plane write", ("%.2x:%.2x\n", offset, data));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic plane write");
+		mame_printf_debug("%.2x:%.2x\n", offset, data);
 		break;
 	default:
 		vic2.reg[offset] = data;
@@ -133,7 +140,8 @@ READ8_HANDLER ( vic3_port_r )
 	case 0x2f:
 	case 0x30:
 		val = vic2.reg[offset];
-		DBG_LOG (2, "vic read", ("%.2x:%.2x\n", offset, val));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic read");
+		mame_printf_debug("%.2x:%.2x\n", offset, val);
 		break;
 	case 0x31:
 	case 0x32:
@@ -151,7 +159,8 @@ READ8_HANDLER ( vic3_port_r )
 	case 0x3e:
 	case 0x3f:						   /* not used */
 		val = vic2.reg[offset];
-		DBG_LOG (2, "vic read", ("%.2x:%.2x\n", offset, val));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic read");
+		mame_printf_debug("%.2x:%.2x\n", offset, val);
 		break;
 	case 0x40:
 	case 0x41:
@@ -161,7 +170,8 @@ READ8_HANDLER ( vic3_port_r )
 	case 0x45:
 	case 0x46:
 	case 0x47:
-		DBG_LOG (2, "vic3 plane read", ("%.2x:%.2x\n", offset, val));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic3 plane read");
+		mame_printf_debug("%.2x:%.2x\n", offset, val);
 		break;
 	default:
 		val = vic2.reg[offset];

@@ -15,7 +15,6 @@
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
-#define VERBOSE_DBG 0
 #include "includes/cbm.h"
 #include "machine/cbmipt.h"
 #include "video/vic4567.h"

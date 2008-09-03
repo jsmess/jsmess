@@ -11,8 +11,6 @@
 #include "streams.h"
 #include "deprecat.h"
 
-#define VERBOSE_DBG 1
-#include "includes/cbm.h"
 #include "includes/c16.h"
 #include "video/ted7360.h"
 
@@ -58,21 +56,21 @@ void ted7360_soundport_w (running_machine *machine, int offset, int data)
 		else
 			ted7360[offset] = data;
 		tone1samples = machine->sample_rate / TONE_FREQUENCY (TONE1_VALUE);
-		DBG_LOG (1, "ted7360", ("tone1 %d %d sample:%d\n",
-					TONE1_VALUE, TONE_FREQUENCY(TONE1_VALUE), tone1samples));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360");
+		mame_printf_debug("tone1 %d %d sample:%d\n", TONE1_VALUE, TONE_FREQUENCY(TONE1_VALUE), tone1samples);
 
 		break;
 	case 0xf:
 	case 0x10:
 		ted7360[offset] = data;
 		tone2samples = machine->sample_rate / TONE_FREQUENCY (TONE2_VALUE);
-		DBG_LOG (1, "ted7360", ("tone2 %d %d sample:%d\n",
-					TONE2_VALUE, TONE_FREQUENCY(TONE2_VALUE), tone2samples));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360");
+		mame_printf_debug("tone2 %d %d sample:%d\n", TONE2_VALUE, TONE_FREQUENCY(TONE2_VALUE), tone2samples);
 
 		noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * machine->sample_rate
 							  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
-		DBG_LOG (1, "ted7360", ("noise %d sample:%d\n",
-					NOISE_FREQUENCY, noisesamples));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360");
+		mame_printf_debug("noise %d sample:%d\n", NOISE_FREQUENCY, noisesamples);
 		if (!NOISE_ON || ((double) noisepos / noisesamples >= 1.0))
 		{
 			noisepos = 0;
@@ -80,10 +78,11 @@ void ted7360_soundport_w (running_machine *machine, int offset, int data)
 		break;
 	case 0x11:
 		ted7360[offset] = data;
-		DBG_LOG(1, "ted7360", ("%s volume %d, %s %s %s\n",
-				       TONE_ON?"on":"off",
-				       VOLUME, TONE1_ON?"tone1":"", TONE2_ON?"tone2":"",
-				       NOISE_ON?"noise":""));
+
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "ted7360");
+		mame_printf_debug("%s volume %d, %s %s %s\n", TONE_ON?"on":"off", VOLUME, 
+							TONE1_ON?"tone1":"", TONE2_ON?"tone2":"", NOISE_ON?"noise":"");
+
 		if (!TONE_ON||!TONE1_ON) tone1pos=0;
 		if (!TONE_ON||!TONE2_ON) tone2pos=0;
 		if (!TONE_ON||!NOISE_ON) noisepos=0;

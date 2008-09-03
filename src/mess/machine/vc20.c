@@ -17,8 +17,6 @@
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 
-#define VERBOSE_DBG 0
-#include "includes/cbm.h"
 #include "machine/6522via.h"
 #include "includes/vc1541.h"
 #include "includes/cbmserb.h"
@@ -74,7 +72,9 @@ static READ8_HANDLER( vc20_via0_read_ca1 )
 
 static READ8_HANDLER( vc20_via0_read_ca2 )
 {
-	DBG_LOG (1, "tape", ("motor read %d\n", via0_ca2));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "tape");
+	mame_printf_debug("motor read %d\n", via0_ca2);
+
 	return via0_ca2;
 }
 
@@ -120,7 +120,9 @@ static  READ8_HANDLER( vc20_via0_read_porta )
 static WRITE8_HANDLER( vc20_via0_write_porta )
 {
 	cbm_serial_atn_write (serial_atn = !(data & 0x80));
-	DBG_LOG (1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
+
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "serial out");
+	mame_printf_debug("atn %s\n", serial_atn ? "high" : "low");
 }
 
 /* via 1 addr 0x9120
@@ -317,7 +319,9 @@ static WRITE8_HANDLER( vc20_via1_write_portb )
 
 static  READ8_HANDLER( vc20_via1_read_cb1 )
 {
-	DBG_LOG (1, "serial in", ("request read\n"));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "serial in");
+	mame_printf_debug("request read\n");
+
 	return cbm_serial_request_read ();
 }
 

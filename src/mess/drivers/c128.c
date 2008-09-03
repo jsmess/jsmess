@@ -297,7 +297,6 @@ U102 23256 (read compatible 27256?) 32kB 1571 system rom
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
-#define VERBOSE_DBG 0
 #include "includes/cbm.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"

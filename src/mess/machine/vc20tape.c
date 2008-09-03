@@ -12,8 +12,6 @@
 #include "image.h"
 #include "sound/dac.h"
 
-#define VERBOSE_DBG 0
-#include "includes/cbm.h"
 #include "includes/vc20tape.h"
 
 #define TONE_ON_VALUE 0xff

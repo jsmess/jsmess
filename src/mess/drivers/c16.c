@@ -156,7 +156,6 @@ when problems start with -log and look into error.log file
 #include "driver.h"
 #include "sound/sid6581.h"
 
-#define VERBOSE_DBG 0
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"

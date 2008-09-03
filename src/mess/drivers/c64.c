@@ -194,7 +194,6 @@ when problems start with -log and look into error.log file
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
-#define VERBOSE_DBG 0
 #include "includes/cbm.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"

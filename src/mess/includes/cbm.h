@@ -14,39 +14,6 @@
 
 /***********************************************
 
-	CBM Debug Logging Macro
-
-***********************************************/
-
-/* call the XXX_LOG with XXX_LOG("info",("%fmt\n",args));			*
- * where "info" can also be 0 to append .."%fmt",args to a line.	*/
-
-#define LOG(LEVEL,N,M,A)  \
-        { \
-	  if(LEVEL>=N) { \
-	    if( M ) \
-              logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()), (char*)M );\
-	    logerror A; \
-	  } \
-        }
-
-/* debugging level here for all on or off */
-#if 1
-# ifdef VERBOSE_DBG
-#  undef VERBOSE_DBG
-# endif
-# if 1
-#  define VERBOSE_DBG 0
-# else
-#  define VERBOSE_DBG 1
-# endif
-#endif
-
-#define DBG_LOG(n,m,a) LOG(VERBOSE_DBG,n,m,a)
-
-
-/***********************************************
-
 	CBM Quickloads
 
 ***********************************************/

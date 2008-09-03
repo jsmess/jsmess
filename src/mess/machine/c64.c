@@ -29,7 +29,6 @@
 #include "machine/6526cia.h"
 #include "deprecat.h"
 
-#define VERBOSE_DBG 1
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
@@ -311,7 +310,9 @@ static void c64_irq (running_machine *machine, int level)
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos6510", ("irq %s\n", level ? "start" : "end"));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "mos6510");
+		mame_printf_debug("irq %s\n", level ? "start" : "end");
+
 		if (is_c128(machine))
 		{
 			if (0 && (cpu_getactivecpu() == 0))
@@ -446,17 +447,22 @@ WRITE8_HANDLER( c64_write_io )
 		if (c64_cia1_on)
 			cia_1_w(machine, offset, data);
 		else
-			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
+			{
+			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io write");
+			mame_printf_debug("%.3x %.2x\n", offset, data);
+			}
 	}
 	else if (offset < 0xf00)
 	{
 		/* i/o 1 */
-			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io write");
+		mame_printf_debug("%.3x %.2x\n", offset, data);
 	}
 	else
 	{
 		/* i/o 2 */
-			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io write");
+		mame_printf_debug("%.3x %.2x\n", offset, data);
 	}
 }
 
@@ -501,7 +507,8 @@ READ8_HANDLER( c64_read_io )
 	else if (c64_cia1_on && (offset < 0xe00))
 		return cia_1_r(machine, offset);
 
-	DBG_LOG (1, "io read", ("%.3x\n", offset));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "io read");
+	mame_printf_debug("%.3x\n", offset);
 
 	return 0xff;
 }
@@ -640,7 +647,9 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	if (!c64_game && c64_exrom)
 		ultimax_mode = 1;
 
-	DBG_LOG (1, "bankswitch", ("%d\n", data & 7));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "bankswitch");
+	mame_printf_debug("%d\n", data & 0x07);
+
 	loram  = (data & 1) ? 1 : 0;
 	hiram  = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;

@@ -11,10 +11,8 @@
 #include "utils.h"
 #include "sound/custom.h"
 
-#define VERBOSE_DBG 0
 #include "vic6560.h"
 
-#include "includes/cbm.h"
 #include "includes/vc20.h"
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
@@ -187,7 +185,8 @@ VIDEO_START( vic6560 )
 
 WRITE8_HANDLER ( vic6560_port_w )
 {
-	DBG_LOG (1, "vic6560_port_w", ("%.4x:%.2x\n", offset, data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560_port_w");
+	mame_printf_debug("%.4x:%.2x\n", offset, data);
 	switch (offset)
 	{
 	case 0xa:
@@ -291,7 +290,8 @@ WRITE8_HANDLER ( vic6560_port_w )
 		val = vic6560[offset];
 		break;
 	}
-	DBG_LOG (3, "vic6560_port_r", ("%.4x:%.2x\n", offset, val));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560_port_r");
+	mame_printf_debug("%.4x:%.2x\n", offset, val);
 	return val;
 }
 

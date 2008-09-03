@@ -8,7 +8,6 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 
-#define VERBOSE_DBG 1
 #include "includes/cbm.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
@@ -132,7 +131,9 @@ static void pet_irq (running_machine *machine, int level)
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos6502", ("irq %s\n", level ? "start" : "end"));
+		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "mos6502");
+		mame_printf_debug("irq %s\n", level ? "start" : "end");
+
 		if (superpet)
 			cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, level);
 		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, level);
@@ -226,7 +227,9 @@ static const pia6821_interface pet_pia1 =
 
 static WRITE8_HANDLER( pet_address_line_11 )
 {
-	DBG_LOG (1, "address line", ("%d\n", data));
+	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "address line");
+	mame_printf_debug("%d\n", data);
+
 	if (data) pet_font |= 1;
 	else pet_font &= ~1;
 }

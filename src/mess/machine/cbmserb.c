@@ -5,8 +5,6 @@
 #include "driver.h"
 #include "image.h"
 
-#define VERBOSE_DBG 0				   /* general debug messages */
-//#include "includes/cbm.h"
 #include "includes/cbmdrive.h"
 
 #include "includes/cbmserb.h"
@@ -365,7 +363,7 @@ void cbm_serial_atn_write (int level)
 static void cbm_drive_status (CBM_Drive * c1551, char *text, int size)
 {
 	text[0] = 0;
-#if VERBOSE_DBG
+#if 0
 	if ((c1551->interface == SERIAL) /*&&(c1551->i.serial.device==8) */ )
 	{
 		snprintf (text, size, "%d state:%d %d %d %s %s %s",

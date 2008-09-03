@@ -10,7 +10,6 @@
 #include "machine/6526cia.h"
 #include "deprecat.h"
 
-#define VERBOSE_DBG 1
 #include "includes/cbm.h"
 #include "machine/tpi6525.h"
 #include "includes/cbmserb.h"
@@ -208,7 +207,8 @@ static void cbmb_irq (running_machine *machine, int level)
 
 	if (level != old_level)
 	{
-		DBG_LOG (3, "mos6509", ("irq %s\n", level ? "start" : "end"));
+		logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "mos6509");
+		logerror("irq %s\n", level ? "start" : "end");
 		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, level);
 		old_level = level;
 	}
