@@ -634,8 +634,8 @@ static TIMER_CALLBACK(x68k_scc_ack)
 	if(sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
-	if((sys.ioc.irqstatus & 0xc0) != 0)
-		return;
+//	if((sys.ioc.irqstatus & 0xc0) != 0)
+//		return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
 	if((scc_get_reg_a(scc, 9) & 0x08) || (scc_get_reg_b(scc, 9) & 0x08))  // SCC reg WR9 is the same for both channels
@@ -746,12 +746,15 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, data & 0x03), (data & 0x80));
 		if(data & 0x80)
 		{
-			for(drive=0;drive<4;drive++) // enable motor for this drive, disable all the others.
+			for(drive=0;drive<4;drive++) // enable motor for this drive
 			{
 				if(drive == (data & 0x03))
+				{
 					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 1);
+					output_set_indexed_value("access_drv",drive,0);
+				}
 				else
-					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 0);
+					output_set_indexed_value("access_drv",drive,1);
 			}
 		}
 		else    // BIOS code suggests that setting bit 7 of this port to 0 disables the motor of all floppy drives
@@ -763,13 +766,13 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 2),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 3),1,1);
-		for(drive=0;drive<4;drive++)
-		{
-			if(floppy_drive_get_flag_state(image_from_devtype_and_index(IO_FLOPPY, drive),FLOPPY_DRIVE_MOTOR_ON))
-				output_set_indexed_value("access_drv",drive,0);
-			else
-				output_set_indexed_value("access_drv",drive,1);
-		}
+//		for(drive=0;drive<4;drive++)
+//		{
+//			if(floppy_drive_get_flag_state(image_from_devtype_and_index(IO_FLOPPY, drive),FLOPPY_DRIVE_MOTOR_ON))
+//				output_set_indexed_value("access_drv",drive,0);
+//			else
+//				output_set_indexed_value("access_drv",drive,1);
+//		}
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:

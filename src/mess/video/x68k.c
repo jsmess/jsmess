@@ -328,7 +328,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	}
 
 	if (x68k_mfp != NULL)
-	mc68901_tai_w(x68k_mfp, sys.crtc.vblank);
+	mc68901_tai_w(x68k_mfp, !sys.crtc.vblank);
 }
 
 
