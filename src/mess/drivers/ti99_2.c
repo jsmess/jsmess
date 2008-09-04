@@ -244,13 +244,6 @@ static WRITE8_HANDLER ( ti99_2_write_misc_cru )
 	}
 }
 
-static ADDRESS_MAP_START(ti99_2_writecru, ADDRESS_SPACE_IO, 8)
-
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(ti99_2_write_kbd)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(ti99_2_write_misc_cru)
-
-ADDRESS_MAP_END
-
 /* read keys in the current row */
 static  READ8_HANDLER ( ti99_2_read_kbd )
 {
@@ -264,11 +257,11 @@ static  READ8_HANDLER ( ti99_2_read_misc_cru )
 	return 0;
 }
 
-static ADDRESS_MAP_START(ti99_2_readcru, ADDRESS_SPACE_IO, 8)
-
+static ADDRESS_MAP_START(ti99_2_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0E00, 0x0E7f) AM_READ(ti99_2_read_kbd)
 	AM_RANGE(0x0E80, 0x0Eff) AM_READ(ti99_2_read_misc_cru)
-
+	AM_RANGE(0x7000, 0x73ff) AM_WRITE(ti99_2_write_kbd)
+	AM_RANGE(0x7400, 0x77ff) AM_WRITE(ti99_2_write_misc_cru)
 ADDRESS_MAP_END
 
 
@@ -361,7 +354,7 @@ static MACHINE_DRIVER_START(ti99_2)
 	MDRV_CPU_ADD("main", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(ti99_2_processor_config)
 	MDRV_CPU_PROGRAM_MAP(ti99_2_memmap, 0)
-	MDRV_CPU_IO_MAP(ti99_2_readcru, ti99_2_writecru)
+	MDRV_CPU_IO_MAP(ti99_2_io, 0)
 	MDRV_CPU_VBLANK_INT("main", ti99_2_vblank_interrupt)
 
 	MDRV_MACHINE_RESET( ti99_2 )

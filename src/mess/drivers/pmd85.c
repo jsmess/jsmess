@@ -179,20 +179,12 @@ I/O ports
 
 /* I/O ports */
 
-static ADDRESS_MAP_START( pmd85_readport , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x00, 0xff) AM_READ( pmd85_io_r )
+static ADDRESS_MAP_START( pmd85_io_map, ADDRESS_SPACE_IO, 8)
+	AM_RANGE( 0x00, 0xff) AM_READWRITE( pmd85_io_r, pmd85_io_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pmd85_writeport , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x00, 0xff) AM_WRITE( pmd85_io_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mato_readport , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x00, 0xff) AM_READ( mato_io_r )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mato_writeport , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x00, 0xff) AM_WRITE( mato_io_w )
+static ADDRESS_MAP_START( mato_io_map, ADDRESS_SPACE_IO, 8)
+	AM_RANGE( 0x00, 0xff) AM_READWRITE( mato_io_r, mato_io_w )
 ADDRESS_MAP_END
 
 /* memory w/r functions */
@@ -529,7 +521,7 @@ static MACHINE_DRIVER_START( pmd85 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080, 2000000)		/* 2.048MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(pmd85_mem, 0)
-	MDRV_CPU_IO_MAP(pmd85_readport, pmd85_writeport)
+	MDRV_CPU_IO_MAP(pmd85_io_map, 0)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( pmd85 )
@@ -604,7 +596,7 @@ static MACHINE_DRIVER_START( mato )
 	MDRV_IMPORT_FROM( pmd85 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mato_mem, 0)
-	MDRV_CPU_IO_MAP(mato_readport, mato_writeport)
+	MDRV_CPU_IO_MAP(mato_io_map, 0)
 
 	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
 	MDRV_DEVICE_CONFIG( mato_ppi8255_interface )

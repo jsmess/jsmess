@@ -166,23 +166,15 @@ ADDRESS_MAP_END
   CRU map
 */
 
-static ADDRESS_MAP_START(ti990_10_writecru, ADDRESS_SPACE_IO, 8)
-
-	AM_RANGE(0x80, 0x8f) AM_WRITE(vdt911_0_cru_w)
-
-	AM_RANGE(0xfd0, 0xfdf) AM_WRITE(ti990_10_mapper_cru_w)
-	AM_RANGE(0xfe0, 0xfef) AM_WRITE(ti990_10_eir_cru_w)
-	AM_RANGE(0xff0, 0xfff) AM_WRITE(ti990_panel_write)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(ti990_10_readcru, ADDRESS_SPACE_IO, 8)
-
+static ADDRESS_MAP_START(ti990_10_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x10, 0x11) AM_READ(vdt911_0_cru_r)
-
+	AM_RANGE(0x80, 0x8f) AM_WRITE(vdt911_0_cru_w)
 	AM_RANGE(0x1fa, 0x1fb) AM_READ(ti990_10_mapper_cru_r)
 	AM_RANGE(0x1fc, 0x1fd) AM_READ(ti990_10_eir_cru_r)
 	AM_RANGE(0x1fe, 0x1ff) AM_READ(ti990_panel_read)
+	AM_RANGE(0xfd0, 0xfdf) AM_WRITE(ti990_10_mapper_cru_w)
+	AM_RANGE(0xfe0, 0xfef) AM_WRITE(ti990_10_eir_cru_w)
+	AM_RANGE(0xff0, 0xfff) AM_WRITE(ti990_panel_write)
 
 ADDRESS_MAP_END
 
@@ -204,7 +196,7 @@ static MACHINE_DRIVER_START(ti990_10)
 	MDRV_CPU_ADD("main", TI990_10, 4000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(ti990_10_memmap, 0)
-	MDRV_CPU_IO_MAP(ti990_10_readcru, ti990_10_writecru)
+	MDRV_CPU_IO_MAP(ti990_10_io, 0)
 	MDRV_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
 
 	MDRV_MACHINE_START( ti990_10 )

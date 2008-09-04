@@ -142,19 +142,14 @@ static WRITE8_HANDLER(fd5_tc_w)
 /* 0x030 fd5 reads from this port to communicate with m5 */
 /* 0x040 */
 /* 0x050 */
-static ADDRESS_MAP_START( readport_sord_fd5 , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x000, 0x000) AM_READ( nec765_status_r)
-	AM_RANGE( 0x001, 0x001) AM_READ( nec765_data_r)
-	AM_RANGE( 0x010, 0x010) AM_READ( fd5_data_r)
-	AM_RANGE( 0x030, 0x030) AM_READ( fd5_communication_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_sord_fd5 , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x001, 0x001) AM_WRITE( nec765_data_w)
-	AM_RANGE( 0x010, 0x010) AM_WRITE( fd5_data_w)
-	AM_RANGE( 0x020, 0x020) AM_WRITE( fd5_communication_w)
-	AM_RANGE( 0x040, 0x040) AM_WRITE( fd5_drive_control_w)
-	AM_RANGE( 0x050, 0x050) AM_WRITE( fd5_tc_w)
+static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
+	AM_RANGE(0x000, 0x000) AM_READ(nec765_status_r)
+	AM_RANGE(0x001, 0x001) AM_READWRITE(nec765_data_r, nec765_data_w)
+	AM_RANGE(0x010, 0x010) AM_READWRITE(fd5_data_r, fd5_data_w)
+	AM_RANGE(0x020, 0x020) AM_WRITE(fd5_communication_w)
+	AM_RANGE(0x030, 0x030) AM_READ(fd5_communication_r)
+	AM_RANGE(0x040, 0x040) AM_WRITE(fd5_drive_control_w)
+	AM_RANGE(0x050, 0x050) AM_WRITE(fd5_tc_w)
 ADDRESS_MAP_END
 
 /* nec765 data request is connected to interrupt of z80 inside fd5 interface */
@@ -662,7 +657,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 
 	MDRV_CPU_ADD("floppy", Z80, 3800000)
 	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem, 0)
-	MDRV_CPU_IO_MAP(readport_sord_fd5,writeport_sord_fd5)
+	MDRV_CPU_IO_MAP(sord_fd5_io, 0)
 
 	MDRV_INTERLEAVE(20)
 	MDRV_MACHINE_RESET( sord_m5_fd5 )

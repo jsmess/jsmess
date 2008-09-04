@@ -441,18 +441,10 @@ ADDRESS_MAP_END
     >ed00(r): tape input
 */
 
-static ADDRESS_MAP_START(tutor_readcru, ADDRESS_SPACE_IO, 8)
-
+static ADDRESS_MAP_START(tutor_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xec0, 0xec7) AM_READ(read_keyboard)			/*keyboard interface*/
 	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)		/*cassette interface*/
-
 ADDRESS_MAP_END
-
-/*static ADDRESS_MAP_START(tutor_writecru, ADDRESS_SPACE_IO, 8)
-
-
-ADDRESS_MAP_END*/
-
 
 /* tutor keyboard: 56 keys 
 
@@ -585,7 +577,7 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_CPU_ADD("main", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(tutor_processor_config)
 	MDRV_CPU_PROGRAM_MAP(tutor_memmap, 0)
-	MDRV_CPU_IO_MAP(tutor_readcru, /*tutor_writecru*/0)
+	MDRV_CPU_IO_MAP(tutor_io, 0)
 	MDRV_CPU_VBLANK_INT("main", tutor_vblank_interrupt)
 
 	MDRV_MACHINE_START( tutor )
