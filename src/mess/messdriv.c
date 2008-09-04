@@ -480,7 +480,7 @@ XL/XE 16kB OS roms
 	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
 	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
 	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
-//	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
+	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
 	DRIVER( avigo )		/*													*/
 
@@ -540,9 +540,9 @@ XL/XE 16kB OS roms
 	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
 	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
 	DRIVER( trs80m4 )
-	DRIVER( ht1080z ) /* Híradástechnika Szövetkezet HT-1080Z */
-	DRIVER( ht1080z2 ) /* Híradástechnika Szövetkezet HT-1080Z Series II */
-	DRIVER( ht108064 ) /* Híradástechnika Szövetkezet HT-1080Z/64 */
+	DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
+	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
+	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
 
 	DRIVER( coco )		/* Color Computer									*/
 	DRIVER( cocoe )		/* Color Computer (Extended BASIC 1.0)				*/
@@ -781,7 +781,7 @@ XL/XE 16kB OS roms
 	DRIVER(tmc600s2)
 
 	/* OSCOM Oy */
-//	DRIVER(osc1000b)
+	DRIVER(osc1000b)
 	DRIVER(oscnano)
 
 	/* MIT */
