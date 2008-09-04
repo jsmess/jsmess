@@ -25,6 +25,7 @@ MESSTEST_OBJS =	\
 	$(MESSOBJ)/tools/messtest/core.o		\
 	$(MESSOBJ)/tools/messtest/testmess.o	\
 	$(MESSOBJ)/tools/messtest/testimgt.o	\
+	$(MESSOBJ)/tools/messtest/testzpth.o	\
 	$(MESSOBJ)/tools/messtest/tststubs.o	\
 	$(MESSOBJ)/tools/messtest/tstutils.o	\
 

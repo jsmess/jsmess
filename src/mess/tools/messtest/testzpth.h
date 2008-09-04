@@ -1,17 +1,17 @@
 /*********************************************************************
 
-	testimgt.h
+	testzpth.h
 
-	Imgtool testing code
+	Code for testing zip paths
 
 *********************************************************************/
 
-#ifndef __TESTIMGT_H__
-#define __TESTIMGT_H__
+#ifndef __TESTZPTH_H__
+#define __TESTZPTH_H__
 
 #include "xmlfile.h"
 #include "core.h"
 
-void node_testimgtool(xml_data_node *node);
+void node_testzippath(xml_data_node *node);
 
-#endif /* __TESTIMGT_H__ */
+#endif /* __TESTZPTH_H__ */

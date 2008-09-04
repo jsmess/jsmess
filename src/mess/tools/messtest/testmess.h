@@ -6,12 +6,12 @@
 
 *********************************************************************/
 
-#ifndef TESTMESS_H
-#define TESTMESS_H
+#ifndef __TESTMESS_H__
+#define __TESTMESS_H__
 
 #include "xmlfile.h"
 #include "core.h"
 
 void node_testmess(xml_data_node *node);
 
-#endif /* TESTMESS_H */
+#endif /* __TESTMESS_H__ */

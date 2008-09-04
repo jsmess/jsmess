@@ -17,6 +17,7 @@
 #include "core.h"
 #include "testmess.h"
 #include "testimgt.h"
+#include "testzpth.h"
 #include "osdepend.h"
 #include "pool.h"
 #include "pile.h"
@@ -472,6 +473,15 @@ static void node_tests(xml_data_node *tests_node, int *test_count, int *failure_
 		{
 			/* an Imgtool test */
 			node_testimgtool(child_node);
+
+			(*test_count)++;
+			if (is_failure)
+				(*failure_count)++;
+		}
+		else if (!strcmp(child_node->name, "zippathtest"))
+		{
+			/* a zippath test */
+			node_testzippath(child_node);
 
 			(*test_count)++;
 			if (is_failure)
