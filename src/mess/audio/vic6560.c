@@ -14,6 +14,18 @@
 #include "video/vic6560.h"
 
 
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
+
 /*
  * assumed model:
  * each write to a ton/noise generated starts it new
@@ -82,8 +94,7 @@ void vic6560_soundport_w (running_machine *machine, int offset, int data)
 			if (tone1samples == 0)
 				tone1samples = 1;
 		}
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560");
-		mame_printf_debug("tone1 %.2x %d\n", data, TONE1_FREQUENCY);
+		DBG_LOG (1, "vic6560", ("tone1 %.2x %d\n", data, TONE1_FREQUENCY));
 		break;
 	case 0xb:
 		vic6560[offset] = data;
@@ -94,8 +105,7 @@ void vic6560_soundport_w (running_machine *machine, int offset, int data)
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560");
-		mame_printf_debug("tone2 %.2x %d\n", data, TONE2_FREQUENCY);
+		DBG_LOG (1, "vic6560", ("tone2 %.2x %d\n", data, TONE2_FREQUENCY));
 		break;
 	case 0xc:
 		vic6560[offset] = data;
@@ -106,8 +116,7 @@ void vic6560_soundport_w (running_machine *machine, int offset, int data)
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560");
-		mame_printf_debug("tone3 %.2x %d\n", data, TONE3_FREQUENCY);
+		DBG_LOG (1, "vic6560", ("tone3 %.2x %d\n", data, TONE3_FREQUENCY));
 		break;
 	case 0xd:
 		vic6560[offset] = data;
@@ -115,10 +124,8 @@ void vic6560_soundport_w (running_machine *machine, int offset, int data)
 		{
 			noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * machine->sample_rate
 								  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
-
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560");
-			mame_printf_debug("noise %.2x %d sample:%d\n", data, NOISE_FREQUENCY, noisesamples);
-
+			DBG_LOG (1, "vic6560", ("noise %.2x %d sample:%d\n",
+									data, NOISE_FREQUENCY, noisesamples));
 			if ((double) noisepos / noisesamples >= 1.0)
 			{
 				noisepos = 0;
@@ -131,8 +138,7 @@ void vic6560_soundport_w (running_machine *machine, int offset, int data)
 		break;
 	case 0xe:
 		vic6560[offset] = (old & ~0xf) | (data & 0xf);
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "vic6560");
-		mame_printf_debug("volume %d\n", data & 0xf);
+		DBG_LOG (3, "vic6560", ("volume %d\n", data & 0xf));
 		break;
 	}
 }

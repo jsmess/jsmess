@@ -19,6 +19,20 @@
 
 #include "machine/tpi6525.h"
 
+
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
+
+
 /*
  c364 speech
  say 0 .. 10
@@ -102,9 +116,7 @@ void c364_speech_init(void)
 
 WRITE8_HANDLER(c364_speech_w)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "364");
-	mame_printf_debug("port write %.2x %.2x\n", offset, data);
-
+	DBG_LOG (2, "364", ("port write %.2x %.2x\n", offset, data));
 	switch (offset) {
 	case 0:
 		if (data&0x80) {
@@ -151,11 +163,14 @@ WRITE8_HANDLER(c364_speech_w)
 		break;
 	case 2:
 		speech.sample.data[speech.sample.index++]=data;
-		if (speech.sample.index==sizeof(speech.sample.data)) 
-		{
-			mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "t6721");
-			mame_printf_debug("%.2x%.2x%.2x%.2x%.2x%.2x\n", speech.sample.data[0], speech.sample.data[1],
-						speech.sample.data[2], speech.sample.data[3], speech.sample.data[4], speech.sample.data[5]);
+		if (speech.sample.index==sizeof(speech.sample.data)) {
+			DBG_LOG(1,"t6721",("%.2x%.2x%.2x%.2x%.2x%.2x\n",
+							   speech.sample.data[0],
+							   speech.sample.data[1],
+							   speech.sample.data[2],
+							   speech.sample.data[3],
+							   speech.sample.data[4],
+							   speech.sample.data[5]));
 			speech.sample.index=0;
 			/*speech.endOfSample=false; */
 			speech.busy=TRUE;
@@ -178,7 +193,8 @@ WRITE8_HANDLER(c364_speech_w)
 		}
 		break;
 	}
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "364");
-	mame_printf_debug("port read %.2x %.2x\n", offset, data);
+	DBG_LOG (2, "364", ("port read %.2x %.2x\n", offset, data));
 	return data;
 }
+
+

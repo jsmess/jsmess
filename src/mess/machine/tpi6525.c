@@ -76,6 +76,19 @@
 
 #include "tpi6525.h"
 
+
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N,M,A) \
+	{ \
+		if(VERBOSE_LEVEL >= N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+			logerror A; \
+		} \
+	}
+
+
 TPI6525 tpi6525[4]={
 	{ 0 },
 	{ 1 },
@@ -113,10 +126,7 @@ static void tpi6525_set_interrupt(running_machine *machine, TPI6525 *This)
 {
 	if (!This->interrupt.level && (This->air!=0)) {
 		This->interrupt.level=1;
-
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "tpi6525");
-		mame_printf_debug("%d set interrupt\n",This->number);
-
+		DBG_LOG (3, "tpi6525",("%d set interrupt\n",This->number));
 		if (This->interrupt.output!=NULL)
 			This->interrupt.output(machine, This->interrupt.level);
 	}
@@ -126,10 +136,7 @@ static void tpi6525_clear_interrupt(running_machine *machine, TPI6525 *This)
 {
 	if (This->interrupt.level && (This->air==0)) {
 		This->interrupt.level=0;
-
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "tpi6525");
-		mame_printf_debug("%d clear interrupt\n",This->number);
-
+		DBG_LOG (3, "tpi6525",("%d clear interrupt\n",This->number));
 		if (This->interrupt.output!=NULL)
 			This->interrupt.output(machine, This->interrupt.level);
 	}
@@ -269,8 +276,8 @@ static int tpi6525_port_r(running_machine *machine, TPI6525 *This, int offset)
 			if (This->c.read) data&=This->c.read();
 			data=(data&~This->c.ddr)|(This->c.ddr&This->c.port);
 		}
-		mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "tpi6525");
-		mame_printf_debug("%d read %.2x %.2x\n",This->number, offset,data);
+		DBG_LOG (2, "tpi6525",
+				 ("%d read %.2x %.2x\n",This->number, offset,data));
 		break;
 	case 3:
 		data=This->a.ddr;
@@ -309,15 +316,15 @@ static int tpi6525_port_r(running_machine *machine, TPI6525 *This, int offset)
 		tpi6525_clear_interrupt(machine, This);
 		break;
 	}
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "tpi6525");
-	mame_printf_debug("%d read %.2x %.2x\n",This->number, offset,data);
+	DBG_LOG (3, "tpi6525",
+			 ("%d read %.2x %.2x\n",This->number, offset,data));
 	return data;
 }
 
 static void tpi6525_port_w(running_machine *machine, TPI6525 *This, int offset, int data)
 {
-	mame_printf_debug("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) "tpi6525");
-	mame_printf_debug("%d write %.2x %.2x\n",This->number, offset,data);
+	DBG_LOG (2, "tpi6525",
+			 ("%d write %.2x %.2x\n",This->number, offset,data));
 
 	switch (offset&7) {
 	case 0:
