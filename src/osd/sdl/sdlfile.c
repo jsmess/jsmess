@@ -63,6 +63,7 @@ static file_error error_to_file_error(UINT32 error)
 	switch (error)
 	{
 	case ENOENT:
+	case ENOTDIR:
 		return FILERR_NOT_FOUND;
 
 	case EACCES:
@@ -462,6 +463,7 @@ file_error osd_copyfile(const char *destfile, const char *srcfile)
 #ifndef SDLMAME_WIN32
 osd_directory_entry *osd_stat(const char *path)
 {
+	int err;
 	osd_directory_entry *result = NULL;
 	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	struct stat st;
@@ -470,11 +472,13 @@ osd_directory_entry *osd_stat(const char *path)
 	#endif
 	
 	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
-	stat(path, &st);
+	err = stat(path, &st);
 	#else
-	stat64(path, &st);
+	err = stat64(path, &st);
 	#endif
-	
+
+	if( err == -1) return NULL;
+
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
 	result = (osd_directory_entry *) malloc(sizeof(*result) + strlen(path) + 1);

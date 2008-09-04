@@ -268,8 +268,10 @@ const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subp
 		i = 0;
 		j = 0;
 		last_char = '/';
-		while((c1 = next_path_char(header->filename, &i)) == (c2 = next_path_char(subpath, &j)))
-			last_char = c2;
+                while(((c1 = next_path_char(header->filename, &i)) == (c2 = next_path_char(subpath, &j))) &&
+                        ( c1 != '\0' && c2 != '\0' ))
+                        last_char = c2;
+
 
 		if (c2 == '\0')
 		{

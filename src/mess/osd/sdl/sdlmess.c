@@ -155,7 +155,7 @@ char *osd_dirname(const char *filename)
 // no idea what these are for, just cheese them
 int osd_num_devices(void)
 {
-	return 0;
+	return 1;
 }
 
 const char *osd_get_device_name(int idx)
