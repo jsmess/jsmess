@@ -91,14 +91,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_NOP /* temporary */
-	//AM_RANGE(0x00, 0x03) AM_READWRITE(8255ppi_r, 8255ppi_w)
-	//AM_RANGE(0x04, 0x3f) AM_MIRROR (0x00, 0x03)
-	//AM_RANGE(0x40, 0x41) AM_READWRITE(msm8251_r, msm8251_w)
-	//AM_RANGE(0x42, 0x7f) AM_MIRROR (0x40, 0x41)
-	//AM_RANGE(0x80, 0x83) AM_READWRITE(pit8253_r, pit8253_w)
-	//AM_RANGE(0x84, 0xbf) AM_MIRROR (0x80, 0x83)
-	//AM_RANGE(0xc0, 0xc3) AM_READWRITE(ay8910_r, ay8910_W)
-	//AM_RANGE(0xc4, 0xff) AM_MIRROR (0xc0, 0xc3)
+	//AM_RANGE(0x00, 0x03) AM_READWRITE(8255ppi_r, 8255ppi_w) AM_MIRROR (0x3c)
+	//AM_RANGE(0x40, 0x41) AM_READWRITE(msm8251_r, msm8251_w) AM_MIRROR (0x3e)
+	//AM_RANGE(0x80, 0x83) AM_READWRITE(pit8253_r, pit8253_w) AM_MIRROR (0x3c)
+	//AM_RANGE(0xc0, 0xc3) AM_READWRITE(ay8910_r, ay8910_W) AM_MIRROR (0x3c)
 ADDRESS_MAP_END
 
 
@@ -194,7 +190,7 @@ MACHINE_DRIVER_END
 ******************************************************************************/
 
 ROM_START(votrpss)
-    ROM_REGION(0xe000, "main", 0)
+    ROM_REGION(0x10000, "main", 0)
     /* old logo PSS, version 3.A (1982), selftest 3.0? (1982) */
     //ROM_LOAD("u-2.3.A.bin",   0x0000, 0x2000, NO_DUMP )) /* 3.A 1982 */
     //ROM_LOAD("u-3.3.A.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.A 1982 */
@@ -205,15 +201,11 @@ ROM_START(votrpss)
     //ROM_LOAD("u-3.3.B.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.B 1983? */
     //ROM_LOAD("u-4.3.0.bin", 0xc000, 0x2000, NO_DUMP )) /* 3.0? */
 
-    /* old or new logo PSS, Version 3.C (1984?), selftest 3.1 (1985) */
-    ROM_LOAD("u-2.1985.bin",   0x0000, 0x2000, CRC(410c58cf) SHA1(6e181e61ab9c268e3772fbeba101302fd40b09a2)) /* 3.C 1984? */
+    /* old or new logo PSS, Version 3.C (1984?), selftest 3.1 (1985?) */
+    ROM_LOAD("u-2.1985.bin",   0x0000, 0x2000, CRC(410c58cf) SHA1(6e181e61ab9c268e3772fbeba101302fd40b09a2)) /* 3.C 1984?; The 1987/1988 version marked "U-2 // 090788" matches this rom */
     ROM_LOAD("u-3.1985.bin",   0x2000, 0x2000, CRC(1439492e) SHA1(46af8ccac6fdb93cbeb8a6d57dce5898e0e0d623)) /* 3.C 1984? */
     ROM_LOAD("u-4.100985.bin", 0xc000, 0x2000, CRC(0b7c4260) SHA1(56f0b6b1cd7b1104e09a9962583121c112337984)) /* 3.1 10/09/85 */
 
-    /* new logo PSS, Version 3.C* (1988), selftest 3.1 (1985) (the 3.C version here is probably different as it has a 1988 datecode, and it may have fixed the ram test bug. chip is soldered in making dumping difficult. note that the 1988 pss does NOT have the module potted!) */
-    //ROM_LOAD("u-2.090788.bin", 0x0000, 0x2000, NO_DUMP )) /* 3.C* 09/07/88 */
-    //ROM_LOAD("u-3.unmarked.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.C* 1988? may match the 1984 one */
-    //ROM_LOAD("u-4.100985.bin", 0xc000, 0x2000, CRC(0b7c4260) SHA1(56f0b6b1cd7b1104e09a9962583121c112337984)) /* 3.1 10/09/85 */
 ROM_END
 
 
