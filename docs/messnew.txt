@@ -1,4 +1,4 @@
-0.127.1
+﻿0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -39,6 +39,9 @@ System Driver Changes:
 
 - [C64] Modified VIC II implementation: for every raster interrupt
   the chip draws only one line. [Roberto Zandona']
+
+- [C64] Modified VIC II implementation: modified resolutions for NTSC and
+  PAL modes [Roberto Zandona']
 
 - [C64] Refactored cartridge code to rely on MESS core functions and
   generally cleaned up cart code. Support is still limited to Type 0 Carts
