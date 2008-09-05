@@ -601,17 +601,17 @@ $(MESSOBJ)/amiga.a: \
 	$(MESS_DRIVERS)/amiga.o		\
 
 $(MESSOBJ)/cbmshare.a: \
+	$(MESS_FORMATS)/cbm_tap.o 	\
 	$(MESS_MACHINE)/tpi6525.o	\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmdrive.o	\
-	$(MESS_MACHINE)/vc1541.o	 \
-	$(MESS_MACHINE)/cbmieeeb.o \
-	$(MESS_MACHINE)/cbmserb.o  \
-	$(MESS_MACHINE)/cbmipt.o   \
-	$(MESS_MACHINE)/c64.o      \
+	$(MESS_MACHINE)/vc1541.o	\
+	$(MESS_MACHINE)/cbmieeeb.o 	\
+	$(MESS_MACHINE)/cbmserb.o 	\
+	$(MESS_MACHINE)/cbmipt.o   	\
+	$(MESS_MACHINE)/c64.o    	\
 	$(MESS_MACHINE)/c65.o		\
-	$(MESS_VIDEO)/vic6567.o	 \
-	$(MESS_MACHINE)/vc20tape.o
+	$(MESS_VIDEO)/vic6567.o
 
 $(MESSOBJ)/cbm.a: \
 	$(MESS_VIDEO)/pet.o		\
@@ -620,7 +620,7 @@ $(MESSOBJ)/cbm.a: \
 	$(MESS_DRIVERS)/c64.o		\
 	$(MESS_MACHINE)/vc20.o		\
 	$(MESS_DRIVERS)/vc20.o		\
-	$(MESS_AUDIO)/ted7360.o	\
+	$(MESS_AUDIO)/ted7360.o		\
 	$(MESS_AUDIO)/t6721.o		\
 	$(MESS_MACHINE)/c16.o		\
 	$(MESS_DRIVERS)/c16.o		\
@@ -628,11 +628,11 @@ $(MESSOBJ)/cbm.a: \
 	$(MESS_MACHINE)/cbmb.o		\
 	$(MESS_VIDEO)/cbmb.o		\
 	$(MESS_DRIVERS)/c65.o		\
-	$(MESS_VIDEO)/vdc8563.o	\
+	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_DRIVERS)/c128.o		\
 	$(MESS_MACHINE)/c128.o		\
-	$(MESS_AUDIO)/vic6560.o	\
-	$(MESS_VIDEO)/ted7360.o	\
+	$(MESS_AUDIO)/vic6560.o		\
+	$(MESS_VIDEO)/ted7360.o		\
 	$(MESS_VIDEO)/vic6560.o  
 
 $(MESSOBJ)/coco.a:   \
