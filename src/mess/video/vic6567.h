@@ -14,7 +14,6 @@
 #ifndef VIC6567_H_
 #define VIC6567_H_
 
-
 #define VIC6567_VRETRACERATE 60
 #define VIC6569_VRETRACERATE 50
 #define VIC2_VRETRACERATE (vic2.pal?VIC6569_VRETRACERATE:VIC6567_VRETRACERATE)
@@ -25,6 +24,7 @@
  * but to achieve TV-frequency the clock must have a fix frequency */
 #define VIC2_HSIZE	320
 #define VIC2_VSIZE	200
+
 /* of course you clock select an other clock, but for accurate */
 /* video timing */
 #define VIC6567_CLOCK	1022730
@@ -44,6 +44,22 @@
 #define VIC6567_LINES 262
 #define VIC6569_LINES 312
 #define VIC2_LINES (vic2.pal?VIC6569_LINES:VIC6567_LINES)
+#define VIC6567_VISIBLELINES 234
+#define VIC6569_VISIBLELINES 284
+#define VIC2_VISIBLELINES (vic2.pal?VIC6569_VISIBLELINES:VIC6567_VISIBLELINES)
+#define VIC6567_STARTVISIBLELINES ((VIC6567_LINES - VIC6567_VISIBLELINES)/2)
+#define VIC6569_STARTVISIBLELINES ((VIC6569_LINES - VIC6569_VISIBLELINES)/2)
+#define VIC2_STARTVISIBLELINES ((VIC2_LINES - VIC2_VISIBLELINES)/2)
+
+#define VIC6567_COLUMNS 512
+#define VIC6569_COLUMNS 504
+#define VIC2_COLUMNS (vic2.pal?VIC6569_COLUMNS:VIC6567_COLUMNS)
+#define VIC6567_VISIBLECOLUMNS 411
+#define VIC6569_VISIBLECOLUMNS 403
+#define VIC2_VISIBLECOLUMNS (vic2.pal?VIC6569_VISIBLECOLUMNS:VIC6567_VISIBLECOLUMNS)
+#define VIC6567_STARTVISIBLECOLUMNS ((VIC6567_COLUMNS - VIC6567_VISIBLECOLUMNS)/2)
+#define VIC6569_STARTVISIBLECOLUMNS ((VIC6569_COLUMNS - VIC6569_VISIBLECOLUMNS)/2)
+#define VIC2_STARTVISIBLECOLUMNS ((VIC2_COLUMNS - VIC2_VISIBLECOLUMNS)/2)
 
 
 /*----------- defined in video/vic6567.c -----------*/
@@ -56,6 +72,7 @@ extern void vic6567_init (int vic2e, int pal, int (*dma_read) (int),
 extern void vic2_set_rastering(int onoff);
 
 MACHINE_DRIVER_EXTERN( vh_vic2 );
+MACHINE_DRIVER_EXTERN( vh_vic2_pal );
 extern VIDEO_START( vic2 );
 extern VIDEO_UPDATE( vic2 );
 extern INTERRUPT_GEN( vic2_raster_irq );
@@ -81,6 +98,5 @@ extern INTERRUPT_GEN( vic2_frame_interrupt );
 
 /*extern UINT8 vic2[]; */
 /*extern int vic2_pal; */
-
 
 #endif /* VIC6567_H_ */

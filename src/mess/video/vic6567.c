@@ -86,8 +86,8 @@
 #define VIC2_YPOS 50
 #define RASTERLINE_2_C64(a) (a)
 #define C64_2_RASTERLINE(a) (a)
-#define XPOS 8
-#define YPOS 8
+#define XPOS (VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE)/2)
+#define YPOS (VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE)/2 */)
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
@@ -822,7 +822,7 @@ static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior)
 {
 	register int x, mask, shift;
 
-	if ((y < YPOS) || (y >= 208) || (xbegin <= 1) || (xbegin >= 328))
+	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
 		return;
 
 	for (x = 0, mask = 0xc0, shift = 6; x < 8; x += 2, mask >>= 2, shift -= 2)
@@ -850,7 +850,7 @@ static void vic2_draw_sprite_code (int y, int xbegin, int code, int color)
 {
 	register int mask, x;
 
-	if ((y < YPOS) || (y >= 208) || (xbegin <= 1) || (xbegin >= 328))
+	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
 		return;
 
 	for (x = 0, mask = 0x80; x < 8; x++, mask >>= 1)
@@ -1155,10 +1155,9 @@ static void vic2_drawlines (int first, int last)
 	else
 		end = vic2.y_begin + YPOS;
 
-	line=first;
-	if (line<end) {
-		plot_box(vic2.bitmap, 0, line, vic2.bitmap->width, end-line,
-				 FRAMECOLOR);
+	line = first;
+	if (line < end) {
+		plot_box(vic2.bitmap, 0, line, vic2.bitmap->width, end-line, FRAMECOLOR);
 		line=end;
 	}
 
@@ -1256,9 +1255,9 @@ static void vic2_drawlines (int first, int last)
 				}
 			}
 			// sprite wrap y at the top of the screen
-			else if (SPRITEON (i) && (SPRITE_Y_POS (i) < yoff) && (yoff == 8))
+			else if (SPRITEON (i) && (SPRITE_Y_POS (i) < yoff) && (yoff == YPOS))
 			{
-				int wrapped = yoff - SPRITE_Y_POS (i);
+				int wrapped = YPOS - SPRITE_Y_POS (i);
 				syend = yend;
 
 				if (SPRITE_Y_EXPAND (i))
@@ -1277,9 +1276,9 @@ static void vic2_drawlines (int first, int last)
 				vic2.sprites[i].line = wrapped;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, 0 , syend);
+					vic2_draw_sprite_multi (i, YPOS, 0 , syend);
 				else
-					vic2_draw_sprite (i, yoff, 0 , syend);
+					vic2_draw_sprite (i, YPOS, 0 , syend);
 
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
@@ -1362,7 +1361,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 	{
 		vic2_set_interrupt (1);
 	}
-
+// printf("%08x  ",(int)activecpu_gettotalcycles());
 	if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 }
 
@@ -1385,11 +1384,21 @@ static PALETTE_INIT( vic2 )
 MACHINE_DRIVER_START( vh_vic2 )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 216)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
+	MDRV_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MDRV_SCREEN_VISIBLE_AREA(VIC6567_STARTVISIBLECOLUMNS ,VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1)
 	MDRV_PALETTE_INIT( vic2 )
 	MDRV_PALETTE_LENGTH(sizeof (vic2_palette) / sizeof (vic2_palette[0]) / 3)
 	MDRV_VIDEO_START( vic2 )
 	MDRV_VIDEO_UPDATE( vic2 )
 MACHINE_DRIVER_END
 
+MACHINE_DRIVER_START( vh_vic2_pal )
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
+	MDRV_SCREEN_VISIBLE_AREA(VIC6569_STARTVISIBLECOLUMNS, VIC6569_STARTVISIBLECOLUMNS + VIC6569_VISIBLECOLUMNS - 1, VIC6569_STARTVISIBLELINES, VIC6569_STARTVISIBLELINES + VIC6569_VISIBLELINES - 1)
+	MDRV_PALETTE_INIT( vic2 )
+	MDRV_PALETTE_LENGTH(sizeof (vic2_palette) / sizeof (vic2_palette[0]) / 3)
+	MDRV_VIDEO_START( vic2 )
+	MDRV_VIDEO_UPDATE( vic2 )
+MACHINE_DRIVER_END
