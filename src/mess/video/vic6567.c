@@ -1130,6 +1130,7 @@ static void vic2_drawlines (int first, int last)
 	/* top part of display not rastered */
 	first -= VIC2_YPOS - YPOS;
 	last -= VIC2_YPOS - YPOS;
+/*
 	if ((first >= last) || (last <= 0))
 	{
 		for (i = 0; i < 8; i++)
@@ -1138,7 +1139,7 @@ static void vic2_drawlines (int first, int last)
 	}
 	if (first < 0)
 		first = 0;
-
+*/
 	if (!SCREENON)
 	{
 		for (line = first; (line < last) && (line < vic2.bitmap->height); line++)
@@ -1363,7 +1364,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 	}
 // printf("%08x  ",(int)activecpu_gettotalcycles());
 	if (vic2.on)
-		if ((vic2.rasterline > 0x25) && (vic2.rasterline < 0x120))vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
+		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))) vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
 }
 
 VIDEO_UPDATE( vic2 )
