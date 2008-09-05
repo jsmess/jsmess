@@ -32,8 +32,7 @@ OSDOBJS += \
 	$(MESS_WINOBJ)/menu.o		\
 	$(MESS_WINOBJ)/mess.res	\
 	$(MESS_WINOBJ)/messlib.o	\
-	$(MESS_WINOBJ)/opcntrl.o	\
-	$(MESS_WINOBJ)/tapedlg.o
+	$(MESS_WINOBJ)/opcntrl.o
 
 $(LIBOSD): $(OSDOBJS)
 

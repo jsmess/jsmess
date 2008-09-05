@@ -37,7 +37,6 @@ static const char *const mess_default_text[] =
 
 	"Image Information",
 	"File Manager",
-	"Tape Control",
 
 	"No Tape Image loaded",
 	"recording",

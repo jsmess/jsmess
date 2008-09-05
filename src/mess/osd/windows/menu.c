@@ -25,7 +25,6 @@
 #include "mslegacy.h"
 #include "strconv.h"
 #include "utils.h"
-#include "tapedlg.h"
 #include "artworkx.h"
 #include "debug/debugcpu.h"
 #include "inptport.h"
@@ -61,8 +60,6 @@ extern void win_timer_enable(int enabled);
 
 #define MAX_JOYSTICKS				(8)
 
-#define USE_TAPEDLG	0
-
 enum
 {
 	DEVOPTION_OPEN,
@@ -72,12 +69,8 @@ enum
 	DEVOPTION_CASSETTE_STOPPAUSE,
 	DEVOPTION_CASSETTE_PLAY,
 	DEVOPTION_CASSETTE_RECORD,
-#if USE_TAPEDLG
-	DEVOPTION_CASSETTE_DIALOG,
-#else
 	DEVOPTION_CASSETTE_REWIND,
 	DEVOPTION_CASSETTE_FASTFORWARD,
-#endif
 	DEVOPTION_MAX
 };
 
@@ -1404,12 +1397,8 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 			append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	UI_pauseorstop);
 			append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			UI_play);
 			append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		UI_record);
-#if USE_TAPEDLG
-			append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_DIALOG,		UI_tapecontrol);
-#else
 			append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		UI_rewind);
 			append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	UI_fastforward);
-#endif
 		}
 #endif /* HAS_WAVE */
 		s = image_exists(img) ? image_filename(img) : ui_getstring(UI_emptyslot);
@@ -1534,11 +1523,6 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 						cassette_change_state(img, CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 						break;
 
-#if USE_TAPEDLG
-					case DEVOPTION_CASSETTE_DIALOG:
-						tapedialog_show(wnd, image_index_in_device(img));
-						break;
-#else
 					case DEVOPTION_CASSETTE_REWIND:
 						cassette_seek(img, -1.0, SEEK_CUR);
 						break;
@@ -1546,7 +1530,6 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 					case DEVOPTION_CASSETTE_FASTFORWARD:
 						cassette_seek(img, +1.0, SEEK_CUR);
 						break;
-#endif
 				}
 				break;
 #endif /* HAS_WAVE */
