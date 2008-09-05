@@ -16,28 +16,47 @@
 
 ****************************************************************************
 
-         EU21     EU18     EU20   32.000MHz
-         M6295    M6295    M6295       Xilinx
-   Dip-8 2.000Mhz 2.000Mhz 2.000Mhz
-J        VC9                 GUNCN
-A  Dip-4 VC8                 Xilinx     EGR4
-M               Mach210                 EGR6.3
-M   M5M442256x4 Mach210 Mach210 Mach210 EGR3
-A          11.2896MHz                   EGR2
-     TMS34010           W241024x4       EGR1
- 2803A                                  EGR5.3
-    40.000MHz   Bt121 Mach210 Mach210 Mach210
+Egg Venture
+The Gameroom, 1997
 
+PCB Layout
+----------
 
-Chips:
- TMS34010FNL-40     Main CPU
- Xilinx XC3042-70   Field Programmable Gate Array
- Bt121KPJ80         Triple 8-bit 80MHz VideoDAC
- AMD Mach210A-10JC  Programmable Logic Device (CPLD)
- ST ULN2803A        8 Darlington Transistor Array with common emitter
+(C) 1996 I.C.E.
+|-------------------------------------------------------|
+|           EU21.U21  EU18.U18  EU20.U20        32MHz   |
+|                                             |-------| |
+|           M6295     M6295     M6295         |XILINX | |
+|           2MHz      2MHz      2MHz          |XC3042 | |
+|  DSW(8)                        KYLR1        |-------| |
+|J       EGR9.VC9                             EGR4.GR4  |
+|A DSW(4)EGR8.VC8               |-------|               |
+|M      M5M442256               |XILINX |     EGR6.GR6  |
+|M      M5M442256   11.0592MHz  |XC3042 |               |
+|A      M5M442256     MACH210   |-------|     EGR3.GR3  |
+|4116R  M5M442256     MACH210 MACH210 MACH210           |
+|4116R  |--------|               W241024      EGR1.GR2  |
+|       |TMS34010|               W241024                |
+|2803A  |-50     |               W241024      EGR1.GR1  |
+|       |        |               W241024                |
+| 40MHz |--------|                            EGR5.GR5  |
+|                         BT121 MACH210 MACH210 MACH210 |
+|-------------------------------------------------------|
 
-Note 1: Lethal Justice uses a 11.0592MHz OSC instead of the 11.2896MHz
-Note 2: Lethal Justice uses a TMS34010FNL-50 instead of the TMS34010FNL-40
+Notes:
+      TMS34010  - TMS34010FNL-50 CPU, clock input 20.000MHz [40/2] (PLCC68)
+      M6295     - Clock input 2.000MHz, pin 7 HIGH (QFP44)
+      XC3042    - XILINX XC3042 FPGA (PLCC84)
+      BT121     - BT121KPJ80 Triple 8-bit 80MHz Video DAC (PLCC44)
+      MACH210   - AMD MACH210A-10JC Complex Programmable Logic Device (CPLD, PLCC44)
+      2803A     - ST ULN2803A Eight Darlington Transistor Arrays With Common Emitters (DIP18)
+      4116R     - 4116R-001 Bourns Type 4100R Series Resistor Network (DIP16)
+      M5M442256 - Mitsubishi M5M442256AL-8 256k x4 DRAM (ZIP28)
+      W241024   - Winbond W241024AK-20 128 x8 SRAM (NDIP32)
+      KYLR1     - 8 Pin Gun Connector
+
+Note 1: Some PCBs use a 11.2896MHz OSC instead of the 11.0592MHz
+Note 2: Some PCBs use a TMS34010FNL-40 instead of the TMS34010FNL-50
 
 ***************************************************************************/
 
@@ -630,6 +649,30 @@ ROM_START( eggvent7 )
 ROM_END
 
 
+ROM_START( eggventa ) /* Allied Leisure Australia, official license? */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_LOAD16_BYTE( "egr8.vc8", 0x000000, 0x080000, CRC(a62c4143) SHA1(a21d6b7efdba4965285265426ed79f3249a86685) )
+	ROM_LOAD16_BYTE( "egr9.vc9", 0x000001, 0x080000, CRC(bc55bc7a) SHA1(d6e3fc76b4a0a20176af1338a32bb81f0599fdc0) )
+
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_LOAD16_BYTE( "egr1.bin",  0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
+	ROM_LOAD16_BYTE( "egr2.bin",  0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
+	ROM_LOAD16_BYTE( "egr4.bin",  0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
+	ROM_LOAD16_BYTE( "egr3.bin",  0x200001, 0x100000, CRC(3f8dfc73) SHA1(83a168069f896ea7e67a97c6d591d09b19d5f486) )
+	ROM_LOAD16_BYTE( "egr6.gr6",  0x400000, 0x100000, CRC(0d73dd85) SHA1(d99a95ace89483688bae48021b416fc0a3c531d6) )
+	ROM_LOAD16_BYTE( "egr5.gr5",  0x400001, 0x100000, CRC(6d89c4e3) SHA1(613703a3f194af3ed44a58610d99b7dc99382725) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )				/* sound data */
+	ROM_LOAD( "eu20.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
+
+	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
+	ROM_LOAD( "eu21.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
+
+	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
+	ROM_LOAD( "eu18.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
+ROM_END
+
+
 ROM_START( eggvntdx )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x080000, CRC(d7f56141) SHA1(3c16b509fd1c763e452c27084fb0e90cde3947f7) )
@@ -788,6 +831,7 @@ static DRIVER_INIT( cclownz )
 GAME( 1996, lethalj,  0,        lethalj,  lethalj,  0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
 GAME( 1997, eggventr, 0,        gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
 GAME( 1997, eggvent7, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventa, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room (Allied Leisure license)", "Egg Venture (A.L. Release)", 0 )
 GAME( 1997, eggvntdx, eggventr, gameroom, eggvntdx, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
 GAME( 1997, ripribit, 0,        gameroom, ripribit, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
 GAME( 1999, cfarm,    0,        gameroom, cfarm,    cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )

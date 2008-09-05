@@ -179,11 +179,11 @@ static READ8_HANDLER( sio2_r )
 	switch (offset)
 	{
 	case 0:
-		return z80sio_d_r(0, 0);
+		return z80sio_d_r(machine, 0, 0);
 	case 1:
 		return z80sio_c_r(0, 0);
 	case 2:
-		return z80sio_d_r(0, 1);
+		return z80sio_d_r(machine, 0, 1);
 	case 3:
 		return z80sio_c_r(0, 1);
 	}
@@ -196,16 +196,16 @@ static WRITE8_HANDLER( sio2_w )
 	switch (offset)
 	{
 	case 0:
-		z80sio_d_w(0, 0, data);
+		z80sio_d_w(machine, 0, 0, data);
 		break;
 	case 1:
-		z80sio_c_w(0, 0, data);
+		z80sio_c_w(machine, 0, 0, data);
 		break;
 	case 2:
-		z80sio_d_w(0, 1, data);
+		z80sio_d_w(machine, 0, 1, data);
 		break;
 	case 3:
-		z80sio_c_w(0, 1, data);
+		z80sio_c_w(machine, 0, 1, data);
 		break;
 	}
 }

@@ -653,11 +653,11 @@ static WRITE8_HANDLER(einstein_pio_w)
 				break;
 		}
 
-		z80pio_d_w( 0, (offset>>1) & 0x01,data);
+		z80pio_d_w( machine, 0, (offset>>1) & 0x01,data);
 		return;
 	}
 
-	z80pio_c_w( 0, (offset>>1) & 0x01,data);
+	z80pio_c_w( machine, 0, (offset>>1) & 0x01,data);
 }
 
 static  READ8_HANDLER(einstein_pio_r)
@@ -666,7 +666,7 @@ static  READ8_HANDLER(einstein_pio_r)
 
 	if ((offset & 0x01)==0)
 	{
-		return z80pio_d_r( 0, (offset>>1) & 0x01);
+		return z80pio_d_r( machine, 0, (offset>>1) & 0x01);
 	}
 
 	return z80pio_c_r( 0, (offset>>1) & 0x01);
@@ -1368,11 +1368,11 @@ static void einstein_printer_handshake_in(int number, int data, int mask)
 		if (data & CENTRONICS_ACKNOWLEDGE)
 		{
 			/* /ack into /astb */
-			z80pio_astb_w(0, 0);
+			z80pio_astb_w(Machine, 0, 0);
 		}
 		else
 		{
-			z80pio_astb_w(0, 1);
+			z80pio_astb_w(Machine, 0, 1);
 		}
 	}
 }

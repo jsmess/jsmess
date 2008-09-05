@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( masao_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mario_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mario_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(Z80DMA, "z80dma", z80dma_r, z80dma_w)	/* dma controller */
 ADDRESS_MAP_END
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( mario_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, Z80_CLOCK)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mario_map, 0)
-	MDRV_CPU_IO_MAP(0,mario_writeport)
+	MDRV_CPU_IO_MAP(mario_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* devices */
@@ -384,7 +384,7 @@ static MACHINE_DRIVER_START( masao )
 
 	MDRV_CPU_REPLACE("main", Z80, 4000000)        /* 4.000 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(masao_map, 0)
-	MDRV_CPU_IO_MAP(0,mario_writeport)
+	MDRV_CPU_IO_MAP(mario_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* sound hardware */
@@ -405,8 +405,13 @@ ROM_START( mario )
 	ROM_LOAD( "tma1-c.7d_e-1",     0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
 	ROM_LOAD( "tma1-c.7c_e-3",     0xf000, 0x1000, CRC(0d31bd1c) SHA1(a2e238470ba2ea3c81225fec687f61f047c68c59) )
 
-	ROM_REGION( 0x1000, "audio", 0 )	/* sound */
-	ROM_LOAD( "tma1c-a.6k",   0x0000, 0x1000, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
+	ROM_REGION( 0x2000, "audio", 0 )	/* sound */
+	/* internal rom */
+	ROM_FILL(                 0x0000, 0x0800, 0x00)
+	/* first half banked */
+	ROM_LOAD( "tma1c-a.6k",   0x1000, 0x0800, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
+	/* second half always read */
+	ROM_CONTINUE(             0x0800, 0x0800)
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mario.3f",     0x0000, 0x1000, CRC(28b0c42c) SHA1(46749568aff88a28c3b6a1ac423abd1b90742a4d) )

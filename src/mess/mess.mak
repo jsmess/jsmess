@@ -271,6 +271,7 @@ SOUNDS += ASTROCADE
 #SOUNDS += NAMCO_52XX
 #SOUNDS += NAMCO_63701X
 #SOUNDS += NAMCONA
+#SOUNDS += SNKWAVE
 #SOUNDS += C140
 #SOUNDS += C352
 #SOUNDS += TMS36XX
@@ -383,8 +384,8 @@ DRVLIBS = \
 	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/grundy.a \
-	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/homelab.a \
+	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kaypro.a \

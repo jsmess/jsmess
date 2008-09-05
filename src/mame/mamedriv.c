@@ -4085,6 +4085,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
+	DRIVER( fotns )
+	DRIVER( demofist )
 
 	/* Hikaru */
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
@@ -5461,7 +5463,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vangrd2 )	/* A2005      (c) 1984 */
 	DRIVER( mainsnk )	/* fill in */
 	DRIVER( canvas )	/*            (c) 1985 */
-	DRIVER( jcross )	/* .. */
+	DRIVER( jcross )	/* A3006      (c) 1984 */
 	DRIVER( sgladiat )	/* A3006      (c) 1984 */
 	DRIVER( hal21 )		/* A4031      (c) 1985 */
 	DRIVER( hal21j )	/*            (c) 1985 (Japan) */
@@ -5476,6 +5478,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( countryc )	/* A7004 'CC' (c) 1988 */
 	DRIVER( ikari )		/* A5004 'IW' (c) 1986 */
 	DRIVER( ikaria )	/* A5004 'IW' (c) 1986 */
+	DRIVER( ikarinc )	/* A5004 'IW' (c) 1986 */
 	DRIVER( ikarijp )	/* A5004 'IW' (c) 1986 (Japan) */
 	DRIVER( ikarijpb )	/* bootleg */
 	DRIVER( victroad )	/* A6002      (c) 1986 */
@@ -5879,6 +5882,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ddragnba )	/* bootleg */
 	DRIVER( ddgn6809 )	/* bootleg */
 	DRIVER( dd6809a )	/* bootleg */
+	DRIVER( ddragob2 )	/* bootleg */
 	DRIVER( spdodgeb )	/* TA-0022 (c) 1987 */
 	DRIVER( nkdodge )	/* TA-0022 (c) 1987 (Japan) */
 	DRIVER( nkdodgeb )	/* TA-0022 (c) 1987 (Japan) */
@@ -6310,9 +6314,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( raiden2e )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raiden2f )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndx )	/* (c) 1993 Seibu Kaihatsu */
-	DRIVER( raidndxa )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxj )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxm )	/* (c) 1993 Seibu Kaihatsu + Metrotainment license */
+	DRIVER( raidndxt )	/* (c) 1993 Seibu Kaihatsu + Tuning license*/
 	DRIVER( zeroteam )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteaa )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteab )	/* (c) 1993 Seibu Kaihatsu */
@@ -7805,6 +7809,7 @@ Other Sun games
 	DRIVER( lethalj )	/* (c) 1996 The Game Room */
 	DRIVER( eggventr )	/* (c) 1997 The Game Room */
 	DRIVER( eggvent7 )	/* (c) 1997 The Game Room */
+	DRIVER( eggventa )	/* (c) 1997 The Game Room (Allied Leisure license) */
 	DRIVER( eggvntdx )	/* (c) 1997 The Game Room */
 	DRIVER( ripribit )	/* (c) 1997 LAI Games */
 	DRIVER( cfarm )		/* (c) 1999 LAI Games */
@@ -8038,6 +8043,7 @@ Other Sun games
 	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */
 	DRIVER( mcolors )	/* 1999 unknown */
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
+	DRIVER( magjoker )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */
@@ -8132,6 +8138,7 @@ Other Sun games
 	DRIVER( tetriunk )
 	DRIVER( smstrv )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( skylncr )	/* (c) 1995 Bordun International */
+	DRIVER( madzoo )	/* (c) 1995 Bordun International */
 	DRIVER( livequiz )	/* (c) 1999 Andamiro */
 	DRIVER( cowrace )	/* (c) 19?? unknown */
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
@@ -8190,6 +8197,12 @@ Other Sun games
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
 	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
 	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
+
+	/* InterFlip */
+	DRIVER( videopkr )	/* (c) 1984 InterFlip */
+	DRIVER( blckjack )	/* (c) 1984 InterFlip */
+	DRIVER( videodad )	/* (c) 1987 InterFlip */
+	DRIVER( videocba )	/* (c) 1987 InterFlip */
 
 	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */

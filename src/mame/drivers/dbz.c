@@ -113,11 +113,6 @@ static WRITE16_HANDLER( dbzcontrol_w )
 	coin_counter_w(1, data & 2);
 }
 
-static READ16_HANDLER( dbz_inp2_r )
-{
-	return input_port_read(machine, "DSW2") | (input_port_read(machine, "DSW2")<<8);
-}
-
 static WRITE16_HANDLER( dbz_sound_command_w )
 {
 	soundlatch_w(machine, 0, data>>8);
@@ -148,7 +143,7 @@ static ADDRESS_MAP_START( dbz_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x4c0000, 0x4c0001) AM_READ(K053246_word_r)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x4e0002, 0x4e0003) AM_READ_PORT("SYSTEM_DSW1")
-	AM_RANGE(0x4e4000, 0x4e4001) AM_READ(dbz_inp2_r)		// DSW2
+	AM_RANGE(0x4e4000, 0x4e4001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500000, 0x501fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x508000, 0x509fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x510000, 0x513fff) AM_READ(SMH_RAM)
@@ -201,7 +196,7 @@ static ADDRESS_MAP_START( dbz_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd001) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbz_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dbz_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
@@ -258,6 +253,10 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "FAKE")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "FAKE")
+
+	PORT_START("FAKE")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -347,7 +346,7 @@ static MACHINE_DRIVER_START( dbz )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(dbz_sound_readmem, dbz_sound_writemem)
-	MDRV_CPU_IO_MAP(0,dbz_sound_writeport)
+	MDRV_CPU_IO_MAP(dbz_sound_io_map, 0)
 
 	MDRV_GFXDECODE(dbz)
 

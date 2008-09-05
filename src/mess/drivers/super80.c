@@ -401,7 +401,7 @@ Reasons why it is necessary:
 
 static TIMER_CALLBACK( super80_timer )
 {
-	UINT8 cass_ws=0, i, mask=1, out_f8=z80pio_p_r(0,0), in_fa=255;
+	UINT8 cass_ws=0, i, mask=1, out_f8=z80pio_p_r(machine,0,0), in_fa=255;
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	for ( i=0; i < 8;i++)
@@ -410,7 +410,7 @@ static TIMER_CALLBACK( super80_timer )
 		mask<<=1;
 	}
 
-	z80pio_p_w(0,1,in_fa);
+	z80pio_p_w(machine,0,1,in_fa);
 
 	cass_data[1]++;
 	cass_ws = (cassette_input(cassette_device_image()) > +0.03) ? 4 : 0;
@@ -501,14 +501,14 @@ static WRITE8_HANDLER( super80_f1_w )
 	current_charset = data & 1;
 }
 
-static READ8_HANDLER( super80_f8_r ) { return z80pio_d_r (0,0); }
+static READ8_HANDLER( super80_f8_r ) { return z80pio_d_r (machine,0,0); }
 static READ8_HANDLER( super80_f9_r ) { return z80pio_c_r (0,0); }
-static READ8_HANDLER( super80_fa_r ) { return z80pio_d_r (0,1); }
+static READ8_HANDLER( super80_fa_r ) { return z80pio_d_r (machine,0,1); }
 static READ8_HANDLER( super80_fb_r ) { return z80pio_c_r (0,1); }
-static WRITE8_HANDLER( super80_f8_w ) { z80pio_d_w(0,0, data); }
-static WRITE8_HANDLER( super80_f9_w ) { z80pio_c_w(0,0, data); }
-static WRITE8_HANDLER( super80_fa_w ) { z80pio_d_w(0,1, data); }
-static WRITE8_HANDLER( super80_fb_w ) { z80pio_c_w(0,1, data); }
+static WRITE8_HANDLER( super80_f8_w ) { z80pio_d_w(machine, 0,0, data); }
+static WRITE8_HANDLER( super80_f9_w ) { z80pio_c_w(machine, 0,0, data); }
+static WRITE8_HANDLER( super80_fa_w ) { z80pio_d_w(machine, 0,1, data); }
+static WRITE8_HANDLER( super80_fb_w ) { z80pio_c_w(machine, 0,1, data); }
 
 /**************************** MEMORY AND I/O MAPPINGS *****************************************************************/
 

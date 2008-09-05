@@ -70,7 +70,7 @@ struct dst_mixer_context
 {
 	int		type;
 	int		size;
-	int		has_r_node;
+	int		r_node_bit_flag;
 	double	r_total;
 	double *r_node[DISC_MIXER_MAX_INPS];		/* Either pointer to resistance node output OR NULL */
 	double	exponent_rc[DISC_MIXER_MAX_INPS];	/* For high pass filtering cause by cIn */
@@ -270,7 +270,7 @@ static void dst_clamp_step(node_description *node)
  * Mar 2004, D Renaud.
  ************************************************************************/
 #define DST_DAC_R1__ENABLE		(*(node->input[0]))
-#define DST_DAC_R1__DATA		(int)(*(node->input[1]))
+#define DST_DAC_R1__DATA		(*(node->input[1]))
 #define DST_DAC_R1__VON			(*(node->input[2]))
 
 static void dst_dac_r1_step(node_description *node)
@@ -283,7 +283,7 @@ static void dst_dac_r1_step(node_description *node)
 
 	i_total = context->i_bias;
 
-	data  = (int)DST_DAC_R1__DATA;
+	data   = (int)DST_DAC_R1__DATA;
 	x_time = DST_DAC_R1__DATA - data;
 
 	if (DST_DAC_R1__ENABLE)
@@ -315,6 +315,7 @@ static void dst_dac_r1_step(node_description *node)
 		}
 
 		v = i_total * context->r_total;
+		context->last_data = data;
 
 		/* Filter if needed, else just output voltage */
 		node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
@@ -365,7 +366,7 @@ static void dst_dac_r1_reset(node_description *node)
 	context->r_total = 0;
 	for(bit = 0; bit < info->ladderLength; bit++)
 	{
-		if (info->r[bit])
+		if (info->r[bit] != 0)
 			context->r_total += 1.0 / info->r[bit];
 	}
 	if (info->rBias) context->r_total += 1.0 / info->rBias;
@@ -394,9 +395,9 @@ static void dst_dac_r1_reset(node_description *node)
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_DIODE_MIX__ENABLE		(*(node->input[0]))
-#define DST_DIODE_MIX__VJUNC		(*(node->input[1]))
-#define DST_DIODE_MIX__INP(addr)	(*(node->input[2 + addr]))
+#define DST_DIODE_MIX__VJUNC		(*(node->input[0]))
+#define DST_DIODE_MIX_INP_OFFSET	1
+#define DST_DIODE_MIX__INP(addr)	(*(node->input[DST_DIODE_MIX_INP_OFFSET + addr]))
 
 static void dst_diode_mix_step(node_description *node)
 {
@@ -405,26 +406,19 @@ static void dst_diode_mix_step(node_description *node)
 	double	max = 0;
 	int		addr;
 
-	if (DST_DIODE_MIX__ENABLE)
+	for (addr = 0; addr < context->size; addr++)
 	{
-		for (addr = 0; addr < context->size; addr++)
-		{
-			if (DST_DIODE_MIX__INP(addr) > max) max = DST_DIODE_MIX__INP(addr);
-		}
-		node->output[0] = max - DST_DIODE_MIX__VJUNC;
-		if (node->output[0] < 0) node->output[0] = 0;
+		if (DST_DIODE_MIX__INP(addr) > max) max = DST_DIODE_MIX__INP(addr);
 	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = max - DST_DIODE_MIX__VJUNC;
+	if (node->output[0] < 0) node->output[0] = 0;
 }
 
 static void dst_diode_mix_reset(node_description *node)
 {
 	struct dst_size_context *context = node->context;
 
-	context->size = node->active_inputs - 2;
+	context->size = node->active_inputs - DST_DIODE_MIX_INP_OFFSET;
 
 	dst_diode_mix_step(node);
 }
@@ -1000,11 +994,20 @@ static void dst_mixer_step(node_description *node)
 	double	i = 0;		/* total current of inputs */
 	int		bit, connected;
 
+	/* put commonly used stuff in local variables for speed */
+	double	value;
+	double	dt = discrete_current_context->sample_rate;
+	int		r_node_bit_flag = context->r_node_bit_flag;
+	int		has_rF = (info->rF != 0);
+	int		type = context->type;
+	double	v_ref = info->vRef;
+	double	rI = info->rI;
+
 	if (DST_MIXER__ENABLE)
 	{
 		r_total = context->r_total;
 
-		if (context->has_r_node)
+		if (context->r_node_bit_flag != 0)
 		{
 			/* loop and do any high pass filtering for connected caps */
 			/* but first see if there is an r_node for the current path */
@@ -1015,24 +1018,27 @@ static void dst_mixer_step(node_description *node)
 				connected = 1;
 				vTemp     = DST_MIXER__IN(bit);
 
-				if (context->r_node[bit] != NULL)
+				if (r_node_bit_flag & (1 << bit))
 				{
-					/* a node has the posibility of being disconnected from the circuit. */
-					if (*context->r_node[bit] == 0)
+					/* a node has the possibility of being disconnected from the circuit. */
+					value = *context->r_node[bit];
+					if (value == 0)
 						connected = 0;
 					else
 					{
-						rTemp   += *context->r_node[bit];
+						/* value currently holds resistance */
+						rTemp   += value;
 						r_total += 1.0 / rTemp;
-						if (info->c[bit] != 0)
+						value = info->c[bit];
+						if (value != 0)
 						{
-							switch (context->type)
+							switch (type)
 							{
 								case DISC_MIXER_IS_RESISTOR:
 									/* is there an rF? */
-									if (info->rF != 0)
+									if (has_rF)
 									{
-										rTemp2 = 1.0 / ((1.0 / rTemp) + (1.0 / info->rF));
+										rTemp2 = RES_2_PARALLEL(rTemp, info->rF);
 										break;
 									}
 									/* else, fall through and just use the resistor value */
@@ -1040,12 +1046,12 @@ static void dst_mixer_step(node_description *node)
 									rTemp2 = rTemp;
 									break;
 								case DISC_MIXER_IS_OP_AMP_WITH_RI:
-									rTemp2 = rTemp + info->rI;
+									rTemp2 = rTemp + rI;
 									break;
 							}
 							/* Re-calculate exponent if resistor is a node */
-							context->exponent_rc[bit] = -1.0 / (rTemp2 * info->c[bit]  * discrete_current_context->sample_rate);
-							context->exponent_rc[bit] =  1.0 - exp(context->exponent_rc[bit]);
+							/* value currently holds capacitance */
+							context->exponent_rc[bit] =  1.0 - exp(-1.0 / (rTemp2 * value * dt));
 						}
 					}
 				}
@@ -1055,10 +1061,10 @@ static void dst_mixer_step(node_description *node)
 					if (info->c[bit] != 0)
 					{
 						/* do input high pass filtering if needed. */
-						context->v_cap[bit] += (vTemp - info->vRef - context->v_cap[bit]) * context->exponent_rc[bit];
+						context->v_cap[bit] += (vTemp - v_ref - context->v_cap[bit]) * context->exponent_rc[bit];
 						vTemp -= context->v_cap[bit];
 					}
-					i += ((context->type == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
+					i += ((type == DISC_MIXER_IS_OP_AMP) ? v_ref - vTemp : vTemp) / rTemp;
 				}
 			}
 		}
@@ -1067,41 +1073,39 @@ static void dst_mixer_step(node_description *node)
 			/* no r_nodes, so just do high pass filtering */
 			for (bit = 0; bit < context->size; bit++)
 			{
-				rTemp = info->r[bit];
 				vTemp = DST_MIXER__IN(bit);
 
 				if (info->c[bit] != 0)
 				{
 					/* do input high pass filtering if needed. */
-					context->v_cap[bit] += (vTemp - info->vRef - context->v_cap[bit]) * context->exponent_rc[bit];
+					context->v_cap[bit] += (vTemp - v_ref - context->v_cap[bit]) * context->exponent_rc[bit];
 					vTemp -= context->v_cap[bit];
 				}
-				i += ((context->type == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
+				i += ((type == DISC_MIXER_IS_OP_AMP) ? v_ref - vTemp : vTemp) / info->r[bit];
 			}
 		}
 
-		if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI)
-			i += info->vRef / info->rI;
+		if (type == DISC_MIXER_IS_OP_AMP_WITH_RI)
+			i += v_ref / rI;
 
 		r_total = 1.0 / r_total;
 
 		/* If resistor network or has rI then Millman is used.
          * If op-amp then summing formula is used. */
-		v = i * ((context->type == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
+		v = i * ((type == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
 
-		if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI)
-			v = info->vRef + (context->gain * (info->vRef - v));
+		if (type == DISC_MIXER_IS_OP_AMP_WITH_RI)
+			v = v_ref + (context->gain * (v_ref - v));
 
 		/* Do the low pass filtering for cF */
 		if (info->cF != 0)
 		{
-			if (context->has_r_node)
+			if (r_node_bit_flag != 0)
 			{
 				/* Re-calculate exponent if resistor nodes are used */
-				context->exponent_c_f = -1.0 / (r_total * info->cF  * discrete_current_context->sample_rate);
-				context->exponent_c_f =  1.0 - exp(context->exponent_c_f);
+				context->exponent_c_f =  1.0 - exp(-1.0 / (r_total * info->cF  * dt));
 			}
-			context->v_cap_f += (v -info->vRef - context->v_cap_f) * context->exponent_c_f;
+			context->v_cap_f += (v - v_ref - context->v_cap_f) * context->exponent_c_f;
 			v = context->v_cap_f;
 		}
 
@@ -1129,14 +1133,14 @@ static void dst_mixer_reset(node_description *node)
 	double	rTemp = 0;
 
 	/* link to r_node outputs */
-	context->has_r_node = 0;
+	context->r_node_bit_flag = 0;
 	for (bit = 0; bit < 8; bit++)
 	{
 		r_node = discrete_find_node(NULL, info->r_node[bit]);
-		if (r_node)
+		if (r_node != NULL)
 		{
 			context->r_node[bit] = &(r_node->output[NODE_CHILD_NODE_NUM(info->r_node[bit])]);
-			context->has_r_node = 1;
+			context->r_node_bit_flag |= 1 << bit;
 		}
 		else
 			context->r_node[bit] = NULL;
@@ -1555,12 +1559,11 @@ static void dst_aswitch_step(node_description *node)
  * input[5]    - Channel4 input value
  *
  ************************************************************************/
-#define DST_TRANSFORM__ENABLE	(*(node->input[0]))
-#define DST_TRANSFORM__IN0		(*(node->input[1]))
-#define DST_TRANSFORM__IN1		(*(node->input[2]))
-#define DST_TRANSFORM__IN2		(*(node->input[3]))
-#define DST_TRANSFORM__IN3		(*(node->input[4]))
-#define DST_TRANSFORM__IN4		(*(node->input[5]))
+#define DST_TRANSFORM__IN0		(*(node->input[0]))
+#define DST_TRANSFORM__IN1		(*(node->input[1]))
+#define DST_TRANSFORM__IN2		(*(node->input[2]))
+#define DST_TRANSFORM__IN3		(*(node->input[3]))
+#define DST_TRANSFORM__IN4		(*(node->input[4]))
 
 #define MAX_TRANS_STACK	16
 
@@ -1581,102 +1584,95 @@ INLINE void dst_transform_push(double *stack, int *pointer, double value)
 
 static void dst_transform_step(node_description *node)
 {
-	if(DST_TRANSFORM__ENABLE)
+	double	trans_stack[MAX_TRANS_STACK];
+	double	number1,top;
+	int		trans_stack_ptr = 0;
+
+	const char *fPTR = node->custom;
+	node->output[0]  = 0;
+
+	top = HUGE_VAL;
+
+	while(*fPTR != 0)
 	{
-		double	trans_stack[MAX_TRANS_STACK];
-		double	number1,top;
-		int		trans_stack_ptr = 0;
-
-		const char *fPTR = node->custom;
-		node->output[0]  = 0;
-
-		top = HUGE_VAL;
-
-		while(*fPTR != 0)
+		switch (*fPTR++)
 		{
-			switch (*fPTR++)
-			{
-				case '*':
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 * top;
-					break;
-				case '/':
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 / top;
-					break;
-				case '+':
-					number1=dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 + top;
-					break;
-				case '-':
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 - top;
-					break;
-				case '0':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN0;
-					break;
-				case '1':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN1;
-					break;
-				case '2':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN2;
-					break;
-				case '3':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN3;
-					break;
-				case '4':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN4;
-					break;
-				case 'P':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					break;
-				case 'i':	/* * -1 */
-					top = -top;
-					break;
-				case '!':	/* Logical NOT of Last Value */
-					top = !top;
-					break;
-				case '=':	/* Logical = */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 == (int)top;
-					break;
-				case '>':	/* Logical > */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 > top;
-					break;
-				case '<':	/* Logical < */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 < top;
-					break;
-				case '&':	/* Bitwise AND */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 & (int)top;
-					break;
-				case '|':	/* Bitwise OR */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 | (int)top;
-					break;
-				case '^':	/* Bitwise XOR */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 ^ (int)top;
-					break;
-				default:
-					discrete_log("dst_transform_step - Invalid function type/variable passed");
-					node->output[0] = 0;
-					break;
-			}
+			case '*':
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 * top;
+				break;
+			case '/':
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 / top;
+				break;
+			case '+':
+				number1=dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 + top;
+				break;
+			case '-':
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 - top;
+				break;
+			case '0':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN0;
+				break;
+			case '1':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN1;
+				break;
+			case '2':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN2;
+				break;
+			case '3':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN3;
+				break;
+			case '4':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN4;
+				break;
+			case 'P':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				break;
+			case 'i':	/* * -1 */
+				top = -top;
+				break;
+			case '!':	/* Logical NOT of Last Value */
+				top = !top;
+				break;
+			case '=':	/* Logical = */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 == (int)top;
+				break;
+			case '>':	/* Logical > */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 > top;
+				break;
+			case '<':	/* Logical < */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 < top;
+				break;
+			case '&':	/* Bitwise AND */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 & (int)top;
+				break;
+			case '|':	/* Bitwise OR */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 | (int)top;
+				break;
+			case '^':	/* Bitwise XOR */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 ^ (int)top;
+				break;
+			default:
+				discrete_log("dst_transform_step - Invalid function type/variable passed");
+				node->output[0] = 0;
+				break;
 		}
-		node->output[0] = top;
 	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = top;
 }
 
 

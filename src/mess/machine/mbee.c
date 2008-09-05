@@ -92,10 +92,10 @@ static const device_config *cassette_device_image(void)
 READ8_HANDLER ( mbee_pio_r )
 {
 	UINT8 data=0;
-	if (offset == 0) return z80pio_d_r(0,0);
+	if (offset == 0) return z80pio_d_r(machine,0,0);
 	if (offset == 1) return z80pio_c_r(0,0);
 	if (offset == 3) return z80pio_c_r(0,1);
-	data = z80pio_d_r(0,1) | 1;
+	data = z80pio_d_r(machine,0,1) | 1;
 	if (cassette_input(cassette_device_image()) > 0.03)
 		data &= ~1;
 	return data;
@@ -103,14 +103,14 @@ READ8_HANDLER ( mbee_pio_r )
 
 WRITE8_HANDLER ( mbee_pio_w )
 {
-	if (offset == 0) z80pio_d_w(0,0,data);
-	if (offset == 1) z80pio_c_w(0,0,data);
-	if (offset == 3) z80pio_c_w(0,1,data);
+	if (offset == 0) z80pio_d_w(machine, 0,0,data);
+	if (offset == 1) z80pio_c_w(machine, 0,0,data);
+	if (offset == 3) z80pio_c_w(machine, 0,1,data);
 
 	if( offset == 2 )
 	{
-		z80pio_d_w(0,1,data);
-		data = z80pio_p_r(0,1);
+		z80pio_d_w(machine, 0,1,data);
+		data = z80pio_p_r(machine,0,1);
 		cassette_output(cassette_device_image(), (data & 0x02) ? -1.0 : +1.0);
 		speaker_level_w(0, (data & 0x40) ? 1 : 0);
 	}
@@ -171,8 +171,8 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 INTERRUPT_GEN( mbee_interrupt )
 {
 	/* once per frame, pulse the PIO B bit 7 */
-	z80pio_p_w(0, 1, 0x80);
-	z80pio_p_w(0, 1, 0x00);
+	z80pio_p_w(machine, 0, 1, 0x80);
+	z80pio_p_w(machine, 0, 1, 0x00);
 }
 
 DEVICE_IMAGE_LOAD( mbee_cart )

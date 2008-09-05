@@ -410,7 +410,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 		bit = 1;
 
 	/* update astb with bit */
-	z80pio_astb_w(0,bit & kc_ardy);
+	z80pio_astb_w(machine,0,bit & kc_ardy);
 }
 
 static void	kc_cassette_init(void)
@@ -865,7 +865,7 @@ static TIMER_CALLBACK(kc_keyboard_transmit_timer_callback)
 		LOG_KBD(("kc keyboard sending pulse: %02x\n",pulse_state));
 
 		/* set pulse */
-		z80pio_bstb_w(0,pulse_state & kc_brdy);
+		z80pio_bstb_w(machine,0,pulse_state & kc_brdy);
 
 		/* update counts */
 		keyboard_data.transmit_pulse_count_remaining--;
@@ -920,7 +920,7 @@ static void kc_keyboard_init(running_machine *machine)
 	keyboard_data.transmit_pulse_count = 0;
 
 	/* set initial state */
-	z80pio_bstb_w(0,0);
+	z80pio_bstb_w(machine,0,0);
 
 
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
@@ -1377,7 +1377,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_4_pio_data_w )
 {
 	kc85_pio_data[offset] = data;
-	z80pio_d_w(0, offset, data);
+	z80pio_d_w(machine, 0, offset, data);
 
 	switch (offset)
 	{
@@ -1619,7 +1619,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_3_pio_data_w )
 {
    kc85_pio_data[offset] = data;
-   z80pio_d_w(0, offset, data);
+   z80pio_d_w(machine, 0, offset, data);
 
    switch (offset)
    {
@@ -1693,7 +1693,7 @@ static TIMER_CALLBACK(kc85_reset_timer_callback)
 
  READ8_HANDLER ( kc85_pio_data_r )
 {
-	return z80pio_d_r(0,offset);
+	return z80pio_d_r(machine,0,offset);
 }
 
  READ8_HANDLER ( kc85_pio_control_r )
@@ -1705,7 +1705,7 @@ static TIMER_CALLBACK(kc85_reset_timer_callback)
 
 WRITE8_HANDLER ( kc85_pio_control_w )
 {
-   z80pio_c_w(0, offset, data);
+   z80pio_c_w(machine, 0, offset, data);
 }
 
 

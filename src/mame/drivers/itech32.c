@@ -154,13 +154,13 @@ Notes:
       *      - These locations not populated
       ES5506 - Ensonic ES5506 OTTOR2, clock 16.000MHz
       6809   - STMicroelectronics EF68B09, clock 2.000MHz
-      ENSONIC- DIP42 chip labelled 'ENSONIC (C)1992 2M 1350901601 9320 1.00' at location ROM0
+      ENSONIC- DIP42 chip labelled 'ENSONIC (C)1992 2M 1350901601 9320 1.00' at location SROM0
                -This is actually a 16MBit DIP42 MaskROM
       MM5437 - National Semiconductor MM5437 pseudo-random noise generator chip (DIP8)
       LED1   - Sound Status Yellow LED, blinks when active
       PAL1   - Labelled 'ITBP-1'
       PAL2   - Labelled 'ITSS-1'
-      JP3    - 4 pin connector for right speaker output
+      JP3    - 4 pin connector for right & left speaker output
 
 Main Board
 ----------
@@ -208,6 +208,88 @@ Notes:
       62256 - MOSEL MS62256L-10PC 32k x8 SRAM (DIP28)
       V52C8128K70 - Vitelic V52C8128K70 ?? possibly 128k x8 DRAM (SOJ40)
 
+****************************************************************************
+
+Hard Yardage
+Strata/Incredible Technologies, 1993
+
+PCB Layout
+----------
+
+Top (2 separate PCBs plugged into the main board)
+---
+
+P/N 1060 REV 0                         P/N 1061 REV 1
+|---------------------------------|    |---------------------------------|
+|6522          SND.U17    SROM0   |    |  ITFB3             ITFB2        |
+|   6809     6264   ENSONIC       |    |                                 |
+|                                 |    |  ITFB7             ITFB6        |
+|  LED1                           |    |                                 |
+|        PAL1                     |    |  ITFB11            ITFB10       |
+|                                 |    |                                 |
+|                  *SROM2  SROM1  |    | *GROM18           *GROM13       |
+|    ES5506  16MHz                |    |                                 |
+|               MM5437            |    | *GROM19           *GROM14       |
+|                                 |    |                                 |
+|            PAL2                 |    |  ITFB1             ITFB0        |
+|                                 |    |                                 |
+|                           VOL   |    |  ITFB5             ITFB4        |
+|                    TDA1543      |    |                                 |
+|                                 |    |  ITFB9             ITFB8        |
+|    555         3403    3403     |    |                                 |
+|                                 |    | *GROM8            *GROM3        |
+|                                 |    |                                 |
+|        JP3                      |    | *GROM9            *GROM4        |
+|---------------------------------|    |---------------------------------|
+
+Notes:
+      Same main board (P/N 1059 REV3) & sound PCB(P/N 1060 REV 0) as shown above.
+      *      - These locations not populated
+
+****************************************************************************
+
+World Class Bowling
+Incredible Technologies, 1995
+
+PCB Layout
+----------
+
+Top (2 separate PCBs plugged into the main board)
+---
+
+P/N 1060 REV 0                         P/N 1079 REV 1
+|---------------------------------|    |---------------------------------|
+|6522          SND.U17    SROM0   |    |                                 |
+|   6809     6264   ENSONIC       |    |  GRM0_3            GRM0_2       |
+|                                 |    |                                 |
+|  LED1                           |    |  GRM1_3            GRM1_2       |
+|        PAL1                     |    |                                 |
+|                                 |    | *GRM2_3           *GRM2_2       |
+|                  *SROM2  SROM1  |    |                                 |
+|    ES5506  16MHz                |    |                                 |
+|               MM5437            |    |                                 |
+|                                 |    |  GRM0_1            GRM0_0       |
+|            PAL2                 |    |                                 |
+|                                 |    |  GRM1_1            GRM1_0       |
+|                           VOL   |    |                                 |
+|                    TDA1543      |    | *GRM2_1           *GRM2_0       |
+|                                 |    |                                 |
+|    555         3403    3403     |    |                                 |
+|                                 |    | ITBWL-1                      JP7|
+|                                 |    | 4MHz                            |
+|        JP3                      |    | LED                          JP8|
+|---------------------------------|    |---------------------------------|
+
+Notes:
+      Same main board (P/N 1059 REV3) & sound PCB(P/N 1060 REV 0) as shown above.
+      *       - These locations not populated
+      ENSONIC - DIP42 chip labelled 'ENSONIC (C)1993 2MX16U 1350901801 9312 1.00' at location SROM0
+              - This is actually a 16MBit DIP42 MaskROM
+      ITBWL-1 PIC 16C54 used for protection
+      JP7 6 Pin trackball connector (Player 1)
+      JP8 6 Pin trackball connector (Player 2)
+
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -219,7 +301,7 @@ Notes:
 #include "itech32.h"
 #include "sound/es5506.h"
 #include "machine/timekpr.h"
-#include "memconv.h"
+#include "devconv.h"
 
 
 #define FULL_LOGGING				0
@@ -364,13 +446,6 @@ static CUSTOM_INPUT( special_port_r )
 		special_result ^= 1;
 
 	return special_result;
-}
-
-static READ16_HANDLER( drivedge_special_port_r )
-{
-	int result = input_port_read(machine, "82000");
-	if (sound_int_state) result ^= 0x08;
-	return result;
 }
 
 static READ16_HANDLER( trackball_r )
@@ -766,14 +841,14 @@ static WRITE32_HANDLER( int1_ack32_w )
 	int1_ack_w(machine, offset, data, mem_mask);
 }
 
-static WRITE32_HANDLER( timekeeper_0_32be_w )
+static WRITE32_DEVICE_HANDLER( timekeeper_32be_w )
 {
-	write32be_with_write8_handler( timekeeper_0_w, machine, offset, data, mem_mask );
+	write32be_with_write8_device_handler( timekeeper_w, device, offset, data, mem_mask );
 }
 
-static READ32_HANDLER( timekeeper_0_32be_r )
+static READ32_DEVICE_HANDLER( timekeeper_32be_r )
 {
-	return read32be_with_read8_handler( timekeeper_0_r, machine, offset, mem_mask );
+	return read32be_with_read8_device_handler( timekeeper_r, device, offset, mem_mask );
 }
 
 
@@ -818,14 +893,6 @@ static NVRAM_HANDLER( itech020 )
 			((UINT8 *)nvram)[i] = mame_rand(machine);
 	}
 }
-
-
-static NVRAM_HANDLER( tournament )
-{
-	NVRAM_HANDLER_CALL(itech020);
-	NVRAM_HANDLER_CALL(timekeeper_0);
-}
-
 
 
 /*************************************
@@ -920,8 +987,8 @@ AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
 AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 #endif
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x080000, 0x080003) AM_READ16(input_port_3_word_r, 0xffff0000)
-	AM_RANGE(0x082000, 0x082003) AM_READ16(drivedge_special_port_r, 0xffff0000)
+	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("80000")
+	AM_RANGE(0x082000, 0x082003) AM_READ_PORT("82000")
 	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
 	AM_RANGE(0x088000, 0x088003) AM_READ(drivedge_steering_r)
@@ -1231,10 +1298,12 @@ static INPUT_PORTS_START( drivedge )
 	PORT_SERVICE_DIPLOC( 0x80000000, IP_ACTIVE_HIGH, "SW1:1" )
 
 	PORT_START("80000")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x06) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_PLAYER(3)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x00ff0000, 0x00000000, IPT_PEDAL ) PORT_MINMAX(0x00000000,0x00060000) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_PLAYER(3)
 
 	PORT_START("82000")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x06) PORT_SENSITIVITY(2) PORT_KEYDELTA(40) PORT_PLAYER(2)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x00ff0000, 0x00000000, IPT_PEDAL ) PORT_MINMAX(0x00000000,0x00060000) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_PLAYER(2)
 
 	PORT_START("STEER")		/* 88000 */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
@@ -1699,7 +1768,7 @@ static MACHINE_DRIVER_START( tourny )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sftm)
 
-	MDRV_NVRAM_HANDLER( tournament ) /* Make Tournament sets load/store the Timekeeper info */
+	MDRV_DEVICE_ADD( "m48t02", M48T02 )
 MACHINE_DRIVER_END
 
 
@@ -1918,10 +1987,10 @@ ROM_START( bloods11 )
 ROM_END
 
 
-ROM_START( hardyard )
+ROM_START( hardyard )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "fb00v12.u83", 0x00000, 0x40000, CRC(c7497692) SHA1(6c11535cf011e15dd7ffb5eba8e8da557c38277e) )
-	ROM_LOAD16_BYTE( "fb00v12.u88", 0x00001, 0x40000, CRC(3320c79a) SHA1(d1d32048c541782e60c525d9789fe12607a6df3a) )
+	ROM_LOAD16_BYTE( "fb01v12.u88", 0x00001, 0x40000, CRC(3320c79a) SHA1(d1d32048c541782e60c525d9789fe12607a6df3a) )
 
 	ROM_REGION( 0x28000, "sound", 0 )
 	ROM_LOAD( "fbsndv11.u17", 0x10000, 0x18000, CRC(d221b121) SHA1(06f351274a9dcb522f67f58499c9dc2ef5f06c07) )
@@ -1950,13 +2019,13 @@ ROM_START( hardyard )
 ROM_END
 
 
-ROM_START( hardyd10 )
+ROM_START( hardyd10 )	/* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "hrdyrd.u83", 0x00000, 0x40000, CRC(f839393c) SHA1(ba06172bc4781f7738ce43019031715fee4b344c) )
-	ROM_LOAD16_BYTE( "hrdyrd.u88", 0x00001, 0x40000, CRC(ca444702) SHA1(49bcc0994da9cd2c31c0cd78b822aceeaffd035f) )
+	ROM_LOAD16_BYTE( "fb00v10.u83", 0x00000, 0x40000, CRC(f839393c) SHA1(ba06172bc4781f7738ce43019031715fee4b344c) )
+	ROM_LOAD16_BYTE( "fb01v10.u88", 0x00001, 0x40000, CRC(ca444702) SHA1(49bcc0994da9cd2c31c0cd78b822aceeaffd035f) )
 
 	ROM_REGION( 0x28000, "sound", 0 )
-	ROM_LOAD( "hy_fbsnd.u17", 0x10000, 0x18000, CRC(6c6db5b8) SHA1(925e7c7cc7c3d290f4a334f24eef574aaac3150c) )
+	ROM_LOAD( "fbsndv10.u17", 0x10000, 0x18000, CRC(6c6db5b8) SHA1(925e7c7cc7c3d290f4a334f24eef574aaac3150c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
@@ -1982,10 +2051,10 @@ ROM_START( hardyd10 )
 ROM_END
 
 
-ROM_START( pairs )
+ROM_START( pairs )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N ???? Rev ? &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "pair0.u83", 0x00000, 0x20000, CRC(a9c761d8) SHA1(2618c9c3f336cf30f760fd88f12c09985cfd4ee7) )
-	ROM_LOAD16_BYTE( "pair1.u88", 0x00001, 0x20000, CRC(5141eb86) SHA1(3bb10d588e6334a33e5c2c468651699e84f46cdc) )
+	ROM_LOAD16_BYTE( "pair0v12.u83", 0x00000, 0x20000, CRC(a9c761d8) SHA1(2618c9c3f336cf30f760fd88f12c09985cfd4ee7) )
+	ROM_LOAD16_BYTE( "pair1v12.u88", 0x00001, 0x20000, CRC(5141eb86) SHA1(3bb10d588e6334a33e5c2c468651699e84f46cdc) )
 
 	ROM_REGION( 0x28000, "sound", 0 )
 	ROM_LOAD( "snd.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
@@ -2009,10 +2078,10 @@ ROM_START( pairs )
 ROM_END
 
 
-ROM_START( pairsa )
+ROM_START( pairsa )	/* Version ?? (3-tier board set: P/N 1059 Rev 3, P/N ???? Rev ? &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "pair0", 0x00000, 0x20000, CRC(774995a3) SHA1(93df91378b56802d14c105f7f48ed8a4f7bafffd) )
-	ROM_LOAD16_BYTE( "pair1", 0x00001, 0x20000, CRC(85d0b73a) SHA1(48a6ac6de94be13e407da13e3e2440d858714b4b) )
+	ROM_LOAD16_BYTE( "pair0.u83", 0x00000, 0x20000, CRC(774995a3) SHA1(93df91378b56802d14c105f7f48ed8a4f7bafffd) )
+	ROM_LOAD16_BYTE( "pair1.u88", 0x00001, 0x20000, CRC(85d0b73a) SHA1(48a6ac6de94be13e407da13e3e2440d858714b4b) )
 
 	ROM_REGION( 0x28000, "sound", 0 )
 	ROM_LOAD( "snd.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
@@ -2035,7 +2104,7 @@ ROM_START( pairsa )
 	ROM_LOAD16_BYTE( "srom0", 0x000000, 0x80000, CRC(1d96c581) SHA1(3b7c84b7db3b098ec28c7058c16f97e9cf0e4733) )
 ROM_END
 
-ROM_START( hotmemry )
+ROM_START( hotmemry )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N ???? Rev ? &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "hotmem0.u83", 0x00000, 0x40000, CRC(5b9d87a2) SHA1(5a1ca7b622832fcb641e081d0c2a49c38ca795cd) )
 	ROM_LOAD16_BYTE( "hotmem1.u88", 0x00001, 0x40000, CRC(aeea087c) SHA1(3a8bdc04bc4051691823d0c5a1a3429475692100) )
@@ -3892,13 +3961,18 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x1116);
 }
 
+static void install_timekeeper(running_machine *machine)
+{
+	const device_config *device = device_list_find_by_tag(machine->config->devicelist, M48T02, "m48t02");
+	memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
+}
+
 static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
 {
 	/* Tournament Version, Same protection memory address as WCB Deluxe, but uses the standard WCB pic ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x111a);
 
-	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
+	install_timekeeper(machine);
 }
 
 static void init_gt_common(running_machine *machine)
@@ -3946,8 +4020,8 @@ static DRIVER_INIT( aamat )
         Tournament Version - So install needed handler for the TimeKeeper ram
     */
 	DRIVER_INIT_CALL(aama);
-	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
+
+	install_timekeeper(machine);
 }
 
 

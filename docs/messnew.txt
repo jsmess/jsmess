@@ -6,6 +6,8 @@ New System Drivers Supported (in no particular order):
 - Primo B32/ Primo B48/ Primo C64 [Miodrag Milanovic]
 - Homelab 2/3/4 [Miodrag Milanovic]
 
+
+
 System Driver Changes:
 ----------------------
 
@@ -108,7 +110,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.127u1.  This incorporates all features of the
+- The core is based on MAME 0.127u2.  This incorporates all features of the
   update to this core.  [MAME team]
 
 

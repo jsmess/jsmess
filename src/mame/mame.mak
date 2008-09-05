@@ -264,6 +264,7 @@ SOUNDS += NAMCO_CUS30
 SOUNDS += NAMCO_52XX
 SOUNDS += NAMCO_63701X
 SOUNDS += NAMCONA
+SOUNDS += SNKWAVE
 SOUNDS += C140
 SOUNDS += C352
 SOUNDS += TMS36XX
@@ -1263,11 +1264,9 @@ $(MAMEOBJ)/sigma.a: \
 $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/bbusters.o $(VIDEO)/bbusters.o \
 	$(DRIVERS)/dmndrby.o \
-	$(DRIVERS)/hal21.o \
 	$(DRIVERS)/hng64.o $(VIDEO)/hng64.o \
 	$(DRIVERS)/lasso.o $(VIDEO)/lasso.o \
 	$(DRIVERS)/mainsnk.o $(VIDEO)/mainsnk.o \
-	$(DRIVERS)/marvins.o $(VIDEO)/marvins.o \
 	$(DRIVERS)/munchmo.o $(VIDEO)/munchmo.o \
 	$(DRIVERS)/prehisle.o $(VIDEO)/prehisle.o \
 	$(DRIVERS)/rockola.o $(AUDIO)/rockola.o $(VIDEO)/rockola.o \
@@ -1655,6 +1654,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
+	$(DRIVERS)/videopkr.o \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \

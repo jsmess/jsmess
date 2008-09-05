@@ -123,19 +123,6 @@ static READ32_HANDLER( port0_r )
 }
 
 
-static READ32_HANDLER( port1_r )
-{
-	return (input_port_read(machine, "IN1") << 16) | input_port_read(machine, "IN1");
-}
-
-
-static READ32_HANDLER( port2_r )
-{
-	return (input_port_read(machine, "DSW") << 16) | input_port_read(machine, "DSW");
-}
-
-
-
 /*************************************
  *
  *  ADC input ports
@@ -323,7 +310,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 static READ32_HANDLER( crusnwld_serial_status_r )
 {
 	int status = midway_serial_pic_status_r();
-	return (port1_r(offset, mem_mask) & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (input_port_read(machine, "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -387,7 +374,7 @@ static WRITE32_HANDLER( bit_reset_w )
 static READ32_HANDLER( offroadc_serial_status_r )
 {
 	int status = midway_serial_pic2_status_r();
-	return (port1_r(machine, offset, mem_mask) & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (input_port_read(machine, "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -503,10 +490,10 @@ static ADDRESS_MAP_START( midvunit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x980080, 0x980080) AM_NOP
 	AM_RANGE(0x980082, 0x980083) AM_READ(midvunit_dma_trigger_r)
 	AM_RANGE(0x990000, 0x990000) AM_READ(SMH_NOP)	// link PAL (low 4 bits must == 4)
-	AM_RANGE(0x991030, 0x991030) AM_READ(port1_r)
+	AM_RANGE(0x991030, 0x991030) AM_READ_PORT("991030")
 //  AM_RANGE(0x991050, 0x991050) AM_READ(SMH_RAM) // seems to be another port
 	AM_RANGE(0x991060, 0x991060) AM_READ(port0_r)
-	AM_RANGE(0x992000, 0x992000) AM_READ(port2_r)
+	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
 	AM_RANGE(0x995000, 0x995000) AM_WRITE(SMH_NOP)	// force feedback?
@@ -554,6 +541,14 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( crusnusa )
+	PORT_START("991030")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
+
+	PORT_START("992000")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
+
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -588,28 +583,28 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_DIPSETTING(      0x0000, "Master" )
 	PORT_DIPSETTING(      0x0001, "Slave" )
 	PORT_DIPNAME( 0x0002, 0x0002, "Link???" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0004, 0x0004, "Linking" )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, "Freeze" )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ))
-	PORT_DIPSETTING(      0x0020, DEF_STR( Upright ))
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, "Sitdown" )
 	PORT_DIPNAME( 0x0040, 0x0040, "Enable Motion" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0100, 0x0100, "Coin Counters" )
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0xfe00, "USA-1" )
 	PORT_DIPSETTING(      0xfa00, "USA-3" )
 	PORT_DIPSETTING(      0xfc00, "USA-7" )
@@ -678,6 +673,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( crusnwld )
+	PORT_START("991030")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
+
+	PORT_START("992000")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
+
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -714,23 +717,23 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_DIPSETTING(      0x0002, "3" )
 	PORT_DIPSETTING(      0x0003, "4" )
 	PORT_DIPNAME( 0x0004, 0x0004, "Linking" )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0018, 0x0008, "Games Linked" )
 	PORT_DIPSETTING(      0x0008, "2" )
 	PORT_DIPSETTING(      0x0010, "3" )
 	PORT_DIPSETTING(      0x0018, "4" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ))
-	PORT_DIPSETTING(      0x0020, DEF_STR( Upright ))
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, "Sitdown" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0100, 0x0100, "Coin Counters" )
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0xfe00, "USA-1" )
 	PORT_DIPSETTING(      0xfa00, "USA-3" )
 	PORT_DIPSETTING(      0xfc00, "USA-7" )
@@ -799,6 +802,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( offroadc )
+	PORT_START("991030")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
+
+	PORT_START("992000")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
+
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -829,21 +840,21 @@ static INPUT_PORTS_START( offroadc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0000, "Shifter" )
 	PORT_DIPSETTING(      0x0002, "Closed" )
 	PORT_DIPSETTING(      0x0000, "Open" )
 	PORT_DIPNAME( 0x0004, 0x0004, "Girls" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, "Road Kill" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, "Link" )
 	PORT_DIPSETTING(      0x0020, "Disabled" )
 	PORT_DIPSETTING(      0x0000, "Enabled" )
@@ -852,16 +863,16 @@ static INPUT_PORTS_START( offroadc )
 	PORT_DIPSETTING(      0x0080, "2" )
 	PORT_DIPSETTING(      0x0040, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0xf800, 0xf800, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0xf800, 0xf800, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0xf800, "USA 1" )
 	PORT_DIPSETTING(      0xf000, "German 1" )
 	PORT_DIPSETTING(      0xe800, "French 1" )
@@ -894,35 +905,35 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( wargods )
-	PORT_START("DIPS")		/* DS1 */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_START("DIPS")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, "Blood" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, "Graphics" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Family" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0100, "Coinage Source" )
 	PORT_DIPSETTING(      0x0100, "Dipswitch" )
 	PORT_DIPSETTING(      0x0000, "CMOS" )
-	PORT_DIPNAME( 0x3e00, 0x3e00, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0x3e00, 0x3e00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x3e00, "USA-1" )
 	PORT_DIPSETTING(      0x3c00, "USA-2" )
 	PORT_DIPSETTING(      0x3a00, "USA-3" )
@@ -943,19 +954,19 @@ static INPUT_PORTS_START( wargods )
 	PORT_DIPSETTING(      0x1400, "French-11" )
 	PORT_DIPSETTING(      0x1200, "French-12" )
 	PORT_DIPSETTING(      0x1600, "French-ECA" )
-	PORT_DIPSETTING(      0x3000, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x3000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT )		/* Slam Switch */
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1059,6 +1070,64 @@ MACHINE_DRIVER_END
  *  ROM definitions
  *
  *************************************/
+
+/*
+Cruis'n USA
+Midway, 1994
+
+PCB Layout
+----------
+
+5770-14365-02 (C) 1994 NINTENDO
+|-------------------------------------------------------------------------------|
+|  SOUND.U5  SOUND.U9   BATTERY          GAME.U26  GAME.U27  GAME.U28  GAME.U29 |
+|  SOUND.U4  SOUND.U8                    GAME.U22  GAME.U23  GAME.U24  GAME.U25 |
+|  SOUND.U3  SOUND.U7   6264  RESET_SW   GAME.U18  GAME.U19  GAME.U20  GAME.U21 |
+|  SOUND.U2  SOUND.U6                    GAME.U14  GAME.U15  GAME.U16  GAME.U17 |
+|                                        GAME.U10  GAME.U11  GAME.U12  GAME.U13 |
+|            6116            PAL2              IDT7204      IDT7204             |
+|                                          LH521007 LH521007   LH521007 LH521007|
+|            6116   6116     PAL3                                               |
+|             PAL1           PAL4      |----------|    4C4001 4C4001  |-------| |
+|AD1851                      33.3333MHz|LSI       |    4C4001 4C4001  |TMS    | |
+|                                      |L1A7968   |    4C4001 4C4001  |320C31 | |
+|                                 40MHz|5410-1346500   4C4001 4C4001  |DSP    | |
+|                                      |MIDWAY    |                   |-------| |
+|      10MHz   ADSP-2105   CY7C199     |----------|                   50MHz     |
+|TDA2030                   CY7C199                                        DSW(8)|
+|       TL084                             D482234  D482234                      |
+|     TL084                               D482234  D482234                DSW(8)|
+|TDA2030                        PAL5            SN75160   SN75160   PAL6        |
+|          P5                             P7      SN75176  SN75176    P11       |
+|P3      P4  |--|        JAMMA         |--|P8 P9  SN75176  SN75176 P10   ADC0844|
+|------------|  |----------------------|  |-------------------------------------|
+Notes:
+      TMS320C31 - Texas Instruments TMS320C31 32-bit Floating-Point DSP, clock input 50.000MHz
+      ADSP-2105 - Analog Devices ADSP-2105 16-bit Fixed-Point DSP Microprocessor with On-Chip Memory, clock input 10.000MHz
+      IDT7204   - IDT7204 4k x9 Async. FIFO
+      LH521007  - Sharp LH521007AK-17 128k x8 SRAM (SOJ32)
+      D482234   - NEC D482234LE-70 (possibly 256k x8 ?) DRAM (SOJ40)
+      4C4001    - Micron Technology 4C4001JDJ-6 1M x4 DRAM (SOJ24/20)
+      CY7C199   - Cypress CY7C199-20PC 32k x8 SRAM
+      6264      - 8k x8 SRAM (battery-backed)
+      6116      - 2k x8 SRAM
+      AD1851    - Analog Devices AD1851 16 bit PCM Audio DAC
+      TDA2030   - ST TDA2030 Audio AMP
+      TL084     - Texas Instruments TL084 JFET-Input Operational Amplifier
+      ADC0844   - National Semiconductor ADC0844 8-Bit Microprocessor Compatible A/D Converter with Multiplexer Option
+      PAL1      - GAL20V8 labelled 'A-19668'
+      PAL2      - PALC22V10 (no label)
+      PAL3      - TIBPAL20L8 labelled 'A-19670'
+      PAL4      - TIBPAL22V10 labelled 'A-19671'
+      PAL5      - TIBPAL22V10 labelled 'A-19672'
+      PAL6      - TIBPAL22V10 labelled 'A-19673'
+      P3 - P11  - various connectors for controls
+      VSync     - 57.7090Hz  \
+      HSync     - 15.3544kHz / measured via EL4583
+      ROMs      - All ROMs 27C040
+                  SOUND.Uxx - Sound ROMs
+                  GAME.Uxx  - PROGRAM ROMs (including GFX)
+*/
 
 ROM_START( crusnusa ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
