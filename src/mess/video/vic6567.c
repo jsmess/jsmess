@@ -88,6 +88,7 @@
 #define C64_2_RASTERLINE(a) (a)
 #define XPOS (VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE)/2)
 #define YPOS (VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE)/2 */)
+#define FIRSTLINE ((VIC2_VISIBLELINES - VIC2_VSIZE)/2)
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
@@ -750,14 +751,14 @@ static void vic2_draw_character (int ybegin, int yend, int ch, int yoff, int xof
 	{
 		code = vic2.dma_read (vic2.chargenaddr + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = code;
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 0) = color[code >> 7];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 1) = color[(code >> 6) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 2) = color[(code >> 5) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 3) = color[(code >> 4) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 4) = color[(code >> 3) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 5) = color[(code >> 2) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 6) = color[(code >> 1) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 7) = color[code & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = color[(code >> 4) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = color[(code >> 3) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = color[(code >> 2) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = color[(code >> 1) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = color[code & 1];
 	}
 }
 
@@ -769,14 +770,14 @@ static void vic2_draw_character_multi (int ybegin, int yend, int ch, int yoff, i
 	{
 		code = vic2.dma_read (vic2.chargenaddr + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = vic2.foreground[code];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 0) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 1) = vic2.multi[code >> 6];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 2) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 3) = vic2.multi[(code >> 4) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 4) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 5) = vic2.multi[(code >> 2) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 6) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 7) = vic2.multi[code & 3];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.multi[code >> 6];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.multi[(code >> 4) & 3];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.multi[(code >> 2) & 3];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.multi[code & 3];
 	}
 }
 
@@ -788,14 +789,14 @@ static void vic2_draw_bitmap (int ybegin, int yend, int ch, int yoff, int xoff)
 	{
 		code = vic2.dma_read ((vic2.chargenaddr&0x2000) + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = code;
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 0) = vic2.c64_bitmap[code >> 7];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 1) = vic2.c64_bitmap[(code >> 6) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 2) = vic2.c64_bitmap[(code >> 5) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 3) = vic2.c64_bitmap[(code >> 4) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 4) = vic2.c64_bitmap[(code >> 3) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 5) = vic2.c64_bitmap[(code >> 2) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 6) = vic2.c64_bitmap[(code >> 1) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 7) = vic2.c64_bitmap[code & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic2.c64_bitmap[code >> 7];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.c64_bitmap[(code >> 6) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic2.c64_bitmap[(code >> 5) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.c64_bitmap[(code >> 4) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic2.c64_bitmap[(code >> 3) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.c64_bitmap[(code >> 2) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic2.c64_bitmap[(code >> 1) & 1];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.c64_bitmap[code & 1];
 	}
 }
 
@@ -807,14 +808,14 @@ static void vic2_draw_bitmap_multi (int ybegin, int yend, int ch, int yoff, int 
 	{
 		code = vic2.dma_read ((vic2.chargenaddr&0x2000) + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = vic2.foreground[code];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 0) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 1) = vic2.bitmapmulti[code >> 6];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 2) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 3) = vic2.bitmapmulti[(code >> 4) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 4) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 5) = vic2.bitmapmulti[(code >> 2) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 6) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff, xoff + 7) = vic2.bitmapmulti[code & 3];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.bitmapmulti[code >> 6];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.bitmapmulti[(code >> 4) & 3];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.bitmapmulti[(code >> 2) & 3];
+		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) =
+			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.bitmapmulti[code & 3];
 	}
 }
 
@@ -832,14 +833,14 @@ static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior)
 			switch ((prior & mask) >> shift)
 			{
 			case 1:
-				*BITMAP_ADDR16(vic2.bitmap, y, xbegin + x + 1) = vic2.spritemulti[(code >> shift) & 3];
+				*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x + 1) = vic2.spritemulti[(code >> shift) & 3];
 				break;
 			case 2:
-				*BITMAP_ADDR16(vic2.bitmap, y, xbegin + x) = vic2.spritemulti[(code >> shift) & 3];
+				*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) = vic2.spritemulti[(code >> shift) & 3];
 				break;
 			case 3:
-				*BITMAP_ADDR16(vic2.bitmap, y, xbegin + x) =
-					*BITMAP_ADDR16(vic2.bitmap, y, xbegin + x + 1) = vic2.spritemulti[(code >> shift) & 3];
+				*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) =
+					*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x + 1) = vic2.spritemulti[(code >> shift) & 3];
 				break;
 			}
 		}
@@ -857,7 +858,7 @@ static void vic2_draw_sprite_code (int y, int xbegin, int code, int color)
 	{
 		if (code & mask)
 		{
-			*BITMAP_ADDR16(vic2.bitmap, y, xbegin + x) = color;
+			*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) = color;
 		}
 	}
 }
@@ -1141,7 +1142,7 @@ static void vic2_drawlines (int first, int last)
 	if (!SCREENON)
 	{
 		for (line = first; (line < last) && (line < vic2.bitmap->height); line++)
-			memset16 (BITMAP_ADDR16(vic2.bitmap, line, 0), FRAMECOLOR, vic2.bitmap->width);
+			memset16 (BITMAP_ADDR16(vic2.bitmap, line + FIRSTLINE, 0), FRAMECOLOR, vic2.bitmap->width);
 		return;
 	}
 
@@ -1157,7 +1158,7 @@ static void vic2_drawlines (int first, int last)
 
 	line = first;
 	if (line < end) {
-		plot_box(vic2.bitmap, 0, line, vic2.bitmap->width, end-line, FRAMECOLOR);
+		plot_box(vic2.bitmap, 0, line + FIRSTLINE, vic2.bitmap->width, end-line, FRAMECOLOR);
 		line=end;
 	}
 
@@ -1183,7 +1184,6 @@ static void vic2_drawlines (int first, int last)
 		/* rendering 39 characters */
 		/* left and right borders are overwritten later */
 		vic2.shift[line] = HORICONTALPOS;
-
 		for (xoff = vic2.x_begin + XPOS; xoff < vic2.x_end + XPOS; xoff += 8, offs++)
 		{
 			ch = vic2.dma_read (vic2.videoaddr + offs);
@@ -1321,8 +1321,8 @@ static void vic2_drawlines (int first, int last)
 				memset (vic2.sprites[i].paintedline, 0, sizeof (vic2.sprites[i].paintedline));
 			}
 		}
-		plot_box(vic2.bitmap, 0, yoff+ybegin, xbegin, yend-ybegin+1, FRAMECOLOR);
-		plot_box(vic2.bitmap, xend, yoff+ybegin, vic2.bitmap->width - xend, yend-ybegin+1, FRAMECOLOR);
+		plot_box(vic2.bitmap, 0, yoff + ybegin + FIRSTLINE, xbegin, yend-ybegin+1, FRAMECOLOR);
+		plot_box(vic2.bitmap, xend, yoff + ybegin + FIRSTLINE, vic2.bitmap->width - xend, yend-ybegin+1, FRAMECOLOR);
 	}
 	if (last < vic2.bitmap->height)
 		end = last;
@@ -1330,7 +1330,7 @@ static void vic2_drawlines (int first, int last)
 		end = vic2.bitmap->height;
 
 	if (line < end) {
-		plot_box(vic2.bitmap, 0, line, vic2.bitmap->width, end-line, FRAMECOLOR);
+		plot_box(vic2.bitmap, 0, line + FIRSTLINE, vic2.bitmap->width, end-line, FRAMECOLOR);
 		line = end;
 	}
 }
@@ -1362,7 +1362,8 @@ INTERRUPT_GEN( vic2_raster_irq )
 		vic2_set_interrupt (1);
 	}
 // printf("%08x  ",(int)activecpu_gettotalcycles());
-	if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
+	if (vic2.on)
+		if ((vic2.rasterline > 0x25) && (vic2.rasterline < 0x120))vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
 }
 
 VIDEO_UPDATE( vic2 )
