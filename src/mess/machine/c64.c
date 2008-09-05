@@ -13,12 +13,12 @@
  */
 
 /* 
-	2008-08-31: Tape status [FP & RZ]
+	2008-09-05: Tape status [FP & RZ]
 	- tape loading works
+	- tap files are supported
 	
 	TODO:
 	* write to tape
-	* support for .tap files
 */
 
 #include "driver.h"

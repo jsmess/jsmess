@@ -6,6 +6,7 @@
 #include "devices/cassette.h"
 
 #include "includes/cbm.h"
+#include "formats/cbm_tap.h"
 
 
 
@@ -197,6 +198,7 @@ void datasette_device_getinfo(const mess_device_class *devclass, UINT32 state, u
 	case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
 
 	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
+	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:			info->p = (void *)cbm_cassette_formats; break;
 
 	default:										cassette_device_getinfo(devclass, state, info); break;
 	}

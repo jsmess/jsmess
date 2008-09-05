@@ -1,4 +1,4 @@
-﻿0.127.1
+0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -11,8 +11,8 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 
-- [C16] Added partial support for tape emulation using MESS core 
-  functions (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
+- [C16] Added support for tape emulation using MESS core functions (only 
+  loading, both .wav and .tap formats) [Fabio Priuli, Roberto Zandona']
 
 - [C16] Refactored cartridge code to rely on MESS core functions. As
   a result carts are now working. Also removed -cart2 device, since
@@ -23,15 +23,15 @@ System Driver Changes:
   had plugged your joystick in port 2). This helps with games which expect 
   joystick inputs from port 2 of the C16 [Fabio Priuli]
 
-- [C128] Added partial support for tape emulation using MESS core 
-  functions (only loading and only .wav) [Fabio Priuli]
+- [C128] Added support for tape emulation using MESS core functions (only 
+  loading, both .wav and .tap formats) [Fabio Priuli]
 
 - [C128] Refactored cartridge code to rely on MESS core functions. 
-  Currently, .crt emulation uses C64 cart code and therefore support has 
-  not improved (yet) [Fabio Priuli]
+  Currently, .crt emulation uses unmodified C64 cart code and therefore 
+  support has not improved (yet) [Fabio Priuli]
 
-- [C64] Added partial support for tape emulation using MESS core 
-  functions (only loading and only .wav) [Fabio Priuli, Roberto Zandona']
+- [C64] Added support for tape emulation using MESS core functions (only 
+  loading, both .wav and .tap formats) [Fabio Priuli, Roberto Zandona']
 
 - [C64] Fixed border color during tape loading [Roberto Zandona']
 
@@ -53,8 +53,8 @@ System Driver Changes:
   joystick inputs from port 2 of the C64 [Fabio Priuli]
 
 - [C65] Added preliminary cartridge support through MESS core functions. 
-  Currently, .crt emulation uses C64 cart code and therefore is not 
-  working [Fabio Priuli]
+  Currently, .crt emulation uses unmodified C64 cart code and therefore 
+  is not working [Fabio Priuli]
 
 - [CBMB] Refactored cartridge code to rely on MESS core functions. Disabled
   .crt support (.10, .20, .40 and .60 files working as before) since I 
@@ -81,8 +81,8 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
-- [VIC20] Added partial support for tape emulation using MESS core 
-  functions (only loading and only .wav) [Fabio Priuli]
+- [VIC20] Added support for tape emulation using MESS core functions (only 
+  loading, both .wav and .tap formats) [Fabio Priuli]
 
 - [VIC20] Refactored cartridge code to rely on MESS core functions. As
   a result carts are now working (fixed remaining half of bug #1603). Also
