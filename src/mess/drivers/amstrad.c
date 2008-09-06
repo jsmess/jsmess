@@ -1808,7 +1808,7 @@ static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
 	{
 		logerror("IRQ: Not cleared, IRQ was called by DMA [%i]\n",amstrad_plus_irq_cause);
 		amstrad_plus_asic_ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
-		return (amstrad_plus_asic_ram[0x2805] & 0xf8) + amstrad_plus_irq_cause;
+		return (amstrad_plus_asic_ram[0x2805] & 0xf8) | amstrad_plus_irq_cause;
 	}
 	cpunum_set_input_line(machine, 0,0, CLEAR_LINE);
 	amstrad_CRTC_HS_Counter &= 0x1F;
@@ -1821,7 +1821,7 @@ static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
 			amstrad_plus_asic_ram[0x2c0f] &= ~0x80;
 			amstrad_plus_asic_ram[0x2c0f] &= (0x40 >> amstrad_plus_irq_cause/2);
 		}
-		return (amstrad_plus_asic_ram[0x2805] & 0xf8) + amstrad_plus_irq_cause;
+		return (amstrad_plus_asic_ram[0x2805] & 0xf8) | amstrad_plus_irq_cause;
 	}
 	return 0xFF;
 }
@@ -2135,6 +2135,8 @@ static MACHINE_RESET( plus )
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration(machine);
 	amstrad_plus_setsplitline(0,0);
+	amstrad_GateArray_write(machine, 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
+	
 	//  multiface_init();
 }
 
@@ -2185,6 +2187,7 @@ static MACHINE_RESET( gx4000 )
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration(machine);
 	amstrad_plus_setsplitline(0,0);
+	amstrad_GateArray_write(machine, 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 	//  multiface_init();
 }
 
