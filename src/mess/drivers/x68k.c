@@ -760,7 +760,10 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		else    // BIOS code suggests that setting bit 7 of this port to 0 disables the motor of all floppy drives
 		{
 			for(drive=0;drive<4;drive++)
+			{
 				floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 0);
+				output_set_indexed_value("access_drv",drive,1);
+			}
 		}
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0),1,1);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1),1,1);
