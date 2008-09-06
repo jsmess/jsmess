@@ -824,7 +824,9 @@ static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior)
 	register int x, mask, shift;
 
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
-		return;
+		{
+			return;
+		}
 
 	for (x = 0, mask = 0xc0, shift = 6; x < 8; x += 2, mask >>= 2, shift -= 2)
 	{
@@ -1126,10 +1128,10 @@ static void vic2_drawlines (int first, int last)
 	if (video_skip_this_frame ())
 		return;
 
-
 	/* top part of display not rastered */
 	first -= VIC2_YPOS - YPOS;
 	last -= VIC2_YPOS - YPOS;
+
 /*
 	if ((first >= last) || (last <= 0))
 	{
@@ -1159,7 +1161,7 @@ static void vic2_drawlines (int first, int last)
 
 	line = first;
 	if (line < end) {
-		plot_box(vic2.bitmap, 0, line + FIRSTLINE, vic2.bitmap->width, end-line, FRAMECOLOR);
+		plot_box(vic2.bitmap, 0, line + FIRSTLINE, vic2.bitmap->width, 1, FRAMECOLOR);
 		line=end;
 	}
 
@@ -1226,6 +1228,28 @@ static void vic2_drawlines (int first, int last)
 				vic2_draw_character (ybegin, yend, ch, yoff, xoff, vic2.mono);
 			}
 		}
+	}
+
+	line = first;
+	if (LINES25)
+	{
+		vline = line - vic2.y_begin - YPOS;
+	}
+	else
+	{
+		vline = line - vic2.y_begin - YPOS + 8 - VERTICALPOS;
+	}
+	if (last < vic2.y_end + YPOS)
+		end = last;
+	else
+		end = vic2.y_end + YPOS;
+
+	for (; line < end; vline = (vline + 8) & ~7, line = line + 1 + yend - ybegin)
+	{
+		offs = (vline >> 3) * 40;
+		ybegin = vline & 7;
+		yoff = line - ybegin;
+		yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
 		/* sprite priority, sprite overwrites lowerprior pixels */
 		for (i = 7; i >= 0; i--)
 		{
@@ -1244,6 +1268,12 @@ static void vic2_drawlines (int first, int last)
 				}
 				if (yoff + syend > YPOS + 200)
 					syend = YPOS + 200 - yoff - 1;
+				if (yoff + ybegin < 0)
+					{
+						ybegin = -yoff;
+						yend = - yoff;
+					}
+
 				if (SPRITE_MULTICOLOR (i))
 					vic2_draw_sprite_multi (i, yoff, ybegin, syend);
 				else
@@ -1255,10 +1285,14 @@ static void vic2_drawlines (int first, int last)
 						vic2.sprites[i].paintedline[j] = 0;
 				}
 			}
-			// sprite wrap y at the top of the screen
-			else if (SPRITEON (i) && (SPRITE_Y_POS (i) < yoff) && (yoff == YPOS))
+			// wrap at the top of the screen
+			else if 	(SPRITEON (i) &&
+					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
+					(yoff + ybegin - SPRITE_Y_POS (i) < (SPRITE_Y_EXPAND (i)? 21 * 2 : 21 )) &&
+					(SPRITE_Y_POS (i) < 0))
 			{
-				int wrapped = YPOS - SPRITE_Y_POS (i);
+				int wrapped = - SPRITE_Y_POS (i) + 6;
+
 				syend = yend;
 
 				if (SPRITE_Y_EXPAND (i))
@@ -1277,9 +1311,9 @@ static void vic2_drawlines (int first, int last)
 				vic2.sprites[i].line = wrapped;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, YPOS, 0 , syend);
+					vic2_draw_sprite_multi (i, 0, 0 , syend);
 				else
-					vic2_draw_sprite (i, YPOS, 0 , syend);
+					vic2_draw_sprite (i, 0, 0 , syend);
 
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
@@ -1289,7 +1323,7 @@ static void vic2_drawlines (int first, int last)
 				}
 			}
 			else if (SPRITEON (i) && (yoff + ybegin <= SPRITE_Y_POS (i))
-					 && (yoff + yend >= SPRITE_Y_POS (i)))
+					 && (yoff + yend >= SPRITE_Y_POS (i)) && (SPRITE_Y_POS (i) >= 0) )
 			{
 				syend = yend;
 				if (SPRITE_Y_EXPAND (i))
@@ -1304,12 +1338,13 @@ static void vic2_drawlines (int first, int last)
 				}
 				if (yoff + syend >= YPOS + 200)
 					syend = YPOS + 200 - yoff - 1;
-				for (j = 0; j < SPRITE_Y_POS (i) - yoff; j++)
+				 for (j = 0; j < SPRITE_Y_POS (i) - yoff; j++)
 					vic2.sprites[i].paintedline[j] = 0;
 				if (SPRITE_MULTICOLOR (i))
 					vic2_draw_sprite_multi (i, yoff, SPRITE_Y_POS (i) - yoff, syend);
 				else
 					vic2_draw_sprite (i, yoff, SPRITE_Y_POS (i) - yoff, syend);
+
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
 					for (j = syend; j <= yend; j++)
@@ -1322,16 +1357,17 @@ static void vic2_drawlines (int first, int last)
 				memset (vic2.sprites[i].paintedline, 0, sizeof (vic2.sprites[i].paintedline));
 			}
 		}
-		plot_box(vic2.bitmap, 0, yoff + ybegin + FIRSTLINE, xbegin, yend-ybegin+1, FRAMECOLOR);
-		plot_box(vic2.bitmap, xend, yoff + ybegin + FIRSTLINE, vic2.bitmap->width - xend, yend-ybegin+1, FRAMECOLOR);
 	}
+	plot_box(vic2.bitmap, 0, first + FIRSTLINE, xbegin, 1, FRAMECOLOR);
+	plot_box(vic2.bitmap, xend, first + FIRSTLINE, vic2.bitmap->width - xend, 1, FRAMECOLOR);
+
 	if (last < vic2.bitmap->height)
 		end = last;
 	else
 		end = vic2.bitmap->height;
 
 	if (line < end) {
-		plot_box(vic2.bitmap, 0, line + FIRSTLINE, vic2.bitmap->width, end-line, FRAMECOLOR);
+		plot_box(vic2.bitmap, 0, first + FIRSTLINE, vic2.bitmap->width, 1, FRAMECOLOR);
 		line = end;
 	}
 }
@@ -1362,9 +1398,11 @@ INTERRUPT_GEN( vic2_raster_irq )
 	{
 		vic2_set_interrupt (1);
 	}
+
 // printf("%08x  ",(int)activecpu_gettotalcycles());
 	if (vic2.on)
-		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))) vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
+		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
+			vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
 }
 
 VIDEO_UPDATE( vic2 )
