@@ -8,6 +8,48 @@
 
 ***************************************************************************/
 
+/*
+
+2008 - Driver Updates 
+---------------------
+
+(most of the informations are taken from http://www.zimmers.net/cbmpics/ )
+
+
+[CBM systems which belong to this driver]
+
+* Commodore 65 (1989)
+
+Also known as C64 DX at early stages of the project. It was cancelled 
+around 1990-1991. Only few units survive (they were sold after Commodore 
+liquidation in 1994).
+
+CPU: CSG 4510 (3.54 Mhz)
+RAM: 128 kilobytes, expandable to 8 megabytes
+ROM: 128 kilobytes
+Video: CSG 4569 "VIC-III" (6 Video modes; Resolutions from 320x200 to 
+	1280x400; 80 columns text; Palette of 4096 colors)
+Sound: CSG 8580 "SID" x2 (6 voice stereo synthesizer/digital sound 
+	capabilities)
+Ports: CSG 4510 (2 Joystick/Mouse ports; CBM Serial port; CBM 'USER' 
+	port; CBM Monitor port; Power and reset switches; C65 bus drive 
+	port; RGBI video port; 2 RCA audio ports; RAM expansion port; C65 
+	expansion port)
+Keyboard: Full-sized 77 key QWERTY (12 programmable function keys;
+	4 direction cursor-pad)
+Additional Hardware: Built in 3.5" DD disk drive (1581 compatible)
+Miscellaneous: Partially implemented Commodore 64 emulation
+
+[Notes]
+
+The datasette port was removed here. C65 supports an additional "dumb" 
+drive externally. It also features, in addition to the standard CBM 
+bus serial (available in all modes), a Fast and a Burst serial bus 
+(both available in C65 mode only)
+
+*/
+
+
 #include "driver.h"
 #include "includes/c65.h"
 #include "includes/c64.h"
@@ -22,6 +64,12 @@
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( c65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x07fff) AM_RAMBANK(11)
@@ -119,6 +167,13 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
+
 static PALETTE_INIT( c65 )
 {
 	int i;
@@ -128,51 +183,27 @@ static PALETTE_INIT( c65 )
 	}
 }
 
-#if 0
-	/* caff */
-	/* dma routine alpha 1 (0x400000 reversed copy)*/
-	ROM_LOAD ("910111.bin", 0x20000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206))
-	/* b96b */
-	/* dma routine alpha 2 */
-	ROM_LOAD ("910523.bin", 0x20000, 0x20000, CRC(e8235dd4) SHA1(e453a8e7e5b95de65a70952e9d48012191e1b3e7))
-	/* 888c */
-	/* dma routine alpha 2 */
-	ROM_LOAD ("910626.bin", 0x20000, 0x20000, CRC(12527742) SHA1(07c185b3bc58410183422f7ac13a37ddd330881b))
-	/* c9cd */
-	/* dma routine alpha 2 */
-	ROM_LOAD ("910828.bin", 0x20000, 0x20000, CRC(3ee40b06) SHA1(b63d970727a2b8da72a0a8e234f3c30a20cbcb26))
-	/* 4bcf loading demo disk??? */
-	/* basic program stored at 0x4000 ? */
-	/* dma routine alpha 2 */
-	ROM_LOAD ("911001.bin", 0x20000, 0x20000, CRC(0888b50f) SHA1(129b9a2611edaebaa028ac3e3f444927c8b1fc5d))
-	/* german e96a */
-	/* dma routine alpha 1 */
-	ROM_LOAD ("910429.bin", 0x20000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d))
-#endif
 
-ROM_START( c65 )
-	ROM_REGION (0x400000, "main", 0)
-	ROM_SYSTEM_BIOS( 0, "910111", "V0.9.910111" )
-	ROMX_LOAD( "910111.bin", 0x20000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "910523", "V0.9.910523" )
-	ROMX_LOAD( "910523.bin", 0x20000, 0x20000, CRC(e8235dd4) SHA1(e453a8e7e5b95de65a70952e9d48012191e1b3e7), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "910626", "V0.9.910626" )
-	ROMX_LOAD( "910626.bin", 0x20000, 0x20000, CRC(12527742) SHA1(07c185b3bc58410183422f7ac13a37ddd330881b), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "910828", "V0.9.910828" )
-	ROMX_LOAD( "910828.bin", 0x20000, 0x20000, CRC(3ee40b06) SHA1(b63d970727a2b8da72a0a8e234f3c30a20cbcb26), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 4, "911001", "V0.9.911001" )
-	ROMX_LOAD( "911001.bin", 0x20000, 0x20000, CRC(0888b50f) SHA1(129b9a2611edaebaa028ac3e3f444927c8b1fc5d), ROM_BIOS(5) )
-ROM_END
+/*************************************
+ *
+ *  Sound definitions
+ *
+ *************************************/
 
-ROM_START( c64dx )
-	ROM_REGION (0x400000, "main", 0)
-	ROM_LOAD ("910429.bin", 0x20000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d))
-ROM_END
 
 static const sid6581_interface c65_sound_interface =
 {
 	c64_paddle_read
 };
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 
 static MACHINE_DRIVER_START( c65 )
 	/* basic machine hardware */
@@ -222,6 +253,42 @@ static MACHINE_DRIVER_START( c65pal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 MACHINE_DRIVER_END
 
+
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+
+ROM_START( c65 )
+	ROM_REGION( 0x400000, "main", 0 )
+	ROM_SYSTEM_BIOS( 0, "910111", "V0.9.910111" )
+	ROMX_LOAD( "910111.bin", 0x20000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "910523", "V0.9.910523" )
+	ROMX_LOAD( "910523.bin", 0x20000, 0x20000, CRC(e8235dd4) SHA1(e453a8e7e5b95de65a70952e9d48012191e1b3e7), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "910626", "V0.9.910626" )
+	ROMX_LOAD( "910626.bin", 0x20000, 0x20000, CRC(12527742) SHA1(07c185b3bc58410183422f7ac13a37ddd330881b), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "910828", "V0.9.910828" )
+	ROMX_LOAD( "910828.bin", 0x20000, 0x20000, CRC(3ee40b06) SHA1(b63d970727a2b8da72a0a8e234f3c30a20cbcb26), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "911001", "V0.9.911001" )
+	ROMX_LOAD( "911001.bin", 0x20000, 0x20000, CRC(0888b50f) SHA1(129b9a2611edaebaa028ac3e3f444927c8b1fc5d), ROM_BIOS(5) )
+ROM_END
+
+ROM_START( c64dx )
+	ROM_REGION( 0x400000, "main", 0 )
+	ROM_LOAD( "910429.bin", 0x20000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d) )
+ROM_END
+
+
+/*************************************
+ *
+ *  System configuration(s)
+ *
+ *************************************/
+
+
 static SYSTEM_CONFIG_START( c65 )
 	CONFIG_DEVICE(c64_cartslot_getinfo)	// to investigate which carts could work in the c65 expansion port!
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
@@ -230,6 +297,14 @@ static SYSTEM_CONFIG_START( c65 )
 	CONFIG_RAM((128 + 4096) * 1024)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                         FULLNAME                                                            FLAGS */
-COMP( 1991, c65,    0,      0,      c65,    c65,    c65,    c65,    "Commodore Electronics, Ltd.",  "The Commodore 65 Development System (Prototype, NTSC)",            GAME_NOT_WORKING )
-COMP( 1991, c64dx,  c65,    0,      c65pal, c65ger, c65pal, c65,    "Commodore Electronics, Ltd.",  "The Commodore 64DX Development System (Prototype, PAL, German)",   GAME_NOT_WORKING )
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                         FULLNAME                                              FLAGS */
+
+COMP( 1991, c65,    0,      0,      c65,    c65,    c65,    c65,    "Commodore Electronics, Ltd.",  "Commodore 65 Development System (Prototype, NTSC)", GAME_NOT_WORKING )
+COMP( 1991, c64dx,  c65,    0,      c65pal, c65ger, c65pal, c65,    "Commodore Electronics, Ltd.",  "Commodore 64DX Development System (Prototype, PAL, German)", GAME_NOT_WORKING )

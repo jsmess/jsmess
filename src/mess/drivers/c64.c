@@ -8,186 +8,318 @@
 ***************************************************************************/
 
 /*
-------------------------------------
-max     commodore max (vic10/ultimax/vickie prototype)
-c64     commodore c64 (ntsc version)
-c64pal  commodore c64 (pal version)
-c64gs   commodore c64 game system (ntsc version)
-sx64    commodore sx64 (pal version)
-------------------------------------
-(preliminary version)
 
-if the game runs to fast with the ntsc version, try the pal version!
+2008 - Driver Updates 
+---------------------
 
-c64
- design like the vic20
- better videochip with sprites
- famous sid6581 sound chip
- 64 kbyte ram
- 2nd gameport
-Educator 64-1
- standard c64
- bios color bios (as in pet64 series) when delivered with green monitor
-max  (vic10,ultimax,vickey prototype)
- delivered in japan only?
- (all modules should work with c64)
- cartridges neccessary
- low cost c64
- flat design
- only 4 kbyte sram
- simplier banking chip
-  no portlines from cpu
- only 1 cia6526 chip
-  restore key connection?
-  no serial bus
-  no userport
- keyboard
- tape port
- 2 gameports
-  lightpen (port a only) and joystick mentioned in advertisement
-  paddles
- cartridge/expansion port (some signals different to c64)
- no rom on board (minibasic with kernel delivered as cartridge?)
-c64gs
- game console without keyboard
- standard c64 mainboard!
- modified kernal
- basic rom
- 2. cia yes
- no userport
- no cbm serial port
- no keyboard connector
- no tapeport
-cbm4064/pet64/educator64-2
- build in green monitor
- other case
- differences, versions???
-(sx100 sx64 like prototype with build in black/white monitor)
-sx64
- movable compact (and heavy) all in one comp
- build in vc1541
- build in small color monitor
- no tape connector
-dx64 prototype
- two build in vc1541 (or 2 drives driven by one vc1541 circuit)
+(most of the informations are taken from http://www.zimmers.net/cbmpics/ )
 
-state
------
-rasterline based video system
- no cpu holding
- imperfect scrolling support (when 40 columns or 25 lines)
- lightpen support not finished
- rasterline not finished
-no sound
-cia6526's look in machine/cia6526.c
-keyboard
-gameport a
- paddles 1,2
- joystick 1
- 2 button joystick/mouse joystick emulation
- no mouse
- lightpen (not finished)
-gameport b
- paddles 3,4
- joystick 2
- 2 button joystick/mouse joystick emulation
- no mouse
-simple tape support
- (not working, cia timing?)
-serial bus
- simple disk drives
- no printer or other devices
-expansion modules c64
- rom cartridges (exrom)
- ultimax rom cartridges (game)
- no other rom cartridges (bankswitching logic in it, switching exrom, game)
- no ieee488 support
- no cpm cartridge
- no speech cartridge (no circuit diagram found)
- no fm sound cartridge
- no other expansion modules
-expansion modules ultimax
- ultimax rom cartridges
- no other expansion modules
-no userport
- no rs232/v.24 interface
-no super cpu modification
-no second sid modification
-quickloader
 
-Keys
-----
-Some PC-Keyboards does not behave well when special two or more keys are
-pressed at the same time
-(with my keyboard printscreen clears the pressed pause key!)
+[CBM systems which belong to this driver]
 
-shift-cbm switches between upper-only and normal character set
-(when wrong characters on screen this can help)
-run (shift-stop) loads pogram from type and starts it
+* Commodore Max Machine (1982, Japan)
 
-Lightpen
---------
-Paddle 5 x-axe
-Paddle 6 y-axe
+  The Max Machine was produced by Commodore Japan and was released along 
+with the C64 in Japan. Also known as "UltiMax" (in North America ads) 
+or "VC-10 / VIC-10" (in some European advertising), it was designed to be a 
+game console. It has no internal kernel and no BASIC, everything must be 
+supplied by the cart. A Mini BASIC and a BASIC carts were produced (the 
+latter with support for LOAD/SAVE commands as well). The character rom 
+is not present either and its content was, again, in the cart. Max Machine
+carts can be run by both C64 and C128.
 
-Tape
-----
-(DAC 1 volume in noise volume)
-loading of wav, prg and prg files in zip archiv
-commandline -cassette image
-wav:
- 8 or 16(not tested) bit, mono, 125000 Hz minimum
- has the same problems like an original tape drive (tone head must
- be adjusted to get working(no load error,...) wav-files)
-zip:
- must be placed in current directory
- prg's are played in the order of the files in zip file
+CPU: MOS Technology 6510 (1Mhz)
+RAM: 4 kilobytes (2 kilobytes?)
+ROM: none
+Video: MOS 6566 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
+	colors)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
+	capabilities) 
+Ports: 6526 CIA (Power switch; 2 Commodore "Joystick" ports; 'EXPANSION' 
+	port; "TV" port; CBM Datasette port)
+Keyboard: Full-sized QWERTY "Contact-Pad"
 
-use LOAD or LOAD"" or LOAD"",1 for loading of normal programs
-use LOAD"",1,1 for loading programs to their special address
 
-several programs relies on more features
-(loading other file types, writing, ...)
+* Commodore 64 (1982)
 
-Discs
------
-only file load from drive 8 and 9 implemented
- loads file from rom directory (*.prg,*.p00,*.t64) (must NOT be specified on
- commandline)
- or file from d64 image (here also directory LOAD"$",8 supported)
-use LOAD"filename",8
-or LOAD"filename",8,1 (for loading machine language programs at their address)
-for loading
-type RUN or the appropriate sys call to start them
+  Released in August 1982 in the US and marketed as a lower end home 
+computer, the C64 dominated the home computer market for a few years,
+outselling competitors like Apple computers, IBM PCs and TRS-80s.
+During the early stages of the project it was called VIC-40, but the 
+named was changed in the end probably to fit the name scheme used at
+time for business product (letter + memory size: P128 & B256).
+It was also advertised as VC 64 in Germany, and as VIC 64S in Sweden
+(the latter came with a modified character set)
 
-several programs rely on more features
-(loading other file types, writing, ...)
+CPU: CSG 6510 (1Mhz)
+RAM: 64 kilobytes
+ROM: 20 kilobytes
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
+	colors)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
+	capabilities) 
+Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports; 
+	CBM Serial port; CBM Datasette port; parallel programmable "User" 
+	port; CBM Monitor port; C64 expansion port)
+Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
+	cursor keys, 2 directions each)
 
-most games rely on starting own programs in the floppy drive
-(and therefor cpu level emulation is needed)
+BIOS:
+	kernal.901227-02.bin
+	basic.901226-01.bin
+	characters.901225-01.bin
 
-Roms
-----
-.prg
-.crt
-.80 .90 .a0 .b0 .e0 .f0
-files with boot-sign in it
-  recogniced as roms
 
-.prg files loaded at address in its first two bytes
-.?0 files to address specified in extension
-.crt roms to addresses in crt file
+* Commodore 64 (1982, Japan)
 
-Quickloader
------------
-.prg, .p00 and .t64 files supported (.t64s must be standard single entry type
- with a start address of $0801 - which covers most T64 files)
-loads program into memory and sets program end pointer
-(works with most programs)
-program ready to get started with RUN
-loads first rom when you press quickload key (f8)
+  Released in Japan at the same time as Max Machine, in the hope to repeat 
+the success of the VIC-1001, this system was a flop. Technically it is the 
+same as the C64, but it has native support for the Katakana character set.
 
-when problems start with -log and look into error.log file
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
+	colors)
+Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
+	cursor keys, 2 directions each; Katakana characters accessible through
+	C= key)
+
+BIOS
+	kernal.906145-02.bin
+	basic.901226-01.bin
+	characters.906143-02.bin
+
+
+* PET 64 (1983)
+
+  Also known as CBM 4064, it was a C64 fitted in a PET case and with a PET 
+monochrome screen. Exactly like the C64, it features a VIC-II video chip,
+a SID sound chip, 2 x CIA 6526, 64K of memory and BASIC 2.0. Being forced 
+to display on a monochrome screen, color codes were removed from the front 
+of number keys. The kernel itself was modified to output only white 
+characters on a black background. A plate with BASIC commands and other hints 
+was put above the keyboard.
+
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
+	colors, monochrome 14" monitor support)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
+	capabilities; Internal speaker) 
+Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
+	cursor keys, 2 directions each; complete BASIC reference on keyboard 
+	panel )
+
+BIOS
+	kernal.4064.901246-01.bin
+	basic.901226-01.bin
+	characters.901225-01.bin
+
+
+* Educator 64 (1983)
+
+ Basically the same as the PET 64, but it uses a standard C64 kernel, 
+allowing  to 'explore' all shades of green the monitor was capable of. Also 
+the BASIC plate is slightly different. There could have been an earlier 
+version, already called Educator 64, which came with no monitor and in a 
+C64 case.
+
+Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
+	cursor keys, 2 directions each; complete BASIC reference on keyboard 
+	panel )
+
+BIOS
+	kernal.901227-02.bin
+	basic.901226-01.bin
+	characters.901225-01.bin
+
+
+* SX-64 Executive Computer (1984)
+
+  Portable color computer based on the C64 hardware. The unit is heavy, with 
+its metal case, features a built-in disk driver (mostly 1541 compatible) and 
+has a large handle to carry the computer around. The detachable keyboard can 
+be used as protective front plate. The SX-64 had a 4" full color screen and a
+built-in speaker. The only differences between the C64 and the SX-64 are in 
+the start up colors and in the SX-64 better support for the internal floppy
+drive. The tape drive support was removed in the portable system.
+
+CPU: MOS 6510 (1Mhz)
+RAM: 64 kilobytes (68 with the 1541)
+ROM: 20 kilobytes (36 with the 1541)
+Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
+	colors, 4" Full-color screen)
+Sound: MOS 6581 "SID" (3 voice stereo synthesizer/digital sound 
+	capabilities; Internal MONO speaker) 
+Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports; 
+	CBM Serial port; CBM Datasette port; parallel programmable "User" 
+	port; CBM Monitor port; C64 expansion port)
+Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
+	cursor keys, 2 directions each; detachable)
+Additional hardware: Commodore 1541 Disk Drive (5.25" 170K SS SD Floppy)
+
+BIOS:
+	kernal.sx.251104-04.bin
+	basic.901226-01.bin
+	characters.901225-01.bin
+
+
+* DX-64 (198?)
+
+  Rumored version of a SX-64 variant featuring two floppy drives. Not sure
+if it ever reached the prototype stage.
+
+
+* Commodore 64C (1986)
+
+  Redesigned version of the C64, released with slightly upgraded versions
+of chips and peripherals. It came often bundled with GEOS, GUI based OS 
+by Berkeley Softworks (it was stored on floppy disks). It's also known as
+C64-II but the name doesn't seems to have ever been official (only used
+by magazines at early stage of ad & review). Another redesign, in a slightly 
+larger case (closer to the original C64) is known as Commodore 64G, because 
+mainly sold in Germany. Other repackaged versions followed, built around the 
+same kernel and chips.
+
+CPU: CSG 8500 (1 Mhz; 6510 compatible)
+RAM: 64 kilobytes
+ROM: 20 kilobytes
+Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
+	colors)
+Sound: CSG 8580 "SID" (3 voice stereo synthesizer/digital sound 
+	capabilities) 
+Ports: MOS 6526 CIA x2 (Power switch; 2 Commodore Joystick/Mouse ports; 
+	CBM Serial port; CBM Datasette port; parallel programmable "User" 
+	port; CBM Monitor port; C64 expansion port)
+Keyboard: Full-sized 62 key QWERTY (8 programmable function keys; 2
+	cursor keys, 2 directions each)
+
+BIOS:
+	64c.251913-01.bin
+	characters.901225-01.bin
+
+
+* Commodore 64 Games System (1990)
+
+  Repackaged C64 with neither keyboard, nor ports. Basically, the
+system came far too late to enter the console market of the 90s.
+
+CPU: CSG 6510 (1 Mhz)
+RAM: 64 kilobytes
+ROM: 16 kilobytes
+Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
+	colors)
+Sound: CSG 8580 "SID" (3 voice stereo synthesizer/digital sound 
+	capabilities) 
+Ports: MOS 6526 CIA (Power switch; 2 Commodore Joystick/Mouse ports; 
+	CBM Monitor port; C64 expansion port)
+
+BIOS:
+	64gs.390852-01.bin
+	characters.901225-01.bin
+
+* Commodore 64 "Gold" (1984, US - 1986, Germany)
+
+  Commemorative version released to celebrate the one millionth Commodore 64 
+sold in the country. The whole case is golden colored. It is also reasonable 
+to assume that the US version is based on the original C64, while the German 
+version is based on the C64C.
+
+
+[Rumored / Unconfirmed]
+
+VC-10 - Ultimax with built-in (even if stripped down) BASIC 2.0
+SX-100 - Rumored SX-64 prototype with built-in b&w screen
+C64CGS - C64GS in a C64C-like case, sold in Ireland (?), with a keyboard (?)
+
+
+[Known Fake / Unofficial BIOS]
+
+Max Machine - These are BASIC V2.0 and kernel contained in the MAX BASIC 
+cart, not a real Max BIOS.  
+	basic.901230-01.bin
+	kernal.901231-01.bin
+	
+Character roms
+	c64-german.bin - amateur hack
+	c64-hungarian.bin - amateur hack
+	kauno.bin - calligraphic font for the C64, data saved from a 1985 tape
+
+[Peripherals]
+
+- CBM 1530 Datasette Recorder
+- VIC 1541 / 1541-II / 1571 / 1581 disk drive (up to 5 at a time)
+- Commodore Modem Cartridge 1650 / 1660 / 1670
+- IEEE Interface Expansion Card
+- Commodore CBM 8050 / 4040 Dual Floppy Disk Drives (through IEEE Interface)
+- Commodore 6400 Letter Quality Printer (through IEEE Interface)
+- Commodore 8023 Dot Matrix Printer (through IEEE Interface)
+- Commodore 1520 Printer / Plotter
+- Commodore 1701 / 1702 Monitor
+
+- Lt. Kernal Hard Drive
+- CMD HD-Series
+
+- Commodore Joysticks
+- Commodore Paddles
+- Commodore 1350 / 1351 Mouse
+- CMD SmartMouse 
+- Inkwell Light Pen
+- Koala Pad
+- Commodore Music Maker overlay
+- External music keyboard (to be plugged into the Sound Expander)
+
+- Commodore REU: REU stands for RAM Expansion Unit for C64 & C128. Three
+models 1700 (128 KB) and 1750 (512 KB), and later the 1764 (256 KB, for the 
+C64)
+- Commodore Sound Expander Cart
+- Commodore Sound Sampler Cart
+- Berkeley Softworks GeoRAM
+- Schnedler Systems Turbo Master CPU
+- Creative Micro Designs (CMD) RAMDrive, RAMLink and Super CPU Accelerator
+- CMD SID symphony cartridge
+- Commodore Universal Btx Decoder: Same design of the REU, it's a decoder 
+for the Bildschirmtext, a sort of videotext online service similar to the
+French Minitel. It allowed the C64 + Decoder to replace the very expensive
+standalone decoder.
+
+Freezer Carts: Datel "Action Replay", Freeze Frame MK III B, Trilogic 
+"Expert", "The Final Cartridge III", "Retro Replay"
+Kernal Replacement: SpeedDOS, DolphinDOS, JiffyDOS etc.
+
+[TO DO]
+
+* Floppy drives:
+
+- Drives 8 & 9 supported, but limited compatibility. Real 1541 emulation is
+needed.
+
+* Cartridges:
+
+- Currently only Type 0 hardware is supported (check cart code in 
+machine/c64.c for more notes). Other Types may load but not work.
+
+* Datasette:
+
+- Currently, .t64 images are supported as Quickload device. This only works 
+if the file contains a single entry with a start address of $0801. This 
+covers most of the existing files, but the format is desinged to be much 
+more flexible and it could be implemented as a real tape format.
+
+* Other Peripherals:
+
+- Lightpen support is unfinished
+- Missing support for (it might or might not be added eventually):
+printers; IEEE488; CPM cartridge, Speech cartridge, FM Sound cartridge
+and other expansion modules; userport; rs232/v.24 interface; Super CPU;
+dual SID configuration
+
+* Informations / BIOS / Supported Sets:
+
+- Find out if C64 was sold both as VIC 64S and C64 in Sweden, and which 
+were inner/outer differences. For sure advertising was using the VIC 64S
+name.
+- Was it really sold as VC 64 in Germany, or was it just a nickname used
+at launch to indicate standard C64 units?
+- What's the difference between Educator 64-1 and Educator 64-2? My guess 
+is that Edu64-1 was a standard PET64/CBMB4064 with a different name, while 
+the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
  */
 
 #include "driver.h"
@@ -202,6 +334,12 @@ when problems start with -log and look into error.log file
 
 #include "includes/c64.h"
 
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&c64_memory)
@@ -322,171 +460,40 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
+
 static PALETTE_INIT( pet64 )
 {
 	int i;
-	for (i=0; i<16; i++)
-		palette_set_color_rgb(machine, i, 0, vic2_palette[i*3+1], 0);
+	for (i = 0; i < 16; i++)
+		palette_set_color_rgb(machine, i, 0, vic2_palette[i * 3 + 1], 0);
 }
 
-ROM_START (ultimax)
-	ROM_REGION (0x10000, "main", ROMREGION_ERASEFF)
-ROM_END
 
-ROM_START (c64gs)
-	ROM_REGION (0x19400, "main", 0)
-	/* standard basic, modified kernel */
-	ROM_LOAD ("390852.01", 0x10000, 0x4000, CRC(b0a9c2da) SHA1(21940ef5f1bfe67d7537164f7ca130a1095b067a))
-	ROM_LOAD ("901225.01", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-ROM_END
+/*************************************
+ *
+ *  Sound definitions
+ *
+ *************************************/
 
-ROM_START (c64)
-	ROM_REGION (0x19400, "main", 0)
-	ROM_LOAD ("901226.01", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-	ROM_LOAD ("901227.03", 0x12000, 0x2000, CRC(dbe3e7c7) SHA1(1d503e56df85a62fee696e7618dc5b4e781df1bb))
-	ROM_LOAD ("901225.01", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-ROM_END
-
-ROM_START (c64pal)
-	ROM_REGION (0x19400, "main", 0)
-	ROM_LOAD ("901226.01", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-	ROM_LOAD ("901227.03", 0x12000, 0x2000, CRC(dbe3e7c7) SHA1(1d503e56df85a62fee696e7618dc5b4e781df1bb))
-	ROM_LOAD ("901225.01", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-ROM_END
-
-ROM_START (vic64s)
-	ROM_REGION (0x19400, "main", 0)
-	ROM_LOAD ("901226.01",	0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-	ROM_LOAD ("kernel.swe",	0x12000, 0x2000, CRC(f10c2c25) SHA1(e4f52d9b36c030eb94524eb49f6f0774c1d02e5e))
-	ROM_LOAD ("charswe.bin",0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a))
-ROM_END
-
-ROM_START (sx64)
-	ROM_REGION (0x19400, "main", 0)
-	ROM_LOAD ("901226.01", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-	ROM_LOAD( "251104.04", 0x12000, 0x2000, CRC(2c5965d4) SHA1(aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98))
-	ROM_LOAD ("901225.01", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-	VC1541_ROM ("cpu_vc1540")
-ROM_END
-
-ROM_START (dx64)
-	ROM_REGION (0x19400, "main", 0)
-    ROM_LOAD ("901226.01", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-    ROM_LOAD( "dx64kern.bin",     0x12000, 0x2000, CRC(58065128))
-    // vc1541 roms were not included in submission
-    VC1541_ROM ("cpu_vc1540")
-	//    VC1541_ROM (" ")
-ROM_END
-
-ROM_START (vip64)
-	ROM_REGION (0x19400, "main", 0)
-	ROM_LOAD ("901226.01", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-	ROM_LOAD( "kernelsx.swe",   0x12000, 0x2000, CRC(7858d3d7) SHA1(097cda60469492a8916c2677b7cce4e12a944bc0))
-	ROM_LOAD ("charswe.bin", 0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a))
-	VC1541_ROM ("cpu_vc1540")
-ROM_END
-
-ROM_START (pet64)
-	ROM_REGION (0x19400, "main", 0)
-	ROM_LOAD ("901226.01", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-	ROM_LOAD( "901246.01", 0x12000, 0x2000, CRC(789c8cc5) SHA1(6c4fa9465f6091b174df27dfe679499df447503c))
-	ROM_LOAD ("901225.01", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-ROM_END
-
-#if 0
-ROM_START (flash8)
-	ROM_REGION (0x1009400, "main", 0)
-#if 1
-    ROM_LOAD ("flash8", 0x010000, 0x002000, CRC(3c4fb703)) // basic
-    ROM_CONTINUE( 0x014000, 0x001000) // empty
-    ROM_CONTINUE( 0x014000, 0x001000) // characterset
-    ROM_CONTINUE( 0x012000, 0x002000) // c64 mode kernel
-    ROM_CONTINUE( 0x015000, 0x002000) // kernel
-#else
-	ROM_LOAD ("flash8", 0x012000-0x6000, 0x008000, CRC(3c4fb703))
-#endif
-ROM_END
-#endif
-
-#if 0
-     /* character rom */
-	 ROM_LOAD ("901225.01", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-	 ROM_LOAD ("charswe.bin", 0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a))
-
-	/* basic */
-	 ROM_LOAD ("901226.01", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e))
-
-/* in c16 and some other commodore machines:
-   cbm version in kernel at 0xff80 (offset 0x3f80)
-   0x80 means pal version */
-
-	 /* scrap */
-     /* modified for alec 64, not booting */
-	 ROM_LOAD( "alec64.e0",   0x12000, 0x2000, CRC(2b1b7381 ))
-     /* unique copyright, else speeddos? */
-	 ROM_LOAD( "a.e0", 0x12000, 0x2000, CRC(b8f49365 ))
-	 /* ? */
-	 ROM_LOAD( "kernelx.e0",  0x12000, 0x2000, CRC(beed6d49 ))
-	 ROM_LOAD( "kernelx2.e0",  0x12000, 0x2000, CRC(cfb58230 ))
-	 /* basic x 2 */
-	 ROM_LOAD( "frodo.e0",    0x12000, 0x2000, CRC(6ec94629 ))
-
-     /* commodore versions */
-	 /* 901227-01 */
-	 ROM_LOAD( "901227.01",  0x12000, 0x2000, CRC(dce782fa ))
-     /* 901227-02 */
-	 ROM_LOAD( "901227.02", 0x12000, 0x2000, CRC(a5c687b3 ))
-     /* 901227-03 */
-	 ROM_LOAD( "901227.03",   0x12000, 0x2000, CRC(dbe3e7c7) SHA1(1d503e56df85a62fee696e7618dc5b4e781df1bb))
-	 /* 901227-03? swedish  */
-	 ROM_LOAD( "kernel.swe",   0x12000, 0x2000, CRC(f10c2c25) SHA1(e4f52d9b36c030eb94524eb49f6f0774c1d02e5e))
-	 /* c64c 901225-01 + 901227-03 */
-	 ROM_LOAD ("251913.01", 0x10000, 0x4000, CRC(0010ec31))
-     /* c64gs 901225-01 with other fillbyte, modified kernel */
-	 ROM_LOAD ("390852.01", 0x10000, 0x4000, CRC(b0a9c2da) SHA1(21940ef5f1bfe67d7537164f7ca130a1095b067a))
-	 /* sx64 */
-	 ROM_LOAD( "251104.04",     0x12000, 0x2000, CRC(2c5965d4 ))
-     /* 251104.04? swedish */
-	 ROM_LOAD( "kernel.swe",   0x12000, 0x2000, CRC(7858d3d7 ))
-	 /* 4064, Pet64, Educator 64 */
-	 ROM_LOAD( "901246.01",     0x12000, 0x2000, CRC(789c8cc5 ))
-
-	 /* few differences to above versions */
-	 ROM_LOAD( "901227.02b",  0x12000, 0x2000, CRC(f80eb87b ))
-	 ROM_LOAD( "901227.03b",  0x12000, 0x2000, CRC(8e5c500d ))
-	 ROM_LOAD( "901227.03c",  0x12000, 0x2000, CRC(c13310c2 ))
-
-     /* 64er system v1
-        ieee interface extension for c64 and vc1541!? */
-     ROM_LOAD( "64ersys1.e0", 0x12000, 0x2000, CRC(97d9a4df ))
-	 /* 64er system v3 */
-	 ROM_LOAD( "64ersys3.e0", 0x12000, 0x2000, CRC(5096b3bd ))
-
-	 /* exos v3 */
-	 ROM_LOAD( "exosv3.e0",   0x12000, 0x2000, CRC(4e54d020 ))
-     /* 2 bytes different */
-	 ROM_LOAD( "exosv3.e0",   0x12000, 0x2000, CRC(26f3339e ))
-
-	 /* jiffydos v6.01 by cmd */
-	 ROM_LOAD( "jiffy.e0",    0x12000, 0x2000, CRC(2f79984c ))
-
-	 /* dolphin with dolphin vc1541 */
-	 ROM_LOAD( "mager.e0",    0x12000, 0x2000, CRC(c9bb21bc ))
-	 ROM_LOAD( "dos20.e0",    0x12000, 0x2000, CRC(ffaeb9bc ))
-
-	 /* speeddos plus
-        parallel interface on userport to modified vc1541 !? */
-	 ROM_LOAD( "speeddos.e0", 0x12000, 0x2000, CRC(8438e77b ))
-	 /* speeddos plus + */
-	 ROM_LOAD( "speeddos.e0", 0x12000, 0x2000, CRC(10aee0ae ))
-	 /* speeddos plus and 80 column text */
-	 ROM_LOAD( "rom80.e0",    0x12000, 0x2000, CRC(e801dadc ))
-#endif
 
 static const sid6581_interface c64_sound_interface =
 {
 	c64_paddle_read
 };
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 
 static MACHINE_DRIVER_START( c64 )
 	/* basic machine hardware */
@@ -578,8 +585,115 @@ static MACHINE_DRIVER_START( sx64 )
 #endif
 MACHINE_DRIVER_END
 
-#define rom_max rom_ultimax
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+
+ROM_START( max )
+	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( c64 )
+	ROM_REGION( 0x19400, "main", 0 )
+	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )	// BASIC
+	ROM_SYSTEM_BIOS(0, "default", "Kernal rev. 3" )
+	ROMX_LOAD( "901227-03.bin", 0x12000, 0x2000, CRC(dbe3e7c7) SHA1(1d503e56df85a62fee696e7618dc5b4e781df1bb), ROM_BIOS(1) )	// Kernal
+	ROM_SYSTEM_BIOS(1, "rev1", "Kernal rev. 1" )
+	ROMX_LOAD( "901227-01.bin", 0x12000, 0x2000, CRC(dce782fa) SHA1(87cc04d61fc748b82df09856847bb5c2754a2033), ROM_BIOS(2) )	// Kernal
+	ROM_SYSTEM_BIOS(2, "rev2", "Kernal rev. 2" )
+	ROMX_LOAD( "901227-02.bin", 0x12000, 0x2000, CRC(a5c687b3) SHA1(0e2e4ee3f2d41f00bed72f9ab588b83e306fdb13), ROM_BIOS(3) )	// Kernal
+	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )	// Character
+ROM_END
+
+#define rom_c64pal	rom_c64
+
+ROM_START( c64jpn )
+	ROM_REGION( 0x19400, "main", 0 )
+	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+	ROM_LOAD( "906145-02.bin", 0x12000, 0x2000, CRC(3a9ef6f1) SHA1(4ff0f11e80f4b57430d8f0c3799ed0f0e0f4565d) )
+	ROM_LOAD( "906143-02.bin", 0x14000, 0x1000, CRC(1604f6c1) SHA1(0fad19dbcdb12461c99657b2979dbb5c2e47b527) )
+ROM_END
+
+
+ROM_START( vic64s )
+	ROM_REGION( 0x19400, "main", 0 )
+	ROM_LOAD( "901226-01.bin",	0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+	ROM_LOAD( "kernel.swe",	0x12000, 0x2000, CRC(f10c2c25) SHA1(e4f52d9b36c030eb94524eb49f6f0774c1d02e5e) )
+	ROM_SYSTEM_BIOS(0, "default", "Swedish Characters" )
+	ROMX_LOAD( "charswe.bin",0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "default", "Swedish Characters (Alt)" )
+	ROMX_LOAD( "charswe2.bin",0x14000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac), ROM_BIOS(2) )
+ROM_END
+
+#define rom_c64swe	rom_vic64s
+
+ROM_START( pet64 )
+	ROM_REGION( 0x19400, "main", 0 )
+	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+	ROM_LOAD( "901246-01.bin", 0x12000, 0x2000, CRC(789c8cc5) SHA1(6c4fa9465f6091b174df27dfe679499df447503c) )
+	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
+ROM_END
+
 #define rom_cbm4064 rom_pet64
+#define rom_edu64	rom_c64
+
+ROM_START( sx64 )
+	ROM_REGION( 0x19400, "main", 0 )
+	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+	ROM_LOAD( "251104-04.bin", 0x12000, 0x2000, CRC(2c5965d4) SHA1(aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98) )
+	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
+
+	VC1541_ROM( "cpu_vc1540" )
+ROM_END
+
+ROM_START( dx64 )
+	ROM_REGION( 0x19400, "main", 0 )
+    ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+    ROM_LOAD( "dx64kern.bin",     0x12000, 0x2000, CRC(58065128) )
+
+    // vc1541 roms were not included in submission
+    VC1541_ROM ("cpu_vc1540")
+//	VC1541_ROM (" ")
+ROM_END
+
+ROM_START( vip64 )
+	ROM_REGION( 0x19400, "main", 0 )
+	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+	ROM_LOAD( "kernelsx.swe",   0x12000, 0x2000, CRC(7858d3d7) SHA1(097cda60469492a8916c2677b7cce4e12a944bc0) )
+	ROM_LOAD( "charswe.bin", 0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a) )
+
+	VC1541_ROM( "cpu_vc1540" )
+ROM_END
+
+
+ROM_START( c64c )
+	ROM_REGION( 0x19400, "main", 0 )
+	/* standard basic, modified kernel */
+	ROM_LOAD( "251913-01.bin", 0x10000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
+ROM_END
+
+#define rom_c64cpal		rom_c64c
+#define rom_c64g		rom_c64c
+
+ROM_START( c64gs )
+	ROM_REGION( 0x19400, "main", 0 )
+	/* standard basic, modified kernel */
+	ROM_LOAD( "390852-01.bin", 0x10000, 0x4000, CRC(b0a9c2da) SHA1(21940ef5f1bfe67d7537164f7ca130a1095b067a) )
+	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
+ROM_END
+
+
+
+/*************************************
+ *
+ *  System configuration(s)
+ *
+ *************************************/
 
 
 static SYSTEM_CONFIG_START(c64)
@@ -602,25 +716,34 @@ static SYSTEM_CONFIG_START(c64gs)
 	CONFIG_DEVICE(c64_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
+
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
 
-/*   YEAR  NAME     PARENT  COMPAT  MACHINE         INPUT   INIT    CONFIG      COMPANY                            FULLNAME */
-COMP(1982, c64,		0,		0,		c64,			c64,	c64,	c64,		"Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
-COMP(1982, c64pal, 	c64,	0,		c64pal, 		c64,	c64pal, c64,		"Commodore Business Machines Co.", "Commodore 64/VC64/VIC64 (PAL)", 0)
-COMP(1982, cbm4064,	c64,	0,		pet64,			c64,	c64,	c64,		"Commodore Business Machines Co.", "CBM4064/PET64/Educator64 (NTSC)", 0)
-COMP(1982, vic64s, 	c64,	0,		c64pal, 		vic64s,	c64pal, c64,		"Commodore Business Machines Co.", "Commodore 64 Swedish (PAL)", 0)
-COMP(1982, max,		0,		0,		ultimax,		ultimax,ultimax,ultimax,	"Commodore Business Machines Co.", "Commodore Max (Ultimax/VC10)", 0)
-CONS(1987, c64gs,	c64,	0,		c64gs,			c64gs,	c64gs,	c64gs,		"Commodore Business Machines Co.", "C64GS (PAL)", 0)
+/*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT    CONFIG    COMPANY                            FULLNAME */
 
-COMP(1983, sx64,	c64,	0,		sx64,			sx64,	sx64,	sx64,		"Commodore Business Machines Co.", "SX64 (PAL)", GAME_NOT_WORKING)
-COMP(1983, vip64,	c64,	0,		sx64,			vip64,	sx64,	sx64,		"Commodore Business Machines Co.", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
-// sx64 with second disk drive
-COMP(198?, dx64,	c64,	0,		sx64,			sx64,	sx64,	sx64,		"Commodore Business Machines Co.", "DX64 (Prototype, PAL)", GAME_NOT_WORKING)
-/*c64 II (cbm named it still c64) */
-/*c64c (bios in 1 chip) */
-/*c64g late 8500/8580 based c64, sold at aldi/germany */
-/*c64cgs late c64, sold in ireland, gs bios?, but with keyboard */
+COMP(1982, max,	    0,    0,    ultimax, ultimax, ultimax, ultimax, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
+
+COMP(1982, c64,     0,    0,    c64,     c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
+COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64 (PAL)", 0)
+COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (Japan)", 0)
+COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  c64,     "Commodore Business Machines Co.", "VIC 64S", 0)
+COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64 (Sweden)", 0)
+
+COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "PET 64 (NTSC)", 0)
+COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "CBM 4064 (NTSC)", 0)
+COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "Educator 64 (NTSC)", 0) // maybe different palette?
+
+// missing floppy emulation, among other things
+COMP(1984, sx64,    c64,  0,    sx64,    sx64,    sx64,    sx64,    "Commodore Business Machines Co.", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
+COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    sx64,    "Commodore Business Machines Co.", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
+COMP(198?, dx64,    c64,  0,    sx64,    sx64,    sx64,    sx64,    "Commodore Business Machines Co.", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
+
+COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64C (NTSC)", 0)
+COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64C (PAL)", 0)
+COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64G (PAL)", 0)
+
+CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   c64gs,   "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)

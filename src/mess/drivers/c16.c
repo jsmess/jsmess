@@ -9,148 +9,107 @@
 ***************************************************************************/
 
 /*
-------------------------------------
-c16 commodore c16/c116/c232/c264 (pal version)
-plus4   commodore plus4 (ntsc version)
-c364 commodore c364/v364 prototype (ntsc version)
-------------------------------------
-(beta version)
 
-if the game runs to fast with the ntsc version, try the pal version!
-flickering affects in one video version, try the other video version
+2008 - Driver Updates 
+---------------------
 
-c16(pal version, ntsc version?):
- design like the vc20/c64
- sequel to c64
- other keyboardlayout,
- worse soundchip,
- more colors, but no sprites,
- other tape and gameports plugs
- 16 kbyte ram
- newer basic and kernal (ieee floppy support)
+(most of the informations are taken from http://www.zimmers.net/cbmpics/ )
 
-c116(pal version, ntsc version?):
- 100% software compatible to c16
- small and flat
- gummi keys
 
-232:
- video system versions (?)
- plus4 case
- 32 kbyte ram
- userport?, acia6551 chip?
+[CBM systems which belong to this driver]
 
-264:
- video system versions (?)
- plus4 case
- 64 kbyte ram
- userport?, acia6551 chip?
+* Commodore 116 (1984, Europe only)
 
-plus4(pal version, ntsc version?):
- in emu ntsc version!
- case like c116, but with normal keys
- 64 kbyte ram
- userport
- build in additional rom with programs
+  Entry level computer of the Commodore 264 family, it was marketed only
+in Europe. It was impressive for the small size of its case, but it didn't
+meet commercial success
 
-c364 prototype:
- video system versions (?)
- like plus4, but with additional numeric keyblock
- slightly modified kernel rom
- build in speech hardware/rom
+CPU: MOS Technology 7501 (variable clock rate, with max 1.76 Mhz)
+RAM: 16 kilobytes (expandable to 64k internally)
+ROM: 32 kilobytes
+Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
+	40 columns text; Palette of 16 colors in 8 shades, for 128 colors) 
+Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities) 
+Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV" 
+	Port and switch; CBM Monitor port; Power and reset switches; Power 
+	connector)
+Keyboard: QWERTY 62 key "membrane" (8 programmable function keys; 4 direction 
+	cursor-pad)
 
-state
------
-rasterline based video system
- imperfect scrolling support (when 40 columns or 25 lines)
- lightpen support missing?
- should be enough for 95% of the games and programs
-imperfect sound
-keyboard, joystick 1 and 2
-no speech hardware (c364)
-simple tape support
-serial bus
- simple disk drives
- no printer or other devices
-expansion modules
- rom cartridges
- simple ieee488 floppy support (c1551 floppy disk drive)
- no other expansion modules
-no userport (plus4)
- no rs232/v.24 interface
-quickloader
 
-some unsolved problems
- memory check by c16 kernel will not recognize more memory without restart of mess
- cpu clock switching/changing (overclocking should it be)
+* Commodore 16 (1984)
 
-Keys
-----
-Some PC-Keyboards does not behave well when special two or more keys are
-pressed at the same time
-(with my keyboard printscreen clears the pressed pause key!)
+  Redesigned version of the C116, with a different case and a different 
+keyboard.
 
-shift-cbm switches between upper-only and normal character set
-(when wrong characters on screen this can help)
-run (shift-stop) loads first program from device 8 (dload"*) and starts it
-stop-reset activates monitor (use x to leave it)
+CPU: MOS Technology 7501 (variable clock rate, with max 1.76 Mhz)
+RAM: 16 kilobytes (expandable to 64k internally)
+ROM: 32 kilobytes
+Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
+	40 columns text; Palette of 16 colors in 8 shades, for 128 colors) 
+Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities) 
+Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV" 
+	Port and switch; CBM Monitor port; Power and reset switches; Power 
+	connector)
+Keyboard: QWERTY 66 key typewriter style (8 programmable function keys;
+	4 direction cursor-pad)
 
-Tape
-----
-(DAC 1 volume in noise volume)
-loading of wav, prg and prg files in zip archiv
-commandline -cassette image
-wav:
- 8 or 16(not tested) bit, mono, 5000 Hz minimum
- has the same problems like an original tape drive (tone head must
- be adjusted to get working(no load error,...) wav-files)
-zip:
- must be placed in current directory
- prg's are played in the order of the files in zip file
 
-use LOAD or LOAD"" or LOAD"",1 for loading of normal programs
-use LOAD"",1,1 for loading programs to their special address
+* Commodore Plus/4 (1984)
 
-several programs relies on more features
-(loading other file types, writing, ...)
+  This system became the middle tier of the Commodore 264 family, replacing
+the original Commodore 264. The Plus/4 is basically the same as the C264,
+but the name refers to the four built-in programs which came with the 
+machine: Word Processing, Spreadsheet, Database software, Graphing package.
 
-Discs
------
-only file load from drive 8 and 9 implemented
- loads file from rom directory (*.prg,*p00) (must NOT be specified on commandline)
- or file from d64 image (here also directory LOAD"$",8 supported)
-use DLOAD"filename"
-or LOAD"filename",8
-or LOAD"filename",8,1 (for loading machine language programs at their address)
-for loading
-type RUN or the appropriate sys call to start them
+CPU: MOS Technology 7501 (variable clock rate, with max 1.76 Mhz)
+RAM: 64 kilobytes (expandable to 64k internally)
+ROM: 64 kilobytes
+Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
+	40 columns text; Palette of 16 colors in 8 shades, for 128 colors) 
+Sound: MOS Technology 7360 "TED" (2 voice tone-generating sound capabilities) 
+Ports: MOS 7360 (2 Joystick/Mouse ports; CBM Serial port; 'TED' port; "TV" 
+	Port and switch; CBM Monitor port; Power and reset switches; Power 
+	connector)
+Keyboard: Full-sized QWERTY 67 key (8 programmable function keys;
+	4 direction cursor-pad)
 
-several programs rely on more features
-(loading other file types, writing, ...)
 
-most games rely on starting own programs in the floppy drive
-(and therefore cpu level emulation is needed)
+* Commodore 232 (1984, Prototype)
 
-Roms
-----
-.bin .rom .lo .hi .prg
-files with boot-sign in it
-  recogniced as roms
+  This system never reached the production and only few units exist. It is 
+in between the C16 and the C264, with its 32 kilobytes of RAM.
 
-.prg files loaded at address in its first two bytes
-.bin, .rom, .lo , .hi roms loaded to cs1 low, cs1 high, cs2 low, cs2 high
- address accordingly to order in command line
 
-Quickloader
------------
-.prg files supported
-loads program into memory and sets program end pointer
-(works with most programs)
-program ready to get started with RUN
-loads first rom when you press quickload key (f8)
+* Commodore 264 (1984, Prototype)
 
-when problems start with -log and look into error.log file
- */
+  Basically the same of a Plus/4 but without the built-in programs.
+
+
+* Commodore V364 (1984, Prototype)
+
+  This system was supposed to become the high-end system of the family,
+featuring 64 kilobytes of RAM, the same technology of the Plus/4, a 
+keyboard with numeric keypad and built in voice synthesis capabilities.
+
+[TO DO]
+
+* Floppy drives:
+
+- Drives 8 & 9 supported, but limited compatibility. Real disk emulation is
+needed.
+
+* Other Peripherals:
+
+- Lightpen support is unfinished
+- Missing support for (it might or might not be added eventually):
+printers and other devices; most expansion modules; userport; rs232/v.24 interface.
+
+* System Specific
+
+- V364 lacks speech hardware emulation
+
+*/
 
 
 #include "driver.h"
@@ -163,6 +122,13 @@ when problems start with -log and look into error.log file
 #include "video/ted7360.h"
 
 #include "includes/c16.h"
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+
 
 
 /*
@@ -404,8 +370,13 @@ INPUT_PORTS_END
 #endif
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
-/* Initialise the c16 palette */
+
 static PALETTE_INIT( c16 )
 {
 	int i;
@@ -415,100 +386,14 @@ static PALETTE_INIT( c16 )
 	}
 }
 
-#if 0
-/* cbm version in kernel at 0xff80 (offset 0x3f80)
-   0x80 means pal version */
 
-	 /* basic */
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
 
-	 /* kernal pal */
-	 ROM_LOAD("318004.05",    0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb))
-	 ROM_LOAD ("318004.03", 0x14000, 0x4000, CRC(77bab934))
 
-	 /* kernal ntsc */
-	 ROM_LOAD ("318005.05", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682))
-	 ROM_LOAD ("318005.04", 0x14000, 0x4000, CRC(799a633d))
-
-	 /* 3plus1 program */
-	 ROM_LOAD ("317053.01", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f))
-	 ROM_LOAD ("317054.01", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693))
-
-	 /* same as 109de2fc, but saved from running machine, so
-        io area different ! */
-	 ROM_LOAD ("3plus1hi.rom", 0x1c000, 0x4000, CRC(aab61387))
-	 /* same but lo and hi in one rom */
-	 ROM_LOAD ("3plus1.rom", 0x18000, 0x8000, CRC(7d464449))
-#endif
-
-ROM_START (c232)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD("318004.01",    0x14000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201))
-ROM_END
-
-ROM_START (c16)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD("318004.05",    0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb))
-ROM_END
-
-ROM_START (c16hun)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD("hungary.bin",    0x14000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee))
-ROM_END
-
-ROM_START (c16c)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD("318004.05",    0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb))
-	 C1551_ROM ("cpu_c1551")
-ROM_END
-
-ROM_START (c16v)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD("318004.05",    0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb))
-	 VC1541_ROM ("cpu_vc1540")
-ROM_END
-
-ROM_START (plus4)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD ("318005.05", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682))
-	 ROM_LOAD ("317053.01", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f))
-	 ROM_LOAD ("317054.01", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693))
-ROM_END
-
-ROM_START (plus4c)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD ("318005.05", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682))
-	 ROM_LOAD ("317053.01", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f))
-	 ROM_LOAD ("317054.01", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693))
-	 C1551_ROM ("cpu_c1551")
-ROM_END
-
-ROM_START (plus4v)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD ("318005.05", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682))
-	 ROM_LOAD ("317053.01", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f))
-	 ROM_LOAD ("317054.01", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693))
-	 VC1541_ROM ("cpu_vc1540")
-ROM_END
-
-ROM_START (c364)
-	 ROM_REGION (0x40000, "main", 0)
-	 ROM_LOAD ("318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd))
-	 ROM_LOAD ("kern364p.bin", 0x14000, 0x4000, CRC(84fd4f7a) SHA1(b9a5b5dacd57ca117ef0b3af29e91998bf4d7e5f))
-	 ROM_LOAD ("317053.01", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f))
-	 ROM_LOAD ("317054.01", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693))
-	 /* at address 0x20000 not so good */
-	 ROM_LOAD ("spk3cc4.bin", 0x28000, 0x4000, CRC(5227c2ee) SHA1(59af401cbb2194f689898271c6e8aafa28a7af11))
-ROM_END
-
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 
 static MACHINE_DRIVER_START( c16 )
@@ -615,18 +500,150 @@ static MACHINE_DRIVER_START( c364 )
 	MDRV_CPU_PROGRAM_MAP(c364_map, 0)
 MACHINE_DRIVER_END
 
-static DRIVER_INIT( c16 )		{ c16_driver_init(machine); }
-#ifdef UNUSED_FUNCTION
-DRIVER_INIT( c16hun )	{ c16_driver_init(machine); }
-DRIVER_INIT( c16c )		{ c16_driver_init(machine); }
-DRIVER_INIT( c16v )		{ c16_driver_init(machine); }
-#endif
-static DRIVER_INIT( plus4 )	{ c16_driver_init(machine); }
-#ifdef UNUSED_FUNCTION
-DRIVER_INIT( plus4c )	{ c16_driver_init(machine); }
-DRIVER_INIT( plus4v )	{ c16_driver_init(machine); }
-DRIVER_INIT( c364 )		{ c16_driver_init(machine); }
-#endif
+
+
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+ROM_START( c232 )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_LOAD( "318004-01.bin", 0x14000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201) )
+ROM_END
+
+ROM_START( c264 )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "basic-264.bin", 0x10000, 0x4000, CRC(6a2fc8e3) SHA1(473fce23afa07000cdca899fbcffd6961b36a8a0) )
+	ROM_LOAD( "kernal-264.bin", 0x14000, 0x4000, CRC(8f32abe7) SHA1(d481faf5fcbb331878dc7851c642d04f26a32873) )
+ROM_END
+
+ROM_START( c364 )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_LOAD( "kern364p.bin", 0x14000, 0x4000, CRC(84fd4f7a) SHA1(b9a5b5dacd57ca117ef0b3af29e91998bf4d7e5f) )
+	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
+	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
+	/* at address 0x20000 not so good */
+	ROM_LOAD( "spk3cc4.bin", 0x28000, 0x4000, CRC(5227c2ee) SHA1(59af401cbb2194f689898271c6e8aafa28a7af11) )
+ROM_END
+
+
+ROM_START( c16 )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
+	ROMX_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "rev3", "rev. 3" )
+	ROMX_LOAD( "318004-03.bin", 0x14000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "rev4", "rev. 4" )
+	ROMX_LOAD( "318004-04.bin", 0x14000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( c16c )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
+	ROMX_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "rev3", "rev. 3" )
+	ROMX_LOAD( "318004-03.bin", 0x14000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "rev4", "rev. 4" )
+	ROMX_LOAD( "318004-04.bin", 0x14000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(3) )
+
+	C1551_ROM ("cpu_c1551")
+ROM_END
+
+ROM_START( c16v )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
+	ROMX_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "rev3", "rev. 3" )
+	ROMX_LOAD( "318004-03.bin", 0x14000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "rev4", "rev. 4" )
+	ROMX_LOAD( "318004-04.bin", 0x14000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(3) )
+
+	VC1541_ROM ("cpu_vc1540")
+ROM_END
+
+#define rom_c116		rom_c16
+#define rom_c116c		rom_c16c
+#define rom_c116v		rom_c16v
+
+ROM_START( c16hun )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_LOAD( "hungary.bin", 0x14000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee) )
+ROM_END
+
+ROM_START( plus4 )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
+	ROMX_LOAD( "318005-05.bin", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "rev4", "rev. 4" )
+	ROMX_LOAD( "318005-04.bin", 0x14000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(2) )
+
+	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
+	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
+ROM_END
+
+ROM_START( plus4c )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
+	ROMX_LOAD( "318005-05.bin", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "rev4", "rev. 4" )
+	ROMX_LOAD( "318005-04.bin", 0x14000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(2) )
+
+	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
+	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
+
+	C1551_ROM ("cpu_c1551")
+ROM_END
+
+ROM_START( plus4v )
+	ROM_REGION (0x40000, "main", 0)
+	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
+	ROMX_LOAD( "318005-05.bin", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "rev4", "rev. 4" )
+	ROMX_LOAD( "318005-04.bin", 0x14000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(2) )
+
+	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
+	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
+
+	VC1541_ROM ("cpu_vc1540")
+ROM_END
+
+
+
+/*************************************
+ *
+ *  Generic driver initialization
+ *
+ *************************************/
+
+
+static DRIVER_INIT( c16 )
+{ 
+	c16_driver_init(machine); 
+}
+
+static DRIVER_INIT( plus4 )	
+{ 
+	c16_driver_init(machine); 
+}
+
+
+/*************************************
+ *
+ *  System configuration(s)
+ *
+ *************************************/
 
 
 static SYSTEM_CONFIG_START(c16)
@@ -677,13 +694,27 @@ static SYSTEM_CONFIG_START(plusv)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
-/*      YEAR    NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG   COMPANY                                FULLNAME */
-COMP ( 1984,	c232,	c16,	0,	c16,	c16,	c16,	c16,     "Commodore Business Machines Co.",      "Commodore 232 Prototype", 0)
-COMP ( 1984,	c16,	0,	0,	c16,	c16,	c16,	c16,     "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL)", 0)
-COMP ( 1984,	c16hun, c16,	0,	c16,	c16,	c16,	c16,     "Commodore Business Machines Co.",      "Commodore 16 Novotrade (PAL, Hungarian Character Set)", 0)
-COMP ( 1984,	c16c,	c16,	0,	c16c,	c16c,	c16,	c16c,    "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL), 1551", 0 )
-COMP ( 1984,	plus4,	c16,	0,	plus4,	plus4,	plus4,	plus,    "Commodore Business Machines Co.",      "Commodore +4 (NTSC)", 0)
-COMP ( 1984,	plus4c, c16,	0,	plus4c, plus4c, plus4,	plusc,   "Commodore Business Machines Co.",      "Commodore +4 (NTSC), 1551", 0 )
-COMP ( 1984,	c364,	c16,	0,	c364,	plus4,	plus4,	plusv,   "Commodore Business Machines Co.",      "Commodore 364 (Prototype)", GAME_IMPERFECT_SOUND)
-COMP ( 1984,	c16v,	c16,	0,	c16v,	c16v,	c16,	c16v,    "Commodore Business Machines Co.",      "Commodore 16/116/232/264 (PAL), VC1541", GAME_NOT_WORKING)
-COMP ( 1984,	plus4v, c16,	0,	plus4v, plus4v, plus4,	plusv,   "Commodore Business Machines Co.",      "Commodore +4 (NTSC), VC1541", GAME_NOT_WORKING)
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT   CONFIG    COMPANY                             FULLNAME            FLAGS */
+
+COMP( 1984, c16,     0,     0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
+COMP( 1984, c16c,    c16,   0,  c16c,   c16c,   c16,    c16c,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
+COMP( 1984, c16v,    c16,   0,  c16v,   c16v,   c16,    c16v,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
+
+COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
+COMP( 1984, c116c,	 c16,   0,  c16c,   c16c,   c16,    c16c,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
+COMP( 1984, c116v,   c16,   0,  c16v,   c16v,   c16,    c16v,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
+
+COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  plus4,  plus,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
+COMP( 1984, plus4c,  c16,   0,  plus4c, plus4c, plus4,  plusc,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
+COMP( 1984, plus4v,  c16,   0,  plus4v, plus4v, plus4,  plusv,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
+
+COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
+COMP( 1984, c264,    c16,   0,  c16,    plus4,  plus4,  plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c364,    c16,   0,  c364,   plus4,  plus4,  plusv,   "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)

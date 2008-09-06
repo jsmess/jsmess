@@ -23,15 +23,16 @@ System Driver Changes:
   had plugged your joystick in port 2). This helps with games which expect 
   joystick inputs from port 2 of the C16 [Fabio Priuli]
 
-- [C128] Added support for tape emulation using MESS core functions (only 
-  loading, both .wav and .tap formats) [Fabio Priuli]
+- [C128] Added support for tape emulation using MESS core functions 
+  (loading and saving, both .wav and .tap formats) [Fabio Priuli]
 
 - [C128] Refactored cartridge code to rely on MESS core functions. 
   Currently, .crt emulation uses unmodified C64 cart code and therefore 
   support has not improved (yet) [Fabio Priuli]
 
-- [C64] Added support for tape emulation using MESS core functions (only 
-  loading, both .wav and .tap formats) [Fabio Priuli, Roberto Zandona']
+- [C64] Added support for tape emulation using MESS core functions 
+  (loading and saving, both .wav and .tap formats) [Fabio Priuli, Roberto 
+  Zandona']
 
 - [C64] Fixed border color during tape loading [Roberto Zandona']
 
@@ -62,8 +63,16 @@ System Driver Changes:
   when/if more documents will be available [Fabio Priuli]
 
 - [COMMODORE] Temporarily commented out VC1540 / VC1541 floppy support from
-  systems which had been promoted from TESTDRIVER status. This fixed asserts 
-  and freezes. [Fabio Priuli]
+  systems which had been promoted from TESTDRIVER status. This fixed 
+  asserts and freezes. [Fabio Priuli]
+
+- [COMMODORE] Cleaned up documentation and comments in c16.c, c64.c, c65.c,
+  c128.c and vc20.c. Added missing BASIC revisions, new sets and new
+  clones. In particular, I've tagged as BAD_DUMPS most of the C128/C128D 
+  PAL BIOSes and started to use split kernal & character ROMs to make 
+  clear their origin and possible incompleteness. When dumps will be 
+  confirmed, we will start to use the correct ones. If you own a C128 PAL,
+  please dump its BIOS to verify the content. [Fabio Priuli]
 
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully 
@@ -81,8 +90,8 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
-- [VIC20] Added support for tape emulation using MESS core functions (only 
-  loading, both .wav and .tap formats) [Fabio Priuli]
+- [VIC20] Added support for tape emulation using MESS core functions 
+  (loading and saving, both .wav and .tap formats) [Fabio Priuli]
 
 - [VIC20] Refactored cartridge code to rely on MESS core functions. As
   a result carts are now working (fixed remaining half of bug #1603). Also

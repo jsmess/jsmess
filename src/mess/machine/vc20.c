@@ -117,7 +117,7 @@ static  READ8_HANDLER( vc20_via0_read_porta )
 	if (!serial_data || !cbm_serial_data_read ())
 		value &= ~0x02;
 
-	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		value &= ~0x40;
 	else
 		value |=  0x40;
@@ -319,7 +319,7 @@ static WRITE8_HANDLER( vc20_via1_write_porta )
 static WRITE8_HANDLER( vc20_via1_write_portb )
 {
 /*  logerror("via1_write_portb: $%02X\n", data); */
-//	vc20_tape_write (data & 0x08 ? 1 : 0);		// CASSETTE_RECORD not implemeted yet!
+	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 	via1_portb = data;
 }
 

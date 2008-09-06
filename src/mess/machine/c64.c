@@ -13,12 +13,10 @@
  */
 
 /* 
-	2008-09-05: Tape status [FP & RZ]
+	2008-09-06: Tape status for C64 & C128 [FP & RZ]
 	- tape loading works
 	- tap files are supported
-	
-	TODO:
-	* write to tape
+	- tape writing works
 */
 
 #include "driver.h"
@@ -768,7 +766,7 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 	{
 		if (direction & 0x08) 
 		{
-		/* CASSETTE_RECORD is not implemented yet */
+			cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
@@ -806,7 +804,7 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 
 	if (c64_tape_on)
 	{
-		if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+		if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 			data &= ~0x10;
 		else
 			data |=  0x10;

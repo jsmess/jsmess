@@ -834,7 +834,7 @@ static void c128_m6510_port_write(UINT8 direction, UINT8 data)
 	{
 		if (direction & 0x08) 
 		{
-		/* CASSETTE_RECORD is not implemented yet */
+			cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
@@ -863,7 +863,7 @@ static UINT8 c128_m6510_port_read(UINT8 direction)
 	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
-	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 	else
 		data |=  0x10;

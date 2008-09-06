@@ -311,22 +311,33 @@ XL/XE 16kB OS roms
 	DRIVER( superpet )	/* Commodore SP9000/MMF9000 (50Hz)					*/
 	DRIVER( mmf9000 )	/* Commodore MMF9000 Swedish						*/
 
-	DRIVER( vic20 )		/* Commodore Vic-20 NTSC							*/
-	DRIVER( vic1001 )	/* Commodore VIC-1001 (VIC20 Japan)					*/
-	DRIVER( vc20 )		/* Commodore Vic-20 PAL								*/
-	DRIVER( vic20swe )	/* Commodore Vic-20 Sweden							*/
-	DRIVER( vic20v )	/* Commodore Vic-20 NTSC, VC1540					*/
-	DRIVER( vc20v )		/* Commodore Vic-20 PAL, VC1541						*/
-	DRIVER( vic20i )	/* Commodore Vic-20 IEEE488 Interface				*/
+	DRIVER( vic1001 )	/* Commodore VIC-1001 (Japan)						*/
+	DRIVER( vic20 )		/* Commodore VIC 20 (NTSC)							*/
+	DRIVER( vic20cr )	/* Commodore VIC 20CR (NTSC)						*/
+	DRIVER( vic20i )	/* Commodore VIC 20 (NTSC, IEEE488 Interface)		*/
+	DRIVER( vic20v )	/* Commodore VIC 20 (NTSC, VC1540)					*/
+	DRIVER( vic20pal )	/* Commodore VIC 20 (PAL)							*/
+	DRIVER( vic20crp )	/* Commodore VIC 20CR (PAL)							*/
+	DRIVER( vic20plv )	/* Commodore VIC 20 (PAL, VC1541)					*/
+	DRIVER( vc20 )		/* Commodore VIC 20 (PAL, Germany)					*/
+	DRIVER( vc20v )		/* Commodore VIC 20 (PAL, VC1541)					*/
+	DRIVER( vic20swe )	/* Commodore VIC 20 (Swedish Expanson Kit)			*/
 
-	DRIVER( max )		/* Max (Japan)/Ultimax (US)/VC10 (German)			*/
-	DRIVER( c64 )		/* Commodore 64 - NTSC								*/
-	DRIVER( c64pal )	/* Commodore 64 - PAL								*/
-	DRIVER( vic64s )	/* Commodore VIC64S (Swedish)						*/
-	DRIVER( cbm4064 )	/* Commodore CBM4064								*/
-	DRIVER( sx64 )		/* Commodore SX 64 - PAL							*/
+	DRIVER( max )		/* Commodore Max Machine (Japan)					*/
+	DRIVER( c64 )		/* Commodore 64 (NTSC)								*/
+	DRIVER( c64pal )	/* Commodore 64 (PAL)								*/
+	DRIVER( c64jpn )	/* Commodore 64 (Japan)								*/
+	DRIVER( c64swe )	/* Commodore 64 (Sweden)							*/
+	DRIVER( vic64s )	/* Commodore VIC 64S (Sweden)						*/
+	DRIVER( pet64 )		/* Commodore PET 64									*/
+	DRIVER( cbm4064 )	/* Commodore CBM 4064								*/
+	DRIVER( edu64 )		/* Commodore Educator 64							*/
+	DRIVER( sx64 )		/* Commodore SX-64 Executive Machine (PAL)			*/
 	DRIVER( vip64 )		/* Commodore VIP64 (SX64, PAL, Swedish)				*/
-//	DRIVER( dx64 )		/* Commodore DX 64 - PROTOTPYE, PAL					*/
+//	DRIVER( dx64 )		/* Commodore DX-64 - Prototype						*/
+	DRIVER( c64c )		/* Commodore 64C (NTSC)								*/
+	DRIVER( c64cpal )	/* Commodore 64C (PAL)								*/
+	DRIVER( c64g )		/* Commodore 64G (PAL)								*/
 	DRIVER( c64gs )		/* Commodore 64 Games System						*/
 
 	DRIVER( cbm500 )	/* Commodore 500/P128-40							*/
@@ -338,23 +349,31 @@ XL/XE 16kB OS roms
 	DRIVER( cbm720se )	/* Commodore 720/B256HP Swedish/Finnish				*/
 
 	DRIVER( c16 )		/* Commodore 16										*/
-	DRIVER( c16hun )	/* Commodore 16 Novotrade (Hungarian Character Set)	*/
 	DRIVER( c16c )		/* Commodore 16  c1551								*/
 	DRIVER( c16v )		/* Commodore 16  vc1541								*/
-	DRIVER( plus4 )		/* Commodore +4  c1551								*/
-	DRIVER( plus4c )	/* Commodore +4  vc1541								*/
-	DRIVER( plus4v )	/* Commodore +4										*/
+	DRIVER( c16hun )	/* Commodore 16 Novotrade (Hungarian Character Set)	*/
+	DRIVER( c116 )		/* Commodore 116									*/
+	DRIVER( c116c )		/* Commodore 116  c1551								*/
+	DRIVER( c116v )		/* Commodore 116  vc1541							*/
+	DRIVER( plus4 )		/* Commodore +4										*/
+	DRIVER( plus4c )	/* Commodore +4  c1551								*/
+	DRIVER( plus4v )	/* Commodore +4  vc1541								*/
 	DRIVER( c232 )		/* Commodore 232 - Prototype						*/
-	DRIVER( c364 )		/* Commodore 364 - Prototype						*/
+	DRIVER( c264 )		/* Commodore 264 - Prototype						*/
+	DRIVER( c364 )		/* Commodore V364 - Prototype						*/
 
 	DRIVER( c128 )		/* Commodore 128 - NTSC								*/
-	DRIVER( c128ger )	/* Commodore 128 - PAL (german)						*/
-	DRIVER( c128fra )	/* Commodore 128 - PAL (french)						*/
-	DRIVER( c128ita )	/* Commodore 128 - PAL (italian)					*/
-	DRIVER( c128swe )	/* Commodore 128 - PAL (swedish)					*/
-	DRIVER( c128nor )	/* Commodore 128 - PAL (norwegian)					*/
-	DRIVER( c128d )		/* Commodore 128D - NTSC							*/
-//	DRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
+	DRIVER( c128cr )	/* Commodore 128CR - NTSC (proto?)					*/
+	DRIVER( c128fin )	/* Commodore 128 - PAL (Finnish)					*/
+	DRIVER( c128fra )	/* Commodore 128 - PAL (French)						*/
+	DRIVER( c128ger )	/* Commodore 128 - PAL (German)						*/
+	DRIVER( c128nor )	/* Commodore 128 - PAL (Norwegian)					*/
+	DRIVER( c128d )		/* Commodore 128D - PAL								*/
+	DRIVER( c128dpr )	/* Commodore 128D - NTSC (proto)					*/
+	DRIVER( c128dcr )	/* Commodore 128DCR - NTSC							*/
+	DRIVER( c128drde )	/* Commodore 128DCR - PAL (German)					*/
+	DRIVER( c128drit )	/* Commodore 128DCR - PAL (Italian)					*/
+	DRIVER( c128drsw )	/* Commodore 128DCR - PAL (Swedish)					*/
 
 	DRIVER( a500n )		/* Commodore Amiga 500 - NTSC						*/
 	DRIVER( a500p )		/* Commodore Amiga 500 - PAL						*/

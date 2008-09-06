@@ -10,145 +10,76 @@
 ***************************************************************************/
 
 /*
-------------------------------------
-vic20 commodore vic20 (ntsc version)
-vc20  commodore vc20  (pal version)
-------------------------------------
 
-vic20 ntsc-version
- when screen is two wide right or low,
-  or screen doesn't fitt in visible area
-  or gameplay is too fast
- try the pal version
+2008 - Driver Updates 
+---------------------
 
-vc20  pal-version
+(most of the informations are taken from http://www.zimmers.net/cbmpics/ )
 
-a normal or good written program does not rely on the video system
 
-vic20cr
- cost reduced
- only modified for cheaper production (newer rams, ...)
- (2 2kx8 rams instead of 8 1kx4 rams, ...)
+[CBM systems which belong to this driver]
 
-State
------
 
-rasterline based video system
- should be enough for all vic20 games and programs
-imperfect sound
-timer system only 98% accurate
-simple tape support
-serial bus
- simple disk support
- no printer or other devices
-no userport
- no rs232/v.24 interface
-keyboard
-gameport
- joystick
- paddles
- lightpen
-expansion slot
- ram and rom cartridges
- no special expansion modules like ieee488 interface
-Quickloader
+* VIC-1001 (1981, Japan)
 
-for a more complete vic20 emulation take a look at the very good
-vice emulator
+  The first model released was the Japanese one. It featured support for the
+Japanese katakana character.
 
-Video
------
-NTSC:
-Screen Size (normal TV (horizontal),4/3 ratio)
-pixel ratio: about 7/5 !
-so no standard Vesa Resolution is good
-tweaked mode 256x256 acceptable
-best define own display mode (when graphic driver supports this)
-PAL:
-pixel ratio about 13/10 !
-good (but only part of screen filled) 1024x768
-acceptable 800x600
-better define own display mode (when graphic driver supports this)
+CPU: MOS Technology 6502 (1.01 Mhz)
+RAM: 5 kilobytes (Expanded to 21k though an external 16k unit)
+ROM: 20 kilobytes
+Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184 
+pixels bitmapped; 8 text colors, 16 background colors)
+Sound: MOS Technology 6560 "VIC" (3 voices -square wave-, noise and volume)
+Ports: 6522 VIA x2 (1 Joystick/Mouse port; CBM Serial port; 'Cartridge /
+	Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and 
+	reset switches; Power connector)
+Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of 
+	Keyboardable graphic characters; 2 key direction cursor-pad)
+  
 
-XMESS:
-use -scalewidth 3 -scaleheight 2 for acceptable display
-better define own display mode
+* VIC 20 (1981)
 
-Keys
-----
-Some PC-Keyboards does not behave well when special two or more keys are
-pressed at the same time
-(with my keyboard printscreen clears the pressed pause key!)
+  This system was the first computer to sell more than one million units 
+worldwide. It was sold both in Europe and in the US. In Germany the 
+computer was renamed as VC 20 (apparently, it stands for 'VolksComputer'
 
-stop-restore in much cases prompt will appear
-shift-cbm switches between upper-only and normal character set
-(when wrong characters on screen this can help)
-run (shift-stop) load and start program from tape
+CPU: MOS Technology 6502A (1.01 Mhz)
+RAM: 5 kilobytes (Expanded to 32k)
+ROM: 20 kilobytes
+Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184 
+pixels bitmapped; 8 text colors, 16 background colors)
+Sound: MOS Technology 6560 "VIC" (3 voices -square wave-, noise and volume)
+Ports: 6522 VIA x2 (1 Joystick/Mouse port; CBM Serial port; 'Cartridge /
+	Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and 
+	reset switches; Power connector)
+Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of 
+	Keyboardable graphic characters; 2 key direction cursor-pad)
 
-Lightpen
---------
-Paddle 3 x-axe
-Paddle 4 y-axe
 
-Tape
-----
-(DAC 1 volume in noise volume)
-loading of wav, prg and prg files in zip archiv
-commandline -cassette image
-wav:
- 8 or 16(not tested) bit, mono, 12500 Hz minimum
- has the same problems like an original tape drive (tone head must
- be adjusted to get working (no load error,...) wav-files)
-zip:
- must be placed in current directory
- prg's are played in the order of the files in zip file
+* VIC 21 (1983)
 
-use LOAD or LOAD"" or LOAD"",1 for loading of normal programs
-use LOAD"",1,1 for loading programs to their special address
+  It consists of a VIC 20 with built-in RAM expansion, to reach a RAM 
+  capability of 21 kilobytes.
 
-several programs rely on more features
-(loading other file types, writing, ...)
 
-Discs
------
-only file load from drive 8 and 9 implemented
- loads file from rom directory (*.prg,*.p00)(must NOT be specified on commandline)
- or file from d64 image (here also directory command LOAD"$",8 supported)
-LOAD"filename",8
-or LOAD"filename",8,1 (for loading machine language programs at their address)
-for loading
-type RUN or the appropriate SYS call to start them
+* VIC 20CR
 
-several programs rely on more features
-(loading other file types, writing, ...)
+  CR stands for Cost Reduced, as it consisted of a board with only 2 (larger)
+block of RAM instead of 8.
 
-some games rely on starting own programs in the floppy drive
-(and therefore CPU level emulation is needed)
 
-Roms
-----
-.bin .rom .a0 .20 .40 .60 .prg
-files with boot-sign in it
-  recognized as roms
+[TO DO]
 
-.20 files loaded at 0x2000
-.40 files loaded at 0x4000
-.60 files loaded at 0x6000
-.a0 files loaded at 0xa000
-.prg files loaded at address in its first two bytes
-.bin .rom files loaded at 0x4000 when 0x4000 bytes long
-else loaded at 0xa000
 
-Quickloader
------------
-.prg files supported
-loads program into memory and sets program end pointer
-(works with most programs)
-program ready to get started with RUN
-currently loads first rom when you press quickload key (f8)
+* Imperfect sound
 
-when problems start with -log and look into error.log file
- */
+* Timer system only 98% accurate
+
+* No support for printer or other devices; no userport; no rs232/v.24 
+interface; no special expansion modules like ieee488 interface
+ 
+*/
 
 
 #include "driver.h"
@@ -161,6 +92,13 @@ when problems start with -log and look into error.log file
 #include "video/vic6560.h"
 
 #include "includes/vc20.h"
+
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
 
 
 static ADDRESS_MAP_START( vc20_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -308,8 +246,13 @@ static INPUT_PORTS_START (vic20swe)
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
-/* Initialise the vc20 palette */
+
 static PALETTE_INIT( vc20 )
 {
 	int i;
@@ -319,93 +262,13 @@ static PALETTE_INIT( vc20 )
 	}
 }
 
-#if 0
-	/* chargen */
-	ROM_LOAD ("901460.03", 0x8000, 0x1000, CRC(83e032a6))
-	/* basic */
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1))
-	/* kernel ntsc-m of vic1001? */
-	ROM_LOAD ("901486.02", 0xe000, 0x2000, CRC(336900d7))
-	/* kernel ntsc */
-	ROM_LOAD ("901486.06", 0xe000, 0x2000, CRC(e5e7c174))
-	/* kernel pal */
-	ROM_LOAD ("901486.07", 0xe000, 0x2000, CRC(4be07cb4))
 
-	/* patched pal system for swedish/finish keyboard and chars */
-	/* but in rom? (maybe patched means in this case nec version) */
-	ROM_LOAD ("nec22101.207", 0x8000, 0x1000, CRC(d808551d))
-	ROM_LOAD ("nec22081.206", 0xe000, 0x2000, CRC(b2a60662))
 
-	/* ieee488 cartridge */
-	ROM_LOAD ("325329-04.bin", 0xb000, 0x800, CRC(d37b6335))
-#endif
-
-ROM_START (vic20)
-	ROM_REGION (0x10000, "main",0)
-	ROM_FILL( 0x0000, 0x8000, 0xFF )
-	ROM_LOAD ("901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4))
-	ROM_FILL( 0x9000, 0x3000, 0xFF )
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
-	ROM_LOAD ("901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19))
-ROM_END
-
-ROM_START (vic1001)
-	ROM_REGION (0x10000, "main",0)
-	ROM_FILL( 0x0000, 0x8000, 0xFF )
-	ROM_LOAD ("901460.02", 0x8000, 0x1000, CRC(fcfd8a4b) SHA1(dae61ac03065aa2904af5c123ce821855898c555))
-	ROM_FILL( 0x9000, 0x3000, 0xFF )
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
-	ROM_LOAD ("901486.02", 0xe000, 0x2000, CRC(336900d7) SHA1(c9ead45e6674d1042ca6199160e8583c23aeac22))
-ROM_END
-
-ROM_START (vic20swe)
-	ROM_REGION (0x10000, "main",0)
-	ROM_FILL( 0x0000, 0x8000, 0xFF )
-	ROM_LOAD ("nec22101.207", 0x8000, 0x1000, CRC(d808551d) SHA1(f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f))
-	ROM_FILL( 0x9000, 0x3000, 0xFF )
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
-	ROM_LOAD ("nec22081.206", 0xe000, 0x2000, CRC(b2a60662) SHA1(cb3e2f6e661ea7f567977751846ce9ad524651a3))
-ROM_END
-
-ROM_START (vic20v)
-	ROM_REGION (0x10000, "main",0)
-	ROM_FILL( 0x0000, 0x8000, 0xFF )
-	ROM_LOAD ("901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4))
-	ROM_FILL( 0x9000, 0x3000, 0xFF )
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
-	ROM_LOAD ("901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19))
-	VC1540_ROM ("cpu_vc1540")
-ROM_END
-
-ROM_START (vic20i)
-	ROM_REGION (0x10000, "main",0)
-	ROM_FILL( 0x0000, 0x8000, 0xFF )
-	ROM_LOAD ("901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4))
-	ROM_FILL( 0x9000, 0x2000, 0xFF )
-	ROM_LOAD ("325329.04", 0xb000, 0x800, CRC(d37b6335) SHA1(828c965829d21c60e8c2d083caee045c639a270f))
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
-	ROM_LOAD ("901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19))
-/*	C2031_ROM ("cpu_vc1540") */
-ROM_END
-
-ROM_START (vc20)
-	ROM_REGION (0x10000, "main",0)
-	ROM_FILL( 0x0000, 0x8000, 0xFF )
-	ROM_LOAD ("901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4))
-	ROM_FILL( 0x9000, 0x3000, 0xFF )
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
-	ROM_LOAD ("901486.07", 0xe000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e))
-ROM_END
-
-ROM_START (vc20v)
-	ROM_REGION (0x10000, "main",0)
-	ROM_FILL( 0x0000, 0x8000, 0xFF )
-	ROM_LOAD ("901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4))
-	ROM_FILL( 0x9000, 0x3000, 0xFF )
-	ROM_LOAD ("901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d))
-	ROM_LOAD ("901486.07", 0xe000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e))
-	VC1541_ROM ("cpu_vc1540")
-ROM_END
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( vic20 )
 	/* basic machine hardware */
@@ -492,6 +355,102 @@ static MACHINE_DRIVER_START( vc20v )
 MACHINE_DRIVER_END
 
 
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+
+ROM_START( vic1001 )
+	ROM_REGION (0x10000, "main", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+	ROM_LOAD( "901460.02", 0x8000, 0x1000, CRC(fcfd8a4b) SHA1(dae61ac03065aa2904af5c123ce821855898c555) )
+	ROM_FILL( 0x9000, 0x3000, 0xff )
+	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "901486.02", 0xe000, 0x2000, CRC(336900d7) SHA1(c9ead45e6674d1042ca6199160e8583c23aeac22) )
+ROM_END
+
+
+ROM_START( vic20 )
+	ROM_REGION (0x10000, "main", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
+	ROM_FILL( 0x9000, 0x3000, 0xff )
+	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19) )
+ROM_END
+
+ROM_START( vic20pal )
+	ROM_REGION (0x10000, "main", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
+	ROM_FILL( 0x9000, 0x3000, 0xff )
+	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "901486.07", 0xe000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e) )
+ROM_END
+
+#define rom_vic20cr		rom_vic20
+#define rom_vic20crp	rom_vic20pal
+
+#define rom_vc20		rom_vic20pal
+
+ROM_START( vic20swe )
+	/* patched pal system for swedish/finish keyboard and chars */
+	/* but in rom? (maybe patched means in this case nec version) */
+	ROM_REGION (0x10000, "main", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+	ROM_LOAD( "nec22101.207", 0x8000, 0x1000, CRC(d808551d) SHA1(f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f) )
+	ROM_FILL( 0x9000, 0x3000, 0xff )
+	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "nec22081.206", 0xe000, 0x2000, CRC(b2a60662) SHA1(cb3e2f6e661ea7f567977751846ce9ad524651a3) )
+ROM_END
+
+
+ROM_START( vic20i )
+	ROM_REGION (0x10000, "main", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
+	ROM_FILL( 0x9000, 0x2000, 0xff )
+	ROM_LOAD( "325329.04", 0xb000, 0x800, CRC(d37b6335) SHA1(828c965829d21c60e8c2d083caee045c639a270f) )
+	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19) )
+
+/*	C2031_ROM ("cpu_vc1540") */
+ROM_END
+
+ROM_START( vic20v )
+	ROM_REGION (0x10000, "main", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
+	ROM_FILL( 0x9000, 0x3000, 0xff )
+	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "901486.06", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19) )
+
+	VC1540_ROM ("cpu_vc1540")
+ROM_END
+
+ROM_START( vic20plv )
+	ROM_REGION (0x10000, "main", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
+	ROM_FILL( 0x9000, 0x3000, 0xff )
+	ROM_LOAD( "901486.01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "901486.07", 0xe000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e) )
+
+	VC1541_ROM("cpu_vc1540")
+ROM_END
+
+#define rom_vc20v		rom_vic20plv
+
+
+/*************************************
+ *
+ *  System configuration(s)
+ *
+ *************************************/
+
+
 static SYSTEM_CONFIG_START(vic20)
 	CONFIG_DEVICE(vic20_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
@@ -514,11 +473,26 @@ static SYSTEM_CONFIG_START(vic20v)
 	CONFIG_RAM(32 * 1024)
 SYSTEM_CONFIG_END
 
-/*      YEAR    NAME        PARENT  COMPAT  MACHINE INPUT       INIT    CONFIG     COMPANY                          FULLNAME */
-COMP ( 1981,	vic20,		0,		0,		vic20,	vic20,		vic20,	vic20,      "Commodore Business Machines Co.",  "VIC20 (NTSC)", GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic20i, 	vic20,	0,		vic20i, vic20i, 	vic20i, vic20,      "Commodore Business Machines Co.",  "VIC20 (NTSC), IEEE488 Interface (SYS45065)",   GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic1001,	vic20,	0,		vic20,	vic1001,	vic20,	vic20,      "Commodore Business Machines Co.",  "VIC1001 (NTSC)", GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vc20,		vic20,	0,		vc20,	vc20,		vc20,	vic20,      "Commodore Business Machines Co.",  "VIC20/VC20(German) PAL",       GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic20swe,	vic20,	0,		vc20,	vic20swe,	vc20,	vic20,      "Commodore Business Machines Co.",  "VIC20 PAL, Swedish Expansion Kit", GAME_IMPERFECT_SOUND)
-COMP ( 1981,	vic20v, 	vic20,	0,		vic20v, vic20,		vic20,	vic20v,     "Commodore Business Machines Co.",  "VIC20 (NTSC), VC1540", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-COMP ( 1981,	vc20v,		vic20,	0,		vc20v,	vic20,		vc20,	vic20v,     "Commodore Business Machines Co.",  "VC20 (PAL), VC1541", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+/*    YEAR  NAME      PARENT COMPAT MACHINE INPUT    INIT     CONFIG     COMPANY                             FULLNAME            FLAGS */
+
+COMP( 1981, vic1001,   vic20,  0,  vic20,   vic1001,  vic20,  vic20,     "Commodore Business Machines Co.",  "VIC-1001 (NTSC, Japan)", GAME_IMPERFECT_SOUND)
+
+COMP( 1981, vic20,     0,      0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20cr,   vic20,  0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20CR (NTSC)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20i,   vic20i, vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20,  vic20v,    "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+
+COMP( 1981, vic20pal,  vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VC 20 (PAL)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20crp,  vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VC 20CR (PAL)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20plv,  vic20,  0,   vc20v,  vic20,    vc20,   vic20v,    "Commodore Business Machines Co.",  "VC 20 (PAL, VC1541)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vc20,      vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vc20v,     vic20,  0,   vc20v,  vic20,    vc20,   vic20v,    "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany, VC1541)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+
+COMP( 1981, vic20swe,  vic20,  0,   vc20,   vic20swe, vc20,   vic20,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Swedish Expansion Kit)", GAME_IMPERFECT_SOUND)
