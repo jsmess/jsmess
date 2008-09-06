@@ -893,7 +893,6 @@ static void change_device(HWND wnd, const device_config *device, int is_save)
 	}
 
 	// use image directory, if it is there
-	get_devicedirectory(info.type);
 	initial_dir = image_working_directory(device);
 
 	// add custom dialog elements, if appropriate

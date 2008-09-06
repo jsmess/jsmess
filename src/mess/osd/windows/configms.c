@@ -42,14 +42,6 @@ void osd_mess_options_init(core_options *opts)
 
 
 
-const char *get_devicedirectory(int dev)
-{
-	// I hate MinGW
-	return NULL;
-}
-
-
-
 void osd_get_emulator_directory(char *dir, size_t dir_size)
 {
 	char *s;
