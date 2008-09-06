@@ -211,7 +211,7 @@ static void vic3_drawlines (int first, int last)
 	if (!SCREENON)
 	{
 		for (line = first; (line < last) && (line < vic2.bitmap->height); line++)
-			memset16 (BITMAP_ADDR16(vic2.bitmap, line, 0), 0, vic2.bitmap->width);
+			memset16 (BITMAP_ADDR16(vic2.bitmap, line + FIRSTLINE, 0), 0, vic2.bitmap->width);
 		return;
 	}
 	if (COLUMNS40)
@@ -226,8 +226,7 @@ static void vic3_drawlines (int first, int last)
 
 	for (line = first; line < end; line++)
 	{
-		memset16 (BITMAP_ADDR16(vic2.bitmap, line, 0), FRAMECOLOR,
-			vic2.bitmap->width);
+		memset16 (BITMAP_ADDR16(vic2.bitmap, line + FIRSTLINE, 0), FRAMECOLOR, vic2.bitmap->width);
 	}
 
 	if (LINES25)
@@ -388,15 +387,8 @@ static void vic3_drawlines (int first, int last)
 
 		for (i = ybegin; i <= yend; i++)
 		{
-			plot_box(vic2.bitmap, 0, yoff+ybegin, xbegin, yend-ybegin+1, FRAMECOLOR);
-			plot_box(vic2.bitmap, xend, yoff+ybegin, vic2.bitmap->width - xend, yend-ybegin+1, FRAMECOLOR);
-
-			/*
-			memset16 (BITMAP_ADDR16(vic2.bitmap, yoff + 1, 0),
-						FRAMECOLOR, xbegin);
-			memset16 (BITMAP_ADDR16(vic2.bitmap, yoff + 1, xend),
-						FRAMECOLOR, vic2.bitmap->width - xend);
-			*/
+			plot_box(vic2.bitmap, 0, yoff + ybegin + FIRSTLINE, xbegin, yend-ybegin+1, FRAMECOLOR);
+			plot_box(vic2.bitmap, xend, yoff + ybegin + FIRSTLINE, vic2.bitmap->width - xend, yend-ybegin+1, FRAMECOLOR);
 		}
 	}
 	if (last < vic2.bitmap->height)
@@ -406,8 +398,7 @@ static void vic3_drawlines (int first, int last)
 
 	for (; line < end; line++)
 	{
-		memset16 (BITMAP_ADDR16(vic2.bitmap, line, 0), FRAMECOLOR,
-			vic2.bitmap->width);
+		memset16 (BITMAP_ADDR16(vic2.bitmap, line + FIRSTLINE, 0), FRAMECOLOR, vic2.bitmap->width);
 	}
 }
 
@@ -828,7 +819,18 @@ INTERRUPT_GEN( vic3_raster_irq )
 		if ((new_columns!=columns)||(new_raws!=raws)) {
 			raws=new_raws;
 			columns=new_columns;
-			video_screen_set_visarea(machine->primary_screen, 0,columns+16-1,0, raws+16-1);
+			if (c64_pal)
+				video_screen_set_visarea(	machine->primary_screen,
+									VIC2_STARTVISIBLECOLUMNS + 32,
+									VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1,
+									VIC2_STARTVISIBLELINES + 34,
+									VIC2_STARTVISIBLELINES + 34 + raws + 16 - 1);
+			else
+				video_screen_set_visarea(	machine->primary_screen,
+									VIC2_STARTVISIBLECOLUMNS + 32,
+									VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1,
+									VIC2_STARTVISIBLELINES + 34,
+									VIC2_STARTVISIBLELINES + 34 + raws + 16 - 1);
 		}
 		if (VIC3_BITPLANES) {
 			if (!video_skip_this_frame ()) vic3_draw_bitplanes(machine);
