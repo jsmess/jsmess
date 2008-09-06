@@ -23,9 +23,6 @@ static const char *const mess_default_text[] =
 	"Autocenter Speed",
 	"Reverse",
 	"Sensitivity",
-	"\xc2\xab",
-	"\xc2\xbb",
-	"Return to Main Menu",
 
 	"Keyboard Emulation Status",
 	"-------------------------",
@@ -34,9 +31,6 @@ static const char *const mess_default_text[] =
 	"UI:   Enabled",
 	"UI:   Disabled",
 	"**Use ScrLock to toggle**",
-
-	"Image Information",
-	"File Manager",
 
 	"No Tape Image loaded",
 	"recording",
