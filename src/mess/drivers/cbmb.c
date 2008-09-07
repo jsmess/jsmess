@@ -587,7 +587,7 @@ static MACHINE_DRIVER_START( cbm500 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6509, VIC6567_CLOCK)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cbm500_readmem, cbm500_writemem)
-	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC2_HRETRACERATE)
+	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 	MDRV_INTERLEAVE(0)
 
 	MDRV_MACHINE_RESET( cbmb )

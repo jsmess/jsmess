@@ -65,7 +65,6 @@
 /* lightpen values */
 #include "includes/c64.h"
 
-
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
 	{ \
@@ -1253,40 +1252,7 @@ static void vic2_drawlines (int first, int last)
 		/* sprite priority, sprite overwrites lowerprior pixels */
 		for (i = 7; i >= 0; i--)
 		{
-			if (vic2.sprites[i].line || vic2.sprites[i].repeat)
-			{
-				syend = yend;
-				if (SPRITE_Y_EXPAND (i))
-				{
-					if ((21 - vic2.sprites[i].line) * 2 - vic2.sprites[i].repeat < yend - ybegin + 1)
-						syend = ybegin + (21 - vic2.sprites[i].line) * 2 - vic2.sprites[i].repeat - 1;
-				}
-				else
-				{
-					if (vic2.sprites[i].line + yend - ybegin + 1 > 20)
-						syend = ybegin + 20 - vic2.sprites[i].line;
-				}
-				if (yoff + syend > YPOS + 200)
-					syend = YPOS + 200 - yoff - 1;
-				if (yoff + ybegin < 0)
-					{
-						ybegin = -yoff;
-						yend = - yoff;
-					}
-
-				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, ybegin, syend);
-				else
-					vic2_draw_sprite (i, yoff, ybegin, syend);
-				if ((syend != yend) || (vic2.sprites[i].line > 20))
-				{
-					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
-					for (j = syend; j <= yend; j++)
-						vic2.sprites[i].paintedline[j] = 0;
-				}
-			}
-			// wrap at the top of the screen
-			else if 	(SPRITEON (i) &&
+			if 	(SPRITEON (i) &&
 					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
 					(yoff + ybegin - SPRITE_Y_POS (i) < (SPRITE_Y_EXPAND (i)? 21 * 2 : 21 )) &&
 					(SPRITE_Y_POS (i) < 0))
@@ -1322,28 +1288,37 @@ static void vic2_drawlines (int first, int last)
 					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
 				}
 			}
-			else if (SPRITEON (i) && (yoff + ybegin <= SPRITE_Y_POS (i))
-					 && (yoff + yend >= SPRITE_Y_POS (i)) && (SPRITE_Y_POS (i) >= 0) )
+			else if 	(SPRITEON (i) &&
+					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
+					(yoff + ybegin - SPRITE_Y_POS (i) < (SPRITE_Y_EXPAND (i)? 21 * 2 : 21 )) &&
+					(SPRITE_Y_POS (i) >= 0))
 			{
+				int wrapped = yoff + ybegin - SPRITE_Y_POS (i);
+
 				syend = yend;
+
 				if (SPRITE_Y_EXPAND (i))
 				{
-					if (21 * 2 < yend - ybegin + 1)
-						syend = ybegin + 21 * 2 - 1;
+					if (wrapped & 1) vic2.sprites[i].repeat = 1;
+					wrapped >>= 1;
+					syend = 21 * 2 - 1 - wrapped * 2;
+					if (syend > (yend - ybegin)) syend = yend - ybegin;
 				}
 				else
 				{
-					if (yend - ybegin + 1 > 21)
-						syend = ybegin + 21 - 1;
+					syend = 21 - 1 - wrapped;
+					if (syend > (yend - ybegin)) syend = yend - ybegin;
 				}
-				if (yoff + syend >= YPOS + 200)
-					syend = YPOS + 200 - yoff - 1;
-				 for (j = 0; j < SPRITE_Y_POS (i) - yoff; j++)
+
+				vic2.sprites[i].line = wrapped;
+
+				for (j = 0; j < SPRITE_Y_POS (i) - yoff; j++)
 					vic2.sprites[i].paintedline[j] = 0;
+
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, SPRITE_Y_POS (i) - yoff, syend);
+					vic2_draw_sprite_multi (i, yoff + ybegin, 0, 0);
 				else
-					vic2_draw_sprite (i, yoff, SPRITE_Y_POS (i) - yoff, syend);
+					vic2_draw_sprite (i, yoff + ybegin, 0, 0);
 
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
@@ -1380,7 +1355,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 
 	vic2.rasterline++;
 
-	if (vic2.rasterline >= vic2.lines)
+	if (vic2.rasterline == vic2.lines)
 	{
 		if (!c64_pal)	// FIX ME
 			for (i = vic2.lines; i < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES); i++)
@@ -1403,10 +1378,11 @@ INTERRUPT_GEN( vic2_raster_irq )
 		vic2_set_interrupt (1);
 	}
 
-// printf("%08x  ",(int)activecpu_gettotalcycles());
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
 			vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
+
+// printf("%08x  ",(int)activecpu_gettotalcycles());
 }
 
 VIDEO_UPDATE( vic2 )

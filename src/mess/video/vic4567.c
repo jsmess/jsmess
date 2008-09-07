@@ -211,7 +211,9 @@ static void vic3_drawlines (int first, int last)
 	if (!SCREENON)
 	{
 		for (line = first; (line < last) && (line < vic2.bitmap->height); line++)
+		{
 			memset16 (BITMAP_ADDR16(vic2.bitmap, line + FIRSTLINE, 0), 0, vic2.bitmap->width);
+		}
 		return;
 	}
 	if (COLUMNS40)
@@ -827,10 +829,10 @@ INTERRUPT_GEN( vic3_raster_irq )
 									VIC2_STARTVISIBLELINES + 34 + raws + 16 - 1);
 			else
 				video_screen_set_visarea(	machine->primary_screen,
-									VIC2_STARTVISIBLECOLUMNS + 32,
-									VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1,
-									VIC2_STARTVISIBLELINES + 34,
-									VIC2_STARTVISIBLELINES + 34 + raws + 16 - 1);
+									VIC2_STARTVISIBLECOLUMNS + 34,
+									VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1,
+									VIC2_STARTVISIBLELINES + 10,
+									VIC2_STARTVISIBLELINES + 10 + raws + 16 - 1);
 		}
 		if (VIC3_BITPLANES) {
 			if (!video_skip_this_frame ()) vic3_draw_bitplanes(machine);
@@ -849,9 +851,11 @@ INTERRUPT_GEN( vic3_raster_irq )
 	}
 	if (vic2.rasterline == C64_2_RASTERLINE (RASTERLINE))
 	{
-		if (vic2.on)
-			vic2_drawlines (vic2.lastline, vic2.rasterline);
 		vic2_set_interrupt (1);
 	}
+	if (vic2.on)
+		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
+			vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
 }
+
 
