@@ -27,7 +27,7 @@ static UINT8 pmd853_memory_mapping = 0x01;
 static void (*pmd85_update_memory)(running_machine *);
 
 enum {PMD85_LED_1, PMD85_LED_2, PMD85_LED_3};
-enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO};
+enum {PMD85_1, PMD85_2, PMD85_2A, PMD85_2B, PMD85_3, ALFA, MATO, C2717};
 
 static UINT8 pmd85_model;
 
@@ -191,6 +191,26 @@ static void mato_update_memory(running_machine *machine)
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 
+		memory_set_bankptr(1, mess_ram);
+		memory_set_bankptr(2, mess_ram + 0x4000);
+	}
+}
+
+static void c2717_update_memory(running_machine *machine)
+{
+	UINT8 *mem = memory_region(machine, "main");
+	if (pmd85_startup_mem_map)
+	{
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+
+		memory_set_bankptr(1, mem + 0x010000);
+		memory_set_bankptr(2, mess_ram + 0x4000);
+		memory_set_bankptr(3, mem + 0x010000);
+		memory_set_bankptr(4, mess_ram + 0xc000);
+	}
+	else
+	{
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 		memory_set_bankptr(1, mess_ram);
 		memory_set_bankptr(2, mess_ram + 0x4000);
 	}
@@ -490,6 +510,7 @@ static WRITE8_HANDLER ( pmd85_ppi_3_portc_w )
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
+					case C2717:
 					case PMD85_3:
 						if (pmd85_rom_module_present)
 						{
@@ -563,6 +584,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
+					case C2717:
 					case PMD85_3:
 						if (pmd85_rom_module_present)
 						{
@@ -781,6 +803,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 					return;
 				case PMD85_2:
 				case PMD85_2A:
+				case C2717:
 				case PMD85_3:
 				case ALFA:
 					/* not hardware data decoding */
@@ -870,6 +893,12 @@ DRIVER_INIT ( mato )
 	pmd85_update_memory = mato_update_memory;
 }
 
+DRIVER_INIT ( c2717 )
+{
+	pmd85_model = C2717;
+	pmd85_update_memory = c2717_update_memory;
+	pmd85_common_driver_init(machine);
+}
 
 static TIMER_CALLBACK( setup_pit8253_gates ) {
 	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
@@ -888,6 +917,7 @@ MACHINE_RESET( pmd85 )
 		case PMD85_1:
 		case PMD85_2A:
 		case PMD85_3:
+	  case C2717:
 			pmd85_rom_module_present = (input_port_read(machine, "DSW0") & 0x01) ? 1 : 0;
 			break;
 		case ALFA:
@@ -906,6 +936,7 @@ MACHINE_RESET( pmd85 )
 		case PMD85_1:
 		case PMD85_2A:
 		case PMD85_3:
+		case C2717:
 		case ALFA:
 			msm8251_reset();
 			break;

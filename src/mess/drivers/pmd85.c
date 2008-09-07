@@ -244,6 +244,13 @@ static ADDRESS_MAP_START( mato_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK4)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( c2717_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK2, SMH_BANK2)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK3, SMH_ROM)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK4)
+ADDRESS_MAP_END
+
 /* keyboard input */
 
 static INPUT_PORTS_START( pmd85 )
@@ -603,6 +610,13 @@ static MACHINE_DRIVER_START( mato )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( c2717 )
+	MDRV_IMPORT_FROM( pmd851 )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(c2717_mem, 0)
+MACHINE_DRIVER_END
+
+
 ROM_START(pmd851)
 	ROM_REGION(0x11000,"main",0)
 	ROM_LOAD("pmd85-1.bin", 0x10000, 0x1000, CRC(ef50b416) SHA1(afa3ec0d03228adc5287a4cba905ce7ad0497dff))
@@ -662,6 +676,10 @@ ROM_START(mato)
 	ROMX_LOAD("matogm3.rom", 0x10000, 0x4000, CRC(9352f2c1) SHA1(b3e45c56d2800c69a0bb02febda6fa715f1afbc3), ROM_BIOS(7))
 ROM_END
 
+ROM_START(c2717)
+	ROM_REGION(0x14000,"main",0)
+	ROM_LOAD("c2717.rom", 0x10000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
+ROM_END
 
 static const struct CassetteOptions pmd85_cassette_options = {
 	1,		/* channels */
@@ -702,3 +720,4 @@ COMP( 1985, pmd852b, pmd851, 0,		pmd852a, pmd85, pmd852a,  pmd85, "Tesla", "PMD-
 COMP( 1988, pmd853,  pmd851, 0,		pmd853,  pmd85, pmd853,   pmd85, "Tesla", "PMD-85.3" , 0)
 COMP( 1986, alfa,    pmd851, 0,		alfa,    alfa,  alfa,     pmd85, "Didaktik", "Alfa" , 0)
 COMP( 1985, mato,    pmd851, 0,		mato,    mato,  mato,     pmd85, "Statny", "Mato" , 0)
+COMP( 1989, c2717,   pmd851, 0,		c2717,   pmd85, c2717,    pmd85, "Zbrojovka Brno", "Consul 2717" , 0)

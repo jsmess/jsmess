@@ -741,7 +741,10 @@ XL/XE 16kB OS roms
 
 	/* Statny */
 	DRIVER( mato )		/* Mato (PMD-85.2 clone)							*/
-
+	
+	/* Zbrojovka Brno */
+	DRIVER( c2717 )		/* Consul 2717 (PMD-85.2 clone)				*/
+	
 	/* Microkey */
 	DRIVER( primoa32 )	/* Primo A-32										*/
 	DRIVER( primoa48 )	/* Primo A-48										*/

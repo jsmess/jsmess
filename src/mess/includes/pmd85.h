@@ -25,6 +25,7 @@ DRIVER_INIT ( pmd852a );
 DRIVER_INIT ( pmd853 );
 DRIVER_INIT ( alfa );
 DRIVER_INIT ( mato );
+DRIVER_INIT ( c2717 );
 extern MACHINE_RESET( pmd85 );
 
 
