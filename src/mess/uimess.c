@@ -388,3 +388,30 @@ void ui_mess_set_use_natural_keyboard(running_machine *machine, int use_natural_
 {
 	machine->ui_mess_data->use_natural_keyboard = use_natural_keyboard;
 }
+
+/*-------------------------------------------------
+    ui_menu_keyboard_mode - menu that 	
+-------------------------------------------------*/
+
+void ui_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *event;
+	int natural = ui_mess_get_use_natural_keyboard(machine);
+	
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+	{
+		ui_menu_item_append(menu, "Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, NULL);
+	}
+
+	/* process the menu */
+	event = ui_menu_process(menu, 0);
+
+	if (event != NULL)
+	{
+		if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT) {
+			ui_mess_set_use_natural_keyboard(machine, natural ^ TRUE);
+			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
+		}
+	}		
+}

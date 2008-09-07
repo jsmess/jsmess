@@ -57,4 +57,7 @@ int ui_mess_get_use_natural_keyboard(running_machine *machine);
 /* specifies whether the natural keyboard is active */
 void ui_mess_set_use_natural_keyboard(running_machine *machine, int use_natural_keyboard);
 
+/* keyboard mode menu */
+void ui_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+
 #endif /* __UIMESS_H__ */

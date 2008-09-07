@@ -1480,6 +1480,9 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	if (device_find_from_machine(machine, IO_CASSETTE))
 		ui_menu_item_append(menu, "Tape Control", NULL, 0, menu_tape_control);
 #endif /* HAS_WAVE */
+
+  	/* add keyboard mode menu */
+	ui_menu_item_append(menu, "Keyboard Mode", NULL, 0, ui_menu_keyboard_mode);
 #endif /* MESS */
 
 	/* add sliders menu */
