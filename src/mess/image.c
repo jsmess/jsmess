@@ -290,13 +290,6 @@ static void image_exit(running_machine *machine)
 			/* unload this image */
 			image_unload_internal(slot);
 
-			/* free the working directory */
-			if (slot->working_directory != NULL)
-			{
-				free(slot->working_directory);
-				slot->working_directory = NULL;
-			}
-
 			/* free the memory pool */
 			pool_free(slot->mempool);
 			slot->mempool = NULL;
@@ -943,10 +936,11 @@ static void image_clear(image_slot_data *image)
 		image->file = NULL;
 	}
 
+	astring_cpyc(image->name, "");
+
 	pool_clear(image->mempool);
 	image->writeable = 0;
 	image->created = 0;
-	image->name = NULL;
 	image->dir = NULL;
 	image->hash = NULL;
 	image->longname = NULL;
