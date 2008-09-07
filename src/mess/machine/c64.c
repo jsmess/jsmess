@@ -1152,6 +1152,11 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	{
 		value = 0xff;
 		value &= ~input_port_read(machine, c64ports[i]);
+
+		/* Shift Lock is mapped on Left Shift */
+		if ((i == 1) && (input_port_read(machine, "SPECIAL") & 0x40))
+			value &= ~0x80;			
+
 		c64_keyline[i] = value;
 	}
 
@@ -1240,8 +1245,8 @@ INTERRUPT_GEN( c64_frame_interrupt )
 
 	vic2_frame_interrupt (machine, cpunum);
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
-	set_led_status (0, input_port_read(machine, "DSW0") & 0x0100 ? 1 : 0);		/*KB_NUMLOCK_FLAG */ 
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
+	set_led_status (0, input_port_read(machine, "DSW0") & 0x0100 ? 1 : 0);		/* Joystick Swap */ 
 }
 
 
