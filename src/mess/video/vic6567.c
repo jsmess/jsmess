@@ -1382,6 +1382,10 @@ INTERRUPT_GEN( vic2_raster_irq )
 
 	if (vic2.rasterline >= vic2.lines)
 	{
+		if (!c64_pal)	// FIX ME
+			for (i = vic2.lines; i < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES); i++)
+				vic2_drawlines (i-1, i);
+
 		vic2.rasterline = 0;
 
 		for (i = 0; i < 8; i++)
