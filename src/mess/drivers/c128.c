@@ -23,8 +23,8 @@
 CPU: CSG 8502 (1 or 2 Mhz), Z80 (~3 Mhz)
 RAM: 128 kilobytes
 ROM: 72 kilobytes expandable
-Video: MOS 8564 "VIC-II", MOS 8563 CTRC (40/80 columns text; Palette of 16 
-	colors; Hires modes 320 x 200, 640 x 200
+Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16 
+	colors; Hires modes 320 x 200, 640 x 200, 16k of dedicated VDC RAM)
 Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound 
 	capabilities)
 Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM 
@@ -33,8 +33,11 @@ Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM
 Keyboard: Full-sized 93 key QWERTY (14 key numeric keypad; 8 programmable 
 	function keys + HELP; 4 direction 4-key cursor-pad)
 
+Upgrade kits were sold to upgrade the VDC RAM to 64k using a passthrough board
+that the VDC sat in.
 
-* Commodore 128CR (198?)
+
+* Commodore 128CR (prototype from June, 1986)
 
   Basically, a C128 in a redesigned board to reduce production costs. It's
 not clear when it's been produced, nor if it has ever been produced on 
@@ -42,6 +45,10 @@ large scale. Its BIOS is an intermediate revision between rev. 0 and rev. 1
 in the main C128.
 A picture of the PCB can be found here:
 http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/c128/c128cr.jpg
+
+Appears to be functionally identical to the original c128, has 16k VDC ram, and a
+?prototype? VDC labeled 2568R1X. Has 6526A-1 CIAs, 8721R3 and 8722R2 gate
+arrays, 8580R5 sid, and 8502R0 processor.
 
 
 * Commodore 128D (1985)
@@ -54,8 +61,8 @@ CPU: CSG 8502 (1 or 2 Mhz), Z80 (~3 Mhz), 6502 (co-processor for disk
 	drive)
 RAM: 128 kilobytes
 ROM: 72 kilobytes expandable
-Video: MOS 8564 "VIC-II", MOS 8563 CTRC (40/80 columns text; Palette of 16 
-	colors; Hires modes 320 x 200, 640 x 200
+Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16 
+	colors; Hires modes 320 x 200, 640 x 200, 64k of dedicated VDC RAM)
 Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound 
 	capabilities)
 Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM 
@@ -650,10 +657,17 @@ ROM_END
 
 
 ROM_START( c128cr )
+	/* C128CR prototype, owned by Bo Zimmers
+	   PCB markings: "COMMODORE 128CR REV.3 // PCB NO.252270" and "PCB ASSY NO.250783"
+           Sticker on rom cart shield: "C128CR  No.2 // ENG. SAMPLE // Jun/9/'86   KNT"
+	   3 ROMs (combined basic, combined c64/kernal, plain character rom)
+	   6526A-1 CIAs
+	   ?prototype? 2568R1X VDC w/ 1186 datecode
+	*/
 	ROM_REGION( 0x132800, "main", 0 )
-	ROM_LOAD( "252343-03.bin", 0x100000, 0x8000, CRC(bc07ed87) SHA1(0eec437994a3f2212343a712847213a8a39f4a7b) )			// BASIC lo + hi
-	ROM_LOAD( "252343-04.bin", 0x108000, 0x8000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) )			// C64 OS ROM + Kernal
-	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character
+	ROM_LOAD( "252343-03.u34", 0x100000, 0x8000, CRC(bc07ed87) SHA1(0eec437994a3f2212343a712847213a8a39f4a7b) )			// BASIC lo + hi, "252343-03 // U34" 
+	ROM_LOAD( "252343-04.u32", 0x108000, 0x8000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) )			// C64 OS ROM + Kernal, "252343-04 // US // U32" 
+	ROM_LOAD( "390059-01.u18", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character, "MOS // (C)1985 CBM // 390059-01 // M468613 8547H"
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
