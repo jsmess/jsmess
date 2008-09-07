@@ -43,6 +43,14 @@ struct _zippath_directory
 };
 
 
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type);
+static int is_zip_file(const char *path);
+static int is_zip_file_separator(char c);
+
 
 /***************************************************************************
     PATH OPERATIONS
@@ -138,6 +146,212 @@ astring *zippath_combine(astring *dst, const char *path1, const char *path2)
 	return result;
 }
 
+
+
+/***************************************************************************
+    FILE OPERATIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    file_error_from_zip_error - translates a
+	file_error to a zip_error
+-------------------------------------------------*/
+
+static file_error file_error_from_zip_error(zip_error ziperr)
+{
+	file_error filerr;
+	switch(ziperr)
+	{
+		case ZIPERR_NONE:
+			filerr = FILERR_NONE;
+			break;
+		case ZIPERR_OUT_OF_MEMORY:
+			filerr = FILERR_OUT_OF_MEMORY;
+			break;
+		case ZIPERR_BAD_SIGNATURE:
+		case ZIPERR_DECOMPRESS_ERROR:
+		case ZIPERR_FILE_TRUNCATED:
+		case ZIPERR_FILE_CORRUPT:
+		case ZIPERR_UNSUPPORTED:
+		case ZIPERR_FILE_ERROR:
+			filerr = FILERR_INVALID_DATA;
+			break;
+		case ZIPERR_BUFFER_TOO_SMALL:
+		default:
+			filerr = FILERR_FAILURE;
+			break;
+	}
+	return filerr;
+}
+
+
+/*-------------------------------------------------
+    create_core_file_from_zip - creates a core_file
+	from a zip file entry
+-------------------------------------------------*/
+
+static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file **file)
+{
+	file_error filerr;
+	zip_error ziperr;
+	void *ptr;
+	
+	ptr = malloc(header->uncompressed_length);
+	if (ptr == NULL)
+	{
+		filerr = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	ziperr = zip_file_decompress(zip, ptr, header->uncompressed_length);
+	if (ziperr != ZIPERR_NONE)
+	{
+		filerr = file_error_from_zip_error(ziperr);
+		goto done;
+	}
+
+	filerr = core_fopen_ram_copy(ptr, header->uncompressed_length, OPEN_FLAG_READ, file);
+	if (filerr != FILERR_NONE)
+		goto done;
+
+done:
+	if (ptr != NULL)
+		free(ptr);
+	return filerr;
+}
+
+
+/*-------------------------------------------------
+    zippath_fopen - opens a zip path file
+-------------------------------------------------*/
+
+file_error zippath_fopen(const char *filename, UINT32 openflags, core_file **file, astring *revised_path)
+{
+	file_error filerr = FILERR_NOT_FOUND;
+	zip_error ziperr;
+	zip_file *zip = NULL;
+	const zip_file_header *header;
+	osd_dir_entry_type entry_type;
+	astring *mainpath;
+	astring *subpath;
+	astring *temp;
+	astring *temp2;
+	char *alloc_fullpath = NULL;
+	int len;
+
+	/* first, set up the two types of paths */
+	mainpath = astring_cpyc(astring_alloc(), filename);
+	subpath = astring_alloc();
+	temp = astring_alloc();
+	temp2 = astring_alloc();
+	*file = NULL;
+
+	/* loop through */
+	while((*file == NULL) && (astring_len(mainpath) > 0)
+		&& ((openflags == OPEN_FLAG_READ) || (astring_len(subpath) == 0)))
+	{
+		/* is the mainpath a ZIP path? */
+		if (is_zip_file(astring_c(mainpath)))
+		{
+			/* this file might be a zip file - lets take a look */
+			ziperr = zip_file_open(astring_c(mainpath), &zip);
+			if (ziperr == ZIPERR_NONE)
+			{
+				/* it is a zip file - error if we're not opening for reading */
+				if (openflags != OPEN_FLAG_READ)
+				{
+					filerr = FILERR_ACCESS_DENIED;
+					goto done;
+				}
+
+				if (astring_len(subpath) > 0)
+					header = zippath_find_sub_path(zip, astring_c(subpath), &entry_type);
+				else
+					header = zip_file_first_file(zip);
+
+				if (header == NULL)
+				{
+					filerr = FILERR_NOT_FOUND;
+					goto done;
+				}
+
+				/* attempt to read the file */
+				filerr = create_core_file_from_zip(zip, header, file);
+				if (filerr != FILERR_NONE)
+					goto done;
+
+				/* update subpath, if appropriate */
+				if (astring_len(subpath) == 0)
+					astring_cpyc(subpath, header->filename);
+
+				/* we're done */
+				goto done;
+			}
+		}
+
+		if (astring_len(subpath) == 0)
+			filerr = core_fopen(filename, openflags, file);
+		else
+			filerr = FILERR_NOT_FOUND;
+
+		/* if we errored, then go up a directory */
+		if (filerr != FILERR_NONE)
+		{
+			/* go up a directory */
+			zippath_parent(temp, astring_c(mainpath));
+
+			/* append to the sub path */
+			if (astring_len(subpath) > 0)
+			{
+				astring_assemble_3(temp2, astring_c(mainpath) + astring_len(temp), PATH_SEPARATOR, astring_c(subpath));
+				astring_cpy(subpath, temp2);
+			}
+			else
+			{
+				astring_cpyc(subpath, astring_c(mainpath) + astring_len(temp));
+			}
+
+			/* get the new main path, truncating path separators */
+			len = astring_len(temp);
+			while((len > 0) && is_zip_file_separator(astring_c(temp)[len - 1]))
+				len--;
+			astring_cpych(mainpath, astring_c(temp), len);
+		}
+	}
+
+done:
+	/* store the revised path if appropriate */
+	if (revised_path != NULL)
+	{
+		astring_cpyc(revised_path, "");
+		if (filerr == FILERR_NONE)
+		{
+			/* cannonicalize mainpath */
+			filerr = osd_get_full_path(&alloc_fullpath, astring_c(mainpath));
+			if (filerr == FILERR_NONE)
+			{
+				if (astring_len(subpath) > 0)
+					astring_assemble_3(revised_path, alloc_fullpath, PATH_SEPARATOR, astring_c(subpath));
+				else
+					astring_cpyc(revised_path, alloc_fullpath);
+			}
+		}
+	}
+
+	if (zip != NULL)
+		zip_file_close(zip);
+	if (mainpath != NULL)
+		astring_free(mainpath);
+	if (subpath != NULL)
+		astring_free(subpath);
+	if (temp != NULL)
+		astring_free(temp);
+	if (temp2 != NULL)
+		astring_free(temp2);
+	if (alloc_fullpath != NULL)
+		free(alloc_fullpath);
+	return filerr;
+}
 
 
 /***************************************************************************
@@ -249,7 +463,7 @@ static char next_path_char(const char *s, int *pos)
 	type of a sub path in a zip file
 -------------------------------------------------*/
 
-const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
+static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
 {
 	int i, j;
 	char c1, c2, last_char;

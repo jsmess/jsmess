@@ -22,6 +22,7 @@
 #include "pool.h"
 #include "pile.h"
 #include "inputx.h"
+#include "unzip.h"
 
 #define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))
 
@@ -562,6 +563,7 @@ done:
 		core_fclose(file);
 	if (root_node != NULL)
 		xml_file_free(root_node);
+	zip_file_cache_clear();
 	return result;
 }
 

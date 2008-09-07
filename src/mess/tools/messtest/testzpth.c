@@ -58,6 +58,10 @@ void node_testzippath(xml_data_node *node)
 	const char *type_string;
 	file_error err;
 	UINT64 size;
+	mess_pile pile;
+	core_file *file = NULL;
+
+	pile_init(&pile);
 
 	/* name the test case */
 	report_testcase_begin("zippath");
@@ -78,6 +82,30 @@ void node_testzippath(xml_data_node *node)
 	{
 		apath = astring_cpyc(astring_alloc(), path);
 		report_message(MSG_INFO, "Testing ZIP Path '%s'", astring_c(apath));
+	}
+
+	/* try doing a file compare */
+	messtest_get_data(node, &pile);
+	if (pile_size(&pile) > 0)
+	{
+		err = zippath_fopen(astring_c(apath), OPEN_FLAG_READ, &file, NULL);
+		if (err != FILERR_NONE)
+		{
+			report_message(MSG_FAILURE, "Error %d opening file", (int) err);
+			goto done;
+		}
+
+		if (pile_size(&pile) != core_fsize(file))
+		{
+			report_message(MSG_FAILURE, "Expected file to be of length %d, instead got %d", (int) pile_size(&pile), (int) core_fsize(file));
+			goto done;
+		}
+
+		if (memcmp(pile_getptr(&pile), core_fbuffer(file), pile_size(&pile)))
+		{
+			report_message(MSG_FAILURE, "File sizes match, but contents do not");
+			goto done;
+		}		
 	}
 
 	/* try doing a directory listing */
@@ -131,8 +159,11 @@ void node_testzippath(xml_data_node *node)
 	}
 
 done:
+	pile_delete(&pile);
 	if (apath != NULL)
 		astring_free(apath);
+	if (file != NULL)
+		core_fclose(file);
 	if (directory != NULL)
 		zippath_closedir(directory);
 }
