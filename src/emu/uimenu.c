@@ -1431,6 +1431,9 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	int has_configs = FALSE;
 	int has_analog = FALSE;
 	int has_dips = FALSE;
+#ifdef MESS
+	int has_keyboard = FALSE;
+#endif
 
 	/* scan the input port array to see what options we need to enable */
 	for (port = machine->portconfig; port != NULL; port = port->next)
@@ -1444,6 +1447,10 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 				has_categories = TRUE;
 			if (input_type_is_analog(field->type))
 				has_analog = TRUE;
+#ifdef MESS
+			if (field->type == IPT_KEYBOARD)
+				has_keyboard = TRUE;			
+#endif
 		}
 
 	/* add input menu items */
@@ -1482,7 +1489,8 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 #endif /* HAS_WAVE */
 
   	/* add keyboard mode menu */
-	ui_menu_item_append(menu, "Keyboard Mode", NULL, 0, ui_menu_keyboard_mode);
+  	if( has_keyboard && inputx_can_post(machine) )
+		ui_menu_item_append(menu, "Keyboard Mode", NULL, 0, ui_menu_keyboard_mode);
 #endif /* MESS */
 
 	/* add sliders menu */
