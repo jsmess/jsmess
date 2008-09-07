@@ -17,7 +17,6 @@
 
 #include "x68k_hdc.h"
 #include "devices/harddriv.h"
-#include "device.h"
 #include "image.h"
 
 static struct hd_state hd;
@@ -474,9 +473,8 @@ DEVICE_GET_INFO(x68k_hdc)
 		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 		break;
-		case MESS_DEVINFO_STR_NAME:						info->s = "sasihd"; 			break;
-		case MESS_DEVINFO_STR_SHORT_NAME:				info->s = "sasi"; 			break;
-		case MESS_DEVINFO_STR_DESCRIPTION:				info->s = "SASI Hard Disk"; 			break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:			info->s = "sasihd"; 			break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		info->s = "sasi"; 			break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "hdf"; break;
 	}
 }
