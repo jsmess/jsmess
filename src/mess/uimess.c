@@ -297,11 +297,11 @@ static astring *image_info_astring(running_machine *machine, astring *string)
 
 
 /*-------------------------------------------------
-    ui_menu_image_info - menu that shows info on
-	all loaded images
+    ui_mess_menu_image_info - menu that shows info
+	on all loaded images
 -------------------------------------------------*/
 
-void ui_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_mess_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
@@ -441,15 +441,15 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 	}
 
   	/* add image info menu */
-	ui_menu_item_append(menu, "Image Information", NULL, 0, ui_menu_image_info);
+	ui_menu_item_append(menu, "Image Information", NULL, 0, ui_mess_menu_image_info);
 
   	/* add image info menu */
-	ui_menu_item_append(menu, "File Manager", NULL, 0, menu_file_manager);
+	ui_menu_item_append(menu, "File Manager", NULL, 0, ui_mess_menu_file_manager);
 
 #if HAS_WAVE
   	/* add tape control menu */
 	if (device_find_from_machine(machine, IO_CASSETTE))
-		ui_menu_item_append(menu, "Tape Control", NULL, 0, menu_tape_control);
+		ui_menu_item_append(menu, "Tape Control", NULL, 0, ui_mess_menu_tape_control);
 #endif /* HAS_WAVE */
 
   	/* add keyboard mode menu */

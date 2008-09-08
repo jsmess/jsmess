@@ -132,7 +132,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
     menu_tape_control - main tape control menu
 -------------------------------------------------*/
 
-void menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	tape_control_menu_state *menustate;
 	const ui_menu_event *event;

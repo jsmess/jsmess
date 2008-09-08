@@ -935,7 +935,7 @@ static void file_manager_destroy_state(ui_menu *menu, void *state)
     menu_file_manager - main file manager menu
 -------------------------------------------------*/
 
-void menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_mess_menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	const ui_menu_event *event;
 	file_manager_menu_state *menustate;
