@@ -58,6 +58,9 @@ int ui_mess_get_use_natural_keyboard(running_machine *machine);
 void ui_mess_set_use_natural_keyboard(running_machine *machine, int use_natural_keyboard);
 
 /* keyboard mode menu */
-void ui_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+void ui_mess_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+
+/* populate MESS-specific menus */
+void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu);
 
 #endif /* __UIMESS_H__ */

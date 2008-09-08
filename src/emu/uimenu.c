@@ -1431,9 +1431,6 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	int has_configs = FALSE;
 	int has_analog = FALSE;
 	int has_dips = FALSE;
-#ifdef MESS
-	int has_keyboard = FALSE;
-#endif
 
 	/* scan the input port array to see what options we need to enable */
 	for (port = machine->portconfig; port != NULL; port = port->next)
@@ -1447,10 +1444,6 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 				has_categories = TRUE;
 			if (input_type_is_analog(field->type))
 				has_analog = TRUE;
-#ifdef MESS
-			if (field->type == IPT_KEYBOARD)
-				has_keyboard = TRUE;			
-#endif
 		}
 
 	/* add input menu items */
@@ -1476,21 +1469,8 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	ui_menu_item_append(menu, CAPSTARTGAMENOUN " Information", NULL, 0, menu_game_info);
 
 #ifdef MESS
-  	/* add image info menu */
-	ui_menu_item_append(menu, "Image Information", NULL, 0, ui_menu_image_info);
-
-  	/* add image info menu */
-	ui_menu_item_append(menu, "File Manager", NULL, 0, menu_file_manager);
-
-#if HAS_WAVE
-  	/* add tape control menu */
-	if (device_find_from_machine(machine, IO_CASSETTE))
-		ui_menu_item_append(menu, "Tape Control", NULL, 0, menu_tape_control);
-#endif /* HAS_WAVE */
-
-  	/* add keyboard mode menu */
-  	if( has_keyboard && inputx_can_post(machine) )
-		ui_menu_item_append(menu, "Keyboard Mode", NULL, 0, ui_menu_keyboard_mode);
+	/* add MESS-specific menus */
+	ui_mess_main_menu_populate(machine, menu);
 #endif /* MESS */
 
 	/* add sliders menu */
