@@ -119,7 +119,7 @@ User Interface Changes:
 - Fixed a tape control bug that caused the counter to fail to update.  [Nate
   Woods]
 
-- Added "Keybaord Mode" menu to switch between emulated and natural keyboard
+- Added "Keyboard Mode" menu to switch between emulated and natural keyboard
   during emulation. [Oliver Stöneberg]
 
 - Fixed toggling through multiple cassettes in Tape Control menu [Oliver 
