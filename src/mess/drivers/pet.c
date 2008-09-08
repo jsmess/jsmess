@@ -721,8 +721,22 @@ MACHINE_DRIVER_END
 #define rom_cbm80 rom_pet80
 #define rom_cbm80pal rom_pet80pal
 
+
+
+void pet_datasette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+
+		default:									datasette_device_getinfo(devclass, state, info);
+	}
+}
+
 static SYSTEM_CONFIG_START(pet)
 	CONFIG_DEVICE(pet_cartslot_getinfo)
+	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM(8 * 1024)
@@ -732,6 +746,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pet2)
 	CONFIG_DEVICE(pet_cartslot_getinfo)
+	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM(8 * 1024)
@@ -741,6 +756,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pet4)
 	CONFIG_DEVICE(pet4_cartslot_getinfo)
+	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM(8 * 1024)
@@ -750,6 +766,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pet4_32)
 	CONFIG_DEVICE(pet4_cartslot_getinfo)
+	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END

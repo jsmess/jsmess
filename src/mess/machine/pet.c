@@ -17,6 +17,7 @@
 #include "includes/pet.h"
 
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
@@ -40,6 +41,10 @@ UINT8 *pet_memory;
 UINT8 *superpet_memory;
 UINT8 *pet_videoram;
 static UINT8 *pet80_bank1_base;
+
+static emu_timer *datasette1_timer;
+static emu_timer *datasette2_timer;
+
 
 static READ8_HANDLER( pet_mc6845_register_r )
 {
@@ -77,8 +82,15 @@ static  READ8_HANDLER ( pet_pia0_port_a_read )
 {
 	int data = 0xf0 | pet_keyline_select;
 
+	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		data &= ~0x10;
+
+	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 1)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		data &= ~0x20;
+
 	if (!cbm_ieee_eoi_r()) 
-		data&=~0x40;
+		data &= ~0x40;
+
 	return data;
 }
 
@@ -131,10 +143,33 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 	return data;
 }
 
+/* NOT WORKING - Just placeholder */
+static READ8_HANDLER( pet_pia0_ca1_in )
+{
+	// cassette 1 read
+	return (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+}
+
+
 static WRITE8_HANDLER( pet_pia0_ca2_out )
 {
 	cbm_ieee_eoi_w(0, data);
 }
+
+static WRITE8_HANDLER( pet_pia0_cb2_out )
+{
+	if (!data)
+	{
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		timer_adjust_periodic(datasette1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
+	}
+	else
+	{
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		timer_reset(datasette1_timer, attotime_never);
+	}
+}
+
 
 static void pet_irq (running_machine *machine, int level)
 {
@@ -192,14 +227,14 @@ static const pia6821_interface pet_pia0 =
 {
 	pet_pia0_port_a_read,		/* in_a_func */
 	pet_pia0_port_b_read,		/* in_b_func */
-	NULL,						/* in_ca1_func */
+	pet_pia0_ca1_in,			/* in_ca1_func */
 	NULL,						/* in_cb1_func */
 	NULL,						/* in_ca2_func */
 	NULL,						/* in_cb2_func */
 	pet_pia0_port_a_write,		/* out_a_func */
 	NULL,						/* out_b_func */
 	pet_pia0_ca2_out,			/* out_ca2_func */
-	NULL,						/* out_cb2_func */
+	pet_pia0_cb2_out,			/* out_cb2_func */
 	NULL,						/* irq_a_func */
 	pet_irq						/* irq_b_func */
 };
@@ -208,14 +243,14 @@ static const pia6821_interface petb_pia0 =
 {
 	pet_pia0_port_a_read,		/* in_a_func */
 	petb_pia0_port_b_read,		/* in_b_func */
-	NULL,						/* in_ca1_func */
+	pet_pia0_ca1_in,			/* in_ca1_func */
 	NULL,						/* in_cb1_func */
 	NULL,						/* in_ca2_func */
 	NULL,						/* in_cb2_func */
 	pet_pia0_port_a_write,		/* out_a_func */
 	NULL,						/* out_b_func */
 	pet_pia0_ca2_out,			/* out_ca2_func */
-	NULL,						/* out_cb2_func */
+	pet_pia0_cb2_out,			/* out_cb2_func */
 	NULL,						/* irq_a_func */
 	pet_irq						/* irq_b_func */
 };
@@ -262,7 +297,20 @@ static  READ8_HANDLER( pet_via_port_b_r )
 {
 	UINT8 data = 0;
 
-	if (cbm_ieee_ndac_r()) data |= 1;
+	if (cbm_ieee_ndac_r()) data |= 0x01;
+
+	//	data & 0x08 -> cassette write (it seems to BOTH cassettes from schematics)
+
+	if (!(data & 0x10))
+	{
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
+	}
+	else
+	{
+		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		timer_reset(datasette2_timer, attotime_never);
+	}
 
 	if (cbm_ieee_nrfd_r()) data |= 0x40;
 
@@ -270,6 +318,14 @@ static  READ8_HANDLER( pet_via_port_b_r )
 
 	return data;
 }
+
+/* NOT WORKING - Just placeholder */
+static READ8_HANDLER( pet_via_cb1_r )
+{
+	// cassette 2 read
+	return (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+}
+
 
 static WRITE8_HANDLER( pet_via_port_b_w )
 {
@@ -283,7 +339,7 @@ static const struct via6522_interface pet_via =
 	NULL,					/* in_a_func */
 	pet_via_port_b_r,		/* in_b_func */
 	NULL,					/* in_ca1_func */
-	NULL,					/* in_cb1_func */
+	pet_via_cb1_r,			/* in_cb1_func */
 	NULL,					/* in_ca2_func */
 	NULL,					/* in_cb2_func */
 	NULL,					/* out_a_func */
@@ -499,6 +555,24 @@ static TIMER_CALLBACK(pet_interrupt)
 	level = !level;
 }
 
+
+/* NOT WORKING - Just placeholder */
+static TIMER_CALLBACK( pet_tape1_timer )
+{
+//	cassette 1
+	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	pia_0_ca1_w(machine, 0, data);
+}
+
+/* NOT WORKING - Just placeholder */
+static TIMER_CALLBACK( pet_tape2_timer )
+{
+//	cassette 2
+	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 1)) > +0.0) ? 1 : 0;
+	via_0_cb1_w(machine, 0, data);
+}
+
+
 static void pet_common_driver_init(running_machine *machine)
 {
 	int i;
@@ -525,6 +599,11 @@ static void pet_common_driver_init(running_machine *machine)
 
 	/* pet clock */
 	timer_pulse(ATTOTIME_IN_MSEC(10), NULL, 0, pet_interrupt);
+
+	/* datasette */
+	datasette1_timer = timer_alloc(pet_tape1_timer, NULL);
+	datasette2_timer = timer_alloc(pet_tape2_timer, NULL);
+
 
 	via_config(0, &pet_via);
 	pia_config(1, &pet_pia1);
