@@ -1,4 +1,4 @@
-0.127.1
+﻿0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -54,6 +54,10 @@ System Driver Changes:
   had plugged your joystick in port 2). This helps with games which expect 
   joystick inputs from port 2 of the C64 [Fabio Priuli]
 
+- [C64] Fixed memory leaks with floppies [Oliver Stöneberg]
+
+- [C64] Fixed floppy unmounting [Oliver Stöneberg]
+
 - [C65] Added preliminary cartridge support through MESS core functions. 
   Currently, .crt emulation uses unmodified C64 cart code and therefore 
   is not working [Fabio Priuli]
@@ -103,6 +107,8 @@ System Driver Changes:
   and improved quickloading so that the CHIP-8 interpreter is automatically
   loaded alongside .c8 files. [Curt Coder]
 
+- [X68000] Fixed SASI harddisk device info [Oliver Stöneberg]
+
 
 
 User Interface Changes:
@@ -112,6 +118,12 @@ User Interface Changes:
   
 - Fixed a tape control bug that caused the counter to fail to update.  [Nate
   Woods]
+
+- Added "Keybaord Mode" menu to switch between emulated and natural keyboard
+  during emulation. [Oliver Stöneberg]
+
+- Fixed toggling through multiple cassettes in Tape Control menu [Oliver 
+  Stöneberg]
 
 
 
@@ -128,6 +140,9 @@ Source Changes:
 
 - Refactored ZIP path code out of src/mess/image.c, made more testable.  [Nate
   Woods]
+
+- Removed MESS_DEBUG and the TESTDRIVER define and enabled a lot of 
+  non-working drivers [Oliver Stöneberg]
 
 
 
