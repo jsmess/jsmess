@@ -6,13 +6,15 @@
 
 *********************************************************************/
 
-#ifndef CHEATMS_H
-#define CHEATMS_H
+#pragma once
 
-extern UINT32				thisGameCRC;
+#ifndef __CHEATMS_H__
+#define __CHEATMS_H__
 
-void InitMessCheats(running_machine *machine);
-void StopMessCheats(void);
-int MatchesCRCTable(UINT32 crc);
+extern UINT32 this_game_crc;
 
-#endif /* CHEATMS_H */
+void cheat_mess_init(running_machine *machine);
+void cheat_mess_exit(void);
+int cheat_mess_matches_crc_table(UINT32 crc);
+
+#endif /* __CHEATMS_H__ */

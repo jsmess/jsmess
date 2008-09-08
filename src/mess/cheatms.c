@@ -17,9 +17,9 @@
     GLOBALS
 ***************************************************************************/
 
-static UINT32				* deviceCRCList = NULL;
-static INT32				deviceCRCListLength = 0;
-UINT32				thisGameCRC = 0;
+static UINT32 *device_crc_list = NULL;
+static INT32 device_crc_list_length = 0;
+UINT32 this_game_crc = 0;
 
 
 
@@ -27,16 +27,16 @@ UINT32				thisGameCRC = 0;
     CODE
 ***************************************************************************/
 
-static void BuildCRCTable(running_machine *machine)
+static void build_crc_table(running_machine *machine)
 {
 	int	listIdx;
 	const device_config *img;
 
-	free(deviceCRCList);
+	free(device_crc_list);
 
-	// allocate list with single member (0x00000000)
-	deviceCRCList = calloc(1, sizeof(UINT32));
-	deviceCRCListLength = 1;
+	/* allocate list with single member (0x00000000) */
+	device_crc_list = calloc(1, sizeof(UINT32));
+	device_crc_list_length = 1;
 
 	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
 	{
@@ -45,9 +45,9 @@ static void BuildCRCTable(running_machine *machine)
 			UINT32	crc = image_crc(img);
 			int		isUnique = 1;
 
-			for(listIdx = 0; listIdx < deviceCRCListLength; listIdx++)
+			for(listIdx = 0; listIdx < device_crc_list_length; listIdx++)
 			{
-				if(deviceCRCList[listIdx] == crc)
+				if(device_crc_list[listIdx] == crc)
 				{
 					isUnique = 0;
 
@@ -57,47 +57,47 @@ static void BuildCRCTable(running_machine *machine)
 
 			if(isUnique)
 			{
-				if(!thisGameCRC)
-					thisGameCRC = crc;
+				if(!this_game_crc)
+					this_game_crc = crc;
 
-				deviceCRCList = realloc(deviceCRCList, (deviceCRCListLength + 1) * sizeof(UINT32));
+				device_crc_list = realloc(device_crc_list, (device_crc_list_length + 1) * sizeof(UINT32));
 
-				deviceCRCList[deviceCRCListLength] = crc;
-				deviceCRCListLength++;
+				device_crc_list[device_crc_list_length] = crc;
+				device_crc_list_length++;
 			}
 		}
 	}
 }
 
 
-void InitMessCheats(running_machine *machine)
+void cheat_mess_init(running_machine *machine)
 {
-	deviceCRCList =			NULL;
-	deviceCRCListLength =	0;
-	thisGameCRC =			0;
+	device_crc_list = NULL;
+	device_crc_list_length = 0;
+	this_game_crc =	0;
 
-	BuildCRCTable(machine);
+	build_crc_table(machine);
 }
 
 
 
-void StopMessCheats(void)
+void cheat_mess_exit(void)
 {
-	free(deviceCRCList);
-	deviceCRCList = NULL;
+	free(device_crc_list);
+	device_crc_list = NULL;
 
-	deviceCRCListLength = 0;
-	thisGameCRC = 0;
+	device_crc_list_length = 0;
+	this_game_crc = 0;
 }
 
 
 
-int MatchesCRCTable(UINT32 crc)
+int cheat_mess_matches_crc_table(UINT32 crc)
 {
-	int	i;
+	int i;
 
-	for(i = 0; i < deviceCRCListLength; i++)
-		if(deviceCRCList[i] == crc)
+	for(i = 0; i < device_crc_list_length; i++)
+		if(device_crc_list[i] == crc)
 			return 1;
 
 	return 0;
