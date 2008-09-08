@@ -1154,7 +1154,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		value &= ~input_port_read(machine, c64ports[i]);
 
 		/* Shift Lock is mapped on Left Shift */
-		if ((i == 1) && (input_port_read(machine, "SPECIAL") & 0x40))
+		if ((i == 1) && (input_port_read(machine, "SPECIAL") & 0x40) && !is_c128(machine))	// Fix Me! Currently, neither left Shift nor Shift Lock works in c128, but reading this in c128 produces a bug!
 			value &= ~0x80;			
 
 		c64_keyline[i] = value;

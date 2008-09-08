@@ -7,7 +7,7 @@
  *
  *		TO DO:
  *
- *		- investigate C128 inputs problems (bugzilla #1240)
+ *		- investigate C128 input problem with Left Shift / Shift Lock
  *		- investigate superpet different reading of Caps Lock (check machine/pet.c)
  *		- move here lightpen inputs from vc20.c, eventually
  *		- clean up the "SPECIAL" and "CFG" input ports (e.g. there a quite a lot
