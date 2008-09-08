@@ -81,11 +81,21 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 {
 	astring *timepos = astring_alloc();
 	cassette_state state;
+	int count = device_count(machine, IO_CASSETTE);
+	UINT32 flags = 0;
+
+	if( count > 0 )
+	{
+		if( menustate->index == (count-1) )
+			flags |= MENU_FLAG_LEFT_ARROW;
+		else
+			flags |= MENU_FLAG_RIGHT_ARROW;
+	}
 
 	if (image_exists(menustate->device))
 	{
 		/* name of tape */
-		ui_menu_item_append(menu, image_typename_id(menustate->device), image_filename(menustate->device), 0, NULL);
+		ui_menu_item_append(menu, image_typename_id(menustate->device), image_filename(menustate->device), flags, NULL);
 
 		/* state */
 		tapecontrol_gettime(timepos, menustate->device, NULL, NULL);
@@ -120,7 +130,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 	else
 	{
 		/* no tape loaded */
-		ui_menu_item_append(menu, ui_getstring(UI_notapeimageloaded), NULL, 0, NULL);
+		ui_menu_item_append(menu, ui_getstring(UI_notapeimageloaded), NULL, flags, NULL);
 	}
 
 	if (timepos != NULL)
