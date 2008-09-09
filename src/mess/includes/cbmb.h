@@ -25,7 +25,7 @@ extern UINT8 *cbmb_colorram;
 
 WRITE8_HANDLER ( cbmb_colorram_w );
 
-DRIVER_INIT( cbm500 );
+DRIVER_INIT( p500 );
 DRIVER_INIT( cbm600 );
 DRIVER_INIT( cbm600pal );
 DRIVER_INIT( cbm600hu );

@@ -611,6 +611,15 @@ static void pet_common_driver_init(running_machine *machine)
 	cbm_ieee_open();
 }
 
+
+DRIVER_INIT( pet2001 )
+{
+	pet_basic1 = 1;
+	pet_common_driver_init(machine);
+	pia_config(0, &pet_pia0);
+	pet_vh_init(machine);
+}
+
 DRIVER_INIT( pet )
 {
 	pet_common_driver_init(machine);
@@ -625,14 +634,6 @@ DRIVER_INIT( petb )
 	pet_vh_init(machine);
 }
 
-DRIVER_INIT( pet1 )
-{
-	pet_basic1 = 1;
-	pet_common_driver_init(machine);
-	pia_config(0, &pet_pia0);
-	pet_vh_init(machine);
-}
-
 DRIVER_INIT( pet40 )
 {
 	pet_common_driver_init(machine);
@@ -640,7 +641,7 @@ DRIVER_INIT( pet40 )
 	pet_vh_init(machine);
 }
 
-DRIVER_INIT( cbm80 )
+DRIVER_INIT( pet80 )
 {
 	cbm8096 = 1;
 	pet_memory = memory_region(machine, "main");

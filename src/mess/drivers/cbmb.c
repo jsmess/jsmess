@@ -9,153 +9,91 @@
 ***************************************************************************/
 
 /*
-CBM B Series:   6509 @ 2MHz, 6545/6845 Video, 6526 CIA, 6581 SID, BASIC 4.0+
-                (Sometimes called BASIC 4.5)
-                Commodore differentiated between the HP (High Profile) and
-                LP (Low Profile) series by naming all HP machine CBM.
-                (B128-80HP was CBM128-80).  Also, any machine with optional
-                8088 CPU card had 'X' after B or CBM (BX128-80).
-* CBM B128-80HP 128kB, Detached Keyboard, Cream.                            GP
-* CBM B128-80LP 128kB, One-Piece, Cream, New Keyboard.                      GP
-* CBM B256-80HP 256kB, Detached Keyboard, Cream.
-* CBM B256-80LP 256kB, One-Piece, Cream.                                    GP
-* CBM B128-40   6567, 6581, 6509, 6551, 128kB.  In B128-80LP case.
-  CBM B256-40   6567, 6581, 6509, 6551, 256kB.  In B128-80LP case.
-* CBM B500
-* CBM B500      256kB. board same as B128-80.                               GP
 
-CBM 500 Series: 6509, 6567, 6581, 6551.
-                Sometimes called PET II series.
-* CBM 500       256kB. (is this the 500, or should it 515?)                 EC
-* CBM 505       64kB.
-* CBM 510       128kB.
-* CBM P500      64kB                                                        GP
+2008 - Driver Updates 
+---------------------
 
-CBM 600 Series: Same as B series LP
-* CBM 610       B128-80 LP                                                  CS
-* CBM 620       B256-80 LP                                                  CS
+(most of the informations are taken from http://www.zimmers.net/cbmpics/ )
+(according to http://ca.geocities.com/sjgray@rogers.com/CBM/index.html there
+are MANY more models in this family... but I haven't found confirmations, nor
+dumps)
 
-CBM 700 Series: Same as B series HP.  Also named PET 700 Series
-* CBM 700       B128-80 LP (Note this unit is out of place here)
-* CBM 710       B128-80 HP                                                  SL
-* CBM 720       B256-80 HP                                                  GP
-* CBM 730       720 with 8088 coprocessor card
+[CBM systems which belong to this driver]
 
-CBM B or II Series
-B128-80LP/610/B256-80LP/620
-Pet700 Series B128-80HP/710/B256-80HP/720/BX256-80HP/730
----------------------------
-M6509 2 MHZ
-CRTC6545 6845 video chip
-RS232 Port/6551
-TAPE Port
-IEEE488 Port
-ROM Port
-Monitor Port
-Audio
-reset
-internal user port
-internal processor/dram slot
- optional 8088 cpu card
-2 internal system bus slots
+* Commodore CBM-II Series (1983)
 
-LP/600 series
--------------
-case with integrated powersupply
+  Notice that, despite the Datasette port present on the board, the BASIC ROMs
+miss the routines needed to actually load from a tape
 
-HP/700 series
--------------
-separated keyboard, integrated monitor, no monitor port
-no standard monitor with tv frequencies, 25 character lines
-with 14 lines per character (like hercules/pc mda)
+  Various models:
 
-B128-80LP/610
--------------
-128 KB RAM
+U.S. name			EU name		RAM
 
-B256-80LP/620
--------------
-256 KB RAM
+B500 (*)			-			128k
+B128				CBM 610		128k
+B256				CBM 620		256k
+B128-80HP (**)		CBM 710		128k
+B256-80HP (**)		CBM 720		256k
+BX256-80HP (***)	CBM 730		256k
 
-B128-80HP/710
--------------
-128 KB RAM
+(*) Prototype for the B128? As you can read at http://www.zimmers.net/cbmpics/cb500.html
+	the naming of these machines is not clear: either they were B500/128 & 
+	B500/256 or B128 & B256. However, these names always refer to the low 
+	profile models.
+(**) HP stands for High Profile. The other systems were the low profile models.
+	HP machines had a detachable keyboard
+(***) Additional 8088 CPU present
 
-B256-80HP/720
--------------
-256 KB RAM
-
-BX256-80LP/730
---------------
-(720 with cpu upgrade)
-8088 upgrade CPU
-
-CBM Pet II Series
-500/505/515/P500/B128-40/B256-40
---------------------------------
-LP/600 case
-videochip vic6567
-2 gameports
-m6509 clock 1? MHZ
-
-CBM 500
--------
-256 KB RAM
-
-CBM 505/P500
--------
-64 KB RAM
-
-CBM 510
--------
-128 KB RAM
+CPU: MOS 6509 (2 mhz)
+RAM: 128 Kilobytes (Expandable to 256k internal, 704k external)
+ROM: 24 Kilobytes
+Video: MOS 6545 CTRC (Text: 80 columns, 25 rows)
+Sound: MOS 6581 SID (3 voice stereo synthesizer/digital sound capabilities)
+Ports: CSG 6551/6525x2/6526 (IEEE-488 port; CBM Datasette port; RS232 port;
+	CBM Monitor port; CBM-II/PET-II expansion port; 1 RCA audio port; Power 
+	and reset switches 
+Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction 
+	cursor-pad)
 
 
-state
------
-keyboard
-no sound
-no tape support
- no system roms supporting build in tape connector found
-no ieee488 support
- no floppy support
-no internal userport support
-no internal slot1/slot2 support
-no internal cpu/dram slot support
-preliminary quickloader
+* Commodore PET-II Series (1983)
 
-state 600/700
--------------
-dirtybuffer based video system
- no lightpen support
- no rasterline
+  This series only features the P500 machine, which never even reached the 
+market. In this machine, the Datasette port can be used (the BASIC ROMs 
+contain the necessary routines). It is also probably know as C128-40.
+  
+CPU: CSG 6509 (1 Mhz)
+RAM: 128 kilobytes, expandable to 720k
+ROM: 24 kilobytes
+Video: CSG 6569 "VIC-II" (320 x 200 Hi-Resolution; 40 columns text; Palette 
+	of 16 colors)
+Sound: CSG 6581 "SID" (3 voice stereo synthesizer/digital sound capabilities)
+Ports: CSG 6551/6522 (2 Joystick/Mouse ports; IEEE-488 port; CBM Datasette 
+	port; RS232 port; CBM Monitor port; CBM-II/PET-II expansion port; 1 RCA 
+	audio port; Power and reset switches)
+Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction 
+	cursor-pad)
 
-state 500
------
-rasterline based video system
- no lightpen support
- no rasterline support
- memory access not complete
-no gameport a
- no paddles 1,2
- no joystick 1
- no 2 button joystick/mouse joystick emulation
- no mouse
- no lightpen
-no gameport b
- paddles 3,4
- joystick 2
- 2 button joystick/mouse joystick emulation
- no mouse
+[To Do]
 
-Keys
-----
-Some PC-Keyboards does not behave well when special two or more keys are
-pressed at the same time
-(with my keyboard printscreen clears the pressed pause key!)
+* Support is still missing for: Sound, IEEE488, Floppy, internal slots 
 
-when problems start with -log and look into error.log file
- */
+* Emulate 8088 co-processor for BX-256HP and eventually add its European
+	counterpart CBM 730
+
+* Add better P500 emulation (almost everything: memory access, inputs, 
+	Datasette, etc.)
+
+* Was CBM 710 / 720 monitor at 50Hz? If not remove MACHINE_DRIVER_START(cbm700pal)
+	and use the 60Hz version for the whole High Profile
+
+* Find info about the following models (if ever existed):
+	+ BX128-80HP
+	+ CBM 700
+	+ CBM 505, CBM 510 (these seems proto as CBM 500 but with less RAM, 64 
+		& 128)
+*/
+
 
 #include "driver.h"
 #include "cpu/m6502/m6509.h"
@@ -171,6 +109,14 @@ when problems start with -log and look into error.log file
 #include "includes/vc1541.h"
 
 #include "includes/cbmb.h"
+
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+
 
 static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0xf07ff) AM_READ( SMH_RAM )
@@ -219,7 +165,7 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_kernal )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbm500_readmem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( p500_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0xf07ff) AM_READ( SMH_RAM )
 #if 0
 	AM_RANGE(0xf0800, 0xf0fff) AM_READ( SMH_ROM )
@@ -243,7 +189,7 @@ static ADDRESS_MAP_START( cbm500_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfe000, 0xfffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbm500_writemem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( p500_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x1ffff) AM_WRITE( SMH_RAM )
 	AM_RANGE(0x20000, 0x2ffff) AM_WRITE( SMH_NOP )
 	AM_RANGE(0x30000, 0x7ffff) AM_WRITE( SMH_RAM )
@@ -275,7 +221,7 @@ ADDRESS_MAP_END
  *************************************/
 
 
-static INPUT_PORTS_START (cbm500)
+static INPUT_PORTS_START( p500 )
 	PORT_INCLUDE( cbmb_keyboard )			/* ROW0 -> ROW11 */
 
 	PORT_INCLUDE( cbmb_special )			/* SPECIAL */
@@ -286,8 +232,8 @@ static INPUT_PORTS_START (cbm500)
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START (cbm600)
-	PORT_INCLUDE( cbm500 )
+static INPUT_PORTS_START( cbm600 )
+	PORT_INCLUDE( p500 )
 
 	PORT_MODIFY("ROW0")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Graph  Norm") PORT_CODE(KEYCODE_PGUP)
@@ -295,8 +241,8 @@ static INPUT_PORTS_START (cbm600)
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START (cbm600pal)
-	PORT_INCLUDE( cbm500 )
+static INPUT_PORTS_START( cbm600pal )
+	PORT_INCLUDE( p500 )
 
 	PORT_MODIFY("ROW0")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Graph  Norm") PORT_CODE(KEYCODE_HOME)
@@ -304,14 +250,21 @@ static INPUT_PORTS_START (cbm600pal)
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START (cbm700)
-	PORT_INCLUDE( cbm500 )
+static INPUT_PORTS_START( cbm700 )
+	PORT_INCLUDE( p500 )
 
 	PORT_MODIFY("ROW0")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RVS  Off") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Graph  Norm") PORT_CODE(KEYCODE_PGUP)
 INPUT_PORTS_END
 
+
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 
 static const unsigned char cbm700_palette[] =
@@ -373,134 +326,6 @@ static PALETTE_INIT( cbm700 )
 	}
 }
 
-ROM_START (cbm610)
-	ROM_REGION (0x100000, "main", 0)
-	ROM_LOAD ("901243.04a", 0xf8000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96))
-	ROM_LOAD ("901242.04a", 0xfa000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908))
-	ROM_LOAD ("901244.04a", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439))
-	ROM_REGION (0x2000, "gfx1", 0)
-    ROM_LOAD ("901237.01", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102))
-ROM_END
-
-ROM_START (cbm620)
-	ROM_REGION (0x100000, "main", 0)
-    ROM_LOAD ("901241.03", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42))
-    ROM_LOAD ("901240.03", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce))
-    ROM_LOAD ("901244.04a", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439))
-	ROM_REGION (0x2000, "gfx1", 0)
-    ROM_LOAD ("901237.01", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102))
-ROM_END
-
-ROM_START (cbm620hu)
-	ROM_REGION (0x100000, "main", 0)
-	ROM_LOAD ("610u60.bin", 0xf8000, 0x4000, CRC(8eed0d7e) SHA1(9d06c5c3c012204eaaef8b24b1801759b62bf57e))
-	ROM_LOAD ("kernhun.bin", 0xfe000, 0x2000, CRC(0ea8ca4d) SHA1(9977c9f1136ee9c04963e0b50ae0c056efa5663f))
-	ROM_REGION (0x2000, "gfx1", 0)
-	ROM_LOAD ("charhun.bin", 0x0000, 0x2000, CRC(1fb5e596) SHA1(3254e069f8691b30679b19a9505b6afdfedce6ac))
-ROM_END
-
-ROM_START (cbm710)
-	ROM_REGION (0x100000, "main", 0)
-	ROM_LOAD ("901243.04a", 0xf8000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96))
-	ROM_LOAD ("901242.04a", 0xfa000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908))
-	ROM_LOAD ("901244.04a", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439))
-	ROM_REGION (0x2000, "gfx1", 0)
-    ROM_LOAD ("901232.01", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287))
-ROM_END
-
-ROM_START (cbm720)
-	ROM_REGION (0x100000, "main", 0)
-    ROM_LOAD ("901241.03", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42))
-    ROM_LOAD ("901240.03", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce))
-    ROM_LOAD ("901244.04a", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439))
-	ROM_REGION (0x2000, "gfx1", 0)
-    ROM_LOAD ("901232.01", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287))
-ROM_END
-
-ROM_START (cbm720se)
-	ROM_REGION (0x100000, "main", 0)
-    ROM_LOAD ("901241.03", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42))
-    ROM_LOAD ("901240.03", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce))
-    ROM_LOAD ("901244.03", 0xfe000, 0x2000, CRC(87bc142b) SHA1(fa711f6082741b05a9c80744f5aee68dc8c1dcf4))
-	ROM_REGION (0x2000, "gfx1", 0)
-    ROM_LOAD ("901233.03", 0x0000, 0x1000, CRC(09518b19) SHA1(2e28491e31e2c0a3b6db388055216140a637cd09))
-ROM_END
-
-
-ROM_START (cbm500)
-	ROM_REGION (0x101000, "main", 0)
-	ROM_LOAD ("901236.02", 0xf8000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca))
-	ROM_LOAD ("901235.02", 0xfa000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841))
-	ROM_LOAD ("901234.02", 0xfe000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523))
-	ROM_LOAD ("901225.01", 0x100000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-ROM_END
-
-#if 0
-/* in c16 and some other commodore machines:
-   cbm version in kernel at 0xff80 (offset 0x3f80)
-   0x80 means pal version */
-
-    /* scrap */
-	 /* 0000 1fff --> 0000
-                      inverted 2000
-        2000 3fff --> 4000
-                      inverted 6000 */
-
-	 /* 128 kb basic version */
-    ROM_LOAD ("b128-8000.901243-02b.bin", 0xf8000, 0x2000, CRC(9d0366f9))
-    ROM_LOAD ("b128-a000.901242-02b.bin", 0xfa000, 0x2000, CRC(837978b5))
-	 /* merged df83bbb9 */
-
-    ROM_LOAD ("b128-8000.901243-04a.bin", 0xf8000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96))
-    ROM_LOAD ("b128-a000.901242-04a.bin", 0xfa000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908))
-	 /* merged a8ff9372 */
-
-	 /* some additions to 901242-04a */
-    ROM_LOAD ("b128-a000.901242-04_3f.bin", 0xfa000, 0x2000, CRC(5a680d2a))
-
-     /* 256 kbyte basic version */
-    ROM_LOAD ("b256-8000.610u60.bin", 0xf8000, 0x4000, CRC(8eed0d7e) SHA1(9d06c5c3c012204eaaef8b24b1801759b62bf57e))
-
-    ROM_LOAD ("b256-8000.901241-03.bin", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42))
-    ROM_LOAD ("b256-a000.901240-03.bin", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce))
-	 /* merged 5db15870 */
-
-     /* monitor instead of tape */
-    ROM_LOAD ("kernal.901244-03b.bin", 0xfe000, 0x2000, CRC(4276dbba))
-     /* modified 03b for usage of vc1541 on tape port ??? */
-    ROM_LOAD ("kernelnew", 0xfe000, 0x2000, CRC(19bf247e))
-    ROM_LOAD ("kernal.901244-04a.bin", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439))
-    ROM_LOAD ("kernal.hungarian.bin", 0xfe000, 0x2000, CRC(0ea8ca4d) SHA1(9977c9f1136ee9c04963e0b50ae0c056efa5663f))
-
-
-	 /* 600 8x16 chars for 8x8 size
-        128 ascii, 128 ascii graphics
-        inversion logic in hardware */
-    ROM_LOAD ("characters.901237-01.bin", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102))
-	 /* packing 128 national, national graphics, ascii, ascii graphics */
-    ROM_LOAD ("characters-hungarian.bin", 0x0000, 0x2000, CRC(1fb5e596) SHA1(3254e069f8691b30679b19a9505b6afdfedce6ac))
-	 /* 700 8x16 chars for 9x14 size*/
-    ROM_LOAD ("characters.901232-01.bin", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287))
-
-    ROM_LOAD ("vt52emu.bin", 0xf4000, 0x2000, CRC(b3b6173a))
-	 /* load address 0xf4000? */
-    ROM_LOAD ("moni.bin", 0xfe000, 0x2000, CRC(43b08d1f))
-
-    ROM_LOAD ("profitext.bin", 0xf2000, 0x2000, CRC(ac622a2b))
-	 /* address ?*/
-    ROM_LOAD ("sfd1001-copy-u59.bin", 0xf1000, 0x1000, CRC(1c0fd916))
-
-    ROM_LOAD ("", 0xfe000, 0x2000, CRC())
-
-	 /* 500 */
-	 /* 128 basic, other colors than cbmb series basic */
-    ROM_LOAD ("basic-lo.901236-02.bin", 0xf8000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca))
-    ROM_LOAD ("basic-hi.901235-02.bin", 0xfa000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841))
-     /* monitor instead of tape */
-    ROM_LOAD ("kernal.901234-02.bin", 0xfe000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523))
-    ROM_LOAD ("characters.901225-01.bin", 0x100000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-
-#endif
 
 static const mc6845_interface cbm600_crtc = {
 	"main",
@@ -525,6 +350,13 @@ static const mc6845_interface cbm700_crtc = {
 	NULL,
 	NULL
 };
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 
 static MACHINE_DRIVER_START( cbm600 )
@@ -570,7 +402,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( cbm700 )
-	MDRV_IMPORT_FROM( cbm600pal )
+	MDRV_IMPORT_FROM( cbm600 )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(720, 350)
 	MDRV_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
@@ -583,10 +415,24 @@ static MACHINE_DRIVER_START( cbm700 )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( cbm500 )
+static MACHINE_DRIVER_START( cbm700pal )
+	MDRV_IMPORT_FROM( cbm700 )
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_REFRESH_RATE(50)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( bx256hp )
+	MDRV_IMPORT_FROM( cbm700 )
+
+//	MDRV_CPU_ADD("8088", I8088, /* ? */)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( p500 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6509, VIC6567_CLOCK)        /* 7.8336 Mhz */
-	MDRV_CPU_PROGRAM_MAP(cbm500_readmem, cbm500_writemem)
+	MDRV_CPU_PROGRAM_MAP(p500_readmem, p500_writemem)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 	MDRV_INTERLEAVE(0)
 
@@ -604,23 +450,189 @@ static MACHINE_DRIVER_START( cbm500 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(cbm500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_QUICKLOAD_ADD(p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+
+/* Low Profile Series - CBM 600 Series */
+/* chargen: 8x16 chars for 8x8 size; 128 ascii, 128 ascii graphics; inversion logic in hardware */
+
+ROM_START( b500 )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD( "901243-01.u59",  0xf8000, 0x2000, CRC(22822706) SHA1(901bbf59d8b8682b481be8b2de99b406fffa4bab) )
+	ROM_LOAD( "901242-01a.u60", 0xfa000, 0x2000, CRC(ef13d595) SHA1(2fb72985d7d4ab69c5780179178828c931a9f5b0) )
+	ROM_LOAD( "901244-01.u61",  0xfe000, 0x2000, CRC(93414213) SHA1(a54a593dbb420ae1ac39b0acde9348160f7840ff) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
+ROM_END
+
+ROM_START( b128 )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
+	ROMX_LOAD( "901243-04a.u59", 0xf8000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-04a.u60", 0xfa000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-04a.u61", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "older", "BASIC 4.0" )
+	ROMX_LOAD( "901243-02b.u59", 0xf8000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(2) )
+	ROMX_LOAD( "901242-02b.u60", 0xfa000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-03b.u61", 0xfe000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
+ROM_END
+
+ROM_START( b256 )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
+	ROMX_LOAD( "901244-04a.u61", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "older", "BASIC 4.0" )
+	ROMX_LOAD( "901244-03b.u61", 0xfe000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
+ROM_END
+
+
+#define rom_cbm610		rom_b128
+#define rom_cbm620		rom_b256
+
+
+ROM_START( cbm620hu )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD( "610.u60", 0xf8000, 0x4000, CRC(8eed0d7e) SHA1(9d06c5c3c012204eaaef8b24b1801759b62bf57e) )
+	ROM_LOAD( "kernhun.bin", 0xfe000, 0x2000, CRC(0ea8ca4d) SHA1(9977c9f1136ee9c04963e0b50ae0c056efa5663f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "charhun.bin", 0x0000, 0x2000, CRC(1fb5e596) SHA1(3254e069f8691b30679b19a9505b6afdfedce6ac) )
+ROM_END
+
+
+/* High Profile Series - CBM 700 Series */
+/* chargen: 8x16 chars for 9x14 size */
+
+ROM_START( b128hp )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
+	ROMX_LOAD( "901243-04a.u59", 0xf8000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-04a.u60", 0xfa000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-04a.u61", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "older", "BASIC 4.0" )
+	ROMX_LOAD( "901243-02b.u59", 0xf8000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(2) )
+	ROMX_LOAD( "901242-02b.u60", 0xfa000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-03b.u61", 0xfe000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
+ROM_END
+
+ROM_START( b256hp )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
+	ROMX_LOAD( "901244-04a.u61", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "older", "BASIC 4.0" )
+	ROMX_LOAD( "901244-03b.u61", 0xfe000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
+ROM_END
+
+#define rom_cbm710		rom_b128hp
+#define rom_cbm720		rom_b256hp
+
+
+/* BX-256HP - only ROM loading added */
+ROM_START( bx256hp )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
+	ROMX_LOAD( "901244-04a.u61", 0xfe000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "older", "BASIC 4.0" )
+	ROMX_LOAD( "901244-03b.u61", 0xfe000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "8088", 0)
+	ROM_LOAD( "8088.u14", 0x0000, 0x1000, CRC(195e0281) SHA1(ce8acd2a5fb6cbd70d837811d856d656544a1f97) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
+ROM_END
+
+ROM_START( cbm720se )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+	ROM_LOAD( "swe-901244-03.u61", 0xfe000, 0x2000, CRC(87bc142b) SHA1(fa711f6082741b05a9c80744f5aee68dc8c1dcf4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "901233-03.u25", 0x0000, 0x1000, CRC(09518b19) SHA1(2e28491e31e2c0a3b6db388055216140a637cd09) )
+ROM_END
+
+ROM_START( p500 )
+	ROM_REGION( 0x101000, "main", 0 )
+	ROM_SYSTEM_BIOS(0, "default", "BASIC 4.0 new" )
+	ROMX_LOAD( "901236-02.bin", 0xf8000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca), ROM_BIOS(1) )
+	ROMX_LOAD( "901235-02.bin", 0xfa000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841), ROM_BIOS(1) )
+	ROMX_LOAD( "901234-02.bin", 0xfe000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "old", "BASIC 4.0 old" )
+	ROMX_LOAD( "901236-01.bin", 0xf8000, 0x2000, CRC(33eb6aa2) SHA1(7e3497ae2edbb38c753bd31ed1bf3ae798c9a976), ROM_BIOS(2) )
+	ROMX_LOAD( "901235-01.bin", 0xfa000, 0x2000, CRC(18a27feb) SHA1(951b5370dd7db762b8504a141f9f26de345069bb), ROM_BIOS(2) )
+	ROMX_LOAD( "901234-01.bin", 0xfe000, 0x2000, CRC(67962025) SHA1(24b41b65c85bf30ab4e2911f677ce9843845b3b1), ROM_BIOS(2) )
+
+	ROM_LOAD( "901225-01.bin", 0x100000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
+ROM_END
+
+
+
+/*************************************
+ *
+ *  System configuration(s)
+ *
+ *************************************/
 
 
 static SYSTEM_CONFIG_START(cbmb)
 	CONFIG_DEVICE(cbmb_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(cbm500)
+static SYSTEM_CONFIG_START(p500)
 	CONFIG_DEVICE(cbmb_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-/*     YEAR     NAME      PARENT    COMPAT  MACHINE     INPUT       INIT        CONFIG  COMPANY                             FULLNAME */
-COMP (1983,	cbm500,	  0,		0,		cbm500,		cbm500,		cbm500,		cbm500,	"Commodore Business Machines Co.",	"Commodore B128-40/Pet-II/P500 60Hz",		GAME_NOT_WORKING)
-COMP (1983,	cbm610,   0,		0,		cbm600, 	cbm600, 	cbm600, 	cbmb,	"Commodore Business Machines Co.",  "Commodore B128-80LP/610 60Hz",             GAME_NOT_WORKING)
-COMP (1983,	cbm620,	  cbm610,	0,		cbm600pal,	cbm600pal,	cbm600pal,	cbmb,	"Commodore Business Machines Co.",	"Commodore B256-80LP/620 50Hz",	GAME_NOT_WORKING)
-COMP (1983,	cbm620hu, cbm610,	0,		cbm600pal,	cbm600pal,	cbm600hu,	cbmb,	"Commodore Business Machines Co.",	"Commodore B256-80LP/620 Hungarian 50Hz",	GAME_NOT_WORKING)
-COMP (1983,	cbm710,   cbm610,   0,		cbm700, 	cbm700, 	cbm700, 	cbmb,	"Commodore Business Machines Co.",  "Commodore B128-80HP/710",                  GAME_NOT_WORKING)
-COMP (1983,	cbm720,	  cbm610,	0,		cbm700,		cbm700,		cbm700,		cbmb,	"Commodore Business Machines Co.",	"Commodore B256-80HP/720",					GAME_NOT_WORKING)
-COMP (1983,	cbm720se, cbm610,	0,		cbm700,     cbm700,		cbm700,		cbmb,	"Commodore Business Machines Co.",	"Commodore B256-80HP/720 Swedish/Finnish",	GAME_NOT_WORKING)
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+/*    YEAR  NAME      PARENT COMPAT MACHINE     INPUT       INIT        CONFIG  COMPANY                             FULLNAME */
+
+COMP( 1983,	b500,     cbm610,   0,  cbm600,     cbm600,     cbm600,     cbmb,   "Commodore Business Machines Co.",  "B500 (proto, 60Hz)", GAME_NOT_WORKING)
+COMP( 1983,	b128,     cbm610,   0,  cbm600pal,  cbm600pal,  cbm600pal,  cbmb,   "Commodore Business Machines Co.",	"B128 (60Hz)", GAME_NOT_WORKING)
+COMP( 1983,	b256,     cbm610,   0,  cbm600pal,  cbm600pal,  cbm600hu,   cbmb,   "Commodore Business Machines Co.",	"B256 (60Hz)", GAME_NOT_WORKING)
+COMP( 1983,	cbm610,   0,        0,  cbm600,     cbm600,     cbm600,     cbmb,   "Commodore Business Machines Co.",  "CBM 610 (50Hz)", GAME_NOT_WORKING)
+COMP( 1983,	cbm620,   cbm610,   0,  cbm600pal,  cbm600pal,  cbm600pal,  cbmb,   "Commodore Business Machines Co.",	"CBM 620 (50Hz)", GAME_NOT_WORKING)
+COMP( 1983,	cbm620hu, cbm610,   0,  cbm600pal,  cbm600pal,  cbm600hu,   cbmb,   "Commodore Business Machines Co.",	"CBM 620 (Hungary, 50Hz)", GAME_NOT_WORKING)
+
+COMP( 1983, b128hp,   cbm610,   0,  cbm700,     cbm700,     cbm700,     cbmb,   "Commodore Business Machines Co.",  "B128-80HP (60Hz)", GAME_NOT_WORKING)
+COMP( 1983, b256hp,   cbm610,   0,  cbm700,     cbm700,     cbm700,     cbmb,   "Commodore Business Machines Co.",	"B256-80HP (60Hz)", GAME_NOT_WORKING)
+COMP( 1983, cbm710,   cbm610,   0,  cbm700pal,  cbm700,     cbm700,     cbmb,   "Commodore Business Machines Co.",  "CBM 710 (50Hz)", GAME_NOT_WORKING)
+COMP( 1983, cbm720,   cbm610,   0,  cbm700pal,  cbm700,     cbm700,     cbmb,   "Commodore Business Machines Co.",	"CBM 720 (50Hz)", GAME_NOT_WORKING)
+COMP( 1983, cbm720se, cbm610,   0,  cbm700pal,  cbm700,     cbm700,     cbmb,   "Commodore Business Machines Co.",	"CBM 720 (Sweden/Finland, 50Hz)", GAME_NOT_WORKING)
+
+COMP( 1983,	bx256hp,  cbm610,   0,  bx256hp,    cbm700,     cbm700,     cbmb,   "Commodore Business Machines Co.",	"BX256-80HP (60Hz)", GAME_NOT_WORKING)
+
+COMP( 1983,	p500,     0,        0,  p500,       p500,       p500,       p500,   "Commodore Business Machines Co.",	"P500 (proto, a.k.a. B128-40 or Pet-II)", GAME_NOT_WORKING)

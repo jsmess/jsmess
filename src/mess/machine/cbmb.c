@@ -42,7 +42,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt);
 /* keyboard lines */
 static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
 
-static int cbm500 = 0;
+static int p500 = 0;
 static int cbm700;
 static int cbm_ntsc;
 UINT8 *cbmb_basic;
@@ -201,7 +201,7 @@ static int cbmb_keyboard_line_c(void)
 				(input_port_read(Machine, "ROW11") & ~cbmb_keyline_b)) 
 		 data |= 0x20;
 
-	if (!cbm500) 
+	if (!p500) 
 	{
 		if (!cbm_ntsc) 
 			data |= 0x40;
@@ -303,7 +303,7 @@ static void cbmb_common_driver_init(running_machine *machine)
 
 	timer_pulse(ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);
 
-	cbm500 = 0;
+	p500 = 0;
 	cbm700 = 0;
 	cbm_ieee_open();
 }
@@ -336,10 +336,10 @@ DRIVER_INIT( cbm700 )
 	cbm700_vh_init(machine);
 }
 
-DRIVER_INIT( cbm500 )
+DRIVER_INIT( p500 )
 {
 	cbmb_common_driver_init(machine);
-	cbm500 = 1;
+	p500 = 1;
 	cbm_ntsc = 1;
 	vic6567_init(0, 0, cbmb_dma_read, cbmb_dma_read_color, NULL);
 }

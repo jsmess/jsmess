@@ -151,7 +151,7 @@ QUICKLOAD_LOAD( cbmb )
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0x10000, cbmb_quick_sethiaddress);
 }
 
-QUICKLOAD_LOAD( cbm500 )
+QUICKLOAD_LOAD( p500 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbmb_quick_sethiaddress);
 }
