@@ -298,18 +298,31 @@ XL/XE 16kB OS roms
 	DRIVER( sym1 )		/* Synertek SYM-1									*/
 	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
-	DRIVER( pet )		/* PET2001/CBM20xx Series (Basic 1)					*/
-	DRIVER( cbm30 )		/* Commodore 30xx (Basic 2)							*/
-	DRIVER( cbm30b )	/* Commodore 30xx (Basic 2) (business keyboard)		*/
-	DRIVER( cbm40 )		/* Commodore 40xx FAT (CRTC) 60Hz					*/
-	DRIVER( cbm40pal )	/* Commodore 40xx FAT (CRTC) 50Hz					*/
-	DRIVER( cbm40b )	/* Commodore 40xx THIN (business keyboard)			*/
-	DRIVER( cbm80 )		/* Commodore 80xx 60Hz								*/
-	DRIVER( cbm80pal )	/* Commodore 80xx 50Hz								*/
-	DRIVER( cbm80ger )	/* Commodore 80xx German (50Hz)						*/
-	DRIVER( cbm80swe )	/* Commodore 80xx Swedish (50Hz)					*/
-	DRIVER( superpet )	/* Commodore SP9000/MMF9000 (50Hz)					*/
-	DRIVER( mmf9000 )	/* Commodore MMF9000 Swedish						*/
+	DRIVER( pet2001 )	/* PET 2001											*/
+	DRIVER( pet2001n )	/* PET 2001-N										*/
+	DRIVER( pet2001b )	/* PET 2001-B										*/
+	DRIVER( cbm30 )		/* CBM 30xx											*/
+	DRIVER( cbm30b )	/* CBM 30xx (Business keyboard)						*/
+	DRIVER( cbm30nor )	/* CBM 30xx (Norway, Business keyboard)				*/
+	DRIVER( pet40on )	/* PET 40xx (Basic 4, no CRTC, Normal keyboard)		*/
+	DRIVER( pet40ob )	/* PET 40xx (Basic 4, no CRTC, Business keyboard)	*/
+	DRIVER( pet40n )	/* PET 40xx (Basic 4, CRTC 60Hz, 40 columns)		*/
+	DRIVER( pet40b )	/* PET 40xx (Basic 4, CRTC 60Hz, 80 columns)		*/
+	DRIVER( cbm40o )	/* CBM 40xx (Basic 4, no CRTC, Normal keyboard)		*/
+	DRIVER( cbm40ob )	/* CBM 40xx (Basic 4, no CRTC, Business keyboard)	*/
+	DRIVER( cbm40n )	/* CBM 40xx (Basic 4, CRTC 50Hz, 40 columns)		*/
+	DRIVER( cbm40b )	/* CBM 40xx (Basic 4, CRTC 50Hz, 80 columns)		*/
+	DRIVER( pet80 )		/* PET 80xx (Basic 4, CRTC 60Hz, 80 columns)		*/
+	DRIVER( cbm80 )		/* CBM 80xx (Basic 4, CRTC 50Hz, 80 columns)		*/
+	DRIVER( cbm80ger )	/* CBM 80xx (Germany, Basic 4, CRTC 50Hz, 80 cols)	*/
+	DRIVER( cbm80hun )	/* CBM 80xx (Hungary, Basic 4, CRTC 50Hz, 80 cols)	*/
+	DRIVER( cbm80swe )	/* CBM 80xx (Sweden, Basic 4, CRTC 50Hz, 80 cols)	*/
+	DRIVER( cbm8296 )	/* CBM 8296 (Basic 4, CRTC 50Hz, 80 columns)		*/
+	DRIVER( cbm8296d )	/* CBM 8296D										*/
+	DRIVER( superpet )	/* SuperPET											*/
+	DRIVER( sp9000 )	/* CBM SP9000										*/
+	DRIVER( mmf9000 )	/* MiniMainFrame 9000								*/
+	DRIVER( mmf9000s )	/* MiniMainFrame 9000 (Sweden)						*/
 
 	DRIVER( vic1001 )	/* Commodore VIC-1001 (Japan)						*/
 	DRIVER( vic20 )		/* Commodore VIC 20 (NTSC)							*/
@@ -340,13 +353,19 @@ XL/XE 16kB OS roms
 	DRIVER( c64g )		/* Commodore 64G (PAL)								*/
 	DRIVER( c64gs )		/* Commodore 64 Games System						*/
 
-	DRIVER( cbm500 )	/* Commodore 500/P128-40							*/
-	DRIVER( cbm610 )	/* Commodore 610/B128LP								*/
-	DRIVER( cbm620 )	/* Commodore 620/B256LP								*/
-	DRIVER( cbm620hu )	/* Commodore 620/B256LP Hungarian					*/
-	DRIVER( cbm710 )	/* Commodore 710/B128HP								*/
-	DRIVER( cbm720 )	/* Commodore 720/B256HP								*/
-	DRIVER( cbm720se )	/* Commodore 720/B256HP Swedish/Finnish				*/
+	DRIVER( b500 )		/* Commodore B500									*/
+	DRIVER( b128 )		/* Commodore B128									*/
+	DRIVER( b256 )		/* Commodore B256									*/
+	DRIVER( cbm610 )	/* Commodore CBM 610								*/
+	DRIVER( cbm620 )	/* Commodore CBM 620								*/
+	DRIVER( cbm620hu )	/* Commodore CBM 620 (Hungary)						*/
+	DRIVER( b128hp )	/* Commodore B128HP									*/
+	DRIVER( b256hp )	/* Commodore B256HP									*/
+	DRIVER( bx256hp )	/* Commodore BX256HP								*/
+	DRIVER( cbm710 )	/* Commodore CBM 710								*/
+	DRIVER( cbm720 )	/* Commodore CBM 720								*/
+	DRIVER( cbm720se )	/* Commodore CBM 720 (Sweden / Finland)				*/
+	DRIVER( p500 )		/* Commodore P500 (proto, a.k.a. C128-40, PET-II)	*/
 
 	DRIVER( c16 )		/* Commodore 16										*/
 	DRIVER( c16c )		/* Commodore 16  c1551								*/
