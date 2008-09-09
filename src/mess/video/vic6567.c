@@ -572,11 +572,11 @@ WRITE8_HANDLER ( vic2_port_w )
 	cycles = (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
 
 	if (cycles > VIC2_CYCLESPERLINE - 1) cycles = VIC2_CYCLESPERLINE - 1;
-	startx = VIC2_FIRSTRASTERCOLUMNS + cycles * 8;
+	startx = VIC2_FIRSTRASTERCOLUMNS + (cycles) * 8;
 	if (startx >= VIC2_COLUMNS) startx -= VIC2_COLUMNS;
 
 	// sprites chenges are active only from the next raster line
-	// FIX ME : c64 have different width
+	// FIX ME : c65 have different width, left border width is 8 pixel wrong ?!
 	if (!strncmp(machine->gamedrv->name, "c64", 3))
 	{
 		if (startx > VIC2_FIRSTRASTERCOLUMNS)
@@ -585,13 +585,13 @@ WRITE8_HANDLER ( vic2_port_w )
 				{
 					vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
 				}
-			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS - 1);
+			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
 		}
 		else
 		{
 			if (startx >= VIC2_STARTVISIBLECOLUMNS)
 			{
-				vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS - 1);
+				vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
 			}
 		}
 	}
@@ -1429,7 +1429,8 @@ INTERRUPT_GEN( vic2_raster_irq )
 	}
 	for (i=0; i < 5; i++)
 		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
-
+	//if (input_code_pressed(KEYCODE_Q)) { cpunum_suspend(0, SUSPEND_ANY_REASON, 40); cpunum_resume(0, SUSPEND_ANY_REASON); }
+	//printf("%04x    ", (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles));
 	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
 
 	if (vic2.rasterline == vic2.lines)
@@ -1445,7 +1446,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 	}
-// if (input_code_pressed(KEYCODE_Q)) activecpu_eat_cycles(1000);
+	// activecpu_eat_cycles(1000);
 
 	if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
 	{
