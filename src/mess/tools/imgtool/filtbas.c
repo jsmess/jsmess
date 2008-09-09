@@ -2271,7 +2271,7 @@ static const char *const basic_35_magic_voice[] = /* "BASIC 3.5 with Magic Voice
 	"SAY"             /* 0xfe0a */
 };
 
-static const char *const basic_40[] = /* "BASIC 4.0" - supported by cbm40xx & cbm80xx series, cbm500, cbm600 & clones */
+static const char *const basic_40[] = /* "BASIC 4.0" - supported by cbm40xx & cbm80xx series, p500, cbm600 & clones */
 {
 	"END",            /* 0x80 */
 	"FOR",            /* 0x81 */
