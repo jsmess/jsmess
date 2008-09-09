@@ -24,6 +24,10 @@
 #define VIC2_HSIZE	320
 #define VIC2_VSIZE	200
 
+#define VIC6567_CYCLESPERLINE 65
+#define VIC6569_CYCLESPERLINE 63
+#define VIC2_CYCLESPERLINE (vic2.pal?VIC6569_CYCLESPERLINE:VIC6567_CYCLESPERLINE)
+
 /* of course you clock select an other clock, but for accurate */
 /* video timing */
 #define VIC6567_CLOCK	1022730
@@ -39,8 +43,9 @@
 /* cpu driven with one (visible screen area) */
 #define VIC2_CLOCK ((vic2.pal?VIC6569_CLOCK:VIC6567_CLOCK))
 
-#define VIC6567_HRETRACERATE 15734
-#define VIC6569_HRETRACERATE 15639
+#define VIC6567_HRETRACERATE (VIC6567_CLOCK / 65) 
+#define VIC6569_HRETRACERATE (VIC6569_CLOCK / 63)
+
 #define VIC2_HRETRACERATE (vic2.pal?VIC6569_VRETRACERATE:VIC6567_VRETRACERATE)
 
 /* pal 50 Hz vertical screen refresh, screen consists of 312 lines
@@ -73,6 +78,10 @@
 #define VIC6569_STARTVISIBLECOLUMNS ((VIC6569_COLUMNS - VIC6569_VISIBLECOLUMNS)/2)
 #define VIC2_STARTVISIBLECOLUMNS ((VIC2_COLUMNS - VIC2_VISIBLECOLUMNS)/2)
 
+#define VIC6567_FIRSTRASTERCOLUMNS 412
+#define VIC6569_FIRSTRASTERCOLUMNS 404
+#define VIC2_FIRSTRASTERCOLUMNS (vic2.pal?VIC6569_FIRSTRASTERCOLUMNS:VIC6567_FIRSTRASTERCOLUMNS)
+
 
 /*----------- defined in video/vic6567.c -----------*/
 
@@ -88,6 +97,8 @@ MACHINE_DRIVER_EXTERN( vh_vic2_pal );
 extern VIDEO_START( vic2 );
 extern VIDEO_UPDATE( vic2 );
 extern INTERRUPT_GEN( vic2_raster_irq );
+// extern emu_timer *vicii_scanline_timer;
+// extern TIMER_CALLBACK( vicii_scanline_interrupt );
 
 extern const unsigned char vic2_palette[16 * 3];
 

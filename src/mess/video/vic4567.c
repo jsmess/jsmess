@@ -181,7 +181,7 @@ READ8_HANDLER ( vic3_port_r )
 	return val;
 }
 
-static void vic3_drawlines (int first, int last)
+static void vic3_drawlines (int first, int last, int start_x, int end_x)
 {
 	int line, vline, end;
 	int attr, ch, ecm;
@@ -252,7 +252,7 @@ static void vic3_drawlines (int first, int last)
 		yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
 		/* rendering 39 characters */
 		/* left and right borders are overwritten later */
-		vic2.shift[line] = HORICONTALPOS;
+		vic2.shift[line] = HORIZONTALPOS;
 
 		for (xoff = vic2.x_begin + XPOS; xoff < x_end2 + XPOS; xoff += 8, offs++)
 		{
@@ -265,11 +265,11 @@ static void vic3_drawlines (int first, int last)
 				if (MULTICOLORON)
 				{
 					vic2.bitmapmulti[3] = attr;
-					vic2_draw_bitmap_multi (ybegin, yend, offs, yoff, xoff);
+					vic2_draw_bitmap_multi (ybegin, yend, offs, yoff, xoff, start_x, end_x);
 				}
 				else
 				{
-					vic2_draw_bitmap (ybegin, yend, offs, yoff, xoff);
+					vic2_draw_bitmap (ybegin, yend, offs, yoff, xoff, start_x, end_x);
 				}
 			}
 			else if (ECMON)
@@ -277,17 +277,17 @@ static void vic3_drawlines (int first, int last)
 				ecm = ch >> 6;
 				vic2.ecmcolor[0] = vic2.colors[ecm];
 				vic2.ecmcolor[1] = attr;
-				vic2_draw_character (ybegin, yend, ch & ~0xC0, yoff, xoff, vic2.ecmcolor);
+				vic2_draw_character (ybegin, yend, ch & ~0xC0, yoff, xoff, vic2.ecmcolor, start_x, end_x);
 			}
 			else if (MULTICOLORON && (attr & 8))
 			{
 				vic2.multi[3] = attr & 7;
-				vic2_draw_character_multi (ybegin, yend, ch, yoff, xoff);
+				vic2_draw_character_multi (ybegin, yend, ch, yoff, xoff, start_x, end_x);
 			}
 			else
 			{
 				vic2.mono[1] = attr;
-				vic2_draw_character (ybegin, yend, ch, yoff, xoff, vic2.mono);
+				vic2_draw_character (ybegin, yend, ch, yoff, xoff, vic2.mono, start_x, end_x);
 			}
 		}
 		/* sprite priority, sprite overwrites lowerprior pixels */
@@ -309,9 +309,9 @@ static void vic3_drawlines (int first, int last)
 				if (yoff + syend > YPOS + 200)
 					syend = YPOS + 200 - yoff - 1;
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, ybegin, syend);
+					vic2_draw_sprite_multi (i, yoff, ybegin, syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff, ybegin, syend);
+					vic2_draw_sprite (i, yoff, ybegin, syend, start_x, end_x);
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
 					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
@@ -341,9 +341,9 @@ static void vic3_drawlines (int first, int last)
 				vic2.sprites[i].line = wrapped;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, 0 , syend);
+					vic2_draw_sprite_multi (i, yoff, 0 , syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff, 0 , syend);
+					vic2_draw_sprite (i, yoff, 0 , syend, start_x, end_x);
 
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
@@ -371,9 +371,9 @@ static void vic3_drawlines (int first, int last)
 				for (j = 0; j < SPRITE_Y_POS (i) - yoff; j++)
 					vic2.sprites[i].paintedline[j] = 0;
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, SPRITE_Y_POS (i) - yoff, syend);
+					vic2_draw_sprite_multi (i, yoff, SPRITE_Y_POS (i) - yoff, syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff, SPRITE_Y_POS (i) - yoff, syend);
+					vic2_draw_sprite (i, yoff, SPRITE_Y_POS (i) - yoff, syend, start_x, end_x);
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
 					for (j = syend; j <= yend; j++)
@@ -783,7 +783,7 @@ static void vic3_draw_bitplanes(running_machine *machine)
 
 INTERRUPT_GEN( vic3_raster_irq )
 {
-	static int columns=640, raws=200;
+	static int columns = 640, raws = 200;
 	int new_columns, new_raws;
 	int i;
 
@@ -791,34 +791,37 @@ INTERRUPT_GEN( vic3_raster_irq )
 	if (vic2.rasterline >= vic2.lines)
 	{
 		vic2.rasterline = 0;
-		if (vic3.palette_dirty) {
-			for (i=0; i<256; i++) {
-				palette_set_color_rgb(machine, i,vic3.palette[i].red<<4,
-									 vic3.palette[i].green<<4,
-									 vic3.palette[i].blue<<4);
-			}
-		}
+		if (vic3.palette_dirty)
+			for (i=0; i<256; i++)
+				palette_set_color_rgb(machine, i,vic3.palette[i].red<<4, vic3.palette[i].green<<4, vic3.palette[i].blue<<4);
+
 		if (vic3.palette_dirty) {
 			vic2.spritemulti[1] = SPRITE_MULTICOLOR1;
 			vic2.spritemulti[3] = SPRITE_MULTICOLOR2;
-			vic2.mono[0] = vic2.bitmapmulti[0] = vic2.multi[0] =
-				vic2.colors[0] = BACKGROUNDCOLOR;
+			vic2.mono[0] = vic2.bitmapmulti[0] = vic2.multi[0] = vic2.colors[0] = BACKGROUNDCOLOR;
 			vic2.multi[1] = vic2.colors[1] = MULTICOLOR1;
 			vic2.multi[2] = vic2.colors[2] = MULTICOLOR2;
 			vic2.colors[3] = FOREGROUNDCOLOR;
-			vic3.palette_dirty=0;
+			vic3.palette_dirty = 0;
 		}
 		new_raws=200;
-		if (VIC3_BITPLANES) {
+		if (VIC3_BITPLANES)
+		{
 			new_columns=VIC3_BITPLANES_WIDTH;
-			if (new_columns<320) new_columns=320; /*sprites resolution about 320x200 */
+			if (new_columns < 320)
+				new_columns = 320; /*sprites resolution about 320x200 */
 			new_raws=VIC3_LINES;
-		} else if (VIC3_80COLUMNS) {
+		}
+		else if (VIC3_80COLUMNS)
+		{
 			new_columns=640;
-		} else {
+		}
+		else
+		{
 			new_columns=320;
 		}
-		if ((new_columns!=columns)||(new_raws!=raws)) {
+		if ((new_columns!=columns)||(new_raws!=raws))
+		{
 			raws=new_raws;
 			columns=new_columns;
 			if (c64_pal)
@@ -834,10 +837,19 @@ INTERRUPT_GEN( vic3_raster_irq )
 									VIC2_STARTVISIBLELINES + 10,
 									VIC2_STARTVISIBLELINES + 10 + raws + 16 - 1);
 		}
-		if (VIC3_BITPLANES) {
-			if (!video_skip_this_frame ()) vic3_draw_bitplanes(machine);
+		if (VIC3_BITPLANES)
+		{
+			if (!video_skip_this_frame ())
+				vic3_draw_bitplanes(machine);
 		} else {
-			if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines);
+			if (c64_pal)
+			{
+				if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
+			}			
+			else
+			{
+				// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
+			}
 		}
 		for (i = 0; i < 8; i++)
 			vic2.sprites[i].repeat = vic2.sprites[i].line = 0;
@@ -855,7 +867,18 @@ INTERRUPT_GEN( vic3_raster_irq )
 	}
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
-			vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
+		{
+//			vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+			if (c64_pal)
+			{
+				if (vic2.on) vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
+			}			
+			else
+			{
+				// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
+				if (vic2.on) vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
+			}
+		}
 }
 
 

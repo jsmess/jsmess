@@ -65,6 +65,8 @@
 /* lightpen values */
 #include "includes/c64.h"
 
+// emu_timer *vicii_scanline_timer;
+
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
 	{ \
@@ -145,9 +147,15 @@
 #define SPRITE_SET_BG_COLLISION(nr) (vic2.reg[0x1f]|=(1<<nr))
 #define SPRITE_SET_COLLISION(nr) (vic2.reg[0x1e]|=(1<<nr))
 
+// for sprite's changes in the middle of a raster line
+#define SPRITE_X_POS_BUFFER(nr) ( (vic2.reg_buffer[(nr)*2]|(vic2.reg_buffer[0x10]&(1<<(nr))?0x100:0))-24+XPOS )
+#define SPRITE_Y_POS_BUFFER(nr) (vic2.reg_buffer[1+2*(nr)]-50+YPOS)
+#define SPRITE_MULTICOLOR1_BUFFER (vic2.reg_buffer[0x25]&0xf)
+#define SPRITE_MULTICOLOR2_BUFFER (vic2.reg_buffer[0x26]&0xf)
+
 #define SCREENON (vic2.reg[0x11]&0x10)
 #define VERTICALPOS (vic2.reg[0x11]&7)
-#define HORICONTALPOS (vic2.reg[0x16]&7)
+#define HORIZONTALPOS (vic2.reg[0x16]&7)
 #define ECMON (vic2.reg[0x11]&0x40)
 #define HIRESON (vic2.reg[0x11]&0x20)
 #define MULTICOLORON (vic2.reg[0x16]&0x10)
@@ -183,7 +191,7 @@ const unsigned char vic2_palette[] =
 };
 
 static struct {
-	UINT8 reg[0x80];
+	UINT8 reg[0x80],reg_buffer[0x80]; 	// buffer for sprite's changes in a middle of a rasterline
 	int pal;
 	int vic2e;		     /* version with some port lines */
 	int vic3;
@@ -202,10 +210,10 @@ static struct {
 	int x_begin, x_end;
 	int y_begin, y_end;
 
-	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2],
-		multi[4], ecmcolor[2], colors[4], spritemulti[4];
+	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2], multi[4], ecmcolor[2], colors[4], spritemulti[4], spritemulti_buffer[4];
 
 	int lastline, rasterline;
+	UINT64 rasterline_start_cpu_cycles;
 
 	/* background/foreground for sprite collision */
 	UINT8 *screen[216], shift[216];
@@ -228,7 +236,11 @@ static struct {
 		int paintedline[8];
 	    UINT8 bitmap[8][SPRITE_BASE_X_SIZE * 2 / 8 + 1/*for simplier sprite collision detection*/];
 	}
-	sprites[8];
+	sprites[8]; // buffer for sprite's changes in a middle of a rasterline
+	struct {
+		int on, x, y, xexpand, yexpand;
+	}
+	sprites_buffer[8];
 } vic2;
 
 INLINE int vic2_getforeground (register int y, register int x)
@@ -251,7 +263,7 @@ static void vic2_setforeground (int y, int x, int value)
 }
 #endif
 
-static void vic2_drawlines (int first, int last);
+static void vic2_drawlines (int first, int last, int start_x, int end_x);
 
 void vic6567_init (int chip_vic2e, int pal,
 				   int (*dma_read) (int), int (*dma_read_color) (int),
@@ -351,6 +363,8 @@ INTERRUPT_GEN( vic2_frame_interrupt )
 
 WRITE8_HANDLER ( vic2_port_w )
 {
+	int startx, cycles;
+
 	DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;
 	switch (offset)
@@ -364,10 +378,10 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0xd:
 	case 0xf:
 		/* sprite y positions */
-		if (vic2.reg[offset] != data) {
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
-			vic2.reg[offset] = data;
-			vic2.sprites[offset/2].y=SPRITE_Y_POS(offset/2);
+		if (vic2.reg[offset] != data)
+		{
+			vic2.reg_buffer[offset] = data;
+			vic2.sprites_buffer[offset/2].y = SPRITE_Y_POS_BUFFER(offset/2);
 		}
 		break;
 	case 0:
@@ -379,25 +393,25 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0xc:
 	case 0xe:
 		/* sprite x positions */
-		if (vic2.reg[offset] != data) {
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
-			vic2.reg[offset] = data;
-			vic2.sprites[offset/2].x=SPRITE_X_POS(offset/2);
+		if (vic2.reg[offset] != data)
+		{
+			vic2.reg_buffer[offset] = data;
+			vic2.sprites_buffer[offset/2].x = SPRITE_X_POS_BUFFER(offset/2);
 		}
 		break;
 	case 0x10:
 		/* sprite x positions */
-		if (vic2.reg[offset] != data) {
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
-			vic2.reg[offset] = data;
-			vic2.sprites[0].x=SPRITE_X_POS(0);
-			vic2.sprites[1].x=SPRITE_X_POS(1);
-			vic2.sprites[2].x=SPRITE_X_POS(2);
-			vic2.sprites[3].x=SPRITE_X_POS(3);
-			vic2.sprites[4].x=SPRITE_X_POS(4);
-			vic2.sprites[5].x=SPRITE_X_POS(5);
-			vic2.sprites[6].x=SPRITE_X_POS(6);
-			vic2.sprites[7].x=SPRITE_X_POS(7);
+		if (vic2.reg[offset] != data)
+		{
+			vic2.reg_buffer[offset] = data;
+			vic2.sprites_buffer[0].x = SPRITE_X_POS_BUFFER(0);
+			vic2.sprites_buffer[1].x = SPRITE_X_POS_BUFFER(1);
+			vic2.sprites_buffer[2].x = SPRITE_X_POS_BUFFER(2);
+			vic2.sprites_buffer[3].x = SPRITE_X_POS_BUFFER(3);
+			vic2.sprites_buffer[4].x = SPRITE_X_POS_BUFFER(4);
+			vic2.sprites_buffer[5].x = SPRITE_X_POS_BUFFER(5);
+			vic2.sprites_buffer[6].x = SPRITE_X_POS_BUFFER(6);
+			vic2.sprites_buffer[7].x = SPRITE_X_POS_BUFFER(7);
 		}
 		break;
 	case 0x17:						   /* sprite y size */
@@ -414,24 +428,21 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x2e:
 		if (vic2.reg[offset] != data)
 		{
-			vic2.reg[offset] = data;
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
+			vic2.reg_buffer[offset] = data;
 		}
 		break;
 	case 0x25:
 		if (vic2.reg[offset] != data)
 		{
-			vic2.reg[offset] = data;
-			vic2.spritemulti[1] = SPRITE_MULTICOLOR1;
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
+			vic2.reg_buffer[offset] = data;
+			vic2.spritemulti_buffer[1] = SPRITE_MULTICOLOR1_BUFFER;
 		}
 		break;
 	case 0x26:
 		if (vic2.reg[offset] != data)
 		{
-			vic2.reg[offset] = data;
-			vic2.spritemulti[3] = SPRITE_MULTICOLOR2;
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
+			vic2.reg_buffer[offset] = data;
+			vic2.spritemulti_buffer[3] = SPRITE_MULTICOLOR2_BUFFER;
 		}
 		break;
 	case 0x19:
@@ -439,12 +450,11 @@ WRITE8_HANDLER ( vic2_port_w )
 		break;
 	case 0x1a:						   /* irq mask */
 		vic2.reg[offset] = data;
-		vic2_set_interrupt(0); //beamrider needs this
+		vic2_set_interrupt(0); 			//beamrider needs this
 		break;
 	case 0x11:
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 			if (LINES25)
 			{
@@ -467,7 +477,6 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x16:
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 			if (COLUMNS40)
 			{
@@ -476,7 +485,7 @@ WRITE8_HANDLER ( vic2_port_w )
 			}
 			else
 			{
-				vic2.x_begin = HORICONTALPOS;
+				vic2.x_begin = HORIZONTALPOS;
 				vic2.x_end = vic2.x_begin + 320;
 			}
 		}
@@ -484,16 +493,14 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x18:
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 			vic2.videoaddr = VIDEOADDR;
 			vic2.chargenaddr = CHARGENADDR;
 		}
 		break;
-	case 0x21:						   /* backgroundcolor */
+	case 0x21:						   /* background color */
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 			vic2.mono[0] = vic2.bitmapmulti[0] = vic2.multi[0] =
 				vic2.colors[0] = BACKGROUNDCOLOR;
@@ -502,7 +509,6 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x22:						   /* background color 1 */
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 			vic2.multi[1] = vic2.colors[1] = MULTICOLOR1;
 		}
@@ -510,7 +516,6 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x23:						   /* background color 2 */
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 			vic2.multi[2] = vic2.colors[2] = MULTICOLOR2;
 		}
@@ -518,7 +523,6 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x24:						   /* background color 3 */
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 			vic2.colors[3] = FOREGROUNDCOLOR;
 		}
@@ -526,7 +530,6 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x20:						   /* framecolor */
 		if (vic2.reg[offset] != data)
 		{
-			// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 			vic2.reg[offset] = data;
 		}
 		break;
@@ -565,6 +568,34 @@ WRITE8_HANDLER ( vic2_port_w )
 		vic2.reg[offset] = data;
 		break;
 	}
+
+	cycles = (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
+
+	if (cycles > VIC2_CYCLESPERLINE - 1) cycles = VIC2_CYCLESPERLINE - 1;
+	startx = VIC2_FIRSTRASTERCOLUMNS + cycles * 8;
+	if (startx >= VIC2_COLUMNS) startx -= VIC2_COLUMNS;
+
+	// sprites chenges are active only from the next raster line
+	// FIX ME : c64 have different width
+	if (!strncmp(machine->gamedrv->name, "c64", 3))
+	{
+		if (startx > VIC2_FIRSTRASTERCOLUMNS)
+		{
+			if (startx < VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)
+				{
+					vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
+				}
+			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS - 1);
+		}
+		else
+		{
+			if (startx >= VIC2_STARTVISIBLECOLUMNS)
+			{
+				vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS - 1);
+			}
+		}
+	}
+
 }
 
 READ8_HANDLER ( vic2_port_r )
@@ -575,11 +606,9 @@ READ8_HANDLER ( vic2_port_r )
 	{
 	case 0x11:
 		val = (vic2.reg[offset] & ~0x80) | ((vic2.rasterline & 0x100) >> 1);
-		// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 		break;
 	case 0x12:
 		val = vic2.rasterline & 0xff;
-		// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.rasterline);
 		break;
 	case 0x16:
 		val = vic2.reg[offset] | 0xc0;
@@ -609,6 +638,29 @@ READ8_HANDLER ( vic2_port_r )
 	case 0x22:
 	case 0x23:
 	case 0x24:
+		val = vic2.reg[offset];
+		break;
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b:
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+	case 0x0f:
+	case 0x10:
+	case 0x17:
+	case 0x1b:
+	case 0x1c:
+	case 0x1d:
 	case 0x25:
 	case 0x26:
 	case 0x27:
@@ -619,7 +671,7 @@ READ8_HANDLER ( vic2_port_r )
 	case 0x2c:
 	case 0x2d:
 	case 0x2e:
-		val = vic2.reg[offset];
+		val = vic2.reg_buffer[offset];
 		break;
 	case 0x2f:
 	case 0x30:
@@ -644,7 +696,8 @@ READ8_HANDLER ( vic2_port_r )
 	case 0x3d:
 	case 0x3e:
 	case 0x3f:						   /* not used */
-		val = vic2.reg[offset];
+		// val = vic2.reg[offset]; //
+		val = 0xff;
 		DBG_LOG (2, "vic read", ("%.2x:%.2x\n", offset, val));
 		break;
 	default:
@@ -742,7 +795,7 @@ VIDEO_START( vic2 )
 	}
 }
 
-static void vic2_draw_character (int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color)
+static void vic2_draw_character (int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color, int start_x, int end_x)
 {
 	int y, code;
 
@@ -750,18 +803,18 @@ static void vic2_draw_character (int ybegin, int yend, int ch, int yoff, int xof
 	{
 		code = vic2.dma_read (vic2.chargenaddr + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = code;
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = color[(code >> 4) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = color[(code >> 3) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = color[(code >> 2) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = color[(code >> 1) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = color[code & 1];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
+		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
+		if ((xoff + 2 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
+		if ((xoff + 3 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = color[(code >> 4) & 1];
+		if ((xoff + 4 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = color[(code >> 3) & 1];
+		if ((xoff + 5 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = color[(code >> 2) & 1];
+		if ((xoff + 6 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = color[(code >> 1) & 1];
+		if ((xoff + 7 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = color[code & 1];
 	}
 }
 
-static void vic2_draw_character_multi (int ybegin, int yend, int ch, int yoff, int xoff)
+static void vic2_draw_character_multi (int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
 	int y, code;
 
@@ -769,18 +822,18 @@ static void vic2_draw_character_multi (int ybegin, int yend, int ch, int yoff, i
 	{
 		code = vic2.dma_read (vic2.chargenaddr + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = vic2.foreground[code];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.multi[code >> 6];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.multi[(code >> 4) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.multi[(code >> 2) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.multi[code & 3];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic2.multi[code >> 6];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.multi[code >> 6];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic2.multi[(code >> 4) & 3];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.multi[(code >> 4) & 3];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic2.multi[(code >> 2) & 3];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.multi[(code >> 2) & 3];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic2.multi[code & 3];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.multi[code & 3];
 	}
 }
 
-static void vic2_draw_bitmap (int ybegin, int yend, int ch, int yoff, int xoff)
+static void vic2_draw_bitmap (int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x)
 {
 	int y, code;
 
@@ -788,18 +841,18 @@ static void vic2_draw_bitmap (int ybegin, int yend, int ch, int yoff, int xoff)
 	{
 		code = vic2.dma_read ((vic2.chargenaddr&0x2000) + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = code;
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic2.c64_bitmap[code >> 7];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.c64_bitmap[(code >> 6) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic2.c64_bitmap[(code >> 5) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.c64_bitmap[(code >> 4) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic2.c64_bitmap[(code >> 3) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.c64_bitmap[(code >> 2) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic2.c64_bitmap[(code >> 1) & 1];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.c64_bitmap[code & 1];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic2.c64_bitmap[code >> 7];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.c64_bitmap[(code >> 6) & 1];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic2.c64_bitmap[(code >> 5) & 1];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.c64_bitmap[(code >> 4) & 1];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic2.c64_bitmap[(code >> 3) & 1];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.c64_bitmap[(code >> 2) & 1];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic2.c64_bitmap[(code >> 1) & 1];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.c64_bitmap[code & 1];
 	}
 }
 
-static void vic2_draw_bitmap_multi (int ybegin, int yend, int ch, int yoff, int xoff)
+static void vic2_draw_bitmap_multi (int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x)
 {
 	int y, code;
 
@@ -807,18 +860,18 @@ static void vic2_draw_bitmap_multi (int ybegin, int yend, int ch, int yoff, int 
 	{
 		code = vic2.dma_read ((vic2.chargenaddr&0x2000) + ch * 8 + y);
 		vic2.screen[y + yoff][xoff >> 3] = vic2.foreground[code];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.bitmapmulti[code >> 6];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.bitmapmulti[(code >> 4) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.bitmapmulti[(code >> 2) & 3];
-		*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) =
-			*BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.bitmapmulti[code & 3];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic2.bitmapmulti[code >> 6];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic2.bitmapmulti[code >> 6];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic2.bitmapmulti[(code >> 4) & 3];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic2.bitmapmulti[(code >> 4) & 3];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic2.bitmapmulti[(code >> 2) & 3];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic2.bitmapmulti[(code >> 2) & 3];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic2.bitmapmulti[code & 3];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) *BITMAP_ADDR16(vic2.bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic2.bitmapmulti[code & 3];
 	}
 }
 
-static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior)
+static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior, int start_x, int end_x)
 {
 	register int x, mask, shift;
 
@@ -834,13 +887,17 @@ static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior)
 			switch ((prior & mask) >> shift)
 			{
 			case 1:
-				*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x + 1) = vic2.spritemulti[(code >> shift) & 3];
+				if ((xbegin + x + 1 > start_x) && (xbegin + x + 1 < end_x))
+					*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x + 1) = vic2.spritemulti[(code >> shift) & 3];
 				break;
 			case 2:
-				*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) = vic2.spritemulti[(code >> shift) & 3];
+				if ((xbegin + x > start_x) && (xbegin + x < end_x))
+					*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) = vic2.spritemulti[(code >> shift) & 3];
 				break;
 			case 3:
-				*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) =
+				if ((xbegin + x > start_x) && (xbegin + x < end_x))
+					*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) = vic2.spritemulti[(code >> shift) & 3];
+				if ((xbegin + x + 1> start_x) && (xbegin + x + 1< end_x))
 					*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x + 1) = vic2.spritemulti[(code >> shift) & 3];
 				break;
 			}
@@ -848,7 +905,7 @@ static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior)
 	}
 }
 
-static void vic2_draw_sprite_code (int y, int xbegin, int code, int color)
+static void vic2_draw_sprite_code (int y, int xbegin, int code, int color, int start_x, int end_x)
 {
 	register int mask, x;
 
@@ -859,7 +916,8 @@ static void vic2_draw_sprite_code (int y, int xbegin, int code, int color)
 	{
 		if (code & mask)
 		{
-			*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) = color;
+			if ((xbegin + x > start_x) && (xbegin + x < end_x))
+				*BITMAP_ADDR16(vic2.bitmap, y + FIRSTLINE, xbegin + x) = color;
 		}
 	}
 }
@@ -895,7 +953,7 @@ static void vic2_sprite_collision (int nr, int y, int x, int mask)
 	}
 }
 
-static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend)
+static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int start_x, int end_x)
 {
 	int y, i, prior, addr, xbegin, collision;
 	int value, value2, value3 = 0, bg, color[2];
@@ -933,15 +991,13 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend)
 				}
 				if (prior)
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16, value >> 8,
-												 (value3 >> 8) ^ 0xff);
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16 + 8, value & 0xff,
-												 (value3 & 0xff) ^ 0xff);
+					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16, value >> 8, (value3 >> 8) ^ 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16 + 8, value & 0xff, (value3 & 0xff) ^ 0xff, start_x, end_x);
 				}
 				else
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16, value >> 8, 0xff);
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16 + 8, value & 0xff, 0xff);
+					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16, value >> 8, 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16 + 8, value & 0xff, 0xff, start_x, end_x);
 				}
 			}
 			vic2.sprites[nr].bitmap[y][i*2]=0; //easier sprite collision detection
@@ -984,11 +1040,11 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend)
 				}
 				if (prior)
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 8, value, value3 ^ 0xff);
+					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 8, value, value3 ^ 0xff, start_x, end_x);
 				}
 				else
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 8, value, 0xff);
+					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 8, value, 0xff, start_x, end_x);
 				}
 			}
 			vic2.sprites[nr].bitmap[y][i]=0; //easier sprite collision detection
@@ -1010,7 +1066,7 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend)
 	}
 }
 
-static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend)
+static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend, int start_x, int end_x)
 {
 	int y, i, addr, xbegin, color, prior, collision;
 	int value, value3 = 0;
@@ -1043,8 +1099,8 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend)
 				}
 				if (prior)
 					value &= ~value3;
-				vic2_draw_sprite_code (yoff + y, xbegin + i * 16, value >> 8, color);
-				vic2_draw_sprite_code (yoff + y, xbegin + i * 16 + 8, value & 0xff, color);
+				vic2_draw_sprite_code (yoff + y, xbegin + i * 16, value >> 8, color, start_x, end_x);
+				vic2_draw_sprite_code (yoff + y, xbegin + i * 16 + 8, value & 0xff, color, start_x, end_x);
 			}
 			vic2.sprites[nr].bitmap[y][i*2]=0; //easier sprite collision detection
 			if (SPRITE_Y_EXPAND (nr))
@@ -1083,7 +1139,7 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend)
 				}
 				if (prior)
 					value &= ~value3;
-				vic2_draw_sprite_code (yoff + y, xbegin + i * 8, value, color);
+				vic2_draw_sprite_code (yoff + y, xbegin + i * 8, value, color, start_x, end_x);
 			}
 			vic2.sprites[nr].bitmap[y][i]=0; //easier sprite collision detection
 			if (SPRITE_Y_EXPAND (nr))
@@ -1104,9 +1160,9 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend)
 	}
 }
 
-static void vic3_drawlines (int first, int last);
+static void vic3_drawlines (int first, int last, int start_x, int end_x);
 
-static void vic2_drawlines (int first, int last)
+static void vic2_drawlines (int first, int last, int start_x, int end_x)
 {
 	int line, vline, end;
 	int attr, ch, ecm;
@@ -1117,7 +1173,7 @@ static void vic2_drawlines (int first, int last)
 	if (vic2.vic3 && VIC3_BITPLANES) return ;
 	/* temporary allowing vic3 displaying 80 columns */
 	if (vic2.vic3&&(vic2.reg[0x31]&0x80)) {
-		vic3_drawlines(first,last);
+		vic3_drawlines(first , last, start_x, end_x);
 		return;
 	}
 
@@ -1160,7 +1216,7 @@ static void vic2_drawlines (int first, int last)
 
 	line = first;
 	if (line < end) {
-		plot_box(vic2.bitmap, 0, line + FIRSTLINE, vic2.bitmap->width, 1, FRAMECOLOR);
+		plot_box(vic2.bitmap, start_x, line + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		line=end;
 	}
 
@@ -1185,7 +1241,7 @@ static void vic2_drawlines (int first, int last)
 		yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
 		/* rendering 39 characters */
 		/* left and right borders are overwritten later */
-		vic2.shift[line] = HORICONTALPOS;
+		vic2.shift[line] = HORIZONTALPOS;
 		for (xoff = vic2.x_begin + XPOS; xoff < vic2.x_end + XPOS; xoff += 8, offs++)
 		{
 			ch = vic2.dma_read (vic2.videoaddr + offs);
@@ -1202,11 +1258,11 @@ static void vic2_drawlines (int first, int last)
 				if (MULTICOLORON)
 				{
 				    vic2.bitmapmulti[3] = attr;
-					vic2_draw_bitmap_multi (ybegin, yend, offs, yoff, xoff);
+					vic2_draw_bitmap_multi (ybegin, yend, offs, yoff, xoff, start_x, end_x);
 				}
 				else
 				{
-					vic2_draw_bitmap (ybegin, yend, offs, yoff, xoff);
+					vic2_draw_bitmap (ybegin, yend, offs, yoff, xoff, start_x, end_x);
 				}
 			}
 			else if (ECMON)
@@ -1214,17 +1270,17 @@ static void vic2_drawlines (int first, int last)
 				ecm = ch >> 6;
 				vic2.ecmcolor[0] = vic2.colors[ecm];
 				vic2.ecmcolor[1] = attr;
-				vic2_draw_character (ybegin, yend, ch & ~0xC0, yoff, xoff, vic2.ecmcolor);
+				vic2_draw_character (ybegin, yend, ch & ~0xC0, yoff, xoff, vic2.ecmcolor, start_x, end_x);
 			}
 			else if (MULTICOLORON && (attr & 8))
 			{
 				vic2.multi[3] = attr & 7;
-				vic2_draw_character_multi (ybegin, yend, ch, yoff, xoff);
+				vic2_draw_character_multi (ybegin, yend, ch, yoff, xoff, start_x, end_x);
 			}
 			else
 			{
 				vic2.mono[1] = attr;
-				vic2_draw_character (ybegin, yend, ch, yoff, xoff, vic2.mono);
+				vic2_draw_character (ybegin, yend, ch, yoff, xoff, vic2.mono, start_x, end_x);
 			}
 		}
 	}
@@ -1277,9 +1333,9 @@ static void vic2_drawlines (int first, int last)
 				vic2.sprites[i].line = wrapped;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, 0, 0 , syend);
+					vic2_draw_sprite_multi (i, 0, 0 , syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, 0, 0 , syend);
+					vic2_draw_sprite (i, 0, 0 , syend, start_x, end_x);
 
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
@@ -1316,9 +1372,9 @@ static void vic2_drawlines (int first, int last)
 					vic2.sprites[i].paintedline[j] = 0;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff + ybegin, 0, 0);
+					vic2_draw_sprite_multi (i, yoff + ybegin, 0, 0, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff + ybegin, 0, 0);
+					vic2_draw_sprite (i, yoff + ybegin, 0, 0, start_x, end_x);
 
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
@@ -1333,6 +1389,7 @@ static void vic2_drawlines (int first, int last)
 			}
 		}
 	}
+	// TO DO: to implement start_x and end_x
 	plot_box(vic2.bitmap, 0, first + FIRSTLINE, xbegin, 1, FRAMECOLOR);
 	plot_box(vic2.bitmap, xend, first + FIRSTLINE, vic2.bitmap->width - xend, 1, FRAMECOLOR);
 
@@ -1342,25 +1399,41 @@ static void vic2_drawlines (int first, int last)
 		end = vic2.bitmap->height;
 
 	if (line < end) {
-		plot_box(vic2.bitmap, 0, first + FIRSTLINE, vic2.bitmap->width, 1, FRAMECOLOR);
+		plot_box(vic2.bitmap, start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		line = end;
 	}
 }
 
 #include "vic4567.c"
 
+// TIMER_CALLBACK( vic2_scanline_interrupt )
 INTERRUPT_GEN( vic2_raster_irq )
 {
 	int i;
+//	int scanline = param;
 
 	vic2.rasterline++;
 
+	// update sprites registers
+	for (i=0x00; i <= 0x10; i++)
+		vic2.reg[i] = vic2.reg_buffer[i];
+	vic2.reg[0x17] = vic2.reg_buffer[0x17];
+	for (i=0x1b; i <= 0x1d; i++)
+		vic2.reg[i] = vic2.reg_buffer[i];
+	for (i=0x25; i <= 0x2e; i++)
+		vic2.reg[i] = vic2.reg_buffer[i];	
+	for (i=0; i < 8; i++)
+	{
+		vic2.sprites[i].x = vic2.sprites_buffer[i].x;
+		vic2.sprites[i].y = vic2.sprites_buffer[i].y;
+	}
+	for (i=0; i < 5; i++)
+		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
+
+	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
+
 	if (vic2.rasterline == vic2.lines)
 	{
-		if (!c64_pal)	// FIX ME
-			for (i = vic2.lines; i < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES); i++)
-				vic2_drawlines (i-1, i);
-
 		vic2.rasterline = 0;
 
 		for (i = 0; i < 8; i++)
@@ -1372,17 +1445,21 @@ INTERRUPT_GEN( vic2_raster_irq )
 			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 	}
+// if (input_code_pressed(KEYCODE_Q)) activecpu_eat_cycles(1000);
 
 	if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
 	{
 		vic2_set_interrupt (1);
 	}
+	if (!c64_pal)
+		if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
+			vic2_drawlines (vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
 
 	if (vic2.on)
-		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
-			vic2_drawlines (vic2.rasterline-1, vic2.rasterline);
+		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
+			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
 
-// printf("%08x  ",(int)activecpu_gettotalcycles());
+//	timer_adjust_oneshot(vicii_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 VIDEO_UPDATE( vic2 )
