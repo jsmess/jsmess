@@ -577,6 +577,7 @@ WRITE8_HANDLER ( vic2_port_w )
 
 	// sprites chenges are active only from the next raster line
 	// FIX ME : c65 have different width, left border width is 8 pixel wrong ?!
+/*
 	if (!strncmp(machine->gamedrv->name, "c64", 3))
 	{
 		if (startx > VIC2_FIRSTRASTERCOLUMNS)
@@ -595,7 +596,7 @@ WRITE8_HANDLER ( vic2_port_w )
 			}
 		}
 	}
-
+*/
 }
 
 READ8_HANDLER ( vic2_port_r )
@@ -1308,7 +1309,39 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 		/* sprite priority, sprite overwrites lowerprior pixels */
 		for (i = 7; i >= 0; i--)
 		{
-			if 	(SPRITEON (i) &&
+		if (vic2.sprites[i].line || vic2.sprites[i].repeat) // FIX ME: sprite warp is wrong
+			{
+				syend = yend;
+				if (SPRITE_Y_EXPAND (i))
+				{
+					if ((21 - vic2.sprites[i].line) * 2 - vic2.sprites[i].repeat < yend - ybegin + 1)
+					syend = ybegin + (21 - vic2.sprites[i].line) * 2 - vic2.sprites[i].repeat - 1;
+				}
+				else
+				{
+					if (vic2.sprites[i].line + yend - ybegin + 1 > 20)
+					syend = ybegin + 20 - vic2.sprites[i].line;
+				}
+				if (yoff + syend > YPOS + 200)
+					syend = YPOS + 200 - yoff - 1;
+				if (yoff + ybegin < 0)
+				{
+					ybegin = -yoff;
+					yend = - yoff;
+				}
+
+				if (SPRITE_MULTICOLOR (i))
+					vic2_draw_sprite_multi (i, yoff, ybegin, syend, start_x, end_x);
+				else
+					vic2_draw_sprite (i, yoff, ybegin, syend,  start_x, end_x);
+				if ((syend != yend) || (vic2.sprites[i].line > 20))
+				{
+					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
+					for (j = syend; j <= yend; j++)
+						vic2.sprites[i].paintedline[j] = 0;
+				}
+			}
+			else if (SPRITEON (i) &&
 					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
 					(yoff + ybegin - SPRITE_Y_POS (i) < (SPRITE_Y_EXPAND (i)? 21 * 2 : 21 )) &&
 					(SPRITE_Y_POS (i) < 0))
@@ -1429,8 +1462,10 @@ INTERRUPT_GEN( vic2_raster_irq )
 	}
 	for (i=0; i < 5; i++)
 		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
-	//if (input_code_pressed(KEYCODE_Q)) { cpunum_suspend(0, SUSPEND_ANY_REASON, 40); cpunum_resume(0, SUSPEND_ANY_REASON); }
-	//printf("%04x    ", (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles));
+	if (input_code_pressed(KEYCODE_Q)) { cpunum_set_clock(machine, 0, 0x93203); }
+	if (input_code_pressed(KEYCODE_W)) { cpunum_set_clock(machine, 0, 0xf08a0); }
+	// if (input_code_pressed(KEYCODE_E)) printf("%04x    ",cpunum_get_clock(0));
+	// if (input_code_pressed(KEYCODE_R)) printf("%04x    ", (int)(cpunum_get_clock(0)*63/103));
 	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
 
 	if (vic2.rasterline == vic2.lines)
