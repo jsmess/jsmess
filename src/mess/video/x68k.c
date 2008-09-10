@@ -396,17 +396,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 		x68k_crtc_refresh_mode(machine);
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
-		if(data != 0)
 		{
 			attotime irq_time;
 			irq_time = video_screen_get_time_until_pos(machine->primary_screen,(data - 1) / sys.crtc.vmultiple,2);
 
 			if(attotime_to_double(irq_time) > 0)
 				timer_adjust_oneshot(raster_irq, irq_time, (data - 1) / sys.crtc.vmultiple);
-		}
-		else
-		{
-			timer_adjust_oneshot(raster_irq, attotime_never, 0);  // disable timer
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
