@@ -831,7 +831,7 @@ ROM_START( pet40on )
 	ROMX_LOAD( "901465-19.ud5", 0xb000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(2) )
 	ROM_LOAD( "901465-20.ud6", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901447-29.ud8", 0xe000, 0x800,  CRC(e5714d4c) SHA1(1330580c0aaaaaaa6a389da4649488ba04a60908) )	// Screen Editor (40 columns, no CRTC, Normal Keyb)
+	ROM_LOAD( "901447-29.ud8", 0xe000, 0x800,  CRC(e5714d4c) SHA1(e88f56e5c54b0e8d8d4e8cb39a4647c803c1f51c) )	// Screen Editor (40 columns, no CRTC, Normal Keyb)
 	ROM_LOAD( "901465-22.ud9", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -987,7 +987,7 @@ ROM_END
 /* CBM 8296 / 8296D - only ROM loading added */
 ROM_START( cbm8296 )
 	ROM_REGION( 0x20000, "main", 0 )
-	ROM_LOAD( "324746-01.ue7", 0xb000, 0x3000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )	// BASIC 4
+	ROM_LOAD( "324746-01.ue7", 0xb000, 0x3000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )	// BASIC 4 // FIX ME!!
 	ROM_CONTINUE(			   0xf000, 0x1000 )
 	ROM_LOAD( "901474-04.ue8", 0xe000, 0x800,  CRC(c1ffca3a) SHA1(7040b283ba39e9630e3d147f7d076b7abc39bc70) )	// Dated 0384, coincides with 3681 above according to André Fachat's notes
 
@@ -1033,7 +1033,7 @@ ROM_START( cbm30nor )
 	ROM_LOAD( "901465-03.ud9", 0xf000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )	// Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "norwegian.uf10", 0x0000, 0x800, CRC(7c00534a) SHA1(2c46bd5f5351530ceb52686e5196de995e28e24f) )	// Character Generator dumped from a CBM 3032
+	ROM_LOAD( "norwegian.uf10", 0x0000, 0x800, CRC(7c00534a) SHA1(2c46bd5f5351530ceb52686e5196de995e28e24f) )	// Character Generator dumped from a CBM 3032 // FIX ME!!
 ROM_END
 
 /* This had only the CharGen dumped, the editor needs to be dumped as well (and the other ones verified)!!  */
@@ -1046,7 +1046,7 @@ ROM_START( cbm80hun )
 	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "hungarian.ua3", 0x0000, 0x800, CRC(a02d8122) SHA1(2fedbb59068b457d98f28de79f1817e25f745604) )	// Character Generator
+	ROM_LOAD( "hungarian.ua3", 0x0000, 0x800, CRC(a02d8122) SHA1(2fedbb59068b457d98f28de79f1817e25f745604) )	// Character Generator // FIX ME!!
 ROM_END
 
 /* Swedish M6809 roms needed */
