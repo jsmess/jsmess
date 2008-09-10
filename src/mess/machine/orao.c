@@ -57,7 +57,7 @@ READ8_HANDLER( orao_io_r )
 	 	case 0x03FF : return input_port_read(machine, "LINE19"); break;
 	 	/* Tape */ 
 	 	case 0x07FF : 
-	 				level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	 				level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
 					if (level <  0) { 
 						return 0x00; 
 					}

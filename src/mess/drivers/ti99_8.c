@@ -417,7 +417,7 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -433,6 +433,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -461,7 +463,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_8_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -472,6 +474,8 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 /*
@@ -506,18 +510,6 @@ ROM_START(ti99_8)
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8
-
-static void ti99_8_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void ti99_8_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -625,7 +617,6 @@ static SYSTEM_CONFIG_START(ti99_8)
 	/* Hex-bus disk controller: supports up to 4 floppy disk drives */
 	/* expansion port (similar to 99/4(a) - yet slightly different) */
 
-	CONFIG_DEVICE(ti99_8_cassette_getinfo)
 	CONFIG_DEVICE(ti99_8_cartslot_getinfo)
 #if 1
 	CONFIG_DEVICE(ti99_8_floppy_getinfo)

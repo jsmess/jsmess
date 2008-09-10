@@ -102,7 +102,7 @@ READ16_HANDLER (bk_vid_scrool_r) {
 }
 
 READ16_HANDLER (bk_key_press_r) {
-	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	double level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
 	UINT16 cas;
 	if (level < 0) { 
 	 	cas = 0x00; 

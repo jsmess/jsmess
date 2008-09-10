@@ -809,14 +809,14 @@ static READ8_HANDLER(modeSS_r)
 
 		/* Check if we should stop the tape */
 		if ( cpu_getactivecpu() >= 0 && activecpu_get_pc() == 0x00FD ) {
-			const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+			const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 			if ( img ) {
 				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 			}
 		}
 	} else if ( offset == 0xFF9 ) {
 		/* Cassette port read */
-		double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
+		double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
 		//logerror("%04X: Cassette port read, tap_val = %f\n", activecpu_get_pc(), tap_val);
 		if ( tap_val < 0 ) {
 			data = 0x00;
@@ -1100,7 +1100,7 @@ static void switch_A_w(const device_config *device, UINT8 olddata, UINT8 data)
 		keypad_right_column = data & 0x0F;
 		break;
 	case 0x0a:	/* KidVid voice module */
-		cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY, CASSETTE_MOTOR_DISABLED );
 		break;
 	}
 }
@@ -1746,7 +1746,7 @@ static MACHINE_RESET( a2600 )
 		modeSS_byte_started = 0;
 		memory_set_opbase_handler( 0, modeSS_opbase );
 		/* Already start the motor of the cassette for the user */
-		cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 
 	case modeFV:
@@ -1963,6 +1963,14 @@ static INPUT_PORTS_START( a2600 )
 INPUT_PORTS_END
 
 
+static const cassette_config a2600_cassette_config =
+{
+	a26_cassette_formats,
+	NULL,
+	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( a2600 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
@@ -1985,12 +1993,15 @@ static MACHINE_DRIVER_START( a2600 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("tia", TIA, MASTER_CLOCK_NTSC/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* devices */
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
+
+	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( a2600p )
 	/* basic machine hardware */
@@ -2014,11 +2025,13 @@ static MACHINE_DRIVER_START( a2600p )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("tia", TIA, MASTER_CLOCK_PAL/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* devices */
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
+
+	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -2051,32 +2064,9 @@ static void a2600_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static void a2600_cassette_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
-	switch( state ) {
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_INT_WRITEABLE:
-		info->i = 0;
-		break;
-	case MESS_DEVINFO_INT_CREATABLE:
-		info->i = 0;
-		break;
-	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:
-		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED;
-		break;
-	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
-		info->p = (void *)a26_cassette_formats;
-		break;
-	default:
-		cassette_device_getinfo( devclass, state, info );
-		break;
-	}
-}
 
 static SYSTEM_CONFIG_START(a2600)
 	CONFIG_DEVICE(a2600_cartslot_getinfo)
-	CONFIG_DEVICE(a2600_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 

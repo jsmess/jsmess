@@ -23,6 +23,8 @@
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 
+#include "deprecat.h"
+
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
@@ -138,6 +140,7 @@ void c16_m7501_port_write(UINT8 data)
 
 UINT8 c16_m7501_port_read(void)
 {
+	running_machine *machine = Machine;
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT);
 
@@ -149,12 +152,12 @@ UINT8 c16_m7501_port_read(void)
 
 //	data &= ~0x20; // port bit not in pinout
 
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0)
+	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > +0.0)
 		data |=  0x10;
 	else
 		data &= ~0x10;
 
-	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	return data;
 }
@@ -317,7 +320,7 @@ WRITE8_HANDLER(plus4_6529_port_w)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }
@@ -326,7 +329,7 @@ WRITE8_HANDLER(plus4_6529_port_w)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }

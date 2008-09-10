@@ -70,7 +70,7 @@ static READ8_HANDLER (specialist_8255_portb_r )
 	dat = (dat  << 2) ^0xff;	
 	if (input_port_read(machine, "LINE12")!=0xff) dat ^= 0x02;
 		
-	level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
 	if (level >=  0) { 
 			dat ^= 0x01;
  	}		
@@ -99,7 +99,7 @@ static WRITE8_HANDLER (specialist_8255_portc_w )
 {		
 	specialist_8255_portc = data;
 	
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x80 ? 1 : -1);	
+	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),data & 0x80 ? 1 : -1);	
 
 	dac_data_w(0,data & 0x20); //beeper
 	

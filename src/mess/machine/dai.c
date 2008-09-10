@@ -190,7 +190,7 @@ MACHINE_START( dai )
 		data |= 0x08;			// serial ready
 		if (mame_rand(machine)&0x01)
 			data |= 0x40;		// random number generator
-		if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.01)
+		if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.01)
 			data |= 0x80;		// tape input
 		break;
 
@@ -225,8 +225,8 @@ WRITE8_HANDLER( dai_io_discrete_devices_w )
 		dai_paddle_enable = (data&0x08)>>3;
 		dai_cassette_motor[0] = (data&0x10)>>4;
 		dai_cassette_motor[1] = (data&0x20)>>5;
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), dai_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x01) ? -1.0 : 1.0);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), dai_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x01) ? -1.0 : 1.0);
 		dai_update_memory ((data&0xc0)>>6);
 		LOG_DAI_PORT_W (offset, (data&0x06)>>2, "discrete devices - paddle select");
 		LOG_DAI_PORT_W (offset, (data&0x08)>>3, "discrete devices - paddle enable");

@@ -38,9 +38,9 @@ static MACHINE_RESET( vip );
 
 /* Cassette Image */
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /* Discrete Sound */
@@ -211,7 +211,7 @@ static CDP1802_EF_READ( vip_ef_r )
 	if (state->cdp1861_efx) flags -= EF1;
 
 	/* tape input */
-	if (cassette_input(cassette_device_image()) < 0) flags -= EF2;
+	if (cassette_input(cassette_device_image(machine)) < 0) flags -= EF2;
 
 	/* keyboard */
 	if (input_port_read(machine, "KEYPAD") & (1 << state->keylatch)) flags -= EF3;
@@ -228,7 +228,7 @@ static CDP1802_Q_WRITE( vip_q_w )
 	set_led_status(1, level);
 
 	/* tape output */
-	cassette_output(cassette_device_image(), level ? 1.0 : -1.0);
+	cassette_output(cassette_device_image(machine), level ? 1.0 : -1.0);
 }
 
 static CDP1802_DMA_WRITE( vip_dma_w )
@@ -300,6 +300,13 @@ static MACHINE_RESET( vip )
 
 /* Machine Drivers */
 
+static const cassette_config vip_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+};
+
 static MACHINE_DRIVER_START( vip )
 	MDRV_DRIVER_DATA(vip_state)
 
@@ -332,6 +339,8 @@ static MACHINE_DRIVER_START( vip )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(vip, "bin,c8", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", vip_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -386,24 +395,10 @@ static QUICKLOAD_LOAD( vip )
 	return INIT_PASS;
 }
 
-static void vip_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START( vip )
 	CONFIG_RAM			( 1 * 1024)
 	CONFIG_RAM			( 2 * 1024)
 	CONFIG_RAM_DEFAULT	( 4 * 1024)
-	CONFIG_DEVICE(vip_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */

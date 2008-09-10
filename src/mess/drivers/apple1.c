@@ -209,6 +209,13 @@ INPUT_PORTS_END
 
 /* sound output */
 
+static const cassette_config apple1_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED
+};
+
 /* machine definition */
 static MACHINE_DRIVER_START( apple1 )
 	/* basic machine hardware */
@@ -242,6 +249,8 @@ static MACHINE_DRIVER_START( apple1 )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(apple1, "snp", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", apple1_cassette_config )
 MACHINE_DRIVER_END
 
 ROM_START(apple1)
@@ -254,21 +263,7 @@ ROM_START(apple1)
 	ROM_LOAD("apple1.vid", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
 ROM_END
 
-static void apple1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(apple1)
-	CONFIG_DEVICE(apple1_cassette_getinfo)
 	/* Note that because we always include 4K of RAM at $E000-$EFFF,
        the RAM amounts listed here will be 4K below the actual RAM
        total. */

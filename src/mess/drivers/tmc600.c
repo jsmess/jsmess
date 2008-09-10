@@ -92,9 +92,9 @@ Notes:
 
 static QUICKLOAD_LOAD( tmc600 );
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /* Read/Write Handlers */
@@ -254,7 +254,7 @@ static CDP1802_EF_READ( tmc600_ef_r )
 
 	// tape in
 
-	if (cassette_input(cassette_device_image()) < +0.0) flags -= EF2;
+	if (cassette_input(cassette_device_image(machine)) < +0.0) flags -= EF2;
 
 	// keyboard
 
@@ -265,7 +265,7 @@ static CDP1802_EF_READ( tmc600_ef_r )
 
 static CDP1802_Q_WRITE( tmc600_q_w )
 {
-	cassette_output(cassette_device_image(), level ? +1.0 : -1.0);
+	cassette_output(cassette_device_image(machine), level ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( tmc600_cdp1802_config )
@@ -312,6 +312,13 @@ static MACHINE_RESET( tmc600 )
 
 /* Machine Drivers */
 
+static const cassette_config tmc600_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+};
+
 static MACHINE_DRIVER_START( tmc600 )
 	// basic system hardware
 
@@ -339,6 +346,8 @@ static MACHINE_DRIVER_START( tmc600 )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(tmc600, "sbp", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", tmc600_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -376,19 +385,6 @@ static QUICKLOAD_LOAD( tmc600 )
 	return INIT_PASS;
 }
 
-static void tmc600_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void tmc600_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -411,7 +407,6 @@ static SYSTEM_CONFIG_START( tmc600 )
 	CONFIG_RAM_DEFAULT	( 8 * 1024)
 	CONFIG_RAM			(16 * 1024)
 	CONFIG_RAM			(24 * 1024)
-	CONFIG_DEVICE(tmc600_cassette_getinfo)
 	CONFIG_DEVICE(tmc600_floppy_getinfo)
 SYSTEM_CONFIG_END
 

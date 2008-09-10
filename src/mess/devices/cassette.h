@@ -14,14 +14,6 @@
 #include "formats/cassimg.h"
 
 
-enum
-{
-	MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE = MESS_DEVINFO_INT_DEV_SPECIFIC,
-
-	MESS_DEVINFO_PTR_CASSETTE_FORMATS = MESS_DEVINFO_PTR_DEV_SPECIFIC,
-	MESS_DEVINFO_PTR_CASSETTE_OPTIONS
-};
-
 typedef enum
 {
 	/* this part of the state is controlled by the UI */
@@ -42,7 +34,24 @@ typedef enum
 	CASSETTE_MASK_DRVSTATE		= 12
 } cassette_state;
 
-/* cassette prototypes */
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct cassette_config_t	cassette_config;
+struct cassette_config_t
+{
+	const struct CassetteFormat* 	const *formats;
+	const struct CassetteOptions	*create_opts;
+	const cassette_state			default_state;
+};
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
 cassette_state cassette_get_state(const device_config *cassette);
 void cassette_set_state(const device_config *cassette, cassette_state state);
 void cassette_change_state(const device_config *cassette, cassette_state state, cassette_state mask);
@@ -55,8 +64,24 @@ double cassette_get_position(const device_config *cassette);
 double cassette_get_length(const device_config *cassette);
 void cassette_seek(const device_config *cassette, double time, int origin);
 
-/* device specification */
-void cassette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+#define CASSETTE	DEVICE_GET_INFO_NAME(cassette)
+DEVICE_GET_INFO(cassette);
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_CASSETTE_ADD(_tag, _config) 	\
+	MDRV_DEVICE_ADD(_tag, CASSETTE)			\
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CASSETTE_REMOVE(_tag)			\
+	MDRV_DEVICE_REMOVE(_tag, CASSETTE)
+
+#define MDRV_CASSETTE_MODIFY(_tag, _config)	\
+	MDRV_DEVICE_MODIFY(_tag, CASSETTE)		\
+	MDRV_DEVICE_CONFIG(_config)
+
+extern const cassette_config default_cassette_config;
 
 #endif /* CASSETTE_H */

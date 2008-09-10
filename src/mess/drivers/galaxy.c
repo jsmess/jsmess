@@ -152,6 +152,14 @@ static const ay8910_interface galaxy_ay_interface =
 #define XTAL 6144000
 
 
+static const cassette_config galaxy_cassette_config =
+{
+	gtp_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL / 2)
@@ -176,8 +184,10 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galaxyp )
@@ -208,8 +218,10 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL/4)
 	MDRV_SOUND_CONFIG(galaxy_ay_interface)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )
 MACHINE_DRIVER_END
 
 ROM_START (galaxy)
@@ -229,18 +241,6 @@ ROM_START (galaxyp)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-static void galaxy_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)gtp_cassette_formats; break;
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM(2 * 1024)
@@ -248,12 +248,10 @@ static SYSTEM_CONFIG_START(galaxy)
 	CONFIG_RAM((6+16) * 1024)
 	CONFIG_RAM((6+32) * 1024)
 	CONFIG_RAM((6+48) * 1024)
-	CONFIG_DEVICE(galaxy_common_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(galaxyp)
 	CONFIG_RAM_DEFAULT((6+32) * 1024)
-	CONFIG_DEVICE(galaxy_common_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY FULLNAME */

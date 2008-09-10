@@ -1133,9 +1133,9 @@ static const device_config *cartslot_image(void)
 	return image_from_devtype_and_index(IO_CARTSLOT, 0);
 }
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 static const device_config *bitbanger_image(running_machine *machine)
@@ -1160,7 +1160,7 @@ static int get_soundmux_status(void)
 	return soundmux_status;
 }
 
-static void soundmux_update(void)
+static void soundmux_update(running_machine *machine)
 {
 	/* This function is called whenever the MUX (selector switch) is changed
 	 * It mainly turns on and off the cassette audio depending on the switch.
@@ -1181,7 +1181,7 @@ static void soundmux_update(void)
 	}
 
 	cococart_enable_sound(coco_cart, soundmux_status == (SOUNDMUX_STATUS_ENABLE|SOUNDMUX_STATUS_SEL2));
-	cassette_change_state(cassette_device_image(), new_state, CASSETTE_MASK_SPEAKER);
+	cassette_change_state(cassette_device_image(machine), new_state, CASSETTE_MASK_SPEAKER);
 }
 
 static void coco_sound_update(void)
@@ -1265,7 +1265,7 @@ static TIMER_CALLBACK(coco_update_sel1_timerproc)
 {
 	mux_sel1 = param;
 	(*update_keyboard)(machine);
-	soundmux_update();
+	soundmux_update(machine);
 }
 
 static WRITE8_HANDLER ( d_pia0_cb2_w )
@@ -1277,7 +1277,7 @@ static TIMER_CALLBACK(coco_update_sel2_timerproc)
 {
 	mux_sel2 = param;
 	(*update_keyboard)(machine);
-	soundmux_update();
+	soundmux_update(machine);
 }
 
 
@@ -1447,7 +1447,7 @@ static WRITE8_HANDLER ( d_pia0_pa_w )
 
 static WRITE8_HANDLER ( d_pia1_cb2_w )
 {
-	soundmux_update();
+	soundmux_update(machine);
 }
 
 /* Printer output functions used by d_pia1_pa_w */
@@ -1526,7 +1526,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	}
 	else
 	{
-		cassette_output(cassette_device_image(), ((int) dac - 0x80) / 128.0);
+		cassette_output(cassette_device_image(machine), ((int) dac - 0x80) / 128.0);
 	}
 
 	(*update_keyboard)(machine);
@@ -1727,7 +1727,7 @@ WRITE8_HANDLER(wd2797_w)
 static WRITE8_HANDLER ( d_pia1_ca2_w )
 {
 	cassette_change_state(
-		cassette_device_image(),
+		cassette_device_image(machine),
 		data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 }
@@ -1736,7 +1736,7 @@ static WRITE8_HANDLER ( d_pia1_ca2_w )
 
 static READ8_HANDLER ( d_pia1_pa_r )
 {
-	return (cassette_input(cassette_device_image()) >= 0) ? 1 : 0;
+	return (cassette_input(cassette_device_image(machine)) >= 0) ? 1 : 0;
 }
 
 

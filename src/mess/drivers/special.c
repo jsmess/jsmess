@@ -305,6 +305,14 @@ static INPUT_PORTS_START( specimx )
 		PORT_BIT(0xFE, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+static const cassette_config special_cassette_config =
+{
+	rks_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 /* Machine driver */
 static MACHINE_DRIVER_START( special )
     /* basic machine hardware */
@@ -335,8 +343,10 @@ static MACHINE_DRIVER_START( special )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", special_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( specialp )
@@ -402,8 +412,10 @@ static MACHINE_DRIVER_START( erik )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", special_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -445,20 +457,6 @@ ROM_START( erik )
     ROM_LOAD( "erik.bin", 0x10000, 0x10000, CRC(6F3208F4) SHA1(41f6e2763ef60d3c7214c98893e580d25346fa2d))
 ROM_END
 
-static void special_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rks_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void specimx_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -476,29 +474,24 @@ static void specimx_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
 }
-static SYSTEM_CONFIG_START(special)
-	CONFIG_DEVICE(special_cassette_getinfo)
-SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(specimx)
  	CONFIG_RAM_DEFAULT(128 * 1024)
-	CONFIG_DEVICE(special_cassette_getinfo)
 	CONFIG_DEVICE(specimx_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(erik)
  	CONFIG_RAM_DEFAULT(192 * 1024)
-	CONFIG_DEVICE(special_cassette_getinfo)
 	CONFIG_DEVICE(specimx_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT    CONFIG      COMPANY              FULLNAME       FLAGS */
-COMP( 1985, special,    0,     	0, 		special, 	special, 	special, special,  "", 					 "Specialist",		0)
-COMP( 1985, specialp,   special,0, 		specialp, 	special, 	special, special,  "", 					 "Specialist + hires graph",		0)
-COMP( 1985, lik,    	special,0, 		special, 	special, 	special, special,  "", 					 "Lik",		 		0)
-COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx, specimx,  "", 					 "Specialist MX", 	0)
-COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 	 erik,  	 "", 				 "Erik", 	0)
+COMP( 1985, special,    0,     	0, 		special, 	special, 	special, 0,         "", 				 "Specialist",		0)
+COMP( 1985, specialp,   special,0, 		specialp, 	special, 	special, 0,         "", 				 "Specialist + hires graph",		0)
+COMP( 1985, lik,    	special,0, 		special, 	special, 	special, 0,         "", 				 "Lik",		 		0)
+COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	specimx, specimx,   "", 				 "Specialist MX", 	0)
+COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 	 erik,      "", 				 "Erik", 	0)
 
 

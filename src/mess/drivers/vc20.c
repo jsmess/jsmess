@@ -303,6 +303,8 @@ static MACHINE_DRIVER_START( vic20 )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -454,7 +456,6 @@ ROM_END
 static SYSTEM_CONFIG_START(vic20)
 	CONFIG_DEVICE(vic20_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
 	CONFIG_RAM(8 * 1024)
 	CONFIG_RAM(16 * 1024)
@@ -464,7 +465,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(vic20v)
 	CONFIG_DEVICE(vic20_cartslot_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
 	CONFIG_RAM(8 * 1024)

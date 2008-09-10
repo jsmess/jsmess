@@ -127,6 +127,14 @@ static INPUT_PORTS_START( mikro80 )
 INPUT_PORTS_END
 
 /* Machine driver */
+static const cassette_config mikro80_cassette_config =
+{
+	rk8_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( mikro80 )
     /* basic machine hardware */
     MDRV_CPU_ADD("main",8080, 2000000)
@@ -151,9 +159,10 @@ static MACHINE_DRIVER_START( mikro80 )
     MDRV_VIDEO_UPDATE(mikro80)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
-   	MDRV_SOUND_ADD("wave", WAVE, 0)
+   	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	MDRV_CASSETTE_ADD( "cassette", mikro80_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radio99 )
@@ -166,23 +175,6 @@ static MACHINE_DRIVER_START( radio99 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)    
 MACHINE_DRIVER_END
 
-static void mikro80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rk8_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(mikro80)
-	CONFIG_DEVICE(mikro80_cassette_getinfo)	
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 
@@ -204,5 +196,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1983, mikro80, 	 0,  	 0,	mikro80, 	mikro80, 	mikro80, mikro80,  "", 					 "Mikro-80",	 0)
-COMP( 1993, radio99, mikro80,  	 0,	radio99, 	mikro80, 	radio99, mikro80,  "", 					 "Radio-99DM",	 0)
+COMP( 1983, mikro80, 	 0,  	 0,	mikro80, 	mikro80, 	mikro80, 0,     "", 					 "Mikro-80",	 0)
+COMP( 1993, radio99, mikro80,  	 0,	radio99, 	mikro80, 	radio99, 0,     "", 					 "Radio-99DM",	 0)

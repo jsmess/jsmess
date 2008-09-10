@@ -74,7 +74,6 @@ extern QUICKLOAD_LOAD( spectrum );
 INPUT_PORTS_EXTERN( spectrum );
 MACHINE_DRIVER_EXTERN( spectrum );
 SYSTEM_CONFIG_EXTERN(spectrum)
-SYSTEM_CONFIG_EXTERN(spectrum_common)
 
 extern READ8_HANDLER(spectrum_port_1f_r);
 extern READ8_HANDLER(spectrum_port_7f_r);

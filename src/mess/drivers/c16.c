@@ -437,6 +437,8 @@ static MACHINE_DRIVER_START( c16 )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -657,7 +659,6 @@ static DRIVER_INIT( plus4 )
 static SYSTEM_CONFIG_START(c16)
 	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
 	CONFIG_RAM_DEFAULT(64 * 1024)
@@ -665,7 +666,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16c)
 	CONFIG_DEVICE(c16_cartslot_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
@@ -674,7 +674,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c16v)
 	CONFIG_DEVICE(c16_cartslot_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
@@ -684,20 +683,17 @@ SYSTEM_CONFIG_END
 static SYSTEM_CONFIG_START(plus)
 	CONFIG_DEVICE(c16_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusc)
 	CONFIG_DEVICE(c16_cartslot_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(c1551_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(plusv)
 	CONFIG_DEVICE(c16_cartslot_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END

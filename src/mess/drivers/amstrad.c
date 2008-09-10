@@ -328,7 +328,7 @@ static READ8_HANDLER (amstrad_ppi_portb_r)
 /* Set b7 with cassette tape input */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.03) {
+		if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.03) {
 			data |= (1<<7);
 		}
 	}
@@ -394,7 +394,7 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x20) != 0) {
-			cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),
+			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
 				((data & 0x20) ? -1.0 : +1.0));
 		}
 	}
@@ -403,7 +403,7 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x10) != 0) {
-			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
+			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
 				((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
 				CASSETTE_MASK_MOTOR);
 		}
@@ -2908,6 +2908,14 @@ speed of 3.8Mhz */
   This is the reason why the displayed area is not the same as the visible area.
  */
 
+static const cassette_config amstrad_cassette_config =
+{
+	cdt_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( amstrad )
 	/* Machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)
@@ -2938,7 +2946,7 @@ static MACHINE_DRIVER_START( amstrad )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("tape", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("ay", AY8912, 1000000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
@@ -2949,6 +2957,8 @@ static MACHINE_DRIVER_START( amstrad )
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(amstrad, "sna", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -2976,12 +2986,14 @@ static MACHINE_DRIVER_START( cpcplus )
 
 	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
 	MDRV_PALETTE_INIT(amstrad_plus)
+
+	MDRV_CASSETTE_REMOVE( "cassette" )
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( gx4000 )
 	MDRV_IMPORT_FROM(amstrad)
-	MDRV_SOUND_REMOVE("tape")
+	MDRV_SOUND_REMOVE("cassette")
 	MDRV_GFXDECODE(asic_sprite)
 	MDRV_MACHINE_START(plus)
 	MDRV_MACHINE_RESET(gx4000)
@@ -2995,6 +3007,8 @@ static MACHINE_DRIVER_START( gx4000 )
 
 	/* printer not present in the gx4000 */
 	MDRV_DEVICE_REMOVE("printer", PRINTER)
+
+	MDRV_CASSETTE_REMOVE( "cassette" )
 MACHINE_DRIVER_END
 
 
@@ -3131,21 +3145,6 @@ static void cpc6128_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 
-static void cpc6128_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *)cdt_cassette_formats; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static void cpcplus_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
@@ -3184,7 +3183,6 @@ static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 static SYSTEM_CONFIG_START( cpc6128 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(cpc6128_floppy_getinfo)
-	CONFIG_DEVICE(cpc6128_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 
@@ -3202,7 +3200,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( aleste )
 	CONFIG_DEVICE(aleste_floppy_getinfo)
-	CONFIG_DEVICE(cpc6128_cassette_getinfo)
 	CONFIG_RAM_DEFAULT(2048 * 1024)  // has 2048k RAM
 SYSTEM_CONFIG_END
 

@@ -663,6 +663,9 @@ static MACHINE_DRIVER_START( pet_general )
 	MDRV_PALETTE_INIT( pet )
 
 	MDRV_VIDEO_UPDATE( pet )
+
+	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -1079,21 +1082,9 @@ ROM_END
  *
  *************************************/
 
-void pet_datasette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
-
-		default:									datasette_device_getinfo(devclass, state, info);
-	}
-}
-
 /* Original PET 2001 - Basic 1 - RAM: 4k, 8k */
 static SYSTEM_CONFIG_START( pet2001 )
 	CONFIG_DEVICE(pet_cartslot_getinfo)
-	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM_DEFAULT(8 * 1024)
@@ -1102,7 +1093,6 @@ SYSTEM_CONFIG_END
 /* Later PET 2001 - Basic "2" - RAM: 8k, 16k, 32k */
 static SYSTEM_CONFIG_START( pet2 )
 	CONFIG_DEVICE(pet_cartslot_getinfo)
-	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(8 * 1024)
 	CONFIG_RAM(16 * 1024)
@@ -1112,7 +1102,6 @@ SYSTEM_CONFIG_END
 /* Early PET 4000 - Basic 4 - RAM: 8k, 16k, 32k */
 static SYSTEM_CONFIG_START( pet4o )
 	CONFIG_DEVICE(pet4_cartslot_getinfo)
-	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(8 * 1024)
 	CONFIG_RAM(16 * 1024)
@@ -1122,7 +1111,6 @@ SYSTEM_CONFIG_END
 /* Later PET 4000 / PET 8000 - Basic 4 - RAM: 32k expandable (expansion through DIPs currently) */
 static SYSTEM_CONFIG_START( pet4 )
 	CONFIG_DEVICE(pet4_cartslot_getinfo)
-	CONFIG_DEVICE(pet_datasette_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END

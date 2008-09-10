@@ -398,6 +398,13 @@ static INTERRUPT_GEN( vtech2_interrupt )
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
+static const cassette_config laser_cassette_config =
+{
+	vtech2_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
 static MACHINE_DRIVER_START( laser350 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3694700)        /* 3.694700 Mhz */
@@ -424,10 +431,12 @@ static MACHINE_DRIVER_START( laser350 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -478,21 +487,6 @@ ROM_END
 
 ***************************************************************************/
 
-static void laser_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) vtech2_cassette_formats; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void laser_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
@@ -533,7 +527,6 @@ static void laser_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 }
 
 static SYSTEM_CONFIG_START(laser)
-	CONFIG_DEVICE(laser_cassette_getinfo)
 	CONFIG_DEVICE(laser_cartslot_getinfo)
 	CONFIG_DEVICE(laser_floppy_getinfo)
 SYSTEM_CONFIG_END

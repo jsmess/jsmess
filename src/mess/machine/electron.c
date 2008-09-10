@@ -15,8 +15,8 @@
 ULA ula;
 static emu_timer *electron_tape_timer;
 
-static const device_config *cassette_device_image( void ) {
-	return image_from_devtype_and_index( IO_CASSETTE, 0 );
+static const device_config *cassette_device_image( running_machine *machine ) {
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 static void electron_tape_start( void ) {
@@ -43,7 +43,7 @@ static TIMER_CALLBACK(electron_tape_timer_handler)
 {
 	if ( ula.cassette_motor_mode ) {
 		double tap_val;
-		tap_val = cassette_input( cassette_device_image() );
+		tap_val = cassette_input( cassette_device_image( machine ) );
 		if ( tap_val < -0.5 ) {
 			ula.tape_value = ( ula.tape_value << 8 ) | TAPE_LOW;
 			ula.tape_steps++;
@@ -227,7 +227,7 @@ WRITE8_HANDLER( electron_ula_w ) {
 		ula.vram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, ula.screen_base );
 		logerror( "ULA: screen mode set to %d\n", ula.screen_mode );
 		ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
-		cassette_change_state( cassette_device_image(), ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( cassette_device_image( machine ), ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		ula.capslock_mode = ( data >> 7 ) & 0x01;
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:

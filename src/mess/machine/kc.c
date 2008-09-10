@@ -406,7 +406,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 	bit = 0;
 
 	/* get data from cassette */
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0038)
+	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
 		bit = 1;
 
 	/* update astb with bit */
@@ -418,13 +418,13 @@ static void	kc_cassette_init(void)
 	kc_cassette_timer = timer_alloc(kc_cassette_timer_callback, NULL);
 }
 
-static void	kc_cassette_set_motor(int motor_state)
+static void	kc_cassette_set_motor(running_machine *machine, int motor_state)
 {
 	/* state changed? */
 	if (((kc_cassette_motor_state^motor_state)&0x01)!=0)
 	{
 		/* set new motor state in cassette device */
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
 			motor_state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 			CASSETTE_MASK_MOTOR);
 
@@ -1389,7 +1389,7 @@ WRITE8_HANDLER ( kc85_4_pio_data_w )
 			kc85_4_update_0x08000(machine);
 			kc85_4_update_0x00000(machine);
 
-			kc_cassette_set_motor((data>>6) & 0x01);
+			kc_cassette_set_motor(machine, (data>>6) & 0x01);
 		}
 		break;
 
@@ -1630,7 +1630,7 @@ WRITE8_HANDLER ( kc85_3_pio_data_w )
 			kc85_3_update_0x0e000(machine);
 			kc85_3_update_0x00000(machine);
 
-			kc_cassette_set_motor((data>>6) & 0x01);
+			kc_cassette_set_motor(machine, (data>>6) & 0x01);
 		}
 		break;
 

@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910.1", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(microtan_ay8910_interface)
@@ -249,6 +249,8 @@ static MACHINE_DRIVER_START( microtan )
 	// snapshot/quickload
 	MDRV_SNAPSHOT_ADD(microtan, "m65", 0.5)
 	MDRV_QUICKLOAD_ADD(microtan_hexfile, "hex", 0.5)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 ROM_START( microtan )
@@ -268,21 +270,6 @@ ROM_START( microtan )
     // initialized in init_microtan
 ROM_END
 
-static void microtan_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( microtan )
-	CONFIG_DEVICE(microtan_cassette_getinfo)
-SYSTEM_CONFIG_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY      FULLNAME
-COMP( 1979, microtan, 0,		0,		microtan, microtan, microtan, microtan, "Tangerine", "Microtan 65" , 0)
+COMP( 1979, microtan, 0,		0,		microtan, microtan, microtan, 0,        "Tangerine", "Microtan 65" , 0)

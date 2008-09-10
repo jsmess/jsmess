@@ -748,6 +748,14 @@ static VIDEO_START( msx2 )
 #define MSX_VISIBLE_XBORDER_PIXELS	8
 #define MSX_VISIBLE_YBORDER_PIXELS	24
 
+static const cassette_config msx_cassette_config =
+{
+	fmsx_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
+
 static MACHINE_DRIVER_START( msx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 Mhz */
@@ -774,7 +782,7 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
 	MDRV_SOUND_CONFIG(msx_ay8910_interface)
@@ -786,6 +794,8 @@ static MACHINE_DRIVER_START( msx )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -834,7 +844,7 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
 	MDRV_SOUND_CONFIG(msx_ay8910_interface)
@@ -848,6 +858,8 @@ static MACHINE_DRIVER_START( msx2 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -2209,25 +2221,10 @@ static void msx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void msx_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) fmsx_cassette_formats; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(msx)
 	CONFIG_DEVICE(msx_floppy_getinfo)
 	CONFIG_DEVICE(msx_cartslot_getinfo)
-	CONFIG_DEVICE(msx_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 MSX_DRIVER_LIST

@@ -499,7 +499,6 @@ static const tms5220_interface ti99_4x_tms5220interface =
 };
 
 
-
 static MACHINE_DRIVER_START(ti99_4_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
@@ -519,9 +518,9 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave.1", WAVE, 0)
+	MDRV_SOUND_ADD("cassette1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("wave.2", WAVE, 0)
+	MDRV_SOUND_ADD("cassette2", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -535,6 +534,9 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4_50hz)
@@ -561,7 +563,7 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -570,6 +572,9 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4a_60hz)
@@ -596,7 +601,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -605,6 +610,9 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -632,7 +640,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -641,6 +649,9 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -676,7 +687,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -685,6 +696,9 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -789,18 +803,6 @@ ROM_END
  * and you could plug quite a lot of GROMs in the side port.  Neither of these
  * are emulated.
  */
-
-static void ti99_4_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void ti99_4_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -927,7 +929,6 @@ static void ti99_4_memcard_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 static SYSTEM_CONFIG_START(ti99_4)
-	CONFIG_DEVICE(ti99_4_cassette_getinfo)
 	CONFIG_DEVICE(ti99_4_cartslot_getinfo)
 	CONFIG_DEVICE(ti99_4_floppy_getinfo)
 	CONFIG_DEVICE(ti99_4_parallel_getinfo)

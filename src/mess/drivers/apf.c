@@ -207,7 +207,7 @@ static READ8_HANDLER(apf_imagination_pia_in_b_func)
 
 	data = 0x000;
 
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE,0)) > 0.0038)
+	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
 		data =(1<<7);
 
 	return data;
@@ -254,12 +254,12 @@ static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
 	keyboard_data = input_port_read(machine, keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
+	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),
+	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
@@ -625,6 +625,14 @@ INPUT_PORTS_END
 
 
 
+static const cassette_config apf_cassette_config =
+{
+	apf_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
+
 static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
 	//	MDRV_CPU_ADD("main", M6800, 3750000)        /* 7.8336 Mhz, only 6800p type used 1mhz max*/
@@ -648,6 +656,8 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", apf_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -656,6 +666,8 @@ static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( apf_m1000_map, 0 )
 	MDRV_MACHINE_START( apf_m1000 )
+
+	MDRV_CASSETTE_REMOVE( "cassette" )
 MACHINE_DRIVER_END
 
 
@@ -679,20 +691,6 @@ ROM_START(apfm1000)
 	ROM_CART_LOAD(0, "bin", 0x8000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
-static void apfimag_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) apf_cassette_formats; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void apfimag_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -714,7 +712,6 @@ static void apfimag_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 
 
 static SYSTEM_CONFIG_START( apfimag )
-	CONFIG_DEVICE(apfimag_cassette_getinfo)
 	CONFIG_DEVICE(apfimag_floppy_getinfo)
 SYSTEM_CONFIG_END
 

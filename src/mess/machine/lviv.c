@@ -66,7 +66,7 @@ static  READ8_HANDLER ( lviv_ppi_0_portb_r )
 static  READ8_HANDLER ( lviv_ppi_0_portc_r )
 {
 	UINT8 data = lviv_ppi_port_outputs[0][2] & 0x0f;
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.038)
+	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.038)
 		data |= 0x10;
 	if (lviv_ppi_port_outputs[0][0] & input_port_read(machine, "JOY"))
 		data |= 0x80;
@@ -89,7 +89,7 @@ static WRITE8_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory on/off
 	lviv_ppi_port_outputs[0][2] = data;
 	if (lviv_ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(0, data&0x01);
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x01) ? -1.0 : 1.0);
+	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x01) ? -1.0 : 1.0);
 	lviv_update_memory();
 }
 

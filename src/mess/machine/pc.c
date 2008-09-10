@@ -689,7 +689,7 @@ static READ8_HANDLER ( ibm5150_ppi_portc_r )
 
 	if ( ! ( pc_ppi.portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
+		double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
 
 		if ( tap_val < 0 )
 		{
@@ -730,7 +730,7 @@ static WRITE8_HANDLER ( ibm5150_ppi_portb_w )
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
 
@@ -908,7 +908,7 @@ static WRITE8_HANDLER ( pcjr_ppi_portb_w )
 	pit8253_gate_w( device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 
@@ -946,7 +946,7 @@ static READ8_HANDLER ( pcjr_ppi_portc_r )
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( pc_ppi.portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
+		double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
 
 		if ( tap_val < 0 )
 		{

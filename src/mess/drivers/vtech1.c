@@ -301,6 +301,13 @@ static const speaker_interface vtech1_speaker_interface =
  Machine Drivers
 ******************************************************************************/
 
+static const cassette_config laser_cassette_config =
+{
+	vtech1_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
 static MACHINE_DRIVER_START(laser110)
     /* basic machine hardware */
     MDRV_CPU_ADD("main", Z80, VTECH1_CLK)  /* 3.57950 Mhz */
@@ -321,7 +328,7 @@ static MACHINE_DRIVER_START(laser110)
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(vtech1_speaker_interface)
@@ -333,6 +340,8 @@ static MACHINE_DRIVER_START(laser110)
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(vtech1, "vz", 1.5)
 	MDRV_Z80BIN_QUICKLOAD_ADD(vtech1, 1.5)
+
+	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)
@@ -450,20 +459,6 @@ static Z80BIN_EXECUTE( vtech1 )
 	}
 }
 
-static void vtech1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) vtech1_cassette_formats; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -499,7 +494,6 @@ static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 
 static SYSTEM_CONFIG_START(vtech1)
     CONFIG_DEVICE(cartslot_device_getinfo)
-    CONFIG_DEVICE(vtech1_cassette_getinfo)
     CONFIG_DEVICE(vtech1_floppy_getinfo)
 	CONFIG_RAM_DEFAULT (66 * 1024)   /* with 64K memory expansion */
 	CONFIG_RAM         (4098 * 1024) /* with 4MB memory expansion */

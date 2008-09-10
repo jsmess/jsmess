@@ -79,6 +79,14 @@ ADDRESS_MAP_END
 INPUT_PORTS_EXTERN( radio86 );
 INPUT_PORTS_EXTERN( ms7007 );
 
+static const cassette_config orion_cassette_config =
+{
+	rko_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 /* Machine driver */
 static MACHINE_DRIVER_START( orion128 )
     MDRV_CPU_ADD("main", 8080, 2000000)
@@ -110,8 +118,10 @@ static MACHINE_DRIVER_START( orion128 )
     MDRV_VIDEO_UPDATE(orion128)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
@@ -163,11 +173,13 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
 	MDRV_SOUND_CONFIG(orionz80_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionz80ms )
@@ -209,26 +221,15 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
 	MDRV_SOUND_CONFIG(orionz80_ay_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 MACHINE_DRIVER_END
 
-static void orion_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rko_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -251,21 +252,18 @@ static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 static SYSTEM_CONFIG_START(orion128)
 	CONFIG_RAM_DEFAULT(256 * 1024)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(orionz80)
 	CONFIG_RAM_DEFAULT(512 * 1024)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(orionpro)
 	CONFIG_RAM_DEFAULT(512 * 1024)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(orion_cassette_getinfo);
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 

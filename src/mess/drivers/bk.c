@@ -148,6 +148,14 @@ static const struct t11_setup t11_data =
 };
 
 /* Machine driver */
+static const cassette_config bk0010_cassette_config =
+{
+	/*rk8_cassette_formats*/cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( bk0010 )
     /* basic machine hardware */
     MDRV_CPU_ADD("main", T11, 3000000)
@@ -169,8 +177,10 @@ static MACHINE_DRIVER_START( bk0010 )
     MDRV_VIDEO_UPDATE(bk0010)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
-   	MDRV_SOUND_ADD("wave", WAVE, 0)
+   	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bk0010fd )
@@ -194,28 +204,12 @@ static MACHINE_DRIVER_START( bk0010fd )
     MDRV_VIDEO_UPDATE(bk0010)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
-   	MDRV_SOUND_ADD("wave", WAVE, 0)
+   	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )
 MACHINE_DRIVER_END
 
-
-static void bk_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		//case MESS_DEVINFO_PTR_CASSETTE_FORMATS:       info->p = (void *)rk8_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(bk)
-	CONFIG_DEVICE(bk_cassette_getinfo)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 
@@ -243,8 +237,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY                  FULLNAME   FLAGS */
-COMP( 1985, bk0010, 	 0,  	 0,	bk0010, 	bk0010, 	bk0010, bk,  "Elektronika",			 "BK-0010",	 0)
-COMP( 1986, bk001001, 	bk0010,  0,	bk0010, 	bk0010, 	bk0010, bk,  "Elektronika",			 "BK-0010.01",	 0)
-COMP( 1986, bk0010fd, 	bk0010,  0,	bk0010fd, 	bk0010, 	bk0010, bk,  "Elektronika",			 "BK-0010 FDD",	 GAME_NOT_WORKING)
+COMP( 1985, bk0010, 	 0,  	 0,	bk0010, 	bk0010, 	bk0010, 0,  "Elektronika",			 "BK-0010",	 0)
+COMP( 1986, bk001001, 	bk0010,  0,	bk0010, 	bk0010, 	bk0010, 0,  "Elektronika",			 "BK-0010.01",	 0)
+COMP( 1986, bk0010fd, 	bk0010,  0,	bk0010fd, 	bk0010, 	bk0010, 0,  "Elektronika",			 "BK-0010 FDD",	 GAME_NOT_WORKING)
 
 

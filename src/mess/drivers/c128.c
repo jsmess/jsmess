@@ -597,6 +597,8 @@ static MACHINE_DRIVER_START( c128 )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -834,13 +836,11 @@ ROM_END
 static SYSTEM_CONFIG_START(c128)
 	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c128d)
 	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(c1571_device_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 

@@ -2313,7 +2313,7 @@ static int ti99_R9901_1(int offset)
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0)
+	/*if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
 		answer |= 8;*/
 
 	return answer;
@@ -2337,6 +2337,7 @@ static int ti99_R9901_2(int offset)
 */
 static int ti99_R9901_3(int offset)
 {
+	running_machine *machine = Machine;
 	int answer;
 
 	if (has_handset && (handset_buflen == 3))
@@ -2345,7 +2346,7 @@ static int ti99_R9901_3(int offset)
 		answer = 4;	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0)
+	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
 		answer |= 8;
 
 	return answer;
@@ -2443,7 +2444,7 @@ static int ti99_8_R9901_1(int offset)
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0)
+	/*if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
 		answer |= 8;*/
 
 	return answer;
@@ -2478,7 +2479,9 @@ static void ti99_8_PTGEN(int offset, int data)
 */
 static void ti99_CS_motor(int offset, int data)
 {
-	const device_config *img = image_from_devtype_and_index(IO_CASSETTE, offset-6);
+	running_machine *machine = Machine;
+
+	const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, ( offset-6 ) ? "cassette2" :  "cassette1" );
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -2501,9 +2504,17 @@ static void ti99_audio_gate(int offset, int data)
 */
 static void ti99_CS_output(int offset, int data)
 {
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), data ? +1 : -1);
+	running_machine *machine = Machine;
+
 	if (ti99_model != model_99_8)	/* 99/8 only has one tape port!!! */
-		cassette_output(image_from_devtype_and_index(IO_CASSETTE, 1), data ? +1 : -1);
+	{
+		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), data ? +1 : -1);
+		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), data ? +1 : -1);
+	}
+	else
+	{
+		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), data ? +1 : -1);
+	}
 }
 
 

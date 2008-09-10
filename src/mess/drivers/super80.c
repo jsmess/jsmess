@@ -365,23 +365,23 @@ static const struct z80_irq_daisy_chain super80_daisy_chain[] =
 
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 static void cassette_motor( running_machine *machine, UINT8 data )
 {
 	if (data)
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(cassette_device_image(machine), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	else
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(cassette_device_image(machine), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
 	if (input_port_read(machine, "CONFIG") & 8)
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(cassette_device_image(machine), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 	else
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(cassette_device_image(machine), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 }
 
 /********************************************* TIMER ************************************************/
@@ -413,7 +413,7 @@ static TIMER_CALLBACK( super80_timer )
 	z80pio_p_w(machine,0,1,in_fa);
 
 	cass_data[1]++;
-	cass_ws = (cassette_input(cassette_device_image()) > +0.03) ? 4 : 0;
+	cass_ws = (cassette_input(cassette_device_image(machine)) > +0.03) ? 4 : 0;
 
 	if (cass_ws != cass_data[0])
 	{
@@ -464,7 +464,7 @@ static WRITE8_HANDLER( super80_f0_w )
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80_mhz = (data & 4) ? 1 : 2;				/* bit 2 - video on/off */
 	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
-	if (bits & 0x01) cassette_output(cassette_device_image(), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 0x01) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -476,7 +476,7 @@ static WRITE8_HANDLER( super80r_f0_w )
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
-	if (bits & 0x01) cassette_output(cassette_device_image(), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 0x01) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -490,7 +490,7 @@ static WRITE8_HANDLER( super80v_f0_w )
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80v_vid_col = data & 4;					/* bit 2 - bankswitch video or colour ram */
 	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
-	if (bits & 0x01) cassette_output(cassette_device_image(), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 0x01) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -926,6 +926,13 @@ static MACHINE_RESET( super80 )
 	memory_set_bank(1, 1);
 }
 
+static const cassette_config super80_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
 static MACHINE_DRIVER_START( super80 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 Mhz */
@@ -947,13 +954,15 @@ static MACHINE_DRIVER_START( super80 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
+
+	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
@@ -996,13 +1005,15 @@ static MACHINE_DRIVER_START( super80v )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
+
+	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80r )
@@ -1140,21 +1151,7 @@ static void super80_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-static void super80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
-
-		default:				cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(super80)
-	CONFIG_DEVICE(super80_cassette_getinfo)
 	CONFIG_DEVICE(super80_cartslot_getinfo)
 SYSTEM_CONFIG_END
 

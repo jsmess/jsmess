@@ -186,9 +186,9 @@ static MACHINE_RESET( sord_m5_fd5 )
 }
 
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /*********************************************************************************************/
@@ -352,7 +352,7 @@ static  READ8_HANDLER(sord_sys_r)
 	data = 0;
 
 	/* cassette read */
-	if (cassette_input(cassette_device_image()) >=0)
+	if (cassette_input(cassette_device_image(machine)) >=0)
 		data |=(1<<0);
 
 	printer_handshake = centronics_read_handshake(0);
@@ -390,12 +390,12 @@ static WRITE8_HANDLER(sord_sys_w)
 
 	/* cassette remote */
 	cassette_change_state(
-		cassette_device_image(),
+		cassette_device_image(machine),
 		(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* cassette data */
-	cassette_output(cassette_device_image(), (data & (1<<0)) ? -1.0 : 1.0);
+	cassette_output(cassette_device_image(machine), (data & (1<<0)) ? -1.0 : 1.0);
 
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
@@ -618,6 +618,13 @@ static INTERRUPT_GEN( sord_interrupt )
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
+static const cassette_config sordm5_cassette_config =
+{
+	sordm5_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
 static MACHINE_DRIVER_START( sord_m5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3800000)
@@ -646,6 +653,8 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", sordm5_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -696,24 +705,9 @@ static FLOPPY_OPTIONS_START( sordm5 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static void sordm5_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) sordm5_cassette_formats; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(sordm5)
 	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_DEVICE(sordm5_cassette_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

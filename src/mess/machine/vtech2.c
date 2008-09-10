@@ -196,9 +196,9 @@ WRITE8_HANDLER( laser_bank_select_w )
     }
 }
 
-static const device_config *vtech2_cassette_image(void)
+static const device_config *vtech2_cassette_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /*************************************************
@@ -277,7 +277,7 @@ static int mra_bank(running_machine *machine, int bank, int offs)
 	}
 
     /* what's bit 7 good for? tape input maybe? */
-	level = cassette_input(vtech2_cassette_image()) * 65536.0;
+	level = cassette_input(vtech2_cassette_image(machine)) * 65536.0;
 	if( level < level_old - 511 )
 		cassette_bit = 0x00;
 	if( level > level_old + 511 )

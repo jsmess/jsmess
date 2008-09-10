@@ -114,6 +114,14 @@ static INPUT_PORTS_START( mikrosha )
 INPUT_PORTS_END
 
 /* Machine driver */
+static const cassette_config mikrosha_cassette_config =
+{
+	rkm_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( mikrosha )
     /* basic machine hardware */
     MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
@@ -142,26 +150,15 @@ static MACHINE_DRIVER_START( mikrosha )
 	MDRV_VIDEO_UPDATE(radio86)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_DEVICE_ADD("dma8257", DMA8257)
 	MDRV_DEVICE_CONFIG(radio86_dma)
+
+	MDRV_CASSETTE_ADD( "cassette", mikrosha_cassette_config )
 MACHINE_DRIVER_END
 
-static void mikrosha_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rkm_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 /* ROM definition */
 ROM_START( mikrosha )
@@ -171,11 +168,8 @@ ROM_START( mikrosha )
 	ROM_LOAD ("mikrosha.fnt", 0x0000, 0x0800, CRC(B315DA1C) SHA1(b5bf9abc0fff75b1aba709a7f08b23d4a89bb04b))
 ROM_END
 
-static SYSTEM_CONFIG_START(mikrosha)
-	CONFIG_DEVICE(mikrosha_cassette_getinfo);
-SYSTEM_CONFIG_END
 
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME        FLAGS */
-COMP( 1987, mikrosha, radio86,0, 		mikrosha, 	mikrosha,	radio86,	mikrosha,  	"Lianozovo Electromechanical Factory", 		"Mikrosha",		0)
+COMP( 1987, mikrosha, radio86,0, 		mikrosha, 	mikrosha,	radio86,	0,  		"Lianozovo Electromechanical Factory", 		"Mikrosha",		0)

@@ -166,6 +166,13 @@ ROM_START(electron)
         /* 3c000 15 */
 ROM_END
 
+static const cassette_config electron_cassette_config =
+{
+	uef_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
 static MACHINE_DRIVER_START( electron )
 	MDRV_CPU_ADD( "main", M6502, 2000000 )
 	MDRV_CPU_PROGRAM_MAP( electron_mem, 0 )
@@ -188,25 +195,10 @@ static MACHINE_DRIVER_START( electron )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+
+	MDRV_CASSETTE_ADD( "cassette", electron_cassette_config )
 MACHINE_DRIVER_END
 
-static void electron_cassette_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
-	switch( state ) {
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
-		info->p = (void *)uef_cassette_formats;
-		break;
-	default:
-		cassette_device_getinfo( devclass, state, info );
-		break;
-	}
-}
-
-static SYSTEM_CONFIG_START(electron)
-	CONFIG_DEVICE(electron_cassette_getinfo)
-SYSTEM_CONFIG_END
 
 /*     YEAR  NAME      PARENT COMPAT    MACHINE   INPUT     INIT  CONFIG    COMPANY  FULLNAME */
-COMP ( 1983, electron, 0,     0,        electron, electron, 0,    electron, "Acorn", "Acorn Electron", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+COMP ( 1983, electron, 0,     0,        electron, electron, 0,    0,        "Acorn", "Acorn Electron", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

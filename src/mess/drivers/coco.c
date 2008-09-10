@@ -629,9 +629,16 @@ static MACHINE_DRIVER_START( coco_sound )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
+
+static const cassette_config coco_cassette_config =
+{
+	coco_cassette_formats,
+	NULL,
+	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED
+};
 
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
@@ -657,6 +664,8 @@ static MACHINE_DRIVER_START( dragon32 )
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -683,6 +692,8 @@ static MACHINE_DRIVER_START( dragon64 )
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -709,6 +720,8 @@ static MACHINE_DRIVER_START( d64plus )
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -738,6 +751,8 @@ static MACHINE_DRIVER_START( dgnalpha )
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -764,6 +779,8 @@ static MACHINE_DRIVER_START( tanodr64 )
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -794,6 +811,8 @@ static MACHINE_DRIVER_START( coco )
 
 	/* devices */
 	MDRV_DEVICE_ADD("disto", MSM6242)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -824,6 +843,8 @@ static MACHINE_DRIVER_START( coco2 )
 
 	/* devices */
 	MDRV_DEVICE_ADD("disto", MSM6242)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -854,6 +875,8 @@ static MACHINE_DRIVER_START( coco2b )
 
 	/* devices */
 	MDRV_DEVICE_ADD("disto", MSM6242)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -894,6 +917,8 @@ static MACHINE_DRIVER_START( coco3 )
 	/* devices */
 	MDRV_DEVICE_ADD("vhd", COCO_VHD)
 	MDRV_DEVICE_ADD("disto", MSM6242)
+
+	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
@@ -1006,26 +1031,6 @@ ROM_END
  *
  *************************************/
 
-static void coco_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) coco_cassette_formats; break;
-
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-
 static void coco_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -1105,7 +1110,6 @@ static void coco3_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 
 
 static SYSTEM_CONFIG_START( generic_coco )
-	CONFIG_DEVICE( coco_cassette_getinfo )
 	CONFIG_DEVICE( coco_floppy_getinfo )
 SYSTEM_CONFIG_END
 
@@ -1117,7 +1121,6 @@ SYSTEM_CONFIG_END
 /* These have to be split up, as the CoCo has a bitbanger */
 /* where the Dragon has a paralell printer port */
 static SYSTEM_CONFIG_START( generic_dragon )
-	CONFIG_DEVICE( coco_cassette_getinfo )
 	CONFIG_DEVICE( coco_floppy_getinfo )
 	CONFIG_DEVICE( coco_cartslot_getinfo )
 SYSTEM_CONFIG_END

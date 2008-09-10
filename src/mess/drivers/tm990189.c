@@ -413,7 +413,7 @@ static int sys9901_r0(int offset)
 		reply |= input_port_read(Machine, keynames[digitsel]) << 1;
 
 	/* tape input */
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0)
+	if (cassette_input(device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" )) > 0.0)
 		reply |= 0x40;
 
 	return reply;
@@ -463,7 +463,7 @@ static void sys9901_spkrdrive_w(int offset, int data)
 
 static void sys9901_tapewdata_w(int offset, int data)
 {
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), data ? +1.0 : -1.0);
+	cassette_output(device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" ), data ? +1.0 : -1.0);
 }
 
 /*
@@ -553,7 +553,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 5: /* CKON: set DECKCONTROL */
 		LED_state |= 0x20;
 		{
-			const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+			const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -561,7 +561,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 6: /* CKOF: clear DECKCONTROL */
 		LED_state &= ~0x20;
 		{
-			const device_config *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+			const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -815,10 +815,12 @@ static MACHINE_DRIVER_START(tm990_189)
 	/* sound hardware */
 	/* one two-level buzzer */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 #define LEFT_BORDER		15
@@ -851,10 +853,12 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	/* sound hardware */
 	/* one two-level buzzer */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -983,18 +987,6 @@ static INPUT_PORTS_START(tm990_189)
 
 INPUT_PORTS_END
 
-static void tm990_189_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void tm990_189_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* serial */
@@ -1018,7 +1010,6 @@ static void tm990_189_serial_getinfo(const mess_device_class *devclass, UINT32 s
 
 static SYSTEM_CONFIG_START(tm990_189)
 	/* a tape interface and a rs232 interface... */
-	CONFIG_DEVICE(tm990_189_cassette_getinfo)
 	CONFIG_DEVICE(tm990_189_serial_getinfo)
 SYSTEM_CONFIG_END
 

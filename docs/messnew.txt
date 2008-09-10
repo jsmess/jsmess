@@ -145,6 +145,8 @@ Source Changes:
 - Removed MESS_DEBUG and the TESTDRIVER define and enabled a lot of 
   non-working drivers [Oliver Stöneberg]
 
+- Changed the cassette implementation into a regular mame device.  [Wilbert Pol]
+
 
 
 0.127

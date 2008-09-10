@@ -697,7 +697,6 @@ INPUT_PORTS_END
 
 static SYSTEM_CONFIG_START ( to )
      CONFIG_DEVICE ( to7_cartridge_getinfo )
-     CONFIG_DEVICE ( to7_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
@@ -756,6 +755,7 @@ static MACHINE_DRIVER_START ( to7 )
 	 /* printer */
 	 MDRV_DEVICE_ADD("printer", PRINTER)
 
+	MDRV_CASSETTE_ADD( "cassette", to7_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
@@ -1117,7 +1117,6 @@ INPUT_PORTS_END
 
 static SYSTEM_CONFIG_START ( mo )
      CONFIG_DEVICE ( mo5_cartridge_getinfo )
-     CONFIG_DEVICE ( mo5_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
@@ -1140,6 +1139,8 @@ static MACHINE_DRIVER_START ( mo5 )
      MDRV_MACHINE_RESET ( mo5 )
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( mo5, 0 )
+
+	MDRV_CASSETTE_MODIFY( "cassette", mo5_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( mo5e )

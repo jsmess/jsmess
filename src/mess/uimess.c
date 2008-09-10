@@ -12,6 +12,7 @@
 #include "uimess.h"
 #include "uiinput.h"
 #include "input.h"
+#include "devices/cassette.h"
 
 
 /***************************************************************************
@@ -448,7 +449,7 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 
 #if HAS_WAVE
   	/* add tape control menu */
-	if (device_find_from_machine(machine, IO_CASSETTE))
+	if (device_list_first(machine->config->devicelist, CASSETTE))
 		ui_menu_item_append(menu, "Tape Control", NULL, 0, ui_mess_menu_tape_control);
 #endif /* HAS_WAVE */
 

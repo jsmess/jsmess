@@ -92,9 +92,9 @@ Notes:
 
 static emu_timer *abc80_keyboard_timer;
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /* Read/Write Handlers */
@@ -468,7 +468,7 @@ static READ8_HANDLER( abc80_pio_port_b_r )
 
 	*/
 
-	UINT8 data = (cassette_input(cassette_device_image()) > +1.0) ? 0x80 : 0;
+	UINT8 data = (cassette_input(cassette_device_image(machine)) > +1.0) ? 0x80 : 0;
 
 	return data;
 };
@@ -490,9 +490,9 @@ static WRITE8_HANDLER( abc80_pio_port_b_w )
 
 	*/
 
-	cassette_change_state(cassette_device_image(), BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(cassette_device_image(machine), BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-	cassette_output(cassette_device_image(), BIT(data, 7) ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(machine), BIT(data, 7) ? -1.0 : +1.0);
 };
 
 static const z80pio_interface abc80_pio_intf =
@@ -574,6 +574,8 @@ static MACHINE_DRIVER_START( abc80 )
 
 	// printer device
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -610,18 +612,6 @@ ROM_END
 
 /* System Configuration */
 
-static void abc80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	// cassette
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -643,7 +633,6 @@ static void abc80_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 static SYSTEM_CONFIG_START( abc80 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
-	CONFIG_DEVICE(abc80_cassette_getinfo)
 	CONFIG_DEVICE(abc80_floppy_getinfo)
 SYSTEM_CONFIG_END
 

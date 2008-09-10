@@ -692,7 +692,6 @@ static void ts2068_cartslot_getinfo(const mess_device_class *devclass, UINT32 st
 }
 
 static SYSTEM_CONFIG_START(ts2068)
-	CONFIG_IMPORT_FROM(spectrum_common)
 	CONFIG_DEVICE(ts2068_cartslot_getinfo)
 	CONFIG_RAM_DEFAULT(48 * 1024)
 SYSTEM_CONFIG_END

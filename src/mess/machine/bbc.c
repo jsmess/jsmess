@@ -1407,7 +1407,7 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 {
 
 	double dev_val;
-	dev_val=cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
+	dev_val=cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
 
 	// look for rising edges on the cassette wave
 	if (((dev_val>=0.0) && (last_dev_val<0.0)) || ((dev_val<0.0) && (last_dev_val>=0.0)))
@@ -1463,14 +1463,14 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 
 }
 
-static void BBC_Cassette_motor(unsigned char status)
+static void BBC_Cassette_motor(running_machine *machine, unsigned char status)
 {
 	if (status)
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED ,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(bbc_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	} else {
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		timer_reset(bbc_tape_timer, attotime_never);
 		MC6850_Reset(wav_len);
 		len0=0;
@@ -1485,7 +1485,7 @@ static void BBC_Cassette_motor(unsigned char status)
 
 WRITE8_HANDLER ( BBC_SerialULA_w )
 {
-	BBC_Cassette_motor((data & 0x80) >> 7);
+	BBC_Cassette_motor(machine, (data & 0x80) >> 7);
 }
 
 

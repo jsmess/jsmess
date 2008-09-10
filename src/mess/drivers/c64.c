@@ -521,6 +521,8 @@ static MACHINE_DRIVER_START( c64 )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c64pal )
@@ -549,6 +551,8 @@ static MACHINE_DRIVER_START( c64pal )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ultimax )
@@ -570,6 +574,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c64gs )
 	MDRV_IMPORT_FROM( c64pal )
 	MDRV_SOUND_REMOVE( "dac" )
+	MDRV_CASSETTE_REMOVE( "cassette" )
 	MDRV_QUICKLOAD_REMOVE
 MACHINE_DRIVER_END
 
@@ -578,6 +583,7 @@ static MACHINE_DRIVER_START( sx64 )
 	MDRV_IMPORT_FROM( c64pal )
 //	MDRV_IMPORT_FROM( cpu_vc1541 )
 	MDRV_SOUND_REMOVE( "dac" )
+	MDRV_CASSETTE_REMOVE( "cassette" )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
 #else
@@ -699,7 +705,6 @@ ROM_END
 static SYSTEM_CONFIG_START(c64)
 	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(sx64)
@@ -709,7 +714,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(ultimax)
 	CONFIG_DEVICE(ultimax_cartslot_getinfo)
-	CONFIG_DEVICE(datasette_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c64gs)

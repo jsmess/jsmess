@@ -189,7 +189,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & (1<<3))!=0)
 	{
 		/* write cassette data */
-		cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & (1<<3)) ? -1.0 : +1.0);
+		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & (1<<3)) ? -1.0 : +1.0);
 	}
 
 	PreviousFE = data;
@@ -260,7 +260,7 @@ READ8_HANDLER(spectrum_port_fe_r)
 	data |= (0xe0); /* Set bits 5-7 - as reset above */
 
 	/* cassette input from wav */
-	if (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0038 )
+	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038 )
 	{
 		data &= ~0x40;
 	}
@@ -446,6 +446,13 @@ static INTERRUPT_GEN( spec_interrupt )
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
+static const cassette_config spectrum_cassette_config =
+{
+	tzx_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
 MACHINE_DRIVER_START( spectrum )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3500000)        /* 3.5 Mhz */
@@ -473,7 +480,7 @@ MACHINE_DRIVER_START( spectrum )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -481,6 +488,8 @@ MACHINE_DRIVER_START( spectrum )
 	/* devices */
 	MDRV_SNAPSHOT_ADD(spectrum, "sna,z80,sp", 0)
 	MDRV_QUICKLOAD_ADD(spectrum, "scr", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", spectrum_cassette_config )
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -526,25 +535,7 @@ ROM_START(inves)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-static void spectrum_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)tzx_cassette_formats; break;
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-SYSTEM_CONFIG_START(spectrum_common)
-	CONFIG_DEVICE(spectrum_common_cassette_getinfo)
-SYSTEM_CONFIG_END
-
 SYSTEM_CONFIG_START(spectrum)
-	CONFIG_IMPORT_FROM(spectrum_common)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 

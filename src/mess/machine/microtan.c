@@ -159,9 +159,9 @@ static void microtan_set_irq_line(running_machine *machine)
     cpunum_set_input_line(machine, 0, 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
 }
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /**************************************************************
@@ -218,7 +218,7 @@ static WRITE8_HANDLER (via_0_out_b )
 {
     LOG(("microtan_via_0_out_b %02X\n", data));
     /* bit #7 is the cassette output signal */
-    cassette_output(cassette_device_image(), data & 0x80 ? +1.0 : -1.0);
+    cassette_output(cassette_device_image(machine), data & 0x80 ? +1.0 : -1.0);
 }
 
 static WRITE8_HANDLER ( via_0_out_ca2 )
@@ -337,7 +337,7 @@ static const struct via6522_interface via6522[2] =
 
 static TIMER_CALLBACK(microtan_read_cassette)
 {
-	double level = cassette_input(cassette_device_image());
+	double level = cassette_input(cassette_device_image(machine));
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)

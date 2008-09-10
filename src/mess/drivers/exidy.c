@@ -195,12 +195,12 @@ The serial code (which was never connected to the outside) is disabled for now.
 static emu_timer *cassette_timer;
 
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
 	if (exidy_fe & 0x20)
-		return image_from_devtype_and_index(IO_CASSETTE, 1);
+		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" );
 	else
-		return image_from_devtype_and_index(IO_CASSETTE, 0);
+		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" );
 }
 
 static UINT8 cass_data[]={ 0, 0, 0, 0, 0, 0, 0 };
@@ -217,7 +217,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 
 			cass_data[1]++;
 
-			cass_ws = (cassette_input(cassette_device_image()) > +0.02) ? 1 : 0;
+			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
 
 			if (cass_ws != cass_data[0])
 			{
@@ -250,7 +250,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 				if (!((cass_data[4] == 0) && (cass_data[5] & 4)))
 				{
 					cass_data[6] ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(), cass_data[6] ? -1.0 : +1.0);
+					cassette_output(cassette_device_image(machine), cass_data[6] ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -259,7 +259,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 			/* loading a tape */
 			cass_data[1]++;
 
-			cass_ws = (cassette_input(cassette_device_image()) > +0.02) ? 1 : 0;
+			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
 
 			if (cass_ws != cass_data[0])
 			{
@@ -292,7 +292,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 				if (!((cass_data[4] == 0) && (cass_data[5] & 8)))
 				{
 					cass_data[6] ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(), cass_data[6] ? -1.0 : +1.0);
+					cassette_output(cassette_device_image(machine), cass_data[6] ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -424,27 +424,27 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 	{
 		if (data & 0x20)
 		{
-			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 		else
 		{
-			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 	}
 	else
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 	}
 
 	/* cassette 1 motor */
-	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),
+	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette 2 motor */
-	cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1),
+	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ),
 		(data & 0x20) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if ((data & EXIDY_CASSETTE_MOTOR_MASK) && (~data & 0x80))
@@ -720,6 +720,14 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
+static const cassette_config exidy_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( exidy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 12638000/6)
@@ -743,9 +751,9 @@ static MACHINE_DRIVER_START( exidy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cass1", WAVE, 0)
+	MDRV_SOUND_ADD("cassette1", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
-	MDRV_SOUND_ADD("cass2", WAVE, 1)
+	MDRV_SOUND_ADD("cassette2", WAVE, 1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	// speaker on parallel port
@@ -755,6 +763,9 @@ static MACHINE_DRIVER_START( exidy )
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 3)
+
+	MDRV_CASSETTE_ADD( "cassette1", exidy_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", exidy_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )
@@ -863,28 +874,14 @@ static void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-static void exidy_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(exidy)
 	CONFIG_DEVICE(exidy_floppy_getinfo)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(exidy_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(exidyd)
 	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(exidy_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 

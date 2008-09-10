@@ -161,7 +161,7 @@ static READ8_HANDLER (pio_port_c_r )
     if (mz700_motor_on)
         data |= 0x10;
 
-    if (cassette_input(image_from_devtype_and_index(IO_CASSETTE,0)) > 0.0038)
+    if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
         data |= 0x20;       /* set the RDATA status */
 
 	if (ne556_out[0])
@@ -210,11 +210,11 @@ static WRITE8_HANDLER ( pio_port_c_w )
 	pio_port_c_output = data;
 
 	cassette_change_state(
-		image_from_devtype_and_index(IO_CASSETTE, 0),
+		device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
-    cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x02) ? +1.0 : -1.0);
+    cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x02) ? +1.0 : -1.0);
 }
 
 /************************ MMIO ***********************************************/

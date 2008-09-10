@@ -362,13 +362,15 @@ static MACHINE_DRIVER_START( kc85_3 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(kc, "kcc", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -419,21 +421,9 @@ ROM_START(kc85_3)
 	ROM_LOAD("caos__e0.853", 0x12000, 0x2000, CRC(52bc2199) SHA1(207d3e1c4ebf82ac7553ed0a0850b627b9796d4b))
 ROM_END
 
-static void kc85_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(kc85)
 	CONFIG_RAM_DEFAULT		(64 * 1024)
-	CONFIG_DEVICE(kc85_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 static void kc85d_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

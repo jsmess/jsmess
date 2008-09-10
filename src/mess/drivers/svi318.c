@@ -260,6 +260,13 @@ static const ay8910_interface svi318_ay8910_interface =
 	svi318_psg_port_b_w
 };
 
+static const cassette_config svi318_cassette_config =
+{
+	svi_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
 static MACHINE_DRIVER_START( svi318 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 Mhz */
@@ -287,7 +294,7 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
 	MDRV_SOUND_CONFIG(svi318_ay8910_interface)
@@ -295,6 +302,8 @@ static MACHINE_DRIVER_START( svi318 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi318n )
@@ -363,7 +372,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910", AY8910, 1789773)
 	MDRV_SOUND_CONFIG(svi318_ay8910_interface)
@@ -371,6 +380,8 @@ static MACHINE_DRIVER_START( svi328_806 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi328n_806 )
@@ -448,26 +459,6 @@ ROM_START( sv328n80 )
 	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
-static void svi318_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:
-			info->i = 1;
-			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
-			info->p = (void *) svi_cassette_formats;
-			break;
-
-		default:
-			cassette_device_getinfo(devclass, state, info);
-			break;
-	}
-}
 
 static void svi318_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -528,7 +519,6 @@ static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 static SYSTEM_CONFIG_START( svi318_common )
-	CONFIG_DEVICE(svi318_cassette_getinfo)
 	CONFIG_DEVICE(svi318_cartslot_getinfo)
 	CONFIG_DEVICE(svi318_floppy_getinfo)
 SYSTEM_CONFIG_END

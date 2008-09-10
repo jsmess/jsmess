@@ -204,6 +204,14 @@ INPUT_PORTS_END
 *****************************************************************************/
 
 
+static const cassette_config mc10_cassette_config =
+{
+	coco_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
+
 static MACHINE_DRIVER_START( mc10 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6803, XTAL_3_579545MHz)  /* 0,894886 Mhz */
@@ -225,6 +233,8 @@ static MACHINE_DRIVER_START( mc10 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", mc10_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -248,37 +258,11 @@ ROM_END
 
 
 /*****************************************************************************
- Devices
-*****************************************************************************/
-
-
-static void mc10_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) coco_cassette_formats; break;
-
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-
-/*****************************************************************************
  System config
 *****************************************************************************/
 
 
 static SYSTEM_CONFIG_START(mc10)
-	CONFIG_DEVICE( mc10_cassette_getinfo )
 	CONFIG_RAM        (  4 * 1024 )   /* standard */
 	CONFIG_RAM_DEFAULT( 20 * 1024 )   /* with 16K memory expansion */
 SYSTEM_CONFIG_END

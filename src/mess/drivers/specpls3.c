@@ -424,7 +424,6 @@ static void specpls3_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 }
 
 static SYSTEM_CONFIG_START(specpls3)
-	CONFIG_IMPORT_FROM(spectrum_common)
 	CONFIG_DEVICE(specpls3_floppy_getinfo)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 SYSTEM_CONFIG_END

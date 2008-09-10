@@ -165,9 +165,9 @@ WRITE8_HANDLER (vtech1_memory_bank_w)
  Cassette Handling
 ******************************************************************************/
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 
@@ -498,7 +498,7 @@ READ8_HANDLER(vtech1_keyboard_r)
         data &= ~0x80;
 
 	/* cassette input is bit 5 (0x40) */
-	level = cassette_input(cassette_device_image());
+	level = cassette_input(cassette_device_image(machine));
 	if (level < -0.008)
 		cassette_bit = 0x00;
 	if (level > +0.008)
@@ -529,7 +529,7 @@ WRITE8_HANDLER(vtech1_latch_w)
 	if ((vtech1_latch ^ data ) & 0x06)
 	{
 		static double amp[4] = { +1.0, +0.5, -0.5, -1.0 };
-		cassette_output(cassette_device_image(), amp[(data >> 1) & 3]);
+		cassette_output(cassette_device_image(machine), amp[(data >> 1) & 3]);
 	}
 
 	/* speaker data bits toggle? */

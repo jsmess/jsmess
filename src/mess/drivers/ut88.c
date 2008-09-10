@@ -155,6 +155,13 @@ static INPUT_PORTS_START( ut88mini )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
 INPUT_PORTS_END
 
+static const cassette_config ut88_cassette_config =
+{
+	rku_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
 /* Machine driver */
 static MACHINE_DRIVER_START( ut88 )
 	/* basic machine hardware */
@@ -184,8 +191,10 @@ static MACHINE_DRIVER_START( ut88 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", ut88_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ut88mini )
@@ -198,25 +207,9 @@ static MACHINE_DRIVER_START( ut88mini )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_ut88mini)
+
+	MDRV_CASSETTE_ADD( "cassette", ut88_cassette_config )
 MACHINE_DRIVER_END
-
-static void ut88_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rku_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(ut88)
-	CONFIG_DEVICE(ut88_cassette_getinfo)
-SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( ut88 )
@@ -236,6 +229,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT       INIT        CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1989, ut88mini,  0,      	0, 		ut88mini, 	ut88mini, 	ut88mini, 	ut88,  "", 		 "UT-88 mini",	 0)
-COMP( 1989, ut88,      ut88mini,0, 		ut88, 		ut88,		ut88, 		ut88,  "", 		 "UT-88",		 0)
+COMP( 1989, ut88mini,  0,      	0, 		ut88mini, 	ut88mini, 	ut88mini, 	0,     "", 		 "UT-88 mini",	 0)
+COMP( 1989, ut88,      ut88mini,0, 		ut88, 		ut88,		ut88, 		0,     "", 		 "UT-88",		 0)
 

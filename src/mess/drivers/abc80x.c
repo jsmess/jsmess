@@ -801,6 +801,8 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_IMPORT_FROM(abc800m_video)
 
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
@@ -820,6 +822,8 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_IMPORT_FROM(abc800c_video)
 
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
@@ -840,6 +844,8 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_IMPORT_FROM(abc802_video)
 
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
@@ -863,6 +869,8 @@ static MACHINE_DRIVER_START( abc806 )
 
 	MDRV_DEVICE_ADD(E0516_TAG, E0516)
 	MDRV_DEVICE_CONFIG(abc806_e0516_intf)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1018,18 +1026,6 @@ ROM_END
 
 /* System Configuration */
 
-static void abc800_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void abc800_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -1089,21 +1085,18 @@ static void abc800_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 static SYSTEM_CONFIG_START( abc800 )
 	CONFIG_RAM_DEFAULT(16 * 1024)
 	CONFIG_RAM		  (32 * 1024)
-	CONFIG_DEVICE(abc800_cassette_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( abc802 )
 	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_DEVICE(abc800_cassette_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( abc806 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
-	CONFIG_DEVICE(abc800_cassette_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END

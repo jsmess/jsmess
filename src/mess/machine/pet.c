@@ -82,10 +82,10 @@ static  READ8_HANDLER ( pet_pia0_port_a_read )
 {
 	int data = 0xf0 | pet_keyline_select;
 
-	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 
-	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 1)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x20;
 
 	if (!cbm_ieee_eoi_r()) 
@@ -147,7 +147,7 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 static READ8_HANDLER( pet_pia0_ca1_in )
 {
 	// cassette 1 read
-	return (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	return (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > +0.0) ? 1 : 0;
 }
 
 
@@ -160,12 +160,12 @@ static WRITE8_HANDLER( pet_pia0_cb2_out )
 {
 	if (!data)
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette1_timer, attotime_never);
 	}
 }
@@ -303,12 +303,12 @@ static  READ8_HANDLER( pet_via_port_b_r )
 
 	if (!(data & 0x10))
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 1),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette2_timer, attotime_never);
 	}
 
@@ -323,7 +323,7 @@ static  READ8_HANDLER( pet_via_port_b_r )
 static READ8_HANDLER( pet_via_cb1_r )
 {
 	// cassette 2 read
-	return (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	return (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
 }
 
 
@@ -560,7 +560,7 @@ static TIMER_CALLBACK(pet_interrupt)
 static TIMER_CALLBACK( pet_tape1_timer )
 {
 //	cassette 1
-	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > +0.0) ? 1 : 0;
 	pia_0_ca1_w(machine, 0, data);
 }
 
@@ -568,7 +568,7 @@ static TIMER_CALLBACK( pet_tape1_timer )
 static TIMER_CALLBACK( pet_tape2_timer )
 {
 //	cassette 2
-	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 1)) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
 	via_0_cb1_w(machine, 0, data);
 }
 

@@ -438,9 +438,9 @@ WRITE8_HANDLER ( msx_psg_w )
 		ay8910_control_port_0_w (machine, offset, data);
 }
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 static const device_config *printer_image(running_machine *machine)
@@ -452,7 +452,7 @@ READ8_HANDLER ( msx_psg_port_a_r )
 {
 	int data, inp;
 
-	data = (cassette_input(cassette_device_image()) > 0.0038 ? 0x80 : 0);
+	data = (cassette_input(cassette_device_image(machine)) > 0.0038 ? 0x80 : 0);
 
 	if ( (msx1.psg_b ^ input_port_read(machine, "DSW") ) & 0x40)
 		{
@@ -714,14 +714,14 @@ static WRITE8_HANDLER ( msx_ppi_port_c_w )
 
 	/* cassette motor on/off */
 	if ( (old_val ^ data) & 0x10)
-		cassette_change_state(cassette_device_image(),
+		cassette_change_state(cassette_device_image(machine),
 						(data & 0x10) ? CASSETTE_MOTOR_DISABLED :
 										CASSETTE_MOTOR_ENABLED,
 						CASSETTE_MASK_MOTOR);
 
 	/* cassette signal write */
 	if ( (old_val ^ data) & 0x20)
-		cassette_output(cassette_device_image(), (data & 0x20) ? -1.0 : 1.0);
+		cassette_output(cassette_device_image(machine), (data & 0x20) ? -1.0 : 1.0);
 
 	old_val = data;
 }

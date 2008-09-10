@@ -173,6 +173,13 @@ static const struct CassetteOptions dai_cassette_options = {
 	44100		/* sample frequency */
 };
 
+static const cassette_config dai_cassette_config =
+{
+	cassette_default_formats,
+	&dai_cassette_options,
+	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
 /* machine definition */
 static MACHINE_DRIVER_START( dai )
 	/* basic machine hardware */
@@ -204,13 +211,15 @@ static MACHINE_DRIVER_START( dai )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(dai_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
+
+	MDRV_CASSETTE_ADD( "cassette", dai_cassette_config )
 MACHINE_DRIVER_END
 
 #define io_dai		io_NULL
@@ -227,27 +236,8 @@ ROM_START(dai)
 ROM_END
 
 
-static void dai_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_OPTIONS:				info->p = (void *) &dai_cassette_options; break;
-
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(dai)
 	CONFIG_RAM_DEFAULT(48 * 1024)
-	CONFIG_DEVICE(dai_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 

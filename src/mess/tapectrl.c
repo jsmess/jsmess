@@ -46,6 +46,24 @@ struct _tape_control_menu_state
 ***************************************************************************/
 
 /*-------------------------------------------------
+    cassette_count - returns the number of cassette
+    devices in the machine
+-------------------------------------------------*/
+
+INLINE int cassette_count( running_machine *machine )
+{
+	int count = 0;
+	const device_config *device = device_list_first( machine->config->devicelist, CASSETTE );
+
+	while ( device )
+	{
+		count++;
+		device = device_list_next ( device, CASSETTE );
+	}
+	return count;
+}
+
+/*-------------------------------------------------
     tapecontrol_gettime - returns a textual
 	representation of the time
 -------------------------------------------------*/
@@ -81,7 +99,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 {
 	astring *timepos = astring_alloc();
 	cassette_state state;
-	int count = device_count(machine, IO_CASSETTE);
+	int count = cassette_count(machine);
 	UINT32 flags = 0;
 
 	if( count > 0 )
@@ -155,7 +173,15 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	/* do we have to load the device? */
 	if (menustate->device == NULL)
 	{
-		menustate->device = image_from_devtype_and_index(IO_CASSETTE, menustate->index);
+		int index = menustate->index;
+		const device_config *device = device_list_first( machine->config->devicelist, CASSETTE );
+
+		while ( index > 0 && device )
+		{
+			device = device_list_next ( device, CASSETTE );
+			index--;
+		}
+		menustate->device = device;
 		ui_menu_reset(menu, 0);
 	}
 
@@ -174,13 +200,13 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 				if (menustate->index > 0)
 					menustate->index--;
 				else
-					menustate->index = device_count(machine, IO_CASSETTE) - 1;
+					menustate->index = cassette_count(machine) - 1;
 				menustate->device = NULL;
 				break;
 
 			case IPT_UI_RIGHT:
 				/* right arrow - rotate right through cassette devices */
-				if (menustate->index < device_count(machine, IO_CASSETTE) - 1)
+				if (menustate->index < cassette_count(machine) - 1)
 					menustate->index++;
 				else
 					menustate->index = 0;

@@ -92,12 +92,12 @@ static WRITE8_HANDLER( vc20_via0_write_ca2 )
 
 	if(via0_ca2)
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	}
 	else
 	{
-		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette_timer, attotime_never);
 	}
 }
@@ -117,7 +117,7 @@ static  READ8_HANDLER( vc20_via0_read_porta )
 	if (!serial_data || !cbm_serial_data_read ())
 		value &= ~0x02;
 
-	if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		value &= ~0x40;
 	else
 		value |=  0x40;
@@ -180,7 +180,7 @@ static READ8_HANDLER( vc20_via1_read_porta )
 
 static  READ8_HANDLER( vc20_via1_read_ca1 )
 {
-	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
 	return data;
 }
 
@@ -319,7 +319,7 @@ static WRITE8_HANDLER( vc20_via1_write_porta )
 static WRITE8_HANDLER( vc20_via1_write_portb )
 {
 /*  logerror("via1_write_portb: $%02X\n", data); */
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 	via1_portb = data;
 }
 
@@ -549,7 +549,7 @@ static void vc20_memory_init(running_machine *machine)
 
 static TIMER_CALLBACK( vic20_tape_timer )
 {
-	UINT8 data = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
 	via_1_ca1_w(machine, 0, data);
 }
 

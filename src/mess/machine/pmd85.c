@@ -775,19 +775,19 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
 	{
 		/* tape reading */
-		if (cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0))&CASSETTE_PLAY)
+		if (cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ))&CASSETTE_PLAY)
 		{
 			switch (pmd85_model)
 			{
 				case PMD85_1:
 					if (clk_level_tape)
 					{
-						previous_level = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.038) ? 1 : 0;
+						previous_level = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.038) ? 1 : 0;
 						clk_level_tape = 0;
 					}
 					else
 					{
-						current_level = (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.038) ? 1 : 0;
+						current_level = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.038) ? 1 : 0;
 
 						if (previous_level!=current_level)
 						{
@@ -812,11 +812,11 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		}
 
 		/* tape writing */
-		if (cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0))&CASSETTE_RECORD)
+		if (cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ))&CASSETTE_RECORD)
 		{
 			data = get_in_data_bit(pmd85_cassette_serial_connection.input_state);
 			data ^= clk_level_tape;
-			cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), data&0x01 ? 1 : -1);
+			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), data&0x01 ? 1 : -1);
 
 			if (!clk_level_tape)
 				msm8251_transmit_clock();

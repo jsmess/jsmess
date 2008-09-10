@@ -270,13 +270,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//assert(tape_interrupt_enable);
-	cpunum_set_input_line(machine, 0, 1, (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 1, (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
 static  READ8_HANDLER(tutor_cassette_r)
 {
-	return (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0) ? 1 : 0;
+	return (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
@@ -293,7 +293,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		{
 		case 0:
 			/* data out */
-			cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data) ? +1.0 : -1.0);
+			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data) ? +1.0 : -1.0);
 			break;
 		case 1:
 			/* interrupt control??? */
@@ -593,8 +593,10 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -627,18 +629,6 @@ static void tutor_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static void tutor_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void tutor_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* parallel */
@@ -660,7 +650,6 @@ static SYSTEM_CONFIG_START(tutor)
 
 	/* cartridge port is not emulated */
 	CONFIG_DEVICE(tutor_cartslot_getinfo)
-	CONFIG_DEVICE(tutor_cassette_getinfo)
 	CONFIG_DEVICE(tutor_parallel_getinfo)
 
 SYSTEM_CONFIG_END

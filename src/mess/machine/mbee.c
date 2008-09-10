@@ -74,9 +74,9 @@ MACHINE_START( mbee )
 	wd17xx_init(machine, WD_TYPE_179X,mbee_fdc_callback, NULL);
 }
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /* PIO B data bits
@@ -96,7 +96,7 @@ READ8_HANDLER ( mbee_pio_r )
 	if (offset == 1) return z80pio_c_r(0,0);
 	if (offset == 3) return z80pio_c_r(0,1);
 	data = z80pio_d_r(machine,0,1) | 1;
-	if (cassette_input(cassette_device_image()) > 0.03)
+	if (cassette_input(cassette_device_image(machine)) > 0.03)
 		data &= ~1;
 	return data;
 }
@@ -111,7 +111,7 @@ WRITE8_HANDLER ( mbee_pio_w )
 	{
 		z80pio_d_w(machine, 0,1,data);
 		data = z80pio_p_r(machine,0,1);
-		cassette_output(cassette_device_image(), (data & 0x02) ? -1.0 : +1.0);
+		cassette_output(cassette_device_image(machine), (data & 0x02) ? -1.0 : +1.0);
 		speaker_level_w(0, (data & 0x40) ? 1 : 0);
 	}
 }

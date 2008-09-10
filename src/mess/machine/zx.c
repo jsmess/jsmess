@@ -180,7 +180,7 @@ READ8_HANDLER ( zx_io_r )
 		}
 		else
 		{
-			if ((cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < -0.75) && zx_tape_bit)
+			if ((cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
 				timer_set(ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
@@ -245,7 +245,7 @@ READ8_HANDLER ( pow3000_io_r )
 		}
 		else
 		{
-			if ((cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) < -0.75) && zx_tape_bit)
+			if ((cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
 				timer_set(ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);

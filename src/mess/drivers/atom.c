@@ -279,6 +279,8 @@ static MACHINE_DRIVER_START( atom )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(atom, "atm", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -317,17 +319,6 @@ ROM_START (atomeb)
 	ROM_LOAD ("atomicw.rom",0x018000,0x1000, CRC(a3fd737d) SHA1(d418d9322c69c49106ed2c268ad0864c0f2c4c1b))
 ROM_END
 
-static void atom_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void atom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -348,7 +339,6 @@ static void atom_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 }
 
 static SYSTEM_CONFIG_START(atom)
-	CONFIG_DEVICE(atom_cassette_getinfo)
 	CONFIG_DEVICE(atom_floppy_getinfo)
 SYSTEM_CONFIG_END
 

@@ -27,9 +27,9 @@
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /* Read/Write Handlers */
@@ -53,7 +53,7 @@ static READ8_HANDLER( cassette_r )
 	
 	*/
 
-	return (cassette_input(cassette_device_image()) < +0.0) ? 0 : 1;
+	return (cassette_input(cassette_device_image(machine)) < +0.0) ? 0 : 1;
 }
 
 static WRITE8_HANDLER( cassette_w )
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( cassette_w )
 
 	speaker_level_w(0, data & 0x01);
 
-	cassette_output(cassette_device_image(), (data & 0x01) ? +1.0 : -1.0);
+	cassette_output(cassette_device_image(machine), (data & 0x01) ? +1.0 : -1.0);
 }
 
 static READ8_HANDLER( vsync_r )
@@ -395,6 +395,13 @@ static MACHINE_RESET( aquarius )
 }
 
 /* Machine Driver */
+static const cassette_config aquarius_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+};
+
 
 static MACHINE_DRIVER_START( aquarius )
 	/* basic machine hardware */
@@ -431,6 +438,8 @@ static MACHINE_DRIVER_START( aquarius )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", aquarius_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -487,19 +496,6 @@ static void aquarius_cartslot_getinfo( const mess_device_class *devclass, UINT32
 	}
 }
 
-static void aquarius_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	// cassette
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( aquarius_floppy )
 {
 	// 128K images, 64K/side
@@ -530,7 +526,6 @@ static SYSTEM_CONFIG_START( aquarius )
 	CONFIG_RAM		  (20 * 1024)
 	CONFIG_RAM		  (36 * 1024)
 	CONFIG_DEVICE(aquarius_cartslot_getinfo)
-	CONFIG_DEVICE(aquarius_cassette_getinfo)
 	CONFIG_DEVICE(aquarius_floppy_getinfo)
 SYSTEM_CONFIG_END
 

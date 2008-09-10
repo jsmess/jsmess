@@ -23,9 +23,9 @@
 #include "video/cdp1869.h"
 #include "video/mc6845.h"
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 /* Memory Maps */
@@ -241,7 +241,7 @@ static CDP1802_EF_READ( comx35_ef_r )
 	if (!state->cdp1871_efxa) flags -= EF3;
 
 	// cassette input, expansion device flag
-	if ((cassette_input(cassette_device_image()) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
+	if ((cassette_input(cassette_device_image(machine)) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
 
 	return flags;
 }
@@ -298,7 +298,7 @@ static CDP1802_Q_WRITE( comx35_q_w )
 	}
 
 	// cassette output
-	cassette_output(cassette_device_image(), level ? +1.0 : -1.0);
+	cassette_output(cassette_device_image(machine), level ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( comx35_cdp1802_config )
@@ -343,6 +343,13 @@ static CDP1871_INTERFACE( comx35p_cdp1871_intf )
 
 /* Machine Drivers */
 
+static const cassette_config comx35_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+};
+
 static MACHINE_DRIVER_START( comx35p )
 	MDRV_DRIVER_DATA(comx35_state)
 
@@ -372,7 +379,7 @@ static MACHINE_DRIVER_START( comx35p )
 	MDRV_SOUND_ADD("cdp1869", CDP1869, CDP1869_DOT_CLK_PAL)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("tape", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// printer
@@ -382,6 +389,8 @@ static MACHINE_DRIVER_START( comx35p )
 	// quickload
 
 	MDRV_QUICKLOAD_ADD(comx35, "comx", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", comx35_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( comx35n )
@@ -413,7 +422,7 @@ static MACHINE_DRIVER_START( comx35n )
 	MDRV_SOUND_ADD("cdp1869", CDP1869, CDP1869_DOT_CLK_NTSC)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("tape", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// printer
@@ -423,6 +432,8 @@ static MACHINE_DRIVER_START( comx35n )
 	// quickload
 
 	MDRV_QUICKLOAD_ADD(comx35, "comx", 0)
+
+	MDRV_CASSETTE_ADD( "cassette", comx35_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -456,19 +467,6 @@ ROM_END
 
 /* System Configuration */
 
-static void comx35_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void comx35_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -489,7 +487,6 @@ static void comx35_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 
 static SYSTEM_CONFIG_START( comx35 )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(comx35_cassette_getinfo)
 	CONFIG_DEVICE(comx35_floppy_getinfo)
 SYSTEM_CONFIG_END
 

@@ -343,6 +343,13 @@ static const ay8910_interface oric_ay_interface =
 };
 
 
+static const cassette_config oric_cassette_config =
+{
+	oric_cassette_formats,
+	NULL,
+	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED
+};
+
 static MACHINE_DRIVER_START( oric )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)
@@ -367,7 +374,7 @@ static MACHINE_DRIVER_START( oric )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("ay8912", AY8912, 1000000)
 	MDRV_SOUND_CONFIG(oric_ay_interface)
@@ -375,6 +382,8 @@ static MACHINE_DRIVER_START( oric )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", oric_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -427,25 +436,6 @@ ROM_START(prav8dd)
     ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
-static void oric_common_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:			info->p = (void *) oric_cassette_formats; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(oric_common)
-	CONFIG_DEVICE(oric_common_cassette_getinfo)
-SYSTEM_CONFIG_END
 
 static void oric1_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -469,7 +459,6 @@ static void oric1_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 }
 
 static SYSTEM_CONFIG_START(oric1)
-	CONFIG_IMPORT_FROM(oric_common)
 	CONFIG_DEVICE(oric1_floppy_getinfo)
 SYSTEM_CONFIG_END
 
@@ -489,7 +478,6 @@ static void prav8_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 }
 
 static SYSTEM_CONFIG_START(prav8)
-	CONFIG_IMPORT_FROM(oric_common)
 	CONFIG_DEVICE(prav8_floppy_getinfo)
 SYSTEM_CONFIG_END
 

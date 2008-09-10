@@ -142,6 +142,14 @@ static INPUT_PORTS_START( orao )
 INPUT_PORTS_END
 
 /* Machine driver */
+static const cassette_config orao_cassette_config =
+{
+	orao_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( orao )
     /* basic machine hardware */
     MDRV_CPU_ADD("main", M6502, 1000000)
@@ -165,8 +173,10 @@ static MACHINE_DRIVER_START( orao )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.00)
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", orao_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -182,26 +192,9 @@ ROM_START( orao103 )
     ROM_LOAD( "crt13.rom", 0xe000, 0x2000, CRC(e7076014) SHA1(0e213287b0b520440af6a2a6297788a9356818c2) )
 ROM_END
 
-static void orao_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)orao_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(orao)
-	CONFIG_DEVICE(orao_cassette_getinfo)
-SYSTEM_CONFIG_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT     CONFIG         COMPANY          FULLNAME       FLAGS */
-COMP( 1984, orao,     0,      0, 		orao, 	orao, 	orao, 	 orao,  "PEL Varazdin", "Orao 102",		 0)
-COMP( 1985, orao103,  orao,   0, 		orao, 	orao, 	orao103, orao,  "PEL Varazdin", "Orao 103",		 0)
+COMP( 1984, orao,     0,      0, 		orao, 	orao, 	orao, 	 0,  "PEL Varazdin", "Orao 102",		 0)
+COMP( 1985, orao103,  orao,   0, 		orao, 	orao, 	orao103, 0,  "PEL Varazdin", "Orao 103",		 0)
 

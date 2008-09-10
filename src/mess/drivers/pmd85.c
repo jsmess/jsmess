@@ -523,6 +523,21 @@ INPUT_PORTS_END
 
 
 
+static const struct CassetteOptions pmd85_cassette_options =
+{
+	1,		/* channels */
+	16,		/* bits per sample */
+	7200	/* sample frequency */
+};
+
+static const cassette_config pmd85_cassette_config =
+{
+	pmd85_pmd_format,
+	&pmd85_cassette_options,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+};
+
+
 /* machine definition */
 static MACHINE_DRIVER_START( pmd85 )
 	/* basic machine hardware */
@@ -551,8 +566,10 @@ static MACHINE_DRIVER_START( pmd85 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_CASSETTE_ADD( "cassette", pmd85_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmd851 )
@@ -681,34 +698,9 @@ ROM_START(c2717)
 	ROM_LOAD("c2717.rom", 0x10000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
 ROM_END
 
-static const struct CassetteOptions pmd85_cassette_options = {
-	1,		/* channels */
-	16,		/* bits per sample */
-	7200		/* sample frequency */
-};
-
-static void pmd85_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:				info->p = (void *) pmd85_pmd_format; break;
-		case MESS_DEVINFO_PTR_CASSETTE_OPTIONS:				info->p = (void *) &pmd85_cassette_options; break;
-
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(pmd85)
 	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_DEVICE(pmd85_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 

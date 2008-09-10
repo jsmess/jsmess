@@ -264,6 +264,14 @@ INPUT_PORTS_START( ms7007 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 2") PORT_CODE(KEYCODE_2_PAD)
 INPUT_PORTS_END
 
+static const cassette_config radio86_cassette_config =
+{
+	rkr_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
+};
+
+
 /* Machine driver */
 static MACHINE_DRIVER_START( radio86 )
     /* basic machine hardware */
@@ -290,11 +298,13 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_VIDEO_UPDATE(radio86)
 	
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("wave", WAVE, 0)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_DEVICE_ADD("dma8257", DMA8257)
 	MDRV_DEVICE_CONFIG(radio86_dma)
+
+	MDRV_CASSETTE_ADD( "cassette", radio86_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radio16 )
@@ -344,19 +354,6 @@ static MACHINE_DRIVER_START( rk700716 )
 	MDRV_DEVICE_CONFIG( rk7007_ppi8255_interface )    
 MACHINE_DRIVER_END
 
-static void radio86_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED; break;
-		case MESS_DEVINFO_PTR_CASSETTE_FORMATS:		info->p = (void *)rkr_cassette_formats; break;
-
-		default:					cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 /* ROM definition */
 ROM_START( radio86 )
@@ -424,18 +421,15 @@ ROM_START( rk700716 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
-static SYSTEM_CONFIG_START(radio86)
-	CONFIG_DEVICE(radio86_cassette_getinfo);
-SYSTEM_CONFIG_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 1986, radio86, 0,       0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK",	0)
-COMP( 1986, radio16, radio86, 0, 	radio16, 	radio86,radio86, radio86,  "", 	"Radio-86RK (16K RAM)",	0)
-COMP( 1986, radio4k, radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Radio-86RK (4K ROM)",	0)
-COMP( 1986, radiorom,radio86, 0, 	radiorom, 	radio86,radio86, radio86,  "", 	"Radio-86RK (ROM-Disk)",	0)
-COMP( 1986, radioram, radio86, 0, 	radioram, 	radio86,radioram, radio86,  "", "Radio-86RK (ROM/RAM Disk)",	0)
-COMP( 1986, spektr01,radio86, 0, 	radio86, 	radio86,radio86, radio86,  "", 	"Spektr-001",	0)
-COMP( 1986, rk7007, radio86, 0, 	rk7007, 	ms7007,radio86, radio86,  "", 	"Radio-86RK (MS7007)",	0)
-COMP( 1986, rk700716, radio86, 0, 	rk700716, 	ms7007,radio86, radio86,  "", 	"Radio-86RK (MS7007 16K RAM)",	0)
+COMP( 1986, radio86, 0,       0, 	radio86, 	radio86,radio86, 0,  "", 	"Radio-86RK",	0)
+COMP( 1986, radio16, radio86, 0, 	radio16, 	radio86,radio86, 0,  "", 	"Radio-86RK (16K RAM)",	0)
+COMP( 1986, radio4k, radio86, 0, 	radio86, 	radio86,radio86, 0,  "", 	"Radio-86RK (4K ROM)",	0)
+COMP( 1986, radiorom,radio86, 0, 	radiorom, 	radio86,radio86, 0,  "", 	"Radio-86RK (ROM-Disk)",	0)
+COMP( 1986, radioram, radio86, 0, 	radioram, 	radio86,radioram, 0,  "", "Radio-86RK (ROM/RAM Disk)",	0)
+COMP( 1986, spektr01,radio86, 0, 	radio86, 	radio86,radio86, 0,  "", 	"Spektr-001",	0)
+COMP( 1986, rk7007, radio86, 0, 	rk7007, 	ms7007,radio86, 0,  "", 	"Radio-86RK (MS7007)",	0)
+COMP( 1986, rk700716, radio86, 0, 	rk700716, 	ms7007,radio86, 0,  "", 	"Radio-86RK (MS7007 16K RAM)",	0)

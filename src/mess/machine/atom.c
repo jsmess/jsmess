@@ -52,9 +52,9 @@ static void atom_via_irq_func(running_machine *machine, int state)
 	}
 }
 
-static const device_config *cassette_device_image(void)
+static const device_config *cassette_device_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
 static const device_config *printer_image(running_machine *machine)
@@ -215,7 +215,7 @@ static TIMER_CALLBACK(atom_timer_callback)
 		result = (~(B & atom_8255_portc)) & 0x01;
 
 		/* tape output */
-		cassette_output(cassette_device_image(), (result & 0x01) ? -1.0 : +1.0);
+		cassette_output(cassette_device_image(machine), (result & 0x01) ? -1.0 : +1.0);
 	}
 }
 
@@ -370,7 +370,7 @@ READ8_HANDLER ( atom_8255_portc_r )
 	atom_8255_portc &= 0x0f;
 
 	/* cassette input */
-	if (cassette_input(cassette_device_image()) > 0.0)
+	if (cassette_input(cassette_device_image(machine)) > 0.0)
 	{
 		atom_8255_portc |= (1<<5);
 	}

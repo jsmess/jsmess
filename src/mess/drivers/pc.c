@@ -1432,6 +1432,13 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_IMPORT_FROM( pc_hdc )
 MACHINE_DRIVER_END
 
+static const cassette_config ibm5150_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
 static MACHINE_DRIVER_START( ibm5150 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", I8088, XTAL_14_31818MHz/3)
@@ -1492,6 +1499,8 @@ static MACHINE_DRIVER_START( ibm5150 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+
+	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pccga )
@@ -1948,6 +1957,8 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 MACHINE_DRIVER_END
 
 #if 0
@@ -2363,16 +2374,6 @@ ROM_START( dgone )
 ROM_END
 
 
-static void ibmpc_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
-	switch( state ) {
-	case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-	case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED; break;
-
-	default:											cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static void ibmpc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -2409,7 +2410,6 @@ static void pcjr_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 
 static SYSTEM_CONFIG_START(ibm5150)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
-	CONFIG_DEVICE(ibmpc_cassette_getinfo)
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 SYSTEM_CONFIG_END
 
@@ -2422,7 +2422,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pcjr)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
-	CONFIG_DEVICE(ibmpc_cassette_getinfo)
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
 	CONFIG_DEVICE(pcjr_cartslot_getinfo)
 SYSTEM_CONFIG_END

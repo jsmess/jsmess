@@ -87,13 +87,13 @@ WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
 WRITE8_HANDLER( ut88_sound_w )
 {
 	dac_data_w(0,data); //beeper
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0),data & 0x01 ? 1 : -1);	
+	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),data & 0x01 ? 1 : -1);	
 }
 
 
 READ8_HANDLER( ut88_tape_r )
 {
-	double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));	 									 					
+	double level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
 	if (level <  0) { 
 		 	return 0x00; 
  	}

@@ -268,10 +268,8 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("wave.1", WAVE, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("wave.2", WAVE, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+//	MDRV_SOUND_ADD("cassette, WAVE, 0)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
@@ -284,6 +282,8 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+
+	/* MDRV_CASSETTE_ADD( "cassette", default_cassette_config ) */
 MACHINE_DRIVER_END
 
 
@@ -311,20 +311,6 @@ ROM_START(ti99_4p)
 	ROM_REGION(0x8000, region_speech_rom, 0)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
-
-#ifdef UNUSED_FUNCTION
-static void ti99_4p_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-#endif
 
 static void ti99_4p_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {

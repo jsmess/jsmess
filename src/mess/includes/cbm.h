@@ -8,6 +8,7 @@
 #define CBM_H_
 
 #include "devices/snapquik.h"
+#include "devices/cassette.h"
 
 
 /* global header file for c16, c64, c65, c128, vc20 */
@@ -69,7 +70,7 @@ typedef struct {
 
 ***********************************************/
 
-void datasette_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+extern const cassette_config cbm_cassette_config;
 
 
 #endif /* CBM_H_ */

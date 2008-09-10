@@ -22,7 +22,7 @@ READ8_HANDLER( galaxy_keyboard_r )
 
 	if (offset == 0) 
 	{
-		double level = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
+		double level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
 		return (level >  0) ? 0xfe : 0xff;
 	} 
 	else 
@@ -37,7 +37,7 @@ WRITE8_HANDLER( galaxy_latch_w )
 {	
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;			
 	gal_latch_value = data;
-	cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), val);
+	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), val);
 }
 
 

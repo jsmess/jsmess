@@ -747,6 +747,8 @@ static emu_timer *datasette_timer;
 
 void c64_m6510_port_write(UINT8 direction, UINT8 data)
 {
+	running_machine *machine = Machine;
+
 	/* if line is marked as input then keep current value */
 	data = (c64_port_data & ~direction) | (data & direction);
 
@@ -766,19 +768,19 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 	{
 		if (direction & 0x08) 
 		{
-			cassette_output(image_from_devtype_and_index(IO_CASSETTE, 0), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
 			if(!(data & 0x20))
 			{
-				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+				cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 			}
 			else
 			{
-				cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+				cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 				timer_reset(datasette_timer, attotime_never);
 			}
 		}
@@ -804,7 +806,7 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 
 	if (c64_tape_on)
 	{
-		if ((cassette_get_state(image_from_devtype_and_index(IO_CASSETTE, 0)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 			data &= ~0x10;
 		else
 			data |=  0x10;
@@ -965,7 +967,7 @@ double last = 0;
 
 TIMER_CALLBACK( c64_tape_timer )
 {
-	double tmp = cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0));
+	double tmp = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
 
 	if((last > +0.0) && (tmp < +0.0))
 		cia_issue_index(machine, 0);

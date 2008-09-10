@@ -700,6 +700,14 @@ static INTERRUPT_GEN( bbcb_vsync )
 //};
 
 
+static const cassette_config bbc_cassette_config =
+{
+	bbc_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
+
+
 static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 2000000)        /* 2.00Mhz */
@@ -729,6 +737,8 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 //  MDRV_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
+
+	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -796,6 +806,8 @@ static MACHINE_DRIVER_START( bbcm )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
 MACHINE_DRIVER_END
 
 static void bbc_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -834,35 +846,16 @@ static void bbc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 	}
 }
 
-static void bbc_cassette_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
-	switch( state ) {
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_PTR_CASSETTE_FORMATS:
-		info->p = (void *)bbc_cassette_formats;
-		break;
-	default:
-		cassette_device_getinfo( devclass, state, info );
-		break;
-	}
-}
-
-static SYSTEM_CONFIG_START(bbca)
-	CONFIG_DEVICE(bbc_cassette_getinfo)
-SYSTEM_CONFIG_END
-
 
 static SYSTEM_CONFIG_START(bbc)
 	CONFIG_DEVICE(bbc_cartslot_getinfo)
 	CONFIG_DEVICE(bbc_floppy_getinfo)
-	CONFIG_DEVICE(bbc_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      CONFIG   COMPANY  FULLNAME */
-COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca,   bbc,     bbca,	"Acorn","BBC Micro Model A" , 0)
+COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca,   bbc,     0,		"Acorn","BBC Micro Model A" , 0)
 COMP ( 1981, bbcb,     bbca,	 0,		bbcb,     bbca,   bbc,	   bbc,		"Acorn","BBC Micro Model B" , 0)
 COMP ( 1985, bbcbp,    bbca,	 0,		bbcbp,    bbca,   bbc,     bbc,		"Acorn","BBC Micro Model B+ 64K" , 0)
 COMP ( 1985, bbcbp128, bbca,     0,		bbcbp128, bbca,   bbc,     bbc,		"Acorn","BBC Micro Model B+ 128k" , 0)

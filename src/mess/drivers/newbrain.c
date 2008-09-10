@@ -60,9 +60,12 @@
 
 static UINT8 acia_rxd = 1, acia_txd = 1;
 
-static const device_config *cassette_device_image(int index)
+static const device_config *cassette_device_image(running_machine *machine, int index)
 {
-	return image_from_devtype_and_index(IO_CASSETTE, index);
+	if ( index )
+		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" );
+	else
+		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" );
 }
 
 /* Enable/Status */
@@ -332,8 +335,8 @@ static WRITE8_HANDLER( newbrain_cop_g_w )
 
 	/* tape motor enable */
 
-	cassette_change_state(cassette_device_image(0), BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-	cassette_change_state(cassette_device_image(1), BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(cassette_device_image(machine, 0), BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(cassette_device_image(machine, 1), BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 static READ8_HANDLER( newbrain_cop_g_r )
@@ -382,8 +385,8 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 
 	state->cop_tdo = BIT(data, 1);
 
-	cassette_output(cassette_device_image(0), state->cop_tdo ? -1.0 : +1.0);
-	cassette_output(cassette_device_image(1), state->cop_tdo ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(machine, 0), state->cop_tdo ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(machine, 1), state->cop_tdo ? -1.0 : +1.0);
 
 	/* keyboard and display clock */
 
@@ -445,7 +448,7 @@ static READ8_HANDLER( newbrain_cop_si_r )
 
 	newbrain_state *state = machine->driver_data;
 
-	state->cop_tdi = ((cassette_input(cassette_device_image(0)) > +1.0) || (cassette_input(cassette_device_image(1)) > +1.0)) ^ state->cop_tdo;
+	state->cop_tdi = ((cassette_input(cassette_device_image(machine, 0)) > +1.0) || (cassette_input(cassette_device_image(machine, 1)) > +1.0)) ^ state->cop_tdo;
 
 	return state->cop_tdi;
 }
@@ -1227,6 +1230,14 @@ static COP400_INTERFACE( newbrain_cop_intf )
 
 /* Machine Drivers */
 
+static const cassette_config newbrain_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
+};
+
+
 static MACHINE_DRIVER_START( newbrain )
 	MDRV_DRIVER_DATA(newbrain_state)
 
@@ -1257,6 +1268,9 @@ static MACHINE_DRIVER_START( newbrain )
 	// video hardware
 
 	MDRV_IMPORT_FROM(newbrain_video)
+
+	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraim )
@@ -1280,6 +1294,9 @@ static MACHINE_DRIVER_START( newbraim )
 	// video hardware
 
 	MDRV_IMPORT_FROM(newbrain_video)
+
+	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraia )
@@ -1303,6 +1320,9 @@ static MACHINE_DRIVER_START( newbraia )
 	// video hardware
 
 	MDRV_IMPORT_FROM(newbrain_video)
+
+	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraiv )
@@ -1326,6 +1346,9 @@ static MACHINE_DRIVER_START( newbraiv )
 	// video hardware
 
 	MDRV_IMPORT_FROM(newbrain_video)
+
+	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1396,19 +1419,6 @@ ROM_END
 #define rom_newbraiv rom_newbraia
 
 /* System Configuration */
-
-static void newbrain_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
-		case MESS_DEVINFO_INT_CASSETTE_DEFAULT_STATE:	info->i = CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static DEVICE_IMAGE_LOAD( newbrain_floppy )
 {
@@ -1481,26 +1491,22 @@ static void newbrain_serial_getinfo(const mess_device_class *devclass, UINT32 st
 
 static SYSTEM_CONFIG_START( newbrain )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(newbrain_cassette_getinfo)
 	CONFIG_DEVICE(newbrain_floppy_getinfo)
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( newbraim )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(newbrain_cassette_getinfo)
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( newbraia )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(newbrain_cassette_getinfo)
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( newbraiv )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(newbrain_cassette_getinfo)
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 
