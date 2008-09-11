@@ -452,7 +452,9 @@ XL/XE 16kB OS roms
 	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
 	DRIVER( lambda )	/* Lambda 8300										*/
 
-	DRIVER( spectrum )	/* 1982 ZX Spectrum									*/
+	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
+	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
+	DRIVER( specide ) /* 1995 ZX Spectrum IDE							*/
 	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
 	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
 	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
@@ -462,8 +464,6 @@ XL/XE 16kB OS roms
 
 	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
 	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
-	DRIVER( specpl2c )	/* 1986 ZX Spectrum +2c (Andrew Owen) */
-	DRIVER( specpl2n )	/* 1986 ZX Spectrum +2c (Namco) 			*/
 	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/	
 	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
 	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
