@@ -132,13 +132,13 @@ static int DEPos		= 0;
 static int NoScreen		= 0;
 
 /* Debugging commands and handlers. */
-static void ToggleRegLog(int ref, int params, const char *param[]);
+static void execute_beta_vid_log(running_machine *machine, int ref, int params, const char *param[]);
 static void RegLog(int offset, int data);
-static void FillScreen(int ref, int params, const char *param[]);
-static void ScreenBox(int ref, int params, const char *param[]);
-static void VidToggle(int ref, int params, const char *param[]);
-static void ShowVidLimits(int ref, int params, const char *param[]);
-static void SetClkMax(int ref, int params, const char *param[]);
+static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_beta_vid_box(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_beta_vid(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_beta_vid_limits(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_beta_vid_clkmax(running_machine *machine, int ref, int params, const char *param[]);
 
 static bitmap_t	*bit;
 static int MinAddr	= 0xFFFF;
@@ -326,12 +326,12 @@ void init_video(running_machine *machine)
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command("beta_vid_log", CMDFLAG_NONE, 0, 0, 0,ToggleRegLog);
-		debug_console_register_command("beta_vid_fill", CMDFLAG_NONE, 0, 0, 0,FillScreen);
-		debug_console_register_command("beta_vid_box", CMDFLAG_NONE, 0, 0, 5,ScreenBox);
-		debug_console_register_command("beta_vid", CMDFLAG_NONE, 0, 0, 0,VidToggle);
-		debug_console_register_command("beta_vid_limits", CMDFLAG_NONE, 0, 0, 0,ShowVidLimits);
-		debug_console_register_command("beta_vid_clkmax", CMDFLAG_NONE, 0, 0, 1,SetClkMax);
+		debug_console_register_command(machine, "beta_vid_log", CMDFLAG_NONE, 0, 0, 0, execute_beta_vid_log);
+		debug_console_register_command(machine, "beta_vid_fill", CMDFLAG_NONE, 0, 0, 0, execute_beta_vid_fill);
+		debug_console_register_command(machine, "beta_vid_box", CMDFLAG_NONE, 0, 0, 5, execute_beta_vid_box);
+		debug_console_register_command(machine, "beta_vid", CMDFLAG_NONE, 0, 0, 0, execute_beta_vid);
+		debug_console_register_command(machine, "beta_vid_limits", CMDFLAG_NONE, 0, 0, 0, execute_beta_vid_limits);
+		debug_console_register_command(machine, "beta_vid_clkmax", CMDFLAG_NONE, 0, 0, 1, execute_beta_vid_clkmax);
 	}
 	LogRegWrites=0;
 }
@@ -725,7 +725,7 @@ WRITE8_HANDLER(colour_ram_w)
  *
  *************************************/
 
-static void ToggleRegLog(int ref, int params, const char *param[])
+static void execute_beta_vid_log(running_machine *machine, int ref, int params, const char *param[])
 {
 	LogRegWrites=!LogRegWrites;
 
@@ -761,7 +761,7 @@ static void RegLog(int offset, int data)
 		debug_console_printf("6845 write Reg %s Addr=%3d Data=%3d ($%2.2X) \n",RegName,VidAddr,data,data);
 }
 
-static void FillScreen(int ref, int params, const char *param[])
+static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[])
 {
 	int	x;
 
@@ -772,7 +772,7 @@ static void FillScreen(int ref, int params, const char *param[])
 	NoScreen=1;
 }
 
-static void ScreenBox(int ref, int params, const char *param[])
+static void execute_beta_vid_box(running_machine *machine, int ref, int params, const char *param[])
 {
 	int	x,y;
 
@@ -797,12 +797,12 @@ static void ScreenBox(int ref, int params, const char *param[])
 }
 
 
-static void VidToggle(int ref, int params, const char *param[])
+static void execute_beta_vid(running_machine *machine, int ref, int params, const char *param[])
 {
 	NoScreen=!NoScreen;
 }
 
-static void ShowVidLimits(int ref, int params, const char *param[])
+static void execute_beta_vid_limits(running_machine *machine, int ref, int params, const char *param[])
 {
 	debug_console_printf("Min X     =$%4X, Max X     =$%4X\n",MinX,MaxX);
 	debug_console_printf("Min Y     =$%4X, Max Y     =$%4X\n",MinY,MaxY);
@@ -818,7 +818,7 @@ static void ShowVidLimits(int ref, int params, const char *param[])
 		debug_console_printf("Gfx4/Text\n");
 }
 
-static void SetClkMax(int ref, int params, const char *param[])
+static void execute_beta_vid_clkmax(running_machine *machine, int ref, int params, const char *param[])
 {
 	if(params>0)	sscanf(param[0],"%d",&ClkMax);
 }

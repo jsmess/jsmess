@@ -13,7 +13,6 @@
 #include "inptport.h"
 #include "mame.h"
 
-#include "deprecat.h"
 #include "debug/debugcon.h"
 
 
@@ -634,8 +633,8 @@ static TIMER_CALLBACK(inputx_timerproc);
 
 
 /*  Debugging commands and handlers. */
-static void execute_input(int ref, int params, const char *param[]);
-static void execute_dumpkbd(int ref, int params, const char *param[]);
+static void execute_input(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_dumpkbd(running_machine *machine, int ref, int params, const char *param[]);
 
 
 
@@ -669,8 +668,8 @@ void inputx_init(running_machine *machine)
 
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command("input", CMDFLAG_NONE, 0, 1, 1, execute_input);
-		debug_console_register_command("dumpkbd", CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
+		debug_console_register_command(machine, "input", CMDFLAG_NONE, 0, 1, 1, execute_input);
+		debug_console_register_command(machine, "dumpkbd", CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
 	}
 
 	/* posting keys directly only makes sense for a computer */
@@ -1511,9 +1510,9 @@ int input_category_active(running_machine *machine, int category)
 	natural keyboard input
 -------------------------------------------------*/
 
-static void execute_input(int ref, int params, const char *param[])
+static void execute_input(running_machine *machine, int ref, int params, const char *param[])
 {
-	inputx_post_coded(Machine, param[0]);
+	inputx_post_coded(machine, param[0]);
 }
 
 
@@ -1523,7 +1522,7 @@ static void execute_input(int ref, int params, const char *param[])
 	keyboard codes
 -------------------------------------------------*/
 
-static void execute_dumpkbd(int ref, int params, const char *param[])
+static void execute_dumpkbd(running_machine *machine, int ref, int params, const char *param[])
 {
 	const char *filename;
 	FILE *file = NULL;

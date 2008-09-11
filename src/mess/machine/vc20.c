@@ -657,6 +657,7 @@ DEVICE_START(vic20_cart)
 	vc20_rom_4000 = NULL;
 	vc20_rom_6000 = NULL;
 	vc20_rom_a000 = NULL;
+	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD(vic20_cart)

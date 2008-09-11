@@ -96,6 +96,7 @@ static DEVICE_START(apple2_slot)
 	{
 		token->slot_device = NULL;
 	}
+	return DEVICE_START_OK;
 }
 
 

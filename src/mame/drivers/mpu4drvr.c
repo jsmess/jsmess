@@ -668,7 +668,7 @@ static UINT8 scn2674_gfx_enabled;
 static UINT8 scn2674_display_enabled;
 static UINT8 scn2674_cursor_enabled;
 
-static void scn2674_write_command(UINT8 data)
+static void scn2674_write_command(running_machine *machine, UINT8 data)
 {
 	UINT8 oprand;
 	int i;
@@ -777,7 +777,7 @@ static void scn2674_write_command(UINT8 data)
 		{
 			scn2674_irq_state = 1;
 		}
-		update_mpu68_interrupts(Machine);
+		update_mpu68_interrupts(machine);
 	}
 	if ((data&0xe0)==0x80)
 	{
@@ -803,7 +803,7 @@ static void scn2674_write_command(UINT8 data)
 				scn2674_irq_state = 1;
 			}
 		}
-		update_mpu68_interrupts(Machine);
+		update_mpu68_interrupts(machine);
 
 	}
 
@@ -828,7 +828,7 @@ static void scn2674_write_command(UINT8 data)
 				scn2674_irq_state = 1;
 			}
 		}
-		update_mpu68_interrupts(Machine);
+		update_mpu68_interrupts(machine);
 	}
 
 	/* Delayed Commands */
@@ -962,7 +962,7 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 			break;
 
 		case 1:
-			scn2674_write_command(data);
+			scn2674_write_command(machine, data);
 			break;
 
 		case 2: scn2674_screen1_l = data; break;
@@ -1655,7 +1655,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_CPU_ADD("main", M6809, MPU4_MASTER_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP(mpu4_6809_map,0)
-	MDRV_TIMER_ADD_PERIODIC("50HZ",gen_50hz, HZ(100))
+	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
 	MDRV_NVRAM_HANDLER(generic_0fill)				/* confirm */
 
@@ -1680,7 +1680,7 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1704,10 +1704,10 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_CPU_ADD("main", M6809, MPU4_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)
 
-	MDRV_TIMER_ADD_PERIODIC("50HZ",gen_50hz, HZ(100))
+	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

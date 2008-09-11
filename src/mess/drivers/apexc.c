@@ -171,6 +171,7 @@ static void apexc_get_open_mode(int id,
 
 static DEVICE_START( apexc_tape )
 {
+	return DEVICE_START_OK;
 }
 
 

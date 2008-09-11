@@ -388,6 +388,7 @@ DEVICE_START( intv_cart )
 	/* assume keyboard is absent */
 	memory[0x7000<<1] = 0xff;
 	memory[(0x7000<<1)+1] = 0xff;
+	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( intv_cart )

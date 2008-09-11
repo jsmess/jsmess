@@ -22,6 +22,10 @@
     CONSTANTS
 ***************************************************************************/
 
+/* by convention, tags should all lowercase and this length or less */
+#define MAX_TAG_LENGTH			15
+
+
 /* token types */
 enum
 {
@@ -120,6 +124,7 @@ struct _machine_config
 	UINT32					driver_data_size;		/* amount of memory needed for driver_data */
 
 	cpu_config				cpu[MAX_CPU];			/* array of CPUs in the system */
+	astring *				cputag[MAX_CPU];		/* allocated strings for each CPU tag */
 	UINT32					cpu_slices_per_frame;	/* number of times to interleave execution per frame */
 	INT32					watchdog_vblank_count;	/* number of VBLANKs until the watchdog kills us */
 	attotime				watchdog_time;			/* length of time until the watchdog kills us */
@@ -142,6 +147,7 @@ struct _machine_config
 	video_update_func 		video_update; 			/* video update callback */
 
 	sound_config			sound[MAX_SOUND];		/* array of sound chips in the system */
+	astring *				soundtag[MAX_SOUND];	/* allocated strings for each sound tag */
 
 	sound_start_func		sound_start;			/* one-time sound start callback */
 	sound_reset_func		sound_reset;			/* sound reset callback */
@@ -460,18 +466,6 @@ machine_config *machine_config_alloc(const machine_config_token *tokens);
 
 /* release memory allocated for a machine configuration */
 void machine_config_free(machine_config *config);
-
-
-
-
-
-cpu_config *machine_config_add_cpu(machine_config *machine, const char *tag, cpu_type type, int cpuclock);
-cpu_config *machine_config_find_cpu(machine_config *machine, const char *tag);
-void machine_config_remove_cpu(machine_config *machine, const char *tag);
-
-sound_config *machine_config_add_sound(machine_config *machine, const char *tag, sound_type type, int clock);
-sound_config *machine_config_find_sound(machine_config *machine, const char *tag);
-void machine_config_remove_sound(machine_config *machine, const char *tag);
 
 
 #endif	/* __MCONFIG_H__ */

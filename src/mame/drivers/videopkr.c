@@ -232,7 +232,7 @@
 
 
 #include "driver.h"
-#include "cpu/mcs48/mcs48.c"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 
 #define DATA_NVRAM_SIZE     0x100
@@ -377,15 +377,9 @@ static READ8_HANDLER( videopkr_io_r )
 			}
 			break;
 		}
+		case 0x5f:
 		case 0xdf:
 		{
-			n_offs = ((p1 & 0xc0) << 2 ) + offset;
-			valor = data_ram[offset];
-			break;
-		}
-		case 0x5f:
-		{
-			n_offs = ((p1 & 0xc0) << 2 ) + offset;
 			valor = data_ram[offset];
 			break;
 		}
@@ -617,7 +611,7 @@ static TIMER_CALLBACK(sound_t1_callback)
 
 		if (dc_40103 == 0)
 		{
-			cpunum_set_input_line(machine, 1, 0, 1);
+			cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 		}
 	}
 }

@@ -105,6 +105,7 @@ static DEVICE_START( snapquick )
 
 	/* locate the load function */
 	token->load = (snapquick_load_func) device_get_info_fct(device, DEVINFO_FCT_SNAPSHOT_QUICKLOAD_LOAD);
+	return DEVICE_START_OK;
 }
 
 

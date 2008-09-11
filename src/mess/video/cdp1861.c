@@ -218,6 +218,7 @@ static DEVICE_START( cdp1861 )
 	state_save_register_item(unique_tag, 0, cdp1861->disp);
 	state_save_register_item(unique_tag, 0, cdp1861->dmaout);
 	state_save_register_bitmap(unique_tag, 0, "cdp1861->bitmap", cdp1861->bitmap);
+	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( cdp1861 )

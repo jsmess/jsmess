@@ -354,6 +354,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 		for (ndriver = 0; ndriver < driver_list_get_count(drivers); ndriver++)
 		{
 			const game_driver *gamedrv = drivers[ndriver];
+			const rom_source *source;
 			struct DriversInfo *gameinfo = &drivers_info[ndriver];
 			const rom_entry *region, *rom;
 			machine_config *config;
@@ -368,10 +369,13 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->supportsSaveState = ((gamedrv->flags & GAME_SUPPORTS_SAVE) != 0);
 			gameinfo->isHarddisk = FALSE;
 			gameinfo->isVertical = (gamedrv->flags & ORIENTATION_SWAP_XY) ? TRUE : FALSE;
-			for (region = rom_first_region(gamedrv); region; region = rom_next_region(region))
+			for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
 			{
-				if (ROMREGION_ISDISKDATA(region))
-					gameinfo->isHarddisk = TRUE;
+				for (region = rom_first_region(gamedrv, source); region != NULL; region = rom_next_region(region))
+				{
+					if (ROMREGION_ISDISKDATA(region))
+						gameinfo->isHarddisk = TRUE;
+				}
 			}
 			gameinfo->hasOptionalBIOS = FALSE;
 			if (gamedrv->rom != NULL)
@@ -394,12 +398,17 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->isMultiMon = 0;
 			gameinfo->isVector = isDriverVector(config); // ((drv.video_attributes & VIDEO_TYPE_VECTOR) != 0);
 			gameinfo->usesRoms = FALSE;
-			for (region = rom_first_region(gamedrv); region; region = rom_next_region(region))
-				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
+			{
+				for (region = rom_first_region(gamedrv, source); region; region = rom_next_region(region))
 				{
-					gameinfo->usesRoms = TRUE; 
-					break; 
+					for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+					{
+						gameinfo->usesRoms = TRUE; 
+						break; 
+					}
 				}
+			}
 			gameinfo->usesSamples = FALSE;
 			
 			if (HAS_SAMPLES || HAS_VLM5030)

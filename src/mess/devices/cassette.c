@@ -238,6 +238,7 @@ static DEVICE_START( cassette )
 	cassette->config = device->static_config;
 	cassette->cassette = NULL;
 	cassette->state = cassette->config->default_state;
+	return DEVICE_START_OK;
 }
 
 

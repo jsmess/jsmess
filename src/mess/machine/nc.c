@@ -97,6 +97,7 @@ DEVICE_START( nc_pcmcia_card )
 	/* card ram NULL */
 	nc_card_ram = NULL;
 	nc_card_size = 0;
+	return DEVICE_START_OK;
 }
 
 /* load pcmcia card */

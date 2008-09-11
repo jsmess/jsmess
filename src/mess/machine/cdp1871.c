@@ -324,6 +324,7 @@ static DEVICE_START( cdp1871 )
 	state_save_register_item(unique_tag, 0, cdp1871->next_da);
 	state_save_register_item(unique_tag, 0, cdp1871->rpt);
 	state_save_register_item(unique_tag, 0, cdp1871->next_rpt);
+	return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( cdp1871 )

@@ -637,6 +637,7 @@ static DEVICE_START( zx8302 )
 	
 	state_save_register_item(unique_tag, 0, zx8302->mdv_motor);
 	state_save_register_item_array(unique_tag, 0, zx8302->mdv_offset);
+	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( zx8302 )

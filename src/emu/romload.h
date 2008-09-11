@@ -68,6 +68,10 @@ enum
 #define		ROMREGION_DATATYPEROM	0x00000000
 #define		ROMREGION_DATATYPEDISK	0x00004000
 
+#define ROMREGION_LOADBYNAMEMASK	0x00008000			/* use region name as path to read from */
+#define		ROMREGION_NOLOADBYNAME	0x00000000
+#define		ROMREGION_LOADBYNAME	0x00008000
+
 #define ROMREGION_ERASEVALMASK		0x00ff0000			/* value to erase the region to */
 #define		ROMREGION_ERASEVAL(x)	((((x) & 0xff) << 16) | ROMREGION_ERASE)
 #define		ROMREGION_ERASE00		ROMREGION_ERASEVAL(0)
@@ -121,6 +125,9 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+typedef struct _rom_source rom_source;
+
 
 typedef struct _rom_entry rom_entry;
 struct _rom_entry
@@ -185,6 +192,7 @@ struct _rom_load_data
 #define ROMREGION_GETDATATYPE(r)	(ROMREGION_GETFLAGS(r) & ROMREGION_DATATYPEMASK)
 #define ROMREGION_ISROMDATA(r)		(ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEROM)
 #define ROMREGION_ISDISKDATA(r)		(ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEDISK)
+#define ROMREGION_ISLOADBYNAME(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_LOADBYNAMEMASK) == ROMREGION_LOADBYNAME)
 
 
 /* ----- per-ROM macros ----- */
@@ -283,14 +291,18 @@ chd_file *get_disk_handle(const char *region);
 void set_disk_handle(const char *region, mame_file *file, chd_file *chd);
 
 /* ROM processing */
-void rom_init(running_machine *machine, const rom_entry *romp);
+void rom_init(running_machine *machine);
 int rom_load_warnings(void);
-const rom_entry *rom_first_region(const game_driver *drv);
+const rom_source *rom_first_source(const game_driver *drv, const machine_config *config);
+const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous);
+const rom_entry *rom_first_region(const game_driver *drv, const rom_source *romp);
 const rom_entry *rom_next_region(const rom_entry *romp);
 const rom_entry *rom_first_file(const rom_entry *romp);
 const rom_entry *rom_next_file(const rom_entry *romp);
 const rom_entry *rom_first_chunk(const rom_entry *romp);
 const rom_entry *rom_next_chunk(const rom_entry *romp);
 
+int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source);
+astring *rom_region_name(astring *result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
 
 #endif	/* __ROMLOAD_H__ */

@@ -53,6 +53,7 @@ DEVICE_START( x68k_hdc )
 	sasi->status_port = 0x00;
 	sasi->phase = SASI_PHASE_BUSFREE;
 	hd.current_block = 0;
+	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_CREATE( sasihd )

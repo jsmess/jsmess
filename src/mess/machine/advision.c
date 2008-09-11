@@ -29,8 +29,8 @@
 MACHINE_START( advision )
 {
 	/* configure EA banking */
-	memory_configure_bank(MCS48_INTERNAL_ROMBANK, 0, 1, memory_region(machine, "bios"), 0);
-	memory_configure_bank(MCS48_INTERNAL_ROMBANK, 1, 1, memory_region(machine, "main"), 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, "bios"), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "main"), 0);
 }
 
 MACHINE_RESET( advision )

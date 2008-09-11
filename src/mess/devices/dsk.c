@@ -74,6 +74,7 @@ static int dsk_floppy_verify(UINT8 *diskimage_data)
 static DEVICE_START( dsk_floppy )
 {
 	floppy_drive_init(device, NULL);
+	return DEVICE_START_OK;
 }
 
 

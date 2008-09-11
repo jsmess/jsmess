@@ -35,6 +35,7 @@ static d88image *get_d88image(const device_config *img)
 DEVICE_START(d88image_floppy)
 {
 	floppy_drive_init(device, &d88image_floppy_interface);
+	return DEVICE_START_OK;
 }
 
 /* attempt to insert a disk into the drive specified with id */

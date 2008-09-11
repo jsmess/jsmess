@@ -1720,6 +1720,8 @@ $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 
 $(DRIVERS)/lucky74.o:	$(LAYOUT)/lucky74.lh
 
+$(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh
+
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
@@ -1752,6 +1754,10 @@ $(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
+
+$(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \
+						$(LAYOUT)/spacewin.lh \
+						$(LAYOUT)/pmroulet.lh \
 
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 

@@ -292,7 +292,7 @@ ADDRESS_MAP_END
                         SOUND
 *****************************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 static UINT8 adpcm_command = 0;
 static UINT8 nmi_enable = 0;
 
@@ -884,63 +884,63 @@ static MACHINE_DRIVER_START( darius )
 
 	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
-	MDRV_SOUND_ROUTE(0, "filter.2203.0.0l", 0.08)
-	MDRV_SOUND_ROUTE(0, "filter.2203.0.0r", 0.08)
-	MDRV_SOUND_ROUTE(1, "filter.2203.0.1l", 0.08)
-	MDRV_SOUND_ROUTE(1, "filter.2203.0.1r", 0.08)
-	MDRV_SOUND_ROUTE(2, "filter.2203.0.2l", 0.08)
-	MDRV_SOUND_ROUTE(2, "filter.2203.0.2r", 0.08)
-	MDRV_SOUND_ROUTE(3, "filter.2203.0.3l", 0.60)
-	MDRV_SOUND_ROUTE(3, "filter.2203.0.3r", 0.60)
+	MDRV_SOUND_ROUTE(0, "filter0.0l", 0.08)
+	MDRV_SOUND_ROUTE(0, "filter0.0r", 0.08)
+	MDRV_SOUND_ROUTE(1, "filter0.1l", 0.08)
+	MDRV_SOUND_ROUTE(1, "filter0.1r", 0.08)
+	MDRV_SOUND_ROUTE(2, "filter0.2l", 0.08)
+	MDRV_SOUND_ROUTE(2, "filter0.2r", 0.08)
+	MDRV_SOUND_ROUTE(3, "filter0.3l", 0.60)
+	MDRV_SOUND_ROUTE(3, "filter0.3r", 0.60)
 
 	MDRV_SOUND_ADD("ym2", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_interface_2)
-	MDRV_SOUND_ROUTE(0, "filter.2203.1.0l", 0.08)
-	MDRV_SOUND_ROUTE(0, "filter.2203.1.0r", 0.08)
-	MDRV_SOUND_ROUTE(1, "filter.2203.1.1l", 0.08)
-	MDRV_SOUND_ROUTE(1, "filter.2203.1.1r", 0.08)
-	MDRV_SOUND_ROUTE(2, "filter.2203.1.2l", 0.08)
-	MDRV_SOUND_ROUTE(2, "filter.2203.1.2r", 0.08)
-	MDRV_SOUND_ROUTE(3, "filter.2203.1.3l", 0.60)
-	MDRV_SOUND_ROUTE(3, "filter.2203.1.3r", 0.60)
+	MDRV_SOUND_ROUTE(0, "filter1.0l", 0.08)
+	MDRV_SOUND_ROUTE(0, "filter1.0r", 0.08)
+	MDRV_SOUND_ROUTE(1, "filter1.1l", 0.08)
+	MDRV_SOUND_ROUTE(1, "filter1.1r", 0.08)
+	MDRV_SOUND_ROUTE(2, "filter1.2l", 0.08)
+	MDRV_SOUND_ROUTE(2, "filter1.2r", 0.08)
+	MDRV_SOUND_ROUTE(3, "filter1.3l", 0.60)
+	MDRV_SOUND_ROUTE(3, "filter1.3r", 0.60)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 
-	MDRV_SOUND_ADD("filter.2203.0.0l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.0l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.0.0r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.0r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD("filter.2203.0.1l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.1l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.0.1r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.1r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD("filter.2203.0.2l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.2l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.0.2r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.2r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD("filter.2203.0.3l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.3l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.0.3r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter0.3r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("filter.2203.1.0l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.0l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.1.0r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.0r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD("filter.2203.1.1l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.1l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.1.1r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.1r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD("filter.2203.1.2l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.2l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.1.2r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.2r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD("filter.2203.1.3l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.3l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("filter.2203.1.3r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ADD("filter1.3r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
 	MDRV_SOUND_ADD("msm5205.l", FILTER_VOLUME, 0)
@@ -1183,9 +1183,6 @@ static DRIVER_INIT( darius )
 {
 //  taitosnd_setz80_soundcpu( 2 );
 
-	cpua_ctrl = 0xff;
-
-	banknum = -1;
 }
 
 
@@ -1197,6 +1194,11 @@ static STATE_POSTLOAD( darius_postload )
 
 static MACHINE_START( darius )
 {
+	cpua_ctrl = 0xff;
+	banknum = -1;
+	adpcm_command = 0;
+	nmi_enable = 0;
+
 	state_save_register_global(cpua_ctrl);
 
 	// (there are other sound vars that may need saving too) //

@@ -619,7 +619,7 @@ static VIDEO_UPDATE( glasgow )
 				{
 
 				cursor_field = get_field(my_cursor->rawbounds.x0,my_cursor->rawbounds.y0, MOUSE_MOVE);
-				if ( strcmp((char *)cursor_field.piece, "0") && (strcmp((char *)cursor_field.piece, EMP))  && strcmp(my_cursor->name, (char *)cursor_field.piece ) )
+				if ( strcmp((char *)cursor_field.piece, "0") && (strcmp((char *)cursor_field.piece, EMP))  && strcmp(my_cursor->output_name, (char *)cursor_field.piece ) )
 					{
 					update_board(my_target,cursor_field, 0);
 
@@ -639,12 +639,12 @@ static VIDEO_UPDATE( glasgow )
 				save_y = my_cursor->rawbounds.y0;
 
 				cursor_field = get_field(my_cursor->rawbounds.x0,my_cursor->rawbounds.y0, MOUSE_MOVE);
-				if ( strcmp((char *)cursor_field.piece, "0") && strcmp(my_cursor->name, "CURSOR_1") )
+				if ( strcmp((char *)cursor_field.piece, "0") && strcmp(my_cursor->output_name, "CURSOR_1") )
 					{
 
 // Put piece back to board
 //
-		           strcpy((char *)cursor_field.piece, (char *)my_cursor->name);
+		           strcpy((char *)cursor_field.piece, (char *)my_cursor->output_name);
 				   update_board(my_target,cursor_field, 1);
 				   my_cursor->color.a = 1;
 
@@ -704,7 +704,7 @@ static VIDEO_UPDATE( glasgow )
 
 // change cursor to piece
 //
-        piece = get_non_set_pieces(my_cursor->name);
+        piece = get_non_set_pieces(my_cursor->output_name);
 
 		if (strcmp(piece,NO_PIECE))
 			{
@@ -1028,7 +1028,7 @@ view_item *get_view_item(render_target *target, const char *v_name)
 
  for (; cur_view != NULL; cur_view = cur_view->next)
  {
-	if (!strcmp(cur_view->name, v_name))
+	if (!strcmp(cur_view->output_name, v_name))
 		{
 		return (cur_view);
 		}

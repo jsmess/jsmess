@@ -90,8 +90,8 @@ static UINT8 *system_rom;
 
 /* Debugging commands and handlers. */
 static offs_t dgnbeta_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-static void ToggleDatLog(int ref, int params, const char *param[]);
-static void DumpKeys(int ref, int params, const char *param[]);
+static void execute_beta_dat_log(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_beta_key_dump(running_machine *machine, int ref, int params, const char *param[]);
 
 /* Debugging variables */
 static int LogDatWrites;
@@ -1080,8 +1080,8 @@ MACHINE_START( dgnbeta )
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command("beta_dat_log", CMDFLAG_NONE, 0, 0, 0,ToggleDatLog);
-		debug_console_register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, 0,DumpKeys);
+		debug_console_register_command(machine, "beta_dat_log", CMDFLAG_NONE, 0, 0, 0, execute_beta_dat_log);
+		debug_console_register_command(machine, "beta_key_dump", CMDFLAG_NONE, 0, 0, 0, execute_beta_key_dump);
 	}
 	LogDatWrites=0;
 }
@@ -1260,14 +1260,14 @@ static offs_t dgnbeta_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom,
 	return result;
 }
 
-static void ToggleDatLog(int ref, int params, const char *param[])
+static void execute_beta_dat_log(running_machine *machine, int ref, int params, const char *param[])
 {
 	LogDatWrites=!LogDatWrites;
 
 	debug_console_printf("DAT register write info set : %d\n",LogDatWrites);
 }
 
-static void DumpKeys(int ref, int params, const char *param[])
+static void execute_beta_key_dump(running_machine *machine, int ref, int params, const char *param[])
 {
 	int Idx;
 

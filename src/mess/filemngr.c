@@ -238,7 +238,7 @@ static void menu_confirm_save_as(running_machine *machine, ui_menu *menu, void *
 		menu_confirm_save_as_populate(machine, menu, state);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 
 	/* process the event */
 	if ((event != NULL) && (event->iptkey == IPT_UI_SELECT))
@@ -445,7 +445,7 @@ static void menu_file_create(running_machine *machine, ui_menu *menu, void *para
 	else
 	{
 		/* process the menu */
-		event = ui_menu_process(menu, 0);
+		event = ui_menu_process(machine, menu, 0);
 	}
 
 	/* process the event */
@@ -787,7 +787,7 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 	}
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->itemref != NULL)
 	{
 		/* handle selections */
@@ -961,7 +961,7 @@ void ui_mess_menu_file_manager(running_machine *machine, ui_menu *menu, void *pa
 	menustate->selected_device = (const device_config *) ui_menu_get_selection(menu);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 	{
 		menustate->selected_device = (const device_config *) event->itemref;

@@ -165,6 +165,7 @@ static DEVICE_START( adc080x )
 	state_save_register_item(unique_tag, 0, adc080x->sar);
 	state_save_register_item(unique_tag, 0, adc080x->cycle);
 	state_save_register_item(unique_tag, 0, adc080x->bit);
+	return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( adc080x )

@@ -111,6 +111,7 @@ static DEVICE_START( cbm_drive )
 	int id = image_index_in_device(device);
 	if (id == 0)
 		cbm_drive_open();	/* boy these C64 drivers are butt ugly */
+	return DEVICE_START_OK;
 }
 
 static DEVICE_STOP( cbm_drive )

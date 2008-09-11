@@ -158,7 +158,7 @@ static READ16_HANDLER( hangon_io_r )
 
 		case 0x1000/2: /* Input ports and DIP switches */
 		{
-			static const char *sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
+			static const char *const sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
 			return input_port_read(machine, sysports[offset & 3]);
 		}
 
@@ -167,7 +167,7 @@ static READ16_HANDLER( hangon_io_r )
 
 		case 0x3020/2: /* ADC0804 data output */
 		{
-			static const char *adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 			return input_port_read_safe(machine, adcports[adc_select], 0);
 		}
 	}
@@ -209,7 +209,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 		case 0x0010/2: /* Input ports and DIP switches */
 		{
-			static const char *sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
+			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
 			return input_port_read(machine, sysports[offset & 3]);
 		}
 
@@ -219,7 +219,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 		case 0x0030/2: /* ADC0804 data output */
 		{
-			static const char *adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 			return input_port_read_safe(machine, adcports[adc_select], 0);
 		}
 	}
@@ -1473,7 +1473,7 @@ ROM_START( enduror )
 	ROM_REGION( 0x2000, "proms", 0 ) /* zoom table */
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0013a.key", 0x0000, 0x2000, CRC(295e6737) SHA1(2eff36f1f24db1154cf970d4c9fd481ae4f9a57c) )
 ROM_END
 
@@ -1553,7 +1553,7 @@ ROM_START( enduror1 )
 	ROM_REGION( 0x2000, "proms", 0 ) /* zoom table */
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0013a.key", 0x0000, 0x2000, CRC(295e6737) SHA1(2eff36f1f24db1154cf970d4c9fd481ae4f9a57c) )
 ROM_END
 

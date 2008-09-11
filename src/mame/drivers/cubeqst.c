@@ -210,7 +210,6 @@ static INTERRUPT_GEN( vblank )
 	cpunum_set_input_line(machine, MAIN_CPU, int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
-	laserdisc_vsync(laserdisc);
 	video_field ^= 1;
 }
 
@@ -534,7 +533,7 @@ static const custom_sound_interface custom_interface =
 static const cubeqst_snd_config snd_config =
 {
 	sound_dac_w,
-	"sound_proms"
+	"soundproms"
 };
 
 
@@ -577,14 +576,14 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_PALETTE_LENGTH(8192 + 1)
 	MDRV_PALETTE_INIT(cubeqst)
 
-	MDRV_LASERDISC_ADD("laserdisc", SIMUTREK_SPECIAL)
+	MDRV_LASERDISC_ADD("laserdisc", SIMUTREK_SPECIAL, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(cubeqst, CUBEQST_HBLANK, CUBEQST_VCOUNT, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MDRV_LASERDISC_OVERLAY_POSITION(0.002, -0.018)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -662,13 +661,13 @@ ROM_START( cubeqst )
     ROM_REGION( 0x10000, "ldp_cpu", 0)
     ROM_LOAD( "laser_player_interface_d8748_a308.bin", 0x0000, 0x0400, CRC(eed3e728) SHA1(1eb3467f1c41553375b2c21952cd593b167f5416) )
 
-	ROM_REGION16_BE( 0x1000, "sound_proms", 0)
+	ROM_REGION16_BE( 0x1000, "soundproms", 0)
 	ROMX_LOAD( "mother_sounds_82s185.17f", 0x0, 0x800, CRC(0f49d40e) SHA1(40340833ab27ccb5b60baf44ad01930f204f5318), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "mother_sounds_82s185.19f", 0x0, 0x800, CRC(a041ce92) SHA1(9bc92992de22b830e479933c50650c7dc23f5713), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
 	ROMX_LOAD( "mother_sounds_82s185.16f", 0x1, 0x800, CRC(75b1749f) SHA1(71da8224e72fb5250e2097666a47314d0a818ee9), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "mother_sounds_82s185.18f", 0x1, 0x800, CRC(ae4c78ae) SHA1(76fdb8eab372065882caaa5b93ce9e21efe54da5), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
 
-	ROM_REGION( 0x1000, "video_proms", 0 )
+	ROM_REGION( 0x1000, "videoproms", 0 )
 	/* Horizontal and vertical video timing PROMs */
 	ROM_LOAD( "rotate_video_board_82s129.4h", 0x000, 0x100, CRC(6ed1b8d3) SHA1(c392855e1ff8637e551891aefd6c6a3bbcf273a5) )
 	ROM_LOAD( "rotate_video_board_82s129.5h", 0x100, 0x100, CRC(32d839d4) SHA1(7b82e5c1ea5a351eba60c19560a10e4702ae2c22) )

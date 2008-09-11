@@ -322,7 +322,8 @@ const game_driver * const drivers[] =
 	DRIVER( jumpcoat )	/* (c) 1983 Taito */
 	DRIVER( boggy84 )	/* bootleg, original is (c)1983 Taito/Kaneko */
 	DRIVER( redrobin )	/* (c) 1986 Elettronolo */
-	DRIVER( imago )		/* (c) 1983 Acom */
+	DRIVER( imago )		/* (c) 1984 Acom */
+	DRIVER( imagoa )	/* (c) 1983 Acom */
 	DRIVER( scorpion )	/* (c) 1982 Zaccaria */
 	DRIVER( scrpiona )	/* (c) 1982 Zaccaria */
 	DRIVER( scrpionb )	/* (c) 1982 Zaccaria */
@@ -1766,6 +1767,7 @@ const game_driver * const drivers[] =
 	DRIVER( kabukiz )	/* B50 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( kabukizj )	/* B50 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( tnzs )		/* B53 (c) 1988 Taito Corporation Japan (World) (new logo) */
+	DRIVER( tnzsjn )	/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
 	DRIVER( tnzsj )		/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
 	DRIVER( tnzso )		/* B53?(c) 1988 Taito Corporation Japan (World) (old logo) */
 	DRIVER( insectx )	/* B97 (c) 1989 Taito Corporation Japan (World) */
@@ -4076,12 +4078,35 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( dybbnao )
 
 	DRIVER( naomigd )
+
+	DRIVER( gundmgd )
 	DRIVER( sfz3ugd )
+	DRIVER( cvsgd )
+	DRIVER( gundmxgd )
 	DRIVER( cvs2gd )
+	DRIVER( ikaruga )
+	DRIVER( ggxx )
+	DRIVER( chocomk )
+	DRIVER( quizqgd )
+	DRIVER( ggxxrl )
+	DRIVER( shikgam2 )
+	DRIVER( meltybld )
+	DRIVER( senko )
+	DRIVER( ss2005 )
+
+	DRIVER( sprtjam )
+	DRIVER( slashout )
+	DRIVER( spkrbtl )
+	DRIVER( dygolf )
+	DRIVER( wsbbgd )
+	DRIVER( vathlete )
 
 	DRIVER( hod2bios )
 
 	DRIVER( naomi2 )
+	DRIVER( vstrik3 )
+	DRIVER( vf4 )
+	DRIVER( initd )
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
@@ -4380,9 +4405,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 				/* MBA ?? */
 				/* MBB ?? */
 				/* MBC ?? */
-	DRIVER( boogwing )	/* MBD (c) 1992 */
-	DRIVER( boogwina )	/* MBD (c) 1992 */
-	DRIVER( ragtime )	/* MBD (c) 1992 */
+	DRIVER( boogwing )	/* MBD (c) 1992 (Euro) */
+	DRIVER( boogwina )	/* MBD (c) 1992 (Asia) */
+	DRIVER( ragtime )	/* MBD (c) 1992 (Japan) */
+	DRIVER( ragtimea )	/* MBD (c) 1992 (Japan) */
 	DRIVER( dblewing )	/* MBE (c) 1993 Mitchell */
 	DRIVER( fghthist )	/* MBF (c) 1993 Data East Corporation (World) */
 	DRIVER( fghthstu )	/* MBF (c) 1993 Data East Corporation (US) */
@@ -4539,9 +4565,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tp84b )		/* GX388 (c) 1984 */
 	DRIVER( hyperspt )	/* GX330 (c) 1984 + Centuri */
 	DRIVER( hpolym84 )	/* GX330 (c) 1984 */
-	DRIVER( sbasketb )	/* GX405 (c) 1984 */
-	DRIVER( sbasketo )	/* GX405 (c) 1984 */
-	DRIVER( sbasketu )	/* GX405 (c) 1984 */
+	DRIVER( sbasketb )	/* GX405 (c) 1984 (Version H, Unprotected) */
+	DRIVER( sbasketg )	/* GX405 (c) 1984 (Version G, Encrypted) */
+	DRIVER( sbaskete )	/* GX405 (c) 1984 (Version E, Encrypted) */
 	DRIVER( mikie )		/* GX469 (c) 1984 */
 	DRIVER( mikiej )	/* GX469 (c) 1984 */
 	DRIVER( mikiehs )	/* GX469 (c) 1984 */
@@ -5130,12 +5156,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jedi )		/* 136030           (c) 1984 */
 
 	/* Atari System 1 games */
+	DRIVER( atarisy1 )	/* 136033           (c) 1984 */
 	DRIVER( peterpak )	/* 136028           (c) 1984 */
 	/* Marble Madness */
 	DRIVER( marble )	/* 136033           (c) 1984 */
 	DRIVER( marble2 )	/* 136033           (c) 1984 */
 	DRIVER( marble3 )	/* 136033           (c) 1984 */
 	DRIVER( marble4 )	/* 136033           (c) 1984 */
+    DRIVER( marble5 )   /* 136033           (c) 1984   (LSI Cartridge) */
 	/* Indiana Jones and the Temple of Doom */
 	DRIVER( indytemp )	/* 136036           (c) 1985 */
 	DRIVER( indytem2 )	/* 136036           (c) 1985 */
@@ -5461,8 +5489,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( marvins )	/* A2003      (c) 1983 */
 	DRIVER( madcrash )	/* A2005      (c) 1984 */
 	DRIVER( vangrd2 )	/* A2005      (c) 1984 */
-	DRIVER( mainsnk )	/* fill in */
-	DRIVER( canvas )	/*            (c) 1985 */
+	DRIVER( mainsnk )	/*            (c) 1984 */
+	DRIVER( canvas )	/* A3008      (c) 1985 */
 	DRIVER( jcross )	/* A3006      (c) 1984 */
 	DRIVER( sgladiat )	/* A3006      (c) 1984 */
 	DRIVER( hal21 )		/* A4031      (c) 1985 */
@@ -7040,6 +7068,7 @@ Other Sun games
 	DRIVER( drtomy )	/* (c) 1993 no copyright message (1993 on pcb), some code taken from 'Big Karnak' */
 	DRIVER( sderby )	/* (c) 1996 */
 	DRIVER( pmroulet )
+	DRIVER( spacewin )
 
 	/* Pacific Novelty games */
 	DRIVER( sharkatt )	/* (c) 1980 */
@@ -8042,6 +8071,7 @@ Other Sun games
 	DRIVER( suprpool )	/* (c) 1997 ABM Games */
 	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */
 	DRIVER( mcolors )	/* 1999 unknown */
+	DRIVER( sgsafari )	/* 1996 New Impeuropex Corp. */
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( magjoker )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */

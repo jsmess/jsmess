@@ -322,7 +322,7 @@ static WRITE8_HANDLER( gottlieb_analog_reset_w )
 
 static CUSTOM_INPUT( stooges_joystick_r )
 {
-	static const char *joyport[] = { "P1JOY", "P2JOY", "P3JOY", NULL };
+	static const char *const joyport[] = { "P1JOY", "P2JOY", "P3JOY", NULL };
 	return (joyport[joystick_select & 3] != NULL) ? input_port_read(field->port->machine, joyport[joystick_select & 3]) : 0xff;
 }
 
@@ -678,8 +678,6 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 	if (laserdisc != NULL)
 	{
 		bitmap_t *dummy;
-
-		laserdisc_vsync(laserdisc);
 
 		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
 		if (laserdisc_get_video(laserdisc, &dummy) == 0)
@@ -1889,7 +1887,7 @@ static MACHINE_DRIVER_START( g2laser )
 	MDRV_IMPORT_FROM(gottlieb_core)
 	MDRV_IMPORT_FROM(gottlieb_soundrev2)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "main", "ldsound")
 	MDRV_LASERDISC_AUDIO(laserdisc_audio_process)
 	MDRV_LASERDISC_OVERLAY(gottlieb, GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
@@ -1897,7 +1895,7 @@ static MACHINE_DRIVER_START( g2laser )
 	MDRV_SCREEN_REMOVE("main")
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */

@@ -787,6 +787,7 @@ DEVICE_START( thom_floppy )
 	thom_qdd_compute_map();
 	thom_floppy_reset( thom_floppy_drive_of_image( device  ) );
 	floppy_drive_init( device, &thom_floppy_interface );
+	return DEVICE_START_OK;
 }
 
 

@@ -64,6 +64,7 @@ static DEVICE_START( ins8154 )
 	state_save_register_item(unique_tag, 0, ins8154->mdr);
 	state_save_register_item(unique_tag, 0, ins8154->odra);
 	state_save_register_item(unique_tag, 0, ins8154->odrb);
+	return DEVICE_START_OK;
 }
 
 

@@ -113,6 +113,7 @@ DEVICE_START( svi318_cart )
 {
 	pcart = NULL;
 	pcart_rom_size = 0;
+	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( svi318_cart )

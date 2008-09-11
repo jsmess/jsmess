@@ -1673,7 +1673,7 @@ static TIMER_CALLBACK(fs_rise)
  *************************************/
 
 
-static void execute_dumpscanline(int ref, int params, const char **param)
+static void execute_m6847_dumpscanline(running_machine *machine, int ref, int params, const char **param)
 {
 	int i;
 	int beamx = get_beamx() / 8;
@@ -1915,7 +1915,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command("m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_dumpscanline);
+		debug_console_register_command(machine, "m6847_dumpscanline", CMDFLAG_NONE, 0, 0, 0, execute_m6847_dumpscanline);
 }
 
 

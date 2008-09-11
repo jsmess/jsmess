@@ -593,6 +593,7 @@ READ8_HANDLER( gamecom_vram_r ) {
 DEVICE_START( gamecom_cart )
 {
 	internal_ram = sm8500_internal_ram();
+	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart )

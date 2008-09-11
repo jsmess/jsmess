@@ -271,19 +271,19 @@ static WRITE32_HANDLER( znsecsel_w )
 	if( ( m_n_znsecsel & 0x80 ) == 0 )
 	{
 		psx_sio_install_handler( 0, sio_pad_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else if( ( m_n_znsecsel & 0x08 ) == 0 )
 	{
 		znsec_start( 1 );
 		psx_sio_install_handler( 0, sio_znsec1_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else if( ( m_n_znsecsel & 0x04 ) == 0 )
 	{
 		znsec_start( 0 );
 		psx_sio_install_handler( 0, sio_znsec0_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else
 	{
@@ -291,7 +291,7 @@ static WRITE32_HANDLER( znsecsel_w )
 		m_b_lastclock = 1;
 
 		psx_sio_install_handler( 0, sio_dip_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 
 		timer_adjust_oneshot( dip_timer, ATTOTIME_IN_CYCLES( 100, 0 ), 1 );
 	}
@@ -301,7 +301,7 @@ static WRITE32_HANDLER( znsecsel_w )
 
 static TIMER_CALLBACK( dip_timer_fired )
 {
-	psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
+	psx_sio_input( machine, 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
 
 	if( param )
 	{
@@ -450,7 +450,7 @@ static const at28c16_config at28c16_intf =
 
 static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -489,7 +489,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zn2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_100MHz )
+	MDRV_CPU_ADD( "main", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -2353,7 +2353,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coh1000a_ide )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	MDRV_CPU_MODIFY( "MAIN" )
+	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_VBLANK_INT("main", jdredd_vblank)
 
 	MDRV_MACHINE_RESET( coh1000a )

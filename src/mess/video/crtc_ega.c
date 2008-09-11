@@ -772,6 +772,7 @@ static void common_start(const device_config *device, int device_type)
 static DEVICE_START( crtc_ega )
 {
 	common_start(device, TYPE_CRTC_EGA);
+	return DEVICE_START_OK;
 }
 
 

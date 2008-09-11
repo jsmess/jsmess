@@ -27,6 +27,7 @@ DEVICE_START(hd63450)
 		dmac->reg[x].niv = 0x0f;  // defaults?
 		dmac->reg[x].eiv = 0x0f;
 	}
+	return DEVICE_START_OK;
 }
 
 int hd63450_read(const device_config* device, int offset, UINT16 mem_mask)

@@ -120,6 +120,7 @@ DEVICE_START( ti990_tape )
 	t->wp = 1;
 	t->bot = 0;
 	t->eot = 0;
+	return DEVICE_START_OK;
 }
 
 /*DEVICE_STOP( ti990_tape )

@@ -120,6 +120,7 @@ DEVICE_START( smartmedia )
 	smartmedia[id].pagereg = NULL;
 	smartmedia[id].id[0] = smartmedia[id].id[1] = 0;
 	smartmedia[id].mp_opcode = 0;
+	return DEVICE_START_OK;
 }
 
 /*

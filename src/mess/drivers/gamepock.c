@@ -64,6 +64,7 @@ MACHINE_DRIVER_END
 
 static DEVICE_START(gamepock_cart) {
 	memory_set_bankptr( 1, memory_region(device->machine,  "user1" ) );
+	return DEVICE_START_OK;
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {

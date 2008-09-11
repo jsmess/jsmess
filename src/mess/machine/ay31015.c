@@ -158,6 +158,7 @@ static DEVICE_START(ay31015)
 //	const ay31015_config *config = get_config(device);
 
 	ay = get_token(device);
+	return DEVICE_START_OK;
 }
 #endif
 

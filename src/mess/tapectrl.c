@@ -190,7 +190,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	menu_tape_control_populate(machine, menu, state);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL)
 	{
 		switch(event->iptkey)

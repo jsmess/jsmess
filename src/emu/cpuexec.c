@@ -332,7 +332,7 @@ void cpuexec_timeslice(running_machine *machine)
 	}
 
 	/* update the global time */
-	timer_set_global_time(target);
+	timer_set_global_time(machine, target);
 }
 
 
@@ -765,7 +765,7 @@ int cpu_getiloops(void)
     for this screen
 -------------------------------------------------*/
 
-static void on_vblank(const device_config *device, int vblank_state)
+static void on_vblank(const device_config *device, void *param, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state)
@@ -971,7 +971,7 @@ static void cpu_inittimers(running_machine *machine)
 
 			assert(screen != NULL);
 
-			video_screen_register_vblank_callback(screen, on_vblank);
+			video_screen_register_vblank_callback(screen, on_vblank, NULL);
 		}
 
 		/* periodic interrupts */

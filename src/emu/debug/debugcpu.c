@@ -59,6 +59,7 @@ struct _debugger_private
 	UINT8			within_instruction_hook;
 	UINT8			vblank_occurred;
 	UINT8			memory_modified;
+	UINT8			debugger_access;
 
 	int				execution_state;
 
@@ -90,10 +91,10 @@ static debugger_private global;
 ***************************************************************************/
 
 static void debug_cpu_exit(running_machine *machine);
-static void perform_trace(debug_cpu_info *info);
+static void perform_trace(running_machine *machine, debug_cpu_info *info);
 static void prepare_for_step_overout(debug_cpu_info *info);
-static void process_source_file(void);
-static void breakpoint_check(debug_cpu_info *info, offs_t pc);
+static void process_source_file(running_machine *machine);
+static void breakpoint_check(running_machine *machine, debug_cpu_info *info, offs_t pc);
 static void watchpoint_check(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
 static void check_hotspots(int cpunum, int spacenum, offs_t address);
 
@@ -158,7 +159,7 @@ int debug_cpu_within_instruction_hook(running_machine *machine)
     on_vblank - called when a VBLANK hits
 -------------------------------------------------*/
 
-static void on_vblank(const device_config *device, int vblank_state)
+static void on_vblank(const device_config *device, void *param, int vblank_state)
 {
 	/* just set a global flag to be consumed later */
 	if (vblank_state)
@@ -300,7 +301,7 @@ void debug_cpu_init(running_machine *machine)
 
 	/* add callback for breaking on VBLANK */
 	if (machine->primary_screen != NULL)
-		video_screen_register_vblank_callback(machine->primary_screen, on_vblank);
+		video_screen_register_vblank_callback(machine->primary_screen, on_vblank, NULL);
 
 	add_exit_callback(machine, debug_cpu_exit);
 }
@@ -383,7 +384,7 @@ static void compute_debug_flags(running_machine *machine, const debug_cpu_info *
 
 	/* if any of the watchpoint flags are set and we're live, tell the memory system */
 	if (global.livecpu != NULL && ((info->flags & DEBUG_FLAG_WATCHPOINT) != 0))
-		memory_set_context(-1);
+		memory_set_context(machine, -1);
 }
 
 
@@ -532,7 +533,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 
 	/* are we tracing? */
 	if (info->flags & DEBUG_FLAG_TRACING_ANY)
-		perform_trace(info);
+		perform_trace(machine, info);
 
 	/* per-instruction hook? */
 	if (global.execution_state != EXECUTION_STATE_STOPPED && (info->flags & DEBUG_FLAG_HOOKED) != 0 && (*info->instrhook)(curpc))
@@ -580,7 +581,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 
 		/* check for execution breakpoints */
 		else if ((info->flags & DEBUG_FLAG_LIVE_BP) != 0)
-			breakpoint_check(info, curpc);
+			breakpoint_check(machine, info, curpc);
 	}
 
 	/* if we are supposed to halt, do it now */
@@ -612,7 +613,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 			}
 
 			/* check for commands in the source file */
-			process_source_file();
+			process_source_file(machine);
 
 			/* if an event got scheduled, resume */
 			if (mame_is_scheduled_event_pending(machine))
@@ -975,7 +976,7 @@ static UINT32 dasm_wrapped(char *buffer, offs_t pc)
 }
 
 
-static void perform_trace(debug_cpu_info *info)
+static void perform_trace(running_machine *machine, debug_cpu_info *info)
 {
 	offs_t pc = activecpu_get_pc();
 	int offset, count, i;
@@ -1005,7 +1006,7 @@ static void perform_trace(debug_cpu_info *info)
 
 		/* execute any trace actions first */
 		if (info->trace.action != NULL)
-			debug_console_execute_command(info->trace.action, 0);
+			debug_console_execute_command(machine, info->trace.action, 0);
 
 		/* print the address */
 		offset = sprintf(buffer, "%0*X: ", info->space[ADDRESS_SPACE_PROGRAM].logchars, pc);
@@ -1082,7 +1083,7 @@ static void prepare_for_step_overout(debug_cpu_info *info)
     a source file
 -------------------------------------------------*/
 
-static void process_source_file(void)
+static void process_source_file(running_machine *machine)
 {
 	/* loop until the file is exhausted or until we are executing again */
 	while (debug_source_file != NULL && global.execution_state == EXECUTION_STATE_STOPPED)
@@ -1115,7 +1116,7 @@ static void process_source_file(void)
 
 		/* execute the command */
 		if (buf[0])
-			debug_console_execute_command(buf, 1);
+			debug_console_execute_command(machine, buf, 1);
 	}
 }
 
@@ -1172,7 +1173,7 @@ static void breakpoint_update_flags(running_machine *machine, debug_cpu_info *in
     a given CPU
 -------------------------------------------------*/
 
-static void breakpoint_check(debug_cpu_info *info, offs_t pc)
+static void breakpoint_check(running_machine *machine, debug_cpu_info *info, offs_t pc)
 {
 	debug_cpu_breakpoint *bp;
 	UINT64 result;
@@ -1189,7 +1190,7 @@ static void breakpoint_check(debug_cpu_info *info, offs_t pc)
 
 				/* if we hit, evaluate the action */
 				if (bp->action != NULL)
-					debug_console_execute_command(bp->action, 0);
+					debug_console_execute_command(machine, bp->action, 0);
 
 				/* print a notification, unless the action made us go again */
 				if (global.execution_state == EXECUTION_STATE_STOPPED)
@@ -1361,7 +1362,7 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 	UINT64 result;
 
 	/* if we're within debugger code, don't stop */
-	if (global.within_instruction_hook)
+	if (global.within_instruction_hook || global.debugger_access)
 		return;
 
 	global.within_instruction_hook = TRUE;
@@ -1408,7 +1409,7 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 
 				/* if we hit, evaluate the action */
 				if (wp->action != NULL)
-					debug_console_execute_command(wp->action, 0);
+					debug_console_execute_command(machine, wp->action, 0);
 
 				/* print a notification, unless the action made us go again */
 				if (global.execution_state == EXECUTION_STATE_STOPPED)
@@ -1642,7 +1643,7 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* all accesses from this point on are for the debugger */
-	memory_set_debugger_access(1);
+	memory_set_debugger_access(global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, return 0xff */
 	if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1657,7 +1658,7 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 		result = (*active_address_space[spacenum].accessors->read_byte)(address);
 
 	/* no longer accessing via the debugger */
-	memory_set_debugger_access(0);
+	memory_set_debugger_access(global.debugger_access = FALSE);
 	return result;
 }
 
@@ -1693,7 +1694,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1708,7 +1709,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 			result = (*active_address_space[spacenum].accessors->read_word)(address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1746,7 +1747,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1761,7 +1762,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 			result = (*active_address_space[spacenum].accessors->read_dword)(address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1799,7 +1800,7 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1814,7 +1815,7 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 			result = (*active_address_space[spacenum].accessors->read_qword)(address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1834,7 +1835,7 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 	address &= info->space[spacenum].logbytemask;
 
 	/* all accesses from this point on are for the debugger */
-	memory_set_debugger_access(1);
+	memory_set_debugger_access(global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, we're done */
 	if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1849,7 +1850,7 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 		(*active_address_space[spacenum].accessors->write_byte)(address, data);
 
 	/* no longer accessing via the debugger */
-	memory_set_debugger_access(0);
+	memory_set_debugger_access(global.debugger_access = FALSE);
 	global.memory_modified = TRUE;
 }
 
@@ -1885,7 +1886,7 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1900,7 +1901,7 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 			(*active_address_space[spacenum].accessors->write_word)(address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -1937,7 +1938,7 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1952,7 +1953,7 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 			(*active_address_space[spacenum].accessors->write_dword)(address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -1988,7 +1989,7 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -2003,7 +2004,7 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 			(*active_address_space[spacenum].accessors->write_qword)(address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -2110,7 +2111,7 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 	/* get pointer to data */
 	/* note that we query aligned to the bus width, and then add back the low bits */
 	lowbits_mask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
-	ptr = memory_get_op_ptr(cpu_getactivecpu(), address & ~lowbits_mask, arg);
+	ptr = memory_get_op_ptr(Machine, cpu_getactivecpu(), address & ~lowbits_mask, arg);
 	if (!ptr)
 		return ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size));
 	ptr = (UINT8 *)ptr + (address & lowbits_mask);
@@ -2264,7 +2265,7 @@ static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t ad
 
 			/* get the base of memory, aligned to the address minus the lowbits */
 			if (opcode & 1)
-				base = memory_get_op_ptr(cpuindex, address & ~lowmask, FALSE);
+				base = memory_get_op_ptr(Machine, cpuindex, address & ~lowmask, FALSE);
 			else
 				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
 
@@ -2478,7 +2479,7 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
 
 			/* get the base of memory, aligned to the address minus the lowbits */
 			if (opcode & 1)
-				base = memory_get_op_ptr(cpuindex, address & ~lowmask, FALSE);
+				base = memory_get_op_ptr(Machine, cpuindex, address & ~lowmask, FALSE);
 			else
 				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
 

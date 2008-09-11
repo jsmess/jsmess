@@ -949,7 +949,7 @@ static const pia6821_interface pia_ic7_intf =
 /* IC8, Inputs, TRIACS, alpha clock */
 static READ8_HANDLER( pia_ic8_porta_r )
 {
-	static const char *portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
+	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
 
 	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n", activecpu_get_previouspc()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
@@ -1421,10 +1421,10 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	MDRV_CPU_ADD("main", M6809, MPU4_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mod2_memmap,0)
 
-	MDRV_TIMER_ADD_PERIODIC("50HZ",gen_50hz, HZ(100))
+	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

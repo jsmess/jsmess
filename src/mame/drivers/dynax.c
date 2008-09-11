@@ -610,8 +610,8 @@ static WRITE8_HANDLER( yarunara_input_w )
 
 static READ8_HANDLER( yarunara_input_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch (offset)
 	{
@@ -966,7 +966,7 @@ static READ8_HANDLER( mjelctrn_keyboard_1_r )
 static READ8_HANDLER( mjelctrn_dsw_r )
 {
 	int dsw = (keyb & 0xc0) >> 6;
-	static const char *dswnames[] = { "DSW2", "DSW1", "DSW3", "DSW4" };
+	static const char *const dswnames[] = { "DSW2", "DSW1", "DSW3", "DSW4" };
 
 	return input_port_read(machine, dswnames[dsw]);
 }
@@ -1069,8 +1069,8 @@ static WRITE8_HANDLER( htengoku_coin_w )
 
 static READ8_HANDLER( htengoku_input_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch( htengoku_select )
 	{
@@ -1199,8 +1199,8 @@ static WRITE8_HANDLER( tenkai_ip_w )
 
 static READ8_HANDLER( tenkai_ip_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-//  static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	//static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch (offset)
 	{
@@ -1280,9 +1280,9 @@ static WRITE8_HANDLER( tenkai_palette_w )
 	}
 }
 
-static void tenkai_update_rombank(void)
+static void tenkai_update_rombank(running_machine *machine)
 {
-	romptr = memory_region(Machine, "main") + 0x10000 + 0x8000 * rombank;
+	romptr = memory_region(machine, "main") + 0x10000 + 0x8000 * rombank;
 //  logerror("rombank = %02x\n",rombank);
 }
 
@@ -1293,12 +1293,12 @@ static READ8_HANDLER( tenkai_p3_r )
 static WRITE8_HANDLER( tenkai_p3_w )
 {
 	rombank = ((data & 0x04) << 1) | (rombank & 0x07);
-	tenkai_update_rombank();
+	tenkai_update_rombank(machine);
 }
 static WRITE8_HANDLER( tenkai_p4_w )
 {
 	rombank = (rombank & 0x08) | ((data & 0x0e) >> 1);
-	tenkai_update_rombank();
+	tenkai_update_rombank(machine);
 }
 // Added by Whistler - START
 static READ8_HANDLER( tenkai_p5_r )
@@ -1325,7 +1325,7 @@ static WRITE8_HANDLER( tenkai_p7_w )
 static WRITE8_HANDLER( tenkai_p8_w )
 {
 	rombank = ((data & 0x08) <<	 1) | (rombank & 0x0f);
-	tenkai_update_rombank();
+	tenkai_update_rombank(machine);
 }
 static READ8_HANDLER( tenkai_p8_r )
 {

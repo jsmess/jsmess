@@ -116,28 +116,30 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 
 static int process_cartridge(const device_config *image, const device_config *file)
 {
+	const rom_source *source;
 	const rom_entry *romrgn, *roment;
 	int position = 0, result;
 
-	romrgn = rom_first_region(image->machine->gamedrv);
-	while(romrgn)
+	for (source = rom_first_source(image->machine->gamedrv, image->machine->config); source != NULL; source = rom_next_source(image->machine->gamedrv, image->machine->config, source))
 	{
-		roment = romrgn + 1;
-		while(!ROMENTRY_ISREGIONEND(roment))
+		for (romrgn = rom_first_region(image->machine->gamedrv, source); romrgn != NULL; romrgn = rom_next_region(romrgn))
 		{
-			if (is_cart_roment(roment))
+			roment = romrgn + 1;
+			while(!ROMENTRY_ISREGIONEND(roment))
 			{
-				parse_rom_name(roment, &position, NULL);
-				if (position == image_index_in_device(image))
+				if (is_cart_roment(roment))
 				{
-					result = load_cartridge(image->machine, romrgn, roment, file);
-					if (!result)
-						return result;
+					parse_rom_name(roment, &position, NULL);
+					if (position == image_index_in_device(image))
+					{
+						result = load_cartridge(image->machine, romrgn, roment, file);
+						if (!result)
+							return result;
+					}
 				}
+				roment++;
 			}
-			roment++;
 		}
-		romrgn = rom_next_region(romrgn);
 	}
 	return INIT_PASS;
 }
@@ -147,6 +149,7 @@ static int process_cartridge(const device_config *image, const device_config *fi
 static DEVICE_START( cartslot_specified )
 {
 	process_cartridge(device, NULL);
+	return DEVICE_START_OK;
 }
 
 static DEVICE_IMAGE_LOAD( cartslot_specified )
@@ -163,36 +166,40 @@ static DEVICE_IMAGE_UNLOAD( cartslot_specified )
 
 void cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
+	const game_driver *gamedrv = devclass->gamedrv;
+	machine_config *config = machine_config_alloc(gamedrv->machine_config);
+	const rom_source *source;
 	const rom_entry *romrgn, *roment;
 	int position, count = 0, must_be_loaded = 0;
 	const char *file_extensions = "bin";
 	UINT32 flags;
 
 	/* try to find ROM_CART_LOADs in the ROM declaration */
-	romrgn = rom_first_region(devclass->gamedrv);
-	while(romrgn != NULL)
+	for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
 	{
-		roment = romrgn + 1;
-		while(!ROMENTRY_ISREGIONEND(roment))
+		for (romrgn = rom_first_region(gamedrv, source); romrgn != NULL; romrgn = rom_next_region(romrgn))
 		{
-			if (is_cart_roment(roment) && !parse_rom_name(roment, &position, &file_extensions))
+			roment = romrgn + 1;
+			while(!ROMENTRY_ISREGIONEND(roment))
 			{
-				flags = ROM_GETFLAGS(roment);
-
-				/* reject any unsupported flags */
-				if (flags & (ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK
-					| ROM_BITWIDTHMASK | ROM_BITSHIFTMASK
-					| ROM_INHERITFLAGSMASK))
+				if (is_cart_roment(roment) && !parse_rom_name(roment, &position, &file_extensions))
 				{
-					fatalerror("Unsupported ROM cart flags 0x%08X", flags);
-				}
+					flags = ROM_GETFLAGS(roment);
 
-				count = MAX(position + 1, count);
-				must_be_loaded = (flags & ROM_OPTIONAL) ? 0 : 1;
+					/* reject any unsupported flags */
+					if (flags & (ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK
+						| ROM_BITWIDTHMASK | ROM_BITSHIFTMASK
+						| ROM_INHERITFLAGSMASK))
+					{
+						fatalerror("Unsupported ROM cart flags 0x%08X", flags);
+					}
+
+					count = MAX(position + 1, count);
+					must_be_loaded = (flags & ROM_OPTIONAL) ? 0 : 1;
+				}
+				roment++;
 			}
-			roment++;
 		}
-		romrgn = rom_next_region(romrgn);
 	}
 
 	switch(state)
@@ -219,4 +226,5 @@ void cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, un
 			strcpy(info->s, file_extensions);
 			break;
 	}
+	machine_config_free(config);
 }

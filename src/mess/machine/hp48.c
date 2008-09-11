@@ -1080,6 +1080,7 @@ static DEVICE_IMAGE_UNLOAD( hp48_port )
 static DEVICE_START( hp48_port )
 {
 	hp48_unfill_port( device );
+	return DEVICE_START_OK;
 }
 
 DEVICE_GET_INFO( hp48_port )

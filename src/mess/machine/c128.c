@@ -552,9 +552,9 @@ static void c128_bankswitch (running_machine *machine, int reset)
 		{
 			DBG_LOG (1, "switching to z80",
 						("active %d\n",cpu_getactivecpu()) );
-			memory_set_context(0);
+			memory_set_context(machine, 0);
 			c128_bankswitch_z80(machine);
-			memory_set_context(1);
+			memory_set_context(machine, 1);
 			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 		}
@@ -562,9 +562,9 @@ static void c128_bankswitch (running_machine *machine, int reset)
 		{
 			DBG_LOG (1, "switching to m6502",
 						("active %d\n",cpu_getactivecpu()) );
-			memory_set_context(1);
+			memory_set_context(machine, 1);
 			c128_bankswitch_128(machine, reset);
-			memory_set_context(0);
+			memory_set_context(machine, 0);
 			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 

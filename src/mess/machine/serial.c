@@ -639,6 +639,7 @@ DEVICE_START(serial_device)
 {
 	int id = image_index_in_device(device);
 	memset(&serial_devices[id], 0, sizeof(serial_devices[id]));
+	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD(serial_device)

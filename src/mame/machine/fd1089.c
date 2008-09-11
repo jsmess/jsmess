@@ -130,7 +130,7 @@ struct parameters
 	int s7,s6,s5,s4,s3,s2,s1,s0;
 };
 
-static UINT8 basetable_fd1089[0x100] =
+static const UINT8 basetable_fd1089[0x100] =
 {
 	0x00,0x1c,0x76,0x6a,0x5e,0x42,0x24,0x38,0x4b,0x67,0xad,0x81,0xe9,0xc5,0x03,0x2f,
 	0x45,0x69,0xaf,0x83,0xe7,0xcb,0x01,0x2d,0x02,0x1e,0x78,0x64,0x5c,0x40,0x2a,0x36,
@@ -426,11 +426,11 @@ void *fd1089_get_decrypted_base(void)
 
 void fd1089a_decrypt(running_machine *machine)
 {
-	sys16_decrypt(machine, memory_region(machine, "fd1089a_key"), FD1089A);
+	sys16_decrypt(machine, memory_region(machine, "fd1089a"), FD1089A);
 }
 
 void fd1089b_decrypt(running_machine *machine)
 {
-	sys16_decrypt(machine, memory_region(machine, "fd1089b_key"), FD1089B);
+	sys16_decrypt(machine, memory_region(machine, "fd1089b"), FD1089B);
 }
 

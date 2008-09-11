@@ -547,36 +547,42 @@ static void common_start( const device_config *device, int device_type )
 static DEVICE_START( ins8250 )
 {
 	common_start( device, TYPE_INS8250 );
+	return DEVICE_START_OK;
 }
 
 
 static DEVICE_START( ins8250a )
 {
 	common_start( device, TYPE_INS8250A );
+	return DEVICE_START_OK;
 }
 
 
 static DEVICE_START( ns16450 )
 {
 	common_start( device, TYPE_NS16450 );
+	return DEVICE_START_OK;
 }
 
 
 static DEVICE_START( ns16550 )
 {
 	common_start( device, TYPE_NS16550 );
+	return DEVICE_START_OK;
 }
 
 
 static DEVICE_START( ns16550a )
 {
 	common_start( device, TYPE_NS16550A );
+	return DEVICE_START_OK;
 }
 
 
 static DEVICE_START( pc16550d )
 {
 	common_start( device, TYPE_PC16550D );
+	return DEVICE_START_OK;
 }
 
 

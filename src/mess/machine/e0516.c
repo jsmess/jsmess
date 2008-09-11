@@ -216,6 +216,7 @@ static DEVICE_START( e0516 )
 	state_save_register_item(unique_tag, 0, e0516->dio);
 
 	state_save_register_item_array(unique_tag, 0, e0516->reg);
+	return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( e0516 )

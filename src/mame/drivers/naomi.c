@@ -1176,6 +1176,7 @@ Region byte encoding is as follows:
 */
 
 #define NAOMI2_BIOS \
+	ROM_REGION( 0x200000, "main", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-23608b (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23608b.bin",   0x000000, 0x200000, CRC(a554b1e3) SHA1(343b727a3619d1c75a9b6d4cc156a9050447f155) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-23608 (Export)"  ) \
@@ -1195,7 +1196,7 @@ Region byte encoding is as follows:
 #define AW_BIOS \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l",                         0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */ \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_h-dolhpin_blue_settings",   0x010000, 0x010000, BAD_DUMP CRC(5d5687c7) SHA1(2600ce09c44872d1793f6b55bf44342673da5ad1) ) /* it appears to flash settings game data here */ /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_h-dolphin_blue_settings",   0x010000, 0x010000, BAD_DUMP CRC(5d5687c7) SHA1(2600ce09c44872d1793f6b55bf44342673da5ad1) ) /* it appears to flash settings game data here */ /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
 
 
 ROM_START( naomi )
@@ -1219,7 +1220,6 @@ ROM_START( hod2bios )
 ROM_END
 
 ROM_START( naomi2 )
-	ROM_REGION( 0x200000, "main", 0)
 	NAOMI2_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
@@ -2792,59 +2792,12 @@ void naomi_write_keyfile(void)
 
 
 }
-
-ROM_START( sfz3ugd )
-	NAOMIGD_BIOS
-
-	ROM_REGION( 0xac00000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD_OPTIONAL("zero3rom.bin", 0x0000000, 0xac00000, CRC(4eabda58) SHA1(e70db0e93c821838c77510fd47c91f0c4cfb09c9) )
-
-	/* GD-ROM dump, this will be replaced once an appropriate CHD format has been decided upon for the GD images*/
-	ROM_REGION( 0x3d8ab000, "user3", ROMREGION_ERASE)
-	ROM_LOAD("track.txt",  0x0000000, 0x000000ad, CRC(bf017e1d) SHA1(0345310b6982f818a07dec8739efe1709281f1e6) )
-	ROM_LOAD("track01.iso",0x0000000, 0x000e1000, CRC(8af2e370) SHA1(0f359d423f72055e6a5c81e7075df1ffd3ccfa5c) )
-	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(c5628df6) SHA1(0d1a24e6271c3b0ef92c55ec9d63e2326892f1d8) )
-	ROM_LOAD("track03.iso",0x0000000, 0x3d8ab000, CRC(195f0d93) SHA1(183412704bd90750355e7af019b78541328fe633) )
-
-
-	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
-	ROM_LOAD("317-5072-com.data", 0x00, 0x50, CRC(6d2992b9) SHA1(88e6dc6711f9f883362ba1217a3350d452a70896) )
-ROM_END
-
 extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
 
-DRIVER_INIT( cvs2gd )
-{
-	// get from key file instead
-	naomi_game_decrypt( 0x2f3226165b9e407cULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
-
-DRIVER_INIT( sfz3ugd )
-{
-	// get from key file instead
-	naomi_game_decrypt( 0x4FF16D1A9E0BFBCDULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-//  naomi_write_keyfile();
-}
 
 
 
-ROM_START( cvs2gd )
-	NAOMIGD_BIOS
 
-	ROM_REGION( 0x9800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("snkgd_sl.bin", 0x0000000, 0x9800000,  CRC(f153421d) SHA1(0c2b935ae3cfb6c85410a209fec4eab497066d84) )
-
-	/* GD-ROM dump, this will be replaced once an appropriate CHD format has been decided upon for the GD images*/
-	ROM_REGION( 0x26ad4620, "user3", ROMREGION_ERASE)
-	ROM_LOAD("capcom_vs_snk2.txt",  0x0000000, 0x00000141, CRC(0db478be) SHA1(a18f87b76139e4a845ecc1456b6195574110e30c) )
-	ROM_LOAD("track01.bin",0x0000000, 0x00ac440,  CRC(d48bd072) SHA1(2fc840586c655dee2686ee3b520c7760bd3b8dcb) )
-	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(3b3a2e7b) SHA1(fd8e5cac5bd387229f4ffbe05d1bf2fabf7ea3f9) )
-	ROM_LOAD("track03.bin",0x0000000, 0x26ad4620, CRC(670d2182) SHA1(a99ceb7bb74e4a0fe6ae80b33cd2963465ae9d14) )
-	ROM_CONTINUE(0x0000000, 0x20000000)
-
-	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
-	ROM_LOAD("317-5078-com.data", 0x00, 0x50, CRC(1c8d94ee) SHA1(bec4a6901f62dc8f76f7b9d72284b3eaac340bf3) )
-ROM_END
 
 
 
@@ -2903,15 +2856,429 @@ GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            
 /* HOTD2 isn't dumped */
 
 
-/* No GD-Rom Sets Supported */
-GAME( 2001, naomigd,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    sfz3ugd, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvs2gd,    naomigd,  naomi,    naomi,    cvs2gd, ROT0, "Capcom",          "Capcom Vs. SNK 2", GAME_NO_SOUND|GAME_NOT_WORKING )
 
+DRIVER_INIT( ngdkey )
+{
+	UINT8* picdata = memory_region(machine,"picreturn");
+	UINT64 key;
+
+	key =(((UINT64)picdata[0x31] << 56) |
+		  ((UINT64)picdata[0x32] << 48) |
+		  ((UINT64)picdata[0x33] << 40) |
+		  ((UINT64)picdata[0x34] << 32) |
+		  ((UINT64)picdata[0x35] << 24) |
+		  ((UINT64)picdata[0x36] << 16) |
+		  ((UINT64)picdata[0x37] << 8)  |
+		  ((UINT64)picdata[0x29] << 0));
+
+	printf("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
+
+	naomi_game_decrypt( key, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+
+ROM_START( gundmgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xa000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("gdmgd_sl.bin", 0x0000000,  0xa000000, CRC(d07ee020) SHA1(751033d48e021908958757125cf3b96a89d0e765) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0001", 0, SHA1(f525111e2762e5895fd0016a9bd41210c1125499) MD5(dcba598e76646a5a6b6e6da70552a7c5) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5069-COM)
+	//(sticker 253-5509-5069)
+	ROM_LOAD("317-5069-com.data", 0x00, 0x50, CRC(8e2f0cbd) SHA1(a5f3a990a03bfa50a1a742593c5ec07645c8718d) )
+ROM_END
+
+
+ROM_START( sfz3ugd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xac00000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("zero3rom.bin", 0x0000000, 0xac00000, CRC(4eabda58) SHA1(e70db0e93c821838c77510fd47c91f0c4cfb09c9) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0002", 0, SHA1(6e7cb0df5feea41ae0b5eb72a92adcd8966595dc) MD5(6340b2527673a8cf387dcda52ecae0ca) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5072-COM)
+	//(sticker 253-5509-5072)
+	ROM_LOAD("317-5072-com.data", 0x00, 0x50, CRC(6d2992b9) SHA1(88e6dc6711f9f883362ba1217a3350d452a70896) )
+ROM_END
+
+ROM_START( cvsgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x7800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("snkgd_sl.bin", 0x0000000, 0x7800000, CRC(83ec3894) SHA1(d07271d964bf6421ea9f13e10ecec57c6e995b2e) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0004", 0,  SHA1(8f8651527463aa01d40c280c0d9b03b7a0650a32) MD5(2d17eaf881c06bd95847e54878bc2ba9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5076-JPN)
+	//(sticker 253-5509-5076J)
+	ROM_LOAD("317-5076-jpn.data", 0x00, 0x50, CRC(5004161b) SHA1(8b2cdfec12ffd9160bc74659e08d07cbc46a4011) )
+ROM_END
+
+
+ROM_START( gundmxgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xc800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("gdmgd_sl.bin", 0x0000000, 0xc800000, CRC(322e503c) SHA1(10a0e3e079d9724e6bc2d4916a4f64384d00d202) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0006", 0, SHA1(b95bc07e61e57a62e276ba7fef0ae9a5c19667d9) MD5(90b1980605e7f53b38292ae32d547c8b) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5079-COM)
+	//(sticker 253-5509-5079)
+	ROM_LOAD("317-5079-com.data", 0x00, 0x50, CRC(e6abe978) SHA1(700e610d84e517793a22d6cabd1aef9c3b8bc092) )
+ROM_END
+
+
+ROM_START( cvs2gd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x9800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("snkgd_sl.bin", 0x0000000, 0x9800000,  CRC(f153421d) SHA1(0c2b935ae3cfb6c85410a209fec4eab497066d84) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0007a", 0, SHA1(e8f199f2743a63765bcbcd533bbe5eed82f959a8) MD5(1f434e6f610987987d1d130e454f5c74) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5078-COM)
+	//(sticker 253-5509-5078)
+	ROM_LOAD("317-5078-com.data", 0x00, 0x50, CRC(1c8d94ee) SHA1(bec4a6901f62dc8f76f7b9d72284b3eaac340bf3) )
+ROM_END
+
+ROM_START( ikaruga )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x9800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("ikaruga.bin", 0x0000000, 0x2000000, CRC(e0369676) SHA1(87f1d01ed81a612b44ed2e1bc48098c3ba92c238) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0010", 0, SHA1(3b853be7208f523100690e12a661173d023af9c1) MD5(83f1877b979b0e5fd77ebfa1ddd9fd56) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5081-JPN)
+	//(sticker 253-5509-5081J)
+	ROM_LOAD("317-5081-jpn.data", 0x00, 0x50, CRC(d4cc5c8c) SHA1(44c0c5c2744fbd419b684cbc36f01973487bafbc) )
+ROM_END
+
+
+ROM_START( ggxx )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("ggx2.bin", 0x0000000, 0xf000000, CRC(666676ee) SHA1(24302e6f10e0d4d41f432cabf9d2743c0aa8fa7c) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0011", 0, SHA1(c08a19acb5641d2fd14b54cc149459c345dae013) MD5(25ab6d42bf07dd26e7033cf201322d9c) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5082-COM)
+	//(sticker 253-5509-5082)
+	ROM_LOAD("317-5082-com.data", 0x00, 0x50, CRC(fa31209d) SHA1(bb18e6412a02510832f7200a06a3179ef1695ef2) )
+ROM_END
+
+
+ROM_START( chocomk )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x3f1f000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("typ.bin", 0x0000000, 0x3f1f000,  CRC(d3976ae9) SHA1(764675d0b612b856dab95caa3000b31206439db4) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(ee71e76f136b1a25855233a614d5c60a6a3e587d) MD5(1e5a028b0ae5cf3c5602cdc657fa2bc4) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5085-JPN)
+	//(sticker 253-5509-5085J)
+	ROM_LOAD("317-5085-jpn.data", 0x00, 0x50, CRC(eecd8140) SHA1(471fb6b242eff646173265df891109e3e0a37a7d) )
+ROM_END
+
+
+ROM_START( quizqgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("game.bin", 0x0000000, 0x9000000,  CRC(0075dd46) SHA1(8f0cb3f8bce492c8d2bdec607a4b95d36ddea404) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0017", 0, SHA1(b6f3fbc81d9aea18551134b93ba3b612254bbc43) MD5(af4be08bf65cbddf2177ccf838c0df20) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5090-JPN)
+	//(sticker 253-5509-5090J)
+	ROM_LOAD("317-5090-jpn.data", 0x00, 0x50, CRC(b4dd88f6) SHA1(c9aacd79c1088225fa5a69b7bd31a7c1286160e1) )
+ROM_END
+
+ROM_START( ggxxrl )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("ggx2.bin", 0x0000000,  0xf000000,  CRC(96ee0174) SHA1(3063682aa31b983fc8dcc2a86bf57dc50da5d904) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0019a", 0, SHA1(50ec9bba5a7ba71f8543763cb139bab46dc487a5) MD5(b09c865e3e06e6e4467acf45b04e9caa) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5092-JPN)
+	//(sticker 253-5509-5092J)
+	ROM_LOAD("317-5092-jpn.data", 0x00, 0x50, CRC(7c8cca4b) SHA1(92c5a0fd8916744eefc023e64daea69803573928) )
+ROM_END
+
+ROM_START( shikgam2 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x704e000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("game.bin", 0x0000000, 0x704e000,  CRC(f658311f) SHA1(d4b780d5954dd41bfe6ceff5fb358d94bc836126) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0021", 0, SHA1(ca6a9f78b2f6b18be3fb926ebcd20c2e90923882) MD5(ba448900dd5cbc9f1f75f285f5d72231) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5095-JPN)
+	//(sticker 253-5509-5095J)
+	ROM_LOAD("317-5095-jpn.data", 0x00, 0x50, CRC(6033ec89) SHA1(9e99a8ad43fa29296dbf2e13b3a3d4552130b4e8) )
+ROM_END
+
+
+ROM_START( meltybld )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xdc2c000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("mel.bin", 0x0000000,  0xdc2c000, CRC(2af7db27) SHA1(2569b6f84be411928764fb513503dfe116f957f5) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0028c", 0, SHA1(bbe95fd6bb39a33e979a0d9d8a63c0f2df1e9e96) MD5(b3318abacfea682605aaa24c756f225d) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5104-JPN)
+	//(sticker 253-5509-5104J)
+	ROM_LOAD("317-5104-jpn.data", 0x00, 0x50, CRC(fedc8305) SHA1(c535545937213f726f25e6aa8eb3746a794e9100) )
+ROM_END
+
+
+
+ROM_START( senko )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xfe40000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("ronde.bin", 0x0000000,  0xfe40000, CRC(49bff4cb) SHA1(bd67522ed781cdd70b4c652cbb1befddb395a4b7) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0030a", 0,  SHA1(bb9727f69f7e5452e09b151c1198d006a81aeb0e) MD5(12885cd794d8a5a839699aef4769b2dd) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5107-JPN)
+	//(sticker 253-5509-5107J)
+	ROM_LOAD("317-5107-jpn.data", 0x00, 0x50, CRC(7b607409) SHA1(a9946a0637453e4813bef18060d4420355cff800) )
+ROM_END
+
+
+
+ROM_START( ss2005 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x5504800, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("sh2sl.bin", 0x0000000,   0x5504800, CRC(5c1d2394) SHA1(197cb74c00adb2acafa927045a2fa7b5730605c7) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(09a47ce506b9696d7bdf4d7c95aa3182cc0d9efa) MD5(1a83930f2083397868172745d3ab2926) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5108-JPN)
+	//(sticker 253-5509-5108J)
+	ROM_LOAD("317-5108-jpn.data", 0x00, 0x50, CRC(6a2eb334) SHA1(cab407d2e994f33aa921d50f399b17e6fbf98eb0) )
+ROM_END
+
+
+
+ROM_START( sprtjam )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("rom.enc", 0x0000000,   0xb000000, CRC(1f6daa8d) SHA1(41c40da36c0448d0a8695fef2fd304b9caaf7562) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(bfabb0da1d4f0422e0b62d8a7bb67dbcdb0d5954) MD5(3a8d3cbc4067f9b5f50be9b9abdc689b) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0300-COM)
+	//(sticker 253-5508-0300)
+	ROM_LOAD("317-0300-com.data", 0x00, 0x50, CRC(9a08413f) SHA1(d57649dcc3af578d55a93dd7a3f41da62d580f54) )
+ROM_END
+
+
+ROM_START( slashout )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("slash.bin", 0x0000000,   0x9000000, CRC(e1f9320f) SHA1(09f1a69aee6e401acbe2099e10193d3fb575eeeb) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(ec1758f5ae359bcb3c66c7ce9ebcb7443c4fd967) MD5(f5228f26e661ab0cb67414f51fe1a5bc) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0302-COM)
+	//(sticker 253-5508-0302)
+	ROM_LOAD("317-0302-com.data", 0x00, 0x50, CRC(4bf6cd62) SHA1(c1fdf12a4d80fa3008170c89d2dc583f19e0450b) )
+ROM_END
+
+
+ROM_START( spkrbtl )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("spkb.bin", 0x0000000,   0xb000000, CRC(ca11d20e) SHA1(e2e2710a8c69eeb970e131be80e0ec19e91d90c6) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(ca6e7ed2e161acad8600898e1b83aded9bb31d3b) MD5(a8a05ce6ab7d9ea67e015cd4853a5b80) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0303-COM)
+	//(sticker 253-5508-0303)
+	ROM_LOAD("317-0303-com.data", 0x00, 0x50, CRC(6e7888a3) SHA1(5ca78052bcfd9e9f81934cbddd9c173e88973e0e) )
+ROM_END
+
+
+ROM_START( dygolf )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x6000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("game.enc", 0x0000000,   0x6000000, CRC(ab02d769) SHA1(3d96d43522357950a3928717464ecf854dd6e385) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d58a42586c65dcb44282bf930631ea8b663c6aa7) MD5(e553e1811f28b67fd57fa8e34d978d87) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0308-COM)
+	//(sticker 253-5508-0308)
+	ROM_LOAD("317-0308-com.data", 0x00, 0x50,  CRC(56f63af0) SHA1(3c453226fc53d2f700b3634db3ef8ce206d94392) )
+ROM_END
+
+ROM_START( wsbbgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xa000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("wsb_sl.bin", 0x0000000,   0xa000000, CRC(e61f37f1) SHA1(ba7b97eec6df672b520c57422287f699438267c5) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(8ce36c9710a8d55e8c19d7f218500b7074b66dec) MD5(bfb8c5ead5ac9e2a82bca9114390a99f) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0309-COM)
+	//(sticker 253-5508-0309)
+	ROM_LOAD("317-0309-com.data", 0x00, 0x50, CRC(8792c550) SHA1(e8d6d91583d1673d8d3fa9ccb0ab1097c5c5ad08) )
+ROM_END
+
+
+ROM_START( vathlete )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x7000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("va.bin", 0x0000000,   0x7000000, CRC(82992bf8) SHA1(1c36e1d8e5bf392b760c934b358963b92fc716cf) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(2167bbdde987c16949c5814ab7cff6eefd9f9326) MD5(67499591f2c61cda14fa581db9294315) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0330-COM)
+	//(sticker 253-5508-0330)
+	ROM_LOAD("317-0330-com.data", 0x00, 0x50, CRC(f5e7f7d4) SHA1(3903337e82011d132993e4366475586866bd39b1) )
+ROM_END
+
+/* Naomi GD-Rom Sets */
+GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+
+// GDL-xxxx (licensed games?)
+GAME( 200?, gundmgd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, sfz3ugd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvsgd,     naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, gundmxgd,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvs2gd,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ikaruga,   naomigd,  naomi,    naomi,    ngdkey,   ROT270, "Treasure",      "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, ggxx,      naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, chocomk,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, quizqgd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, ggxxrl,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, shikgam2,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, meltybld,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Ecole",         "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, senko,     naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+// GDS-xxxx (first party games?)
+GAME( 200?, sprtjam,   naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, slashout,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, spkrbtl,   naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, dygolf,    naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, wsbbgd,    naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "World Series Baseball (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
+
+
+ROM_START( vstrik3 )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("vs3.bin", 0x0000000,   0xb000000, CRC(79d44ff4) SHA1(af0b892531c60999f0ef5db7525de50836764c77) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0006", 0, SHA1(293b84c7f4547060f57598b796b6fc49513cc839) MD5(060d9fef55d8f0fc1986ecc991478942) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0304-COM)
+	//(sticker 253-5508-0304)
+	ROM_LOAD("317-0304-com.data", 0x00, 0x50, CRC(a181c601) SHA1(6a489904941e638ac1069b66e76ee0bcec7d0bab) )
+ROM_END
+
+ROM_START( vf4 )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("vf4.bin", 0x0000000,   0xf000000, CRC(a81e3277) SHA1(fb162f34720d6ba49297ecb5e2869b2afffc307b) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(d68436ee72ea5db40e184b7ff38903a9cadb6df7) MD5(5a18300646a68f2994ed8c81abe9bdd8) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	// this key is wrong! not for this game
+	// (it's for game with a BDR.bin file on the GD-ROM, vf4 has BDM.bin)
+
+	//PIC16C622A (317-0317-COM)
+	//(sticker 253-5508-0317)
+	ROM_LOAD("317-0317-com.data", 0x00, 0x50, BAD_DUMP CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
+ROM_END
+
+ROM_START( initd )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0xc2ed000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("inid.bin", 0x0000000,    0xc2ed000, CRC(524ca451) SHA1(cc8dd06e4fe50e70f277043bd1b817e41c5db8cf) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(5f386183e856722fee4a6ddb0146350b73349181) MD5(b085005215e2766e0fc1e3bd16b2fd95) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0331-JPN)
+	//(sticker 253-5508-0331J)
+	ROM_LOAD("317-0331-jpn.data", 0x00, 0x50, CRC(bb39742e) SHA1(b3100b18aeb80ebfd5312ba5c320e7e647710b55) )
+ROM_END
+
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-/* No Supported Sets */
+// GDS-xxxx (first party games?)
+GAME( 200?, vstrik3, naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vf4,     naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, initd,   naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Initial D (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
 
 /* Atomiswave */
 GAME( 2001, awbios,   0,        naomi,    naomi,    0, ROT0, "Sammy",           "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )

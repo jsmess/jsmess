@@ -139,6 +139,7 @@ static DEVICE_START( dl1416 )
 	state_save_register_item(unique_tag, 0, dl1416->cursor_enable);
 	state_save_register_item(unique_tag, 0, dl1416->write_enable);
 	state_save_register_item_array(unique_tag, 0, dl1416->cursor_ram);
+	return DEVICE_START_OK;
 }
 
 

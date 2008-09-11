@@ -284,6 +284,7 @@ static DEVICE_START( apple525_floppy )
 
 	parent_init = (device_start_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_START);
 	parent_init(device);
+	return DEVICE_START_OK;
 }
 
 

@@ -87,6 +87,7 @@ static basicdsk *get_basicdsk(const device_config *img)
 DEVICE_START( basicdsk_floppy )
 {
 	floppy_drive_init(device, &basicdsk_floppy_interface);
+	return DEVICE_START_OK;
 }
 
 /* attempt to insert a disk into the drive specified with id */

@@ -665,6 +665,7 @@ DEVICE_START( ti85_serial )
 {
 	ti85_free_serial_data_memory(device->machine);
 	ti85_receive_serial (NULL,0);
+	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( ti85_serial )

@@ -379,6 +379,7 @@ static DEVICE_START( msm6255 )
 
 	state_save_register_item(unique_tag, 0, msm6255->cursor);
 	state_save_register_item(unique_tag, 0, msm6255->frame);
+	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( msm6255 )
