@@ -663,7 +663,7 @@ COMP( 1990, didakt90, spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Didaktik
 COMP( 1991, didakm91, spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Didaktik Skalica",	"Didaktik M 91" , 0)
 COMP( 1992, didaktk,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Didaktik Skalica",	"Didaktik Kompakt" , 0)
 COMP( 1993, didakm93, spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Didaktik Skalica",	"Didaktik M 93" , 0)
-COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"",	"Mistrum" , 0)
+COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Amaterske RADIO",	"Mistrum" , 0)
 COMP( 1990, blitz,    spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"",	"Blic" , 0)
 COMP( 1990, byte,     spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"",	"Byte" , 0)
 COMP( 199?, orizon,   spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"",	"Orizon-Micro" , 0)
