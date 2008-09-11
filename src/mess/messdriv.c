@@ -927,6 +927,29 @@ XL/XE 16kB OS roms
 	DRIVER (homelab3)
 	DRIVER (homelab4)
 	
+	/* Irisha */
+	DRIVER (irisha)
+	
+	/* PK-8020 */
+	DRIVER (korvet)
+
+	/* Vector-06c */
+	DRIVER (vector06)
+
+	/* Robotron 1715 */
+	DRIVER (rt1715)
+	DRIVER (rt1715w)
+
+	/* PP-01 */
+	DRIVER (pp01)
+
+	/* Ondra */
+	DRIVER (ondrat)
+	DRIVER (ondrav)
+
+	/* SAPI-1 */
+	DRIVER (sapi1)
+	
 	/* Bondwell */
 	DRIVER( bw2 )
 

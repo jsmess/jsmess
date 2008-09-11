@@ -387,9 +387,11 @@ DRVLIBS = \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
+	$(MESSOBJ)/irisha.a \
 	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
+	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
@@ -407,6 +409,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
+	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/p2000.a \
@@ -417,10 +420,13 @@ DRVLIBS = \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pmd85.a \
 	$(MESSOBJ)/primo.a \
+	$(MESSOBJ)/pp01.a \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/rockwell.a \
+	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/samcoupe.a \
+	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sega.a \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
@@ -447,6 +453,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vc4000.a \
 	$(MESSOBJ)/veb.a \
+	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
@@ -1279,10 +1286,45 @@ $(MESSOBJ)/comx.a:				\
 $(MESSOBJ)/bondwell.a: \
 	$(MESS_DRIVERS)/bw2.o \
 
+$(MESSOBJ)/irisha.a:      \
+	$(MESS_DRIVERS)/irisha.o \
+	$(MESS_MACHINE)/irisha.o \
+	$(MESS_VIDEO)/irisha.o \
+
+$(MESSOBJ)/pk8020.a:      \
+	$(MESS_DRIVERS)/pk8020.o \
+	$(MESS_MACHINE)/pk8020.o \
+	$(MESS_VIDEO)/pk8020.o \
+
+$(MESSOBJ)/vector06.a:      \
+	$(MESS_DRIVERS)/vector06.o \
+	$(MESS_MACHINE)/vector06.o \
+	$(MESS_VIDEO)/vector06.o \
+
+$(MESSOBJ)/rt1715.a:      \
+	$(MESS_DRIVERS)/rt1715.o \
+	$(MESS_MACHINE)/rt1715.o \
+	$(MESS_VIDEO)/rt1715.o \
+
 $(MESSOBJ)/homelab.a: \
 	$(MESS_DRIVERS)/homelab.o \
 	$(MESS_VIDEO)/homelab.o		\
 	$(MESS_MACHINE)/homelab.o	\
+
+$(MESSOBJ)/pp01.a:      \
+	$(MESS_DRIVERS)/pp01.o \
+	$(MESS_MACHINE)/pp01.o \
+	$(MESS_VIDEO)/pp01.o \
+
+$(MESSOBJ)/ondra.a:      \
+	$(MESS_DRIVERS)/ondra.o \
+	$(MESS_MACHINE)/ondra.o \
+	$(MESS_VIDEO)/ondra.o \
+
+$(MESSOBJ)/sapi1.a:      \
+	$(MESS_DRIVERS)/sapi1.o \
+	$(MESS_MACHINE)/sapi1.o \
+	$(MESS_VIDEO)/sapi1.o \
 
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \

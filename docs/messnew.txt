@@ -5,9 +5,13 @@ New System Drivers Supported (in no particular order):
 - Consul 2717 [Miodrag Milanovic]
 - HT-1080Z / HT-1080Z/64 [Miodrag Milanovic]
 - Primo B32/ Primo B48/ Primo C64 [Miodrag Milanovic]
-- Homelab 2/3/4 [Miodrag Milanovic]
-
-
+- Homelab 2/3/4 (not working) [Miodrag Milanovic]
+- SAPI-1 (not working) [Miodrag Milanovic]
+- Vector-06c (not working) [Miodrag Milanovic]
+- Irisha (not working) [Miodrag Milanovic]
+- PP-01 (not working) [Miodrag Milanovic]
+- Ondra (not working) [Miodrag Milanovic]
+- PK-8020 Korvet (not working) [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------

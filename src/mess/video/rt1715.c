@@ -1,0 +1,29 @@
+/***************************************************************************
+
+        Robotron 1715 video driver by Miodrag Milanovic
+
+        10/06/2008 Preliminary driver.
+
+****************************************************************************/
+
+
+#include "driver.h"
+#include "video/i8275.h"
+
+VIDEO_UPDATE( rt1715 )
+{
+	VIDEO_UPDATE_CALL ( generic_bitmapped );
+	return 0;
+}
+
+const rgb_t rt1715_palette[3] = {
+	MAKE_RGB(0x00, 0x00, 0x00), // black
+	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
+	MAKE_RGB(0xff, 0xff, 0xff)	// highlight
+};
+
+PALETTE_INIT( rt1715 )
+{
+	palette_set_colors(machine, 0, rt1715_palette, ARRAY_LENGTH(rt1715_palette));
+}
+

@@ -1,0 +1,87 @@
+/***************************************************************************
+
+        Robotron 1715 video driver by Miodrag Milanovic
+
+        10/06/2008 Preliminary driver.
+
+****************************************************************************/
+
+
+#include "driver.h"
+#include "cpu/i8085/i8085.h"
+#include "machine/8255ppi.h"
+#include "machine/8257dma.h"
+#include "video/i8275.h"
+#include "devices/cassette.h"
+#include "formats/rk_cas.h"
+#include "includes/rt1715.h"
+
+WRITE8_HANDLER (rt1717_set_bank )
+{
+	memory_set_bankptr(1, mess_ram);
+	memory_set_bankptr(3, mess_ram);
+}
+
+/* Address maps */
+static ADDRESS_MAP_START(rt1715_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x07ff ) AM_READWRITE(SMH_BANK1, SMH_BANK3)
+  AM_RANGE( 0x0800, 0xffff ) AM_READWRITE(SMH_BANK2, SMH_BANK2)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rt1715_io , ADDRESS_SPACE_IO, 8)
+	//ADDRESS_MAP_GLOBAL_MASK(0xFF)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x28, 0x28 ) AM_WRITE( rt1717_set_bank )
+ADDRESS_MAP_END
+
+/* Input ports */
+INPUT_PORTS_START( rt1715 )
+INPUT_PORTS_END
+
+/* Machine driver */
+static MACHINE_DRIVER_START( rt1715 )
+  /* basic machine hardware */
+  MDRV_CPU_ADD("main", Z80, XTAL_16MHz / 4)
+  MDRV_CPU_PROGRAM_MAP(rt1715_mem, 0)
+  MDRV_CPU_IO_MAP(rt1715_io, 0)
+  MDRV_MACHINE_RESET( rt1715 )
+
+    /* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(78*6, 30*10)
+	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	MDRV_PALETTE_LENGTH(3)
+	MDRV_PALETTE_INIT(rt1715)
+
+	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(rt1715)
+
+MACHINE_DRIVER_END
+
+/* ROM definition */
+ROM_START( rt1715 )
+	ROM_REGION( 0x10800, "main", ROMREGION_ERASEFF )
+	ROM_LOAD( "s502.bin", 0x10000, 0x0800, CRC(7b6302e1))
+	ROM_REGION(0x0800, "gfx",0)
+	ROM_LOAD ("s619.bin", 0x0000, 0x0400, CRC(98647763))
+ROM_END
+
+ROM_START( rt1715w )
+	ROM_REGION( 0x10800, "main", ROMREGION_ERASEFF )
+	ROM_LOAD( "s550.bin", 0x10000, 0x0800, CRC(0A96C754))
+	ROM_REGION(0x0800, "gfx",0)
+	ROM_LOAD ("s619.bin", 0x0000, 0x0400, CRC(98647763))
+ROM_END
+
+SYSTEM_CONFIG_START(rt1715)
+	CONFIG_RAM_DEFAULT(64 * 1024)
+SYSTEM_CONFIG_END
+
+/* Driver */
+
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    CONFIG COMPANY   FULLNAME       FLAGS */
+COMP( 1986, rt1715, 0,      0, 		rt1715, 	rt1715,rt1715, rt1715,  "Robotron", 	"Robotron 1715",	GAME_NOT_WORKING)
+COMP( 1986, rt1715w,rt1715, 0, 		rt1715, 	rt1715,rt1715, rt1715,  "Robotron", 	"Robotron 1715W",	GAME_NOT_WORKING)
