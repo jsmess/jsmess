@@ -10,16 +10,38 @@
 
     TODO:
 
+	- several disk interfaces (720K/1.44MB/3.2MB)
+	- Trump Card missing extra 256K RAM
+	- Gold Card (68000 @ 16MHz, 2MB RAM)
+	- Super Gold Card (68020 @ 24MHz, 4MB RAM)
+	- QLToolkit II ROM
+	- GST 68kOS ROM
 	- natural keyboard SHIFT does not work, it causes characters to be skipped altogether
 	- get modified Danish version to boot (e.g. MD_DESEL was patched to jump to 0x1cd5e)
+	- ICL One Per Desk / British Telecom Merlin Tonto / Telecom Australia Computerphone / Mega OPD (US)
+	- Sandy Q-XT 640 (original motherboard, Super QBoard 512KB, Centronics, Super Toolkit II, FDC, 1 or 2 3.5" 1MB drives, 3 expansion slots)
+	- CST Thor PC 1F (720K 3.5")
+	- CST Thor PC 2F (2x 720k 3.5")
+	- CST Thor PC 2FW (20MB Winchester + 720K 3.5")
+	- CST Thor 20 (68020)
+	- CST Thor 21 (68020+68881)
+    - CST Thor XVI CF    (Workstation, 68000 @ 8 MHz, M6802, 68682 DUART)
+    - CST Thor XVI IF    (Single Floppy)
+    - CST Thor XVI FF    (Dual Floppy)
+    - CST Thor XVI W20F  (20MB Winchester, 1 Floppy)
+    - CST Thor XVI W20FF (20MB Winchester, 2 Floppies)
+    - CST Thor XVI W40F  (40MB Winchester, 1 Floppy)
+    - CST Thor XVI W40FF (40MB Winchester, 2 Floppies)
 
 */
 
 #include "driver.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
+#include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/microdrv.h"
+#include "devices/snapquik.h"
 #include "includes/serial.h"
 #include "sound/speaker.h"
 #include "video/zx8301.h"
@@ -35,6 +57,8 @@
 #define X2 XTAL_32_768kHz
 #define X3 XTAL_4_436MHz
 #define X4 XTAL_11MHz
+
+static QUICKLOAD_LOAD( ql );
 
 /* Intelligent Peripheral Controller (IPC) */
 
@@ -205,9 +229,9 @@ static READ8_HANDLER( ipc_bus_r )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // Cartridge ROM
-	AM_RANGE(0x010000, 0x017fff) AM_NOP // expansion I/O
+	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // 16K Cartridge ROM
+	AM_RANGE(0x010000, 0x017fff) AM_NOP // 32K Expansion I/O
 	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302, ZX8302_TAG, zx8302_rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302, ZX8302_TAG, zx8302_rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302, ZX8302_TAG, zx8302_control_w)
@@ -217,11 +241,11 @@ static ADDRESS_MAP_START( ql_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302, ZX8302_TAG, zx8302_mdv_track_r, zx8302_data_w)
 	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302, ZX8302_TAG, zx8302_mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301, ZX8301_TAG, zx8301_control_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_ROM // expansion I/O
+	AM_RANGE(0x01c000, 0x01ffff) AM_ROM // 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301, ZX8301_TAG, zx8301_ram_r, zx8301_ram_w)
-	AM_RANGE(0x040000, 0x0bffff) AM_RAMBANK(1) // 512KB expansion RAM
+	AM_RANGE(0x040000, 0x0bffff) AM_RAMBANK(1) // 512KB Expansion RAM
 	AM_RANGE(0x0c0000, 0x0dffff) AM_NOP // 8x16KB device slots
-	AM_RANGE(0x0e0000, 0x0fffff) AM_NOP // expansion I/O
+	AM_RANGE(0x0e0000, 0x0fffff) AM_NOP // 128K Expansion I/O
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ipc_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -540,7 +564,34 @@ static MACHINE_START( ql )
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x0bffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
+	case 192*1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x04ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x050000, 0x0bffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_configure_bank(1, 0, 1, mess_ram + (128 * 1024), 0);
+		memory_set_bank(1, 0);
+		break;
+
+	case 256*1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x05ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060000, 0x0bffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_configure_bank(1, 0, 1, mess_ram + (128 * 1024), 0);
+		memory_set_bank(1, 0);
+		break;
+
+	case 384*1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x07ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x0bffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_configure_bank(1, 0, 1, mess_ram + (128 * 1024), 0);
+		memory_set_bank(1, 0);
+		break;
+
 	case 640*1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x0bffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_configure_bank(1, 0, 1, mess_ram + (128 * 1024), 0);
+		memory_set_bank(1, 0);
+		break;
+
+	case 896*1024:
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x0bffff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_configure_bank(1, 0, 1, mess_ram + (128 * 1024), 0);
 		memory_set_bank(1, 0);
@@ -599,6 +650,9 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(ql, "bas", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ql_ntsc )
@@ -639,10 +693,10 @@ ROM_START( ql )
     ROMX_LOAD( "fb.ic34", 0x008000, 0x004000, NO_DUMP, ROM_BIOS(6) )
 
 	ROM_SYSTEM_BIOS( 6, "tyche", "v2.05 (Tyche)" )
-    ROMX_LOAD( "tyche.rom", 0x000000, 0x010000, BAD_DUMP CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_BIOS(7) )
+    ROMX_LOAD( "tyche.rom", 0x000000, 0x010000, CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_BIOS(7) )
 
 	ROM_SYSTEM_BIOS( 7, "min189", "Minerva v1.89" )
-    ROMX_LOAD( "minerva.rom", 0x000000, 0x00c000, CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
+    ROMX_LOAD( "minerva.rom", 0x000000, 0x00c000, BAD_DUMP CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
 
 	ROM_REGION( 0x800, "ipc", 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -735,6 +789,13 @@ ROM_END
 
 /* System Configuration */
 
+static QUICKLOAD_LOAD( ql )
+{
+	image_fread(image, mess_ram, 128*1024);
+
+	return INIT_PASS;
+}
+
 static DEVICE_IMAGE_LOAD( ql_serial )
 {
 	/* filename specified */
@@ -808,11 +869,65 @@ static void ql_cartslot_getinfo( const mess_device_class *devclass, UINT32 state
 	}
 }
 
+static DEVICE_IMAGE_LOAD( ql_floppy )
+{
+	if (image_has_been_created(image))
+		return INIT_FAIL;
+
+	switch (image_length(image))
+	{
+	case 40*1*9*512: // 184320 (SSSD)
+		basicdsk_set_geometry(image, 40, 1, 9, 512, 1, 0, FALSE);
+		return INIT_PASS;
+
+	case 40*2*9*512: // 368640 (DSSD)
+		basicdsk_set_geometry(image, 40, 2, 9, 512, 1, 0, FALSE);
+		return INIT_PASS;
+
+	case 80*2*9*512: // 737280 (DSDD)
+		basicdsk_set_geometry(image, 80, 2, 9, 512, 1, 0, FALSE);
+		return INIT_PASS;
+
+	case 80*2*18*512: // 1474560 (HD)
+		basicdsk_set_geometry(image, 80, 2, 18, 512, 1, 0, FALSE);
+		return INIT_PASS;
+
+	case 80*2*40*512: // 3276800 (ED)
+		basicdsk_set_geometry(image, 80, 2, 40, 512, 1, 0, FALSE);
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+static void ql_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(ql_floppy); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "dsk"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
+
 static SYSTEM_CONFIG_START( ql )
 	CONFIG_RAM_DEFAULT	(128 * 1024)
-	CONFIG_RAM			(640 * 1024)
+	CONFIG_RAM			(192 * 1024) // 64K expansion
+	CONFIG_RAM			(256 * 1024) // 128K expansion
+	CONFIG_RAM			(384 * 1024) // 256K expansion
+	CONFIG_RAM			(640 * 1024) // 512K expansion
+	CONFIG_RAM			(896 * 1024) // Trump Card
 	CONFIG_DEVICE(ql_serial_getinfo)
 	CONFIG_DEVICE(ql_cartslot_getinfo)
+	CONFIG_DEVICE(ql_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /* Computer Drivers */
