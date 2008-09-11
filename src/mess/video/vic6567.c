@@ -455,6 +455,8 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x11:
 		if (vic2.reg[offset] != data)
 		{
+//			vic2.reg_buffer[offset] = data;
+
 			vic2.reg[offset] = data;
 			if (LINES25)
 			{
@@ -466,6 +468,7 @@ WRITE8_HANDLER ( vic2_port_w )
 				vic2.y_begin = 4;
 				vic2.y_end = vic2.y_begin + 192;
 			}
+
 		}
 		break;
 	case 0x12:
@@ -477,6 +480,8 @@ WRITE8_HANDLER ( vic2_port_w )
 	case 0x16:
 		if (vic2.reg[offset] != data)
 		{
+//			vic2.reg_buffer[offset] = data;
+
 			vic2.reg[offset] = data;
 			if (COLUMNS40)
 			{
@@ -488,6 +493,7 @@ WRITE8_HANDLER ( vic2_port_w )
 				vic2.x_begin = HORIZONTALPOS;
 				vic2.x_end = vic2.x_begin + 320;
 			}
+
 		}
 		break;
 	case 0x18:
@@ -1170,39 +1176,27 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 	int attr, ch, ecm;
 	int syend;
 	int offs, yoff, xoff, ybegin, yend, xbegin, xend;
-	int i, j;
+	int i;
 
 	if (vic2.vic3 && VIC3_BITPLANES) return ;
+
 	/* temporary allowing vic3 displaying 80 columns */
-	if (vic2.vic3&&(vic2.reg[0x31]&0x80)) {
-		vic3_drawlines(first , last, start_x, end_x);
+	if (vic2.vic3 && (vic2.reg[0x31] & 0x80))
+	{
+		vic3_drawlines(first, first + 1, start_x, end_x);
 		return;
 	}
 
-	if (first == last)
-		return;
-	vic2.lastline = last;
 	if (video_skip_this_frame ())
 		return;
 
 	/* top part of display not rastered */
 	first -= VIC2_YPOS - YPOS;
-	last -= VIC2_YPOS - YPOS;
 
-/*
-	if ((first >= last) || (last <= 0))
-	{
-		for (i = 0; i < 8; i++)
-			vic2.sprites[i].repeat = vic2.sprites[i].line = 0;
-		return;
-	}
-	if (first < 0)
-		first = 0;
-*/
 	if (!SCREENON)
 	{
-		for (line = first; (line < last) && (line < vic2.bitmap->height); line++)
-			memset16 (BITMAP_ADDR16(vic2.bitmap, line + FIRSTLINE, 0), FRAMECOLOR, vic2.bitmap->width);
+//		if (first < vic2.bitmap->height)
+		memset16 (BITMAP_ADDR16(vic2.bitmap, first + FIRSTLINE, 0), FRAMECOLOR, vic2.bitmap->width);
 		return;
 	}
 
@@ -1211,15 +1205,16 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 	else
 		xbegin = XPOS + 7, xend = xbegin + 304;
 
-	if (last < vic2.y_begin)
-		end = last;
+	if (first + 1 < vic2.y_begin)
+		end = first + 1;
 	else
 		end = vic2.y_begin + YPOS;
 
 	line = first;
-	if (line < end) {
+	if (line < end)
+	{
 		plot_box(vic2.bitmap, start_x, line + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
-		line=end;
+		line = end;
 	}
 
 	if (LINES25)
@@ -1230,19 +1225,21 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 	{
 		vline = line - vic2.y_begin - YPOS + 8 - VERTICALPOS;
 	}
-	if (last < vic2.y_end + YPOS)
-		end = last;
+	if (first + 1 < vic2.y_end + YPOS)
+		end = first + 1;
 	else
 		end = vic2.y_end + YPOS;
 
-	for (; line < end; vline = (vline + 8) & ~7, line = line + 1 + yend - ybegin)
+	if (line < end)
 	{
 		offs = (vline >> 3) * 40;
 		ybegin = vline & 7;
 		yoff = line - ybegin;
 		yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
+
 		/* rendering 39 characters */
 		/* left and right borders are overwritten later */
+
 		vic2.shift[line] = HORIZONTALPOS;
 		for (xoff = vic2.x_begin + XPOS; xoff < vic2.x_end + XPOS; xoff += 8, offs++)
 		{
@@ -1285,64 +1282,11 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 				vic2_draw_character (ybegin, yend, ch, yoff, xoff, vic2.mono, start_x, end_x);
 			}
 		}
-	}
 
-	line = first;
-	if (LINES25)
-	{
-		vline = line - vic2.y_begin - YPOS;
-	}
-	else
-	{
-		vline = line - vic2.y_begin - YPOS + 8 - VERTICALPOS;
-	}
-	if (last < vic2.y_end + YPOS)
-		end = last;
-	else
-		end = vic2.y_end + YPOS;
-
-	for (; line < end; vline = (vline + 8) & ~7, line = line + 1 + yend - ybegin)
-	{
-		offs = (vline >> 3) * 40;
-		ybegin = vline & 7;
-		yoff = line - ybegin;
-		yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
 		/* sprite priority, sprite overwrites lowerprior pixels */
 		for (i = 7; i >= 0; i--)
 		{
-		if (vic2.sprites[i].line || vic2.sprites[i].repeat) // FIX ME: sprite warp is wrong
-			{
-				syend = yend;
-				if (SPRITE_Y_EXPAND (i))
-				{
-					if ((21 - vic2.sprites[i].line) * 2 - vic2.sprites[i].repeat < yend - ybegin + 1)
-					syend = ybegin + (21 - vic2.sprites[i].line) * 2 - vic2.sprites[i].repeat - 1;
-				}
-				else
-				{
-					if (vic2.sprites[i].line + yend - ybegin + 1 > 20)
-					syend = ybegin + 20 - vic2.sprites[i].line;
-				}
-				if (yoff + syend > YPOS + 200)
-					syend = YPOS + 200 - yoff - 1;
-				if (yoff + ybegin < 0)
-				{
-					ybegin = -yoff;
-					yend = - yoff;
-				}
-
-				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, ybegin, syend, start_x, end_x);
-				else
-					vic2_draw_sprite (i, yoff, ybegin, syend,  start_x, end_x);
-				if ((syend != yend) || (vic2.sprites[i].line > 20))
-				{
-					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
-					for (j = syend; j <= yend; j++)
-						vic2.sprites[i].paintedline[j] = 0;
-				}
-			}
-			else if (SPRITEON (i) &&
+			if (SPRITEON (i) &&
 					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
 					(yoff + ybegin - SPRITE_Y_POS (i) < (SPRITE_Y_EXPAND (i)? 21 * 2 : 21 )) &&
 					(SPRITE_Y_POS (i) < 0))
@@ -1370,13 +1314,6 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 					vic2_draw_sprite_multi (i, 0, 0 , syend, start_x, end_x);
 				else
 					vic2_draw_sprite (i, 0, 0 , syend, start_x, end_x);
-
-				if ((syend != yend) || (vic2.sprites[i].line > 20))
-				{
-					for (j = syend; j <= yend; j++)
-						vic2.sprites[i].paintedline[j] = 0;
-					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
-				}
 			}
 			else if 	(SPRITEON (i) &&
 					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
@@ -1402,33 +1339,24 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 
 				vic2.sprites[i].line = wrapped;
 
-				for (j = 0; j < SPRITE_Y_POS (i) - yoff; j++)
-					vic2.sprites[i].paintedline[j] = 0;
-
 				if (SPRITE_MULTICOLOR (i))
 					vic2_draw_sprite_multi (i, yoff + ybegin, 0, 0, start_x, end_x);
 				else
 					vic2_draw_sprite (i, yoff + ybegin, 0, 0, start_x, end_x);
-
-				if ((syend != yend) || (vic2.sprites[i].line > 20))
-				{
-					for (j = syend; j <= yend; j++)
-						vic2.sprites[i].paintedline[j] = 0;
-					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
-				}
 			}
 			else
 			{
 				memset (vic2.sprites[i].paintedline, 0, sizeof (vic2.sprites[i].paintedline));
 			}
 		}
+		line += 1 + yend - ybegin;
 	}
 	// TO DO: to implement start_x and end_x
 	plot_box(vic2.bitmap, 0, first + FIRSTLINE, xbegin, 1, FRAMECOLOR);
 	plot_box(vic2.bitmap, xend, first + FIRSTLINE, vic2.bitmap->width - xend, 1, FRAMECOLOR);
 
-	if (last < vic2.bitmap->height)
-		end = last;
+	if (first + 1 < vic2.bitmap->height)
+		end = first + 1;
 	else
 		end = vic2.bitmap->height;
 
@@ -1443,7 +1371,7 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 // TIMER_CALLBACK( vic2_scanline_interrupt )
 INTERRUPT_GEN( vic2_raster_irq )
 {
-	int i;
+	int i,j;
 //	int scanline = param;
 
 	vic2.rasterline++;
@@ -1463,12 +1391,50 @@ INTERRUPT_GEN( vic2_raster_irq )
 	}
 	for (i=0; i < 5; i++)
 		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
-	// if (input_code_pressed(KEYCODE_Q)) { cpunum_set_clock(machine, 0, 0x93203); }
-	// if (input_code_pressed(KEYCODE_W)) { cpunum_set_clock(machine, 0, 0xf08a0); }
-	// if (input_code_pressed(KEYCODE_E)) printf("%04x    ",cpunum_get_clock(0));
-	// if (input_code_pressed(KEYCODE_R)) printf("%04x    ", (int)(cpunum_get_clock(0)*63/103));
+/*
+	i=0;
+	if (input_code_pressed(KEYCODE_Q)) i = 1;
+	if (input_code_pressed(KEYCODE_W)) i = 2;
+	if (input_code_pressed(KEYCODE_E)) i = 3;
+	if (input_code_pressed(KEYCODE_R)) i = 4;
+	if (input_code_pressed(KEYCODE_T)) i = 5;
+	if (input_code_pressed(KEYCODE_Y)) i = 6;
+	if (input_code_pressed(KEYCODE_U)) i = 7;
+
+	if ((vic2.rasterline % 8) == 0x02)
+	{
+		vic2.reg[0x11] = vic2.reg_buffer[0x11];
+		if (LINES25)
+		{
+			vic2.y_begin = 0;
+			vic2.y_end = vic2.y_begin + 200;
+		}
+		else
+		{
+			vic2.y_begin = 4;
+			vic2.y_end = vic2.y_begin + 192;
+		}
+
+		vic2.reg[0x16] = vic2.reg_buffer[0x16];
+		if (COLUMNS40)
+		{
+			vic2.x_begin = 0;
+			vic2.x_end = vic2.x_begin + 320;
+		}
+		else
+		{
+			vic2.x_begin = HORIZONTALPOS;
+			vic2.x_end = vic2.x_begin + 320;
+		}
+	}
+*/
+/*
+	if (input_code_pressed(KEYCODE_Q)) { cpunum_set_clock(machine, 0, 0x93203); }
+	if (input_code_pressed(KEYCODE_W)) { cpunum_set_clock(machine, 0, 0xf08a0); }
+	if (input_code_pressed(KEYCODE_E)) printf("%04x    ",cpunum_get_clock(0));
+	if (input_code_pressed(KEYCODE_R)) printf("%04x    ", (int)(cpunum_get_clock(0)*63/103));
 	vic2.raster_mod += 63 - (activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
-	// if (input_code_pressed(KEYCODE_Q)) printf("%04x-%04x ",vic2.raster_mod, (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles));
+	if (input_code_pressed(KEYCODE_Q)) printf("%04x-%04x ",vic2.raster_mod, (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles));
 	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
 	if (vic2.raster_mod > 63)
 	{
@@ -1480,21 +1446,26 @@ INTERRUPT_GEN( vic2_raster_irq )
 		vic2.raster_mod += 63;
 		vic2.rasterline++;
 	}
-
+*/
 	if (vic2.rasterline == vic2.lines)
 	{
 		vic2.rasterline = 0;
 
+
+
 		for (i = 0; i < 8; i++)
+		{
 			vic2.sprites[i].repeat = vic2.sprites[i].line = 0;
-		vic2.lastline = 0;
+			for (j = 0; j < 256; j++)
+				vic2.sprites[i].paintedline[j] = 0;
+		}
+
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer starten */
 			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 	}
-	// activecpu_eat_cycles(1000);
 
 	if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
 	{
