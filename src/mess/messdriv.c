@@ -462,7 +462,9 @@ XL/XE 16kB OS roms
 
 	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
 	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
-	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/
+	DRIVER( specpl2c )	/* 1986 ZX Spectrum +2c (Andrew Owen) */
+	DRIVER( specpl2n )	/* 1986 ZX Spectrum +2c (Namco) 			*/
+	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/	
 	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
 	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
 	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
