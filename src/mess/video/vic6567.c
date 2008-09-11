@@ -212,7 +212,7 @@ static struct {
 
 	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2], multi[4], ecmcolor[2], colors[4], spritemulti[4], spritemulti_buffer[4];
 
-	int lastline, rasterline;
+	int lastline, rasterline, raster_mod;
 	UINT64 rasterline_start_cpu_cycles;
 
 	/* background/foreground for sprite collision */
@@ -571,32 +571,33 @@ WRITE8_HANDLER ( vic2_port_w )
 
 	cycles = (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
 
-	if (cycles > VIC2_CYCLESPERLINE - 1) cycles = VIC2_CYCLESPERLINE - 1;
-	startx = VIC2_FIRSTRASTERCOLUMNS + (cycles) * 8;
+	if (cycles > VIC2_CYCLESPERLINE - 1) cycles = VIC2_CYCLESPERLINE;
+	startx = VIC2_FIRSTRASTERCOLUMNS + cycles * 8;
 	if (startx >= VIC2_COLUMNS) startx -= VIC2_COLUMNS;
 
 	// sprites chenges are active only from the next raster line
-	// FIX ME : c65 have different width, left border width is 8 pixel wrong ?!
-/*
-	if (!strncmp(machine->gamedrv->name, "c64", 3))
-	{
-		if (startx > VIC2_FIRSTRASTERCOLUMNS)
-		{
-			if (startx < VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)
-				{
-					vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
-				}
-			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
-		}
-		else
-		{
-			if (startx >= VIC2_STARTVISIBLECOLUMNS)
+	// FIX ME : left border width is 8 pixel wrong ?!
+	// printf("%04x-%04x %04x-%04x %04x-%04x\n",startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS - 1, startx, VIC2_FIRSTRASTERCOLUMNS - 1);
+	if (vic2.on)
+		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
+			// if (!strncmp(machine->gamedrv->name, "c64", 3)) // 
 			{
-				vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
+				if (startx > VIC2_FIRSTRASTERCOLUMNS)
+				{
+					if (startx < VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)
+						{
+							vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
+						}
+					vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
+				}
+				else
+				{
+					if (startx >= VIC2_STARTVISIBLECOLUMNS)
+					{
+						vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
+					}
+				}
 			}
-		}
-	}
-*/
 }
 
 READ8_HANDLER ( vic2_port_r )
@@ -1462,11 +1463,23 @@ INTERRUPT_GEN( vic2_raster_irq )
 	}
 	for (i=0; i < 5; i++)
 		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
-	if (input_code_pressed(KEYCODE_Q)) { cpunum_set_clock(machine, 0, 0x93203); }
-	if (input_code_pressed(KEYCODE_W)) { cpunum_set_clock(machine, 0, 0xf08a0); }
+	// if (input_code_pressed(KEYCODE_Q)) { cpunum_set_clock(machine, 0, 0x93203); }
+	// if (input_code_pressed(KEYCODE_W)) { cpunum_set_clock(machine, 0, 0xf08a0); }
 	// if (input_code_pressed(KEYCODE_E)) printf("%04x    ",cpunum_get_clock(0));
 	// if (input_code_pressed(KEYCODE_R)) printf("%04x    ", (int)(cpunum_get_clock(0)*63/103));
+	vic2.raster_mod += 63 - (activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
+	// if (input_code_pressed(KEYCODE_Q)) printf("%04x-%04x ",vic2.raster_mod, (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles));
 	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
+	if (vic2.raster_mod > 63)
+	{
+		vic2.raster_mod -= 63;
+		vic2.rasterline--;
+	}
+	if (vic2.raster_mod < -63)
+	{
+		vic2.raster_mod += 63;
+		vic2.rasterline++;
+	}
 
 	if (vic2.rasterline == vic2.lines)
 	{

@@ -44,9 +44,9 @@
 #define VIC2_CLOCK ((vic2.pal?VIC6569_CLOCK:VIC6567_CLOCK))
 
 #define VIC6567_HRETRACERATE (VIC6567_CLOCK / 65) 
-#define VIC6569_HRETRACERATE (VIC6569_CLOCK / 63)
+#define VIC6569_HRETRACERATE (VIC6569_CLOCK / VIC6569_CLOCK )
 
-#define VIC2_HRETRACERATE (vic2.pal?VIC6569_VRETRACERATE:VIC6567_VRETRACERATE)
+#define VIC2_HRETRACERATE (vic2.pal?VIC6569_HRETRACERATE:VIC6567_HRETRACERATE)
 
 /* pal 50 Hz vertical screen refresh, screen consists of 312 lines
  * ntsc 60 Hz vertical screen refresh, screen consists of 262 lines */
