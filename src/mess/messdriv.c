@@ -458,7 +458,7 @@ XL/XE 16kB OS roms
 	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
 	DRIVER( tc2048 )	/* 198? TC2048										*/
 	DRIVER( ts2068 )	/* 1983 TS2068										*/
-	DRIVER( uk2086 )	/* 1986 UK2086										*/
+	DRIVER( uk2086 )	/* 1986 UK2086										*/  
 
 	DRIVER( spec128 )	/* 1986 ZX Spectrum 128								*/
 	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
@@ -949,6 +949,33 @@ XL/XE 16kB OS roms
 
 	/* SAPI-1 */
 	DRIVER (sapi1)
+
+  /* Spectrum clones */
+  	
+  /* ICE-Felix */
+  DRIVER( hc85 )    /* 1985 HC-85										  */
+  DRIVER( hc90 )    /* 1990 HC-90										  */
+  DRIVER( hc91 )    /* 1991 HC-91										  */
+  
+  /* Didaktik Skalica */
+  DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
+  DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
+  DRIVER( dgama89)  /* 1989 Didaktik Gama 89          */
+  DRIVER( didakt90) /* 1990 Didaktik Skalica 90       */
+  DRIVER( didakm91) /* 1991 Didaktik M 91             */
+  DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
+  DRIVER( didakm93) /* 1993 Didaktik M 93             */
+
+	DRIVER( mistrum ) /* 1988 Mistrum										*/
+	
+  /* Russian clones */
+
+  DRIVER( blitz )     /* 1990 Blic                     */
+  DRIVER( byte )      /* 1990 Byte                     */
+  DRIVER( orizon )    /* 199? Orizon-Micro             */
+  DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
+  DRIVER( magic6 )    /* 1993 Magic 6                  */
+  DRIVER( compani1 )  /* 1990 Kompanion 1              */
 	
 	/* Bondwell */
 	DRIVER( bw2 )
