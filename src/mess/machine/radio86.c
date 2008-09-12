@@ -168,6 +168,11 @@ static TIMER_CALLBACK( radio86_reset )
 
 static UINT8 romdisk_lsb,romdisk_msb, disk_sel;
 
+READ8_HANDLER (radio_cpu_state_r )
+{
+	return cpunum_get_reg(0, I8080_STATUS);	
+}
+
 MACHINE_RESET( radio86 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);

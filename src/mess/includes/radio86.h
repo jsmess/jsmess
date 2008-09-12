@@ -17,6 +17,8 @@ extern DRIVER_INIT( radio86 );
 extern DRIVER_INIT( radioram );
 extern MACHINE_RESET( radio86 );
 
+extern READ8_HANDLER (radio_cpu_state_r );
+
 extern const ppi8255_interface radio86_ppi8255_interface_1;
 extern const ppi8255_interface radio86_ppi8255_interface_2;
 extern const ppi8255_interface rk7007_ppi8255_interface;

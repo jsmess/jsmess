@@ -50,7 +50,7 @@ static ADDRESS_MAP_START(radio86ram_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
     AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) // video
     AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
-	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE( radio86_pagesel )
+	  AM_RANGE( 0xf688, 0xf688 ) AM_WRITE( radio86_pagesel )
     AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM page 1
 ADDRESS_MAP_END
@@ -59,6 +59,7 @@ static ADDRESS_MAP_START(radio86_16_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
     AM_RANGE( 0x1000, 0x3fff ) AM_RAM  // RAM
+    AM_RANGE( 0x4000, 0x7fff ) AM_READ(radio_cpu_state_r)
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x1ffc)
     //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
