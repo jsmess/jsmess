@@ -285,29 +285,7 @@ static INPUT_PORTS_START( c16 )
 
 	/* no real floppy */
 
-	PORT_INCLUDE( c16_config )				/* DSW0, CFG0, CFG1 */
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( c16c )
-	PORT_INCLUDE( c16 )
-
-	/* c1551 floppy */
-
-	PORT_MODIFY("CFG0")
-	PORT_BIT( 0x38, 0x10, IPT_UNUSED )
-	PORT_BIT( 0x07, 0x00, IPT_UNUSED )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( c16v )
-	PORT_INCLUDE( c16 )
-	
-	/* vc1541 floppy */
-	
-	PORT_MODIFY("CFG0")
-	PORT_BIT( 0x38, 0x10, IPT_UNUSED )
-	PORT_BIT( 0x07, 0x00, IPT_UNUSED )
+	PORT_INCLUDE( c16_config )				/* DSW0, CFG1 */
 INPUT_PORTS_END
 
 
@@ -334,33 +312,6 @@ static INPUT_PORTS_START( plus4 )
 	PORT_BIT( 0x0c, 0x04, IPT_UNUSED )			/* plus4 */
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START (plus4c)
-	PORT_INCLUDE( plus4 )
-
-	/* c1551 floppy */
-	
-	PORT_MODIFY("CFG0")
-	PORT_BIT( 0x38, 0x10, IPT_UNUSED )
-	PORT_BIT( 0x07, 0x00, IPT_UNUSED )
-	PORT_MODIFY("CFG1")
-	PORT_BIT( 0x10, 0x10, IPT_UNUSED )			/* ntsc */
-	PORT_BIT( 0x0c, 0x04, IPT_UNUSED )			/* plus4 */
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START (plus4v)
-	PORT_INCLUDE( plus4 )
-
-	/* vc1541 floppy */
-	
-	PORT_MODIFY("CFG0")
-	PORT_BIT( 0x38, 0x20, IPT_UNUSED )
-	PORT_BIT( 0x07, 0x00, IPT_UNUSED )
-	PORT_MODIFY("CFG1")
-	PORT_BIT( 0x10, 0x10, IPT_UNUSED )			/* ntsc */
-	PORT_BIT( 0x0c, 0x04, IPT_UNUSED )			/* plus4 */
-INPUT_PORTS_END
 
 
 #if 0
@@ -455,7 +406,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c16v )
 	MDRV_IMPORT_FROM( c16 )
-//	MDRV_IMPORT_FROM( cpu_vc1541 )
+	MDRV_IMPORT_FROM( cpu_vc1541 )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
 #else
@@ -490,7 +441,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( plus4v )
 	MDRV_IMPORT_FROM( plus4 )
-//	MDRV_IMPORT_FROM( cpu_vc1541 )
+	MDRV_IMPORT_FROM( cpu_vc1541 )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -630,25 +581,6 @@ ROM_START( plus4v )
 ROM_END
 
 
-
-/*************************************
- *
- *  Generic driver initialization
- *
- *************************************/
-
-
-static DRIVER_INIT( c16 )
-{ 
-	c16_driver_init(machine); 
-}
-
-static DRIVER_INIT( plus4 )	
-{ 
-	c16_driver_init(machine); 
-}
-
-
 /*************************************
  *
  *  System configuration(s)
@@ -707,18 +639,18 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT   CONFIG    COMPANY                             FULLNAME            FLAGS */
 
 COMP( 1984, c16,     0,     0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16c,    c16,   0,  c16c,   c16c,   c16,    c16c,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,    c16,   0,  c16v,   c16v,   c16,    c16v,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16c,   c16c,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, 1551)", 0 )
+COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16v,   c16v,    "Commodore Business Machines Co.",  "Commodore 16 (PAL, VC1541)", GAME_NOT_WORKING)
 COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
 COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 116 (PAL)", 0)
-COMP( 1984, c116c,	 c16,   0,  c16c,   c16c,   c16,    c16c,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,   c16,   0,  c16v,   c16v,   c16,    c16v,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, c116c,	 c16,   0,  c16c,   c16,    c16c,   c16c,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, 1551)", 0 )
+COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16v,   c16v,    "Commodore Business Machines Co.",  "Commodore 116 (PAL, VC1541)", GAME_NOT_WORKING)
 
-COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  plus4,  plus,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
-COMP( 1984, plus4c,  c16,   0,  plus4c, plus4c, plus4,  plusc,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,  c16,   0,  plus4v, plus4v, plus4,  plusv,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
+COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC)", 0)
+COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16c,   plusc,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, 1551)", 0 )
+COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16v,   plusv,   "Commodore Business Machines Co.",  "Commodore Plus/4 (NTSC, VC1541)", GAME_NOT_WORKING)
 
 COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,    c16,     "Commodore Business Machines Co.",  "Commodore 232 (Prototype)", 0)
-COMP( 1984, c264,    c16,   0,  c16,    plus4,  plus4,  plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
-COMP( 1984, c364,    c16,   0,  c364,   plus4,  plus4,  plusv,   "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+COMP( 1984, c264,    c16,   0,  c16,    plus4,  c16,    plus,    "Commodore Business Machines Co.",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,    plusv,   "Commodore Business Machines Co.",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)

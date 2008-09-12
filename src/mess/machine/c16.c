@@ -68,22 +68,7 @@ static UINT8 *c16_memory_24000;
 static UINT8 *c16_memory_28000;
 static UINT8 *c16_memory_2c000;
 
-static UINT8 read_cfg0(running_machine *machine)
-{
-	UINT8 result;
-	switch(mame_get_phase(machine))
-	{
-		case MAME_PHASE_RESET:
-		case MAME_PHASE_RUNNING:
-			result = input_port_read(machine, "CFG0");
-			break;
-
-		default:
-			result = 0x00;
-			break;
-	}
-	return result;
-}
+int has_c1551 = 0, has_vc1541 = 0, has_iec8 = 0, has_iec9 = 0; // Notice that iec8 & iec9 have never been implemented
 
 static UINT8 read_cfg1(running_machine *machine)
 {
@@ -444,9 +429,7 @@ void c16_interrupt (running_machine *machine, int level)
 
 static void c16_common_driver_init (running_machine *machine)
 {
-#ifdef VC1541
 	VC1541_CONFIG vc1541= { 1, 8 };
-#endif
 	C1551_CONFIG config= { 1 };
 	UINT8 *rom;
 
@@ -457,7 +440,7 @@ static void c16_common_driver_init (running_machine *machine)
 	c16_select_roms (machine, 0, 0);
 	c16_switch_to_rom (machine, 0, 0);
 
-	if ((read_cfg0(machine) & 0xc0 ) == 0x40)		/* C1551 */
+	if (has_c1551)		/* C1551 */
 	 {
 		tpi6525[2].a.read   = c1551x_0_read_data;
 		tpi6525[2].a.output = c1551x_0_write_data;
@@ -495,14 +478,12 @@ static void c16_common_driver_init (running_machine *machine)
 	memset(mess_ram + (0xfdc0 % mess_ram_size), 0xff, 0x40);
 
 	memset(mess_ram + (0xfd40 % mess_ram_size), 0xff, 0x20);
-
-	if ((read_cfg0(machine) & 0xc0 ) == 0x40)		/* C1551 */
+	
+	if (has_c1551)		/* C1551 */
 		c1551_config (0, 0, &config);
 
-#ifdef VC1541
-	if ((read_cfg0(machine) & 0xc0 ) == 0x80)		/* VC1541 */
+	if (has_vc1541)		/* VC1541 */
 		vc1541_config (0, 0, &vc1541);
-#endif
 }
 
 void c16_driver_init(running_machine *machine)
@@ -511,6 +492,25 @@ void c16_driver_init(running_machine *machine)
 	ted7360_init ((read_cfg1(machine) & 0x10 ) == 0x00);		/* is it PAL? */
 	ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 }
+
+
+DRIVER_INIT( c16 )
+{ 
+	c16_driver_init(machine); 
+}
+
+DRIVER_INIT( c16c )
+{ 
+	has_c1551 = 1;
+	c16_driver_init(machine); 
+}
+
+DRIVER_INIT( c16v )
+{ 
+	has_vc1541 = 1;
+	c16_driver_init(machine); 
+}
+
 
 MACHINE_RESET( c16 )
 {
@@ -562,7 +562,7 @@ MACHINE_RESET( c16 )
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
 
-	if ((read_cfg0(machine) & 0x38 ) == 0x08 || (read_cfg0(machine) & 0xc0 ) == 0x40)  /* IEC8 on || C1551 */
+	if (has_c1551 || has_iec8)		/* IEC8 on || C1551 */
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfee0, 0xfeff, 0, 0, tpi6525_2_port_w);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfee0, 0xfeff, 0, 0, tpi6525_2_port_r);
@@ -572,7 +572,7 @@ MACHINE_RESET( c16 )
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfee0, 0xfeff, 0, 0, SMH_NOP);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfee0, 0xfeff, 0, 0, SMH_NOP);
 	}
-	if ((read_cfg0(machine) & 0x07 ) == 0x01)		/* IEC9 on */
+	if (has_iec9)					/* IEC9 on */
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfec0, 0xfedf, 0, 0, tpi6525_3_port_w);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfec0, 0xfedf, 0, 0, tpi6525_3_port_r);
@@ -586,13 +586,11 @@ MACHINE_RESET( c16 )
 	cbm_drive_0_config (SERIAL, 8);
 	cbm_drive_1_config (SERIAL, 9);
 
-	if ((read_cfg0(machine) & 0xc0 ) == 0x40)		/* c1551 */
+	if (has_c1551)		/* c1551 */
 		c1551_reset ();
 
-#ifdef VC1541
-	if ((read_cfg0(machine) & 0xc0 ) == 0x80)		/* VC1541 */
+	if (has_vc1541)		/* VC1541 */
 		vc1541_reset ();
-#endif
 
 	cbm_serial_reset_write (0);
 }
@@ -611,7 +609,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 		/* Shift Lock is mapped on Left/Right Shift */
 		if ((i == 1) && (input_port_read(machine, "SPECIAL") & 0x80))
-			value |= 0x80;			
+			value &= ~0x80;			
 
 		keyline[i] = value;
 	}

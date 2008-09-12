@@ -634,7 +634,6 @@ DEVICE_IMAGE_LOAD(vc1541)
 
 	logerror("floppy image %s loaded\n", image_filename(image));
 
-	vc1541->timer = timer_alloc(vc1541_timer, NULL);
 	return INIT_PASS;
 }
 
@@ -642,7 +641,6 @@ DEVICE_IMAGE_UNLOAD(vc1541)
 {
 	/* writeback of image data */
 	vc1541->d64.data = NULL;
-	timer_reset(vc1541->timer, attotime_never);	/* FIXME - timers should only be allocated once */
 }
 
 int vc1541_config (int id, int mode, VC1541_CONFIG *config)
@@ -652,6 +650,7 @@ int vc1541_config (int id, int mode, VC1541_CONFIG *config)
 	vc1541->type=TypeVC1541;
 	vc1541->cpunumber = config->cpunr;
 	vc1541->drive.serial.deviceid = config->devicenr;
+	vc1541->timer = timer_alloc(vc1541_timer, NULL);
 	return 0;
 }
 
@@ -951,6 +950,7 @@ int c1551_config (int id, int mode, C1551_CONFIG *config)
 {
 	vc1541->cpunumber = config->cpunr;
 	vc1541->type=TypeC1551;
+	vc1541->timer = timer_alloc(vc1541_timer, NULL);
 	tpi6525[0].c.read=c1551_port_c_r;
 	tpi6525[0].b.read=c1551_port_b_r;
 

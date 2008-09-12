@@ -360,7 +360,6 @@ Video part
 
 #include "includes/c16.h"
 #include "includes/cbmserb.h"
-#include "includes/vc1541.h"
 
 #include "ted7360.h"
 
