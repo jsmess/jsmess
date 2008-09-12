@@ -210,7 +210,7 @@ static struct {
 	int x_begin, x_end;
 	int y_begin, y_end;
 
-	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2], multi[4], ecmcolor[2], colors[4], spritemulti[4], spritemulti_buffer[4];
+	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2], multi[4], ecmcolor[2], colors[4], spritemulti[5], spritemulti_buffer[5];
 
 	int lastline, rasterline, raster_mod;
 	UINT64 rasterline_start_cpu_cycles;
