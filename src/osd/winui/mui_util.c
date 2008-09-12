@@ -354,11 +354,11 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 		for (ndriver = 0; ndriver < driver_list_get_count(drivers); ndriver++)
 		{
 			const game_driver *gamedrv = drivers[ndriver];
-			const rom_source *source;
 			struct DriversInfo *gameinfo = &drivers_info[ndriver];
 			const rom_entry *region, *rom;
 			machine_config *config;
 			const input_port_config *input_ports;
+			const rom_source *source;
 			int num_speakers;
 
 			/* Allocate machine config */
@@ -371,7 +371,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->isVertical = (gamedrv->flags & ORIENTATION_SWAP_XY) ? TRUE : FALSE;
 			for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
 			{
-				for (region = rom_first_region(gamedrv, source); region != NULL; region = rom_next_region(region))
+				for (region = rom_first_region(gamedrv, source); region; region = rom_next_region(region))
 				{
 					if (ROMREGION_ISDISKDATA(region))
 						gameinfo->isHarddisk = TRUE;
@@ -422,7 +422,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 					{
 #if (HAS_SAMPLES)
 						if( config->sound[i].type == SOUND_SAMPLES )
-							samplenames = ((struct Samplesinterface *)config->sound[i].config)->samplenames;
+							samplenames = ((samples_interface *)config->sound[i].config)->samplenames;
 #endif
 					}
 #endif

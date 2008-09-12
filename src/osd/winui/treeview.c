@@ -1134,7 +1134,6 @@ void CreateDumpingFolders(int parent_index)
 	const rom_entry *region, *rom;
 	const char *name;
 	const game_driver *gamedrv;
-	const rom_source *source;
 	machine_config *config;
 
 	// create our two subfolders
@@ -1169,16 +1168,18 @@ void CreateDumpingFolders(int parent_index)
 
 	for (jj = 0; jj < nGames; jj++)
 	{
+		const rom_source *source;
 		gamedrv = drivers[jj];
 
 		if (!gamedrv->rom) 
 			continue;
 		bBadDump = FALSE;
 		bNoDump = FALSE;
+		/* Allocate machine config */
 		config = machine_config_alloc(gamedrv->machine_config);
 		for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
 		{
-			for (region = rom_first_region(gamedrv, source); region; region = rom_next_region(region))
+			for (region = rom_first_region(gamedrv,source); region; region = rom_next_region(region))
 			{
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
@@ -1193,8 +1194,8 @@ void CreateDumpingFolders(int parent_index)
 				}
 			}
 		}
+		/* Free the structure */
 		machine_config_free(config);
-		config = NULL;
 		if (bBadDump)
 		{
 			AddGame(lpBad,jj);
