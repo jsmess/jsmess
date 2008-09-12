@@ -48,8 +48,8 @@
 #include "machine/zx8302.h"
 
 #define SCREEN_TAG	"main"
-#define ZX8301_TAG	"IC22"
-#define ZX8302_TAG	"IC23"
+#define ZX8301_TAG	"ic22"
+#define ZX8302_TAG	"ic23"
 #define MDV1_TAG	"mdv1"
 #define MDV2_TAG	"mdv2"
 

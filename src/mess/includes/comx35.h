@@ -6,10 +6,10 @@
 #define SCREEN_TAG			"main"
 #define MC6845_SCREEN_TAG	"mc6845"
 
-#define CDP1870_TAG "U1"
-#define CDP1869_TAG	"U2"
-#define CDP1802_TAG "U3"
-#define CDP1871_TAG	"U4"
+#define CDP1870_TAG "u1"
+#define CDP1869_TAG	"u2"
+#define CDP1802_TAG "u3"
+#define CDP1871_TAG	"u4"
 #define MC6845_TAG	"mc6845"
 
 enum

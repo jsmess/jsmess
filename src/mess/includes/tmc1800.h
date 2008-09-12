@@ -4,7 +4,7 @@
 #define SCREEN_TAG "main"
 
 #define CDP1861_TAG "cdp1861"
-#define CDP1864_TAG "M3"
+#define CDP1864_TAG "m3"
 
 typedef struct _tmc1800_state tmc1800_state;
 struct _tmc1800_state

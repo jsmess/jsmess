@@ -580,7 +580,7 @@ static MACHINE_DRIVER_START( apple2_common )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("A2DAC", DAC, 0)
+	MDRV_SOUND_ADD("a2dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("ay8913.1", AY8913, 1022727)
 	MDRV_SOUND_CONFIG(apple2_ay8910_interface)

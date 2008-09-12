@@ -1,7 +1,7 @@
 #ifndef __KB_KEYTRO_H_
 #define __KB_KEYTRO_H_
 
-#define KEYTRONIC_KB3270PC_CPU	"kb_kb3270/pc"
+#define KEYTRONIC_KB3270PC_CPU	"kb_kb3270_pc"
 
 WRITE8_HANDLER( kb_keytronic_set_clock_signal );
 WRITE8_HANDLER( kb_keytronic_set_data_signal );
