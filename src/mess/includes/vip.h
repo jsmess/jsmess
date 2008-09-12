@@ -3,8 +3,8 @@
 
 #define SCREEN_TAG "main"
 
-#define CDP1802_TAG "U1"
-#define CDP1861_TAG "U2"
+#define CDP1802_TAG "u1"
+#define CDP1861_TAG "u2"
 
 #define VIP_BANK_RAM		0
 #define VIP_BANK_ROM		1
