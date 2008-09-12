@@ -210,7 +210,7 @@ static struct {
 	int x_begin, x_end;
 	int y_begin, y_end;
 
-	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2], multi[4], ecmcolor[2], colors[4], spritemulti[5], spritemulti_buffer[5];
+	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2], multi[4], ecmcolor[2], colors[4], spritemulti[4], spritemulti_buffer[4];
 
 	int lastline, rasterline, raster_mod;
 	UINT64 rasterline_start_cpu_cycles;
@@ -1389,7 +1389,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 		vic2.sprites[i].x = vic2.sprites_buffer[i].x;
 		vic2.sprites[i].y = vic2.sprites_buffer[i].y;
 	}
-	for (i=0; i < 5; i++)
+	for (i=0; i < 4; i++)
 		vic2.spritemulti[i] = vic2.spritemulti_buffer[i];
 /*
 	i=0;
