@@ -68,7 +68,7 @@ static UINT8 *c16_memory_24000;
 static UINT8 *c16_memory_28000;
 static UINT8 *c16_memory_2c000;
 
-int has_c1551 = 0, has_vc1541 = 0, has_iec8 = 0, has_iec9 = 0; // Notice that iec8 & iec9 have never been implemented
+static int has_c1551 = 0, has_vc1541 = 0, has_iec8 = 0, has_iec9 = 0; // Notice that iec8 & iec9 have never been implemented
 
 static UINT8 read_cfg1(running_machine *machine)
 {

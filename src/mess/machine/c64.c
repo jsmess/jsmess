@@ -85,7 +85,7 @@ static int ultimax = 0;
 int c64_tape_on = 1;
 static int c64_cia1_on = 1;
 static int c64_io_enabled = 0;
-
+static int is_sx64 = 0;	// temporary workaround until we implement full vc1541 emulation for every c64 set
 
 static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq = 0;
@@ -1047,6 +1047,7 @@ DRIVER_INIT( c64gs )
 DRIVER_INIT( sx64 )
 {
 	VC1541_CONFIG vc1541 = { 1, 8 };
+	is_sx64 = 1;
 	c64_tape_on = 0;
 	c64_pal = 1;
 	c64_common_driver_init (machine);
@@ -1055,9 +1056,8 @@ DRIVER_INIT( sx64 )
 
 void c64_common_init_machine (running_machine *machine)
 {
-#ifdef VC1541
-	vc1541_reset ();
-#endif
+	if (is_sx64)
+		vc1541_reset ();
 
 	if (c64_cia1_on)
 	{
