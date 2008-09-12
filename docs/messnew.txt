@@ -1,4 +1,4 @@
-0.127.1
+﻿0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -92,6 +92,9 @@ System Driver Changes:
   .crt support (.a0 and .b0 files working as before) since I doubt these 
   computers used the same format as C64. More work when/if more documents 
   will be available [Fabio Priuli]
+
+- [SG1000] Lightgun crosshair is now shown only if TV Draw cartridge is 
+  loaded. [Curt Coder]
 
 - [SYM1] Refactored cartridge code to rely on MESS core functions. Code to
   load cartridges has never been present apparently, but now it only miss
