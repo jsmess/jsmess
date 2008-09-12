@@ -269,21 +269,21 @@ INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
         G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
         B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
     */
-	int r, g, b, common;
+	//int r, g, b, common;
+	unsigned int r, g, b, common;
 
-	common = 298 * y - 298 * 16;
-	r = (common +                        409 * cr - 409 * 128 + 128) >> 8;
-	g = (common - 100 * cb + 100 * 128 - 208 * cr + 208 * 128 + 128) >> 8;
-	b = (common + 516 * cb - 516 * 128                        + 128) >> 8;
+	common = 298 * y - 56992;
+	r = (common +            409 * cr);
+	g = (common - 100 * cb - 208 * cr + 91776);
+	b = (common + 516 * cb - 13696);
 
-	if (r < 0) r = 0;
-	else if (r > 255) r = 255;
-	if (g < 0) g = 0;
-	else if (g > 255) g = 255;
-	if (b < 0) b = 0;
-	else if (b > 255) b = 255;
+	if ((int) r < 0) r = 0;
+	if ((int) g < 0) g = 0;
+	if ((int) b < 0) b = 0;
 
-	return MAKE_RGB(r, g, b);
+	/* MAME_RGB does upper clamping */
+
+	return MAKE_RGB(r >> 8, g >> 8, b >> 8);
 }
 
 

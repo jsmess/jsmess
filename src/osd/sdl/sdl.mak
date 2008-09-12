@@ -294,6 +294,9 @@ OSDCOREOBJS += $(SDLOBJ)/debugwin.o
 
 CFLAGS += `sdl-config --cflags`
 LIBS += `sdl-config --libs`
+
+# to avoid name clash of '_brk'
+$(OBJ)/emu/cpu/h6280/6280dasm.o : CDEFS += -D__STRICT_ANSI__
 endif # OS2
 
 TOOLS += \

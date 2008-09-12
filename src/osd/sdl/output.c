@@ -29,6 +29,20 @@
 
 #define SDLMAME_OUTPUT	"/tmp/sdlmame_out"
 
+/*
+ * Using long/int should be sufficient on all
+ * architectures. 
+ */
+
+
+#ifdef PTR64
+#define PID_FMT "%ld"
+#define PID_CAST long
+#else
+#define PID_FMT "%d"
+#define PID_CAST int
+#endif
+
 //============================================================
 //  TYPEDEFS
 //============================================================
@@ -45,6 +59,15 @@ static FILE *output;
 
 static void sdloutput_exit(running_machine *machine);
 static void notifier_callback(const char *outname, INT32 value, void *param);
+
+//============================================================
+//  osd_get_pid
+//============================================================
+
+PID_CAST osd_getpid(void)
+{
+	return (PID_CAST) getpid();
+}
 
 //============================================================
 //  sdloutput_init
@@ -68,7 +91,7 @@ void sdloutput_init(running_machine *machine)
 		output = fdopen(fildes, "w");
 		
 		mame_printf_verbose("ouput: opened output notifier file %s\n", SDLMAME_OUTPUT);
-		fprintf(output, "MAME %d START %s\n", getpid(), machine->gamedrv->name);
+		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), machine->gamedrv->name);
 		fflush(output);
 	}
 	
@@ -84,7 +107,7 @@ static void sdloutput_exit(running_machine *machine)
 {
 	if (output != NULL)
 	{
-		fprintf(output, "MAME %d STOP %s\n", getpid(), machine->gamedrv->name);
+		fprintf(output, "MAME " PID_FMT " STOP %s\n", osd_getpid(), machine->gamedrv->name);
 		fflush(output);
 		fclose(output);
 		output = NULL;
@@ -100,7 +123,7 @@ static void notifier_callback(const char *outname, INT32 value, void *param)
 {
 	if (output != NULL)
 	{
-		fprintf(output, "OUT %d %s %d\n", getpid(), outname, value);
+		fprintf(output, "OUT " PID_FMT " %s %d\n", osd_getpid(), outname, value);
 		fflush(output);
 	}
 }

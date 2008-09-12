@@ -74,7 +74,6 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 		}
-		break;
 		
 		// always fill non-wrapping textures with an extra pixel on the right
 		#if 0 
@@ -83,6 +82,8 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 		#endif
 	}
 }
+
+#define CLSH(x)		(((int) x < 0) ? 0 : x >> 8)
 
 static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource)
 {
@@ -107,11 +108,24 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-	
+			
+#if 0	
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix1 >> 8)], cb, cr);
+#else
+			unsigned int r1, r2, g1, g2, b1, b2;
+			unsigned int y1 = texsource->palette[(srcpix0 >> 8)] * 298;
+			unsigned int y2 = texsource->palette[(srcpix1 >> 8)] * 298;
+
+			r1 = r2 =               409 * cr - 56992;
+			g1 = g2 =  - 100 * cb - 208 * cr + 34784;
+			b1 = b2 =  + 516 * cb - 70688;
+			r1 += y1; g1 += y1; b1 += y1;
+			r2 += y2; g2 += y2; b2 += y2;
+			*dst++ = MAKE_RGB(CLSH(r1), CLSH(g1), CLSH(b1));
+			*dst++ = MAKE_RGB(CLSH(r2), CLSH(g2), CLSH(b2));
+#endif
 		}
-		break;
 		
 		// always fill non-wrapping textures with an extra pixel on the right
 		#if 0
@@ -120,6 +134,8 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 		#endif
 	}
 }
+#undef CLSH
+
 #endif
 
 #else // recursive include

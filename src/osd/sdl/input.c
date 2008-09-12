@@ -684,13 +684,13 @@ static void sdlinput_register_joysticks(running_machine *machine)
 			{
 				sprintf(tempname, "NC%d", stick);
 				devinfo = generic_device_alloc(&joystick_list, tempname);
-				devinfo->device = input_device_add(DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
+				devinfo->device = input_device_add(machine, DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
 			}
 		}
 		else
 		{
 			devinfo = generic_device_alloc(&joystick_list, joy_map[stick].name);
-			devinfo->device = input_device_add(DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
+			devinfo->device = input_device_add(machine, DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
 		}
 		
 
@@ -926,7 +926,7 @@ void sdlinput_init(running_machine *machine)
 	// SDL 1.2 only has 1 keyboard (1.3+ will have multiple, this must be revisited then)
 	// add it now
 	devinfo = generic_device_alloc(&keyboard_list, "System keyboard");
-	devinfo->device = input_device_add(DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
 
 	// populate it
 	for (keynum = 0; sdl_key_trans_table[keynum].mame_key >= 0; keynum++)
@@ -945,7 +945,7 @@ void sdlinput_init(running_machine *machine)
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
-	devinfo->device = input_device_add(DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
 
 	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
 	
@@ -1131,8 +1131,7 @@ void sdlinput_poll(running_machine *machine)
 			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jhat.which]);
 			if (devinfo)
 			{
-				// FIXME: change == to x & y != 0
-				if (event.jhat.value == SDL_HAT_UP)
+				if (event.jhat.value & SDL_HAT_UP)
 				{
 					devinfo->joystick.hatsU[event.jhat.hat] = 0x80;
 				}
@@ -1140,7 +1139,7 @@ void sdlinput_poll(running_machine *machine)
 				{
 					devinfo->joystick.hatsU[event.jhat.hat] = 0;
 				}
-				if (event.jhat.value == SDL_HAT_DOWN)
+				if (event.jhat.value & SDL_HAT_DOWN)
 				{
 					devinfo->joystick.hatsD[event.jhat.hat] = 0x80;
 				}
@@ -1148,7 +1147,7 @@ void sdlinput_poll(running_machine *machine)
 				{
 					devinfo->joystick.hatsD[event.jhat.hat] = 0;
 				}
-				if (event.jhat.value == SDL_HAT_LEFT)
+				if (event.jhat.value & SDL_HAT_LEFT)
 				{
 					devinfo->joystick.hatsL[event.jhat.hat] = 0x80;
 				}
@@ -1156,7 +1155,7 @@ void sdlinput_poll(running_machine *machine)
 				{
 					devinfo->joystick.hatsL[event.jhat.hat] = 0;
 				}
-				if (event.jhat.value == SDL_HAT_RIGHT)
+				if (event.jhat.value & SDL_HAT_RIGHT)
 				{
 					devinfo->joystick.hatsR[event.jhat.hat] = 0x80;
 				}
@@ -1189,7 +1188,7 @@ void sdlinput_poll(running_machine *machine)
 				
 				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
 				{
-					ui_input_push_mouse_click_event(machine, window->target, cx, cy); 
+					ui_input_push_mouse_down_event(machine, window->target, cx, cy); 
 					// FIXME Parameter ?
 					if ((click-last_click < 250) 
 							&& (cx >= last_x - 4 && cx <= last_x  + 4)
@@ -1210,6 +1209,17 @@ void sdlinput_poll(running_machine *machine)
 		case SDL_MOUSEBUTTONUP:
 			devinfo = mouse_list;
 			devinfo->mouse.buttons[event.button.button-1] = 0; 
+
+			if (event.button.button == 1)
+			{
+				int cx, cy;
+				sdl_window_info *window = GET_WINDOW(&event.button);
+				
+				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
+				{
+					ui_input_push_mouse_up_event(machine, window->target, cx, cy); 
+				}
+			}
 			break;
 		case SDL_MOUSEMOTION:
 			devinfo = mouse_list;

@@ -406,7 +406,7 @@ static void debugmain_process_string(const char *str, void *dmp)
 	if(!str[0])
 		debug_cpu_single_step(1);
 	else
-		debug_console_execute_command(str, 1);
+		debug_console_execute_command(Machine, str, 1);
 }
 
 static void debugmain_destroy(GtkObject *obj, gpointer user_data)
