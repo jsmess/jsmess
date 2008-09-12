@@ -611,7 +611,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 		/* Shift Lock is mapped on Left/Right Shift */
 		if ((i == 1) && (input_port_read(machine, "SPECIAL") & 0x80))
-			value &= ~0x80;			
+			value |= 0x80;			
 
 		keyline[i] = value;
 	}
