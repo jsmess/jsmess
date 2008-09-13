@@ -17,17 +17,16 @@
 
 /***************************** configuration **************************/
 
-#define K7_SPEED_HACK 1
+#define K7_SPEED_HACK 0
 /* When set to 1, bits extracted from k7 files are not transformed into a
    raw wave. It saves some time & memory but disables the ability to "hear" the
    cassette.
    This does not affect raw wave files.
    Also, we do not do this for k5 files because the the corresponding wave
-   files are more compact anyway.
-*/
+   files are more compact anyway. */
+/* It must be set accordingly in machine/thomson.c */
 
 #define VERBOSE 0 /* 0, 1 or 2 */
-
 
 
 /***************************** utilities **************************/
@@ -38,38 +37,6 @@
 #define VLOG(x)	do { if (VERBOSE > 1) logerror x; } while (0)
 
 
-
-/*************************** I / O **************************/
-
-
-INLINE const device_config* thom_cassette_img( void )
-{ return image_from_devtype_and_index(IO_CASSETTE, 0); }
-
-
-
-/*-------------- TO7 ------------*/
-
-
-/* On the TO7 & compatible (TO7/70,TO8,TO9, but not MO5,MO6), bits are coded
-   in FM format with a 1.1 ms period (900 bauds):
-   - 0 is 5 periods at 4.5 KHz
-   - 1 is 7 periods at 6.3 KHz
-
-   Moreover, a byte is represented using 11 bits:
-   - one 0 start bit
-   - eight data bits (low bit first)
-   - two 1 stop bits
-
-   There are also long (1 s) sequences of 1 bits to re-synchronize the
-   cassette at places the motor can be cut off and back on (e.g., between
-   files).
-
-   The computer outputs a modulated wave that is directly put on the cassette.
-   However, the input is demodulated by the cassette-reader before being
-   sent to the computer: we got 0 when the signal is around 4.5 KHz and
-   1 when the signal is around 6.3 KHz.
-*/
-
 #define TO7_BIT_LENGTH 0.001114
 
 #define TO7_FREQ_CASS_0 4500.
@@ -78,172 +45,11 @@ INLINE const device_config* thom_cassette_img( void )
 #define TO7_PERIOD_CASS_0 ( 1. / TO7_FREQ_CASS_0 )
 #define TO7_PERIOD_CASS_1 ( 1. / TO7_FREQ_CASS_1 )
 
-/* buffer storing demodulated bits, only for k7 and with speed hack */
 static UINT32 to7_k7_bitsize;
 static UINT8* to7_k7_bits;
 
-
-/* 1-bit cassette input to the computer
-   inside the controller, two frequency filters (adjusted to 6.3 and 4.5 KHz)
-   and a comparator demodulate the raw signal into 0s and 1s.
-*/
-int to7_get_cassette ( void )
-{
-	const device_config* img = thom_cassette_img();
-
-	if ( image_exists( img ) )
-	{
-		cassette_image* cass = cassette_get_image( img );
-		cassette_state state = cassette_get_state( img );
-		double pos = cassette_get_position( img );
-		int bitpos = pos / TO7_BIT_LENGTH;
-
-		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
-			return 1;
-
-		if ( K7_SPEED_HACK && to7_k7_bits )
-		{
-			/* hack, feed existing bits */
-			if ( bitpos >= to7_k7_bitsize )
-				bitpos = to7_k7_bitsize -1;
-			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
-				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos,
-				to7_k7_bits[ bitpos ] ));
-			return to7_k7_bits[ bitpos ];
-		}
-		else
-		{
-			/* demodulate wave signal on-the-fly */
-			/* we simply count sign changes... */
-			int k, chg;
-			INT8 data[40];
-			cassette_get_samples( cass, 0, pos, TO7_BIT_LENGTH * 15. / 14., 40, 1, data, 0 );
-
-			for ( k = 1, chg = 0; k < 40; k++ )
-			{
-				if ( data[ k - 1 ] >= 0 && data[ k ] < 0 )
-					chg++;
-				if ( data[ k - 1 ] <= 0 && data[ k ] > 0 )
-					chg++;
-			}
-			k = ( chg >= 13 ) ? 1 : 0;
-			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
-				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos,
-				k, chg ));
-			return k;
-		}
-
-	}
-	else
-		return 0;
-}
-
-
-
-/* 1-bit cassette output */
-void to7_set_cassette ( int data )
-{
-	const device_config* img = thom_cassette_img();
-	cassette_output( img, data ? 1. : -1. );
-}
-
-
-
-WRITE8_HANDLER ( to7_set_cassette_motor )
-{
-	const device_config* img = thom_cassette_img();
-	cassette_state state = cassette_get_state( img );
-	double pos = cassette_get_position(img);
-
-	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
-	       (int) (pos / TO7_BIT_LENGTH) ));
-
-	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
-	{
-		/* rewind a little before starting the motor */
-		cassette_seek( img, -0.3, SEEK_CUR );
-	}
-
-	cassette_change_state( img, data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
-}
-
-
-
-/*-------------- MO5 ------------*/
-
-
-/* Each byte is represented as 8 bits without start or stop bit (unlike TO7).
-   Bits are coded in MFM, and the MFM signal is directly fed to the
-   computer which has to decode it in software (unlike TO7).
-   A 1 bit is one period at 1200 Hz; a 0 bit is one half-period at 600 Hz.
-   Bit-order is most significant bit first (unlike TO7).
-
-   Double-density MO6 cassettes follow the exact same mechanism, but with
-   at double frequency (perdiods at 2400 Hz, and half-perdios at 1200 Hz).
-*/
-
-
 #define MO5_BIT_LENGTH   0.000833
 #define MO5_HBIT_LENGTH (MO5_BIT_LENGTH / 2.)
-
-
-int mo5_get_cassette ( void )
-{
-	const device_config* img = thom_cassette_img();
-
-	if ( image_exists( img ) )
-	{
-		cassette_image* cass = cassette_get_image( img );
-		cassette_state state = cassette_get_state( img );
-		double pos = cassette_get_position( img );
-		INT32 hbit;
-
-		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
-			return 1;
-
-		cassette_get_sample( cass, 0, pos, 0, &hbit );
-		hbit = hbit >= 0;
-
-		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
-			activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos,
-			(int) (pos / MO5_HBIT_LENGTH), hbit ));
-		return hbit;
-	}
-	else
-		return 0;
-}
-
-
-
-void mo5_set_cassette ( int data )
-{
-	const device_config* img = thom_cassette_img();
-	cassette_output( img, data ? 1. : -1. );
-}
-
-
-
-WRITE8_HANDLER ( mo5_set_cassette_motor )
-{
-	const device_config* img = thom_cassette_img();
-	cassette_state state = cassette_get_state( img );
-	double pos = cassette_get_position(img);
-
-	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
-	       (int) (pos / MO5_HBIT_LENGTH) ));
-
-	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
-	{
-		/* rewind a little before starting the motor */
-		cassette_seek( img, -0.3, SEEK_CUR );
-	}
-
-	cassette_change_state( img, data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
-}
-
-
 
 /************************* k7 format *************************/
 

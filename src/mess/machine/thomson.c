@@ -21,7 +21,6 @@
 #include "devices/printer.h"
 #include "includes/serial.h"
 #include "devices/cassette.h"
-#include "formats/thom_cas.h"
 #include "devices/thomflop.h"
 #include "formats/thom_dsk.h"
 
@@ -36,12 +35,215 @@
 #define PRINT(x) mame_printf_info x
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define VLOG(x)	do { if (VERBOSE > 1) logerror x; } while (0)
 #define LOG_IRQ(x) do { if (VERBOSE_IRQ) logerror x; } while (0)
 #define LOG_KBD(x) do { if (VERBOSE_KBD) logerror x; } while (0)
 #define LOG_BANK(x) do { if (VERBOSE_BANK) logerror x; } while (0)
 #define LOG_VIDEO(x) do { if (VERBOSE_VIDEO) logerror x; } while (0)
 #define LOG_IO(x) do { if (VERBOSE_IO) logerror x; } while (0)
 #define LOG_MIDI(x) do { if (VERBOSE_MIDI) logerror x; } while (0)
+
+/* This set to 1 handle the .k7 files without passing through .wav */
+/* It must be set accordingly in formats/thom_cas.c */
+#define K7_SPEED_HACK 0
+
+/********************* common cassette code ***************************/
+
+INLINE const device_config* thom_cassette_img( running_machine *machine )
+{ return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ); }
+
+/*-------------- TO7 ------------*/
+
+
+/* On the TO7 & compatible (TO7/70,TO8,TO9, but not MO5,MO6), bits are coded
+   in FM format with a 1.1 ms period (900 bauds):
+   - 0 is 5 periods at 4.5 KHz
+   - 1 is 7 periods at 6.3 KHz
+
+   Moreover, a byte is represented using 11 bits:
+   - one 0 start bit
+   - eight data bits (low bit first)
+   - two 1 stop bits
+
+   There are also long (1 s) sequences of 1 bits to re-synchronize the
+   cassette at places the motor can be cut off and back on (e.g., between
+   files).
+
+   The computer outputs a modulated wave that is directly put on the cassette.
+   However, the input is demodulated by the cassette-reader before being
+   sent to the computer: we got 0 when the signal is around 4.5 KHz and
+   1 when the signal is around 6.3 KHz.
+*/
+
+#define TO7_BIT_LENGTH 0.001114
+
+/* buffer storing demodulated bits, only for k7 and with speed hack */
+static UINT32 to7_k7_bitsize;
+static UINT8* to7_k7_bits;
+
+
+/* 1-bit cassette input to the computer
+   inside the controller, two frequency filters (adjusted to 6.3 and 4.5 KHz)
+   and a comparator demodulate the raw signal into 0s and 1s.
+*/
+static int to7_get_cassette ( running_machine *machine )
+{
+	const device_config* img = thom_cassette_img(machine);
+
+	if ( image_exists( img ) )
+	{
+		cassette_image* cass = cassette_get_image( img );
+		cassette_state state = cassette_get_state( img );
+		double pos = cassette_get_position( img );
+		int bitpos = pos / TO7_BIT_LENGTH;
+
+		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
+			return 1;
+
+		if ( K7_SPEED_HACK && to7_k7_bits )
+		{
+			/* hack, feed existing bits */
+			if ( bitpos >= to7_k7_bitsize )
+				bitpos = to7_k7_bitsize -1;
+			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
+				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos,
+				to7_k7_bits[ bitpos ] ));
+			return to7_k7_bits[ bitpos ];
+		}
+		else
+		{
+			/* demodulate wave signal on-the-fly */
+			/* we simply count sign changes... */
+			int k, chg;
+			INT8 data[40];
+			cassette_get_samples( cass, 0, pos, TO7_BIT_LENGTH * 15. / 14., 40, 1, data, 0 );
+
+			for ( k = 1, chg = 0; k < 40; k++ )
+			{
+				if ( data[ k - 1 ] >= 0 && data[ k ] < 0 )
+					chg++;
+				if ( data[ k - 1 ] <= 0 && data[ k ] > 0 )
+					chg++;
+			}
+			k = ( chg >= 13 ) ? 1 : 0;
+			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
+				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos,
+				k, chg ));
+			return k;
+		}
+
+	}
+	else
+		return 0;
+}
+
+
+
+/* 1-bit cassette output */
+static void to7_set_cassette ( running_machine *machine, int data )
+{
+	const device_config* img = thom_cassette_img(machine);
+	cassette_output( img, data ? 1. : -1. );
+}
+
+
+
+static WRITE8_HANDLER ( to7_set_cassette_motor )
+{
+	const device_config* img = thom_cassette_img(machine);
+	cassette_state state = cassette_get_state( img );
+	double pos = cassette_get_position(img);
+
+	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
+	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
+	       (int) (pos / TO7_BIT_LENGTH) ));
+
+	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
+	{
+		/* rewind a little before starting the motor */
+		cassette_seek( img, -0.3, SEEK_CUR );
+	}
+
+	cassette_change_state( img, data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+}
+
+
+
+/*-------------- MO5 ------------*/
+
+
+/* Each byte is represented as 8 bits without start or stop bit (unlike TO7).
+   Bits are coded in MFM, and the MFM signal is directly fed to the
+   computer which has to decode it in software (unlike TO7).
+   A 1 bit is one period at 1200 Hz; a 0 bit is one half-period at 600 Hz.
+   Bit-order is most significant bit first (unlike TO7).
+
+   Double-density MO6 cassettes follow the exact same mechanism, but with
+   at double frequency (perdiods at 2400 Hz, and half-perdios at 1200 Hz).
+*/
+
+
+#define MO5_BIT_LENGTH   0.000833
+#define MO5_HBIT_LENGTH (MO5_BIT_LENGTH / 2.)
+
+
+static int mo5_get_cassette ( running_machine *machine )
+{
+	const device_config* img = thom_cassette_img(machine);
+
+	if ( image_exists( img ) )
+	{
+		cassette_image* cass = cassette_get_image( img );
+		cassette_state state = cassette_get_state( img );
+		double pos = cassette_get_position( img );
+		INT32 hbit;
+
+		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
+			return 1;
+
+		cassette_get_sample( cass, 0, pos, 0, &hbit );
+		hbit = hbit >= 0;
+
+		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
+			activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos,
+			(int) (pos / MO5_HBIT_LENGTH), hbit ));
+		return hbit;
+	}
+	else
+		return 0;
+}
+
+
+
+static void mo5_set_cassette ( running_machine *machine, int data )
+{
+	const device_config* img = thom_cassette_img(machine);
+	cassette_output( img, data ? 1. : -1. );
+}
+
+
+
+static WRITE8_HANDLER ( mo5_set_cassette_motor )
+{
+	const device_config* img = thom_cassette_img(machine);
+	cassette_state state = cassette_get_state( img );
+	double pos = cassette_get_position(img);
+
+	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
+	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
+	       (int) (pos / MO5_HBIT_LENGTH) ));
+
+	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
+	{
+		/* rewind a little before starting the motor */
+		cassette_seek( img, -0.3, SEEK_CUR );
+	}
+
+	cassette_change_state( img, data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+}
+
+
+
 
 /*************************** utilities ********************************/
 
@@ -380,7 +582,7 @@ static WRITE8_HANDLER ( to7_timer_cp2_out )
 static READ8_HANDLER ( to7_timer_port_in )
 {
 	int lightpen = (input_port_read(machine, "lightpen_button") & 1) ? 2 : 0;
-	int cass = to7_get_cassette() ? 0x80 : 0;
+	int cass = to7_get_cassette(machine) ? 0x80 : 0;
 	return lightpen | cass;
 }
 
@@ -389,7 +591,7 @@ static READ8_HANDLER ( to7_timer_port_in )
 static WRITE8_HANDLER ( to7_timer_tco_out )
 {
 	/* 1-bit cassette output */
-	to7_set_cassette( data );
+	to7_set_cassette( machine, data );
 }
 
 
@@ -1642,9 +1844,9 @@ static void mo5_init_timer(void)
 
 static WRITE8_HANDLER ( mo5_sys_porta_out )
 {
-	thom_set_mode_point( data & 1 );               /* bit 0: video bank switch */
-	thom_set_border_color( (data >> 1) & 15 );     /* bit 1-4: border color */
-	mo5_set_cassette( (data & 0x40) ? 1 : 0 );     /* bit 6: cassette output */
+	thom_set_mode_point( data & 1 );						/* bit 0: video bank switch */
+	thom_set_border_color( (data >> 1) & 15 );				/* bit 1-4: border color */
+	mo5_set_cassette( machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
 }
 
 
@@ -1652,7 +1854,7 @@ static WRITE8_HANDLER ( mo5_sys_porta_out )
 static READ8_HANDLER ( mo5_sys_porta_in )
 {
 	return
-		(mo5_get_cassette() ? 0x80 : 0) |     /* bit 7: cassette input */
+		(mo5_get_cassette(machine) ? 0x80 : 0) |     /* bit 7: cassette input */
 		((input_port_read(machine, "lightpen_button") & 1) ? 0x20 : 0)
 		/* bit 5: lightpen button */;
 }
@@ -3735,7 +3937,7 @@ static const pia6821_interface to8_sys =
 static READ8_HANDLER ( to8_timer_port_in )
 {
 	int lightpen = (input_port_read(machine, "lightpen_button") & 1) ? 2 : 0;
-	int cass = to7_get_cassette() ? 0x80 : 0;
+	int cass = to7_get_cassette(machine) ? 0x80 : 0;
 	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	int lock = to8_kbd_caps ? 0 : 8; /* undocumented! */
 	return lightpen | cass | dtr | lock;
@@ -3931,7 +4133,7 @@ static const pia6821_interface to9p_sys =
 static READ8_HANDLER ( to9p_timer_port_in )
 {
 	int lightpen = (input_port_read(machine, "lightpen_button") & 1) ? 2 : 0;
-	int cass = to7_get_cassette() ? 0x80 : 0;
+	int cass = to7_get_cassette(machine) ? 0x80 : 0;
 	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	return lightpen | cass | dtr;
 }
@@ -4317,7 +4519,7 @@ static void mo6_game_reset ( void )
 static READ8_HANDLER ( mo6_sys_porta_in )
 {
 	return
-		(mo5_get_cassette() ? 0x80 : 0) |     /* bit 7: cassette input */
+		(mo5_get_cassette(machine) ? 0x80 : 0) |     /* bit 7: cassette input */
 		8 |                                   /* bit 3: kbd-line float up to 1 */
 		((input_port_read(machine, "lightpen_button") & 1) ? 2 : 0);
 	/* bit 1: lightpen button */;
@@ -4347,11 +4549,11 @@ static READ8_HANDLER ( mo6_sys_portb_in )
 
 static WRITE8_HANDLER ( mo6_sys_porta_out )
 {
-	thom_set_mode_point( data & 1 );           /* bit 0: video bank switch */
-	to7_game_mute = data & 4;                  /* bit 2: sound mute */
-	thom_set_caps_led( (data & 16) ? 0 : 1 ) ; /* bit 4: keyboard led */
-	mo5_set_cassette( (data & 0x40) ? 1 : 0 ); /* bit 6: cassette output */
-	mo6_update_cart_bank(machine);                    /* bit 5: rom bank */
+	thom_set_mode_point( data & 1 );						/* bit 0: video bank switch */
+	to7_game_mute = data & 4;								/* bit 2: sound mute */
+	thom_set_caps_led( (data & 16) ? 0 : 1 ) ;				/* bit 4: keyboard led */
+	mo5_set_cassette( machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
+	mo6_update_cart_bank(machine);							/* bit 5: rom bank */
 	to7_game_sound_update();
 }
 
@@ -4768,10 +4970,10 @@ static READ8_HANDLER ( mo5nr_sys_portb_in )
 static WRITE8_HANDLER ( mo5nr_sys_porta_out )
 {
 	/* no keyboard LED */
-	thom_set_mode_point( data & 1 );           /* bit 0: video bank switch */
-	to7_game_mute = data & 4;                  /* bit 2: sound mute */
-	mo5_set_cassette( (data & 0x40) ? 1 : 0 ); /* bit 6: cassette output */
-	mo6_update_cart_bank(machine);                    /* bit 5: rom bank */
+	thom_set_mode_point( data & 1 );						/* bit 0: video bank switch */
+	to7_game_mute = data & 4;								/* bit 2: sound mute */
+	mo5_set_cassette( machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
+	mo6_update_cart_bank(machine);							/* bit 5: rom bank */
 	to7_game_sound_update();
 }
 
