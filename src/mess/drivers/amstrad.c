@@ -2986,8 +2986,6 @@ static MACHINE_DRIVER_START( cpcplus )
 
 	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
 	MDRV_PALETTE_INIT(amstrad_plus)
-
-	MDRV_CASSETTE_REMOVE( "cassette" )
 MACHINE_DRIVER_END
 
 
