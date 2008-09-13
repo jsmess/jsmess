@@ -9,7 +9,13 @@
 
 #include "includes/cbmserb.h"
 
-static void vc1541_reset_write (CBM_Drive * vc1541, int level);
+/***********************************************
+
+	Drive handling
+
+***********************************************/
+
+static void drive_reset_write (CBM_Drive * drive, int level);
 
 CBM_Drive cbm_drive[2];
 
@@ -91,7 +97,7 @@ static void cbm_drive_config (CBM_Drive * drive, int interface, int serialnr)
 	else if (drive->interface == SERIAL)
 	{
 		cbm_serial.drives[cbm_serial.count++] = drive;
-		vc1541_reset_write(drive, 0);
+		drive_reset_write(drive, 0);
 	}
 }
 
@@ -105,77 +111,53 @@ void cbm_drive_1_config (int interface, int serialnr)
 }
 
 
-
-static DEVICE_START( cbm_drive )
+static void drive_reset_write (CBM_Drive * drive, int level)
 {
-	int id = image_index_in_device(device);
-	if (id == 0)
-		cbm_drive_open();	/* boy these C64 drivers are butt ugly */
-	return DEVICE_START_OK;
-}
-
-static DEVICE_STOP( cbm_drive )
-{
-	int id = image_index_in_device(device);
-	if (id == 0)
-		cbm_drive_close();	/* boy these C64 drivers are butt ugly */
+	if (level == 0)
+	{
+		drive->i.serial.data =
+			drive->i.serial.clock =
+			drive->i.serial.atn = 1;
+		drive->i.serial.state = 0;
+	}
 }
 
 
+/**************************************
 
-/* open an d64 image */
-static DEVICE_IMAGE_LOAD( cbm_drive )
+	C1551
+
+**************************************/
+
+
+static void c1551_write_data (CBM_Drive * drive, int data)
 {
-	int id = image_index_in_device(image);
-
-	cbm_drive[id].drive = 0;
-	cbm_drive[id].image = NULL;
-
-	cbm_drive[id].image = image_ptr(image);
-	if (!cbm_drive[id].image)
-		return INIT_FAIL;
-
-	cbm_drive[id].drive = D64_IMAGE;
-	return 0;
+	drive->i.iec.datain = data;
+	c1551_state (drive);
 }
 
-static DEVICE_IMAGE_UNLOAD( cbm_drive )
+static int c1551_read_data (CBM_Drive * drive)
 {
-	int id = image_index_in_device(image);
-
-	cbm_drive[id].drive = 0;
-	cbm_drive[id].image = NULL;
+	c1551_state (drive);
+	return drive->i.iec.dataout;
 }
 
-
-static void c1551_write_data (CBM_Drive * c1551, int data)
+static void c1551_write_handshake (CBM_Drive * drive, int data)
 {
-	c1551->i.iec.datain = data;
-	c1551_state (c1551);
+	drive->i.iec.handshakein = data&0x40?1:0;
+	c1551_state (drive);
 }
 
-static int c1551_read_data (CBM_Drive * c1551)
+static int c1551_read_handshake (CBM_Drive * drive)
 {
-	c1551_state (c1551);
-	return c1551->i.iec.dataout;
+	c1551_state (drive);
+	return drive->i.iec.handshakeout?0x80:0;
 }
 
-static void c1551_write_handshake (CBM_Drive * c1551, int data)
+static int c1551_read_status (CBM_Drive * drive)
 {
-	c1551->i.iec.handshakein = data&0x40?1:0;
-	c1551_state (c1551);
-}
-
-static int c1551_read_handshake (CBM_Drive * c1551)
-{
-	c1551_state (c1551);
-	return c1551->i.iec.handshakeout?0x80:0;
-}
-
-static int c1551_read_status (CBM_Drive * c1551)
-{
-	c1551_state (c1551);
-	return c1551->i.iec.status;
+	c1551_state (drive);
+	return drive->i.iec.status;
 }
 
 void c1551_0_write_data (int data)
@@ -220,49 +202,53 @@ int c1551_1_read_status (void)
 	return c1551_read_status (cbm_drive + 1);
 }
 
-static void vc1541_reset_write (CBM_Drive * vc1541, int level)
+/**************************************
+
+	VC1541
+
+**************************************/
+
+static int vc1541_atn_read (CBM_Drive * drive)
 {
-	if (level == 0)
-	{
-		vc1541->i.serial.data =
-			vc1541->i.serial.clock =
-			vc1541->i.serial.atn = 1;
-		vc1541->i.serial.state = 0;
-	}
+	vc1541_state (drive);
+	return drive->i.serial.atn;
 }
 
-static int vc1541_atn_read (CBM_Drive * vc1541)
+static int vc1541_data_read (CBM_Drive * drive)
 {
-	vc1541_state (vc1541);
-	return vc1541->i.serial.atn;
+	vc1541_state (drive);
+	return drive->i.serial.data;
 }
 
-static int vc1541_data_read (CBM_Drive * vc1541)
+static int vc1541_clock_read (CBM_Drive * drive)
 {
-	vc1541_state (vc1541);
-	return vc1541->i.serial.data;
+	vc1541_state (drive);
+	return drive->i.serial.clock;
 }
 
-static int vc1541_clock_read (CBM_Drive * vc1541)
+static void vc1541_data_write (CBM_Drive * drive, int level)
 {
-	vc1541_state (vc1541);
-	return vc1541->i.serial.clock;
+	vc1541_state (drive);
 }
 
-static void vc1541_data_write (CBM_Drive * vc1541, int level)
+static void vc1541_clock_write (CBM_Drive * drive, int level)
 {
-	vc1541_state (vc1541);
+	vc1541_state (drive);
 }
 
-static void vc1541_clock_write (CBM_Drive * vc1541, int level)
+static void vc1541_atn_write (CBM_Drive * drive, int level)
 {
-	vc1541_state (vc1541);
+	vc1541_state (drive);
 }
 
-static void vc1541_atn_write (CBM_Drive * vc1541, int level)
-{
-	vc1541_state (vc1541);
-}
+
+
+/**************************************
+
+	Serial communications
+
+**************************************/
+
 
 
 /* bus handling */
@@ -271,7 +257,7 @@ void cbm_serial_reset_write (int level)
 	int i;
 
 	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_reset_write (cbm_serial.drives[i], level);
+		drive_reset_write (cbm_serial.drives[i], level);
 	/* init bus signals */
 }
 
@@ -360,57 +346,55 @@ void cbm_serial_atn_write (int level)
 		vc1541_atn_write (cbm_serial.drives[i], cbm_serial.atn[0]);
 }
 
-/* delivers status for displaying */
-static void cbm_drive_status (CBM_Drive * c1551, char *text, int size)
+
+/**************************************
+
+	Device configurations
+
+**************************************/
+
+
+static DEVICE_START( cbm_drive )
 {
-	text[0] = 0;
-#if 0
-	if ((c1551->interface == SERIAL) /*&&(c1551->i.serial.device==8) */ )
-	{
-		snprintf (text, size, "%d state:%d %d %d %s %s %s",
-				  c1551->state, c1551->i.serial.state, c1551->pos, c1551->size,
-				  cbm_serial.atn[0] ? "ATN" : "atn",
-				  cbm_serial.clock[0] ? "CLOCK" : "clock",
-				  cbm_serial.data[0] ? "DATA" : "data");
-		return;
-	}
-	if ((c1551->interface == IEC) /*&&(c1551->i.serial.device==8) */ )
-	{
-		snprintf (text, size, "%d state:%d %d %d",
-				  c1551->state, c1551->i.iec.state, c1551->pos, c1551->size);
-		return;
-	}
-#endif
-	if (c1551->drive == D64_IMAGE)
-	{
-		switch (c1551->state)
-		{
-		case OPEN:
-			snprintf (text, size, "Image File %s open",
-					  c1551->filename);
-			break;
-		case READING:
-			snprintf (text, size, "Image File %s loading %d",
-					  c1551->filename,
-					  c1551->size - c1551->pos - 1);
-			break;
-		case WRITING:
-			snprintf (text, size, "Image File %s saving %d",
-					  c1551->filename, c1551->pos);
-			break;
-		}
-	}
+	int id = image_index_in_device(device);
+	if (id == 0)
+		cbm_drive_open();	/* boy these C64 drivers are butt ugly */
+	return DEVICE_START_OK;
 }
 
-void cbm_drive_0_status (char *text, int size)
+static DEVICE_STOP( cbm_drive )
 {
-	cbm_drive_status (cbm_drive, text, size);
+	int id = image_index_in_device(device);
+	if (id == 0)
+		cbm_drive_close();	/* boy these C64 drivers are butt ugly */
 }
 
-void cbm_drive_1_status (char *text, int size)
+
+
+/* open an d64 image */
+static DEVICE_IMAGE_LOAD( cbm_drive )
 {
-	cbm_drive_status (cbm_drive + 1, text, size);
+	int id = image_index_in_device(image);
+
+	cbm_drive[id].drive = 0;
+	cbm_drive[id].image = NULL;
+
+	cbm_drive[id].image = image_ptr(image);
+	if (!cbm_drive[id].image)
+		return INIT_FAIL;
+
+	cbm_drive[id].drive = D64_IMAGE;
+	return 0;
 }
+
+static DEVICE_IMAGE_UNLOAD( cbm_drive )
+{
+	int id = image_index_in_device(image);
+
+	cbm_drive[id].drive = 0;
+	cbm_drive[id].image = NULL;
+}
+
 
 void cbmfloppy_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {

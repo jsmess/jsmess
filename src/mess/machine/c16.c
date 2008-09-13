@@ -581,13 +581,16 @@ MACHINE_RESET( c16 )
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfec0, 0xfedf, 0, 0, SMH_NOP);
 	}
 
-	cbm_drive_0_config (SERIAL, 8);
-	cbm_drive_1_config (SERIAL, 9);
-
 	if (has_c1551 || has_vc1541)		/* c1551 or vc1541 */
+	{
 		drive_reset ();
-
-	cbm_serial_reset_write (0);
+	}
+	else								/* simulated drives */
+	{
+		cbm_serial_reset_write (0);
+		cbm_drive_0_config (SERIAL, 8);
+		cbm_drive_1_config (SERIAL, 9);
+	}
 }
 
 

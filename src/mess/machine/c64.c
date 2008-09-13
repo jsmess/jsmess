@@ -1058,7 +1058,7 @@ void c64_common_init_machine (running_machine *machine)
 	if (is_sx64)
 		drive_reset ();
 
-	if (c64_cia1_on)
+	else if (c64_cia1_on)
 	{
 		cbm_serial_reset_write (0);
 		cbm_drive_0_config (SERIAL, is_c65(machine) ? 10 : 8);
