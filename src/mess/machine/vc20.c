@@ -555,19 +555,15 @@ static TIMER_CALLBACK( vic20_tape_timer )
 
 static void vc20_common_driver_init (running_machine *machine)
 {
-#ifdef VC1541
-	VC1541_CONFIG vc1541= { 1, 8 };
-#endif
 	vc20_memory_init(machine);
 
 	datasette_timer = timer_alloc(vic20_tape_timer, NULL);
 
 #ifdef VC1541
-	vc1541_config (0, 0, &vc1541);
+	drive_config (type_1541, 0, 0, 1, 8);
 #endif
 	via_config (0, &via0);
 	via_config (1, &via1);
-
 }
 
 
@@ -602,7 +598,7 @@ MACHINE_RESET( vic20 )
 {
 	cbm_serial_reset_write (0);
 #ifdef VC1541
-	vc1541_reset ();
+	drive_reset ();
 #endif
 
 	if (ieee) 

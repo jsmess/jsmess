@@ -9,32 +9,31 @@
 #ifndef VC1541_H_
 #define VC1541_H_
 
-typedef struct {
-	int cpunr;
-	int devicenr;
-} VC1541_CONFIG;
-
-
 /*----------- defined in machine/vc1541.c -----------*/
+
+/* we currently have preliminary support for 1541 & 1551 only */
+enum { 
+type_1541 = 0,
+type_1541ii,
+type_1551,
+type_1570,
+type_1571,
+type_1571cr,
+type_1581,
+type_2031,
+type_2040,
+type_3040,
+type_4040,
+type_1001,
+type_8050,
+type_8250,
+};
 
 DEVICE_IMAGE_LOAD(vc1541);
 DEVICE_IMAGE_UNLOAD(vc1541);
 
-int vc1541_config(int id, int mode, VC1541_CONFIG*config);
-void vc1541_reset(void);
-void vc1541_drive_status(char *text, int size);
-
-typedef struct {
-	int cpunr;
-} C1551_CONFIG;
-
-int c1551_config(int id, int mode, C1551_CONFIG*config);
-#define c1551_reset vc1541_reset
-
-enum
-{
-	DEVINFO_PTR_VC1541_CONFIG = MESS_DEVINFO_PTR_DEV_SPECIFIC
-};
+int drive_config(int type, int id, int mode, int cpunr, int devicenr);
+void drive_reset(void);
 
 void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 void c2031_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);

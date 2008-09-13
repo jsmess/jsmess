@@ -1046,18 +1046,17 @@ DRIVER_INIT( c64gs )
 
 DRIVER_INIT( sx64 )
 {
-	VC1541_CONFIG vc1541 = { 1, 8 };
 	is_sx64 = 1;
 	c64_tape_on = 0;
 	c64_pal = 1;
 	c64_common_driver_init (machine);
-	vc1541_config (0, 0, &vc1541);
+	drive_config (type_1541, 0, 0, 1, 8);
 }
 
 void c64_common_init_machine (running_machine *machine)
 {
 	if (is_sx64)
-		vc1541_reset ();
+		drive_reset ();
 
 	if (c64_cia1_on)
 	{

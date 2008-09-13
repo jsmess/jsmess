@@ -429,8 +429,6 @@ void c16_interrupt (running_machine *machine, int level)
 
 static void c16_common_driver_init (running_machine *machine)
 {
-	VC1541_CONFIG vc1541= { 1, 8 };
-	C1551_CONFIG config= { 1 };
 	UINT8 *rom;
 
 	/* configure the M7501 port */
@@ -480,10 +478,10 @@ static void c16_common_driver_init (running_machine *machine)
 	memset(mess_ram + (0xfd40 % mess_ram_size), 0xff, 0x20);
 	
 	if (has_c1551)		/* C1551 */
-		c1551_config (0, 0, &config);
+		drive_config (type_1551, 0, 0, 1, 8);
 
 	if (has_vc1541)		/* VC1541 */
-		vc1541_config (0, 0, &vc1541);
+		drive_config (type_1541, 0, 0, 1, 8);
 }
 
 void c16_driver_init(running_machine *machine)
@@ -586,11 +584,8 @@ MACHINE_RESET( c16 )
 	cbm_drive_0_config (SERIAL, 8);
 	cbm_drive_1_config (SERIAL, 9);
 
-	if (has_c1551)		/* c1551 */
-		c1551_reset ();
-
-	if (has_vc1541)		/* VC1541 */
-		vc1541_reset ();
+	if (has_c1551 || has_vc1541)		/* c1551 or vc1541 */
+		drive_reset ();
 
 	cbm_serial_reset_write (0);
 }
