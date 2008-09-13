@@ -1388,7 +1388,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 		append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	UI_unmount);
 
 #if HAS_WAVE
-		if ((info.type == IO_CASSETTE) && !strcmp(info.file_extensions, "wav"))
+		if ((img->type == CASSETTE) && !strcmp(info.file_extensions, "wav"))
 		{
 			cassette_state state;
 			state = image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED;
@@ -1505,11 +1505,11 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 			break;
 
 		default:
-			switch(image_devtype(img))
-			{
 #if HAS_WAVE
-				case IO_CASSETTE:
-					switch(devoption) {
+			if (img->type == CASSETTE)
+			{
+				switch(devoption)
+				{
 					case DEVOPTION_CASSETTE_STOPPAUSE:
 						cassette_change_state(img, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 						break;
@@ -1530,12 +1530,9 @@ static void device_command(HWND wnd, const device_config *img, int devoption)
 						cassette_seek(img, +1.0, SEEK_CUR);
 						break;
 				}
-				break;
+			}
 #endif /* HAS_WAVE */
-
-			default:
-				break;
-		}
+			break;
 	}
 }
 
