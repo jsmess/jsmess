@@ -1,6 +1,6 @@
 <tests>
 
-<test name="pet_000" driver="pet">
+<test name="pet_000" driver="pet2001">
 	<wait time="5"/>
 	<checkblank/>
 </test>
