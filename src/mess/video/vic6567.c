@@ -484,17 +484,8 @@ WRITE8_HANDLER ( vic2_port_w )
 //			vic2.reg_buffer[offset] = data;
 
 			vic2.reg[offset] = data;
-			if (COLUMNS40)
-			{
-				vic2.x_begin = 0;
-				vic2.x_end = vic2.x_begin + 320;
-			}
-			else
-			{
-				vic2.x_begin = HORIZONTALPOS;
-				vic2.x_end = vic2.x_begin + 320;
-			}
-
+			vic2.x_begin = HORIZONTALPOS;
+			vic2.x_end = vic2.x_begin + 320;
 		}
 		break;
 	case 0x18:
@@ -1202,9 +1193,15 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 	}
 
 	if (COLUMNS40)
-		xbegin = XPOS, xend = xbegin + 320;
+	{
+		xbegin = XPOS;
+		xend = xbegin + 320;
+	}
 	else
-		xbegin = XPOS + 7, xend = xbegin + 304;
+	{
+		xbegin = XPOS + 7;
+		xend = xbegin + 304;
+	}
 
 	if (first + 1 < vic2.y_begin)
 		end = first + 1;
