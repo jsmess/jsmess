@@ -256,6 +256,7 @@ MACHINE_RESET( primob )
 {
 	primo_common_machine_init(machine);
 
+	serial_config(machine, &sim_drive_interface);	
 	cbm_serial_reset_write (0);
 	cbm_drive_0_config (SERIAL, 8);
 	cbm_drive_1_config (SERIAL, 9);

@@ -34,6 +34,8 @@ DRIVER_INIT( vc20 );
 DRIVER_INIT( vic20 );
 DRIVER_INIT( vic20i );
 DRIVER_INIT( vic1001 );
+DRIVER_INIT( vc20v );
+DRIVER_INIT( vic20v );
 
 MACHINE_RESET( vic20 );
 INTERRUPT_GEN( vic20_frame_interrupt );

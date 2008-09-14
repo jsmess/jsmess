@@ -583,10 +583,12 @@ MACHINE_RESET( c16 )
 
 	if (has_c1551 || has_vc1541)		/* c1551 or vc1541 */
 	{
+		serial_config(machine, &fake_drive_interface);
 		drive_reset ();
 	}
 	else								/* simulated drives */
 	{
+		serial_config(machine, &sim_drive_interface);
 		cbm_serial_reset_write (0);
 		cbm_drive_0_config (SERIAL, 8);
 		cbm_drive_1_config (SERIAL, 9);

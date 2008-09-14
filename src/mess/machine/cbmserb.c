@@ -4,255 +4,23 @@
 #include <string.h>
 #include "driver.h"
 #include "image.h"
-
-#include "includes/cbmdrive.h"
+#include "deprecat.h"
 
 #include "includes/cbmserb.h"
 
-/***********************************************
-
-	Drive handling
-
-***********************************************/
-
-static void drive_reset_write (CBM_Drive * drive, int level);
-
-CBM_Drive cbm_drive[2];
-
-CBM_Serial cbm_serial;
-
-/* must be called before other functions */
-static void cbm_drive_open (void)
-{
-	int i;
-
-	memset(cbm_drive, 0, sizeof(cbm_drive));
-	memset(&cbm_serial, 0, sizeof(cbm_serial));
-
-	cbm_drive_open_helper ();
-
-	cbm_serial.count = 0;
-	for (i = 0; i < sizeof (cbm_serial.atn) / sizeof (int); i++)
-
-	{
-		cbm_serial.atn[i] =
-			cbm_serial.data[i] =
-			cbm_serial.clock[i] = 1;
-	}
-}
-
-static void cbm_drive_close (void)
-{
-	int i;
-
-	cbm_serial.count = 0;
-	for (i = 0; i < sizeof (cbm_drive) / sizeof (CBM_Drive); i++)
-	{
-		cbm_drive[i].interface = 0;
-		
-		if( cbm_drive[i].buffer ) {
-			free(cbm_drive[i].buffer);
-			cbm_drive[i].buffer = NULL;
-		}
-
-		if (cbm_drive[i].drive == D64_IMAGE)
-			cbm_drive[i].image = NULL;
-		cbm_drive[i].drive = 0;
-	}
-}
-
-
-
-static void cbm_drive_config (CBM_Drive * drive, int interface, int serialnr)
-{
-	int i;
-
-	if (interface==SERIAL)
-		drive->i.serial.device=serialnr;
-
-	if (interface==IEEE)
-		drive->i.ieee.device=serialnr;
-
-	if (drive->interface == interface)
-		return;
-
-	if (drive->interface == SERIAL)
-	{
-		for (i = 0; (i < cbm_serial.count) && (cbm_serial.drives[i] != drive); i++) ;
-		for (; i + 1 < cbm_serial.count; i++)
-			cbm_serial.drives[i] = cbm_serial.drives[i + 1];
-		cbm_serial.count--;
-	}
-
-	drive->interface = interface;
-
-	if (drive->interface == IEC)
-	{
-		drive->i.iec.handshakein =
-			drive->i.iec.handshakeout = 0;
-		drive->i.iec.status = 0;
-		drive->i.iec.dataout = drive->i.iec.datain = 0xff;
-		drive->i.iec.state = 0;
-	}
-	else if (drive->interface == SERIAL)
-	{
-		cbm_serial.drives[cbm_serial.count++] = drive;
-		drive_reset_write(drive, 0);
-	}
-}
-
-void cbm_drive_0_config (int interface, int serialnr)
-{
-	cbm_drive_config (cbm_drive, interface, serialnr);
-}
-void cbm_drive_1_config (int interface, int serialnr)
-{
-	cbm_drive_config (cbm_drive + 1, interface, serialnr);
-}
-
-
-static void drive_reset_write (CBM_Drive * drive, int level)
-{
-	if (level == 0)
-	{
-		drive->i.serial.data =
-			drive->i.serial.clock =
-			drive->i.serial.atn = 1;
-		drive->i.serial.state = 0;
-	}
-}
+/* with these we include the handlers for the interfaces below */
+#include "includes/vc1541.h"
+#include "includes/cbmdrive.h"
 
 
 /**************************************
 
-	C1551
+	Handlers for the simulated drive
 
 **************************************/
 
 
-static void c1551_write_data (CBM_Drive * drive, int data)
-{
-	drive->i.iec.datain = data;
-	c1551_state (drive);
-}
-
-static int c1551_read_data (CBM_Drive * drive)
-{
-	c1551_state (drive);
-	return drive->i.iec.dataout;
-}
-
-static void c1551_write_handshake (CBM_Drive * drive, int data)
-{
-	drive->i.iec.handshakein = data&0x40?1:0;
-	c1551_state (drive);
-}
-
-static int c1551_read_handshake (CBM_Drive * drive)
-{
-	c1551_state (drive);
-	return drive->i.iec.handshakeout?0x80:0;
-}
-
-static int c1551_read_status (CBM_Drive * drive)
-{
-	c1551_state (drive);
-	return drive->i.iec.status;
-}
-
-void c1551_0_write_data (int data)
-{
-	c1551_write_data (cbm_drive, data);
-}
-int c1551_0_read_data (void)
-{
-	return c1551_read_data (cbm_drive);
-}
-void c1551_0_write_handshake (int data)
-{
-	c1551_write_handshake (cbm_drive, data);
-}
-int c1551_0_read_handshake (void)
-{
-	return c1551_read_handshake (cbm_drive);
-}
-int c1551_0_read_status (void)
-{
-	return c1551_read_status (cbm_drive);
-}
-
-void c1551_1_write_data (int data)
-{
-	c1551_write_data (cbm_drive + 1, data);
-}
-int c1551_1_read_data (void)
-{
-	return c1551_read_data (cbm_drive + 1);
-}
-void c1551_1_write_handshake (int data)
-{
-	c1551_write_handshake (cbm_drive + 1, data);
-}
-int c1551_1_read_handshake (void)
-{
-	return c1551_read_handshake (cbm_drive + 1);
-}
-int c1551_1_read_status (void)
-{
-	return c1551_read_status (cbm_drive + 1);
-}
-
-/**************************************
-
-	VC1541
-
-**************************************/
-
-static int vc1541_atn_read (CBM_Drive * drive)
-{
-	vc1541_state (drive);
-	return drive->i.serial.atn;
-}
-
-static int vc1541_data_read (CBM_Drive * drive)
-{
-	vc1541_state (drive);
-	return drive->i.serial.data;
-}
-
-static int vc1541_clock_read (CBM_Drive * drive)
-{
-	vc1541_state (drive);
-	return drive->i.serial.clock;
-}
-
-static void vc1541_data_write (CBM_Drive * drive, int level)
-{
-	vc1541_state (drive);
-}
-
-static void vc1541_clock_write (CBM_Drive * drive, int level)
-{
-	vc1541_state (drive);
-}
-
-static void vc1541_atn_write (CBM_Drive * drive, int level)
-{
-	vc1541_state (drive);
-}
-
-
-
-/**************************************
-
-	Serial communications
-
-**************************************/
-
-
-
-/* bus handling */
-void cbm_serial_reset_write (int level)
+static void sim_drive_reset_write (int level)
 {
 	int i;
 
@@ -261,17 +29,17 @@ void cbm_serial_reset_write (int level)
 	/* init bus signals */
 }
 
-int cbm_serial_request_read (void)
+static int sim_drive_request_read (void)
 {
 	/* in c16 not connected */
 	return 1;
 }
 
-void cbm_serial_request_write (int level)
+static void sim_drive_request_write (int level)
 {
 }
 
-int cbm_serial_atn_read (void)
+static int sim_drive_atn_read (void)
 {
 	int i;
 
@@ -282,7 +50,7 @@ int cbm_serial_atn_read (void)
 	return cbm_serial.atn[0];
 }
 
-int cbm_serial_data_read (void)
+static int sim_drive_data_read (void)
 {
 	int i;
 
@@ -293,7 +61,7 @@ int cbm_serial_data_read (void)
 	return cbm_serial.data[0];
 }
 
-int cbm_serial_clock_read (void)
+static int sim_drive_clock_read (void)
 {
 	int i;
 
@@ -304,7 +72,7 @@ int cbm_serial_clock_read (void)
 	return cbm_serial.clock[0];
 }
 
-void cbm_serial_data_write (int level)
+static void sim_drive_data_write (int level)
 {
 	int i;
 
@@ -318,7 +86,7 @@ void cbm_serial_data_write (int level)
 		vc1541_data_write (cbm_serial.drives[i], cbm_serial.data[0]);
 }
 
-void cbm_serial_clock_write (int level)
+static void sim_drive_clock_write (int level)
 {
 	int i;
 
@@ -332,7 +100,7 @@ void cbm_serial_clock_write (int level)
 		vc1541_clock_write (cbm_serial.drives[i], cbm_serial.clock[0]);
 }
 
-void cbm_serial_atn_write (int level)
+static void sim_drive_atn_write (int level)
 {
 	int i;
 
@@ -347,74 +115,230 @@ void cbm_serial_atn_write (int level)
 }
 
 
+const cbm_serial_interface sim_drive_interface =
+{
+	1,
+	sim_drive_reset_write,
+	sim_drive_request_read,
+	sim_drive_request_write,
+	sim_drive_atn_read,
+	sim_drive_data_read,
+	sim_drive_clock_read,
+	sim_drive_atn_write,
+	sim_drive_data_write,
+	sim_drive_clock_write
+};
+
+
 /**************************************
 
-	Device configurations
+	Handlers for the emulated drive
 
 **************************************/
 
 
-static DEVICE_START( cbm_drive )
+static void emu_drive_reset_write( int level )
 {
-	int id = image_index_in_device(device);
-	if (id == 0)
-		cbm_drive_open();	/* boy these C64 drivers are butt ugly */
-	return DEVICE_START_OK;
+	vc1541_serial_reset_write(0, level);
 }
 
-static DEVICE_STOP( cbm_drive )
+static int emu_drive_request_read( void )	
 {
-	int id = image_index_in_device(device);
-	if (id == 0)
-		cbm_drive_close();	/* boy these C64 drivers are butt ugly */
+	return vc1541_serial_request_read(0);
+}
+	
+static void emu_drive_request_write( int level )
+{
+	vc1541_serial_request_write(0, level);
 }
 
-
-
-/* open an d64 image */
-static DEVICE_IMAGE_LOAD( cbm_drive )
+static int emu_drive_atn_read( void )
 {
-	int id = image_index_in_device(image);
+	return vc1541_serial_atn_read(0);
+}
 
-	cbm_drive[id].drive = 0;
-	cbm_drive[id].image = NULL;
+static int emu_drive_data_read( void )
+{
+	return vc1541_serial_data_read(0);
+}
 
-	cbm_drive[id].image = image_ptr(image);
-	if (!cbm_drive[id].image)
-		return INIT_FAIL;
+static int emu_drive_clock_read( void )
+{
+	return vc1541_serial_clock_read(0);
+}
 
-	cbm_drive[id].drive = D64_IMAGE;
+static void emu_drive_atn_write( int level )
+{
+	vc1541_serial_atn_write(Machine, 0, level);
+}
+
+static void emu_drive_data_write( int level )
+{
+	vc1541_serial_data_write(0, level);
+}
+
+static void emu_drive_clock_write( int level )
+{
+	vc1541_serial_clock_write(0, level);
+}
+
+const cbm_serial_interface emu_drive_interface =
+{
+	2,
+	emu_drive_reset_write,
+	emu_drive_request_read,
+	emu_drive_request_write,
+	emu_drive_atn_read,
+	emu_drive_data_read,
+	emu_drive_clock_read,
+	emu_drive_atn_write,
+	emu_drive_data_write,
+	emu_drive_clock_write
+};
+
+
+/**************************************
+
+	Empty handlers
+
+**************************************/
+
+
+/* In sx64, c16v & vic20v we use these while fixing handlers for real emulation */
+
+static void fake_drive_reset_write( int level )
+{
+}
+
+static int fake_drive_request_read( void )	
+{
+	return 0;
+}
+	
+static void fake_drive_request_write( int level )
+{
+}
+
+static int fake_drive_atn_read( void )
+{
 	return 0;
 }
 
-static DEVICE_IMAGE_UNLOAD( cbm_drive )
+static int fake_drive_data_read( void )
 {
-	int id = image_index_in_device(image);
+	return 0;
+}
 
-	cbm_drive[id].drive = 0;
-	cbm_drive[id].image = NULL;
+static int fake_drive_clock_read( void )
+{
+	return 0;
+}
+
+static void fake_drive_atn_write( int level )
+{
+}
+
+static void fake_drive_data_write( int level )
+{
+}
+
+static void fake_drive_clock_write( int level )
+{
+}
+
+const cbm_serial_interface fake_drive_interface =
+{
+	3,
+	fake_drive_reset_write,
+	fake_drive_request_read,
+	fake_drive_request_write,
+	fake_drive_atn_read,
+	fake_drive_data_read,
+	fake_drive_clock_read,
+	fake_drive_atn_write,
+	fake_drive_data_write,
+	fake_drive_clock_write
+};	
+	
+/**************************************
+
+	Serial communications
+
+**************************************/
+
+/* 2008-09 FP:
+	To make possible to test code for both simulated floppy drive and emulated floppy drive, I 
+	created this interface for the serial bus emulation. The implementation is maybe not the cleanest 
+	possible, but it works.
+	This is necessary because using simulation we support two drives (see the handlers above) while
+	the emulation only supports one drive (the handlers have a 'which' parameter, but the reset and
+	config functions are strictly for 1 drive). 
+	Eventually, we will remove the simulation and here we will have only the emu_drive_*** above 
+	renamed as cbm_serial_*** and the whole interface will be trashed.
+ */
+/* To Do: Can we pass more directly the handlers from the interface to the drivers?	*/
+
+static cbm_serial_interface serial_intf_static= { 0 }, *serial_intf = &serial_intf_static;
+
+void serial_config(running_machine *machine, const cbm_serial_interface *intf)
+{
+	serial_intf->serial = intf->serial;
+	serial_intf->serial_reset_write = intf->serial_reset_write;
+	serial_intf->serial_request_read = intf->serial_request_read;
+	serial_intf->serial_request_write = intf->serial_request_write;
+	serial_intf->serial_atn_read = intf->serial_atn_read;
+	serial_intf->serial_data_read = intf->serial_data_read;
+	serial_intf->serial_clock_read = intf->serial_clock_read;
+	serial_intf->serial_atn_write = intf->serial_atn_write;
+	serial_intf->serial_data_write = intf->serial_data_write;
+	serial_intf->serial_clock_write = intf->serial_clock_write;
+
+	logerror("Serial interface in use: %d\n", serial_intf->serial);
 }
 
 
-void cbmfloppy_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+/* bus handling */
+void cbm_serial_reset_write (int level)
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_FLOPPY; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(cbm_drive); break;
-		case MESS_DEVINFO_PTR_STOP:							info->stop = DEVICE_STOP_NAME(cbm_drive); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(cbm_drive); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(cbm_drive); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "d64"); break;
-	}
+	serial_intf->serial_reset_write(level);
 }
 
+int cbm_serial_request_read (void)
+{
+	return serial_intf->serial_request_read();
+}
+
+void cbm_serial_request_write (int level)
+{
+	serial_intf->serial_request_write(level);
+}
+
+int cbm_serial_atn_read (void)
+{
+	return serial_intf->serial_atn_read();
+}
+
+int cbm_serial_data_read (void)
+{
+	return serial_intf->serial_data_read();
+}
+
+int cbm_serial_clock_read (void)
+{
+	return serial_intf->serial_clock_read();
+}
+
+void cbm_serial_data_write (int level)
+{
+	serial_intf->serial_data_write(level);
+}
+
+void cbm_serial_clock_write (int level)
+{
+	serial_intf->serial_clock_write(level);
+}
+
+void cbm_serial_atn_write (int level)
+{
+	serial_intf->serial_atn_write(level);
+}

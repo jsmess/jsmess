@@ -12,32 +12,33 @@
 
 /*----------- defined in machine/cbmserb.c -----------*/
 
-void cbmfloppy_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+/* through this interface, we choose between simulated and emulated drives */
+/* this is temporarily needed in order to be able to compile the code for both, without breaking anything */
+typedef struct _cbm_serial_interface cbm_serial_interface;
+struct _cbm_serial_interface
+{
+	int serial;			/* This is just a parameter, to log which interface is in use */
+	void (*serial_reset_write)(int level);
+	int (*serial_request_read)(void);
+	void (*serial_request_write)(int level);
+	int (*serial_atn_read)(void);
+	int (*serial_data_read)(void);
+	int (*serial_clock_read)(void);
+	void (*serial_atn_write)(int level);
+	void (*serial_data_write)(int level);
+	void (*serial_clock_write)(int level);
+};
 
-#define IEC 1
-#define SERIAL 2
-#define IEEE 3
-void cbm_drive_0_config (int interface, int serialnr);
-void cbm_drive_1_config (int interface, int serialnr);
+void serial_config(running_machine *machine, const cbm_serial_interface *intf);
 
-/* delivers status for displaying */
-extern void cbm_drive_0_status (char *text, int size);
-extern void cbm_drive_1_status (char *text, int size);
+const cbm_serial_interface sim_drive_interface;		/* serial = 1 */
+const cbm_serial_interface emu_drive_interface;		/* serial = 2 */
+const cbm_serial_interface fake_drive_interface;	/* serial = 3 */
 
-/* iec interface c16/c1551 */
-void c1551_0_write_data (int data);
-int c1551_0_read_data (void);
-void c1551_0_write_handshake (int data);
-int c1551_0_read_handshake (void);
-int c1551_0_read_status (void);
 
-void c1551_1_write_data (int data);
-int c1551_1_read_data (void);
-void c1551_1_write_handshake (int data);
-int c1551_1_read_handshake (void);
-int c1551_1_read_status (void);
+/* Serial bus for vic20, c64 & c16 with vc1541 and some printer */
 
-/* serial bus vc20/c64/c16/vc1541 and some printer */
+/* To be passed directly to the drivers */
 void cbm_serial_reset_write (int level);
 int cbm_serial_atn_read (void);
 void cbm_serial_atn_write (int level);
@@ -47,11 +48,6 @@ int cbm_serial_clock_read (void);
 void cbm_serial_clock_write (int level);
 int cbm_serial_request_read (void);
 void cbm_serial_request_write (int level);
-
-extern CBM_Serial cbm_serial;
-
-/* private */
-extern CBM_Drive cbm_drive[2];
 
 
 #endif /* CBMSERB_H_ */

@@ -13,11 +13,9 @@
 #define CBMDRIVE_H_
 
 
-#if 0
 #define IEC 1
 #define SERIAL 2
 #define IEEE 3
-#endif
 
 
 /*----------- defined in machine/cbmdrive.c -----------*/
@@ -72,6 +70,9 @@ typedef struct
 }
 CBM_Drive;
 
+extern CBM_Drive cbm_drive[2];
+
+
 #define D64_MAX_TRACKS 35
 extern const int d64_sectors_per_track[D64_MAX_TRACKS];
 int d64_tracksector2offset (int track, int sector);
@@ -87,10 +88,47 @@ typedef struct
 }
 CBM_Serial;
 
+extern CBM_Serial cbm_serial;
+
+
 void cbm_drive_open_helper (void);
-void c1551_state (CBM_Drive * c1551);
-void vc1541_state (CBM_Drive * vc1541);
-void c2031_state(CBM_Drive *drive);
+void c1551_state (CBM_Drive * drive);
+void vc1541_state (CBM_Drive * drive);
+void c2031_state (CBM_Drive *drive);
+
+void cbm_drive_0_config (int interface, int serialnr);
+void cbm_drive_1_config (int interface, int serialnr);
+
+
+/* IEC interface for c16 with c1551 */
+
+/* To be passed directly to the drivers */
+void c1551_0_write_data (int data);
+int c1551_0_read_data (void);
+void c1551_0_write_handshake (int data);
+int c1551_0_read_handshake (void);
+int c1551_0_read_status (void);
+
+void c1551_1_write_data (int data);
+int c1551_1_read_data (void);
+void c1551_1_write_handshake (int data);
+int c1551_1_read_handshake (void);
+int c1551_1_read_status (void);
+
+
+/* Serial bus for vic20, c64 & c16 with vc1541 and some printer */
+
+/* To be passed to serial bus emulation */
+void drive_reset_write (CBM_Drive * drive, int level);
+int vc1541_atn_read (CBM_Drive * drive);
+int vc1541_data_read (CBM_Drive * drive);
+int vc1541_clock_read (CBM_Drive * drive);
+void vc1541_atn_write (CBM_Drive * drive, int level);
+void vc1541_data_write (CBM_Drive * drive, int level);
+void vc1541_clock_write (CBM_Drive * drive, int level);
+
+
+void cbmfloppy_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
 
 #endif /* CBMDRIVE_H_ */

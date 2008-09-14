@@ -310,7 +310,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vic20v )
 	MDRV_IMPORT_FROM( vic20 )
-//	MDRV_IMPORT_FROM( cpu_vc1540 )
+	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
 #else
@@ -348,7 +348,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vc20v )
 	MDRV_IMPORT_FROM( vc20 )
-//	MDRV_IMPORT_FROM( cpu_vc1540 )
+	MDRV_IMPORT_FROM( cpu_vc1540 )
 #ifdef CPU_SYNC
 	MDRV_INTERLEAVE(1)
 #else
@@ -487,12 +487,12 @@ COMP( 1981, vic1001,   vic20,  0,  vic20,   vic1001,  vic20,  vic20,     "Commod
 COMP( 1981, vic20,     0,      0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC)", GAME_IMPERFECT_SOUND)
 COMP( 1981, vic20cr,   vic20,  0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20CR (NTSC)", GAME_IMPERFECT_SOUND)
 COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20i,   vic20i, vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20,  vic20v,    "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20v, vic20v,    "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 COMP( 1981, vic20pal,  vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VC 20 (PAL)", GAME_IMPERFECT_SOUND)
 COMP( 1981, vic20crp,  vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VC 20CR (PAL)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20plv,  vic20,  0,   vc20v,  vic20,    vc20,   vic20v,    "Commodore Business Machines Co.",  "VC 20 (PAL, VC1541)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vic20plv,  vic20,  0,   vc20v,  vic20,    vc20v,  vic20v,    "Commodore Business Machines Co.",  "VC 20 (PAL, VC1541)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 COMP( 1981, vc20,      vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vc20v,     vic20,  0,   vc20v,  vic20,    vc20,   vic20v,    "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany, VC1541)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1981, vc20v,     vic20,  0,   vc20v,  vic20,    vc20v,  vic20v,    "Commodore Business Machines Co.",  "VIC 20 (PAL, Germany, VC1541)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 COMP( 1981, vic20swe,  vic20,  0,   vc20,   vic20swe, vc20,   vic20,     "Commodore Business Machines Co.",  "VIC 20 (PAL, Swedish Expansion Kit)", GAME_IMPERFECT_SOUND)

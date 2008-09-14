@@ -45,7 +45,8 @@ static UINT8 keyboard[8] =
 static int via1_portb, via1_porta, via0_ca2;
 static int serial_atn = 1, serial_clock = 1, serial_data = 1;
 
-static int ieee=0; /* ieee cartridge (interface and rom)*/
+static int has_vc1541 = 0;
+static int ieee = 0; /* ieee cartridge (interface and rom)*/
 static UINT8 *vc20_rom_2000;
 static UINT8 *vc20_rom_4000;
 static UINT8 *vc20_rom_6000;
@@ -559,14 +560,12 @@ static void vc20_common_driver_init (running_machine *machine)
 
 	datasette_timer = timer_alloc(vic20_tape_timer, NULL);
 
-#ifdef VC1541
-	drive_config (type_1541, 0, 0, 1, 8);
-#endif
+	if (has_vc1541)
+		drive_config (type_1541, 0, 0, 1, 8);
 
 	via_config (0, &via0);
 	via_config (1, &via1);
 }
-
 
 DRIVER_INIT( vc20 )
 {
@@ -585,6 +584,20 @@ DRIVER_INIT( vic1001 )
 	DRIVER_INIT_CALL( vic20 );
 }
 
+DRIVER_INIT( vc20v )
+{
+	has_vc1541 = 1;
+	vc20_common_driver_init (machine);
+	vic6561_init (vic6560_dma_read, vic6560_dma_read_color);
+}
+
+DRIVER_INIT( vic20v )
+{
+	has_vc1541 = 1;
+	vc20_common_driver_init (machine);
+	vic6560_init (vic6560_dma_read, vic6560_dma_read_color);
+}
+
 DRIVER_INIT( vic20i )
 {
 	ieee = 1;
@@ -597,21 +610,26 @@ DRIVER_INIT( vic20i )
 
 MACHINE_RESET( vic20 )
 {
-#ifdef VC1541
-	drive_reset ();
-#endif
-
-	cbm_serial_reset_write (0);
-
-	if (ieee) 
+	if (has_vc1541)
 	{
-		cbm_drive_0_config (IEEE, 8);
-		cbm_drive_1_config (IEEE, 9);
-	} 
-	else 
+		serial_config(machine, &fake_drive_interface);
+		drive_reset ();
+	}
+	else
 	{
-		cbm_drive_0_config (SERIAL, 8);
-		cbm_drive_1_config (SERIAL, 9);
+		serial_config(machine, &sim_drive_interface);
+		cbm_serial_reset_write (0);
+
+		if (ieee) 
+		{
+			cbm_drive_0_config (IEEE, 8);
+			cbm_drive_1_config (IEEE, 9);
+		} 
+		else 
+		{
+			cbm_drive_0_config (SERIAL, 8);
+			cbm_drive_1_config (SERIAL, 9);
+		}
 	}
 
 	via_reset ();
@@ -638,7 +656,7 @@ INTERRUPT_GEN( vic20_frame_interrupt )
 	keyboard[6] = input_port_read(machine, "ROW6");
 	keyboard[7] = input_port_read(machine, "ROW7");
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/* Caps Lock */
 }
 
 

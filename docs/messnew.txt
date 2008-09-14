@@ -1,4 +1,4 @@
-﻿0.127.1
+0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -72,9 +72,10 @@ System Driver Changes:
   doubt these CBM-II computers used the same format as C64. More work 
   when/if more documents will be available [Fabio Priuli]
 
-- [COMMODORE] Temporarily commented out VC1540 / VC1541 floppy support from
-  systems which had been promoted from TESTDRIVER status. This fixed 
-  asserts and freezes. [Fabio Priuli]
+- [COMMODORE] Properly fixed asserts / freezes / crashes in systems with 
+  VC1540 / VC1541 floppy support which had been promoted from TESTDRIVER 
+  status. However, they are flagged as NOT_WORKING because the floppy 
+  emulation is not implemented yet. [Fabio Priuli]
 
 - [COMMODORE] Cleaned up documentation and comments in c16.c, c64.c, c65.c,
   c128.c, cbmb.c, pet.c and vc20.c. Added missing BASIC revisions, new 

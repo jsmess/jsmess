@@ -1056,13 +1056,17 @@ DRIVER_INIT( sx64 )
 void c64_common_init_machine (running_machine *machine)
 {
 	if (is_sx64)
+	{
+		serial_config(machine, &fake_drive_interface);
 		drive_reset ();
+	}
 
 	else if (c64_cia1_on)
 	{
+		serial_config(machine, &sim_drive_interface);
 		cbm_serial_reset_write (0);
-		cbm_drive_0_config (SERIAL, is_c65(machine) ? 10 : 8);
-		cbm_drive_1_config (SERIAL, is_c65(machine) ? 11 : 9);
+		cbm_drive_0_config (SERIAL, 8);
+		cbm_drive_1_config (SERIAL, 9);
 		serial_clock = serial_data = serial_atn = 1;
 	}
 

@@ -149,20 +149,20 @@ MACHINE_DRIVER_EXTERN( cpu_c1571 );
 	ROM_LOAD("",  0xc000, 0x4000, CRC())
 #endif
 
-/* serial bus vc20/c64/c16/vc1541 and some printer */
 
-#ifdef VC1541
-#define cbm_serial_reset_write(level)   vc1541_serial_reset_write(0,level)
-#define cbm_serial_atn_read()           vc1541_serial_atn_read(0)
-#define cbm_serial_atn_write(level)     vc1541_serial_atn_write(Machine, 0,level)
-#define cbm_serial_data_read()          vc1541_serial_data_read(0)
-#define cbm_serial_data_write(level)    vc1541_serial_data_write(0,level)
-#define cbm_serial_clock_read()         vc1541_serial_clock_read(0)
-#define cbm_serial_clock_write(level)   vc1541_serial_clock_write(0,level)
-#define cbm_serial_request_read()       vc1541_serial_request_read(0)
-#define cbm_serial_request_write(level) vc1541_serial_request_write(0,level)
-#endif
+/* IEC interface for c16 with c1551 */
 
+/* To be passed directly to the drivers */
+void c1551x_0_write_data (int data);
+int c1551x_0_read_data (void);
+void c1551x_0_write_handshake (int data);
+int c1551x_0_read_handshake (void);
+int c1551x_0_read_status (void);
+
+
+/* serial bus for vic20, c64 & c16 with vc1541 and some printer */
+
+/* To be passed to serial bus emulation */
 void vc1541_serial_reset_write(int which,int level);
 int vc1541_serial_atn_read(int which);
 void vc1541_serial_atn_write(running_machine *machine, int which,int level);
@@ -172,12 +172,6 @@ int vc1541_serial_clock_read(int which);
 void vc1541_serial_clock_write(int which,int level);
 int vc1541_serial_request_read(int which);
 void vc1541_serial_request_write(int which,int level);
-
-void c1551x_0_write_data (int data);
-int c1551x_0_read_data (void);
-void c1551x_0_write_handshake (int data);
-int c1551x_0_read_handshake (void);
-int c1551x_0_read_status (void);
 
 
 #endif /* VC1541_H_ */
