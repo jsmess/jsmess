@@ -961,8 +961,10 @@ XL/XE 16kB OS roms
   DRIVER( hc85 )    /* 1985 HC-85										  */
   DRIVER( hc90 )    /* 1990 HC-90										  */
   DRIVER( hc91 )    /* 1991 HC-91										  */
+  DRIVER( hc128 )   /* 1991 HC-128									  */
+  DRIVER( hc2000 )  /* 1992 HC-2000									  */
   
-  DRIVER( cip03 )   /* 1991 CIP-03										  */
+  DRIVER( cip03 )   /* 1988 CIP-03										  */
   DRIVER( jet )     /* 1990 JET										  */
   
   /* Didaktik Skalica */

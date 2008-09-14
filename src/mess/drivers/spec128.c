@@ -330,11 +330,31 @@ ROM_START(specpls2)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START(hc128)
+	ROM_REGION(0x18000,"main",0)
+	ROM_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5))
+	ROM_LOAD("hc128.rom",  0x14000,0x4000, CRC(0241e960) SHA1(cea0d14391b9e571460a816088a1c00ecb24afa3))	
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START(hc2000)
+	ROM_REGION(0x18000,"main",0)
+	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
+	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(1))
+	ROMX_LOAD("hc2000.v1",  0x14000,0x4000, CRC(453c1a5a) SHA1(f8139fc38478691cf44944dc83fd6e70b0f002fb), ROM_BIOS(1))	
+	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
+	ROMX_LOAD("zx128_0.rom",0x10000,0x4000, CRC(e76799d2) SHA1(4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5), ROM_BIOS(2))
+	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(2))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
 static SYSTEM_CONFIG_START(spec128)
 	CONFIG_IMPORT_FROM(spectrum)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( 1986, spec128,  0,		0,		spectrum_128,	spectrum,	0,		spec128,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
-COMP( 1986, specpls2, spec128,  0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
+COMP( 1986, spec128,  0,		   0,		spectrum_128,	spectrum,	0,		spec128,	"Sinclair Research",    "ZX Spectrum 128" , 0 )
+COMP( 1986, specpls2, spec128, 0,		spectrum_128,	spectrum,	0,		spec128,	"Amstrad plc",          "ZX Spectrum +2" , 0 )
+COMP( 1991, hc128,    spec128, 0,		spectrum_128, spectrum,	0,		spec128,	"ICE-Felix",	"HC-128" , 0)
+COMP( 1992, hc2000,   spec128, 0,		spectrum_128,	spectrum,	0,		spec128,	"ICE-Felix",	"HC-2000" , GAME_NOT_WORKING)
