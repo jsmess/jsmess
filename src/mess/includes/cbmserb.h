@@ -31,9 +31,9 @@ struct _cbm_serial_interface
 
 void serial_config(running_machine *machine, const cbm_serial_interface *intf);
 
-const cbm_serial_interface sim_drive_interface;		/* serial = 1 */
-const cbm_serial_interface emu_drive_interface;		/* serial = 2 */
-const cbm_serial_interface fake_drive_interface;	/* serial = 3 */
+extern const cbm_serial_interface sim_drive_interface;		/* serial = 1 */
+extern const cbm_serial_interface emu_drive_interface;		/* serial = 2 */
+extern const cbm_serial_interface fake_drive_interface;	/* serial = 3 */
 
 
 /* Serial bus for vic20, c64 & c16 with vc1541 and some printer */
