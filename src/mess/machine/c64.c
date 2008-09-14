@@ -856,7 +856,7 @@ int c64_paddle_read (int which)
 			break;
 
 		case 0x03:
-			if (input_port_read(Machine, "JOY1_2B") & 0x20)	/* Joy1 Button 2 */
+			if (which && (input_port_read(Machine, "JOY1_2B") & 0x20))	/* Joy1 Button 2 */
 				pot1 = 0x00;
 			break;
 
@@ -877,26 +877,26 @@ int c64_paddle_read (int which)
 
 	switch (controller2)
 	{
-		case 0x01:
+		case 0x10:
 			if (which)
 				pot4 = input_port_read(Machine, "PADDLE4");
 			else
 				pot3 = input_port_read(Machine, "PADDLE3");
 			break;
 
-		case 0x02:
+		case 0x20:
 			if (which)
 				pot4 = input_port_read(Machine, "TRACKY");
 			else
 				pot3 = input_port_read(Machine, "TRACKX");
 			break;
 
-		case 0x03:
-			if (input_port_read(Machine, "JOY2_2B") & 0x20)	/* Joy2 Button 2 */
+		case 0x30:
+			if (which && (input_port_read(Machine, "JOY2_2B") & 0x20))	/* Joy2 Button 2 */
 				pot4 = 0x00;
 			break;
 
-		case 0x04:
+		case 0x40:
 			if (which)
 				pot4 = input_port_read(Machine, "LIGHTY");
 			else
