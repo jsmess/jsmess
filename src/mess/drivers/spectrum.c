@@ -590,6 +590,19 @@ ROM_START(hc91)
 	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START(cip03)
+	ROM_REGION(0x10000,"main",0)
+	ROM_LOAD("cip03.rom",0x0000,0x4000, CRC(c7d0cd3c) SHA1(811055b44fc74076137e2bf8db206b2a70287cc2))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+ROM_START(jet)
+	ROM_REGION(0x10000,"main",0)
+	ROM_LOAD("jet.rom",0x0000,0x4000, CRC(e56a7d11) SHA1(e76be9ee71bae6aa1c2ff969276fb599ed68cb50))
+	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
+
 /* Czechoslovakian clones*/
 
 /* TODO: need to add memory handling for 80K RAM */
@@ -701,6 +714,8 @@ COMP( 1986, tk95,     spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Micro Di
 COMP( 1985, hc85,     spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"ICE-Felix",	"HC-85" , 0)
 COMP( 1990, hc90,     spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"ICE-Felix",	"HC-90" , 0)
 COMP( 1991, hc91,     spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"ICE-Felix",	"HC-91" , 0)
+COMP( 1988, cip03,    spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Intreprinderea Electronica",	"CIP-03" , 0)
+COMP( 1990, jet,      spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Electromagnetica",	"JET" , 0)
 COMP( 1987, dgama87,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Didaktik Skalica",	"Didaktik Gama 87" , 0)
 COMP( 1988, dgama88,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Didaktik Skalica",	"Didaktik Gama 88" , 0)
 COMP( 1989, dgama89,  spectrum, 0,		spectrum,		spectrum,	0,		spectrum,	"Didaktik Skalica",	"Didaktik Gama 89" , 0)
