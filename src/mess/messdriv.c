@@ -981,6 +981,9 @@ XL/XE 16kB OS roms
   DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
   DRIVER( magic6 )    /* 1993 Magic 6                  */
   DRIVER( compani1 )  /* 1990 Kompanion 1              */
+
+	/* Kramer */
+	DRIVER(kramermc) /* 1987 Kramer MC				*/
 	
 	/* Bondwell */
 	DRIVER( bw2 )

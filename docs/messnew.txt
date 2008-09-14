@@ -12,6 +12,7 @@ New System Drivers Supported (in no particular order):
 - PP-01 (not working) [Miodrag Milanovic]
 - Ondra (not working) [Miodrag Milanovic]
 - PK-8020 Korvet (not working) [Miodrag Milanovic]
+- Kramer MC [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------
@@ -95,6 +96,8 @@ System Driver Changes:
 
 - [SG1000] Lightgun crosshair is now shown only if TV Draw cartridge is 
   loaded. [Curt Coder]
+
+- [SPECTRUM] Added lot of Spectrum clones and custom ROM's [Miodrag Milanovic]
 
 - [SYM1] Refactored cartridge code to rely on MESS core functions. Code to
   load cartridges has never been present apparently, but now it only miss
