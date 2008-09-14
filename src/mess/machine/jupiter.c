@@ -7,11 +7,9 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/jupiter.h"
-#include "sound/speaker.h"
 #include "image.h"
 
 #define	JUPITER_NONE	0
@@ -36,22 +34,6 @@ static int jupiter_data_type = JUPITER_NONE;
 
 static void jupiter_machine_stop(running_machine *machine);
 
-static UINT8 read_cfg(running_machine *machine)
-{
-	UINT8 result;
-	switch(mame_get_phase(machine))
-	{
-		case MAME_PHASE_RESET:
-		case MAME_PHASE_RUNNING:
-			result = input_port_read(machine, "CFG");
-			break;
-
-		default:
-			result = 0x00;
-			break;
-	}
-	return result;
-}
 
 /* only gets called at the start of a cpu time slice */
 
@@ -100,40 +82,11 @@ OPBASE_HANDLER( jupiter_opbaseoverride )
 	return (-1);
 }
 
-static	int	jupiter_ramsize = 2;
-
 MACHINE_START( jupiter )
 {
 	logerror("jupiter_init\r\n");
 	logerror("data: %p\n", jupiter_data);
 
-	if (read_cfg(machine) != jupiter_ramsize)
-	{
-		jupiter_ramsize = read_cfg(machine);
-		switch (jupiter_ramsize)
-		{
-			case 03:
-			case 02:
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8800, 0xffff, 0, 0, SMH_RAM);
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8800, 0xffff, 0, 0, SMH_RAM);
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x87ff, 0, 0, SMH_RAM);
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x87ff, 0, 0, SMH_RAM);
-				break;
-			case 01:
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8800, 0xffff, 0, 0, SMH_NOP);
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8800, 0xffff, 0, 0, SMH_NOP);
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x87ff, 0, 0, SMH_RAM);
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x87ff, 0, 0, SMH_RAM);
-				break;
-			case 00:
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8800, 0xffff, 0, 0, SMH_NOP);
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8800, 0xffff, 0, 0, SMH_NOP);
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x87ff, 0, 0, SMH_NOP);
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x87ff, 0, 0, SMH_NOP);
-				break;
-		}
-
-	}
 	if (jupiter_data)
 	{
 		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);
@@ -287,16 +240,5 @@ DEVICE_IMAGE_UNLOAD( jupiter_tap )
 		jupiter_data = NULL;
 		jupiter_data_type = JUPITER_NONE;
 	}
-}
-
-READ8_HANDLER ( jupiter_port_7ffe_r )
-{
-	speaker_level_w(0,0);
-	return (input_port_read(machine, "KEY7"));
-}
-
-WRITE8_HANDLER ( jupiter_port_fe_w )
-{
-	speaker_level_w(0,1);
 }
 

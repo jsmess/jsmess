@@ -931,7 +931,6 @@ $(MESSOBJ)/super80.a :   \
 
 $(MESSOBJ)/jupiter.a : \
 	$(MESS_DRIVERS)/jupiter.o	\
-	$(MESS_VIDEO)/jupiter.o	\
 	$(MESS_MACHINE)/jupiter.o	\
 
 $(MESSOBJ)/mbee.a :    \

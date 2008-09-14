@@ -3,16 +3,14 @@ Jupiter Ace memory map
 
     CPU: Z80
         0000-1fff ROM
-        2000-22ff unused
-        2300-23ff RAM (cassette buffer)
-        2400-26ff RAM (screen)
-        2700-27ff RAM (edit buffer)
-        2800-2bff unused
-        2c00-2fff RAM (char set)
-        3000-3bff unused
-        3c00-47ff RAM (standard)
-        4800-87ff RAM (16K expansion)
-        8800-ffff RAM (Expansion)
+        2000-23ff Mirror of 2400-27FF
+        2400-27ff RAM (1K RAM used for screen and edit/cassette buffer)
+        2800-2bff Mirror of 2C00-2FFF
+        2c00-2fff RAM (1K RAM for char set, write only)
+        3000-3bff Mirror of 3C00-3FFF
+        3c00-3fff RAM (1K RAM standard)
+        4000-7fff RAM (16K Expansion)
+        8000-ffff RAM (48K Expansion)
 
 Interrupts:
 
@@ -25,67 +23,44 @@ Ports:
         Tape and buzzer
 
     In 0xfe:
-        Keyboard input and buzzer
+        Keyboard input, tape, and buzzer
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/jupiter.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
+#include "sound/speaker.h"
+
+/* This needs to be moved to drivers/xtal */
+#define XTAL_6_5MHz	6500000
+
+static emu_timer	*jupiter_set_irq_timer;
+static emu_timer	*jupiter_clear_irq_timer;
+static UINT8		*jupiter_charram;
+static UINT8		*jupiter_expram;
+
+
+static READ8_HANDLER( jupiter_io_r );
+static WRITE8_HANDLER( jupiter_port_fe_w );
+static WRITE8_HANDLER( jupiter_expram_w );
+static WRITE8_HANDLER( jupiter_vh_charram_w );
 
 
 /* memory w/r functions */
 static ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x22ff) AM_NOP
-	AM_RANGE(0x2300, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x26ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2700, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2bff) AM_NOP
-	AM_RANGE(0x2c00, 0x2fff) AM_READWRITE(SMH_RAM, jupiter_vh_charram_w) AM_BASE(&jupiter_charram) AM_SIZE(&jupiter_charram_size)
-	AM_RANGE(0x3000, 0x3bff) AM_NOP
-	AM_RANGE(0x3c00, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0xffff) AM_RAM
+	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_WRITE(jupiter_vh_charram_w) AM_BASE(&jupiter_charram)
+	AM_RANGE(0x3c00, 0x3fff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x4800, 0xffff) AM_RAM AM_RAM_WRITE( jupiter_expram_w ) AM_BASE(&jupiter_expram)			/* Expansion RAM */
 ADDRESS_MAP_END
 
 /* port i/o functions */
 static ADDRESS_MAP_START( jupiter_io , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x00fe, 0xfffe) AM_WRITE( jupiter_port_fe_w )
-	AM_RANGE( 0xfefe, 0xfefe) AM_READ_PORT( "KEY0" )
-	AM_RANGE( 0xfdfe, 0xfdfe) AM_READ_PORT( "KEY1" )
-	AM_RANGE( 0xfbfe, 0xfbfe) AM_READ_PORT( "KEY2" )
-	AM_RANGE( 0xf7fe, 0xf7fe) AM_READ_PORT( "KEY3" )
-	AM_RANGE( 0xeffe, 0xeffe) AM_READ_PORT( "KEY4" )
-	AM_RANGE( 0xdffe, 0xdffe) AM_READ_PORT( "KEY5" )
-	AM_RANGE( 0xbffe, 0xbffe) AM_READ_PORT( "KEY6" )
-	AM_RANGE( 0x7ffe, 0x7ffe) AM_READ( jupiter_port_7ffe_r )
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE( jupiter_io_r, jupiter_port_fe_w ) 
 ADDRESS_MAP_END
-
-/* graphics output */
-
-static const gfx_layout jupiter_charlayout =
-{
-	8, 8,	/* 8x8 characters */
-	128,	/* 128 characters */
-	1,		/* 1 bits per pixel */
-	{0},	/* no bitplanes; 1 bit per pixel */
-	{0, 1, 2, 3, 4, 5, 6, 7},
-	{0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-	8*8 	/* each character takes 8 consecutive bytes */
-};
-
-static PALETTE_INIT( jupiter )
-{
-	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,RGB_WHITE); /* white */
-	palette_set_color(machine,2,RGB_WHITE); /* white */
-	palette_set_color(machine,3,RGB_BLACK); /* black */
-}
-
-static GFXDECODE_START( jupiter )
-	GFXDECODE_ENTRY( "main", 0x2c00, jupiter_charlayout, 0, 2 )
-GFXDECODE_END
 
 
 /* keyboard input */
@@ -111,6 +86,7 @@ static INPUT_PORTS_START (jupiter)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) 			PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) 			PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR('<')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) 			PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR('>')
+
 	PORT_START("KEY3")	/* 3: 0xF7FE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) 			PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) 			PORT_CHAR('2') PORT_CHAR('@')
@@ -148,53 +124,208 @@ static INPUT_PORTS_START (jupiter)
 
 	PORT_START("CFG")	/* 8: machine config */
 	PORT_DIPNAME( 0x03, 2, "RAM Size")
-	PORT_DIPSETTING(	0, "3Kb")
-	PORT_DIPSETTING(	1, "19Kb")
-	PORT_DIPSETTING(	2, "49Kb")
+	PORT_DIPSETTING(	0, "No RAM Expansion")
+	PORT_DIPSETTING(	1, "16KB RAM Expansion")
+	PORT_DIPSETTING(	2, "48KB RAM Expansion")
 INPUT_PORTS_END
 
-/* Sound output */
 
-static INTERRUPT_GEN( jupiter_interrupt )
+static READ8_HANDLER( jupiter_io_r )
 {
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	UINT8 data = 0xff;
+
+	if ( ( offset & 0xff ) != 0xfe )
+		return data;
+
+	if ( ! ( offset & 0x0100 ) )
+	{
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY0" ) );
+	}
+	if ( ! ( offset & 0x0200 ) )
+	{
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY1" ) );
+	}
+	if ( ! ( offset & 0x0400 ) )
+	{
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY2" ) );
+	}
+	if ( ! ( offset & 0x0800 ) )
+	{
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY3" ) );
+	}
+	if ( ! ( offset & 0x1000 ) )
+	{
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY4" ) );
+	}
+	if ( ! ( offset & 0x2000 ) )
+	{
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY5" ) );
+	}
+	if ( ! ( offset & 0x4000 ) )
+	{
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY6" ) );
+	}
+	if ( ! ( offset & 0x8000 ) )
+	{
+//		cassette_output( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), -1 );
+		speaker_level_w(0,0);
+		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY7" ) );;
+	}
+	if ( cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) < 0 )
+	{
+		data &= ~0x20;
+	}
+	return data;
+}
+
+
+static WRITE8_HANDLER( jupiter_port_fe_w )
+{
+//	cassette_output( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), 1 );
+	speaker_level_w(0,1);
+}
+
+
+static WRITE8_HANDLER( jupiter_expram_w )
+{
+	if ( offset > 0x4000 )
+	{
+		if ( input_port_read(machine, "CFG") >= 1 )
+			jupiter_expram[offset] = data;
+	}
+	else
+	{
+		if ( input_port_read(machine, "CFG") == 2 )
+			jupiter_expram[offset] = data;
+	}
+}
+
+
+/* graphics output */
+
+static PALETTE_INIT( jupiter )
+{
+	palette_set_color(machine,0,RGB_BLACK); /* black */
+	palette_set_color(machine,1,RGB_WHITE); /* white */
+	palette_set_color(machine,2,RGB_WHITE); /* white */
+	palette_set_color(machine,3,RGB_BLACK); /* black */
+}
+
+
+static const gfx_layout jupiter_charlayout =
+{
+	8, 8,	/* 8x8 characters */
+	128,	/* 128 characters */
+	1,		/* 1 bits per pixel */
+	{0},	/* no bitplanes; 1 bit per pixel */
+	{0, 1, 2, 3, 4, 5, 6, 7},
+	{0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+	8*8 	/* each character takes 8 consecutive bytes */
+};
+
+
+static GFXDECODE_START( jupiter )
+	GFXDECODE_ENTRY( "main", 0x2c00, jupiter_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "main", 0x2c00, jupiter_charlayout, 2, 1 )
+GFXDECODE_END
+
+
+static WRITE8_HANDLER( jupiter_vh_charram_w )
+{
+	if(data == jupiter_charram[offset])
+		return; /* no change */
+
+	jupiter_charram[offset] = data;
+
+	/* decode character graphics again */
+	decodechar(machine->gfx[0], offset / 8, jupiter_charram);
+	decodechar(machine->gfx[1], offset / 8, jupiter_charram);
+}
+
+
+static TIMER_CALLBACK( jupiter_set_irq_callback )
+{
+	cpunum_set_input_line( machine, 0, 0, ASSERT_LINE );
+}
+
+
+static TIMER_CALLBACK( jupiter_clear_irq_callback )
+{
+	cpunum_set_input_line( machine, 0, 0, CLEAR_LINE );
+}
+
+
+static VIDEO_START( jupiter )
+{
+	jupiter_set_irq_timer = timer_alloc( jupiter_set_irq_callback, NULL );
+	jupiter_clear_irq_timer = timer_alloc( jupiter_clear_irq_callback, NULL );
+
+	timer_adjust_periodic( jupiter_set_irq_timer,
+		video_screen_get_time_until_pos( machine->primary_screen, 31*8, 0 ),
+		0, video_screen_get_frame_period( machine->primary_screen ) );
+
+	timer_adjust_periodic( jupiter_clear_irq_timer,
+		video_screen_get_time_until_pos( machine->primary_screen, 32*8, 0 ),
+		0, video_screen_get_frame_period( machine->primary_screen ) );
+}
+
+
+static VIDEO_UPDATE( jupiter )
+{
+	int offs;
+
+	for(offs = 0; offs < 768; offs++)
+	{
+		int code = videoram[offs];
+		int sx, sy;
+
+		sy = (offs / 32) * 8;
+		sx = (offs % 32) * 8;
+
+		drawgfx(bitmap, ( code & 0x80 ) ? screen->machine->gfx[1] : screen->machine->gfx[0],
+			code & 0x7f, 0, 0,0, sx,sy, NULL, TRANSPARENCY_NONE, 0);
+	}
+
+	return 0;
 }
 
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3250000)        /* 3.25 Mhz */
+	MDRV_CPU_ADD("main", Z80, XTAL_6_5MHz/2)        /* 3.25 Mhz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem, 0)
 	MDRV_CPU_IO_MAP(jupiter_io, 0)
-	MDRV_CPU_VBLANK_INT("main", jupiter_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( jupiter )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32 * 8, 24 * 8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32 * 8 - 1, 0, 24 * 8 - 1)
+	MDRV_SCREEN_RAW_PARAMS( XTAL_6_5MHz, 416, 0, 256, 264, 0, 192 )
+
 	MDRV_GFXDECODE( jupiter )
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(jupiter)
 
+	MDRV_VIDEO_START( jupiter )
 	MDRV_VIDEO_UPDATE( jupiter )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
+
 
 ROM_START (jupiter)
 	ROM_REGION (0x10000, "main",0)
 	ROM_LOAD ("jupiter.lo", 0x0000, 0x1000, CRC(dc8438a5) SHA1(8fa97eb71e5dd17c7d190c6587ee3840f839347c))
 	ROM_LOAD ("jupiter.hi", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3))
 ROM_END
+
 
 static void jupiter_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -214,31 +345,9 @@ static void jupiter_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 	}
 }
 
-static void jupiter_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(jupiter_tap); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(jupiter_tap); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(jupiter)
 	CONFIG_DEVICE(jupiter_cartslot_getinfo)
-	CONFIG_DEVICE(jupiter_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */

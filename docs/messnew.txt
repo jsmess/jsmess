@@ -90,6 +90,8 @@ System Driver Changes:
   black and white, and fixed quickloading. System is now fully 
   working, including the "Säkkijärven polkka" program. [Curt Coder]
 
+- [JUPITER] Fixed regression; driver works again.  [Wilbert Pol]
+
 - [PET] Refactored cartridge code to rely on MESS core functions. Disabled
   .crt support (.a0 and .b0 files working as before) since I doubt these 
   computers used the same format as C64. More work when/if more documents 
