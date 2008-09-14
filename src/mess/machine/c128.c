@@ -946,6 +946,19 @@ DRIVER_INIT( c128pal )
 	vdc8563_set_rastering(0);
 }
 
+DRIVER_INIT( c128d )
+{
+	DRIVER_INIT_CALL( c128 );
+//	drive_config (type_1541, 0, 0, 1, 8);
+}
+
+DRIVER_INIT( c128dpal )
+{
+	DRIVER_INIT_CALL( c128d );
+//	drive_config (type_1541, 0, 0, 1, 8);
+}
+
+
 MACHINE_RESET( c128 )
 {
 	c64_common_init_machine(machine);

@@ -656,7 +656,7 @@ INTERRUPT_GEN( vic20_frame_interrupt )
 	keyboard[6] = input_port_read(machine, "ROW6");
 	keyboard[7] = input_port_read(machine, "ROW7");
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/* Caps Lock */
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/* Shift Lock */
 }
 
 

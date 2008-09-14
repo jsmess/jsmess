@@ -702,13 +702,13 @@ ROM_START( c128fin )
 	ROM_LOAD( "318019-04.bin", 0x104000, 0x4000, BAD_DUMP CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )			// BASIC hi
 	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, BAD_DUMP CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
 	ROM_SYSTEM_BIOS( 0, "fin1", "set 1" )
-	ROMX_LOAD( "editor.finnish1.bin", 0x10c000, 0x1000, BAD_DUMP CRC(71002a97), ROM_BIOS(1) )
-	ROMX_LOAD( "kernalpart.finnish1.bin", 0x10e000, 0x2000, BAD_DUMP CRC(167b8364), ROM_BIOS(1) )
+	ROMX_LOAD( "editor.finnish1.bin", 0x10c000, 0x1000, BAD_DUMP CRC(71002a97) SHA1(e0771493503225d309e51239249e8d92da55ca37), ROM_BIOS(1) )
+	ROMX_LOAD( "kernalpart.finnish1.bin", 0x10e000, 0x2000, BAD_DUMP CRC(167b8364) SHA1(2e51c562ef5ae6aa4cd333c560afed0c34902e28), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "fin2", "set 2" )
-	ROMX_LOAD( "editor.finnish2.bin", 0x10c000, 0x1000, BAD_DUMP CRC(b7ff5efe), ROM_BIOS(2) )
-	ROMX_LOAD( "kernalpart.finnish2.bin", 0x10e000, 0x2000, BAD_DUMP CRC(7b0d2140), ROM_BIOS(2) )
+	ROMX_LOAD( "editor.finnish2.bin", 0x10c000, 0x1000, BAD_DUMP CRC(b7ff5efe) SHA1(a1f574d010e2d0c754444258709818ec76667cc4), ROM_BIOS(2) )
+	ROMX_LOAD( "kernalpart.finnish2.bin", 0x10e000, 0x2000, BAD_DUMP CRC(5ce42fc8) SHA1(f5d604d89daedb47a1abe4b0aa41ea762829e71e), ROM_BIOS(2) )
 
-	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) )
+	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
 	/* Swedish character set while waiting for a real dump */
 	ROM_LOAD( "325181-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) )
 
@@ -722,10 +722,10 @@ ROM_START( c128fra )
 	ROM_LOAD( "318018-04.bin", 0x100000, 0x4000, BAD_DUMP CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )			// BASIC lo
 	ROM_LOAD( "318019-04.bin", 0x104000, 0x4000, BAD_DUMP CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )			// BASIC hi
 	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, BAD_DUMP CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "editor.french.bin", 0x10c000, 0x1000, BAD_DUMP CRC(3e086a24) )
-	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) )
-	ROM_LOAD( "kernalpart.french.bin", 0x10e000, 0x2000, BAD_DUMP CRC(ca5e1179) )
-	ROM_LOAD( "characters.french.325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) )
+	ROM_LOAD( "editor.french.bin", 0x10c000, 0x1000, BAD_DUMP CRC(3e086a24) SHA1(0a2f67455166f8dac101f8f8564a1c0364cb456a) )
+	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
+	ROM_LOAD( "kernalpart.french.bin", 0x10e000, 0x2000, BAD_DUMP CRC(ca5e1179) SHA1(d234a031caf59a0f66871f2babe1644783e66cf7) )
+	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
@@ -738,9 +738,9 @@ ROM_START( c128nor )
 	ROM_LOAD( "318018-04.bin", 0x100000, 0x4000, BAD_DUMP CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )			// BASIC lo
 	ROM_LOAD( "318019-04.bin", 0x104000, 0x4000, BAD_DUMP CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )			// BASIC hi
 	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, BAD_DUMP CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "editor.norwegian.bin", 0x10c000, 0x1000, BAD_DUMP CRC(84c55911) )
-	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) )
-	ROM_LOAD( "kernalpart.norwegian.bin", 0x10e000, 0x2000, BAD_DUMP CRC(3ba48012) )
+	ROM_LOAD( "editor.norwegian.bin", 0x10c000, 0x1000, BAD_DUMP CRC(84c55911) SHA1(22f6c5f40d4e895ea51e8432b30c219eacb75778) )
+	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
+	ROM_LOAD( "kernalpart.norwegian.bin", 0x10e000, 0x2000, BAD_DUMP CRC(3ba48012) SHA1(21a90256a3572a890f8027a085d851bf818b0dda) )
 	/* standard vic20 based norwegian */
 	ROM_LOAD( "char.nor", 0x120000, 0x2000, BAD_DUMP CRC(ba95c625) SHA1(5a87faa457979e7b6f434251a9e32f4483b337b3) )
 
@@ -813,10 +813,10 @@ ROM_START( c128drit )
 	ROM_REGION( 0x132800, "main", 0 )
 	ROM_LOAD( "318022-01.bin", 0x100000, 0x8000, CRC(e857df90) SHA1(5c2d7bbda2c3f9a926bd76ad19dc0c8c733c41cd) )			// BASIC lo + hi - based on BASIC rev.0
 	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, BAD_DUMP CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "editor.italian.bin", 0x10c000, 0x1000, BAD_DUMP CRC(8df58148) )
-	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) )
-	ROM_LOAD( "kernalpart.italian.bin", 0x10e000, 0x2000, BAD_DUMP CRC(7b0d2140) )
-	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) )
+	ROM_LOAD( "editor.italian.bin", 0x10c000, 0x1000, BAD_DUMP CRC(8df58148) SHA1(39add4c0adda7a64f68a09ae8742599091228017) )
+	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
+	ROM_LOAD( "kernalpart.italian.bin", 0x10e000, 0x2000, BAD_DUMP CRC(7b0d2140) SHA1(f5d604d89daedb47a1abe4b0aa41ea762829e71e) )
+	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
 
 	ROM_REGION( 0x10000, "m8502", ROMREGION_ERASEFF )
 	C1571_ROM("cpu_vc1540")
@@ -861,11 +861,11 @@ COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, c128pal,  c128,  "Commodor
 COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, c128pal,  c128,  "Commodore Business Machines Co.", "Commodore 128 (PAL, Norway)", 0)
 /* other countries spain, belgium, ... */
 
-COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128,     c128d, "Commodore Business Machines Co.", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING)
-COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128pal,  c128d, "Commodore Business Machines Co.", "Commodore 128D PAL", GAME_NOT_WORKING)
+COMP( 1985, c128dpr,   c128,  0,   c128d,    c128,    c128d,    c128d, "Commodore Business Machines Co.", "Commodore 128D (NTSC, proto)", GAME_NOT_WORKING)
+COMP( 1985, c128d,     c128,  0,   c128dpal, c128,    c128dpal, c128d, "Commodore Business Machines Co.", "Commodore 128D PAL", GAME_NOT_WORKING)
 
-COMP( 1986, c128dcr,   c128,  0,   c128d,    c128,    c128,     c128d, "Commodore Business Machines Co.", "Commodore 128DCR NTSC", GAME_NOT_WORKING)
-COMP( 1986, c128drde,  c128,  0,   c128dpal, c128ger, c128pal,  c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Germany)", GAME_NOT_WORKING)
-COMP( 1986, c128drit,  c128,  0,   c128dpal, c128ita, c128pal,  c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Italy)", GAME_NOT_WORKING)
-COMP( 1986, c128drsw,  c128,  0,   c128dpal, c128swe, c128pal,  c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Sweden)", GAME_NOT_WORKING)
-//COMP( 1986, c128d81,   c128,  0,   c128d,    c128,    c128,     c128d, "Commodore Business Machines Co.", "Commodore "128D/81" NTSC", GAME_NOT_WORKING) // no floppy drive emulation makes this useless atm
+COMP( 1986, c128dcr,   c128,  0,   c128d,    c128,    c128d,    c128d, "Commodore Business Machines Co.", "Commodore 128DCR NTSC", GAME_NOT_WORKING)
+COMP( 1986, c128drde,  c128,  0,   c128dpal, c128ger, c128dpal, c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Germany)", GAME_NOT_WORKING)
+COMP( 1986, c128drit,  c128,  0,   c128dpal, c128ita, c128dpal, c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Italy)", GAME_NOT_WORKING)
+COMP( 1986, c128drsw,  c128,  0,   c128dpal, c128swe, c128dpal, c128d, "Commodore Business Machines Co.", "Commodore 128DCR (PAL, Sweden)", GAME_NOT_WORKING)
+//COMP( 1986, c128d81,   c128,  0,   c128d,    c128,    c128d,    c128d, "Commodore Business Machines Co.", "Commodore "128D/81" NTSC", GAME_NOT_WORKING) // no floppy drive emulation makes this useless atm

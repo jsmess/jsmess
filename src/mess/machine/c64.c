@@ -100,6 +100,12 @@ static int is_c128(running_machine *machine)
 	return !strncmp(machine->gamedrv->name, "c128", 4);
 }
 
+/* Needed to initialize correctly the floppy drive emulation */
+/*static int is_c128d(running_machine *machine)
+{
+	return !strncmp(machine->gamedrv->name, "c128d", 5);
+}*/
+
 static void c64_nmi(running_machine *machine)
 {
 	static int nmilevel = 0;
@@ -1055,7 +1061,7 @@ DRIVER_INIT( sx64 )
 
 void c64_common_init_machine (running_machine *machine)
 {
-	if (is_sx64)
+	if (is_sx64 /* || is_c128d(machine) */)
 	{
 		serial_config(machine, &fake_drive_interface);
 		drive_reset ();

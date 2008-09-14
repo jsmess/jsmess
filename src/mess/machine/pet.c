@@ -725,7 +725,7 @@ INTERRUPT_GEN( pet_frame_interrupt )
 		}
 	}
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x80 ? 1 : 0);	/*KB_CAPSLOCK_FLAG */
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
 }
 
 

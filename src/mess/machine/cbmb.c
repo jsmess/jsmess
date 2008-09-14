@@ -432,10 +432,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 
 	vic2_frame_interrupt (machine, 0);
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/*KB_CAPSLOCK_FLAG */
-#if 0
-	set_led_status (0, input_port_read(machine, "DSW0") & 0x100 ? 1 : 0);		/*KB_NUMLOCK_FLAG */
-#endif
+	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
 }
 
 
