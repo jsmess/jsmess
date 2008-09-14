@@ -32,6 +32,8 @@ Ports:
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
+#include "formats/jupi_tap.h"
+
 
 /* This needs to be moved to drivers/xtal */
 #define XTAL_6_5MHz	6500000
@@ -289,6 +291,14 @@ static VIDEO_UPDATE( jupiter )
 	return 0;
 }
 
+
+static cassette_config jupiter_cassette_config =
+{
+	jupiter_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED
+};
+
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
 	/* basic machine hardware */
@@ -316,7 +326,7 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", jupiter_cassette_config )
 MACHINE_DRIVER_END
 
 
