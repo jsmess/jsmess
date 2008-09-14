@@ -93,10 +93,9 @@
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
-#define LIGHTPEN_BUTTON		(((input_port_read(machine, "DSW0") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "TRACKIPT") & 0x02))
-#define LIGHTPEN_POINTER	(((input_port_read(machine, "DSW0") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "DSW0") & 0x1000))
-#define LIGHTPEN_X_VALUE	(input_port_read(machine, "TRACKX") & ~1)
-#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "TRACKY") & ~1)
+#define LIGHTPEN_BUTTON		(input_port_read(machine, "OTHER") & 0x04)
+#define LIGHTPEN_X_VALUE	(input_port_read(machine, "LIGHTX") & ~0x01)
+#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "LIGHTY") & ~0x01)
 
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */

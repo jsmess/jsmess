@@ -359,8 +359,8 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
 #if 0
-	int controller1 = input_port_read(Machine, "DSW0") & 0xe000;
-	int controller2 = input_port_read(Machine, "DSW0") & 0x0e00;
+	int controller1 = input_port_read(Machine, "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(Machine, "CTRLSEL") & 0x70;
 #endif
 
 	tpi6525_0_irq0_level(machine, level);
@@ -371,26 +371,32 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	value = 0xff;
 	switch(controller1)
 	{
-		case 0x2000:
-		case 0x6000:
-			value &= ~(input_port_read(machine, "JOY0") & 0x1f);	/* Joy0 Directions + Button 1 */
+		case 0x00:
+			value &= ~input_port_read(machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
 			break;
 		
-		case 0x4000:
-			if (input_port_read(machine, "PADDLE1") & 0x100)		/* Paddle1 Button */
+		case 0x01:
+			if (input_port_read(machine, "OTHER") & 0x40)			/* Paddle2 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "PADDLE0") & 0x100)		/* Paddle0 Button */
+			if (input_port_read(machine, "OTHER") & 0x80)			/* Paddle1 Button */
 				value &= ~0x04;
 			break;
 
-		case 0x8000:
-			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
+		case 0x02:
+			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 			
-		case 0xa000:
+		case 0x03:
+			value &= ~(input_port_read(machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
+			break;
+		
+		case 0x04:
+/* was there any input on the lightpen? where is it mapped? */
+//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//				value &= ?? ;
 			break;
 
 		default:
@@ -398,28 +404,38 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 			break;
 	}
 
-	cbmb_keyline[8] = value;
+	c64_keyline[8] = value;
+
 
 	value = 0xff;
 	switch(controller2)
 	{
-		case 0x0200:
-		case 0x0600:
-			value &= ~(input_port_read(machine, "JOY1") & 0x1f);	/* Joy1 Directions + Button 1 */
+		case 0x00:
+			value &= ~input_port_read(machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
 			break;
 		
-		case 0x0400:
-			if (input_port_read(machine, "PADDLE3") & 0x100)		/* Paddle3 Button */
+		case 0x10:
+			if (input_port_read(machine, "OTHER") & 0x10)			/* Paddle4 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "PADDLE2") & 0x100)		/* Paddle2 Button */
+			if (input_port_read(machine, "OTHER") & 0x20)			/* Paddle3 Button */
 				value &= ~0x04;
 			break;
 
-		case 0x0800:
-			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
+		case 0x20:
+			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
+			break;
+		
+		case 0x30:
+			value &= ~(input_port_read(machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
+			break;
+
+		case 0x40:
+/* was there any input on the lightpen? where is it mapped? */
+//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//				value &= ?? ;
 			break;
 
 		default:
@@ -427,7 +443,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 			break;
 	}
 
-	cbmb_keyline[9] = value;
+	c64_keyline[9] = value;
 #endif
 
 	vic2_frame_interrupt (machine, 0);

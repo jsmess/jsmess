@@ -269,7 +269,7 @@ static UINT8 c64_cia0_port_a_r (void)
 		value &= t;
 	}
 
-	if ( input_port_read(Machine, "DSW0") & 0x0100 )
+	if ( input_port_read(Machine, "CTRLSEL") & 0x80 )
 		value &= c64_keyline[8];
 	else
 		value &= c64_keyline[9];
@@ -291,7 +291,7 @@ static UINT8 c64_cia0_port_b_r (void)
     if (!(cia0porta & 0x02)) value &= c64_keyline[1];
     if (!(cia0porta & 0x01)) value &= c64_keyline[0];
 
-	if ( input_port_read(Machine, "DSW0") & 0x0100 )
+	if ( input_port_read(Machine, "CTRLSEL") & 0x80 )
 		value &= c64_keyline[9];
     else 
 		value &= c64_keyline[8];
@@ -499,13 +499,13 @@ READ8_HANDLER( c64_read_io )
 
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(0, 0, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[8] : c64_keyline[9] );
+			cia_set_port_mask_value(0, 0, input_port_read(machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 			return cia_0_r(machine, offset);
 		}
 
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(0, 1, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[9] : c64_keyline[8] );
+			cia_set_port_mask_value(0, 1, input_port_read(machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 			return cia_0_r(machine, offset);
 		}
 
@@ -835,78 +835,83 @@ int c64_paddle_read (int which)
 {
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = cia_get_output_a(0);
-	int controller = input_port_read(Machine, "DSW0") & 0x0e00;
+	int controller1 = input_port_read(Machine, "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(Machine, "CTRLSEL") & 0x70;
 
-	if (which)
+	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */
+	switch (controller1)
 	{
-		switch (controller)
-		{
-			case 0x0400:
-				pot4 = (input_port_read(Machine, "PADDLE3") & 0xff);
-				break;
+		case 0x01:
+			if (which)
+				pot2 = input_port_read(Machine, "PADDLE2");
+			else
+				pot1 = input_port_read(Machine, "PADDLE1");
+			break;
 
-			case 0x0600:
-				if (input_port_read(Machine, "JOY1") & 0x20)	/* Joy1 Button 2 */
-					pot4 = 0x00;
-				break;
-			
-			case 0x0800:
-				pot4 = input_port_read(Machine, "TRACKY");
-				break;
-
-			case 0x4000:
-				pot2 = (input_port_read(Machine, "PADDLE1") & 0xff);
-				break;
-
-			case 0x6000:
-				if (input_port_read(Machine, "JOY0") & 0x20)	/* Joy0 Button 2 */
-					pot1 = 0x00;
-				break;
-			
-			case 0x8000:
+		case 0x02:
+			if (which)
 				pot2 = input_port_read(Machine, "TRACKY");
-				break;
-		
-			case 0xa000:
-				break;
-		
-			default:
-				logerror("Invalid Controller Setting %d\n", controller);
-				break;
-		}
-	}
-	else
-	{
-		switch (controller)
-		{
-			case 0x0400:
-				pot3 = (input_port_read(Machine, "PADDLE2") & 0xff);
-				break;
-			
-			case 0x0800:
-				pot3 = input_port_read(Machine, "TRACKX");
-				break;
-
-			case 0x4000:
-				pot1 = (input_port_read(Machine, "PADDLE0") & 0xff);
-				break;
-
-			case 0x8000:
+			else
 				pot1 = input_port_read(Machine, "TRACKX");
-				break;
-				
-			case 0x0600:
-			case 0x6000:
-			case 0xa000:
-				break;
-		
-			default:
-				logerror("Invalid Controller Setting %d\n", controller);
-				break;
-		}
+			break;
+
+		case 0x03:
+			if (input_port_read(Machine, "JOY1_2B") & 0x20)	/* Joy1 Button 2 */
+				pot1 = 0x00;
+			break;
+
+		case 0x04:
+			if (which)
+				pot2 = input_port_read(Machine, "LIGHTY");
+			else
+				pot1 = input_port_read(Machine, "LIGHTX");
+			break;
+
+		case 0x00:
+			break;
+
+		default:
+			logerror("Invalid Controller Setting %d\n", controller1);
+			break;
 	}
 
-	if (input_port_read(Machine, "DSW0") & 0x0100)		/* Swap */
+	switch (controller2)
+	{
+		case 0x01:
+			if (which)
+				pot4 = input_port_read(Machine, "PADDLE4");
+			else
+				pot3 = input_port_read(Machine, "PADDLE3");
+			break;
+
+		case 0x02:
+			if (which)
+				pot4 = input_port_read(Machine, "TRACKY");
+			else
+				pot3 = input_port_read(Machine, "TRACKX");
+			break;
+
+		case 0x03:
+			if (input_port_read(Machine, "JOY2_2B") & 0x20)	/* Joy2 Button 2 */
+				pot4 = 0x00;
+			break;
+
+		case 0x04:
+			if (which)
+				pot4 = input_port_read(Machine, "LIGHTY");
+			else
+				pot3 = input_port_read(Machine, "LIGHTX");
+			break;
+
+		case 0x00:
+			break;
+
+		default:
+			logerror("Invalid Controller Setting %d\n", controller1);
+			break;
+	}
+
+	if (input_port_read(Machine, "CTRLSEL") & 0x80)		/* Swap */
 	{
 		temp = pot1; pot1 = pot2; pot2 = pot1;
 		temp = pot3; pot3 = pot4; pot4 = pot3;
@@ -1128,8 +1133,8 @@ INTERRUPT_GEN( c64_frame_interrupt )
 {
 	static int monitor = -1;
 	int value, i;
-	int controller1 = input_port_read(Machine, "DSW0") & 0xe000;
-	int controller2 = input_port_read(Machine, "DSW0") & 0x0e00;
+	int controller1 = input_port_read(Machine, "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(Machine, "CTRLSEL") & 0x70;
 	static const char *c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 	static const char *c128ports[] = { "KP0", "KP1", "KP2" };
 
@@ -1175,26 +1180,32 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	value = 0xff;
 	switch(controller1)
 	{
-		case 0x2000:
-		case 0x6000:
-			value &= ~(input_port_read(machine, "JOY0") & 0x1f);	/* Joy0 Directions + Button 1 */
+		case 0x00:
+			value &= ~input_port_read(machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
 			break;
 		
-		case 0x4000:
-			if (input_port_read(machine, "PADDLE1") & 0x100)		/* Paddle1 Button */
+		case 0x01:
+			if (input_port_read(machine, "OTHER") & 0x40)			/* Paddle2 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "PADDLE0") & 0x100)		/* Paddle0 Button */
+			if (input_port_read(machine, "OTHER") & 0x80)			/* Paddle1 Button */
 				value &= ~0x04;
 			break;
 
-		case 0x8000:
-			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
+		case 0x02:
+			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 			
-		case 0xa000:
+		case 0x03:
+			value &= ~(input_port_read(machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
+			break;
+		
+		case 0x04:
+/* was there any input on the lightpen? where is it mapped? */
+//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//				value &= ?? ;
 			break;
 
 		default:
@@ -1208,23 +1219,32 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	value = 0xff;
 	switch(controller2)
 	{
-		case 0x0200:
-		case 0x0600:
-			value &= ~(input_port_read(machine, "JOY1") & 0x1f);	/* Joy1 Directions + Button 1 */
+		case 0x00:
+			value &= ~input_port_read(machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
 			break;
 		
-		case 0x0400:
-			if (input_port_read(machine, "PADDLE3") & 0x100)		/* Paddle3 Button */
+		case 0x10:
+			if (input_port_read(machine, "OTHER") & 0x10)			/* Paddle4 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "PADDLE2") & 0x100)		/* Paddle2 Button */
+			if (input_port_read(machine, "OTHER") & 0x20)			/* Paddle3 Button */
 				value &= ~0x04;
 			break;
 
-		case 0x0800:
-			if (input_port_read(machine, "TRACKIPT") & 0x02)		/* Mouse Button Left */
+		case 0x20:
+			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "TRACKIPT") & 0x01)		/* Mouse Button Right */
+			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
+			break;
+		
+		case 0x30:
+			value &= ~(input_port_read(machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
+			break;
+
+		case 0x40:
+/* was there any input on the lightpen? where is it mapped? */
+//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//				value &= ?? ;
 			break;
 
 		default:
@@ -1257,7 +1277,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	vic2_frame_interrupt (machine, cpunum);
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
-	set_led_status (0, input_port_read(machine, "DSW0") & 0x0100 ? 1 : 0);		/* Joystick Swap */ 
+	set_led_status (0, input_port_read(machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */ 
 }
 
 

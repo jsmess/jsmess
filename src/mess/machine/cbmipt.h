@@ -7,7 +7,6 @@
 INPUT_PORTS_EXTERN( common_cbm_keyboard );	/* shared with c16, c65, c128 */
 INPUT_PORTS_EXTERN( c64_special );
 INPUT_PORTS_EXTERN( c64_controls );			/* shared with c65, c128, cbmb */
-INPUT_PORTS_EXTERN( c64_control_cfg );		/* shared with c65, c128, cbmb */
 INPUT_PORTS_EXTERN( c64_config );
 
 
