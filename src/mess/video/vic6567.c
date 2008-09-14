@@ -213,7 +213,7 @@ static struct {
 	UINT16 c64_bitmap[2], bitmapmulti[4], mono[2], multi[4], ecmcolor[2], colors[4], spritemulti[4], spritemulti_buffer[4];
 
 	int lastline, rasterline, raster_mod;
-	UINT64 rasterline_start_cpu_cycles;
+	UINT64 rasterline_start_cpu_cycles, totalcycles;
 
 	/* background/foreground for sprite collision */
 	UINT8 *screen[216], shift[216];
@@ -271,6 +271,7 @@ void vic6567_init (int chip_vic2e, int pal,
 {
 	memset(&vic2, 0, sizeof(vic2));
 
+	vic2.totalcycles = 63;
 	vic2.pal = pal;
 	vic2.lines = VIC2_LINES;
 
@@ -364,7 +365,7 @@ INTERRUPT_GEN( vic2_frame_interrupt )
 WRITE8_HANDLER ( vic2_port_w )
 {
 	int startx, cycles;
-
+	// printf("vic write %04x %04x %04x\n", offset, data, vic2.rasterline);
 	DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;
 	switch (offset)
@@ -578,7 +579,7 @@ WRITE8_HANDLER ( vic2_port_w )
 	cycles = (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
 
 	if (cycles > VIC2_CYCLESPERLINE - 1) cycles = VIC2_CYCLESPERLINE;
-	startx = VIC2_FIRSTRASTERCOLUMNS + cycles * 8;
+	startx = VIC2_FIRSTRASTERCOLUMNS + cycles * 8 * (63 / vic2.totalcycles);
 	if (startx >= VIC2_COLUMNS) startx -= VIC2_COLUMNS;
 
 	// sprites chenges are active only from the next raster line
@@ -1217,14 +1218,8 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 		line = end;
 	}
 
-	if (LINES25)
-	{
-		vline = line - vic2.y_begin - YPOS;
-	}
-	else
-	{
-		vline = line - vic2.y_begin - YPOS + 8 - VERTICALPOS;
-	}
+	vline = line - YPOS + 3 - VERTICALPOS;
+
 	if (first + 1 < vic2.y_end + YPOS)
 		end = first + 1;
 	else
@@ -1375,6 +1370,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 //	int scanline = param;
 
 	vic2.rasterline++;
+	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
 
 	// update sprites registers
 	for (i=0x00; i <= 0x10; i++)
@@ -1429,13 +1425,24 @@ INTERRUPT_GEN( vic2_raster_irq )
 	}
 */
 /*
+		if (((vic2.reg[0x11] & 7) == (vic2.reg[0x12] & 7)) && (vic2.rasterline >= 0x30) && (vic2.rasterline <= 0xf7)) // bad lines simulation
+		{
+			cpunum_set_clock(machine, 0, 0x57d0d);
+			vic2.totalcycles = 63 - 40;
+		}
+		else
+		{
+			cpunum_set_clock(machine, 0, 0xf08a0);
+			vic2.totalcycles = 63;
+		}
+*/
+/*
 	if (input_code_pressed(KEYCODE_Q)) { cpunum_set_clock(machine, 0, 0x93203); }
 	if (input_code_pressed(KEYCODE_W)) { cpunum_set_clock(machine, 0, 0xf08a0); }
 	if (input_code_pressed(KEYCODE_E)) printf("%04x    ",cpunum_get_clock(0));
 	if (input_code_pressed(KEYCODE_R)) printf("%04x    ", (int)(cpunum_get_clock(0)*63/103));
 	vic2.raster_mod += 63 - (activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
 	if (input_code_pressed(KEYCODE_Q)) printf("%04x-%04x ",vic2.raster_mod, (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles));
-	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
 	if (vic2.raster_mod > 63)
 	{
 		vic2.raster_mod -= 63;
@@ -1475,6 +1482,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 		if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
 			vic2_drawlines (vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
 
+// if (vic2.rasterline == 0x80)
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
 			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
