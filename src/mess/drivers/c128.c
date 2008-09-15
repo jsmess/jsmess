@@ -725,7 +725,7 @@ ROM_START( c128fin )
 	ROMX_LOAD( "kernalpart.finnish1.bin", 0x10e000, 0x2000, BAD_DUMP CRC(167b8364) SHA1(2e51c562ef5ae6aa4cd333c560afed0c34902e28), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "fin2", "set 2" )
 	ROMX_LOAD( "editor.finnish2.bin", 0x10c000, 0x1000, BAD_DUMP CRC(b7ff5efe) SHA1(a1f574d010e2d0c754444258709818ec76667cc4), ROM_BIOS(2) )
-	ROMX_LOAD( "kernalpart.finnish2.bin", 0x10e000, 0x2000, BAD_DUMP CRC(5ce42fc8) SHA1(f5d604d89daedb47a1abe4b0aa41ea762829e71e), ROM_BIOS(2) )
+	ROMX_LOAD( "kernalpart.finnish2.bin", 0x10e000, 0x2000, BAD_DUMP CRC(5ce42fc8) SHA1(0ec2bf1c185d26da7f62f88c6e24de7b16d78fe5), ROM_BIOS(2) )
 
 	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
 	/* Swedish character set while waiting for a real dump */
