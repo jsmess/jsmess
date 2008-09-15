@@ -19,12 +19,13 @@ VIDEO_UPDATE( sapi1 )
  	int x,y,j,b;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
 
-	for(y = 0; y < 32; y++ )
+	for(y = 0; y < 24; y++ )
 	{
-		for(x = 0; x < 64; x++ )
+		for(x = 0; x < 40; x++ )
 		{
 			int code = program_read_byte(0x3800+ x + y*64);
 			if (code<0x20) code |= 0x40;
+			if (code==0xa0) code = 0xc0;
 			for(j = 0; j < 12; j++ )
 			{
 				for(b = 0; b < 6; b++ )

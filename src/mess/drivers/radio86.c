@@ -308,11 +308,33 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_CASSETTE_ADD( "cassette", radio86_cassette_config )
 MACHINE_DRIVER_END
 
+static UINT8 *radio16_io_mirror = NULL;
+
+static OPBASE_HANDLER( radio16_opbase )
+{	
+	if (address >= 0x4000 && address <=0x7FFF) {
+			opbase->mask = 0xffff;
+			opbase->ram = radio16_io_mirror;
+			opbase->rom = radio16_io_mirror;
+			opbase->mem_min = 0x4000;
+			opbase->mem_max = 0x7fff;
+			radio16_io_mirror[address] = cpunum_get_reg(0, I8080_STATUS);
+	} 
+	return address;
+}
+
+static MACHINE_START( radio16 )
+{
+	radio16_io_mirror = auto_malloc( 0x8000 );
+	memory_set_opbase_handler( 0, radio16_opbase );
+}
+
 static MACHINE_DRIVER_START( radio16 )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(radio86)
     MDRV_CPU_MODIFY("main")
     MDRV_CPU_PROGRAM_MAP(radio86_16_mem, 0)
+    MDRV_MACHINE_START( radio16 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radiorom )

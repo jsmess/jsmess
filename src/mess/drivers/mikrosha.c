@@ -19,7 +19,7 @@
 /* Address maps */
 static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
-    AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
+    AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
     AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r)
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
@@ -128,12 +128,34 @@ static const cassette_config mikrosha_cassette_config =
 };
 
 
+static UINT8 *mikrosha_io_mirror = NULL;
+
+static OPBASE_HANDLER( mikrosha_opbase )
+{	
+	if (address >= 0x8000 && address <=0xBFFF) {
+			opbase->mask = 0xffff;
+			opbase->ram = mikrosha_io_mirror;
+			opbase->rom = mikrosha_io_mirror;
+			opbase->mem_min = 0x8000;
+			opbase->mem_max = 0xbfff;
+			mikrosha_io_mirror[address] = cpunum_get_reg(0, I8080_STATUS);
+	} 
+	return address;
+}
+
+static MACHINE_START( mikrosha )
+{
+	mikrosha_io_mirror = auto_malloc( 0xc000 );
+	memory_set_opbase_handler( 0, mikrosha_opbase );
+}
+
 static MACHINE_DRIVER_START( mikrosha )
-    /* basic machine hardware */
-    MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
-    MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
-    MDRV_CPU_IO_MAP(mikrosha_io, 0)
-    MDRV_MACHINE_RESET( radio86 )
+  /* basic machine hardware */
+  MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
+  MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
+  MDRV_CPU_IO_MAP(mikrosha_io, 0)
+  MDRV_MACHINE_START( mikrosha )
+  MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
 	MDRV_DEVICE_CONFIG( mikrosha_ppi8255_interface_1 )
