@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mikrosha_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x80, 0xbf ) AM_READ(radio_cpu_state_r)
+	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */

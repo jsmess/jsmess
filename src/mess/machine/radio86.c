@@ -173,6 +173,16 @@ READ8_HANDLER (radio_cpu_state_r )
 	return cpunum_get_reg(0, I8080_STATUS);	
 }
 
+READ8_HANDLER (radio_io_r )
+{
+	return program_read_byte((offset << 8) + offset);
+}
+
+WRITE8_HANDLER(radio_io_w )
+{
+	program_write_byte((offset << 8) + offset,data);
+}
+
 MACHINE_RESET( radio86 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);

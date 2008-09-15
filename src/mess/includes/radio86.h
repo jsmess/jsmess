@@ -19,6 +19,9 @@ extern MACHINE_RESET( radio86 );
 
 extern READ8_HANDLER (radio_cpu_state_r );
 
+extern READ8_HANDLER (radio_io_r );
+extern WRITE8_HANDLER(radio_io_w );
+
 extern const ppi8255_interface radio86_ppi8255_interface_1;
 extern const ppi8255_interface radio86_ppi8255_interface_2;
 extern const ppi8255_interface rk7007_ppi8255_interface;
