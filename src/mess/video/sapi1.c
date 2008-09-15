@@ -24,6 +24,7 @@ VIDEO_UPDATE( sapi1 )
 		for(x = 0; x < 64; x++ )
 		{
 			int code = program_read_byte(0x3800+ x + y*64);
+			if (code<0x20) code |= 0x40;
 			for(j = 0; j < 12; j++ )
 			{
 				for(b = 0; b < 6; b++ )
