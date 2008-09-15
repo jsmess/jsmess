@@ -156,12 +156,12 @@ static READ8_HANDLER( c128_read_io )
 		return c64_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(0, 0, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[8] : c64_keyline[9] );
+			cia_set_port_mask_value(0, 0, input_port_read(machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 			return cia_0_r(machine, offset);
 		}
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(0, 1, input_port_read(machine, "DSW0") & 0x0100 ? c64_keyline[9] : c64_keyline[8] );
+			cia_set_port_mask_value(0, 1, input_port_read(machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 			return cia_0_r(machine, offset);
 		}
 	else if (offset < 0xd00)
