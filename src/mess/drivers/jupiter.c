@@ -173,7 +173,7 @@ static READ8_HANDLER( jupiter_io_r )
 		speaker_level_w(0,0);
 		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY7" ) );;
 	}
-	if ( cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) < 0 )
+	if ( cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0 )
 	{
 		data &= ~0x20;
 	}
@@ -299,6 +299,7 @@ static cassette_config jupiter_cassette_config =
 	CASSETTE_STOPPED
 };
 
+
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
 	/* basic machine hardware */
@@ -359,6 +360,7 @@ static void jupiter_cartslot_getinfo(const mess_device_class *devclass, UINT32 s
 static SYSTEM_CONFIG_START(jupiter)
 	CONFIG_DEVICE(jupiter_cartslot_getinfo)
 SYSTEM_CONFIG_END
+
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
 COMP( 1981, jupiter,  0,		0,		jupiter,  jupiter,	0,		  jupiter,	"Cantab",  "Jupiter Ace" , 0)

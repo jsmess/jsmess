@@ -59,6 +59,24 @@ INLINE int jupiter_tap_silence(INT16 *buffer, int sample_pos, int samples)
 }
 
 
+INLINE int jupiter_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
+{
+	int i, samples;
+
+	samples = 0;
+	for ( i = 0; i < 8; i++ )
+	{
+		if ( data & 0x80 )
+			samples += jupiter_tap_cycle( buffer, sample_pos + samples, 21, 22 );
+		else
+			samples += jupiter_tap_cycle( buffer, sample_pos + samples, 10, 11 );
+
+		data <<= 1;
+	}
+	return samples;
+}
+
+
 static int jupiter_handle_tap(INT16 *buffer, const UINT8 *casdata)
 {
 	int	data_pos, sample_count;
@@ -95,21 +113,12 @@ static int jupiter_handle_tap(INT16 *buffer, const UINT8 *casdata)
 		/* Sync samples */
 		sample_count += jupiter_tap_cycle( buffer, sample_count, 8, 11 );
 
+		/* Output block type identification byte */
+		sample_count += jupiter_tap_byte( buffer, sample_count, ( block_size != 0x001A ) ? 0xFF : 0x00 );
+
 		/* Data samples */
 		for ( ; block_size ; data_pos++, block_size-- )
-		{
-			UINT8	data = casdata[data_pos];
-
-			for ( i = 0; i < 8; i++ )
-			{
-				if ( data & 0x80 )
-					sample_count += jupiter_tap_cycle( buffer, sample_count, 21, 22 );
-				else
-					sample_count += jupiter_tap_cycle( buffer, sample_count, 10, 11 );
-
-				data <<= 1;
-			}
-		}
+			sample_count += jupiter_tap_byte( buffer, sample_count, casdata[data_pos] );
 
 		/* End mark samples */
 		sample_count += jupiter_tap_cycle( buffer, sample_count, 12, 57 );
