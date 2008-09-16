@@ -2314,7 +2314,7 @@ static int ti99_R9901_1(int offset)
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
+	/*if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > 0)
 		answer |= 8;*/
 
 	return answer;
@@ -2347,8 +2347,16 @@ static int ti99_R9901_3(int offset)
 		answer = 4;	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
-		answer |= 8;
+	if ( ti99_model != model_99_8 )
+	{
+		if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > 0)
+			answer |= 8;
+	}
+	else
+	{
+		if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
+			answer |= 8;
+	}
 
 	return answer;
 }
@@ -2481,8 +2489,16 @@ static void ti99_8_PTGEN(int offset, int data)
 static void ti99_CS_motor(int offset, int data)
 {
 	running_machine *machine = Machine;
+	const device_config *img;
 
-	const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, ( offset-6 ) ? "cassette2" :  "cassette1" );
+	if ( ti99_model != model_99_8 )
+	{
+		img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, ( offset-6 ) ? "cassette2" :  "cassette1" );
+	}
+	else
+	{
+		img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	}
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
