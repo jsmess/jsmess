@@ -54,7 +54,6 @@ UINT8 vic6560[16];
 /* 2008-05 FP: lightpen code needs to read input port from vc20.c */
 
 #define LIGHTPEN_BUTTON		(((input_port_read(machine, "CFG") & 0xf0) == 0x20) && (input_port_read(machine, "JOY") & 0x40))
-#define LIGHTPEN_POINTER	(input_port_read(machine, "CFG") & 0x20)
 #define LIGHTPEN_X_VALUE	(input_port_read(machine, "LIGHTX") & ~0x01)
 #define LIGHTPEN_Y_VALUE	(input_port_read(machine, "LIGHTY") & ~0x01)
 
@@ -117,32 +116,10 @@ static int xsize, ysize, xpos, ypos;
 static int chargenaddr, videoaddr;
 
 /* values in videoformat */
-static UINT16 backgroundcolor, framecolor, helpercolor, white, black;
+static UINT16 backgroundcolor, framecolor, helpercolor;
 
 /* arrays for bit to color conversion without condition checking */
 static UINT16 mono[2], monoinverted[2], multi[4], multiinverted[4];
-
-/* transparent, white, black */
-static UINT32 pointercolortable[3] =
-{0};
-static const gfx_layout pointerlayout =
-{
-	8, 8,
-	1,
-	2,
-	{0, 64},
-	{0, 1, 2, 3, 4, 5, 6, 7},
-	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
-	8 * 8
-};
-
-static const UINT8 pointermask[] =
-{
-	0x00, 0x70, 0x60, 0x50, 0x08, 0x04, 0x00, 0x00,		/* blackmask */
-	0xf0, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00	/* whitemask */
-};
-
-static gfx_element *pointerelement;
 
 static void vic656x_init (void)
 {
@@ -168,10 +145,6 @@ void vic6561_init (int (*dma_read) (int), int (*dma_read_color) (int))
 	vic656x_init ();
 }
 
-static void vic6560_video_stop(running_machine *machine)
-{
-	freegfx(pointerelement);
-}
 
 VIDEO_START( vic6560 )
 {
@@ -179,17 +152,7 @@ VIDEO_START( vic6560 )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
-	black = 0;
-	white = 1;
-	pointerelement = allocgfx(&pointerlayout);
-	decodegfx(pointerelement, pointermask, 0, 1);
-	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
-	/* pointerelement->colortable = pointercolortable; */
-	pointercolortable[1] = 1;
-	pointercolortable[2] = 0;
-	pointerelement->total_colors = 3;
 	vic6560_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	add_exit_callback(machine, vic6560_video_stop);
 }
 
 WRITE8_HANDLER ( vic6560_port_w )
@@ -272,7 +235,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 		vic6560_drawlines (lastline, rasterline);
 		val = (rasterline / 2) & 0xff;
 		break;
-	case 6:						   /*lightpen horicontal */
+	case 6:						   /*lightpen horizontal */
 	case 7:						   /*lightpen vertical */
 		if (LIGHTPEN_BUTTON
 			&& ((attotime_to_double(timer_get_time ()) - lightpenreadtime) * VIC6560_VRETRACERATE >= 1))
@@ -300,27 +263,6 @@ WRITE8_HANDLER ( vic6560_port_w )
 	}
 	DBG_LOG (3, "vic6560_port_r", ("%.4x:%.2x\n", offset, val));
 	return val;
-}
-
-static int DOCLIP (rectangle *r1, const rectangle *r2)
-{
-	if (r1->min_x > r2->max_x)
-		return 0;
-	if (r1->max_x < r2->min_x)
-		return 0;
-	if (r1->min_y > r2->max_y)
-		return 0;
-	if (r1->max_y < r2->min_y)
-		return 0;
-	if (r1->min_x < r2->min_x)
-		r1->min_x = r2->min_x;
-	if (r1->max_x > r2->max_x)
-		r1->max_x = r2->max_x;
-	if (r1->min_y < r2->min_y)
-		r1->min_y = r2->min_y;
-	if (r1->max_y > r2->max_y)
-		r1->max_y = r2->max_y;
-	return 1;
 }
 
 static void vic6560_draw_character (int ybegin, int yend,
@@ -362,31 +304,6 @@ static void vic6560_draw_character_multi (int ybegin, int yend,
 	}
 }
 
-
-#ifndef GFX
-INLINE void vic6560_draw_pointer (bitmap_t *bitmap,
-								  rectangle *visible, int xoff, int yoff)
-{
-	/* this is a a static graphical object */
-	/* should be easy to convert to gfx_element!? */
-	static const UINT8 blackmask[] =
-	{0x00, 0x70, 0x60, 0x50, 0x08, 0x04, 0x00, 0x00};
-	static const UINT8 whitemask[] =
-	{0xf0, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00};
-	int i, j, y, x;
-
-	for (y = visible->min_y, j = yoff; y <= visible->max_y; y++, j++)
-	{
-		for (x = visible->min_x, i = xoff; x <= visible->max_x; x++, i++)
-		{
-			if ((blackmask[j] << i) & 0x80)
-				*BITMAP_ADDR16(bitmap, y, x) = black;
-			else if ((whitemask[j] << (i & ~1)) & 0x80)
-				*BITMAP_ADDR16(bitmap, y, x) = white;
-		}
-	}
-}
-#endif
 
 static void vic6560_drawlines (int first, int last)
 {
@@ -485,35 +402,12 @@ static void vic6560_drawlines (int first, int last)
 
 INTERRUPT_GEN( vic656x_raster_interrupt )
 {
-	rectangle r;
-
 	rasterline++;
 	if (rasterline >= vic656x_lines)
 	{
 		rasterline = 0;
 		vic6560_drawlines (lastline, vic656x_lines);
 		lastline = 0;
-
-		if (LIGHTPEN_POINTER)
-		{
-
-			r.min_x = LIGHTPEN_X_VALUE - 1 + VIC656X_MAME_XPOS;
-			r.max_x = r.min_x + 8 - 1;
-			r.min_y = LIGHTPEN_Y_VALUE - 1 + VIC656X_MAME_YPOS;
-			r.max_y = r.min_y + 8 - 1;
-
-			if (DOCLIP (&r, video_screen_get_visible_area(video_screen_first(machine->config))))
-			{
-#ifndef GFX
-				vic6560_draw_pointer (vic6560_bitmap, &r,
-									  r.min_x - (LIGHTPEN_X_VALUE + VIC656X_MAME_XPOS - 1),
-									  r.min_y - (LIGHTPEN_Y_VALUE + VIC656X_MAME_YPOS - 1));
-#else
-				drawgfx (vic6560_bitmap, pointerelement, 0, 0, 0, 0,
-						 r.min_x - 1, r.min_y - 1, &r, TRANSPARENCY_PEN, 0);
-#endif
-			}
-		}
 	}
 }
 

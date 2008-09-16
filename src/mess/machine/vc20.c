@@ -644,6 +644,20 @@ MACHINE_RESET( vic20 )
 }
 
 
+static TIMER_CALLBACK( lightpen_tick )
+{
+	if ((input_port_read(machine, "CFG") & 0xf0) == 0x20)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+	}
+}
+
 INTERRUPT_GEN( vic20_frame_interrupt )
 {
 	via_0_ca1_w(machine, 0, vc20_via0_read_ca1 (machine, 0));
@@ -655,6 +669,9 @@ INTERRUPT_GEN( vic20_frame_interrupt )
 	keyboard[5] = input_port_read(machine, "ROW5");
 	keyboard[6] = input_port_read(machine, "ROW6");
 	keyboard[7] = input_port_read(machine, "ROW7");
+
+	/* check if lightpen has been chosen as input: if so, enable crosshair */
+	timer_set(attotime_zero, NULL, 0, lightpen_tick);
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/* Shift Lock */
 }

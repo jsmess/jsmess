@@ -92,11 +92,9 @@
 #define FIRSTLINE ((VIC2_VISIBLELINES - VIC2_VSIZE)/2)
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
-
-#define LIGHTPEN_BUTTON		(((input_port_read(machine, "CTRLSEL") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "TRACKIPT") & 0x02))
-#define LIGHTPEN_POINTER	(((input_port_read(machine, "CTRLSEL") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "CTRLSEL") & 0x1000))
-#define LIGHTPEN_X_VALUE	(input_port_read(machine, "TRACKX") & ~1)
-#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "TRACKY") & ~1)
+#define LIGHTPEN_BUTTON		(input_port_read(machine, "OTHER") & 0x04)
+#define LIGHTPEN_X_VALUE	(input_port_read(machine, "LIGHTX") & ~0x01)
+#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "LIGHTY") & ~0x01)
 
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
@@ -123,7 +121,7 @@
 #define VIC3_LINES	   ((vic2.reg[0x31]&0x19)==0x19?400:200)
 #define VIC3_BITPLANES_WIDTH (vic2.reg[0x31]&0x80?640:320)
 
-	 /*#define VIC2E_TEST (vic2[0x30]&2) */
+/*#define VIC2E_TEST (vic2[0x30]&2) */
 #define DOUBLE_CLOCK (vic2.reg[0x30]&1)
 
 /* sprites 0 .. 7 */

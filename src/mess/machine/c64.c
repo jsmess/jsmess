@@ -1129,6 +1129,20 @@ MACHINE_START( c64 )
 }
 
 
+static TIMER_CALLBACK( lightpen_tick )
+{
+	if ((input_port_read(machine, "CTRLSEL") & 0x07) == 0x04)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+	}
+}
+
 INTERRUPT_GEN( c64_frame_interrupt )
 {
 	static int monitor = -1;
@@ -1275,6 +1289,9 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	}
 
 	vic2_frame_interrupt (machine, cpunum);
+
+	/* check if lightpen has been chosen as input: if so, enable crosshair */
+	timer_set(attotime_zero, NULL, 0, lightpen_tick);
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
 	set_led_status (0, input_port_read(machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */ 
