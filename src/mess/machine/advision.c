@@ -43,6 +43,8 @@ MACHINE_RESET( advision )
 	/* enable internal ROM */
 	cpunum_set_input_line(machine, 0, MCS48_INPUT_EA, CLEAR_LINE);
 
+	memory_set_bank(1, 0);
+
 	/* reset sound CPU */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -59,6 +61,8 @@ WRITE8_HANDLER( advision_bankswitch_w )
 	advision_state *state = machine->driver_data;
 
 	cpunum_set_input_line(machine, 0, MCS48_INPUT_EA, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+
+	memory_set_bank(1, BIT(data, 2));
 
 	state->rambank = (data & 0x03) << 8;
 }
