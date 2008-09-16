@@ -62,7 +62,6 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "video/vic4567.h"
 #include "video/vic6567.h"
 #include "includes/cbmserb.h"
-#include "includes/vc1541.h"
 
 
 /*************************************

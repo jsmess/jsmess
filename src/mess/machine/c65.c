@@ -13,7 +13,6 @@
 #include "machine/6526cia.h"
 
 #include "includes/cbmserb.h"
-#include "includes/vc1541.h"
 #include "video/vic4567.h"
 
 #include "includes/c65.h"

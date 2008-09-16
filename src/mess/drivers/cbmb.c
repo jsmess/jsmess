@@ -106,7 +106,6 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 #include "video/vic6567.h"
 #include "video/mc6845.h"
 #include "includes/cbmserb.h"
-#include "includes/vc1541.h"
 
 #include "includes/cbmb.h"
 

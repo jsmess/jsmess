@@ -114,17 +114,12 @@ current status:
 		the variants supported by Vice in the enum)
 */
 
-
-#include <assert.h>
-#include <stdio.h>
-
 #include "driver.h"
 #include "deprecat.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 
-#include "includes/cbmdrive.h"
 #include "machine/tpi6525.h"
 
 #include "includes/vc1541.h"
@@ -141,6 +136,27 @@ current status:
 		} \
 	}
 
+#define D64_MAX_TRACKS 35
+
+static const int d64_sectors_per_track[] =
+{
+	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
+	19, 19, 19, 19, 19, 19, 19,
+	18, 18, 18, 18, 18, 18,
+	17, 17, 17, 17, 17
+};
+
+static int d64_offset[D64_MAX_TRACKS];		   /* offset of begin of track in d64 file */
+
+/* calculates offset to beginning of d64 file for sector beginning */
+static int d64_tracksector2offset (int track, int sector)
+{
+	return d64_offset[track - 1] + sector * 256;
+}
+
+
+#define D64_TRACK_ID1   (d64_tracksector2offset(18,0)+162)
+#define D64_TRACK_ID2   (d64_tracksector2offset(18,0)+163)
 
 /*
  * only for testing at the moment
@@ -243,8 +259,8 @@ static const double drive_times[4]= {
  */
 static const int bin_2_gcr[] =
 {
-	0xa, 0xb, 0x12, 0x13, 0xe, 0xf, 0x16, 0x17,
-	9, 0x19, 0x1a, 0x1b, 0xd, 0x1d, 0x1e, 0x15
+	0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,
+	0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15
 };
 
 #if 0

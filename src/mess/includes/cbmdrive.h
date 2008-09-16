@@ -73,12 +73,6 @@ CBM_Drive;
 extern CBM_Drive cbm_drive[2];
 
 
-#define D64_MAX_TRACKS 35
-extern const int d64_sectors_per_track[D64_MAX_TRACKS];
-int d64_tracksector2offset (int track, int sector);
-#define D64_TRACK_ID1   (d64_tracksector2offset(18,0)+162)
-#define D64_TRACK_ID2   (d64_tracksector2offset(18,0)+163)
-
 typedef struct
 {
 	int count;

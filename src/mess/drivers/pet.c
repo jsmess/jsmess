@@ -385,7 +385,6 @@ normal keyboards?
 #include "video/mc6845.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-/*#include "includes/vc1541.h" */
 
 
 /*************************************

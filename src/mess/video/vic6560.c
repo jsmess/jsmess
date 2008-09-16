@@ -14,8 +14,6 @@
 #include "vic6560.h"
 
 #include "includes/vc20.h"
-#include "includes/cbmserb.h"
-#include "includes/vc1541.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
