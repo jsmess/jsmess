@@ -93,9 +93,10 @@
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
-#define LIGHTPEN_BUTTON		(input_port_read(machine, "OTHER") & 0x04)
-#define LIGHTPEN_X_VALUE	(input_port_read(machine, "LIGHTX") & ~0x01)
-#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "LIGHTY") & ~0x01)
+#define LIGHTPEN_BUTTON		(((input_port_read(machine, "CTRLSEL") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "TRACKIPT") & 0x02))
+#define LIGHTPEN_POINTER	(((input_port_read(machine, "CTRLSEL") & 0xe000 ) == 0xa000 ) && (input_port_read(machine, "CTRLSEL") & 0x1000))
+#define LIGHTPEN_X_VALUE	(input_port_read(machine, "TRACKX") & ~1)
+#define LIGHTPEN_Y_VALUE	(input_port_read(machine, "TRACKY") & ~1)
 
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
@@ -974,13 +975,13 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int 
 			{
 				value = vic2.expandx_multi[bg = vic2.dma_read (addr + vic2.sprites[nr].line * 3 + i)];
 				value2 = vic2.expandx[vic2.multi_collision[bg]];
-				vic2.sprites[nr].bitmap[y][i*2] = value2>>8;
-				vic2.sprites[nr].bitmap[y][i*2+1] = value2&0xff;
+				vic2.sprites[nr].bitmap[y][i*2] = value2 >> 8;
+				vic2.sprites[nr].bitmap[y][i*2+1] = value2 & 0xff;
 				vic2_sprite_collision (nr, y, xbegin + i * 16, value2 >> 8);
 				vic2_sprite_collision (nr, y, xbegin + i * 16 + 8, value2 & 0xff);
 				if (prior || !collision)
 				{
-					value3 = vic2_getforeground16 (yoff + y, xbegin + i * 16);
+					value3 = vic2_getforeground16 (yoff + y, xbegin + i * 16 - 7);
 				}
 				if (!collision && (value2 & value3))
 				{
@@ -1029,7 +1030,7 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int 
 				vic2_sprite_collision (nr, y, xbegin + i * 8, value2);
 				if (prior || !collision)
 				{
-					value3 = vic2_getforeground (yoff + y, xbegin + i * 8);
+					value3 = vic2_getforeground (yoff + y, xbegin + i * 8 - 7);
 				}
 				if (!collision && (value2 & value3))
 				{
@@ -1089,7 +1090,7 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend, int start_
 				vic2_sprite_collision (nr, y, xbegin + i * 16, value >> 8);
 				vic2_sprite_collision (nr, y, xbegin + i * 16 + 8, value & 0xff);
 				if (prior || !collision)
-					value3 = vic2_getforeground16 (yoff + y, xbegin + i * 16);
+					value3 = vic2_getforeground16 (yoff + y, xbegin + i * 16 - 7);
 				if (!collision && (value & value3))
 				{
 					collision = 1;
@@ -1129,7 +1130,7 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend, int start_
 				vic2.sprites[nr].bitmap[y][i] = value;
 				vic2_sprite_collision (nr, y, xbegin + i * 8, value);
 				if (prior || !collision)
-					value3 = vic2_getforeground (yoff + y, xbegin + i * 8);
+					value3 = vic2_getforeground (yoff + y, xbegin + i * 8 - 7);
 				if (!collision && (value & value3))
 				{
 					collision = 1;
@@ -1488,6 +1489,7 @@ INTERRUPT_GEN( vic2_raster_irq )
 
 VIDEO_UPDATE( vic2 )
 {
+	vic2.rasterline = 0;
 	if (vic2.on)
 		copybitmap(bitmap, vic2.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

@@ -52,6 +52,7 @@ void vic4567_init (int pal, int (*dma_read) (int),
 {
 	memset(&vic2, 0, sizeof(vic2));
 
+	vic2.totalcycles = 63;
 	vic2.lines = VIC2_LINES;
 	vic2.vic3 = TRUE;
 

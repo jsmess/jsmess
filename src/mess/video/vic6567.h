@@ -15,7 +15,7 @@
 #define VIC6567_H_
 
 #define VIC6567_VRETRACERATE 60
-#define VIC6569_VRETRACERATE 50
+#define VIC6569_VRETRACERATE (50.12706  /* vice: 50.123432124542124 */)
 #define VIC2_VRETRACERATE (vic2.pal?VIC6569_VRETRACERATE:VIC6567_VRETRACERATE)
 
 /* to be inserted in MachineDriver-Structure */
@@ -24,16 +24,14 @@
 #define VIC2_HSIZE	320
 #define VIC2_VSIZE	200
 
-#define VIC6567_CYCLESPERLINE 63
+#define VIC6567_CYCLESPERLINE 65
 #define VIC6569_CYCLESPERLINE 63
 #define VIC2_CYCLESPERLINE (vic2.pal?VIC6569_CYCLESPERLINE:VIC6567_CYCLESPERLINE)
 
 /* of course you clock select an other clock, but for accurate */
 /* video timing */
-#define VIC6567_CLOCK	1022730
-			/* (8180000/8) old value */
-#define VIC6569_CLOCK	985248
-			/* (7880000/8) old value */
+#define VIC6567_CLOCK	(1022725 /* (8181800/8) */ )
+#define VIC6569_CLOCK	( 985248 /* (7880000/8) */ )
 
 /* pixel clock 8 mhz */
 /* accesses to memory with 2 megahertz */
@@ -41,14 +39,14 @@
 /* + sprite + */
 /* but system clock 1 megahertz */
 /* cpu driven with one (visible screen area) */
-#define VIC2_CLOCK ((vic2.pal?VIC6569_CLOCK:VIC6567_CLOCK))
+#define VIC2_CLOCK (vic2.pal?VIC6569_CLOCK:VIC6567_CLOCK)
 
 #define VIC6567_HRETRACERATE (VIC6567_CLOCK / 65) 
 #define VIC6569_HRETRACERATE (VIC6569_CLOCK / 63)
 
 #define VIC2_HRETRACERATE (vic2.pal?VIC6569_HRETRACERATE:VIC6567_HRETRACERATE)
 
-/* pal 50 Hz vertical screen refresh, screen consists of 312 lines
+/* pal  50 Hz vertical screen refresh, screen consists of 312 lines
  * ntsc 60 Hz vertical screen refresh, screen consists of 262 lines */
 #define VIC6567_LINES 262
 #define VIC6569_LINES 312
@@ -87,8 +85,7 @@
 
 /* call to init videodriver */
 /* dma_read: videochip fetched 1 byte data from system bus */
-extern void vic6567_init (int vic2e, int pal, int (*dma_read) (int),
-						  int (*dma_read_color) (int), void (*irq) (int));
+extern void vic6567_init (int vic2e, int pal, int (*dma_read) (int), int (*dma_read_color) (int), void (*irq) (int));
 
 extern void vic2_set_rastering(int onoff);
 
