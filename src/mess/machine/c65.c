@@ -11,9 +11,10 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
+#include "video/vic4567.h"
 
 #include "includes/cbmserb.h"
-#include "video/vic4567.h"
+#include "includes/cbmdrive.h"
 
 #include "includes/c65.h"
 #include "includes/c64.h"

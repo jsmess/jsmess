@@ -13,6 +13,7 @@
 #include "machine/6522via.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
+#include "includes/cbmdrive.h"
 
 #include "includes/pet.h"
 

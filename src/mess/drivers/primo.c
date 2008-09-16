@@ -107,9 +107,7 @@ Interrupts:
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
-#include "includes/cbmserb.h"
 #include "formats/primoptp.h"
-
 
 static ADDRESS_MAP_START( primoa_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)

@@ -377,14 +377,16 @@ normal keyboards?
 
 #include "driver.h"
 
-#include "includes/cbm.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "includes/pet.h"
 #include "machine/cbmipt.h"
 #include "video/mc6845.h"
-#include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
+
+/* devices config */
+#include "includes/cbm.h"
+#include "includes/cbmdrive.h"
 
 
 /*************************************

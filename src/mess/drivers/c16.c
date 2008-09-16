@@ -115,11 +115,13 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "driver.h"
 #include "sound/sid6581.h"
 
-#include "includes/cbm.h"
-#include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
+
+/* devices config */
+#include "includes/cbm.h"
+#include "includes/cbmdrive.h"
 
 #include "includes/c16.h"
 

@@ -326,11 +326,13 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
-#include "includes/cbm.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
-#include "includes/cbmserb.h"
 #include "includes/vc1541.h"
+
+/* devices config */
+#include "includes/cbm.h"
+#include "includes/cbmdrive.h"
 
 #include "includes/c64.h"
 

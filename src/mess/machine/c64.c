@@ -25,13 +25,14 @@
 #include "cpu/z80/z80.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
+#include "video/vic6567.h"
+#include "video/vdc8563.h"
 #include "deprecat.h"
 
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
+#include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
-#include "video/vic6567.h"
-#include "video/vdc8563.h"
 
 #include "includes/c64.h"
 #include "includes/c128.h"      /* we need c128_bankswitch_64 in MACHINE_START */

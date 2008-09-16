@@ -16,6 +16,7 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "includes/cbmserb.h"
+#include "includes/cbmdrive.h"
 #include "sound/speaker.h"
 
 /* Devices */

@@ -51,17 +51,20 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 
 
 #include "driver.h"
-#include "includes/c65.h"
-#include "includes/c64.h"
 
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 
-#include "includes/cbm.h"
 #include "machine/cbmipt.h"
 #include "video/vic4567.h"
 #include "video/vic6567.h"
-#include "includes/cbmserb.h"
+
+/* devices config */
+#include "includes/cbm.h"
+#include "includes/cbmdrive.h"
+
+#include "includes/c64.h"
+#include "includes/c65.h"
 
 
 /*************************************

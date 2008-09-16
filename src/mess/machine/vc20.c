@@ -18,10 +18,11 @@
 #include "cpu/m6502/m6502.h"
 
 #include "machine/6522via.h"
+#include "video/vic6560.h"
 #include "includes/vc1541.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "video/vic6560.h"
+#include "includes/cbmdrive.h"
 
 #include "includes/vc20.h"
 

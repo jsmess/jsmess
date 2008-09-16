@@ -12,9 +12,10 @@
 
 #include "includes/cbm.h"
 #include "machine/tpi6525.h"
+#include "video/vic6567.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
-#include "video/vic6567.h"
+#include "includes/cbmdrive.h"
 
 #include "includes/cbmb.h"
 

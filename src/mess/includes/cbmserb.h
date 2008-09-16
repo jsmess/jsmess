@@ -7,9 +7,6 @@
 #ifndef CBMSERB_H_
 #define CBMSERB_H_
 
-#include "cbmdrive.h"
-
-
 /*----------- defined in machine/cbmserb.c -----------*/
 
 /* through this interface, we choose between simulated and emulated drives */

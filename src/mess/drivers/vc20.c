@@ -84,12 +84,14 @@ interface; no special expansion modules like ieee488 interface
 
 #include "driver.h"
 
-#include "includes/cbm.h"
 #include "machine/6522via.h"
-#include "includes/cbmserb.h"
 #include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/vic6560.h"
+
+/* devices config */
+#include "includes/cbm.h"
+#include "includes/cbmdrive.h"
 
 #include "includes/vc20.h"
 
