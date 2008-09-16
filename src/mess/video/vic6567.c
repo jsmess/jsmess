@@ -1183,10 +1183,20 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 	/* top part of display not rastered */
 	first -= VIC2_YPOS - YPOS;
 
+	xbegin = VIC2_STARTVISIBLECOLUMNS;
+	xend = xbegin + VIC2_VISIBLECOLUMNS;
 	if (!SCREENON)
 	{
-//		if (first < vic2.bitmap->height)
-		memset16 (BITMAP_ADDR16(vic2.bitmap, first + FIRSTLINE, 0), FRAMECOLOR, vic2.bitmap->width);
+		xbegin = VIC2_STARTVISIBLECOLUMNS;
+		xend = xbegin + VIC2_VISIBLECOLUMNS;
+		if ((start_x <= xbegin) && (end_x >= xend))
+			plot_box(vic2.bitmap, xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
+		if ((start_x > xbegin) && (end_x >= xend))
+			plot_box(vic2.bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
+		if ((start_x <= xbegin) && (end_x < xend))
+			plot_box(vic2.bitmap, xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
+		if ((start_x > xbegin) && (end_x < xend))
+			plot_box(vic2.bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		return;
 	}
 
@@ -1207,9 +1217,17 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 		end = vic2.y_begin + YPOS;
 
 	line = first;
+	// top border
 	if (line < end)
 	{
-		plot_box(vic2.bitmap, start_x, line + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+		if ((start_x <= xbegin) && (end_x >= xend))
+			plot_box(vic2.bitmap, xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
+		if ((start_x > xbegin) && (end_x >= xend))
+			plot_box(vic2.bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
+		if ((start_x <= xbegin) && (end_x < xend))
+			plot_box(vic2.bitmap, xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
+		if ((start_x > xbegin) && (end_x < xend))
+			plot_box(vic2.bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		line = end;
 	}
 
@@ -1341,17 +1359,43 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 		}
 		line += 1 + yend - ybegin;
 	}
-	// TO DO: to implement start_x and end_x
-	plot_box(vic2.bitmap, 0, first + FIRSTLINE, xbegin, 1, FRAMECOLOR);
-	plot_box(vic2.bitmap, xend, first + FIRSTLINE, vic2.bitmap->width - xend, 1, FRAMECOLOR);
+
+	// left border
+	if ((start_x <= VIC2_STARTVISIBLECOLUMNS) && (end_x >= xbegin))
+		plot_box(vic2.bitmap, VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xbegin - VIC2_STARTVISIBLECOLUMNS, 1, FRAMECOLOR);
+	else if ((start_x > VIC2_STARTVISIBLECOLUMNS) && (end_x >= xbegin))
+		plot_box(vic2.bitmap, start_x, first + FIRSTLINE, xbegin - start_x, 1, FRAMECOLOR);
+	else if ((start_x <= VIC2_STARTVISIBLECOLUMNS) && (end_x < xbegin))
+		plot_box(vic2.bitmap, VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x, 1, FRAMECOLOR);
+	else if ((start_x > VIC2_STARTVISIBLECOLUMNS) && (end_x < xbegin))
+		plot_box(vic2.bitmap, start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+
+	// right border
+	if ((start_x <= xend) && (end_x >= VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS))
+		plot_box(vic2.bitmap, xend, first + FIRSTLINE, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - xend, 1, FRAMECOLOR);
+	else if ((start_x > xend) && (end_x >= VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS))
+		plot_box(vic2.bitmap, start_x, first + FIRSTLINE, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - start_x, 1, FRAMECOLOR);
+	else if ((start_x <= xend) && (end_x < VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS))
+		plot_box(vic2.bitmap, xend, first + FIRSTLINE, end_x - xend, 1, FRAMECOLOR);
+	else if ((start_x > VIC2_STARTVISIBLECOLUMNS) && (end_x < xbegin))
+		plot_box(vic2.bitmap, start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 
 	if (first + 1 < vic2.bitmap->height)
 		end = first + 1;
 	else
 		end = vic2.bitmap->height;
 
-	if (line < end) {
-		plot_box(vic2.bitmap, start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+	// bottom border
+	if (line < end)
+	{
+		if ((start_x <= xbegin) && (end_x >= xend))
+			plot_box(vic2.bitmap, xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
+		if ((start_x > xbegin) && (end_x >= xend))
+			plot_box(vic2.bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
+		if ((start_x <= xbegin) && (end_x < xend))
+			plot_box(vic2.bitmap, xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
+		if ((start_x > xbegin) && (end_x < xend))
+			plot_box(vic2.bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		line = end;
 	}
 }
@@ -1475,12 +1519,12 @@ INTERRUPT_GEN( vic2_raster_irq )
 	}
 	if (!c64_pal)
 		if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
-			vic2_drawlines (vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
+			vic2_drawlines (vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
 // if (vic2.rasterline == 0x80)
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
-			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
+			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
 //	timer_adjust_oneshot(vicii_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }

@@ -849,7 +849,7 @@ INTERRUPT_GEN( vic3_raster_irq )
 			}			
 			else
 			{
-				// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
+				if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
 			}
 		}
 		for (i = 0; i < 8; i++)
@@ -869,14 +869,12 @@ INTERRUPT_GEN( vic3_raster_irq )
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
 		{
-//			vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 			if (c64_pal)
 			{
 				if (vic2.on) vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
 			}			
 			else
 			{
-				// if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
 				if (vic2.on) vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
 			}
 		}
