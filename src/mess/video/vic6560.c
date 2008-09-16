@@ -26,11 +26,6 @@
 		} \
 	}
 
-
-/* usage of GFX system for lightpenpointer drawing,
- * needs little more testing with working dipswitches */
-/*#define GFX */
-
 const unsigned char vic6560_palette[] =
 {
 /* ripped from vice, a very excellent emulator */
