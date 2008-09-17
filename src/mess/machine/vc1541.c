@@ -136,27 +136,129 @@ current status:
 		} \
 	}
 
+#define XTAL_16_MHz	16000000
+
+/* Are there other formats to support which could require more tracks? */
+#define IMAGE_MAX_TRACKS 154
+
 #define D64_MAX_TRACKS 35
+#define D64_40T_MAX_TRACKS 40
 
 static const int d64_sectors_per_track[] =
 {
 	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
 	19, 19, 19, 19, 19, 19, 19,
 	18, 18, 18, 18, 18, 18,
+	17, 17, 17, 17, 17,
+	17, 17, 17, 17, 17		/* only for 40 tracks d64 */
+};
+
+#define D71_MAX_TRACKS 70
+
+static const int d71_sectors_per_track[] =
+{
+	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
+	19, 19, 19, 19, 19, 19, 19,
+	18, 18, 18, 18, 18, 18,
+	17, 17, 17, 17, 17,
+	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21,
+	19, 19, 19, 19, 19, 19, 19,
+	18, 18, 18, 18, 18, 18,
 	17, 17, 17, 17, 17
 };
 
-static int d64_offset[D64_MAX_TRACKS];		   /* offset of begin of track in d64 file */
+#define D81_MAX_TRACKS 80
 
-/* calculates offset to beginning of d64 file for sector beginning */
-static int d64_tracksector2offset (int track, int sector)
+/* Each track in a d81 file has 40 sectors, so no need of a sectors_per_track table */
+
+#define D80_MAX_TRACKS 77
+
+static const int d80_sectors_per_track[] =
 {
-	return d64_offset[track - 1] + sector * 256;
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
+};
+
+
+#define D82_MAX_TRACKS 154
+
+static const int d82_sectors_per_track[] =
+{
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
+};
+
+
+static int image_offset[IMAGE_MAX_TRACKS] = { 0 };
+
+
+static void offset_init (int format)
+{
+	int i;
+
+	/* Track # starts from 1 */
+	image_offset[0] = 0;
+
+	switch (format)
+	{
+		case format_d64:
+			for (i = 1; i <= D64_MAX_TRACKS; i++)
+				image_offset[i] = image_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
+			break;
+
+		case format_d64_40t:
+			for (i = 1; i <= D64_40T_MAX_TRACKS; i++)
+				image_offset[i] = image_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
+			break;
+
+		case format_d71:
+			for (i = 1; i <= D71_MAX_TRACKS; i++)
+				image_offset[i] = image_offset[i - 1] + d71_sectors_per_track[i - 1] * 256;
+			break;
+
+		case format_d81:
+			for (i = 1; i <= D81_MAX_TRACKS; i++)
+				image_offset[i] = image_offset[i - 1] + 40 * 256;
+			break;
+
+		case format_d80:
+			for (i = 1; i <= D80_MAX_TRACKS; i++)
+				image_offset[i] = image_offset[i - 1] + d80_sectors_per_track[i - 1] * 256;
+			break;
+
+		case format_d82:
+			for (i = 1; i <= D82_MAX_TRACKS; i++)
+				image_offset[i] = image_offset[i - 1] + d82_sectors_per_track[i - 1] * 256;
+			break;
+
+		default:
+			logerror("Unsupported format");
+			break;
+	}
 }
 
 
-#define D64_TRACK_ID1   (d64_tracksector2offset(18,0)+162)
-#define D64_TRACK_ID2   (d64_tracksector2offset(18,0)+163)
+/* calculates offset to beginning of the image file for sector beginning */
+/* since sectors are always 256 bytes large, this works for each file format! */
+static int image_tracksector2offset (int track, int sector)
+{
+	return image_offset[track - 1] + sector * 256;
+}
+
+
+#define D64_TRACK_ID1   (image_tracksector2offset(18,0)+162)
+#define D64_TRACK_ID2   (image_tracksector2offset(18,0)+163)
 
 /*
  * only for testing at the moment
@@ -214,7 +316,7 @@ typedef struct
 		int pos; /* position  in sector */
 		int sector;
 		UINT8 *data;
-	} d64;
+	} image;
 } CBM_Drive_Emu;
 
 static CBM_Drive_Emu drive_static= { 0 }, *drive = &drive_static;
@@ -325,7 +427,7 @@ static void drive_sector_to_gcr(int track, int sector)
 {
 	int i=0, j, offset, chksum=0;
 
-	if (drive->d64.data==NULL) return;
+	if (drive->image.data==NULL) return;
 	drive->head.data[i++]=0xff;
 	drive->head.data[i++]=0xff;
 	drive->head.data[i++]=0xff;
@@ -335,12 +437,12 @@ static void drive_sector_to_gcr(int track, int sector)
 
 	drive_sector_data(8, &i);
 	chksum= sector^track
-		^drive->d64.data[D64_TRACK_ID1]^drive->d64.data[D64_TRACK_ID2];
+		^drive->image.data[D64_TRACK_ID1]^drive->image.data[D64_TRACK_ID2];
 	drive_sector_data(chksum, &i);
 	drive_sector_data(sector, &i);
 	drive_sector_data(track, &i);
-	drive_sector_data(drive->d64.data[D64_TRACK_ID1], &i);
-	drive_sector_data(drive->d64.data[D64_TRACK_ID2], &i);
+	drive_sector_data(drive->image.data[D64_TRACK_ID1], &i);
+	drive_sector_data(drive->image.data[D64_TRACK_ID2], &i);
 	drive_sector_data(0xf, &i);
 	drive_sector_data(0xf, &i);
 	drive_sector_end(&i);
@@ -356,9 +458,9 @@ static void drive_sector_to_gcr(int track, int sector)
 	drive_sector_data(0x7, &i);
 
 	chksum=0;
-	for (offset=d64_tracksector2offset(track,sector), j=0; j<256; j++) {
-		chksum^=drive->d64.data[offset];
-		drive_sector_data(drive->d64.data[offset++], &i);
+	for (offset=image_tracksector2offset(track,sector), j=0; j<256; j++) {
+		chksum^=drive->image.data[offset];
+		drive_sector_data(drive->image.data[offset++], &i);
 	}
 	drive_sector_data(chksum, &i);
 	drive_sector_data(0, &i); /* padding up */
@@ -371,12 +473,12 @@ static void drive_sector_to_gcr(int track, int sector)
 
 /**************************************
 
-	VC1541
+	1541 / 1541II
 
 **************************************/
 
 
-static ADDRESS_MAP_START( vc1541_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( _1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_READWRITE(via_2_r, via_2_w)  /* 0 and 1 used in vc20 */
 	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP) /* for debugger */
@@ -418,16 +520,16 @@ static TIMER_CALLBACK(drive_timer)
 		}
 		return;
 	}
-	if (++(drive->d64.pos)>=sizeof(drive->head.data)) {
-		if (++(drive->d64.sector)>=
+	if (++(drive->image.pos)>=sizeof(drive->head.data)) {
+		if (++(drive->image.sector)>=
 			d64_sectors_per_track[(int)drive->track-1]) {
-			drive->d64.sector=0;
+			drive->image.sector=0;
 		}
-		drive_sector_to_gcr((int)drive->track,drive->d64.sector);
-		drive->d64.pos=0;
+		drive_sector_to_gcr((int)drive->track,drive->image.sector);
+		drive->image.pos=0;
 	}
 	drive->head.ready=1;
-	if (drive->head.data[drive->d64.pos]==0xff) {
+	if (drive->head.data[drive->image.pos]==0xff) {
 		drive->head.ffcount++;
 		if (drive->head.ffcount==5) {
 			drive->head.sync=1;
@@ -567,7 +669,7 @@ static void vc1541_via1_irq (running_machine *machine, int level)
 
 static READ8_HANDLER( vc1541_via1_read_porta )
 {
-	int data=drive->head.data[drive->d64.pos];
+	int data=drive->head.data[drive->image.pos];
 	DBG_LOG(2, "vc1541 drive",("port a read %.2x\n", data));
 	return data;
 }
@@ -795,7 +897,50 @@ void vc1541_serial_request_write (int which, int level)
 
 /**************************************
 
-	C1551
+	1570 / 1571 / 1571CR
+
+**************************************/
+
+static ADDRESS_MAP_START( _1571_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_READWRITE(via_2_r, via_2_w)  /* 0 and 1 used in vc20 */
+	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP) /* for debugger */
+	AM_RANGE(0x1c00, 0x1c0f) AM_READWRITE(via_3_r, via_3_w)
+	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP) /* for debugger */
+//	AM_RANGE(0x2000, 0x2003) // WD17xx
+//	AM_RANGE(0x4000, 0x400f) // CIA
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+/**************************************
+
+	1581
+
+**************************************/
+
+static ADDRESS_MAP_START( _1581_map, ADDRESS_SPACE_PROGRAM, 8 )
+//	AM_RANGE(0x4000, 0x400f) // CIA
+//	AM_RANGE(0x6000, 0x6003) // WD17xx
+ADDRESS_MAP_END
+
+
+/**************************************
+
+	2031 / 2040 / 3040 / 4040 / 
+		1001 / 8050 / 8250
+
+**************************************/
+
+static ADDRESS_MAP_START( _2031_map, ADDRESS_SPACE_PROGRAM, 8 )
+//	AM_RANGE(0x0200, 0x021f) // RIOT1
+//	AM_RANGE(0x0280, 0x029f) // RIOT2
+ADDRESS_MAP_END
+
+
+/**************************************
+
+	1551
 
 **************************************/
 
@@ -924,13 +1069,13 @@ static int c1551_port_c_r(void)
 
 static int c1551_port_b_r (void)
 {
-	int data=drive->head.data[drive->d64.pos];
+	int data=drive->head.data[drive->image.pos];
 	DBG_LOG(2, "c1551 drive",("port a read %.2x\n", data));
 	return data;
 }
 
 
-static ADDRESS_MAP_START( c1551_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( _1551_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x0001) AM_READWRITE(c1551_port_r, c1551_port_w)
 	AM_RANGE(0x0002, 0x07ff) AM_RAM
     AM_RANGE(0x4000, 0x4007) AM_READWRITE(tpi6525_0_port_r, tpi6525_0_port_w)
@@ -1085,8 +1230,8 @@ void drive_reset (void)
 **************************************/
 
 MACHINE_DRIVER_START( cpu_vc1540 )
-	MDRV_CPU_ADD("cpu_vc1540", M6502, 1000000)
-	MDRV_CPU_PROGRAM_MAP(vc1541_map, 0)
+	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
+	MDRV_CPU_PROGRAM_MAP(_1541_map, 0)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_vc1541 )
@@ -1098,17 +1243,18 @@ MACHINE_DRIVER_START( cpu_c2031 )
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_dolphin )
-	MDRV_CPU_ADD("cpu_dolphin", M6502, 1000000)
+	MDRV_CPU_ADD("cpu_dolphin", M6502, XTAL_16_MHz / 16)
 	MDRV_CPU_PROGRAM_MAP(dolphin_map, 0)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_c1551 )
 	MDRV_CPU_ADD("cpu_c1551", M6510T, 2000000)
-	MDRV_CPU_PROGRAM_MAP(c1551_map, 0)
+	MDRV_CPU_PROGRAM_MAP(_1551_map, 0)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_c1571 )
-	MDRV_IMPORT_FROM(cpu_vc1541)
+	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
+	MDRV_CPU_PROGRAM_MAP(_1571_map, 0)
 MACHINE_DRIVER_END
 
 /**************************************
@@ -1119,8 +1265,11 @@ MACHINE_DRIVER_END
 
 DEVICE_IMAGE_LOAD(vc1541)
 {
-	drive->d64.data = image_ptr(image);
-	if (!drive->d64.data)
+	offset_init (format_d64);
+
+	/* Fix me: we should load directly the GCR data */
+	drive->image.data = image_ptr(image);
+	if (!drive->image.data)
 		return INIT_FAIL;
 
 	logerror("floppy image %s loaded\n", image_filename(image));
@@ -1131,7 +1280,7 @@ DEVICE_IMAGE_LOAD(vc1541)
 DEVICE_IMAGE_UNLOAD(vc1541)
 {
 	/* writeback of image data */
-	drive->d64.data = NULL;
+	drive->image.data = NULL;
 }
 
 void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

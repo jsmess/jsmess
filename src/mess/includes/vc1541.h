@@ -29,6 +29,16 @@ type_8050,
 type_8250,
 };
 
+enum { 
+format_d64 = 0,
+format_d64_40t,
+format_d71,
+format_d81,
+format_d80,
+format_d82,
+format_g64,
+};
+
 DEVICE_IMAGE_LOAD(vc1541);
 DEVICE_IMAGE_UNLOAD(vc1541);
 
