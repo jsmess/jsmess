@@ -18,8 +18,6 @@
 
 extern UINT8 trs80_port_ff;
 
-DEVICE_IMAGE_LOAD( trs80_cas );
-DEVICE_IMAGE_UNLOAD( trs80_cas );
 DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
 

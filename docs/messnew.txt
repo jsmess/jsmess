@@ -109,6 +109,8 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
+- [TRS80] Added proper cassette emulation support.  [Wilbert Pol]
+
 - [VIC20] Added support for tape emulation using MESS core functions 
   (loading and saving, both .wav and .tap formats) [Fabio Priuli]
 

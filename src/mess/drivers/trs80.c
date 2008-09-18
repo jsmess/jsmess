@@ -87,6 +87,7 @@ Not emulated:
 
 /* Devices */
 #include "devices/basicdsk.h"
+#include "devices/cassette.h"
 
 
 #define FW	TRS80_FONT_W
@@ -402,6 +403,8 @@ static MACHINE_DRIVER_START( level1 )
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(trs80_cmd, "cmd", 0.5)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -524,32 +527,6 @@ ROM_START(ht108064)
 ROM_END
 
 
-static void trs80_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(trs80_cas); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(trs80_cas); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(trs80)
-	CONFIG_DEVICE(trs80_cassette_getinfo)
-SYSTEM_CONFIG_END
-
-
 static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -569,13 +546,12 @@ static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 }
 
 static SYSTEM_CONFIG_START(trs8012)
-	CONFIG_IMPORT_FROM(trs80)
 	CONFIG_DEVICE(trs8012_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  INIT  CONFIG   COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	     0,		level1,   trs80, trs80,    trs80,	"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
+COMP( 1977, trs80,    0,	     0,		level1,   trs80, trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
 COMP( 1978, trs80l2,  trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
 COMP( 1980, sys80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
 COMP( 1981, lnw80,    trs80,	 0,		model1,   trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )

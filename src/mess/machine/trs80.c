@@ -18,6 +18,7 @@
 
 /* Devices */
 #include "devices/basicdsk.h"
+#include "devices/cassette.h"
 #include "devices/flopdrv.h"
 
 
@@ -49,104 +50,25 @@ static UINT8 sector[4] = {0, }; 			/* current sector per drive */
 #endif
 static UINT8 irq_mask = 0;
 
-static UINT8 *cas_buff = NULL;
-static UINT32 cas_size = 0;
-
-/* current tape file handles */
-static mame_file *tape_put_file = NULL;
-static mame_file *tape_get_file = NULL;
-
-/* tape buffer for the first eight bytes at write (to extract a filename) */
-static UINT8 tape_buffer[8];
-
-static int tape_count = 0;		/* file offset within tape file */
-static int put_bit_count = 0;	/* number of sync and data bits that were written */
-static int get_bit_count = 0;	/* number of sync and data bits to read */
-static int tape_bits = 0;		/* sync and data bits mask */
-static int tape_time = 0;		/* time in cycles for the next bit at read */
-static int in_sync = 0; 		/* flag if writing to tape detected the sync header A5 already */
-static int put_cycles = 0;		/* cycle count at last output port change */
-static int get_cycles = 0;		/* cycle count at last input port read */
-
-static void tape_put_byte(UINT8 value);
-static void tape_get_open(running_machine *machine);
-static void tape_put_close(running_machine *machine);
-
 #define FW TRS80_FONT_W
 #define FH TRS80_FONT_H
 
+static double old_cassette_val;
+static UINT8 cassette_data;
+static emu_timer *cassette_data_timer;
 
-static TIMER_CALLBACK(cas_copy_callback)
+static TIMER_CALLBACK( cassette_data_callback )
 {
-	UINT16 entry = 0, block_ofs = 0, block_len = 0;
-	unsigned offs = 0;
+	double new_val = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
 
-	while( cas_size > 3 )
+	/* Check for HI-LO transition */
+	if ( old_cassette_val > -0.2 && new_val < -0.2 )
 	{
-		UINT8 data = cas_buff[offs++];
-
-		switch( data )
-		{
-		case 0x3c:		   /* CAS file header */
-			block_len = cas_buff[offs++];
-			/* on CMD files size=zero means size 256 */
-			if( block_len == 0 )
-				block_len += 256;
-			block_ofs = cas_buff[offs++];
-			block_ofs += 256 * cas_buff[offs++];
-			cas_size -= 4;
-			LOG(("cas_copy_callback block ($%02X) %d at $%04X\n", data, block_len, block_ofs));
-			while( block_len && cas_size )
-			{
-				program_write_byte(block_ofs, cas_buff[offs]);
-				offs++;
-				block_ofs++;
-				block_len--;
-				cas_size--;
-			}
-			/* skip the CHKSUM byte */
-			offs++;
-			break;
-		case 0x78:
-			entry = cas_buff[offs++];
-			entry += 256 * cas_buff[offs++];
-			LOG(("cas_copy_callback entry ($%02X) at $%04X\n", data, entry));
-			cas_size -= 3;
-			break;
-		default:
-			cas_size--;
-		}
+		cassette_data |= 0x80;
 	}
-	cas_size = 0;
-	activecpu_set_reg(Z80_PC, entry);
+	old_cassette_val = new_val;
 }
 
-DEVICE_IMAGE_LOAD( trs80_cas )
-{
-	cas_size = image_length(image);
-	cas_buff = image_ptr(image);
-	if (!cas_buff)
-		return INIT_FAIL;
-
-	if (cas_buff[1] == 0x55)
-	{
-		LOG(("trs80_cas_init: loading %s size %d\n", image_filename(image), cas_size));
-	}
-	else
-	{
-		cas_buff = NULL;
-		cas_size = 0;
-		logerror("trs80_cas_init: CAS file is not in SYSTEM format\n");
-		return 1;
-	}
-	return 0;
-}
-
-DEVICE_IMAGE_UNLOAD( trs80_cas )
-{
-	cas_buff = NULL;
-	cas_size = 0;
-}
 
 QUICKLOAD_LOAD( trs80_cmd )
 {
@@ -282,14 +204,14 @@ DEVICE_IMAGE_LOAD( trs80_floppy )
 
 static void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
+
 MACHINE_RESET( trs80 )
 {
-	if (cas_size)
-	{
-		LOG(("trs80_init_machine: schedule cas_copy_callback (%d)\n", cas_size));
-		timer_set(ATTOTIME_IN_MSEC(500), NULL, 0, cas_copy_callback);
-	}
+	cassette_data = 0x00;
+	cassette_data_timer = timer_alloc( cassette_data_callback, NULL );
+	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
 }
+
 
 DRIVER_INIT( trs80 )
 {
@@ -354,6 +276,7 @@ DRIVER_INIT( ht1080z )
 {
 }
 
+
 DRIVER_INIT( ht108064 )
 {
 	UINT8 *FNT = memory_region(machine, "gfx1");
@@ -363,129 +286,12 @@ DRIVER_INIT( ht108064 )
 	}
 }
 
+
 MACHINE_START( trs80 )
 {
 	wd17xx_init(machine, WD_TYPE_179X,trs80_fdc_callback, NULL);
-	add_exit_callback(machine, tape_put_close);
 }
 
-/*************************************
- *
- *				Tape emulation.
- *
- *************************************/
-
-static void tape_put_byte(UINT8 value)
-{
-	if (tape_count < 8)
-	{
-		tape_buffer[tape_count++] = value;
-		if (tape_count == 8)
-		{
-			/* BASIC tape ? */
-			if (tape_buffer[1] == 0xd3)
-			{
-				char filename[12+1];
-				UINT8 zeroes[256] = {0,};
-
-				sprintf(filename, "basic%c.cas", tape_buffer[4]);
-				mame_fopen(SEARCHPATH_IMAGE, filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, &tape_put_file);
-				mame_fwrite(tape_put_file, zeroes, 256);
-				mame_fwrite(tape_put_file, tape_buffer, 8);
-			}
-			else
-			/* SYSTEM tape ? */
-			if (tape_buffer[1] == 0x55)
-			{
-				char filename[12+1];
-				UINT8 zeroes[256] = {0,};
-
-				sprintf(filename, "%-6.6s.cas", tape_buffer+2);
-				mame_fopen(SEARCHPATH_IMAGE, filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, &tape_put_file);
-				mame_fwrite(tape_put_file, zeroes, 256);
-				mame_fwrite(tape_put_file, tape_buffer, 8);
-			}
-		}
-	}
-	else
-	{
-		if (tape_put_file)
-			mame_fwrite(tape_put_file, &value, 1);
-	}
-}
-
-static void tape_put_close(running_machine *machine)
-{
-	/* file open ? */
-	if (tape_put_file)
-	{
-		if (put_bit_count)
-		{
-			UINT8	value;
-			while (put_bit_count < 16)
-			{
-					tape_bits <<= 1;
-					put_bit_count++;
-			}
-			value = 0;
-			if (tape_bits & 0x8000) value |= 0x80;
-			if (tape_bits & 0x2000) value |= 0x40;
-			if (tape_bits & 0x0800) value |= 0x20;
-			if (tape_bits & 0x0200) value |= 0x10;
-			if (tape_bits & 0x0080) value |= 0x08;
-			if (tape_bits & 0x0020) value |= 0x04;
-			if (tape_bits & 0x0008) value |= 0x02;
-			if (tape_bits & 0x0002) value |= 0x01;
-			tape_put_byte(value);
-		}
-		mame_fclose(tape_put_file);
-	}
-	tape_count = 0;
-	tape_put_file = 0;
-}
-
-static void tape_get_byte(running_machine *machine)
-{
-	int 	count;
-	UINT8	value;
-	if (tape_get_file)
-	{
-		count = mame_fread(tape_get_file, &value, 1);
-		if (count == 0)
-		{
-				value = 0;
-				mame_fclose(tape_get_file);
-				tape_get_file = 0;
-		}
-		tape_bits |= 0xaaaa;
-		if (value & 0x80) tape_bits ^= 0x4000;
-		if (value & 0x40) tape_bits ^= 0x1000;
-		if (value & 0x20) tape_bits ^= 0x0400;
-		if (value & 0x10) tape_bits ^= 0x0100;
-		if (value & 0x08) tape_bits ^= 0x0040;
-		if (value & 0x04) tape_bits ^= 0x0010;
-		if (value & 0x02) tape_bits ^= 0x0004;
-		if (value & 0x01) tape_bits ^= 0x0001;
-		get_bit_count = 16;
-		tape_count++;
-	}
-}
-
-static void tape_get_open(running_machine *machine)
-{
-	/* TODO: remove this */
-	unsigned char *RAM = memory_region(machine, "main");
-
-	if (!tape_get_file)
-	{
-		char filename[12+1];
-
-		sprintf(filename, "%-6.6s.cas", RAM + 0x41e8);
-		logerror("filename %s\n", filename);
-		mame_fopen(SEARCHPATH_IMAGE, filename, OPEN_FLAG_READ, &tape_get_file);
-		tape_count = 0;
-	}
-}
 
 /*************************************
  *
@@ -493,150 +299,30 @@ static void tape_get_open(running_machine *machine)
  *
  *************************************/
 
+
  READ8_HANDLER( trs80_port_xx_r )
 {
 	return 0;
 }
 
+
 WRITE8_HANDLER( trs80_port_ff_w )
 {
-	int changes = trs80_port_ff ^ data;
+	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
+	const device_config *cass = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 
-	/* tape output changed ? */
-	if( changes & 0x03 )
-	{
-		/* virtual tape ? */
-		if( input_port_read(machine, "CONFIG") & 0x20 )
-		{
-			int now_cycles = activecpu_gettotalcycles();
-			int diff = now_cycles - put_cycles;
-			UINT8 value;
-			/* overrun since last write ? */
-			if (diff > 4000)
-			{
-				/* reset tape output */
-				tape_put_close(machine);
-				put_bit_count = tape_bits = in_sync = 0;
-			}
-			else
-			/* just wrote the interesting value ? */
-			if( (data & 0x03) == 0x01 )
-			{
-				/* change within time for a 1 bit ? */
-				if( diff < 2000 )
-				{
-					tape_bits = (tape_bits << 1) | 1;
-					/* in sync already ? */
-					if( in_sync )
-					{
-						/* count 1 bit */
-						put_bit_count += 1;
-					}
-					else
-					{
-						/* try to find sync header A5 */
-						if( tape_bits == 0xcc33 )
-						{
-							in_sync = 1;
-							put_bit_count = 16;
-						}
-					}
-				}
-				else	/* no change indicates a 0 bit */
-				{
-					/* shift twice */
-					tape_bits <<= 2;
-					/* in sync already ? */
-					if( in_sync )
-						put_bit_count += 2;
-				}
+	cassette_change_state( cass, ( data & 0x04 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
-				/* collected 8 sync plus 8 data bits ? */
-				if( put_bit_count >= 16 )
-				{
-					/* extract data bits to value */
-					value = 0;
-					if (tape_bits & 0x8000) value |= 0x80;
-					if (tape_bits & 0x2000) value |= 0x40;
-					if (tape_bits & 0x0800) value |= 0x20;
-					if (tape_bits & 0x0200) value |= 0x10;
-					if (tape_bits & 0x0080) value |= 0x08;
-					if (tape_bits & 0x0020) value |= 0x04;
-					if (tape_bits & 0x0008) value |= 0x02;
-					if (tape_bits & 0x0002) value |= 0x01;
-					put_bit_count -= 16;
-					tape_bits = 0;
-					tape_put_byte(value);
-				}
-			}
-			/* remember the cycle count of this write */
-			put_cycles = now_cycles;
-		}
-		else
-		{
-			switch( data & 0x03 )
-			{
-			case 0: /* 0.46 volts */
-				speaker_level_w(0,1);
-				break;
-			case 1:
-			case 3: /* 0.00 volts */
-				speaker_level_w(0,0);
-				break;
-			case 2: /* 0.85 volts */
-				speaker_level_w(0,2);
-				break;
-			}
-		}
-	}
+	cassette_output( cass, levels[data & 0x03]);
 
+	cassette_data &= ~0x80;
 	trs80_port_ff = data;
 }
 
+
  READ8_HANDLER( trs80_port_ff_r )
 {
-	int now_cycles = activecpu_gettotalcycles();
-	/* virtual tape ? */
-	if( input_port_read(machine, "CONFIG") & 0x20 )
-	{
-		int diff = now_cycles - get_cycles;
-		/* overrun since last read ? */
-		if (diff >= 4000)
-		{
-			if (tape_get_file)
-			{
-				mame_fclose(tape_get_file);
-				tape_get_file = 0;
-			}
-			get_bit_count = tape_bits = tape_time = 0;
-		}
-		else /* check what he will get for input */
-		{
-			/* count down cycles */
-			tape_time -= diff;
-			/* time for the next sync or data bit ? */
-			if (tape_time <= 0)
-			{
-				/* approx. time for a bit */
-				tape_time += 1570;
-				/* need to read get new data ? */
-				if (--get_bit_count <= 0)
-				{
-					tape_get_open(machine);
-					tape_get_byte(machine);
-				}
-				/* shift next sync or data bit to bit 16 */
-				tape_bits <<= 1;
-				/* if bit is set, set trs80_port_ff bit 4
-				   which is then read as bit 7 */
-				if (tape_bits & 0x10000)
-					trs80_port_ff |= 0x80;
-			}
-		}
-		/* remember the cycle count of this read */
-		get_cycles = now_cycles;
-	}
-	return (trs80_port_ff << 3) & 0xc0;
+	return cassette_data | 0x7F;
 }
 
 /*************************************
