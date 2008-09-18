@@ -2,15 +2,16 @@
 
     TODO:
 
+	- CDP1862 colorram
     - pcb layout guru-style readme
     - artwork for leds
-    - VP-550/551 Super Sound Board
-	- VP-580 Expansion Keyboard
-	- VP-585 Expansion Keyboard Interface
-    - VP-590 Color Board
-    - VP-595 Simple Sound Board
-    - VP-601/611 ASCII Keyboard
-    - VP-700 Expanded Tiny Basic Board
+    - VP-550/551 Super Sound Board (VP-550 2 channel, VP-551 4 channel sound)
+	- VP-580 Expansion Keyboard (connects to VP-585 or VP-590)
+	- VP-585 Expansion Keyboard Interface (2 keypad connectors for VP-580)
+    - VP-590 Color Board (CDP1862, 2 keypad connectors for VP-580)
+    - VP-595 Simple Sound Board (CDP1863?)
+    - VP-601/611 ASCII Keyboard (VP-601 58 keys, VP611 58 keys + 16 keys numerical keypad)
+    - VP-700 Expanded Tiny Basic Board (4 KB ROM expansion)
 
 	- VIP Blockout
 
@@ -32,6 +33,8 @@
 #include "sound/beep.h"
 #include "sound/discrete.h"
 #include "video/cdp1861.h"
+#include "video/cdp1862.h"
+#include "machine/rescap.h"
 
 static QUICKLOAD_LOAD( vip );
 static MACHINE_RESET( vip );
@@ -86,6 +89,10 @@ static WRITE8_HANDLER( bankswitch_w )
 	case 4 * 1024:
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
 		break;
+
+	case 32 * 1024:
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		break;
 	}
 }
 
@@ -100,14 +107,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861, CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-//  AM_RANGE(0x03, 0x03) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)
+//	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1862, CDP1862_TAG, cdp1862_bkg_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
 
 static INPUT_PORTS_START( vip )
-	PORT_START("KEYPAD")
+	PORT_START("KEYPAD1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 MW") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
@@ -127,6 +134,26 @@ static INPUT_PORTS_START( vip )
 
 	PORT_START("RUN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+
+	PORT_START("KEYBOARD")
+	PORT_CONFNAME( 0x07, 0x00, "Keyboard")
+	PORT_CONFSETTING( 0x00, "Standard" )
+	PORT_CONFSETTING( 0x01, "VP-580 Expansion Keyboard" )
+	PORT_CONFSETTING( 0x02, "2x VP-580 Expansion Keyboard" )
+	PORT_CONFSETTING( 0x03, "VP-601 ASCII Keyboard" )
+	PORT_CONFSETTING( 0x04, "VP-611 ASCII Keyboard" )
+	
+	PORT_START("VIDEO")
+	PORT_CONFNAME( 0x01, 0x00, "Video")
+	PORT_CONFSETTING( 0x00, "Standard" )
+	PORT_CONFSETTING( 0x01, "VP-590 Color Board" )
+
+	PORT_START("SOUND")
+	PORT_CONFNAME( 0x03, 0x00, "Sound")
+	PORT_CONFSETTING( 0x00, DEF_STR( None ) )
+	PORT_CONFSETTING( 0x01, "VP-595 Simple Sound Board" )
+	PORT_CONFSETTING( 0x02, "VP-550 Super Sound Board" )
+	PORT_CONFSETTING( 0x03, "VP-551 Super Sound Board" )
 INPUT_PORTS_END
 
 /* Video */
@@ -157,11 +184,34 @@ static CDP1861_INTERFACE( vip_cdp1861_intf )
 	vip_efx_w
 };
 
+static CDP1862_INTERFACE( vip_cdp1862_intf )
+{
+	SCREEN_TAG,
+	CPD1862_CLOCK,
+	RES_K(1.21), // ???
+	RES_K(2.05), // ???
+	RES_K(2.26), // ???
+	RES_K(3.92)	 // ???
+};
+
 static VIDEO_UPDATE( vip )
 {
-	const device_config *cdp1861 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1861, CDP1861_TAG);
+	vip_state *state = screen->machine->driver_data;
 
-	cdp1861_update(cdp1861, bitmap, cliprect);
+	switch (input_port_read(screen->machine, "VIDEO"))
+	{
+	case VIP_VIDEO_CDP1861:
+		{
+			cdp1861_update(state->cdp1861, bitmap, cliprect);
+		}
+		break;
+
+	case VIP_VIDEO_CDP1862:
+		{
+			cdp1862_update(state->cdp1862, bitmap, cliprect);
+		}
+		break;
+	}
 
 	return 0;
 }
@@ -204,7 +254,7 @@ static CDP1802_EF_READ( vip_ef_r )
         EF1     CDP1861
         EF2     tape in
         EF3     keyboard
-        EF4     ?
+        EF4     extended keyboard
     */
 
 	/* CDP1861 */
@@ -214,7 +264,10 @@ static CDP1802_EF_READ( vip_ef_r )
 	if (cassette_input(cassette_device_image(machine)) < 0) flags -= EF2;
 
 	/* keyboard */
-	if (input_port_read(machine, "KEYPAD") & (1 << state->keylatch)) flags -= EF3;
+	if (input_port_read(machine, "KEYPAD1") & (1 << state->keylatch)) flags -= EF3;
+
+	/* extended keyboard */
+//	if (input_port_read(machine, "KEYPAD2") & (1 << state->keylatch)) flags -= EF4;
 
 	return flags;
 }
@@ -233,9 +286,22 @@ static CDP1802_Q_WRITE( vip_q_w )
 
 static CDP1802_DMA_WRITE( vip_dma_w )
 {
-	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+	vip_state *state = machine->driver_data;
 
-	cdp1861_dma_w(cdp1861, data);
+	switch (input_port_read(machine, "VIDEO"))
+	{
+	case VIP_VIDEO_CDP1861:
+		{
+			cdp1861_dma_w(state->cdp1861, data);
+		}
+		break;
+
+	case VIP_VIDEO_CDP1862:
+		{
+			cdp1862_dma_w(state->cdp1862, data, ASSERT_LINE, 1, 1, 1);
+		}
+		break;
+	}
 }
 
 static CDP1802_INTERFACE( vip_config )
@@ -274,11 +340,22 @@ static MACHINE_START( vip )
 		ram[addr] = mame_rand(machine) & 0xff;
 	}
 
+	/* allocate color RAM */
+	
+	state->colorram = auto_malloc(VP590_COLOR_RAM_SIZE);
+
 	/* enable power LED */
 
 	set_led_status(0, 1);
 
+	/* look up devices */
+
+	state->cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+	state->cdp1862 = device_list_find_by_tag(machine->config->devicelist, CDP1862, CDP1862_TAG);
+
 	/* register for state saving */
+
+	state_save_register_global_pointer(state->colorram, VP590_COLOR_RAM_SIZE);
 
 	state_save_register_global(state->cdp1861_efx);
 	state_save_register_global(state->keylatch);
@@ -287,10 +364,25 @@ static MACHINE_START( vip )
 
 static MACHINE_RESET( vip )
 {
-	/* reset CDP1861 */
+	vip_state *state = machine->driver_data;
 
-	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
-	cdp1861->reset(cdp1861);
+	/* reset video chips */
+
+	state->cdp1861->reset(state->cdp1861);
+	state->cdp1862->reset(state->cdp1862);
+
+	/* map CDP1862 memory */
+
+	switch (input_port_read(machine, "VIDEO"))
+	{
+	case VIP_VIDEO_CDP1861:
+		memory_install_write8_device_handler(state->cdp1862, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, SMH_UNMAP);
+		break;
+
+	case VIP_VIDEO_CDP1862:
+		memory_install_write8_device_handler(state->cdp1862, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, cdp1862_bkg_w);
+		break;
+	}
 
 	/* enable ROM mirror at 0x0000 */
 
@@ -324,12 +416,15 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_3_52128MHz/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
-	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(vip)
 
 	MDRV_DEVICE_ADD(CDP1861_TAG, CDP1861)
 	MDRV_DEVICE_CONFIG(vip_cdp1861_intf)
+
+	MDRV_DEVICE_ADD(CDP1862_TAG, CDP1862)
+	MDRV_DEVICE_CONFIG(vip_cdp1862_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -338,7 +433,7 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(vip, "bin,c8", 0)
+	MDRV_QUICKLOAD_ADD(vip, "bin,c8,c8x", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", vip_cassette_config )
 MACHINE_DRIVER_END
@@ -348,60 +443,84 @@ MACHINE_DRIVER_END
 ROM_START( vip )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "cdpr566.u10", 0x8000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
+	ROM_SYSTEM_BIOS( 0, "vp711", "VP-711" )
+	ROMX_LOAD( "vp711.bin",	 0x9000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "vp700", "VP-700 Tiny BASIC" )
+	ROMX_LOAD( "vp700.bin",	 0x9000, 0x1000, NO_DUMP, ROM_BIOS(2) )
 
 	ROM_REGION( 0x200, "chip8", 0 )
 	ROM_LOAD( "chip8.bin", 0x0000, 0x0200, CRC(438ec5d5) SHA1(8aa634c239004ff041c9adbf9144bd315ab5fc77) )
+
+	ROM_REGION( 0x300, "chip8x", 0 )
+	ROM_LOAD( "chip8x.bin", 0x0000, 0x0300, CRC(79c5f6f8) SHA1(ed438747b577399f6ccbf20fe14156f768842898) )
+ROM_END
+
+ROM_START( vp111 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_LOAD( "cdpr566.u10", 0x8000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
+	ROM_SYSTEM_BIOS( 0, "vp111", "VP-111" )
+	ROM_SYSTEM_BIOS( 1, "vp700", "VP-700 Tiny BASIC" )
+	ROMX_LOAD( "vp700.bin",	 0x9000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+
+	ROM_REGION( 0x200, "chip8", 0 )
+	ROM_LOAD( "chip8.bin", 0x000, 0x0200, CRC(438ec5d5) SHA1(8aa634c239004ff041c9adbf9144bd315ab5fc77) )
+
+	ROM_REGION( 0x300, "chip8x", 0 )
+	ROM_LOAD( "chip8x.bin", 0x0000, 0x0300, CRC(79c5f6f8) SHA1(ed438747b577399f6ccbf20fe14156f768842898) )
 ROM_END
 
 /* System Configuration */
 
 static QUICKLOAD_LOAD( vip )
 {
+	UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
+	UINT8 *chip8_ptr = NULL;
+	int chip8_size = 0;
 	int size = image_length(image);
 
 	if (strcmp(image_filetype(image), "c8") == 0)
 	{
 		/* CHIP-8 program */
-
-		UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
-		UINT8 *chip8 = memory_region(image->machine, "chip8");
-
-		if ((size + 0x200) > mess_ram_size)
-		{
-			return INIT_FAIL;
-		}
-
-		/* copy CHIP-8 interpreter to RAM */
-		memcpy(ptr, chip8, 0x200);
-
-		/* load image to RAM */
-		image_fread(image, ptr + 0x0200, size);
+		chip8_ptr = memory_region(image->machine, "chip8");
+		chip8_size = memory_region_length(image->machine, "chip8");
 	}
-	else
+	else if (strcmp(image_filetype(image), "c8x") == 0)
 	{
-		/* normal program */
-
-		UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
-
-		if (size > mess_ram_size)
-		{
-			return INIT_FAIL;
-		}
-
-		image_fread(image, ptr, size);
+		/* CHIP-8X program */
+		chip8_ptr = memory_region(image->machine, "chip8x");
+		chip8_size = memory_region_length(image->machine, "chip8x");
 	}
 
+	if ((size + chip8_size) > mess_ram_size)
+	{
+		return INIT_FAIL;
+	}
+
+	if (chip8_size > 0)
+	{
+		/* copy CHIP-8 interpreter to RAM */
+		memcpy(ptr, chip8_ptr, chip8_size);
+	}
+
+	/* load image to RAM */
+	image_fread(image, ptr + chip8_size, size);
 
 	return INIT_PASS;
 }
 
-static SYSTEM_CONFIG_START( vip )
-	CONFIG_RAM			( 1 * 1024)
-	CONFIG_RAM			( 2 * 1024)
+static SYSTEM_CONFIG_START( vp711 )
 	CONFIG_RAM_DEFAULT	( 4 * 1024)
+	CONFIG_RAM			(32 * 1024)
+SYSTEM_CONFIG_END
+
+static SYSTEM_CONFIG_START( vp111 )
+	CONFIG_RAM_DEFAULT	( 1 * 1024)
+	CONFIG_RAM			( 2 * 1024)
+	CONFIG_RAM			( 4 * 1024)
 SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-//	  YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY FULLNAME
-COMP( 1977, vip, 0, 0, vip, vip, 0, vip, "RCA", "Cosmac VIP (VP-711)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+//	  YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME
+COMP( 1977, vip,	0,		0,		vip,		vip,	0,		vp711,	"RCA",	"Cosmac VIP (VP-711)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1977, vp111,	vip,	0,		vip,		vip,	0,		vp111,	"RCA",	"Cosmac VIP (VP-111)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -30,6 +30,8 @@ INLINE cdp1861_t *get_safe_token(const device_config *device)
 	return (cdp1861_t *)device->token;
 }
 
+/* Timer Callbacks */
+
 static TIMER_CALLBACK(cdp1861_int_tick)
 {
 	const device_config *device = ptr;
@@ -218,6 +220,7 @@ static DEVICE_START( cdp1861 )
 	state_save_register_item(unique_tag, 0, cdp1861->disp);
 	state_save_register_item(unique_tag, 0, cdp1861->dmaout);
 	state_save_register_bitmap(unique_tag, 0, "cdp1861->bitmap", cdp1861->bitmap);
+
 	return DEVICE_START_OK;
 }
 

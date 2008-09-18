@@ -8,26 +8,26 @@ PCB Layout
 171-5078 (C) SEGA 1983
 171-5046 REV. A (C) SEGA 1983
 
-|---------------------------|							   |------------------------|
-|	SW1		CN2				|   |------|---------------|   |	SW2		CN4			|
-|							|---|		  CN3		   |---|						|
-|  CN1																			CN5	|
-|																					|
-|	10.738635MHz			|------------------------------|			7805		|
-|	|---|					|------------------------------|						|
-|	|   |								  CN6										|					
-|	| 9 |																			|
-|	| 9 |																	LS32	|
-|	| 1 |		|---------|															|
-|	| 8 |		| TMM2009 |													LS139	|
-|	| A |		|---------|				|------------------|						|
-|	|   |								|		Z80		   |						|
-|   |---|								|------------------|						|
-|																					|
-|																					|
-|		MB8118	MB8118	MB8118	MB8118				SN76489A		SW3				|
-|			MB8118	MB8118	MB8118	MB8118						LS257	LS257		|
-|-----------------------------------------------------------------------------------|
+|---------------------------|							   |----------------------------|
+|	SW1		CN2				|   |------|---------------|   |	SW2		CN4				|
+|							|---|		  CN3		   |---|							|
+|  CN1																				CN5	|
+|																						|
+|	10.738635MHz			|------------------------------|				7805		|
+|	|---|					|------------------------------|							|
+|	|   |								  CN6											|
+|	| 9 |																				|
+|	| 9 |																		LS32	|
+|	| 1 |		|---------|																|
+|	| 8 |		| TMM2009 |														LS139	|
+|	| A |		|---------|				|------------------|							|
+|	|   |								|		Z80		   |							|
+|   |---|								|------------------|							|
+|																						|
+|																						|
+|		MB8118	MB8118	MB8118	MB8118				SN76489A			SW3				|
+|			MB8118	MB8118	MB8118	MB8118							LS257	LS257		|
+|---------------------------------------------------------------------------------------|
 
 Notes:
     All IC's shown.
@@ -43,7 +43,7 @@ Notes:
 	CN4		- power connector (+9VDC)
 	CN5		- player 2 joystick connector
 	CN6		- cartridge connector
-	SW1		- select switch
+	SW1		- TV channel select switch
 	SW2		- power switch
 	SW3		- hold switch
 
@@ -53,7 +53,7 @@ Notes:
 
     TODO:
 
-	- fix cartridge loading while running
+	- OMV keyboard
 	- SC-3000 return instruction referenced by R when reading ports 60-7f,e0-ff
 	- connect the PSG /READY signal 
 	- accurate video timing
@@ -397,7 +397,30 @@ static INPUT_PORTS_START( omv )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+/*
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("S-1") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("S-1") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+*/
 	PORT_START("NMI")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_P) PORT_CHANGED(trigger_nmi, 0)
 
@@ -415,7 +438,7 @@ static INTERRUPT_GEN( sg1000_int )
 
 static void sg1000_vdp_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line_and_vector(machine, 0, INPUT_LINE_IRQ0, state, 0x38);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -831,9 +854,14 @@ ROM_START( sg1000m2 )
     ROM_REGION( 0x10000, "main", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( omv )
+ROM_START( omv1000 )
     ROM_REGION( 0x10000, "main", ROMREGION_ERASE00 )
-	ROM_LOAD( "omvbios.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "omvbios.bin", 0x0000, 0x8000, NO_DUMP )
+ROM_END
+
+ROM_START( omv2000 )
+    ROM_REGION( 0x10000, "main", ROMREGION_ERASE00 )
+	ROM_LOAD( "omvbios.bin", 0x0000, 0x8000, NO_DUMP )
 ROM_END
 
 ROM_START( sc3000 )
@@ -907,9 +935,14 @@ static void sg1000_cartslot_getinfo( const mess_device_class *devclass, UINT32 s
 {
 	switch( state )
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:			info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sg,bin"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
@@ -960,10 +993,32 @@ static void sc3000_cartslot_getinfo( const mess_device_class *devclass, UINT32 s
 {
 	switch( state )
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
 		case MESS_DEVINFO_INT_MUST_BE_LOADED:			info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sc3000_cart); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sg,sc,bin"); break;
+
+		default:										cartslot_device_getinfo( devclass, state, info ); break;
+	}
+}
+
+static void omv_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
+{
+	switch( state )
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sg,bin"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
@@ -992,34 +1047,17 @@ static void sf7000_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 {
 	switch(state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sf7000_floppy); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sf7"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
-}
-
-static DEVICE_IMAGE_LOAD( sf7000_serial )
-{
-	/* filename specified */
-	if (device_load_serial_device(image) == INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
-
-		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(image);
-
-		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
-
-		/* and start transmit */
-		serial_device_set_transmit_state(image, 1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
 }
 
 static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -1028,28 +1066,26 @@ static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
+		case MESS_DEVINFO_INT_TYPE:						info->i = IO_SERIAL; break;
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(serial_device); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sf7000_serial); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
+		case MESS_DEVINFO_PTR_START:					info->start = DEVICE_START_NAME(serial_device); break;
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(serial_device); break;
+		case MESS_DEVINFO_PTR_UNLOAD:					info->unload = DEVICE_IMAGE_UNLOAD_NAME(serial_device); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "txt"); break;
 	}
 }
 
 static SYSTEM_CONFIG_START( sg1000 )
-	CONFIG_DEVICE(sg1000_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( omv )
+	CONFIG_RAM_DEFAULT	(1 * 1024)
 	CONFIG_DEVICE(sg1000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( sc3000 )
+	CONFIG_RAM_DEFAULT	(2 * 1024)
 	CONFIG_DEVICE(sc3000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -1059,12 +1095,17 @@ static SYSTEM_CONFIG_START( sf7000 )
 	CONFIG_DEVICE(sf7000_serial_getinfo)
 SYSTEM_CONFIG_END
 
+static SYSTEM_CONFIG_START( omv )
+	CONFIG_DEVICE(omv_cartslot_getinfo)
+SYSTEM_CONFIG_END
+
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY   FULLNAME */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", GAME_SUPPORTS_SAVE )
 CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SG-1000 II", GAME_SUPPORTS_SAVE )
-CONS( 1983,	omv,        sg1000, 0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision", GAME_NOT_WORKING )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", GAME_SUPPORTS_SAVE )
 COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000H", GAME_SUPPORTS_SAVE )
 COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", GAME_SUPPORTS_SAVE )
+CONS( 1984,	omv1000,    sg1000,	0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision FG-1000", GAME_NOT_WORKING )
+CONS( 1984,	omv2000,    sg1000,	0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision FG-2000", GAME_NOT_WORKING )

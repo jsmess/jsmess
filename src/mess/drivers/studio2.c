@@ -90,12 +90,57 @@ Notes:
 
 /*
 
+	RCA Studio II games list
+
+	Title							Series					Dumped
+	----------------------------------------------------------------------------
+	Bowling							built-in				yes
+	Doodles							built-in				yes
+	Freeway							built-in				yes
+	Math							built-in				yes
+	Patterns						built-in				yes
+	Gunfighter/Moonship Battle		TV Arcade				no, but Guru has one
+	Space War						TV Arcade I				yes
+	Fun with Numbers				TV Arcade II			no, but Guru has one
+	Tennis/Squash					TV Arcade III			yes
+	Baseball						TV Arcade IV			yes
+	Speedway/Tag					TV Arcade				yes
+	Blackjack						TV Casino I				yes
+	Bingo							TV Casino				no
+	Math and Social Studies			TV School House I		no, but Guru has one
+	Math Fun						TV School House II		no, but Guru has one
+	Biorhythm						TV Mystic				no, but Guru has one
+
+
+	MPT-02 games list
+
+	ID		Title					Series					Dumped
+	----------------------------------------------------------------------------
+	MG-201	Bingo											no
+	MG-202	Concentration Match								no, but Guru has one
+	MG-203	Star Wars										no, but Guru has one
+	MG-204	Math Fun				School House II			no, but Guru has one
+	MG-205	Pinball											no, but Guru has one
+	MG-206	Biorythm										no
+	MG-207	Tennis/Squash									no
+	MG-208	Fun with Numbers								no
+	MG-209	Computer Quiz			School House I			no
+	MG-210	Baseball										no
+	MG-211	Speedway/Tag									no
+	MG-212	Spacewar Intercept								no
+	MG-213	Gun Fight/Moon ship								no
+
+*/
+
+/*
+
     TODO:
 
-	- figure out real cpu clock from schematics
-    - cdp1864 video colors
+	- rewrite cartridge loading
+	- cpu clock from schematics
+    - mpt02/mustang cdp1864 colors
+	- cdp1862 for Toshiba Visicom
     - discrete sound
-    - redump studio2 bios as 4 separate roms
 
 */
 
@@ -230,7 +275,7 @@ static CDP1864_ON_EFX_CHANGED( mpt02_efx_w )
 static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 {
 	SCREEN_TAG,
-	CDP1864_CLK_FREQ,
+	CDP1864_CLOCK,
 	CDP1864_INTERLACED,
 	mpt02_int_w,
 	mpt02_dmao_w,
@@ -391,10 +436,41 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( visicom )
+	// basic machine hardware
+
+	MDRV_CPU_ADD("main", CDP1802, 3579545/2) // ???
+	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
+	MDRV_CPU_IO_MAP(studio2_io_map, 0)
+	MDRV_CPU_CONFIG(studio2_config)
+
+	MDRV_MACHINE_START(studio2)
+	MDRV_MACHINE_RESET(studio2)
+
+    // video hardware
+
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(3579545/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
+
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_VIDEO_UPDATE(studio2)
+
+	MDRV_DEVICE_ADD(CDP1861_TAG, CDP1861)
+	MDRV_DEVICE_CONFIG(studio2_cdp1861_intf)
+
+	// sound hardware
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( mpt02 )
 	// basic machine hardware
 
-	MDRV_CPU_ADD("main", CDP1802, CDP1864_CLK_FREQ)
+	MDRV_CPU_ADD("main", CDP1802, CDP1864_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mpt02_map, 0)
 	MDRV_CPU_IO_MAP(mpt02_io_map, 0)
 	MDRV_CPU_CONFIG(mpt02_config)
@@ -406,7 +482,7 @@ static MACHINE_DRIVER_START( mpt02 )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
+	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLOCK, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(8+8)
 	MDRV_VIDEO_UPDATE(mpt02)
@@ -432,11 +508,29 @@ ROM_START( studio2 )
 	ROM_LOAD( "studio2.rom", 0x0000, 0x0800, BAD_DUMP CRC(a494b339) SHA1(f2650dacc9daab06b9fdf0e7748e977b2907010c) )
 ROM_END
 
-ROM_START( m9016tc )
+ROM_START( mtc9016 )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "86676.ic13",  0x0000, 0x0400, NO_DUMP )
 	ROM_LOAD( "86677b.ic14", 0x0400, 0x0400, NO_DUMP )
 	ROM_LOAD( "87201.ic12",  0x0a00, 0x0400, NO_DUMP )
+ROM_END
+
+ROM_START( shmc1200 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "shmc1200.bin",  0x0000, 0x0800, NO_DUMP )
+ROM_END
+
+ROM_START( mpt02s )
+	ROM_REGION( 0x10000, "main", 0 )
+ROM_END
+
+ROM_START( mpt02h )
+	ROM_REGION( 0x10000, "main", 0 )
+ROM_END
+
+ROM_START( visicom )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "visicom.bin",  0x0000, 0x0800, NO_DUMP )
 ROM_END
 
 /* System Configuration */
@@ -475,18 +569,16 @@ static void studio2_cartslot_getinfo( const mess_device_class *devclass, UINT32 
 {
 	switch( state )
 	{
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_PTR_LOAD:
-		info->load = DEVICE_IMAGE_LOAD_NAME(studio2_cart);
-		break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy(info->s = device_temp_str(), "st2");
-		break;
-	default:
-		cartslot_device_getinfo( devclass, state, info );
-		break;
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(studio2_cart); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "st2"); break;
+
+		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
 }
 
@@ -522,21 +614,21 @@ static TIMER_CALLBACK(mpt02_setup_beep)
 static DRIVER_INIT( mpt02 )
 {
 	timer_set(attotime_zero, NULL, 0, mpt02_setup_beep);
+	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+}
+
+static DRIVER_INIT( visicom )
+{
+	timer_set(attotime_zero, NULL, 0, setup_beep);
+	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 }
 
 /* Game Drivers */
 
-/*
-
-    PAL clones of RCA Studio II using CDP1864C (color display):
-
-    "Mustang", "9016 Telespiel Computer (Germany)"
-    "Soundic", "MPT-02 Victory Home TV Programmer (Austria)"
-    "Hanimex", "MPT-02 (France)"
-    "Sheen",   "1200 Micro Computer (Australia)"
-
-*/
-
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978,	m9016tc,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	visicom,	studio2,	"Toshiba",	"Visicom (Japan)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
+CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
+CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )

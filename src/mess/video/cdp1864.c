@@ -1,15 +1,9 @@
-#include "driver.h"
-#include "sndintrf.h"
-#include "streams.h"
-#include "cpu/cdp1802/cdp1802.h"
-#include "sound/beep.h"
-#include "video/cdp1864.h"
-
 /*
 
     TODO:
 
 	- interlace mode
+	- PAL output, currently using RGB
     - connect to sound system when possible
 	- cpu synchronization
 
@@ -19,6 +13,13 @@
 		attain synchronization. (i.e. picture moves 8 pixels to the right)
 
 */
+
+#include "driver.h"
+#include "sndintrf.h"
+#include "streams.h"
+#include "cpu/cdp1802/cdp1802.h"
+#include "sound/beep.h"
+#include "video/cdp1864.h"
 
 #define CDP1864_DEFAULT_LATCH	0x35
 
@@ -249,7 +250,7 @@ WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w )
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	cdp1864->latch = data;
-	beep_set_frequency(0, CDP1864_CLK_FREQ / 8 / 4 / (data + 1) / 2); // TODO: remove this
+	beep_set_frequency(0, CDP1864_CLOCK / 8 / 4 / (data + 1) / 2); // TODO: remove this
 }
 
 /* DMA Write */

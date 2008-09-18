@@ -2,7 +2,7 @@
 
 					  RCA CDP1861 Video Display Controller
 
-								________________
+								_______  _______
 				  CLK_	 1	---|	   \/		|---  24  Vdd
 			     DMAO_	 2	---|				|---  23  CLEAR_
 			      INT_	 3	---|				|---  22  SC1
