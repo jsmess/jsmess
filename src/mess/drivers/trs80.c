@@ -88,6 +88,7 @@ Not emulated:
 /* Devices */
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
+#include "formats/trs_cas.h"
 
 
 #define FW	TRS80_FONT_W
@@ -369,6 +370,12 @@ static const speaker_interface trs80_speaker_interface =
 	speaker_levels	/* optional: level lookup table */
 };
 
+static const cassette_config trs80l2_cassette_config =
+{
+	trs80l2_cassette_formats,
+	NULL,
+	CASSETTE_PLAY
+};
 
 static MACHINE_DRIVER_START( level1 )
 	/* basic machine hardware */
@@ -413,6 +420,8 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( mem_model1, 0 )
 	MDRV_CPU_IO_MAP( io_model1, 0 )
+
+	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -422,6 +431,8 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_CPU_PROGRAM_MAP( mem_model3, 0 )
 	MDRV_CPU_IO_MAP( io_model3, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(trs80_frame_interrupt, 2)
+
+	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ht1080z )

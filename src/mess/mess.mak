@@ -670,6 +670,7 @@ $(MESSOBJ)/trs80.a:    \
 	$(MESS_MACHINE)/trs80.o	 \
 	$(MESS_VIDEO)/trs80.o	 \
 	$(MESS_FORMATS)/trs_dsk.o	\
+	$(MESS_FORMATS)/trs_cas.o	\
 	$(MESS_DRIVERS)/trs80.o
 
 $(MESSOBJ)/cgenie.a:   \
