@@ -101,7 +101,7 @@ const game_driver * const drivers[] =
 	DRIVER( genesis )	/* 1989 Sega Genesis (USA)							*/
 	DRIVER( gensvp )	/* 1993 Sega Genesis (USA w/SVP chip)				*/
 	DRIVER( megadriv )	/* 1990 Sega Mega Drive (Europe)					*/
-	DRIVER( picoe )		/* 1994 Sega Pico (Europe)							*/
+	DRIVER( pico )		/* 1994 Sega Pico (Europe)							*/
 	DRIVER( picou )		/* 1994 Sega Pico (USA)								*/
 	DRIVER( picoj )		/* 1993 Sega Pico (Japan)							*/
 

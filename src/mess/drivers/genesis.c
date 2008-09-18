@@ -50,7 +50,6 @@ MESS adaptation by R. Belmont
 
 #include "driver.h"
 #include "sound/2612intf.h"
-/*#include "includes/genesis.h"*/
 #include "devices/cartslot.h"
 #include "../../mame/drivers/megadriv.h"
 #include "cpu/m68000/m68000.h"
@@ -75,227 +74,16 @@ static int genesis_sram_len = 0;
 static int genesis_sram_active;
 static int genesis_sram_readonly;
 
-static READ16_HANDLER( genesis_sram_read )
-{
-	UINT16 retval = 0;
-
-	offset <<= 1;
-
-	if (genesis_sram_active)
-	{
-		retval |= genesis_sram[offset] << 8;
-		retval |= genesis_sram[offset ^ 1] & 0xff;
-	}
-
-	return retval;
-}
 
 
-static WRITE16_HANDLER( genesis_sram_write )
-{
-	offset <<= 1;
-
-	if (!genesis_sram_readonly)
-	{
-		genesis_sram[offset] = data >> 8;
-		genesis_sram[offset ^ 1] = data & 0xff;
-	}
-}
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 
-static WRITE16_HANDLER( genesis_sram_toggle )
-{
-        /* unsure if this is actually supposed to toggle or just switch on?
-          * Yet to encounter game that utilizes
-          */
-        genesis_sram_active = (data & 1) ? 1 : 0;
-        genesis_sram_readonly = (data & 2) ? 1 : 0;
-}
-
-
-/* code taken directly from GoodGEN by Cowering */
-static int genesis_isfunkySMD(unsigned char *buf,unsigned int len)
-{
-	/* aq quiz */
-	if (!strncmp("UZ(-01  ", (const char *) &buf[0xf0], 8))
-		return 1;
-
-    /* Phelios USA redump */
-	/* target earth */
-	/* klax (namcot) */
-	if (buf[0x2080] == ' ' && buf[0x0080] == 'S' && buf[0x2081] == 'E' && buf[0x0081] == 'G')
-		return 1;
-
-    /* jap baseball 94 */
-	if (!strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
-		return 1;
-
-    /* devilish Mahjong Tower */
-    if (!strncmp("optrEtranet", (const char *) &buf[0xf3], 11))
-		return 1;
-
-	/* golden axe 2 beta */
-	if (buf[0x0100] == 0x3c && buf[0x0101] == 0 && buf[0x0102] == 0 && buf[0x0103] == 0x3c)
-		return 1;
-
-    /* omega race */
-	if (!strncmp("OEARC   ", (const char *) &buf[0x90], 8))
-		return 1;
-
-    /* budokan beta */
-	if ((len >= 0x6708+8) && !strncmp(" NTEBDKN", (const char *) &buf[0x6708], 8))
-		return 1;
-
-    /* cdx pro 1.8 bios */
-	if (!strncmp("so fCXP", (const char *) &buf[0x2c0], 7))
-		return 1;
-
-    /* ishido (hacked) */
-	if (!strncmp("sio-Wyo ", (const char *) &buf[0x0090], 8))
-		return 1;
-
-    /* onslaught */
-	if (!strncmp("SS  CAL ", (const char *) &buf[0x0088], 8))
-		return 1;
-
-    /* tram terror pirate */
-	if ((len >= 0x3648 + 8) && !strncmp("SG NEPIE", (const char *) &buf[0x3648], 8))
-		return 1;
-
-    /* breath of fire 3 chinese */
-	if (buf[0x0007] == 0x1c && buf[0x0008] == 0x0a && buf[0x0009] == 0xb8 && buf[0x000a] == 0x0a)
-		return 1;
-
-    /*tetris pirate */
-	if ((len >= 0x1cbe + 5) && !strncmp("@TTI>", (const char *) &buf[0x1cbe], 5))
-		return 1;
-
-	return 0;
-}
-
-
-
-/* code taken directly from GoodGEN by Cowering */
-static int genesis_isSMD(unsigned char *buf,unsigned int len)
-{
-	if (buf[0x2080] == 'S' && buf[0x80] == 'E' && buf[0x2081] == 'G' && buf[0x81] == 'A')
-		return 1;
-	return genesis_isfunkySMD(buf,len);
-}
-
-
-static DEVICE_IMAGE_LOAD( genesis_cart )
-{
-	unsigned char *ROM, *rawROM, *tmpROMnew, *tmpROM, *secondhalf;
-	int relocate, length, ptr, x;
-#ifdef LSB_FIRST
-	unsigned char fliptemp;
-#endif
-
-	genesis_sram = NULL;
-	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
-
-	rawROM = memory_region(image->machine, "main");
-	ROM = rawROM /*+ 512 */;
-
-	length = image_fread(image, rawROM + 0x2000, 0x600000);
-	logerror("image length = 0x%x\n", length);
-
-	if (genesis_isSMD(&rawROM[0x2200],(unsigned)length))	/* is this a SMD file..? */
-	{
-		tmpROMnew = ROM;
-		tmpROM = ROM + 0x2000 + 512;
-
-		for (ptr = 0; ptr < (0x500000) / (8192); ptr += 2)
-		{
-			for (x = 0; x < 8192; x++)
-			{
-				*tmpROMnew++ = *(tmpROM + ((ptr + 1) * 8192) + x);
-				*tmpROMnew++ = *(tmpROM + ((ptr + 0) * 8192) + x);
-			}
-		}
-
-#ifdef LSB_FIRST
-		tmpROMnew = ROM;
-		for (ptr = 0; ptr < length; ptr += 2)
-		{
-			fliptemp = tmpROMnew[ptr];
-			tmpROMnew[ptr] = tmpROMnew[ptr+1];
-			tmpROMnew[ptr+1] = fliptemp;
-		}
-#endif
-		genesis_last_loaded_image_length = length - 512;
-		memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  /* store a copy of data for MACHINE_RESET processing */
-
-		relocate = 0;
-
-	}
-	else
-	/* check if it's a MD file */
-	if ((rawROM[0x2080] == 'E') &&
-		(rawROM[0x2081] == 'A') &&
-		(rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))  /* is this a MD file..? */
-	{
-		tmpROMnew = malloc(length);
-		secondhalf = &tmpROMnew[length >> 1];
-
-		if (!tmpROMnew)
-		{
-			logerror("Memory allocation failed reading roms!\n");
-			goto bad;
-		}
-
-		memcpy(tmpROMnew, ROM + 0x2000, length);
-		for (ptr = 0; ptr < length; ptr += 2)
-		{
-
-			ROM[ptr] = secondhalf[ptr >> 1];
-			ROM[ptr + 1] = tmpROMnew[ptr >> 1];
-		}
-		free(tmpROMnew);
-
-#ifdef LSB_FIRST
-		for (ptr = 0; ptr < length; ptr += 2)
-		{
-			fliptemp = ROM[ptr];
-			ROM[ptr] = ROM[ptr+1];
-			ROM[ptr+1] = fliptemp;
-		}
-#endif
-		genesis_last_loaded_image_length = length;
-		memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  /* store a copy of data for MACHINE_RESET processing */
-		relocate = 0;
-
-	}
-	else
-	/* BIN it is, then */
-	{
-		relocate = 0x2000;
-		genesis_last_loaded_image_length = length;
-
-
-		ROM = memory_region(image->machine, "main");	/* 68000 ROM region */
-
- 		for (ptr = 0; ptr < 0x502000; ptr += 2)		/* mangle bytes for littleendian machines */
-		{
-#ifdef LSB_FIRST
-			int temp = ROM[relocate + ptr];
-
-			ROM[ptr] = ROM[relocate + ptr + 1];
-			ROM[ptr + 1] = temp;
-#else
-			ROM[ptr] = ROM[relocate + ptr];
-			ROM[ptr + 1] = ROM[relocate + ptr + 1];
-#endif
-		}
-		memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  /* store a copy of data for MACHINE_RESET processing */
-	}
-	return INIT_PASS;
-
-bad:
-	return INIT_FAIL;
-}
-/* we don't use the bios rom (its not needed and only provides security on early models) */
+/* we don't use the bios rom (it's not needed and only provides security on early models) */
 
 ROM_START(genesis)
 	ROM_REGION(0x1415000, "main", ROMREGION_ERASEFF)
@@ -317,38 +105,52 @@ ROM_START(megadrij)
 	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
 ROM_END
 
-static DEVICE_IMAGE_UNLOAD( genesis_cart )
+
+
+/*************************************
+ *
+ *  Handlers for custom mappers
+ *
+ *************************************/
+
+/******* SRAM handling *******/
+
+static READ16_HANDLER( genesis_sram_read )
 {
-	/* Write out the battery file if necessary */
-	if ((genesis_sram != NULL) && (genesis_sram_len > 0))
+	UINT16 retval = 0;
+
+	offset <<= 1;
+
+	if (genesis_sram_active)
 	{
-		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
+		retval |= genesis_sram[offset] << 8;
+		retval |= genesis_sram[offset ^ 1] & 0xff;
+	}
+
+	return retval;
+}
+
+static WRITE16_HANDLER( genesis_sram_write )
+{
+	offset <<= 1;
+
+	if (!genesis_sram_readonly)
+	{
+		genesis_sram[offset] = data >> 8;
+		genesis_sram[offset ^ 1] = data & 0xff;
 	}
 }
 
-static void genesis_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static WRITE16_HANDLER( genesis_sram_toggle )
 {
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(genesis_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(genesis_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "smd,bin,md,gen"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
+        /* unsure if this is actually supposed to toggle or just switch on?
+		 * Yet to encounter game that utilizes
+		 */
+        genesis_sram_active = (data & 1) ? 1 : 0;
+        genesis_sram_readonly = (data & 2) ? 1 : 0;
 }
 
-static SYSTEM_CONFIG_START(genesis)
-	CONFIG_DEVICE(genesis_cartslot_getinfo)
-SYSTEM_CONFIG_END
+/**************************/
 
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
@@ -829,35 +631,7 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
 }
 
-static void genesis_machine_stop(running_machine *machine)
-{
-}
 
-static DRIVER_INIT( gencommon )
-{
-	if (genesis_sram)
-	{
-		add_exit_callback(machine, genesis_machine_stop);
-	}
-}
-
-static DRIVER_INIT( genusa )
-{
-	DRIVER_INIT_CALL(gencommon);
-	DRIVER_INIT_CALL(megadriv);
-}
-
-static DRIVER_INIT( geneur )
-{
-	DRIVER_INIT_CALL(gencommon);
-	DRIVER_INIT_CALL(megadrie);
-}
-
-static DRIVER_INIT( genjpn )
-{
-	DRIVER_INIT_CALL(gencommon);
-	DRIVER_INIT_CALL(megadrij);
-}
 
 // only looks for == in the compare for LSB systems
 static int allendianmemcmp(const void *s1, const void *s2, size_t n)
@@ -1216,6 +990,14 @@ void setup_megadriv_custom_mappers(running_machine *machine)
 }
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+/* We add handlers for custom mappers to basic megadriv reset */
+
 static MACHINE_RESET( ms_megadriv )
 {
 	MACHINE_RESET_CALL( megadriv );
@@ -1236,49 +1018,286 @@ static MACHINE_DRIVER_START( ms_megdsvp )
 	MDRV_MACHINE_RESET( ms_megadriv )
 MACHINE_DRIVER_END
 
-/***************************************************************************
- Pico Related
-
-***************************************************************************/
-
-ROM_START(picoe)
-	ROM_REGION(0x1415000, "main", ROMREGION_ERASEFF)
-	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
-ROM_END
-
-ROM_START(picou)
-	ROM_REGION(0x1415000, "main", ROMREGION_ERASEFF)
-	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
-ROM_END
-
-ROM_START(picoj)
-	ROM_REGION(0x1415000, "main", ROMREGION_ERASEFF)
-	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
-ROM_END
-
-/* static DRIVER_INIT( picoeur ) */
-/* { */
-/* 	DRIVER_INIT_CALL(picoe); */
-/* } */
-
-/* static DRIVER_INIT( picousa ) */
-/* { */
-/* 	DRIVER_INIT_CALL(picou); */
-/* } */
-
-/* static DRIVER_INIT( picojpn ) */
-/* { */
-/* 	DRIVER_INIT_CALL(picoj); */
-/* } */
-
-/* static MACHINE_DRIVER_START( ms_pico ) */
-/* 	MDRV_IMPORT_FROM(pico) */
-
-/* 	MDRV_MACHINE_RESET( ms_megadriv ) */
-/* MACHINE_DRIVER_END */
 
 
-/****************************************** PICO related ****************************************/
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static void genesis_machine_stop(running_machine *machine)
+{
+}
+
+static DRIVER_INIT( gencommon )
+{
+	if (genesis_sram)
+	{
+		add_exit_callback(machine, genesis_machine_stop);
+	}
+}
+
+static DRIVER_INIT( genesis )
+{
+	DRIVER_INIT_CALL(gencommon);
+	DRIVER_INIT_CALL(megadriv);
+}
+
+static DRIVER_INIT( md_eur )
+{
+	DRIVER_INIT_CALL(gencommon);
+	DRIVER_INIT_CALL(megadrie);
+}
+
+static DRIVER_INIT( md_jpn )
+{
+	DRIVER_INIT_CALL(gencommon);
+	DRIVER_INIT_CALL(megadrij);
+}
+
+
+/*************************************
+ *
+ *  Cart handling / 
+ *		System configuration(s)
+ *
+ *************************************/
+
+
+/******* SMD files detection *******/
+
+
+/* code taken directly from GoodGEN by Cowering */
+static int genesis_isfunkySMD(unsigned char *buf,unsigned int len)
+{
+	/* aq quiz */
+	if (!strncmp("UZ(-01  ", (const char *) &buf[0xf0], 8))
+		return 1;
+
+    /* Phelios USA redump */
+	/* target earth */
+	/* klax (namcot) */
+	if (buf[0x2080] == ' ' && buf[0x0080] == 'S' && buf[0x2081] == 'E' && buf[0x0081] == 'G')
+		return 1;
+
+    /* jap baseball 94 */
+	if (!strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
+		return 1;
+
+    /* devilish Mahjong Tower */
+    if (!strncmp("optrEtranet", (const char *) &buf[0xf3], 11))
+		return 1;
+
+	/* golden axe 2 beta */
+	if (buf[0x0100] == 0x3c && buf[0x0101] == 0 && buf[0x0102] == 0 && buf[0x0103] == 0x3c)
+		return 1;
+
+    /* omega race */
+	if (!strncmp("OEARC   ", (const char *) &buf[0x90], 8))
+		return 1;
+
+    /* budokan beta */
+	if ((len >= 0x6708+8) && !strncmp(" NTEBDKN", (const char *) &buf[0x6708], 8))
+		return 1;
+
+    /* cdx pro 1.8 bios */
+	if (!strncmp("so fCXP", (const char *) &buf[0x2c0], 7))
+		return 1;
+
+    /* ishido (hacked) */
+	if (!strncmp("sio-Wyo ", (const char *) &buf[0x0090], 8))
+		return 1;
+
+    /* onslaught */
+	if (!strncmp("SS  CAL ", (const char *) &buf[0x0088], 8))
+		return 1;
+
+    /* tram terror pirate */
+	if ((len >= 0x3648 + 8) && !strncmp("SG NEPIE", (const char *) &buf[0x3648], 8))
+		return 1;
+
+    /* breath of fire 3 chinese */
+	if (buf[0x0007] == 0x1c && buf[0x0008] == 0x0a && buf[0x0009] == 0xb8 && buf[0x000a] == 0x0a)
+		return 1;
+
+    /*tetris pirate */
+	if ((len >= 0x1cbe + 5) && !strncmp("@TTI>", (const char *) &buf[0x1cbe], 5))
+		return 1;
+
+	return 0;
+}
+
+
+
+/* code taken directly from GoodGEN by Cowering */
+static int genesis_isSMD(unsigned char *buf,unsigned int len)
+{
+	if (buf[0x2080] == 'S' && buf[0x80] == 'E' && buf[0x2081] == 'G' && buf[0x81] == 'A')
+		return 1;
+	return genesis_isfunkySMD(buf,len);
+}
+
+
+/******* Image loading *******/
+
+static DEVICE_IMAGE_LOAD( genesis_cart )
+{
+	unsigned char *ROM, *rawROM, *tmpROMnew, *tmpROM, *secondhalf;
+	int relocate, length, ptr, x;
+#ifdef LSB_FIRST
+	unsigned char fliptemp;
+#endif
+
+	genesis_sram = NULL;
+	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
+
+	rawROM = memory_region(image->machine, "main");
+	ROM = rawROM /*+ 512 */;
+
+	length = image_fread(image, rawROM + 0x2000, 0x600000);
+	logerror("image length = 0x%x\n", length);
+
+	if (genesis_isSMD(&rawROM[0x2200],(unsigned)length))	/* is this a SMD file..? */
+	{
+		tmpROMnew = ROM;
+		tmpROM = ROM + 0x2000 + 512;
+
+		for (ptr = 0; ptr < (0x500000) / (8192); ptr += 2)
+		{
+			for (x = 0; x < 8192; x++)
+			{
+				*tmpROMnew++ = *(tmpROM + ((ptr + 1) * 8192) + x);
+				*tmpROMnew++ = *(tmpROM + ((ptr + 0) * 8192) + x);
+			}
+		}
+
+#ifdef LSB_FIRST
+		tmpROMnew = ROM;
+		for (ptr = 0; ptr < length; ptr += 2)
+		{
+			fliptemp = tmpROMnew[ptr];
+			tmpROMnew[ptr] = tmpROMnew[ptr+1];
+			tmpROMnew[ptr+1] = fliptemp;
+		}
+#endif
+		genesis_last_loaded_image_length = length - 512;
+		memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  /* store a copy of data for MACHINE_RESET processing */
+
+		relocate = 0;
+
+	}
+	else
+	/* check if it's a MD file */
+	if ((rawROM[0x2080] == 'E') &&
+		(rawROM[0x2081] == 'A') &&
+		(rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))  /* is this a MD file..? */
+	{
+		tmpROMnew = malloc(length);
+		secondhalf = &tmpROMnew[length >> 1];
+
+		if (!tmpROMnew)
+		{
+			logerror("Memory allocation failed reading roms!\n");
+			goto bad;
+		}
+
+		memcpy(tmpROMnew, ROM + 0x2000, length);
+		for (ptr = 0; ptr < length; ptr += 2)
+		{
+
+			ROM[ptr] = secondhalf[ptr >> 1];
+			ROM[ptr + 1] = tmpROMnew[ptr >> 1];
+		}
+		free(tmpROMnew);
+
+#ifdef LSB_FIRST
+		for (ptr = 0; ptr < length; ptr += 2)
+		{
+			fliptemp = ROM[ptr];
+			ROM[ptr] = ROM[ptr+1];
+			ROM[ptr+1] = fliptemp;
+		}
+#endif
+		genesis_last_loaded_image_length = length;
+		memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  /* store a copy of data for MACHINE_RESET processing */
+		relocate = 0;
+
+	}
+	else
+	/* BIN it is, then */
+	{
+		relocate = 0x2000;
+		genesis_last_loaded_image_length = length;
+
+
+		ROM = memory_region(image->machine, "main");	/* 68000 ROM region */
+
+ 		for (ptr = 0; ptr < 0x502000; ptr += 2)		/* mangle bytes for littleendian machines */
+		{
+#ifdef LSB_FIRST
+			int temp = ROM[relocate + ptr];
+
+			ROM[ptr] = ROM[relocate + ptr + 1];
+			ROM[ptr + 1] = temp;
+#else
+			ROM[ptr] = ROM[relocate + ptr];
+			ROM[ptr + 1] = ROM[relocate + ptr + 1];
+#endif
+		}
+		memcpy(&ROM[VIRGIN_COPY_GEN],&ROM[0x000000],0x500000);  /* store a copy of data for MACHINE_RESET processing */
+	}
+	return INIT_PASS;
+
+bad:
+	return INIT_FAIL;
+}
+
+
+/******* Image unloading (with SRAM saving) *******/
+
+static DEVICE_IMAGE_UNLOAD( genesis_cart )
+{
+	/* Write out the battery file if necessary */
+	if ((genesis_sram != NULL) && (genesis_sram_len > 0))
+	{
+		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
+	}
+}
+
+
+/******* Cart getinfo *******/
+
+static void genesis_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cartslot */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(genesis_cart); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(genesis_cart); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "smd,bin,md,gen"); break;
+
+		default:											cartslot_device_getinfo(devclass, state, info); break;
+	}
+}
+
+/******* System configuration *******/
+
+static SYSTEM_CONFIG_START( genesis )
+	CONFIG_DEVICE(genesis_cartslot_getinfo)
+SYSTEM_CONFIG_END
+
+
+
+
+/****************************************** PICO emulation ****************************************/
 
 /*
    Pico Implementation By ElBarto (Emmanuel Vadot, elbarto@megadrive.org)
@@ -1455,26 +1474,27 @@ static ADDRESS_MAP_START( _pico_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 
+
 INPUT_PORTS_START( pico )
 	PORT_START("PAD")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("RED BUTTON")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("PEN BUTTON")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Red Button")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Pen Button")
 
 	PORT_START("PAGE")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Increment Page")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Decrement Page")
 
 	PORT_START("PENX")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN X")
 
 	PORT_START("PENY")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0,255 ) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0,255 ) PORT_CATEGORY(5) PORT_PLAYER(1) PORT_NAME("PEN Y")
 
-	PORT_START("REGION")	/* Buttons on Genesis Console */
+	PORT_START("REGION")
 	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1483,41 +1503,8 @@ INPUT_PORTS_START( pico )
 	PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
 INPUT_PORTS_END
 
+
 MACHINE_DRIVER_START( pico )
-/* 	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 7) /\* 7.67 MHz *\/ */
-/* 	MDRV_CPU_PROGRAM_MAP(_pico_readmem,_pico_writemem) */
-/* 	/\* IRQs are handled via the timers *\/ */
-
-/* 	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15) /\* 3.58 MHz *\/ */
-/* 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem) */
-/* 	MDRV_CPU_IO_MAP(z80_portmap,0) */
-/* 	/\* IRQ handled via the timers *\/ */
-
-/* 	MDRV_MACHINE_RESET(megadriv) */
-
-/* 	MDRV_SCREEN_ADD("pico", RASTER) */
-/* 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15) */
-/* 	MDRV_SCREEN_REFRESH_RATE(60) */
-/* 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually. */
-/* 	MDRV_SCREEN_SIZE(64*8, 64*8) */
-/* 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1) */
-
-/* #ifndef MESS */
-/* 	MDRV_NVRAM_HANDLER(megadriv) */
-/* #endif */
-
-/* 	MDRV_PALETTE_LENGTH(0x200) */
-
-/* 	MDRV_VIDEO_START(megadriv) */
-/* 	MDRV_VIDEO_UPDATE(megadriv) /\* Copies a bitmap *\/ */
-/* 	MDRV_VIDEO_EOF(megadriv) /\* Used to Sync the timing *\/ */
-
-/* 	MDRV_SPEAKER_STANDARD_STEREO("left", "right") */
-
-/* 	/\* sound hardware *\/ */
-/* 	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15) */
-/* 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25) /\* 3.58 MHz *\/ */
-/* 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right",0.25) /\* 3.58 MHz *\/ */
 	MDRV_IMPORT_FROM(megadriv)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(_pico_readmem,_pico_writemem)
@@ -1525,25 +1512,49 @@ MACHINE_DRIVER_START( pico )
 	MDRV_MACHINE_RESET( ms_megadriv )
 MACHINE_DRIVER_END
 
-DRIVER_INIT( picoe )
+
+
+ROM_START( pico )
+	ROM_REGION(0x1415000, "main", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START( picou )
+	ROM_REGION(0x1415000, "main", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START( picoj )
+	ROM_REGION(0x1415000, "main", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
+ROM_END
+
+
+
+static void pico_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-  DRIVER_INIT_CALL(gencommon);
-  DRIVER_INIT_CALL(megadrie);
+	/* cartslot */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(genesis_cart); break;
+		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(genesis_cart); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
+
+		default:											cartslot_device_getinfo(devclass, state, info); break;
+	}
 }
 
-DRIVER_INIT( picou )
-{
-  DRIVER_INIT_CALL(gencommon);
-  DRIVER_INIT_CALL(megadriv);
-}
+static SYSTEM_CONFIG_START( pico )
+	CONFIG_DEVICE(pico_cartslot_getinfo)
+SYSTEM_CONFIG_END
 
-DRIVER_INIT( picoj )
-{
-  DRIVER_INIT_CALL(gencommon);
-  DRIVER_INIT_CALL(megadrij);
-}
-
-/****************************************** END PICO related ************************************/
 
 
 /***************************************************************************
@@ -1552,11 +1563,11 @@ DRIVER_INIT( picoj )
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE    	  INPUT     INIT  		CONFIG   COMPANY   FULLNAME */
-CONS( 1989, genesis,  0,		0,      ms_megadriv,  megadri6, genusa,		genesis, "Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1993, gensvp,   genesis,	0,      ms_megdsvp,   megdsvp,  megadsvp,	genesis, "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
-CONS( 1990, megadriv, genesis,	0,      ms_megadriv,  megadri6, geneur,		genesis, "Sega",   "Mega Drive (Europe, PAL)", 0)
-CONS( 1988, megadrij, genesis,	0,      ms_megadriv,  megadri6, genjpn,		genesis, "Sega",   "Mega Drive (Japan, NTSC)", 0)
-CONS( 1994, picoe,    genesis,  0,      pico,	      pico,		picoe,		genesis, "Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,    genesis,  0,      pico,	      pico,		picou,		genesis, "Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,    genesis,  0,      pico,	      pico,		picoj,		genesis, "Sega",   "Pico (Japan, NTSC)", 0)
+/*    YEAR  NAME		PARENT		COMPAT  MACHINE    	  INPUT     INIT  		CONFIG		COMPANY   FULLNAME */
+CONS( 1989, genesis,	0,			0,      ms_megadriv,  megadri6, genesis,	genesis,	"Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1993, gensvp,		genesis,	0,      ms_megdsvp,   megdsvp,  megadsvp,	genesis,	"Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
+CONS( 1990, megadriv,	genesis,	0,      ms_megadriv,  megadri6, md_eur,		genesis,	"Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1988, megadrij,	genesis,	0,      ms_megadriv,  megadri6, md_jpn,		genesis,	"Sega",   "Mega Drive (Japan, NTSC)", 0)
+CONS( 1994, pico,		0,			0,      pico,	      pico,		md_eur,		pico,		"Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,		pico,		0,      pico,	      pico,		genesis,	pico,		"Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,		pico,		0,      pico,	      pico,		md_jpn,		pico,		"Sega",   "Pico (Japan, NTSC)", 0)
