@@ -3,9 +3,7 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-
-#include "machine/rriot.h"
+#include "machine/6530miot.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "mk2.lh"
@@ -46,7 +44,7 @@ MOS MPS 6332 005 2179
 static ADDRESS_MAP_START(mk2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
-	AM_RANGE( 0x0b00, 0x0b0f) AM_READWRITE( rriot_0_r, rriot_0_w )
+	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE(MIOT6530, "miot", miot6530_r, miot6530_w)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
 	AM_RANGE( 0x0c00, 0x0fff) AM_ROM // rriot rom
 	AM_RANGE( 0x1000, 0x1fff) AM_ROM
@@ -98,10 +96,75 @@ static MACHINE_START( mk2 )
 	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
 }
 
-static MACHINE_RESET( mk2 )
+
+static UINT8 mk2_read_a(const device_config *device, UINT8 olddata)
 {
-	rriot_reset(0);
+	int data=0xff;
+	int help=input_port_read(device->machine, "BLACK")|input_port_read(device->machine, "WHITE"); // looks like white and black keys are the same!
+
+	switch (miot6530_portb_out_get(device)&0x7) {
+	case 4:
+		if (help&0x20) data&=~0x1; //F
+		if (help&0x10) data&=~0x2; //E
+		if (help&8) data&=~0x4; //D
+		if (help&4) data&=~0x8; // C
+		if (help&2) data&=~0x10; // B
+		if (help&1) data&=~0x20; // A
+#if 0
+		if (input_port_read(device->machine, "???")&1) data&=~0x40; //?
+#endif
+		break;
+	case 5:
+#if 0
+		if (input_port_read(device->machine, "???")&2) data&=~0x1; //?
+		if (input_port_read(device->machine, "???")&4) data&=~0x2; //?
+		if (input_port_read(device->machine, "???")&8) data&=~0x4; //?
+#endif
+		if (input_port_read(device->machine, "EXTRA")&4) data&=~0x8; // Enter
+		if (input_port_read(device->machine, "EXTRA")&2) data&=~0x10; // Clear
+		if (help&0x80) data&=~0x20; // H
+		if (help&0x40) data&=~0x40; // G
+		break;
+	}
+	return data;
 }
+
+
+static void mk2_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	int temp = miot6530_portb_out_get(device);
+
+	switch(temp&0x3) {
+	case 0: case 1: case 2: case 3:
+		mk2_led[temp&3]|=newdata;
+	}
+}
+
+
+static UINT8 mk2_read_b(const device_config *device, UINT8 olddata)
+{
+	return 0xff&~0x40; // chip select mapped to pb6
+}
+
+
+static void mk2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	if (newdata&0x80)
+		dac_data_w(0,newdata&1?80:0);
+	mk2_led[4]|=newdata;
+
+	cpunum_set_input_line( device->machine, 0, M6502_IRQ_LINE, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE );
+}
+
+
+static const miot6530_interface mk2_miot6530_interface =
+{
+	mk2_read_a,
+	mk2_read_b,
+	mk2_write_a,
+	mk2_write_b
+};
+
 
 static MACHINE_DRIVER_START( mk2 )
 	/* basic machine hardware */
@@ -110,10 +173,11 @@ static MACHINE_DRIVER_START( mk2 )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( mk2 )
-	MDRV_MACHINE_RESET( mk2 )
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_mk2)
+
+	MDRV_MIOT6530_ADD( "miot", 1000000, mk2_miot6530_interface )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -151,78 +215,7 @@ ROM_END
 
 */
 
-static int mk2_read_a(int chip)
-{
-	int data=0xff;
-	int help=input_port_read(Machine, "BLACK")|input_port_read(Machine, "WHITE"); // looks like white and black keys are the same!
-
-	switch (rriot_0_b_r(Machine, 0)&0x7) {
-	case 4:
-		if (help&0x20) data&=~0x1; //F
-		if (help&0x10) data&=~0x2; //E
-		if (help&8) data&=~0x4; //D
-		if (help&4) data&=~0x8; // C
-		if (help&2) data&=~0x10; // B
-		if (help&1) data&=~0x20; // A
-#if 0
-		if (input_port_read(Machine, "???")&1) data&=~0x40; //?
-#endif
-		break;
-	case 5:
-#if 0
-		if (input_port_read(Machine, "???")&2) data&=~0x1; //?
-		if (input_port_read(Machine, "???")&4) data&=~0x2; //?
-		if (input_port_read(Machine, "???")&8) data&=~0x4; //?
-#endif
-		if (input_port_read(Machine, "EXTRA")&4) data&=~0x8; // Enter
-		if (input_port_read(Machine, "EXTRA")&2) data&=~0x10; // Clear
-		if (help&0x80) data&=~0x20; // H
-		if (help&0x40) data&=~0x40; // G
-		break;
-	}
-	return data;
-}
-
-static void mk2_write_a(int chip, int value)
-{
-	int temp=rriot_0_b_r(Machine, 0);
-
-
-	switch(temp&0x3) {
-	case 0: case 1: case 2: case 3:
-		mk2_led[temp&3]|=value;
-	}
-}
-
-static int mk2_read_b(int chip)
-{
-	return 0xff&~0x40; // chip select mapped to pb6
-}
-
-static void mk2_write_b(int chip, int value)
-{
-	if (value&0x80)
-		dac_data_w(0,value&1?80:0);
-	mk2_led[4]|=value;
-}
-
-static void mk2_irq(int chip, int level)
-{
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, level);
-}
-
-static const RRIOT_CONFIG riot={
-	1000000,
-	{ mk2_read_a, mk2_write_a },
-	{ mk2_read_b, mk2_write_b },
-	mk2_irq
-};
-
-static DRIVER_INIT( mk2 )
-{
-	rriot_init(0,&riot);
-}
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG    COMPANY   FULLNAME */
-CONS( 1979,	mk2,	0,		0,		mk2,	mk2,	mk2,	NULL,	  "Quelle International",  "Chess Champion MK II", 0)
+CONS( 1979,	mk2,	0,		0,		mk2,	mk2,	0,		NULL,	  "Quelle International",  "Chess Champion MK II", 0)
 // second design sold (same computer/program?)
