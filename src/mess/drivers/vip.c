@@ -1,27 +1,224 @@
 /*
 
+RCA COSMAC VIP
+
+PCB Layout
+----------
+
+|-------------------------------------------------------------------------------|
+|	|---------------CN1---------------|		|---------------CN2---------------|	|
+|CN6																			|
+|	|---------|					|---------|				4050		4050		|
+|	| CDPR566 |					| CDP1861 |									CN3	|
+|	|---------|					|---------|										|
+|																			CN4	|
+| 7805										|---------|		 |--------|			|
+|		2114					3.521280MHz	|  4508   |		 |  4508  |		CN5	|
+|											|---------|		 |--------|			|
+|		2114												 |--------|			|
+|								7474  7400	4049  4051  4028 |  4515  |	CA3401	|	
+|		2114												 |--------|			|
+|				|-------------|													|
+|		2114	|   CDP1802	  |													|
+|				|-------------|				LED1								|
+|		2114																	|
+|											LED2								|
+|		2114	4556	4042													|
+|											LED3								|
+|  555	2114	4011	4013													|
+|											SW1									|
+|		2114																	|
+|																				|
+|-------------------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+	
+    CDPR566	- Programmed CDP1832 512 x 8-Bit Static ROM
+	2114	- 2114 4096 Bit (1024x4) NMOS Static RAM
+	CDP1802	- RCA CDP1802 CMOS 8-Bit Microprocessor
+	CDP1861	- RCA CDP1861 Video Display Controller
+	CA3401	- Quad Single-Supply Op-Amp
+	CN1		- expansion interface connector
+	CN2		- parallel I/O interface connector
+	CN3		- video connector
+	CN4		- tape in connector
+	CN5		- tape out connector
+	CN6		- power connector
+	LED1	- power led
+	LED2	- Q led
+	LED3	- tape led
+	SW1		- Run/Reset switch
+
+*/
+
+/*
+
     TODO:
 
-	- CDP1862 colorram
-    - pcb layout guru-style readme
-    - artwork for leds
-    - VP-550/551 Super Sound Board (VP-550 2 channel, VP-551 4 channel sound)
+	- CDP1863 clocks
+	- second VP580 keypad
+	- colorram bit order
+
+    - VP-590 Color Board (CDP1862, 2 keypad connectors for VP-580)
+    - VP-595 Simple Sound Board (CDP1864-like sound generator)
 	- VP-580 Expansion Keyboard (connects to VP-585 or VP-590)
 	- VP-585 Expansion Keyboard Interface (2 keypad connectors for VP-580)
-    - VP-590 Color Board (CDP1862, 2 keypad connectors for VP-580)
-    - VP-595 Simple Sound Board (CDP1863?)
+    - VP-550/551 Super Sound Board (VP-550 2 channel, VP-551 4 channel sound)
     - VP-601/611 ASCII Keyboard (VP-601 58 keys, VP611 58 keys + 16 keys numerical keypad)
     - VP-700 Expanded Tiny Basic Board (4 KB ROM expansion)
 
-	- VIP Blockout
+*/
 
-		1. This game is programmed in color and has sound effects.  It can be used with the
-		VP590 Color Board and VP595 Simple Sound Board, or it will run on a standard VIP
-		without color and sound enhancement.
+/*
 
-		2. This game requires a minimum of one VIP expansion keyboard (VP580) or two expansion
-		keyboards for exciting "Dual action".  Expansion keyboards plug directly into the
-		VP590 Color graphics board or into the VP585 expansion keyboard interface.
+	VP-711 COSMAC MicroComputer $199
+	(CDP18S711) Features RCA COSMAC microprocessor. 2K RAM, expandable to
+	32K (4K on-board). Built-in cassette interface and video interface.
+	16 key hexidecimal keypad. ROM operating system. CHIP-8 language and
+	machine language. Tone generator and speaker. 8-bit input port, 8-bit
+	output port, and full system expansion connector. Power supply and 3
+	manuals (VP-311, VP-320, MPM201 B) included. Completely assembled.
+
+	VP-44 VP-711 RAM On-Board Expansion Kit $36
+	Four type 2114 RAM IC's for expanding VP-711 on-board memory
+	to 4K bytes.
+
+	VP-111 MicroComputer $99
+	RCA COSMAC microprocessor. 1 K RAM expandable to 32K (4K On-
+	board). Built-in cassette interface and video interface. 16 key
+	Hexidecimal keypad. ROM operating system. CHIP-8 language and Machine
+	language. Tone generator. Assembled - user must install Cables
+	(supplied) and furnish 5 volt power supply and speaker.
+
+	VP-114 VP-111 Expansion Kit $76
+	Includes I/O ports, system expansion connector and additional
+	3K of RAM. Expands VP-111 to VP-711 capability.
+
+	VP-155 VP-111 Cover $12
+	Attractive protective plastic cover for VP-111.
+
+	VP-3301 Interactive Data Terminal Available Approx. 6 Months
+	Microprocessor Based Computer Terminal with keyboard, video
+	Interface and color graphics - includes full resident and user
+	Definable character font, switch selectable configuration, cursor
+	Control, reverse video and many other features.
+
+	VP-590 Color Board $69
+	Displays VP-711 output in color! Program control of four
+	Background colors and eight foreground colors. CHIP-8X language
+	Adds color commands. Includes two sockets for VP-580 Expansion
+	Keyboards.
+
+	VP-595 Simple Sound Board $30
+	Provides 256 different frequencies in place of VP-711 single-
+	tone Output. Use with VP-590 Color Board for simultaneous color and
+	Sound. Great for simple music or sound effects! Includes speaker.
+
+	VP-550 Super Sound Board $49
+	Turn your VP-711 into a music synthesizer! Two independent
+	sound Channels. Frequency, duration and amplitude envelope (voice) of
+	Each channel under program control. On-board tempo control. Provision
+	for multi-track recording or slaving VP-711's. Output drives audio
+	preamp. Does not permit simultaneous video display.
+
+	VP-551 Super Sound 4-Channel Expander Package $74
+	VP-551 provides four (4) independent sound channels with
+	frequency duration and amplitude envelope for each channel. Package
+	includes modified VP-550 super sound board, VP-576 two board
+	expander, data cassette with 4-channel PIN-8 program, and instruction
+	manual. Requires 4K RAM system and your VP-550 Super Sound Board.
+
+	VP-570 Memory Expansion Board $95
+	Plug-in 4K static RAM memory. Jumper locates RAM in any 4K
+	block in first 32K of VP-711 memory space.
+
+	VP-580 Auxiliary Keyboard $20
+	Adds two-player interactive game capability to VP-711 16-key
+	keypad with cable. Connects to sockets on VP-590 Color Board or VP-
+	585 Keyboard Interface.
+
+	VP-585 Keyboard Interface Board $15
+	Interfaces two VP-580 Expansion Keyboards directly to the VP-
+	711. Not required when VP-590 Color Board is used.
+
+	VP-560 EPROM Board $34
+	Interfaces two Intel 2716 EPROMs to VP-711. Places EPROMs any-
+	where in memory space. Can also re-allocate on-board RAM in memory
+	space.
+
+	VP-565 EPROM Programmer Board $99
+	Programs Intel 2716 EPROMs with VP-711. Complete with software
+	to program, copy, and verify. On-board generation of all programming
+	voltages.
+
+	VP-575 Expansion Board $59
+	Plug-in board with 4 buffered and one unbuffered socket.
+	Permits use of up to 5 Accessory Boards in VP-711 Expansion Socket.
+
+	VP-576 Two-Board Expander $20
+	Plug-in board for VP-711 I/O or Expansion Socket permits use
+	of two Accessory Boards in either location.
+
+	VP-601* ASCII Keyboard. 7-Bit Parallel Output $69
+	Fully encoded, 128-character ASCII alphanumeric keyboard. 58
+	light touch keys (2 user defined). Selectable "Upper-Case-Only".
+
+	VP-606* ASCII Keyboard - Serial Output $99
+	Same as VP-601. EIA RS232C compatible, 20 mA current loop and
+	TTL outputs. Six selectable baud rates. Available mid-1980.
+
+	VP-611* ASCII/Numeric Keyboard. 7-Bit Parallel Output $89
+	ASCII Keyboard identical to VP-601 plus 16 key numeric entry
+	keyboard for easier entry of numbers.
+
+	VP-616* ASCII/Numeric Keyboard - Serial Output $119
+	Same as VP-611. EIA RS232C compatible, 20 mA current loop and
+	TTL outputs. Six selectable baud rates. Available mid-1980.
+
+	VP-620 Cable: ASCII Keyboards to VP-711 $20
+	Flat ribbon cable, 24" length, for connecting VP-601 or VP-
+	611 and VP-711. Includes matching connector on both ends.
+
+	VP-623 Cable: Parallel Output ASCII Keyboards $20
+	Flat ribbon cable, 36" length with mating connector for VP-
+	601 or VP-611 Keyboards. Other end is unterminated.
+
+	VP-626 Connector: Serial Output ASCII Keyboards & Terminal $7
+	25 pin solderable male "D" connector mates to VP-606, VP-616
+	or VP-3301.
+
+	TC1210 9" Video Monitor $195
+	Ideal, low-cost monochrome monitor for displaying the video
+	output from your microcomputer or terminal.
+
+	TC1217 17" Video Monitor $480
+	A really BIG monochrome monitor for use with your
+	microcomputer or terminal 148 sq. in. pictures.
+
+	VP-700 Tiny BASIC ROM Board $39
+	Run Tiny BASIC on your VP-711! All BASIC code stored in ROM.
+	Requires separate ASCII keyboard.
+
+	VP-701 Floating Point BASIC for VP-711 $49
+	16K bytes on cassette tape, includes floating point and
+	integer math, string capability and color graphics. More than 70
+	commands and statements. Available mid-1980.
+
+	VP-710 Game Manual $10
+	More exciting games for your VP-711! Includes Blackjack,
+	Biorythm, Pinball, Bowling and 10 others.
+
+	VP-720 Game Manual II More exciting games. Available mid-1980. $15
+
+	VP-311 VP-711 Instruction Manual (Included with VP-711) $5
+
+	VP-320 VP-711 User Guide Manual (Included with VP-711) $5
+
+	MPM-201B CDP1802 User Manual (Included with VP-711) $5
+
+	* Quantities of 15 or more available less case and speaker (Assembled
+	keypad and circut board only). Price on request.
 
 */
 
@@ -30,10 +227,10 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
-#include "sound/beep.h"
 #include "sound/discrete.h"
 #include "video/cdp1861.h"
 #include "video/cdp1862.h"
+#include "audio/cdp1863.h"
 #include "machine/rescap.h"
 
 static QUICKLOAD_LOAD( vip );
@@ -46,7 +243,7 @@ static const device_config *cassette_device_image(running_machine *machine)
 	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
-/* Discrete Sound */
+/* Sound */
 
 static const discrete_555_desc vip_ca555_a =
 {
@@ -60,6 +257,12 @@ DISCRETE_SOUND_START( vip )
 	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, RES_M(1), CAP_P(470), NODE_01, &vip_ca555_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
+
+static CDP1863_INTERFACE( vip_cdp1863_intf )
+{
+	1750000,	// ???
+	0			// ???
+};
 
 /* Read/Write Handlers */
 
@@ -107,6 +310,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861, CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
+//	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1863, CDP1863_TAG, cdp1863_str_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)
 //	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1862, CDP1862_TAG, cdp1862_bkg_w)
 ADDRESS_MAP_END
@@ -114,7 +318,25 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( vip )
-	PORT_START("KEYPAD1")
+	PORT_START("KEYPAD")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 MW") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A MR") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B TR") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F TW") PORT_CODE(KEYCODE_F)
+
+	PORT_START("VP580")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 MW") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
@@ -150,7 +372,7 @@ static INPUT_PORTS_START( vip )
 
 	PORT_START("SOUND")
 	PORT_CONFNAME( 0x03, 0x00, "Sound")
-	PORT_CONFSETTING( 0x00, DEF_STR( None ) )
+	PORT_CONFSETTING( 0x00, "Standard" )
 	PORT_CONFSETTING( 0x01, "VP-595 Simple Sound Board" )
 	PORT_CONFSETTING( 0x02, "VP-550 Super Sound Board" )
 	PORT_CONFSETTING( 0x03, "VP-551 Super Sound Board" )
@@ -193,6 +415,13 @@ static CDP1862_INTERFACE( vip_cdp1862_intf )
 	RES_K(2.26), // ???
 	RES_K(3.92)	 // ???
 };
+
+static WRITE8_HANDLER( vip_colorram_w )
+{
+	vip_state *state = machine->driver_data;
+
+	state->colorram[offset] = data;
+}
 
 static VIDEO_UPDATE( vip )
 {
@@ -262,20 +491,29 @@ static CDP1802_EF_READ( vip_ef_r )
 
 	/* tape input */
 	if (cassette_input(cassette_device_image(machine)) < 0) flags -= EF2;
+	set_led_status(2, (cassette_input(cassette_device_image(machine)) > 0));
 
 	/* keyboard */
-	if (input_port_read(machine, "KEYPAD1") & (1 << state->keylatch)) flags -= EF3;
+	if (input_port_read(machine, "KEYPAD") & (1 << state->keylatch)) flags -= EF3;
 
 	/* extended keyboard */
-//	if (input_port_read(machine, "KEYPAD2") & (1 << state->keylatch)) flags -= EF4;
+	if (input_port_read(machine, "VP580") & (1 << state->keylatch)) flags -= EF4;
 
 	return flags;
 }
 
 static CDP1802_Q_WRITE( vip_q_w )
 {
+	vip_state *state = machine->driver_data;
+
 	/* sound output */
 	discrete_sound_w(machine, NODE_01, level);
+
+	if (input_port_read(machine, "SOUND") == VIP_SOUND_CDP1863)
+	{
+		/* CDP1863 output enable */
+		cdp1863_oe_w(state->cdp1863, level);
+	}
 
 	/* Q led */
 	set_led_status(1, level);
@@ -291,14 +529,18 @@ static CDP1802_DMA_WRITE( vip_dma_w )
 	switch (input_port_read(machine, "VIDEO"))
 	{
 	case VIP_VIDEO_CDP1861:
-		{
-			cdp1861_dma_w(state->cdp1861, data);
-		}
+		cdp1861_dma_w(state->cdp1861, data);
 		break;
 
 	case VIP_VIDEO_CDP1862:
 		{
-			cdp1862_dma_w(state->cdp1862, data, ASSERT_LINE, 1, 1, 1);
+			UINT8 color = state->colorram[ma & 0xff];
+			
+			int rdata = BIT(color, 0);
+			int gdata = BIT(color, 2);
+			int bdata = BIT(color, 1);
+
+			cdp1862_dma_w(state->cdp1862, data, ASSERT_LINE, rdata, gdata, bdata);
 		}
 		break;
 	}
@@ -352,6 +594,7 @@ static MACHINE_START( vip )
 
 	state->cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
 	state->cdp1862 = device_list_find_by_tag(machine->config->devicelist, CDP1862, CDP1862_TAG);
+	state->cdp1863 = device_list_find_by_tag(machine->config->devicelist, CDP1863, CDP1863_TAG);
 
 	/* register for state saving */
 
@@ -366,21 +609,37 @@ static MACHINE_RESET( vip )
 {
 	vip_state *state = machine->driver_data;
 
-	/* reset video chips */
+	/* reset auxiliary chips */
 
 	state->cdp1861->reset(state->cdp1861);
 	state->cdp1862->reset(state->cdp1862);
+	state->cdp1863->reset(state->cdp1863);
 
-	/* map CDP1862 memory */
+	/* configure video */
 
 	switch (input_port_read(machine, "VIDEO"))
 	{
 	case VIP_VIDEO_CDP1861:
-		memory_install_write8_device_handler(state->cdp1862, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc0ff, 0, 0, SMH_UNMAP);
 		break;
 
 	case VIP_VIDEO_CDP1862:
 		memory_install_write8_device_handler(state->cdp1862, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, cdp1862_bkg_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc0ff, 0, 0, vip_colorram_w);
+		break;
+	}
+
+	/* configure audio */
+
+	switch (input_port_read(machine, "SOUND"))
+	{
+	case VIP_SOUND_CDP1863:
+		memory_install_write8_device_handler(state->cdp1863, 0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, cdp1863_str_w);
+		break;
+
+	default:
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, SMH_UNMAP);
 		break;
 	}
 
@@ -427,10 +686,16 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_DEVICE_CONFIG(vip_cdp1862_intf)
 
 	/* sound hardware */
+	MDRV_DEVICE_ADD(CDP1863_TAG, CDP1863)
+	MDRV_DEVICE_CONFIG(vip_cdp1863_intf)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(vip)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("beep", BEEP, 0) /* CDP1863 */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD(vip, "bin,c8,c8x", 0)
@@ -509,8 +774,9 @@ static QUICKLOAD_LOAD( vip )
 }
 
 static SYSTEM_CONFIG_START( vp711 )
-	CONFIG_RAM_DEFAULT	( 4 * 1024)
-	CONFIG_RAM			(32 * 1024)
+	CONFIG_RAM_DEFAULT	( 2 * 1024)
+	CONFIG_RAM			( 4 * 1024)
+	CONFIG_RAM			( 8 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( vp111 )
@@ -519,8 +785,21 @@ static SYSTEM_CONFIG_START( vp111 )
 	CONFIG_RAM			( 4 * 1024)
 SYSTEM_CONFIG_END
 
+/* Driver Initialization */
+
+static TIMER_CALLBACK(setup_beep)
+{
+	beep_set_state(0, 0);
+	beep_set_frequency( 0, 0 );
+}
+
+static DRIVER_INIT( vip )
+{
+	timer_set(attotime_zero, NULL, 0, setup_beep);
+}
+
 /* System Drivers */
 
 //	  YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY FULLNAME
-COMP( 1977, vip,	0,		0,		vip,		vip,	0,		vp711,	"RCA",	"Cosmac VIP (VP-711)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1977, vp111,	vip,	0,		vip,		vip,	0,		vp111,	"RCA",	"Cosmac VIP (VP-111)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1977, vip,	0,		0,		vip,		vip,	vip,	vp711,	"RCA",	"Cosmac VIP (VP-711)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1977, vp111,	vip,	0,		vip,		vip,	vip,	vp111,	"RCA",	"Cosmac VIP (VP-111)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

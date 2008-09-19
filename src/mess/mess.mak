@@ -761,7 +761,8 @@ $(MESSOBJ)/rca.a: \
 	$(MESS_DRIVERS)/vip.o  \
 	$(MESS_DRIVERS)/studio2.o  \
 	$(MESS_VIDEO)/cdp1861.o \
-	$(MESS_VIDEO)/cdp1862.o
+	$(MESS_VIDEO)/cdp1862.o \
+	$(MESS_AUDIO)/cdp1863.o
 
 $(MESSOBJ)/fairch.a: \
 	$(MESS_VIDEO)/channelf.o \
