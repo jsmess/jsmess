@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( magicstk_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
 	AM_RANGE(0x0c201e, 0x0c201f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM
+	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
@@ -316,6 +316,86 @@ static INPUT_PORTS_START( magicstk )
 //  PORT_DIPSETTING(    0x80, "Very Hard 4" )
 //  PORT_DIPSETTING(    0x40, "Very Hard 4" )
 	PORT_DIPSETTING(    0x00, "Very Hard 4" )
+	PORT_DIPSETTING(    0x60, "Normal 8" )
+	PORT_DIPSETTING(    0xe0, "Easy 9" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hotminda )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x06, "Premio" )			PORT_DIPLOCATION("DSW1:7,6")
+	PORT_DIPSETTING(    0x00, "1 Premio ogni 10 Vincite" )
+	PORT_DIPSETTING(    0x04, "1 Premio ogni 10 Vincite" )
+	PORT_DIPSETTING(    0x02, "1 Premio ogni 5 Vincite" )
+	PORT_DIPSETTING(    0x06, "Paga 1 Premio ogni Vincita" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B )	)	PORT_DIPLOCATION("DSW1:5,4")
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Clear Counters" )	PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Ticket" )			PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Hopper" )			PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0xe0, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("DSW2:3,2,1")
+	PORT_DIPSETTING(    0xa0, "Hard 7" )
+	PORT_DIPSETTING(    0x20, "Very Hard 6" )
+	PORT_DIPSETTING(    0xc0, "Very Hard 5" )
+	PORT_DIPSETTING(    0x40, "Very Hard 4" )
+	PORT_DIPSETTING(    0x80, "Very Hard 3" )
+	PORT_DIPSETTING(    0x00, "Very Hard 2" )
 	PORT_DIPSETTING(    0x60, "Normal 8" )
 	PORT_DIPSETTING(    0xe0, "Easy 9" )
 INPUT_PORTS_END
@@ -572,6 +652,28 @@ ROM_START( magicstk )
 	ROM_LOAD( "gal22v10b.bin", 0x0400, 0x02e5, NO_DUMP ) /* GAL is soldered */
 ROM_END
 
+
+ROM_START( hotminda )
+	ROM_REGION( 0x80000, "main", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "rom1.rom",       0x00001, 0x20000, CRC(33aaceba) SHA1(a914400b081eabd869f1ca2c843a91b03af510b1) )
+	ROM_LOAD16_BYTE( "rom2.rom",       0x00000, 0x20000, CRC(f5accd9f) SHA1(12194ea7c35263be9afd91f0abe2041998528af9) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "rom13.rom",       0x00000, 0x20000, CRC(18d22109) SHA1(52bbb68f4ef5f4d41f5915bef4304784451ca6d8) )
+	ROM_LOAD( "rom14.rom",       0x20000, 0x20000, CRC(f95a1ff6) SHA1(646c59199570ccd11cb53b0b59a6cd03b1b42fac) )
+	ROM_LOAD( "rom15.rom",       0x40000, 0x20000, CRC(8a9ea7ed) SHA1(529c0466df3f0aa050526699099ea7a5da9dbcfe) )
+	ROM_LOAD( "rom16.rom",       0x60000, 0x20000, CRC(df63b642) SHA1(d5df740717193b06267508d169bb5df6214ca13d))
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "rom17.rom",       0x00000, 0x20000, CRC(805002cf) SHA1(dc97881bc78dcb753f404b7df2cfd4a071ca8393) )
+	ROM_LOAD( "rom18.rom",       0x20000, 0x20000, CRC(6a9d896b) SHA1(d617a69e6954de3bf7c322529232eadb90034fbc) )
+	ROM_LOAD( "rom19.rom",       0x40000, 0x20000, CRC(223ad90f) SHA1(57b4e364f21aeea24a99deb6bab13019846e8f9b) )
+	ROM_LOAD( "rom20.rom",       0x60000, 0x20000, CRC(ab37a273) SHA1(2051ee99a7ff3f4fc2b91c2c9d4e4da2f12db256) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* OKI Samples */
+	ROM_LOAD( "rom10.rom",       0x00000, 0x40000,  CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
+ROM_END
+
 static DRIVER_INIT( powerbal )
 {
 	bg_yoffset = 16;
@@ -584,5 +686,11 @@ static DRIVER_INIT( magicstk )
 	yoffset = -5;
 }
 
-GAME( 1994, powerbal, 0, powerbal, powerbal, powerbal, ROT0, "Playmark", "Power Balls", 0 )
-GAME( 1995, magicstk, 0, magicstk, magicstk, magicstk, ROT0, "Playmark", "Magic Sticks", 0 )
+/*************************
+*      Game Drivers      *
+*************************/
+
+/*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY     FULLNAME                      FLAGS */
+GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal, ROT0, "Playmark", "Power Balls",                 0 )
+GAME( 1995, magicstk, 0,       magicstk, magicstk, magicstk, ROT0, "Playmark", "Magic Sticks",                0 )
+GAME( 1995, hotminda, hotmind, magicstk, hotminda, magicstk, ROT0, "Playmark", "Hot Mind (adjustable prize)", 0 )

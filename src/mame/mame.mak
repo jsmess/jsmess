@@ -263,7 +263,6 @@ SOUNDS += NAMCO_15XX
 SOUNDS += NAMCO_CUS30
 SOUNDS += NAMCO_52XX
 SOUNDS += NAMCO_63701X
-SOUNDS += NAMCONA
 SOUNDS += SNKWAVE
 SOUNDS += C140
 SOUNDS += C352
@@ -502,6 +501,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/destroyr.o $(VIDEO)/destroyr.o \
 	$(DRIVERS)/dragrace.o $(AUDIO)/dragrace.o $(VIDEO)/dragrace.o \
 	$(DRIVERS)/eprom.o $(VIDEO)/eprom.o \
+	$(DRIVERS)/firefox.o \
 	$(DRIVERS)/firetrk.o $(AUDIO)/firetrk.o $(VIDEO)/firetrk.o \
 	$(DRIVERS)/flyball.o $(VIDEO)/flyball.o \
 	$(DRIVERS)/foodf.o $(VIDEO)/foodf.o \
@@ -803,6 +803,7 @@ $(MAMEOBJ)/itech.a: \
 $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/aeroboto.o $(VIDEO)/aeroboto.o \
 	$(DRIVERS)/argus.o $(VIDEO)/argus.o \
+	$(VIDEO)/jalblend.o \
 	$(DRIVERS)/bestleag.o \
 	$(DRIVERS)/bigstrkb.o $(VIDEO)/bigstrkb.o \
 	$(DRIVERS)/blueprnt.o $(VIDEO)/blueprnt.o \
@@ -1712,6 +1713,8 @@ $(DRIVERS)/dlair.o:		$(LAYOUT)/dlair.lh
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
 $(DRIVERS)/funworld.o:	$(LAYOUT)/funworld.lh
+
+$(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
 
 $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 						$(LAYOUT)/pulltabs.lh

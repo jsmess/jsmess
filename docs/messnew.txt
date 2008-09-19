@@ -14,6 +14,8 @@ New System Drivers Supported (in no particular order):
 - PK-8020 Korvet (not working) [Miodrag Milanovic]
 - Kramer MC [Miodrag Milanovic]
 
+
+
 System Driver Changes:
 ----------------------
 
@@ -155,7 +157,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.127u3.  This incorporates all features of the
+- The core is based on MAME 0.127u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Refactored ZIP path code out of src/mess/image.c, made more testable.  [Nate
