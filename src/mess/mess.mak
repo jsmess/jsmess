@@ -492,7 +492,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/msm8251.o  \
 	$(MESS_MACHINE)/tc8521.o   \
 	$(MESS_VIDEO)/crtc6845.o	\
-	$(MESS_MACHINE)/rriot.o    \
 	$(MESS_MACHINE)/74145.o    \
 	$(MESS_MACHINE)/ins8250.o \
 	$(MESS_MACHINE)/pc_mouse.o \
