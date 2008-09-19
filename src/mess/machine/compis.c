@@ -1547,7 +1547,7 @@ MACHINE_RESET( compis )
 	compis_fdc_reset(machine);
 
 	/* RTC */
-	mm58274c_init(machine, 0, 0);
+	mm58274c_init(machine, 0, 0, 1);
 
 	/* Setup the USART */
 	msm8251_init(&compis_usart_interface);

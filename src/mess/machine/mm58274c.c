@@ -36,7 +36,7 @@ static struct
 	int int_ctl;	/* interrupt control register */
 
 
-	int wday;		/* day of the week (1-7 (1=monday, 7=sunday)) */
+	int wday;		/* day of the week (1-7 (1=day1 as set in init)) */
 	int years1;		/* years (BCD: 0-99) */
 	int years2;
 	int months1;	/* months (BCD: 1-12) */
@@ -89,11 +89,15 @@ static attotime interrupt_period_table(int val)
 	}
 };
 
-
-void mm58274c_init(running_machine *machine, int which, int mode24)
+/* 
+	Initializes the clock chip. 
+	day1 must be set to a value from 0 (sunday), 1 (monday) ... 
+	to 6 (saturday)	and is needed to correctly retrieve the day-of-week 
+	from the host system clock.
+*/
+void mm58274c_init(running_machine *machine, int which, int mode24, int day1)
 {
 	memset(&rtc[which], 0, sizeof(rtc[which]));
-
 	timer_pulse(ATTOTIME_IN_MSEC(100), NULL, which, increment_rtc);
 	rtc[which].interrupt_timer = timer_alloc(rtc_interrupt_callback, NULL);
 
@@ -106,9 +110,9 @@ void mm58274c_init(running_machine *machine, int which, int mode24)
 		rtc[which].clk_set = systime.local_time.year & 3 << 2;
 		if (mode24)
 			rtc[which].clk_set |= clk_set_24;
-
+                    
 		/* The clock count starts on 1st January 1900 */
-		rtc[which].wday = systime.local_time.weekday ? systime.local_time.weekday : 7;
+		rtc[which].wday = 1 + ((systime.local_time.weekday - day1)%7);
 		rtc[which].years1 = (systime.local_time.year / 10) % 10;
 		rtc[which].years2 = systime.local_time.year % 10;
 		rtc[which].months1 = (systime.local_time.month + 1) / 10;

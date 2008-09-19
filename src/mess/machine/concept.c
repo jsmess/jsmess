@@ -96,7 +96,7 @@ MACHINE_START(concept)
 
 	/* initialize clock interface */
 	clock_enable = 0/*1*/;
-	mm58274c_init(machine, 0, 0);
+	mm58274c_init(machine, 0, 0, 1);
 
 	/* clear keyboard interface state */
 	KeyQueueHead = KeyQueueLen = 0;

@@ -86,6 +86,8 @@ System Driver Changes:
   we will start to use the correct ones. If you own a C128 PAL, please 
   dump its BIOS to verify its content. [Fabio Priuli]
 
+- [GENEVE] Fixed RTC to start on Sunday.  [Michael Zapf]
+
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully 
   working, including the "Säkkijärven polkka" program. [Curt Coder]
@@ -106,6 +108,8 @@ System Driver Changes:
   load cartridges has never been present apparently, but now it only miss
   memory addresses to be working. More work when/if more documents will 
   be available [Fabio Priuli]
+
+- [TI99] Changed ESC key to map to F12.  [Michael Zapf]
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 

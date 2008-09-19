@@ -213,7 +213,7 @@ MACHINE_START( geneve )
         ti99_ide_init(machine);
         ti99_rs232_init(machine);
 	ti99_usbsm_init(machine);
-	mm58274c_init(machine, 0, 1);
+	mm58274c_init(machine, 0, 1, 0);
 	add_exit_callback(machine, machine_stop_geneve);
 }
 
