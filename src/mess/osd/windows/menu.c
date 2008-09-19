@@ -291,6 +291,8 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 	const input_field_config *field;
 	const input_setting_config *setting;
 	const char *switch_name = NULL;
+	input_field_user_settings settings;
+
 	UINT32 type;
 
 	dlg = win_dialog_init(ui_getstring(title_string_num), NULL);
@@ -306,7 +308,10 @@ static void customize_switches(running_machine *machine, HWND wnd, int title_str
 			if (type == ipt_name)
 			{
 				switch_name = input_field_name(field);
-				if (win_dialog_add_combobox(dlg, switch_name, field->defvalue, storeval_inputport, (void *) field))
+
+				input_field_get_user_settings(field, &settings);
+
+				if (win_dialog_add_combobox(dlg, switch_name, settings.value, storeval_inputport, (void *) field))
 					goto done;
 
 				for (setting = field->settinglist; setting != NULL; setting = setting->next)
