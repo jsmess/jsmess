@@ -330,7 +330,6 @@ SOUNDS += WAVE
 SOUNDS += SID6581
 SOUNDS += SID8580
 SOUNDS += SP0256
-#SOUNDS += NAMCONA
 
 
 #-------------------------------------------------
