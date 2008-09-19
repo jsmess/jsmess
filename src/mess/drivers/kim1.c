@@ -65,11 +65,13 @@
 
 #include "driver.h"
 #include "includes/kim1.h"
+#include "machine/6530miot.h"
+
 
 static ADDRESS_MAP_START ( kim1_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_READWRITE( m6530_003_r, m6530_003_w )
-	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_READWRITE( m6530_002_r, m6530_002_w )
+	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE( MIOT6530, "miot_u3", miot6530_r, miot6530_w )
+	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE( MIOT6530, "miot_u2", miot6530_r, miot6530_w )
 	AM_RANGE(0x1780, 0x17bf) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_ROM
@@ -161,6 +163,107 @@ static GFXDECODE_START( kim1 )
 GFXDECODE_END
 
 
+static UINT8	u2_port_b;
+
+static UINT8 kim1_u2_read_a(const device_config *device, UINT8 olddata)
+{
+	UINT8	data = 0xff;
+
+	switch( ( u2_port_b >> 1 ) & 0x0f )
+	{
+	case 0:
+		data = input_port_read(device->machine, "LINE0");
+		break;
+	case 1:
+		data = input_port_read(device->machine, "LINE1");
+		break;
+	case 2:
+		data = input_port_read(device->machine, "LINE2");
+		break;
+	}
+	return data;
+}
+
+
+static void kim1_u2_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	switch( ( u2_port_b >> 1 ) & 0x0f )
+	{
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+		if ( newdata & 0x80 )
+		{
+			videoram[(( ( u2_port_b >> 1 ) & 0x0f ) - 4) * 2 + 0] = newdata & 0x7f;
+			videoram[(( ( u2_port_b >> 1 ) & 0x0f ) - 4) * 2 + 1] = 15;
+		}
+		break;
+	}
+}
+
+
+static UINT8 kim1_u2_read_b(const device_config *device, UINT8 olddata)
+{
+	return 0xFF;
+}
+
+
+static void kim1_u2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	u2_port_b = newdata;
+
+	if ( ( newdata & 0x3f ) == 0x27 )
+	{
+		/* cassette write/speaker update */
+	}
+
+	/* Set IRQ when bit 7 is cleared */
+}
+
+
+static const miot6530_interface kim1_u2_miot6530_interface =
+{
+	kim1_u2_read_a,
+	kim1_u2_read_b,
+	kim1_u2_write_a,
+	kim1_u2_write_b
+};
+
+
+static UINT8 kim1_u3_read_a(const device_config *device, UINT8 olddata)
+{
+	return 0xFF;
+}
+
+
+static void kim1_u3_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+}
+
+
+static UINT8 kim1_u3_read_b(const device_config *device, UINT8 olddata)
+{
+	return 0xFF;
+}
+
+
+static void kim1_u3_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+}
+
+
+static const miot6530_interface kim1_u3_miot6530_interface =
+{
+	kim1_u3_read_a,
+	kim1_u3_read_b,
+	kim1_u3_write_a,
+	kim1_u3_write_b
+};
+
+
 static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)        /* 1 MHz */
@@ -183,6 +286,9 @@ static MACHINE_DRIVER_START( kim1 )
 
 	MDRV_VIDEO_START( kim1 )
 	MDRV_VIDEO_UPDATE( kim1 )
+
+	MDRV_MIOT6530_ADD( "miot_u2", 1000000, kim1_u2_miot6530_interface )
+	MDRV_MIOT6530_ADD( "miot_u3", 1000000, kim1_u3_miot6530_interface )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -511,6 +511,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/68901mfp.o \
 	$(MESS_FORMATS)/rk_cas.o	\
 	$(MESS_VIDEO)/msm6255.o	\
+	$(MESS_MACHINE)/6530miot.o	\
 
 
 

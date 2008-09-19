@@ -17,13 +17,6 @@ void kim1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, unio
 
 INTERRUPT_GEN( kim1_interrupt );
 
-READ8_HANDLER ( m6530_003_r );
-READ8_HANDLER ( m6530_002_r );
-
-WRITE8_HANDLER ( m6530_003_w );
-WRITE8_HANDLER ( m6530_002_w );
-
-
 /*----------- defined in video/kim1.c -----------*/
 
 PALETTE_INIT( kim1 );
