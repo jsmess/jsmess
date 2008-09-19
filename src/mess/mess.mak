@@ -537,19 +537,20 @@ $(MESSOBJ)/arcadia.a:  \
 
 $(MESSOBJ)/sega.a:						\
 	$(MESS_DRIVERS)/genesis.o	\
+	$(MESS_MACHINE)/genesis.o	\
 	$(MESS_DRIVERS)/saturn.o	\
-	$(MAME_MACHINE)/stvcd.o			\
-	$(MAME_MACHINE)/scudsp.o			\
+	$(MAME_MACHINE)/stvcd.o		\
+	$(MAME_MACHINE)/scudsp.o	\
 	$(MAME_VIDEO)/stvvdp1.o		\
 	$(MAME_VIDEO)/stvvdp2.o		\
-	$(MESS_VIDEO)/smsvdp.o	\
+	$(MESS_VIDEO)/smsvdp.o		\
 	$(MESS_MACHINE)/sms.o		\
 	$(MESS_DRIVERS)/sms.o		\
-	$(MAME_DRIVERS)/megadriv.o  \
+	$(MAME_DRIVERS)/megadriv.o  	\
 	$(MESS_DRIVERS)/sg1000.o	\
-	$(MESS_DRIVERS)/dc.o	\
-	$(MAME_MACHINE)/dc.o 	\
-	$(MAME_VIDEO)/dc.o	\
+	$(MESS_DRIVERS)/dc.o		\
+	$(MAME_MACHINE)/dc.o 		\
+	$(MAME_VIDEO)/dc.o		\
 
 $(MESSOBJ)/atari.a:						\
 	$(MAME_VIDEO)/tia.o			\
