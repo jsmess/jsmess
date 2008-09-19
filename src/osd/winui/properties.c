@@ -2912,11 +2912,12 @@ static void InitializeBIOSUI(HWND hwnd)
 					if (ROMENTRY_ISSYSTEM_BIOS(rom))
 					{
 						const char *name = ROM_GETHASHDATA(rom);
+						const char *biosname = ROM_GETNAME(rom);
 						t_s = tstring_from_utf8(name);
 						if( !t_s )
 							return;
 						(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
-						(void)ComboBox_SetItemData( hCtrl, i++, name);
+						(void)ComboBox_SetItemData( hCtrl, i++, biosname);
 						free(t_s);
 					}
 				}
@@ -2940,11 +2941,12 @@ static void InitializeBIOSUI(HWND hwnd)
 				if (ROMENTRY_ISSYSTEM_BIOS(rom))
 				{
 					const char *name = ROM_GETHASHDATA(rom);
+					const char *biosname = ROM_GETNAME(rom);
 					t_s = tstring_from_utf8(name);
 					if( !t_s )
 						return;
 					(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
-					(void)ComboBox_SetItemData( hCtrl, i++, name);
+					(void)ComboBox_SetItemData( hCtrl, i++, biosname);
 					free(t_s);
 				}
 			}
