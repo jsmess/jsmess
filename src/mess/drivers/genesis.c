@@ -379,31 +379,36 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( genesis )
+static DRIVER_INIT( mess_md_common )
 {
 	DRIVER_INIT_CALL(gencommon);
-	DRIVER_INIT_CALL(megadriv);
 	
 	megadrive_io_read_data_port_ptr	= mess_md_io_read_data_port;
 	megadrive_io_write_data_port_ptr = mess_md_io_write_data_port;
 }
 
+static DRIVER_INIT( genesis )
+{
+	DRIVER_INIT_CALL(megadriv);
+	DRIVER_INIT_CALL(mess_md_common);
+}
+
 static DRIVER_INIT( gensvp )
 {
-	DRIVER_INIT_CALL(gencommon);
 	DRIVER_INIT_CALL(megadsvp);
+	DRIVER_INIT_CALL(mess_md_common);
 }
 
 static DRIVER_INIT( md_eur )
 {
-	DRIVER_INIT_CALL(gencommon);
 	DRIVER_INIT_CALL(megadrie);
+	DRIVER_INIT_CALL(mess_md_common);
 }
 
 static DRIVER_INIT( md_jpn )
 {
-	DRIVER_INIT_CALL(gencommon);
 	DRIVER_INIT_CALL(megadrij);
+	DRIVER_INIT_CALL(mess_md_common);
 }
 
 
