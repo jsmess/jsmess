@@ -88,6 +88,9 @@ System Driver Changes:
   we will start to use the correct ones. If you own a C128 PAL, please 
   dump its BIOS to verify its content. [Fabio Priuli]
 
+- [GENESIS / MD] Added possibility to choose between a 3 buttons and a 6
+  buttons Joypad. [Fabio Priuli]
+
 - [GENEVE] Fixed RTC to start on Sunday.  [Michael Zapf]
 
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
