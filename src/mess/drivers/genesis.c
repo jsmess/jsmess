@@ -61,6 +61,259 @@ static int megadrive_region_export = 0;
 static int megadrive_region_pal = 0;
 
 
+/*************************************
+ *
+ *  Input handlers
+ *
+ *************************************/
+
+/* We need to always initialize 6 buttons pad */
+static emu_timer *mess_io_timeout[3];
+static int mess_io_stage[3];
+
+static TIMER_CALLBACK( mess_io_timeout_timer_callback )
+{
+	mess_io_stage[(int)(FPTR)ptr] = -1;
+}
+
+static void mess_init_6buttons_pad(void)
+{
+	int i;
+
+	for (i = 0; i < 3; i++)
+	{
+		mess_io_timeout[i] = timer_alloc(mess_io_timeout_timer_callback, (void*)(FPTR)i);
+		mess_io_stage[i] = -1;
+	}
+}
+
+/* These overwrite the MAME ones in DRIVER_INIT */
+/* They're needed to give the users the choice between different controllers */
+static UINT8 mess_md_io_read_data_port(int portnum)
+{
+	static const char *const pad6names[2][4] = {{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" }, 
+												{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }};
+	static const char *const pad3names[4] = { "PAD1_3B", "PAD2_3B", "UNUSED", "UNUSED" };
+
+	UINT8 retdata; 
+	int controller;
+	UINT8 helper_6b = (megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
+	UINT8 helper_3b = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
+
+	switch (portnum)
+	{
+		case 0:
+			controller = (input_port_read(Machine, "CTRLSEL") & 0x0f);
+			break;
+
+		case 1:
+			controller = (input_port_read(Machine, "CTRLSEL") & 0xf0);
+			break;
+
+		default:
+			controller = 0;
+			break;
+	}
+
+	/* Are we using a 6 buttons Joypad? */
+	if (controller)
+	{
+		if (megadrive_io_data_regs[portnum] & 0x40)
+		{
+			if (mess_io_stage[portnum] == 2)
+			{
+				/* here we read B, C & the additional buttons */
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+							(((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0x30) | 
+								(input_port_read_safe(Machine, pad6names[1][portnum], 0) & 0x0f)) & ~helper_6b);
+			}
+			else
+			{
+				/* here we read B, C & the directional buttons */
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+							((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0x3f) & ~helper_6b);
+			}
+		}
+		else
+		{
+			if (mess_io_stage[portnum] == 1)
+			{
+				/* here we read ((Start & A) >> 2) | 0x00 */
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+							(((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0xc0) >> 2) & ~helper_6b);
+			}
+			else if (mess_io_stage[portnum]==2)
+			{
+				/* here we read ((Start & A) >> 2) | 0x0f */
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+							((((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
+			}
+			else
+			{
+				/* here we read ((Start & A) >> 2) | Up and Down */
+				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
+							((((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 
+								(input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0x03)) & ~helper_6b);
+			}
+		}
+
+	//  mame_printf_debug("read io data port stage %d port %d %02x\n",mess_io_stage[portnum],portnum,retdata);
+
+		retdata |= (retdata << 8);
+	}
+	/* Otherwise it's a 3 buttons Joypad */
+	else
+	{
+		if (megadrive_io_data_regs[portnum] & 0x40)
+		{
+			/* here we read B, C & the directional buttons */
+			retdata = (megadrive_io_data_regs[portnum] & helper_3b) | 
+						(((input_port_read_safe(Machine, pad3names[portnum], 0) & 0x3f) | 0x40) & ~helper_3b);
+		}
+		else
+		{
+			/* here we read ((Start & A) >> 2) | Up and Down */
+			retdata = (megadrive_io_data_regs[portnum] & helper_3b) | 
+						((((input_port_read_safe(Machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
+							(input_port_read_safe(Machine, pad3names[portnum], 0) & 0x03) | 0x40) & ~helper_3b);
+		}
+	}
+
+	return retdata;
+}
+
+
+static void mess_md_io_write_data_port(int portnum, UINT16 data)
+{
+	int controller;
+
+	switch (portnum)
+	{
+		case 0:
+			controller = (input_port_read(Machine, "CTRLSEL") & 0x0f);
+			break;
+
+		case 1:
+			controller = (input_port_read(Machine, "CTRLSEL") & 0xf0);
+			break;
+
+		default:
+			controller = 0;
+			break;
+	}
+
+	if (controller)
+	{
+		if (megadrive_io_ctrl_regs[portnum] & 0x40)
+		{
+			if (((megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
+			{
+				mess_io_stage[portnum]++;
+				timer_adjust_oneshot(mess_io_timeout[portnum], ATTOTIME_IN_CYCLES(8192,0), 0);
+			}
+
+		}
+	}
+	megadrive_io_data_regs[portnum] = data;
+	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
+}
+
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
+
+
+INPUT_PORTS_START( md )
+	PORT_START("CTRLSEL")	/* Controller selection */
+	PORT_CATEGORY_CLASS( 0x0f, 0x00, "Player 1 Controller" )
+	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 10 )
+	PORT_CATEGORY_ITEM( 0x01, "Joystick 6 Buttons", 11 )
+//	PORT_CATEGORY_ITEM( 0x02, "Sega Mouse", 12 )
+/* there exists both a 2 buttons version of the Mouse (Jpn ver, to be used with RPGs, it
+	can aslo be used as trackball) and a 3 buttons version (US ver, no trackball feats.) */
+//	PORT_CATEGORY_ITEM( 0x03, "Sega Menacer", 13 )
+//	PORT_CATEGORY_ITEM( 0x04, "Konami Justifier", 14 )
+//	PORT_CATEGORY_ITEM( 0x05, "Team Player (Sega Multitap)", 15 )
+//	PORT_CATEGORY_ITEM( 0x06, "4-Play (EA Multitap)", 16 )
+//	PORT_CATEGORY_ITEM( 0x07, "J-Cart", 17 )
+	PORT_CATEGORY_CLASS( 0xf0, 0x00, "Player 2 Controller" )
+	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 20 )
+	PORT_CATEGORY_ITEM( 0x10, "Joystick 6 Buttons", 21 )
+
+	PORT_START("PAD1_3B")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") PORT_CATEGORY(10)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") PORT_CATEGORY(10)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CATEGORY(10)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_CATEGORY(10)
+
+	PORT_START("PAD2_3B")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(20)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(20)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(20)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(20)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") PORT_CATEGORY(20)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") PORT_CATEGORY(20)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") PORT_CATEGORY(20)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_CATEGORY(20)
+
+	PORT_START("PAD1_6B")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") PORT_CATEGORY(11)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") PORT_CATEGORY(11)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CATEGORY(11)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_CATEGORY(11)
+
+	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Z") PORT_CATEGORY(11)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Y") PORT_CATEGORY(11)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 X") PORT_CATEGORY(11)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Mode") PORT_CATEGORY(11)
+
+	PORT_START("PAD2_6B")		/* Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") PORT_CATEGORY(21)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") PORT_CATEGORY(21)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") PORT_CATEGORY(21)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_CATEGORY(21)
+
+	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Z") PORT_CATEGORY(21)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Y") PORT_CATEGORY(21)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 X") PORT_CATEGORY(21)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Mode") PORT_CATEGORY(21)
+
+	PORT_START("RESET")		/* Buttons on Genesis Console */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( md_svp )
+	PORT_INCLUDE( md )
+
+	/* We need this as long as we only have the US version of the SVP add-on,
+	  otherwise we could not play Non-US Virtua Racing versions  */
+	PORT_START("REGION")
+	/* Region setting for Console */
+	PORT_CONFNAME( 0x000f, 0x0000, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, "Use Default Choice" )
+	PORT_CONFSETTING(      0x0001, "US (NTSC, 60fps)" )
+	PORT_CONFSETTING(      0x0002, "Japan (NTSC, 60fps)" )
+	PORT_CONFSETTING(      0x0003, "Europe (PAL, 50fps)" )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -72,6 +325,8 @@ static MACHINE_RESET( ms_megadriv )
 {
 	MACHINE_RESET_CALL( megadriv );
 	MACHINE_RESET_CALL( md_mappers );
+	
+	mess_init_6buttons_pad();
 }
 
 static MACHINE_DRIVER_START( ms_megadriv )
@@ -118,7 +373,6 @@ ROM_START(megadrij)
 ROM_END
 
 
-
 /*************************************
  *
  *  Driver initialization
@@ -129,6 +383,15 @@ static DRIVER_INIT( genesis )
 {
 	DRIVER_INIT_CALL(gencommon);
 	DRIVER_INIT_CALL(megadriv);
+	
+	megadrive_io_read_data_port_ptr	= mess_md_io_read_data_port;
+	megadrive_io_write_data_port_ptr = mess_md_io_write_data_port;
+}
+
+static DRIVER_INIT( gensvp )
+{
+	DRIVER_INIT_CALL(gencommon);
+	DRIVER_INIT_CALL(megadsvp);
 }
 
 static DRIVER_INIT( md_eur )
@@ -404,10 +667,10 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME		PARENT		COMPAT  MACHINE    	  INPUT     INIT  		CONFIG		COMPANY   FULLNAME */
-CONS( 1989, genesis,	0,			0,      ms_megadriv,  megadri6, genesis,	genesis,	"Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1993, gensvp,		genesis,	0,      ms_megdsvp,   megdsvp,  megadsvp,	genesis,	"Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
-CONS( 1990, megadriv,	genesis,	0,      ms_megadriv,  megadri6, md_eur,		genesis,	"Sega",   "Mega Drive (Europe, PAL)", 0)
-CONS( 1988, megadrij,	genesis,	0,      ms_megadriv,  megadri6, md_jpn,		genesis,	"Sega",   "Mega Drive (Japan, NTSC)", 0)
+CONS( 1989, genesis,	0,			0,      ms_megadriv,  md,		genesis,	genesis,	"Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1993, gensvp,		genesis,	0,      ms_megdsvp,   md_svp,	gensvp,		genesis,	"Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
+CONS( 1990, megadriv,	genesis,	0,      ms_megadriv,  md,		md_eur,		genesis,	"Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1988, megadrij,	genesis,	0,      ms_megadriv,  md,		md_jpn,		genesis,	"Sega",   "Mega Drive (Japan, NTSC)", 0)
 CONS( 1994, pico,		0,			0,      pico,	      pico,		md_eur,		pico,		"Sega",   "Pico (Europe, PAL)", 0)
 CONS( 1994, picou,		pico,		0,      pico,	      pico,		genesis,	pico,		"Sega",   "Pico (USA, NTSC)", 0)
 CONS( 1993, picoj,		pico,		0,      pico,	      pico,		md_jpn,		pico,		"Sega",   "Pico (Japan, NTSC)", 0)
