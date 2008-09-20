@@ -48,7 +48,7 @@ UINT8 vic6560[16];
 
 /* 2008-05 FP: lightpen code needs to read input port from vc20.c */
 
-#define LIGHTPEN_BUTTON		(((input_port_read(machine, "CFG") & 0xf0) == 0x20) && (input_port_read(machine, "JOY") & 0x40))
+#define LIGHTPEN_BUTTON		(((input_port_read(machine, "CTRLSEL") & 0xf0) == 0x20) && (input_port_read(machine, "JOY") & 0x40))
 #define LIGHTPEN_X_VALUE	(input_port_read(machine, "LIGHTX") & ~0x01)
 #define LIGHTPEN_Y_VALUE	(input_port_read(machine, "LIGHTY") & ~0x01)
 

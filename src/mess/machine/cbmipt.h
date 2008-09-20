@@ -7,7 +7,6 @@
 INPUT_PORTS_EXTERN( common_cbm_keyboard );	/* shared with c16, c65, c128 */
 INPUT_PORTS_EXTERN( c64_special );
 INPUT_PORTS_EXTERN( c64_controls );			/* shared with c65, c128, cbmb */
-INPUT_PORTS_EXTERN( c64_config );
 
 
 /* Commodore 16 */
@@ -20,13 +19,11 @@ INPUT_PORTS_EXTERN( c16_config );
 /* Commodore 65 */
 
 INPUT_PORTS_EXTERN( c65_special );
-INPUT_PORTS_EXTERN( c65_config );
 
 
 /* Commodore 128 */
 
 INPUT_PORTS_EXTERN( c128_special );
-INPUT_PORTS_EXTERN( c128_config );
 
 
 /* PET2001 */
@@ -50,7 +47,6 @@ INPUT_PORTS_EXTERN( vic_special );
 INPUT_PORTS_EXTERN( vic_controls );
 INPUT_PORTS_EXTERN( vic_devices );
 INPUT_PORTS_EXTERN( vic_expansion );
-INPUT_PORTS_EXTERN( vic_config );
 
 
 #endif /* CBMIPT_H_ */

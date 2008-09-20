@@ -375,16 +375,6 @@ static INPUT_PORTS_START( c64 )
 	PORT_INCLUDE( c64_special )				/* SPECIAL */
 
 	PORT_INCLUDE( c64_controls )			/* CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER */
-
-	PORT_INCLUDE( c64_config )				/* CFG */
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START (ultimax)
-	PORT_INCLUDE( c64 )
-
-	PORT_MODIFY( "CFG" )
-	PORT_BIT( 0x1c, 0x04, IPT_UNUSED )	/* only ultimax cartridges */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START (c64gs)
@@ -412,17 +402,6 @@ static INPUT_PORTS_START (c64gs)
 	PORT_BIT (0xff, 0x00, IPT_UNUSED )
 	PORT_MODIFY( "SPECIAL" ) /* no keyboard */
 	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-
-	PORT_MODIFY( "CFG" )
-	PORT_BIT( 0xff00, 0x0000, IPT_UNUSED )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START (sx64)
-	PORT_INCLUDE( c64 )
-
-	PORT_MODIFY( "CFG" )
-	PORT_BIT( 0x7f00, 0x0000, IPT_UNUSED ) /* no tape */
 INPUT_PORTS_END
 
 
@@ -456,9 +435,6 @@ static INPUT_PORTS_START (vip64)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb6") PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR('\xB6')
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)						PORT_CHAR(':') PORT_CHAR('*')
-
-	PORT_MODIFY( "CFG" )
-	PORT_BIT( 0x7f00, 0x00, IPT_UNUSED ) /* no tape */
 INPUT_PORTS_END
 
 
@@ -731,7 +707,7 @@ SYSTEM_CONFIG_END
 
 /*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT    CONFIG    COMPANY                            FULLNAME */
 
-COMP(1982, max,	    0,    0,    ultimax, ultimax, ultimax, ultimax, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
+COMP(1982, max,	    0,    0,    ultimax, c64,     ultimax, ultimax, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
 COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64 (PAL)", 0)
@@ -744,9 +720,9 @@ COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     c64,     "Commodore B
 COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     c64,     "Commodore Business Machines Co.", "Educator 64 (NTSC)", 0) // maybe different palette?
 
 // missing floppy emulation, among other things
-COMP(1984, sx64,    c64,  0,    sx64,    sx64,    sx64,    sx64,    "Commodore Business Machines Co.", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
+COMP(1984, sx64,    c64,  0,    sx64,    c64,     sx64,    sx64,    "Commodore Business Machines Co.", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
 COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    sx64,    "Commodore Business Machines Co.", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
-COMP(198?, dx64,    c64,  0,    sx64,    sx64,    sx64,    sx64,    "Commodore Business Machines Co.", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
+COMP(198?, dx64,    c64,  0,    sx64,    c64,     sx64,    sx64,    "Commodore Business Machines Co.", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
 
 COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64C (NTSC)", 0)
 COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64C (PAL)", 0)

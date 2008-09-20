@@ -25,9 +25,6 @@
  *	- c64_special: input port for the Restore key and the Shift Lock Switch
  *	- c64_controls: joypads, paddles and lightpen; shared with C65, C128 
  *			and CBMB
- *	- c64_control_cfg: input port to select controllers and switch 
- *			gameports A/B; shared with C65, C128 and CBMB
- *	- c64_config: devices and serial configurations
  *
  **********************************************************************************/
 
@@ -154,15 +151,17 @@ INPUT_PORTS_START( c64_controls )
 	PORT_CATEGORY_CLASS( 0x07, 0x00, "Gameport A" )
 	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 10 )
 	PORT_CATEGORY_ITEM( 0x01, "Paddles 1 & 2", 11 )
-	PORT_CATEGORY_ITEM( 0x02, "Mouse", 12 )
-	PORT_CATEGORY_ITEM( 0x03, "Joystick 2 Buttons", 13 )
+	PORT_CATEGORY_ITEM( 0x02, "Mouse 1351", 12 )
+	PORT_CATEGORY_ITEM( 0x03, "Mouse (Non Proportional) 1350", 13 )
 	PORT_CATEGORY_ITEM( 0x04, "Lightpen", 14 )
+//	PORT_CATEGORY_ITEM( 0x05, "Koala Pad", 15 )
+	PORT_CATEGORY_ITEM( 0x07, "No Device Connected", 17 )
 	PORT_CATEGORY_CLASS( 0x70, 0x00, "Gameport B" )
 	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 20 )
 	PORT_CATEGORY_ITEM( 0x10, "Paddles 3 & 4", 21 )
-//	PORT_CATEGORY_ITEM( 0x20, "Mouse", 22 )
-	PORT_CATEGORY_ITEM( 0x30, "Joystick 2 Buttons", 23 )
-//	PORT_CATEGORY_ITEM( 0x40, "Lightpen", 24 )
+//	PORT_CATEGORY_ITEM( 0x20, "Mouse 1351", 22 )
+//	PORT_CATEGORY_ITEM( 0x30, "Mouse (Non Proportional) 1350", 23 )
+	PORT_CATEGORY_ITEM( 0x70, "No Device Connected", 27 )
 	PORT_CONFNAME( 0x80, 0x00, "Swap Gameport A and B") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )		
 	PORT_CONFSETTING(    0x80, DEF_STR( Yes ) )
@@ -183,24 +182,28 @@ INPUT_PORTS_START( c64_controls )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CATEGORY(20) PORT_CODE(KEYCODE_INSERT) PORT_CODE(JOYCODE_BUTTON1)
     PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 
+	/* Mouse Commodore 1350 was basically working as a Joystick */
 	PORT_START("JOY1_2B")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CATEGORY(13)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Mouse 1350 Up") PORT_CATEGORY(13)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Mouse 1350 Down") PORT_CATEGORY(13)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Mouse 1350 Left") PORT_CATEGORY(13)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Mouse 1350 Right") PORT_CATEGORY(13)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Mouse 1350 Button 1") PORT_CATEGORY(13)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Mouse 1350 Button 2") PORT_CATEGORY(13)
     PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 
+	/* Still to verify how many mices you were able to plug into a c64 */
+	/* Only one, for now */
 	PORT_START("JOY2_2B") 
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_HOME) PORT_CODE(JOYCODE_Y_UP_SWITCH)
+    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+/*	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_HOME) PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_END) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_DEL) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_PGDN) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_INSERT) PORT_CODE(JOYCODE_BUTTON1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_PGUP) PORT_CODE(JOYCODE_BUTTON2)
-    PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+*/
 	PORT_START("PADDLE1") 
 	PORT_BIT( 0xff, 128, IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_CATEGORY(11) PORT_PLAYER(1) PORT_REVERSE
 
@@ -236,23 +239,6 @@ INPUT_PORTS_START( c64_controls )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button Left") PORT_CATEGORY(12) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button Right") PORT_CATEGORY(12) PORT_CODE(KEYCODE_LALT) PORT_CODE(JOYCODE_BUTTON2)
 INPUT_PORTS_END
-
-
-INPUT_PORTS_START( c64_config )
-	PORT_START( "CFG" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Tape Drive/Device 1")									
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )											
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )												
-	PORT_DIPNAME( 0x2000, 0x0000, "Tape Sound")											
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )											
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )												
-	PORT_DIPNAME( 0x80, 0x00, "Sid Chip Type")											
-	PORT_DIPSETTING(	0x00, "MOS6581" )													
-	PORT_DIPSETTING(	0x80, "MOS8580" )													
-	PORT_BIT( 0x02, 0x00, IPT_UNUSED )	/* no serial bus */									
-	PORT_BIT( 0x01, 0x00, IPT_UNUSED )
-INPUT_PORTS_END
-
 
 
 /***************************** Commodore 16 ****************************************
@@ -389,7 +375,6 @@ INPUT_PORTS_END
  *	- C128 shares Controls and Keyboard with C64 (+ a keypad, see c128.c)
  *	- c128_special: input port for the Restore key and the Shift Lock, 
  *			TV/RGBI and 40/80 columns switches
- *	- c128_config: memory and devices configurations
  *
  **********************************************************************************/
 
@@ -432,32 +417,9 @@ INPUT_PORTS_START( c128_special )
 	PORT_DIPNAME( 0x10, 0x10, "40 80 Display (switch) (active after a rebooting)")					
 	PORT_DIPSETTING(	0x00, "40 Columns (DIN/TV)")												
 	PORT_DIPSETTING(	0x10, "80 Columns (RGBI)")
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( c128_config )
-	PORT_START("CFG") 
-	PORT_DIPNAME( 0x4000, 0x4000, "Tape Drive / Device 1")									
-	PORT_DIPSETTING(	0x0000, DEF_STR( Off ) )											
-	PORT_DIPSETTING(	0x4000, DEF_STR( On ) )												
-	PORT_DIPNAME( 0x2000, 0x00, "Tape Sound")												
-	PORT_DIPSETTING(	0x0000, DEF_STR( Off ) )											
-	PORT_DIPSETTING(	0x2000, DEF_STR( On ) )												
-	PORT_DIPNAME( 0x0300, 0x0000, "Main Memory / MMU Version")								
-	PORT_DIPSETTING(	0x0000, "128 KByte" )												
-	PORT_DIPSETTING(	0x0100, "256 KByte" )												
-	PORT_DIPSETTING(	0x0200, "1024 KByte" )												
-	PORT_DIPNAME( 0x80, 0x80, "Sid Chip Type")												
-	PORT_DIPSETTING(	0x00, "MOS6581" )													
-	PORT_DIPSETTING(	0x80, "MOS8580" )													
-	PORT_DIPNAME( 0x40, 0x40, "VDC Memory (RGBI)")											
-	PORT_DIPSETTING(	0x00, "16 KByte" )													
-	PORT_DIPSETTING(	0x40, "64 KByte" )													
-	PORT_DIPNAME( 0x20, 0x20, "DIN,TV / RGBI Monitor (switch)") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_DIPNAME( 0x08, 0x08, "DIN,TV / RGBI Monitor (switch)") PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_DIPSETTING(	0x00, "DIN,TV" )													
-	PORT_DIPSETTING(	0x20, "RGBI" )														
-	PORT_BIT( 0x02, 0x00, IPT_UNUSED )	/* no serial bus */									
-	PORT_BIT( 0x01, 0x00, IPT_UNUSED )
+	PORT_DIPSETTING(	0x08, "RGBI" )														
 INPUT_PORTS_END
 
 
@@ -466,7 +428,6 @@ INPUT_PORTS_END
  *	- C65 shares Keyboard and Inputs with C64 (+ some function keys, see c65.c)
  *	- c65_special: input port for the Restore key and the Shift Lock and DIN 
  *			switches
- *	- c65_config: devices configurations
  *
  **********************************************************************************/
 
@@ -504,23 +465,6 @@ INPUT_PORTS_START( c65_special )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )														
 	PORT_DIPSETTING(	0x20, DEF_STR( On ) )														
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( c65_config )
-	PORT_START( "CFG" )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Quickload") PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT( 0x7c00, 0x0, IPT_UNUSED )	/* no tape */										
-	PORT_DIPNAME( 0x80, 0x00, "Sid Chip Type")											
-	PORT_DIPSETTING(	0x00, "MOS6581" )													
-	PORT_DIPSETTING(	0x80, "MOS8580" )													
-	PORT_BIT( 0x1c, 0x00, IPT_UNUSED )	/* no cart type ever supported */					
-	PORT_DIPNAME( 0x02, 0x02, "Serial Bus/Device 10")										
-	PORT_DIPSETTING(	0x00, DEF_STR( None ))
-	PORT_DIPSETTING(	0x02, "Floppy Drive Simulation")									
-	PORT_DIPNAME( 0x01, 0x01, "Serial Bus/Device 11")										
-	PORT_DIPSETTING(	0x00, DEF_STR( None ))
-	PORT_DIPSETTING(	0x01, "Floppy Drive Simulation")
 INPUT_PORTS_END
 
 
@@ -796,7 +740,6 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( pet_config )
     PORT_START("CFG")
-    PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Quickload") PORT_CODE(KEYCODE_F8)
 	PORT_DIPNAME( 0x180, 0x180, "Memory")					
 	PORT_DIPSETTING(	0x000, "4 KByte" )					
 	PORT_DIPSETTING(	0x080, "8 KByte" )					
@@ -975,7 +918,6 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( cbmb_special )
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Quickload") PORT_CODE(KEYCODE_F8) 
 	PORT_BIT( 0x200, 0x200, IPT_UNUSED ) /* ntsc */		
 	PORT_BIT( 0x100, 0x000, IPT_UNUSED ) /* cbm600 */	
 	PORT_DIPNAME( 0x04, 0x00, "Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
@@ -990,7 +932,6 @@ INPUT_PORTS_END
  *  - vic_special: input port for the Shift Lock Switch
  *	- vic_controls: joypads and paddles
  *	- vic_expansion: RAM expansions
- *	- vic_config: controllers, tape and serial configurations
  *	- VIC20 also has 2 lightpen ports, vic_lightpen_6560 & vic_lightpen_6561
  *			currently in vc20.c (they need visible area parameters for centering)
  *
@@ -1121,16 +1062,22 @@ static CUSTOM_INPUT( vic_custom_inputs )
 	int bit_mask = (FPTR)param;
 	UINT8 port = 0;
 	
-	if ((input_port_read(field->port->machine, "CFG") & 0xf0) == 0x10)
+	if ((input_port_read(field->port->machine, "CTRLSEL") & 0xf0) == 0x10)
 		port |= (input_port_read(field->port->machine, "FAKE0") & bit_mask) ? 1 : 0;
 
-	if ((input_port_read(field->port->machine, "CFG") & 0xf0) == 0x00)
+	if ((input_port_read(field->port->machine, "CTRLSEL") & 0xf0) == 0x00)
 		port |= (input_port_read(field->port->machine, "FAKE1") & bit_mask) ? 1 : 0;
 
 	return port;
 }
 	
 INPUT_PORTS_START( vic_controls )
+	PORT_START( "CTRLSEL" )
+	PORT_CATEGORY_CLASS( 0xf0, 0x00, DEF_STR( Controller ) )
+	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 10 )
+	PORT_CATEGORY_ITEM( 0x10, "Paddles", 11 )
+	PORT_CATEGORY_ITEM( 0x20, "Lightpen", 12 )
+
 	PORT_START( "JOY" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vic_custom_inputs, (void *)0x02)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightpen Signal") PORT_CODE(KEYCODE_LALT) PORT_CATEGORY(12)
@@ -1180,25 +1127,3 @@ INPUT_PORTS_START( vic_expansion )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )	
 INPUT_PORTS_END
-
-
-INPUT_PORTS_START( vic_config )
-	PORT_START( "CFG" )
-	PORT_CATEGORY_CLASS( 0xf0, 0x00, DEF_STR( Controller ) )
-	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 10 )
-	PORT_CATEGORY_ITEM( 0x10, "Paddles", 11 )
-	PORT_CATEGORY_ITEM( 0x20, "Lightpen", 12 )
-	PORT_DIPNAME( 0x08, 0x08, "Tape Drive/Device 1")		
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )				
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )				
-	PORT_DIPNAME( 0x04, 0x00, "Tape Sound")					
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )				
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )				
-	PORT_DIPNAME( 0x02, 0x02, "Serial/Dev 8/VC1541 Floppy")	
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )				
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )				
-	PORT_DIPNAME( 0x01, 0x01, "Serial/Dev 9/VC1541 Floppy")	
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )				
-	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-INPUT_PORTS_END
-

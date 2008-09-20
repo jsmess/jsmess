@@ -869,6 +869,7 @@ int c64_paddle_read (int which)
 			break;
 
 		case 0x00:
+		case 0x07:
 			break;
 
 		default:
@@ -905,6 +906,7 @@ int c64_paddle_read (int which)
 			break;
 
 		case 0x00:
+		case 0x70:
 			break;
 
 		default:
@@ -1157,9 +1159,9 @@ INTERRUPT_GEN( c64_frame_interrupt )
 
 	 if (is_c128(machine))
 	 {
-	 	if ((input_port_read(machine, "CFG") & 0x20) != monitor)
+	 	if ((input_port_read(machine, "SPECIAL") & 0x08) != monitor)
 		{
-			if (input_port_read(machine, "CFG") & 0x20)
+			if (input_port_read(machine, "SPECIAL") & 0x08)
 			{
 				vic2_set_rastering(0);
 				vdc8563_set_rastering(1);
@@ -1174,7 +1176,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 				else
 					video_screen_set_visarea(machine->primary_screen, VIC6567_STARTVISIBLECOLUMNS, VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1);
 			}
-			monitor = input_port_read(machine, "CFG") & 0x20;
+			monitor = input_port_read(machine, "SPECIAL") & 0x08;
 		}
 	}
 
@@ -1223,6 +1225,9 @@ INTERRUPT_GEN( c64_frame_interrupt )
 //				value &= ?? ;
 			break;
 
+		case 0x07:
+			break;
+
 		default:
 			logerror("Invalid Controller 1 Setting %d\n", controller1);
 			break;
@@ -1260,6 +1265,9 @@ INTERRUPT_GEN( c64_frame_interrupt )
 /* was there any input on the lightpen? where is it mapped? */
 //			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
 //				value &= ?? ;
+			break;
+
+		case 0x70:
 			break;
 
 		default:

@@ -181,8 +181,6 @@ static INPUT_PORTS_START( vic20 )
 	PORT_INCLUDE( vic_lightpen_6560 )	/* LIGHTX, LIGHTY */
 
 	PORT_INCLUDE( vic_expansion )		/* EXP */
-
-	PORT_INCLUDE( vic_config )			/* CFG */
 INPUT_PORTS_END
 
 
@@ -191,24 +189,6 @@ static INPUT_PORTS_START( vic1001 )
 
 	PORT_MODIFY( "ROW0" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('\xA5')
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( vic20i )
-	PORT_INCLUDE( vic20 )
-
-	PORT_MODIFY( "CFG" )
-	PORT_DIPNAME( 0x02, 0x02, "IEEE/Dev 8/Floppy Sim")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
-#if 1
-	/* ieee simu currently not a bus, so only 1 device */
-	PORT_BIT( 0x01, 0x00, IPT_UNUSED )
-#else
-	PORT_DIPNAME( 0x01, 0x01, "IEEE/Dev 9/Floppy Sim")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-#endif
 INPUT_PORTS_END
 
 
@@ -223,8 +203,6 @@ static INPUT_PORTS_START( vc20 )
 	PORT_INCLUDE( vic_lightpen_6561 )	/* LIGHTX, LIGHTY */
 
 	PORT_INCLUDE( vic_expansion )		/* EXP */
-
-	PORT_INCLUDE( vic_config )			/* CFG */
 INPUT_PORTS_END
 
 
@@ -488,7 +466,7 @@ COMP( 1981, vic1001,   vic20,  0,  vic20,   vic1001,  vic20,  vic20,     "Commod
 
 COMP( 1981, vic20,     0,      0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC)", GAME_IMPERFECT_SOUND)
 COMP( 1981, vic20cr,   vic20,  0,   vic20,  vic20,    vic20,  vic20,     "Commodore Business Machines Co.",  "VIC 20CR (NTSC)", GAME_IMPERFECT_SOUND)
-COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20i,   vic20i, vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
+COMP( 1981, vic20i,    vic20,  0,   vic20i, vic20,    vic20i, vic20,     "Commodore Business Machines Co.",  "VIC 20 (NTSC, IEEE488 Interface - SYS45065)", GAME_IMPERFECT_SOUND)
 COMP( 1981, vic20v,    vic20,  0,   vic20v, vic20,    vic20v, vic20v,    "Commodore Business Machines Co.",  "VIC 20 (NTSC, VC1540)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 COMP( 1981, vic20pal,  vic20,  0,   vc20,   vc20,     vc20,   vic20,     "Commodore Business Machines Co.",  "VC 20 (PAL)", GAME_IMPERFECT_SOUND)

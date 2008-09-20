@@ -400,6 +400,9 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 //				value &= ?? ;
 			break;
 
+		case 0x07:
+			break;
+
 		default:
 			logerror("Invalid Controller 1 Setting %d\n", controller1);
 			break;
@@ -437,6 +440,9 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 /* was there any input on the lightpen? where is it mapped? */
 //			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
 //				value &= ?? ;
+			break;
+
+		case 0x70:
 			break;
 
 		default:

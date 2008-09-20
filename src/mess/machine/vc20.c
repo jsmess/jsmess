@@ -112,7 +112,7 @@ static  READ8_HANDLER( vc20_via0_read_porta )
 
 	/* to short to be recognized normally */
 	/* should be reduced to about 1 or 2 microseconds */
-	/*  if ((input_port_read(machine, "CFG") & 0x20 ) && (input_port_read(machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
+	/*  if ((input_port_read(machine, "CTRLSEL") & 0x20 ) && (input_port_read(machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
 		value &= ~0x20; */
 	if (!serial_clock || !cbm_serial_clock_read ())
 		value &= ~0x01;
@@ -647,7 +647,7 @@ MACHINE_RESET( vic20 )
 
 static TIMER_CALLBACK( lightpen_tick )
 {
-	if ((input_port_read(machine, "CFG") & 0xf0) == 0x20)
+	if ((input_port_read(machine, "CTRLSEL") & 0xf0) == 0x20)
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
