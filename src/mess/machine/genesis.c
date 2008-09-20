@@ -45,6 +45,7 @@ enum
 	SKINGKONG,				/* Super King Kong 99 */
 	SDK99,					/* Super Donkey Kong 99 */
 	REDCLIFF,				/* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
+	REDCL_EN,				/* The encoded version... */
 	RADICA,					/* Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
 	KOF99,					/* King of Fighters '99 */
 	SOULBLAD,				/* Soul Blade */
@@ -649,6 +650,21 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r);
 	}
 
+	if (cart_type == REDCL_EN)
+	{
+		int x;
+
+		for (x = VIRGIN_COPY_GEN; x < VIRGIN_COPY_GEN + 0x200005; x++)
+		{
+			ROM[x] ^= 0x40;
+		}
+
+		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + 4], 0x200000); /* default rom */
+
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r);
+		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r);
+	}
+
 	if (cart_type == RADICA)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
@@ -1077,6 +1093,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			lk3_sig[]		= { 0x0c, 0x01, 0x00, 0x30, 0x66, 0xe4 },
 			sdk_sig[]		= { 0x48, 0xe7, 0xff, 0xfe, 0x52, 0x79 },
 			redcliff_sig[]	= { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04 }, // move.b  ($400004).l,d0
+			redcl_en_sig[]	= { 0x50, 0x79, 0x40, 0x00, 0x40, 0x44 }, // move.b  ($400004).l,d0
 			smb_sig[]		= { 0x20, 0x4d, 0x41, 0x52, 0x49, 0x4f },
 			smb2_sig[]		= { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84 },
 			kaiju_sig[]		= { 0x19, 0x7c, 0x00, 0x01, 0x00, 0x00 },
@@ -1089,7 +1106,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			radica_sig[]	= { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
 			soulb_sig[]		= { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
 			s19in1_sig[]	= { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 };
-	
+
 		switch (genesis_last_loaded_image_length)
 		{
 			case 0x80000:
@@ -1152,6 +1169,11 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 				if (!allendianmemcmp(&ROM[0x17bb2], &s15in1_sig[0], sizeof(s15in1_sig)))
 					cart_type = SUP15IN1;
+				break;
+
+			case 0x200005:
+				if (!allendianmemcmp(&ROM[0xce564], &redcl_en_sig[0], sizeof(redcliff_sig)))
+					cart_type = REDCL_EN;
 				break;
 
 			case 0x300000:
