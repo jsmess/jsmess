@@ -66,6 +66,7 @@
 #include "driver.h"
 #include "includes/kim1.h"
 #include "machine/6530miot.h"
+#include "devices/cassette.h"
 
 
 static ADDRESS_MAP_START ( kim1_map , ADDRESS_SPACE_PROGRAM, 8)
@@ -142,24 +143,9 @@ static const gfx_layout led_layout =
 	24 * 24,	/* every LED code takes 32 times 18 (aligned 24) bit words */
 };
 
-static const gfx_layout key_layout =
-{
-	24, 18, 	/* 24 * 18 keyboard icons */
-	24, 		/* 24  codes */
-	2,			/* 2 bit per pixel */
-	{ 0, 1 },	/* two bitplanes */
-	{ 0*2, 1*2, 2*2, 3*2, 4*2, 5*2, 6*2, 7*2,
-	  8*2, 9*2,10*2,11*2,12*2,13*2,14*2,15*2,
-	 16*2,17*2,18*2,19*2,20*2,21*2,22*2,23*2 },
-	{ 0*24*2, 1*24*2, 2*24*2, 3*24*2, 4*24*2, 5*24*2, 6*24*2, 7*24*2,
-	  8*24*2, 9*24*2,10*24*2,11*24*2,12*24*2,13*24*2,14*24*2,15*24*2,
-	 16*24*2,17*24*2 },
-	18 * 24 * 2,	/* every icon takes 18 rows of 24 * 2 bits */
-};
 
 static GFXDECODE_START( kim1 )
 	GFXDECODE_ENTRY( "gfx1", 0, led_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, key_layout, 34, 2 )
 GFXDECODE_END
 
 
@@ -207,7 +193,7 @@ static void kim1_u2_write_a(const device_config *device, UINT8 newdata, UINT8 ol
 
 static UINT8 kim1_u2_read_b(const device_config *device, UINT8 olddata)
 {
-	return 0xFF;
+	return 0x7F | ( cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) ) > 0.2 ? 0x80 : 0x00 );
 }
 
 
@@ -218,6 +204,7 @@ static void kim1_u2_write_b(const device_config *device, UINT8 newdata, UINT8 ol
 	if ( ( newdata & 0x3f ) == 0x27 )
 	{
 		/* cassette write/speaker update */
+		cassette_output( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( newdata & 0x80 ) ? 1.0 : -1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -295,6 +282,8 @@ static MACHINE_DRIVER_START( kim1 )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
@@ -304,12 +293,10 @@ ROM_START(kim1)
 		ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 	ROM_REGION(128 * 24 * 3,"gfx1",ROMREGION_ERASEFF)
 		/* space filled with 7segement graphics by kim1_init_driver */
-	ROM_REGION( 24 * 18 * 3 * 2,"gfx2", ROMREGION_ERASEFF)
-		/* space filled with key icons by kim1_init_driver */
 ROM_END
 
 static SYSTEM_CONFIG_START(kim1)
-	CONFIG_DEVICE(kim1_cassette_getinfo)
+//	CONFIG_DEVICE(kim1_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY   FULLNAME */

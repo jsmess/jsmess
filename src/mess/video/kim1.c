@@ -53,10 +53,7 @@ VIDEO_START( kim1 )
 VIDEO_UPDATE( kim1 )
 {
 	int width = video_screen_get_width(screen);
-	int x, y;
-	static const int layout[6][4] = { {19, 21, 22, 23}, {16, 17, 20, 18}, {12, 13, 14, 15},
-					{ 8,  9, 10, 11}, { 4,  5,  6,  7}, { 0,  1,  2,  3} };
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
+	int x;
 
 	fillbitmap(bitmap, get_black_pen(screen->machine), NULL);
 
@@ -69,22 +66,6 @@ VIDEO_UPDATE( kim1 )
 		drawgfx (bitmap, screen->machine->gfx[0], videoram[x<<1], videoram[(x<<1) + 1],	0, 0, sx, sy, NULL, TRANSPARENCY_PEN, 0);
 	}
 
-	/* show buttons */
-	for (y = 0; y < 6; y++)
-	{
-		int sy = 516 + y * 36;
-
-		for (x = 0; x < 4; x++)
-		{
-			int sx = width - 182 + x * 37;
-			int code = layout[y][x];
-			int color = 0;
-
-			color = (input_port_read(screen->machine, keynames[code / 7]) & (0x40 >> (code % 7))) ? 0 : 1;
-			videoram[6 * 2 + code] = color;
-			drawgfx (bitmap, screen->machine->gfx[1], layout[y][x], color, 0, 0, sx, sy, NULL, TRANSPARENCY_NONE, 0);
-		}
-	}
 	return 0;
 }
 
