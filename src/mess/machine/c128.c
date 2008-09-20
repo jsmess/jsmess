@@ -303,8 +303,8 @@ static void c128_bankswitch_z80 (running_machine *machine)
 #if 1
 	 memory_set_bankptr(10, c128_z80);
 	 memory_set_bankptr(11, c128_ram + 0x1000);
-	 if ( (( (input_port_read(machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (input_port_read(machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 		 c128_ram = NULL;
 #else
 	 if (MMU_BOTTOM)
@@ -370,8 +370,8 @@ static void c128_bankswitch_z80 (running_machine *machine)
 		memory_set_bankptr(9, c64_memory + 0xff05); 
 	 }
 
-	 if ( (( (input_port_read(machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (input_port_read(machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+	 if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 		 c128_ram = NULL;
 #endif
 }
@@ -537,8 +537,8 @@ static void c128_bankswitch_128 (running_machine *machine, int reset)
 			memory_set_bankptr(16, c128_external_function + 0x3f05);
 		}
 
-		if ( (( (input_port_read(machine, "CFG") & 0x300) == 0x100 ) && (MMU_RAM_ADDR >= 0x40000))
-				|| (( (input_port_read(machine, "CFG") & 0x300) == 0x000) && (MMU_RAM_ADDR >= 0x20000)) )
+		if ( (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+				|| (( (input_port_read(machine, "SPECIAL") & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
 			c128_ram = NULL;
 	}
 }
@@ -661,9 +661,9 @@ READ8_HANDLER( c128_mmu8722_port_r )
 		break;
 	case 0xb:
 		/* hinybble number of 64 kb memory blocks */
-		if ((input_port_read(machine, "CFG") & 0x300) == 0x100)			// 256KB RAM
+		if ((input_port_read(machine, "SPECIAL") & 0x06) == 0x02)			// 256KB RAM
 			data = 0x4f;
-		else if ((input_port_read(machine, "CFG") & 0x300) == 0x200)	//	1MB
+		else if ((input_port_read(machine, "SPECIAL") & 0x06) == 0x04)	//	1MB
 			data = 0xf;
 		else 
 			data = 0x2f;
