@@ -35,7 +35,7 @@ VIDEO_EOF( megadriv );
 
 /* Needed to create external input handlers (see e.g. MESS) */
 
-UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
-void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
-UINT8 megadrive_io_data_regs[3];
-UINT8 megadrive_io_ctrl_regs[3];
+extern UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
+extern void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
+extern UINT8 megadrive_io_data_regs[3];
+extern UINT8 megadrive_io_ctrl_regs[3];
