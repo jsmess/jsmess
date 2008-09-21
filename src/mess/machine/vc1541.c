@@ -97,28 +97,44 @@ FF00-FFFF       Jump table, vectors
 
  */
 /* 2008-09 FP 
-started some work on the floppy emulation code:
+Started some work on the floppy emulation code:
 	+ made the functions / structs less vc1541-centric & d64-centric
 	+ unified config & reset functions, using type variable
 		to choose the actions to be done
 	+ moved GCR encoding at loading time (wip untested code)
  
-a limitation is clear: only a single occurrence of emulated drive
+A limitation is clear: only a single occurrence of emulated drive
 is expected. 
-at a later stage, at least drive_config & drive_reset will need
+At a later stage, at least drive_config & drive_reset will need
 an index to choose between the drives
+In the end, we could also split the floppy drives emulation from the
+disk image handling...
 
-current status:
+Current status:
 	+ preliminary vc1541 & c1551 implementation (seems very slow)
 	+ no support for other drive types (even if now I list all
 		the variants supported by Vice in the enum)
 	+ communications between the drive CPU and the computer CPU have 
 		to be checked, debugged and improved
-	+ most functions / constants are d64 independent, even if other
-		formats are not supported yet!
+	+ all but .g64 images should be correctly encoded at loading time
+		(I actually have doubts about some .d82 details) 
+	+ error maps are not still used, even if their presence is 
+		acknowledged
 	+ the floppy handling still uses CBM_Drive_Emu struct instead of
 		functions similar to other floppy formats
 */
+/*
+Informations on the fileformats (which the code is based on)
+
+D64 - http://ist.uwaterloo.ca/~schepers/formats/D64.TXT
+D71 - http://ist.uwaterloo.ca/~schepers/formats/D71.TXT
+D81 - http://ist.uwaterloo.ca/~schepers/formats/D81.TXT
+D80 & D82 - http://ist.uwaterloo.ca/~schepers/formats/D80-D82.TXT
+G64 & GCR - http://ist.uwaterloo.ca/~schepers/formats/G64.TXT
+GCR - http://www.baltissen.org/newhtm/1541c.htm
+
+*/
+
 
 #include "driver.h"
 #include "deprecat.h"
@@ -199,8 +215,8 @@ typedef struct
 
 	struct {
 		int sync;				// active after > 9 '1's
+		int ones_count;
 		int ready;				// needed for 1551
-		int ones_count;			// still needed?
 		UINT8 data[0x500000];	// entire d64 image encoded at loading time
 	} gcr;
 } CBM_Drive_Emu;
@@ -228,7 +244,8 @@ static const int d64_sectors_per_track[] =
 	19, 19, 19, 19, 19, 19, 19,
 	18, 18, 18, 18, 18, 18,
 	17, 17, 17, 17, 17,
-	17, 17, 17, 17, 17		/* only for 40 tracks d64 */
+	17, 17, 17, 17, 17,		/* only for 40 tracks d64 */
+	17, 17					/* in principle the drive could read 42 tracks */
 };
 
 #define D71_MAX_TRACKS 70
@@ -261,6 +278,8 @@ static const int d80_sectors_per_track[] =
 };
 
 
+/* Still have to investigate if these are read as 154 or as 77 in the drive... */
+/* For now we assume it's 154, but I'm not sure */
 #define D82_MAX_TRACKS 154
 
 static const int d82_sectors_per_track[] =
@@ -277,6 +296,21 @@ static const int d82_sectors_per_track[] =
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
 };
 
+
+static const int max_tracks_per_format[] =
+{
+D64_MAX_TRACKS,
+D64_MAX_TRACKS,
+D64_40T_MAX_TRACKS,
+D64_40T_MAX_TRACKS,
+D64_MAX_TRACKS,
+D71_MAX_TRACKS,
+D71_MAX_TRACKS,
+D81_MAX_TRACKS,
+D80_MAX_TRACKS,
+D82_MAX_TRACKS,
+0		/* Still to add support for .g64 */
+};
 
 static int image_offset[IMAGE_MAX_TRACKS] = { 0 };
 
@@ -299,6 +333,7 @@ static void offset_init (int format)
 	{
 		case format_d64:
 		case format_d64_err:
+		case format_d67:
 			for (i = 1; i <= D64_MAX_TRACKS; i++)
 				image_offset[i] = image_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
 			break;
@@ -331,7 +366,7 @@ static void offset_init (int format)
 			break;
 
 		default:
-			/* Still have to work on d67 & g64 images */
+			/* Still have to work on g64 images */
 			logerror("Unsupported format\n");
 			break;
 	}
@@ -389,6 +424,7 @@ static int disk_id1 (int format)
 		case format_d64_err:
 		case format_d64_40t:
 		case format_d64_40t_err:
+		case format_d67:
 		case format_d71:
 		case format_d71_err:
 			id1 = image_tracksector2offset(18, 0) + 0xa2;
@@ -404,7 +440,7 @@ static int disk_id1 (int format)
 			break;
 
 		default:
-			/* Still have to work on d67 & g64 images */
+			/* Still have to work on g64 images */
 			logerror("Unsupported format\n");
 			break;
 	}
@@ -423,6 +459,7 @@ static int disk_id2 (int format)
 		case format_d64_err:
 		case format_d64_40t:
 		case format_d64_40t_err:
+		case format_d67:
 		case format_d71:
 		case format_d71_err:
 			id2 = image_tracksector2offset(18, 0) + 0xa3;
@@ -438,7 +475,7 @@ static int disk_id2 (int format)
 			break;
 
 		default:
-			/* Still have to work on d67 & g64 images */
+			/* Still have to work on g64 images */
 			logerror("Unsupported format\n");
 			break;
 	}
@@ -1450,6 +1487,8 @@ static DEVICE_IMAGE_LOAD( _1541 )
 				return INIT_FAIL;
 		}
 	}
+	else if (!mame_stricmp (filetype, "d67"))
+		format = format_d67;
 	else if (!mame_stricmp (filetype, "d81"))
 		format = format_d81;
 	else if (!mame_stricmp (filetype, "d80"))
@@ -1458,7 +1497,7 @@ static DEVICE_IMAGE_LOAD( _1541 )
 		format = format_d82;
 	else
 	{
-		/* Still have to work on d67 & g64 images */
+		/* Still have to work on g64 images */
 		logerror("Unsupported format\n");
 		return INIT_FAIL;
 	}
@@ -1476,7 +1515,7 @@ static DEVICE_IMAGE_LOAD( _1541 )
 	format_id_1 = temp_copy[disk_id1(format)];	// can be modified by error code 29 -> ^ 0xff
 	format_id_2 = temp_copy[disk_id2(format)];
 
-	for (k = 1; k <= D64_MAX_TRACKS; k++)
+	for (k = 1; k <= max_tracks_per_format[format]; k++)
 	{
 /*		logerror("decoding track %d offset %d %d %d %d %d\n", k,
 						image_tracksector2offset(k, 0) / (16*16*16*16), 
@@ -1609,17 +1648,61 @@ void c2031_device_getinfo(const mess_device_class *devclass, UINT32 state, union
 
 void c1551_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_DEV_SPECIFIC:			info->f = (genf *) drive_config; break;
-
-		default: vc1541_device_getinfo(devclass, state, info); break;
-	}
+	vc1541_device_getinfo(devclass, state, info);
 }
 
 
 void c1571_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	vc1541_device_getinfo(devclass, state, info);
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "d71"); break;
+
+		default:									vc1541_device_getinfo(devclass, state, info);
+	}
+}
+
+void c1581_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "d81"); break;
+
+		default:									vc1541_device_getinfo(devclass, state, info);
+	}
+}
+
+void c8050_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "d80"); break;
+
+		default:									vc1541_device_getinfo(devclass, state, info);
+	}
+}
+
+void c8250_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "d82"); break;
+
+		default:									vc1541_device_getinfo(devclass, state, info);
+	}
+}
+
+void c2040_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "d67"); break;
+
+		default:									vc1541_device_getinfo(devclass, state, info);
+	}
 }

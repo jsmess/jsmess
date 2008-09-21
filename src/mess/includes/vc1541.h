@@ -30,17 +30,17 @@ type_8250,
 };
 
 enum { 
-format_d64 = 0,
-format_d64_err,
-format_d64_40t,
-format_d64_40t_err,
-format_d67,
-format_d71,
-format_d71_err,
-format_d81,
-format_d80,
-format_d82,
-format_g64,
+format_d64 = 0,			/* 1541 image, 35 tracks */
+format_d64_err,			/* 1541 image, 35 tracks + error table */
+format_d64_40t,			/* 1541 image, 40 tracks */
+format_d64_40t_err,		/* 1541 image, 40 tracks + error table */
+format_d67,				/* 2040 image, 35 tracks DOS1 format */
+format_d71,				/* 1571 image, 70 tracks */
+format_d71_err,			/* 1571 image, 70 tracks + error table */
+format_d81,				/* 1581 image, 80 tracks */
+format_d80,				/* 8050 image, 77 tracks */
+format_d82,				/* 8250 image, 154 tracks (read as 77?) */
+format_g64,				/* 1541 image in GCR format */
 };
 
 
@@ -48,9 +48,15 @@ int drive_config(int type, int id, int mode, int cpunr, int devicenr);
 void drive_reset(void);
 
 void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-void c2031_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 void c1551_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 void c1571_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+/* the ones below are still not used in any drivers */
+void c1581_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void c2031_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void c2040_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void c8050_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+void c8250_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+
 
 MACHINE_DRIVER_EXTERN( cpu_vc1540 );
 MACHINE_DRIVER_EXTERN( cpu_vc1541 );
