@@ -88,7 +88,6 @@ void nes_partialhash(char *dest, const unsigned char *data,
 
 /*----------- defined in video/nes.c -----------*/
 
-extern bitmap_t *nes_zapper_hack;
 extern int nes_vram_sprite[8];
 
 PALETTE_INIT( nes );

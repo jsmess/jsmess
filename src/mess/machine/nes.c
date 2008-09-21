@@ -197,102 +197,103 @@ static void nes_machine_stop(running_machine *machine)
 
 
 
-static int zapper_hit_pixel(running_machine *machine, const nes_input *input)
-{
-	UINT16 pix = 0;
-	rgb_t col;
-	UINT8 r, g, b;
-
-	if (nes_zapper_hack)
-		pix = *BITMAP_ADDR16(nes_zapper_hack, input->i2, input->i1);
-
-	col = palette_get_color(machine, pix);
-	r = (UINT8) (col >> 16);
-	g = (UINT8) (col >> 8);
-	b = (UINT8) (col >> 0);
-
-	return (((UINT16) r) + ((UINT16) g) + ((UINT16) b)) >= 240*3;
-}
-
-
-
  READ8_HANDLER ( nes_IN0_r )
 {
-	int cfg;
-	int retVal;
+	int ret;
 
 	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
 	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
-	retVal = 0x40;
+	ret = 0x40;
 
-	retVal |= ((in_0.i0 >> in_0.shift) & 0x01);
+	ret |= ((in_0.i0 >> in_0.shift) & 0x01);
 
-	/* Check the configuration to see what's connected */
-	cfg = input_port_read(machine, "CONTROLLERS");
-
-	if (((cfg & 0x000f) == 0x0002) || ((cfg & 0x000f) == 0x0003))
+	/* zapper */
+	if ((input_port_read(machine, "CTRLSEL") & 0x000f) == 0x0002)
 	{
-		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		retVal |= ((in_0.i0 & 0x01) << 4);
+		int x = in_0.i1;	/* read Zapper x-position */
+		int y = in_0.i2;	/* read Zapper y-position */
+		UINT32 pix, color_base;
 
-		/* Look at the screen and see if the cursor is over a bright pixel */
-		if (zapper_hit_pixel(machine, &in_0))
-			retVal &= ~0x08; /* sprite hit */
+		/* get the pixel at the gun position */
+		pix = ppu2c0x_get_pixel( 0, x, y );
+
+		/* get the color base from the ppu */
+		color_base = ppu2c0x_get_colorbase( 0 );
+
+		/* look at the screen and see if the cursor is over a bright pixel */
+		if ( ( pix == color_base + 0x20 ) || ( pix == color_base + 0x30 ) ||
+			 ( pix == color_base + 0x33 ) || ( pix == color_base + 0x34 ) )
+		{
+			ret &= ~0x08; /* sprite hit */
+		}
 		else
-			retVal |= 0x08;  /* no sprite hit */
+			ret |= 0x08;  /* no sprite hit */
+
+		/* If button 1 is pressed, indicate the light gun trigger is pressed */
+		ret |= ((in_0.i0 & 0x01) << 4);
 	}
 
 	if (LOG_JOY)
-		logerror ("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", retVal, activecpu_get_pc(), in_0.shift, in_0.i0);
+		logerror ("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, activecpu_get_pc(), in_0.shift, in_0.i0);
 
-	in_0.shift ++;
-	return retVal;
+	in_0.shift++;
+	return ret;
 }
 
  READ8_HANDLER ( nes_IN1_r )
 {
-	int cfg;
-	int retVal;
+	int ret;
 
 	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
 	/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
-	retVal = 0x40;
+	ret = 0x40;
 
 	/* Handle data line 0's serial output */
-	retVal |= ((in_1.i0 >> in_1.shift) & 0x01);
+	ret |= ((in_1.i0 >> in_1.shift) & 0x01);
 
-	/* Check the fake dip to see what's connected */
-	cfg = input_port_read(machine, "CONTROLLERS");
-
-	if (((cfg & 0x00f0) == 0x0020) || ((cfg & 0x00f0) == 0x0030))
+	/* zapper */
+	if ((input_port_read(machine, "CTRLSEL") & 0x00f0) == 0x0030)
 	{
-		/* zapper */
-		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		retVal |= ((in_1.i0 & 0x01) << 4);
+		int x = in_1.i1;	/* read Zapper x-position */
+		int y = in_1.i2;	/* read Zapper y-position */
+		UINT32 pix, color_base;
 
-		/* Look at the screen and see if the cursor is over a bright pixel */
-		if (zapper_hit_pixel(machine, &in_1))
-			retVal &= ~0x08; /* sprite hit */
+		/* get the pixel at the gun position */
+		pix = ppu2c0x_get_pixel( 0, x, y );
+
+		/* get the color base from the ppu */
+		color_base = ppu2c0x_get_colorbase( 0 );
+
+		/* look at the screen and see if the cursor is over a bright pixel */
+		if ( ( pix == color_base + 0x20 ) || ( pix == color_base + 0x30 ) ||
+			 ( pix == color_base + 0x33 ) || ( pix == color_base + 0x34 ) )
+		{
+			ret &= ~0x08; /* sprite hit */
+		}
 		else
-			retVal |= 0x08;  /* no sprite hit */
+			ret |= 0x08;  /* no sprite hit */
+
+		/* If button 1 is pressed, indicate the light gun trigger is pressed */
+		ret |= ((in_1.i0 & 0x01) << 4);
 	}
-	else if ((cfg & 0x00f0) == 0x0040)
+
+	/* arkanoid dial */
+	else if ((input_port_read(machine, "CTRLSEL") & 0x00f0) == 0x0040)
 	{
-		/* arkanoid dial */
 		/* Handle data line 2's serial output */
-		retVal |= ((in_1.i2 >> in_1.shift) & 0x01) << 3;
+		ret |= ((in_1.i2 >> in_1.shift) & 0x01) << 3;
 
 		/* Handle data line 3's serial output - bits are reversed */
 		/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
-		/* retVal |= ((in_1[3] >> in_1.shift) & 0x01) << 4; */
-		/* retVal |= ((in_1[3] << in_1.shift) & 0x80) >> 3; */
+		/* ret |= ((in_1[3] >> in_1.shift) & 0x01) << 4; */
+		/* ret |= ((in_1[3] << in_1.shift) & 0x80) >> 3; */
 	}
 
 	if (LOG_JOY)
-		logerror ("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", retVal, activecpu_get_pc(), in_1.shift, in_1.i0);
+		logerror ("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, activecpu_get_pc(), in_1.shift, in_1.i0);
 
-	in_1.shift ++;
-	return retVal;
+	in_1.shift++;
+	return ret;
 }
 
 
@@ -339,6 +340,30 @@ static void nes_read_input_device(running_machine *machine, int cfg, nes_input *
 }
 
 
+static TIMER_CALLBACK( lightgun_tick )
+{
+	if ((input_port_read(machine, "CTRLSEL") & 0x000f) == 0x0002)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+	}
+
+	if ((input_port_read(machine, "CTRLSEL") & 0x00f0) == 0x0030)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);
+	}
+}
 
 WRITE8_HANDLER ( nes_IN0_w )
 {
@@ -355,8 +380,11 @@ WRITE8_HANDLER ( nes_IN0_w )
 	in_0.shift = 0;
 	in_1.shift = 0;
 
+	/* Check if lightgun has been chosen as input: if so, enable crosshair */
+	timer_set(attotime_zero, NULL, 0, lightgun_tick);
+
 	/* Check the configuration to see what's connected */
-	cfg = input_port_read(machine, "CONTROLLERS");
+	cfg = input_port_read(machine, "CTRLSEL");
 
 	/* Read the input devices */
 	nes_read_input_device(machine, cfg >>  0, &in_0, 0,  TRUE, -1);

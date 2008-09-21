@@ -14,7 +14,6 @@
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
 
-bitmap_t *nes_zapper_hack;
 int nes_vram_sprite[8]; /* Used only by mmc5 for now */
 static int last_frame_flip = 0;
 
@@ -28,13 +27,9 @@ static void nes_vh_reset(running_machine *machine)
 	ppu2c0x_reset( machine, 0, 1 );
 }
 
-
-
 static void nes_vh_start(running_machine *machine, ppu_t ppu_type, double scanlines_per_frame)
 {
 	ppu2c0x_interface ppu_interface;
-
-	nes_zapper_hack = NULL;
 
 	last_frame_flip =  0;
 
@@ -89,52 +84,17 @@ PALETTE_INIT( nes )
 	ppu2c0x_init_palette(machine, 0);
 }
 
-static void draw_sight(bitmap_t *bitmap, UINT16 color, int x_center, int y_center)
-{
-	int x,y;
-
-	if (x_center<2)   x_center=2;
-	if (x_center>253) x_center=253;
-
-	if (y_center<2)   y_center=2;
-	if (y_center>253) y_center=253;
-
-	for(y = y_center-5; y < y_center+6; y++)
-		if((y >= 0) && (y < 256))
-			*BITMAP_ADDR16(bitmap, y, x_center) = color;
-
-	for(x = x_center-5; x < x_center+6; x++)
-		if((x >= 0) && (x < 256))
-			*BITMAP_ADDR16(bitmap, y_center, x) = color;
-}
 
 /***************************************************************************
 
   Display refresh
 
 ***************************************************************************/
+
 VIDEO_UPDATE( nes )
 {
-	int sights = 0;
-
-	nes_zapper_hack = bitmap;
-
 	/* render the ppu */
 	ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
-
-	/* figure out what sights to draw, and draw them */
-	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x000f) == 0x0002)
-		sights |= 0x0001;
-	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x000f) == 0x0003)
-		sights |= 0x0002;
-	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x00f0) == 0x0020)
-		sights |= 0x0001;
-	if ((input_port_read(screen->machine, "CONTROLLERS") & 0x00f0) == 0x0030)
-		sights |= 0x0002;
-	if (sights & 0x0001)
-		draw_sight(bitmap, 0x30, input_port_read(screen->machine, "ZAPPER1_X"), input_port_read(screen->machine, "ZAPPER1_Y"));
-	if (sights & 0x0002)
-		draw_sight(bitmap, 0x00, input_port_read(screen->machine, "ZAPPER2_X"), input_port_read(screen->machine, "ZAPPER2_Y"));
 
 	/* if this is a disk system game, check for the flip-disk key */
 	if (nes.mapper == 20)
