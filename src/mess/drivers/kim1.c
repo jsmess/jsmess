@@ -64,9 +64,13 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "includes/kim1.h"
 #include "machine/6530miot.h"
 #include "devices/cassette.h"
+#include "kim1.lh"
+
+
+static UINT8		u2_port_b;
+static UINT8		kim1_led_time[6];
 
 
 static ADDRESS_MAP_START ( kim1_map , ADDRESS_SPACE_PROGRAM, 8)
@@ -131,33 +135,6 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x01, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const gfx_layout led_layout =
-{
-	18, 24, 	/* 16 x 24 LED 7segment displays */
-	128,		/* 128 codes */
-	1,			/* 1 bit per pixel */
-	{ 0 },		/* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  8, 9,10,11,12,13,14,15,
-	 16,17 },
-	{ 0*24, 1*24, 2*24, 3*24,
-	  4*24, 5*24, 6*24, 7*24,
-	  8*24, 9*24,10*24,11*24,
-	 12*24,13*24,14*24,15*24,
-	 16*24,17*24,18*24,19*24,
-	 20*24,21*24,22*24,23*24,
-	 24*24,25*24,26*24,27*24,
-	 28*24,29*24,30*24,31*24 },
-	24 * 24,	/* every LED code takes 32 times 18 (aligned 24) bit words */
-};
-
-
-static GFXDECODE_START( kim1 )
-	GFXDECODE_ENTRY( "gfx1", 0, led_layout, 0, 16 )
-GFXDECODE_END
-
-
-static UINT8	u2_port_b;
 
 static UINT8 kim1_u2_read_a(const device_config *device, UINT8 olddata)
 {
@@ -181,27 +158,28 @@ static UINT8 kim1_u2_read_a(const device_config *device, UINT8 olddata)
 
 static void kim1_u2_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	switch( ( u2_port_b >> 1 ) & 0x0f )
+	UINT8 idx = ( u2_port_b >> 1 ) & 0x0f;
+
+	if ( idx >= 4 && idx < 10 )
 	{
-	case 4:
-	case 5:
-	case 6:
-	case 7:
-	case 8:
-	case 9:
 		if ( newdata & 0x80 )
 		{
-			videoram[(( ( u2_port_b >> 1 ) & 0x0f ) - 4) * 2 + 0] = newdata & 0x7f;
-			videoram[(( ( u2_port_b >> 1 ) & 0x0f ) - 4) * 2 + 1] = 15;
+			output_set_digit_value( idx-4, newdata & 0x7f );
+			kim1_led_time[idx - 4] = 15;
 		}
-		break;
 	}
 }
 
 
 static UINT8 kim1_u2_read_b(const device_config *device, UINT8 olddata)
 {
-	return 0x7F | ( cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) ) > 0.2 ? 0x80 : 0x00 );
+	double tap_val = cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) );
+
+	if ( miot6530_portb_out_get(device) & 0x20 )
+		return 0xFF;
+
+//	printf("kim1_u2_read_b(): tap_val = %f\n", tap_val);
+	return 0x7F | ( tap_val >= 0.0 ? 0x80 : 0x00 );
 }
 
 
@@ -209,10 +187,10 @@ static void kim1_u2_write_b(const device_config *device, UINT8 newdata, UINT8 ol
 {
 	u2_port_b = newdata;
 
-	if ( ( newdata & 0x3f ) == 0x27 )
+	if ( newdata & 0x20 )
 	{
 		/* cassette write/speaker update */
-		cassette_output( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( newdata & 0x80 ) ? 1.0 : -1.0 );
+		cassette_output( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( newdata & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -259,28 +237,40 @@ static const miot6530_interface kim1_u3_miot6530_interface =
 };
 
 
+static TIMER_CALLBACK( kim1_update_leds )
+{
+	int i;
+
+	for ( i = 0; i < 6; i++ )
+	{
+		if ( kim1_led_time[i] )
+			kim1_led_time[i]--; 
+		else
+			output_set_digit_value( i, 0 );
+	}
+}
+
+
+static MACHINE_RESET( kim1 )
+{
+	int i;
+
+	timer_pulse( ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
+
+	for ( i = 0; i < 6; i++ )
+	{
+		kim1_led_time[i] = 0;
+	}
+}
+
+
 static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(kim1_map, 0)
-	MDRV_CPU_VBLANK_INT("main", kim1_interrupt)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( kim1 )
-
-	/* video hardware (well, actually there was no video ;) */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(600, 768)
-	MDRV_SCREEN_VISIBLE_AREA(0, 600 - 1, 0, 768 - 1)
-	MDRV_GFXDECODE( kim1 )
-	MDRV_PALETTE_LENGTH(40)
-	MDRV_PALETTE_INIT( kim1 )
-
-	MDRV_VIDEO_START( kim1 )
-	MDRV_VIDEO_UPDATE( kim1 )
 
 	MDRV_MIOT6530_ADD( "miot_u2", 1000000, kim1_u2_miot6530_interface )
 	MDRV_MIOT6530_ADD( "miot_u3", 1000000, kim1_u3_miot6530_interface )
@@ -292,20 +282,70 @@ static MACHINE_DRIVER_START( kim1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+
+	/* video */
+	MDRV_DEFAULT_LAYOUT( layout_kim1 )
 MACHINE_DRIVER_END
 
 
 ROM_START(kim1)
 	ROM_REGION(0x10000,"main",0)
-		ROM_LOAD("6530-003.bin",    0x1800, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
-		ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
-	ROM_REGION(128 * 24 * 3,"gfx1",ROMREGION_ERASEFF)
-		/* space filled with 7segement graphics by kim1_init_driver */
+	ROM_LOAD("6530-003.bin",    0x1800, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
+	ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 ROM_END
 
+
+#ifdef UNUSED_FUNCTION
+static DEVICE_IMAGE_LOAD( kim1_cassette )
+{
+	const char magic[] = "KIM1";
+	char buff[4];
+	UINT16 addr, size;
+	UINT8 ident, *RAM = memory_region(image->machine, "main");
+
+	image_fread(image, buff, sizeof (buff));
+	if (memcmp(buff, magic, sizeof (buff)))
+	{
+		logerror("kim1_rom_load: magic '%s' not found\n", magic);
+		return INIT_FAIL;
+	}
+	image_fread(image, &addr, 2);
+	addr = LITTLE_ENDIANIZE_INT16(addr);
+	image_fread(image, &size, 2);
+	size = LITTLE_ENDIANIZE_INT16(size);
+	image_fread(image, &ident, 1);
+	logerror("kim1_rom_load: $%04X $%04X $%02X\n", addr, size, ident);
+	while (size-- > 0)
+		image_fread(image, &RAM[addr++], 1);
+	return INIT_PASS;
+}
+
+
+static void kim1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_TYPE:								info->i = IO_CASSETTE; break;
+		case MESS_DEVINFO_INT_READABLE:							info->i = 1; break;
+		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:								info->load = DEVICE_IMAGE_LOAD_NAME(kim1_cassette); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:					strcpy(info->s = device_temp_str(), "kim1"); break;
+	}
+}
+
+
 static SYSTEM_CONFIG_START(kim1)
-//	CONFIG_DEVICE(kim1_cassette_getinfo)
+	CONFIG_DEVICE(kim1_cassette_getinfo)
 SYSTEM_CONFIG_END
+#endif
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY   FULLNAME */
-COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	kim1,	  kim1,	  "MOS Technologies",  "KIM-1" , 0)
+COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	0,		  0,	  "MOS Technologies",  "KIM-1" , 0)
