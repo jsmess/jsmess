@@ -31,16 +31,18 @@ type_8250,
 
 enum { 
 format_d64 = 0,
+format_d64_err,
 format_d64_40t,
+format_d64_40t_err,
+format_d67,
 format_d71,
+format_d71_err,
 format_d81,
 format_d80,
 format_d82,
 format_g64,
 };
 
-DEVICE_IMAGE_LOAD(vc1541);
-DEVICE_IMAGE_UNLOAD(vc1541);
 
 int drive_config(int type, int id, int mode, int cpunr, int devicenr);
 void drive_reset(void);
