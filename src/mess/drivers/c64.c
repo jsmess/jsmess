@@ -609,7 +609,7 @@ ROM_START( vic64s )
 	ROM_LOAD( "kernel.swe",	0x12000, 0x2000, CRC(f10c2c25) SHA1(e4f52d9b36c030eb94524eb49f6f0774c1d02e5e) )
 	ROM_SYSTEM_BIOS(0, "default", "Swedish Characters" )
 	ROMX_LOAD( "charswe.bin",0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "default", "Swedish Characters (Alt)" )
+	ROM_SYSTEM_BIOS(1, "alt", "Swedish Characters (Alt)" )
 	ROMX_LOAD( "charswe2.bin",0x14000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac), ROM_BIOS(2) )
 ROM_END
 
