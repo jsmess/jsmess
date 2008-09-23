@@ -210,6 +210,7 @@ const game_driver * const drivers[] =
 	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
 	DRIVER( cpc664 )	/* Amstrad (Schneider in Germany) 1985				*/
 	DRIVER( cpc6128 )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128s )	/* Amstrad (Schneider in Germany) 1985				*/
 	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
 	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
 	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/

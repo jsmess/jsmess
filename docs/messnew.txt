@@ -1,7 +1,8 @@
-0.127.1
+﻿0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Amstrad CPC6128 (Sweden/Finland) [Iggy Drougge, Curt Coder]
 - Consul 2717 [Miodrag Milanovic]
 - HT-1080Z / HT-1080Z/64 [Miodrag Milanovic]
 - Primo B32/ Primo B48/ Primo C64 [Miodrag Milanovic]
@@ -129,8 +130,12 @@ System Driver Changes:
   multifile carts work [Fabio Priuli]
 
 - [VIP] Fixed memory banking, added discrete sound, added tape support,
-  and improved quickloading so that the CHIP-8 interpreter is automatically
+  and improved quickloading so that the CHIP-8(X) interpreter is automatically
   loaded alongside .c8 files. [Curt Coder]
+
+- [VIP] Added VP-590 color board, VP-595 Simple Sound Board, and a
+  single VP-580 Auxiliary Keyboard emulation. The VIP Blockout game can
+  now be played in color with sound using 2 keypads. [Curt Coder]
 
 - [X68000] Fixed SASI harddisk device info [Oliver Stöneberg]
 
@@ -150,7 +155,10 @@ User Interface Changes:
 - Fixed toggling through multiple cassettes in Tape Control menu [Oliver 
   Stöneberg]
 
+- MESSUI now shows the actual values of the system configuration
+  settings instead of the defaults. (bug #1679) [Curt Coder]
 
+- BIOS selection from MESSUI is now possible. (bug #1681) [Curt Coder]
 
 Imgtool Changes:
 ----------------
