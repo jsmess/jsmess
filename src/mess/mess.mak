@@ -889,7 +889,8 @@ $(MESSOBJ)/ascii.a :   \
 	$(MESS_MACHINE)/msx.o	 \
 
 $(MESSOBJ)/kim1.a :    \
-	$(MESS_DRIVERS)/kim1.o
+	$(MESS_DRIVERS)/kim1.o	\
+	$(MESS_FORMATS)/kim1_cas.o
 
 $(MESSOBJ)/synertec.a :    \
 	$(MESS_MACHINE)/sym1.o	 \

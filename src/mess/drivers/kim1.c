@@ -82,6 +82,7 @@ change from 1 to 0.
 #include "driver.h"
 #include "machine/6530miot.h"
 #include "devices/cassette.h"
+#include "formats/kim1_cas.h"
 #include "kim1.lh"
 
 
@@ -311,6 +312,14 @@ static MACHINE_RESET( kim1 )
 }
 
 
+static const cassette_config kim1_cassette_config =
+{
+	kim1_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED
+};
+
+
 static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)        /* 1 MHz */
@@ -329,7 +338,7 @@ static MACHINE_DRIVER_START( kim1 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", kim1_cassette_config )
 
 	/* video */
 	MDRV_DEFAULT_LAYOUT( layout_kim1 )
@@ -342,58 +351,6 @@ ROM_START(kim1)
 	ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 ROM_END
 
-
-#ifdef UNUSED_FUNCTION
-static DEVICE_IMAGE_LOAD( kim1_cassette )
-{
-	const char magic[] = "KIM1";
-	char buff[4];
-	UINT16 addr, size;
-	UINT8 ident, *RAM = memory_region(image->machine, "main");
-
-	image_fread(image, buff, sizeof (buff));
-	if (memcmp(buff, magic, sizeof (buff)))
-	{
-		logerror("kim1_rom_load: magic '%s' not found\n", magic);
-		return INIT_FAIL;
-	}
-	image_fread(image, &addr, 2);
-	addr = LITTLE_ENDIANIZE_INT16(addr);
-	image_fread(image, &size, 2);
-	size = LITTLE_ENDIANIZE_INT16(size);
-	image_fread(image, &ident, 1);
-	logerror("kim1_rom_load: $%04X $%04X $%02X\n", addr, size, ident);
-	while (size-- > 0)
-		image_fread(image, &RAM[addr++], 1);
-	return INIT_PASS;
-}
-
-
-static void kim1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:								info->i = IO_CASSETTE; break;
-		case MESS_DEVINFO_INT_READABLE:							info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:								info->load = DEVICE_IMAGE_LOAD_NAME(kim1_cassette); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:					strcpy(info->s = device_temp_str(), "kim1"); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(kim1)
-	CONFIG_DEVICE(kim1_cassette_getinfo)
-SYSTEM_CONFIG_END
-#endif
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY   FULLNAME */
 COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	0,		  0,	  "MOS Technologies",  "KIM-1" , GAME_SUPPORTS_SAVE)
