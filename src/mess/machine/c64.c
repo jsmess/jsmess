@@ -1612,28 +1612,19 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	}
 
 	/* Finally load the cart */
-	if (ultimax) 
+	roml = c64_roml;
+	romh = c64_romh;
+
+	memset(roml, 0, 0x2000);
+	memset(romh, 0, 0x2000);
+
+	for (i=0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++) 
 	{
-		for (i=0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++) 
-				memcpy(c64_memory + c64_cbm_cart[i].addr, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
-	}
+		if (c64_cbm_cart[i].addr < 0xc000) 
+			memcpy(roml + c64_cbm_cart[i].addr - 0x8000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
 
-	else
-	{
-		roml = c64_roml;
-		romh = c64_romh;
-
-		memset(roml, 0, 0x2000);
-		memset(romh, 0, 0x2000);
-
-		for (i=0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++) 
-		{
-			if (c64_cbm_cart[i].addr < 0xc000) 
-				memcpy(roml + c64_cbm_cart[i].addr - 0x8000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
-
-			else 
-				memcpy(romh + c64_cbm_cart[i].addr - 0xe000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
-		}
+		else 
+			memcpy(romh + c64_cbm_cart[i].addr - 0xe000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
 	}
 
 	return INIT_PASS;
