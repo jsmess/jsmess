@@ -4,6 +4,9 @@
 #include "cpu/cp1610/cp1610.h"
 #include "image.h"
 
+#define INTELLIVOICE_MASK	0x02
+#define ECS_MASK			0x01
+
 UINT8 intv_gramdirty;
 UINT8 intv_gram[512];
 UINT8 intv_gramdirtybytes[512];
@@ -316,9 +319,9 @@ WRITE16_HANDLER( intv_ram16_w )
 	intv_ram16[offset] = data&0xffff;
 }
 
-static int intv_load_rom_file(const device_config *image, int required)
+static int intv_load_rom_file(const device_config *image)
 {
-    int i;
+    int i,j;
 
 	UINT8 temp;
 	UINT8 num_segments;
@@ -332,47 +335,133 @@ static int intv_load_rom_file(const device_config *image, int required)
 	UINT8 low_byte;
 
 	UINT8 *memory = memory_region(image->machine, "main");
-
-	image_fread(image, &temp,1);			/* header */
-	if (temp != 0xa8)
+	const char *filetype = image_filetype(image);
+	
+	/* if it is in .rom format, we enter here */
+	if (!mame_stricmp (filetype, "rom"))
 	{
-		return INIT_FAIL;
-	}
-
-	image_fread(image, &num_segments,1);
-
-	image_fread(image, &temp,1);
-	if (temp != (num_segments ^ 0xff))
-	{
-		return INIT_FAIL;
-	}
-
-	for(i=0;i<num_segments;i++)
-	{
-		image_fread(image,&start_seg,1);
-		current_address = start_seg*0x100;
-
-		image_fread(image,&end_seg,1);
-		end_address = end_seg*0x100 + 0xff;
-
-		while(current_address <= end_address)
+		image_fread(image, &temp, 1);			/* header */
+		if (temp != 0xa8)
 		{
-			image_fread(image,&low_byte,1);
-			memory[(current_address<<1)+1] = low_byte;
-			image_fread(image,&high_byte,1);
-			memory[current_address<<1] = high_byte;
-			current_address++;
+			return INIT_FAIL;
 		}
 
-		image_fread(image,&temp,1);
-		image_fread(image,&temp,1);
-	}
+		image_fread(image, &num_segments, 1);
 
-	for(i=0;i<(16+32+2);i++)
-	{
-		image_fread(image,&temp,1);
+		image_fread(image, &temp, 1);
+		if (temp != (num_segments ^ 0xff))
+		{
+			return INIT_FAIL;
+		}
+
+		for (i = 0; i < num_segments; i++)
+		{
+			image_fread(image, &start_seg, 1);
+			current_address = start_seg * 0x100;
+
+			image_fread(image, &end_seg, 1);
+			end_address = end_seg * 0x100 + 0xff;
+
+			while (current_address <= end_address)
+			{
+				image_fread(image, &low_byte, 1);
+				memory[(current_address << 1) + 1] = low_byte;
+				image_fread(image, &high_byte, 1);
+				memory[current_address << 1] = high_byte;
+				current_address++;
+			}
+
+			/* Here we should calculate and compare the CRC16... */
+			image_fread(image, &temp, 1);
+			image_fread(image, &temp, 1);
+		}
+
+		/* Access tables and fine address restriction tables are not supported ATM */
+		for (i = 0; i < (16 + 32 + 2); i++)
+		{
+			image_fread(image, &temp, 1);
+		}
+		return INIT_PASS;
 	}
-	return INIT_PASS;
+	/* otherwise, we load it as a .bin file, using extrainfo from intv.hsi in place of .cfg */
+	else 
+	{
+		/* This code is a blatant hack, due to impossibility to load a separate .cfg file in MESS. */
+		/* It shall be eventually replaced by the .xml loading */
+
+		/* extrainfo format */
+		// 1. mapper number (to deal with bankswitch). no bankswitch is mapper 0 (most games).
+		// 2.->5. current images have at most 4 chunks of data. we store here block size and location to load
+		//	(value & 0xf0) >> 4 is the location / 0x1000
+		//	(value & 0x0f) is the size / 0x800
+		// 6. some images have a ram chunk. as above we store location and size in 8 bits
+		// 7. extra = 1 ECS, 2 Intellivoice
+		int start, size;
+		int mapper, rom[5], ram, extra;
+
+		if (!image_extrainfo(image))
+		{
+			/* If no extrainfo, we assume a single 0x2000 chunk at 0x5000 */
+			for (i = 0; i < 0x2000; i++ )
+			{
+				image_fread(image, &low_byte, 1);
+				memory[((0x5000 + i) << 1) + 1] = low_byte;
+				image_fread(image, &high_byte, 1);
+				memory[(0x5000 + i) << 1] = high_byte;
+			}
+		}
+		else
+		{
+			sscanf(image_extrainfo(image),"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+																&rom[3], &ram, &extra);
+
+//			logerror("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2],
+//																rom[3], ram, extra);
+
+			if (mapper) 
+			{
+				logerror("Bankswitch not yet implemented! \n");
+			}
+
+			if (ram) 
+			{
+				logerror("RAM banks not yet implemented! \n");
+			}
+
+			if (extra & INTELLIVOICE_MASK) 
+			{
+				logerror("Intellivoice support not yet implemented! \n");
+			}
+
+			if (extra & ECS_MASK) 
+			{
+				logerror("ECS support is only partial\n");
+				logerror("(even with the intvkbd driver)! \n");
+			}
+
+			for (j = 0; j < 4; j++)
+			{
+				start = (( rom[j] & 0xf0 ) >> 4) * 0x1000;
+				size = ( rom[j] & 0x0f ) * 0x800;
+				
+				/* some cart has to be loaded to 0x4800, but none goes to 0x4000. Hence, we use */
+				/* 0x04 << 4 in extrainfo (to reduce the stored values) and fix the value here. */
+				if (start == 0x4000) start += 0x800;
+				
+//				logerror("step %d: %d %d \n", j, start / 0x1000, size / 0x1000);
+		
+				for (i = 0; i < size; i++ )
+				{
+					image_fread(image, &low_byte, 1);
+					memory[((start + i) << 1) + 1] = low_byte;
+					image_fread(image, &high_byte, 1);
+					memory[(start + i) << 1] = high_byte;
+				}
+			}
+		}
+
+		return INIT_PASS;
+	}
 }
 
 DEVICE_START( intv_cart )
@@ -382,12 +471,13 @@ DEVICE_START( intv_cart )
 	UINT8 *memory = memory_region(device->machine, "main");
 
 	/* assume playcable is absent */
-	memory[0x4800<<1] = 0xff;
-	memory[(0x4800<<1)+1] = 0xff;
+	memory[0x4800 << 1] = 0xff;
+	memory[(0x4800 << 1) + 1] = 0xff;
 
 	/* assume keyboard is absent */
-	memory[0x7000<<1] = 0xff;
-	memory[(0x7000<<1)+1] = 0xff;
+	memory[0x7000 << 1] = 0xff;
+	memory[(0x7000 << 1) + 1] = 0xff;
+
 	return DEVICE_START_OK;
 }
 
@@ -398,14 +488,14 @@ DEVICE_IMAGE_LOAD( intv_cart )
 	UINT8 *memory = memory_region(image->machine, "main");
 
 	/* assume playcable is absent */
-	memory[0x4800<<1] = 0xff;
-	memory[(0x4800<<1)+1] = 0xff;
+	memory[0x4800 << 1] = 0xff;
+	memory[(0x4800 << 1) + 1] = 0xff;
 
 	/* assume keyboard is absent */
-	memory[0x7000<<1] = 0xff;
-	memory[(0x7000<<1)+1] = 0xff;
+	memory[0x7000 << 1] = 0xff;
+	memory[(0x7000 << 1) + 1] = 0xff;
 
-	return intv_load_rom_file(image, 1);
+	return intv_load_rom_file(image);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -496,10 +586,10 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 		UINT8 *memory = memory_region(image->machine, "main");
 
 		/* assume playcable is absent */
-		memory[0x4800<<1] = 0xff;
-		memory[(0x4800<<1)+1] = 0xff;
+		memory[0x4800 << 1] = 0xff;
+		memory[(0x4800 << 1) + 1] = 0xff;
 
-		intv_load_rom_file(image, 0);
+		intv_load_rom_file(image);
 	}
 
 	if (id == 1) /* Keyboard component cartridge slot */
@@ -507,7 +597,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 		UINT8 *memory = memory_region(image->machine, "keyboard");
 
 		/* Assume an 8K cart, like BASIC */
-		image_fread(image,&memory[0xe000],0x2000);
+		image_fread(image, &memory[0xe000], 0x2000);
 	}
 
 	return INIT_PASS;

@@ -25,6 +25,7 @@
 	</hash>
 	<hash crc32="b45633cf" name="All-Star Major League Baseball (Mattel)">
 		<year>1983</year>
+		<extrainfo>0 84 210 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="6f91fbc1" name="Armor Battle (Mattel)">
 		<year>1978</year>
@@ -37,12 +38,14 @@
 	</hash>
 	<hash crc32="13ff363c" name="Atlantis (Imagic) [!]">
 		<year>1981</year>
+		<extrainfo>0 68 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="b35c1101" name="Auto Racing (Mattel)">
 		<year>1979</year>
 	</hash>
 	<hash crc32="8ad19ab3" name="B-17 Bomber (Mattel) [!]">
 		<year>1981</year>
+		<extrainfo>0 84 210 0 0 0 2</extrainfo>
 	</hash>
 	<hash crc32="dab36628" name="Baseball (Mattel)">
 		<year>1978</year>
@@ -52,15 +55,18 @@
 	</hash>
 	<hash crc32="c047d487" name="Beauty and the Beast (Imagic) [!]">
 		<year>1982</year>
+		<extrainfo>0 68 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="b03f739b" name="Blockade Runner (Interphase)">
 		<year>1983</year>
 	</hash>
 	<hash crc32="515e1d7e" name="Body Slam - Super Pro Wrestling (Intv Corp)">
 		<year>1988</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="32697b72" name="Bomb Squad (Mattel) [!]">
 		<year>1982</year>
+		<extrainfo>0 84 210 0 0 0 2</extrainfo>
 	</hash>
 	<hash crc32="18e08520" name="Bouncing Pixels by JRMZ Electronics (PD)">
 		<year>1999</year>
@@ -73,6 +79,7 @@
 	</hash>
 	<hash crc32="999cceed" name="Bump 'N' Jump (Mattel)">
 		<year>1982-83</year>
+		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="43806375" name="BurgerTime! (Mattel)">
 		<year>1982</year>
@@ -85,39 +92,49 @@
 	</hash>
 	<hash crc32="d5363b8c" name="Centipede (Atarisoft)">
 		<year>1983</year>
+		<extrainfo>0 100 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="4cc46a04" name="Championship Tennis (Mattel)">
 		<year>1985</year>
+		<extrainfo>0 84 212 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="36e1d858" name="Checkers (Mattel)">
 		<year>1979</year>
 	</hash>
 	<hash crc32="0bf464c6" name="Chip Shot - Super Pro Golf (Intv Corp)">
 		<year>1987</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="3289c8ba" name="Commando (Mattel)">
 		<year>1987</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="4b23a757" name="Congo Bongo (Sega)">
 		<year>1983</year>
+		<extrainfo>0 86 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="e1ee408f" name="Crazy Clones (PD)">
 		<year>1981</year>
 	</hash>
 	<hash crc32="6802b191" name="Deep Pockets - Super Pro Pool and Billiards (Realtime) [!]">
 		<year>1990</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="d8f99aa2" name="Defender (Atarisoft)">
 		<year>1983</year>
+		<extrainfo>0 86 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="5e6a8cd8" name="Demon Attack (Imagic) [!]">
 		<year>1982</year>
+		<extrainfo>0 68 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="159af7f7" name="Dig Dug (Intv Corp)">
 		<year>1987</year>
+		<extrainfo>0 86 146 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="13ee56f1" name="Diner (Intv Corp)">
 		<year>1987</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="c30f61c0" name="Donkey Kong (Coleco)">
 		<year>1982</year>
@@ -196,6 +213,7 @@
 	</hash>
 	<hash crc32="ff83ff80" name="Hover Force (Intv Corp)">
 		<year>1986</year>
+		<extrainfo>0 84 148 210 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="a3147630" name="Hypnotic Lights (Mattel)">
 		<year>1981</year>
@@ -232,15 +250,18 @@
 	</hash>
 	<hash crc32="c83eea4c" name="Intellivision Test Cartridge and Baseball (Mattel)">
 		<year>1978</year>
+		<extrainfo>0 82 114 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="0de7579d" name="IntelliVoice BIOS (Mattel)">
 		<year>1981</year>
 	</hash>
 	<hash crc32="ee5f1be2" name="Jetsons, The - Ways With Words (Mattel)">
 		<year>1983</year>
+		<extrainfo>0 84 210 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="4422868e" name="King of the Mountain (Mattel)">
 		<year>1982</year>
+		<extrainfo>0 84 212 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="8c9819a2" name="Kool-Aid Man (Mattel)">
 		<year>1983</year>
@@ -250,6 +271,7 @@
 	</hash>
 	<hash crc32="3825c25b" name="Land Battle (Mattel)">
 		<year>1982</year>
+		<extrainfo>0 84 0 0 0 212 0</extrainfo>
 	</hash>
 	<hash crc32="604611c0" name="Las Vegas Blackjack and Poker (Mattel)">
 		<year>1979</year>
@@ -280,6 +302,7 @@
 	</hash>
 	<hash crc32="573b9b6d" name="Masters of the Universe - The Power of He-Man! (Mattel)">
 		<year>1983</year>
+		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="7d0f8162" name="Maze Demo #1 by JRMZ Electronics (PD)">
 		<year>2000</year>
@@ -289,6 +312,7 @@
 	</hash>
 	<hash crc32="ff68aa22" name="Melody Blaster (Mattel) [!]">
 		<year>1983</year>
+		<extrainfo>0 84 210 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="e00e23e7" name="Mickey's Hello World (PD)">
 		<year>1999</year>
@@ -298,6 +322,7 @@
 	</hash>
 	<hash crc32="9d57498f" name="Mind Strike! (Mattel) [!]">
 		<year>1982</year>
+		<extrainfo>0 84 210 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="bd731e3c" name="Minotaur (Mattel)">
 		<year>1981</year>
@@ -325,10 +350,12 @@
 	</hash>
 	<hash crc32="bef0b0c7" name="Mr. Basic Meets Bits 'N Bytes (Mattel) [!]">
 		<year>1983</year>
+		<extrainfo>0 84 210 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="0b50a367" name="Mr. Basic Meets Bits 'N Bytes (Mattel)">
 		<year>1983</year>
 		<status>Known Bad Dump</status>
+		<extrainfo>0 84 210 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="dbab54ca" name="NASL Soccer (Mattel)">
 		<year>1979</year>
@@ -350,12 +377,15 @@
 	</hash>
 	<hash crc32="e5d1a8d2" name="Number Jumble (Mattel) [!]">
 		<year>1983</year>
+		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="a21c31c3" name="Pac-Man (Atarisoft)">
 		<year>1983</year>
+		<extrainfo>0 86 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="6e4e8eb4" name="Pac-Man (Intv Corp)">
 		<year>1983</year>
+		<extrainfo>0 86 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="169e3584" name="PBA Bowling (Mattel)">
 		<year>1980</year>
@@ -365,12 +395,14 @@
 	</hash>
 	<hash crc32="d7c5849c" name="Pinball (Mattel)">
 		<year>1981</year>
+		<extrainfo>0 84 210 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="9c75efcc" name="Pitfall! (Activision) [!]">
 		<year>1982</year>
 	</hash>
 	<hash crc32="bb939881" name="Pole Position (Intv Corp)">
 		<year>1986</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="a982e8d5" name="Pong (PD)">
 		<year>1999</year>
@@ -413,6 +445,7 @@
 	</hash>
 	<hash crc32="e9e3f60d" name="Scooby Doo's Maze Chase (Mattel)">
 		<year>1983</year>
+		<extrainfo>0 84 148 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="99ae29a9" name="Sea Battle (Mattel)">
 		<year>1980</year>
@@ -434,6 +467,7 @@
 	</hash>
 	<hash crc32="800b572f" name="Slam Dunk - Super Pro Basketball (Intv Corp)">
 		<year>1987</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="ba68ff28" name="Slap Shot - Super Pro Hockey (Intv Corp)">
 		<year>1987</year>
@@ -443,39 +477,51 @@
 	</hash>
 	<hash crc32="72c2a343" name="Song Player - Back in the USSR (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="e7c04ab6" name="Song Player - Closing Time (PD)">
 		<year>2001</year>
+		<extrainfo></extrainfo>
 	</hash>
 	<hash crc32="5e3130e1" name="Song Player - Copacabana (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 146 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="c91b1d79" name="Song Player - Creep (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 0 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="82d2e346" name="Song Player - Nut March (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 0 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="fcf06a8b" name="Song Player - Nut Reed (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 0 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="5914220a" name="Song Player - Nut Trep (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 0 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="71f5be4e" name="Song Player - Nut Waltz (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 148 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="437c0e2d" name="Song Player - Secret Agent Man (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 148 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="da5d77ea" name="Song Player - Take on Me 3 (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 0 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="10d721ca" name="Song Player - Take on Me 6 (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 0 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="cc6f4f90" name="Song Player - Too Sexy (PD)">
 		<year>1999</year>
+		<extrainfo>0 84 0 0 0 0 1</extrainfo>
 	</hash>
 	<hash crc32="e8b8eba5" name="Space Armada (Mattel)">
 		<year>1981</year>
@@ -491,12 +537,15 @@
 	</hash>
 	<hash crc32="3784dc52" name="Space Spartans (Mattel) [!]">
 		<year>1981</year>
+		<extrainfo>0 84 0 0 0 0 2</extrainfo>
 	</hash>
 	<hash crc32="a95021fc" name="Spiker! - Super Pro Volleyball (Intv Corp)">
 		<year>1988</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="b745c1ca" name="Stadium Mud Buggies (Intv Corp)">
 		<year>1988</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="2deacd15" name="Stampede (Activision) [!]">
 		<year>1982</year>
@@ -521,12 +570,15 @@
 	</hash>
 	<hash crc32="16bfb8eb" name="Super Pro Decathlon (Intv Corp)">
 		<year>1988</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="32076e9d" name="Super Pro Football (Intv Corp)">
 		<year>1986</year>
+		<extrainfo>0 84 148 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="51b82eb7" name="Super Soccer (Mattel)">
 		<year>1983</year>
+		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="15e88fce" name="Swords and Serpents (Imagic) [!]">
 		<year>1982</year>
@@ -542,18 +594,22 @@
 	</hash>
 	<hash crc32="d6495910" name="Thin Ice (Prototype) (Intv Corp) [!]">
 		<year>1983</year>
+ 		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="c1f1ca74" name="Thunder Castle (Mattel)">
 		<year>1982</year>
+ 		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="d1d352a0" name="Tower of Doom (Intv Corp)">
 		<year>1986</year>
+		<extrainfo>0 84 148 210 242 0 0</extrainfo>
 	</hash>
 	<hash crc32="1ac989e2" name="Triple Action (Mattel)">
 		<year>1981</year>
 	</hash>
 	<hash crc32="095638c0" name="Triple Challenge (Intv Corp)">
 		<year>1986</year>
+		<extrainfo>0 84 148 193 210 0 0</extrainfo>
 	</hash>
 	<hash crc32="ca447bbd" name="TRON - Deadly Discs (Mattel)">
 		<year>1981</year>
@@ -566,6 +622,7 @@
 	</hash>
 	<hash crc32="07fb9435" name="TRON - Solar Sailer (Mattel)">
 		<year>1982</year>
+		<extrainfo>0 84 210 0 0 0 2</extrainfo>
 	</hash>
 	<hash crc32="6f23a741" name="Tropical Trouble (Imagic) [!]">
 		<year>1982</year>
@@ -584,12 +641,14 @@
 	</hash>
 	<hash crc32="752fd927" name="USCF Chess (Mattel)">
 		<year>1981</year>
+		<extrainfo>0 84 0 0 0 212 0</extrainfo>
 	</hash>
 	<hash crc32="f9e0789e" name="Utopia (Mattel)">
 		<year>1981</year>
 	</hash>
 	<hash crc32="a4a20354" name="Vectron (Mattel)">
 		<year>1982</year>
+		<extrainfo>0 84 210 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="6efa67b2" name="Venture (Coleco)">
 		<year>1982</year>
@@ -599,13 +658,16 @@
 	</hash>
 	<hash crc32="15d9d27a" name="World Cup Football (Nice Ideas)">
 		<year>1985</year>
+		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="c2063c08" name="World Series Major League Baseball (Mattel) [!]">
 		<year>1983</year>
+		<extrainfo>1 84 210 226 242 0 0</extrainfo>
 	</hash>
 	<hash crc32="a12c27e1" name="World Series Major League Baseball (Mattel)">
 		<year>1983</year>
 		<status>Known Bad Dump</status>
+		<extrainfo>1 84 210 226 242 0 0</extrainfo>
 	</hash>
 	<hash crc32="24b667b9" name="Worm Whomper (Activision) [!]">
 		<year>1983</year>
