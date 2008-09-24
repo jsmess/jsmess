@@ -61,6 +61,22 @@
         ---------------------------------------------
             0-7 bus PB0-7           bus PB0-7
 
+
+The cassette interface
+======================
+
+The KIM-1 stores data on cassette using 2 frequencies: ~3700Hz (high) and ~2400Hz
+(low). A high tone is output for 9 cycles and a low tone for 6 cycles. A logic bit
+is encoded using 3 sequences of high and low tones. It always starts with a high
+tone and ends with a low tone. The middle tone is high for a logic 0 and low for
+0 logic 1.
+
+These high and low tone signals are fed to a circuit containing a LM565 PLL and
+a 311 comparator. For a high tone a 1 is passed to DB7 of 6530-U2 for a low tone
+a 0 is passed. The KIM-1 software measures the time it takes for the signal to
+change from 1 to 0.
+
+
 ******************************************************************************/
 
 #include "driver.h"
@@ -69,7 +85,9 @@
 #include "kim1.lh"
 
 
-static UINT8		u2_port_b;
+static UINT8		kim1_u2_port_b;
+static UINT8		kim1_311_output;
+static UINT32		kim1_cassette_high_count;
 static UINT8		kim1_led_time[6];
 
 
@@ -140,7 +158,7 @@ static UINT8 kim1_u2_read_a(const device_config *device, UINT8 olddata)
 {
 	UINT8	data = 0xff;
 
-	switch( ( u2_port_b >> 1 ) & 0x0f )
+	switch( ( kim1_u2_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
 		data = input_port_read(device->machine, "LINE0");
@@ -158,7 +176,7 @@ static UINT8 kim1_u2_read_a(const device_config *device, UINT8 olddata)
 
 static void kim1_u2_write_a(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	UINT8 idx = ( u2_port_b >> 1 ) & 0x0f;
+	UINT8 idx = ( kim1_u2_port_b >> 1 ) & 0x0f;
 
 	if ( idx >= 4 && idx < 10 )
 	{
@@ -173,19 +191,16 @@ static void kim1_u2_write_a(const device_config *device, UINT8 newdata, UINT8 ol
 
 static UINT8 kim1_u2_read_b(const device_config *device, UINT8 olddata)
 {
-	double tap_val = cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) );
-
 	if ( miot6530_portb_out_get(device) & 0x20 )
 		return 0xFF;
 
-//	printf("kim1_u2_read_b(): tap_val = %f\n", tap_val);
-	return 0x7F | ( tap_val >= 0.0 ? 0x80 : 0x00 );
+	return 0x7F | ( kim1_311_output ^ 0x80 );
 }
 
 
 static void kim1_u2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	u2_port_b = newdata;
+	kim1_u2_port_b = newdata;
 
 	if ( newdata & 0x20 )
 	{
@@ -237,6 +252,26 @@ static const miot6530_interface kim1_u3_miot6530_interface =
 };
 
 
+static TIMER_CALLBACK( kim1_cassette_input )
+{
+	double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
+
+	if ( tap_val <= 0 )
+	{
+		if ( kim1_cassette_high_count )
+		{
+			kim1_311_output = ( kim1_cassette_high_count < 8 ) ? 0x80 : 0;
+			kim1_cassette_high_count = 0;
+		}
+	}
+
+	if ( tap_val > 0 )
+	{
+		kim1_cassette_high_count++;
+	}
+}
+
+
 static TIMER_CALLBACK( kim1_update_leds )
 {
 	int i;
@@ -251,16 +286,28 @@ static TIMER_CALLBACK( kim1_update_leds )
 }
 
 
+static MACHINE_START( kim1 )
+{
+	state_save_register_item( "kim1", 0, kim1_u2_port_b );
+	state_save_register_item( "kim1", 0, kim1_311_output );
+	state_save_register_item( "kim1", 0, kim1_cassette_high_count );
+}
+
+
 static MACHINE_RESET( kim1 )
 {
 	int i;
 
 	timer_pulse( ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
+	timer_pulse( ATTOTIME_IN_HZ(44100), NULL, 0, kim1_cassette_input );
 
 	for ( i = 0; i < 6; i++ )
 	{
 		kim1_led_time[i] = 0;
 	}
+
+	kim1_311_output = 0;
+	kim1_cassette_high_count = 0;
 }
 
 
@@ -270,6 +317,7 @@ static MACHINE_DRIVER_START( kim1 )
 	MDRV_CPU_PROGRAM_MAP(kim1_map, 0)
 	MDRV_INTERLEAVE(1)
 
+	MDRV_MACHINE_START( kim1 )
 	MDRV_MACHINE_RESET( kim1 )
 
 	MDRV_MIOT6530_ADD( "miot_u2", 1000000, kim1_u2_miot6530_interface )
@@ -348,4 +396,4 @@ SYSTEM_CONFIG_END
 #endif
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY   FULLNAME */
-COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	0,		  0,	  "MOS Technologies",  "KIM-1" , 0)
+COMP( 1975, kim1,	  0, 		0,		kim1,	  kim1, 	0,		  0,	  "MOS Technologies",  "KIM-1" , GAME_SUPPORTS_SAVE)
