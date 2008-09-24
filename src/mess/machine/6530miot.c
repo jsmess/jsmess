@@ -9,6 +9,10 @@ The timer seems to follow these rules:
 - When the timer flag is set and the timer contents are 0, the counting
   stops.
 
+From the operation of the KIM1 it expects the irqflag to be set whenever
+the unit is reset. This is something that is not clear from the datasheet
+and should be verified against real hardware.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -427,7 +431,7 @@ static DEVICE_RESET( miot6530 )
 
 	/* reset IRQ states */
 	miot->irqenable = 0;
-	miot->irqstate = 0;
+	miot->irqstate = TIMER_FLAG;
 	update_irqstate(device);
 
 	/* reset timer states */
