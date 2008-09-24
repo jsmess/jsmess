@@ -149,7 +149,7 @@ static UINT8 mk2_read_b(const device_config *device, UINT8 olddata)
 
 static void mk2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	if (newdata&0x80)
+	if ((newdata&0x06)==0x06)
 		dac_data_w(0,newdata&1?80:0);
 	mk2_led[4]|=newdata;
 
