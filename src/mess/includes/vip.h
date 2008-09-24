@@ -21,6 +21,16 @@
 #define VIP_SOUND_VP550		2
 #define VIP_SOUND_VP551		3
 
+#define VIP_KEYBOARD_KEYPAD		0
+#define VIP_KEYBOARD_VP580		1
+#define VIP_KEYBOARD_DUAL_VP580	2
+#define VIP_KEYBOARD_VP601		3
+#define VIP_KEYBOARD_VP611		4
+
+#define VIP_LED_POWER		0
+#define VIP_LED_Q			1
+#define VIP_LED_TAPE		2
+
 typedef struct _vip_state vip_state;
 struct _vip_state
 {
@@ -28,16 +38,19 @@ struct _vip_state
 	int reset;						/* reset activated */
 
 	/* video state */
-	const device_config *cdp1861;	/* CDP1861 */
-	const device_config *cdp1862;	/* CDP1862 */
 	int cdp1861_efx;				/* EFx */
+	int colorram_mwr;				/* color RAM write */
 	UINT8 *colorram;				/* CDP1862 color RAM */
 
 	/* sound state */
-	const device_config *cdp1863;	/* CDP1863 */
 
 	/* keyboard state */
 	int keylatch;					/* key latch */
+
+	/* devices */
+	const device_config *cdp1861;
+	const device_config *cdp1862;
+	const device_config *cdp1863;
 };
 
 #endif

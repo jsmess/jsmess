@@ -122,7 +122,8 @@ const game_driver * const drivers[] =
 	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
 
 	/* RCA */
-	DRIVER( vip )		/* 1977 Cosmac VIP									*/
+	DRIVER( vip )		/* 1977 Cosmac VIP VP-711							*/
+	DRIVER( vp111 )		/* 1977 Cosmac VIP VP-111							*/
 	DRIVER( studio2 )	/* 1977 Studio II									*/
 //	DRIVER( mtc9016 )	/* 1978 Mustang 9016 Telespiel Computer				*/ 
 

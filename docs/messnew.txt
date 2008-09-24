@@ -14,6 +14,7 @@ New System Drivers Supported (in no particular order):
 - Ondra (not working) [Miodrag Milanovic]
 - PK-8020 Korvet (not working) [Miodrag Milanovic]
 - Kramer MC [Miodrag Milanovic]
+- RCA Cosmac VIP (VP-111) [Curt Coder]
 
 
 
