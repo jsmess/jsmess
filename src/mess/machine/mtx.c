@@ -78,7 +78,7 @@ SNAPSHOT_LOAD( mtx )
 {
 	UINT8 header[18];
 	UINT16 sys_addr;
-	
+
 	/* get the header */
 	image_fread(image, &header, sizeof(header));
 
@@ -97,7 +97,7 @@ SNAPSHOT_LOAD( mtx )
 		image_fread(image, mtx_ram + (sys_addr - 0xc000), 599);
 		image_fread(image, mtx_ram, snapshot_size - 599 - 4);
 	}
-	
+
 	return INIT_PASS;
 }
 
@@ -134,7 +134,7 @@ static const device_config *mtx_printer_image(running_machine *machine)
 READ8_HANDLER( mtx_strobe_r )
 {
 	if (mtx_prt_strobe == 0)
-		printer_output (mtx_printer_image(machine), mtx_prt_data);
+		printer_output(mtx_printer_image(machine), mtx_prt_data);
 
 	mtx_prt_strobe = 1;
 
@@ -146,7 +146,7 @@ READ8_HANDLER( mtx_prt_r )
 {
 	mtx_prt_strobe = 0;
 
-	return MTX_PRT_NOERROR | (printer_is_ready (mtx_printer_image (machine))
+	return MTX_PRT_NOERROR | (printer_is_ready(mtx_printer_image(machine))
 			? MTX_PRT_SELECTED : 0);
 }
 
@@ -303,7 +303,7 @@ static const z80dart_interface mtx_dart_intf =
 WRITE8_HANDLER( mtx_bankswitch_w )
 {
 //  UINT8 cbm_mode = data >> 7 & 0x01;
-	UINT8 rom_page = data >> 4 & 0x03;
+	UINT8 rom_page = data >> 4 & 0x07;
 	UINT8 ram_page = data >> 0 & 0x0f;
 
 	/* set rom bank (switches between basic and assembler rom or cartridges) */
