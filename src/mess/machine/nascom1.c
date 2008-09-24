@@ -5,7 +5,6 @@
 **********************************************************************/
 
 /* Core includes */
-#include <stdio.h>
 #include "driver.h"
 #include "includes/nascom1.h"
 
