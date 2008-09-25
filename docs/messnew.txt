@@ -101,6 +101,8 @@ System Driver Changes:
 
 - [JUPITER] Fixed regression; driver works again.  [Wilbert Pol]
 
+- [MSX] Added some Brazilian clones [Miodrag Milanovic]
+
 - [PET] Refactored cartridge code to rely on MESS core functions. Disabled
   .crt support (.a0 and .b0 files working as before) since I doubt these 
   computers used the same format as C64. More work when/if more documents 

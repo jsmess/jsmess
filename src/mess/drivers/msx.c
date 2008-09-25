@@ -1144,11 +1144,35 @@ MSX_LAYOUT_END
 
 ROM_START (expert11)
 	ROM_REGION (0xc000, "main",0)
+	ROM_LOAD ("expbios11.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
+ROM_END
+
+MSX_LAYOUT_INIT (expert11)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
+ROM_START (expert13)
+	ROM_REGION (0x8000, "main",0)
+	ROM_LOAD ("expbios13.rom", 0x0000, 0x8000, CRC(5638bc38) SHA1(605f5af3f358c6811f54e0173bad908614a198c0))
+ROM_END
+
+MSX_LAYOUT_INIT (expert13)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
+ROM_START (expertpl)
+	ROM_REGION (0xc000, "main",0)
 	ROM_LOAD ("exppbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
 	ROM_LOAD ("exppdemo.rom", 0x8000, 0x4000, CRC(a9bbef64) SHA1(d4cea8c815f3eeabe0c6a1c845f902ec4318bf6b))
 ROM_END
 
-MSX_LAYOUT_INIT (expert11)
+MSX_LAYOUT_INIT (expertpl)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
@@ -2249,6 +2273,8 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (hotbit12)
 	MSX_DRIVER (expert10)
 	MSX_DRIVER (expert11)
+	MSX_DRIVER (expert13)
+	MSX_DRIVER (expertpl)
 	MSX_DRIVER (expertdp)
 	MSX_DRIVER (msx2)
 	MSX_DRIVER (nms8220)
@@ -2321,8 +2347,10 @@ COMP(1985, hotbit11, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "H
 COMP(1985, hotbit12, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
 COMP(1984, hx10,     msx,	0,	msx,	  msx,      msx,     msx, "Toshiba",	 "HX-10" , 0)
 COMP(1985, vg8020,   msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8020" , 0)
-COMP(1983, expert10, msx,	0,	msx,	  expert10, msx,     msx, "Gradiente", "Expert (Brazil)" , 0)
-COMP(1984, expert11, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert Plus (Brazil)" , 0)
+COMP(1983, expert10, msx,	0,	msx,	  expert10, msx,     msx, "Gradiente", "Expert 1.0 (Brazil)" , 0)
+COMP(1984, expert11, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert 1.1 (Brazil)" , 0)
+COMP(1984, expert13, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert 1.3 (Brazil)" , 0)
+COMP(1984, expertpl, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert Plus (Brazil)" , 0)
 COMP(1985, expertdp, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert DDPlus (Brazil)", 0 )
 COMP(1985, msx2,     0,		msx,	msx2_pal, msx2,	    msx2,    msx, "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 / 1st released version", 0)

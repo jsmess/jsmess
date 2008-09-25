@@ -680,6 +680,8 @@ XL/XE 16kB OS roms
 	DRIVER( vg8020 )	/* 1985 MSX											*/
 	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
 	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
+	DRIVER( expert13 )	/* 1984 MSX Brazil									*/
+	DRIVER( expertpl )	/* 1984 MSX Brazil									*/
 	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
 	DRIVER( msx2 )		/* 1985 MSX2										*/
 	DRIVER( hbf9p )		/* 1985 MSX2										*/
