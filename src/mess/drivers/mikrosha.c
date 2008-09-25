@@ -11,6 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/8255ppi.h"
 #include "machine/8257dma.h"
+#include "machine/pit8253.h"
 #include "video/i8275.h"
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
@@ -20,11 +21,13 @@
 static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK(1) // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
-    AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r)
+    AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r) // Not connected
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
-    //AM_RANGE( 0xd800, 0xd603 ) AM_MIRROR(0x07fc) // Timer
+    AM_RANGE( 0xd803, 0xd803 ) AM_READ(radio_cpu_state_r) AM_MIRROR(0x07fc) // Not connected
+//    AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
+    AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
   	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -132,12 +135,12 @@ static UINT8 *mikrosha_io_mirror = NULL;
 
 static OPBASE_HANDLER( mikrosha_opbase )
 {	
-	if (address >= 0x8000 && address <=0xBFFF) {
+	if (address >= 0x8000 && address <=0xFFFF) {
 			opbase->mask = 0xffff;
 			opbase->ram = mikrosha_io_mirror;
 			opbase->rom = mikrosha_io_mirror;
 			opbase->mem_min = 0x8000;
-			opbase->mem_max = 0xbfff;
+			opbase->mem_max = 0xffff;
 			mikrosha_io_mirror[address] = cpunum_get_reg(0, I8080_STATUS);
 	} 
 	return address;
@@ -145,9 +148,32 @@ static OPBASE_HANDLER( mikrosha_opbase )
 
 static MACHINE_START( mikrosha )
 {
-	mikrosha_io_mirror = auto_malloc( 0xc000 );
+	mikrosha_io_mirror = auto_malloc( 0x10000 );
 	memory_set_opbase_handler( 0, mikrosha_opbase );
 }
+
+static PIT8253_OUTPUT_CHANGED(mikrosha_pit_out2)
+{
+
+}
+
+const struct pit8253_config mikrosha_pit8253_intf =
+{
+	{
+		{
+			0,
+			NULL
+		},
+		{
+			0,
+			NULL
+		},
+		{
+			2000000,
+			mikrosha_pit_out2
+		}
+	}
+};
 
 static MACHINE_DRIVER_START( mikrosha )
   /* basic machine hardware */
@@ -165,7 +191,11 @@ static MACHINE_DRIVER_START( mikrosha )
 
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(mikrosha_i8275_interface)
-    /* video hardware */
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( mikrosha_pit8253_intf )
+
+  /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
