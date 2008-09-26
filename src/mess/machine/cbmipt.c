@@ -34,7 +34,7 @@ C64 Keyboard Layout
 -------------------
 
                                                                            CLR    INST
-    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL           f 1
+    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    ¬£    HOME   DEL           f 1
 
  
     CTRL   Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE          f 3
@@ -49,7 +49,7 @@ C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT   U/D  
                                  SPACEBAR
 
 
-Notes: “C=” is a key with the Commodore logo, “UP” is an arrow pointing up, the “CRSR” keys at the 
+Notes: ‚ÄúC=‚Äù is a key with the Commodore logo, ‚ÄúUP‚Äù is an arrow pointing up, the ‚ÄúCRSR‚Äù keys at the 
 bottom-right corner are used to move the cursor on screen (Up/Down and Left/Right resp.). 
 */
 
@@ -66,7 +66,7 @@ INPUT_PORTS_START( common_cbm_keyboard )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del  Inst") PORT_CODE(KEYCODE_BACKSPACE)		PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
 	PORT_START( "ROW1" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT)		
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT)		PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) 		PORT_CHAR('E')	
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) 		PORT_CHAR('S')	
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)			PORT_CHAR('Z')	
@@ -119,7 +119,7 @@ INPUT_PORTS_START( common_cbm_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)								PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL)	PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)							PORT_CHAR('=')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT)	
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT)	PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Home  Clr") PORT_CODE(KEYCODE_INSERT)		PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)								PORT_CHAR(';') PORT_CHAR(']')
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('*')
@@ -265,7 +265,7 @@ C16 Keyboard Layout
   STOP  LOCK   A    S    D    F     G     H    J    K    L   :[   ;]    *      RETURN             f 5
   
   
-  C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT     £     =           HELP
+  C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT     ¬£     =           HELP
   
   
                                  SPACEBAR
@@ -285,7 +285,7 @@ C116 Keyboard Layout
    CONTROL   Q    W    E    R    T     Y    U    I    O    P    @   RETURN
   
   RUN   
-  STOP    £    A    S    D    F     G     H    J    K    L   :[   ;]    =
+  STOP    ¬£    A    S    D    F     G     H    J    K    L   :[   ;]    =
   
   
   C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT
@@ -303,7 +303,7 @@ Plus/4 (also 232/264/364 proto)
      ESC   1!   2"   3#   4$   5%   6&   7'   8(   9)   0^   +    -     =    HOME    DEL        ||      @  +  -  =
                                                                                                 ||
                                                                                                 ||
-   CONTROL   Q    W    E    R    T     Y    U    I    O    P    @    £     *    CONTROL         ||      7  8  9  *
+   CONTROL   Q    W    E    R    T     Y    U    I    O    P    @    ¬£     *    CONTROL         ||      7  8  9  *
                                                                                                 ||
   RUN   SHIFT                                                                                   ||
   STOP  LOCK   A    S    D    F     G     H    J    K    L   :[   ;]    RETURN                  ||      4  5  6  /
@@ -388,7 +388,7 @@ C128 Keyboard Layout
      ESC  TAB  ALT  LOCK           HELP  FEED  DISPLAY SCROLL      UP  DOWN  LEFT  RIGHT          F1  F3  F5  F7
   
                                                                              CLR    INST
-      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL           7   8   9   +
+      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    ¬£    HOME   DEL           7   8   9   +
   
    
    CONTROL   Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE          4   5   6   -
@@ -444,7 +444,7 @@ C65 Keyboard Layout
     STOP       ESC  ALT  LOCK  SCROLL    F1   F3   F5   F7        F9    F11   F13   HELP
   
                                                                              CLR    INST
-      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL 
+      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    ¬£    HOME   DEL 
   
    
    TAB       Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE
@@ -777,7 +777,7 @@ CBMB Series Keyboard Layout (based on a CBM 610 keyboard)
      F1    F2   F3   F4   F5   F6   F7   F8   F9  F10      DOWN  UP  LEFT  RIGHT     HOME/CLEAR   DEL/INST
   
                                                                             INS  
-     ESC   1!   2"   3#   4$   5%   6^   7&   8*   9(   0)   -   =+   <-£   DEL          ?   CE    .    /
+     ESC   1!   2"   3#   4$   5%   6^   7&   8*   9(   0)   -   =+   <-¬£   DEL          ?   CE    .    /
   
                                                                          ________   
      TAB     Q    W    E    R    T     Y    U    I    O    P    [    ]  | RETURN |       7    8    9    -
@@ -947,7 +947,7 @@ VIC20 Keyboard Layout
 ---------------------
 
                                                                            CLR    INST
-    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL           f 1
+    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    ¬£    HOME   DEL           f 1
 
  
     CTRL   Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE          f 3
@@ -962,7 +962,7 @@ C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT   U/D  
                                  SPACEBAR
 
 
-Notes: “C=” is a key with the Commodore logo, “UP” is an arrow pointing up, the “CRSR” keys at the 
+Notes: ‚ÄúC=‚Äù is a key with the Commodore logo, ‚ÄúUP‚Äù is an arrow pointing up, the ‚ÄúCRSR‚Äù keys at the 
 bottom-right corner are used to move the cursor on screen (Up/Down and Left/Right respectively).
 Notice that this is exactly the same layout of C64 keyboard.
  
