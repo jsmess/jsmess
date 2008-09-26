@@ -535,7 +535,7 @@ $(MESSOBJ)/arcadia.a:  \
 	$(MESS_AUDIO)/arcadia.o	\
 	$(MESS_VIDEO)/arcadia.o	\
 
-$(MESSOBJ)/sega.a:						\
+$(MESSOBJ)/sega.a:			\
 	$(MESS_DRIVERS)/genesis.o	\
 	$(MESS_MACHINE)/genesis.o	\
 	$(MESS_DRIVERS)/saturn.o	\
@@ -577,7 +577,7 @@ $(MESSOBJ)/gce.a:	                     \
 	$(MESS_VIDEO)/vectrex.o	\
 	$(MESS_MACHINE)/vectrex.o	\
 
-$(MESSOBJ)/nintendo.a:					\
+$(MESSOBJ)/nintendo.a:			\
 	$(MESS_AUDIO)/gb.o		\
 	$(MESS_VIDEO)/gb.o		\
 	$(MESS_MACHINE)/gb.o		\
@@ -587,13 +587,14 @@ $(MESSOBJ)/nintendo.a:					\
 	$(MESS_VIDEO)/nes.o		\
 	$(MESS_MACHINE)/nes.o		\
 	$(MESS_DRIVERS)/nes.o		\
-	$(MAME_AUDIO)/snes.o			\
-	$(MAME_MACHINE)/snes.o			\
-	$(MAME_VIDEO)/snes.o			\
+	$(MAME_AUDIO)/snes.o		\
+	$(MAME_MACHINE)/snes.o		\
+	$(MAME_VIDEO)/snes.o		\
+	$(MESS_MACHINE)/snescart.o	\
 	$(MESS_DRIVERS)/snes.o	 	\
 	$(MESS_DRIVERS)/n64.o		\
-	$(MAME_MACHINE)/n64.o			\
-	$(MAME_VIDEO)/n64.o			\
+	$(MAME_MACHINE)/n64.o		\
+	$(MAME_VIDEO)/n64.o		\
 	$(MESS_MACHINE)/pokemini.o	\
 	$(MESS_DRIVERS)/pokemini.o	\
 
