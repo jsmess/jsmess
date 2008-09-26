@@ -658,31 +658,49 @@ XL/XE 16kB OS roms
 
 	/* ASCII & MICROSOFT */
 	DRIVER( msx )		/* 1983 MSX 										*/
-	DRIVER( cf2000 )	/* 1983 MSX Japan									*/
-	DRIVER( cf1200 )	/* 1984 MSX Japan									*/
-	DRIVER( cf2700 )	/* 1984 MSX Japan									*/
-	DRIVER( cf3000 )	/* 1984 MSX Japan									*/
-	DRIVER( cf3300 )	/* 1985 MSX Japan									*/
-	DRIVER( fs4000 )	/* 1985 MSX Japan									*/
-	DRIVER( fs1300 )	/* 1985 MSX Japan									*/
-	DRIVER( hb201 )		/* 1985 MSX Japan									*/
+	DRIVER( ax170 )
+	DRIVER( canonv10 )
+	DRIVER( canonv20 )
 	DRIVER( dpc100 )	/* 1984 MSX Korea									*/
 	DRIVER( dpc180 )	/* 1984 MSX Korea									*/
 	DRIVER( dpc200 )	/* 1984 MSX Korea									*/
-	DRIVER( hb75d )		/* 1983 MSX Germany									*/
-	DRIVER( hb75p )		/* 1983 MSX											*/
-	DRIVER( hb501p )	/* 1984 MSX											*/
-	DRIVER( hb201p )	/* 1985 MSX											*/
-	DRIVER( svi738 )	/* 1985 MSX											*/
-	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
-	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
-	DRIVER( hx10 )		/* 1984 MSX											*/
-	DRIVER( vg8020 )	/* 1985 MSX											*/
+	DRIVER( gsfc200 )
 	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
 	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
 	DRIVER( expert13 )	/* 1984 MSX Brazil									*/
-	DRIVER( expertpl )	/* 1984 MSX Brazil									*/
 	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
+	DRIVER( expertpl )	/* 1984 MSX Brazil									*/
+	DRIVER( jvchc7gb )
+	DRIVER( mlf80 )
+	DRIVER( mlfx1 )
+	DRIVER( cf1200 )	/* 1984 MSX Japan									*/
+	DRIVER( cf2000 )	/* 1983 MSX Japan									*/
+	DRIVER( cf2700 )	/* 1984 MSX Japan									*/
+	DRIVER( cf3000 )	/* 1984 MSX Japan									*/
+	DRIVER( cf3300 )	/* 1985 MSX Japan									*/
+	DRIVER( fs1300 )	/* 1985 MSX Japan									*/
+	DRIVER( fs4000 )	/* 1985 MSX Japan									*/
+	DRIVER( nms801 )
+	DRIVER( vg802000 )
+	DRIVER( vg802020 )	/* 1985 MSX											*/
+	DRIVER( piopx7 )	
+	DRIVER( mpc100 )
+	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
+	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbi13b )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbi13p )	/* 1985 MSX	Brazil									*/
+	DRIVER( hb201 )		/* 1985 MSX Japan									*/
+	DRIVER( hb201p )	/* 1985 MSX											*/
+	DRIVER( hb501p )	/* 1984 MSX											*/
+	DRIVER( hb55d )		/* 1983 MSX Germany									*/
+	DRIVER( hb55p )		/* 1983 MSX											*/
+	DRIVER( hb75d )		/* 1983 MSX Germany									*/
+	DRIVER( hb75p )		/* 1983 MSX											*/
+	DRIVER( svi728 )	/* 1985 MSX											*/
+	DRIVER( svi738 )	/* 1985 MSX											*/
+	DRIVER( svi738sw )	/* 1985 MSX											*/
+	
+	DRIVER( hx10 )		/* 1984 MSX											*/
 	DRIVER( msx2 )		/* 1985 MSX2										*/
 	DRIVER( hbf9p )		/* 1985 MSX2										*/
 	DRIVER( hbf500p )	/* 1985 MSX2										*/
@@ -728,6 +746,7 @@ XL/XE 16kB OS roms
 	DRIVER( phc70fd )	/* 1988 MSX2+ Japan									*/
 	DRIVER( phc70fd2 )	/* 1988 MSX2+ Japan									*/
 	DRIVER( phc35j )	/* 1989 MSX2+ Japan									*/
+
 
 	/* NASCOM MICROCOMPUTERS */
 	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
@@ -913,7 +932,9 @@ XL/XE 16kB OS roms
 	DRIVER( orion128 )
 	DRIVER( orionms )
 	DRIVER( orionz80 )
+	DRIVER( orionide )
 	DRIVER( orionzms )
+	DRIVER( orionidm )
 	DRIVER( orionpro )
 
 	/* BK */

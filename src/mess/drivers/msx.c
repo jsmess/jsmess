@@ -876,6 +876,10 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+/********************************  MSX 1 **********************************/
+
+/* MSX */
+
 ROM_START (msx)
 	ROM_REGION (0x8000, "main", 0)
 	ROM_LOAD ("msx.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
@@ -888,86 +892,225 @@ MSX_LAYOUT_INIT (msx)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (hb75d)
-	ROM_REGION (0xc000, "main", 0)
-	ROM_LOAD ("75dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730))
-	ROM_LOAD ("75dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
-ROM_END
+/* MSX - Al Alamiah AX-170 */
 
-MSX_LAYOUT_INIT (hb75d)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-MSX_LAYOUT_END
-
-ROM_START (hb75p)
-	ROM_REGION (0xc000, "main", 0)
-	ROM_LOAD ("75pbios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
-	ROM_LOAD ("75pnote.rom", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
-ROM_END
-
-MSX_LAYOUT_INIT (hb75p)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-MSX_LAYOUT_END
-
-ROM_START (hb501p)
-	ROM_REGION (0x8000, "main", 0)
-	ROM_LOAD ("501pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
-ROM_END
-
-MSX_LAYOUT_INIT (hb501p)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-MSX_LAYOUT_END
-
-ROM_START (hb201p)
-	ROM_REGION (0xc000, "main", 0)
-	ROM_LOAD ("201pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
-	ROM_LOAD ("201pnote.rom", 0x8000, 0x4000, CRC(1ff9b6ec) SHA1(e84d3ec7a595ee36b50e979683c84105c1871857))
-ROM_END
-
-MSX_LAYOUT_INIT (hb201p)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-MSX_LAYOUT_END
-
-ROM_START (svi738)
+ROM_START (ax170)
 	ROM_REGION (0x10000, "main", 0)
-	ROM_LOAD ("738bios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d))
-	ROM_LOAD ("738disk.rom", 0x8000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
-	ROM_LOAD ("738232c.rom", 0xc000, 0x4000, CRC(af568506) SHA1(9de525e042d7345f6b725a696bd1b6fef69ecbf1))
+	ROM_LOAD ("ax170bios.rom", 0x0000, 0x8000, CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d))
+	ROM_LOAD ("ax170arab.rom", 0x8000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
 ROM_END
 
-MSX_LAYOUT_INIT (svi738)
+MSX_LAYOUT_INIT (ax170)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
+	MSX_LAYOUT_SLOT (1, 0, 1, 2, ROM, 0x8000, 0x8000)	
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0xc000)
-	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000) 	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (cf2000)
+/* MSX - Canon V-10 */
+
+ROM_START (canonv10)
 	ROM_REGION (0x8000, "main", 0)
-	ROM_LOAD ("2000bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+	ROM_LOAD ("v10bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
-MSX_LAYOUT_INIT (cf2000)
+MSX_LAYOUT_INIT (canonv10)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 3, 1, RAM, 0x4000, 0xC000)   /* 16KB RAM */
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000) 	/* 16KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Canon V-20 */
+ROM_START (canonv20)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("v20bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+ROM_END
+
+MSX_LAYOUT_INIT (canonv20)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Daewoo DPC-100 */
+
+ROM_START (dpc100)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("100bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+	ROM_LOAD ("100han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+ROM_END
+
+MSX_LAYOUT_INIT (dpc100)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000)   /* 16KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Daewoo DPC-180 */
+
+ROM_START (dpc180)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("180bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+	ROM_LOAD ("180han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+ROM_END
+
+MSX_LAYOUT_INIT (dpc180)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 2, 2, RAM, 0x8000, 0x8000)   /* 32KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Daewoo DPC-200 */
+
+ROM_START (dpc200)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("200bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+	ROM_LOAD ("200han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+ROM_END
+
+MSX_LAYOUT_INIT (dpc200)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Goldstar FC-200 */
+
+ROM_START (gsfc200)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("fc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
+ROM_END
+
+MSX_LAYOUT_INIT (gsfc200)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Gradiente Expert 1.0 */
+
+ROM_START (expert10)
+	ROM_REGION (0x8000, "main",0)
+	ROM_LOAD ("expbios.rom", 0x0000, 0x8000, CRC(07610d77) SHA1(ef3e010eb57e4476700a3bbff9d2119ab3acdf62))
+ROM_END
+
+MSX_LAYOUT_INIT (expert10)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+MSX_LAYOUT_END
+
+/* MSX - Gradiente Expert 1.1 */
+ROM_START (expert11)
+	ROM_REGION (0xc000, "main",0)
+	ROM_LOAD ("expbios11.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
+ROM_END
+
+MSX_LAYOUT_INIT (expert11)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Gradiente Expert 1.3 */
+ROM_START (expert13)
+	ROM_REGION (0x8000, "main",0)
+	ROM_LOAD ("expbios13.rom", 0x0000, 0x8000, CRC(5638bc38) SHA1(605f5af3f358c6811f54e0173bad908614a198c0))
+ROM_END
+
+MSX_LAYOUT_INIT (expert13)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Gradiente Expert DDPlus */
+ROM_START (expertdp)
+	ROM_REGION (0xc000, "main",0)
+	ROM_LOAD ("eddpbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
+	ROM_LOAD ("eddpdisk.rom", 0x8000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
+ROM_END
+
+MSX_LAYOUT_INIT (expertdp)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
+  MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM2, 0x4000, 0x8000)
 MSX_LAYOUT_END
+
+/* MSX - Gradiente Expert Plus */
+
+ROM_START (expertpl)
+	ROM_REGION (0xc000, "main",0)
+	ROM_LOAD ("exppbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
+	ROM_LOAD ("exppdemo.rom", 0x8000, 0x4000, CRC(a9bbef64) SHA1(d4cea8c815f3eeabe0c6a1c845f902ec4318bf6b))
+ROM_END
+
+MSX_LAYOUT_INIT (expertpl)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 3, 2, 1, ROM, 0x4000, 0x8000)
+MSX_LAYOUT_END
+
+/* MSX - JVC HC-7GB */
+
+ROM_START (jvchc7gb)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("hc7gbbios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+ROM_END
+
+MSX_LAYOUT_INIT (jvchc7gb)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Mitsubishi ML-F80 */
+
+ROM_START (mlf80)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("mlf80bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+ROM_END
+
+MSX_LAYOUT_INIT (mlf80)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)	
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Mitsubishi ML-FX1 */
+
+ROM_START (mlfx1)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("mlfx1bios.rom", 0x0000, 0x8000, CRC(62867dce) SHA1(0cbe0df4af45e8f531e9c761403ac9e71808f20c))
+ROM_END
+
+MSX_LAYOUT_INIT (mlfx1)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - National CF-1200 */
 
 ROM_START (cf1200)
 	ROM_REGION (0x8000, "main", 0)
@@ -981,6 +1124,21 @@ MSX_LAYOUT_INIT (cf1200)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
+/* MSX - National CF-2000 */
+
+ROM_START (cf2000)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("2000bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+ROM_END
+
+MSX_LAYOUT_INIT (cf2000)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 3, 1, RAM, 0x4000, 0xC000)   /* 16KB RAM */
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - National CF-2700 */
 ROM_START (cf2700)
 	ROM_REGION (0x8000, "main", 0)
 	ROM_LOAD ("2700bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
@@ -992,6 +1150,8 @@ MSX_LAYOUT_INIT (cf2700)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
+
+/* MSX - National CF-3000 */
 
 ROM_START (cf3000)
 	ROM_REGION (0x8000, "main", 0)
@@ -1005,6 +1165,7 @@ MSX_LAYOUT_INIT (cf3000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
+/* MSX - National CF-3300 */
 ROM_START (cf3300)
 	ROM_REGION (0xc000, "main", 0)
 	ROM_LOAD ("3300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
@@ -1016,9 +1177,24 @@ MSX_LAYOUT_INIT (cf3300)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
-  	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+  MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
 MSX_LAYOUT_END
 
+/* MSX - National FS-1300 */
+
+ROM_START (fs1300)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("1300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
+ROM_END
+
+MSX_LAYOUT_INIT (fs1300)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - National FS-4000 */
 ROM_START (fs4000)
 	ROM_REGION (0x38000 ,"main", 0)
 	ROM_LOAD ("4000bios.rom", 0x0000, 0x8000, CRC(071135e0) SHA1(df48902f5f12af8867ae1a87f255145f0e5e0774))
@@ -1037,74 +1213,79 @@ MSX_LAYOUT_INIT (fs4000)
 	MSX_LAYOUT_KANJI (0x18000)
 MSX_LAYOUT_END
 
-ROM_START (fs1300)
+/* MSX - Philips NMS-801 */
+
+ROM_START (nms801)
 	ROM_REGION (0x8000, "main", 0)
-	ROM_LOAD ("1300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
+	ROM_LOAD ("801bios.rom", 0x0000, 0x8000, CRC(fa089461) SHA1(21329398c0f350e330b353f45f21aa7ba338fc8d))
 ROM_END
 
-MSX_LAYOUT_INIT (fs1300)
+MSX_LAYOUT_INIT (nms801)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
-MSX_LAYOUT_END
-
-ROM_START (hb201)
-	ROM_REGION (0x10000, "main", 0)
-	ROM_LOAD ("201bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD ("201note.rom", 0x8000, 0x8000, CRC(d280186e) SHA1(1c8270207b5cc14414a52ffcdece65094f70774e))
-ROM_END
-
-MSX_LAYOUT_INIT (hb201)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 2, ROM, 0x8000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (dpc100)
-	ROM_REGION (0xc000, "main", 0)
-	ROM_LOAD ("100bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
-	ROM_LOAD ("100han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+/* MSX - Philips VG-8020-00 */
+
+ROM_START (vg802000)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("8020-00bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
-MSX_LAYOUT_INIT (dpc100)
+MSX_LAYOUT_INIT (vg802000)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000)   /* 16KB RAM */
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (dpc180)
-	ROM_REGION (0xc000, "main", 0)
-	ROM_LOAD ("180bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
-	ROM_LOAD ("180han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+/* MSX - Philips VG-8020-20 */
+
+ROM_START (vg802020)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("8020-20bios.rom", 0x0000, 0x8000, CRC(A317E6B4) SHA1(E998F0C441F4F1800EF44E42CD1659150206CF79))
 ROM_END
 
-MSX_LAYOUT_INIT (dpc180)
+MSX_LAYOUT_INIT (vg802020)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 2, 2, RAM, 0x8000, 0x8000)   /* 32KB RAM */
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
 MSX_LAYOUT_END
 
+/* MSX - Pioneer PX-7 */
 
-ROM_START (dpc200)
+ROM_START (piopx7)
 	ROM_REGION (0xc000, "main", 0)
-	ROM_LOAD ("200bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
-	ROM_LOAD ("200han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+	ROM_LOAD ("px7bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+	ROM_LOAD ("px7pbasic.rom", 0x8000, 0x4000, CRC(2ff3fdb1) SHA1(76d0c05b7c58609db73e350380e2e556876fff0a))
 ROM_END
 
-MSX_LAYOUT_INIT (dpc200)
+MSX_LAYOUT_INIT (piopx7)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 2, RAM, 0x8000, 0x8000)   /* 32KB RAM */
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 1, 2, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
 MSX_LAYOUT_END
+
+/* MSX - Sanyo MPC-100 */
+
+ROM_START (mpc100)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("mpc100bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+ROM_END
+
+MSX_LAYOUT_INIT (mpc100)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - Sharp Epcom HotBit 1.1 */
 
 ROM_START (hotbit11)
 	ROM_REGION (0x8000, "main",0)
@@ -1118,6 +1299,8 @@ MSX_LAYOUT_INIT (hotbit11)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
+/* MSX - Sharp Epcom HotBit 1.2 */
+
 ROM_START (hotbit12)
 	ROM_REGION (0x8000, "main",0)
 	ROM_LOAD ("hotbit12.rom", 0x0000, 0x8000, CRC(f59a4a0c) SHA1(9425815446d468058705bae545ffa13646744a87))
@@ -1130,49 +1313,60 @@ MSX_LAYOUT_INIT (hotbit12)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (expert10)
+/* MSX - Sharp Epcom HotBit 1.3b */
+
+ROM_START (hotbi13b)
 	ROM_REGION (0x8000, "main",0)
-	ROM_LOAD ("expbios.rom", 0x0000, 0x8000, CRC(07610d77) SHA1(ef3e010eb57e4476700a3bbff9d2119ab3acdf62))
+	ROM_LOAD ("hotbit13b.rom", 0x0000, 0x8000, CRC(7a19820e) SHA1(e0c2bfb078562d15acabc5831020a2370ea87052))
 ROM_END
 
-MSX_LAYOUT_INIT (expert10)
+MSX_LAYOUT_INIT (hotbi13b)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
 MSX_LAYOUT_END
 
-ROM_START (expert11)
-	ROM_REGION (0xc000, "main",0)
-	ROM_LOAD ("expbios11.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
-ROM_END
+/* MSX - Sharp Epcom HotBit 1.3p */
 
-MSX_LAYOUT_INIT (expert11)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-MSX_LAYOUT_END
-
-ROM_START (expert13)
+ROM_START (hotbi13p)
 	ROM_REGION (0x8000, "main",0)
-	ROM_LOAD ("expbios13.rom", 0x0000, 0x8000, CRC(5638bc38) SHA1(605f5af3f358c6811f54e0173bad908614a198c0))
+	ROM_LOAD ("hotbit13p.rom", 0x0000, 0x8000, CRC(150e239c) SHA1(942f9507d206cd8156f15601fe8032fcf0e3875b))
 ROM_END
 
-MSX_LAYOUT_INIT (expert13)
+MSX_LAYOUT_INIT (hotbi13p)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+MSX_LAYOUT_END
+
+/* MSX - Sony HB-201 */
+
+ROM_START (hb201)
+	ROM_REGION (0x10000, "main", 0)
+	ROM_LOAD ("201bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+	ROM_LOAD ("201note.rom", 0x8000, 0x4000, CRC(74567244) SHA1(0f4f09f1a6ef7535b243afabfb44a3a0eb0498d9))
+	ROM_FILL( 0xc000, 0x4000, 0xff )
+ROM_END
+
+MSX_LAYOUT_INIT (hb201)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 2, ROM, 0x8000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (expertpl)
-	ROM_REGION (0xc000, "main",0)
-	ROM_LOAD ("exppbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
-	ROM_LOAD ("exppdemo.rom", 0x8000, 0x4000, CRC(a9bbef64) SHA1(d4cea8c815f3eeabe0c6a1c845f902ec4318bf6b))
+/* MSX - Sony HB-201P */
+
+ROM_START (hb201p)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("201pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
+	ROM_LOAD ("201pnote.rom", 0x8000, 0x4000, CRC(1ff9b6ec) SHA1(e84d3ec7a595ee36b50e979683c84105c1871857))
 ROM_END
 
-MSX_LAYOUT_INIT (expertpl)
+MSX_LAYOUT_INIT (hb201p)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
@@ -1180,19 +1374,146 @@ MSX_LAYOUT_INIT (expertpl)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (expertdp)
-	ROM_REGION (0xc000, "main",0)
-	ROM_LOAD ("eddpbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
-	ROM_LOAD ("eddpdisk.rom", 0x8000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
+/* MSX - Sony HB-501P */
+
+ROM_START (hb501p)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("501pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
 ROM_END
 
-MSX_LAYOUT_INIT (expertdp)
+MSX_LAYOUT_INIT (hb501p)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
-  	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
+
+/* MSX - Sony HB-55D */
+
+ROM_START (hb55d)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("55dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730))
+	ROM_LOAD ("55dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
+ROM_END
+
+MSX_LAYOUT_INIT (hb55d)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)	
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0x0000)	/* 16KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Sony HB-55P */
+
+ROM_START (hb55p)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("55pbios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+	ROM_LOAD ("55pnote.rom", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
+ROM_END
+
+MSX_LAYOUT_INIT (hb55p)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)	
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0x0000)	/* 16KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Sony HB-75D */
+
+ROM_START (hb75d)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("75dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730))
+	ROM_LOAD ("75dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
+ROM_END
+
+MSX_LAYOUT_INIT (hb75d)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Sony HB-75P */
+
+ROM_START (hb75p)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("75pbios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+	ROM_LOAD ("75pnote.rom", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
+ROM_END
+
+MSX_LAYOUT_INIT (hb75p)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Spectravideo SVI-728 */
+
+ROM_START (svi728)
+	ROM_REGION (0xc000, "main", 0)
+	ROM_LOAD ("728bios.rom", 0x0000, 0x8000, CRC(1ce9246c) SHA1(ea6a82cf8c6e65eb30b98755c8577cde8d9186c0))
+	ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
+ROM_END
+
+MSX_LAYOUT_INIT (svi728)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+MSX_LAYOUT_END
+
+/* MSX - Spectravideo SVI-738 */
+
+ROM_START (svi738)
+	ROM_REGION (0x10000, "main", 0)
+	ROM_LOAD ("738bios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d))
+	ROM_LOAD ("738disk.rom", 0x8000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
+	ROM_LOAD ("738232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
+	ROM_FILL (0xe000, 0x2000, 0xff)
+ROM_END
+
+MSX_LAYOUT_INIT (svi738)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Spectravideo SVI-738 Swedish */
+
+ROM_START (svi738sw)
+	ROM_REGION (0x10000, "main", 0)
+	ROM_LOAD ("738sebios.rom", 0x0000, 0x8000, CRC(c8ccdaa0) SHA1(87f4d0fa58cfe9cef818a3185df2735e6da6168c))
+	ROM_LOAD ("738sedisk.rom", 0x8000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7))
+	ROM_LOAD ("738se232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
+	ROM_FILL (0xe000, 0x2000, 0xff)
+ROM_END
+
+MSX_LAYOUT_INIT (svi738sw)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+
+
+
+
+
+
+
+
 
 ROM_START (msx2)
 	ROM_REGION (0x20000, "main",0)
@@ -2196,18 +2517,6 @@ MSX_LAYOUT_INIT (hx10)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
-ROM_START (vg8020)
-	ROM_REGION (0x8000, "main", 0)
-	ROM_LOAD ("vg8020.rom", 0x0000, 0x8000, CRC(A317E6B4) SHA1(E998F0C441F4F1800EF44E42CD1659150206CF79))
-ROM_END
-
-MSX_LAYOUT_INIT (vg8020)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-MSX_LAYOUT_END
-
 static void msx_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -2252,30 +2561,51 @@ static SYSTEM_CONFIG_START(msx)
 SYSTEM_CONFIG_END
 
 MSX_DRIVER_LIST
+  /* MSX 1 */
 	MSX_DRIVER (msx)
-	MSX_DRIVER (hb75d)
-	MSX_DRIVER (hb75p)
-	MSX_DRIVER (hb501p)
-	MSX_DRIVER (hb201p)
-	MSX_DRIVER (svi738)
-	MSX_DRIVER (cf2000)
-	MSX_DRIVER (cf1200)
-	MSX_DRIVER (cf2700)
-	MSX_DRIVER (cf3000)
-	MSX_DRIVER (cf3300)
-	MSX_DRIVER (fs4000)
-	MSX_DRIVER (fs1300)
-	MSX_DRIVER (hb201)
+  MSX_DRIVER (ax170)
+	MSX_DRIVER (canonv10)
+	MSX_DRIVER (canonv20)
 	MSX_DRIVER (dpc100)
 	MSX_DRIVER (dpc180)
 	MSX_DRIVER (dpc200)
-	MSX_DRIVER (hotbit11)
-	MSX_DRIVER (hotbit12)
+	MSX_DRIVER (gsfc200)
 	MSX_DRIVER (expert10)
 	MSX_DRIVER (expert11)
 	MSX_DRIVER (expert13)
-	MSX_DRIVER (expertpl)
 	MSX_DRIVER (expertdp)
+	MSX_DRIVER (expertpl)
+	MSX_DRIVER (jvchc7gb)
+	MSX_DRIVER (mlf80)
+	MSX_DRIVER (mlfx1)
+	MSX_DRIVER (cf1200)
+	MSX_DRIVER (cf2000)
+	MSX_DRIVER (cf2700)
+	MSX_DRIVER (cf3000)
+	MSX_DRIVER (cf3300)
+	MSX_DRIVER (fs1300)
+	MSX_DRIVER (fs4000)
+	MSX_DRIVER (nms801)
+	MSX_DRIVER (vg802000)
+	MSX_DRIVER (vg802020)
+	MSX_DRIVER (piopx7)
+	MSX_DRIVER (mpc100)
+	MSX_DRIVER (hotbit11)
+	MSX_DRIVER (hotbit12)
+	MSX_DRIVER (hotbi13b)
+	MSX_DRIVER (hotbi13p)
+	MSX_DRIVER (hb201)
+	MSX_DRIVER (hb201p)
+	MSX_DRIVER (hb501p)	
+	MSX_DRIVER (hb55d)
+	MSX_DRIVER (hb55p)	
+	MSX_DRIVER (hb75d)
+	MSX_DRIVER (hb75p)		
+	MSX_DRIVER (svi728)
+	MSX_DRIVER (svi738)	
+	MSX_DRIVER (svi738sw)
+	
+	
 	MSX_DRIVER (msx2)
 	MSX_DRIVER (nms8220)
 	MSX_DRIVER (nms8220a)
@@ -2322,36 +2652,57 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (phc70fd2)
 	MSX_DRIVER (phc35j)
 	MSX_DRIVER (hx10)
-	MSX_DRIVER (vg8020)
+
 MSX_DRIVER_END
+
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     INIT   CONFIG  COMPANY              FULLNAME */
 COMP(1983, msx,	     0,		0,	msx_pal,  msx,	    msx,     msx, "ASCII & Microsoft", "MSX" , 0)
-COMP(1983, hb75d,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-75D (Germany)" , 0)
-COMP(1983, hb75p,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-75P" , 0)
-COMP(1984, hb501p,   msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-501P" , 0)
-COMP(1985, hb201p,   msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-201P" , 0)
-COMP(1985, svi738,   msx,	0,	msx_pal,  msx,      msx,     msx, "Spectravideo", "SVI-738", 0 )
-COMP(1983, cf2000,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-2000 (Japan)" , 0)
-COMP(1984, cf1200,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-1200 (Japan)" , 0)
-COMP(1984, cf2700,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-2700 (Japan)" , 0)
-COMP(1984, cf3000,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-3000 (Japan)" , 0)
-COMP(1985, cf3300,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-3300 (Japan)", 0 )
-COMP(1985, fs4000,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "FS-4000 (Japan)" , 0)
-COMP(1985, fs1300,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "FS-1300 (Japan)" , 0)
-COMP(1985, hb201,    msx,	0,      msx,      msxjp,    msx,     msx, "Sony", "HB-201 (Japan)" , 0)
+
+COMP(1983, ax170,  		msx,	0,	msx_pal,  msx,      msx,     msx, "Al Alamiah", "AX-170" , 0)
+COMP(1983, canonv10,  msx,	0,	msx_pal,  msx,      msx,     msx, "Canon", "V-10" , 0)
+COMP(1983, canonv20,  msx,	0,	msx_pal,  msx,      msx,     msx, "Canon", "V-20" , 0)
 COMP(1984, dpc100,   msx,	0,	msx,	  msxkr,    msx,     msx, "Daewoo", "IQ-1000 DPC-100 (Korea)" , 0)
 COMP(1984, dpc180,   msx,	0,	msx,	  msxkr,    msx,     msx, "Daewoo", "IQ-1000 DPC-180 (Korea)" , 0)
 COMP(1984, dpc200,   msx,	0,	msx,	  msxkr,    msx,     msx, "Daewoo", "IQ-1000 DPC-200 (Korea)" , 0)
-COMP(1985, hotbit11, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.1" , 0)
-COMP(1985, hotbit12, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
-COMP(1984, hx10,     msx,	0,	msx,	  msx,      msx,     msx, "Toshiba",	 "HX-10" , 0)
-COMP(1985, vg8020,   msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8020" , 0)
+COMP(1983, gsfc200,   msx,	0,	msx_pal,  msx,      msx,     msx, "Goldstar", "FC-200" , 0)
 COMP(1983, expert10, msx,	0,	msx,	  expert10, msx,     msx, "Gradiente", "Expert 1.0 (Brazil)" , 0)
 COMP(1984, expert11, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert 1.1 (Brazil)" , 0)
 COMP(1984, expert13, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert 1.3 (Brazil)" , 0)
-COMP(1984, expertpl, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert Plus (Brazil)" , 0)
 COMP(1985, expertdp, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert DDPlus (Brazil)", 0 )
+COMP(1984, expertpl, msx,	0,	msx,	  expert11, msx,     msx, "Gradiente", "Expert Plus (Brazil)" , 0)
+COMP(1983, jvchc7gb,  msx,	0,	msx_pal,  msx,      msx,     msx, "JVC", "HC-7GB" , 0)
+COMP(1983, mlf80,  	  msx,	0,	msx_pal,  msx,      msx,     msx, "Mitsubishi", "ML-F80" , 0)
+COMP(1983, mlfx1, 	  msx,	0,	msx_pal,  msx,      msx,     msx, "Mitsubishi", "ML-FX1" , 0)
+COMP(1984, cf1200,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-1200 (Japan)" , 0)
+COMP(1983, cf2000,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-2000 (Japan)" , 0)
+COMP(1984, cf2700,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-2700 (Japan)" , 0)
+COMP(1984, cf3000,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-3000 (Japan)" , 0)
+COMP(1985, cf3300,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "CF-3300 (Japan)", 0 )
+COMP(1985, fs1300,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "FS-1300 (Japan)" , 0)
+COMP(1985, fs4000,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "FS-4000 (Japan)" , 0)
+COMP(1983, nms801, 	  msx,	0,	msx_pal,  msx,      msx,     msx, "Philips", "NMS-801" , 0)
+COMP(1985, vg802000,  msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8020-00" , 0)
+COMP(1985, vg802020, msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8020-20" , 0)
+COMP(1985, piopx7, 	  msx,	0,	msx_pal,  msx,      msx,     msx, "Pioneer",	 "PX-07" , 0)
+COMP(1985, mpc100, 	  msx,	0,	msx_pal,  msx,      msx,     msx, "Sanyo",	 "MPC-100" , 0)
+COMP(1985, hotbit11, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.1" , 0)
+COMP(1985, hotbit12, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
+COMP(1985, hotbi13b, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.3b" , 0)
+COMP(1985, hotbi13p, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.3p" , 0)
+COMP(1985, hb201,    msx,	0,      msx,      msxjp,    msx,     msx, "Sony", "HB-201 (Japan)" , 0)
+COMP(1985, hb201p,   msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-201P" , 0)
+COMP(1984, hb501p,   msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-501P" , 0)
+COMP(1983, hb55d,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-55D (Germany)" , 0)
+COMP(1983, hb55p,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-55P" , 0)
+COMP(1983, hb75d,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-75D (Germany)" , 0)
+COMP(1983, hb75p,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-75P" , 0)
+COMP(1985, svi728,   msx,	0,	msx_pal,  msx,      msx,     msx, "Spectravideo", "SVI-728", 0 )
+COMP(1985, svi738,   msx,	0,	msx_pal,  msx,      msx,     msx, "Spectravideo", "SVI-738", 0 )
+COMP(1985, svi738sw, msx,	0,	msx_pal,  msx,      msx,     msx, "Spectravideo", "SVI-738 (Swedish)", 0 )
+
+
+COMP(1984, hx10,     msx,	0,	msx,	  msx,      msx,     msx, "Toshiba",	 "HX-10" , 0)
 COMP(1985, msx2,     0,		msx,	msx2_pal, msx2,	    msx2,    msx, "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 / 1st released version", 0)
 COMP(1986, nms8220a, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 / 2nd released version", 0)
