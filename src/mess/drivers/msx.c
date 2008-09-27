@@ -1400,7 +1400,7 @@ MSX_LAYOUT_INIT (hb55d)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)	
-	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0x0000)	/* 16KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000)	/* 16KB RAM */
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
@@ -1416,7 +1416,7 @@ MSX_LAYOUT_INIT (hb55p)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (0, 0, 2, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)	
-	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0x0000)	/* 16KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000)	/* 16KB RAM */
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
@@ -1464,8 +1464,8 @@ MSX_LAYOUT_INIT (svi728)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0xc000)
-	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 1, DISK_ROM2, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 1, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
 /* MSX - Spectravideo SVI-738 */
@@ -1507,11 +1507,204 @@ MSX_LAYOUT_INIT (svi738sw)
 MSX_LAYOUT_END
 
 
+/* MSX - Talent DPC-200 */
+
+ROM_START (tadpc200)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("dpc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
+ROM_END
+
+MSX_LAYOUT_INIT (tadpc200)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+MSX_LAYOUT_END
 
 
+/* MSX - Talent DPC-200A */
 
+ROM_START (tadpc20a)
+	ROM_REGION (0x8000, "main", 0)
+	ROM_LOAD ("dpc200abios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
+ROM_END
 
+MSX_LAYOUT_INIT (tadpc20a)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+MSX_LAYOUT_END
 
+/* MSX - Toshiba HX-10 */
+
+ROM_START (hx10)
+	ROM_REGION (0x8000, "main",0)
+	ROM_LOAD ("hx10bios.rom", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3))
+ROM_END
+
+MSX_LAYOUT_INIT (hx10)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Toshiba HX-10S */
+
+ROM_START (hx10s)
+	ROM_REGION (0x8000, "main",0)
+	ROM_LOAD ("hx10sbios.rom", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3))
+ROM_END
+
+MSX_LAYOUT_INIT (hx10s)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000)	/* 16KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Toshiba HX-20 */
+
+ROM_START (hx20)
+	ROM_REGION (0x10000, "main",0)
+	ROM_LOAD ("hx20bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
+	ROM_LOAD ("hx20word.rom", 0x8000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
+ROM_END
+
+MSX_LAYOUT_INIT (hx20)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */	
+	MSX_LAYOUT_SLOT (3, 3, 1, 2, ROM, 0x8000, 0x8000)
+MSX_LAYOUT_END
+
+/* MSX - Yamaha CX5M */
+
+ROM_START (cx5m)
+	ROM_REGION (0x10000, "main",0)
+	ROM_LOAD ("cx5mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
+	ROM_LOAD ("sfg05.rom", 		0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
+ROM_END
+
+MSX_LAYOUT_INIT (cx5m)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 2, ROM, 0x8000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 2, 2, RAM, 0x8000, 0x0000)	/* 32KB RAM */	
+MSX_LAYOUT_END
+
+/* MSX - Yamaha CX5M-128 */
+
+ROM_START (cx5m128)
+	ROM_REGION (0x14000, "main",0)
+	ROM_LOAD ("cx5mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
+	ROM_LOAD ("sfg05.rom", 		0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
+	ROM_LOAD ("yrm502.rom", 	0x10000,0x4000, CRC(51f7ddd1) SHA1(2a4b4a4657e3077df8a88f98210b76883d3702b1))
+ROM_END
+
+MSX_LAYOUT_INIT (cx5m128)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 1, ROM, 0x10000, 0x4000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 0, 2, ROM, 0x8000, 0x8000)
+MSX_LAYOUT_END
+
+/* MSX - Yamaha CX5MII */
+
+ROM_START (cx5m2)
+	ROM_REGION (0x10000, "main",0)
+	ROM_LOAD ("cx5mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
+	ROM_LOAD ("sfg05.rom", 		0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
+ROM_END
+
+MSX_LAYOUT_INIT (cx5m2)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 0, 2, ROM, 0x8000, 0x8000)
+MSX_LAYOUT_END
+
+/* MSX - Yamaha YIS303 */
+
+ROM_START (yis303)
+	ROM_REGION (0x14000, "main",0)
+	ROM_LOAD ("yis303bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
+	ROM_FILL( 0x8000, 0xc000, 0xff )
+ROM_END
+
+MSX_LAYOUT_INIT (yis303)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 3, ROM, 0xC000, 0x0000)	/* Fill FF */
+	MSX_LAYOUT_SLOT (3, 0, 3, 1, RAM, 0x4000, 0xC000)	/* 16KB RAM */	
+MSX_LAYOUT_END
+
+/* MSX - Yamaha YIS503 */
+
+ROM_START (yis503)
+	ROM_REGION (0x10000, "main",0)
+	ROM_LOAD ("yis503bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
+	ROM_FILL( 0x8000, 0x8000, 0xff )
+ROM_END
+
+MSX_LAYOUT_INIT (yis503)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 2, ROM, 0xC000, 0x0000)	/* Fill FF */
+	MSX_LAYOUT_SLOT (3, 0, 2, 2, RAM, 0x8000, 0x8000)	/* 32KB RAM */	
+MSX_LAYOUT_END
+
+/* MSX - Yamaha YIS503II */
+
+ROM_START (yis503ii)
+	ROM_REGION (0x8000, "main",0)
+	ROM_LOAD ("yis503iibios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
+ROM_END
+
+MSX_LAYOUT_INIT (yis503ii)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */	
+MSX_LAYOUT_END
+
+/* MSX - Yamaha YIS503M */
+
+ROM_START (yis503m)
+	ROM_REGION (0x10000, "main",0)
+	ROM_LOAD ("yis503mbios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
+	ROM_LOAD ("sfg05.rom", 		   0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
+ROM_END
+
+MSX_LAYOUT_INIT (yis503m)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 2, ROM, 0x8000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 2, 2, RAM, 0x8000, 0x8000)	/* 32KB RAM */	
+MSX_LAYOUT_END
+
+/* MSX - Yashica YC-64 */
+
+ROM_START (yc64)
+	ROM_REGION (0x8000, "main",0)
+	ROM_LOAD ("yc64bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+ROM_END
+
+MSX_LAYOUT_INIT (yc64)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x4000, 0x0000)	/* 64KB RAM */	
+MSX_LAYOUT_END
 
 
 
@@ -2506,17 +2699,6 @@ MSX_LAYOUT_INIT (phc35j)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
 
-ROM_START (hx10)
-	ROM_REGION (0x8000, "main",0)
-	ROM_LOAD ("hx10.rom", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3))
-ROM_END
-
-MSX_LAYOUT_INIT (hx10)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
-MSX_LAYOUT_END
-
 static void msx_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -2604,6 +2786,20 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (svi728)
 	MSX_DRIVER (svi738)	
 	MSX_DRIVER (svi738sw)
+	MSX_DRIVER (tadpc200)
+	MSX_DRIVER (tadpc20a)
+	MSX_DRIVER (hx10)
+	MSX_DRIVER (hx10s)
+	MSX_DRIVER (hx20)
+	MSX_DRIVER (cx5m)
+	MSX_DRIVER (cx5m128)
+	MSX_DRIVER (cx5m2)
+	MSX_DRIVER (yis303)
+	MSX_DRIVER (yis503)
+	MSX_DRIVER (yis503ii)
+	MSX_DRIVER (yis503m)
+	MSX_DRIVER (yc64)
+	
 	
 	
 	MSX_DRIVER (msx2)
@@ -2651,7 +2847,6 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (phc70fd)
 	MSX_DRIVER (phc70fd2)
 	MSX_DRIVER (phc35j)
-	MSX_DRIVER (hx10)
 
 MSX_DRIVER_END
 
@@ -2700,9 +2895,20 @@ COMP(1983, hb75p,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-75P" 
 COMP(1985, svi728,   msx,	0,	msx_pal,  msx,      msx,     msx, "Spectravideo", "SVI-728", 0 )
 COMP(1985, svi738,   msx,	0,	msx_pal,  msx,      msx,     msx, "Spectravideo", "SVI-738", 0 )
 COMP(1985, svi738sw, msx,	0,	msx_pal,  msx,      msx,     msx, "Spectravideo", "SVI-738 (Swedish)", 0 )
+COMP(1983, tadpc200,  msx,	0,	msx_pal,  msx,      msx,     msx, "Talent", "DPC-200" , 0)
+COMP(1983, tadpc20a,  msx,	0,	msx_pal,  msx,      msx,     msx, "Talent", "DPC-200A" , 0)
+COMP(1984, hx10,     msx,	0,	msx_pal,	  msx,      msx,     msx, "Toshiba",	 "HX-10" , 0)
+COMP(1984, hx10s,     msx,	0,	msx_pal,	  msx,      msx,     msx, "Toshiba",	 "HX-10S" , 0)
+COMP(1984, hx20,     msx,	0,	msx_pal,	  msx,      msx,     msx, "Toshiba",	 "HX-20" , 0)
+COMP(1984, cx5m,     msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "CX5M" , GAME_NOT_WORKING)
+COMP(1984, cx5m128,  msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "CX5M-128" , GAME_NOT_WORKING)
+COMP(1984, cx5m2,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "CX5MII" , GAME_NOT_WORKING)
+COMP(1984, yis303,  msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS303" , 0)
+COMP(1984, yis503, 	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503" , 0)
+COMP(1984, yis503ii,msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503II" , GAME_NOT_WORKING)
+COMP(1984, yis503m, msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503M" , GAME_NOT_WORKING)
+COMP(1984, yc64,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yashica", "YC-64" , 0)
 
-
-COMP(1984, hx10,     msx,	0,	msx,	  msx,      msx,     msx, "Toshiba",	 "HX-10" , 0)
 COMP(1985, msx2,     0,		msx,	msx2_pal, msx2,	    msx2,    msx, "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 / 1st released version", 0)
 COMP(1986, nms8220a, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 / 2nd released version", 0)

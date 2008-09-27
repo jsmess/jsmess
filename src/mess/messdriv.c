@@ -699,8 +699,21 @@ XL/XE 16kB OS roms
 	DRIVER( svi728 )	/* 1985 MSX											*/
 	DRIVER( svi738 )	/* 1985 MSX											*/
 	DRIVER( svi738sw )	/* 1985 MSX											*/
-	
+	DRIVER( tadpc200 )
+	DRIVER( tadpc20a )
 	DRIVER( hx10 )		/* 1984 MSX											*/
+	DRIVER( hx10s )		/* 1984 MSX											*/
+	DRIVER( hx20 )		/* 1984 MSX											*/
+	DRIVER( cx5m )
+	DRIVER( cx5m128 )
+	DRIVER( cx5m2 )	
+	DRIVER( yis303 )
+	DRIVER( yis503 )
+	DRIVER( yis503ii )
+	DRIVER( yis503m )
+	DRIVER( yc64 )
+	
+	
 	DRIVER( msx2 )		/* 1985 MSX2										*/
 	DRIVER( hbf9p )		/* 1985 MSX2										*/
 	DRIVER( hbf500p )	/* 1985 MSX2										*/
