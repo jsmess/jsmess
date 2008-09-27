@@ -55,10 +55,13 @@ Nascom Memory map
 /* Components */
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
+#include "machine/ay31015.h"
+#include "machine/z80pio.h"
 
 /* Devices */
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 
 
 
@@ -85,6 +88,7 @@ static ADDRESS_MAP_START( nascom1_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
+//	AM_RANGE(0x04, 0x07) AM_READWRITE( z80pio_0_r, z80pio_0_w )
 ADDRESS_MAP_END
 
 
@@ -93,6 +97,7 @@ static ADDRESS_MAP_START( nascom2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
+//	AM_RANGE(0x04, 0x07) AM_READWRITE( z80_pio_0_r, z80pio_0_w )
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(wd17xx_r, wd17xx_w)
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(nascom2_fdc_select_r, nascom2_fdc_select_w)
 	AM_RANGE(0xe5, 0xe5) AM_READ(nascom2_fdc_status_r)
@@ -246,11 +251,24 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const ay31015_config nascom1_ay31015_config =
+{
+	AY_3_1015,
+	( XTAL_16MHz / 16 ) / 256,
+	( XTAL_16MHz / 16 ) / 256,
+	nascom1_hd6402_si,
+	nascom1_hd6402_so,
+	NULL
+};
+
+
 static MACHINE_DRIVER_START( nascom1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 1000000)
+	MDRV_CPU_ADD("main", Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(nascom1_mem, 0)
 	MDRV_CPU_IO_MAP(nascom1_io, 0)
+
+	MDRV_MACHINE_RESET( nascom1 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -265,14 +283,18 @@ static MACHINE_DRIVER_START( nascom1 )
 
 	MDRV_VIDEO_UPDATE(nascom1)
 
+	MDRV_AY31015_ADD( "hd6402", nascom1_ay31015_config )
+
 	/* devices */
 	MDRV_SNAPSHOT_ADD(nascom1, "nas", 0.5)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( nascom2 )
 	MDRV_IMPORT_FROM(nascom1)
-	MDRV_CPU_REPLACE("main", Z80, 2000000)
+	MDRV_CPU_REPLACE("main", Z80, XTAL_16MHz/8)
 	MDRV_CPU_IO_MAP(nascom2_io, 0)
 
 	MDRV_MACHINE_START(nascom2)
@@ -327,26 +349,26 @@ ROM_END
  *
  *************************************/
 
-static void nascom1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nascom1_cassette); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(nascom1_cassette); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
-	}
-}
+//static void nascom1_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+//{
+//	/* cassette */
+//	switch(state)
+//	{
+//		/* --- the following bits of info are returned as 64-bit signed integers --- */
+//		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
+//		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
+//		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
+//		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
+//		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+//
+//		/* --- the following bits of info are returned as pointers to data or functions --- */
+//		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nascom1_cassette); break;
+//		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(nascom1_cassette); break;
+//
+//		/* --- the following bits of info are returned as NULL-terminated strings --- */
+//		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
+//	}
+//}
 
 
 static void nascom2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -373,7 +395,7 @@ static SYSTEM_CONFIG_START( nascom1 )
 	CONFIG_RAM(16 * 1024)
 	CONFIG_RAM(32 * 1024)
 	CONFIG_RAM_DEFAULT(40 * 1024)
-	CONFIG_DEVICE(nascom1_cassette_getinfo)
+//	CONFIG_DEVICE(nascom1_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 

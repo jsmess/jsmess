@@ -11,15 +11,16 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
+#include "machine/ay31015.h"
 
 /* Devices */
 #include "devices/basicdsk.h"
 #include "devices/snapquik.h"
+#include "devices/cassette.h"
 
 
 #define NASCOM1_KEY_RESET	0x02
 #define NASCOM1_KEY_INCR	0x01
-#define NASCOM1_CAS_ENABLE	0x10
 
 
 
@@ -29,6 +30,7 @@
  *
  *************************************/
 
+static const device_config *nascom1_hd6402;
 static int nascom1_tape_size = 0;
 static UINT8 *nascom1_tape_image = NULL;
 static int nascom1_tape_index = 0;
@@ -159,8 +161,9 @@ READ8_HANDLER ( nascom1_port_00_r )
 
 WRITE8_HANDLER( nascom1_port_00_w )
 {
-	nascom1_portstat.stat_flags &= ~NASCOM1_CAS_ENABLE;
-	nascom1_portstat.stat_flags |= (data & NASCOM1_CAS_ENABLE);
+
+	cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	if (!(data & NASCOM1_KEY_RESET)) {
 		if (nascom1_portstat.stat_flags & NASCOM1_KEY_RESET)
@@ -174,10 +177,6 @@ WRITE8_HANDLER( nascom1_port_00_w )
 }
 
 
-WRITE8_HANDLER( nascom1_port_01_w )
-{
-}
-
 
 
 /*************************************
@@ -186,27 +185,42 @@ WRITE8_HANDLER( nascom1_port_01_w )
  *
  *************************************/
 
-static int	nascom1_read_cassette(void)
-{
-	if (nascom1_tape_image && (nascom1_tape_index < nascom1_tape_size))
-		return (nascom1_tape_image[nascom1_tape_index++]);
-
-	return 0;
-}
-
 
 READ8_HANDLER( nascom1_port_01_r )
 {
-	if (nascom1_portstat.stat_flags & NASCOM1_CAS_ENABLE)
-		return (nascom1_read_cassette());
-
-	return 0;
+	return ay31015_get_received_data( nascom1_hd6402 );
 }
 
 
+WRITE8_HANDLER( nascom1_port_01_w )
+{
+	ay31015_set_transmit_data( nascom1_hd6402, data );
+}
+
 READ8_HANDLER( nascom1_port_02_r )
 {
-	return nascom1_portstat.stat_flags & NASCOM1_CAS_ENABLE ? 0x80 : 0x00;
+	UINT8 data = 0x31;
+
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_OR ) ? 0x02 : 0;
+	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_PE ) ? 0x04 : 0;
+	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_FE ) ? 0x08 : 0;
+	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_TBMT ) ? 0x40 : 0;
+	data |= ay31015_get_output_pin( nascom1_hd6402, AY31015_DAV ) ? 0x80 : 0;
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 1 );
+
+	return data;
+}
+
+
+READ8_DEVICE_HANDLER( nascom1_hd6402_si )
+{
+	return 1;
+}
+
+
+WRITE8_DEVICE_HANDLER( nascom1_hd6402_so )
+{
 }
 
 
@@ -275,6 +289,24 @@ MACHINE_START( nascom2 )
 {
 	wd17xx_init(machine, WD_TYPE_1793, nascom2_fdc_callback, NULL);
 }
+
+
+MACHINE_RESET( nascom1 )
+{
+	nascom1_hd6402 = device_list_find_by_tag( machine->config->devicelist, AY31015, "hd6402" );
+
+	/* Set up hd6402 pins */
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 1 );
+
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_CS, 0 );
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_NP, 1 );
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_NB1, 1 );
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_NB2, 1 );
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_EPS, 1 );
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_TSB, 1 );
+	ay31015_set_input_pin( nascom1_hd6402, AY31015_CS, 1 );
+}
+
 
 DRIVER_INIT( nascom1 )
 {

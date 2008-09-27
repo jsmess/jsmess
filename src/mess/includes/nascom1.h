@@ -29,6 +29,10 @@ READ8_HANDLER( nascom1_port_02_r);
 WRITE8_HANDLER( nascom1_port_00_w);
 WRITE8_HANDLER( nascom1_port_01_w);
 
+READ8_DEVICE_HANDLER( nascom1_hd6402_si );
+WRITE8_DEVICE_HANDLER( nascom1_hd6402_so );
+
+MACHINE_RESET( nascom1 );
 
 /*----------- defined in video/nascom1.c -----------*/
 
