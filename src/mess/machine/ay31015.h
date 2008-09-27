@@ -4,55 +4,110 @@
 
 */
 
-/* control reg */
-#define AY31015_NB1	0x01
-#define AY31015_NB2	0x02
-#define AY31015_TSB	0x04
-#define AY31015_EPS	0x08
-#define AY31015_NP	0x10
+#ifndef __AY31015_H_
+#define __AY31015_H_
 
-/* status reg */
-#define AY31015_TBMT	0x01
-#define AY31015_DAV	0x02
-#define AY31015_OR	0x04
-#define AY31015_FE	0x08
-#define AY31015_PE	0x10
-#define AY31015_EOC	0x20
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-#define AY31015_SO	0x40
 
-// Reset the device
-void ay51013_init( void );
+typedef enum
+{
+	/* For AY-3-1014A, AY-3-1015(D) and HD6402 variants */
+	AY_3_1015,
 
-// Set Control register
-void ay51013_cs( UINT8 data );
+	/* For AY-3-1014, AY-5-1013 and AY-6-1013 variants */
+	AY_5_1013
+} ay31015_type_t;
 
-// Reset the device
-void ay31015_init( void );
 
-// Set Control register
-void ay31015_cs( UINT8 data );
+typedef enum
+{
+	AY31015_SWE=16,			/* -SWE  - Pin 16 - Status word enable */
+	AY31015_RDAV=18,		/* -RDAV - Pin 18 - Reset data available */
+	AY31015_SI=20,			/*  SI   - Pin 20 - Serial input */
+	AY31015_XR=21,			/*  XR   - Pin 21 - External reset */
+	AY31015_CS=34,			/*  CS   - Pin 34 - Control strobe */
+	AY31015_NP=35,			/*  NP   - Pin 35 - No parity */
+	AY31015_TSB=36,			/*  TSB  - Pin 36 - Number of stop bits */
+	AY31015_NB1=37,			/*  NB1  - Pin 37 - Number of bits #1 */
+	AY31015_NB2=38,			/*  NB2  - Pin 38 - Number of bits #2 */
+	AY31015_EPS=39			/*  EPS  - Pin 39 - Odd/Even parity select */
+} ay31015_input_pin_t;
 
-// Set Receive Clock
-void ay31015_set_rx_clock_speed( UINT32 data );
 
-// Read status register
-UINT8 ay31015_swe( void );
+typedef enum
+{
+	AY31015_PE=13,			/* PE   - Pin 13 - Parity error */
+	AY31015_FE=14,			/* FE   - Pin 14 - Framing error */
+	AY31015_OR=15,			/* OR   - Pin 15 - Over-run */
+	AY31015_DAV=19,			/* DAV  - Pin 19 - Data available */
+	AY31015_TBMT=22,		/* TBMT - Pin 22 - Transmit buffer empty */
+	AY31015_EOC=24,			/* EOC  - Pin 24 - End of character */
+	AY31015_SO=25			/* SO   - Pin 25 - Serial output */
+} ay31015_output_pin_t;
 
-// Send a bit to the device
-void ay31015_si( UINT8 data );
 
-// Read a byte from the device
-UINT8 ay31015_rde( void );
+typedef struct _ay31015_config	ay31015_config;
+struct _ay31015_config
+{
+	ay31015_type_t		type;					/* Type of chip */
+	double				transmitter_clock;		/* TCP - pin 40 */
+	double				receiver_clock;			/* RCP - pin 17 */
+	read8_device_func	read_si;				/* SI - pin 20 - This will be called whenever the SI pin is sampled. Optional */
+	write8_device_func	write_so;				/* SO - pin 25 - This will be called whenever data is put on the SO pin. Optional */
+	write8_device_func	status_changed;			/* This will be called whenever one of the status pins may have changed. Optional */
+};
 
-// Tell device you have read the data
-void ay31015_rdav( void );
 
-// Set Transmit Clock
-void ay31015_set_tx_clock_speed( UINT32 data );
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
 
-// Get serialised output
-UINT8 ay31015_so( void );
+#define MDRV_AY31015_ADD(_tag, _config)	\
+    MDRV_DEVICE_ADD(_tag, AY31015)		\
+    MDRV_DEVICE_CONFIG(_config)
 
-// Send a byte to the device
-void ay31015_ds( UINT8 data );
+#define MDRV_AY31015_REMOVE(_tag)		\
+    MDRV_DEVICE_REMOVE(_tag, AY31015)
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* Set an input pin */
+void ay31015_set_input_pin( const device_config *device, ay31015_input_pin_t pin, int data );
+
+
+/* Get an output pin */
+int ay31015_get_output_pin( const device_config *device, ay31015_output_pin_t pin );
+
+
+/* Set a new transmitter clock (new_clock is in Hz) */
+void ay31015_set_transmitter_clock( const device_config *device, double new_clock );
+
+
+/* Set a new receiver clock (new_clock is in Hz) */
+void ay31015_set_receiver_clock( const device_config *device, double new_clock );
+
+
+/* Reead the received data */
+/* The received data is available on RD8-RD1 (pins 5-12) */
+UINT8 ay31015_get_received_data( const device_config *device );
+
+
+/* Set the transmitter buffer */
+/* The data to transmit is set on DB1-DB8 (pins 26-33) */
+void ay31015_set_transmit_data( const device_config *device, UINT8 data );
+
+
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
+
+#define AY31015 DEVICE_GET_INFO_NAME( ay31015 )
+DEVICE_GET_INFO( ay31015 );
+
+#endif

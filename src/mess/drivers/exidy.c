@@ -150,6 +150,9 @@ So far, it has been tested to work at 300 baud.
 #include "machine/ay31015.h"
 
 
+static const device_config *exidy_ay31015;
+
+
 static Z80BIN_EXECUTE( exidy );
 
 static DEVICE_IMAGE_LOAD( exidy_floppy )
@@ -203,96 +206,103 @@ static const device_config *cassette_device_image(running_machine *machine)
 		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" );
 }
 
-static UINT8 cass_data[]={ 0, 0, 0, 0, 0, 0, 0 };
+
+static struct {
+	struct {
+		int length;		/* time cassette level is at input.level */
+		int level;		/* cassette level */
+		int bit;		/* bit being read */
+	} input;
+	struct {
+		int length;		/* time cassette level is at output.level */
+		int level;		/* cassette level */
+		int bit;		/* bit to to output */
+	} output;
+} cass_data;
+
 
 static TIMER_CALLBACK(exidy_cassette_tc)
 {
 	UINT8 cass_ws = 0;
-	switch (exidy_fe & 0xc0)		// bit 7 low indicates cassette
+	switch (exidy_fe & 0xc0)		/*/ bit 7 low indicates cassette */
 	{
-		case 0x00:				// cassette 300 baud - works
+		case 0x00:				/* Cassette 300 baud */
 
 			/* loading a tape - this is basically the same as the super80.
 				We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
 
-			cass_data[1]++;
+			cass_data.input.length++;
 
 			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
 
-			if (cass_ws != cass_data[0])
+			if (cass_ws != cass_data.input.level)
 			{
-				cass_data[0] = cass_ws;
-				cass_data[2] = ((cass_data[1] < 0x6) || (cass_data[1] > 0x20)) ? 1 : 0;
-				cass_data[1] = 0;
-				if (cass_data[2] != cass_data[3])
-				{
-					ay31015_si(cass_data[2]);
-					cass_data[3] = cass_data[2];
-				}
+				cass_data.input.level = cass_ws;
+				cass_data.input.bit = ((cass_data.input.length < 0x6) || (cass_data.input.length > 0x20)) ? 1 : 0;
+				cass_data.input.length = 0;
+				ay31015_set_input_pin( exidy_ay31015, AY31015_SI, cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
 				Synchronisation of the frequency pulses to the uart is extremely important. */
 
-			cass_data[5]++;
-			if (!(cass_data[5] & 0x1f))
+			cass_data.output.length++;
+			if (!(cass_data.output.length & 0x1f))
 			{
-				cass_ws = ay31015_so();
-				if (cass_ws != cass_data[4])
+				cass_ws = ay31015_get_output_pin( exidy_ay31015, AY31015_SO );
+				if (cass_ws != cass_data.output.bit)
 				{
-					cass_data[4] = cass_ws;
-					cass_data[5]=0;
+					cass_data.output.bit = cass_ws;
+					cass_data.output.length = 0;
 				}
 			}
 
-			if (!(cass_data[5] & 3))
+			if (!(cass_data.output.length & 3))
 			{
-				if (!((cass_data[4] == 0) && (cass_data[5] & 4)))
+				if (!((cass_data.output.bit == 0) && (cass_data.output.length & 4)))
 				{
-					cass_data[6] ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(machine), cass_data[6] ? -1.0 : +1.0);
+					cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
+					cassette_output(cassette_device_image(machine), cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
 
-		case 0x40:				// cassette 1200 baud - not working at this time
+		case 0x40:			/* Cassette 1200 baud */
 			/* loading a tape */
-			cass_data[1]++;
+			cass_data.input.length++;
 
 			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
 
-			if (cass_ws != cass_data[0])
+			if (cass_ws != cass_data.input.level || cass_data.input.length == 10)
 			{
-				cass_data[0] = cass_ws;
-				cass_data[2] = ((cass_data[1] < 0xc) || (cass_data[1] > 0x20)) ? 1 : 0;
-				cass_data[1] = 0;
-				if (cass_data[2] != cass_data[3])
+				cass_data.input.bit = ((cass_data.input.length < 10) || (cass_data.input.length > 0x20)) ? 1 : 0;
+				if ( cass_ws != cass_data.input.level )
 				{
-					ay31015_si(cass_data[2]);
-					cass_data[3] = cass_data[2];
+					cass_data.input.length = 0;
+					cass_data.input.level = cass_ws;
 				}
-				cass_data[2] = 0;
+				ay31015_set_input_pin( exidy_ay31015, AY31015_SI, cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
 
-			cass_data[5]++;
-			if (!(cass_data[5] & 0x07))
+			cass_data.output.length++;
+			if (!(cass_data.output.length & 0x07))
 			{
-				cass_ws = ay31015_so();
-				if (cass_ws != cass_data[4])
+				cass_ws = ay31015_get_output_pin( exidy_ay31015, AY31015_SO );
+				if (cass_ws != cass_data.output.bit)
 				{
-					cass_data[4] = cass_ws;
-					cass_data[5]=0;
+					cass_data.output.bit = cass_ws;
+					cass_data.output.length = 0;
 				}
 			}
 
-			if (!(cass_data[5] & 7))
+			if (!(cass_data.output.length & 7))
 			{
-				if (!((cass_data[4] == 0) && (cass_data[5] & 8)))
+				if (!((cass_data.output.bit == 0) && (cass_data.output.length & 8)))
 				{
-					cass_data[6] ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(machine), cass_data[6] ? -1.0 : +1.0);
+					cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
+					cassette_output(cassette_device_image(machine), cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -337,7 +347,13 @@ static MACHINE_START( exidy )
 
 static MACHINE_RESET( exidyd )
 {
-	ay31015_init();
+	/* Initialize cassette interface */
+	cass_data.output.length = 0;
+	cass_data.output.level = 1;
+	cass_data.input.length = 0;
+	cass_data.input.bit = 1;
+
+	exidy_ay31015 = device_list_find_by_tag( machine->config->devicelist, AY31015, "ay_3_1015" );
 
 	centronics_config(0, exidy_cent_config);
 	/* assumption: select is tied low */
@@ -396,13 +412,21 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 
 static WRITE8_HANDLER(exidy_fc_port_w)
 {
-	ay31015_ds( data );
+	ay31015_set_transmit_data( exidy_ay31015, data );
 }
 
 
 static WRITE8_HANDLER(exidy_fd_port_w)
 {
-	ay31015_cs( data );
+	/* Translate data to control signals */
+
+	ay31015_set_input_pin( exidy_ay31015, AY31015_CS, 0 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_NB1, ( data & 0x01 ) ? 1 : 0 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_NB2, ( data & 0x02 ) ? 1 : 0 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_TSB, ( data & 0x04 ) ? 1 : 0 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_EPS, ( data & 0x08 ) ? 1 : 0 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_NP,  ( data & 0x10 ) ? 1 : 0 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_CS, 1 );
 }
 
 #define EXIDY_CASSETTE_MOTOR_MASK ((1<<4)|(1<<5))
@@ -455,8 +479,8 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 	/* bit 6 */
 	if (changed_bits & 0x40)
 	{
-		ay31015_set_rx_clock_speed ((data & 0x40) ? 19200 : 4800);
-		ay31015_set_tx_clock_speed ((data & 0x40) ? 14400 : 4800);
+		ay31015_set_receiver_clock( exidy_ay31015, (data & 0x40) ? 19200.0 : 4800.0);
+		ay31015_set_transmitter_clock( exidy_ay31015, (data & 0x40) ? 19200.0 : 4800.0);
 	}
 
 	/* bit 7 */
@@ -495,15 +519,26 @@ static WRITE8_HANDLER(exidy_ff_port_w)
 
 static READ8_HANDLER(exidy_fc_port_r)
 {
-	UINT8 data = ay31015_rde();
-	ay31015_rdav();
+	UINT8 data = ay31015_get_received_data( exidy_ay31015 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_RDAV, 0 );
+	ay31015_set_input_pin( exidy_ay31015, AY31015_RDAV, 1 );
 	return data;
 }
 
 static READ8_HANDLER(exidy_fd_port_r)
 {
 	/* set unused bits high */
-	return ay31015_swe() | 0xe0;
+	UINT8 data = 0xe0;
+
+	ay31015_set_input_pin( exidy_ay31015, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( exidy_ay31015, AY31015_TBMT ) ? 0x01 : 0;
+	data |= ay31015_get_output_pin( exidy_ay31015, AY31015_DAV  ) ? 0x02 : 0;
+	data |= ay31015_get_output_pin( exidy_ay31015, AY31015_OR   ) ? 0x04 : 0;
+	data |= ay31015_get_output_pin( exidy_ay31015, AY31015_FE   ) ? 0x08 : 0;
+	data |= ay31015_get_output_pin( exidy_ay31015, AY31015_PE   ) ? 0x10 : 0;
+	ay31015_set_input_pin( exidy_ay31015, AY31015_SWE, 1 );
+
+	return data;
 }
 
 static READ8_HANDLER(exidy_fe_port_r)
@@ -720,11 +755,22 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
+static const ay31015_config exidy_ay31015_config =
+{
+	AY_3_1015,
+	4800.0,
+	4800.0,
+	NULL,
+	NULL,
+	NULL
+};
+
+
 static const cassette_config exidy_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
 
@@ -757,6 +803,8 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	// speaker on parallel port
+
+	MDRV_AY31015_ADD( "ay_3_1015", exidy_ay31015_config )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)

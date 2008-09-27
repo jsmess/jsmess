@@ -90,6 +90,8 @@ System Driver Changes:
   we will start to use the correct ones. If you own a C128 PAL, please 
   dump its BIOS to verify its content. [Fabio Priuli]
 
+- [EXIDY] Added support for 1200 baud cassette images. [Wilbert Pol]
+
 - [GENESIS / MD] Added possibility to choose between a 3 buttons and a 6
   buttons Joypad. [Fabio Priuli]
 
