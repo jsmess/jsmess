@@ -349,7 +349,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
     player data
 -------------------------------------------------*/
 
-void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
+static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
 {
 //  ldplayer_data *player = ld->player;
 }
@@ -804,7 +804,7 @@ static ADDRESS_MAP_START( simutrek_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-MACHINE_DRIVER_START( simutrek )
+static MACHINE_DRIVER_START( simutrek )
 	MDRV_CPU_ADD("simutrek", I8748, XTAL_6MHz)
 	MDRV_CPU_IO_MAP(simutrek_portmap,0)
 

@@ -861,8 +861,10 @@ const game_driver * const drivers[] =
 	DRIVER( propcycl )	/* (c) 1996 */
 
 	/* Namco System 23 */
+	DRIVER( rapidrvr )	/* (c) 1997 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
-	DRIVER( gp500 )		/* (c) 1999 */
+	DRIVER( timcrs2b )	/* (c) 1997 */
+	DRIVER( 500gp )		/* (c) 1999 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfrl2j )	/* (c) 1999 */
 
@@ -4225,6 +4227,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( firetrap )	/* (c) 1986 Data East USA (US) */
 	DRIVER( firetpbl )	/* bootleg */
 	DRIVER( metlclsh )	/* (c) 1985 Data East */
+	DRIVER( chanbara )	/* (c) 1985 Data East */
 	DRIVER( brkthru )	/* (c) 1986 Data East USA (US) */
 	DRIVER( brkthruj )	/* (c) 1986 Data East Corporation (Japan) */
 	DRIVER( forcebrk )	/* (c) 1986 Data East Corporation (Japan) */
@@ -7142,6 +7145,7 @@ Other Sun games
 	/* Yun Sung games */
 	DRIVER( paradise )	/* (c) >1994 Yun Sung */
 	DRIVER( paradlx )	/* (c) >1994 Yun Sung */
+	DRIVER( para2dx )	/* (c) >1994 Yun Sung */
 	DRIVER( tgtball )	/* (c) 1995 Yun Sung */
 	DRIVER( tgtballa )	/* (c) 1995 Yun Sung */
 	DRIVER( torus )		/* (c) 1996 Yun Sung */
@@ -8229,6 +8233,7 @@ Other Sun games
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( gamecstl )	/* MAME based bootleg */
+	DRIVER( gamecst2 )	/* MAME based bootleg, version 2.613 */
 	DRIVER( drw80pkr )	/* (c) 1983 IGT */
 	DRIVER( blazlaz )	/* (c) 1989 Hudson Soft */
 	DRIVER( paranoia )	/* (c) 1990 Naxat Soft */

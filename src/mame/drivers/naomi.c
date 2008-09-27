@@ -55,8 +55,8 @@ Notes:
                         on power-up.
       JP1             - set to 2-3. Alt setting is 1-2
       JP4             - set to 2-3. Alt setting is 1-2
-      93C46           - 128 bytes EEPROM
-      A179B 96K       - ?, made by TI
+      93C46           - 128 bytes serial EEPROM
+      A179B 96K       - TI SN75179B Differential driver and receiver pair (like RS485)
       ADM485          - Analog Devices ADM485
       BIOS.IC27       - 27C160 EPROM
       5264165         - Hitachi 5264165FTTA60 (video RAM)
@@ -662,11 +662,11 @@ Notes:
 #include "dc.h"
 
 #define CPU_CLOCK (200000000)
-                                 /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
+                                             /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 static UINT32 *dc_sound_ram;
-static UINT32 rom_offset, dma_count;
+static UINT32 rom_offset, rom_offset_flags, dma_count;
 UINT32 dma_offset;
 
 static INTERRUPT_GEN( naomi_vblank )
@@ -716,18 +716,19 @@ static WRITE64_HANDLER( naomi_unknown1_w )
 
     Dimm board registers (add more information if you find it):
 
-    NAOMI_DIMM_COMMAND = 5f703c (16 bit):
+    Name:                   Naomi   Dimm Bd.
+    NAOMI_DIMM_COMMAND    = 5f703c  14000014 (16 bit):
         if bits all 1 no dimm board present and other registers not used
         bit 15: during an interrupt is 1 if the dimm board has a command to be executed
         bit 14-9: 6 bit command number (naomi bios understands 0 1 3 4 5 6 8 9 a)
-        bit 8-0: higher 9 bits of 25 bit offset parameter
-    NAOMI_DIMM_OFFSETL = 5f7040 (16 bit):
-        bit 15-0: lower 16 bits of 25 bit offset parameter
-    NAOMI_DIMM_PARAMETERL = 5f7044 (16 bit)
-    NAOMI_DIMM_PARAMETERH = 5f7048 (16 bit)
-    NAOMI_DIMM_STATUS = 5f704c (16 bit):
-        bit 0: when read as 1 means something has happened write it to 0 to clear
-        bit 8: written to 1 at the end of the interrupt routine (signals command response available to dimm board ?)
+        bit 7-0: higher 8 bits of 24 bit offset parameter
+    NAOMI_DIMM_OFFSETL    = 5f7040  14000018 (16 bit):
+        bit 15-0: lower 16 bits of 24 bit offset parameter
+    NAOMI_DIMM_PARAMETERL = 5f7044  1400001c (16 bit)
+    NAOMI_DIMM_PARAMETERH = 5f7048  14000020 (16 bit)
+    NAOMI_DIMM_STATUS     = 5f704c  14000024 (16 bit):
+        bit 0: when 0 signal interrupt from naomi to dimm board
+        bit 8: when 0 signal interrupt from dimm board to naomi
 */
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
@@ -812,12 +813,19 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 		// ROM_OFFSETH
 		rom_offset &= 0xffff;
 		rom_offset |= (data & 0x1fff)<<16;
+		rom_offset_flags = data >> 13;
 	}
 	else if ((offset == 0) && ACCESSING_BITS_32_47)
 	{
 		// ROM_OFFSETL
 		rom_offset &= 0xffff0000;
 		rom_offset |= ((data >> 32) & 0xffff);
+	}
+	if ((offset == 1) && ACCESSING_BITS_0_15)
+	{
+		// ROM_DATA
+		// Doa2 writes here (16 bit decryption key ?)
+		mame_printf_verbose("ROM: write %llx to 5f7008 (PC=%x)\n", data, activecpu_get_pc());
 	}
 	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
@@ -1154,6 +1162,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 EPR-23605  - NAOMI BOOT ROM 2001 01/19  1.50 (Japan)
 EPR-23605A - NAOMI BOOT ROM 2001 06/20  1.60 (Japan)
 EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
 EPR-23607  - NAOMI BOOT ROM 2001 01/19  1.50 (USA)
 EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-23608  - NAOMI BOOT ROM 2001 01/19  1.50 (Export)
@@ -1185,12 +1194,14 @@ Region byte encoding is as follows:
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-23607b.bin",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
 	ROM_SYSTEM_BIOS( 3, "bios3", "epr-23607 (USA)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
-	ROM_SYSTEM_BIOS( 4, "bios4", "epr-23605b (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "epr-23605a (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-23605a.bin",   0x000000, 0x200000, CRC(7bc3fc2d) SHA1(a4a9531a7c66ff30046908cf71f6c7b6fb59c392) ) \
-	ROM_SYSTEM_BIOS( 6, "bios6", "epr-23605 (Japan)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-23605.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) )
+	ROM_SYSTEM_BIOS( 4, "bios4", "epr-23605c (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-23605c.bin",   0x000000, 0x200000, CRC(297ea6ed) SHA1(cfbfe57c80e6ee86a101fa83aec0a01e00c0f42a) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-23605b (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6", "epr-23605a (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-23605a.bin",   0x000000, 0x200000, CRC(7bc3fc2d) SHA1(a4a9531a7c66ff30046908cf71f6c7b6fb59c392) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7", "epr-23605 (Japan)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-23605.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) )
 
 /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
 #define AW_BIOS \
@@ -1269,7 +1280,7 @@ struct AtomiswaveKey
     int S3[8];
 };
 
-struct AtomiswaveKey fotns_key = {
+static const struct AtomiswaveKey fotns_key = {
     {0,2,7,11,12,1,5,6,15,4,8,9,14,3,10,13},
     {12,8,3,7,0,15,1,11,6,10,4,14,9,5,13,2},
     {4,1,10,16,9,25,26,31,13,0,14,15,24,6,30,18,7,20,5,12,22,17,27,3,8,11,21,29,19,23,28,2},
@@ -1278,7 +1289,7 @@ struct AtomiswaveKey fotns_key = {
     {7,1,6,5,4,2,0,3}
 };
 
-struct AtomiswaveKey df_key = {
+static const struct AtomiswaveKey df_key = {
     {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
     {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
     {9,27,15,6,28,30,7,12,21,0,1,25,22,3,16,29,13,4,24,20,2,5,23,19,18,10,8,14,17,11,31,26},
@@ -1288,7 +1299,7 @@ struct AtomiswaveKey df_key = {
 };
 
 
-UINT16 atomiswave_decrypt(UINT16 cipherText, int address, struct AtomiswaveKey* key)
+static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const struct AtomiswaveKey* key)
 {
     int b0,b1,b2,b3;
     int aux;
@@ -1314,7 +1325,7 @@ UINT16 atomiswave_decrypt(UINT16 cipherText, int address, struct AtomiswaveKey* 
 }
 
 
-DRIVER_INIT(fotns)
+static DRIVER_INIT(fotns)
 {
   	int i;
 	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
@@ -1344,7 +1355,7 @@ DRIVER_INIT(fotns)
 
 
 
-DRIVER_INIT(demofist)
+static DRIVER_INIT(demofist)
 {
   	int i;
 	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
@@ -2526,7 +2537,7 @@ ROM_START( doa2 )
 	NAOMI_BIOS
 
 	ROM_REGION( 0xb000000, "user1", 0)
-	ROM_LOAD("epr22121.22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) )
+	ROM_LOAD("epr22121.22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) ) // partially encrypted
 
 	ROM_LOAD("mpr-22100.ic1", 0x0800000, 0x0800000, CRC(92a53e5e) SHA1(87fcdeee9c4e65a3eb6eb345eed85d4f2df26c3c) )
 	ROM_LOAD("mpr-22101.ic2", 0x1000000, 0x0800000, CRC(14cd7dce) SHA1(5df14a5dad14bc922b4f88881dc2e9c8e74d6170) )
@@ -2722,6 +2733,7 @@ time to go to sleep
 
 */
 
+#ifdef UNUSED_FUNCTION
 // rather crude function to write out a key file
 void naomi_write_keyfile(void)
 {
@@ -2792,6 +2804,8 @@ void naomi_write_keyfile(void)
 
 
 }
+#endif
+
 extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
 
 
@@ -2857,7 +2871,7 @@ GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            
 
 
 
-DRIVER_INIT( ngdkey )
+static DRIVER_INIT( ngdkey )
 {
 	UINT8* picdata = memory_region(machine,"picreturn");
 	UINT64 key;

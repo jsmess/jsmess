@@ -309,7 +309,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 //  debugwin_seq_pressed
 //============================================================
 
-int debugwin_seq_pressed(void)
+static int debugwin_seq_pressed(void)
 {
 	const input_seq *seq = input_type_seq(Machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
 	int result = FALSE;
@@ -485,7 +485,7 @@ void debugwin_show(int type)
 void debugwin_update_during_game(running_machine *machine)
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && mame_get_phase(Machine) == MAME_PHASE_RUNNING)
+	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && mame_get_phase(machine) == MAME_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
 		if (debugwin_seq_pressed())
@@ -493,7 +493,7 @@ void debugwin_update_during_game(running_machine *machine)
 			HWND focuswnd = GetFocus();
 			debugwin_info *info;
 
-			debug_cpu_halt_on_next_instruction(Machine, "User-initiated break\n");
+			debug_cpu_halt_on_next_instruction(machine, -1, "User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info; info = info->next)
