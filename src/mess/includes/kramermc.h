@@ -14,7 +14,7 @@
 DRIVER_INIT( kramermc );
 MACHINE_RESET( kramermc );
 
-const z80pio_interface kramermc_z80pio_intf;
+extern const z80pio_interface kramermc_z80pio_intf;
 
 /*----------- defined in video/kramermc.c -----------*/
 
