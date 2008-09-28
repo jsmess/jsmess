@@ -7,6 +7,7 @@
 #ifndef MBEE_H_
 #define MBEE_H_
 
+#include "cpu/z80/z80daisy.h"
 
 /*----------- defined in machine/mbee.c -----------*/
 
@@ -14,6 +15,7 @@ MACHINE_RESET( mbee );
 MACHINE_START( mbee );
 
 extern UINT8 *mbee_workram;
+extern const struct z80_irq_daisy_chain mbee_daisy_chain[];
 
 INTERRUPT_GEN( mbee_interrupt );
 

@@ -16,6 +16,8 @@ static UINT8 int_sw;		/* internal 1 mhz flipflop */
 static UINT8 current_palette;	/* for super80m and super80v */
 static UINT8 current_charset;	/* for super80m */
 
+static const device_config *super80_z80pio;
+
 /* the rest are for super80v */
 static UINT8 *pcgram;
 static UINT8 framecnt = 0;
@@ -357,9 +359,29 @@ static const z80pio_interface pio_intf =
 };
 
 
+static void super80_z80pio_reset(int which)
+{
+	z80pio_reset( super80_z80pio );
+}
+
+static int super80_z80pio_irq_state(int which)
+{
+	return z80pio_irq_state( super80_z80pio );
+}
+
+static int super80_z80pio_irq_ack(int which)
+{
+	return z80pio_irq_ack( super80_z80pio );
+}
+
+static void super80_z80pio_irq_reti(int which)
+{
+	z80pio_irq_reti( super80_z80pio );
+}
+
 static const struct z80_irq_daisy_chain super80_daisy_chain[] =
 {
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 },
+	{ super80_z80pio_reset, super80_z80pio_irq_state, super80_z80pio_irq_ack, super80_z80pio_irq_reti, 0 },
 	{ 0, 0, 0, 0, -1}      /* end mark */
 };
 
@@ -401,7 +423,7 @@ Reasons why it is necessary:
 
 static TIMER_CALLBACK( super80_timer )
 {
-	UINT8 cass_ws=0, i, mask=1, out_f8=z80pio_p_r(machine,0,0), in_fa=255;
+	UINT8 cass_ws=0, i, mask=1, out_f8=z80pio_p_r(super80_z80pio,0), in_fa=255;
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	for ( i=0; i < 8;i++)
@@ -410,7 +432,7 @@ static TIMER_CALLBACK( super80_timer )
 		mask<<=1;
 	}
 
-	z80pio_p_w(machine,0,1,in_fa);
+	z80pio_p_w(super80_z80pio,1,in_fa);
 
 	cass_data[1]++;
 	cass_ws = (cassette_input(cassette_device_image(machine)) > +0.03) ? 4 : 0;
@@ -501,14 +523,14 @@ static WRITE8_HANDLER( super80_f1_w )
 	current_charset = data & 1;
 }
 
-static READ8_HANDLER( super80_f8_r ) { return z80pio_d_r (machine,0,0); }
-static READ8_HANDLER( super80_f9_r ) { return z80pio_c_r (0,0); }
-static READ8_HANDLER( super80_fa_r ) { return z80pio_d_r (machine,0,1); }
-static READ8_HANDLER( super80_fb_r ) { return z80pio_c_r (0,1); }
-static WRITE8_HANDLER( super80_f8_w ) { z80pio_d_w(machine, 0,0, data); }
-static WRITE8_HANDLER( super80_f9_w ) { z80pio_c_w(machine, 0,0, data); }
-static WRITE8_HANDLER( super80_fa_w ) { z80pio_d_w(machine, 0,1, data); }
-static WRITE8_HANDLER( super80_fb_w ) { z80pio_c_w(machine, 0,1, data); }
+static READ8_HANDLER( super80_f8_r ) { return z80pio_d_r (super80_z80pio,0); }
+static READ8_HANDLER( super80_f9_r ) { return z80pio_c_r (super80_z80pio,0); }
+static READ8_HANDLER( super80_fa_r ) { return z80pio_d_r (super80_z80pio,1); }
+static READ8_HANDLER( super80_fb_r ) { return z80pio_c_r (super80_z80pio,1); }
+static WRITE8_HANDLER( super80_f8_w ) { z80pio_d_w(super80_z80pio,0, data); }
+static WRITE8_HANDLER( super80_f9_w ) { z80pio_c_w(super80_z80pio,0, data); }
+static WRITE8_HANDLER( super80_fa_w ) { z80pio_d_w(super80_z80pio,1, data); }
+static WRITE8_HANDLER( super80_fb_w ) { z80pio_c_w(super80_z80pio,1, data); }
 
 /**************************** MEMORY AND I/O MAPPINGS *****************************************************************/
 
@@ -921,7 +943,7 @@ static TIMER_CALLBACK( super80_reset )
 
 static MACHINE_RESET( super80 )
 {
-	z80pio_init(0, &pio_intf);
+	super80_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(1, 1);
 }
@@ -941,6 +963,8 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_CPU_CONFIG(super80_daisy_chain)
 
 	MDRV_MACHINE_RESET( super80 )
+
+	MDRV_Z80PIO_ADD( "z80pio", pio_intf )
 
 	MDRV_GFXDECODE(super80)
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -29,26 +29,38 @@ static UINT8 fdc_drv = 0;
 static UINT8 fdc_head = 0;
 static UINT8 fdc_den = 0;
 static UINT8 fdc_status = 0;
-static void pio_interrupt(running_machine *machine, int state);
+static const device_config *mbee_z80pio;
 static void mbee_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 UINT8 *mbee_workram;
 
-static const z80pio_interface pio_intf =
+
+static void mbee_z80pio_reset(int which)
 {
-	pio_interrupt,	/* callback when change interrupt status */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	0,				/* portA ready active callback (do not support yet)*/
-	0				/* portB ready active callback (do not support yet)*/
+	z80pio_reset( mbee_z80pio );
+}
+
+static int mbee_z80pio_irq_state(int which)
+{
+	return z80pio_irq_state( mbee_z80pio );
+}
+
+static int mbee_z80pio_irq_ack(int which)
+{
+	return z80pio_irq_ack( mbee_z80pio );
+}
+
+static void mbee_z80pio_irq_reti(int which)
+{
+	z80pio_irq_reti( mbee_z80pio );
+}
+
+const struct z80_irq_daisy_chain mbee_daisy_chain[] =
+{
+	{ mbee_z80pio_reset, mbee_z80pio_irq_state, mbee_z80pio_irq_ack, mbee_z80pio_irq_reti, 0 }, /* PIO number 0 */
+	{ 0, 0, 0, 0, -1}      /* end mark */
 };
 
-static void pio_interrupt(running_machine *machine, int state)
-{
-	cpunum_set_input_line(machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /*
   On reset or power on, a circuit forces rom 8000-8FFF to appear at 0000-0FFF, while ram is disabled.
@@ -64,7 +76,7 @@ static TIMER_CALLBACK( mbee_reset )
 
 MACHINE_RESET( mbee )
 {
-	z80pio_init(0, &pio_intf);
+	mbee_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
 	timer_set(ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 	memory_set_bank(1, 1);
 }
@@ -92,10 +104,10 @@ static const device_config *cassette_device_image(running_machine *machine)
 READ8_HANDLER ( mbee_pio_r )
 {
 	UINT8 data=0;
-	if (offset == 0) return z80pio_d_r(machine,0,0);
-	if (offset == 1) return z80pio_c_r(0,0);
-	if (offset == 3) return z80pio_c_r(0,1);
-	data = z80pio_d_r(machine,0,1) | 1;
+	if (offset == 0) return z80pio_d_r(mbee_z80pio,0);
+	if (offset == 1) return z80pio_c_r(mbee_z80pio,0);
+	if (offset == 3) return z80pio_c_r(mbee_z80pio,1);
+	data = z80pio_d_r(mbee_z80pio,1) | 1;
 	if (cassette_input(cassette_device_image(machine)) > 0.03)
 		data &= ~1;
 	return data;
@@ -103,14 +115,14 @@ READ8_HANDLER ( mbee_pio_r )
 
 WRITE8_HANDLER ( mbee_pio_w )
 {
-	if (offset == 0) z80pio_d_w(machine, 0,0,data);
-	if (offset == 1) z80pio_c_w(machine, 0,0,data);
-	if (offset == 3) z80pio_c_w(machine, 0,1,data);
+	if (offset == 0) z80pio_d_w(mbee_z80pio,0,data);
+	if (offset == 1) z80pio_c_w(mbee_z80pio,0,data);
+	if (offset == 3) z80pio_c_w(mbee_z80pio,1,data);
 
 	if( offset == 2 )
 	{
-		z80pio_d_w(machine, 0,1,data);
-		data = z80pio_p_r(machine,0,1);
+		z80pio_d_w(mbee_z80pio,1,data);
+		data = z80pio_p_r(mbee_z80pio,1);
 		cassette_output(cassette_device_image(machine), (data & 0x02) ? -1.0 : +1.0);
 		speaker_level_w(0, (data & 0x40) ? 1 : 0);
 	}
@@ -171,8 +183,8 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 INTERRUPT_GEN( mbee_interrupt )
 {
 	/* once per frame, pulse the PIO B bit 7 */
-	z80pio_p_w(machine, 0, 1, 0x80);
-	z80pio_p_w(machine, 0, 1, 0x00);
+	z80pio_p_w(mbee_z80pio, 1, 0x80);
+	z80pio_p_w(mbee_z80pio, 1, 0x00);
 }
 
 DEVICE_IMAGE_LOAD( mbee_cart )

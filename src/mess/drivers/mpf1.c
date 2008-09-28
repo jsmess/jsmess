@@ -521,10 +521,6 @@ static const ppi8255_interface ppi8255_intf =
 
 static MACHINE_RESET( mpf1 )
 {
-	// PIO
-	z80pio_init(0, &pio_intf);
-	z80pio_reset(0);
-
 	// CTC
 /*  z80ctc_init(&ctc_intf);
     z80ctc_reset(0);*/
@@ -546,6 +542,8 @@ static MACHINE_DRIVER_START( mpf1 )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET( mpf1 )
+
+	MDRV_Z80PIO_ADD( "z80pio", pio_intf )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ppi8255_intf )

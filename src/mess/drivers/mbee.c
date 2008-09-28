@@ -279,10 +279,21 @@ static PALETTE_INIT( mbeeic )
 			colortable_entry_set_value(machine->colortable, (((i<<5)|r)<<1)|1, r|64);
 }
 
-static const struct z80_irq_daisy_chain mbee_daisy_chain[] =
+
+static void pio_interrupt(running_machine *machine, int state)
 {
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 }, /* PIO number 0 */
-	{ 0, 0, 0, 0, -1}      /* end mark */
+	cpunum_set_input_line(machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static const z80pio_interface mbee_z80pio_intf =
+{
+	pio_interrupt,	/* callback when change interrupt status */
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	0,				/* portA ready active callback (do not support yet)*/
+	0				/* portB ready active callback (do not support yet)*/
 };
 
 
@@ -296,6 +307,8 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_CPU_VBLANK_INT("main", mbee_interrupt)
 
 	MDRV_MACHINE_RESET( mbee )
+
+	MDRV_Z80PIO_ADD( "z80pio", mbee_z80pio_intf )
 
 	MDRV_GFXDECODE(mbee)
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -335,6 +348,8 @@ static MACHINE_DRIVER_START( mbeeic )
 
 	MDRV_MACHINE_RESET( mbee )
 	MDRV_MACHINE_START( mbee )
+
+	MDRV_Z80PIO_ADD( "z80pio", mbee_z80pio_intf )
 
 	MDRV_GFXDECODE(mbeeic)
 	MDRV_SCREEN_ADD("main", RASTER)

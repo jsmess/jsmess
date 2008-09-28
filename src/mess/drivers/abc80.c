@@ -91,6 +91,7 @@ Notes:
 #include "devices/printer.h"
 
 static emu_timer *abc80_keyboard_timer;
+static const device_config *abc80_z80pio;
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -207,52 +208,15 @@ static void abc80_keyboard_scan(running_machine *machine)
 	}
 
 	if (keycode)
-		z80pio_p_w( machine, 0, 0, keycode | 0x80 );
+		z80pio_p_w( abc80_z80pio, 0, keycode | 0x80 );
 	else
-		z80pio_p_w( machine, 0, 0, 0 );
+		z80pio_p_w( abc80_z80pio, 0, 0 );
 
 	if (keycode != keylatch) program_write_byte(0xfdf5, 0x80);
 
 	keylatch = keycode;
 }
 
-// PIO
-
-static READ8_HANDLER( abc80_pio_r )
-{
-	switch (offset)
-	{
-	case 0:
-		return z80pio_d_r(machine, 0, 0);
-	case 1:
-		return z80pio_c_r(0, 0);
-	case 2:
-		return z80pio_d_r(machine, 0, 1);
-	case 3:
-		return z80pio_c_r(0, 1);
-	}
-
-	return 0xff;
-}
-
-static WRITE8_HANDLER( abc80_pio_w )
-{
-	switch (offset)
-	{
-	case 0:
-		z80pio_d_w(machine, 0, 0, data);
-		break;
-	case 1:
-		z80pio_c_w(machine, 0, 0, data);
-		break;
-	case 2:
-		z80pio_d_w(machine, 0, 1, data);
-		break;
-	case 3:
-		z80pio_c_w(machine, 0, 1, data);
-		break;
-	}
-}
 
 /* Memory Maps */
 
@@ -275,7 +239,7 @@ static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(abc80_sound_w)
 	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x38, 0x3b) AM_READWRITE(abc80_pio_r, abc80_pio_w)
+	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE( Z80PIO, "z80pio", z80pio_r, z80pio_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -413,9 +377,29 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 
 /* Machine Initialization */
 
+static void abc80_z80pio_reset(int which)
+{
+	z80pio_reset( abc80_z80pio );
+}
+
+static int abc80_z80pio_irq_state(int which)
+{
+	return z80pio_irq_state( abc80_z80pio );
+}
+
+static int abc80_z80pio_irq_ack(int which)
+{
+	return z80pio_irq_ack( abc80_z80pio );
+}
+
+static void abc80_z80pio_irq_reti(int which)
+{
+	z80pio_irq_reti( abc80_z80pio );
+}
+
 static const struct z80_irq_daisy_chain abc80_daisy_chain[] =
 {
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 },
+	{ abc80_z80pio_reset, abc80_z80pio_irq_state, abc80_z80pio_irq_ack, abc80_z80pio_irq_reti, 0 },
 	{ 0, 0, 0, 0, -1 }
 };
 
@@ -451,7 +435,7 @@ static READ8_HANDLER( abc80_pio_port_a_r )
 }
 #endif
 
-static READ8_HANDLER( abc80_pio_port_b_r )
+static READ8_DEVICE_HANDLER( abc80_pio_port_b_r )
 {
 	/*
 
@@ -468,12 +452,12 @@ static READ8_HANDLER( abc80_pio_port_b_r )
 
 	*/
 
-	UINT8 data = (cassette_input(cassette_device_image(machine)) > +1.0) ? 0x80 : 0;
+	UINT8 data = (cassette_input(cassette_device_image(device->machine)) > +1.0) ? 0x80 : 0;
 
 	return data;
 };
 
-static WRITE8_HANDLER( abc80_pio_port_b_w )
+static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 {
 	/*
 
@@ -490,9 +474,9 @@ static WRITE8_HANDLER( abc80_pio_port_b_w )
 
 	*/
 
-	cassette_change_state(cassette_device_image(machine), BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(cassette_device_image(device->machine), BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-	cassette_output(cassette_device_image(machine), BIT(data, 7) ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(device->machine), BIT(data, 7) ? -1.0 : +1.0);
 };
 
 static const z80pio_interface abc80_pio_intf =
@@ -524,13 +508,11 @@ static MACHINE_START( abc80 )
 		break;
 	}
 
+	abc80_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
+
 	/* register for state saving */
 
 	state_save_register_global(keylatch);
-
-	/* initialize the PIO */
-
-	z80pio_init(0, &abc80_pio_intf);
 
 	/* allocate the keyboard scan timer */
 
@@ -551,6 +533,8 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_CPU_VBLANK_INT("main", abc80_nmi_interrupt)
 
 	MDRV_MACHINE_START(abc80)
+
+	MDRV_Z80PIO_ADD( "z80pio", abc80_pio_intf )
 
 	// video hardware
 

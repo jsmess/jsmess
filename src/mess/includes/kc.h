@@ -7,6 +7,8 @@
 #ifndef KC_H_
 #define KC_H_
 
+#include "cpu/z80/z80daisy.h"
+#include "machine/z80pio.h"
 #include "devices/snapquik.h"
 
 
@@ -67,6 +69,9 @@ WRITE8_HANDLER(kc85_pio_control_w);
 
 READ8_HANDLER(kc85_ctc_r);
 WRITE8_HANDLER(kc85_ctc_w);
+
+extern const z80pio_interface kc85_pio_intf;
+extern const struct z80_irq_daisy_chain kc85_daisy_chain[];
 
 
 /*** MODULE SYSTEM ***/

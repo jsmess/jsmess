@@ -28,15 +28,6 @@
 #include "devices/basicdsk.h"
 
 
-/* pio is last in chain and therefore has highest priority */
-
-static const struct z80_irq_daisy_chain kc85_daisy_chain[] =
-{
-	{z80pio_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
-	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
-	{0,0,0,0,-1}
-};
-
 static READ8_HANDLER(kc85_4_port_r)
 {
 	int port;
@@ -346,6 +337,8 @@ static MACHINE_DRIVER_START( kc85_3 )
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( kc85_3 )
+
+	MDRV_Z80PIO_ADD( "z80pio", kc85_pio_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -19,6 +19,7 @@
 #define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)
 
 static int kc85_pio_data[2];
+static const device_config *kc85_z80pio;
 
 static void kc85_4_update_0x0c000(running_machine *machine);
 static void kc85_4_update_0x0e000(running_machine *machine);
@@ -410,7 +411,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 		bit = 1;
 
 	/* update astb with bit */
-	z80pio_astb_w(machine,0,bit & kc_ardy);
+	z80pio_astb_w(kc85_z80pio,bit & kc_ardy);
 }
 
 static void	kc_cassette_init(void)
@@ -865,7 +866,7 @@ static TIMER_CALLBACK(kc_keyboard_transmit_timer_callback)
 		LOG_KBD(("kc keyboard sending pulse: %02x\n",pulse_state));
 
 		/* set pulse */
-		z80pio_bstb_w(machine,0,pulse_state & kc_brdy);
+		z80pio_bstb_w(kc85_z80pio,pulse_state & kc_brdy);
 
 		/* update counts */
 		keyboard_data.transmit_pulse_count_remaining--;
@@ -920,7 +921,7 @@ static void kc_keyboard_init(running_machine *machine)
 	keyboard_data.transmit_pulse_count = 0;
 
 	/* set initial state */
-	z80pio_bstb_w(machine,0,0);
+	z80pio_bstb_w(kc85_z80pio,0);
 
 
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)
@@ -1377,7 +1378,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_4_pio_data_w )
 {
 	kc85_pio_data[offset] = data;
-	z80pio_d_w(machine, 0, offset, data);
+	z80pio_d_w(kc85_z80pio, offset, data);
 
 	switch (offset)
 	{
@@ -1619,7 +1620,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_3_pio_data_w )
 {
    kc85_pio_data[offset] = data;
-   z80pio_d_w(machine, 0, offset, data);
+   z80pio_d_w(kc85_z80pio, offset, data);
 
    switch (offset)
    {
@@ -1693,19 +1694,19 @@ static TIMER_CALLBACK(kc85_reset_timer_callback)
 
  READ8_HANDLER ( kc85_pio_data_r )
 {
-	return z80pio_d_r(machine,0,offset);
+	return z80pio_d_r(kc85_z80pio,offset);
 }
 
  READ8_HANDLER ( kc85_pio_control_r )
 {
-	return z80pio_c_r(0,offset);
+	return z80pio_c_r(kc85_z80pio,offset);
 }
 
 
 
 WRITE8_HANDLER ( kc85_pio_control_w )
 {
-   z80pio_c_w(machine, 0, offset, data);
+   z80pio_c_w(kc85_z80pio, offset, data);
 }
 
 
@@ -1760,7 +1761,7 @@ static void kc85_pio_brdy_callback(int state)
 	}
 }
 
-static const z80pio_interface kc85_pio_intf =
+const z80pio_interface kc85_pio_intf =
 {
 	kc85_pio_interrupt,		/* callback when change interrupt status */
 	NULL,
@@ -1769,6 +1770,20 @@ static const z80pio_interface kc85_pio_intf =
 	NULL,
 	kc85_pio_ardy_callback,	/* portA ready active callback */
 	kc85_pio_brdy_callback	/* portB ready active callback */
+};
+
+static void kc85_z80pio_reset(int which)
+{
+	z80pio_reset(kc85_z80pio);
+}
+
+/* pio is last in chain and therefore has highest priority */
+
+const struct z80_irq_daisy_chain kc85_daisy_chain[] =
+{
+	{kc85_z80pio_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
+	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
+	{0,0,0,0,-1}
 };
 
 /* used in cassette write -> K0 */
@@ -1833,11 +1848,9 @@ static z80ctc_interface	kc85_ctc_intf =
 
 static void	kc85_common_init(running_machine *machine)
 {
-	z80pio_init(0, &kc85_pio_intf);
 	z80ctc_init(0, &kc85_ctc_intf);
 
 	z80ctc_reset(0);
-	z80pio_reset(0);
 
 	kc_cassette_init();
 	kc_keyboard_init(machine);
@@ -1864,6 +1877,8 @@ MACHINE_RESET( kc85_4 )
 	/* ram0 enable, irm enable */
 	kc85_pio_data[0] = 0x0f;
 	kc85_pio_data[1] = 0x0f1;
+
+	kc85_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
 
 	kc85_4_update_0x04000(machine);
 	kc85_4_update_0x08000(machine);

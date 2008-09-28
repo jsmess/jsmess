@@ -108,6 +108,8 @@ static int einstein_int_mask = 0;
 
 static int einstein_ctc_trigger = 0;
 
+static const device_config *einstein_z80pio;
+
 /* KEYBOARD */
 static int einstein_keyboard_line = 0;
 static int einstein_keyboard_data = 0x0ff;
@@ -527,12 +529,32 @@ static void einstein_fire_reti(int which)
 }
 #endif
 
+static void einstein_z80pio_reset(int which)
+{
+	z80pio_reset( einstein_z80pio );
+}
+
+static int einstein_z80pio_irq_state(int which)
+{
+	return z80pio_irq_state( einstein_z80pio );
+}
+
+static int einstein_z80pio_irq_ack(int which)
+{
+	return z80pio_irq_ack( einstein_z80pio );
+}
+
+static void einstein_z80pio_irq_reti(int which)
+{
+	z80pio_irq_reti( einstein_z80pio );
+}
+
 static const struct z80_irq_daisy_chain einstein_daisy_chain[] =
 {
 	{einstein_keyboard_int_reset, einstein_keyboard_interrupt, 0, einstein_keyboard_reti, 0},
     {z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
 	{einstein_adc_int_reset,einstein_adc_interrupt, 0, einstein_adc_reti, 0},
-	{z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0},
+	{einstein_z80pio_reset, einstein_z80pio_irq_state, einstein_z80pio_irq_ack, einstein_z80pio_irq_reti, 0},
 //  {einstein_fire_int_reset,einstein_fire_interrupt, einstein_fire_reti, 0},
     {0,0,0,0,-1}
 };
@@ -637,39 +659,20 @@ static WRITE8_HANDLER(einstein_pio_w)
 {
 	logerror("pio w: %04x %02x\n",offset,data);
 
-	if ((offset & 0x01)==0)
+	if ( ( offset & 0x03 ) == 0x02 )
 	{
-		switch ((offset>>1) & 0x01)
-		{
-			/* port A */
-			case 0:
-			{
-				/* printer is connected to port A */
-				centronics_write_data(0,data);
-			}
-			break;
-
-			default:
-				break;
-		}
-
-		z80pio_d_w( machine, 0, (offset>>1) & 0x01,data);
-		return;
+		/* printer is connected to port A */
+		centronics_write_data(0,data);
 	}
 
-	z80pio_c_w( machine, 0, (offset>>1) & 0x01,data);
+	z80pio_w( einstein_z80pio, offset, data );
 }
 
 static  READ8_HANDLER(einstein_pio_r)
 {
 	logerror("pio r: %04x\n",offset);
 
-	if ((offset & 0x01)==0)
-	{
-		return z80pio_d_r( machine, 0, (offset>>1) & 0x01);
-	}
-
-	return z80pio_c_r( 0, (offset>>1) & 0x01);
+	return z80pio_r( einstein_z80pio, offset );
 }
 
 static  READ8_HANDLER(einstein_ctc_r)
@@ -1368,11 +1371,11 @@ static void einstein_printer_handshake_in(int number, int data, int mask)
 		if (data & CENTRONICS_ACKNOWLEDGE)
 		{
 			/* /ack into /astb */
-			z80pio_astb_w(Machine, 0, 0);
+			z80pio_astb_w( einstein_z80pio, 0);
 		}
 		else
 		{
-			z80pio_astb_w(Machine, 0, 1);
+			z80pio_astb_w( einstein_z80pio, 1);
 		}
 	}
 }
@@ -1425,6 +1428,8 @@ static MACHINE_START( einstein )
 {
 	TMS9928A_configure(&tms9928a_interface);
 	wd17xx_init(machine, WD_TYPE_177X, NULL, NULL);
+
+	einstein_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
 }
 
 static MACHINE_RESET( einstein )
@@ -1434,11 +1439,9 @@ static MACHINE_RESET( einstein )
 	memory_set_bankptr(4, mess_ram+0x02000);
 
 	z80ctc_init(0, &einstein_ctc_intf);
-	z80pio_init(0, &einstein_pio_intf);
 	msm8251_init(&einstein_msm8251_intf);
 
 	z80ctc_reset(0);
-	z80pio_reset(0);
 
 	TMS9928A_reset ();
 
@@ -1726,6 +1729,8 @@ static MACHINE_DRIVER_START( einstein )
 
 	MDRV_MACHINE_START( einstein )
 	MDRV_MACHINE_RESET( einstein )
+
+	MDRV_Z80PIO_ADD( "z80pio", einstein_pio_intf )
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)

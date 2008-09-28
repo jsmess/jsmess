@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kramermc_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfc, 0x0ff) AM_READWRITE(z80pio_0_r, z80pio_0_w)
+	AM_RANGE(0xfc, 0x0ff) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_r, z80pio_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -105,13 +105,15 @@ INPUT_PORTS_END
 
 /* Machine driver */
 static MACHINE_DRIVER_START( kramermc )
-  /* basic machine hardware */
-  MDRV_CPU_ADD("main", Z80, 1500000)
-  MDRV_CPU_PROGRAM_MAP(kramermc_mem, 0)
-  MDRV_CPU_IO_MAP(kramermc_io, 0)
-  MDRV_MACHINE_RESET( kramermc )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 1500000)
+	MDRV_CPU_PROGRAM_MAP(kramermc_mem, 0)
+	MDRV_CPU_IO_MAP(kramermc_io, 0)
+	MDRV_MACHINE_RESET( kramermc )
 
-  /* video hardware */
+	MDRV_Z80PIO_ADD( "z80pio", kramermc_z80pio_intf )
+
+	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -123,19 +125,19 @@ static MACHINE_DRIVER_START( kramermc )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
-  MDRV_VIDEO_START(kramermc)
-  MDRV_VIDEO_UPDATE(kramermc)
+	MDRV_VIDEO_START(kramermc)
+	MDRV_VIDEO_UPDATE(kramermc)
 MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( kramermc )
-  ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
-  ROM_LOAD( "io-mon.kmc",   0x0000, 0x0400, CRC(ba230fc8) SHA1(197d4ede31ee8768dd4a17854ee21c468e98b3d6) )
-  ROM_LOAD( "debugger.kmc", 0x0400, 0x0400, CRC(5ea3d9e1) SHA1(42e5ced4f965124ae50ec7ac9861d6b668cfab99) )
-  ROM_LOAD( "reass.kmc",    0x0800, 0x0400, CRC(7cc8e605) SHA1(3319a96aad710441af30dace906b9725e07ca92c) )
-  ROM_LOAD( "basic.kmc",  0x8000, 0x3000, CRC(7531801e) SHA1(61d055495ffcc4a281ef0abc3e299ea95f42544b) )
-  ROM_LOAD( "editor.kmc", 0xc000, 0x0400, CRC(2fd4cb84) SHA1(505615a218865aa8becde13848a23e1241a14b96) )
-  ROM_LOAD( "ass.kmc",		0xc400, 0x1c00, CRC(9a09422e) SHA1(a578d2cf0ea6eb35dcd13e4107e15187de906097) )
+	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_LOAD( "io-mon.kmc",   0x0000, 0x0400, CRC(ba230fc8) SHA1(197d4ede31ee8768dd4a17854ee21c468e98b3d6) )
+	ROM_LOAD( "debugger.kmc", 0x0400, 0x0400, CRC(5ea3d9e1) SHA1(42e5ced4f965124ae50ec7ac9861d6b668cfab99) )
+	ROM_LOAD( "reass.kmc",    0x0800, 0x0400, CRC(7cc8e605) SHA1(3319a96aad710441af30dace906b9725e07ca92c) )
+	ROM_LOAD( "basic.kmc",  0x8000, 0x3000, CRC(7531801e) SHA1(61d055495ffcc4a281ef0abc3e299ea95f42544b) )
+	ROM_LOAD( "editor.kmc", 0xc000, 0x0400, CRC(2fd4cb84) SHA1(505615a218865aa8becde13848a23e1241a14b96) )
+	ROM_LOAD( "ass.kmc",		0xc400, 0x1c00, CRC(9a09422e) SHA1(a578d2cf0ea6eb35dcd13e4107e15187de906097) )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("chargen.kmc", 0x0000, 0x0800, CRC(1ba52f9f) SHA1(71bbad90dd427d0132c871a4d3848ab3d4d84b8a))
 ROM_END
