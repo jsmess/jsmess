@@ -715,6 +715,7 @@ XL/XE 16kB OS roms
 	
 	
 	DRIVER( msx2 )		/* 1985 MSX2										*/
+	DRIVER( ax350 )
 	DRIVER( hbf9p )		/* 1985 MSX2										*/
 	DRIVER( hbf500p )	/* 1985 MSX2										*/
 	DRIVER( hbf700d )	/* 1985 MSX2 Germany								*/
