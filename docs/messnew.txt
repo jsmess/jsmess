@@ -15,8 +15,23 @@ New System Drivers Supported (in no particular order):
 - PK-8020 Korvet (not working) [Miodrag Milanovic]
 - Kramer MC [Miodrag Milanovic]
 - RCA Cosmac VIP (VP-111) [Curt Coder]
-
-
+- HC85/HC90/HC91/HC128/HC2000/CIP-03/Jet [Miodrag Milanovic]
+- Didaktik Gama 87/88/89 [Miodrag Milanovic]
+- Didaktik Skalica 90,M 91/93,Kompakt [Miodrag Milanovic]
+- Mistrum  [Miodrag Milanovic]
+- Blitz/Byte/Orizon/Kvorum 48/Magic 6/Kompanion [Miodrag Milanovic]
+- Al Alamiah AX-170/AX-350 [Miodrag Milanovic]
+- Canon V-10/V-20 [Miodrag Milanovic]
+- Gradiente 1.1/1.3 [Miodrag Milanovic]
+- JVC HC-7GB/Pioneer PX-07/Sanyo MPC-100/Goldstar FC-200 [Miodrag Milanovic]
+- Mitsubishi ML-F80/ML-FX1 [Miodrag Milanovic]
+- Sharp HB-8000 Hotbit 1.3b/HB-8000 Hotbit 1.3p [Miodrag Milanovic]
+- Sony HB-201/HB-55D/HB-55P [Miodrag Milanovic]
+- Spectravideo SVI-728/SVI-738 Swedish [Miodrag Milanovic]
+- Talent DPC-200/DPC-200A [Miodrag Milanovic]
+- Toshiba HX-10S/HX-20 [Miodrag Milanovic]
+- Yamaha CX5M/CX5M-128/CX5MII/YIS303/YIS503/YIS503II/YIS503M [Miodrag Milanovic]
+- Yashica YC-64 [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------
