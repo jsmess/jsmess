@@ -30,6 +30,7 @@ NMI
 #include "includes/cgenie.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 #include "sound/ay8910.h"
 
 static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -75,10 +76,7 @@ static INPUT_PORTS_START( cgenie )
 	PORT_DIPNAME( 0x10, 0x10, "Video Display accuracy") PORT_CODE(KEYCODE_F5) PORT_TOGGLE
 	PORT_DIPSETTING(	0x10, "TV set" )
 	PORT_DIPSETTING(	0x00, "RGB monitor" )
-	PORT_DIPNAME( 0x08, 0x08, "Virtual tape support") PORT_CODE(KEYCODE_F6) PORT_TOGGLE
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
-	PORT_BIT(0x07, 0x07, IPT_UNUSED)
+	PORT_BIT(0x0f, 0x0f, IPT_UNUSED)
 
 /**************************************************************************
    +-------------------------------+     +-------------------------------+
@@ -423,6 +421,8 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_SOUND_ADD("ay8910", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(cgenie_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -463,30 +463,10 @@ static void cgenie_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
-static void cgenie_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 0;	/* INVALID */ break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0;	/* INVALID */ break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0;	/* INVALID */ break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(cgenie_cassette); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cas"); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(cgenie)
 	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(cgenie_floppy_getinfo)
-	CONFIG_DEVICE(cgenie_cassette_getinfo)
 	CONFIG_RAM_DEFAULT	(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
 SYSTEM_CONFIG_END

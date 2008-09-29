@@ -13,6 +13,7 @@
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -27,7 +28,6 @@ UINT8 *cgenie_fontram;
 
 
 int cgenie_tv_mode = -1;
-static int cgenie_load_cas = 0;
 static int port_ff = 0xff;
 
 #define CGENIE_DRIVE_INFO
@@ -78,137 +78,20 @@ static UINT8 irq_status;
 static UINT8 motor_drive;
 static UINT8 head;
 
-/* current tape file handles */
-static char tape_name[12+1];
-static mame_file *tape_get_file;
+static UINT8 cass_level;
+static UINT8 cass_bit;
 
-/* tape buffer for the first eight bytes at write (to extract a filename) */
-static UINT8 tape_buffer[9];
-
-/* file offset within tape file */
-static int tape_count;
-
-/* number of sync and data bits that were written */
-static int put_bit_count;
-
-/* number of sync and data bits to read */
-static int get_bit_count;
-
-/* sync and data bits mask */
-static int tape_bits;
-
-/* time in cycles for the next bit at read */
-static int tape_time;
-
-/* flag if writing to tape detected the sync header A5 already */
-static int in_sync;
-
-/* cycle count at last output port change */
-static int put_cycles;
-
-/* cycle count at last input port read */
-static int get_cycles;
-
-/* a prototype to be called from cgenie_stop_machine */
-static void tape_put_close(running_machine *machine);
-
-/* Buffer for image reads */
-static UINT8 *image_buff;
-
-static OPBASE_HANDLER (opbaseoverride)
+static TIMER_CALLBACK( handle_cassette_input )
 {
-	UINT8 *RAM = memory_region(machine, "main");
-	const device_config *img;
-	UINT8 *buff, *s, data;
-	UINT16 size, entry = 0, block_len, block_ofs = 0;
+	UINT8 new_level = ( cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) ) > 0.0 ) ? 1 : 0;
 
-	/* check if the BASIC prompt is visible on the screen */
-	if( cgenie_load_cas && RAM[0x4400+3*40] == 0x3e )
+	if ( new_level != cass_level )
 	{
-		cgenie_load_cas = 0;
-
-		img = image_from_devtype_and_index(IO_CASSETTE, 0);
-
-		if (image_exists(img))
-		{
-			buff = image_buff;
-			size = image_fread(img, buff, 65536);
-			s = buff;
-			if( memcmp(s, TAPE_HEADER, sizeof(TAPE_HEADER)-1) == 0 )
-			{
-				s = (UINT8*)memchr(s, 26, size);
-				if( s )
-				{
-					*s++ = '\n';
-					*s++ = '\0';
-					logerror("%s",s);
-				}
-				size -= s - buff;
-			}
-			if( s[0] == 0x66 && s[1] == 0x55 && s[8] == 0x3c )
-			{
-				logerror("image name: [%-6.6s]\n",s+1);
-				s += 8;
-				size -= 8;
-				while( size > 3 )
-				{
-					data = *s++;
-					switch( data )
-					{
-					case 0x01:		   /* CMD file header */
-					case 0x07:		   /* another type of CMD file header */
-					case 0x3c:		   /* CAS file header */
-						block_len = *s++;
-						/* on CMD files size zero means size 256 */
-						if( block_len == 0 )
-							block_len = 256;
-						block_ofs = *s++;
-						block_ofs += 256 * *s++;
-						if( data != 0x3c )
-						{
-							block_len -= 2;
-							if( block_len == 0 )
-								block_len = 256;
-						}
-						size -= 4;
-						logerror("cgenie_cmd_load block ($%02X) %d at $%04X\n", data, block_len, block_ofs);
-						while( block_len && size )
-						{
-							program_write_byte(block_ofs, *s);
-							s++;
-							block_ofs++;
-							block_len--;
-							size--;
-						}
-						if( data == 0x3c )
-							s++;
-						break;
-					case 0x02:
-						block_len = *s++;
-						size -= 1;
-					case 0x78:
-						block_ofs = *s++;
-						block_ofs += 256 * *s++;
-						if( !entry )
-							entry = block_ofs;
-						logerror( "cgenie_cmd_load entry ($%02X) at $%04X\n", data, entry);
-						size -= 3;
-						if( size <= 3 )
-						{
-							logerror("starting program at $%04X\n", block_ofs);
-						}
-						break;
-					default:
-						size--;
-					}
-				}
-				activecpu_set_reg(REG_PC, entry);
-			}
-		}
-		memory_set_opbase_handler(0,NULL);
+		cass_level = new_level;
+		cass_bit ^= 1;
 	}
-	return address;
 }
+
 
 static void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
@@ -287,8 +170,9 @@ MACHINE_RESET( cgenie )
 		memset(&memory_region(machine, "main")[0x0e000], 0x00, 0x1000);
 	}
 
-	cgenie_load_cas = 1;
-	memory_set_opbase_handler(0, opbaseoverride);
+	cass_level = 0;
+	cass_bit = 1;
+	timer_pulse( ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
 }
 
 MACHINE_START( cgenie )
@@ -297,27 +181,16 @@ MACHINE_START( cgenie )
 	int i;
 
 	/* initialize static variables */
-	memset(tape_buffer, 0, sizeof(tape_buffer));
-	memset(tape_name, 0, sizeof(tape_name));
-	tape_get_file = NULL;
 	irq_status = 0;
 	motor_drive = 0;
 	head = 0;
-	tape_count = 0;
-	put_bit_count = 0;
-	get_bit_count = 0;
-	tape_bits = 0;
-	tape_time = 0;
-	in_sync = 0;
-	put_cycles = 0;
-	get_cycles = 0;
-	image_buff = auto_malloc(65536);
 
 	/*
 	 * Every fifth cycle is a wait cycle, so I reduced
 	 * the overlocking by one fitfth
+	 * Underclocking causes the tape loading to not work.
 	 */
-	cpunum_set_clockscale(machine, 0, 0.80);
+//	cpunum_set_clockscale(machine, 0, 0.80);
 
 	/* Initialize some patterns to be displayed in graphics mode */
 	for( i = 0; i < 256; i++ )
@@ -331,15 +204,8 @@ MACHINE_START( cgenie )
 
 	/* set up FDC */
 	wd17xx_init(machine, WD_TYPE_179X, cgenie_fdc_callback, NULL);
-
-	add_exit_callback(machine, tape_put_close);
 }
 
-
-DEVICE_IMAGE_LOAD( cgenie_cassette )
-{
-	return INIT_PASS;
-}
 
 /* basic-dsk is a disk image format which has the tracks and sectors
  * stored in order, no information is stored which details the number
@@ -436,290 +302,6 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 	return INIT_PASS;
 }
 
-/*************************************
- *
- *				Tape emulation.
- *
- *************************************/
-
-/*******************************************************************
- * tape_put_byte
- * write next data byte to virtual tape. After collecting the first
- * nine bytes try to extract the kind of data and filename.
- *******************************************************************/
-static void tape_put_byte(UINT8 value)
-{
-	mame_file *file;
-
-	if( tape_count < 9 )
-	{
-		tape_name[0] = '\0';
-		tape_buffer[tape_count++] = value;
-		if( tape_count == 9 )
-		{
-			/* BASIC tape ? */
-			if( tape_buffer[1] != 0x55 || tape_buffer[8] != 0x3c )
-				sprintf(tape_name, "basic%c.cas", tape_buffer[1]);
-			else
-			/* SYSTEM tape ? */
-			if( tape_buffer[1] == 0x55 && tape_buffer[8] == 0x3c )
-				sprintf(tape_name, "%-6.6s.cas", tape_buffer + 2);
-			else
-				strcpy(tape_name, "unknown.cas");
-			mame_fopen(SEARCHPATH_IMAGE, tape_name, OPEN_FLAG_WRITE, &file);
-		}
-	}
-	else
-	{
-		tape_count++;
-	}
-}
-
-/*******************************************************************
- * tape_put_close
- * eventuall flush output buffer and close an open
- * virtual tape output file.
- *******************************************************************/
-static void tape_put_close(running_machine *machine)
-{
-	tape_count = 0;
-}
-
-/*******************************************************************
- * tape_put_bit
- * port FF tape status bit changed. Figure out what to do with it ;-)
- *******************************************************************/
-static void tape_put_bit(running_machine *machine)
-{
-	int now_cycles = activecpu_gettotalcycles();
-	int diff = now_cycles - put_cycles;
-	int limit = 12 * (memory_region(machine, "main")[0x4310] + memory_region(machine, "main")[0x4311]);
-	UINT8 value;
-
-	/* overrun since last write ? */
-	if( diff > 4000 )
-	{
-		/* reset tape output */
-		tape_put_close(machine);
-		put_bit_count = tape_bits = in_sync = 0;
-	}
-	else
-	{
-		/* change within time for a 1 bit ? */
-		if( diff < limit )
-		{
-			tape_bits = (tape_bits << 1) | 1;
-			switch( in_sync )
-			{
-				case 0: 	   /* look for sync AA */
-					if( (tape_bits & 0xffff) == 0xcccc )
-					{
-						popmessage("Tape sync1 written");
-						in_sync = 1;
-					}
-					break;
-				case 1: 	   /* look for sync 66 */
-					if( (tape_bits & 0xffff) == 0x3c3c )
-					{
-						in_sync = 2;
-						popmessage("Tape sync2 written");
-						put_bit_count = 16;
-					}
-					break;
-				case 2: 	   /* count 1 bit */
-					put_bit_count += 1;
-			}
-		}
-		/* no change within time indicates a 0 bit */
-		else
-		{
-			tape_bits <<= 2;
-			switch (in_sync)
-			{
-				case 0: 	   /* look for sync AA */
-					if( (tape_bits & 0xffff) == 0xcccc )
-					{
-						popmessage("Tape sync1 written");
-						in_sync = 1;
-					}
-					break;
-				case 1: 	   /* look for sync 66 */
-					if( (tape_bits & 0xffff) == 0x3c3c )
-					{
-						popmessage("Tape sync2 written");
-						in_sync = 2;
-						put_bit_count = 16;
-					}
-					break;
-				case 2: 	   /* count 2 bits */
-					put_bit_count += 2;
-			}
-		}
-
-		logerror("%4d %4d %d bits %04X\n", diff, limit, in_sync, tape_bits & 0xffff);
-
-		/* collected 8 sync plus 8 data bits ? */
-		if( put_bit_count >= 16 )
-		{
-			/* extract data bits to value */
-			value = 0;
-			if( tape_bits & 0x8000 )
-				value |= 0x80;
-			if( tape_bits & 0x2000 )
-				value |= 0x40;
-			if( tape_bits & 0x0800 )
-				value |= 0x20;
-			if( tape_bits & 0x0200 )
-				value |= 0x10;
-			if( tape_bits & 0x0080 )
-				value |= 0x08;
-			if( tape_bits & 0x0020 )
-				value |= 0x04;
-			if( tape_bits & 0x0008 )
-				value |= 0x02;
-			if( tape_bits & 0x0002 )
-				value |= 0x01;
-			put_bit_count -= 16;
-			tape_bits = 0;
-			tape_put_byte(value);
-		}
-	}
-/* remember the cycle count of this write */
-	put_cycles = now_cycles;
-}
-
-/*******************************************************************
- * tape_get_byte
- * read next byte from input tape image file.
- * the first 32 bytes are faked to be sync header AA.
- *******************************************************************/
-static void tape_get_byte(void)
-{
-	UINT8 value;
-
-	if( tape_get_file )
-	{
-		if( tape_count < 32 )
-		{
-			popmessage("Tape load sync1");
-			value = 0xaa;
-		}
-		else
-		{
-			popmessage("Tape load '%s' $%04X bytes", tape_name, tape_count);
-			mame_fread(tape_get_file, &value, 1);
-		}
-		tape_bits |= 0xaaaa;
-		if( value & 0x80 )
-			tape_bits ^= 0x4000;
-		if( value & 0x40 )
-			tape_bits ^= 0x1000;
-		if( value & 0x20 )
-			tape_bits ^= 0x0400;
-		if( value & 0x10 )
-			tape_bits ^= 0x0100;
-		if( value & 0x08 )
-			tape_bits ^= 0x0040;
-		if( value & 0x04 )
-			tape_bits ^= 0x0010;
-		if( value & 0x02 )
-			tape_bits ^= 0x0004;
-		if( value & 0x01 )
-			tape_bits ^= 0x0001;
-		get_bit_count = 16;
-		tape_count++;
-	}
-}
-
-/*******************************************************************
- * tape_get_open
- * Open a virtual tape image file for input. Look for a special
- * header and skip leading description, if present.
- * The filename is taken from BASIC input buffer at 41E8 ff.
- *******************************************************************/
-static void tape_get_open(running_machine *machine)
-{
-	if( !tape_get_file )
-	{
-		char buffer[sizeof(TAPE_HEADER)];
-		UINT8 *ram = memory_region(machine, "main");
-		char *p;
-
-		sprintf(tape_name, "%-6.6s", ram + 0x41e8);
-		p = strchr(tape_name, ' ');
-		if( p ) *p = '\0';
-		strcat(tape_name, ".cas");
-		if (tape_name[0] != ' ')
-		{
-			logerror("tape_get_open '%s'\n", tape_name);
-			mame_fopen(SEARCHPATH_IMAGE, tape_name, OPEN_FLAG_READ, &tape_get_file);
-		}
-		if( tape_get_file )
-		{
-			popmessage("Tape load '%s'", tape_name);
-			mame_fread(tape_get_file, buffer, sizeof(TAPE_HEADER));
-			if( strncmp(buffer, TAPE_HEADER, sizeof(TAPE_HEADER) - 1) == 0 )
-			{
-				UINT8 data;
-				/* skip data until zero byte */
-				do
-				{
-					mame_fread(tape_get_file, &data, 1);
-				} while( data );
-			}
-			else
-			{
-				/* seek back to start of tape */
-				mame_fseek(tape_get_file, 0, SEEK_SET);
-			}
-		}
-		tape_count = 0;
-	}
-}
-
-static void tape_get_bit(running_machine *machine)
-{
-	int now_cycles = activecpu_gettotalcycles();
-	int limit = 10 * memory_region(machine, "main")[0x4312];
-	int diff = now_cycles - get_cycles;
-
-	/* overrun since last read ? */
-	if( diff >= 4000 )
-	{
-		if( tape_get_file )
-		{
-			mame_fclose(tape_get_file);
-			tape_get_file = NULL;
-			popmessage("Tape file closed");
-		}
-		get_bit_count = tape_bits = tape_time = 0;
-	}
-	else
-	/* check what he will get for input */
-	{
-		/* count down cycles */
-		tape_time -= diff;
-
-		/* time for the next sync or data bit ? */
-		if( tape_time <= 0 )
-		{
-			/* approx time for a bit */
-			tape_time += limit;
-			/* need to read get new data ? */
-			if( --get_bit_count <= 0 )
-			{
-				tape_get_open(machine);
-				tape_get_byte();
-			}
-			/* shift next sync or data bit to bit 16 */
-			tape_bits <<= 1;
-			if( tape_bits & 0x10000 )
-				port_ff ^= 1;
-		}
-	}
-	/* remember the cycle count of this read */
-	get_cycles = now_cycles;
-}
 
 /*************************************
  *
@@ -742,14 +324,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 {
 	int port_ff_changed = port_ff ^ data;
 
-	if( port_ff_changed & FF_CAS )	/* casette port changed ? */
-	{
-		/* virtual tape ? */
-		if( input_port_read(machine, "DSW0") & 0x08 )
-			tape_put_bit(machine);
-		else
-			dac_data_w(0,(data & FF_CAS) ? 127:0 );
-	}
+	cassette_output ( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), data & 0x01 ? -1.0 : 1.0 );
 
 	/* background bits changed ? */
 	if( port_ff_changed & FF_BGD )
@@ -816,14 +391,14 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	port_ff = data;
 }
 
+
 READ8_HANDLER( cgenie_port_ff_r )
 {
-	/* virtual tape ? */
+	UINT8	data = port_ff & ~0x01;
 
-	if( input_port_read(machine, "DSW0") & 0x08 )
-		tape_get_bit(machine);
+	data |= cass_bit;
 
-	return port_ff;
+	return data;
 }
 
 int cgenie_port_xx_r( int offset )

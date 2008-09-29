@@ -20,7 +20,6 @@ READ8_HANDLER ( cgenie_sh_data_port_r );
 
 extern UINT8 *cgenie_fontram;
 
-DEVICE_IMAGE_LOAD( cgenie_cassette );
 DEVICE_IMAGE_LOAD( cgenie_floppy );
 
 extern int cgenie_tv_mode;
