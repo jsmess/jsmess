@@ -32,6 +32,8 @@ NMI
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
+#include "formats/cgen_cas.h"
+
 
 static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -387,6 +389,13 @@ static const ay8910_interface cgenie_ay8910_interface =
 };
 
 
+static const cassette_config cgenie_cassette_config =
+{
+	cgenie_cassette_formats,
+	NULL,
+	CASSETTE_STOPPED
+};
+
 
 static MACHINE_DRIVER_START( cgenie )
 	/* basic machine hardware */
@@ -422,7 +431,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_SOUND_CONFIG(cgenie_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", cgenie_cassette_config )
 MACHINE_DRIVER_END
 
 /***************************************************************************

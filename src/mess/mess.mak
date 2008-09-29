@@ -679,6 +679,7 @@ $(MESSOBJ)/cgenie.a:   \
 	$(MESS_VIDEO)/cgenie.o	 \
 	$(MESS_AUDIO)/cgenie.o	 \
 	$(MESS_MACHINE)/cgenie.o	 \
+	$(MESS_FORMATS)/cgen_cas.o
 
 $(MESSOBJ)/pdp1.a:	   \
 	$(MESS_VIDEO)/pdp1.o	\
