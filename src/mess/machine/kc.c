@@ -154,14 +154,14 @@ static void kc85_disc_hw_ctc_interrupt(int state)
 }
 #endif
 
-READ8_HANDLER(kc85_disk_hw_ctc_r)
+READ8_DEVICE_HANDLER(kc85_disk_hw_ctc_r)
 {
-	return z80ctc_1_r(machine, offset);
+	return z80ctc_r(device, offset);
 }
 
-WRITE8_HANDLER(kc85_disk_hw_ctc_w)
+WRITE8_DEVICE_HANDLER(kc85_disk_hw_ctc_w)
 {
-	z80ctc_1_w(machine, offset, data);
+	z80ctc_w(device, offset, data);
 }
 
 WRITE8_HANDLER(kc85_disc_interface_ram_w)
@@ -241,9 +241,6 @@ static void kc_disc_interface_init(running_machine *machine)
 	timer_set(attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
 
 	nec765_init(machine, &kc_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
-
-	/* reset ctc */
-	z80ctc_reset(1);
 
 	/* hold cpu at reset */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
@@ -1710,31 +1707,31 @@ WRITE8_HANDLER ( kc85_pio_control_w )
 }
 
 
- READ8_HANDLER ( kc85_ctc_r )
+ READ8_DEVICE_HANDLER ( kc85_ctc_r )
 {
 	unsigned char data;
 
-	data = z80ctc_0_r(machine, offset);
+	data = z80ctc_r(device, offset);
 	//LOG_KBD(("ctc data r:%02x\n",data));
 	return data;
 }
 
-WRITE8_HANDLER ( kc85_ctc_w )
+WRITE8_DEVICE_HANDLER ( kc85_ctc_w )
 {
 	//logerror("ctc data w:%02x\n",data);
 
-	z80ctc_0_w(machine, offset,data);
+	z80ctc_w(device, offset,data);
 }
 
 
-static void kc85_pio_interrupt(running_machine *machine, int state)
+static void kc85_pio_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, 0, state);
 }
 
-static void kc85_ctc_interrupt(running_machine *machine, int state)
+static void kc85_ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 0, 1, state);
+	cpunum_set_input_line(device->machine, 0, 1, state);
 }
 
 /* callback for ardy output from PIO */
@@ -1772,29 +1769,25 @@ const z80pio_interface kc85_pio_intf =
 	kc85_pio_brdy_callback	/* portB ready active callback */
 };
 
-static void kc85_z80pio_reset(int which)
-{
-	z80pio_reset(kc85_z80pio);
-}
 
 /* pio is last in chain and therefore has highest priority */
 
-const struct z80_irq_daisy_chain kc85_daisy_chain[] =
+const z80_daisy_chain kc85_daisy_chain[] =
 {
-	{kc85_z80pio_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
-	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
-	{0,0,0,0,-1}
+	{ Z80PIO, "z80pio" },
+	{ Z80CTC, "z80ctc" },
+	{ NULL }
 };
 
 /* used in cassette write -> K0 */
-static WRITE8_HANDLER(kc85_zc0_callback)
+static WRITE8_DEVICE_HANDLER(kc85_zc0_callback)
 {
 
 
 }
 
 /* used in cassette write -> K1 */
-static WRITE8_HANDLER(kc85_zc1_callback)
+static WRITE8_DEVICE_HANDLER(kc85_zc1_callback)
 {
 
 }
@@ -1802,12 +1795,14 @@ static WRITE8_HANDLER(kc85_zc1_callback)
 
 static TIMER_CALLBACK(kc85_15khz_timer_callback)
 {
+	const device_config *device = ptr;
+
 	/* toggle state of square wave */
 	kc85_15khz_state^=1;
 
 	/* set clock input for channel 2 and 3 to ctc */
-	z80ctc_0_trg0_w(machine, 0,kc85_15khz_state);
-	z80ctc_0_trg1_w(machine, 0,kc85_15khz_state);
+	z80ctc_trg0_w(device, 0,kc85_15khz_state);
+	z80ctc_trg1_w(device, 0,kc85_15khz_state);
 
 	kc85_15khz_count++;
 
@@ -1819,25 +1814,26 @@ static TIMER_CALLBACK(kc85_15khz_timer_callback)
 		kc85_50hz_state^=1;
 
 		/* set clock input for channel 2 and 3 to ctc */
-		z80ctc_0_trg2_w(machine, 0, kc85_50hz_state);
-		z80ctc_0_trg3_w(machine, 0, kc85_50hz_state);
+		z80ctc_trg2_w(device, 0, kc85_50hz_state);
+		z80ctc_trg3_w(device, 0, kc85_50hz_state);
 	}
 }
 
 /* video blink */
-static WRITE8_HANDLER(kc85_zc2_callback)
+static WRITE8_DEVICE_HANDLER(kc85_zc2_callback)
 {
 	/* is blink enabled? */
 	if (kc85_pio_data[1] & (1<<7))
 	{
 		/* yes */
 		/* toggle state of blink to video hardware */
-		kc85_video_set_blink_state(machine, data);
+		kc85_video_set_blink_state(device->machine, data);
 	}
 }
 
-static z80ctc_interface	kc85_ctc_intf =
+const z80ctc_interface	kc85_ctc_intf =
 {
+	"main",
 	1379310.344828,
 	0,
     kc85_ctc_interrupt,
@@ -1848,10 +1844,6 @@ static z80ctc_interface	kc85_ctc_intf =
 
 static void	kc85_common_init(running_machine *machine)
 {
-	z80ctc_init(0, &kc85_ctc_intf);
-
-	z80ctc_reset(0);
-
 	kc_cassette_init();
 	kc_keyboard_init(machine);
 
@@ -1862,7 +1854,7 @@ static void	kc85_common_init(running_machine *machine)
 	kc85_50hz_state = 0;
 	kc85_15khz_state = 0;
 	kc85_15khz_count = 0;
-	timer_pulse(ATTOTIME_IN_HZ(15625), NULL, 0, kc85_15khz_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(15625), (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, kc85_15khz_timer_callback);
 	timer_set(attotime_zero, NULL, 0, kc85_reset_timer_callback);
 	kc85_module_system_init();
 }

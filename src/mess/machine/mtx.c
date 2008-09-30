@@ -50,7 +50,7 @@ static char mtx_prt_data = 0;
 
 static void mtx_tms9929a_interrupt(running_machine *machine, int data)
 {
-	z80ctc_0_trg0_w(machine, 0, data ? 0 : 1);
+	z80ctc_trg0_w( device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, data ? 0 : 1);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -208,26 +208,27 @@ READ8_HANDLER( mtx_key_hi_r )
  *
  *************************************/
 
-static void mtx_ctc_interrupt(running_machine *machine, int state)
+static void mtx_ctc_interrupt(const device_config *device, int state)
 {
 //  logerror("mtx_ctc_interrupt: %02x\n", state);
-	cpunum_set_input_line(machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, 0, state);
 }
 
-READ8_HANDLER( mtx_ctc_r )
+READ8_DEVICE_HANDLER( mtx_ctc_r )
 {
-	return z80ctc_0_r(machine, offset);
+	return z80ctc_r(device, offset);
 }
 
-WRITE8_HANDLER( mtx_ctc_w )
+WRITE8_DEVICE_HANDLER( mtx_ctc_w )
 {
 //  logerror("mtx_ctc_w: %02x\n", data);
 	if (offset < 3)
-		z80ctc_0_w(machine, offset,data);
+		z80ctc_w(device, offset,data);
 }
 
-static z80ctc_interface mtx_ctc_intf =
+const z80ctc_interface mtx_ctc_intf =
 {
+	"main",
 	MTX_SYSTEM_CLOCK,
 	0,
 	mtx_ctc_interrupt,
@@ -244,28 +245,29 @@ static z80ctc_interface mtx_ctc_intf =
  *
  *************************************/
 
-READ8_HANDLER( mtx_dart_data_r )
+READ8_DEVICE_HANDLER( mtx_dart_data_r )
 {
-	return z80dart_d_r(0, offset);
+	return z80dart_d_r(device, offset);
 }
 
-READ8_HANDLER( mtx_dart_control_r )
+READ8_DEVICE_HANDLER( mtx_dart_control_r )
 {
-	return z80dart_c_r(0, offset);
+	return z80dart_c_r(device, offset);
 }
 
-WRITE8_HANDLER( mtx_dart_data_w )
+WRITE8_DEVICE_HANDLER( mtx_dart_data_w )
 {
-	z80dart_d_w(0, offset, data);
+	z80dart_d_w(device, offset, data);
 }
 
-WRITE8_HANDLER( mtx_dart_control_w )
+WRITE8_DEVICE_HANDLER( mtx_dart_control_w )
 {
-	z80dart_c_w(machine, 0, offset, data);
+	z80dart_c_w(device, offset, data);
 }
 
-static const z80dart_interface mtx_dart_intf =
+const z80dart_interface mtx_dart_intf =
 {
+		"main",
 		MTX_SYSTEM_CLOCK,
 		NULL,
 		NULL,
@@ -348,23 +350,17 @@ DRIVER_INIT( mtx512 )
 
 	/* setup tms9928a */
 	TMS9928A_configure(&tms9928a_interface);
-
-	/* setup ctc */
-	z80ctc_init(0, &mtx_ctc_intf);
 }
 
 DRIVER_INIT( rs128 )
 {
 	DRIVER_INIT_CALL(mtx512);
 
-	z80dart_init(0, &mtx_dart_intf);
-
 	/* install handlers for dart interface */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0c, 0x0d, 0, 0, mtx_dart_data_r, mtx_dart_data_w);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0f, 0, 0, mtx_dart_control_r, mtx_dart_control_w);
+	memory_install_readwrite8_device_handler(device_list_find_by_tag(machine->config->devicelist, Z80DART, "z80dart"), 0, ADDRESS_SPACE_IO, 0x0c, 0x0d, 0, 0, mtx_dart_data_r, mtx_dart_data_w);
+	memory_install_readwrite8_device_handler(device_list_find_by_tag(machine->config->devicelist, Z80DART, "z80dart"), 0, ADDRESS_SPACE_IO, 0x0e, 0x0f, 0, 0, mtx_dart_control_r, mtx_dart_control_w);
 }
 
 MACHINE_RESET( rs128 )
 {
-	z80dart_reset(0);
 }

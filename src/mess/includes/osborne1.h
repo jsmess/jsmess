@@ -10,8 +10,6 @@
 
 /*----------- defined in machine/osborne1.c -----------*/
 
-extern const struct z80_irq_daisy_chain osborne1_daisy_chain[];
-
 WRITE8_HANDLER( osborne1_0000_w );
 WRITE8_HANDLER( osborne1_1000_w );
 READ8_HANDLER( osborne1_2000_r );
@@ -27,5 +25,8 @@ DRIVER_INIT( osborne1 );
 MACHINE_START( osborne1 );
 MACHINE_RESET( osborne1 );
 
+/* Osborne1 specific daisy chain interface */
+#define OSBORNE1_DAISY	DEVICE_GET_INFO_NAME( osborne1_daisy )
+DEVICE_GET_INFO( osborne1_daisy );
 
 #endif /* OSBORNE1_H_ */

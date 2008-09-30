@@ -280,9 +280,9 @@ static PALETTE_INIT( mbeeic )
 }
 
 
-static void pio_interrupt(running_machine *machine, int state)
+static void pio_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(device->machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const z80pio_interface mbee_z80pio_intf =

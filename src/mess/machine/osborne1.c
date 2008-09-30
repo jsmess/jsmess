@@ -27,7 +27,9 @@ be written to RAM if RAM was switched in.
 
 #define RAMMODE		(0x01)
 
-static struct osborne1 {
+
+static struct osborne1
+{
 	UINT8	bank2_enabled;
 	UINT8	bank3_enabled;
 	UINT8	*bank4_ptr;
@@ -49,40 +51,40 @@ static struct osborne1 {
 	UINT8	beep;
 } osborne1;
 
-/* Prototypes */
-static void osborne1_z80_reset(int);
-static int osborne1_z80_irq_state(int);
-static int osborne1_z80_irq_ack(int);
-static void osborne1_z80_irq_reti(int);
 
-const struct z80_irq_daisy_chain osborne1_daisy_chain[] = {
-	{ osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 },
-	{ NULL, NULL, NULL, NULL, -1 }
-};
-
-
-WRITE8_HANDLER( osborne1_0000_w ) {
+WRITE8_HANDLER( osborne1_0000_w )
+{
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) ) {
+	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
+	{
 		mess_ram[ offset ] = data;
 	}
 }
 
-WRITE8_HANDLER( osborne1_1000_w ) {
+
+WRITE8_HANDLER( osborne1_1000_w )
+{
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) ) {
+	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
+	{
 		mess_ram[ 0x1000 + offset ] = data;
 	}
 }
 
-READ8_HANDLER( osborne1_2000_r ) {
+
+READ8_HANDLER( osborne1_2000_r )
+{
 	UINT8	data = 0xFF;
 
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled ) {
+	if ( ! osborne1.bank2_enabled )
+	{
 		data = mess_ram[ 0x2000 + offset ];
-	} else {
-		switch( offset & 0x0F00 ) {
+	}
+	else
+	{
+		switch( offset & 0x0F00 )
+		{
 		case 0x100:	/* Floppy */
 			data = wd17xx_r( machine, offset );
 			break;
@@ -117,16 +119,23 @@ READ8_HANDLER( osborne1_2000_r ) {
 	return data;
 }
 
-WRITE8_HANDLER( osborne1_2000_w ) {
+
+WRITE8_HANDLER( osborne1_2000_w )
+{
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled ) {
+	if ( ! osborne1.bank2_enabled )
+	{
 		mess_ram[ 0x2000 + offset ] = data;
-	} else {
-		if ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) {
+	}
+	else
+	{
+		if ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE )
+		{
 			mess_ram[ 0x2000 + offset ] = data;
 		}
 		/* Handle writes to the I/O area */
-		switch( offset & 0x0F00 ) {
+		switch( offset & 0x0F00 )
+		{
 		case 0x100:	/* Floppy */
 			wd17xx_w( machine, offset, data );
 			break;
@@ -142,23 +151,32 @@ WRITE8_HANDLER( osborne1_2000_w ) {
 	}
 }
 
-WRITE8_HANDLER( osborne1_3000_w ) {
+
+WRITE8_HANDLER( osborne1_3000_w )
+{
 	/* Check whether regular RAM is enabled */
-	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) ) {
+	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
+	{
 		mess_ram[ 0x3000 + offset ] = data;
 	}
 }
 
-WRITE8_HANDLER( osborne1_videoram_w ) {
+
+WRITE8_HANDLER( osborne1_videoram_w )
+{
 	/* Check whether the video attribute section is enabled */
-	if ( osborne1.bank3_enabled ) {
+	if ( osborne1.bank3_enabled )
+	{
 		data |= 0x7F;
 	}
 	osborne1.bank4_ptr[offset] = data;
 }
 
-WRITE8_HANDLER( osborne1_bankswitch_w ) {
-	switch( offset ) {
+
+WRITE8_HANDLER( osborne1_bankswitch_w )
+{
+	switch( offset )
+	{
 	case 0x00:
 		osborne1.bank2_enabled = 1;
 		osborne1.bank3_enabled = 0;
@@ -176,11 +194,14 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 		osborne1.bank3_enabled = 0;
 		break;
 	}
-	if ( osborne1.bank2_enabled ) {
+	if ( osborne1.bank2_enabled )
+	{
 		memory_set_bankptr( 1, memory_region(machine, "main") );
 		memory_set_bankptr( 2, osborne1.empty_4K );
 		memory_set_bankptr( 3, osborne1.empty_4K );
-	} else {
+	}
+	else
+	{
 		memory_set_bankptr( 1, mess_ram );
 		memory_set_bankptr( 2, mess_ram + 0x1000 );
 		memory_set_bankptr( 3, mess_ram + 0x3000 );
@@ -191,9 +212,13 @@ WRITE8_HANDLER( osborne1_bankswitch_w ) {
 	osborne1.in_irq_handler = 0;
 }
 
-static OPBASE_HANDLER( osborne1_opbase ) {
-	if ( ( address & 0xF000 ) == 0x2000 ) {
-		if ( ! osborne1.bank2_enabled ) {
+
+static OPBASE_HANDLER( osborne1_opbase )
+{
+	if ( ( address & 0xF000 ) == 0x2000 )
+	{
+		if ( ! osborne1.bank2_enabled )
+		{
 			opbase->mask = 0x0fff;
 			opbase->ram = mess_ram + 0x2000;
 			opbase->rom = mess_ram + 0x2000;
@@ -205,43 +230,31 @@ static OPBASE_HANDLER( osborne1_opbase ) {
 	return address;
 }
 
-static void osborne1_z80_reset(int param) {
-	osborne1.pia_1_irq_state = 0;
-	osborne1.in_irq_handler = 0;
-}
 
-static int osborne1_z80_irq_state(int param) {
-	return ( osborne1.pia_1_irq_state ? Z80_DAISY_INT : 0 );
-}
-
-static int osborne1_z80_irq_ack(int param) {
-	/* Enable ROM and I/O when IRQ is acknowledged */
-	UINT8	old_bankswitch = osborne1.bankswitch;
-	osborne1_bankswitch_w( Machine, 0, 0 );
-	osborne1.bankswitch = old_bankswitch;
-	osborne1.in_irq_handler = 1;
-	return 0xF8;
-}
-
-static void osborne1_z80_irq_reti(int param) {
-}
-
-static void osborne1_update_irq_state(running_machine *machine) {
+static void osborne1_update_irq_state(running_machine *machine)
+{
 	//logerror("Changing irq state; pia_0_irq_state = %s, pia_1_irq_state = %s\n", osborne1.pia_0_irq_state ? "SET" : "CLEARED", osborne1.pia_1_irq_state ? "SET" : "CLEARED" );
 
-	if ( osborne1.pia_1_irq_state ) {
+	if ( osborne1.pia_1_irq_state )
+	{
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE );
-	} else {
+	}
+	else
+	{
 		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE );
 	}
 }
 
-static void ieee_pia_irq_a_func(running_machine *machine, int state) {
+
+static void ieee_pia_irq_a_func(running_machine *machine, int state)
+{
 	osborne1.pia_0_irq_state = state;
 	osborne1_update_irq_state(machine);
 }
 
-static const pia6821_interface osborne1_ieee_pia_config = {
+
+static const pia6821_interface osborne1_ieee_pia_config =
+{
 	NULL,	/* in_a_func */
 	NULL,	/* in_b_func */
 	NULL,	/* in_ca1_func */
@@ -256,33 +269,46 @@ static const pia6821_interface osborne1_ieee_pia_config = {
 	NULL	/* irq_b_func */
 };
 
-static WRITE8_HANDLER( video_pia_out_cb2_dummy ) {
+
+static WRITE8_HANDLER( video_pia_out_cb2_dummy )
+{
 }
 
-static WRITE8_HANDLER( video_pia_port_a_w ) {
+
+static WRITE8_HANDLER( video_pia_port_a_w )
+{
 	osborne1.new_start_x = data >> 1;
 	wd17xx_set_density( ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
 
 	//logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "DEN_FM_LO" : "DEN_FM_HI" );
 }
 
-static WRITE8_HANDLER( video_pia_port_b_w ) {
+
+static WRITE8_HANDLER( video_pia_port_b_w )
+{
 	osborne1.new_start_y = data & 0x1F;
 	osborne1.beep = ( data & 0x20 ) ? 1 : 0;
-	if ( data & 0x40 ) {
+	if ( data & 0x40 )
+	{
 		wd17xx_set_drive( 0 );
-	} else if ( data & 0x80 ) {
+	}
+	else if ( data & 0x80 )
+	{
 		wd17xx_set_drive( 1 );
 	}
 	//logerror("Video pia port b write: %02X\n", data );
 }
 
-static void video_pia_irq_a_func(running_machine *machine, int state) {
+
+static void video_pia_irq_a_func(running_machine *machine, int state)
+{
 	osborne1.pia_1_irq_state = state;
 	osborne1_update_irq_state(machine);
 }
 
-static const pia6821_interface osborne1_video_pia_config = {
+
+static const pia6821_interface osborne1_video_pia_config =
+{
 	NULL,	/* in_a_func */
 	NULL,	/* in_b_func */
 	NULL,	/* in_ca1_func */
@@ -297,7 +323,9 @@ static const pia6821_interface osborne1_video_pia_config = {
 	NULL	/* irq_b_func */
 };
 
-//static const struct aica6850_interface osborne1_6850_config = {
+
+//static const struct aica6850_interface osborne1_6850_config =
+//{
 //	10,	/* tx_clock */
 //	10,	/* rx_clock */
 //	NULL,	/* rx_pin */
@@ -308,52 +336,64 @@ static const pia6821_interface osborne1_video_pia_config = {
 //	NULL	/* int_callback */
 //};
 
-static TIMER_CALLBACK(osborne1_video_callback) {
+
+static TIMER_CALLBACK(osborne1_video_callback)
+{
 	int y = video_screen_get_vpos(machine->primary_screen);
 
 	/* Check for start of frame */
-	if ( y == 0 ) {
+	if ( y == 0 )
+	{
 		/* Clear CA1 on video PIA */
 		osborne1.start_y = ( osborne1.new_start_y - 1 ) & 0x1F;
 		osborne1.charline = 0;
 		pia_1_ca1_w( machine, 0, 0 );
 	}
-	if ( y == 240 ) {
+	if ( y == 240 )
+	{
 		/* Set CA1 on video PIA */
 		pia_1_ca1_w( machine, 0, 0xFF );
 	}
-	if ( y < 240 ) {
+	if ( y < 240 )
+	{
 		/* Draw a line of the display */
 		UINT16 address = osborne1.start_y * 128 + osborne1.new_start_x + 11;
 		UINT16 *p = BITMAP_ADDR16( tmpbitmap, y, 0 );
 		int x;
 
-		for ( x = 0; x < 52; x++ ) {
+		for ( x = 0; x < 52; x++ )
+		{
 			UINT8	character = mess_ram[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
 			UINT8	cursor = character & 0x80;
 			UINT8	dim = mess_ram[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
 			UINT8	bits = osborne1.charrom[ osborne1.charline * 128 + ( character & 0x7F ) ];
 			int		bit;
 
-			if ( cursor && osborne1.charline == 9 ) {
+			if ( cursor && osborne1.charline == 9 )
+			{
 				bits = 0xFF;
 			}
-			for ( bit = 0; bit < 8; bit++ ) {
+			for ( bit = 0; bit < 8; bit++ )
+			{
 				p[x * 8 + bit] = ( bits & 0x80 ) ? ( dim ? 1 : 2 ) : 0;
 				bits = bits << 1;
 			}
 		}
 
 		osborne1.charline += 1;
-		if ( osborne1.charline == 10 ) {
+		if ( osborne1.charline == 10 )
+		{
 			osborne1.start_y += 1;
 			osborne1.charline = 0;
 		}
 	}
 
-	if ( ( y % 10 ) == 2 || ( y % 10 ) == 6 ) {
+	if ( ( y % 10 ) == 2 || ( y % 10 ) == 6 )
+	{
 		beep_set_state( 0, osborne1.beep );
-	} else {
+	}
+	else
+	{
 		beep_set_state( 0, 0 );
 	}
 
@@ -369,13 +409,16 @@ static TIMER_CALLBACK(osborne1_video_callback) {
  * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
  *
  */
-DEVICE_IMAGE_LOAD( osborne1_floppy ) {
+DEVICE_IMAGE_LOAD( osborne1_floppy )
+{
 	int size, sectors, sectorsize;
 
-	if ( ! image_has_been_created( image ) ) {
+	if ( ! image_has_been_created( image ) )
+	{
 		size = image_length( image );
 
-		switch( size ) {
+		switch( size )
+		{
 		case 40 * 10 * 256:
 			sectors = 10;
 			sectorsize = 256;
@@ -404,11 +447,14 @@ DEVICE_IMAGE_LOAD( osborne1_floppy ) {
 		default:
 			return INIT_FAIL;
 		}
-	} else {
+	}
+	else
+	{
 		return INIT_FAIL;
 	}
 
-	if ( device_load_basicdsk_floppy( image ) != INIT_PASS ) {
+	if ( device_load_basicdsk_floppy( image ) != INIT_PASS )
+	{
 		return INIT_FAIL;
 	}
 
@@ -417,10 +463,13 @@ DEVICE_IMAGE_LOAD( osborne1_floppy ) {
 	return INIT_PASS;
 }
 
-static TIMER_CALLBACK( setup_beep ) {
+
+static TIMER_CALLBACK( setup_beep )
+{
 	beep_set_state( 0, 0 );
 	beep_set_frequency( 0, 300 /* 60 * 240 / 2 */ );
 }
+
 
 MACHINE_START( osborne1 )
 {
@@ -428,12 +477,17 @@ MACHINE_START( osborne1 )
 	wd17xx_init( machine, WD_TYPE_MB8877, NULL, NULL );
 }	
 
-MACHINE_RESET( osborne1 ) {
+
+MACHINE_RESET( osborne1 )
+{
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( machine, 0x00, 0 );
 
 	osborne1.pia_0_irq_state = FALSE;
 	osborne1.pia_1_irq_state = FALSE;
+
+	osborne1.pia_1_irq_state = 0;
+	osborne1.in_irq_handler = 0;
 
 	osborne1.charrom = memory_region( machine, "gfx1" );
 
@@ -448,7 +502,9 @@ MACHINE_RESET( osborne1 ) {
 	memory_set_opbase_handler( 0, osborne1_opbase );
 }
 
-DRIVER_INIT( osborne1 ) {
+
+DRIVER_INIT( osborne1 )
+{
 	memset( &osborne1, 0, sizeof( osborne1 ) );
 
 	osborne1.empty_4K = auto_malloc( 0x1000 );
@@ -460,5 +516,75 @@ DRIVER_INIT( osborne1 ) {
 
 	/* Configure the 6850 ACIA */
 //	acia6850_config( 0, &osborne1_6850_config );
+}
+
+
+/****************************************************************
+	Osborne1 specific daisy chain code
+****************************************************************/
+
+
+static int osborne1_daisy_irq_state(const device_config *device)
+{
+    return ( osborne1.pia_1_irq_state ? Z80_DAISY_INT : 0 );
+}
+
+
+static int osborne1_daisy_irq_ack(const device_config *device)
+{
+    /* Enable ROM and I/O when IRQ is acknowledged */
+    UINT8	old_bankswitch = osborne1.bankswitch;
+    osborne1_bankswitch_w( Machine, 0, 0 );
+    osborne1.bankswitch = old_bankswitch;
+    osborne1.in_irq_handler = 1;
+    return 0xF8;
+}
+
+static void osborne1_daisy_irq_reti(const device_config *device)
+{
+}
+
+
+static DEVICE_START( osborne1_daisy )
+{
+	return DEVICE_START_OK;
+}
+
+
+static DEVICE_RESET( osborne1_daisy )
+{
+}
+
+
+static DEVICE_SET_INFO( osborne1_daisy )
+{
+}
+
+
+DEVICE_GET_INFO( osborne1_daisy )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;						break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(osborne1_daisy);	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(osborne1_daisy);		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */											break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(osborne1_daisy);		break;
+		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)osborne1_daisy_irq_state;				break;
+		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)osborne1_daisy_irq_ack;				break;
+		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)osborne1_daisy_irq_reti;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Osborne1 daisy";								break;
+		case DEVINFO_STR_FAMILY:						info->s = "Z80";										break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";										break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;										break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team";					break;
+	}
 }
 

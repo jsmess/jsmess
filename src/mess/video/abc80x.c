@@ -455,7 +455,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
 {
-	z80dart_set_ri(0, vsync);
+	z80dart_set_ri(device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart"), vsync);
 }
 
 static MC6845_UPDATE_ROW( abc800c_update_row )
@@ -555,7 +555,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
 static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
 {
-	z80dart_set_ri(0, vsync);
+	z80dart_set_ri(device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart"), vsync);
 }
 
 static MC6845_UPDATE_ROW( abc806_update_row )
@@ -637,7 +637,7 @@ static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
 		abc806_v50_addr = 0;
 	}
 
-	z80dart_set_ri(0, vsync);
+	z80dart_set_ri(device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart"), vsync);
 }
 
 /* MC6845 Interfaces */

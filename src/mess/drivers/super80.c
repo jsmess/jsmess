@@ -342,10 +342,11 @@ static VIDEO_UPDATE( super80v )
 
 /**************************** PIO ******************************************************************************/
 
-static void pio_interrupt(running_machine *machine, int state)
+static void pio_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line( machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line( device->machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE );
 }
+
 
 static const z80pio_interface pio_intf =
 {
@@ -359,30 +360,10 @@ static const z80pio_interface pio_intf =
 };
 
 
-static void super80_z80pio_reset(int which)
+static const z80_daisy_chain super80_daisy_chain[] =
 {
-	z80pio_reset( super80_z80pio );
-}
-
-static int super80_z80pio_irq_state(int which)
-{
-	return z80pio_irq_state( super80_z80pio );
-}
-
-static int super80_z80pio_irq_ack(int which)
-{
-	return z80pio_irq_ack( super80_z80pio );
-}
-
-static void super80_z80pio_irq_reti(int which)
-{
-	z80pio_irq_reti( super80_z80pio );
-}
-
-static const struct z80_irq_daisy_chain super80_daisy_chain[] =
-{
-	{ super80_z80pio_reset, super80_z80pio_irq_state, super80_z80pio_irq_ack, super80_z80pio_irq_reti, 0 },
-	{ 0, 0, 0, 0, -1}      /* end mark */
+	{ Z80PIO, "z80pio" },
+	{ NULL }
 };
 
 /**************************** CASSETTE ROUTINES *****************************************************************/

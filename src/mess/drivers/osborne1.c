@@ -40,7 +40,9 @@ TODO:
 #include "cpu/z80/z80daisy.h"
 #include "includes/osborne1.h"
 
+
 #define MAIN_CLOCK	15974400
+
 
 static ADDRESS_MAP_START( osborne1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x0FFF ) AM_READWRITE( SMH_BANK1, osborne1_0000_w )
@@ -51,11 +53,13 @@ static ADDRESS_MAP_START( osborne1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xF000, 0xFFFF ) AM_READWRITE( SMH_BANK4, osborne1_videoram_w )
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( osborne1_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_WRITE( osborne1_bankswitch_w )
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( osborne1 )
 	PORT_START("ROW0")
@@ -141,11 +145,22 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static PALETTE_INIT( osborne1 ) {
+
+static PALETTE_INIT( osborne1 )
+{
 	palette_set_color_rgb( machine, 0, 0, 0, 0 );	/* Black */
 	palette_set_color_rgb( machine, 1, 0, 255, 0 );	/* Full */
 	palette_set_color_rgb( machine, 2, 0, 128, 0 );	/* Dimmed */
 }
+
+
+static const z80_daisy_chain osborne1_daisy_chain[] =
+{
+/*	{ osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
+	{ OSBORNE1_DAISY, "osborne1_daisy" },
+	{ NULL }
+};
+
 
 static MACHINE_DRIVER_START( osborne1 )
 	MDRV_CPU_ADD( "main", Z80, MAIN_CLOCK/4 )
@@ -155,6 +170,8 @@ static MACHINE_DRIVER_START( osborne1 )
 
 	MDRV_MACHINE_START( osborne1 )
 	MDRV_MACHINE_RESET( osborne1 )
+
+	MDRV_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
@@ -168,6 +185,7 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_DRIVER_END
+
 
 ROM_START( osborne1 )
 	ROM_REGION(0x1000, "main", 0)
@@ -189,8 +207,11 @@ ROM_START( osborne1 )
 	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-static void osborne1_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info ) {
-	switch( state ) {
+
+static void osborne1_floppy_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
+{
+	switch( state )
+	{
 	case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
 	case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(osborne1_floppy); break;
 	case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "img" ); break;
@@ -198,10 +219,12 @@ static void osborne1_floppy_getinfo( const mess_device_class *devclass, UINT32 s
 	}
 }
 
+
 static SYSTEM_CONFIG_START( osborne1 )
 	CONFIG_DEVICE( osborne1_floppy_getinfo )
 	CONFIG_RAM_DEFAULT( 68 * 1024 )		/* 64KB Main RAM and 4Kbit video attribute RAM */
 SYSTEM_CONFIG_END
+
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME        FLAGS */
 COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1,   osborne1,   osborne1,   "Osborne",  "Osborne-1",    0 )

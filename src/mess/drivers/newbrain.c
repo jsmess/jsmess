@@ -903,7 +903,7 @@ static ADDRESS_MAP_START( newbrain_ei_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x17, 0x17) AM_MIRROR(0xff00) AM_READWRITE(ei_usbs_r, ei_usbs_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(ei_paging_w)
 ADDRESS_MAP_END
 
@@ -922,7 +922,7 @@ static ADDRESS_MAP_START( newbrain_m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xffc0) AM_READ(ust2_r)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newbrain_a_io_map, ADDRESS_SPACE_IO, 8 )
@@ -951,7 +951,7 @@ static ADDRESS_MAP_START( newbrain_v_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xffc2) AM_READ(user_r)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newbrain_cop_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1118,6 +1118,7 @@ static const struct nec765_interface newbrain_nec765_interface =
 
 static z80ctc_interface newbrain_ctc_intf =
 {
+	"main",					/* cpu */
 	1,						/* clock */
 	0,              		/* timer disables */
 	NULL,			  		/* interrupt handler */
@@ -1173,7 +1174,6 @@ static MACHINE_START( newbrain )
 
 	nec765_init(machine, &newbrain_nec765_interface, NEC765A, NEC765_RDY_PIN_NOT_CONNECTED);
 	acia6850_config(0, &newbrain_acia_intf);
-	z80ctc_init(0, &newbrain_ctc_intf);
 
 	/* allocate reset timer */
 	
@@ -1259,6 +1259,8 @@ static MACHINE_DRIVER_START( newbrain )
 
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
+
+	MDRV_Z80CTC_ADD( "z80ctc", newbrain_ctc_intf )
 
 	// A/D converter
 

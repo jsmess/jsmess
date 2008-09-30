@@ -8,6 +8,8 @@
 #define MTX_H_
 
 #include "devices/snapquik.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
 
 
 #define MTX_SYSTEM_CLOCK   XTAL_4MHz
@@ -43,14 +45,16 @@ READ8_HANDLER( mtx_key_lo_r );
 READ8_HANDLER( mtx_key_hi_r );
 
 /* Z80 CTC */
-READ8_HANDLER( mtx_ctc_r );
-WRITE8_HANDLER( mtx_ctc_w );
+extern const z80ctc_interface mtx_ctc_intf;
+READ8_DEVICE_HANDLER( mtx_ctc_r );
+WRITE8_DEVICE_HANDLER( mtx_ctc_w );
 
 /* Z80 Dart */
-READ8_HANDLER( mtx_dart_data_r );
-READ8_HANDLER( mtx_dart_control_r );
-WRITE8_HANDLER( mtx_dart_data_w );
-WRITE8_HANDLER( mtx_dart_control_w );
+extern const z80dart_interface mtx_dart_intf;
+READ8_DEVICE_HANDLER( mtx_dart_data_r );
+READ8_DEVICE_HANDLER( mtx_dart_control_r );
+WRITE8_DEVICE_HANDLER( mtx_dart_data_w );
+WRITE8_DEVICE_HANDLER( mtx_dart_control_w );
 
 
 #endif /*MTX_H_*/

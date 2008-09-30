@@ -58,7 +58,7 @@ static READ8_HANDLER(kc85_4_port_r)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(machine, port-0x08c);
+			return kc85_ctc_r(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), port-0x08c);
 
 	}
 
@@ -102,7 +102,7 @@ static WRITE8_HANDLER(kc85_4_port_w)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(machine, port-0x08c, data);
+			kc85_ctc_w(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), port-0x08c, data);
 			return;
 	}
 
@@ -154,7 +154,7 @@ static READ8_HANDLER(kc85_3_port_r)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(machine, port-0x08c);
+			return kc85_ctc_r(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), port-0x08c);
 	}
 
 	logerror("unhandled port r: %04x\n",offset);
@@ -187,7 +187,7 @@ static WRITE8_HANDLER(kc85_3_port_w)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(machine, port-0x08c, data);
+			kc85_ctc_w(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), port-0x08c, data);
 			return;
 	}
 
@@ -317,13 +317,15 @@ static ADDRESS_MAP_START(kc85_disc_hw_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0f4, 0x0f5) AM_READ(kc85_disc_hw_input_gate_r)
 	/*{0x0f6, 0x0f7, SMH_NOP},*/		/* for controller */
 	AM_RANGE(0x0f8, 0x0f9) AM_WRITE( kc85_disc_hw_terminal_count_w) /* terminal count */
-	AM_RANGE(0x0fc, 0x0ff) AM_READWRITE(kc85_disk_hw_ctc_r, kc85_disk_hw_ctc_w)
+	AM_RANGE(0x0fc, 0x0ff) AM_DEVREADWRITE(Z80CTC, "z80ctc_1", kc85_disk_hw_ctc_r, kc85_disk_hw_ctc_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_ADD("disc", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
+
+//	MDRV_Z80CTC_ADD( "z80ctc_1", kc85_disc_ctc_intf )
 MACHINE_DRIVER_END
 
 
@@ -339,6 +341,7 @@ static MACHINE_DRIVER_START( kc85_3 )
 	MDRV_MACHINE_RESET( kc85_3 )
 
 	MDRV_Z80PIO_ADD( "z80pio", kc85_pio_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", kc85_ctc_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

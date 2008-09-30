@@ -367,7 +367,7 @@ INPUT_PORTS_END
 
 /* Z80 PIO Interface */
 
-static void mpf1_pio_interrupt( running_machine *machine, int state )
+static void mpf1_pio_interrupt( const device_config *device, int state )
 {
 	logerror("pio irq state: %02x\n",state);
 }

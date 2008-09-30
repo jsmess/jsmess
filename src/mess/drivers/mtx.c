@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( mtx_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READWRITE(mtx_prt_r, mtx_prt_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(mtx_key_hi_r, sn76496_0_w)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE(mtx_ctc_r, mtx_ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC, "z80ctc", mtx_ctc_r, mtx_ctc_w)
 ADDRESS_MAP_END
 
 
@@ -217,10 +217,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct z80_irq_daisy_chain mtx_daisy_chain[] =
+static const z80_daisy_chain mtx_daisy_chain[] =
 {
-	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
-	{0, 0, 0, 0, -1}
+	{ Z80CTC, "z80ctc" },
+	{ NULL }
 };
 
 
@@ -250,6 +250,8 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_SOUND_ADD("sn76489a", SN76489A, MTX_SYSTEM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	MDRV_Z80CTC_ADD( "z80ctc", mtx_ctc_intf )
+
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
@@ -261,6 +263,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rs128 )
 	MDRV_IMPORT_FROM(mtx512)
 	MDRV_MACHINE_RESET(rs128)
+
+	MDRV_Z80DART_ADD( "z80dart", mtx_dart_intf )
 MACHINE_DRIVER_END
 
 

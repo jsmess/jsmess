@@ -174,76 +174,76 @@ static WRITE8_HANDLER( abc806_bankswitch_w )
 
 // Z80 SIO/2
 
-static READ8_HANDLER( sio2_r )
+static READ8_DEVICE_HANDLER( sio2_r )
 {
 	switch (offset)
 	{
 	case 0:
-		return z80sio_d_r(machine, 0, 0);
+		return z80sio_d_r(device, 0);
 	case 1:
-		return z80sio_c_r(0, 0);
+		return z80sio_c_r(device, 0);
 	case 2:
-		return z80sio_d_r(machine, 0, 1);
+		return z80sio_d_r(device, 1);
 	case 3:
-		return z80sio_c_r(0, 1);
+		return z80sio_c_r(device, 1);
 	}
 
 	return 0;
 }
 
-static WRITE8_HANDLER( sio2_w )
+static WRITE8_DEVICE_HANDLER( sio2_w )
 {
 	switch (offset)
 	{
 	case 0:
-		z80sio_d_w(machine, 0, 0, data);
+		z80sio_d_w(device, 0, data);
 		break;
 	case 1:
-		z80sio_c_w(machine, 0, 0, data);
+		z80sio_c_w(device, 0, data);
 		break;
 	case 2:
-		z80sio_d_w(machine, 0, 1, data);
+		z80sio_d_w(device, 1, data);
 		break;
 	case 3:
-		z80sio_c_w(machine, 0, 1, data);
+		z80sio_c_w(device, 1, data);
 		break;
 	}
 }
 
 // Z80 DART
 
-static READ8_HANDLER( dart_r )
+static READ8_DEVICE_HANDLER( dart_r )
 {
 	switch (offset)
 	{
 	case 0:
-		return z80dart_d_r(0, 0);
+		return z80dart_d_r(device, 0);
 	case 1:
-		return z80dart_c_r(0, 0);
+		return z80dart_c_r(device, 0);
 	case 2:
-		return z80dart_d_r(0, 1);
+		return z80dart_d_r(device, 1);
 	case 3:
-		return z80dart_c_r(0, 0); // this gets ABC806 booting, should be z80dart_c_r(0, 1)
+		return z80dart_c_r(device, 0); // this gets ABC806 booting, should be z80dart_c_r(0, 1)
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( dart_w )
+static WRITE8_DEVICE_HANDLER( dart_w )
 {
 	switch (offset)
 	{
 	case 0:
-		z80dart_d_w(0, 0, data);
+		z80dart_d_w(device, 0, data);
 		break;
 	case 1:
-		z80dart_c_w(machine, 0, 0, data);
+		z80dart_c_w(device, 0, data);
 		break;
 	case 2:
-		z80dart_d_w(0, 1, data);
+		z80dart_d_w(device, 1, data);
 		break;
 	case 3:
-		z80dart_c_w(machine, 0, 1, data);
+		z80dart_c_w(device, 1, data);
 		break;
 	}
 }
@@ -294,7 +294,7 @@ static WRITE8_HANDLER( abc77_data_w )
 	abc77_keydown = BIT(data, 6);
 	abc77_hys = BIT(data, 7);
 
-	z80dart_set_dcd(0, 0, abc77_keydown);
+	z80dart_set_dcd(device_list_find_by_tag(machine->config->devicelist, Z80DART, "z80dart"), 0, abc77_keydown);
 	//z80dart_set_cts(0, 0, abc77_keydown); on ABC802 only
 
 	// write abc77_txd to Z80DART TxD
@@ -333,13 +333,13 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800m_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800m_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, "z80dart", dart_r, dart_w)
 	AM_RANGE(0x30, 0x32) AM_WRITE(abc800_ram_ctrl_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x50, 0x53) AM_MIRROR(0x1c) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, "z80sio", sio2_r, sio2_w)
+	AM_RANGE(0x50, 0x53) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
@@ -361,13 +361,13 @@ static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800c_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800c_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, "z80dart", dart_r, dart_w)
 	AM_RANGE(0x30, 0x32) AM_WRITE(abc800_ram_ctrl_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x50, 0x53) AM_MIRROR(0x1c) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, "z80sio", sio2_r, sio2_w)
+	AM_RANGE(0x50, 0x53) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
@@ -387,12 +387,12 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(Z80DART, "z80dart", dart_r, dart_w)
 	AM_RANGE(0x31, 0x31) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
-	AM_RANGE(0x32, 0x35) AM_READWRITE(sio2_r, sio2_w)
+	AM_RANGE(0x32, 0x35) AM_DEVREADWRITE(Z80SIO, "z80sio", sio2_r, sio2_w)
 	AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x60, 0x63) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff18) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(abc806_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_READWRITE(abcbus_reset_r, abc806_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART, "z80dart", dart_r, dart_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_bankswitch_r, abc806_bankswitch_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(abc806_colorram_r, abc806_colorram_w)
@@ -437,8 +437,8 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_READWRITE(abc806_fgctlprom_r, abc806_sync_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x41) AM_MIRROR(0xff1c) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x40, 0x41) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO, "z80sio", sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
@@ -597,13 +597,14 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-static WRITE8_HANDLER( abc800_ctc_z2_w )
+static WRITE8_DEVICE_HANDLER( abc800_ctc_z2_w )
 {
 	// write to DART channel A RxC/TxC
 }
 
-static z80ctc_interface abc800_ctc_intf =
+static const z80ctc_interface abc800_ctc_intf =
 {
+	"main",					/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,              		/* timer disables */
 	0,				  		/* interrupt handler */
@@ -612,17 +613,18 @@ static z80ctc_interface abc800_ctc_intf =
 	abc800_ctc_z2_w    		/* ZC/TO2 callback */
 };
 
-static WRITE8_HANDLER( sio_serial_transmit )
+static WRITE8_DEVICE_HANDLER( sio_serial_transmit )
 {
 }
 
-static int sio_serial_receive(int ch)
+static int sio_serial_receive( const device_config *device, int channel )
 {
 	return -1;
 }
 
 static z80sio_interface abc800_sio_intf =
 {
+	"main",					/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	0,						/* DTR changed handler */
@@ -632,17 +634,18 @@ static z80sio_interface abc800_sio_intf =
 	sio_serial_receive		/* receive handler */
 };
 
-static WRITE8_HANDLER( dart_serial_transmit )
+static WRITE8_DEVICE_HANDLER( dart_serial_transmit )
 {
 }
 
-static int dart_serial_receive(int ch)
+static int dart_serial_receive(const device_config *device, int ch)
 {
 	return -1;
 }
 
 static const z80dart_interface abc800_dart_intf =
 {
+	"main",					/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	0,						/* DTR changed handler */
@@ -652,7 +655,7 @@ static const z80dart_interface abc800_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
-static WRITE8_HANDLER( abc802_dart_dtr_w )
+static WRITE8_DEVICE_HANDLER( abc802_dart_dtr_w )
 {
 	if (offset == 1)
 	{
@@ -660,7 +663,7 @@ static WRITE8_HANDLER( abc802_dart_dtr_w )
 	}
 }
 
-static WRITE8_HANDLER( abc802_dart_rts_w )
+static WRITE8_DEVICE_HANDLER( abc802_dart_rts_w )
 {
 	if (offset == 1)
 	{
@@ -670,6 +673,7 @@ static WRITE8_HANDLER( abc802_dart_rts_w )
 
 static const z80dart_interface abc802_dart_intf =
 {
+	"main",					/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	abc802_dart_dtr_w,		/* DTR changed handler */
@@ -679,22 +683,24 @@ static const z80dart_interface abc802_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
-static const struct z80_irq_daisy_chain abc800_daisy_chain[] =
+static const z80_daisy_chain abc800_daisy_chain[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
-	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 },
-	{ z80dart_reset, z80dart_irq_state, z80dart_irq_ack, z80dart_irq_reti, 0 },
-	{ 0, 0, 0, 0, -1 }
+	{ Z80CTC, "z80ctc" },
+	{ Z80SIO, "z80sio" },
+	{ Z80DART, "z80dart" },
+	{ NULL }
 };
 
 static TIMER_CALLBACK(abc800_ctc_tick)
 {
-	z80ctc_trg_w(machine, 0, 0, 1);
-	z80ctc_trg_w(machine, 0, 0, 0);
-	z80ctc_trg_w(machine, 0, 1, 1);
-	z80ctc_trg_w(machine, 0, 1, 0);
-	z80ctc_trg_w(machine, 0, 2, 1);
-	z80ctc_trg_w(machine, 0, 2, 0);
+	const device_config *device = ptr;
+
+	z80ctc_trg_w(device, 0, 1);
+	z80ctc_trg_w(device, 0, 0);
+	z80ctc_trg_w(device, 1, 1);
+	z80ctc_trg_w(device, 1, 0);
+	z80ctc_trg_w(device, 2, 1);
+	z80ctc_trg_w(device, 2, 0);
 }
 
 static MACHINE_START( abc800 )
@@ -702,19 +708,13 @@ static MACHINE_START( abc800 )
 	state_save_register_global(abc77_keylatch);
 	state_save_register_global(abc77_clock);
 
-	abc800_ctc_timer = timer_alloc(abc800_ctc_tick, NULL);
+	abc800_ctc_timer = timer_alloc(abc800_ctc_tick, (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc") );
 	timer_adjust_periodic(abc800_ctc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC800_X01/2/2/2));
-
-	z80ctc_init(0, &abc800_ctc_intf);
-	z80sio_init(0, &abc800_sio_intf);
-	z80dart_init(0, &abc800_dart_intf);
 }
 
 static MACHINE_START( abc802 )
 {
 	MACHINE_START_CALL(abc800);
-
-	z80dart_init(0, &abc802_dart_intf);
 
 	memory_configure_bank(1, 0, 1, memory_region(machine, "main"), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
@@ -798,6 +798,10 @@ static MACHINE_DRIVER_START( abc800m )
 
 	MDRV_MACHINE_START(abc800)
 
+	MDRV_Z80CTC_ADD( "z80ctc", abc800_ctc_intf )
+	MDRV_Z80SIO_ADD( "z80sio", abc800_sio_intf )
+	MDRV_Z80DART_ADD( "z80dart", abc800_dart_intf )
+
 	MDRV_IMPORT_FROM(abc800m_video)
 
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -818,6 +822,10 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
 	MDRV_MACHINE_START(abc800)
+
+	MDRV_Z80CTC_ADD( "z80ctc", abc800_ctc_intf )
+	MDRV_Z80SIO_ADD( "z80sio", abc800_sio_intf )
+	MDRV_Z80DART_ADD( "z80dart", abc800_dart_intf )
 
 	MDRV_IMPORT_FROM(abc800c_video)
 
@@ -841,6 +849,10 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_MACHINE_START(abc802)
 	MDRV_MACHINE_RESET(abc802)
 
+	MDRV_Z80CTC_ADD( "z80ctc", abc800_ctc_intf )
+	MDRV_Z80SIO_ADD( "z80sio", abc800_sio_intf )
+	MDRV_Z80DART_ADD( "z80dart", abc802_dart_intf )
+
 	MDRV_IMPORT_FROM(abc802_video)
 
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -862,6 +874,10 @@ static MACHINE_DRIVER_START( abc806 )
 
 	MDRV_MACHINE_START(abc806)
 	MDRV_MACHINE_RESET(abc806)
+
+	MDRV_Z80CTC_ADD( "z80ctc", abc800_ctc_intf )
+	MDRV_Z80SIO_ADD( "z80sio", abc800_sio_intf )
+	MDRV_Z80DART_ADD( "z80dart", abc800_dart_intf )
 
 	MDRV_IMPORT_FROM(abc806_video)
 

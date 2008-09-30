@@ -8,6 +8,7 @@
 #define KC_H_
 
 #include "cpu/z80/z80daisy.h"
+#include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "devices/snapquik.h"
 
@@ -67,11 +68,12 @@ WRITE8_HANDLER(kc85_3_pio_data_w);
 READ8_HANDLER(kc85_pio_control_r);
 WRITE8_HANDLER(kc85_pio_control_w);
 
-READ8_HANDLER(kc85_ctc_r);
-WRITE8_HANDLER(kc85_ctc_w);
+READ8_DEVICE_HANDLER(kc85_ctc_r);
+WRITE8_DEVICE_HANDLER(kc85_ctc_w);
 
 extern const z80pio_interface kc85_pio_intf;
-extern const struct z80_irq_daisy_chain kc85_daisy_chain[];
+extern const z80ctc_interface kc85_ctc_intf;
+extern const z80_daisy_chain kc85_daisy_chain[];
 
 
 /*** MODULE SYSTEM ***/
@@ -101,9 +103,9 @@ WRITE8_HANDLER(kc85_module_w);
 /* these are internal to the disc interface */
 
 /* disc hardware internal i/o */
-READ8_HANDLER(kc85_disk_hw_ctc_r);
+READ8_DEVICE_HANDLER(kc85_disk_hw_ctc_r);
 /* disc hardware internal i/o */
-WRITE8_HANDLER(kc85_disk_hw_ctc_w);
+WRITE8_DEVICE_HANDLER(kc85_disk_hw_ctc_w);
 /* 4-bit input latch: DMA Data Request, FDC Int, FDD Ready.. */
 READ8_HANDLER(kc85_disc_hw_input_gate_r);
 /* output port to set NEC765 terminal count input */

@@ -35,30 +35,10 @@ static void mbee_fdc_callback(running_machine *machine, wd17xx_state_t event, vo
 UINT8 *mbee_workram;
 
 
-static void mbee_z80pio_reset(int which)
+const z80_daisy_chain mbee_daisy_chain[] =
 {
-	z80pio_reset( mbee_z80pio );
-}
-
-static int mbee_z80pio_irq_state(int which)
-{
-	return z80pio_irq_state( mbee_z80pio );
-}
-
-static int mbee_z80pio_irq_ack(int which)
-{
-	return z80pio_irq_ack( mbee_z80pio );
-}
-
-static void mbee_z80pio_irq_reti(int which)
-{
-	z80pio_irq_reti( mbee_z80pio );
-}
-
-const struct z80_irq_daisy_chain mbee_daisy_chain[] =
-{
-	{ mbee_z80pio_reset, mbee_z80pio_irq_state, mbee_z80pio_irq_ack, mbee_z80pio_irq_reti, 0 }, /* PIO number 0 */
-	{ 0, 0, 0, 0, -1}      /* end mark */
+	{ Z80PIO, "z80pio" },
+	{ NULL }
 };
 
 

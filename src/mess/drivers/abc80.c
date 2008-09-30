@@ -377,30 +377,10 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 
 /* Machine Initialization */
 
-static void abc80_z80pio_reset(int which)
+static const z80_daisy_chain abc80_daisy_chain[] =
 {
-	z80pio_reset( abc80_z80pio );
-}
-
-static int abc80_z80pio_irq_state(int which)
-{
-	return z80pio_irq_state( abc80_z80pio );
-}
-
-static int abc80_z80pio_irq_ack(int which)
-{
-	return z80pio_irq_ack( abc80_z80pio );
-}
-
-static void abc80_z80pio_irq_reti(int which)
-{
-	z80pio_irq_reti( abc80_z80pio );
-}
-
-static const struct z80_irq_daisy_chain abc80_daisy_chain[] =
-{
-	{ abc80_z80pio_reset, abc80_z80pio_irq_state, abc80_z80pio_irq_ack, abc80_z80pio_irq_reti, 0 },
-	{ 0, 0, 0, 0, -1 }
+	{ Z80PIO, "z80pio" },
+	{ NULL }
 };
 
 static TIMER_CALLBACK( abc80_keyboard_tick )

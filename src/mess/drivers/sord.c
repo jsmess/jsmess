@@ -293,14 +293,15 @@ static const ppi8255_interface sord_ppi8255_interface =
 /*********************************************************************************************/
 
 
-static void sord_m5_ctc_interrupt(running_machine *machine, int state)
+static void sord_m5_ctc_interrupt(const device_config *device, int state)
 {
 	//logerror("interrupting ctc %02x\r\n ",state);
-	cpunum_set_input_line(machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, 0, state);
 }
 
-static z80ctc_interface	sord_m5_ctc_intf =
+static const z80ctc_interface	sord_m5_ctc_intf =
 {
+	"main",
 	3800000,
 	0,
 	sord_m5_ctc_interrupt,
@@ -326,22 +327,22 @@ ADDRESS_MAP_END
 
 
 
-static READ8_HANDLER(sord_ctc_r)
+static READ8_DEVICE_HANDLER(sord_ctc_r)
 {
 	unsigned char data;
 
-	data = z80ctc_0_r(machine, offset & 0x03);
+	data = z80ctc_r(device, offset & 0x03);
 
 	logerror("sord ctc r: %04x %02x\n",(offset & 0x03), data);
 
 	return data;
 }
 
-static WRITE8_HANDLER(sord_ctc_w)
+static WRITE8_DEVICE_HANDLER(sord_ctc_w)
 {
 	logerror("sord ctc w: %04x %02x\n",(offset & 0x03), data);
 
-	z80ctc_0_w(machine, offset & 0x03, data);
+	z80ctc_w(device, offset & 0x03, data);
 }
 
 static  READ8_HANDLER(sord_sys_r)
@@ -412,7 +413,7 @@ static WRITE8_HANDLER(sord_printer_w)
 
 static ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f)					AM_READWRITE(sord_ctc_r,			sord_ctc_w)
+	AM_RANGE(0x00, 0x0f)					AM_DEVREADWRITE(Z80CTC, "z80ctc", sord_ctc_r,			sord_ctc_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_vram_r,		TMS9928A_vram_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_register_r,	TMS9928A_register_w)
 	AM_RANGE(0x20, 0x2f)					AM_WRITE(							sn76496_0_w)
@@ -423,7 +424,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srdm5fd5_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f)					AM_READWRITE(sord_ctc_r,			sord_ctc_w)
+	AM_RANGE(0x00, 0x0f)					AM_DEVREADWRITE(Z80CTC, "z80ctc", sord_ctc_r,			sord_ctc_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_vram_r,		TMS9928A_vram_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_register_r,	TMS9928A_register_w)
 	AM_RANGE(0x20, 0x2f)					AM_WRITE(							sn76496_0_w)
@@ -447,8 +448,8 @@ static void sordm5_video_interrupt_callback(running_machine *machine, int state)
 {
 	if (state)
 	{
-		z80ctc_0_trg3_w(machine, 0, 1);
-		z80ctc_0_trg3_w(machine, 0, 0);
+		z80ctc_trg3_w(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, 1);
+		z80ctc_trg3_w(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, 0);
 	}
 }
 
@@ -467,11 +468,8 @@ static MACHINE_START( sord_m5 )
 
 static MACHINE_RESET( sord_m5 )
 {
-	z80ctc_init(0, &sord_m5_ctc_intf);
-
 //  cassette_timer = timer_pulse(TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
 	TMS9928A_reset ();
-	z80ctc_reset(0);
 
 	/* should be done in a special callback to work properly! */
 	memory_set_bankptr(1, memory_region(machine, "user1"));
@@ -604,10 +602,10 @@ static INPUT_PORTS_START(sord_m5)
 INPUT_PORTS_END
 
 
-static const struct z80_irq_daisy_chain sord_m5_daisy_chain[] =
+static const z80_daisy_chain sord_m5_daisy_chain[] =
 {
-	{z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0},
-	{0,0,0,0,-1}
+	{ Z80CTC, "z80ctc" },
+	{ NULL }
 };
 
 
@@ -639,6 +637,8 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( sord_ppi8255_interface )
+
+	MDRV_Z80CTC_ADD( "z80ctc", sord_m5_ctc_intf )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
