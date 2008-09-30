@@ -31,7 +31,7 @@ static int cgenie_output_byte(INT16 *buffer, int sample_count, UINT8 data)
 		samples++;
 
 		/* Output bit */
-		if ( ! ( data & 0x80 ) )
+		if ( data & 0x80 )
 			level ^= 1;
 		if ( buffer )
 			buffer[ sample_count + samples ] = level ? SMPHI : SMPLO;
@@ -94,7 +94,7 @@ static const struct CassetteLegacyWaveFiller cgenie_cas_legacy_fill_wave =
 	-1,										/* chunk_size */
 	0,										/* chunk_samples */
 	cgenie_cas_to_wav_size,					/* chunk_sample_calc */
-	2200,									/* sample_frequency */
+	2400,									/* sample_frequency */
 	0,										/* header_samples */
 	0										/* trailer_samples */
 };

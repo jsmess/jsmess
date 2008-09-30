@@ -91,6 +91,8 @@ System Driver Changes:
   doubt these CBM-II computers used the same format as C64. More work 
   when/if more documents will be available [Fabio Priuli]
 
+- [CGENIE] Properly implemented the cassette loading.  [Wilbert Pol]
+
 - [COMMODORE] Properly fixed asserts / freezes / crashes in systems with 
   VC1540 / VC1541 floppy support which had been promoted from TESTDRIVER 
   status. However, they are flagged as NOT_WORKING because the floppy 
