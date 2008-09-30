@@ -101,6 +101,16 @@ ADDRESS_MAP_END
   - L : Load memory from magnetic tape
   - N : Trace one instruction
   - V : Set (and remove) breakpoints
+
+The keys are laid out as:
+
+  P L N V
+
+  7 8 9 A  M
+  4 5 6 B  E
+  1 2 3 C  R
+  0 F E D  G
+
  */
 static INPUT_PORTS_START( mekd2 )
 	PORT_START("KEY0")
