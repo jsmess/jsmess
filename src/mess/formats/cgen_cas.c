@@ -9,6 +9,8 @@ Current state: Not working. Only the sync signal and 0x66 byte get
 
 #include "formats/cgen_cas.h"
 
+#define TAPE_HEADER "Colour Genie - Virtual Tape File"
+
 #define SMPLO   -32768
 #define SMPHI   32767
 
@@ -47,12 +49,32 @@ static int cgenie_handle_cas(INT16 *buffer, const UINT8 *casdata)
 {
 	int	i, data_pos, sample_count;
 
-	if ( casdata[0] != 0x66 )
-		return -1;
-
 	data_pos = 0;
 	sample_count = 0;
 	level = 0;
+
+	/* Check for presence of optional header */
+	if ( ! memcmp( casdata, TAPE_HEADER, sizeof(TAPE_HEADER) - 1 ) )
+	{
+		/* Search for 0x00 or end of file */
+		while ( data_pos < cas_size && casdata[data_pos] )
+			data_pos++;
+
+		/* If we're at the end of the file it's not a valid .cas file */
+		if ( data_pos == cas_size )
+			return -1;
+
+		/* Skip the 0x00 byte */
+		data_pos++;
+	}
+
+	/* If we're at the end of the file it's not a valid .cas file */
+	if ( data_pos == cas_size )
+		return -1;
+
+	/* Check for beginning of tape file marker */
+	if ( casdata[data_pos] != 0x66 )
+		return -1;
 
 	/* Create header */
 	for ( i = 0; i < 256; i++ )
