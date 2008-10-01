@@ -306,6 +306,18 @@ INPUT_PORTS_END
 /********************/
 /** DISC INTERFACE **/
 
+static const z80ctc_interface kc85_disc_ctc_intf =
+{
+	"main",			/* cpu */
+	0,				/* timer clock */
+	0,				/* timer disablers */
+	NULL,			/* interrupt callback */
+	NULL,			/* ZC/TO0 callback */
+	NULL,			/* ZC/TO1 callback */
+	NULL			/* ZC/TO2 callback */
+};
+
+
 static ADDRESS_MAP_START(kc85_disc_hw_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0ffff) AM_RAM
 ADDRESS_MAP_END
@@ -325,7 +337,7 @@ static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
 
-//	MDRV_Z80CTC_ADD( "z80ctc_1", kc85_disc_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc_1", kc85_disc_ctc_intf )
 MACHINE_DRIVER_END
 
 

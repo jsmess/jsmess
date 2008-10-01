@@ -1906,6 +1906,8 @@ MACHINE_RESET( kc85_3 )
 	memory_set_bankptr(2,mess_ram+0x0c000);
 	memory_set_bankptr(7,mess_ram+0x0c000);
 
+	kc85_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
+
 	kc85_3_update_0x08000(machine);
 	kc85_3_update_0x0c000(machine);
 	kc85_3_update_0x0e000(machine);
