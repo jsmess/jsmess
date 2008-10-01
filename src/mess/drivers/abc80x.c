@@ -55,7 +55,6 @@
 
     TODO:
 
-	- ABC806 opcodes fetched from 0x7800-0x7fff reads/writes to 0-30K should address the video memory
 	- rewrite Z80DART for bit level serial I/O
 	- connect ABC77 keyboard to DART
     - COM port DIP switch
@@ -87,8 +86,6 @@
 #include "devices/cassette.h"
 #include "devices/printer.h"
 
-static emu_timer *abc800_ctc_timer;
-
 /* Read/Write Handlers */
 
 // ABC 800
@@ -118,12 +115,10 @@ static void abc806_bankswitch(running_machine *machine)
 
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
-			read8_machine_func memory_r = (read8_machine_func)(FPTR)(STATIC_BANK1 + bank - 1);
-			write8_machine_func memory_w = (write8_machine_func)(FPTR)(STATIC_BANK1 + bank - 1);
 			
 			logerror("%04x-%04x: Video RAM bank %u (32K)\n", start_addr, end_addr, videoram_bank);
 
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, memory_r, memory_w);
+			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 			memory_set_bank(bank, videoram_bank + 1);
 
 			videoram_bank++;
@@ -135,12 +130,10 @@ static void abc806_bankswitch(running_machine *machine)
 
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
-			read8_machine_func memory_r = (read8_machine_func)(FPTR)(STATIC_BANK1 + bank - 1);
-			write8_machine_func memory_w = (write8_machine_func)(FPTR)(STATIC_BANK1 + bank - 1);
 			
 			logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, memory_r, memory_w);
+			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 			memory_set_bank(bank, 0);
 		}
 	}
@@ -152,8 +145,6 @@ static void abc806_bankswitch(running_machine *machine)
 		{
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
-			read8_machine_func memory_r = (read8_machine_func)(FPTR)(STATIC_BANK1 + bank - 1);
-			write8_machine_func memory_w = (write8_machine_func)(FPTR)(STATIC_BANK1 + bank - 1);
 			UINT8 map = state->map[bank - 1];
 
 			if (BIT(map, 7) && state->eme)
@@ -163,7 +154,7 @@ static void abc806_bankswitch(running_machine *machine)
 
 				logerror("%04x-%04x: Video RAM bank %u (4K)\n", start_addr, end_addr, videoram_bank);
 
-				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, memory_r, memory_w);
+				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 				memory_set_bank(bank, videoram_bank + 1);
 			}
 			else
@@ -176,7 +167,7 @@ static void abc806_bankswitch(running_machine *machine)
 					/* ROM */
 					logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, memory_r, SMH_UNMAP);
+					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_UNMAP);
 					memory_set_bank(bank, 0);
 					break;
 
@@ -184,7 +175,7 @@ static void abc806_bankswitch(running_machine *machine)
 					/* ROM/char RAM */
 					logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x77ff, 0, 0, memory_r, SMH_UNMAP);
+					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_UNMAP);
 					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
 					memory_set_bank(bank, 0);
 					break;
@@ -193,11 +184,39 @@ static void abc806_bankswitch(running_machine *machine)
 					/* work RAM */
 					logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, memory_r, memory_w);
+					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 					memory_set_bank(bank, 0);
 					break;
 				}
 			}
+		}
+	}
+
+	if (state->fetch_charram)
+	{
+		UINT16 videoram_offset = ((state->hrs >> 4) & 0x02) << 14;
+		int videoram_bank = videoram_offset / 0x1000;
+
+		for (bank = 1; bank <= 8; bank++)
+		{
+			/* 0x0000-0x77FF is video RAM */
+
+			UINT16 start_addr = 0x1000 * (bank - 1);
+			UINT16 end_addr = start_addr + 0xfff;
+			
+			logerror("%04x-%04x: Video RAM bank %u (30K)\n", start_addr, end_addr, videoram_bank);
+
+			if (start_addr == 0x7000)
+			{
+				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
+			}
+			else
+			{
+				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+			}
+
+			memory_set_bank(bank, bank + videoram_bank);
 		}
 	}
 }
@@ -559,8 +578,12 @@ static TIMER_CALLBACK(abc800_ctc_tick)
 
 static MACHINE_START( abc800 )
 {
-	abc800_ctc_timer = timer_alloc(abc800_ctc_tick, (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc") );
-	timer_adjust_periodic(abc800_ctc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC800_X01/2/2/2));
+	abc800_state *state = machine->driver_data;
+
+	/* allocate timer */
+
+	state->ctc_timer = timer_alloc(abc800_ctc_tick, (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc") );
+	timer_adjust_periodic(state->ctc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC800_X01/2/2/2));
 }
 
 // ABC802
@@ -617,9 +640,14 @@ static const z80dart_interface abc802_dart_intf =
 
 static MACHINE_START( abc802 )
 {
-//	abc802_state *state = machine->driver_data;
+	abc802_state *state = machine->driver_data;
 
-	MACHINE_START_CALL(abc800);
+	/* allocate timer */
+
+	state->ctc_timer = timer_alloc(abc800_ctc_tick, (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc") );
+	timer_adjust_periodic(state->ctc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC800_X01/2/2/2));
+
+	/* configure memory */
 
 	memory_configure_bank(1, 0, 1, memory_region(machine, "main"), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
@@ -686,7 +714,10 @@ static MACHINE_START( abc806 )
 	UINT8 *mem = memory_region(machine, "main");
 	int bank;
 
-	MACHINE_START_CALL(abc800);
+	/* allocate timer */
+
+	state->ctc_timer = timer_alloc(abc800_ctc_tick, (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc") );
+	timer_adjust_periodic(state->ctc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC800_X01/2/2/2));
 
 	/* setup memory banking */
 
@@ -1085,12 +1116,21 @@ static OPBASE_HANDLER( abc806_opbase_handler )
 	if (address >= 0x7800 && address < 0x8000)
 	{
 		opbase->rom = opbase->ram = memory_region(machine, "main");
-		state->fetch_charram = 1;
+
+		if (!state->fetch_charram)
+		{
+			state->fetch_charram = 1;
+			abc806_bankswitch(machine);
+		}
 
 		return ~0;
 	}
 
-	state->fetch_charram = 0;
+	if (state->fetch_charram)
+	{
+		state->fetch_charram = 0;
+		abc806_bankswitch(machine);
+	}
 
 	return address;
 }

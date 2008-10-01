@@ -32,6 +32,9 @@ struct _abc800_state
 {
 	/* keyboard state */
 	int abc77_txd;			/* ABC-77 transmit data */
+
+	/* timers */
+	emu_timer *ctc_timer;
 };
 
 typedef struct _abc802_state abc802_state;
@@ -45,6 +48,7 @@ struct _abc802_state
 	int mux80_40;			/* 40/80 column mode */
 
 	/* timers */
+	emu_timer *ctc_timer;
 	emu_timer *flash_timer;
 };
 
@@ -76,6 +80,7 @@ struct _abc806_state
 	int hru2_a8;			/* HRU II PROM address line 8 */
 
 	/* timers */
+	emu_timer *ctc_timer;
 	emu_timer *flash_timer;
 };
 
