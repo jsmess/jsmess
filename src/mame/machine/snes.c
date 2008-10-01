@@ -1241,7 +1241,7 @@ READ8_HANDLER( snes_r_bank3 )
 /* 0x600000 - 0x6fffff */
 READ8_HANDLER( snes_r_bank4 )
 {
-	UINT8 value;
+	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
 	if (snes_cart.mode & 5)							/* Mode 20 & 22 */
