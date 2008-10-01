@@ -174,15 +174,16 @@ static TIMER_CALLBACK( abc802_flash_tick )
 
 static MC6845_UPDATE_ROW( abc800m_update_row )
 {
+	abc800_state *state = device->machine->driver_data;
+
 	int column;
-	const UINT8 *charrom = memory_region(device->machine, "chargen");
 
 	for (column = 0; column < x_count; column++)
 	{
 		int bit;
 
 		UINT16 address = (videoram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
-		UINT8 data = (charrom[address & 0x7ff] & 0x3f);
+		UINT8 data = (state->char_rom[address & 0x7ff] & 0x3f);
 
 		if (column == cursor_x)
 		{
@@ -219,7 +220,6 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 	abc802_state *state = device->machine->driver_data;
 
 	int column;
-	const UINT8 *charrom = memory_region(device->machine, "chargen");
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -235,7 +235,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			ra_latch = 0x0f;
 		}
 
-		data = charrom[(address + ra_latch) & 0x1fff];
+		data = state->char_rom[(address + ra_latch) & 0x1fff];
 
 		if (data & ABC802_ATE)
 		{
@@ -272,7 +272,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			}
 
 			// reload data and mask out two bottom bits
-			data = charrom[(address + ra_latch) & 0x1fff] & 0xfc;
+			data = state->char_rom[(address + ra_latch) & 0x1fff] & 0xfc;
 		}
 		
 		data <<= 2;
@@ -361,6 +361,10 @@ static VIDEO_START( abc800 )
 	/* find devices */
 
 	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+
+	/* find memory regions */
+
+	state->char_rom = memory_region(machine, "chargen");
 }
 
 static VIDEO_START( abc802 )
@@ -370,6 +374,10 @@ static VIDEO_START( abc802 )
 	/* find devices */
 
 	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+
+	/* find memory regions */
+
+	state->char_rom = memory_region(machine, "chargen");
 
 	/* allocate timer */
 

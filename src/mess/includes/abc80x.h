@@ -45,6 +45,9 @@ struct _abc800_state
 	const device_config *z80dart;
 	const device_config *z80sio;
 	const device_config *mc6845;
+
+	/* memory regions */
+	const UINT8 *char_rom;	/* character generator ROM */
 };
 
 typedef struct _abc802_state abc802_state;
@@ -66,6 +69,9 @@ struct _abc802_state
 	const device_config *z80dart;
 	const device_config *z80sio;
 	const device_config *mc6845;
+
+	/* memory regions */
+	const UINT8 *char_rom;	/* character generator ROM */
 };
 
 typedef struct _abc806_state abc806_state;
@@ -104,6 +110,10 @@ struct _abc806_state
 	const device_config *z80dart;
 	const device_config *z80sio;
 	const device_config *mc6845;
+
+	/* memory regions */
+	const UINT8 *rad_prom;	/* line address PROM */
+	const UINT8 *char_rom;	/* character generator ROM */
 };
 
 /*----------- defined in video/abc80x.c -----------*/

@@ -205,7 +205,6 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	abc806_state *state = device->machine->driver_data;
 
 	int column;
-	const UINT8 *charrom = memory_region(device->machine, "chargen");
 
 	UINT8 old_data = 0xff;
 	int fg_color = 7;
@@ -286,13 +285,13 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		else
 		{
 			rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 5) | (state->flshclk << 4) | ra;
-			rad_data = memory_region(device->machine, "rad")[rad_addr] & 0x0f;
+			rad_data = state->rad_prom[rad_addr] & 0x0f;
 
 			rad_data = ra; // HACK because the RAD prom is not dumped yet
 		}
 
 		chargen_addr = (th << 12) | (data << 4) | rad_data;
-		chargen_data = charrom[chargen_addr & 0xfff] << 2;
+		chargen_data = state->char_rom[chargen_addr & 0xfff] << 2;
 		x = column * ABC800_CHAR_WIDTH;
 
 		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
@@ -425,6 +424,11 @@ static VIDEO_START(abc806)
 	/* find devices */
 
 	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+
+	/* find memory regions */
+
+	state->char_rom = memory_region(machine, "chargen");
+	state->rad_prom = memory_region(machine, "rad");
 
 	/* allocate memory */
 
