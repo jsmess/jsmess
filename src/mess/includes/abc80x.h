@@ -21,8 +21,12 @@
 #define ABC806_VIDEO_RAM_SIZE	0x20000
 
 #define SCREEN_TAG	"main"
+#define Z80_TAG		"z80"
 #define E0516_TAG	"j13"
 #define MC6845_TAG	"b12"
+#define Z80CTC_TAG	"z80ctc"
+#define Z80SIO_TAG	"z80sio"
+#define Z80DART_TAG	"z80dart"
 
 #define ABC800_CHAR_WIDTH	6
 #define ABC800_CCLK			ABC800_X01/ABC800_CHAR_WIDTH
@@ -35,6 +39,12 @@ struct _abc800_state
 
 	/* timers */
 	emu_timer *ctc_timer;
+
+	/* devices */
+	const device_config *z80ctc;
+	const device_config *z80dart;
+	const device_config *z80sio;
+	const device_config *mc6845;
 };
 
 typedef struct _abc802_state abc802_state;
@@ -50,6 +60,12 @@ struct _abc802_state
 	/* timers */
 	emu_timer *ctc_timer;
 	emu_timer *flash_timer;
+
+	/* devices */
+	const device_config *z80ctc;
+	const device_config *z80dart;
+	const device_config *z80sio;
+	const device_config *mc6845;
 };
 
 typedef struct _abc806_state abc806_state;
@@ -82,6 +98,12 @@ struct _abc806_state
 	/* timers */
 	emu_timer *ctc_timer;
 	emu_timer *flash_timer;
+
+	/* devices */
+	const device_config *z80ctc;
+	const device_config *z80dart;
+	const device_config *z80sio;
+	const device_config *mc6845;
 };
 
 /*----------- defined in video/abc80x.c -----------*/

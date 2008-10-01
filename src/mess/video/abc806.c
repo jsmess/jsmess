@@ -337,14 +337,12 @@ static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
 {
 	abc806_state *state = device->machine->driver_data;
 	
-	const device_config *z80dart = device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart");
-
 	if (vsync)
 	{
 		state->v50_addr = 0;
 	}
 
-	z80dart_set_ri(z80dart, 1, vsync);
+	z80dart_set_ri(state->z80dart, 1, vsync);
 }
 
 /* MC6845 Interfaces */
@@ -424,6 +422,10 @@ static VIDEO_START(abc806)
 
 	state->sync = 10;
 
+	/* find devices */
+
+	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+
 	/* allocate memory */
 
 	state->charram = auto_malloc(ABC806_CHAR_RAM_SIZE);
@@ -456,10 +458,10 @@ static VIDEO_START(abc806)
 
 static VIDEO_UPDATE( abc806 )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
-
+	abc806_state *state = screen->machine->driver_data;
+	
 	abc806_hr_update(screen->machine, bitmap, cliprect);
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_update(state->mc6845, bitmap, cliprect);
 	
 	return 0;
 }

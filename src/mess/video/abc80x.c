@@ -205,9 +205,9 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
 {
-	const device_config *z80dart = device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart");
+	abc800_state *state = device->machine->driver_data;
 
-	z80dart_set_ri(z80dart, 1, vsync);
+	z80dart_set_ri(state->z80dart, 1, vsync);
 }
 
 static MC6845_UPDATE_ROW( abc800c_update_row )
@@ -309,9 +309,9 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
 static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
 {
-	const device_config *z80dart = device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart");
+	abc802_state *state = device->machine->driver_data;
 
-	z80dart_set_ri(z80dart, 1, vsync);
+	z80dart_set_ri(state->z80dart, 1, vsync);
 }
 
 /* MC6845 Interfaces */
@@ -356,11 +356,20 @@ static const mc6845_interface abc802_mc6845_interface = {
 
 static VIDEO_START( abc800 )
 {
+	abc800_state *state = machine->driver_data;
+
+	/* find devices */
+
+	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
 }
 
 static VIDEO_START( abc802 )
 {
 	abc802_state *state = machine->driver_data;
+
+	/* find devices */
+
+	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
 
 	/* allocate timer */
 
@@ -377,27 +386,27 @@ static VIDEO_START( abc802 )
 
 static VIDEO_UPDATE( abc800m )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	abc800_state *state = screen->machine->driver_data;
 	
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_update(state->mc6845, bitmap, cliprect);
 	
 	return 0;
 }
 
 static VIDEO_UPDATE( abc800c )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	abc800_state *state = screen->machine->driver_data;
 	
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_update(state->mc6845, bitmap, cliprect);
 	
 	return 0;
 }
 
 static VIDEO_UPDATE( abc802 )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, MC6845_TAG);
+	abc802_state *state = screen->machine->driver_data;
 	
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_update(state->mc6845, bitmap, cliprect);
 	
 	return 0;
 }

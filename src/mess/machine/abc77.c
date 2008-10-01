@@ -325,6 +325,7 @@ static DEVICE_START( abc77 )
 
 	astring_printf(tempstring, "%s:%s", device->tag, I8035_TAG);
 	abc77->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
+	astring_free(tempstring);
 
 	/* allocate timer */
 
