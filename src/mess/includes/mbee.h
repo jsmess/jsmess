@@ -15,7 +15,6 @@ MACHINE_RESET( mbee );
 MACHINE_START( mbee );
 
 extern UINT8 *mbee_workram;
-extern const z80_daisy_chain mbee_daisy_chain[];
 
 INTERRUPT_GEN( mbee_interrupt );
 

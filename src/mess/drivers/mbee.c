@@ -297,6 +297,12 @@ static const z80pio_interface mbee_z80pio_intf =
 };
 
 
+static const z80_daisy_chain mbee_daisy_chain[] =
+{
+	{ Z80PIO, "z80pio" },
+	{ NULL }
+};
+
 
 static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */

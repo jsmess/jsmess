@@ -303,6 +303,16 @@ static INPUT_PORTS_START( kc85 )
 INPUT_PORTS_END
 
 
+/* pio is last in chain and therefore has highest priority */
+
+static const z80_daisy_chain kc85_daisy_chain[] =
+{
+	{ Z80PIO, "z80pio" },
+	{ Z80CTC, "z80ctc" },
+	{ NULL }
+};
+
+
 /********************/
 /** DISC INTERFACE **/
 

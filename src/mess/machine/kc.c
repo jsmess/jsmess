@@ -1770,15 +1770,6 @@ const z80pio_interface kc85_pio_intf =
 };
 
 
-/* pio is last in chain and therefore has highest priority */
-
-const z80_daisy_chain kc85_daisy_chain[] =
-{
-	{ Z80PIO, "z80pio" },
-	{ Z80CTC, "z80ctc" },
-	{ NULL }
-};
-
 /* used in cassette write -> K0 */
 static WRITE8_DEVICE_HANDLER(kc85_zc0_callback)
 {

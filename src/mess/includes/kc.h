@@ -73,7 +73,6 @@ WRITE8_DEVICE_HANDLER(kc85_ctc_w);
 
 extern const z80pio_interface kc85_pio_intf;
 extern const z80ctc_interface kc85_ctc_intf;
-extern const z80_daisy_chain kc85_daisy_chain[];
 
 
 /*** MODULE SYSTEM ***/

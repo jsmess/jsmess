@@ -35,13 +35,6 @@ static void mbee_fdc_callback(running_machine *machine, wd17xx_state_t event, vo
 UINT8 *mbee_workram;
 
 
-const z80_daisy_chain mbee_daisy_chain[] =
-{
-	{ Z80PIO, "z80pio" },
-	{ NULL }
-};
-
-
 /*
   On reset or power on, a circuit forces rom 8000-8FFF to appear at 0000-0FFF, while ram is disabled.
   It gets set back to normal on the first attempt to write to memory. (/WR line goes active).
