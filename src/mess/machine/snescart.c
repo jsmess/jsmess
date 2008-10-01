@@ -164,28 +164,44 @@ static void snes_load_sram(void)
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
-	battery_ram = malloc_or_die( snes_cart.sram_max );
+	battery_ram = malloc_or_die(snes_cart.sram_max);
 	ptr = battery_ram;
-	image_battery_load( image_from_devtype_and_index(IO_CARTSLOT,0), battery_ram, snes_cart.sram_max );
+	image_battery_load(image_from_devtype_and_index(IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
 
-	if( snes_cart.mode == SNES_MODE_20 )
+	if (snes_cart.mode == SNES_MODE_20)
 	{
-		for( ii = 0; ii < 8; ii++ )
+		/* There could be some larger image needing banks 0x70 to 0x7f at address 0x8000 for ROM 
+		 * mirroring. These should be treated separately or data would be overwritten by SRAM */
+		for (ii = 0; ii < 16; ii++)
 		{
-			memmove( &snes_ram[0x700000 + (ii * 0x010000)], ptr, 0x7fff );
-			ptr += 0x7fff;
+			/* loading */
+			memmove(&snes_ram[0x700000 + (ii * 0x010000)], ptr, 0xffff);
+			/* mirroring */
+			memcpy(&snes_ram[0xf00000 + (ii * 0x010000)], &snes_ram[0x700000 + (ii * 0x010000)], 0xffff);
+			ptr += 0xffff;
 		}
 	}
-	else
+	else if (snes_cart.mode == SNES_MODE_21)
 	{
-		for( ii = 0; ii < 16; ii++ )
+		for (ii = 0; ii < 16; ii++)
 		{
-			memmove( &snes_ram[0x306000 + (ii * 0x010000)], ptr, 0x1fff );
+			/* loading */
+			memmove(&snes_ram[0x306000 + (ii * 0x010000)], ptr, 0x1fff);
+			/* mirroring */
+			memcpy(&snes_ram[0xb06000 + (ii * 0x010000)], &snes_ram[0x306000 + (ii * 0x010000)], 0x1fff);
+			ptr += 0x1fff;
+		}
+	}
+	else if (snes_cart.mode == SNES_MODE_25)
+	{
+		for (ii = 0; ii < 16; ii++)
+		{
+			memmove(&snes_ram[0xb06000 + (ii * 0x010000)], ptr, 0x1fff);
 			ptr += 0x1fff;
 		}
 	}
 
-	free( battery_ram );
+	free(battery_ram);
 }
 
 /* Saves the battery backed RAM from the appropriate memory area */
@@ -194,29 +210,37 @@ static void snes_save_sram(void)
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
-	battery_ram = malloc_or_die( snes_cart.sram_max );
+	battery_ram = malloc_or_die(snes_cart.sram_max);
 	ptr = battery_ram;
 
-	if( snes_cart.mode == SNES_MODE_20 )
+	if (snes_cart.mode == SNES_MODE_20)
 	{
-		for( ii = 0; ii < 8; ii++ )
+		for (ii = 0; ii < 16; ii++)
 		{
-			memmove( ptr, &snes_ram[0x700000 + (ii * 0x010000)], 0x8000 );
-			ptr += 0x8000;
+			memmove(ptr, &snes_ram[0x700000 + (ii * 0x010000)], 0x10000);
+			ptr += 0x10000;
 		}
 	}
-	else
+	else if (snes_cart.mode == SNES_MODE_21)
 	{
-		for( ii = 0; ii < 16; ii++ )
+		for (ii = 0; ii < 16; ii++)
 		{
-			memmove( ptr, &snes_ram[0x306000 + (ii * 0x010000)], 0x2000 );
+			memmove(ptr, &snes_ram[0x306000 + (ii * 0x010000)], 0x2000);
+			ptr += 0x2000;
+		}
+	}
+	else if (snes_cart.mode == SNES_MODE_25)
+	{
+		for (ii = 0; ii < 16; ii++)
+		{
+			memmove(ptr, &snes_ram[0xb06000 + (ii * 0x010000)], 0x2000);
 			ptr += 0x2000;
 		}
 	}
 
-	image_battery_save( image_from_devtype_and_index(IO_CARTSLOT,0), battery_ram, snes_cart.sram_max );
+	image_battery_save(image_from_devtype_and_index(IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
 
-	free( battery_ram );
+	free(battery_ram);
 }
 
 static void snes_machine_stop(running_machine *machine)
@@ -413,7 +437,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		else
 			snes_cart.mode = SNES_MODE_20;	// LoRom
 
-		snes_cart.sram_max = 0x40000;
+		/* a few games require 512k, however we store twice as much to be sure to cover the various mirrors */
+		snes_cart.sram_max = 0x100000;
 	}
 	else if( valid_mode21 >= valid_mode25 )
 	{
@@ -480,7 +505,9 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		/* Extendend HiROM carts start to load data in banks 0xc0 to 0xff. However, they exceed the 
 		 * available space in these banks, and continue loading at banks 0x40 to 0x7f. The top half 
 		 * (address range 0x8000 - 0xffff) of each bank is also mirrored either to banks 0x00 to 0x3f
-		 * (for data in banks 0x40 to 0x7f) or to banks 0x80 to 0xbf (for data in banks 0xc0 to 0xff)
+		 * (for data in banks 0x40 to 0x7f) or to banks 0x80 to 0xbf (for data in banks 0xc0 to 0xff).
+		 * Notice that banks 0x7e and 0x7f are overwritten by WRAM, but they could contain data at 
+		 * address > 0x8000 because the mirrors at 0x3e and 0x3f are not overwritten. 
 		 */
 			/* Reading the first 64 blocks */
 			while (read_blocks < 64 && read_blocks < total_blocks)
