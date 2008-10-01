@@ -110,6 +110,7 @@ struct _abc806_state
 	const device_config *z80dart;
 	const device_config *z80sio;
 	const device_config *mc6845;
+	const device_config *e0516;
 
 	/* memory regions */
 	const UINT8 *rad_prom;	/* line address PROM */

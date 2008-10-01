@@ -443,13 +443,13 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff18) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(abc806_hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_READWRITE(abcbus_reset_r, abc806_hrc_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_MASK(0xff00) AM_READWRITE(abcbus_reset_r, abc806_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_mai_r, abc806_mao_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(abc806_ami_r, abc806_amo_w)
-	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_WRITE(abc806_sso_w)
-	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_READWRITE(abc806_cli_r, abc806_sto_w)
+	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_WRITE(abc806_sto_w)
+	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_cli_r, abc806_sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x40, 0x41) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
@@ -726,6 +726,7 @@ static MACHINE_START( abc806 )
 	state->z80ctc = device_list_find_by_tag(machine->config->devicelist, Z80CTC, Z80CTC_TAG);
 	state->z80dart = device_list_find_by_tag(machine->config->devicelist, Z80DART, Z80DART_TAG);
 	state->z80sio = device_list_find_by_tag(machine->config->devicelist, Z80SIO, Z80SIO_TAG);
+	state->e0516 = device_list_find_by_tag(machine->config->devicelist, E0516, E0516_TAG);
 
 	/* allocate timer */
 

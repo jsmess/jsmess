@@ -121,8 +121,6 @@ READ8_HANDLER( abc806_cli_r )
 {
 	abc806_state *state = machine->driver_data;
 
-	const device_config *e0516 = device_list_find_by_tag(machine->config->devicelist, E0516, E0516_TAG);
-
 	/*
 
 		bit		description
@@ -141,7 +139,7 @@ READ8_HANDLER( abc806_cli_r )
 	UINT16 hru2_addr = (state->hru2_a8 << 8) | (offset >> 8);
 	UINT8 data = memory_region(machine, "hru2")[hru2_addr] & 0x0f;
 
-	data |= e0516_dio_r(e0516) << 7;
+	data |= e0516_dio_r(state->e0516) << 7;
 
 	return data;
 }
@@ -151,8 +149,6 @@ READ8_HANDLER( abc806_cli_r )
 WRITE8_HANDLER( abc806_sto_w )
 {
 	abc806_state *state = machine->driver_data;
-
-	const device_config *e0516 = device_list_find_by_tag(machine->config->devicelist, E0516, E0516_TAG);
 
 	int level = BIT(data, 7);
 
@@ -176,15 +172,15 @@ WRITE8_HANDLER( abc806_sto_w )
 		break;
 	case 5:
 		/* RTC chip select */
-		e0516_cs_w(e0516, level);
+		e0516_cs_w(state->e0516, level);
 		break;
 	case 6:
 		/* RTC clock */
-		e0516_clk_w(e0516, level);
+		e0516_clk_w(state->e0516, level);
 		break;
 	case 7:
 		/* RTC data in */
-		e0516_dio_w(e0516, level);
+		e0516_dio_w(state->e0516, level);
 		break;
 	}
 }
