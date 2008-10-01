@@ -1163,7 +1163,9 @@ $(MESSOBJ)/luxor.a:					\
 	$(MESS_VIDEO)/abc80.o	\
 	$(MESS_DRIVERS)/abc80x.o	\
 	$(MESS_VIDEO)/abc80x.o	\
+	$(MESS_VIDEO)/abc806.o	\
 	$(MESS_MACHINE)/abcbus.o	\
+	$(MESS_MACHINE)/abc77.o	\
 	$(MESS_MACHINE)/e0516.o	\
 
 $(MESSOBJ)/sgi.a:						\
