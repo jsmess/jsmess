@@ -1293,6 +1293,8 @@ static MACHINE_DRIVER_START( newbraim )
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
+	MDRV_Z80CTC_ADD( "z80ctc", newbrain_ctc_intf )
+
 	// video hardware
 
 	MDRV_IMPORT_FROM(newbrain_video)
@@ -1344,6 +1346,8 @@ static MACHINE_DRIVER_START( newbraiv )
 
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
+
+	MDRV_Z80CTC_ADD( "z80ctc", newbrain_ctc_intf )
 
 	// video hardware
 
