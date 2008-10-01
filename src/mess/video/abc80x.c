@@ -207,7 +207,7 @@ static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
 {
 	const device_config *z80dart = device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart");
 
-	z80dart_set_ri(z80dart, vsync); // TODO: specify channel
+	z80dart_set_ri(z80dart, 1, vsync);
 }
 
 static MC6845_UPDATE_ROW( abc800c_update_row )
@@ -311,7 +311,7 @@ static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
 {
 	const device_config *z80dart = device_list_find_by_tag(device->machine->config->devicelist, Z80DART, "z80dart");
 
-	z80dart_set_ri(z80dart, vsync); // TODO: specify channel
+	z80dart_set_ri(z80dart, 1, vsync);
 }
 
 /* MC6845 Interfaces */

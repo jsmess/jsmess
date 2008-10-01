@@ -550,10 +550,10 @@ void z80dart_set_dcd(const device_config *device, int ch, int state)
     line
 -------------------------------------------------*/
 
-void z80dart_set_ri(const device_config *device, int state)
+void z80dart_set_ri(const device_config *device, int ch, int state)
 {
 	/* operate deferred */
-	timer_set(attotime_zero, (void *)device, (DART_RR0_RI << 8) + (state != 0) * 0x80, change_input_line);
+	timer_set(attotime_zero, (void *)device, (DART_RR0_RI << 8) + (state != 0) * 0x80 + ch, change_input_line);
 }
 
 

@@ -56,7 +56,6 @@
     TODO:
 
 	- ABC806 opcodes fetched from 0x7800-0x7fff reads/writes to 0-30K should address the video memory
-	- Z80DART has RI on both channels
 	- rewrite Z80DART for bit level serial I/O
 	- connect ABC77 keyboard to DART
     - COM port DIP switch
@@ -294,7 +293,7 @@ static READ8_DEVICE_HANDLER( dart_r )
 	case 2:
 		return z80dart_d_r(device, 1);
 	case 3:
-		return z80dart_c_r(device, 0); // this gets ABC806 booting, should be z80dart_c_r(0, 1)
+		return z80dart_c_r(device, 1);
 	}
 
 	return 0xff;

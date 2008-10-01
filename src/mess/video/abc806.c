@@ -344,7 +344,7 @@ static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
 		state->v50_addr = 0;
 	}
 
-	z80dart_set_ri(z80dart, vsync); // TODO: specify channel
+	z80dart_set_ri(z80dart, 1, vsync);
 }
 
 /* MC6845 Interfaces */

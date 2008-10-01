@@ -69,7 +69,7 @@ int z80dart_get_dtr(const device_config *device, int ch);
 int z80dart_get_rts(const device_config *device, int ch);
 void z80dart_set_cts(const device_config *device, int ch, int state);
 void z80dart_set_dcd(const device_config *device, int ch, int state);
-void z80dart_set_ri(const device_config *device, int state);
+void z80dart_set_ri(const device_config *device, int ch, int state);
 void z80dart_receive_data(const device_config *device, int ch, UINT8 data);
 
 
