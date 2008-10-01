@@ -360,8 +360,8 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
 #if 0
-	int controller1 = input_port_read(Machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(Machine, "CTRLSEL") & 0x70;
+	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
 #endif
 
 	tpi6525_0_irq0_level(machine, level);

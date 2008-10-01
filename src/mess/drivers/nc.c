@@ -360,7 +360,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			mem_bank = mem_bank & nc_membank_rom_mask;
 
-			addr = (memory_region(Machine, "main")+0x010000) + (mem_bank<<14);
+			addr = (memory_region(machine, "main")+0x010000) + (mem_bank<<14);
 
 			memory_set_bankptr(bank+1, addr);
 

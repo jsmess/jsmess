@@ -213,8 +213,8 @@ static void pc_fdc_data_rate_w(running_machine *machine, UINT8 data)
 		nec765_set_ready_state(1);
 
 		/* toggle reset state */
-		nec765_set_reset_state(Machine, 1);
- 		nec765_set_reset_state(Machine, 0);
+		nec765_set_reset_state(machine, 1);
+ 		nec765_set_reset_state(machine, 0);
 
 		/* bit is self-clearing */
 		data &= ~0x080;

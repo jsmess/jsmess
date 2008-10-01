@@ -362,7 +362,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 	{
 		unsigned char *FakeROM;
 
-		FakeROM = &memory_region(Machine, "main")[0x010000];
+		FakeROM = &memory_region(machine, "main")[0x010000];
 
 		memory_set_bankptr(1, FakeROM);
 	}

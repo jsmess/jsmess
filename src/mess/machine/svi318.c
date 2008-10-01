@@ -169,7 +169,7 @@ static READ8_HANDLER ( svi318_ppi_port_a_r )
 {
 	int data = 0x0f;
 
-	if (cassette_input(device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
+	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
 		data |= 0x80;
 	if (!svi318_cassette_present(0))
 		data |= 0x40;
@@ -230,13 +230,13 @@ static WRITE8_HANDLER ( svi318_ppi_port_c_w )
 	if (svi318_cassette_present(0))
 	{
 		cassette_change_state(
-			device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" ),
+			device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
 			(data & 0x10) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,
 			CASSETTE_MOTOR_DISABLED);
 	}
 
 	/* cassette signal write */
-	cassette_output(device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x20) ? -1.0 : +1.0);
+	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x20) ? -1.0 : +1.0);
 
 	svi.keyboard_row = data & 0x0F;
 }

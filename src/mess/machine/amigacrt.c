@@ -156,7 +156,7 @@ static void amiga_ar1_init( running_machine *machine )
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9fc000, 0x9fffff, 0, 0, SMH_BANK3);
 
 	/* Configure Banks */
-	memory_set_bankptr(2, memory_region(Machine, "user2"));
+	memory_set_bankptr(2, memory_region(machine, "user2"));
 	memory_set_bankptr(3, ar_ram);
 
 	amiga_ar1_spurious = 0;
@@ -379,12 +379,12 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400003, 0, mirror, amiga_ar23_mode_w);
 
 	/* Configure Banks */
-	memory_set_bankptr(2, memory_region(Machine, "user2"));
+	memory_set_bankptr(2, memory_region(machine, "user2"));
 	memory_set_bankptr(3, ar_ram);
 
 	memory_configure_bank(1, 0, 2, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 2, memory_region(Machine, "user1"), 0);
-	memory_configure_bank(1, 2, 2, memory_region(Machine, "user2"), 0);
+	memory_configure_bank(1, 1, 2, memory_region(machine, "user1"), 0);
+	memory_configure_bank(1, 2, 2, memory_region(machine, "user2"), 0);
 
 	amiga_ar23_mode = 3;
 }
@@ -398,7 +398,7 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 void amiga_cart_init( running_machine *machine )
 {
 	/* see what is there */
-	UINT16 *mem = (UINT16 *)memory_region( Machine, "user2" );
+	UINT16 *mem = (UINT16 *)memory_region( machine, "user2" );
 
 	amiga_cart_type = -1;
 

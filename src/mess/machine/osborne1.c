@@ -15,7 +15,6 @@ be written to RAM if RAM was switched in.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -534,7 +533,7 @@ static int osborne1_daisy_irq_ack(const device_config *device)
 {
     /* Enable ROM and I/O when IRQ is acknowledged */
     UINT8	old_bankswitch = osborne1.bankswitch;
-    osborne1_bankswitch_w( Machine, 0, 0 );
+    osborne1_bankswitch_w( device->machine, 0, 0 );
     osborne1.bankswitch = old_bankswitch;
     osborne1.in_irq_handler = 1;
     return 0xF8;
