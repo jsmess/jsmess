@@ -2311,9 +2311,28 @@ ROM_START( ibm5160 )
 
 	/* PC/3270 and AT/3270 have a set of two (optionally 3) 3270PGC programmable graphics controller cards on them which
            have 2 extra roms, plus a number of custom chips and at least one MCU.
-		** The Controller card (with one 48-pin custom, 3 40 pin customs at least one of which is an MCU,
-		   four 2016BP-10 srams, an 8254 and an 8255 on it, two crystals (16.257MHz and 21.676MHz) plus two
-		   mask roms ) is stickered "61X6579 // 983623 // 6390 SU" on the front.
+	   Information on these three boards plus the keyboard interface can be found at:
+	   http://www.seasip.info/VintagePC/5271.html
+		*** The descriptions below are based on the cards from the AT/3270, which are slightly
+		    different from the PC/3270 cards. Changes between the PC/3270 and AT/3270 video cards are
+		    listed:
+		    1. The card lip edge is changed on the APA and PS cards to allow them to be placed
+		       in a 16-bit ISA slot.
+		    2. The Main Display board is exactly the same PCB (hence cannot be placed in a 16-bit
+		       ISA slot), but the socket to the left of the 8255 is now populated, and has a lot of
+		       rework wires connected to various places on the PCB.
+		    3. The APA board was completely redone, and no longer has an 8254 (though it does have an
+		       empty socket) and has ?twice as much memory on it? (not sure about this). The APA
+		       board also now connects to both main board connectors 1 and 3, instead of only
+		       connector 1.
+		    4. The PS board has been minorly redone to allow clearance for a 16-bit ISA connector,
+		       but no other significant chip changes were made. The connector 3 still exists on the
+		       board but is unpopulated. Connector 2 still connects to the Main display board as
+		       before.
+
+		** The Main Display Board (with one 48-pin custom, 3 40 pin customs at least one of which is
+		   an MCU, four 2016BP-10 srams, an 8254 and an 8255 on it, two crystals (16.257MHz and
+		   21.676MHz) plus two mask roms ) is stickered "61X6579 // 983623 // 6390 SU" on the front.
 		*  The pcb is trace-marked "6320987" on both the front and back.
 		*  The card has a DE-9 connector on it for a monitor.
 		*  The customs are marked:
@@ -2321,15 +2340,17 @@ ROM_START( ibm5160 )
 		   "1503193 // TC15G008AP-0020 // JAPAN       8610A" (48 pins, at U29)
 		   "(M)1503194 // XE KGA005 // 8616N XM // SC81156P" (40 pins, at U36, likely an MCU)
 		   "S8613 // SCN2672B // C4N40 A // CP3303" (40 pins, at U24, also possibly an MCU)
-		** The All Points Addressable (Frame buffer?) card. Description is pending, but its older and
-		   less ASIC-ified (more discrete chips) than the later version of the card included with the
-		   AT/3270. It also is shaped in such a way that it cannot be inserted into a 16-bit ISA slot.
-		   Description of the later AT/3270 APA card is below (functionality is PROBABLY the same between the two):
-		** The All Points Addressable (Frame buffer?) card, (with 2 48-pin customs on it which are
-		   probably gate arrays and not MCUs, an empty ?rom? socket, an Intel Id2147H-3, a bank of 12
-		   16k*4-bit inmos ims2620p-15 DRAMs (tms4416 equivalent)), is stickered
+
+		** The All Points Addressable (Frame buffer?) card (with 2 48-pin customs on it which are
+		   probably gate arrays and not MCUs, an empty socket (28 pins, U46), an Intel Id2147H-3,
+		   a bank of twelve 16k*4-bit inmos ims2620p-15 DRAMs (tms4416 equivalent), and an Intel
+		   D2147K 4096*1 byte SRAM) is stickered
 		   "6487836 // A24969 // 6400 SU" on the back.
 		*  The pcb is trace-marked "EC 999040" on the back, and silkscreened "RC 2682819" on the front
+		*  The customs are marked:
+		   "6323259 // TC15G008AP-0028 // JAPAN       8606A" (48 pins, at U67)
+		   "6323260 // TC15G022AP-0018 // JAPAN       8606A" (48 pins, at U45)
+
 		** The optional Programmable Symbol Card (with an AMD AM9128-10PC, and six tms4416-15NL DRAMS,
 		   and a fleet of discrete logic chips, but no roms, pals, or proms) is stickered 
 		   "6347750 // A24866 // 6285 SU" on the front.
