@@ -2257,8 +2257,8 @@ ROM_START( ibm5160 )
 		* Unlike the much more complex keyboard controller used in the AT/3270, this one only has one rom, 
 		  a motorola made "(M)1503828 // XE // 8434A XM // SC81155P" custom (an MCU?; the more complicated 
 		  3270/AT keyboard card uses this same exact chip), an 8254, and some logic chips.
-		  (I can't tell based on the lousy picture (http://www.seasip.info/VintagePC/Images/5271kbc.jpg)
-		  whether it has pals or proms on it, nor can the location numbers of anything be clearly seen.)
+		  Thanks to high resolution pictures provided by John Elliott, I can see that the location of the
+                  chips is unlabeled (except for by absolute pin position on the back), and there are no pals or proms.
 		* The board is stickered "2683114 // 874999 // 8446 SU" on the front.
 		* The board has a single DE-9 connector where the keyboard dongle connects to.
 		* The keyboard dongle has two connectors on it: a DIN-5 connector which connects to the Motherboard's
@@ -2321,9 +2321,14 @@ ROM_START( ibm5160 )
 		   "1503193 // TC15G008AP-0020 // JAPAN       8610A" (48 pins, at U29)
 		   "(M)1503194 // XE KGA005 // 8616N XM // SC81156P" (40 pins, at U36, likely an MCU)
 		   "S8613 // SCN2672B // C4N40 A // CP3303" (40 pins, at U24, also possibly an MCU)
-		** The Frame-Buffer? Card (with 2 48-pin customs on it which are probably gate arrays and not MCUs,
-		   an empty ?rom? socket, an Intel Id2147H-3, a bank of 12 16k*4-bit inmos ims2620p-15 DRAMs
-		   (tms4416 equivalent)), is stickered "6487836 // A24969 // 6400 SU" on the back.
+		** The All Points Addressable (Frame buffer?) card. Description is pending, but its older and
+		   less ASIC-ified (more discrete chips) than the later version of the card included with the
+		   AT/3270. It also is shaped in such a way that it cannot be inserted into a 16-bit ISA slot.
+		   Description of the later AT/3270 APA card is below (functionality is PROBABLY the same between the two):
+		** The All Points Addressable (Frame buffer?) card, (with 2 48-pin customs on it which are
+		   probably gate arrays and not MCUs, an empty ?rom? socket, an Intel Id2147H-3, a bank of 12
+		   16k*4-bit inmos ims2620p-15 DRAMs (tms4416 equivalent)), is stickered
+		   "6487836 // A24969 // 6400 SU" on the back.
 		*  The pcb is trace-marked "EC 999040" on the back, and silkscreened "RC 2682819" on the front
 		** The optional Programmable Symbol Card (with an AMD AM9128-10PC, and six tms4416-15NL DRAMS,
 		   and a fleet of discrete logic chips, but no roms, pals, or proms) is stickered 
