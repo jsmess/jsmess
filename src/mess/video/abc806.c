@@ -8,11 +8,12 @@
 
 	TODO:
 
-	- how do you select between 512x240 and 256x240 HR modes???
+	- selection between 512x240, 256x240, and 240x240 HR modes
 	- add proper screen parameters to startup
 	- palette configuration from PAL/PROM
 	- vertical sync delay
 	- horizontal positioning of the text and HR screens
+	- protection device @ 16H
 	
 */
 
@@ -51,16 +52,16 @@ WRITE8_HANDLER( abc806_hrs_w )
 {
 	/*
 
-		bit		description
+		bit		signal	description
 
-		0		visible screen memory area bit 0
-		1		visible screen memory area bit 1
-		2		visible screen memory area bit 2 (unused)
-		3		visible screen memory area bit 3 (unused)
-		4		cpu accessible screen memory area bit 0
-		5		cpu accessible screen memory area bit 1
-		6		cpu accessible screen memory area bit 2 (unused)
-		7		cpu accessible screen memory area bit 3 (unused)
+		0		VM14	visible screen memory area bit 0
+		1		VM15	visible screen memory area bit 1
+		2		VM16	visible screen memory area bit 2 (unused)
+		3		VM17	visible screen memory area bit 3 (unused)
+		4		F14		cpu accessible screen memory area bit 0
+		5		F15		cpu accessible screen memory area bit 1
+		6		F16		cpu accessible screen memory area bit 2 (unused)
+		7		F17		cpu accessible screen memory area bit 3 (unused)
 
 	*/
 
@@ -137,7 +138,7 @@ READ8_HANDLER( abc806_cli_r )
 	*/
 
 	UINT16 hru2_addr = (state->hru2_a8 << 8) | (offset >> 8);
-	UINT8 data = memory_region(machine, "hru2")[hru2_addr] & 0x0f;
+	UINT8 data = state->hru2_prom[hru2_addr] & 0x0f;
 
 	data |= e0516_dio_r(state->e0516) << 7;
 
@@ -145,6 +146,28 @@ READ8_HANDLER( abc806_cli_r )
 }
 
 /* Special */
+
+READ8_HANDLER( abc806_sti_r )
+{
+	/* this is some weird device marked PROT @ 16H */
+
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		PROT DOUT
+
+	*/
+
+	return 0;
+}
 
 WRITE8_HANDLER( abc806_sto_w )
 {
@@ -163,8 +186,11 @@ WRITE8_HANDLER( abc806_sto_w )
 		state->_40 = level;
 		break;
 	case 2:
-		/* HRU II address line 8 */
+		/* HRU II address line 8, PROT A0 */
 		state->hru2_a8 = level;
+		break;
+	case 3:
+		/* PROT INI */
 		break;
 	case 4:
 		/* text display enable */
@@ -172,14 +198,14 @@ WRITE8_HANDLER( abc806_sto_w )
 		break;
 	case 5:
 		/* RTC chip select */
-		e0516_cs_w(state->e0516, level);
+		e0516_cs_w(state->e0516, !level);
 		break;
 	case 6:
 		/* RTC clock */
 		e0516_clk_w(state->e0516, level);
 		break;
 	case 7:
-		/* RTC data in */
+		/* RTC data in, PROT DIN */
 		e0516_dio_w(state->e0516, level);
 		break;
 	}
@@ -365,6 +391,23 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 
 	for (y = 0; y < 240; y++)
 	{
+		/* 240x240 */
+		for (sx = 0; sx < 60; sx++)
+		{
+			UINT16 data = (state->videoram[addr++] << 8) | state->videoram[addr++];
+
+			for (dot = 0; dot < 4; dot++)
+			{
+				int color = state->hrc[(data >> 12) & 0x0f]; // TODO get colors from HRU II prom
+				int x = (sx << 3) | (dot << 1);
+
+				*BITMAP_ADDR16(bitmap, y, x) = color;
+				*BITMAP_ADDR16(bitmap, y, x + 1) = color;
+
+				data <<= 4;
+			}
+		}
+
 		/* 256x240 */
 		for (sx = 0; sx < 64; sx++)
 		{
@@ -389,7 +432,7 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 
 			for (dot = 0; dot < 8; dot++)
 			{
-				int color = state->hrc[(data >> 14) & 0x03];
+				int color = (data >> 14) & 0x03;
 				int x = (sx << 3) | dot;
 
 				*BITMAP_ADDR16(bitmap, y, x) = color;
@@ -425,6 +468,7 @@ static VIDEO_START(abc806)
 
 	state->char_rom = memory_region(machine, "chargen");
 	state->rad_prom = memory_region(machine, "rad");
+	state->hru2_prom = memory_region(machine, "hru2");
 
 	/* allocate memory */
 

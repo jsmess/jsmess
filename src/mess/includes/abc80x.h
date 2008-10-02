@@ -114,6 +114,7 @@ struct _abc806_state
 
 	/* memory regions */
 	const UINT8 *rad_prom;	/* line address PROM */
+	const UINT8 *hru2_prom;	/* HR palette PROM */
 	const UINT8 *char_rom;	/* character generator ROM */
 };
 
@@ -142,8 +143,7 @@ WRITE8_HANDLER( abc806_amo_w );
 READ8_HANDLER( abc806_cli_r );
 WRITE8_HANDLER( abc806_sso_w );
 
+READ8_HANDLER( abc806_sti_r );
 WRITE8_HANDLER( abc806_sto_w );
-
-void abc802_mux80_40_w(int level);
 
 #endif /* __ABC80X__ */

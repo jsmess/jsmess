@@ -36,6 +36,8 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 
+- [ABC800M] Added keyboard hack to enable system use. [Curt Coder]
+
 - [C16] Added support for tape emulation using MESS core functions (only 
   loading, both .wav and .tap formats) [Fabio Priuli, Roberto Zandona']
 

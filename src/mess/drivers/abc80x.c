@@ -86,6 +86,115 @@
 #include "devices/cassette.h"
 #include "devices/printer.h"
 
+/* Keyboard HACK */
+
+static emu_timer *abc800_keyboard_timer;
+static int keylatch;
+
+static const UINT8 abc800_keycodes[7*4][8] =
+{
+	// unshift
+	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 },
+	{ 0x39, 0x30, 0x2B, 0x60, 0x3C, 0x71, 0x77, 0x65 },
+	{ 0x72, 0x74, 0x79, 0x75, 0x69, 0x6F, 0x70, 0x7D },
+	{ 0x7E, 0x0D, 0x61, 0x73, 0x64, 0x66, 0x67, 0x68 },
+	{ 0x6A, 0x6B, 0x6C, 0x7C, 0x7B, 0x27, 0x08, 0x7A },
+	{ 0x78, 0x63, 0x76, 0x62, 0x6E, 0x6D, 0x2C, 0x2E },
+	{ 0x2D, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
+
+	// shift
+	{ 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x2f, 0x28 },
+	{ 0x29, 0x3d, 0x3f, 0x40, 0x3e, 0x51, 0x57, 0x45 },
+	{ 0x52, 0x54, 0x59, 0x55, 0x49, 0x4f, 0x50, 0x5d },
+	{ 0x5e, 0x0d, 0x41, 0x53, 0x44, 0x46, 0x47, 0x48 },
+	{ 0x4a, 0x4b, 0x4c, 0x5c, 0x5b, 0x2a, 0x08, 0x5a },
+	{ 0x58, 0x43, 0x56, 0x42, 0x4e, 0x4d, 0x3b, 0x3a },
+	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
+
+	// control
+	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 },
+	{ 0x39, 0x30, 0x2b, 0x00, 0x7f, 0x11, 0x17, 0x05 },
+	{ 0x12, 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x1d },
+	{ 0x1e, 0x0d, 0x01, 0x13, 0x04, 0x06, 0x07, 0x08 },
+	{ 0x0a, 0x0b, 0x0c, 0x1c, 0x1b, 0x27, 0x08, 0x1a },
+	{ 0x18, 0x03, 0x16, 0x02, 0x0e, 0x0d, 0x2c, 0x2e },
+	{ 0x2d, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 },
+
+	// control-shift
+	{ 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x2f, 0x28 },
+	{ 0x29, 0x3d, 0x3f, 0x00, 0x7f, 0x11, 0x17, 0x05 },
+	{ 0x12, 0x14, 0x19, 0x15, 0x09, 0x1f, 0x00, 0x1d },
+	{ 0x1e, 0x0d, 0x01, 0x13, 0x04, 0x06, 0x07, 0x08 },
+	{ 0x0a, 0x1b, 0x1c, 0x1c, 0x1b, 0x2a, 0x08, 0x1a },
+	{ 0x18, 0x03, 0x16, 0x02, 0x1e, 0x1d, 0x3b, 0x3a },
+	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }
+};
+
+static void abc800_keyboard_scan(running_machine *machine)
+{
+	UINT8 keycode = 0;
+	UINT8 data;
+	int table = 0, row, col;
+	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
+
+	// shift, upper case
+	if (input_port_read(machine, "ROW7") & 0x07)
+	{
+		table |= 0x01;
+	}
+
+	// ctrl
+	if (input_port_read(machine, "ROW7") & 0x08)
+	{
+		table |= 0x02;
+	}
+
+	for (row = 0; row < 7; row++)
+	{
+		data = input_port_read(machine, keynames[row]);
+
+		if (data != 0)
+		{
+			UINT8 ibit = 1;
+
+			for (col = 0; col < 8; col++)
+			{
+				if (data & ibit) keycode = abc800_keycodes[row + (table * 7)][col];
+				ibit <<= 1;
+			}
+		}
+	}
+
+	if (keycode)
+	{
+		if (!keylatch)
+		{
+			abc800_state *state = machine->driver_data;
+
+			z80dart_set_dcd(state->z80dart, 1, 1);
+			z80dart_receive_data(state->z80dart, 1, keycode);
+			logerror("KEYCODE WRITE: %02x\n", keycode);
+			keylatch = keycode;
+		}
+	}
+	else
+	{
+		if (keylatch)
+		{
+			abc800_state *state = machine->driver_data;
+
+			z80dart_set_dcd(state->z80dart, 1, 0);
+			z80dart_receive_data(state->z80dart, 1, 0);
+			keylatch = 0;
+		}
+	}
+}
+
+static TIMER_CALLBACK( abc800_keyboard_tick )
+{
+	abc800_keyboard_scan(machine);
+}
+
 /* Read/Write Handlers */
 
 // ABC 800
@@ -448,7 +557,7 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_mai_r, abc806_mao_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(abc806_ami_r, abc806_amo_w)
-	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_WRITE(abc806_sto_w)
+	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_READWRITE(abc806_sti_r, abc806_sto_w)
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_cli_r, abc806_sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
@@ -460,7 +569,85 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( abc800 )
-	PORT_INCLUDE(abc77)
+	PORT_START("ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 \xC2\xA4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0x00A4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+
+	PORT_START("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00E9) PORT_CHAR(0x00C9)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+
+	PORT_START("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
+
+	PORT_START("ROW3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00FC) PORT_CHAR(0x00DC)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+
+	PORT_START("ROW4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+
+	PORT_START("ROW5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
+
+	PORT_START("ROW6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ROW7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UPPER CASE") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc802 )
@@ -539,11 +726,16 @@ static int dart_serial_receive(const device_config *device, int ch)
 	return -1;
 }
 
+static void dart_interrupt(const device_config *device, int state)
+{
+	cpunum_set_input_line(device->machine, 0, 0, state);
+}
+
 static const z80dart_interface abc800_dart_intf =
 {
-	Z80_TAG,					/* cpu */
+	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
-	0,						/* interrupt handler */
+	dart_interrupt,			/* interrupt handler */
 	0,						/* DTR changed handler */
 	0,						/* RTS changed handler */
 	0,						/* BREAK changed handler */
@@ -574,6 +766,11 @@ static TIMER_CALLBACK(abc800_ctc_tick)
 static MACHINE_START( abc800 )
 {
 	abc800_state *state = machine->driver_data;
+
+	/* keyboard HACK */
+
+	abc800_keyboard_timer = timer_alloc(abc800_keyboard_tick, NULL);
+	timer_adjust_periodic(abc800_keyboard_timer, attotime_zero, 0, ATTOTIME_IN_USEC(2500));
 
 	/* find devices */
 
@@ -629,7 +826,7 @@ static WRITE8_DEVICE_HANDLER( abc802_dart_rts_w )
 
 static const z80dart_interface abc802_dart_intf =
 {
-	Z80_TAG,					/* cpu */
+	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	abc802_dart_dtr_w,		/* DTR changed handler */
@@ -704,7 +901,7 @@ static WRITE8_DEVICE_HANDLER( abc806_dart_dtr_w )
 
 static const z80dart_interface abc806_dart_intf =
 {
-	Z80_TAG,					/* cpu */
+	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	abc806_dart_dtr_w,		/* DTR changed handler */
@@ -753,6 +950,8 @@ static MACHINE_START( abc806 )
 
 static MACHINE_RESET( abc806 )
 {
+	abc806_state *state = machine->driver_data;
+
 	/* setup memory banking */
 
 	int bank;
@@ -761,6 +960,8 @@ static MACHINE_RESET( abc806 )
 	{
 		memory_set_bank(bank, 0);
 	}
+
+	state->eme = 0;
 
 	abc806_bankswitch(machine);
 }
@@ -779,9 +980,9 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_MACHINE_START(abc800)
 
 	/* ABC-77 keyboard */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+/*	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)
-	MDRV_DEVICE_CONFIG(abc800_abc77_intf)
+	MDRV_DEVICE_CONFIG(abc800_abc77_intf)*/
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc800m_video)
@@ -809,9 +1010,9 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_MACHINE_START(abc800)
 
 	/* ABC-77 keyboard */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+/*	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)
-	MDRV_DEVICE_CONFIG(abc800_abc77_intf)
+	MDRV_DEVICE_CONFIG(abc800_abc77_intf)*/
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc800c_video)
@@ -880,7 +1081,7 @@ static MACHINE_DRIVER_START( abc806 )
 
 	MDRV_Z80CTC_ADD( Z80CTC_TAG, abc800_ctc_intf )
 	MDRV_Z80SIO_ADD( Z80SIO_TAG, abc800_sio_intf )
-	MDRV_Z80DART_ADD( Z80DART_TAG, abc800_dart_intf )
+	MDRV_Z80DART_ADD( Z80DART_TAG, abc806_dart_intf )
 
 	/* real time clock */
 	MDRV_DEVICE_ADD(E0516_TAG, E0516)
@@ -915,9 +1116,9 @@ MACHINE_DRIVER_END
 	ROM_LOAD( "10726864",  0x1000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), BIOS(1) ) \
 	ROM_LOAD( "abc99.bin", 0x1000, 0x0800, CRC(d48310fc) SHA1(17a2ffc0ec00d395c2b9caf3d57fed575ba2b137), BIOS(2) )
 
-ROM_START( abc800c )
+ROM_START( abc800m )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "abcc.1m",    0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "abcm.1m",    0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
 	ROM_LOAD( "abc1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
 	ROM_LOAD( "abc2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
 	ROM_LOAD( "abc3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
@@ -926,8 +1127,8 @@ ROM_START( abc800c )
 	ROM_LOAD( "abc6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
 	ROM_LOAD( "abc7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "vuc-se.7c",  0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 
 	ROM_REGION( 0x2000, "user1", 0 )
 	// Fast Controller
@@ -959,9 +1160,9 @@ ROM_START( abc800c )
 	ROM_LOAD( "st225.bin",    0x0000, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225
 ROM_END
 
-ROM_START( abc800m )
+ROM_START( abc800c )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "abcm.1m",    0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
+	ROM_LOAD( "abcc.1m",    0x0000, 0x1000, NO_DUMP )
 	ROM_LOAD( "abc1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
 	ROM_LOAD( "abc2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
 	ROM_LOAD( "abc3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
@@ -970,8 +1171,8 @@ ROM_START( abc800m )
 	ROM_LOAD( "abc6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
 	ROM_LOAD( "abc7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 
-	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "vuc-se.7c",  0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 ROM_START( abc802 )
@@ -979,11 +1180,11 @@ ROM_START( abc802 )
 	ROM_LOAD(  "abc02-11.9f",  0x0000, 0x2000, CRC(b86537b2) SHA1(4b7731ef801f9a03de0b5acd955f1e4a1828355d) )
 	ROM_LOAD(  "abc12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
 	ROM_LOAD(  "abc22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
-	ROM_SYSTEM_BIOS( 0, "v19",		"UDF-DOS v6.19" )
+	ROM_SYSTEM_BIOS( 0, "v19", "UDF-DOS v6.19" )
 	ROMX_LOAD( "abc32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v20",		"UDF-DOS v6.20" )
+	ROM_SYSTEM_BIOS( 1, "v20", "UDF-DOS v6.20" )
 	ROMX_LOAD( "abc32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "mica",		"MICA DOS v6.20" )
+	ROM_SYSTEM_BIOS( 2, "mica", "MICA DOS v6.20" )
 	ROMX_LOAD( "mica820.14f",  0x6000, 0x2000, CRC(edf998af) SHA1(daae7e1ff6ef3e0ddb83e932f324c56f4a98f79b), ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
@@ -1162,7 +1363,7 @@ static DRIVER_INIT( abc806 )
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
-COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C", GAME_NOT_WORKING )
-COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M", GAME_NOT_WORKING )
+COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C", GAME_NOT_WORKING )
 COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc800, abc802, "Luxor Datorer AB", "ABC 802",  GAME_NOT_WORKING )
 COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc806, "Luxor Datorer AB", "ABC 806",  GAME_NOT_WORKING )
