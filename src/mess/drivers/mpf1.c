@@ -31,7 +31,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "mscommon.h"
 #include "sound/dac.h"
 
 
@@ -50,65 +49,6 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 	}
 }
 
-static const char leddisplay[] =
-{
-	"         aaaaaaaaaaaaaaaaa   \r"
-	"        aaaaaaaaaaaaaaaaaaa  \r"
-	"        aaaaaaaaaaaaaaaaaa   \r"
-	"      ff aaaaaaaaaaaaaaaa bb \r"
-	"      fff                bbb \r"
-	"     ffff               bbbb \r"
-	"     ffff               bbbb \r"
-	"     ffff              bbbbb \r"
-	"     ffff              bbbb  \r"
-	"    fffff              bbbb  \r"
-	"    ffff               bbbb  \r"
-	"    ffff               bbbb  \r"
-	"    ffff               bbb   \r"
-	"    ffff              bbbb   \r"
-	"    ffff              bbbb   \r"
-	"   fffff              bbbb   \r"
-	"   ffff               bbbb   \r"
-	"    ff ggggggggggggggg bb    \r"
-	"      ggggggggggggggggg      \r"
-	"      gggggggggggggggg       \r"
-	"    e  gggggggggggggg cc     \r"
-	"   eee               cccc    \r"
-	"  eeee              ccccc    \r"
-	"  eeee              ccccc    \r"
-	"  eeee              ccccc    \r"
-	" eeee               ccccc    \r"
-	" eeee               cccc     \r"
-	" eeee               cccc     \r"
-	" eeee              ccccc     \r"
-	" eeee              ccccc     \r"
-	"eeeee              cccc      \r"
-	"eeee               cccc      \r"
-	"eeee               cccc  hh  \r"
-	"eee                cccc hhhh \r"
-	"ee dddddddddddddddd cc  hhhh \r"
-	"  dddddddddddddddddd    hhhh \r"
-	"  dddddddddddddddddd     hh  \r"
-	"   dddddddddddddddd          \r"
-}; // h is originally represented by p in original schematics
-
-static const char radius_7_led[] = {
-       "     11111\r"
-       "   111111111\r"
-       "  11111111111\r"
-       " 1111111111111\r"
-       "11111111111111\r"
-       "111111111111111\r"
-       "111111111111111\r"
-       "111111111111111\r"
-       "111111111111111\r"
-       "111111111111111\r"
-       "111111111111111\r"
-       " 1111111111111\r"
-       "  11111111111\r"
-       "   111111111\r"
-       "    111111\r"
-};
 
 static UINT32 leddigit[6];
 static INT8 lednum;
@@ -118,45 +58,14 @@ static INT8 keycol;
 static UINT8 kbdlatch;
 
 
-
-/* video */
-
-static PALETTE_INIT( mpf1 )
+static TIMER_CALLBACK( check_halt_callback )
 {
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine, 1, 0xff, 0x00, 0x00);
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00);
-}
-
-
-
-static VIDEO_START( mpf1 )
-{
-    videoram_size = 6 * 2 + 24;
-    videoram = auto_malloc (videoram_size);
-}
-
-
-
-static VIDEO_UPDATE( mpf1 )
-{
-	int x;
-	static const UINT8 xpositions[] = { 20, 59, 97, 135, 185, 223 };
-
-	//fillbitmap(bitmap, get_black_pen(), NULL);
-
-	for(x = 0; x < 6; x++)
-		draw_led(screen->machine, bitmap, leddisplay, leddigit[x], xpositions[x], 377);
-
-	// tone-LED; the green one
-	draw_led(screen->machine, bitmap, radius_7_led, led_tone * 2, 277, 375);
-
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
 	led_halt = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_REGISTER + Z80_HALT);
-	draw_led(screen->machine, bitmap, radius_7_led, led_halt, 277, 394);
-	return 0;
+	set_led_status(1, led_tone);
 }
+
 
 /* Memory Maps */
 
@@ -203,8 +112,8 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
 //  The 16 I/O port combinations for the CTC (Zilog, Z0843004PSC, Z80 CTC, 8644)
 //  AM_RANGE(0x40, 0x43) AM_WRITE(ctc_enable_w) AM_MIRROR(0x7C)
 
-//  The 16 I/O port combinations for the PIO (Zilog, Z0842004PSC, Z80 PIO, 8735)
-//  AM_RANGE(0x80, 0x83) AM_READWRITE(pio_r, pio_w) AM_MIRROR(0xBF)
+	/* The 16 I/O port combinations for the PIO (Zilog, Z0842004PSC, Z80 PIO, 8735) */
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_r, z80pio_w) AM_MIRROR(0xBF)
 
 ADDRESS_MAP_END
 
@@ -469,6 +378,8 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 		       ( (data & 0x02) << 5 ) |
 		       ( (data & 0x40) << 1 );
 		leddigit[lednum] = data;
+		output_set_digit_value( lednum, data & 0x7f );
+		set_led_status( lednum + 2, data >> 7 );
 	}
 	verboselog( 1, "PPI port B (LED Data) write: %02x\n", data );
 }
@@ -519,17 +430,17 @@ static const ppi8255_interface ppi8255_intf =
 
 /* Machine Initialization */
 
+static TIMER_CALLBACK( irq0_callback )
+{
+	irq0_line_hold( machine, 0 );
+}
+
 static MACHINE_RESET( mpf1 )
 {
-	// CTC
-/*  z80ctc_init(&ctc_intf);
-    z80ctc_reset(0);*/
-
-	// leds
-	for (lednum = 0; lednum < 6; lednum++)
-		leddigit[lednum] = 0;
-
 	lednum = 0;
+
+	timer_pulse( ATTOTIME_IN_HZ(1), NULL, 0, check_halt_callback );
+	timer_pulse( ATTOTIME_IN_HZ(60), NULL, 0, irq0_callback );
 }
 
 /* Machine Drivers */
@@ -539,7 +450,6 @@ static MACHINE_DRIVER_START( mpf1 )
 	MDRV_CPU_ADD("main", Z80, 3579500/2)	// 1.79 MHz
 	MDRV_CPU_PROGRAM_MAP(mpf1_map, 0)
 	MDRV_CPU_IO_MAP(mpf1_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET( mpf1 )
 
@@ -547,19 +457,6 @@ static MACHINE_DRIVER_START( mpf1 )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( ppi8255_intf )
-
-	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(462, 661)
-	MDRV_SCREEN_VISIBLE_AREA(0, 461, 0, 660)
-	MDRV_PALETTE_LENGTH(3)
-
-	MDRV_PALETTE_INIT( mpf1 )
-	MDRV_VIDEO_START(mpf1)
-	MDRV_VIDEO_UPDATE(mpf1)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
