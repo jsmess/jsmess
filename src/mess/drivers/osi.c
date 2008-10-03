@@ -12,9 +12,9 @@
 */
 
 #include "driver.h"
-#include "image.h"
 #include "machine/6850acia.h"
 #include "sound/discrete.h"
+#include "devices/cassette.h"
 
 /* Video */
 
@@ -308,13 +308,14 @@ GFXDECODE_END
 
 /* Machine Start */
 
+static UINT8 rx_cassette;
 static UINT8 rx, tx;
 
 static const struct acia6850_interface sb2m600_acia_intf =
 {
 	500000, //
 	500000, //
-	&rx,
+	&rx_cassette,
 	&tx,
 	NULL,
 	NULL,
@@ -338,7 +339,7 @@ static const struct acia6850_interface uk101_acia_intf =
 {
 	500000, //
 	500000, //
-	&rx,
+	&rx_cassette,
 	&tx,
 	NULL,
 	NULL,
@@ -346,17 +347,26 @@ static const struct acia6850_interface uk101_acia_intf =
 	NULL
 };
 
+
+static TIMER_CALLBACK( sb2m600_cassette_callback )
+{
+	rx_cassette = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0) ? 1 : 0;
+}
+
+
 static MACHINE_START( sb2m600 )
 {
 	// TODO: save states
 	acia6850_config(0, &sb2m600_acia_intf);
 	acia6850_config(1, &osi470_acia_intf);
+	timer_pulse( ATTOTIME_IN_HZ(4800), NULL, 0, sb2m600_cassette_callback );
 }
 
 static MACHINE_START( uk101 )
 {
 	// TODO: save states
 	acia6850_config(0, &uk101_acia_intf);
+	timer_pulse( ATTOTIME_IN_HZ(4800), NULL, 0, sb2m600_cassette_callback );
 }
 
 /* Machine Drivers */
@@ -388,6 +398,8 @@ static MACHINE_DRIVER_START( sb2m600 )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sb2m600_discrete_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 #define UK101_X1 XTAL_8MHz
@@ -411,6 +423,8 @@ static MACHINE_DRIVER_START( uk101 )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(uk101)
 	MDRV_VIDEO_UPDATE(sb2m600)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -441,54 +455,7 @@ ROM_END
 
 /* System Configuration */
 
-static UINT8 *sb2m600_tape_image;
-static int sb2m600_tape_size;
-static int sb2m600_tape_index;
-
-static DEVICE_IMAGE_LOAD( sb2m600_cassette )
-{
-	sb2m600_tape_image = (UINT8 *)image_malloc(image, sb2m600_tape_size);
-	sb2m600_tape_size = image_length(image);
-
-	if (!sb2m600_tape_image || (image_fread(image, sb2m600_tape_image, sb2m600_tape_size) != sb2m600_tape_size))
-	{
-		return INIT_FAIL;
-	}
-
-	sb2m600_tape_index = 0;
-
-	return INIT_PASS;
-}
-
-static DEVICE_IMAGE_UNLOAD( sb2m600_cassette )
-{
-	sb2m600_tape_image = NULL;
-	sb2m600_tape_size = 0;
-	sb2m600_tape_index = 0;
-}
-
-static void sb2m600_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(sb2m600_cassette); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(sb2m600_cassette); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bas"); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(sb2m600)
-	CONFIG_DEVICE(sb2m600_cassette_getinfo)
 	CONFIG_RAM_DEFAULT(4 * 1024)
 	CONFIG_RAM(8 * 1024)
 SYSTEM_CONFIG_END
