@@ -4,6 +4,9 @@
 
   Driver file to handle emulation of the Odyssey2.
 
+  Minor update to "the voice" rom names, and add comment about
+  the older revision of "the voice" - LN, 10/03/08
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -264,12 +267,21 @@ ROM_START (odyssey2)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
 
 	ROM_REGION( 0x10000, "sp0256_speech", 0 )
-	/* SP0256B-019 mask rom */
-	ROM_LOAD( "0256b019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
-	/* External ROM from The Voice */
-	ROM_LOAD( "sp128_03.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
-	/* Additional rom from S.I.D. the Spellbinder */
-	ROM_LOAD( "sp128_04.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
+	/* SP0256B-019 Speech chip w/2KiB mask rom */
+	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
+
+	/* A note about "The Voice": Two versions of "The Voice" exist:
+	   * An earlier version with eight 2KiB speech roms, spr016-??? thru spr016-??? on a small daughterboard
+	   <note to self: fill in numbers later>
+	   * A later version with one 16KiB speech rom, spr128-003, mounted directly on the mainboard
+	   The rom contents of these two versions are EXACTLY the same.
+	   Both versions have an sp0256b-019 speech chip, which has 2KiB of its own internal speech data
+	   Thanks to kevtris for this info. - LN
+	*/
+	/* External 16KiB speech ROM (spr128-003) from "The Voice" */
+	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
+	/* Additional External 16KiB ROM (spr128-004) from S.I.D. the Spellbinder */
+	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
 ROM_END
 
 ROM_START (videopac)
@@ -284,12 +296,12 @@ ROM_START (videopac)
 	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
 
 	ROM_REGION( 0x10000, "sp0256_speech", 0 )
-	/* SP0256B-019 mask rom */
-	ROM_LOAD( "0256b019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
-	/* External ROM from The Voice */
-	ROM_LOAD( "sp128_03.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
-	/* Additional rom from S.I.D. the Spellbinder */
-	ROM_LOAD( "sp128_04.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
+	/* SP0256B-019 Speech chip w/2KiB mask rom */
+	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
+	/* External 16KiB speech ROM (spr128-003) from "The Voice" */
+	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
+	/* Additional External 16KiB speech ROM (spr128-004) from S.I.D. the Spellbinder */
+	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
 ROM_END
 
 ROM_START (g7400)
