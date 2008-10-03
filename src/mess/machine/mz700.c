@@ -38,12 +38,12 @@ static UINT8 ne556_out[2] = {0,};		/* NE556 current output status */
 
 static UINT8 mz700_motor_on = 0;	/* cassette motor key (play key) */
 
-static  READ8_HANDLER ( pio_port_a_r );
-static  READ8_HANDLER ( pio_port_b_r );
-static  READ8_HANDLER ( pio_port_c_r );
-static WRITE8_HANDLER ( pio_port_a_w );
-static WRITE8_HANDLER ( pio_port_b_w );
-static WRITE8_HANDLER ( pio_port_c_w );
+static READ8_DEVICE_HANDLER ( pio_port_a_r );
+static READ8_DEVICE_HANDLER ( pio_port_b_r );
+static READ8_DEVICE_HANDLER ( pio_port_c_r );
+static WRITE8_DEVICE_HANDLER ( pio_port_a_w );
+static WRITE8_DEVICE_HANDLER ( pio_port_b_w );
+static WRITE8_DEVICE_HANDLER ( pio_port_c_w );
 
 const ppi8255_interface mz700_ppi8255_interface = {
 	pio_port_a_r,
@@ -127,7 +127,7 @@ static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
 
 /************************ PIO ************************************************/
 
-static  READ8_HANDLER ( pio_port_a_r )
+static READ8_DEVICE_HANDLER ( pio_port_a_r )
 {
 	UINT8 data = pio_port_a_output;
 	LOG(2,"mz700_pio_port_a_r",("%02X\n", data));
@@ -135,20 +135,20 @@ static  READ8_HANDLER ( pio_port_a_r )
 }
 
 /* read keyboard row - indexed by a demux LS145 which is connected to PA0-3 */
-static  READ8_HANDLER ( pio_port_b_r )
+static READ8_DEVICE_HANDLER ( pio_port_b_r )
 {
 	UINT8 demux_LS145, data = 0xff;
 	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", 
 										"ROW6", "ROW7", "ROW8", "ROW9", "ROW10" };
 
     demux_LS145 = pio_port_a_output & 15;
-    data = input_port_read(machine, keynames[demux_LS145]);
+    data = input_port_read(device->machine, keynames[demux_LS145]);
 	LOG(2,"mz700_pio_port_b_r",("%02X\n", data));
 
     return data;
 }
 
-static READ8_HANDLER (pio_port_c_r )
+static READ8_DEVICE_HANDLER (pio_port_c_r )
 {
     UINT8 data = pio_port_c_output & 0x0f;
 
@@ -161,26 +161,26 @@ static READ8_HANDLER (pio_port_c_r )
     if (mz700_motor_on)
         data |= 0x10;
 
-    if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
+    if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
         data |= 0x20;       /* set the RDATA status */
 
 	if (ne556_out[0])
         data |= 0x40;           /* set the 556OUT status */
 
-    data |= input_port_read(machine, "STATUS");   /* get VBLANK in bit 7 */
+    data |= input_port_read(device->machine, "STATUS");   /* get VBLANK in bit 7 */
 
 	LOG(2,"mz700_pio_port_c_r",("%02X\n", data));
 
     return data;
 }
 
-static WRITE8_HANDLER (pio_port_a_w )
+static WRITE8_DEVICE_HANDLER (pio_port_a_w )
 {
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data));
 	pio_port_a_output = data;
 }
 
-static WRITE8_HANDLER ( pio_port_b_w )
+static WRITE8_DEVICE_HANDLER ( pio_port_b_w )
 {
 	/*
 	 * bit 7	NE556 reset
@@ -198,7 +198,7 @@ static WRITE8_HANDLER ( pio_port_b_w )
     timer_enable(ne556_timer[0], (data & 0x80) ? 0 : 1);
 }
 
-static WRITE8_HANDLER ( pio_port_c_w )
+static WRITE8_DEVICE_HANDLER ( pio_port_c_w )
 {
     /*
      * bit 3 out    motor control (0 = on)
@@ -210,11 +210,11 @@ static WRITE8_HANDLER ( pio_port_c_w )
 	pio_port_c_output = data;
 
 	cassette_change_state(
-		device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+		device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
-    cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x02) ? +1.0 : -1.0);
+    cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x02) ? +1.0 : -1.0);
 }
 
 /************************ MMIO ***********************************************/

@@ -396,7 +396,7 @@ static const device_config *printer_device(running_machine *machine)
 /* Bit 6: J7-8 Centronics D6           		                           */
 /* Bit 7: J7-9 Centronics D7          		                           */
 /*-------------------------------------------------------------------------*/
-static WRITE8_HANDLER ( compis_ppi_port_a_w )
+static WRITE8_DEVICE_HANDLER ( compis_ppi_port_a_w )
 {
 	compis.printer.data = data;
 }
@@ -410,15 +410,15 @@ static WRITE8_HANDLER ( compis_ppi_port_a_w )
 /* Bit 6: J7-13 Centronics SELECT			                   */
 /* Bit 7: Tmr0			      	                                   */
 /*-------------------------------------------------------------------------*/
-static READ8_HANDLER ( compis_ppi_port_b_r )
+static READ8_DEVICE_HANDLER ( compis_ppi_port_b_r )
 {
 	UINT8 data;
 
 	/* DIP switch - Test mode */
-	data = input_port_read(machine, "DSW0");
+	data = input_port_read(device->machine, "DSW0");
 
 	/* Centronics busy */
-	if (!printer_is_ready(printer_device(machine)))
+	if (!printer_is_ready(printer_device(device->machine)))
 		data |= 0x20;
 
 	return 	data;
@@ -433,19 +433,19 @@ static READ8_HANDLER ( compis_ppi_port_b_r )
 /* Bit 6: V2-4 Floppy Soft reset   			                   */
 /* Bit 7: V2-3 Floppy Terminal count      	                           */
 /*-------------------------------------------------------------------------*/
-static WRITE8_HANDLER ( compis_ppi_port_c_w )
+static WRITE8_DEVICE_HANDLER ( compis_ppi_port_c_w )
 {
 	/* Centronics Strobe */
 	if ((compis.printer.strobe) && !(data & 0x20))
-		printer_output(printer_device(machine), compis.printer.data);
+		printer_output(printer_device(device->machine), compis.printer.data);
 	compis.printer.strobe = ((data & 0x20)?1:0);
 
 	/* FDC Reset */
 	if (data & 0x40)
-		compis_fdc_reset(machine);
+		compis_fdc_reset(device->machine);
 
 	/* FDC Terminal count */
-	compis_fdc_tc(machine, (data & 0x80)?1:0);
+	compis_fdc_tc(device->machine, (data & 0x80)?1:0);
 }
 
 const ppi8255_interface compis_ppi_interface =

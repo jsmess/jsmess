@@ -26,26 +26,26 @@ DRIVER_INIT(ut88)
 	memory_configure_bank(1, 0, 2, RAM, 0xf800);
 }
 
-static READ8_HANDLER (ut88_8255_portb_r )
+static READ8_DEVICE_HANDLER (ut88_8255_portb_r )
 {
 	UINT8 key = 0xff;
-	if ((ut88_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
-	if ((ut88_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
-	if ((ut88_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
-	if ((ut88_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
-	if ((ut88_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
-	if ((ut88_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
-	if ((ut88_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
-	if ((ut88_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
+	if ((ut88_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"LINE0"); }
+	if ((ut88_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"LINE1"); }
+	if ((ut88_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine,"LINE2"); }
+	if ((ut88_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine,"LINE3"); }
+	if ((ut88_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine,"LINE4"); }
+	if ((ut88_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"LINE5"); }
+	if ((ut88_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"LINE6"); }
+	if ((ut88_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"LINE7"); }
 	return key;
 }
 
-static READ8_HANDLER (ut88_8255_portc_r )
+static READ8_DEVICE_HANDLER (ut88_8255_portc_r )
 {
-	return input_port_read(machine, "LINE8");	
+	return input_port_read(device->machine, "LINE8");	
 }
 
-static WRITE8_HANDLER (ut88_8255_porta_w )
+static WRITE8_DEVICE_HANDLER (ut88_8255_porta_w )
 {
 	ut88_keyboard_mask = data ^ 0xff;	
 }

@@ -35,71 +35,71 @@ DRIVER_INIT(special)
 	memory_configure_bank(1, 0, 2, RAM, 0xc000);	
 }
 
-static READ8_HANDLER (specialist_8255_porta_r )
+static READ8_DEVICE_HANDLER (specialist_8255_porta_r )
 {
-	if (input_port_read(machine, "LINE0")!=0xff) return 0xfe;
-	if (input_port_read(machine, "LINE1")!=0xff) return 0xfd;
-	if (input_port_read(machine, "LINE2")!=0xff) return 0xfb;
-	if (input_port_read(machine, "LINE3")!=0xff) return 0xf7;
-	if (input_port_read(machine, "LINE4")!=0xff) return 0xef;
-	if (input_port_read(machine, "LINE5")!=0xff) return 0xdf;
-	if (input_port_read(machine, "LINE6")!=0xff) return 0xbf;
-	if (input_port_read(machine, "LINE7")!=0xff) return 0x7f;	
+	if (input_port_read(device->machine, "LINE0")!=0xff) return 0xfe;
+	if (input_port_read(device->machine, "LINE1")!=0xff) return 0xfd;
+	if (input_port_read(device->machine, "LINE2")!=0xff) return 0xfb;
+	if (input_port_read(device->machine, "LINE3")!=0xff) return 0xf7;
+	if (input_port_read(device->machine, "LINE4")!=0xff) return 0xef;
+	if (input_port_read(device->machine, "LINE5")!=0xff) return 0xdf;
+	if (input_port_read(device->machine, "LINE6")!=0xff) return 0xbf;
+	if (input_port_read(device->machine, "LINE7")!=0xff) return 0x7f;	
 	return 0xff;
 }
 
-static READ8_HANDLER (specialist_8255_portb_r )
+static READ8_DEVICE_HANDLER (specialist_8255_portb_r )
 {
 	
 	int dat = 0;
 	double level;	
-	
-  if ((specialist_8255_porta & 0x01)==0) dat ^= (input_port_read(machine, "LINE0") ^ 0xff);
-  if ((specialist_8255_porta & 0x02)==0) dat ^= (input_port_read(machine, "LINE1") ^ 0xff);
-  if ((specialist_8255_porta & 0x04)==0) dat ^= (input_port_read(machine, "LINE2") ^ 0xff);
-  if ((specialist_8255_porta & 0x08)==0) dat ^= (input_port_read(machine, "LINE3") ^ 0xff);
-  if ((specialist_8255_porta & 0x10)==0) dat ^= (input_port_read(machine, "LINE4") ^ 0xff);
-  if ((specialist_8255_porta & 0x20)==0) dat ^= (input_port_read(machine, "LINE5") ^ 0xff);
-  if ((specialist_8255_porta & 0x40)==0) dat ^= (input_port_read(machine, "LINE6") ^ 0xff);
-  if ((specialist_8255_porta & 0x80)==0) dat ^= (input_port_read(machine, "LINE7") ^ 0xff);
-  if ((specialist_8255_portc & 0x01)==0) dat ^= (input_port_read(machine, "LINE8") ^ 0xff);
-  if ((specialist_8255_portc & 0x02)==0) dat ^= (input_port_read(machine, "LINE9") ^ 0xff);
-  if ((specialist_8255_portc & 0x04)==0) dat ^= (input_port_read(machine, "LINE10") ^ 0xff);
-  if ((specialist_8255_portc & 0x08)==0) dat ^= (input_port_read(machine, "LINE11") ^ 0xff);
+
+	if ((specialist_8255_porta & 0x01)==0) dat ^= (input_port_read(device->machine, "LINE0") ^ 0xff);
+	if ((specialist_8255_porta & 0x02)==0) dat ^= (input_port_read(device->machine, "LINE1") ^ 0xff);
+	if ((specialist_8255_porta & 0x04)==0) dat ^= (input_port_read(device->machine, "LINE2") ^ 0xff);
+	if ((specialist_8255_porta & 0x08)==0) dat ^= (input_port_read(device->machine, "LINE3") ^ 0xff);
+	if ((specialist_8255_porta & 0x10)==0) dat ^= (input_port_read(device->machine, "LINE4") ^ 0xff);
+	if ((specialist_8255_porta & 0x20)==0) dat ^= (input_port_read(device->machine, "LINE5") ^ 0xff);
+	if ((specialist_8255_porta & 0x40)==0) dat ^= (input_port_read(device->machine, "LINE6") ^ 0xff);
+	if ((specialist_8255_porta & 0x80)==0) dat ^= (input_port_read(device->machine, "LINE7") ^ 0xff);
+	if ((specialist_8255_portc & 0x01)==0) dat ^= (input_port_read(device->machine, "LINE8") ^ 0xff);
+	if ((specialist_8255_portc & 0x02)==0) dat ^= (input_port_read(device->machine, "LINE9") ^ 0xff);
+	if ((specialist_8255_portc & 0x04)==0) dat ^= (input_port_read(device->machine, "LINE10") ^ 0xff);
+	if ((specialist_8255_portc & 0x08)==0) dat ^= (input_port_read(device->machine, "LINE11") ^ 0xff);
   	
 	dat = (dat  << 2) ^0xff;	
-	if (input_port_read(machine, "LINE12")!=0xff) dat ^= 0x02;
+	if (input_port_read(device->machine, "LINE12")!=0xff) dat ^= 0x02;
 		
-	level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
+	level = cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
 	if (level >=  0) { 
 			dat ^= 0x01;
  	}		
 	return dat & 0xff;
 }
 
-static READ8_HANDLER (specialist_8255_portc_r )
+static READ8_DEVICE_HANDLER (specialist_8255_portc_r )
 {
-	if (input_port_read(machine, "LINE8")!=0xff) return 0x0e;
-	if (input_port_read(machine, "LINE9")!=0xff) return 0x0d;
-	if (input_port_read(machine, "LINE10")!=0xff) return 0x0b;
-	if (input_port_read(machine, "LINE11")!=0xff) return 0x07;
+	if (input_port_read(device->machine, "LINE8")!=0xff) return 0x0e;
+	if (input_port_read(device->machine, "LINE9")!=0xff) return 0x0d;
+	if (input_port_read(device->machine, "LINE10")!=0xff) return 0x0b;
+	if (input_port_read(device->machine, "LINE11")!=0xff) return 0x07;
 	return 0x0f;
 }
 
-static WRITE8_HANDLER (specialist_8255_porta_w )
+static WRITE8_DEVICE_HANDLER (specialist_8255_porta_w )
 {	
 	specialist_8255_porta = data;
 }
 
-static WRITE8_HANDLER (specialist_8255_portb_w )
+static WRITE8_DEVICE_HANDLER (specialist_8255_portb_w )
 {	
 	specialist_8255_portb = data;
 }
-static WRITE8_HANDLER (specialist_8255_portc_w )
+static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 {		
 	specialist_8255_portc = data;
 	
-	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),data & 0x80 ? 1 : -1);	
+	cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),data & 0x80 ? 1 : -1);	
 
 	dac_data_w(0,data & 0x20); //beeper
 	

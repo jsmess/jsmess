@@ -60,12 +60,16 @@ WRITE8_HANDLER (mikro80_8255_portc_w )
 {
 }
 
+static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(device->machine, offset); }
+static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(device->machine, offset); }
+static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(device->machine, offset, data); }
+
 const ppi8255_interface mikro80_ppi8255_interface =
 {
 	NULL,
-	mikro80_8255_portb_r,
-	mikro80_8255_portc_r,
-	mikro80_8255_porta_w,
+	mikro80_8255_portb_device_r,
+	mikro80_8255_portc_device_r,
+	mikro80_8255_porta_device_w,
 	NULL,
 	NULL,
 };

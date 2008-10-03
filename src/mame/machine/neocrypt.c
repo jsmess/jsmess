@@ -1246,6 +1246,53 @@ void kof2003_decrypt_68k(running_machine *machine)
 }
 
 
+void kof2003h_decrypt_68k(running_machine *machine)
+{
+	static const UINT8 xor1[0x20] = { 0xc2, 0x4b, 0x74, 0xfd, 0x0b, 0x34, 0xeb, 0xd7, 0x10, 0x6d, 0xf9, 0xce, 0x5d, 0xd5, 0x61, 0x29, 0xf5, 0xbe, 0x0d, 0x82, 0x72, 0x45, 0x0f, 0x24, 0xb3, 0x34, 0x1b, 0x99, 0xea, 0x09, 0xf3, 0x03 };
+	static const UINT8 xor2[0x20] = { 0x2b, 0x09, 0xd0, 0x7f, 0x51, 0x0b, 0x10, 0x4c, 0x5b, 0x07, 0x70, 0x9d, 0x3e, 0x0b, 0xb0, 0xb6, 0x54, 0x09, 0xe0, 0xcc, 0x3d, 0x0d, 0x80, 0x99, 0x87, 0x03, 0x90, 0x82, 0xfe, 0x04, 0x20, 0x18 };
+	int i;
+	int ofst;
+	int rom_size = 0x900000;
+	UINT8 *rom = memory_region( machine, "main" );
+	UINT8 *buf = malloc_or_die( rom_size );
+
+	for (i = 0; i < 0x100000; i++)
+	{
+		rom[ 0x800000 + i ] ^= rom[ 0x100002 | BYTE_XOR_LE(i) ];
+	}
+	for( i = 0; i < 0x100000; i++)
+	{
+		rom[ i ] ^= xor1[ (BYTE_XOR_LE(i) % 0x20) ];
+	}
+	for( i = 0x100000; i < 0x800000; i++)
+	{
+		rom[ i ] ^= xor2[ (BYTE_XOR_LE(i) % 0x20) ];
+	}
+	for( i = 0x100000; i < 0x800000; i += 4)
+	{
+		UINT16 rom16;
+		rom16 = rom[BYTE_XOR_LE(i+1)] | rom[BYTE_XOR_LE(i+2)]<<8;
+		rom16 = BITSWAP16( rom16, 15, 14, 13, 12, 10, 11, 8, 9, 6, 7, 4, 5, 3, 2, 1, 0 );
+		rom[BYTE_XOR_LE(i+1)] = rom16&0xff;
+		rom[BYTE_XOR_LE(i+2)] = rom16>>8;
+	}
+	for( i = 0; i < 0x0100000 / 0x10000; i++ )
+	{
+		ofst = (i & 0xf0) + BITSWAP8((i & 0x0f), 7, 6, 5, 4, 1, 0, 3, 2);
+		memcpy( &buf[ i * 0x10000 ], &rom[ ofst * 0x10000 ], 0x10000 );
+	}
+	for( i = 0x100000; i < 0x900000; i += 0x100)
+	{
+		ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00400) + (BITSWAP8( ((i & 0x0ff000) >> 12), 6, 7, 4, 5, 0, 1, 2, 3 ) << 12);
+		memcpy( &buf[ i ], &rom[ ofst ], 0x100 );
+	}
+	memcpy (&rom[0x000000], &buf[0x000000], 0x100000);
+	memcpy (&rom[0x100000], &buf[0x800000], 0x100000);
+	memcpy (&rom[0x200000], &buf[0x100000], 0x700000);
+	free( buf );
+}
+
+
 void kof2003biosdecode(running_machine *machine)
 {
 	static const UINT8 address[0x80]={
@@ -1403,39 +1450,6 @@ static const UINT8 m1_address_0_7_xor[256] =
         0xc2, 0x86, 0xf3, 0x67, 0xba, 0x60, 0x43, 0xc9, 0x04, 0xb3, 0xb0, 0x1e, 0xb5, 0xc8, 0xeb, 0xa5,
         0x76, 0xea, 0x5c, 0x82, 0x1a, 0x4f, 0xaa, 0xca, 0xe1, 0x0b, 0x4e, 0xcb, 0x6a, 0xef, 0xd1, 0xd6,
 };
-
-
-int m1_address_scramble_inv(int address, UINT16 key)
-{
-	int block;
-	int aux;
-
-	const int p1[8][16] = {
-		{8,4,5,6,15,14,12,3,7,13,2,10,9,11,1,0},
-		{13,1,6,7,10,8,14,0,2,5,12,3,15,9,11,4},
-		{9,7,10,3,8,11,1,5,0,15,4,13,14,12,2,6},
-		{10,12,0,4,5,15,9,7,1,3,11,6,13,8,14,2},
-		{14,0,13,5,9,12,2,10,6,8,7,15,11,1,4,3},
-		{5,11,7,2,3,13,8,4,12,6,14,0,10,15,9,1},
-		{11,6,15,10,14,1,4,13,3,9,0,8,12,2,7,5},
-		{3,14,4,1,6,10,15,2,11,0,9,7,5,13,8,12},
-	};
-
-	block = (address>>16)&7;
-	aux = address&0xffff;
-
-	aux = BITSWAP16(aux, 14,13,10,9,7,5,3,1,15,12,11,8,6,4,2,0);
-	aux ^= m1_address_8_15_xor[aux&0xff]<<8;
-	aux ^= m1_address_0_7_xor[(aux>>8)&0xff];
-	aux = BITSWAP16(aux,
-		p1[block][15],p1[block][14],p1[block][13],p1[block][12],
-		p1[block][11],p1[block][10],p1[block][9],p1[block][8],
-		p1[block][7],p1[block][6],p1[block][5],p1[block][4],
-		p1[block][3],p1[block][2],p1[block][1],p1[block][0]);
-	aux ^= key;
-
-	return (block<<16)|aux;
-}
 
 
 /* The CMC50 hardware does a checksum of the first 64kb of the M1 rom,

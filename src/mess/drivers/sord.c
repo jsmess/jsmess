@@ -93,9 +93,9 @@ static  READ8_HANDLER(fd5_data_r)
 
 	LOG(("fd5 0x010 r: %02x %04x\n",fd5_databus,activecpu_get_pc()));
 
-	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
-	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x10);
-	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x10);
+	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 
 	return fd5_databus;
 }
@@ -107,9 +107,9 @@ static WRITE8_HANDLER(fd5_data_w)
 	fd5_databus = data;
 
 	/* set stb on data write */
-	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
-	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x40);
-	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x40);
+	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 
 	cpu_yield();
 }
@@ -182,7 +182,7 @@ static MACHINE_RESET( sord_m5_fd5 )
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
 	sord_fd5_init(machine);
 	MACHINE_RESET_CALL(sord_m5);
-	ppi8255_set_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 }
 
 
@@ -194,14 +194,14 @@ static const device_config *cassette_device_image(running_machine *machine)
 /*********************************************************************************************/
 /* PI-5 */
 
-static  READ8_HANDLER(sord_ppi_porta_r)
+static READ8_DEVICE_HANDLER(sord_ppi_porta_r)
 {
 	cpu_yield();
 
 	return fd5_databus;
 }
 
-static  READ8_HANDLER(sord_ppi_portb_r)
+static READ8_DEVICE_HANDLER(sord_ppi_portb_r)
 {
 	cpu_yield();
 
@@ -210,7 +210,7 @@ static  READ8_HANDLER(sord_ppi_portb_r)
 	return 0x0ff;
 }
 
-static  READ8_HANDLER(sord_ppi_portc_r)
+static READ8_DEVICE_HANDLER(sord_ppi_portc_r)
 {
 	cpu_yield();
 
@@ -241,14 +241,14 @@ static  READ8_HANDLER(sord_ppi_portc_r)
 			);
 }
 
-static WRITE8_HANDLER(sord_ppi_porta_w)
+static WRITE8_DEVICE_HANDLER(sord_ppi_porta_w)
 {
 	cpu_yield();
 
 	fd5_databus = data;
 }
 
-static WRITE8_HANDLER(sord_ppi_portb_w)
+static WRITE8_DEVICE_HANDLER(sord_ppi_portb_w)
 {
 	cpu_yield();
 
@@ -258,8 +258,8 @@ static WRITE8_HANDLER(sord_ppi_portb_w)
 
 	if (data==0x0f0)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(device->machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(device->machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	LOG(("m5 write to pi5 port b: %02x %04x\n",data,activecpu_get_pc()));
 }
@@ -270,7 +270,7 @@ static WRITE8_HANDLER(sord_ppi_portb_w)
 /* C,H,N */
 
 
-static WRITE8_HANDLER(sord_ppi_portc_w)
+static WRITE8_DEVICE_HANDLER(sord_ppi_portc_w)
 {
 	obfa = (data & 0x80) ? 1 : 0;
 	intra = (data & 0x08) ? 1 : 0;

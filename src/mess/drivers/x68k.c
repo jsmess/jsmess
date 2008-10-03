@@ -654,40 +654,28 @@ static TIMER_CALLBACK(x68k_scc_ack)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-static READ8_HANDLER( ppi_port_a_r )
+static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
 	// Joystick 1
 	if(sys.joy.joy1_enable == 0)
-		return input_port_read(machine, "joy1");
+		return input_port_read(device->machine, "joy1");
 	else
 		return 0xff;
 }
 
-static READ8_HANDLER( ppi_port_b_r )
+static READ8_DEVICE_HANDLER( ppi_port_b_r )
 {
 	// Joystick 2
 	if(sys.joy.joy2_enable == 0)
-		return input_port_read(machine, "joy2");
+		return input_port_read(device->machine, "joy2");
 	else
 		return 0xff;
 }
 
-static READ8_HANDLER( ppi_port_c_r )
+static READ8_DEVICE_HANDLER( ppi_port_c_r )
 {
 	return ppi_port[2];
 }
-
-#ifdef UNUSED_FUNCTION
-WRITE8_HANDLER( ppi_port_a_w )
-{
-	ppi_port[0] = data;
-}
-
-WRITE8_HANDLER( ppi_port_b_w )
-{
-	ppi_port[1] = data;
-}
-#endif
 
 /* PPI port C (Joystick control, R/W)
    bit 7    - IOC7 - Function B operation of joystick 1 (?)
@@ -697,7 +685,7 @@ WRITE8_HANDLER( ppi_port_b_w )
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan
 */
-static WRITE8_HANDLER( ppi_port_c_w )
+static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
 	// ADPCM / Joystick control
 	ppi_port[2] = data;

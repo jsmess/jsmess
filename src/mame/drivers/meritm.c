@@ -93,6 +93,8 @@ PROGRAM#    Program Version      Program Differences
 #define UART_CLK	XTAL_18_432MHz
 
 static UINT8* meritm_ram;
+static const device_config *meritm_z80pio[2];
+
 
 /*************************************
  *
@@ -297,7 +299,7 @@ static void meritm_vdp0_interrupt(running_machine *machine, int i)
 			meritm_vint |= 0x08;
 
 		if(i)
-			z80pio_p_w(machine, 0, 0, meritm_vint);
+			z80pio_p_w(meritm_z80pio[0], 0, meritm_vint);
 	}
 }
 
@@ -312,7 +314,7 @@ static void meritm_vdp1_interrupt(running_machine *machine, int i)
 			meritm_vint |= 0x10;
 
 		if(i)
-			z80pio_p_w(machine, 0, 0, meritm_vint);
+			z80pio_p_w(meritm_z80pio[0], 0, meritm_vint);
 	}
 }
 
@@ -556,8 +558,8 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x22, 0x22) AM_WRITE(v9938_1_palette_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(v9938_1_register_w)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x40, 0x43) AM_READWRITE(z80pio_0_r, z80pio_0_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(z80pio_1_r, z80pio_1_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(Z80PIO, "z80pio_0", z80pio_r, z80pio_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(Z80PIO, "z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
@@ -582,8 +584,8 @@ static ADDRESS_MAP_START( meritm_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x22, 0x22) AM_WRITE(v9938_1_palette_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(v9938_1_register_w)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x40, 0x43) AM_READWRITE(z80pio_0_r, z80pio_0_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(z80pio_1_r, z80pio_1_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(Z80PIO, "z80pio_0", z80pio_r, z80pio_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(Z80PIO, "z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc16552d_0_r,pc16552d_0_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_write_port_0_w)
@@ -670,13 +672,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static READ8_HANDLER(meritm_8255_port_c_r)
+static READ8_DEVICE_HANDLER(meritm_8255_port_c_r)
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
 };
 
-static WRITE8_HANDLER(meritm_crt250_port_b_w)
+static WRITE8_DEVICE_HANDLER(meritm_crt250_port_b_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
 	output_set_value("P1 DISC 1 LAMP", !BIT(data,0));
@@ -745,55 +747,55 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static void meritm_audio_pio_interrupt(running_machine *machine, int state)
+static void meritm_audio_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(0) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, 0, state);
 }
 
-static void meritm_io_pio_interrupt(running_machine *machine, int state)
+static void meritm_io_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(1) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, 0, state);
 }
 
 
-static READ8_HANDLER(meritm_audio_pio_port_a_r)
+static READ8_DEVICE_HANDLER(meritm_audio_pio_port_a_r)
 {
 	return meritm_vint;
 };
 
-static READ8_HANDLER(meritm_audio_pio_port_b_r)
+static READ8_DEVICE_HANDLER(meritm_audio_pio_port_b_r)
 {
 	return ds1204_r();
 };
 
-static WRITE8_HANDLER(meritm_audio_pio_port_a_w)
+static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_a_w)
 {
 	meritm_bank = (data & 7) | ((data >> 2) & 0x18);
 	//logerror("Writing BANK with %x (raw = %x)\n", meritm_bank, data);
 };
 
-static WRITE8_HANDLER(meritm_audio_pio_port_b_w)
+static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_b_w)
 {
 	ds1204_w((data & 0x4) >> 2, (data & 0x2) >> 1, data & 0x01);
 };
 
-static READ8_HANDLER(meritm_io_pio_port_a_r)
+static READ8_DEVICE_HANDLER(meritm_io_pio_port_a_r)
 {
-	return input_port_read(machine, "PIO1_PORTA");
+	return input_port_read(device->machine, "PIO1_PORTA");
 };
 
-static READ8_HANDLER(meritm_io_pio_port_b_r)
+static READ8_DEVICE_HANDLER(meritm_io_pio_port_b_r)
 {
-	return input_port_read(machine, "PIO1_PORTB");
+	return input_port_read(device->machine, "PIO1_PORTB");
 };
 
-static WRITE8_HANDLER(meritm_io_pio_port_a_w)
+static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_a_w)
 {
 };
 
-static WRITE8_HANDLER(meritm_io_pio_port_b_w)
+static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_b_w)
 {
 };
 
@@ -826,17 +828,17 @@ static void meritm_pio1_portb_input_changed_callback(void *param, UINT32 oldval,
 }
 #endif
 
-static const struct z80_irq_daisy_chain meritm_daisy_chain[] =
+static const z80_daisy_chain meritm_daisy_chain[] =
 {
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 1 }, /* PIO number 1 */
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 }, /* PIO number 0 */
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ Z80PIO, "z80pio_1" },
+	{ Z80PIO, "z80pio_0" },
+	{ NULL }
 };
 
 static MACHINE_START(merit_common)
 {
-	z80pio_init(0, &meritm_audio_pio_intf);
-	z80pio_init(1, &meritm_io_pio_intf);
+	meritm_z80pio[0] = devtag_get_device( machine, Z80PIO, "z80pio_0" );
+	meritm_z80pio[1] = devtag_get_device( machine, Z80PIO, "z80pio_1" );
 	//input_port_set_changed_callback(port_tag_to_index("PIO1_PORTB"), 0xff, meritm_pio1_portb_input_changed_callback, NULL);
 
 };
@@ -904,8 +906,10 @@ static MACHINE_DRIVER_START(meritm_crt250)
 
 	MDRV_MACHINE_START(meritm_crt250)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( crt250_ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", crt250_ppi8255_intf )
+
+	MDRV_Z80PIO_ADD( "z80pio_0", meritm_audio_pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio_1", meritm_io_pio_intf )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -945,8 +949,7 @@ static MACHINE_DRIVER_START(meritm_crt260)
 	MDRV_CPU_PROGRAM_MAP(meritm_map,0)
 	MDRV_CPU_IO_MAP(meritm_io_map,0)
 
-	MDRV_DEVICE_MODIFY( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( crt260_ppi8255_intf )
+	MDRV_PPI8255_RECONFIG( "ppi8255", crt260_ppi8255_intf )
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_MSEC(1200))	// DS1232, TD connected to VCC
 	MDRV_MACHINE_START(meritm_crt260)

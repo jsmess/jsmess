@@ -165,15 +165,15 @@ DEVICE_IMAGE_UNLOAD( svi318_cart )
   8  CASR     Cassette, Read data
 */
 
-static READ8_HANDLER ( svi318_ppi_port_a_r )
+static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 {
 	int data = 0x0f;
 
-	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
+	if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
 		data |= 0x80;
 	if (!svi318_cassette_present(0))
 		data |= 0x40;
-	data |= input_port_read(machine, "BUTTONS") & 0x30;
+	data |= input_port_read(device->machine, "BUTTONS") & 0x30;
 
 	return data;
 }
@@ -191,7 +191,7 @@ static READ8_HANDLER ( svi318_ppi_port_a_r )
   8  IN7  Keyboard, Column status of selected line
 */
 
-static  READ8_HANDLER ( svi318_ppi_port_b_r )
+static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 {
 	int row;
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", 
@@ -199,7 +199,7 @@ static  READ8_HANDLER ( svi318_ppi_port_b_r )
 
 	row = svi.keyboard_row;
 	if (row <= 10)
-		return input_port_read(machine, keynames[row]);
+		return input_port_read(device->machine, keynames[row]);
 
 	return 0xff;
 }
@@ -217,7 +217,7 @@ static  READ8_HANDLER ( svi318_ppi_port_b_r )
   8  SOUND  Keyboard, Click sound bit (pulse)
 */
 
-static WRITE8_HANDLER ( svi318_ppi_port_c_w )
+static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 {
 	int val;
 
@@ -230,13 +230,13 @@ static WRITE8_HANDLER ( svi318_ppi_port_c_w )
 	if (svi318_cassette_present(0))
 	{
 		cassette_change_state(
-			device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+			device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
 			(data & 0x10) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,
 			CASSETTE_MOTOR_DISABLED);
 	}
 
 	/* cassette signal write */
-	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x20) ? -1.0 : +1.0);
+	cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x20) ? -1.0 : +1.0);
 
 	svi.keyboard_row = data & 0x0F;
 }

@@ -72,7 +72,6 @@ static attotime m6840_internal_counter_period;	/* 68000 CLK / 10 */
 static emu_timer *ipu_watchdog_timer;
 
 
-
 /*************************************
  *
  *  Function prototypes
@@ -92,7 +91,7 @@ static void zwackery_pia_irq(running_machine *machine, int state);
 static void reload_count(int counter);
 static TIMER_CALLBACK( counter_fired_callback );
 static TIMER_CALLBACK( ipu_watchdog_reset );
-static WRITE8_HANDLER( ipu_break_changed );
+static WRITE8_DEVICE_HANDLER( ipu_break_changed );
 
 
 
@@ -188,48 +187,50 @@ static const pia6821_interface zwackery_pia_4_intf =
  *
  *************************************/
 
-static void ctc_interrupt(running_machine *machine, int state)
+static void ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 0, 0, state);
+	cputag_set_input_line(device->machine, "main", 0, state);
 }
 
 
-static void ipu_ctc_interrupt(running_machine *machine, int state)
+static void ipu_ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 3, 0, state);
+	cputag_set_input_line(device->machine, "ipu", 0, state);
 }
 
 
-const struct z80_irq_daisy_chain mcr_daisy_chain[] =
+const z80_daisy_chain mcr_daisy_chain[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ Z80CTC, "ctc" },
+	{ NULL }
 };
 
 
-const struct z80_irq_daisy_chain mcr_ipu_daisy_chain[] =
+const z80_daisy_chain mcr_ipu_daisy_chain[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 1 }, /* CTC number 1 */
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 1 }, /* PIO number 1 */
-	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 }, /* SIO number 0 */
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 }, /* PIO number 0 */
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ Z80CTC, "ipu_ctc" },
+	{ Z80PIO, "ipu_pio1" },
+	{ Z80SIO, "ipu_sio" },
+	{ Z80PIO, "ipu_pio0" },
+	{ NULL }
 };
 
 
-static z80ctc_interface ctc_intf =
+const z80ctc_interface mcr_ctc_intf =
 {
+	"main",				/* clock from the main CPU */
 	0,              	/* clock (filled in from the CPU 0 clock) */
 	0,              	/* timer disables */
 	ctc_interrupt,  	/* interrupt handler */
-	z80ctc_0_trg1_w,	/* ZC/TO0 callback */
+	z80ctc_trg1_w,		/* ZC/TO0 callback */
 	0,              	/* ZC/TO1 callback */
 	0               	/* ZC/TO2 callback */
 };
 
 
-static z80ctc_interface nflfoot_ctc_intf =
+const z80ctc_interface nflfoot_ctc_intf =
 {
+	"ipu",				/* clock from the IPU cpu */
 	0,                  /* clock (filled in from the CPU 3 clock) */
 	0,                  /* timer disables */
 	ipu_ctc_interrupt,  /* interrupt handler */
@@ -239,16 +240,21 @@ static z80ctc_interface nflfoot_ctc_intf =
 };
 
 
-static const z80pio_interface nflfoot_pio_intf =
+const z80pio_interface nflfoot_pio_intf =
 {
 	ipu_ctc_interrupt,
-	0,
-	0
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
 };
 
 
-static z80sio_interface nflfoot_sio_intf =
+const z80sio_interface nflfoot_sio_intf =
 {
+	"ipu",				/* clock from the IPU cpu */
 	0,                  /* clock (filled in from the CPU 3 clock) */
 	ipu_ctc_interrupt,	/* interrupt handler */
 	0,					/* DTR changed handler */
@@ -267,29 +273,12 @@ static z80sio_interface nflfoot_sio_intf =
 
 MACHINE_START( mcr )
 {
-	/* initialize the CTC */
-	ctc_intf.baseclock = cpunum_get_clock(0);
-	z80ctc_init(0, &ctc_intf);
-
 	state_save_register_global(mcr_cocktail_flip);
 }
 
 
 MACHINE_START( nflfoot )
 {
-	/* initialize the CTC */
-	ctc_intf.baseclock = cpunum_get_clock(0);
-	z80ctc_init(0, &ctc_intf);
-
-	nflfoot_ctc_intf.baseclock = cpunum_get_clock(3);
-	z80ctc_init(1, &nflfoot_ctc_intf);
-
-	z80pio_init(0, &nflfoot_pio_intf);
-	z80pio_init(1, &nflfoot_pio_intf);
-
-	nflfoot_sio_intf.baseclock = cpunum_get_clock(3);
-	z80sio_init(0, &nflfoot_sio_intf);
-
 	/* allocate a timer for the IPU watchdog */
 	ipu_watchdog_timer = timer_alloc(ipu_watchdog_reset, NULL);
 }
@@ -422,29 +411,33 @@ MACHINE_RESET( zwackery )
 
 INTERRUPT_GEN( mcr_interrupt )
 {
+	const device_config *ctc = devtag_get_device(machine, Z80CTC, "ctc");
+
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
-	z80ctc_0_trg2_w(machine, 0, 1);
-	z80ctc_0_trg2_w(machine, 0, 0);
+	z80ctc_trg2_w(ctc, 0, 1);
+	z80ctc_trg2_w(ctc, 0, 0);
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (cpu_getiloops() == 0)
 	{
-		z80ctc_0_trg3_w(machine, 0, 1);
-		z80ctc_0_trg3_w(machine, 0, 0);
+		z80ctc_trg3_w(ctc, 0, 1);
+		z80ctc_trg3_w(ctc, 0, 0);
 	}
 }
 
 
 INTERRUPT_GEN( mcr_ipu_interrupt )
 {
+	const device_config *ctc = devtag_get_device(machine, Z80CTC, "ipu_ctc");
+
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (cpu_getiloops() == 0)
 	{
-		z80ctc_1_trg3_w(machine, 0, 1);
-		z80ctc_1_trg3_w(machine, 0, 0);
+		z80ctc_trg3_w(ctc, 0, 1);
+		z80ctc_trg3_w(ctc, 0, 0);
 	}
 }
 
@@ -922,60 +915,30 @@ READ16_HANDLER( mcr68_6840_lower_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( ipu_break_changed )
+static WRITE8_DEVICE_HANDLER( ipu_break_changed )
 {
 	/* channel B is connected to the CED player */
 	if (offset == 1)
 	{
 		logerror("DTR changed -> %d\n", data);
 		if (data == 1)
-			z80sio_receive_data(0, 1, 0);
+			z80sio_receive_data(device, 1, 0);
 	}
 }
 
 
-READ8_HANDLER( mcr_ipu_pio_0_r )
+READ8_DEVICE_HANDLER( mcr_ipu_sio_r )
 {
-	return (offset & 2) ? z80pio_c_r(0, offset & 1) : z80pio_d_r(machine, 0, offset & 1);
+	return (offset & 2) ? z80sio_c_r(device, offset & 1) : z80sio_d_r(device, offset & 1);
 }
 
 
-READ8_HANDLER( mcr_ipu_pio_1_r )
-{
-	return (offset & 2) ? z80pio_c_r(1, offset & 1) : z80pio_d_r(machine, 1, offset & 1);
-}
-
-
-READ8_HANDLER( mcr_ipu_sio_r )
-{
-	return (offset & 2) ? z80sio_c_r(0, offset & 1) : z80sio_d_r(machine, 0, offset & 1);
-}
-
-
-WRITE8_HANDLER( mcr_ipu_pio_0_w )
+WRITE8_DEVICE_HANDLER( mcr_ipu_sio_w )
 {
 	if (offset & 2)
-		z80pio_c_w(machine, 0, offset & 1, data);
+		z80sio_c_w(device, offset & 1, data);
 	else
-		z80pio_d_w(machine, 0, offset & 1, data);
-}
-
-
-WRITE8_HANDLER( mcr_ipu_pio_1_w )
-{
-	if (offset & 2)
-		z80pio_c_w(machine, 1, offset & 1, data);
-	else
-		z80pio_d_w(machine, 1, offset & 1, data);
-}
-
-
-WRITE8_HANDLER( mcr_ipu_sio_w )
-{
-	if (offset & 2)
-		z80sio_c_w(machine, 0, offset & 1, data);
-	else
-		z80sio_d_w(machine, 0, offset & 1, data);
+		z80sio_d_w(device, offset & 1, data);
 }
 
 
@@ -993,11 +956,11 @@ WRITE8_HANDLER( mcr_ipu_laserdisk_w )
 static TIMER_CALLBACK( ipu_watchdog_reset )
 {
 	logerror("ipu_watchdog_reset\n");
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, PULSE_LINE);
-	z80ctc_reset(1);
-	z80pio_reset(0);
-	z80pio_reset(1);
-	z80sio_reset(0);
+	cputag_set_input_line(machine, "ipu", INPUT_LINE_RESET, PULSE_LINE);
+	devtag_reset(machine, Z80CTC, "ipu_ctc");
+	devtag_reset(machine, Z80PIO, "ipu_pio0");
+	devtag_reset(machine, Z80PIO, "ipu_pio1");
+	devtag_reset(machine, Z80SIO, "ipu_sio");
 }
 
 

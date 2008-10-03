@@ -168,7 +168,7 @@ static INPUT_PORTS_START( pipeline )
 
 INPUT_PORTS_END
 
-static WRITE8_HANDLER(vidctrl_w)
+static WRITE8_DEVICE_HANDLER(vidctrl_w)
 {
 	vidctrl=data;
 }
@@ -197,7 +197,7 @@ static WRITE8_HANDLER(vram1_w)
 	vram1[offset]=data;
 }
 
-static READ8_HANDLER(protection_r)
+static READ8_DEVICE_HANDLER(protection_r)
 {
 	return fromMCU;
 }
@@ -207,7 +207,7 @@ static TIMER_CALLBACK( protection_deferred_w )
 	toMCU = param;
 }
 
-static WRITE8_HANDLER(protection_w)
+static WRITE8_DEVICE_HANDLER(protection_w)
 {
 	timer_call_after_resynch(NULL, data, protection_deferred_w);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
@@ -232,7 +232,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READ(z80ctc_0_r) AM_WRITE(z80ctc_0_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x06, 0x07) AM_NOP
 ADDRESS_MAP_END
 
@@ -285,14 +285,15 @@ static GFXDECODE_START( pipeline )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x3, 0x100, 32 ) // 3bpp tiles
 GFXDECODE_END
 
-static void ctc0_interrupt(running_machine *machine, int state)
+static void ctc0_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cputag_set_input_line(device->machine, "audio", 0, state);
 }
 
-static z80ctc_interface ctc_intf =
+static const z80ctc_interface ctc_intf =
 {
-	1,					// clock
+	"audio",			// clock from audio CPU
+	0,					// clock
 	0,					// timer disables
 	ctc0_interrupt,		// interrupt handler
 	0,					// ZC/TO0 callback
@@ -300,16 +301,16 @@ static z80ctc_interface ctc_intf =
 	0,					// ZC/TO2 callback
 };
 
-static const struct z80_irq_daisy_chain daisy_chain_sound[] =
+static const z80_daisy_chain daisy_chain_sound[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },	/* device 0 = CTC_1 */
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ Z80CTC, "ctc" },
+	{ NULL }
 };
 
 static const ppi8255_interface ppi8255_intf[3] =
 {
 	{
-		input_port_0_r,				/* Port A read */
+		DEVICE8_PORT("P1"),			/* Port A read */
 		NULL,						/* Port B read */
 		NULL,						/* Port C read */
 		NULL,						/* Port A write */
@@ -317,8 +318,8 @@ static const ppi8255_interface ppi8255_intf[3] =
 		vidctrl_w					/* Port C write */
 	},
 	{
-		input_port_1_r,				/* Port A read */
-		input_port_2_r,				/* Port B read */
+		DEVICE8_PORT("DSW1"),		/* Port A read */
+		DEVICE8_PORT("DSW2"),		/* Port B read */
 		protection_r,				/* Port C read */
 		NULL,						/* Port A write */
 		NULL,						/* Port B write */
@@ -363,12 +364,6 @@ static PALETTE_INIT(pipeline)
 	}
 }
 
-static MACHINE_RESET( pipeline )
-{
-	ctc_intf.baseclock = cpunum_get_clock(0);
-	z80ctc_init(0, &ctc_intf);
-}
-
 static MACHINE_DRIVER_START( pipeline )
 	/* basic machine hardware */
 
@@ -384,14 +379,11 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_CPU_ADD("mcu", M68705, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+	MDRV_Z80CTC_ADD( "ctc", ctc_intf )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
-
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[2] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -402,8 +394,6 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
 
 	MDRV_GFXDECODE(pipeline)
-
-	MDRV_MACHINE_RESET(pipeline)
 
 	MDRV_PALETTE_INIT(pipeline)
 	MDRV_PALETTE_LENGTH(0x100+0x100)

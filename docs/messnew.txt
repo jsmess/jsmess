@@ -33,6 +33,8 @@ New System Drivers Supported (in no particular order):
 - Yamaha CX5M/CX5M-128/CX5MII/YIS303/YIS503/YIS503II/YIS503M [Miodrag Milanovic]
 - Yashica YC-64 [Miodrag Milanovic]
 
+
+
 System Driver Changes:
 ----------------------
 
@@ -186,6 +188,8 @@ User Interface Changes:
 
 - BIOS selection from MESSUI is now possible. (bug #1681) [Curt Coder]
 
+
+
 Imgtool Changes:
 ----------------
 (none)
@@ -194,7 +198,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.127u5.  This incorporates all features of the
+- The core is based on MAME 0.127u6.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Refactored ZIP path code out of src/mess/image.c, made more testable.  [Nate

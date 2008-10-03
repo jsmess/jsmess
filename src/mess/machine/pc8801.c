@@ -724,12 +724,12 @@ MACHINE_RESET( pc88srh )
 
 static UINT8 load_8255_A(running_machine *machine, int chip)
 {
-	return use_5FD ? ppi8255_get_portB((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
+	return use_5FD ? ppi8255_get_port_b((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
 }
 
 static UINT8 load_8255_B(running_machine *machine, int chip)
 {
-	return use_5FD ? ppi8255_get_portA((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
+	return use_5FD ? ppi8255_get_port_a((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
 }
 
 static UINT8 load_8255_C(running_machine *machine, int chip)
@@ -739,7 +739,7 @@ static UINT8 load_8255_C(running_machine *machine, int chip)
 
 	if (use_5FD)
 	{
-		port_c = ppi8255_get_portC((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) );
+		port_c = ppi8255_get_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) );
 		result = ((port_c >> 4) & 0x0F) | ((port_c << 4) & 0xF0);
 	}
 
@@ -766,12 +766,12 @@ static UINT8 load_8255_C(running_machine *machine, int chip)
 	return result;
 }
 
-static READ8_HANDLER( load_8255_chip0_A )	{ return load_8255_A(machine, 0); }
-static READ8_HANDLER( load_8255_chip1_A )	{ return load_8255_A(machine, 1); }
-static READ8_HANDLER( load_8255_chip0_B )	{ return load_8255_B(machine, 0); }
-static READ8_HANDLER( load_8255_chip1_B )	{ return load_8255_B(machine, 1); }
-static READ8_HANDLER( load_8255_chip0_C )	{ return load_8255_C(machine, 0); }
-static READ8_HANDLER( load_8255_chip1_C )	{ return load_8255_C(machine, 1); }
+static READ8_DEVICE_HANDLER( load_8255_chip0_A )	{ return load_8255_A(device->machine, 0); }
+static READ8_DEVICE_HANDLER( load_8255_chip1_A )	{ return load_8255_A(device->machine, 1); }
+static READ8_DEVICE_HANDLER( load_8255_chip0_B )	{ return load_8255_B(device->machine, 0); }
+static READ8_DEVICE_HANDLER( load_8255_chip1_B )	{ return load_8255_B(device->machine, 1); }
+static READ8_DEVICE_HANDLER( load_8255_chip0_C )	{ return load_8255_C(device->machine, 0); }
+static READ8_DEVICE_HANDLER( load_8255_chip1_C )	{ return load_8255_C(device->machine, 1); }
 
 
 const ppi8255_interface pc8801_8255_config_0 =

@@ -481,7 +481,7 @@ static MACHINE_START( sg1000 )
 
 static int keylatch;
 
-static READ8_HANDLER( sc3000_ppi8255_a_r )
+static READ8_DEVICE_HANDLER( sc3000_ppi8255_a_r )
 {
 	static const char *keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
@@ -498,10 +498,10 @@ static READ8_HANDLER( sc3000_ppi8255_a_r )
         PA7     Keyboard input
     */
 
-	return input_port_read(machine, keynames[keylatch]);
+	return input_port_read(device->machine, keynames[keylatch]);
 }
 
-static READ8_HANDLER( sc3000_ppi8255_b_r )
+static READ8_DEVICE_HANDLER( sc3000_ppi8255_b_r )
 {
 	static const char *keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
@@ -519,7 +519,7 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
     */
 
 	/* keyboard */
-	UINT8 data = input_port_read(machine, keynames[keylatch]);
+	UINT8 data = input_port_read(device->machine, keynames[keylatch]);
 
 	/* cartridge contact */
 	data |= 0x10;
@@ -528,12 +528,12 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
 	data |= 0x60;
 
 	/* tape input */
-	if (cassette_input(cassette_device_image(machine)) > +0.0) data |= 0x80;
+	if (cassette_input(cassette_device_image(device->machine)) > +0.0) data |= 0x80;
 
 	return data;
 }
 
-static WRITE8_HANDLER( sc3000_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( sc3000_ppi8255_c_w )
 {
 	/*
         Signal  Description
@@ -552,7 +552,7 @@ static WRITE8_HANDLER( sc3000_ppi8255_c_w )
 	keylatch = data & 0x07;
 
 	/* cassette */
-	cassette_output(cassette_device_image(machine), BIT(data, 4) ? +1.0 : -1.0);
+	cassette_output(cassette_device_image(device->machine), BIT(data, 4) ? +1.0 : -1.0);
 
 	/* printer */
 }
@@ -585,7 +585,7 @@ static MACHINE_START( sc3000 )
 static int sf7000_fdc_int;
 static int sf7000_fdc_index;
 
-static READ8_HANDLER( sf7000_ppi8255_a_r )
+static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 {
 	/*
         Signal  Description
@@ -611,7 +611,7 @@ static READ8_HANDLER( sf7000_ppi8255_a_r )
 	return (sf7000_fdc_index << 2) | busy | sf7000_fdc_int;
 }
 
-static WRITE8_HANDLER( sf7000_ppi8255_b_w )
+static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_b_w )
 {
 	/*
         Signal  Description
@@ -629,7 +629,7 @@ static WRITE8_HANDLER( sf7000_ppi8255_b_w )
 	centronics_write_data(1, data);
 }
 
-static WRITE8_HANDLER( sf7000_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
 	/*
         Signal  Description
@@ -649,12 +649,12 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
 
 	/* FDC terminal count */
-	nec765_set_tc_state(machine, data & 0x04);
+	nec765_set_tc_state(device->machine, data & 0x04);
 
 	/* FDC reset */
 	if (data & 0x08)
 	{
-		nec765_reset(machine, 0);
+		nec765_reset(device->machine, 0);
 	}
 
 	/* ROM selection */

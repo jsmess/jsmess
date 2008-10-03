@@ -108,7 +108,7 @@ PALETTE_INIT( hd66421 )
 	{
 		palette_set_color( machine, i, RGB_WHITE);
 		#ifndef BRIGHTNESS_DOES_NOT_WORK
-		palette_set_brightness( machine, i, 1.0 * i / (4 - 1));
+		palette_set_pen_contrast( machine, i, 1.0 * i / (4 - 1));
 		#endif
 	}
 }
@@ -148,7 +148,7 @@ VIDEO_UPDATE( hd66421 )
 		#ifdef BRIGHTNESS_DOES_NOT_WORK
 		palette_set_color( screen->machine, pen[i], 255 * bright, 255 * bright, 255 * bright);
 		#else
-		palette_set_brightness( screen->machine, pen[i], bright);
+		palette_set_pen_contrast( screen->machine, pen[i], bright);
 		#endif
 	}
 	// draw bitmap (bottom to top)

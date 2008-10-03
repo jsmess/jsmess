@@ -36,18 +36,18 @@ static UINT8 orionz80_dispatcher;
 
 UINT8 orion_video_mode_mask;
 
-static READ8_HANDLER (orion_romdisk_porta_r )
+static READ8_DEVICE_HANDLER (orion_romdisk_porta_r )
 {
-	UINT8 *romdisk = memory_region(machine, "main") + 0x10000;		
+	UINT8 *romdisk = memory_region(device->machine, "main") + 0x10000;		
 	return romdisk[romdisk_msb*256+romdisk_lsb];	
 }
 
-static WRITE8_HANDLER (orion_romdisk_portb_w )
+static WRITE8_DEVICE_HANDLER (orion_romdisk_portb_w )
 {	
 	romdisk_lsb = data;
 }
 
-static WRITE8_HANDLER (orion_romdisk_portc_w )
+static WRITE8_DEVICE_HANDLER (orion_romdisk_portc_w )
 {		
 	romdisk_msb = data;	
 }

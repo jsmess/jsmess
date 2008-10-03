@@ -40,8 +40,8 @@ typedef struct _palette_client palette_client;
 ***************************************************************************/
 
 /* macros to assemble rgb_t values */
-#define MAKE_RGB(r,g,b) 	((((rgb_t)(r) & 0xff) << 16) | (((rgb_t)(g) & 0xff) << 8) | ((rgb_t)(b) & 0xff))
-#define MAKE_ARGB(a,r,g,b)	(MAKE_RGB(r,g,b) | (((rgb_t)(a) & 0xff) << 24))
+#define MAKE_ARGB(a,r,g,b) 	((((rgb_t)(a) & 0xff) << 24) | (((rgb_t)(r) & 0xff) << 16) | (((rgb_t)(g) & 0xff) << 8) | ((rgb_t)(b) & 0xff))
+#define MAKE_RGB(r,g,b)		(MAKE_ARGB(255,r,g,b))
 
 /* macros to extract components from rgb_t values */
 #define RGB_ALPHA(rgb)		(((rgb) >> 24) & 0xff)
@@ -50,8 +50,8 @@ typedef struct _palette_client palette_client;
 #define RGB_BLUE(rgb)		((rgb) & 0xff)
 
 /* common colors */
-#define RGB_BLACK			(MAKE_RGB(0,0,0))
-#define RGB_WHITE			(MAKE_RGB(255,255,255))
+#define RGB_BLACK			(MAKE_ARGB(255,0,0,0))
+#define RGB_WHITE			(MAKE_ARGB(255,255,255,255))
 
 
 
@@ -128,6 +128,15 @@ const rgb_t *palette_entry_list_adjusted_rgb15(palette_t *palette);
 
 
 /* ----- palette adjustments ----- */
+
+/* set the overall brightness for the palette */
+void palette_set_brightness(palette_t *palette, float brightness);
+
+/* set the overall contrast for the palette */
+void palette_set_contrast(palette_t *palette, float contrast);
+
+/* set the overall gamma for the palette */
+void palette_set_gamma(palette_t *palette, float gamma);
 
 /* set the contrast adjustment for a single palette index */
 void palette_entry_set_contrast(palette_t *palette, UINT32 index, float contrast);

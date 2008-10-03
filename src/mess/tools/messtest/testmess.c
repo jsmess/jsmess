@@ -438,7 +438,7 @@ static void testmess_exit(running_machine *machine)
 void osd_init(running_machine *machine)
 {
 	add_exit_callback(machine, testmess_exit);
-	target = render_target_alloc(NULL, 0);
+	target = render_target_alloc(machine, NULL, 0);
 	render_target_set_orientation(target, 0);
 }
 

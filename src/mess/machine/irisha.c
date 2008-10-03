@@ -44,7 +44,7 @@ static const char *keynames[] = {
 							"LINE4", "LINE5", "LINE6", "LINE7",
 							"LINE8", "LINE9"};
 
-READ8_HANDLER (irisha_8255_portb_r )
+READ8_DEVICE_HANDLER (irisha_8255_portb_r )
 {
   if (irisha_keypressed==1) {
   	irisha_keypressed =0;
@@ -54,7 +54,7 @@ READ8_HANDLER (irisha_8255_portb_r )
 	return 0x00;
 }
 
-READ8_HANDLER (irisha_8255_portc_r )
+READ8_DEVICE_HANDLER (irisha_8255_portc_r )
 {
 	logerror("irisha_8255_portc_r\n");
 	return 0;
@@ -72,17 +72,17 @@ READ8_HANDLER (irisha_keyboard_r)
 	return keycode;
 }
 
-WRITE8_HANDLER (irisha_8255_porta_w )
+WRITE8_DEVICE_HANDLER (irisha_8255_porta_w )
 {
 	logerror("irisha_8255_porta_w %02x\n",data);
 }
 
-WRITE8_HANDLER (irisha_8255_portb_w )
+WRITE8_DEVICE_HANDLER (irisha_8255_portb_w )
 {
 	logerror("irisha_8255_portb_w %02x\n",data);
 }
 
-WRITE8_HANDLER (irisha_8255_portc_w )
+WRITE8_DEVICE_HANDLER (irisha_8255_portc_w )
 {
 	//logerror("irisha_8255_portc_w %02x\n",data);
 }

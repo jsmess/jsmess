@@ -386,7 +386,7 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 
 /* PPI */
 
-static WRITE8_HANDLER( bw2_ppi8255_a_w )
+static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 {
 	/*
 
@@ -420,7 +420,7 @@ static WRITE8_HANDLER( bw2_ppi8255_a_w )
 	centronics_write_handshake(0, BIT(data, 7) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 }
 
-static READ8_HANDLER( bw2_ppi8255_b_r )
+static READ8_DEVICE_HANDLER( bw2_ppi8255_b_r )
 {
 	/*
 
@@ -441,12 +441,12 @@ static READ8_HANDLER( bw2_ppi8255_b_r )
 	row = keyboard_row;
 
 	if (row <= 9)
-		return input_port_read(machine, rownames[row]);
+		return input_port_read(device->machine, rownames[row]);
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( bw2_ppi8255_c_w )
+static WRITE8_DEVICE_HANDLER( bw2_ppi8255_c_w )
 {
 	/*
 
@@ -457,17 +457,17 @@ static WRITE8_HANDLER( bw2_ppi8255_c_w )
 
 	*/
 
-	if (get_ramdisk_size(machine) > 0)
+	if (get_ramdisk_size(device->machine) > 0)
 	{
-		ramcard_set_banks(machine, data & 0x07);
+		ramcard_set_banks(device->machine, data & 0x07);
 	}
 	else
 	{
-		bw2_set_banks(machine, data & 0x07);
+		bw2_set_banks(device->machine, data & 0x07);
 	}
 }
 
-static READ8_HANDLER( bw2_ppi8255_c_r )
+static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 {
 	/*
 

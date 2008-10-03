@@ -21,31 +21,31 @@ DRIVER_INIT(vector06)
 	memset(mess_ram,0,64*1024);
 }
 
-READ8_HANDLER (vector06_8255_portb_r )
+READ8_DEVICE_HANDLER (vector06_8255_portb_r )
 {
 	UINT8 key = 0xff;
-	if ((vector06_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
-	if ((vector06_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
-	if ((vector06_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
-	if ((vector06_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
-	if ((vector06_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
-	if ((vector06_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
-	if ((vector06_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
-	if ((vector06_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
+	if ((vector06_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"LINE0"); }
+	if ((vector06_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"LINE1"); }
+	if ((vector06_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine,"LINE2"); }
+	if ((vector06_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine,"LINE3"); }
+	if ((vector06_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine,"LINE4"); }
+	if ((vector06_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"LINE5"); }
+	if ((vector06_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"LINE6"); }
+	if ((vector06_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"LINE7"); }
 	return key;
 }
 
-READ8_HANDLER (vector06_8255_portc_r )
+READ8_DEVICE_HANDLER (vector06_8255_portc_r )
 {
-	return input_port_read(machine,"LINE8");
+	return input_port_read(device->machine, "LINE8");
 }
 
-WRITE8_HANDLER (vector06_8255_porta_w )
+WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
 {
 	vector06_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_HANDLER (vector06_8255_portb_w )
+WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )
 {
 	vector_color_index = data;
 }

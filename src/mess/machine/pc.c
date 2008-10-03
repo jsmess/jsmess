@@ -629,7 +629,7 @@ static struct {
 } pc_ppi={ 0 };
 
 
-static READ8_HANDLER (ibm5150_ppi_porta_r)
+static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
 {
 	int data = 0xFF;
 
@@ -645,7 +645,7 @@ static READ8_HANDLER (ibm5150_ppi_porta_r)
 		 *      01 - color 40x25
 		 * 6-7  The number of floppy disk drives
 		 */
-		data = input_port_read(machine, "DSW0");
+		data = input_port_read(device->machine, "DSW0");
 	}
 	else
 	{
@@ -656,7 +656,7 @@ static READ8_HANDLER (ibm5150_ppi_porta_r)
 }
 
 
-static READ8_HANDLER (ibm5150_ppi_portb_r )
+static READ8_DEVICE_HANDLER (ibm5150_ppi_portb_r )
 {
 	int data;
 
@@ -666,7 +666,7 @@ static READ8_HANDLER (ibm5150_ppi_portb_r )
 }
 
 
-static READ8_HANDLER ( ibm5150_ppi_portc_r )
+static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 {
 	int timer2_output = pit8253_get_output( pc_devices.pit8253, 2 );
 	int data=0xff;
@@ -677,19 +677,19 @@ static READ8_HANDLER ( ibm5150_ppi_portc_r )
 	if (pc_ppi.portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((input_port_read(machine, "DSW0") >> 4) & 0x0f);
+		data = (data & 0xf0) | ((input_port_read(device->machine, "DSW0") >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(machine, "DSW0") & 0x0f);
+		data = (data & 0xf0) | (input_port_read(device->machine, "DSW0") & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
 	if ( ! ( pc_ppi.portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
+		double tap_val = cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) );
 
 		if ( tap_val < 0 )
 		{
@@ -713,14 +713,14 @@ static READ8_HANDLER ( ibm5150_ppi_portc_r )
 }
 
 
-static WRITE8_HANDLER ( ibm5150_ppi_porta_w )
+static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
 {
 	/* KB controller port A */
 	PIO_LOG(1,"PIO_A_w",("$%02x\n", data));
 }
 
 
-static WRITE8_HANDLER ( ibm5150_ppi_portb_w )
+static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 {
 	/* KB controller port B */
 	pc_ppi.portb = data;
@@ -730,11 +730,11 @@ static WRITE8_HANDLER ( ibm5150_ppi_portb_w )
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
 
-	pc_ppi.clock_callback( machine, 0, pc_ppi.clock_signal );
+	pc_ppi.clock_callback( device->machine, 0, pc_ppi.clock_signal );
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( pc_ppi.keyboard_clear )
@@ -746,7 +746,7 @@ static WRITE8_HANDLER ( ibm5150_ppi_portb_w )
 }
 
 
-static WRITE8_HANDLER ( ibm5150_ppi_portc_w )
+static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
 {
 	/* KB controller port C */
 	PIO_LOG(1,"PIO_C_w",("$%02x\n", data));
@@ -812,7 +812,7 @@ const ppi8255_interface ibm5150_ppi8255_interface =
 };
 
 
-static READ8_HANDLER (ibm5160_ppi_porta_r)
+static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 {
 	int data = 0xFF;
 
@@ -828,7 +828,7 @@ static READ8_HANDLER (ibm5160_ppi_porta_r)
 		 *      01 - color 40x25
 		 * 6-7  The number of floppy disk drives
 		 */
-		data = input_port_read(machine, "DSW0");
+		data = input_port_read(device->machine, "DSW0");
 	}
 	else
 	{
@@ -842,7 +842,7 @@ static READ8_HANDLER (ibm5160_ppi_porta_r)
 }
 
 
-static READ8_HANDLER ( ibm5160_ppi_portc_r )
+static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 {
 	int timer2_output = pit8253_get_output( pc_devices.pit8253, 2 );
 	int data=0xff;
@@ -854,13 +854,13 @@ static READ8_HANDLER ( ibm5160_ppi_portc_r )
 	if (pc_ppi.portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((input_port_read(machine, "DSW0") >> 4) & 0x0f);
+		data = (data & 0xf0) | ((input_port_read(device->machine, "DSW0") >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(machine, "DSW0") & 0x0f);
+		data = (data & 0xf0) | (input_port_read(device->machine, "DSW0") & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -874,7 +874,7 @@ static READ8_HANDLER ( ibm5160_ppi_portc_r )
 }
 
 
-static WRITE8_HANDLER( ibm5160_ppi_portb_w )
+static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
@@ -900,22 +900,22 @@ const ppi8255_interface ibm5160_ppi8255_interface =
 };
 
 
-static WRITE8_HANDLER ( pcjr_ppi_portb_w )
+static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 {
 	/* KB controller port B */
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
-	pit8253_gate_w( device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
+	pit8253_gate_w( device_list_find_by_tag( device->machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 
 /*
  * On a PCJR none of the port A bits are connected.
  */
-static READ8_HANDLER (pcjr_ppi_porta_r )
+static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
 {
 	int data;
 
@@ -936,9 +936,9 @@ static READ8_HANDLER (pcjr_ppi_porta_r )
  * PC6 - KYBD IN
  * PC7 - (keyboard) CABLE CONNECTED
  */
-static READ8_HANDLER ( pcjr_ppi_portc_r )
+static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2 );
+	int timer2_output = pit8253_get_output( device_list_find_by_tag( device->machine->config->devicelist, PIT8253, "pit8253" ), 2 );
 	int data=0xff;
 
 	data&=~0x80;
@@ -946,7 +946,7 @@ static READ8_HANDLER ( pcjr_ppi_portc_r )
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( pc_ppi.portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
+		double tap_val = cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) );
 
 		if ( tap_val < 0 )
 		{

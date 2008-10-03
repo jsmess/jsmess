@@ -390,7 +390,7 @@ static const z80pio_interface pio_intf =
 //  PA7 = tape EAR = INPUT, meant to be connected to the earphone jacket of a taperecorder
 // ~PC7 = tape MIC = OUTPUT, meant to be connected to the microphone jacket of a taperecorder
 
-static  READ8_HANDLER( mpf1_porta_r )
+static READ8_DEVICE_HANDLER( mpf1_porta_r )
 {
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5" };
 
@@ -403,7 +403,7 @@ static  READ8_HANDLER( mpf1_porta_r )
 	verboselog( 0, "Key column for kbd read: %02x\n", keycol );
 	if( keycol != 6 )
 	{
-		retval = input_port_read(machine, keynames[keycol]);
+		retval = input_port_read(device->machine, keynames[keycol]);
 	}
 	else
 	{
@@ -415,7 +415,7 @@ static  READ8_HANDLER( mpf1_porta_r )
 
 
 
-static  READ8_HANDLER( mpf1_portb_r )
+static READ8_DEVICE_HANDLER( mpf1_portb_r )
 {
 	verboselog( 0, "PPI port B read\n" );
 	return 0;
@@ -423,7 +423,7 @@ static  READ8_HANDLER( mpf1_portb_r )
 
 
 
-static  READ8_HANDLER( mpf1_portc_r )
+static READ8_DEVICE_HANDLER( mpf1_portc_r )
 {
 	verboselog( 0, "PPI port C read\n" );
 	return 0;
@@ -431,14 +431,14 @@ static  READ8_HANDLER( mpf1_portc_r )
 
 
 
-static WRITE8_HANDLER( mpf1_porta_w )
+static WRITE8_DEVICE_HANDLER( mpf1_porta_w )
 {
 	verboselog( 0, "PPI port A write: %02x\n", data );
 }
 
 
 
-static WRITE8_HANDLER( mpf1_portb_w )
+static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 {
     //int i;
 	/*  A   0x08
@@ -475,7 +475,7 @@ static WRITE8_HANDLER( mpf1_portb_w )
 
 
 
-static WRITE8_HANDLER( mpf1_portc_w )
+static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 {
 	kbdlatch = ~data;
 
@@ -493,7 +493,7 @@ static WRITE8_HANDLER( mpf1_portc_w )
 	data = ~kbdlatch;
 
 	// watchdog reset
-	watchdog_reset(machine);
+	watchdog_reset(device->machine);
 
 	// TONE led & speaker
 	led_tone = (~data & 0x80) >> 7;

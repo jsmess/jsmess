@@ -1,38 +1,9 @@
 #include "driver.h"
 #include "deprecat.h"
+#include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "sound/samples.h"
-
-
-/* z80 pio */
-static void pio_interrupt(running_machine *machine, int state)
-{
-	cpunum_set_input_line(machine, 1, 0, state);
-}
-
-static const z80pio_interface pio_intf =
-{
-	pio_interrupt,
-	0,
-	0
-};
-
-/* z80 ctc */
-static void ctc_interrupt (running_machine *machine, int state)
-{
-	cpunum_set_input_line(machine, 1, 0, state);
-}
-
-static z80ctc_interface ctc_intf =
-{
-	0,               /* clock (filled in from the CPU 0 clock */
-	NOTIMER_2,       /* timer disables */
-	ctc_interrupt,   /* interrupt handler */
-	z80ctc_0_trg1_w, /* ZC/TO0 callback */
-	0,               /* ZC/TO1 callback */
-	0                /* ZC/TO2 callback */
-};
 
 
 /* single tone generator */
@@ -42,6 +13,44 @@ static z80ctc_interface ctc_intf =
 static INT16 *_single;
 static int single_rate = 1000;
 static int single_volume = 0;
+
+
+const z80_daisy_chain senjyo_daisy_chain[] =
+{
+	{ Z80CTC, "z80ctc" },
+	{ Z80PIO, "z80pio" },
+	{ NULL }
+};
+
+
+/* z80 pio */
+static void daisy_interrupt(const device_config *device, int state)
+{
+	cputag_set_input_line(device->machine, "sub", 0, state);
+}
+
+const z80pio_interface senjyo_pio_intf =
+{
+	daisy_interrupt,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+/* z80 ctc */
+const z80ctc_interface senjyo_ctc_intf =
+{
+	"sub",		 	/* clock from sub CPU */
+	0,               /* clock (filled in from the CPU 0 clock */
+	NOTIMER_2,       /* timer disables */
+	daisy_interrupt, /* interrupt handler */
+	z80ctc_trg1_w, 	 /* ZC/TO0 callback */
+	0,               /* ZC/TO1 callback */
+	0                /* ZC/TO2 callback */
+};
 
 
 WRITE8_HANDLER( senjyo_volume_w )
@@ -54,7 +63,7 @@ WRITE8_HANDLER( senjyo_volume_w )
 static TIMER_CALLBACK( senjyo_sh_update )
 {
 	/* ctc2 timer single tone generator frequency */
-	attotime period = z80ctc_getperiod (0, 2);
+	attotime period = z80ctc_getperiod (devtag_get_device(machine, Z80CTC, "z80ctc"), 2);
 	if (attotime_compare(period, attotime_zero) != 0 )
 		single_rate = ATTOSECONDS_TO_HZ(period.attoseconds);
 	else
@@ -67,13 +76,6 @@ static TIMER_CALLBACK( senjyo_sh_update )
 void senjyo_sh_start(void)
 {
     int i;
-
-	/* z80 ctc init */
-	ctc_intf.baseclock = cpunum_get_clock(1);
-	z80ctc_init (0, &ctc_intf);
-
-	/* z80 pio init */
-	z80pio_init (0, &pio_intf);
 
 	_single = (INT16 *)auto_malloc(SINGLE_LENGTH*2);
 

@@ -285,16 +285,16 @@ static void update_psg(running_machine *machine)
 }
 
 /* Read/Write 8255 PPI port A (connected to AY-3-8912 databus) */
-static READ8_HANDLER ( amstrad_ppi_porta_r )
+static READ8_DEVICE_HANDLER ( amstrad_ppi_porta_r )
 {
-	update_psg(machine);
+	update_psg(device->machine);
 	return ppi_port_inputs[amstrad_ppi_PortA];
 }
 
-static WRITE8_HANDLER ( amstrad_ppi_porta_w )
+static WRITE8_DEVICE_HANDLER ( amstrad_ppi_porta_w )
 {
 	ppi_port_outputs[amstrad_ppi_PortA] = data;
-	update_psg(machine);
+	update_psg(device->machine);
 }
 
 /* - Read PPI Port B -
@@ -322,20 +322,20 @@ Note:
   On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
-static READ8_HANDLER (amstrad_ppi_portb_r)
+static READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 {
 	int data = 0;
 /* Set b7 with cassette tape input */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.03) {
+		if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.03) {
 			data |= (1<<7);
 		}
 	}
 /* Set b6 with Parallel/Printer port ready */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (printer_is_ready(printer_device(machine))==0 ) {
+		if (printer_is_ready(printer_device(device->machine))==0 ) {
 			data |= (1<<6);
 		}
 	}
@@ -371,7 +371,7 @@ Bit Description  Usage
 /* previous_ppi_portc_w value */
 static int previous_ppi_portc_w;
 
-static WRITE8_HANDLER ( amstrad_ppi_portc_w )
+static WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 {
 	int changed_data;
 
@@ -388,13 +388,13 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 	aleste_rtc_function = data & 0x07;
 
 /* Perform PSG function */
-	update_psg(machine);
+	update_psg(device->machine);
 
 /* b5 Cassette Write data */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x20) != 0) {
-			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+			cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
 				((data & 0x20) ? -1.0 : +1.0));
 		}
 	}
@@ -403,7 +403,7 @@ static WRITE8_HANDLER ( amstrad_ppi_portc_w )
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x10) != 0) {
-			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+			cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
 				((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
 				CASSETTE_MASK_MOTOR);
 		}

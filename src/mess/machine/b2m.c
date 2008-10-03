@@ -197,31 +197,31 @@ const struct pit8253_config b2m_pit8253_intf =
 	}
 };
 
-static WRITE8_HANDLER (b2m_8255_porta_w )
+static WRITE8_DEVICE_HANDLER (b2m_8255_porta_w )
 {	
 	b2m_8255_porta = data;
 }
-static WRITE8_HANDLER (b2m_8255_portb_w )
+static WRITE8_DEVICE_HANDLER (b2m_8255_portb_w )
 {	
 	b2m_video_scroll = data;
 }
 
-static WRITE8_HANDLER (b2m_8255_portc_w )
+static WRITE8_DEVICE_HANDLER (b2m_8255_portc_w )
 {	
 	b2m_8255_portc = data;
-	b2m_set_bank(machine,b2m_8255_portc & 7);
+	b2m_set_bank(device->machine, b2m_8255_portc & 7);
 	b2m_video_page = (b2m_8255_portc >> 7) & 1;
 }
 
-static READ8_HANDLER (b2m_8255_porta_r )
+static READ8_DEVICE_HANDLER (b2m_8255_porta_r )
 {
 	return 0xff;
 }
-static READ8_HANDLER (b2m_8255_portb_r )
+static READ8_DEVICE_HANDLER (b2m_8255_portb_r )
 {
 	return b2m_video_scroll;
 }
-static READ8_HANDLER (b2m_8255_portc_r )
+static READ8_DEVICE_HANDLER (b2m_8255_portc_r )
 {
 	return 0xff;
 }
@@ -236,14 +236,14 @@ const ppi8255_interface b2m_ppi8255_interface_1 =
 };
 
 
-static WRITE8_HANDLER (b2m_ext_8255_porta_w )
+static WRITE8_DEVICE_HANDLER (b2m_ext_8255_porta_w )
 {	
 }
-static WRITE8_HANDLER (b2m_ext_8255_portb_w )
+static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portb_w )
 {	
 }
 
-static WRITE8_HANDLER (b2m_ext_8255_portc_w )
+static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 {		
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
 	UINT8 side  = (data  & 1) ^ 1;
@@ -258,15 +258,15 @@ static WRITE8_HANDLER (b2m_ext_8255_portc_w )
 	}
 }
 
-static READ8_HANDLER (b2m_ext_8255_porta_r )
+static READ8_DEVICE_HANDLER (b2m_ext_8255_porta_r )
 {
 	return 0xff;
 }
-static READ8_HANDLER (b2m_ext_8255_portb_r )
+static READ8_DEVICE_HANDLER (b2m_ext_8255_portb_r )
 {
 	return 0xff;
 }
-static READ8_HANDLER (b2m_ext_8255_portc_r )
+static READ8_DEVICE_HANDLER (b2m_ext_8255_portc_r )
 {
 	return 0xff;
 }
@@ -281,18 +281,18 @@ const ppi8255_interface b2m_ppi8255_interface_2 =
 	b2m_ext_8255_portc_w
 };
 
-static READ8_HANDLER (b2m_romdisk_porta_r )
+static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
 {
-	UINT8 *romdisk = memory_region(machine, "main") + 0x12000;		
+	UINT8 *romdisk = memory_region(device->machine, "main") + 0x12000;		
 	return romdisk[b2m_romdisk_msb*256+b2m_romdisk_lsb];	
 }
 
-static WRITE8_HANDLER (b2m_romdisk_portb_w )
+static WRITE8_DEVICE_HANDLER (b2m_romdisk_portb_w )
 {	
 	b2m_romdisk_lsb = data;
 }
 
-static WRITE8_HANDLER (b2m_romdisk_portc_w )
+static WRITE8_DEVICE_HANDLER (b2m_romdisk_portc_w )
 {			
 	b2m_romdisk_msb = data & 0x7f;	
 }
