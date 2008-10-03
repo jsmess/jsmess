@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( lynx )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-        MDRV_SOUND_ADD("lynx", CUSTOM, 0)
+	MDRV_SOUND_ADD("lynx", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(lynx_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -249,10 +249,10 @@ static MACHINE_DRIVER_START( lynx2 )
 	MDRV_IMPORT_FROM( lynx )
 
 	/* sound hardware */
-        MDRV_SPEAKER_REMOVE("mono")
+	MDRV_SPEAKER_REMOVE("mono")
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-        MDRV_SOUND_REMOVE("lynx")
-        MDRV_SOUND_ADD("lynx2", CUSTOM, 0)
+	MDRV_SOUND_REMOVE("lynx")
+	MDRV_SOUND_ADD("lynx2", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(lynx2_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
@@ -265,24 +265,24 @@ MACHINE_DRIVER_END
    these 2 dumps differ only in this byte!
 */
 
-#define MYROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
-
 ROM_START(lynx)
 	ROM_REGION(0x200,"main", 0)
 	ROM_SYSTEM_BIOS( 0, "default",   "rom save" )
-	MYROM_LOAD_BIOS( 0, "lynx.bin",    0x00000, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
+	ROMX_LOAD( "lynx.bin",  0x00000, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "a", "alternate rom save" )
-	MYROM_LOAD_BIOS( 1, "lynxa.bin",    0x00000, 0x200, CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb))
-//  ROM_LOAD("lynx.bin", 0, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
+	ROMX_LOAD( "lynxa.bin", 0x00000, 0x200, CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb), ROM_BIOS(2))
+
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
+
 	ROM_REGION(0x100000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(lynx2)
 	ROM_REGION(0x200,"main", 0)
 	ROM_LOAD("lynx2.bin", 0, 0x200, NO_DUMP)
+
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
+
 	ROM_REGION(0x100000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
@@ -296,17 +296,30 @@ void lynx_partialhash(char *dest, const unsigned char *data,
 	hash_compute(dest, &data[64], length - 64, functions);
 }
 
+#define LYNX_CART		0
+#define LYNX_QUICKLOAD	1
 
-
-static int lynx_verify_cart (char *header)
+static int lynx_verify_cart (char *header, int kind)
 {
-
 	logerror("Trying Header Compare\n");
 
-	if (strncmp("LYNX",&header[0],4) && strncmp("BS9",&header[6],3)) {
-		logerror("Not an valid Lynx image\n");
-		return IMAGE_VERIFY_FAIL;
+	if (kind)
+	{
+		if (strncmp("BS93", &header[6], 4)) 
+		{
+			logerror("Not an valid Lynx image\n");
+			return IMAGE_VERIFY_FAIL;
+		}
 	}
+	else
+	{
+		if (strncmp("LYNX",&header[0],4)) 
+		{
+			logerror("Not an valid Lynx image\n");
+			return IMAGE_VERIFY_FAIL;
+		}
+	}
+
 	logerror("returning ID_OK\n");
 	return IMAGE_VERIFY_PASS;
 }
@@ -330,7 +343,8 @@ static void lynx_crc_keyword(const device_config *image)
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	UINT8 *rom = memory_region(image->machine, "user1");
-	int size;
+	int size = image_length(image);
+	const char *filetype;
 	UINT8 header[0x40];
 /* 64 byte header
    LYNX
@@ -340,57 +354,76 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
    22 chars manufacturer
 */
 
-	size = image_length(image);
-	if (image_fread(image, header, 0x40)!=0x40)
+	filetype = image_filetype(image);
+
+	if (!mame_stricmp (filetype, "lnx"))
 	{
-		logerror("%s load error\n", image_filename(image));
-		return 1;
-	}
+		if (image_fread(image, header, 0x40)!=0x40)
+			return INIT_FAIL;
 
-	/* Check the image */
-	if (lynx_verify_cart((char*)header) == IMAGE_VERIFY_FAIL)
+		/* Check the image */
+		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
+			return INIT_FAIL;
+
+		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using 
+		it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+		implement this as well */
+		lynx_granularity = header[4] | (header[5] << 8);
+
+		logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
+			  header + 10, size / 1024, lynx_granularity, header + 42);
+
+		size -= 0x40;
+	}
+	else if (!mame_stricmp (filetype, "lyx"))
 	{
-		return INIT_FAIL;
+		/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity" 
+		(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
+		This should work with most .lyx files, but we need additional info on raw cart images */
+		lynx_granularity = 0x0400; 
 	}
-
-	size-=0x40;
-	lynx_granularity=header[4]|(header[5]<<8);
-
-	logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
-			  header+10,size/1024,lynx_granularity, header+42);
 
 	if (image_fread(image, rom, size) != size)
-	{
-		logerror("%s load error\n", image_filename(image));
-		return 1;
-	}
+		return INIT_FAIL;
 
 	lynx_crc_keyword(image);
 
-	return 0;
+	return INIT_PASS;
 }
 
 static QUICKLOAD_LOAD( lynx )
 {
+	UINT8 *data = NULL;
 	UINT8 *rom = memory_region(image->machine, "main");
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
-	// maybe the first 2 bytes must be used to identify the endianess of the file
-	UINT16 start;
+	UINT16 start, length;
+	int i;
 
 	if (image_fread(image, header, sizeof(header)) != sizeof(header))
 		return INIT_FAIL;
 
-	quickload_size -= sizeof(header);
-	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
-
-	if (image_fread(image, rom+start, quickload_size) != quickload_size)
+	/* Check the image */
+	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) == IMAGE_VERIFY_FAIL)
 		return INIT_FAIL;
 
-	rom[0xfffc+0x200] = start&0xff;
-	rom[0xfffd+0x200] = start>>8;
+	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
+	length = header[5] | (header[4]<<8);
+	length -= 10;
 
-	lynx_crc_keyword(image_from_devtype_and_index(IO_QUICKLOAD, 0));
-	return 0;
+	data = malloc(length);
+
+	if (image_fread(image, data, length) != length)
+		return INIT_FAIL;
+
+	for (i = 0; i < length; i++)
+		program_write_byte(start + i, data[i]);
+
+	rom[0x1fc] = start & 0xff;
+	rom[0x1fd] = start >> 8;
+
+	lynx_crc_keyword(device_list_find_by_tag( image->machine->config->devicelist, QUICKLOAD, TAG_QUICKLOAD )); 
+
+	return INIT_PASS;
 }
 
 static void lynx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -406,7 +439,7 @@ static void lynx_cartslot_getinfo(const mess_device_class *devclass, UINT32 stat
 		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = lynx_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "lnx"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "lnx,lyx"); break;
 
 		default:										cartslot_device_getinfo(devclass, state, info); break;
 	}
