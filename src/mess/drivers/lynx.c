@@ -379,8 +379,13 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	{
 		/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity" 
 		(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
-		This should work with most .lyx files, but we need additional info on raw cart images */
-		lynx_granularity = 0x0400; 
+		These should work with most .lyx files, but we need additional info on raw cart images */
+		if (size == 0x20000)
+			lynx_granularity = 0x0200; 
+		else if (size == 0x80000)
+			lynx_granularity = 0x0800; 
+		else 
+			lynx_granularity = 0x0400; 
 	}
 
 	if (image_fread(image, rom, size) != size)
