@@ -208,8 +208,7 @@ static WRITE8_HANDLER( abc800_ram_ctrl_w )
 static void abc806_bankswitch(running_machine *machine)
 {
 	abc806_state *state = machine->driver_data;
-
-	int bank;
+	FPTR bank;
 
 	if (state->keydtr)
 	{
