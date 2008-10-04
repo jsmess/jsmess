@@ -1372,6 +1372,7 @@ $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/ut88.o:		$(MESS_LAYOUT)/ut88mini.lh
+$(MESS_DRIVERS)/votrpss.o:	$(MESS_LAYOUT)/votrpss.lh
 $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
 
 

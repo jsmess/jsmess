@@ -56,11 +56,9 @@
 *  (driver structure copied from vtech1.c)
 ******************************************************************************/
 
-/* the following is needed for making mess not crash immediately on startup due to a bug involving systems which have absolutely no display whatsoever */
-#define SCREENLESS_BROKEN 1
-
 /* Core includes */
 #include "driver.h"
+#include "votrpss.lh"
 
 /* Components */
 //#include "sound/ay8910.h"
@@ -132,21 +130,6 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
- Audio Initialisation
-******************************************************************************/
-
-#ifdef SCREENLESS_BROKEN
-static VIDEO_START( votrpss )
-{
-}
- 
-static VIDEO_UPDATE( votrpss )
-{
-    return 0;
-}
-#endif
-
-/******************************************************************************
  Machine Drivers
 ******************************************************************************/
 
@@ -158,18 +141,7 @@ static MACHINE_DRIVER_START(votrpss)
     MDRV_INTERLEAVE(1)
 
     /* video hardware */
-    // PSS has no video hardware
-#ifdef SCREENLESS_BROKEN
-    MDRV_SCREEN_ADD("main", RASTER)
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-    MDRV_PALETTE_LENGTH(4)
-    MDRV_SCREEN_REFRESH_RATE(30)
- 
-    MDRV_VIDEO_START(votrpss)
-    MDRV_VIDEO_UPDATE(votrpss)
-#endif
+	MDRV_DEFAULT_LAYOUT(layout_votrpss)
 
     /* sound hardware */
 	//MDRV_SPEAKER_STANDARD_MONO("mono")
