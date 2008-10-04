@@ -796,7 +796,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->rendered_event = osd_event_alloc(FALSE, TRUE);
 
 	// load the layout
-	window->target = render_target_alloc(NULL, FALSE);
+	window->target = render_target_alloc(machine, NULL, FALSE);
 	if (window->target == NULL)
 		goto error;
 
