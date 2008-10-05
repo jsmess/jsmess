@@ -1,10 +1,5 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="digit" defstate="0">
-		<led7seg>
-			<color red="0.0" green="0.85" blue="0.0" />
-		</led7seg>
-	</element>
 	<element name="background">
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
@@ -15,31 +10,7 @@
 	<view name="Simple LCD">
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="1" top="1" right="212" bottom="100" />
-		</bezel>
-		<bezel name="digit0" element="digit">
-			<bounds left="10" top="20" right="34" bottom="90" />
-		</bezel>
-		<bezel name="digit1" element="digit">
-			<bounds left="34" top="20" right="58" bottom="90" />
-		</bezel>
-		<bezel name="digit2" element="digit">
-			<bounds left="58" top="20" right="82" bottom="90" />
-		</bezel>
-		<bezel name="digit3" element="digit">
-			<bounds left="82" top="20" right="106" bottom="90" />
-		</bezel>
-		<bezel name="digit4" element="digit">
-			<bounds left="106" top="20" right="130" bottom="90" />
-		</bezel>
-		<bezel name="digit5" element="digit">
-			<bounds left="130" top="20" right="154" bottom="90" />
-		</bezel>
-		<bezel name="digit6" element="digit">
-			<bounds left="154" top="20" right="178" bottom="90" />
-		</bezel>
-		<bezel name="digit7" element="digit">
-			<bounds left="178" top="20" right="202" bottom="90" />
+			<bounds left="1" top="1" right="10" bottom="5" />
 		</bezel>
 	</view>
 </mamelayout>
