@@ -689,6 +689,7 @@ XL/XE 16kB OS roms
 	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
 	DRIVER( hotbi13b )	/* 1985 MSX	Brazil									*/
 	DRIVER( hotbi13p )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbit20 )	/* 1986 MSX2 Brazil									*/
 	DRIVER( hb201 )		/* 1985 MSX Japan									*/
 	DRIVER( hb201p )	/* 1985 MSX											*/
 	DRIVER( hb501p )	/* 1984 MSX											*/
@@ -718,19 +719,26 @@ XL/XE 16kB OS roms
 	DRIVER( ax350 )
 	DRIVER( ax370 )
 	DRIVER( hbf9p )		/* 1985 MSX2										*/
+	DRIVER( hbf9s )		/* 1985 MSX2										*/
 	DRIVER( hbf500p )	/* 1985 MSX2										*/
 	DRIVER( hbf700d )	/* 1985 MSX2 Germany								*/
+	DRIVER( hbf700f )	/* 1985 MSX2 						*/
 	DRIVER( hbf700p )	/* 1985 MSX2										*/
 	DRIVER( hbf700s )	/* 1985 MSX2 Spain									*/
+	DRIVER( hbg900ap )	/* 1986 MSX2										*/
 	DRIVER( hbg900p )	/* 1986 MSX2										*/
 	DRIVER( nms8220 )	/* 1986 MSX2										*/
 	DRIVER( nms8220a )	/* 1986 MSX2										*/
+	DRIVER( vg8230 )	/* 1986 MSX2										*/
 	DRIVER( vg8235 )	/* 1986 MSX2										*/
+	DRIVER( vg8235f)	/* 1986 MSX2										*/
+	DRIVER( vg8240)	/* 1986 MSX2										*/
 	DRIVER( nms8245 )	/* 1986 MSX2										*/
 	DRIVER( nms8245f)	/* 1986 MSX2										*/
 	DRIVER( nms8250 )	/* 1986 MSX2										*/
 	DRIVER( nms8255 )	/* 1986 MSX2										*/
 	DRIVER( nms8280 )	/* 1986 MSX2										*/
+	DRIVER( nms8280g)	/* 1986 MSX2										*/
 	DRIVER( fs5500 )	/* 1985 MSX2 Japan									*/
 	DRIVER( fs4500 )	/* 1986 MSX2 Japan									*/
 	DRIVER( fs4700 )	/* 1986 MSX2 Japan									*/

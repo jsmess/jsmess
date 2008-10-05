@@ -2085,7 +2085,7 @@ ROM_START (expert20)
 	ROM_LOAD ("exp20ext.rom",  0x8000, 0x4000, CRC(08CED880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
-	ROM_LOAD ("xbasic2.rom", 0x20000, 0x4000, CRC(6704ef81) SHA1(47370bec7ca1f0615a54eda548b07fbc0c7ef398))
+	ROM_LOAD ("xbasic2.rom", 0x20000, 0x4000, CRC(2825b1a0) SHA1(47370bec7ca1f0615a54eda548b07fbc0c7ef398))
 	ROM_LOAD ("microsoldisk.rom", 0x24000, 0x4000, CRC(6704ef81) SHA1(a3028515ed829e900cc8deb403e17b09a38bf9b0))
 ROM_END
 
@@ -2539,7 +2539,45 @@ MSX_LAYOUT_END
 
 /* MSX2 - Philips NMS-8280G */
 
+ROM_START (nms8280g)
+	ROM_REGION (0x20000, "main", 0)
+	ROM_LOAD ("8280gbios.rom.ic119", 0x0000, 0x8000, CRC(8fa060e2) SHA1(b17d9bea0eb16a1aa2d0ccbd7c9488da9f57698e))
+	ROM_LOAD ("8280gext.rom.ic118", 0x8000, 0x4000, CRC(41e36d03) SHA1(4ab7b2030d022f5486abaab22aaeaf8aa23e05f3))
+	ROM_LOAD ("8280gdisk.rom.ic117", 0xc000, 0x04000, CRC(d0beebb8) SHA1(d1001f93c87ff7fb389e418e33bf7bc81bdbb65f))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+ROM_END
+
+MSX_LAYOUT_INIT (nms8280g)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
+MSX_LAYOUT_END
+
 /* MSX2 - Philips VG-8230 (u11 - exp, u12 - basic, u13 - disk */
+
+ROM_START (vg8230)
+	ROM_REGION (0x20000, "main", 0)
+	ROM_LOAD ("8230bios.rom.u12", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
+	ROM_LOAD ("8230ext.rom.u11", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
+	ROM_LOAD ("8230disk.rom.u13", 0xc000, 0x4000, CRC(77c4e5bc) SHA1(849f93867ff7846b27f84d0be418569faf058ac2))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+ROM_END
+
+MSX_LAYOUT_INIT (vg8230)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
+MSX_LAYOUT_END
 
 /* MSX2 - Philips VG-8235 3 psosible basic and ext roms (/00 /02 /19) */
 
@@ -2564,7 +2602,45 @@ MSX_LAYOUT_END
 
 /* MSX2 - Philips VG-8235F */
 
+ROM_START (vg8235f)
+	ROM_REGION (0x20000, "main", 0)
+	ROM_LOAD ("8235fbios.rom.u48", 0x0000, 0x8000, CRC(c0577a50) SHA1(3926cdd91fa89657a811463e48cfbdb350676e51))
+	ROM_LOAD ("8235fext.rom.u49", 0x8000, 0x4000, CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a))
+	ROM_LOAD ("8235fdisk.rom.u50", 0xc000, 0x4000, CRC(77c4e5bc) SHA1(849f93867ff7846b27f84d0be418569faf058ac2))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+ROM_END
+
+MSX_LAYOUT_INIT (vg8235f)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
+MSX_LAYOUT_END
+
 /* MSX2 - Philips VG-8240 */
+
+ROM_START (vg8240)
+	ROM_REGION (0x20000, "main", 0)
+	ROM_LOAD ("8240bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8240ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	ROM_LOAD ("8240disk.rom", 0xc000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+ROM_END
+
+MSX_LAYOUT_INIT (vg8240)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
+MSX_LAYOUT_END
 
 /* MSX2 - Sanyo Wavy PHC-23 */
 
@@ -2585,6 +2661,27 @@ MSX_LAYOUT_INIT (phc23)
 MSX_LAYOUT_END
 
 /* MSX2 - Sharp Epcom HotBit 2.0 */
+
+ROM_START (hotbit20)
+	ROM_REGION (0x28000, "main", 0)
+	ROM_LOAD ("hb2bios.rom", 0x0000, 0x8000, CRC(0160e8c9) SHA1(9c43106dba3ae2829e9a11dffa9d000ed6d6454c))
+	ROM_LOAD ("hb2ext.rom",  0x8000, 0x4000, CRC(08ced880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("xbasic2.rom", 0x20000, 0x4000, CRC(2825b1a0) SHA1(47370bec7ca1f0615a54eda548b07fbc0c7ef398))
+	ROM_LOAD ("microsoldisk.rom", 0x24000, 0x4000, CRC(6704ef81) SHA1(a3028515ed829e900cc8deb403e17b09a38bf9b0))
+ROM_END
+
+MSX_LAYOUT_INIT (hotbit20)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 1, 0, 1, ROM, 0x4000, 0x8000) /* EXT */
+	MSX_LAYOUT_SLOT (1, 1, 1, 1, ROM, 0x4000, 0x20000) /* BASIC */
+	MSX_LAYOUT_SLOT (1, 3, 1, 1, DISK_ROM, 0x4000, 0x24000) /* Microsol controller */	
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */	
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
 
 /* MSX2 - Sony HB-F1 */
 
@@ -2751,6 +2848,16 @@ ROM_START (hbf700f)
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
+MSX_LAYOUT_INIT (hbf700f)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 2, DISK_ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_SLOT (3, 3, 0, 4, RAM_MM, 0x40000, 0x0000)	/* 256KB Mapper RAM */
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
+
 /* MSX2 - Sony HB-F700P */
 
 ROM_START (hbf700p)
@@ -2864,12 +2971,58 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F9P Russian */
 
 /* MSX2 - Sony HB-F9S */
+ROM_START (hbf9s)
+	ROM_REGION (0x28000, "main", 0)
+	ROM_LOAD ("f9sbios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(4811956f878c3e03da46317f787cdc4bebc86f47))
+	ROM_LOAD ("f9sext.rom", 0x8000, 0x4000, CRC(7c456c8b) SHA1(7b4a96402847decfc110ff9eda713bdcd218bd83))
+	ROM_LOAD ("f9sfirm1.rom", 0xc000, 0x4000, CRC(c2b889a5) SHA1(8948704bad9ff27873fa9ccd0ef89868e2bd6479))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+	ROM_LOAD ("f9sfirm2.rom", 0x20000, 0x8000, CRC(ea97069f) SHA1(2d1880d1f5a6944fcb1b198b997a3d90ecd1903d))
+ROM_END
+
+MSX_LAYOUT_INIT (hbf9s)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x20000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
 
 /* MSX2 - Sony HB-G900AP */
+
 /* IC109 - 32KB Basic ROM SLOT#00 0000-7FFF */
 /* IC112 - 16KB Basic ROM SLOT#01 0000-3FFF */
 /* IC117 - 16KB Disk ROM SLOT#01 4000-7FFF */
 /* IC123 - 32KB ROM RS232C ROM SLOT#02 4000-7FFF / Video Utility ROM SLOT#03 4000-7FFF */
+
+/* MSX2 - Sony HB-G900AP */
+ROM_START (hbg900ap)
+	ROM_REGION (0x28000, "main", 0)
+	ROM_LOAD ("g900bios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
+	ROM_LOAD ("g900ext.rom", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
+	ROM_LOAD ("g900disk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+	ROM_LOAD ("g900232c.rom", 0x20000, 0x4000, CRC(06cf1da6) SHA1(373aa82d0426830880a7344ef98f7309d93814c7))
+	ROM_LOAD ("g900util.rom", 0x24000, 0x4000, CRC(d0417c20) SHA1(8779b004e7605a3c419825f0373a5d8fa84e1d5b))
+ROM_END
+
+MSX_LAYOUT_INIT (hbg900ap)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 1, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (0, 1, 1, 2, DISK_ROM, 0x4000, 0xc000)
+/*  MSX_LAYOUT_SLOT (0, 2, 1, 1, ROM, 0x4000, 0x20000) */ /* RS232C must be emulated */
+	MSX_LAYOUT_SLOT (0, 3, 1, 1, ROM, 0x4000, 0x24000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x80000, 0x0000)	/* 512KB Mapper RAM */
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
+
 
 /* MSX2 - Sony HB-G900P - 3x 32KB ROMs */
 
@@ -3266,6 +3419,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (hotbit12)
 	MSX_DRIVER (hotbi13b)
 	MSX_DRIVER (hotbi13p)
+	MSX_DRIVER (hotbit20)
 	MSX_DRIVER (hb201)
 	MSX_DRIVER (hb201p)
 	MSX_DRIVER (hb501p)	
@@ -3297,17 +3451,24 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (ax370)
 	MSX_DRIVER (nms8220)
 	MSX_DRIVER (nms8220a)
+	MSX_DRIVER (vg8230)
 	MSX_DRIVER (vg8235)
+	MSX_DRIVER (vg8235f)
+	MSX_DRIVER (vg8240)
 	MSX_DRIVER (nms8245)
 	MSX_DRIVER (nms8245f)
 	MSX_DRIVER (nms8250)
 	MSX_DRIVER (nms8255)
 	MSX_DRIVER (nms8280)
+	MSX_DRIVER (nms8280g)
 	MSX_DRIVER (hbf9p)
+	MSX_DRIVER (hbf9s)
 	MSX_DRIVER (hbf500p)
 	MSX_DRIVER (hbf700d)
+	MSX_DRIVER (hbf700f)
 	MSX_DRIVER (hbf700p)
 	MSX_DRIVER (hbf700s)
+	MSX_DRIVER (hbg900ap)
 	MSX_DRIVER (hbg900p)
 	MSX_DRIVER (fs5500)
 	MSX_DRIVER (fs4500)
@@ -3409,18 +3570,26 @@ COMP(1986, ax370,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Al Alamiah", "A
 COMP(1986, expert20, msx2,	0,	msx2_pal, msx2, 		msx2,    msx, "Gradiente", "Expert 2.0 (Brazil)" , GAME_NOT_WORKING)
 COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (12-jun-1986)", 0)
 COMP(1986, nms8220a, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (13-aug-1986)", 0)
+COMP(1986, vg8230,   msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "VG-8230", 0)
 COMP(1986, vg8235,   msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "VG-8235", 0)
+COMP(1986, vg8235f,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "VG-8235F", 0)
+COMP(1986, vg8240,   msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "VG-8240", 0)
 COMP(1986, nms8245,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8245", 0)
 COMP(1986, nms8245f, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8245F", 0)
 COMP(1986, nms8250,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8250", 0)
 COMP(1986, nms8255,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8255", 0)
 COMP(1986, nms8280,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8280", 0)
+COMP(1986, nms8280g, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8280G", 0)
 COMP(1985, hbf9p,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F9P" , 0)
+COMP(1985, hbf9s,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F9S" , 0)
 COMP(1985, hbf500p,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F500P", 0)
 COMP(1985, hbf700d,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700D (Germany)" , 0)
+COMP(1985, hbf700f,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700F" , 0)
 COMP(1985, hbf700p,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700P" , 0)
 COMP(1985, hbf700s,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700S (Spain)", 0)
+COMP(1986, hbg900ap,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-G900AP", 0 )
 COMP(1986, hbg900p,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-G900P", 0 )
+COMP(1986, hotbit20, msx2,	0,	msx2_pal, msx2,   	msx2,    msx, "Sharp / Epcom",	 "HB-8000 Hotbit 2.0" , GAME_NOT_WORKING)
 COMP(1985, fs5500,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "National / Matsushita", "FS-5500F1/F2 (Japan)", 0 )
 COMP(1986, fs4500,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "National / Matsushita", "FS-4500 (Japan)", 0 )
 COMP(1986, fs4700,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "National / Matsushita", "FS-4700 (Japan)", 0 )
@@ -3439,6 +3608,7 @@ COMP(1987, hbf12,    msx2,	0,      msx2,     msx2jp,   msx2,    msx, "Sony", "HB
 COMP(1987, hbf1xd,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "Sony", "HB-F1XD (Japan)", 0)
 COMP(1988, hbf1xdm2, msx2,	0,      msx2,     msx2jp,   msx2,    msx, "Sony", "HB-F1XDMK2 (Japan)", 0)
 COMP(1988, phc23,    msx2,	0,      msx2,     msx2jp,   msx2,    msx, "Sanyo", "WAVY PHC-23 (Japan)", 0)
+
 COMP(1986, cpc300,   msx2,	0,	msx2,	  msx2kr,   msx2,    msx, "Daewoo", "IQ-2000 CPC-300 (Korea)", 0)
 COMP(1986, cpc300e,  msx2,	0,	msx2,	  msx2kr,   msx2,    msx, "Daewoo", "IQ-2000 CPC-300E (Korea)", 0)
 COMP(1986, cpc400,   msx2,	0,	msx2,	  msx2kr,   msx2,    msx, "Daewoo", "X-II CPC-400 (Korea)", 0 )
