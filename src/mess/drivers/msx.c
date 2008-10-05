@@ -2347,13 +2347,13 @@ MSX_LAYOUT_INIT (fsa1mk2)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
 
-/* MSX2 - Philips NMS-8220 */
+/* MSX2 - Philips NMS-8220 - 2 possible sets (/00 /16) */
 
 ROM_START (nms8220)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8220bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8220ext.rom", 0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
-	ROM_LOAD ("8220pen.rom", 0xc000, 0x4000, CRC(3d38c53e) SHA1(cb754aed85b3e97a7d3c5894310df7ca18f89f41))
+	ROM_LOAD ("8220bios.rom.u14", 0x0000, 0x8000, BAD_DUMP CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8220ext.rom.u14", 0x8000, 0x4000, BAD_DUMP CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
+	ROM_LOAD ("8220pen.rom.u13", 0xc000, 0x4000, CRC(3d38c53e) SHA1(cb754aed85b3e97a7d3c5894310df7ca18f89f41))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
@@ -2372,9 +2372,9 @@ MSX_LAYOUT_END
 
 ROM_START (nms8220a)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8220bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8220ext.rom", 0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
-	ROM_LOAD ("8220pena.rom", 0xc000, 0x4000, CRC(17817b5a) SHA1(5df95d033ae70b107697b69470126ce1b7ae9eb5))
+	ROM_LOAD ("8220bios.rom.u14", 0x0000, 0x8000, BAD_DUMP CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8220ext.rom.u14", 0x8000, 0x4000, BAD_DUMP CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
+	ROM_LOAD ("8220pena.rom.u13", 0xc000, 0x4000, CRC(17817b5a) SHA1(5df95d033ae70b107697b69470126ce1b7ae9eb5))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
@@ -2389,13 +2389,13 @@ MSX_LAYOUT_INIT (nms8220a)
 	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
 MSX_LAYOUT_END
 
-/* MSX2 - Philips NMS-8245 */
+/* MSX2 - Philips NMS-8245 - 2 possible sets (/00 /16) */
 
 ROM_START (nms8245)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8245bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8245ext.rom", 0x8000, 0x4000, CRC(95db2959) SHA1(e7905d16d2ccd57a013c122dc432106cd59ef52c))
-	ROM_LOAD ("8245disk.rom", 0xc000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	ROM_LOAD ("8245bios.rom.u7", 0x0000, 0x8000, BAD_DUMP CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8245ext.rom.u7", 0x8000, 0x4000, BAD_DUMP CRC(95db2959) SHA1(e7905d16d2ccd57a013c122dc432106cd59ef52c))
+	ROM_LOAD ("8245disk.rom.u7", 0xc000, 0x4000, BAD_DUMP CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
@@ -2416,9 +2416,9 @@ MSX_LAYOUT_END
 
 ROM_START (nms8250)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8250bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8250ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
-	ROM_LOAD ("8250disk.rom", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	ROM_LOAD ("8250bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8250ext.rom.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	ROM_LOAD ("8250disk.rom.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
@@ -2437,9 +2437,9 @@ MSX_LAYOUT_END
 
 ROM_START (nms8255)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8255bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8255ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
-	ROM_LOAD ("8255disk.rom", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	ROM_LOAD ("8255bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8255ext.rom.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	ROM_LOAD ("8255disk.rom".ic117, 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
@@ -2454,13 +2454,13 @@ MSX_LAYOUT_INIT (nms8255)
 	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
 MSX_LAYOUT_END
 
-/* MSX2 - Philips NMS-8280 */
+/* MSX2 - Philips NMS-8280 - 2 possible sets (/00 /16) */
 
 ROM_START (nms8280)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8280bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8280ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
-	ROM_LOAD ("8280disk.rom", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	ROM_LOAD ("8280bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8280ext.rom.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	ROM_LOAD ("8280disk.rom.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
@@ -2477,15 +2477,15 @@ MSX_LAYOUT_END
 
 /* MSX2 - Philips NMS-8280G */
 
-/* MSX2 - Philips VG-8230 */
+/* MSX2 - Philips VG-8230 (u11 - exp, u12 - basic, u13 - disk */
 
-/* MSX2 - Philips VG-8235 */
+/* MSX2 - Philips VG-8235 3 psosible basic and ext roms (/00 /02 /19) */
 
 ROM_START (vg8235)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8235bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8235ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
-	ROM_LOAD ("8235disk.rom", 0xc000, 0x4000, CRC(51daeb25) SHA1(8954e59aa79310c7b719ecf0cde1e82fb731dcd1))
+	ROM_LOAD ("8235bios.rom.u48", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("8235ext.rom.u49", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	ROM_LOAD ("8235disk.rom.u50", 0xc000, 0x4000, CRC(51daeb25) SHA1(8954e59aa79310c7b719ecf0cde1e82fb731dcd1))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
