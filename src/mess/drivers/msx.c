@@ -2007,6 +2007,25 @@ MSX_LAYOUT_END
 
 /* MSX2 - Daewoo CPC-300E */
 
+ROM_START (cpc300e)
+	ROM_REGION (0x30000, "main", 0)
+	ROM_LOAD ("300ebios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("300eext.rom", 0x20000, 0x8000, CRC(d64da39c) SHA1(fb51c505adfbc174df94289fa894ef969f5357bc))
+	ROM_LOAD ("300ehan.rom", 0x28000, 0x4000, CRC(5afea78d) SHA1(f08c91f8c78d681e1f02eaaaaafb87ad81112b60))
+ROM_END
+
+MSX_LAYOUT_INIT (cpc300e)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 1, 1, 1, ROM, 0x4000, 0x28000)
+	MSX_LAYOUT_SLOT (0, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_SLOT (0, 3, 0, 2, ROM, 0x8000, 0x20000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
+
 /* MSX2 - Daewoo CPC-400 */
 ROM_START (cpc400)
 	ROM_REGION (0x50000, "main", 0)
@@ -2057,6 +2076,28 @@ MSX_LAYOUT_INIT (cpc400s)
 MSX_LAYOUT_END
 
 /* MSX2 - Gradiente Expert 2.0 */
+
+ROM_START (expert20)
+	ROM_REGION (0x28000, "main", 0)
+	ROM_LOAD ("exp20bios.rom", 0x0000, 0x8000, CRC(6BACDCE4) SHA1(9c43106dba3ae2829e9a11dffa9d000ed6d6454c))
+	ROM_LOAD ("exp20ext.rom",  0x8000, 0x4000, CRC(08CED880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("xbasic2.rom", 0x20000, 0x4000, CRC(6704ef81) SHA1(47370bec7ca1f0615a54eda548b07fbc0c7ef398))
+	ROM_LOAD ("microsoldisk.rom", 0x24000, 0x4000, CRC(6704ef81) SHA1(a3028515ed829e900cc8deb403e17b09a38bf9b0))
+ROM_END
+
+MSX_LAYOUT_INIT (expert20)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 1, 0, 1, ROM, 0x4000, 0x8000) /* EXT */
+	MSX_LAYOUT_SLOT (1, 1, 1, 1, ROM, 0x4000, 0x20000) /* BASIC */
+	MSX_LAYOUT_SLOT (1, 3, 1, 1, DISK_ROM, 0x4000, 0x24000) /* Microsol controller */	
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */	
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
+
 
 /* MSX2 - National FS-4500 */
 
@@ -2193,7 +2234,7 @@ MSX_LAYOUT_INIT (fs5000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
 MSX_LAYOUT_END
 
-/* MSX2 - National FS-5500F1 */
+/* MSX2 - National FS-5500F1/F2*/
 
 ROM_START (fs5500)
 	ROM_REGION (0x50000, "main",0)
@@ -2222,7 +2263,6 @@ MSX_LAYOUT_INIT (fs5500)
 	MSX_LAYOUT_KANJI (0x30000)
 MSX_LAYOUT_END
 
-/* MSX2 - National FS-5500F2 */
 
 /* MSX2 - Panasonic FS-A1 */
 
@@ -2412,6 +2452,25 @@ MSX_LAYOUT_INIT (nms8245)
 MSX_LAYOUT_END
 
 /* MSX2 - Philips NMS-8245F */
+
+ROM_START (nms8245f)
+	ROM_REGION (0x20000, "main", 0)
+	ROM_LOAD ("8245ebios.rom", 0x0000, 0x8000, CRC(5cd35ced) SHA1(b034764e6a8978db60b1d652917f5e24a66a7925))
+	ROM_LOAD ("8245eext.rom",  0x8000, 0x4000, CRC(781ba055) SHA1(fd4bcc81a8160a1dea06036c5f79d200f948f4d6))
+	ROM_LOAD ("8245edisk.rom", 0xc000, 0x4000, CRC(13b60725) SHA1(58ba1887e8fd21c912b6859cae6514bd874ffcca))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+ROM_END
+
+MSX_LAYOUT_INIT (nms8245f)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 1, 2, DISK_ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
+MSX_LAYOUT_END
 
 /* MSX2 - Philips NMS-8250 */
 
@@ -3176,6 +3235,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (expert10)
 	MSX_DRIVER (expert11)
 	MSX_DRIVER (expert13)
+	MSX_DRIVER (expert20)
 	MSX_DRIVER (expertdp)
 	MSX_DRIVER (expertpl)
 	MSX_DRIVER (jvchc7gb)
@@ -3230,6 +3290,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (nms8220a)
 	MSX_DRIVER (vg8235)
 	MSX_DRIVER (nms8245)
+	MSX_DRIVER (nms8245f)
 	MSX_DRIVER (nms8250)
 	MSX_DRIVER (nms8255)
 	MSX_DRIVER (nms8280)
@@ -3258,6 +3319,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (hbf1xdm2)
 	MSX_DRIVER (phc23)
 	MSX_DRIVER (cpc300)
+	MSX_DRIVER (cpc300e)
 	MSX_DRIVER (cpc400)
 	MSX_DRIVER (cpc400s)
 	MSX_DRIVER (msx2p)
@@ -3335,10 +3397,12 @@ COMP(1984, yc64,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yashica", "YC-64"
 COMP(1985, msx2,     0,		msx,	msx2_pal, msx2,	    msx2,    msx, "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, ax350,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Al Alamiah", "AX-350", 0)
 COMP(1986, ax370,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Al Alamiah", "AX-370", 0)
+COMP(1986, expert20, msx2,	0,	msx2_pal, msx2, 		msx2,    msx, "Gradiente", "Expert 2.0 (Brazil)" , GAME_NOT_WORKING)
 COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (12-jun-1986)", 0)
 COMP(1986, nms8220a, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (13-aug-1986)", 0)
 COMP(1986, vg8235,   msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "VG-8235", 0)
 COMP(1986, nms8245,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8245", 0)
+COMP(1986, nms8245f, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8245F", 0)
 COMP(1986, nms8250,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8250", 0)
 COMP(1986, nms8255,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8255", 0)
 COMP(1986, nms8280,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8280", 0)
@@ -3367,6 +3431,7 @@ COMP(1987, hbf1xd,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "Sony", "HB
 COMP(1988, hbf1xdm2, msx2,	0,      msx2,     msx2jp,   msx2,    msx, "Sony", "HB-F1XDMK2 (Japan)", 0)
 COMP(1988, phc23,    msx2,	0,      msx2,     msx2jp,   msx2,    msx, "Sanyo", "WAVY PHC-23 (Japan)", 0)
 COMP(1986, cpc300,   msx2,	0,	msx2,	  msx2kr,   msx2,    msx, "Daewoo", "IQ-2000 CPC-300 (Korea)", 0)
+COMP(1986, cpc300e,  msx2,	0,	msx2,	  msx2kr,   msx2,    msx, "Daewoo", "IQ-2000 CPC-300E (Korea)", 0)
 COMP(1986, cpc400,   msx2,	0,	msx2,	  msx2kr,   msx2,    msx, "Daewoo", "X-II CPC-400 (Korea)", 0 )
 COMP(1986, cpc400s,  msx2,	0,	msx2,	  msx2kr,   msx2,    msx, "Daewoo", "X-II CPC-400S (Korea)", 0 )
 COMP(1988, msx2p,    0,		msx,	msx2,	  msx2jp,   msx2,    msx, "ASCII & Microsoft", "MSX2+", 0)
