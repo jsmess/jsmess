@@ -3,6 +3,75 @@
 **
 ** Todo:
 ** - Add support for other MSX models (de,fr,jp,ru etc.)
+
+Toshibao HX-10 (MSX TUK)
+========================
+
+        |---------------------------|-------------------|-------------|
+        |   CN1  CN2  CN3  CN4               CN5                      |
+        |                        |---------------------------|        |
+        |                        |---------------------------|        |
+        |                                    CN6                      |
+        |                        IC40                                 |
+        |                                                         CN7 |
+        |                      IC38     IC32     IC33     IC37        |
+        |                                                             |
+        |                      Q2       IC31     IC34     IC35        |
+        |    Q1                                                   CN8 |
+        |                                                 IC39        |
+        |   |--IC15------| |--IC2----|   |----IC1i----|               |
+        |   |------------| |---------|   |------------|               |
+        |                                                 IC30        |
+        |                 IC3    IC4                              CN9 |
+        |                               |-----IC15-------|            |
+        |  IC17   IC18    IC7    IC8    |----------------|            |
+        |                                                 IC27        |
+        |  IC19   IC20    IC9    IC10   |----IC25------|              |
+|----|  |                               |--------------|  IC26        |
+| Q  |  |  IC21   IC22    IC11   IC12                                 |
+|    |  |                                                             |
+| S  |  |  IC23   IC24    IC13   IC14    IC29             IC28        |
+|  L |  |                                                             |
+|    |  |                                 CN11   CN10                 |
+|----|  |-------------------------------------------------------------|
+
+Notes:
+  Mainboard components:
+   IC1               - Sharp LH0080A Z80A-CPU-D
+   IC2               - MB83256
+   IC3,IC4,IC27,IC28 - Texas Instruments SN74LS157N
+   IC7-IC14          - HM4864AP
+   IC15              - Toshiba TCX-1007 (64pin custom chip)
+   IC16              - 40pin chip covered with some kind of heatsink(?), probably TMS9929A
+   IC17-IC24         - 4116-3
+   IC25              - AY-3-8910A
+   IC26              - SN74LS09N
+   IC29              - HD74LS145P
+   IC30-IC34         - M74LS367AP
+   IC35              - MB74LS74A
+   IC37              - HD74LS373P
+   IC38              - Toshiba TC74HCU04P
+   IC39              - HD74LS08P
+   IC40              - TA75559P
+   Q1                - 10687.5
+   Q2                - 3579545
+   CN1               - Cassette connecter
+   CN2               - RF connector
+   CN3               - Audio connector
+   CN4               - Video connector
+   CN5               - Expansion connector
+   CN6               - Cartridge connector
+   CN7               - Printer connector
+   CN8               - Joystick 2 connector
+   CN9               - Joystick 1 connector
+   CN10              - Keyboard connector 1
+   CN11              - Keyboard connector 2
+
+  Extra pcb (video related?) components::
+   Q - 4.433619
+   S - 74LS04
+   L - LVA510
+
 */
 
 #include "driver.h"
@@ -1537,10 +1606,11 @@ MSX_LAYOUT_INIT (tadpc20a)
 MSX_LAYOUT_END
 
 /* MSX - Toshiba HX-10 */
+/* The BIOS on the Toshiba HX-10 is inside a big 64pin Toshiba chip label TCX-1007 */
 
 ROM_START (hx10)
 	ROM_REGION (0x8000, "main",0)
-	ROM_LOAD ("hx10bios.rom", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3))
+	ROM_LOAD ("tcx-1007.ic15", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3))
 ROM_END
 
 MSX_LAYOUT_INIT (hx10)
