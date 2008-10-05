@@ -1958,6 +1958,31 @@ MSX_LAYOUT_END
 
 /* MSX2 - Al Alamiah AX-370 */
 
+ROM_START (ax370)
+	ROM_REGION (0x44000, "main", 0)
+	ROM_LOAD ("ax370bios.rom",  0x0000,  0x8000, CRC(ea306155) SHA1(35195ab67c289a0b470883464df66bc6ea5b00d3))
+	ROM_LOAD ("ax370ext.rom",   0x8000,  0x4000, CRC(7c7540b7) SHA1(ebb76f9061e875365023523607db610f2eda1d26))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("ax370arab.rom", 0x20000,  0x8000, CRC(c0d8fc85) SHA1(2c9600c6e0025fee10d249e97448ecaa37e38c42))
+	ROM_LOAD ("ax370swp.rom",  0x28000,  0x8000, CRC(076f40fc) SHA1(4b4508131dca6d811694ae6379f41364c477de58))
+	ROM_LOAD ("ax370paint.rom",0x30000, 0x10000, CRC(18956e3a) SHA1(ace202e87337fbc54fea21e22c0b3af0abe6f4ae))
+	ROM_LOAD ("ax370disk.rom", 0x40000,  0x4000, CRC(60f8baba) SHA1(95de8809d2758fc0a743390ea5085b602e59e101))
+ROM_END
+
+MSX_LAYOUT_INIT (ax370)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000,  0x0000)  /* Bios */
+	MSX_LAYOUT_SLOT (0, 2, 1, 2, ROM, 0x8000,  0x28000) /* SWP */
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+  MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */		
+	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000,  0x8000)  /* Ext */
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000,  0x20000)  /* Arab */
+	//MSX_LAYOUT_SLOT (3, 2, 1, 2, DISK_ROM, 0x4000, 0x40000) /* TC8566AF Disk controller*/
+	MSX_LAYOUT_SLOT (3, 3, 0, 4, ROM, 0x10000, 0x30000)  /* Paint */			
+	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
+MSX_LAYOUT_END
+
 /* MSX2 - Daewoo CPC-300 */
 
 ROM_START (cpc300)
@@ -3199,6 +3224,7 @@ MSX_DRIVER_LIST
 	
 	MSX_DRIVER (msx2)
 	MSX_DRIVER (ax350)
+	MSX_DRIVER (ax370)
 	MSX_DRIVER (nms8220)
 	MSX_DRIVER (nms8220a)
 	MSX_DRIVER (vg8235)
@@ -3307,6 +3333,7 @@ COMP(1984, yc64,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yashica", "YC-64"
 
 COMP(1985, msx2,     0,		msx,	msx2_pal, msx2,	    msx2,    msx, "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, ax350,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Al Alamiah", "AX-350", 0)
+COMP(1986, ax370,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Al Alamiah", "AX-370", 0)
 COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (12-jun-1986)", 0)
 COMP(1986, nms8220a, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (13-aug-1986)", 0)
 COMP(1986, vg8235,   msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "VG-8235", 0)
