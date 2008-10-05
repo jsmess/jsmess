@@ -1183,7 +1183,8 @@ MSX_LAYOUT_END
 
 ROM_START (gsfc200)
 	ROM_REGION (0x8000, "main", 0)
-	ROM_LOAD ("fc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
+	ROM_LOAD ("fc200bios.rom.u5a", 0x0000, 0x4000, CRC(61f473fb) SHA1(c425750bbb2ae1d278216b45029d303e37d8df2f))
+	ROM_LOAD ("fc200bios.rom.u5b", 0x4000, 0x4000, CRC(1a99b1a1) SHA1(e18f72271b64693a2a2bc226e1b9ebd0448e07c0))
 ROM_END
 
 MSX_LAYOUT_INIT (gsfc200)
@@ -2439,7 +2440,7 @@ ROM_START (nms8255)
 	ROM_REGION (0x20000, "main", 0)
 	ROM_LOAD ("8255bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8255ext.rom.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
-	ROM_LOAD ("8255disk.rom".ic117, 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	ROM_LOAD ("8255disk.rom.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
