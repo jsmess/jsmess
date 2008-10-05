@@ -1735,24 +1735,26 @@ MSX_LAYOUT_END
 /* MSX2 - Al Alamiah AX-350 */
 
 ROM_START (ax350)
-	ROM_REGION (0x30000, "main", 0)
+	ROM_REGION (0x44000, "main", 0)
 	ROM_LOAD ("ax350bios.rom",  0x0000,  0x8000, CRC(ea306155) SHA1(35195ab67c289a0b470883464df66bc6ea5b00d3))
 	ROM_LOAD ("ax350ext.rom",   0x8000,  0x4000, CRC(7c7540b7) SHA1(ebb76f9061e875365023523607db610f2eda1d26))
-	ROM_LOAD ("ax350arab.rom",  0xc000,  0x8000, CRC(c0d8fc85) SHA1(2c9600c6e0025fee10d249e97448ecaa37e38c42))
-	ROM_LOAD ("ax350swp.rom",  0x14000,  0x8000, CRC(076f40fc) SHA1(4b4508131dca6d811694ae6379f41364c477de58))
-	ROM_LOAD ("ax350paint.rom",0x1c000, 0x10000, CRC(18956e3a) SHA1(ace202e87337fbc54fea21e22c0b3af0abe6f4ae))
-	ROM_LOAD ("ax350disk.rom", 0x2c000,  0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("ax350arab.rom", 0x20000,  0x8000, CRC(c0d8fc85) SHA1(2c9600c6e0025fee10d249e97448ecaa37e38c42))
+	ROM_LOAD ("ax350swp.rom",  0x28000,  0x8000, CRC(076f40fc) SHA1(4b4508131dca6d811694ae6379f41364c477de58))
+	ROM_LOAD ("ax350paint.rom",0x30000, 0x10000, CRC(18956e3a) SHA1(ace202e87337fbc54fea21e22c0b3af0abe6f4ae))
+	ROM_LOAD ("ax350disk.rom", 0x40000,  0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471))
 ROM_END
 
 MSX_LAYOUT_INIT (ax350)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000,  0x0000)  /* Bios */
 	MSX_LAYOUT_SLOT (0, 1, 0, 1, ROM, 0x4000,  0x8000)  /* Ext */
-	MSX_LAYOUT_SLOT (0, 1, 1, 2, ROM, 0x8000,  0xc000)  /* Arab */
-	MSX_LAYOUT_SLOT (0, 2, 1, 2, ROM, 0x8000,  0x14000) /* SWP */
-	MSX_LAYOUT_SLOT (0, 3, 0, 4, ROM, 0x10000, 0x1c000)  /* Paint */	
+	MSX_LAYOUT_SLOT (0, 1, 1, 2, ROM, 0x8000,  0x20000)  /* Arab */
+	MSX_LAYOUT_SLOT (0, 2, 1, 2, ROM, 0x8000,  0x28000) /* SWP */
+	MSX_LAYOUT_SLOT (0, 3, 0, 4, ROM, 0x10000, 0x30000)  /* Paint */	
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x2c000) /* Disk */
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x40000) /* Disk */
 	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */	
 	MSX_LAYOUT_RAMIO_SET_BITS (0xf8)
 MSX_LAYOUT_END
@@ -1762,17 +1764,19 @@ MSX_LAYOUT_END
 /* MSX2 - Daewoo CPC-300 */
 
 ROM_START (cpc300)
-	ROM_REGION (0x18000, "main", 0)
+	ROM_REGION (0x30000, "main", 0)
 	ROM_LOAD ("300bios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
-	ROM_LOAD ("300ext.rom", 0x8000, 0x8000, CRC(d64da39c) SHA1(fb51c505adfbc174df94289fa894ef969f5357bc))
-	ROM_LOAD ("300han.rom", 0x10000, 0x8000, CRC(e78cd87f) SHA1(47a9d9a24e4fc6f9467c6e7d61a02d45f5a753ef))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("300ext.rom", 0x20000, 0x8000, CRC(d64da39c) SHA1(fb51c505adfbc174df94289fa894ef969f5357bc))
+	ROM_LOAD ("300han.rom", 0x28000, 0x8000, CRC(e78cd87f) SHA1(47a9d9a24e4fc6f9467c6e7d61a02d45f5a753ef))
 ROM_END
 
 MSX_LAYOUT_INIT (cpc300)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
-	MSX_LAYOUT_SLOT (0, 1, 1, 2, ROM, 0x8000, 0x10000)
+	MSX_LAYOUT_SLOT (0, 1, 1, 2, ROM, 0x8000, 0x28000)
 	MSX_LAYOUT_SLOT (0, 2, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
-	MSX_LAYOUT_SLOT (0, 3, 0, 2, ROM, 0x8000, 0x8000)
+	MSX_LAYOUT_SLOT (0, 3, 0, 2, ROM, 0x8000, 0x20000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
@@ -1782,6 +1786,7 @@ ROM_START (cpc400)
 	ROM_REGION (0x50000, "main", 0)
 	ROM_LOAD ("400bios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
 	ROM_LOAD ("400disk.rom", 0x8000, 0x4000, CRC(5fa517df) SHA1(914f6ccb25d78621186001f2f5e2aaa2d628cd0c))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("400ext.rom", 0x20000, 0x8000, CRC(2ba104a3) SHA1(b6d3649a6647fa9f6bd61efc317485a20901128f))
 	ROM_LOAD ("400han.rom", 0x28000, 0x8000, CRC(a8ead5e3) SHA1(87936f808423dddfd00629056d6807b4be1dc63e))
@@ -1804,6 +1809,7 @@ ROM_START (cpc400s)
 	ROM_REGION (0x50000, "main", 0)
 	ROM_LOAD ("400sbios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
 	ROM_LOAD ("400sdisk.rom", 0x8000, 0x4000, CRC(5fa517df) SHA1(914f6ccb25d78621186001f2f5e2aaa2d628cd0c))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("400sext.rom", 0x20000, 0x8000, CRC(2ba104a3) SHA1(b6d3649a6647fa9f6bd61efc317485a20901128f))
 	ROM_LOAD ("400shan.rom", 0x28000, 0x8000, CRC(975e7a31) SHA1(6a50295ea35e720ba6f4ba5616c3441128b384ed))
@@ -1827,6 +1833,7 @@ ROM_START (nms8220)
 	ROM_LOAD ("8220bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8220ext.rom", 0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
 	ROM_LOAD ("8220pen.rom", 0xc000, 0x4000, CRC(3d38c53e) SHA1(cb754aed85b3e97a7d3c5894310df7ca18f89f41))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -1845,6 +1852,7 @@ ROM_START (nms8220a)
 	ROM_LOAD ("8220bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8220ext.rom", 0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
 	ROM_LOAD ("8220pena.rom", 0xc000, 0x4000, CRC(17817b5a) SHA1(5df95d033ae70b107697b69470126ce1b7ae9eb5))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -1863,6 +1871,7 @@ ROM_START (vg8235)
 	ROM_LOAD ("8235bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8235ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8235disk.rom", 0xc000, 0x4000, CRC(51daeb25) SHA1(8954e59aa79310c7b719ecf0cde1e82fb731dcd1))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -1881,6 +1890,7 @@ ROM_START (nms8245)
 	ROM_LOAD ("8245bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8245ext.rom", 0x8000, 0x4000, CRC(95db2959) SHA1(e7905d16d2ccd57a013c122dc432106cd59ef52c))
 	ROM_LOAD ("8245disk.rom", 0xc000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -1899,6 +1909,7 @@ ROM_START (nms8250)
 	ROM_LOAD ("8250bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8250ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8250disk.rom", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -1917,6 +1928,7 @@ ROM_START (nms8255)
 	ROM_LOAD ("8255bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8255ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8255disk.rom", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -1935,6 +1947,7 @@ ROM_START (nms8280)
 	ROM_LOAD ("8280bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8280ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8280disk.rom", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -1953,6 +1966,7 @@ ROM_START (fs5500)
 	ROM_LOAD ("5500bios.rom", 0x0000, 0x8000, CRC(5bf38e13) SHA1(44e0dd215b2a9f0770dd76fb49187c05b083eed9))
 	ROM_LOAD ("5500ext.rom", 0x8000, 0x4000, CRC(3c42c367) SHA1(4be8371f3b03e70ddaca495958345f3c4f8e2d36))
 	ROM_LOAD ("5500disk.rom", 0xc000, 0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0xff)
 	ROM_LOAD ("5500imp.rom", 0x20000, 0x8000, CRC(6173a88c) SHA1(b677a861b67e8763a11d5dcf52416b42493ade57))
 	ROM_LOAD ("5500kdr.rom", 0x28000, 0x8000, CRC(b2db6bf5) SHA1(3a9a942ed888dd641cddf8deada1879c454df3c6))
@@ -1978,6 +1992,7 @@ ROM_START (fs4500)
 	ROM_REGION (0x94000, "main",0)
 	ROM_LOAD ("4500bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("4500ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("4500font.rom", 0x20000, 0x4000, CRC(4bd54f95) SHA1(3ce8e35790eb4689b21e14c7ecdd4b63943ee158))
 	ROM_LOAD ("4500buns.rom", 0x24000, 0x8000, CRC(c9398e11) SHA1(e89ea1e8e583392e2dd9debb8a4b6a162f58ba91))
@@ -2011,6 +2026,7 @@ ROM_START (fs4700)
 	ROM_LOAD ("4700bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("4700ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	ROM_LOAD ("4700disk.rom", 0xc000, 0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("4700font.rom", 0x20000, 0x4000, CRC(4bd54f95) SHA1(3ce8e35790eb4689b21e14c7ecdd4b63943ee158))
 	ROM_LOAD ("4700buns.rom", 0x24000, 0x8000, CRC(c9398e11) SHA1(e89ea1e8e583392e2dd9debb8a4b6a162f58ba91))
@@ -2045,6 +2061,7 @@ ROM_START (fs5000)
 	ROM_LOAD ("5000bios.rom", 0x0000, 0x8000, CRC(a44ea707) SHA1(59967765d6e9328909dee4dac1cbe4cf9d47d315))
 	ROM_LOAD ("5000ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("5000disk.rom", 0xc000, 0x4000, CRC(ae4e65b7) SHA1(073feb8bb645d935e099afaf61e6f04f52adee42))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0xff)
 	ROM_LOAD ("5000rtc.rom", 0x20000, 0x8000, CRC(03351598) SHA1(98bbfa3ab07b7a5cad55d7ddf7cbd9440caa2a86))
 	ROM_LOAD ("5000kdr.rom", 0x28000, 0x8000, CRC(b2db6bf5) SHA1(3a9a942ed888dd641cddf8deada1879c454df3c6))
@@ -2072,6 +2089,7 @@ ROM_START (fs4600)
 	ROM_LOAD ("4600bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("4600ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("4600disk.rom", 0xc000, 0x4000, CRC(ae4e65b7) SHA1(073feb8bb645d935e099afaf61e6f04f52adee42))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("4600fon1.rom", 0x20000, 0x4000, CRC(7391389b) SHA1(31292b9ca9fe7d1d8833530f44c0a5671bfefe4e))
 	ROM_LOAD ("4600fon2.rom", 0x24000, 0x4000, CRC(c3a6b445) SHA1(02155fc25c9bd23e1654fe81c74486351e1ecc28))
@@ -2101,6 +2119,7 @@ ROM_START (fsa1)
 	ROM_REGION (0x30000, "main",0)
 	ROM_LOAD ("a1bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("a1desk1.rom", 0x20000, 0x8000, CRC(99c48147) SHA1(63098f27beac9eca6b39d837d2a552395df33fe1))
 	ROM_LOAD ("a1desk2.rom", 0x28000, 0x8000, CRC(7f6f4aa1) SHA1(7f5b76605e3d898cc4b5aacf1d7682b82fe84353))
@@ -2120,6 +2139,7 @@ ROM_START (fsa1a)
 	ROM_REGION (0x30000, "main",0)
 	ROM_LOAD ("a1bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("a1desk1a.rom", 0x20000, 0x8000, CRC(25b5b170) SHA1(d9307bfdaab1312d25e38af7c0d3a7671a9f716b))
 	ROM_LOAD ("a1desk2.rom", 0x28000, 0x8000, CRC(7f6f4aa1) SHA1(7f5b76605e3d898cc4b5aacf1d7682b82fe84353))
@@ -2139,6 +2159,7 @@ ROM_START (fsa1mk2)
 	ROM_REGION (0x34000, "main",0)
 	ROM_LOAD ("a1mkbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1mk2ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("a1mkcoc1.rom", 0x20000, 0x8000, CRC(0eda3f57) SHA1(2752cd89754c05abdf7c23cba132d38e3ef0f27d))
 	ROM_LOAD ("a1mkcoc2.rom", 0x28000, 0x4000, CRC(756d7128) SHA1(e194d290ebfa4595ce0349ea2fc15442508485b0))
@@ -2162,6 +2183,7 @@ ROM_START (fsa1f)
 	ROM_LOAD ("a1fbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1fext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("a1fdisk.rom", 0xc000, 0x4000, CRC(d24cd452) SHA1(141e61cc8e0e51382e508fbd77a34b778a4f8444))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1fkdr.rom", 0x20000, 0x8000, CRC(2dbea5ec) SHA1(ea35cc2cad9cfdf56cae224d8ee41579de37f000))
 	ROM_LOAD ("a1fcock.rom", 0x28000, 0x8000, CRC(5c2948cd) SHA1(4a99f2444f29c2b642efd6f084081d6fd96bfa9b))
@@ -2186,6 +2208,7 @@ ROM_START (fsa1fm)
 	ROM_LOAD ("a1fmbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1fmext.rom", 0x8000, 0x4000, CRC(ad295b5d) SHA1(d552319a19814494e3016de4b8f010e8f7b97e02))
 	ROM_LOAD ("a1fmdisk.rom", 0xc000, 0x4000, CRC(d24cd452) SHA1(141e61cc8e0e51382e508fbd77a34b778a4f8444))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1fmkfn.rom", 0x40000, 0x20000, CRC(c61ddc5d) SHA1(5e872d5853698731a0ed22fb72dbcdfd59cd19c3))
 	ROM_LOAD ("a1fmkf12.rom", 0x60000, 0x20000, CRC(340d1ef7) SHA1(a7a23dc01314e88381eee88b4878b39931ab4818))
@@ -2211,6 +2234,7 @@ ROM_START (hbf500)
 	ROM_LOAD ("f500bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f500ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	ROM_LOAD ("f500disk.rom", 0xc000, 0x4000, CRC(f7f5b0ea) SHA1(e93b8da1e8dddbb3742292b0e5e58731b90e9313))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("f500kfn.rom", 0x20000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799))
 ROM_END
@@ -2231,6 +2255,7 @@ ROM_START (hbf900)
 	ROM_LOAD ("f900bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f900ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f900disk.rom", 0xc000, 0x4000, CRC(f83d0ea6) SHA1(fc760d1d7b16370abc7eea39955f230b95b37df6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("f900util.rom", 0x20000, 0x4000, CRC(bc6c7c66) SHA1(558b7383544542cf7333700ff90c3efbf93ba2a3))
 	ROM_LOAD ("f900kfn.rom", 0x24000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799))
@@ -2253,6 +2278,7 @@ ROM_START (hbf900a)
 	ROM_LOAD ("f900bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f900ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f900disa.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("f900util.rom", 0x20000, 0x4000, CRC(bc6c7c66) SHA1(558b7383544542cf7333700ff90c3efbf93ba2a3))
 	ROM_LOAD ("f900kfn.rom", 0x24000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799))
@@ -2274,6 +2300,7 @@ ROM_START (hbf1)
 	ROM_REGION (0x34000, "main",0)
 	ROM_LOAD ("f1bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f1ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("f1note1.rom", 0x20000, 0x4000, CRC(84810ea8) SHA1(9db72bb78792595a12499c821048504dc96ef848))
 	ROM_LOAD ("f1note2.rom", 0x24000, 0x8000, CRC(e32e5ee0) SHA1(aa78fc9bcd2343f84cf790310a768ee47f90c841))
@@ -2295,6 +2322,7 @@ ROM_START (hbf12)
 	ROM_REGION (0x34000, "main",0)
 	ROM_LOAD ("f12bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f12ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("f12note1.rom", 0x20000, 0x4000, CRC(dcacf970) SHA1(30d914cda2180889a40a3328e0a0c1327f4eaa10))
 	ROM_LOAD ("f12note2.rom", 0x24000, 0x8000, CRC(b0241a61) SHA1(ed2fea5c2a3c2e58d4f69f9d636e08574486a2b1))
@@ -2318,6 +2346,7 @@ ROM_START (hbf1xd)
 	ROM_LOAD ("f1xdbios.rom", 0x0000, 0x8000, CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf))
 	ROM_LOAD ("f1xdext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f1xddisk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -2336,6 +2365,7 @@ ROM_START (hbf1xdm2)
 	ROM_LOAD ("f1m2bios.rom", 0x0000, 0x8000, CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf))
 	ROM_LOAD ("f1m2ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f1m2disk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -2353,6 +2383,7 @@ ROM_START (phc23)
 	ROM_REGION (0x20000, "main",0)
 	ROM_LOAD ("23bios.rom", 0x0000, 0x8000, CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf))
 	ROM_LOAD ("23ext.rom", 0x8000, 0x4000, CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 ROM_END
 
@@ -2370,6 +2401,7 @@ ROM_START (hbf9p)
 	ROM_LOAD ("f9pbios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("f9pext.rom", 0x8000, 0x4000, CRC(7c456c8b) SHA1(7b4a96402847decfc110ff9eda713bdcd218bd83))
 	ROM_LOAD ("f9pfirm1.rom", 0xc000, 0x4000, CRC(dea2cb50) SHA1(8cc1f7ceeef745bb34e80253971e137213671486))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("f9pfirm2.rom", 0x20000, 0x8000, CRC(ea97069f) SHA1(2d1880d1f5a6944fcb1b198b997a3d90ecd1903d))
 ROM_END
@@ -2390,6 +2422,7 @@ ROM_START (hbf500p)
 	ROM_LOAD ("500pbios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("500pext.rom", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
 	ROM_LOAD ("500pdisk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -2409,6 +2442,7 @@ ROM_START (hbf700d)
 	ROM_LOAD ("700dbios.rom", 0x0000, 0x8000, CRC(e975aa79) SHA1(cef16eb95502ba6ab2265fcafcedde470a101541))
 	ROM_LOAD ("700dext.rom", 0x8000, 0x4000, CRC(7c456c8b) SHA1(7b4a96402847decfc110ff9eda713bdcd218bd83))
 	ROM_LOAD ("700ddisk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -2427,6 +2461,7 @@ ROM_START (hbf700p)
 	ROM_LOAD ("700pbios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("700pext.rom", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
 	ROM_LOAD ("700pdisk.rom", 0xc000, 0x4000, CRC(1d9cc7f6) SHA1(3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -2445,6 +2480,7 @@ ROM_START (hbf700s)
 	ROM_LOAD ("700sbios.rom", 0x0000, 0x8000, CRC(c2b889a5) SHA1(4811956f878c3e03da46317f787cdc4bebc86f47))
 	ROM_LOAD ("700sext.rom", 0x8000, 0x4000, CRC(dc0951bd) SHA1(1e9a955943aeea9b1807ddf1250ba6436d8dd276))
 	ROM_LOAD ("700sdisk.rom", 0xc000, 0x4000, CRC(1d9cc7f6) SHA1(3376cf9dd2b1ac9b41bf6bf6598b33136e86f9d5))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
 
@@ -2463,6 +2499,7 @@ ROM_START (hbg900p)
 	ROM_LOAD ("g900bios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("g900ext.rom", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
 	ROM_LOAD ("g900disk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("g900232c.rom", 0x20000, 0x4000, CRC(06cf1da6) SHA1(373aa82d0426830880a7344ef98f7309d93814c7))
 	ROM_LOAD ("g900util.rom", 0x24000, 0x4000, CRC(d0417c20) SHA1(8779b004e7605a3c419825f0373a5d8fa84e1d5b))
@@ -2513,6 +2550,7 @@ ROM_START (fsa1fx)
 	ROM_LOAD ("a1fxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1fxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1fxdisk.rom", 0xc000, 0x4000, CRC(905daa1b) SHA1(bb59c849898d46a23fdbd0cc04ab35088e74a18d))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1fxkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
 	ROM_LOAD ("a1fxcock.rom", 0x28000, 0x8000, CRC(f662e6eb) SHA1(9d67fab55b85f4ac4f5924323a70020eb8589057))
@@ -2539,6 +2577,7 @@ ROM_START (fsa1wsx)
 	ROM_LOAD ("a1wsbios.rom", 0x0000, 0x8000, CRC(358ec547) SHA1(f4433752d3bf876bfefb363c749d4d2e08a218b6))
 	ROM_LOAD ("a1wsext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1wsdisk.rom", 0xc000, 0x4000, CRC(17fa392b) SHA1(7ed7c55e0359737ac5e68d38cb6903f9e5d7c2b6))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1wskdr.rom", 0x20000, 0x8000, CRC(b4fc574d) SHA1(dcc3a67732aa01c4f2ee8d1ad886444a4dbafe06))
 	ROM_LOAD ("a1wsmusp.rom", 0x28000, 0x4000, CRC(456e494e) SHA1(6354ccc5c100b1c558c9395fa8c00784d2e9b0a3))
@@ -2568,6 +2607,7 @@ ROM_START (fsa1wx)
 	ROM_LOAD ("a1wxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1wxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(905daa1b) SHA1(bb59c849898d46a23fdbd0cc04ab35088e74a18d))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1wxkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
 	ROM_LOAD ("a1wxmusp.rom", 0x28000, 0x4000, CRC(456e494e) SHA1(6354ccc5c100b1c558c9395fa8c00784d2e9b0a3))
@@ -2596,6 +2636,7 @@ ROM_START (fsa1wxa)
 	ROM_LOAD ("a1wxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1wxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(905daa1b) SHA1(bb59c849898d46a23fdbd0cc04ab35088e74a18d))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1wxkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
 	ROM_LOAD ("a1wxmusp.rom", 0x28000, 0x4000, CRC(456e494e) SHA1(6354ccc5c100b1c558c9395fa8c00784d2e9b0a3))
@@ -2624,6 +2665,7 @@ ROM_START (phc35j)
 	ROM_REGION (0x48000, "main",0)
 	ROM_LOAD ("35jbios.rom", 0x0000, 0x8000, CRC(358ec547) SHA1(f4433752d3bf876bfefb363c749d4d2e08a218b6))
 	ROM_LOAD ("35jext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
+	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2p parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
 	ROM_LOAD ("35jkdr.rom", 0x20000, 0x8000, CRC(b4fc574d) SHA1(dcc3a67732aa01c4f2ee8d1ad886444a4dbafe06))
 	ROM_LOAD ("35jkfn.rom", 0x28000, 0x20000, CRC(c9651b32) SHA1(84a645becec0a25d3ab7a909cde1b242699a8662))
@@ -2647,6 +2689,7 @@ ROM_START (phc70fd)
 	ROM_LOAD ("70fdbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("70fdext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("70fddisk.rom", 0xc000, 0x4000, CRC(db7f1125) SHA1(9efa744be8355675e7bfdd3976bbbfaf85d62e1d))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("70fdkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
 	ROM_LOAD ("70fdmus.rom", 0x28000, 0x4000, CRC(5c32eb29) SHA1(aad42ba4289b33d8eed225d42cea930b7fc5c228))
@@ -2674,6 +2717,7 @@ ROM_START (phc70fd2)
 	ROM_LOAD ("70f2bios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("70f2ext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("70f2disk.rom", 0xc000, 0x4000, CRC(db7f1125) SHA1(9efa744be8355675e7bfdd3976bbbfaf85d62e1d))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("70f2kdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
 	ROM_LOAD ("70f2mus.rom", 0x28000, 0x4000, CRC(5c32eb29) SHA1(aad42ba4289b33d8eed225d42cea930b7fc5c228))
@@ -2702,6 +2746,7 @@ ROM_START (hbf1xdj)
 	ROM_LOAD ("f1xjbios.rom", 0x0000, 0x8000, CRC(00870134) SHA1(e2fbd56e42da637609d23ae9df9efd1b4241b18a))
 	ROM_LOAD ("f1xjext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("f1xjdisk.rom", 0xc000, 0x4000, CRC(a21f5266) SHA1(c1bb307a570ab833e3bfcc4a58a4f4e12dc1df0f))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("f1xjkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
 	ROM_LOAD ("f1xjmus.rom", 0x28000, 0x4000, CRC(5c32eb29) SHA1(aad42ba4289b33d8eed225d42cea930b7fc5c228))
@@ -2731,6 +2776,7 @@ ROM_START (hbf1xv)
 	ROM_LOAD ("f1xvbios.rom", 0x0000, 0x8000, CRC(2c7ed27b) SHA1(174c9254f09d99361ff7607630248ff9d7d8d4d6))
 	ROM_LOAD ("f1xvext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("f1xvdisk.rom", 0xc000, 0x4000, CRC(04e4e533) SHA1(5a4e7dbbfb759109c7d2a3b38bda9c60bf6ffef5))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("f1xvkdr.rom", 0x20000, 0x8000, CRC(b4fc574d) SHA1(dcc3a67732aa01c4f2ee8d1ad886444a4dbafe06))
 	ROM_LOAD ("f1xvmus.rom", 0x28000, 0x4000, CRC(5c32eb29) SHA1(aad42ba4289b33d8eed225d42cea930b7fc5c228))
