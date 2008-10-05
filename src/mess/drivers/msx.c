@@ -4,9 +4,117 @@
 ** Todo:
 ** - Add support for other MSX models (de,fr,jp,ru etc.)
 
-Toshibao HX-10 (MSX TUK)
-========================
+This following list is probably incomplete. Corrections are welcome.
 
+Al Alamiah AX-170
+Al Alamiah AX-350
+Al Alamiah AX-370
+Canon V-10
+Canon V-20
+Ciel Expert 3 IDE
+Ciel Expert 3 Turbo
+Daewoo CPC-300
+Daewoo CPC-400
+Daewoo CPC-400S
+Daewoo DPC-100
+Daewoo DPC-180
+Daewoo DPC-200
+Goldstar FC-200
+Gradiente Expert 1.0
+Gradiente Expert 1.1
+Gradiente Expert 1.3
+Gradiente Expert 2.0
+Gradiente Expert DDPlus
+Gradiente Expert Plus
+JVC HC-7GB
+Mitsubishi ML-F80
+Mitsubishi ML-FX1
+National CF-1200
+National CF-2000
+National CF-2700
+National CF-3000
+National CF-3300
+National FS-1300
+National FS-4000
+National FS-4500
+National FS-4600
+National FS-4700
+National FS-5000
+National FS-5500F1
+National FS-5500F2
+Panasonic FS-A1
+Panasonic FS-A1 MK2
+Panasonic FS-A1F
+Panasonic FS-A1FM
+Panasonic FS-A1FX
+Panasonic FS-A1GT
+Panasonic FS-A1ST
+Panasonic FS-A1WSX
+Panasonic FS-A1WX
+Philips NMS-801
+Philips NMS-8220
+Philips NMS-8245
+Philips NMS-8245F
+Philips NMS-8250
+Philips NMS-8255
+Philips NMS-8280
+Philips NMS-8280G
+Philips VG-8020-00
+Philips VG-8020-20
+Philips VG-8230
+Philips VG-8235
+Philips VG-8235F
+Philips VG-8240
+Pioneer PX-7
+Sanyo MPC-100
+Sanyo Wavy PHC-23
+Sanyo Wavy PHC-35J
+Sanyo Wavy PHC70FD1
+Sanyo Wavy PHC70FD2
+Sharp Epcom HotBit 1.1
+Sharp Epcom HotBit 1.2
+Sharp Epcom HotBit 1.3b
+Sharp Epcom HotBit 1.3p
+Sharp Epcom HotBit 2.0
+Sony HB-201
+Sony HB-201P
+Sony HB-501P
+Sony HB-55D
+Sony HB-55P
+Sony HB-75D
+Sony HB-75P
+Sony HB-F1
+Sony HB-F1II
+Sony HB-F1XD
+Sony HB-F1XD MK2
+Sony HB-F1XDJ
+Sony HB-F1XV
+Sony HB-F500
+Sony HB-F500P
+Sony HB-F700D
+Sony HB-F700F
+Sony HB-F700P
+Sony HB-F700S
+Sony HB-F900
+Sony HB-F9P
+Sony HB-F9P
+Sony HB-F9S
+Sony HB-G900AP
+Sony HB-G900P
+Spectravideo SVI-728
+Spectravideo SVI-738
+Talent DPC-200
+Talent DPC-200A
+Talent TPC-310
+==============
+
+PCB Layouts missing
+
+
+Toshiba HX-10
+=============
+
+Code on PCB: MSX TUK
         |---------------------------|-------------------|-------------|
         |   CN1  CN2  CN3  CN4               CN5                      |
         |                        |---------------------------|        |
@@ -71,6 +179,25 @@ Notes:
    Q - 4.433619
    S - 74LS04
    L - LVA510
+
+
+Toshiba HX-10S
+Toshiba HX-20
+Toshiba HX-23
+Toshiba HX-23F
+Yamaha CX5M
+Yamaha CX5M-128
+Yamaha CX7M
+Yamaha CX7M-128
+Yamaha YIS-303
+Yamaha YIS-503
+Yamaha YIS-503M
+Yamaha YIS-503
+Yashica YC-64
+=============
+
+PCB Layouts missing
+
 
 */
 
@@ -3082,8 +3209,8 @@ COMP(1984, yc64,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yashica", "YC-64"
 
 COMP(1985, msx2,     0,		msx,	msx2_pal, msx2,	    msx2,    msx, "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, ax350,    msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Al Alamiah", "AX-350", 0)
-COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 / 1st released version", 0)
-COMP(1986, nms8220a, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 / 2nd released version", 0)
+COMP(1986, nms8220,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (12-jun-1986)", 0)
+COMP(1986, nms8220a, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8220 (13-aug-1986)", 0)
 COMP(1986, vg8235,   msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "VG-8235", 0)
 COMP(1986, nms8245,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8245", 0)
 COMP(1986, nms8250,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Philips", "NMS-8250", 0)
