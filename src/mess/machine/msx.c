@@ -828,7 +828,7 @@ void msx_memory_init (running_machine *machine)
 					option = 0x10000;
 					size = 0x10000;
 					mem = memory_region(machine, "main") + option;
-					if (memory_region_length(machine, "main") > size && mem[0] == 'A' && mem[1] == 'B') {
+					if (memory_region_length(machine, "main") >= size + option && mem[0] == 'A' && mem[1] == 'B') {
 						slot = &msx_slot_list[SLOT_FMPAC];
 					}
 					else {
