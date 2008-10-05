@@ -715,7 +715,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
 
-		switch ( mess_ram_size )
+		switch ( mess_ram_size - 64 * 1024 )
 		{
 		case 64 * 1024:		data |= 0x00; break;
 		case 128 * 1024:	data |= 0x02; break;
@@ -735,7 +735,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 		}
 		if ( mess_ram_size > 960 * 1024 )
 			data |= 0x0D;
-		
+
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
