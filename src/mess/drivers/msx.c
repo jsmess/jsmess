@@ -2951,7 +2951,7 @@ MSX_LAYOUT_END
 ROM_START (hbf9p)
 	ROM_REGION (0x28000, "main", 0)
 	ROM_LOAD ("f9pbios.rom.ic11", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
-	ROM_LOAD ("f9pfirm1.ic12", 0x8000, 0x8000, CRC(dea2cb50) SHA1(41a186afced50ca6312cb5b6c4adb684faca6232))
+	ROM_LOAD ("f9pfirm1.ic12", 0x8000, 0x8000, CRC(524f67aa) SHA1(41a186afced50ca6312cb5b6c4adb684faca6232))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("f9pfirm2.rom.ic13", 0x20000, 0x8000, CRC(ea97069f) SHA1(2d1880d1f5a6944fcb1b198b997a3d90ecd1903d))
@@ -2973,12 +2973,11 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F9S */
 ROM_START (hbf9s)
 	ROM_REGION (0x28000, "main", 0)
-	ROM_LOAD ("f9sbios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(4811956f878c3e03da46317f787cdc4bebc86f47))
-	ROM_LOAD ("f9sext.rom", 0x8000, 0x4000, CRC(7c456c8b) SHA1(7b4a96402847decfc110ff9eda713bdcd218bd83))
-	ROM_LOAD ("f9sfirm1.rom", 0xc000, 0x4000, CRC(c2b889a5) SHA1(8948704bad9ff27873fa9ccd0ef89868e2bd6479))
+	ROM_LOAD ("f9sbios.ic11", 0x0000, 0x8000, CRC(c2b889a5) SHA1(4811956f878c3e03da46317f787cdc4bebc86f47))
+	ROM_LOAD ("f9sfirm1.ic12", 0x8000, 0x8000, CRC(cf39620b) SHA1(1166a93d7185ba024bdf2bfa9a30e1c447fb6db1))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
-	ROM_LOAD ("f9sfirm2.rom", 0x20000, 0x8000, CRC(ea97069f) SHA1(2d1880d1f5a6944fcb1b198b997a3d90ecd1903d))
+	ROM_LOAD ("f9sfirm2.ic13", 0x20000, 0x8000, CRC(ea97069f) SHA1(2d1880d1f5a6944fcb1b198b997a3d90ecd1903d))
 ROM_END
 
 MSX_LAYOUT_INIT (hbf9s)
