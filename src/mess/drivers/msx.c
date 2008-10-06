@@ -2471,12 +2471,13 @@ MSX_LAYOUT_INIT (nms8245f)
 MSX_LAYOUT_END
 
 /* MSX2 - Philips NMS-8250 */
+/* Labels taken from an NMS-8250/00 */
 
 ROM_START (nms8250)
 	ROM_REGION (0x20000, "main", 0)
-	ROM_LOAD ("8250bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
-	ROM_LOAD ("8250ext.rom.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
-	ROM_LOAD ("8250disk.rom.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
+	ROM_LOAD ("d23c256eac.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("d23128ec.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	ROM_LOAD ("jq00014.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 ROM_END
