@@ -2661,7 +2661,7 @@ MSX_LAYOUT_END
 
 ROM_START (hotbit20)
 	ROM_REGION (0x28000, "main", 0)
-	ROM_LOAD ("hb2bios.rom", 0x0000, 0x8000, CRC(0160e8c9) SHA1(9c43106dba3ae2829e9a11dffa9d000ed6d6454c))
+	ROM_LOAD ("hb2bios.rom", 0x0000, 0x8000, CRC(0160e8c9) SHA1(d0cfc35f22b150a1cb10decae4841dfe63b78251))
 	ROM_LOAD ("hb2ext.rom",  0x8000, 0x4000, CRC(08ced880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
