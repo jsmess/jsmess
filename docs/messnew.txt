@@ -1,4 +1,4 @@
-﻿0.127.1
+0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -118,11 +118,20 @@ System Driver Changes:
 
 - [GENEVE] Fixed RTC to start on Sunday.  [Michael Zapf]
 
+- [INTV] Added partial support for images in .int/.itv/.bin format. Images in .rom
+  format are still preferred. [Fabio Priuli]
+
+- [LYNX] Added support for images in .lyx format [Fabio Priuli]
+
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully 
   working, including the "Säkkijärven polkka" program. [Curt Coder]
 
 - [JUPITER] Fixed regression; driver works again.  [Wilbert Pol]
+
+- [MAX] Fixed cart loading (both bug #1618 and a problem with the loading
+  address). Commodore Ultimax / Max Machine / VIC-10 is now working. [Fabio 
+  Priuli]
 
 - [MSX] Added some Brazilian clones [Miodrag Milanovic]
 
@@ -136,6 +145,15 @@ System Driver Changes:
 - [SG1000] Lightgun crosshair is now shown only if TV Draw cartridge is 
   loaded. [Curt Coder]
 
+- [SNES] Improved special chips detection (if you run MESS with -log you will
+  be warned of the presence of unemulated chips in error.log), memory handling,
+  cart and SRAM mirroring [Fabio Priuli]
+
+- [SNES] Fixed inputs in Super Street Fighter 2 (bug #437) [Fabio Priuli]
+
+- [SNES] Added support for the emulation of the DSP-2 and OBC-1 add-on chips. Code 
+  based on byuu's implementation in BSNES (thanks byuu) [Fabio Priuli]
+
 - [SPECTRUM] Added lot of Spectrum clones and custom ROM's [Miodrag Milanovic]
 
 - [SYM1] Refactored cartridge code to rely on MESS core functions. Code to
@@ -147,7 +165,8 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
-- [TRS80] Added proper cassette emulation support.  [Wilbert Pol]
+- [TRS80] Added proper cassette emulation support (both .wav and .cas. formats) 
+  [Wilbert Pol]
 
 - [VIC20] Added support for tape emulation using MESS core functions 
   (loading and saving, both .wav and .tap formats) [Fabio Priuli]
