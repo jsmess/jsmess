@@ -6,72 +6,75 @@
 #include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
 
+#include "devices/cartslot.h"
+#include "hash.h"
 
-UINT16 lynx_granularity = 1;
+
+static UINT16 lynx_granularity = 1;
 static int lynx_line;
+static int lynx_line_y;	
+static int sign_AB = 0, sign_CD = 0;
+
+static UINT32 lynx_palette[0x10];
+
+static int rotate = 0;
+static int lynx_rotate;
+
+#define MATH_A		0x55
+#define MATH_B		0x54
+#define MATH_C		0x53
+#define MATH_D		0x52
+#define MATH_E		0x63
+#define MATH_F		0x62
+#define MATH_G		0x61
+#define MATH_H		0x60
+#define MATH_J		0x6f
+#define MATH_K		0x6e
+#define MATH_L		0x6d
+#define MATH_M		0x6c
+#define MATH_N		0x57
+#define MATH_P		0x56
+#define SPRG0		0x91
+#define SPRSYS		0x92
+
+
+#define PAD_UP		0x80
+#define PAD_DOWN	0x40
+#define PAD_LEFT	0x20
+#define PAD_RIGHT	0x10
 
 typedef struct
 {
-    union
-	{
-		UINT8 data[0x100];
-		struct
-		{
-			struct { UINT8 l, h; }
-			// eng used by the blitter engine
-			// scb written by the blitter scb blocks to engine expander
-			//     used by the engine
-			//     might be used directly by software!
-			eng1, eng2,
-			h_offset, v_offset, vidbas, colbas,
-			eng3, eng4,
-			scb1, scb2, scb3, scb4, scb5, scb6,
-			eng5, eng6, eng7, eng8,
-			colloff,
-			eng9,
-			hsizoff, vsizoff,
-			eng10, eng11;
-			UINT8 res[0x20];
-			UINT8 used[2];
-			UINT8 D,C,B,A,P,N;
-			UINT8 res1[8];
-			UINT8 H,G,F,E;
-			UINT8 res2[8];
-			UINT8 M,L,K,J;
-			UINT8 res3[0x21];
-			UINT8 SPRG0;
-			UINT8 SPRSYS;
-		} s;
-    } u;
-    int accumulate_overflow;
-    UINT8 high;
-    int low;
+	UINT8 data[0x100];
+	int accumulate_overflow;
+	UINT8 high;
+	int low;
 } SUZY;
 
 static SUZY suzy;
 
 static struct
 {
-    UINT8 *mem;
-    // global
-    UINT16 screen;
-    UINT16 colbuf;
-    UINT16 colpos; // byte where value of collision is written
-    UINT16 xoff, yoff;
-    // in command
-    int mode;
-    UINT16 cmd;
-    UINT8 spritenr;
-    int x,y;
-    UINT16 width, height; // uint16 important for blue lightning
-    UINT16 stretch, tilt; // uint16 important
-    UINT8 color[16]; // or stored
-    void (*line_function)(const int y, const int xdir);
-    UINT16 bitmap;
+	UINT8 *mem;
+	// global
+	UINT16 screen;
+	UINT16 colbuf;
+	UINT16 colpos; // byte where value of collision is written
+	UINT16 xoff, yoff;
+	// in command
+	int mode;
+	UINT16 cmd;
+	UINT8 spritenr;
+	int x,y;
+	UINT16 width, height; // uint16 important for blue lightning
+	UINT16 stretch, tilt; // uint16 important
+	UINT8 color[16]; // or stored
+	void (*line_function)(const int y, const int xdir);
+	UINT16 bitmap;
 
-    int everon;
-    int memory_accesses;
-    attotime time;
+	int everon;
+	int memory_accesses;
+	attotime time;
 } blitter;
 
 UINT8 *lynx_mem_0000;
@@ -83,234 +86,378 @@ size_t lynx_mem_fe00_size;
 
 static UINT8 lynx_memory_config;
 
-#define GET_WORD(mem, index) ((mem)[(index)]|((mem)[(index)+1]<<8))
+/****************************************
+
+	Graphics Drawing
+
+****************************************/
 
 /*
-mode from blitter command
-#define SHADOW         (0x07)
-#define XORSHADOW      (0x06)
-#define NONCOLLIDABLE  (0x05)
-#define NORMAL         (0x04)
-#define BOUNDARY       (0x03)
-#define BOUNDARYSHADOW (0x02)
-#define BKGRNDNOCOL    (0x01)
-#define BKGRND         (0x00)
+2008-10 FP:
+Current implementation: lynx_blitter reads what will be drawn and sets which line_functions to use.
+It then calls lynx_blit_lines which sets the various flip bits (horizontal and vertical) and calls
+the chosen line_function. These functions (available in various versions, depending on how many 
+color bits are to be used) finally call lynx_plot_pixel which draws the sprite.
+
+Notice however that, based on the problems in Electrocop, Jimmy Connors Tennis and Switchblade II
+(among the others), it clearly seems that something is being lost in some of the passages. From
+my partial understanding while comparing the code with the manual, I would suspect the loops in
+the line_functions to be not completely correct.
+
+This whole part will be eventually moved to video/ once I'm satisfied (or I give up).
+*/
+
+#define GET_WORD(mem, index) ((mem)[(index)]|((mem)[(index)+1]<<8))
+
+/* modes from blitter command */
+enum {
+	BACKGROUND = 0,
+	BACKGROUND_NO_COLL,
+	BOUNDARY_SHADOW,
+	BOUNDARY,
+	NORMAL_SPRITE,
+	NO_COLL,
+	XOR_SPRITE,
+	SHADOW
+};
+
+static UINT8 sprite_collide;
+
+/* The pen numbers range from '0' to 'F. Pen numbers '1' thru 'D' are always collidable and opaque. The other 
+ones have different behavior depending on the sprite type: there are 8 types of sprites, each has different 
+characteristics relating to some or all of their pen numbers. 
+
+* Shadow Error: The hardware is missing an inverter in the 'shadow' generator. This causes sprite types that 
+did not invoke shadow to now invoke it and vice versa. The only actual functionality loss is that 'exclusive or' 
+sprites and 'background' sprites will have shadow enabled. 
+
+The sprite types relate to specific hardware functions according to the following table:
+
+
+   -------------------------- SHADOW
+  |   ----------------------- BOUNDARY_SHADOW
+  |  |   -------------------- NORMAL_SPRITE
+  |  |  |   ----------------- BOUNDARY
+  |  |  |  |   -------------- BACKGROUND (+ shadow, due to bug in 'E' pen)
+  |  |  |  |  |   ----------- BACKGROUND_NO_COLL
+  |  |  |  |  |  |   -------- NO_COLL
+  |  |  |  |  |  |  |   ----- XOR_SPRITE (+ shadow, due to bug in 'E' pen)
+  |  |  |  |  |  |  |  |
+  1  0  1  0  1  1  1  1      F is opaque
+  0  0  1  1  0  0  0  0      E is collideable
+  0  0  1  1  0  0  0  0      0 is opaque and collideable
+  1  1  1  1  0  0  0  1      allow collision detect
+  1  1  1  1  1  0  0  1      allow coll. buffer access
+  0  0  0  0  0  0  0  1      exclusive-or the data
 */
 
 INLINE void lynx_plot_pixel(const int mode, const int x, const int y, const int color)
 {
-    int back;
-    UINT8 *screen;
-    UINT8 *colbuf;
+	int back;
+	UINT8 *screen;
+	UINT8 *colbuf;
 
-    blitter.everon=TRUE;
-    screen=blitter.mem+blitter.screen+y*80+x/2;
-    colbuf=blitter.mem+blitter.colbuf+y*80+x/2;
-    switch (mode) {
-    case 0x00: // background (shadow bug!)
-	if (!(x&1)) {
-	    *screen=(*screen&0x0f)|(color<<4);
-	} else {
-	    *screen=(*screen&0xf0)|color;
+	blitter.everon = TRUE;
+	screen = blitter.mem + blitter.screen + y * 80 + x / 2;
+	colbuf = blitter.mem + blitter.colbuf + y * 80 + x / 2;
+
+	switch (mode) 
+	{
+		case NORMAL_SPRITE:
+		/* A sprite may be set to 'normal'. This means that pen number '0' will be transparent and 
+		non-collideable. All other pens will be opaque and collideable */
+			if (color == 0) 
+				break;
+			if (!(x & 0x01))		/* Upper nibble */
+			{
+				*screen = (*screen & 0x0f) | (color << 4);
+
+				if(sprite_collide)
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0xf0) | (blitter.spritenr << 4);
+					if ((back >> 4) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back >> 4;
+					blitter.memory_accesses += 2;
+				}
+			}
+			else					/* Lower nibble */
+			{
+				*screen = (*screen & 0xf0) | color;
+
+				if(sprite_collide)
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0x0f) | (blitter.spritenr);
+					if ((back & 0x0f) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back & 0x0f;
+					blitter.memory_accesses += 2;
+				}
+			}
+			blitter.memory_accesses++;
+			break;
+
+		case BOUNDARY:
+		/* A sprite may be set to 'boundary'. This is a 'normal' sprite with the exception that pen 
+		number 'F' is transparent (and still collideable). */
+			if (color == 0)
+				break;			
+			if (!(x & 0x01))		/* Upper nibble */
+			{
+				if (color != 0x0f)
+				{
+					*screen = (*screen & 0x0f) | (color << 4);
+					blitter.memory_accesses++;
+				}
+				if(sprite_collide)
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0xf0) | (blitter.spritenr << 4);
+					if ((back >> 4) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back >> 4;
+					blitter.memory_accesses += 2;
+				}
+			}
+			else					/* Lower nibble */ 
+			{
+				if (color != 0x0f)
+				{
+					*screen = (*screen & 0xf0) | color;
+					blitter.memory_accesses++;
+				}
+				if(sprite_collide)
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0x0f) | (blitter.spritenr);
+					if ((back & 0x0f) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back & 0x0f;
+					blitter.memory_accesses += 2;
+				}
+			}
+			break;
+
+		case SHADOW:
+		/* A sprite may be set to 'shadow'. This is a 'normal' sprite with the exception that pen 
+		number 'E' is non-collideable (but still opaque) */
+			if (color == 0) 
+				break;
+			if (!(x & 0x01))		/* Upper nibble */
+			{
+				*screen = (*screen & 0x0f) | (color << 4);
+
+				if (sprite_collide && (color != 0x0e))
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0xf0) | (blitter.spritenr << 4);
+					if ((back >> 4) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back >> 4;
+					blitter.memory_accesses += 2;
+				}
+			}
+			else					/* Lower nibble */
+			{
+				*screen = (*screen & 0xf0) | color;
+
+				if (sprite_collide && (color != 0x0e))
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0x0f) | (blitter.spritenr);
+					if ((back & 0x0f) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back & 0x0f;
+					blitter.memory_accesses += 2;
+				}
+			}
+			blitter.memory_accesses++;
+			break;
+
+		case BOUNDARY_SHADOW:
+		/* This sprite is a 'normal' sprite with the characteristics of both 'boundary' 
+		and 'shadow'. That is, pen number 'F' is transparent (and still collideable) and 
+		pen number 'E' is non-collideable (but still opaque). */
+			if (color == 0) 
+				break;
+			if (!(x & 0x01))		/* Upper nibble */ 
+			{
+				if (color != 0x0f) 
+				{
+					*screen = (*screen & 0x0f) | (color << 4);
+					blitter.memory_accesses++;
+				}
+				if (sprite_collide && (color != 0x0e))
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0xf0) | (blitter.spritenr << 4);
+					if ((back >> 4) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back >> 4;
+					blitter.memory_accesses += 2;
+				}
+			} 
+			else					/* Lower nibble */ 
+			{
+				if (color != 0x0f) 
+				{
+					*screen = (*screen & 0xf0) | color;
+					blitter.memory_accesses++;
+				}
+				if (sprite_collide && (color != 0x0e))
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0x0f) | (blitter.spritenr);
+					if ((back & 0x0f) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back & 0x0f;
+					blitter.memory_accesses += 2;
+				}
+			}
+			break;
+
+		case BACKGROUND: 
+		/* A sprite may be set to 'background'. This sprite will overwrite the contents of the video and 
+		collision buffers. Pens '0' and 'F' are no longer transparent. This sprite is used to initialize 
+		the buffers at the start of a 'painting'. Additionally, no collision detection is done, and no write 
+		to the collision depository occurs. The 'E' error will cause the pen number 'E' to be non-collideable 
+		and therefore not clear the collision buffer */
+			if (!(x & 0x01))		/* Upper nibble */ 
+			{
+				*screen = (*screen & 0x0f) | (color << 4);
+
+				if (sprite_collide && (color != 0x0e))
+				{
+					*colbuf = (*colbuf & ~0xf0) | (blitter.spritenr << 4);
+					blitter.memory_accesses++;
+				}
+			}
+			else					/* Lower nibble */ 
+			{
+				*screen = (*screen & 0xf0) | color;
+
+				if (sprite_collide && (color != 0x0e))
+				{
+					*colbuf = (*colbuf & ~0x0f) | (blitter.spritenr);
+					blitter.memory_accesses++;
+				}
+			}
+			blitter.memory_accesses++;
+			break;
+
+		case BACKGROUND_NO_COLL: 
+		/* This is a 'background' sprite with the exception that no activity occurs in the collision buffer */
+			if (!(x & 0x01))		/* Upper nibble */
+				*screen = (*screen & 0x0f) | (color << 4);
+			else					/* Lower nibble */
+				*screen = (*screen & 0xf0) | color;
+			blitter.memory_accesses++;
+			break;
+
+		case NO_COLL: 
+		/* A sprite may be set to 'non-collideable'. This means that it will have no affect on the contents of 
+		the collision buffer and all other collision activities are overridden (pen 'F' is not collideable). */
+			if (color == 0) 
+				break;
+			if (!(x & 0x01))		/* Upper nibble */
+				*screen = (*screen & 0x0f) | (color << 4);
+			else					/* Lower nibble */
+				*screen = (*screen & 0xf0) | color;
+			blitter.memory_accesses++;
+			break;
+
+		case XOR_SPRITE:
+		/* This is a 'normal' sprite with the exception that the data from the video buffer is exclusive-ored 
+		with the sprite data and written back out to the video buffer. Collision activity is 'normal'. The 'E' 
+		error will cause the pen number 'E' to be non-collideable and therefore not react with the collision 
+		buffer */ 
+			if (color == 0) 
+				break;
+			if (!(x & 0x01))		/* Upper nibble */ 
+			{
+				*screen = (*screen & 0x0f)^(color<<4);
+
+				if (color != 0x0e) 
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0xf0) | (blitter.spritenr << 4);
+					if ((back >> 4) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back >> 4;
+					blitter.memory_accesses += 2;
+				}
+			} 
+			else					/* Lower nibble */ 
+			{
+				*screen = (*screen & 0xf0)^color;
+
+				if (color != 0x0e) 
+				{
+					back = *colbuf;
+					*colbuf = (back & ~0x0f) | (blitter.spritenr);
+					if ((back & 0x0f) > blitter.mem[blitter.colpos])
+						blitter.mem[blitter.colpos] = back & 0x0f;
+					blitter.memory_accesses += 2;
+				}
+			}
+			blitter.memory_accesses++;
+			break;
 	}
-	blitter.memory_accesses++;
-	break;
-    case 0x10:
-	if (!(x&1)) {
-	    if (color!=0xe) {
-		*colbuf=(*colbuf&~0xf0)|(blitter.spritenr<<4);
-		blitter.memory_accesses++;
-	    }
-	    *screen=(*screen&0x0f)|(color<<4);
-	} else {
-	    if (color!=0xe) {
-		*colbuf=(*colbuf&~0xf)|(blitter.spritenr);
-		blitter.memory_accesses++;
-	    }
-	    *screen=(*screen&0xf0)|color;
-	}
-	blitter.memory_accesses++;
-	break;
-    case 0x01: // background, no colliding
-    case 0x11:
-	if (!(x&1)) {
-	    *screen=(*screen&0x0f)|(color<<4);
-	} else {
-	    *screen=(*screen&0xf0)|color;
-	}
-	blitter.memory_accesses++;
-	break;
-    case 0x03: // boundary: pen P? transparent, but collides
-    case 0x02: // boundary, shadow
-	if ((color==0)||(color==0xf)) break;
-	if (!(x&1)) {
-	    *screen=(*screen&0x0f)|(color<<4);
-	} else {
-	    *screen=(*screen&0xf0)|color;
-	}
-	blitter.memory_accesses++;
-	break;
-    case 0x13:
-	if (color==0) break;
-	if (!(x&1)) {
-	    back=*colbuf;
-	    if (back>>4>blitter.mem[blitter.colpos])
-		blitter.mem[blitter.colpos]=back>>4;
-	    *colbuf=(back&~0xf0)|(blitter.spritenr<<4);
-	    if (color!=0xf) {
-		*screen=(*screen&0x0f)|(color<<4);
-		blitter.memory_accesses++;
-	    }
-	} else {
-	    back=*colbuf;
-	    if ((back&0xf)>blitter.mem[blitter.colpos])
-		blitter.mem[blitter.colpos]=back&0xf;
-	    *colbuf=(back&~0xf)|(blitter.spritenr);
-	    if (color!=0xf) {
-		*screen=(*screen&0xf0)|color;
-		blitter.memory_accesses++;
-	    }
-	}
-	blitter.memory_accesses+=2;
-	break;
-    case 0x12:
-	if (color==0) break;
-	if (!(x&1)) {
-	    if (color!=0xe) {
-		back=*colbuf;
-		if (back>>4>blitter.mem[blitter.colpos])
-		    blitter.mem[blitter.colpos]=back>>4;
-		*colbuf=(back&~0xf0)|(blitter.spritenr<<4);
-	    }
-	    if (color!=0xf) {
-		*screen=(*screen&0x0f)|(color<<4);
-		blitter.memory_accesses++;
-	    }
-	} else {
-	    if (color!=0xe) {
-		back=*colbuf;
-		if ((back&0xf)>blitter.mem[blitter.colpos])
-		    blitter.mem[blitter.colpos]=back&0xf;
-		*colbuf=(back&~0xf)|(blitter.spritenr);
-	    }
-	    if (color!=0xf) {
-		*screen=(*screen&0xf0)|color;
-		blitter.memory_accesses++;
-	    }
-	}
-	blitter.memory_accesses+=2;
-	break;
-    case 0x04: // pen 0 transparent,
-    case 0x07: // shadow: pen e doesn't collide
-    case 0x05: // non collidable sprite
-    case 0x15:
-	if (color==0) break;
-	if (!(x&1)) {
-	    *screen=(*screen&0x0f)|(color<<4);
-	} else {
-	    *screen=(*screen&0xf0)|color;
-	}
-	blitter.memory_accesses++;
-	break;
-    case 0x14:
-	if (color==0) break;
-	if (!(x&1)) {
-	    back=*colbuf;
-	    *colbuf=(back&~0xf0)|(blitter.spritenr<<4);
-	    if (back>>4>blitter.mem[blitter.colpos])
-		blitter.mem[blitter.colpos]=back>>4;
-	    *screen=(*screen&0x0f)|(color<<4);
-	} else {
-	    back=*colbuf;
-	    *colbuf=(back&~0xf)|(blitter.spritenr);
-	    if ((back&0xf)>blitter.mem[blitter.colpos])
-		blitter.mem[blitter.colpos]=back&0xf;
-	    *screen=(*screen&0xf0)|color;
-	}
-	blitter.memory_accesses+=3;
-	break;
-    case 0x17:
-	if (color==0) break;
-	if (!(x&1)) {
-	    if (color!=0xe) {
-		back=*colbuf;
-		if (back>>4>blitter.mem[blitter.colpos])
-		    blitter.mem[blitter.colpos]=back>>4;
-		*colbuf=(back&~0xf0)|(blitter.spritenr<<4);
-		blitter.memory_accesses+=2;
-	    }
-	    *screen=(*screen&0x0f)|(color<<4);
-	} else {
-	    if (color!=0xe) {
-		back=*colbuf;
-		if ((back&0xf)>blitter.mem[blitter.colpos])
-		    blitter.mem[blitter.colpos]=back&0xf;
-		*colbuf=(back&~0xf)|(blitter.spritenr);
-		blitter.memory_accesses+=2;
-	    }
-	    *screen=(*screen&0xf0)|color;
-	}
-	blitter.memory_accesses++;
-	break;
-    case 0x06: // xor sprite (shadow bug!)
-	if (!(x&1)) {
-	    *screen=(*screen&0x0f)^(color<<4);
-	} else {
-	    *screen=(*screen&0xf0)^color;
-	}
-	blitter.memory_accesses++;
-	break;
-    case 0x16:
-	if (!(x&1)) {
-	    if (color!=0xe) {
-		back=*colbuf;
-		if (back>>4>blitter.mem[blitter.colpos])
-		    blitter.mem[blitter.colpos]=back>>4;
-		*colbuf=(back&~0xf0)|(blitter.spritenr<<4);
-		blitter.memory_accesses+=2;
-	    }
-	    *screen=(*screen&0x0f)^(color<<4);
-	} else {
-	    if (color!=0xe) {
-		back=*colbuf;
-		if ((back&0xf)>blitter.mem[blitter.colpos])
-		    blitter.mem[blitter.colpos]=back&0xf;
-		*colbuf=(back&~0xf)|(blitter.spritenr);
-		blitter.memory_accesses+=2;
-	    }
-	    *screen=(*screen&0xf0)^color;
-	}
-	blitter.memory_accesses++;
-	break;
-    }
 }
 
-#define INCLUDE_LYNX_LINE_FUNCTION
+static void lynx_blit_do_work( const int y, const int xdir, const int bits, const int mask )
+{
+	int j, xi, wi, i;
+	int b, p, color;
+
+	i = blitter.mem[blitter.bitmap];
+	blitter.memory_accesses++;		// ?
+	
+	for (xi = blitter.x, p = 0, b = 0, j = 1, wi = 0; j < i;)
+	{
+		if (p < bits) 
+		{
+			b = (b << 8) | blitter.mem[blitter.bitmap + j];
+			j++;
+			p += 8;
+			blitter.memory_accesses++;
+		}
+		for ( ; (p >= bits); ) 
+		{
+			color = blitter.color[(b >> (p - bits)) & mask]; 
+			p -= bits;
+			for ( ; wi < blitter.width; wi += 0x100, xi += xdir) 
+			{
+				if ((xi >= 0) && (xi < 160)) 
+					lynx_plot_pixel(blitter.mode, xi, y, color);
+			}
+			wi -= blitter.width;
+		}
+	}
+}
+
+
 static void lynx_blit_2color_line(const int y, const int xdir)
 {
-	const int bits=1;
-	const int mask=0x1;
-#include "includes/lynx.h"
+	const int bits = 1;
+	const int mask = 0x01;
+
+	lynx_blit_do_work(y, xdir, bits, mask);
 }
 static void lynx_blit_4color_line(const int y, const int xdir)
 {
-	const int bits=2;
-	const int mask=0x3;
-#include "includes/lynx.h"
+	const int bits = 2;
+	const int mask = 0x03;
+
+	lynx_blit_do_work(y, xdir, bits, mask);
 }
 static void lynx_blit_8color_line(const int y, const int xdir)
 {
-	const int bits=3;
-	const int mask=0x7;
-#include "includes/lynx.h"
+	const int bits = 3;
+	const int mask = 0x07;
+
+	lynx_blit_do_work(y, xdir, bits, mask);
 }
 static void lynx_blit_16color_line(const int y, const int xdir)
 {
-	const int bits=4;
-	const int mask=0xf;
-#include "includes/lynx.h"
+	const int bits = 4;
+	const int mask = 0x0f;
+
+	lynx_blit_do_work(y, xdir, bits, mask);
 }
-#undef INCLUDE_LYNX_LINE_FUNCTION
 
 /*
 2 color rle: ??
@@ -335,107 +482,215 @@ static void lynx_blit_16color_line(const int y, const int xdir)
  0, 4 bit repeat count-1, 4 bit color
  1, 4 bit count of values-1, 4 bit color, ....
 */
-#define INCLUDE_LYNX_LINE_RLE_FUNCTION
+
+static void lynx_blit_rle_do_work( const int y, const int xdir, const int bits, const int mask )
+{
+	int wi, xi;
+	int b, p, j;
+	int t, count, color;
+
+	for( p = 0, j = 0, b = 0, xi = blitter.x, wi = 0; ; )		/* through the rle entries */
+	{ 
+		if (p < 5 + bits) /* under 7 bits no complete entry */
+		{ 
+			j++;
+			if (j >= blitter.mem[blitter.bitmap]) 
+				return;
+
+			p += 8;
+			b = (b << 8) | blitter.mem[blitter.bitmap + j];
+			blitter.memory_accesses++;
+		}
+
+		t = (b >> (p - 1)) & 0x01;
+		p--;
+		count = ((b >> (p - 4)) & 0x0f) + 1;
+		p -= 4;
+
+		if (t)		/* count of different pixels */
+		{ 
+			for ( ; count; count--) 
+			{
+				if (p < bits) 
+				{
+					j++;
+					if (j >= blitter.mem[blitter.bitmap]) 
+						return;
+					p += 8;
+					b = (b << 8) | blitter.mem[blitter.bitmap + j];
+					blitter.memory_accesses++;
+				}
+
+				color = blitter.color[(b >> (p - bits)) & mask];
+				p -= bits;
+				for ( ; wi < blitter.width; wi += 0x100, xi += xdir) 
+				{
+					if ((xi >= 0) && (xi < 160))
+						lynx_plot_pixel(blitter.mode, xi, y, color);
+				}
+				wi -= blitter.width;
+			}
+		} 
+		else		/* count of same pixels */
+		{ 
+			if (count == 0) 
+				return;
+
+			if (p < bits) 
+			{
+				j++;
+				if (j >= blitter.mem[blitter.bitmap]) 
+					return;
+				p += 8;
+				b = (b << 8) | blitter.mem[blitter.bitmap + j];
+				blitter.memory_accesses++;
+			}
+
+			color = blitter.color[(b >> (p - bits)) & mask];
+			p -= bits;
+
+			for ( ; count; count--) 
+			{
+				for ( ; wi < blitter.width; wi += 0x100, xi += xdir) 
+				{
+					if ((xi >= 0) && (xi < 160)) 
+						lynx_plot_pixel(blitter.mode, xi, y, color);
+				}
+				wi -= blitter.width;
+			}
+		}
+	}
+}
+
 static void lynx_blit_2color_rle_line(const int y, const int xdir)
 {
-	const int bits=1;
-	const int mask=0x1;
-#include "includes/lynx.h"
+	const int bits = 1;
+	const int mask = 0x01;
+
+	lynx_blit_rle_do_work(y, xdir, bits, mask);
 }
 static void lynx_blit_4color_rle_line(const int y, const int xdir)
 {
-	const int bits=2;
-	const int mask=0x3;
-#include "includes/lynx.h"
+	const int bits = 2;
+	const int mask = 0x03;
+
+	lynx_blit_rle_do_work(y, xdir, bits, mask);
 }
 static void lynx_blit_8color_rle_line(const int y, const int xdir)
 {
-	const int bits=3;
-	const int mask=0x7;
-#include "includes/lynx.h"
+	const int bits = 3;
+	const int mask = 0x07;
+
+	lynx_blit_rle_do_work(y, xdir, bits, mask);
 }
 static void lynx_blit_16color_rle_line(const int y, const int xdir)
 {
-	const int bits=4;
-	const int mask=0xf;
-#include "includes/lynx.h"
+	const int bits = 4;
+	const int mask = 0x0f;
+
+	lynx_blit_rle_do_work(y, xdir, bits, mask);
 }
-#undef INCLUDE_LYNX_LINE_RLE_FUNCTION
 
 
 static void lynx_blit_lines(void)
 {
 	int i, hi, y;
-	int ydir=0, xdir=0;
-	int flip=blitter.mem[blitter.cmd+1]&3;
+	int ydir = 0, xdir = 0;
+	int flip;
 
-	blitter.everon=FALSE;
+	blitter.everon = FALSE;
 
 	// flipping sprdemo3
 	// fat bobby 0x10
 	// mirror the sprite in gameplay?
-	xdir=1;
-	if (blitter.mem[blitter.cmd]&0x20) { xdir=-1;blitter.x--;/*?*/ }
-	ydir=1;
-	if (blitter.mem[blitter.cmd]&0x10) { ydir=-1;blitter.y--;/*?*/ }
-	switch (blitter.mem[blitter.cmd+1]&3) {
-	case 0:
-		flip =0;
-		break;
-	case 1: // blockout
-		xdir*=-1;
-		flip=1;
-		break;
-	case 2: // fat bobby horicontal
-		ydir*=-1;
-		flip=1;
-		break;
-	case 3:
-		xdir*=-1;
-		ydir*=-1;
-		flip=3;
-		break;
+	xdir = 1;
+
+	if (blitter.mem[blitter.cmd] & 0x20)	/* Horizontal Flip */
+	{ 
+		xdir = -1;
+		blitter.x--;	/*?*/ 
+	}
+	
+	ydir = 1;
+
+	if (blitter.mem[blitter.cmd] & 0x10) 	/* Vertical Flip */
+	{ 
+		ydir = -1;
+		blitter.y--;	/*?*/ 
+	}
+	
+	switch (blitter.mem[blitter.cmd + 1] & 0x03)	/* Start Left & Start Up */
+	{
+		case 0:
+			flip =0;
+			break;
+
+		case 1: // blockout
+			xdir *= -1;
+			flip = 1;
+			break;
+
+		case 2: // fat bobby horicontal
+			ydir *= -1;
+			flip = 1;
+			break;
+
+		case 3:
+			xdir *= -1;
+			ydir *= -1;
+			flip = 3;
+			break;
 	}
 
-	for ( y=blitter.y, hi=0; (blitter.memory_accesses++,i=blitter.mem[blitter.bitmap]); blitter.bitmap+=i ) {
-		if (i==1) {
-		    // centered sprites sprdemo3, fat bobby, blockout
-		    hi=0;
-		    switch (flip&3) {
-		    case 0:
-		    case 2:
-			ydir*=-1;
-			blitter.y+=ydir;
-			break;
-		    case 1:
-		    case 3:
-			xdir*=-1;
-			blitter.x+=xdir;
-			break;
-		    }
-		    y=blitter.y;
-		    flip++;
+	for (y = blitter.y, hi = 0; blitter.memory_accesses++, i = blitter.mem[blitter.bitmap]; blitter.bitmap += i ) 
+	{
+		if (i == 1) 
+		{
+			// centered sprites sprdemo3, fat bobby, blockout
+			hi = 0;
+			switch (flip & 0x03) 
+			{
+				case 0:
+				case 2:
+					ydir *= -1;
+					blitter.y += ydir;
+					break;
+
+				case 1:
+				case 3:
+					xdir *= -1;
+					blitter.x += xdir;
+					break;
+			}
+
+			y = blitter.y;
+			flip++;
 		    continue;
 		}
-		for (;(hi<blitter.height); hi+=0x100, y+=ydir) {
-		    if ( y>=0 && y<102 )
-			blitter.line_function(y,xdir);
-		    blitter.width+=blitter.stretch;
-		    blitter.x+=blitter.tilt;
+
+		for ( ; (hi < blitter.height); hi += 0x100, y += ydir) 
+		{
+			if (y >= 0 && y < 102)
+				blitter.line_function(y, xdir);
+			blitter.width += blitter.stretch;
+			blitter.x += blitter.tilt;
 		}
-		hi-=blitter.height;
+
+		hi -= blitter.height;
 	}
-	switch (blitter.mode) {
-	case 0x12: case 0x13: case 0x14: case 0x16: case 0x17:
-	    if (suzy.u.s.SPRG0&0x20 && blitter.everon) {
-		blitter.mem[blitter.colpos]|=0x80;
-	    }
+
+	if (suzy.data[SPRG0] & 0x04)
+	{
+		if (sprite_collide & !blitter.everon)
+			blitter.mem[blitter.colpos] |= 0x80;
+		else
+			blitter.mem[blitter.colpos] &= 0x7f;
 	}
 }
 
 static TIMER_CALLBACK(lynx_blitter_timer)
 {
-    suzy.u.s.SPRSYS&=~1; //blitter finished
+	suzy.data[SPRSYS] &= ~0x01; //blitter finished
 }
 
 /*
@@ -513,245 +768,390 @@ static TIMER_CALLBACK(lynx_blitter_timer)
 
 static void lynx_blitter(void)
 {
-    static const int lynx_colors[4]={2,4,8,16};
+	static const int lynx_colors[4]={2,4,8,16};
 
-    static void (* const blit_line[4])(const int y, const int xdir)= {
+	static void (* const blit_line[4])(const int y, const int xdir)= {
 	lynx_blit_2color_line,
 	lynx_blit_4color_line,
 	lynx_blit_8color_line,
 	lynx_blit_16color_line
-    };
+	};
 
-    static void (* const blit_rle_line[4])(const int y, const int xdir)= {
+	static void (* const blit_rle_line[4])(const int y, const int xdir)= {
 	lynx_blit_2color_rle_line,
 	lynx_blit_4color_rle_line,
 	lynx_blit_8color_rle_line,
 	lynx_blit_16color_rle_line
-    };
-    int i; int o;int colors;
+	};
+	int i; int o;int colors;
 
-    blitter.memory_accesses=0;
-    blitter.mem = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
-    blitter.colbuf=GET_WORD(suzy.u.data, 0xa);
-    blitter.screen=GET_WORD(suzy.u.data, 8);
-    blitter.xoff=GET_WORD(suzy.u.data,4);
-    blitter.yoff=GET_WORD(suzy.u.data,6);
-    // hsizeoff GET_WORD(suzy.u.data, 0x28)
-    // vsizeoff GET_WORD(suzy.u.data, 0x2a)
+	blitter.memory_accesses = 0;
+	blitter.mem = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
 
-    // these might be never set by the blitter hardware
-    blitter.width=0x100;
-    blitter.height=0x100;
-    blitter.stretch=0;
-    blitter.tilt=0;
+	blitter.xoff   = GET_WORD(suzy.data, 0x04);
+	blitter.yoff   = GET_WORD(suzy.data, 0x06);
+	blitter.screen = GET_WORD(suzy.data, 0x08);
+	blitter.colbuf = GET_WORD(suzy.data, 0x0a);
+	// hsizeoff GET_WORD(suzy.data, 0x28)
+	// vsizeoff GET_WORD(suzy.data, 0x2a)
 
-    blitter.memory_accesses+=2;
-    for (blitter.cmd=GET_WORD(suzy.u.data, 0x10); blitter.cmd; ) {
+	// these might be never set by the blitter hardware
+	blitter.width   = 0x100;
+	blitter.height  = 0x100;
+	blitter.stretch = 0;
+	blitter.tilt    = 0;
+	sprite_collide  = 0;
 
-	blitter.memory_accesses+=1;
-	if (!(blitter.mem[blitter.cmd+1]&4)) {
+	blitter.memory_accesses += 2;
 
-	    blitter.colpos=GET_WORD(suzy.u.data, 0x24)+blitter.cmd;
+	for (blitter.cmd = GET_WORD(suzy.data, 0x10); blitter.cmd; ) 
+	{
+		blitter.memory_accesses += 1;
 
-	    blitter.bitmap=GET_WORD(blitter.mem,blitter.cmd+5);
-	    blitter.x=(INT16)GET_WORD(blitter.mem, blitter.cmd+7)-blitter.xoff;
-	    blitter.y=(INT16)GET_WORD(blitter.mem, blitter.cmd+9)-blitter.yoff;
-	    blitter.memory_accesses+=6;
+		if (!(blitter.mem[blitter.cmd + 1] & 0x04))		// if 0, we skip this sprite
+		{
+			blitter.colpos = GET_WORD(suzy.data, 0x24) + blitter.cmd;
 
-	    blitter.mode=blitter.mem[blitter.cmd]&07;
-	    if (blitter.mem[blitter.cmd+1]&0x80) {
-		blitter.line_function=blit_line[blitter.mem[blitter.cmd]>>6];
-	    } else {
-		blitter.line_function=blit_rle_line[blitter.mem[blitter.cmd]>>6];
-	    }
+			blitter.bitmap = GET_WORD(blitter.mem,blitter.cmd + 5);
+			blitter.x = (INT16)GET_WORD(blitter.mem, blitter.cmd + 7) - blitter.xoff;
+			blitter.y = (INT16)GET_WORD(blitter.mem, blitter.cmd + 9) - blitter.yoff;
+			blitter.memory_accesses += 6;
 
-	    if (!(blitter.mem[blitter.cmd+2]&0x20) && !( suzy.u.s.SPRSYS&0x20) ) {
-		switch (blitter.mode) {
-		case 0: case 2: case 3: case 4: case 6: case 7:
-		    blitter.mode|=0x10;
-		    blitter.mem[blitter.colpos]=0;
-		    blitter.spritenr=blitter.mem[blitter.cmd+2]&0xf;
+			blitter.mode = blitter.mem[blitter.cmd] & 0x07;
+
+			if (blitter.mem[blitter.cmd + 1] & 0x80) 
+				blitter.line_function = blit_line[blitter.mem[blitter.cmd] >> 6];
+			else 
+				blitter.line_function = blit_rle_line[blitter.mem[blitter.cmd] >> 6];
+
+			if (!(blitter.mem[blitter.cmd + 2] & 0x20) && !(suzy.data[SPRSYS] & 0x20)) 
+			{
+				switch (blitter.mode) 
+				{
+					case BACKGROUND:
+					case BOUNDARY_SHADOW:
+					case BOUNDARY:
+					case NORMAL_SPRITE:
+					case XOR_SPRITE:
+					case SHADOW:
+						sprite_collide = 1;
+						blitter.mem[blitter.colpos] = 0;
+						blitter.spritenr = blitter.mem[blitter.cmd + 2] & 0x0f;
+				}
+			}
+
+			/* Sprite Reload Bits */
+			o = 0x0b;
+			if (blitter.mem[blitter.cmd + 1] & 0x30) 
+			{
+				blitter.width  = GET_WORD(blitter.mem, blitter.cmd + 11);
+				blitter.height = GET_WORD(blitter.mem, blitter.cmd + 13);
+				blitter.memory_accesses += 4;
+				o += 4;
+			}
+			if (blitter.mem[blitter.cmd + 1] & 0x20) 
+			{
+				blitter.stretch = GET_WORD(blitter.mem, blitter.cmd + o);
+				blitter.memory_accesses += 2;
+				o += 2;
+				if (blitter.mem[blitter.cmd + 1] & 0x10) 
+				{
+					blitter.tilt = GET_WORD(blitter.mem, blitter.cmd+o);
+					blitter.memory_accesses += 2;
+					o += 2;
+				}
+			}
+
+			/* Reload Palette Bit */
+			colors = lynx_colors[blitter.mem[blitter.cmd] >> 6];
+
+			if (!(blitter.mem[blitter.cmd + 1] & 0x08)) 
+			{
+				for (i = 0; i < colors / 2; i++) 
+				{
+					blitter.color[i * 2]      = blitter.mem[blitter.cmd + o + i] >> 4;
+					blitter.color[i * 2 + 1 ] = blitter.mem[blitter.cmd + o + i] & 0x0f;
+					blitter.memory_accesses++;
+				}
+			}
+			
+			/* Draw Sprites */
+			lynx_blit_lines();
 		}
-	    }
 
-	    o=0xb;
-	    if (blitter.mem[blitter.cmd+1]&0x30) {
-		blitter.width=GET_WORD(blitter.mem, blitter.cmd+11);
-		blitter.height=GET_WORD(blitter.mem, blitter.cmd+13);
-		blitter.memory_accesses+=4;
-		o+=4;
-	    }
+	blitter.cmd = GET_WORD(blitter.mem,  blitter.cmd + 3);
+	blitter.memory_accesses += 2;
 
-	    if (blitter.mem[blitter.cmd+1]&0x20) {
-		blitter.stretch=GET_WORD(blitter.mem, blitter.cmd+o);
-		blitter.memory_accesses+=2;
-		o+=2;
-		if (blitter.mem[blitter.cmd+1]&0x10) {
-		    blitter.tilt=GET_WORD(blitter.mem, blitter.cmd+o);
-		    blitter.memory_accesses+=2;
-		    o+=2;
-		}
-	    }
-	    colors=lynx_colors[blitter.mem[blitter.cmd]>>6];
-
-	    if (!(blitter.mem[blitter.cmd+1]&8)) {
-		for (i=0; i<colors/2; i++) {
-		    blitter.color[i*2]=blitter.mem[blitter.cmd+o+i]>>4;
-		    blitter.color[i*2+1]=blitter.mem[blitter.cmd+o+i]&0xf;
-		    blitter.memory_accesses++;
-		}
-	    }
-	    lynx_blit_lines();
+	if (!(blitter.cmd & 0xff00)) 
+		break;
 	}
-	blitter.cmd=GET_WORD(blitter.mem, blitter.cmd+3);
-	blitter.memory_accesses+=2;
-	if (!(blitter.cmd&0xff00)) break;
-    }
 
 	if (0)
 		timer_set(ATTOTIME_IN_CYCLES(blitter.memory_accesses*20,0), NULL, 0, lynx_blitter_timer);
 }
 
-static void lynx_divide(void)
+
+/****************************************
+
+	Suzy Emulation
+
+****************************************/
+
+
+/* Math bugs of the original hardware:
+
+- in signed multiply, the hardware thinks that 8000 is a positive number
+- in signed multiply, the hardware thinks that 0 is a negative number. This is not an immediate 
+problem for a multiply by zero, since the answer will be re-negated to the correct polarity of 
+zero. However, since it will set the sign flag, you can not depend on the sign flag to be correct 
+if you just load the lower byte after a multiply by zero.
+- in divide, the remainder will have 2 possible errors, depending on its actual value (no further 
+notes on these errors available) */
+
+static void lynx_divide( void )
 {
-	UINT32 left=suzy.u.s.H|(suzy.u.s.G<<8)|(suzy.u.s.F<<16)|(suzy.u.s.E<<24);
-	UINT16 right=suzy.u.s.P|(suzy.u.s.N<<8);
+	UINT32 left;
+	UINT16 right;
 	UINT32 res, mod;
-	suzy.accumulate_overflow=FALSE;
-	if (right==0) {
-	    suzy.accumulate_overflow=TRUE;
-	    res=0xffffffff;
-	    mod=0; //?
-	} else {
-	    res=left/right;
-	    mod=left%right;
+	/*
+	Hardware divide:
+				EFGH
+	*			  NP
+	----------------
+				ABCD
+	Remainder (JK)LM
+	*/
+
+	left = suzy.data[MATH_H] | (suzy.data[MATH_G] << 8) | (suzy.data[MATH_F] << 16) | (suzy.data[MATH_E] << 24);
+	right = suzy.data[MATH_P] | (suzy.data[MATH_N] << 8);
+
+	suzy.accumulate_overflow = FALSE;
+	if (right == 0) 
+	{
+		suzy.accumulate_overflow = TRUE;	/* during divisions, this bit is used to detect denominator = 0 */
+		res = 0xffffffff;
+		mod = 0; //?
+	} 
+	else 
+	{
+		res = left / right;
+		mod = left % right;
 	}
 //	logerror("coprocessor %8x / %8x = %4x\n", left, right, res);
-	suzy.u.s.D=res&0xff;
-	suzy.u.s.C=res>>8;
-	suzy.u.s.B=res>>16;
-	suzy.u.s.A=res>>24;
-	suzy.u.s.M=mod&0xff;
-	suzy.u.s.L=mod>>8;
-	suzy.u.s.K=mod>>16;
-	suzy.u.s.J=mod>>24;
+	suzy.data[MATH_D] = res & 0xff;
+	suzy.data[MATH_C] = res >> 8;
+	suzy.data[MATH_B] = res >> 16;
+	suzy.data[MATH_A] = res >> 24;
+
+	suzy.data[MATH_M] = mod & 0xff;
+	suzy.data[MATH_L] = mod >> 8;
+	suzy.data[MATH_K] = mod >> 16;
+	suzy.data[MATH_J] = mod >> 24;
 }
 
-static void lynx_multiply(void)
+static void lynx_multiply( void )
 {
 	UINT16 left, right;
 	UINT32 res, accu;
-	left=suzy.u.s.B|(suzy.u.s.A<<8);
-	right=suzy.u.s.D|(suzy.u.s.C<<8);
-	if (suzy.u.s.SPRSYS&0x80) {
-	    // to do
-	    res=(INT16)left*(INT16)right;
-	} else res=left*right;
-//	logerror("coprocessor %4x * %4x = %4x\n", left, right, res);
-	suzy.u.s.H=res&0xff;
-	suzy.u.s.G=res>>8;
-	suzy.u.s.F=res>>16;
-	suzy.u.s.E=res>>24;
-	if (suzy.u.s.SPRSYS&0x40) {
-	    accu=suzy.u.s.M|suzy.u.s.L<<8|suzy.u.s.K<<16|suzy.u.s.J<<24;
-	    accu+=res;
-	    if (accu<res) suzy.accumulate_overflow=TRUE;
-	    suzy.u.s.M=accu;
-	    suzy.u.s.L=accu>>8;
-	    suzy.u.s.K=accu>>16;
-	    suzy.u.s.J=accu>>24;
+	/*
+	Hardware multiply:
+				  AB
+	*			  CD
+	----------------
+				EFGH
+	Accumulate	JKLM
+	*/
+	suzy.accumulate_overflow = FALSE;
+
+	left = suzy.data[MATH_B] | (suzy.data[MATH_A] << 8);
+	right = suzy.data[MATH_D] | (suzy.data[MATH_C] << 8);
+
+	res = left * right;
+
+	if (suzy.data[SPRSYS] & 0x80)		/* signed math */
+	{
+		if (!(sign_AB + sign_CD))	/* different signs */
+			res = (res ^ 0xffffffff) + 1;
+	} 
+
+	suzy.data[MATH_H] = res & 0xff;
+	suzy.data[MATH_G] = res >> 8;
+	suzy.data[MATH_F] = res >> 16;
+	suzy.data[MATH_E] = res >> 24;
+
+	if (suzy.data[SPRSYS] & 0x40)		/* is accumulation allowed? */
+	{
+		accu = suzy.data[MATH_M] | suzy.data[MATH_L] << 8 | suzy.data[MATH_K] << 16 | suzy.data[MATH_J] << 24;
+		accu += res;
+
+		if (accu < res) 
+			suzy.accumulate_overflow = TRUE;
+
+		suzy.data[MATH_M] = accu;
+		suzy.data[MATH_L] = accu >> 8;
+		suzy.data[MATH_K] = accu >> 16;
+		suzy.data[MATH_J] = accu >> 24;
 	}
 }
 
- READ8_HANDLER(suzy_read)
+READ8_HANDLER( suzy_read )
 {
-	UINT8 data=0, input;
-	switch (offset) {
-	case 0x88:
-		data=1; // must not be 0 for correct power up
-		break;
-	case 0x92:
-		if (!attotime_compare(blitter.time, attotime_zero))
-		{
-			if ( ATTOTIME_TO_CYCLES(0,attotime_sub(timer_get_time(), blitter.time)) > blitter.memory_accesses*20)
+	UINT8 value = 0, input;
+
+	switch (offset) 
+	{
+		case 0x88:
+			value = 0x01; // must not be 0 for correct power up
+			break;
+		case 0x92:	/* Better check this with docs! */
+			if (!attotime_compare(blitter.time, attotime_zero))
 			{
-				suzy.u.data[offset]&=~1; //blitter finished
-				blitter.time = attotime_zero;
+				if (ATTOTIME_TO_CYCLES(0, attotime_sub(timer_get_time(), blitter.time)) > blitter.memory_accesses * 20)
+				{
+					suzy.data[offset] &= ~0x01; //blitter finished
+					blitter.time = attotime_zero;
+				}
 			}
-		}
-		data=suzy.u.data[offset];
-		data&=~0x80; // math finished
-		data&=~0x40;
-		if (suzy.accumulate_overflow) data|=0x40;
-		break;
-	case 0xb0:
-		input=input_port_read(machine, "JOY");
-		switch (lynx_rotate) {
-		case 1:
-			data=input;
-			input&=0xf;
-			if (data&PAD_UP) input|=PAD_LEFT;
-			if (data&PAD_LEFT) input|=PAD_DOWN;
-			if (data&PAD_DOWN) input|=PAD_RIGHT;
-			if (data&PAD_RIGHT) input|=PAD_UP;
+			value = suzy.data[offset];
+			value &= ~0x80; // math finished
+			value &= ~0x40;
+			if (suzy.accumulate_overflow) 
+				value |= 0x40;
 			break;
-		case 2:
-			data=input;
-			input&=0xf;
-			if (data&PAD_UP) input|=PAD_RIGHT;
-			if (data&PAD_RIGHT) input|=PAD_DOWN;
-			if (data&PAD_DOWN) input|=PAD_LEFT;
-			if (data&PAD_LEFT) input|=PAD_UP;
+		case 0xb0:
+			input = input_port_read(machine, "JOY");
+			switch (lynx_rotate) 
+			{
+				case 1:
+					value = input;
+					input &= 0x0f;
+					if (value & PAD_UP) input |= PAD_LEFT;
+					if (value & PAD_LEFT) input |= PAD_DOWN;
+					if (value & PAD_DOWN) input |= PAD_RIGHT;
+					if (value & PAD_RIGHT) input |= PAD_UP;
+					break;
+				case 2:
+					value = input;
+					input &= 0x0f;
+					if (value & PAD_UP) input |= PAD_RIGHT;
+					if (value & PAD_RIGHT) input |= PAD_DOWN;
+					if (value & PAD_DOWN) input |= PAD_LEFT;
+					if (value & PAD_LEFT) input |= PAD_UP;
+					break;
+			}
+			if (suzy.data[SPRSYS] & 0x08) /* Left handed controls */
+			{
+				value = input & 0x0f;
+				if (input & PAD_UP) value |= PAD_DOWN;
+				if (input & PAD_DOWN) value |= PAD_UP;
+				if (input & PAD_LEFT) value |= PAD_RIGHT;
+				if (input & PAD_RIGHT) value |= PAD_LEFT;
+			} 
+			else 
+				value = input;
 			break;
-		}
-		if (suzy.u.s.SPRSYS&8) {
-			data=input&0xf;
-			if (input&PAD_UP) data|=PAD_DOWN;
-			if (input&PAD_DOWN) data|=PAD_UP;
-			if (input&PAD_LEFT) data|=PAD_RIGHT;
-			if (input&PAD_RIGHT) data|=PAD_LEFT;
-		} else {
-			data=input;
-		}
-		break;
-	case 0xb1: data=input_port_read(machine, "PAUSE");break;
-	case 0xb2:
-		data=*(memory_region(machine, "user1")+(suzy.high*lynx_granularity)+suzy.low);
-		suzy.low=(suzy.low+1)&(lynx_granularity-1);
-		break;
-	default:
-		data=suzy.u.data[offset];
+		case 0xb1: 
+			value = input_port_read(machine, "PAUSE");
+			break;
+		case 0xb2:
+			value = *(memory_region(machine, "user1") + (suzy.high * lynx_granularity) + suzy.low);
+			suzy.low = (suzy.low + 1) & (lynx_granularity - 1);
+			break;
+		case 0xb3: /* we need bank 1 emulation!!! */
+		default:
+			value = suzy.data[offset];
 	}
 //	logerror("suzy read %.2x %.2x\n",offset,data);
-	return data;
+	return value;
 }
 
 WRITE8_HANDLER(suzy_write)
 {
-	suzy.u.data[offset]=data;
-	switch(offset) {
-	case 0x52: case 0x54: case 0x56:
-	case 0x60: case 0x62:
-	case 0x6e:
-	    suzy.u.data[offset+1]=0;
-	    break;
+	suzy.data[offset] = data;
+
+	/* Additional effects of a write */
+	/* Even addresses are the LSB. Any CPU write to an LSB in 0x00-0x7f will set the MSB to 0. */
+	/* This in particular holds for math quantities:  Writing to B (0x54), D (0x52), 
+	F (0x62), H (0x60), K (0x6e) or M (0x6c) will force a '0' to be written to A (0x55), 
+	C (0x53), E (0x63), G (0x61), J (0x6f) or L (0x6d) respectively */
+	switch(offset) 
+	{
+	case 0x00: case 0x02: case 0x04: case 0x06: case 0x08: case 0x0a: case 0x0c: case 0x0e:
+	case 0x10: case 0x12: case 0x14: case 0x16: case 0x18: case 0x1a: case 0x1c: case 0x1e:
+	case 0x20: case 0x22: case 0x24: case 0x26: case 0x28: case 0x2a: case 0x2c: case 0x2e:
+	case 0x30: case 0x32: case 0x34: case 0x36: case 0x38: case 0x3a: case 0x3c: case 0x3e:
+	case 0x40: case 0x42: case 0x44: case 0x46: case 0x48: case 0x4a: case 0x4c: case 0x4e:
+	case 0x50: case 0x56: case 0x58: case 0x5a: case 0x5c: case 0x5e: 
+	case 0x64: case 0x66: case 0x68: case 0x6a:
+	case 0x70: case 0x72: case 0x74: case 0x76: case 0x78: case 0x7a: case 0x7c: case 0x7e:
+	/* B, D, F, H , K */
+	case 0x52: case 0x54: case 0x60: case 0x62: case 0x6e:
+		suzy.data[offset + 1] = 0;
+		break;
+	/* Writing to M (0x6c) will also clear the accumulator overflow bit */
 	case 0x6c:
-	    suzy.u.data[offset+1]=0;
-	    suzy.accumulate_overflow=FALSE;
-	    break;
-	case 0x55: lynx_multiply();break;
-	case 0x63: lynx_divide();break;
+		suzy.data[offset + 1] = 0;
+		suzy.accumulate_overflow = FALSE;
+		break;
+	case 0x53: 
+	/* If we are going to perform a signed multiplication, we store the sign and convert the number 
+	to an unsigned one */
+		if (suzy.data[SPRSYS] & 0x80)		/* signed math */
+		{
+			UINT16 factor, temp;
+			factor = suzy.data[MATH_D] | (suzy.data[MATH_C] << 8);
+			if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
+			{
+				temp = (factor ^ 0xffff) + 1;
+				sign_CD = - 1;
+				suzy.data[MATH_D] = temp & 0xff;
+				suzy.data[MATH_C] = temp >> 8;
+			}
+			else 
+				sign_CD = 1;
+		}
+		break;
+	/* Writing to A will start a 16 bit multiply */
+	/* If we are going to perform a signed multiplication, we also store the sign and convert the 
+	number to an unsigned one */
+	case 0x55: 
+		if (suzy.data[SPRSYS] & 0x80)		/* signed math */
+		{
+			UINT16 factor, temp;
+			factor = suzy.data[MATH_B] | (suzy.data[MATH_A] << 8);
+			if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
+			{
+				temp = (factor ^ 0xffff) + 1;
+				sign_AB = - 1;
+				suzy.data[MATH_B] = temp & 0xff;
+				suzy.data[MATH_A] = temp >> 8;
+			}
+			else 
+				sign_AB = 1;
+		}
+		lynx_multiply();
+		break;
+	/* Writing to E will start a 16 bit divide */
+	case 0x63: 
+		lynx_divide();
+		break;
 	case 0x91:
-	    if (data&1) {
-		blitter.time=timer_get_time();
-		lynx_blitter();
-	    }
-//	    logerror("suzy write %.2x %.2x\n",offset,data);
-	    break;
-//	default:
-//	    logerror("suzy write %.2x %.2x\n",offset,data);
+		if (data & 0x01) 
+		{
+			blitter.time = timer_get_time();
+			lynx_blitter();
+		}
+		break;
+//	case 0xb2: case 0xb3: /* Cart Bank 0 & 1 */
 	}
 }
+
+
+/****************************************
+
+	Mikey emulation
+
+****************************************/
 
 /*
  0xfd0a r sync signal?
@@ -764,8 +1164,147 @@ WRITE8_HANDLER(suzy_write)
  0xfda0-f rw farben 0..15
  0xfdb0-f rw bit0..3 farben 0..15
 */
+
+typedef struct {
+	UINT8 data[0x100];
+} MIKEY;
+
 MIKEY mikey={ { 0 } };
 
+
+UINT8 lynx_read_vram(UINT16 address)
+{
+	UINT8 result = 0x00;
+	if (address <= 0xfbff)
+		result = lynx_mem_0000[address - 0x0000];
+	else if (address <= 0xfcff)
+		result = lynx_mem_fc00[address - 0xfc00];
+	else if (address <= 0xfdff)
+		result = lynx_mem_fd00[address - 0xfd00];
+	else if (address <= 0xfff7)
+		result = lynx_mem_fe00[address - 0xfe00];
+	else if (address >= 0xfffa)
+		result = lynx_mem_fffa[address - 0xfffa];
+	return result;
+}
+
+
+/*
+DISPCTL EQU $FD92       ; set to $D by INITMIKEY
+
+; B7..B4        0
+; B3    1 EQU color
+; B2    1 EQU 4 bit mode
+; B1    1 EQU flip screen
+; B0    1 EQU video DMA enabled
+*/
+void lynx_draw_lines(running_machine *machine, int newline)
+{
+	static int height = -1, width = -1;
+	int h,w;
+	int x, yend;
+	UINT16 j; // clipping needed!
+	UINT8 byte;
+	UINT16 *line;
+
+	if (newline == -1)
+		yend = 102;
+	else
+		yend = newline;
+
+	if (yend > 102)
+		yend = 102;
+
+	if (yend == lynx_line_y)
+	{
+		if (newline == -1)
+			lynx_line_y = 0;
+		return;
+	}
+
+	j = (mikey.data[0x94] | (mikey.data[0x95]<<8)) + lynx_line_y * 160 / 2;
+	if (mikey.data[0x92] & 0x02)
+		j -= 160 * 102 / 2 - 1;
+
+	/* rotation */
+	if (lynx_rotate & 0x03)
+	{
+		h = 160; w = 102;
+		if (((lynx_rotate == 1) && (mikey.data[0x92] & 0x02)) || ((lynx_rotate == 2) && !(mikey.data[0x92] & 0x02)))
+		{
+			for ( ; lynx_line_y < yend; lynx_line_y++)
+			{
+				line = BITMAP_ADDR16(tmpbitmap, lynx_line_y, 0);
+				for (x = 160 - 2; x >= 0; j++, x -= 2)
+				{
+					byte = lynx_read_vram(j);
+					line[x + 1] = lynx_palette[(byte >> 4) & 0x0f];
+					line[x + 0] = lynx_palette[(byte >> 0) & 0x0f];
+				}
+			}
+		}
+		else
+		{
+			for ( ; lynx_line_y < yend; lynx_line_y++)
+			{
+				line = BITMAP_ADDR16(tmpbitmap, 102 - 1 - lynx_line_y, 0);
+				for (x = 0; x < 160; j++, x += 2)
+				{
+					byte = lynx_read_vram(j);
+					line[x + 0] = lynx_palette[(byte >> 4) & 0x0f];
+					line[x + 1] = lynx_palette[(byte >> 0) & 0x0f];
+				}
+			}
+		}
+	}
+	else
+	{
+		w = 160; h = 102;
+		if (mikey.data[0x92] & 0x02)
+		{
+			for ( ; lynx_line_y < yend; lynx_line_y++)
+			{
+				line = BITMAP_ADDR16(tmpbitmap, 102 - 1 - lynx_line_y, 0);
+				for (x = 160 - 2; x >= 0; j++, x -= 2)
+				{
+					byte = lynx_read_vram(j);
+					line[x + 1] = lynx_palette[(byte >> 4) & 0x0f];
+					line[x + 0] = lynx_palette[(byte >> 0) & 0x0f];
+				}
+			}
+		}
+		else
+		{
+			for ( ; lynx_line_y < yend; lynx_line_y++)
+			{
+				line = BITMAP_ADDR16(tmpbitmap, lynx_line_y, 0);
+				for (x = 0; x < 160; j++, x += 2)
+				{
+					byte = lynx_read_vram(j);
+					line[x + 0] = lynx_palette[(byte >> 4) & 0x0f];
+					line[x + 1] = lynx_palette[(byte >> 0) & 0x0f];
+				}
+			}
+		}
+	}
+	if (newline == -1)
+	{
+		lynx_line_y = 0;
+		if ((w != width) || (h != height))
+		{
+			width = w;
+			height = h;
+			video_screen_set_visarea(machine->primary_screen, 0, width - 1, 0, height - 1);
+		}
+	}
+}
+
+
+/****************************************
+
+	Timers
+
+****************************************/
 
 /*
 HCOUNTER        EQU TIMER0
@@ -823,60 +1362,60 @@ static void lynx_timer_init(int which)
 
 static void lynx_timer_signal_irq(running_machine *machine, int which)
 {
-    if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) { // irq flag handling later
+	if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) { // irq flag handling later
 		mikey.data[0x81] |= ( 1 << which );
 		cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, ASSERT_LINE);
-    }
-    switch ( which ) {
-    case 0:
+	}
+	switch ( which ) {
+	case 0:
 		lynx_timer_count_down( machine, 2 );
 		lynx_line++;
 		break;
-    case 2:
+	case 2:
 		lynx_timer_count_down( machine, 4 );
 		lynx_draw_lines( machine, -1 );
 		lynx_line=0;
 		break;
-    case 1:
+	case 1:
 		lynx_timer_count_down( machine, 3 );
 		break;
-    case 3:
+	case 3:
 		lynx_timer_count_down( machine, 5 );
 		break;
-    case 5:
+	case 5:
 		lynx_timer_count_down( machine, 7 );
 		break;
-    case 7:
+	case 7:
 		lynx_audio_count_down( machine, 0 );
 		break;
-    }
+	}
 }
 
 void lynx_timer_count_down(running_machine *machine, int which)
 {
-    if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f ) {
+	if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f ) {
 		if ( lynx_timer[which].counter > 0 ) {
-		    lynx_timer[which].counter--;
-		    return;
+			lynx_timer[which].counter--;
+			return;
 		}
 		if ( lynx_timer[which].counter == 0 ) {
 			lynx_timer[which].cntrl2 |= 8;
-		    lynx_timer_signal_irq(machine, which);
-		    if ( lynx_timer[which].cntrl1 & 0x10 ) {
+			lynx_timer_signal_irq(machine, which);
+			if ( lynx_timer[which].cntrl1 & 0x10 ) {
 				lynx_timer[which].counter = lynx_timer[which].bakup;
-		    } else {
+			} else {
 				lynx_timer[which].counter--;
-		    }
-		    return;
+			}
+			return;
 		}
-    }
+	}
 }
 
 static TIMER_CALLBACK(lynx_timer_shot)
 {
 	lynx_timer[param].cntrl2 |= 8;
-    lynx_timer_signal_irq( machine, param );
-    if ( ! ( lynx_timer[param].cntrl1 & 0x10 ) )
+	lynx_timer_signal_irq( machine, param );
+	if ( ! ( lynx_timer[param].cntrl1 & 0x10 ) )
 		lynx_timer[param].timer_active = 0;
 }
 
@@ -897,65 +1436,69 @@ static UINT32 lynx_time_factor(int val)
 
 static UINT8 lynx_timer_read(int which, int offset)
 {
-	UINT8 data = 0;
-	switch (offset) {
-	case 0:
-		data = lynx_timer[which].bakup;
-		break;
-	case 1:
-		data = lynx_timer[which].cntrl1;
-		break;
-	case 2:
-		if ( ( lynx_timer[which].cntrl1 & 7 ) == 7 )
-		{
-			data = lynx_timer[which].counter;
-		}
-		else
-		{
-			if ( lynx_timer[which].timer_active )
-				data = (UINT8) ( lynx_timer[which].bakup - attotime_mul(timer_timeleft(lynx_timer[which].timer), lynx_time_factor( lynx_timer[which].cntrl1 & 7 )).seconds);
-		}
-		break;
+	UINT8 value = 0;
 
-	case 3:
-		data = lynx_timer[which].cntrl2;
-		break;
+	switch (offset) 
+	{
+		case 0:
+			value = lynx_timer[which].bakup;
+			break;
+		case 1:
+			value = lynx_timer[which].cntrl1;
+			break;
+		case 2:
+			if ((lynx_timer[which].cntrl1 & 0x07) == 0x07)
+			{
+				value = lynx_timer[which].counter;
+			}
+			else
+			{
+				if ( lynx_timer[which].timer_active )
+					value = (UINT8) ( lynx_timer[which].bakup - attotime_mul(timer_timeleft(lynx_timer[which].timer), lynx_time_factor( lynx_timer[which].cntrl1 & 0x07 )).seconds);
+			}
+			break;
+
+		case 3:
+			value = lynx_timer[which].cntrl2;
+			break;
 	}
-	logerror("timer %d read %x %.2x\n", which, offset, data);
-	return data;
+	logerror("timer %d read %x %.2x\n", which, offset, value);
+	return value;
 }
 
 static void lynx_timer_write(int which, int offset, UINT8 data)
 {
 	logerror("timer %d write %x %.2x\n", which, offset, data);
 
-	switch (offset) {
-	case 0:
-		lynx_timer[which].bakup = data;
-		break;
-	case 1:
-		lynx_timer[which].cntrl1 = data;
-		if ( data & 0x40 )
-			lynx_timer[which].cntrl2 &= ~8;
-		break;
-	case 2:
-//		lynx_timer[which].counter = data;
-		break;
-	case 3:
-		lynx_timer[which].cntrl2 = ( lynx_timer[which].cntrl2 & 8 ) | ( data & ~8 );
-		break;
+	switch (offset)
+	{
+		case 0:
+			lynx_timer[which].bakup = data;
+			break;
+		case 1:
+			lynx_timer[which].cntrl1 = data;
+			if (data & 0x40)
+				lynx_timer[which].cntrl2 &= ~0x08;
+			break;
+		case 2:
+//			lynx_timer[which].counter = data;	// why commented out?
+			break;
+		case 3:
+			lynx_timer[which].cntrl2 = (lynx_timer[which].cntrl2 & 0x08) | (data & ~0x08);
+			break;
 	}
 
 	/* Update timers */
-	if ( offset < 3 ) {
-		timer_reset( lynx_timer[which].timer, attotime_never);
+	if ( offset < 3 ) 
+	{
+		timer_reset(lynx_timer[which].timer, attotime_never);
 		lynx_timer[which].timer_active = 0;
-		if ( ( lynx_timer[which].cntrl1 & 0x08 ) )
+		if ((lynx_timer[which].cntrl1 & 0x08))		// 0x48?
 		{
-			if ( ( lynx_timer[which].cntrl1 & 7 ) != 7 )
+			if ((lynx_timer[which].cntrl1 & 0x07) != 0x07)
 			{
-				attotime t = attotime_mul(ATTOTIME_IN_HZ( lynx_time_factor( lynx_timer[which].cntrl1 & 7 ) ), lynx_timer[which].bakup + 1 );
-				if ( lynx_timer[which].cntrl1 & 0x10 )
+				attotime t = attotime_mul(ATTOTIME_IN_HZ(lynx_time_factor(lynx_timer[which].cntrl1 & 0x07)), lynx_timer[which].bakup + 1);
+				if (lynx_timer[which].cntrl1 & 0x10)
 					timer_adjust_periodic(lynx_timer[which].timer, attotime_zero, which, t);
 				else
 					timer_adjust_oneshot(lynx_timer[which].timer, t, which);
@@ -965,124 +1508,185 @@ static void lynx_timer_write(int which, int offset, UINT8 data)
 	}
 }
 
-static struct {
-    UINT8 serctl;
-    UINT8 data_received, data_to_send, buffer;
 
-    int received;
-    int sending;
-    int buffer_loaded;
+/****************************************
+
+	UART Emulation
+
+****************************************/
+
+
+static struct {
+	UINT8 serctl;
+	UINT8 data_received, data_to_send, buffer;
+
+	int received;
+	int sending;
+	int buffer_loaded;
 } uart;
 
 static void lynx_uart_reset(void)
 {
-    memset(&uart, 0, sizeof(uart));
+	memset(&uart, 0, sizeof(uart));
 }
 
 static TIMER_CALLBACK(lynx_uart_timer)
 {
-    if (uart.buffer_loaded) {
-	uart.data_to_send=uart.buffer;
-	uart.buffer_loaded=FALSE;
-	timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
-    } else {
-	uart.sending=FALSE;
-    }
+	if (uart.buffer_loaded) 
+	{
+		uart.data_to_send = uart.buffer;
+		uart.buffer_loaded = FALSE;
+		timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+	} 
+	else 
+		uart.sending = FALSE;
+
 //    mikey.data[0x80]|=0x10;
-    if (uart.serctl&0x80) {
-	mikey.data[0x81]|=0x10;
-	cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, ASSERT_LINE);
+	if (uart.serctl & 0x80) 
+	{
+		mikey.data[0x81] |= 0x10;
+		cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, ASSERT_LINE);
     }
 }
 
 static  READ8_HANDLER(lynx_uart_r)
 {
-    UINT8 data=0;
-    switch (offset) {
-    case 0x8c:
-	if (!uart.buffer_loaded) data|=0x80;
-	if (uart.received) data|=0x40;
-	if (!uart.sending) data|=0x20;
-	break;
-    case 0x8d:
-	data=uart.data_received;
-	break;
-    }
-    logerror("uart read %.2x %.2x\n",offset,data);
-    return data;
+	UINT8 value = 0x00;
+	switch (offset) 
+	{
+		case 0x8c:
+			if (!uart.buffer_loaded) 
+				value |= 0x80;
+			if (uart.received) 
+				value |= 0x40;
+			if (!uart.sending)
+				value |= 0x20;
+			break;
+
+		case 0x8d:
+			value = uart.data_received;
+			break;
+	}
+	logerror("uart read %.2x %.2x\n", offset, value);
+	return value;
 }
 
 static WRITE8_HANDLER(lynx_uart_w)
 {
-    logerror("uart write %.2x %.2x\n",offset,data);
-    switch (offset) {
-    case 0x8c:
-	uart.serctl=data;
-	break;
-    case 0x8d:
-	if (uart.sending) {
-	    uart.buffer=data;
-	    uart.buffer_loaded=TRUE;
-	} else {
-	    uart.sending=TRUE;
-	    uart.data_to_send=data;
-	    timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+	logerror("uart write %.2x %.2x\n", offset, data);
+	switch (offset) 
+	{
+		case 0x8c:
+			uart.serctl = data;
+			break;
+
+		case 0x8d:
+			if (uart.sending) 
+			{
+				uart.buffer = data;
+				uart.buffer_loaded = TRUE;
+			} 
+			else 
+			{
+				uart.sending = TRUE;
+				uart.data_to_send = data;
+				timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+			}
+			break;
 	}
-	break;
-    }
 }
 
- READ8_HANDLER(mikey_read)
-{
-    UINT8 data=0;
-    switch (offset) {
-    case 0: case 1: case 2: case 3:
-    case 4: case 5: case 6: case 7:
-    case 8: case 9: case 0xa: case 0xb:
-    case 0xc: case 0xd: case 0xe: case 0xf:
-    case 0x10: case 0x11: case 0x12: case 0x13:
-    case 0x14: case 0x15: case 0x16: case 0x17:
-    case 0x18: case 0x19: case 0x1a: case 0x1b:
-    case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-		data = lynx_timer_read( offset >> 2, offset & 3 );
-		return data;
-    case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
-    case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-    case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
-    case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-    case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		data = lynx_audio_read( offset );
-		return data;
-    case 0x81:
-		data = mikey.data[offset];
-		logerror( "mikey read %.2x %.2x\n", offset, data );
-		break;
-    case 0x8b:
-		data = mikey.data[offset];
-		data |= 4; // no comlynx adapter
-		break;
-    case 0x8c: case 0x8d:
-		data = lynx_uart_r(machine, offset);
-		break;
-    default:
-		data = mikey.data[offset];
-		logerror( "mikey read %.2x %.2x\n", offset, data );
-    }
-    return data;
-}
 
-WRITE8_HANDLER(mikey_write)
+/****************************************
+
+	Mikey memory handlers
+
+****************************************/
+
+
+READ8_HANDLER(mikey_read)
 {
-	switch (offset) {
-	case 0: case 1: case 2: case 3:
-	case 4: case 5: case 6: case 7:
-	case 8: case 9: case 0xa: case 0xb:
-	case 0xc: case 0xd: case 0xe: case 0xf:
+	UINT8 direction, value = 0x00;
+
+	switch (offset) 
+	{
+	case 0x00: case 0x01: case 0x02: case 0x03:
+	case 0x04: case 0x05: case 0x06: case 0x07:
+	case 0x08: case 0x09: case 0x0a: case 0x0b:
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 	case 0x10: case 0x11: case 0x12: case 0x13:
 	case 0x14: case 0x15: case 0x16: case 0x17:
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
 	case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-		lynx_timer_write( offset >> 2, offset & 3, data );
+		value = lynx_timer_read(offset >> 2, offset & 0x03);
+		break;
+
+	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
+	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
+	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
+		value = lynx_audio_read(offset);
+		break;
+
+	case 0x80:
+	case 0x81:
+		value = mikey.data[offset];
+		logerror( "mikey read %.2x %.2x\n", offset, value );
+		break;
+
+	case 0x84:
+	case 0x85:
+		value = 0x00;
+		break;
+
+	case 0x86:
+		value = 0x80;
+		break;
+
+	case 0x88:
+		value = 0x01;
+		break;
+
+	case 0x8b:
+		direction = mikey.data[0x8a];
+		value |= (direction & 0x01) ? (mikey.data[offset] & 0x01) : 0x01;	// External Power input
+		value |= (direction & 0x02) ? (mikey.data[offset] & 0x02) : 0x00;	// Cart Address Data output (0 turns cart power on)
+		value |= (direction & 0x04) ? (mikey.data[offset] & 0x04) : 0x04;	// noexp input
+		// REST still to implement
+		value |= (direction & 0x08) ? (mikey.data[offset] & 0x08) : 0x00;	// rest output
+		value |= (direction & 0x10) ? (mikey.data[offset] & 0x10) : 0x10;	// audin input
+		/* Hack: we disable COMLynx  */
+		value |= 0x04;
+		/* B5, B6 & B7 are not used */
+		break;
+
+	case 0x8c: 
+	case 0x8d:
+		value = lynx_uart_r(machine, offset);
+		break;
+
+	default:
+		value = mikey.data[offset];
+		logerror( "mikey read %.2x %.2x\n", offset, value );
+	}
+
+	return value;
+}
+
+WRITE8_HANDLER(mikey_write)
+{
+	switch (offset) 
+	{
+	case 0x00: case 0x01: case 0x02: case 0x03:
+	case 0x04: case 0x05: case 0x06: case 0x07:
+	case 0x08: case 0x09: case 0x0a: case 0x0b:
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+	case 0x10: case 0x11: case 0x12: case 0x13:
+	case 0x14: case 0x15: case 0x16: case 0x17:
+	case 0x18: case 0x19: case 0x1a: case 0x1b:
+	case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+		lynx_timer_write(offset >> 2, offset & 3, data);
 		return;
 
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
@@ -1094,28 +1698,34 @@ WRITE8_HANDLER(mikey_write)
 		return;
 
 	case 0x80:
-		mikey.data[0x81]&=~data; // clear interrupt source
-		logerror("mikey write %.2x %.2x\n",offset,data);
+		mikey.data[0x81] &= ~data; // clear interrupt source
+		logerror("mikey write %.2x %.2x\n", offset, data);
 		if (!mikey.data[0x81])
 			cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
+	/* Is this correct? */
+	case 0x81:
+		mikey.data[offset] |= data;
+		break;
+
 	case 0x87:
-		mikey.data[offset]=data; //?
-		if (data&2)
+		mikey.data[offset] = data;
+		if (data & 0x02)		// Power (1 = on)
 		{
-			if (data&1)
+			if (data & 0x01)	// Cart Address Strobe
 			{
-				suzy.high<<=1;
-				if (mikey.data[0x8b]&2)
-					suzy.high|=1;
-				suzy.low=0;
+				suzy.high <<= 1;
+				if (mikey.data[0x8b] & 0x02)
+					suzy.high |= 1;
+				suzy.high &= 0xff;
+				suzy.low = 0;
 			}
 		}
 		else
 		{
-			suzy.high=0;
-			suzy.low=0;
+			suzy.high = 0;
+			suzy.low = 0;
 		}
 		break;
 
@@ -1127,30 +1737,45 @@ WRITE8_HANDLER(mikey_write)
 	case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 	case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-		mikey.data[offset]=data;
+		mikey.data[offset] = data;
 		lynx_draw_lines(machine, lynx_line);
-#if 0
-		palette_set_color_rgb(offset&0xf,
-					(mikey.data[0xb0+(offset&0xf)]&0xf)<<4,
-					(mikey.data[0xa0+(offset&0xf)]&0xf)<<4,
-					mikey.data[0xb0+(offset&0xf)]&0xf0 );
-#else
-		lynx_palette[offset&0xf]=machine->pens[((mikey.data[0xb0+(offset&0xf)]&0xf))
-			|((mikey.data[0xa0+(offset&0xf)]&0xf)<<4)
-			|((mikey.data[0xb0+(offset&0xf)]&0xf0)<<4)];
-#endif
+
+		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
+		lynx_palette[offset & 0x0f] = machine->pens[
+			((mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
+			((mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
+			((mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4)];
 		break;
 
-    case 0x8b:case 0x90:case 0x91:
-		mikey.data[offset]=data;
+	/* TODO: properly implement these writes */
+	case 0x8b:
+		mikey.data[offset] = data;
+		if (mikey.data[0x8a] & 0x10)
+			logerror("Trying to enable bank 1 write. %d\n", mikey.data[offset] & 0x10);
+		break;
+	
+//	case 0x90: // SDONEACK - Suzy Done Acknowledge
+	case 0x91: // CPUSLEEP - CPU Bus Request Disable
+		mikey.data[offset] = data;
+		if (!data)
+		{
+			/* A write of '0' to this address will reset the CPU bus request flip flop */
+			logerror("CPUSLEEP request \n");
+		}
 		break;
 
-    default:
+	default:
 		mikey.data[offset]=data;
 		logerror("mikey write %.2x %.2x\n",offset,data);
 		break;
-    }
+	}
 }
+
+/****************************************
+
+	Init / Config
+
+****************************************/
 
 READ8_HANDLER( lynx_memory_config_r )
 {
@@ -1159,9 +1784,9 @@ READ8_HANDLER( lynx_memory_config_r )
 
 WRITE8_HANDLER( lynx_memory_config_w )
 {
-    /* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
-     * when these are safe in the cpu */
-    lynx_memory_config = data;
+	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
+	 * when these are safe in the cpu */
+	lynx_memory_config = data;
 
 	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_read);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_write);
@@ -1186,8 +1811,16 @@ static void lynx_reset(running_machine *machine)
 	memset(&suzy, 0, sizeof(suzy));
 	memset(&mikey, 0, sizeof(mikey));
 
-	mikey.data[0x80] = 0;
-	mikey.data[0x81] = 0;
+	suzy.data[0x88]  = 0x01;
+	suzy.data[0x90]  = 0x00;
+	suzy.data[0x91]  = 0x00;
+	mikey.data[0x80] = 0x00;
+	mikey.data[0x81] = 0x00;
+	mikey.data[0x88] = 0x01;
+	mikey.data[0x8a] = 0x00;
+	mikey.data[0x8c] = 0x00;
+	mikey.data[0x90] = 0x00;
+	mikey.data[0x92] = 0x00;
 
 	lynx_uart_reset();
 
@@ -1224,4 +1857,146 @@ MACHINE_START( lynx )
 	memset(&suzy, 0, sizeof(suzy));
 
 	add_reset_callback(machine, lynx_reset);
+}
+
+
+/****************************************
+
+	Image handling
+
+****************************************/
+
+
+static void lynx_partialhash(char *dest, const unsigned char *data,
+	unsigned long length, unsigned int functions)
+{
+	if (length <= 64)
+		return;
+	hash_compute(dest, &data[64], length - 64, functions);
+}
+
+int lynx_verify_cart (char *header, int kind)
+{
+	if (kind)
+	{
+		if (strncmp("BS93", &header[6], 4)) 
+		{
+			logerror("This is not a valid Lynx image\n");
+			return IMAGE_VERIFY_FAIL;
+		}
+	}
+	else
+	{
+		if (strncmp("LYNX",&header[0],4)) 
+		{
+			if (!strncmp("BS93", &header[6], 4)) 
+			{
+				logerror("This image is probably a Quickload image with .lnx extension\n");
+				logerror("Try to load it with -quickload\n");
+			}
+			else
+				logerror("This is not a valid Lynx image\n");
+			return IMAGE_VERIFY_FAIL;
+		}
+	}
+
+	return IMAGE_VERIFY_PASS;
+}
+
+INTERRUPT_GEN( lynx_frame_int )
+{
+    lynx_rotate = rotate;
+    if ((input_port_read(machine, "ROTATION") & 0x03) != 0x03)
+		lynx_rotate=input_port_read(machine, "ROTATION") & 0x03;
+}
+
+void lynx_crc_keyword(const device_config *image)
+{
+    const char *info;
+
+    info = image_extrainfo(image);
+    rotate = 0;
+
+    if (info)
+	{
+		if(strcmp(info, "ROTATE90DEGREE") == 0)
+			rotate = 1;
+		else if (strcmp(info, "ROTATE270DEGREE") == 0)
+			rotate = 2;
+    }
+}
+
+static DEVICE_IMAGE_LOAD( lynx_cart )
+{
+	UINT8 *rom = memory_region(image->machine, "user1");
+	int size = image_length(image);
+	const char *filetype;
+	UINT8 header[0x40];
+/* 64 byte header
+   LYNX
+   intelword lower counter size
+   0 0 1 0
+   32 chars name
+   22 chars manufacturer
+*/
+
+	filetype = image_filetype(image);
+
+	if (!mame_stricmp (filetype, "lnx"))
+	{
+		if (image_fread(image, header, 0x40)!=0x40)
+			return INIT_FAIL;
+
+		/* Check the image */
+		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
+			return INIT_FAIL;
+
+		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using 
+		it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+		implement this as well */
+		lynx_granularity = header[4] | (header[5] << 8);
+
+		logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
+			  header + 10, size / 1024, lynx_granularity, header + 42);
+
+		size -= 0x40;
+	}
+	else if (!mame_stricmp (filetype, "lyx"))
+	{
+		/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity" 
+		(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
+		These should work with most .lyx files, but we need additional info on raw cart images */
+		if (size == 0x20000)
+			lynx_granularity = 0x0200; 
+		else if (size == 0x80000)
+			lynx_granularity = 0x0800; 
+		else 
+			lynx_granularity = 0x0400; 
+	}
+
+	if (image_fread(image, rom, size) != size)
+		return INIT_FAIL;
+
+	lynx_crc_keyword(image);
+
+	return INIT_PASS;
+}
+
+void lynx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cartslot */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(lynx_cart); break;
+		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = lynx_partialhash; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "lnx,lyx"); break;
+
+		default:										cartslot_device_getinfo(devclass, state, info); break;
+	}
 }

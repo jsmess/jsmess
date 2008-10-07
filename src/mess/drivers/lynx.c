@@ -8,184 +8,44 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/snapquik.h"
-#include "devices/cartslot.h"
 #include "includes/lynx.h"
-#include "hash.h"
+
+#include "devices/snapquik.h"
 
 static QUICKLOAD_LOAD( lynx );
-
-static int rotate=0;
-int lynx_rotate;
-static int lynx_line_y;
-UINT32 lynx_palette[0x10];
 
 static ADDRESS_MAP_START( lynx_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_BASE(&lynx_mem_0000)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_BASE(&lynx_mem_fc00)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_BASE(&lynx_mem_fd00)
-	AM_RANGE(0xfe00, 0xfff7) AM_READWRITE( SMH_BANK3, SMH_RAM ) AM_BASE(&lynx_mem_fe00) AM_SIZE(&lynx_mem_fe00_size)
+	AM_RANGE(0xfe00, 0xfff7) AM_READWRITE(SMH_BANK3, SMH_RAM) AM_BASE(&lynx_mem_fe00) AM_SIZE(&lynx_mem_fe00_size)
 	AM_RANGE(0xfff8, 0xfff8) AM_RAM
-	AM_RANGE(0xfff9, 0xfff9) AM_READWRITE( lynx_memory_config_r, lynx_memory_config_w )
-	AM_RANGE(0xfffa, 0xffff) AM_READWRITE( SMH_BANK4, SMH_RAM ) AM_BASE(&lynx_mem_fffa)
+	AM_RANGE(0xfff9, 0xfff9) AM_READWRITE(lynx_memory_config_r, lynx_memory_config_w)
+	AM_RANGE(0xfffa, 0xffff) AM_READWRITE(SMH_BANK4, SMH_RAM) AM_BASE(&lynx_mem_fffa)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lynx )
 	PORT_START("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Opt 2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Opt 1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Opt 2") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Opt 1") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP   )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
 	PORT_START("PAUSE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_3)
 	// power on and power off buttons
+
 	PORT_START("ROTATION")
-	PORT_CONFNAME ( 0x03, 3, "90 Degree Rotation")
-	PORT_CONFSETTING(	2, "Counterclockwise" )
-	PORT_CONFSETTING(	1, "Clockwise" )
-	PORT_CONFSETTING(	0, DEF_STR( None ) )
-	PORT_CONFSETTING(	3, "Crcfile" )
+	PORT_CONFNAME ( 0x03, 0x03, "90 Degree Rotation" )
+	PORT_CONFSETTING(	  0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(	  0x01, "Clockwise" )
+	PORT_CONFSETTING(	  0x02, "Counterclockwise" )
+	PORT_CONFSETTING(	  0x03, "Crcfile" )
 INPUT_PORTS_END
-
-static INTERRUPT_GEN( lynx_frame_int )
-{
-    lynx_rotate=rotate;
-    if ((input_port_read(machine, "ROTATION")&3)!=3)
-		lynx_rotate=input_port_read(machine, "ROTATION")&3;
-}
-
-static UINT8 lynx_read_vram(UINT16 address)
-{
-	UINT8 result = 0x00;
-	if (address <= 0xfbff)
-		result = lynx_mem_0000[address - 0x0000];
-	else if (address <= 0xfcff)
-		result = lynx_mem_fc00[address - 0xfc00];
-	else if (address <= 0xfdff)
-		result = lynx_mem_fd00[address - 0xfd00];
-	else if (address <= 0xfff7)
-		result = lynx_mem_fe00[address - 0xfe00];
-	else if (address >= 0xfffa)
-		result = lynx_mem_fffa[address - 0xfffa];
-	return result;
-}
-
-/*
-DISPCTL EQU $FD92       ; set to $D by INITMIKEY
-
-; B7..B4        0
-; B3    1 EQU color
-; B2    1 EQU 4 bit mode
-; B1    1 EQU flip screen
-; B0    1 EQU video DMA enabled
-*/
-void lynx_draw_lines(running_machine *machine, int newline)
-{
-	static int height=-1, width=-1;
-	int h,w;
-	int x, yend;
-	UINT16 j; // clipping needed!
-	UINT8 byte;
-	UINT16 *line;
-
-	if (video_skip_this_frame()) newline=-1;
-
-	if (newline==-1)
-		yend = 102;
-	else
-		yend = newline;
-
-	if (yend > 102)
-		yend=102;
-
-	if (yend==lynx_line_y)
-	{
-		if (newline==-1)
-			lynx_line_y=0;
-		return;
-	}
-
-	j=(mikey.data[0x94]|(mikey.data[0x95]<<8))+lynx_line_y*160/2;
-	if (mikey.data[0x92]&2)
-		j-=160*102/2-1;
-
-	if (lynx_rotate&3)
-	{
-		/* rotation */
-		h=160; w=102;
-		if ( ((lynx_rotate==1)&&(mikey.data[0x92]&2))
-				||( (lynx_rotate==2)&&!(mikey.data[0x92]&2)) )
-		{
-			for (;lynx_line_y<yend;lynx_line_y++)
-			{
-				line = BITMAP_ADDR16(tmpbitmap, lynx_line_y, 0);
-				for (x=160-2;x>=0;j++,x-=2)
-				{
-					byte = lynx_read_vram(j);
-					line[x + 1] = lynx_palette[(byte >> 4) & 0x0f];
-					line[x + 0] = lynx_palette[(byte >> 0) & 0x0f];
-				}
-			}
-		}
-		else
-		{
-			for (;lynx_line_y<yend;lynx_line_y++)
-			{
-				line = BITMAP_ADDR16(tmpbitmap, 102-1-lynx_line_y, 0);
-				for (x=0;x<160;j++,x+=2)
-				{
-					byte = lynx_read_vram(j);
-					line[x + 0] = lynx_palette[(byte >> 4) & 0x0f];
-					line[x + 1] = lynx_palette[(byte >> 0) & 0x0f];
-				}
-			}
-		}
-	}
-	else
-	{
-		w=160; h=102;
-		if ( mikey.data[0x92]&2)
-		{
-			for (;lynx_line_y<yend;lynx_line_y++)
-			{
-				line = BITMAP_ADDR16(tmpbitmap, 102-1-lynx_line_y, 0);
-				for (x=160-2;x>=0;j++,x-=2)
-				{
-					byte = lynx_read_vram(j);
-					line[x + 1] = lynx_palette[(byte >> 4) & 0x0f];
-					line[x + 0] = lynx_palette[(byte >> 0) & 0x0f];
-				}
-			}
-		}
-		else
-		{
-			for (;lynx_line_y<yend;lynx_line_y++)
-			{
-				line = BITMAP_ADDR16(tmpbitmap, lynx_line_y, 0);
-				for (x=0;x<160;j++,x+=2)
-				{
-					byte = lynx_read_vram(j);
-					line[x + 0] = lynx_palette[(byte >> 4) & 0x0f];
-					line[x + 1] = lynx_palette[(byte >> 0) & 0x0f];
-				}
-			}
-		}
-	}
-	if (newline==-1)
-	{
-		lynx_line_y=0;
-		if ((w!=width)||(h!=height))
-		{
-			width=w;
-			height=h;
-			video_screen_set_visarea(machine->primary_screen, 0, width-1, 0, height-1);
-		}
-	}
-}
 
 static PALETTE_INIT( lynx )
 {
@@ -223,7 +83,7 @@ static MACHINE_DRIVER_START( lynx )
     /* video hardware */
 	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/*MDRV_SCREEN_SIZE(160, 102)*/
 	MDRV_SCREEN_SIZE(160, 160)
@@ -241,7 +101,7 @@ static MACHINE_DRIVER_START( lynx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(lynx, "o", 0)
+	MDRV_QUICKLOAD_ADD(lynx, "o,lnx", 0)
 MACHINE_DRIVER_END
 
 
@@ -287,115 +147,6 @@ ROM_START(lynx2)
 ROM_END
 
 
-
-void lynx_partialhash(char *dest, const unsigned char *data,
-	unsigned long length, unsigned int functions)
-{
-	if (length <= 64)
-		return;
-	hash_compute(dest, &data[64], length - 64, functions);
-}
-
-#define LYNX_CART		0
-#define LYNX_QUICKLOAD	1
-
-static int lynx_verify_cart (char *header, int kind)
-{
-	logerror("Trying Header Compare\n");
-
-	if (kind)
-	{
-		if (strncmp("BS93", &header[6], 4)) 
-		{
-			logerror("Not an valid Lynx image\n");
-			return IMAGE_VERIFY_FAIL;
-		}
-	}
-	else
-	{
-		if (strncmp("LYNX",&header[0],4)) 
-		{
-			logerror("Not an valid Lynx image\n");
-			return IMAGE_VERIFY_FAIL;
-		}
-	}
-
-	logerror("returning ID_OK\n");
-	return IMAGE_VERIFY_PASS;
-}
-
-static void lynx_crc_keyword(const device_config *image)
-{
-    const char *info;
-
-    info = image_extrainfo(image);
-    rotate = 0;
-
-    if (info)
-	{
-		if(strcmp(info, "ROTATE90DEGREE")==0)
-			rotate = 1;
-		else if (strcmp(info, "ROTATE270DEGREE")==0)
-			rotate = 2;
-    }
-}
-
-static DEVICE_IMAGE_LOAD( lynx_cart )
-{
-	UINT8 *rom = memory_region(image->machine, "user1");
-	int size = image_length(image);
-	const char *filetype;
-	UINT8 header[0x40];
-/* 64 byte header
-   LYNX
-   intelword lower counter size
-   0 0 1 0
-   32 chars name
-   22 chars manufacturer
-*/
-
-	filetype = image_filetype(image);
-
-	if (!mame_stricmp (filetype, "lnx"))
-	{
-		if (image_fread(image, header, 0x40)!=0x40)
-			return INIT_FAIL;
-
-		/* Check the image */
-		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
-			return INIT_FAIL;
-
-		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using 
-		it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
-		implement this as well */
-		lynx_granularity = header[4] | (header[5] << 8);
-
-		logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
-			  header + 10, size / 1024, lynx_granularity, header + 42);
-
-		size -= 0x40;
-	}
-	else if (!mame_stricmp (filetype, "lyx"))
-	{
-		/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity" 
-		(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
-		These should work with most .lyx files, but we need additional info on raw cart images */
-		if (size == 0x20000)
-			lynx_granularity = 0x0200; 
-		else if (size == 0x80000)
-			lynx_granularity = 0x0800; 
-		else 
-			lynx_granularity = 0x0400; 
-	}
-
-	if (image_fread(image, rom, size) != size)
-		return INIT_FAIL;
-
-	lynx_crc_keyword(image);
-
-	return INIT_PASS;
-}
-
 static QUICKLOAD_LOAD( lynx )
 {
 	UINT8 *data = NULL;
@@ -429,25 +180,6 @@ static QUICKLOAD_LOAD( lynx )
 	lynx_crc_keyword(device_list_find_by_tag( image->machine->config->devicelist, QUICKLOAD, TAG_QUICKLOAD )); 
 
 	return INIT_PASS;
-}
-
-static void lynx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(lynx_cart); break;
-		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = lynx_partialhash; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "lnx,lyx"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
 }
 
 static SYSTEM_CONFIG_START(lynx)
