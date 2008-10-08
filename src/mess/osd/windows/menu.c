@@ -107,6 +107,87 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 
 
 //============================================================
+//	input_item_from_serial_number
+//============================================================
+
+static int input_item_from_serial_number(running_machine *machine, int serial_number,
+	const input_port_config **port, const input_field_config **field, const input_setting_config **setting)
+{
+	int i;
+	const input_port_config *this_port = NULL;
+	const input_field_config *this_field = NULL;
+	const input_setting_config *this_setting = NULL;
+
+	i = 0;
+	for (this_port = machine->portconfig; (i != serial_number) && (this_port != NULL); this_port = this_port->next)
+	{
+		i++;
+		for (this_field = this_port->fieldlist; (i != serial_number) && (this_field != NULL); this_field = this_field->next)
+		{
+			i++;
+			for (this_setting = this_field->settinglist; (i != serial_number) && (this_setting != NULL); this_setting = this_setting->next)
+			{
+				i++;
+			}
+		}
+	}
+
+	if (this_setting != NULL)
+		this_field = this_setting->field;
+	if (this_field != NULL)
+		this_port = this_field->port;
+
+	if (port != NULL)
+		*port = this_port;
+	if (field != NULL)
+		*field = this_field;
+	if (setting != NULL)
+		*setting = this_setting;
+	return (i == serial_number);
+}
+
+
+
+//============================================================
+//	serial_number_from_input_item
+//============================================================
+
+static int serial_number_from_input_item(running_machine *machine, const input_port_config *port,
+	const input_field_config *field, const input_setting_config *setting)
+{
+	int i;
+	const input_port_config *this_port;
+	const input_field_config *this_field;
+	const input_setting_config *this_setting;
+
+	i = 0;
+	for (this_port = machine->portconfig; this_port != NULL; this_port = this_port->next)
+	{
+		if ((port == this_port) && (field == NULL) && (setting == NULL))
+			return i;
+
+		i++;
+		for (this_field = this_port->fieldlist; this_field != NULL; this_field = this_field->next)
+		{
+			if ((port == this_port) && (field == this_field) && (setting == NULL))
+				return i;
+
+			i++;
+			for (this_setting = this_field->settinglist; this_setting != NULL; this_setting = this_setting->next)
+			{
+				if ((port == this_port) && (field == this_field) && (setting == this_setting))
+					return i;
+
+				i++;
+			}
+		}
+	}
+	return -1;
+}
+
+
+
+//============================================================
 //	customize_input
 //============================================================
 
@@ -1113,7 +1194,8 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 {
 	int joystick_count = 0;
 	HMENU joystick_menu;
-	int i, j;
+	int i;
+	UINT command;
 	HMENU submenu = NULL;
 	const input_port_config *port;
 	const input_field_config *field;
@@ -1141,7 +1223,6 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	if (use_input_categories)
 	{
 		// using input categories
-		i = 0;
 		for (port = machine->portconfig; port != NULL; port = port->next)
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
@@ -1153,19 +1234,19 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 						return;
 
 					// append all of the category settings
-					j = 0;
 					for (setting = field->settinglist; setting != NULL; setting = setting->next)
 					{
-						append_menu_utf8(submenu, MF_STRING, ID_INPUT_0 + j++, setting->name);
+						command = ID_INPUT_0 + serial_number_from_input_item(machine, port, field, setting);
+						append_menu_utf8(submenu, MF_STRING, command, setting->name);
 					}
 
 					// tack on the final items and the menu item
+					command = ID_INPUT_0 + serial_number_from_input_item(machine, port, field, NULL);
 					AppendMenu(submenu, MF_SEPARATOR, 0, NULL);
-					AppendMenu(submenu, MF_STRING, ID_INPUT_0 + i, TEXT("&Configure..."));
+					AppendMenu(submenu, MF_STRING, command, TEXT("&Configure..."));
 					append_menu_utf8(joystick_menu, MF_STRING | MF_POPUP, (UINT_PTR) submenu, field->name);
 					child_count++;
 				}
-				i++;
 			}
 		}
 	}
@@ -1177,7 +1258,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 #endif
 		if (joystick_count > 0)
 		{
-			for(i = 0; i < joystick_count; i++)
+			for (i = 0; i < joystick_count; i++)
 			{
 				snprintf(buf, sizeof(buf) / sizeof(buf[0]), "Joystick %i", i + 1);
 				append_menu_utf8(joystick_menu, MF_STRING, ID_JOYSTICK_0 + i, buf);
@@ -1253,6 +1334,8 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	win_window_info *window = (win_window_info *)ptr;
 	const char *view_name;
 	int view_index;
+	UINT command;
+	input_field_user_settings settings;
 
 	menu_bar = GetMenu(wnd);
 	if (!menu_bar)
@@ -1337,9 +1420,12 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 			{
 				if (field->type == IPT_CATEGORY)
 				{
-					i = 0;
+					input_field_get_user_settings(field, &settings);
 					for (setting = field->settinglist; setting != NULL; setting = setting->next)
-						set_command_state(menu_bar, ID_INPUT_0 + i++, (setting->value == field->defvalue) ? MFS_CHECKED : MFS_ENABLED);
+					{
+						command = ID_INPUT_0 + serial_number_from_input_item(machine, port, field, setting);
+						set_command_state(menu_bar, command, (setting->value == settings.value) ? MFS_CHECKED : MFS_ENABLED);
+					}
 				}
 			}
 		}
@@ -1662,16 +1748,15 @@ static int pause_for_command(UINT command)
 static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 {
 	int handled = 1;
-	int dev_command, i;
+	int dev_command;
 	const device_config *img;
-	int port_count;
 	UINT16 category;
 	const char *section;
-	const input_port_config *port;
 	const input_field_config *field;
 	const input_setting_config *setting;
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	win_window_info *window = (win_window_info *)ptr;
+	input_field_user_settings settings;
 
 	// pause while invoking certain commands
 	if (pause_for_command(command))
@@ -1830,16 +1915,6 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			break;
 
 		default:
-			// quickly come up with a port count, so we can upper bound commands
-			// near ID_INPUT_0
-			port_count = 0;
-			field = NULL;
-			for (port = machine->portconfig; port != NULL; port = port->next)
-			{
-				for (field = port->fieldlist; field != NULL; field = field->next)
-					port_count++;
-			}
-
 			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count()))
 			{
 				// change frameskip
@@ -1861,45 +1936,36 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 				// render views
 				render_target_set_view(window->target, command - ID_VIDEO_VIEW_0);
 			}
-			else if ((command >= ID_INPUT_0) && (command < ID_INPUT_0 + port_count))
+			else if (input_item_from_serial_number(machine, command - ID_INPUT_0, NULL, &field, &setting))
 			{
-				// customize categorized input
-				i = command - ID_INPUT_0;
-				for (port = machine->portconfig; (i > 0) && (port != NULL); port = port->next)
+				if ((field != NULL) && (field->type == IPT_CATEGORY) && (setting != NULL))
 				{
-					for (field = port->fieldlist; (i > 0) && (field != NULL); field = field->next)
-						;
+					// change the input type for this category
+					input_field_get_user_settings(field, &settings);
+					settings.value = setting->value;
+					input_field_set_user_settings(field, &settings);
 				}
-
-				switch(field->type)
+				else if ((field != NULL) && (field->type == IPT_CATEGORY) && (setting == NULL))
 				{
-					case IPT_CATEGORY:
-						// customize the input type
-						category = 0;
-						section = NULL;
-						for (setting = field->settinglist; setting != NULL; setting = setting->next)
+					// customize the input type
+					input_field_get_user_settings(field, &settings);
+					category = 0;
+					section = NULL;
+
+					for (setting = field->settinglist; setting != NULL; setting = setting->next)
+					{
+						if (settings.value == setting->value)
 						{
-							if (field->defvalue == setting->value)
-							{
-								//category = in[i].category;
-								//section = in[i].name;
-							}
+							category = setting->category;
+							section = setting->name;
 						}
-						customize_categorizedinput(machine, wnd, section, category);
-						break;
-
-//					case IPT_CATEGORY_SETTING:
-//						// change the input type for this category
-//						setting = in->default_value;
-//						while((in->type) != IPT_CATEGORY_NAME)
-//							in--;
-//						in->default_value = setting;
-//						break;
-
-					default:
-						// should never happen
-						handled = 0;
-						break;
+					}
+					customize_categorizedinput(machine, wnd, section, category);
+				}
+				else
+				{
+					// should never happen
+					handled = 0;
 				}
 			}
 			else
