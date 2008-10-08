@@ -129,7 +129,7 @@ static void sms_get_inputs(running_machine *machine) {
 	/* Player 1 */
 	switch( input_port_read(machine, "CTRLSEL") & 0x0F ) {
 	case 0x00:  /* Joystick */
-		data = input_port_read(machine, "JOY0");
+		data = input_port_read(machine, "PORT_DC");
 		/* Rapid Fire setting for Button A */
 		if ( input_port_read(machine, "RFU") & 0x01 ) {
 			data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
@@ -149,7 +149,7 @@ static void sms_get_inputs(running_machine *machine) {
 			data = data >> 4;
 		}
 		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x0F ) | ( paddle_read_state & 0x20 )
-		                | ( ( input_port_read(machine, "IN0") & 0x02 ) << 3 );
+		                | ( ( input_port_read(machine, "CTRLIPT") & 0x02 ) << 3 );
 		break;
 	case 0x03:	/* Sega Sports Pad */
 		switch( sports_pad_state_1 ) {
@@ -166,16 +166,16 @@ static void sms_get_inputs(running_machine *machine) {
 			data = sports_pad_1_y & 0x0F;
 			break;
 		}
-		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | data | ( ( input_port_read(machine, "IN0") & 0x0C ) << 2 );
+		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | data | ( ( input_port_read(machine, "CTRLIPT") & 0x0C ) << 2 );
 		break;
 	}
 
 	/* Player 2 */
 	switch( input_port_read(machine, "CTRLSEL") >> 4 ) {
 	case 0x00:	/* Joystick */
-		data = input_port_read(machine, "JOY0");
+		data = input_port_read(machine, "PORT_DC");
 		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( data & 0xC0 );
-		data = input_port_read(machine, "JOY1");
+		data = input_port_read(machine, "PORT_DD");
 		if ( input_port_read(machine, "RFU") & 0x04 ) {
 			data = ( data & 0xFB ) | ( rapid_fire_state_2 & 0x04 );
 		}
@@ -194,7 +194,7 @@ static void sms_get_inputs(running_machine *machine) {
 		}
 		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
 		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( ( data & 0x0C ) >> 2 ) | ( paddle_read_state & 0x08 )
-		                | ( ( input_port_read(machine, "IN0") & 0x20 ) >> 3 );
+		                | ( ( input_port_read(machine, "CTRLIPT") & 0x20 ) >> 3 );
 		break;
 	case 0x03:	/* Sega Sports Pad */
 		switch( sports_pad_state_2 ) {
@@ -211,7 +211,7 @@ static void sms_get_inputs(running_machine *machine) {
 			break;
 		}
 		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
-		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data >> 2 ) | ( ( input_port_read(machine, "IN0") & 0xC0 ) >> 4 );
+		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data >> 2 ) | ( ( input_port_read(machine, "CTRLIPT") & 0xC0 ) >> 4 );
 		break;
 	}
 }
@@ -280,7 +280,7 @@ READ8_HANDLER(sms_count_r) {
 
 void sms_check_pause_button( running_machine *machine ) {
 	if ( ! IS_GAMEGEAR ) {
-		if ( ! (input_port_read(machine, "JOY2") & 0x80) ) {
+		if ( ! (input_port_read(machine, "PAUSE") & 0x80) ) {
 			if ( ! smsPaused ) {
 				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE );
 				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
@@ -315,8 +315,8 @@ WRITE8_HANDLER(sms_ym2413_data_port_0_w) {
 }
 
  READ8_HANDLER(gg_input_port_2_r) {
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", (( IS_REGION_JAPAN ? 0x00 : 0x40) | (input_port_read(machine, "JOY2") & 0x80)), activecpu_get_pc());
-	return (( IS_REGION_JAPAN ? 0x00 : 0x40 ) | (input_port_read(machine, "JOY2") & 0x80));
+	//logerror("joy 2 read, val: %02x, pc: %04x\n", (( IS_REGION_JAPAN ? 0x00 : 0x40) | (input_port_read(machine, "START") & 0x80)), activecpu_get_pc());
+	return (( IS_REGION_JAPAN ? 0x00 : 0x40 ) | (input_port_read(machine, "START") & 0x80));
 }
 
  READ8_HANDLER(sms_mapper_r)
