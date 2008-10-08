@@ -113,13 +113,17 @@ System Driver Changes:
 
 - [EXIDY] Added support for 1200 baud cassette images. [Wilbert Pol]
 
+- [FAMICOM] Fixed small Disk loading bug which caused "Disk Trouble Err. 
+  22" with all disk images (remaining part of bug #1479). Famicom Disk 
+  System is back to working status [Fabio Priuli]
+
 - [GENESIS / MD] Added possibility to choose between a 3 buttons and a 6
   buttons Joypad. [Fabio Priuli]
 
 - [GENEVE] Fixed RTC to start on Sunday.  [Michael Zapf]
 
-- [INTV] Added partial support for images in .int/.itv/.bin format. Images in .rom
-  format are still preferred. [Fabio Priuli]
+- [INTV] Added partial support for images in .int/.itv/.bin format. Images 
+  in .rom format are still preferred. [Fabio Priuli]
 
 - [LYNX] Added support for images in .lyx format [Fabio Priuli]
 
@@ -146,13 +150,13 @@ System Driver Changes:
   loaded. [Curt Coder]
 
 - [SNES] Improved special chips detection (if you run MESS with -log you will
-  be warned of the presence of unemulated chips in error.log), memory handling,
-  cart and SRAM mirroring [Fabio Priuli]
+  be warned of the presence of unemulated chips in error.log), memory 
+  handling, cart and SRAM mirroring [Fabio Priuli]
 
 - [SNES] Fixed inputs in Super Street Fighter 2 (bug #437) [Fabio Priuli]
 
-- [SNES] Added support for the emulation of the DSP-2 and OBC-1 add-on chips. Code 
-  based on byuu's implementation in BSNES (thanks byuu) [Fabio Priuli]
+- [SNES] Added support for the emulation of the DSP-2 and OBC-1 add-on chips. 
+  Code based on byuu's implementation in BSNES (thanks byuu) [Fabio Priuli]
 
 - [SPECTRUM] Added lot of Spectrum clones and custom ROM's [Miodrag Milanovic]
 
@@ -165,8 +169,8 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
-- [TRS80] Added proper cassette emulation support (both .wav and .cas. formats) 
-  [Wilbert Pol]
+- [TRS80] Added proper cassette emulation support (both .wav and .cas. 
+  formats) [Wilbert Pol]
 
 - [VIC20] Added support for tape emulation using MESS core functions 
   (loading and saving, both .wav and .tap formats) [Fabio Priuli]

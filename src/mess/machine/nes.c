@@ -8,7 +8,6 @@
 #include "hash.h"
 
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -90,7 +89,11 @@ static void init_nes_core (running_machine *machine)
 	{
 		case 20:
 			nes.slow_banking = 0;
-			nes_fds.data = auto_malloc( 0x8000 );
+			/* If we are loading a disk we have already filled nes_fds.data and we don't want to overwrite it, 
+			if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc 
+			memory for the bank 2 pointer */
+			if (nes_fds.data == NULL)
+				nes_fds.data = auto_malloc( 0x8000 );
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4030, 0x403f, 0, 0, fds_r);
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xdfff, 0, 0, SMH_BANK2);
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK1);
@@ -406,10 +409,10 @@ WRITE8_HANDLER ( nes_IN1_w )
 
 
 
-DEVICE_IMAGE_LOAD(nes_cart)
+DEVICE_IMAGE_LOAD( nes_cart )
 {
 	const char *mapinfo;
-	int mapint1=0,mapint2=0,mapint3=0,mapint4=0,goodcrcinfo = 0;
+	int mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0, goodcrcinfo = 0;
 	char magic[4];
 	char skank[8];
 	int local_options = 0;
@@ -420,12 +423,14 @@ DEVICE_IMAGE_LOAD(nes_cart)
 	memset(magic, '\0', sizeof(magic));
 	image_fread(image, magic, 4);
 
-	if ((magic[0] != 'N') ||
-		(magic[1] != 'E') ||
-		(magic[2] != 'S'))
-		goto bad;
+	if ((magic[0] != 'N') || (magic[1] != 'E') || (magic[2] != 'S'))
+	{
+		logerror("BAD section hit during LOAD ROM.\n");
+		return INIT_FAIL;
+	}
 
 	mapinfo = image_extrainfo(image);
+
 	if (mapinfo)
 	{
 		if (4 == sscanf(mapinfo,"%d %d %d %d",&mapint1,&mapint2,&mapint3,&mapint4))
@@ -436,14 +441,17 @@ DEVICE_IMAGE_LOAD(nes_cart)
 			nes.chr_chunks = mapint4;
 			logerror("NES.CRC info: %d %d %d %d\n",mapint1,mapint2,mapint3,mapint4);
 			goodcrcinfo = 1;
-		} else
+		} 
+		else
 		{
 			logerror("NES: [%s], Invalid mapinfo found\n",mapinfo);
 		}
-	} else
+	} 
+	else
 	{
 		logerror("NES: No extrainfo found\n");
 	}
+
 	if (!goodcrcinfo)
 	{
 		// image_extrainfo() resets the file position back to start.
@@ -496,7 +504,7 @@ DEVICE_IMAGE_LOAD(nes_cart)
 	memory_region_free (image->machine, "gfx1");
 
 	/* Allocate them again with the proper size */
-	memory_region_alloc(image->machine, "main", 0x10000 + (nes.prg_chunks+1) * 0x4000,0);
+	memory_region_alloc(image->machine, "main", 0x10000 + (nes.prg_chunks + 1) * 0x4000,0);
 	if (nes.chr_chunks)
 		memory_region_alloc(image->machine, "gfx1", nes.chr_chunks * 0x2000,0);
 
@@ -544,7 +552,7 @@ DEVICE_IMAGE_LOAD(nes_cart)
 
 	logerror("**\n");
 	logerror("Mapper: %d\n", nes.mapper);
-	logerror("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000*nes.prg_chunks);
+	logerror("PRG chunks: %02x, size: %06x\n", nes.prg_chunks, 0x4000 * nes.prg_chunks);
 
 	/* Read in any chr chunks */
 	if (nes.chr_chunks > 0)
@@ -554,7 +562,7 @@ DEVICE_IMAGE_LOAD(nes_cart)
 			logerror("Warning: VROM has been found in VRAM-based mapper. Either the mapper is set wrong or the ROM image is incorrect.\n");
 	}
 
-	logerror("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000*nes.chr_chunks);
+	logerror("CHR chunks: %02x, size: %06x\n", nes.chr_chunks, 0x4000 * nes.chr_chunks);
 	logerror("**\n");
 
 	/* Attempt to load a battery file for this ROM. If successful, we */
@@ -563,10 +571,6 @@ DEVICE_IMAGE_LOAD(nes_cart)
 		image_battery_load(image, battery_data, BATTERY_SIZE);
 
 	return INIT_PASS;
-
-bad:
-	logerror("BAD section hit during LOAD ROM.\n");
-	return INIT_FAIL;
 }
 
 
@@ -603,9 +607,7 @@ DEVICE_IMAGE_LOAD(nes_disk)
 
 	/* See if it has a  redundant header on it */
 	image_fread(image, magic, 4);
-	if ((magic[0] == 'F') &&
-		(magic[1] == 'D') &&
-		(magic[2] == 'S'))
+	if ((magic[0] == 'F') && (magic[1] == 'D') && (magic[2] == 'S'))
 	{
 		/* Skip past the redundant header */
 		image_fseek (image, 0x10, SEEK_SET);
@@ -621,7 +623,7 @@ DEVICE_IMAGE_LOAD(nes_disk)
 		nes_fds.data = image_realloc(image, nes_fds.data, nes_fds.sides * 65500);
 		if (!nes_fds.data)
 			return INIT_FAIL;
-		image_fread (image, nes_fds.data + ((nes_fds.sides-1) * 65500), 65500);
+		image_fread (image, nes_fds.data + ((nes_fds.sides - 1) * 65500), 65500);
 	}
 
 	logerror("Number of sides: %d\n", nes_fds.sides);
