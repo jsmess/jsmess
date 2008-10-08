@@ -59,14 +59,18 @@ Philips NMS-8250
 Philips NMS-8255
 Philips NMS-8280
 Philips NMS-8280G
+Philips VG-8000
+Philips VG-8010
 Philips VG-8020-00
 Philips VG-8020-20
+Philips VG-8020-40
 Philips VG-8230
 Philips VG-8235
 Philips VG-8235F
 Philips VG-8240
 Pioneer PX-7
 Sanyo MPC-100
+Sanyo PHC-28S
 Sanyo Wavy PHC-23
 Sanyo Wavy PHC-35J
 Sanyo Wavy PHC70FD1
@@ -76,6 +80,7 @@ Sharp Epcom HotBit 1.2
 Sharp Epcom HotBit 1.3b
 Sharp Epcom HotBit 1.3p
 Sharp Epcom HotBit 2.0
+Sony HB-10P
 Sony HB-201
 Sony HB-201P
 Sony HB-501P
@@ -89,6 +94,7 @@ Sony HB-F1XD
 Sony HB-F1XD MK2
 Sony HB-F1XDJ
 Sony HB-F1XV
+Sony HB-F5
 Sony HB-F500
 Sony HB-F500P
 Sony HB-F700D
@@ -97,10 +103,10 @@ Sony HB-F700P
 Sony HB-F700S
 Sony HB-F900
 Sony HB-F9P
-Sony HB-F9P
 Sony HB-F9S
 Sony HB-G900AP
 Sony HB-G900P
+Sony HB-T7
 Spectravideo SVI-728
 Spectravideo SVI-738
 Talent DPC-200
