@@ -596,7 +596,7 @@ static void lynx_blit_lines(void)
 {
 	int i, hi, y;
 	int ydir = 0, xdir = 0;
-	int flip;
+	int flip = 0;
 
 	blitter.everon = FALSE;
 
