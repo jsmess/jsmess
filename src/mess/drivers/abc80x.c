@@ -173,7 +173,6 @@ static void abc800_keyboard_scan(running_machine *machine)
 
 			z80dart_set_dcd(state->z80dart, 1, 1);
 			z80dart_receive_data(state->z80dart, 1, keycode);
-			logerror("KEYCODE WRITE: %02x\n", keycode);
 			keylatch = keycode;
 		}
 	}
@@ -457,6 +456,7 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
+//	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800m_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800m_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x50, 0x53) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
@@ -493,7 +493,7 @@ static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x50, 0x53) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
@@ -647,6 +647,47 @@ static INPUT_PORTS_START( abc800 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("SW1")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPNAME( 0x05, 0x00, "Drive 0" ) PORT_DIPLOCATION("SW1:1,3") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, "SS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x04, "SS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x01, "DS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x05, "DS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x0a, 0x00, "Drive 1" ) PORT_DIPLOCATION("SW1:2,4") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, "SS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x08, "SS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x02, "DS SD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x0a, "DS DD" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x05, 0x01, "Drive 0" ) PORT_DIPLOCATION("SW1:1,3") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "SS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x04, "SS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, "DS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x05, "DS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x0a, 0x02, "Drive 1" ) PORT_DIPLOCATION("SW1:2,4") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "SS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x08, "SS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x02, "DS DD 80" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0a, "DS DD 40" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x0f, 0x08, "Disk Drive" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x08, "BASF 6106/08 (ABC 830, 190 9206-16)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x09, "MPI 51 (ABC 830, 190 9206-16)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x04, "BASF 6118 (ABC 832, 190 9711-16)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x03, "Micropolis 1015F (ABC 832, 190 9711-15)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x05, "Micropolis 1115F (ABC 832, 190 9711-17)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, "TEAC FD55F (ABC 834, 230 7802-01)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x02, "BASF 6138 (ABC 850, 230 8440-15)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x0e, "BASF 6105" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x0f, "BASF 6106 (ABC 838, 230 8838-15)" ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+
+	PORT_START("SW3")
+	PORT_DIPNAME( 0x7f, 0x2d, "Disk Drive" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
+	PORT_DIPSETTING(    0x2c, "ABC 832/834/850" )
+	PORT_DIPSETTING(    0x2d, "ABC 830" )
+	PORT_DIPSETTING(    0x2e, "ABC 838" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc802 )
@@ -686,7 +727,7 @@ static WRITE8_DEVICE_HANDLER( abc800_ctc_z2_w )
 
 static const z80ctc_interface abc800_ctc_intf =
 {
-	Z80_TAG,					/* cpu */
+	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,              		/* timer disables */
 	0,				  		/* interrupt handler */
@@ -706,7 +747,7 @@ static int sio_serial_receive( const device_config *device, int channel )
 
 static z80sio_interface abc800_sio_intf =
 {
-	Z80_TAG,					/* cpu */
+	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	0,						/* DTR changed handler */
@@ -773,9 +814,9 @@ static MACHINE_START( abc800 )
 
 	/* find devices */
 
-	state->z80ctc = device_list_find_by_tag(machine->config->devicelist, Z80CTC, Z80CTC_TAG);
-	state->z80dart = device_list_find_by_tag(machine->config->devicelist, Z80DART, Z80DART_TAG);
-	state->z80sio = device_list_find_by_tag(machine->config->devicelist, Z80SIO, Z80SIO_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
 
 	/* allocate timer */
 
@@ -841,9 +882,9 @@ static MACHINE_START( abc802 )
 
 	/* find devices */
 
-	state->z80ctc = device_list_find_by_tag(machine->config->devicelist, Z80CTC, Z80CTC_TAG);
-	state->z80dart = device_list_find_by_tag(machine->config->devicelist, Z80DART, Z80DART_TAG);
-	state->z80sio = device_list_find_by_tag(machine->config->devicelist, Z80SIO, Z80SIO_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
 
 	/* allocate timer */
 
@@ -919,10 +960,10 @@ static MACHINE_START( abc806 )
 
 	/* find devices */
 
-	state->z80ctc = device_list_find_by_tag(machine->config->devicelist, Z80CTC, Z80CTC_TAG);
-	state->z80dart = device_list_find_by_tag(machine->config->devicelist, Z80DART, Z80DART_TAG);
-	state->z80sio = device_list_find_by_tag(machine->config->devicelist, Z80SIO, Z80SIO_TAG);
-	state->e0516 = device_list_find_by_tag(machine->config->devicelist, E0516, E0516_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
+	state->e0516 = devtag_get_device(machine, E0516, E0516_TAG);
 
 	/* allocate timer */
 
@@ -1107,6 +1148,17 @@ MACHINE_DRIVER_END
     ABC 6-3X    ABC838
     UFD 6.XX    Winchester
 
+
+	Floppy Controllers
+
+	Art N/O
+	--------
+	55 10760-01		
+	55 20900-0x		
+	55 21046-11		Luxor Conkort	25 pin D-sub connector
+	55 21046-21		Luxor Conkort	34 pin FDD connector
+	55 21046-41		Luxor Conkort	both of the above
+
 */
 
 #define ROM_ABC99 \
@@ -1131,13 +1183,17 @@ ROM_START( abc800m )
 
 	ROM_REGION( 0x2000, "user1", 0 )
 	// Fast Controller
-	ROM_LOAD( "fast108.bin",  0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-	ROM_LOAD( "fast207.bin",  0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
-
+	ROM_LOAD( "6490318-07.bin", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
+	ROM_LOAD( "fast108.bin",	0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.bin",	0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
+	
 	// MyAB Turbo-Kontroller
 	ROM_LOAD( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
 	ROM_LOAD( "unidiskh.bin", 0x0000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
 	ROM_LOAD( "unidisk8.bin", 0x0000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
+
+	// ABC-830
+	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // ABC830 with MPI drives. Styrkort Artnr 5510760-01
 
 	// ABC-832
 	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
@@ -1154,7 +1210,7 @@ ROM_START( abc800m )
 	// ABC-856
 	ROM_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3) ) // Micropolis 1325
 
-	// unknown
+	// XEBEC HDC
 	ROM_LOAD( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038
 	ROM_LOAD( "st225.bin",    0x0000, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225
 ROM_END
