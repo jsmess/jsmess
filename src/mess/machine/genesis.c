@@ -7,6 +7,10 @@
 
 	2008-09: Moved here cart code and custom mapper handlers. Hopefully,
 		it will make painless the future merging with HazeMD
+	2008-10: Fixed SRAM, matching as much as possible HazeMD. Some game is 
+		not detected, however. E.g. Sonic 3. Also some games seem false
+		positives (e.g. Wonderboy 5: according to its headers it should
+		have 1byte of SRAM). Better detection routines would be welcome.
 
 ***************************************************************************/
 
@@ -30,11 +34,12 @@ static int genesis_last_loaded_image_length = -1;
 /* where a fresh copy of rom is stashed for reset and banking setup */
 #define VIRGIN_COPY_GEN 0xd00000
 
-static UINT8 *genesis_sram;
-static int genesis_sram_start;
-static int genesis_sram_len = 0;
-static int genesis_sram_active;
-static int genesis_sram_readonly;
+static UINT16 *genesis_sram, *megadriv_backupram;
+static int genesis_sram_start = 0;
+static int genesis_sram_end = 0;
+static int genesis_sram_active = 0;
+static int genesis_sram_readonly = 0;
+static int has_sram = 0;
 
 
 enum 
@@ -567,37 +572,29 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 
 static READ16_HANDLER( genesis_sram_read )
 {
-	UINT16 retval = 0;
-
-	offset <<= 1;
-
-	if (genesis_sram_active)
-	{
-		retval |= genesis_sram[offset] << 8;
-		retval |= genesis_sram[offset ^ 1] & 0xff;
-	}
-
-	return retval;
+	return genesis_sram_active ? genesis_sram[offset] : 0;
 }
 
 static WRITE16_HANDLER( genesis_sram_write )
 {
-	offset <<= 1;
-
-	if (!genesis_sram_readonly)
+	if (genesis_sram_active)
 	{
-		genesis_sram[offset] = data >> 8;
-		genesis_sram[offset ^ 1] = data & 0xff;
+		if (!genesis_sram_readonly)
+			genesis_sram[offset] = data;
 	}
 }
 
 static WRITE16_HANDLER( genesis_sram_toggle )
 {
-        /* unsure if this is actually supposed to toggle or just switch on?
-		 * Yet to encounter game that utilizes
-		 */
-        genesis_sram_active = (data & 1) ? 1 : 0;
-        genesis_sram_readonly = (data & 2) ? 1 : 0;
+
+	/* unsure if this is actually supposed to toggle or just switch on?
+	* Yet to encounter game that utilizes
+	*/
+	genesis_sram_active = (data & 1) ? 1 : 0;
+	genesis_sram_readonly = (data & 2) ? 1 : 0;
+		
+	if (genesis_sram_active)
+		memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start);
 }
 
 
@@ -808,33 +805,10 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13039, 0, 0, s19in1_bank);
 	}
 
-	/* check if cart has battery save */
-	genesis_sram_len = 0;
-	genesis_sram = NULL;
-	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+	if (has_sram)
 	{
-		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
-		genesis_sram_len = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
-	}
-
-	if (genesis_sram_start != genesis_sram_len)
-	{
-		if (genesis_sram_start & 1)
-			genesis_sram_start -= 1;
-
-		if (!(genesis_sram_len & 1))
-			genesis_sram_len += 1;
-
-		genesis_sram_len -= (genesis_sram_start - 1);
-		genesis_sram = auto_malloc (genesis_sram_len);
-		memset(genesis_sram, 0, genesis_sram_len);
-		image_battery_load(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
-
-		if (genesis_last_loaded_image_length - 0x200 < genesis_sram_start)
-			genesis_sram_active = 1;
-
-        memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, (genesis_sram_start + genesis_sram_len - 1) & 0x3fffff, 0, 0, genesis_sram_read);
-        memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, (genesis_sram_start + genesis_sram_len - 1) & 0x3fffff, 0, 0, genesis_sram_write);
+        memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_read);
+        memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_write);
         memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
 	}
 
@@ -983,9 +957,6 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 #ifdef LSB_FIRST
 	unsigned char fliptemp;
 #endif
-
-	genesis_sram = NULL;
-	genesis_sram_start = genesis_sram_len = genesis_sram_active = genesis_sram_readonly = 0;
 
 	rawROM = memory_region(image->machine, "main");
 	ROM = rawROM /*+ 512 */;
@@ -1208,6 +1179,43 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	logerror("cart type: %d\n", cart_type);
 
+	/* check if cart has battery save */
+	genesis_sram = NULL;
+	
+	/* This is not enough! some games (e.g. Sonic 3) are not detected */
+	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+	{
+		has_sram = 1;
+		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
+		genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
+
+		if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
+			genesis_sram_end = genesis_sram_start + 0x10000;
+
+		/* This fixes Wonderboy 5, but we need more info on the SRAM and a better detection routine! */
+		if ((genesis_sram_end - genesis_sram_start) < 0x800 )
+			has_sram = 0;
+
+		if (genesis_sram_start & 1)
+			genesis_sram_start -= 1;
+
+		if (!(genesis_sram_end & 1))
+			genesis_sram_end += 1;
+		
+		genesis_sram = malloc_or_die(genesis_sram_end - genesis_sram_start);
+		image_battery_load(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_end - genesis_sram_start);
+
+		megadriv_backupram = (UINT16*)ROM + ((genesis_sram_start & 0x3fffff) / 2);
+		memmove(&megadriv_backupram[0], genesis_sram, genesis_sram_end - genesis_sram_start);
+
+		if (genesis_last_loaded_image_length < genesis_sram_start)
+			genesis_sram_active = 1;
+	}
+
+	logerror("SRAM detected? %s\n", has_sram ? "Yes" : "No");
+	if (has_sram)
+		logerror("SRAM starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start);
+
 	return INIT_PASS;
 }
 
@@ -1217,9 +1225,9 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 static DEVICE_IMAGE_UNLOAD( genesis_cart )
 {
 	/* Write out the battery file if necessary */
-	if ((genesis_sram != NULL) && (genesis_sram_len > 0))
+	if (has_sram && (genesis_sram != NULL) && (genesis_sram_end - genesis_sram_start > 0))
 	{
-		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_len);
+		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_end - genesis_sram_start);
 	}
 }
 

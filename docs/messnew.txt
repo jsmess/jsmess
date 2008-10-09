@@ -120,6 +120,8 @@ System Driver Changes:
 - [GENESIS / MD] Added possibility to choose between a 3 buttons and a 6
   buttons Joypad. [Fabio Priuli]
 
+- [GENESIS / MD] Fixed SRAM saving & loading in many games [Fabio Priuli]
+
 - [GENEVE] Fixed RTC to start on Sunday.  [Michael Zapf]
 
 - [INTV] Added partial support for images in .int/.itv/.bin format. Images 
