@@ -454,12 +454,7 @@ INPUT_PORTS_END
     bit     7       6       5       4       3       2       1       0
          nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
 
-    These values scaled up to 0-255 range would give modifiers of:
-
-      +4 = +(4*36), +2 = +(2*36), +1 = *(1*36)
-
-    Not quite max of 255 but close enough for me!
- */
+*/
 static PALETTE_INIT( samcoupe )
 {
 	int i;
@@ -469,23 +464,25 @@ static PALETTE_INIT( samcoupe )
 		UINT8 r = 0, g = 0, b = 0;
 
 		/* colors */
-		if (i & 0x01) b += 2*36;
-		if (i & 0x02) r += 2*36;
-		if (i & 0x04) g += 2*36;
-		if (i & 0x10) b += 4*36;
-		if (i & 0x20) r += 4*36;
-		if (i & 0x40) g += 4*36;
+		if (i & 0x01) b += 2;
+		if (i & 0x02) r += 2;
+		if (i & 0x04) g += 2;
+		if (i & 0x10) b += 4;
+		if (i & 0x20) r += 4;
+		if (i & 0x40) g += 4;
 
 		/* intensity bit */
 		if (i & 0x08)
 		{
-			r += 1*36;
-			g += 1*36;
-			b += 1*36;
+			r += 1;
+			g += 1;
+			b += 1;
 		}
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
+
+	palette_normalize_range(machine->palette, 0, 127, 0, 255);
 }
 
 
