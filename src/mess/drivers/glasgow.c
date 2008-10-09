@@ -402,15 +402,18 @@ static WRITE32_HANDLER ( write_beeper32 )
 
 static TIMER_CALLBACK( update_nmi )
 {
-	// if (irq_flag==0)cpunum_set_input_line_and_vector(machine, 0,  MC68000_IRQ_7, PULSE_LINE, MC68000_INT_ACK_AUTOVECTOR);
-	cpunum_set_input_line_and_vector(machine, 0,  MC68000_IRQ_7,irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, MC68000_INT_ACK_AUTOVECTOR);
-	irq_edge=~irq_edge;
+	//cpunum_set_input_line_and_vector(machine, 0,  MC68000_IRQ_7,irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, MC68000_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0,  MC68000_IRQ_7,ASSERT_LINE, MC68000_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0,  MC68000_IRQ_7,CLEAR_LINE, MC68000_INT_ACK_AUTOVECTOR);
+   	irq_edge=~irq_edge;
 }
 
 static TIMER_CALLBACK( update_nmi32 )
 {
-	cpunum_set_input_line_and_vector(machine, 0,  MC68020_IRQ_7, irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, MC68020_INT_ACK_AUTOVECTOR);
-  irq_edge=~irq_edge;
+	// cpunum_set_input_line_and_vector(machine, 0,  MC68020_IRQ_7, irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, MC68020_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0,  MC68020_IRQ_7, ASSERT_LINE, MC68020_INT_ACK_AUTOVECTOR);
+		cpunum_set_input_line_and_vector(machine, 0,  MC68020_IRQ_7, CLEAR_LINE, MC68020_INT_ACK_AUTOVECTOR);
+    irq_edge=~irq_edge;
 }
 
 static MACHINE_START( glasgow )
@@ -418,7 +421,7 @@ static MACHINE_START( glasgow )
 	key_selector = 0;
 	irq_flag = 0;
 	lcd_shift_counter = 3;
-	timer_pulse(ATTOTIME_IN_HZ(100), NULL, 0, update_nmi);
+	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, update_nmi);
 	beep_set_frequency(0, 44);
 }
 
