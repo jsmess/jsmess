@@ -22,7 +22,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbcbc_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_p_r, z80pio_p_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_r, z80pio_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0x81, 0x81) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 ADDRESS_MAP_END
@@ -46,8 +46,10 @@ static const TMS9928a_interface tms9129_interface =
 };
 
 /* TODO */
-static const z80pio_interface bbcbc_z80pio_intf =
+static Z80PIO_INTERFACE( bbcbc_z80pio_intf )
 {
+	"main",
+	0,
 	NULL,
 	NULL,
 	NULL,

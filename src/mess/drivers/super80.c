@@ -342,18 +342,40 @@ static VIDEO_UPDATE( super80v )
 
 /**************************** PIO ******************************************************************************/
 
-static void pio_interrupt(const device_config *device, int state)
+static UINT8 out_f8;
+
+static Z80PIO_ON_INT_CHANGED( pio_interrupt )
 {
 	cpunum_set_input_line( device->machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
-
-static const z80pio_interface pio_intf =
+static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
+	out_f8 = data;
+};
+
+static READ8_DEVICE_HANDLER( pio_port_b_r )
+{
+	UINT8 i, mask=1, in_fa=255;
+	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+
+	for ( i=0; i < 8;i++)
+	{
+		if (!(out_f8 & mask)) in_fa &= input_port_read(device->machine, keynames[i]);
+		mask<<=1;
+	}
+
+	return in_fa;
+};
+
+static Z80PIO_INTERFACE( pio_intf )
+{
+	"main",
+	0,
 	pio_interrupt,		/* callback when change interrupt status */
 	NULL,
-	NULL,
-	NULL,
+	pio_port_b_r,
+	pio_port_a_w,
 	NULL,
 	NULL,			/* portA ready active callback (not used in super80) */
 	NULL			/* portB ready active callback (not used in super80) */
@@ -391,29 +413,16 @@ static void cassette_motor( running_machine *machine, UINT8 data )
 
 static UINT8 cass_data[]={ 0, 0, 0, 0 };
 
-/* this timer runs at 200khz and does 2 jobs:
-	1. Scan the keyboard and present the results to the pio
-	2. Emulate the 2 chips in the cassette input circuit
+/* this timer runs at 200khz and does 1 job:
+	1. Emulate the 2 chips in the cassette input circuit
 
 Reasons why it is necessary:
-	1. The real z80pio is driven by the cpu clock and is capable of independent actions.
-	MAME does not support this at all. If the interrupt key sequence is entered, the
-	computer can be reset out of a hung state by the operator.
-	2. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
+	1. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
 	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint. */
 
 static TIMER_CALLBACK( super80_timer )
 {
-	UINT8 cass_ws=0, i, mask=1, out_f8=z80pio_p_r(super80_z80pio,0), in_fa=255;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
-
-	for ( i=0; i < 8;i++)
-	{
-		if (!(out_f8 & mask)) in_fa &= input_port_read(machine, keynames[i]);
-		mask<<=1;
-	}
-
-	z80pio_p_w(super80_z80pio,1,in_fa);
+	UINT8 cass_ws=0;
 
 	cass_data[1]++;
 	cass_ws = (cassette_input(cassette_device_image(machine)) > +0.03) ? 4 : 0;

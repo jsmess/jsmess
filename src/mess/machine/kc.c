@@ -1723,8 +1723,7 @@ WRITE8_DEVICE_HANDLER ( kc85_ctc_w )
 	z80ctc_w(device, offset,data);
 }
 
-
-static void kc85_pio_interrupt(const device_config *device, int state)
+static Z80PIO_ON_INT_CHANGED( kc85_pio_interrupt )
 {
 	cpunum_set_input_line(device->machine, 0, 0, state);
 }
@@ -1736,7 +1735,7 @@ static void kc85_ctc_interrupt(const device_config *device, int state)
 
 /* callback for ardy output from PIO */
 /* used in KC85/4 & KC85/3 cassette interface */
-static void	kc85_pio_ardy_callback(int state)
+static Z80PIO_ON_ARDY_CHANGED( kc85_pio_ardy_callback )
 {
 	kc_ardy = state & 0x01;
 
@@ -1748,7 +1747,7 @@ static void	kc85_pio_ardy_callback(int state)
 
 /* callback for brdy output from PIO */
 /* used in KC85/4 & KC85/3 keyboard interface */
-static void kc85_pio_brdy_callback(int state)
+static Z80PIO_ON_BRDY_CHANGED( kc85_pio_brdy_callback )
 {
 	kc_brdy = state & 0x01;
 
@@ -1758,8 +1757,10 @@ static void kc85_pio_brdy_callback(int state)
 	}
 }
 
-const z80pio_interface kc85_pio_intf =
+Z80PIO_INTERFACE( kc85_pio_intf )
 {
+	"main",
+	0,
 	kc85_pio_interrupt,		/* callback when change interrupt status */
 	NULL,
 	NULL,

@@ -411,7 +411,7 @@ static void einstein_ctc_interrupt(const device_config *device, int state)
 	cpunum_set_input_line(device->machine, 0, 1, state);
 }
 
-static void einstein_pio_interrupt(const device_config *device, int state)
+static Z80PIO_ON_INT_CHANGED( einstein_pio_interrupt )
 {
 	logerror("pio irq state: %02x\n",state);
 	cpunum_set_input_line(device->machine, 0, 3, state);
@@ -438,14 +438,14 @@ static z80ctc_interface	einstein_ctc_intf =
     z80ctc_trg3_w
 };
 
-static void einstein_pio_ardy(int data)
+static Z80PIO_ON_ARDY_CHANGED( einstein_pio_ardy )
 {
 	int handshake;
 
 	handshake = 0;
 
 	/* strobe is inverted state of ardy */
-	if (data!=0)
+	if (state != 0)
 		handshake = CENTRONICS_STROBE;
 
 	/* ardy is connected to strobe */
@@ -453,12 +453,20 @@ static void einstein_pio_ardy(int data)
 	centronics_write_handshake(0, handshake, CENTRONICS_STROBE);
 }
 
-static const z80pio_interface einstein_pio_intf =
+static WRITE8_DEVICE_HANDLER( einstein_pio_port_a_w )
 {
+	centronics_write_data(0,data);
+}
+
+
+static Z80PIO_INTERFACE( einstein_pio_intf )
+{
+	"main",
+	0,
 	einstein_pio_interrupt,
 	NULL,
 	NULL,
-	NULL,
+	einstein_pio_port_a_w,
 	NULL,
 	einstein_pio_ardy,
 	NULL
@@ -658,12 +666,6 @@ static  READ8_HANDLER(einstein_fdc_r)
 static WRITE8_HANDLER(einstein_pio_w)
 {
 	logerror("pio w: %04x %02x\n",offset,data);
-
-	if ( ( offset & 0x03 ) == 0x02 )
-	{
-		/* printer is connected to port A */
-		centronics_write_data(0,data);
-	}
 
 	z80pio_w( einstein_z80pio, offset, data );
 }

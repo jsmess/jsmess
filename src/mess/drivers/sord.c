@@ -27,7 +27,6 @@
 #include "machine/centroni.h"
 #include "devices/printer.h"
 #include "machine/z80ctc.h"
-#include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/8255ppi.h"
 #include "devices/cartslot.h"

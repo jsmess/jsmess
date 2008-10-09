@@ -276,13 +276,15 @@ INPUT_PORTS_END
 
 /* Z80 PIO Interface */
 
-static void mpf1_pio_interrupt( const device_config *device, int state )
+static Z80PIO_ON_INT_CHANGED( mpf1_pio_interrupt )
 {
 	logerror("pio irq state: %02x\n",state);
 }
 
-static const z80pio_interface pio_intf =
+static Z80PIO_INTERFACE( pio_intf )
 {
+	"main",
+	0,
 	mpf1_pio_interrupt,
 	NULL,
 	NULL,

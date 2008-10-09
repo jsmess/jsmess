@@ -16,12 +16,7 @@ MACHINE_START( mbee );
 
 extern UINT8 *mbee_workram;
 
-INTERRUPT_GEN( mbee_interrupt );
-
 DEVICE_IMAGE_LOAD( mbee_cart );
-
- READ8_HANDLER ( mbee_pio_r );
-WRITE8_HANDLER ( mbee_pio_w );
 
  READ8_HANDLER ( mbee_fdc_status_r );
 WRITE8_HANDLER ( mbee_fdc_motor_w );
