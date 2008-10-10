@@ -145,6 +145,9 @@ System Driver Changes:
 
 - [MSX] Updated some MSX machines ROMs (bug #1425, #1474) [Miodrag Milanovic]
 
+- [MSX/MSX2] Updated several rom sets to match their original hardware
+  configurations. [Wilbert Pol]
+
 - [PET] Refactored cartridge code to rely on MESS core functions. Disabled
   .crt support (.a0 and .b0 files working as before) since I doubt these 
   computers used the same format as C64. More work when/if more documents 
