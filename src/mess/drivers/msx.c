@@ -68,7 +68,74 @@ Philips VG-8230
 Philips VG-8235
 Philips VG-8235F
 Philips VG-8240
+===============
+
+PCB Layout missing
+
+
 Pioneer PX-7
+============
+
+|---------------------------------------|
+|  CN1     CN2                          |
+|                                       |                                       
+|                                       |
+|  IC33                                 |---------------------------------|
+|                                                      CN3                |
+|   IC32   IC34            IC38  IC40                                     |
+|                                                               IC20      |
+|   IC15   IC18  IC43      IC8   IC35   IC6     |----IC3---|              |
+|                                               |----------|    IC21      |
+|   IC16   IC19  |---IC13---|    IC7    IC10                              |
+|                |----------|                   IC36  IC29      ---       |
+|   IC17   IC14                                     X2          | |       |
+|                |--IC12---|     |----IC1-----|       IC37      |I|       |
+|   IC28   IC11  |---------|     |------------|   X1            |C|       |
+|                                                               |2|       |
+|  |----IC4----| |----IC5----|   IC39  IC9      IC42  IC44      | |       |
+|  |-----------| |-----------|                                  ---       |
+|                                                                         |
+|       IC45   IC31    IC30      IC41                                     |
+|                                                                         |
+|  CN4 CN5  CN6  CN7                                  CN8                 |
+|-------------------------------------------------------------------------|
+
+Notes:
+  X1 - 3.579MHz
+  X2 - 500kHz
+  IC1 - Sharp LH0080A Z80A-CPU-D
+  IC2 - TMS91289NL
+  IC3 - MB111S112  Z10 (500kHz)
+  IC4  - M5L8255AP-5
+  IC5  - YM2149F
+  IC6,IC7,IC8,IC10,IC45 - SN74LS367AN
+  IC9 - SN74LS245N
+  IC11,IC34 - SN74LS139N
+  IC12 - YM2301-23908 / 53 18 85 A (might indicate a version)
+  IC13 - Pioneer PD5031 2364-213 514100 (M5L2764-213)
+  IC14,IC17,IC30,IC31 - SN74LS157N
+  IC15-IC19 - MB81416-12
+  IC20,IC21 - TMS4416-I5NL
+  IC28 - SN74LS153N
+  IC29 - SN74LS02N
+  IC32 - SN74LS374N
+  IC33 - M5218P
+  IC35 - SN74LS74AN
+  IC36 - SN74LS30N
+  IC37-IC39 - SN74LS04N
+  IC40,IC41 - SN74LS05N
+  IC42 - SN74LS08N
+  IC43,IC44 - SN74LS32N
+  CN1 - Printer
+  CN2 - Cassette recorder
+  CN3 - Expansion slot
+  CN4 - Keyboard
+  CN5 - Keyboard
+  CN6 - Controller #1
+  CN7 - Controller #2
+  CN8 - Expansion slot
+
+
 Sanyo MPC-100
 Sanyo PHC-28S
 Sanyo Wavy PHC-23
@@ -1462,8 +1529,8 @@ MSX_LAYOUT_END
 
 ROM_START (piopx7)
 	ROM_REGION (0xc000, "main", 0)
-	ROM_LOAD ("px7bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
-	ROM_LOAD ("px7pbasic.rom", 0x8000, 0x4000, CRC(2ff3fdb1) SHA1(76d0c05b7c58609db73e350380e2e556876fff0a))
+	ROM_LOAD ("ym2301.ic12", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+	ROM_LOAD ("pd5031.ic13", 0x8000, 0x4000, CRC(2ff3fdb1) SHA1(76d0c05b7c58609db73e350380e2e556876fff0a))
 ROM_END
 
 MSX_LAYOUT_INIT (piopx7)
