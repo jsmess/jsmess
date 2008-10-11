@@ -738,6 +738,11 @@ XL/XE 16kB OS roms
 	DRIVER( nms8255 )	/* 1986 MSX2										*/
 	DRIVER( nms8280 )	/* 1986 MSX2										*/
 	DRIVER( nms8280g)	/* 1986 MSX2										*/
+	DRIVER( tpc310)	  /* 1986 MSX2										*/
+	DRIVER( hx23)	    /* 1986 MSX2										*/
+	DRIVER( hx23f)	  /* 1986 MSX2										*/
+	DRIVER( cx7m)	    /* 1986 MSX2										*/
+	DRIVER( cx7m128)	/* 1986 MSX2										*/
 	DRIVER( fs5500 )	/* 1985 MSX2 Japan									*/
 	DRIVER( fs4500 )	/* 1986 MSX2 Japan									*/
 	DRIVER( fs4700 )	/* 1986 MSX2 Japan									*/
@@ -761,6 +766,7 @@ XL/XE 16kB OS roms
 	DRIVER( cpc400 )	/* 1986 MSX2 Korea									*/
 	DRIVER( cpc400s )	/* 1986 MSX2 Korea									*/
 	DRIVER( expert20 )/* 1986 MSX2 Korea									*/
+	
 	DRIVER( msx2p )		/* 1988 MSX2+ Japan									*/
 	DRIVER( fsa1fx )	/* 1988 MSX2+ Japan									*/
 	DRIVER( fsa1wx )	/* 1988 MSX2+ Japan									*/

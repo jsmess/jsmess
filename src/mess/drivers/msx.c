@@ -3119,14 +3119,116 @@ MSX_LAYOUT_INIT (hbg900p)
 MSX_LAYOUT_END
 
 /* MSX2 - Talent TPC-310 */
+ROM_START (tpc310)
+	ROM_REGION (0x2c000, "main", 0)
+	ROM_LOAD ("tpc310bios.rom",  0x0000, 0x8000, CRC(8cd3e845) SHA1(7bba23669b7abfb6a142f9e1735b847d6e4e8267))
+	ROM_LOAD ("tpc310ext.rom",   0x8000, 0x4000, CRC(094a9e7a) SHA1(39dfc46260f99b670916b1e55f67a5d4136e6e54))
+	ROM_LOAD ("dpf550disk.rom",  0xc000, 0x4000, CRC(347b1b44) SHA1(c1d83c559e1e6a6da961eafa55aab105681c634c))
+	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0x10000, 0x10000, 0)
+	ROM_LOAD ("tpc310turbo.rom",0x20000, 0x4000, CRC(0ea62a4d) SHA1(181bf58da7184e128cd419da3109b93344a543cf))
+	ROM_LOAD ("tpc310acc.rom",  0x24000, 0x8000, CRC(4fb8fab3) SHA1(cdeb0ed8adecaaadb78d5a5364fd603238591685))
+ROM_END
+
+MSX_LAYOUT_INIT (tpc310)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0x20000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, ROM, 0x8000, 0x24000)
+	MSX_LAYOUT_SLOT (3, 2, 1, 1, DISK_ROM2, 0x4000, 0xc000)
+	MSX_LAYOUT_SLOT (3, 3, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
 
 /* MSX2 - Toshiba HX-23 */
 
+ROM_START (hx23)
+	ROM_REGION (0x30000, "main", 0)
+	ROM_LOAD ("hx23bios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("hx23ext.rom",   0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
+	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("hx23word.rom", 0x20000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
+	ROM_FILL (0x28000, 0x8000, 0)
+ROM_END
+
+MSX_LAYOUT_INIT (hx23)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 3, 0, 4, ROM, 0x10000, 0x20000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
+
 /* MSX2 - Toshiba HX-23F */
+
+ROM_START (hx23f)
+	ROM_REGION (0x30000, "main", 0)
+	ROM_LOAD ("hx23fbios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("hx23fext.rom",   0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
+	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("hx23fword.rom", 0x20000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
+	ROM_FILL (0x28000, 0x8000, 0)
+ROM_END
+
+MSX_LAYOUT_INIT (hx23f)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x20000, 0x0000)	/* 128KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 3, 0, 4, ROM, 0x10000, 0x20000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
 
 /* MSX2 - Yamaha CX7M */
 
+ROM_START (cx7m)
+	ROM_REGION (0x28000, "main", 0)
+	ROM_LOAD ("cx7mbios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("cx7mext.rom",   0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("sfg05.rom", 0x20000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
+ROM_END
+
+MSX_LAYOUT_INIT (cx7m)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 1, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 0, 2, ROM, 0x8000, 0x20000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
+
 /* MSX2 - Yamaha CX7M-128 */
+
+ROM_START (cx7m128)
+	ROM_REGION (0x2c000, "main", 0)
+	ROM_LOAD ("cx7mbios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
+	ROM_LOAD ("cx7mext.rom",   0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
+	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
+	ROM_FILL (0xc000, 0x14000, 0)
+	ROM_LOAD ("sfg05.rom", 0x20000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))	
+	ROM_LOAD ("yrm502.rom", 0x28000, 0x4000, CRC(51f7ddd1) SHA1(2a4b4a4657e3077df8a88f98210b76883d3702b1))
+ROM_END
+
+MSX_LAYOUT_INIT (cx7m128)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 1, 0, 1, ROM, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 1, ROM, 0x4000, 0x28000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 3, 0, 2, ROM, 0x8000, 0x20000)
+	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
+MSX_LAYOUT_END
 
 /********************************  MSX 2+ **********************************/
 
@@ -3571,6 +3673,12 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (phc70fd)
 	MSX_DRIVER (phc70fd2)
 	MSX_DRIVER (phc35j)
+	
+	MSX_DRIVER (tpc310)
+	MSX_DRIVER (hx23)
+	MSX_DRIVER (hx23f)
+	MSX_DRIVER (cx7m)
+	MSX_DRIVER (cx7m128)
 
 MSX_DRIVER_END
 
@@ -3656,9 +3764,14 @@ COMP(1985, hbf700d,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700
 COMP(1985, hbf700f,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700F" , 0)
 COMP(1985, hbf700p,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700P" , 0)
 COMP(1985, hbf700s,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-F700S (Spain)", 0)
-COMP(1986, hbg900ap,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-G900AP", 0 )
+COMP(1986, hbg900ap, msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-G900AP", 0 )
 COMP(1986, hbg900p,  msx2,	0,	msx2_pal, msx2,	    msx2,    msx, "Sony", "HB-G900P", 0 )
 COMP(1986, hotbit20, msx2,	0,	msx2_pal, msx2,   	msx2,    msx, "Sharp / Epcom",	 "HB-8000 Hotbit 2.0" , GAME_NOT_WORKING)
+COMP(1986, tpc310,   msx2,	0,  msx2_pal, msx2,     msx2,    msx, "Talent", "TPC-310", 0)
+COMP(1986, hx23,     msx2,	0,  msx2_pal, msx2,     msx2,    msx, "Toshiba", "HX-23", 0)
+COMP(1986, hx23f,    msx2,	0,  msx2_pal, msx2,     msx2,    msx, "Toshiba", "HX-23F", 0)
+COMP(1986, cx7m,     msx2,	0,	msx2_pal,	msx2,     msx2,     msx, "Yamaha",	 "CX7M" , GAME_NOT_WORKING)
+COMP(1986, cx7m128,  msx2,	0,	msx2_pal,	msx2,     msx2,     msx, "Yamaha",	 "CX7M-128" , GAME_NOT_WORKING)
 COMP(1985, fs5500,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "National / Matsushita", "FS-5500F1/F2 (Japan)", 0 )
 COMP(1986, fs4500,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "National / Matsushita", "FS-4500 (Japan)", 0 )
 COMP(1986, fs4700,   msx2,	0,      msx2,     msx2jp,   msx2,    msx, "National / Matsushita", "FS-4700 (Japan)", 0 )
