@@ -146,7 +146,7 @@ System Driver Changes:
   address). Commodore Ultimax / Max Machine / VIC-10 is now working. [Fabio
   Priuli]
   
-  [Mephisto 8 Bit] Added clickable Artwork [Dirk Verwiebe]
+  [Mephisto 8/16/32 Bit] Added clickable artwork [Dirk Verwiebe]
 
 - [MSX] Added some Brazilian clones [Miodrag Milanovic]
 
