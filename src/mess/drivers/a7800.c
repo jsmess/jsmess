@@ -351,14 +351,14 @@ ROM_START (a7800p)
     ROM_LOAD ("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
 
-static void a7800_ntsc_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static void a7800_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cartslot */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(a7800_cart); break;
@@ -372,23 +372,8 @@ static void a7800_ntsc_cartslot_getinfo(const mess_device_class *devclass, UINT3
 	}
 }
 
-static SYSTEM_CONFIG_START(a7800_ntsc)
-	CONFIG_DEVICE(a7800_ntsc_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static void a7800_pal_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
-		default:										a7800_ntsc_cartslot_getinfo( devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(a7800_pal)
-	CONFIG_DEVICE(a7800_pal_cartslot_getinfo)
+static SYSTEM_CONFIG_START(a7800)
+	CONFIG_DEVICE(a7800_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
@@ -398,5 +383,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     INIT          CONFIG      COMPANY   FULLNAME */
-CONS( 1986, a7800,    0,        0,		a7800_ntsc,	a7800,    a7800_ntsc,	a7800_ntsc,	"Atari",  "Atari 7800 NTSC" , 0)
-CONS( 1986, a7800p,   a7800,    0,		a7800_pal,	a7800,    a7800_pal,	a7800_pal,	"Atari",  "Atari 7800 PAL" , 0)
+CONS( 1986, a7800,    0,        0,		a7800_ntsc,	a7800,    a7800_ntsc,	a7800,		"Atari",  "Atari 7800 NTSC" , 0)
+CONS( 1986, a7800p,   a7800,    0,		a7800_pal,	a7800,    a7800_pal,	a7800,		"Atari",  "Atari 7800 PAL" , 0)
