@@ -1,4 +1,4 @@
-﻿0.127.1
+0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -166,11 +166,6 @@ System Driver Changes:
   Code based on byuu's implementation in BSNES (thanks byuu) [Fabio Priuli]
 
 - [SPECTRUM] Added lot of Spectrum clones and custom ROM's [Miodrag Milanovic]
-
-- [SYM1] Refactored cartridge code to rely on MESS core functions. Code to
-  load cartridges has never been present apparently, but now it only miss
-  memory addresses to be working. More work when/if more documents will 
-  be available [Fabio Priuli]
 
 - [TI99] Changed ESC key to map to F12.  [Michael Zapf]
 
