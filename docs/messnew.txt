@@ -3,6 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Amstrad CPC6128 (Sweden/Finland) [Iggy Drougge, Curt Coder]
+- Atari 7800 Prototype [Incog]
 - Consul 2717 [Miodrag Milanovic]
 - HT-1080Z / HT-1080Z/64 [Miodrag Milanovic]
 - Primo B32/ Primo B48/ Primo C64 [Miodrag Milanovic]
@@ -16,7 +17,7 @@ New System Drivers Supported (in no particular order):
 - Kramer MC [Miodrag Milanovic]
 - RCA Cosmac VIP (VP-111) [Curt Coder]
 - Spectrum clones [Miodrag Milanovic]
-		- HC85/HC90/HC91/HC128/HC2000/CIP-03/Jet 
+		- HC85/HC90/HC91/HC128/HC2000/CIP-03/Jet
 		- Didaktik Gama 87/88/89
 		- Didaktik Skalica 90,M 91/93,Kompakt
 		- Mistrum
@@ -46,27 +47,27 @@ System Driver Changes:
 
 - [ABC800M] Added keyboard hack to enable system use. [Curt Coder]
 
-- [C16] Added support for tape emulation using MESS core functions (only 
+- [C16] Added support for tape emulation using MESS core functions (only
   loading, both .wav and .tap formats) [Fabio Priuli, Roberto Zandona']
 
 - [C16] Refactored cartridge code to rely on MESS core functions. As
   a result carts are now working. Also removed -cart2 device, since
   C16 / C116 / Plus4 had only a single cartridge port. [Fabio Priuli]
 
-- [C16] Fixed behavior of Joystick Ports Swapping: if you press F1 in 
+- [C16] Fixed behavior of Joystick Ports Swapping: if you press F1 in
   partial keyboard emulation, Joy1 keys will go to Joy2 port (as if you
-  had plugged your joystick in port 2). This helps with games which expect 
+  had plugged your joystick in port 2). This helps with games which expect
   joystick inputs from port 2 of the C16 [Fabio Priuli]
 
-- [C128] Added support for tape emulation using MESS core functions 
+- [C128] Added support for tape emulation using MESS core functions
   (loading and saving, both .wav and .tap formats) [Fabio Priuli]
 
-- [C128] Refactored cartridge code to rely on MESS core functions. 
-  Currently, .crt emulation uses unmodified C64 cart code and therefore 
+- [C128] Refactored cartridge code to rely on MESS core functions.
+  Currently, .crt emulation uses unmodified C64 cart code and therefore
   support has not improved (yet) [Fabio Priuli]
 
-- [C64] Added support for tape emulation using MESS core functions 
-  (loading and saving, both .wav and .tap formats) [Fabio Priuli, Roberto 
+- [C64] Added support for tape emulation using MESS core functions
+  (loading and saving, both .wav and .tap formats) [Fabio Priuli, Roberto
   Zandona']
 
 - [C64] Fixed border color during tape loading [Roberto Zandona']
@@ -83,44 +84,44 @@ System Driver Changes:
   generally cleaned up cart code. Support is still limited to Type 0 Carts
   (8k and 16k images) [Fabio Priuli]
 
-- [C64] Fixed behavior of Joystick Ports Swapping: if you press F1 in 
+- [C64] Fixed behavior of Joystick Ports Swapping: if you press F1 in
   partial keyboard emulation, Joy1 keys will go to Joy2 port (as if you
-  had plugged your joystick in port 2). This helps with games which expect 
+  had plugged your joystick in port 2). This helps with games which expect
   joystick inputs from port 2 of the C64 [Fabio Priuli]
 
 - [C64] Fixed memory leaks with floppies [Oliver Stöneberg]
 
 - [C64] Fixed floppy unmounting [Oliver Stöneberg]
 
-- [C65] Added preliminary cartridge support through MESS core functions. 
-  Currently, .crt emulation uses unmodified C64 cart code and therefore 
+- [C65] Added preliminary cartridge support through MESS core functions.
+  Currently, .crt emulation uses unmodified C64 cart code and therefore
   is not working [Fabio Priuli]
 
 - [CBMB] Refactored cartridge code to rely on MESS core functions. Disabled
-  .crt support (.10, .20, .40 and .60 files working as before) since I 
-  doubt these CBM-II computers used the same format as C64. More work 
+  .crt support (.10, .20, .40 and .60 files working as before) since I
+  doubt these CBM-II computers used the same format as C64. More work
   when/if more documents will be available [Fabio Priuli]
 
 - [CGENIE] Properly implemented the cassette loading.  [Wilbert Pol]
 
-- [COMMODORE] Properly fixed asserts / freezes / crashes in systems with 
-  VC1540 / VC1541 floppy support which had been promoted from TESTDRIVER 
-  status. However, they are flagged as NOT_WORKING because the floppy 
+- [COMMODORE] Properly fixed asserts / freezes / crashes in systems with
+  VC1540 / VC1541 floppy support which had been promoted from TESTDRIVER
+  status. However, they are flagged as NOT_WORKING because the floppy
   emulation is not implemented yet. [Fabio Priuli]
 
 - [COMMODORE] Cleaned up documentation and comments in c16.c, c64.c, c65.c,
-  c128.c, cbmb.c, pet.c and vc20.c. Added missing BASIC revisions, new 
+  c128.c, cbmb.c, pet.c and vc20.c. Added missing BASIC revisions, new
   sets and new clones. Removed models and configurations which were never
-  sold. In particular, I've tagged as BAD_DUMPS most of the C128/C128D PAL 
-  BIOSes and started to use split kernal & character ROMs to make clear 
-  their origin and possible incompleteness. When dumps will be confirmed, 
-  we will start to use the correct ones. If you own a C128 PAL, please 
+  sold. In particular, I've tagged as BAD_DUMPS most of the C128/C128D PAL
+  BIOSes and started to use split kernal & character ROMs to make clear
+  their origin and possible incompleteness. When dumps will be confirmed,
+  we will start to use the correct ones. If you own a C128 PAL, please
   dump its BIOS to verify its content. [Fabio Priuli]
 
 - [EXIDY] Added support for 1200 baud cassette images. [Wilbert Pol]
 
-- [FAMICOM] Fixed small Disk loading bug which caused "Disk Trouble Err. 
-  22" with all disk images (remaining part of bug #1479). Famicom Disk 
+- [FAMICOM] Fixed small Disk loading bug which caused "Disk Trouble Err.
+  22" with all disk images (remaining part of bug #1479). Famicom Disk
   System is back to working status [Fabio Priuli]
 
 - [GENESIS / MD] Added possibility to choose between a 3 buttons and a 6
@@ -130,19 +131,19 @@ System Driver Changes:
 
 - [GENEVE] Fixed RTC to start on Sunday.  [Michael Zapf]
 
-- [INTV] Added partial support for images in .int/.itv/.bin format. Images 
+- [INTV] Added partial support for images in .int/.itv/.bin format. Images
   in .rom format are still preferred. [Fabio Priuli]
 
 - [LYNX] Added support for images in .lyx format [Fabio Priuli]
 
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
-  black and white, and fixed quickloading. System is now fully 
+  black and white, and fixed quickloading. System is now fully
   working, including the "Säkkijärven polkka" program. [Curt Coder]
 
 - [JUPITER] Fixed regression; driver works again.  [Wilbert Pol]
 
 - [MAX] Fixed cart loading (both bug #1618 and a problem with the loading
-  address). Commodore Ultimax / Max Machine / VIC-10 is now working. [Fabio 
+  address). Commodore Ultimax / Max Machine / VIC-10 is now working. [Fabio
   Priuli]
 
 - [MSX] Added some Brazilian clones [Miodrag Milanovic]
@@ -153,20 +154,20 @@ System Driver Changes:
   configurations. [Wilbert Pol]
 
 - [PET] Refactored cartridge code to rely on MESS core functions. Disabled
-  .crt support (.a0 and .b0 files working as before) since I doubt these 
-  computers used the same format as C64. More work when/if more documents 
+  .crt support (.a0 and .b0 files working as before) since I doubt these
+  computers used the same format as C64. More work when/if more documents
   will be available [Fabio Priuli]
 
-- [SG1000] Lightgun crosshair is now shown only if TV Draw cartridge is 
+- [SG1000] Lightgun crosshair is now shown only if TV Draw cartridge is
   loaded. [Curt Coder]
 
 - [SNES] Improved special chips detection (if you run MESS with -log you will
-  be warned of the presence of unemulated chips in error.log), memory 
+  be warned of the presence of unemulated chips in error.log), memory
   handling, cart and SRAM mirroring [Fabio Priuli]
 
 - [SNES] Fixed inputs in Super Street Fighter 2 (bug #437) [Fabio Priuli]
 
-- [SNES] Added support for the emulation of the DSP-2 and OBC-1 add-on chips. 
+- [SNES] Added support for the emulation of the DSP-2 and OBC-1 add-on chips.
   Code based on byuu's implementation in BSNES (thanks byuu) [Fabio Priuli]
 
 - [SPECTRUM] Added lot of Spectrum clones and custom ROM's [Miodrag Milanovic]
@@ -175,15 +176,15 @@ System Driver Changes:
 
 - [TMC2000] Fixed quickloading. [Curt Coder]
 
-- [TRS80] Added proper cassette emulation support (both .wav and .cas. 
+- [TRS80] Added proper cassette emulation support (both .wav and .cas.
   formats) [Wilbert Pol]
 
-- [VIC20] Added support for tape emulation using MESS core functions 
+- [VIC20] Added support for tape emulation using MESS core functions
   (loading and saving, both .wav and .tap formats) [Fabio Priuli]
 
 - [VIC20] Refactored cartridge code to rely on MESS core functions. As
   a result carts are now working (fixed remaining half of bug #1603). Also
-  added proper banking for cart2, making defender, submarin and other 
+  added proper banking for cart2, making defender, submarin and other
   multifile carts work [Fabio Priuli]
 
 - [VIP] Fixed memory banking, added discrete sound, added tape support,
@@ -202,14 +203,14 @@ User Interface Changes:
 -----------------------
 - Fixed a file manager bug that could cause the working directory to be lost
   when inside ZIP files.  [Nate Woods]
-  
+
 - Fixed a tape control bug that caused the counter to fail to update.  [Nate
   Woods]
 
 - Added "Keyboard Mode" menu to switch between emulated and natural keyboard
   during emulation. [Oliver Stöneberg]
 
-- Fixed toggling through multiple cassettes in Tape Control menu [Oliver 
+- Fixed toggling through multiple cassettes in Tape Control menu [Oliver
   Stöneberg]
 
 - MESSUI now shows the actual values of the system configuration
@@ -233,7 +234,7 @@ Source Changes:
 - Refactored ZIP path code out of src/mess/image.c, made more testable.  [Nate
   Woods]
 
-- Removed MESS_DEBUG and the TESTDRIVER define and enabled a lot of 
+- Removed MESS_DEBUG and the TESTDRIVER define and enabled a lot of
   non-working drivers [Oliver Stöneberg]
 
 - Changed the cassette implementation into a regular mame device.  [Wilbert Pol]
@@ -268,7 +269,7 @@ System Driver Changes:
 - [IBM5170] Added support for the 8042 keyboard controller dumped
   by Kevtris.  [Wilbert Pol]
 
-- [Mac SE] Added preliminary ADB mouse emulation, system is now working [R. 
+- [Mac SE] Added preliminary ADB mouse emulation, system is now working [R.
   Belmont]
 
 - [MSX Family] Fixed cartridge loading. (part of bug #1603)  [Wilbert
@@ -361,23 +362,23 @@ System Driver Changes:
   and we've been unable to test Photon, it is unclear whether this reintroduces
   bug #655.  (bug #1608) [Nate Woods]
 
-- [COMMODORE] Large clean-up of input ports across Commodore machines (Amiga 
-  excluded) [Fabio Priuli]: 
+- [COMMODORE] Large clean-up of input ports across Commodore machines (Amiga
+  excluded) [Fabio Priuli]:
   * created machine/cbmipt.c to reduce duplicate code across drivers
-    and hidden dependencies; 
-  * converted to tagged inputs; 
-  * added partial natural keyboard support (keys are almost all there, 
-    but there are still a few issues); 
-  * replaced a lot of constants with direct reads to tagged inputs, 
+    and hidden dependencies;
+  * converted to tagged inputs;
+  * added partial natural keyboard support (keys are almost all there,
+    but there are still a few issues);
+  * replaced a lot of constants with direct reads to tagged inputs,
     cleaning up most of the Commodore files in includes/ ;
   * simplified interrupt handling for c64 and c16;
   * fixed pet.c machines which were starting Caps Lock'ed;
-  * propagated ':/;' fixes (from rev. 2542) to all the drivers with the 
+  * propagated ':/;' fixes (from rev. 2542) to all the drivers with the
     same error;
-  * removed some dead code for cart handling (never fully implemented 
+  * removed some dead code for cart handling (never fully implemented
     and obsolete after rev. 2421);
   * removed hacked SID from c16;
-  * fixed key mappings to follow the real keyboard (also added plus4 
+  * fixed key mappings to follow the real keyboard (also added plus4
     input ports for this same reason);
   * documented keyboard layouts.
 
@@ -617,7 +618,7 @@ User Interface Changes:
   system's controllers.  (bugs #1570, #1573) [Nate Woods]
 
 - [Windows] Reduced flickering in input configuration dialog.  [Nate Woods]
-  
+
 - [Windows UI] Updated MESS icon, logo and other artwork (Asterokid, MAMEPlus
   team, Hobie Troxell)
 
@@ -638,7 +639,7 @@ Source Changes:
 
 - Major changes to transition MESS's device system onto MAME's device system.
   [Nate Woods]
- 
+
 - Converted printers, snapshots and quickloads to the new device system.
   [Nate Woods]
 
@@ -705,7 +706,7 @@ System Driver Changes:
 
 - [COCO] Fixed bug that could cause joystick button presses to not be
   registered.  (bug #1532) [Nate Woods]
-  
+
 - [COCO] Added a quickload for .BIN files.  [Nate Woods]
 
 - [COUPE] Added many new BIOS revisions.  [Oliver Stöneberg]
@@ -800,7 +801,7 @@ System Driver Changes:
 
 - [GBPOCKET] Fixed video startup state to match that of a real unit.  [Wilbert
   Pol]
-  
+
 - [GENEVE] Fixed memory mapping error that would cause an emulated crash on
   reset.  [Michael Zapf]
 
