@@ -327,8 +327,7 @@ XL/XE 16kB OS roms
 	DRIVER( cbm8296 )	/* CBM 8296 (Basic 4, CRTC 50Hz, 80 columns)		*/
 	DRIVER( cbm8296d )	/* CBM 8296D										*/
 	DRIVER( superpet )	/* SuperPET											*/
-	DRIVER( sp9000 )	/* CBM SP9000										*/
-	DRIVER( mmf9000 )	/* MiniMainFrame 9000								*/
+	DRIVER( sp9000 )	/* CBM SP9000 / MiniMainFrame 9000					*/
 	DRIVER( mmf9000s )	/* MiniMainFrame 9000 (Sweden)						*/
 
 	DRIVER( vic1001 )	/* Commodore VIC-1001 (Japan)						*/

@@ -94,6 +94,11 @@ keyboard with numeric keypad and built in voice synthesis capabilities.
 
 [TO DO]
 
+* Supported Systems:
+
+- Once we can add / remove devices, we shall only support c16, c116 and plus/4,
+removing the separated drivers for different floppy drives
+
 * Floppy drives:
 
 - Drives 8 & 9 supported, but limited compatibility. Real disk emulation is

@@ -155,7 +155,6 @@ ROM_END
 
 
 static SYSTEM_CONFIG_START( sym1 )
-	CONFIG_DEVICE(sym1_cartslot_getinfo)
 	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
 	CONFIG_RAM        (3 * 1024) /* 3KB RAM */
 	CONFIG_RAM        (2 * 1024) /* 2KB RAM */

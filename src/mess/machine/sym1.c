@@ -20,8 +20,6 @@
 #include "machine/74145.h"
 #include "sound/speaker.h"
 
-#include "devices/cartslot.h"
-
 
 #define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
 
@@ -306,65 +304,4 @@ MACHINE_RESET( sym1 )
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0xf800, 0xffff, 0, 0, SMH_BANK1, SMH_NOP);
 	memory_set_bankptr(1, sym1_monitor + 0x800);
-}
-
-
-/******************************************************************************
-Cartridge Support
-******************************************************************************/
-
-static CBM_ROM sym1_cbm_cart = { 0 };
-
-static DEVICE_IMAGE_LOAD(sym_cart)
-{
-	int size = image_length(image), test;
-	const char *filetype;
-	int address = 0;
-
-	filetype = image_filetype(image);
-
-	/* Assign loading address according to extension */
-	if (!mame_stricmp (filetype, "60"))
-		address = 0x6000;
-	else if (!mame_stricmp (filetype, "c0"))
-		address = 0xc000;
-	else		// which address for .0080 files?!?
-		;
-
-	logerror("Loading cart %s at %.4x size:%.4x\n", image_filename(image), address, size);
-
-	/* Does cart contain any data? */
-	sym1_cbm_cart.chip = (UINT8*) image_malloc(image, size);
-	if (!sym1_cbm_cart.chip)
-		return INIT_FAIL;
-
-	/* Store data, address & size */
-	sym1_cbm_cart.addr = address;
-	sym1_cbm_cart.size = size;
-	test = image_fread(image, sym1_cbm_cart.chip, sym1_cbm_cart.size);
-
-	if (test != sym1_cbm_cart.size)
-		return INIT_FAIL;
-				
-	/* Finally load the cart */
-//	memcpy(/* where?  base + sym1_cbm_cart.addr */, sym1_cbm_cart.chip, sym1_cbm_cart.size);
-
-	return INIT_PASS;
-}
-
-void sym1_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "60,0080,c0"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(sym_cart); break;
-
-		default:									cartslot_device_getinfo(devclass, state, info); break;
-	}
 }
