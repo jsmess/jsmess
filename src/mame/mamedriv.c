@@ -2575,6 +2575,7 @@ V-V                           TP-027
 	DRIVER( armwar )	/* 24/10/1994 (c) 1994 (Euro) */
 	DRIVER( armwarr1 )	/* 11/10/1994 (c) 1994 (Euro) */
 	DRIVER( armwaru )	/* 24/10/1994 (c) 1994 (US) */
+	DRIVER( armwaru1 )	/* 20/09/1994 (c) 1994 (US) */
 	DRIVER( pgear )		/* 24/10/1994 (c) 1994 (Japan) */
 	DRIVER( pgearr1 )	/* 16/09/1994 (c) 1994 (Japan) */
 	DRIVER( armwara )	/* 20/09/1994 (c) 1994 (Asia) */
@@ -3743,6 +3744,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( cotton2 )	/* (c) 1997 Success */
 	DRIVER( cottonbm )	/* (c) 1998 Success */
 	DRIVER( decathlt )	/* (c) 1995 */
+	DRIVER( decathlo )	/* (c) 1995 */
 	DRIVER( diehard )	/* (c) 1996 */
 	DRIVER( dnmtdeka )	/* (c) 1996 */
 	DRIVER( ejihon )	/* (c) 1995 */
@@ -6143,6 +6145,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mk3 )		/* (c) 1994 Midway */
 	DRIVER( mk3r20 )	/* (c) 1994 Midway */
 	DRIVER( mk3r10 )	/* (c) 1994 Midway */
+	DRIVER( mk3p40 )	/* (c) 1994 Midway */
 	DRIVER( umk3 )		/* (c) 1994 Midway */
 	DRIVER( umk3r11 )	/* (c) 1994 Midway */
 	DRIVER( umk3r10 )	/* (c) 1994 Midway */
@@ -7966,12 +7969,15 @@ Other Sun games
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
 	DRIVER( megat3 )	/* (c) 1996 Merit */
 	DRIVER( megat3a )	/* (c) 1996 Merit */
-	DRIVER( megat3b )	/* (c) 1995 Merit */
+	DRIVER( megat3ca )	/* (c) 1996 Merit */
+	DRIVER( megat3nj )	/* (c) 1995 Merit */
 	DRIVER( megat3te )	/* (c) 1996 Merit */
 	DRIVER( megat4 )	/* (c) 1996 Merit */
 	DRIVER( megat4a )	/* (c) 1996 Merit */
+	DRIVER( megat4sn )	/* (c) 1996 Merit */
 	DRIVER( megat4te )	/* (c) 1996 Merit */
 	DRIVER( megat5 )	/* (c) 1997 Merit */
+	DRIVER( megat5nj )	/* (c) 1997 Merit */
 	DRIVER( megat6 )	/* (c) 1998 Merit */
 	DRIVER( suprgolf )	/* (c) 19?? Nasco */
 	DRIVER( hotblock )	/* (c) 1993 Nics? / Nix? */
@@ -8246,11 +8252,13 @@ Other Sun games
 	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
 	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
 
-	/* InterFlip */
+	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */
 	DRIVER( blckjack )	/* (c) 1984 InterFlip */
 	DRIVER( videodad )	/* (c) 1987 InterFlip */
 	DRIVER( videocba )	/* (c) 1987 InterFlip */
+	DRIVER( babypkr )	/* (c) 1987 Recreativos Franco */
+	DRIVER( babydad )	/* (c) 1987 Recreativos Franco */
 
 	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */

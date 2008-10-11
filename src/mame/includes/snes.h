@@ -437,6 +437,8 @@ struct SNES_PPU_STRUCT
 	{
 		UINT8 address_low;
 		UINT8 address_high;
+		UINT8 saved_address_low;
+		UINT8 saved_address_high;
 		UINT16 address;
 		UINT16 priority_rotation;
 		UINT8 size[2];

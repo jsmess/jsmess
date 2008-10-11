@@ -162,17 +162,13 @@ static void update_irq_state(running_machine *machine)
 		/*  This is for games that supply an *IRQ Vector* on the data bus
             together with an IRQ level for each possible IRQ source */
 
+		UINT8 irq_level[8] = { 0 };
 		int i = 0;
-		while ( i < 8 )
-		{
+		for (i = 0; i < 8; i++)
 			if (irq & (1 << i))
-			{
-				cpunum_set_input_line(machine, 0, metro_irq_levels[i]&7, ASSERT_LINE);
-				return;
-			}
-			i++;
-		}
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+				irq_level[metro_irq_levels[i]&7] = 1;
+		for (i = 0; i < 8; i++)
+			cpunum_set_input_line(machine, 0, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -4953,10 +4949,10 @@ ROM_START( blzntrnd )
 	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* 053936 gfx data */
 	ROM_LOAD( "rom9.bin", 0x000000, 0x200000, CRC(37ca3570) SHA1(3374c586bf84583fa33f2793c4e8f2f61a0cab1c) )
 
-	ROM_REGION( 0x080000, "ym", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Samples */
 	ROM_LOAD( "rom8.bin", 0x000000, 0x080000, CRC(565a4086) SHA1(bd5780acfa5affa8705acbfccb0af16bac8ed298) )
 
-	ROM_REGION( 0x400000, "ym.deltat", 0 )	/* ? YRW801-M ? */
+	ROM_REGION( 0x400000, "ym", 0 )	/* ? YRW801-M ? */
 	ROM_LOAD( "rom6.bin", 0x000000, 0x200000, CRC(8b8819fc) SHA1(5fd9d2b5088cb676c11d32cac7ba8c5c18e31b64) )
 	ROM_LOAD( "rom7.bin", 0x200000, 0x200000, CRC(0089a52b) SHA1(d643ac122d62557de27f06ba1413ef757a45a927) )
 ROM_END
@@ -5037,10 +5033,10 @@ ROM_START( gstrik2 )
 	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* 053936 gfx data */
 	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
 
-	ROM_REGION( 0x200000, "ym", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "ym.deltat", 0 )	/* Samples */
 	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
 
-	ROM_REGION( 0x400000, "ym.deltat", 0 )	/* ? YRW801-M ? */
+	ROM_REGION( 0x400000, "ym", 0 )	/* ? YRW801-M ? */
 	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
 	/* ROM7.27 not populated?  */
 ROM_END
