@@ -304,7 +304,14 @@ static WRITE8_HANDLER(ex800_gate7a_w)
 	logerror("GATE7A W %x @%x with offset %x\n", data, activecpu_get_pc(), offset);
 }
 
+static VIDEO_START( ex800 )
+{
+}
 
+static VIDEO_UPDATE( ex800 )
+{
+	return 0;
+}
 
 /******************************************************************************
  Address Maps
@@ -438,16 +445,16 @@ static MACHINE_DRIVER_START(ex800)
 	MDRV_MACHINE_START(ex800)
 
 	/* "video" hardware */
-//	MDRV_SCREEN_ADD("main", RASTER)
-//	MDRV_SCREEN_REFRESH_RATE(60)
-//	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-//  MDRV_SCREEN_SIZE(480, 640)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 639)
-//  MDRV_PALETTE_LENGTH(4)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(480, 640)
+	MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 639)
+	MDRV_PALETTE_LENGTH(4)
 
-//  MDRV_VIDEO_START(ex800)
-//  MDRV_VIDEO_UPDATE(ex800)
+	MDRV_VIDEO_START(ex800)
+	MDRV_VIDEO_UPDATE(ex800)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
