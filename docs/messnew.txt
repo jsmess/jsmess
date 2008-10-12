@@ -1,4 +1,4 @@
-0.127.1
+﻿0.127.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -145,8 +145,10 @@ System Driver Changes:
 - [MAX] Fixed cart loading (both bug #1618 and a problem with the loading
   address). Commodore Ultimax / Max Machine / VIC-10 is now working. [Fabio
   Priuli]
+
+- [MK1/MK2] Added clickable artwork [Hobie Troxell]
   
-  [Mephisto 8/16/32 Bit] Added clickable artwork [Dirk Verwiebe]
+- [Mephisto 8/16/32 Bit] Added clickable artwork [Dirk Verwiebe]
 
 - [MSX] Added some Brazilian clones [Miodrag Milanovic]
 
