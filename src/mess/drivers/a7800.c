@@ -340,7 +340,7 @@ ROM_START (a7800)
     ROMX_LOAD ("7800.rom", 0xf000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
 /*      ROM_LOAD ("7800a.rom", 0xc000, 0x4000, CRC(649913e5)) */
     ROM_SYSTEM_BIOS( 1, "a7800pr", "Atari 7800 Prototype" )
-    ROMX_LOAD ("c300558-001a.bin", 0xc000, 0x4000, CRC(A0E10EDF) SHA1(14584B1EAFE9721804782D4B1AC3A4A7313E455F), ROM_BIOS(2))
+    ROMX_LOAD ("c300558-001a.bin", 0xc000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(2))
 
 ROM_END
 
@@ -357,18 +357,17 @@ static void a7800_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
+		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(a7800_cart); break;
+		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(a7800_cart); break;
 		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(a7800_cart); break;
 		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = a7800_partialhash; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "a78"); break;
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
+		default:											cartslot_device_getinfo(devclass, state, info); break;
 	}
 }
 
