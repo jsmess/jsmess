@@ -342,7 +342,7 @@ static VIDEO_UPDATE( super80v )
 
 /**************************** PIO ******************************************************************************/
 
-static UINT8 out_f8;
+static UINT8 keylatch;
 
 static Z80PIO_ON_INT_CHANGED( pio_interrupt )
 {
@@ -351,21 +351,22 @@ static Z80PIO_ON_INT_CHANGED( pio_interrupt )
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	out_f8 = data;
+	keylatch = data;
 };
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
-	UINT8 i, mask=1, in_fa=255;
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	for ( i=0; i < 8;i++)
+	int bit;
+	UINT8 data = 0xff;
+
+	for (bit = 0; bit < 8; bit++)
 	{
-		if (!(out_f8 & mask)) in_fa &= input_port_read(device->machine, keynames[i]);
-		mask<<=1;
+		if (!BIT(keylatch, bit)) data &= input_port_read(device->machine, keynames[bit]);
 	}
 
-	return in_fa;
+	return data;
 };
 
 static Z80PIO_INTERFACE( pio_intf )

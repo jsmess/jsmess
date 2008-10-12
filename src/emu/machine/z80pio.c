@@ -179,12 +179,6 @@ static void z80pio_port_read(const device_config *device, int channel)
 		}
 	}
 
-	if (z80pio->mode[channel] == PIO_MODE_BIDIRECTIONAL)
-	{
-		/* mask out output bits */
-		data &= z80pio->ddr[channel];
-	}
-
 	//if (LOG) logerror("Z80PIO Port %c Read Data %02x\n", 'A' + channel, data);
 
 	z80pio->input[channel] = data;
@@ -194,17 +188,6 @@ static void z80pio_port_write(const device_config *device, int channel)
 {
 	z80pio_t *z80pio = get_safe_token(device);
 	UINT8 data = z80pio->output[channel];
-
-	switch (z80pio->mode[channel])
-	{
-	case PIO_MODE_BIDIRECTIONAL:
-		/* mask out input bits */
-		data &= ~z80pio->ddr[channel];
-		break;
-	
-	default:
-		break;
-	}
 
 	if (channel == PIO_PORT_A)
 	{
@@ -276,7 +259,7 @@ static void z80pio_set_mode(const device_config *device, int channel, int mode)
 
 READ8_DEVICE_HANDLER( z80pio_c_r )
 {
-	return z80pio_d_r(device, offset);
+	return 0;
 }
 
 WRITE8_DEVICE_HANDLER( z80pio_c_w )
@@ -395,7 +378,7 @@ READ8_DEVICE_HANDLER( z80pio_d_r )
 		break;
 
 	case PIO_MODE_CONTROL:
-		data = z80pio->input[channel] | (z80pio->output[channel] & (~z80pio->ddr[channel]));
+		data = (z80pio->input[channel] & z80pio->ddr[channel]) | (z80pio->output[channel] & (~z80pio->ddr[channel]));
 		break;
 	}
 
@@ -474,27 +457,21 @@ static TIMER_CALLBACK( z80pio_poll_tick )
 			/* input data */
 			z80pio_port_read(device, channel);
 
-			if (z80pio->enable[channel] & PIO_IRQ_HIGH_LOW)
-			{
-				/* active polarity is high */
-				data = z80pio->input[channel] & ~z80pio->mask[channel];
-			}
-			else
-			{
-				/* active polarity is low */
-				data = ~z80pio->input[channel] & ~z80pio->mask[channel];
-			}
+			data = z80pio->input[channel] & z80pio->ddr[channel];
+  
+			/* keep only relevant bits */
+			data &= ~z80pio->mask[channel];
 
+			/* if active low, invert the bits */
+			if (!(z80pio->enable[channel] & PIO_IRQ_HIGH_LOW))
+				data ^= z80pio->mask[channel];
+
+			/* if AND logic, interrupt if all bits are set */
 			if (z80pio->enable[channel] & PIO_IRQ_AND_OR)
-			{
-				/* logical operation is AND */
-				match = (data == ~z80pio->mask[channel]);
-			}
+				match = (data == z80pio->mask[channel]);
+			/* otherwise, interrupt if at least one bit is set */
 			else
-			{
-				/* logical operation is OR */
 				match = (data != 0);
-			}
 
 			if (match)
 			{
@@ -627,7 +604,7 @@ static int z80pio_irq_state(const device_config *device)
 	int state = 0;
 	int channel;
 
-	logerror("Z80PIO IRQ STATE\n");
+	if (LOG) logerror("Z80PIO IRQ STATE\n");
 
 	/* loop over all channels */
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
@@ -650,7 +627,7 @@ static int z80pio_irq_ack(const device_config *device)
 	z80pio_t *z80pio = get_safe_token( device );
 	int channel;
 
-	logerror("Z80PIO IRQ ACK\n");
+	if (LOG) logerror("Z80PIO IRQ ACK\n");
 
 	/* loop over all channels */
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
@@ -676,7 +653,7 @@ static void z80pio_irq_reti(const device_config *device)
 	z80pio_t *z80pio = get_safe_token( device );
 	int channel;
 
-	logerror("Z80PIO IRQ RETI\n");
+	if (LOG) logerror("Z80PIO IRQ RETI\n");
 
 	/* loop over all channels */
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
