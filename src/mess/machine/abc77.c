@@ -85,15 +85,17 @@ void abc77_reset_w(const device_config *device, int level)
 	abc77->reset = level;
 }
 
-static READ8_DEVICE_HANDLER( abc77_clock_r )
+static READ8_HANDLER( abc77_clock_r )
 {
+	const device_config *device = devtag_get_device(machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	return abc77->clock;
 }
 
-static READ8_DEVICE_HANDLER( abc77_data_r )
+static READ8_HANDLER( abc77_data_r )
 {
+	const device_config *device = devtag_get_device(machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	static const char *keynames[] = { "ABC77_X0", "ABC77_X1", "ABC77_X2", "ABC77_X3", "ABC77_X4", "ABC77_X5", "ABC77_X6", "ABC77_X7", "ABC77_X8", "ABC77_X9", "ABC77_X10", "ABC77_X11" };
@@ -101,8 +103,9 @@ static READ8_DEVICE_HANDLER( abc77_data_r )
 	return input_port_read(device->machine, keynames[abc77->keylatch]);
 }
 
-static WRITE8_DEVICE_HANDLER( abc77_data_w )
+static WRITE8_HANDLER( abc77_data_w )
 {
+	const device_config *device = devtag_get_device(machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->keylatch = data & 0x0f;
@@ -133,9 +136,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREAD(ABC77, ABC77_TAG, abc77_data_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE(ABC77, ABC77_TAG, abc77_data_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD(ABC77, ABC77_TAG, abc77_clock_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(abc77_data_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(abc77_data_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(abc77_clock_r)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ_PORT("ABC77_DSW")
 ADDRESS_MAP_END
 
