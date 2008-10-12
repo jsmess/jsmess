@@ -198,7 +198,6 @@ static void z80pio_port_write(const device_config *device, int channel)
 	switch (z80pio->mode[channel])
 	{
 	case PIO_MODE_BIDIRECTIONAL:
-	case PIO_MODE_CONTROL:
 		/* mask out input bits */
 		data &= ~z80pio->ddr[channel];
 		break;
