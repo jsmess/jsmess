@@ -34,7 +34,7 @@
 #define __Z80PIO_H__
 
 /***************************************************************************
-    TYPE DEFINITIONS
+    CALLBACK FUNCTION PROTOTYPES
 ***************************************************************************/
 
 typedef void (*z80pio_on_int_changed_func) (const device_config *device, int state);
@@ -46,8 +46,9 @@ typedef void (*z80pio_on_ardy_changed_func) (const device_config *device, int st
 typedef void (*z80pio_on_brdy_changed_func) (const device_config *device, int state);
 #define Z80PIO_ON_BRDY_CHANGED(name) void name(const device_config *device, int state)
 
-typedef void (*z80pio_on_bstb_changed_func) (const device_config *device, int state);
-#define Z80PIO_ON_BSTB_CHANGED(name) void name(const device_config *device, int state)
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _z80pio_interface z80pio_interface;
 struct _z80pio_interface
@@ -114,8 +115,15 @@ void z80pio_bstb_w(const device_config *device, int state);
     READ/WRITE HANDLERS
 ***************************************************************************/
 
+/* A0 = B/A
+   A1 = C/D */
 READ8_DEVICE_HANDLER(z80pio_r);
 WRITE8_DEVICE_HANDLER(z80pio_w);
+
+/* A0 = C/D
+   A1 = B/A */
+READ8_DEVICE_HANDLER(z80pio_alt_r);
+WRITE8_DEVICE_HANDLER(z80pio_alt_w);
 
 /***************************************************************************
     DEVICE INTERFACE

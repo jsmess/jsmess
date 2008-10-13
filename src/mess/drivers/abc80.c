@@ -97,34 +97,6 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 /* Read/Write Handlers */
 
-static READ8_DEVICE_HANDLER( abc80_z80pio_r )
-{
-	int channel = BIT(offset, 1);
-
-	if (BIT(offset, 0))
-	{
-		return z80pio_c_r(device, channel);
-	}
-	else
-	{
-		return z80pio_d_r(device, channel);
-	}
-}
-
-static WRITE8_DEVICE_HANDLER( abc80_z80pio_w )
-{
-	int channel = BIT(offset, 1);
-
-	if (BIT(offset, 0))
-	{
-		z80pio_c_w(device, channel, data);
-	}
-	else
-	{
-		z80pio_d_w(device, channel, data);
-	}
-}
-
 static WRITE8_HANDLER( abc80_sound_w )
 {
 	/*
@@ -263,7 +235,7 @@ static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(abc80_sound_w)
 	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, abc80_z80pio_r, abc80_z80pio_w)
+	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

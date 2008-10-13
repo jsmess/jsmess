@@ -74,7 +74,6 @@ struct _z80pio
 	UINT8 mask[PIO_PORT_COUNT];				/* mask register */
 	UINT8 ddr[PIO_PORT_COUNT];				/* input/output select register */
 	int strobe[PIO_PORT_COUNT];				/* strobe pulse */
-	int match[PIO_PORT_COUNT];				/* mode 3 match equation match */
 
 	/* timers */
 	emu_timer *poll_timer;					/* mode 3 poll timer */
@@ -116,7 +115,7 @@ static void z80pio_check_interrupt(const device_config *device)
 		{
 			if (z80pio->irq_pending[channel])
 			{
-				if (LOG) logerror("Z80PIO Port %c Interrupt Request\n", 'A' + channel);
+				if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Request\n", device->tag, 'A' + channel);
 
 				/* request interrupt */
 				z80pio->irq_pending[channel] = 0;
@@ -141,7 +140,7 @@ static void z80pio_set_ready_line(const device_config *device, int channel, int 
 {
 	z80pio_t *z80pio = get_safe_token(device);
 
-	if (LOG) logerror("Z80PIO Port %c Ready %u\n", 'A' + channel, level);
+	if (LOG) logerror("Z80PIO \"%s\" Port %c Ready %u\n", device->tag, 'A' + channel, level);
 
 	if (channel == PIO_PORT_A)
 	{
@@ -179,7 +178,7 @@ static void z80pio_port_read(const device_config *device, int channel)
 		}
 	}
 
-	//if (LOG) logerror("Z80PIO Port %c Read Data %02x\n", 'A' + channel, data);
+	//if (LOG) logerror("Z80PIO \"%s\" Port %c Read Data %02x\n", device->tag, 'A' + channel, data);
 
 	z80pio->input[channel] = data;
 }
@@ -210,20 +209,19 @@ static void z80pio_port_write(const device_config *device, int channel)
 		}
 	}
 
-	if (LOG) logerror("Z80PIO Port %c Write Data %02x\n", 'A' + channel, data);
+	if (LOG) logerror("Z80PIO \"%s\" Port %c Write Data %02x\n", device->tag, 'A' + channel, data);
 }
 
 static void z80pio_set_mode(const device_config *device, int channel, int mode)
 {
 	z80pio_t *z80pio = get_safe_token(device);
 
-	if (LOG) logerror("Z80PIO Port %c Mode %u\n", 'A' + channel, mode);
+	if (LOG) logerror("Z80PIO \"%s\" Port %c Mode %u\n", device->tag, 'A' + channel, mode);
 
 	/* clear interrupt */
 	z80pio->irq_enable[channel] = 0;
 	z80pio->irq_pending[channel] = 0;
 	z80pio->int_state[channel] = 0;
-	z80pio->match[channel] = 0;
 
 	z80pio_check_interrupt(device);
 
@@ -284,7 +282,16 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 			/* load interrupt vector */
 			z80pio->vector[channel] = data & 0xfe;
 
-			if (LOG) logerror("Z80PIO Port %c Interrupt Vector %02x\n", 'A' + channel, z80pio->vector[channel]);
+			if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Vector %02x\n", device->tag, 'A' + channel, z80pio->vector[channel]);
+		}
+		else if ((data & 0x0f) == 0x03)
+		{
+			/* set interrupt enable */
+			z80pio->enable[channel] = (data & 0x80) | (z80pio->enable[channel] & 0x7f);
+			z80pio->irq_enable[channel] = BIT(data, 7);
+			z80pio_check_interrupt(device);
+
+			if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Enable %u\n", device->tag, 'A' + channel, BIT(data, 7));
 		}
 		else if ((data & 0x0f) == 0x0f)
 		{
@@ -319,15 +326,13 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 
 			z80pio_check_interrupt(device);
 
-			if (LOG) logerror("Z80PIO Port %c Interrupt Control %02x\n", 'A' + channel, data);
+			if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Control %02x\n", device->tag, 'A' + channel, data);
 		}
 		break;
-
 
 	case PIO_STATE_DDR:
 		/* set data direction */
 		z80pio->ddr[channel] = data;
-		z80pio->match[channel] = 0;
 
 		/* set interrupt enable */
 		z80pio->irq_enable[channel] = BIT(z80pio->enable[channel], 7);
@@ -335,13 +340,12 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 
 		z80pio->state[channel] = PIO_STATE_NORMAL;
 
-		if (LOG) logerror("Z80PIO Port %c Direction %02x\n", 'A' + channel, data);
+		if (LOG) logerror("Z80PIO \"%s\" Port %c Direction %02x\n", device->tag, 'A' + channel, data);
 		break;
 
 	case PIO_STATE_MASK:
 		/* set interrupt mask */
 		z80pio->mask[channel] = data;
-		z80pio->match[channel] = 0;
 
 		/* set interrupt enable */
 		z80pio->irq_enable[channel] = BIT(z80pio->enable[channel], 7);
@@ -349,7 +353,7 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 
 		z80pio->state[channel] = PIO_STATE_NORMAL;
 
-		if (LOG) logerror("Z80PIO Port %c Mask %02x\n", 'A' + channel, data);
+		if (LOG) logerror("Z80PIO \"%s\" Port %c Mask %02x\n", device->tag, 'A' + channel, data);
 		break;
 	}
 }
@@ -391,11 +395,12 @@ READ8_DEVICE_HANDLER( z80pio_d_r )
 		break;
 
 	case PIO_MODE_CONTROL:
+		z80pio_port_read(device, channel);
 		data = (z80pio->input[channel] & z80pio->ddr[channel]) | (z80pio->output[channel] & (~z80pio->ddr[channel]));
 		break;
 	}
 
-	if (LOG) logerror("Z80PIO Port %c Data Register Read %02x\n", 'A' + channel, data);
+	if (LOG) logerror("Z80PIO \"%s\" Port %c Data Register Read %02x\n", device->tag, 'A' + channel, data);
 
 	return data;
 }
@@ -405,7 +410,7 @@ WRITE8_DEVICE_HANDLER( z80pio_d_w )
 	z80pio_t *z80pio = get_safe_token( device );
 	int channel = offset & 0x01;
 
-	if (LOG) logerror("Z80PIO Port %c Data Register Write %02x\n", 'A' + channel, data);
+	if (LOG) logerror("Z80PIO \"%s\" Port %c Data Register Write %02x\n", device->tag, 'A' + channel, data);
 
 	switch (z80pio->mode[channel])
 	{
@@ -485,6 +490,8 @@ static TIMER_CALLBACK( z80pio_poll_tick )
 					{
 						if (!BIT(old_data, bit) && BIT(data, bit)) // rising edge
 						{
+							if (LOG) logerror("Z80PIO \"%s\" Port %c Rising Edge detected on bit %u\n", device->tag, 'A' + channel, bit);
+
 							match = 1;
 
 							if (!(z80pio->enable[channel] & PIO_IRQ_AND_OR)) // OR
@@ -505,6 +512,8 @@ static TIMER_CALLBACK( z80pio_poll_tick )
 					{
 						if (BIT(old_data, bit) && !BIT(data, bit)) // falling edge
 						{
+							if (LOG) logerror("Z80PIO \"%s\" Port %c Falling Edge detected on bit %u\n", device->tag, 'A' + channel, bit);
+
 							match = 1;
 
 							if (!(z80pio->enable[channel] & PIO_IRQ_AND_OR)) // OR
@@ -529,7 +538,7 @@ static TIMER_CALLBACK( z80pio_poll_tick )
 				/* trigger interrupt */
 				z80pio->irq_pending[channel] = 1;
 
-				if (LOG) logerror("Z80PIO Port %c Interrupt Pending\n", 'A' + channel);
+				if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Pending\n", device->tag, 'A' + channel);
 
 				z80pio_check_interrupt(device);
 			}
@@ -545,7 +554,7 @@ static void z80pio_strobe(const device_config *device, int channel, int level)
 {
 	z80pio_t *z80pio = get_safe_token(device);
 
-	if (LOG) logerror("Z80PIO Port %c Strobe %u\n", 'A' + channel, level);
+	if (LOG) logerror("Z80PIO \"%s\" Port %c Strobe %u\n", device->tag, 'A' + channel, level);
 
 	if (z80pio->mode[PIO_PORT_A] == PIO_MODE_BIDIRECTIONAL)
 	{
@@ -576,7 +585,7 @@ static void z80pio_strobe(const device_config *device, int channel, int level)
 				/* clear ready line */
 				z80pio_set_ready_line(device, channel, 0);
 
-				if (LOG) logerror("Z80PIO Port %c Interrupt Pending\n", 'A' + channel);
+				if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Pending\n", device->tag, 'A' + channel);
 			}
 			break;
 		}
@@ -595,7 +604,7 @@ static void z80pio_strobe(const device_config *device, int channel, int level)
 				/* clear ready line */
 				z80pio_set_ready_line(device, channel, 0);
 
-				if (LOG) logerror("Z80PIO Port %c Interrupt Pending\n", 'A' + channel);
+				if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Pending\n", device->tag, 'A' + channel);
 			}
 			break;
 
@@ -614,7 +623,7 @@ static void z80pio_strobe(const device_config *device, int channel, int level)
 				/* clear ready line */
 				z80pio_set_ready_line(device, channel, 0);
 
-				if (LOG) logerror("Z80PIO Port %c Interrupt Pending\n", 'A' + channel);
+				if (LOG) logerror("Z80PIO \"%s\" Port %c Interrupt Pending\n", device->tag, 'A' + channel);
 			}
 			break;
 
@@ -647,7 +656,7 @@ static int z80pio_irq_state(const device_config *device)
 	int state = 0;
 	int channel;
 
-	if (LOG) logerror("Z80PIO IRQ STATE\n");
+	if (LOG) logerror("Z80PIO \"%s\" IRQ STATE\n", device->tag);
 
 	/* loop over all channels */
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
@@ -670,7 +679,7 @@ static int z80pio_irq_ack(const device_config *device)
 	z80pio_t *z80pio = get_safe_token( device );
 	int channel;
 
-	if (LOG) logerror("Z80PIO IRQ ACK\n");
+	if (LOG) logerror("Z80PIO \"%s\" IRQ ACK\n", device->tag);
 
 	/* loop over all channels */
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
@@ -696,7 +705,7 @@ static void z80pio_irq_reti(const device_config *device)
 	z80pio_t *z80pio = get_safe_token( device );
 	int channel;
 
-	if (LOG) logerror("Z80PIO IRQ RETI\n");
+	if (LOG) logerror("Z80PIO \"%s\" IRQ RETI\n", device->tag);
 
 	/* loop over all channels */
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
@@ -730,6 +739,23 @@ WRITE8_DEVICE_HANDLER(z80pio_w)
 		z80pio_c_w(device, offset & 1, data);
 	else
 		z80pio_d_w(device, offset & 1, data);
+}
+
+READ8_DEVICE_HANDLER(z80pio_alt_r)
+{
+	int channel = BIT(offset, 1);
+
+	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
+}
+
+WRITE8_DEVICE_HANDLER(z80pio_alt_w)
+{
+	int channel = BIT(offset, 1);
+
+	if (offset & 1)
+		z80pio_c_w(device, channel, data);
+	else
+		z80pio_d_w(device, channel, data);
 }
 
 /***************************************************************************
@@ -784,7 +810,6 @@ static DEVICE_START( z80pio )
 	state_save_register_item_array(unique_tag, 0, z80pio->mask);
 	state_save_register_item_array(unique_tag, 0, z80pio->ddr);
 	state_save_register_item_array(unique_tag, 0, z80pio->strobe);
-	state_save_register_item_array(unique_tag, 0, z80pio->match);
 
 	return DEVICE_START_OK;
 }
@@ -815,7 +840,6 @@ static DEVICE_RESET( z80pio )
 		z80pio->irq_enable[channel] = 0;
 		z80pio->irq_pending[channel] = 0;
 		z80pio->int_state[channel] = 0;
-		z80pio->match[channel] = 0;
 
 		/* reset output register */
 		z80pio->output[channel] = 0;
