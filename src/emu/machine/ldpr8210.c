@@ -91,7 +91,8 @@ struct _simutrek_data
 	UINT8				data;					/* parallel data for simutrek */
 	UINT8				data_ready;				/* ready flag for simutrek data */
 	UINT8				port2;					/* 8748 port 2 state */
-	UINT8				jumphack;
+	UINT8				controlnext;			/* latch to control next pair of fields */
+	UINT8				controlthis;			/* latched value for our control over the current pair of fields */
 };
 
 
@@ -797,12 +798,11 @@ static WRITE8_HANDLER( pr8210_port1_w )
 	if (!(data & 0x01) && (prev & 0x01))
 	{
 		/* special override for the Simutrek, which takes over control of this is some situations */
-		if (player->simutrek.cpunum == -1 || (player->simutrek.port2 & 0x04) != 0 || player->simutrek.jumphack)
+		if (player->simutrek.cpunum == -1 || !player->simutrek.controlthis)
 		{
 			if (LOG_SIMUTREK)
 				printf("%3d:JUMP TRG\n", video_screen_get_vpos(ld->screen));
 			ldcore_advance_slider(ld, direction);
-			player->simutrek.jumphack = 0;
 		}
 		else if (LOG_SIMUTREK)
 			printf("%3d:Skipped JUMP TRG\n", video_screen_get_vpos(ld->screen));
@@ -1070,6 +1070,8 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
 	ldplayer_data *player = ld->player;
+	if (LOG_SIMUTREK && player->simutrek.audio_squelch != (state == 0))
+		printf("--> audio squelch = %d\n", state == 0);
 	player->simutrek.audio_squelch = (state == 0);
 	update_audio_squelch(ld);
 }
@@ -1083,12 +1085,17 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 static void simutrek_init(laserdisc_state *ld)
 {
 	astring *tempstring = astring_alloc();
+	ldplayer_data *player = ld->player;
 
 	/* standard PR-8210 initialization */
 	pr8210_init(ld);
 
+	/* initialize the Simutrek state */
+	/* for proper synchronization of initial attract mode, this needs to be set */
+	player->simutrek.data_ready = 1;
+
 	/* find the Simutrek CPU */
-	ld->player->simutrek.cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
+	player->simutrek.cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
 	astring_free(tempstring);
 }
 
@@ -1110,6 +1117,12 @@ static TIMER_CALLBACK( irq_off )
 static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
 {
 	ldplayer_data *player = ld->player;
+
+	if (fieldnum == 1)
+	{
+		player->simutrek.controlthis = player->simutrek.controlnext;
+		player->simutrek.controlnext = 0;
+	}
 
 	if (LOG_SIMUTREK)
 		printf("%3d:VSYNC(%d)\n", video_screen_get_vpos(ld->screen), fieldnum);
@@ -1231,8 +1244,9 @@ static WRITE8_HANDLER( simutrek_port2_w )
 	}
 
 	/* bit $04 controls who owns the JUMP TRG command */
-	if (!(data & 0x04) && (prev & 0x04))
-		player->simutrek.jumphack = 1;
+	if (LOG_SIMUTREK && ((data ^ prev) & 0x04))
+		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), (data >> 2) & 1, activecpu_get_pc());
+	player->simutrek.controlnext = (~data >> 2) & 1;
 
 	/* bits $03 control something (status?) */
 	if (LOG_SIMUTREK && ((data ^ prev) & 0x03))

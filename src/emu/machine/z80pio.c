@@ -458,7 +458,7 @@ static TIMER_CALLBACK( z80pio_poll_tick )
 			z80pio_port_read(device, channel);
 
 			data = z80pio->input[channel] & z80pio->ddr[channel];
-  
+
 			/* keep only relevant bits */
 			data &= ~z80pio->mask[channel];
 
@@ -517,7 +517,7 @@ static void z80pio_strobe(const device_config *device, int channel, int level)
 				z80pio_port_write(device, PIO_PORT_A);
 			}
 			break;
-		
+
 		case PIO_PORT_B:
 			if (!level)
 			{
@@ -642,7 +642,7 @@ static int z80pio_irq_ack(const device_config *device)
 			return z80pio->vector[channel];
 		}
 	}
-	
+
 	if (LOG) logerror("z80pio_irq_ack: failed to find an interrupt to ack!");
 
 	return z80pio->vector[0];
@@ -668,7 +668,7 @@ static void z80pio_irq_reti(const device_config *device)
 			return;
 		}
 	}
-	
+
 	if (LOG) logerror("z80pio_irq_reti: failed to find an interrupt to clear IEO on!");
 }
 
@@ -702,9 +702,9 @@ static DEVICE_START( z80pio )
 
 	assert(intf != NULL);
 	z80pio->intf = intf;
-	
+
 	/* get clock */
-	
+
 	if (intf->cpu != NULL)
 	{
 		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
@@ -757,7 +757,7 @@ static DEVICE_RESET( z80pio )
 	{
 		/* set port mask register to inhibit all port data bits */
 		z80pio->mask[channel] = 0xff;
-		
+
 		/* clear ready line */
 		z80pio_set_ready_line(device, channel, 0);
 

@@ -5797,6 +5797,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kf10thep )	/* bootleg of kof2002 */
 	DRIVER( kof2k4se )	/* bootleg of kof2002 */
 	DRIVER( matrim )	/* 0266 (c) 2002 Atlus */
+	DRIVER( matrimbl )	/* bootleg */
 	DRIVER( pnyaa )		/* 0267 (c) 2003 Aiky / Taito */
 	DRIVER( ms5pcb )	/* 0268 (c) 2003 Playmore */
 	DRIVER( mslug5 )	/* 0268 (c) 2003 Playmore */
@@ -8133,13 +8134,26 @@ Other Sun games
 	DRIVER( sb2003a )	/* (c) 2003 Limenko */
 	DRIVER( spotty )	/* (c) 2001 Prince Co. */
 	DRIVER( carrera )	/* (c) 19?? BS Electronics */
+
+	/* Golden Poker / Potten's Poker hardware */
 	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
 	DRIVER( goldnpkr )	/* (c) 1981 Bonanza */
- 	DRIVER( goldnpkb )	/* (c) 1981 Bonanza */
- 	DRIVER( goldnpkc )	/* Bootleg */
-	DRIVER( jokerpkr )	/* Bootleg in Coinmaster hardware */
+	DRIVER( goldnpkb )	/* (c) 1981 Bonanza */
 	DRIVER( pottnpkr )	/* Bootleg */
-	DRIVER( pottnpkb )	/* Bootleg */
+	DRIVER( potnpkra )	/* Bootleg in Coinmaster H/W */
+	DRIVER( potnpkrb )	/* Bootleg */
+	DRIVER( potnpkrc )	/* Bootleg */
+	DRIVER( potnpkrd )	/* Bootleg */
+	DRIVER( potnpkre )	/* Bootleg */
+	DRIVER( goodluck )	/* Unknown */
+	DRIVER( bsuerte )	/* Unknown */
+	DRIVER( bsuertea )	/* Unknown */
+	DRIVER( royale )	/* Unknown */
+	DRIVER( witchcrd )	/* 1991, Unknown */
+	DRIVER( witchcda )	/* 1991, Unknown */
+	DRIVER( witchcdb )	/* 1991, Unknown */
+	DRIVER( sloco93 )	/* 1993, Unknown */
+	DRIVER( sloco93a )	/* 1993, Unknown */
 
 	/* Cal Omega */
 	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
