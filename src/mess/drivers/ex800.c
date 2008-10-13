@@ -129,6 +129,8 @@ TODO:  - The UPD7810 core is missing analog port emulation
 #include "driver.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/beep.h"
+#include "ex800.lh"
+
 
 #define PA0 (data & 0x01)
 #define PA1 (data & 0x02)
@@ -182,19 +184,6 @@ static MACHINE_START(ex800)
 	beep_set_state(0, 0);
 	beep_set_frequency(0, 4000); /* measured at 4000 hz */
 }
-
-
-#if 0
-static VIDEO_START(ex800)
-{
-}
-
-
-static VIDEO_UPDATE(ex800)
-{
-	return 0;
-}
-#endif
 
 
 static READ8_HANDLER(ex800_porta_r)
@@ -304,14 +293,6 @@ static WRITE8_HANDLER(ex800_gate7a_w)
 	logerror("GATE7A W %x @%x with offset %x\n", data, activecpu_get_pc(), offset);
 }
 
-static VIDEO_START( ex800 )
-{
-}
-
-static VIDEO_UPDATE( ex800 )
-{
-	return 0;
-}
 
 /******************************************************************************
  Address Maps
@@ -444,17 +425,7 @@ static MACHINE_DRIVER_START(ex800)
 
 	MDRV_MACHINE_START(ex800)
 
-	/* "video" hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(480, 640)
-	MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 639)
-	MDRV_PALETTE_LENGTH(4)
-
-	MDRV_VIDEO_START(ex800)
-	MDRV_VIDEO_UPDATE(ex800)
+	MDRV_DEFAULT_LAYOUT(layout_ex800)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
