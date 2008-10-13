@@ -189,6 +189,12 @@ static void z80pio_port_write(const device_config *device, int channel)
 	z80pio_t *z80pio = get_safe_token(device);
 	UINT8 data = z80pio->output[channel];
 
+	if (z80pio->mode[channel] == PIO_MODE_CONTROL)
+	{
+		/* mask out input pins */
+		data &= ~z80pio->ddr[channel];
+	}
+
 	if (channel == PIO_PORT_A)
 	{
 		if (z80pio->intf->port_a_w)
@@ -214,9 +220,12 @@ static void z80pio_set_mode(const device_config *device, int channel, int mode)
 	if (LOG) logerror("Z80PIO Port %c Mode %u\n", 'A' + channel, mode);
 
 	/* clear interrupt */
+	z80pio->irq_enable[channel] = 0;
 	z80pio->irq_pending[channel] = 0;
 	z80pio->int_state[channel] = 0;
 	z80pio->match[channel] = 0;
+
+	z80pio_check_interrupt(device);
 
 	switch (mode)
 	{
@@ -319,6 +328,10 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 		/* set data direction */
 		z80pio->ddr[channel] = data;
 		z80pio->match[channel] = 0;
+
+		/* set interrupt enable */
+		z80pio->irq_enable[channel] = BIT(z80pio->enable[channel], 7);
+		z80pio_check_interrupt(device);
 
 		z80pio->state[channel] = PIO_STATE_NORMAL;
 
@@ -449,46 +462,76 @@ static TIMER_CALLBACK( z80pio_poll_tick )
 
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
 	{
-		if (z80pio->mode[channel] == PIO_MODE_CONTROL)
+		if ((z80pio->mode[channel] == PIO_MODE_CONTROL) && (z80pio->mask[channel] != 0xff))
 		{
+			int bit;
 			int match = 0;
-			UINT8 data;
 
-			/* input data */
+			UINT8 ddr = z80pio->ddr[channel];
+			UINT8 mask = z80pio->mask[channel];
+			UINT8 output = (z80pio->output[channel] & ~ddr);
+			UINT8 old_data = (z80pio->input[channel] & z80pio->ddr[channel]) | output;
+			UINT8 data;
+			
 			z80pio_port_read(device, channel);
 
-			data = z80pio->input[channel] & z80pio->ddr[channel];
+			data = (z80pio->input[channel] & ddr) | output;
 
-			/* keep only relevant bits */
-			data &= ~z80pio->mask[channel];
+			for (bit = 0; bit < 8; bit++)
+			{
+				if (!BIT(mask, bit))
+				{
+					if (z80pio->enable[channel] & PIO_IRQ_HIGH_LOW)
+					{
+						if (!BIT(old_data, bit) && BIT(data, bit)) // rising edge
+						{
+							match = 1;
 
-			/* if active low, invert the bits */
-			if (!(z80pio->enable[channel] & PIO_IRQ_HIGH_LOW))
-				data ^= z80pio->mask[channel];
+							if (!(z80pio->enable[channel] & PIO_IRQ_AND_OR)) // OR
+							{
+								break;
+							}
+						}
+						else
+						{
+							if (z80pio->enable[channel] & PIO_IRQ_AND_OR) // AND
+							{
+								match = 0;
+								break;
+							}
+						}
+					}
+					else
+					{
+						if (BIT(old_data, bit) && !BIT(data, bit)) // falling edge
+						{
+							match = 1;
 
-			/* if AND logic, interrupt if all bits are set */
-			if (z80pio->enable[channel] & PIO_IRQ_AND_OR)
-				match = (data == z80pio->mask[channel]);
-			/* otherwise, interrupt if at least one bit is set */
-			else
-				match = (data != 0);
+							if (!(z80pio->enable[channel] & PIO_IRQ_AND_OR)) // OR
+							{
+								break;
+							}
+						}
+						else
+						{
+							if (z80pio->enable[channel] & PIO_IRQ_AND_OR) // AND
+							{
+								match = 0;
+								break;
+							}
+						}
+					}
+				}
+			}
 
 			if (match)
 			{
-				if (!z80pio->match[channel])
-				{
-					/* trigger interrupt */
-					z80pio->match[channel] = 1;
-					z80pio->irq_pending[channel] = 1;
+				/* trigger interrupt */
+				z80pio->irq_pending[channel] = 1;
 
-					if (LOG) logerror("Z80PIO Port %c Interrupt Pending\n", 'A' + channel);
+				if (LOG) logerror("Z80PIO Port %c Interrupt Pending\n", 'A' + channel);
 
-					z80pio_check_interrupt(device);
-				}
-			}
-			else
-			{
-				z80pio->match[channel] = 0;
+				z80pio_check_interrupt(device);
 			}
 		}
 	}
@@ -723,7 +766,7 @@ static DEVICE_START( z80pio )
 	/* allocate poll timers */
 
 	z80pio->poll_timer = timer_alloc(z80pio_poll_tick, (void *)device);
-	timer_adjust_periodic(z80pio->poll_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80pio->clock));
+	timer_adjust_periodic(z80pio->poll_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80pio->clock / 16));
 
 	/* register for state saving */
 
@@ -763,6 +806,9 @@ static DEVICE_RESET( z80pio )
 
 		/* set mode 1 */
 		z80pio->mode[channel] = PIO_MODE_INPUT;
+
+		/* set all inputs */
+		z80pio->ddr[channel] = 0xff;
 
 		/* reset interrupt */
 		z80pio->enable[channel] &= 0x7f;
