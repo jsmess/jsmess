@@ -1,11 +1,11 @@
 /***************************************************************************
 
-    Z80 PIO (Z8420) implementation
+    Z80 PIO Parallel Input/Output Controller emulation
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
-***************************************************************************
+****************************************************************************
                             _____   _____
                     D2   1 |*    \_/     | 40  D3
                     D7   2 |             | 39  D4
@@ -97,6 +97,8 @@ struct _z80pio_interface
 READ8_DEVICE_HANDLER( z80pio_c_r );
 WRITE8_DEVICE_HANDLER( z80pio_c_w );
 
+READ8_DEVICE_HANDLER( lh0081_c_r );
+
 /***************************************************************************
     DATA REGISTER READ/WRITE
 ***************************************************************************/
@@ -131,5 +133,14 @@ WRITE8_DEVICE_HANDLER(z80pio_alt_w);
 
 #define Z80PIO DEVICE_GET_INFO_NAME(z80pio)
 DEVICE_GET_INFO( z80pio );
+
+#define Z8420 DEVICE_GET_INFO_NAME(z8420)
+DEVICE_GET_INFO( z8420 );
+
+#define LH0081 DEVICE_GET_INFO_NAME(lh0081)
+DEVICE_GET_INFO( lh0081 );
+
+#define MK3881 DEVICE_GET_INFO_NAME(mk3881)
+DEVICE_GET_INFO( mk3881 );
 
 #endif
