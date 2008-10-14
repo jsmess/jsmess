@@ -309,7 +309,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 	UINT8 data = 0;
 
 	if (cassette_input(cassette_device_image(device->machine)) > 0.03)
-		data &= ~1;
+		data |= 0x01;
 
 	data |= mbee_vsync << 7;
 
