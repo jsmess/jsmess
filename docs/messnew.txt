@@ -1,4 +1,4 @@
-﻿0.127.1
+﻿0.128
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -232,7 +232,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.127u8.  This incorporates all features of the
+- The core is based on MAME 0.128.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Refactored ZIP path code out of src/mess/image.c, made more testable.  [Nate
