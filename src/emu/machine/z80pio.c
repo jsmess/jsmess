@@ -69,6 +69,7 @@ struct _z80pio
 	int state[PIO_PORT_COUNT];				/* control register state */
 	int mode[PIO_PORT_COUNT];				/* mode control register */
 	int irq_enable[PIO_PORT_COUNT];			/* interrupt enable flag */
+	int irq_pending[PIO_PORT_COUNT];		/* interrupt pending flag */
 	int int_state[PIO_PORT_COUNT];			/* interrupt status */
 	UINT8 enable[PIO_PORT_COUNT];			/* interrupt control word */
 	UINT8 input[PIO_PORT_COUNT];			/* data input register */
@@ -116,7 +117,20 @@ static void z80pio_check_interrupt(const device_config *device)
 
 	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
 	{
-		if (!(z80pio->irq_enable[channel]))
+		if (z80pio->irq_enable[channel])
+		{
+			if (z80pio->irq_pending[channel])
+			{
+				/* trigger interrupt request */
+				z80pio->int_state[channel] |= Z80_DAISY_INT;
+
+				/* reset interrupt pending */
+				z80pio->irq_pending[channel] = 0;
+
+				LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Request\n", device->tag, 'A' + channel);
+			}
+		}
+		else
 		{
 			/* clear interrupt request */
 			z80pio->int_state[channel] &= ~Z80_DAISY_INT;
@@ -140,6 +154,14 @@ static void z80pio_trigger_interrupt(const device_config *device, int channel)
 
 		LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Request\n", device->tag, 'A' + channel);
 	}
+	else
+	{
+		/* set interrupt pending */
+		z80pio->irq_pending[channel] = 1;
+		z80pio_check_interrupt(device);
+
+		LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Pending\n", device->tag, 'A' + channel);
+	}
 }
 
 static TIMER_CALLBACK( z80pio_irq_tick )
@@ -154,6 +176,9 @@ static TIMER_CALLBACK( z80pio_irq_tick )
 	z80pio->irq_enable[channel] = state;
 
 	LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Enable %u\n", device->tag, 'A' + channel, state);
+
+	/* check interrupt status */
+	z80pio_check_interrupt(device);
 }
 
 static void z80pio_set_irq_enable(const device_config *device, int channel, int state)
@@ -371,6 +396,12 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 			{
 				/* disable interrupts until mask is written */
 				z80pio_set_irq_enable(device, channel, 0);
+		
+				/* reset pending interrupt */
+				z80pio->irq_pending[channel] = 0;
+
+				/* set logic equation to false */
+				z80pio->match[channel] = 0;
 
 				/* next word is mask control */
 				z80pio->state[channel] = PIO_STATE_MASK;
@@ -532,6 +563,8 @@ static TIMER_CALLBACK( z80pio_poll_tick )
 			UINT8 ddr = z80pio->ddr[channel];
 			UINT8 old_data = z80pio->input[channel] & ddr;
 			UINT8 data = z80pio_port_r(device, channel) & ddr;
+
+			if (old_data == data) continue;
 
 			for (bit = 0; bit < 8; bit++)
 			{
@@ -840,6 +873,7 @@ static DEVICE_START( z80pio )
 	state_save_register_item_array(unique_tag, 0, z80pio->state);
 	state_save_register_item_array(unique_tag, 0, z80pio->mode);
 	state_save_register_item_array(unique_tag, 0, z80pio->irq_enable);
+	state_save_register_item_array(unique_tag, 0, z80pio->irq_pending);
 	state_save_register_item_array(unique_tag, 0, z80pio->int_state);
 	state_save_register_item_array(unique_tag, 0, z80pio->enable);
 	state_save_register_item_array(unique_tag, 0, z80pio->input);
@@ -862,26 +896,27 @@ static DEVICE_RESET( z80pio )
 
 	for (channel = 0; channel < 2; channel++)
 	{
-		/* set port mask register to inhibit all port data bits */
-		z80pio->mask[channel] = 0xff;
-
-		/* clear ready line */
-		z80pio_ready_w(device, channel, 0);
-
 		/* set mode 1 */
 		z80pio->mode[channel] = PIO_MODE_INPUT;
 
-		/* set all inputs */
-		z80pio->ddr[channel] = 0xff;
-
-		/* reset interrupt */
+		/* disable interrupt */
 		z80pio->enable[channel] &= 0x7f;
 		z80pio->irq_enable[channel] = 0;
+		z80pio->irq_pending[channel] = 0;
 		z80pio->int_state[channel] = 0;
 		z80pio->match[channel] = 0;
 
+		/* reset all bits of the data I/O register */
+		z80pio->ddr[channel] = 0;
+
+		/* set all bits of the mask control register */
+		z80pio->mask[channel] = 0xff;
+
 		/* reset output register */
 		z80pio->output[channel] = 0;
+
+		/* clear ready line */
+		z80pio_ready_w(device, channel, 0);
 	}
 
 	z80pio_check_interrupt(device);
@@ -930,7 +965,7 @@ DEVICE_GET_INFO( z8420 )
 		case DEVINFO_STR_NAME:							info->s = "Zilog Z8420";				break;
 		case DEVINFO_STR_FAMILY:						info->s = "Z80 PIO";					break;
 
-		default: DEVICE_GET_INFO_CALL(z80pio);
+		default:										DEVICE_GET_INFO_CALL(z80pio);
 	}
 }
 
@@ -942,7 +977,7 @@ DEVICE_GET_INFO( lh0081 )
 		case DEVINFO_STR_NAME:							info->s = "Sharp LH0081";				break;
 		case DEVINFO_STR_FAMILY:						info->s = "Z80 PIO";					break;
 
-		default: DEVICE_GET_INFO_CALL(z80pio);
+		default:										DEVICE_GET_INFO_CALL(z80pio);
 	}
 }
 
@@ -954,6 +989,6 @@ DEVICE_GET_INFO( mk3881 )
 		case DEVINFO_STR_NAME:							info->s = "Mostek MK3881";				break;
 		case DEVINFO_STR_FAMILY:						info->s = "Z80 PIO";					break;
 
-		default: DEVICE_GET_INFO_CALL(z80pio);
+		default:										DEVICE_GET_INFO_CALL(z80pio);
 	}
 }
