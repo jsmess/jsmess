@@ -1661,7 +1661,7 @@ static void	dgnalpha_fdc_callback(running_machine *machine, wd17xx_state_t event
 			}
 			else
 			{
-				if (pia_get_output_ca2(2))
+				if (pia_get_output_ca2_z(2))
 					cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
@@ -1722,7 +1722,14 @@ WRITE8_HANDLER(wd2797_w)
 	};
 }
 
+READ8_HANDLER(alpha_modem_r)
+{
+	return 0xFF;
+}
 
+WRITE8_HANDLER(alpha_modem_w)
+{
+}
 
 static WRITE8_HANDLER ( d_pia1_ca2_w )
 {

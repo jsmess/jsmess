@@ -226,6 +226,7 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff04, 0xff07) AM_READWRITE(acia_6551_r,		acia_6551_w)
 	AM_RANGE(0xff20, 0xff23) AM_READWRITE(pia_1_r,			coco_pia_1_w)
 	AM_RANGE(0xff24, 0xff27) AM_READWRITE(pia_2_r,			pia_2_w) 	/* Third PIA on Dragon Alpha */
+	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(alpha_modem_r,	alpha_modem_w)	/* Modem, dummy to stop eror log ! */
 	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(wd2797_r,			wd2797_w)	/* Alpha onboard disk interface */
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP

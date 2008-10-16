@@ -273,12 +273,18 @@ static int y_screen_offset=-8;
 WRITE8_HANDLER ( videoULA_w )
 {
 
-	int tpal,tcol;
+	int tpal,tcol,vpos;
 
 
 	// emulation refresh optimisation
 	video_refresh=1;
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+
+	// Make sure vpos is never <0 2008-10-11 PHS.
+	vpos=video_screen_get_vpos(machine->primary_screen);
+	if(vpos==0)
+	  video_screen_update_partial(machine->primary_screen, vpos);
+	else
+	  video_screen_update_partial(machine->primary_screen, vpos -1 );
 
 //	logerror("setting videoULA %s at %.4x size:%.4x\n",image_filename(image), addr, size);
 	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,video_screen_get_vpos(machine->primary_screen) );

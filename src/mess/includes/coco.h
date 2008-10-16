@@ -89,6 +89,10 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write );
 READ8_HANDLER(wd2797_r);
 WRITE8_HANDLER(wd2797_w);
 
+/* Dragon Alpha Modem, just dummy funcs at the mo */
+READ8_HANDLER(alpha_modem_r);
+WRITE8_HANDLER(alpha_modem_w);
+
 #ifdef UNUSED_FUNCTION
 void coco_set_halt_line(running_machine *machine, int halt_line);
 #endif
