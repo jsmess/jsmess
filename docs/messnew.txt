@@ -118,7 +118,9 @@ System Driver Changes:
   we will start to use the correct ones. If you own a C128 PAL, please
   dump its BIOS to verify its content. [Fabio Priuli]
 
-- [EXIDY] Added support for 1200 baud cassette images. [Wilbert Pol]
+- [EXIDY] Added support for cassette images. [Robbbert, Wilbert Pol]
+
+- [EXIDY] Fixed Centronics printing. [Robbbert]
 
 - [FAMICOM] Fixed small Disk loading bug which caused "Disk Trouble Err.
   22" with all disk images (remaining part of bug #1479). Famicom Disk

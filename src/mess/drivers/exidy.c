@@ -511,7 +511,7 @@ static WRITE8_HANDLER(exidy_ff_port_w)
 		case 1: /* printer */
 			/* bit 7 = strobe, bit 6..0 = data */
 			centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-			centronics_write_handshake(0, (data>>7) & 0x01, CENTRONICS_STROBE);
+			centronics_write_handshake(0, (~data>>7) & 0x01, CENTRONICS_STROBE);
 			centronics_write_data(0, data & 0x7f);
 			break;
 	}
