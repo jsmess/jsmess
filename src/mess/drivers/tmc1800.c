@@ -867,6 +867,13 @@ static MACHINE_DRIVER_START( tmc1800 )
 
 	MDRV_IMPORT_FROM(tmc1800_video)
 
+	// sound hardware
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	// quickload
 
 	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
@@ -890,6 +897,13 @@ static MACHINE_DRIVER_START( osc1000b )
 	// video hardware
 
 	MDRV_IMPORT_FROM(osc1000b_video)
+
+	// sound hardware
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// quickload
 
