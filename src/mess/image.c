@@ -1073,7 +1073,7 @@ void image_message(const device_config *device, const char *format, ...)
 	va_end(args);
 
 	/* display the popup for a standard amount of time */
-	ui_popup_time(10, "%s: %s",
+	ui_popup_time(5, "%s: %s",
 		image_basename(device),
 		buffer);
 }
