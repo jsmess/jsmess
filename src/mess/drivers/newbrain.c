@@ -1118,8 +1118,8 @@ static const struct nec765_interface newbrain_nec765_interface =
 
 static z80ctc_interface newbrain_ctc_intf =
 {
-	"main",					/* cpu */
-	1,						/* clock */
+	Z80_TAG,				/* cpu */
+	0,						/* clock */
 	0,              		/* timer disables */
 	NULL,			  		/* interrupt handler */
 	NULL,					/* ZC/TO0 callback */
