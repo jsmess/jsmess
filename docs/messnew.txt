@@ -47,6 +47,8 @@ System Driver Changes:
 
 - [ABC800M] Added keyboard hack to enable system use. [Curt Coder]
 
+- [ARCADIA] Cleanups, and fixed colors.  (bug #1399) [Manfred Schneider]
+
 - [C16] Added support for tape emulation using MESS core functions (only
   loading, both .wav and .tap formats) [Fabio Priuli, Roberto Zandona']
 

@@ -1,14 +1,121 @@
 /******************************************************************************
- PeT mess@utanet.at May 2001
+Consolidation and enhancment of documentation by Manfred Schneider based on previous work from
+ PeT mess@utanet.at and Paul Robson (autismuk@aol.com)
 
- Paul Robson's Emulator at www.classicgaming.com/studio2 made it possible
-******************************************************************************/
+ Schematics, manuals and anything you can desire for at http://amigan.classicgaming.gamespy.com/
 
-/*
-Schematics, manuals and anything you can desire for at http://amigan.classicgaming.gamespy.com/
+ TODO: implement the RESET key on the front panel
+         find a dump of the charactyer ROM
+         convert the drawing code to tilemap
+ 
+ 
+ 1. General
+   SYSTEM
+- Signetics 2650 CPU at 3.58/4 Mhz(for NTSC) or at 4,433/5 (for PAL)
+- 1k x 8 of RAM (physically present but only 512 byte available)
+- 2 x 2 axis Analogue Joysticks
+- 2 x 12 button Controllers
+- 3 buttons on system unit and CPU Reset
+   VIDEO
+- 128 x 208 pixel resolution (alternate 128 x 104 mode available)
+- 16 x 26 (can be 16x13) background display (2 colour 8 x 8 pixel characters)
+- 4 x 8 x 8 Sprites (2 colour 8 x 8 pixels)
+- total of 8 user defined characters available
+   SOUND
+- Single channel beeper
 
-TODO: Define a proper color table - see machine/arcadia.c for details
-*/
+
+2. Memory map
+The memory map of the 2001 is below.
+0000 - 0FFF	4k ROM Block 1 (first 4k of a cartridge)
+1000 - 13FF		mirror of $1800-$1BFF
+1400 - 17FF		mirror of $1800-$1BFF
+1800 - 1BFF		UVI2637 Area (detail description in video/arcadia.c)
+	1800 - 18CF		Screen display , upper 13 lines, characters/palette high bits
+	18D0 - 18EF	Free for user programs.
+	18F0 - 18F7		Sprite coordinates y0x0y1x1y2x2y3x3
+	18F8 - 1908		registers of UVI
+	1909 - 197F		Unmapped
+	1980 - 19BF		User defined characters (8 possible, 8 bytes per character)
+	19C0 - 19F7		Unmapped
+	19F8 - 19FF		registers of UVI
+	1A00 - 1ACF	Screen display , lower 13 lines, characters/palette high bits
+	1AD0 - 1AFF	User memory
+	1B00 - 1BFF		mirror of 1900-19FF
+1C00 - 1FFF		mirror of 1800-1BFF
+2000 - 2FFF	4k ROM Block 2 (for 8k carts such as Jungler)
+3000 - 3FFF	mirror of 1000-1FFF
+4000 - 4FFF	mirror of 0000-0FFF
+5000 - 5FFF	mirror of 1000-1FFF
+6000 - 6FFF	mirror of 0000-0FFF
+7000 - 7FFF	mirror of 1000-1FFF
+
+The Palladium VCG memory map is as follows.
+0000 - 0FFF	4k ROM Block 1 (first 4k of a cartridge)
+1000 - 17FF		could be ROM or RAM but no Cartridge uses this
+1800 - 1BFF		UVI2637 Area (detail description in video/arcadia.c)
+	1800 - 18CF		Screen display , upper 13 lines, characters/palette high bits
+	18D0 - 18EF	Free for user programs.
+	18F0 - 18F7		Sprite coordinates y0x0y1x1y2x2y3x3
+	18F8 - 1908		registers of UVI
+	1909 - 197F		Unmapped
+	1980 - 19BF		User defined characters (8 possible, 8 bytes per character)
+	19C0 - 19F7		Unmapped
+	19F8 - 19FF		registers of UVI
+	1A00 - 1ACF	Screen display , lower 13 lines, characters/palette high bits
+	1AD0 - 1AFF	User memory
+	1B00 - 1BFF		mirror of 1900-19FF
+1C00 - 1FFF		could be ROM or RAM but no Cartridge uses this
+2000 - 2FFF	4k ROM Block  (for 8k carts such as Jungler)
+3000 - 3FFF	could be ROM or RAM but no Cartridge uses this
+4000 - 4FFF	4k ROM Block  (first 2K used by Golf)
+5000 - 5FFF	4k ROM Block
+6000 - 6FFF	4k ROM Block
+7000 - 7FFF	4k ROM Block
+
+
+3. ROM Images
+ROM Images are loaded into 0000-0FFF. If the ROM is an 8k ROM the
+second half of the Rom is located at 2000-2FFF. Except for the Golf cart
+which is located from 0x0000-0x0FFF and a 2kbyte block from 0x4000 only on 
+Palladium VCG.
+
+
+4. Controls
+All key controls are indicated by a bit going to '1'. Unused bits at
+the memory location are set to zero.
+
+Keypads
+
+1900-1902 (Player 1) 1904-1906 (Player 2)
+The keypads are arranged as follows :-
+
+        1       2       3
+        4       5       6
+        7       8       9
+      Enter     0     Clear
+
+Row 1/4/7 is 1900/4, Row 2/5/8/0 is 1901/5 and Row 3/6/9 is 1902/6
+The topmost key is bit 3, the lowermost key is bit 0.
+
+Location $1908 contains bit 0 Start,bit 1 Option,bit 2 Difficulty.
+These keys are "latched" i.e. a press causes a logic 1 to appear
+on the current frame.
+
+The fire buttons are equivalent to Keypad #2 e.g. they are 1901 and
+1905 bit 3.
+
+Palladium has 4 additional key per keypad which are mapped at
+1903 palladium player 1 
+1907 palladium player 2 
+
+
+5. Other information
+Interrupts are not supported
+The Read/Write 2650 CPU Port-Commands do not appear to be connected to
+anything in hardware. No cartridge has been found which uses them.
+
+ ******************************************************************************/
 
 #include <assert.h>
 #include "driver.h"
@@ -281,31 +388,21 @@ INPUT_PORTS_END
 
 static const gfx_layout arcadia_charlayout =
 {
-	8,1,
-	256,                                    /* 256 characters */
-	1,                      /* 1 bits per pixel */
+	8,						/*width*/
+	1,						/*heigth*/
+	256,					/* 256 characters */
+	1,						/* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{
-	0,
-	1,
-	2,
-	3,
-	4,
-	5,
-	6,
-	7,
-	},
-	/* y offsets */
-	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },	/* x offsets */
+	{ 0 },					/* y offsets */
 	1*8
 };
 
 static GFXDECODE_START( arcadia )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, arcadia_charlayout, 0, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, arcadia_charlayout, 0, 68 )
 GFXDECODE_END
 
-static const rgb_t arcadia_palette[] =
+static const rgb_t arcadia_colors[] =
 {
 	RGB_WHITE,					/* white */
 	MAKE_RGB(0xff, 0xff, 0x00),	/* yellow */
@@ -317,19 +414,36 @@ static const rgb_t arcadia_palette[] =
 	RGB_BLACK					/* black */
 };
 
-static const unsigned short arcadia_colortable[2][2] = {
-	{ 0, 1 },
-	{ 1, 0 }
+static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
+{
+	0,1,2,3,4,5,6,7,
+	
+	0,0, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7,
+	1,0, 1,1, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7,
+	2,0, 2,1, 2,2, 2,3, 2,4, 2,5, 2,6, 2,7,
+	3,0, 3,1, 3,2, 3,3, 3,4, 3,5, 3,6, 3,7,
+	4,0, 4,1, 4,2, 4,3, 4,4, 4,5, 4,6, 4,7,
+	5,0, 5,1, 5,2, 5,3, 5,4, 5,5, 5,6, 5,7,
+	6,0, 6,1, 6,2, 6,3, 6,4, 6,5, 6,6, 6,7,
+	7,0, 7,1, 7,2, 7,3, 7,4, 7,5, 7,6, 7,7
 };
 
 static PALETTE_INIT( arcadia )
 {
-	palette_set_colors(machine, 0, arcadia_palette, ARRAY_LENGTH(arcadia_palette));
+	int i;
+
+	machine->colortable = colortable_alloc(machine, 8);
+
+	for (i = 0; i < 8; i++)
+		colortable_palette_set_color(machine->colortable, i, arcadia_colors[i]);
+
+	for (i = 0; i < 128+8; i++)
+		colortable_entry_set_value(machine->colortable, i, arcadia_palette[i]);
 }
 
 static MACHINE_DRIVER_START( arcadia )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 3580000/3)        /* 1.796 Mhz */
+	MDRV_CPU_ADD("main", S2650, 3580000/4)        /* 0.895 Mhz */
 	MDRV_CPU_PROGRAM_MAP(arcadia_mem, 0)
 	MDRV_CPU_IO_MAP(arcadia_io, 0)
 	MDRV_CPU_PERIODIC_INT(arcadia_video_line, 262*60)
