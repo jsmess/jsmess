@@ -2,35 +2,27 @@
 #include "video/cdp1869.h"
 #include "includes/tmc600.h"
 
-#define SCREEN_TAG	"main"
-#define CDP1869_TAG	"cdp1869"
-
-#define TMC600_PAGERAM_SIZE	0x400
-#define TMC600_PAGERAM_MASK	0x3ff
-
-static int vismac_reg_latch;
-static int vismac_color_latch;
-static int vismac_bkg_latch;
-static int vismac_blink;
-static UINT8 *pageram, *vismac_colorram;
-
 WRITE8_HANDLER( tmc600_vismac_register_w )
 {
-	vismac_reg_latch = data;
+	tmc600_state *state = machine->driver_data;
+
+	state->vismac_reg_latch = data;
 }
 
 WRITE8_DEVICE_HANDLER( tmc600_vismac_data_w )
 {
-	switch (vismac_reg_latch)
+	tmc600_state *state = device->machine->driver_data;
+
+	switch (state->vismac_reg_latch)
 	{
 	case 0x20:
 		// set character color
-		vismac_color_latch = data;
+		state->vismac_color_latch = data;
 		break;
 
 	case 0x30:
 		// write cdp1869 command on the data bus
-		vismac_bkg_latch = data & 0x07;
+		state->vismac_bkg_latch = data & 0x07;
 		cdp1869_out3_w(device, 0, data);
 		break;
 
@@ -52,48 +44,56 @@ WRITE8_DEVICE_HANDLER( tmc600_vismac_data_w )
 	}
 }
 
-static TIMER_CALLBACK( vismac_blink_int )
+static TIMER_CALLBACK( blink_tick )
 {
-	vismac_blink = !vismac_blink;
+	tmc600_state *state = machine->driver_data;
+
+	state->blink = !state->blink;
 }
 
-static UINT8 tmc600_get_color(UINT16 pma)
+static UINT8 tmc600_get_color(running_machine *machine, UINT16 pma)
 {
-	UINT8 color = vismac_colorram[pma];
+	tmc600_state *state = machine->driver_data;
 
-	if (BIT(color, 3) && vismac_blink)
+	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	UINT8 color = state->color_ram[pageaddr];
+
+	if (BIT(color, 3) && state->blink)
 	{
-		return vismac_bkg_latch;
+		color = state->vismac_bkg_latch;
 	}
-	else
-	{
-		return color;
-	}
+
+	return color;
 }
 
-static CDP1869_PAGE_RAM_READ(tmc600_pageram_r)
+static CDP1869_PAGE_RAM_READ( tmc600_page_ram_r )
 {
-	UINT16 addr = pma & TMC600_PAGERAM_MASK;
+	tmc600_state *state = device->machine->driver_data;
 
-	return pageram[addr];
+	UINT16 addr = pma & TMC600_PAGE_RAM_MASK;
+
+	return state->page_ram[addr];
 }
 
-static CDP1869_PAGE_RAM_WRITE(tmc600_pageram_w)
+static CDP1869_PAGE_RAM_WRITE( tmc600_page_ram_w )
 {
-	UINT16 addr = pma & TMC600_PAGERAM_MASK;
+	tmc600_state *state = device->machine->driver_data;
 
-	pageram[addr] = data;
-	vismac_colorram[addr] = vismac_color_latch;
+	UINT16 addr = pma & TMC600_PAGE_RAM_MASK;
+
+	state->page_ram[addr] = data;
+	state->color_ram[addr] = state->vismac_color_latch;
 }
 
-static CDP1869_CHAR_RAM_READ(tmc600_charram_r)
+static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )
 {
-	UINT16 pageaddr = pma & TMC600_PAGERAM_MASK;
-	UINT8 column = pageram[pageaddr];
-	UINT8 color = tmc600_get_color(pageaddr);
+	tmc600_state *state = device->machine->driver_data;
+
+	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	UINT8 column = state->page_ram[pageaddr];
+	UINT8 color = tmc600_get_color(device->machine, pageaddr);
 	UINT16 charaddr = ((cma & 0x08) << 8) | (column << 3) | (cma & 0x07);
-	UINT8 *charrom = memory_region(device->machine, "chargen");
-	UINT8 cdb = charrom[charaddr] & 0x3f;
+	UINT8 cdb = state->char_rom[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
 	int ccb1 = BIT(color, 1);
@@ -101,14 +101,12 @@ static CDP1869_CHAR_RAM_READ(tmc600_charram_r)
 	return (ccb1 << 7) | (ccb0 << 6) | cdb;
 }
 
-static CDP1869_PCB_READ(tmc600_pcb_r)
+static CDP1869_PCB_READ( tmc600_pcb_r )
 {
-	UINT16 pageaddr = pma & TMC600_PAGERAM_MASK;
-	UINT8 color = tmc600_get_color(pageaddr);
+	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	UINT8 color = tmc600_get_color(device->machine, pageaddr);
 
-	int pcb = BIT(color, 0);
-
-	return pcb;
+	return BIT(color, 0);
 }
 
 static CDP1869_INTERFACE( tmc600_cdp1869_intf )
@@ -117,43 +115,58 @@ static CDP1869_INTERFACE( tmc600_cdp1869_intf )
 	CDP1869_DOT_CLK_PAL,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
-	tmc600_pageram_r,
-	tmc600_pageram_w,
+	tmc600_page_ram_r,
+	tmc600_page_ram_w,
 	tmc600_pcb_r,
-	tmc600_charram_r,
+	tmc600_char_ram_r,
 	NULL,
 	NULL
 };
 
 static VIDEO_START( tmc600 )
 {
-	// allocate memory
+	tmc600_state *state = machine->driver_data;
 
-	pageram = auto_malloc(TMC600_PAGERAM_SIZE);
-	vismac_colorram = auto_malloc(TMC600_PAGERAM_SIZE);
+	/* allocate memory */
 
-	// register for save state
+	state->page_ram = auto_malloc(TMC600_PAGE_RAM_SIZE);
+	state->color_ram = auto_malloc(TMC600_PAGE_RAM_SIZE);
 
-	state_save_register_global_pointer(pageram, TMC600_PAGERAM_SIZE);
-	state_save_register_global_pointer(vismac_colorram, TMC600_PAGERAM_SIZE);
+	/* find devices */
 
-	state_save_register_global(vismac_reg_latch);
-	state_save_register_global(vismac_color_latch);
-	state_save_register_global(vismac_bkg_latch);
-	state_save_register_global(vismac_blink);
+	state->cdp1869 = devtag_get_device(machine, CDP1869_VIDEO, CDP1869_TAG);
+
+	/* find memory regions */
+
+	state->char_rom = memory_region(machine, "chargen");
+
+	/* allocate blink timer */
+
+	state->blink_timer = timer_alloc(blink_tick, NULL);
+	timer_adjust_periodic(state->blink_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2));
+
+	/* register for state saving */
+
+	state_save_register_global_pointer(state->page_ram, TMC600_PAGE_RAM_SIZE);
+	state_save_register_global_pointer(state->color_ram, TMC600_PAGE_RAM_SIZE);
+
+	state_save_register_global(state->vismac_reg_latch);
+	state_save_register_global(state->vismac_color_latch);
+	state_save_register_global(state->vismac_bkg_latch);
+	state_save_register_global(state->blink);
 }
 
 static VIDEO_UPDATE( tmc600 )
 {
-	const device_config *cdp1869 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1869_VIDEO, CDP1869_TAG);
+	tmc600_state *state = screen->machine->driver_data;
 
-	cdp1869_update(cdp1869, bitmap, cliprect);
+	cdp1869_update(state->cdp1869, bitmap, cliprect);
 
 	return 0;
 }
 
 MACHINE_DRIVER_START( tmc600_video )
-	MDRV_TIMER_ADD_PERIODIC("blink", vismac_blink_int, HZ(2))
+//	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(2))
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

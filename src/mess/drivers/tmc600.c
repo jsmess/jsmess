@@ -88,27 +88,25 @@ Notes:
 #include "includes/tmc600.h"
 #include "video/cdp1869.h"
 
-#define CDP1869_TAG	"cdp1869"
-
 static QUICKLOAD_LOAD( tmc600 );
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 /* Read/Write Handlers */
 
-static int keylatch;
-
 static WRITE8_HANDLER( keyboard_latch_w )
 {
-	keylatch = data;
+	tmc600_state *state = machine->driver_data;
+
+	state->keylatch = data;
 }
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 static WRITE8_HANDLER( printer_w )
@@ -242,6 +240,8 @@ static CDP1802_MODE_READ( tmc600_mode_r )
 
 static CDP1802_EF_READ( tmc600_ef_r )
 {
+	tmc600_state *state = machine->driver_data;
+
 	int flags = 0x0f;
 	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
@@ -258,7 +258,7 @@ static CDP1802_EF_READ( tmc600_ef_r )
 
 	// keyboard
 
-	flags -= (~input_port_read(machine, keynames[keylatch / 8]) & (1 << (keylatch % 8))) ? EF3 : 0;
+	flags -= (~input_port_read(machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) ? EF3 : 0;
 
 	return flags;
 }
@@ -282,6 +282,10 @@ static CDP1802_INTERFACE( tmc600_cdp1802_config )
 
 static MACHINE_START( tmc600 )
 {
+	tmc600_state *state = machine->driver_data;
+
+	/* configure RAM */
+
 	memory_configure_bank(1, 0, 1, mess_ram, 0);
 	memory_set_bank(1, 0);
 
@@ -302,7 +306,9 @@ static MACHINE_START( tmc600 )
 		break;
 	}
 
-	state_save_register_global(keylatch);
+	/* register for state saving */
+
+	state_save_register_global(state->keylatch);
 }
 
 static MACHINE_RESET( tmc600 )
@@ -320,6 +326,8 @@ static const cassette_config tmc600_cassette_config =
 };
 
 static MACHINE_DRIVER_START( tmc600 )
+	MDRV_DRIVER_DATA(tmc600_state)
+
 	// basic system hardware
 
 	MDRV_CPU_ADD("main", CDP1802, 3579545)	// ???
@@ -347,6 +355,7 @@ static MACHINE_DRIVER_START( tmc600 )
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(tmc600, "sbp", 0)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", tmc600_cassette_config )
 MACHINE_DRIVER_END
 
@@ -380,7 +389,9 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc600 )
 {
-	image_fread(image, memory_region(image->machine, "main") + 0x6300, 0x9500);
+	void *ptr = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x6300);
+
+	image_fread(image, ptr, 0x9500);
 
 	return INIT_PASS;
 }
@@ -414,4 +425,4 @@ SYSTEM_CONFIG_END
 
 //    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     INIT    CONFIG    COMPANY        FULLNAME
 COMP( 1982, tmc600s1, 0,		0,	     tmc600,   tmc600,   0, 	tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   0, 	tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1982, tmc600s2, tmc600s1,	0,	     tmc600,   tmc600,   0, 	tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
