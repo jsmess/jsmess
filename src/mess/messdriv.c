@@ -881,14 +881,14 @@ XL/XE 16kB OS roms
 	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
 
 	/* Telercas Oy */
-	DRIVER(tmc1800)
+//	DRIVER(tmc1800)
 	DRIVER(tmc2000)
 	DRIVER(tmc2000e)
-	DRIVER(tmc600s1)
+//	DRIVER(tmc600s1)
 	DRIVER(tmc600s2)
 
 	/* OSCOM Oy */
-	DRIVER(osc1000b)
+//	DRIVER(osc1000b)
 	DRIVER(oscnano)
 
 	/* MIT */
