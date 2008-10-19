@@ -502,17 +502,25 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 static WRITE8_HANDLER(exidy_ff_port_w)
 {
 	/* reading the config switch */
-	switch ((input_port_read(machine, "CONFIG")>>1) & 0x01)
+	switch (input_port_read(machine, "CONFIG") & 0x06)
 	{
 		case 0: /* speaker */
 			speaker_level_w(0, (data) ? 1 : 0);
 			break;
 
-		case 1: /* printer */
+		case 2: /* Centronics 7-bit printer */
 			/* bit 7 = strobe, bit 6..0 = data */
 			centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 			centronics_write_handshake(0, (~data>>7) & 0x01, CENTRONICS_STROBE);
 			centronics_write_data(0, data & 0x7f);
+			break;
+
+		case 4: /* 8-bit parallel output */
+			/* hardware strobe driven from port select, bit 7..0 = data */
+			centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+			centronics_write_handshake(0, 1, CENTRONICS_STROBE);
+			centronics_write_data(0, data);
+			centronics_write_handshake(0, 0, CENTRONICS_STROBE);
 			break;
 	}
 }
@@ -579,7 +587,7 @@ static READ8_HANDLER(exidy_ff_port_r)
 	0 = printer is not busy */
 
 	if (printer_is_ready(printer_device(machine))==0 )
-		data |= 0x080;
+		data |= 0x80;
 
 	return data;
 }
@@ -745,9 +753,10 @@ static INPUT_PORTS_START(exidy)
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
 	/* hardware connected to printer port */
-	PORT_CONFNAME( 0x02, 0x00, "Parallel port" )
+	PORT_CONFNAME( 0x06, 0x00, "Parallel port" )
 	PORT_CONFSETTING(    0x00, "Speaker" )
-	PORT_CONFSETTING(    0x02, "Printer" )
+	PORT_CONFSETTING(    0x02, "Printer (7-bit)" )
+	PORT_CONFSETTING(    0x04, "Printer (8-bit)" )
 	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
 	PORT_CONFSETTING(    0x08, DEF_STR(On))
 	PORT_CONFSETTING(    0x00, DEF_STR(Off))
