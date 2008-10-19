@@ -7,7 +7,27 @@
 #include "driver.h"
 #include "includes/abc80.h"
 
-PALETTE_INIT( abc80 )
+/* Graphics Layout */
+
+static const gfx_layout charlayout =
+{
+	6, 10,
+	128,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	10*8
+};
+
+/* Graphics Decode Information */
+
+static GFXDECODE_START( abc80 )
+	GFXDECODE_ENTRY( "chargen", 0,	   charlayout, 0, 2 ) // normal characters
+	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 2 ) // graphics characters
+GFXDECODE_END
+
+static PALETTE_INIT( abc80 )
 {
 	palette_set_color(machine, 0, RGB_BLACK);
 	palette_set_color(machine, 1, RGB_WHITE);
@@ -178,7 +198,7 @@ static void abc80_update(running_machine *machine, bitmap_t *bitmap, const recta
 }
 #endif
 
-VIDEO_START( abc80 )
+static VIDEO_START( abc80 )
 {
 	abc80_state *state = machine->driver_data;
 
@@ -209,7 +229,7 @@ VIDEO_START( abc80 )
 	state_save_register_global(state->char_row);
 }
 
-VIDEO_UPDATE( abc80 )
+static VIDEO_UPDATE( abc80 )
 {
 	abc80_state *state = screen->machine->driver_data;
 	rectangle rect;
@@ -228,3 +248,18 @@ VIDEO_UPDATE( abc80 )
 
 	return 0;
 }
+
+MACHINE_DRIVER_START( abc80_video )
+//	MDRV_TIMER_ADD_PERIODIC("blink", abc80_blink_tick, HZ(ABC80_XTAL/2/6/64/312/16))
+
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_GFXDECODE(abc80)
+	MDRV_PALETTE_LENGTH(4)
+
+	MDRV_PALETTE_INIT(abc80)
+	MDRV_VIDEO_START(abc80)
+	MDRV_VIDEO_UPDATE(abc80)
+
+	MDRV_SCREEN_RAW_PARAMS(ABC80_XTAL/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
+MACHINE_DRIVER_END

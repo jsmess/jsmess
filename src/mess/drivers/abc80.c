@@ -323,26 +323,6 @@ static INPUT_PORTS_START( abc80 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-/* Graphics Layout */
-
-static const gfx_layout charlayout =
-{
-	6, 10,
-	128,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	10*8
-};
-
-/* Graphics Decode Information */
-
-static GFXDECODE_START( abc80 )
-	GFXDECODE_ENTRY( "chargen", 0,	   charlayout, 0, 2 ) // normal characters
-	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 2 ) // graphics characters
-GFXDECODE_END
-
 /* Sound Interface */
 
 static const sn76477_interface abc80_sn76477_interface =
@@ -536,20 +516,15 @@ static MACHINE_DRIVER_START( abc80 )
 
 	MDRV_MACHINE_START(abc80)
 
+	/* keyboard */
+//	MDRV_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
+
 	/* Z80PIO */
-	MDRV_Z80PIO_ADD( Z80PIO_TAG, abc80_pio_intf )
+//	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, abc80_pio_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(abc80)
-	MDRV_PALETTE_LENGTH(4)
-
-	MDRV_PALETTE_INIT(abc80)
-	MDRV_VIDEO_START(abc80)
-	MDRV_VIDEO_UPDATE(abc80)
-
-	MDRV_SCREEN_RAW_PARAMS(ABC80_XTAL/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
+	MDRV_IMPORT_FROM(abc80_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

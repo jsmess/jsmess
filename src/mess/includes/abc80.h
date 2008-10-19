@@ -80,9 +80,6 @@ struct _abc80_state
 
 /*----------- defined in video/abc80.c -----------*/
 
-PALETTE_INIT( abc80 );
-VIDEO_START( abc80 );
-VIDEO_UPDATE( abc80 );
-
+MACHINE_DRIVER_EXTERN( abc80_video );
 
 #endif /* ABC80_H_ */
