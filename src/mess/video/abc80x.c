@@ -161,15 +161,6 @@ WRITE8_HANDLER( abc800c_hrc_w )
 {
 }
 
-/* Timer Callbacks */
-
-static TIMER_CALLBACK( abc802_flash_tick )
-{
-	abc802_state *state = machine->driver_data;
-
-	state->flshclk = !state->flshclk;
-}
-
 /* MC6845 Row Update */
 
 static MC6845_UPDATE_ROW( abc800m_update_row )
@@ -311,6 +302,18 @@ static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
 {
 	abc802_state *state = device->machine->driver_data;
 
+	state->flshclk_ctr++;
+
+	if (state->flshclk_ctr == 31)
+	{
+		state->flshclk = 1;
+		state->flshclk_ctr = 0;
+	}
+	else
+	{
+		state->flshclk = 0;
+	}
+
 	z80dart_set_ri(state->z80dart, 1, vsync);
 }
 
@@ -360,7 +363,7 @@ static VIDEO_START( abc800 )
 
 	/* find devices */
 
-	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+	state->mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
 
 	/* find memory regions */
 
@@ -373,19 +376,15 @@ static VIDEO_START( abc802 )
 
 	/* find devices */
 
-	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+	state->mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
 
 	/* find memory regions */
 
 	state->char_rom = memory_region(machine, "chargen");
 
-	/* allocate timer */
-
-	state->flash_timer = timer_alloc(abc802_flash_tick, NULL);
-	timer_adjust_periodic(state->flash_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2));
-
 	/* register for state saving */
 
+	state_save_register_global(state->flshclk_ctr);
 	state_save_register_global(state->flshclk);
 	state_save_register_global(state->mux80_40);
 }

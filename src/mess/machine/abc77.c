@@ -3,6 +3,14 @@
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 
+/*
+
+	TODO:
+
+	- clock generator 74LS393 @ Z6
+
+*/
+
 typedef struct _abc77_t abc77_t;
 struct _abc77_t
 {
@@ -51,11 +59,12 @@ void abc77_rxd_w(const device_config *device, int level)
 	cpunum_set_input_line(device->machine, abc77->cpunum, MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
 }
 
-void abc77_clock_w(const device_config *device, int level)
+static TIMER_DEVICE_CALLBACK( clock_tick )
 {
+	const device_config *device = devtag_get_device(timer->machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
-	abc77->clock = level;
+	abc77->clock = !abc77->clock;
 }
 
 static TIMER_CALLBACK( reset_tick )
@@ -291,6 +300,9 @@ MACHINE_DRIVER_START( abc77 )
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
+	/* serial clock timer */
+	MDRV_TIMER_ADD_PERIODIC("clock", clock_tick, HZ(600*2))
+
 	/* discrete sound */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(abc77)
@@ -330,7 +342,7 @@ static DEVICE_START( abc77 )
 	abc77->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
 
-	/* allocate timer */
+	/* allocate reset timer */
 
 	abc77->reset_timer = timer_alloc(reset_tick, (FPTR *) device);
 

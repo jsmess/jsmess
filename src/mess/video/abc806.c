@@ -11,7 +11,7 @@
 	- selection between 512x240, 256x240, and 240x240 HR modes
 	- add proper screen parameters to startup
 	- palette configuration from PAL/PROM
-	- vertical sync delay
+	- vertical sync delay in picture
 	- horizontal positioning of the text and HR screens
 	- protection device @ 16H
 	
@@ -35,15 +35,6 @@ static PALETTE_INIT( abc806 )
 	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff); // cyan
 	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00); // yellow
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
-}
-
-/* Timer Callbacks */
-
-static TIMER_CALLBACK( abc806_flash_tick )
-{
-	abc806_state *state = machine->driver_data;
-
-	state->flshclk = !state->flshclk;
 }
 
 /* High Resolution Screen Select */
@@ -348,22 +339,48 @@ static MC6845_ON_HSYNC_CHANGED(abc806_hsync_changed)
 {
 	abc806_state *state = device->machine->driver_data;
 
+	int vsync;
+
 	if (!hsync)
 	{
 		state->v50_addr++;
+
+		/* clock current vsync value into the shift register */
+		state->vsync_shift <<= 1;
+		state->vsync_shift = (state->vsync_shift & 0xfffffffffffffffell) | state->vsync;
+
+		vsync = BIT(state->vsync_shift, state->sync);
+
+		if (vsync)
+		{
+			/* clear V50 address */
+			state->v50_addr = 0;
+		}
+		else
+		{
+			/* flash clock */
+			if (state->flshclk_ctr == 31)
+			{
+				state->flshclk = 1;
+				state->flshclk_ctr = 0;
+			}
+			else
+			{
+				state->flshclk = 0;
+				state->flshclk_ctr++;
+			}
+		}
+
+		/* _DEW signal to DART */
+		z80dart_set_ri(state->z80dart, 1, vsync);
 	}
 }
 
 static MC6845_ON_VSYNC_CHANGED(abc806_vsync_changed)
 {
 	abc806_state *state = device->machine->driver_data;
-	
-	if (vsync)
-	{
-		state->v50_addr = 0;
-	}
 
-	z80dart_set_ri(state->z80dart, 1, vsync);
+	state->vsync = vsync;
 }
 
 /* MC6845 Interfaces */
@@ -462,7 +479,7 @@ static VIDEO_START(abc806)
 
 	/* find devices */
 
-	state->mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+	state->mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
 
 	/* find memory regions */
 
@@ -474,11 +491,6 @@ static VIDEO_START(abc806)
 
 	state->charram = auto_malloc(ABC806_CHAR_RAM_SIZE);
 	state->colorram = auto_malloc(ABC806_ATTR_RAM_SIZE);
-
-	/* allocate timer */
-
-	state->flash_timer = timer_alloc(abc806_flash_tick, NULL);
-	timer_adjust_periodic(state->flash_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2));
 
 	/* register for state saving */
 
@@ -494,8 +506,11 @@ static VIDEO_START(abc806)
 	state_save_register_global(state->eme);
 	state_save_register_global(state->txoff);
 	state_save_register_global(state->_40);
+	state_save_register_global(state->flshclk_ctr);
 	state_save_register_global(state->flshclk);
 	state_save_register_global(state->hru2_a8);
+	state_save_register_global(state->vsync_shift);
+	state_save_register_global(state->vsync);
 }
 
 /* Video Update */

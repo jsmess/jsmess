@@ -37,13 +37,11 @@ struct _abc800_state
 	/* keyboard state */
 	int abc77_txd;			/* ABC-77 transmit data */
 
-	/* timers */
-	emu_timer *ctc_timer;
-
 	/* devices */
 	const device_config *z80ctc;
 	const device_config *z80dart;
 	const device_config *z80sio;
+	const device_config *abc77;
 	const device_config *mc6845;
 
 	/* memory regions */
@@ -57,17 +55,15 @@ struct _abc802_state
 	int abc77_txd;			/* ABC-77 transmit data */
 
 	/* video state */
+	int flshclk_ctr;		/* flash clock counter */
 	int flshclk;			/* flash clock */
 	int mux80_40;			/* 40/80 column mode */
-
-	/* timers */
-	emu_timer *ctc_timer;
-	emu_timer *flash_timer;
 
 	/* devices */
 	const device_config *z80ctc;
 	const device_config *z80dart;
 	const device_config *z80sio;
+	const device_config *abc77;
 	const device_config *mc6845;
 
 	/* memory regions */
@@ -93,23 +89,23 @@ struct _abc806_state
 
 	int txoff;				/* text display enable */
 	int _40;				/* 40/80 column mode */
+	int flshclk_ctr;		/* flash clock counter */
 	int flshclk;			/* flash clock */
 	UINT8 attr_data;		/* attribute data latch */
 	UINT8 hrs;				/* HR memory mapping */
 	UINT8 hrc[16];			/* HR palette */
-	UINT8 sync;				/* line synchronization */
+	UINT8 sync;				/* line synchronization delay */
 	UINT8 v50_addr;			/* vertical sync PROM address */
 	int hru2_a8;			/* HRU II PROM address line 8 */
-
-	/* timers */
-	emu_timer *ctc_timer;
-	emu_timer *flash_timer;
+	UINT64 vsync_shift;		/* vertical sync shift register */
+	int vsync;				/* vertical sync */
 
 	/* devices */
 	const device_config *z80ctc;
 	const device_config *z80dart;
 	const device_config *z80sio;
 	const device_config *mc6845;
+	const device_config *abc77;
 	const device_config *e0516;
 
 	/* memory regions */
@@ -118,18 +114,24 @@ struct _abc806_state
 	const UINT8 *char_rom;	/* character generator ROM */
 };
 
-/*----------- defined in video/abc80x.c -----------*/
+/*----------- defined in video/abc800.c -----------*/
 
 MACHINE_DRIVER_EXTERN(abc800m_video);
 MACHINE_DRIVER_EXTERN(abc800c_video);
-MACHINE_DRIVER_EXTERN(abc802_video);
-MACHINE_DRIVER_EXTERN(abc806_video);
 
 WRITE8_HANDLER( abc800m_hrs_w );
 WRITE8_HANDLER( abc800m_hrc_w );
 
 WRITE8_HANDLER( abc800c_hrs_w );
 WRITE8_HANDLER( abc800c_hrc_w );
+
+/*----------- defined in video/abc802.c -----------*/
+
+MACHINE_DRIVER_EXTERN(abc802_video);
+
+/*----------- defined in video/abc806.c -----------*/
+
+MACHINE_DRIVER_EXTERN(abc806_video);
 
 WRITE8_HANDLER( abc806_hrs_w );
 WRITE8_HANDLER( abc806_hrc_w );
