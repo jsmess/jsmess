@@ -135,6 +135,7 @@ const PROPERTYSHEETINFO g_propSheets[] =
 	{ TRUE,		NULL,					IDD_PROP_SOUND,			GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_INPUT,			GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_CONTROLLER,	GameOptionsProc },
+	{ TRUE,		NULL,					IDD_PROP_DEBUG,			GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_MISC,			GameOptionsProc },
 	{ FALSE,	NULL,					IDD_PROP_SOFTWARE,		GameMessOptionsProc },
 	{ FALSE,	PropSheetFilter_Config,	IDD_PROP_CONFIGURATION,	GameMessOptionsProc },

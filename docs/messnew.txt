@@ -226,6 +226,8 @@ User Interface Changes:
 
 - BIOS selection from MESSUI is now possible. (bug #1681) [Curt Coder]
 
+- [Windows GUI] Fixed internal debugger.  (bug #1712) [Nate Woods]
+
 
 
 Imgtool Changes:
