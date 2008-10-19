@@ -62,11 +62,6 @@ struct _abc80_state
 	int char_bank;
 	int char_row;
 
-	/* timers */
-	emu_timer *keyboard_timer;
-	emu_timer *z80pio_astb_timer;
-	emu_timer *blink_timer;
-
 	/* devices */
 	const device_config *z80pio;
 

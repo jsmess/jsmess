@@ -44,9 +44,9 @@ WRITE8_DEVICE_HANDLER( tmc600_vismac_data_w )
 	}
 }
 
-static TIMER_CALLBACK( blink_tick )
+static TIMER_DEVICE_CALLBACK( blink_tick )
 {
-	tmc600_state *state = machine->driver_data;
+	tmc600_state *state = timer->machine->driver_data;
 
 	state->blink = !state->blink;
 }
@@ -140,11 +140,6 @@ static VIDEO_START( tmc600 )
 
 	state->char_rom = memory_region(machine, "chargen");
 
-	/* allocate blink timer */
-
-	state->blink_timer = timer_alloc(blink_tick, NULL);
-	timer_adjust_periodic(state->blink_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2));
-
 	/* register for state saving */
 
 	state_save_register_global_pointer(state->page_ram, TMC600_PAGE_RAM_SIZE);
@@ -166,7 +161,7 @@ static VIDEO_UPDATE( tmc600 )
 }
 
 MACHINE_DRIVER_START( tmc600_video )
-//	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(2))
+	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(2))
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

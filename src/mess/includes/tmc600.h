@@ -22,8 +22,6 @@ struct _tmc600_state
 
 	const device_config *cdp1869;
 
-	emu_timer *blink_timer;
-
 	/* keyboard state */
 	int keylatch;			/* key latch */
 };

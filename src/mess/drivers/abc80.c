@@ -209,9 +209,9 @@ static void abc80_keyboard_scan(running_machine *machine)
 	}
 }
 
-static TIMER_CALLBACK( abc80_keyboard_tick )
+static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 {
-	abc80_keyboard_scan(machine);
+	abc80_keyboard_scan(timer->machine);
 }
 
 /* Memory Maps */
@@ -354,9 +354,9 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 
 /* Z80 PIO Interface */
 
-static TIMER_CALLBACK( z80pio_astb_tick )
+static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 {
-	abc80_state *state = machine->driver_data;
+	abc80_state *state = timer->machine->driver_data;
 
 	/* toggle ASTB every other video line */
 	state->z80pio_astb = !state->z80pio_astb;
@@ -490,16 +490,6 @@ static MACHINE_START( abc80 )
 	state_save_register_global(state->key_data);
 	state_save_register_global(state->key_strobe);
 	state_save_register_global(state->z80pio_astb);
-
-	/* allocate the keyboard scan timer */
-
-	state->keyboard_timer = timer_alloc(abc80_keyboard_tick, NULL);
-	timer_adjust_periodic(state->keyboard_timer, attotime_zero, 0, ATTOTIME_IN_USEC(2500)); // 2.5 ms
-
-	/* allocate Z80PIO strobe timer */
-
-	state->z80pio_astb_timer = timer_alloc(z80pio_astb_tick, NULL);
-	timer_adjust_periodic(state->z80pio_astb_timer, attotime_zero, 0, video_screen_get_time_until_pos(device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "main"), 0, 0));
 }
 
 /* Machine Drivers */
@@ -517,10 +507,10 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_MACHINE_START(abc80)
 
 	/* keyboard */
-//	MDRV_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
+	MDRV_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
 
 	/* Z80PIO */
-//	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, abc80_pio_intf)
 
 	/* video hardware */

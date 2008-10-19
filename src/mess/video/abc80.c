@@ -71,9 +71,9 @@ static UINT32 abc80_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT3
 	return ((row & 0x07) << 7) + (row >> 3) * num_cols + col;
 }
 
-static TIMER_CALLBACK(abc80_blink_tick)
+static TIMER_DEVICE_CALLBACK(abc80_blink_tick)
 {
-	abc80_state *state = machine->driver_data;
+	abc80_state *state = timer->machine->driver_data;
 
 	state->blink = !state->blink;
 }
@@ -202,11 +202,6 @@ static VIDEO_START( abc80 )
 {
 	abc80_state *state = machine->driver_data;
 
-	/* allocate blink timer */
-
-	state->blink_timer = timer_alloc(abc80_blink_tick, NULL);
-	timer_adjust_periodic(state->blink_timer, attotime_zero, 0, ATTOTIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
-
 	/* create tx_tilemap */
 
 	state->tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan, 6, 10, 40, 24);
@@ -250,7 +245,7 @@ static VIDEO_UPDATE( abc80 )
 }
 
 MACHINE_DRIVER_START( abc80_video )
-//	MDRV_TIMER_ADD_PERIODIC("blink", abc80_blink_tick, HZ(ABC80_XTAL/2/6/64/312/16))
+	MDRV_TIMER_ADD_PERIODIC("blink", abc80_blink_tick, HZ(ABC80_XTAL/2/6/64/312/16))
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
