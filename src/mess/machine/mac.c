@@ -212,19 +212,32 @@ static void mac_install_memory(running_machine *machine, offs_t memory_begin, of
 	Interrupt handling
 */
 
-static int scc_interrupt, via_interrupt, scsi_interrupt;
+static int scc_interrupt, via_interrupt, scsi_interrupt, last_taken_interrupt;
 
 static void mac_field_interrupts(running_machine *machine)
 {
+	int take_interrupt = -1;
+
 	if ((scc_interrupt) || (scsi_interrupt))
- 		/* SCC interrupt, SCSI on SE and Classic */
-		cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
+	{
+		take_interrupt = 2;
+	}
 	else if (via_interrupt)
-		/* VIA interrupt */
-		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
-	else
-		/* clear all interrupts */
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	{
+		take_interrupt = 1;
+	}
+
+	if (last_taken_interrupt != -1)
+	{
+		cpunum_set_input_line(machine, 0, last_taken_interrupt, CLEAR_LINE);
+		last_taken_interrupt = -1;
+	}
+
+	if (take_interrupt != -1)
+	{
+		cpunum_set_input_line(machine, 0, take_interrupt, ASSERT_LINE);
+		last_taken_interrupt = take_interrupt;
+	}
 }
 
 static void set_scc_interrupt(running_machine *machine, int value)
@@ -1644,6 +1657,8 @@ WRITE16_HANDLER ( mac_via_w )
 
 MACHINE_RESET(mac)
 {
+	last_taken_interrupt = -1;
+
 	/* initialize real-time clock */
 	rtc_init();
 
