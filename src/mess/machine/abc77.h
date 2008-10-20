@@ -48,6 +48,12 @@ struct _abc77_interface
 };
 #define ABC77_INTERFACE(name) const abc77_interface (name) =
 
+/* inline configuration */
+#define MDRV_ABC77_ADD(config) \
+	MDRV_SPEAKER_STANDARD_MONO("mono")\
+	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)\
+	MDRV_DEVICE_CONFIG(config)
+
 /* device interface */
 DEVICE_GET_INFO( abc77 );
 

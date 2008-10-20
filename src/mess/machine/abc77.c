@@ -301,7 +301,7 @@ MACHINE_DRIVER_START( abc77 )
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
 	/* serial clock timer */
-	MDRV_TIMER_ADD_PERIODIC("clock", clock_tick, HZ(600*2))
+	MDRV_TIMER_ADD_PERIODIC("clock", clock_tick, HZ(20000))
 
 	/* discrete sound */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
