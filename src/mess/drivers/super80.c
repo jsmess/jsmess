@@ -8,6 +8,8 @@
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
+#include "machine/centroni.h"
+#include "devices/printer.h"
 
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
@@ -414,12 +416,16 @@ static void cassette_motor( running_machine *machine, UINT8 data )
 
 static UINT8 cass_data[]={ 0, 0, 0, 0 };
 
-/* this timer runs at 200khz and does 1 job:
-	1. Emulate the 2 chips in the cassette input circuit
+/*	This timer runs at 200khz and emulates the 2 chips in the cassette input circuit
+	They are U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
+	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
 
-Reasons why it is necessary:
-	1. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
-	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint. */
+	The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
+	My "read-any-system" cassette circuit was a CA3140 op-amp, the smarts being done in software.
+
+	bit 0 = original system (U79 and U1)
+	bit 1 = MDS fast system
+	bit 2 = CA3140 */
 
 static TIMER_CALLBACK( super80_timer )
 {
@@ -430,12 +436,46 @@ static TIMER_CALLBACK( super80_timer )
 
 	if (cass_ws != cass_data[0])
 	{
-		if (cass_ws) cass_data[3] ^= 2;
+		if (cass_ws) cass_data[3] ^= 2;						// the MDS flipflop
 		cass_data[0] = cass_ws;
 		cass_data[2] = ((cass_data[1] < 0x40) ? 1 : 0) | cass_ws | cass_data[3];
 		cass_data[1] = 0;
 	}
 }
+
+/*************************************** PRINTER ********************************************************/
+
+/* The Super80 had an optional I/O card that plugged into the S-100 slot. The card had facility for running
+	an 8-bit Centronics printer, and a serial device at 300, 600, or 1200 baud. The I/O address range
+	was selectable via 4 dipswitches. The serial parameters (baud rate, parity, stop bits, etc) was
+	chosen with more dipswitches. Regretably, no parameters could be set by software. Currently, the
+	Centronics printer is emulated; the serial side of things may be done later, as will the dipswitches.
+
+	The most commonly used I/O range is DC-DE (DC = centronics, DD = serial data, DE = serial control
+	All the home-brew roms use this, except for super80e which uses BC-BE (which we don't support yet). */
+
+static void super80_printer_handshake_in(int number, int data, int mask)
+{
+	if (mask & CENTRONICS_ACKNOWLEDGE)
+	{
+		if (data & CENTRONICS_ACKNOWLEDGE)
+		{
+		}
+	}
+}
+
+static const CENTRONICS_CONFIG super80_cent_config[1]={
+	{
+		PRINTER_CENTRONICS,
+		super80_printer_handshake_in
+	},
+};
+
+static const device_config *printer_device(running_machine *machine)
+{
+	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+}
+
 
 /**************************** I/O PORTS *****************************************************************/
 
@@ -447,10 +487,23 @@ static READ8_HANDLER( super80v_11_r )
 		return 0;
 }
 
+static READ8_HANDLER( super80_dc_r )
+{
+	UINT8 data=0x7f;
+
+	/* bit 7 = printer busy
+	0 = printer is not busy */
+
+	if (printer_is_ready(printer_device(machine))==0 )
+		data |= 0x80;
+
+	return data;
+}
+
 static READ8_HANDLER( super80_f2_r )
 {
 	UINT8 data = input_port_read(machine, "DSW") & 0xf0;	// dip switches on pcb
-	data |= cass_data[2];			// bit 0 = output of U1, bit 2 = current wave_state
+	data |= cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;				// bit 3 - not used
 	return data;
 }
@@ -467,6 +520,15 @@ static WRITE8_HANDLER( super80v_11_w )
 	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape */
 }
 
+static WRITE8_HANDLER( super80_dc_w )
+{
+	/* hardware strobe driven from port select, bit 7..0 = data */
+	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(0, 1, CENTRONICS_STROBE);
+	centronics_write_data(0, data);
+	centronics_write_handshake(0, 0, CENTRONICS_STROBE);
+}
+
 static UINT8 last_data;
 
 static WRITE8_HANDLER( super80_f0_w )
@@ -476,8 +538,8 @@ static WRITE8_HANDLER( super80_f0_w )
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80_mhz = (data & 4) ? 1 : 2;				/* bit 2 - video on/off */
-	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
-	if (bits & 0x01) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) cassette_motor( machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -488,8 +550,8 @@ static WRITE8_HANDLER( super80r_f0_w )
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
-	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
-	if (bits & 0x01) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) cassette_motor( machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -502,8 +564,8 @@ static WRITE8_HANDLER( super80v_f0_w )
 	super80v_rom_pcg = data & 0x10;					/* bit 4 - bankswitch gfx rom or pcg */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80v_vid_col = data & 4;					/* bit 2 - bankswitch video or colour ram */
-	if (bits & 0x02) cassette_motor( machine, data & 2 ? 1 : 0);		/* bit 1 - cassette motor */
-	if (bits & 0x01) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) cassette_motor( machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -553,6 +615,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( super80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_WRITE(super80_f1_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
@@ -567,6 +630,7 @@ static ADDRESS_MAP_START( super80r_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(super80v_11_r, super80v_11_w)
+	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80r_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x04) AM_READWRITE(super80_f8_r,super80_f8_w)
@@ -580,6 +644,7 @@ static ADDRESS_MAP_START( super80v_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(super80v_11_r, super80v_11_w)
+	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80v_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x04) AM_READWRITE(super80_f8_r,super80_f8_w)
@@ -935,6 +1000,9 @@ static TIMER_CALLBACK( super80_reset )
 static MACHINE_RESET( super80 )
 {
 	super80_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
+	centronics_config(0, super80_cent_config);
+	/* assumption: select is tied low */
+	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(1, 1);
 }
@@ -973,6 +1041,9 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
@@ -1026,6 +1097,9 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* printer */
+	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
