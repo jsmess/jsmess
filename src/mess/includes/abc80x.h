@@ -97,8 +97,9 @@ struct _abc806_state
 	UINT8 sync;				/* line synchronization delay */
 	UINT8 v50_addr;			/* vertical sync PROM address */
 	int hru2_a8;			/* HRU II PROM address line 8 */
-	UINT64 vsync_shift;		/* vertical sync shift register */
+	UINT32 vsync_shift;		/* vertical sync shift register */
 	int vsync;				/* vertical sync */
+	int d_vsync;			/* delayed vertical sync */
 
 	/* devices */
 	const device_config *z80ctc;

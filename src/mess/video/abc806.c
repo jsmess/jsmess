@@ -347,16 +347,16 @@ static MC6845_ON_HSYNC_CHANGED(abc806_hsync_changed)
 
 		/* clock current vsync value into the shift register */
 		state->vsync_shift <<= 1;
-		state->vsync_shift = (state->vsync_shift & 0xfffffffffffffffell) | state->vsync;
+		state->vsync_shift = (state->vsync_shift & 0xfffffffel) | state->vsync;
 
 		vsync = BIT(state->vsync_shift, state->sync);
 
-		if (vsync)
+		if (!state->d_vsync && vsync)
 		{
 			/* clear V50 address */
 			state->v50_addr = 0;
 		}
-		else
+		else if (state->d_vsync && !vsync)
 		{
 			/* flash clock */
 			if (state->flshclk_ctr == 31)
@@ -371,8 +371,13 @@ static MC6845_ON_HSYNC_CHANGED(abc806_hsync_changed)
 			}
 		}
 
-		/* _DEW signal to DART */
-		z80dart_set_ri(state->z80dart, 1, vsync);
+		if (state->d_vsync != vsync)
+		{
+			/* signal _DEW to DART */
+			z80dart_set_ri(state->z80dart, 1, !vsync);
+		}
+
+		state->d_vsync = vsync;
 	}
 }
 
@@ -476,6 +481,8 @@ static VIDEO_START(abc806)
 	}
 
 	state->sync = 10;
+	state->d_vsync = 1;
+	state->vsync = 1;
 
 	/* find devices */
 
@@ -511,6 +518,7 @@ static VIDEO_START(abc806)
 	state_save_register_global(state->hru2_a8);
 	state_save_register_global(state->vsync_shift);
 	state_save_register_global(state->vsync);
+	state_save_register_global(state->d_vsync);
 }
 
 /* Video Update */

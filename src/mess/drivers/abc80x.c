@@ -55,9 +55,9 @@
 
     TODO:
 
-	- rewrite Z80DART for bit level serial I/O
-	- connect ABC77 keyboard to DART
-    - COM port DIP switch
+	- CTC interrupt breaks ABC802/806
+	- bit level accurate Z80 DART (keyboard)
+	- bit level accurate Z80 SIO/2 (cassette)
     - floppy controller board
     - Facit DTC (recased ABC-800?)
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
@@ -85,6 +85,11 @@
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
+
+static const device_config *cassette_device_image(running_machine *machine)
+{
+	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+}
 
 /* Keyboard HACK */
 
@@ -129,7 +134,7 @@ static const UINT8 abc800_keycodes[7*4][8] =
 	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }
 };
 
-static void abc800_keyboard_scan(running_machine *machine)
+static void scan_keyboard(running_machine *machine)
 {
 	UINT8 keycode = 0;
 	UINT8 data;
@@ -168,10 +173,11 @@ static void abc800_keyboard_scan(running_machine *machine)
 	{
 		if (!keylatch)
 		{
-			abc800_state *state = machine->driver_data;
+			const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 
-			z80dart_set_dcd(state->z80dart, 1, 1);
-			z80dart_receive_data(state->z80dart, 1, keycode);
+			z80dart_set_dcd(z80dart, 1, 1);
+			z80dart_receive_data(z80dart, 1, keycode);
+
 			keylatch = keycode;
 		}
 	}
@@ -179,18 +185,19 @@ static void abc800_keyboard_scan(running_machine *machine)
 	{
 		if (keylatch)
 		{
-			abc800_state *state = machine->driver_data;
+			const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 
-			z80dart_set_dcd(state->z80dart, 1, 0);
-			z80dart_receive_data(state->z80dart, 1, 0);
+			z80dart_set_dcd(z80dart, 1, 0);
+			z80dart_receive_data(z80dart, 1, 0);
+
 			keylatch = 0;
 		}
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( abc800_keyboard_tick )
+static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
-	abc800_keyboard_scan(timer->machine);
+	scan_keyboard(timer->machine);
 }
 
 /* Read/Write Handlers */
@@ -508,17 +515,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
-	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
-	AM_RANGE(0x32, 0x35) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0xff) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x08) AM_READWRITE(abcbus_data_r, abcbus_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
+	AM_RANGE(0x02, 0x05) AM_MIRROR(0x08) AM_WRITE(abcbus_command_w)
+//	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_READ(pling_r)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x08) AM_READ(abcbus_reset_r)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
 // ABC 806
@@ -559,7 +567,7 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_cli_r, abc806_sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x41) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
@@ -687,17 +695,24 @@ static INPUT_PORTS_START( abc800 )
 	PORT_DIPSETTING(    0x2c, "ABC 832/834/850" )
 	PORT_DIPSETTING(    0x2d, "ABC 830" )
 	PORT_DIPSETTING(    0x2e, "ABC 838" )
+
+	PORT_START("SB")
+	PORT_DIPNAME( 0xff, 0xaa, "Serial Communications" ) PORT_DIPLOCATION("SB:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0xaa, "Asynchronous, Single Speed" )
+	PORT_DIPSETTING(    0x2e, "Asynchronous, Split Speed" )
+	PORT_DIPSETTING(    0x50, "Synchronous" )
+	PORT_DIPSETTING(    0x8b, "ABC NET" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc802 )
-	PORT_INCLUDE(abc77)
+	PORT_INCLUDE(abc800)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc806 )
-	PORT_INCLUDE(abc77)
+	PORT_INCLUDE(abc800)
 INPUT_PORTS_END
 
-/* Machine Initialization */
+/* ABC 77 */
 
 static ABC77_ON_TXD_CHANGED( abc800_abc77_txd_changed )
 {
@@ -706,65 +721,186 @@ static ABC77_ON_TXD_CHANGED( abc800_abc77_txd_changed )
 	state->abc77_txd = level;
 }
 
-static ABC77_ON_CLOCK_CHANGED( abc800_abc77_clock_changed )
+static ABC77_ON_CLOCK_CHANGED( abc77_clock_changed )
 {
-//	abc800_state *state = device->machine->driver_data;
+//	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
 
-	/* clock into DART RxTxCB (Receiver/Transmitter Clock B) */
+	/* connected to DART channel B RxTxCB (pin ) */
+	//z80dart_rxtxc_w(z80dart, 1, level);
 }
 
-static ABC77_ON_KEYDOWN_CHANGED( abc800_abc77_keydown_changed )
+static ABC77_ON_KEYDOWN_CHANGED( abc77_keydown_changed )
 {
-	abc800_state *state = device->machine->driver_data;
+	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
 
-	z80dart_set_dcd(state->z80dart, 1, level);
+	/* connected to DART channel B DCD (pin ) */
+	z80dart_set_dcd(z80dart, 1, level);
 }
 
 static ABC77_INTERFACE( abc800_abc77_intf )
 {
 	abc800_abc77_txd_changed,
-	abc800_abc77_clock_changed,
-	abc800_abc77_keydown_changed
+	abc77_clock_changed,
+	abc77_keydown_changed
 };
 
-static WRITE8_DEVICE_HANDLER( abc800_ctc_z2_w )
+static ABC77_ON_TXD_CHANGED( abc802_abc77_txd_changed )
 {
-	//abc800_state *state = device->machine->driver_data;
+	abc802_state *state = device->machine->driver_data;
 
-	/* write to DART channel A RxC/TxC */
+	state->abc77_txd = level;
 }
 
-static const z80ctc_interface abc800_ctc_intf =
+static ABC77_INTERFACE( abc802_abc77_intf )
 {
-	Z80_TAG,				/* cpu */
-	ABC800_X01/2/2,			/* clock */
-	0,              		/* timer disables */
-	0,				  		/* interrupt handler */
-	0,						/* ZC/TO0 callback */
-	0,              		/* ZC/TO1 callback */
-	abc800_ctc_z2_w    		/* ZC/TO2 callback */
+	abc802_abc77_txd_changed,
+	abc77_clock_changed,
+	abc77_keydown_changed
 };
+
+static ABC77_ON_TXD_CHANGED( abc806_abc77_txd_changed )
+{
+	abc806_state *state = device->machine->driver_data;
+
+	state->abc77_txd = level;
+}
+
+static ABC77_INTERFACE( abc806_abc77_intf )
+{
+	abc806_abc77_txd_changed,
+	abc77_clock_changed,
+	abc77_keydown_changed
+};
+
+/* Z80 CTC */
+
+static TIMER_DEVICE_CALLBACK( ctc_tick )
+{
+	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC, Z80CTC_TAG);
+
+	z80ctc_trg_w(z80ctc, 0, 1);
+	z80ctc_trg_w(z80ctc, 0, 0);
+
+	z80ctc_trg_w(z80ctc, 1, 1);
+	z80ctc_trg_w(z80ctc, 1, 0);
+	
+	z80ctc_trg_w(z80ctc, 2, 1);
+	z80ctc_trg_w(z80ctc, 2, 0);
+}
+
+static void ctc_interrupt(const device_config *device, int state)
+{
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
+}
+
+static WRITE8_DEVICE_HANDLER( ctc_z0_w )
+{
+	//const device_config *z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
+
+	UINT8 sb = input_port_read(device->machine, "SB");
+
+	if (BIT(sb, 2))
+	{
+		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
+		//z80sio_txc_w(z80sio, 0, data);
+		z80ctc_trg_w(device, 3, data);
+	}
+
+	/* connected to SIO/2 RxCB through a thingy */
+	//z80sio_rxcb = ?
+	//z80sio_rxc_w(z80sio, 1, z80sio_rxcb);
+
+	/* connected to SIO/2 TxCB through a JK divide by 2 */
+	//z80sio_txcb = !z80sio_txcb;
+	//z80sio_txc_w(z80sio, 1, z80sio_txcb);
+}
+
+static WRITE8_DEVICE_HANDLER( ctc_z1_w )
+{
+	//const device_config *z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
+
+	UINT8 sb = input_port_read(device->machine, "SB");
+
+	if (BIT(sb, 3))
+	{
+		/* connected to SIO/2 RxCA */
+		//z80sio_rxc_w(z80sio, 0, data);
+	}
+
+	if (BIT(sb, 8))
+	{
+		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
+		//z80sio_txc_w(z80sio, 0, data);
+		z80ctc_trg_w(device, 3, data);
+	}
+}
+
+static WRITE8_DEVICE_HANDLER( ctc_z2_w )
+{
+//	const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+
+	/* connected to DART RxCA/TxCA (pin ) */
+	//z80dart_rxtxc_w(z80dart, 0, data);
+}
+
+static const z80ctc_interface ctc_intf =
+{
+	Z80_TAG,			/* cpu */
+	ABC800_X01/2/2,		/* clock */
+	0,              	/* timer disables */
+	ctc_interrupt,		/* interrupt handler */
+	ctc_z0_w,			/* ZC/TO0 callback */
+	ctc_z1_w,			/* ZC/TO1 callback */
+	ctc_z2_w    		/* ZC/TO2 callback */
+};
+
+/* Z80 SIO/2 */
+
+static void sio_interrupt(const device_config *device, int state)
+{
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
+}
+
+static WRITE8_DEVICE_HANDLER( sio_dtr_w )
+{
+	if (offset == 1)
+	{
+		/* cassette motor control */
+		cassette_change_state(cassette_device_image(device->machine), data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	}
+}
 
 static WRITE8_DEVICE_HANDLER( sio_serial_transmit )
 {
+	if (offset == 1)
+	{
+		/* cassette dfd out */
+	}
 }
 
 static int sio_serial_receive( const device_config *device, int channel )
 {
+	if (channel == 1)
+	{
+		/* cassette dfd in */
+	}
+
 	return -1;
 }
 
-static z80sio_interface abc800_sio_intf =
+static z80sio_interface sio_intf =
 {
 	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
-	0,						/* interrupt handler */
-	0,						/* DTR changed handler */
+	sio_interrupt,			/* interrupt handler */
+	sio_dtr_w,				/* DTR changed handler */
 	0,						/* RTS changed handler */
 	0,						/* BREAK changed handler */
 	sio_serial_transmit,	/* transmit handler */
 	sio_serial_receive		/* receive handler */
 };
+
+/* Z80 DART */
 
 static WRITE8_DEVICE_HANDLER( dart_serial_transmit )
 {
@@ -777,7 +913,7 @@ static int dart_serial_receive(const device_config *device, int ch)
 
 static void dart_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
 }
 
 static const z80dart_interface abc800_dart_intf =
@@ -792,79 +928,11 @@ static const z80dart_interface abc800_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
-static const z80_daisy_chain abc800_daisy_chain[] =
-{
-	{ Z80CTC, "z80ctc" },
-	{ Z80SIO, Z80SIO_TAG },
-	{ Z80DART, Z80DART_TAG },
-	{ NULL }
-};
-
-static void abc800_ctc_trg_w(const device_config *z80ctc)
-{
-	z80ctc_trg_w(z80ctc, 0, 1);
-	z80ctc_trg_w(z80ctc, 0, 0);
-
-	z80ctc_trg_w(z80ctc, 1, 1);
-	z80ctc_trg_w(z80ctc, 1, 0);
-	
-	z80ctc_trg_w(z80ctc, 2, 1);
-	z80ctc_trg_w(z80ctc, 2, 0);
-}
-
-static TIMER_DEVICE_CALLBACK( abc800_ctc_tick )
-{
-	abc800_state *state = timer->machine->driver_data;
-
-	abc800_ctc_trg_w(state->z80ctc);
-}
-
-static MACHINE_START( abc800 )
-{
-	abc800_state *state = machine->driver_data;
-
-	/* find devices */
-
-	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
-	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
-}
-
-// ABC802
-
-static ABC77_ON_TXD_CHANGED( abc802_abc77_txd_changed )
-{
-	abc802_state *state = device->machine->driver_data;
-
-	state->abc77_txd = level;
-}
-
-static ABC77_ON_CLOCK_CHANGED( abc802_abc77_clock_changed )
-{
-//	abc802_state *state = device->machine->driver_data;
-
-	/* clock into DART RxTxCB (Receiver/Transmitter Clock B) */
-}
-
-static ABC77_ON_KEYDOWN_CHANGED( abc802_abc77_keydown_changed )
-{
-	abc802_state *state = device->machine->driver_data;
-
-	z80dart_set_dcd(state->z80dart, 1, level);
-}
-
-static ABC77_INTERFACE( abc802_abc77_intf )
-{
-	abc802_abc77_txd_changed,
-	abc802_abc77_clock_changed,
-	abc802_abc77_keydown_changed
-};
-
 static WRITE8_DEVICE_HANDLER( abc802_dart_dtr_w )
 {
 	if (offset == 1)
 	{
+		/* _LRS */
 		memory_set_bank(1, data);
 	}
 }
@@ -875,6 +943,7 @@ static WRITE8_DEVICE_HANDLER( abc802_dart_rts_w )
 
 	if (offset == 1)
 	{
+		/* _MUX 80/40 */
 		state->mux80_40 = !BIT(data, 0);
 	}
 }
@@ -889,88 +958,6 @@ static const z80dart_interface abc802_dart_intf =
 	0,						/* BREAK changed handler */
 	dart_serial_transmit,	/* transmit handler */
 	dart_serial_receive		/* receive handler */
-};
-
-static TIMER_DEVICE_CALLBACK( abc802_ctc_tick )
-{
-	abc802_state *state = timer->machine->driver_data;
-
-	abc800_ctc_trg_w(state->z80ctc);
-}
-
-static WRITE8_DEVICE_HANDLER( abc802_ctc_z2_w )
-{
-//	abc802_state *state = device->machine->driver_data;
-
-	/* write to DART channel A RxC/TxC */
-}
-
-static const z80ctc_interface abc802_ctc_intf =
-{
-	Z80_TAG,				/* cpu */
-	ABC800_X01/2/2,			/* clock */
-	0,              		/* timer disables */
-	0,				  		/* interrupt handler */
-	0,						/* ZC/TO0 callback */
-	0,              		/* ZC/TO1 callback */
-	abc802_ctc_z2_w    		/* ZC/TO2 callback */
-};
-
-static MACHINE_START( abc802 )
-{
-	abc802_state *state = machine->driver_data;
-
-	/* find devices */
-
-	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
-	state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
-
-	/* configure memory */
-
-	memory_configure_bank(1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(1, 1, 1, mess_ram, 0);
-}
-
-static MACHINE_RESET( abc802 )
-{
-	memory_set_bank(1, 0);
-}
-
-// ABC806
-
-static ABC77_ON_TXD_CHANGED( abc806_abc77_txd_changed )
-{
-	abc806_state *state = device->machine->driver_data;
-
-	state->abc77_txd = level;
-}
-
-static ABC77_ON_CLOCK_CHANGED( abc806_abc77_clock_changed )
-{
-//	abc806_state *state = device->machine->driver_data;
-
-	/* clock into DART RxTxCB (Receiver/Transmitter Clock B) */
-}
-
-static ABC77_ON_KEYDOWN_CHANGED( abc806_abc77_keydown_changed )
-{
-	abc806_state *state = device->machine->driver_data;
-
-	z80dart_set_dcd(state->z80dart, 1, level);
-}
-
-static ABC77_INTERFACE( abc806_abc77_intf )
-{
-	abc806_abc77_txd_changed,
-	abc806_abc77_clock_changed,
-	abc806_abc77_keydown_changed
-};
-
-static const e0516_interface abc806_e0516_intf =
-{
-	ABC806_X02
 };
 
 static WRITE8_DEVICE_HANDLER( abc806_dart_dtr_w )
@@ -995,30 +982,73 @@ static const z80dart_interface abc806_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
-static TIMER_DEVICE_CALLBACK( abc806_ctc_tick )
+/* E05-16 */
+
+static const e0516_interface abc806_e0516_intf =
 {
-	abc806_state *state = timer->machine->driver_data;
-
-	abc800_ctc_trg_w(state->z80ctc);
-}
-
-static WRITE8_DEVICE_HANDLER( abc806_ctc_z2_w )
-{
-//	abc806_state *state = device->machine->driver_data;
-
-	/* write to DART channel A RxC/TxC */
-}
-
-static const z80ctc_interface abc806_ctc_intf =
-{
-	Z80_TAG,				/* cpu */
-	ABC800_X01/2/2,			/* clock */
-	0,              		/* timer disables */
-	0,				  		/* interrupt handler */
-	0,						/* ZC/TO0 callback */
-	0,              		/* ZC/TO1 callback */
-	abc806_ctc_z2_w    		/* ZC/TO2 callback */
+	ABC806_X02
 };
+
+/* Z80 Daisy Chain */
+
+static const z80_daisy_chain abc800_daisy_chain[] =
+{
+	{ Z80CTC, Z80CTC_TAG },
+	{ Z80SIO, Z80SIO_TAG },
+	{ Z80DART, Z80DART_TAG },
+	{ NULL }
+};
+
+/* Machine Initialization */
+
+static MACHINE_START( abc800 )
+{
+	abc800_state *state = machine->driver_data;
+
+	/* find devices */
+
+	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
+	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+}
+
+static MACHINE_START( abc802 )
+{
+	abc802_state *state = machine->driver_data;
+
+	/* find devices */
+
+	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
+//	state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+
+	/* configure memory */
+
+	memory_configure_bank(1, 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(1, 1, 1, mess_ram, 0);
+}
+
+static MACHINE_RESET( abc802 )
+{
+	abc802_state *state = machine->driver_data;
+
+	/* memory banking */
+	memory_set_bank(1, 0);
+
+	/* clear screen time out (S1) */
+	z80sio_set_dcd(state->z80sio, 1, 0);
+
+	/* unknown (S2) */
+	z80sio_set_cts(state->z80sio, 1, 0);
+
+	/* 40/80 char (S3) */
+	z80dart_set_ri(state->z80dart, 0, 0); // 0 = 40, 1 = 80
+
+	/* 50/60 Hz */
+	z80dart_set_cts(state->z80dart, 1, 0); // 0 = 50Hz, 1 = 60Hz ???
+}
 
 static MACHINE_START( abc806 )
 {
@@ -1033,7 +1063,7 @@ static MACHINE_START( abc806 )
 	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
 	state->e0516 = devtag_get_device(machine, E0516, E0516_TAG);
-	state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
 
 	/* setup memory banking */
 
@@ -1085,25 +1115,23 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_MACHINE_START(abc800)
 
 	/* fake keyboard */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", abc800_keyboard_tick, USEC(2500))
+	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	/* ABC-77 keyboard */
-/*	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)
-	MDRV_DEVICE_CONFIG(abc800_abc77_intf)*/
+//	MDRV_ABC77_ADD(abc800_abc77_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc800m_video)
 	
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD( Z80CTC_TAG, abc800_ctc_intf )
-	MDRV_TIMER_ADD_PERIODIC("ctc", abc800_ctc_tick, HZ(ABC800_X01/2/2/2))
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD( Z80SIO_TAG, abc800_sio_intf )
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
 
 	/* Z80 DART */
-	MDRV_Z80DART_ADD( Z80DART_TAG, abc800_dart_intf )
+	MDRV_Z80DART_ADD(Z80DART_TAG, abc800_dart_intf)
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1124,25 +1152,23 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_MACHINE_START(abc800)
 
 	/* fake keyboard */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", abc800_keyboard_tick, USEC(2500))
+	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	/* ABC-77 keyboard */
-/*	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)
-	MDRV_DEVICE_CONFIG(abc800_abc77_intf)*/
+//	MDRV_ABC77_ADD(abc800_abc77_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc800c_video)
 
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD( Z80CTC_TAG, abc800_ctc_intf )
-	MDRV_TIMER_ADD_PERIODIC("ctc", abc800_ctc_tick, HZ(ABC800_X01/2/2/2))
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD( Z80SIO_TAG, abc800_sio_intf )
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
 
 	/* Z80 DART */
-	MDRV_Z80DART_ADD( Z80DART_TAG, abc800_dart_intf )
+	MDRV_Z80DART_ADD(Z80DART_TAG, abc800_dart_intf)
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1163,23 +1189,24 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_MACHINE_START(abc802)
 	MDRV_MACHINE_RESET(abc802)
 
+	/* fake keyboard */
+	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+
 	/* ABC-77 keyboard */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)
-	MDRV_DEVICE_CONFIG(abc802_abc77_intf)
+//	MDRV_ABC77_ADD(abc802_abc77_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc802_video)
 
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD( Z80CTC_TAG, abc802_ctc_intf )
-	MDRV_TIMER_ADD_PERIODIC("ctc", abc802_ctc_tick, HZ(ABC800_X01/2/2/2))
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD( Z80SIO_TAG, abc800_sio_intf )
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
 
 	/* Z80 DART */
-	MDRV_Z80DART_ADD( Z80DART_TAG, abc800_dart_intf )
+	MDRV_Z80DART_ADD(Z80DART_TAG, abc802_dart_intf)
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1199,24 +1226,25 @@ static MACHINE_DRIVER_START( abc806 )
 
 	MDRV_MACHINE_START(abc806)
 	MDRV_MACHINE_RESET(abc806)
+	
+	/* fake keyboard */
+	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	/* ABC-77 keyboard */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)
-	MDRV_DEVICE_CONFIG(abc806_abc77_intf)
+	//MDRV_ABC77_ADD(abc806_abc77_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc806_video)
 
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD( Z80CTC_TAG, abc806_ctc_intf )
-	MDRV_TIMER_ADD_PERIODIC("ctc", abc806_ctc_tick, HZ(ABC800_X01/2/2/2))
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD( Z80SIO_TAG, abc800_sio_intf )
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
 
 	/* Z80 DART */
-	MDRV_Z80DART_ADD( Z80DART_TAG, abc800_dart_intf )
+	MDRV_Z80DART_ADD(Z80DART_TAG, abc806_dart_intf)
 
 	/* real time clock */
 	MDRV_DEVICE_ADD(E0516_TAG, E0516)
