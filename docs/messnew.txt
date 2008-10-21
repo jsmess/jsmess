@@ -1,9 +1,26 @@
-ï»¿0.128.1
+0.128.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 (none)
 
+
+System Driver Changes:
+----------------------
+
+- [COCO] Fixed Dragon Alpha, via mame update, the NMI enable/disable allowing
+  disks to boot again [Phill Harvey-Smith]
+
+- [BBC] Changed memory handling for the 0xfc00 to 0xfeff memory region
+  on the Master driver, to allow correct debugging of code in this area
+  when ROM is paged in for read [Phill Harvey-Smith]
+
+- [BBC] Added version 3.20 of the Master MOS, selectable as a bios, as this is the 
+  more common version of the bios [Phill Harvey-Smith]
+
+- [BBC] Fixed up loading of 8K roms as cartriges so that they mirror correctly
+  and don't cause an error on loading, 16K was already working correctly
+  [Phill Harvey-Smith]  
 
 
 User Interface Changes:
@@ -117,9 +134,9 @@ System Driver Changes:
   had plugged your joystick in port 2). This helps with games which expect
   joystick inputs from port 2 of the C64 [Fabio Priuli]
 
-- [C64] Fixed memory leaks with floppies [Oliver StÃ¶neberg]
+- [C64] Fixed memory leaks with floppies [Oliver Stöneberg]
 
-- [C64] Fixed floppy unmounting [Oliver StÃ¶neberg]
+- [C64] Fixed floppy unmounting [Oliver Stöneberg]
 
 - [C65] Added preliminary cartridge support through MESS core functions.
   Currently, .crt emulation uses unmodified C64 cart code and therefore
@@ -168,7 +185,7 @@ System Driver Changes:
 
 - [OSCNANO] Implemented RUN/MONITOR keys properly, changed video to
   black and white, and fixed quickloading. System is now fully
-  working, including the "SÃ¤kkijÃ¤rven polkka" program. [Curt Coder]
+  working, including the "Säkkijärven polkka" program. [Curt Coder]
 
 - [JUPITER] Fixed regression; driver works again.  [Wilbert Pol]
 
@@ -229,7 +246,7 @@ System Driver Changes:
   single VP-580 Auxiliary Keyboard emulation. The VIP Blockout game can
   now be played in color with sound using 2 keypads. [Curt Coder]
 
-- [X68000] Fixed SASI harddisk device info [Oliver StÃ¶neberg]
+- [X68000] Fixed SASI harddisk device info [Oliver Stöneberg]
 
 
 
@@ -242,10 +259,10 @@ User Interface Changes:
   Woods]
 
 - Added "Keyboard Mode" menu to switch between emulated and natural keyboard
-  during emulation. [Oliver StÃ¶neberg]
+  during emulation. [Oliver Stöneberg]
 
 - Fixed toggling through multiple cassettes in Tape Control menu [Oliver
-  StÃ¶neberg]
+  Stöneberg]
 
 - MESSUI now shows the actual values of the system configuration
   settings instead of the defaults. (bug #1679) [Curt Coder]
@@ -271,7 +288,7 @@ Source Changes:
   Woods]
 
 - Removed MESS_DEBUG and the TESTDRIVER define and enabled a lot of
-  non-working drivers [Oliver StÃ¶neberg]
+  non-working drivers [Oliver Stöneberg]
 
 - Changed the cassette implementation into a regular mame device.  [Wilbert Pol]
 
@@ -561,13 +578,13 @@ System Driver Changes:
 
 - [CBM, C16] Simplified keyboard and interrupt handling code.  [Fabio Priuli]
 
-- [C64] Fixed some timings in c64 pal. [Roberto ZandonÃ ]
+- [C64] Fixed some timings in c64 pal. [Roberto Zandonà]
 
 - [C64] Partial input fix, joystick 2 still not working. (bug #1150) [Roberto
-  ZandonÃ ]
+  Zandonà]
 
 - [C64] Implentation of sprite wrapping at the top of the screen. (bug #1599)
-  [Roberto ZandonÃ ]
+  [Roberto Zandonà]
 
 - [COCO/COCO3] Transitioned Bitbanger and VHD support to use MAME's core
   device system.  [Nate Woods]
@@ -745,7 +762,7 @@ System Driver Changes:
 
 - [COCO] Added a quickload for .BIN files.  [Nate Woods]
 
-- [COUPE] Added many new BIOS revisions.  [Oliver StÃ¶neberg]
+- [COUPE] Added many new BIOS revisions.  [Oliver Stöneberg]
 
 - [EP128] Fixed 0.119 regression in graphics display. (bug #1478)
   [Wilbert Pol]
@@ -1027,7 +1044,7 @@ System Driver Changes:
   to the data port.  (bug #1378 and bug #1418) [Wilbert Pol]
 
 - [MEPHISTO] Implemented artwork/code for real chess board usage. [Ralf
-  SchÃ¤fer, Cowering]
+  Schäfer, Cowering]
 
 - [ORIC] Fixed floppy interface detection.  [Dirk Best]
 
@@ -6663,9 +6680,9 @@ Other Changes:
   *"Engine" is separate from the "shell"; which gives the potential for front ends for
    those who don't like command lines. [Nate Woods]
 
-- Disk write support for AMSTRAD CPC [Oscar MartÃ­n GonzÃ¡lez]
+- Disk write support for AMSTRAD CPC [Oscar Martín González]
 
-- Wave timer fix [Oscar MartÃ­n GonzÃ¡lez]
+- Wave timer fix [Oscar Martín González]
 
 - m6510t/m7501/m8502 CPU cores added [Peter Trauner]
 

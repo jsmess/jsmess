@@ -2094,6 +2094,7 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 	switch (size) {
 	case 0x2000:
 		read_ = image_fread(image, mem + addr, size);
+		image_fseek(image,0,SEEK_SET);
 		read_ = image_fread(image, mem + addr + 0x2000, size);
 		break;
 	case 0x4000:
