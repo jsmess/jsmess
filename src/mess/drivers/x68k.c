@@ -105,15 +105,12 @@
       Keyboard doesn't work (MFP USART).
       Supervisor area set isn't implemented.
 
-    Some minor game-specific issues (at 14/05/08):
+    Some minor game-specific issues (at 22/10/08):
       Pacmania:      Black squares on the maze (transparency?).
-      Nemesis '94:   Menu system doesn't work except for start buttons.
-      Flying Shark:  Appears to lock up at main menu.
       Salamander:    System error when using keys in-game.  No error if a joystick is used.
       Kyukyoku Tiger:Sprites offset by a looooong way.
       Dragon Buster: Text is black and unreadable (text palette should be loaded from disk, but it reads all zeroes).
-      Baraduke:      Corrupt background, locks up on demo mode.
-      Viewpoint:     Corrupt graphics on title screen, phantom movements on title screen, corrupt sprites, locks up.
+      Baraduke:      Locks up on demo mode.
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
 

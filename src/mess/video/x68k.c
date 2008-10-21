@@ -311,9 +311,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	if(val == 1)  // VBlank on
 	{
 		sys.crtc.vblank = 1;
-		vblank_line = sys.crtc.vend;
-		if(vblank_line > sys.crtc.vtotal)
-			vblank_line = sys.crtc.vtotal;
+		vblank_line = sys.crtc.vbegin;
 		irq_time = video_screen_get_time_until_pos(machine->primary_screen,vblank_line,2);
 		timer_adjust_oneshot(vblank_irq, irq_time, 0);
 		logerror("CRTC: VBlank on\n");
@@ -321,7 +319,9 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	if(val == 0)  // VBlank off
 	{
 		sys.crtc.vblank = 0;
-		vblank_line = sys.crtc.vbegin;
+		vblank_line = sys.crtc.vend;
+		if(vblank_line > sys.crtc.vtotal)
+			vblank_line = sys.crtc.vtotal;
 		irq_time = video_screen_get_time_until_pos(machine->primary_screen,vblank_line,2);
 		timer_adjust_oneshot(vblank_irq, irq_time, 1);
 		logerror("CRTC: VBlank off\n");
