@@ -16,6 +16,9 @@
 #define ABC802_ATE	0x80
 #define ABC802_INV	0x80
 
+#define ABC800C_CHAR_RAM_SIZE	0x400
+#define ABC800M_CHAR_RAM_SIZE	0x800
+#define ABC800_VIDEO_RAM_SIZE	0x1000
 #define ABC802_CHAR_RAM_SIZE	0x800
 #define ABC806_CHAR_RAM_SIZE	0x800
 #define ABC806_ATTR_RAM_SIZE	0x800
@@ -37,6 +40,12 @@ struct _abc800_state
 {
 	/* keyboard state */
 	int abc77_txd;			/* ABC-77 transmit data */
+	
+	/* video state */
+	UINT8 *charram;			/* character RAM */
+	UINT8 *videoram;		/* HR video RAM */
+
+	UINT8 fgctl;			/* HR foreground control */
 
 	/* devices */
 	const device_config *z80ctc;
@@ -123,14 +132,17 @@ struct _abc806_state
 
 /*----------- defined in video/abc800.c -----------*/
 
-MACHINE_DRIVER_EXTERN(abc800m_video);
-MACHINE_DRIVER_EXTERN(abc800c_video);
+READ8_HANDLER( abc800_charram_r );
+WRITE8_HANDLER( abc800_charram_w );
 
 WRITE8_HANDLER( abc800m_hrs_w );
 WRITE8_HANDLER( abc800m_hrc_w );
 
 WRITE8_HANDLER( abc800c_hrs_w );
 WRITE8_HANDLER( abc800c_hrc_w );
+
+MACHINE_DRIVER_EXTERN(abc800m_video);
+MACHINE_DRIVER_EXTERN(abc800c_video);
 
 /*----------- defined in video/abc802.c -----------*/
 

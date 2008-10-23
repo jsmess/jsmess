@@ -236,7 +236,7 @@ static void abc806_bankswitch(running_machine *machine)
 	abc806_state *state = machine->driver_data;
 	FPTR bank;
 
-	if (state->keydtr)
+	if (!state->keydtr)
 	{
 		/* 32K block mapping */
 
@@ -473,7 +473,7 @@ static WRITE8_DEVICE_HANDLER( dart_w )
 static ADDRESS_MAP_START( abc800m_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -501,7 +501,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800c_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
+	AM_RANGE(0x7c00, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

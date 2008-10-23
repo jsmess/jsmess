@@ -21,6 +21,22 @@
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
 
+/* Character Memory */
+
+READ8_HANDLER( abc800_charram_r )
+{
+	abc800_state *state = machine->driver_data;
+
+	return state->charram[offset];
+}
+
+WRITE8_HANDLER( abc800_charram_w )
+{
+	abc800_state *state = machine->driver_data;
+
+	state->charram[offset] = data;
+}
+
 /* Palette Initialization */
 
 static PALETTE_INIT( abc800m )
@@ -71,7 +87,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	{
 		int bit;
 
-		UINT16 address = (videoram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
+		UINT16 address = (state->charram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
 		UINT8 data = (state->char_rom[address & 0x7ff] & 0x3f);
 
 		if (column == cursor_x)
@@ -132,9 +148,14 @@ static const mc6845_interface abc800c_mc6845_interface = {
 
 /* Video Start */
 
-static VIDEO_START( abc800 )
+static VIDEO_START( abc800m )
 {
 	abc800_state *state = machine->driver_data;
+	
+	/* allocate memory */
+
+	state->charram = auto_malloc(ABC800M_CHAR_RAM_SIZE);
+	state->videoram = auto_malloc(ABC800_VIDEO_RAM_SIZE);
 
 	/* find devices */
 
@@ -143,6 +164,38 @@ static VIDEO_START( abc800 )
 	/* find memory regions */
 
 	state->char_rom = memory_region(machine, "chargen");
+
+	/* register for state saving */
+
+	state_save_register_global_pointer(state->charram, ABC800M_CHAR_RAM_SIZE);
+	state_save_register_global_pointer(state->videoram, ABC800_VIDEO_RAM_SIZE);
+
+	state_save_register_global(state->fgctl);
+}
+
+static VIDEO_START( abc800c )
+{
+	abc800_state *state = machine->driver_data;
+	
+	/* allocate memory */
+
+	state->charram = auto_malloc(ABC800C_CHAR_RAM_SIZE);
+	state->videoram = auto_malloc(ABC800_VIDEO_RAM_SIZE);
+
+	/* find devices */
+
+	state->mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
+
+	/* find memory regions */
+
+	state->char_rom = memory_region(machine, "chargen");
+
+	/* register for state saving */
+
+	state_save_register_global_pointer(state->charram, ABC800M_CHAR_RAM_SIZE);
+	state_save_register_global_pointer(state->videoram, ABC800_VIDEO_RAM_SIZE);
+
+	state_save_register_global(state->fgctl);
 }
 
 /* Video Update */
@@ -184,7 +237,7 @@ MACHINE_DRIVER_START( abc800m_video )
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(abc800m)
-	MDRV_VIDEO_START(abc800)
+	MDRV_VIDEO_START(abc800m)
 	MDRV_VIDEO_UPDATE(abc800m)
 MACHINE_DRIVER_END
 
@@ -205,6 +258,6 @@ MACHINE_DRIVER_START( abc800c_video )
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(abc800c)
-	MDRV_VIDEO_START(abc800)
+	MDRV_VIDEO_START(abc800c)
 	MDRV_VIDEO_UPDATE(abc800c)
 MACHINE_DRIVER_END
