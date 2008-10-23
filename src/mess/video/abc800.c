@@ -155,7 +155,6 @@ static VIDEO_START( abc800m )
 	/* allocate memory */
 
 	state->charram = auto_malloc(ABC800M_CHAR_RAM_SIZE);
-	state->videoram = auto_malloc(ABC800_VIDEO_RAM_SIZE);
 
 	/* find devices */
 
@@ -180,7 +179,6 @@ static VIDEO_START( abc800c )
 	/* allocate memory */
 
 	state->charram = auto_malloc(ABC800C_CHAR_RAM_SIZE);
-	state->videoram = auto_malloc(ABC800_VIDEO_RAM_SIZE);
 
 	/* find devices */
 

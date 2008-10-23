@@ -142,6 +142,7 @@ struct _dart_channel
 	int rx_first;			/* first character received */
 	int rx_parity;			/* received data parity */
 	int rx_break;			/* receive break condition */
+	int rx_rr0_latch;		/* read register 0 latched */
 
 	int ri;					/* ring indicator latch */
 	int cts;				/* clear to send latch */
@@ -391,30 +392,13 @@ static void z80dart_reset_channel(const device_config *device, int channel)
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 
-	/* reset read registers */
-	ch->rr[0] = Z80DART_RR0_TX_BUFFER_EMPTY;
-	ch->rr[1] = ch->rr[2] = 0;
-
-	/* reset write registers */
-	ch->wr[0] = ch->wr[1] = ch->wr[2] = ch->wr[3] = ch->wr[4] = ch->wr[5] = 0;
-
-	/* reset receiver */
-	ch->rx_shift = 0;
-	ch->rx_error = 0;
-	ch->rx_data_fifo[0] = ch->rx_data_fifo[1] = ch->rx_data_fifo[2] = 0;
-	ch->rx_error_fifo[0] = ch->rx_error_fifo[1] = ch->rx_error_fifo[2] = 0;
-	ch->rx_fifo = 0;
+	/* disable receiver */
+	ch->wr[3] &= ~Z80DART_WR3_RX_ENABLE;
 	ch->rx_state = STATE_START;
-	ch->rx_bits = 0;
-	ch->rx_first = 1;
-	ch->rx_parity = 0;
 
-	/* reset transmitter */
-	ch->tx_data = 0;
-	ch->tx_shift = 0;
+	/* disable transmitter */
+	ch->wr[5] &= ~Z80DART_WR5_TX_ENABLE;
 	ch->tx_state = STATE_START;
-	ch->tx_bits = 0;
-	ch->tx_parity = 0;
 
 	/* reset external lines */
 	z80dart_rts_w(device, channel, 1);
@@ -748,7 +732,8 @@ READ8_DEVICE_HANDLER( z80dart_c_r )
 
 	case 2:
 		/* channel B only */
-		data = z80dart->channel[Z80DART_CH_B].rr[reg];
+		if (channel == Z80DART_CH_B)
+			data = ch->rr[reg];
 		break;
 	}
 
@@ -784,6 +769,13 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 		case Z80DART_WR0_RESET_EXT_STATUS:
 			/* reset external/status interrupt */
 			ch->rr[0] &= ~(Z80DART_RR0_DCD | Z80DART_RR0_RI | Z80DART_RR0_CTS | Z80DART_RR0_BREAK);
+
+			if (!ch->dcd) ch->rr[0] |= Z80DART_RR0_DCD;
+			if (ch->ri) ch->rr[0] |= Z80DART_RR0_RI;
+			if (ch->cts) ch->rr[0] |= Z80DART_RR0_CTS;
+
+			ch->rx_rr0_latch = 0;
+
 			LOGERROR("Z80DART \"%s\" Channel %c : Reset External/Status Interrupt\n", device->tag, 'A' + channel);
 			break;
 
@@ -1018,11 +1010,23 @@ void z80dart_cts_w(const device_config *device, int channel, int state)
 		/* set clear to send */
 		ch->cts = state;
 
-		if (ch->cts)
-			ch->rr[0] |= Z80DART_RR0_CTS;
+		if (!ch->rx_rr0_latch)
+		{
+			if (!ch->cts)
+				ch->rr[0] |= Z80DART_RR0_CTS;
+			else
+				ch->rr[0] &= ~Z80DART_RR0_CTS;
 
-		/* trigger interrupt */
-		z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+			/* trigger interrupt */
+			if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
+			{
+				/* trigger interrupt */
+				z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+
+				/* latch read register 0 */
+				ch->rx_rr0_latch = 1;
+			}
+		}
 	}
 }
 
@@ -1043,12 +1047,22 @@ void z80dart_dcd_w(const device_config *device, int channel, int state)
 		/* set data carrier detect */
 		ch->dcd = state;
 
-		if (ch->dcd)
-			ch->rr[0] |= Z80DART_RR0_DCD;
+		if (!ch->rx_rr0_latch)
+		{
+			if (ch->dcd)
+				ch->rr[0] |= Z80DART_RR0_DCD;
+			else
+				ch->rr[0] &= ~Z80DART_RR0_DCD;
 
-		/* trigger interrupt */
-		if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
-			z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+			if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
+			{
+				/* trigger interrupt */
+				z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+
+				/* latch read register 0 */
+				ch->rx_rr0_latch = 1;
+			}
+		}
 	}
 }
 
@@ -1064,12 +1078,24 @@ void z80dart_ri_w(const device_config *device, int channel, int state)
 		/* set ring indicator state */
 		ch->ri = state;
 
-		if (ch->ri)
-			ch->rr[0] |= Z80DART_RR0_RI;
+		if (!ch->rx_rr0_latch)
+		{
+			if (ch->ri)
+				ch->rr[0] |= Z80DART_RR0_RI;
+			else
+				ch->rr[0] &= ~Z80DART_RR0_RI;
 
-		/* trigger interrupt */
-		if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
-			z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+			if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
+			{
+				/* trigger interrupt */
+				z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+
+				/* latch read register 0 */
+				ch->rx_rr0_latch = 1;
+			}
+		}
+
+		logerror("PERKLE %u", ch->rr[0]);
 	}
 }
 
@@ -1165,7 +1191,7 @@ static int z80dart_irq_state(const device_config *device)
 	int state = 0;
 	int i;
 
-	LOGERROR("dart IRQ state = B:%d%d%d%d A:%d%d%d%d\n",
+	LOGERROR("Z80DART \"%s\" : Interrupt State B:%d%d%d%d A:%d%d%d%d\n", device->tag, 
 				z80dart->int_state[0], z80dart->int_state[1], z80dart->int_state[2], z80dart->int_state[3],
 				z80dart->int_state[4], z80dart->int_state[5], z80dart->int_state[6], z80dart->int_state[7]);
 
@@ -1336,6 +1362,8 @@ static DEVICE_START( z80dart )
 static DEVICE_RESET( z80dart )
 {
 	int channel;
+
+	LOGERROR("Z80DART \"%s\" Reset\n", device->tag);
 
 	for (channel = Z80DART_CH_A; channel <= Z80DART_CH_B; channel++)
 	{

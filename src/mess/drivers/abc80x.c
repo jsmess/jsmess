@@ -472,7 +472,8 @@ static WRITE8_DEVICE_HANDLER( dart_w )
 
 static ADDRESS_MAP_START( abc800m_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x4000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -500,7 +501,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800c_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x4000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_READWRITE(abc800_charram_r, abc800_charram_w)
 	AM_RANGE(0x7c00, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
@@ -1109,6 +1111,19 @@ static MACHINE_START( abc800 )
 	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
 	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+
+	/* configure memory */
+
+	state->videoram = auto_malloc(ABC800_VIDEO_RAM_SIZE);
+
+	memory_configure_bank(1, 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(1, 1, 1, state->videoram, 0);
+}
+
+static MACHINE_RESET( abc800 )
+{
+	/* memory banking */
+	memory_set_bank(1, 0);
 }
 
 static MACHINE_START( abc802 )
@@ -1211,6 +1226,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_CPU_IO_MAP(abc800m_io_map, 0)
 
 	MDRV_MACHINE_START(abc800)
+	MDRV_MACHINE_RESET(abc800)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1248,6 +1264,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_CPU_IO_MAP(abc800c_io_map, 0)
 
 	MDRV_MACHINE_START(abc800)
+	MDRV_MACHINE_RESET(abc800)
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
