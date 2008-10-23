@@ -3,14 +3,6 @@
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 
-/*
-
-	TODO:
-
-	- clock generator 74LS393 @ Z6
-
-*/
-
 typedef struct _abc77_t abc77_t;
 struct _abc77_t
 {
@@ -296,12 +288,15 @@ INPUT_PORTS_END
 
 MACHINE_DRIVER_START( abc77 )
 	/* keyboard cpu */
-	MDRV_CPU_ADD(I8035_TAG, I8035, 4608000)
+	MDRV_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
+	/* watchdog */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ(XTAL_4_608MHz/(3*5)))
+
 	/* serial clock timer */
-	MDRV_TIMER_ADD_PERIODIC("clock", clock_tick, HZ(20000))
+	MDRV_TIMER_ADD_PERIODIC("serial", clock_tick, HZ(XTAL_4_608MHz/(3*5)/16))
 
 	/* discrete sound */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
