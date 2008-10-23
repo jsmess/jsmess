@@ -309,7 +309,7 @@ static void mc68901_check_interrupts(const device_config *device)
 
 	if (mc68901->ipr & mc68901->imr)
 	{
-		mc68901->intf->on_irq_changed(device, ASSERT_LINE);
+		mc68901->intf->on_irq_changed(device, HOLD_LINE);
 	}
 	else
 	{
