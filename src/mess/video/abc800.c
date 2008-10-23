@@ -97,7 +97,7 @@ static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
 {
 	abc800_state *state = device->machine->driver_data;
 
-	z80dart_set_ri(state->z80dart, 1, vsync);
+	z80dart_ri_w(state->z80dart, 1, vsync);
 }
 
 static MC6845_UPDATE_ROW( abc800c_update_row )

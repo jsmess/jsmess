@@ -1,137 +1,122 @@
 /***************************************************************************
 
-    Z80 DART (Z8470) implementation
+    Z80 DART Dual Asynchronous Receiver/Transmitter emulation
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright (c) 2008, The MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
+
+/*
+
+	TODO:
+
+	- save state support
+	- break detection
+	- wr0 reset tx interrupt pending
+	- wait/ready
+	- 1.5 stop bits
+
+*/
 
 #include "driver.h"
 #include "z80dart.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 
-
-
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE		1
+#define VERBOSE 1
 
-#define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
-
-
+#define LOGERROR if (VERBOSE) logerror
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-/* interrupt states */
-#define INT_CHB_TRANSMIT	0x00		/* not confirmed */
-#define INT_CHB_STATUS		0x01
-#define INT_CHB_RECEIVE		0x02
-#define INT_CHB_ERROR		0x03
+enum
+{
+	STATE_START = 0,
+	STATE_DATA,
+	STATE_PARITY,
+	STATE_STOP,
+	STATE_STOP2
+};
 
-#define INT_CHA_TRANSMIT	0x04		/* not confirmed */
-#define INT_CHA_STATUS		0x05
-#define INT_CHA_RECEIVE		0x06
-#define INT_CHA_ERROR		0x07
+enum
+{
+	INT_TRANSMIT = 0,
+	INT_EXTERNAL,
+	INT_RECEIVE,
+	INT_SPECIAL
+};
 
-/* DART write register 0 */
-#define DART_WR0_RESET_MASK					0xc0	/* D7-D6: Reset control */
-#define DART_WR0_RESET_NULL					0x00	/*  00 = NULL code */
-#define DART_WR0_RESET_RX_CRC				0x40	/*  01 = Reset Rx CRC checker */
-#define DART_WR0_RESET_TX_CRC				0x80	/*  10 = Reset Tx CRC generator */
-#define DART_WR0_RESET_TX_LATCH				0xc0	/*  11 = Reset Tx Underrun/EOM latch */
-#define DART_WR0_COMMAND_MASK				0x38	/* D5-D3: Command */
-#define DART_WR0_COMMAND_NULL				0x00	/*  000 = NULL code */
-													/*  001 = not used */
-#define DART_WR0_COMMAND_RES_STATUS_INT		0x10	/*  010 = reset ext/status interrupts */
-#define DART_WR0_COMMAND_CH_RESET			0x18	/*  011 = Channel reset */
-#define DART_WR0_COMMAND_ENA_RX_INT			0x20	/*  100 = Enable int on next Rx character */
-#define DART_WR0_COMMAND_RES_TX_INT			0x28	/*  101 = Reset Tx int pending */
-#define DART_WR0_COMMAND_RES_ERROR			0x30	/*  110 = Error reset */
-#define DART_WR0_COMMAND_RETI				0x38	/*  111 = Return from int (CH-A only) */
-#define DART_WR0_REGISTER_MASK				0x07	/* D2-D0: Register select (0-7) */
+#define Z80DART_RR0_RX_CHAR_AVAILABLE	0x01
+#define Z80DART_RR0_INTERRUPT_PENDING	0x02
+#define Z80DART_RR0_TX_BUFFER_EMPTY		0x04
+#define Z80DART_RR0_DCD					0x08
+#define Z80DART_RR0_RI					0x10
+#define Z80DART_RR0_CTS					0x20
+#define Z80DART_RR0_BREAK				0x80 /* not supported */
 
-/* DART write register 1 */
-#define DART_WR1_READY_WAIT_ENA				0x80	/* D7 = READY/WAIT enable */
-#define DART_WR1_READY_WAIT_FUNCTION		0x40	/* D6 = READY/WAIT function */
-#define DART_WR1_READY_WAIT_ON_RT			0x20	/* D5 = READY/WAIT on R/T */
-#define DART_WR1_RXINT_MASK					0x18	/* D4-D3 = Rx int control */
-#define DART_WR1_RXINT_DISABLE				0x00	/*  00 = Rx int disable */
-#define DART_WR1_RXINT_FIRST				0x08	/*  01 = Rx int on first character */
-#define DART_WR1_RXINT_ALL_PARITY			0x10	/*  10 = int on all Rx characters (parity affects vector) */
-#define DART_WR1_RXINT_ALL_NOPARITY			0x18	/*  11 = int on all Rx characters (parity ignored) */
-#define DART_WR1_STATUS_AFFECTS_VECTOR		0x04	/* D2 = Status affects vector (CH-B only) */
-#define DART_WR1_TXINT_ENABLE				0x02	/* D1 = Tx int enable */
-#define DART_WR1_STATUSINT_ENABLE			0x01	/* D0 = Ext int enable */
+#define Z80DART_RR1_ALL_SENT			0x01
+#define Z80DART_RR1_PARITY_ERROR		0x10
+#define Z80DART_RR1_RX_OVERRUN_ERROR	0x20
+#define Z80DART_RR1_FRAMING_ERROR		0x40
 
-/* DART write register 2 (CH-B only) */
-#define DART_WR2_INT_VECTOR_MASK			0xff	/* D7-D0 = interrupt vector */
+#define Z80DART_WR0_REGISTER_MASK		0x07
+#define Z80DART_WR0_COMMAND_MASK		0x38
+#define Z80DART_WR0_NULL_CODE			0x00
+#define Z80DART_WR0_RESET_EXT_STATUS	0x10
+#define Z80DART_WR0_CHANNEL_RESET		0x18
+#define Z80DART_WR0_ENABLE_INT_NEXT_RX	0x20
+#define Z80DART_WR0_RESET_TX_INT		0x28 /* not supported */
+#define Z80DART_WR0_ERROR_RESET			0x30
+#define Z80DART_WR0_RETURN_FROM_INT		0x38 /* not supported */
 
-/* DART write register 3 */
-#define DART_WR3_RX_DATABITS_MASK			0xc0	/* D7-D6 = Rx Data bits */
-#define DART_WR3_RX_DATABITS_5				0x00	/*  00 = Rx 5 bits/character */
-#define DART_WR3_RX_DATABITS_7				0x40	/*  01 = Rx 7 bits/character */
-#define DART_WR3_RX_DATABITS_6				0x80	/*  10 = Rx 6 bits/character */
-#define DART_WR3_RX_DATABITS_8				0xc0	/*  11 = Rx 8 bits/character */
-#define DART_WR3_AUTO_ENABLES				0x20	/* D5 = Auto enables */
-													/* D1-D4 = not used */
-#define DART_WR3_RX_ENABLE					0x01	/* D0 = Rx enable */
+#define Z80DART_WR1_EXT_INT_ENABLE		0x01
+#define Z80DART_WR1_TX_INT_ENABLE		0x02
+#define Z80DART_WR1_STATUS_VECTOR		0x04
+#define Z80DART_WR1_RX_INT_ENABLE_MASK	0x18
+#define Z80DART_WR1_RX_INT_DISABLE		0x00
+#define Z80DART_WR1_RX_INT_FIRST		0x08
+#define Z80DART_WR1_RX_INT_ALL_PARITY	0x10 /* not supported */
+#define Z80DART_WR1_RX_INT_ALL			0x18
+#define Z80DART_WR1_WRDY_ON_RX_TX		0x20 /* not supported */
+#define Z80DART_WR1_WRDY_FUNCTION		0x40 /* not supported */
+#define Z80DART_WR1_WRDY_ENABLE			0x80 /* not supported */
 
-/* DART write register 4 */
-#define DART_WR4_CLOCK_MODE_MASK			0xc0	/* D7-D6 = Clock mode */
-#define DART_WR4_CLOCK_MODE_x1				0x00	/*  00 = x1 clock mode */
-#define DART_WR4_CLOCK_MODE_x16				0x40	/*  01 = x16 clock mode */
-#define DART_WR4_CLOCK_MODE_x32				0x80	/*  10 = x32 clock mode */
-#define DART_WR4_CLOCK_MODE_x64				0xc0	/*  11 = x64 clock mode */
-													/* D5-D4 = not used */
-#define DART_WR4_STOPBITS_MASK				0x0c	/* D3-D2 = Stop bits */
-													/*  00 = not used */
-#define DART_WR4_STOPBITS_1					0x04	/*  01 = 1 stop bit/character */
-#define DART_WR4_STOPBITS_15				0x08	/*  10 = 1.5 stop bits/character */
-#define DART_WR4_STOPBITS_2					0x0c	/*  11 = 2 stop bits/character */
-#define DART_WR4_PARITY_EVEN				0x02	/* D1 = Parity even/odd */
-#define DART_WR4_PARITY_ENABLE				0x01	/* D0 = Parity enable */
+#define Z80DART_WR3_RX_ENABLE			0x01
+#define Z80DART_WR3_AUTO_ENABLES		0x20
+#define Z80DART_WR3_RX_WORD_LENGTH_MASK	0xc0
+#define Z80DART_WR3_RX_WORD_LENGTH_5	0x00
+#define Z80DART_WR3_RX_WORD_LENGTH_7	0x40
+#define Z80DART_WR3_RX_WORD_LENGTH_6	0x80
+#define Z80DART_WR3_RX_WORD_LENGTH_8	0xc0
 
-/* DART write register 5 */
-#define DART_WR5_DTR						0x80	/* D7 = DTR */
-#define DART_WR5_TX_DATABITS_MASK			0x60	/* D6-D5 = Tx Data bits */
-#define DART_WR5_TX_DATABITS_5				0x00	/*  00 = Tx 5 bits/character */
-#define DART_WR5_TX_DATABITS_7				0x20	/*  01 = Tx 7 bits/character */
-#define DART_WR5_TX_DATABITS_6				0x40	/*  10 = Tx 6 bits/character */
-#define DART_WR5_TX_DATABITS_8				0x60	/*  11 = Tx 8 bits/character */
-#define DART_WR5_SEND_BREAK					0x10	/* D4 = Send break */
-#define DART_WR5_TX_ENABLE					0x08	/* D3 = Tx Enable */
-													/* D2 = not used */
-#define DART_WR5_RTS						0x02	/* D1 = RTS */
-													/* D0 = not used */
+#define Z80DART_WR4_PARITY_ENABLE		0x01 /* not supported */
+#define Z80DART_WR4_PARITY_EVEN			0x02 /* not supported */
+#define Z80DART_WR4_STOP_BITS_MASK		0x0c
+#define Z80DART_WR4_STOP_BITS_1			0x04
+#define Z80DART_WR4_STOP_BITS_1_5		0x08 /* not supported */
+#define Z80DART_WR4_STOP_BITS_2			0x0c
+#define Z80DART_WR4_CLOCK_MODE_MASK		0xc0
+#define Z80DART_WR4_CLOCK_MODE_X1		0x00
+#define Z80DART_WR4_CLOCK_MODE_X16		0x40
+#define Z80DART_WR4_CLOCK_MODE_X32		0x80
+#define Z80DART_WR4_CLOCK_MODE_X64		0xc0
 
-/* DART read register 0 */
-#define DART_RR0_BREAK_ABORT				0x80	/* D7 = Break/abort */
-													/* D6 = not used */
-#define DART_RR0_CTS						0x20	/* D5 = CTS */
-#define DART_RR0_RI							0x10	/* D4 = RI */
-#define DART_RR0_DCD						0x08	/* D3 = DCD */
-#define DART_RR0_TX_BUFFER_EMPTY			0x04	/* D2 = Tx buffer empty */
-#define DART_RR0_INT_PENDING				0x02	/* D1 = int pending (CH-A only) */
-#define DART_RR0_RX_CHAR_AVAILABLE			0x01	/* D0 = Rx character available */
-
-/* DART read register 1 */
-													/* D7 = not used */
-#define DART_RR1_CRC_FRAMING_ERROR			0x40	/* D6 = Framing error */
-#define DART_RR1_RX_OVERRUN_ERROR			0x20	/* D5 = Rx overrun error */
-#define DART_RR1_PARITY_ERROR				0x10	/* D4 = Parity error */
-													/* D3-D1 = not used */
-#define DART_RR1_ALL_SENT					0x01	/* D0 = All sent */
-
-/* DART read register 2 (CH-B only) */
-#define DART_RR2_VECTOR_MASK				0xff	/* D7-D0 = Interrupt vector */
-
-
+#define Z80DART_WR5_RTS					0x02
+#define Z80DART_WR5_TX_ENABLE			0x08
+#define Z80DART_WR5_SEND_BREAK			0x10
+#define Z80DART_WR5_TX_WORD_LENGTH_MASK	0x60
+#define Z80DART_WR5_TX_WORD_LENGTH_5	0x00
+#define Z80DART_WR5_TX_WORD_LENGTH_7	0x40
+#define Z80DART_WR5_TX_WORD_LENGTH_6	0x80
+#define Z80DART_WR5_TX_WORD_LENGTH_8	0xc0
+#define Z80DART_WR5_DTR					0x80
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -140,618 +125,1112 @@
 typedef struct _dart_channel dart_channel;
 struct _dart_channel
 {
-	UINT8		regs[6];			/* 6 writeable registers */
-	UINT8		status[4];			/* 3 readable registers */
-	int			inbuf;				/* input buffer */
-	int			outbuf;				/* output buffer */
-	UINT8		int_on_next_rx;		/* interrupt on next rx? */
-	emu_timer *receive_timer;		/* timer to clock data in */
-	UINT8		receive_buffer[16];	/* buffer for incoming data */
-	UINT8		receive_inptr;		/* index of data coming in */
-	UINT8		receive_outptr;		/* index of data going out */
+	/* register state */
+	UINT8 rr[3];			/* read register */
+	UINT8 wr[6];			/* write register */
+
+	/* receiver state */
+	UINT8 rx_data_fifo[3];	/* receive data FIFO */
+	UINT8 rx_error_fifo[3];	/* receive error FIFO */
+	UINT8 rx_shift;			/* 8-bit receive shift register */
+	UINT8 rx_error;			/* current receive error */
+	int rx_fifo;			/* receive FIFO pointer */
+
+	int rx_clock;			/* receive clock pulse count */
+	int rx_state;			/* receive state */
+	int rx_bits;			/* bits received */
+	int rx_first;			/* first character received */
+	int rx_parity;			/* received data parity */
+	int rx_break;			/* receive break condition */
+
+	int ri;					/* ring indicator latch */
+	int cts;				/* clear to send latch */
+	int dcd;				/* data carrier detect latch */
+
+	/* transmitter state */
+	UINT8 tx_data;			/* transmit data register */
+	UINT8 tx_shift;			/* transmit shift register */
+
+	int tx_clock;			/* transmit clock pulse count */
+	int tx_state;			/* transmit state */
+	int tx_bits;			/* bits transmitted */
+	int tx_parity;			/* transmitted data parity */
+
+	int dtr;				/* data terminal ready */
+	int rts;				/* request to send */
 };
 
-
-typedef struct _z80dart z80dart;
-struct _z80dart
+typedef struct _z80dart_t z80dart_t;
+struct _z80dart_t
 {
-	dart_channel	chan[2];			/* 2 channels */
-	UINT8		int_state[8];		/* interrupt states */
+	const z80dart_interface *intf;	/* interface */
 
-	void (*irq_cb)(const device_config *device, int state);
-	write8_device_func dtr_changed_cb;
-	write8_device_func rts_changed_cb;
-	write8_device_func break_changed_cb;
-	write8_device_func transmit_cb;
-	int (*receive_poll_cb)(const device_config *device, int ch);
+	dart_channel channel[2];		/* channels */
+
+	int clock;						/* base clock */
+	int int_state[8];				/* interrupt state */
+
+	/* timers */
+	emu_timer *rxca_timer;
+	emu_timer *txca_timer;
+	emu_timer *rxtxcb_timer;
 };
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static TIMER_CALLBACK(serial_callback);
 static int z80dart_irq_state(const device_config *device);
-
-
-
-/*
-
-    Interrupt priorities:
-        Ch A receive
-        Ch A transmit
-        Ch A external/status
-        Ch B receive
-        Ch B transmit
-        Ch B external/status
-
-
-    Initial configuration (both channels):
-        005D:dart_reg_w(0,4) = 44
-                    01 = x16 clock mode
-                    00 = 8 bit sync character
-                    01 = 1 stop bit/character
-                    Parity odd
-                    Parity disabled
-
-        005D:dart_reg_w(0,3) = C1
-                    11 = Rx 8 bits/character
-                    No auto enables
-                    No enter hunt phase
-                    No Rx CRC enable
-                    No address search mode
-                    No sync character load inhibit
-                    Rx enable
-
-        005D:dart_reg_w(0,5) = 68
-                    DTR = 0
-                    11 = Tx 8 bits/character
-                    No send break
-                    Tx enable
-                    SDLC
-                    No RTS
-                    No CRC enable
-
-        005D:dart_reg_w(0,2) = 40
-                    Vector = 0x40
-
-        005D:dart_reg_w(0,1) = 1D
-                    No READY/WAIT
-                    No READY/WAIT function
-                    No READY/WAIT on R/T
-                    11 = int on all Rx characters (parity ignored)
-                    Status affects vector
-                    No Tx int enable
-                    Ext int enable
-
-*/
-
+static void z80dart_irq_reti(const device_config *device);
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z80dart *get_safe_token(const device_config *device)
+INLINE z80dart_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == Z80DART);
-	return (z80dart *)device->token;
+	
+	return (z80dart_t *)device->token;
 }
 
+/***************************************************************************
+    CALLBACK INTERFACE MANAGEMENT
+***************************************************************************/
 
-INLINE void interrupt_check(const device_config *device)
+static int z80dart_rxd_r(const device_config *device, int channel)
 {
-	z80dart *dart = get_safe_token( device );
+	z80dart_t *z80dart = get_safe_token(device);
 
-	/* if we have a callback, update it with the current state */
-	if (dart->irq_cb != NULL)
-		dart->irq_cb(device, (z80dart_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+	int data = 1;
+
+	if (z80dart->intf->rxd_r)
+	{
+		data = z80dart->intf->rxd_r(device, channel);
+	}
+
+	return data;
 }
 
-
-INLINE attotime compute_time_per_character(const device_config *device, int ch)
+static void z80dart_txd_w(const device_config *device, int channel, int state)
 {
-	/* fix me -- should compute properly and include data, stop, parity bits */
-	return ATTOTIME_IN_HZ(9600 / 10);
+	z80dart_t *z80dart = get_safe_token(device);
+
+	if (z80dart->intf->on_txd_changed)
+	{
+		z80dart->intf->on_txd_changed(device, channel, state);
+	}
 }
 
-
-INLINE void reset_channel(const device_config *device, int ch)
+static void z80dart_rts_w(const device_config *device, int channel, int state)
 {
-	z80dart *dart = get_safe_token( device );
-	attotime tpc = compute_time_per_character(device, ch);
-	dart_channel *chan = &dart->chan[ch];
+	z80dart_t *z80dart = get_safe_token(device);
 
-	chan->status[0] = DART_RR0_TX_BUFFER_EMPTY;
-	chan->status[1] = 0x00;
-	chan->status[2] = 0x00;
-	chan->int_on_next_rx = 0;
-	chan->outbuf = -1;
+	if (z80dart->intf->on_rts_changed)
+	{
+		z80dart->intf->on_rts_changed(device, channel, state);
+	}
 
-	dart->int_state[0 + 4*ch] = 0;
-	dart->int_state[1 + 4*ch] = 0;
-	dart->int_state[2 + 4*ch] = 0;
-	dart->int_state[3 + 4*ch] = 0;
-
-	/* start the receive timer running */
-	timer_adjust_periodic(chan->receive_timer, tpc, ch, tpc);
+	LOGERROR("Z80DART \"%s\" Channel %c : RTS %u\n", device->tag, 'A' + channel, state);
 }
 
+static void z80dart_dtr_w(const device_config *device, int channel, int state)
+{
+	z80dart_t *z80dart = get_safe_token(device);
 
+	if (z80dart->intf->on_dtr_changed)
+	{
+		z80dart->intf->on_dtr_changed(device, channel, state);
+	}
+
+	LOGERROR("Z80DART \"%s\" Channel %c : DTR %u\n", device->tag, 'A' + channel, state);
+}
+
+/***************************************************************************
+    INTERNAL STATE MANAGEMENT
+***************************************************************************/
+
+static void z80dart_check_interrupt(const device_config *device)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	int state = (z80dart_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
+
+	if (z80dart->intf->on_int_changed)
+	{
+		z80dart->intf->on_int_changed(device, state);
+	}
+}
+
+static void z80dart_trigger_interrupt(const device_config *device, int channel, int level)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+	UINT8 vector = ch->wr[2];
+	int priority = (channel << 2) | level;
+
+	LOGERROR("Z80DART \"%s\" Channel %c : Interrupt Request %u\n", device->tag, 'A' + channel, level);
+
+	if ((channel == Z80DART_CH_B) && (ch->wr[1] & Z80DART_WR1_STATUS_VECTOR))
+	{
+		/* status affects vector */
+		vector = (ch->wr[2] & 0xf1) | (!channel << 3) | (level << 1);
+	}
+
+	/* update vector register */
+	ch->rr[2] = vector;
+
+	/* trigger interrupt */
+	z80dart->int_state[priority] |= Z80_DAISY_INT;
+	z80dart->channel[Z80DART_CH_A].rr[0] |= Z80DART_RR0_INTERRUPT_PENDING;
+
+	/* check for interrupt */
+	z80dart_check_interrupt(device);
+}
+
+static int z80dart_get_clock_mode(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	int clocks = 1;
+
+	switch (ch->wr[4] & Z80DART_WR4_CLOCK_MODE_MASK)
+	{
+	case Z80DART_WR4_CLOCK_MODE_X1:
+		clocks = 1;
+
+	case Z80DART_WR4_CLOCK_MODE_X16:
+		clocks = 16;
+
+	case Z80DART_WR4_CLOCK_MODE_X32:
+		clocks = 32;
+
+	case Z80DART_WR4_CLOCK_MODE_X64:
+		clocks = 64;
+	}
+
+	return clocks;
+}
+
+static float z80dart_get_stop_bits(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	float bits = 1;
+
+	switch (ch->wr[4] & Z80DART_WR4_STOP_BITS_MASK)
+	{
+	case Z80DART_WR4_STOP_BITS_1:
+		bits = 1;
+
+	case Z80DART_WR4_STOP_BITS_1_5:
+		bits = 1.5;
+
+	case Z80DART_WR4_STOP_BITS_2:
+		bits = 2;
+	}
+
+	return bits;
+}
+
+static int z80dart_get_rx_word_length(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	int bits = 5;
+
+	switch (ch->wr[3] & Z80DART_WR3_RX_WORD_LENGTH_MASK)
+	{
+	case Z80DART_WR3_RX_WORD_LENGTH_5:
+		bits = 5;
+
+	case Z80DART_WR3_RX_WORD_LENGTH_6:
+		bits = 6;
+
+	case Z80DART_WR3_RX_WORD_LENGTH_7:
+		bits = 7;
+
+	case Z80DART_WR3_RX_WORD_LENGTH_8:
+		bits = 8;
+	}
+
+	return bits;
+}
+
+static int z80dart_get_tx_word_length(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	int bits = 5;
+
+	switch (ch->wr[5] & Z80DART_WR5_TX_WORD_LENGTH_MASK)
+	{
+	case Z80DART_WR5_TX_WORD_LENGTH_5:
+		bits = 5;
+
+	case Z80DART_WR5_TX_WORD_LENGTH_6:
+		bits = 6;
+
+	case Z80DART_WR5_TX_WORD_LENGTH_7:
+		bits = 7;
+
+	case Z80DART_WR5_TX_WORD_LENGTH_8:
+		bits = 8;
+	}
+
+	return bits;
+}
+
+static void z80dart_reset_channel(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	/* reset read registers */
+	ch->rr[0] = Z80DART_RR0_TX_BUFFER_EMPTY;
+	ch->rr[1] = ch->rr[2] = 0;
+
+	/* reset write registers */
+	ch->wr[0] = ch->wr[1] = ch->wr[2] = ch->wr[3] = ch->wr[4] = ch->wr[5] = 0;
+
+	/* reset receiver */
+	ch->rx_shift = 0;
+	ch->rx_error = 0;
+	ch->rx_data_fifo[0] = ch->rx_data_fifo[1] = ch->rx_data_fifo[2] = 0;
+	ch->rx_error_fifo[0] = ch->rx_error_fifo[1] = ch->rx_error_fifo[2] = 0;
+	ch->rx_fifo = 0;
+	ch->rx_state = STATE_START;
+	ch->rx_bits = 0;
+	ch->rx_first = 1;
+	ch->rx_parity = 0;
+
+	/* reset transmitter */
+	ch->tx_data = 0;
+	ch->tx_shift = 0;
+	ch->tx_state = STATE_START;
+	ch->tx_bits = 0;
+	ch->tx_parity = 0;
+
+	/* reset external lines */
+	z80dart_rts_w(device, channel, 1);
+	z80dart_dtr_w(device, channel, 1);
+
+	if (channel == Z80DART_CH_A)
+	{
+		/* reset interrupt logic */
+		int i;
+
+		for (i = 0; i < 8; i++)
+		{
+			z80dart->int_state[i] = 0;
+		}
+
+		z80dart_check_interrupt(device);
+	}
+}
+
+/***************************************************************************
+    SERIAL RECEIVE
+***************************************************************************/
+
+static int detect_start_bit(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+	
+	if (!(ch->wr[3] & Z80DART_WR3_RX_ENABLE))
+		return 0;
+
+	return !z80dart_rxd_r(device, channel);
+}
+
+static void shift_data_in(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	if (ch->rx_bits < 8)
+	{
+		int rxd = z80dart_rxd_r(device, channel);
+
+		ch->rx_shift >>= 1;
+		ch->rx_shift = (rxd << 7) | (ch->rx_shift & 0x7f);
+		ch->rx_parity ^= rxd;
+		ch->rx_bits++;
+	}
+}
+
+static int character_completed(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	return ch->rx_bits == z80dart_get_rx_word_length(device, channel);
+}
+
+static void detect_parity_error(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+	
+	int rxd = z80dart_rxd_r(device, channel);
+	int parity = (ch->wr[1] & Z80DART_WR4_PARITY_EVEN) ? 1 : 0;
+
+	if (rxd != (ch->rx_parity ^ parity))
+	{
+		/* parity error detected */
+		ch->rx_error |= Z80DART_RR1_PARITY_ERROR;
+
+		switch (ch->wr[1] & Z80DART_WR1_RX_INT_ENABLE_MASK)
+		{
+		case Z80DART_WR1_RX_INT_FIRST:
+			if (!ch->rx_first)
+			{
+				z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			}
+			break;
+		
+		case Z80DART_WR1_RX_INT_ALL_PARITY:
+			z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			break;
+		
+		case Z80DART_WR1_RX_INT_ALL:
+			z80dart_trigger_interrupt(device, channel, INT_RECEIVE);
+			break;
+		}
+	}
+}
+
+static void detect_framing_error(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+	
+	int rxd = z80dart_rxd_r(device, channel);
+
+	if (!rxd)
+	{
+		/* framing error detected */
+		ch->rx_error |= Z80DART_RR1_FRAMING_ERROR;
+
+		switch (ch->wr[1] & Z80DART_WR1_RX_INT_ENABLE_MASK)
+		{
+		case Z80DART_WR1_RX_INT_FIRST:
+			if (!ch->rx_first)
+			{
+				z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			}
+			break;
+		
+		case Z80DART_WR1_RX_INT_ALL_PARITY:
+		case Z80DART_WR1_RX_INT_ALL:
+			z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			break;
+		}
+	}
+}
+
+static void receive(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+	
+	float stop_bits = z80dart_get_stop_bits(device, channel);
+
+	switch (ch->rx_state)
+	{
+	case STATE_START:
+		/* check for start bit */
+		if (detect_start_bit(device, channel))
+		{
+			/* start bit detected */
+			ch->rx_shift = 0;
+			ch->rx_error = 0;
+			ch->rx_bits = 0;
+			ch->rx_parity = 0;
+
+			/* next bit is a data bit */
+			ch->rx_state = STATE_DATA;
+		}
+		break;
+
+	case STATE_DATA:
+		/* shift bit into shift register */
+		shift_data_in(device, channel);
+		
+		if (character_completed(device, channel))
+		{
+			/* all data bits received */
+			if (ch->wr[4] & Z80DART_WR4_PARITY_ENABLE)
+			{
+				/* next bit is the parity bit */
+				ch->rx_state = STATE_PARITY;
+			}
+			else
+			{
+				/* next bit is a STOP bit */
+				if (stop_bits == 1)
+					ch->rx_state = STATE_STOP2;
+				else
+					ch->rx_state = STATE_STOP;
+			}
+		}
+		break;
+
+	case STATE_PARITY:
+		/* shift bit into shift register */
+		shift_data_in(device, channel);
+
+		/* check for parity error */
+		detect_parity_error(device, channel);
+
+		/* next bit is a STOP bit */
+		if (stop_bits == 1)
+			ch->rx_state = STATE_STOP2;
+		else
+			ch->rx_state = STATE_STOP;
+		break;
+
+	case STATE_STOP:
+		/* shift bit into shift register */
+		shift_data_in(device, channel);
+
+		/* check for framing error */
+		detect_framing_error(device, channel);
+
+		/* next bit is the second STOP bit */
+		ch->rx_state = STATE_STOP2;
+		break;
+
+	case STATE_STOP2:
+		/* shift bit into shift register */
+		shift_data_in(device, channel);
+
+		/* check for framing error */
+		detect_framing_error(device, channel);
+
+		/* store data into FIFO */
+		z80dart_receive_data(device, channel, ch->rx_shift);
+
+		/* next bit is the START bit */
+		ch->rx_state = STATE_START;
+		break;
+	}
+}
+
+/***************************************************************************
+    SERIAL TRANSMIT
+***************************************************************************/
+
+#define TXD(state) z80dart_txd_w(device, channel, 1);
+
+static void transmit(const device_config *device, int channel)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+	
+	int word_length = z80dart_get_tx_word_length(device, channel);
+	float stop_bits = z80dart_get_stop_bits(device, channel);
+
+	switch (ch->tx_state)
+	{
+	case STATE_START:
+		if ((ch->wr[5] & Z80DART_WR5_TX_ENABLE) && !(ch->rr[0] & Z80DART_RR0_TX_BUFFER_EMPTY))
+		{
+			/* transmit start bit */
+			TXD(0);
+
+			ch->tx_bits = 0;
+			ch->tx_shift = ch->tx_data;
+
+			/* empty transmit buffer */
+			ch->rr[0] |= Z80DART_RR0_TX_BUFFER_EMPTY;
+
+			if (ch->wr[1] & Z80DART_WR1_TX_INT_ENABLE)
+				z80dart_trigger_interrupt(device, channel, INT_TRANSMIT);
+
+			ch->tx_state = STATE_DATA;
+		}
+		else if (ch->wr[5] & Z80DART_WR5_SEND_BREAK)
+		{
+			/* transmit break */
+			TXD(0);
+		}
+		else
+		{
+			/* transmit marking line */
+			TXD(1);
+		}
+
+		break;
+
+	case STATE_DATA:
+		/* transmit data bit */
+		TXD(BIT(ch->tx_shift, 0));
+
+		/* shift data */
+		ch->tx_shift >>= 1;
+		ch->tx_bits++;
+
+		if (ch->rx_bits == word_length)
+		{
+			if (ch->wr[4] & Z80DART_WR4_PARITY_ENABLE)
+				ch->tx_state = STATE_PARITY;
+			else
+			{
+				if (stop_bits == 1)
+					ch->tx_state = STATE_STOP2;
+				else
+					ch->tx_state = STATE_STOP;
+			}
+		}
+		break;
+
+	case STATE_PARITY:
+		// TODO: calculate parity
+		if (stop_bits == 1)
+			ch->tx_state = STATE_STOP2;
+		else
+			ch->tx_state = STATE_STOP;
+		break;
+
+	case STATE_STOP:
+		/* transmit stop bit */
+		TXD(1);
+
+		ch->tx_state = STATE_STOP2;
+		break;
+
+	case STATE_STOP2:
+		/* transmit stop bit */
+		TXD(1);
+
+		/* if transmit buffer is empty */
+		if (ch->rr[0] & Z80DART_RR0_TX_BUFFER_EMPTY)
+		{
+			/* then all characters have been sent */
+			ch->rr[1] |= Z80DART_RR1_ALL_SENT;
+
+			/* when the RTS bit is reset, the _RTS output goes high after the transmitter empties */
+			if (!ch->rts)
+				z80dart_rts_w(device, channel, 1);
+		}
+
+		ch->tx_state = STATE_START;
+		break;
+	}
+}
 
 /***************************************************************************
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-/*-------------------------------------------------
-    z80dart_c_w - write to a control register
--------------------------------------------------*/
+READ8_DEVICE_HANDLER( z80dart_c_r )
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	int channel = offset & 0x01;
+	dart_channel *ch = &z80dart->channel[channel];
+	UINT8 data = 0;
+
+	int reg = ch->wr[0] & Z80DART_WR0_REGISTER_MASK;
+
+	switch (reg)
+	{
+	case 0:
+	case 1:
+		data = ch->rr[reg];
+		break;
+
+	case 2:
+		/* channel B only */
+		data = z80dart->channel[Z80DART_CH_B].rr[reg];
+		break;
+	}
+
+	LOGERROR("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", device->tag, 'A' + channel, data);
+
+	return data;
+}
 
 WRITE8_DEVICE_HANDLER( z80dart_c_w )
 {
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[offset];
-	int reg = chan->regs[0] & 7;
-	UINT8 old = chan->regs[reg];
+	z80dart_t *z80dart = get_safe_token(device);
+	int channel = offset & 0x01;
+	dart_channel *ch = &z80dart->channel[channel];
 
-	if (reg != 0 || (reg & 0xf8))
-		VPRINTF(("%04X:dart_reg_w(%c,%d) = %02X\n", activecpu_get_pc(), 'A' + offset, reg, data));
+	int reg = ch->wr[0] & Z80DART_WR0_REGISTER_MASK;
 
-	/* write a new value to the selected register */
-	chan->regs[reg] = data;
+	LOGERROR("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", device->tag, 'A' + channel, data);
 
-	/* clear the register number for the next write */
+	/* write data to selected register */
+	ch->wr[reg] = data;
+
 	if (reg != 0)
-		chan->regs[0] &= ~7;
-
-	/* switch off the register for live state changes */
-	switch (reg)
 	{
-		/* DART write register 0 */
-		case 0:
-			switch (data & DART_WR0_COMMAND_MASK)
-			{
-				case DART_WR0_COMMAND_CH_RESET:
-					VPRINTF(("%04X:DART reset channel %c\n", activecpu_get_pc(), 'A' + offset));
-					reset_channel(device, offset);
-					interrupt_check(device);
-					break;
-
-				case DART_WR0_COMMAND_RES_STATUS_INT:
-					dart->int_state[INT_CHA_STATUS - 4*offset] &= ~Z80_DAISY_INT;
-					interrupt_check(device);
-					break;
-
-				case DART_WR0_COMMAND_ENA_RX_INT:
-					chan->int_on_next_rx = TRUE;
-					interrupt_check(device);
-					break;
-
-				case DART_WR0_COMMAND_RES_TX_INT:
-					dart->int_state[INT_CHA_TRANSMIT - 4*offset] &= ~Z80_DAISY_INT;
-					interrupt_check(device);
-					break;
-
-				case DART_WR0_COMMAND_RES_ERROR:
-					dart->int_state[INT_CHA_ERROR - 4*offset] &= ~Z80_DAISY_INT;
-					interrupt_check(device);
-					break;
-			}
-			break;
-
-		/* DART write register 1 */
-		case 1:
-			interrupt_check(device);
-			break;
-
-		/* DART write register 5 */
-		case 5:
-			if (((old ^ data) & DART_WR5_DTR) && dart->dtr_changed_cb)
-				(*dart->dtr_changed_cb)(device, offset, (data & DART_WR5_DTR) != 0);
-			if (((old ^ data) & DART_WR5_SEND_BREAK) && dart->break_changed_cb)
-				(*dart->break_changed_cb)(device, offset, (data & DART_WR5_SEND_BREAK) != 0);
-			if (((old ^ data) & DART_WR5_RTS) && dart->rts_changed_cb)
-				(*dart->rts_changed_cb)(device, offset, (data & DART_WR5_RTS) != 0);
-			break;
-	}
-}
-
-
-/*-------------------------------------------------
-    z80dart_c_r - read from a control register
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( z80dart_c_r )
-{
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[offset];
-	int reg = chan->regs[0] & 7;
-	UINT8 result = chan->status[reg];
-
-	/* switch off the register for live state changes */
-	switch (reg)
-	{
-		/* DART read register 0 */
-		case 0:
-			result &= ~DART_RR0_INT_PENDING;
-			if (z80dart_irq_state(device) & Z80_DAISY_INT)
-				result |= DART_RR0_INT_PENDING;
-			break;
+		/* mask out register index */
+		ch->wr[0] &= ~Z80DART_WR0_REGISTER_MASK;
 	}
 
-	VPRINTF(("%04X:dart_reg_r(%c,%d) = %02x\n", activecpu_get_pc(), 'A' + offset, reg, chan->status[reg]));
+	switch (reg)
+	{
+	case 0:
+		switch (data & Z80DART_WR0_COMMAND_MASK)
+		{
+		case Z80DART_WR0_RESET_EXT_STATUS:
+			/* reset external/status interrupt */
+			ch->rr[0] &= ~(Z80DART_RR0_DCD | Z80DART_RR0_RI | Z80DART_RR0_CTS | Z80DART_RR0_BREAK);
+			LOGERROR("Z80DART \"%s\" Channel %c : Reset External/Status Interrupt\n", device->tag, 'A' + channel);
+			break;
 
-	return chan->status[reg];
+		case Z80DART_WR0_CHANNEL_RESET:
+			/* channel reset */
+			LOGERROR("Z80DART \"%s\" Channel %c : Channel Reset\n", device->tag, 'A' + channel);
+			z80dart_reset_channel(device, channel);
+			break;
+
+		case Z80DART_WR0_ENABLE_INT_NEXT_RX:
+			/* enable interrupt on next receive character */
+			LOGERROR("Z80DART \"%s\" Channel %c : Enable Interrupt on Next Received Character\n", device->tag, 'A' + channel);
+			ch->rx_first = 1;
+			break;
+
+		case Z80DART_WR0_RESET_TX_INT:
+			/* reset transmitter interrupt pending */
+			LOGERROR("Z80DART \"%s\" Channel %c : Reset Transmitter Interrupt Pending\n", device->tag, 'A' + channel);
+			break;
+
+		case Z80DART_WR0_ERROR_RESET:
+			/* error reset */
+			LOGERROR("Z80DART \"%s\" Channel %c : Error Reset\n", device->tag, 'A' + channel);
+			ch->rr[1] &= ~(Z80DART_RR1_FRAMING_ERROR | Z80DART_RR1_RX_OVERRUN_ERROR | Z80DART_RR1_PARITY_ERROR);
+			break;
+
+		case Z80DART_WR0_RETURN_FROM_INT:
+			/* return from interrupt */
+			LOGERROR("Z80DART \"%s\" Channel %c : Return from Interrupt\n", device->tag, 'A' + channel);
+			z80dart_irq_reti(device);
+			break;
+		}
+		break;
+
+	case 1:
+		LOGERROR("Z80DART \"%s\" Channel %c : External Interrupt Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR1_EXT_INT_ENABLE) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Transmit Interrupt Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR1_TX_INT_ENABLE) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Status Affects Vector %u\n", device->tag, 'A' + channel, (data & Z80DART_WR1_STATUS_VECTOR) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Wait/Ready Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR1_WRDY_ENABLE) ? 1 : 0);
+		
+		switch (data & Z80DART_WR1_RX_INT_ENABLE_MASK)
+		{
+		case Z80DART_WR1_RX_INT_DISABLE:
+			LOGERROR("Z80DART \"%s\" Channel %c : Receiver Interrupt Disabled\n", device->tag, 'A' + channel);
+			break;
+
+		case Z80DART_WR1_RX_INT_FIRST:
+			LOGERROR("Z80DART \"%s\" Channel %c : Receiver Interrupt on First Character\n", device->tag, 'A' + channel);
+			break;
+
+		case Z80DART_WR1_RX_INT_ALL_PARITY:
+			LOGERROR("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters, Parity Affects Vector\n", device->tag, 'A' + channel);
+			break;
+
+		case Z80DART_WR1_RX_INT_ALL:
+			LOGERROR("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters\n", device->tag, 'A' + channel);
+			break;
+		}
+
+		z80dart_check_interrupt(device);
+		break;
+
+	case 2:
+		/* interrupt vector */
+		z80dart_check_interrupt(device);
+		LOGERROR("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", device->tag, 'A' + channel, data);
+		break;
+
+	case 3:
+		LOGERROR("Z80DART \"%s\" Channel %c : Receiver Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR3_RX_ENABLE) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Auto Enables %u\n", device->tag, 'A' + channel, (data & Z80DART_WR3_AUTO_ENABLES) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", device->tag, 'A' + channel, z80dart_get_rx_word_length(device, channel));
+		break;
+
+	case 4:
+		LOGERROR("Z80DART \"%s\" Channel %c : Parity Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR4_PARITY_ENABLE) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Parity %s\n", device->tag, 'A' + channel, (data & Z80DART_WR4_PARITY_EVEN) ? "Even" : "Odd");
+		LOGERROR("Z80DART \"%s\" Channel %c : Stop Bits %f\n", device->tag, 'A' + channel, z80dart_get_stop_bits(device, channel));
+		LOGERROR("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", device->tag, 'A' + channel, z80dart_get_clock_mode(device, channel));
+		break;
+
+	case 5:
+		LOGERROR("Z80DART \"%s\" Channel %c : Transmitter Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_TX_ENABLE) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Transmitter Bits/Character %u\n", device->tag, 'A' + channel, z80dart_get_tx_word_length(device, channel));
+		LOGERROR("Z80DART \"%s\" Channel %c : Send Break %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_SEND_BREAK) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Request to Send %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_RTS) ? 1 : 0);
+		LOGERROR("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_DTR) ? 1 : 0);
+
+		if (data & Z80DART_WR5_RTS)
+		{
+			/* when the RTS bit is set, the _RTS output goes low */
+			z80dart_rts_w(device, channel, 0);
+
+			ch->rts = 1;
+		}
+		else
+		{
+			/* when the RTS bit is reset, the _RTS output goes high after the transmitter empties */
+			ch->rts = 0;
+		}
+
+		/* data terminal ready output follows the state programmed into the DTR bit*/
+		ch->dtr = (data & Z80DART_WR5_DTR) ? 0 : 1;
+		z80dart_dtr_w(device, channel, ch->dtr);
+		break;
+	}
 }
-
-
-
 
 /***************************************************************************
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-/*-------------------------------------------------
-    z80dart_d_w - write to a data register
--------------------------------------------------*/
+READ8_DEVICE_HANDLER( z80dart_d_r )
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	int channel = offset & 0x01;
+	dart_channel *ch = &z80dart->channel[channel];
+	UINT8 data = 0;
+
+	if (ch->rx_fifo >= 0)
+	{
+		/* load data from the FIFO */
+		data = ch->rx_data_fifo[ch->rx_fifo];
+
+		/* load error status from the FIFO, retain overrun and parity errors */
+		ch->rr[1] = (ch->rr[1] & (Z80DART_RR1_RX_OVERRUN_ERROR | Z80DART_RR1_PARITY_ERROR)) | ch->rx_error_fifo[ch->rx_fifo];
+
+		/* decrease FIFO pointer */
+		ch->rx_fifo--;
+
+		if (ch->rx_fifo < 0)
+		{
+			/* no more characters available in the FIFO */
+			ch->rr[0] &= ~ Z80DART_RR0_RX_CHAR_AVAILABLE;
+		}
+	}
+
+	LOGERROR("Z80DART \"%s\" Channel %c : Data Register Read '%02x'\n", device->tag, 'A' + channel, data);
+
+	return data;
+}
 
 WRITE8_DEVICE_HANDLER( z80dart_d_w )
 {
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[offset];
+	z80dart_t *z80dart = get_safe_token(device);
+	int channel = offset & 0x01;
+	dart_channel *ch = &z80dart->channel[channel];
 
-	VPRINTF(("%04X:dart_data_w(%c) = %02X\n", activecpu_get_pc(), 'A' + offset, data));
+	ch->tx_data = data;
+	
+	ch->rr[0] &= ~Z80DART_RR0_TX_BUFFER_EMPTY;
+	ch->rr[1] &= ~Z80DART_RR1_ALL_SENT;
 
-	/* if tx not enabled, just ignore it */
-	if (!(chan->regs[5] & DART_WR5_TX_ENABLE))
-		return;
-
-	/* update the status register */
-	chan->status[0] &= ~DART_RR0_TX_BUFFER_EMPTY;
-
-	/* reset the transmit interrupt */
-	dart->int_state[INT_CHA_TRANSMIT - 4*offset] &= ~Z80_DAISY_INT;
-	interrupt_check(device);
-
-	/* stash the character */
-	chan->outbuf = data;
+	LOGERROR("Z80DART \"%s\" Channel %c : Data Register Write '%02x'\n", device->tag, 'A' + channel, data);
 }
-
-
-/*-------------------------------------------------
-    z80dart_d_r - read from a data register
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( z80dart_d_r )
-{
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[offset];
-
-	/* update the status register */
-	chan->status[0] &= ~DART_RR0_RX_CHAR_AVAILABLE;
-
-	/* reset the receive interrupt */
-	dart->int_state[INT_CHA_RECEIVE - 4*offset] &= ~Z80_DAISY_INT;
-	interrupt_check(device);
-
-	VPRINTF(("%04X:dart_data_r(%c) = %02X\n", activecpu_get_pc(), 'A' + offset, chan->inbuf));
-
-	return chan->inbuf;
-}
-
-
 
 /***************************************************************************
     CONTROL LINE READ/WRITE
 ***************************************************************************/
 
-/*-------------------------------------------------
-    z80dart_get_dtr - return the state of the DTR
-    line
--------------------------------------------------*/
-
-int z80dart_get_dtr(const device_config *device, int ch)
+void z80dart_receive_data(const device_config *device, int channel, UINT8 data)
 {
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[ch];
-	return ((chan->regs[5] & DART_WR5_DTR) != 0);
-}
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
 
+	LOGERROR("Z80DART \"%s\" Channel %c : Receive Data Byte '%02x'\n", device->tag, 'A' + channel, data);
 
-/*-------------------------------------------------
-    z80dart_get_rts - return the state of the RTS
-    line
--------------------------------------------------*/
-
-int z80dart_get_rts(const device_config *device, int ch)
-{
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[ch];
-	return ((chan->regs[5] & DART_WR5_RTS) != 0);
-}
-
-
-/*-------------------------------------------------
-    z80dart_set_cts - set the state of the CTS
-    line
--------------------------------------------------*/
-
-static TIMER_CALLBACK(change_input_line)
-{
-	const device_config *device = ptr;
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[param & 1];
-	UINT8 line = (param >> 8) & 0xff;
-	int state = (param >> 7) & 1;
-	int ch = param & 1;
-	UINT8 old;
-	char linename[4];
-
-	switch (line)
+	if (ch->rx_fifo == 2)
 	{
-	case DART_RR0_CTS:
-		sprintf(linename, "%s", "CTS");
-		break;
-	case DART_RR0_DCD:
-		sprintf(linename, "%s", "DCD");
-		break;
-	case DART_RR0_RI:
-		sprintf(linename, "%s", "RI");
-		break;
-	}
-	VPRINTF(("dart_change_input_line(%c, %s) = %d\n", 'A' + ch, linename, state));
+		/* receive overrun error detected */
+		ch->rx_error |= Z80DART_RR1_RX_OVERRUN_ERROR;
 
-	/* remember the old value */
-	old = chan->status[0];
-
-	/* set the bit in the status register */
-	chan->status[0] &= ~line;
-	if (state)
-		chan->status[0] |= line;
-
-	/* if state change interrupts are enabled, signal */
-	if (((old ^ chan->status[0]) & line) && (chan->regs[1] & DART_WR1_STATUSINT_ENABLE))
-	{
-		dart->int_state[INT_CHA_STATUS - 4*ch] |= Z80_DAISY_INT;
-		interrupt_check(device);
-	}
-}
-
-
-/*-------------------------------------------------
-    z80dart_set_cts - set the state of the CTS
-    line
--------------------------------------------------*/
-
-void z80dart_set_cts(const device_config *device, int ch, int state)
-{
-	/* operate deferred */
-	timer_set(attotime_zero, (void *)device, (DART_RR0_CTS << 8) + (state != 0) * 0x80 + ch, change_input_line);
-}
-
-
-/*-------------------------------------------------
-    z80dart_set_dcd - set the state of the DCD
-    line
--------------------------------------------------*/
-
-void z80dart_set_dcd(const device_config *device, int ch, int state)
-{
-	/* operate deferred */
-	timer_set(attotime_zero, (void *)device, (DART_RR0_DCD << 8) + (state != 0) * 0x80 + ch, change_input_line);
-}
-
-
-/*-------------------------------------------------
-    z80dart_set_ri - set the state of the RIA
-    line
--------------------------------------------------*/
-
-void z80dart_set_ri(const device_config *device, int ch, int state)
-{
-	/* operate deferred */
-	timer_set(attotime_zero, (void *)device, (DART_RR0_RI << 8) + (state != 0) * 0x80 + ch, change_input_line);
-}
-
-
-/*-------------------------------------------------
-    z80dart_receive_data - receive data on the
-    input lines
--------------------------------------------------*/
-
-void z80dart_receive_data(const device_config *device, int ch, UINT8 data)
-{
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[ch];
-	int newinptr;
-
-	/* put it on the queue */
-	newinptr = (chan->receive_inptr + 1) % ARRAY_LENGTH(chan->receive_buffer);
-	if (newinptr != chan->receive_outptr)
-	{
-		chan->receive_buffer[chan->receive_inptr] = data;
-		chan->receive_inptr = newinptr;
+		switch (ch->wr[1] & Z80DART_WR1_RX_INT_ENABLE_MASK)
+		{
+		case Z80DART_WR1_RX_INT_FIRST:
+			if (!ch->rx_first)
+			{
+				z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			}
+			break;
+		
+		case Z80DART_WR1_RX_INT_ALL_PARITY:
+		case Z80DART_WR1_RX_INT_ALL:
+			z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			break;
+		}
 	}
 	else
-		logerror("z80dart_receive_data: buffer overrun\n");
+	{
+		ch->rx_fifo++;
+	}
+
+	/* store received character and error status into FIFO */
+	ch->rx_data_fifo[ch->rx_fifo] = data;
+	ch->rx_error_fifo[ch->rx_fifo] = ch->rx_error;
+
+	ch->rr[0] |= Z80DART_RR0_RX_CHAR_AVAILABLE;
+
+	/* receive interrupt */
+	switch (ch->wr[1] & Z80DART_WR1_RX_INT_ENABLE_MASK)
+	{
+	case Z80DART_WR1_RX_INT_FIRST:
+		if (ch->rx_first)
+		{
+			z80dart_trigger_interrupt(device, channel, INT_RECEIVE);
+
+			ch->rx_first = 0;
+		}
+		break;
+
+	case Z80DART_WR1_RX_INT_ALL_PARITY:
+	case Z80DART_WR1_RX_INT_ALL:
+		z80dart_trigger_interrupt(device, channel, INT_RECEIVE);
+		break;
+	}
 }
 
-
-/*-------------------------------------------------
-    serial_callback - callback to pump
-    data through
--------------------------------------------------*/
-
-static TIMER_CALLBACK(serial_callback)
+void z80dart_cts_w(const device_config *device, int channel, int state)
 {
-	const device_config *device = ptr;
-	z80dart *dart = get_safe_token( device );
-	dart_channel *chan = &dart->chan[param & 1];
-	int ch = param & 1;
-	int data = -1;
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
 
-	/* first perform any outstanding transmits */
-	if (chan->outbuf != -1)
+	LOGERROR("Z80DART \"%s\" Channel %c : CTS %u\n", device->tag, 'A' + channel, state);
+
+	if (ch->cts != state)
 	{
-		VPRINTF(("serial_callback(%c): Transmitting %02x\n", 'A' + ch, chan->outbuf));
+		/* enable transmitter if in auto enables mode */
+		if (!state)
+			if (ch->wr[3] & Z80DART_WR3_AUTO_ENABLES)
+				ch->wr[5] |= Z80DART_WR5_TX_ENABLE;
 
-		/* actually transmit the character */
-		if (dart->transmit_cb != NULL)
-			(*dart->transmit_cb)(device, ch, chan->outbuf);
+		/* set clear to send */
+		ch->cts = state;
 
-		/* update the status register */
-		chan->status[0] |= DART_RR0_TX_BUFFER_EMPTY;
+		if (ch->cts)
+			ch->rr[0] |= Z80DART_RR0_CTS;
 
-		/* set the transmit buffer empty interrupt if enabled */
-		if (chan->regs[1] & DART_WR1_TXINT_ENABLE)
-		{
-			dart->int_state[INT_CHA_TRANSMIT - 4*ch] |= Z80_DAISY_INT;
-			interrupt_check(device);
-		}
-
-		/* reset the output buffer */
-		chan->outbuf = -1;
-	}
-
-	/* ask the polling callback if there is data to receive */
-	if (dart->receive_poll_cb != NULL)
-		data = (*dart->receive_poll_cb)(device, ch);
-
-	/* if we have buffered data, pull it */
-	if (chan->receive_inptr != chan->receive_outptr)
-	{
-		data = chan->receive_buffer[chan->receive_outptr];
-		chan->receive_outptr = (chan->receive_outptr + 1) % ARRAY_LENGTH(chan->receive_buffer);
-	}
-
-	/* if we have data, receive it */
-	if (data != -1)
-	{
-		VPRINTF(("serial_callback(%c): Receiving %02x\n", 'A' + ch, data));
-
-		/* if rx not enabled, just ignore it */
-		if (!(chan->regs[3] & DART_WR3_RX_ENABLE))
-		{
-			VPRINTF(("  (ignored because receive is disabled)\n"));
-			return;
-		}
-
-		/* stash the data and update the status */
-		chan->inbuf = data;
-		chan->status[0] |= DART_RR0_RX_CHAR_AVAILABLE;
-
-		/* update our interrupt state */
-		switch (chan->regs[1] & DART_WR1_RXINT_MASK)
-		{
-			case DART_WR1_RXINT_FIRST:
-				if (!chan->int_on_next_rx)
-					break;
-
-			case DART_WR1_RXINT_ALL_NOPARITY:
-			case DART_WR1_RXINT_ALL_PARITY:
-				dart->int_state[INT_CHA_RECEIVE - 4*ch] |= Z80_DAISY_INT;
-				interrupt_check(device);
-				break;
-		}
-		chan->int_on_next_rx = FALSE;
+		/* trigger interrupt */
+		z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
 	}
 }
 
+void z80dart_dcd_w(const device_config *device, int channel, int state)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
 
+	LOGERROR("Z80DART \"%s\" Channel %c : DCD %u\n", device->tag, 'A' + channel, state);
+
+	if (ch->dcd != state)
+	{
+		/* enable receiver if in auto enables mode */
+		if (!state)
+			if (ch->wr[3] & Z80DART_WR3_AUTO_ENABLES)
+				ch->wr[3] |= Z80DART_WR3_RX_ENABLE;
+
+		/* set data carrier detect */
+		ch->dcd = state;
+
+		if (ch->dcd)
+			ch->rr[0] |= Z80DART_RR0_DCD;
+
+		/* trigger interrupt */
+		if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
+			z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+	}
+}
+
+void z80dart_ri_w(const device_config *device, int channel, int state)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[channel];
+
+	LOGERROR("Z80DART \"%s\" Channel %c : RI %u\n", device->tag, 'A' + channel, state);
+
+	if (ch->ri != state)
+	{
+		/* set ring indicator state */
+		ch->ri = state;
+
+		if (ch->ri)
+			ch->rr[0] |= Z80DART_RR0_RI;
+
+		/* trigger interrupt */
+		if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
+			z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+	}
+}
+
+/***************************************************************************
+    CLOCK MANAGEMENT
+***************************************************************************/
+
+void z80dart_rxca_w(const device_config *device)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[Z80DART_CH_A];
+
+	int clocks = z80dart_get_clock_mode(device, Z80DART_CH_A);
+
+	LOGERROR("Z80DART \"%s\" Channel A : Receiver Clock Pulse\n", device->tag);
+	
+	ch->rx_clock++;
+
+	if (ch->rx_clock == clocks)
+	{
+		ch->rx_clock = 0;
+
+		/* receive data */
+		receive(device, Z80DART_CH_A);
+	}
+}
+
+void z80dart_txca_w(const device_config *device)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[Z80DART_CH_A];
+
+	int clocks = z80dart_get_clock_mode(device, Z80DART_CH_A);
+
+	LOGERROR("Z80DART \"%s\" Channel A : Transmitter Clock Pulse\n", device->tag);
+	
+	ch->tx_clock++;
+
+	if (ch->tx_clock == clocks)
+	{
+		ch->tx_clock = 0;
+
+		/* transmit data */
+		transmit(device, Z80DART_CH_A);
+	}
+}
+
+void z80dart_rxtxcb_w(const device_config *device)
+{
+	z80dart_t *z80dart = get_safe_token(device);
+	dart_channel *ch = &z80dart->channel[Z80DART_CH_B];
+
+	int clocks = z80dart_get_clock_mode(device, Z80DART_CH_B);
+
+	LOGERROR("Z80DART \"%s\" Channel A : Receiver/Transmitter Clock Pulse\n", device->tag);
+	
+	ch->rx_clock++;
+	ch->tx_clock++;
+
+	if (ch->rx_clock == clocks)
+	{
+		ch->rx_clock = 0;
+		ch->tx_clock = 0;
+
+		/* receive and transmit data */
+		receive(device, Z80DART_CH_B);
+		transmit(device, Z80DART_CH_B);
+	}
+}
+
+static TIMER_CALLBACK( rxca_tick )
+{
+	z80dart_rxca_w(ptr);
+}
+
+static TIMER_CALLBACK( txca_tick )
+{
+	z80dart_txca_w(ptr);
+}
+
+static TIMER_CALLBACK( rxtxcb_tick )
+{
+	z80dart_rxtxcb_w(ptr);
+}
 
 /***************************************************************************
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
-static const UINT8 int_priority[] =
-{
-	INT_CHA_RECEIVE,
-	INT_CHA_TRANSMIT,
-	INT_CHA_STATUS,
-	INT_CHA_ERROR,
-	INT_CHB_RECEIVE,
-	INT_CHB_TRANSMIT,
-	INT_CHB_STATUS,
-	INT_CHB_ERROR
-};
-
-
 static int z80dart_irq_state(const device_config *device)
 {
-	z80dart *dart = get_safe_token( device );
+	z80dart_t *z80dart = get_safe_token( device );
 	int state = 0;
 	int i;
 
-	VPRINTF(("dart IRQ state = B:%d%d%d%d A:%d%d%d%d\n",
-				dart->int_state[0], dart->int_state[1], dart->int_state[2], dart->int_state[3],
-				dart->int_state[4], dart->int_state[5], dart->int_state[6], dart->int_state[7]));
+	LOGERROR("dart IRQ state = B:%d%d%d%d A:%d%d%d%d\n",
+				z80dart->int_state[0], z80dart->int_state[1], z80dart->int_state[2], z80dart->int_state[3],
+				z80dart->int_state[4], z80dart->int_state[5], z80dart->int_state[6], z80dart->int_state[7]);
 
 	/* loop over all interrupt sources */
 	for (i = 0; i < 8; i++)
 	{
-		int inum = int_priority[i];
-
 		/* if we're servicing a request, don't indicate more interrupts */
-		if (dart->int_state[inum] & Z80_DAISY_IEO)
+		if (z80dart->int_state[i] & Z80_DAISY_IEO)
 		{
 			state |= Z80_DAISY_IEO;
 			break;
 		}
-		state |= dart->int_state[inum];
+		state |= z80dart->int_state[i];
 	}
+
+	LOGERROR("Z80DART \"%s\" : Interrupt State %u\n", device->tag, state);
 
 	return state;
 }
 
-
 static int z80dart_irq_ack(const device_config *device)
 {
-	z80dart *dart = get_safe_token( device );
+	z80dart_t *z80dart = get_safe_token( device );
 	int i;
+
+	LOGERROR("Z80DART \"%s\" Interrupt Acknowledge\n", device->tag);
 
 	/* loop over all interrupt sources */
 	for (i = 0; i < 8; i++)
 	{
-		int inum = int_priority[i];
-
 		/* find the first channel with an interrupt requested */
-		if (dart->int_state[inum] & Z80_DAISY_INT)
+		if (z80dart->int_state[i] & Z80_DAISY_INT)
 		{
-			VPRINTF(("dart IRQAck %d\n", inum));
-
 			/* clear interrupt, switch to the IEO state, and update the IRQs */
-			dart->int_state[inum] = Z80_DAISY_IEO;
-			interrupt_check(device);
-			return dart->chan[1].regs[2] + inum * 2;
+			z80dart->int_state[i] = Z80_DAISY_IEO;
+			z80dart->channel[Z80DART_CH_A].rr[0] &= ~Z80DART_RR0_INTERRUPT_PENDING;
+			z80dart_check_interrupt(device);
+
+			LOGERROR("Z80DART \"%s\" : Interrupt Acknowledge Vector %02x\n", device->tag, z80dart->channel[Z80DART_CH_B].rr[2]);
+
+			return z80dart->channel[Z80DART_CH_B].rr[2];
 		}
 	}
 
 	logerror("z80dart_irq_ack: failed to find an interrupt to ack!\n");
-	return dart->chan[1].regs[2];
+	
+	return z80dart->channel[Z80DART_CH_B].rr[2];
 }
-
 
 static void z80dart_irq_reti(const device_config *device)
 {
-	z80dart *dart = get_safe_token( device );
+	z80dart_t *z80dart = get_safe_token( device );
 	int i;
+
+	LOGERROR("Z80DART \"%s\" Return from Interrupt\n", device->tag);
 
 	/* loop over all interrupt sources */
 	for (i = 0; i < 8; i++)
 	{
-		int inum = int_priority[i];
-
 		/* find the first channel with an IEO pending */
-		if (dart->int_state[inum] & Z80_DAISY_IEO)
+		if (z80dart->int_state[i] & Z80_DAISY_IEO)
 		{
-			VPRINTF(("dart IRQReti %d\n", inum));
-
 			/* clear the IEO state and update the IRQs */
-			dart->int_state[inum] &= ~Z80_DAISY_IEO;
-			interrupt_check(device);
+			z80dart->int_state[i] &= ~Z80_DAISY_IEO;
+			z80dart_check_interrupt(device);
 			return;
 		}
 	}
@@ -759,38 +1238,112 @@ static void z80dart_irq_reti(const device_config *device)
 	logerror("z80dart_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
+/***************************************************************************
+    READ/WRITE HANDLERS
+***************************************************************************/
+
+READ8_DEVICE_HANDLER( z80dart_r )
+{
+	return (offset & 2) ? z80dart_c_r(device, offset & 1) : z80dart_d_r(device, offset & 1);
+}
+
+WRITE8_DEVICE_HANDLER( z80dart_w )
+{
+	if (offset & 2)
+		z80dart_c_w(device, offset & 1, data);
+	else
+		z80dart_d_w(device, offset & 1, data);
+}
+
+READ8_DEVICE_HANDLER( z80dart_alt_r )
+{
+	int channel = BIT(offset, 1);
+
+	return (offset & 1) ? z80dart_c_r(device, channel) : z80dart_d_r(device, channel);
+}
+
+WRITE8_DEVICE_HANDLER( z80dart_alt_w )
+{
+	int channel = BIT(offset, 1);
+
+	if (offset & 1)
+		z80dart_c_w(device, channel, data);
+	else
+		z80dart_d_w(device, channel, data);
+}
+
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
 
 static DEVICE_START( z80dart )
 {
 	const z80dart_interface *intf = device->static_config;
-	z80dart *dart = get_safe_token(device);
+	z80dart_t *z80dart = get_safe_token(device);
+	char unique_tag[30];
+	int cpunum = -1;
 
-	dart->chan[0].receive_timer = timer_alloc(serial_callback, (void *)device);
-	dart->chan[1].receive_timer = timer_alloc(serial_callback, (void *)device);
+	assert(intf != NULL);
+	z80dart->intf = intf;
 
-	dart->irq_cb = intf->irq_cb;
-	dart->dtr_changed_cb = intf->dtr_changed_cb;
-	dart->rts_changed_cb = intf->rts_changed_cb;
-	dart->break_changed_cb = intf->break_changed_cb;
-	dart->transmit_cb = intf->transmit_cb;
-	dart->receive_poll_cb = intf->receive_poll_cb;
+	/* get clock */
+
+	if (intf->cpu != NULL)
+	{
+		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
+	}
+
+	if (cpunum != -1)
+	{
+		z80dart->clock = device->machine->config->cpu[cpunum].clock;
+	}
+	else
+	{
+		assert(intf->clock > 0);
+		z80dart->clock = intf->clock;
+	}
+
+	/* allocate channel A receive timer */
+
+	z80dart->rxca_timer = timer_alloc(rxca_tick, (void *)device);
+
+	if (z80dart->intf->rx_clock_a)
+		timer_adjust_periodic(z80dart->rxca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->rx_clock_a));
+
+	/* allocate channel A transmit timer */
+
+	z80dart->txca_timer = timer_alloc(txca_tick, (void *)device);
+
+	if (z80dart->intf->tx_clock_a)
+		timer_adjust_periodic(z80dart->txca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->tx_clock_a));
+
+	/* allocate channel B receive/transmit timer */
+
+	z80dart->rxtxcb_timer = timer_alloc(rxtxcb_tick, (void *)device);
+
+	if (z80dart->intf->rx_tx_clock_b)
+		timer_adjust_periodic(z80dart->rxtxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->rx_tx_clock_b));
+
+	/* register for state saving */
+
+	state_save_combine_module_and_tag(unique_tag, "z80dart", device->tag);
+
+	//state_save_register_item_array(unique_tag, 0, z80dart->);
 
 	return DEVICE_START_OK;
 }
 
-
 static DEVICE_RESET( z80dart )
 {
-	int ch;
+	int channel;
 
-	/* set up defaults */
-	for (ch = 0; ch < 2; ch++)
+	for (channel = Z80DART_CH_A; channel <= Z80DART_CH_B; channel++)
 	{
-		reset_channel( device, ch );
+		z80dart_reset_channel(device, channel);
 	}
-	interrupt_check(device);
-}
 
+	z80dart_check_interrupt(device);
+}
 
 static DEVICE_SET_INFO( z80dart )
 {
@@ -800,13 +1353,12 @@ static DEVICE_SET_INFO( z80dart )
 	}
 }
 
-
 DEVICE_GET_INFO( z80dart )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(z80dart);						break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(z80dart_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
@@ -827,4 +1379,3 @@ DEVICE_GET_INFO( z80dart )
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team";			break;
 	}
 }
-

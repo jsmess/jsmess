@@ -171,12 +171,12 @@ static void scan_keyboard(running_machine *machine)
 
 	if (keycode)
 	{
-		if (!keylatch)
+		if (keycode != keylatch)
 		{
 			const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 
-			z80dart_set_dcd(z80dart, 1, 1);
-			z80dart_receive_data(z80dart, 1, keycode);
+			z80dart_dcd_w(z80dart, Z80DART_CH_B, 0);
+			z80dart_receive_data(z80dart, Z80DART_CH_B, keycode);
 
 			keylatch = keycode;
 		}
@@ -187,8 +187,8 @@ static void scan_keyboard(running_machine *machine)
 		{
 			const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 
-			z80dart_set_dcd(z80dart, 1, 0);
-			z80dart_receive_data(z80dart, 1, 0);
+			z80dart_dcd_w(z80dart, Z80DART_CH_B, 1);
+			z80dart_receive_data(z80dart, Z80DART_CH_B, 0);
 
 			keylatch = 0;
 		}
@@ -206,6 +206,27 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 static WRITE8_HANDLER( abc800_ram_ctrl_w )
 {
+}
+
+// ABC 802
+
+static void abc802_bankswitch(running_machine *machine)
+{
+	abc802_state *state = machine->driver_data;
+
+	if (state->lrs)
+	{
+		/* ROM and video RAM selected */
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x77ff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7fff, 0, 0, abc802_charram_r, abc802_charram_w);
+	}
+	else
+	{
+		/* low RAM selected */
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+	}
+
+	memory_set_bank(1, state->lrs);
 }
 
 // ABC 806
@@ -507,8 +528,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x77ff) AM_RAMBANK(1)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -723,10 +743,10 @@ static ABC77_ON_TXD_CHANGED( abc800_abc77_txd_changed )
 
 static ABC77_ON_CLOCK_CHANGED( abc77_clock_changed )
 {
-//	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
+	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
 
-	/* connected to DART channel B RxTxCB (pin ) */
-	//z80dart_rxtxc_w(z80dart, 1, level);
+	/* connected to DART channel B clock */
+	z80dart_rxtxcb_w(z80dart);
 }
 
 static ABC77_ON_KEYDOWN_CHANGED( abc77_keydown_changed )
@@ -734,7 +754,7 @@ static ABC77_ON_KEYDOWN_CHANGED( abc77_keydown_changed )
 	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
 
 	/* connected to DART channel B DCD (pin ) */
-	z80dart_set_dcd(z80dart, 1, level);
+	z80dart_dcd_w(z80dart, 1, level);
 }
 
 static ABC77_INTERFACE( abc800_abc77_intf )
@@ -795,52 +815,53 @@ static void ctc_interrupt(const device_config *device, int state)
 
 static WRITE8_DEVICE_HANDLER( ctc_z0_w )
 {
-	//const device_config *z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
+	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO, Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
 	if (BIT(sb, 2))
 	{
 		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
-		//z80sio_txc_w(z80sio, 0, data);
+		//z80sio_txca_w(z80sio, data);
 		z80ctc_trg_w(device, 3, data);
 	}
 
 	/* connected to SIO/2 RxCB through a thingy */
 	//z80sio_rxcb = ?
-	//z80sio_rxc_w(z80sio, 1, z80sio_rxcb);
+	//z80sio_rxcb_w(z80sio, z80sio_rxcb);
 
 	/* connected to SIO/2 TxCB through a JK divide by 2 */
 	//z80sio_txcb = !z80sio_txcb;
-	//z80sio_txc_w(z80sio, 1, z80sio_txcb);
+	//z80sio_txcb_w(z80sio, z80sio_txcb);
 }
 
 static WRITE8_DEVICE_HANDLER( ctc_z1_w )
 {
-	//const device_config *z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
+	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO, Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
 	if (BIT(sb, 3))
 	{
 		/* connected to SIO/2 RxCA */
-		//z80sio_rxc_w(z80sio, 0, data);
+		//z80sio_rxca_w(z80sio, data);
 	}
 
 	if (BIT(sb, 8))
 	{
 		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
-		//z80sio_txc_w(z80sio, 0, data);
+		//z80sio_txca_w(z80sio, data);
 		z80ctc_trg_w(device, 3, data);
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( ctc_z2_w )
 {
-//	const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
 
-	/* connected to DART RxCA/TxCA (pin ) */
-	//z80dart_rxtxc_w(z80dart, 0, data);
+	/* connected to DART channel A clock inputs */
+	z80dart_rxca_w(z80dart);
+	z80dart_txca_w(z80dart);
 }
 
 static const z80ctc_interface ctc_intf =
@@ -902,84 +923,160 @@ static z80sio_interface sio_intf =
 
 /* Z80 DART */
 
-static WRITE8_DEVICE_HANDLER( dart_serial_transmit )
-{
-}
-
-static int dart_serial_receive(const device_config *device, int ch)
-{
-	return -1;
-}
-
-static void dart_interrupt(const device_config *device, int state)
+static Z80DART_ON_INT_CHANGED( dart_interrupt )
 {
 	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
 }
 
-static const z80dart_interface abc800_dart_intf =
+static Z80DART_RXD_READ( abc800_dart_rxd_r )
 {
-	Z80_TAG,				/* cpu */
-	ABC800_X01/2/2,			/* clock */
-	dart_interrupt,			/* interrupt handler */
-	0,						/* DTR changed handler */
-	0,						/* RTS changed handler */
-	0,						/* BREAK changed handler */
-	dart_serial_transmit,	/* transmit handler */
-	dart_serial_receive		/* receive handler */
-};
+	abc800_state *state = device->machine->driver_data;
 
-static WRITE8_DEVICE_HANDLER( abc802_dart_dtr_w )
-{
-	if (offset == 1)
+	if (channel == Z80DART_CH_B)
 	{
-		/* _LRS */
-		memory_set_bank(1, data);
+		/* receive bit from keyboard */
+		return state->abc77_txd;
+	}
+
+	return 1;
+}
+
+static Z80DART_ON_TXD_CHANGED( abc800_dart_txd_w )
+{
+	abc800_state *state = device->machine->driver_data;
+
+	if (channel == Z80DART_CH_B)
+	{
+		/* transmit bit to keyboard */
+		abc77_rxd_w(state->abc77, level);
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( abc802_dart_rts_w )
+static Z80DART_INTERFACE( abc800_dart_intf )
+{
+	Z80_TAG,				/* cpu */
+	ABC800_X01/2/2,			/* clock */
+	0,						/* channel A receive clock */
+	0,						/* channel A transmit clock */
+	0,						/* channel B clock */
+	dart_interrupt,			/* interrupt handler */
+	abc800_dart_rxd_r,		/* receive handler */
+	abc800_dart_txd_w,		/* transmit handler */
+	0,						/* DTR changed handler */
+	0,						/* RTS changed handler */
+	0						/* W/RDY changed handler */
+};
+
+static Z80DART_RXD_READ( abc802_dart_rxd_r )
 {
 	abc802_state *state = device->machine->driver_data;
 
-	if (offset == 1)
+	if (channel == Z80DART_CH_B)
 	{
-		/* _MUX 80/40 */
-		state->mux80_40 = !BIT(data, 0);
+		/* receive bit from keyboard */
+		return state->abc77_txd;
+	}
+
+	return 1;
+}
+
+static Z80DART_ON_TXD_CHANGED( abc802_dart_txd_w )
+{
+	abc802_state *state = device->machine->driver_data;
+
+	if (channel == Z80DART_CH_B)
+	{
+		/* transmit bit to keyboard */
+		abc77_rxd_w(state->abc77, level);
 	}
 }
 
-static const z80dart_interface abc802_dart_intf =
+static Z80DART_ON_DTR_CHANGED( abc802_dart_dtr_w )
+{
+	abc802_state *state = device->machine->driver_data;
+
+	if (channel == Z80DART_CH_B)
+	{
+		/* low RAM select */
+		state->lrs = level;
+
+		abc802_bankswitch(device->machine);
+	}
+}
+
+static Z80DART_ON_RTS_CHANGED( abc802_dart_rts_w )
+{
+	abc802_state *state = device->machine->driver_data;
+
+	if (channel == Z80DART_CH_B)
+	{
+		/* _MUX 80/40 */
+		state->mux80_40 = level;
+	}
+}
+
+static Z80DART_INTERFACE( abc802_dart_intf )
 {
 	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
-	0,						/* interrupt handler */
+	0,						/* channel A receive clock */
+	0,						/* channel A transmit clock */
+	0,						/* channel B clock */
+	dart_interrupt,			/* interrupt handler */
+	abc802_dart_rxd_r,		/* receive handler */
+	abc802_dart_txd_w,		/* transmit handler */
 	abc802_dart_dtr_w,		/* DTR changed handler */
 	abc802_dart_rts_w,		/* RTS changed handler */
-	0,						/* BREAK changed handler */
-	dart_serial_transmit,	/* transmit handler */
-	dart_serial_receive		/* receive handler */
+	0						/* W/RDY changed handler */
 };
 
-static WRITE8_DEVICE_HANDLER( abc806_dart_dtr_w )
+static Z80DART_RXD_READ( abc806_dart_rxd_r )
+{
+	abc806_state *state = device->machine->driver_data;
+
+	if (channel == Z80DART_CH_B)
+	{
+		/* receive bit from keyboard */
+		return state->abc77_txd;
+	}
+
+	return 1;
+}
+
+static Z80DART_ON_TXD_CHANGED( abc806_dart_txd_w )
+{
+	abc806_state *state = device->machine->driver_data;
+
+	if (channel == Z80DART_CH_B)
+	{
+		/* transmit bit to keyboard */
+		abc77_rxd_w(state->abc77, level);
+	}
+}
+
+static Z80DART_ON_DTR_CHANGED( abc806_dart_dtr_w )
 {
 	abc806_state *state = device->machine->driver_data;
 	
-	if (offset == 1)
+	if (channel == Z80DART_CH_B)
 	{
-		state->keydtr = BIT(data, 0);
+		state->keydtr = level;
 	}
 }
 
-static const z80dart_interface abc806_dart_intf =
+static Z80DART_INTERFACE( abc806_dart_intf )
 {
 	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */
-	0,						/* interrupt handler */
+	0,						/* channel A receive clock */
+	0,						/* channel A transmit clock */
+	0,						/* channel B clock */
+	dart_interrupt,			/* interrupt handler */
+	abc806_dart_rxd_r,		/* receive handler */
+	abc806_dart_txd_w,		/* transmit handler */
 	abc806_dart_dtr_w,		/* DTR changed handler */
 	0,						/* RTS changed handler */
-	0,						/* BREAK changed handler */
-	dart_serial_transmit,	/* transmit handler */
-	dart_serial_receive		/* receive handler */
+	0						/* W/RDY changed handler */
 };
 
 /* E05-16 */
@@ -1026,8 +1123,8 @@ static MACHINE_START( abc802 )
 
 	/* configure memory */
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(1, 1, 1, mess_ram, 0);
+	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, Z80_TAG), 0);
 }
 
 static MACHINE_RESET( abc802 )
@@ -1035,7 +1132,7 @@ static MACHINE_RESET( abc802 )
 	abc802_state *state = machine->driver_data;
 
 	/* memory banking */
-	memory_set_bank(1, 0);
+	memory_set_bank(1, 1);
 
 	/* clear screen time out (S1) */
 	z80sio_set_dcd(state->z80sio, 1, 0);
@@ -1044,10 +1141,10 @@ static MACHINE_RESET( abc802 )
 	z80sio_set_cts(state->z80sio, 1, 0);
 
 	/* 40/80 char (S3) */
-	z80dart_set_ri(state->z80dart, 0, 0); // 0 = 40, 1 = 80
+	z80dart_ri_w(state->z80dart, Z80DART_CH_A, 1); // 0 = 40, 1 = 80
 
 	/* 50/60 Hz */
-	z80dart_set_cts(state->z80dart, 1, 0); // 0 = 50Hz, 1 = 60Hz ???
+	z80dart_cts_w(state->z80dart, Z80DART_CH_B, 0); // 0 = 50Hz, 1 = 60Hz ???
 }
 
 static MACHINE_START( abc806 )
@@ -1489,6 +1586,27 @@ static OPBASE_HANDLER( abc800_opbase_handler )
 	return address;
 }
 
+static OPBASE_HANDLER( abc802_opbase_handler )
+{
+	abc802_state *state = machine->driver_data;
+
+	if (state->lrs)
+	{
+		if (address >= 0x7800 && address < 0x8000)
+		{
+			opbase->rom = opbase->ram = memory_region(machine, Z80_TAG);
+			return ~0;
+		}
+	}
+	else
+	{
+		opbase->rom = opbase->ram = mess_ram;
+		return ~0;
+	}
+
+	return address;
+}
+
 static OPBASE_HANDLER( abc806_opbase_handler )
 {
 	abc806_state *state = machine->driver_data;
@@ -1520,6 +1638,11 @@ static DRIVER_INIT( abc800 )
 	memory_set_opbase_handler(0, abc800_opbase_handler);
 }
 
+static DRIVER_INIT( abc802 )
+{
+	memory_set_opbase_handler(0, abc802_opbase_handler);
+}
+
 static DRIVER_INIT( abc806 )
 {
 	memory_set_opbase_handler(0, abc806_opbase_handler);
@@ -1530,5 +1653,5 @@ static DRIVER_INIT( abc806 )
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
 COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc800, abc802, "Luxor Datorer AB", "ABC 802",  GAME_NOT_WORKING )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc806, "Luxor Datorer AB", "ABC 806",  GAME_NOT_WORKING )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc802, "Luxor Datorer AB", "ABC 802",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc806, "Luxor Datorer AB", "ABC 806",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

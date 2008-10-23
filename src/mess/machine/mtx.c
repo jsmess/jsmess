@@ -265,10 +265,13 @@ WRITE8_DEVICE_HANDLER( mtx_dart_control_w )
 	z80dart_c_w(device, offset, data);
 }
 
-const z80dart_interface mtx_dart_intf =
+Z80DART_INTERFACE( mtx_dart_intf )
 {
 		"main",
 		MTX_SYSTEM_CLOCK,
+		0,
+		0,
+		0,
 		NULL,
 		NULL,
 		NULL,

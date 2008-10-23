@@ -16,6 +16,7 @@
 #define ABC802_ATE	0x80
 #define ABC802_INV	0x80
 
+#define ABC802_CHAR_RAM_SIZE	0x800
 #define ABC806_CHAR_RAM_SIZE	0x800
 #define ABC806_ATTR_RAM_SIZE	0x800
 #define ABC806_VIDEO_RAM_SIZE	0x20000
@@ -51,10 +52,15 @@ struct _abc800_state
 typedef struct _abc802_state abc802_state;
 struct _abc802_state
 {
+	/* cpu state */
+	int lrs;				/* low RAM select */
+
 	/* keyboard state */
 	int abc77_txd;			/* ABC-77 transmit data */
 
 	/* video state */
+	UINT8 *charram;			/* character RAM */
+
 	int flshclk_ctr;		/* flash clock counter */
 	int flshclk;			/* flash clock */
 	int mux80_40;			/* 40/80 column mode */
@@ -127,6 +133,9 @@ WRITE8_HANDLER( abc800c_hrs_w );
 WRITE8_HANDLER( abc800c_hrc_w );
 
 /*----------- defined in video/abc802.c -----------*/
+
+READ8_HANDLER( abc802_charram_r );
+WRITE8_HANDLER( abc802_charram_w );
 
 MACHINE_DRIVER_EXTERN(abc802_video);
 

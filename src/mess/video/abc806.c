@@ -359,14 +359,13 @@ static MC6845_ON_HSYNC_CHANGED(abc806_hsync_changed)
 		else if (state->d_vsync && !vsync)
 		{
 			/* flash clock */
-			if (state->flshclk_ctr == 31)
+			if (state->flshclk_ctr & 0x20)
 			{
-				state->flshclk = 1;
+				state->flshclk = !state->flshclk;
 				state->flshclk_ctr = 0;
 			}
 			else
 			{
-				state->flshclk = 0;
 				state->flshclk_ctr++;
 			}
 		}
@@ -374,7 +373,7 @@ static MC6845_ON_HSYNC_CHANGED(abc806_hsync_changed)
 		if (state->d_vsync != vsync)
 		{
 			/* signal _DEW to DART */
-			z80dart_set_ri(state->z80dart, 1, !vsync);
+			z80dart_ri_w(state->z80dart, 1, !vsync);
 		}
 
 		state->d_vsync = vsync;

@@ -119,6 +119,22 @@
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
 
+/* Character Memory */
+
+READ8_HANDLER( abc802_charram_r )
+{
+	abc802_state *state = machine->driver_data;
+
+	return state->charram[offset];
+}
+
+WRITE8_HANDLER( abc802_charram_w )
+{
+	abc802_state *state = machine->driver_data;
+
+	state->charram[offset] = data;
+}
+
 /* MC6845 Row Update */
 
 static MC6845_UPDATE_ROW( abc802_update_row )
@@ -131,7 +147,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 	{
 		int bit;
 
-		UINT8 code = videoram[(ma + column) & 0x7ff];
+		UINT8 code = state->charram[(ma + column) & 0x7ff];
 		UINT16 address = ((code & 0x80) << 5) | ((code & 0x7f) << 4);
 		UINT8 ra_latch = ra;
 		UINT8 data;
@@ -220,20 +236,19 @@ static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
 	if (!vsync)
 	{
 		/* flash clock */
-		if (state->flshclk_ctr == 31)
+		if (state->flshclk_ctr & 0x20)
 		{
-			state->flshclk = 1;
+			state->flshclk = !state->flshclk;
 			state->flshclk_ctr = 0;
 		}
 		else
 		{
-			state->flshclk = 0;
 			state->flshclk_ctr++;
 		}
 	}
 
 	/* signal _DEW to DART */
-	z80dart_set_ri(state->z80dart, 1, !vsync);
+	z80dart_ri_w(state->z80dart, 1, !vsync);
 }
 
 /* MC6845 Interfaces */
@@ -255,6 +270,10 @@ static const mc6845_interface abc802_mc6845_interface = {
 static VIDEO_START( abc802 )
 {
 	abc802_state *state = machine->driver_data;
+	
+	/* allocate memory */
+
+	state->charram = auto_malloc(ABC802_CHAR_RAM_SIZE);
 
 	/* find devices */
 
@@ -265,6 +284,8 @@ static VIDEO_START( abc802 )
 	state->char_rom = memory_region(machine, "chargen");
 
 	/* register for state saving */
+
+	state_save_register_global_pointer(state->charram, ABC802_CHAR_RAM_SIZE);
 
 	state_save_register_global(state->flshclk_ctr);
 	state_save_register_global(state->flshclk);
