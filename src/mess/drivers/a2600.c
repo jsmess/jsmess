@@ -566,6 +566,7 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 	case 0x04000:
 	case 0x08000:
 	case 0x10000:
+	case 0x78000:
 	case 0x80000:
 		break;
 
@@ -606,6 +607,7 @@ static int next_bank(void)
 
 static void modeF8_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
+printf("F8 switch offset = %04X\n", offset );
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
@@ -662,7 +664,7 @@ static void mode3E_switch(running_machine *machine, UINT16 offset, UINT8 data)
 }
 static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
-	ram_base = extra_RAM + 0x200 * ( data & 0x3F );
+	ram_base = extra_RAM + 0x4200 * ( data & 0x3F );
 	memory_set_bankptr(1, ram_base );
 	mode3E_ram_enabled = 1;
 }
@@ -1550,6 +1552,9 @@ static MACHINE_RESET( a2600 )
 		case 0x10000:
 			banking_mode = mode32in1;
 			break;
+		case 0x78000:
+			banking_mode = mode3E;
+			break;
 		case 0x80000:
 			banking_mode = mode3F;
 			break;
@@ -1634,7 +1639,10 @@ static MACHINE_RESET( a2600 )
 
 	case mode3E:
 		install_banks(machine, 2, cart_size - 0x800);
-		number_banks = cart_size / 0x800;
+		if ( cart_size == 0x78000 )
+			number_banks = 0x80000 / 0x800;
+		else
+			number_banks = cart_size / 0x800;
 		mode3E_ram_enabled = 0;
 		break;
 
@@ -1734,7 +1742,7 @@ static MACHINE_RESET( a2600 )
 	case mode3E:
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, mode3E_RAM_w);
 		break;
 
 	case modeSS:

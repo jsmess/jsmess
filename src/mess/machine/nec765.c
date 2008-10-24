@@ -35,7 +35,7 @@ typedef enum
 
 /* uncomment the following line for verbose information */
 #define LOG_VERBOSE		1
-#define LOG_COMMAND		0
+#define LOG_COMMAND		1
 #define LOG_EXTRA		0
 #define LOG_INTERRUPT	0
 
@@ -115,6 +115,8 @@ typedef struct nec765
 	emu_timer *seek_timer;
 	emu_timer *timer;
 	int timer_type;
+
+	int	double_step;
 
 	emu_timer *command_timer;
 } NEC765;
@@ -862,6 +864,7 @@ static int nec765_get_matching_sector(running_machine *machine)
 				in the read/write command did not match the C value read from the disc */
 
 				/* no data - checked on Amstrad CPC */
+				logerror("ST1_NO_DATA: C = %02x, H = %02x, N = %02x\n", id.C, id.H, id.N);
 				fdc.nec765_status[1] |= NEC765_ST1_NO_DATA;
 				/* bad C value */
 				fdc.nec765_status[2] |= NEC765_ST2_WRONG_CYLINDER;
@@ -925,6 +928,40 @@ static void nec765_read_complete(void)
 	fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
 	fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
 	fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
+
+	/* Is the MultiTrack bit set in the original command */
+	if ( fdc.nec765_command_bytes[0] & 0x80 )
+	{
+		/* Check if we're at the end of the track */
+		if ( fdc.nec765_command_bytes[4] == fdc.nec765_command_bytes[6] && fdc.nec765_command_bytes[3] )
+		{
+			fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2] + 1; /* C */
+			fdc.nec765_result_bytes[4] = 0; /* H, inverse of programmed H */
+			fdc.nec765_result_bytes[5] = 1; /* R */
+		}
+		else
+		{
+			fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2]; /* C */
+			fdc.nec765_result_bytes[4] = 0; /* H, inverse of programmed H */
+			fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4] + 1; /* R */
+		}
+	}
+	else
+	{
+		/* Check if we're at the end of the track */
+		if ( fdc.nec765_command_bytes[4] == fdc.nec765_command_bytes[6] )
+		{
+			fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2] + 1; /* C */
+			fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
+			fdc.nec765_result_bytes[5] = 1; /* R */
+		}
+		else
+		{
+			fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2]; /* C */
+			fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
+			fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4] + 1; /* R */
+		}
+	}
 
 	nec765_setup_result_phase(7);
 }

@@ -160,15 +160,11 @@ gfx_layout nes_vram_charlayout =
 };
 #endif
 
-static const nes_interface nesntsc_interface =
+static const nes_interface nes_apu_interface =
 {
-	0
+	"main"
 };
 
-static const nes_interface nespal_interface =
-{
-	0
-};
 
 ROM_START( nes )
     ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
@@ -245,7 +241,7 @@ static MACHINE_DRIVER_START( nes )
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("nessound", NES, NTSC_CLOCK)
-	MDRV_SOUND_CONFIG(nesntsc_interface)
+	MDRV_SOUND_CONFIG(nes_apu_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -263,7 +259,7 @@ static MACHINE_DRIVER_START( nespal )
 
     /* sound hardware */
 	MDRV_SOUND_REPLACE("nessound", NES, PAL_CLOCK)
-	MDRV_SOUND_CONFIG(nespal_interface)
+	MDRV_SOUND_CONFIG(nes_apu_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

@@ -23,7 +23,7 @@ Up to 4096 bytes can be addressed.
 #include <driver.h>
 #include "machine/i2cmem.h"
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL ( 4 )
 
 INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 {
@@ -60,6 +60,8 @@ struct i2cmem_chip
 	int shift;
 	int devsel;
 	int byteaddr;
+	int byteaddr_width;
+	int byteaddr_bits;
 	unsigned char *data;
 	int data_size;
 	unsigned char *page;
@@ -67,11 +69,13 @@ struct i2cmem_chip
 	int page_size;
 };
 
-#define STATE_IDLE ( 0 )
-#define STATE_DEVSEL ( 1 )
-#define STATE_BYTEADDR ( 2 )
-#define STATE_DATAIN ( 3 )
-#define STATE_DATAOUT ( 4 )
+enum {
+	STATE_IDLE=0,
+	STATE_DEVSEL,
+	STATE_BYTEADDR,
+	STATE_DATAIN,
+	STATE_DATAOUT
+};
 
 #define DEVSEL_RW ( 1 )
 #define DEVSEL_ADDRESS ( 0xfe )
@@ -117,6 +121,8 @@ void i2cmem_init( int chip, int slave_address, int page_size, int data_size, uns
 	c->shift = 0;
 	c->devsel = 0;
 	c->byteaddr = 0;
+	c->byteaddr_width = 16;
+	c->byteaddr_bits = 0;
 	c->data = data;
 	c->page = page;
 
@@ -132,6 +138,8 @@ void i2cmem_init( int chip, int slave_address, int page_size, int data_size, uns
 	state_save_register_item( "i2cmem", chip, c->shift );
 	state_save_register_item( "i2cmem", chip, c->devsel );
 	state_save_register_item( "i2cmem", chip, c->byteaddr );
+	state_save_register_item( "i2cmem", chip, c->byteaddr_width );
+	state_save_register_item( "i2cmem", chip, c->byteaddr_bits );
 	state_save_register_item_pointer( "i2cmem", chip, c->data, c->data_size );
 }
 
@@ -150,7 +158,14 @@ static int select_device( struct i2cmem_chip *c )
 
 static int data_offset( struct i2cmem_chip *c )
 {
-	return ( ( ( c->devsel << 7 ) & 0xff00 ) | ( c->byteaddr & 0xff ) ) & ( c->data_size - 1 );
+	switch( c->byteaddr_width )
+	{
+	case 16:
+		return ( ( ( c->devsel << 15 ) & 0xff0000 ) | ( c->byteaddr & 0xffff ) ) & ( c->data_size - 1 );
+	case 8:
+	default:
+		return ( ( ( c->devsel << 7 ) & 0xff00 ) | ( c->byteaddr & 0xff ) ) & ( c->data_size - 1 );
+	}
 }
 
 void i2cmem_write( int chip, int line, int data )
@@ -256,6 +271,7 @@ void i2cmem_write( int chip, int line, int data )
 							{
 								verboselog( 1, "i2cmem(%d) devsel %02x: write\n", chip, c->devsel );
 								c->state = STATE_BYTEADDR;
+								c->byteaddr_bits = c->byteaddr_width;
 							}
 							else
 							{
@@ -265,12 +281,15 @@ void i2cmem_write( int chip, int line, int data )
 							break;
 
 						case STATE_BYTEADDR:
-							c->byteaddr = c->shift;
+							c->byteaddr_bits -= 8;
+							c->byteaddr &= ~ ( 0xff << c->byteaddr_bits );
+							c->byteaddr |= ( c->shift << c->byteaddr_bits );
 							c->page_offset = 0;
 
 							verboselog( 1, "i2cmem(%d) byteaddr %02x\n", chip, c->byteaddr );
 
-							c->state = STATE_DATAIN;
+							if ( c->byteaddr_bits <= 0 )
+								c->state = STATE_DATAIN;
 							break;
 
 						case STATE_DATAIN:
@@ -336,8 +355,13 @@ void i2cmem_write( int chip, int line, int data )
 							c->shift = c->data[ offset ];
 							verboselog( 1, "i2cmem(%d) data[ %04x ] -> %02x\n", chip, offset, c->data[ offset ] );
 							c->byteaddr++;
+
+							/* Check if there was an acknowledge */
+							if ( ! c->sdaw )
+								c->sdaw = 1;
 						}
 
+verboselog( 1, "c->shift = %02x, c->sadw = %d\n", c->shift, c->sdaw );
 						c->sdar = ( c->shift >> 7 ) & 1;
 
 						c->shift = ( c->shift << 1 ) & 0xff;

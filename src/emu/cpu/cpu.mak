@@ -738,6 +738,7 @@ $(CPUOBJ)/i86/i86.o:	$(CPUSRC)/i86/i86.c \
 						$(I86DEPS)
 
 $(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i86.c \
+						$(CPUSRC)/i86/instr86.c \
 						$(CPUSRC)/i86/instr286.c \
 						$(CPUSRC)/i86/i286intf.h \
 						$(I86DEPS)
@@ -1500,6 +1501,26 @@ endif
 
 $(CPUOBJ)/ssp1610/ssp1601.o:	$(CPUSRC)/ssp1601/ssp1601.c \
 								$(CPUSRC)/ssp1610/ssp1601.h
+
+
+
+#-------------------------------------------------
+# Texas Instruments TMS0980
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_TMS0980=$(if $(filter TMS0980,$(CPUS)),1,0)
+
+ifneq ($(filter TMS0980,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/tms0980
+CPUOBJS += $(CPUOBJ)/tms0980/tms0980.o
+DBGOBJS += $(CPUOBJ)/tms0980/tms0980d.o
+endif
+
+$(CPUOBJ)/tms0980/tms0980.o:	$(CPUSRC)/tms0980/tms0980.c \
+								$(CPUSRC)/tms0980/tms0980.h
+
+$(CPUOBJ)/tms0980/tms0980d.o:	$(CPUSRC)/tms0980/tms0980d.c \
+								$(CPUSRC)/tms0980/tms0980.h
 
 
 

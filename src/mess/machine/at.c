@@ -34,10 +34,11 @@
 
 #include "machine/kb_keytro.h"
 
-#define LOG_PORT80	0
+#define LOG_PORT80	1
 #define LOG_KBDC	0
 
 static struct {
+	int cpunum_main;
 	const device_config	*pic8259_master;
 	const device_config	*pic8259_slave;
 	const device_config	*dma8237_1;
@@ -242,6 +243,16 @@ WRITE8_HANDLER(at_page8_w)
 }
 
 
+static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
+{
+	cpunum_set_input_line(device->machine, at_devices.cpunum_main, INPUT_LINE_HALT,
+		state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	dma8237_set_hlda( device, state );
+}
+
+
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	UINT8 result;
@@ -294,9 +305,9 @@ static DMA8237_OUT_EOP( at_dma8237_out_eop ) {
 
 const struct dma8237_interface at_dma8237_1_config =
 {
-	0,
-	1.0e-6, // 1us
+	XTAL_14_31818MHz/3,
 
+	pc_dma_hrq_changed,
 	pc_dma_read_byte,
 	pc_dma_write_byte,
 
@@ -309,9 +320,9 @@ const struct dma8237_interface at_dma8237_1_config =
 /* TODO: How is this hooked up in the actual machine? */
 const struct dma8237_interface at_dma8237_2_config =
 {
-	0, 
-	1.0e-6, // 1us 
+	XTAL_14_31818MHz/3,
 
+	pc_dma_hrq_changed,
 	pc_dma_read_byte,
 	pc_dma_write_byte,
 
@@ -488,7 +499,9 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
-	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 1 : 0;
+	at_set_keyb_int( ( data & 0x10 ) ? 1 : 0 );
+
+	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 0 : 1;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
 
 	at_kbdc8042.data_callback( machine, 0, at_kbdc8042.data_signal );
@@ -511,12 +524,14 @@ static READ8_HANDLER( at_kbdc8042_t1_r )
 static WRITE8_HANDLER( at_kbdc8042_set_clock_signal )
 {
 	at_kbdc8042.clock_signal = data;
+	at_kbdc8042.clock_callback( machine, 0, at_kbdc8042.clock_signal);
 }
 
 
 static WRITE8_HANDLER( at_kbdc8042_set_data_signal )
 {
 	at_kbdc8042.data_signal = data;
+	at_kbdc8042.data_callback( machine, 0, at_kbdc8042.data_signal );
 }
 
 
@@ -775,6 +790,7 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
+	at_devices.cpunum_main = mame_find_cpu_index( machine, "main" );
 	at_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
 	at_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
 	at_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );

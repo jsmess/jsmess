@@ -2190,7 +2190,7 @@ static void i8x41_set_info(UINT32 state, cpuinfo *info)
 			break;
 
 		case CPUINFO_INT_REGISTER + I8X41_STAT:
-			logerror("i8x41 #%d:%03x  Setting STAT DBBI to %02x\n", cpu_getactivecpu(), PC, (UINT8)info->i);
+			//logerror("i8x41 #%d:%03x  Setting STAT DBBI to %02x\n", cpu_getactivecpu(), PC, (UINT8)info->i);
 			/* writing status.. hmm, should we issue interrupts here too? */
 			STATE = info->i;
 			break;
@@ -2271,7 +2271,7 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 			break;
 
 		case CPUINFO_INT_REGISTER + I8X41_STAT:
-			logerror("i8x41 #%d:%03x  Reading STAT %02x\n", cpu_getactivecpu(), PC, STATE);
+			//logerror("i8x41 #%d:%03x  Reading STAT %02x\n", cpu_getactivecpu(), PC, STATE);
 			info->i = STATE;
 			break;
 

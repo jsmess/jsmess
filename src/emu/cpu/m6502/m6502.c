@@ -219,6 +219,327 @@ INLINE void m6502_take_irq(void)
 	m6502.pending_irq = 0;
 }
 
+#define NR_OPS		258
+#define MAX_OP_LEN	32
+enum {
+	OP_FETCH=1,	/* Opcode fetch, increase pc */
+	FETCH,		/* Fetch a byte from memory, store byte in tmp */
+	STORE,		/* Store a byte in memory writes byte from tmp */
+	/* Basic instructions */
+	/* 1st pass instructions */
+	_BPL, _BMI, _BVC, _BVS, _BCC, _BCS, _BNE, _BEQ,
+	_ADC, _ANC, _AND, _ARR, _ASL, _ASR, _AST, _ASX, _AXA, _BIT, _BRK, _CLC, _CLD, _CLI, _CLV, _CMP, _CPX, _CPY,
+	_DCP, _DEC, _DEX, _DEY, _EOR, _INC, _INX, _INY, _ISB, _JMP, _JSR, _KIL,
+	_LAX, _LDA, _LDX, _LDY, _LSR, _OAL, _NOP, _ORA, _PHA, _PHP, _PLA, _PLP, _RLA, _ROL, _ROR, _RTI, _RRA, _RTS,
+	_SAH, _SAX, _SBC, _SEC, _SED, _SEI, _SLO, _SRE, _SSH, _STA, _STX, _STY, _SXH, _SYH, _TAX, _TAY, _TSX, _TXA, _TXS, _TYA,
+	/* addressing modes */
+	_EA_ABS, _EA_ABX_NP, _EA_ABX_P, _EA_ABY_NP, _EA_ABY_P, _EA_IND, _EA_IDX, _EA_IDY_NP, _EA_IDY_P, _EA_ZPG, _EA_ZPX, _EA_ZPY,
+	_RD_DUM, _RD_IMM,
+	_RD_EA, _WR_EA,
+	_WB_ACC, _RD_ACC,
+
+/*
+	_EA_ZPG: _RD_OP, _WB_ZP, _WB_EA_ZP
+	_EA_ZPX: _RD_OP, _WB_ZP, _Z_IDX, _WB_EA_ZP
+	_EA_ZPY: _RD_OP, _WB_ZP, _Z_IDY, _WB_EA_ZP
+	_EA_ABS: _RD_OP, _WB_EAL, _RD_OP, _WB_EAH
+	_EA_ABX_NP: _RD_OP, _WB_EAL, _RD_OP, _WB_EAH, _IDX, _RD_EA, _EA_C, (_RD_EA/_WR_EA)
+	_EA_ABX_P: _RD_OP, _WB_EAL, _RD_OP, _WB_EAH, _IDX, _RD_EA, _EA_C, (_RD_EA_C/_WR_EA_C)
+	_EA_ABY_NP: _RD_OP, _WB_EAL, _RD_OP, _WB_EAH, _IDX, _RD_EA, _EA_C, (_RD_EA/_WR_EA)
+*/
+};
+
+static const int m6502_ops[NR_OPS][MAX_OP_LEN] = {
+	/* 0x00 - 0x0F */
+	{ _BRK, OP_FETCH },	/* 00 - 7 BRK */
+	{ _EA_IDX, _RD_EA, _ORA, OP_FETCH },	/* 01 - 6 ORA IDX */
+	{ _KIL, OP_FETCH },	/* 02 - 1 KIL */
+	{ _EA_IDX, _RD_EA, _WR_EA, _SLO, _WR_EA, OP_FETCH },	/* 03 - 7 SLO IDX */
+	{ _EA_ZPG, _RD_EA, _NOP, OP_FETCH },	/* 04 - 3 NOP ZPG */
+	{ _EA_ZPG, _RD_EA, _ORA, OP_FETCH },	/* 05 - 3 ORA ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _ASL, _WR_EA, OP_FETCH },	/* 06 - 5 ASL ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _SLO, _WR_EA, OP_FETCH },	/* 07 - 5 SLO ZPG */
+	{ _RD_DUM, _PHP, OP_FETCH },	/* 08 - 3 PHP */
+	{ _RD_IMM, _ORA, OP_FETCH },	/* 09 - 2 ORA IMM */
+	{ _RD_DUM, _RD_ACC, _ASL, _WB_ACC, OP_FETCH },	/* 0a - 2 ASL A */
+	{ _RD_IMM, _ANC, OP_FETCH },	/* 0b - 2 ANC IMM */
+	{ _EA_ABS, _RD_EA, _NOP, OP_FETCH },	/* 0c - 4 NOP ABS */
+	{ _EA_ABS, _RD_EA, _ORA, OP_FETCH },	/* 0d - 4 ORA ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _ASL, _WR_EA, OP_FETCH },	/* 0e - 6 ASL ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _SLO, _WR_EA, OP_FETCH },	/* 0f - 6 SLO ABS */
+	/* 0x10 - 0x1F */
+	{ _BPL, OP_FETCH },	/* 10 - 2-4 BPL REL */
+	{ _EA_IDY_P, _RD_EA, _ORA, OP_FETCH },	/* 11 - 5 ORA IDY page penalty */
+	{ _KIL, OP_FETCH },	/* 12 - 1 KIL */
+	{ _EA_IDY_NP, _RD_EA, _WR_EA, _SLO, _WR_EA, OP_FETCH },	/* 13 - 7 SLO IDY */
+	{ _EA_ZPX, _RD_EA, _NOP, OP_FETCH },	/* 14 - 4 NOP ZPX */
+	{ _EA_ZPX, _RD_EA, _ORA, OP_FETCH },	/* 15 - 4 ORA ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _ASL, _WR_EA, OP_FETCH },	/* 16 - 4 ASL ZPG */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _SLO, _WR_EA, OP_FETCH },	/* 17 - 6 SLO ZPX */
+	{ _RD_DUM, _CLC, OP_FETCH },	/* 18 - 2 CLC */
+	{ _EA_ABY_P, _RD_EA, _ORA, OP_FETCH },	/* 19 - 4 ORA ABY page penalty */
+	{ _RD_DUM, _NOP, OP_FETCH },	/* 1a - 2 NOP */
+	{ _EA_ABY_NP, _RD_EA, _WR_EA, _SLO, _WR_EA, OP_FETCH },	/* 1b - 7 SLO ABY */
+	{ _EA_ABX_P, _RD_EA, _NOP, OP_FETCH },	/* 1c - NOP ABX page penalty */
+	{ _EA_ABX_P, _RD_EA, _ORA, OP_FETCH },	/* 1d - ORA ABX page penalty */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _ASL, _WR_EA, OP_FETCH },	/* 1e - 7 ASL ABX */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _SLO, _WR_EA, OP_FETCH },	/* 1f - 7 SLA ABX */
+	/* 0x20 - 0x2F */
+	{ _JSR, OP_FETCH },	/* 20 - 6 JSR */
+	{ _EA_IDX, _RD_EA, _AND, OP_FETCH },	/* 21 - 6 AND IDX */
+	{ _KIL, OP_FETCH },	/* 22 - 1 KIL */
+	{ _EA_IDX, _RD_EA, _WR_EA, _RLA, _WR_EA, OP_FETCH },	/* 23 - 7 RLA IDX */
+	{ _EA_ZPG, _RD_EA, _BIT, OP_FETCH },	/* 24 - 3 BIT ZPG */
+	{ _EA_ZPG, _RD_EA, _AND, OP_FETCH },	/* 25 - 3 AND ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _ROL, _WR_EA, OP_FETCH },	/* 26 - 5 ROL ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _RLA, _WR_EA, OP_FETCH },	/* 27 - 5 RLA ZPG */
+	{ _RD_DUM, _PLP, OP_FETCH },	/* 28 - 4 PLP */
+	{ _RD_IMM, _AND, OP_FETCH },	/* 29 - 2 AND IMM */
+	{ _RD_DUM, _RD_ACC, _ROL, _WB_ACC, OP_FETCH },	/* 2a - 2 ROL A */
+	{ _RD_IMM, _ANC, OP_FETCH },	/* 2b - 2 ANC IMM */
+	{ _EA_ABS, _RD_EA, _BIT, OP_FETCH },	/* 2c - 4 BIT ABS */
+	{ _EA_ABS, _RD_EA, _AND, OP_FETCH },	/* 2d - 4 AND ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _ROL, _WR_EA, OP_FETCH },	/* 2e - 6 ROL ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _RLA, _WR_EA, OP_FETCH },	/* 2f - 6 RLA ABS */
+	/* 0x30 - 0x3F */
+	{ _BMI, OP_FETCH },	/* 30 - 2-4 BMI REL */
+	{ _EA_IDY_P, _RD_EA, _AND, OP_FETCH },	/* 31 - 5 AND IDY page penalty */
+	{ _KIL, OP_FETCH },	/* 32 - 1 KIL */
+	{ _EA_IDY_NP, _RD_EA, _WR_EA, _RLA, _WR_EA, OP_FETCH },	/* 33 - 7 RLA IDY */
+	{ _EA_ZPX, _RD_EA, _NOP, OP_FETCH },	/* 34 - 4 NOP ZPX */
+	{ _EA_ZPX, _RD_EA, _AND, OP_FETCH },	/* 35 - 4 AND ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _ROL, _WR_EA, OP_FETCH },	/* 36 - 6 ROL ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _RLA, _WR_EA, OP_FETCH },	/* 37 - 6 RLA ZPX */
+	{ _RD_DUM, _SEC, OP_FETCH },	/* 38 - 2 SEC */
+	{ _EA_ABY_P, _RD_EA, _AND, OP_FETCH },	/* 39 - 4 AND ABY page penalty */
+	{ _RD_DUM, _NOP, OP_FETCH },	/* 3a - 2 NOP */
+	{ _EA_ABY_NP, _RD_EA, _WR_EA, _RLA, _WR_EA, OP_FETCH },	/* 3b - 7 RLA ABY */
+	{ _EA_ABX_P, _RD_EA, _NOP, OP_FETCH },	/* 3c - 4 NOP ABX page penalty */
+	{ _EA_ABX_P, _RD_EA, _AND, OP_FETCH },	/* 3d - 4 AND ABX page penalty */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _ROL, _WR_EA, OP_FETCH },	/* 3e - 7 ROL ABX */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _RLA, _WR_EA, OP_FETCH },	/* 3f - 7 RLA ABX */
+	/* 0x40 - 0x4F */
+	{ _RTI, OP_FETCH },	/* 40 - 6 RTI */
+	{ _EA_IDX, _RD_EA, _EOR, OP_FETCH },	/* 41 - 6 EOR IDX */
+	{ _KIL, OP_FETCH },	/* 42 - 1 KIL */
+	{ _EA_IDX, _RD_EA, _WR_EA, _SRE, _WR_EA, OP_FETCH },	/* 43 - 7 SRE IDX */
+	{ _EA_ZPG, _RD_EA, _NOP, OP_FETCH },	/* 44 - 3 NOP ZPG */
+	{ _EA_ZPG, _RD_EA, _EOR, OP_FETCH },	/* 45 - 3 EOR ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _LSR, _WR_EA, OP_FETCH },	/* 46 - 5 LSR ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _SRE, _WR_EA, OP_FETCH },	/* 47 - 5 SRE ZPG */
+	{ _RD_DUM, _PHA, OP_FETCH },	/* 48 - 3 PHA */
+	{ _RD_IMM, _EOR, OP_FETCH },	/* 49 - 2 EOR IMM */
+	{ _RD_DUM, _RD_ACC, _ROL, _WB_ACC, OP_FETCH },	/* 4a - 2 LSR A */
+	{ _RD_IMM, _ASR, _WB_ACC, OP_FETCH },	/* 4b - 2 ASR IMM */
+	{ _EA_ABS, _JMP, OP_FETCH },	/* 4c - 3 JMP ABS */
+	{ _EA_ABS, _RD_EA, _EOR, OP_FETCH },	/* 4d - 4 EOR ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _LSR, _WR_EA, OP_FETCH },	/* 4e - 6 LSR ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _SRE, _WR_EA, OP_FETCH },	/* 4f - 6 SRE ABS */
+	/* 0x50 - 0x5F */
+	{ _BVC, OP_FETCH },	/* 50 - 2-4 BVC REL */
+	{ _EA_IDY_P, _RD_EA, _EOR, OP_FETCH },	/* 51 - EOR IDY page penalty */
+	{ _KIL, OP_FETCH },	/* 52 - 1 KIL */
+	{ _EA_IDY_NP, _RD_EA, _WR_EA, _SRE, _WR_EA, OP_FETCH },	/* 53 - 7 SRE IDY */
+	{ _EA_ZPX, _RD_EA, _NOP, OP_FETCH },	/* 54 - 4 NOP ZPX */
+	{ _EA_ZPX, _RD_EA, _EOR, OP_FETCH },	/* 55 - 4 EOR ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _LSR, _WR_EA, OP_FETCH },	/* 56 - 6 LSR ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _SRE, _WR_EA, OP_FETCH },	/* 57 - 6 SRE ZPX */
+	{ _RD_DUM, _CLI, OP_FETCH },	/* 58 - 2 CLI */
+	{ _EA_ABY_P, _RD_EA, _EOR, OP_FETCH },	/* 59 - 4 EOR ABY page penalty */
+	{ _RD_DUM, _NOP, OP_FETCH },	/* 5a - 2 NOP */
+	{ _EA_ABY_NP, _RD_EA, _WR_EA, _SRE, _WR_EA, OP_FETCH },	/* 5b - 7 SRE ABY */
+	{ _EA_ABX_P, _RD_EA, _NOP, OP_FETCH },	/* 5c - 4 NOP ABX page penalty */
+	{ _EA_ABX_P, _RD_EA, _EOR, OP_FETCH },	/* 5d - 4 EOR ABX page penalty */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _LSR, _WR_EA, OP_FETCH },	/* 5e - 7 LSR ABX */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _SRE, _WR_EA, OP_FETCH },	/* 5f - 7 SRE ABX */
+	/* 0x60 - 0x6F */
+	{ _RTS, OP_FETCH },	/* 60 - 6 RTS */
+	{ _EA_IDX, _RD_EA, _ADC, OP_FETCH },	/* 61 - 6 ADC IDX */
+	{ _KIL, OP_FETCH },	/* 62 - 1 KIL */
+	{ _EA_IDX, _RD_EA, _WR_EA, _RRA, _WR_EA, OP_FETCH },	/* 63 - 7 RRA IDX */
+	{ _EA_ZPG, _RD_EA, _NOP, OP_FETCH },	/* 64 - 3 NOP ZPG */
+	{ _EA_ZPG, _RD_EA, _ADC, OP_FETCH },	/* 65 - 3 ADC ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _ROR, _WR_EA, OP_FETCH },	/* 66 - 5 ROR ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _RRA, _WR_EA, OP_FETCH },	/* 67 - 5 RRA ZPG */
+	{ _RD_DUM, _PLA, OP_FETCH },	/* 68 - 4 PLA */
+	{ _RD_IMM, _ADC, OP_FETCH },	/* 69 - 2 ADC IMM */
+	{ _RD_DUM, _RD_ACC, _ROR, _WB_ACC, OP_FETCH },	/* 6a - 2 ROR A */
+	{ _RD_IMM, _ARR, _WB_ACC, OP_FETCH },	/* 6b - 2 ARR IMM */
+	{ _EA_IND, _JMP, OP_FETCH },	/* 6c - 5 JMP IND */
+	{ _EA_ABS, _RD_EA, _ADC, OP_FETCH },	/* 6d - 4 AdC ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _ROR, _WR_EA, OP_FETCH },	/* 6e - 6 ROR ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _RRA, _WR_EA, OP_FETCH },	/* 6f - 6 RRA ABS */
+	/* 0x70 - 0x7F */
+	{ _BVS, OP_FETCH },	/* 70 - 2-4 BVS REL */
+	{ _EA_IDY_P, _RD_EA, _ADC, OP_FETCH },	/* 71 - 5 ADC IDY page penalty */
+	{ _KIL, OP_FETCH },	/* 72 - KIL */
+	{ _EA_IDY_NP, _RD_EA, _WR_EA, _RRA, _WR_EA, OP_FETCH },	/* 73 - 7 RRA IDY */
+	{ _EA_ZPX, _RD_EA, _NOP, OP_FETCH },	/* 74 - 4 NOP ZPX */
+	{ _EA_ZPX, _RD_EA, _ADC, OP_FETCH },	/* 75 - 4 ADC ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _ROR, _WR_EA, OP_FETCH },	/* 76 - 6 ROR ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _RRA, _WR_EA, OP_FETCH },	/* 77 - 6 RRA ZPX */
+	{ _RD_DUM, _SEI, OP_FETCH },	/* 78 - 2 SEI */
+	{ _EA_ABY_P, _RD_EA, _ADC, OP_FETCH },	/* 79 - 4 ADC ABY page penalty */
+	{ _RD_DUM, _NOP, OP_FETCH },	/* 7a - 2 NOP */
+	{ _EA_ABY_NP, _RD_EA, _WR_EA, _RRA, _WR_EA, OP_FETCH },	/* 7b - 7 RRA ABY */
+	{ _EA_ABX_P, _RD_EA, _NOP, OP_FETCH },	/* 7c - 4 NOP ABX page penalty */
+	{ _EA_ABX_P, _RD_EA, _ADC, OP_FETCH },	/* 7d - 4 ADC ABX page penalty */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _ROR, _WR_EA, OP_FETCH },	/* 7e - 7 ROR ABS */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _RRA, _WR_EA, OP_FETCH },	/* 7f - 7 RRA ABX */
+	/* 0x80 - 0x8F */
+	{ _RD_IMM, _NOP, OP_FETCH },	/* 80 - 2 NOP IMM */
+	{ _EA_IDX, _STA, _WR_EA, OP_FETCH },	/* 81 - 6 STA IDX */
+	{ _RD_IMM, _NOP, OP_FETCH },	/* 82 - 2 NOP IMM */
+	{ _EA_IDX, _SAX, _WR_EA, OP_FETCH },	/* 83 - 6 SAX IDX */
+	{ _EA_ZPG, _STY, _WR_EA, OP_FETCH },	/* 84 - 3 STY ZPG */
+	{ _EA_ZPG, _STA, _WR_EA, OP_FETCH },	/* 85 - 3 STA ZPG */
+	{ _EA_ZPG, _STX, _WR_EA, OP_FETCH },	/* 86 - 3 STX ZPG */
+	{ _EA_ZPG, _SAX, _WR_EA, OP_FETCH },	/* 87 - 3 SAX ZPG */
+	{ _RD_DUM, _DEY, OP_FETCH },	/* 88 - 2 DEY */
+	{ _RD_IMM, _NOP, OP_FETCH },	/* 89 - 2 NOP IMM */
+	{ _RD_DUM, _TXA, OP_FETCH },	/* 8a - 2 TXA */
+	{ _RD_IMM, _AXA, OP_FETCH },	/* 8b - 2 AXA IMM */
+	{ _EA_ABS, _STY, _WR_EA, OP_FETCH },	/* 8c - 4 STY ABS */
+	{ _EA_ABS, _STA, _WR_EA, OP_FETCH },	/* 8d - 4 STA ABS */
+	{ _EA_ABS, _STX, _WR_EA, OP_FETCH },	/* 8e - 4 STX ABS */
+	{ _EA_ABS, _SAX, _WR_EA, OP_FETCH },	/* 8f - 4 SAX ABS */
+	/* 0x90 - 0x9F */
+	{ _BCC, OP_FETCH },	/* 90 - 2-4 BCC IMS */
+	{ _EA_IDY_NP, _STA, _WR_EA, OP_FETCH },	/* 91 - 6 STA IDY */
+	{ _KIL, OP_FETCH },	/* 92 - 1 KIL */
+	{ _EA_IDY_NP, _SAH, _WR_EA, OP_FETCH },	/* 93 - SAH IDY */
+	{ _EA_ZPX, _STY, _WR_EA, OP_FETCH },	/* 94 - 4 STY ZPX */
+	{ _EA_ZPX, _STA, _WR_EA, OP_FETCH },	/* 95 - 4 STA ZPX */
+	{ _EA_ZPY, _STX, _WR_EA, OP_FETCH },	/* 96 - 4 STX ZPY */
+	{ _EA_ZPY, _SAX, _WR_EA, OP_FETCH },	/* 97 - 4 SAX ZPY */
+	{ _RD_DUM, _TYA, OP_FETCH },	/* 98 - 2 TYA */
+	{ _EA_ABY_NP, _STA, _WR_EA, OP_FETCH },	/* 99 - 5 STA ABY */
+	{ _RD_DUM, _TXS, OP_FETCH },	/* 9a - 2 TXS */
+	{ _EA_ABY_NP, _SSH, _WR_EA, OP_FETCH },	/* 9b - 5 SSH ABY */
+	{ _EA_ABX_NP, _SYH, _WR_EA, OP_FETCH },	/* 9c - 5 SYH ABX */
+	{ _EA_ABX_NP, _STA, _WR_EA, OP_FETCH },	/* 9d - 5 STA ABX */
+	{ _EA_ABY_NP, _SXH, _WR_EA, OP_FETCH },	/* 9e - 5 SXH ABY */
+	{ _EA_ABY_NP, _SAH, OP_FETCH },	/* 9f - 5 SAH ABY */
+	/* 0xA0 - 0xAF */
+	{ _RD_IMM, _LDY, OP_FETCH },	/* a0 - 2 LDY IMM */
+	{ _EA_IDX, _RD_EA, _LDA, OP_FETCH },	/* a1 - 6 LDA IDX */
+	{ _RD_IMM, _LDX, OP_FETCH },	/* a2 - 2 LDX IMM */
+	{ _EA_IDX, _RD_EA, _LAX, OP_FETCH },	/* a3 - 6 LAX IDX */
+	{ _EA_ZPG, _RD_EA, _LDY, OP_FETCH },	/* a4 - 3 LDY ZPG */
+	{ _EA_ZPG, _RD_EA, _LDA, OP_FETCH },	/* a5 - 3 LDA ZPG */
+	{ _EA_ZPG, _RD_EA, _LDX, OP_FETCH },	/* a6 - 3 LDX ZPG */
+	{ _EA_ZPG, _RD_EA, _LAX, OP_FETCH },	/* a7 - 3 LAX ZPG */
+	{ _RD_DUM, _TAY, OP_FETCH },	/* a8 - 2 TAY */
+	{ _RD_IMM, _LDA, OP_FETCH },	/* a9 - 2 LDA IMM */
+	{ _RD_DUM, _TAX, OP_FETCH },	/* aa - 2 TAX */
+	{ _RD_IMM, _OAL, OP_FETCH },	/* ab - 2 OAL IMM */
+	{ _EA_ABS, _RD_EA, _LDY, OP_FETCH },	/* ac - 4 LDY ABS */
+	{ _EA_ABS, _RD_EA, _LDA, OP_FETCH },	/* ad - 4 LDA ABS */
+	{ _EA_ABS, _RD_EA, _LDX, OP_FETCH },	/* ae - 4 LDX ABS */
+	{ _EA_ABS, _RD_EA, _LAX, OP_FETCH },	/* af - 4 LAX ABS */
+	/* 0xB0 - 0xBF */
+	{ _BCS, OP_FETCH },	/* b0 - 2-4 BCS REL */
+	{ _EA_IDY_P, _RD_EA, _LDA, OP_FETCH },	/* b1 - 5 LDA IDY page penalty */
+	{ _KIL, OP_FETCH },	/* b2 - 1 KIL */
+	{ _EA_IDY_P, _RD_EA, _LAX, OP_FETCH },	/* b3 - 5 LAX IDY page penalty */
+	{ _EA_ZPX, _RD_EA, _LDY, OP_FETCH },	/* b4 - 4 LDY ZPX */
+	{ _EA_ZPX, _RD_EA, _LDA, OP_FETCH },	/* b5 - 4 LDA ZPX */
+	{ _EA_ZPY, _RD_EA, _LDX, OP_FETCH },	/* b6 - 4 LDX ZPY */
+	{ _EA_ZPY, _RD_EA, _LAX, OP_FETCH },	/* b7 - 4 LAX ZPY */
+	{ _RD_DUM, _CLV, OP_FETCH },	/* b8 - 2 CLV */
+	{ _EA_ABY_P, _RD_EA, _LDA, OP_FETCH },	/* b9 - 4 LDA ABY page penalty */
+	{ _RD_DUM, _TSX, OP_FETCH },	/* ba - 2 TSX */
+	{ _EA_ABY_P, _RD_EA, _AST, OP_FETCH },	/* bb - 4 AST ABY page penalty */
+	{ _EA_ABX_P, _RD_EA, _LDY, OP_FETCH },	/* bc - 4 LDY ABX page penalty */
+	{ _EA_ABX_P, _RD_EA, _LDA, OP_FETCH },	/* bd - 4 LDA ABX page penalty */
+	{ _EA_ABY_P, _RD_EA, _LDX, OP_FETCH },	/* be - 4 LDX ABY page penalty */
+	{ _EA_ABY_P, _RD_EA, _LAX, OP_FETCH },	/* bf - 4 LAX ABY page penalty */
+	/* 0xC0 - 0xCF */
+	{ _RD_IMM, _CPY, OP_FETCH },	/* c0 - 2 CPY IMM */
+	{ _EA_IDX, _RD_EA, _CMP, OP_FETCH },	/* c1 - 6 CMP IDX */
+	{ _RD_IMM, _NOP, OP_FETCH },	/* c2 - 2 NOP IMM */
+	{ _EA_IDX, _RD_EA, _WR_EA, _DCP, _WR_EA, OP_FETCH },	/* c3 - 7 DCP IDX */
+	{ _EA_ZPG, _RD_EA, _CPY, OP_FETCH },	/* c4 - 3 CPY ZPG */
+	{ _EA_ZPG, _RD_EA, _CMP, OP_FETCH },	/* c5 - 3 CMP ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _DEC, _WR_EA, OP_FETCH },	/* c6 - 5 DEC ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _DCP, _WR_EA, OP_FETCH },	/* c7 - 5 DCP ZPG */
+	{ _RD_DUM, _INY, OP_FETCH },	/* c8 - 2 INY */
+	{ _RD_IMM, _CMP, OP_FETCH },	/* c9 - 2 CMP IMM */
+	{ _RD_DUM, _DEX, OP_FETCH },	/* ca - 2 DEX */
+	{ _RD_IMM, _ASX, OP_FETCH },	/* cb - 2 ASX IMM */
+	{ _EA_ABS, _RD_EA, _CPY, OP_FETCH },	/* cc - 4 CPY ABS */
+	{ _EA_ABS, _RD_EA, _CMP, OP_FETCH },	/* cd - 4 CMP ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _DEC, _WR_EA, OP_FETCH },	/* ce - 6 DEC ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _DCP, _WR_EA, OP_FETCH },	/* cf - 6 DCP ABS */
+	/* 0xD0 - 0xDF */
+	{ _BNE, OP_FETCH },	/* d0 - 2-4 BNE REL */
+	{ _EA_IDY_P, _RD_EA, _CMP, OP_FETCH },	/* d1 - 5 CMP IDX page penalty */
+	{ _KIL, OP_FETCH },	/* d2 - 1 KIL */
+	{ _EA_IDY_NP, _RD_EA, _WR_EA, _DCP, _WR_EA, OP_FETCH },	/* d3 - 7 DCP, IDY */
+	{ _EA_ZPX, _RD_EA, _NOP, OP_FETCH },	/* d4 - 4 NOP ZPX */
+	{ _EA_ZPX, _RD_EA, _CMP, OP_FETCH },	/* d5 - 4 CMP ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _DEC, _WR_EA, OP_FETCH },	/* d6 - 6 DEC ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _DCP, _WR_EA, OP_FETCH },	/* d7 - 6 DCP ZPX */
+	{ _RD_DUM, _CLD, OP_FETCH },	/* d8 - 2 CLD */
+	{ _EA_ABY_P, _RD_EA, _CMP, OP_FETCH },	/* d9 - 4 CMP ABY page penalty */
+	{ _RD_DUM, _NOP, OP_FETCH },	/* da - 2 NOP */
+	{ _EA_ABY_NP, _RD_EA, _WR_EA, _DCP, _WR_EA, OP_FETCH },	/* db - 7 DCP ABY */
+	{ _EA_ABX_P, _RD_EA, _NOP, OP_FETCH },	/* dc - 4 NOP ABX page penalty */
+	{ _EA_ABX_P, _RD_EA, _CMP, OP_FETCH },	/* dd - 4 CMP ABX page penalty */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _DEC, _WR_EA, OP_FETCH },	/* de - 7 DEC ABX */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _DCP, _WR_EA, OP_FETCH },	/* df - 7 DCP ABX */
+	/* 0xE0 - 0xEF */
+	{ _RD_IMM, _CPX, OP_FETCH },	/* e0 - 2 CPX IMM */
+	{ _EA_IDX, _RD_EA, _SBC, OP_FETCH },	/* e1 - 6 SBC IDX */
+	{ _RD_IMM, _NOP, OP_FETCH },	/* e2 - 2 NOP IMM */
+	{ _EA_IDX, _RD_EA, _WR_EA, _ISB, _WR_EA, OP_FETCH },	/* e3 - 7 ISB IDX */
+	{ _EA_ZPG, _RD_EA, _CPX, OP_FETCH },	/* e4 - 3 CPX ZPG */
+	{ _EA_ZPG, _RD_EA, _SBC, OP_FETCH },	/* e5 - 3 SBC ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _INC, _WR_EA, OP_FETCH },	/* e6 - 5 INC ZPG */
+	{ _EA_ZPG, _RD_EA, _WR_EA, _ISB, _WR_EA, OP_FETCH },	/* e7 - 5 ISB ZPG */
+	{ _RD_DUM, _INX, OP_FETCH },	/* e8 - 2 INX */
+	{ _RD_IMM, _SBC, OP_FETCH },	/* e9 - 2 SBC IMM */
+	{ _RD_DUM, _NOP, OP_FETCH },	/* ea - 2 NOP */
+	{ _RD_IMM, _SBC, OP_FETCH },	/* eb - 2 SBC IMM */
+	{ _EA_ABS, _RD_EA, _CPX, OP_FETCH },	/* ec - 4 CPX ABS */
+	{ _EA_ABS, _RD_EA, _SBC, OP_FETCH },	/* ed - 4 SBC ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _INC, _WR_EA, OP_FETCH },	/* ee - 6 INC ABS */
+	{ _EA_ABS, _RD_EA, _WR_EA, _ISB, _WR_EA, OP_FETCH },	/* ef - 6 ISB ABS */
+	/* 0xF0 - 0xFF */
+	{ _BEQ, OP_FETCH },	/* f0 - 2-4 BEQ REL */
+	{ _EA_IDY_P, _RD_EA, _SBC, OP_FETCH },	/* f1 - 5 SBC page penalty */
+	{ _KIL, OP_FETCH },	/* f2 - 1 KIL */
+	{ _EA_IDY_NP, _RD_EA, _WR_EA, _ISB, _WR_EA, OP_FETCH },	/* f3 - 7 ISB IDY */
+	{ _EA_ZPX, _RD_EA, _NOP, OP_FETCH },	/* f4 - 4 NOP ZPX */
+	{ _EA_ZPX, _RD_EA, _SBC, OP_FETCH },	/* f5 - 4 SBC ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _INC, _WR_EA, OP_FETCH },	/* f6 - 6 INC ZPX */
+	{ _EA_ZPX, _RD_EA, _WR_EA, _ISB, _WR_EA, OP_FETCH },	/* f7 - 6 ISB ZPX */
+	{ _RD_DUM, _SED, OP_FETCH },	/* f8 - 2 SED */
+	{ _EA_ABY_P, _RD_EA, _SBC, OP_FETCH },	/* f9 - 4 SBC ABY page penalty */
+	{ _RD_DUM, _NOP, OP_FETCH },	/* fa - 2 NOP */
+	{ _EA_ABY_NP, _RD_EA, _WR_EA, _ISB, _WR_EA, OP_FETCH },	/* fb - 7 ISB ABY */
+	{ _EA_ABX_P, _RD_EA, _NOP, OP_FETCH },	/* fc - 4 NOP ABX page penalty */
+	{ _EA_ABX_P, _RD_EA, _SBC, OP_FETCH },	/* fd - 4 SBC ABX page penalty */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _INC, _WR_EA, OP_FETCH },	/* fe - 7 INC ABX */
+	{ _EA_ABX_NP, _RD_EA, _WR_EA, _ISB, _WR_EA, OP_FETCH },	/* ff - 7 ISB ABX */
+	/* special cases */
+	{ OP_FETCH },	/* RESET */
+	{ OP_FETCH },	/* TAKE_IRQ */
+};
+
+static int m6502_execute2(int cycles) {
+	m6502_ICount = cycles;
+
+	change_pc(PCD);
+
+	do {
+		debugger_instruction_hook(Machine, PCD);
+		m6502_ICount--;
+	} while (m6502_ICount > 0);
+
+	return cycles - m6502_ICount;
+}
+
 static int m6502_execute(int cycles)
 {
 	m6502_ICount = cycles;

@@ -81,6 +81,8 @@ struct _crtc_ega_t
 	emu_timer *hsync_off_timer;
 	emu_timer *vsync_on_timer;
 	emu_timer *vsync_off_timer;
+	emu_timer *vblank_on_timer;
+	emu_timer *vblank_off_timer;
 	emu_timer *light_pen_latch_timer;
 
 	/* computed values - do NOT state save these! */
@@ -104,6 +106,7 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload);
 static void update_de_changed_timer(crtc_ega_t *crtc_ega);
 static void update_hsync_changed_timers(crtc_ega_t *crtc_ega);
 static void update_vsync_changed_timers(crtc_ega_t *crtc_ega);
+static void update_vblank_changed_timers(crtc_ega_t *crtc_ega);
 
 
 /* makes sure that the passed in device is the right type */
@@ -306,6 +309,7 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
 			update_de_changed_timer(crtc_ega);
 			update_hsync_changed_timers(crtc_ega);
 			update_vsync_changed_timers(crtc_ega);
+			update_vblank_changed_timers(crtc_ega);
 		}
 	}
 }
@@ -401,6 +405,16 @@ static void update_vsync_changed_timers(crtc_ega_t *crtc_ega)
 }
 
 
+static void update_vblank_changed_timers(crtc_ega_t *crtc_ega)
+{
+	if (crtc_ega->has_valid_parameters && (crtc_ega->vblank_on_timer != NULL))
+	{
+		timer_adjust_oneshot(crtc_ega->vblank_on_timer,  video_screen_get_time_until_pos(crtc_ega->screen, crtc_ega->vert_disp_end,  crtc_ega->hsync_on_pos), 0);
+		timer_adjust_oneshot(crtc_ega->vblank_off_timer, video_screen_get_time_until_pos(crtc_ega->screen, 0, crtc_ega->hsync_off_pos), 0);
+	}
+}
+
+
 static TIMER_CALLBACK( de_changed_timer_cb )
 {
 	const device_config *device = ptr;
@@ -456,6 +470,30 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 	update_hsync_changed_timers(crtc_ega);
 }
 
+
+
+static TIMER_CALLBACK( vblank_on_timer_cb )
+{
+	const device_config *device = ptr;
+	crtc_ega_t *crtc_ega = get_safe_token(device);
+
+	/* call the callback function -- we know it exists */
+	crtc_ega->intf->on_vblank_changed(device, TRUE);
+
+	update_vblank_changed_timers(crtc_ega);
+}
+
+
+static TIMER_CALLBACK( vblank_off_timer_cb )
+{
+	const device_config *device = ptr;
+	crtc_ega_t *crtc_ega = get_safe_token(device);
+
+	/* call the callback function -- we know it exists */
+	crtc_ega->intf->on_vblank_changed(device, FALSE);
+
+	update_vblank_changed_timers(crtc_ega);
+}
 
 
 UINT16 crtc_ega_get_ma(const device_config *device)
@@ -718,6 +756,12 @@ static void common_start(const device_config *device, int device_type)
 		{
 			crtc_ega->vsync_on_timer = timer_alloc(vsync_on_timer_cb, (void *)device);
 			crtc_ega->vsync_off_timer = timer_alloc(vsync_off_timer_cb, (void *)device);
+		}
+
+		if (crtc_ega->intf->on_vblank_changed != NULL)
+		{
+			crtc_ega->vblank_on_timer = timer_alloc(vblank_on_timer_cb, (void *)device);
+			crtc_ega->vblank_off_timer = timer_alloc(vblank_off_timer_cb, (void *)device);
 		}
 	}
 

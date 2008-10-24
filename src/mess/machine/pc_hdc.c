@@ -37,8 +37,8 @@
 #include "deprecat.h"
 
 
-#define LOG_HDC_STATUS		0
-#define LOG_HDC_CALL		0
+#define LOG_HDC_STATUS		1
+#define LOG_HDC_CALL		1
 #define LOG_HDC_DATA		0
 
 
@@ -415,6 +415,7 @@ static void execute_read(void)
 
 	if (no_dma())
 	{
+printf("pc_hdc: execute_read without DMA\n");
 		do
 		{
 			buffer[data_cnt++] = pc_hdc_dack_r();
@@ -422,6 +423,7 @@ static void execute_read(void)
 	}
 	else
 	{
+printf("pc_hdc: execute_read through DMA\n");
 		dma8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
 	}
 }
@@ -446,6 +448,7 @@ static void execute_write(void)
 
 	if (no_dma())
 	{
+//printf("pc_hdc: execute_write without DMA\n");
 		do
 		{
 			pc_hdc_dack_w(buffer[data_cnt++]);
@@ -454,6 +457,7 @@ static void execute_write(void)
 	}
 	else
 	{
+printf("pc_hdc: execute_write through DMA\n");
 		dma8237_run_transfer(pc_hdc_dma8237, HDC_DMA);
 	}
 }

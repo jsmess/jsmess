@@ -1117,6 +1117,18 @@ static OPBASE_HANDLER( c64_opbase )
 
 MACHINE_START( c64 )
 {
+	int i,j,k;
+
+	/* Set up RAM contents */
+	for ( i = 0; i < 64; i++ )
+	{
+		UINT8	bootup_ram[8] = { 0xFF, 0x01, 0xFF, 0x01, 0x99, 0x66, 0x99, 0x66 };
+
+		for ( j = 0; j < 8; j++ )
+			for ( k = 0; k < 128; k++ )
+				c64_memory[ i * 0x400 + j * 0x80 + k ] = mame_rand(machine) * 255;
+	}
+
 	c64_port_data = 0x17;
 
 	c64_io_mirror = auto_malloc( 0x1000 );

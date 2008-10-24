@@ -12,7 +12,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "memconv.h"
 #include "machine/pic8259.h"
 
 #define IRQ_COUNT	8
@@ -47,7 +46,7 @@ struct pic8259
 	UINT8 interrupt_mask;
 
 	UINT8 input;
-	UINT32 special : 1;
+	UINT8 ocw3;
 
 	/* ICW1 state */
 	UINT32 level_trig_mode : 1;
@@ -103,12 +102,12 @@ static TIMER_CALLBACK( pic8259_timerproc )
 		{
 			if (LOG_GENERAL)
 				logerror("pic8259_timerproc(): PIC triggering IRQ #%d\n", irq);
-			if (pic8259->intf->set_int_line)
+			if ( ! ( pic8259->ocw3 & 0x04 ) && pic8259->intf->set_int_line)
 				pic8259->intf->set_int_line(device, 1);
 			return;
 		}
 	}
-	if (pic8259->intf->set_int_line)
+	if ( ! ( pic8259->ocw3 & 0x04 ) && pic8259->intf->set_int_line)
 		pic8259->intf->set_int_line(device, 0);
 }
 
@@ -122,29 +121,37 @@ INLINE void pic8259_set_timer(pic8259_t *pic8259)
 void pic8259_set_irq_line(const device_config *device, int irq, int state)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
+	UINT8		old_irq_lines = pic8259->irq_lines;
 
 	if (state)
 	{
 		/* setting IRQ line */
-		if (!(pic8259->irq_lines & (1 << irq)))
-		{
-			if (LOG_GENERAL)
-				logerror("pic8259_set_irq_line(): PIC set IRQ line #%d\n", irq);
+		if (LOG_GENERAL)
+			logerror("pic8259_set_irq_line(): PIC set IRQ line #%d\n", irq);
 
-			pic8259->irq_lines |= 1 << irq;
-			pic8259->pending |= 1 << irq;
-			pic8259_set_timer(pic8259);
-		}
+		pic8259->irq_lines |= 1 << irq;
 	}
 	else
 	{
 		/* clearing IRQ line */
-		if (pic8259->irq_lines & (1 << irq))
-		{
-			if (LOG_GENERAL)
-				logerror("pic8259_set_irq_line(): PIC cleared IRQ line #%d\n", irq);
+		if (LOG_GENERAL)
+			logerror("pic8259_set_irq_line(): PIC cleared IRQ line #%d\n", irq);
 
-			pic8259->irq_lines &= ~(1 << irq);
+		pic8259->irq_lines &= ~(1 << irq);
+	}
+
+	if ( pic8259->level_trig_mode )
+	{
+		/* Level triggering mode; just copy the IR level */
+		pic8259->pending = ( pic8259->pending & ~ ( 1 << irq ) ) | ( pic8259->irq_lines & ( 1 << irq ) );
+		pic8259_set_timer(pic8259);
+	}
+	else
+	{
+		/* Edge triggering mode; check for a 0 -> 1 transition */
+		if ( ! ( old_irq_lines & ( 1 << irq ) ) && state )
+		{
+			pic8259->pending |= ( 1 << irq );
 			pic8259_set_timer(pic8259);
 		}
 	}
@@ -191,13 +198,44 @@ READ8_DEVICE_HANDLER( pic8259_r )
 	/* NPW 18-May-2003 - Changing 0xFF to 0x00 as per Ruslan */
 	UINT8 data = 0x00;
 
+//printf("pic8259_r(): pc = %08x, offset = %02x\n", activecpu_get_pc(), offset );
 	switch(offset)
 	{
 		case 0: /* PIC acknowledge IRQ */
-			if (pic8259->special)
+			if ( pic8259->ocw3 & 0x04 )
 			{
-				pic8259->special = 0;
-				data = pic8259->input;
+				/* Polling mode */
+				if ( pic8259->in_service & ~pic8259->interrupt_mask )
+				{
+					int irq;
+
+					pic8259_acknowledge( device );
+
+					for ( irq = 0; irq < IRQ_COUNT; irq++ )
+					{
+						if ( ( 1 << irq ) & pic8259->in_service & ~pic8259->interrupt_mask )
+						{
+							data = 0x80 | irq;
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				switch ( pic8259->ocw3 & 0x03 )
+				{
+				case 2:
+					data = pic8259->pending;
+					break;
+				case 3:
+					data = pic8259->in_service & ~pic8259->interrupt_mask;
+					break;
+				case 1:
+				default:
+					data = 0x00;
+					break;
+				}
 			}
 			break;
 
@@ -214,6 +252,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
 
+//printf("pic8259_w(): pc = %08x, offset = %02x, data = %02x\n", activecpu_get_pc(), offset, data );
 	switch(offset)
 	{
 		case 0:    /* PIC acknowledge IRQ */
@@ -224,6 +263,9 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 					logerror("pic8259_w(): ICW1; data=0x%02X\n", data);
 
 				pic8259->interrupt_mask	= 0x00;
+				pic8259->in_service     = 0x00;
+				pic8259->pending        = 0x00;
+				pic8259->irq_lines      = 0x00;
 				pic8259->level_trig_mode	= (data & 0x08) ? 1 : 0;
 				pic8259->vector_size		= (data & 0x04) ? 1 : 0;
 				pic8259->cascade			= (data & 0x02) ? 0 : 1;
@@ -239,17 +281,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 					if (LOG_OCW)
 						logerror("pic8259_w(): OCW3; data=0x%02X\n", data);
 
-					switch (data & 0x03)
-					{
-						case 0x02:
-							pic8259->special = 1;
-							pic8259->input = pic8259->pending;
-							break;
-						case 0x03:
-							pic8259->special = 1;
-							pic8259->input = pic8259->in_service & ~pic8259->interrupt_mask;
-							break;
-					}
+					pic8259->ocw3 = data;
 				}
 				else if ((data & 0x18) == 0x00)
 				{
@@ -317,6 +349,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 			switch(pic8259->state)
 			{
 				case STATE_ICW1:
+					/* keep compiler happy */
 					break;
 
 				case STATE_ICW2:
@@ -358,6 +391,15 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 					if (LOG_OCW)
 						logerror("pic8259_w(): OCW1; data=0x%02X\n", data);
 
+					/* Changing a bit in the mask from 1 to 0 with a pending
+					   interrupt seems to clear the bit in the IRR.
+					   Observed in Supersoft XT diagnostics and AT + EGA POST
+					   checks.
+					*/
+					if ( pic8259->interrupt_mask & ~data )
+					{
+						pic8259->pending = pic8259->pending & ~ ( pic8259->interrupt_mask & ~data );
+					}
 					pic8259->interrupt_mask = data;
 					break;
 			}
@@ -373,6 +415,8 @@ static DEVICE_START( pic8259 ) {
 
 	pic8259->intf = device->static_config;
 
+	pic8259->timer = timer_alloc( pic8259_timerproc, (void *)device );
+
 	return DEVICE_START_OK;
 }
 
@@ -380,16 +424,14 @@ static DEVICE_START( pic8259 ) {
 static DEVICE_RESET( pic8259 ) {
 	pic8259_t	*pic8259 = get_safe_token(device);
 
-	pic8259->timer = timer_alloc( pic8259_timerproc, (void *)device );
-
 	pic8259->state = STATE_ICW1;	/* It is unclear from the original code whether this is correct */
 	pic8259->irq_lines = 0;
 	pic8259->in_service = 0;
 	pic8259->pending = 0;
 	pic8259->prio = 0;
-	pic8259->interrupt_mask = 0;
+	pic8259->interrupt_mask = 0xff;
 	pic8259->input = 0;
-	pic8259->special = 0;
+	pic8259->ocw3 = 0;
 	pic8259->level_trig_mode = 0;
 	pic8259->vector_size = 0;
 	pic8259->cascade = 0;
