@@ -79,10 +79,19 @@ CPUS += I8749
 CPUS += N7751
 CPUS += M58715
 CPUS += I8X41
+CPUS += I8031
+CPUS += I8032
 CPUS += I8051
 CPUS += I8052
 CPUS += I8751
 CPUS += I8752
+CPUS += I80C31
+CPUS += I80C32
+CPUS += I80C51
+CPUS += I80C52
+CPUS += I87C51
+CPUS += I87C52
+CPUS += AT89C4051
 CPUS += DS5002FP
 CPUS += M6800
 CPUS += M6801
@@ -1539,7 +1548,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/cowrace.o \
-	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
+	$(DRIVERS)/crystal.o $(DRIVERS)/psattack.o $(VIDEO)/vrender0.o \
 	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \
@@ -1594,6 +1603,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/lucky8.o \
 	$(DRIVERS)/magic10.o \
 	$(DRIVERS)/magicfly.o \
+	$(DRIVERS)/magictg.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o \

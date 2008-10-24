@@ -396,7 +396,7 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 			{
 				/* disable interrupts until mask is written */
 				z80pio_set_irq_enable(device, channel, 0);
-		
+
 				/* reset pending interrupt */
 				z80pio->irq_pending[channel] = 0;
 

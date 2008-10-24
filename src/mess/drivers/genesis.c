@@ -395,7 +395,7 @@ static DRIVER_INIT( genesis )
 
 static DRIVER_INIT( gensvp )
 {
-	DRIVER_INIT_CALL(megadsvp);
+	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(mess_md_common);
 }
 

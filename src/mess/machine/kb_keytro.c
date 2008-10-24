@@ -302,7 +302,7 @@ WRITE8_HANDLER( kb_keytronic_set_clock_signal )
 WRITE8_HANDLER( kb_keytronic_set_data_signal )
 {
 	kb_keytronic.data_signal = data;
-	cpunum_set_input_line( machine, kb_keytronic.cpunum, I8051_T0_LINE, data ? HOLD_LINE : CLEAR_LINE );
+	cpunum_set_input_line( machine, kb_keytronic.cpunum, MCS51_T0_LINE, data ? HOLD_LINE : CLEAR_LINE );
 }
 
 

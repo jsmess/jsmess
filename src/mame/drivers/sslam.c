@@ -395,7 +395,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 static WRITE16_HANDLER( powerbls_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1,I8051_INT1_LINE,PULSE_LINE);
+	cpunum_set_input_line(machine, 1,I8051_INT1_LINE,HOLD_LINE);
 }
 
 /* Memory Maps */
@@ -489,13 +489,9 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 //   (data & 0x40) -> always set
 }
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(playmark_snd_control_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(playmark_snd_control_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -734,8 +730,6 @@ static MACHINE_DRIVER_START( sslam )
 
 	MDRV_CPU_ADD("audio", I8051, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped - 2 boards were protected */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(0,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -766,8 +760,7 @@ static MACHINE_DRIVER_START( powerbls )
 	MDRV_CPU_PROGRAM_MAP(powerbls_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", I8051, 12000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_ADD("audio", I80C51, 12000000)		/* 83C751 */
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
@@ -829,7 +822,7 @@ ROM_START( sslam )
 	ROM_RELOAD ( 0xe00001, 0x80000 )
 	ROM_RELOAD ( 0xf00001, 0x80000 )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x1000, "audio", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE  ) /* Bg */
@@ -889,7 +882,7 @@ ROM_START( sslama )
 	ROM_RELOAD ( 0xe00001, 0x80000 )
 	ROM_RELOAD ( 0xf00001, 0x80000 )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x1000, "audio", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE  ) /* Bg */
@@ -920,7 +913,7 @@ ROM_START( powerbls )
 	ROM_LOAD16_BYTE( "21.u67", 0x00000, 0x40000, CRC(4e302381) SHA1(5685d15fd3137866093ff13b95a7df2265a8bc64) )
 	ROM_LOAD16_BYTE( "22.u66", 0x00001, 0x40000, CRC(89b70599) SHA1(57a5d71e4d8ca62fffe2e81116c5236d2194ae11) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x1000, "audio", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, CRC(5b8b2d3a) SHA1(c3409243dfc0ca959a80f6890c87b4ce9eb0741d) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE  ) /* Bg */
