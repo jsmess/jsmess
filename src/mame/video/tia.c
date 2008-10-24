@@ -611,13 +611,8 @@ static void update_bitmap(int next_x, int next_y)
 		}
 		else
 		{
-			if ( CTRLPF & 2 ) {
-				drawBL(temp, lineBL);
-				drawPF(temp, linePF);
-			} else {
-				drawPF(temp, linePF);
-				drawBL(temp, lineBL);
-			}
+			drawPF(temp, linePF);
+			drawBL(temp, lineBL);
 			drawS1(temp, lineP1);
 			drawM1(temp, lineM1);
 			drawS0(temp, lineP0);
@@ -771,13 +766,8 @@ static void update_bitmap(int next_x, int next_y)
 					}
 					else
 					{
-						if ( CTRLPF & 2 ) {
-							drawBL(temp, lineBL);
-							drawPF(temp, linePF);
-						} else {
-							drawPF(temp, linePF);
-							drawBL(temp, lineBL);
-						}
+						drawPF(temp, linePF);
+						drawBL(temp, lineBL);
 						drawS1(temp, lineP1);
 						drawM1(temp, lineM1);
 						drawS0(temp, lineP0);

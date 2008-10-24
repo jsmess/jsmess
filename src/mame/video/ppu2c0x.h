@@ -19,7 +19,6 @@
 #define PPU_MIRROR_HIGH		3
 #define PPU_MIRROR_LOW		4
 #define PPU_MIRROR_4SCREEN	5	// Same effect as NONE, but signals that we should never mirror
-#define PPU_MIRROR_CUSTOM	6	/* Custom mirroring handled by driver */
 
 /* registers definition */
 enum
@@ -84,7 +83,6 @@ typedef void (*ppu2c0x_scanline_cb)( int num, int scanline, int vblank, int blan
 typedef void (*ppu2c0x_hblank_cb)( int num, int scanline, int vblank, int blanked );
 typedef void (*ppu2c0x_nmi_cb)( int num, int *ppu_regs );
 typedef int  (*ppu2c0x_vidaccess_cb)( int num, int address, int data );
-typedef UINT8* (*ppu2c0x_custpage_cb)( int num, int page, UINT8 *vram_base );
 
 typedef struct _ppu2c0x_interface ppu2c0x_interface;
 struct _ppu2c0x_interface
@@ -115,7 +113,6 @@ void ppu2c0x_set_mirroring( int num, int mirroring );
 void ppu2c0x_set_scanline_callback( int num, ppu2c0x_scanline_cb cb );
 void ppu2c0x_set_hblank_callback( int num, ppu2c0x_scanline_cb cb );
 void ppu2c0x_set_vidaccess_callback( int num, ppu2c0x_vidaccess_cb cb );
-void ppu2c0x_set_custpage_callback( int num, ppu2c0x_custpage_cb cb );
 void ppu2c0x_set_scanlines_per_frame( int num, int scanlines );
 
 //27/12/2002

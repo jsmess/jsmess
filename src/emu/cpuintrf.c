@@ -225,7 +225,6 @@ void sc61860_get_info(UINT32 state, cpuinfo *info);
 void tx0_64kw_get_info(UINT32 state, cpuinfo *info);
 void tx0_8kw_get_info(UINT32 state, cpuinfo *info);
 void lr35902_get_info(UINT32 state, cpuinfo *info);
-void tms0980_get_info(UINT32 state, cpuinfo *indo);
 void tms7000_get_info(UINT32 state, cpuinfo *info);
 void tms7000_exl_get_info(UINT32 state, cpuinfo *info);
 void sm8500_get_info(UINT32 state, cpuinfo *info);
@@ -877,9 +876,6 @@ static const struct
 #endif
 #if (HAS_LR35902)
 	{ CPU_LR35902, lr35902_get_info },
-#endif
-#if (HAS_TMS0980)
-	{ CPU_TMS0980, tms0980_get_info },
 #endif
 #if (HAS_TMS7000)
 	{ CPU_TMS7000, tms7000_get_info },

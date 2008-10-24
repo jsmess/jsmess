@@ -26,7 +26,7 @@
 /* AT keyboard documentation comes from www.beyondlogic.org and HelpPC documentation */
 
 /* to enable logging of keyboard read/writes */
-#define LOG_KEYBOARD	1
+#define LOG_KEYBOARD	0
 
 
 /*
@@ -750,8 +750,8 @@ void at_keyboard_write(UINT8 data)
 
 				at_clear_buffer_and_acknowledge();
 
-//				/* acknowledge */
-//				at_keyboard_queue_insert(0xfa);
+	//          /* acknowledge */
+	//          at_keyboard_queue_insert(0xfa);
 				/* BAT completion code */
 				at_keyboard_queue_insert(0xaa);
 				break;

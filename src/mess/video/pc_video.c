@@ -123,7 +123,6 @@ VIDEO_UPDATE( pc_video )
 
 WRITE8_HANDLER ( pc_video_videoram_w )
 {
-	offset %= videoram_size;
 	if (videoram && videoram[offset] != data)
 	{
 		videoram[offset] = data;

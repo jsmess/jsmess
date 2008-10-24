@@ -370,7 +370,8 @@
 	</hash>
 	<hash crc32="c888222b" sha1="b6a13d51c72b576738f0d7e8e328db2ffeb0b38c" name="Fantastic Dizzy (U) [S]">
 		<status>GoodGG Verified Image</status>
-		<extrainfo>GGSMS,CODEMASTERS</extrainfo>
+		<extrainfo>GGSMS</extrainfo>
+
 	</hash>
 	<hash crc32="d69097e8" sha1="5951d500d6f53b0537f045adb85d94068a838f32" name="Fantasy Zone Gear (JU)">
 		<status>GoodGG Verified Image</status>

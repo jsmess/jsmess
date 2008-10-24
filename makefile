@@ -357,8 +357,7 @@ CFLAGS += \
 
 # LDFLAGS are used generally; LDFLAGSEMULATOR are additional
 # flags only used when linking the core emulator
-#LDFLAGS = -Wl,--warn-common
-LDFLAGS += -Wl
+LDFLAGS = -Wl,--warn-common
 LDFLAGSEMULATOR =
 
 # add profiling information for the linker

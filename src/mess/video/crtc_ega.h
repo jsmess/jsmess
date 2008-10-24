@@ -34,16 +34,13 @@ typedef void (*crtc_ega_on_hsync_changed_func)(const device_config *device, int 
 typedef void (*crtc_ega_on_vsync_changed_func)(const device_config *device, int vsync);
 #define CRTC_EGA_ON_VSYNC_CHANGED(name)	void name(const device_config *device, int vsync)
 
-typedef void (*crtc_ega_on_vblank_changed_func)(const device_config *device, int vblank);
-#define CRTC_EGA_ON_VBLANK_CHANGED(name) void name(const device_config *device, int vblank)
-
 
 /* interface */
 typedef struct _crtc_ega_interface crtc_ega_interface;
 struct _crtc_ega_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int clock;					/* the clock of the chip */
+	int clock;					/* the clock (pin 21) of the chip */
 	int hpixels_per_column;		/* number of pixels per video memory address */
 
 	/* if specified, this gets called before any pixel update,
@@ -60,17 +57,14 @@ struct _crtc_ega_interface
 	/* if specified, this gets called after all row updating is complete */
 	crtc_ega_end_update_func			end_update;
 
-	/* if specified, this gets called for every change of the disply enable signal */
+	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
 	crtc_ega_on_de_changed_func		on_de_changed;
 
-	/* if specified, this gets called for every change of the HSYNC signal */
+	/* if specified, this gets called for every change of the HSYNC pin (pin 39) */
 	crtc_ega_on_hsync_changed_func	on_hsync_changed;
 
-	/* if specified, this gets called for every change of the VSYNC signal */
+	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
 	crtc_ega_on_vsync_changed_func	on_vsync_changed;
-
-	/* if specificed, this gets called for every change of the VBLAnk signal */
-	crtc_ega_on_vblank_changed_func	on_vblank_changed;
 };
 
 

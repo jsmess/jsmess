@@ -370,14 +370,6 @@ static void device_display_cassette(const device_config *image)
 
 	/* draw the cassette */
 	ui_draw_text_box(buf, JUSTIFY_LEFT, x, y, UI_FILLCOLOR);
-
-	if ( uistate == CASSETTE_PLAY ) {
-		/* Check if we are past the end of the tape. If so, stop the motor. */
-		if ( position > length ) {
-			cassette_change_state( image, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		}
-	}
-
 }
 
 

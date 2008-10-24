@@ -711,16 +711,6 @@ WRITE64_HANDLER(bebox_80000480_w)
 }
 
 
-static DMA8237_HRQ_CHANGED( bebox_dma_hrq_changed )
-{
-//	cpunum_set_input_line(device->machine, pc_devices.cpunum_main, INPUT_LINE_HALT,
-//		state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	dma8237_set_hlda( device, state );
-}
-
-
 static DMA8237_MEM_READ( bebox_dma_read_byte )
 {
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
@@ -754,9 +744,9 @@ static DMA8237_OUT_EOP( bebox_dma8237_out_eop ) {
 
 const struct dma8237_interface bebox_dma8237_1_config =
 {
-	XTAL_14_31818MHz/3, /* this needs to be verified */
+	0,
+	1.0e-6, /* 1us */
 
-	bebox_dma_hrq_changed,
 	bebox_dma_read_byte,
 	bebox_dma_write_byte,
 
@@ -768,9 +758,9 @@ const struct dma8237_interface bebox_dma8237_1_config =
 
 const struct dma8237_interface bebox_dma8237_2_config =
 {
-	XTAL_14_31818MHz/3, /* this needs to be verified */
+	0,
+	1.0e-6, /* 1us */
 
-	NULL,
 	NULL,
 	NULL,
 

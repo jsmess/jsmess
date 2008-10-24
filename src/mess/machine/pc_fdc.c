@@ -24,7 +24,7 @@
 #define PC_FDC_FLAGS_DOR_FDC_ENABLED	(1<<2)
 #define PC_FDC_FLAGS_DOR_MOTOR_ON		(1<<4)
 
-#define LOG_FDC		1
+#define LOG_FDC		0
 
 /* registers etc */
 struct pc_fdc
@@ -420,7 +420,6 @@ READ8_HANDLER ( pc_fdc_r )
 		case 0: /* status register a */
 		case 1: /* status register b */
 			data = 0x00;
-			break;
 		case 2:
 			data = fdc->digital_output_register;
 			break;
@@ -440,7 +439,7 @@ READ8_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		printf/*logerror*/("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
 	return data;
 }
 
@@ -448,10 +447,8 @@ READ8_HANDLER ( pc_fdc_r )
 
 WRITE8_HANDLER ( pc_fdc_w )
 {
-	int floppy_count;
-
 	if (LOG_FDC)
-		printf/*logerror*/("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
 
 	switch(offset)
 	{
@@ -478,33 +475,14 @@ WRITE8_HANDLER ( pc_fdc_w )
 			 *
 			 * Currently unimplemented; bits 1-0 are supposed to control data
 			 * flow rates:
-			 *                             5 1/4" settings
-			 *      bits   datarate     drive speed   sectors   cylinders   capacity
-			 *		0 0		 500 kbps    360 RPM        15         80       1.2Mbyte
-			 *		0 1		 300 kbps    360 RPM         9         40       360Kbyte
-			 *		1 0		 250 kbps    300 RPM         9         40       360Kbyte
+			 *		0 0		 500 kbps
+			 *		0 1		 300 kbps
+			 *		1 0		 250 kbps
 			 *		1 1		1000 kbps
 			 */
-
-			if ( LOG_FDC )
-				logerror("data rate bits set to %02X\n", data & 0x03 );
-
-			floppy_count = device_count(machine, IO_FLOPPY);
-			switch ( data & 0x03 )
-			{
-			case 0x00:	/* 500kbps */
-				break;
-			case 0x01:	/* 300kbps */
-				break;
-			case 0x02:	/* 250kbps */
-				break;
-			case 0x03:	/* 1000kbps */
-				break;
-			}
 			break;
 	}
 }
-
 
 WRITE8_HANDLER ( pcjr_fdc_w )
 {

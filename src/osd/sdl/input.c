@@ -1217,7 +1217,6 @@ void sdlinput_poll(running_machine *machine)
 				
 				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
 				{
-printf("click. cx = %d, cy = %d\n", cx, cy );
 					ui_input_push_mouse_up_event(machine, window->target, cx, cy); 
 				}
 			}

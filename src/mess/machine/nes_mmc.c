@@ -77,7 +77,6 @@ static int MMC3_prg0, MMC3_prg1;
 static int MMC3_chr[6];
 static int MMC3_prg_base, MMC3_prg_mask;
 static int MMC3_chr_base, MMC3_chr_mask;
-static int MMC3_exmode;
 
 static int MMC5_rom_bank_mode;
 static int MMC5_vrom_bank_mode;
@@ -4222,24 +4221,6 @@ static WRITE8_HANDLER( mapper113_l_w )
 	prg32(data>>3);
 	chr8(data&7);
 }
-
-static READ8_HANDLER( mapper121_l_r )
-{
-	return 0x9F;
-}
-
-static WRITE8_HANDLER( mapper121_w )
-{
-	LOG_MMC(("mapper121_w, offset: %04x, data: %02x\n", offset, data));
-
-	if ( ( offset & 0x7003 ) == 0x0003 && ( data == 0xAB || data == 0xFF ) ) {
-		MMC3_exmode = data;
-	} else {
-		MMC3_exmode = 0;
-		mapper4_w( machine, offset, data );
-	}
-}
-
 static WRITE8_HANDLER( mapper133_l_w )
 {
 	LOG_MMC(("mapper133_w %04x:%02x\n", offset, data));
@@ -4944,7 +4925,6 @@ int mapper_reset (int mapperNum)
 			break;
 		case 4:
 		case 118:
-		case 121:
 		case 206:
 			/* Can switch 8k prg banks */
 			IRQ_enable = 0;
@@ -5393,7 +5373,6 @@ static const mmc mmc_list[] =
 	{ 113, "Sachen/Hacker/Nina",	mapper113_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 118, "MMC3?",					NULL, NULL, NULL, mapper118_w, NULL, NULL, mapper4_irq },
 // 119 - Pinbot
-	{ 121, "Panda Prince",			NULL, mapper121_l_r, NULL, mapper121_w, NULL, NULL, mapper4_irq },
 	{ 133, "Sachen",				mapper133_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
 	{ 140, "Jaleco",                        NULL, NULL, mapper_140_m_w, NULL, NULL, NULL, NULL },
 	{ 144, "AGCI 50282",			NULL, NULL, NULL, mapper144_w, NULL, NULL, NULL }, //Death Race only

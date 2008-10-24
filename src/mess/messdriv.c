@@ -1096,7 +1096,6 @@ XL/XE 16kB OS roms
 	DRIVER( dallas32 )		/* Dallas										*/
 	DRIVER( roma )			/* Roma											*/
 	DRIVER( roma32 )		/* Roma											*/
-	DRIVER( stopthie )
 
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )

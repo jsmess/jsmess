@@ -345,7 +345,7 @@ READ8_HANDLER(mc146818_port_r)
 	}
 
 	if (LOG_MC146818)
-		logerror("mc146818_port_r(): offset=0x%02x index=0x%02x data=0x%02x\n", offset, mc146818->index, data);
+		logerror("mc146818_port_r(): index=0x%02x data=0x%02x\n", mc146818->index, data);
 	return data;
 }
 
@@ -354,7 +354,7 @@ READ8_HANDLER(mc146818_port_r)
 WRITE8_HANDLER(mc146818_port_w)
 {
 	if (LOG_MC146818)
-		logerror("mc146818_port_w(): offset=0x%02x index=0x%02x data=0x%02x\n", offset, mc146818->index, data);
+		logerror("mc146818_port_w(): index=0x%02x data=0x%02x\n", mc146818->index, data);
 
 	switch (offset) {
 	case 0:

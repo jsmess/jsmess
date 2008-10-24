@@ -115,7 +115,6 @@ CPUS += T11
 CPUS += S2650
 #CPUS += TMS34010
 #CPUS += TMS34020
-CPUS += TMS0980
 CPUS += TMS9900
 #CPUS += TMS9940
 CPUS += TMS9980
@@ -413,7 +412,6 @@ DRVLIBS = \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/p2000.a \
-	$(MESSOBJ)/parkbros.a \
 	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcshare.a \
@@ -1349,9 +1347,6 @@ $(MESSOBJ)/grundy.a: \
 $(MESSOBJ)/votrax.a: \
 	$(MESS_DRIVERS)/votrpss.o \
 
-$(MESSOBJ)/parkbros.a: \
-	$(MESS_DRIVERS)/stopthie.o
-
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
@@ -1375,7 +1370,6 @@ $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
 $(MESS_DRIVERS)/nc.o:		$(MESS_LAYOUT)/nc200.lh
 $(MESS_DRIVERS)/pokemini.o:	$(MESS_LAYOUT)/pokemini.lh
-$(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
