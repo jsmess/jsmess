@@ -22,6 +22,9 @@ System Driver Changes:
   and don't cause an error on loading, 16K was already working correctly
   [Phill Harvey-Smith]  
 
+- [NES] Fixed bug #1672.  [Wilbert Pol]
+
+
 
 User Interface Changes:
 -----------------------
