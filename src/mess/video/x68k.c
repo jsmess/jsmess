@@ -287,18 +287,21 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	attotime irq_time;
 	attotime end_time;
 
-	sys.mfp.gpio &= ~0x40;  // GPIP6
-	if((input_port_read(machine, "options") & 0x01))
+	if(scan <= sys.crtc.vtotal)
 	{
-		video_screen_update_partial(machine->primary_screen,scan);
+		sys.mfp.gpio &= ~0x40;  // GPIP6
+		if((input_port_read(machine, "options") & 0x01))
+		{
+			video_screen_update_partial(machine->primary_screen,scan);
+		}
+	
+		irq_time = video_screen_get_time_until_pos(machine->primary_screen,scan,2);
+		// end of HBlank period clears GPIP6 also?
+		end_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hbegin);
+		timer_adjust_oneshot(raster_irq, irq_time, scan);
+		timer_set(end_time,NULL,0,x68k_crtc_raster_end);
+		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(machine->primary_screen));
 	}
-
-	irq_time = video_screen_get_time_until_pos(machine->primary_screen,scan,2);
-	// end of HBlank period clears GPIP6 also?
-	end_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hbegin);
-	timer_adjust_oneshot(raster_irq, irq_time, scan);
-	timer_set(end_time,NULL,0,x68k_crtc_raster_end);
-	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(machine->primary_screen));
 }
 
 TIMER_CALLBACK(x68k_crtc_vblank_irq)

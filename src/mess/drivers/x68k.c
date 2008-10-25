@@ -1500,47 +1500,12 @@ static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 	prev = level;
 }
 
-static INTERRUPT_GEN( x68k_vsync_irq )
-{
-//  if(sys.mfp.ierb & 0x40)
-//  {
-//      sys.mfp.isrb |= 0x40;
-//      current_vector[6] = (sys.mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
-//      current_irq_line = 6;
-//  mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
-//  mfp_trigger_irq(MFP_IRQ_GPIP4);
-//  }
-//  if(sys.crtc.height == 256)
-//      video_screen_update_partial(machine->primary_screen,256);//sys.crtc.reg[4]/2);
-//  else
-//      video_screen_update_partial(machine->primary_screen,512);//sys.crtc.reg[4]);
-}
-
 static IRQ_CALLBACK(x68k_int_ack)
 {
 	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
 
 	if(irqline == 6)  // MFP
 	{
-//      if(sys.mfp.isra & 0x10)
-//          sys.mfp.rsr &= ~0x80;
-//      if(sys.mfp.isra & 0x04)
-//          sys.mfp.tsr &= ~0x80;
-
-//      if(sys.mfp.current_irq < 8)
-//      {
-//          sys.mfp.iprb &= ~(1 << sys.mfp.current_irq);
-			// IRQ is in service
-//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-//              sys.mfp.isrb |= (1 << sys.mfp.current_irq);
-//      }
-//      else
-//      {
-//          sys.mfp.ipra &= ~(1 << (sys.mfp.current_irq - 8));
-			// IRQ is in service
-//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-//              sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
-//      }
 		sys.mfp.current_irq = -1;
 		current_vector[6] = mc68901_get_vector(x68k_mfp);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
@@ -2090,7 +2055,6 @@ static MACHINE_DRIVER_START( x68000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map, 0)
-	MDRV_CPU_VBLANK_INT("main", x68k_vsync_irq)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( x68000 )
