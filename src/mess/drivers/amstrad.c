@@ -3062,7 +3062,7 @@ ROM_START( cpc6128 )
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128.rom", 0x10000, 0x8000, CRC(9e827fe1) SHA1(5977adbad3f7c1e0e082cd02fe76a700d9860c30))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
-  ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+
 	/* optional Multiface hardware */
 	ROM_LOAD_OPTIONAL("multface.rom", 0x1c000, 0x2000, CRC(f36086de) SHA1(1431ec628d38f000715545dd2186b684c5fe5a6f))
 ROM_END
@@ -3075,7 +3075,7 @@ ROM_START( cpc6128f )
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128f.rom", 0x10000, 0x8000, CRC(1574923b) SHA1(200d59076dfef36db061d6d7d21d80021cab1237))
 	ROM_LOAD("cpcados.rom",  0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
-  ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+
 	/* optional Multiface hardware */
 	ROM_LOAD_OPTIONAL("multface.rom", 0x01c000, 0x2000, CRC(f36086de) SHA1(1431ec628d38f000715545dd2186b684c5fe5a6f))
 ROM_END
@@ -3088,7 +3088,7 @@ ROM_START( cpc6128s )
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128s.rom", 0x10000, 0x8000, CRC(588b5540) SHA1(6765a91a42fed68a807325bf62a728e5ac5d622f))
 	ROM_LOAD("cpcados.rom",  0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
-  ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+
 	/* optional Multiface hardware */
 	ROM_LOAD_OPTIONAL("multface.rom", 0x01c000, 0x2000, CRC(f36086de) SHA1(1431ec628d38f000715545dd2186b684c5fe5a6f))
 ROM_END
@@ -3100,7 +3100,6 @@ ROM_START( cpc464 )
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc464.rom",  0x10000, 0x8000, CRC(40852f25) SHA1(56d39c463da60968d93e58b4ba0e675829412a20))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 
@@ -3108,9 +3107,8 @@ ROM_START( cpc664 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
 	ROM_REGION(0x01c000, "main", 0)
 	/* load the os to offset 0x01000 from memory base */
-	ROM_LOAD("cpc664.rom",  0x10000, 0x8000, CRC(9ab5a036) SHA1(073a7665527b5bd8a148747a3947dbd3328682c8))
+	ROM_LOAD("cpc664.rom",  0x10000, 0x8000, CRC(9AB5A036) SHA1(073a7665527b5bd8a148747a3947dbd3328682c8))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 
@@ -3118,6 +3116,7 @@ ROM_START( kccomp )
 	ROM_REGION(0x018000, "main", 0)
 	ROM_LOAD("kccos.rom",  0x10000, 0x4000, CRC(7f9ab3f7) SHA1(f828045e98e767f737fd93df0af03917f936ad08))
 	ROM_LOAD("kccbas.rom", 0x14000, 0x4000, CRC(ca6af63d) SHA1(d7d03755099d0aff501fa5fffc9c0b14c0825448))
+
 	ROM_REGION(0x018000+0x0800, "proms", 0)
 	ROM_LOAD("farben.rom", 0x18000, 0x0800, CRC(a50fa3cf) SHA1(2f229ac9f62d56973139dad9992c208421bc0f51))
 
@@ -3129,7 +3128,7 @@ ROM_END
 /* this system must have a cartridge installed to run */
 ROM_START(cpc6128p)
 	ROM_REGION(0x80000, "main", ROMREGION_ERASEFF)
-	ROM_REGION(0x04000, "user1", ROMREGION_ERASEFF)	
+	ROM_REGION(0x04000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
 
@@ -3212,20 +3211,15 @@ static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}
 }
 
+
 static SYSTEM_CONFIG_START( cpc6128 )
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_DEVICE(cpc6128_floppy_getinfo)
-	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( kccomp )
-	CONFIG_RAM_DEFAULT(128 * 1024)
-	CONFIG_DEVICE(cpc6128_floppy_getinfo)
-SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( cpcplus )
-  CONFIG_RAM_DEFAULT(128 * 1024)
-	CONFIG_DEVICE(cpc6128_floppy_getinfo)
+	CONFIG_IMPORT_FROM(cpc6128)
 	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -3258,5 +3252,5 @@ COMP( 1985, cpc6128s, cpc464,   0,      amstrad, cpc6128s, 0,       cpc6128, "Am
 COMP( 1990, cpc464p,  0,        0,      cpcplus, plus,     0,       cpcplus, "Amstrad plc",         "Amstrad CPC464+",                           0 )
 COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus,     0,       cpcplus, "Amstrad plc",         "Amstrad CPC6128+",                          0 )
 CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000,   0,       gx4000,  "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp,   0,       kccomp,  "VEB Mikroelektronik", "KC Compact",                                0 )
+COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp,   0,       cpc6128, "VEB Mikroelektronik", "KC Compact",                                0 )
 COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste,   aleste,  aleste,  "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )

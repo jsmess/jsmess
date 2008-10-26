@@ -24,7 +24,7 @@ System Driver Changes:
 
 - [NES] Fixed bug #1672.  [Wilbert Pol]
 
-- [AMSTRAD] Added support for ROM carts [Miodrag Milanovic]
+
 
 User Interface Changes:
 -----------------------
