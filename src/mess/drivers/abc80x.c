@@ -10,7 +10,6 @@
     CPU:            Z80 @ 3 MHz
     ROM:            32 KB
     RAM:            16 KB, 1 KB frame buffer, 16 KB high-resolution videoram (800C/HR)
-    CRTC:           6845
     Resolution:     240x240
     Colors:         8
 
@@ -55,11 +54,8 @@
 
     TODO:
 
-	- CTC interrupt breaks ABC802/806
-	- bit level accurate Z80 DART (keyboard)
-	- bit level accurate Z80 SIO/2 (cassette)
+	- bit accurate Z80 SIO/2 (cassette)
     - floppy controller board
-    - Facit DTC (recased ABC-800?)
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
 */
@@ -80,6 +76,7 @@
 #include "machine/e0516.h"
 #include "machine/abc77.h"
 #include "video/mc6845.h"
+#include "sound/discrete.h"
 
 /* Devices */
 #include "devices/basicdsk.h"
@@ -90,6 +87,13 @@ static const device_config *cassette_device_image(running_machine *machine)
 {
 	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
+
+/* Discrete Sound */
+
+DISCRETE_SOUND_START( abc800 )
+	DISCRETE_INPUT_LOGIC(NODE_01)
+	DISCRETE_OUTPUT(NODE_01, 5000)
+DISCRETE_SOUND_END
 
 /* Keyboard HACK */
 
@@ -202,13 +206,23 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 /* Read/Write Handlers */
 
-// ABC 800
-
-static WRITE8_HANDLER( abc800_ram_ctrl_w )
+static void abc800_bankswitch(running_machine *machine)
 {
-}
+	abc800_state *state = machine->driver_data;
+	
+	if (state->fetch_charram)
+	{
+		/* HR video RAM selected */
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
+	}
+	else
+	{
+		/* BASIC ROM selected */
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	}
 
-// ABC 802
+	memory_set_bank(1, state->fetch_charram);
+}
 
 static void abc802_bankswitch(running_machine *machine)
 {
@@ -228,8 +242,6 @@ static void abc802_bankswitch(running_machine *machine)
 
 	memory_set_bank(1, state->lrs);
 }
-
-// ABC 806
 
 static void abc806_bankswitch(running_machine *machine)
 {
@@ -428,42 +440,28 @@ static WRITE8_DEVICE_HANDLER( sio2_w )
 	}
 }
 
-// Z80 DART (SIO/0)
+/* Pling */
 
-static READ8_DEVICE_HANDLER( dart_r )
+static READ8_HANDLER( abc800_pling_r )
 {
-	switch (offset)
-	{
-	case 0:
-		return z80dart_d_r(device, 0);
-	case 1:
-		return z80dart_c_r(device, 0);
-	case 2:
-		return z80dart_d_r(device, 1);
-	case 3:
-		return z80dart_c_r(device, 1);
-	}
+	abc800_state *state = machine->driver_data;
+
+	state->pling = !state->pling;
+
+	discrete_sound_w(machine, NODE_01, state->pling);
 
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( dart_w )
+static READ8_HANDLER( abc802_pling_r )
 {
-	switch (offset)
-	{
-	case 0:
-		z80dart_d_w(device, 0, data);
-		break;
-	case 1:
-		z80dart_c_w(device, 0, data);
-		break;
-	case 2:
-		z80dart_d_w(device, 1, data);
-		break;
-	case 3:
-		z80dart_c_w(device, 1, data);
-		break;
-	}
+	abc802_state *state = machine->driver_data;
+
+	state->pling = !state->pling;
+
+	discrete_sound_w(machine, NODE_01, state->pling);
+
+	return 0xff;
 }
 
 /* Memory Maps */
@@ -484,17 +482,15 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
-//	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(pling_r)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800m_hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800m_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
-	AM_RANGE(0x30, 0x32) AM_WRITE(abc800_ram_ctrl_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
 // ABC 800C
@@ -514,17 +510,12 @@ static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
-//	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(pling_r)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800m_hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800m_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
-	AM_RANGE(0x30, 0x32) AM_WRITE(abc800_ram_ctrl_w)
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
 // ABC 802
@@ -541,15 +532,14 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x08) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0x08) AM_WRITE(abcbus_command_w)
-//	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_READ(pling_r)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_READ(abc802_pling_r)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x08) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
 // ABC 806
@@ -576,13 +566,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff1f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff18) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(abc806_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_MASK(0xff00) AM_READWRITE(abcbus_reset_r, abc806_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, dart_r, dart_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_mai_r, abc806_mao_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(abc806_ami_r, abc806_amo_w)
@@ -591,8 +580,7 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff7f) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -729,6 +717,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc802 )
 	PORT_INCLUDE(abc800)
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Clear Screen Time Out" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "Characters Per Line" )
+	PORT_CONFSETTING(    0x00, "40" )
+	PORT_CONFSETTING(    0x04, "80" )
+	PORT_CONFNAME( 0x08, 0x08, "Frame Frequency" )
+	PORT_CONFSETTING(    0x00, "60 Hz" )
+	PORT_CONFSETTING(    0x08, "50 Hz" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc806 )
@@ -965,9 +967,9 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 	dart_interrupt,			/* interrupt handler */
 	abc800_dart_rxd_r,		/* receive handler */
 	abc800_dart_txd_w,		/* transmit handler */
-	0,						/* DTR changed handler */
-	0,						/* RTS changed handler */
-	0						/* W/RDY changed handler */
+	NULL,					/* DTR changed handler */
+	NULL,					/* RTS changed handler */
+	NULL					/* W/RDY changed handler */
 };
 
 static Z80DART_RXD_READ( abc802_dart_rxd_r )
@@ -1030,7 +1032,7 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 	abc802_dart_txd_w,		/* transmit handler */
 	abc802_dart_dtr_w,		/* DTR changed handler */
 	abc802_dart_rts_w,		/* RTS changed handler */
-	0						/* W/RDY changed handler */
+	NULL					/* W/RDY changed handler */
 };
 
 static Z80DART_RXD_READ( abc806_dart_rxd_r )
@@ -1078,8 +1080,8 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 	abc806_dart_rxd_r,		/* receive handler */
 	abc806_dart_txd_w,		/* transmit handler */
 	abc806_dart_dtr_w,		/* DTR changed handler */
-	0,						/* RTS changed handler */
-	0						/* W/RDY changed handler */
+	NULL,					/* RTS changed handler */
+	NULL					/* W/RDY changed handler */
 };
 
 /* E05-16 */
@@ -1123,7 +1125,7 @@ static MACHINE_START( abc800 )
 static MACHINE_RESET( abc800 )
 {
 	/* memory banking */
-	memory_set_bank(1, 0);
+	abc800_bankswitch(machine);
 }
 
 static MACHINE_START( abc802 )
@@ -1147,20 +1149,22 @@ static MACHINE_RESET( abc802 )
 {
 	abc802_state *state = machine->driver_data;
 
+	UINT8 config = input_port_read(machine, "CONFIG");
+
 	/* memory banking */
 	memory_set_bank(1, 1);
 
 	/* clear screen time out (S1) */
-	z80sio_set_dcd(state->z80sio, 1, 0);
+	z80sio_set_dcd(state->z80sio, 1, BIT(config, 0));
 
 	/* unknown (S2) */
-	z80sio_set_cts(state->z80sio, 1, 0);
+	z80sio_set_cts(state->z80sio, 1, BIT(config, 1));
 
 	/* 40/80 char (S3) */
-	z80dart_ri_w(state->z80dart, Z80DART_CH_A, 1); // 0 = 40, 1 = 80
+	z80dart_ri_w(state->z80dart, Z80DART_CH_A, BIT(config, 2)); // 0 = 40, 1 = 80
 
 	/* 50/60 Hz */
-	z80dart_cts_w(state->z80dart, Z80DART_CH_B, 0); // 0 = 50Hz, 1 = 60Hz ???
+	z80dart_cts_w(state->z80dart, Z80DART_CH_B, BIT(config, 3)); // 0 = 50Hz, 1 = 60Hz
 }
 
 static MACHINE_START( abc806 )
@@ -1247,6 +1251,12 @@ static MACHINE_DRIVER_START( abc800m )
 	/* Z80 DART */
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc800_dart_intf)
 
+	/* discrete sound */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(abc800)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
@@ -1285,6 +1295,12 @@ static MACHINE_DRIVER_START( abc800c )
 	/* Z80 DART */
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc800_dart_intf)
 
+	/* discrete sound */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(abc800)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
@@ -1322,6 +1338,12 @@ static MACHINE_DRIVER_START( abc802 )
 
 	/* Z80 DART */
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc802_dart_intf)
+
+	/* discrete sound */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(abc800)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1416,8 +1438,11 @@ ROM_START( abc800m )
 	ROM_LOAD( "abc6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
 	ROM_LOAD( "abc7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 
-	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
+
+	ROM_REGION( 0x200, "fgctl", 0 )
+	ROM_LOAD( "fgctl.bin", 0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) ) // typed in
 
 	ROM_REGION( 0x2000, "user1", 0 )
 	// Fast Controller
@@ -1595,10 +1620,25 @@ SYSTEM_CONFIG_END
 
 static OPBASE_HANDLER( abc800_opbase_handler )
 {
+	abc800_state *state = machine->driver_data;
+
 	if (address >= 0x7800 && address < 0x8000)
 	{
 		opbase->rom = opbase->ram = memory_region(machine, Z80_TAG);
+
+		if (!state->fetch_charram)
+		{
+			state->fetch_charram = 1;
+			abc800_bankswitch(machine);
+		}
+
 		return ~0;
+	}
+
+	if (state->fetch_charram)
+	{
+		state->fetch_charram = 0;
+		abc800_bankswitch(machine);
 	}
 
 	return address;
@@ -1669,7 +1709,7 @@ static DRIVER_INIT( abc806 )
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
-COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C", GAME_NOT_WORKING )
+COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
 COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc802, "Luxor Datorer AB", "ABC 802",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc806, "Luxor Datorer AB", "ABC 806",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

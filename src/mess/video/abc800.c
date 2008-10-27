@@ -8,11 +8,7 @@
 
 	TODO:
 
-	- add proper screen parameters to startup
-	- abc800m high resolution (HR)
-	- abc800c row update
-	- abc800c palette
-	- abc800c high resolution (HR)
+	- abc800c
 
 */
 
@@ -42,7 +38,13 @@ WRITE8_HANDLER( abc800_charram_w )
 static PALETTE_INIT( abc800m )
 {
 	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine, 1, 0xff, 0xff, 0x00); // yellow (really white, but blue signal is disconnected from monitor)
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff); // blue
+	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00); // red
+	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff); // magenta
+	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00); // green
+	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff); // cyan
+	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00); // yellow
+	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
 }
 
 static PALETTE_INIT( abc800c )
@@ -59,20 +61,18 @@ static PALETTE_INIT( abc800c )
 
 /* External Interface */
 
-WRITE8_HANDLER( abc800m_hrs_w )
+WRITE8_HANDLER( abc800_hrs_w )
 {
+	abc800_state *state = machine->driver_data;
+
+	state->hrs = data;
 }
 
-WRITE8_HANDLER( abc800m_hrc_w )
+WRITE8_HANDLER( abc800_hrc_w )
 {
-}
+	abc800_state *state = machine->driver_data;
 
-WRITE8_HANDLER( abc800c_hrs_w )
-{
-}
-
-WRITE8_HANDLER( abc800c_hrc_w )
-{
+	state->fgctl = data;
 }
 
 /* MC6845 Row Update */
@@ -100,9 +100,11 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
 			int x = (column * ABC800_CHAR_WIDTH) + bit;
-			int color = BIT(data, 7);
 
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			if (BIT(data, 7))
+			{
+				*BITMAP_ADDR16(bitmap, y, x) = 7;
+			}
 
 			data <<= 1;
 		}
@@ -114,10 +116,6 @@ static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
 	abc800_state *state = device->machine->driver_data;
 
 	z80dart_ri_w(state->z80dart, 1, vsync);
-}
-
-static MC6845_UPDATE_ROW( abc800c_update_row )
-{
 }
 
 /* MC6845 Interfaces */
@@ -134,17 +132,42 @@ static const mc6845_interface abc800m_mc6845_interface = {
 	abc800_vsync_changed
 };
 
-static const mc6845_interface abc800c_mc6845_interface = {
-	SCREEN_TAG,
-	ABC800_CCLK,
-	ABC800_CHAR_WIDTH,
-	NULL,
-	abc800c_update_row,
-	NULL,
-	NULL,
-	NULL,
-	abc800_vsync_changed
-};
+/* ABC 800 C */
+
+static void abc800c_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+}
+
+/* HR */
+
+static void abc800_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	abc800_state *state = machine->driver_data;
+
+	UINT16 addr = 0;
+	int sx, y, dot;
+
+	for (y = state->hrs; y < MIN(cliprect->max_y + 1, state->hrs + 240); y++)
+	{
+		int x = 0;
+
+		for (sx = 0; sx < 64; sx++)
+		{
+			UINT8 data = state->videoram[addr++];
+
+			for (dot = 0; dot < 4; dot++)
+			{
+				UINT16 fgctl_addr = ((state->fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
+				int color = state->fgctl_prom[fgctl_addr] & 0x07;
+
+				*BITMAP_ADDR16(bitmap, y, x++) = color;
+				*BITMAP_ADDR16(bitmap, y, x++) = color;
+
+				data <<= 2;
+			}
+		}
+	}
+}
 
 /* Video Start */
 
@@ -163,12 +186,14 @@ static VIDEO_START( abc800m )
 	/* find memory regions */
 
 	state->char_rom = memory_region(machine, "chargen");
+	state->fgctl_prom = memory_region(machine, "fgctl");
 
 	/* register for state saving */
 
 	state_save_register_global_pointer(state->charram, ABC800M_CHAR_RAM_SIZE);
 	state_save_register_global_pointer(state->videoram, ABC800_VIDEO_RAM_SIZE);
 
+	state_save_register_global(state->hrs);
 	state_save_register_global(state->fgctl);
 }
 
@@ -180,19 +205,17 @@ static VIDEO_START( abc800c )
 
 	state->charram = auto_malloc(ABC800C_CHAR_RAM_SIZE);
 
-	/* find devices */
-
-	state->mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
-
 	/* find memory regions */
 
 	state->char_rom = memory_region(machine, "chargen");
+	state->fgctl_prom = memory_region(machine, "fgctl");
 
 	/* register for state saving */
 
-	state_save_register_global_pointer(state->charram, ABC800M_CHAR_RAM_SIZE);
+	state_save_register_global_pointer(state->charram, ABC800C_CHAR_RAM_SIZE);
 	state_save_register_global_pointer(state->videoram, ABC800_VIDEO_RAM_SIZE);
 
+	state_save_register_global(state->hrs);
 	state_save_register_global(state->fgctl);
 }
 
@@ -201,8 +224,18 @@ static VIDEO_START( abc800c )
 static VIDEO_UPDATE( abc800m )
 {
 	abc800_state *state = screen->machine->driver_data;
+
+	/* clear screen */
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+
+	/* draw HR graphics */
+	abc800_hr_update(screen->machine, bitmap, cliprect);
 	
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	if (!BIT(state->fgctl, 7))
+	{
+		/* draw text */
+		mc6845_update(state->mc6845, bitmap, cliprect);
+	}
 	
 	return 0;
 }
@@ -210,8 +243,18 @@ static VIDEO_UPDATE( abc800m )
 static VIDEO_UPDATE( abc800c )
 {
 	abc800_state *state = screen->machine->driver_data;
+
+	/* clear screen */
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+
+	/* draw HR graphics */
+	abc800_hr_update(screen->machine, bitmap, cliprect);
 	
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	if (!BIT(state->fgctl, 7))
+	{
+		/* draw text */
+		abc800c_update(screen->machine, bitmap, cliprect);
+	}
 	
 	return 0;
 }
@@ -219,11 +262,9 @@ static VIDEO_UPDATE( abc800c )
 /* Machine Drivers */
 
 MACHINE_DRIVER_START( abc800m_video )
-	// device interface
 	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
 	MDRV_DEVICE_CONFIG(abc800m_mc6845_interface)
 
-	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -232,7 +273,7 @@ MACHINE_DRIVER_START( abc800m_video )
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(abc800m)
 	MDRV_VIDEO_START(abc800m)
@@ -240,11 +281,6 @@ MACHINE_DRIVER_START( abc800m_video )
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( abc800c_video )
-	// device interface
-	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
-	MDRV_DEVICE_CONFIG(abc800c_mc6845_interface)
-
-	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -253,7 +289,7 @@ MACHINE_DRIVER_START( abc800c_video )
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(abc800c)
 	MDRV_VIDEO_START(abc800c)

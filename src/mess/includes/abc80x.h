@@ -18,7 +18,7 @@
 
 #define ABC800C_CHAR_RAM_SIZE	0x400
 #define ABC800M_CHAR_RAM_SIZE	0x800
-#define ABC800_VIDEO_RAM_SIZE	0x1000
+#define ABC800_VIDEO_RAM_SIZE	0x4000
 #define ABC802_CHAR_RAM_SIZE	0x800
 #define ABC806_CHAR_RAM_SIZE	0x800
 #define ABC806_ATTR_RAM_SIZE	0x800
@@ -39,13 +39,18 @@ typedef struct _abc800_state abc800_state;
 struct _abc800_state
 {
 	/* keyboard state */
-	int abc77_txd;			/* ABC-77 transmit data */
+	int abc77_txd;				/* ABC-77 transmit data */
 	
 	/* video state */
-	UINT8 *charram;			/* character RAM */
-	UINT8 *videoram;		/* HR video RAM */
+	UINT8 *charram;				/* character RAM */
+	UINT8 *videoram;			/* HR video RAM */
 
-	UINT8 fgctl;			/* HR foreground control */
+	UINT8 hrs;					/* HR picture start scanline */
+	UINT8 fgctl;				/* HR foreground control */
+	int fetch_charram;			/* opcode fetched from character RAM region (0x7800-0x7fff) */
+
+	/* sound state */
+	int pling;					/* pling */
 
 	/* devices */
 	const device_config *z80ctc;
@@ -55,7 +60,8 @@ struct _abc800_state
 	const device_config *mc6845;
 
 	/* memory regions */
-	const UINT8 *char_rom;	/* character generator ROM */
+	const UINT8 *char_rom;		/* character generator ROM */
+	const UINT8 *fgctl_prom;	/* foreground control PROM */
 };
 
 typedef struct _abc802_state abc802_state;
@@ -73,6 +79,9 @@ struct _abc802_state
 	int flshclk_ctr;		/* flash clock counter */
 	int flshclk;			/* flash clock */
 	int mux80_40;			/* 40/80 column mode */
+
+	/* sound state */
+	int pling;					/* pling */
 
 	/* devices */
 	const device_config *z80ctc;
@@ -135,11 +144,8 @@ struct _abc806_state
 READ8_HANDLER( abc800_charram_r );
 WRITE8_HANDLER( abc800_charram_w );
 
-WRITE8_HANDLER( abc800m_hrs_w );
-WRITE8_HANDLER( abc800m_hrc_w );
-
-WRITE8_HANDLER( abc800c_hrs_w );
-WRITE8_HANDLER( abc800c_hrc_w );
+WRITE8_HANDLER( abc800_hrs_w );
+WRITE8_HANDLER( abc800_hrc_w );
 
 MACHINE_DRIVER_EXTERN(abc800m_video);
 MACHINE_DRIVER_EXTERN(abc800c_video);
