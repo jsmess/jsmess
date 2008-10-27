@@ -617,7 +617,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 
 	static unsigned char repeat_timer;
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
-	static char last_key_pressed = -1;
+	static UINT8 last_key_pressed = 0x80;
 	static modifier_state_t last_modifier_state;
 
 	UINT16 key_buf[6];
@@ -655,7 +655,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 		/* reset REPEAT timer if the REPEAT key is not pressed */
 		repeat_timer = 0;
 
-	if ((last_key_pressed >= 0) && (key_buf[last_key_pressed >> 4] & (1 << (last_key_pressed & 0xf))))
+	if ( ! (last_key_pressed & 0x80) && (key_buf[last_key_pressed >> 4] & (1 << (last_key_pressed & 0xf))))
 	{
 		/* last key has not been released */
 		if (modifier_state == last_modifier_state)
@@ -684,7 +684,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 	}
 	else
 	{
-		last_key_pressed = -1;
+		last_key_pressed = 0x80;
 
 		if (asr[unit].status & AS_rrq_mask)
 		{	/* keyboard buffer full */
@@ -701,7 +701,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 						last_key_pressed = (i << 4) | j;
 						last_modifier_state = modifier_state;
 
-						asr[unit].recv_buf = (int)key_translate[modifier_state][(int)last_key_pressed];
+						asr[unit].recv_buf = (int)key_translate[modifier_state][last_key_pressed];
 						asr[unit].status |= AS_rrq_mask;
 						asr[unit].new_status_flag = 1;	/* right??? */
 						asr_field_interrupt(unit);
