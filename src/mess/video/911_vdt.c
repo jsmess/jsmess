@@ -567,7 +567,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 
 	static unsigned char repeat_timer;
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
-	static char last_key_pressed = -1;
+	static UINT8 last_key_pressed = 0x80;
 	static modifier_state_t last_modifier_state;
 	static char foreign_mode;
 
@@ -634,7 +634,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 		/* reset REPEAT timer if the REPEAT key is not pressed */
 		repeat_timer = 0;
 
-	if ((last_key_pressed >= 0) && (key_buf[last_key_pressed >> 4] & (1 << (last_key_pressed & 0xf))))
+	if (! (last_key_pressed & 0x80) && (key_buf[last_key_pressed >> 4] & (1 << (last_key_pressed & 0xf))))
 	{
 		/* last key has not been released */
 		if (modifier_state == last_modifier_state)
@@ -661,7 +661,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 	}
 	else
 	{
-		last_key_pressed = -1;
+		last_key_pressed = 0x80;
 
 		if (vdt[unit].keyboard_data_ready)
 		{	/* keyboard buffer full */
@@ -678,7 +678,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 						last_key_pressed = (i << 4) | j;
 						last_modifier_state = modifier_state;
 
-						vdt[unit].keyboard_data = (int)key_translate[vdt[unit].model][modifier_state][(int)last_key_pressed];
+						vdt[unit].keyboard_data = (int)key_translate[vdt[unit].model][modifier_state][last_key_pressed];
 						vdt[unit].keyboard_data_ready = 1;
 						if (vdt[unit].keyboard_interrupt_enable)
 							(*vdt[unit].int_callback)(1);
