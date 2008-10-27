@@ -28,7 +28,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define LOGERROR if (VERBOSE) logerror
 
@@ -1094,8 +1094,6 @@ void z80dart_ri_w(const device_config *device, int channel, int state)
 				ch->rx_rr0_latch = 1;
 			}
 		}
-
-		logerror("PERKLE %u", ch->rr[0]);
 	}
 }
 
