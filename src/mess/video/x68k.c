@@ -183,10 +183,12 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 	if(visiblescr.min_y < 0)
 		visiblescr.min_y = 0;
 	if(visiblescr.max_x >= scr.max_x)
-		visiblescr.max_x = scr.max_x - 1;
+		visiblescr.max_x = scr.max_x - 2;
 	if(visiblescr.max_y >= scr.max_y)
-		visiblescr.max_y = scr.max_y - 1;
+		visiblescr.max_y = scr.max_y - 2;
 
+	logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",sys.crtc.reg[0],sys.crtc.reg[1],sys.crtc.reg[2],sys.crtc.reg[3],
+		sys.crtc.reg[4],sys.crtc.reg[5],sys.crtc.reg[6],sys.crtc.reg[7],sys.crtc.reg[8],sys.crtc.reg[9]);
 	logerror("video_screen_configure(machine->primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
 	video_screen_configure(machine->primary_screen,scr.max_x,scr.max_y,&visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
@@ -206,8 +208,8 @@ TIMER_CALLBACK(x68k_hsync)
 			{
 				int scan = video_screen_get_vpos(machine->primary_screen);
 				if(scan > sys.crtc.vend)
-					scan = 0;
-				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hend);
+					scan = sys.crtc.vbegin;
+				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan,(sys.crtc.htotal + sys.crtc.hend) / 2);
 				timer_adjust_oneshot(scanline_timer, hsync_time, 0);
 				if(scan != 0)
 				{
@@ -221,7 +223,7 @@ TIMER_CALLBACK(x68k_hsync)
 			{
 				int scan = video_screen_get_vpos(machine->primary_screen);
 				if(scan > sys.crtc.vend)
-					scan = 0;
+					scan = sys.crtc.vbegin;
 				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hend / 2);
 				timer_adjust_oneshot(scanline_timer, hsync_time, 0);
 				if(scan != 0)
@@ -237,13 +239,18 @@ TIMER_CALLBACK(x68k_hsync)
 		{
 			if(oddscanline == 1)
 			{
-				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen)+1,sys.crtc.hbegin);
+				int scan = video_screen_get_vpos(machine->primary_screen); 
+				if(scan > sys.crtc.vend)
+					scan = sys.crtc.vbegin;
+				else
+					scan++;
+				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hbegin / 2);
 				timer_adjust_oneshot(scanline_timer, hsync_time, 1);
 				oddscanline = 0;
 			}
 			else
 			{
-				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen),sys.crtc.hbegin + (sys.crtc.hend / 2));
+				hsync_time = video_screen_get_time_until_pos(machine->primary_screen,video_screen_get_vpos(machine->primary_screen),(sys.crtc.htotal + sys.crtc.hbegin) / 2);
 				timer_adjust_oneshot(scanline_timer, hsync_time, 1);
 				oddscanline = 1;
 			}
@@ -294,7 +301,6 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 		{
 			video_screen_update_partial(machine->primary_screen,scan);
 		}
-	
 		irq_time = video_screen_get_time_until_pos(machine->primary_screen,scan,2);
 		// end of HBlank period clears GPIP6 also?
 		end_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hbegin);

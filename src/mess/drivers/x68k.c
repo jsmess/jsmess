@@ -109,7 +109,7 @@
       Pacmania:      Black squares on the maze (transparency?).
       Salamander:    System error when using keys in-game.  No error if a joystick is used.
       Kyukyoku Tiger:Sprites offset by a looooong way.
-      Dragon Buster: Text is black and unreadable (text palette should be loaded from disk, but it reads all zeroes).
+      Dragon Buster: Text is black and unreadable.
       Baraduke:      Locks up on demo mode.
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
