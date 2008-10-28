@@ -203,7 +203,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 		{
 			for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 			{
-				int x = (column * ABC800_CHAR_WIDTH) + bit;
+				int x = ((column + 3) * ABC800_CHAR_WIDTH) + bit; // DEN+3
 				int color = BIT(data, 7) ^ BIT(code, 7);
 
 				*BITMAP_ADDR16(bitmap, y, x) = color;
@@ -215,7 +215,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 		{
 			for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 			{
-				int x = (column * ABC800_CHAR_WIDTH) + (bit << 1);
+				int x = ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1); // DEN+3
 				int color = BIT(data, 7) ^ BIT(code, 7);
 
 				*BITMAP_ADDR16(bitmap, y, x) = color;

@@ -8,11 +8,7 @@
 
 	TODO:
 
-	- selection between 512x240, 256x240, and 240x240 HR modes
-	- add proper screen parameters to startup
-	- palette configuration from PAL/PROM
-	- vertical sync delay in picture
-	- horizontal positioning of the text and HR screens
+	- PRINT GRN "ABC" RED "800" does not give colors
 	- protection device @ 16H
 	
 */
@@ -28,11 +24,11 @@
 static PALETTE_INIT( abc806 )
 {
 	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff); // blue
-	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00); // red
-	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff); // magenta
-	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff); // cyan
+	palette_set_color_rgb(machine, 1, 0xff, 0x00, 0x00); // red
+	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); // green
+	palette_set_color_rgb(machine, 3, 0x00, 0xff, 0xff); // cyan
+	palette_set_color_rgb(machine, 4, 0x00, 0x00, 0xff); // blue
+	palette_set_color_rgb(machine, 5, 0xff, 0x00, 0xff); // magenta
 	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00); // yellow
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
 }
@@ -69,7 +65,7 @@ WRITE8_HANDLER( abc806_hrc_w )
 
 	int reg = (offset >> 8) & 0x0f;
 
-	state->hrc[reg] = data & 0x0f;
+	state->hrc[reg] = data;
 }
 
 /* Character Memory */
@@ -224,15 +220,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	int bg_color = 0;
 	int underline = 0;
 	int flash = 0;
-	int e5 = 0;
-	int e6 = 0;
+	int e5 = state->_40;
+	int e6 = state->_40;
 	int th = 0;
 
-	if (state->_40)
-	{
-		e5 = 1;
-		e6 = 1;
-	}
+	y += state->sync;
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -287,8 +279,8 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 			bg_color = (attr >> 3) & 0x07;
 			underline = BIT(attr, 6);
 			flash = BIT(attr, 7);
-			e5 = state->_40 ? 1 : 0;
-			e6 = state->_40 ? 1 : 0;
+			e5 = state->_40;
+			e6 = state->_40;
 		}
 
 		if (column == cursor_x)
@@ -305,16 +297,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 
 		chargen_addr = (th << 12) | (data << 4) | rad_data;
 		chargen_data = state->char_rom[chargen_addr & 0xfff] << 2;
-		x = column * ABC800_CHAR_WIDTH;
+		x = (column + 4) * ABC800_CHAR_WIDTH;
 
 		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
-
-			if (state->txoff)
-			{
-				color = 0;
-			}
 
 			*BITMAP_ADDR16(bitmap, y, x++) = color;
 
@@ -410,53 +397,35 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 	UINT16 addr = (state->hrs & 0x03) << 14;
 	int sx, y, dot;
 
-	for (y = 0; y < 240; y++)
+	for (y = state->sync; y < MIN(cliprect->max_y + 1, state->sync + 240); y++)
 	{
-		/* 240x240 */
-		for (sx = 0; sx < 60; sx++)
+		int x = (ABC800_CHAR_WIDTH * 4) - 16;
+
+		for (sx = 0; sx < 32; sx++)
 		{
-			UINT16 data = (state->videoram[addr++] << 8) | state->videoram[addr++];
-
-			for (dot = 0; dot < 4; dot++)
-			{
-				int color = state->hrc[(data >> 12) & 0x0f]; // TODO get colors from HRU II prom
-				int x = (sx << 3) | (dot << 1);
-
-				*BITMAP_ADDR16(bitmap, y, x) = color;
-				*BITMAP_ADDR16(bitmap, y, x + 1) = color;
-
-				data <<= 4;
-			}
-		}
-
-		/* 256x240 */
-		for (sx = 0; sx < 64; sx++)
-		{
-			UINT16 data = (state->videoram[addr++] << 8) | state->videoram[addr++];
-
-			for (dot = 0; dot < 4; dot++)
-			{
-				int color = state->hrc[(data >> 12) & 0x0f];
-				int x = (sx << 3) | (dot << 1);
-
-				*BITMAP_ADDR16(bitmap, y, x) = color;
-				*BITMAP_ADDR16(bitmap, y, x + 1) = color;
-
-				data <<= 4;
-			}
-		}
-
-		/* 512x240 */
-		for (sx = 0; sx < 64; sx++)
-		{
-			UINT16 data = (state->videoram[addr++] << 8) | state->videoram[addr++];
+			UINT32 data = (state->videoram[addr++] << 24) | (state->videoram[addr++] << 16) | (state->videoram[addr++] << 8) | state->videoram[addr++];
 
 			for (dot = 0; dot < 8; dot++)
 			{
-				int color = (data >> 14) & 0x03;
-				int x = (sx << 3) | dot;
+				UINT8 hrc = state->hrc[(data >> 28) & 0x0f];
 
-				*BITMAP_ADDR16(bitmap, y, x) = color;
+				int dot1 = hrc >> 4;
+				int dot2 = hrc & 0x0f;
+				int tx_color = *BITMAP_ADDR16(bitmap, y, x);
+
+				if (BIT(dot1, 3) || tx_color == 0)
+				{
+					*BITMAP_ADDR16(bitmap, y, x) = dot1 & 0x07;
+				}
+				
+				x++;
+
+				if (BIT(dot2, 3) || tx_color == 0)
+				{
+					*BITMAP_ADDR16(bitmap, y, x) = dot2 & 0x07;
+				}
+				
+				x++;
 
 				data <<= 4;
 			}
@@ -482,6 +451,7 @@ static VIDEO_START(abc806)
 	state->sync = 10;
 	state->d_vsync = 1;
 	state->vsync = 1;
+	state->_40 = 1;
 
 	/* find devices */
 
@@ -526,8 +496,17 @@ static VIDEO_UPDATE( abc806 )
 {
 	abc806_state *state = screen->machine->driver_data;
 	
+	/* clear screen */
+	fillbitmap(bitmap, 0, cliprect);
+	
+	if (!state->txoff)
+	{
+		/* draw text */
+		mc6845_update(state->mc6845, bitmap, cliprect);
+	}
+
+	/* draw HR graphics */
 	abc806_hr_update(screen->machine, bitmap, cliprect);
-	mc6845_update(state->mc6845, bitmap, cliprect);
 	
 	return 0;
 }
