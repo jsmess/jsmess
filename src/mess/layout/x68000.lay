@@ -88,7 +88,7 @@
 			<bounds left="20" right="34" top="241" bottom="255" />
 		</bezel>
 		<screen index="0">
-			<bounds left="61" right="1084" top="0" bottom="1023" />
+			<bounds left="61" right="1084" top="0" bottom="767" />
 		</screen>
 	</view>
 
