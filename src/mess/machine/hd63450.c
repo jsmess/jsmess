@@ -377,7 +377,6 @@ void hd63450_single_transfer(const device_config* device, int x)
 				}
 				timer_adjust_oneshot(dmac->timer[x], attotime_zero, 0);
 				dmac->in_progress[x] = 0;
-				dmac->reg[x].mtc = dmac->transfer_size[x];
 				dmac->reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete
 				dmac->reg[x].csr &= ~0x08;  // channel no longer active
 				if((dmac->reg[x].dcr & 0xc0) == 0x00)  // Burst transfer
