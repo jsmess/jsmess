@@ -204,7 +204,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 	scan_keyboard(timer->machine);
 }
 
-/* Read/Write Handlers */
+/* Memory Banking */
 
 static void abc800_bankswitch(running_machine *machine)
 {
@@ -252,7 +252,7 @@ static void abc806_bankswitch(running_machine *machine)
 	{
 		/* 32K block mapping */
 
-		UINT16 videoram_offset = ((state->hrs >> 4) & 0x02) << 14;
+		UINT32 videoram_offset = (state->hrs & 0xf0) << 10;
 		int videoram_bank = videoram_offset / 0x1000;
 
 		for (bank = 1; bank <= 8; bank++)
@@ -296,7 +296,7 @@ static void abc806_bankswitch(running_machine *machine)
 			if (BIT(map, 7) && state->eme)
 			{
 				/* map to video RAM */
-				int videoram_bank = map & 0x1f;
+				int videoram_bank = map & state->map_mask;
 
 				//logerror("%04x-%04x: Video RAM bank %u (4K)\n", start_addr, end_addr, videoram_bank);
 
@@ -340,7 +340,7 @@ static void abc806_bankswitch(running_machine *machine)
 
 	if (state->fetch_charram)
 	{
-		UINT16 videoram_offset = ((state->hrs >> 4) & 0x02) << 14;
+		UINT32 videoram_offset = (state->hrs & 0xf0) << 10;
 		int videoram_bank = videoram_offset / 0x1000;
 
 		for (bank = 1; bank <= 8; bank++)
@@ -402,7 +402,7 @@ static WRITE8_HANDLER( abc806_mao_w )
 	abc806_bankswitch(machine);
 }
 
-// Z80 SIO/2
+/* Z80 SIO/2 */
 
 static READ8_DEVICE_HANDLER( sio2_r )
 {
@@ -585,7 +585,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_PORTS_START( abc800 )
+static INPUT_PORTS_START( fake_keyboard )
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -665,7 +665,52 @@ static INPUT_PORTS_START( abc800 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( abc800 )
+	//PORT_INCLUDE(abc77)
+	PORT_INCLUDE(fake_keyboard)
+
+	PORT_START("SB")
+	PORT_DIPNAME( 0xff, 0xaa, "Serial Communications" ) PORT_DIPLOCATION("SB:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0xaa, "Asynchronous, Single Speed" )
+	PORT_DIPSETTING(    0x2e, "Asynchronous, Split Speed" )
+	PORT_DIPSETTING(    0x50, "Synchronous" )
+	PORT_DIPSETTING(    0x8b, "ABC NET" )
+
+	PORT_START("FLOPPY")
+	PORT_CONFNAME( 0x07, 0x00, "Floppy Drive" )
+	PORT_CONFSETTING(    0x00, "ABC 830 (160KB)" )
+	PORT_CONFSETTING(    0x01, "ABC 832/834 (640KB)" )
+	PORT_CONFSETTING(    0x02, "ABC 838 (1MB)" )
+	PORT_CONFSETTING(    0x03, "ABC 850 (640KB/HDD 10MB)" )
+	PORT_CONFSETTING(    0x04, "ABC 852 (640KB/HDD 20MB)" )
+	PORT_CONFSETTING(    0x05, "ABC 856 (640KB/HDD 64MB)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( abc802 )
+	PORT_INCLUDE(abc800)
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Clear Screen Time Out" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "Characters Per Line" )
+	PORT_CONFSETTING(    0x00, "40" )
+	PORT_CONFSETTING(    0x04, "80" )
+	PORT_CONFNAME( 0x08, 0x08, "Frame Frequency" )
+	PORT_CONFSETTING(    0x00, "60 Hz" )
+	PORT_CONFSETTING(    0x08, "50 Hz" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( abc806 )
+	PORT_INCLUDE(abc800)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( luxor_55_21046 )
 	PORT_START("SW1")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
 	PORT_DIPNAME( 0x05, 0x00, "Drive 0" ) PORT_DIPLOCATION("SW1:1,3") PORT_CONDITION("SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
@@ -706,35 +751,6 @@ static INPUT_PORTS_START( abc800 )
 	PORT_DIPSETTING(    0x2c, "ABC 832/834/850" )
 	PORT_DIPSETTING(    0x2d, "ABC 830" )
 	PORT_DIPSETTING(    0x2e, "ABC 838" )
-
-	PORT_START("SB")
-	PORT_DIPNAME( 0xff, 0xaa, "Serial Communications" ) PORT_DIPLOCATION("SB:1,2,3,4,5,6,7,8")
-	PORT_DIPSETTING(    0xaa, "Asynchronous, Single Speed" )
-	PORT_DIPSETTING(    0x2e, "Asynchronous, Split Speed" )
-	PORT_DIPSETTING(    0x50, "Synchronous" )
-	PORT_DIPSETTING(    0x8b, "ABC NET" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( abc802 )
-	PORT_INCLUDE(abc800)
-
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Clear Screen Time Out" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Characters Per Line" )
-	PORT_CONFSETTING(    0x00, "40" )
-	PORT_CONFSETTING(    0x04, "80" )
-	PORT_CONFNAME( 0x08, 0x08, "Frame Frequency" )
-	PORT_CONFSETTING(    0x00, "60 Hz" )
-	PORT_CONFSETTING(    0x08, "50 Hz" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( abc806 )
-	PORT_INCLUDE(abc800)
 INPUT_PORTS_END
 
 /* ABC 77 */
@@ -1120,6 +1136,12 @@ static MACHINE_START( abc800 )
 
 	memory_configure_bank(1, 0, 1, memory_region(machine, Z80_TAG), 0);
 	memory_configure_bank(1, 1, 1, state->videoram, 0);
+
+	/* register for state saving */
+
+	state_save_register_global(state->fetch_charram);
+	state_save_register_global(state->abc77_txd);
+	state_save_register_global(state->pling);
 }
 
 static MACHINE_RESET( abc800 )
@@ -1143,6 +1165,12 @@ static MACHINE_START( abc802 )
 
 	memory_configure_bank(1, 0, 1, mess_ram, 0);
 	memory_configure_bank(1, 1, 1, memory_region(machine, Z80_TAG), 0);
+
+	/* register for state saving */
+
+	state_save_register_global(state->lrs);
+	state_save_register_global(state->abc77_txd);
+	state_save_register_global(state->pling);
 }
 
 static MACHINE_RESET( abc802 )
@@ -1172,7 +1200,8 @@ static MACHINE_START( abc806 )
 	abc806_state *state = machine->driver_data;
 
 	UINT8 *mem = memory_region(machine, Z80_TAG);
-	int bank;
+	int bank, videoram_banks;
+	int videoram_size = mess_ram_size - (32 * 1024);
 
 	/* find devices */
 
@@ -1184,20 +1213,37 @@ static MACHINE_START( abc806 )
 
 	/* setup memory banking */
 
-	state->videoram = auto_malloc(ABC806_VIDEO_RAM_SIZE);
+	state->videoram = auto_malloc(videoram_size);
+
+	if (videoram_size == 128 * 1024)
+	{
+		videoram_banks = 32;
+		state->hrs_mask = 0x33;
+		state->map_mask = 0x1f;
+	}
+	else
+	{
+		videoram_banks = 128;
+		state->hrs_mask = 0xff;
+		state->map_mask = 0x7f;
+	}
 
 	for (bank = 1; bank <= 16; bank++)
 	{
 		memory_configure_bank(bank, 0, 1, mem + (0x1000 * (bank - 1)), 0);
-		memory_configure_bank(bank, 1, 32, state->videoram, 0x1000);
+		memory_configure_bank(bank, 1, videoram_banks, state->videoram, 0x1000);
 
 		memory_set_bank(bank, 0);
 	}
 
 	/* register for state saving */
 
-	state_save_register_global_array(state->map);
+	state_save_register_global(state->abc77_txd);
 	state_save_register_global(state->keydtr);
+	state_save_register_global(state->eme);
+	state_save_register_global(state->fetch_charram);
+	state_save_register_global_array(state->map);
+	state_save_register_global(state->map_mask);
 }
 
 static MACHINE_RESET( abc806 )
@@ -1421,12 +1467,6 @@ MACHINE_DRIVER_END
 
 */
 
-#define ROM_ABC99 \
-	ROM_REGION( 0x1800, "abc99", 0 ) \
-	ROM_LOAD( "10681909",  0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7) ) \
-	ROM_LOAD( "10726864",  0x1000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), BIOS(1) ) \
-	ROM_LOAD( "abc99.bin", 0x1000, 0x0800, CRC(d48310fc) SHA1(17a2ffc0ec00d395c2b9caf3d57fed575ba2b137), BIOS(2) )
-
 ROM_START( abc800m )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "abcm.1m",    0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
@@ -1442,43 +1482,26 @@ ROM_START( abc800m )
 	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 
 	ROM_REGION( 0x200, "fgctl", 0 )
-	ROM_LOAD( "fgctl.bin", 0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) ) // typed in
-
-	ROM_REGION( 0x2000, "user1", 0 )
-	// Fast Controller
-	ROM_LOAD( "6490318-07.bin", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
-	ROM_LOAD( "fast108.bin",	0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-	ROM_LOAD( "fast207.bin",	0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
-	
-	// MyAB Turbo-Kontroller
-	ROM_LOAD( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
-	ROM_LOAD( "unidiskh.bin", 0x0000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
-	ROM_LOAD( "unidisk8.bin", 0x0000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
-
-	// ABC-830
-	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // ABC830 with MPI drives. Styrkort Artnr 5510760-01
-
-	// ABC-832
-	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
-	ROM_LOAD( "micr1115.bin", 0x0000, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115
-	ROM_LOAD( "basf6118.bin", 0x0000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118
-
-	// ABC-850
-	ROM_LOAD( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime 202
-	ROM_LOAD( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185
-
-	// ABC-852
-	ROM_LOAD( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d) ) // NEC 5126
-
-	// ABC-856
-	ROM_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3) ) // Micropolis 1325
-
-	// XEBEC HDC
-	ROM_LOAD( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038
-	ROM_LOAD( "st225.bin",    0x0000, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225
+	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
 ROM_END
 
-#define rom_abc800c rom_abc800m
+ROM_START( abc800c )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "abcc.1m",    0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "abc1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
+	ROM_LOAD( "abc2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
+	ROM_LOAD( "abc3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
+	ROM_LOAD( "abc4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
+	ROM_LOAD( "abc5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
+	ROM_LOAD( "abc6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
+	ROM_LOAD( "abc7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
+
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "vuc-se.bin", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x200, "fgctl", 0 )
+	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
+ROM_END
 
 ROM_START( abc802 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
@@ -1529,14 +1552,54 @@ ROM_START( abc806 )
 	ROM_REGION( 0x200, "hru2", 0 )
 	ROM_LOAD( "64 90127-01.12g", 0x0000, 0x0200, NO_DUMP ) // "HRU II" 7621 (82S131), ABC800C HR compatibility mode palette
 
-	ROM_REGION( 0x200, "v50", 0 )
+	ROM_REGION( 0x400, "v50", 0 )
 	ROM_LOAD( "64 90242-01.7e",  0x0000, 0x0200, NO_DUMP ) // "V50" 7621 (82S131), HR vertical timing 50Hz
-//	ROM_LOAD( "64 90319-01.7e",  0x0000, 0x0200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
+	ROM_LOAD( "64 90319-01.7e",  0x0200, 0x0200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "64 90225-01.11c", 0x0000, 0x0400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
 	ROM_LOAD( "64 90239-01.1b", 0x0000, 0x0400, NO_DUMP ) // "ABC P3-11" PAL16R4, color encoder
 	ROM_LOAD( "64 90240-01.2d", 0x0000, 0x0400, NO_DUMP ) // "ABC P4-11" PAL16L8, memory mapper
+ROM_END
+
+ROM_START( luxor_55_21046 )
+	/* Luxor Fast Controller */
+
+	ROM_REGION( 0x6000, "fast", 0 )
+	ROM_LOAD( "64 90318-07.bin", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
+	ROM_LOAD( "fast108.bin",	 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.bin",	 0x4000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
+	
+	/* MyAB Turbo-Kontroller */
+
+	ROM_REGION( 0x3000, "myab", 0 )
+	ROM_LOAD( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
+	ROM_LOAD( "unidiskh.bin", 0x1000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
+	ROM_LOAD( "unidisk8.bin", 0x2000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
+
+	/* Luxor "slow" controller with separate ROMs for each drive type */
+
+	ROM_REGION( 0x800, "abc830", 0 )
+	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // ABC830 with MPI drives. Styrkort Artnr 5510760-01
+
+	ROM_REGION( 0x1800, "abc832", 0 )
+	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
+	ROM_LOAD( "micr1115.bin", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115
+	ROM_LOAD( "basf6118.bin", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118
+
+	ROM_REGION( 0x1000, "abc850", 0 )
+	ROM_LOAD( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime 202
+	ROM_LOAD( "basf6185.bin", 0x0800, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185
+
+	ROM_REGION( 0x1000, "abc852", 0 )
+	ROM_LOAD( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d) ) // NEC 5126
+
+	ROM_REGION( 0x800, "abc856", 0 )
+	ROM_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3) ) // Micropolis 1325
+
+	ROM_REGION( 0x1000, "xebec", 0 )
+	ROM_LOAD( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038
+	ROM_LOAD( "st225.bin",    0x0800, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225
 ROM_END
 
 /* System Configuration */
@@ -1611,7 +1674,8 @@ static SYSTEM_CONFIG_START( abc802 )
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( abc806 )
-	CONFIG_RAM_DEFAULT(160 * 1024)
+	CONFIG_RAM_DEFAULT(160 * 1024) // 32KB + 128KB
+	CONFIG_RAM		  (544 * 1024) // 32KB + 512KB
 	CONFIG_DEVICE(abc800_floppy_getinfo)
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
@@ -1708,8 +1772,8 @@ static DRIVER_INIT( abc806 )
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME    FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG  COMPANY             FULLNAME		FLAGS */
 COMP( 1981, abc800m,    0,			0,      abc800m,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 M/HR", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 COMP( 1981, abc800c,    abc800m,    0,      abc800c,    abc800, abc800, abc800, "Luxor Datorer AB", "ABC 800 C/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc802, "Luxor Datorer AB", "ABC 802",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc806, "Luxor Datorer AB", "ABC 806",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802, abc802, "Luxor Datorer AB", "ABC 802",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806, abc806, "Luxor Datorer AB", "ABC 806",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

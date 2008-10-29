@@ -38,13 +38,7 @@ WRITE8_HANDLER( abc800_charram_w )
 static PALETTE_INIT( abc800m )
 {
 	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff); // blue
-	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00); // red
-	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff); // magenta
-	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff); // cyan
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00); // yellow
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
+	palette_set_color_rgb(machine, 1, 0xff, 0xff, 0x00); // yellow
 }
 
 static PALETTE_INIT( abc800c )
@@ -103,7 +97,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 			if (BIT(data, 7))
 			{
-				*BITMAP_ADDR16(bitmap, y, x) = 7;
+				*BITMAP_ADDR16(bitmap, y, x) = 1;
 			}
 
 			data <<= 1;
@@ -140,7 +134,36 @@ static void abc800c_update(running_machine *machine, bitmap_t *bitmap, const rec
 
 /* HR */
 
-static void abc800_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void abc800m_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	abc800_state *state = machine->driver_data;
+
+	UINT16 addr = 0;
+	int sx, y, dot;
+
+	for (y = state->hrs; y < MIN(cliprect->max_y + 1, state->hrs + 240); y++)
+	{
+		int x = 0;
+
+		for (sx = 0; sx < 64; sx++)
+		{
+			UINT8 data = state->videoram[addr++];
+
+			for (dot = 0; dot < 4; dot++)
+			{
+				UINT16 fgctl_addr = ((state->fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
+				int color = (state->fgctl_prom[fgctl_addr] & 0x07) ? 1 : 0;
+
+				*BITMAP_ADDR16(bitmap, y, x++) = color;
+				*BITMAP_ADDR16(bitmap, y, x++) = color;
+
+				data <<= 2;
+			}
+		}
+	}
+}
+
+static void abc800c_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	abc800_state *state = machine->driver_data;
 
@@ -160,7 +183,6 @@ static void abc800_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 				UINT16 fgctl_addr = ((state->fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = state->fgctl_prom[fgctl_addr] & 0x07;
 
-				*BITMAP_ADDR16(bitmap, y, x++) = color;
 				*BITMAP_ADDR16(bitmap, y, x++) = color;
 
 				data <<= 2;
@@ -229,7 +251,7 @@ static VIDEO_UPDATE( abc800m )
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	/* draw HR graphics */
-	abc800_hr_update(screen->machine, bitmap, cliprect);
+	abc800m_hr_update(screen->machine, bitmap, cliprect);
 	
 	if (!BIT(state->fgctl, 7))
 	{
@@ -248,7 +270,7 @@ static VIDEO_UPDATE( abc800c )
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	/* draw HR graphics */
-	abc800_hr_update(screen->machine, bitmap, cliprect);
+	abc800c_hr_update(screen->machine, bitmap, cliprect);
 	
 	if (!BIT(state->fgctl, 7))
 	{
@@ -273,7 +295,7 @@ MACHINE_DRIVER_START( abc800m_video )
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(abc800m)
 	MDRV_VIDEO_START(abc800m)

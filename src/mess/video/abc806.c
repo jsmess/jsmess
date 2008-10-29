@@ -8,8 +8,8 @@
 
 	TODO:
 
-	- PRINT GRN "ABC" RED "800" does not give colors
-	- protection device @ 16H
+	- attributes
+	- prot device
 	
 */
 
@@ -54,7 +54,7 @@ WRITE8_HANDLER( abc806_hrs_w )
 
 	abc806_state *state = machine->driver_data;
 	
-	state->hrs = data;
+	state->hrs = data & state->hrs_mask;
 }
 
 /* High Resolution Palette */
@@ -136,8 +136,6 @@ READ8_HANDLER( abc806_cli_r )
 
 READ8_HANDLER( abc806_sti_r )
 {
-	/* this is some weird device marked PROT @ 16H */
-
 	/*
 
 		bit		description
@@ -394,40 +392,26 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 {
 	abc806_state *state = machine->driver_data;
 
-	UINT16 addr = (state->hrs & 0x03) << 14;
-	int sx, y, dot;
+	UINT32 addr = (state->hrs & 0x0f) << 14;
+	int sx, y, pixel;
 
 	for (y = state->sync; y < MIN(cliprect->max_y + 1, state->sync + 240); y++)
 	{
-		int x = (ABC800_CHAR_WIDTH * 4) - 16;
-
-		for (sx = 0; sx < 32; sx++)
+		for (sx = 0; sx < 128; sx++)
 		{
-			UINT32 data = (state->videoram[addr++] << 24) | (state->videoram[addr++] << 16) | (state->videoram[addr++] << 8) | state->videoram[addr++];
+			UINT8 data = state->videoram[addr++];
+			UINT16 dot = (state->hrc[data >> 4] << 8) | state->hrc[data & 0x0f];
 
-			for (dot = 0; dot < 8; dot++)
+			for (pixel = 0; pixel < 4; pixel++)
 			{
-				UINT8 hrc = state->hrc[(data >> 28) & 0x0f];
+				int x = (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				int dot1 = hrc >> 4;
-				int dot2 = hrc & 0x0f;
-				int tx_color = *BITMAP_ADDR16(bitmap, y, x);
-
-				if (BIT(dot1, 3) || tx_color == 0)
+				if (BIT(dot, 15) || *BITMAP_ADDR16(bitmap, y, x) == 0)
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = dot1 & 0x07;
+					*BITMAP_ADDR16(bitmap, y, x) = (dot >> 12) & 0x07;
 				}
-				
-				x++;
 
-				if (BIT(dot2, 3) || tx_color == 0)
-				{
-					*BITMAP_ADDR16(bitmap, y, x) = dot2 & 0x07;
-				}
-				
-				x++;
-
-				data <<= 4;
+				dot <<= 4;
 			}
 		}
 	}
@@ -474,16 +458,16 @@ static VIDEO_START(abc806)
 	state_save_register_global_pointer(state->colorram, ABC806_ATTR_RAM_SIZE);
 	state_save_register_global_pointer(state->videoram, ABC806_VIDEO_RAM_SIZE);
 
-	state_save_register_global(state->v50_addr);
-	state_save_register_global(state->attr_data);
-	state_save_register_global(state->hrs);
-	state_save_register_global(state->sync);
-	state_save_register_global_array(state->hrc);
-	state_save_register_global(state->eme);
 	state_save_register_global(state->txoff);
 	state_save_register_global(state->_40);
 	state_save_register_global(state->flshclk_ctr);
 	state_save_register_global(state->flshclk);
+	state_save_register_global(state->attr_data);
+	state_save_register_global(state->hrs);
+	state_save_register_global(state->hrs_mask);
+	state_save_register_global_array(state->hrc);
+	state_save_register_global(state->sync);
+	state_save_register_global(state->v50_addr);
 	state_save_register_global(state->hru2_a8);
 	state_save_register_global(state->vsync_shift);
 	state_save_register_global(state->vsync);
