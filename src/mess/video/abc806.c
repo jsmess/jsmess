@@ -6,11 +6,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- attributes
-	- prot device
-	
+	- HRU II PROM reading
+
 */
 
 #include "driver.h"
@@ -26,10 +25,10 @@ static PALETTE_INIT( abc806 )
 	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
 	palette_set_color_rgb(machine, 1, 0xff, 0x00, 0x00); // red
 	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine, 3, 0x00, 0xff, 0xff); // cyan
+	palette_set_color_rgb(machine, 3, 0xff, 0xff, 0x00); // yellow
 	palette_set_color_rgb(machine, 4, 0x00, 0x00, 0xff); // blue
 	palette_set_color_rgb(machine, 5, 0xff, 0x00, 0xff); // magenta
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00); // yellow
+	palette_set_color_rgb(machine, 6, 0x00, 0xff, 0xff); // cyan
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
 }
 
@@ -43,18 +42,18 @@ WRITE8_HANDLER( abc806_hrs_w )
 
 		0		VM14	visible screen memory area bit 0
 		1		VM15	visible screen memory area bit 1
-		2		VM16	visible screen memory area bit 2 (unused)
-		3		VM17	visible screen memory area bit 3 (unused)
+		2		VM16	visible screen memory area bit 2
+		3		VM17	visible screen memory area bit 3
 		4		F14		cpu accessible screen memory area bit 0
 		5		F15		cpu accessible screen memory area bit 1
-		6		F16		cpu accessible screen memory area bit 2 (unused)
-		7		F17		cpu accessible screen memory area bit 3 (unused)
+		6		F16		cpu accessible screen memory area bit 2
+		7		F17		cpu accessible screen memory area bit 3
 
 	*/
 
 	abc806_state *state = machine->driver_data;
 	
-	state->hrs = data & state->hrs_mask;
+	state->hrs = data;
 }
 
 /* High Resolution Palette */
@@ -151,7 +150,7 @@ READ8_HANDLER( abc806_sti_r )
 
 	*/
 
-	return 0;
+	return 0x7f;
 }
 
 WRITE8_HANDLER( abc806_sto_w )
@@ -392,7 +391,7 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 {
 	abc806_state *state = machine->driver_data;
 
-	UINT32 addr = (state->hrs & 0x0f) << 14;
+	UINT32 addr = (state->hrs & 0x0f) << 15;
 	int sx, y, pixel;
 
 	for (y = state->sync; y < MIN(cliprect->max_y + 1, state->sync + 240); y++)
@@ -464,7 +463,6 @@ static VIDEO_START(abc806)
 	state_save_register_global(state->flshclk);
 	state_save_register_global(state->attr_data);
 	state_save_register_global(state->hrs);
-	state_save_register_global(state->hrs_mask);
 	state_save_register_global_array(state->hrc);
 	state_save_register_global(state->sync);
 	state_save_register_global(state->v50_addr);

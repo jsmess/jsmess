@@ -107,7 +107,6 @@ struct _abc806_state
 	int eme;				/* extended memory enable */
 	int fetch_charram;		/* opcode fetched from character RAM region (0x7800-0x7fff) */
 	UINT8 map[16];			/* memory page register */
-	UINT8 map_mask;			/* memory page register mask */
 
 	/* video state */
 	UINT8 *charram;			/* character RAM */
@@ -120,7 +119,6 @@ struct _abc806_state
 	int flshclk;			/* flash clock */
 	UINT8 attr_data;		/* attribute data latch */
 	UINT8 hrs;				/* HR memory mapping */
-	UINT8 hrs_mask;			/* HR memory mapping mask */
 	UINT8 hrc[16];			/* HR palette */
 	UINT8 sync;				/* line synchronization delay */
 	UINT8 v50_addr;			/* vertical sync PROM address */

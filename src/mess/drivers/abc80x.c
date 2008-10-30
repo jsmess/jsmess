@@ -54,6 +54,7 @@
 
     TODO:
 
+	- ABC 77 keyboard
 	- bit accurate Z80 SIO/2 (cassette)
     - floppy controller board
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
@@ -246,14 +247,14 @@ static void abc802_bankswitch(running_machine *machine)
 static void abc806_bankswitch(running_machine *machine)
 {
 	abc806_state *state = machine->driver_data;
+	UINT32 videoram_mask = mess_ram_size - (32 * 1024) - 1;
 	FPTR bank;
 
 	if (!state->keydtr)
 	{
 		/* 32K block mapping */
 
-		UINT32 videoram_offset = (state->hrs & 0xf0) << 10;
-		int videoram_bank = videoram_offset / 0x1000;
+		UINT32 videoram_start = (state->hrs & 0xf0) << 11;
 
 		for (bank = 1; bank <= 8; bank++)
 		{
@@ -261,13 +262,13 @@ static void abc806_bankswitch(running_machine *machine)
 
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
+			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
 			
-			//logerror("%04x-%04x: Video RAM bank %u (32K)\n", start_addr, end_addr, videoram_bank);
+			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
 			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-			memory_set_bank(bank, videoram_bank + 1);
-
-			videoram_bank++;
+			memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
+			memory_set_bank(bank, 1);
 		}
 
 		for (bank = 9; bank <= 16; bank++)
@@ -292,16 +293,16 @@ static void abc806_bankswitch(running_machine *machine)
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
 			UINT8 map = state->map[bank - 1];
+			UINT32 videoram_offset = ((map & 0x7f) << 12) & videoram_mask;
 
 			if (BIT(map, 7) && state->eme)
 			{
 				/* map to video RAM */
-				int videoram_bank = map & state->map_mask;
-
-				//logerror("%04x-%04x: Video RAM bank %u (4K)\n", start_addr, end_addr, videoram_bank);
+				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
 				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-				memory_set_bank(bank, videoram_bank + 1);
+				memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
+				memory_set_bank(bank, 1);
 			}
 			else
 			{
@@ -340,8 +341,9 @@ static void abc806_bankswitch(running_machine *machine)
 
 	if (state->fetch_charram)
 	{
-		UINT32 videoram_offset = (state->hrs & 0xf0) << 10;
-		int videoram_bank = videoram_offset / 0x1000;
+		/* 30K block mapping */
+
+		UINT32 videoram_start = (state->hrs & 0xf0) << 11;
 
 		for (bank = 1; bank <= 8; bank++)
 		{
@@ -349,8 +351,9 @@ static void abc806_bankswitch(running_machine *machine)
 
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
+			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
 			
-			//logerror("%04x-%04x: Video RAM bank %u (30K)\n", start_addr, end_addr, videoram_bank);
+			//logerror("%04x-%04x: Video RAM %04x (30K)\n", start_addr, end_addr, videoram_offset);
 
 			if (start_addr == 0x7000)
 			{
@@ -362,7 +365,8 @@ static void abc806_bankswitch(running_machine *machine)
 				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 			}
 
-			memory_set_bank(bank, bank + videoram_bank);
+			memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
+			memory_set_bank(bank, 1);
 		}
 	}
 }
@@ -1082,6 +1086,8 @@ static Z80DART_ON_DTR_CHANGED( abc806_dart_dtr_w )
 	if (channel == Z80DART_CH_B)
 	{
 		state->keydtr = level;
+
+		abc806_bankswitch(device->machine);
 	}
 }
 
@@ -1200,8 +1206,8 @@ static MACHINE_START( abc806 )
 	abc806_state *state = machine->driver_data;
 
 	UINT8 *mem = memory_region(machine, Z80_TAG);
-	int bank, videoram_banks;
-	int videoram_size = mess_ram_size - (32 * 1024);
+	UINT32 videoram_size = mess_ram_size - (32 * 1024);
+	int bank;
 
 	/* find devices */
 
@@ -1215,24 +1221,10 @@ static MACHINE_START( abc806 )
 
 	state->videoram = auto_malloc(videoram_size);
 
-	if (videoram_size == 128 * 1024)
-	{
-		videoram_banks = 32;
-		state->hrs_mask = 0x33;
-		state->map_mask = 0x1f;
-	}
-	else
-	{
-		videoram_banks = 128;
-		state->hrs_mask = 0xff;
-		state->map_mask = 0x7f;
-	}
-
 	for (bank = 1; bank <= 16; bank++)
 	{
 		memory_configure_bank(bank, 0, 1, mem + (0x1000 * (bank - 1)), 0);
-		memory_configure_bank(bank, 1, videoram_banks, state->videoram, 0x1000);
-
+		memory_configure_bank(bank, 1, 1, state->videoram, 0);
 		memory_set_bank(bank, 0);
 	}
 
@@ -1243,7 +1235,6 @@ static MACHINE_START( abc806 )
 	state_save_register_global(state->eme);
 	state_save_register_global(state->fetch_charram);
 	state_save_register_global_array(state->map);
-	state_save_register_global(state->map_mask);
 }
 
 static MACHINE_RESET( abc806 )
@@ -1259,9 +1250,22 @@ static MACHINE_RESET( abc806 )
 		memory_set_bank(bank, 0);
 	}
 
-	state->eme = 0;
-
 	abc806_bankswitch(machine);
+
+	/* clear STO lines */
+	state->eme = 0;
+	state->_40 = 0;
+	state->hru2_a8 = 0;
+	state->txoff = 0;
+	e0516_cs_w(state->e0516, 1);
+	e0516_clk_w(state->e0516, 1);
+	e0516_dio_w(state->e0516, 1);
+
+	/* 40/80 char */
+	z80dart_ri_w(state->z80dart, Z80DART_CH_A, 1); // 0 = 40, 1 = 80
+
+	/* 50/60 Hz */
+	z80dart_cts_w(state->z80dart, Z80DART_CH_B, 0); // 0 = 50Hz, 1 = 60Hz
 }
 
 /* Machine Drivers */
@@ -1469,57 +1473,57 @@ MACHINE_DRIVER_END
 
 ROM_START( abc800m )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "abcm.1m",    0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
-	ROM_LOAD( "abc1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
-	ROM_LOAD( "abc2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
-	ROM_LOAD( "abc3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
-	ROM_LOAD( "abc4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
-	ROM_LOAD( "abc5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
-	ROM_LOAD( "abc6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
-	ROM_LOAD( "abc7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
+	ROM_LOAD( "abc m-12.1m", 0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
+	ROM_LOAD( "abc 1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
+	ROM_LOAD( "abc 2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
+	ROM_LOAD( "abc 3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
+	ROM_LOAD( "abc 4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
+	ROM_LOAD( "abc 5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
+	ROM_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
+	ROM_LOAD( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
+	ROM_LOAD( "vu m-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 
 	ROM_REGION( 0x200, "fgctl", 0 )
-	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
+	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
 ROM_END
 
 ROM_START( abc800c )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "abcc.1m",    0x0000, 0x1000, NO_DUMP )
-	ROM_LOAD( "abc1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
-	ROM_LOAD( "abc2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
-	ROM_LOAD( "abc3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
-	ROM_LOAD( "abc4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
-	ROM_LOAD( "abc5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
-	ROM_LOAD( "abc6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
-	ROM_LOAD( "abc7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
+	ROM_LOAD( "abc c-12.1m", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "abc 1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
+	ROM_LOAD( "abc 2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
+	ROM_LOAD( "abc 3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
+	ROM_LOAD( "abc 4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
+	ROM_LOAD( "abc 5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
+	ROM_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) )
+	ROM_LOAD( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "vuc-se.bin", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "vu c-se.bin", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x200, "fgctl", 0 )
-	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
+	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
 ROM_END
 
 ROM_START( abc802 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD(  "abc02-11.9f",  0x0000, 0x2000, CRC(b86537b2) SHA1(4b7731ef801f9a03de0b5acd955f1e4a1828355d) )
-	ROM_LOAD(  "abc12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
-	ROM_LOAD(  "abc22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
+	ROM_LOAD(  "abc 02-11.9f",  0x0000, 0x2000, CRC(b86537b2) SHA1(4b7731ef801f9a03de0b5acd955f1e4a1828355d) )
+	ROM_LOAD(  "abc 12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
+	ROM_LOAD(  "abc 22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
 	ROM_SYSTEM_BIOS( 0, "v19", "UDF-DOS v6.19" )
-	ROMX_LOAD( "abc32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574), ROM_BIOS(1) )
+	ROMX_LOAD( "abc 32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v20", "UDF-DOS v6.20" )
-	ROMX_LOAD( "abc32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(2) )
+	ROMX_LOAD( "abc 32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "mica", "MICA DOS v6.20" )
 	ROMX_LOAD( "mica820.14f",  0x6000, 0x2000, CRC(edf998af) SHA1(daae7e1ff6ef3e0ddb83e932f324c56f4a98f79b), ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "abct2-11.3g",  0x0000, 0x2000, CRC(e21601ee) SHA1(2e838ebd7692e5cb9ba4e80fe2aa47ea2584133a) ) // 64 90191-01
+	ROM_LOAD( "abc t2-11.3g",  0x0000, 0x2000, CRC(e21601ee) SHA1(2e838ebd7692e5cb9ba4e80fe2aa47ea2584133a) ) // 64 90191-01
 
 	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "abcp2-11.2g", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
+	ROM_LOAD( "abc p2-11.2g", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
 ROM_END
 
 ROM_START( abc806 )
@@ -1550,7 +1554,8 @@ ROM_START( abc806 )
 	ROM_LOAD( "64 90128-01.6e",  0x0000, 0x0020, NO_DUMP ) // "HRU I" 7603 (82S123), HR horizontal timing and video memory access
 
 	ROM_REGION( 0x200, "hru2", 0 )
-	ROM_LOAD( "64 90127-01.12g", 0x0000, 0x0200, NO_DUMP ) // "HRU II" 7621 (82S131), ABC800C HR compatibility mode palette
+	ROM_LOAD( "fgctl.bin",  0x0000, 0x0200, BAD_DUMP CRC(7a19de8d) SHA1(e7cc49e749b37f7d7dd14f3feda53eae843a8fe0) )
+//	ROM_LOAD( "64 90127-01.12g", 0x0000, 0x0200, NO_DUMP ) // "HRU II" 7621 (82S131), ABC800C HR compatibility mode palette
 
 	ROM_REGION( 0x400, "v50", 0 )
 	ROM_LOAD( "64 90242-01.7e",  0x0000, 0x0200, NO_DUMP ) // "V50" 7621 (82S131), HR vertical timing 50Hz
