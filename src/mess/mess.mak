@@ -1169,6 +1169,7 @@ $(MESSOBJ)/luxor.a:					\
 	$(MESS_MACHINE)/abc77.o	\
 	$(MESS_MACHINE)/abc99.o	\
 	$(MESS_MACHINE)/e0516.o	\
+	$(MESS_MACHINE)/conkort.o \
 
 $(MESSOBJ)/sgi.a:						\
 	$(MESS_MACHINE)/sgi.o		\
