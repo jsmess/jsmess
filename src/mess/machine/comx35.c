@@ -45,7 +45,7 @@ static UINT8 read_expansion(running_machine *machine)
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 static int expansion_box_installed(running_machine *machine)
@@ -287,7 +287,7 @@ static void printer_w(running_machine *machine, UINT8 data)
 static void get_active_bank(running_machine *machine, UINT8 data)
 {
 	comx35_state *state = machine->driver_data;
-	static const char *slotnames[] = { "SLOT1", "SLOT2", "SLOT3", "SLOT4" };
+	static const char *slotnames[] = { "", "SLOT1", "SLOT2", "SLOT3", "SLOT4" };
 
 	if (expansion_box_installed(machine))
 	{
@@ -359,11 +359,11 @@ static void set_active_bank(running_machine *machine)
 
 	case BANK_80_COLUMNS:
 		{
-			const device_config *mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+			const device_config *mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
 
 			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP); // ROM
 			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xd7ff, 0, 0, SMH_BANK1, SMH_BANK1); // RAM
+			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xd7ff, 0, 0, comx35_videoram_r, comx35_videoram_w);
 			memory_install_readwrite8_device_handler(mc6845, 0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xd800, 0, 0, SMH_UNMAP, mc6845_address_w);
 			memory_install_readwrite8_device_handler(mc6845, 0, ADDRESS_SPACE_PROGRAM, 0xd801, 0xd801, 0, 0, mc6845_register_r, mc6845_register_w);
 			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd802, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
@@ -505,7 +505,7 @@ static OPBASE_HANDLER( comx35_opbase_handler )
 		if (dos_card_active(machine))
 		{
 			// read opcode from DOS ROM
-			opbase->rom = opbase->ram = memory_region(machine, "user1");
+			opbase->rom = opbase->ram = memory_region(machine, "fdc");
 			return ~0;
 		}
 	}
@@ -549,7 +549,13 @@ MACHINE_START( comx35p )
 	/* card slot banking */
 
 	memory_configure_bank(1, 0, 1, memory_region(machine, CDP1802_TAG) + 0xc000, 0);
-	memory_configure_bank(1, BANK_FLOPPY, 7, memory_region(machine, "user1"), 0x2000);
+	memory_configure_bank(1, BANK_FLOPPY, 1, memory_region(machine, "fdc"), 0);
+	memory_configure_bank(1, BANK_PRINTER_PARALLEL, 1, memory_region(machine, "printer"), 0);
+	memory_configure_bank(1, BANK_PRINTER_PARALLEL_FM, 1, memory_region(machine, "printer_fm"), 0);
+	memory_configure_bank(1, BANK_PRINTER_SERIAL, 1, memory_region(machine, "rs232"), 0);
+	memory_configure_bank(1, BANK_PRINTER_THERMAL, 1, memory_region(machine, "thermal"), 0);
+	memory_configure_bank(1, BANK_JOYCARD, 1, memory_region(machine, CDP1802_TAG), 0);
+	memory_configure_bank(1, BANK_80_COLUMNS, 1, memory_region(machine, "80column"), 0);
 	memory_configure_bank(1, BANK_RAMCARD, 4, mess_ram, 0x2000);
 
 	memory_set_bank(1, 0);

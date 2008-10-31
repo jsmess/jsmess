@@ -4,7 +4,6 @@
 
 	- unreliable DOS commands?
 	- tape input/output
-	- 80 column card
 	- PL-80 plotter
 	- serial printer
 	- thermal printer
@@ -25,7 +24,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 /* Memory Maps */
@@ -451,16 +450,23 @@ ROM_START( comx35p )
 	ROM_SYSTEM_BIOS( 3, "basic101", "COMX BASIC V1.01" )
 	ROMX_LOAD( "comx_11.u21",			0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(4) )
 
-	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_REGION( 0x2000, "fdc", 0 )
 	ROM_LOAD( "fdc.f4",					0x0000, 0x2000, CRC(cf4ecd2e) SHA1(290e19bdc89e3c8059e63d5ae3cca4daa194e1fe) )
-	ROM_LOAD( "printer.bin",			0x2000, 0x0800, CRC(3bbc2b2e) SHA1(08bf7ea4174713ab24969c553affd5c1401876b8) )
-	ROM_LOAD( "f&m.printer.1.2.bin",	0x4000, 0x1000, CRC(2feb997d) SHA1(ee9cb91042696c88ff5f2f44d2f702dc93369ba0) )
-	ROM_LOAD( "rs232.bin",				0x6000, 0x0800, CRC(926ff2d1) SHA1(be02bd388bba0211ea72d4868264a63308e4318d) )
-	ROM_LOAD( "thermal.bin",			0x8000, 0x1000, CRC(41a72ba8) SHA1(3a8760c78bd8c7bec2dbf26657b930c9a6814803) )
-	ROM_LOAD( "80.column.card.u3",		0xc000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x10000, "chargen", 0 ) // MC6845 font
-	ROM_LOAD( "mc6845.font.u",			0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x2000, "printer", 0 )
+	ROM_LOAD( "printer.bin",			0x0000, 0x0800, CRC(3bbc2b2e) SHA1(08bf7ea4174713ab24969c553affd5c1401876b8) )
+
+	ROM_REGION( 0x2000, "printer_fm", 0 )
+	ROM_LOAD( "f&m.printer.1.2.bin",	0x0000, 0x1000, CRC(2feb997d) SHA1(ee9cb91042696c88ff5f2f44d2f702dc93369ba0) )
+
+	ROM_REGION( 0x2000, "rs232", 0 )
+	ROM_LOAD( "rs232.bin",				0x0000, 0x0800, CRC(926ff2d1) SHA1(be02bd388bba0211ea72d4868264a63308e4318d) )
+
+	ROM_REGION( 0x2000, "thermal", 0 )
+	ROM_LOAD( "thermal.bin",			0x0000, 0x1000, CRC(41a72ba8) SHA1(3a8760c78bd8c7bec2dbf26657b930c9a6814803) )
+
+	ROM_REGION( 0x2000, "80column", 0 )
+	ROM_LOAD( "80column.u3",			0x0000, 0x1000, CRC(7a38761b) SHA1(df8d8a8800570b0f43717d067f683c165a3fedb7) )
 ROM_END
 
 #define rom_comx35n rom_comx35p

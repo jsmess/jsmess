@@ -12,6 +12,14 @@
 #define CDP1871_TAG	"u4"
 #define MC6845_TAG	"mc6845"
 
+#define COMX35_PAGERAM_SIZE 0x400
+#define COMX35_CHARRAM_SIZE 0x800
+#define COMX35_VIDEORAM_SIZE 0x800
+
+#define COMX35_PAGERAM_MASK 0x3ff
+#define COMX35_CHARRAM_MASK 0x7ff
+#define COMX35_VIDEORAM_MASK 0x7ff
+
 enum
 {
 	BANK_NONE = 0,
@@ -44,6 +52,7 @@ struct _comx35_state
 
 	UINT8 *pageram;			/* page memory */
 	UINT8 *charram;			/* character memory */
+	UINT8 *videoram;		/* 80 column video memory */
 
 	/* keyboard state */
 	int cdp1871_efxa;		/* keyboard data available */
@@ -59,6 +68,9 @@ struct _comx35_state
 };
 
 /* ---------- defined in machine/comx35.c ---------- */
+
+WRITE8_HANDLER( comx35_videoram_w );
+READ8_HANDLER( comx35_videoram_r );
 
 WRITE8_HANDLER( comx35_bank_select_w );
 READ8_HANDLER( comx35_io_r );

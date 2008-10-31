@@ -5,12 +5,6 @@
 #include "video/cdp1869.h"
 #include "video/mc6845.h"
 
-#define COMX35_PAGERAM_SIZE 0x400
-#define COMX35_CHARRAM_SIZE 0x800
-
-#define COMX35_PAGERAM_MASK 0x3ff
-#define COMX35_CHARRAM_MASK 0x7ff
-
 /* CDP1869 */
 
 static CDP1869_PAGE_RAM_READ( comx35_pageram_r )
@@ -110,6 +104,7 @@ static VIDEO_START( comx35 )
 
 	state->pageram = auto_malloc(COMX35_PAGERAM_SIZE);
 	state->charram = auto_malloc(COMX35_CHARRAM_SIZE);
+	state->videoram = auto_malloc(COMX35_VIDEORAM_SIZE);
 
 	// register for save state
 
@@ -118,6 +113,7 @@ static VIDEO_START( comx35 )
 
 	state_save_register_global_pointer(state->pageram, COMX35_PAGERAM_SIZE);
 	state_save_register_global_pointer(state->charram, COMX35_CHARRAM_SIZE);
+	state_save_register_global_pointer(state->videoram, COMX35_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( comx35 )
@@ -142,25 +138,38 @@ static VIDEO_UPDATE( comx35 )
 
 /* MC6845 */
 
+READ8_HANDLER( comx35_videoram_r )
+{
+	comx35_state *state = machine->driver_data;
+
+	return state->videoram[offset];
+}
+
+WRITE8_HANDLER( comx35_videoram_w )
+{
+	comx35_state *state = machine->driver_data;
+
+	state->videoram[offset] = data;
+}
+
 static MC6845_UPDATE_ROW( comx35_update_row )
 {
-	const UINT8 *charrom = memory_region(device->machine, "chargen");
-	const UINT8 *videoram = memory_region(device->machine, "user1") + 0x1000;
+	comx35_state *state = device->machine->driver_data;
 
-	int column;
+	UINT8 *charrom = memory_region(device->machine, "80column");
+
+	int column, bit;
 
 	for (column = 0; column < x_count; column++)
 	{
-		int bit;
-
-		UINT8 code = videoram[((ma + column) & 0x7ff)];
-		UINT8 addr = (code << 4) | ra;
-		UINT8 data = charrom[addr & 0x7ff];
+		UINT8 code = state->videoram[((ma + column) & 0x7ff)];
+		UINT16 addr = (code << 3) | (ra & 0x07);
+		UINT8 data = charrom[0x800 + (addr & 0x7ff)];
 
 		for (bit = 0; bit < 8; bit++)
 		{
-			int x = (column * 8) + (bit << 1);
-			int color = BIT(code, 7);
+			int x = (column * 8) + bit;
+			int color = BIT(data, 7) ? 7 : 0;
 
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
