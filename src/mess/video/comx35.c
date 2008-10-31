@@ -156,7 +156,7 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 {
 	comx35_state *state = device->machine->driver_data;
 
-	UINT8 *charrom = memory_region(device->machine, "80column");
+	UINT8 *charrom = memory_region(device->machine, "chargen");
 
 	int column, bit;
 
@@ -164,7 +164,7 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 	{
 		UINT8 code = state->videoram[((ma + column) & 0x7ff)];
 		UINT16 addr = (code << 3) | (ra & 0x07);
-		UINT8 data = charrom[0x800 + (addr & 0x7ff)];
+		UINT8 data = charrom[addr & 0x7ff];
 
 		for (bit = 0; bit < 8; bit++)
 		{
