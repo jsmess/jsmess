@@ -131,7 +131,7 @@ static DEVICE_START( conkort )
 
 	/* find our CPU */
 
-	astring_printf(tempstring, "%s:%s", device->tag, I8035_TAG);
+	astring_printf(tempstring, "%s:%s", device->tag, "main");
 	conkort->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
 
