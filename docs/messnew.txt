@@ -8,8 +8,11 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 
-- [COCO] Fixed Dragon Alpha, via mame update, the NMI enable/disable allowing
-  disks to boot again [Phill Harvey-Smith]
+- [ABC800M] Added HR graphics. [Curt Coder, Erik Isaksson]
+
+- [ABC802] Added keyboard simulation. [Curt Coder]
+
+- [ABC806] Added keyboard simulation and HR graphics. [Curt Coder, Erik Isaksson]
 
 - [BBC] Changed memory handling for the 0xfc00 to 0xfeff memory region
   on the Master driver, to allow correct debugging of code in this area
@@ -22,8 +25,12 @@ System Driver Changes:
   and don't cause an error on loading, 16K was already working correctly
   [Phill Harvey-Smith]  
 
-- [NES] Fixed bug #1672.  [Wilbert Pol]
+- [COCO] Fixed Dragon Alpha, via mame update, the NMI enable/disable allowing
+  disks to boot again [Phill Harvey-Smith]
 
+- [COMX35] Added support for the 80 column card. [Curt coder, Marcel van Tongeren]
+
+- [NES] Fixed bug #1672.  [Wilbert Pol]
 
 
 User Interface Changes:
