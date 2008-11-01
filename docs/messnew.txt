@@ -28,7 +28,7 @@ System Driver Changes:
 - [COCO] Fixed Dragon Alpha, via mame update, the NMI enable/disable allowing
   disks to boot again [Phill Harvey-Smith]
 
-- [COMX35] Added support for the 80 column card. [Curt coder, Marcel van Tongeren]
+- [COMX35] Added support for the 80 column card. [Curt Coder, Marcel van Tongeren]
 
 - [NES] Fixed bug #1672.  [Wilbert Pol]
 
