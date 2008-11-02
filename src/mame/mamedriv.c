@@ -2120,7 +2120,7 @@ const game_driver * const drivers[] =
 	/* More Toaplan Games */
 	DRIVER( tekipaki )	/* TP-020 (c) 1991 Toaplan */
 	DRIVER( ghox )		/* TP-021 (c) 1991 Toaplan */
-	DRIVER( ghoxa )		/* TP-021 (c) 1991 Toaplan */
+	DRIVER( ghoxj )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( dogyuun )	/* TP-022 (c) 1992 Toaplan */
 	DRIVER( kbash )		/* TP-023 (c) 1993 Toaplan */
 	DRIVER( kbash2 )	/* bootleg */
@@ -2652,10 +2652,10 @@ V-V                           TP-027
 	DRIVER( megaman2 )	/* 08/07/1996 (c) 1996 (US) */
 	DRIVER( megamn2a )	/* 08/07/1996 (c) 1996 (Asia) */
 	DRIVER( rckman2j )	/* 08/07/1996 (c) 1996 (Japan) */
-	DRIVER( sfz2aj )	/* 05/08/1996 (c) 1996 (Japan) */
-	DRIVER( sfz2ah )	/* 13/08/1996 (c) 1996 (Hispanic) */
-	DRIVER( sfz2ab )	/* 13/08/1996 (c) 1996 (Brazil) */
-	DRIVER( sfz2aa )	/* 26/08/1996 (c) 1996 (Asia) */
+	DRIVER( sfz2al )	/* 26/08/1996 (c) 1996 (Asia) */
+	DRIVER( sfz2alj )	/* 05/08/1996 (c) 1996 (Japan) */
+	DRIVER( sfz2alh )	/* 13/08/1996 (c) 1996 (Hispanic) */
+	DRIVER( sfz2alb )	/* 13/08/1996 (c) 1996 (Brazil) */
 	DRIVER( xmvsf )		/* 04/10/1996 (c) 1996 (Euro) */
 	DRIVER( xmvsfr1 )	/* 10/09/1996 (c) 1996 (Euro) */
 	DRIVER( xmvsfu )	/* 23/10/1996 (c) 1996 (US) */
@@ -6945,9 +6945,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mayjin3 )
 
 	/* Atlus games */
-	DRIVER( powerins )	/* (c) 1993 Atlus (Japan) */
-	DRIVER( powerina )	/* (c) 1993 Atlus (Japan) */
-	DRIVER( powerinb )	/* (c) 1993 Atlus (Japan) */
+	DRIVER( powerins )	/* (c) 1993 Atlus (USA) */
+	DRIVER( powerinj )	/* (c) 1993 Atlus (Japan) */
+	DRIVER( powerina )	/* (c) 1993 Atlus (bootleg of USA version) */
+	DRIVER( powerinb )	/* (c) 1993 Atlus (bootleg of USA version) */
 	DRIVER( ohmygod )	/* (c) 1993 Atlus (Japan) */
 	DRIVER( naname )	/* (c) 1994 Atlus (Japan) */
 	DRIVER( blmbycar )	/* (c) 1994 ABM & Gecas - uses same gfx chip as powerins? */
@@ -8278,6 +8279,9 @@ Other Sun games
 	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
 	DRIVER( magictg )	/* (c) 199? Acclaim */
 	DRIVER( magictga )	/* (c) 199? Acclaim */
+	DRIVER( re900 )		/* (c) 1993 Entretenimientos GEMINIS */
+	DRIVER( bs94 )		/* (c) 1994 Entretenimientos GEMINIS */
+	DRIVER( jokrwild )	/* (c) 1988 Sigma */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */

@@ -67,7 +67,7 @@ Notes:
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 
 #define FIFO_SIZE 1024
 #define IO_SIZE 	0x100
@@ -80,7 +80,7 @@ static UINT16 io_reg[IO_SIZE];
 static UINT16 fifo[FIFO_SIZE];
 static UINT16 fptr;
 
-static int jpeg_addr=-1;
+static int jpeg_addr;
 static UINT16 jpeg1,jpeg2;
 static int jpeg_h=0;
 static int jpeg_w=0;
@@ -391,7 +391,7 @@ static WRITE16_HANDLER(io_data_w)
 static WRITE16_HANDLER(sound_w)
 {
 		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1, I8051_INT0_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, MCS51_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -588,6 +588,7 @@ ROM_END
 
 static DRIVER_INIT(sliver)
 {
+	jpeg_addr = -1;
 	colorram=auto_malloc(256*3);
 }
 

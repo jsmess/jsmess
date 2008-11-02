@@ -132,7 +132,8 @@ VIDEO_START( m72 )
 
 	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000);
 	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
-	tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
+	//tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
+	tilemap_set_transmask(bg_tilemap,2,0x0007,0xfff8);
 
 	memset(m72_spriteram,0,spriteram_size);
 

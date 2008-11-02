@@ -22,8 +22,9 @@ static TILE_GET_INFO( ttl_get_tile_info )
 {
 	int attr, code;
 
-	code = ttl_vram[tile_index]&0xff;
-	attr = 0;
+	code = ttl_vram[tile_index]&0xfff;
+
+	attr = ttl_vram[tile_index]>>12;	// palette in all 4 bits?
 
 	SET_TILE_INFO(ttl_gfx_index, code, attr, 0);
 }
@@ -43,6 +44,11 @@ WRITE32_HANDLER( polygonet_ttl_ram_w )
 
 	tilemap_mark_tile_dirty(ttl_tilemap, offset*2);
 	tilemap_mark_tile_dirty(ttl_tilemap, offset*2+1);
+}
+
+static TILEMAP_MAPPER( plygonet_scan )
+{
+	return row * num_cols + (col^1);
 }
 
 VIDEO_START( polygonet )
@@ -72,7 +78,7 @@ VIDEO_START( polygonet )
 	machine->gfx[ttl_gfx_index]->total_colors = machine->config->total_colors / 16;
 
 	// create the tilemap
-	ttl_tilemap = tilemap_create(ttl_get_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	ttl_tilemap = tilemap_create(ttl_get_tile_info, plygonet_scan,  8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 

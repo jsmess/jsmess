@@ -159,7 +159,7 @@ Stephh's log (2007.11.28) :
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 
 #include "peplus.lh"
@@ -313,6 +313,9 @@ static WRITE8_HANDLER( peplus_crtc_display_w )
 
 static WRITE8_HANDLER( peplus_io_w )
 {
+	if (offset == 2)
+		cputag_set_input_line(machine, "main", 0, CLEAR_LINE);
+
 	io_port[offset] = data;
 }
 
@@ -997,7 +1000,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_CPU_PROGRAM_MAP(peplus_map, 0)
 	//MDRV_CPU_DATA_MAP(peplus_datamap, 0)
 	MDRV_CPU_IO_MAP(peplus_iomap, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(peplus)
 	MDRV_NVRAM_HANDLER(peplus)
