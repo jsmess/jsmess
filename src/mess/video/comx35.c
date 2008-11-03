@@ -166,6 +166,11 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 		UINT16 addr = (code << 3) | (ra & 0x07);
 		UINT8 data = charrom[addr & 0x7ff];
 
+		if (BIT(ra, 3) && column == cursor_x)
+		{
+			data = 0xff;
+		}
+
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
@@ -178,11 +183,11 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 	}
 }
 
-static MC6845_ON_VSYNC_CHANGED( comx35_vsync_changed )
+static MC6845_ON_HSYNC_CHANGED( comx35_hsync_changed )
 {
 	comx35_state *state = device->machine->driver_data;
 
-	state->cdp1802_ef4 = vsync;
+	state->cdp1802_ef4 = hsync;
 }
 
 static const mc6845_interface comx35_mc6845_interface =
@@ -194,8 +199,8 @@ static const mc6845_interface comx35_mc6845_interface =
 	comx35_update_row,
 	NULL,
 	NULL,
-	NULL,
-	comx35_vsync_changed
+	comx35_hsync_changed,
+	NULL
 };
 
 /* Machine Drivers */
