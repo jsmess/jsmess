@@ -221,8 +221,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	int e6 = state->_40;
 	int th = 0;
 
-	y += state->sync;
+	/* prevent wraparound */
+	if (y >= 240) return;
 
+	y += state->sync + 27;
+	
 	for (column = 0; column < x_count; column++)
 	{
 		UINT8 data = state->charram[(ma + column) & 0x7ff];
@@ -294,7 +297,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 
 		chargen_addr = (th << 12) | (data << 4) | rad_data;
 		chargen_data = state->char_rom[chargen_addr & 0xfff] << 2;
-		x = (column + 4) * ABC800_CHAR_WIDTH;
+		x = 109 + (column + 4) * ABC800_CHAR_WIDTH;
 
 		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
@@ -394,7 +397,7 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 	UINT32 addr = (state->hrs & 0x0f) << 15;
 	int sx, y, pixel;
 
-	for (y = state->sync; y < MIN(cliprect->max_y + 1, state->sync + 240); y++)
+	for (y = state->sync + 27; y < MIN(cliprect->max_y + 1, state->sync + 27 + 240); y++)
 	{
 		for (sx = 0; sx < 128; sx++)
 		{
@@ -403,7 +406,7 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 
 			for (pixel = 0; pixel < 4; pixel++)
 			{
-				int x = (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
+				int x = 109 + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
 				if (BIT(dot, 15) || *BITMAP_ADDR16(bitmap, y, x) == 0)
 				{
@@ -477,7 +480,10 @@ static VIDEO_START(abc806)
 static VIDEO_UPDATE( abc806 )
 {
 	abc806_state *state = screen->machine->driver_data;
-	
+
+	/* expand visible area to workaround MC6845 */
+	video_screen_set_visarea(screen, 0, 767, 0, 311);
+
 	/* clear screen */
 	fillbitmap(bitmap, 0, cliprect);
 	

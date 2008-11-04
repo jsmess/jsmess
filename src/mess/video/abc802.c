@@ -80,6 +80,11 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
 	int column;
 	int rf = 0, rc = 0, rg = 0;
+	
+	/* prevent wraparound */
+	if (y >= 240) return;
+	
+	y += 29;
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -144,7 +149,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			{
 				for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = ((column + 3) * ABC800_CHAR_WIDTH) + bit; // DEN+3
+					int x = 121 + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
 					int color = BIT(data, 7) ^ ri;
 
 					*BITMAP_ADDR16(bitmap, y, x) = color;
@@ -156,7 +161,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			{
 				for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1); // DEN+3
+					int x = 121 + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = BIT(data, 7) ^ ri;
 
 					*BITMAP_ADDR16(bitmap, y, x) = color;
@@ -240,6 +245,10 @@ static VIDEO_UPDATE( abc802 )
 {
 	abc802_state *state = screen->machine->driver_data;
 	
+	/* expand visible area to workaround MC6845 */
+	video_screen_set_visarea(screen, 0, 767, 0, 311);
+
+	/* draw text */
 	mc6845_update(state->mc6845, bitmap, cliprect);
 	
 	return 0;

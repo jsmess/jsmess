@@ -76,6 +76,11 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	abc800_state *state = device->machine->driver_data;
 
 	int column;
+	
+	/* prevent wraparound */
+	if (y >= 240) return;
+	
+	y += 29;
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -93,7 +98,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
-			int x = (column * ABC800_CHAR_WIDTH) + bit;
+			int x = 115 + (column * ABC800_CHAR_WIDTH) + bit;
 
 			if (BIT(data, 7))
 			{
@@ -141,9 +146,9 @@ static void abc800m_hr_update(running_machine *machine, bitmap_t *bitmap, const 
 	UINT16 addr = 0;
 	int sx, y, dot;
 
-	for (y = state->hrs; y < MIN(cliprect->max_y + 1, state->hrs + 240); y++)
+	for (y = state->hrs + 29; y < MIN(cliprect->max_y + 1, state->hrs + 29 + 240); y++)
 	{
-		int x = 0;
+		int x = 115;
 
 		for (sx = 0; sx < 64; sx++)
 		{
@@ -246,6 +251,9 @@ static VIDEO_START( abc800c )
 static VIDEO_UPDATE( abc800m )
 {
 	abc800_state *state = screen->machine->driver_data;
+
+	/* expand visible area to workaround MC6845 */
+	video_screen_set_visarea(screen, 0, 767, 0, 311);
 
 	/* clear screen */
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
