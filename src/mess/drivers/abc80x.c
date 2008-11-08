@@ -1417,6 +1417,7 @@ MACHINE_DRIVER_END
     800 8"      DD88
     ABC 6-2X    ABC832
     ABC 6-3X    ABC838
+	ABC 6-52	ABC834
     UFD 6.XX    Winchester
 
 
@@ -1424,7 +1425,8 @@ MACHINE_DRIVER_END
 
 	Art N/O
 	--------
-	55 10760-01		
+	55 10761-01		"old" controller
+	55 10828-01		"old" controller
 	55 20900-0x		
 	55 21046-11		Luxor Conkort	25 pin D-sub connector
 	55 21046-21		Luxor Conkort	34 pin FDD connector
