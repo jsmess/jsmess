@@ -799,6 +799,16 @@ ROM_START(apple2cp)
 	ROM_LOAD("3410625a.256", 0x0000, 0x8000, CRC(0b996420) SHA1(1a27ae26966bbafd825d08ad1a24742d3e33557c))
 ROM_END
 
+ROM_START(ivelultr)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "ultra.chr", 0x0000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
+	ROM_LOAD ( "ultra.chr", 0x1000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
+	ROM_REGION(0x4700,"main",0)
+	ROM_LOAD ( "ultra1.002", 0x1000, 0x1000, CRC(392170ff) SHA1(f065104ab5a476321d56d802f1a174afabff9dbd))
+	ROM_LOAD ( "ultra1.001", 0x2000, 0x1000, CRC(671b8c2e) SHA1(c1e4b1477620c9292f2c2b25df55965eef445dee))
+	ROM_LOAD ( "ultra2.bin", 0x3000, 0x1000, CRC(1ac1e17e) SHA1(a5b8adec37da91970c303905b5e2c4d1b715ee4e))
+	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+ROM_END
 
 static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -875,3 +885,5 @@ COMP( 1985, apple2c0, apple2c,  0,			apple2c_iwm,  apple2e,  0,   apple2e,	"Appl
 COMP( 1986, apple2c3, apple2c,  0,			apple2c_iwm,  apple2e,  0,	 apple2e,	"Apple Computer", "Apple //c (Original Memory Expansion)" , 0)
 COMP( 1986, apple2c4, apple2c,  0,			apple2c_iwm,  apple2e,  0,	 apple2e,	"Apple Computer", "Apple //c (rev 4)" , GAME_NOT_WORKING )
 COMP( 1988, apple2cp, apple2c,  0,			apple2c_iwm,  apple2e,  0,	 apple2e,	"Apple Computer", "Apple //c Plus" , 0)
+
+COMP( 1984, ivelultr, apple2,   0,			apple2p,   	  apple2p,  0,   apple2p,	"Ivasim", "Ivel Ultra" , 0)

@@ -411,12 +411,21 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 		}
 	}
 
+	/* Fix for Ivel Ultra */
+	if (!strcmp(machine->gamedrv->name, "ivelultr")) {
+		int len = memory_region_length(machine, "gfx1");
+		for (i = 0; i < len; i++)
+		{
+			apple2_font[i] = BITSWAP8(apple2_font[i],  7, 7, 6, 5, 4, 3, 2, 1);		
+		}
+	}
+	
 	/* do we need to flip the gfx? */
 	if (!strcmp(machine->gamedrv->name, "apple2")
 		|| !strcmp(machine->gamedrv->name, "apple2p")
 		|| !strcmp(machine->gamedrv->name, "ace100")
 		|| !strcmp(machine->gamedrv->name, "apple2jp"))
-	{
+	{		
 		int len = memory_region_length(machine, "gfx1");
 		for (i = 0; i < len; i++)
 		{

@@ -381,6 +381,7 @@ DRVLIBS = \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
+	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/ep128.a \
 	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/epson.a \
@@ -1350,6 +1351,11 @@ $(MESSOBJ)/kramermc.a:      \
 	$(MESS_MACHINE)/kramermc.o \
 	$(MESS_VIDEO)/kramermc.o \
 
+$(MESSOBJ)/einis.a:      \
+	$(MESS_DRIVERS)/pecom.o \
+	$(MESS_MACHINE)/pecom.o \
+	$(MESS_VIDEO)/pecom.o \
+	
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
 	$(MESS_VIDEO)/newbrain.o \

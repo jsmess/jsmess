@@ -253,6 +253,7 @@ const game_driver * const drivers[] =
 	DRIVER( laser128 )	/* ??? 1987 Laser 128								*/
 	DRIVER( las128ex )	/* ??? 1987 Laser 128 EX							*/
 	DRIVER( las3000 )	/* ??? 1983 Laser 3000								*/
+	DRIVER( ivelultr )	/* Ivasim Ivel Ultra								*/
 
 /*
  * Lisa 				 January			 1983
@@ -1052,7 +1053,10 @@ XL/XE 16kB OS roms
 
 	/* Kramer */
 	DRIVER(kramermc) /* 1987 Kramer MC				*/
-	
+
+	/* Ei Nis */
+	DRIVER(pecom64)
+		
 	/* Bondwell */
 	DRIVER( bw2 )
 
