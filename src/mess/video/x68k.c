@@ -156,9 +156,9 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 	scr.max_x = sys.crtc.htotal - 8;
 	scr.max_y = sys.crtc.vtotal;
 	if(scr.max_y <= sys.crtc.vend)
-		scr.max_y = sys.crtc.vend + 1;
+		scr.max_y = sys.crtc.vend + 2;
 	if(scr.max_x <= sys.crtc.hend)
-		scr.max_x = sys.crtc.hend + 1;
+		scr.max_x = sys.crtc.hend + 2;
 	visiblescr.min_x = sys.crtc.hbegin;
 	visiblescr.max_x = sys.crtc.hend;
 	visiblescr.min_y = sys.crtc.vbegin;
@@ -184,7 +184,7 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 		visiblescr.min_y = 0;
 	if(visiblescr.max_x >= scr.max_x)
 		visiblescr.max_x = scr.max_x - 2;
-	if(visiblescr.max_y >= scr.max_y)
+	if(visiblescr.max_y >= scr.max_y - 1)
 		visiblescr.max_y = scr.max_y - 2;
 
 	logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",sys.crtc.reg[0],sys.crtc.reg[1],sys.crtc.reg[2],sys.crtc.reg[3],
@@ -447,7 +447,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(ACCESSING_BITS_8_15)
 		{
 			sys.crtc.interlace = 0;
-			if(data & 0x0400)  // real size 1024x1024
+			if(data & 0x0400)
 				sys.crtc.interlace = 1;
 		}
 		x68k_crtc_refresh_mode(machine);
@@ -725,7 +725,7 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 
 	for(priority=3;priority>=0;priority--)
 	{
-		if(sys.video.reg[0] & 0x04)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
+		if(sys.crtc.reg[20] & 0x0400)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
 		{
 			// 16 colour gfx screen
 			rect.min_x=sys.crtc.hshift;
@@ -734,14 +734,15 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 			rect.max_y=rect.min_y + sys.crtc.visible_height-1;
 			if(sys.video.reg[2] & 0x0010 && priority == sys.video.gfxlayer_pri[0])
 			{
-				xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x1ff);
-				yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x1ff);
+				xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x3ff);
+				yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x3ff);
 				copyscrollbitmap_trans(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 				xscr+=512;
 				copyscrollbitmap_trans(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 				yscr+=512;
-				copyscrollbitmap_trans(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 				xscr-=512;
+				copyscrollbitmap_trans(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
+				xscr+=512;
 				copyscrollbitmap_trans(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
 			}
 		}
