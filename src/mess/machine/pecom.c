@@ -35,9 +35,42 @@ WRITE8_HANDLER( pecom_bank_w )
 	memory_set_bankptr(1, mess_ram + 0x0000);
 }
 
+UINT8 key_val = 0;
 READ8_HANDLER (pecom_keyboard_r)
 {
-	return input_port_read(machine, "LINE0");
+	static const char *keynames[] = { 	"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
+										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15", "LINE16",
+										"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25" };
+	UINT8 reg = cpunum_get_reg(0,CDP1802_D);
+	switch(reg) {
+		case 0xca : key_val = 0;break;
+		case 0x29 : key_val = 1;break;
+		case 0x28 : key_val = 2;break;
+		case 0x2f : key_val = 3;break;
+		case 0x2e : key_val = 4;break;
+		case 0x2d : key_val = 5;break;
+		case 0x2c : key_val = 6;break;
+		case 0x33 : key_val = 7;break;
+		case 0x32 : key_val = 8;break;
+		case 0x31 : key_val = 9;break;
+		case 0x30 : key_val = 10;break;
+		case 0x37 : key_val = 11;break;
+		case 0x36 : key_val = 12;break;
+		case 0x35 : key_val = 13;break;
+		case 0x34 : key_val = 14;break;
+		case 0x3b : key_val = 15;break;
+		case 0x3a : key_val = 16;break;
+		case 0x39 : key_val = 17;break;
+		case 0x38 : key_val = 18;break;
+		case 0x3f : key_val = 19;break;
+		case 0x3e : key_val = 20;break;
+		case 0x3d : key_val = 21;break;
+		case 0x3c : key_val = 22;break;
+		case 0x03 : key_val = 23;break;
+		case 0x02 : key_val = 24;break;
+		case 0x01 : key_val = 25;break;		
+	}			
+	return input_port_read(machine, keynames[key_val]) & 0x03;
 }
 
 /* CDP1802 Interface */
@@ -60,7 +93,7 @@ static CDP1802_SC_WRITE( pecom64_sc_w )
 
 static CDP1802_Q_WRITE( pecom64_q_w )
 {
-	//logerror("CDP1802_Q_WRITE %d\n",level);
+	logerror("CDP1802_Q_WRITE %d\n",level);
 }
 
 CDP1802_INTERFACE( pecom64_cdp1802_config )
