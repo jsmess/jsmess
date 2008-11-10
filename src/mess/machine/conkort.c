@@ -69,12 +69,11 @@ Notes:
 
 	TODO:
 
-	- install read/write handlers for ABCBUS
+	- "memory_set_bank called for bank 1 with invalid bank entry 0"
 	- floppy drive selection
 	- floppy side selection
 	- DS/DD SS/DS jumpers
 	- S1-S5 jumpers
-	- read C5 from DS8131 (card address)
 	- protection device @ 8B
 	- Z80 wait logic
 	- everything for fast controller
@@ -88,6 +87,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
+#include "machine/abcbus.h"
 
 typedef struct _conkort_t conkort_t;
 struct _conkort_t
@@ -110,7 +110,7 @@ INLINE conkort_t *get_safe_token(const device_config *device)
 
 /* Slow Controller */
 
-READ8_HANDLER( luxor_55_10828_data_r )
+static READ8_HANDLER( slow_bus_data_r )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
 	const device_config *z80pio = devtag_get_device(machine, Z80PIO, CONKORT_Z80PIO_TAG);
@@ -131,7 +131,7 @@ READ8_HANDLER( luxor_55_10828_data_r )
 	return data;
 }
 
-WRITE8_HANDLER( luxor_55_10828_data_w )
+static WRITE8_HANDLER( slow_bus_data_w )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
 	const device_config *z80pio = devtag_get_device(machine, Z80PIO, CONKORT_Z80PIO_TAG);
@@ -148,7 +148,7 @@ WRITE8_HANDLER( luxor_55_10828_data_w )
 	z80pio_astb_w(z80pio, 1);
 }
 
-READ8_HANDLER( luxor_55_10828_status_r )
+static READ8_HANDLER( slow_bus_stat_r )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
 	conkort_t *conkort = get_safe_token(device);
@@ -156,19 +156,29 @@ READ8_HANDLER( luxor_55_10828_status_r )
 	return (conkort->pio_ardy << 7) | conkort->status;
 }
 
-WRITE8_HANDLER( luxor_55_10828_channel_w )
+static WRITE8_HANDLER( slow_bus_c1_w )
 {
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_HANDLER( luxor_55_10828_command_w )
+static WRITE8_HANDLER( slow_bus_c3_w )
 {
+	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
-READ8_HANDLER( luxor_55_10828_reset_r )
+static void slow_card_select(const device_config *device, UINT8 data)
 {
-	// reset Z80 and slow_ctrl lach
+	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
+	{
+		memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
+		memory_install_read8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C1, ABCBUS_C1, 0x18, 0, slow_bus_c1_w);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C3, ABCBUS_C3, 0x18, 0, slow_bus_c3_w);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
+	}
 
-	return 0xff;
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 READ8_HANDLER( slow_ctrl_r )
@@ -207,44 +217,20 @@ WRITE8_HANDLER( slow_status_w )
 
 /* Fast Controller */
 
-
-READ8_HANDLER( luxor_55_21046_data_r )
+static void fast_card_select(const device_config *device, UINT8 data)
 {
-	return 0;
-}
-
-WRITE8_HANDLER( luxor_55_21046_data_w )
-{
-}
-
-READ8_HANDLER( luxor_55_21046_status_r )
-{
-	return 0;
-}
-
-WRITE8_HANDLER( luxor_55_21046_channel_w )
-{
-}
-
-WRITE8_HANDLER( luxor_55_21046_command_w )
-{
-}
-
-READ8_HANDLER( luxor_55_21046_reset_r )
-{
-	return 0;
 }
 
 /* Memory Maps */
 
 // Slow Controller
 
-static ADDRESS_MAP_START( luxor_55_10828_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luxor_55_10828_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(slow_status_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(slow_ctrl_r, slow_ctrl_w)
@@ -254,12 +240,12 @@ ADDRESS_MAP_END
 
 // Fast Controller
 
-static ADDRESS_MAP_START( luxor_55_21046_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fast_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luxor_55_21046_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -409,7 +395,7 @@ static Z80PIO_INTERFACE( pio_intf )
 	NULL						/* portB ready active callback */
 };
 
-static const z80_daisy_chain luxor_55_10828_daisy_chain[] =
+static const z80_daisy_chain slow_daisy_chain[] =
 {
 	{ Z80PIO, CONKORT_Z80PIO_TAG },
 	{ NULL }
@@ -457,7 +443,7 @@ static const z80dma_interface dma_intf =
 	0
 };
 
-static const z80_daisy_chain luxor_55_21046_daisy_chain[] =
+static const z80_daisy_chain fast_daisy_chain[] =
 {
 	{ Z80DMA, CONKORT_Z80DMA_TAG },
 	{ NULL }
@@ -465,7 +451,7 @@ static const z80_daisy_chain luxor_55_21046_daisy_chain[] =
 
 /* FD1791 */
 
-static void wd1791_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static void slow_wd1791_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
 	conkort_t *conkort = get_safe_token(device);
@@ -487,7 +473,7 @@ static void wd1791_callback(running_machine *machine, wd17xx_state_t state, void
 
 /* FD1793 */
 
-static void wd1793_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static void fast_wd1793_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
 	switch(state)
 	{
@@ -504,39 +490,39 @@ static void wd1793_callback(running_machine *machine, wd17xx_state_t state, void
 
 /* Machine Start */
 
-static MACHINE_START( luxor_55_10828 )
+static MACHINE_START( slow )
 {
-	wd17xx_init(machine, WD_TYPE_179X, wd1791_callback, NULL); // FD1791-01
+	wd17xx_init(machine, WD_TYPE_179X, slow_wd1791_callback, NULL); // FD1791-01
 }
 
-static MACHINE_START( luxor_55_21046 )
+static MACHINE_START( fast )
 {
-	wd17xx_init(machine, WD_TYPE_1793, wd1793_callback, NULL); // FD1793-01
+	wd17xx_init(machine, WD_TYPE_1793, fast_wd1793_callback, NULL); // FD1793-01
 }
 
 /* Machine Driver */
 
-MACHINE_DRIVER_START( luxor_55_10828 )
+static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_ADD(CONKORT_Z80_TAG, Z80, XTAL_4MHz/2)
-	MDRV_CPU_PROGRAM_MAP(luxor_55_10828_map, 0)
-	MDRV_CPU_IO_MAP(luxor_55_10828_io_map, 0)
-	MDRV_CPU_CONFIG(luxor_55_10828_daisy_chain)
+	MDRV_CPU_PROGRAM_MAP(slow_map, 0)
+	MDRV_CPU_IO_MAP(slow_io_map, 0)
+	MDRV_CPU_CONFIG(slow_daisy_chain)
 
 	MDRV_Z80PIO_ADD(CONKORT_Z80PIO_TAG, pio_intf)
 	
-	MDRV_MACHINE_START(luxor_55_10828)
+	MDRV_MACHINE_START(slow)
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( luxor_55_21046 )
+static MACHINE_DRIVER_START( luxor_55_21046 )
 	MDRV_CPU_ADD(CONKORT_Z80_TAG, Z80, XTAL_16MHz/4)
-	MDRV_CPU_PROGRAM_MAP(luxor_55_21046_map, 0)
-	MDRV_CPU_IO_MAP(luxor_55_21046_io_map, 0)
-	MDRV_CPU_CONFIG(luxor_55_21046_daisy_chain)
+	MDRV_CPU_PROGRAM_MAP(fast_map, 0)
+	MDRV_CPU_IO_MAP(fast_io_map, 0)
+	MDRV_CPU_CONFIG(fast_daisy_chain)
 
 	MDRV_DEVICE_ADD(CONKORT_Z80DMA_TAG, Z80DMA)
 	MDRV_DEVICE_CONFIG(dma_intf)
 	
-	MDRV_MACHINE_START(luxor_55_21046)
+	MDRV_MACHINE_START(fast)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -609,6 +595,10 @@ static DEVICE_SET_INFO( luxor_55_10828 )
 	}
 }
 
+static DEVICE_RESET( luxor_55_10828 )
+{
+}
+
 DEVICE_GET_INFO( luxor_55_10828 )
 {
 	switch (state)
@@ -626,7 +616,8 @@ DEVICE_GET_INFO( luxor_55_10828 )
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(luxor_55_10828); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_10828);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(luxor_55_10828); break;
+		case DEVINFO_FCT_CARD_SELECT:					info->f = (genf *)slow_card_select;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "Luxor 55 10828";					break;
@@ -670,6 +661,10 @@ static DEVICE_SET_INFO( luxor_55_21046 )
 	}
 }
 
+static DEVICE_RESET( luxor_55_21046 )
+{
+}
+
 DEVICE_GET_INFO( luxor_55_21046 )
 {
 	switch (state)
@@ -685,9 +680,10 @@ DEVICE_GET_INFO( luxor_55_21046 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(luxor_55_21046); break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_21046);	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_21046); break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(luxor_55_21046); break;
+		case DEVINFO_FCT_CARD_SELECT:					info->f = (genf *)fast_card_select;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "Luxor Conkort 55 21046";			break;

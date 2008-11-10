@@ -84,6 +84,7 @@ Notes:
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 #include "machine/abcbus.h"
+#include "machine/conkort.h"
 
 /* Devices */
 #include "devices/basicdsk.h"
@@ -231,9 +232,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(abc80_sound_w)
 	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
 	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
@@ -352,7 +351,7 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-/* Z80 PIO Interface */
+/* Z80 PIO */
 
 static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 {
@@ -459,6 +458,14 @@ static const z80_daisy_chain abc80_daisy_chain[] =
 	{ NULL }
 };
 
+/* ABC BUS */
+
+static ABCBUS_CONFIG( abcbus_config )
+{
+//	{ luxor_55_10828, CONKORT_TAG },
+	{ NULL }
+};
+
 /* Machine Initialization */
 
 static MACHINE_START( abc80 )
@@ -484,6 +491,10 @@ static MACHINE_START( abc80 )
 	/* find devices */
 
 	state->z80pio = devtag_get_device(machine, Z80PIO, Z80PIO_TAG);
+
+	/* initialize the ABC BUS */
+
+	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* register for state saving */
 
@@ -512,6 +523,9 @@ static MACHINE_DRIVER_START( abc80 )
 	/* Z80PIO */
 	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, abc80_pio_intf)
+
+	/* Luxor Conkort 55-10828 */
+//	MDRV_DEVICE_ADD(CONKORT_TAG, LUXOR_55_10828)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc80_video)

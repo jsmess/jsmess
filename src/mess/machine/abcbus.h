@@ -38,6 +38,21 @@
 
 /*
 
+	OUT 0	_OUT	data output
+	OUT 1	_CS		card select
+	OUT 2	_C1		command 1
+	OUT 3	_C2		command 2
+	OUT 4	_C3		command 3
+	OUT 5	_C4		command 4
+
+	IN 0	_INP	data input
+	IN 1	_STAT	status in
+	IN 7	RST		reset
+
+*/
+
+/*
+
 	Type					Size		Tracks	Sides	Sectors/track	Sectors		Speed			Drives
 
 	ABC-830		Floppy		160 KB		40		1		16				640			250 Kbps		MPI 51, BASF 6106
@@ -56,6 +71,14 @@
 
 */
 
+#ifndef __ABCBUS__
+#define __ABCBUS__
+
+enum
+{
+	DEVINFO_FCT_CARD_SELECT = DEVINFO_FCT_DEVICE_SPECIFIC,	/* R/O: abcbus_daisy_cs */
+};
+
 enum
 {
 	ABCBUS_CHANNEL_ABC850_852_856 = 36,
@@ -64,12 +87,38 @@ enum
 	ABCBUS_CHANNEL_ABC838 = 46
 };
 
-READ8_HANDLER( abcbus_data_r );
-WRITE8_HANDLER( abcbus_data_w );
-READ8_HANDLER( abcbus_status_r );
+enum
+{
+	ABCBUS_OUT = 0,
+	ABCBUS_INP = 0,
+	ABCBUS_CS = 1,
+	ABCBUS_STAT = 1,
+	ABCBUS_C1,
+	ABCBUS_C2,
+	ABCBUS_C3,
+	ABCBUS_C4,
+	ABCBUS_RST = 7
+};
+
+/* per-device callback functions */
+typedef void (*abcbus_card_select)(const device_config *device, UINT8 data);
+
+/* opaque internal daisy chain state */
+
+/* daisy chain structure */
+typedef struct _abcbus_daisy_chain abcbus_daisy_chain;
+struct _abcbus_daisy_chain
+{
+	device_type		devtype;					/* type of device */
+	const char *	devname;					/* name of the device */
+};
+#define ABCBUS_CONFIG(name) const abcbus_daisy_chain (name)[] =
+
+void *abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy);
+
 WRITE8_HANDLER( abcbus_channel_w );
-WRITE8_HANDLER( abcbus_command_w );
 READ8_HANDLER( abcbus_reset_r );
-READ8_HANDLER( abcbus_strobe_r );
-WRITE8_HANDLER( abcbus_strobe_w );
+
 DEVICE_IMAGE_LOAD( abc_floppy );
+
+#endif

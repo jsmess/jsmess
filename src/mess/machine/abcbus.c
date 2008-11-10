@@ -2,49 +2,52 @@
 #include "abcbus.h"
 #include "devices/basicdsk.h"
 
-static int abcbus_strobe;
-static int abcbus_channel;
-
-READ8_HANDLER( abcbus_data_r )
+typedef struct _abcbus_daisy_state abcbus_daisy_state;
+struct _abcbus_daisy_state
 {
-	return 0xff;
-}
+	abcbus_daisy_state *		next;			/* next device */
+	const device_config *	device;			/* associated device */
+	abcbus_card_select		card_select;	/* card select callback */
+};
 
-WRITE8_HANDLER( abcbus_data_w )
-{
-}
+static abcbus_daisy_state *daisy;
 
-READ8_HANDLER( abcbus_status_r )
+void *abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy)
 {
-	return 0xff;
+	astring *tempstring = astring_alloc();
+	abcbus_daisy_state *head = NULL;
+	abcbus_daisy_state **tailptr = &head;
+
+	/* create a linked list of devices */
+	for ( ; daisy->devtype != NULL; daisy++)
+	{
+		*tailptr = auto_malloc(sizeof(**tailptr));
+		(*tailptr)->next = NULL;
+		(*tailptr)->device = devtag_get_device(machine, daisy->devtype, device_inherit_tag(tempstring, cputag, daisy->devname));
+		if ((*tailptr)->device == NULL)
+			fatalerror("Unable to locate device '%s'", daisy->devname);
+		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CARD_SELECT);
+		tailptr = &(*tailptr)->next;
+	}
+
+	astring_free(tempstring);
+	return head;
 }
 
 WRITE8_HANDLER( abcbus_channel_w )
 {
-	abcbus_channel = data;
-}
-
-WRITE8_HANDLER( abcbus_command_w )
-{
+	/* loop over all devices and call their card select function */
+	for ( ; daisy != NULL; daisy = daisy->next)
+		(*daisy->card_select)(daisy->device, data);
 }
 
 READ8_HANDLER( abcbus_reset_r )
 {
-	abcbus_strobe = CLEAR_LINE;
+	/* loop over all devices and call their reset function */
+	for ( ; daisy != NULL; daisy = daisy->next)
+		device_reset(daisy->device);
 
 	return 0xff;
-}
-
-READ8_HANDLER( abcbus_strobe_r )
-{
-	abcbus_strobe = ASSERT_LINE;
-
-	return 0xff;
-}
-
-WRITE8_HANDLER( abcbus_strobe_w )
-{
-	abcbus_strobe = ASSERT_LINE;
 }
 
 DEVICE_IMAGE_LOAD( abc_floppy )

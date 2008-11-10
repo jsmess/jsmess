@@ -484,9 +484,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
@@ -512,9 +510,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_MIRROR(0x18) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
@@ -534,9 +530,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x08) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_MIRROR(0x08) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_READ(abc802_pling_r)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x08) AM_READ(abcbus_reset_r)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
@@ -571,9 +565,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
-	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff18) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(abc806_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_MASK(0xff00) AM_READWRITE(abcbus_reset_r, abc806_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
@@ -1081,6 +1073,14 @@ static const z80_daisy_chain abc800_daisy_chain[] =
 	{ NULL }
 };
 
+/* ABC BUS */
+
+static ABCBUS_CONFIG( abcbus_config )
+{
+//	{ LUXOR_55_21046, CONKORT_TAG },
+	{ NULL }
+};
+
 /* Machine Initialization */
 
 static MACHINE_START( abc800 )
@@ -1093,6 +1093,10 @@ static MACHINE_START( abc800 )
 	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
 	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+
+	/* initialize the ABC BUS */
+
+	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* configure memory */
 
@@ -1124,6 +1128,10 @@ static MACHINE_START( abc802 )
 	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
 	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
 //	state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+
+	/* initialize the ABC BUS */
+
+	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* configure memory */
 
@@ -1174,6 +1182,10 @@ static MACHINE_START( abc806 )
 	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
 	state->e0516 = devtag_get_device(machine, E0516, E0516_TAG);
 	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+
+	/* initialize the ABC BUS */
+
+	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* setup memory banking */
 
@@ -1247,7 +1259,7 @@ static MACHINE_DRIVER_START( abc800m )
 //	MDRV_ABC77_ADD(abc800_abc77_intf)
 
 	/* Luxor Conkort 55-21046 */
-	MDRV_DEVICE_ADD("conkort", LUXOR_CONKORT)
+//	MDRV_DEVICE_ADD(CONKORT_TAG, LUXOR_55_21046)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc800m_video)
@@ -1293,6 +1305,9 @@ static MACHINE_DRIVER_START( abc800c )
 	/* ABC-77 keyboard */
 //	MDRV_ABC77_ADD(abc800_abc77_intf)
 
+	/* Luxor Conkort 55-21046 */
+//	MDRV_DEVICE_ADD(CONKORT_TAG, LUXOR_55_21046)
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc800c_video)
 
@@ -1337,6 +1352,9 @@ static MACHINE_DRIVER_START( abc802 )
 	/* ABC-77 keyboard */
 //	MDRV_ABC77_ADD(abc802_abc77_intf)
 
+	/* Luxor Conkort 55-21046 */
+//	MDRV_DEVICE_ADD(CONKORT_TAG, LUXOR_55_21046)
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc802_video)
 
@@ -1380,6 +1398,9 @@ static MACHINE_DRIVER_START( abc806 )
 
 	/* ABC-77 keyboard */
 	//MDRV_ABC77_ADD(abc806_abc77_intf)
+
+	/* Luxor Conkort 55-21046 */
+//	MDRV_DEVICE_ADD(CONKORT_TAG, LUXOR_55_21046)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc806_video)
