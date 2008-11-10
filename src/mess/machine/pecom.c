@@ -56,6 +56,9 @@ READ8_HANDLER (pecom_keyboard_r)
 		if (pecom_key_cnt==26) {
 			pecom_key_cnt = 0;
 		}
+	} if ((pecom_key_val!=val) && (pecom_key_val!=0)) {
+		val = 0;
+		pecom_key_cnt = 0;
 	}
 	pecom_key_val=val;
 	return val;	
