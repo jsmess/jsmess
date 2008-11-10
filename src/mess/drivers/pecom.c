@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1869.h"
+#include "devices/cassette.h"
 #include "includes/pecom.h"
 
 
@@ -113,9 +114,9 @@ static INPUT_PORTS_START( pecom )
 		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) // ??
 	PORT_START("CNT")		
 		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassete in
 		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 INPUT_PORTS_END
 
 
@@ -123,6 +124,12 @@ static SYSTEM_CONFIG_START(pecom64)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END
 
+static const cassette_config pecom_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
+};
 
 /* Machine driver */
 static MACHINE_DRIVER_START( pecom64 )
@@ -146,7 +153,10 @@ static MACHINE_DRIVER_START( pecom64 )
 
 	MDRV_SOUND_ADD("cdp1869", CDP1869, CDP1869_DOT_CLK_PAL)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	
+	MDRV_CASSETTE_ADD( "cassette", pecom_cassette_config )
 MACHINE_DRIVER_END
 
 /* ROM definition */

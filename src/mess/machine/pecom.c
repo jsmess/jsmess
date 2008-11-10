@@ -8,8 +8,9 @@
 
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
+#include "devices/cassette.h"
 #include "includes/pecom.h"
-  
+ 
   
 /* Driver initialization */
 DRIVER_INIT(pecom)
@@ -79,28 +80,31 @@ static CDP1802_MODE_READ( pecom64_mode_r )
 	return CDP1802_MODE_RUN;
 }
 
+static const device_config *cassette_device_image(running_machine *machine)
+{
+	return devtag_get_device(machine, CASSETTE, "cassette");
+}
+
 static CDP1802_EF_READ( pecom64_ef_r )
 {
 	int flags = 0x0f;
 	flags -= input_port_read(machine, "CNT");
+
+	if (cassette_input(cassette_device_image(machine)) > +0.5) flags -= EF2;
+	
 	return flags;
 }
 
-static CDP1802_SC_WRITE( pecom64_sc_w )
-{
-	//logerror("CDP1802_SC_WRITE %02x\n",state);
-}
-
 static CDP1802_Q_WRITE( pecom64_q_w )
-{
-	logerror("CDP1802_Q_WRITE %d\n",level);
+{	
+	cassette_output(cassette_device_image(machine), level ? +1.0 : -1.0);
 }
 
 CDP1802_INTERFACE( pecom64_cdp1802_config )
 {
 	pecom64_mode_r,
 	pecom64_ef_r,
-	pecom64_sc_w,
+	NULL,
 	pecom64_q_w,
 	NULL,
 	NULL
