@@ -3,22 +3,20 @@
 
 #include "driver.h"
 
-#define CONKORT_TAG	"55-21046"
+#define CONKORT_Z80_TAG		"5a"
+#define CONKORT_Z80PIO_TAG	"3a"
+#define CONKORT_Z80DMA_TAG	"z80dma"
 
-#define LUXOR_CONKORT DEVICE_GET_INFO_NAME( conkort )
+#define CONKORT_TAG	"conkort"
+
+#define LUXOR_55_10828 DEVICE_GET_INFO_NAME( luxor_55_10828 )
+#define LUXOR_55_21046 DEVICE_GET_INFO_NAME( luxor_55_21046 )
 
 /* device interface */
-DEVICE_GET_INFO( conkort );
+DEVICE_GET_INFO( luxor_55_10828 );
+DEVICE_GET_INFO( luxor_55_21046 );
 
 /* configuration dips */
-INPUT_PORTS_EXTERN( conkort );
-
-/* ABCBUS interface */
-READ8_HANDLER( conkort_abcbus_data_r );
-WRITE8_HANDLER( conkort_abcbus_data_w );
-READ8_HANDLER( conkort_abcbus_status_r );
-WRITE8_HANDLER( conkort_abcbus_channel_w );
-WRITE8_HANDLER( conkort_abcbus_command_w );
-READ8_HANDLER( conkort_abcbus_reset_r );
+INPUT_PORTS_EXTERN( luxor_55_21046 );
 
 #endif
