@@ -88,10 +88,11 @@ static const device_config *cassette_device_image(running_machine *machine)
 static CDP1802_EF_READ( pecom64_ef_r )
 {
 	int flags = 0x0f;
-	flags -= input_port_read(machine, "CNT");
-
-	if (cassette_input(cassette_device_image(machine)) > +0.5) flags -= EF2;
-	
+	if (cassette_get_state(cassette_device_image(machine)) & CASSETTE_PLAY) {
+		if (cassette_input(cassette_device_image(machine)) > +0.05) flags -= EF2;
+	} else {
+		flags -= input_port_read(machine, "CNT");
+	}
 	return flags;
 }
 
