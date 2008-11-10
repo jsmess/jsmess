@@ -49,6 +49,7 @@ static CDP1802_MODE_READ( pecom64_mode_r )
 static CDP1802_EF_READ( pecom64_ef_r )
 {
 	int flags = 0x0f;
+	flags -= input_port_read(machine, "CNT");
 	return flags;
 }
 
