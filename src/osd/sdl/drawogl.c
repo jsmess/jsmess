@@ -341,11 +341,9 @@ static void texcopy_palette16(texture_info *texture, const render_texinfo *texso
 static void texcopy_palette16a(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_rgb15(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
-#ifndef SDLMAME_MACOSX
 static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
-#endif
-#ifdef SDLMAME_MACOSX
+#if 0 //def SDLMAME_MACOSX
 static void texcopy_yuv16_apple(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_yuv16_paletted_apple(texture_info *texture, const render_texinfo *texsource);
 #endif
@@ -1439,7 +1437,7 @@ static const GLint texture_gl_properties_srcNative_intNative[9][6] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-#ifdef SDLMAME_MACOSX
+#if 0 //def SDLMAME_MACOSX
 	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16
 	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16_PALETTED
 #else
@@ -1456,7 +1454,7 @@ static const GLint texture_gl_properties_srcNative_int32bpp[9][6] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-#ifdef SDLMAME_MACOSX
+#if 0 //def SDLMAME_MACOSX
 	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16
 	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16_PALETTED
 #else
@@ -1473,7 +1471,7 @@ static const GLint texture_gl_properties_srcCopy_int32bpp[9][6] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-#ifdef SDLMAME_MACOSX
+#if 0 //def SDLMAME_MACOSX
 	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16
 	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16_PALETTED
 #else
@@ -1490,7 +1488,7 @@ static const texture_copy_func texcopy_dstNative_f[2][9] = { {
 	texcopy_argb32,
 	texcopy_rgb32,
 	texcopy_rgb32_paletted,
-#ifdef SDLMAME_MACOSX
+#if 0 //def SDLMAME_MACOSX
 	texcopy_yuv16_apple,
 	texcopy_yuv16_paletted_apple,
 #else
@@ -1520,7 +1518,7 @@ static const texture_copy_func texcopy_dst32bpp_f[2][9] = { {
 	texcopy_argb32,
 	texcopy_rgb32,
 	texcopy_rgb32_paletted,
-#ifdef SDLMAME_MACOSX
+#if 0 //def SDLMAME_MACOSX
 	texcopy_yuv16_apple,
 	texcopy_yuv16_paletted_apple,
 #else

@@ -32,6 +32,14 @@
 
 #include "osdcore.h"
 
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+#define PATHSEPCH '\\'
+#define INVPATHSEPCH '/'
+#else
+#define PATHSEPCH '/'
+#define INVPATHSEPCH '\\'
+#endif
+
 struct _osd_directory
 {
 	osd_directory_entry ent;
@@ -96,6 +104,8 @@ static UINT64 osd_get_file_size(const char *file)
 osd_directory *osd_opendir(const char *dirname)
 {
 	osd_directory *dir = NULL;
+	char *tmpstr, *envstr;
+	int i, j;
 
 	dir = malloc(sizeof(osd_directory));
 	if (dir)
@@ -104,7 +114,44 @@ osd_directory *osd_opendir(const char *dirname)
 		dir->fd = NULL;
 	}
 
-	dir->fd = opendir(dirname);
+	tmpstr = malloc(strlen(dirname)+1);
+	strcpy(tmpstr, dirname);
+
+	if (tmpstr[0] == '$')
+	{
+		char *envval;
+		envstr = malloc(strlen(tmpstr)+1); 
+
+		strcpy(envstr, tmpstr);
+
+		i = 0;
+		while (envstr[i] != PATHSEPCH && envstr[i] != 0 && envstr[i] != '.')
+		{
+			i++;
+		}
+
+		envstr[i] = '\0';
+
+		envval = getenv(&envstr[1]);
+		if (envval != NULL)
+		{
+			j = strlen(envval) + strlen(tmpstr) + 1;
+			free(tmpstr);
+			tmpstr = malloc(j);
+	
+			// start with the value of $HOME
+			strcpy(tmpstr, envval);
+			// replace the null with a path separator again
+			envstr[i] = PATHSEPCH;
+			// append it
+			strcat(tmpstr, &envstr[i]);
+		}
+		else
+			fprintf(stderr, "Warning: Environment variable %s not found.\n", envstr);
+		free(envstr);
+	}
+
+	dir->fd = opendir(tmpstr);
 
 	if (dir && (dir->fd == NULL))
 	{
@@ -112,6 +159,8 @@ osd_directory *osd_opendir(const char *dirname)
 		dir = NULL;
 	}
 
+	if (tmpstr)
+	  free(tmpstr);
 	return dir;
 }
 

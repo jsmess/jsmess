@@ -34,6 +34,11 @@
 #define SDLMAME_FREEBSD 1
 #endif
 
+// fix for Ubuntu 8.10
+#ifdef _FORTIFY_SOURCE
+#undef _FORTIFY_SOURCE
+#endif
+
 #endif /* SDLMAME_UNIX */
 
 //============================================================

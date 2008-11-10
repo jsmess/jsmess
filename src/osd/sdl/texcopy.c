@@ -31,7 +31,7 @@
 #define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555
 #include "texcopy.c"
 
-#ifdef SDLMAME_MACOSX /* native MacOS X composite texture format */
+#if 0 //def SDLMAME_MACOSX /* native MacOS X composite texture format */
 
 #define SDL_TEXFORMAT SDL_TEXFORMAT_YUY16
 #include "texcopy.c"
@@ -46,7 +46,7 @@
 //  (YUY format is weird and doesn't fit the assumptions of the
 //   standard macros so we handle it here
 //============================================================
-#ifndef SDLMAME_MACOSX
+#if 1 //ndef SDLMAME_MACOSX
 static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource)
 {
 	int x, y;
