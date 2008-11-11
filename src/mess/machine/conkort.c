@@ -69,7 +69,6 @@ Notes:
 
 	TODO:
 
-	- "memory_set_bank called for bank 1 with invalid bank entry 0"
 	- floppy drive selection
 	- floppy side selection
 	- DS/DD SS/DS jumpers
@@ -488,18 +487,6 @@ static void fast_wd1793_callback(running_machine *machine, wd17xx_state_t state,
 	}
 }
 
-/* Machine Start */
-
-static MACHINE_START( slow )
-{
-	wd17xx_init(machine, WD_TYPE_179X, slow_wd1791_callback, NULL); // FD1791-01
-}
-
-static MACHINE_START( fast )
-{
-	wd17xx_init(machine, WD_TYPE_1793, fast_wd1793_callback, NULL); // FD1793-01
-}
-
 /* Machine Driver */
 
 static MACHINE_DRIVER_START( luxor_55_10828 )
@@ -509,8 +496,6 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
 	MDRV_Z80PIO_ADD(CONKORT_Z80PIO_TAG, pio_intf)
-	
-	MDRV_MACHINE_START(slow)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luxor_55_21046 )
@@ -521,8 +506,6 @@ static MACHINE_DRIVER_START( luxor_55_21046 )
 
 	MDRV_DEVICE_ADD(CONKORT_Z80DMA_TAG, Z80DMA)
 	MDRV_DEVICE_CONFIG(dma_intf)
-	
-	MDRV_MACHINE_START(fast)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -579,6 +562,10 @@ static DEVICE_START( luxor_55_10828 )
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
 	conkort->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
+
+	/* initialize FDC */
+
+	wd17xx_init(device->machine, WD_TYPE_179X, slow_wd1791_callback, NULL); // FD1791-01
 
 	/* register for state saving */
 
@@ -645,6 +632,10 @@ static DEVICE_START( luxor_55_21046 )
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
 	conkort->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
+
+	/* initialize FDC */
+
+	wd17xx_init(device->machine, WD_TYPE_1793, fast_wd1793_callback, NULL); // FD1793-01
 
 	/* register for state saving */
 
