@@ -117,7 +117,8 @@ typedef struct {
 	UINT8	irq_state[3];		/* irq line states (INT0,INT1,INT2) */
 	UINT8	after_EI;			/* are we in the EI shadow? */
 	z80_daisy_state *daisy;
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 }	Z180_Regs;
 
 #define CF	0x01
@@ -795,8 +796,8 @@ static UINT8 z180_readcontrol(offs_t port);
 static void z180_writecontrol(offs_t port, UINT8 data);
 static void z180_dma0(void);
 static void z180_dma1(void);
-static void z180_burn(int cycles);
-static void z180_set_info(UINT32 state, cpuinfo *info);
+static CPU_BURN( z180 );
+static CPU_SET_INFO( z180 );
 
 #include "z180daa.h"
 #include "z180ops.h"
@@ -1897,12 +1898,13 @@ static void z180_write_iolines(UINT32 data)
 }
 
 
-static void z180_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( z180 )
 {
 	Z180.daisy = NULL;
 	if (config)
 		Z180.daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
 	Z180.irq_callback = irqcallback;
+	Z180.device = device;
 
 	state_save_register_item("z180", index, Z180.AF.w.l);
 	state_save_register_item("z180", index, Z180.BC.w.l);
@@ -1934,10 +1936,11 @@ static void z180_init(int index, int clock, const void *config, int (*irqcallbac
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static void z180_reset(void)
+static CPU_RESET( z180 )
 {
 	z80_daisy_state *save_daisy;
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 	int i, p;
 #if BIG_FLAGS_ARRAY
 	int oldval, newval, val;
@@ -2018,9 +2021,11 @@ static void z180_reset(void)
 
 	save_daisy = Z180.daisy;
 	save_irqcallback = Z180.irq_callback;
+	save_device = Z180.device;
 	memset(&Z180, 0, sizeof(Z180));
 	Z180.daisy = save_daisy;
 	Z180.irq_callback = save_irqcallback;
+	Z180.device = device;
 	_IX = _IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	_F = ZF;			/* Zero flag is set */
 	Z180.nmi_state = CLEAR_LINE;
@@ -2182,7 +2187,7 @@ static void check_interrupts(void)
 /****************************************************************************
  * Execute 'cycles' T-states. Return number of T-states really executed
  ****************************************************************************/
-static int z180_execute(int cycles)
+static CPU_EXECUTE( z180 )
 {
 	int old_icount = cycles;
 	z180_icount = cycles;
@@ -2272,7 +2277,7 @@ again:
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust R register for the lost time
  ****************************************************************************/
-static void z180_burn(int cycles)
+static CPU_BURN( z180 )
 {
 	if( cycles > 0 )
 	{
@@ -2286,7 +2291,7 @@ static void z180_burn(int cycles)
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void z180_get_context (void *dst)
+static CPU_GET_CONTEXT( z180 )
 {
 	if( dst )
 		*(Z180_Regs*)dst = Z180;
@@ -2295,7 +2300,7 @@ static void z180_get_context (void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void z180_set_context (void *src)
+static CPU_SET_CONTEXT( z180 )
 {
 	if( src )
 		Z180 = *(Z180_Regs*)src;
@@ -2342,11 +2347,11 @@ static void set_irq_line(int irqline, int state)
 }
 
 /* logical to physical address translation */
-static int z180_translate(int space, int intention, offs_t *addr)
+static CPU_TRANSLATE( z180 )
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
-		*addr = MMU_REMAP_ADDR(*addr);
+		*address = MMU_REMAP_ADDR(*address);
 	}
 	return TRUE;
 }
@@ -2355,7 +2360,7 @@ static int z180_translate(int space, int intention, offs_t *addr)
  * Generic set_info
  **************************************************************************/
 
-static void z180_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( z180 )
 {
 	switch (state)
 	{
@@ -2466,7 +2471,7 @@ static void z180_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void z180_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( z180 )
 {
 	switch (state)
 	{
@@ -2586,16 +2591,16 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + Z180_IOLINES:		info->i = Z180.iol;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = z180_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = z180_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = z180_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = z180_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = z180_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = z180_execute;			break;
-		case CPUINFO_PTR_BURN:							info->burn = z180_burn;					break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = z180_dasm;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z180);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(z180);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(z180);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(z180);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(z180);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(z180);			break;
+		case CPUINFO_PTR_BURN:							info->burn = CPU_BURN_NAME(z180);					break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(z180);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z180_icount;			break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = z180_translate;		break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(z180);		break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: info->p = (void *)cc[Z180_TABLE_op];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: info->p = (void *)cc[Z180_TABLE_cb];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: info->p = (void *)cc[Z180_TABLE_ed];			break;

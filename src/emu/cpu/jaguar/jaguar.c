@@ -94,7 +94,8 @@ typedef struct
 	int			op;
 	int			interrupt_cycles;
 	void 		(*const *table)(void);
-	int 		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	void		(*cpu_interrupt)(void);
 } jaguar_regs;
 
@@ -352,7 +353,7 @@ static void set_irq_line(int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void jaguar_get_context(void *dst)
+static CPU_GET_CONTEXT( jaguar )
 {
 	/* copy the context */
 	if (dst)
@@ -360,7 +361,7 @@ static void jaguar_get_context(void *dst)
 }
 
 
-static void jaguar_set_context(void *src)
+static CPU_SET_CONTEXT( jaguar )
 {
 	/* copy the context */
 	if (src)
@@ -430,33 +431,35 @@ static void jaguar_state_register(int index, const char *type)
 	state_save_register_postload(Machine, jaguar_postload, NULL);
 }
 
-static void jaguargpu_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( jaguargpu )
 {
-	const jaguar_cpu_core *config = _config;
+	const jaguar_cpu_core *configdata = config;
 
 	memset(&jaguar, 0, sizeof(jaguar));
 
 	jaguar_state_register(index, "jaguargpu");
 
 	jaguar.irq_callback = irqcallback;
-	if (config)
-		jaguar.cpu_interrupt = config->cpu_int_callback;
+	jaguar.device = device;
+	if (configdata)
+		jaguar.cpu_interrupt = configdata->cpu_int_callback;
 }
 
-static void jaguardsp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( jaguardsp )
 {
-	const jaguar_cpu_core *config = _config;
+	const jaguar_cpu_core *configdata = config;
 
 	memset(&jaguar, 0, sizeof(jaguar));
 
 	jaguar_state_register(index, "jaguardsp");
 
 	jaguar.irq_callback = irqcallback;
-	if (config)
-		jaguar.cpu_interrupt = config->cpu_int_callback;
+	jaguar.device = device;
+	if (configdata)
+		jaguar.cpu_interrupt = configdata->cpu_int_callback;
 }
 
-INLINE void common_reset(void)
+INLINE CPU_RESET( common )
 {
 	init_tables();
 
@@ -467,21 +470,21 @@ INLINE void common_reset(void)
 	change_pc(jaguar.PC);
 }
 
-static void jaguargpu_reset(void)
+static CPU_RESET( jaguargpu )
 {
-	common_reset();
+	CPU_RESET_CALL(common);
 	jaguar.table = gpu_op_table;
 	jaguar.isdsp = 0;
 }
 
-static void jaguardsp_reset(void)
+static CPU_RESET( jaguardsp )
 {
-	common_reset();
+	CPU_RESET_CALL(common);
 	jaguar.table = dsp_op_table;
 	jaguar.isdsp = 1;
 }
 
-static void jaguar_exit(void)
+static CPU_EXIT( jaguar )
 {
 	if (mirror_table)
 		free(mirror_table);
@@ -498,7 +501,7 @@ static void jaguar_exit(void)
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static int jaguargpu_execute(int cycles)
+static CPU_EXECUTE( jaguargpu )
 {
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
@@ -544,7 +547,7 @@ static int jaguargpu_execute(int cycles)
 	return cycles - jaguar_icount;
 }
 
-static int jaguardsp_execute(int cycles)
+static CPU_EXECUTE( jaguardsp )
 {
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
@@ -596,13 +599,13 @@ static int jaguardsp_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t jaguargpu_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( jaguargpu )
 {
 	extern unsigned dasmjag(int, char *, unsigned, const UINT8 *);
     return dasmjag(JAGUAR_VARIANT_GPU, buffer, pc, oprom);
 }
 
-static offs_t jaguardsp_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( jaguardsp )
 {
 	extern unsigned dasmjag(int, char *, unsigned, const UINT8 *);
     return dasmjag(JAGUAR_VARIANT_DSP, buffer, pc, oprom);
@@ -1512,7 +1515,7 @@ void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
  * Generic set_info
  **************************************************************************/
 
-static void jaguargpu_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( jaguargpu )
 {
 	switch (state)
 	{
@@ -1569,7 +1572,7 @@ static void jaguargpu_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void jaguargpu_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( jaguargpu )
 {
 	switch (state)
 	{
@@ -1642,15 +1645,15 @@ void jaguargpu_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_SP:							info->i = jaguar.b0[31];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = jaguargpu_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = jaguar_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = jaguar_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = jaguargpu_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = jaguargpu_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = jaguar_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = jaguargpu_execute;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguargpu);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(jaguar);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(jaguar);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(jaguargpu);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(jaguargpu);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(jaguar);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguargpu);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = jaguargpu_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguargpu);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &jaguar_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1715,7 +1718,7 @@ void jaguargpu_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-static void jaguardsp_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( jaguardsp )
 {
 	switch (state)
 	{
@@ -1725,12 +1728,12 @@ static void jaguardsp_set_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are set as pointers to data or functions --- */
 
 		default:
-			jaguargpu_set_info(state, info);
+			CPU_SET_INFO_CALL(jaguargpu);
 			break;
 	}
 }
 
-void jaguardsp_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( jaguardsp )
 {
 	switch (state)
 	{
@@ -1739,17 +1742,17 @@ void jaguardsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ5:		info->i = (jaguar.ctrl[G_CTRL] & 0x10000) ? ASSERT_LINE : CLEAR_LINE; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = jaguardsp_set_info;		break;
-		case CPUINFO_PTR_INIT:							info->init = jaguardsp_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = jaguardsp_reset;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = jaguardsp_execute;		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = jaguardsp_dasm;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguardsp);		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(jaguardsp);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(jaguardsp);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguardsp);		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguardsp);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Jaguar DSP");			break;
 
 		default:
-			jaguargpu_get_info(state, info);
+			CPU_GET_INFO_CALL(jaguargpu);
 			break;
 	}
 }

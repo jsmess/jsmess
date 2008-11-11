@@ -144,7 +144,6 @@ static INPUT_PORTS_START( mk1 )
 INPUT_PORTS_END
 
 static MACHINE_RESET( mk1 ) {
-    f3853_reset();
 }
 
 static TIMER_CALLBACK( mk1_update_leds ) {

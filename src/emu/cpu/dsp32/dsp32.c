@@ -185,6 +185,7 @@ typedef struct
 	UINT32			op;
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
+	const device_config *device;
 } dsp32_regs;
 
 
@@ -193,7 +194,7 @@ typedef struct
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void dsp32c_reset(void);
+static CPU_RESET( dsp32c );
 
 
 
@@ -301,7 +302,7 @@ static void update_pcr(UINT16 newval)
 
 	/* reset the chip if we get a reset */
 	if ((oldval & PCR_RESET) == 0 && (newval & PCR_RESET) != 0)
-		dsp32c_reset();
+		CPU_RESET_NAME(dsp32c)(dsp32.device);
 
 	/* track the state of the output pins */
 	if (dsp32.output_pins_changed)
@@ -321,7 +322,7 @@ static void update_pcr(UINT16 newval)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void dsp32c_get_context(void *dst)
+static CPU_GET_CONTEXT( dsp32c )
 {
 	/* copy the context */
 	if (dst)
@@ -329,7 +330,7 @@ static void dsp32c_get_context(void *dst)
 }
 
 
-static void dsp32c_set_context(void *src)
+static CPU_SET_CONTEXT( dsp32c )
 {
 	/* copy the context */
 	if (src)
@@ -346,17 +347,19 @@ static void dsp32c_set_context(void *src)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static void dsp32c_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( dsp32c )
 {
-	const dsp32_config *config = _config;
+	const dsp32_config *configdata = config;
 
 	/* copy in config data */
-	if (config)
-		dsp32.output_pins_changed = config->output_pins_changed;
+	if (configdata)
+		dsp32.output_pins_changed = configdata->output_pins_changed;
+
+	dsp32.device = device;
 }
 
 
-static void dsp32c_reset(void)
+static CPU_RESET( dsp32c )
 {
 	/* reset goes to 0 */
 	dsp32.PC = 0;
@@ -381,7 +384,7 @@ static void dsp32c_reset(void)
 }
 
 
-static void dsp32c_exit(void)
+static CPU_EXIT( dsp32c )
 {
 }
 
@@ -399,7 +402,7 @@ static void dsp32c_exit(void)
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static int dsp32c_execute(int cycles)
+static CPU_EXECUTE( dsp32c )
 {
 	/* skip if halted */
 	if ((dsp32.pcr & PCR_RESET) == 0)
@@ -437,7 +440,7 @@ static int dsp32c_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t dsp32c_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( dsp32c )
 {
 	extern unsigned dasm_dsp32(char *, unsigned, UINT32);
 	return dasm_dsp32(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
@@ -709,7 +712,7 @@ int dsp32c_pio_r(int cpunum, int reg)
  * Generic set_info
  **************************************************************************/
 
-static void dsp32c_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( dsp32c )
 {
 	switch (state)
 	{
@@ -780,7 +783,7 @@ static void dsp32c_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void dsp32c_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( dsp32c )
 {
 	switch (state)
 	{
@@ -867,15 +870,15 @@ void dsp32c_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + DSP32_IOC:			info->i = dsp32.IOC;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = dsp32c_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = dsp32c_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = dsp32c_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = dsp32c_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = dsp32c_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = dsp32c_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = dsp32c_execute;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp32c);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dsp32c);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dsp32c);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dsp32c);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dsp32c);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dsp32c);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp32c);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = dsp32c_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp32c);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &dsp32_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

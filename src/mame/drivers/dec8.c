@@ -43,47 +43,7 @@ To do:
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-PALETTE_INIT( ghostb );
-VIDEO_UPDATE( cobracom );
-VIDEO_UPDATE( ghostb );
-VIDEO_UPDATE( srdarwin );
-VIDEO_UPDATE( gondo );
-VIDEO_UPDATE( garyoret );
-VIDEO_UPDATE( lastmiss );
-VIDEO_UPDATE( shackled );
-VIDEO_UPDATE( oscar );
-VIDEO_START( cobracom );
-VIDEO_START( oscar );
-VIDEO_START( ghostb );
-VIDEO_START( lastmiss );
-VIDEO_START( shackled );
-VIDEO_START( srdarwin );
-VIDEO_START( gondo );
-VIDEO_START( garyoret );
-
-WRITE8_HANDLER( dec8_bac06_0_w );
-WRITE8_HANDLER( dec8_bac06_1_w );
-WRITE8_HANDLER( dec8_pf0_data_w );
-WRITE8_HANDLER( dec8_pf1_data_w );
-READ8_HANDLER( dec8_pf0_data_r );
-READ8_HANDLER( dec8_pf1_data_r );
-WRITE8_HANDLER( srdarwin_videoram_w );
-WRITE8_HANDLER( dec8_scroll1_w );
-WRITE8_HANDLER( dec8_scroll2_w );
-WRITE8_HANDLER( srdarwin_control_w );
-WRITE8_HANDLER( gondo_scroll_w );
-WRITE8_HANDLER( shackled_control_w );
-WRITE8_HANDLER( lastmiss_control_w );
-WRITE8_HANDLER( lastmiss_scrollx_w );
-WRITE8_HANDLER( lastmiss_scrolly_w );
-WRITE8_HANDLER( dec8_bac06_0_w );
-WRITE8_HANDLER( dec8_bac06_1_w );
-WRITE8_HANDLER( dec8_videoram_w );
-
-/******************************************************************************/
-
-extern UINT8 *dec8_pf0_data,*dec8_pf1_data,*dec8_row;
+#include "includes/dec8.h"
 
 static int nmi_enable,int_enable;
 static int i8751_return, i8751_value;
@@ -1425,7 +1385,7 @@ static INPUT_PORTS_START( oscar )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( oscarj0 )
+static INPUT_PORTS_START( oscaru )
 	PORT_START("IN0")
 	PLAYER1_JOYSTICK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -2999,6 +2959,36 @@ ROM_END
 
 ROM_START( oscar )
 	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "du10", 0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) )
+	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+
+	ROM_REGION( 0x10000, "sub", 0 )	/* CPU 2, 1st 16k is empty */
+	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
+
+	ROM_REGION( 2*0x10000, "audio", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
+
+	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
+	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_LOAD( "ed04", 0x00000, 0x10000, CRC(416a791b) SHA1(e6541b713225289a43962363029eb0e22a1ecb4a) )
+	ROM_LOAD( "ed05", 0x20000, 0x10000, CRC(fcdba431) SHA1(0be2194519c36ddf136610f60890506eda1faf0b) )
+	ROM_LOAD( "ed06", 0x40000, 0x10000, CRC(7d50bebc) SHA1(06375f3273c48c7c7d81f1c15cbc5d3f3e05b8ed) )
+	ROM_LOAD( "ed07", 0x60000, 0x10000, CRC(8fdf0fa5) SHA1(2b4d1ca1436864e89b13b3fa151a4a3708592e0a) )
+
+	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_LOAD( "ed01", 0x00000, 0x10000, CRC(d3a58e9e) SHA1(35eda2aa630fc2c11a1aff2b00bcfabe2f3d4249) )
+	ROM_LOAD( "ed03", 0x20000, 0x10000, CRC(4fc4fb0f) SHA1(0906762a3adbffe765e072255262fedaa78bdb2a) )
+	ROM_LOAD( "ed00", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
+	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
+ROM_END
+
+ROM_START( oscaru )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "ed10", 0x08000, 0x08000, CRC(f9b0d4d4) SHA1(dc2aba978ba96f365027c7be5714728d5d7fb802) )
 	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
@@ -3028,36 +3018,6 @@ ROM_START( oscar )
 
 	ROM_REGION( 512, "proms", 0 )
 	ROM_LOAD( "du-13.bin", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )	/* Priority (Not yet used) */
-ROM_END
-
-ROM_START( oscarj0 )
-	ROM_REGION( 0x20000, "main", 0 )
-	ROM_LOAD( "du10", 0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) )
-	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
-
-	ROM_REGION( 0x10000, "sub", 0 )	/* CPU 2, 1st 16k is empty */
-	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
-
-	ROM_REGION( 2*0x10000, "audio", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
-	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
-
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
-	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
-
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
-	ROM_LOAD( "ed04", 0x00000, 0x10000, CRC(416a791b) SHA1(e6541b713225289a43962363029eb0e22a1ecb4a) )
-	ROM_LOAD( "ed05", 0x20000, 0x10000, CRC(fcdba431) SHA1(0be2194519c36ddf136610f60890506eda1faf0b) )
-	ROM_LOAD( "ed06", 0x40000, 0x10000, CRC(7d50bebc) SHA1(06375f3273c48c7c7d81f1c15cbc5d3f3e05b8ed) )
-	ROM_LOAD( "ed07", 0x60000, 0x10000, CRC(8fdf0fa5) SHA1(2b4d1ca1436864e89b13b3fa151a4a3708592e0a) )
-
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
-	ROM_LOAD( "ed01", 0x00000, 0x10000, CRC(d3a58e9e) SHA1(35eda2aa630fc2c11a1aff2b00bcfabe2f3d4249) )
-	ROM_LOAD( "ed03", 0x20000, 0x10000, CRC(4fc4fb0f) SHA1(0906762a3adbffe765e072255262fedaa78bdb2a) )
-	ROM_LOAD( "ed00", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
-	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 ROM_END
 
 ROM_START( oscarj1 )
@@ -3093,7 +3053,7 @@ ROM_START( oscarj1 )
 	ROM_LOAD( "du-13.bin", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )	/* Priority (Not yet used) */
 ROM_END
 
-ROM_START( oscarj )
+ROM_START( oscarj2 )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "oscr10-2.bin", 0x08000, 0x08000, CRC(114e898d) SHA1(1072ccabe6d53c50cdfa1e27d5d848ecdd6559cc) ) /* DU10-2 */
 	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
@@ -3527,10 +3487,10 @@ GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, deco222, ROT270, "Data East 
 GAME( 1987, srdarwnj, srdarwin, srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", 0 )
 GAME( 1987, gondo,    0,        gondo,    gondo,    0,       ROT270, "Data East USA", "Gondomania (US)", 0 )
 GAME( 1987, makyosen, gondo,    gondo,    gondo,    0,       ROT270, "Data East Corporation", "Makyou Senshi (Japan)", 0 )
-GAME( 1988, oscar,    0,        oscar,    oscar,    deco222, ROT0,   "Data East USA", "Psycho-Nics Oscar (US)", 0 )
-GAME( 1987, oscarj,   oscar,    oscar,    oscar,    deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", 0 )
-GAME( 1987, oscarj1,  oscar,    oscar,    oscar,    deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", 0 )
-GAME( 1987, oscarj0,  oscar,    oscar,    oscarj0,  deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 0)", 0 )
+GAME( 1988, oscar,    0,        oscar,    oscar,    deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", 0 )
+GAME( 1987, oscaru,   oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East USA", "Psycho-Nics Oscar (US)", 0 )
+GAME( 1987, oscarj1,  oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", 0 )
+GAME( 1987, oscarj2,  oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", 0 )
 GAME( 1986, lastmisn, 0,        lastmiss, lastmisn, 0,       ROT270, "Data East USA", "Last Mission (US revision 6)", 0 )
 GAME( 1986, lastmsno, lastmisn, lastmiss, lastmisn, 0,       ROT270, "Data East USA", "Last Mission (US revision 5)", 0 )
 GAME( 1986, lastmsnj, lastmisn, lastmiss, lastmsnj, 0,       ROT270, "Data East Corporation", "Last Mission (Japan)", 0 )

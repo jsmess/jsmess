@@ -663,7 +663,7 @@ static void cfunc_SUBV(void *param)
     sh2_init - initialize the processor
 -------------------------------------------------*/
 
-static void sh2_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( sh2 )
 {
 	drcfe_config feconfig =
 	{
@@ -687,7 +687,7 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
 	memset(sh2, 0, sizeof(SH2));
 
 	/* initialize the common core parts */
-	sh2_common_init(0, index, clock, config, irqcallback);
+	sh2_common_init(0, device, index, clock, config, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	sh2->cache = cache;
@@ -764,7 +764,7 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
     sh2_exit - cleanup from execution
 -------------------------------------------------*/
 
-static void sh2_exit(void)
+static CPU_EXIT( sh2 )
 {
 	/* clean up the DRC */
 	drcfe_exit(sh2->drcfe);
@@ -777,14 +777,15 @@ static void sh2_exit(void)
     sh2_reset - reset the processor
 -------------------------------------------------*/
 
-static void sh2_reset(void)
+static CPU_RESET( sh2 )
 {
 	void *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
 	int cpunum;
 
 	void (*f)(UINT32 data);
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	cpunum = sh2->cpu_number;
 	m = sh2->m;
@@ -794,6 +795,7 @@ static void sh2_reset(void)
 
 	f = sh2->ftcsr_read_callback;
 	save_irqcallback = sh2->irq_callback;
+	save_device = sh2->device;
 
 	sh2->ppc = sh2->pc = sh2->pr = sh2->sr = sh2->gbr = sh2->vbr = sh2->mach = sh2->macl = 0;
 	sh2->evec = sh2->irqsr = 0;
@@ -809,6 +811,7 @@ static void sh2_reset(void)
 
 	sh2->ftcsr_read_callback = f;
 	sh2->irq_callback = save_irqcallback;
+	sh2->device = save_device;
 
 	sh2->timer = tsave;
 	sh2->dma_timer[0] = tsaved0;
@@ -833,9 +836,9 @@ static void sh2_reset(void)
     sh1_reset - reset the processor
 -------------------------------------------------*/
 
-static void sh1_reset(void)
+static CPU_RESET( sh1 )
 {
-	sh2_reset();
+	CPU_RESET_CALL(sh2);
 	sh2->cpu_type = CPU_TYPE_SH1;
 }
 
@@ -866,7 +869,7 @@ static void code_flush_cache(drcuml_state *drcuml)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-static int sh2_execute(int cycles)
+static CPU_EXECUTE( sh2 )
 {
 	drcuml_state *drcuml = sh2->drcuml;
 	int execute_result;
@@ -3285,7 +3288,7 @@ static int generate_group_12(drcuml_block *block, compiler_state *compiler, cons
     current context
 -------------------------------------------------*/
 
-static void sh2_get_context(void *dst)
+static CPU_GET_CONTEXT( sh2 )
 {
 	if( dst )
 		*(SH2 **)dst = sh2;
@@ -3296,7 +3299,7 @@ static void sh2_get_context(void *dst)
     into the global state
 -------------------------------------------------*/
 
-static void sh2_set_context(void *src)
+static CPU_SET_CONTEXT( sh2 )
 {
 	if( src )
 		sh2 = *(SH2 **)src;
@@ -3306,7 +3309,7 @@ static void sh2_set_context(void *src)
     sh2_dasm - disassemble an instruction
 -------------------------------------------------*/
 
-static offs_t sh2_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( sh2 )
 {
 	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
 }
@@ -3336,7 +3339,7 @@ ADDRESS_MAP_END
     CPU instance
 -------------------------------------------------*/
 
-static void sh2_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( sh2 )
 {
 	switch (state)
 	{
@@ -3404,7 +3407,7 @@ static void sh2_set_info(UINT32 state, cpuinfo *info)
     given CPU instance
 -------------------------------------------------*/
 
-void sh2_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( sh2 )
 {
 	switch (state)
 	{
@@ -3431,7 +3434,7 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
 		// Internal maps
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = address_map_sh2_internal_map; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(sh2_internal_map); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map32 = NULL;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map32 = NULL;	break;
 
@@ -3484,15 +3487,15 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SH2_EA:				info->i = sh2->ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = sh2_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sh2_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh2_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = sh2_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = sh2_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = sh2_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = sh2_execute;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh2);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sh2);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sh2);		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sh2);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sh2);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(sh2);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh2);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh2_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh2);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh2->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -3546,17 +3549,17 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
     given CPU instance
 -------------------------------------------------*/
 
-void sh1_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( sh1 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:						info->reset = sh1_reset;				break;
+		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(sh1);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;
 
-		default:							sh2_get_info(state, info);			break;
+		default:							CPU_GET_INFO_CALL(sh2);			break;
 	}
 }
 

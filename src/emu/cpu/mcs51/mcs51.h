@@ -66,11 +66,11 @@ enum
 
 enum
 {
-	MCS51_PORT_P0	= 0x10000,
-	MCS51_PORT_P1	= 0x10001,
-	MCS51_PORT_P2	= 0x10002,
-	MCS51_PORT_P3	= 0x10003,
-	MCS51_PORT_TX	= 0x10004,	/* P3.1 */
+	MCS51_PORT_P0	= 0x20000,
+	MCS51_PORT_P1	= 0x20001,
+	MCS51_PORT_P2	= 0x20002,
+	MCS51_PORT_P3	= 0x20003,
+	MCS51_PORT_TX	= 0x20004,	/* P3.1 */
 };
 
 /***************************************************************************
@@ -94,35 +94,58 @@ extern void i8051_set_serial_tx_callback(void (*callback)(int data));
 extern void i8051_set_serial_rx_callback(int (*callback)(void));
 
 /* variants with no internal rom and 128 byte internal memory */
-void i8031_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8031 );
 
 /* variants with no internal rom and 256 byte internal memory */
-void i8032_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8032 );
 
 /* variants 4k internal rom and 128 byte internal memory */
-void i8051_get_info(UINT32 state, cpuinfo *info);
-void i8751_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8051 );
+CPU_GET_INFO( i8751 );
 
 /* variants 8k internal rom and 256 byte internal memory and more registers */
-void i8052_get_info(UINT32 state, cpuinfo *info);
-void i8752_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8052 );
+CPU_GET_INFO( i8752 );
 
 /* cmos variants */
-void i80c31_get_info(UINT32 state, cpuinfo *info);
-void i80c51_get_info(UINT32 state, cpuinfo *info);
-void i87c51_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i80c31 );
+CPU_GET_INFO( i80c51 );
+CPU_GET_INFO( i87c51 );
 
-void i80c32_get_info(UINT32 state, cpuinfo *info);
-void i80c52_get_info(UINT32 state, cpuinfo *info);
-void i87c52_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i80c32 );
+CPU_GET_INFO( i80c52 );
+CPU_GET_INFO( i87c52 );
 
 /* 4k internal perom and 128 internal ram and 2 analog comparators */
-void at89c4051_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( at89c4051 );
+
+/*
+ * The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the
+ * partition mode, the memory range and the expanded bus select. The partition mode and the expanded bus select can be changed at any time.
+ *
+ * In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
+
+ * 0x00000-0x0ffff -> data memory on the expanded bus
+ * 0x10000-0x1ffff -> data memory on the byte-wide bus
+
+ * For non-partitioned mode the following memory map is assumed:
+
+ * 0x0000-0xffff -> data memory (the bus used to access it does not matter)
+ *
+ * Internal ram 128k and security features
+ */
+
+CPU_GET_INFO( ds5002fp );
+
 
 /****************************************************************************
  * Disassembler
  ****************************************************************************/
 
-offs_t i8051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( i8051 );
+CPU_DISASSEMBLE( i80c51 );
+CPU_DISASSEMBLE( i8052 );
+CPU_DISASSEMBLE( i80c52 );
+CPU_DISASSEMBLE( ds5002fp );
 
 #endif /* __MCS51_H__ */

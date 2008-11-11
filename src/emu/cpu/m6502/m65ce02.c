@@ -55,8 +55,8 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-
-typedef struct {
+typedef struct 	_m65ce02_Regs m65ce02_Regs;
+struct 	_m65ce02_Regs {
 	void	(*const *insn)(void); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc;				/* program counter */
@@ -73,16 +73,13 @@ typedef struct {
 	UINT8	after_cli;		/* pending IRQ and last insn cleared I */
 	UINT8	nmi_state;
 	UINT8	irq_state;
-	int 	(*irq_callback)(int irqline);	/* IRQ callback */
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
-}	m65ce02_Regs;
+};
 
-
-static int m65ce02_ICount = 0;
-
-static m65ce02_Regs m65ce02;
-
+static void *token;
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
@@ -92,14 +89,15 @@ static m65ce02_Regs m65ce02;
 static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
 static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
 
-static void m65ce02_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m65ce02 )
 {
 	m65ce02.rdmem_id = default_rdmem_id;
 	m65ce02.wrmem_id = default_wdmem_id;
 	m65ce02.irq_callback = irqcallback;
+	m65ce02.device = device;
 }
 
-static void m65ce02_reset(void)
+static CPU_RESET( m65ce02 )
 {
 	m65ce02.insn = insn65ce02;
 
@@ -121,18 +119,18 @@ static void m65ce02_reset(void)
 	change_pc(PCD);
 }
 
-static void m65ce02_exit(void)
+static CPU_EXIT( m65ce02 )
 {
 	/* nothing to do yet */
 }
 
-static void m65ce02_get_context (void *dst)
+static CPU_GET_CONTEXT( m65ce02 )
 {
 	if( dst )
 		*(m65ce02_Regs*)dst = m65ce02;
 }
 
-static void m65ce02_set_context (void *src)
+static CPU_SET_CONTEXT( m65ce02 )
 {
 	if( src )
 	{
@@ -146,7 +144,7 @@ INLINE void m65ce02_take_irq(void)
 	if( !(P & F_I) )
 	{
 		EAD = M65CE02_IRQ_VEC;
-		m65ce02_ICount -= 7;
+		m65ce02->icount -= 7;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -155,15 +153,15 @@ INLINE void m65ce02_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M65ce02#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m65ce02.irq_callback) (*m65ce02.irq_callback)(0);
+		if (m65ce02.irq_callback) (*m65ce02.irq_callback)(m65ce02.device, 0);
 		change_pc(PCD);
 	}
 	m65ce02.pending_irq = 0;
 }
 
-static int m65ce02_execute(int cycles)
+static CPU_EXECUTE( m65ce02 )
 {
-	m65ce02_ICount = cycles;
+	m65ce02->icount = cycles;
 
 	change_pc(PCD);
 
@@ -200,9 +198,9 @@ static int m65ce02_execute(int cycles)
 		if( m65ce02.pending_irq )
 			m65ce02_take_irq();
 
-	} while (m65ce02_ICount > 0);
+	} while (m65ce02->icount > 0);
 
-	return cycles - m65ce02_ICount;
+	return cycles - m65ce02->icount;
 }
 
 static void m65ce02_set_irq_line(int irqline, int state)
@@ -215,7 +213,7 @@ static void m65ce02_set_irq_line(int irqline, int state)
 		{
 			LOG(("M65ce02#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = M65CE02_NMI_VEC;
-			m65ce02_ICount -= 7;
+			m65ce02->icount -= 7;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -241,7 +239,7 @@ static void m65ce02_set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void m65ce02_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m65ce02 )
 {
 	switch( state )
  	{
@@ -272,7 +270,7 @@ static void m65ce02_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void m65ce02_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m65ce02 )
 {
 	switch( state )
 	{
@@ -319,16 +317,16 @@ void m65ce02_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER+M65CE02_ZP:			info->i = m65ce02.zp.w.l;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m65ce02_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m65ce02_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m65ce02_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m65ce02_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m65ce02_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m65ce02_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m65ce02_execute;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65ce02);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m65ce02);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m65ce02);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65ce02);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m65ce02);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m65ce02);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65ce02);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m65ce02_dasm;			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m65ce02_ICount;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65ce02);			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m65ce02->icount;			break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m65ce02.rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m65ce02.wrmem_id;		break;
 

@@ -10,7 +10,7 @@
 #include "machine/mm58274c.h"	/* mm58274 seems to be compatible with mm58174 */
 //#include "machine/6551.h"
 #include "machine/wd17xx.h"
-#include "cpu/m68000/m68k.h"
+#include "cpu/m68000/m68000.h"
 #include "devices/basicdsk.h"
 #include "includes/corvushd.h"
 

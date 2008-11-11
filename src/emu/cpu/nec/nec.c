@@ -161,7 +161,8 @@ typedef struct
 	UINT32	poll_state;
 	UINT8	no_interrupt;
 
-	int     (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 
 	memory_interface	mem;
 
@@ -273,7 +274,7 @@ static UINT8 fetchop(void)
 
 /***************************************************************************/
 
-static void nec_reset (void)
+static CPU_RESET( nec )
 {
     unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
@@ -331,7 +332,7 @@ static void nec_reset (void)
 	I.poll_state = 1;
 }
 
-static void nec_exit (void)
+static CPU_EXIT( nec )
 {
 
 }
@@ -346,7 +347,7 @@ static void nec_interrupt(unsigned int_num,BOOLEAN md_flag)
 
 	if (int_num == -1)
 	{
-		int_num = (*I.irq_callback)(0);
+		int_num = (*I.irq_callback)(I.device, 0);
 
 		I.irq_state = CLEAR_LINE;
 		I.pending_irq &= ~INT_IRQ;
@@ -1055,13 +1056,13 @@ static void i_invalid(void)
 
 /*****************************************************************************/
 
-static void nec_get_context(void *dst)
+static CPU_GET_CONTEXT( nec )
 {
 	if( dst )
 		*(nec_Regs*)dst = I;
 }
 
-static void nec_set_context(void *src)
+static CPU_SET_CONTEXT( nec )
 {
 	if( src )
 	{
@@ -1102,12 +1103,12 @@ static void set_poll_line(int state)
 	I.poll_state = state;
 }
 
-static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( nec )
 {
 	return necv_dasm_one(buffer, pc, oprom, I.config);
 }
 
-static void nec_init(int index, int clock, const void *_config, int (*irqcallback)(int), int type)
+static void nec_init(const device_config *device, int index, int clock, const void *_config, cpu_irq_callback irqcallback, int type)
 {
 	const nec_config *config = _config ? _config : &default_config;
 
@@ -1138,6 +1139,7 @@ static void nec_init(int index, int clock, const void *_config, int (*irqcallbac
 	state_save_register_item(names[type], index, I.ParityVal);
 
 	I.irq_callback = irqcallback;
+	I.device = device;
 }
 
 
@@ -1228,7 +1230,7 @@ static void configure_memory_16bit(void)
 }
 #endif
 
-static int necv_execute(int cycles)
+static CPU_EXECUTE( necv )
 {
 	int prev_ICount;
 
@@ -1258,9 +1260,9 @@ static int necv_execute(int cycles)
 
 /* Wrappers for the different CPU types */
 #if (HAS_V20||HAS_V25)
-static void v20_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( v20 )
 {
-	nec_init(index, clock, config, irqcallback, 0);
+	nec_init(device, index, clock, config, irqcallback, 0);
 	configure_memory_8bit();
 	I.chip_type=V20;
 	I.prefetch_size = 4;		/* 3 words */
@@ -1269,9 +1271,9 @@ static void v20_init(int index, int clock, const void *config, int (*irqcallback
 #endif
 
 #if (HAS_V30||HAS_V35)
-static void v30_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( v30 )
 {
-	nec_init(index, clock, config, irqcallback, 1);
+	nec_init(device, index, clock, config, irqcallback, 1);
 	configure_memory_16bit();
 	I.chip_type=V30;
 	I.prefetch_size = 6;		/* 3 words */
@@ -1281,9 +1283,9 @@ static void v30_init(int index, int clock, const void *config, int (*irqcallback
 #endif
 
 #if (HAS_V33)
-static void v33_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( v33 )
 {
-	nec_init(index, clock, config, irqcallback, 2);
+	nec_init(device, index, clock, config, irqcallback, 2);
 	I.chip_type=V33;
 	I.prefetch_size = 6;		/* ???? */
 	I.prefetch_cycles = 2;		/* two cycles per byte / four per word */
@@ -1298,7 +1300,7 @@ static void v33_init(int index, int clock, const void *config, int (*irqcallback
  * Generic set_info
  **************************************************************************/
 
-static void nec_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( nec )
 {
 	switch (state)
 	{
@@ -1354,7 +1356,7 @@ static void nec_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void nec_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( nec )
 {
 	int flags;
 
@@ -1409,15 +1411,15 @@ static void nec_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + NEC_PENDING:		info->i = I.pending_irq;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = nec_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = nec_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = nec_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(nec);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(nec);		break;
 		case CPUINFO_PTR_INIT:							/* set per-CPU */						break;
-		case CPUINFO_PTR_RESET:							info->reset = nec_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = nec_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = necv_execute;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(necv);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nec_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1473,7 +1475,7 @@ static void nec_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v20_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v20 )
 {
 	switch (state)
 	{
@@ -1482,12 +1484,12 @@ void v20_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = v20_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v20);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V20");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1498,7 +1500,7 @@ void v20_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v25_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v25 )
 {
 	switch (state)
 	{
@@ -1507,12 +1509,12 @@ void v25_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = v20_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v20);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V25");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1523,17 +1525,17 @@ void v25_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v30_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v30 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = v30_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v30);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V30");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1544,17 +1546,17 @@ void v30_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v33_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v33 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = v33_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v33);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V33");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1565,17 +1567,17 @@ void v33_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v35_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v35 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = v30_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v30);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V35");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif

@@ -497,7 +497,7 @@ static UINT32 ptr2_read(int op)
 // -----------------------------------------------------
 
 
-static void ssp1601_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ssp1601 )
 {
 	state_save_register_item(CHIP_NAME, index, rX);
 	state_save_register_item(CHIP_NAME, index, rY);
@@ -516,12 +516,12 @@ static void ssp1601_init(int index, int clock, const void *config, int (*irqcall
 	ssp1601.gr[0].w.h = 0xffff; // constant reg
 }
 
-static void ssp1601_exit(void)
+static CPU_EXIT( ssp1601 )
 {
 	/* nothing to do */
 }
 
-static void ssp1601_reset(void)
+static CPU_RESET( ssp1601 )
 {
 	rPC = 0x400;
 	rSTACK = 0; // ? using ascending stack
@@ -529,7 +529,7 @@ static void ssp1601_reset(void)
 }
 
 
-static int ssp1601_execute(int cycles)
+static CPU_EXECUTE( ssp1601 )
 {
 	g_cycles = cycles;
 
@@ -743,28 +743,28 @@ static int ssp1601_execute(int cycles)
  * MAME interface
  **************************************************************************/
 
-static void ssp1601_get_context(void *regs)
+static CPU_GET_CONTEXT( ssp1601 )
 {
 	/* copy the context */
-	if (regs)
-		*(ssp1601_regs *)regs = ssp1601;
+	if (dst)
+		*(ssp1601_regs *)dst = ssp1601;
 }
 
-static void ssp1601_set_context(void *regs)
+static CPU_SET_CONTEXT( ssp1601 )
 {
 	/* copy the context */
-	if (regs)
-		ssp1601 = *(ssp1601_regs *)regs;
+	if (src)
+		ssp1601 = *(ssp1601_regs *)src;
 }
 
-static offs_t ssp1601_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( ssp1601 )
 {
 	return dasm_ssp1601(buffer, pc, oprom);
 }
 
 #if (HAS_SSP1601)
 
-static void ssp1601_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ssp1601 )
 {
 	switch (state)
 	{
@@ -803,7 +803,7 @@ static void ssp1601_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void ssp1601_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ssp1601 )
 {
 	switch (state)
 	{
@@ -858,15 +858,15 @@ void ssp1601_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SSP_PR7:			info->i = ssp1601.r[7];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ssp1601_set_info;	break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ssp1601_get_context; break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ssp1601_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = ssp1601_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = ssp1601_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = ssp1601_exit;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = ssp1601_execute;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ssp1601);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(ssp1601); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(ssp1601); break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ssp1601);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ssp1601);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ssp1601);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ssp1601);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ssp1601_dasm;	break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ssp1601);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &g_cycles;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;

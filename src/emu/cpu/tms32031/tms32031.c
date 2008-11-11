@@ -109,7 +109,8 @@ typedef struct
 	void			(*xf0_w)(UINT8 val);
 	void			(*xf1_w)(UINT8 val);
 	void			(*iack_w)(UINT8 val, offs_t addr);
-	int				(*irq_callback)(int state);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } tms32031_regs;
 
 
@@ -385,7 +386,7 @@ static void set_irq_line(int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void tms32031_get_context(void *dst)
+static CPU_GET_CONTEXT( tms32031 )
 {
 	/* copy the context */
 	if (dst)
@@ -393,7 +394,7 @@ static void tms32031_get_context(void *dst)
 }
 
 
-static void tms32031_set_context(void *src)
+static CPU_SET_CONTEXT( tms32031 )
 {
 	/* copy the context */
 	if (src)
@@ -410,21 +411,22 @@ static void tms32031_set_context(void *src)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static void tms32031_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( tms32031 )
 {
-	const struct tms32031_config *config = _config;
+	const struct tms32031_config *configdata = config;
 	int i;
 	char namebuf[30];
 
 	tms32031.irq_callback = irqcallback;
+	tms32031.device = device;
 
 	/* copy in the xf write routines */
-	tms32031.bootoffset = config ? config->bootoffset : 0;
-	if (config)
+	tms32031.bootoffset = configdata ? configdata->bootoffset : 0;
+	if (configdata)
 	{
-		tms32031.xf0_w = config->xf0_w;
-		tms32031.xf1_w = config->xf1_w;
-		tms32031.iack_w = config->iack_w;
+		tms32031.xf0_w = configdata->xf0_w;
+		tms32031.xf1_w = configdata->xf1_w;
+		tms32031.iack_w = configdata->iack_w;
 	}
 
 	state_save_register_item("tms32031", index, tms32031.pc);
@@ -444,7 +446,7 @@ static void tms32031_init(int index, int clock, const void *_config, int (*irqca
 
 }
 
-static void tms32031_reset(void)
+static CPU_RESET( tms32031 )
 {
 	/* if we have a config struct, get the boot ROM address */
 	if (tms32031.bootoffset)
@@ -470,9 +472,9 @@ static void tms32031_reset(void)
 	tms32031.is_idling = FALSE;
 }
 
-static void tms32032_reset(void)
+static CPU_RESET( tms32032 )
 {
-	tms32031_reset();
+	CPU_RESET_CALL(tms32031);
 	tms32031.is_32032 = TRUE;
 }
 
@@ -481,7 +483,7 @@ static void tms32032_reset(void)
 static UINT32 hits[0x200*4];
 #endif
 
-static void tms32031_exit(void)
+static CPU_EXIT( tms32031 )
 {
 #if (LOG_OPCODE_USAGE)
 	int i;
@@ -505,7 +507,7 @@ static void tms32031_exit(void)
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static int tms32031_execute(int cycles)
+static CPU_EXECUTE( tms32031 )
 {
 	/* count cycles and interrupt cycles */
 	tms32031_icount = cycles;
@@ -589,7 +591,7 @@ static int tms32031_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t tms32031_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( tms32031 )
 {
 	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	extern unsigned dasm_tms32031(char *, unsigned, UINT32);
@@ -670,7 +672,7 @@ static UINT32 boot_loader(UINT32 boot_rom_addr)
  * Generic set_info
  **************************************************************************/
 
-static void tms32031_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( tms32031 )
 {
 	switch (state)
 	{
@@ -748,7 +750,7 @@ ADDRESS_MAP_END
  * Generic get_info
  **************************************************************************/
 
-void tms32031_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tms32031 )
 {
 	float ftemp;
 
@@ -833,17 +835,17 @@ void tms32031_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + TMS32031_RC:		info->i = IREG(TMR_RC);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms32031_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms32031_get_context; break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms32031_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = tms32031_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = tms32031_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = tms32031_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = tms32031_execute;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32031);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms32031); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms32031); break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32031);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32031);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32031);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32031);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32031_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32031);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms32031_icount;		break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = address_map_internal_32031; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_32031); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32031");			break;
@@ -908,17 +910,17 @@ void tms32031_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void tms32032_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tms32032 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = tms32032_reset;			break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = address_map_internal_32032; break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32032);			break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_32032); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32032");			break;
 
-		default:										tms32031_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(tms32031);			break;
 	}
 }

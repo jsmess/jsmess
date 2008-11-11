@@ -82,12 +82,13 @@ static int ARM7_ICOUNT;
 /***************************************************************************
  * CPU SPECIFIC IMPLEMENTATIONS
  **************************************************************************/
-static void arm7_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( arm7 )
 {
     // must call core
     arm7_core_init("arm7", index);
 
     ARM7.irq_callback = irqcallback;
+    ARM7.device = device;
 
 #if TEST_COPROC_FUNCS
     // setup co-proc callbacks example
@@ -99,18 +100,18 @@ static void arm7_init(int index, int clock, const void *config, int (*irqcallbac
 #endif
 }
 
-static void arm7_reset(void)
+static CPU_RESET( arm7 )
 {
     // must call core reset
     arm7_core_reset();
 }
 
-static void arm7_exit(void)
+static CPU_EXIT( arm7 )
 {
     /* nothing to do here */
 }
 
-static int arm7_execute(int cycles)
+static CPU_EXECUTE( arm7 )
 {
 /* include the arm7 core execute code */
 #include "arm7exec.c"
@@ -123,7 +124,7 @@ static void set_irq_line(int irqline, int state)
     arm7_core_set_irq_line(irqline,state);
 }
 
-static void arm7_get_context(void *dst)
+static CPU_GET_CONTEXT( arm7 )
 {
     if (dst)
     {
@@ -131,7 +132,7 @@ static void arm7_get_context(void *dst)
     }
 }
 
-static void arm7_set_context(void *src)
+static CPU_SET_CONTEXT( arm7 )
 {
     if (src)
     {
@@ -139,7 +140,7 @@ static void arm7_set_context(void *src)
     }
 }
 
-static offs_t arm7_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( arm7 )
 {
     if (T_IS_SET(GET_CPSR))
     {
@@ -156,7 +157,7 @@ static offs_t arm7_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8
  * Generic set_info
  **************************************************************************/
 
-static void arm7_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( arm7 )
 {
     switch (state)
     {
@@ -230,7 +231,7 @@ static void arm7_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void arm7_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( arm7 )
 {
     switch (state)
     {
@@ -319,15 +320,15 @@ void arm7_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_INT_REGISTER + ARM7_USPSR: info->i = ARM7REG(eSPSR_UND);                   break;
 
         /* --- the following bits of info are returned as pointers to data or functions --- */
-        case CPUINFO_PTR_SET_INFO:              info->setinfo = arm7_set_info;                  break;
-        case CPUINFO_PTR_GET_CONTEXT:           info->getcontext = arm7_get_context;            break;
-        case CPUINFO_PTR_SET_CONTEXT:           info->setcontext = arm7_set_context;            break;
-        case CPUINFO_PTR_INIT:                  info->init = arm7_init;                         break;
-        case CPUINFO_PTR_RESET:                 info->reset = arm7_reset;                       break;
-        case CPUINFO_PTR_EXIT:                  info->exit = arm7_exit;                         break;
-        case CPUINFO_PTR_EXECUTE:               info->execute = arm7_execute;                   break;
+        case CPUINFO_PTR_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(arm7);                  break;
+        case CPUINFO_PTR_GET_CONTEXT:           info->getcontext = CPU_GET_CONTEXT_NAME(arm7);            break;
+        case CPUINFO_PTR_SET_CONTEXT:           info->setcontext = CPU_SET_CONTEXT_NAME(arm7);            break;
+        case CPUINFO_PTR_INIT:                  info->init = CPU_INIT_NAME(arm7);                         break;
+        case CPUINFO_PTR_RESET:                 info->reset = CPU_RESET_NAME(arm7);                       break;
+        case CPUINFO_PTR_EXIT:                  info->exit = CPU_EXIT_NAME(arm7);                         break;
+        case CPUINFO_PTR_EXECUTE:               info->execute = CPU_EXECUTE_NAME(arm7);                   break;
         case CPUINFO_PTR_BURN:                  info->burn = NULL;                              break;
-        case CPUINFO_PTR_DISASSEMBLE:           info->disassemble = arm7_dasm;                  break;
+        case CPUINFO_PTR_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(arm7);                  break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &ARM7_ICOUNT;                    break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */

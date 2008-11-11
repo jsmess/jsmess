@@ -3237,7 +3237,7 @@ INLINE void op1111(UINT16 opcode)
  *  MAME CPU INTERFACE
  *****************************************************************************/
 
-static void sh4_reset(void)
+static CPU_RESET( sh4 )
 {
 	void *tsaved[4];
 	emu_timer *tsave[5];
@@ -3247,7 +3247,8 @@ static void sh4_reset(void)
 	int	savecpu_clock, savebus_clock, savepm_clock;
 
 	void (*f)(UINT32 data);
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	cpunum = sh4.cpu_number;
 	m = sh4.m;
@@ -3263,6 +3264,7 @@ static void sh4_reset(void)
 
 	f = sh4.ftcsr_read_callback;
 	save_irqcallback = sh4.irq_callback;
+	save_device = sh4.device;
 	save_is_slave = sh4.is_slave;
 	savecpu_clock = sh4.cpu_clock;
 	savebus_clock = sh4.bus_clock;
@@ -3274,6 +3276,7 @@ static void sh4_reset(void)
 	sh4.pm_clock = savepm_clock;
 	sh4.ftcsr_read_callback = f;
 	sh4.irq_callback = save_irqcallback;
+	sh4.device = save_device;
 
 	sh4.dma_timer[0] = tsaved[0];
 	sh4.dma_timer[1] = tsaved[1];
@@ -3314,7 +3317,7 @@ static void sh4_reset(void)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-static int sh4_execute(int cycles)
+static CPU_EXECUTE( sh4 )
 {
 	sh4.sh4_icount = cycles;
 
@@ -3371,25 +3374,25 @@ static int sh4_execute(int cycles)
 }
 
 /* Get registers, return context size */
-static void sh4_get_context(void *dst)
+static CPU_GET_CONTEXT( sh4 )
 {
 	if( dst )
 		memcpy(dst, &sh4, sizeof(SH4));
 }
 
 /* Set registers */
-static void sh4_set_context(void *src)
+static CPU_SET_CONTEXT( sh4 )
 {
 	if( src )
 		memcpy(&sh4, src, sizeof(SH4));
 }
 
-static offs_t sh4_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( sh4 )
 {
 	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
 
-static void sh4_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( sh4 )
 {
 	const struct sh4_config *conf = config;
 
@@ -3399,6 +3402,7 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 
 	sh4.cpu_number = index;
 	sh4.irq_callback = irqcallback;
+	sh4.device = device;
 	sh4_default_exception_priorities();
 	sh4.irln = 15;
 	sh4.test_irq = 0;
@@ -3474,7 +3478,7 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
  * Generic set_info
  **************************************************************************/
 
-static void sh4_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( sh4 )
 {
 	switch (state)
 	{
@@ -3636,7 +3640,7 @@ ADDRESS_MAP_END
  * Generic get_info
  **************************************************************************/
 
-void sh4_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( sh4 )
 {
 	switch (state)
 	{
@@ -3662,7 +3666,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = address_map_sh4_internal_map; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh4_internal_map); break;
 
 		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:		info->i = sh4.irq_line_state[SH4_IRL0]; break;
 		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:		info->i = sh4.irq_line_state[SH4_IRL1]; break;
@@ -3701,14 +3705,14 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SH4_EA:				info->i = sh4.ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = sh4_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sh4_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh4_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = sh4_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = sh4_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = sh4_execute;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh4);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sh4);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sh4);		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sh4);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sh4);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh4);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh4_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh4);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4.sh4_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

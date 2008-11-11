@@ -534,7 +534,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int index, int clock, const powerpc_config *config, int (*irqcallback)(int))
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, const powerpc_config *config, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -558,7 +558,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int in
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
-	ppccom_init(ppc, flavor, cap, tb_divisor, index, clock, config, irqcallback);
+	ppccom_init(ppc, flavor, cap, tb_divisor, device, index, clock, config, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	ppc->impstate = drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
@@ -670,7 +670,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int in
     ppcdrc_reset - reset the processor
 -------------------------------------------------*/
 
-static void ppcdrc_reset(void)
+static CPU_RESET( ppcdrc )
 {
 	/* reset the common code and mark the cache dirty */
 	ppccom_reset(ppc);
@@ -684,7 +684,7 @@ static void ppcdrc_reset(void)
     specified number of cycles
 -------------------------------------------------*/
 
-static int ppcdrc_execute(int cycles)
+static CPU_EXECUTE( ppcdrc )
 {
 	drcuml_state *drcuml = ppc->impstate->drcuml;
 	int execute_result;
@@ -720,7 +720,7 @@ static int ppcdrc_execute(int cycles)
     ppcdrc_exit - cleanup from execution
 -------------------------------------------------*/
 
-static void ppcdrc_exit(void)
+static CPU_EXIT( ppcdrc )
 {
 	ppccom_exit(ppc);
 
@@ -736,7 +736,7 @@ static void ppcdrc_exit(void)
     current context
 -------------------------------------------------*/
 
-static void ppcdrc_get_context(void *dst)
+static CPU_GET_CONTEXT( ppcdrc )
 {
 	if (dst != NULL)
 		*(powerpc_state **)dst = ppc;
@@ -748,7 +748,7 @@ static void ppcdrc_get_context(void *dst)
     into the global state
 -------------------------------------------------*/
 
-static void ppcdrc_set_context(void *src)
+static CPU_SET_CONTEXT( ppcdrc )
 {
 	if (src != NULL)
 		ppc = *(powerpc_state **)src;
@@ -760,7 +760,7 @@ static void ppcdrc_set_context(void *src)
     address translation
 -------------------------------------------------*/
 
-static int ppcdrc_translate(int space, int intention, offs_t *address)
+static CPU_TRANSLATE( ppcdrc )
 {
 	return ppccom_translate_address(ppc, space, intention, address);
 }
@@ -770,7 +770,7 @@ static int ppcdrc_translate(int space, int intention, offs_t *address)
     ppcdrc_dasm - disassemble an instruction
 -------------------------------------------------*/
 
-static offs_t ppcdrc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( ppcdrc )
 {
 	return ppccom_dasm(ppc, buffer, pc, oprom, opram);
 }
@@ -781,7 +781,7 @@ static offs_t ppcdrc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
     CPU instance
 -------------------------------------------------*/
 
-static void ppcdrc_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppcdrc )
 {
 	switch (state)
 	{
@@ -812,7 +812,7 @@ static void ppcdrc_set_info(UINT32 state, cpuinfo *info)
     CPU instance
 -------------------------------------------------*/
 
-static void ppcdrc_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( ppcdrc )
 {
 	switch (state)
 	{
@@ -821,15 +821,15 @@ static void ppcdrc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppcdrc_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ppcdrc_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ppcdrc_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(ppcdrc);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(ppcdrc);	break;
 		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
-		case CPUINFO_PTR_RESET:							info->reset = ppcdrc_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = ppcdrc_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = ppcdrc_execute;			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ppcdrc_dasm;		break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = ppcdrc_translate;		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppcdrc);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppcdrc);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppcdrc);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);		break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(ppcdrc);		break;
 		case CPUINFO_PTR_CONTEXT:						info->p = ppc;							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -4190,9 +4190,9 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
     information getter
 -------------------------------------------------*/
 
-static void ppcdrc4xx_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( ppcdrc4xx )
 {
-	ppcdrc_get_info(state, info);
+	CPU_GET_INFO_CALL(ppcdrc);
 	ppc4xx_get_info(ppc, state, info);
 }
 
@@ -4202,9 +4202,9 @@ static void ppcdrc4xx_get_info(UINT32 state, cpuinfo *info)
     information setter
 -------------------------------------------------*/
 
-static void ppcdrc4xx_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppcdrc4xx )
 {
-	ppcdrc_set_info(state, info);
+	CPU_SET_INFO_CALL(ppcdrc);
 	ppc4xx_set_info(ppc, state, info);
 }
 
@@ -4218,9 +4218,9 @@ static void ppcdrc4xx_set_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc403ga_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc403ga )
 {
-	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, device, index, clock, config, irqcallback);
 }
 
 
@@ -4229,21 +4229,21 @@ static void ppc403ga_init(int index, int clock, const void *config, int (*irqcal
     information getter
 -------------------------------------------------*/
 
-void ppc403ga_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc403ga )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc403ga_init;				break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppcdrc4xx_set_info;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403ga);				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GA");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc4xx_get_info(state, info);		break;
+		default:										CPU_GET_INFO_CALL(ppcdrc4xx);		break;
 	}
 }
 
@@ -4257,9 +4257,9 @@ void ppc403ga_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc403gcx_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc403gcx )
 {
-	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, device, index, clock, config, irqcallback);
 }
 
 
@@ -4268,21 +4268,21 @@ static void ppc403gcx_init(int index, int clock, const void *config, int (*irqca
     information getter
 -------------------------------------------------*/
 
-void ppc403gcx_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc403gcx )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc403gcx_init;			break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppcdrc4xx_set_info;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403gcx);			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GCX");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc4xx_get_info(state, info);		break;
+		default:										CPU_GET_INFO_CALL(ppcdrc4xx);		break;
 	}
 }
 
@@ -4301,9 +4301,9 @@ void ppc403gcx_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc601_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc601 )
 {
-	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, device, index, clock, config, irqcallback);
 }
 
 
@@ -4312,20 +4312,20 @@ static void ppc601_init(int index, int clock, const void *config, int (*irqcallb
     information getter
 -------------------------------------------------*/
 
-void ppc601_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc601 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc601_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 601");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4339,9 +4339,9 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc602_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc602 )
 {
-	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
 }
 
 
@@ -4350,20 +4350,20 @@ static void ppc602_init(int index, int clock, const void *config, int (*irqcallb
     information getter
 -------------------------------------------------*/
 
-void ppc602_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc602 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc602_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 602");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4377,9 +4377,9 @@ void ppc602_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc603_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc603 )
 {
-	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
 }
 
 
@@ -4388,20 +4388,20 @@ static void ppc603_init(int index, int clock, const void *config, int (*irqcallb
     information getter
 -------------------------------------------------*/
 
-void ppc603_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc603 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc603_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4415,9 +4415,9 @@ void ppc603_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc603e_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc603e )
 {
-	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
 }
 
 
@@ -4426,20 +4426,20 @@ static void ppc603e_init(int index, int clock, const void *config, int (*irqcall
     information getter
 -------------------------------------------------*/
 
-void ppc603e_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc603e )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc603e_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603e);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603e");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4453,9 +4453,9 @@ void ppc603e_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc603r_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc603r )
 {
-	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
 }
 
 
@@ -4464,20 +4464,20 @@ static void ppc603r_init(int index, int clock, const void *config, int (*irqcall
     information getter
 -------------------------------------------------*/
 
-void ppc603r_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc603r )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc603r_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603r);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603R");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4491,9 +4491,9 @@ void ppc603r_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void ppc604_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ppc604 )
 {
-	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, device, index, clock, config, irqcallback);
 }
 
 
@@ -4502,20 +4502,20 @@ static void ppc604_init(int index, int clock, const void *config, int (*irqcallb
     information getter
 -------------------------------------------------*/
 
-void ppc604_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc604 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = ppc604_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 604");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4534,9 +4534,9 @@ void ppc604_get_info(UINT32 state, cpuinfo *info)
     initialization
 -------------------------------------------------*/
 
-static void mpc8240_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( mpc8240 )
 {
-	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, device, index, clock, config, irqcallback);
 }
 
 
@@ -4545,20 +4545,20 @@ static void mpc8240_init(int index, int clock, const void *config, int (*irqcall
     information getter
 -------------------------------------------------*/
 
-void mpc8240_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mpc8240 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = mpc8240_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC MPC8240");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 

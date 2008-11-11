@@ -21,7 +21,8 @@ typedef struct
 	UINT32 ER;
 	UINT32 PPC;
 
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT8 IRQ;
 	UINT8 NMI;
 } _SE3208Context;
@@ -1721,11 +1722,13 @@ static void BuildTable(void)
 		OpTable[i]=DecodeOp(i);
 }
 
-static void SE3208_Reset(void)
+static CPU_RESET( SE3208 )
 {
-	int (*save_irqcallback)(int) = Context.irq_callback;
+	cpu_irq_callback save_irqcallback = Context.irq_callback;
+	const device_config *save_device = Context.device;
 	memset(&Context,0,sizeof(_SE3208Context));
 	Context.irq_callback = save_irqcallback;
+	Context.device = save_device;
 	Context.PC=SE3208_Read32(0);
 	Context.SR=0;
 	Context.IRQ=CLEAR_LINE;
@@ -1758,12 +1761,12 @@ static void SE3208_Interrupt(void)
 	if(!(TESTFLAG(FLAG_AUT)))
 		Context.PC=SE3208_Read32(8);
 	else
-		Context.PC=SE3208_Read32(4*Context.irq_callback(0));
+		Context.PC=SE3208_Read32(4*Context.irq_callback(Context.device, 0));
 	change_pc(Context.PC+2);
 }
 
 
-static int SE3208_Run(int cycles)
+static CPU_EXECUTE( SE3208 )
 {
 	SE3208_ICount=cycles;
 	do
@@ -1791,27 +1794,28 @@ static int SE3208_Run(int cycles)
 	return cycles-SE3208_ICount;
 }
 
-static void SE3208_Init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( SE3208 )
 {
 	BuildTable();
 
 	Context.irq_callback = irqcallback;
+	Context.device = device;
 }
 
-static void SE3208_Exit(void)
+static CPU_EXIT( SE3208 )
 {
 	if(OpTable)
 		free(OpTable);
 }
 
 
-static void SE3208_get_context(void *dst)
+static CPU_GET_CONTEXT( SE3208 )
 {
 	if(dst)
 		memcpy(dst,&Context,sizeof(Context));
 }
 
-static void SE3208_set_context(void *src)
+static CPU_SET_CONTEXT( SE3208 )
 {
 	if(src)
 		memcpy(&Context,src,sizeof(Context));
@@ -1826,7 +1830,7 @@ static void set_irq_line(int line,int state)
 }
 
 
-static void SE3208_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( SE3208 )
 {
 	switch (state)
 	{
@@ -1852,7 +1856,7 @@ static void SE3208_set_info(UINT32 state, cpuinfo *info)
 }
 
 
-void SE3208_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( SE3208 )
 {
 	switch (state)
 	{
@@ -1899,15 +1903,15 @@ void SE3208_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SE3208_R7:			info->i = Context.R[ 7];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = SE3208_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = SE3208_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = SE3208_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = SE3208_Init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = SE3208_Reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = SE3208_Exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = SE3208_Run;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(SE3208);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(SE3208);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(SE3208);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(SE3208);		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(SE3208);	break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(SE3208);		break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(SE3208);break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = SE3208_Dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(SE3208);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &SE3208_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

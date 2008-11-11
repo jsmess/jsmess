@@ -83,7 +83,8 @@ typedef struct {
 	UINT8	YI;
 	UINT8	halted;
 	UINT8	interrupt_pending;
-	int		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } minx_regs;
 
 static minx_regs regs;
@@ -107,9 +108,10 @@ INLINE void wr16( UINT32 offset, UINT16 data )
 }
 
 
-static void minx_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( minx )
 {
 	regs.irq_callback = irqcallback;
+	regs.device = device;
 	if ( config != NULL )
 	{
 	}
@@ -119,7 +121,7 @@ static void minx_init(int index, int clock, const void *config, int (*irqcallbac
 }
 
 
-static void minx_reset( void )
+static CPU_RESET( minx )
 {
 	regs.SP = regs.BA = regs.HL = regs.X = regs.Y = 0;
 	regs.U = regs.V = regs.F = regs.E = regs.I = regs.XI = regs.YI = 0;
@@ -130,7 +132,7 @@ static void minx_reset( void )
 }
 
 
-static void minx_exit( void )
+static CPU_EXIT( minx )
 {
 }
 
@@ -157,7 +159,7 @@ INLINE UINT16 rdop16( void )
 #include "minxops.h"
 
 
-static int minx_execute( int cycles )
+static CPU_EXECUTE( minx )
 {
 	UINT32	oldpc;
 	UINT8	op;
@@ -182,7 +184,7 @@ static int minx_execute( int cycles )
 				/* Set Interrupt Branch flag */
 				regs.F |= 0x80;
 				regs.V = 0;
-				regs.PC = rd16( regs.irq_callback( 0 ) << 1 );
+				regs.PC = rd16( regs.irq_callback( regs.device, 0 ) << 1 );
 				minx_icount -= 28;		/* This cycle count is a guess */
 			}
 		}
@@ -202,18 +204,18 @@ static int minx_execute( int cycles )
 }
 
 
-static void minx_burn( int cycles )
+static CPU_BURN( minx )
 {
 	minx_icount = 0;
 }
 
 
-static void minx_set_context( void *src )
+static CPU_SET_CONTEXT( minx )
 {
 }
 
 
-static void minx_get_context( void *dst )
+static CPU_GET_CONTEXT( minx )
 {
 }
 
@@ -280,7 +282,7 @@ static void minx_set_irq_line( int irqline, int state )
 }
 
 
-static void minx_set_info( UINT32 state, cpuinfo *info )
+static CPU_SET_INFO( minx )
 {
 	switch( state )
 	{
@@ -306,7 +308,7 @@ static void minx_set_info( UINT32 state, cpuinfo *info )
 }
 
 
-void minx_get_info( UINT32 state, cpuinfo *info )
+CPU_GET_INFO( minx )
 {
 	switch( state )
 	{
@@ -347,15 +349,15 @@ void minx_get_info( UINT32 state, cpuinfo *info )
 	case CPUINFO_INT_REGISTER + MINX_XI:
 	case CPUINFO_INT_REGISTER + MINX_YI:						info->i = minx_get_reg( state - CPUINFO_INT_REGISTER ); break;
 	case CPUINFO_INT_PREVIOUSPC:								info->i = 0x0000; break;
-	case CPUINFO_PTR_SET_INFO:									info->setinfo = minx_set_info; break;
-	case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = minx_get_context; break;
-	case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = minx_set_context; break;
-	case CPUINFO_PTR_INIT:										info->init = minx_init; break;
-	case CPUINFO_PTR_RESET:										info->reset = minx_reset; break;
-	case CPUINFO_PTR_EXIT:										info->exit = minx_exit; break;
-	case CPUINFO_PTR_EXECUTE:									info->execute = minx_execute; break;
-	case CPUINFO_PTR_BURN:										info->burn = minx_burn; break;
-	case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = minx_dasm; break;
+	case CPUINFO_PTR_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(minx); break;
+	case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = CPU_GET_CONTEXT_NAME(minx); break;
+	case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = CPU_SET_CONTEXT_NAME(minx); break;
+	case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(minx); break;
+	case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(minx); break;
+	case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(minx); break;
+	case CPUINFO_PTR_EXECUTE:									info->execute = CPU_EXECUTE_NAME(minx); break;
+	case CPUINFO_PTR_BURN:										info->burn = CPU_BURN_NAME(minx); break;
+	case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(minx); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &minx_icount; break;
 	case CPUINFO_STR_NAME:										strcpy( info->s = cpuintrf_temp_str(), "Minx" ); break;
 	case CPUINFO_STR_CORE_FAMILY:								strcpy( info->s = cpuintrf_temp_str(), "Nintendo Minx" ); break;

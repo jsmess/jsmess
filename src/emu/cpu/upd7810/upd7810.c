@@ -835,7 +835,7 @@ static void upd7810_take_irq(void)
 	{
 		/* acknowledge external IRQ */
 		if (irqline)
-			(*upd7810.irq_callback)(irqline);
+			(*upd7810.irq_callback)(upd7810.device, irqline);
 		SP--;
 		WM( SP, PSW );
 		SP--;
@@ -1530,10 +1530,11 @@ static void upd78c05_timers(int cycles)
 	}
 }
 
-static void upd7810_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( upd7810 )
 {
 	upd7810.config = *(const UPD7810_CONFIG*) config;
 	upd7810.irq_callback = irqcallback;
+	upd7810.device = device;
 
 	state_save_register_item("upd7810", index, upd7810.ppc.w.l);
 	state_save_register_item("upd7810", index, upd7810.pc.w.l);
@@ -1602,16 +1603,19 @@ static void upd7810_init(int index, int clock, const void *config, int (*irqcall
 #include "7810tbl.c"
 #include "7810ops.c"
 
-static void upd7810_reset (void)
+static CPU_RESET( upd7810 )
 {
 	UPD7810_CONFIG save_config;
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	save_config = upd7810.config;
 	save_irqcallback = upd7810.irq_callback;
+	save_device = upd7810.device;
 	memset(&upd7810, 0, sizeof(upd7810));
 	upd7810.config = save_config;
 	upd7810.irq_callback = save_irqcallback;
+	upd7810.device = save_device;
 
 	upd7810.opXX = opXX_7810;
 	upd7810.op48 = op48;
@@ -1643,14 +1647,15 @@ static void upd7810_reset (void)
 	upd7810.handle_timers = upd7810_timers;
 }
 
-static void upd7807_reset (void)
+static CPU_RESET( upd7807 )
 {
-	upd7810_reset();
+	CPU_RESET_CALL(upd7810);
 	upd7810.opXX = opXX_7807;
 }
 
-static void upd7801_reset( void ) {
-	upd7810_reset();
+static CPU_RESET( upd7801 )
+{
+	CPU_RESET_CALL(upd7810);
 	upd7810.op48 = op48_7801;
 	upd7810.op4C = op4C_7801;
 	upd7810.op4D = op4D_7801;
@@ -1661,8 +1666,9 @@ static void upd7801_reset( void ) {
 	upd7810.opXX = opXX_7801;
 }
 
-static void upd78c05_reset( void ) {
-	upd7810_reset();
+static CPU_RESET( upd78c05 )
+{
+	CPU_RESET_CALL(upd7810);
 	upd7810.op48 = op48_78c05;
 	upd7810.op4C = op4C_78c05;
 	upd7810.op4D = op4D_78c05;
@@ -1679,8 +1685,9 @@ static void upd78c05_reset( void ) {
 	upd7810.ovc0 = ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
 }
 
-static void upd78c06_reset( void ) {
-	upd78c05_reset();
+static CPU_RESET( upd78c06 )
+{
+	CPU_RESET_CALL(upd7810);
 	upd7810.op48 = op48_78c06;
 	upd7810.op4C = op4C_78c06;
 	upd7810.op4D = op4D_78c06;
@@ -1691,11 +1698,11 @@ static void upd78c06_reset( void ) {
 	upd7810.opXX = opXX_78c06;
 }
 
-static void upd7810_exit (void)
+static CPU_EXIT( upd7810 )
 {
 }
 
-static int upd7810_execute (int cycles)
+static CPU_EXECUTE( upd7810 )
 {
 	upd7810_icount = cycles;
 
@@ -1778,13 +1785,13 @@ static int upd7810_execute (int cycles)
 	return cycles - upd7810_icount;
 }
 
-static void upd7810_get_context (void *dst)
+static CPU_GET_CONTEXT( upd7810 )
 {
 	if (dst)
 		memcpy(dst, &upd7810, sizeof(upd7810));
 }
 
-static void upd7810_set_context (void *src)
+static CPU_SET_CONTEXT( upd7810 )
 {
 	if (src)
 		memcpy(&upd7810, src, sizeof(upd7810));
@@ -1833,7 +1840,7 @@ static void set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void upd7810_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( upd7810 )
 {
 	switch (state)
 	{
@@ -1906,7 +1913,7 @@ static void upd7810_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void upd7810_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( upd7810 )
 {
 	switch (state)
 	{
@@ -1993,15 +2000,15 @@ void upd7810_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + UPD7810_CO1:		info->i = CO1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = upd7810_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = upd7810_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = upd7810_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = upd7810_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = upd7810_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = upd7810_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = upd7810_execute;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(upd7810);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(upd7810);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(upd7810);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(upd7810);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7810);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(upd7810);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(upd7810);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7810_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7810);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &upd7810_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2081,38 +2088,38 @@ void upd7810_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void upd7807_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( upd7807 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = upd7807_reset;			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7807_dasm;		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7807);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7807);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;
 
-		default:										upd7810_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(upd7810);				break;
 	}
 }
 
-void upd7801_get_info(UINT32 state, cpuinfo *info) {
+CPU_GET_INFO( upd7801 ) {
 	switch( state ) {
-		case CPUINFO_PTR_RESET:							info->reset = upd7801_reset;			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7801_dasm;		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7801);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7801);		break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7801");				break;
 
-		default:										upd7810_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(upd7810);				break;
 	}
 }
 
-void upd78c05_get_info(UINT32 state, cpuinfo *info ) {
+CPU_GET_INFO( upd78c05 ) {
 	switch ( state ) {
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
-		case CPUINFO_PTR_RESET:							info->reset = upd78c05_reset;			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd78c05_dasm;		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd78c05);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd78c05);		break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C05");			break;
 
@@ -2150,16 +2157,16 @@ void upd78c05_get_info(UINT32 state, cpuinfo *info ) {
 		case CPUINFO_STR_REGISTER + UPD7810_CO0:
 		case CPUINFO_STR_REGISTER + UPD7810_CO1:		break;
 
-		default:										upd7801_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(upd7801);				break;
 	}
 }
 
-void upd78c06_get_info(UINT32 state, cpuinfo *info ) {
+CPU_GET_INFO( upd78c06 ) {
 	switch ( state ) {
-		case CPUINFO_PTR_RESET:							info->reset = upd78c06_reset;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd78c06);			break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C06");			break;
 
-		default:										upd78c05_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(upd78c05);				break;
 	}
 }

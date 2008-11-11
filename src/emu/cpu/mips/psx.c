@@ -180,7 +180,8 @@ typedef struct
 	int multiplier_operation;
 	UINT32 multiplier_operand1;
 	UINT32 multiplier_operand2;
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT8 (*readbyte)( UINT32 );
 	UINT16 (*readhalf)( UINT32 );
 	UINT32 (*readword)( UINT32 );
@@ -1580,14 +1581,15 @@ static void mips_state_register( const char *type, int index )
 	state_save_register_postload( Machine, mips_postload, NULL );
 }
 
-static void mips_init( int index, int clock, const void *config, int (*irqcallback)(int) )
+static CPU_INIT( mips )
 {
 	mipscpu.irq_callback = irqcallback;
+	mipscpu.device = device;
 
 	mips_state_register( "psxcpu", index );
 }
 
-static void mips_reset( void )
+static CPU_RESET( mips )
 {
 	mipscpu.delayr = 0;
 	mipscpu.delayv = 0;
@@ -1607,7 +1609,7 @@ static void mips_reset( void )
 	mips_set_pc( 0xbfc00000 );
 }
 
-static void mips_exit( void )
+static CPU_EXIT( mips )
 {
 }
 
@@ -1788,7 +1790,7 @@ static void mips_bc( int cop, int sr_cu, int condition )
 	}
 }
 
-static int mips_execute( int cycles )
+static CPU_EXECUTE( mips )
 {
 	mips_ICount = cycles;
 	do
@@ -2786,7 +2788,7 @@ static int mips_execute( int cycles )
 	return cycles - mips_ICount;
 }
 
-static void mips_get_context( void *dst )
+static CPU_GET_CONTEXT( mips )
 {
 	if( dst )
 	{
@@ -2794,7 +2796,7 @@ static void mips_get_context( void *dst )
 	}
 }
 
-static void mips_set_context( void *src )
+static CPU_SET_CONTEXT( mips )
 {
 	if( src )
 	{
@@ -2854,7 +2856,7 @@ static void set_irq_line( int irqline, int state )
             There is also a problem with PULSE_LINE interrupts as the interrupt
             pending bits aren't latched the emulated code won't know what caused
             the interrupt. */
-			(*mipscpu.irq_callback)( irqline );
+			(*mipscpu.irq_callback)( mipscpu.device, irqline );
 		}
 		break;
 	}
@@ -2902,7 +2904,7 @@ ADDRESS_MAP_END
  * Return a formatted string for a register
  ****************************************************************************/
 
-static offs_t mips_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( mips )
 {
 	return DasmMIPS( buffer, pc, opram );
 }
@@ -3855,7 +3857,7 @@ static void docop2( int gteop )
  * Generic set_info
  **************************************************************************/
 
-static void mips_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mips )
 {
 	switch (state)
 	{
@@ -3996,7 +3998,7 @@ static void mips_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void mips_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( mips )
 {
 	switch (state)
 	{
@@ -4157,18 +4159,18 @@ static void mips_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MIPS_CP2CR31:		info->i = mipscpu.cp2cr[ 31 ].d;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mips_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mips_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mips_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = mips_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = mips_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = mips_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = mips_execute;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(mips);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(mips);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mips);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mips);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mips_ICount;			break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = address_map_psxcpu_internal_map; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(psxcpu_internal_map); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map32 = 0; break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map32 = 0; break;
 
@@ -4308,7 +4310,7 @@ static void mips_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void psxcpu_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( psxcpu )
 {
 	switch (state)
 	{
@@ -4316,7 +4318,7 @@ void psxcpu_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PSX CPU"); break;
 
 		default:
-			mips_get_info(state, info);
+			CPU_GET_INFO_CALL(mips);
 			break;
 	}
 }
@@ -4324,17 +4326,17 @@ void psxcpu_get_info(UINT32 state, cpuinfo *info)
 
 #if (HAS_CXD8661R)
 
-void cxd8661r_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cxd8661r )
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = address_map_cxd8661r_internal_map; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(cxd8661r_internal_map); break;
 
 			/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "CXD8661R"); break;
 
 		default:
-			mips_get_info(state, info);
+			CPU_GET_INFO_CALL(mips);
 			break;
 	}
 }

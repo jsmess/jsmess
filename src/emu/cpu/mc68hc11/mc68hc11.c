@@ -52,7 +52,8 @@ typedef struct
 	UINT8 adctl;
 	int ad_channel;
 
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	int icount;
 	int ram_position;
 	int reg_position;
@@ -313,7 +314,7 @@ static void (*hc11_optable_page4[256])(void);
 #include "hc11ops.c"
 #include "hc11ops.h"
 
-static void hc11_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( hc11 )
 {
 	int i;
 
@@ -350,26 +351,27 @@ static void hc11_init(int index, int clock, const void *config, int (*irqcallbac
 	hc11.reg_position = 0;
 	hc11.ram_position = 0x100;
 	hc11.irq_callback = irqcallback;
+	hc11.device = device;
 }
 
-static void hc11_reset(void)
+static CPU_RESET( hc11 )
 {
 	hc11.pc = READ16(0xfffe);
 }
 
-static void hc11_exit(void)
+static CPU_EXIT( hc11 )
 {
 
 }
 
-static void hc11_get_context(void *dst)
+static CPU_GET_CONTEXT( hc11 )
 {
 	if (dst) {
 		*(HC11_REGS*)dst = hc11;
 	}
 }
 
-static void hc11_set_context(void *src)
+static CPU_SET_CONTEXT( hc11 )
 {
 	if (src) {
 		hc11 = *(HC11_REGS*)src;
@@ -377,7 +379,7 @@ static void hc11_set_context(void *src)
 	change_pc(hc11.pc);
 }
 
-static int hc11_execute(int cycles)
+static CPU_EXECUTE( hc11 )
 {
 	hc11.icount = cycles;
 
@@ -397,7 +399,7 @@ static int hc11_execute(int cycles)
 
 /*****************************************************************************/
 
-static void mc68hc11_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mc68hc11 )
 {
 	switch (state)
 	{
@@ -412,7 +414,7 @@ static void mc68hc11_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void mc68hc11_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mc68hc11 )
 {
 	switch(state)
 	{
@@ -451,13 +453,13 @@ void mc68hc11_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + HC11_IY:			info->i = hc11.iy;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mc68hc11_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = hc11_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = hc11_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = hc11_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = hc11_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = hc11_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = hc11_execute;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mc68hc11);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(hc11);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(hc11);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hc11);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hc11);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hc11);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hc11);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hc11_disasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hc11.icount;			break;

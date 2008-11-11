@@ -662,7 +662,7 @@ static const s_opcode opcode_8301[256]=
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
-static void ALPHA8201_init (int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ALPHA8201 )
 {
 	state_save_register_item_array("ALPHA8201", index, R.RAM);
 	state_save_register_item("ALPHA8201", index, R.PREVPC);
@@ -689,7 +689,7 @@ static void ALPHA8201_init (int index, int clock, const void *config, int (*irqc
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static void ALPHA8201_reset (void)
+static CPU_RESET( ALPHA8201 )
 {
 	PC     = 0;
 	regPTR = 0;
@@ -712,7 +712,7 @@ static void ALPHA8201_reset (void)
 /****************************************************************************
  * Shut down CPU emulation
  ****************************************************************************/
-static void ALPHA8201_exit (void)
+static CPU_EXIT( ALPHA8201 )
 {
 	/* nothing to do ? */
 }
@@ -802,17 +802,17 @@ mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
 }
 
 #if (HAS_ALPHA8201)
-static int ALPHA8201_execute(int cycles) { return alpha8xxx_execute(opcode_8201,cycles); }
+static CPU_EXECUTE( ALPHA8201 ) { return alpha8xxx_execute(opcode_8201,cycles); }
 #endif
 
 #if (HAS_ALPHA8301)
-static int ALPHA8301_execute(int cycles) { return alpha8xxx_execute(opcode_8301,cycles); }
+static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(opcode_8301,cycles); }
 #endif
 
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void ALPHA8201_get_context (void *dst)
+static CPU_GET_CONTEXT( ALPHA8201 )
 {
 	if( dst )
 		*(ALPHA8201_Regs*)dst = R;
@@ -821,7 +821,7 @@ static void ALPHA8201_get_context (void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void ALPHA8201_set_context (void *src)
+static CPU_SET_CONTEXT( ALPHA8201 )
 {
 	if( src )
 		R = *(ALPHA8201_Regs*)src;
@@ -846,7 +846,7 @@ static void set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void ALPHA8201_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ALPHA8201 )
 {
 	switch (state)
 	{
@@ -889,7 +889,7 @@ static void ALPHA8201_set_info(UINT32 state, cpuinfo *info)
  **************************************************************************/
 
 /* 8201 and 8301 */
-static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( alpha8xxx )
 {
 	switch (state)
 	{
@@ -944,14 +944,14 @@ static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + ALPHA8201_R7:			info->i = RD_REG(7);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ALPHA8201_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ALPHA8201_get_context; break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ALPHA8201_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = ALPHA8201_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = ALPHA8201_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = ALPHA8201_exit;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ALPHA8201);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(ALPHA8201); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(ALPHA8201); break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ALPHA8201);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ALPHA8201);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ALPHA8201);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ALPHA8201_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ALPHA8201);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ALPHA8201_ICount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -987,29 +987,29 @@ static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 #if (HAS_ALPHA8201)
-void alpha8201_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( alpha8201 )
 {
 	switch (state)
 	{
 	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8201");				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = ALPHA8201_execute;			break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8201);			break;
 	default:
 		/* 8201 / 8301 */
-		alpha8xxx_get_info(state,info);
+		CPU_GET_INFO_CALL(alpha8xxx);
 	}
 }
 #endif
 
 #if (HAS_ALPHA8301)
-void alpha8301_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( alpha8301 )
 {
 	switch (state)
 	{
 	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8301");				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = ALPHA8301_execute;			break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8301);			break;
 	default:
 		/* 8201 / 8301 */
-		alpha8xxx_get_info(state,info);
+		CPU_GET_INFO_CALL(alpha8xxx);
 	}
 }
 #endif

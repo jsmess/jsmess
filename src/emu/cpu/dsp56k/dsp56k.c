@@ -38,9 +38,9 @@
 /***************************************************************************
     LOCAL DECLARATIONS
 ***************************************************************************/
-static void dsp56k_init(int index, int clock, const void *_config, int (*irqcallback)(int));
-static void dsp56k_reset(void);
-static void dsp56k_exit(void);
+static CPU_INIT( dsp56k );
+static CPU_RESET( dsp56k );
+static CPU_EXIT( dsp56k );
 
 /***************************************************************************
     MACROS
@@ -208,6 +208,7 @@ typedef struct
 	UINT32			op;
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
+	const device_config *device;
 } dsp56k_core;
 
 
@@ -333,7 +334,7 @@ static void set_irq_line(int irqline, int state)
 			{
 				/* If it changes state from asserted to cleared.  Call the reset function. */
 				if (core.reset_state == TRUE)
-					dsp56k_reset();
+					cpu_reset_dsp56k(core.device);
 
 				core.reset_state = FALSE;
 			}
@@ -357,14 +358,14 @@ static void set_irq_line(int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void dsp56k_get_context(void *dst)
+static CPU_GET_CONTEXT( dsp56k )
 {
 	if (dst)
 		*(dsp56k_core *)dst = core;
 }
 
 
-static void dsp56k_set_context(void *src)
+static CPU_SET_CONTEXT( dsp56k )
 {
 	if (src)
 		core = *(dsp56k_core *)src;
@@ -377,7 +378,7 @@ static void dsp56k_set_context(void *src)
 /***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
-static void dsp56k_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( dsp56k )
 {
 	// Call specific module inits
 	pcu_init(index);
@@ -399,6 +400,7 @@ static void dsp56k_init(int index, int clock, const void *_config, int (*irqcall
 
 	//core.config = _config;
 	//core.irq_callback = irqcallback;
+	core.device = device;
 }
 
 static void agu_reset(void)
@@ -431,7 +433,7 @@ static void alu_reset(void)
 }
 
 
-static void dsp56k_reset(void)
+static CPU_RESET( dsp56k )
 {
 	logerror("Dsp56k reset\n");
 
@@ -451,7 +453,7 @@ static void dsp56k_reset(void)
 }
 
 
-static void dsp56k_exit(void)
+static CPU_EXIT( dsp56k )
 {
 }
 
@@ -468,7 +470,7 @@ static void dsp56k_exit(void)
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static int dsp56k_execute(int cycles)
+static CPU_EXECUTE( dsp56k )
 {
 	/* If reset line is asserted, do nothing */
 	if (core.reset_state)
@@ -499,7 +501,7 @@ static int dsp56k_execute(int cycles)
 /***************************************************************************
     DISASSEMBLY HOOK
 ***************************************************************************/
-extern offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( dsp56k );
 
 
 /****************************************************************************
@@ -520,7 +522,7 @@ ADDRESS_MAP_END
  * Generic set_info/get_info
  **************************************************************************/
 
-static void dsp56k_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( dsp56k )
 {
 	switch (state)
 	{
@@ -586,7 +588,7 @@ static void dsp56k_set_info(UINT32 state, cpuinfo *info)
 }
 
 
-void dsp56k_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( dsp56k )
 {
 	switch (state)
 	{
@@ -596,7 +598,7 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0x0000;						break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;	// ?
@@ -672,25 +674,25 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + DSP56K_ST15:		info->i = ST15;							break;
 
 		// --- the following bits of info are returned as pointers to data or functions ---
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = dsp56k_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = dsp56k_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = dsp56k_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = dsp56k_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = dsp56k_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = dsp56k_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = dsp56k_execute;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dsp56k);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dsp56k);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dsp56k);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dsp56k);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp56k);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = dsp56k_dasm;		break;
-		case CPUINFO_PTR_DEBUG_SETUP_COMMANDS:			info->setup_commands = NULL;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp56k);		break;
+		case CPUINFO_PTR_DEBUG_INIT:					info->debug_init = NULL;				break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = NULL;					break;
 		case CPUINFO_PTR_READ:							info->read = NULL;						break;
 		case CPUINFO_PTR_WRITE:							info->write = NULL;						break;
 		case CPUINFO_PTR_READOP:						info->readop = NULL;					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &dsp56k_icount;			break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map16 = address_map_dsp56156_x_data_map;								break;
+ 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);								break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map16 = address_map_dsp56156_program_map;							break;
+ 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);							break;
 
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case CPUINFO_STR_NAME:							strcpy(info->s, "DSP56156");			break;

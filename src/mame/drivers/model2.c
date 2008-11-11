@@ -53,17 +53,13 @@
 #include "machine/eeprom.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
-#include "cpu/m68000/m68k.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86233/mb86233.h"
 #include "sound/scsp.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
-
-extern VIDEO_START(model2);
-extern VIDEO_UPDATE(model2);
-
-extern void model2_3d_set_zclip( UINT8 clip );
+#include "includes/model2.h"
 
 UINT32 *model2_bufferram, *model2_colorxlat;
 static UINT32 *model2_workram, *model2_backup1, *model2_backup2;
@@ -630,7 +626,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 /* GEO */
 
 UINT32 geo_read_start_address = 0;
-static UINT32 geo_write_start_address = 0;
+UINT32 geo_write_start_address = 0;
 
 static WRITE32_HANDLER( geo_ctl1_w )
 {
@@ -905,7 +901,7 @@ static int to_68k;
 
 static int snd_68k_ready_r(void)
 {
-	int sr = cpunum_get_reg(1, M68K_REG_SR);
+	int sr = cpunum_get_reg(1, M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{

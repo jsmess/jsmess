@@ -77,7 +77,8 @@ typedef struct
 	UINT8   in_irq;         /* already servicing IRQ */
 	UINT8	pending_irq;	/* IRQ is pending */
 	UINT8   sleeping;       /* low-consumption state */
-	int 	(*irq_callback)(int irqline);	/* IRQ callback */
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 }	Saturn_Regs;
 
 static int saturn_ICount = 0;
@@ -97,10 +98,11 @@ static Saturn_Regs saturn;
  *
  *****************************************************************************/
 
-static void saturn_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( saturn )
 {
 	saturn.config = (saturn_cpu_core *) config;
 	saturn.irq_callback = irqcallback;
+	saturn.device = device;
 
 	state_save_register_item_array("saturn",index,saturn.reg[R0]);
 	state_save_register_item_array("saturn",index,saturn.reg[R1]);
@@ -127,7 +129,7 @@ static void saturn_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("saturn",index,saturn.sleeping);
 }
 
-static void saturn_reset(void)
+static CPU_RESET( saturn )
 {
 	saturn.pc=0;
 	saturn.sleeping = 0;
@@ -136,13 +138,13 @@ static void saturn_reset(void)
 	change_pc(saturn.pc);
 }
 
-static void saturn_get_context (void *dst)
+static CPU_GET_CONTEXT( saturn )
 {
 	if( dst )
 		*(Saturn_Regs*)dst = saturn;
 }
 
-static void saturn_set_context (void *src)
+static CPU_SET_CONTEXT( saturn )
 {
 	if( src )
 	{
@@ -163,11 +165,11 @@ INLINE void saturn_take_irq(void)
 
 	LOG(("Saturn#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), saturn.pc));
 
-	if (saturn.irq_callback) (*saturn.irq_callback)(SATURN_IRQ_LINE);
+	if (saturn.irq_callback) (*saturn.irq_callback)(saturn.device, SATURN_IRQ_LINE);
 	change_pc(saturn.pc);
 }
 
-static int saturn_execute(int cycles)
+static CPU_EXECUTE( saturn )
 {
 	saturn_ICount = cycles;
 
@@ -227,7 +229,7 @@ static void saturn_set_wakeup_line(int state)
 	if (saturn.sleeping && state==1)
 	{
 		LOG(( "SATURN#%d set_wakeup_line(ASSERT)\n", cpu_getactivecpu()));
-		if (saturn.irq_callback) (*saturn.irq_callback)(SATURN_WAKEUP_LINE);
+		if (saturn.irq_callback) (*saturn.irq_callback)(saturn.device, SATURN_WAKEUP_LINE);
 		saturn.sleeping = 0;
 	}
 }
@@ -246,7 +248,7 @@ static void IntReg64(Saturn64 r, INT64 d)
 }
 
 
-static void saturn_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( saturn )
 {
 	switch (state)
 	{
@@ -301,7 +303,7 @@ static INT64 Reg64Int(Saturn64 r)
 	return x;
 }
 
-void saturn_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( saturn )
 {
 	switch (state)
 	{
@@ -363,14 +365,14 @@ void saturn_get_info(UINT32 state, cpuinfo *info)
 	        case CPUINFO_INT_REGISTER + SATURN_SLEEPING:		info->i = saturn.sleeping;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = saturn_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = saturn_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = saturn_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = saturn_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = saturn_reset;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = saturn_execute;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(saturn);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(saturn);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(saturn);		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(saturn);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(saturn);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(saturn);				break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;							break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = saturn_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(saturn);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &saturn_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

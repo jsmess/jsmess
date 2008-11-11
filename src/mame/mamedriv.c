@@ -4287,10 +4287,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( garyoret )	/* (c) 1987 Data East Corporation (Japan) */
 	DRIVER( cobracom )	/* (c) 1988 Data East Corporation (World) */
 	DRIVER( cobracmj )	/* (c) 1988 Data East Corporation (Japan) */
-	DRIVER( oscar )		/* (c) 1988 Data East USA (US) */
-	DRIVER( oscarj )	/* (c) 1987 Data East Corporation (Japan) */
+	DRIVER( oscar )		/* (c) 1988 Data East Corporation (World) */
+	DRIVER( oscaru )	/* (c) 1987 Data East USA (US) */
 	DRIVER( oscarj1 )	/* (c) 1987 Data East Corporation (Japan) */
-	DRIVER( oscarj0 )	/* (c) 1987 Data East Corporation (Japan) */
+	DRIVER( oscarj2 )	/* (c) 1987 Data East Corporation (Japan) */
 
 	/* Data East 16-bit games */
 	DRIVER( karnov )	/* (c) 1987 Data East USA (US) */
@@ -6292,6 +6292,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zaryavos )	/* (c) 1983 Nova Games of Canada (prototype) */
 	DRIVER( timelimt )	/* (c) 1983 Chuo Co. Ltd */
 	DRIVER( progress )	/* (c) 1984 Chuo Co. Ltd */
+	DRIVER( koroleva )		/* (c) 1988 Terminal */
 	DRIVER( rtriv )		/* (c) 198? Romar */
 
 	/* TIA-MC1 hardware games */

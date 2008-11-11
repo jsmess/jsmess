@@ -96,7 +96,7 @@ extern int m37710_ICount;				/* cycle count */
 /* ======================================================================== */
 
 /* Clean up after the emulation core - Not used in this core - */
-void m37710_exit(void);
+CPU_EXIT( m37710 );
 
 /* Save the current CPU state to disk */
 void m37710_state_save(void *file);
@@ -116,7 +116,7 @@ void m37710_state_load(void *file);
 #define m37710_branching(A)
 
 
-void m37710_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m37710 );
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

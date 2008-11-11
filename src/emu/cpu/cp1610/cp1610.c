@@ -36,7 +36,8 @@ typedef struct {
 	UINT8	flags;	/* flags */
 	int 	intr_enabled;
 	//int       (*reset_callback)(void);
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT16	intr_vector;
 	int 	reset_state;
 	int		intr_state;
@@ -1547,7 +1548,7 @@ static void cp1610_xori(int d)
 	cp1610_icount -= 8;
 }
 
-static void cp1610_reset(void)
+static CPU_RESET( cp1610 )
 {
 	/* This is how we set the reset vector */
 	cpunum_set_input_line(Machine, cpu_getactivecpu(), CP1610_RESET, PULSE_LINE);
@@ -2159,7 +2160,7 @@ static void cp1610_do_jumps(void)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-static int cp1610_execute(int cycles)
+static CPU_EXECUTE( cp1610 )
 {
 	UINT16 opcode;
 
@@ -3349,7 +3350,7 @@ static int cp1610_execute(int cycles)
 				cp1610.r[6]++;
 				cp1610_icount -= 9;
 				cp1610.intr_pending = 0;
-				cp1610.r[7] = cp1610.irq_callback(CP1610_INT_INTR);
+				cp1610.r[7] = cp1610.irq_callback(cp1610.device, CP1610_INT_INTR);
 			}
 			if ((cp1610.intrm_pending == 1) && (cp1610.intr_enabled))
 			{
@@ -3358,12 +3359,12 @@ static int cp1610_execute(int cycles)
 				cp1610.r[6]++;
 				cp1610_icount -= 9;
 				cp1610.intrm_pending = 0;
-				cp1610.r[7] = cp1610.irq_callback(CP1610_INT_INTRM);
+				cp1610.r[7] = cp1610.irq_callback(cp1610.device, CP1610_INT_INTRM);
 			}
 			if (cp1610.reset_pending == 1)
 			{
 				cp1610.reset_pending = 0;
-				cp1610.r[7] = cp1610.irq_callback(CP1610_RESET);
+				cp1610.r[7] = cp1610.irq_callback(cp1610.device, CP1610_RESET);
 			}
 		}
 
@@ -3372,25 +3373,26 @@ static int cp1610_execute(int cycles)
 	return cycles - cp1610_icount;
 }
 
-static void cp1610_get_context (void *dst)
+static CPU_GET_CONTEXT( cp1610 )
 {
 	if (dst)
 		*(cp1610_Regs *) dst = cp1610;
 }
 
-static void cp1610_set_context (void *src)
+static CPU_SET_CONTEXT( cp1610 )
 {
 	if (src)
 		cp1610 = *(cp1610_Regs *) src;
 }
 
-static void cp1610_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cp1610 )
 {
 	cp1610.intr_enabled = 0;
 	cp1610.reset_pending = 0;
 	cp1610.intr_pending = 0;
 	cp1610.intrm_pending = 0;
 	cp1610.irq_callback = irqcallback;
+	cp1610.device = device;
 }
 
 static void cp1610_set_irq_line(UINT32 irqline, int state)
@@ -3415,7 +3417,7 @@ static void cp1610_set_irq_line(UINT32 irqline, int state)
 	}
 }
 
-static void cp1610_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( cp1610 )
 {
 	switch (state)
 	{
@@ -3440,7 +3442,7 @@ static void cp1610_set_info(UINT32 state, cpuinfo *info)
 	return;
 }
 
-void cp1610_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cp1610 )
 {
 	switch (state)
 	{
@@ -3484,15 +3486,15 @@ void cp1610_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_REGISTER + CP1610_R7: info->i = cp1610.r[7];			break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = cp1610_set_info;		break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cp1610_get_context;	break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cp1610_set_context;	break;
-	case CPUINFO_PTR_INIT:							info->init = cp1610_init;				break;
-	case CPUINFO_PTR_RESET:							info->reset = cp1610_reset;				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = cp1610_execute;			break;
+	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cp1610);		break;
+	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cp1610);	break;
+	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cp1610);	break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cp1610);				break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cp1610);				break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cp1610);			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cp1610_dasm;		break;
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cp1610);		break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cp1610_icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

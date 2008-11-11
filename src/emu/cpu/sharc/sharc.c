@@ -7,7 +7,7 @@
 #include "debugger.h"
 #include "deprecat.h"
 
-static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+static CPU_DISASSEMBLE( sharc );
 
 static void sharc_dma_exec(int channel);
 static void check_interrupts(void);
@@ -126,7 +126,8 @@ typedef struct
 	UINT16 *internal_ram;
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	void (*opcode_handler)(void);
 	UINT64 opcode;
 	UINT64 fetch_opcode;
@@ -404,7 +405,7 @@ void sharc_external_dma_write(UINT32 address, UINT64 data)
 	}
 }
 
-static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( sharc )
 {
 	UINT64 op = 0;
 	UINT32 flags = 0;
@@ -418,7 +419,7 @@ static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 }
 
 
-static void sharc_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( sharc )
 {
 	const sharc_config *cfg = config;
 	int saveindex;
@@ -426,6 +427,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	sharc.boot_mode = cfg->boot_mode;
 
 	sharc.irq_callback = irqcallback;
+	sharc.device = device;
 
 	build_opcode_table();
 
@@ -549,7 +551,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("sharc", index, sharc.astat_old_old_old);
 }
 
-static void sharc_reset(void)
+static CPU_RESET( sharc )
 {
 	memset(sharc.internal_ram, 0, 2 * 0x10000 * sizeof(UINT16));
 
@@ -591,12 +593,12 @@ static void sharc_reset(void)
 	sharc.interrupt_active = 0;
 }
 
-static void sharc_exit(void)
+static CPU_EXIT( sharc )
 {
 	/* TODO */
 }
 
-static void sharc_get_context(void *dst)
+static CPU_GET_CONTEXT( sharc )
 {
 	/* copy the context */
 	if (dst)
@@ -605,7 +607,7 @@ static void sharc_get_context(void *dst)
 	}
 }
 
-static void sharc_set_context(void *src)
+static CPU_SET_CONTEXT( sharc )
 {
 	/* copy the context */
 	if (src)
@@ -683,7 +685,7 @@ static void check_interrupts(void)
 	}
 }
 
-static int sharc_execute(int cycles)
+static CPU_EXECUTE( sharc )
 {
 	sharc_icount = cycles;
 
@@ -861,7 +863,7 @@ static int sharc_execute(int cycles)
  * Generic set_info
  **************************************************************************/
 
-static void sharc_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( sharc )
 {
 	switch (state)
 	{
@@ -958,7 +960,7 @@ static void sharc_set_info(UINT32 state, cpuinfo *info)
 }
 
 #if (HAS_ADSP21062)
-static void adsp21062_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp21062 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 2)
 	{
@@ -972,13 +974,13 @@ static void adsp21062_set_info(UINT32 state, cpuinfo *info)
 	}
 	switch(state)
 	{
-		default:	sharc_set_info(state, info);		break;
+		default:	CPU_SET_INFO_CALL(sharc);		break;
 	}
 }
 #endif
 
 
-static int sharc_debug_read(int space, UINT32 offset, int size, UINT64 *value)
+static CPU_READ( sharc )
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
@@ -1040,7 +1042,7 @@ static int sharc_debug_read(int space, UINT32 offset, int size, UINT64 *value)
 	return 1;
 }
 
-static int sharc_debug_readop(UINT32 offset, int size, UINT64 *value)
+static CPU_READOP( sharc )
 {
 	UINT64 mask = (size < 8) ? (((UINT64)1 << (8 * size)) - 1) : ~(UINT64)0;
 	int shift = 8 * (offset & 7);
@@ -1069,7 +1071,7 @@ static ADDRESS_MAP_START( internal_pgm, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x20000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 
-static void sharc_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( sharc )
 {
 	switch(state)
 	{
@@ -1201,18 +1203,18 @@ static void sharc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SHARC_B15:			info->i = sharc.dag2.b[7];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sharc_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sharc_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = sharc_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = sharc_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = sharc_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = sharc_execute;			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sharc);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sharc);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sharc);		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sharc);	break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(sharc);		break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sharc);break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sharc_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sharc);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sharc_icount;			break;
-		case CPUINFO_PTR_READ:							info->read = sharc_debug_read;			break;
-		case CPUINFO_PTR_READOP:						info->readop = sharc_debug_readop;		break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = address_map_internal_pgm; break;
+		case CPUINFO_PTR_READ:							info->read = CPU_READ_NAME(sharc);		break;
+		case CPUINFO_PTR_READOP:						info->readop = CPU_READOP_NAME(sharc);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(internal_pgm); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "SHARC");				break;
@@ -1325,17 +1327,17 @@ static void sharc_get_info(UINT32 state, cpuinfo *info)
 }
 
 #if (HAS_ADSP21062)
-void adsp21062_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( adsp21062 )
 {
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp21062_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp21062);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP21062");			break;
 
-		default:										sharc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(sharc);				break;
 	}
 }
 #endif

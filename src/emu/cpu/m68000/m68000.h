@@ -5,6 +5,36 @@
 
 #include "cpuintrf.h"
 
+/* There are 7 levels of interrupt to the 68K.
+ * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
+ */
+#define M68K_IRQ_NONE 0
+#define M68K_IRQ_1    1
+#define M68K_IRQ_2    2
+#define M68K_IRQ_3    3
+#define M68K_IRQ_4    4
+#define M68K_IRQ_5    5
+#define M68K_IRQ_6    6
+#define M68K_IRQ_7    7
+
+
+/* Special interrupt acknowledge values.
+ * Use these as special returns from the interrupt acknowledge callback
+ * (specified later in this header).
+ */
+
+/* Causes an interrupt autovector (0x18 + interrupt level) to be taken.
+ * This happens in a real 68K if VPA or AVEC is asserted during an interrupt
+ * acknowledge cycle instead of DTACK.
+ */
+#define M68K_INT_ACK_AUTOVECTOR    0xffffffff
+
+/* Causes the spurious interrupt vector (0x18) to be taken
+ * This happens in a real 68K if BERR is asserted during the interrupt
+ * acknowledge cycle (i.e. no devices responded to the acknowledge).
+ */
+#define M68K_INT_ACK_SPURIOUS      0xfffffffe
+
 enum
 {
 	/* NOTE: M68K_SP fetches the current SP, be it USP, ISP, or MSP */
@@ -21,8 +51,6 @@ enum
 	CPUINFO_PTR_M68K_RTE_CALLBACK,
 	CPUINFO_PTR_M68K_TAS_CALLBACK
 };
-
-extern int m68k_ICount;
 
 /* Redirect memory calls */
 
@@ -74,7 +102,7 @@ struct _m68k_encryption_interface
 #define MC68000_INT_ACK_AUTOVECTOR    -1
 #define MC68000_INT_ACK_SPURIOUS      -2
 
-void m68000_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68000 );
 extern void m68000_memory_interface_set(int Entry,void * memory_routine);
 
 /****************************************************************************
@@ -91,7 +119,7 @@ extern void m68000_memory_interface_set(int Entry,void * memory_routine);
 #define MC68008_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68008_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68008_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68008 );
 #endif
 
 /****************************************************************************
@@ -108,7 +136,7 @@ void m68008_get_info(UINT32 state, cpuinfo *info);
 #define MC68010_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68010_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68010_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68010 );
 #endif
 
 /****************************************************************************
@@ -125,7 +153,7 @@ void m68010_get_info(UINT32 state, cpuinfo *info);
 #define MC68EC020_INT_ACK_AUTOVECTOR	MC68000_INT_ACK_AUTOVECTOR
 #define MC68EC020_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68ec020_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68ec020 );
 #endif
 
 /****************************************************************************
@@ -142,7 +170,7 @@ void m68ec020_get_info(UINT32 state, cpuinfo *info);
 #define MC68020_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68020_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68020_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68020 );
 #endif
 
 /****************************************************************************
@@ -159,7 +187,7 @@ void m68020_get_info(UINT32 state, cpuinfo *info);
 #define MC68040_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68040_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68040_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68040 );
 #endif
 
 // C Core header

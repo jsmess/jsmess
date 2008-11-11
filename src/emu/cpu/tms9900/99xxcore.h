@@ -94,16 +94,19 @@ Other references can be found on spies.com:
 #if (TMS99XX_MODEL == TI990_10_ID)
 
 	#define TMS99XX_PREFIX ti990_10
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10 )
 	#define TMS99XX_CPU_NAME "TI990/10"
 
 #elif (TMS99XX_MODEL == TMS9900_ID)
 
 	#define TMS99XX_PREFIX tms9900
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900 )
 	#define TMS99XX_CPU_NAME "TMS9900"
 
 #elif (TMS99XX_MODEL == TMS9940_ID)
 
 	#define TMS99XX_PREFIX tms9940
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940 )
 	#define TMS99XX_CPU_NAME "TMS9940"
 
 	#error "tms9940 is not yet supported"
@@ -111,11 +114,13 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS9980_ID)
 
 	#define TMS99XX_PREFIX tms9980a
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980a )
 	#define TMS99XX_CPU_NAME "TMS9980A/TMS9981"
 
 #elif (TMS99XX_MODEL == TMS9985_ID)
 
 	#define TMS99XX_PREFIX tms9985
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985 )
 	#define TMS99XX_CPU_NAME "TMS9985"
 
 	#error "tms9985 is not yet supported"
@@ -123,6 +128,7 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS9989_ID)
 
 	#define TMS99XX_PREFIX tms9989
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989 )
 	#define TMS99XX_CPU_NAME "TMS9989"
 
 	#error "tms9989 is not yet supported"
@@ -130,11 +136,13 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS9995_ID)
 
 	#define TMS99XX_PREFIX tms9995
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995 )
 	#define TMS99XX_CPU_NAME "TMS9995"
 
 #elif (TMS99XX_MODEL == TMS99000_ID)
 
 	#define TMS99XX_PREFIX tms99000
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000 )
 	#define TMS99XX_CPU_NAME "TMS99000"
 
 	#error "tms99000 is not yet supported"
@@ -142,6 +150,7 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS99105A_ID)
 
 	#define TMS99XX_PREFIX tms99105a
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105a )
 	#define TMS99XX_CPU_NAME "TMS99105A"
 
 	#error "tms99105a is not yet supported"
@@ -149,6 +158,7 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS99110A_ID)
 
 	#define TMS99XX_PREFIX tms99110a
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110a )
 	#define TMS99XX_CPU_NAME "TMS99110A"
 
 	#error "tms99110a is not yet supported"
@@ -165,7 +175,6 @@ Other references can be found on spies.com:
 #define RESET_PARAM(prefix)			concat2(prefix,reset_param)
 
 #define TMS99XX_ICOUNT				ICOUNT(TMS99XX_PREFIX)
-#define TMS99XX_GET_INFO			GET_INFO(TMS99XX_PREFIX)
 #define TMS99XX_RESET_PARAM			RESET_PARAM(TMS99XX_PREFIX)
 
 
@@ -431,7 +440,8 @@ typedef struct
 	/* interrupt callback */
 	/* note that this callback is used by tms9900_set_irq_line() and tms9980a_set_irq_line() to
     retreive the value on IC0-IC3 (non-standard behaviour) */
-	int (*irq_callback)(int irq_line);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 
 	UINT8 IDLE;       /* nonzero if processor is IDLE - i.e waiting for interrupt while writing
                         special data on CRU bus */
@@ -1268,7 +1278,7 @@ static void register_for_save_state(int index)
 }
 
 
-static void tms99xx_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( tms99xx )
 {
 	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) config;
 
@@ -1276,6 +1286,7 @@ static void tms99xx_init(int index, int clock, const void *config, int (*irqcall
 
 	I.irq_level = 16;
 	I.irq_callback = irqcallback;
+	I.device = device;
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	I.timer = timer_alloc(decrementer_callback, NULL);
@@ -1311,7 +1322,7 @@ static void tms99xx_init(int index, int clock, const void *config, int (*irqcall
 /*
     TMS9900 hard reset
 */
-static void tms99xx_reset(void)
+static CPU_RESET( tms99xx )
 {
 	I.STATUS = 0; /* TMS9980 and TMS9995 Data Books say so */
 	getstat();
@@ -1364,7 +1375,7 @@ static void tms99xx_reset(void)
 	CYCLES(6, 26, 14);
 }
 
-static void tms99xx_exit(void)
+static CPU_EXIT( tms99xx )
 {
 	/* nothing to do ? */
 }
@@ -1378,7 +1389,7 @@ INLINE UINT16 fetch(void)
 }
 
 
-static int tms99xx_execute(int cycles)
+static CPU_EXECUTE( tms99xx )
 			{
 	TMS99XX_ICOUNT = cycles;
 
@@ -1453,9 +1464,9 @@ static int tms99xx_execute(int cycles)
 
 					/* unlike tms9900, we can call the callback */
 					if (level == 1)
-						(* I.irq_callback)(0);
+						(* I.irq_callback)(I.device, 0);
 					else if (level == 4)
-						(* I.irq_callback)(1);
+						(* I.irq_callback)(I.device, 1);
 				}
 #endif
 
@@ -1549,7 +1560,7 @@ static int tms99xx_execute(int cycles)
 	return cycles - TMS99XX_ICOUNT;
 }
 
-static void tms99xx_get_context(void *dst)
+static CPU_GET_CONTEXT( tms99xx )
 {
 	setstat();
 
@@ -1557,7 +1568,7 @@ static void tms99xx_get_context(void *dst)
 		*(tms99xx_Regs*)dst = I;
 }
 
-static void tms99xx_set_context(void *src)
+static CPU_SET_CONTEXT( tms99xx )
 {
 	if( src )
 	{
@@ -1603,7 +1614,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 			I.irq_level = 16;
 			/* trick : 16 will always be bigger than the IM (0-15), so there will never be interrupts */
 		else
-			I.irq_level = (* I.irq_callback)(0);
+			I.irq_level = (* I.irq_callback)(I.device, 0);
 
 		field_interrupt();  /* interrupt state is likely to have changed */
 	}
@@ -1699,7 +1710,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 			I.irq_level = 16;
 			/* trick : 16 will always be bigger than the IM (0-15), so there will never be interrupts */
 		else
-			I.irq_level = (* I.irq_callback)(0);
+			I.irq_level = (* I.irq_callback)(I.device, 0);
 
 		field_interrupt();  /* interrupt state is likely to have changed */
 	}
@@ -1726,7 +1737,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 		if (irqline == INPUT_LINE_NMI)
 			level = 2;	/* translate MAME's convention to CPU's representation */
 		else
-			level = (* I.irq_callback)(0);
+			level = (* I.irq_callback)(I.device, 0);
 
 		switch (level)
 		{
@@ -1735,7 +1746,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 			I.load_state = 0;
 			I.irq_state = 0;
 			I.irq_level = 16;
-			tms99xx_reset();
+			CPU_RESET_NAME(tms99xx)(I.device);
 			break;
 		case 2:
 			I.load_state = 1;
@@ -1957,7 +1968,7 @@ static void field_interrupt(void)
 
 #endif
 
-static unsigned tms99xx_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( tms99xx )
 {
 	return Dasm9900(buffer, pc, TMS99XX_MODEL, oprom, opram);
 }
@@ -4587,7 +4598,7 @@ INLINE void execute(UINT16 opcode)
  * Generic set_info
  **************************************************************************/
 
-static void tms99xx_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( tms99xx )
 {
 	switch (state)
 	{
@@ -4792,15 +4803,15 @@ void TMS99XX_GET_INFO(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + TMS9900_R15:		info->i = READREG_DEBUG(R15);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms99xx_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms99xx_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms99xx_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = tms99xx_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = tms99xx_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = tms99xx_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = tms99xx_execute;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms99xx);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms99xx);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms99xx);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms99xx);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms99xx);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms99xx);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms99xx);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms99xx_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms99xx);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &TMS99XX_ICOUNT;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

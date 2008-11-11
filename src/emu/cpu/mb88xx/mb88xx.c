@@ -52,7 +52,8 @@ typedef struct
 
     /* IRQ handling */
     int	pending_interrupt;
-    int (*irqcallback)(int);
+    cpu_irq_callback irqcallback;
+    const device_config *device;
 } mb88Regs;
 
 /***************************************************************************
@@ -99,14 +100,14 @@ static int mb88_icount;
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void mb88_get_context(void *dst)
+static CPU_GET_CONTEXT( mb88 )
 {
 	/* copy the context */
 	*(mb88Regs *)dst = mb88;
 }
 
 
-static void mb88_set_context(void *src)
+static CPU_SET_CONTEXT( mb88 )
 {
 	/* copy the context */
 	if (src)
@@ -118,7 +119,7 @@ static void mb88_set_context(void *src)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static void mb88_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( mb88 )
 {
 	if ( config )
 	{
@@ -127,6 +128,7 @@ static void mb88_init(int index, int clock, const void *config, int (*irqcallbac
 	}
 
 	mb88.irqcallback = irqcallback;
+	mb88.device = device;
 
 	state_save_register_item("mb88", clock, mb88.PC);
 	state_save_register_item("mb88", clock, mb88.PA);
@@ -151,7 +153,7 @@ static void mb88_init(int index, int clock, const void *config, int (*irqcallbac
 	state_save_register_item("mb88", clock, mb88.pending_interrupt);
 }
 
-static void mb88_reset(void)
+static CPU_RESET( mb88 )
 {
 	/* zero registers and flags */
 	mb88.PC = 0;
@@ -208,7 +210,7 @@ static void update_pio( void )
 	{
 		/* no vectors supported, just do the callback to clear irq_state if needed */
 		if (mb88.irqcallback)
-			(*mb88.irqcallback)(0);
+			(*mb88.irqcallback)(mb88.device, 0);
 
 		mb88.SP[mb88.SI] = GETPC();
 		mb88.SP[mb88.SI] |= TEST_CF() << 15;
@@ -228,7 +230,7 @@ static void update_pio( void )
 	/* TODO: add support for serial and timer */
 }
 
-static int mb88_execute(int cycles)
+static CPU_EXECUTE( mb88 )
 {
 	mb88_icount = cycles;
 
@@ -753,7 +755,7 @@ static int mb88_execute(int cycles)
     INFORMATION SETTERS
 ***************************************************************************/
 
-static void mb88_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mb88 )
 {
 	switch (state)
 	{
@@ -791,7 +793,7 @@ static void mb88_set_info(UINT32 state, cpuinfo *info)
     INFORMATION GETTERS
 ***************************************************************************/
 
-void mb88_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mb88 )
 {
 	switch (state)
 	{
@@ -843,15 +845,15 @@ void mb88_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MB88_SB: 			info->i = mb88.SB;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mb88_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mb88_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mb88_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = mb88_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = mb88_reset;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mb88);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(mb88);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(mb88);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mb88);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mb88);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = mb88_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mb88);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mb88_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mb88);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mb88_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -894,7 +896,7 @@ void mb88_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void mb8841_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mb8841 )
 {
 	switch (state)
 	{
@@ -905,11 +907,11 @@ void mb8841_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8841");				break;
 
-		default:										mb88_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
 }
 
-void mb8842_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mb8842 )
 {
 	switch (state)
 	{
@@ -920,11 +922,11 @@ void mb8842_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8842");				break;
 
-		default:										mb88_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
 }
 
-void mb8843_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mb8843 )
 {
 	switch (state)
 	{
@@ -935,11 +937,11 @@ void mb8843_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8843");				break;
 
-		default:										mb88_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
 }
 
-void mb8844_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mb8844 )
 {
 	switch (state)
 	{
@@ -950,6 +952,6 @@ void mb8844_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8844");				break;
 
-		default:										mb88_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
 }

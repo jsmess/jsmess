@@ -90,13 +90,13 @@ static LH5801_Regs lh5801= { 0 };
  ***************************************************************/
 #include "5801tbl.c"
 
-static void lh5801_init(int cpu, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( lh5801 )
 {
 	memset(&lh5801, 0, sizeof(lh5801));
 	lh5801.config = (const lh5801_cpu_core *) config;
 }
 
-static void lh5801_reset(void)
+static CPU_RESET( lh5801 )
 {
 	P = (program_read_byte(0xfffe)<<8) | program_read_byte(0xffff);
 
@@ -105,13 +105,13 @@ static void lh5801_reset(void)
 	lh5801.idle=0;
 }
 
-static void lh5801_get_context (void *dst)
+static CPU_GET_CONTEXT( lh5801 )
 {
 	if( dst )
 		*(LH5801_Regs*)dst = lh5801;
 }
 
-static void lh5801_set_context (void *src)
+static CPU_SET_CONTEXT( lh5801 )
 {
 	if( src )
 	{
@@ -120,7 +120,7 @@ static void lh5801_set_context (void *src)
 	}
 }
 
-static int lh5801_execute(int cycles)
+static CPU_EXECUTE( lh5801 )
 {
 	lh5801_icount = cycles;
 
@@ -153,7 +153,7 @@ static void set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void lh5801_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( lh5801 )
 {
 	switch (state)
 	{
@@ -182,7 +182,7 @@ static void lh5801_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void lh5801_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( lh5801 )
 {
 	switch (state)
 	{
@@ -228,15 +228,15 @@ void lh5801_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + LH5801_DP:			info->i = lh5801.dp;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = lh5801_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = lh5801_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = lh5801_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = lh5801_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = lh5801_reset;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(lh5801);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(lh5801);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(lh5801);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(lh5801);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(lh5801);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = lh5801_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(lh5801);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = lh5801_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(lh5801);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lh5801_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
