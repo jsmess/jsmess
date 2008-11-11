@@ -67,7 +67,7 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
 
 #include "driver.h"
 #include "machine/kb_keytro.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 
 #define	LOG		0
 
@@ -294,7 +294,7 @@ INPUT_PORTS_END
 WRITE8_HANDLER( kb_keytronic_set_clock_signal )
 {
 	kb_keytronic.clock_signal = data;
-	cpunum_set_input_line( machine, kb_keytronic.cpunum, I8051_INT0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line( machine, kb_keytronic.cpunum, MCS51_INT0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
