@@ -119,19 +119,19 @@ static const device_config *cassette_device_image(running_machine *machine)
 static CDP1802_EF_READ( pecom64_ef_r )
 {
 	int flags = 0x0f;
-	if (cassette_get_state(cassette_device_image(machine)) & CASSETTE_PLAY) {
-		double val = cassette_input(cassette_device_image(machine));
-		flags -= EF2;
-		if ( val > 0.00) flags += EF2;
-	} else {
-		UINT8 val = input_port_read(machine, "CNT");
-		if ((val & 0x04)==0x04 && pecom_prev_caps_state==0) {
-			pecom_caps_state = (pecom_caps_state==4) ? 0 : 4; // Change CAPS state
-		}
-		pecom_prev_caps_state = val & 0x04;
-		
-		flags -= (val & 0x0b) + pecom_caps_state;
+	double valcas = cassette_input(cassette_device_image(machine));
+	UINT8 val = input_port_read(machine, "CNT");
+	
+	if ((val & 0x04)==0x04 && pecom_prev_caps_state==0) {
+		pecom_caps_state = (pecom_caps_state==4) ? 0 : 4; // Change CAPS state
 	}
+	pecom_prev_caps_state = val & 0x04;
+	if (valcas!=0.0) { // If there is any cassette signal
+		val = (val & 0x0D); // remove EF2 from SHIFT
+		flags -= EF2;
+		if ( valcas > 0.00) flags += EF2;
+	}	
+	flags -= (val & 0x0b) + pecom_caps_state;
 	return flags;
 }
 
