@@ -12,9 +12,8 @@
 #include "devices/cassette.h"
 #include "includes/pecom.h"
  
-UINT8 pecom_key_val = 0;
-UINT8 pecom_key_cnt = 0;
-
+UINT8 pecom_caps_state = 4;
+UINT8 pecom_prev_caps_state = 4;
   
 /* Driver initialization */
 DRIVER_INIT(pecom)
@@ -42,8 +41,8 @@ MACHINE_RESET( pecom )
 	memory_set_bankptr(3, rom + 0xf400);
 	memory_set_bankptr(4, rom + 0xf800);
 	
-	pecom_key_val = 0;
-	pecom_key_cnt = 0;
+	pecom_caps_state = 4;
+	pecom_prev_caps_state = 4;
 }
 
 WRITE8_HANDLER( pecom_bank_w )
@@ -68,7 +67,8 @@ WRITE8_HANDLER( pecom_bank_w )
 	}
 }
 
-UINT8 key_val = 0;
+static UINT8 key_val = 0;
+
 READ8_HANDLER (pecom_keyboard_r)
 {
 	static const char *keynames[] = { 	"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
@@ -124,7 +124,13 @@ static CDP1802_EF_READ( pecom64_ef_r )
 		flags -= EF2;
 		if ( val > 0.00) flags += EF2;
 	} else {
-		flags -= input_port_read(machine, "CNT");
+		UINT8 val = input_port_read(machine, "CNT");
+		if ((val & 0x04)==0x04 && pecom_prev_caps_state==0) {
+			pecom_caps_state = (pecom_caps_state==4) ? 0 : 4; // Change CAPS state
+		}
+		pecom_prev_caps_state = val & 0x04;
+		
+		flags -= (val & 0x0b) + pecom_caps_state;
 	}
 	return flags;
 }
