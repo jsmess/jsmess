@@ -69,6 +69,7 @@ Notes:
 
 	TODO:
 
+	- Assertion failed: header, file src/mess/tagpool.c, line 76
 	- floppy drive selection
 	- floppy side selection
 	- DS/DD SS/DS jumpers
@@ -231,10 +232,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(slow_status_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(slow_ctrl_r, slow_ctrl_w)
-	AM_RANGE(0x40, 0x43) AM_READWRITE(wd17xx_r, wd17xx_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO, CONKORT_Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO, CONKORT_Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0xbc, 0xbf) AM_READWRITE(wd17xx_r, wd17xx_w)
+	AM_RANGE(0xdf, 0xdf) AM_WRITE(slow_status_w)
+	AM_RANGE(0xef, 0xef) AM_READWRITE(slow_ctrl_r, slow_ctrl_w)
 ADDRESS_MAP_END
 
 // Fast Controller
@@ -383,8 +384,8 @@ static Z80PIO_ON_ARDY_CHANGED( pio_ardy_w )
 
 static Z80PIO_INTERFACE( pio_intf )
 {
-	CONKORT_Z80_TAG,			/* CPU */
-	0,							/* clock (get from main CPU) */
+	NULL,						/* CPU (cannot use from within device) */
+	XTAL_4MHz/2,				/* clock (get from main CPU) */
 	pio_interrupt,				/* callback when change interrupt status */
 	pio_port_a_r,				/* port A read callback */
 	pio_port_b_r,				/* port B read callback */
@@ -512,6 +513,7 @@ MACHINE_DRIVER_END
 
 ROM_START( l5510828 )
 	ROM_REGION( 0x10000, CONKORT_Z80_TAG, 0 )
+	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // ABC830 with MPI drives. Styrkort Artnr 5510760-01
 
 	ROM_REGION( 0x800, "abc830", 0 )
 	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // ABC830 with MPI drives. Styrkort Artnr 5510760-01
