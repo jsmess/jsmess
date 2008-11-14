@@ -14,7 +14,15 @@
  
 UINT8 pecom_caps_state = 4;
 UINT8 pecom_prev_caps_state = 4;
-  
+
+static UINT8 pecom_key_press_line;
+static UINT8 pecom_key_pressed;
+static UINT8 pecom_key_state = 0;
+static UINT8 pecom_prev_key_state = 0;
+static UINT8 pecom_key_read_line = 0;
+static UINT8 pecom_key_real = 0;
+
+
 /* Driver initialization */
 DRIVER_INIT(pecom)
 {
@@ -43,6 +51,12 @@ MACHINE_RESET( pecom )
 	
 	pecom_caps_state = 4;
 	pecom_prev_caps_state = 4;
+	
+	pecom_key_press_line = 0;
+	pecom_key_pressed = 0;
+	pecom_key_state = 0;
+	pecom_prev_key_state = 0;
+	pecom_key_read_line = 0;
 }
 
 WRITE8_HANDLER( pecom_bank_w )
@@ -67,44 +81,58 @@ WRITE8_HANDLER( pecom_bank_w )
 	}
 }
 
-static UINT8 key_val = 0;
-
 READ8_HANDLER (pecom_keyboard_r)
 {
 	static const char *keynames[] = { 	"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15", "LINE16",
-										"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25" };
-	UINT8 reg = cpunum_get_reg(0,CDP1802_D);
-	switch(reg) {
-		case 0xca : key_val = 0;break;
-		case 0x29 : key_val = 1;break;
-		case 0x28 : key_val = 2;break;
-		case 0x2f : key_val = 3;break;
-		case 0x2e : key_val = 4;break;
-		case 0x2d : key_val = 5;break;
-		case 0x2c : key_val = 6;break;
-		case 0x33 : key_val = 7;break;
-		case 0x32 : key_val = 8;break;
-		case 0x31 : key_val = 9;break;
-		case 0x30 : key_val = 10;break;
-		case 0x37 : key_val = 11;break;
-		case 0x36 : key_val = 12;break;
-		case 0x35 : key_val = 13;break;
-		case 0x34 : key_val = 14;break;
-		case 0x3b : key_val = 15;break;
-		case 0x3a : key_val = 16;break;
-		case 0x39 : key_val = 17;break;
-		case 0x38 : key_val = 18;break;
-		case 0x3f : key_val = 19;break;
-		case 0x3e : key_val = 20;break;
-		case 0x3d : key_val = 21;break;
-		case 0x3c : key_val = 22;break;
-		case 0x03 : key_val = 23;break;
-		case 0x02 : key_val = 24;break;
-		case 0x01 : key_val = 25;break;		
-	}			
-	return input_port_read(machine, keynames[key_val]) & 0x03;
+									"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15", "LINE16",
+									"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25" };	
+	pecom_key_state =  input_port_read(machine, keynames[pecom_key_read_line]) & 0x03;	
+	// If key has been clicked
+	if ((pecom_key_pressed==0) &&(pecom_key_state!=0) && ((pecom_prev_key_state & pecom_prev_key_state)==0)) {
+		// key is pressed 
+		pecom_key_press_line = pecom_key_read_line;
+		pecom_key_read_line  = 0;
+		pecom_key_pressed = 1; 
+		pecom_key_real = 0;
+	} else 
+	if (pecom_key_pressed==1 && pecom_key_read_line==pecom_key_press_line) {
+		// key is released
+		if ((pecom_key_state==0) && (pecom_key_real==0)) {
+			// if first read value is 0 then we act as button is already released
+			// so move to next as usual but mark as it is released
+			pecom_key_read_line++;
+			pecom_key_pressed = 0;
+			pecom_key_press_line = 0;	
+			pecom_key_real = 0;		
+		} else {		
+			// If button is not yet released then we need to give 
+			// read value until it became 0
+			if (pecom_key_real==0) { 
+				pecom_key_real = pecom_key_state; // Take first value while it is pressed			
+			}
+			
+			if ((pecom_key_state & pecom_key_real)!=pecom_key_real) {
+				// If key is released clear all counters
+				pecom_key_pressed = 0;
+				pecom_key_read_line = 0;
+				pecom_key_press_line = 0;	
+				pecom_key_real = 0;		
+			}
+		}
+	} 
+	else
+	{	
+		// Else just increment counter	
+		pecom_key_read_line++;
+	} 	
+	if (pecom_key_read_line>25) {
+		pecom_key_read_line=0;
+	}
+	pecom_prev_key_state = pecom_key_state;
+	return pecom_key_state;
+	
 }
+
 /* CDP1802 Interface */
 static CDP1802_MODE_READ( pecom64_mode_r )
 {
