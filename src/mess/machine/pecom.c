@@ -88,7 +88,7 @@ READ8_HANDLER (pecom_keyboard_r)
 									"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25" };	
 	pecom_key_state =  input_port_read(machine, keynames[pecom_key_read_line]) & 0x03;	
 	// If key has been clicked
-	if ((pecom_key_pressed==0) &&(pecom_key_state!=0) && ((pecom_prev_key_state & pecom_prev_key_state)==0)) {
+	if ((pecom_key_pressed==0) &&(pecom_key_state!=0) && ((pecom_prev_key_state & pecom_key_state)==0)) {
 		// key is pressed 
 		pecom_key_press_line = pecom_key_read_line;
 		pecom_key_read_line  = 0;
@@ -124,6 +124,7 @@ READ8_HANDLER (pecom_keyboard_r)
 	{	
 		// Else just increment counter	
 		pecom_key_read_line++;
+		pecom_key_state = 0;
 	} 	
 	if (pecom_key_read_line>25) {
 		pecom_key_read_line=0;
