@@ -4,8 +4,8 @@
 #define SCREEN_TAG	"main"
 #define CDP1869_TAG	"cdp1869"
 
-#define PECOM_PAGE_RAM_SIZE	0x400
-#define PECOM_PAGE_RAM_MASK	0x3ff
+#define PECOM_PAGE_RAM_SIZE	0x800
+#define PECOM_PAGE_RAM_MASK	0x7ff
 
 typedef struct _pecom_state pecom_state;
 
@@ -13,8 +13,13 @@ struct _pecom_state
 {
 	UINT8 *page_ram;		/* page memory */
 	UINT8 *charram;			/* character generator ROM */
-
+	int cdp1802_mode;		/* CPU mode */	
+	int dma;				/* memory refresh DMA */
 	const device_config *cdp1869;
+
+	/* timers */
+	emu_timer *reset_timer;	/* power on reset timer */
+	
 };
 
 /*----------- defined in machine/pecom.c -----------*/

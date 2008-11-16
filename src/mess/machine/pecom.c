@@ -29,15 +29,24 @@ DRIVER_INIT(pecom)
 	memset(mess_ram,0,32*1024);
 }
 
+static TIMER_CALLBACK( reset_tick )
+{
+	pecom_state *state = machine->driver_data;
+
+	state->cdp1802_mode = CDP1802_MODE_RUN;
+}
+
 MACHINE_START( pecom )
 {
+	pecom_state *state = machine->driver_data;
+	state->reset_timer = timer_alloc(reset_tick, NULL);
 }
 
 MACHINE_RESET( pecom )
 {
 	UINT8 *rom = memory_region(machine, "main");
-
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	pecom_state *state = machine->driver_data;
+	
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, SMH_UNMAP);
@@ -55,17 +64,21 @@ MACHINE_RESET( pecom )
 	pecom_key_press_line = 0;
 	pecom_key_pressed = 0;
 	pecom_key_state = 0;
-	pecom_prev_key_state = 0;
+	pecom_prev_key_state = 0;	
 	pecom_key_read_line = 0;
+	
+	state->cdp1802_mode = CDP1802_MODE_RESET;
+	state->dma = 0;
+	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(5), 0);
 }
 
 WRITE8_HANDLER( pecom_bank_w )
 {
 	const device_config *cdp1869 = device_list_find_by_tag(machine->config->devicelist, CDP1869_VIDEO, CDP1869_TAG);
 	UINT8 *rom = memory_region(machine, "main");
-		
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, mess_ram + 0x0000);
+		
 	if (data==2) {
 		memory_install_read8_device_handler (cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, cdp1869_charram_r);
 		memory_install_write8_device_handler(cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, cdp1869_charram_w);
@@ -137,7 +150,9 @@ READ8_HANDLER (pecom_keyboard_r)
 /* CDP1802 Interface */
 static CDP1802_MODE_READ( pecom64_mode_r )
 {
-	return CDP1802_MODE_RUN;
+	pecom_state *state = machine->driver_data;
+
+	return state->cdp1802_mode;	
 }
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -169,14 +184,31 @@ static CDP1802_Q_WRITE( pecom64_q_w )
 	cassette_output(cassette_device_image(machine), level ? -1.0 : +1.0);
 }
 
+static CDP1802_SC_WRITE( pecom64_sc_w )
+{
+	switch (state)
+	{
+	case CDP1802_STATE_CODE_S0_FETCH:
+		// not connected
+		break;
+
+	case CDP1802_STATE_CODE_S1_EXECUTE:
+		break;
+		
+	case CDP1802_STATE_CODE_S2_DMA:
+		// DMA acknowledge clears the DMAOUT request
+		cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		break;
+	case CDP1802_STATE_CODE_S3_INTERRUPT:
+		break;
+	}
+}
 CDP1802_INTERFACE( pecom64_cdp1802_config )
 {
 	pecom64_mode_r,
 	pecom64_ef_r,
-	NULL,
+	pecom64_sc_w,
 	pecom64_q_w,
 	NULL,
 	NULL
 };
-
-

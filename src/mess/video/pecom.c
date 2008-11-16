@@ -62,6 +62,22 @@ static CDP1869_PCB_READ( pecom_pcb_r )
 }
 
 
+static CDP1869_ON_PRD_CHANGED( pecom_prd_w )
+{
+	pecom_state *state = device->machine->driver_data;
+	// every other PRD triggers a DMAOUT request
+	if (state->dma)
+	{
+		state->dma = 0;
+
+		cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+	}
+	else
+	{
+		state->dma = 1;
+	}
+}
+
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
 {
 	SCREEN_TAG,
@@ -73,7 +89,7 @@ static CDP1869_INTERFACE( pecom_cdp1869_intf )
 	pecom_pcb_r,
 	pecom_char_ram_r,
 	pecom_char_ram_w,
-	NULL
+	pecom_prd_w
 };
 
 
@@ -92,8 +108,9 @@ static VIDEO_START( pecom )
 	state->cdp1869 = devtag_get_device(machine, CDP1869_VIDEO, CDP1869_TAG);
 
 	/* register for state saving */
-
-	state_save_register_global_pointer(state->page_ram, PECOM_PAGE_RAM_SIZE);
+	state_save_register_global(state->cdp1802_mode);
+	state_save_register_global(state->dma);
+	state_save_register_global_pointer(state->page_ram, PECOM_PAGE_RAM_SIZE);	
 }
 
 static VIDEO_UPDATE( pecom )
