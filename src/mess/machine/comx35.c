@@ -1,3 +1,38 @@
+/*
+
+COMX-35 Disk Controller Card
+
+PCB Layout
+----------
+
+xxx-REVx
+
+	|---------------|
+	|      CN1      |
+|---|				|---------------------------|
+|												|
+|	40174				4068	4072		   -|
+|			ROM								   ||
+|	LS04				4072	4050	7438   C|
+|8MHz										   N|
+|						4049	4075	LS08   2|
+|LD1		WD1770							   ||
+|	40174				4503	4075	7438   -|
+|LD2											|
+|-----------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    ROM     - "D.O.S. V1.2"
+    WD1770	- Western Digital WD1770-xx Floppy Disc Controller @ 8MHz
+    CN1		- COMX-35 bus PCB edge connector
+    CN2		- 34 pin floppy connector
+    LD1		- card selected LED
+    LD2		- floppy motor on LED
+
+*/
+
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "machine/wd17xx.h"
