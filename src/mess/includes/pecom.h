@@ -4,8 +4,8 @@
 #define SCREEN_TAG	"main"
 #define CDP1869_TAG	"cdp1869"
 
-#define PECOM_PAGE_RAM_SIZE	0x800
-#define PECOM_PAGE_RAM_MASK	0x7ff
+#define PECOM_PAGE_RAM_SIZE	0x400
+#define PECOM_PAGE_RAM_MASK	0x3ff
 
 typedef struct _pecom_state pecom_state;
 
