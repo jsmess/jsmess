@@ -158,8 +158,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 	}
 }
 
-
-static PIT8253_OUTPUT_CHANGED(bm2_pit_irq)
+static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
 {
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"),1,state);		
 }
@@ -173,9 +172,9 @@ static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
 	b2m_sound_input = state;
 }
 
-static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
+static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
 {
-	pit8253_set_clock_signal( device, 0, state );
+	pit8253_set_clock_signal( device, 2, state );
 }
 
 
@@ -183,8 +182,8 @@ const struct pit8253_config b2m_pit8253_intf =
 {
 	{
 		{
-			0,
-			bm2_pit_irq
+			2000000,
+			bm2_pit_out0
 		},
 		{
 			0,
@@ -307,34 +306,6 @@ const ppi8255_interface b2m_ppi8255_interface_3 =
 	b2m_romdisk_portc_w
 };
 
-
-READ8_HANDLER( b2m_8255_2_r ) 
-{
-	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_3" ),offset);
-}
-WRITE8_HANDLER( b2m_8255_2_w ) 
-{
-	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_3" ),offset,data);
-}
-
-READ8_HANDLER( b2m_8255_1_r ) 
-{
-	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ),offset);
-}
-WRITE8_HANDLER( b2m_8255_1_w ) 
-{
-	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ),offset,data);
-}
-
-READ8_HANDLER( b2m_8255_0_r ) 
-{
-	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ),offset);
-}
-WRITE8_HANDLER( b2m_8255_0_w ) 
-{
-	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ),offset,data);
-}
-
 static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
 {		
 	cpunum_set_input_line(device->machine, 0, 0,interrupt ?  HOLD_LINE : CLEAR_LINE);  
@@ -407,20 +378,9 @@ const struct pic8259_interface b2m_pic8259_config = {
 
 INTERRUPT_GEN (b2m_vblank_interrupt)
 {	
-	//vblank_state++;
-	//if (vblank_state>1) vblank_state=0;
-	//pic8259_set_irq_line((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
-}
-/*static TIMER_CALLBACK (b2m_callback)
-{	
 	vblank_state++;
 	if (vblank_state>1) vblank_state=0;
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259"),0,vblank_state);		
-}*/
-
-static TIMER_CALLBACK( b2m_reset )
-{
-	program_write_byte(0xdfff,0x00);
 }
 
 MACHINE_RESET(b2m)
@@ -443,9 +403,6 @@ MACHINE_RESET(b2m)
 	pit8253_gate_w(pit8253, 0, 0);
 	pit8253_gate_w(pit8253, 1, 0);
 	pit8253_gate_w(pit8253, 2, 0);
-	
-	timer_set(ATTOTIME_IN_SEC(2), NULL, 0, b2m_reset);
-//	timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, b2m_callback);
 }
 
 DEVICE_IMAGE_LOAD( b2m_floppy )
