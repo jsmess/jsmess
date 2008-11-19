@@ -91,10 +91,10 @@ READ8_HANDLER (pecom_keyboard_r)
 	   Address is available on address bus during reading of value from port, and that is 
 	   used to determine keyboard line reading
 	*/
-	UINT16 addr = cpunum_get_reg(0,CDP1802_R0 + cpunum_get_reg(0,CDP1802_X)) & 0xff;
+	UINT16 addr = cpunum_get_reg(0,CDP1802_R0 + cpunum_get_reg(0,CDP1802_X));
 	/* just in case somone is reading non existing ports */
-	if (addr<0xca || addr>0xe3) return 0; 
-	return input_port_read(machine, keynames[addr - 0xca]) & 0x03;
+	if (addr<0x7cca || addr>0x7ce3) return 0; 
+	return input_port_read(machine, keynames[addr - 0x7cca]) & 0x03;
 }
 
 /* CDP1802 Interface */
