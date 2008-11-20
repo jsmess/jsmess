@@ -41,13 +41,13 @@ MACHINE_RESET( pecom )
 	
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_UNMAP);
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, SMH_BANK3);
+	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_BANK3);
 	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK4);
 	memory_set_bankptr(1, rom + 0x8000);	
 	memory_set_bankptr(2, mess_ram + 0x4000);
-	memory_set_bankptr(3, rom + 0xf400);
+	memory_set_bankptr(3, rom + 0xf000);
 	memory_set_bankptr(4, rom + 0xf800);
 	
 	pecom_caps_state = 4;
@@ -66,16 +66,16 @@ WRITE8_HANDLER( pecom_bank_w )
 	memory_set_bankptr(1, mess_ram + 0x0000);
 		
 	if (data==2) {
-		memory_install_read8_device_handler (cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, cdp1869_charram_r);
-		memory_install_write8_device_handler(cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, cdp1869_charram_w);
+		memory_install_read8_device_handler (cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, cdp1869_charram_r);
+		memory_install_write8_device_handler(cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, cdp1869_charram_w);
 		memory_install_read8_device_handler (cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, cdp1869_pageram_r);
 		memory_install_write8_device_handler(cdp1869, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, cdp1869_pageram_w);	
 	} else {
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_UNMAP);
-		memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0xf400, 0xf7ff, 0, 0, SMH_BANK3);
+		memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_BANK3);
 		memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK4);
-		memory_set_bankptr(3, rom + 0xf400);
+		memory_set_bankptr(3, rom + 0xf000);
 		memory_set_bankptr(4, rom + 0xf800);
 	}
 }
