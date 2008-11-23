@@ -4,7 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Ivel Ultra [Miodrag Milanovic]
 - Pecom 64 [Miodrag Milanovic]
-
+- Sharp MZ80K [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------

@@ -504,6 +504,9 @@ XL/XE 16kB OS roms
 	DRIVER( mz700 )		/* 1982 Sharp MZ700									*/
 	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
 	DRIVER( mz800 )		/* 1982 Sharp MZ800									*/
+	
+	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
+	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
 
 	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
 
