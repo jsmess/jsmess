@@ -103,8 +103,6 @@ enum
 /* per-device callback functions */
 typedef void (*abcbus_card_select)(const device_config *device, UINT8 data);
 
-/* opaque internal daisy chain state */
-
 /* daisy chain structure */
 typedef struct _abcbus_daisy_chain abcbus_daisy_chain;
 struct _abcbus_daisy_chain
@@ -114,7 +112,7 @@ struct _abcbus_daisy_chain
 };
 #define ABCBUS_CONFIG(name) const abcbus_daisy_chain (name)[] =
 
-void *abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy);
+void abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy);
 
 WRITE8_HANDLER( abcbus_channel_w );
 READ8_HANDLER( abcbus_reset_r );

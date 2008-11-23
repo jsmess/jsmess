@@ -89,8 +89,8 @@ Notes:
 #include "machine/wd17xx.h"
 #include "machine/abcbus.h"
 
-typedef struct _conkort_t conkort_t;
-struct _conkort_t
+typedef struct _slow_t slow_t;
+struct _slow_t
 {
 	int cpunum;						/* CPU index of the Z80 */
 
@@ -98,14 +98,36 @@ struct _conkort_t
 	UINT8 data;
 	int pio_ardy;
 	int fdc_irq;
+
+	const device_config *z80pio;
 };
 
-INLINE conkort_t *get_safe_token(const device_config *device)
+typedef struct _fast_t fast_t;
+struct _fast_t
+{
+	int cpunum;						/* CPU index of the Z80 */
+
+	UINT8 status;
+	UINT8 data;
+	int fdc_irq;
+
+	const device_config *z80dma;
+};
+
+INLINE slow_t *get_safe_token_slow(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 
-	return (conkort_t *)device->token;
+	return (slow_t *)device->token;
+}
+
+INLINE fast_t *get_safe_token_fast(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+
+	return (fast_t *)device->token;
 }
 
 /* Slow Controller */
@@ -113,9 +135,9 @@ INLINE conkort_t *get_safe_token(const device_config *device)
 static READ8_HANDLER( slow_bus_data_r )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
-	const device_config *z80pio = devtag_get_device(machine, Z80PIO, CONKORT_Z80PIO_TAG);
+	const device_config *z80pio = devtag_get_device(device->machine, Z80PIO, CONKORT_Z80PIO_TAG);
 
-	conkort_t *conkort = get_safe_token(device);
+	slow_t *conkort = get_safe_token_slow(device);
 
 	UINT8 data = 0xff;
 
@@ -134,9 +156,9 @@ static READ8_HANDLER( slow_bus_data_r )
 static WRITE8_HANDLER( slow_bus_data_w )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
-	const device_config *z80pio = devtag_get_device(machine, Z80PIO, CONKORT_Z80PIO_TAG);
+	const device_config *z80pio = devtag_get_device(device->machine, Z80PIO, CONKORT_Z80PIO_TAG);
 
-	conkort_t *conkort = get_safe_token(device);
+	slow_t *conkort = get_safe_token_slow(device);
 
 	z80pio_astb_w(z80pio, 0);
 
@@ -151,7 +173,7 @@ static WRITE8_HANDLER( slow_bus_data_w )
 static READ8_HANDLER( slow_bus_stat_r )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
-	conkort_t *conkort = get_safe_token(device);
+	slow_t *conkort = get_safe_token_slow(device);
 
 	return (conkort->pio_ardy << 7) | conkort->status;
 }
@@ -208,7 +230,7 @@ WRITE8_HANDLER( slow_ctrl_w )
 WRITE8_HANDLER( slow_status_w )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
-	conkort_t *conkort = get_safe_token(device);
+	slow_t *conkort = get_safe_token_slow(device);
 
 	conkort->status = data & 0x7f;
 
@@ -319,7 +341,7 @@ static READ8_DEVICE_HANDLER( pio_port_a_r )
 	*/
 
 	const device_config *conkort_device = devtag_get_device(device->machine, LUXOR_55_10828, CONKORT_TAG);
-	conkort_t *conkort = get_safe_token(conkort_device);
+	slow_t *conkort = get_safe_token_slow(conkort_device);
 
 	return conkort->data;
 }
@@ -327,7 +349,7 @@ static READ8_DEVICE_HANDLER( pio_port_a_r )
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
 	const device_config *conkort_device = devtag_get_device(device->machine, LUXOR_55_10828, CONKORT_TAG);
-	conkort_t *conkort = get_safe_token(conkort_device);
+	slow_t *conkort = get_safe_token_slow(conkort_device);
 
 	conkort->data = data;
 }
@@ -350,7 +372,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 	*/
 
 	const device_config *conkort_device = devtag_get_device(device->machine, LUXOR_55_10828, CONKORT_TAG);
-	conkort_t *conkort = get_safe_token(conkort_device);
+	slow_t *conkort = get_safe_token_slow(conkort_device);
 
 	return conkort->fdc_irq << 7;
 }
@@ -377,7 +399,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 static Z80PIO_ON_ARDY_CHANGED( pio_ardy_w )
 {
 	const device_config *conkort_device = devtag_get_device(device->machine, LUXOR_55_10828, CONKORT_TAG);
-	conkort_t *conkort = get_safe_token(conkort_device);
+	slow_t *conkort = get_safe_token_slow(conkort_device);
 
 	conkort->pio_ardy = state;
 }
@@ -407,7 +429,7 @@ static READ8_DEVICE_HANDLER( dma_read_byte )
 {
 	UINT8 data;
 
-	cpuintrf_push_context(0);
+	cpuintrf_push_context(1);
 	data = program_read_byte(offset);
 	cpuintrf_pop_context();
 
@@ -416,7 +438,7 @@ static READ8_DEVICE_HANDLER( dma_read_byte )
 
 static WRITE8_DEVICE_HANDLER( dma_write_byte )
 {
-	cpuintrf_push_context(0);
+	cpuintrf_push_context(1);
 	program_write_byte(offset, data);
 	cpuintrf_pop_context();
 }
@@ -454,7 +476,7 @@ static const z80_daisy_chain fast_daisy_chain[] =
 static void slow_wd1791_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
-	conkort_t *conkort = get_safe_token(device);
+	slow_t *conkort = get_safe_token_slow(device);
 
 	switch(state)
 	{
@@ -549,7 +571,7 @@ ROM_END
 
 static DEVICE_START( luxor_55_10828 )
 {
-	conkort_t *conkort = device->token;
+	slow_t *conkort = device->token;
 	char unique_tag[30];
 	astring *tempstring = astring_alloc();
 
@@ -586,6 +608,7 @@ static DEVICE_SET_INFO( luxor_55_10828 )
 
 static DEVICE_RESET( luxor_55_10828 )
 {
+	wd17xx_reset(device->machine);
 }
 
 DEVICE_GET_INFO( luxor_55_10828 )
@@ -595,7 +618,7 @@ DEVICE_GET_INFO( luxor_55_10828 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(conkort_t);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(slow_t);				break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = rom_l5510828;				break;
@@ -619,7 +642,7 @@ DEVICE_GET_INFO( luxor_55_10828 )
 
 static DEVICE_START( luxor_55_21046 )
 {
-	conkort_t *conkort = device->token;
+	fast_t *conkort = device->token;
 	char unique_tag[30];
 	astring *tempstring = astring_alloc();
 
@@ -656,6 +679,7 @@ static DEVICE_SET_INFO( luxor_55_21046 )
 
 static DEVICE_RESET( luxor_55_21046 )
 {
+	wd17xx_reset(device->machine);
 }
 
 DEVICE_GET_INFO( luxor_55_21046 )
@@ -665,7 +689,7 @@ DEVICE_GET_INFO( luxor_55_21046 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(conkort_t);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(slow_t);				break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = rom_l5521046;				break;

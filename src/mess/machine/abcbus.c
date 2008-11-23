@@ -5,14 +5,14 @@
 typedef struct _abcbus_daisy_state abcbus_daisy_state;
 struct _abcbus_daisy_state
 {
-	abcbus_daisy_state *		next;			/* next device */
+	abcbus_daisy_state *	next;			/* next device */
 	const device_config *	device;			/* associated device */
 	abcbus_card_select		card_select;	/* card select callback */
 };
 
-static abcbus_daisy_state *daisy;
+static abcbus_daisy_state *daisy_state;
 
-void *abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy)
+void abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy)
 {
 	astring *tempstring = astring_alloc();
 	abcbus_daisy_state *head = NULL;
@@ -29,20 +29,25 @@ void *abcbus_init(running_machine *machine, const char *cputag, const abcbus_dai
 		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CARD_SELECT);
 		tailptr = &(*tailptr)->next;
 	}
-
+	
 	astring_free(tempstring);
-	return head;
+
+	daisy_state = head;
 }
 
 WRITE8_HANDLER( abcbus_channel_w )
 {
+	abcbus_daisy_state *daisy = daisy_state;
+
 	/* loop over all devices and call their card select function */
-	for ( ; daisy != NULL; daisy = daisy->next)
+	for ( ; daisy != NULL; daisy = daisy_state->next)
 		(*daisy->card_select)(daisy->device, data);
 }
 
 READ8_HANDLER( abcbus_reset_r )
 {
+	abcbus_daisy_state *daisy = daisy_state;
+
 	/* loop over all devices and call their reset function */
 	for ( ; daisy != NULL; daisy = daisy->next)
 		device_reset(daisy->device);
