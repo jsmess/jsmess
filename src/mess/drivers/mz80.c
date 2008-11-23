@@ -125,7 +125,10 @@ ADDRESS_MAP_END
 
 ROM_START (mz80k)
 	ROM_REGION(0x10000,"main",0)
-	ROM_LOAD ("sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c))
+	ROM_SYSTEM_BIOS(0, "sp1002", "sp1002")
+	ROMX_LOAD("sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "tc", "tc")
+	ROMX_LOAD("80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(2))
 	ROM_LOAD ("mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mz80k.int", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2))
@@ -134,6 +137,7 @@ ROM_END
 ROM_START (mz80kj)
 	ROM_REGION(0x10000,"main",0)
 	ROM_LOAD ("sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c))
+	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowecase, but japanese letters
 	ROM_LOAD ("mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mz80k.jap", 0x0000, 0x0800, CRC(bffe3312) SHA1(7058e565f338f5ec2bba85c19c9671e5c4fe258e))
