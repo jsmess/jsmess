@@ -44,6 +44,8 @@ struct _hd63450_t
 {
     hd63450_regs reg[4];
 	emu_timer* timer[4];  // for timing data reading/writing each channel
+	attotime clock[4];
+	attotime burst_clock[4];
 	int in_progress[4];  // if a channel is in use
 	int transfer_size[4];
 	int halted[4];  // non-zero if a channel has been halted, and can be continued later.
@@ -56,6 +58,7 @@ DEVICE_GET_INFO( hd63450 );
 int hd63450_read(const device_config* device, int offset, UINT16 mem_mask);
 void hd63450_write(const device_config* device,int offset, int data, UINT16 mem_mask);
 void hd63450_single_transfer(const device_config* device, int x);
+void hd63450_set_timer(const device_config* device, int channel, attotime tm);
 
 void dma_transfer_start(const device_config* device, int channel, int dir);
 

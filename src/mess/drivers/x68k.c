@@ -105,12 +105,15 @@
       Keyboard doesn't work (MFP USART).
       Supervisor area set isn't implemented.
 
-    Some minor game-specific issues (at 22/10/08):
+    Some minor game-specific issues (at 14/05/08):
       Pacmania:      Black squares on the maze (transparency?).
+      Nemesis '94:   Menu system doesn't work except for start buttons.
+      Flying Shark:  Appears to lock up at main menu.
       Salamander:    System error when using keys in-game.  No error if a joystick is used.
       Kyukyoku Tiger:Sprites offset by a looooong way.
-      Dragon Buster: Text is black and unreadable.
-      Baraduke:      Locks up on demo mode.
+      Dragon Buster: Text is black and unreadable (text palette should be loaded from disk, but it reads all zeroes).
+      Baraduke:      Corrupt background, locks up on demo mode.
+      Viewpoint:     Corrupt graphics on title screen, phantom movements on title screen, corrupt sprites, locks up.
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
 
@@ -126,7 +129,7 @@
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
+#include "sound/okim6258.h"
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
@@ -650,6 +653,32 @@ static TIMER_CALLBACK(x68k_scc_ack)
 	}
 }
 
+static void x68k_set_adpcm(running_machine* machine)
+{
+	const device_config *dev = device_list_find_by_tag(machine->config->devicelist, HD63450, "hd63450");
+	UINT32 rate = 0;
+
+	switch(sys.adpcm.rate & 0x0c)
+	{
+		case 0x00:
+			rate = 7812/2;
+			break;
+		case 0x04:
+			rate = 10417/2;
+			break;
+		case 0x08:
+			rate = 15625/2;
+			break;
+		default:
+			logerror("PPI: Invalid ADPCM sample rate set.\n");
+			rate = 15625/2;
+	}
+	if(sys.adpcm.clock != 0)
+		rate = rate/2;
+	hd63450_set_timer(dev,3,ATTOTIME_IN_HZ(rate));
+}
+
+
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
@@ -685,15 +714,18 @@ static READ8_DEVICE_HANDLER( ppi_port_c_r )
 static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
 	// ADPCM / Joystick control
+	
 	ppi_port[2] = data;
 	sys.adpcm.pan = data & 0x03;
 	sys.adpcm.rate = data & 0x0c;
+	x68k_set_adpcm(device->machine);
+	okim6258_set_divider(0, (data >> 2) & 3);
+
 	sys.joy.joy1_enable = data & 0x10;
 	sys.joy.joy2_enable = data & 0x20;
 	sys.joy.ioc6 = data & 0x40;
 	sys.joy.ioc7 = data & 0x80;
 }
-
 
 
 // NEC uPD72065 at 0xe94000
@@ -866,6 +898,9 @@ static WRITE8_HANDLER( x68k_ct_w )
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	nec765_set_ready_state(data & 0x01);
+	sys.adpcm.clock = data & 0x02;
+	x68k_set_adpcm(machine);
+	okim6258_set_clock(0, data & 0x02 ? 4000000 : 8000000);
 }
 
 /*
@@ -1330,15 +1365,6 @@ static READ16_HANDLER( x68k_vid_r )
 	return 0xff;
 }
 
-static READ16_HANDLER( x68k_adpcm_r )
-{
-	return 0x0000;
-}
-
-static WRITE16_HANDLER( x68k_adpcm_w )
-{
-}
-
 static READ16_HANDLER( x68k_areaset_r )
 {
 	// register is write-only
@@ -1500,12 +1526,47 @@ static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 	prev = level;
 }
 
+static INTERRUPT_GEN( x68k_vsync_irq )
+{
+//  if(sys.mfp.ierb & 0x40)
+//  {
+//      sys.mfp.isrb |= 0x40;
+//      current_vector[6] = (sys.mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
+//      current_irq_line = 6;
+//  mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
+//  mfp_trigger_irq(MFP_IRQ_GPIP4);
+//  }
+//  if(sys.crtc.height == 256)
+//      video_screen_update_partial(machine->primary_screen,256);//sys.crtc.reg[4]/2);
+//  else
+//      video_screen_update_partial(machine->primary_screen,512);//sys.crtc.reg[4]);
+}
+
 static IRQ_CALLBACK(x68k_int_ack)
 {
 	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
 
 	if(irqline == 6)  // MFP
 	{
+//      if(sys.mfp.isra & 0x10)
+//          sys.mfp.rsr &= ~0x80;
+//      if(sys.mfp.isra & 0x04)
+//          sys.mfp.tsr &= ~0x80;
+
+//      if(sys.mfp.current_irq < 8)
+//      {
+//          sys.mfp.iprb &= ~(1 << sys.mfp.current_irq);
+			// IRQ is in service
+//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
+//              sys.mfp.isrb |= (1 << sys.mfp.current_irq);
+//      }
+//      else
+//      {
+//          sys.mfp.ipra &= ~(1 << (sys.mfp.current_irq - 8));
+			// IRQ is in service
+//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
+//              sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
+//      }
 		sys.mfp.current_irq = -1;
 		current_vector[6] = mc68901_get_vector(x68k_mfp);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
@@ -1542,7 +1603,8 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
-	AM_RANGE(0xe92000, 0xe93fff) AM_READWRITE(x68k_adpcm_r, x68k_adpcm_w)
+	AM_RANGE(0xe92000, 0xe92001) AM_READWRITE(okim6258_status_0_lsb_r, okim6258_ctrl_0_lsb_w)
+	AM_RANGE(0xe92002, 0xe92003) AM_READWRITE(okim6258_data_0_lsb_r, okim6258_data_0_lsb_w)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe97fff) AM_DEVREADWRITE(X68KHDC,"x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
@@ -1586,7 +1648,7 @@ static const ppi8255_interface ppi_interface =
 static const hd63450_intf dmac_interface =
 {
 	0,  // CPU - 68000
-	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(450),STATIC_ATTOTIME_IN_USEC(4),STATIC_ATTOTIME_IN_USEC(32)},  // Cycle steal mode timing (guesstimate)
+	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(450),STATIC_ATTOTIME_IN_USEC(4),STATIC_ATTOTIME_IN_HZ(15625/2)},  // Cycle steal mode timing (guesstimate)
 	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(450),STATIC_ATTOTIME_IN_NSEC(50),STATIC_ATTOTIME_IN_NSEC(50)}, // Burst mode timing (guesstimate)
 	x68k_dma_end,
 	x68k_dma_error,
@@ -1606,6 +1668,13 @@ static const ym2151_interface x68k_ym2151_interface =
 {
 	x68k_fm_irq,
 	x68k_ct_w  // CT1, CT2 from YM2151 port 0x1b
+};
+
+static const okim6258_interface x68k_okim6258_interface =
+{
+	FOSC_DIV_BY_512,
+	TYPE_4BITS,
+	OUTPUT_10BITS,
 };
 
 static const struct rp5c15_interface rtc_intf =
@@ -2050,11 +2119,11 @@ static DRIVER_INIT( x68000 )
 	led_timer = timer_alloc(x68k_led_callback,NULL);
 }
 
-
 static MACHINE_DRIVER_START( x68000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map, 0)
+	MDRV_CPU_VBLANK_INT("main", x68k_vsync_irq)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( x68000 )
@@ -2095,9 +2164,9 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_SOUND_ADD("ym2151", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(x68k_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-//  MDRV_SOUND_ADD("okim6295", OKIM6295, 0)
-//  MDRV_SOUND_CONFIG(oki_interface)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+    MDRV_SOUND_ADD("okim6258", OKIM6258, 4000000)
+    MDRV_SOUND_CONFIG(x68k_okim6258_interface)
+    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 MACHINE_DRIVER_END

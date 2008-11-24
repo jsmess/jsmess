@@ -66,6 +66,7 @@ struct x68k_system
 	{
 		int rate;  // ADPCM sample rate
 		int pan;  // ADPCM output switch
+		int clock;  // ADPCM clock speed
 	} adpcm;
 	struct
 	{

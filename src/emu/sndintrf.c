@@ -123,6 +123,7 @@ void adpcm_get_info(void *token, UINT32 state, sndinfo *info);
 void okim6295_get_info(void *token, UINT32 state, sndinfo *info);
 void msm5205_get_info(void *token, UINT32 state, sndinfo *info);
 void msm5232_get_info(void *token, UINT32 state, sndinfo *info);
+void okim6258_get_info(void *token, UINT32 state, sndinfo *info);
 void upd7759_get_info(void *token, UINT32 state, sndinfo *info);
 void hc55516_get_info(void *token, UINT32 state, sndinfo *info);
 void mc3417_get_info(void *token, UINT32 state, sndinfo *info);
@@ -484,6 +485,9 @@ static const struct
 #endif
 #if (HAS_AICA)
 	{ SOUND_AICA, aica_get_info },
+#endif
+#if (HAS_OKIM6258)
+	{ SOUND_OKIM6258, okim6258_get_info },
 #endif
 
 	{ SOUND_FILTER_VOLUME, filter_volume_get_info },

@@ -26,6 +26,8 @@ DEVICE_START(hd63450)
 		dmac->timer[x] = timer_alloc(dma_transfer_timer, (void*)device);
 		dmac->reg[x].niv = 0x0f;  // defaults?
 		dmac->reg[x].eiv = 0x0f;
+		dmac->clock[x] = dmac->intf->clock[x];
+		dmac->burst_clock[x] = dmac->intf->burst_clock[x];
 	}
 	return DEVICE_START_OK;
 }
@@ -200,27 +202,36 @@ void dma_transfer_start(const device_config* device, int channel, int dir)
 	dmac->reg[channel].csr &= ~0xe0;
 	dmac->reg[channel].csr |= 0x08;  // Channel active
 	dmac->reg[channel].csr &= ~0x30;  // Reset Error and Normal termination bits
-	if(dmac->reg[channel].btc > 0)
+	if((dmac->reg[channel].ocr & 0x0c) != 0x00)  // Array chain or Link array chain
 	{
 		dmac->reg[channel].mar = program_read_word(dmac->reg[channel].bar) << 16;
 		dmac->reg[channel].mar |= program_read_word(dmac->reg[channel].bar+2);
 		dmac->reg[channel].mtc = program_read_word(dmac->reg[channel].bar+4);
-		dmac->reg[channel].btc--;
+		if(dmac->reg[channel].btc > 0)
+			dmac->reg[channel].btc--;
 	}
 
 	// Burst transfers will halt the CPU until the transfer is complete
 	if((dmac->reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
 		cpunum_set_input_line(device->machine, dmac->intf->cpu,INPUT_LINE_HALT,ASSERT_LINE);
-		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->intf->burst_clock[channel]);
+		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->burst_clock[channel]);
 	}
 	else
-		timer_adjust_periodic(dmac->timer[channel], ATTOTIME_IN_USEC(500), channel, dmac->intf->clock[channel]);
-
+		timer_adjust_periodic(dmac->timer[channel], ATTOTIME_IN_USEC(500), channel, dmac->clock[channel]);
 
 	dmac->transfer_size[channel] = dmac->reg[channel].mtc;
 
 	logerror("DMA: Transfer begins: size=0x%08x\n",dmac->transfer_size[channel]);
+}
+
+void hd63450_set_timer(const device_config* device, int channel, attotime tm)
+{
+	hd63450_t* dmac = device->token;
+
+	dmac->clock[channel] = tm;
+	if(dmac->in_progress[channel] != 0)
+		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->clock[channel]);
 }
 
 static TIMER_CALLBACK(dma_transfer_timer)
@@ -255,7 +266,7 @@ static void dma_transfer_continue(const device_config* device, int channel)
 	if(dmac->halted[channel] != 0)
 	{
 		dmac->halted[channel] = 0;
-		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->intf->clock[channel]);
+		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->clock[channel]);
 	}
 }
 
@@ -366,7 +377,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 			{
 				// End of transfer
 				logerror("DMA#%i: End of transfer\n",x);
-				if(dmac->reg[x].btc > 0)
+				if((dmac->reg[x].ocr & 0x0c) != 0 && dmac->reg[x].btc > 0)
 				{
 					dmac->reg[x].btc--;
 					dmac->reg[x].bar+=6;
