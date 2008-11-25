@@ -41,8 +41,8 @@ PCB Layout
 Notes:
     All IC's shown.
 
-    ROM     - Toshiba TMM27128D-20 "CNTR 1.07 6490318-07"
-    TC5565  - Toshiba TC5565PL-15 8192x8 bit Static Random Access Memory
+    ROM     - Toshiba TMM27128D-20 16Kx8 EPROM "CNTR 1.07 6490318-07"
+    TC5565  - Toshiba TC5565PL-15 8Kx8 bit Static RAM
     Z80	    - Zilog Z8400APS Z80A CPU Central Processing Unit
     Z80DMA  - Zilog Z8410APS Z80A DMA Direct Memory Access Controller
     SAB1793 - Siemens SAB1793-02P Floppy Disc Controller
@@ -69,14 +69,25 @@ Notes:
 
 	TODO:
 
-	- Assertion failed: header, file src/mess/tagpool.c, line 76
-	- floppy drive selection
-	- floppy side selection
+	Common
+	------
+	- remove cpunum references
+	- separate wd17xx reset from init
+
+	Slow Controller
+	---------------
 	- DS/DD SS/DS jumpers
 	- S1-S5 jumpers
 	- protection device @ 8B
+	- FDC DRQ
 	- Z80 wait logic
-	- everything for fast controller
+
+	Fast Controller
+	---------------
+	- Z80 DMA interrupt
+	- Z80 DMA memory <-> IO transfer
+	- FDC INT
+	- FDC DRQ
 
 */
 
@@ -130,6 +141,11 @@ INLINE fast_t *get_safe_token_fast(const device_config *device)
 	return (fast_t *)device->token;
 }
 
+static const device_config *get_floppy_image(int drive)
+{
+	return image_from_devtype_and_index(IO_FLOPPY, drive);
+}
+
 /* Slow Controller */
 
 static READ8_HANDLER( slow_bus_data_r )
@@ -180,16 +196,24 @@ static READ8_HANDLER( slow_bus_stat_r )
 
 static WRITE8_HANDLER( slow_bus_c1_w )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
+	slow_t *conkort = get_safe_token_slow(device);
+
+	cpunum_set_input_line(machine, conkort->cpunum, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( slow_bus_c3_w )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
+	slow_t *conkort = get_safe_token_slow(device);
+
+	cpunum_set_input_line(machine, conkort->cpunum, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static void slow_card_select(const device_config *device, UINT8 data)
 {
+	slow_t *conkort = get_safe_token_slow(device);
+
 	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
 	{
 		memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
@@ -200,10 +224,10 @@ static void slow_card_select(const device_config *device, UINT8 data)
 		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
 	}
 
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(device->machine, conkort->cpunum, INPUT_LINE_RESET, PULSE_LINE);
 }
 
-READ8_HANDLER( slow_ctrl_r )
+static WRITE8_HANDLER( slow_ctrl_w )
 {
 	/*
 
@@ -214,20 +238,34 @@ READ8_HANDLER( slow_ctrl_r )
 		2		_SEL 2
 		3		_MOT
 		4		_SIDE
-		5		8B pin 2 or GND
+		5		8B pin 2 (if S4 shorted)
 		6		8A pin 13
 		7		FDC _MR
 
 	*/
 
-	return 0;
+	/* drive selection */
+	if (!BIT(data, 0)) wd17xx_set_drive(0);
+	if (!BIT(data, 1)) wd17xx_set_drive(1);
+//	if (!BIT(data, 2)) wd17xx_set_drive(2);
+
+	/* motor enable */
+	floppy_drive_set_motor_state(get_floppy_image(0), !BIT(data, 3));
+	floppy_drive_set_motor_state(get_floppy_image(1), !BIT(data, 3));
+	floppy_drive_set_ready_state(get_floppy_image(0), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(1), 1, 1);
+
+	/* disk side selection */
+	wd17xx_set_side(!BIT(data, 4));
+
+	if (!BIT(data, 7))
+	{
+		/* FDC master reset */
+		wd17xx_reset(machine);
+	}
 }
 
-WRITE8_HANDLER( slow_ctrl_w )
-{
-}
-
-WRITE8_HANDLER( slow_status_w )
+static WRITE8_HANDLER( slow_status_w )
 {
 	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
 	slow_t *conkort = get_safe_token_slow(device);
@@ -239,8 +277,168 @@ WRITE8_HANDLER( slow_status_w )
 
 /* Fast Controller */
 
+static READ8_HANDLER( fast_bus_data_r )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	UINT8 data = 0xff;
+
+	if (!BIT(conkort->status, 6))
+	{
+		data = conkort->data;
+	}
+
+	return data;
+}
+
+static WRITE8_HANDLER( fast_bus_data_w )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	if (BIT(conkort->status, 6))
+	{
+		conkort->data = data;
+	}
+
+//	cpunum_set_input_line(machine, conkort->cpunum, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static READ8_HANDLER( fast_bus_stat_r )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	return conkort->status;
+}
+
+static WRITE8_HANDLER( fast_bus_c1_w )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	cpunum_set_input_line(machine, conkort->cpunum, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static WRITE8_HANDLER( fast_bus_c3_w )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	cpunum_set_input_line(machine, conkort->cpunum, INPUT_LINE_RESET, PULSE_LINE);
+}
+
 static void fast_card_select(const device_config *device, UINT8 data)
 {
+	fast_t *conkort = get_safe_token_fast(device);
+
+	if (data == input_port_read(device->machine, "SW3"))
+	{
+		memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, fast_bus_data_r, fast_bus_data_w);
+		memory_install_read8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, fast_bus_stat_r);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C1, ABCBUS_C1, 0x18, 0, fast_bus_c1_w);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C3, ABCBUS_C3, 0x18, 0, fast_bus_c3_w);
+		memory_install_write8_handler(device->machine, 0, ADDRESS_SPACE_IO, ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
+	}
+
+	cpunum_set_input_line(device->machine, conkort->cpunum, INPUT_LINE_RESET, PULSE_LINE);
+}
+
+static WRITE8_HANDLER( fast_1f_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	logerror("1F write %02x\n", data);
+}
+
+static WRITE8_HANDLER( fast_3f_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	logerror("3F write %02x\n", data);
+}
+
+static WRITE8_HANDLER( fast_ctrl_w )
+{
+	/*
+
+		bit		description
+
+		0		_SEL 0
+		1		_SEL 1
+		2		_MOT
+		3		_SIDE
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	/* drive selection */
+	if (!BIT(data, 0)) wd17xx_set_drive(0);
+	if (!BIT(data, 1)) wd17xx_set_drive(1);
+
+	/* motor enable */
+	floppy_drive_set_motor_state(get_floppy_image(0), !BIT(data, 2));
+	floppy_drive_set_motor_state(get_floppy_image(1), !BIT(data, 2));
+	floppy_drive_set_ready_state(get_floppy_image(0), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(1), 1, 1);
+
+	/* disk side selection */
+	wd17xx_set_side(!BIT(data, 3));
+}
+
+static READ8_HANDLER( fast_data_r )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	return conkort->data;
+}
+
+static WRITE8_HANDLER( fast_data_w )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	conkort->data = data;
+}
+
+static WRITE8_HANDLER( fast_status_w )
+{
+	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	conkort->status = data;
 }
 
 /* Memory Maps */
@@ -257,7 +455,7 @@ static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO, CONKORT_Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
 	AM_RANGE(0xbc, 0xbf) AM_READWRITE(wd17xx_r, wd17xx_w)
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(slow_status_w)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(slow_ctrl_r, slow_ctrl_w)
+	AM_RANGE(0xef, 0xef) AM_WRITE(slow_ctrl_w)
 ADDRESS_MAP_END
 
 // Fast Controller
@@ -269,6 +467,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0f, 0x0f) AM_READ(fast_data_r)
+	AM_RANGE(0x1f, 0x1f) AM_WRITE(fast_data_w)
+	AM_RANGE(0x2f, 0x2f) AM_WRITE(fast_status_w)
+//	AM_RANGE(0x3f, 0x3f) AM_WRITE()
+//	AM_RANGE(0x4f, 0x4f) AM_WRITE()
+//	AM_RANGE(0x5d, 0x5d) AM_READ()
+
+	AM_RANGE(0x68, 0x6b) AM_READ(wd17xx_r)
+	AM_RANGE(0x78, 0x7b) AM_WRITE(wd17xx_w)
+	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE(Z80DMA, CONKORT_Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -425,11 +633,18 @@ static const z80_daisy_chain slow_daisy_chain[] =
 
 /* Z80 DMA */
 
+#define Z80DMA_CPUNUM 1
+
+static dma_irq_callback(const device_config *device, int state)
+{
+	cpunum_set_input_line(device->machine, Z80DMA_CPUNUM, INPUT_LINE_IRQ0, state);
+}
+
 static READ8_DEVICE_HANDLER( dma_read_byte )
 {
 	UINT8 data;
 
-	cpuintrf_push_context(1);
+	cpuintrf_push_context(Z80DMA_CPUNUM);
 	data = program_read_byte(offset);
 	cpuintrf_pop_context();
 
@@ -438,7 +653,7 @@ static READ8_DEVICE_HANDLER( dma_read_byte )
 
 static WRITE8_DEVICE_HANDLER( dma_write_byte )
 {
-	cpuintrf_push_context(1);
+	cpuintrf_push_context(Z80DMA_CPUNUM);
 	program_write_byte(offset, data);
 	cpuintrf_pop_context();
 }
@@ -455,14 +670,15 @@ static WRITE8_DEVICE_HANDLER( wd17xx_write_byte )
 
 static const z80dma_interface dma_intf =
 {
-	0,
-	XTAL_16MHz/4, // ???
-	dma_read_byte,
-	dma_write_byte,
-	wd17xx_read_byte,
-	wd17xx_write_byte,
-	0,
-	0
+	Z80DMA_CPUNUM,			/* cpunum to HALT */
+	XTAL_16MHz/4,			/* chip clock */
+	dma_read_byte,			/* memory read */
+	dma_write_byte,			/* memory write */
+	wd17xx_read_byte,		/* port A read */
+	wd17xx_write_byte,		/* port A write */
+	0,						/* port B read */
+	0,						/* port B write */
+	dma_irq_callback		/* interrupt callback */
 };
 
 static const z80_daisy_chain fast_daisy_chain[] =
@@ -486,7 +702,7 @@ static void slow_wd1791_callback(running_machine *machine, wd17xx_state_t state,
 		case WD17XX_IRQ_SET:
 			conkort->fdc_irq = 1;
 			break;
-		case WD17XX_DRQ_CLR:				
+		case WD17XX_DRQ_CLR:
 			break;
 		case WD17XX_DRQ_SET:
 			break;
@@ -497,15 +713,19 @@ static void slow_wd1791_callback(running_machine *machine, wd17xx_state_t state,
 
 static void fast_wd1793_callback(running_machine *machine, wd17xx_state_t state, void *param)
 {
+//	const device_config *z80dma = devtag_get_device(machine, Z80DMA, CONKORT_Z80DMA_TAG);
+
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
 			break;
 		case WD17XX_IRQ_SET:
 			break;
-		case WD17XX_DRQ_CLR:				
+		case WD17XX_DRQ_CLR:
+			//z80dma_rdy_w(z80dma, 0, 0);
 			break;
 		case WD17XX_DRQ_SET:
+			//z80dma_rdy_w(z80dma, 0, 1);
 			break;
 	}
 }
@@ -563,8 +783,8 @@ ROM_END
 ROM_START( l5521046 )
 	ROM_REGION( 0x10000, CONKORT_Z80_TAG, 0 )
 	ROM_LOAD( "fast108.bin",	0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-	ROM_LOAD( "fast207.bin",	0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
 	ROM_LOAD( "6490318-07.bin", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
+	ROM_LOAD( "fast207.bin",	0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
 ROM_END
 
 /* Device Interface */
