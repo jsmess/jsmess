@@ -352,13 +352,13 @@ static TIMER_CALLBACK( x68k_led_callback )
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
-	const device_config* device = device_list_find_by_tag(machine->config->devicelist,HD63450,"hd63450");
+	const device_config* device = device_list_find_by_tag(space->machine->config->devicelist,HD63450,"hd63450");
 	hd63450_w(device, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
-	const device_config* device = device_list_find_by_tag(machine->config->devicelist,HD63450,"hd63450");
+	const device_config* device = device_list_find_by_tag(space->machine->config->devicelist,HD63450,"hd63450");
 	return hd63450_r(device, offset, mem_mask);
 }
 
@@ -577,14 +577,14 @@ static int x68k_read_mouse(running_machine *machine)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
-	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
 		return scc_r(scc, 0);
 	case 1:
-		return x68k_read_mouse(machine);
+		return x68k_read_mouse(space->machine);
 	case 2:
 		return scc_r(scc, 1);
 	case 3:
@@ -596,7 +596,7 @@ static READ16_HANDLER( x68k_scc_r )
 
 static WRITE16_HANDLER( x68k_scc_w )
 {
-	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 	static unsigned char prev;
 	offset %= 4;
 
@@ -647,7 +647,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 				sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;
 				current_irq_line = 5;
-				cpunum_set_input_line_and_vector(machine, 0,5,ASSERT_LINE,0x54);
+				cpu_set_input_line_and_vector(machine->cpu[0],5,ASSERT_LINE,0x54);
 			}
 		}
 	}
@@ -736,7 +736,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	{
 	case 0x00:
 	case 0x01:
-		nec765_data_w(machine, 0,data);
+		nec765_data_w(space, 0,data);
 		break;
 	case 0x02:  // drive option signal control
 		x = data & 0x0f;
@@ -808,9 +808,9 @@ static READ16_HANDLER( x68k_fdc_r )
 	switch(offset)
 	{
 	case 0x00:
-		return nec765_status_r(machine, 0);
+		return nec765_status_r(space, 0);
 	case 0x01:
-		return nec765_data_r(machine, 0);
+		return nec765_data_r(space, 0);
 	case 0x02:
 		ret = 0x00;
 		for(x=0;x<4;x++)
@@ -845,7 +845,7 @@ static void fdc_irq(int state)
 		sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cpunum_set_input_line_and_vector(Machine, 0,1,ASSERT_LINE,current_vector[1]);
+		cpu_set_input_line_and_vector(Machine->cpu[0],1,ASSERT_LINE,current_vector[1]);
 	}
 }
 
@@ -854,14 +854,14 @@ static int x68k_fdc_read_byte(int addr)
 	int data = -1;
 
 	if(sys.fdc.drq_state != 0)
-		data = nec765_dack_r(Machine, 0);
+		data = nec765_dack_r(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
 }
 
 static void x68k_fdc_write_byte(int addr, int data)
 {
-	nec765_dack_w(Machine, 0, data);
+	nec765_dack_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
 static void fdc_drq(int state, int read_write)
@@ -874,11 +874,11 @@ static WRITE16_HANDLER( x68k_fm_w )
 	switch(offset)
 	{
 	case 0x00:
-		ym2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(space, 0, data);
 		logerror("YM: Register select 0x%02x\n",data);
 		break;
 	case 0x01:
-		ym2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(space, 0, data);
 		logerror("YM: Data write 0x%02x\n",data);
 		break;
 	}
@@ -887,7 +887,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return ym2151_status_port_0_r(machine, 0);
+		return ym2151_status_port_0_r(space, 0);
 
 	return 0xff;
 }
@@ -899,7 +899,7 @@ static WRITE8_HANDLER( x68k_ct_w )
 	// CT2 - 1 = Set ready state of FDC
 	nec765_set_ready_state(data & 0x01);
 	sys.adpcm.clock = data & 0x02;
-	x68k_set_adpcm(machine);
+	x68k_set_adpcm(space->machine);
 	okim6258_set_clock(0, data & 0x02 ? 4000000 : 8000000);
 }
 
@@ -1028,7 +1028,7 @@ static READ16_HANDLER( x68k_sysport_r )
 
 static READ16_HANDLER( x68k_mfp_r )
 {
-	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *x68k_mfp = device_list_find_by_tag(space->machine->config->devicelist, MC68901, MC68901_TAG);
 
 	return mc68901_register_r(x68k_mfp, offset);
 }
@@ -1099,7 +1099,7 @@ READ16_HANDLER( x68k_mfp_r )
 
 static WRITE16_HANDLER( x68k_mfp_w )
 {
-	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *x68k_mfp = device_list_find_by_tag(space->machine->config->devicelist, MC68901, MC68901_TAG);
 
 	/* For the Interrupt registers, the bits are set out as such:
        Reg A - bit 7: GPIP7 (HSync)
@@ -1239,12 +1239,12 @@ static READ16_DEVICE_HANDLER( x68k_ppi_r )
 
 static READ16_HANDLER( x68k_rtc_r )
 {
-	return rp5c15_r(machine, offset, mem_mask);
+	return rp5c15_r(space, offset, mem_mask);
 }
 
 static WRITE16_HANDLER( x68k_rtc_w )
 {
-	rp5c15_w(machine, offset, data, mem_mask);
+	rp5c15_w(space, offset, data, mem_mask);
 }
 
 static void x68k_rtc_alarm_irq(int state)
@@ -1295,7 +1295,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(sys.video.gfx_pal+offset);
 		val = sys.video.gfx_pal[offset];
-		palette_set_color_rgb(machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(space->machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1303,7 +1303,7 @@ static WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(sys.video.text_pal+(offset-0x100));
 		val = sys.video.text_pal[offset-0x100];
-		palette_set_color_rgb(machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(space->machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1391,11 +1391,11 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	if(mess_ram[0x09] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (mess_ram[0x09] << 24) | (mess_ram[0x08] << 16) |(mess_ram[0x0b] << 8) | mess_ram[0x0a];
-		int sp = cpunum_get_reg(0,REG_SP);
-		int pc = cpunum_get_reg(0,REG_PC);
-		int sr = cpunum_get_reg(0,M68K_SR);
-		//int pda = cpunum_get_reg(0,M68K_PREF_DATA);
-		cpunum_set_reg(0,REG_SP,sp-14);
+		int sp = cpu_get_reg(machine->cpu[0],REG_SP);
+		int pc = cpu_get_reg(machine->cpu[0],REG_PC);
+		int sr = cpu_get_reg(machine->cpu[0],M68K_SR);
+		//int pda = cpu_get_reg(machine->cpu[0],M68K_PREF_DATA);
+		cpu_set_reg(machine->cpu[0],REG_SP,sp-14);
 		mess_ram[sp-11] = (val & 0xff000000) >> 24;
 		mess_ram[sp-12] = (val & 0x00ff0000) >> 16;
 		mess_ram[sp-9] = (val & 0x0000ff00) >> 8;
@@ -1406,7 +1406,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		mess_ram[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
 		mess_ram[sp-5] = (sr & 0xff00) >> 8;
 		mess_ram[sp-6] = (sr & 0x00ff);  // place SR onto the stack
-		cpunum_set_reg(0,REG_PC,addr);  // real exceptions seem to take too long to be acknowledged
+		cpu_set_reg(machine->cpu[0],REG_PC,addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x",val,addr);
 	}
 }
@@ -1417,7 +1417,7 @@ static READ16_HANDLER( x68k_rom0_r )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
+	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 	return 0xff;
 }
 
@@ -1427,13 +1427,13 @@ static WRITE16_HANDLER( x68k_rom0_w )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
+	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 }
 
 static READ16_HANDLER( x68k_exp_r )
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(input_port_read(machine, "options") & 0x02)
+	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		current_vector[2] = 0x02;  // bus error
 		current_irq_line = 2;
@@ -1449,7 +1449,7 @@ static READ16_HANDLER( x68k_exp_r )
 static WRITE16_HANDLER( x68k_exp_w )
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(input_port_read(machine, "options") & 0x02)
+	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		current_vector[2] = 0x02;  // bus error
 		current_irq_line = 2;
@@ -1467,7 +1467,7 @@ static void x68k_dma_irq(running_machine *machine, int channel)
 	current_vector[3] = hd63450_get_vector(device, channel);
 	current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,current_vector[3]);
-	cpunum_set_input_line_and_vector(machine, 0,3,ASSERT_LINE,current_vector[3]);
+	cpu_set_input_line_and_vector(machine->cpu[0],3,ASSERT_LINE,current_vector[3]);
 }
 
 static void x68k_dma_end(int channel,int irq)
@@ -1485,7 +1485,7 @@ static void x68k_dma_error(int channel, int irq)
 	{
 		current_vector[3] = hd63450_get_error_vector(device,channel);
 		current_irq_line = 3;
-		cpunum_set_input_line_and_vector(Machine, 0,3,ASSERT_LINE,current_vector[3]);
+		cpu_set_input_line_and_vector(Machine->cpu[0],3,ASSERT_LINE,current_vector[3]);
 	}
 }
 
@@ -1522,7 +1522,7 @@ static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 		return;
 //	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //		return;
-	cpunum_set_input_line(device->machine, 0, 6, level);
+	cpu_set_input_line(device->machine->cpu[0], 6, level);
 	prev = level;
 }
 
@@ -1544,7 +1544,7 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 
 static IRQ_CALLBACK(x68k_int_ack)
 {
-	const device_config *x68k_mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *x68k_mfp = device_list_find_by_tag(device->machine->config->devicelist, MC68901, MC68901_TAG);
 
 	if(irqline == 6)  // MFP
 	{
@@ -1573,7 +1573,7 @@ static IRQ_CALLBACK(x68k_int_ack)
 		return current_vector[6];
 	}
 	
-	cpunum_set_input_line_and_vector(machine, 0,irqline,CLEAR_LINE,current_vector[irqline]);
+	cpu_set_input_line_and_vector(device->machine->cpu[0],irqline,CLEAR_LINE,current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
 		sys.ioc.irqstatus &= ~0xf0;
@@ -1925,7 +1925,7 @@ static DEVICE_IMAGE_LOAD( x68k_floppy )
 			current_vector[1] = 0x61;
 			sys.ioc.irqstatus |= 0x40;
 			current_irq_line = 1;
-			cpunum_set_input_line_and_vector(image->machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+			cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 			logerror("IOC: Disk image inserted\n");
 		}
 		sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
@@ -1942,7 +1942,7 @@ static DEVICE_IMAGE_UNLOAD( x68k_floppy )
 		current_vector[1] = 0x61;
 		sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cpunum_set_input_line_and_vector(image->machine, 0,1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
 	sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }
@@ -2048,20 +2048,21 @@ static MACHINE_RESET( x68000 )
 
 static MACHINE_START( x68000 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
-	memory_install_read16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_machine_func)1);
-	memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_machine_func)1);
-	memory_set_bankptr(1,mess_ram);
-	memory_install_read16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0xc00000,0xdfffff,0x1fffff,0,(read16_machine_func)x68k_gvram_r);
-	memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0xc00000,0xdfffff,0x1fffff,0,(write16_machine_func)x68k_gvram_w);
-	memory_set_bankptr(2,gvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(read16_machine_func)x68k_tvram_r);
-	memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(write16_machine_func)x68k_tvram_w);
-	memory_set_bankptr(3,tvram);  // so that code in VRAM is executable - needed for Terra Cresta
-	memory_install_read16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(read16_machine_func)x68k_sram_r);
-	memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(write16_machine_func)x68k_sram_w);
-	memory_set_bankptr(4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	memory_install_read16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_space_func)1);
+	memory_install_write16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_space_func)1);
+	memory_set_bankptr(machine, 1,mess_ram);
+	memory_install_read16_handler(space,0xc00000,0xdfffff,0x1fffff,0,(read16_space_func)x68k_gvram_r);
+	memory_install_write16_handler(space,0xc00000,0xdfffff,0x1fffff,0,(write16_space_func)x68k_gvram_w);
+	memory_set_bankptr(machine, 2,gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_install_read16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,(read16_space_func)x68k_tvram_r);
+	memory_install_write16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,(write16_space_func)x68k_tvram_w);
+	memory_set_bankptr(machine, 3,tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_install_read16_handler(space,0xed0000,0xed3fff,0x003fff,0,(read16_space_func)x68k_sram_r);
+	memory_install_write16_handler(space,0xed0000,0xed3fff,0x003fff,0,(write16_space_func)x68k_sram_w);
+	memory_set_bankptr(machine, 4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	timer_adjust_periodic(kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
@@ -2106,7 +2107,7 @@ static DRIVER_INIT( x68000 )
 	mfp_init();
 	rp5c15_init(machine, &rtc_intf);
 
-	cpunum_set_irq_callback(0, x68k_int_ack);
+	cpu_set_irq_callback(machine->cpu[0], x68k_int_ack);
 
 	// init keyboard
 	sys.keyboard.delay = 500;  // 3*100+200

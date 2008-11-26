@@ -85,7 +85,7 @@ DRIVER_INIT( mz700 )
 	videoram = auto_malloc(videoram_size);
 	colorram = auto_malloc(0x800);
 
-	mz700_bank_w(machine, 4, 0);
+	mz700_bank_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 4, 0);
 }
 
 
@@ -122,7 +122,7 @@ static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
 {
 	/* INTMSK: interrupt enabled? */
     if (pio_port_c_output & 0x04)
-		cpunum_set_input_line(device->machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 }
 
 /************************ PIO ************************************************/
@@ -221,7 +221,7 @@ static WRITE8_DEVICE_HANDLER ( pio_port_c_w )
 
 READ8_HANDLER ( mz700_mmio_r )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	const device_config *screen = video_screen_first(space->machine->config);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 	UINT8 data = 0x7e;
 
@@ -229,17 +229,17 @@ READ8_HANDLER ( mz700_mmio_r )
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		data = ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
+		data = ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
+		data = pit8253_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
         break;
 
 	case 8:
 		data = ne556_out[1] ? 0x01 : 0x00;
-		data |= input_port_read(machine, "JOY");	/* get joystick ports */
-		if (video_screen_get_hpos(machine->primary_screen) >= visarea->max_x - 32)
+		data |= input_port_read(space->machine, "JOY");	/* get joystick ports */
+		if (video_screen_get_hpos(space->machine->primary_screen) >= visarea->max_x - 32)
 			data |= 0x80;
 		LOG(1,"mz700_e008_r",("%02X\n", data));
         break;
@@ -253,17 +253,17 @@ WRITE8_HANDLER ( mz700_mmio_w )
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3, data);
+		ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3, data);
         break;
 
 	/* the next four ports are connected to a 8253 PIT */
     case 4: case 5: case 6: case 7:
-		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 3, data);
+		pit8253_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), offset & 3, data);
 		break;
 
 	case 8:
 		LOG(1,"mz700_e008_w",("%02X\n", data));
-		pit8253_gate_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 0, data & 1);
+		pit8253_gate_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 0, data & 1);
         break;
 	}
 }
@@ -273,143 +273,143 @@ WRITE8_HANDLER ( mz700_mmio_w )
 /* BANK1 0000-0FFF */
 static void bank1_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(1, &mem[0x00000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
+	memory_set_bankptr(machine, 1, &mem[0x00000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, SMH_BANK1);
 }
 
 static void bank1_ROM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(1, &mem[0x10000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
+	memory_set_bankptr(machine, 1, &mem[0x10000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
 }
 
 
 /* BANK2 1000-1FFF */
 static void bank2_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(2, &mem[0x01000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
+	memory_set_bankptr(machine, 2, &mem[0x01000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x1fff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x1fff, 0, 0, SMH_BANK2);
 }
 
 static void bank2_ROM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(2, &mem[0x11000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_UNMAP);
+	memory_set_bankptr(machine, 2, &mem[0x11000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x1fff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x1fff, 0, 0, SMH_UNMAP);
 }
 
 
 /* BANK3 8000-9FFF */
 static void bank3_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(3, &mem[0x08000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK3);
+	memory_set_bankptr(machine, 3, &mem[0x08000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK3);
 }
 
 static void bank3_VID(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(3, videoram);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, SMH_BANK3);
+	memory_set_bankptr(machine, 3, videoram);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK3);
 }
 
 
 /* BANK4 A000-BFFF */
 static void bank4_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(4, &mem[0x0a000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
+	memory_set_bankptr(machine, 4, &mem[0x0a000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
 }
 
 static void bank4_VID(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(4, videoram + 0x2000);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
+	memory_set_bankptr(machine, 4, videoram + 0x2000);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xA000, 0xBFFF, 0, 0, SMH_BANK4);
 }
 
 
 /* BANK7 C000-CFFF */
 static void bank5_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(5, &mem[0x0c000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xCFFF, 0, 0, SMH_BANK5);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xCFFF, 0, 0, SMH_BANK5);
+	memory_set_bankptr(machine, 5, &mem[0x0c000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xC000, 0xCFFF, 0, 0, SMH_BANK5);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xC000, 0xCFFF, 0, 0, SMH_BANK5);
 }
 
 
 /* BANK6 D000-D7FF */
 static void bank6_NOP(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(6, &mem[0x0d000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, SMH_NOP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, SMH_NOP);
+	memory_set_bankptr(machine, 6, &mem[0x0d000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD000, 0xD7FF, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD000, 0xD7FF, 0, 0, SMH_NOP);
 }
 
 static void bank6_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(6, &mem[0x0d000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
+	memory_set_bankptr(machine, 6, &mem[0x0d000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
 }
 
 static void bank6_VIO(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(6, videoram);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
+	memory_set_bankptr(machine, 6, videoram);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD000, 0xD7FF, 0, 0, SMH_BANK6);
 }
 
 
 /* BANK9 D800-DFFF */
 static void bank7_NOP(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(7, &mem[0x0d800]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, SMH_NOP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, SMH_NOP);
+	memory_set_bankptr(machine, 7, &mem[0x0d800]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD800, 0xDFFF, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD800, 0xDFFF, 0, 0, SMH_NOP);
 }
 
 static void bank7_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(7, &mem[0x0d800]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
+	memory_set_bankptr(machine, 7, &mem[0x0d800]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
 }
 
 static void bank7_VIO(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(7, colorram);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
+	memory_set_bankptr(machine, 7, colorram);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xD800, 0xDFFF, 0, 0, SMH_BANK7);
 }
 
 
 /* BANK8 E000-FFFF */
 static void bank8_NOP(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(8, &mem[0x0e000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xE000, 0xFFFF, 0, 0, SMH_NOP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xE000, 0xFFFF, 0, 0, SMH_NOP);
+	memory_set_bankptr(machine, 8, &mem[0x0e000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, SMH_NOP);
 
 }
 
 static void bank8_RAM(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(8, &mem[0x0e000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xE000, 0xFFFF, 0, 0, SMH_BANK8);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xE000, 0xFFFF, 0, 0, SMH_BANK8);
+	memory_set_bankptr(machine, 8, &mem[0x0e000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, SMH_BANK8);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, SMH_BANK8);
 }
 
 static void bank8_VIO(running_machine *machine, UINT8 *mem)
 {
-	memory_set_bankptr(8, &mem[0x16000]);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xE000, 0xFFFF, 0, 0, mz700_mmio_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xE000, 0xFFFF, 0, 0, mz700_mmio_w);
+	memory_set_bankptr(machine, 8, &mem[0x16000]);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, mz700_mmio_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, mz700_mmio_w);
 }
 
 
@@ -418,46 +418,46 @@ WRITE8_HANDLER ( mz700_bank_w )
     static int mz700_locked = 0;
 	static int vio_mode = 0;
 	static int vio_lock = 0;
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(space->machine, "main");
 
     switch (offset)
 	{
 	case 0: /* 0000-0FFF RAM */
 		LOG(1,"mz700_bank_w",("0: 0000-0FFF RAM\n"));
-		bank1_RAM(machine, mem);
+		bank1_RAM(space->machine, mem);
 		mz700_locked = 0;
         break;
 
 	case 1: /* D000-FFFF RAM */
 		LOG(1,"mz700_bank_w",("1: D000-FFFF RAM\n"));
-		bank6_RAM(machine, mem);
-		bank7_RAM(machine, mem);
-		bank8_RAM(machine, mem);
+		bank6_RAM(space->machine, mem);
+		bank7_RAM(space->machine, mem);
+		bank8_RAM(space->machine, mem);
         mz700_locked = 0;
 		vio_mode = 1;
         break;
 
 	case 2: /* 0000-0FFF ROM */
 		LOG(1,"mz700_bank_w",("2: 0000-0FFF ROM\n"));
-		bank1_ROM(machine, mem);
+		bank1_ROM(space->machine, mem);
 		mz700_locked = 0;
         break;
 
 	case 3: /* D000-FFFF videoram, memory mapped io */
 		LOG(1,"mz700_bank_w",("3: D000-FFFF videoram, memory mapped io\n"));
-		bank6_VIO(machine, mem);
-		bank7_VIO(machine, mem);
-		bank8_VIO(machine, mem);
+		bank6_VIO(space->machine, mem);
+		bank7_VIO(space->machine, mem);
+		bank8_VIO(space->machine, mem);
 		mz700_locked = 0;
 		vio_mode = 3;
         break;
 
 	case 4: /* 0000-0FFF ROM	D000-FFFF videoram, memory mapped io */
 		LOG(1,"mz700_bank_w",("4: 0000-0FFF ROM; D000-FFFF videoram, memory mapped io\n"));
-		bank1_ROM(machine, mem);
-		bank6_VIO(machine, mem);
-		bank7_VIO(machine, mem);
-		bank8_VIO(machine, mem);
+		bank1_ROM(space->machine, mem);
+		bank6_VIO(space->machine, mem);
+		bank7_VIO(space->machine, mem);
+		bank8_VIO(space->machine, mem);
         mz700_locked = 0;
 		vio_mode = 3;
         break;
@@ -468,16 +468,16 @@ WRITE8_HANDLER ( mz700_bank_w )
 		{
 			vio_lock = vio_mode;
 			mz700_locked = 1;
-			bank6_NOP(machine, mem);
-			bank7_NOP(machine, mem);
-			bank8_NOP(machine, mem);
+			bank6_NOP(space->machine, mem);
+			bank7_NOP(space->machine, mem);
+			bank8_NOP(space->machine, mem);
 		}
         break;
 
 	case 6: /* 0000-0FFF no chg D000-FFFF unlocked */
 		LOG(1,"mz700_bank_w",("6: D000-FFFF unlocked\n"));
 		if (mz700_locked == 1)
-			mz700_bank_w(machine, vio_lock, 0); /* old config for D000-DFFF */
+			mz700_bank_w(space, vio_lock, 0); /* old config for D000-DFFF */
         break;
     }
 }
@@ -511,15 +511,15 @@ static UINT8 mz800_palette_bank;
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		data = ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
+		data = ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
+		data = pit8253_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
         break;
 
 	default:
-		data = memory_region(machine, "main")[0x16000 + offset];
+		data = memory_region(space->machine, "main")[0x16000 + offset];
         break;
     }
     return data;
@@ -528,54 +528,54 @@ static UINT8 mz800_palette_bank;
 /* port E0 - E9 */
 READ8_HANDLER( mz800_bank_r )
 {
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(space->machine, "main");
     UINT8 data = 0xff;
 
     switch (offset)
     {
 	case 0: /* 1000-1FFF PCG ROM */
 		LOG(1,"mz800_bank_r",("0: 1000-1FFF PCG ROM"));
-        bank2_ROM(machine, mem);
+        bank2_ROM(space->machine, mem);
 		if ((mz800_display_mode & 0x08) == 0)
 		{
 			if (VERBOSE>=1) logerror("; 8000-9FFF videoram");
-            bank3_VID(machine, mem);
+            bank3_VID(space->machine, mem);
 			if (mz800_display_mode & 0x04)
 			{
 				if (VERBOSE>=1) logerror("; A000-BFFF videoram");
                 /* 640x480 mode so A000-BFFF is videoram too */
-				bank4_VID(machine, mem);
+				bank4_VID(space->machine, mem);
             }
 			else
 			{
 				if (VERBOSE>=1) logerror("; A000-BFFF RAM");
-				bank4_RAM(machine, mem);
+				bank4_RAM(space->machine, mem);
             }
 		}
 		else
 		{
 			if (VERBOSE>=1) logerror("; C000-CFFF PCG RAM");
             /* make C000-CFFF PCG RAM */
-			bank5_RAM(machine, mem);
+			bank5_RAM(space->machine, mem);
         }
 		if (VERBOSE>=1) logerror("\n");
         break;
 
     case 1: /* make 1000-1FFF and C000-CFFF RAM */
 		LOG(1,"mz800_bank_r",("1: 1000-1FFF RAM"));
-        bank2_RAM(machine, mem);
+        bank2_RAM(space->machine, mem);
 		if ((mz800_display_mode & 0x08) == 0)
 		{
 			if (VERBOSE>=1) logerror("; 8000-9FFF RAM; A000-BFFF RAM");
             /* make 8000-BFFF RAM */
-            bank3_RAM(machine, mem);
-			bank4_RAM(machine, mem);
+            bank3_RAM(space->machine, mem);
+			bank4_RAM(space->machine, mem);
 		}
 		else
 		{
 			if (VERBOSE>=1) logerror("; C000-CFFF RAM");
             /* make C000-CFFF RAM */
-			bank5_RAM(machine, mem);
+			bank5_RAM(space->machine, mem);
         }
 		if (VERBOSE>=1) logerror("\n");
         break;
@@ -590,7 +590,7 @@ READ8_HANDLER( mz800_bank_r )
 /* port EA */
  READ8_HANDLER( mz800_ramdisk_r )
 {
-	UINT8 *mem = memory_region(machine, "user1");
+	UINT8 *mem = memory_region(space->machine, "user1");
 	UINT8 data = mem[mz800_ramaddr];
 	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", mz800_ramaddr, data));
 	if (mz800_ramaddr++ == 0)
@@ -618,12 +618,12 @@ WRITE8_HANDLER( mz800_read_format_w )
  */
 WRITE8_HANDLER( mz800_display_mode_w )
 {
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(space->machine, "main");
 	LOG(1,"mz800_display_mode_w",("%02X\n", data));
     mz800_display_mode = data;
 	if ((mz800_display_mode & 0x08) == 0)
 	{
-		bank8_RAM(machine, mem);
+		bank8_RAM(space->machine, mem);
 	}
 }
 
@@ -637,7 +637,7 @@ WRITE8_HANDLER( mz800_scroll_border_w )
 WRITE8_HANDLER( mz800_mmio_w )
 {
 	/* just wrap to the mz700 handler */
-    mz700_mmio_w(machine, offset,data);
+    mz700_mmio_w(space, offset,data);
 }
 
 /* port E0-E9 */
@@ -646,46 +646,46 @@ WRITE8_HANDLER ( mz800_bank_w )
     static int mz800_locked = 0;
     static int vio_mode = 0;
     static int vio_lock = 0;
-    UINT8 *mem = memory_region(machine, "main");
+    UINT8 *mem = memory_region(space->machine, "main");
 
     switch (offset)
     {
     case 0: /* 0000-0FFF RAM */
 		LOG(1,"mz800_bank_w",("0: 0000-0FFF RAM\n"));
-        bank1_RAM(machine, mem);
+        bank1_RAM(space->machine, mem);
         mz800_locked = 0;
         break;
 
     case 1: /* D000-FFFF RAM */
 		LOG(1,"mz800_bank_w",("1: D000-FFFF RAM\n"));
-		bank6_RAM(machine, mem);
-		bank7_RAM(machine, mem);
-		bank8_RAM(machine, mem);
+		bank6_RAM(space->machine, mem);
+		bank7_RAM(space->machine, mem);
+		bank8_RAM(space->machine, mem);
         mz800_locked = 0;
         vio_mode = 1;
         break;
 
     case 2: /* 0000-0FFF ROM */
 		LOG(1,"mz800_bank_w",("2: 0000-0FFF ROM\n"));
-        bank1_ROM(machine, mem);
+        bank1_ROM(space->machine, mem);
         mz800_locked = 0;
         break;
 
     case 3: /* D000-FFFF videoram, memory mapped io */
 		LOG(1,"mz800_bank_w",("3: D000-FFFF videoram, memory mapped io\n"));
-		bank6_VIO(machine, mem);
-		bank7_VIO(machine, mem);
-		bank8_VIO(machine, mem);
+		bank6_VIO(space->machine, mem);
+		bank7_VIO(space->machine, mem);
+		bank8_VIO(space->machine, mem);
         mz800_locked = 0;
         vio_mode = 3;
         break;
 
     case 4: /* 0000-0FFF ROM    D000-FFFF videoram, memory mapped io */
 		LOG(1,"mz800_bank_w",("4: 0000-0FFF ROM; D000-FFFF videoram, memory mapped io\n"));
-        bank1_ROM(machine, mem);
-		bank6_VIO(machine, mem);
-		bank7_VIO(machine, mem);
-		bank8_VIO(machine, mem);
+        bank1_ROM(space->machine, mem);
+		bank6_VIO(space->machine, mem);
+		bank7_VIO(space->machine, mem);
+		bank8_VIO(space->machine, mem);
         mz800_locked = 0;
         vio_mode = 3;
         break;
@@ -696,31 +696,31 @@ WRITE8_HANDLER ( mz800_bank_w )
         {
             vio_lock = vio_mode;
             mz800_locked = 1;
-			bank6_NOP(machine, mem);
-			bank7_NOP(machine, mem);
-			bank8_NOP(machine, mem);
+			bank6_NOP(space->machine, mem);
+			bank7_NOP(space->machine, mem);
+			bank8_NOP(space->machine, mem);
         }
         break;
 
     case 6: /* 0000-0FFF no chg D000-FFFF unlocked */
 		LOG(1,"mz800_bank_w",("6: D000-FFFF unlocked\n"));
         if (mz800_locked == 1)
-            mz800_bank_w(machine, vio_lock, 0); /* old config for D000-DFFF */
+            mz800_bank_w(space, vio_lock, 0); /* old config for D000-DFFF */
         break;
 
 	case 8: /* set MZ700 enable bit 7 ? */
 		mz800_port_e8 = data;
 		if (mz800_port_e8 & 0x80)
 		{
-			bank6_VIO(machine, mem);
-			bank7_VIO(machine, mem);
-			bank8_VIO(machine, mem);
+			bank6_VIO(space->machine, mem);
+			bank7_VIO(space->machine, mem);
+			bank8_VIO(space->machine, mem);
 		}
 		else
 		{
-			bank6_RAM(machine, mem);
-			bank7_RAM(machine, mem);
-			bank8_RAM(machine, mem);
+			bank6_RAM(space->machine, mem);
+			bank7_RAM(space->machine, mem);
+			bank8_RAM(space->machine, mem);
         }
         break;
     }
@@ -729,7 +729,7 @@ WRITE8_HANDLER ( mz800_bank_w )
 /* port EA */
 WRITE8_HANDLER( mz800_ramdisk_w )
 {
-	UINT8 *mem = memory_region(machine, "user1");
+	UINT8 *mem = memory_region(space->machine, "user1");
 	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", mz800_ramaddr, data));
 	mem[mz800_ramaddr] = data;
 	if (mz800_ramaddr++ == 0)
@@ -739,7 +739,7 @@ WRITE8_HANDLER( mz800_ramdisk_w )
 /* port EB */
 WRITE8_HANDLER( mz800_ramaddr_w )
 {
-	mz800_ramaddr = (cpunum_get_reg(0, Z80_BC) & 0xff00) | (data & 0xff);
+	mz800_ramaddr = (cpu_get_reg(space->machine->cpu[0], Z80_BC) & 0xff00) | (data & 0xff);
 	LOG(1,"mz800_ramaddr_w",("%04X\n", mz800_ramaddr));
 }
 
@@ -764,7 +764,8 @@ WRITE8_HANDLER( mz800_palette_w )
 DRIVER_INIT( mz800 )
 {
 	UINT8 *mem = memory_region(machine, "main");
-
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
 	videoram_size = 0x5000;
 	videoram = auto_malloc(videoram_size);
 	colorram = auto_malloc(0x800);
@@ -776,9 +777,9 @@ DRIVER_INIT( mz800 )
     mem = memory_region(machine, "user1");
 	memset(&mem[0x00000], 0xff, 0x10000);
 
-    mz800_display_mode_w(machine, 0, 0x08);   /* set MZ700 mode */
-	mz800_bank_r(machine, 1);
-	mz800_bank_w(machine, 4, 0);
+    mz800_display_mode_w(space, 0, 0x08);   /* set MZ700 mode */
+	mz800_bank_r(space, 1);
+	mz800_bank_w(space, 4, 0);
 }
 
 

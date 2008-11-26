@@ -402,12 +402,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 	case 6:
 	case 7:
 	case 8:
-		x68k_crtc_refresh_mode(machine);
+		x68k_crtc_refresh_mode(space->machine);
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
 		{
 			attotime irq_time;
-			irq_time = video_screen_get_time_until_pos(machine->primary_screen,(data) / sys.crtc.vmultiple,2);
+			irq_time = video_screen_get_time_until_pos(space->machine->primary_screen,(data) / sys.crtc.vmultiple,2);
 
 			if(attotime_to_double(irq_time) > 0)
 				timer_adjust_oneshot(raster_irq, irq_time, (data) / sys.crtc.vmultiple);
@@ -450,7 +450,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			if(data & 0x0400)
 				sys.crtc.interlace = 1;
 		}
-		x68k_crtc_refresh_mode(machine);
+		x68k_crtc_refresh_mode(space->machine);
 		break;
 	case 576:  // operation register
 		sys.crtc.operation = data;
