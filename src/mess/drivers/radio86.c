@@ -318,14 +318,14 @@ static UINT8 *radio16_io_mirror = NULL;
 
 static DIRECT_UPDATE_HANDLER( radio16_direct )
 {	
-/*	if (address >= 0x4000 && address <=0x7FFF) {
+	if (address >= 0x4000 && address <=0x7FFF) {
 			direct->mask = 0xffff;
-			direct->ram = radio16_io_mirror;
-			direct->rom = radio16_io_mirror;
-			direct->mem_min = 0x4000;
-			direct->mem_max = 0x7fff;
-			radio16_io_mirror[address] = cpu_get_reg(machine->cpu[0], I8080_STATUS);
-	} */
+			direct->raw = radio16_io_mirror;
+			direct->decrypted = radio16_io_mirror;
+			direct->min = 0x4000;
+			direct->max = 0x7fff;
+			radio16_io_mirror[address] = cpu_get_reg(space->machine->cpu[0], I8080_STATUS);
+	} 
 	return address;
 }
 

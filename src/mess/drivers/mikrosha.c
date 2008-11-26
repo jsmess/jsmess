@@ -135,14 +135,14 @@ static UINT8 *mikrosha_io_mirror = NULL;
 
 static DIRECT_UPDATE_HANDLER( mikrosha_direct )
 {		
-/*	if (address >= 0x8000 && address <=0xFFFF) {
-			opbase->mask = 0xffff;
-			opbase->ram = mikrosha_io_mirror;
-			opbase->rom = mikrosha_io_mirror;
-			opbase->mem_min = 0x8000;
-			opbase->mem_max = 0xffff;
-			mikrosha_io_mirror[address] = cpunum_get_reg(0, I8080_STATUS);
-	} */
+	if (address >= 0x8000 && address <=0xFFFF) {
+			direct->mask = 0xffff;
+			direct->raw = mikrosha_io_mirror;
+			direct->decrypted = mikrosha_io_mirror;
+			direct->min = 0x8000;
+			direct->max = 0xffff;
+			mikrosha_io_mirror[address] = cpu_get_reg(space->machine->cpu[0], I8080_STATUS);
+	} 
 	return address;
 }
 
