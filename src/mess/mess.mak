@@ -384,6 +384,7 @@ DRVLIBS = \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/mikro80.a \
 	$(MESSOBJ)/mk2.a \
+	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/p2000.a \
@@ -393,7 +394,7 @@ DRVLIBS = \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
-	$(MESSOBJ)/nintendo.a \
+	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ut88.a \

@@ -20,6 +20,8 @@
 #include "sound/psx.h"
 #include "debugger.h"
 
+// RB: there is no longer an opbase handler so the quickload won't work as designed.
+#if 0
 static struct
 {
 	UINT8 id[ 8 ];
@@ -148,6 +150,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 	memory_set_opbase_handler( 0, psx_setopbase );
 	return INIT_PASS;
 }
+#endif
 
 #define PAD_STATE_IDLE ( 0 )
 #define PAD_STATE_LISTEN ( 1 )
@@ -549,7 +552,7 @@ static READ32_HANDLER( psx_cd_r )
 
 	if( mem_mask == 0xffffff00 )
 	{
-		logerror( "%08x cd0 read\n", activecpu_get_pc() );
+		logerror( "%08x cd0 read\n", cpu_get_pc(space->cpu) );
 
 		if (cd_result_ready && cd_result_c)
 			cd_io_status |= 0x20;
@@ -566,7 +569,7 @@ static READ32_HANDLER( psx_cd_r )
 	}
 	else if( mem_mask == 0xffff00ff )
 	{
-		logerror( "%08x cd1 read\n", activecpu_get_pc() );
+		logerror( "%08x cd1 read\n", cpu_get_pc(space->cpu) );
 
 		if (cd_result_ready && cd_result_c)
 			result = ((UINT32) cd_result[cd_result_p]) << 8;
@@ -580,17 +583,17 @@ static READ32_HANDLER( psx_cd_r )
 	}
 	else if( mem_mask == 0xff00ffff )
 	{
-		logerror( "%08x cd2 read\n", activecpu_get_pc() );
+		logerror( "%08x cd2 read\n", cpu_get_pc(space->cpu) );
 	}
 	else if( mem_mask == 0x00ffffff )
 	{
-		logerror( "%08x cd3 read\n", activecpu_get_pc() );
+		logerror( "%08x cd3 read\n", cpu_get_pc(space->cpu) );
 
 		result = ((UINT32) cd_stat) << 24;
 	}
 	else
 	{
-		logerror( "%08x cd_r( %08x, %08x ) unsupported transfer\n", activecpu_get_pc(), offset, mem_mask );
+		logerror( "%08x cd_r( %08x, %08x ) unsupported transfer\n", cpu_get_pc(space->cpu), offset, mem_mask );
 	}
 	return result;
 }
@@ -603,7 +606,7 @@ static WRITE32_HANDLER( psx_cd_w )
 	{
 		/* write to CD register 0 */
 		data = (data >> 0) & 0xff;
-		logerror( "%08x cd0 write %02x\n", activecpu_get_pc(), data & 0xff );
+		logerror( "%08x cd0 write %02x\n", cpu_get_pc(space->cpu), data & 0xff );
 
 		cd_param_p = 0;
 		if (data == 0x00)
@@ -622,7 +625,7 @@ static WRITE32_HANDLER( psx_cd_w )
 	{
 		/* write to CD register 1 */
 		data = (data >> 8) & 0xff;
-		logerror( "%08x cd1 write %02x\n", activecpu_get_pc(), data );
+		logerror( "%08x cd1 write %02x\n", cpu_get_pc(space->cpu), data );
 
 		if (data <= sizeof(psx_cdcmds) / sizeof(psx_cdcmds[0]))
 			psx_cdcmd = psx_cdcmds[data];
@@ -632,13 +635,13 @@ static WRITE32_HANDLER( psx_cd_w )
 		if (psx_cdcmd)
 			psx_cdcmd();
 
-		psx_irq_set(machine, 0x0004);
+		psx_irq_set(space->machine, 0x0004);
 	}
 	else if( mem_mask == 0xff00ffff )
 	{
 		/* write to CD register 2 */
 		data = (data >> 16) & 0xff;
-		logerror( "%08x cd2 write %02x\n", activecpu_get_pc(), data & 0xff );
+		logerror( "%08x cd2 write %02x\n", cpu_get_pc(space->cpu), data & 0xff );
 
 		if ((cd_reset == 2) && (data == 0x07))
 		{
@@ -666,7 +669,7 @@ static WRITE32_HANDLER( psx_cd_w )
 	{
 		/* write to CD register 3 */
 		data = (data >> 24) & 0xff;
-		logerror( "%08x cd3 write %02x\n", activecpu_get_pc(), data & 0xff );
+		logerror( "%08x cd3 write %02x\n", cpu_get_pc(space->cpu), data & 0xff );
 
 		if ((data == 0x07) && (cd_reset == 1))
 		{
@@ -680,7 +683,7 @@ static WRITE32_HANDLER( psx_cd_w )
 	}
 	else
 	{
-		logerror( "%08x cd_w( %08x, %08x, %08x ) unsupported transfer\n", activecpu_get_pc(), offset, data, mem_mask );
+		logerror( "%08x cd_w( %08x, %08x, %08x ) unsupported transfer\n", cpu_get_pc(space->cpu), offset, data, mem_mask );
 	}
 }
 
@@ -803,7 +806,7 @@ static MACHINE_DRIVER_START( psxntsc )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
+//	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
@@ -836,7 +839,7 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
+//	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
 MACHINE_DRIVER_END
 
 ROM_START( psj )
