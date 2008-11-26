@@ -41,8 +41,8 @@ const game_driver * const drivers[] =
 
 
 	/* 3DO */
-//128u4	DRIVER( 3do )		/* 3DO consoles										*/
-//128u4	DRIVER( 3do_pal )
+	DRIVER( 3do )		/* 3DO consoles										*/
+	DRIVER( 3do_pal )
 
 	/* ATARI */
 //128u4	DRIVER( a2600 )		/* Atari 2600										*/

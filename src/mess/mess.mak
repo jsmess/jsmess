@@ -367,10 +367,10 @@ SOUNDS += SP0256
 
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
+	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/3do.a \
 #	$(MESSOBJ)/acorn.a \
 #	$(MESSOBJ)/advision.a \
 #	$(MESSOBJ)/amiga.a \

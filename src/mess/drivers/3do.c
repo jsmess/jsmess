@@ -125,14 +125,14 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( 3do )
 {
-	memory_set_bankptr(2,memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 2,memory_region(machine, "user1"));
 
 	/* configure overlay */
-	memory_configure_bank(1, 0, 1, dram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, 1, 0, 1, dram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* start with overlay enabled */
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 
 	madam_init();
 	clio_init();
