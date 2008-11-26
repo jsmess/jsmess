@@ -101,6 +101,7 @@ OSC:    12.000MHz
 *******************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
@@ -399,7 +400,7 @@ static VIDEO_UPDATE( jalmah )
 	tilemap_set_scrolly( sc3_tilemap_2, 0, jm_scrollram[7] & 0x1ff);
 	tilemap_set_scrolly( sc3_tilemap_3, 0, jm_scrollram[7] & 0x3ff);
 
-    fillbitmap(bitmap, Machine->pens[0x10f], cliprect);//selectable by a ram address?
+    fillbitmap(bitmap, screen->machine->pens[0x10f], cliprect);//selectable by a ram address?
 
 	for(cur_prin=0;cur_prin<4;cur_prin++)
 	{
@@ -420,7 +421,7 @@ static VIDEO_UPDATE( urashima )
 	tilemap_set_scrolly( sc0_tilemap_0, 0, jm_scrollram[4]);
 	tilemap_set_scrolly( sc3_tilemap_0, 0, jm_scrollram[7]);
 
-	fillbitmap(bitmap, Machine->pens[0x1ff], cliprect);//selectable by a ram address?
+	fillbitmap(bitmap, screen->machine->pens[0x1ff], cliprect);//selectable by a ram address?
 	if(jm_vregs[0] & 1) { tilemap_draw(bitmap,cliprect,sc0_tilemap_0,0,0); }
  	if(jm_vregs[3] & 1) { tilemap_draw(bitmap,cliprect,sc3_tilemap_0,0,0); }
 	return 0;
@@ -634,13 +635,14 @@ static WRITE16_HANDLER( urashima_dma_w )
 	{
 		UINT32 i;
 		for(i=0;i<0x200;i+=2)
-			program_write_word(0x88200+i,program_read_word(0x88400+i));
+			memory_write_word(space,0x88200+i,memory_read_word(space,0x88400+i));
 	}
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
 static void daireika_palette_dma(running_machine *machine,UINT16 val)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT32 index_1,index_2,src_addr,tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
@@ -649,10 +651,10 @@ static void daireika_palette_dma(running_machine *machine,UINT16 val)
 	for(index_1=0;index_1<0x200;index_1+=0x20)
 	{
 		tmp_addr = src_addr;
-		src_addr = program_read_dword(src_addr);
+		src_addr = memory_read_dword(space,src_addr);
 
 		for(index_2=0;index_2<0x20;index_2+=2)
-			program_write_word(0x88000+index_2+index_1,program_read_word(src_addr+index_2));
+			memory_write_word(space,0x88000+index_2+index_1,memory_read_word(space,src_addr+index_2));
 
 		src_addr = tmp_addr + 4;
 	}
@@ -868,24 +870,24 @@ static WRITE16_HANDLER( jalmah_okirom_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(machine, "oki");
+		UINT8 *oki = memory_region(space->machine, "oki");
 		oki_rom = data & 1;
 		/*ZA appears to be related to the banking*/
 		oki_za = (data & 2) ? 1 : 0;
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
-	//popmessage("PC=%06x %02x %02x %02x",activecpu_get_pc(),oki_rom,oki_za,oki_bank);
+	//popmessage("PC=%06x %02x %02x %02x",cpu_get_pc(space->cpu),oki_rom,oki_za,oki_bank);
 }
 
 static WRITE16_HANDLER( jalmah_okibank_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(machine, "oki");
+		UINT8 *oki = memory_region(space->machine, "oki");
 		oki_bank = data & 3;
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
-	//popmessage("PC=%06x %02x %02x %02x",activecpu_get_pc(),oki_rom,oki_za,oki_bank);
+	//popmessage("PC=%06x %02x %02x %02x",cpu_get_pc(space->cpu),oki_rom,oki_za,oki_bank);
 }
 
 static WRITE16_HANDLER( jalmah_flip_screen_w )
@@ -1575,7 +1577,7 @@ static READ16_HANDLER( urashima_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu),res);
 
 	return res;
 }
@@ -1791,7 +1793,7 @@ static READ16_HANDLER( daireika_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu),res);
 
 	return res;
 }
@@ -2067,7 +2069,7 @@ static READ16_HANDLER( mjzoomin_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu),res);
 
 	return res;
 }
@@ -2202,7 +2204,7 @@ static READ16_HANDLER( kakumei_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
+//  popmessage("%04x: mcu_r %02x",cpu_get_pc(space->cpu),res);
 
 	return res;
 }
@@ -2223,52 +2225,52 @@ static READ16_HANDLER( suchipi_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
+//  popmessage("%04x: mcu_r %02x",cpu_get_pc(space->cpu),res);
 
 	return res;
 }
 
 static DRIVER_INIT( urashima )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, urashima_mcu_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80012, 0x80013, 0, 0, urashima_mcu_w );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, urashima_mcu_r );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, urashima_mcu_w );
 
 	mcu_prg = 0x12;
 }
 
 static DRIVER_INIT( daireika )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, daireika_mcu_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80012, 0x80013, 0, 0, daireika_mcu_w );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, daireika_mcu_r );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, daireika_mcu_w );
 
 	mcu_prg = 0x11;
 }
 
 static DRIVER_INIT( mjzoomin )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
 
 	mcu_prg = 0x13;
 }
 
 static DRIVER_INIT( kakumei )
 {
-	memory_install_read16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	mcu_prg = 0x21;
 }
 
 static DRIVER_INIT( kakumei2 )
 {
-	memory_install_read16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	mcu_prg = 0x22;
 }
 
 static DRIVER_INIT( suchipi )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
 	mcu_prg = 0x23;
 }
 

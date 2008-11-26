@@ -137,15 +137,17 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
 
 static WRITE8_DEVICE_HANDLER( sound_w )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	coin_lockout_global_w(~data & 0x08);
 	set_led_status(9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(device->machine,0, (data & 0x20)<< 2);
+	ticket_dispenser_w(space, 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(device->machine,0,data & 0x40);
+	interrupt_enable_w(space, 0, data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
 	dac_data_w(0,((data & 0x80) >> 7) * 255);
@@ -176,52 +178,54 @@ static WRITE8_DEVICE_HANDLER( lamps2_w )
 
 static WRITE8_DEVICE_HANDLER( nmi_w )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	set_led_status(8,data & 0x10);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(device->machine,0,data & 0x40);
+	interrupt_enable_w(space, 0, data & 0x40);
 }
 
 static WRITE8_HANDLER( banksel_1_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x10000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x14000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x14000);
 }
 static WRITE8_HANDLER( banksel_3_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x18000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_4_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1c000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x1c000);
 }
 static WRITE8_HANDLER( banksel_5_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x20000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_1_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x12000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x12000);
 }
 static WRITE8_HANDLER( banksel_2_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x16000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x16000);
 }
 static WRITE8_HANDLER( banksel_3_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1a000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x1a000);
 }
 static WRITE8_HANDLER( banksel_4_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1e000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x1e000);
 }
 static WRITE8_HANDLER( banksel_5_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x22000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x22000);
 }
 
 static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -828,7 +832,7 @@ ROM_END
 
 static DRIVER_INIT( setbank )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x2000);
+	memory_set_bankptr(machine, 1,memory_region(machine, "cpu") + 0x2000);
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

@@ -33,7 +33,7 @@ void debugger_refresh_display(running_machine *machine);
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
+    CPU CORE INLINE FUNCTIONS
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -41,12 +41,29 @@ void debugger_refresh_display(running_machine *machine);
     this once per instruction from CPU cores
 -------------------------------------------------*/
 
-INLINE void debugger_instruction_hook(running_machine *machine, offs_t curpc)
+INLINE void debugger_instruction_hook(const device_config *device, offs_t curpc)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
-		debug_cpu_instruction_hook(machine, curpc);
+	if ((device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
+		debug_cpu_instruction_hook(device, curpc);
 }
 
+
+/*-------------------------------------------------
+    debugger_exception_hook - CPU cores call this
+    anytime an exception is generated
+-------------------------------------------------*/
+
+INLINE void debugger_exception_hook(const device_config *device, int exception)
+{
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_exception_hook(device, exception);
+}
+
+
+
+/***************************************************************************
+    CPU EXECUTION SYSTEM INLINE FUNCTIONS
+***************************************************************************/
 
 /*-------------------------------------------------
     debugger_start_cpu_hook - the CPU execution
@@ -54,10 +71,10 @@ INLINE void debugger_instruction_hook(running_machine *machine, offs_t curpc)
     execution for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_start_cpu_hook(running_machine *machine, int cpunum, attotime endtime)
+INLINE void debugger_start_cpu_hook(const device_config *device, attotime endtime)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_start_hook(machine, cpunum, endtime);
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_start_hook(device, endtime);
 }
 
 
@@ -67,12 +84,30 @@ INLINE void debugger_start_cpu_hook(running_machine *machine, int cpunum, attoti
     for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_stop_cpu_hook(running_machine *machine, int cpunum)
+INLINE void debugger_stop_cpu_hook(const device_config *device)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_stop_hook(machine, cpunum);
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_stop_hook(device);
 }
 
+
+/*-------------------------------------------------
+    debugger_interrupt_hook - the CPU execution
+    system calls this hook when an interrupt is
+    acknowledged
+-------------------------------------------------*/
+
+INLINE void debugger_interrupt_hook(const device_config *device, int irqline)
+{
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_interrupt_hook(device, irqline);
+}
+
+
+
+/***************************************************************************
+    GENERAL INLINE FUNCTIONS
+***************************************************************************/
 
 /*-------------------------------------------------
     debugger_break - stop in the debugger at the
@@ -82,7 +117,7 @@ INLINE void debugger_stop_cpu_hook(running_machine *machine, int cpunum)
 INLINE void debugger_break(running_machine *machine)
 {
 	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_halt_on_next_instruction(machine, cpu_getactivecpu(), "Internal breakpoint\n");
+		debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(machine), "Internal breakpoint\n");
 }
 
 

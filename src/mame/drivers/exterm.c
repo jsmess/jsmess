@@ -117,13 +117,13 @@ static MACHINE_RESET( exterm )
 
 static WRITE16_HANDLER( exterm_host_data_w )
 {
-	tms34010_host_w(1, offset / TOWORD(0x00100000), data);
+	tms34010_host_w(space->machine->cpu[1], offset / TOWORD(0x00100000), data);
 }
 
 
 static READ16_HANDLER( exterm_host_data_r )
 {
-	return tms34010_host_r(1, offset / TOWORD(0x00100000));
+	return tms34010_host_r(space->machine->cpu[1], offset / TOWORD(0x00100000));
 }
 
 
@@ -134,12 +134,12 @@ static READ16_HANDLER( exterm_host_data_r )
  *
  *************************************/
 
-static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT16 mem_mask)
+static UINT16 exterm_trackball_port_r(const address_space *space, int which, UINT16 mem_mask)
 {
 	UINT16 port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = input_port_read(machine, which ? "DIAL1" : "DIAL0");
+	UINT8 trackball_pos = input_port_read(space->machine, which ? "DIAL1" : "DIAL0");
 
 	/* Calculate the change from the last position. */
 	UINT8 trackball_diff = trackball_old[which] - trackball_pos;
@@ -155,7 +155,7 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 	aimpos[which] = (aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = which ? input_port_read(machine, "P2") : input_port_read(machine, "P1");
+	port = which ? input_port_read(space->machine, "P2") : input_port_read(space->machine, "P1");
 
 	return (port & 0xc0ff) | (aimpos[which] << 8);
 }
@@ -163,13 +163,13 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 
 static READ16_HANDLER( exterm_input_port_0_r )
 {
-	return exterm_trackball_port_r(machine, 0, mem_mask);
+	return exterm_trackball_port_r(space, 0, mem_mask);
 }
 
 
 static READ16_HANDLER( exterm_input_port_1_r )
 {
-	return exterm_trackball_port_r(machine, 1, mem_mask);
+	return exterm_trackball_port_r(space, 1, mem_mask);
 }
 
 
@@ -198,7 +198,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(last & 0x2000))
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
 		coin_counter_w(0, data & 0x8000);
@@ -213,8 +213,8 @@ static TIMER_CALLBACK( sound_delayed_w )
 {
 	/* data is latched independently for both sound CPUs */
 	master_sound_latch = slave_sound_latch = param;
-	cpunum_set_input_line(machine, 2, M6502_IRQ_LINE, ASSERT_LINE);
-	cpunum_set_input_line(machine, 3, M6502_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], M6502_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -236,7 +236,7 @@ static TIMER_CALLBACK( master_sound_nmi_callback )
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (sound_control & 0x01)
-		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -244,9 +244,9 @@ static WRITE8_HANDLER( ym2151_data_latch_w )
 {
 	/* bit 7 of the sound control selects which port */
 	if (sound_control & 0x80)
-		ym2151_data_port_0_w(machine, offset, data);
+		ym2151_data_port_0_w(space, offset, data);
 	else
-		ym2151_register_port_0_w(machine, offset, data);
+		ym2151_register_port_0_w(space, offset, data);
 }
 
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 static READ8_HANDLER( sound_master_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpunum_set_input_line(machine, 2, M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], M6502_IRQ_LINE, CLEAR_LINE);
 	return master_sound_latch;
 }
 
@@ -271,7 +271,7 @@ static READ8_HANDLER( sound_master_latch_r )
 static READ8_HANDLER( sound_slave_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpunum_set_input_line(machine, 3, M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[3], M6502_IRQ_LINE, CLEAR_LINE);
 	return slave_sound_latch;
 }
 
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( sound_slave_dac_w )
 static READ8_HANDLER( sound_nmi_to_slave_r )
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 	return 0xff;
 }
 

@@ -34,7 +34,7 @@ static TIMER_CALLBACK( periodic_callback )
 {
 	int scanline = param;
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 
 	scanline += 64;
 
@@ -77,7 +77,7 @@ static READ8_HANDLER( wolfpack_misc_r )
 	if (!wolfpack_collision)
 		val |= 0x10;
 
-	if (video_screen_get_vpos(machine->primary_screen) >= 240)
+	if (video_screen_get_vpos(space->machine->primary_screen) >= 240)
 		val |= 0x80;
 
 	return val;

@@ -20,10 +20,8 @@ MACHINE_RESET( scramble )
 {
 	MACHINE_RESET_CALL(galaxold);
 
-	if (cpu_gettotalcpu() > 1)
-	{
+	if (machine->cpu[1] != NULL)
 		scramble_sh_init();
-	}
 
   security_2B_counter = 0;
 }
@@ -88,7 +86,7 @@ static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(device->machine->activecpu))
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;
@@ -99,7 +97,7 @@ static READ8_DEVICE_HANDLER( scramble_protection_r )
 	case 0x1ca2: return 0x00;  /* I don't think it's checked */
 	case 0x1d7e: return 0xb0;
 	default:
-		logerror("%04x: read protection\n",activecpu_get_pc());
+		logerror("%04x: read protection\n",cpu_get_pc(device->machine->activecpu));
 		return 0;
 	}
 }
@@ -118,65 +116,69 @@ static READ8_HANDLER( mariner_protection_2_r )
 
 READ8_HANDLER( triplep_pip_r )
 {
-	logerror("PC %04x: triplep read port 2\n",activecpu_get_pc());
-	if (activecpu_get_pc() == 0x015a) return 0xff;
-	else if (activecpu_get_pc() == 0x0886) return 0x05;
+	logerror("PC %04x: triplep read port 2\n",cpu_get_pc(space->cpu));
+	if (cpu_get_pc(space->cpu) == 0x015a) return 0xff;
+	else if (cpu_get_pc(space->cpu) == 0x0886) return 0x05;
 	else return 0;
 }
 
 READ8_HANDLER( triplep_pap_r )
 {
-	logerror("PC %04x: triplep read port 3\n",activecpu_get_pc());
-	if (activecpu_get_pc() == 0x015d) return 0x04;
+	logerror("PC %04x: triplep read port 3\n",cpu_get_pc(space->cpu));
+	if (cpu_get_pc(space->cpu) == 0x015d) return 0x04;
 	else return 0;
 }
 
 
 
-static void cavelon_banksw(void)
+static void cavelon_banksw(running_machine *machine)
 {
 	/* any read/write access in the 0x8000-0xffff region causes a bank switch.
        Only the lower 0x2000 is switched but we switch the whole region
        to keep the CPU core happy at the boundaries */
 
 	cavelon_bank = !cavelon_bank;
-	memory_set_bank(1, cavelon_bank);
+	memory_set_bank(machine, 1, cavelon_bank);
 }
 
 static READ8_HANDLER( cavelon_banksw_r )
 {
-	cavelon_banksw();
+	cavelon_banksw(space->machine);
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_r((device_config*)devtag_get_device(machine, PPI8255, "ppi8255_0"), offset - 0x0100);
+		return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_r((device_config*)devtag_get_device(machine, PPI8255, "ppi8255_1"), offset - 0x0200);
+		return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset - 0x0200);
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( cavelon_banksw_w )
 {
-	cavelon_banksw();
+	cavelon_banksw(space->machine);
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset - 0x0100, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset - 0x0200, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset - 0x0200, data);
 }
 
 
 READ8_HANDLER( hunchbks_mirror_r )
 {
-	return program_read_byte(0x1000+offset);
+	return memory_read_byte(space, 0x1000+offset);
 }
 
 WRITE8_HANDLER( hunchbks_mirror_w )
 {
-	program_write_byte(0x1000+offset,data);
+	memory_write_byte(space, 0x1000+offset,data);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_latch_w ) { soundlatch_w(device->machine, offset, data); }
+static WRITE8_DEVICE_HANDLER( sound_latch_w )
+{
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	soundlatch_w(space, offset, data);
+}
 
 const ppi8255_interface scramble_ppi_0_intf =
 {
@@ -238,12 +240,12 @@ DRIVER_INIT( scramble_ppi )
 
 DRIVER_INIT( scobra )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( atlantis )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( scramble )
@@ -253,14 +255,14 @@ DRIVER_INIT( scramble )
 
 DRIVER_INIT( stratgyx )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0, scrambold_background_green_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scrambold_background_blue_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb00a, 0xb00a, 0, 0, scrambold_background_red_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb000, 0, 0, scrambold_background_green_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_blue_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb00a, 0xb00a, 0, 0, scrambold_background_red_w);
 }
 
 DRIVER_INIT( tazmani2 )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( ckongs )
@@ -270,14 +272,14 @@ DRIVER_INIT( ckongs )
 DRIVER_INIT( mariner )
 {
 	/* extra ROM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x5800);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x5800);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
 
 	/* ??? (it's NOT a background enable) */
-	/*memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);*/
+	/*memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, SMH_NOP);*/
 }
 
 DRIVER_INIT( frogger )
@@ -353,15 +355,15 @@ DRIVER_INIT( cavelon )
 	UINT8 *ROM = memory_region(machine, "main");
 
 	/* banked ROM */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_configure_bank(1, 0, 2, &ROM[0x00000], 0x10000);
-	cavelon_banksw();
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x00000], 0x10000);
+	cavelon_banksw(machine);
 
 	/* A15 switches memory banks */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, SMH_NOP);	/* ??? */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3801, 0, 0, SMH_NOP);  /* looks suspicously like
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, SMH_NOP);	/* ??? */
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0, SMH_NOP);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(cavelon_bank);
 }
@@ -370,7 +372,7 @@ DRIVER_INIT( cavelon )
 
 DRIVER_INIT( darkplnt )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb00a, 0xb00a, 0, 0, darkplnt_bullet_color_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb00a, 0xb00a, 0, 0, darkplnt_bullet_color_w);
 }
 
 DRIVER_INIT( mimonkey )
@@ -406,17 +408,17 @@ DRIVER_INIT( mimonkey )
 		ctr++;
 	}
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonsco )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonscr )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6804, 0x6804, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6804, 0x6804, 0, 0, scrambold_background_enable_w);
 }
 
 

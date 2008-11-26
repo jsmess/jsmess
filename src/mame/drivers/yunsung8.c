@@ -55,11 +55,12 @@ VIDEO_UPDATE( yunsung8 );
 
 static MACHINE_RESET( yunsung8 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, "main") + 0x24000;
 
 	yunsung8_videoram_0 = RAM + 0x0000;	// Ram is banked
 	yunsung8_videoram_1 = RAM + 0x2000;
-	yunsung8_videobank_w(machine,0,0);
+	yunsung8_videobank_w(space,0,0);
 }
 
 
@@ -74,17 +75,17 @@ static MACHINE_RESET( yunsung8 )
 
 static WRITE8_HANDLER( yunsung8_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	int bank				=	data & 7;		// ROM bank
 	yunsung8_layers_ctrl	=	data & 0x30;	// Layers enable
 
-	if (data & ~0x37)	logerror("CPU #0 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x37)	logerror("CPU #0 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(1, RAM);
+	memory_set_bankptr(space->machine, 1, RAM);
 }
 
 /*
@@ -131,15 +132,15 @@ static int adpcm;
 
 static WRITE8_HANDLER( yunsung8_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bank = data & 7;
 
-	if ( bank != (data&(~0x20)) ) 	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( bank != (data&(~0x20)) ) 	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(2, RAM);
+	memory_set_bankptr(space->machine, 2, RAM);
 
 	msm5205_reset_w(0,data & 0x20);
 }
@@ -487,7 +488,7 @@ static void yunsung8_adpcm_int(running_machine *machine, int irq)
 
 	toggle ^= 1;
 	if (toggle)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =

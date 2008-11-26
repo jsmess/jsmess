@@ -36,8 +36,8 @@
 /**   Split fetch and execute cycles.                       **/
 /**                                                         **/
 /*************************************************************/
+
 #include "debugger.h"
-#include "deprecat.h"
 #include "lr35902.h"
 
 #define FLAG_Z	0x80
@@ -65,6 +65,7 @@ typedef struct {
 	int	ei_delay;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 	/* Timer stuff */
 	void	(*timer_fired_func)(int cycles);
 	/* Fetch & execute related */
@@ -120,8 +121,8 @@ static lr35902_regs Regs;
 /* Memory functions                                                         */
 /****************************************************************************/
 
-#define mem_ReadByte(A)		((UINT8)program_read_byte_8le(A))
-#define mem_WriteByte(A,V)	(program_write_byte_8le(A,V))
+#define mem_ReadByte(A)		((UINT8)memory_read_byte_8le(Regs.w.program,A))
+#define mem_WriteByte(A,V)	(memory_write_byte_8le(Regs.w.program,A,V))
 
 INLINE UINT16 mem_ReadWord (UINT32 address)
 {
@@ -181,9 +182,10 @@ static const int CyclesCB[256] =
 
 static CPU_INIT( lr35902 )
 {
-	Regs.w.config = (const lr35902_cpu_core *) config;
+	Regs.w.config = (const lr35902_cpu_core *) device->static_config;
 	Regs.w.irq_callback = irqcallback;
 	Regs.w.device = device;
+	Regs.w.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 /*** Reset lr353902 registers: ******************************/
@@ -309,7 +311,7 @@ static CPU_EXECUTE( lr35902 )
 		} else {
 			/* Fetch and count cycles */
 			lr35902_ProcessInterrupts ();
-			debugger_instruction_hook(Machine, Regs.w.PC);
+			debugger_instruction_hook(device, Regs.w.PC);
 			if ( Regs.w.enable & HALTED ) {
 				CYCLES_PASSED( Cycles[0x76] );
 				Regs.w.execution_state = 1;
@@ -345,7 +347,6 @@ static CPU_SET_CONTEXT( lr35902 )
 {
 	if( src )
 		Regs = *(lr35902_regs *)src;
-	change_pc(Regs.w.PC);
 }
 
 /****************************************************************************/
@@ -401,9 +402,9 @@ static CPU_SET_INFO( lr35902 )
 	case CPUINFO_INT_INPUT_STATE + 4:			lr35902_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i); break;
 
 	case CPUINFO_INT_SP:						Regs.w.SP = info->i;						break;
-	case CPUINFO_INT_PC:						Regs.w.PC = info->i; change_pc(Regs.w.PC);	break;
+	case CPUINFO_INT_PC:						Regs.w.PC = info->i; 						break;
 
-	case CPUINFO_INT_REGISTER + LR35902_PC:		Regs.w.PC = info->i; change_pc(Regs.w.PC);	break;
+	case CPUINFO_INT_REGISTER + LR35902_PC:		Regs.w.PC = info->i; 						break;
 	case CPUINFO_INT_REGISTER + LR35902_SP:		Regs.w.SP = info->i;						break;
 	case CPUINFO_INT_REGISTER + LR35902_AF:		Regs.w.AF = info->i;						break;
 	case CPUINFO_INT_REGISTER + LR35902_BC:		Regs.w.BC = info->i;						break;

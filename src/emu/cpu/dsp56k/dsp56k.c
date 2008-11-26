@@ -209,6 +209,8 @@ typedef struct
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
 	const device_config *device;
+	const address_space *program;
+	const address_space *data;
 } dsp56k_core;
 
 
@@ -249,7 +251,7 @@ static int dsp56k_icount;
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   cpu_readop16(pc)
+#define ROPCODE(pc)   memory_decrypted_read_word(core.program, pc)
 
 
 /***************************************************************************
@@ -395,12 +397,14 @@ static CPU_INIT( dsp56k )
 	core.reset_state = FALSE;
 
 	/* Save the core's state */
-	// state_save_register_item("dsp56k", index, modA_state);
+	// state_save_register_item("dsp56k", device->tag, 0, modA_state);
 	// ...
 
-	//core.config = _config;
+	//core.config = device->static_config;
 	//core.irq_callback = irqcallback;
 	core.device = device;
+	core.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	core.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 }
 
 static void agu_reset(void)
@@ -449,7 +453,7 @@ static CPU_RESET( dsp56k )
 	alu_reset();
 
 	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU put in MAME */
-	program_write_word_16le(0x0000, 0x0124);
+	memory_write_word_16le(core.program, 0x0000, 0x0124);
 }
 
 

@@ -34,7 +34,7 @@ static IRQ_CALLBACK(aztarac_irq_callback)
 
 static MACHINE_RESET( aztarac )
 {
-	cpunum_set_irq_callback(0, aztarac_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], aztarac_irq_callback);
 }
 
 
@@ -60,8 +60,8 @@ static READ16_HANDLER( nvram_r )
 
 static READ16_HANDLER( joystick_r )
 {
-    return (((input_port_read(machine, "STICKZ") - 0xf) << 8) |
-            ((input_port_read(machine, "STICKY") - 0xf) & 0xff));
+    return (((input_port_read(space->machine, "STICKZ") - 0xf) << 8) |
+            ((input_port_read(space->machine, "STICKY") - 0xf) & 0xff));
 }
 
 

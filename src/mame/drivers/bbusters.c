@@ -182,6 +182,18 @@ If you calibrate the guns correctly the game runs as expected:
 2) Using P2 controls fire at the indicated spots.
 3) Using P3 controls fire at the indicated spots.
 
+---
+
+Beast Busters notes (from Brian Hargrove)
+
+1. Stage 2 for example, has background sprites and enemies that float on the
+foreground and not behind the moving elevator layer.
+
+2. Oddly enough, the emulation completely misses the huge zombie that jumps
+out during the attract demo right before the text story text comes in.
+When you hear the the high pitch "zing" sound, there should be a zombie nearly
+the entire size of the screen.
+
 
 ***************************************************************************/
 
@@ -190,8 +202,6 @@ If you calibrate the guns correctly the game runs as expected:
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
 
-#define BBUSTERS_HACK	0
-#define MECHATT_HACK	0
 
 VIDEO_START( bbuster );
 VIDEO_START( mechatt );
@@ -207,41 +217,32 @@ WRITE16_HANDLER( bbuster_video_w );
 
 /******************************************************************************/
 
-#if BBUSTERS_HACK
-static MACHINE_RESET( bbusters )
-{
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
-	int data = input_port_read(machine, "FAKE1") & 0x03;
 
-	/* Country/Version :
-         - 0x0000 : Japan?
-           - 0x0004 : US?
-           - 0x0008 : World?    (default)
-           - 0x000c : World?    (same as 0x0008)
-    */
+/* Beast Busters Region code works as follows
 
-	RAM[0x003954/2] = data * 4;
+ROM[0x003954/2] = data * 4;
 
-//  memset (eprom_data, 0xff, 0x80);    // Force EEPROM reset
-}
-#endif
+Country/Version :
 
-#if MECHATT_HACK
-static MACHINE_RESET( mechatt )
-{
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
-	int data = input_port_read(machine, "FAKE1") & 0x03;
+ - 0x0000 : Japan?
+ - 0x0004 : US?
+ - 0x0008 : World?    (default)
+ - 0x000c : World?    (same as 0x0008)
 
-	/* Country :
-         - 0x0000 : Japan
-           - 0x1111 : World (default)
-           - 0x2222 : US
-           - 0x3333 : Asia?
-    */
+*/
 
-	RAM[0x06a000/2] = (data << 12) | (data << 8) | (data << 4) | (data << 0);
-}
-#endif
+/* Mech Attack Region code works as follows
+
+ROM[0x06a000/2] = (data << 12) | (data << 8) | (data << 4) | (data << 0);
+
+Country :
+- 0x0000 : Japan
+- 0x1111 : World (default)
+- 0x2222 : US
+- 0x3333 : Asia?
+
+*/
+
 
 /******************************************************************************/
 
@@ -261,8 +262,8 @@ static WRITE16_HANDLER( sound_cpu_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, 0, data&0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, 0, data&0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -278,33 +279,36 @@ static READ16_HANDLER( control_3_r )
 {
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
-	return input_port_read(machine, port[gun_select]);
+	UINT16 retdata =  input_port_read(space->machine, port[gun_select]);
+
+	retdata >>=1; // by lowering the precision of the gun reading hardware the game seems to work better
+
+	return retdata;
 }
 
 static WRITE16_HANDLER( gun_select_w )
 {
-	logerror("%08x: gun r\n",activecpu_get_pc());
+	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
+
+	cpu_set_input_line(space->cpu, 2, HOLD_LINE);
+
 
 	gun_select = data & 0xff;
 }
 
 static READ16_HANDLER( kludge_r )
 {
-	bbuster_ram[0xa692/2] = input_port_read(machine, "GUNX1")<<1;
-	bbuster_ram[0xa694/2] = input_port_read(machine, "GUNY1")<<1;
-	bbuster_ram[0xa696/2] = input_port_read(machine, "GUNX2")<<1;
-	bbuster_ram[0xa698/2] = input_port_read(machine, "GUNY2")<<1;
-	bbuster_ram[0xa69a/2] = input_port_read(machine, "GUNX3")<<1;
-	bbuster_ram[0xa69c/2] = input_port_read(machine, "GUNY3")<<1;
-	return 0;
+	// might latch the gun value?
+	return 0x0000;
+
 }
 
 static READ16_HANDLER( mechatt_gun_r )
 {
 	int x, y;
 
-	x = input_port_read(machine, offset ? "GUNX2" : "GUNX1");
-	y = input_port_read(machine, offset ? "GUNY2" : "GUNY1");
+	x = input_port_read(space->machine, offset ? "GUNX2" : "GUNX1");
+	y = input_port_read(space->machine, offset ? "GUNY2" : "GUNY1");
 
 	/* Todo - does the hardware really clamp like this? */
 	x += 0x18;
@@ -488,15 +492,6 @@ static INPUT_PORTS_START( bbusters )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
 	PORT_START("GUNY3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
-
-#if BBUSTERS_HACK
-	PORT_START("FAKE1")
-	PORT_DIPNAME( 0x03, 0x02, "Country/Version" )
-	PORT_DIPSETTING(    0x00, "Japan?" )
-	PORT_DIPSETTING(    0x01, "US?" )
-	PORT_DIPSETTING(    0x02, "World?" )
-//  PORT_DIPSETTING(    0x03, "World?" )            // Same as "0008" - impossible choice ?
-#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mechatt )
@@ -564,15 +559,6 @@ static INPUT_PORTS_START( mechatt )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	PORT_START("GUNY2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-#if MECHATT_HACK
-	PORT_START("FAKE1")
-	PORT_DIPNAME( 0x03, 0x01, "Country" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( World ) )
-	PORT_DIPSETTING(    0x02, "US" )
-	PORT_DIPSETTING(    0x03, "Asia?" )
-#endif
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -641,7 +627,7 @@ GFXDECODE_END
 
 static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -661,6 +647,27 @@ static const ym2610_interface ym2610_config =
 
 /******************************************************************************/
 
+// default eeprom with reasonable calibration for MAME
+unsigned char bbusters_default_eeprom[128] = {
+	                                    /*y*/                   /*y*/
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00, 0x00, 0x00, 0xEE, 0x00,
+	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
+	                                    /*y*/                   /*y*/
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00,	0x00, 0x00, 0xEE, 0x00,
+	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
+	                                    /*y*/                   /*y*/
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00,	0x00, 0x00, 0xEE, 0x00,
+	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
+
+
+	0x42, 0x00, 0x45, 0x00, 0x41, 0x00, 0x53, 0x00,	0x54, 0x00, 0x20, 0x00,
+	0x42, 0x00, 0x55, 0x00, 0x53, 0x00, 0x54, 0x00, 0x45, 0x00, 0x52, 0x00,
+	0x53, 0x00, 0x20, 0x00, 0x54, 0x00, 0x4D, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+};
+
+
 static NVRAM_HANDLER( bbusters )
 {
 	if( read_or_write ) {
@@ -670,27 +677,22 @@ static NVRAM_HANDLER( bbusters )
 		if (file)
 			mame_fread (file, eprom_data, 0x80);
 		else
-			memset (eprom_data, 0xff, 0x80);
+			memcpy(eprom_data, bbusters_default_eeprom, 0x80);
 	}
-}
-
-static INTERRUPT_GEN( bbuster )
-{
-	if (cpu_getiloops()==0)
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE); /* VBL */
-	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE); /* at least 6 interrupts per frame to read gun controls */
 }
 
 static VIDEO_EOF( bbuster )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
-	buffer_spriteram16_2_w(machine,0,0,0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram16_w(space,0,0,0xffff);
+	buffer_spriteram16_2_w(space,0,0,0xffff);
 }
 
 static VIDEO_EOF( mechatt )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
 static MACHINE_DRIVER_START( bbusters )
@@ -698,15 +700,11 @@ static MACHINE_DRIVER_START( bbusters )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bbuster_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(bbuster,4)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80,4000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
-
-#if BBUSTERS_HACK
-	MDRV_MACHINE_RESET(bbusters)
-#endif
 
 	MDRV_NVRAM_HANDLER(bbusters)
 
@@ -730,8 +728,8 @@ static MACHINE_DRIVER_START( bbusters )
 
 	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "left",  3.0)
-	MDRV_SOUND_ROUTE(0, "right", 3.0)
+	MDRV_SOUND_ROUTE(0, "left",  1.0)
+	MDRV_SOUND_ROUTE(0, "right", 1.0)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
@@ -746,10 +744,6 @@ static MACHINE_DRIVER_START( mechatt )
 	MDRV_CPU_ADD("audio", Z80,4000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sounda_portmap,0)
-
-#if MECHATT_HACK
-	MDRV_MACHINE_RESET(mechatt)
-#endif
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -811,10 +805,11 @@ ROM_START( bbusters )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "user1", 0 ) /* Zoom table */
+	/* same rom exists in 4 different locations on the board */
 	ROM_LOAD( "bb-6.e7",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
-	/* This rom also as bb-7.h7 */
-	/* This rom also as bb-8.a14 */
-	/* This rom also as bb-9.c14 */
+	ROM_LOAD( "bb-7.h7",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
 	ROM_REGION( 0x80000, "ym", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
@@ -822,6 +817,52 @@ ROM_START( bbusters )
 	ROM_REGION( 0x80000, "ym.deltat", 0 )
 	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
+
+ROM_START( bbusteru )
+	ROM_REGION( 0x80000, "main", 0 )
+	ROM_LOAD16_BYTE( "bbv2-3.k10",   0x000000, 0x20000, CRC(6930088b) SHA1(265f0b584d81b6fdcda5c3a2e0bd15d56443bb35) )
+	ROM_LOAD16_BYTE( "bbv2-5.k12",   0x000001, 0x20000, CRC(cfdb2c6c) SHA1(54a837dc84b74d12e931f607f3dc9ee06a7e4d31) )
+	ROM_LOAD16_BYTE( "bb-2.k8",    0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
+	ROM_LOAD16_BYTE( "bb-4.k11",   0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
+
+	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_LOAD( "bb-1.e6",     0x000000, 0x10000, CRC(4360f2ee) SHA1(4c6b212f59389bdf4388893d2030493b110ac087) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "bb-10.l9",    0x000000, 0x20000, CRC(490c0d9b) SHA1(567c25a6d96407259c64061d674305e4117d9fa4) )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "bb-f11.m16",  0x000000, 0x80000, CRC(39fdf9c0) SHA1(80392947e3a1831c3ee80139f6f3bdc3bafa4f0d) )
+	ROM_LOAD( "bb-f12.m13",  0x080000, 0x80000, CRC(69ee046b) SHA1(5c0435f1ce76b584fa8d154d7617d73c7ab5f62f) )
+	ROM_LOAD( "bb-f13.m12",  0x100000, 0x80000, CRC(f5ef840e) SHA1(dd0f630c52076e0d330f47931e68a3ae9a401078) )
+	ROM_LOAD( "bb-f14.m11",  0x180000, 0x80000, CRC(1a7df3bb) SHA1(1f27a528e6f89fe56a7342c4f1ff733da0a09327) )
+
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD( "bb-f21.l10",  0x000000, 0x80000, CRC(530f595b) SHA1(820898693b878c4423de9c244f943d39ea69515e) )
+	ROM_LOAD( "bb-f22.l12",  0x080000, 0x80000, CRC(889c562e) SHA1(d19172d6515ab9793c98de75d6e41687e61a408d) )
+	ROM_LOAD( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
+	ROM_LOAD( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
+
+	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )
+	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
+
+	ROM_REGION( 0x80000, "gfx5", ROMREGION_DISPOSE )
+	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) /* Zoom table */
+	/* same rom exists in 4 different locations on the board */
+	ROM_LOAD( "bb-6.e7",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-7.h7",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+
+	ROM_REGION( 0x80000, "ym", 0 )
+	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
+
+	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
+ROM_END
+
 
 ROM_START( mechatt )
 	ROM_REGION( 0x80000, "main", 0 )
@@ -856,7 +897,7 @@ ROM_START( mechatt )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* Zoom table */
 	ROM_LOAD( "ma8.bin",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
-	/* ma9 is identical to ma8 */
+	ROM_LOAD( "ma9.bin",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) /* identical to ma8 */
 ROM_END
 
 
@@ -893,50 +934,15 @@ ROM_START( mechattu )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* Zoom table */
 	ROM_LOAD( "ma8.bin",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
-	/* ma9 is identical to ma8 */
+	ROM_LOAD( "ma9.bin",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) /* identical to ma8 */
 ROM_END
 
 
-#if 0
-static void bbusters_patch_code(UINT16 offset)
-{
-	/* To avoid checksum error */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
-	RAM[(offset +  0)/2] = 0x4e71;
-	RAM[(offset +  2)/2] = 0x4e71;
-	RAM[(offset + 10)/2] = 0x4e71;
-	RAM[(offset + 12)/2] = 0x4e71;
-	RAM[(offset + 20)/2] = 0x4e71;
-	RAM[(offset + 22)/2] = 0x4e71;
-	RAM[(offset + 30)/2] = 0x4e71;
-	RAM[(offset + 32)/2] = 0x4e71;
-}
-#endif
-
-static DRIVER_INIT( bbusters )
-{
-	#if BBUSTERS_HACK
-	bbusters_patch_code(0x00234c);
-	#endif
-}
-
-static DRIVER_INIT( mechatt )
-{
-	#if MECHATT_HACK
-	bbusters_patch_code(0x003306);
-	#endif
-}
-
 /******************************************************************************/
 
-#if !MECHATT_HACK
-GAME( 1989, bbusters, 0, bbusters, bbusters, bbusters, ROT0,  "SNK", "Beast Busters (World ?)", 0 )
-#else
-GAME( 1989, bbusters, 0, bbusters, bbusters, bbusters, ROT0,  "SNK", "Beast Busters", 0 )
-#endif
-#if !MECHATT_HACK
-GAME( 1989, mechatt,  0, mechatt,  mechatt,  mechatt,  ROT0,  "SNK", "Mechanized Attack (World)", 0 )
-#else
-GAME( 1989, mechatt,  0, mechatt,  mechatt,  mechatt,  ROT0,  "SNK", "Mechanized Attack", 0 )
-#endif
-GAME( 1989, mechattu, mechatt, mechatt,  mechatt,  mechatt,  ROT0,  "SNK", "Mechanized Attack (US)", 0 )
+// as soon as you calibrate the guns in test mode the game refuses to boot
+GAME( 1989, bbusters, 0,        bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, bbusteru, bbusters, bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+GAME( 1989, mechatt,  0,        mechatt,  mechatt,  0, ROT0,  "SNK", "Mechanized Attack (World)", 0 )
+GAME( 1989, mechattu, mechatt,  mechatt,  mechatt,  0, ROT0,  "SNK", "Mechanized Attack (US)", 0 )

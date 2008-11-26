@@ -454,7 +454,7 @@ static WRITE32_HANDLER( rabbit_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine,offset^0xff,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset^0xff,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( rabbit_tilemap0_r )
@@ -479,7 +479,7 @@ static READ32_HANDLER( rabbit_tilemap3_r )
 
 static READ32_HANDLER( randomrabbits )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( rabbit_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -502,13 +502,13 @@ ADDRESS_MAP_END
 /* rom bank is used when testing roms, not currently hooked up */
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
-	UINT8 *dataroms = memory_region(machine, "gfx1");
+	UINT8 *dataroms = memory_region(space->machine, "gfx1");
 	int bank;
 //  mame_printf_debug("rabbit rombank %08x\n",data&0x3ff);
 	bank = data & 0x3ff;
 
-//  memory_set_bankptr(1,&dataroms[0x40000*(bank&0x3ff)]);
-	memory_set_bankptr(1,&dataroms[0]);
+//  memory_set_bankptr(space->machine, 1,&dataroms[0x40000*(bank&0x3ff)]);
+	memory_set_bankptr(space->machine, 1,&dataroms[0]);
 }
 
 /*
@@ -592,7 +592,7 @@ if (VERBOSE_AUDIO_LOG)
 
 static TIMER_CALLBACK( rabbit_blit_done )
 {
-	cpunum_set_input_line(machine, 0, rabbit_bltirqlevel, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], rabbit_bltirqlevel, HOLD_LINE);
 }
 
 static void rabbit_do_blit(running_machine *machine)
@@ -696,7 +696,7 @@ static WRITE32_HANDLER( rabbit_blitter_w )
 
 	if (offset == 0x0c/4)
 	{
-		rabbit_do_blit(machine);
+		rabbit_do_blit(space->machine);
 	}
 }
 
@@ -774,7 +774,7 @@ static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
 }
 
 
@@ -1031,7 +1031,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 {
 	int intlevel = 0;
 
-	int line = 262 - cpu_getiloops();
+	int line = 262 - cpu_getiloops(device);
 
 	if(line==262)
 	{
@@ -1042,7 +1042,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 		return;
 	}
 
-	cpunum_set_input_line(machine, 0, intlevel, HOLD_LINE);
+	cpu_set_input_line(device, intlevel, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( rabbit )
@@ -1165,12 +1165,12 @@ static INTERRUPT_GEN( tmmjprd_interrupt )
 {
 	int intlevel = 0;
 
-	if (cpu_getiloops()==0)
+	if (cpu_getiloops(device)==0)
 		intlevel = 5;
 	else
 		intlevel = 3;
 
-	cpunum_set_input_line(machine, 0, intlevel, HOLD_LINE);
+	cpu_set_input_line(device, intlevel, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( tmmjprd )

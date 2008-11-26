@@ -50,7 +50,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 	switch (offset)
 	{
 		case 0x00/2: // watchdog
-			return watchdog_reset_r(machine,0);
+			return watchdog_reset_r(space,0);
 
 		case 0x02/2: // unknown (yet!), used by *MANY* games !!!
 			//popmessage("unknown collision reg");
@@ -86,10 +86,10 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 			return (((UINT32)hit.mult_a * (UINT32)hit.mult_b) & 0xffff);
 
 		case 0x14/2:
-			return (mame_rand(machine) & 0xffff);
+			return (mame_rand(space->machine) & 0xffff);
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 
 	return 0;
@@ -112,7 +112,7 @@ WRITE16_HANDLER(galpanib_calc_w)
 		case 0x12/2: hit.mult_b = data; break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 }
 
@@ -136,7 +136,7 @@ WRITE16_HANDLER(bloodwar_calc_w)
 		case 0x38/2: break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 }
 
@@ -217,7 +217,7 @@ READ16_HANDLER(bloodwar_calc_r)
 			return data;
 
 		case 0x14/2:
-			return (mame_rand(machine) & 0xffff);
+			return (mame_rand(space->machine) & 0xffff);
 
 		case 0x20/2: return hit.x1p;
 		case 0x22/2: return hit.x1s;
@@ -230,7 +230,7 @@ READ16_HANDLER(bloodwar_calc_r)
 		case 0x32/2: return hit.y2s;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 
 	return 0;
@@ -283,14 +283,15 @@ void calc3_mcu_init(void)
 WRITE16_HANDLER( calc3_mcu_ram_w )
 {
 	COMBINE_DATA(&kaneko16_mcu_ram[offset]);
-	calc3_mcu_run(machine);
+	calc3_mcu_run(space->machine);
 }
 
 #define CALC3_MCU_COM_W(_n_)				\
 WRITE16_HANDLER( calc3_mcu_com##_n_##_w )	\
 {											\
+	logerror("calc3w %d %04x %04x\n",_n_, data,mem_mask); \
 	calc3_mcu_status |= (1 << _n_);			\
-	calc3_mcu_run(machine);					\
+	calc3_mcu_run(space->machine);					\
 }
 
 CALC3_MCU_COM_W(0)
@@ -322,20 +323,100 @@ static void calc3_mcu_run(running_machine *machine)
 	if (mcu_command == 0) return;
 
 	logerror("CPU #0 PC %06X : MCU executed command at %04X: %04X\n",
-	 	activecpu_get_pc(),calc3_mcu_command_offset*2,mcu_command);
+	 	cpu_get_pc(machine->activecpu),calc3_mcu_command_offset*2,mcu_command);
 
 	switch (mcu_command)
 	{
 
 		case 0x00ff:
 		{
+				static UINT16 shogwarr_snip_[] = {
+		 	0x48E7,0xFFFE,				// movem.l D0-D7/A0-A6, -(A7)
+
+			0x3039,0x00A8,0x0000,		// move.w  $a80000.l, D0
+			0x4279,0x0020,0xFFFE,		// clr.w   $20fffe.l
+
+			0x41F9,0x0020,0x0000,		// lea     $200000.l, A0
+			0x7000,						// moveq   #$0, D0
+
+			0x43E8,0x01C6,				// lea     ($1c6,A0), A1
+			0x7E02,						// moveq   #$2, D7
+			0xD059,						// add.w   (A1)+, D0
+			0x51CF,0xFFFC,				// dbra    D7, 207ffe
+
+			0x43E9,0x0002,				// lea     ($2,A1), A1
+			0x7E04,						// moveq   #$4, D7
+			0xD059,						// add.w   (A1)+, D0
+			0x51CF,0xFFFC,				// dbra    D7, 20800a
+
+			0x4640,						// not.w   D0
+			0x5340,						// subq.w  #1, D0
+			0x0068,0x0030,0x0216,		// ori.w   #$30, ($216,A0)
+
+			0xB07A,0x009A,				// cmp.w   ($9a,PC), D0; ($2080b6)
+			0x670A,						// beq     20802a
+
+			0x0268,0x000F,0x0216,		// andi.w  #$f, ($216,A0)
+			0x4268,0x0218,				// clr.w   ($218,A0)
+
+			0x5468,0x0216,				// addq.w  #2, ($216,A0)
+			0x42A8,0x030C,				// clr.l   ($30c,A0)
+			0x117C,0x0020,0x030C,		// move.b  #$20, ($30c,A0)
+
+			0x3E3C,0x0001,				// move.w  #$1, D7
+
+			0x0C68,0x0008,0x0218,		// cmpi.w  #$8, ($218,A0)
+			0x6C00,0x0068,				// bge     2080ac
+
+			0x117C,0x0080,0x0310,		// move.b  #$80, ($310,A0)
+			0x117C,0x0008,0x0311,		// move.b  #$8, ($311,A0)
+			0x317C,0x7800,0x0312,		// move.w  #$7800, ($312,A0)
+			0x5247,						// addq.w  #1, D7
+			0x0C68,0x0040,0x0216,		// cmpi.w  #$40, ($216,A0)
+			0x6D08,						// blt     20806a
+
+			0x5468,0x0218,				// addq.w  #2, ($218,A0)
+			0x6000,0x0044,				// bra     2080ac
+
+			0x117C,0x0041,0x0314,		// move.b  #$41, ($314,A0)
+
+			0x0C39,0x0001,0x0010,0x2E12,// cmpi.b  #$1, $102e12.l
+			0x6606,						// bne     208080
+
+			0x117C,0x0040,0x0314,		// move.b  #$40, ($314,A0)
+
+			0x117C,0x000C,0x0315,		// move.b  #$c, ($315,A0)
+			0x317C,0x7000,0x0316,		// move.w  #$7000, ($316,A0)
+			0x5247,						// addq.w  #1, D7
+
+			0x0839,0x0001,0x0010,0x2E15,// btst    #$1, $102e15.l ; service mode
+			0x6714,						// beq     2080ac
+
+			0x117C,0x0058,0x0318,		// move.b  #$58, ($318,A0)
+			0x117C,0x0006,0x0319,		// move.b  #$6, ($319,A0)
+			0x317C,0x6800,0x031A,		// move.w  #$6800, ($31a,A0)
+			0x5247,						// addq.w  #1, D7
+
+			0x3147,0x030A,				// move.w  D7, ($30a,A0)
+			0x4CDF,0x7FFF,				// movem.l (A7)+, D0-D7/A0-A6
+			0x4E73,						// rte
+			0xC747,
+			};
+
+
 			int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
 			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
 			int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
-			//int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
 			int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
-			//int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
-			//int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+			int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+			UINT32 writeaddress = (param6 << 16) | param7;
+			int i;
+			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
+			param1,param2,param3,param4,param5,param6,param7);
+
+
 
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
@@ -350,90 +431,30 @@ static void calc3_mcu_run(running_machine *machine)
 			kaneko16_mcu_ram[param5 / 2] = 0x8ee4;				// MCU Rom Checksum!
 			// param 6&7 = address.l
 
-/*
+			writeaddress&=0xffff;
 
-First code snippet provided by the MCU:
 
-207FE0: 48E7 FFFE                movem.l D0-D7/A0-A6, -(A7)
+			for(i=0;i<sizeof(shogwarr_snip_) / 2;i++)
+			{
+				kaneko16_mcu_ram[(writeaddress/2)+i] = shogwarr_snip_[i];
+			}
 
-207FE4: 3039 00A8 0000           move.w  $a80000.l, D0
-207FEA: 4279 0020 FFFE           clr.w   $20fffe.l
-
-207FF0: 41F9 0020 0000           lea     $200000.l, A0
-207FF6: 7000                     moveq   #$0, D0
-
-207FF8: 43E8 01C6                lea     ($1c6,A0), A1
-207FFC: 7E02                     moveq   #$2, D7
-207FFE: D059                     add.w   (A1)+, D0
-208000: 51CF FFFC                dbra    D7, 207ffe
-
-208004: 43E9 0002                lea     ($2,A1), A1
-208008: 7E04                     moveq   #$4, D7
-20800A: D059                     add.w   (A1)+, D0
-20800C: 51CF FFFC                dbra    D7, 20800a
-
-208010: 4640                     not.w   D0
-208012: 5340                     subq.w  #1, D0
-208014: 0068 0030 0216           ori.w   #$30, ($216,A0)
-
-20801A: B07A 009A                cmp.w   ($9a,PC), D0; ($2080b6)
-20801E: 670A                     beq     20802a
-
-208020: 0268 000F 0216           andi.w  #$f, ($216,A0)
-208026: 4268 0218                clr.w   ($218,A0)
-
-20802A: 5468 0216                addq.w  #2, ($216,A0)
-20802E: 42A8 030C                clr.l   ($30c,A0)
-208032: 117C 0020 030C           move.b  #$20, ($30c,A0)
-
-208038: 3E3C 0001                move.w  #$1, D7
-
-20803C: 0C68 0008 0218           cmpi.w  #$8, ($218,A0)
-208042: 6C00 0068                bge     2080ac
-
-208046: 117C 0080 0310           move.b  #$80, ($310,A0)
-20804C: 117C 0008 0311           move.b  #$8, ($311,A0)
-208052: 317C 7800 0312           move.w  #$7800, ($312,A0)
-208058: 5247                     addq.w  #1, D7
-20805A: 0C68 0040 0216           cmpi.w  #$40, ($216,A0)
-208060: 6D08                     blt     20806a
-
-208062: 5468 0218                addq.w  #2, ($218,A0)
-208066: 6000 0044                bra     2080ac
-
-20806A: 117C 0041 0314           move.b  #$41, ($314,A0)
-
-208070: 0C39 0001 0010 2E12      cmpi.b  #$1, $102e12.l
-208078: 6606                     bne     208080
-
-20807A: 117C 0040 0314           move.b  #$40, ($314,A0)
-
-208080: 117C 000C 0315           move.b  #$c, ($315,A0)
-208086: 317C 7000 0316           move.w  #$7000, ($316,A0)
-20808C: 5247                     addq.w  #1, D7
-
-20808E: 0839 0001 0010 2E15      btst    #$1, $102e15.l ; service mode
-208096: 6714                     beq     2080ac
-
-208098: 117C 0058 0318           move.b  #$58, ($318,A0)
-20809E: 117C 0006 0319           move.b  #$6, ($319,A0)
-2080A4: 317C 6800 031A           move.w  #$6800, ($31a,A0)
-2080AA: 5247                     addq.w  #1, D7
-
-2080AC: 3147 030A                move.w  D7, ($30a,A0)
-2080B0: 4CDF 7FFF                movem.l (A7)+, D0-D7/A0-A6
-2080B4: 4E73                     rte
-
-2080B6: C747
-*/
 		}
 		break;
 
 
 		case 0x0001:
 		{
-			//int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
+			int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
 			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
+			int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
+			int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
+			int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+
+			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
+			param1,param2,param3,param4,param5,param6,param7);
 
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
@@ -453,13 +474,17 @@ First code snippet provided by the MCU:
 
 		case 0x0002:
 		{
-			//int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
-			//int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
-			//int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
-			//int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
-			//int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
-			//int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
-			//int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+			int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
+			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
+			int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
+			int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
+			int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+
+			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
+			param1,param2,param3,param4,param5,param6,param7);
+
 
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
@@ -541,6 +566,111 @@ probably the MCU model string, so this one should be in internal MCU ROM (anothe
 TODO: look at this one since this remark is only driver-based.
 */
 
+
+static UINT8 toybox_mcu_decryption_table[0x100] = {
+0x7b,0x82,0xf0,0xbc,0x7f,0x1d,0xa2,0xc5,0x2a,0xfa,0x55,0xee,0x1a,0xd0,0x59,0x76,
+0x5e,0x75,0x79,0x16,0xa5,0xf6,0x84,0xed,0x0f,0x2e,0xf2,0x36,0x61,0xac,0xcd,0xab,
+0x01,0x3b,0x01,0x87,0x73,0xab,0xce,0x5d,0xd4,0x1d,0x68,0x2a,0x35,0xea,0x13,0x27,
+0x00,0xaa,0x46,0x36,0x6e,0x65,0x80,0x7e,0x19,0xe2,0x96,0xab,0xac,0xa5,0x6c,0x63,
+0x4a,0x6f,0x87,0xf6,0x6a,0xac,0x38,0xe2,0x1f,0x87,0xf9,0xaa,0xf5,0x41,0x60,0xa6,
+0x42,0xb9,0x30,0xf2,0xc3,0x1c,0x4e,0x4b,0x08,0x10,0x42,0x32,0xbf,0xb2,0xc5,0x0f,
+0x7a,0xab,0x97,0xf6,0xe7,0xb3,0x46,0xf8,0xec,0x2b,0x7d,0x5f,0xb1,0x10,0x03,0xe4,
+0x0f,0x22,0xdf,0x8d,0x10,0x66,0xa7,0x7e,0x96,0xbd,0x5a,0xaf,0xaa,0x43,0xdf,0x10,
+0x7c,0x04,0xe2,0x9d,0x66,0xd7,0xf0,0x02,0x58,0x8a,0x55,0x17,0x16,0xe2,0xe2,0x52,
+0xaf,0xd9,0xf9,0x0d,0x59,0x70,0x86,0x3c,0x05,0xd1,0x52,0xa7,0xf0,0xbf,0x17,0xd0,
+0x23,0x15,0xfe,0x23,0xf2,0x80,0x60,0x6f,0x95,0x89,0x67,0x65,0xc9,0x0e,0xfc,0x16,
+0xd6,0x8a,0x9f,0x25,0x2c,0x0f,0x2d,0xe4,0x51,0xb2,0xa8,0x18,0x3a,0x5d,0x66,0xa0,
+0x9f,0xb0,0x58,0xea,0x78,0x72,0x08,0x6a,0x90,0xb6,0xa4,0xf5,0x08,0x19,0x60,0x4e,
+0x92,0xbd,0xf1,0x05,0x67,0x4f,0x24,0x99,0x69,0x1d,0x0c,0x6d,0xe7,0x74,0x88,0x22,
+0x2d,0x15,0x7a,0xa2,0x37,0xa9,0xa0,0xb0,0x2c,0xfb,0x27,0xe5,0x4f,0xb6,0xcd,0x75,
+0xdc,0x39,0xce,0x6f,0x1f,0xfe,0xcc,0xb5,0xe6,0xda,0xd8,0xee,0x85,0xee,0x2f,0x04,
+};
+
+
+static UINT8 toybox_mcu_decryption_table_alt[0x100] = {
+0x26,0x17,0xb9,0xcf,0x1a,0xf5,0x14,0x1e,0x0c,0x35,0xb3,0x66,0xa0,0x17,0xe9,0xe4,
+0x90,0xf6,0xd5,0x35,0xac,0x95,0x49,0x43,0x64,0x0c,0x03,0x75,0x4d,0xda,0xb6,0xdf,
+0x06,0xcf,0x83,0x9e,0x35,0x2c,0x71,0x2a,0xab,0xcc,0x65,0xd4,0x1f,0xb0,0x88,0x3c,
+0xb7,0x87,0x35,0xc0,0x41,0x65,0x9f,0xa0,0xd5,0x8c,0x3e,0x06,0x53,0xdb,0x45,0x64,
+0x09,0x1e,0xc5,0x8d,0x50,0x24,0xe2,0x4a,0x9b,0x99,0x77,0x25,0x43,0xa9,0x1d,0xac,
+0x99,0x31,0x75,0xb5,0x53,0xab,0xad,0x5a,0x42,0x14,0xa1,0x52,0xac,0xec,0x5f,0xf8,
+0x8c,0x78,0x05,0x47,0xea,0xb8,0xde,0x69,0x98,0x2d,0x8f,0x9d,0xfc,0x05,0xea,0xee,
+0x77,0xbb,0xa9,0x31,0x01,0x00,0xea,0xd8,0x9c,0x43,0xb5,0x2f,0x4e,0xb5,0x1b,0xd2,
+0x01,0x4b,0xc4,0xf8,0x76,0x92,0x59,0x4f,0x20,0x52,0xd9,0x7f,0xa9,0x19,0xe9,0x7c,
+0x8d,0x3b,0xec,0xe0,0x60,0x08,0x2e,0xbd,0x27,0x8b,0xb2,0xfc,0x29,0xd8,0x39,0x8a,
+0x4f,0x2f,0x6b,0x04,0x10,0xbd,0xa1,0x04,0xde,0xc0,0xd5,0x0f,0x04,0x86,0xd6,0xd8,
+0xfd,0xb1,0x3c,0x4c,0xd1,0xc4,0xf1,0x5b,0xf5,0x8b,0xe3,0xc4,0x89,0x3c,0x39,0x86,
+0xd2,0x92,0xc9,0xe5,0x2c,0x4f,0xe2,0x2f,0x2d,0xc5,0x35,0x09,0x94,0x47,0x3c,0x04,
+0x40,0x8b,0x57,0x08,0xf6,0x74,0xe9,0xb8,0x36,0x4d,0xc5,0x26,0x13,0x3d,0x75,0xa0,
+0xa8,0x29,0x09,0x8c,0x87,0xf7,0x13,0xaf,0x4c,0x38,0x0b,0x8a,0x7f,0x2c,0x62,0x27,
+0x47,0xaa,0xda,0x07,0x92,0x8d,0xfd,0x1f,0xee,0x48,0x1a,0x53,0x3b,0x98,0x6a,0x72,
+};
+
+// I use a byteswapped MCU data rom to make the transfers to the 68k side easier
+//  not sure if it's all 100% endian safe
+DRIVER_INIT( decrypt_toybox_rom )
+{
+
+	UINT8 *src = (UINT8 *)memory_region(machine, "mcudata" );
+
+	int i;
+
+	for (i=0;i<0x020000;i++)
+	{
+		src[i] = src[i] + toybox_mcu_decryption_table[(i^1)&0xff];
+	}
+
+	#if 0
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"%s.mcudata", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src, 0x20000, 1, fp);
+			fclose(fp);
+		}
+	}
+	#endif
+}
+
+DRIVER_INIT( decrypt_toybox_rom_alt )
+{
+
+	UINT8 *src = (UINT8 *)memory_region(machine, "mcudata" );
+
+	int i;
+
+	for (i=0;i<0x020000;i++)
+	{
+		src[i] = src[i] + toybox_mcu_decryption_table_alt[(i^1)&0xff];
+	}
+}
+
+void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT16*mcu_ram)
+{
+	UINT8 *src = (UINT8 *)memory_region(machine, "mcudata")+0x10000;
+	UINT8* dst = (UINT8 *)mcu_ram;
+
+	int offs = (mcu_subcmd&0x3f)*8;
+	int x;
+
+	//UINT16 unused = src[offs+0] | (src[offs+1]<<8);
+	UINT16 romstart = src[offs+2] | (src[offs+3]<<8);
+	UINT16 romlength = src[offs+4] | (src[offs+5]<<8);
+	UINT16 ramdest = mcu_ram[0x0012/2];
+	//UINT16 extra = src[offs+6] | (src[offs+7]<<8); // BONK .. important :-(
+
+	//printf("romstart %04x length %04x\n",romstart,romlength);
+
+	for (x=0;x<romlength;x++)
+	{
+		dst[(ramdest+x)] = src[(romstart+x)];
+	}
+}
+
+
 void (*toybox_mcu_run)(running_machine *machine);
 
 static UINT16 toybox_mcu_com[4];
@@ -560,7 +690,7 @@ WRITE16_HANDLER( toybox_mcu_com##_n_##_w )				\
 	if (toybox_mcu_com[3] != 0xFFFF)	return;			\
 														\
 	memset(toybox_mcu_com, 0, 4 * sizeof( UINT16 ) );	\
-	toybox_mcu_run(machine);							\
+	toybox_mcu_run(space->machine);							\
 }
 
 TOYBOX_MCU_COM_W(0)
@@ -573,7 +703,7 @@ TOYBOX_MCU_COM_W(3)
 */
 READ16_HANDLER( toybox_mcu_status_r )
 {
-	logerror("CPU #%d (PC=%06X) : read MCU status\n", cpu_getactivecpu(), activecpu_get_previouspc());
+	logerror("CPU #%d (PC=%06X) : read MCU status\n", cpunum_get_active(), cpu_get_previouspc(space->cpu));
 	return 0; // most games test bit 0 for failure
 }
 
@@ -598,7 +728,7 @@ void bloodwar_mcu_run(running_machine *machine)
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -610,84 +740,28 @@ void bloodwar_mcu_run(running_machine *machine)
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 
-			switch(mcu_data)
-			{
-				// unknown purpose data
-				case 0x01: MCU_RESPONSE(bloodwar_mcu_4_01); break; // Warrior 1
-				case 0x02: MCU_RESPONSE(bloodwar_mcu_4_02); break; // Warrior 2
-				case 0x03: MCU_RESPONSE(bloodwar_mcu_4_03); break; // Warrior 3
-				case 0x04: MCU_RESPONSE(bloodwar_mcu_4_04); break; // Warrior 4
-				case 0x05: MCU_RESPONSE(bloodwar_mcu_4_05); break; // Warrior 5
-				case 0x06: MCU_RESPONSE(bloodwar_mcu_4_06); break; // Warrior 6
-				case 0x07: MCU_RESPONSE(bloodwar_mcu_4_07); break; // Warrior 7
-				case 0x08: MCU_RESPONSE(bloodwar_mcu_4_08); break; // Warrior 8
-				case 0x09: MCU_RESPONSE(bloodwar_mcu_4_09); break; // Warrior 9
+			toxboy_handle_04_subcommand(machine, mcu_data, kaneko16_mcu_ram);
 
-				// palette data
-				case 0x0a: MCU_RESPONSE(bloodwar_mcu_4_0a); break; // Warrior 1 Player 1
-				case 0x0b: MCU_RESPONSE(bloodwar_mcu_4_0b); break; // Warrior 1 Player 2
-				case 0x0c: MCU_RESPONSE(bloodwar_mcu_4_0c); break; // Warrior 5 Player 1
-				case 0x0d: MCU_RESPONSE(bloodwar_mcu_4_0d); break; // Warrior 5 Player 2
-				case 0x0e: MCU_RESPONSE(bloodwar_mcu_4_0e); break; // Warrior 4 Player 2
-				case 0x0f: MCU_RESPONSE(bloodwar_mcu_4_0f); break; // Warrior 4 Player 1
-				case 0x10: MCU_RESPONSE(bloodwar_mcu_4_10); break; // Warrior 6 Player 1
-				case 0x11: MCU_RESPONSE(bloodwar_mcu_4_11); break; // Warrior 6 Player 2
-				case 0x12: MCU_RESPONSE(bloodwar_mcu_4_12); break; // Warrior 9 Player 1
-				case 0x13: MCU_RESPONSE(bloodwar_mcu_4_13); break; // Warrior 9 Player 2
-				case 0x14: MCU_RESPONSE(bloodwar_mcu_4_14); break; // Warrior 7 Player 1
-				case 0x15: MCU_RESPONSE(bloodwar_mcu_4_15); break; // Warrior 7 Player 2
-				case 0x16: MCU_RESPONSE(bloodwar_mcu_4_16); break; // Warrior 8 Player 1
-				case 0x17: MCU_RESPONSE(bloodwar_mcu_4_17); break; // Warrior 8 Player 2
-				case 0x18: MCU_RESPONSE(bloodwar_mcu_4_18); break; // Warrior 2 Player 2
-				case 0x19: MCU_RESPONSE(bloodwar_mcu_4_19); break; // Warrior 2 Player 1
-				case 0x1a: MCU_RESPONSE(bloodwar_mcu_4_1a); break; // Warrior 3 Player 1
-				case 0x1b: MCU_RESPONSE(bloodwar_mcu_4_1b); break; // Warrior 3 Player 2
-
-				// tilemap data
-				case 0x1c: MCU_RESPONSE(bloodwar_mcu_4_1c); break; // Warrior 8
-				case 0x1d: MCU_RESPONSE(bloodwar_mcu_4_1d); break; // Warrior 2
-				case 0x1e: MCU_RESPONSE(bloodwar_mcu_4_1e); break; // Warrior 3
-				case 0x1f: MCU_RESPONSE(bloodwar_mcu_4_1f); break; // Warrior 5
-				case 0x20: MCU_RESPONSE(bloodwar_mcu_4_20); break; // Warrior 4
-				case 0x21: MCU_RESPONSE(bloodwar_mcu_4_21); break; // Warrior 6
-				case 0x22: MCU_RESPONSE(bloodwar_mcu_4_22); break; // Warrior 1
-				case 0x23: MCU_RESPONSE(bloodwar_mcu_4_23); break; // Warrior 9
-				case 0x24: MCU_RESPONSE(bloodwar_mcu_4_24); break; // Warrior 7
-
-				// fighter data: pointers to ROM data
-				case 0x25: MCU_RESPONSE(bloodwar_mcu_4_25); break; // Warrior 1
-				case 0x26: MCU_RESPONSE(bloodwar_mcu_4_26); break; // Warrior 2
-				case 0x27: MCU_RESPONSE(bloodwar_mcu_4_27); break; // Warrior 3
-				case 0x28: MCU_RESPONSE(bloodwar_mcu_4_28); break; // Warrior 4
-				case 0x29: MCU_RESPONSE(bloodwar_mcu_4_29); break; // Warrior 5
-				case 0x2a: MCU_RESPONSE(bloodwar_mcu_4_2a); break; // Warrior 6
-				case 0x2b: MCU_RESPONSE(bloodwar_mcu_4_2b); break; // Warrior 7
-				case 0x2c: MCU_RESPONSE(bloodwar_mcu_4_2c); break; // Warrior 8
-				case 0x2d: MCU_RESPONSE(bloodwar_mcu_4_2d); break; // Warrior 9
-
-				default:
-					logerror(" (UNKNOWN PARAMETER %02X)\n", mcu_data);
-			}
 		}
 		break;
 
 		default:
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -713,7 +787,7 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -725,7 +799,7 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -737,24 +811,25 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fwrite(f, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (restore default NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (restore default NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
+
 
 			switch(mcu_data)
 			{
-				// static, in this order, at boot/reset
+				// static, in this order, at boot/reset - these aren't understood, different params in Mcu data rom, data can't be found
 				case 0x34: MCU_RESPONSE(bonkadv_mcu_4_34); break;
 				case 0x30: MCU_RESPONSE(bonkadv_mcu_4_30); break;
 				case 0x31: MCU_RESPONSE(bonkadv_mcu_4_31); break;
@@ -762,44 +837,16 @@ void bonkadv_mcu_run(running_machine *machine)
 				case 0x33: MCU_RESPONSE(bonkadv_mcu_4_33); break;
 
 				// dynamic, per-level (29), in level order
-				case 0x00: MCU_RESPONSE(bonkadv_mcu_4_00); break;
-				case 0x02: MCU_RESPONSE(bonkadv_mcu_4_02); break;
-				case 0x01: MCU_RESPONSE(bonkadv_mcu_4_01); break;
-				case 0x05: MCU_RESPONSE(bonkadv_mcu_4_05); break;
-				case 0x07: MCU_RESPONSE(bonkadv_mcu_4_07); break;
-				case 0x06: MCU_RESPONSE(bonkadv_mcu_4_06); break;
-				case 0x09: MCU_RESPONSE(bonkadv_mcu_4_09); break;
-				case 0x0D: MCU_RESPONSE(bonkadv_mcu_4_0D); break;
-				case 0x03: MCU_RESPONSE(bonkadv_mcu_4_03); break;
-				case 0x08: MCU_RESPONSE(bonkadv_mcu_4_08); break;
-				case 0x04: MCU_RESPONSE(bonkadv_mcu_4_04); break;
-				case 0x0C: MCU_RESPONSE(bonkadv_mcu_4_0C); break;
-				case 0x0A: MCU_RESPONSE(bonkadv_mcu_4_0A); break;
-				case 0x0B: MCU_RESPONSE(bonkadv_mcu_4_0B); break;
-				case 0x10: MCU_RESPONSE(bonkadv_mcu_4_10); break;
-				case 0x0E: MCU_RESPONSE(bonkadv_mcu_4_0E); break;
-				case 0x13: MCU_RESPONSE(bonkadv_mcu_4_13); break;
-				case 0x0F: MCU_RESPONSE(bonkadv_mcu_4_0F); break;
-				case 0x11: MCU_RESPONSE(bonkadv_mcu_4_11); break;
-				case 0x14: MCU_RESPONSE(bonkadv_mcu_4_14); break;
-				case 0x12: MCU_RESPONSE(bonkadv_mcu_4_12); break;
-				case 0x17: MCU_RESPONSE(bonkadv_mcu_4_17); break;
-				case 0x1A: MCU_RESPONSE(bonkadv_mcu_4_1A); break;
-				case 0x15: MCU_RESPONSE(bonkadv_mcu_4_15); break;
-				case 0x18: MCU_RESPONSE(bonkadv_mcu_4_18); break;
-				case 0x16: MCU_RESPONSE(bonkadv_mcu_4_16); break;
-				case 0x19: MCU_RESPONSE(bonkadv_mcu_4_19); break;
-				case 0x1B: MCU_RESPONSE(bonkadv_mcu_4_1B); break;
-				case 0x1C: MCU_RESPONSE(bonkadv_mcu_4_1C); break;
-
 				default:
-					logerror(" (UNKNOWN PARAMETER %02X)\n", mcu_data);
+					toxboy_handle_04_subcommand(machine, mcu_data, kaneko16_mcu_ram);
+					break;
+
 			}
 		}
 		break;
 
 		default:
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -822,7 +869,7 @@ void gtmr_mcu_run(running_machine *machine)
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
 
-	logerror("CPU #0 PC %06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+	logerror("CPU #0 PC %06X : MCU executed command: %04X %04X %04X\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 
 	switch (mcu_command >> 8)
 	{
@@ -857,31 +904,7 @@ void gtmr_mcu_run(running_machine *machine)
 
 		case 0x04:	// TEST (2 versions)
 		{
-			if (strcmp(machine->gamedrv->name, "gtmr") == 0 ||
-				strcmp(machine->gamedrv->name, "gtmra") == 0)
-			{
-				/* MCU writes the string "MM0525-TOYBOX199" to shared ram */
-				kaneko16_mcu_ram[mcu_offset+0] = 0x4d4d;
-				kaneko16_mcu_ram[mcu_offset+1] = 0x3035;
-				kaneko16_mcu_ram[mcu_offset+2] = 0x3235;
-				kaneko16_mcu_ram[mcu_offset+3] = 0x2d54;
-				kaneko16_mcu_ram[mcu_offset+4] = 0x4f59;
-				kaneko16_mcu_ram[mcu_offset+5] = 0x424f;
-				kaneko16_mcu_ram[mcu_offset+6] = 0x5831;
-				kaneko16_mcu_ram[mcu_offset+7] = 0x3939;
-			}
-			else
-			{
-				/* MCU writes the string "USMM0713-TB1994 " to shared ram */
-				kaneko16_mcu_ram[mcu_offset+0] = 0x5553;
-				kaneko16_mcu_ram[mcu_offset+1] = 0x4d4d;
-				kaneko16_mcu_ram[mcu_offset+2] = 0x3037;
-				kaneko16_mcu_ram[mcu_offset+3] = 0x3133;
-				kaneko16_mcu_ram[mcu_offset+4] = 0x2d54;
-				kaneko16_mcu_ram[mcu_offset+5] = 0x4231;
-				kaneko16_mcu_ram[mcu_offset+6] = 0x3939;
-				kaneko16_mcu_ram[mcu_offset+7] = 0x3420;
-			}
+			toxboy_handle_04_subcommand(machine, mcu_data, kaneko16_mcu_ram);
 		}
 		break;
 	}

@@ -105,7 +105,7 @@ static STATE_POSTLOAD( ym2203_intf_postload )
 }
 
 
-static void *ym2203_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2203 )
 {
 	static const ym2203_interface generic_2203 =
 	{
@@ -124,7 +124,7 @@ static void *ym2203_start(const char *tag, int sndindex, int clock, const void *
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2203, sndindex, clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(SOUND_YM2203, tag, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -135,7 +135,7 @@ static void *ym2203_start(const char *tag, int sndindex, int clock, const void *
 	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
-	info->chip = ym2203_init(info,sndindex,clock,rate,timer_handler,IRQHandler,&psgintf);
+	info->chip = ym2203_init(info,tag,clock,rate,timer_handler,IRQHandler,&psgintf);
 
 	state_save_register_postload(Machine, ym2203_intf_postload, info);
 
@@ -147,14 +147,14 @@ static void *ym2203_start(const char *tag, int sndindex, int clock, const void *
 	return NULL;
 }
 
-static void ym2203_stop(void *token)
+static SND_STOP( ym2203 )
 {
 	struct ym2203_info *info = token;
 	ym2203_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
-static void ym2203_reset(void *token)
+static SND_RESET( ym2203 )
 {
 	struct ym2203_info *info = token;
 	ym2203_reset_chip(info->chip);
@@ -305,17 +305,17 @@ WRITE16_HANDLER( ym2203_write_port_4_lsb_w )
 WRITE8_HANDLER( ym2203_word_0_w )
 {
 	if (offset)
-		ym2203_write_port_0_w(machine,0,data);
+		ym2203_write_port_0_w(space,0,data);
 	else
-		ym2203_control_port_0_w(machine,0,data);
+		ym2203_control_port_0_w(space,0,data);
 }
 
 WRITE8_HANDLER( ym2203_word_1_w )
 {
 	if (offset)
-		ym2203_write_port_1_w(machine,0,data);
+		ym2203_write_port_1_w(space,0,data);
 	else
-		ym2203_control_port_1_w(machine,0,data);
+		ym2203_control_port_1_w(space,0,data);
 }
 
 
@@ -326,7 +326,7 @@ WRITE8_HANDLER( ym2203_word_1_w )
  * Generic get_info
  **************************************************************************/
 
-static void ym2203_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym2203 )
 {
 	switch (state)
 	{
@@ -335,17 +335,17 @@ static void ym2203_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym2203_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2203 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym2203_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2203_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2203_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2203_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2203 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2203 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2203 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2203 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM2203";						break;

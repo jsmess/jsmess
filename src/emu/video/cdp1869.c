@@ -150,9 +150,9 @@ static STATE_POSTLOAD( cdp1869_state_save_postload )
 
 /* CDP1802 X Register */
 
-static UINT16 cdp1802_get_r_x(void)
+static UINT16 cdp1802_get_r_x(running_machine *machine)
 {
-	return activecpu_get_reg(CDP1802_R0 + activecpu_get_reg(CDP1802_X));
+	return cpu_get_reg(machine->activecpu, CDP1802_R0 + cpu_get_reg(machine->activecpu, CDP1802_X));
 }
 
 /* Palette Initialization */
@@ -383,7 +383,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description
@@ -422,7 +422,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description
@@ -479,7 +479,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out6_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description
@@ -509,7 +509,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out7_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description
@@ -779,13 +779,11 @@ static void cdp1869_sound_update(const device_config *device, stream_sample_t **
 static DEVICE_START( cdp1869 )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
-	char unique_tag[30];
 
 	// validate arguments
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	cdp1869->intf = device->static_config;
@@ -813,32 +811,30 @@ static DEVICE_START( cdp1869 )
 	}
 
 	// register for state saving
-
-	state_save_combine_module_and_tag(unique_tag, "CDP1869", device->tag);
 	state_save_register_postload(device->machine, cdp1869_state_save_postload, cdp1869);
 
-	state_save_register_item(unique_tag, 0, cdp1869->dispoff);
-	state_save_register_item(unique_tag, 0, cdp1869->fresvert);
-	state_save_register_item(unique_tag, 0, cdp1869->freshorz);
-	state_save_register_item(unique_tag, 0, cdp1869->cmem);
-	state_save_register_item(unique_tag, 0, cdp1869->dblpage);
-	state_save_register_item(unique_tag, 0, cdp1869->line16);
-	state_save_register_item(unique_tag, 0, cdp1869->line9);
-	state_save_register_item(unique_tag, 0, cdp1869->cfc);
-	state_save_register_item(unique_tag, 0, cdp1869->col);
-	state_save_register_item(unique_tag, 0, cdp1869->bkg);
-	state_save_register_item(unique_tag, 0, cdp1869->pma);
-	state_save_register_item(unique_tag, 0, cdp1869->hma);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->dispoff);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->fresvert);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->freshorz);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->cmem);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->dblpage);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->line16);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->line9);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->cfc);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->col);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->bkg);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->pma);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->hma);
 
-	state_save_register_item(unique_tag, 0, cdp1869->signal);
-	state_save_register_item(unique_tag, 0, cdp1869->incr);
-	state_save_register_item(unique_tag, 0, cdp1869->toneoff);
-	state_save_register_item(unique_tag, 0, cdp1869->wnoff);
-	state_save_register_item(unique_tag, 0, cdp1869->tonediv);
-	state_save_register_item(unique_tag, 0, cdp1869->tonefreq);
-	state_save_register_item(unique_tag, 0, cdp1869->toneamp);
-	state_save_register_item(unique_tag, 0, cdp1869->wnfreq);
-	state_save_register_item(unique_tag, 0, cdp1869->wnamp);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->signal);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->incr);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->toneoff);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->wnoff);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->tonediv);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->tonefreq);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->toneamp);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->wnfreq);
+	state_save_register_item("CDP1869", device->tag, 0, cdp1869->wnamp);
 
 	return DEVICE_START_OK;
 }

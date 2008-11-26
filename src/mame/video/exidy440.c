@@ -137,7 +137,7 @@ WRITE8_HANDLER( exidy440_paletteram_w )
 		word = (local_paletteram[offset] << 8) + local_paletteram[offset + 1];
 
 		/* extract the 5-5-5 RGB colors */
-		palette_set_color_rgb(machine, offset / 2, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
+		palette_set_color_rgb(space->machine, offset / 2, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
 	}
 }
 
@@ -153,7 +153,7 @@ READ8_HANDLER( exidy440_horizontal_pos_r )
 {
 	/* clear the FIRQ on a read here */
 	exidy440_firq_beam = 0;
-	exidy440_update_firq(machine);
+	exidy440_update_firq(space->machine);
 
 	/* according to the schems, this value is only latched on an FIRQ
      * caused by collision or beam */
@@ -169,7 +169,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
      * caused by collision or beam, ORed together with CHRCLK,
      * which probably goes off once per scanline; for now, we just
      * always return the current scanline */
-	result = video_screen_get_vpos(machine->primary_screen);
+	result = video_screen_get_vpos(space->machine->primary_screen);
 	return (result < 255) ? result : 255;
 }
 
@@ -183,7 +183,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
 
 WRITE8_HANDLER( exidy440_spriteram_w )
 {
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 	spriteram[offset] = data;
 }
 
@@ -200,14 +200,14 @@ WRITE8_HANDLER( exidy440_control_w )
 	int oldvis = palettebank_vis;
 
 	/* extract the various bits */
-	exidy440_bank_select(machine, data >> 4);
+	exidy440_bank_select(space->machine, data >> 4);
 	firq_enable = (data >> 3) & 1;
 	firq_select = (data >> 2) & 1;
 	palettebank_io = (data >> 1) & 1;
 	palettebank_vis = data & 1;
 
 	/* update the FIRQ in case we enabled something */
-	exidy440_update_firq(machine);
+	exidy440_update_firq(space->machine);
 
 	/* if we're swapping palettes, change all the colors */
 	if (oldvis != palettebank_vis)
@@ -220,7 +220,7 @@ WRITE8_HANDLER( exidy440_control_w )
 		{
 			/* extract a word and the 5-5-5 RGB components */
 			int word = (local_paletteram[offset] << 8) + local_paletteram[offset + 1];
-			palette_set_color_rgb(machine, i, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
+			palette_set_color_rgb(space->machine, i, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
 		}
 	}
 }
@@ -230,7 +230,7 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 {
 	/* clear the VBLANK FIRQ on a write here */
 	exidy440_firq_vblank = 0;
-	exidy440_update_firq(machine);
+	exidy440_update_firq(space->machine);
 }
 
 
@@ -244,9 +244,9 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 static void exidy440_update_firq(running_machine *machine)
 {
 	if (exidy440_firq_vblank || (firq_enable && exidy440_firq_beam))
-		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 }
 
 
@@ -254,7 +254,7 @@ INTERRUPT_GEN( exidy440_vblank_interrupt )
 {
 	/* set the FIRQ line on a VBLANK */
 	exidy440_firq_vblank = 1;
-	exidy440_update_firq(machine);
+	exidy440_update_firq(device->machine);
 }
 
 

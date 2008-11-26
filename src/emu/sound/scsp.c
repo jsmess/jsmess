@@ -28,6 +28,7 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "deprecat.h"
 #include "scsp.h"
 #include "scspdsp.h"
@@ -226,7 +227,7 @@ struct _SCSP
 	struct _SCSPDSP DSP;
 };
 
-static void dma_scsp(running_machine *machine, struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
+static void dma_scsp(const address_space *space, struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
 #define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
 #define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
 #define scsp_dexe 		scsp_regs[0x16/2] & 0x1000
@@ -696,6 +697,8 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 
 static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -715,7 +718,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(Machine, 0, SCSP->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(space, 0, SCSP->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:
@@ -1150,7 +1153,7 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 	}
 }
 
-static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
+static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 {
 	static UINT16 tmp_dma[3], *scsp_regs;
 
@@ -1173,7 +1176,7 @@ static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 	{
 		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
 		{
-			program_write_word(SCSP->scsp_dmea, program_read_word(0x100000|SCSP->scsp_drga));
+			memory_write_word(space,SCSP->scsp_dmea, memory_read_word(space,0x100000|SCSP->scsp_drga));
 			SCSP->scsp_dmea+=2;
 			SCSP->scsp_drga+=2;
 		}
@@ -1182,7 +1185,7 @@ static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 	{
 		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
 		{
-  			program_write_word(0x100000|SCSP->scsp_drga,program_read_word(SCSP->scsp_dmea));
+  			memory_write_word(space,0x100000|SCSP->scsp_drga,memory_read_word(space,SCSP->scsp_dmea));
 			SCSP->scsp_dmea+=2;
 			SCSP->scsp_drga+=2;
 		}
@@ -1198,7 +1201,7 @@ static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-	cpunum_set_input_line(machine, 2,dma_transfer_end,HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[2],dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1218,7 +1221,7 @@ static void SCSP_Update(void *param, stream_sample_t **inputs, stream_sample_t *
 	SCSP_DoMasterSamples(SCSP, samples);
 }
 
-static void *scsp_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( scsp )
 {
 	const scsp_interface *intf;
 
@@ -1307,7 +1310,7 @@ WRITE16_HANDLER( scsp_0_w )
 		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(machine, SCSP);
+			dma_scsp(space, SCSP);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
@@ -1315,7 +1318,7 @@ WRITE16_HANDLER( scsp_0_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
+				cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;
@@ -1368,7 +1371,7 @@ READ16_HANDLER( scsp_midi_out_r )
  * Generic get_info
  **************************************************************************/
 
-static void scsp_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( scsp )
 {
 	switch (state)
 	{
@@ -1377,15 +1380,15 @@ static void scsp_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void scsp_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( scsp )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = scsp_set_info;			break;
-		case SNDINFO_PTR_START:							info->start = scsp_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( scsp );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( scsp );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

@@ -49,20 +49,20 @@ Notes:
 
 static WRITE8_HANDLER( nbmj8991_soundbank_w )
 {
-	if (!(data & 0x80)) soundlatch_clear_w(machine, 0, 0);
-	memory_set_bank(1, data & 0x03);
+	if (!(data & 0x80)) soundlatch_clear_w(space, 0, 0);
+	memory_set_bank(space->machine, 1, data & 0x03);
 }
 
 static WRITE8_HANDLER( nbmj8991_sound_w )
 {
-	soundlatch_w(machine, 0, data);
+	soundlatch_w(space, 0, data);
 }
 
 static READ8_HANDLER( nbmj8991_sound_r )
 {
 	int data;
 
-	data = soundlatch_r(machine,0);
+	data = soundlatch_r(space,0);
 	return data;
 }
 
@@ -70,8 +70,8 @@ static MACHINE_RESET( nbmj8991 )
 {
 	if (machine->config->cpu[1].type == CPU_Z80)
 	{
-		memory_configure_bank(1, 0, 4, memory_region(machine, "audio") + 0x8000, 0x8000);
-		memory_set_bank(1, 0);
+		memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "audio") + 0x8000, 0x8000);
+		memory_set_bank(machine, 1, 0);
 	}
 	MACHINE_RESET_CALL(nb1413m3);
 }

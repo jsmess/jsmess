@@ -118,7 +118,7 @@ static STATE_POSTLOAD( ym2608_intf_postload )
 }
 
 
-static void *ym2608_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2608 )
 {
 	static const ym2608_interface generic_2608 =
 	{
@@ -141,7 +141,7 @@ static void *ym2608_start(const char *tag, int sndindex, int clock, const void *
 
 	info->intf = intf;
 	/* FIXME: Force to use simgle output */
-	info->psg = ay8910_start_ym(SOUND_YM2608, sndindex, clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(SOUND_YM2608, tag, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -155,7 +155,7 @@ static void *ym2608_start(const char *tag, int sndindex, int clock, const void *
 	pcmsizea = memory_region_length(Machine, tag);
 
 	/* initialize YM2608 */
-	info->chip = ym2608_init(info,sndindex,clock,rate,
+	info->chip = ym2608_init(info,tag,clock,rate,
 		           pcmbufa,pcmsizea,
 		           timer_handler,IRQHandler,&psgintf);
 
@@ -168,14 +168,14 @@ static void *ym2608_start(const char *tag, int sndindex, int clock, const void *
 	return NULL;
 }
 
-static void ym2608_stop(void *token)
+static SND_STOP( ym2608 )
 {
 	struct ym2608_info *info = token;
 	ym2608_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
-static void ym2608_reset(void *token)
+static SND_RESET( ym2608 )
 {
 	struct ym2608_info *info = token;
 	ym2608_reset_chip(info->chip);
@@ -186,14 +186,14 @@ static void ym2608_reset(void *token)
 /************************************************/
 READ8_HANDLER( ym2608_status_port_0_a_r )
 {
-//logerror("PC %04x: 2608 S0A=%02X\n",activecpu_get_pc(),ym2608_read(sndti_token(SOUND_YM2608, 0),0));
+//logerror("PC %04x: 2608 S0A=%02X\n",cpu_get_pc(space->cpu),ym2608_read(sndti_token(SOUND_YM2608, 0),0));
 	struct ym2608_info *info = sndti_token(SOUND_YM2608, 0);
 	return ym2608_read(info->chip,0);
 }
 
 READ8_HANDLER( ym2608_status_port_0_b_r )
 {
-//logerror("PC %04x: 2608 S0B=%02X\n",activecpu_get_pc(),ym2608_read(sndti_token(SOUND_YM2608, 0),2));
+//logerror("PC %04x: 2608 S0B=%02X\n",cpu_get_pc(space->cpu),ym2608_read(sndti_token(SOUND_YM2608, 0),2));
 	struct ym2608_info *info = sndti_token(SOUND_YM2608, 0);
 	return ym2608_read(info->chip,2);
 }
@@ -293,7 +293,7 @@ WRITE8_HANDLER( ym2608_data_port_1_b_w ){
  * Generic get_info
  **************************************************************************/
 
-static void ym2608_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym2608 )
 {
 	switch (state)
 	{
@@ -302,17 +302,17 @@ static void ym2608_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym2608_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2608 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym2608_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2608_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2608_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2608_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2608 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2608 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2608 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2608 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM2608";						break;

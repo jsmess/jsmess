@@ -421,7 +421,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 {
 	nmi_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: nmi_enable = %02x\n",activecpu_get_pc(),data);
+		logerror("PC %06X: nmi_enable = %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 static int irq_enable;
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	irq_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: irq_enable = %02x\n",activecpu_get_pc(),data);
+		logerror("PC %06X: irq_enable = %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 static UINT8 input_select;
@@ -442,9 +442,9 @@ static READ8_HANDLER( input_r )
 {
 	switch (input_select)
 	{
-		case 0x00:	return input_port_read(machine, "PLAYER1");
-		case 0x01:	return input_port_read(machine, "PLAYER2");
-		case 0x02:	return input_port_read(machine, "COINS");
+		case 0x00:	return input_port_read(space->machine, "PLAYER1");
+		case 0x01:	return input_port_read(space->machine, "PLAYER2");
+		case 0x02:	return input_port_read(space->machine, "COINS");
 
 		case 0x03:	return 01;
 
@@ -471,7 +471,7 @@ static READ8_HANDLER( input_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("PC %06X: input %02x read\n",activecpu_get_pc(),input_select);
+			logerror("PC %06X: input %02x read\n",cpu_get_pc(space->cpu),input_select);
 			return 0xff;
 	}
 }
@@ -654,15 +654,15 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( igs_180_interrupt )
 {
-	if (cpu_getiloops() & 1)
+	if (cpu_getiloops(device) & 1)
 	{
 		 if (nmi_enable)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
 		 if (irq_enable)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+			cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 

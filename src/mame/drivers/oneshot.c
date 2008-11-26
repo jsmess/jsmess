@@ -46,7 +46,7 @@ int gun_x_shift;
 
 static READ16_HANDLER( oneshot_in0_word_r )
 {
-	int data = input_port_read(machine, "DSW1");
+	int data = input_port_read(space->machine, "DSW1");
 
 	switch (data & 0x0c)
 	{
@@ -351,7 +351,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

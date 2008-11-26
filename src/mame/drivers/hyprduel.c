@@ -108,7 +108,7 @@ static void update_irq_state(running_machine *machine)
 {
 	int irq = requested_int & ~*hypr_irq_enable;
 
-	cpunum_set_input_line(machine, 0, 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ16_HANDLER( hyprduel_irq_cause_r )
@@ -125,13 +125,13 @@ static WRITE16_HANDLER( hyprduel_irq_cause_w )
 		else
 			requested_int &= ~(data & *hypr_irq_enable);
 
-		update_irq_state(machine);
+		update_irq_state(space->machine);
 	}
 }
 
 static WRITE16_HANDLER( hypr_subcpu_control_w )
 {
-	int pc = activecpu_get_pc();
+	int pc = cpu_get_pc(space->cpu);
 
 	if (data & 0x01)
 	{
@@ -139,24 +139,24 @@ static WRITE16_HANDLER( hypr_subcpu_control_w )
 		{
 			if (pc != 0x95f2)
 			{
-				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 				subcpu_resetline = 1;
 			} else {
-				cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 				subcpu_resetline = -1;
 			}
 		}
 	} else {
 		if (subcpu_resetline == 1 && (data != 0x0c))
 		{
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 			subcpu_resetline = 0;
 			if (pc == 0xbb0 || pc == 0x9d30 || pc == 0xb19c)
-				cpu_spinuntil_time(ATTOTIME_IN_USEC(15000));		/* sync semaphore */
+				cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(15000));		/* sync semaphore */
 		}
 		else if (subcpu_resetline == -1)
 		{
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 			subcpu_resetline = 0;
 		}
 	}
@@ -194,19 +194,19 @@ static WRITE16_HANDLER( hypr_scrollreg_init_w )
 static TIMER_CALLBACK( vblank_end_callback )
 {
 	requested_int &= ~param;
-	cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( hyprduel_interrupt )
 {
-	int line = RASTER_LINES - cpu_getiloops();
+	int line = RASTER_LINES - cpu_getiloops(device);
 
 	if (line == RASTER_LINES)
 	{
 		requested_int |= 0x01;		/* vblank */
 		requested_int |= 0x20;
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
-		cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+		cpu_set_input_line(device, 2, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
 		/* the duration is a guess */
 		timer_set(ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
 		rastersplit = 0;
@@ -215,13 +215,13 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		rastersplit = line + 1;
 	}
 
-	update_irq_state(machine);
+	update_irq_state(device->machine);
 }
 
 static MACHINE_RESET( hyprduel )
 {
 	/* start with cpu2 halted */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	subcpu_resetline = 1;
 }
 
@@ -244,8 +244,8 @@ static READ16_HANDLER( hyprduel_bankedrom_r )
 {
 	const char *region = "gfx1";
 
-	UINT8 *ROM = memory_region( machine, region );
-	size_t  len  = memory_region_length( machine, region );
+	UINT8 *ROM = memory_region( space->machine, region );
+	size_t  len  = memory_region_length( space->machine, region );
 
 	offset = offset * 2 + 0x10000 * (*hyprduel_rombank);
 
@@ -310,15 +310,15 @@ INLINE int blt_read(const UINT8 *ROM, const int offs)
 	return ROM[offs] ^ 0xff;
 }
 
-INLINE void blt_write(running_machine *machine, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
+INLINE void blt_write(const address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
 {
 	switch( tmap )
 	{
-		case 1:	hyprduel_vram_0_w(machine,offs,data,mask);	break;
-		case 2:	hyprduel_vram_1_w(machine,offs,data,mask);	break;
-		case 3:	hyprduel_vram_2_w(machine,offs,data,mask);	break;
+		case 1:	hyprduel_vram_0_w(space,offs,data,mask);	break;
+		case 2:	hyprduel_vram_1_w(space,offs,data,mask);	break;
+		case 3:	hyprduel_vram_2_w(space,offs,data,mask);	break;
 	}
-//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",activecpu_get_pc(),tmap,offs,data,mask);
+//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",cpu_get_pc(machine->activecpu),tmap,offs,data,mask);
 }
 
 
@@ -330,8 +330,8 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 	{
 		const char *region = "gfx1";
 
-		UINT8 *src	=	memory_region(machine, region);
-		size_t  src_len	=	memory_region_length(machine, region);
+		UINT8 *src	=	memory_region(space->machine, region);
+		size_t  src_len	=	memory_region_length(space->machine, region);
 
 		UINT32 tmap		=	(hyprduel_blitter_regs[ 0x00 / 2 ] << 16 ) +
 							 hyprduel_blitter_regs[ 0x02 / 2 ];
@@ -343,7 +343,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 		int shift			=	(dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask		=	(dst_offs & 0x80) ? 0xff00 : 0x00ff;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",activecpu_get_pc(),tmap,src_offs,dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",cpu_get_pc(space->cpu),tmap,src_offs,dst_offs);
 
 		dst_offs >>= 7+1;
 		switch( tmap )
@@ -353,7 +353,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",activecpu_get_pc(),tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",cpu_get_pc(space->cpu),tmap);
 				return;
 		}
 
@@ -363,7 +363,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 			src_offs %= src_len;
 			b1 = blt_read(src,src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",cpu_get_pc(space->cpu),b1,src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -391,7 +391,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2,mask);
+						blt_write(space,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -407,7 +407,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2<<shift,mask);
+						blt_write(space,tmap,dst_offs,b2<<shift,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 						b2++;
 					}
@@ -424,7 +424,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2,mask);
+						blt_write(space,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -447,7 +447,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs-1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",cpu_get_pc(space->cpu),b1,src_offs-1);
 					return;
 			}
 
@@ -704,7 +704,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -817,12 +817,12 @@ static DRIVER_INIT( hyprduel )
 //  ROM[(0x174b9*0x20)+0x1f] |= 0x0e;       /* I */
 //  ROM[(0x174e9*0x20)+0x1f] |= 0x0e;
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x000000, 0x003fff, 0, 0, hypr_sharedram1_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x000000, 0x003fff, 0, 0, hypr_sharedram1_w);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
 
 	requested_int = 0x00;
 	blitter_bit = 2;

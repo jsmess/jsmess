@@ -33,10 +33,10 @@
 struct memory_mapper_chip
 {
 	UINT8	regs[0x20];
-	const char *cpu;
-	const struct segaic16_memory_map_entry *map;
-	void	(*sound_w)(UINT8);
-	UINT8	(*sound_r)(void);
+	const device_config *cpu;
+	const segaic16_memory_map_entry *map;
+	void	(*sound_w)(running_machine *, UINT8);
+	UINT8	(*sound_r)(running_machine *);
 };
 
 
@@ -57,7 +57,7 @@ struct compare_timer_chip
 	UINT16	regs[16];
 	UINT16	counter;
 	UINT8	bit;
-	void	(*sound_w)(UINT8);
+	void	(*sound_w)(running_machine *, UINT8);
 	void	(*timer_ack)(running_machine *);
 };
 
@@ -111,7 +111,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = program_read_word_16be(activecpu_get_pc());
+	result = memory_read_word_16be(space, cpu_get_pc(space->cpu));
 	recurse = 0;
 	return result;
 }
@@ -124,7 +124,7 @@ READ16_HANDLER( segaic16_open_bus_r )
  *
  *************************************/
 
-void segaic16_memory_mapper_init(running_machine *machine, const char *cpu, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void))
+void segaic16_memory_mapper_init(const device_config *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *))
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
@@ -136,7 +136,7 @@ void segaic16_memory_mapper_init(running_machine *machine, const char *cpu, cons
 	chip->sound_r = sound_r_callback;
 
 	/* create the initial regions */
-	segaic16_memory_mapper_reset(machine);
+	segaic16_memory_mapper_reset(cpu->machine);
 }
 
 
@@ -163,18 +163,18 @@ void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_da
 void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
-	offs_t romsize = memory_region_length(machine, chip->cpu);
+	offs_t romsize = chip->cpu->regionbytes;
 	int rgnum;
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
 	{
 		static const offs_t region_size_map[4] = { 0x00ffff, 0x01ffff, 0x07ffff, 0x1fffff };
-		const struct segaic16_memory_map_entry *rgn = &chip->map[rgnum];
+		const segaic16_memory_map_entry *rgn = &chip->map[rgnum];
 		offs_t region_size = region_size_map[chip->regs[rgn->regbase] & 3];
 		offs_t region_base = (chip->regs[rgn->regbase + 1] << 16) & ~region_size;
 		offs_t region_start = region_base + (rgn->regoffs & region_size);
-		read16_machine_func read = rgn->read;
+		read16_space_func read = rgn->read;
 		int banknum = 0;
 
 		/* skip non-ROM regions */
@@ -189,13 +189,13 @@ void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decry
 		if (region_start >= romsize)
 			continue;
 
-		memory_configure_bank_decrypted(banknum, 0, 1, decrypted + region_start, 0);
-		memory_set_bank(banknum, 0);
+		memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted + region_start, 0);
+		memory_set_bank(machine, banknum, 0);
 	}
 }
 
 
-static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
+static void memory_mapper_w(const address_space *space, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
 {
 	UINT8 oldval;
 
@@ -215,21 +215,21 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			/*   03 - maybe controls halt and reset lines together? */
 			if ((oldval ^ chip->regs[offset]) & 3)
 			{
-				cpunum_set_input_line(machine, mame_find_cpu_index(machine, chip->cpu), INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
+				cpu_set_input_line(chip->cpu, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
 				if ((chip->regs[offset] & 3) == 3)
-					fd1094_machine_init();
+					fd1094_machine_init(space->machine->cpu[0]);
 			}
 			break;
 
 		case 0x03:
 			if (chip->sound_w)
-				(*chip->sound_w)(data);
+				(*chip->sound_w)(space->machine, data);
 			break;
 
 		case 0x04:
 			/* controls IRQ lines to 68000, negative logic -- write $B to signal IRQ4 */
 			if ((chip->regs[offset] & 7) != 7)
-				cpunum_set_input_line(machine, mame_find_cpu_index(machine, chip->cpu), (~chip->regs[offset] & 7), HOLD_LINE);
+				cpu_set_input_line(chip->cpu, (~chip->regs[offset] & 7), HOLD_LINE);
 			break;
 
 		case 0x05:
@@ -238,18 +238,20 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			/*   02 - read data into latches 00,01 from 2 * (address in 07,08,09) */
 			if (data == 0x01)
 			{
+				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				cpuintrf_push_context(mame_find_cpu_index(machine, chip->cpu));
-				program_write_word_16be(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
-				cpuintrf_pop_context();
+				cpu_push_context(targetspace->cpu);
+				memory_write_word(targetspace, addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
+				cpu_pop_context();
 			}
 			else if (data == 0x02)
 			{
+				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				cpuintrf_push_context(mame_find_cpu_index(machine, chip->cpu));
-				result = program_read_word_16be(addr);
-				cpuintrf_pop_context();
+				cpu_push_context(targetspace->cpu);
+				result = memory_read_word(targetspace, addr);
+				cpu_pop_context();
 				chip->regs[0x00] = result >> 8;
 				chip->regs[0x01] = result;
 			}
@@ -272,7 +274,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 		case 0x1c:	case 0x1d:
 		case 0x1e:	case 0x1f:
 			if (oldval != data)
-				update_memory_mapping(machine, chip);
+				update_memory_mapping(space->machine, chip);
 			break;
 
 		default:
@@ -309,7 +311,7 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 		case 0x03:
 			/* this returns data that the sound CPU writes */
 			if (chip->sound_r)
-				return (*chip->sound_r)();
+				return (*chip->sound_r)(chip->cpu->machine);
 			return 0xff;
 
 		default:
@@ -327,20 +329,20 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
-	memory_install_readwrite16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(chip->cpu)], ADDRESS_SPACE_PROGRAM), 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
 	{
 		static const offs_t region_size_map[4] = { 0x00ffff, 0x01ffff, 0x07ffff, 0x1fffff };
-		const struct segaic16_memory_map_entry *rgn = &chip->map[rgnum];
+		const segaic16_memory_map_entry *rgn = &chip->map[rgnum];
 		offs_t region_size = region_size_map[chip->regs[rgn->regbase] & 3];
 		offs_t region_base = (chip->regs[rgn->regbase + 1] << 16) & ~region_size;
 		offs_t region_mirror = rgn->mirror & region_size;
 		offs_t region_start = region_base + (rgn->regoffs & region_size);
 		offs_t region_end = region_start + ((rgn->length - 1 < region_size) ? rgn->length - 1 : region_size);
-		write16_machine_func write = rgn->write;
-		read16_machine_func read = rgn->read;
+		write16_space_func write = rgn->write;
+		read16_space_func read = rgn->read;
 		int banknum = 0;
 
 		/* check for mapping to banks */
@@ -352,7 +354,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 		/* ROM areas need extra clamping */
 		if (rgn->romoffset != ~0)
 		{
-			offs_t romsize = memory_region_length(machine, chip->cpu);
+			offs_t romsize = chip->cpu->regionbytes;
 			if (region_start >= romsize)
 				read = NULL;
 			else if (region_start + rgn->length > romsize)
@@ -361,17 +363,17 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 		/* map it */
 		if (read)
-			memory_install_read16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
+			memory_install_read16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, read);
 		if (write)
-			memory_install_write16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
+			memory_install_write16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, write);
 
 		/* set the bank pointer */
 		if (banknum && read)
 		{
 			if (rgn->base)
 			{
-				memory_configure_bank(banknum, 0, 1, *rgn->base, 0);
-				memory_set_bank(banknum, 0);
+				memory_configure_bank(machine, banknum, 0, 1, *rgn->base, 0);
+				memory_set_bank(machine, banknum, 0);
 			}
 			else if (rgn->romoffset != ~0)
 			{
@@ -381,10 +383,10 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 				if (!decrypted)
 					decrypted = fd1089_get_decrypted_base();
 
-				memory_configure_bank(banknum, 0, 1, memory_region(machine, chip->cpu) + region_start, 0);
+				memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
 				if (decrypted)
-					memory_configure_bank_decrypted(banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
-				memory_set_bank(banknum, 0);
+					memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
+				memory_set_bank(machine, banknum, 0);
 			}
 		}
 
@@ -401,20 +403,20 @@ READ8_HANDLER( segaic16_memory_mapper_r )
 
 WRITE8_HANDLER( segaic16_memory_mapper_w )
 {
-	memory_mapper_w(machine, &memory_mapper, offset, data);
+	memory_mapper_w(space, &memory_mapper, offset, data);
 }
 
 
 READ16_HANDLER( segaic16_memory_mapper_lsb_r )
 {
-	return memory_mapper_r(&memory_mapper, offset, segaic16_open_bus_r(machine,0,0xffff));
+	return memory_mapper_r(&memory_mapper, offset, segaic16_open_bus_r(space,0,0xffff));
 }
 
 
 WRITE16_HANDLER( segaic16_memory_mapper_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memory_mapper_w(machine, &memory_mapper, offset, data & 0xff);
+		memory_mapper_w(space, &memory_mapper, offset, data & 0xff);
 }
 
 
@@ -545,12 +547,12 @@ static UINT16 divide_r(int which, offs_t offset, UINT16 mem_mask)
 }
 
 
-static void divide_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void divide_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	int a4 = offset & 8;
 	int a3 = offset & 4;
 
-	if (LOG_DIVIDE) logerror("%06X:divide%d_w(%X) = %04X\n", activecpu_get_pc(), which, offset, data);
+	if (LOG_DIVIDE) logerror("%06X:divide%d_w(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, data);
 
 	/* only 4 effective write registers */
 	offset &= 3;
@@ -570,9 +572,9 @@ static void divide_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 READ16_HANDLER( segaic16_divide_0_r )  { return divide_r(0, offset, mem_mask); }
 READ16_HANDLER( segaic16_divide_1_r )  { return divide_r(1, offset, mem_mask); }
 READ16_HANDLER( segaic16_divide_2_r )  { return divide_r(2, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(1, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(2, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(space, 0, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(space, 1, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(space, 2, offset, data, mem_mask); }
 
 
 
@@ -582,7 +584,7 @@ WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(2, offset, data, mem_mask); }
  *
  *************************************/
 
-void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(running_machine *))
+void segaic16_compare_timer_init(int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *))
 {
 	compare_timer[which].sound_w = sound_write_callback;
 	compare_timer[which].timer_ack = timer_ack_callback;
@@ -645,10 +647,10 @@ static void timer_interrupt_ack(running_machine *machine, int which)
 }
 
 
-static UINT16 compare_timer_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
+static UINT16 compare_timer_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", activecpu_get_pc(), which, offset, compare_timer[which].regs[offset]);
+	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, compare_timer[which].regs[offset]);
 	switch (offset)
 	{
 		case 0x0:	return compare_timer[which].regs[0];
@@ -660,16 +662,16 @@ static UINT16 compare_timer_r(running_machine *machine, int which, offs_t offset
 		case 0x6:	return compare_timer[which].regs[2];
 		case 0x7:	return compare_timer[which].regs[7];
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(machine, which); break;
+		case 0xd:	timer_interrupt_ack(space->machine, which); break;
 	}
 	return 0xffff;
 }
 
 
-static void compare_timer_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void compare_timer_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", activecpu_get_pc(), which, offset, data);
+	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, data);
 	switch (offset)
 	{
 		case 0x0:	COMBINE_DATA(&compare_timer[which].regs[0]); update_compare(which, 0); break;
@@ -680,20 +682,20 @@ static void compare_timer_w(running_machine *machine, int which, offs_t offset, 
 		case 0x8:
 		case 0xc:	COMBINE_DATA(&compare_timer[which].regs[8]); break;
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(machine, which); break;
+		case 0xd:	timer_interrupt_ack(space->machine, which); break;
 		case 0xa:
 		case 0xe:	COMBINE_DATA(&compare_timer[which].regs[10]); break;
 		case 0xb:
 		case 0xf:
 			COMBINE_DATA(&compare_timer[which].regs[11]);
 			if (compare_timer[which].sound_w)
-				(*compare_timer[which].sound_w)(compare_timer[which].regs[11]);
+				(*compare_timer[which].sound_w)(space->machine, compare_timer[which].regs[11]);
 			break;
 	}
 }
 
 
-READ16_HANDLER( segaic16_compare_timer_0_r )  { return compare_timer_r(machine, 0, offset, mem_mask); }
-READ16_HANDLER( segaic16_compare_timer_1_r )  { return compare_timer_r(machine, 1, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_0_w ) { compare_timer_w(machine, 0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_1_w ) { compare_timer_w(machine, 1, offset, data, mem_mask); }
+READ16_HANDLER( segaic16_compare_timer_0_r )  { return compare_timer_r(space, 0, offset, mem_mask); }
+READ16_HANDLER( segaic16_compare_timer_1_r )  { return compare_timer_r(space, 1, offset, mem_mask); }
+WRITE16_HANDLER( segaic16_compare_timer_0_w ) { compare_timer_w(space, 0, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_compare_timer_1_w ) { compare_timer_w(space, 1, offset, data, mem_mask); }

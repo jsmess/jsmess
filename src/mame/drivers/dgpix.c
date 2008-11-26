@@ -60,7 +60,7 @@ static INT32 first_offset;
 
 static READ32_HANDLER( flash_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
 
 	if(offset >= (0x2000000 - flash_roms * 0x400000) / 4)
 	{
@@ -97,7 +97,7 @@ static WRITE32_HANDLER( flash_w )
 		if(data == 0xd0d00000)
 		{
 			// point to game settings
-			UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + offset*4;
+			UINT8 *rom = (UINT8 *)memory_region(space->machine, "user1") + offset*4;
 
 			// erase one block
 			memset(rom, 0xff, 0x10000);
@@ -115,7 +115,7 @@ static WRITE32_HANDLER( flash_w )
 		}
 		else
 		{
-			UINT16 *rom = (UINT16 *)memory_region(machine, "user1");
+			UINT16 *rom = (UINT16 *)memory_region(space->machine, "user1");
 
 			// write game settings
 
@@ -179,8 +179,8 @@ static WRITE32_HANDLER( coin_w )
 static READ32_HANDLER( vblank_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	activecpu_adjust_icount(-100);
-	return input_port_read(machine, "VBLANK");
+	cpu_adjust_icount(space->cpu, -100);
+	return input_port_read(space->machine, "VBLANK");
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -565,7 +565,7 @@ static DRIVER_INIT( xfiles )
 	rom[BYTE4_XOR_BE(0x3aa933)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf0c8b440, 0xf0c8b447, 0, 0, SMH_NOP );
+//  memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c8b440, 0xf0c8b447, 0, 0, SMH_NOP );
 
 	flash_roms = 2;
 }
@@ -585,7 +585,7 @@ static DRIVER_INIT( kdynastg )
 	rom[BYTE4_XOR_BE(0x3a45c9)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x12341234, 0x12341243, 0, 0, SMH_NOP );
+//  memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x12341234, 0x12341243, 0, 0, SMH_NOP );
 
 	flash_roms = 4;
 }

@@ -109,12 +109,12 @@ int q = I.AF.b.h+R; 							\
 #define M_IN													\
 	I.STATUS = 0x42; 											\
 	I.XX.d=ARG();												\
-	I.AF.b.h=io_read_byte_8le(I.XX.d);
+	I.AF.b.h=memory_read_byte_8le(I.io, I.XX.d);
 
 #define M_OUT													\
 	I.STATUS = 0x10; 											\
 	I.XX.d=ARG();												\
-	io_write_byte_8le(I.XX.d,I.AF.b.h)
+	memory_write_byte_8le(I.io, I.XX.d,I.AF.b.h)
 
 #define M_DAD(R) {                                              \
 	int q = I.HL.d + I.R.d; 									\
@@ -126,14 +126,14 @@ int q = I.AF.b.h+R; 							\
 
 #define M_PUSH(R) {                                             \
 	I.STATUS = 0x04; 											\
-	program_write_byte_8le(--I.SP.w.l, I.R.b.h);									\
-	program_write_byte_8le(--I.SP.w.l, I.R.b.l);									\
+	memory_write_byte_8le(I.program, --I.SP.w.l, I.R.b.h);									\
+	memory_write_byte_8le(I.program, --I.SP.w.l, I.R.b.l);									\
 }
 
 #define M_POP(R) {												\
 	I.STATUS = 0x86;											\
-	I.R.b.l = program_read_byte_8le(I.SP.w.l++);									\
-	I.R.b.h = program_read_byte_8le(I.SP.w.l++);									\
+	I.R.b.l = memory_read_byte_8le(I.program, I.SP.w.l++);									\
+	I.R.b.h = memory_read_byte_8le(I.program, I.SP.w.l++);									\
 }
 
 #define M_RET(cc)												\
@@ -142,7 +142,6 @@ int q = I.AF.b.h+R; 							\
 	{															\
 		i8085_ICount -= 6;										\
 		M_POP(PC);												\
-		change_pc(I.PC.d);									\
 	}															\
 }
 
@@ -150,7 +149,6 @@ int q = I.AF.b.h+R; 							\
 #define M_JMP(cc) { 											\
 	if (cc) {													\
 		I.PC.w.l = ARG16(); 									\
-		change_pc(I.PC.d);										\
 	} else {													\
 		I.PC.w.l += 2;											\
 		i8085_ICount += (I.cputype) ? 3 : 0;					\
@@ -166,7 +164,6 @@ int q = I.AF.b.h+R; 							\
 		i8085_ICount -= (I.cputype) ? 7 : 6 ;					\
 		M_PUSH(PC); 											\
 		I.PC.d = a; 											\
-		change_pc(I.PC.d);										\
 	} else {													\
 		I.PC.w.l += 2;											\
 		i8085_ICount += (I.cputype) ? 2 : 0;					\
@@ -176,7 +173,6 @@ int q = I.AF.b.h+R; 							\
 #define M_RST(nn) { 											\
 	M_PUSH(PC); 												\
 	I.PC.d = 8 * nn;											\
-	change_pc(I.PC.d);										\
 }
 
 #define M_DSUB() {												\

@@ -232,9 +232,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -301,11 +301,11 @@ static READ32_HANDLER( jamma_r )
 	switch (offset)
 	{
 	case 0:
-		data = input_port_read(machine, "IN0");
+		data = input_port_read(space->machine, "IN0");
 		break;
 	case 1:
 	{
-		data = input_port_read(machine, "IN1");
+		data = input_port_read(space->machine, "IN1");
 		data |= 0x000000c0;
 
 		if( has_ds2401[ security_cart_number ] )
@@ -341,10 +341,10 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 	case 2:
-		data = input_port_read(machine, "IN2");
+		data = input_port_read(space->machine, "IN2");
 		break;
 	case 3:
-		data = input_port_read(machine, "IN3");
+		data = input_port_read(space->machine, "IN3");
 		break;
 	}
 
@@ -568,7 +568,7 @@ static READ32_HANDLER( atapi_r )
 			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 			atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-			psx_irq_set(machine, 0x400);
+			psx_irq_set(space->machine, 0x400);
 		}
 
 		if( atapi_data_ptr < atapi_data_len )
@@ -585,7 +585,7 @@ static READ32_HANDLER( atapi_r )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					psx_irq_set(machine, 0x400);
+					psx_irq_set(space->machine, 0x400);
 				}
 			}
 		}
@@ -635,7 +635,7 @@ static READ32_HANDLER( atapi_r )
 			break;
 		}
 
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, activecpu_get_pc());
+//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(space->cpu));
 
 		data <<= shift;
 	}
@@ -667,7 +667,7 @@ static WRITE32_HANDLER( atapi_w )
 				SCSIWriteData( inserted_cdrom, atapi_data, atapi_cdata_wait );
 
 				// assert IRQ
-				psx_irq_set(machine, 0x400);
+				psx_irq_set(space->machine, 0x400);
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -740,7 +740,7 @@ static WRITE32_HANDLER( atapi_w )
 				}
 
 				// assert IRQ
-				psx_irq_set(machine, 0x400);
+				psx_irq_set(space->machine, 0x400);
 			}
 			else
 			{
@@ -791,11 +791,11 @@ static WRITE32_HANDLER( atapi_w )
 		}
 
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, activecpu_get_pc());
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, activecpu_get_pc());
+//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(space->cpu));
 
 			switch (data)
 			{
@@ -857,7 +857,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					psx_irq_set(machine, 0x400);
+					psx_irq_set(space->machine, 0x400);
 					break;
 
 				case 0xef:	// SET FEATURES
@@ -866,7 +866,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
 
-					psx_irq_set(machine, 0x400);
+					psx_irq_set(space->machine, 0x400);
 					break;
 
 				default:
@@ -1048,7 +1048,7 @@ static READ32_HANDLER( flash_r )
 
 	if( flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", activecpu_get_pc(), offset, mem_mask, control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, control );
 		data = 0xffffffff;
 	}
 	else
@@ -1084,7 +1084,7 @@ static WRITE32_HANDLER( flash_w )
 
 	if( flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", activecpu_get_pc(), offset, mem_mask, data, control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data, control );
 	}
 	else
 	{
@@ -1129,7 +1129,7 @@ static UINT64 m_p_n_root_start[ 3 ];
 static UINT64 psxcpu_gettotalcycles( void )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpunum_gettotalcycles(0) * 2;
+	return cpu_get_total_cycles(Machine->cpu[0]) * 2;
 }
 
 static int root_divider( int n_counter )
@@ -1506,10 +1506,10 @@ static DRIVER_INIT( konami573 )
 	security_cart_init( machine, 0, "user2", "user9" );
 	security_cart_init( machine, 1, "user8", "user10" );
 
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_count );
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_mode );
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_target );
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_start );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_count );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_mode );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_target );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_start );
 
 	adc083x_init( 0, ADC0834, analogue_inputs_callback );
 	flash_init(machine);
@@ -1569,9 +1569,9 @@ static void update_mode( running_machine *machine )
 
 static INTERRUPT_GEN( sys573_vblank )
 {
-	update_mode(machine);
+	update_mode(device->machine);
 
-	if( strcmp( machine->gamedrv->name, "ddr2ml" ) == 0 )
+	if( strcmp( device->machine->gamedrv->name, "ddr2ml" ) == 0 )
 	{
 		/* patch out security-plate error */
 
@@ -1583,7 +1583,7 @@ static INTERRUPT_GEN( sys573_vblank )
 		}
 	}
 
-	psx_vblank(machine, cpunum);
+	psx_vblank(device);
 }
 
 /*
@@ -1603,8 +1603,8 @@ static READ32_HANDLER( ge765pwbba_r )
 	switch( offset )
 	{
 	case 0x26:
-		uPD4701_y_add( 0, input_port_read_safe(machine,  "uPD4701_y", 0 ) );
-		uPD4701_switches_set( 0, input_port_read_safe(machine,  "uPD4701_switches", 0 ) );
+		uPD4701_y_add( 0, input_port_read_safe(space->machine,  "uPD4701_y", 0 ) );
+		uPD4701_switches_set( 0, input_port_read_safe(space->machine,  "uPD4701_switches", 0 ) );
 
 		uPD4701_cs_w( 0, 0 );
 		uPD4701_xy_w( 0, 1 );
@@ -1676,7 +1676,7 @@ static DRIVER_INIT( ge765pwbba )
 
 	uPD4701_init( 0 );
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
 }
 
 /*
@@ -1787,7 +1787,7 @@ static void gx700pwfbf_init( running_machine *machine, void (*output_callback_fu
 
 	gx700pwfbf_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
 
 	state_save_register_global_array( gx700pwbf_output_data );
 }
@@ -2030,7 +2030,7 @@ static DRIVER_INIT( gtrfrks )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
 }
 
 /* GX894 digital i/o */
@@ -2142,7 +2142,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	}
 
 	verboselog( 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", activecpu_get_pc(), offset, mem_mask, data );
+//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data );
 	return data;
 }
 
@@ -2320,7 +2320,7 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 
 	gx894pwbba_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
 
 	gx894_ram_write_offset = 0;
 	gx894_ram_read_offset = 0;
@@ -2349,7 +2349,7 @@ static DRIVER_INIT( gtrfrkdigital )
 
 	gx894pwbba_init( machine, NULL );
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
 }
 
 /* ddr solo */
@@ -2642,7 +2642,7 @@ static DRIVER_INIT( dmx )
 
 	gx894pwbba_init( machine, dmx_output_callback );
 
-	memory_install_write32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, dmx_io_w );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, dmx_io_w );
 }
 
 /* salary man champ */

@@ -655,6 +655,7 @@ static void continue_read(ide_state *ide)
 
 static void write_buffer_to_dma(ide_state *ide)
 {
+	const address_space *target = cpu_get_address_space(ide->device->machine->cpu[ide->dma_cpu], ADDRESS_SPACE_PROGRAM);
 	int bytesleft = IDE_DISK_SECTOR_SIZE;
 	UINT8 *data = ide->buffer;
 
@@ -674,17 +675,17 @@ static void write_buffer_to_dma(ide_state *ide)
 			}
 
 			/* fetch the address */
-			ide->dma_address = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_address = memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_address |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_address |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_address |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_address &= 0xfffffffe;
 
 			/* fetch the length */
-			ide->dma_bytes_left = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_bytes_left = memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_bytes_left |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_bytes_left |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_bytes_left |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_last_buffer = (ide->dma_bytes_left >> 31) & 1;
 			ide->dma_bytes_left &= 0xfffe;
 			if (ide->dma_bytes_left == 0)
@@ -694,7 +695,7 @@ static void write_buffer_to_dma(ide_state *ide)
 		}
 
 		/* write the next byte */
-		cpunum_write_byte(ide->dma_cpu, ide->dma_address++, *data++);
+		memory_write_byte(target, ide->dma_address++, *data++);
 		ide->dma_bytes_left--;
 	}
 }
@@ -853,6 +854,7 @@ static void continue_write(ide_state *ide)
 
 static void read_buffer_from_dma(ide_state *ide)
 {
+	const address_space *target = cpu_get_address_space(ide->device->machine->cpu[ide->dma_cpu], ADDRESS_SPACE_PROGRAM);
 	int bytesleft = IDE_DISK_SECTOR_SIZE;
 	UINT8 *data = ide->buffer;
 
@@ -872,17 +874,17 @@ static void read_buffer_from_dma(ide_state *ide)
 			}
 
 			/* fetch the address */
-			ide->dma_address = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_address = memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_address |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_address |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_address |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_address &= 0xfffffffe;
 
 			/* fetch the length */
-			ide->dma_bytes_left = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_bytes_left = memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_bytes_left |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_bytes_left |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_bytes_left |= memory_read_byte(target, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_last_buffer = (ide->dma_bytes_left >> 31) & 1;
 			ide->dma_bytes_left &= 0xfffe;
 			if (ide->dma_bytes_left == 0)
@@ -892,7 +894,7 @@ static void read_buffer_from_dma(ide_state *ide)
 		}
 
 		/* read the next byte */
-		*data++ = cpunum_read_byte(ide->dma_cpu, ide->dma_address++);
+		*data++ = memory_read_byte(target, ide->dma_address++);
 		ide->dma_bytes_left--;
 	}
 }
@@ -1182,7 +1184,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 
 	/* logit */
 //  if (offset != IDE_ADDR_DATA && offset != IDE_ADDR_STATUS_COMMAND && offset != IDE_ADDR_STATUS_CONTROL)
-		LOG(("%08X:IDE read at %03X, size=%d\n", activecpu_get_previouspc(), offset, size));
+		LOG(("%08X:IDE read at %03X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, size));
 
 	switch (offset)
 	{
@@ -1217,7 +1219,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%08X:IDE completed PIO read\n", activecpu_get_previouspc()));
+					LOG(("%08X:IDE completed PIO read\n", cpu_get_previouspc(device->machine->activecpu)));
 					continue_read(ide);
 				}
 			}
@@ -1266,12 +1268,12 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 			}
 
 			/* take a bit of time to speed up people who poll hard */
-			activecpu_adjust_icount(-100);
+			cpu_adjust_icount(device->machine->activecpu, -100);
 			break;
 
 		/* log anything else */
 		default:
-			logerror("%08X:unknown IDE read at %03X, size=%d\n", activecpu_get_previouspc(), offset, size);
+			logerror("%08X:unknown IDE read at %03X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, size);
 			break;
 	}
 
@@ -1293,7 +1295,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 
 	/* logit */
 	if (offset != IDE_ADDR_DATA)
-		LOG(("%08X:IDE write to %03X = %08X, size=%d\n", activecpu_get_previouspc(), offset, data, size));
+		LOG(("%08X:IDE write to %03X = %08X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, data, size));
 
 	switch (offset)
 	{
@@ -1330,7 +1332,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%08X:IDE completed PIO write\n", activecpu_get_previouspc()));
+					LOG(("%08X:IDE completed PIO write\n", cpu_get_previouspc(device->machine->activecpu)));
 					if (ide->command != IDE_COMMAND_SECURITY_UNLOCK)
 						continue_write(ide);
 					else
@@ -1440,7 +1442,7 @@ static UINT32 ide_bus_master_read(const device_config *device, offs_t offset, in
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%08X:ide_bus_master_read(%d, %d)\n", activecpu_get_previouspc(), offset, size));
+	LOG(("%08X:ide_bus_master_read(%d, %d)\n", cpu_get_previouspc(device->machine->activecpu), offset, size));
 
 	/* command register */
 	if (offset == 0)
@@ -1469,7 +1471,7 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%08X:ide_bus_master_write(%d, %d, %08X)\n", activecpu_get_previouspc(), offset, size, data));
+	LOG(("%08X:ide_bus_master_write(%d, %d, %08X)\n", cpu_get_previouspc(device->machine->activecpu), offset, size, data));
 
 	/* command register */
 	if (offset == 0)
@@ -1488,8 +1490,8 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
 			ide->dma_bytes_left = 0;
 			ide->dma_last_buffer = 0;
 			ide->dma_descriptor = ide->bus_master_descriptor;
-			ide->dma_cpu = cpu_getactivecpu();
-			ide->dma_address_xor = (activecpu_endianness() == CPU_IS_LE) ? 0 : 3;
+			ide->dma_cpu = cpunum_get_active();
+			ide->dma_address_xor = (cpu_get_endianness(device->machine->activecpu) == CPU_IS_LE) ? 0 : 3;
 
 			/* if we're going live, start the pending read/write */
 			if (ide->dma_active)
@@ -1670,7 +1672,6 @@ static DEVICE_START( ide_controller )
 	ide_state *ide = get_safe_token(device);
 	const hard_disk_info *hdinfo;
 	const ide_config *config;
-	char unique_tag[50];
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -1707,55 +1708,51 @@ static DEVICE_START( ide_controller )
 	ide->last_status_timer = timer_alloc(NULL, NULL);
 	ide->reset_timer = timer_alloc(reset_callback, (void *)device);
 
-	/* create the name for save states */
-	assert(strlen(device->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "ide_controller", device->tag);
-
 	/* register ide states */
-	state_save_register_item(unique_tag, 0, ide->adapter_control);
-	state_save_register_item(unique_tag, 0, ide->status);
-	state_save_register_item(unique_tag, 0, ide->error);
-	state_save_register_item(unique_tag, 0, ide->command);
-	state_save_register_item(unique_tag, 0, ide->interrupt_pending);
-	state_save_register_item(unique_tag, 0, ide->precomp_offset);
+	state_save_register_item("ide_controller", device->tag, 0, ide->adapter_control);
+	state_save_register_item("ide_controller", device->tag, 0, ide->status);
+	state_save_register_item("ide_controller", device->tag, 0, ide->error);
+	state_save_register_item("ide_controller", device->tag, 0, ide->command);
+	state_save_register_item("ide_controller", device->tag, 0, ide->interrupt_pending);
+	state_save_register_item("ide_controller", device->tag, 0, ide->precomp_offset);
 
-	state_save_register_item_array(unique_tag, 0, ide->buffer);
-	state_save_register_item_array(unique_tag, 0, ide->features);
-	state_save_register_item(unique_tag, 0, ide->buffer_offset);
-	state_save_register_item(unique_tag, 0, ide->sector_count);
+	state_save_register_item_array("ide_controller", device->tag, 0, ide->buffer);
+	state_save_register_item_array("ide_controller", device->tag, 0, ide->features);
+	state_save_register_item("ide_controller", device->tag, 0, ide->buffer_offset);
+	state_save_register_item("ide_controller", device->tag, 0, ide->sector_count);
 
-	state_save_register_item(unique_tag, 0, ide->block_count);
-	state_save_register_item(unique_tag, 0, ide->sectors_until_int);
+	state_save_register_item("ide_controller", device->tag, 0, ide->block_count);
+	state_save_register_item("ide_controller", device->tag, 0, ide->sectors_until_int);
 
-	state_save_register_item(unique_tag, 0, ide->dma_active);
-	state_save_register_item(unique_tag, 0, ide->dma_cpu);
-	state_save_register_item(unique_tag, 0, ide->dma_address_xor);
-	state_save_register_item(unique_tag, 0, ide->dma_last_buffer);
-	state_save_register_item(unique_tag, 0, ide->dma_address);
-	state_save_register_item(unique_tag, 0, ide->dma_descriptor);
-	state_save_register_item(unique_tag, 0, ide->dma_bytes_left);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_active);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_cpu);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_address_xor);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_last_buffer);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_address);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_descriptor);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_bytes_left);
 
-	state_save_register_item(unique_tag, 0, ide->bus_master_command);
-	state_save_register_item(unique_tag, 0, ide->bus_master_status);
-	state_save_register_item(unique_tag, 0, ide->bus_master_descriptor);
+	state_save_register_item("ide_controller", device->tag, 0, ide->bus_master_command);
+	state_save_register_item("ide_controller", device->tag, 0, ide->bus_master_status);
+	state_save_register_item("ide_controller", device->tag, 0, ide->bus_master_descriptor);
 
-	state_save_register_item(unique_tag, 0, ide->cur_cylinder);
-	state_save_register_item(unique_tag, 0, ide->cur_sector);
-	state_save_register_item(unique_tag, 0, ide->cur_head);
-	state_save_register_item(unique_tag, 0, ide->cur_head_reg);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_cylinder);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_sector);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_head);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_head_reg);
 
-	state_save_register_item(unique_tag, 0, ide->cur_lba);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_lba);
 
-	state_save_register_item(unique_tag, 0, ide->num_cylinders);
-	state_save_register_item(unique_tag, 0, ide->num_sectors);
-	state_save_register_item(unique_tag, 0, ide->num_heads);
+	state_save_register_item("ide_controller", device->tag, 0, ide->num_cylinders);
+	state_save_register_item("ide_controller", device->tag, 0, ide->num_sectors);
+	state_save_register_item("ide_controller", device->tag, 0, ide->num_heads);
 
-	state_save_register_item(unique_tag, 0, ide->config_unknown);
-	state_save_register_item_array(unique_tag, 0, ide->config_register);
-	state_save_register_item(unique_tag, 0, ide->config_register_num);
+	state_save_register_item("ide_controller", device->tag, 0, ide->config_unknown);
+	state_save_register_item_array("ide_controller", device->tag, 0, ide->config_register);
+	state_save_register_item("ide_controller", device->tag, 0, ide->config_register_num);
 
-	state_save_register_item(unique_tag, 0, ide->master_password_enable);
-	state_save_register_item(unique_tag, 0, ide->user_password_enable);
+	state_save_register_item("ide_controller", device->tag, 0, ide->master_password_enable);
+	state_save_register_item("ide_controller", device->tag, 0, ide->user_password_enable);
 
 	return DEVICE_START_OK;
 }

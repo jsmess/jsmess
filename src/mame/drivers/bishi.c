@@ -125,14 +125,14 @@ static INTERRUPT_GEN(bishi_interrupt)
 {
 	if (cur_control & 0x800)
 	{
-		switch (cpu_getiloops())
+		switch (cpu_getiloops(device))
 		{
 			case 0:
-				cpunum_set_input_line(machine, 0, MC68000_IRQ_3, HOLD_LINE);
+				cpu_set_input_line(device, M68K_IRQ_3, HOLD_LINE);
 				break;
 
 			case 1:
-				cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+				cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 				break;
 		}
 	}
@@ -146,18 +146,18 @@ static READ16_HANDLER( bishi_mirror_r )
 
 static READ16_HANDLER( bishi_sound_r )
 {
-	return ymz280b_status_0_r(machine, offset)<<8;
+	return ymz280b_status_0_r(space, offset)<<8;
 }
 
 static WRITE16_HANDLER( bishi_sound_w )
 {
  	if (offset)
 	{
-		ymz280b_data_0_w(machine, offset, data>>8);
+		ymz280b_data_0_w(space, offset, data>>8);
 	}
  	else
 	{
-		ymz280b_register_0_w(machine, offset, data>>8);
+		ymz280b_register_0_w(space, offset, data>>8);
 	}
 }
 
@@ -176,7 +176,7 @@ static READ16_HANDLER( bishi_K056832_rom_r )
 		ouroffs += 4;
 	}
 
-	return K056832_bishi_rom_word_r(machine, ouroffs, mem_mask);
+	return K056832_bishi_rom_word_r(space, ouroffs, mem_mask);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -302,9 +302,9 @@ static MACHINE_RESET( bishi )
 static void sound_irq_gen(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(machine, 0, MC68000_IRQ_1, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M68K_IRQ_1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, MC68000_IRQ_1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], M68K_IRQ_1, CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =

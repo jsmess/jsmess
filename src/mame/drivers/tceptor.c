@@ -62,7 +62,7 @@ static WRITE16_HANDLER( m68k_shared_word_w )
 static INTERRUPT_GEN( m6809_vb_interrupt )
 {
 	if (m6809_irq_enable)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 		m6809_irq_enable = 1;
 }
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( m6809_irq_disable_w )
 static INTERRUPT_GEN( m68k_vb_interrupt )
 {
 	if (m68k_irq_enable)
-		cpunum_set_input_line(machine, 3, MC68000_IRQ_1, HOLD_LINE);
+		cpu_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( m68k_irq_enable_w )
@@ -93,7 +93,7 @@ static WRITE16_HANDLER( m68k_irq_enable_w )
 static INTERRUPT_GEN( mcu_vb_interrupt )
 {
 	if (mcu_irq_enable)
-		cpunum_set_input_line(machine, 4, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 		mcu_irq_enable = 1;
 }
@@ -150,22 +150,22 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 
 static READ8_HANDLER( dsw0_r )
 {
-	return fix_input0(input_port_read(machine, "DSW1"), input_port_read(machine, "DSW2"));
+	return fix_input0(input_port_read(space->machine, "DSW1"), input_port_read(space->machine, "DSW2"));
 }
 
 static READ8_HANDLER( dsw1_r )
 {
-	return fix_input1(input_port_read(machine, "DSW1"), input_port_read(machine, "DSW2"));
+	return fix_input1(input_port_read(space->machine, "DSW1"), input_port_read(space->machine, "DSW2"));
 }
 
 static READ8_HANDLER( input0_r )
 {
-	return fix_input0(input_port_read(machine, "BUTTONS"), input_port_read(machine, "SERVICE"));
+	return fix_input0(input_port_read(space->machine, "BUTTONS"), input_port_read(space->machine, "SERVICE"));
 }
 
 static READ8_HANDLER( input1_r )
 {
-	return fix_input1(input_port_read(machine, "BUTTONS"), input_port_read(machine, "SERVICE"));
+	return fix_input1(input_port_read(space->machine, "BUTTONS"), input_port_read(space->machine, "SERVICE"));
 }
 
 static READ8_HANDLER( readFF )

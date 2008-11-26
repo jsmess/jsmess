@@ -28,6 +28,7 @@
 #include <stddef.h>
 #include "cpuintrf.h"
 #include "debugger.h"
+#include "cpuexec.h"
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "deprecat.h"
@@ -342,7 +343,7 @@ INLINE void save_fast_iregs(drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, const mips3_config *config, cpu_irq_callback irqcallback)
+static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -366,7 +367,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 	memset(mips3, 0, sizeof(*mips3));
 
 	/* initialize the core */
-	mips3com_init(mips3, flavor, bigendian, device, index, clock, config, irqcallback);
+	mips3com_init(mips3, flavor, bigendian, device, index, clock, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	mips3->impstate = drccache_memory_alloc_near(cache, sizeof(*mips3->impstate));
@@ -380,7 +381,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	mips3->impstate->drcuml = drcuml_alloc(cache, flags, 8, 32, 2);
+	mips3->impstate->drcuml = drcuml_alloc(device, cache, flags, 8, 32, 2);
 	if (mips3->impstate->drcuml == NULL)
 		fatalerror("Error initializing the UML");
 
@@ -430,7 +431,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 	/* initialize the front-end helper */
 	if (SINGLE_INSTRUCTION_MODE)
 		feconfig.max_sequence = 1;
-	mips3->impstate->drcfe = drcfe_init(&feconfig, mips3);
+	mips3->impstate->drcfe = drcfe_init(device, &feconfig, mips3);
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(mips3->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
@@ -767,7 +768,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */
@@ -816,7 +817,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 static void cfunc_get_cycles(void *param)
 {
 	UINT64 *dest = param;
-	*dest = activecpu_gettotalcycles();
+	*dest = cpu_get_total_cycles(Machine->activecpu);
 }
 
 
@@ -3621,12 +3622,12 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 #if (HAS_R4600)
 static CPU_INIT( r4600be )
 {
-	mips3_init(MIPS3_TYPE_R4600, TRUE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, TRUE, device, index, clock, irqcallback);
 }
 
 static CPU_INIT( r4600le )
 {
-	mips3_init(MIPS3_TYPE_R4600, FALSE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, FALSE, device, index, clock, irqcallback);
 }
 
 CPU_GET_INFO( r4600be )
@@ -3675,12 +3676,12 @@ CPU_GET_INFO( r4600le )
 #if (HAS_R4650)
 static CPU_INIT( r4650be )
 {
-	mips3_init(MIPS3_TYPE_R4650, TRUE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, TRUE, device, index, clock, irqcallback);
 }
 
 static CPU_INIT( r4650le )
 {
-	mips3_init(MIPS3_TYPE_R4650, FALSE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, FALSE, device, index, clock, irqcallback);
 }
 
 CPU_GET_INFO( r4650be )
@@ -3729,12 +3730,12 @@ CPU_GET_INFO( r4650le )
 #if (HAS_R4700)
 static CPU_INIT( r4700be )
 {
-	mips3_init(MIPS3_TYPE_R4700, TRUE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, TRUE, device, index, clock, irqcallback);
 }
 
 static CPU_INIT( r4700le )
 {
-	mips3_init(MIPS3_TYPE_R4700, FALSE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, FALSE, device, index, clock, irqcallback);
 }
 
 CPU_GET_INFO( r4700be )
@@ -3783,12 +3784,12 @@ CPU_GET_INFO( r4700le )
 #if (HAS_R5000)
 static CPU_INIT( r5000be )
 {
-	mips3_init(MIPS3_TYPE_R5000, TRUE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, TRUE, device, index, clock, irqcallback);
 }
 
 static CPU_INIT( r5000le )
 {
-	mips3_init(MIPS3_TYPE_R5000, FALSE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, FALSE, device, index, clock, irqcallback);
 }
 
 CPU_GET_INFO( r5000be )
@@ -3837,12 +3838,12 @@ CPU_GET_INFO( r5000le )
 #if (HAS_QED5271)
 static CPU_INIT( qed5271be )
 {
-	mips3_init(MIPS3_TYPE_QED5271, TRUE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, TRUE, device, index, clock, irqcallback);
 }
 
 static CPU_INIT( qed5271le )
 {
-	mips3_init(MIPS3_TYPE_QED5271, FALSE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, FALSE, device, index, clock, irqcallback);
 }
 
 CPU_GET_INFO( qed5271be )
@@ -3891,12 +3892,12 @@ CPU_GET_INFO( qed5271le )
 #if (HAS_RM7000)
 static CPU_INIT( rm7000be )
 {
-	mips3_init(MIPS3_TYPE_RM7000, TRUE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, TRUE, device, index, clock, irqcallback);
 }
 
 static CPU_INIT( rm7000le )
 {
-	mips3_init(MIPS3_TYPE_RM7000, FALSE, device, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, FALSE, device, index, clock, irqcallback);
 }
 
 CPU_GET_INFO( rm7000be )

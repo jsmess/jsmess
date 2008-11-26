@@ -11,6 +11,8 @@
 #ifndef __SH2COMN_H__
 #define __SH2COMN_H__
 
+#include "timer.h"
+
 #define USE_SH2DRC
 
 #ifdef USE_SH2DRC
@@ -113,6 +115,8 @@ typedef struct
 	INT8	irq_line_state[17];
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *internal;
 	UINT32	*m;
 	INT8  nmi_line_state;
 
@@ -128,7 +132,7 @@ typedef struct
 	emu_timer *dma_timer[2];
 	int     dma_timer_active[2];
 
-	int     is_slave, cpu_number, cpu_type;
+	int     is_slave, cpu_type;
 	int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
 
 	void	(*ftcsr_read_callback)(UINT32 data);
@@ -170,7 +174,7 @@ typedef struct
 TIMER_CALLBACK( sh2_timer_callback );
 TIMER_CALLBACK( sh2_dmac_callback );
 
-void sh2_common_init(int alloc, const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback);
+void sh2_common_init(int alloc, const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
 void sh2_recalc_irq(void);
 void sh2_set_irq_line(int irqline, int state);
 void sh2_set_frt_input(int cpunum, int state);

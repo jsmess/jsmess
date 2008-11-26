@@ -271,7 +271,7 @@ static void send_to_adder(running_machine *machine, int data)
 	adder2_sc2data       = data;
 
 	adder2_acia_triggered = 1;
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
@@ -374,10 +374,10 @@ send data to them, although obviously there's no response. */
 	{
 		UINT8 *rom = memory_region(machine, "main");
 
-		memory_configure_bank(1, 0, 1, &rom[0x10000], 0);
-		memory_configure_bank(1, 1, 3, &rom[0x02000], 0x02000);
+		memory_configure_bank(machine, 1, 0, 1, &rom[0x10000], 0);
+		memory_configure_bank(machine, 1, 1, 3, &rom[0x02000], 0x02000);
 
-		memory_set_bank(1,3);
+		memory_set_bank(machine, 1,3);
 	}
 }
 
@@ -492,7 +492,7 @@ static WRITE8_HANDLER( watchdog_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(1,data & 0x03);
+	memory_set_bank(space->machine, 1,data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -511,8 +511,8 @@ static INTERRUPT_GEN( timer_irq )
 		watchdog_cnt++;
 		if ( watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
-			mame_schedule_soft_reset(machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
-			on_scorpion2_reset(machine);
+			mame_schedule_soft_reset(device->machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
+			on_scorpion2_reset(device->machine);
 			return;
 		}
 	}
@@ -522,7 +522,7 @@ static INTERRUPT_GEN( timer_irq )
 		irq_timer_stat = 0x01;
 		irq_status     = 0x02;
 
-		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line(device, M6809_IRQ_LINE, PULSE_LINE );
 	}
 }
 
@@ -619,7 +619,7 @@ static WRITE8_HANDLER( mmtr_w )
 			}
  		}
  	}
-	if ( data & 0x1F ) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -655,11 +655,11 @@ static READ8_HANDLER( mux_input_r )
 		t1 = input_override[offset];	// strobe 0-7 data 0-4
 		t2 = input_override[offset+idx];	// strobe 8-B data 0-4
 
-		t1 = (sc2_Inputs[offset]   & t1) | ( ( input_port_read(machine, port[offset])   & ~t1) & 0x1F);
+		t1 = (sc2_Inputs[offset]   & t1) | ( ( input_port_read(space->machine, port[offset])   & ~t1) & 0x1F);
 		if (idx == 8)
-			t2 = (sc2_Inputs[offset+8] & t2) | ( ( input_port_read(machine, port[offset+8]) & ~t2) << 5);
+			t2 = (sc2_Inputs[offset+8] & t2) | ( ( input_port_read(space->machine, port[offset+8]) & ~t2) << 5);
 		else
-			t2 =  (sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read(machine, port[offset+4]) & ~t2) << 2) & 0x60);
+			t2 =  (sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read(space->machine, port[offset+4]) & ~t2) << 2) & 0x60);
 
 		sc2_Inputs[offset]   = (sc2_Inputs[offset]   & ~0x1F) | t1;
 		sc2_Inputs[offset+idx] = (sc2_Inputs[offset+idx] & ~0x60) | t2;
@@ -894,7 +894,7 @@ static WRITE8_HANDLER( coininhib_w )
 
 static READ8_HANDLER( coin_input_r )
 {
-	return input_port_read(machine, "COINS");
+	return input_port_read(space->machine, "COINS");
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1072,7 +1072,7 @@ static WRITE8_HANDLER( uart2data_w )
 
 static WRITE8_HANDLER( vid_uart_tx_w )
 {
-	send_to_adder(machine, data);
+	send_to_adder(space->machine, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////

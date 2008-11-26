@@ -924,7 +924,7 @@ Notes:
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/mips/psx.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
@@ -940,9 +940,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -984,8 +984,8 @@ static UINT32 m_n_bankoffset;
 static WRITE32_HANDLER( bankoffset_w )
 {
 	// Golgo 13 has different banking (maybe the keycus controls it?)
-	if( strcmp( machine->gamedrv->name, "golgo13" ) == 0 ||
-		strcmp( machine->gamedrv->name, "g13knd" ) == 0 )
+	if( strcmp( space->machine->gamedrv->name, "golgo13" ) == 0 ||
+		strcmp( space->machine->gamedrv->name, "g13knd" ) == 0 )
 	{
 		if( ( data & 8 ) != 0 )
 		{
@@ -1001,7 +1001,7 @@ static WRITE32_HANDLER( bankoffset_w )
 		m_n_bankoffset = data;
 	}
 
-	memory_set_bank( 1, m_n_bankoffset );
+	memory_set_bank(space->machine,  1, m_n_bankoffset );
 
 	verboselog( 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
@@ -1146,16 +1146,16 @@ static READ32_HANDLER( system11gun_r )
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read(machine, "LIGHT0_X");
+		data = input_port_read(space->machine, "LIGHT0_X");
 		break;
 	case 1:
-		data = ( input_port_read(machine, "LIGHT0_Y") ) | ( ( input_port_read(machine, "LIGHT0_Y") + 1 ) << 16 );
+		data = ( input_port_read(space->machine, "LIGHT0_Y") ) | ( ( input_port_read(space->machine, "LIGHT0_Y") + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read(machine, "LIGHT1_X");
+		data = input_port_read(space->machine, "LIGHT1_X");
 		break;
 	case 3:
-		data = ( input_port_read(machine, "LIGHT1_Y") ) | ( ( input_port_read(machine, "LIGHT1_Y") + 1 ) << 16 );
+		data = ( input_port_read(space->machine, "LIGHT1_Y") ) | ( ( input_port_read(space->machine, "LIGHT1_Y") + 1 ) << 16 );
 		break;
 	}
 	verboselog( 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -1164,20 +1164,20 @@ static READ32_HANDLER( system11gun_r )
 
 static void system11gun_install( running_machine *machine )
 {
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
-	memory_install_read32_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
+	memory_install_read32_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
 }
 
 static UINT8 kcram[ 12 ];
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr( 2, memory_region( machine, "user1" ) + 0x20280 );
+	memory_set_bankptr(space->machine,  2, memory_region( space->machine, "user1" ) + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
 {
-	memory_set_bankptr( 2, kcram );
+	memory_set_bankptr(space->machine,  2, kcram );
 }
 
 static WRITE32_HANDLER( tektagt_protection_1_w )
@@ -1207,16 +1207,17 @@ static READ32_HANDLER( tektagt_protection_2_r )
 
 static MACHINE_RESET( namcos12 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	psx_machine_init(machine);
-	bankoffset_w(machine,0,0,0xffffffff);
+	bankoffset_w(space,0,0,0xffffffff);
 
 	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tektagta" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tektagtb" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 )
 	{
-		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r, tektagt_protection_1_w );
-		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_r, tektagt_protection_2_w );
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r, tektagt_protection_1_w );
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_r, tektagt_protection_2_w );
 	}
 
 	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
@@ -1238,12 +1239,12 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		memory_install_read32_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fc20280, 0x1fc2028b, 0, 0, SMH_BANK2 );
-		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
-		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
+		memory_install_read32_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fc20280, 0x1fc2028b, 0, 0, SMH_BANK2 );
+		memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f008000, 0x1f008003, 0, 0, kcon_w );
+		memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
 
 		memset( kcram, 0, sizeof( kcram ) );
-		memory_set_bankptr( 2, kcram );
+		memory_set_bankptr(space->machine,  2, kcram );
 	}
 }
 
@@ -1298,7 +1299,7 @@ static READ8_HANDLER( s12_mcu_rtc_r )
 	mame_system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-	mame_get_current_datetime(machine, &systime);
+	mame_get_current_datetime(space->machine, &systime);
 
 	switch (s12_rtcstate)
 	{
@@ -1383,7 +1384,7 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
 {
-	const input_port_config *port = input_port_by_tag(machine->portconfig, "LIGHT0_X");
+	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_X");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1402,7 +1403,7 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 
 static READ8_HANDLER( s12_mcu_gun_v_r )
 {
-	const input_port_config *port = input_port_by_tag(machine->portconfig, "LIGHT0_Y");
+	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_Y");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1420,11 +1421,11 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 }
 
 static ADDRESS_MAP_START( s12h8iomap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(H8_PORT7, H8_PORT7) AM_READ_PORT("DSW")
-	AM_RANGE(H8_PORT8, H8_PORT8) AM_READ( s12_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(H8_PORTA, H8_PORTA) AM_READWRITE( s12_mcu_pa_r, s12_mcu_pa_w )
-	AM_RANGE(H8_PORTB, H8_PORTB) AM_READWRITE( s12_mcu_portB_r, s12_mcu_portB_w )
-	AM_RANGE(H8_SERIAL_B, H8_SERIAL_B) AM_READ( s12_mcu_rtc_r ) AM_WRITE( s12_mcu_settings_w )
+	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT("DSW")
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s12_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s12_mcu_pa_r, s12_mcu_pa_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE( s12_mcu_portB_r, s12_mcu_portB_w )
+	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ( s12_mcu_rtc_r ) AM_WRITE( s12_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
 	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_READ( s12_mcu_gun_h_r )	// golgo 13 gun X-axis
 	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_READ( s12_mcu_gun_v_r )	// golgo 13 gun Y-axis
@@ -1437,7 +1438,7 @@ static DRIVER_INIT( namcos12 )
 
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 
-	memory_configure_bank( 1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
+	memory_configure_bank(machine,  1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
 
 	s12_porta = 0;
 	s12_rtcstate = 0;
@@ -1450,7 +1451,7 @@ static DRIVER_INIT( namcos12 )
 	m_n_dmaoffset = 0;
 	m_n_dmabias = 0;
 	m_n_bankoffset = 0;
-	memory_set_bank( 1, 0 );
+	memory_set_bank(machine,  1, 0 );
 
 	state_save_register_global( m_n_dmaoffset );
 	state_save_register_global( m_n_dmabias );

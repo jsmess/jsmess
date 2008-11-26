@@ -160,7 +160,7 @@ struct _ay_ym_param
 typedef struct _ay8910_context ay8910_context;
 struct _ay8910_context
 {
-	int index;
+	const char *tag;
 	int streams;
 	int ready;
 	sound_stream *channel;
@@ -386,6 +386,8 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 
 static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
 	psg->regs[r] = v;
@@ -412,7 +414,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			{
 				/* write out 0xff if port set to input */
 				if (psg->intf->portAwrite)
-					(*psg->intf->portAwrite)(Machine, 0, (psg->regs[AY_ENABLE] & 0x40) ? psg->regs[AY_PORTA] : 0xff);
+					(*psg->intf->portAwrite)(space, 0, (psg->regs[AY_ENABLE] & 0x40) ? psg->regs[AY_PORTA] : 0xff);
 			}
 
 			if ((psg->last_enable == -1) ||
@@ -420,7 +422,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			{
 				/* write out 0xff if port set to input */
 				if (psg->intf->portBwrite)
-					(*psg->intf->portBwrite)(Machine, 0, (psg->regs[AY_ENABLE] & 0x80) ? psg->regs[AY_PORTB] : 0xff);
+					(*psg->intf->portBwrite)(space, 0, (psg->regs[AY_ENABLE] & 0x80) ? psg->regs[AY_PORTB] : 0xff);
 			}
 
 			psg->last_enable = psg->regs[AY_ENABLE];
@@ -446,26 +448,26 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			if (psg->regs[AY_ENABLE] & 0x40)
 			{
 				if (psg->intf->portAwrite)
-					(*psg->intf->portAwrite)(Machine, 0, psg->regs[AY_PORTA]);
+					(*psg->intf->portAwrite)(space, 0, psg->regs[AY_PORTA]);
 				else
-					logerror("warning - write %02x to 8910 #%d Port A\n",psg->regs[AY_PORTA],psg->index);
+					logerror("warning - write %02x to 8910 '%s' Port A\n",psg->regs[AY_PORTA],psg->tag);
 			}
 			else
 			{
-				logerror("warning: write to 8910 #%d Port A set as input - ignored\n",psg->index);
+				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n",psg->tag);
 			}
 			break;
 		case AY_PORTB:
 			if (psg->regs[AY_ENABLE] & 0x80)
 			{
 				if (psg->intf->portBwrite)
-					(*psg->intf->portBwrite)(Machine, 0, psg->regs[AY_PORTB]);
+					(*psg->intf->portBwrite)(space, 0, psg->regs[AY_PORTB]);
 				else
-					logerror("warning - write %02x to 8910 #%d Port B\n",psg->regs[AY_PORTB],psg->index);
+					logerror("warning - write %02x to 8910 '%s' Port B\n",psg->regs[AY_PORTB],psg->tag);
 			}
 			else
 			{
-				logerror("warning: write to 8910 #%d Port B set as input - ignored\n",psg->index);
+				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n",psg->tag);
 			}
 			break;
 	}
@@ -626,27 +628,27 @@ static void build_mixer_table(ay8910_context *psg)
 	build_3D_table(psg->intf->res_load[0], psg->par, psg->par_env, normalize, 3, psg->zero_is_off, psg->vol3d_table);
 }
 
-static void ay8910_statesave(ay8910_context *psg, int sndindex)
+static void ay8910_statesave(ay8910_context *psg, const char *tag)
 {
-	state_save_register_item("AY8910", sndindex, psg->register_latch);
-	state_save_register_item_array("AY8910", sndindex, psg->regs);
-	state_save_register_item("AY8910", sndindex, psg->last_enable);
+	state_save_register_item("AY8910", tag, 0, psg->register_latch);
+	state_save_register_item_array("AY8910", tag, 0, psg->regs);
+	state_save_register_item("AY8910", tag, 0, psg->last_enable);
 
-	state_save_register_item_array("AY8910", sndindex, psg->count);
-	state_save_register_item("AY8910", sndindex, psg->count_noise);
-	state_save_register_item("AY8910", sndindex, psg->count_env);
+	state_save_register_item_array("AY8910", tag, 0, psg->count);
+	state_save_register_item("AY8910", tag, 0, psg->count_noise);
+	state_save_register_item("AY8910", tag, 0, psg->count_env);
 
-	state_save_register_item("AY8910", sndindex, psg->env_volume);
+	state_save_register_item("AY8910", tag, 0, psg->env_volume);
 
-	state_save_register_item_array("AY8910", sndindex, psg->output);
-	state_save_register_item("AY8910", sndindex, psg->output_noise);
+	state_save_register_item_array("AY8910", tag, 0, psg->output);
+	state_save_register_item("AY8910", tag, 0, psg->output_noise);
 
-	state_save_register_item("AY8910", sndindex, psg->env_step);
-	state_save_register_item("AY8910", sndindex, psg->hold);
-	state_save_register_item("AY8910", sndindex, psg->alternate);
-	state_save_register_item("AY8910", sndindex, psg->attack);
-	state_save_register_item("AY8910", sndindex, psg->holding);
-	state_save_register_item("AY8910", sndindex, psg->rng);
+	state_save_register_item("AY8910", tag, 0, psg->env_step);
+	state_save_register_item("AY8910", tag, 0, psg->hold);
+	state_save_register_item("AY8910", tag, 0, psg->alternate);
+	state_save_register_item("AY8910", tag, 0, psg->attack);
+	state_save_register_item("AY8910", tag, 0, psg->holding);
+	state_save_register_item("AY8910", tag, 0, psg->rng);
 }
 
 /*************************************
@@ -657,13 +659,13 @@ static void ay8910_statesave(ay8910_context *psg, int sndindex)
  *
  *************************************/
 
-void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const ay8910_interface *intf)
+void *ay8910_start_ym(sound_type chip_type, const char *tag, int clock, const ay8910_interface *intf)
 {
 	ay8910_context *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
-	info->index = sndindex;
+	info->tag = tag;
 	info->intf = intf;
 	if ((info->intf->flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
@@ -707,7 +709,7 @@ void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const ay891
 	info->channel = stream_create(0,info->streams,clock / 8 ,info,ay8910_update);
 
 	ay8910_set_clock_ym(info,clock);
-	ay8910_statesave(info, sndindex);
+	ay8910_statesave(info, tag);
 
 	return info;
 }
@@ -779,6 +781,8 @@ void ay8910_write_ym(void *chip, int addr, int data)
 
 int ay8910_read_ym(void *chip)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	ay8910_context *psg = chip;
 	int r = psg->register_latch;
 
@@ -788,23 +792,23 @@ int ay8910_read_ym(void *chip)
 	{
 	case AY_PORTA:
 		if ((psg->regs[AY_ENABLE] & 0x40) != 0)
-			logerror("warning: read from 8910 #%d Port A set as output\n",psg->index);
+			logerror("warning: read from 8910 '%s' Port A set as output\n",psg->tag);
 		/*
            even if the port is set as output, we still need to return the external
            data. Some games, like kidniki, need this to work.
          */
 		if (psg->intf->portAread)
-			psg->regs[AY_PORTA] = (*psg->intf->portAread)(Machine, 0);
+			psg->regs[AY_PORTA] = (*psg->intf->portAread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 #%d Port A\n",activecpu_get_pc(),psg->index);
+			logerror("PC %04x: warning - read 8910 '%s' Port A\n",cpu_get_pc(Machine->activecpu),psg->tag);
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
-			logerror("warning: read from 8910 #%d Port B set as output\n",psg->index);
+			logerror("warning: read from 8910 '%s' Port B set as output\n",psg->tag);
 		if (psg->intf->portBread)
-			psg->regs[AY_PORTB] = (*psg->intf->portBread)(Machine, 0);
+			psg->regs[AY_PORTB] = (*psg->intf->portBread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 #%d Port B\n",activecpu_get_pc(),psg->index);
+			logerror("PC %04x: warning - read 8910 '%s' Port B\n",cpu_get_pc(Machine->activecpu),psg->tag);
 		break;
 	}
 	return psg->regs[r];
@@ -816,7 +820,7 @@ int ay8910_read_ym(void *chip)
  *
  *************************************/
 
-static void *ay8910_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ay8910 )
 {
 	static const ay8910_interface generic_ay8910 =
 	{
@@ -825,10 +829,10 @@ static void *ay8910_start(const char *tag, int sndindex, int clock, const void *
 		NULL, NULL, NULL, NULL
 	};
 	const ay8910_interface *intf = (config ? config : &generic_ay8910);
-	return ay8910_start_ym(SOUND_AY8910, sndindex+16, clock, intf);
+	return ay8910_start_ym(SOUND_AY8910, tag, clock, intf);
 }
 
-static void *ym2149_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2149 )
 {
 	static const ay8910_interface generic_ay8910 =
 	{
@@ -837,15 +841,20 @@ static void *ym2149_start(const char *tag, int sndindex, int clock, const void *
 		NULL, NULL, NULL, NULL
 	};
 	const ay8910_interface *intf = (config ? config : &generic_ay8910);
-	return ay8910_start_ym(SOUND_YM2149, sndindex+16, clock, intf);
+	return ay8910_start_ym(SOUND_YM2149, tag, clock, intf);
 }
 
-static void ay8910_stop(void *chip)
+static SND_STOP( ay8910 )
 {
-	ay8910_stop_ym(chip);
+	ay8910_stop_ym(token);
 }
 
-static void ay8910_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_RESET( ay8910 )
+{
+	ay8910_reset_ym(token);
+}
+
+static SND_SET_INFO( ay8910 )
 {
 	switch (state)
 	{
@@ -853,7 +862,7 @@ static void ay8910_set_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8910 )
 {
 	switch (state)
 	{
@@ -861,10 +870,10 @@ void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_INT_ALIAS:							info->i = SOUND_AY8910;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ay8910_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ay8910_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ay8910_reset_ym;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ay8910 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ay8910 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ay8910 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "AY-3-8910A";					break;
@@ -875,73 +884,73 @@ void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void ay8912_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8912 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
 		case SNDINFO_STR_NAME:							info->s = "AY-3-8912A";					break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ay8913_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8913 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
 		case SNDINFO_STR_NAME:							info->s = "AY-3-8913A";					break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ay8930_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8930 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
 		case SNDINFO_STR_NAME:							info->s = "AY8930";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ym2149_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2149 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YM2149";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ym3439_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym3439 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YM3439";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ymz284_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymz284 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YMZ284";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ymz294_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymz294 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YMZ294";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 

@@ -134,10 +134,10 @@ void intelflash_init(int chip, int type, void *data)
 	c->timer = timer_alloc(erase_finished, c);
 	c->flash_memory = data;
 
-	state_save_register_item( "intelfsh", chip, c->status );
-	state_save_register_item( "intelfsh", chip, c->flash_mode );
-	state_save_register_item( "intelfsh", chip, c->flash_master_lock );
-	state_save_register_memory( "intelfsh", chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8) );
+	state_save_register_item( "intelfsh", NULL, chip, c->status );
+	state_save_register_item( "intelfsh", NULL, chip, c->flash_mode );
+	state_save_register_item( "intelfsh", NULL, chip, c->flash_master_lock );
+	state_save_register_memory( "intelfsh", NULL, chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8) );
 }
 
 UINT32 intelflash_read(int chip, UINT32 address)
@@ -212,7 +212,7 @@ UINT32 intelflash_read(int chip, UINT32 address)
 		break;
 	}
 
-//  logerror( "%08x: intelflash_read( %d, %08x ) %08x\n", activecpu_get_pc(), chip, address, data );
+//  logerror( "%08x: intelflash_read( %d, %08x ) %08x\n", cpu_get_pc(machine->activecpu), chip, address, data );
 
 	return data;
 }
@@ -227,7 +227,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 	}
 	c = &chips[ chip ];
 
-//  logerror( "%08x: intelflash_write( %d, %08x, %08x )\n", activecpu_get_pc(), chip, address, data );
+//  logerror( "%08x: intelflash_write( %d, %08x, %08x )\n", cpu_get_pc(machine->activecpu), chip, address, data );
 
 	switch( c->flash_mode )
 	{

@@ -128,7 +128,7 @@ Notes (couriersud)
 static WRITE8_DEVICE_HANDLER(ic8j1_output_changed)
 {
 	printf("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen));
-	cpunum_set_input_line(device->machine, 0, 0, !data ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER(ic8j2_output_changed)
@@ -221,7 +221,7 @@ static MACHINE_RESET( irem )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = space->machine->driver_data;
 
 #if DEBUG
 	if (data & 0x40)
@@ -231,10 +231,10 @@ static WRITE8_HANDLER( m10_ctrl_w )
 	/* I have NO IDEA if this is correct or not */
 	state->bottomline = ~data & 0x20;
 
-	if (input_port_read(machine, "CAB") & 0x01)
+	if (input_port_read(space->machine, "CAB") & 0x01)
 		state->flip = ~data & 0x10;
 
-	if (!(input_port_read(machine, "CAB") & 0x02))
+	if (!(input_port_read(space->machine, "CAB") & 0x02))
 		sound_global_enable(~data & 0x80);
 
 	/* sound command in lower 4 bytes */
@@ -298,7 +298,7 @@ static WRITE8_HANDLER( m10_ctrl_w )
 
 static WRITE8_HANDLER( m11_ctrl_w )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = space->machine->driver_data;
 
 #if DEBUG
 	if (data & 0x4C)
@@ -307,10 +307,10 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 	state->bottomline = ~data & 0x20;
 
-	if (input_port_read(machine, "CAB") & 0x01)
+	if (input_port_read(space->machine, "CAB") & 0x01)
 		state->flip = ~data & 0x10;
 
-	if (!(input_port_read(machine, "CAB") & 0x02))
+	if (!(input_port_read(space->machine, "CAB") & 0x02))
 		sound_global_enable(~data & 0x80);
 }
 
@@ -331,15 +331,15 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 static WRITE8_HANDLER( m15_ctrl_w )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = space->machine->driver_data;
 
 #if DEBUG
 	if (data & 0xF0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
-	if (input_port_read(machine, "CAB") & 0x01)
+	if (input_port_read(space->machine, "CAB") & 0x01)
 		state->flip = ~data & 0x04;
-	if (!(input_port_read(machine, "CAB") & 0x02))
+	if (!(input_port_read(space->machine, "CAB") & 0x02))
 		sound_global_enable(~data & 0x08);
 }
 
@@ -459,20 +459,20 @@ static WRITE8_HANDLER( m15_a100_w )
 
 static READ8_HANDLER( m10_a700_r )
 {
-   	//printf("rd:%d\n",video_screen_get_vpos(machine->primary_screen));
+   	//printf("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen));
 	printf("clear\n");
-	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 1);
+	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
 	return 0x00;
 }
 
 static READ8_HANDLER( m11_a700_r )
 {
-   	//printf("rd:%d\n",video_screen_get_vpos(machine->primary_screen));
-	//cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+   	//printf("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen));
+	//cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	printf("clear\n");
-	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 1);
+	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
 	return 0x00;
 }
 
@@ -485,7 +485,7 @@ static READ8_HANDLER( m11_a700_r )
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -493,36 +493,36 @@ static TIMER_CALLBACK( interrupt_callback )
 {
     if (param==0)
     {
-	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	    cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 	    timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
     }
     if (param==1)
     {
-	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	    cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
     	timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
     }
     if (param==-1)
-	    cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	    cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 
 }
 
 #if 0
 static INTERRUPT_GEN( m11_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	//timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 #endif
 
 static INTERRUPT_GEN( m15_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-   	timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
+   	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
 }
 
 /*************************************

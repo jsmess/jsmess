@@ -35,7 +35,7 @@ static INTERRUPT_GEN( tutankhm_interrupt )
 	/* flip flops cause the interrupt to be signalled every other frame */
 	irq_toggle ^= 1;
 	if (irq_toggle && irq_enable)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	irq_enable = data & 1;
 	if (!irq_enable)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -56,7 +56,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static MACHINE_START( tutankhm )
 {
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
 	state_save_register_global(irq_toggle);
 	state_save_register_global(irq_enable);
 }
@@ -64,7 +64,7 @@ static MACHINE_START( tutankhm )
 
 static WRITE8_HANDLER( tutankhm_bankselect_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 

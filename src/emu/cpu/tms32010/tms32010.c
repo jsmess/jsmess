@@ -52,9 +52,7 @@
  \**************************************************************************/
 
 
-
 #include "debugger.h"
-#include "deprecat.h"
 #include "tms32010.h"
 
 
@@ -94,6 +92,11 @@ typedef struct			/* Page 3-6 shows all registers */
 	/********************** Status data ****************************/
 	PAIR	opcode;
 	int		INTF;		/* Pending Interrupt flag */
+
+	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 } tms32010_Regs;
 
 static tms32010_Regs R;
@@ -712,21 +715,26 @@ static const opcode_fn opcode_7F_other[32]=
  ****************************************************************************/
 static CPU_INIT( tms32010 )
 {
-	state_save_register_item("tms32010", index, R.PC);
-	state_save_register_item("tms32010", index, R.PREVPC);
-	state_save_register_item("tms32010", index, R.STR);
-	state_save_register_item("tms32010", index, R.ACC.d);
-	state_save_register_item("tms32010", index, R.ALU.d);
-	state_save_register_item("tms32010", index, R.Preg.d);
-	state_save_register_item("tms32010", index, R.Treg);
-	state_save_register_item("tms32010", index, R.AR[0]);
-	state_save_register_item("tms32010", index, R.AR[1]);
-	state_save_register_item("tms32010", index, R.STACK[0]);
-	state_save_register_item("tms32010", index, R.STACK[1]);
-	state_save_register_item("tms32010", index, R.STACK[2]);
-	state_save_register_item("tms32010", index, R.STACK[3]);
-	state_save_register_item("tms32010", index, R.INTF);
-	state_save_register_item("tms32010", index, R.opcode.d);
+	state_save_register_item("tms32010", device->tag, 0, R.PC);
+	state_save_register_item("tms32010", device->tag, 0, R.PREVPC);
+	state_save_register_item("tms32010", device->tag, 0, R.STR);
+	state_save_register_item("tms32010", device->tag, 0, R.ACC.d);
+	state_save_register_item("tms32010", device->tag, 0, R.ALU.d);
+	state_save_register_item("tms32010", device->tag, 0, R.Preg.d);
+	state_save_register_item("tms32010", device->tag, 0, R.Treg);
+	state_save_register_item("tms32010", device->tag, 0, R.AR[0]);
+	state_save_register_item("tms32010", device->tag, 0, R.AR[1]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[0]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[1]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[2]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[3]);
+	state_save_register_item("tms32010", device->tag, 0, R.INTF);
+	state_save_register_item("tms32010", device->tag, 0, R.opcode.d);
+
+	R.device = device;
+	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 /****************************************************************************
@@ -790,7 +798,7 @@ static CPU_EXECUTE( tms32010 )
 
 		R.PREVPC = R.PC;
 
-		debugger_instruction_hook(Machine, R.PC);
+		debugger_instruction_hook(device, R.PC);
 
 		R.opcode.d = M_RDOP(R.PC);
 		R.PC++;

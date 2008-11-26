@@ -158,11 +158,11 @@ void cage_init(running_machine *machine, offs_t speedup)
 
 	cage_irqhandler = NULL;
 
-	memory_set_bankptr(10, memory_region(machine, "cageboot"));
-	memory_set_bankptr(11, memory_region(machine, "cage"));
+	memory_set_bankptr(machine, 10, memory_region(machine, "cageboot"));
+	memory_set_bankptr(machine, 11, memory_region(machine, "cage"));
 
 	cage_cpu = mame_find_cpu_index(machine, "cage");
-	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpunum_get_clock(cage_cpu));
+	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[cage_cpu]));
 	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
 
 	dma_timer = timer_alloc(dma_timer_callback, NULL);
@@ -170,7 +170,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	timer[1] = timer_alloc(cage_timer_callback, NULL);
 
 	if (speedup)
-		speedup_ram = memory_install_write32_handler(machine, cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
+		speedup_ram = memory_install_write32_handler(cpu_get_address_space(machine->cpu[cage_cpu], ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
 
 	state_save_register_global(cpu_to_cage_ready);
 	state_save_register_global(cage_to_cpu_ready);
@@ -193,8 +193,8 @@ void cage_set_irq_handler(void (*irqhandler)(running_machine *, int))
 void cage_reset_w(int state)
 {
 	if (state)
-		cage_control_w(0);
-	cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+		cage_control_w(Machine, 0);
+	cpu_set_input_line(Machine->cpu[cage_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -223,12 +223,12 @@ static TIMER_CALLBACK( dma_timer_callback )
 	tms32031_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	cpunum_set_input_line(machine, cage_cpu, TMS32031_DINT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[cage_cpu], TMS32031_DINT, ASSERT_LINE);
 	dma_enabled = 0;
 }
 
 
-static void update_dma_state(void)
+static void update_dma_state(const address_space *space)
 {
 	/* determine the new enabled state */
 	int enabled = ((tms32031_io_regs[DMA_GLOBAL_CTL] & 3) == 3) && (tms32031_io_regs[DMA_TRANSFER_COUNT] != 0);
@@ -251,7 +251,7 @@ static void update_dma_state(void)
 		inc = (tms32031_io_regs[DMA_GLOBAL_CTL] >> 4) & 1;
 		for (i = 0; i < tms32031_io_regs[DMA_TRANSFER_COUNT]; i++)
 		{
-			sound_data[i % STACK_SOUND_BUFSIZE] = program_read_dword(addr * 4);
+			sound_data[i % STACK_SOUND_BUFSIZE] = memory_read_dword(space, addr * 4);
 			addr += inc;
 			if (i % STACK_SOUND_BUFSIZE == STACK_SOUND_BUFSIZE - 1)
 				dmadac_transfer(0, DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
@@ -292,7 +292,7 @@ static TIMER_CALLBACK( cage_timer_callback )
 	int which = param;
 
 	/* set the interrupt */
-	cpunum_set_input_line(machine, cage_cpu, TMS32031_TINT0 + which, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[cage_cpu], TMS32031_TINT0 + which, ASSERT_LINE);
 	cage_timer_enabled[which] = 0;
 	update_timer(which);
 }
@@ -381,7 +381,7 @@ static READ32_HANDLER( tms32031_io_r )
 	}
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s read -> %08X\n", activecpu_get_pc(), register_names[offset & 0x7f], result);
+		logerror("CAGE:%06X:%s read -> %08X\n", cpu_get_pc(space->cpu), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -391,7 +391,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s write = %08X\n", activecpu_get_pc(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
+		logerror("CAGE:%06X:%s write = %08X\n", cpu_get_pc(space->cpu), register_names[offset & 0x7f], tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -399,7 +399,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 		case DMA_SOURCE_ADDR:
 		case DMA_DEST_ADDR:
 		case DMA_TRANSFER_COUNT:
-			update_dma_state();
+			update_dma_state(space);
 			break;
 
 		case TIMER0_GLOBAL_CTL:
@@ -443,7 +443,7 @@ static WRITE32_HANDLER( tms32031_io_w )
  *
  *************************************/
 
-static void update_control_lines(void)
+static void update_control_lines(running_machine *machine)
 {
 	int val;
 
@@ -457,27 +457,27 @@ static void update_control_lines(void)
 		if ((cage_control & 2) && cage_to_cpu_ready)
 			reason |= CAGE_IRQ_REASON_DATA_READY;
 
-		(*cage_irqhandler)(Machine, reason);
+		(*cage_irqhandler)(machine, reason);
 	}
 
 	/* set the IOF input lines */
-	cpuintrf_push_context(cage_cpu);
-	val = activecpu_get_reg(TMS32031_IOF);
+	cpu_push_context(machine->cpu[cage_cpu]);
+	val = cpu_get_reg(machine->activecpu, TMS32031_IOF);
 	val &= ~0x88;
 	if (cpu_to_cage_ready) val |= 0x08;
 	if (cage_to_cpu_ready) val |= 0x80;
-	activecpu_set_reg(TMS32031_IOF, val);
-	cpuintrf_pop_context();
+	cpu_set_reg(machine->activecpu, TMS32031_IOF, val);
+	cpu_pop_context();
 }
 
 
 static READ32_HANDLER( cage_from_main_r )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE read command = %04X\n", activecpu_get_pc(), cage_from_main);
+		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 	cpu_to_cage_ready = 0;
-	update_control_lines();
-	cpunum_set_input_line(machine, cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
+	update_control_lines(space->machine);
+	cpu_set_input_line(space->machine->cpu[cage_cpu], TMS32031_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -485,17 +485,17 @@ static READ32_HANDLER( cage_from_main_r )
 static WRITE32_HANDLER( cage_from_main_ack_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE ack command = %04X\n", activecpu_get_pc(), cage_from_main);
+		logerror("%06X:CAGE ack command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 }
 
 
 static WRITE32_HANDLER( cage_to_main_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:Data from CAGE = %04X\n", activecpu_get_pc(), data);
-	soundlatch_word_w(machine, 0, data, mem_mask);
+		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(space->cpu), data);
+	soundlatch_word_w(space, 0, data, mem_mask);
 	cage_to_cpu_ready = 1;
-	update_control_lines();
+	update_control_lines(space->machine);
 }
 
 
@@ -510,13 +510,13 @@ static READ32_HANDLER( cage_io_status_r )
 }
 
 
-UINT16 main_from_cage_r(void)
+UINT16 main_from_cage_r(const address_space *space)
 {
 	if (LOG_COMM)
-		logerror("%06X:main read data = %04X\n", activecpu_get_pc(), soundlatch_word_r(Machine, 0, 0));
+		logerror("%06X:main read data = %04X\n", cpu_get_pc(space->machine->activecpu), soundlatch_word_r(space, 0, 0));
 	cage_to_cpu_ready = 0;
-	update_control_lines();
-	return soundlatch_word_r(Machine, 0, 0xffff);
+	update_control_lines(space->machine);
+	return soundlatch_word_r(space, 0, 0xffff);
 }
 
 
@@ -524,15 +524,15 @@ static TIMER_CALLBACK( deferred_cage_w )
 {
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
-	update_control_lines();
-	cpunum_set_input_line(machine, cage_cpu, TMS32031_IRQ0, ASSERT_LINE);
+	update_control_lines(machine);
+	cpu_set_input_line(machine->cpu[cage_cpu], TMS32031_IRQ0, ASSERT_LINE);
 }
 
 
 void main_to_cage_w(UINT16 data)
 {
 	if (LOG_COMM)
-		logerror("%06X:Command to CAGE = %04X\n", activecpu_get_pc(), data);
+		logerror("%06X:Command to CAGE = %04X\n", cpu_get_pc(Machine->activecpu), data);
 	timer_call_after_resynch(NULL, data, deferred_cage_w);
 }
 
@@ -550,14 +550,14 @@ UINT16 cage_control_r(void)
 }
 
 
-void cage_control_w(UINT16 data)
+void cage_control_w(running_machine *machine, UINT16 data)
 {
 	cage_control = data;
 
 	/* CPU is reset if both control lines are 0 */
 	if (!(cage_control & 3))
 	{
-		cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[cage_cpu], INPUT_LINE_RESET, ASSERT_LINE);
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
@@ -574,10 +574,10 @@ void cage_control_w(UINT16 data)
 		cage_to_cpu_ready = 0;
 	}
 	else
-		cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[cage_cpu], INPUT_LINE_RESET, CLEAR_LINE);
 
 	/* update the control state */
-	update_control_lines();
+	update_control_lines(machine);
 }
 
 
@@ -590,7 +590,7 @@ void cage_control_w(UINT16 data)
 
 static WRITE32_HANDLER( speedup_w )
 {
-	activecpu_eat_cycles(100);
+	cpu_eat_cycles(space->cpu, 100);
 	COMBINE_DATA(&speedup_ram[offset]);
 }
 
@@ -602,7 +602,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-static const struct tms32031_config cage_config =
+static const tms32031_config cage_config =
 {
 	0x400000
 };

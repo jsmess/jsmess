@@ -30,8 +30,8 @@ static WRITE16_HANDLER( goal92_sound_command_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine, 0, (data >> 8) & 0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		soundlatch_w(space, 0, (data >> 8) & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 	}
 }
 
@@ -40,18 +40,18 @@ static READ16_HANDLER( goal92_inputs_r )
 	switch(offset)
 	{
 		case 0:
-			return input_port_read(machine, "DSW1");
+			return input_port_read(space->machine, "DSW1");
 		case 1:
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 		case 2:
-			return input_port_read(machine, "IN2");
+			return input_port_read(space->machine, "IN2");
 		case 3:
-			return input_port_read(machine, "IN3");
+			return input_port_read(space->machine, "IN3");
 		case 7:
-			return input_port_read(machine, "DSW2");
+			return input_port_read(space->machine, "DSW2");
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n",offset, mem_mask,activecpu_get_pc());
+			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n",offset, mem_mask,cpu_get_pc(space->cpu));
 	}
 
 	return 0;
@@ -87,11 +87,11 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	msm5205_reset_w(0,data & 0x08);
 }
@@ -234,7 +234,7 @@ INPUT_PORTS_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -256,7 +256,7 @@ static void goal92_adpcm_int(running_machine *machine, int data)
 
 	toggle ^= 1;
 	if(toggle)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =

@@ -35,8 +35,8 @@ static UINT8 rambank;
 static WRITE8_HANDLER( cbasebal_bankswitch_w )
 {
 	/* bits 0-4 select ROM bank */
-//logerror("%04x: bankswitch %02x\n",activecpu_get_pc(),data);
-	memory_set_bank(1, data & 0x1f);
+//logerror("%04x: bankswitch %02x\n",cpu_get_pc(space->cpu),data);
+	memory_set_bank(space->machine, 1, data & 0x1f);
 
 	/* bit 5 used but unknown */
 
@@ -48,7 +48,7 @@ static WRITE8_HANDLER( cbasebal_bankswitch_w )
 static READ8_HANDLER( bankedram_r )
 {
 	if (rambank == 2)
-		return cbasebal_textram_r(machine,offset);	/* VRAM */
+		return cbasebal_textram_r(space,offset);	/* VRAM */
 	else if (rambank == 1)
 	{
 		if (offset < 0x800)
@@ -57,21 +57,21 @@ static READ8_HANDLER( bankedram_r )
 	}
 	else
 	{
-		return cbasebal_scrollram_r(machine,offset);	/* SCROLL */
+		return cbasebal_scrollram_r(space,offset);	/* SCROLL */
 	}
 }
 
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (rambank == 2)
-		cbasebal_textram_w(machine,offset,data);
+		cbasebal_textram_w(space,offset,data);
 	else if (rambank == 1)
 	{
 		if (offset < 0x800)
-			paletteram_xxxxBBBBRRRRGGGG_le_w(machine,offset,data);
+			paletteram_xxxxBBBBRRRRGGGG_le_w(space,offset,data);
 	}
 	else
-		cbasebal_scrollram_w(machine,offset,data);
+		cbasebal_scrollram_w(space,offset,data);
 }
 
 static WRITE8_HANDLER( cbasebal_coinctrl_w )
@@ -306,7 +306,7 @@ ROM_END
 
 static DRIVER_INIT( cbasebal )
 {
-	memory_configure_bank(1, 0, 32, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 32, memory_region(machine, "main") + 0x10000, 0x4000);
 	pang_decode(machine);
 }
 

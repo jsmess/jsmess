@@ -26,6 +26,7 @@ static int vdp1_sprite_log = 0;
 UINT32 *stv_vdp1_vram;
 static UINT32 *stv_vdp1_regs;
 UINT8* stv_vdp1_gfx_decode;
+extern UINT8 get_vblank(running_machine *machine);
 
 static UINT16	 *stv_framebuffer[2];
 static UINT16	 **stv_framebuffer_draw_lines;
@@ -193,7 +194,7 @@ READ32_HANDLER( stv_vdp1_regs_r )
 
 //  x ^= 0x00020000;
 
-	logerror ("cpu #%d (PC=%08X) VDP1: Read from Registers, Offset %04x\n",cpu_getactivecpu(), activecpu_get_pc(), offset);
+	logerror ("cpu #%d (PC=%08X) VDP1: Read from Registers, Offset %04x\n",cpunum_get_active(), cpu_get_pc(space->cpu), offset);
 //  if (offset == 0x04) return x;
 
 	return stv_vdp1_regs[offset];
@@ -294,16 +295,16 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 		else
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
-			if ( STV_VDP1_VBE && stv_vblank )
+			if ( STV_VDP1_VBE && get_vblank(space->machine) )
 			{
 				stv_vdp1_clear_framebuffer_on_next_frame = 1;
 			}
 
 			/* needed by pblbeach, it doesn't clear local coordinates in its sprite list...*/
-			if ( !strcmp(machine->gamedrv->name, "pblbeach") )
-			{
-				stvvdp1_local_x = stvvdp1_local_y = 0;
-			}
+			//if ( !strcmp(space->machine->gamedrv->name, "pblbeach") )
+			//{
+			//  stvvdp1_local_x = stvvdp1_local_y = 0;
+			//}
 		}
 	}
 	else if ( offset == 1 )
@@ -314,12 +315,6 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 			{
 				if ( vdp1_sprite_log ) logerror( "VDP1: Access to register PTMR = %1X\n", STV_VDP1_PTMR );
 				stv_vdp1_process_list( );
-
-				if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-				{
-					logerror( "Interrupt: Sprite draw end, Vector 0x4d, Level 0x02\n" );
-					cpunum_set_input_line_and_vector(machine, 0, 2, HOLD_LINE , 0x4d);
-				}
 			}
 		}
 		else if ( ACCESSING_BITS_0_15 )
@@ -355,7 +350,7 @@ WRITE32_HANDLER ( stv_vdp1_vram_w )
 
 //  if (((offset * 4) > 0xdf) && ((offset * 4) < 0x140))
 //  {
-//      logerror("cpu #%d (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), offset*4, data, mem_mask);
+//      logerror("cpu #%d (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 //  }
 
 	data = stv_vdp1_vram[offset];
@@ -1994,7 +1989,7 @@ static void stv_vdp1_process_list()
 
 	/* not here! this is done every frame drawn even if the cpu isn't running eg in the debugger */
 //  if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-//      cpunum_set_input_line_and_vector(Machine, 0, 2, HOLD_LINE , 0x4d);
+//      cpu_set_input_line_and_vector(Machine->cpu[0], 2, HOLD_LINE , 0x4d);
 
 	if (vdp1_sprite_log) logerror ("End of list processing!\n");
 }

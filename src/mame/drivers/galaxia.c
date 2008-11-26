@@ -100,7 +100,7 @@ static VIDEO_UPDATE( galaxia )
 
 static WRITE8_HANDLER(galaxia_video_w)
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(space->cpu, S2650_FO))
 	{
 		galaxia_video[offset]=data;
 	}
@@ -178,7 +178,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( galaxia_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 static MACHINE_DRIVER_START( galaxia )

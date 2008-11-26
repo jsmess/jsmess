@@ -64,36 +64,34 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 /************************************************************************/
 
-#define CHANGE_PC change_pc((I.sregs[CS]<<4) + I.ip)
-
 #define SegBase(Seg) (I.sregs[Seg] << 4)
 
 #define DefaultBase(Seg) ((seg_prefix && (Seg==DS || Seg==SS)) ? prefix_base : I.sregs[Seg] << 4)
 
-#define GetMemB(Seg,Off) ((UINT8)program_read_byte_8le((DefaultBase(Seg)+(Off))))
-#define GetMemW(Seg,Off) ((UINT16) program_read_byte_8le((DefaultBase(Seg)+(Off))) + (program_read_byte_8le((DefaultBase(Seg)+((Off)+1)))<<8) )
+#define GetMemB(Seg,Off) ((UINT8)memory_read_byte_8le(I.program, (DefaultBase(Seg)+(Off))))
+#define GetMemW(Seg,Off) ((UINT16) memory_read_byte_8le(I.program, (DefaultBase(Seg)+(Off))) + (memory_read_byte_8le(I.program, (DefaultBase(Seg)+((Off)+1)))<<8) )
 
-#define PutMemB(Seg,Off,x) { program_write_byte_8le((DefaultBase(Seg)+(Off)),(x)); }
+#define PutMemB(Seg,Off,x) { memory_write_byte_8le(I.program, (DefaultBase(Seg)+(Off)),(x)); }
 #define PutMemW(Seg,Off,x) { PutMemB(Seg,Off,(x)&0xff); PutMemB(Seg,(Off)+1,(BYTE)((x)>>8)); }
 
 /* Todo:  Remove these later - plus readword could overflow */
-#define ReadByte(ea) ((BYTE)program_read_byte_8le((ea)))
-#define ReadWord(ea) (program_read_byte_8le((ea))+(program_read_byte_8le(((ea)+1))<<8))
-#define WriteByte(ea,val) { program_write_byte_8le((ea),val); }
-#define WriteWord(ea,val) { program_write_byte_8le((ea),(BYTE)(val)); program_write_byte_8le(((ea)+1),(val)>>8); }
+#define ReadByte(ea) ((BYTE)memory_read_byte_8le(I.program, (ea)))
+#define ReadWord(ea) (memory_read_byte_8le(I.program, (ea))+(memory_read_byte_8le(I.program, ((ea)+1))<<8))
+#define WriteByte(ea,val) { memory_write_byte_8le(I.program, (ea),val); }
+#define WriteWord(ea,val) { memory_write_byte_8le(I.program, (ea),(BYTE)(val)); memory_write_byte_8le(I.program, ((ea)+1),(val)>>8); }
 
-#define read_port(port) io_read_byte_8le(port)
-#define write_port(port,val) io_write_byte_8le(port,val)
+#define read_port(port) memory_read_byte_8le(I.io, port)
+#define write_port(port,val) memory_write_byte_8le(I.io, port,val)
 
-#define FETCH (cpu_readop_arg((I.sregs[CS]<<4)+I.ip++))
-#define FETCHOP (cpu_readop((I.sregs[CS]<<4)+I.ip++))
-#define FETCHWORD(var) { var=cpu_readop_arg((((I.sregs[CS]<<4)+I.ip)))+(cpu_readop_arg((((I.sregs[CS]<<4)+I.ip+1)))<<8); I.ip+=2; }
+#define FETCH (memory_raw_read_byte(I.program, (I.sregs[CS]<<4)+I.ip++))
+#define FETCHOP (memory_decrypted_read_byte(I.program, (I.sregs[CS]<<4)+I.ip++))
+#define FETCHWORD(var) { var=memory_raw_read_byte(I.program, (((I.sregs[CS]<<4)+I.ip)))+(memory_raw_read_byte(I.program, (((I.sregs[CS]<<4)+I.ip+1)))<<8); I.ip+=2; }
 #define PUSH(val) { I.regs.w[SP]-=2; WriteWord((((I.sregs[SS]<<4)+I.regs.w[SP])),val); }
 #define POP(var) { var = ReadWord((((I.sregs[SS]<<4)+I.regs.w[SP]))); I.regs.w[SP]+=2; }
-#define PEEK(addr) ((BYTE)cpu_readop_arg(addr))
-#define PEEKOP(addr) ((BYTE)cpu_readop(addr))
+#define PEEK(addr) ((BYTE)memory_raw_read_byte(I.program, addr))
+#define PEEKOP(addr) ((BYTE)memory_decrypted_read_byte(I.program, addr))
 
-#define GetModRM UINT32 ModRM=cpu_readop_arg((I.sregs[CS]<<4)+I.ip++)
+#define GetModRM UINT32 ModRM=memory_raw_read_byte(I.program, (I.sregs[CS]<<4)+I.ip++)
 
 /* Cycle count macros:
     CLK  - cycle count is the same on all processors
@@ -152,7 +150,6 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 		static const UINT8 table[3]={3,10,10}; 	\
 		I.ip = (WORD)(I.ip+tmp);			\
 		nec_ICount-=table[chip_type/8];		\
-		CHANGE_PC;							\
 		return;								\
 	}
 
@@ -280,7 +277,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	unsigned di = I.regs.w[IY];								\
 	unsigned si = I.regs.w[IX];								\
 	static const UINT8 table[3]={18,19,19};	 					\
-	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",activecpu_get_pc());	\
+	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",cpu_get_pc(Machine->activecpu));	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
 		nec_ICount-=table[chip_type/8];						\
@@ -305,7 +302,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
     unsigned di = I.regs.w[IY];								\
 	unsigned si = I.regs.w[IX];								\
 	static const UINT8 table[3]={18,19,19};	 					\
-	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",activecpu_get_pc());	\
+	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",cpu_get_pc(Machine->activecpu));	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
 		nec_ICount-=table[chip_type/8];						\
@@ -335,7 +332,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
     unsigned di = I.regs.w[IY];								\
 	unsigned si = I.regs.w[IX];								\
 	static const UINT8 table[3]={14,19,19};						\
-	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",activecpu_get_pc());	\
+	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",cpu_get_pc(Machine->activecpu));	\
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
 		nec_ICount-=table[chip_type/8];						\

@@ -229,6 +229,7 @@
 #include "rendlay.h"
 #include "lazercmd.lh"
 
+#define MASTER_CLOCK XTAL_8MHz
 
 /*************************************************************
  *
@@ -249,7 +250,7 @@ static INTERRUPT_GEN( lazercmd_timer )
 	if( ++timer_count >= 64*128 ) {
 		timer_count = 0;
 		sense_state ^= 1;
-		cpunum_set_input_line(machine, 0, 1, (sense_state) ? ASSERT_LINE : CLEAR_LINE );
+		cpu_set_input_line(device, 1, (sense_state) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -286,7 +287,7 @@ static WRITE8_HANDLER( lazercmd_data_port_w )
 static READ8_HANDLER( lazercmd_data_port_r )
 {
 	int data;
-	data = input_port_read(machine, "DSW") & 0x0f;
+	data = input_port_read(space->machine, "DSW") & 0x0f;
 	return data;
 }
 
@@ -381,16 +382,16 @@ static READ8_HANDLER( lazercmd_hardware_r )
 	switch (offset)
 	{
 		case 0: 			   /* player 1 joysticks */
-			data = input_port_read(machine, "IN0");
+			data = input_port_read(space->machine, "IN0");
 			break;
 		case 1: 			   /* player 2 joysticks */
-			data = input_port_read(machine, "IN1");
+			data = input_port_read(space->machine, "IN1");
 			break;
 		case 2: 			   /* player 1 + 2 buttons */
-			data = input_port_read(machine, "IN3");
+			data = input_port_read(space->machine, "IN3");
 			break;
 		case 3: 			   /* coin slot + start buttons */
-			data = input_port_read(machine, "IN2");
+			data = input_port_read(space->machine, "IN2");
 			break;
 		case 4: 			   /* vertical scan counter */
 			data = ((timer_count&0x10)>>1)|((timer_count&0x20)>>3)|((timer_count&0x40)>>5)|((timer_count&0x80)>>7);
@@ -614,7 +615,7 @@ static PALETTE_INIT( lazercmd )
 static MACHINE_DRIVER_START( lazercmd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,8064000/12)				/* 672 kHz? */
+	MDRV_CPU_ADD("main", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -649,7 +650,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( medlanes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,8064000/12)				/* 672 kHz? */
+	MDRV_CPU_ADD("main", S2650,MASTER_CLOCK/12)				/* 666 kHz */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -684,7 +685,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbonk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,8064000/12)				/* 672 kHz? */
+	MDRV_CPU_ADD("main", S2650,MASTER_CLOCK/12)				/* 666 kHz */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period

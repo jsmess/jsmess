@@ -39,7 +39,7 @@ VIDEO_START( dv );
 static INTERRUPT_GEN( mainevt_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		irq0_line_hold(machine, cpunum);
+		irq0_line_hold(device);
 }
 
 
@@ -53,18 +53,18 @@ static WRITE8_HANDLER( dv_nmienable_w )
 static INTERRUPT_GEN( dv_interrupt )
 {
 	if (nmi_enable)
-		nmi_line_pulse(machine, cpunum);
+		nmi_line_pulse(device);
 }
 
 
 static WRITE8_HANDLER( mainevt_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	/* bit 0-1 ROM bank select */
 	bankaddress = 0x10000 + (data & 0x03) * 0x2000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* TODO: bit 5 = select work RAM or palette? */
 //  palette_selected = data & 0x20;
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( mainevt_coin_w )
 
 static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
@@ -97,19 +97,19 @@ static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
 	upd7759_reset_w(0, data & 2);
 	upd7759_start_w(0, data & 1);
 
-	interrupt_enable_w(machine,0,data & 4);
+	interrupt_enable_w(space,0,data & 4);
 }
 
 static WRITE8_HANDLER( devstor_sh_irqcontrol_w )
 {
-	interrupt_enable_w(machine,0,data & 4);
+	interrupt_enable_w(space,0,data & 4);
 }
 
 static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 {
 	int bank_A,bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",activecpu_get_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( dv_sh_bankswitch_w )
 {
 	int bank_A,bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",activecpu_get_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);

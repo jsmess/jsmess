@@ -164,12 +164,12 @@ WRITE8_HANDLER( dec8_scroll2_w )
 WRITE8_HANDLER( srdarwin_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	switch (offset) {
     	case 0: /* Top 3 bits - bank switch, bottom 4 - scroll MSB */
 			bankaddress = 0x10000 + (data >> 5) * 0x4000;
-			memory_set_bankptr(1,&RAM[bankaddress]);
+			memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 			scroll2[0]=data&0xf;
 			return;
 
@@ -181,7 +181,7 @@ WRITE8_HANDLER( srdarwin_control_w )
 
 WRITE8_HANDLER( lastmiss_control_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	/*
         Bit 0x0f - ROM bank switch.
@@ -190,25 +190,25 @@ WRITE8_HANDLER( lastmiss_control_w )
         Bit 0x40 - Y scroll MSB
         Bit 0x80 - Hold subcpu reset line high if clear, else low
     */
-	memory_set_bankptr(1,&RAM[0x10000 + (data & 0x0f) * 0x4000]);
+	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + (data & 0x0f) * 0x4000]);
 
 	scroll2[0]=(data>>5)&1;
 	scroll2[2]=(data>>6)&1;
 
 	if (data&0x80)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_HANDLER( shackled_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	scroll2[0]=(data>>5)&1;
 	scroll2[2]=(data>>6)&1;

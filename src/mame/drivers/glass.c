@@ -39,7 +39,7 @@ static WRITE16_HANDLER( clr_int_w )
 static INTERRUPT_GEN( glass_interrupt )
 {
 	if (cause_interrupt){
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+		cpu_set_input_line(device, 6, HOLD_LINE);
 		cause_interrupt = 0;
 	}
 }
@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "oki");
+	UINT8 *RAM = memory_region(space->machine, "oki");
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);

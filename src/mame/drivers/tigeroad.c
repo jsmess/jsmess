@@ -86,11 +86,11 @@ static const int f1dream_2450_lookup[32] = {
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0,
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0 };
 
-static void f1dream_protection_w(running_machine *machine)
+static void f1dream_protection_w(const address_space *space)
 {
 	int indx;
 	int value = 255;
-	int prevpc = activecpu_get_previouspc();
+	int prevpc = cpu_get_previouspc(space->machine->activecpu);
 
 	if (prevpc == 0x244c)
 	{
@@ -145,20 +145,20 @@ static void f1dream_protection_w(running_machine *machine)
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_w(machine,2,ram16[0x3ffc/2]);
+		soundlatch_w(space,2,ram16[0x3ffc/2]);
 	}
 }
 
 static WRITE16_HANDLER( f1dream_control_w )
 {
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",activecpu_get_pc(), ram16[0x3fe0/2]);
-	f1dream_protection_w(machine);
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(space->cpu), ram16[0x3fe0/2]);
+	f1dream_protection_w(space);
 }
 
 static WRITE16_HANDLER( tigeroad_soundcmd_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(machine,offset,data >> 8);
+		soundlatch_w(space,offset,data >> 8);
 }
 
 static WRITE8_HANDLER( msm5205_w )
@@ -502,7 +502,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -771,12 +771,12 @@ ROM_END
 
 static DRIVER_INIT( tigeroad )
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe4002, 0xfe4003, 0, 0, tigeroad_soundcmd_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, tigeroad_soundcmd_w);
 }
 
 static DRIVER_INIT( f1dream )
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe4002, 0xfe4003, 0, 0, f1dream_control_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, f1dream_control_w);
 }
 
 

@@ -81,7 +81,7 @@ const game_driver * const drivers[] =
 	DRIVER( piranhao )	/* GL */
 	DRIVER( nmouse )	/* (c) 1981 Amenip (Palcom Queen River) */
 	DRIVER( nmouseb )	/* (c) 1981 Amenip Nova Games Ltd. */
-	DRIVER( mspacman )	/* (c) 1981 Midway */ /* made by Gencomp */
+	DRIVER( mspacman )	/* (c) 1981 Midway */ /* made by General Computer */
 	DRIVER( mspacmnf )	/* hack */
 	DRIVER( mspacmat )	/* hack */
 	DRIVER( woodpek )	/* (c) 1981 Amenip (Palcom Queen River) */
@@ -862,6 +862,7 @@ const game_driver * const drivers[] =
 
 	/* Namco System 23 */
 	DRIVER( rapidrvr )	/* (c) 1997 */
+	DRIVER( motoxgo )	/* (c) 1997 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
 	DRIVER( timcrs2b )	/* (c) 1997 */
 	DRIVER( 500gp )		/* (c) 1999 */
@@ -1055,6 +1056,7 @@ const game_driver * const drivers[] =
 	DRIVER( rbibba )	/* (c) 1987 Namco */
 	DRIVER( suprmrio )	/* (c) 1986 Nintendo */
 	DRIVER( suprmria )	/* (c) 1986 Nintendo */
+	DRIVER( skatekds )	/* (c) 1988 (hack) */
 	DRIVER( vsskykid )	/* (c) 1986 Namco */
 	DRIVER( tkoboxng )	/* (c) 1987 Data East */
 	DRIVER( smgolf )	/* (c) 1984 Nintendo */
@@ -1995,6 +1997,7 @@ const game_driver * const drivers[] =
 	DRIVER( twinqix )	/* ??? (c) 1995 Taito America Corporation (US) */
 	DRIVER( quizhuhu )	/* E08 (c) 1995 Taito Corporation (Japan) */
 	DRIVER( pbobble2 )	/* E10 (c) 1995 Taito Corporation Japan (World) */
+	DRIVER( pbobbl2o )	/* E10 (c) 1995 Taito Corporation Japan (World) */
 	DRIVER( pbobbl2j )	/* E10 (c) 1995 Taito Corporation (Japan) */
 	DRIVER( pbobbl2u )	/* E10 (c) 1995 Taito America Corporation (US) */
 	DRIVER( pbobbl2x )	/* E10 (c) 1995 Taito Corporation (Japan) */
@@ -2474,6 +2477,7 @@ V-V                           TP-027
 	DRIVER( sf2cej )	/* 13/05/1992 (c) 1992 (Japan) */
 	DRIVER( sf2rb )		/* hack */
 	DRIVER( sf2rb2 )	/* hack */
+	DRIVER( sf2rb3 )	/* hack */
 	DRIVER( sf2red )	/* hack */
 	DRIVER( sf2v004 )	/* hack */
 	DRIVER( sf2accp2 )	/* hack */
@@ -2739,6 +2743,35 @@ V-V                           TP-027
 	DRIVER( choko )		/* 20/08/2001 (c) 2001 Mitchell (Japan) */
 	DRIVER( hsf2j )		/* 22/12/2003 (c) 2003 Hyper Street Fighter 2 (Japan) */
 	DRIVER( hsf2 )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (Asia) */
+
+	/* CPS2 'Phoenix' bootlegs */
+	DRIVER( ssf2ud )
+	DRIVER( ddtodd )
+	DRIVER( avspd )
+	DRIVER( dstlku1d )
+	DRIVER( ringdstd )
+	DRIVER( xmcotad )
+	DRIVER( nwarrud )
+	DRIVER( sfad )
+	DRIVER( mshud )
+	DRIVER( 19xxd )
+	DRIVER( sfz2ad )
+	DRIVER( spf2xjd )
+	DRIVER( ddsomud )
+	DRIVER( megamn2d )
+	DRIVER( sfz2aad )
+	DRIVER( xmvsfu1d )
+	DRIVER( batcird )
+	DRIVER( vsavd )
+	DRIVER( mvscud )
+	DRIVER( sfa3ud )
+	DRIVER( gwingjd )
+	DRIVER( 1944d )
+	DRIVER( progerjd )
+	DRIVER( hsf2d )
+	DRIVER( ssf2tbd )
+	DRIVER( ssf2xjd )
+	DRIVER( sgemfd )
 
 	/* Capcom CPS3 games */
 	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
@@ -4826,6 +4859,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mystwaru )	/* GX128 (c) 1993 (US) */
 	DRIVER( viostorm )	/* GX168 (c) 1993 (Europe) */
 	DRIVER( viostrmu )	/* GX168 (c) 1993 (US) */
+	DRIVER( viostmub )	/* GX168 (c) 1993 (US) */
 	DRIVER( viostrmj )	/* GX168 (c) 1993 (Japan) */
 	DRIVER( viostrma )	/* GX168 (c) 1993 (Asia) */
 	DRIVER( mmaulers )	/* GX170 (c) 1993 (Europe) */
@@ -5565,6 +5599,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mechatt )	/* A8002 'MA' (c) 1989 */
 	DRIVER( mechattu )	/* A8002 'MA' (c) 1989 */
 	DRIVER( bbusters )	/* A9003 'BB' (c) 1989 */
+	DRIVER( bbusteru )	/* A9003 'BB' (c) 1989 */
 
 	/* Electrocoin on early SNK hardware - gambling game remove once it works */
 	DRIVER( dmndrby )	/* G4001 'DD' (c) 1986 */
@@ -6518,6 +6553,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( edfu )		/* (c) 1991 */
 	DRIVER( 64street )	/* (c) 1991 */
 	DRIVER( 64streej )	/* (c) 1991 (Japan) */
+	DRIVER( soldam )	/* (c) 1992 */
 	DRIVER( soldamj )	/* (c) 1992 (Japan) */
 	DRIVER( bigstrik )	/* (c) 1992 */
 	DRIVER( bigstrkb )	/* bootleg on different hardware */
@@ -7131,6 +7167,7 @@ Other Sun games
 	DRIVER( toride2j )	/* (c) 1994 */
 	DRIVER( gunmast )	/* (c) 1994 */
 	DRIVER( daitorid )	/* (c) 1995 */
+	DRIVER( daitoa )	/* (c) 1995 */
 	DRIVER( dokyusei )	/* (c) 1995 Make Software / Elf / Media Trading */
 	DRIVER( dokyusp )	/* (c) 1995 Make Software / Elf / Media Trading */
 	DRIVER( puzzli )	/* (c) 1995 Metro / Banpresto */

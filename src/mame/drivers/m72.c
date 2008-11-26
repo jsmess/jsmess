@@ -113,8 +113,8 @@ static MACHINE_START( m72 )
 
 static TIMER_CALLBACK( synch_callback )
 {
-	//cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(8000000));
-	cpu_boost_interleave(machine, ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
+	//cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(8000000));
+	cpuexec_boost_interleave(machine, ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
 }
 
 static MACHINE_RESET( m72 )
@@ -203,7 +203,7 @@ static WRITE16_HANDLER( m72_main_mcu_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_snd_cmd_latch = data;
-		cputag_set_input_line(machine, "mcu", 1, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "mcu", 1, ASSERT_LINE);
 	}
 }
 
@@ -220,10 +220,10 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
 		protection_ram[offset] = val;
-		cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_clear);
-		//timer_set(ATTOTIME_IN_CYCLES(0, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_raise);
+		//timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_clear);
+		//timer_set(ATTOTIME_IN_CYCLES(0, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_raise);
 	}
 	else
 		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
@@ -244,7 +244,7 @@ static READ8_HANDLER(m72_mcu_data_r )
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
-		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 	}
 
 	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
@@ -257,19 +257,19 @@ static INTERRUPT_GEN( m72_mcu_int )
 {
 	//mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
 	mcu_snd_cmd_latch = 0x11;// | (mame_rand(machine) & 1); /* 0x10 is special as well - FIXME */
-	cputag_set_input_line(machine, "mcu", 1, ASSERT_LINE);
+	cpu_set_input_line(device, 1, ASSERT_LINE);
 }
 
 static READ8_HANDLER(m72_mcu_sample_r )
 {
 	UINT8 sample;
-	sample = memory_region(machine, "samples")[mcu_sample_addr++];
+	sample = memory_region(space->machine, "samples")[mcu_sample_addr++];
 	return sample;
 }
 
 static WRITE8_HANDLER(m72_mcu_ack_w )
 {
-	cputag_set_input_line(machine, "mcu", 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "mcu", 1, CLEAR_LINE);
 	mcu_snd_cmd_latch = 0;
 }
 
@@ -289,7 +289,7 @@ static WRITE8_HANDLER(m72_mcu_port_w )
 	if (offset == 1)
 	{
 		mcu_sample_latch = data;
-		cputag_set_input_line(machine, "sound", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "sound", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		logerror("port: %02x %02x\n", offset, data);
@@ -325,16 +325,16 @@ INLINE DRIVER_INIT( loht_mcu )
 	int sndnum = mame_find_cpu_index(machine, "sound");
 
 	protection_ram = auto_malloc(0x10000);
-	memory_install_read16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
-	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
-	memory_set_bankptr(1, protection_ram);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_set_bankptr(machine, 1, protection_ram);
 
-	//memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
-	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
+	//memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
 
 	/* sound cpu */
-	memory_install_write8_handler(machine, sndnum, ADDRESS_SPACE_IO, 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
-	memory_install_read8_handler (machine, sndnum, ADDRESS_SPACE_IO, 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[sndnum], ADDRESS_SPACE_IO), 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[sndnum], ADDRESS_SPACE_IO), 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
 
 #if 0
 	/* running the mcu at twice the speed, the following
@@ -402,9 +402,10 @@ static int find_sample(int num)
 
 static INTERRUPT_GEN(fake_nmi)
 {
-	int sample = m72_sample_r(machine,0);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	int sample = m72_sample_r(space,0);
 	if (sample)
-		m72_sample_w(machine,0,sample);
+		m72_sample_w(space,0,sample);
 }
 
 
@@ -696,52 +697,52 @@ static void install_protection_handler(running_machine *machine, const UINT8 *co
 	protection_ram = auto_malloc(0x1000);
 	protection_code = code;
 	protection_crc =  crc;
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
-	memory_set_bankptr(1, protection_ram);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
+	memory_set_bankptr(machine, 1, protection_ram);
 }
 
 static DRIVER_INIT( bchopper )
 {
 	install_protection_handler(machine, bchopper_code,bchopper_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( mrheli )
 {
 	install_protection_handler(machine, bchopper_code,mrheli_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspirit )
 {
 	install_protection_handler(machine, nspirit_code,nspirit_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspiritj )
 {
 	install_protection_handler(machine, nspirit_code,nspiritj_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( imgfight )
 {
 	install_protection_handler(machine, imgfight_code,imgfight_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
 }
 
 static DRIVER_INIT( loht )
 {
 	install_protection_handler(machine, loht_code,loht_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m72_videoram2,0,0x4000);
@@ -751,33 +752,33 @@ static DRIVER_INIT( xmultipl )
 {
 	install_protection_handler(machine, xmultipl_code,xmultipl_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
 }
 
 static DRIVER_INIT( dbreed72 )
 {
 	install_protection_handler(machine, dbreed72_code,dbreed72_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
 }
 
 static DRIVER_INIT( airduel )
 {
 	install_protection_handler(machine, airduel_code,airduel_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
 	install_protection_handler(machine, dkgenm72_code,dkgenm72_crc);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( gallop )
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
 }
 
 
@@ -811,7 +812,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 
 		for (i = 0;i < 4;i++)
 		{
-			curr = input_port_read(machine, axisnames[i]);
+			curr = input_port_read(space->machine, axisnames[i]);
 			diff[i] = (curr - prev[i]);
 			prev[i] = curr;
 		}
@@ -823,7 +824,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 		case 0:
 			return (diff[0] & 0xff) | ((diff[2] & 0xff) << 8);
 		case 1:
-			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (input_port_read(machine, "IN0") & 0xe0e0);
+			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (input_port_read(space->machine, "IN0") & 0xe0e0);
 		case 2:
 			return (diff[1] & 0xff) | ((diff[3] & 0xff) << 8);
 		case 3:

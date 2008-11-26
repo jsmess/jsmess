@@ -1,6 +1,8 @@
 /***************************************************************************
 
-    Z80 PIO Parallel Input/Output Controller emulation
+    Z80 PIO implementation
+
+    based on original version (c) 1997, Tatsuyuki Satoh
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -12,48 +14,39 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 
+
+
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE 0
+#define VERBOSE		0
 
-#define LOGERROR if (VERBOSE) logerror
+#define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
+
+
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-enum
-{
-	PIO_MODE_OUTPUT = 0,
-	PIO_MODE_INPUT,
-	PIO_MODE_BIDIRECTIONAL,
-	PIO_MODE_CONTROL
-};
+#define PIO_MODE0		0x00		/* output mode */
+#define PIO_MODE1		0x01		/* input  mode */
+#define PIO_MODE2		0x02		/* i/o    mode */
+#define PIO_MODE3		0x03		/* bit    mode */
 
-enum
-{
-	PIO_STATE_NORMAL = 0,
-	PIO_STATE_DDR,
-	PIO_STATE_MASK
-};
+/* pio controll port operation (bit 0-3) */
+#define PIO_OP_MODE		0x0f		/* mode select        */
+#define PIO_OP_INTC		0x07		/* interrupt controll */
+#define PIO_OP_INTE		0x03		/* interrupt enable   */
 
-enum
-{
-	PIO_PORT_A = 0,
-	PIO_PORT_B,
-	PIO_PORT_COUNT
-};
+/* pio interrupt controll nit */
+#define PIO_INT_ENABLE	0x80		/* ENABLE : 0=disable , 1=enable */
+#define PIO_INT_AND		0x40		/* LOGIC  : 0=OR      , 1=AND    */
+#define PIO_INT_HIGH	0x20		/* LEVEL  : 0=low     , 1=high   */
+#define PIO_INT_MASK	0x10		/* MASK   : 0=off     , 1=on     */
 
-#define PIO_MODE_CONTROL_WORD	0x0f
-#define PIO_IRQ_CONTROL_WORD	0x07
-#define PIO_IRQ_DISABLE_WORD	0x03
 
-#define PIO_IRQ_MASK_FOLLOWS	0x10
-#define PIO_IRQ_ACTIVE_HIGH		0x20
-#define PIO_IRQ_AND				0x40
-#define PIO_IRQ_ENABLE			0x80
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -62,28 +55,23 @@ enum
 typedef struct _z80pio z80pio_t;
 struct _z80pio
 {
-	const z80pio_interface *intf;			/* interface */
-
-	int clock;								/* clock frequency */
-
-	int state[PIO_PORT_COUNT];				/* control register state */
-	int mode[PIO_PORT_COUNT];				/* mode control register */
-	int irq_enable[PIO_PORT_COUNT];			/* interrupt enable flag */
-	int irq_pending[PIO_PORT_COUNT];		/* interrupt pending flag */
-	int int_state[PIO_PORT_COUNT];			/* interrupt status */
-	UINT8 enable[PIO_PORT_COUNT];			/* interrupt control word */
-	UINT8 input[PIO_PORT_COUNT];			/* data input register */
-	UINT8 output[PIO_PORT_COUNT];			/* data output register */
-	UINT8 vector[PIO_PORT_COUNT];			/* interrupt vector */
-	UINT8 mask[PIO_PORT_COUNT];				/* mask register */
-	UINT8 ddr[PIO_PORT_COUNT];				/* input/output select register */
-	int strobe[PIO_PORT_COUNT];				/* strobe pulse */
-	int match[PIO_PORT_COUNT];				/* control mode bit logic equation match */
-
-	/* timers */
-	emu_timer *poll_timer;					/* mode 3 poll timer */
-	emu_timer *irq_timer;					/* interrupt enable timer */
+	UINT8 vector[2];                      /* interrupt vector               */
+	void (*intr)(const device_config *, int which);            /* interrupt callbacks            */
+	void (*rdyr[2])(int data);          /* RDY active callback            */
+	read8_device_func  port_read[2];     /* port read callbacks            */
+	write8_device_func port_write[2];    /* port write callbacks           */
+	UINT8 mode[2];                        /* mode 00=in,01=out,02=i/o,03=bit*/
+	UINT8 enable[2];                      /* interrupt enable               */
+	UINT8 mask[2];                        /* mask folowers                  */
+	UINT8 dir[2];                         /* direction (bit mode)           */
+	UINT8 rdy[2];                         /* ready pin level                */
+	UINT8 in[2];                          /* input port data                */
+	UINT8 out[2];                         /* output port                    */
+	UINT8 strobe[2];						/* strobe inputs */
+	UINT8 int_state[2];                   /* interrupt status (daisy chain) */
 };
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -92,6 +80,8 @@ struct _z80pio
 static int z80pio_irq_state(const device_config *device);
 static int z80pio_irq_ack(const device_config *device);
 static void z80pio_irq_reti(const device_config *device);
+
+
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -102,617 +92,361 @@ INLINE z80pio_t *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == Z80PIO);
-
 	return (z80pio_t *)device->token;
 }
+
 
 /***************************************************************************
     INTERNAL STATE MANAGEMENT
 ***************************************************************************/
 
-static void z80pio_check_interrupt(const device_config *device)
+INLINE void set_rdy(const device_config *device, int ch, int state)
 {
-	z80pio_t *z80pio = get_safe_token(device);
-	int channel;
+	z80pio_t *z80pio = get_safe_token( device );
+	/* set state */
+	z80pio->rdy[ch] = state;
 
-	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
+	/* call callback with state */
+	if (z80pio->rdyr[ch])
+		z80pio->rdyr[ch](z80pio->rdy[ch]);
+}
+
+
+INLINE void interrupt_check(const device_config *device)
+{
+	z80pio_t *z80pio = get_safe_token( device );
+
+	/* if we have a callback, update it with the current state */
+	if (z80pio->intr)
+		z80pio->intr(device, (z80pio_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static void update_irq_state(const device_config *device, int ch)
+{
+	z80pio_t *z80pio = get_safe_token( device );
+	int old_state = z80pio->int_state[ch];
+	int irq = 0;
+	int data;
+	if (z80pio->mode[ch] == 0x13 || (z80pio->enable[ch] & PIO_INT_MASK)) return;
+
+	/* only check if interrupts are enabled */
+	if (z80pio->enable[ch] & PIO_INT_ENABLE)
 	{
-		if (z80pio->irq_enable[channel])
+		/* in mode 3, interrupts are tricky */
+		if (z80pio->mode[ch] == PIO_MODE3)
 		{
-			if (z80pio->irq_pending[channel])
+			/* fetch input data (ignore output lines) */
+			data = z80pio->in[ch] & z80pio->dir[ch];
+
+			/* keep only relevant bits */
+			data &= ~z80pio->mask[ch];
+
+			/* if active low, invert the bits */
+			if (!(z80pio->enable[ch] & PIO_INT_HIGH))
+				data ^= z80pio->mask[ch];
+
+			/* if AND logic, interrupt if all bits are set */
+			if (z80pio->enable[ch] & PIO_INT_AND)
+				irq = (data == z80pio->mask[ch]);
+
+			/* otherwise, interrupt if at least one bit is set */
+			else
+				irq = (data != 0);
+
+			/* if portB, portA mode 2 check */
+			if (ch && (z80pio->mode[0] == PIO_MODE2))
 			{
-				/* trigger interrupt request */
-				z80pio->int_state[channel] |= Z80_DAISY_INT;
-
-				/* reset interrupt pending */
-				z80pio->irq_pending[channel] = 0;
-
-				LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Request\n", device->tag, 'A' + channel);
+				if (z80pio->rdy[ch] == 0)
+					irq = 1;
 			}
 		}
+
+		/* otherwise, just interrupt when ready is cleared */
 		else
-		{
-			/* clear interrupt request */
-			z80pio->int_state[channel] &= ~Z80_DAISY_INT;
-		}
+			irq = (z80pio->rdy[ch] == 0);
 	}
 
-	if (z80pio->intf->on_int_changed)
-	{
-		z80pio->intf->on_int_changed(device, (z80pio_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
-
-static void z80pio_trigger_interrupt(const device_config *device, int channel)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-
-	if (z80pio->irq_enable[channel])
-	{
-		z80pio->int_state[channel] |= Z80_DAISY_INT;
-		z80pio_check_interrupt(device);
-
-		LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Request\n", device->tag, 'A' + channel);
-	}
+	if (irq)
+		z80pio->int_state[ch] |=  Z80_DAISY_INT;
 	else
-	{
-		/* set interrupt pending */
-		z80pio->irq_pending[channel] = 1;
-		z80pio_check_interrupt(device);
+		z80pio->int_state[ch] &= ~Z80_DAISY_INT;
 
-		LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Pending\n", device->tag, 'A' + channel);
-	}
+	if (old_state != z80pio->int_state[ch])
+		interrupt_check(device);
 }
 
-static TIMER_CALLBACK( z80pio_irq_tick )
-{
-	const device_config *device = (device_config *) ptr;
-	z80pio_t *z80pio = get_safe_token(device);
 
-	int channel = BIT(param, 1);
-	int state = BIT(param, 0);
-
-	/* set interrupt enable */
-	z80pio->irq_enable[channel] = state;
-
-	LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Enable %u\n", device->tag, 'A' + channel, state);
-
-	/* check interrupt status */
-	z80pio_check_interrupt(device);
-}
-
-static void z80pio_set_irq_enable(const device_config *device, int channel, int state)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-
-	if (state)
-	{
-		/* enable interrupt on next _M1 */
-		int param = (channel << 1) | state;
-
-		timer_adjust_oneshot(z80pio->irq_timer, ATTOTIME_IN_HZ(z80pio->clock * 4), param);
-	}
-	else
-	{
-		/* disable interrupt immediately */
-		z80pio->irq_enable[channel] = state;
-
-		LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Enable %u\n", device->tag, 'A' + channel, state);
-	}
-}
-
-static void z80pio_ready_w(const device_config *device, int channel, int state)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-
-	LOGERROR("Z80PIO \"%s\" Port %c : Ready %u\n", device->tag, 'A' + channel, state);
-
-	if (channel == PIO_PORT_A)
-	{
-		if (z80pio->intf->on_ardy_changed)
-		{
-			z80pio->intf->on_ardy_changed(device, state);
-		}
-	}
-	else
-	{
-		if (z80pio->intf->on_brdy_changed)
-		{
-			z80pio->intf->on_brdy_changed(device, state);
-		}
-	}
-}
-
-static UINT8 z80pio_port_r(const device_config *device, int channel)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-	UINT8 data = 0;
-
-	if (channel == PIO_PORT_A)
-	{
-		if (z80pio->intf->port_a_r)
-		{
-			data = z80pio->intf->port_a_r(device, 0);
-		}
-	}
-	else
-	{
-		if (z80pio->intf->port_b_r)
-		{
-			data = z80pio->intf->port_b_r(device, 0);
-		}
-	}
-
-	//LOGERROR("Z80PIO \"%s\" Port %c : Input Data '%02x'\n", device->tag, 'A' + channel, data);
-
-	return data;
-}
-
-static void z80pio_port_w(const device_config *device, int channel)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-	UINT8 data = z80pio->output[channel];
-
-	if (z80pio->mode[channel] == PIO_MODE_CONTROL)
-	{
-		/* mask input pins */
-		data &= ~z80pio->ddr[channel];
-	}
-
-	if (channel == PIO_PORT_A)
-	{
-		if (z80pio->intf->port_a_w)
-		{
-			z80pio->intf->port_a_w(device, 0, data);
-		}
-	}
-	else
-	{
-		if (z80pio->intf->port_b_w)
-		{
-			z80pio->intf->port_b_w(device, 0, data);
-		}
-	}
-
-	//LOGERROR("Z80PIO \"%s\" Port %c : Output Data '%02x'\n", device->tag, 'A' + channel, data);
-}
-
-static void z80pio_set_mode(const device_config *device, int channel, UINT8 data)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-
-	int mode = data >> 6;
-
-	switch (mode)
-	{
-	case PIO_MODE_OUTPUT:
-		LOGERROR("Z80PIO \"%s\" Port %c : Mode %u (Byte Output)\n", device->tag, 'A' + channel, mode);
-
-		/* set mode */
-		z80pio->mode[channel] = mode;
-
-		/* enable data output */
-		z80pio_port_w(device, channel);
-
-		/* assert ready line */
-		z80pio_ready_w(device, channel, 1);
-		break;
-
-	case PIO_MODE_INPUT:
-		LOGERROR("Z80PIO \"%s\" Port %c : Mode %u (Byte Input)\n", device->tag, 'A' + channel, mode);
-
-		/* set mode */
-		z80pio->mode[channel] = mode;
-		break;
-
-	case PIO_MODE_BIDIRECTIONAL:
-		if (channel == PIO_PORT_A)
-		{
-			LOGERROR("Z80PIO \"%s\" Port %c : Mode %u (Bidirectional)\n", device->tag, 'A' + channel, mode);
-
-			/* set mode */
-			z80pio->mode[channel] = mode;
-		}
-		break;
-
-	case PIO_MODE_CONTROL:
-		LOGERROR("Z80PIO \"%s\" Port %c : Mode %u (Bit Control)\n", device->tag, 'A' + channel, mode);
-
-		/* set mode */
-		z80pio->mode[channel] = mode;
-
-		if ((channel == PIO_PORT_A) || (z80pio->mode[PIO_PORT_A] != PIO_MODE_BIDIRECTIONAL))
-		{
-			/* clear ready line */
-			z80pio_ready_w(device, channel, 0);
-		}
-
-		/* disable interrupts until DDR is written */
-		z80pio_set_irq_enable(device, channel, 0);
-
-		/* set logic equation to false */
-		z80pio->match[channel] = 0;
-
-		/* next word is I/O control */
-		z80pio->state[channel] = PIO_STATE_DDR;
-		break;
-	}
-}
 
 /***************************************************************************
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( lh0081_c_r )
+WRITE8_DEVICE_HANDLER( z80pio_c_w )
 {
-	z80pio_t *z80pio = get_safe_token(device);
+	z80pio_t *z80pio = get_safe_token( device );
 
-	return (z80pio->enable[PIO_PORT_A] & 0xc0) | (z80pio->enable[PIO_PORT_B] >> 4);
+	/* There are only 2 channels */
+	offset &= 0x01;
+
+	/* load direction phase ? */
+	if (z80pio->mode[offset] == 0x13)
+	{
+		VPRINTF(("PIO-%c Bits %02x\n", 'A' + offset, data));
+		z80pio->dir[offset] = data;
+		z80pio->mode[offset] = 0x03;
+		return;
+	}
+
+	/* load mask folows phase ? */
+	if (z80pio->enable[offset] & PIO_INT_MASK)
+	{
+		/* load mask folows */
+		z80pio->mask[offset] = data;
+		z80pio->enable[offset] &= ~PIO_INT_MASK;
+		VPRINTF(("PIO-%c interrupt mask %02x\n",'A'+offset,data ));
+		return;
+	}
+
+	switch (data & 0x0f)
+	{
+		case PIO_OP_MODE:	/* mode select 0=out,1=in,2=i/o,3=bit */
+			z80pio->mode[offset] = (data >> 6);
+			VPRINTF(("PIO-%c Mode %x\n", 'A' + offset, z80pio->mode[offset]));
+			if (z80pio->mode[offset] == 0x03)
+				z80pio->mode[offset] = 0x13;
+			return;
+
+		case PIO_OP_INTC:		/* interrupt control */
+			z80pio->enable[offset] = data & 0xf0;
+			z80pio->mask[offset] = 0x00;
+			/* when interrupt enable , set vector request flag */
+			VPRINTF(("PIO-%c Controll %02x\n", 'A' + offset, data));
+			break;
+
+		case PIO_OP_INTE:		/* interrupt enable controll */
+			z80pio->enable[offset] &= ~PIO_INT_ENABLE;
+			z80pio->enable[offset] |= (data & PIO_INT_ENABLE);
+			VPRINTF(("PIO-%c enable %02x\n", 'A' + offset, data & 0x80));
+			break;
+
+		default:
+			if (!(data & 1))
+			{
+				z80pio->vector[offset] = data;
+				VPRINTF(("PIO-%c vector %02x\n", 'A' + offset, data));
+			}
+			else
+				VPRINTF(("PIO-%c illegal command %02x\n", 'A' + offset, data));
+			break;
+	}
+
+	/* interrupt check */
+	update_irq_state(device, offset);
 }
+
 
 READ8_DEVICE_HANDLER( z80pio_c_r )
 {
+	/* There are only 2 channels */
+	offset &= 0x01;
+
+	VPRINTF(("PIO-%c controll read\n", 'A' + offset ));
 	return 0;
 }
 
-WRITE8_DEVICE_HANDLER( z80pio_c_w )
-{
-	z80pio_t *z80pio = get_safe_token(device);
-	int channel = offset & 0x01;
 
-	switch (z80pio->state[channel])
-	{
-	case PIO_STATE_NORMAL:
-		if (!BIT(data, 0))
-		{
-			LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Vector Word '%02x'\n", device->tag, 'A' + channel, z80pio->vector[channel]);
-
-			/* load interrupt vector */
-			z80pio->vector[channel] = data & 0xfe;
-		}
-		else if ((data & 0x0f) == PIO_IRQ_DISABLE_WORD)
-		{
-			LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Disable Word '%02x'\n", device->tag, 'A' + channel, data);
-
-			/* set interrupt enable */
-			z80pio->enable[channel] = (data & 0x80) | (z80pio->enable[channel] & 0x7f);
-			z80pio_set_irq_enable(device, channel, BIT(data, 7));
-		}
-		else if ((data & 0x0f) == PIO_MODE_CONTROL_WORD)
-		{
-			LOGERROR("Z80PIO \"%s\" Port %c : Mode Control Word '%02x'\n", device->tag, 'A' + channel, data);
-
-			/* set operating mode */
-			z80pio_set_mode(device, channel, data);
-		}
-		else if ((data & 0x0f) == PIO_IRQ_CONTROL_WORD)
-		{
-			LOGERROR("Z80PIO \"%s\" Port %c : Interrupt Control Word '%02x'\n", device->tag, 'A' + channel, data);
-
-			/* set interrupt control word */
-			z80pio->enable[channel] = data & 0xf0;
-
-			if (data & PIO_IRQ_MASK_FOLLOWS)
-			{
-				/* disable interrupts until mask is written */
-				z80pio_set_irq_enable(device, channel, 0);
-
-				/* reset pending interrupt */
-				z80pio->irq_pending[channel] = 0;
-
-				/* set logic equation to false */
-				z80pio->match[channel] = 0;
-
-				/* next word is mask control */
-				z80pio->state[channel] = PIO_STATE_MASK;
-			}
-			else
-			{
-				/* set interrupt enable */
-				z80pio_set_irq_enable(device, channel, BIT(data, 7));
-			}
-		}
-		break;
-
-	case PIO_STATE_DDR:
-		LOGERROR("Z80PIO \"%s\" Port %c : I/O Control Word '%02x'\n", device->tag, 'A' + channel, data);
-
-		/* set data direction */
-		z80pio->ddr[channel] = data;
-
-		/* set interrupt enable */
-		z80pio_set_irq_enable(device, channel, BIT(z80pio->enable[channel], 7));
-
-		/* next word is indeterminate */
-		z80pio->state[channel] = PIO_STATE_NORMAL;
-		break;
-
-	case PIO_STATE_MASK:
-		LOGERROR("Z80PIO \"%s\" Port %c : Mask Control Word '%02x'\n", device->tag, 'A' + channel, data);
-
-		/* set interrupt mask */
-		z80pio->mask[channel] = data;
-
-		/* set interrupt enable */
-		z80pio_set_irq_enable(device, channel, BIT(z80pio->enable[channel], 7));
-
-		/* next word is indeterminate */
-		z80pio->state[channel] = PIO_STATE_NORMAL;
-		break;
-	}
-}
 
 /***************************************************************************
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( z80pio_d_r )
-{
-	z80pio_t *z80pio = get_safe_token( device );
-	int channel = offset & 0x01;
-	UINT8 data = 0;
-
-	switch (z80pio->mode[channel])
-	{
-	case PIO_MODE_OUTPUT:
-		data = z80pio->output[channel];
-		break;
-
-	case PIO_MODE_INPUT:
-		data = z80pio->input[channel];
-
-		/* clear ready line */
-		z80pio_ready_w(device, channel, 0);
-
-		/* assert ready line */
-		z80pio_ready_w(device, channel, 1);
-		break;
-
-	case PIO_MODE_BIDIRECTIONAL:
-		data = z80pio->input[PIO_PORT_A] | (z80pio->output[PIO_PORT_A] & (~z80pio->ddr[PIO_PORT_A]));
-
-		/* clear ready line */
-		z80pio_ready_w(device, 1, 0);
-
-		/* assert ready line */
-		z80pio_ready_w(device, 1, 1);
-		break;
-
-	case PIO_MODE_CONTROL:
-		z80pio->input[channel] = z80pio_port_r(device, channel);
-
-		data = (z80pio->input[channel] & z80pio->ddr[channel]) | (z80pio->output[channel] & (~z80pio->ddr[channel]));
-		break;
-	}
-
-	LOGERROR("Z80PIO \"%s\" Port %c : Data Register Read '%02x'\n", device->tag, 'A' + channel, data);
-
-	return data;
-}
-
 WRITE8_DEVICE_HANDLER( z80pio_d_w )
 {
 	z80pio_t *z80pio = get_safe_token( device );
-	int channel = offset & 0x01;
 
-	LOGERROR("Z80PIO \"%s\" Port %c : Data Register Write '%02x'\n", device->tag, 'A' + channel, data);
+	/* There are only 2 channels */
+	offset &= 0x01;
 
-	switch (z80pio->mode[channel])
+	z80pio->out[offset] = data;	/* latch out data */
+	if(z80pio->port_write[offset])
+		z80pio->port_write[offset](device, 0, data);
+
+	switch (z80pio->mode[offset])
 	{
-	case PIO_MODE_OUTPUT:
-		/* clear ready line */
-		z80pio_ready_w(device, channel, 0);
+		case PIO_MODE0:			/* mode 0 output */
+		case PIO_MODE2:			/* mode 2 i/o */
+			set_rdy(device, offset, 1); /* ready = H */
+			update_irq_state(device, offset);
+			return;
 
-		/* output data */
-		z80pio->output[channel] = data;
-		z80pio_port_w(device, channel);
+		case PIO_MODE1:			/* mode 1 input */
+		case PIO_MODE3:			/* mode 0 bit */
+			return;
 
-		/* assert ready line */
-		z80pio_ready_w(device, channel, 1);
-		break;
-
-	case PIO_MODE_INPUT:
-		/* do nothing */
-		break;
-
-	case PIO_MODE_BIDIRECTIONAL:
-		/* clear ready line */
-		z80pio_ready_w(device, channel, 0);
-
-		/* latch output data */
-		z80pio->output[channel] = data;
-
-		if (!z80pio->strobe[channel])
-		{
-			/* output data if ASTB active */
-			z80pio_port_w(device, channel);
-		}
-
-		/* assert ready line */
-		z80pio_ready_w(device, channel, 1);
-		break;
-
-	case PIO_MODE_CONTROL:
-		/* output data */
-		z80pio->output[channel] = data;
-		z80pio_port_w(device, channel);
-		break;
+		default:
+			VPRINTF(("PIO-%c data write,bad mode\n",'A'+offset ));
 	}
 }
+
+
+READ8_DEVICE_HANDLER( z80pio_d_r )
+{
+	z80pio_t *z80pio = get_safe_token( device );
+
+	/* There are only 2 channels */
+	offset &= 0x01;
+
+	switch (z80pio->mode[offset])
+	{
+		case PIO_MODE0:			/* mode 0 output */
+			return z80pio->out[offset];
+
+		case PIO_MODE1:			/* mode 1 input */
+			set_rdy(device, offset, 1);	/* ready = H */
+			if(z80pio->port_read[offset])
+				z80pio->in[offset] = z80pio->port_read[offset](device, 0);
+			update_irq_state(device, offset);
+			return z80pio->in[offset];
+
+		case PIO_MODE2:			/* mode 2 i/o */
+			if (offset) VPRINTF(("PIO-B mode 2 \n"));
+			set_rdy(device, 1, 1); /* brdy = H */
+			if(z80pio->port_read[offset])
+				z80pio->in[offset] = z80pio->port_read[offset](device, 0);
+			update_irq_state(device, offset);
+			return z80pio->in[offset];
+
+		case PIO_MODE3:			/* mode 3 bit */
+			if(z80pio->port_read[offset])
+				z80pio->in[offset] = z80pio->port_read[offset](device, 0);
+			return (z80pio->in[offset] & z80pio->dir[offset]) | (z80pio->out[offset] & ~z80pio->dir[offset]);
+	}
+	VPRINTF(("PIO-%c data read,bad mode\n",'A'+offset ));
+	return 0;
+}
+
+
+
+/***************************************************************************
+    PORT I/O
+***************************************************************************/
+
+WRITE8_DEVICE_HANDLER( z80pio_p_w )
+{
+	z80pio_t *z80pio = get_safe_token( device );
+
+	/* There are only 2 channels */
+	offset &= 0x01;
+
+	z80pio->in[offset]  = data;
+	switch (z80pio->mode[offset])
+	{
+		case PIO_MODE0:
+			VPRINTF(("PIO-%c OUTPUT mode and data write\n",'A'+offset ));
+			break;
+
+		case PIO_MODE2:	/* only port A */
+			offset = 1;		/* handshake and IRQ is use portB */
+
+		case PIO_MODE1:
+			set_rdy(device, offset, 0);
+			update_irq_state(device, offset);
+			break;
+
+		case PIO_MODE3:
+			/* irq check */
+			update_irq_state(device, offset);
+			break;
+	}
+}
+
+
+READ8_DEVICE_HANDLER( z80pio_p_r )
+{
+	z80pio_t *z80pio = get_safe_token( device );
+
+	/* There are only 2 channels */
+	offset &= 0x01;
+
+	switch (z80pio->mode[offset])
+	{
+		case PIO_MODE2:		/* port A only */
+		case PIO_MODE0:
+			set_rdy(device, offset, 0);
+			update_irq_state(device, offset);
+			break;
+
+		case PIO_MODE1:
+			VPRINTF(("PIO-%c INPUT mode and data read\n",'A'+offset ));
+			break;
+
+		case PIO_MODE3:
+			return (z80pio->in[offset] & z80pio->dir[offset]) | (z80pio->out[offset] & ~z80pio->dir[offset]);
+	}
+	return z80pio->out[offset];
+}
+
 
 /***************************************************************************
     STROBE STATE MANAGEMENT
 ***************************************************************************/
 
-static TIMER_CALLBACK( z80pio_poll_tick )
+static void z80pio_update_strobe(const device_config *device, int ch, int state)
 {
-	const device_config *device = (device_config *) ptr;
-	z80pio_t *z80pio = get_safe_token(device);
-	int channel;
+	z80pio_t *z80pio = get_safe_token( device );
 
-	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
+	switch (z80pio->mode[ch])
 	{
-		if ((z80pio->mode[channel] == PIO_MODE_CONTROL) && (z80pio->mask[channel] != 0xff))
+		/* output mode: a positive edge is used by peripheral to acknowledge
+            the receipt of data */
+		case PIO_MODE0:
 		{
-			int bit;
-			int match = 0;
+			/* ensure valid */
+			state = state & 0x01;
 
-			int edge = (z80pio->enable[channel] & PIO_IRQ_ACTIVE_HIGH) ? 1 : 0;
-
-			UINT8 mask = z80pio->mask[channel];
-			UINT8 ddr = z80pio->ddr[channel];
-			UINT8 old_data = z80pio->input[channel] & ddr;
-			UINT8 data = z80pio_port_r(device, channel) & ddr;
-
-			if (old_data == data) continue;
-
-			for (bit = 0; bit < 8; bit++)
+			/* strobe changed state? */
+			if ((z80pio->strobe[ch] ^ state) != 0)
 			{
-				if (BIT(mask, bit)) continue; /* masked out */
-				if (!BIT(ddr, bit)) continue; /* output bit */
-
-				if ((BIT(old_data, bit) ^ edge) && !(BIT(data, bit) ^ edge)) /* falling edge */
+				/* yes */
+				if (state != 0)
 				{
-					/* logic equation is true, until proven otherwise */
-					match = 1;
+					/* positive edge */
+					VPRINTF(("PIO-%c positive strobe\n",'A' + ch));
 
-					LOGERROR("Z80PIO \"%s\" Port %c : Edge Transition detected on bit %u, data %02x %02x\n", device->tag, 'A' + channel, bit, old_data, data);
-				}
-				else if (z80pio->enable[channel] & PIO_IRQ_AND)
-				{
-					/* all bits must match in AND mode, so logic equation is false */
-					match = 0;
-					break;
+					/* ready is now inactive */
+					set_rdy(device, ch, 0);
+
+					/* int enabled? */
+					if (z80pio->enable[ch] & PIO_INT_ENABLE)
+					{
+						/* trigger an int request */
+						z80pio->int_state[ch] |= Z80_DAISY_INT;
+					}
 				}
 			}
 
-			if (!z80pio->match[channel] && match) /* rising edge */
-			{
-				/* trigger interrupt only once */
-				z80pio_trigger_interrupt(device, channel);
-				z80pio->input[channel] = data;
-			}
+			/* store strobe state */
+			z80pio->strobe[ch] = state;
 
-			z80pio->match[channel] = match;
-		}
-	}
-}
-
-/***************************************************************************
-    STROBE STATE MANAGEMENT
-***************************************************************************/
-
-static void z80pio_strobe_bidirectional(const device_config *device, int channel, int state)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-
-	switch (channel)
-	{
-	case PIO_PORT_A:
-		if (!state) /* low level */
-		{
-			/* output data */
-			z80pio_port_w(device, PIO_PORT_A);
-		}
-		else if (!z80pio->strobe[channel] && state) /* rising edge */
-		{
-			/* trigger interrupt */
-			z80pio_trigger_interrupt(device, channel);
-
-			/* clear ready line */
-			z80pio_ready_w(device, channel, 0);
+			/* check interrupt */
+			interrupt_check(device);
 		}
 		break;
 
-	case PIO_PORT_B:
-		if (!state) /* low level */
-		{
-			/* input data */
-			z80pio->input[channel] = z80pio_port_r(device, PIO_PORT_A);
-		}
-		else if (!z80pio->strobe[channel] && state) /* rising edge */
-		{
-			/* trigger interrupt */
-			z80pio_trigger_interrupt(device, channel);
+		/* input mode: strobe is used by peripheral to load data from the peripheral
+            into port a input register, data loaded into pio when signal is active */
 
-			/* clear ready line */
-			z80pio_ready_w(device, channel, 0);
-		}
-		break;
-	}
-
-	/* latch strobe state */
-	z80pio->strobe[channel] = state;
-}
-
-static void z80pio_strobe(const device_config *device, int channel, int state)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-
-	switch (z80pio->mode[channel])
-	{
-	case PIO_MODE_OUTPUT:
-		if (!z80pio->strobe[channel] && state) /* rising edge */
-		{
-			/* trigger interrupt */
-			z80pio_trigger_interrupt(device, channel);
-
-			/* clear ready line */
-			z80pio_ready_w(device, channel, 0);
-		}
-		break;
-
-	case PIO_MODE_INPUT:
-		if (!state) /* low level */
-		{
-			/* strobe data in */
-			z80pio->input[channel] = z80pio_port_r(device, channel);
-		}
-		else if (!z80pio->strobe[channel] && state) /* rising edge */
-		{
-			/* trigger interrupt */
-			z80pio_trigger_interrupt(device, channel);
-
-			/* clear ready line */
-			z80pio_ready_w(device, channel, 0);
-		}
-		break;
-
-	case PIO_MODE_CONTROL:
-		/* ignore strobes */
-		break;
-	}
-
-	/* latch strobe state */
-	z80pio->strobe[channel] = state;
-}
-
-static void z80pio_strobe_w(const device_config *device, int channel, int state)
-{
-	z80pio_t *z80pio = get_safe_token(device);
-
-	LOGERROR("Z80PIO \"%s\" Port %c : Strobe %u\n", device->tag, 'A' + channel, state);
-
-	if (z80pio->mode[PIO_PORT_A] == PIO_MODE_BIDIRECTIONAL)
-	{
-		/* port A bidirectional mode */
-		z80pio_strobe_bidirectional(device, channel, state);
-	}
-	else
-	{
-		z80pio_strobe(device, channel, state);
+		default:
+			break;
 	}
 }
 
-void z80pio_astb_w(const device_config *device, int state)
-{
-	z80pio_strobe_w(device, PIO_PORT_A, state);
-}
 
-void z80pio_bstb_w(const device_config *device, int state)
-{
-	z80pio_strobe_w(device, PIO_PORT_B, state);
-}
+void z80pio_astb_w(const device_config *device, int state) { z80pio_update_strobe(device, 0, state); }
+void z80pio_bstb_w(const device_config *device, int state) { z80pio_update_strobe(device, 1, state); }
+
+
 
 /***************************************************************************
     DAISY CHAIN INTERFACE
@@ -722,80 +456,69 @@ static int z80pio_irq_state(const device_config *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int state = 0;
-	int channel;
+	int ch;
 
 	/* loop over all channels */
-	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
+	for (ch = 0; ch < 2; ch++)
 	{
 		/* if we're servicing a request, don't indicate more interrupts */
-		if (z80pio->int_state[channel] & Z80_DAISY_IEO)
+		if (z80pio->int_state[ch] & Z80_DAISY_IEO)
 		{
 			state |= Z80_DAISY_IEO;
 			break;
 		}
-
-		state |= z80pio->int_state[channel];
+		state |= z80pio->int_state[ch];
 	}
-
-	LOGERROR("Z80PIO \"%s\" : Interrupt State %u\n", device->tag, state);
-
 	return state;
 }
+
 
 static int z80pio_irq_ack(const device_config *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
-	int channel;
-
-	LOGERROR("Z80PIO \"%s\" Interrupt Acknowledge\n", device->tag);
+	int ch;
 
 	/* loop over all channels */
-	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
-	{
+	for (ch = 0; ch < 2; ch++)
+
 		/* find the first channel with an interrupt requested */
-		if (z80pio->int_state[channel] & Z80_DAISY_INT)
+		if (z80pio->int_state[ch] & Z80_DAISY_INT)
 		{
 			/* clear interrupt, switch to the IEO state, and update the IRQs */
-			z80pio->int_state[channel] = Z80_DAISY_IEO;
-			z80pio_check_interrupt(device);
-
-			return z80pio->vector[channel];
+			z80pio->int_state[ch] = Z80_DAISY_IEO;
+			interrupt_check(device);
+			return z80pio->vector[ch];
 		}
-	}
 
-	LOGERROR("z80pio_irq_ack: failed to find an interrupt to ack!");
-
+	VPRINTF(("z80pio_irq_ack: failed to find an interrupt to ack!"));
 	return z80pio->vector[0];
 }
+
 
 static void z80pio_irq_reti(const device_config *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
-	int channel;
-
-	LOGERROR("Z80PIO \"%s\" Return from Interrupt\n", device->tag);
+	int ch;
 
 	/* loop over all channels */
-	for (channel = PIO_PORT_A; channel < PIO_PORT_COUNT; channel++)
-	{
+	for (ch = 0; ch < 2; ch++)
+
 		/* find the first channel with an IEO pending */
-		if (z80pio->int_state[channel] & Z80_DAISY_IEO)
+		if (z80pio->int_state[ch] & Z80_DAISY_IEO)
 		{
 			/* clear the IEO state and update the IRQs */
-			z80pio->int_state[channel] &= ~Z80_DAISY_IEO;
-			z80pio_check_interrupt(device);
-
+			z80pio->int_state[ch] &= ~Z80_DAISY_IEO;
+			interrupt_check(device);
 			return;
 		}
-	}
 
-	LOGERROR("z80pio_irq_reti: failed to find an interrupt to clear IEO on!");
+	VPRINTF(("z80pio_irq_reti: failed to find an interrupt to clear IEO on!"));
 }
+
 
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
-
 READ8_DEVICE_HANDLER(z80pio_r)
 {
 	return (offset & 2) ? z80pio_c_r(device, offset & 1) : z80pio_d_r(device, offset & 1);
@@ -809,118 +532,55 @@ WRITE8_DEVICE_HANDLER(z80pio_w)
 		z80pio_d_w(device, offset & 1, data);
 }
 
-READ8_DEVICE_HANDLER(z80pio_alt_r)
-{
-	int channel = BIT(offset, 1);
-
-	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
-}
-
-WRITE8_DEVICE_HANDLER(z80pio_alt_w)
-{
-	int channel = BIT(offset, 1);
-
-	if (offset & 1)
-		z80pio_c_w(device, channel, data);
-	else
-		z80pio_d_w(device, channel, data);
-}
-
-/***************************************************************************
-    DEVICE INTERFACE
-***************************************************************************/
 
 static DEVICE_START( z80pio )
 {
 	const z80pio_interface *intf = device->static_config;
 	z80pio_t *z80pio = get_safe_token( device );
-	char unique_tag[30];
-	int cpunum = -1;
 
-	assert(intf != NULL);
-	z80pio->intf = intf;
+	z80pio->intr = intf->intr;
+	z80pio->port_read[0] = intf->portAread;
+	z80pio->port_read[1] = intf->portBread;
+	z80pio->port_write[0] = intf->portAwrite;
+	z80pio->port_write[1] = intf->portBwrite;
+	z80pio->rdyr[0] = intf->rdyA;
+	z80pio->rdyr[1] = intf->rdyB;
 
-	/* get clock */
-
-	if (intf->cpu != NULL)
-	{
-		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
-	}
-
-	if (cpunum != -1)
-	{
-		z80pio->clock = device->machine->config->cpu[cpunum].clock;
-	}
-	else
-	{
-		assert(intf->clock > 0);
-		z80pio->clock = intf->clock;
-	}
-
-	/* allocate poll timer */
-
-	z80pio->poll_timer = timer_alloc(z80pio_poll_tick, (void *)device);
-	timer_adjust_periodic(z80pio->poll_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80pio->clock / 16));
-
-	/* allocate interrupt enable timer */
-
-	z80pio->irq_timer = timer_alloc(z80pio_irq_tick, (void *)device);
-
-	/* register for state saving */
-
-	state_save_combine_module_and_tag(unique_tag, "z80pio", device->tag);
-
-	state_save_register_item_array(unique_tag, 0, z80pio->state);
-	state_save_register_item_array(unique_tag, 0, z80pio->mode);
-	state_save_register_item_array(unique_tag, 0, z80pio->irq_enable);
-	state_save_register_item_array(unique_tag, 0, z80pio->irq_pending);
-	state_save_register_item_array(unique_tag, 0, z80pio->int_state);
-	state_save_register_item_array(unique_tag, 0, z80pio->enable);
-	state_save_register_item_array(unique_tag, 0, z80pio->input);
-	state_save_register_item_array(unique_tag, 0, z80pio->output);
-	state_save_register_item_array(unique_tag, 0, z80pio->vector);
-	state_save_register_item_array(unique_tag, 0, z80pio->mask);
-	state_save_register_item_array(unique_tag, 0, z80pio->ddr);
-	state_save_register_item_array(unique_tag, 0, z80pio->strobe);
-	state_save_register_item_array(unique_tag, 0, z80pio->match);
+	/* register for save states */
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->vector);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->mode);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->enable);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->mask);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->dir);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->rdy);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->in);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->out);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->strobe);
+	state_save_register_item_array("z80pio", device->tag, 0, z80pio->int_state);
 
 	return DEVICE_START_OK;
 }
 
+
 static DEVICE_RESET( z80pio )
 {
-	z80pio_t *z80pio = get_safe_token(device);
-	int channel;
+	z80pio_t	*z80pio = get_safe_token( device );
+	int i;
 
-	LOGERROR("Z80PIO \"%s\" : Reset\n", device->tag);
-
-	for (channel = 0; channel < 2; channel++)
+	for (i = 0; i < 2; i++)
 	{
-		/* set mode 1 */
-		z80pio->mode[channel] = PIO_MODE_INPUT;
-
-		/* disable interrupt */
-		z80pio->enable[channel] &= 0x7f;
-		z80pio->irq_enable[channel] = 0;
-		z80pio->irq_pending[channel] = 0;
-		z80pio->int_state[channel] = 0;
-		z80pio->match[channel] = 0;
-
-		/* reset all bits of the data I/O register */
-		z80pio->ddr[channel] = 0;
-
-		/* set all bits of the mask control register */
-		z80pio->mask[channel] = 0xff;
-
-		/* reset output register */
-		z80pio->output[channel] = 0;
-
-		/* clear ready line */
-		z80pio_ready_w(device, channel, 0);
+		z80pio->mask[i]   = 0xff;	/* mask all on */
+		z80pio->enable[i] = 0x00;	/* disable     */
+		z80pio->mode[i]   = 0x01;	/* mode input  */
+		z80pio->dir[i]    = 0x01;	/* dir  input  */
+		set_rdy(device, i, 0);	/* RDY = low   */
+		z80pio->out[i]    = 0x00;	/* outdata = 0 */
+		z80pio->int_state[i] = 0;
+		z80pio->strobe[i] = 0;
 	}
-
-	z80pio_check_interrupt(device);
+	interrupt_check(device);
 }
+
 
 static DEVICE_SET_INFO( z80pio )
 {
@@ -929,6 +589,7 @@ static DEVICE_SET_INFO( z80pio )
 		/* no parameters to set */
 	}
 }
+
 
 DEVICE_GET_INFO( z80pio )
 {
@@ -957,38 +618,3 @@ DEVICE_GET_INFO( z80pio )
 	}
 }
 
-DEVICE_GET_INFO( z8420 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Zilog Z8420";				break;
-		case DEVINFO_STR_FAMILY:						info->s = "Z80 PIO";					break;
-
-		default:										DEVICE_GET_INFO_CALL(z80pio);
-	}
-}
-
-DEVICE_GET_INFO( lh0081 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Sharp LH0081";				break;
-		case DEVINFO_STR_FAMILY:						info->s = "Z80 PIO";					break;
-
-		default:										DEVICE_GET_INFO_CALL(z80pio);
-	}
-}
-
-DEVICE_GET_INFO( mk3881 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Mostek MK3881";				break;
-		case DEVINFO_STR_FAMILY:						info->s = "Z80 PIO";					break;
-
-		default:										DEVICE_GET_INFO_CALL(z80pio);
-	}
-}

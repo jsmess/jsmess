@@ -233,12 +233,12 @@ static int vblank;
 static INTERRUPT_GEN( homedata_irq )
 {
 	vblank = 1;
-	cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( upd7807_irq )
 {
-	cpunum_set_input_line(machine, 1,UPD7810_INTF1,HOLD_LINE);
+	cpu_set_input_line(device,UPD7810_INTF1,HOLD_LINE);
 }
 
 
@@ -264,7 +264,7 @@ static READ8_HANDLER( mrokumei_keyboard_r )
 		{
 			if (keyb & (1 << i))
 			{
-				res = input_port_read(machine, keynames[i]) & 0x3f;
+				res = input_port_read(space->machine, keynames[i]) & 0x3f;
 				break;
 			}
 		}
@@ -298,9 +298,9 @@ static int sndbank;
 static READ8_HANDLER( mrokumei_sound_io_r )
 {
 	if (sndbank & 4)
-		return(soundlatch_r(machine,0));
+		return(soundlatch_r(space,0));
 	else
-		return memory_region(machine, "audio")[0x10000 + offset + (sndbank & 1) * 0x10000];
+		return memory_region(space->machine, "audio")[0x10000 + offset + (sndbank & 1) * 0x10000];
 }
 
 static WRITE8_HANDLER( mrokumei_sound_bank_w )
@@ -319,15 +319,15 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 			dac_signed_data_w(0,data);
 			break;
 		default:
-			logerror("%04x: I/O write to port %04x\n",activecpu_get_pc(),offset);
+			logerror("%04x: I/O write to port %04x\n",cpu_get_pc(space->cpu),offset);
 			break;
 	}
 }
 
 static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
 
@@ -363,27 +363,27 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
        1 \ ROM bank
        0 /
       */
-//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",activecpu_get_pc(),data,BIT(data,2),BIT(data,6));
+//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",cpu_get_pc(space->cpu),data,BIT(data,2),BIT(data,6));
 
 
-	memory_set_bankptr(2,memory_region(machine, "audio") + 0x10000 * (data & 0x03));
+	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audio") + 0x10000 * (data & 0x03));
 
 	coin_counter_w(0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
 	{
 		if (BIT(data,3))
-			ym2203_write_port_0_w(machine,0,upd7807_porta);
+			ym2203_write_port_0_w(space,0,upd7807_porta);
 		else
-			ym2203_control_port_0_w(machine,0,upd7807_porta);
+			ym2203_control_port_0_w(space,0,upd7807_porta);
 	}
 
 	if (BIT(upd7807_portc,4) && !BIT(data,4))	/* read clock 1->0 */
 	{
 		if (BIT(data,3))
-			upd7807_porta = ym2203_read_port_0_r(machine,0);
+			upd7807_porta = ym2203_read_port_0_r(space,0);
 		else
-			upd7807_porta = ym2203_status_port_0_r(machine,0);
+			upd7807_porta = ym2203_status_port_0_r(space,0);
 	}
 
 	upd7807_portc = data;
@@ -391,14 +391,15 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 
 static MACHINE_RESET( reikaids_upd7807 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_which=homedata_priority;
-	reikaids_upd7807_portc_w(machine,0,0xff);
+	reikaids_upd7807_portc_w(space,0,0xff);
 }
 
 static READ8_HANDLER( reikaids_io_r )
 {
-	int res = input_port_read(machine, "IN2");	// bit 4 = coin, bit 5 = service
+	int res = input_port_read(space->machine, "IN2");	// bit 4 = coin, bit 5 = service
 
 	res |= BIT(upd7807_portc,2) * 0x01;		// bit 0 = upd7807 status
 	res |= BIT(upd7807_portc,6) * 0x02;		// bit 1 = upd7807 data
@@ -407,7 +408,7 @@ static READ8_HANDLER( reikaids_io_r )
 
 	vblank = 0;
 
-//logerror("%04x: io_r %02x\n",activecpu_get_pc(),res);
+//logerror("%04x: io_r %02x\n",cpu_get_pc(space->cpu),res);
 
 	return res;
 }
@@ -416,14 +417,14 @@ static int snd_command;
 
 static READ8_HANDLER( reikaids_snd_command_r )
 {
-//logerror("%04x: sndmcd_r (%02x)\n",activecpu_get_pc(),snd_command);
+//logerror("%04x: sndmcd_r (%02x)\n",cpu_get_pc(space->cpu),snd_command);
 	return snd_command;
 }
 
 static WRITE8_HANDLER( reikaids_snd_command_w )
 {
 	snd_command = data;
-//logerror("%04x: coprocessor_command_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: coprocessor_command_w %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 
@@ -440,13 +441,13 @@ static int to_cpu,from_cpu;
 
 static WRITE8_HANDLER( pteacher_snd_command_w )
 {
-//logerror("%04x: snd_command_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: snd_command_w %02x\n",cpu_get_pc(space->cpu),data);
 	from_cpu = data;
 }
 
 static READ8_HANDLER( pteacher_snd_r )
 {
-//logerror("%04x: pteacher_snd_r %02x\n",activecpu_get_pc(),to_cpu);
+//logerror("%04x: pteacher_snd_r %02x\n",cpu_get_pc(space->cpu),to_cpu);
 	return to_cpu;
 }
 
@@ -469,15 +470,15 @@ static READ8_HANDLER( pteacher_io_r )
 static READ8_HANDLER( pteacher_keyboard_r )
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
-	int dips = input_port_read(machine, "DSW");
+	int dips = input_port_read(space->machine, "DSW");
 
-//  logerror("%04x: keyboard_r with port A = %02x\n",activecpu_get_pc(),upd7807_porta);
+//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(space->cpu),upd7807_porta);
 
 	if (upd7807_porta & 0x80)
 	{
 		/* player 1 + dip switches */
 		int row = (upd7807_porta & 0x07);
-		return input_port_read(machine, keynames[row]) | (((dips >> row) & 1) << 5);	// 0-5
+		return input_port_read(space->machine, keynames[row]) | (((dips >> row) & 1) << 5);	// 0-5
 	}
 	if (upd7807_porta & 0x08)
 	{
@@ -494,7 +495,7 @@ static READ8_HANDLER( pteacher_upd7807_porta_r )
 	if (!BIT(upd7807_portc,6))
 		upd7807_porta = from_cpu;
 	else
-logerror("%04x: read PA with PC *not* clear\n",activecpu_get_pc());
+logerror("%04x: read PA with PC *not* clear\n",cpu_get_pc(space->cpu));
 
 	return upd7807_porta;
 }
@@ -502,7 +503,7 @@ logerror("%04x: read PA with PC *not* clear\n",activecpu_get_pc());
 static WRITE8_HANDLER( pteacher_snd_answer_w )
 {
 	to_cpu = data;
-//logerror("%04x: to_cpu = %02x\n",activecpu_get_pc(),to_cpu);
+//logerror("%04x: to_cpu = %02x\n",cpu_get_pc(space->cpu),to_cpu);
 }
 
 static WRITE8_HANDLER( pteacher_upd7807_porta_w )
@@ -523,22 +524,23 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
        0 input (coin)
       */
 
-//  logerror("%04x: port C wr %02x\n",activecpu_get_pc(),data);
+//  logerror("%04x: port C wr %02x\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bankptr(2,memory_region(machine, "audio") + 0x10000 * ((data & 0x0c) >> 2));
+	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audio") + 0x10000 * ((data & 0x0c) >> 2));
 
 	coin_counter_w(0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
-		sn76496_0_w(machine,0,upd7807_porta);
+		sn76496_0_w(space,0,upd7807_porta);
 
 	upd7807_portc = data;
 }
 
 static MACHINE_RESET( pteacher_upd7807 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	pteacher_upd7807_portc_w(machine,0,0xff);
+	pteacher_upd7807_portc_w(space,0,0xff);
 }
 
 
@@ -547,18 +549,18 @@ static MACHINE_RESET( pteacher_upd7807 )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
-	int len = memory_region_length(machine, "main") - 0x10000+0x4000;
+	UINT8 *rom = memory_region(space->machine, "main");
+	int len = memory_region_length(space->machine, "main") - 0x10000+0x4000;
 	int offs = (data * 0x4000) & (len-1);
 
 	/* last bank is fixed */
 	if (offs < len - 0x4000)
 	{
-		memory_set_bankptr(1, &rom[offs + 0x10000]);
+		memory_set_bankptr(space->machine, 1, &rom[offs + 0x10000]);
 	}
 	else
 	{
-		memory_set_bankptr(1, &rom[0xc000]);
+		memory_set_bankptr(space->machine, 1, &rom[0xc000]);
 	}
 }
 
@@ -1786,15 +1788,15 @@ static DRIVER_INIT( jogakuen )
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
        but with just these two addresses swapped. Instead of creating a new
        MachineDriver, I just fix them here. */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
 }
 
 static DRIVER_INIT( mjikaga )
 {
 	/* Mahjong Ikagadesuka is different as well. */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7802, 0x7802, 0, 0, pteacher_snd_r);
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7802, 0x7802, 0, 0, pteacher_snd_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
 }
 
 static DRIVER_INIT( reikaids )

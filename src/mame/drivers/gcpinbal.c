@@ -46,7 +46,7 @@ static int start, end, bank;
 
 static TIMER_CALLBACK( gcpinbal_interrupt1 )
 {
-	cpunum_set_input_line(machine, 0,1,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],1,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -55,7 +55,7 @@ static TIMER_CALLBACK( gcpinbal_interrupt3 )
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))
 	{
-		cpunum_set_input_line(machine, 0,3,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0],3,HOLD_LINE);
 	}
 }
 #endif
@@ -66,7 +66,7 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 
 	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, gcpinbal_interrupt1);
 //  timer_set(ATTOTIME_IN_CYCLES(1000,0), NULL, 0, gcpinbal_interrupt3);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 
@@ -81,22 +81,22 @@ static READ16_HANDLER( ioc_r )
 	switch (offset)
 	{
 		case 0x80/2:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		case 0x84/2:
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 
 		case 0x86/2:
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 
 		case 0x50:
 		case 0x51:
-			return okim6295_status_0_r(machine,0)<<8;
+			return okim6295_status_0_r(space,0)<<8;
 			break;
 
 	}
 
-//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
+//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(space->cpu),offset);
 
 	return gcpinbal_ioc_ram[offset];
 }
@@ -149,7 +149,7 @@ static WRITE16_HANDLER( ioc_w )
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			okim6295_data_0_w(machine, 0, data>>8);
+			okim6295_data_0_w(space, 0, data>>8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
@@ -186,7 +186,7 @@ static WRITE16_HANDLER( ioc_w )
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n",activecpu_get_pc(),offset,data);
+			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n",cpu_get_pc(space->cpu),offset,data);
 			break;
 	}
 

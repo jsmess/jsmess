@@ -1,13 +1,13 @@
 #define IRQ_ADDRESS	0xf
 
 #define saturn_assert(x) \
-	do { if (!(x)) logerror("SATURN%d assertion failed: %s at %s:%i, pc=%05x\n", cpu_getactivecpu(), #x, __FILE__, __LINE__, saturn.pc); } while (0)
+	do { if (!(x)) logerror("SATURN%d assertion failed: %s at %s:%i, pc=%05x\n", cpunum_get_active(), #x, __FILE__, __LINE__, saturn.pc); } while (0)
 
 INLINE int READ_OP(void)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-        data=cpu_readop(saturn.pc);
+        data=memory_decrypted_read_byte(saturn.program, saturn.pc);
 	saturn_assert(data<0x10);
 	saturn.pc=(saturn.pc+1)&0xfffff;
 	return data;
@@ -17,7 +17,7 @@ INLINE int READ_OP_ARG(void)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-        data=cpu_readop_arg(saturn.pc);
+        data=memory_raw_read_byte(saturn.program, saturn.pc);
 	saturn_assert(data<0x10);
 	saturn.pc=(saturn.pc+1)&0xfffff;
 	return data;
@@ -78,7 +78,7 @@ INLINE int READ_NIBBLE(SaturnAdr adr)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-	data=program_read_byte(adr&0xfffff);
+	data=memory_read_byte(saturn.program, adr&0xfffff);
 	saturn_assert(data<0x10);
 	if (saturn.config&&saturn.config->crc) saturn.config->crc(Machine, adr&0xfffff, data);
 	return data;
@@ -108,7 +108,7 @@ INLINE void WRITE_NIBBLE(SaturnAdr adr, SaturnNib nib)
 {
 	saturn_ICount-=3;
 	saturn_assert(nib<0x10);
-	program_write_byte(adr&0xfffff,nib);
+	memory_write_byte(saturn.program, adr&0xfffff,nib);
 }
 
 #define BEGIN_B 0
@@ -186,24 +186,24 @@ INLINE void saturn_push(SaturnAdr adr)
 
 INLINE void saturn_interrupt_on(void)
 {
-	LOG(( "SATURN#%d at %05x: INTON\n", cpu_getactivecpu(), saturn.pc-4 ));
+	LOG(( "SATURN#%d at %05x: INTON\n", cpunum_get_active(), saturn.pc-4 ));
 	saturn.irq_enable=1;
 	if (saturn.irq_state)
 	{
-		LOG(( "SATURN#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
+		LOG(( "SATURN#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
 		saturn.pending_irq=1;
 	}
 }
 
 INLINE void saturn_interrupt_off(void)
 {
-	LOG(( "SATURN#%d at %05x: INTOFF\n", cpu_getactivecpu(), saturn.pc-4 ));
+	LOG(( "SATURN#%d at %05x: INTOFF\n", cpunum_get_active(), saturn.pc-4 ));
 	saturn.irq_enable=0;
 }
 
 INLINE void saturn_reset_interrupt(void)
 {
-	LOG(( "SATURN#%d at %05x: RSI\n", cpu_getactivecpu(), saturn.pc-5 ));
+	LOG(( "SATURN#%d at %05x: RSI\n", cpunum_get_active(), saturn.pc-5 ));
 	if (saturn.config&&saturn.config->rsi) saturn.config->rsi(Machine);
 }
 
@@ -236,27 +236,27 @@ INLINE void saturn_shutdown(void)
 {
 	saturn.sleeping=1;
 	saturn.irq_enable=1;
-	LOG(( "SATURN#%d at %05x: SHUTDN\n", cpu_getactivecpu(), saturn.pc-3 ));
+	LOG(( "SATURN#%d at %05x: SHUTDN\n", cpunum_get_active(), saturn.pc-3 ));
 }
 
 INLINE void saturn_bus_command_b(void)
 {
-	logerror( "SATURN#%d at %05x: BUSCB opcode not handled\n", cpu_getactivecpu(), saturn.pc-4 );
+	logerror( "SATURN#%d at %05x: BUSCB opcode not handled\n", cpunum_get_active(), saturn.pc-4 );
 }
 
 INLINE void saturn_bus_command_c(void)
 {
-	logerror( "SATURN#%d at %05x: BUSCC opcode not handled\n", cpu_getactivecpu(), saturn.pc-3 );
+	logerror( "SATURN#%d at %05x: BUSCC opcode not handled\n", cpunum_get_active(), saturn.pc-3 );
 }
 
 INLINE void saturn_bus_command_d(void)
 {
-	logerror( "SATURN#%d at %05x: BUSCD opcode not handled\n", cpu_getactivecpu(), saturn.pc-4 );
+	logerror( "SATURN#%d at %05x: BUSCD opcode not handled\n", cpunum_get_active(), saturn.pc-4 );
 }
 
 INLINE void saturn_serial_request(void)
 {
-	logerror( "SATURN#%d at %05x: SREQ? opcode not handled\n", cpu_getactivecpu(), saturn.pc-3 );
+	logerror( "SATURN#%d at %05x: SREQ? opcode not handled\n", cpunum_get_active(), saturn.pc-3 );
 }
 
 INLINE void saturn_out_c(void)
@@ -279,7 +279,7 @@ INLINE void saturn_in(int reg)
 	saturn_assert(reg>=0 && reg<9);
 	if (!(saturn.pc&1))
 		logerror( "SATURN#%d at %05x: reg=IN opcode at odd addresse\n",
-			  cpu_getactivecpu(), saturn.pc-3 );
+			  cpunum_get_active(), saturn.pc-3 );
 	if (saturn.config&&saturn.config->in) in = saturn.config->in(Machine);
 	S64_WRITE_WORD(reg,in);
 	monitor_in = in;
@@ -320,7 +320,6 @@ INLINE void saturn_jump_after_test(void)
 		} else {
 			saturn.pc=(saturn.pc+adr-2)&0xfffff;
 		}
-		change_pc(saturn.pc);
 	}
 }
 INLINE void saturn_st_clear_bit(void)
@@ -429,7 +428,6 @@ INLINE void saturn_jump(int adr, int jump)
 	if (jump) {
 		saturn.pc=adr;
 		saturn_ICount-=10;
-		change_pc(saturn.pc);
 	}
 }
 
@@ -439,7 +437,6 @@ INLINE void saturn_call(int adr)
 	saturn_push(saturn.pc);
 	saturn.pc=adr;
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_return(int yes)
@@ -447,7 +444,6 @@ INLINE void saturn_return(int yes)
 	if (yes) {
 		saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-		change_pc(saturn.pc);
 	}
 }
 
@@ -455,7 +451,6 @@ INLINE void saturn_return_carry_set(void)
 {
 	saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 	saturn.carry=1;
 }
 
@@ -463,17 +458,15 @@ INLINE void saturn_return_carry_clear(void)
 {
 	saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 	saturn.carry=0;
 }
 
 INLINE void saturn_return_interrupt(void)
 {
-	LOG(( "SATURN#%d at %05x: RTI\n", cpu_getactivecpu(), saturn.pc-2 ));
+	LOG(( "SATURN#%d at %05x: RTI\n", cpunum_get_active(), saturn.pc-2 ));
 	saturn.in_irq=0; /* set to 1 when an IRQ is taken */
 	saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_return_xm_set(void)
@@ -481,7 +474,6 @@ INLINE void saturn_return_xm_set(void)
 	saturn.pc=saturn_pop();
 	saturn.hst|=XM;
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_pop_c(void)
@@ -498,7 +490,6 @@ INLINE void saturn_indirect_jump(int reg)
 {
 	saturn_assert(reg>=0 && reg<9);
 	saturn.pc=READ_20(S64_READ_A(reg));
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_equals_zero(int reg, int begin, int count)
@@ -649,7 +640,6 @@ INLINE void saturn_load_pc(int reg)
 {
 	saturn_assert(reg>=0 && reg<9);
 	saturn.pc=S64_READ_A(reg);
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_store_pc(int reg)
@@ -663,7 +653,6 @@ INLINE void saturn_exchange_pc(int reg)
 	int temp=saturn.pc;
 	saturn_assert(reg>=0 && reg<9);
 	saturn.pc=S64_READ_A(reg);
-	change_pc(saturn.pc);
 	S64_WRITE_A(reg, temp);
 }
 

@@ -404,9 +404,7 @@ STOP            01001000  10111011          12  stop
 
 */
 
-
 #include "debugger.h"
-#include "deprecat.h"
 #include "upd7810.h"
 
 static UPD7810 upd7810;
@@ -537,10 +535,10 @@ struct opcode_s {
 	UINT8 mask_l0_l1;
 };
 
-#define RDOP(O) 	O = cpu_readop(PCD); PC++
-#define RDOPARG(A)	A = cpu_readop_arg(PCD); PC++
-#define RM(A)		program_read_byte_8le(A)
-#define WM(A,V) 	program_write_byte_8le(A,V)
+#define RDOP(O) 	O = memory_decrypted_read_byte(upd7810.program, PCD); PC++
+#define RDOPARG(A)	A = memory_raw_read_byte(upd7810.program, PCD); PC++
+#define RM(A)		memory_read_byte_8le(upd7810.program, A)
+#define WM(A,V) 	memory_write_byte_8le(upd7810.program, A,V)
 
 #define ZHC_ADD(after,before,carry) 	\
 	if (after == 0) PSW |= Z; else PSW &= ~Z; \
@@ -581,17 +579,17 @@ static UINT8 RP(offs_t port)
 	{
 	case UPD7810_PORTA:
 		if (upd7810.ma)	// NS20031301 no need to read if the port is set as output
-			upd7810.pa_in = io_read_byte_8le(port);
+			upd7810.pa_in = memory_read_byte_8le(upd7810.io, port);
 		data = (upd7810.pa_in & upd7810.ma) | (upd7810.pa_out & ~upd7810.ma);
 		break;
 	case UPD7810_PORTB:
 		if (upd7810.mb)	// NS20031301 no need to read if the port is set as output
-			upd7810.pb_in = io_read_byte_8le(port);
+			upd7810.pb_in = memory_read_byte_8le(upd7810.io, port);
 		data = (upd7810.pb_in & upd7810.mb) | (upd7810.pb_out & ~upd7810.mb);
 		break;
 	case UPD7810_PORTC:
 		if (upd7810.mc)	// NS20031301 no need to read if the port is set as output
-			upd7810.pc_in = io_read_byte_8le(port);
+			upd7810.pc_in = memory_read_byte_8le(upd7810.io, port);
 		data = (upd7810.pc_in & upd7810.mc) | (upd7810.pc_out & ~upd7810.mc);
 		if (upd7810.mcc & 0x01) 	/* PC0 = TxD output */
 			data = (data & ~0x01) | (upd7810.txd & 1 ? 0x01 : 0x00);
@@ -611,7 +609,7 @@ static UINT8 RP(offs_t port)
 			data = (data & ~0x80) | (upd7810.co1 & 1 ? 0x80 : 0x00);
 		break;
 	case UPD7810_PORTD:
-		upd7810.pd_in = io_read_byte_8le(port);
+		upd7810.pd_in = memory_read_byte_8le(upd7810.io, port);
 		switch (upd7810.mm & 0x07)
 		{
 		case 0x00:			/* PD input mode, PF port mode */
@@ -626,7 +624,7 @@ static UINT8 RP(offs_t port)
 		}
 		break;
 	case UPD7810_PORTF:
-		upd7810.pf_in = io_read_byte_8le(port);
+		upd7810.pf_in = memory_read_byte_8le(upd7810.io, port);
 		switch (upd7810.mm & 0x06)
 		{
 		case 0x00:			/* PD input/output mode, PF port mode */
@@ -646,7 +644,7 @@ static UINT8 RP(offs_t port)
 		}
 		break;
 	case UPD7807_PORTT:	// NS20031301 partial implementation
-		data = io_read_byte_8le(port);
+		data = memory_read_byte_8le(upd7810.io, port);
 		break;
 	default:
 		logerror("uPD7810 internal error: RP() called with invalid port number\n");
@@ -662,13 +660,13 @@ static void WP(offs_t port, UINT8 data)
 		upd7810.pa_out = data;
 //      data = (data & ~upd7810.ma) | (upd7810.pa_in & upd7810.ma);
 		data = (data & ~upd7810.ma) | (upd7810.ma);	// NS20031401
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTB:
 		upd7810.pb_out = data;
 //      data = (data & ~upd7810.mb) | (upd7810.pb_in & upd7810.mb);
 		data = (data & ~upd7810.mb) | (upd7810.mb);	// NS20031401
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTC:
 		upd7810.pc_out = data;
@@ -690,7 +688,7 @@ static void WP(offs_t port, UINT8 data)
 			data = (data & ~0x40) | (upd7810.co0 & 1 ? 0x40 : 0x00);
 		if (upd7810.mcc & 0x80) 	/* PC7 = CO1 output */
 			data = (data & ~0x80) | (upd7810.co1 & 1 ? 0x80 : 0x00);
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTD:
 		upd7810.pd_out = data;
@@ -705,7 +703,7 @@ static void WP(offs_t port, UINT8 data)
 		default:			/* PD extension mode, PF port/extension mode */
 			return;
 		}
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTF:
 		upd7810.pf_out = data;
@@ -724,7 +722,7 @@ static void WP(offs_t port, UINT8 data)
 			data |= 0xff;	/* what would come out for the lower bits here? */
 			break;
 		}
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	default:
 		logerror("uPD7810 internal error: RP() called with invalid port number\n");
@@ -845,7 +843,6 @@ static void upd7810_take_irq(void)
 		IFF = 0;
 		PSW &= ~(SK|L0|L1);
 		PC = vector;
-		change_pc( PCD );
 	}
 }
 
@@ -1532,72 +1529,74 @@ static void upd78c05_timers(int cycles)
 
 static CPU_INIT( upd7810 )
 {
-	upd7810.config = *(const UPD7810_CONFIG*) config;
+	upd7810.config = *(const UPD7810_CONFIG*) device->static_config;
 	upd7810.irq_callback = irqcallback;
 	upd7810.device = device;
+	upd7810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	upd7810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("upd7810", index, upd7810.ppc.w.l);
-	state_save_register_item("upd7810", index, upd7810.pc.w.l);
-	state_save_register_item("upd7810", index, upd7810.sp.w.l);
-	state_save_register_item("upd7810", index, upd7810.psw);
-	state_save_register_item("upd7810", index, upd7810.op);
-	state_save_register_item("upd7810", index, upd7810.op2);
-	state_save_register_item("upd7810", index, upd7810.iff);
-	state_save_register_item("upd7810", index, upd7810.ea.w.l);
-	state_save_register_item("upd7810", index, upd7810.va.w.l);
-	state_save_register_item("upd7810", index, upd7810.bc.w.l);
-	state_save_register_item("upd7810", index, upd7810.de.w.l);
-	state_save_register_item("upd7810", index, upd7810.hl.w.l);
-	state_save_register_item("upd7810", index, upd7810.ea2.w.l);
-	state_save_register_item("upd7810", index, upd7810.va2.w.l);
-	state_save_register_item("upd7810", index, upd7810.bc2.w.l);
-	state_save_register_item("upd7810", index, upd7810.de2.w.l);
-	state_save_register_item("upd7810", index, upd7810.hl2.w.l);
-	state_save_register_item("upd7810", index, upd7810.cnt.d);
-	state_save_register_item("upd7810", index, upd7810.tm.d);
-	state_save_register_item("upd7810", index, upd7810.ecnt.d);
-	state_save_register_item("upd7810", index, upd7810.etm.d);
-	state_save_register_item("upd7810", index, upd7810.ma);
-	state_save_register_item("upd7810", index, upd7810.mb);
-	state_save_register_item("upd7810", index, upd7810.mcc);
-	state_save_register_item("upd7810", index, upd7810.mc);
-	state_save_register_item("upd7810", index, upd7810.mm);
-	state_save_register_item("upd7810", index, upd7810.mf);
-	state_save_register_item("upd7810", index, upd7810.tmm);
-	state_save_register_item("upd7810", index, upd7810.etmm);
-	state_save_register_item("upd7810", index, upd7810.eom);
-	state_save_register_item("upd7810", index, upd7810.sml);
-	state_save_register_item("upd7810", index, upd7810.smh);
-	state_save_register_item("upd7810", index, upd7810.anm);
-	state_save_register_item("upd7810", index, upd7810.mkl);
-	state_save_register_item("upd7810", index, upd7810.mkh);
-	state_save_register_item("upd7810", index, upd7810.zcm);
-	state_save_register_item("upd7810", index, upd7810.pa_out);
-	state_save_register_item("upd7810", index, upd7810.pb_out);
-	state_save_register_item("upd7810", index, upd7810.pc_out);
-	state_save_register_item("upd7810", index, upd7810.pd_out);
-	state_save_register_item("upd7810", index, upd7810.pf_out);
-	state_save_register_item("upd7810", index, upd7810.cr0);
-	state_save_register_item("upd7810", index, upd7810.cr1);
-	state_save_register_item("upd7810", index, upd7810.cr2);
-	state_save_register_item("upd7810", index, upd7810.cr3);
-	state_save_register_item("upd7810", index, upd7810.txb);
-	state_save_register_item("upd7810", index, upd7810.rxb);
-	state_save_register_item("upd7810", index, upd7810.txd);
-	state_save_register_item("upd7810", index, upd7810.rxd);
-	state_save_register_item("upd7810", index, upd7810.sck);
-	state_save_register_item("upd7810", index, upd7810.ti);
-	state_save_register_item("upd7810", index, upd7810.to);
-	state_save_register_item("upd7810", index, upd7810.ci);
-	state_save_register_item("upd7810", index, upd7810.co0);
-	state_save_register_item("upd7810", index, upd7810.co1);
-	state_save_register_item("upd7810", index, upd7810.irr);
-	state_save_register_item("upd7810", index, upd7810.itf);
-	state_save_register_item("upd7810", index, upd7810.ovc0);
-	state_save_register_item("upd7810", index, upd7810.ovc1);
-	state_save_register_item("upd7810", index, upd7810.ovcf);
-	state_save_register_item("upd7810", index, upd7810.ovcs);
-	state_save_register_item("upd7810", index, upd7810.edges);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ppc.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.pc.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.sp.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.psw);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.op);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.op2);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.iff);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ea.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.va.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.bc.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.de.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.hl.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ea2.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.va2.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.bc2.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.de2.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.hl2.w.l);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.cnt.d);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.tm.d);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ecnt.d);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.etm.d);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ma);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.mb);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.mcc);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.mc);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.mm);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.mf);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.tmm);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.etmm);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.eom);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.sml);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.smh);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.anm);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.mkl);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.mkh);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.zcm);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.pa_out);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.pb_out);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.pc_out);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.pd_out);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.pf_out);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.cr0);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.cr1);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.cr2);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.cr3);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.txb);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.rxb);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.txd);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.rxd);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.sck);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ti);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.to);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ci);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.co0);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.co1);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.irr);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.itf);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ovc0);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ovc1);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ovcf);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.ovcs);
+	state_save_register_item("upd7810", device->tag, 0, upd7810.edges);
 }
 
 #include "7810tbl.c"
@@ -1607,15 +1606,15 @@ static CPU_RESET( upd7810 )
 {
 	UPD7810_CONFIG save_config;
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_config = upd7810.config;
 	save_irqcallback = upd7810.irq_callback;
-	save_device = upd7810.device;
 	memset(&upd7810, 0, sizeof(upd7810));
 	upd7810.config = save_config;
 	upd7810.irq_callback = save_irqcallback;
-	upd7810.device = save_device;
+	upd7810.device = device;
+	upd7810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	upd7810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	upd7810.opXX = opXX_7810;
 	upd7810.op48 = op48;
@@ -1710,7 +1709,7 @@ static CPU_EXECUTE( upd7810 )
 	{
 		int cc = 0;
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		PPC = PC;
 		RDOP(OP);
@@ -1769,7 +1768,6 @@ static CPU_EXECUTE( upd7810 )
 			}
 			PSW &= ~SK;
 			upd7810.handle_timers( cc );
-			change_pc( PCD );
 		}
 		else
 		{
@@ -1816,7 +1814,6 @@ static void set_irq_line(int irqline, int state)
 				IFF = 0;
 				PSW &= ~(SK|L0|L1);
 				PC = 0x0004;
-				change_pc( PCD );
 			}
 		}
 		else
@@ -1850,7 +1847,7 @@ static CPU_SET_INFO( upd7810 )
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF2:	set_irq_line(UPD7810_INTF2, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTFE1:	set_irq_line(UPD7810_INTFE1, info->i);	break;
 
-		case CPUINFO_INT_PC:							PC = info->i; change_pc(PCD);			break;
+		case CPUINFO_INT_PC:							PC = info->i; 							break;
 		case CPUINFO_INT_REGISTER + UPD7810_PC:			PC = info->i; 							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + UPD7810_SP:			SP = info->i; 							break;

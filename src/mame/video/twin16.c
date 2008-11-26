@@ -44,7 +44,7 @@ WRITE16_HANDLER( twin16_paletteram_word_w )
 	offset &= ~1;
 
 	data = ((paletteram16[offset] & 0xff) << 8) | (paletteram16[offset + 1] & 0xff);
-	palette_set_color_rgb(machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette_set_color_rgb(space->machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 WRITE16_HANDLER( fround_gfx_bank_w )
@@ -456,11 +456,13 @@ VIDEO_UPDATE( twin16 )
 
 VIDEO_EOF( twin16 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	if( twin16_spriteram_process_enable() && need_process_spriteram )
 		twin16_spriteram_process();
 
 	need_process_spriteram = 1;
 
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_w(space,0,0,0xffff);
 }
 

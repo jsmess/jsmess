@@ -59,11 +59,11 @@ static UINT8 sound_msb_latch;
  *
  *************************************/
 
-static void update_irq_state(running_machine *machine)
+static void update_irq_state(const device_config *cpu)
 {
 	int i;
 	for (i = 1; i < 5; i++)
-		cpunum_set_input_line(machine, 0, i, irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(cpu, i, irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -71,7 +71,7 @@ static IRQ_CALLBACK(irq_callback)
 {
 	/* auto-ack the IRQ */
 	irq_state[irqline] = 0;
-	update_irq_state(machine);
+	update_irq_state(device);
 
 	/* vector is 0x40 + index */
 	return 0x40 + irqline;
@@ -81,14 +81,14 @@ static IRQ_CALLBACK(irq_callback)
 void dcheese_signal_irq(running_machine *machine, int which)
 {
 	irq_state[which] = 1;
-	update_irq_state(machine);
+	update_irq_state(machine->cpu[0]);
 }
 
 
 static INTERRUPT_GEN( dcheese_vblank )
 {
 	logerror("---- VBLANK ----\n");
-	dcheese_signal_irq(machine, 4);
+	dcheese_signal_irq(device->machine, 4);
 }
 
 
@@ -101,7 +101,7 @@ static INTERRUPT_GEN( dcheese_vblank )
 
 static MACHINE_START( dcheese )
 {
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	state_save_register_global_array(irq_state);
 	state_save_register_global(soundlatch_full);
@@ -132,7 +132,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 		eeprom_set_cs_line(~data & 8);
 		eeprom_write_bit(data & 2);
 		eeprom_set_clock_line(data & 4);
-		ticket_dispenser_w(machine, 0, (data & 1) << 7);
+		ticket_dispenser_w(space, 0, (data & 1) << 7);
 	}
 }
 
@@ -143,8 +143,8 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		soundlatch_full = 1;
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
-		soundlatch_w(machine, 0, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
@@ -160,8 +160,8 @@ static READ8_HANDLER( sound_command_r )
 {
 	/* read the latch and clear the IRQ */
 	soundlatch_full = 0;
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
-	return soundlatch_r(machine, 0);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	return soundlatch_r(space, 0);
 }
 
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( sound_control_w )
 	if ((diff & 0x40) && (data & 0x40))
 		sndti_reset(SOUND_BSMT2000, 0);
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", activecpu_get_pc(), data);
+		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( bsmt_data_w )
 	if (offset % 2 == 0)
 		sound_msb_latch = data;
 	else
-		bsmt2000_data_0_w(machine, offset/2, (sound_msb_latch << 8) | data, 0xffff);
+		bsmt2000_data_0_w(space, offset/2, (sound_msb_latch << 8) | data, 0xffff);
 }
 
 

@@ -91,7 +91,7 @@ static READ8_HANDLER( laserbat_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(machine, portnames[laserbat_input_mux]);
+	return input_port_read(space->machine, portnames[laserbat_input_mux]);
 }
 
 static WRITE8_HANDLER( laserbat_cnteff_w )
@@ -594,17 +594,17 @@ static const sn76477_interface laserbat_sn76477_interface =
 
 /* Cat'N Mouse sound ***********************************/
 
-static void zaccaria_irq0a(running_machine *machine, int state) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(running_machine *machine, int state) { cpunum_set_input_line(machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0a(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0b(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1],0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910,port0a;
 
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return ay8910_read_port_0_r(machine,0);
+		return ay8910_read_port_0_r(space,0);
 	else
-		return ay8910_read_port_1_r(machine,0);
+		return ay8910_read_port_1_r(space,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -622,9 +622,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			ay8910_control_port_0_w(machine,0,port0a);
+			ay8910_control_port_0_w(space,0,port0a);
 		else
-			ay8910_write_port_0_w(machine,0,port0a);
+			ay8910_write_port_0_w(space,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -637,9 +637,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			ay8910_control_port_1_w(machine,0,port0a);
+			ay8910_control_port_1_w(space,0,port0a);
 		else
-			ay8910_write_port_1_w(machine,0,port0a);
+			ay8910_write_port_1_w(space,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -681,14 +681,14 @@ static MACHINE_RESET( catnmous )
 
 static INTERRUPT_GEN( laserbat_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0,0,PULSE_LINE,0x0a);
+	cpu_set_input_line_and_vector(device,0,PULSE_LINE,0x0a);
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	static int toggle;
 
-	pia_0_cb1_w(machine,0,toggle & 1);
+	pia_0_cb1_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM),0,toggle & 1);
 	toggle ^= 1;
 }
 

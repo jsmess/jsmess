@@ -32,6 +32,8 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 #include "sound/samples.h"
 #include "sound/dac.h"
 
+#define MASTER_CLOCK (XTAL_9_828MHz)
+
 
 PALETTE_INIT( panic );
 PALETTE_INIT( cosmica );
@@ -127,7 +129,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 
 static WRITE8_HANDLER( panic_sound_output2_w )
 {
-	panic_sound_output_w(machine, offset+15, data);
+	panic_sound_output_w(space, offset+15, data);
 }
 
 static WRITE8_HANDLER( cosmicg_output_w )
@@ -350,20 +352,20 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 
 static INTERRUPT_GEN( panic_interrupt )
 {
-	if (cpu_getiloops() != 0)
+	if (cpu_getiloops(device) != 0)
 	{
     	/* Coin insert - Trigger Sample */
 
         /* mostly not noticed since sound is */
 		/* only enabled if game in progress! */
 
-    	if ((input_port_read(machine, "SYSTEM") & 0xc0) != 0xc0)
-        	panic_sound_output_w(machine, 17, 1);
+    	if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
+        	panic_sound_output_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 17, 1);
 
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
     }
     else
-        cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+        cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 static INTERRUPT_GEN( cosmica_interrupt )
@@ -372,8 +374,8 @@ static INTERRUPT_GEN( cosmica_interrupt )
 
     if (pixel_clock == 0)
     {
-		if (input_port_read(machine, "FAKE") & 1)	/* Left Coin */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (input_port_read(device->machine, "FAKE") & 1)	/* Left Coin */
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
 
@@ -386,27 +388,27 @@ static INTERRUPT_GEN( cosmicg_interrupt )
     It makes sense and works fine, but I cannot be 100% sure this is correct,
     as I have no Cosmic Guerilla console :-) . */
 
-	if ((input_port_read(machine, "IN2") & 1))	/* Coin */
+	if ((input_port_read(device->machine, "IN2") & 1))	/* Coin */
 		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
-		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 6);
+		cpu_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
 	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(device, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
-	if (input_port_read(machine, "COINS") & 0x01)
-  		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	else if (input_port_read(machine, "COINS") & 0x02)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "COINS") & 0x01)
+  		cpu_set_input_line(device, 0, HOLD_LINE);
+	else if (input_port_read(device->machine, "COINS") & 0x02)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( nomnlnd_interrupt )
 {
 	/* Coin causes an NMI */
-	if (input_port_read(machine, "COIN") & 0x01)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "COIN") & 0x01)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -420,12 +422,12 @@ static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 
-	return (input_port_read(machine, "IN0") & 0xf0) | ((video_screen_get_vpos(machine->primary_screen) & 0xf0) >> 4);
+	return (input_port_read(space->machine, "IN0") & 0xf0) | ((video_screen_get_vpos(space->machine->primary_screen) & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )
 {
-	return (input_port_read_safe(machine, "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_read_safe(space->machine, "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -434,12 +436,12 @@ static READ8_HANDLER( magspot_coinage_dip_r )
 static READ8_HANDLER( nomnlnd_port_0_1_r )
 {
 	int control;
-    int fire = input_port_read(machine, "IN3");
+    int fire = input_port_read(space->machine, "IN3");
 
 	if (offset)
-		control = input_port_read(machine, "IN1");
+		control = input_port_read(space->machine, "IN1");
     else
-		control = input_port_read(machine, "IN0");
+		control = input_port_read(space->machine, "IN0");
 
     /* If firing - stop tank */
 
@@ -1150,7 +1152,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cosmicg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS9980, 1228500)
+	MDRV_CPU_ADD("main", TMS9980, MASTER_CLOCK/8)
 			/* 9.828 MHz Crystal */
 			/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
@@ -1584,16 +1586,16 @@ static DRIVER_INIT( cosmicg )
 
 static DRIVER_INIT( devzone )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
 }
 
 
 static DRIVER_INIT( nomnlnd )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4800, 0, 0, SMH_NOP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x480a, 0x480a, 0, 0, dac_0_data_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x480a, 0x480a, 0, 0, dac_0_data_w);
 }
 
 

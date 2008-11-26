@@ -101,9 +101,9 @@ WRITE8_HANDLER( starwars_out_w )
 			break;
 
 		case 4:		/* bank switch */
-			memory_set_bank(1, (data >> 7) & 1);
+			memory_set_bank(space->machine, 1, (data >> 7) & 1);
 			if (starwars_is_esb)
-				memory_set_bank(2, (data >> 7) & 1);
+				memory_set_bank(space->machine, 2, (data >> 7) & 1);
 			break;
 		case 5:		/* reset PRNG */
 			break;
@@ -144,11 +144,11 @@ READ8_HANDLER( starwars_adc_r )
 {
 	/* pitch */
 	if (control_num == kPitch)
-		return input_port_read(machine, "STICKY");
+		return input_port_read(space->machine, "STICKY");
 
 	/* yaw */
 	else if (control_num == kYaw)
-		return input_port_read(machine, "STICKX");
+		return input_port_read(space->machine, "STICKX");
 
 	/* default to unused thrust */
 	else
@@ -400,7 +400,7 @@ READ8_HANDLER( starwars_prng_r )
      */
 
 	/* Use MAME's PRNG for now */
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 

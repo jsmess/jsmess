@@ -61,29 +61,29 @@ static void niyanpai_soundbank_w(running_machine *machine, int data)
 {
 	UINT8 *SNDROM = memory_region(machine, "audio");
 
-	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	memory_set_bankptr(machine, 1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static int niyanpai_sound_r(running_machine *machine, int offset)
+static READ8_HANDLER( niyanpai_sound_r )
 {
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 static WRITE16_HANDLER( niyanpai_sound_w )
 {
-	soundlatch_w(machine, 0, ((data >> 8) & 0xff));
+	soundlatch_w(space, 0, ((data >> 8) & 0xff));
 }
 
-static void niyanpai_soundclr_w(running_machine *machine, int offset, int data)
+static WRITE8_HANDLER( niyanpai_soundclr_w )
 {
-	soundlatch_clear_w(machine, 0, 0);
+	soundlatch_clear_w(space, 0, 0);
 }
 
 
 /* TMPZ84C011 PIO emulation */
 static UINT8 pio_dir[5], pio_latch[5];
 
-static int tmpz84c011_pio_r(running_machine *machine, int offset)
+static READ8_HANDLER( tmpz84c011_pio_r )
 {
 	int portdata;
 
@@ -99,14 +99,14 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 			portdata = 0xff;
 			break;
 		case 3:			/* PD_0 */
-			portdata = niyanpai_sound_r(machine, 0);
+			portdata = niyanpai_sound_r(space, 0);
 			break;
 		case 4:			/* PE_0 */
 			portdata = 0xff;
 			break;
 
 		default:
-			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", activecpu_get_pc(), offset);
+			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(space->machine->activecpu), offset);
 			portdata = 0xff;
 			break;
 	}
@@ -114,43 +114,43 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 	return portdata;
 }
 
-static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
+static WRITE8_HANDLER( tmpz84c011_pio_w)
 {
 	switch (offset)
 	{
 		case 0:			/* PA_0 */
-			niyanpai_soundbank_w(machine, data & 0x03);
+			niyanpai_soundbank_w(space->machine, data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_1_WRITE(machine, 0, data);
+			DAC_1_WRITE(space, 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_0_WRITE(machine, 0, data);
+			DAC_0_WRITE(space, 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
 		case 4:			/* PE_0 */
-			if (!(data & 0x01)) niyanpai_soundclr_w(machine, 0, 0);
+			if (!(data & 0x01)) niyanpai_soundclr_w(space, 0, 0);
 			break;
 
 		default:
-			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", activecpu_get_pc(), offset, data);
+			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(space->machine->activecpu), offset, data);
 			break;
 	}
 }
 
 /* CPU interface */
-static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(machine,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
-static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(machine,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
-static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(machine,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
-static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(machine,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
-static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(machine,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
+static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(space,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
+static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(space,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
+static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(space,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
+static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(space,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
+static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(space,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(machine, 0, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(machine, 1, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(machine, 2, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(machine, 3, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(machine, 4, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(space, 0, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(space, 1, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(space, 2, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(space, 3, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(space, 4, data); }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pa_r )	{ return pio_dir[0]; }
 static READ8_HANDLER( tmpz84c011_0_dir_pb_r )	{ return pio_dir[1]; }
@@ -183,13 +183,14 @@ static z80ctc_interface ctc_intf =
 
 static MACHINE_RESET( niyanpai )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
 	for (i = 0; i < 5; i++)
 	{
 		pio_dir[i] = pio_latch[i] = 0;
-		tmpz84c011_pio_w(machine, i, 0);
+		tmpz84c011_pio_w(space, i, 0);
 	}
 }
 
@@ -219,15 +220,15 @@ static READ16_HANDLER( niyanpai_dipsw_r )
 {
 	UINT8 dipsw_a, dipsw_b;
 
-	dipsw_a = (((input_port_read(machine, "DSWA") & 0x01) << 7) | ((input_port_read(machine, "DSWA") & 0x02) << 5) |
-			   ((input_port_read(machine, "DSWA") & 0x04) << 3) | ((input_port_read(machine, "DSWA") & 0x08) << 1) |
-			   ((input_port_read(machine, "DSWA") & 0x10) >> 1) | ((input_port_read(machine, "DSWA") & 0x20) >> 3) |
-			   ((input_port_read(machine, "DSWA") & 0x40) >> 5) | ((input_port_read(machine, "DSWA") & 0x80) >> 7));
+	dipsw_a = (((input_port_read(space->machine, "DSWA") & 0x01) << 7) | ((input_port_read(space->machine, "DSWA") & 0x02) << 5) |
+			   ((input_port_read(space->machine, "DSWA") & 0x04) << 3) | ((input_port_read(space->machine, "DSWA") & 0x08) << 1) |
+			   ((input_port_read(space->machine, "DSWA") & 0x10) >> 1) | ((input_port_read(space->machine, "DSWA") & 0x20) >> 3) |
+			   ((input_port_read(space->machine, "DSWA") & 0x40) >> 5) | ((input_port_read(space->machine, "DSWA") & 0x80) >> 7));
 
-	dipsw_b = (((input_port_read(machine, "DSWB") & 0x01) << 7) | ((input_port_read(machine, "DSWB") & 0x02) << 5) |
-			   ((input_port_read(machine, "DSWB") & 0x04) << 3) | ((input_port_read(machine, "DSWB") & 0x08) << 1) |
-			   ((input_port_read(machine, "DSWB") & 0x10) >> 1) | ((input_port_read(machine, "DSWB") & 0x20) >> 3) |
-			   ((input_port_read(machine, "DSWB") & 0x40) >> 5) | ((input_port_read(machine, "DSWB") & 0x80) >> 7));
+	dipsw_b = (((input_port_read(space->machine, "DSWB") & 0x01) << 7) | ((input_port_read(space->machine, "DSWB") & 0x02) << 5) |
+			   ((input_port_read(space->machine, "DSWB") & 0x04) << 3) | ((input_port_read(space->machine, "DSWB") & 0x08) << 1) |
+			   ((input_port_read(space->machine, "DSWB") & 0x10) >> 1) | ((input_port_read(space->machine, "DSWB") & 0x20) >> 3) |
+			   ((input_port_read(space->machine, "DSWB") & 0x40) >> 5) | ((input_port_read(space->machine, "DSWB") & 0x80) >> 7));
 
 	return ((dipsw_a << 8) | dipsw_b);
 }
@@ -238,13 +239,13 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 	switch ((musobana_inputport ^ 0xff00) >> 8)
 	{
-		case 0x01:	portdata = input_port_read(machine, "KEY0"); break;
-		case 0x02:	portdata = input_port_read(machine, "KEY1"); break;
-		case 0x04:	portdata = input_port_read(machine, "KEY2"); break;
-		case 0x08:	portdata = input_port_read(machine, "KEY3"); break;
-		case 0x10:	portdata = input_port_read(machine, "KEY4"); break;
-		default:	portdata = input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2")
-								& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"); break;
+		case 0x01:	portdata = input_port_read(space->machine, "KEY0"); break;
+		case 0x02:	portdata = input_port_read(space->machine, "KEY1"); break;
+		case 0x04:	portdata = input_port_read(space->machine, "KEY2"); break;
+		case 0x08:	portdata = input_port_read(space->machine, "KEY3"); break;
+		case 0x10:	portdata = input_port_read(space->machine, "KEY4"); break;
+		default:	portdata = input_port_read(space->machine, "KEY0") & input_port_read(space->machine, "KEY1") & input_port_read(space->machine, "KEY2")
+								& input_port_read(space->machine, "KEY3") & input_port_read(space->machine, "KEY4"); break;
 	}
 
 	return (portdata);
@@ -252,12 +253,13 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 static CUSTOM_INPUT( musobana_outcoin_flag_r )
 {
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on
 	//  bit 3   coin lock
 
-	if (tmp68301_parallel_interface_r(field->port->machine, 0x0005, 0x00ff) & 0x0004) musobana_outcoin_flag ^= 1;
+	if (tmp68301_parallel_interface_r(space, 0x0005, 0x00ff) & 0x0004) musobana_outcoin_flag ^= 1;
 	else musobana_outcoin_flag = 1;
 
 	return musobana_outcoin_flag & 0x01;
@@ -835,7 +837,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( niyanpai_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
 static const z80_daisy_chain daisy_chain_sound[] =

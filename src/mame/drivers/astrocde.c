@@ -284,7 +284,7 @@ static READ8_HANDLER( spacezap_io_r )
 {
 	coin_counter_w(0, (offset >> 8) & 1);
 	coin_counter_w(1, (offset >> 9) & 1);
-	return input_port_read_safe(machine, "P3HANDLE", 0xff);
+	return input_port_read_safe(space->machine, "P3HANDLE", 0xff);
 }
 
 
@@ -421,15 +421,15 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	profpac_bank = data;
 
 	/* set the main banking */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, "user1") + 0x8000 * bank);
+	memory_install_read8_handler(space, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user1") + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
+		memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && memory_region(machine, "user2") != NULL)
+	if ((data & 0x80) && memory_region(space->machine, "user2") != NULL)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
 		bank = data - 0x80;
@@ -437,18 +437,20 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
-			memory_set_bankptr(2, memory_region(machine, "user2") + 0x4000 * bank);
+			memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
+			memory_set_bankptr(space->machine, 2, memory_region(space->machine, "user2") + 0x4000 * bank);
 		}
 		else
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
 	}
 }
 
 
 static STATE_POSTLOAD( profbank_banksw_restore )
 {
-	profpac_banksw_w(machine, 0, profpac_bank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	profpac_banksw_w(space, 0, profpac_bank);
 }
 
 
@@ -521,8 +523,8 @@ static const ay8910_interface ay8912_interface =
 
 static WRITE8_HANDLER( tenpindx_sound_w )
 {
-	soundlatch_w(machine, offset, data);
-	cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1670,92 +1672,98 @@ ROM_END
 static DRIVER_INIT( seawolf2 )
 {
 	astrocade_video_config = 0x00;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x40, 0x40, 0, 0xff18, seawolf2_sound_1_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x41, 0x41, 0, 0xff18, seawolf2_sound_2_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x42, 0x43, 0, 0xff18, seawolf2_lamps_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x40, 0x40, 0, 0xff18, seawolf2_sound_1_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x41, 0x41, 0, 0xff18, seawolf2_sound_2_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x42, 0x43, 0, 0xff18, seawolf2_lamps_w);
 }
 
 
 static DRIVER_INIT( ebases )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0xff07, ebases_coin_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x28, 0x28, 0, 0xff07, ebases_trackball_select_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x20, 0x20, 0, 0xff07, ebases_coin_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x28, 0x28, 0, 0xff07, ebases_trackball_select_w);
 }
 
 
 static DRIVER_INIT( spacezap )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
 }
 
 
 static DRIVER_INIT( wow )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, wow_io_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, wow_speech_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0x0fff, 0xff00, wow_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x17, 0x17, 0xffff, 0xff00, wow_speech_r);
 }
 
 
 static DRIVER_INIT( gorf )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, gorf_io_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x16, 0x16, 0x0fff, 0xff00, gorf_io_2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, gorf_speech_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0x0fff, 0xff00, gorf_io_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0x0fff, 0xff00, gorf_io_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x17, 0x17, 0xffff, 0xff00, gorf_speech_r);
 }
 
 
 static DRIVER_INIT( robby )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, robby_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0x0fff, 0xff00, robby_io_r);
 }
 
 
 static DRIVER_INIT( profpac )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x0fff, 0xff00, profpac_io_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x77ff, 0xff00, profpac_io_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x14, 0x14, 0x0fff, 0xff00, profpac_io_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0x77ff, 0xff00, profpac_io_2_r);
 
 	/* reset banking */
-	profpac_banksw_w(machine, 0, 0);
+	profpac_banksw_w(space, 0, 0);
 	state_save_register_postload(machine, profbank_banksw_restore, NULL);
 }
 
 
 static DRIVER_INIT( demndrgn )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	astrocade_video_config = 0x00;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x1c, 0x1c, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "FIREX"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x1d, 0x1d, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "FIREY"));
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1c, 0x1c, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "FIREX"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1d, 0x1d, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "FIREY"));
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
 
 	/* reset banking */
-	profpac_banksw_w(machine, 0, 0);
+	profpac_banksw_w(space, 0, 0);
 	state_save_register_postload(machine, profbank_banksw_restore, NULL);
 }
 
 
 static DRIVER_INIT( tenpindx )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	astrocade_video_config = 0x00;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x60, 0x60, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P60"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x61, 0x61, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P61"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x62, 0x62, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P62"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x63, 0x63, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P63"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x64, 0x64, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P64"));
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, tenpindx_sound_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x60, 0x60, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P60"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x61, 0x61, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P61"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x62, 0x62, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P62"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x63, 0x63, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P63"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x64, 0x64, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P64"));
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x97, 0x97, 0x0000, 0xff00, tenpindx_sound_w);
 
 	/* reset banking */
-	profpac_banksw_w(machine, 0, 0);
+	profpac_banksw_w(space, 0, 0);
 	state_save_register_postload(machine, profbank_banksw_restore, NULL);
 }
 

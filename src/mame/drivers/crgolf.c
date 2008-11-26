@@ -55,15 +55,15 @@ static UINT8 sample_count;
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	memory_set_bank(1, data & 15);
+	memory_set_bank(space->machine, 1, data & 15);
 }
 
 
 static MACHINE_START( crgolf )
 {
 	/* configure the banking */
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_set_bank(machine, 1, 0);
 
 	/* register for save states */
 	state_save_register_global(port_select);
@@ -85,13 +85,13 @@ static READ8_HANDLER( switch_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
 
-	return input_port_read(machine, portnames[port_select]);
+	return input_port_read(space->machine, portnames[port_select]);
 }
 
 
 static READ8_HANDLER( analog_input_r )
 {
-	return ((input_port_read(machine, "STICK0") >> 4) | (input_port_read(machine, "STICK1") & 0xf0)) ^ 0x88;
+	return ((input_port_read(space->machine, "STICK0") >> 4) | (input_port_read(space->machine, "STICK1") & 0xf0)) ^ 0x88;
 }
 
 
@@ -109,7 +109,7 @@ static WRITE8_HANDLER( switch_input_select_w )
 
 static WRITE8_HANDLER( unknown_w )
 {
-	logerror("%04X:unknown_w = %02X\n", activecpu_get_pc(), data);
+	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( unknown_w )
 
 static TIMER_CALLBACK( main_to_sound_callback )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	main_to_sound_data = param;
 }
 
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( main_to_sound_w )
 
 static READ8_HANDLER( main_to_sound_r )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	return main_to_sound_data;
 }
 
@@ -149,7 +149,7 @@ static READ8_HANDLER( main_to_sound_r )
 
 static TIMER_CALLBACK( sound_to_main_callback )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 	sound_to_main_data = param;
 }
 
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( sound_to_main_w )
 
 static READ8_HANDLER( sound_to_main_r )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 	return sound_to_main_data;
 }
 
@@ -580,7 +580,7 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

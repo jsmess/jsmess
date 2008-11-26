@@ -232,7 +232,7 @@ static void execute_one(void)
 	UINT8 cycle_count = 0;
 
 	/* For MAME */
-	debugger_instruction_hook(Machine, PC);
+	debugger_instruction_hook(core.device, PC);
 	OP = ROPCODE(WORD(PC));
 
 	/* The words we're going to be working with */
@@ -594,7 +594,6 @@ static void execute_one(void)
 	if (size != 0x1337)
 	{
 		PC += size;
-		change_pc(PC);
 
 		dsp56k_process_loop();
 		dsp56k_process_rep(size);
@@ -1081,7 +1080,6 @@ static void execute_one(void)
 
 	/* Must have been a good opcode */
 	PC += size;
-	change_pc(PC);
 
 	dsp56k_process_loop();
 	dsp56k_process_rep(size);
@@ -2188,7 +2186,7 @@ static size_t dsp56k_op_bfop(const UINT16 op, const UINT16 op2, UINT8* cycles)
 	decode_BBB_bitmask(BITS(op2,0xe000), &iVal);
 
 	workAddr = assemble_address_from_Pppppp_table(BITS(OP,0x0020), BITS(OP,0x001f));
-	previousValue = data_read_word_16le(WORD(workAddr));
+	previousValue = memory_read_word_16le(core.data, WORD(workAddr));
 	workingWord = previousValue;
 
 	switch(BITS(op2, 0x1f00))
@@ -2254,7 +2252,7 @@ static size_t dsp56k_op_bfop_1(const UINT16 op, const UINT16 op2, UINT8* cycles)
 	decode_RR_table(BITS(op,0x0003), &R);
 
 	workAddr = *((UINT16*)R.addr);
-	previousValue = data_read_word_16le(WORD(workAddr));
+	previousValue = memory_read_word_16le(core.data, WORD(workAddr));
 	workingWord = previousValue;
 
 	switch(BITS(op2, 0x1f00))
@@ -2384,7 +2382,6 @@ static size_t dsp56k_op_bcc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 
 		core.ppc = PC;
 		PC += offset;
-		change_pc(PC);
 
 		cycles += 4;
 		return 0;
@@ -2413,7 +2410,6 @@ static size_t dsp56k_op_bcc_1(const UINT16 op, UINT8* cycles)
 
 		core.ppc = PC;
 		PC += offset;
-		change_pc(PC) ;
 
 		cycles += 4;
 		return 0;
@@ -2457,7 +2453,6 @@ static size_t dsp56k_op_bra_1(const UINT16 op, UINT8* cycles)
 	/* Jump */
 	core.ppc = PC;
 	PC += branchOffset;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2483,7 +2478,6 @@ static size_t dsp56k_op_brkcc(const UINT16 op, UINT8* cycles)
 		/* TODO: I think this PC = LA thing is off-by-1, but it's working this way because its consistently so */
 		core.ppc = PC;
 		PC = LA;
-		change_pc(PC);
 
 		SR = SSL;	/* TODO: A-83.  I believe only the Loop Flag and Forever Flag come back here. */
 		SP--;
@@ -2524,7 +2518,6 @@ static size_t dsp56k_op_bscc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 		/* Change */
 		core.ppc = PC;
 		PC = PC + (INT16)op2;
-		change_pc(PC);
 	}
 
 	/* S L E U N Z V C */
@@ -2555,7 +2548,6 @@ static size_t dsp56k_op_bsr(const UINT16 op, const UINT16 op2, UINT8* cycles)
 	/* Change */
 	core.ppc = PC;
 	PC = PC + (INT16)op2;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2813,7 +2805,6 @@ static size_t dsp56k_op_jmp(const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
 	core.ppc = PC;
 	PC = op2;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2830,7 +2821,6 @@ static size_t dsp56k_op_jmp_1(const UINT16 op, UINT8* cycles)
 
 	core.ppc = PC;
 	PC = *((UINT16*)R.addr);
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2858,7 +2848,6 @@ static size_t dsp56k_op_jscc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 
 		core.ppc = PC;
 		PC = branchOffset;
-		change_pc(PC);
 
 		cycles += 4;	/* TODO: +jx oscillator clock cycles */
 		return 0;
@@ -2897,7 +2886,6 @@ static size_t dsp56k_op_jsr(const UINT16 op, const UINT16 op2, UINT8* cycles)
 
 	core.ppc = PC;
 	PC = branchOffset;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -3030,7 +3018,7 @@ static size_t dsp56k_op_movec(const UINT16 op, UINT8* cycles)
 	if (W)
 	{
 		/* Write D */
-		UINT16 value = data_read_word_16le(WORD(*((UINT16*)R.addr))) ;
+		UINT16 value = memory_read_word_16le(core.data, WORD(*((UINT16*)R.addr))) ;
 		typed_pointer temp_src = { &value, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3072,7 +3060,7 @@ static size_t dsp56k_op_movec_1(const UINT16 op, UINT8* cycles)
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = data_read_word_16le(WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(core.data, WORD(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3116,7 +3104,7 @@ static size_t dsp56k_op_movec_2(const UINT16 op, UINT8* cycles)
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = data_read_word_16le(WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(core.data, WORD(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3167,7 +3155,7 @@ static size_t dsp56k_op_movec_3(const UINT16 op, const UINT16 op2, UINT8* cycles
 		else
 		{
 			/* 16-bit long address */
-			UINT16 tempD = data_read_word_16le(WORD(op2));
+			UINT16 tempD = memory_read_word_16le(core.data, WORD(op2));
 			typed_pointer tempTP = {&tempD, DT_WORD};
 			SetDestinationValue(tempTP, SD);
 		}
@@ -3245,7 +3233,7 @@ static size_t dsp56k_op_movec_5(const UINT16 op, const UINT16 op2, UINT8* cycles
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = data_read_word_16le(WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(core.data, WORD(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3308,7 +3296,7 @@ static size_t dsp56k_op_movem(const UINT16 op, UINT8* cycles)
 	{
 		/* Read from Program Memory */
 		typed_pointer data;
-		UINT16 ldata = program_read_word_16le(WORD(*((UINT16*)R.addr)));
+		UINT16 ldata = memory_read_word_16le(core.program, WORD(*((UINT16*)R.addr)));
 
 		data.addr = &ldata;
 		data.data_type = DT_WORD;
@@ -3362,7 +3350,7 @@ static size_t dsp56k_op_movep(const UINT16 op, UINT8* cycles)
 
 	if (W)
 	{
-		UINT16 data = data_read_word_16le(WORD(pp));
+		UINT16 data = memory_read_word_16le(core.data, WORD(pp));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -3401,7 +3389,7 @@ static size_t dsp56k_op_movep_1(const UINT16 op, UINT8* cycles)
 	/* A little different than most W if's - opposite read and write */
 	if (W)
 	{
-		UINT16 data = data_read_word_16le(WORD(*((UINT16*)SD.addr)));
+		UINT16 data = memory_read_word_16le(core.data, WORD(*((UINT16*)SD.addr)));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -3569,7 +3557,6 @@ static size_t dsp56k_op_rti(const UINT16 op, UINT8* cycles)
 {
 	core.ppc = PC;
 	PC = SSH;
-	change_pc(PC);
 
 	SR = SSL;
 	SP = SP - 1;
@@ -3587,7 +3574,6 @@ static size_t dsp56k_op_rts(const UINT16 op, UINT8* cycles)
 	/* Pop */
 	core.ppc = PC;
 	PC = SSH;
-	change_pc(PC);
 
 	/* SR = SSL; The status register is not affected. */
 
@@ -4255,7 +4241,6 @@ static void dsp56k_process_loop(void)
 
 			core.ppc = PC;
 			PC = SSH;
-			change_pc(PC);
 		}
 	}
 	else if (LF_bit())
@@ -4277,7 +4262,6 @@ static void dsp56k_process_loop(void)
 			{
 				LC--;
 				PC = SSH;
-				change_pc(PC);
 			}
 		}
 	}
@@ -4300,7 +4284,6 @@ static void dsp56k_process_rep(size_t repSize)
 			{
 				LC--;
 				PC -= repSize;		/* A little strange - rewind by the size of the rep'd op */
-				change_pc(PC);
 			}
 		}
 	}
@@ -4352,7 +4335,7 @@ static void execute_x_memory_data_move(const UINT16 op, typed_pointer* d_registe
 	if (W)
 	{
 		/* From X:<ea> to SD */
-		UINT16 data = data_read_word_16le(WORD(*((UINT16*)R.addr)));
+		UINT16 data = memory_read_word_16le(core.data, WORD(*((UINT16*)R.addr)));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -4400,7 +4383,7 @@ static void execute_x_memory_data_move2(const UINT16 op, typed_pointer* d_regist
 	if (W)
 	{
 		/* Write D */
-		UINT16 value = data_read_word_16le(WORD(*mem_offset));
+		UINT16 value = memory_read_word_16le(core.data, WORD(*mem_offset));
 		typed_pointer tempV = {&value, DT_WORD};
 		SetDestinationValue(tempV, SD);
 	}
@@ -4428,7 +4411,7 @@ static void execute_x_memory_data_move_with_short_displacement(const UINT16 op, 
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = data_read_word_16le(WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(core.data, WORD(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -4464,13 +4447,13 @@ static void execute_dual_x_memory_data_read(const UINT16 op, typed_pointer* d_re
 		fatalerror("Dsp56k: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read.");
 
 	/* First memmove */
-	srcVal1 = data_read_word_16le(WORD(*((UINT16*)R.addr)));
+	srcVal1 = memory_read_word_16le(core.data, WORD(*((UINT16*)R.addr)));
 	tempV.addr = &srcVal1;
 	tempV.data_type = DT_WORD;
 	SetDestinationValue(tempV, D1);
 
 	/* Second memmove */
-	srcVal2 = data_read_word_16le(WORD(R3));
+	srcVal2 = memory_read_word_16le(core.data, WORD(R3));
 	tempV.addr = &srcVal2;
 	tempV.data_type = DT_WORD;
 	SetDestinationValue(tempV, D2);
@@ -4565,13 +4548,13 @@ static void SetDataMemoryValue(typed_pointer source, UINT32 destinationAddr)
 {
 	switch(source.data_type)
 	{
-		case DT_BYTE:        data_write_word_16le(destinationAddr, (UINT16)( (*((UINT8*) source.addr) & 0xff)               ) ) ; break ;
-		case DT_WORD:        data_write_word_16le(destinationAddr, (UINT16)( (*((UINT16*)source.addr) & 0xffff)             ) ) ; break ;
-		case DT_DOUBLE_WORD: data_write_word_16le(destinationAddr, (UINT16)( (*((UINT32*)source.addr) & 0x0000ffff)         ) ) ; break ;
+		case DT_BYTE:        memory_write_word_16le(core.data, destinationAddr, (UINT16)( (*((UINT8*) source.addr) & 0xff)               ) ) ; break ;
+		case DT_WORD:        memory_write_word_16le(core.data, destinationAddr, (UINT16)( (*((UINT16*)source.addr) & 0xffff)             ) ) ; break ;
+		case DT_DOUBLE_WORD: memory_write_word_16le(core.data, destinationAddr, (UINT16)( (*((UINT32*)source.addr) & 0x0000ffff)         ) ) ; break ;
 
 		// !!! Is this universal ???
 		// !!! Forget not, yon shift-limiter !!!
-		case DT_LONG_WORD:   data_write_word_16le(destinationAddr, (UINT16)( ((*((UINT64*)source.addr)) & U64(0x00000000ffff0000)) >> 16) ) ; break ;
+		case DT_LONG_WORD:   memory_write_word_16le(core.data, destinationAddr, (UINT16)( ((*((UINT64*)source.addr)) & U64(0x00000000ffff0000)) >> 16) ) ; break ;
 	}
 }
 
@@ -4580,13 +4563,13 @@ static void SetProgramMemoryValue(typed_pointer source, UINT32 destinationAddr)
 {
 	switch(source.data_type)
 	{
-		case DT_BYTE:        program_write_word_16le(destinationAddr, (UINT16)( (*((UINT8*) source.addr) & 0xff)               ) ) ; break ;
-		case DT_WORD:        program_write_word_16le(destinationAddr, (UINT16)( (*((UINT16*)source.addr) & 0xffff)             ) ) ; break ;
-		case DT_DOUBLE_WORD: program_write_word_16le(destinationAddr, (UINT16)( (*((UINT32*)source.addr) & 0x0000ffff)         ) ) ; break ;
+		case DT_BYTE:        memory_write_word_16le(core.program, destinationAddr, (UINT16)( (*((UINT8*) source.addr) & 0xff)               ) ) ; break ;
+		case DT_WORD:        memory_write_word_16le(core.program, destinationAddr, (UINT16)( (*((UINT16*)source.addr) & 0xffff)             ) ) ; break ;
+		case DT_DOUBLE_WORD: memory_write_word_16le(core.program, destinationAddr, (UINT16)( (*((UINT32*)source.addr) & 0x0000ffff)         ) ) ; break ;
 
 		// !!! Is this universal ???
 		// !!! Forget not, yon shift-limiter !!!
-		case DT_LONG_WORD:   program_write_word_16le(destinationAddr, (UINT16)( ((*((UINT64*)source.addr)) & U64(0x00000000ffff0000)) >> 16) ) ; break ;
+		case DT_LONG_WORD:   memory_write_word_16le(core.program, destinationAddr, (UINT16)( ((*((UINT64*)source.addr)) & U64(0x00000000ffff0000)) >> 16) ) ; break ;
 	}
 }
 

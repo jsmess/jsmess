@@ -79,11 +79,11 @@ static READ16_HANDLER( mahjong_panel_r )
 
 	switch(goodejan_mux_data)
 	{
-		case 1:    ret = input_port_read(machine, "KEY0"); break;
-		case 2:    ret = input_port_read(machine, "KEY1"); break;
-		case 4:    ret = input_port_read(machine, "KEY2"); break;
-		case 8:    ret = input_port_read(machine, "KEY3"); break;
-		case 0x10: ret = input_port_read(machine, "KEY4"); break;
+		case 1:    ret = input_port_read(space->machine, "KEY0"); break;
+		case 2:    ret = input_port_read(space->machine, "KEY1"); break;
+		case 4:    ret = input_port_read(space->machine, "KEY2"); break;
+		case 8:    ret = input_port_read(space->machine, "KEY3"); break;
+		case 0x10: ret = input_port_read(space->machine, "KEY4"); break;
 	}
 
 	return ret;
@@ -266,10 +266,10 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( goodejan_interrupt )
 {
-	if (cpu_getiloops())
-		cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x208/4);
+	if (cpu_getiloops(device))
+		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x208/4);
 	else
-		cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x00c/4);
+		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x00c/4);
 }
 
 static MACHINE_DRIVER_START( goodejan )

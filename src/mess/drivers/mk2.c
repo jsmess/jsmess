@@ -153,7 +153,7 @@ static void mk2_write_b(const device_config *device, UINT8 newdata, UINT8 olddat
 		dac_data_w(0,newdata&1?80:0);
 	mk2_led[4]|=newdata;
 
-	cpunum_set_input_line( device->machine, 0, M6502_IRQ_LINE, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line( device->machine->cpu[0], M6502_IRQ_LINE, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 

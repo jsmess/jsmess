@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TIMER_CALLBACK( crtc_interrupt_gen )
 {
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, HOLD_LINE);
 	if (param != 0)
 		timer_adjust_periodic(crtc_timer, attotime_div(video_screen_get_frame_period(machine->primary_screen), param), 0, attotime_div(video_screen_get_frame_period(machine->primary_screen), param));
 }
@@ -164,7 +164,7 @@ WRITE16_HANDLER( rpunch_crtc_data_w )
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_vblank_start(machine->primary_screen), (data == 0xc0) ? 2 : 1);
+				timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_vblank_start(space->machine->primary_screen), (data == 0xc0) ? 2 : 1);
 				break;
 
 			default:

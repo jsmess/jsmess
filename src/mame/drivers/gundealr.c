@@ -69,27 +69,27 @@ static int input_ports_hack;
 
 static INTERRUPT_GEN( yamyam_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		if (input_ports_hack)
 		{
-			rambase[0x004] = input_port_read(machine, "IN2");
-			rambase[0x005] = input_port_read(machine, "IN1");
-			rambase[0x006] = input_port_read(machine, "IN0");
+			rambase[0x004] = input_port_read(device->machine, "IN2");
+			rambase[0x005] = input_port_read(device->machine, "IN1");
+			rambase[0x006] = input_port_read(device->machine, "IN0");
 		}
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h vblank */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h vblank */
 	}
-	else if ((cpu_getiloops() & 1) == 1)
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h sound (hand tuned) */
+	else if ((cpu_getiloops(device) & 1) == 1)
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h sound (hand tuned) */
 }
 
 static WRITE8_HANDLER( yamyam_bankswitch_w )
 {
  	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( yamyam_protection_w )
@@ -567,7 +567,7 @@ static DRIVER_INIT( gundealr )
 static DRIVER_INIT( yamyam )
 {
 	input_ports_hack = 1;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe000, 0, 0, yamyam_protection_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xe000, 0, 0, yamyam_protection_w);
 }
 
 

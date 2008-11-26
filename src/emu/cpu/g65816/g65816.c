@@ -330,33 +330,34 @@ static CPU_INIT( g65816 )
 {
 	g65816_set_irq_callback(irqcallback);
 	g65816i_cpu.device = device;
+	g65816i_cpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("G65816", index, g65816i_cpu.a);
-	state_save_register_item("G65816", index, g65816i_cpu.b);
-	state_save_register_item("G65816", index, g65816i_cpu.x);
-	state_save_register_item("G65816", index, g65816i_cpu.y);
-	state_save_register_item("G65816", index, g65816i_cpu.s);
-	state_save_register_item("G65816", index, g65816i_cpu.pc);
-	state_save_register_item("G65816", index, g65816i_cpu.ppc);
-	state_save_register_item("G65816", index, g65816i_cpu.pb);
-	state_save_register_item("G65816", index, g65816i_cpu.db);
-	state_save_register_item("G65816", index, g65816i_cpu.d);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_e);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_m);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_x);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_n);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_v);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_d);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_i);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_z);
-	state_save_register_item("G65816", index, g65816i_cpu.flag_c);
-	state_save_register_item("G65816", index, g65816i_cpu.line_irq);
-	state_save_register_item("G65816", index, g65816i_cpu.line_nmi);
-	state_save_register_item("G65816", index, g65816i_cpu.ir);
-	state_save_register_item("G65816", index, g65816i_cpu.irq_delay);
-	state_save_register_item("G65816", index, g65816i_cpu.stopped);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.a);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.b);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.x);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.y);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.s);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.pc);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.ppc);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.pb);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.db);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.d);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_e);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_m);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_x);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_n);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_v);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_d);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_i);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_z);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.flag_c);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.line_irq);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.line_nmi);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.ir);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.irq_delay);
+	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.stopped);
 
-	state_save_register_postload(Machine, g65816_restore_state, NULL);
+	state_save_register_postload(device->machine, g65816_restore_state, NULL);
 }
 
 /**************************************************************************
@@ -392,7 +393,7 @@ static CPU_SET_INFO( g65816 )
 		case CPUINFO_INT_REGISTER + G65816_IRQ_STATE:	g65816_set_reg(G65816_IRQ_STATE, info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_G65816_READVECTOR_CALLBACK:	READ_VECTOR = (read8_machine_func) info->f;	break;
+		case CPUINFO_PTR_G65816_READVECTOR_CALLBACK:	READ_VECTOR = (read8_space_func) info->f;	break;
 	}
 }
 

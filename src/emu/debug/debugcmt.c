@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "xmlfile.h"
 #include "debugcmt.h"
 #include "debugcpu.h"
@@ -102,11 +103,16 @@ static void debug_comment_free(void);
 
 int debug_comment_init(running_machine *machine)
 {
-	if (cpu_gettotalcpu() > 0)
+	int numcpu;
+
+	for (numcpu = 0; numcpu < ARRAY_LENGTH(machine->cpu); numcpu++)
+		if (machine->cpu[numcpu] == NULL)
+			break;
+	if (numcpu > 0)
 	{
 		/* allocate enough comment groups for the total # of cpu's */
-		debug_comments = (comment_group*) auto_malloc(cpu_gettotalcpu() * sizeof(comment_group));
-		memset(debug_comments, 0, cpu_gettotalcpu() * sizeof(comment_group));
+		debug_comments = (comment_group*) auto_malloc(numcpu * sizeof(comment_group));
+		memset(debug_comments, 0, numcpu * sizeof(comment_group));
 
 		/* automatically load em up */
 		debug_comment_load(machine);
@@ -124,8 +130,9 @@ int debug_comment_init(running_machine *machine)
                         the proper crc32
 -------------------------------------------------------------------------*/
 
-int debug_comment_add(int cpu_num, offs_t addr, const char *comment, rgb_t color, UINT32 c_crc)
+int debug_comment_add(const device_config *device, offs_t addr, const char *comment, rgb_t color, UINT32 c_crc)
 {
+	int cpu_num = cpu_get_index(device);
 	int i = 0;
 	int insert_point = debug_comments[cpu_num].comment_count;
 	int match = 0;
@@ -190,8 +197,9 @@ int debug_comment_add(int cpu_num, offs_t addr, const char *comment, rgb_t color
                         the proper crc32
 -------------------------------------------------------------------------*/
 
-int debug_comment_remove(int cpu_num, offs_t addr, UINT32 c_crc)
+int debug_comment_remove(const device_config *device, offs_t addr, UINT32 c_crc)
 {
+	int cpu_num = cpu_get_index(device);
 	int i;
 	int remove_index = -1;
 
@@ -234,8 +242,9 @@ int debug_comment_remove(int cpu_num, offs_t addr, UINT32 c_crc)
                         the proper crc32
 -------------------------------------------------------------------------*/
 
-const char *debug_comment_get_text(int cpu_num, offs_t addr, UINT32 c_crc)
+const char *debug_comment_get_text(const device_config *device, offs_t addr, UINT32 c_crc)
 {
+	int cpu_num = cpu_get_index(device);
 	int i;
 
 	/* inefficient - should use bsearch - but will be a little tricky with multiple comments per addr */
@@ -260,9 +269,9 @@ const char *debug_comment_get_text(int cpu_num, offs_t addr, UINT32 c_crc)
     for a given cpu number
 -------------------------------------------------------------------------*/
 
-int debug_comment_get_count(int cpu_num)
+int debug_comment_get_count(const device_config *device)
 {
-	return debug_comments[cpu_num].comment_count;
+	return debug_comments[cpu_get_index(device)].comment_count;
 }
 
 
@@ -271,9 +280,9 @@ int debug_comment_get_count(int cpu_num)
     for a given cpu number
 -------------------------------------------------------------------------*/
 
-UINT32 debug_comment_get_change_count(int cpu_num)
+UINT32 debug_comment_get_change_count(const device_config *device)
 {
-	return debug_comments[cpu_num].change_count;
+	return debug_comments[cpu_get_index(device)].change_count;
 }
 
 /*-------------------------------------------------------------------------
@@ -281,13 +290,14 @@ UINT32 debug_comment_get_change_count(int cpu_num)
     for all cpu's
 -------------------------------------------------------------------------*/
 
-UINT32 debug_comment_all_change_count(void)
+UINT32 debug_comment_all_change_count(running_machine *machine)
 {
 	int i ;
 	UINT32 retVal = 0;
 
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-		retVal += debug_comments[i].change_count ;
+	for (i = 0; i < ARRAY_LENGTH(machine->cpu); i++)
+		if (machine->cpu[i] != NULL)
+			retVal += debug_comments[i].change_count ;
 
 	return retVal;
 }
@@ -298,16 +308,17 @@ UINT32 debug_comment_all_change_count(void)
                         for the opcode at the requested address.
 -------------------------------------------------------------------------*/
 
-UINT32 debug_comment_get_opcode_crc32(offs_t address)
+UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t address)
 {
-	const debug_cpu_info *info = debug_get_cpu_info(cpu_getactivecpu());
+	const cpu_debug_data *info = cpu_get_debug_data(device);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i;
 	UINT32 crc;
 	UINT8 opbuf[64], argbuf[64];
 	char buff[256];
 	offs_t numbytes;
-	int maxbytes = activecpu_max_instruction_bytes();
-	UINT32 addrmask = (debug_get_cpu_info(cpu_getactivecpu()))->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
+	int maxbytes = cpu_get_max_opcode_bytes(device);
+	UINT32 addrmask = (cpu_get_debug_data(device))->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
 
 	memset(opbuf, 0x00, sizeof(opbuf));
 	memset(argbuf, 0x00, sizeof(argbuf));
@@ -315,11 +326,11 @@ UINT32 debug_comment_get_opcode_crc32(offs_t address)
 	// fetch the bytes up to the maximum
 	for (i = 0; i < maxbytes; i++)
 	{
-		opbuf[i] = debug_read_opcode(address + i, 1, FALSE);
-		argbuf[i] = debug_read_opcode(address + i, 1, TRUE);
+		opbuf[i] = debug_read_opcode(space, address + i, 1, FALSE);
+		argbuf[i] = debug_read_opcode(space, address + i, 1, TRUE);
 	}
 
-	numbytes = activecpu_dasm(buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+	numbytes = cpu_dasm(device, buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 	numbytes = ADDR2BYTE(numbytes, info, ADDRESS_SPACE_PROGRAM);
 
 	crc = crc32(0, argbuf, numbytes);
@@ -332,8 +343,9 @@ UINT32 debug_comment_get_opcode_crc32(offs_t address)
     debug_comment_dump - debugging function to dump junk to the command line
 -------------------------------------------------------------------------*/
 
-void debug_comment_dump(int cpu_num, offs_t addr)
+void debug_comment_dump(const device_config *device, offs_t addr)
 {
+	int cpu_num = cpu_get_index(device);
 	int i;
 	int ff = 0;
 
@@ -351,7 +363,7 @@ void debug_comment_dump(int cpu_num, offs_t addr)
 	}
 	else
 	{
-		UINT32 c_crc = debug_comment_get_opcode_crc32(addr);
+		UINT32 c_crc = debug_comment_get_opcode_crc32(device, addr);
 
 		for (i = 0; i < debug_comments[cpu_num].comment_count; i++)
 		{
@@ -403,25 +415,26 @@ int debug_comment_save(running_machine *machine)
 	xml_set_attribute(systemnode, "name", machine->gamedrv->name);
 
 	/* for each cpu */
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-	{
-		xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
-		if (!curnode)
-			goto error;
-		xml_set_attribute_int(curnode, "num", i);
-
-		for (j = 0; j < debug_comments[i].comment_count; j++)
+	for (i = 0; i < ARRAY_LENGTH(machine->cpu); i++)
+		if (machine->cpu[i] != NULL)
 		{
-			xml_data_node *datanode = xml_add_child(curnode, "comment", xml_normalize_string(debug_comments[i].comment_info[j]->text));
-			if (!datanode)
+			xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
+			if (!curnode)
 				goto error;
-			xml_set_attribute_int(datanode, "address", debug_comments[i].comment_info[j]->address);
-			xml_set_attribute_int(datanode, "color", debug_comments[i].comment_info[j]->color);
-			sprintf(crc_buf, "%08X", debug_comments[i].comment_info[j]->crc);
-			xml_set_attribute(datanode, "crc", crc_buf);
-			total_comments++;
+			xml_set_attribute_int(curnode, "num", i);
+
+			for (j = 0; j < debug_comments[i].comment_count; j++)
+			{
+				xml_data_node *datanode = xml_add_child(curnode, "comment", xml_normalize_string(debug_comments[i].comment_info[j]->text));
+				if (!datanode)
+					goto error;
+				xml_set_attribute_int(datanode, "address", debug_comments[i].comment_info[j]->address);
+				xml_set_attribute_int(datanode, "color", debug_comments[i].comment_info[j]->color);
+				sprintf(crc_buf, "%08X", debug_comments[i].comment_info[j]->crc);
+				xml_set_attribute(datanode, "crc", crc_buf);
+				total_comments++;
+			}
 		}
-	}
 
 	/* flush the file */
 	if (total_comments > 0)
@@ -556,13 +569,14 @@ static void debug_comment_free(void)
 {
 	int i, j;
 
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-	{
-		for (j = 0; j < debug_comments[i].comment_count; j++)
+	for (i = 0; i < ARRAY_LENGTH(Machine->cpu); i++)
+		if (Machine->cpu[i] != NULL)
 		{
-			free(debug_comments[i].comment_info[j]);
-		}
+			for (j = 0; j < debug_comments[i].comment_count; j++)
+			{
+				free(debug_comments[i].comment_info[j]);
+			}
 
-		debug_comments[i].comment_count = 0;
-	}
+			debug_comments[i].comment_count = 0;
+		}
 }

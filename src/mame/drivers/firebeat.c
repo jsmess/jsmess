@@ -109,6 +109,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/intelfsh.h"
 #include "machine/scsicd.h"
@@ -578,8 +579,8 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 
 	if (reg != 0x70 && chip == 0)
 	{
-		//printf("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, activecpu_get_pc());
-		//logerror("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, activecpu_get_pc());
+		//printf("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+		//logerror("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 
 	switch(reg)
@@ -588,7 +589,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x0001) == 0)
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case 0x30:
@@ -657,7 +658,7 @@ static READ32_HANDLER(gcu0_r)
 
 static WRITE32_HANDLER(gcu0_w)
 {
-	GCU_w(machine, 0, offset, data, mem_mask);
+	GCU_w(space->machine, 0, offset, data, mem_mask);
 }
 
 static READ32_HANDLER(gcu1_r)
@@ -667,7 +668,7 @@ static READ32_HANDLER(gcu1_r)
 
 static WRITE32_HANDLER(gcu1_w)
 {
-	GCU_w(machine, 1, offset, data, mem_mask);
+	GCU_w(space->machine, 1, offset, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -678,15 +679,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (input_port_read(machine, "IN0") & 0xff) << 24;
+		r |= (input_port_read(space->machine, "IN0") & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (input_port_read(machine, "IN1") & 0xff) << 8;
+		r |= (input_port_read(space->machine, "IN1") & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (input_port_read(machine, "IN2") & 0xff);
+		r |= (input_port_read(space->machine, "IN2") & 0xff);
 	}
 
 	return r;
@@ -696,11 +697,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return input_port_read(machine, "SENSOR1") | 0x01000100;
+		return input_port_read(space->machine, "SENSOR1") | 0x01000100;
 	}
 	else
 	{
-		return input_port_read(machine, "SENSOR2") | 0x01000100;
+		return input_port_read(space->machine, "SENSOR2") | 0x01000100;
 	}
 }
 
@@ -856,12 +857,12 @@ static int atapi_drivesel;
 
 static void atapi_cause_irq(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ4, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ4, ASSERT_LINE);
 }
 
 static void atapi_clear_irq(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ4, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
 static void atapi_exit(running_machine* machine)
@@ -973,7 +974,7 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 
 	if (reg == ATAPI_REG_DATA)
 	{
-//      printf("ATAPI: packet write %04x at %08X\n", data, activecpu_get_pc());
+//      printf("ATAPI: packet write %04x at %08X\n", data, cpu_get_pc(machine->activecpu));
 		atapi_data[atapi_data_ptr] = data;
 		atapi_data_ptr++;
 
@@ -1172,12 +1173,12 @@ static READ32_HANDLER( atapi_command_r )
 //  printf("atapi_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_command_reg_r(machine, offset*2);
+		r = atapi_command_reg_r(space->machine, offset*2);
 		return ATAPI_ENDIAN(r) << 16;
 	}
 	else
 	{
-		r = atapi_command_reg_r(machine, (offset*2) + 1);
+		r = atapi_command_reg_r(space->machine, (offset*2) + 1);
 		return ATAPI_ENDIAN(r) << 0;
 	}
 }
@@ -1188,11 +1189,11 @@ static WRITE32_HANDLER( atapi_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_command_reg_w(machine, offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
+		atapi_command_reg_w(space->machine, offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
 	}
 	else
 	{
-		atapi_command_reg_w(machine, (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
+		atapi_command_reg_w(space->machine, (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
 	}
 }
 
@@ -1235,19 +1236,19 @@ static READ32_HANDLER( comm_uart_r )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+0) << 24;
+		r |= pc16552d_0_r(space, (offset*4)+0) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+1) << 16;
+		r |= pc16552d_0_r(space, (offset*4)+1) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+2) << 8;
+		r |= pc16552d_0_r(space, (offset*4)+2) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+3) << 0;
+		r |= pc16552d_0_r(space, (offset*4)+3) << 0;
 	}
 
 	return r;
@@ -1257,26 +1258,26 @@ static WRITE32_HANDLER( comm_uart_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		pc16552d_0_w(machine, (offset*4)+0, (data >> 24) & 0xff);
+		pc16552d_0_w(space, (offset*4)+0, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		pc16552d_0_w(machine, (offset*4)+1, (data >> 16) & 0xff);
+		pc16552d_0_w(space, (offset*4)+1, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		pc16552d_0_w(machine, (offset*4)+2, (data >> 8) & 0xff);
+		pc16552d_0_w(space, (offset*4)+2, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		pc16552d_0_w(machine, (offset*4)+3, (data >> 0) & 0xff);
+		pc16552d_0_w(space, (offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 
 static void comm_uart_irq_callback(running_machine *machine, int channel, int value)
 {
 	// TODO
-	//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+	//cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -1338,11 +1339,11 @@ static READ32_HANDLER( sound_r )
 
 	if (ACCESSING_BITS_24_31)	/* External RAM read */
 	{
-		r |= ymz280b_data_0_r(machine, offset) << 24;
+		r |= ymz280b_data_0_r(space, offset) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= ymz280b_status_0_r(machine, offset) << 16;
+		r |= ymz280b_status_0_r(space, offset) << 16;
 	}
 
 	return r;
@@ -1353,11 +1354,11 @@ static WRITE32_HANDLER( sound_w )
 //  printf("sound_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 	if (ACCESSING_BITS_24_31)
 	{
-		ymz280b_register_0_w(machine, offset, (data >> 24) & 0xff);
+		ymz280b_register_0_w(space, offset, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		ymz280b_data_0_w(machine, offset, (data >> 16) & 0xff);
+		ymz280b_data_0_w(space, offset, (data >> 16) & 0xff);
 	}
 }
 
@@ -1394,11 +1395,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return input_port_read(machine, "WHEEL_P1") << 24;
+		return input_port_read(space->machine, "WHEEL_P1") << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return input_port_read(machine, "WHEEL_P2") << 24;
+		return input_port_read(space->machine, "WHEEL_P2") << 24;
 	}
 
 	return 0;
@@ -1410,7 +1411,7 @@ static READ32_HANDLER( midi_uart_r )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= pc16552d_1_r(machine, offset >> 6) << 24;
+		r |= pc16552d_1_r(space, offset >> 6) << 24;
 	}
 
 	return r;
@@ -1420,7 +1421,7 @@ static WRITE32_HANDLER( midi_uart_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		pc16552d_1_w(machine, offset >> 6, (data >> 24) & 0xff);
+		pc16552d_1_w(space, offset >> 6, (data >> 24) & 0xff);
 	}
 }
 
@@ -1431,20 +1432,20 @@ static void midi_uart_irq_callback(running_machine *machine, int channel, int va
 		if ((extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
 		{
 			extend_board_irq_active |= 0x02;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 	else
 	{
 		if ((extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
 		{
 			extend_board_irq_active |= 0x01;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 }
 
@@ -1576,7 +1577,7 @@ static WRITE32_HANDLER( lamp_output_w )
 
 static WRITE32_HANDLER( lamp_output_kbm_w )
 {
-	lamp_output_w(machine, offset, data, mem_mask);
+	lamp_output_w(space, offset, data, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1595,7 +1596,7 @@ static WRITE32_HANDLER( lamp_output_kbm_w )
 
 static WRITE32_HANDLER( lamp_output_ppp_w )
 {
-	lamp_output_w(machine, offset, data, mem_mask);
+	lamp_output_w(space, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00000100 Left
@@ -1642,7 +1643,7 @@ static WRITE32_HANDLER( lamp_output2_w )
 
 static WRITE32_HANDLER( lamp_output2_ppp_w )
 {
-	lamp_output2_w(machine, offset, data, mem_mask);
+	lamp_output2_w(space, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Top LED 0
@@ -1676,7 +1677,7 @@ static WRITE32_HANDLER( lamp_output3_w )
 
 static WRITE32_HANDLER( lamp_output3_ppp_w )
 {
-	lamp_output3_w(machine, offset, data, mem_mask);
+	lamp_output3_w(space, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Lamp 0
@@ -1763,14 +1764,14 @@ static UINT32 *work_ram;
 static MACHINE_START( firebeat )
 {
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x01ffffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x01ffffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1995,7 +1996,7 @@ static INTERRUPT_GEN(firebeat_interrupt)
 	// IRQ 2: Main board UART
 	// IRQ 4: ATAPI
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_RESET( firebeat )
@@ -2255,20 +2256,20 @@ static void security_w(UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
-		ppc4xx_spu_receive_byte(0, r);
+		ppc4xx_spu_receive_byte(Machine->cpu[0], r);
 }
 
 /*****************************************************************************/
 
-static void init_lights(running_machine *machine, write32_machine_func out1, write32_machine_func out2, write32_machine_func out3)
+static void init_lights(running_machine *machine, write32_space_func out1, write32_space_func out2, write32_space_func out3)
 {
 	if(!out1) out1 = lamp_output_w;
 	if(!out2) out1 = lamp_output2_w;
 	if(!out3) out1 = lamp_output3_w;
 
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7d000804, 0x7d000807, 0, 0, out1);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7d000320, 0x7d000323, 0, 0, out2);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7d000324, 0x7d000327, 0, 0, out3);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
 }
 
 static void init_firebeat(running_machine *machine)
@@ -2290,7 +2291,7 @@ static void init_firebeat(running_machine *machine)
 
 	cur_cab_data = cab_data;
 
-	ppc4xx_spu_set_tx_handler(0, security_w);
+	ppc4xx_spu_set_tx_handler(machine->cpu[0], security_w);
 
 	set_ibutton(rom);
 

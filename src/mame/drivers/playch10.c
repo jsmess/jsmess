@@ -332,7 +332,7 @@ static WRITE8_HANDLER( ram_8w_w )
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( 0, source );
+	ppu2c0x_spriteram_dma( space, 0, source );
 }
 
 static NVRAM_HANDLER( playch10 )
@@ -362,17 +362,17 @@ static WRITE8_HANDLER( time_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(machine, 0x15);
+	return nes_psg_0_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(machine, 0x15, data);
+	nes_psg_0_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(machine, 0x17, data);
+	nes_psg_0_w(space, 0x17, data);
 }
 
 /******************************************************************************/
@@ -670,11 +670,11 @@ static INTERRUPT_GEN( playch10_interrupt ) {
 
 	/* LS161A, Sheet 1 - bottom left of Z80 */
 	if ( !pc10_dog_di && !pc10_nmi_enable ) {
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE );
+		cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE );
 	}
 
 	else if ( pc10_nmi_enable )
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const nes_interface nes_config =

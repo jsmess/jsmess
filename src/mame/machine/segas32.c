@@ -36,12 +36,13 @@ static const UINT8 ga2_v25_opcode_table[256] = {
 static void nec_v25_cpu_decrypt(running_machine *machine)
 {
 	int i;
+	const address_space *space = cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "mcu");
 	UINT8* decrypted = auto_malloc(0x100000);
 	UINT8* temp = malloc_or_die(0x100000);
 
 	// set CPU3 opcode base
-	memory_set_decrypted_region(2, 0x00000, 0xfffff, decrypted);
+	memory_set_decrypted_region(space, 0x00000, 0xfffff, decrypted);
 
 	// make copy of ROM so original can be overwritten
 	memcpy(temp, rom, 0x10000);
@@ -133,7 +134,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 		}
 		else
 		{
-			const UINT8 *ROM = memory_region(machine, "main");
+			const UINT8 *ROM = memory_region(space->machine, "main");
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -184,7 +185,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	switch (offset)
 	{
@@ -227,17 +228,19 @@ WRITE16_HANDLER(brival_protection_w)
  ******************************************************************************
  ******************************************************************************/
 
-void darkedge_fd1149_vblank(void)
+void darkedge_fd1149_vblank(const device_config *device)
 {
-	program_write_word(0x20f072, 0);
-	program_write_word(0x20f082, 0);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	if( program_read_byte(0x20a12c) != 0 )
+	memory_write_word(space, 0x20f072, 0);
+	memory_write_word(space, 0x20f082, 0);
+
+	if( memory_read_byte(space, 0x20a12c) != 0 )
 	{
-		program_write_byte(0x20a12c, program_read_byte(0x20a12c)-1 );
+		memory_write_byte(space, 0x20a12c, memory_read_byte(space, 0x20a12c)-1 );
 
-		if( program_read_byte(0x20a12c) == 0 )
-			program_write_byte(0x20a12e, 1);
+		if( memory_read_byte(space, 0x20a12c) == 0 )
+			memory_write_byte(space, 0x20a12e, 1);
 	}
 }
 
@@ -245,14 +248,14 @@ void darkedge_fd1149_vblank(void)
 WRITE16_HANDLER( darkedge_protection_w )
 {
 	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
-		activecpu_get_pc(), 0xa00000 + 2*offset, data, mem_mask);
+		cpu_get_pc(space->cpu), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
 READ16_HANDLER( darkedge_protection_r )
 {
 	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
-		activecpu_get_pc(), 0xa00000 + 2*offset, mem_mask);
+		cpu_get_pc(space->cpu), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
 }
 
@@ -266,7 +269,7 @@ READ16_HANDLER( darkedge_protection_r )
 
 WRITE16_HANDLER( dbzvrvs_protection_w )
 {
-	program_write_word( 0x2080c8, program_read_word( 0x200044 ) );
+	memory_write_word( space, 0x2080c8, memory_read_word( space, 0x200044 ) );
 }
 
 
@@ -287,12 +290,12 @@ READ16_HANDLER( dbzvrvs_protection_r )
 // protection ram is 8-bits wide and only occupies every other address
 READ16_HANDLER(arabfgt_protection_r)
 {
-	int PC = activecpu_get_pc();
+	int PC = cpu_get_pc(space->cpu);
 	int cmpVal;
 
 	if (PC == 0xfe0325 || PC == 0xfe01e5 || PC == 0xfe035e || PC == 0xfe03cc)
 	{
-		cmpVal = activecpu_get_reg(1);
+		cmpVal = cpu_get_reg(space->cpu, 1);
 
 		// R0 always contains the value the protection is supposed to return (!)
 		return cmpVal;
@@ -330,12 +333,12 @@ WRITE16_HANDLER( jleague_protection_w )
 		// Map team browser selection to opponent browser selection
 		// using same lookup table that V60 uses for sound sample mapping.
 		case 0:
-			program_write_byte( 0x20f708, program_read_word( 0x7bbc0 + data*2 ) );
+			memory_write_byte( space, 0x20f708, memory_read_word( space, 0x7bbc0 + data*2 ) );
 			break;
 
 		// move on to team browser
 		case 4/2:
-			program_write_byte( 0x200016, data & 0xff );
+			memory_write_byte( space, 0x200016, data & 0xff );
 			break;
 
 		default:

@@ -26,7 +26,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", activecpu_get_pc(), buf );
+		logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 	}
 }
 
@@ -249,7 +249,7 @@ static void spu_write( UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void *psxspu_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( psxspu )
 {
 	struct psxinfo *chip;
 	int n_effect;
@@ -308,43 +308,43 @@ static void *psxspu_start(const char *tag, int sndindex, int clock, const void *
 
 	chip->m_p_n_spuram = auto_malloc( SPU_RAM_SIZE );
 
-	state_save_register_item( "psx", sndindex, chip->m_n_mainvolumeleft );
-	state_save_register_item( "psx", sndindex, chip->m_n_mainvolumeright );
-	state_save_register_item( "psx", sndindex, chip->m_n_reverberationdepthleft );
-	state_save_register_item( "psx", sndindex, chip->m_n_reverberationdepthright );
-	state_save_register_item( "psx", sndindex, chip->m_n_voiceon );
-	state_save_register_item( "psx", sndindex, chip->m_n_voiceoff );
-	state_save_register_item( "psx", sndindex, chip->m_n_modulationmode );
-	state_save_register_item( "psx", sndindex, chip->m_n_noisemode );
-	state_save_register_item( "psx", sndindex, chip->m_n_reverbmode );
-	state_save_register_item( "psx", sndindex, chip->m_n_channelonoff );
-	state_save_register_item( "psx", sndindex, chip->m_n_reverbworkareastart );
-	state_save_register_item( "psx", sndindex, chip->m_n_irqaddress );
-	state_save_register_item( "psx", sndindex, chip->m_n_spuoffset );
-	state_save_register_item( "psx", sndindex, chip->m_n_spudata );
-	state_save_register_item( "psx", sndindex, chip->m_n_spucontrol );
-	state_save_register_item( "psx", sndindex, chip->m_n_spustatus );
-	state_save_register_item( "psx", sndindex, chip->m_n_cdvolumeleft );
-	state_save_register_item( "psx", sndindex, chip->m_n_cdvolumeright );
-	state_save_register_item( "psx", sndindex, chip->m_n_externalvolumeleft );
-	state_save_register_item( "psx", sndindex, chip->m_n_externalvolumeright );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_volumeleft );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_volumeright );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_pitch );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_address );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_attackdecaysustain );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_sustainrelease );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_adsrvolume );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_repeataddress );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_effect );
-	state_save_register_item_pointer( "psx", sndindex, chip->m_p_n_spuram, SPU_RAM_SIZE/2 );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_blockaddress );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_blockoffset );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_blockstatus );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_blockbuffer );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_s1 );
-	state_save_register_item_array( "psx", sndindex, chip->m_p_n_s2 );
-	state_save_register_item_array( "psx", sndindex, chip->m_n_loop );
+	state_save_register_item( "psx", tag, 0, chip->m_n_mainvolumeleft );
+	state_save_register_item( "psx", tag, 0, chip->m_n_mainvolumeright );
+	state_save_register_item( "psx", tag, 0, chip->m_n_reverberationdepthleft );
+	state_save_register_item( "psx", tag, 0, chip->m_n_reverberationdepthright );
+	state_save_register_item( "psx", tag, 0, chip->m_n_voiceon );
+	state_save_register_item( "psx", tag, 0, chip->m_n_voiceoff );
+	state_save_register_item( "psx", tag, 0, chip->m_n_modulationmode );
+	state_save_register_item( "psx", tag, 0, chip->m_n_noisemode );
+	state_save_register_item( "psx", tag, 0, chip->m_n_reverbmode );
+	state_save_register_item( "psx", tag, 0, chip->m_n_channelonoff );
+	state_save_register_item( "psx", tag, 0, chip->m_n_reverbworkareastart );
+	state_save_register_item( "psx", tag, 0, chip->m_n_irqaddress );
+	state_save_register_item( "psx", tag, 0, chip->m_n_spuoffset );
+	state_save_register_item( "psx", tag, 0, chip->m_n_spudata );
+	state_save_register_item( "psx", tag, 0, chip->m_n_spucontrol );
+	state_save_register_item( "psx", tag, 0, chip->m_n_spustatus );
+	state_save_register_item( "psx", tag, 0, chip->m_n_cdvolumeleft );
+	state_save_register_item( "psx", tag, 0, chip->m_n_cdvolumeright );
+	state_save_register_item( "psx", tag, 0, chip->m_n_externalvolumeleft );
+	state_save_register_item( "psx", tag, 0, chip->m_n_externalvolumeright );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_volumeleft );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_volumeright );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_pitch );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_address );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_attackdecaysustain );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_sustainrelease );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_adsrvolume );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_repeataddress );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_effect );
+	state_save_register_item_pointer( "psx", tag, 0, chip->m_p_n_spuram, SPU_RAM_SIZE/2 );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_blockaddress );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_blockoffset );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_blockstatus );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_blockbuffer );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_s1 );
+	state_save_register_item_array( "psx", tag, 0, chip->m_p_n_s2 );
+	state_save_register_item_array( "psx", tag, 0, chip->m_n_loop );
 
 	chip->intf->spu_install_read_handler( 4, spu_read );
 	chip->intf->spu_install_write_handler( 4, spu_write );
@@ -664,7 +664,7 @@ WRITE32_HANDLER( psx_spu_w )
  * Generic get_info
  **************************************************************************/
 
-static void psxspu_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( psxspu )
 {
 	switch (state)
 	{
@@ -673,15 +673,15 @@ static void psxspu_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void psxspu_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( psxspu )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = psxspu_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = psxspu_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( psxspu );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( psxspu );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

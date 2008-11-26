@@ -36,9 +36,9 @@ static UINT32 *namcoc7x_hostram;
 
 static READ16_HANDLER( speedup_r )
 {
-	if ((activecpu_get_pc() == 0xc12d) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(space->cpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(space->cpu);
 	}
 
 	return su_82;
@@ -61,14 +61,14 @@ READ16_HANDLER(namcoc7x_soundram16_r)
 
 WRITE32_HANDLER(namcoc7x_soundram32_w)
 {
-	namcoc7x_soundram16_w(machine, offset*2, data >> 16, mem_mask >> 16);
-	namcoc7x_soundram16_w(machine, offset*2+1, data, mem_mask);
+	namcoc7x_soundram16_w(space, offset*2, data >> 16, mem_mask >> 16);
+	namcoc7x_soundram16_w(space, offset*2+1, data, mem_mask);
 }
 
 READ32_HANDLER(namcoc7x_soundram32_r)
 {
-	return (namcoc7x_soundram16_r(machine, offset*2, mem_mask >> 16) << 16) |
-		namcoc7x_soundram16_r(machine, offset*2+1, mem_mask);
+	return (namcoc7x_soundram16_r(space, offset*2, mem_mask >> 16) << 16) |
+		namcoc7x_soundram16_r(space, offset*2+1, mem_mask);
 }
 
 void namcoc7x_sound_write16(UINT16 command, UINT32 offset)
@@ -89,7 +89,7 @@ void namcoc7x_on_driver_init(running_machine *machine)
 	// install speedup cheat
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 		if (machine->config->cpu[cpunum].type == CPU_M37702)
-			memory_install_readwrite16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, speedup_r, speedup_w);
+			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, speedup_r, speedup_w);
 }
 
 void namcoc7x_set_host_ram(UINT32 *hostram)
@@ -187,9 +187,9 @@ ADDRESS_MAP_END
 
 INTERRUPT_GEN( namcoc7x_interrupt )
 {
-	if (cpu_getiloops() == 0)
- 		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ0, HOLD_LINE);
+	if (cpu_getiloops(device) == 0)
+ 		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ2, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 }
 

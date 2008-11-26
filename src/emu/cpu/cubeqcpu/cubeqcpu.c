@@ -127,6 +127,9 @@ typedef struct
 
 	void (*dac_w)(UINT16 data);
 	UINT16 *sound_data;
+
+	const device_config *device;
+	const address_space *program;
 } cquestsnd_state;
 
 
@@ -163,6 +166,9 @@ typedef struct
 	UINT8 wc;
 	UINT8 rc;
 	UINT8 clkcnt;
+
+	const device_config *device;
+	const address_space *program;
 } cquestrot_state;
 
 
@@ -204,6 +210,9 @@ typedef struct
 	UINT8	*ptr_ram;
 	UINT32	*e_stack;
 	UINT32	*o_stack;
+
+	const device_config *device;
+	const address_space *program;
 
 } cquestlin_state;
 
@@ -313,41 +322,44 @@ static STATE_POSTLOAD( cquestsnd_postload )
 
 }
 
-static void cquestsnd_state_register(int index, const char *type)
+static void cquestsnd_state_register(const device_config *device, const char *type)
 {
-	state_save_register_item_array(type, index, cquestsnd.ram);
-	state_save_register_item(type, index, cquestsnd.q);
-	state_save_register_item(type, index, cquestsnd.f);
-	state_save_register_item(type, index, cquestsnd.y);
-	state_save_register_item(type, index, cquestsnd.cflag);
-	state_save_register_item(type, index, cquestsnd.vflag);
+	state_save_register_item_array(type, device->tag, 0, cquestsnd.ram);
+	state_save_register_item(type, device->tag, 0, cquestsnd.q);
+	state_save_register_item(type, device->tag, 0, cquestsnd.f);
+	state_save_register_item(type, device->tag, 0, cquestsnd.y);
+	state_save_register_item(type, device->tag, 0, cquestsnd.cflag);
+	state_save_register_item(type, device->tag, 0, cquestsnd.vflag);
 
-	state_save_register_item(type, index, cquestsnd.pc);
-	state_save_register_item(type, index, cquestsnd.platch);
-	state_save_register_item(type, index, cquestsnd.rtnlatch);
-	state_save_register_item(type, index, cquestsnd.adrcntr);
-	state_save_register_item(type, index, cquestsnd.adrlatch);
-	state_save_register_item(type, index, cquestsnd.dinlatch);
-	state_save_register_item(type, index, cquestsnd.ramwlatch);
-	state_save_register_item(type, index, cquestsnd.prev_ipram);
-	state_save_register_item(type, index, cquestsnd.prev_ipwrt);
+	state_save_register_item(type, device->tag, 0, cquestsnd.pc);
+	state_save_register_item(type, device->tag, 0, cquestsnd.platch);
+	state_save_register_item(type, device->tag, 0, cquestsnd.rtnlatch);
+	state_save_register_item(type, device->tag, 0, cquestsnd.adrcntr);
+	state_save_register_item(type, device->tag, 0, cquestsnd.adrlatch);
+	state_save_register_item(type, device->tag, 0, cquestsnd.dinlatch);
+	state_save_register_item(type, device->tag, 0, cquestsnd.ramwlatch);
+	state_save_register_item(type, device->tag, 0, cquestsnd.prev_ipram);
+	state_save_register_item(type, device->tag, 0, cquestsnd.prev_ipwrt);
 
-	state_save_register_postload(Machine, cquestsnd_postload, NULL);
+	state_save_register_postload(device->machine, cquestsnd_postload, (void *)device);
 }
 
 static CPU_INIT( cquestsnd )
 {
-	cubeqst_snd_config* _config = (cubeqst_snd_config*)config;
+	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->static_config;
 
 	memset(&cquestsnd, 0, sizeof(cquestsnd));
 
 	cquestsnd.dac_w = _config->dac_w;
-	cquestsnd.sound_data = (UINT16*)memory_region(Machine, _config->sound_data_region);
+	cquestsnd.sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
+
+	cquestsnd.device = device;
+	cquestsnd.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* Allocate RAM shared with 68000 */
 	cquestsnd.sram = malloc(4096);
 
-	cquestsnd_state_register(index, "cquestsnd");
+	cquestsnd_state_register(device, "cquestsnd");
 }
 
 
@@ -372,35 +384,35 @@ static STATE_POSTLOAD( cquestrot_postload )
 
 }
 
-static void cquestrot_state_register(int index, const char *type)
+static void cquestrot_state_register(const device_config *device, const char *type)
 {
-	state_save_register_item_array(type, index, cquestrot.ram);
-	state_save_register_item(type, index, cquestrot.q);
-	state_save_register_item(type, index, cquestrot.f);
-	state_save_register_item(type, index, cquestrot.y);
-	state_save_register_item(type, index, cquestrot.cflag);
-	state_save_register_item(type, index, cquestrot.vflag);
+	state_save_register_item_array(type, device->tag, 0, cquestrot.ram);
+	state_save_register_item(type, device->tag, 0, cquestrot.q);
+	state_save_register_item(type, device->tag, 0, cquestrot.f);
+	state_save_register_item(type, device->tag, 0, cquestrot.y);
+	state_save_register_item(type, device->tag, 0, cquestrot.cflag);
+	state_save_register_item(type, device->tag, 0, cquestrot.vflag);
 
-	state_save_register_item(type, index, cquestrot.pc);
-	state_save_register_item(type, index, cquestrot.seqcnt);
-	state_save_register_item(type, index, cquestrot.dsrclatch);
-	state_save_register_item(type, index, cquestrot.rsrclatch);
-	state_save_register_item(type, index, cquestrot.dynaddr);
-	state_save_register_item(type, index, cquestrot.dyndata);
-	state_save_register_item(type, index, cquestrot.yrlatch);
-	state_save_register_item(type, index, cquestrot.ydlatch);
-	state_save_register_item(type, index, cquestrot.dinlatch);
-	state_save_register_item(type, index, cquestrot.divreg);
-	state_save_register_item(type, index, cquestrot.linedata);
-	state_save_register_item(type, index, cquestrot.lineaddr);
-	state_save_register_item(type, index, cquestrot.prev_dred);
-	state_save_register_item(type, index, cquestrot.prev_dwrt);
-	state_save_register_item(type, index, cquestrot.wc);
+	state_save_register_item(type, device->tag, 0, cquestrot.pc);
+	state_save_register_item(type, device->tag, 0, cquestrot.seqcnt);
+	state_save_register_item(type, device->tag, 0, cquestrot.dsrclatch);
+	state_save_register_item(type, device->tag, 0, cquestrot.rsrclatch);
+	state_save_register_item(type, device->tag, 0, cquestrot.dynaddr);
+	state_save_register_item(type, device->tag, 0, cquestrot.dyndata);
+	state_save_register_item(type, device->tag, 0, cquestrot.yrlatch);
+	state_save_register_item(type, device->tag, 0, cquestrot.ydlatch);
+	state_save_register_item(type, device->tag, 0, cquestrot.dinlatch);
+	state_save_register_item(type, device->tag, 0, cquestrot.divreg);
+	state_save_register_item(type, device->tag, 0, cquestrot.linedata);
+	state_save_register_item(type, device->tag, 0, cquestrot.lineaddr);
+	state_save_register_item(type, device->tag, 0, cquestrot.prev_dred);
+	state_save_register_item(type, device->tag, 0, cquestrot.prev_dwrt);
+	state_save_register_item(type, device->tag, 0, cquestrot.wc);
 
-	state_save_register_item_pointer(type, index, cquestrot.dram, 16384);
-	state_save_register_item_pointer(type, index, cquestrot.sram, 2048);
+	state_save_register_item_pointer(type, device->tag, 0, cquestrot.dram, 16384);
+	state_save_register_item_pointer(type, device->tag, 0, cquestrot.sram, 2048);
 
-	state_save_register_postload(Machine, cquestrot_postload, NULL);
+	state_save_register_postload(device->machine, cquestrot_postload, (void *)device);
 }
 
 static CPU_INIT( cquestrot )
@@ -411,7 +423,10 @@ static CPU_INIT( cquestrot )
 	cquestrot.dram = malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */
 	cquestrot.sram = malloc(2048 * sizeof(UINT16));   /* Private */
 
-	cquestrot_state_register(index, "cquestrot");
+	cquestrot.device = device;
+	cquestrot.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
+	cquestrot_state_register(device, "cquestrot");
 }
 
 
@@ -444,39 +459,39 @@ static STATE_POSTLOAD( cquestlin_postload )
 
 }
 
-static void cquestlin_state_register(int index, const char *type)
+static void cquestlin_state_register(const device_config *device, const char *type)
 {
-	state_save_register_item_array(type, index, cquestlin.ram);
-	state_save_register_item(type, index, cquestlin.q);
-	state_save_register_item(type, index, cquestlin.f);
-	state_save_register_item(type, index, cquestlin.y);
-	state_save_register_item(type, index, cquestlin.cflag);
-	state_save_register_item(type, index, cquestlin.vflag);
+	state_save_register_item_array(type, device->tag, 0, cquestlin.ram);
+	state_save_register_item(type, device->tag, 0, cquestlin.q);
+	state_save_register_item(type, device->tag, 0, cquestlin.f);
+	state_save_register_item(type, device->tag, 0, cquestlin.y);
+	state_save_register_item(type, device->tag, 0, cquestlin.cflag);
+	state_save_register_item(type, device->tag, 0, cquestlin.vflag);
 
-	state_save_register_item(type, index, cquestlin.pc[0]);
-	state_save_register_item(type, index, cquestlin.pc[1]);
-	state_save_register_item(type, index, cquestlin.seqcnt);
-	state_save_register_item(type, index, cquestlin.clatch);
-	state_save_register_item(type, index, cquestlin.zlatch);
-	state_save_register_item(type, index, cquestlin.xcnt);
-	state_save_register_item(type, index, cquestlin.ycnt);
-	state_save_register_item(type, index, cquestlin.sreg);
-	state_save_register_item(type, index, cquestlin.fadlatch);
-	state_save_register_item(type, index, cquestlin.badlatch);
-	state_save_register_item(type, index, cquestlin.sramdlatch);
-	state_save_register_item(type, index, cquestlin.fglatch);
-	state_save_register_item(type, index, cquestlin.bglatch);
-	state_save_register_item(type, index, cquestlin.gt0reg);
-	state_save_register_item(type, index, cquestlin.fdxreg);
-	state_save_register_item(type, index, cquestlin.field);
-	state_save_register_item(type, index, cquestlin.clkcnt);
+	state_save_register_item(type, device->tag, 0, cquestlin.pc[0]);
+	state_save_register_item(type, device->tag, 0, cquestlin.pc[1]);
+	state_save_register_item(type, device->tag, 0, cquestlin.seqcnt);
+	state_save_register_item(type, device->tag, 0, cquestlin.clatch);
+	state_save_register_item(type, device->tag, 0, cquestlin.zlatch);
+	state_save_register_item(type, device->tag, 0, cquestlin.xcnt);
+	state_save_register_item(type, device->tag, 0, cquestlin.ycnt);
+	state_save_register_item(type, device->tag, 0, cquestlin.sreg);
+	state_save_register_item(type, device->tag, 0, cquestlin.fadlatch);
+	state_save_register_item(type, device->tag, 0, cquestlin.badlatch);
+	state_save_register_item(type, device->tag, 0, cquestlin.sramdlatch);
+	state_save_register_item(type, device->tag, 0, cquestlin.fglatch);
+	state_save_register_item(type, device->tag, 0, cquestlin.bglatch);
+	state_save_register_item(type, device->tag, 0, cquestlin.gt0reg);
+	state_save_register_item(type, device->tag, 0, cquestlin.fdxreg);
+	state_save_register_item(type, device->tag, 0, cquestlin.field);
+	state_save_register_item(type, device->tag, 0, cquestlin.clkcnt);
 
-	state_save_register_item_pointer(type, index, cquestlin.sram, 4096);
-	state_save_register_item_pointer(type, index, cquestlin.ptr_ram, 1024);
-	state_save_register_item_pointer(type, index, cquestlin.e_stack, 32768);
-	state_save_register_item_pointer(type, index, cquestlin.o_stack, 32768);
+	state_save_register_item_pointer(type, device->tag, 0, cquestlin.sram, 4096);
+	state_save_register_item_pointer(type, device->tag, 0, cquestlin.ptr_ram, 1024);
+	state_save_register_item_pointer(type, device->tag, 0, cquestlin.e_stack, 32768);
+	state_save_register_item_pointer(type, device->tag, 0, cquestlin.o_stack, 32768);
 
-	state_save_register_postload(Machine, cquestlin_postload, NULL);
+	state_save_register_postload(device->machine, cquestlin_postload, (void *)device);
 }
 
 static CPU_INIT( cquestlin )
@@ -489,7 +504,10 @@ static CPU_INIT( cquestlin )
 	cquestlin.e_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
 	cquestlin.o_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
 
-	cquestlin_state_register(index, "cquestlin");
+	cquestlin.device = device;
+	cquestlin.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
+	cquestlin_state_register(device, "cquestlin");
 }
 
 
@@ -541,7 +559,7 @@ static int do_sndjmp(int jmp)
 
 static CPU_EXECUTE( cquestsnd )
 {
-	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	cquestsnd_icount = cycles;
 
@@ -549,7 +567,7 @@ static CPU_EXECUTE( cquestsnd )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = cpu_readop64(SND_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cquestsnd.program, SND_PC << 3);
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
 
@@ -571,7 +589,7 @@ static CPU_EXECUTE( cquestsnd )
 		int _rin    = (inslow >> 26) & 1;
 
 		if (calldebugger)
-			debugger_instruction_hook(Machine, cquestsnd.pc);
+			debugger_instruction_hook(device, cquestsnd.pc);
 
 		/* Don't think this matters, but just in case */
 		if (rtn)
@@ -875,7 +893,7 @@ INLINE int do_rotjmp(int jmp)
 
 static CPU_EXECUTE( cquestrot )
 {
-	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	cquestrot_icount = cycles;
 
@@ -883,7 +901,7 @@ static CPU_EXECUTE( cquestrot )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = cpu_readop64(ROT_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cquestrot.program, ROT_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -907,7 +925,7 @@ static CPU_EXECUTE( cquestrot )
 		UINT16 data_in = 0xffff;
 
 		if (calldebugger)
-			debugger_instruction_hook(Machine, ROT_PC);
+			debugger_instruction_hook(device, ROT_PC);
 
 		/* Handle DRAM accesses - I ought to check this... */
 		if (!(cquestrot.clkcnt & 3))
@@ -1381,7 +1399,7 @@ static CPU_EXECUTE( cquestlin )
 {
 #define LINE_PC ((cquestlin.pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
 
-	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	UINT32	*stack_ram;
 	UINT8	*ptr_ram;
 
@@ -1405,7 +1423,7 @@ static CPU_EXECUTE( cquestlin )
 		/* Are we executing the foreground or backgroud program? */
 		int prog = (cquestlin.clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
-		UINT64 inst = cpu_readop64(LINE_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cquestlin.program, LINE_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -1426,7 +1444,7 @@ static CPU_EXECUTE( cquestlin )
 		UINT16	data_in = 0;
 
 		if (calldebugger)
-			debugger_instruction_hook(Machine, cquestlin.pc[prog]);
+			debugger_instruction_hook(device, cquestlin.pc[prog]);
 
 		/* Handle accesses to and from shared SRAM */
 		if (prog == FOREGROUND)

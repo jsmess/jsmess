@@ -147,7 +147,7 @@ WRITE16_HANDLER( bionicc_paletteram_w )
 		b = b * (0x07 + bright) / 0x0e;
 	}
 
-	palette_set_color (machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color (space->machine, offset, MAKE_RGB(r, g, b));
 }
 
 WRITE16_HANDLER( bionicc_scroll_w )
@@ -243,5 +243,7 @@ VIDEO_UPDATE( bionicc )
 
 VIDEO_EOF( bionicc )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram16_w(space,0,0,0xffff);
 }

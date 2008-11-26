@@ -56,13 +56,15 @@ static MACHINE_RESET( starwars )
 	/* ESB-specific */
 	if (starwars_is_esb)
 	{
+		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 		/* reset the slapstic */
 		slapstic_reset();
 		slapstic_current_bank = slapstic_bank();
 		memcpy(slapstic_base, &slapstic_source[slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
-		starwars_out_w(machine, 4, 0);
+		starwars_out_w(space, 4, 0);
 	}
 
 	/* reset the matrix processor */
@@ -79,7 +81,7 @@ static MACHINE_RESET( starwars )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -90,9 +92,9 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static void esb_slapstic_tweak(offs_t offset)
+static void esb_slapstic_tweak(const address_space *space, offs_t offset)
 {
-	int new_bank = slapstic_tweak(offset);
+	int new_bank = slapstic_tweak(space, offset);
 
 	/* update for the new bank */
 	if (new_bank != slapstic_current_bank)
@@ -106,14 +108,14 @@ static void esb_slapstic_tweak(offs_t offset)
 static READ8_HANDLER( esb_slapstic_r )
 {
 	int result = slapstic_base[offset];
-	esb_slapstic_tweak(offset);
+	esb_slapstic_tweak(space, offset);
 	return result;
 }
 
 
 static WRITE8_HANDLER( esb_slapstic_w )
 {
-	esb_slapstic_tweak(offset);
+	esb_slapstic_tweak(space, offset);
 }
 
 
@@ -124,12 +126,12 @@ static WRITE8_HANDLER( esb_slapstic_w )
  *
  *************************************/
 
-static OPBASE_HANDLER( esb_setopbase )
+static DIRECT_UPDATE_HANDLER( esb_setdirect )
 {
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
-		offs_t pc = activecpu_get_pc();
+		offs_t pc = cpu_get_pc(space->cpu);
 
 		/* filter out duplicates; we get these because the handler gets called for
            multiple reasons:
@@ -140,7 +142,7 @@ static OPBASE_HANDLER( esb_setopbase )
 		{
 			slapstic_last_pc = pc;
 			slapstic_last_address = address;
-			esb_slapstic_tweak(address & 0x1fff);
+			esb_slapstic_tweak(space, address & 0x1fff);
 		}
 		return ~0;
 	}
@@ -501,8 +503,8 @@ static DRIVER_INIT( starwars )
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x6000, 0x10000 - 0x6000);
+	memory_set_bank(machine, 1, 0);
 }
 
 
@@ -519,23 +521,23 @@ static DRIVER_INIT( esb )
 	slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
-	memory_set_opbase_handler(0, esb_setopbase);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), esb_setdirect);
 
 	/* install read/write handlers for it */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
 
 	/* install additional banking */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, SMH_BANK2);
 
 	/* prepare the matrix processor */
 	starwars_is_esb = 1;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(1, 0);
-	memory_configure_bank(2, 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);
+	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, 2, 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
+	memory_set_bank(machine, 2, 0);
 
 	/* additional globals for state saving */
 	state_save_register_global(slapstic_current_bank);

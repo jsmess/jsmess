@@ -118,7 +118,7 @@ static WRITE8_HANDLER( control_w ) {
 
 static WRITE8_HANDLER( sound_reset_w ) {
 	if ( !( data & 1 ) )
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_control_w ) {
@@ -127,8 +127,8 @@ static WRITE8_HANDLER( sound_control_w ) {
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( machine, 0, data );
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+	soundlatch_w( space, 0, data );
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 
 static int msm_data = 0;
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( kc_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static READ8_HANDLER( sound_reset_r ) {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -377,7 +377,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( kc_interrupt ) {
 
 	if ( nmi_enable )
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void msmint( running_machine *machine, int data ) {
@@ -393,7 +393,7 @@ static void msmint( running_machine *machine, int data ) {
 
 	if ( !( counter ^= 1 ) ) {
 		if ( sound_nmi_enable ) {
-			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }
@@ -411,7 +411,7 @@ static const msm5205_interface msm_interface =
 static INTERRUPT_GEN( sound_int ) {
 
 	if ( sound_nmi_enable )
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -681,11 +681,12 @@ ROM_END
 
 static DRIVER_INIT( kchampvs )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x10000);
 	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 
 	for (A = 0;A < 0x10000;A++)
 		decrypted[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);

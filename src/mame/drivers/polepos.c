@@ -249,7 +249,7 @@ static READ16_HANDLER( polepos2_ic25_r )
 		last_result = (INT8)last_signed * (UINT8)last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", activecpu_get_pc(), offset, result);
+//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(space->cpu), offset, result);
 
 	return result | (result << 8);
 }
@@ -263,14 +263,14 @@ static int auto_start_mask;
 
 static READ8_HANDLER( polepos_adc_r )
 {
-	return input_port_read(machine, adc_input ? "ACCEL" : "BRAKE");
+	return input_port_read(space->machine, adc_input ? "ACCEL" : "BRAKE");
 }
 
 static READ8_HANDLER( polepos_ready_r )
 {
 	int ret = 0xff;
 
-	if (video_screen_get_vpos(machine->primary_screen) >= 128)
+	if (video_screen_get_vpos(space->machine->primary_screen) >= 128)
 		ret ^= 0x02;
 
 	ret ^= 0x08; /* ADC End Flag */
@@ -288,7 +288,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 		case 0x00:	/* IRQON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -299,8 +299,8 @@ static WRITE8_HANDLER( polepos_latch_w )
 			polepos_sound_enable(bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(machine,0,0);
-				polepos_engine_sound_msb_w(machine,0,0);
+				polepos_engine_sound_lsb_w(space,0,0);
+				polepos_engine_sound_msb_w(space,0,0);
 			}
 			break;
 
@@ -309,11 +309,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x04:	/* RESB */
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
@@ -321,31 +321,31 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x07:	/* CHACL */
-			polepos_chacl_w(machine,offset,data);
+			polepos_chacl_w(space,offset,data);
 			break;
 	}
 }
 
 static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 {
-	int which = cpu_getactivecpu();
+	int which = cpunum_get_active();
 
 	data &= 1;
 
 	cpu_interrupt_enable(which,data);
 	if (!data)
-		cpunum_set_input_line(machine, which, 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[which], 0, CLEAR_LINE);
 }
 
 
-static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0") & auto_start_mask; }	// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }				// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSWA"); }					// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSWA") >> 4; }				// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read(machine, "DSWB"); }					// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read(machine, "DSWB") >> 4; }				// dips B
-static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "STEER"); }					// wheel
-static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "STEER") >> 4; }				// wheel
+static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0") & auto_start_mask; }	// fire and start buttons
+static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }				// coins
+static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSWA"); }					// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSWA") >> 4; }				// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSWB"); }					// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSWB") >> 4; }				// dips B
+static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "STEER"); }					// wheel
+static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "STEER") >> 4; }				// wheel
 static WRITE8_HANDLER( out_0 )
 {
 // no start lamps in pole position
@@ -374,11 +374,12 @@ static const struct namcoio_interface intf1 =
 #include "cpu/z8000/z8000.h"
 static MACHINE_RESET( polepos )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 8;i++)
-		polepos_latch_w(machine,i,0);
+		polepos_latch_w(space,i,0);
 
 	namco_06xx_init(0, 0,
 		NAMCOIO_51XX, &intf0,
@@ -387,8 +388,8 @@ static MACHINE_RESET( polepos )
 		NAMCOIO_54XX, NULL);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	cpunum_set_input_line_vector(1, 0, Z8000_NVI);
-	cpunum_set_input_line_vector(2, 0, Z8000_NVI);
+	cpu_set_input_line_vector(machine->cpu[1], 0, Z8000_NVI);
+	cpu_set_input_line_vector(machine->cpu[2], 0, Z8000_NVI);
 }
 
 
@@ -1743,16 +1744,16 @@ static DRIVER_INIT( topracra )
 	polepos_gear_bit = 0x20;
 
 	/* extra direct mapped inputs read */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, input_port_read_handler8(machine->portconfig, "STEER"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, input_port_read_handler8(machine->portconfig, "DSWA"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, input_port_read_handler8(machine->portconfig, "STEER"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, input_port_read_handler8(machine->portconfig, "DSWA"));
 
 }
 
 static DRIVER_INIT( polepos2 )
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	memory_install_read16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
 
 	DRIVER_INIT_CALL(polepos);
 }

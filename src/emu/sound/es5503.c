@@ -70,7 +70,7 @@ typedef struct
 
 	void (*irq_callback)(running_machine *machine, int);	// IRQ callback
 
-	read8_machine_func adc_read;		// callback for the 5503's built-in analog to digital converter
+	read8_space_func adc_read;		// callback for the 5503's built-in analog to digital converter
 
 	INT8  oscsenabled;		// # of oscillators enabled
 
@@ -224,7 +224,7 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 }
 
 
-static void *es5503_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( es5503 )
 {
 	const es5503_interface *intf;
 	int osc;
@@ -245,19 +245,16 @@ static void *es5503_start(const char *tag, int sndindex, int clock, const void *
 
 	for (osc = 0; osc < 32; osc++)
 	{
-		char sname[32];
-		sprintf(sname, "ES5503 %d osc %d", sndindex, osc);
-
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].freq);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].wtsize);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].control);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].vol);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].data);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].wavetblpointer);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].wavetblsize);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].resolution);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].accumulator);
-		state_save_register_item(sname, sndindex, chip->oscillators[osc].irqpend);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].freq);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].wtsize);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].control);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].vol);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].data);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].wavetblpointer);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].wavetblsize);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].resolution);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].accumulator);
+		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].irqpend);
 
 		chip->oscillators[osc].data = 0x80;
 		chip->oscillators[osc].irqpend = 0;
@@ -348,7 +345,7 @@ READ8_HANDLER(es5503_reg_0_r)
 
 						if (chip->irq_callback)
 						{
-							chip->irq_callback(machine, 0);
+							chip->irq_callback(space->machine, 0);
 						}
 						break;
 					}
@@ -361,7 +358,7 @@ READ8_HANDLER(es5503_reg_0_r)
 					{
 						if (chip->irq_callback)
 						{
-							chip->irq_callback(machine, 1);
+							chip->irq_callback(space->machine, 1);
 						}
 						break;
 					}
@@ -377,7 +374,7 @@ READ8_HANDLER(es5503_reg_0_r)
 			case 0xe2:	// A/D converter
 				if (chip->adc_read)
 				{
-					return chip->adc_read(machine, 0);
+					return chip->adc_read(space, 0);
 				}
 				break;
 		}
@@ -520,7 +517,7 @@ void es5503_set_base_0(UINT8 *wavemem)
  * Generic get_info
  **************************************************************************/
 
-static void es5503_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( es5503 )
 {
 	switch (state)
 	{
@@ -529,15 +526,15 @@ static void es5503_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void es5503_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( es5503 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = es5503_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = es5503_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5503 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( es5503 );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

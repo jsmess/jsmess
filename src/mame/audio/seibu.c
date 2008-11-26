@@ -105,11 +105,12 @@ static UINT8 decrypt_opcode(int a,int src)
 
 void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 {
+	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_malloc(length);
 	UINT8 *rom = memory_region(machine, cpu);
 	int i;
 
-	memory_set_decrypted_region(mame_find_cpu_index(machine, cpu), 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	for (i = 0;i < length;i++)
 	{
@@ -120,7 +121,7 @@ void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 	}
 
 	if (length > 0x10000)
-		memory_configure_bank_decrypted(1, 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		memory_configure_bank_decrypted(machine, 1, 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 
@@ -317,14 +318,14 @@ static void update_irq_lines(running_machine *machine, int param)
 	}
 
 	if ((irq1 & irq2) == 0xff)	/* no IRQs pending */
-		cpunum_set_input_line(machine, sound_cpu,0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpu],0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line_and_vector(machine, sound_cpu,0,ASSERT_LINE,irq1 & irq2);
+		cpu_set_input_line_and_vector(machine->cpu[sound_cpu],0,ASSERT_LINE,irq1 & irq2);
 }
 
 WRITE8_HANDLER( seibu_irq_clear_w )
 {
-	update_irq_lines(machine, VECTOR_INIT);
+	update_irq_lines(space->machine, VECTOR_INIT);
 }
 
 WRITE8_HANDLER( seibu_rst10_ack_w )
@@ -334,7 +335,7 @@ WRITE8_HANDLER( seibu_rst10_ack_w )
 
 WRITE8_HANDLER( seibu_rst18_ack_w )
 {
-	update_irq_lines(machine, RST18_CLEAR);
+	update_irq_lines(space->machine, RST18_CLEAR);
 }
 
 void seibu_ym3812_irqhandler(running_machine *machine, int linestate)
@@ -362,7 +363,7 @@ MACHINE_RESET( seibu_sound )
 	sound_cpu=mame_find_cpu_index(machine, "audio");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
-		memory_configure_bank(1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
+		memory_configure_bank(machine, 1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 }
 
 /***************************************************************************/
@@ -372,7 +373,7 @@ static int main2sub_pending,sub2main_pending;
 
 WRITE8_HANDLER( seibu_bank_w )
 {
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 }
 
 WRITE8_HANDLER( seibu_coin_w )
@@ -405,7 +406,7 @@ static WRITE8_HANDLER( seibu_pending_w )
 
 READ16_HANDLER( seibu_main_word_r )
 {
-	//logerror("%06x: seibu_main_word_r(%x)\n",activecpu_get_pc(),offset);
+	//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(space->cpu),offset);
 	switch (offset)
 	{
 		case 2:
@@ -414,14 +415,14 @@ READ16_HANDLER( seibu_main_word_r )
 		case 5:
 			return main2sub_pending ? 1 : 0;
 		default:
-			//logerror("%06x: seibu_main_word_r(%x)\n",activecpu_get_pc(),offset);
+			//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(space->cpu),offset);
 			return 0xffff;
 	}
 }
 
 WRITE16_HANDLER( seibu_main_word_w )
 {
-	//logerror("%06x: seibu_main_word_w(%x,%02x)\n",activecpu_get_pc(),offset,data);
+	//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(space->cpu),offset,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -431,7 +432,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub[offset] = data;
 				break;
 			case 4:
-				update_irq_lines(machine, RST18_ASSERT);
+				update_irq_lines(space->machine, RST18_ASSERT);
 				break;
 			case 6:
 				/* just a guess */
@@ -439,7 +440,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub_pending = 1;
 				break;
 			default:
-				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",activecpu_get_pc(),offset,data);
+				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(space->cpu),offset,data);
 				break;
 		}
 	}
@@ -447,12 +448,12 @@ WRITE16_HANDLER( seibu_main_word_w )
 
 READ8_HANDLER( seibu_main_v30_r )
 {
-	return seibu_main_word_r(machine,offset/2,0xffff) >> (8 * (offset & 1));
+	return seibu_main_word_r(space,offset/2,0xffff) >> (8 * (offset & 1));
 }
 
 WRITE8_HANDLER( seibu_main_v30_w )
 {
-	seibu_main_word_w(machine,offset/2,data << (8 * (offset & 1)),0x00ff << (8 * (offset & 1)));
+	seibu_main_word_w(space,offset/2,data << (8 * (offset & 1)),0x00ff << (8 * (offset & 1)));
 }
 
 WRITE16_HANDLER( seibu_main_mustb_w )
@@ -462,7 +463,7 @@ WRITE16_HANDLER( seibu_main_mustb_w )
 
 //  logerror("seibu_main_mustb_w: %x -> %x %x\n", data, main2sub[0], main2sub[1]);
 
-	update_irq_lines(machine, RST18_ASSERT);
+	update_irq_lines(space->machine, RST18_ASSERT);
 }
 
 /***************************************************************************/

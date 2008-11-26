@@ -128,10 +128,8 @@ VIDEO_START( kaneko16_sprites )
 	spritelist.first_sprite = (struct tempsprite *)auto_malloc(0x400 * sizeof(spritelist.first_sprite[0]));
 }
 
-VIDEO_START( kaneko16_1xVIEW2 )
+VIDEO_START( kaneko16_1xVIEW2_tilemaps )
 {
-	VIDEO_START_CALL(kaneko16_sprites);
-
 	kaneko16_tmap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
 										 16,16, 0x20,0x20	);
 	kaneko16_tmap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
@@ -174,6 +172,15 @@ VIDEO_START( kaneko16_1xVIEW2 )
 		tilemap_set_scroll_rows(kaneko16_tmap_0, 0x200);	// Line Scroll
 		tilemap_set_scroll_rows(kaneko16_tmap_1, 0x200);
 	}
+
+}
+
+
+VIDEO_START( kaneko16_1xVIEW2 )
+{
+	VIDEO_START_CALL(kaneko16_sprites);
+
+	VIDEO_START_CALL(kaneko16_1xVIEW2_tilemaps);
 }
 
 VIDEO_START( kaneko16_2xVIEW2 )
@@ -736,7 +743,7 @@ WRITE16_HANDLER( kaneko16_sprites_regs_w )
 			break;
 	}
 
-//  logerror("CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",activecpu_get_pc(),offset*2,data);
+//  logerror("CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",cpu_get_pc(space->cpu),offset*2,data);
 }
 
 
@@ -1010,6 +1017,24 @@ VIDEO_UPDATE(berlwall)
 	return 0;
 }
 
+
+VIDEO_UPDATE( jchan_view2 )
+{
+	int dx,dy;
+
+	VIDEO_UPDATE_CALL(common);
+
+	/* override the offsets set in common - tuned to char select in jchan2 */
+	dx = 25;dy = 11;
+
+	tilemap_set_scrolldx( kaneko16_tmap_0, -dx,		320 + dx -1        );
+	tilemap_set_scrolldx( kaneko16_tmap_1, -(dx+2),	320 + (dx + 2) - 1 );
+
+	tilemap_set_scrolldy( kaneko16_tmap_0, -dy,		240 + dy -1 );
+	tilemap_set_scrolldy( kaneko16_tmap_1, -dy,		240 + dy -1 );
+
+	return 0;
+}
 
 
 VIDEO_UPDATE( kaneko16 )

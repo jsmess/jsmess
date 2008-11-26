@@ -168,19 +168,19 @@ static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset
 static READ16_HANDLER(cyclwarr_input_r)
 {
 	static const char *const port[] = { "SERVICE", "P1", "P2", "DSW3" };
-	return input_port_read(machine, port[offset]);
+	return input_port_read(space->machine, port[offset]);
 }
 
 static READ16_HANDLER(cyclwarr_input2_r)
 {
 	static const char *const port2[] = { "DSW1", "DSW2", "P3", "P4" };
-	return input_port_read(machine, port2[offset]);
+	return input_port_read(space->machine, port2[offset]);
 }
 
 static WRITE16_HANDLER(cyclwarr_sound_w)
 {
-	soundlatch_w(machine, 0, data >> 8);
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data >> 8);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -817,7 +817,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_IRQ0, state);
 }
 
 static const ym2151_interface ym2151_config =
@@ -827,7 +827,7 @@ static const ym2151_interface ym2151_config =
 
 static INTERRUPT_GEN( roundup5_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static MACHINE_DRIVER_START( apache3 )
@@ -1202,7 +1202,7 @@ static DRIVER_INIT( apache3 )
 	UINT8 *src2 = memory_region(machine, "gfx3");
 	int i;
 
-	cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, ASSERT_LINE); // ?
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_HALT, ASSERT_LINE); // ?
 
 	for (i=0; i<0x100000; i+=32) {
 		memcpy(dst,src1,32);
@@ -1266,11 +1266,11 @@ static DRIVER_INIT( cyclwarr )
 
 	dst = memory_region(machine, "main");
 	memcpy(cyclwarr_cpua_ram,dst,8);
-	memory_set_bankptr(1, dst);
+	memory_set_bankptr(machine, 1, dst);
 
 	dst = memory_region(machine, "sub");
 	memcpy(cyclwarr_cpub_ram,dst,8);
-	memory_set_bankptr(2, dst);
+	memory_set_bankptr(machine, 2, dst);
 
 	// Copy sprite & palette data out of GFX rom area
 	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");

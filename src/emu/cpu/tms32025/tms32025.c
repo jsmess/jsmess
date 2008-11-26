@@ -117,9 +117,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
 */
 
 
-
 #include "debugger.h"
-#include "deprecat.h"
 #include "tms32025.h"
 
 
@@ -134,51 +132,15 @@ Table 3-2.  TMS32025/26 Memory Blocks
 static UINT16 *tms32025_pgmmap[0x200];
 static UINT16 *tms32025_datamap[0x200];
 
-#define SET_PC(x)	do { R.PC = (x); change_pc(R.PC<<1); } while (0)
+#define SET_PC(x)	do { R.PC = (x); } while (0)
 
-INLINE UINT16 M_RDROM(offs_t addr)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_pgmmap[addr >> 7];
-	if (ram) return ram[addr & 0x7f];
-	return program_read_word_16be(addr << 1);
-}
+#define P_IN(A)			(memory_read_word_16be(R.io, (A)<<1))
+#define P_OUT(A,V)		(memory_write_word_16be(R.io, ((A)<<1),(V)))
+#define S_IN(A)			(memory_read_word_16be(R.io, (A)<<1))
+#define S_OUT(A,V)		(memory_write_word_16be(R.io, ((A)<<1),(V)))
 
-INLINE void M_WRTROM(offs_t addr, UINT16 data)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_pgmmap[addr >> 7];
-	if (ram) { ram[addr & 0x7f] = data; }
-	else program_write_word_16be(addr << 1, data);
-}
-
-INLINE UINT16 M_RDRAM(offs_t addr)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_datamap[addr >> 7];
-	if (ram) return ram[addr & 0x7f];
-	return data_read_word_16be(addr << 1);
-}
-
-INLINE void M_WRTRAM(offs_t addr, UINT16 data)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_datamap[addr >> 7];
-	if (ram) { ram[addr & 0x7f] = data; }
-	else data_write_word_16be(addr << 1, data);
-}
-
-#define P_IN(A)			(io_read_word_16be((A)<<1))
-#define P_OUT(A,V)		(io_write_word_16be(((A)<<1),(V)))
-#define S_IN(A)			(io_read_word_16be((A)<<1))
-#define S_OUT(A,V)		(io_write_word_16be(((A)<<1),(V)))
-
-#define M_RDOP(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : cpu_readop16((A)<<1))
-#define M_RDOP_ARG(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : cpu_readop16((A)<<1))
+#define M_RDOP(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(R.program, (A)<<1))
+#define M_RDOP_ARG(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(R.program, (A)<<1))
 
 
 
@@ -210,6 +172,9 @@ typedef struct			/* Page 3-6 (45) shows all registers */
 	int		tms32025_dec_cycles;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 	UINT16 *datamap_save[16];
 	UINT16 *pgmmap_save[12];
 } tms32025_Regs;
@@ -300,6 +265,43 @@ INLINE void MODIFY_ARB(int data) { R.STR1 &= ~ARB_REG; R.STR1 |= ((data << 13) &
 #endif
 
 static int mHackIgnoreARP; /* special handling for lst, lst1 instructions */
+
+INLINE UINT16 M_RDROM(offs_t addr)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_pgmmap[addr >> 7];
+	if (ram) return ram[addr & 0x7f];
+	return memory_read_word_16be(R.program, addr << 1);
+}
+
+INLINE void M_WRTROM(offs_t addr, UINT16 data)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_pgmmap[addr >> 7];
+	if (ram) { ram[addr & 0x7f] = data; }
+	else memory_write_word_16be(R.program, addr << 1, data);
+}
+
+INLINE UINT16 M_RDRAM(offs_t addr)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_datamap[addr >> 7];
+	if (ram) return ram[addr & 0x7f];
+	return memory_read_word_16be(R.data, addr << 1);
+}
+
+INLINE void M_WRTRAM(offs_t addr, UINT16 data)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_datamap[addr >> 7];
+	if (ram) { ram[addr & 0x7f] = data; }
+	else memory_write_word_16be(R.data, addr << 1, data);
+}
+
 
 static UINT16 reverse_carry_add( UINT16 arg0, UINT16 arg1 )
 {
@@ -1734,39 +1736,42 @@ static CPU_INIT( tms32025 )
 	R.intRAM = auto_malloc(0x800*2);
 	R.irq_callback = irqcallback;
 	R.device = device;
+	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("tms32025", index, R.PC);
-	state_save_register_item("tms32025", index, R.STR0);
-	state_save_register_item("tms32025", index, R.STR1);
-	state_save_register_item("tms32025", index, R.PFC);
-	state_save_register_item("tms32025", index, R.IFR);
-	state_save_register_item("tms32025", index, R.RPTC);
-	state_save_register_item("tms32025", index, R.ACC.d);
-	state_save_register_item("tms32025", index, R.ALU.d);
-	state_save_register_item("tms32025", index, R.Preg.d);
-	state_save_register_item("tms32025", index, R.Treg);
-	state_save_register_item("tms32025", index, R.AR[0]);
-	state_save_register_item("tms32025", index, R.AR[1]);
-	state_save_register_item("tms32025", index, R.AR[2]);
-	state_save_register_item("tms32025", index, R.AR[3]);
-	state_save_register_item("tms32025", index, R.AR[4]);
-	state_save_register_item("tms32025", index, R.AR[5]);
-	state_save_register_item("tms32025", index, R.AR[6]);
-	state_save_register_item("tms32025", index, R.AR[7]);
-	state_save_register_item("tms32025", index, R.STACK[0]);
-	state_save_register_item("tms32025", index, R.STACK[1]);
-	state_save_register_item("tms32025", index, R.STACK[2]);
-	state_save_register_item("tms32025", index, R.STACK[3]);
-	state_save_register_item("tms32025", index, R.STACK[4]);
-	state_save_register_item("tms32025", index, R.STACK[5]);
-	state_save_register_item("tms32025", index, R.STACK[6]);
-	state_save_register_item("tms32025", index, R.STACK[7]);
+	state_save_register_item("tms32025", device->tag, 0, R.PC);
+	state_save_register_item("tms32025", device->tag, 0, R.STR0);
+	state_save_register_item("tms32025", device->tag, 0, R.STR1);
+	state_save_register_item("tms32025", device->tag, 0, R.PFC);
+	state_save_register_item("tms32025", device->tag, 0, R.IFR);
+	state_save_register_item("tms32025", device->tag, 0, R.RPTC);
+	state_save_register_item("tms32025", device->tag, 0, R.ACC.d);
+	state_save_register_item("tms32025", device->tag, 0, R.ALU.d);
+	state_save_register_item("tms32025", device->tag, 0, R.Preg.d);
+	state_save_register_item("tms32025", device->tag, 0, R.Treg);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[0]);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[1]);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[2]);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[3]);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[4]);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[5]);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[6]);
+	state_save_register_item("tms32025", device->tag, 0, R.AR[7]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[0]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[1]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[2]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[3]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[4]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[5]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[6]);
+	state_save_register_item("tms32025", device->tag, 0, R.STACK[7]);
 
-	state_save_register_item("tms32025", index, R.idle);
-	state_save_register_item("tms32025", index, R.hold);
-	state_save_register_item("tms32025", index, R.external_mem_access);
-	state_save_register_item("tms32025", index, R.init_load_addr);
-	state_save_register_item("tms32025", index, R.PREVPC);
+	state_save_register_item("tms32025", device->tag, 0, R.idle);
+	state_save_register_item("tms32025", device->tag, 0, R.hold);
+	state_save_register_item("tms32025", device->tag, 0, R.external_mem_access);
+	state_save_register_item("tms32025", device->tag, 0, R.init_load_addr);
+	state_save_register_item("tms32025", device->tag, 0, R.PREVPC);
 }
 
 /****************************************************************************
@@ -1986,7 +1991,7 @@ static CPU_EXECUTE( tms32025 )
 	while (R.idle && tms32025_icount > 0)
 		process_timer(tms32025_icount);
 
-	if (tms32025_icount <= 0) debugger_instruction_hook(Machine, R.PC);
+	if (tms32025_icount <= 0) debugger_instruction_hook(device, R.PC);
 
 
 	while (tms32025_icount > 0)
@@ -1999,7 +2004,7 @@ static CPU_EXECUTE( tms32025 )
 
 		R.PREVPC = R.PC;
 
-		debugger_instruction_hook(Machine, R.PC);
+		debugger_instruction_hook(device, R.PC);
 
 		R.opcode.d = M_RDOP(R.PC);
 		R.PC++;
@@ -2024,7 +2029,7 @@ static CPU_EXECUTE( tms32025 )
 		if (R.init_load_addr == 2) {		/* Repeat next instruction */
 			R.PREVPC = R.PC;
 
-			debugger_instruction_hook(Machine, R.PC);
+			debugger_instruction_hook(device, R.PC);
 
 			R.opcode.d = M_RDOP(R.PC);
 			R.PC++;
@@ -2191,15 +2196,15 @@ static CPU_READ( tms32025 )
 			*value = ((UINT16 *)ptr)[(offset & 0xff) / 2];
 			break;
 		case 4:
-			CPU_READ_NAME(tms32025)(space, offset + 0, 2, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 0, 2, &temp);
 			*value = temp << 16;
-			CPU_READ_NAME(tms32025)(space, offset + 2, 2, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 2, 2, &temp);
 			*value |= temp & 0xffff;
 			break;
 		case 8:
-			CPU_READ_NAME(tms32025)(space, offset + 0, 4, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 0, 4, &temp);
 			*value = temp << 32;
-			CPU_READ_NAME(tms32025)(space, offset + 4, 4, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 4, 4, &temp);
 			*value |= temp & 0xffffffff;
 			break;
 	}
@@ -2241,12 +2246,12 @@ static CPU_WRITE( tms32025 )
 			((UINT16 *)ptr)[(offset & 0xff) / 2] = value;
 			break;
 		case 4:
-			CPU_WRITE_NAME(tms32025)(space, offset + 0, 2, value >> 16);
-			CPU_WRITE_NAME(tms32025)(space, offset + 2, 2, value);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 0, 2, value >> 16);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 2, 2, value);
 			break;
 		case 8:
-			CPU_WRITE_NAME(tms32025)(space, offset + 0, 4, value >> 32);
-			CPU_WRITE_NAME(tms32025)(space, offset + 4, 4, value);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 0, 4, value >> 32);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 4, 4, value);
 			break;
 	}
 	return 1;

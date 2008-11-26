@@ -17,8 +17,8 @@
  * based on info found on an artikel for the tandy trs80 pc2
  *
  *****************************************************************************/
+
 #include "debugger.h"
-#include "deprecat.h"
 
 #include "lh5801.h"
 
@@ -48,6 +48,8 @@ enum
 typedef struct
 {
 	const lh5801_cpu_core *config;
+	const device_config *device;
+	const address_space *program;
 
 	PAIR s, p, u, x, y;
 	int tm; //9 bit
@@ -93,14 +95,14 @@ static LH5801_Regs lh5801= { 0 };
 static CPU_INIT( lh5801 )
 {
 	memset(&lh5801, 0, sizeof(lh5801));
-	lh5801.config = (const lh5801_cpu_core *) config;
+	lh5801.config = (const lh5801_cpu_core *) device->static_config;
+	lh5801.device = device;
+	lh5801.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( lh5801 )
 {
-	P = (program_read_byte(0xfffe)<<8) | program_read_byte(0xffff);
-
-	change_pc(P);
+	P = (memory_read_byte(lh5801.program, 0xfffe)<<8) | memory_read_byte(lh5801.program, 0xffff);
 
 	lh5801.idle=0;
 }
@@ -116,15 +118,12 @@ static CPU_SET_CONTEXT( lh5801 )
 	if( src )
 	{
 		lh5801 = *(LH5801_Regs*)src;
-		change_pc(P);
 	}
 }
 
 static CPU_EXECUTE( lh5801 )
 {
 	lh5801_icount = cycles;
-
-	change_pc(P);
 
 	if (lh5801.idle) {
 		lh5801_icount=0;
@@ -133,7 +132,7 @@ static CPU_EXECUTE( lh5801 )
 		{
 			lh5801.oldpc = P;
 
-			debugger_instruction_hook(Machine, P);
+			debugger_instruction_hook(device, P);
 			lh5801_instruction();
 
 		} while (lh5801_icount > 0);
@@ -240,14 +239,14 @@ CPU_GET_INFO( lh5801 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lh5801_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s = cpuintrf_temp_str(), "LH5801"); break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s = cpuintrf_temp_str(), "LH5801"); break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "1.0alpha"); break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__); break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "Copyright Peter Trauner, all rights reserved."); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "LH5801"); break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "LH5801"); break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0alpha"); break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Peter Trauner, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
-			sprintf(info->s = cpuintrf_temp_str(), "%s%s%s%s%s%s%s%s",
+			sprintf(info->s, "%s%s%s%s%s%s%s%s",
 				lh5801.t&0x80?"1":"0",
 				lh5801.t&0x40?"1":"0",
 				lh5801.t&0x20?"1":"0",
@@ -258,18 +257,18 @@ CPU_GET_INFO( lh5801 )
 				lh5801.t&1?"C":".");
 			break;
 
-		case CPUINFO_STR_REGISTER + LH5801_P:			sprintf(info->s = cpuintrf_temp_str(), "P:%04X", lh5801.p.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_S:			sprintf(info->s = cpuintrf_temp_str(), "S:%04X", lh5801.s.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_U:			sprintf(info->s = cpuintrf_temp_str(), "U:%04X", lh5801.u.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_X:			sprintf(info->s = cpuintrf_temp_str(), "X:%04X", lh5801.x.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_Y:			sprintf(info->s = cpuintrf_temp_str(), "Y:%04X", lh5801.y.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_T:			sprintf(info->s = cpuintrf_temp_str(), "T:%02X", lh5801.t); break;
-		case CPUINFO_STR_REGISTER + LH5801_A:			sprintf(info->s = cpuintrf_temp_str(), "A:%02X", lh5801.a); break;
-		case CPUINFO_STR_REGISTER + LH5801_TM:			sprintf(info->s = cpuintrf_temp_str(), "TM:%03X", lh5801.tm); break;
-		case CPUINFO_STR_REGISTER + LH5801_IN:			sprintf(info->s = cpuintrf_temp_str(), "IN:%02X", lh5801.config->in()); break;
-		case CPUINFO_STR_REGISTER + LH5801_PV:			sprintf(info->s = cpuintrf_temp_str(), "PV:%04X", lh5801.pv); break;
-		case CPUINFO_STR_REGISTER + LH5801_PU:			sprintf(info->s = cpuintrf_temp_str(), "PU:%04X", lh5801.pu); break;
-		case CPUINFO_STR_REGISTER + LH5801_BF:			sprintf(info->s = cpuintrf_temp_str(), "BF:%04X", lh5801.bf); break;
-		case CPUINFO_STR_REGISTER + LH5801_DP:			sprintf(info->s = cpuintrf_temp_str(), "DP:%04X", lh5801.dp); break;
+		case CPUINFO_STR_REGISTER + LH5801_P:			sprintf(info->s, "P:%04X", lh5801.p.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_S:			sprintf(info->s, "S:%04X", lh5801.s.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_U:			sprintf(info->s, "U:%04X", lh5801.u.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_X:			sprintf(info->s, "X:%04X", lh5801.x.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_Y:			sprintf(info->s, "Y:%04X", lh5801.y.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_T:			sprintf(info->s, "T:%02X", lh5801.t); break;
+		case CPUINFO_STR_REGISTER + LH5801_A:			sprintf(info->s, "A:%02X", lh5801.a); break;
+		case CPUINFO_STR_REGISTER + LH5801_TM:			sprintf(info->s, "TM:%03X", lh5801.tm); break;
+		case CPUINFO_STR_REGISTER + LH5801_IN:			sprintf(info->s, "IN:%02X", lh5801.config->in()); break;
+		case CPUINFO_STR_REGISTER + LH5801_PV:			sprintf(info->s, "PV:%04X", lh5801.pv); break;
+		case CPUINFO_STR_REGISTER + LH5801_PU:			sprintf(info->s, "PU:%04X", lh5801.pu); break;
+		case CPUINFO_STR_REGISTER + LH5801_BF:			sprintf(info->s, "BF:%04X", lh5801.bf); break;
+		case CPUINFO_STR_REGISTER + LH5801_DP:			sprintf(info->s, "DP:%04X", lh5801.dp); break;
 	}
 }

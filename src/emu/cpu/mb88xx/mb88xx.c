@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "mb88xx.h"
 
 /***************************************************************************
@@ -54,6 +53,9 @@ typedef struct
     int	pending_interrupt;
     cpu_irq_callback irqcallback;
     const device_config *device;
+    const address_space *program;
+    const address_space *data;
+    const address_space *io;
 } mb88Regs;
 
 /***************************************************************************
@@ -67,13 +69,13 @@ static int mb88_icount;
     MACROS
 ***************************************************************************/
 
-#define READOP(a) 			(cpu_readop(a))
+#define READOP(a) 			(memory_decrypted_read_byte(mb88.program, a))
 
-#define RDMEM(a)			(data_read_byte_8be(a))
-#define WRMEM(a,v)			(data_write_byte_8be((a), (v)))
+#define RDMEM(a)			(memory_read_byte_8be(mb88.data, a))
+#define WRMEM(a,v)			(memory_write_byte_8be(mb88.data, (a), (v)))
 
-#define READPORT(a)			(io_read_byte_8be(a))
-#define WRITEPORT(a,v)		(io_write_byte_8be((a), (v)))
+#define READPORT(a)			(memory_read_byte_8be(mb88.io, a))
+#define WRITEPORT(a,v)		(memory_write_byte_8be(mb88.io, (a), (v)))
 
 #define TEST_ST()			(mb88.st & 1)
 #define TEST_ZF()			(mb88.zf & 1)
@@ -112,7 +114,6 @@ static CPU_SET_CONTEXT( mb88 )
 	/* copy the context */
 	if (src)
 		mb88 = *(mb88Regs *)src;
-	change_pc(GETPC());
 }
 
 /***************************************************************************
@@ -121,36 +122,39 @@ static CPU_SET_CONTEXT( mb88 )
 
 static CPU_INIT( mb88 )
 {
-	if ( config )
+	if ( device->static_config )
 	{
-		const mb88_cpu_core *_config = (const mb88_cpu_core*)config;
+		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->static_config;
 		mb88.PLA = _config->PLA_config;
 	}
 
 	mb88.irqcallback = irqcallback;
 	mb88.device = device;
+	mb88.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	mb88.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	mb88.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("mb88", clock, mb88.PC);
-	state_save_register_item("mb88", clock, mb88.PA);
-	state_save_register_item("mb88", clock, mb88.SP[0]);
-	state_save_register_item("mb88", clock, mb88.SP[1]);
-	state_save_register_item("mb88", clock, mb88.SP[2]);
-	state_save_register_item("mb88", clock, mb88.SP[3]);
-	state_save_register_item("mb88", clock, mb88.SI);
-	state_save_register_item("mb88", clock, mb88.A);
-	state_save_register_item("mb88", clock, mb88.X);
-	state_save_register_item("mb88", clock, mb88.Y);
-	state_save_register_item("mb88", clock, mb88.st);
-	state_save_register_item("mb88", clock, mb88.zf);
-	state_save_register_item("mb88", clock, mb88.cf);
-	state_save_register_item("mb88", clock, mb88.vf);
-	state_save_register_item("mb88", clock, mb88.sf);
-	state_save_register_item("mb88", clock, mb88.nf);
-	state_save_register_item("mb88", clock, mb88.pio);
-	state_save_register_item("mb88", clock, mb88.TH);
-	state_save_register_item("mb88", clock, mb88.TL);
-	state_save_register_item("mb88", clock, mb88.SB);
-	state_save_register_item("mb88", clock, mb88.pending_interrupt);
+	state_save_register_item("mb88", device->tag, 0, mb88.PC);
+	state_save_register_item("mb88", device->tag, 0, mb88.PA);
+	state_save_register_item("mb88", device->tag, 0, mb88.SP[0]);
+	state_save_register_item("mb88", device->tag, 0, mb88.SP[1]);
+	state_save_register_item("mb88", device->tag, 0, mb88.SP[2]);
+	state_save_register_item("mb88", device->tag, 0, mb88.SP[3]);
+	state_save_register_item("mb88", device->tag, 0, mb88.SI);
+	state_save_register_item("mb88", device->tag, 0, mb88.A);
+	state_save_register_item("mb88", device->tag, 0, mb88.X);
+	state_save_register_item("mb88", device->tag, 0, mb88.Y);
+	state_save_register_item("mb88", device->tag, 0, mb88.st);
+	state_save_register_item("mb88", device->tag, 0, mb88.zf);
+	state_save_register_item("mb88", device->tag, 0, mb88.cf);
+	state_save_register_item("mb88", device->tag, 0, mb88.vf);
+	state_save_register_item("mb88", device->tag, 0, mb88.sf);
+	state_save_register_item("mb88", device->tag, 0, mb88.nf);
+	state_save_register_item("mb88", device->tag, 0, mb88.pio);
+	state_save_register_item("mb88", device->tag, 0, mb88.TH);
+	state_save_register_item("mb88", device->tag, 0, mb88.TL);
+	state_save_register_item("mb88", device->tag, 0, mb88.SB);
+	state_save_register_item("mb88", device->tag, 0, mb88.pending_interrupt);
 }
 
 static CPU_RESET( mb88 )
@@ -220,7 +224,6 @@ static void update_pio( void )
 		mb88.PC = 0x02;
 		mb88.PA = 0x00;
 		mb88.st = 1;
-		change_pc(GETPC());
 
 		mb88.pending_interrupt = 0;
 
@@ -239,7 +242,7 @@ static CPU_EXECUTE( mb88 )
 		UINT8 opcode, arg, oc;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(Machine, GETPC());
+		debugger_instruction_hook(device, GETPC());
 		opcode = READOP(GETPC());
 
 		/* increment the PC */
@@ -528,7 +531,6 @@ static CPU_EXECUTE( mb88 )
 				mb88.SI = ( mb88.SI - 1 ) & 3;
 				mb88.PC = mb88.SP[mb88.SI] & 0x3f;
 				mb88.PA = mb88.SP[mb88.SI] >> 6;
-				change_pc(GETPC());
 				mb88.st = 1;
 				break;
 
@@ -578,7 +580,6 @@ static CPU_EXECUTE( mb88 )
 				mb88.st = (mb88.SP[mb88.SI] >> 13)&1;
 				mb88.zf = (mb88.SP[mb88.SI] >> 14)&1;
 				mb88.cf = (mb88.SP[mb88.SI] >> 15)&1;
-				change_pc(GETPC());
 				break;
 
 			case 0x3d: /* jpa imm ZCS:..x */
@@ -659,8 +660,6 @@ static CPU_EXECUTE( mb88 )
 					mb88.SI = ( mb88.SI + 1 ) & 3;
 					mb88.PC = arg & 0x3f;
 					mb88.PA = ( ( opcode & 7 ) << 2 ) | ( arg >> 6 );
-					change_pc(GETPC());
-
 				}
 				mb88.st = 1;
 				break;
@@ -674,7 +673,6 @@ static CPU_EXECUTE( mb88 )
 				{
 					mb88.PC = arg & 0x3f;
 					mb88.PA = ( ( opcode & 7 ) << 2 ) | ( arg >> 6 );
-					change_pc(GETPC());
 				}
 				mb88.st = 1;
 				break;
@@ -735,7 +733,6 @@ static CPU_EXECUTE( mb88 )
 				if ( TEST_ST() )
 				{
 					mb88.PC = opcode & 0x3f;
-					change_pc(GETPC());
 				}
 				mb88.st = 1;
 				break;
@@ -765,7 +762,6 @@ static CPU_SET_INFO( mb88 )
 		case CPUINFO_INT_PC:
 				mb88.PC = info->i & 0x3f;
 				mb88.PA = (info->i >> 6) & 0x1f;
-				change_pc(GETPC());
 				break;
 		case CPUINFO_INT_REGISTER + MB88_PC:			mb88.PC = info->i;						break;
 		case CPUINFO_INT_REGISTER + MB88_PA:			mb88.PA = info->i;						break;

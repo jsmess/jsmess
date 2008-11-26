@@ -138,7 +138,7 @@ static READ32_HANDLER( simpl156_inputs_read )
 	int eep = eeprom_read_bit();
 	UINT32 returndata;
 
-	returndata = input_port_read(machine, "IN0") ^ 0xffff0000;
+	returndata = input_port_read(space->machine, "IN0") ^ 0xffff0000;
 
 	returndata^= ( (eep<<8)  );
 	return returndata;
@@ -161,7 +161,7 @@ static WRITE32_HANDLER( simpl156_palette_w )
 	color = offset;
 
 	dat = paletteram16[offset]&0xffff;
-	palette_set_color_rgb(machine,color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
+	palette_set_color_rgb(space->machine,color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
 }
 
 
@@ -169,7 +169,7 @@ static READ32_HANDLER(  simpl156_system_r )
 {
 	UINT32 returndata;
 
-	returndata = input_port_read(machine, "IN1");
+	returndata = input_port_read(space->machine, "IN1");
 
 	return returndata;
 }
@@ -190,22 +190,22 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 static READ32_HANDLER( oki_r )
 {
-	return okim6295_status_0_r(machine, 0);
+	return okim6295_status_0_r(space, 0);
 }
 
 static WRITE32_HANDLER( oki_w )
 {
-	okim6295_data_0_w(machine, 0, data & 0xff);
+	okim6295_data_0_w(space, 0, data & 0xff);
 }
 
 static READ32_HANDLER( oki2_r )
 {
-	return okim6295_status_1_r(machine, 0);
+	return okim6295_status_1_r(space, 0);
 }
 
 static WRITE32_HANDLER( oki2_w )
 {
-	okim6295_data_1_w(machine, 0, data & 0xff);
+	okim6295_data_1_w(space, 0, data & 0xff);
 }
 
 /* we need to throw away bits for all ram accesses as the devices are connected as 16-bit */
@@ -289,7 +289,7 @@ static WRITE32_HANDLER( simpl156_pf1_data_w )
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
 
-	deco16_pf1_data_w(machine,offset,data,mem_mask);
+	deco16_pf1_data_w(space,offset,data,mem_mask);
 }
 
 static READ32_HANDLER( simpl156_pf2_data_r )
@@ -302,7 +302,7 @@ static WRITE32_HANDLER( simpl156_pf2_data_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
-	deco16_pf2_data_w(machine,offset,data,mem_mask);
+	deco16_pf2_data_w(space,offset,data,mem_mask);
 }
 
 /* Memory Map controled by PALs */
@@ -472,7 +472,7 @@ static NVRAM_HANDLER( simpl156 )
 
 static INTERRUPT_GEN( simpl156_vbl_interrupt )
 {
-	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -1151,46 +1151,46 @@ static const UINT8 gangonta_eeprom[128] = {
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 static READ32_HANDLER( joemacr_speedup_r )
 {
-	if (activecpu_get_pc()==0x284)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(space->cpu)==0x284)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x18/4];
 }
 
 
 static DRIVER_INIT (joemacr)
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
 static READ32_HANDLER( chainrec_speedup_r )
 {
-	if (activecpu_get_pc()==0x2d4)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(space->cpu)==0x2d4)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x18/4];
 }
 
 static DRIVER_INIT (chainrec)
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = chainrec_eeprom;
 }
 
 static READ32_HANDLER( prtytime_speedup_r )
 {
-	if (activecpu_get_pc()==0x4f0)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(space->cpu)==0x4f0)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0xae0/4];
 }
 
 static DRIVER_INIT (prtytime)
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = prtytime_eeprom;
 }
 
 static DRIVER_INIT (gangonta)
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = gangonta_eeprom;
 }
@@ -1198,25 +1198,25 @@ static DRIVER_INIT (gangonta)
 
 static READ32_HANDLER( charlien_speedup_r )
 {
-	if (activecpu_get_pc()==0xc8c8)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(space->cpu)==0xc8c8)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x10/4];
 }
 
 static DRIVER_INIT (charlien)
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
 static READ32_HANDLER( osman_speedup_r )
 {
-	if (activecpu_get_pc()==0x5974)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(space->cpu)==0x5974)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x10/4];
 }
 
 static DRIVER_INIT (osman)
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = osman_eeprom;
 
@@ -1224,7 +1224,7 @@ static DRIVER_INIT (osman)
 
 static DRIVER_INIT (candance)
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 	simpl156_default_eeprom = candance_eeprom;
 }

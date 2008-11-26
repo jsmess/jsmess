@@ -23,9 +23,9 @@ MACHINE_RESET( jackal )
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
-	cpunum_set_clockscale(machine, 1, 1.2f);
+	cpu_set_clockscale(machine->cpu[1], 1.2f);
 
-	memory_set_bankptr(1,&rgn[0x4000]);
+	memory_set_bankptr(machine, 1,&rgn[0x4000]);
  	jackal_rambank = rgn;
 	jackal_spritebank = rgn;
 }
@@ -52,14 +52,14 @@ READ8_HANDLER( jackal_spriteram_r )
 
 WRITE8_HANDLER( jackal_rambank_w )
 {
-	UINT8 *rgn = memory_region(machine, "master");
+	UINT8 *rgn = memory_region(space->machine, "master");
 
 	if (data & 0x04) popmessage("jackal_rambank_w %02x",data);
 	coin_counter_w(0,data & 0x01);
 	coin_counter_w(1,data & 0x02);
 	jackal_spritebank = &rgn[((data & 0x08) << 13)];
 	jackal_rambank = &rgn[((data & 0x10) << 12)];
-	memory_set_bankptr(1,&rgn[((data & 0x20) << 11) + 0x4000]);
+	memory_set_bankptr(space->machine, 1,&rgn[((data & 0x20) << 11) + 0x4000]);
 }
 
 

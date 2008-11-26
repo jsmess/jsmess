@@ -90,8 +90,8 @@ static void ram_init(running_machine *machine, const game_driver *gamedrv)
 		mess_ram = (UINT8 *) auto_malloc(mess_ram_size);
 		memset(mess_ram, mess_ram_default_value, mess_ram_size);
 
-		state_save_register_item("mess", 0, mess_ram_size);
-		state_save_register_item_pointer("mess", 0, mess_ram, mess_ram_size);
+		state_save_register_item("mess", NULL, 0, mess_ram_size);
+		state_save_register_item_pointer("mess", NULL, 0, mess_ram, mess_ram_size);
 	}
 	else
 	{

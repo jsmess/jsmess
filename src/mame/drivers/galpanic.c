@@ -142,19 +142,19 @@ static VIDEO_EOF( galpanic )
 static INTERRUPT_GEN( galpanic_interrupt )
 {
 	/* IRQ 3 drives the game, IRQ 5 updates the palette */
-	if (cpu_getiloops() != 0)
-		cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	if (cpu_getiloops(device) != 0)
+		cpu_set_input_line(device, 5, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+		cpu_set_input_line(device, 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( galhustl_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 5, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 3, HOLD_LINE); break;
 	}
 }
 
@@ -163,7 +163,7 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(machine, "oki");
+		UINT8 *rom = memory_region(space->machine, "oki");
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
@@ -176,7 +176,7 @@ static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(machine, "oki");
+		UINT8 *rom = memory_region(space->machine, "oki");
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
@@ -212,7 +212,7 @@ static WRITE16_HANDLER( galpanic_bgvideoram_mirror_w )
 	for(i = 0; i < 8; i++)
 	{
 		// or offset + i * 0x2000 ?
-		galpanic_bgvideoram_w(machine, offset * 8 + i, data, mem_mask);
+		galpanic_bgvideoram_w(space, offset * 8 + i, data, mem_mask);
 	}
 }
 
@@ -237,7 +237,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( kludge )
 {
-	return mame_rand(machine) & 0x0700;
+	return mame_rand(space->machine) & 0x0700;
 }
 
 /* a kludge! */
@@ -246,7 +246,7 @@ static READ16_HANDLER( comad_okim6295_status_0_msb_r )
 	UINT16 retvalue;
 
 //  retvalue = okim6295_status_0_msb_r(offset,mem_mask); // doesn't work, causes lockups when girls change..
-	retvalue = mame_rand(machine);
+	retvalue = mame_rand(space->machine);
 
 	return retvalue;
 }
@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 READ16_HANDLER( zipzap_random_read )
 {
-    return mame_rand(machine);
+    return mame_rand(space->machine);
 }
 #endif
 

@@ -237,7 +237,7 @@ static INTERRUPT_GEN( interrupt_gen )
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
 	if (irq_enabled)
-		cpunum_set_input_line(machine, 0, irq_line, ASSERT_LINE);
+		cpu_set_input_line(device, irq_line, ASSERT_LINE);
 }
 
 
@@ -248,7 +248,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
 	if (!irq_enabled)
-		cpunum_set_input_line(machine, 0, irq_line, CLEAR_LINE);
+		cpu_set_input_line(space->cpu, irq_line, CLEAR_LINE);
 }
 
 
@@ -297,8 +297,8 @@ static READ8_HANDLER( konami_ay8910_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x20) result &= ay8910_read_port_0_r(machine, 0);
-	if (offset & 0x80) result &= ay8910_read_port_1_r(machine, 0);
+	if (offset & 0x20) result &= ay8910_read_port_0_r(space, 0);
+	if (offset & 0x80) result &= ay8910_read_port_1_r(space, 0);
 	return result;
 }
 
@@ -307,14 +307,14 @@ static WRITE8_HANDLER( konami_ay8910_w )
 {
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		ay8910_control_port_0_w(machine, 0, data);
+		ay8910_control_port_0_w(space, 0, data);
 	else if (offset & 0x20)
-		ay8910_write_port_0_w(machine, 0, data);
+		ay8910_write_port_0_w(space, 0, data);
 
 	if (offset & 0x40)
-		ay8910_control_port_1_w(machine, 0, data);
+		ay8910_control_port_1_w(space, 0, data);
 	else if (offset & 0x80)
-		ay8910_write_port_1_w(machine, 0, data);
+		ay8910_write_port_1_w(space, 0, data);
 }
 
 
@@ -326,7 +326,7 @@ static WRITE8_DEVICE_HANDLER( konami_sound_control_w )
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x08) && !(data & 0x08))
-		cpunum_set_input_line(device->machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, HOLD_LINE);
 
 	/* bit 4 is sound disable */
 	sound_global_enable(~data & 0x10);
@@ -349,7 +349,7 @@ static READ8_HANDLER( konami_sound_timer_r )
         current counter index, we use the sound cpu clock times 8 mod
         16*16*2*8*5*2.
     */
-	UINT32 cycles = (cpunum_gettotalcycles(1) * 8) % (UINT64)(16*16*2*8*5*2);
+	UINT32 cycles = (cpu_get_total_cycles(space->machine->cpu[1]) * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
 	/* separate the high bit from the others */
@@ -381,26 +381,28 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 
 				/* low bit goes to 0.22uF capacitor = 220000pF  */
 				/* high bit goes to 0.047uF capacitor = 47000pF */
-				discrete_sound_w(machine, NODE(3 * (1-which) + chan + 11), bits);
+				discrete_sound_w(space, NODE(3 * (1-which) + chan + 11), bits);
 			}
 }
 
 
 static WRITE8_DEVICE_HANDLER( konami_portc_0_w )
 {
-	logerror("%04X:ppi0_portc_w = %02X\n", activecpu_get_pc(), data);
+	logerror("%04X:ppi0_portc_w = %02X\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 {
-	logerror("%04X:ppi1_portc_w = %02X\n", activecpu_get_pc(), data);
+	logerror("%04X:ppi1_portc_w = %02X\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	soundlatch_w(device->machine, offset, data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	soundlatch_w(space, offset, data);
 }
 
 
@@ -437,8 +439,8 @@ static READ8_HANDLER( theend_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x0100) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3);
-	if (offset & 0x0200) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3);
+	if (offset & 0x0100) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
+	if (offset & 0x0200) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
 	return result;
 }
 
@@ -446,8 +448,8 @@ static READ8_HANDLER( theend_ppi8255_r )
 static WRITE8_HANDLER( theend_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3, data);
-	if (offset & 0x0200) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3, data);
+	if (offset & 0x0100) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3, data);
+	if (offset & 0x0200) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3, data);
 }
 
 
@@ -536,14 +538,14 @@ static const ppi8255_interface scramble_ppi8255_1_intf =
 
 static WRITE8_HANDLER( explorer_sound_control_w )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( explorer_sound_latch_r )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
-	return soundlatch_r(machine, 0);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	return soundlatch_r(space, 0);
 }
 
 
@@ -558,7 +560,7 @@ static READ8_HANDLER( sfx_sample_io_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x04) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_2"), offset & 3);
+	if (offset & 0x04) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_2"), offset & 3);
 	return result;
 }
 
@@ -566,8 +568,8 @@ static READ8_HANDLER( sfx_sample_io_r )
 static WRITE8_HANDLER( sfx_sample_io_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_2"), offset & 3, data);
-	if (offset & 0x10) dac_0_signed_data_w(machine, offset, data);
+	if (offset & 0x04) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_2"), offset & 3, data);
+	if (offset & 0x10) dac_0_signed_data_w(space, offset, data);
 }
 
 
@@ -579,13 +581,15 @@ static WRITE8_HANDLER( sfx_sample_control_w )
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 
 static READ8_DEVICE_HANDLER( sound_data2_r )
 {
-	return soundlatch2_r(device->machine, offset);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	return soundlatch2_r(space, offset);
 }
 
 
@@ -611,8 +615,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3);
 	return result;
 }
 
@@ -620,8 +624,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 static WRITE8_HANDLER( frogger_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3, data);
-	if (offset & 0x2000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3, data);
+	if (offset & 0x1000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3, data);
+	if (offset & 0x2000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3, data);
 }
 
 
@@ -629,7 +633,7 @@ static READ8_HANDLER( frogger_ay8910_r )
 {
 	/* the decoding here is very simplistic */
 	UINT8 result = 0xff;
-	if (offset & 0x40) result &= ay8910_read_port_0_r(machine, 0);
+	if (offset & 0x40) result &= ay8910_read_port_0_r(space, 0);
 	return result;
 }
 
@@ -638,23 +642,23 @@ static WRITE8_HANDLER( frogger_ay8910_w )
 {
 	/* the decoding here is very simplistic */
 	if (offset & 0x40)
-		ay8910_write_port_0_w(machine, 0, data);
+		ay8910_write_port_0_w(space, 0, data);
 	else if (offset & 0x80)
-		ay8910_control_port_0_w(machine, 0, data);
+		ay8910_control_port_0_w(space, 0, data);
 }
 
 
 static READ8_HANDLER( frogger_sound_timer_r )
 {
 	/* same as regular Konami sound but with bits 3,5 swapped */
-	UINT8 konami_value = konami_sound_timer_r(machine, 0);
+	UINT8 konami_value = konami_sound_timer_r(space, 0);
 	return BITSWAP8(konami_value, 7,6,3,4,5,2,1,0);
 }
 
 
 static WRITE8_HANDLER( froggrmc_sound_control_w )
 {
-	cpunum_set_input_line(machine, 1, 0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -669,8 +673,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3);
 	return result;
 }
 
@@ -678,8 +682,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 static WRITE8_HANDLER( frogf_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3, data);
-	if (offset & 0x2000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3, data);
+	if (offset & 0x1000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3, data);
+	if (offset & 0x2000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3, data);
 }
 
 
@@ -690,10 +694,10 @@ static WRITE8_HANDLER( frogf_ppi8255_w )
  *
  *************************************/
 
-static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3); }
-static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3); }
-static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3, data); }
-static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3, data); }
+static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3); }
+static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3); }
+static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3, data); }
+static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3, data); }
 
 
 
@@ -707,9 +711,9 @@ static READ8_HANDLER( scorpion_ay8910_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x08) result &= ay8910_read_port_2_r(machine, 0);
-	if (offset & 0x20) result &= ay8910_read_port_0_r(machine, 0);
-	if (offset & 0x80) result &= ay8910_read_port_1_r(machine, 0);
+	if (offset & 0x08) result &= ay8910_read_port_2_r(space, 0);
+	if (offset & 0x20) result &= ay8910_read_port_0_r(space, 0);
+	if (offset & 0x80) result &= ay8910_read_port_1_r(space, 0);
 	return result;
 }
 
@@ -717,12 +721,12 @@ static READ8_HANDLER( scorpion_ay8910_r )
 static WRITE8_HANDLER( scorpion_ay8910_w )
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) ay8910_control_port_2_w(machine, 0, data);
-	if (offset & 0x08) ay8910_write_port_2_w(machine, 0, data);
-	if (offset & 0x10) ay8910_control_port_0_w(machine, 0, data);
-	if (offset & 0x20) ay8910_write_port_0_w(machine, 0, data);
-	if (offset & 0x40) ay8910_control_port_1_w(machine, 0, data);
-	if (offset & 0x80) ay8910_write_port_1_w(machine, 0, data);
+	if (offset & 0x04) ay8910_control_port_2_w(space, 0, data);
+	if (offset & 0x08) ay8910_write_port_2_w(space, 0, data);
+	if (offset & 0x10) ay8910_control_port_0_w(space, 0, data);
+	if (offset & 0x20) ay8910_write_port_0_w(space, 0, data);
+	if (offset & 0x40) ay8910_control_port_1_w(space, 0, data);
+	if (offset & 0x80) ay8910_write_port_1_w(space, 0, data);
 }
 
 
@@ -758,7 +762,7 @@ static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 
 static READ8_HANDLER( scorpion_sound_status_r )
 {
-	logerror("%04X:scorpion_sound_status_r()\n", safe_activecpu_get_pc());
+	logerror("%04X:scorpion_sound_status_r()\n", safe_cpu_get_pc(space->cpu));
 	return 1;
 }
 
@@ -766,7 +770,7 @@ static READ8_HANDLER( scorpion_sound_status_r )
 static WRITE8_HANDLER( scorpion_sound_data_w )
 {
 	scorpion_sound_data = data;
-//  logerror("%04X:scorpion_sound_data_w(%02X)\n", safe_activecpu_get_pc(), data);
+//  logerror("%04X:scorpion_sound_data_w(%02X)\n", safe_cpu_get_pc(space->cpu), data);
 }
 
 
@@ -774,7 +778,7 @@ static WRITE8_HANDLER( scorpion_sound_control_w )
 {
 	if (!(data & 0x04))
 		mame_printf_debug("Secondary sound = %02X\n", scorpion_sound_data);
-//  logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_activecpu_get_pc(), data);
+//  logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_cpu_get_pc(space->cpu), data);
 }
 
 
@@ -798,18 +802,20 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 
 static INPUT_CHANGED( gmgalax_game_changed )
 {
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* new value is the selected game */
 	gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	memory_set_bank(1, gmgalax_selected_game);
-	galaxian_gfxbank_w(field->port->machine, 0, gmgalax_selected_game);
+	memory_set_bank(field->port->machine, 1, gmgalax_selected_game);
+	galaxian_gfxbank_w(space, 0, gmgalax_selected_game);
 
 	/* reset the starts */
-	galaxian_stars_enable_w(field->port->machine, 0, 0);
+	galaxian_stars_enable_w(space, 0, 0);
 
 	/* reset the CPU */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -831,8 +837,8 @@ static CUSTOM_INPUT( gmgalax_port_r )
 
 static WRITE8_HANDLER( zigzag_bankswap_w )
 {
-	memory_set_bank(1, data & 1);
-	memory_set_bank(2, ~data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
+	memory_set_bank(space->machine, 2, ~data & 1);
 }
 
 
@@ -847,9 +853,9 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 			if ((offset & 1) != 0)
 			{
 				if ((offset & 2) == 0)
-					ay8910_write_port_0_w(machine, 0, zigzag_ay8910_latch);
+					ay8910_write_port_0_w(space, 0, zigzag_ay8910_latch);
 				else
-					ay8910_control_port_0_w(machine, 0, zigzag_ay8910_latch);
+					ay8910_control_port_0_w(space, 0, zigzag_ay8910_latch);
 			}
 			break;
 
@@ -916,13 +922,13 @@ static WRITE8_HANDLER( kingball_sound1_w )
 static WRITE8_HANDLER( kingball_sound2_w )
 {
 	kingball_sound = (kingball_sound & ~0x02) | (data << 1);
-	soundlatch_w(machine, 0, kingball_sound | 0xf0);
+	soundlatch_w(space, 0, kingball_sound | 0xf0);
 }
 
 
 static WRITE8_HANDLER( kingball_dac_w )
 {
-	dac_0_data_w(machine, offset, data ^ 0xff);
+	dac_0_data_w(space, offset, data ^ 0xff);
 }
 
 
@@ -942,21 +948,21 @@ static WRITE8_HANDLER( mshuttle_ay8910_cs_w )
 static WRITE8_HANDLER( mshuttle_ay8910_control_w )
 {
 	if (!mshuttle_ay8910_cs)
-		ay8910_control_port_0_w(machine, offset, data);
+		ay8910_control_port_0_w(space, offset, data);
 }
 
 
 static WRITE8_HANDLER( mshuttle_ay8910_data_w )
 {
 	if (!mshuttle_ay8910_cs)
-		ay8910_write_port_0_w(machine, offset, data);
+		ay8910_write_port_0_w(space, offset, data);
 }
 
 
 static READ8_HANDLER( mshuttle_ay8910_data_r )
 {
 	if (!mshuttle_ay8910_cs)
-		return ay8910_read_port_0_r(machine, offset);
+		return ay8910_read_port_0_r(space, offset);
 	return 0xff;
 }
 
@@ -978,7 +984,7 @@ static READ8_HANDLER( jumpbug_protection_r )
 		case 0x0235:  return 0x02;
 		case 0x0311:  return 0xff;  /* not checked */
 	}
-	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,activecpu_get_pc());
+	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,cpu_get_pc(space->cpu));
 	return 0xff;
 }
 
@@ -992,20 +998,20 @@ static READ8_HANDLER( jumpbug_protection_r )
 
 static WRITE8_HANDLER( checkman_sound_command_w )
 {
-	soundlatch_w(machine, 0, data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-static TIMER_CALLBACK( checkmaj_irq0_gen )
+static TIMER_DEVICE_CALLBACK( checkmaj_irq0_gen )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(timer->machine->cpu[1], 0, HOLD_LINE);
 }
 
 
 static READ8_HANDLER( checkmaj_protection_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x0f15:  return 0xf5;
 		case 0x0f8f:  return 0x7c;
@@ -1014,7 +1020,7 @@ static READ8_HANDLER( checkmaj_protection_r )
 		case 0x10f1:  return 0xaa;
 		case 0x1402:  return 0xaa;
 		default:
-			logerror("Unknown protection read. PC=%04X\n",activecpu_get_pc());
+			logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(space->cpu));
 	}
 
 	return 0;
@@ -2298,9 +2304,9 @@ static void common_init(
 
 static void unmap_galaxian_sound(running_machine *machine, offs_t base)
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base + 0x0004, base + 0x0007, 0, 0x07f8, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base + 0x0800, base + 0x0807, 0, 0x07f8, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base + 0x1800, base + 0x1800, 0, 0x07ff, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base + 0x0004, base + 0x0007, 0, 0x07f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base + 0x0800, base + 0x0807, 0, 0x07f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base + 0x1800, base + 0x1800, 0, 0x07ff, SMH_UNMAP);
 }
 
 
@@ -2323,7 +2329,7 @@ static DRIVER_INIT( nolock )
 	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
 }
 
 
@@ -2333,7 +2339,7 @@ static DRIVER_INIT( azurian )
 	common_init(machine, scramble_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin lockout disabled */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
 }
 
 
@@ -2343,8 +2349,8 @@ static DRIVER_INIT( gmgalax )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, gmgalax_extend_tile_info, gmgalax_extend_sprite_info);
 
 	/* ROM is banked */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine->portconfig->fieldlist, NULL, 0, 0);
@@ -2358,7 +2364,7 @@ static DRIVER_INIT( pisces )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
 }
 
 
@@ -2368,7 +2374,7 @@ static DRIVER_INIT( batman2 )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
 }
 
 
@@ -2378,8 +2384,8 @@ static DRIVER_INIT( frogg )
 	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* ...but needs a full 2k of RAM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x47ff, 0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr(1, auto_malloc(0x800));
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x47ff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_set_bankptr(machine, 1, auto_malloc(0x800));
 }
 
 
@@ -2413,12 +2419,13 @@ static DRIVER_INIT( mooncrgx )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* LEDs and coin lockout replaced by graphics banking */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
 }
 
 
 static DRIVER_INIT( moonqsr )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_malloc(0x8000);
 
 	/* video extensions */
@@ -2426,7 +2433,7 @@ static DRIVER_INIT( moonqsr )
 
 	/* decrypt program code */
 	decode_mooncrst(machine, 0x8000, decrypt);
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 }
 
 
@@ -2436,7 +2443,7 @@ static DRIVER_INIT( pacmanbl )
 	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
 
 	/* also shift the sprite clip offset */
 	galaxian_sprite_clip_start = 7;
@@ -2456,27 +2463,29 @@ static DRIVER_INIT( devilfsg )
 
 static DRIVER_INIT( zigzag )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* video extensions */
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
 
 	/* make ROMs 2 & 3 swappable */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK1);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK2);
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x2000, 0x1000);
-	memory_configure_bank(2, 0, 2, memory_region(machine, "main") + 0x2000, 0x1000);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3fff, 0, 0, SMH_BANK2);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x2000, 0x1000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "main") + 0x2000, 0x1000);
 
 	/* handler for doing the swaps */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
-	zigzag_bankswap_w(machine, 0, 0);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
+	zigzag_bankswap_w(space, 0, 0);
 
 	/* coin lockout disabled */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
 
 	/* remove the galaxian sound hardware */
 	unmap_galaxian_sound(machine, 0x6000);
 
 	/* install our AY-8910 handler */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4fff, 0, 0, zigzag_ay8910_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4fff, 0, 0, zigzag_ay8910_w);
 }
 
 
@@ -2493,11 +2502,11 @@ static DRIVER_INIT( checkman )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* attach the sound command handler */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0xffff, checkman_sound_command_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0xffff, checkman_sound_command_w);
 
 	/* decrypt program code */
 	decode_checkman(machine);
@@ -2510,10 +2519,10 @@ static DRIVER_INIT( checkmaj )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* attach the sound command handler */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7800, 0, 0x7ff, checkman_sound_command_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7800, 0x7800, 0, 0x7ff, checkman_sound_command_w);
 
 	/* for the title screen */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
 }
 
 
@@ -2523,10 +2532,10 @@ static DRIVER_INIT( dingo )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* attach the sound command handler */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7800, 0, 0x7ff, checkman_sound_command_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7800, 0x7800, 0, 0x7ff, checkman_sound_command_w);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, dingo_3000_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3035, 0x3035, 0, 0, dingo_3035_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, dingo_3000_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3035, 0x3035, 0, 0, dingo_3035_r);
 }
 
 
@@ -2536,13 +2545,13 @@ static DRIVER_INIT( dingoe )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* attach the sound command handler */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0xffff, checkman_sound_command_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0xffff, checkman_sound_command_w);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
 
 	/* decrypt program code */
 	decode_dingoe(machine);
@@ -2555,15 +2564,15 @@ static DRIVER_INIT( skybase )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa002, 0xa002, 0, 0x7f8, galaxian_gfxbank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa002, 0xa002, 0, 0x7f8, galaxian_gfxbank_w);
 
 	/* needs a full 2k of RAM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr(1, auto_malloc(0x800));
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x87ff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_set_bankptr(machine, 1, auto_malloc(0x800));
 
 	/* extend ROM */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x5fff, 0, 0, SMH_BANK2);
-	memory_set_bankptr(2, memory_region(machine, "main"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK2);
+	memory_set_bankptr(machine, 2, memory_region(machine, "main"));
 }
 
 
@@ -2598,10 +2607,10 @@ static DRIVER_INIT( kingball )
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0x7f8, kingball_sound1_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0x7f8, kingball_sound2_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb003, 0xb003, 0, 0x7f8, kingball_speech_dip_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb000, 0, 0x7f8, kingball_sound1_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0x7f8, kingball_sound2_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb003, 0xb003, 0, 0x7f8, kingball_speech_dip_w);
 
 	state_save_register_global(kingball_speech_dip);
 	state_save_register_global(kingball_sound);
@@ -2614,19 +2623,19 @@ static DRIVER_INIT( scorpnmc )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* extra ROM */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x67ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x5000);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x67ff, 0, 0, SMH_BANK1);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x5000);
 
 	/* install RAM at $4000-$4800 */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x47ff, 0, 0, SMH_BANK2, SMH_BANK2);
-	memory_set_bankptr(2, auto_malloc(0x800));
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x47ff, 0, 0, SMH_BANK2, SMH_BANK2);
+	memory_set_bankptr(machine, 2, auto_malloc(0x800));
 
 	/* doesn't appear to use original RAM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x87ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 }
 
 
@@ -2643,7 +2652,7 @@ static DRIVER_INIT( theend )
 	common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin counter on the upper bit of port C */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6802, 0x6802, 0, 0x7f8, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6802, 0x6802, 0, 0x7f8, SMH_UNMAP);
 }
 
 
@@ -2660,16 +2669,16 @@ static DRIVER_INIT( explorer )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog works for writes as well? (or is it just disabled?) */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0x7ff, watchdog_reset_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7000, 0x7000, 0, 0x7ff, watchdog_reset_w);
 
 	/* I/O appears to be direct, not via PPIs */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN0"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8001, 0x8001, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN1"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8002, 0x8002, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN2"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8003, 0x8003, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN3"));
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0xfff, soundlatch_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9000, 0, 0xfff, explorer_sound_control_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN0"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8001, 0x8001, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN1"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8002, 0x8002, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN2"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8003, 0x8003, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN3"));
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0xfff, soundlatch_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9000, 0x9000, 0, 0xfff, explorer_sound_control_w);
 }
 
 
@@ -2680,8 +2689,8 @@ static DRIVER_INIT( sfx )
 	galaxian_sfx_tilemap = TRUE;
 
 	/* sound board has space for extra ROM */
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, "audio"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_set_bankptr(machine, 1, memory_region(machine, "audio"));
 }
 
 
@@ -2691,8 +2700,8 @@ static DRIVER_INIT( atlantis )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog is at $7800? (or is it just disabled?) */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0x7ff, SMH_UNMAP);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7800, 0, 0x7ff, watchdog_reset_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7000, 0x7000, 0, 0x7ff, SMH_UNMAP);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7800, 0x7800, 0, 0x7ff, watchdog_reset_r);
 }
 
 
@@ -2730,12 +2739,12 @@ static DRIVER_INIT( froggrmc )
 	/* video extensions */
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xa800, 0, 0x7ff, soundlatch_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb001, 0xb001, 0, 0x7f8, froggrmc_sound_control_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa800, 0xa800, 0, 0x7ff, soundlatch_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb001, 0xb001, 0, 0x7f8, froggrmc_sound_control_w);
 
 	/* actually needs 2k of RAM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr(1, auto_malloc(0x800));
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x87ff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_set_bankptr(machine, 1, auto_malloc(0x800));
 
 	/* decrypt */
 	decode_frogger_sound(machine);
@@ -2774,16 +2783,16 @@ static DRIVER_INIT( scorpion )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* hook up AY8910 */
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x00, 0xff, 0, 0, scorpion_ay8910_r, scorpion_ay8910_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x00, 0xff, 0, 0, scorpion_ay8910_r, scorpion_ay8910_w);
 
 	/* extra ROM */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x5800);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, SMH_BANK1);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x5800);
 
 	/* no background related */
-//  memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);
+//  memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, SMH_NOP);
 
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, scorpion_sound_status_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_sound_status_r);
 /*
 {
     const UINT8 *rom = memory_region(machine, "speech");

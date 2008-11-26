@@ -59,42 +59,42 @@ extern VIDEO_UPDATE( pokechmp );
 
 static WRITE8_HANDLER( pokechmp_bank_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	if (data == 0x00)
 	{
-		memory_set_bankptr(1,&RAM[0x10000]);
-		memory_set_bankptr(2,&RAM[0x12000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x10000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x12000]);
 	}
 	if (data == 0x01)
 	{
-		memory_set_bankptr(1,&RAM[0x14000]);
-		memory_set_bankptr(2,&RAM[0x16000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x14000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x16000]);
 	}
 	if (data == 0x02)
 	{
-		memory_set_bankptr(1,&RAM[0x20000]);
-		memory_set_bankptr(2,&RAM[0x22000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x20000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x22000]);
 	}
 
 	if (data == 0x03)
 	{
-		memory_set_bankptr(1,&RAM[0x04000]);
-		memory_set_bankptr(2,&RAM[0x06000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x04000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x06000]);
 	}
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( pokechmp_sound_bank_w )
 {
-	memory_set_bank(3, (data >> 2) & 1);
+	memory_set_bank(space->machine, 3, (data >> 2) & 1);
 }
 #endif
 
 static WRITE8_HANDLER( pokechmp_sound_w )
 {
-	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -107,7 +107,7 @@ INLINE void pokechmp_set_color(running_machine *machine, pen_t color, int rshift
 static WRITE8_HANDLER( pokechmp_paletteram_w )
 {
 	paletteram[offset] = data;
-	pokechmp_set_color(machine, offset &0x3ff, 0, 5, 10, (paletteram[offset&0x3ff]<<8) | ( paletteram[ (offset&0x3ff)+0x400 ] )  );
+	pokechmp_set_color(space->machine, offset &0x3ff, 0, 5, 10, (paletteram[offset&0x3ff]<<8) | ( paletteram[ (offset&0x3ff)+0x400 ] )  );
 }
 
 
@@ -285,7 +285,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( pokechmp )
 {
-	memory_configure_bank(3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 

@@ -8,20 +8,21 @@
 READ16_HANDLER( segaic16_open_bus_r );
 
 /* memory mapping chip */
-struct segaic16_memory_map_entry
+typedef struct _segaic16_memory_map_entry segaic16_memory_map_entry;
+struct _segaic16_memory_map_entry
 {
 	UINT8			regbase;			/* register offset for this region */
 	offs_t			regoffs;			/* offset within the region for this entry */
 	offs_t			length;				/* length in bytes of this entry */
 	offs_t			mirror;				/* maximal mirror values (will be truncated) */
 	offs_t			romoffset;			/* offset within REGION_CPU0, or ~0 for independent entries */
-	read16_machine_func	read;				/* read handler */
-	write16_machine_func	write;				/* write handler */
+	read16_space_func	read;				/* read handler */
+	write16_space_func	write;				/* write handler */
 	UINT16 **		base;				/* pointer to memory base */
 	const char *	name;				/* friendly name for debugging */
 };
 
-void segaic16_memory_mapper_init(running_machine *machine, const char *cpu, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void));
+void segaic16_memory_mapper_init(const device_config *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *));
 void segaic16_memory_mapper_reset(running_machine *machine);
 void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_data);
 void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted);
@@ -47,7 +48,7 @@ WRITE16_HANDLER( segaic16_divide_1_w );
 WRITE16_HANDLER( segaic16_divide_2_w );
 
 /* compare/timer chip */
-void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(running_machine *));
+void segaic16_compare_timer_init(int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *));
 int segaic16_compare_timer_clock(int which);
 READ16_HANDLER( segaic16_compare_timer_0_r );
 READ16_HANDLER( segaic16_compare_timer_1_r );

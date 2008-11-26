@@ -280,43 +280,36 @@ static void okim6295_update(void *param, stream_sample_t **inputs, stream_sample
 
 ***********************************************************************************************/
 
-static void adpcm_state_save_register(struct ADPCMVoice *voice, int i)
+static void adpcm_state_save_register(struct ADPCMVoice *voice, const char *tag, int index)
 {
-	char buf[20];
-
-	sprintf(buf,"ADPCM");
-
-	state_save_register_item(buf, i, voice->playing);
-	state_save_register_item(buf, i, voice->sample);
-	state_save_register_item(buf, i, voice->count);
-	state_save_register_item(buf, i, voice->adpcm.signal);
-	state_save_register_item(buf, i, voice->adpcm.step);
-	state_save_register_item(buf, i, voice->volume);
-	state_save_register_item(buf, i, voice->base_offset);
+	state_save_register_item("okim6295", tag, index, voice->playing);
+	state_save_register_item("okim6295", tag, index, voice->sample);
+	state_save_register_item("okim6295", tag, index, voice->count);
+	state_save_register_item("okim6295", tag, index, voice->adpcm.signal);
+	state_save_register_item("okim6295", tag, index, voice->adpcm.step);
+	state_save_register_item("okim6295", tag, index, voice->volume);
+	state_save_register_item("okim6295", tag, index, voice->base_offset);
 }
 
-static void okim6295_state_save_register(struct okim6295 *info, int sndindex)
+static void okim6295_state_save_register(struct okim6295 *info, const char *tag)
 {
 	int j;
-	char buf[20];
 
-	sprintf(buf,"OKIM6295");
-
-	state_save_register_item(buf, sndindex, info->command);
-	state_save_register_item(buf, sndindex, info->bank_offset);
+	state_save_register_item("okim6295", tag, 0, info->command);
+	state_save_register_item("okim6295", tag, 0, info->bank_offset);
 	for (j = 0; j < OKIM6295_VOICES; j++)
-		adpcm_state_save_register(&info->voice[j], sndindex * 4 + j);
+		adpcm_state_save_register(&info->voice[j], tag, j);
 }
 
 
 
 /**********************************************************************************************
 
-     OKIM6295_start -- start emulation of an OKIM6295-compatible chip
+     SND_START( okim6295 ) -- start emulation of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static void *okim6295_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( okim6295 )
 {
 	const okim6295_interface *intf = config;
 	struct okim6295 *info;
@@ -345,7 +338,7 @@ static void *okim6295_start(const char *tag, int sndindex, int clock, const void
 		reset_adpcm(&info->voice[voice].adpcm);
 	}
 
-	okim6295_state_save_register(info, sndindex);
+	okim6295_state_save_register(info, tag);
 
 	/* success */
 	return info;
@@ -355,13 +348,13 @@ static void *okim6295_start(const char *tag, int sndindex, int clock, const void
 
 /**********************************************************************************************
 
-     OKIM6295_stop -- stop emulation of an OKIM6295-compatible chip
+     SND_RESET( okim6295 ) -- stop emulation of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static void okim6295_reset(void *chip)
+static SND_RESET( okim6295 )
 {
-	struct okim6295 *info = chip;
+	struct okim6295 *info = token;
 	int i;
 
 	stream_update(info->stream);
@@ -640,7 +633,7 @@ WRITE16_HANDLER( okim6295_data_2_msb_w )
  * Generic get_info
  **************************************************************************/
 
-static void okim6295_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( okim6295 )
 {
 	switch (state)
 	{
@@ -649,17 +642,17 @@ static void okim6295_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void okim6295_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( okim6295 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = okim6295_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = okim6295_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( okim6295 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( okim6295 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = okim6295_reset;			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( okim6295 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "OKI6295";					break;

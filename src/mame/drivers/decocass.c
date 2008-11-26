@@ -72,14 +72,14 @@ INLINE int swap_bits_5_6(int data)
 }
 
 static WRITE8_HANDLER( ram_w )        { decrypted[0x0000 + offset] = swap_bits_5_6(data); decocass_rambase[0x0000 + offset] = data;  }
-static WRITE8_HANDLER( charram_w )    { decrypted[0x6000 + offset] = swap_bits_5_6(data); decocass_charram_w(machine, offset, data); }
-static WRITE8_HANDLER( fgvideoram_w ) { decrypted[0xc000 + offset] = swap_bits_5_6(data); decocass_fgvideoram_w(machine, offset, data); }
-static WRITE8_HANDLER( fgcolorram_w ) { decrypted[0xc400 + offset] = swap_bits_5_6(data); decocass_colorram_w(machine, offset, data); }
-static WRITE8_HANDLER( tileram_w )    { decrypted[0xd000 + offset] = swap_bits_5_6(data); decocass_tileram_w(machine, offset, data); }
-static WRITE8_HANDLER( objectram_w )  { decrypted[0xd800 + offset] = swap_bits_5_6(data); decocass_objectram_w(machine, offset, data); }
+static WRITE8_HANDLER( charram_w )    { decrypted[0x6000 + offset] = swap_bits_5_6(data); decocass_charram_w(space, offset, data); }
+static WRITE8_HANDLER( fgvideoram_w ) { decrypted[0xc000 + offset] = swap_bits_5_6(data); decocass_fgvideoram_w(space, offset, data); }
+static WRITE8_HANDLER( fgcolorram_w ) { decrypted[0xc400 + offset] = swap_bits_5_6(data); decocass_colorram_w(space, offset, data); }
+static WRITE8_HANDLER( tileram_w )    { decrypted[0xd000 + offset] = swap_bits_5_6(data); decocass_tileram_w(space, offset, data); }
+static WRITE8_HANDLER( objectram_w )  { decrypted[0xd800 + offset] = swap_bits_5_6(data); decocass_objectram_w(space, offset, data); }
 
-static WRITE8_HANDLER( mirrorvideoram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgvideoram_w(machine, offset, data); }
-static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgcolorram_w(machine, offset, data); }
+static WRITE8_HANDLER( mirrorvideoram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgvideoram_w(space, offset, data); }
+static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgcolorram_w(space, offset, data); }
 static READ8_HANDLER( mirrorvideoram_r ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); return decocass_fgvideoram[offset]; }
 static READ8_HANDLER( mirrorcolorram_r ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); return decocass_colorram[offset]; }
 
@@ -138,10 +138,6 @@ static ADDRESS_MAP_START( decocass_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0800, 0x087f) AM_RAM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decocass_mcu_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(i8041_p1_r, i8041_p1_w)
@@ -389,11 +385,10 @@ static MACHINE_DRIVER_START( decocass )
 	MDRV_CPU_ADD("audio", M6502,500000) /* 500 kHz */
 	MDRV_CPU_PROGRAM_MAP(decocass_sound_map,0)
 
-	MDRV_CPU_ADD("mcu", I8X41,500000*15) /* 500 kHz ( I doubt it is 400kHz Al! )*/
-	MDRV_CPU_PROGRAM_MAP(decocass_mcu_map,0)
+	MDRV_CPU_ADD("mcu", I8041,500000*15) /* 500 kHz ( I doubt it is 400kHz Al! )*/
 	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
 
-	MDRV_INTERLEAVE(7)				/* interleave CPUs */
+	MDRV_INTERLEAVE(70)				/* interleave CPUs */
 
 	MDRV_MACHINE_RESET(decocass)
 
@@ -1104,14 +1099,15 @@ ROM_END
 
 static DRIVER_INIT( decocass )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
 	decrypted = auto_malloc(0x10000);
-	memory_set_decrypted_region(0, 0x0000, 0xc7ff, &decrypted[0x0000]);
-	memory_set_decrypted_region(0, 0xd000, 0xdbff, &decrypted[0xd000]);
-	memory_set_decrypted_region(0, 0xf000, 0xffff, &decrypted[0xf000]);
+	memory_set_decrypted_region(space, 0x0000, 0xc7ff, &decrypted[0x0000]);
+	memory_set_decrypted_region(space, 0xd000, 0xdbff, &decrypted[0xd000]);
+	memory_set_decrypted_region(space, 0xf000, 0xffff, &decrypted[0xf000]);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0xf000;A < 0x10000;A++)
@@ -1138,15 +1134,15 @@ static DRIVER_INIT( decocrom )
 		decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
-	memory_configure_bank(1, 0, 1, decocass_charram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user3"), 0);
-	memory_configure_bank_decrypted(1, 0, 1, &decrypted[0x6000], 0);
-	memory_configure_bank_decrypted(1, 1, 1, decrypted2, 0);
-	memory_set_bank(1, 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
+	memory_configure_bank(machine, 1, 0, 1, decocass_charram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user3"), 0);
+	memory_configure_bank_decrypted(machine, 1, 0, 1, &decrypted[0x6000], 0);
+	memory_configure_bank_decrypted(machine, 1, 1, 1, decrypted2, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* install the bank selector */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe900, 0xe900, 0, 0, decocass_e900_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);
 }
 
 

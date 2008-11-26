@@ -73,7 +73,7 @@ WRITE16_HANDLER( midwunit_cmos_w )
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", activecpu_get_pc(), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", cpu_get_pc(space->cpu), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -110,7 +110,7 @@ WRITE16_HANDLER( midwunit_io_w )
 	switch (offset)
 	{
 		case 1:
-			logerror("%08X:Control W @ %05X = %04X\n", activecpu_get_pc(), offset, data);
+			logerror("%08X:Control W @ %05X = %04X\n", cpu_get_pc(space->cpu), offset, data);
 
 			/* bit 4 reset sound CPU */
 			dcs_reset_w(newword & 0x10);
@@ -126,7 +126,7 @@ WRITE16_HANDLER( midwunit_io_w )
 			break;
 
 		default:
-			logerror("%08X:Unknown I/O write to %d = %04X\n", activecpu_get_pc(), offset, data);
+			logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 	iodata[offset] = newword;
@@ -150,8 +150,8 @@ WRITE16_HANDLER( midxunit_io_w )
 			break;
 
 		default:
-			logerror("%08X:I/O write to %d = %04X\n", activecpu_get_pc(), offset, data);
-//          logerror("%08X:Unknown I/O write to %d = %04X\n", activecpu_get_pc(), offset, data);
+			logerror("%08X:I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
+//          logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 	iodata[offset] = newword;
@@ -166,7 +166,7 @@ WRITE16_HANDLER( midxunit_unknown_w )
 		dcs_reset_w(data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
-		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", activecpu_get_pc(), offs, data & 0xff);
+		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", cpu_get_pc(space->cpu), offs, data & 0xff);
 }
 
 
@@ -190,13 +190,13 @@ READ16_HANDLER( midwunit_io_r )
 		case 1:
 		case 2:
 		case 3:
-			return input_port_read(machine, portnames[offset]);
+			return input_port_read(space->machine, portnames[offset]);
 
 		case 4:
-			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(machine,0,0xffff);
+			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(space,0,0xffff);
 
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", activecpu_get_pc(), offset);
+			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(space->cpu), offset);
 			break;
 	}
 	return ~0;
@@ -215,10 +215,10 @@ READ16_HANDLER( midxunit_io_r )
 		case 1:
 		case 2:
 		case 3:
-			return input_port_read(machine, portnames[offset]);
+			return input_port_read(space->machine, portnames[offset]);
 
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", activecpu_get_pc(), offset);
+			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(space->cpu), offset);
 			break;
 	}
 	return ~0;
@@ -229,7 +229,7 @@ READ16_HANDLER( midxunit_analog_r )
 {
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
 
-	return input_port_read(machine, portnames[midxunit_analog_port]);
+	return input_port_read(space->machine, portnames[midxunit_analog_port]);
 }
 
 
@@ -258,7 +258,7 @@ void midxunit_dcs_output_full(int state)
 {
 	/* only signal if not in loopback state */
 	if (uart[1] != 0x66)
-		cpunum_set_input_line(Machine, 0, 1, state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -287,7 +287,7 @@ READ16_HANDLER( midxunit_uart_r )
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
 			else
 			{
-				int temp = midwunit_sound_state_r(machine, 0, 0xffff);
+				int temp = midwunit_sound_state_r(space, 0, 0xffff);
 				result |= (temp & 0x800) >> 9;
 				result |= (~temp & 0x400) >> 10;
 				timer_call_after_resynch(NULL, 0, 0);
@@ -302,7 +302,7 @@ READ16_HANDLER( midxunit_uart_r )
 
 			/* non-loopback case: read from the DCS system */
 			else
-				result = midwunit_sound_r(machine, 0, 0xffff);
+				result = midwunit_sound_r(space, 0, 0xffff);
 			break;
 
 		case 5:	/* register 5 seems to be like 3, but with in/out swapped */
@@ -314,7 +314,7 @@ READ16_HANDLER( midxunit_uart_r )
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
 			else
 			{
-				int temp = midwunit_sound_state_r(machine, 0, 0xffff);
+				int temp = midwunit_sound_state_r(space, 0, 0xffff);
 				result |= (temp & 0x800) >> 11;
 				result |= (~temp & 0x400) >> 8;
 				timer_call_after_resynch(NULL, 0, 0);
@@ -326,7 +326,7 @@ READ16_HANDLER( midxunit_uart_r )
 			break;
 	}
 
-/*  logerror("%08X:UART R @ %X = %02X\n", activecpu_get_pc(), offset, result);*/
+/*  logerror("%08X:UART R @ %X = %02X\n", cpu_get_pc(space->cpu), offset, result);*/
 	return result;
 }
 
@@ -350,7 +350,7 @@ WRITE16_HANDLER( midxunit_uart_w )
 
 			/* non-loopback case: send to the DCS system */
 			else
-				midwunit_sound_w(machine, 0, data, mem_mask);
+				midwunit_sound_w(space, 0, data, mem_mask);
 			break;
 
 		case 5:	/* register 5 write seems to reset things */
@@ -362,7 +362,7 @@ WRITE16_HANDLER( midxunit_uart_w )
 			break;
 	}
 
-/*  logerror("%08X:UART W @ %X = %02X\n", activecpu_get_pc(), offset, data);*/
+/*  logerror("%08X:UART W @ %X = %02X\n", cpu_get_pc(space->cpu), offset, data);*/
 }
 
 
@@ -373,7 +373,7 @@ WRITE16_HANDLER( midxunit_uart_w )
  *
  *************************************/
 
-static void init_wunit_generic(void)
+static void init_wunit_generic(running_machine *machine)
 {
 	UINT8 *base;
 	int i, j, len;
@@ -397,7 +397,7 @@ static void init_wunit_generic(void)
 	}
 
 	/* init sound */
-	dcs_init();
+	dcs_init(machine);
 }
 
 
@@ -436,14 +436,14 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
         without significantly impacting the rest of the system.
     */
 	COMBINE_DATA(&umk3_palette[offset]);
-	activecpu_adjust_icount(-100);
+	cpu_adjust_icount(space->cpu, -100);
 /*  printf("in=%04X%04X  out=%04X%04X\n", umk3_palette[3], umk3_palette[2], umk3_palette[1], umk3_palette[0]); */
 }
 
 static void init_mk3_common(running_machine *machine)
 {
 	/* common init */
-	init_wunit_generic();
+	init_wunit_generic(machine);
 
 	/* serial prefixes 439, 528 */
 	midway_serial_pic_init(machine, 528);
@@ -467,13 +467,13 @@ DRIVER_INIT( mk3r10 )
 DRIVER_INIT( umk3 )
 {
 	init_mk3_common(machine);
-	umk3_palette = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	umk3_palette = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 DRIVER_INIT( umk3r11 )
 {
 	init_mk3_common(machine);
-	umk3_palette = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	umk3_palette = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 
@@ -482,7 +482,7 @@ DRIVER_INIT( umk3r11 )
 DRIVER_INIT( openice )
 {
 	/* common init */
-	init_wunit_generic();
+	init_wunit_generic(machine);
 
 	/* serial prefixes 438, 528 */
 	midway_serial_pic_init(machine, 528);
@@ -494,7 +494,7 @@ DRIVER_INIT( openice )
 DRIVER_INIT( nbahangt )
 {
 	/* common init */
-	init_wunit_generic();
+	init_wunit_generic(machine);
 
 	/* serial prefixes 459, 470, 528 */
 	midway_serial_pic_init(machine, 528);
@@ -555,10 +555,10 @@ static WRITE16_HANDLER( wwfmania_io_0_w )
 DRIVER_INIT( wwfmania )
 {
 	/* common init */
-	init_wunit_generic();
+	init_wunit_generic(machine);
 
 	/* enable I/O shuffling */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01800000, 0x0180000f, 0, 0, wwfmania_io_0_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01800000, 0x0180000f, 0, 0, wwfmania_io_0_w);
 
 	/* serial prefixes 430, 528 */
 	midway_serial_pic_init(machine, 528);
@@ -570,7 +570,7 @@ DRIVER_INIT( wwfmania )
 DRIVER_INIT( rmpgwt )
 {
 	/* common init */
-	init_wunit_generic();
+	init_wunit_generic(machine);
 
 	/* serial prefixes 465, 528 */
 	midway_serial_pic_init(machine, 528);
@@ -589,7 +589,7 @@ DRIVER_INIT( revx )
 
 	/* load the graphics ROMs -- quadruples */
 	midyunit_gfx_rom = base = memory_region(machine, "gfx1");
-	len = memory_region_length(Machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 	for (i = 0; i < len / 0x200000; i++)
 	{
 		memcpy(midwunit_decode_memory, base, 0x200000);
@@ -603,7 +603,7 @@ DRIVER_INIT( revx )
 	}
 
 	/* init sound */
-	dcs_init();
+	dcs_init(machine);
 
 	/* serial prefixes 419, 420 */
 	midway_serial_pic_init(machine, 419);
@@ -681,7 +681,7 @@ WRITE16_HANDLER( midxunit_security_clock_w )
 
 READ16_HANDLER( midwunit_sound_r )
 {
-	logerror("%08X:Sound read\n", activecpu_get_pc());
+	logerror("%08X:Sound read\n", cpu_get_pc(space->cpu));
 
 	return dcs_data_r() & 0xff;
 }
@@ -698,14 +698,14 @@ WRITE16_HANDLER( midwunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", activecpu_get_pc(), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(space->cpu), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", activecpu_get_pc(), data);
+		logerror("%08X:Sound write = %04X\n", cpu_get_pc(space->cpu), data);
 		dcs_data_w(data & 0xff);
 	}
 }

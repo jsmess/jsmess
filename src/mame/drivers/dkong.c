@@ -380,7 +380,7 @@ static const dma8257_interface hb_dma =
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -468,9 +468,9 @@ static MACHINE_RESET( strtheat )
 	MACHINE_RESET_CALL(dkong);
 
 	/* The initial state of the counter is 0x08 */
-	memory_configure_bank(1, 0, 4, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
 	state->decrypt_counter = 0x08;
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static MACHINE_RESET( drakton )
@@ -481,9 +481,9 @@ static MACHINE_RESET( drakton )
 	MACHINE_RESET_CALL(dkong);
 
 	/* The initial state of the counter is 0x09 */
-	memory_configure_bank(1, 0, 4, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
 	state->decrypt_counter = 0x09;
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 }
 
 
@@ -495,24 +495,27 @@ static MACHINE_RESET( drakton )
 
 static READ8_DEVICE_HANDLER( dk_dma_read_byte )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 result;
 
-	cpuintrf_push_context(0);
-	result = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_push_context(space->cpu);
+	result = memory_read_byte(space, offset);
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE8_DEVICE_HANDLER( dk_dma_write_byte )
 {
-	cpuintrf_push_context(0);
-	program_write_byte(offset, data);
-	cpuintrf_pop_context();
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	cpu_push_context(space->cpu);
+	memory_write_byte(space, offset, data);
+	cpu_pop_context();
 }
 
 static READ8_DEVICE_HANDLER( hb_dma_read_byte )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	dkong_state *state = device->machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -523,15 +526,16 @@ static READ8_DEVICE_HANDLER( hb_dma_read_byte )
 
 	addr = ((bucket<<7) & 0x7c00) | (offset & 0x3ff);
 
-	cpuintrf_push_context(0);
-	data = program_read_byte(addr);
-	cpuintrf_pop_context();
+	cpu_push_context(space->cpu);
+	data = memory_read_byte(space, addr);
+	cpu_pop_context();
 
 	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( hb_dma_write_byte )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	dkong_state *state = device->machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -541,9 +545,9 @@ static WRITE8_DEVICE_HANDLER( hb_dma_write_byte )
 
 	addr = ((bucket<<7) & 0x7c00) | (offset & 0x3ff);
 
-	cpuintrf_push_context(0);
-	program_write_byte(addr, data);
-	cpuintrf_pop_context();
+	cpu_push_context(space->cpu);
+	memory_write_byte(space, addr, data);
+	cpu_pop_context();
 }
 
 static READ8_DEVICE_HANDLER( p8257_ctl_r )
@@ -579,12 +583,12 @@ static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 static READ8_HANDLER( dkong_in2_r )
 {
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
-	const device_config *devvp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
+	const device_config *devvp2 = devtag_get_device(space->machine, LATCH8, "virtual_p2");
 	UINT8 mcustatus = latch8_bit4_q_r(devvp2, 0);
 
 	UINT8 r;
 
-	r = (input_port_read(machine, "IN2") & 0xBF) | (mcustatus << 6);
+	r = (input_port_read(space->machine, "IN2") & 0xBF) | (mcustatus << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
@@ -597,7 +601,7 @@ static READ8_HANDLER( dkongjr_in2_r )
 
 	UINT8 r;
 
-	r = (input_port_read(machine, "IN2") & 0xBF) | 0x40;
+	r = (input_port_read(space->machine, "IN2") & 0xBF) | 0x40;
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
@@ -606,19 +610,19 @@ static READ8_HANDLER( dkongjr_in2_r )
 
 static READ8_HANDLER( s2650_mirror_r )
 {
-	return program_read_byte(0x1000+offset);
+	return memory_read_byte(space, 0x1000+offset);
 }
 
 
 static WRITE8_HANDLER( s2650_mirror_w )
 {
-	program_write_byte(0x1000+offset,data);
+	memory_write_byte(space, 0x1000+offset, data);
 }
 
 
 static READ8_HANDLER( epos_decrypt_rom )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	if (offset & 0x01)
 	{
@@ -633,10 +637,10 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 	switch(state->decrypt_counter)
 	{
-		case 0x08:	memory_set_bank(1, 0);		break;
-		case 0x09:	memory_set_bank(1, 1);		break;
-		case 0x0A:	memory_set_bank(1, 2);		break;
-		case 0x0B:	memory_set_bank(1, 3);		break;
+		case 0x08:	memory_set_bank(space->machine, 1, 0);		break;
+		case 0x09:	memory_set_bank(space->machine, 1, 1);		break;
+		case 0x0A:	memory_set_bank(space->machine, 1, 2);		break;
+		case 0x0B:	memory_set_bank(space->machine, 1, 3);		break;
 		default:
 			logerror("Invalid counter = %02X\n",state->decrypt_counter);
 			break;
@@ -648,9 +652,9 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( s2650_data_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, loopback = %02x\n",activecpu_get_pc(), data);
+	logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
 
 	state->hunchloopback = data;
@@ -658,12 +662,12 @@ static WRITE8_HANDLER( s2650_data_w )
 
 static READ8_HANDLER( s2650_port0_r )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("port 0 : pc = %04x, loopback = %02x\n",activecpu_get_pc(), state->hunchloopback);
+	logerror("port 0 : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), state->hunchloopback);
 #endif
 
-	switch (COMBINE_TYPE_PC(state->protect_type, activecpu_get_pc()))
+	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(space->cpu)))
 	{
 		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x00e9):  return 0xff;
 		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x0114):  return 0xfb; //fb
@@ -679,18 +683,18 @@ static READ8_HANDLER( s2650_port0_r )
 		case DK2650_SHOOTGAL:  return 0x00;
 		case DK2650_SPCLFORC:  return 0x00;
 	}
-	fatalerror("Unhandled read from port 0 : pc = %4x\n",activecpu_get_pc());
+	fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
 
 
 static READ8_HANDLER( s2650_port1_r )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("port 1 : pc = %04x, loopback = %02x\n",activecpu_get_pc(), state->hunchloopback);
+	logerror("port 1 : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), state->hunchloopback);
 #endif
 
-	switch (COMBINE_TYPE_PC(state->protect_type, activecpu_get_pc()))
+	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(space->cpu)))
 	{
 		case COMBINE_TYPE_PC(DK2650_EIGHTACT, 0x0021):  return 0x00;
 		case COMBINE_TYPE_PC(DK2650_HERBIEDK, 0x002b):  return 0x00;
@@ -703,7 +707,7 @@ static READ8_HANDLER( s2650_port1_r )
 		case DK2650_EIGHTACT:  return 1;
 		case DK2650_HERBIEDK:  return 1;
 	}
-	fatalerror("Unhandled read from port 1 : pc = %4x\n",activecpu_get_pc());
+	fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
 
 
@@ -711,42 +715,42 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
 static READ8_HANDLER( strtheat_inputport_0_r )
 {
-	if(input_port_read(machine, "DSW0") & 0x40)
+	if(input_port_read(space->machine, "DSW0") & 0x40)
 	{
 		/* Joystick inputs */
-		return input_port_read(machine, "IN0");
+		return input_port_read(space->machine, "IN0");
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (input_port_read(machine, "IN0") & ~3) | (input_port_read(machine, "IN4") & 3);
+		return (input_port_read(space->machine, "IN0") & ~3) | (input_port_read(space->machine, "IN4") & 3);
 	}
 }
 
 
 static READ8_HANDLER( strtheat_inputport_1_r )
 {
-	if(input_port_read(machine, "DSW0") & 0x40)
+	if(input_port_read(space->machine, "DSW0") & 0x40)
 	{
 		/* Joystick inputs */
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (input_port_read(machine, "IN1") & ~3) | (input_port_read(machine, "IN5") & 3);
+		return (input_port_read(space->machine, "IN1") & ~3) | (input_port_read(space->machine, "IN5") & 3);
 	}
 }
 
@@ -2877,7 +2881,7 @@ static DRIVER_INIT( drakton )
 			{7,1,4,0,3,6,2,5},
 	};
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -2899,7 +2903,7 @@ static DRIVER_INIT( strtheat )
 			{6,3,4,1,0,7,2,5},
 	};
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -2910,8 +2914,8 @@ static DRIVER_INIT( strtheat )
 	drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
 }
 
 /*************************************

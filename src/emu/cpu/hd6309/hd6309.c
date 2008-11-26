@@ -103,51 +103,58 @@
 *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "hd6309.h"
+
+#define BIG_SWITCH 0
 
 #define VERBOSE 0
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#ifndef true
-#define true 1
-#endif
-
-#ifndef false
-#define false 0
-#endif
-
-extern CPU_DISASSEMBLE( hd6309 );
-
-/*#define BIG_SWITCH*/
-
-static void CHECK_IRQ_LINES( void );
-static void IIError(void);
-static void DZError(void);
-
-INLINE void fetch_effective_address( void );
-
 /* 6309 Registers */
-typedef struct
+typedef struct _m68_state_t m68_state_t;
+struct _m68_state_t
 {
 	PAIR	pc; 		/* Program counter */
 	PAIR	ppc;		/* Previous program counter */
-	PAIR	d,w;		/* Accumlator d and w (ab = d, ef = w, abef = q) */
+	PAIR	d;		/* Accumulator a and b */
+	PAIR	w;		/* Accumlator e and f */
+	/* abef = q */
 	PAIR	dp; 		/* Direct Page register (page in MSB) */
 	PAIR	u, s;		/* Stack pointers */
 	PAIR	x, y;		/* Index registers */
-	PAIR	v;			/* New 6309 register */
 	UINT8	cc;
+	PAIR	v;		/* New 6309 register */
 	UINT8	md; 		/* Special mode register */
 	UINT8	ireg;		/* First opcode */
 	UINT8	irq_state[2];
+
 	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	int		icount;
+	PAIR	ea; 		/* effective address */
+
+	/* Memory spaces */
+    const address_space *program;
+
 	UINT8	int_state;	/* SYNC and CWAI flags */
 	UINT8	nmi_state;
-} hd6309_Regs;
+
+	UINT8	dummy_byte;
+	UINT8 	*regTable[4];
+
+	UINT8 const *cycle_counts_page0;
+	UINT8 const *cycle_counts_page01;
+	UINT8 const *cycle_counts_page11;
+	UINT8 const *index_cycle;
+};
+
+static void check_irq_lines( m68_state_t *m68_state );
+static void IIError(m68_state_t *m68_state);
+static void DZError(m68_state_t *m68_state);
+
+INLINE void fetch_effective_address( m68_state_t *m68_state );
 
 /* flag bits in the cc register */
 #define CC_C	0x01		/* Carry */
@@ -165,72 +172,75 @@ typedef struct
 #define MD_II	0x40		/* Illegal instruction */
 #define MD_DZ	0x80		/* Division by zero */
 
-/* 6309 registers */
-static hd6309_Regs hd6309;
-//static int hd6309_slapstic = 0;
+#define pPPC	m68_state->ppc
+#define pPC 	m68_state->pc
+#define pU		m68_state->u
+#define pS		m68_state->s
+#define pX		m68_state->x
+#define pY		m68_state->y
+#define pD		m68_state->d
 
-#define pPPC	hd6309.ppc
-#define pPC 	hd6309.pc
-#define pU		hd6309.u
-#define pS		hd6309.s
-#define pX		hd6309.x
-#define pY		hd6309.y
-#define pV		hd6309.v
-/*#define pQ        hd6309.q*/
-#define pD		hd6309.d
-#define pW		hd6309.w
-#define pZ		hd6309.z
+#define pV		m68_state->v
+#define pW		m68_state->w
 
-#define PPC 	hd6309.ppc.w.l
-#define PC		hd6309.pc.w.l
-#define PCD 	hd6309.pc.d
-#define U		hd6309.u.w.l
-#define UD		hd6309.u.d
-#define S		hd6309.s.w.l
-#define SD		hd6309.s.d
-#define X		hd6309.x.w.l
-#define XD		hd6309.x.d
-#define Y		hd6309.y.w.l
-#define YD		hd6309.y.d
-#define V		hd6309.v.w.l
-#define VD		hd6309.v.d
-#define D		hd6309.d.w.l
-#define A		hd6309.d.b.h
-#define B		hd6309.d.b.l
-#define W		hd6309.w.w.l
-#define E		hd6309.w.b.h
-#define F		hd6309.w.b.l
-#define DP		hd6309.dp.b.h
-#define DPD 	hd6309.dp.d
-#define CC		hd6309.cc
-#define MD		hd6309.md
+/* #define pQ           m68_state->q */
+/* #define pZ       m68_state->z */
 
-static PAIR ea; 		/* effective address */
-#define EA	ea.w.l
-#define EAD ea.d
+#define PPC 	m68_state->ppc.w.l
+#define PC		m68_state->pc.w.l
+#define PCD 	m68_state->pc.d
+#define U		m68_state->u.w.l
+#define UD		m68_state->u.d
+#define S		m68_state->s.w.l
+#define SD		m68_state->s.d
+#define X		m68_state->x.w.l
+#define XD		m68_state->x.d
+#define Y		m68_state->y.w.l
+#define YD		m68_state->y.d
+#define V		m68_state->v.w.l
+#define VD		m68_state->v.d
+#define D		m68_state->d.w.l
+#define A		m68_state->d.b.h
+#define B		m68_state->d.b.l
+#define W		m68_state->w.w.l
+#define E		m68_state->w.b.h
+#define F		m68_state->w.b.l
+#define DP		m68_state->dp.b.h
+#define DPD 	m68_state->dp.d
+#define CC		m68_state->cc
+#define MD		m68_state->md
 
-#define CHANGE_PC change_pc(PCD)
-#if 0
-#define CHANGE_PC	{			\
-	if( hd6309_slapstic )		\
-		cpu_setOPbase16(PCD);	\
-	else						\
-		change_pc(PCD);		\
-	}
-#endif
+#define EA	m68_state->ea.w.l
+#define EAD m68_state->ea.d
+#define EAP m68_state->ea
 
-#define HD6309_CWAI 	8	/* set when CWAI is waiting for an interrupt */
-#define HD6309_SYNC 	16	/* set when SYNC is waiting for an interrupt */
-#define HD6309_LDS		32	/* set when LDS occured at least once */
+#define M6809_CWAI 	8	/* set when CWAI is waiting for an interrupt */
+#define M6809_SYNC 	16	/* set when SYNC is waiting for an interrupt */
+#define M6809_LDS		32	/* set when LDS occured at least once */
 
-/* public globals */
-static int hd6309_ICount;
+/****************************************************************************/
+/* Read a byte from given memory location                                   */
+/****************************************************************************/
+#define RM(Addr) ((unsigned)memory_read_byte_8be(m68_state->program, Addr))
 
-/* these are re-defined in hd6309.h TO RAM, ROM or functions in cpuintrf.c */
-#define RM(mAddr)		HD6309_RDMEM(mAddr)
-#define WM(mAddr,Value) HD6309_WRMEM(mAddr,Value)
-#define ROP(mAddr)		HD6309_RDOP(mAddr)
-#define ROP_ARG(mAddr)	HD6309_RDOP_ARG(mAddr)
+/****************************************************************************/
+/* Write a byte to given memory location                                    */
+/****************************************************************************/
+#define WM(Addr,Value) (memory_write_byte_8be(m68_state->program, Addr,Value))
+
+/****************************************************************************/
+/* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */
+/* opcodes. In case of system with memory mapped I/O, this function can be  */
+/* used to greatly speed up emulation                                       */
+/****************************************************************************/
+#define ROP(Addr) ((unsigned)memory_decrypted_read_byte(m68_state->program, Addr))
+
+/****************************************************************************/
+/* Z80_RDOP_ARG() is identical to Z80_RDOP() except it is used for reading  */
+/* opcode arguments. This difference can be used to support systems that    */
+/* use different encoding mechanisms for opcodes and opcode arguments       */
+/****************************************************************************/
+#define ROP_ARG(Addr) ((unsigned)memory_raw_read_byte(m68_state->program, Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)	b = ROP_ARG(PCD); PC++
@@ -273,11 +283,6 @@ static int hd6309_ICount;
 #define SET_FLAGS8I(a)		{CC|=flags8i[(a)&0xff];}
 #define SET_FLAGS8D(a)		{CC|=flags8d[(a)&0xff];}
 
-static UINT8 const *cycle_counts_page0;
-static UINT8 const *cycle_counts_page01;
-static UINT8 const *cycle_counts_page11;
-static UINT8 const *index_cycle;
-
 /* combos */
 #define SET_NZ8(a)			{SET_N8(a);SET_Z(a);}
 #define SET_NZ16(a) 		{SET_N16(a);SET_Z(a);}
@@ -288,14 +293,15 @@ static UINT8 const *index_cycle;
 
 /* for treating an unsigned byte as a signed word */
 #define SIGNED(b) ((UINT16)(b&0x80?b|0xff00:b))
+
 /* for treating an unsigned short as a signed long */
 #define SIGNED_16(b) ((UINT32)(b&0x8000?b|0xffff0000:b))
 
 /* macros for addressing modes (postbytes have their own code) */
-#define DIRECT	EAD = DPD; IMMBYTE(ea.b.l)
+#define DIRECT	EAD = DPD; IMMBYTE(m68_state->ea.b.l)
 #define IMM8	EAD = PCD; PC++
 #define IMM16	EAD = PCD; PC+=2
-#define EXTENDED IMMWORD(ea)
+#define EXTENDED IMMWORD(EAP)
 
 /* macros to set status flags */
 #if defined(SEC)
@@ -324,11 +330,12 @@ static UINT8 const *index_cycle;
 
 /* macros for convenience */
 #define DIRBYTE(b) {DIRECT;b=RM(EAD);}
-#define DIRWORD(w) {DIRECT;w.d=RM16(EAD);}
-#define DIRLONG(lng) {DIRECT;lng.w.h=RM16(EAD);lng.w.l=RM16(EAD+2);}
+#define DIRWORD(w) {DIRECT;w.d=RM16(m68_state, EAD);}
 #define EXTBYTE(b) {EXTENDED;b=RM(EAD);}
-#define EXTWORD(w) {EXTENDED;w.d=RM16(EAD);}
-#define EXTLONG(lng) {EXTENDED;lng.w.h=RM16(EAD);lng.w.l=RM16(EAD+2);}
+#define EXTWORD(w) {EXTENDED;w.d=RM16(m68_state, EAD);}
+
+#define DIRLONG(lng) {DIRECT;lng.w.h=RM16(m68_state, EAD);lng.w.l=RM16(m68_state, EAD+2);}
+#define EXTLONG(lng) {EXTENDED;lng.w.h=RM16(m68_state, EAD);lng.w.l=RM16(m68_state, EAD+2);}
 
 /* includes the static function prototypes and other tables */
 #include "6309tbl.c"
@@ -340,7 +347,6 @@ static UINT8 const *index_cycle;
 	if( f ) 							\
 	{									\
 		PC += SIGNED(t);				\
-		CHANGE_PC;						\
 	}									\
 }
 
@@ -350,76 +356,73 @@ static UINT8 const *index_cycle;
 	if( f ) 							\
 	{									\
 		if( !(MD & MD_EM) )				\
-			hd6309_ICount -= 1;			\
+			m68_state->icount -= 1;			\
 		PC += t.w.l;					\
-		CHANGE_PC;						\
 	}									\
 }
 
-INLINE UINT32 RM16( UINT32 mAddr );
-INLINE UINT32 RM16( UINT32 mAddr )
+/* macros for setting/getting registers in TFR/EXG instructions */
+
+INLINE UINT32 RM16(m68_state_t *m68_state, UINT32 Addr )
 {
-	UINT32 result = RM(mAddr) << 8;
-	return result | RM((mAddr+1)&0xffff);
+	UINT32 result = RM(Addr) << 8;
+	return result | RM((Addr+1)&0xffff);
 }
 
-INLINE UINT32 RM32( UINT32 mAddr );
-INLINE UINT32 RM32( UINT32 mAddr )
+INLINE UINT32 RM32(m68_state_t *m68_state, UINT32 Addr )
 {
-	UINT32 result = RM(mAddr) << 24;
-	result += RM(mAddr+1) << 16;
-	result += RM(mAddr+2) << 8;
-	result += RM(mAddr+3);
+	UINT32 result = RM(Addr) << 24;
+	result += RM(Addr+1) << 16;
+	result += RM(Addr+2) << 8;
+	result += RM(Addr+3);
 	return result;
 }
 
-INLINE void WM16( UINT32 mAddr, PAIR *p );
-INLINE void WM16( UINT32 mAddr, PAIR *p )
+INLINE void WM16(m68_state_t *m68_state, UINT32 Addr, PAIR *p )
 {
-	WM( mAddr, p->b.h );
-	WM( (mAddr+1)&0xffff, p->b.l );
+	WM( Addr, p->b.h );
+	WM( (Addr+1)&0xffff, p->b.l );
 }
 
-INLINE void WM32( UINT32 mAddr, PAIR *p );
-INLINE void WM32( UINT32 mAddr, PAIR *p )
+INLINE void WM32(m68_state_t *m68_state, UINT32 Addr, PAIR *p )
 {
-	WM( mAddr, p->b.h3 );
-	WM( (mAddr+1)&0xffff, p->b.h2 );
-	WM( (mAddr+2)&0xffff, p->b.h );
-	WM( (mAddr+3)&0xffff, p->b.l );
+	WM( Addr, p->b.h3 );
+	WM( (Addr+1)&0xffff, p->b.h2 );
+	WM( (Addr+2)&0xffff, p->b.h );
+	WM( (Addr+3)&0xffff, p->b.l );
 }
 
-static void UpdateState(void)
+static void UpdateState(m68_state_t *m68_state)
 {
-	if ( hd6309.md & MD_EM )
+	if ( m68_state->md & MD_EM )
 	{
-		cycle_counts_page0  = ccounts_page0_na;
-		cycle_counts_page01 = ccounts_page01_na;
-		cycle_counts_page11 = ccounts_page11_na;
-		index_cycle         = index_cycle_na;
+		m68_state->cycle_counts_page0  = ccounts_page0_na;
+		m68_state->cycle_counts_page01 = ccounts_page01_na;
+		m68_state->cycle_counts_page11 = ccounts_page11_na;
+		m68_state->index_cycle         = index_cycle_na;
 	}
 	else
 	{
-		cycle_counts_page0  = ccounts_page0_em;
-		cycle_counts_page01 = ccounts_page01_em;
-		cycle_counts_page11 = ccounts_page11_em;
-		index_cycle         = index_cycle_em;
+		m68_state->cycle_counts_page0  = ccounts_page0_em;
+		m68_state->cycle_counts_page01 = ccounts_page01_em;
+		m68_state->cycle_counts_page11 = ccounts_page11_em;
+		m68_state->index_cycle         = index_cycle_em;
 	}
 }
 
-static void CHECK_IRQ_LINES( void )
+static void check_irq_lines( m68_state_t *m68_state )
 {
-	if( hd6309.irq_state[HD6309_IRQ_LINE] != CLEAR_LINE ||
-		hd6309.irq_state[HD6309_FIRQ_LINE] != CLEAR_LINE )
-		hd6309.int_state &= ~HD6309_SYNC; /* clear SYNC flag */
-	if( hd6309.irq_state[HD6309_FIRQ_LINE]!=CLEAR_LINE && !(CC & CC_IF))
+	if( m68_state->irq_state[HD6309_IRQ_LINE] != CLEAR_LINE ||
+		m68_state->irq_state[HD6309_FIRQ_LINE] != CLEAR_LINE )
+		m68_state->int_state &= ~M6809_SYNC; /* clear SYNC flag */
+	if( m68_state->irq_state[HD6309_FIRQ_LINE]!=CLEAR_LINE && !(CC & CC_IF))
 	{
 		/* fast IRQ */
 		/* HJB 990225: state already saved by CWAI? */
-		if( hd6309.int_state & HD6309_CWAI )
+		if( m68_state->int_state & M6809_CWAI )
 		{
-			hd6309.int_state &= ~HD6309_CWAI;
-			hd6309.extra_cycles += 7;		 /* subtract +7 cycles */
+			m68_state->int_state &= ~M6809_CWAI;
+			m68_state->extra_cycles += 7;		 /* subtract +7 cycles */
 		}
 		else
 		{
@@ -435,35 +438,34 @@ static void CHECK_IRQ_LINES( void )
 				{
 					PUSHBYTE(F);
 					PUSHBYTE(E);
-					hd6309.extra_cycles += 2; /* subtract +2 cycles */
+					m68_state->extra_cycles += 2; /* subtract +2 cycles */
 				}
 				PUSHBYTE(B);
 				PUSHBYTE(A);
 				PUSHBYTE(CC);
-				hd6309.extra_cycles += 19;	 /* subtract +19 cycles */
+				m68_state->extra_cycles += 19;	 /* subtract +19 cycles */
 			}
 			else
 			{
 				CC &= ~CC_E;				/* save 'short' state */
 				PUSHWORD(pPC);
 				PUSHBYTE(CC);
-				hd6309.extra_cycles += 10;	/* subtract +10 cycles */
+				m68_state->extra_cycles += 10;	/* subtract +10 cycles */
 			}
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
-		PCD=RM16(0xfff6);
-		CHANGE_PC;
-		(void)(*hd6309.irq_callback)(hd6309.device, HD6309_FIRQ_LINE);
+		PCD=RM16(m68_state, 0xfff6);
+		(void)(*m68_state->irq_callback)(m68_state->device, HD6309_FIRQ_LINE);
 	}
 	else
-	if( hd6309.irq_state[HD6309_IRQ_LINE]!=CLEAR_LINE && !(CC & CC_II) )
+	if( m68_state->irq_state[HD6309_IRQ_LINE]!=CLEAR_LINE && !(CC & CC_II) )
 	{
 		/* standard IRQ */
 		/* HJB 990225: state already saved by CWAI? */
-		if( hd6309.int_state & HD6309_CWAI )
+		if( m68_state->int_state & M6809_CWAI )
 		{
-			hd6309.int_state &= ~HD6309_CWAI;  /* clear CWAI flag */
-			hd6309.extra_cycles += 7;		 /* subtract +7 cycles */
+			m68_state->int_state &= ~M6809_CWAI;  /* clear CWAI flag */
+			m68_state->extra_cycles += 7;		 /* subtract +7 cycles */
 		}
 		else
 		{
@@ -477,27 +479,26 @@ static void CHECK_IRQ_LINES( void )
 			{
 				PUSHBYTE(F);
 				PUSHBYTE(E);
-				hd6309.extra_cycles += 2; /* subtract +2 cycles */
+				m68_state->extra_cycles += 2; /* subtract +2 cycles */
 			}
 			PUSHBYTE(B);
 			PUSHBYTE(A);
 			PUSHBYTE(CC);
-			hd6309.extra_cycles += 19;	 /* subtract +19 cycles */
+			m68_state->extra_cycles += 19;	 /* subtract +19 cycles */
 		}
 		CC |= CC_II;					/* inhibit IRQ */
-		PCD=RM16(0xfff8);
-		CHANGE_PC;
-		(void)(*hd6309.irq_callback)(hd6309.device, HD6309_IRQ_LINE);
+		PCD=RM16(m68_state, 0xfff8);
+		(void)(*m68_state->irq_callback)(m68_state->device, HD6309_IRQ_LINE);
 	}
 }
+
+
 
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
 static CPU_GET_CONTEXT( hd6309 )
 {
-	if( dst )
-		*(hd6309_Regs*)dst = hd6309;
 }
 
 /****************************************************************************
@@ -505,38 +506,50 @@ static CPU_GET_CONTEXT( hd6309 )
  ****************************************************************************/
 static CPU_SET_CONTEXT( hd6309 )
 {
-	if( src )
-		hd6309 = *(hd6309_Regs*)src;
-	CHANGE_PC;
-
-	CHECK_IRQ_LINES();
-	UpdateState();
 }
 
 static STATE_POSTLOAD( hd6309_postload )
 {
-	UpdateState();
+	const device_config *device = param;
+	m68_state_t *m68_state = device->token;
+
+	UpdateState(m68_state);
 }
 
+
+/****************************************************************************/
+/* Reset registers to their initial values                                  */
+/****************************************************************************/
 static CPU_INIT( hd6309 )
 {
-	hd6309.irq_callback = irqcallback;
-	hd6309.device = device;
+	m68_state_t *m68_state = device->token;
 
-	state_save_register_item("hd6309", index, PC);
-	state_save_register_item("hd6309", index, U);
-	state_save_register_item("hd6309", index, S);
-	state_save_register_item("hd6309", index, X);
-	state_save_register_item("hd6309", index, Y);
-	state_save_register_item("hd6309", index, V);
-	state_save_register_item("hd6309", index, DP);
-	state_save_register_item("hd6309", index, CC);
-	state_save_register_item("hd6309", index, MD);
-	state_save_register_postload(Machine, hd6309_postload, NULL);
-	state_save_register_item("hd6309", index, hd6309.int_state);
-	state_save_register_item("hd6309", index, hd6309.nmi_state);
-	state_save_register_item("hd6309", index, hd6309.irq_state[0]);
-	state_save_register_item("hd6309", index, hd6309.irq_state[1]);
+	m68_state->irq_callback = irqcallback;
+	m68_state->device = device;
+
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+
+	/* setup regtable */
+
+	m68_state->regTable[0] = &(CC);
+	m68_state->regTable[1] = &(A);
+	m68_state->regTable[2] = &(B);
+	m68_state->regTable[3] = &m68_state->dummy_byte;
+
+	state_save_register_item("hd6309", device->tag, 0, PC);
+	state_save_register_item("hd6309", device->tag, 0, U);
+	state_save_register_item("hd6309", device->tag, 0, S);
+	state_save_register_item("hd6309", device->tag, 0, X);
+	state_save_register_item("hd6309", device->tag, 0, Y);
+	state_save_register_item("hd6309", device->tag, 0, V);
+	state_save_register_item("hd6309", device->tag, 0, DP);
+	state_save_register_item("hd6309", device->tag, 0, CC);
+	state_save_register_item("hd6309", device->tag, 0, MD);
+	state_save_register_postload(device->machine, hd6309_postload, (void *) device);
+	state_save_register_item("hd6309", device->tag, 0, m68_state->int_state);
+	state_save_register_item("hd6309", device->tag, 0, m68_state->nmi_state);
+	state_save_register_item("hd6309", device->tag, 0, m68_state->irq_state[0]);
+	state_save_register_item("hd6309", device->tag, 0, m68_state->irq_state[1]);
 }
 
 /****************************************************************************/
@@ -544,10 +557,12 @@ static CPU_INIT( hd6309 )
 /****************************************************************************/
 static CPU_RESET( hd6309 )
 {
-	hd6309.int_state = 0;
-	hd6309.nmi_state = CLEAR_LINE;
-	hd6309.irq_state[0] = CLEAR_LINE;
-	hd6309.irq_state[0] = CLEAR_LINE;
+	m68_state_t *m68_state = device->token;
+
+	m68_state->int_state = 0;
+	m68_state->nmi_state = CLEAR_LINE;
+	m68_state->irq_state[0] = CLEAR_LINE;
+	m68_state->irq_state[1] = CLEAR_LINE;
 
 	DPD = 0;			/* Reset direct page register */
 
@@ -555,9 +570,8 @@ static CPU_RESET( hd6309 )
 	CC |= CC_II;		/* IRQ disabled */
 	CC |= CC_IF;		/* FIRQ disabled */
 
-	PCD = RM16(0xfffe);
-	CHANGE_PC;
-	UpdateState();
+	PCD = RM16(m68_state, 0xfffe);
+	UpdateState(m68_state);
 }
 
 static CPU_EXIT( hd6309 )
@@ -565,28 +579,27 @@ static CPU_EXIT( hd6309 )
 	/* nothing to do ? */
 }
 
-/* Generate interrupts */
 /****************************************************************************
  * Set IRQ line state
  ****************************************************************************/
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (hd6309.nmi_state == state) return;
-		hd6309.nmi_state = state;
-		LOG(("HD6309#%d set_irq_line (NMI) %d (PC=%4.4X)\n", cpu_getactivecpu(), state, pPC.d));
+		if (m68_state->nmi_state == state) return;
+		m68_state->nmi_state = state;
+		LOG(("HD6309#%d set_irq_line (NMI) %d (PC=%4.4X)\n", cpunum_get_active(), state, pPC.d));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
-		if( !(hd6309.int_state & HD6309_LDS) ) return;
+		if( !(m68_state->int_state & M6809_LDS) ) return;
 
-		hd6309.int_state &= ~HD6309_SYNC;
+		m68_state->int_state &= ~M6809_SYNC;
 		/* HJB 990225: state already saved by CWAI? */
-		if( hd6309.int_state & HD6309_CWAI )
+		if( m68_state->int_state & M6809_CWAI )
 		{
-			hd6309.int_state &= ~HD6309_CWAI;
-			hd6309.extra_cycles += 7;	/* subtract +7 cycles next time */
+			m68_state->int_state &= ~M6809_CWAI;
+			m68_state->extra_cycles += 7;	/* subtract +7 cycles next time */
 		}
 		else
 		{
@@ -600,40 +613,45 @@ static void set_irq_line(int irqline, int state)
 			{
 				PUSHBYTE(F);
 				PUSHBYTE(E);
-				hd6309.extra_cycles += 2; /* subtract +2 cycles */
+				m68_state->extra_cycles += 2; /* subtract +2 cycles */
 			}
 
 			PUSHBYTE(B);
 			PUSHBYTE(A);
 			PUSHBYTE(CC);
-			hd6309.extra_cycles += 19;	/* subtract +19 cycles next time */
+			m68_state->extra_cycles += 19;	/* subtract +19 cycles next time */
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
-		PCD = RM16(0xfffc);
-		CHANGE_PC;
+		PCD = RM16(m68_state, 0xfffc);
 	}
 	else if (irqline < 2)
 	{
-		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpu_getactivecpu(), irqline, state, pPC.d));
-		hd6309.irq_state[irqline] = state;
+		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpunum_get_active(), irqline, state, pPC.d));
+		m68_state->irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
-		CHECK_IRQ_LINES();
+		check_irq_lines(m68_state);
 	}
 }
 
-/* includes the actual opcode implementations */
+/****************************************************************************
+ * includes the actual opcode implementations
+ ****************************************************************************/
 #include "6309ops.c"
 
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 {
-	hd6309_ICount = cycles - hd6309.extra_cycles;
-	hd6309.extra_cycles = 0;
+	m68_state_t *m68_state = device->token;
 
-	if (hd6309.int_state & (HD6309_CWAI | HD6309_SYNC))
+	m68_state->icount = cycles - m68_state->extra_cycles;
+	m68_state->extra_cycles = 0;
+
+	check_irq_lines(m68_state);
+
+	if (m68_state->int_state & (M6809_CWAI | M6809_SYNC))
 	{
-		debugger_instruction_hook(Machine, PCD);
-		hd6309_ICount = 0;
+		debugger_instruction_hook(device, PCD);
+		m68_state->icount = 0;
 	}
 	else
 	{
@@ -641,287 +659,286 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 		{
 			pPPC = pPC;
 
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device, PCD);
 
-			hd6309.ireg = ROP(PCD);
+			m68_state->ireg = ROP(PCD);
 			PC++;
-
-#ifdef BIG_SWITCH
-			switch( hd6309.ireg )
+#if BIG_SWITCH
+			switch( m68_state->ireg )
 			{
-			case 0x00: neg_di();   				break;
-			case 0x01: oim_di();   				break;
-			case 0x02: aim_di();   				break;
-			case 0x03: com_di();   				break;
-			case 0x04: lsr_di();   				break;
-			case 0x05: eim_di();   				break;
-			case 0x06: ror_di();   				break;
-			case 0x07: asr_di();   				break;
-			case 0x08: asl_di();   				break;
-			case 0x09: rol_di();   				break;
-			case 0x0a: dec_di();   				break;
-			case 0x0b: tim_di();   				break;
-			case 0x0c: inc_di();   				break;
-			case 0x0d: tst_di();   				break;
-			case 0x0e: jmp_di();   				break;
-			case 0x0f: clr_di();   				break;
-			case 0x10: pref10();				break;
-			case 0x11: pref11();				break;
-			case 0x12: nop();	   				break;
-			case 0x13: sync();	   				break;
-			case 0x14: sexw();	   				break;
-			case 0x15: IIError();				break;
-			case 0x16: lbra();	   				break;
-			case 0x17: lbsr();	   				break;
-			case 0x18: IIError();				break;
-			case 0x19: daa();	   				break;
-			case 0x1a: orcc();	   				break;
-			case 0x1b: IIError();				break;
-			case 0x1c: andcc();    				break;
-			case 0x1d: sex();	   				break;
-			case 0x1e: exg();	   				break;
-			case 0x1f: tfr();	   				break;
-			case 0x20: bra();	   				break;
-			case 0x21: brn();	   				break;
-			case 0x22: bhi();	   				break;
-			case 0x23: bls();	   				break;
-			case 0x24: bcc();	   				break;
-			case 0x25: bcs();	   				break;
-			case 0x26: bne();	   				break;
-			case 0x27: beq();	   				break;
-			case 0x28: bvc();	   				break;
-			case 0x29: bvs();	   				break;
-			case 0x2a: bpl();	   				break;
-			case 0x2b: bmi();	   				break;
-			case 0x2c: bge();	   				break;
-			case 0x2d: blt();	   				break;
-			case 0x2e: bgt();	   				break;
-			case 0x2f: ble();	   				break;
-			case 0x30: leax();	   				break;
-			case 0x31: leay();	   				break;
-			case 0x32: leas();	   				break;
-			case 0x33: leau();	   				break;
-			case 0x34: pshs();	   				break;
-			case 0x35: puls();	   				break;
-			case 0x36: pshu();	   				break;
-			case 0x37: pulu();	   				break;
-			case 0x38: IIError();				break;
-			case 0x39: rts();	   				break;
-			case 0x3a: abx();	   				break;
-			case 0x3b: rti();	   				break;
-			case 0x3c: cwai();					break;
-			case 0x3d: mul();					break;
-			case 0x3e: IIError();				break;
-			case 0x3f: swi();					break;
-			case 0x40: nega();	   				break;
-			case 0x41: IIError();				break;
-			case 0x42: IIError();				break;
-			case 0x43: coma();	   				break;
-			case 0x44: lsra();	   				break;
-			case 0x45: IIError();				break;
-			case 0x46: rora();	   				break;
-			case 0x47: asra();	   				break;
-			case 0x48: asla();	   				break;
-			case 0x49: rola();	   				break;
-			case 0x4a: deca();	   				break;
-			case 0x4b: IIError();				break;
-			case 0x4c: inca();	   				break;
-			case 0x4d: tsta();	   				break;
-			case 0x4e: IIError();				break;
-			case 0x4f: clra();	   				break;
-			case 0x50: negb();	   				break;
-			case 0x51: IIError();				break;
-			case 0x52: IIError();				break;
-			case 0x53: comb();	   				break;
-			case 0x54: lsrb();	   				break;
-			case 0x55: IIError();				break;
-			case 0x56: rorb();	   				break;
-			case 0x57: asrb();	   				break;
-			case 0x58: aslb();	   				break;
-			case 0x59: rolb();	   				break;
-			case 0x5a: decb();	   				break;
-			case 0x5b: IIError();				break;
-			case 0x5c: incb();	   				break;
-			case 0x5d: tstb();	   				break;
-			case 0x5e: IIError();				break;
-			case 0x5f: clrb();	   				break;
-			case 0x60: neg_ix();   				break;
-			case 0x61: oim_ix();   				break;
-			case 0x62: aim_ix();   				break;
-			case 0x63: com_ix();   				break;
-			case 0x64: lsr_ix();   				break;
-			case 0x65: eim_ix();   				break;
-			case 0x66: ror_ix();   				break;
-			case 0x67: asr_ix();   				break;
-			case 0x68: asl_ix();   				break;
-			case 0x69: rol_ix();   				break;
-			case 0x6a: dec_ix();   				break;
-			case 0x6b: tim_ix();   				break;
-			case 0x6c: inc_ix();   				break;
-			case 0x6d: tst_ix();   				break;
-			case 0x6e: jmp_ix();   				break;
-			case 0x6f: clr_ix();   				break;
-			case 0x70: neg_ex();   				break;
-			case 0x71: oim_ex();   				break;
-			case 0x72: aim_ex();   				break;
-			case 0x73: com_ex();   				break;
-			case 0x74: lsr_ex();   				break;
-			case 0x75: eim_ex();   				break;
-			case 0x76: ror_ex();   				break;
-			case 0x77: asr_ex();   				break;
-			case 0x78: asl_ex();   				break;
-			case 0x79: rol_ex();   				break;
-			case 0x7a: dec_ex();   				break;
-			case 0x7b: tim_ex();   				break;
-			case 0x7c: inc_ex();   				break;
-			case 0x7d: tst_ex();   				break;
-			case 0x7e: jmp_ex();   				break;
-			case 0x7f: clr_ex();   				break;
-			case 0x80: suba_im();  				break;
-			case 0x81: cmpa_im();  				break;
-			case 0x82: sbca_im();  				break;
-			case 0x83: subd_im();  				break;
-			case 0x84: anda_im();  				break;
-			case 0x85: bita_im();  				break;
-			case 0x86: lda_im();   				break;
-			case 0x87: IIError(); 				break;
-			case 0x88: eora_im();  				break;
-			case 0x89: adca_im();  				break;
-			case 0x8a: ora_im();   				break;
-			case 0x8b: adda_im();  				break;
-			case 0x8c: cmpx_im();  				break;
-			case 0x8d: bsr();	   				break;
-			case 0x8e: ldx_im();   				break;
-			case 0x8f: IIError();  				break;
-			case 0x90: suba_di();  				break;
-			case 0x91: cmpa_di();  				break;
-			case 0x92: sbca_di();  				break;
-			case 0x93: subd_di();  				break;
-			case 0x94: anda_di();  				break;
-			case 0x95: bita_di();  				break;
-			case 0x96: lda_di();   				break;
-			case 0x97: sta_di();   				break;
-			case 0x98: eora_di();  				break;
-			case 0x99: adca_di();  				break;
-			case 0x9a: ora_di();   				break;
-			case 0x9b: adda_di();  				break;
-			case 0x9c: cmpx_di();  				break;
-			case 0x9d: jsr_di();   				break;
-			case 0x9e: ldx_di();   				break;
-			case 0x9f: stx_di();   				break;
-			case 0xa0: suba_ix();  				break;
-			case 0xa1: cmpa_ix();  				break;
-			case 0xa2: sbca_ix();  				break;
-			case 0xa3: subd_ix();  				break;
-			case 0xa4: anda_ix();  				break;
-			case 0xa5: bita_ix();  				break;
-			case 0xa6: lda_ix();   				break;
-			case 0xa7: sta_ix();   				break;
-			case 0xa8: eora_ix();  				break;
-			case 0xa9: adca_ix();  				break;
-			case 0xaa: ora_ix();   				break;
-			case 0xab: adda_ix();  				break;
-			case 0xac: cmpx_ix();  				break;
-			case 0xad: jsr_ix();   				break;
-			case 0xae: ldx_ix();   				break;
-			case 0xaf: stx_ix();   				break;
-			case 0xb0: suba_ex();  				break;
-			case 0xb1: cmpa_ex();  				break;
-			case 0xb2: sbca_ex();  				break;
-			case 0xb3: subd_ex();  				break;
-			case 0xb4: anda_ex();  				break;
-			case 0xb5: bita_ex();  				break;
-			case 0xb6: lda_ex();   				break;
-			case 0xb7: sta_ex();   				break;
-			case 0xb8: eora_ex();  				break;
-			case 0xb9: adca_ex();  				break;
-			case 0xba: ora_ex();   				break;
-			case 0xbb: adda_ex();  				break;
-			case 0xbc: cmpx_ex();  				break;
-			case 0xbd: jsr_ex();   				break;
-			case 0xbe: ldx_ex();   				break;
-			case 0xbf: stx_ex();   				break;
-			case 0xc0: subb_im();  				break;
-			case 0xc1: cmpb_im();  				break;
-			case 0xc2: sbcb_im();  				break;
-			case 0xc3: addd_im();  				break;
-			case 0xc4: andb_im();  				break;
-			case 0xc5: bitb_im();  				break;
-			case 0xc6: ldb_im();   				break;
-			case 0xc7: IIError(); 				break;
-			case 0xc8: eorb_im();  				break;
-			case 0xc9: adcb_im();  				break;
-			case 0xca: orb_im();   				break;
-			case 0xcb: addb_im();  				break;
-			case 0xcc: ldd_im();   				break;
-			case 0xcd: ldq_im();   				break; /* in m6809 was std_im */
-			case 0xce: ldu_im();   				break;
-			case 0xcf: IIError();  				break;
-			case 0xd0: subb_di();  				break;
-			case 0xd1: cmpb_di();  				break;
-			case 0xd2: sbcb_di();  				break;
-			case 0xd3: addd_di();  				break;
-			case 0xd4: andb_di();  				break;
-			case 0xd5: bitb_di();  				break;
-			case 0xd6: ldb_di();   				break;
-			case 0xd7: stb_di();   				break;
-			case 0xd8: eorb_di();  				break;
-			case 0xd9: adcb_di();  				break;
-			case 0xda: orb_di();   				break;
-			case 0xdb: addb_di();  				break;
-			case 0xdc: ldd_di();   				break;
-			case 0xdd: std_di();   				break;
-			case 0xde: ldu_di();   				break;
-			case 0xdf: stu_di();   				break;
-			case 0xe0: subb_ix();  				break;
-			case 0xe1: cmpb_ix();  				break;
-			case 0xe2: sbcb_ix();  				break;
-			case 0xe3: addd_ix();  				break;
-			case 0xe4: andb_ix();  				break;
-			case 0xe5: bitb_ix();  				break;
-			case 0xe6: ldb_ix();   				break;
-			case 0xe7: stb_ix();   				break;
-			case 0xe8: eorb_ix();  				break;
-			case 0xe9: adcb_ix();  				break;
-			case 0xea: orb_ix();   				break;
-			case 0xeb: addb_ix();  				break;
-			case 0xec: ldd_ix();   				break;
-			case 0xed: std_ix();   				break;
-			case 0xee: ldu_ix();   				break;
-			case 0xef: stu_ix();   				break;
-			case 0xf0: subb_ex();  				break;
-			case 0xf1: cmpb_ex();  				break;
-			case 0xf2: sbcb_ex();  				break;
-			case 0xf3: addd_ex();  				break;
-			case 0xf4: andb_ex();  				break;
-			case 0xf5: bitb_ex();  				break;
-			case 0xf6: ldb_ex();   				break;
-			case 0xf7: stb_ex();   				break;
-			case 0xf8: eorb_ex();  				break;
-			case 0xf9: adcb_ex();  				break;
-			case 0xfa: orb_ex();   				break;
-			case 0xfb: addb_ex();  				break;
-			case 0xfc: ldd_ex();   				break;
-			case 0xfd: std_ex();   				break;
-			case 0xfe: ldu_ex();   				break;
-			case 0xff: stu_ex();   				break;
+			case 0x00: neg_di(m68_state);   				break;
+			case 0x01: oim_di(m68_state);   				break;
+			case 0x02: aim_di(m68_state);   				break;
+			case 0x03: com_di(m68_state);   				break;
+			case 0x04: lsr_di(m68_state);   				break;
+			case 0x05: eim_di(m68_state);   				break;
+			case 0x06: ror_di(m68_state);   				break;
+			case 0x07: asr_di(m68_state);   				break;
+			case 0x08: asl_di(m68_state);   				break;
+			case 0x09: rol_di(m68_state);   				break;
+			case 0x0a: dec_di(m68_state);   				break;
+			case 0x0b: tim_di(m68_state);   				break;
+			case 0x0c: inc_di(m68_state);   				break;
+			case 0x0d: tst_di(m68_state);   				break;
+			case 0x0e: jmp_di(m68_state);   				break;
+			case 0x0f: clr_di(m68_state);   				break;
+			case 0x10: pref10(m68_state);				break;
+			case 0x11: pref11(m68_state);				break;
+			case 0x12: nop(m68_state);	   				break;
+			case 0x13: sync(m68_state);	   				break;
+			case 0x14: sexw(m68_state);	   				break;
+			case 0x15: IIError(m68_state);				break;
+			case 0x16: lbra(m68_state);	   				break;
+			case 0x17: lbsr(m68_state);	   				break;
+			case 0x18: IIError(m68_state);				break;
+			case 0x19: daa(m68_state);	   				break;
+			case 0x1a: orcc(m68_state);	   				break;
+			case 0x1b: IIError(m68_state);				break;
+			case 0x1c: andcc(m68_state);    				break;
+			case 0x1d: sex(m68_state);	   				break;
+			case 0x1e: exg(m68_state);	   				break;
+			case 0x1f: tfr(m68_state);	   				break;
+			case 0x20: bra(m68_state);	   				break;
+			case 0x21: brn(m68_state);	   				break;
+			case 0x22: bhi(m68_state);	   				break;
+			case 0x23: bls(m68_state);	   				break;
+			case 0x24: bcc(m68_state);	   				break;
+			case 0x25: bcs(m68_state);	   				break;
+			case 0x26: bne(m68_state);	   				break;
+			case 0x27: beq(m68_state);	   				break;
+			case 0x28: bvc(m68_state);	   				break;
+			case 0x29: bvs(m68_state);	   				break;
+			case 0x2a: bpl(m68_state);	   				break;
+			case 0x2b: bmi(m68_state);	   				break;
+			case 0x2c: bge(m68_state);	   				break;
+			case 0x2d: blt(m68_state);	   				break;
+			case 0x2e: bgt(m68_state);	   				break;
+			case 0x2f: ble(m68_state);	   				break;
+			case 0x30: leax(m68_state);	   				break;
+			case 0x31: leay(m68_state);	   				break;
+			case 0x32: leas(m68_state);	   				break;
+			case 0x33: leau(m68_state);	   				break;
+			case 0x34: pshs(m68_state);	   				break;
+			case 0x35: puls(m68_state);	   				break;
+			case 0x36: pshu(m68_state);	   				break;
+			case 0x37: pulu(m68_state);	   				break;
+			case 0x38: IIError(m68_state);				break;
+			case 0x39: rts(m68_state);	   				break;
+			case 0x3a: abx(m68_state);	   				break;
+			case 0x3b: rti(m68_state);	   				break;
+			case 0x3c: cwai(m68_state);					break;
+			case 0x3d: mul(m68_state);					break;
+			case 0x3e: IIError(m68_state);				break;
+			case 0x3f: swi(m68_state);					break;
+			case 0x40: nega(m68_state);	   				break;
+			case 0x41: IIError(m68_state);				break;
+			case 0x42: IIError(m68_state);				break;
+			case 0x43: coma(m68_state);	   				break;
+			case 0x44: lsra(m68_state);	   				break;
+			case 0x45: IIError(m68_state);				break;
+			case 0x46: rora(m68_state);	   				break;
+			case 0x47: asra(m68_state);	   				break;
+			case 0x48: asla(m68_state);	   				break;
+			case 0x49: rola(m68_state);	   				break;
+			case 0x4a: deca(m68_state);	   				break;
+			case 0x4b: IIError(m68_state);				break;
+			case 0x4c: inca(m68_state);	   				break;
+			case 0x4d: tsta(m68_state);	   				break;
+			case 0x4e: IIError(m68_state);				break;
+			case 0x4f: clra(m68_state);	   				break;
+			case 0x50: negb(m68_state);	   				break;
+			case 0x51: IIError(m68_state);				break;
+			case 0x52: IIError(m68_state);				break;
+			case 0x53: comb(m68_state);	   				break;
+			case 0x54: lsrb(m68_state);	   				break;
+			case 0x55: IIError(m68_state);				break;
+			case 0x56: rorb(m68_state);	   				break;
+			case 0x57: asrb(m68_state);	   				break;
+			case 0x58: aslb(m68_state);	   				break;
+			case 0x59: rolb(m68_state);	   				break;
+			case 0x5a: decb(m68_state);	   				break;
+			case 0x5b: IIError(m68_state);				break;
+			case 0x5c: incb(m68_state);	   				break;
+			case 0x5d: tstb(m68_state);	   				break;
+			case 0x5e: IIError(m68_state);				break;
+			case 0x5f: clrb(m68_state);	   				break;
+			case 0x60: neg_ix(m68_state);   				break;
+			case 0x61: oim_ix(m68_state);   				break;
+			case 0x62: aim_ix(m68_state);   				break;
+			case 0x63: com_ix(m68_state);   				break;
+			case 0x64: lsr_ix(m68_state);   				break;
+			case 0x65: eim_ix(m68_state);   				break;
+			case 0x66: ror_ix(m68_state);   				break;
+			case 0x67: asr_ix(m68_state);   				break;
+			case 0x68: asl_ix(m68_state);   				break;
+			case 0x69: rol_ix(m68_state);   				break;
+			case 0x6a: dec_ix(m68_state);   				break;
+			case 0x6b: tim_ix(m68_state);   				break;
+			case 0x6c: inc_ix(m68_state);   				break;
+			case 0x6d: tst_ix(m68_state);   				break;
+			case 0x6e: jmp_ix(m68_state);   				break;
+			case 0x6f: clr_ix(m68_state);   				break;
+			case 0x70: neg_ex(m68_state);   				break;
+			case 0x71: oim_ex(m68_state);   				break;
+			case 0x72: aim_ex(m68_state);   				break;
+			case 0x73: com_ex(m68_state);   				break;
+			case 0x74: lsr_ex(m68_state);   				break;
+			case 0x75: eim_ex(m68_state);   				break;
+			case 0x76: ror_ex(m68_state);   				break;
+			case 0x77: asr_ex(m68_state);   				break;
+			case 0x78: asl_ex(m68_state);   				break;
+			case 0x79: rol_ex(m68_state);   				break;
+			case 0x7a: dec_ex(m68_state);   				break;
+			case 0x7b: tim_ex(m68_state);   				break;
+			case 0x7c: inc_ex(m68_state);   				break;
+			case 0x7d: tst_ex(m68_state);   				break;
+			case 0x7e: jmp_ex(m68_state);   				break;
+			case 0x7f: clr_ex(m68_state);   				break;
+			case 0x80: suba_im(m68_state);  				break;
+			case 0x81: cmpa_im(m68_state);  				break;
+			case 0x82: sbca_im(m68_state);  				break;
+			case 0x83: subd_im(m68_state);  				break;
+			case 0x84: anda_im(m68_state);  				break;
+			case 0x85: bita_im(m68_state);  				break;
+			case 0x86: lda_im(m68_state);   				break;
+			case 0x87: IIError(m68_state); 				break;
+			case 0x88: eora_im(m68_state);  				break;
+			case 0x89: adca_im(m68_state);  				break;
+			case 0x8a: ora_im(m68_state);   				break;
+			case 0x8b: adda_im(m68_state);  				break;
+			case 0x8c: cmpx_im(m68_state);  				break;
+			case 0x8d: bsr(m68_state);	   				break;
+			case 0x8e: ldx_im(m68_state);   				break;
+			case 0x8f: IIError(m68_state);  				break;
+			case 0x90: suba_di(m68_state);  				break;
+			case 0x91: cmpa_di(m68_state);  				break;
+			case 0x92: sbca_di(m68_state);  				break;
+			case 0x93: subd_di(m68_state);  				break;
+			case 0x94: anda_di(m68_state);  				break;
+			case 0x95: bita_di(m68_state);  				break;
+			case 0x96: lda_di(m68_state);   				break;
+			case 0x97: sta_di(m68_state);   				break;
+			case 0x98: eora_di(m68_state);  				break;
+			case 0x99: adca_di(m68_state);  				break;
+			case 0x9a: ora_di(m68_state);   				break;
+			case 0x9b: adda_di(m68_state);  				break;
+			case 0x9c: cmpx_di(m68_state);  				break;
+			case 0x9d: jsr_di(m68_state);   				break;
+			case 0x9e: ldx_di(m68_state);   				break;
+			case 0x9f: stx_di(m68_state);   				break;
+			case 0xa0: suba_ix(m68_state);  				break;
+			case 0xa1: cmpa_ix(m68_state);  				break;
+			case 0xa2: sbca_ix(m68_state);  				break;
+			case 0xa3: subd_ix(m68_state);  				break;
+			case 0xa4: anda_ix(m68_state);  				break;
+			case 0xa5: bita_ix(m68_state);  				break;
+			case 0xa6: lda_ix(m68_state);   				break;
+			case 0xa7: sta_ix(m68_state);   				break;
+			case 0xa8: eora_ix(m68_state);  				break;
+			case 0xa9: adca_ix(m68_state);  				break;
+			case 0xaa: ora_ix(m68_state);   				break;
+			case 0xab: adda_ix(m68_state);  				break;
+			case 0xac: cmpx_ix(m68_state);  				break;
+			case 0xad: jsr_ix(m68_state);   				break;
+			case 0xae: ldx_ix(m68_state);   				break;
+			case 0xaf: stx_ix(m68_state);   				break;
+			case 0xb0: suba_ex(m68_state);  				break;
+			case 0xb1: cmpa_ex(m68_state);  				break;
+			case 0xb2: sbca_ex(m68_state);  				break;
+			case 0xb3: subd_ex(m68_state);  				break;
+			case 0xb4: anda_ex(m68_state);  				break;
+			case 0xb5: bita_ex(m68_state);  				break;
+			case 0xb6: lda_ex(m68_state);   				break;
+			case 0xb7: sta_ex(m68_state);   				break;
+			case 0xb8: eora_ex(m68_state);  				break;
+			case 0xb9: adca_ex(m68_state);  				break;
+			case 0xba: ora_ex(m68_state);   				break;
+			case 0xbb: adda_ex(m68_state);  				break;
+			case 0xbc: cmpx_ex(m68_state);  				break;
+			case 0xbd: jsr_ex(m68_state);   				break;
+			case 0xbe: ldx_ex(m68_state);   				break;
+			case 0xbf: stx_ex(m68_state);   				break;
+			case 0xc0: subb_im(m68_state);  				break;
+			case 0xc1: cmpb_im(m68_state);  				break;
+			case 0xc2: sbcb_im(m68_state);  				break;
+			case 0xc3: addd_im(m68_state);  				break;
+			case 0xc4: andb_im(m68_state);  				break;
+			case 0xc5: bitb_im(m68_state);  				break;
+			case 0xc6: ldb_im(m68_state);   				break;
+			case 0xc7: IIError(m68_state); 				break;
+			case 0xc8: eorb_im(m68_state);  				break;
+			case 0xc9: adcb_im(m68_state);  				break;
+			case 0xca: orb_im(m68_state);   				break;
+			case 0xcb: addb_im(m68_state);  				break;
+			case 0xcc: ldd_im(m68_state);   				break;
+			case 0xcd: ldq_im(m68_state);   				break; /* in m6809 was std_im */
+			case 0xce: ldu_im(m68_state);   				break;
+			case 0xcf: IIError(m68_state);  				break;
+			case 0xd0: subb_di(m68_state);  				break;
+			case 0xd1: cmpb_di(m68_state);  				break;
+			case 0xd2: sbcb_di(m68_state);  				break;
+			case 0xd3: addd_di(m68_state);  				break;
+			case 0xd4: andb_di(m68_state);  				break;
+			case 0xd5: bitb_di(m68_state);  				break;
+			case 0xd6: ldb_di(m68_state);   				break;
+			case 0xd7: stb_di(m68_state);   				break;
+			case 0xd8: eorb_di(m68_state);  				break;
+			case 0xd9: adcb_di(m68_state);  				break;
+			case 0xda: orb_di(m68_state);   				break;
+			case 0xdb: addb_di(m68_state);  				break;
+			case 0xdc: ldd_di(m68_state);   				break;
+			case 0xdd: std_di(m68_state);   				break;
+			case 0xde: ldu_di(m68_state);   				break;
+			case 0xdf: stu_di(m68_state);   				break;
+			case 0xe0: subb_ix(m68_state);  				break;
+			case 0xe1: cmpb_ix(m68_state);  				break;
+			case 0xe2: sbcb_ix(m68_state);  				break;
+			case 0xe3: addd_ix(m68_state);  				break;
+			case 0xe4: andb_ix(m68_state);  				break;
+			case 0xe5: bitb_ix(m68_state);  				break;
+			case 0xe6: ldb_ix(m68_state);   				break;
+			case 0xe7: stb_ix(m68_state);   				break;
+			case 0xe8: eorb_ix(m68_state);  				break;
+			case 0xe9: adcb_ix(m68_state);  				break;
+			case 0xea: orb_ix(m68_state);   				break;
+			case 0xeb: addb_ix(m68_state);  				break;
+			case 0xec: ldd_ix(m68_state);   				break;
+			case 0xed: std_ix(m68_state);   				break;
+			case 0xee: ldu_ix(m68_state);   				break;
+			case 0xef: stu_ix(m68_state);   				break;
+			case 0xf0: subb_ex(m68_state);  				break;
+			case 0xf1: cmpb_ex(m68_state);  				break;
+			case 0xf2: sbcb_ex(m68_state);  				break;
+			case 0xf3: addd_ex(m68_state);  				break;
+			case 0xf4: andb_ex(m68_state);  				break;
+			case 0xf5: bitb_ex(m68_state);  				break;
+			case 0xf6: ldb_ex(m68_state);   				break;
+			case 0xf7: stb_ex(m68_state);   				break;
+			case 0xf8: eorb_ex(m68_state);  				break;
+			case 0xf9: adcb_ex(m68_state);  				break;
+			case 0xfa: orb_ex(m68_state);   				break;
+			case 0xfb: addb_ex(m68_state);  				break;
+			case 0xfc: ldd_ex(m68_state);   				break;
+			case 0xfd: std_ex(m68_state);   				break;
+			case 0xfe: ldu_ex(m68_state);   				break;
+			case 0xff: stu_ex(m68_state);   				break;
 			}
 #else
-			(*hd6309_main[hd6309.ireg])();
+			(*hd6309_main[m68_state->ireg])(m68_state);
 #endif    /* BIG_SWITCH */
 
-			hd6309_ICount -= cycle_counts_page0[hd6309.ireg];
+			m68_state->icount -= m68_state->cycle_counts_page0[m68_state->ireg];
 
-		} while( hd6309_ICount > 0 );
+		} while( m68_state->icount > 0 );
 
-		hd6309_ICount -= hd6309.extra_cycles;
-		hd6309.extra_cycles = 0;
+		m68_state->icount -= m68_state->extra_cycles;
+		m68_state->extra_cycles = 0;
 	}
 
-	return cycles - hd6309_ICount;	 /* NS 970908 */
+	return cycles - m68_state->icount;	 /* NS 970908 */
 }
 
-INLINE void fetch_effective_address( void )
+INLINE void fetch_effective_address( m68_state_t *m68_state )
 {
 	UINT8 postbyte = ROP_ARG(PCD);
 	PC++;
@@ -1073,30 +1090,30 @@ INLINE void fetch_effective_address( void )
 	case 0x86: EA=X+SIGNED(A);											break;
 	case 0x87: EA=X+SIGNED(E);											break;
 	case 0x88: IMMBYTE(EA); 	EA=X+SIGNED(EA);						break;
-	case 0x89: IMMWORD(ea); 	EA+=X;									break;
+	case 0x89: IMMWORD(EAP); 	EA+=X;									break;
 	case 0x8a: EA=X+SIGNED(F);											break;
 	case 0x8b: EA=X+D;													break;
 	case 0x8c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0x8d: IMMWORD(ea); 	EA+=PC; 								break;
+	case 0x8d: IMMWORD(EAP); 	EA+=PC; 								break;
 	case 0x8e: EA=X+W;													break;
 	case 0x8f: EA=W;		 											break;
 
-	case 0x90: EA=W;								EAD=RM16(EAD);		break;
-	case 0x91: EA=X;	X+=2;						EAD=RM16(EAD);		break;
-	case 0x92: IIError();												break;
-	case 0x93: X-=2;	EA=X;						EAD=RM16(EAD);		break;
-	case 0x94: EA=X;								EAD=RM16(EAD);		break;
-	case 0x95: EA=X+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0x96: EA=X+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0x97: EA=X+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0x98: IMMBYTE(EA); 	EA=X+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0x99: IMMWORD(ea); 	EA+=X;				EAD=RM16(EAD);		break;
-	case 0x9a: EA=X+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0x9b: EA=X+D;								EAD=RM16(EAD);		break;
-	case 0x9c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0x9d: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0x9e: EA=X+W;								EAD=RM16(EAD);		break;
-	case 0x9f: IMMWORD(ea); 						EAD=RM16(EAD);		break;
+	case 0x90: EA=W;								EAD=RM16(m68_state, EAD);		break;
+	case 0x91: EA=X;	X+=2;						EAD=RM16(m68_state, EAD);		break;
+	case 0x92: IIError(m68_state);												break;
+	case 0x93: X-=2;	EA=X;						EAD=RM16(m68_state, EAD);		break;
+	case 0x94: EA=X;								EAD=RM16(m68_state, EAD);		break;
+	case 0x95: EA=X+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0x96: EA=X+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0x97: EA=X+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0x98: IMMBYTE(EA); 	EA=X+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0x99: IMMWORD(EAP); 	EA+=X;				EAD=RM16(m68_state, EAD);		break;
+	case 0x9a: EA=X+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0x9b: EA=X+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0x9c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0x9d: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0x9e: EA=X+W;								EAD=RM16(m68_state, EAD);		break;
+	case 0x9f: IMMWORD(EAP); 						EAD=RM16(m68_state, EAD);		break;
 
 	case 0xa0: EA=Y;	Y++;											break;
 	case 0xa1: EA=Y;	Y+=2;											break;
@@ -1107,30 +1124,30 @@ INLINE void fetch_effective_address( void )
 	case 0xa6: EA=Y+SIGNED(A);											break;
 	case 0xa7: EA=Y+SIGNED(E);											break;
 	case 0xa8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);						break;
-	case 0xa9: IMMWORD(ea); 	EA+=Y;									break;
+	case 0xa9: IMMWORD(EAP); 	EA+=Y;									break;
 	case 0xaa: EA=Y+SIGNED(F);											break;
 	case 0xab: EA=Y+D;													break;
 	case 0xac: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xad: IMMWORD(ea); 	EA+=PC; 								break;
+	case 0xad: IMMWORD(EAP); 	EA+=PC; 								break;
 	case 0xae: EA=Y+W;													break;
-	case 0xaf: IMMWORD(ea);     EA+=W;									break;
+	case 0xaf: IMMWORD(EAP);     EA+=W;									break;
 
-	case 0xb0: IMMWORD(ea); 	EA+=W;				EAD=RM16(EAD);		break;
-	case 0xb1: EA=Y;	Y+=2;						EAD=RM16(EAD);		break;
-	case 0xb2: IIError();												break;
-	case 0xb3: Y-=2;	EA=Y;						EAD=RM16(EAD);		break;
-	case 0xb4: EA=Y;								EAD=RM16(EAD);		break;
-	case 0xb5: EA=Y+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xb6: EA=Y+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xb7: EA=Y+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xb8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xb9: IMMWORD(ea); 	EA+=Y;				EAD=RM16(EAD);		break;
-	case 0xba: EA=Y+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xbb: EA=Y+D;								EAD=RM16(EAD);		break;
-	case 0xbc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xbd: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xbe: EA=Y+W;								EAD=RM16(EAD);		break;
-	case 0xbf: IIError();												break;
+	case 0xb0: IMMWORD(EAP); 	EA+=W;				EAD=RM16(m68_state, EAD);		break;
+	case 0xb1: EA=Y;	Y+=2;						EAD=RM16(m68_state, EAD);		break;
+	case 0xb2: IIError(m68_state);												break;
+	case 0xb3: Y-=2;	EA=Y;						EAD=RM16(m68_state, EAD);		break;
+	case 0xb4: EA=Y;								EAD=RM16(m68_state, EAD);		break;
+	case 0xb5: EA=Y+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0xb6: EA=Y+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0xb7: EA=Y+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0xb8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xb9: IMMWORD(EAP); 	EA+=Y;				EAD=RM16(m68_state, EAD);		break;
+	case 0xba: EA=Y+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0xbb: EA=Y+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0xbc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xbd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xbe: EA=Y+W;								EAD=RM16(m68_state, EAD);		break;
+	case 0xbf: IIError(m68_state);												break;
 
 	case 0xc0: EA=U;			U++;									break;
 	case 0xc1: EA=U;			U+=2;									break;
@@ -1141,30 +1158,30 @@ INLINE void fetch_effective_address( void )
 	case 0xc6: EA=U+SIGNED(A);											break;
 	case 0xc7: EA=U+SIGNED(E);											break;
 	case 0xc8: IMMBYTE(EA); 	EA=U+SIGNED(EA);						break;
-	case 0xc9: IMMWORD(ea); 	EA+=U;									break;
+	case 0xc9: IMMWORD(EAP); 	EA+=U;									break;
 	case 0xca: EA=U+SIGNED(F);											break;
 	case 0xcb: EA=U+D;													break;
 	case 0xcc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xcd: IMMWORD(ea); 	EA+=PC; 								break;
+	case 0xcd: IMMWORD(EAP); 	EA+=PC; 								break;
 	case 0xce: EA=U+W;													break;
 	case 0xcf: EA=W;            W+=2;									break;
 
-	case 0xd0: EA=W;	W+=2;						EAD=RM16(EAD);		break;
-	case 0xd1: EA=U;	U+=2;						EAD=RM16(EAD);		break;
-	case 0xd2: IIError();												break;
-	case 0xd3: U-=2;	EA=U;						EAD=RM16(EAD);		break;
-	case 0xd4: EA=U;								EAD=RM16(EAD);		break;
-	case 0xd5: EA=U+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xd6: EA=U+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xd7: EA=U+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xd8: IMMBYTE(EA); 	EA=U+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xd9: IMMWORD(ea); 	EA+=U;				EAD=RM16(EAD);		break;
-	case 0xda: EA=U+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xdb: EA=U+D;								EAD=RM16(EAD);		break;
-	case 0xdc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xdd: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xde: EA=U+W;								EAD=RM16(EAD);		break;
-	case 0xdf: IIError();												break;
+	case 0xd0: EA=W;	W+=2;						EAD=RM16(m68_state, EAD);		break;
+	case 0xd1: EA=U;	U+=2;						EAD=RM16(m68_state, EAD);		break;
+	case 0xd2: IIError(m68_state);												break;
+	case 0xd3: U-=2;	EA=U;						EAD=RM16(m68_state, EAD);		break;
+	case 0xd4: EA=U;								EAD=RM16(m68_state, EAD);		break;
+	case 0xd5: EA=U+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0xd6: EA=U+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0xd7: EA=U+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0xd8: IMMBYTE(EA); 	EA=U+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xd9: IMMWORD(EAP); 	EA+=U;				EAD=RM16(m68_state, EAD);		break;
+	case 0xda: EA=U+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0xdb: EA=U+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0xdc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xdd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xde: EA=U+W;								EAD=RM16(m68_state, EAD);		break;
+	case 0xdf: IIError(m68_state);												break;
 
 	case 0xe0: EA=S;	S++;											break;
 	case 0xe1: EA=S;	S+=2;											break;
@@ -1175,33 +1192,33 @@ INLINE void fetch_effective_address( void )
 	case 0xe6: EA=S+SIGNED(A);											break;
 	case 0xe7: EA=S+SIGNED(E);											break;
 	case 0xe8: IMMBYTE(EA); 	EA=S+SIGNED(EA);						break;
-	case 0xe9: IMMWORD(ea); 	EA+=S;									break;
+	case 0xe9: IMMWORD(EAP); 	EA+=S;									break;
 	case 0xea: EA=S+SIGNED(F);											break;
 	case 0xeb: EA=S+D;													break;
 	case 0xec: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xed: IMMWORD(ea); 	EA+=PC; 								break;
+	case 0xed: IMMWORD(EAP); 	EA+=PC; 								break;
 	case 0xee: EA=S+W;													break;
 	case 0xef: W-=2;	EA=W;											break;
 
-	case 0xf0: W-=2;	EA=W;						EAD=RM16(EAD);		break;
-	case 0xf1: EA=S;	S+=2;						EAD=RM16(EAD);		break;
-	case 0xf2: IIError();												break;
-	case 0xf3: S-=2;	EA=S;						EAD=RM16(EAD);		break;
-	case 0xf4: EA=S;								EAD=RM16(EAD);		break;
-	case 0xf5: EA=S+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xf6: EA=S+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xf7: EA=S+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xf8: IMMBYTE(EA); 	EA=S+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xf9: IMMWORD(ea); 	EA+=S;				EAD=RM16(EAD);		break;
-	case 0xfa: EA=S+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xfb: EA=S+D;								EAD=RM16(EAD);		break;
-	case 0xfc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xfd: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xfe: EA=S+W;								EAD=RM16(EAD);		break;
-	case 0xff: IIError();												break;
+	case 0xf0: W-=2;	EA=W;						EAD=RM16(m68_state, EAD);		break;
+	case 0xf1: EA=S;	S+=2;						EAD=RM16(m68_state, EAD);		break;
+	case 0xf2: IIError(m68_state);												break;
+	case 0xf3: S-=2;	EA=S;						EAD=RM16(m68_state, EAD);		break;
+	case 0xf4: EA=S;								EAD=RM16(m68_state, EAD);		break;
+	case 0xf5: EA=S+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0xf6: EA=S+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0xf7: EA=S+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0xf8: IMMBYTE(EA); 	EA=S+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xf9: IMMWORD(EAP); 	EA+=S;				EAD=RM16(m68_state, EAD);		break;
+	case 0xfa: EA=S+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0xfb: EA=S+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0xfc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xfd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xfe: EA=S+W;								EAD=RM16(m68_state, EAD);		break;
+	case 0xff: IIError(m68_state);												break;
 	}
 
-	hd6309_ICount -= index_cycle[postbyte];
+	m68_state->icount -= m68_state->index_cycle[postbyte];
 }
 
 
@@ -1211,19 +1228,21 @@ INLINE void fetch_effective_address( void )
 
 static CPU_SET_INFO( hd6309 )
 {
+	m68_state_t *m68_state = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:	set_irq_line(HD6309_IRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:set_irq_line(HD6309_FIRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:	set_irq_line(m68_state, HD6309_IRQ_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:set_irq_line(m68_state, HD6309_FIRQ_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(m68_state, INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + HD6309_PC:		PC = info->i; CHANGE_PC;					break;
+		case CPUINFO_INT_REGISTER + HD6309_PC:		PC = info->i;								break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + HD6309_S:		S = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_CC:		CC = info->i; CHECK_IRQ_LINES();			break;
-		case CPUINFO_INT_REGISTER + HD6309_MD:		MD = info->i; UpdateState();				break;
+		case CPUINFO_INT_REGISTER + HD6309_CC:		CC = info->i; check_irq_lines(m68_state);			break;
+		case CPUINFO_INT_REGISTER + HD6309_MD:		MD = info->i; UpdateState(m68_state);				break;
 		case CPUINFO_INT_REGISTER + HD6309_U: 		U = info->i;								break;
 		case CPUINFO_INT_REGISTER + HD6309_A: 		A = info->i;								break;
 		case CPUINFO_INT_REGISTER + HD6309_B: 		B = info->i;								break;
@@ -1244,10 +1263,12 @@ static CPU_SET_INFO( hd6309 )
 
 CPU_GET_INFO( hd6309 )
 {
+	m68_state_t *m68_state = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(hd6309);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68_state_t);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
@@ -1268,9 +1289,9 @@ CPU_GET_INFO( hd6309 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:	info->i = hd6309.irq_state[HD6309_IRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:info->i = hd6309.irq_state[HD6309_FIRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = hd6309.nmi_state;				break;
+		case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:	info->i = m68_state->irq_state[HD6309_IRQ_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:info->i = m68_state->irq_state[HD6309_FIRQ_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = m68_state->nmi_state;				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;							break;
 
@@ -1300,7 +1321,7 @@ CPU_GET_INFO( hd6309 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd6309);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6309);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hd6309_ICount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68_state->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD6309");				break;
@@ -1311,33 +1332,33 @@ CPU_GET_INFO( hd6309 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c (MD:%c%c%c%c)",
-				hd6309.cc & 0x80 ? 'E':'.',
-				hd6309.cc & 0x40 ? 'F':'.',
-				hd6309.cc & 0x20 ? 'H':'.',
-				hd6309.cc & 0x10 ? 'I':'.',
-				hd6309.cc & 0x08 ? 'N':'.',
-				hd6309.cc & 0x04 ? 'Z':'.',
-				hd6309.cc & 0x02 ? 'V':'.',
-				hd6309.cc & 0x01 ? 'C':'.',
+				m68_state->cc & 0x80 ? 'E':'.',
+				m68_state->cc & 0x40 ? 'F':'.',
+				m68_state->cc & 0x20 ? 'H':'.',
+				m68_state->cc & 0x10 ? 'I':'.',
+				m68_state->cc & 0x08 ? 'N':'.',
+				m68_state->cc & 0x04 ? 'Z':'.',
+				m68_state->cc & 0x02 ? 'V':'.',
+				m68_state->cc & 0x01 ? 'C':'.',
 
-				hd6309.md & 0x80 ? 'E':'e',
-				hd6309.md & 0x40 ? 'F':'f',
-				hd6309.md & 0x02 ? 'I':'i',
-				hd6309.md & 0x01 ? 'Z':'z');
+				m68_state->md & 0x80 ? 'E':'e',
+				m68_state->md & 0x40 ? 'F':'f',
+				m68_state->md & 0x02 ? 'I':'i',
+				m68_state->md & 0x01 ? 'Z':'z');
 			break;
 
-		case CPUINFO_STR_REGISTER + HD6309_PC:			sprintf(info->s, "PC:%04X", hd6309.pc.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_S:			sprintf(info->s, "S:%04X", hd6309.s.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_CC:			sprintf(info->s, "CC:%02X", hd6309.cc); break;
-		case CPUINFO_STR_REGISTER + HD6309_MD:			sprintf(info->s, "MD:%02X", hd6309.md); break;
-		case CPUINFO_STR_REGISTER + HD6309_U:			sprintf(info->s, "U:%04X", hd6309.u.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_A:			sprintf(info->s, "A:%02X", hd6309.d.b.h); break;
-		case CPUINFO_STR_REGISTER + HD6309_B:			sprintf(info->s, "B:%02X", hd6309.d.b.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_E:			sprintf(info->s, "E:%02X", hd6309.w.b.h); break;
-		case CPUINFO_STR_REGISTER + HD6309_F:			sprintf(info->s, "F:%02X", hd6309.w.b.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_X:			sprintf(info->s, "X:%04X", hd6309.x.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_Y:			sprintf(info->s, "Y:%04X", hd6309.y.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_V:			sprintf(info->s, "V:%04X", hd6309.v.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_DP:			sprintf(info->s, "DP:%02X", hd6309.dp.b.h); break;
+		case CPUINFO_STR_REGISTER + HD6309_PC:			sprintf(info->s, "PC:%04X", m68_state->pc.w.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_S:			sprintf(info->s, "S:%04X", m68_state->s.w.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_CC:			sprintf(info->s, "CC:%02X", m68_state->cc); break;
+		case CPUINFO_STR_REGISTER + HD6309_MD:			sprintf(info->s, "MD:%02X", m68_state->md); break;
+		case CPUINFO_STR_REGISTER + HD6309_U:			sprintf(info->s, "U:%04X", m68_state->u.w.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_A:			sprintf(info->s, "A:%02X", m68_state->d.b.h); break;
+		case CPUINFO_STR_REGISTER + HD6309_B:			sprintf(info->s, "B:%02X", m68_state->d.b.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_E:			sprintf(info->s, "E:%02X", m68_state->w.b.h); break;
+		case CPUINFO_STR_REGISTER + HD6309_F:			sprintf(info->s, "F:%02X", m68_state->w.b.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_X:			sprintf(info->s, "X:%04X", m68_state->x.w.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_Y:			sprintf(info->s, "Y:%04X", m68_state->y.w.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_V:			sprintf(info->s, "V:%04X", m68_state->v.w.l); break;
+		case CPUINFO_STR_REGISTER + HD6309_DP:			sprintf(info->s, "DP:%02X", m68_state->dp.b.h); break;
 	}
 }

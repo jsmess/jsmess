@@ -78,7 +78,7 @@ static void appoooh_adpcm_int(running_machine *machine, int num)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	UINT8 *RAM = memory_region(machine, "adpcm");
+	UINT8 *RAM = memory_region(space->machine, "adpcm");
 	adpcmptr  = &RAM[data*256];
 	msm5205_reset_w(0,0);
 	appoooh_adpcm_data=-1;
@@ -554,7 +554,8 @@ static DRIVER_INIT(robowres){
 }
 
 static DRIVER_INIT(robowrb){
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x1c000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x1c000);
 }
 
 

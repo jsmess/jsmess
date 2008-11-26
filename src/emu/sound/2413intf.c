@@ -48,7 +48,7 @@ static void _stream_update(void *param, int interval)
 	stream_update(info->stream);
 }
 
-static void *ym2413_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2413 )
 {
 	int rate = clock/72;
 	struct ym2413_info *info;
@@ -57,7 +57,7 @@ static void *ym2413_start(const char *tag, int sndindex, int clock, const void *
 	memset(info, 0, sizeof(*info));
 
 	/* emulator create */
-	info->chip = ym2413_init(clock, rate, sndindex);
+	info->chip = ym2413_init(clock, rate, tag);
 	if (!info->chip)
 		return NULL;
 
@@ -95,15 +95,15 @@ static void *ym2413_start(const char *tag, int sndindex, int clock, const void *
 
 }
 
-static void ym2413_stop (void *chip)
+static SND_STOP( ym2413 )
 {
-	struct ym2413_info *info = chip;
+	struct ym2413_info *info = token;
 	ym2413_shutdown(info->chip);
 }
 
-static void ym2413_reset (void *chip)
+static SND_RESET( ym2413 )
 {
-	struct ym2413_info *info = chip;
+	struct ym2413_info *info = token;
 	ym2413_reset_chip(info->chip);
 }
 
@@ -139,23 +139,23 @@ WRITE8_HANDLER( ym2413_data_port_1_w ) { struct ym2413_info *info = sndti_token(
 WRITE8_HANDLER( ym2413_data_port_2_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 2); ym2413_write (info->chip, 1, data); } /* 3rd chip */
 WRITE8_HANDLER( ym2413_data_port_3_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 3); ym2413_write (info->chip, 1, data); } /* 4th chip */
 
-WRITE16_HANDLER( ym2413_register_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_0_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_register_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_register_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
-WRITE16_HANDLER( ym2413_register_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_1_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_register_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_2_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_register_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_3_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_0_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_data_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
-WRITE16_HANDLER( ym2413_data_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_1_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_2_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_3_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_0_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_register_port_0_w(space,offset,((data & 0xff00) >> 8)); }
+WRITE16_HANDLER( ym2413_register_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_1_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_2_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_3_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_0_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_data_port_0_w(space,offset,((data & 0xff00) >> 8)); }
+WRITE16_HANDLER( ym2413_data_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_1_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_2_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_3_w(space,offset,data & 0xff); }
 
 
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static void ym2413_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym2413 )
 {
 	switch (state)
 	{
@@ -164,17 +164,17 @@ static void ym2413_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym2413_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2413 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym2413_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2413_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2413_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2413_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2413 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2413 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2413 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2413 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM2413";						break;

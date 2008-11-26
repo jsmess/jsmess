@@ -230,7 +230,7 @@ static MACHINE_RESET( mpu4_vid )
 {
 	ROC10937_reset(0);
 
-/*  cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE); */
+/*  cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE); */
 	mpu4_stepper_reset();
 
 	lamp_strobe    = 0;
@@ -271,9 +271,9 @@ static MACHINE_RESET( mpu4_vid )
 
 static void update_mpu68_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 1, 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 2, m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 2, m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */
@@ -282,7 +282,7 @@ static void update_mpu68_interrupts(running_machine *machine)
 static void m6809_acia_irq(int state)
 {
 	m68k_acia_cts = state;
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[0], M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 
@@ -329,7 +329,7 @@ static void cpu1_ptm_irq(running_machine *machine, int state)
 
 static WRITE8_HANDLER( vid_o1_callback )
 {
-	ptm6840_set_c2(   machine, 1, data); /* this output is the clock for timer2 */
+	ptm6840_set_c2(   space->machine, 1, data); /* this output is the clock for timer2 */
 
 	if (data)
 	{
@@ -343,13 +343,13 @@ static WRITE8_HANDLER( vid_o1_callback )
 
 static WRITE8_HANDLER( vid_o2_callback )
 {
-	ptm6840_set_c3(   machine, 1, data); /* this output is the clock for timer3 */
+	ptm6840_set_c3(   space->machine, 1, data); /* this output is the clock for timer3 */
 }
 
 
 static WRITE8_HANDLER( vid_o3_callback )
 {
-	ptm6840_set_c1(   machine, 1, data); /* this output is the clock for timer1 */
+	ptm6840_set_c1(   space->machine, 1, data); /* this output is the clock for timer1 */
 }
 
 
@@ -920,19 +920,19 @@ static READ16_HANDLER( mpu4_vid_scn2674_r )
         */
 
 		case 0:
-			LOGSTUFF(("Read Irq Register %06x\n",activecpu_get_pc()));
+			LOGSTUFF(("Read Irq Register %06x\n",cpu_get_pc(space->cpu)));
 			return scn2674_irq_register;
 
 		case 1:
-			LOGSTUFF(("Read Status Register %06x\n",activecpu_get_pc()));
+			LOGSTUFF(("Read Status Register %06x\n",cpu_get_pc(space->cpu)));
 			return scn2674_status_register;
 
-		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",activecpu_get_pc()));return scn2674_screen1_l;
-		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",activecpu_get_pc()));return scn2674_screen1_h;
-		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",activecpu_get_pc()));return scn2674_cursor_l;
-		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",activecpu_get_pc()));return scn2674_cursor_h;
-		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",activecpu_get_pc()));return scn2674_screen2_l;
-		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",activecpu_get_pc()));return scn2674_screen2_h;
+		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen1_l;
+		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen1_h;
+		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_cursor_l;
+		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_cursor_h;
+		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen2_l;
+		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen2_h;
 	}
 
 	return 0xffff;
@@ -962,7 +962,7 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 			break;
 
 		case 1:
-			scn2674_write_command(machine, data);
+			scn2674_write_command(space->machine, data);
 			break;
 
 		case 2: scn2674_screen1_l = data; break;
@@ -1054,7 +1054,7 @@ static WRITE16_HANDLER( ef9369_w )
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(machine, entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
+			palette_set_color_rgb(space->machine, entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
 		}
 
 			/* Address register auto-increment */
@@ -1328,7 +1328,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN(mpu4_vid_irq)
 {
 	LOGSTUFF(("scn2674_irq_mask %02x\n",scn2674_irq_mask));
-	if (cpu_getiloops()==0) /* vbl */
+	if (cpu_getiloops(device)==0) /* vbl */
 	{
 	/*  if (scn2674_display_enabled) ? */
 		{
@@ -1336,7 +1336,7 @@ static INTERRUPT_GEN(mpu4_vid_irq)
 			{
 				LOGSTUFF(("vblank irq\n"));
 				scn2674_irq_state = 1;
-				update_mpu68_interrupts(machine);
+				update_mpu68_interrupts(device->machine);
 
 				scn2674_irq_register |= 0x10;
 			}
@@ -1388,7 +1388,7 @@ static WRITE16_HANDLER( characteriser16_w )
 {
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", activecpu_get_previouspc(),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
 	for (x = prot_col; x < 64; x++)
 	{
 		if (call == 0)
@@ -1410,7 +1410,7 @@ static WRITE16_HANDLER( characteriser16_w )
 
 static READ16_HANDLER( characteriser16_r )
 {
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", activecpu_get_previouspc(),offset,MPU4_chr_data[prot_col]));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(space->cpu),offset,MPU4_chr_data[prot_col]));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[prot_col]));
 	return MPU4_chr_data[prot_col];
@@ -1607,7 +1607,7 @@ static VIDEO_UPDATE(dealem)
 
 static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_NMI, vsync);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, vsync);
 }
 
 /*************************************

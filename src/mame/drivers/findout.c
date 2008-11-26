@@ -66,7 +66,9 @@ static READ8_DEVICE_HANDLER( portC_r )
 
 static READ8_DEVICE_HANDLER( port1_r )
 {
-	return input_port_read(device->machine, "IN0") | (ticket_dispenser_0_r(device->machine, 0) >> 5);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	return input_port_read(device->machine, "IN0") | (ticket_dispenser_0_r(space, 0) >> 5);
 }
 
 static WRITE8_DEVICE_HANDLER( lamps_w )
@@ -85,20 +87,22 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
 
 static WRITE8_DEVICE_HANDLER( sound_w )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* bit 3 - coin lockout (lamp6 in test modes, set to lamp 10 as in getrivia.c) */
 	coin_lockout_global_w(~data & 0x08);
 	set_led_status(9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(device->machine, 0, (data & 0x20)<< 2);
+	ticket_dispenser_w(space, 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(device->machine, 0,data & 0x40);
+	interrupt_enable_w(space, 0,data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
 	dac_data_w(0,((data & 0x80) >> 7) * 255);
 
-//  logerror("%04x: sound_w %02x\n",activecpu_get_pc(),data);
+//  logerror("%04x: sound_w %02x\n",cpu_get_pc(machine->activecpu),data);
 //  popmessage("%02x",data);
 }
 
@@ -130,7 +134,7 @@ static MACHINE_RESET( findout )
 
 static READ8_HANDLER( catchall )
 {
-	int pc = activecpu_get_pc();
+	int pc = cpu_get_pc(space->cpu);
 
 	if (pc != 0x3c74 && pc != 0x0364 && pc != 0x036d)	/* weed out spurious blit reads */
 		logerror("%04x: unmapped memory read from %04x\n",pc,offset);
@@ -140,27 +144,27 @@ static READ8_HANDLER( catchall )
 
 static WRITE8_HANDLER( banksel_main_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x8000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x8000);
 }
 static WRITE8_HANDLER( banksel_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x10000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x18000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_3_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x20000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_4_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x28000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x28000);
 }
 static WRITE8_HANDLER( banksel_5_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x30000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x30000);
 }
 
 

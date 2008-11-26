@@ -25,28 +25,28 @@ VIDEO_UPDATE( labyrunr );
 
 static INTERRUPT_GEN( labyrunr_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		if (K007121_ctrlram[0][0x07] & 0x02)
-			cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2)
+	else if (cpu_getiloops(device) % 2)
 	{
 		if (K007121_ctrlram[0][0x07] & 0x01)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( labyrunr_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 if (data & 0xe0) popmessage("bankswitch %02x",data);
 
 	/* bits 0-2 = bank number */
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bits 3 and 4 are coin counters */
 	coin_counter_w(0,data & 0x08);

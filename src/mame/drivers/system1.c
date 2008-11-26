@@ -39,13 +39,13 @@ static MACHINE_RESET( system1 )
 static MACHINE_RESET( system1_banked )
 {
 	MACHINE_RESET_CALL(system1);
-	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static MACHINE_RESET( wbml )
 {
 	system1_define_background_memory(system1_BACKGROUND_MEMORY_BANKED);
-	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 // Noboranka: there seems to be some protection? involving reads / writes to ports in the 2x region
@@ -54,71 +54,71 @@ static int inport16_step,inport17_step,inport23_step;
 
 static READ8_HANDLER( inport16_r )
 {
-//  logerror("IN  $16 : pc = %04x - data = %02x\n",activecpu_get_pc(),inport16_step);
+//  logerror("IN  $16 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),inport16_step);
 	return(inport16_step);
 }
 
 static READ8_HANDLER( inport1c_r )
 {
-//  logerror("IN  $1c : pc = %04x - data = 0x80\n",activecpu_get_pc());
+//  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(space->cpu));
 	return(0x80);	// infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 static READ8_HANDLER( inport22_r )
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",activecpu_get_pc(),inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),inport17_step);
 	return(inport17_step);
 }
 
 static READ8_HANDLER( inport23_r )
 {
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",activecpu_get_pc(),inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(space->cpu),inport23_step);
 	return(inport23_step);
 }
 
 static WRITE8_HANDLER( outport16_w )
 {
-//  logerror("OUT $16 : pc = %04x - data = %02x\n",activecpu_get_pc(),data);
+//  logerror("OUT $16 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
 	inport16_step = data;
 }
 
 static WRITE8_HANDLER( outport17_w )
 {
-//  logerror("OUT $17 : pc = %04x - data = %02x\n",activecpu_get_pc(),data);
+//  logerror("OUT $17 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
 	inport17_step = data;
 }
 
 static WRITE8_HANDLER( outport24_w )
 {
-//  logerror("OUT $24 : pc = %04x - data = %02x\n",activecpu_get_pc(),data);
+//  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
 	inport23_step = data;
 }
 
 static WRITE8_HANDLER( hvymetal_videomode_w )
 {
-	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(machine, 0, data);
+	memory_set_bank(space->machine, 1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
+	system1_videomode_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( brain_videomode_w )
 {
-	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(machine, 0, data);
+	memory_set_bank(space->machine, 1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
+	system1_videomode_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( chplft_videomode_w )
 {
-	memory_set_bank(1, (data & 0x0c)>>2);
-	system1_videomode_w(machine, 0, data);
+	memory_set_bank(space->machine, 1, (data & 0x0c)>>2);
+	system1_videomode_w(space, 0, data);
 }
 
 
 static WRITE8_HANDLER( system1_soundport_w )
 {
-	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
 }
 
 /* protection values from real hardware, these were verified to be the same on the title
@@ -3988,18 +3988,18 @@ static READ8_HANDLER( dakkochn_port_04_r )
 static WRITE8_HANDLER( dakkochn_port_15_w )
 {
 	dakkochn_control = data; // check if any control multiplex bits are in here!
-	chplft_videomode_w(machine,offset,data);
+	chplft_videomode_w(space,offset,data);
 }
 
 static DRIVER_INIT( dakkochn )
 {
 	mc8123_decrypt_rom(machine, "main", "user1", 1, 4);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
 
 }
 
@@ -4073,14 +4073,16 @@ static DRIVER_INIT( noboranb )
 
 static DRIVER_INIT( bootleg )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
 }
 
 
 static DRIVER_INIT( bootlegb )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x20000);
-	memory_configure_bank_decrypted(1, 0, 4, memory_region(machine, "main") + 0x30000, 0x4000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x20000);
+	memory_configure_bank_decrypted(machine, 1, 0, 4, memory_region(machine, "main") + 0x30000, 0x4000);
 }
 
 /*************************************

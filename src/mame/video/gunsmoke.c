@@ -83,7 +83,7 @@ WRITE8_HANDLER( gunsmoke_c804_w )
 	coin_counter_w(0, data & 0x02);
 
 	/* bits 2 and 3 select the ROM bank */
-	memory_set_bank(1, (data & 0x0c) >> 2);
+	memory_set_bank(space->machine, 1, (data & 0x0c) >> 2);
 
 	/* bit 5 resets the sound CPU? - we ignore it */
 
@@ -134,7 +134,7 @@ VIDEO_START( gunsmoke )
 {
 	/* configure ROM banking */
 	UINT8 *rombase = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 4, &rombase[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x4000);
 
 	/* create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);

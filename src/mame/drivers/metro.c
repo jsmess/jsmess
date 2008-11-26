@@ -82,7 +82,7 @@ driver modified by Eisuke Watanabe
 
 #include "driver.h"
 #include "deprecat.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/eeprom.h"
 #include "video/konamiic.h"
@@ -153,9 +153,11 @@ static READ16_HANDLER( metro_irq_cause_r )
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/*  Get the pending IRQs (only the enabled ones, e.g. where
         irq_enable is *0*)  */
-	UINT16 irq = metro_irq_cause_r(machine,0,0xffff) & ~*metro_irq_enable;
+	UINT16 irq = metro_irq_cause_r(space, 0, 0xffff) & ~*metro_irq_enable;
 
 	if (irq_line == -1)	/* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
@@ -168,7 +170,7 @@ static void update_irq_state(running_machine *machine)
 			if (irq & (1 << i))
 				irq_level[metro_irq_levels[i]&7] = 1;
 		for (i = 0; i < 8; i++)
-			cpunum_set_input_line(machine, 0, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -177,7 +179,7 @@ static void update_irq_state(running_machine *machine)
             source by peeking a register (metro_irq_cause_r) */
 
 		int state =	(irq ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, irq_line, state);
+		cpu_set_input_line(machine->cpu[0], irq_line, state);
 	}
 }
 
@@ -185,20 +187,20 @@ static void update_irq_state(running_machine *machine)
 /* For games that supply an *IRQ Vector* on the data bus */
 static IRQ_CALLBACK(metro_irq_callback)
 {
-//  logerror("CPU #0 PC %06X: irq callback returns %04X\n",activecpu_get_pc(),metro_irq_vectors[int_level]);
+//  logerror("CPU #0 PC %06X: irq callback returns %04X\n",cpu_get_pc(machine->activecpu),metro_irq_vectors[int_level]);
 	return metro_irq_vectors[irqline]&0xff;
 }
 
 static MACHINE_RESET( metro )
 {
 	if (irq_line == -1)
-		cpunum_set_irq_callback(0, metro_irq_callback);
+		cpu_set_irq_callback(machine->cpu[0], metro_irq_callback);
 }
 
 
 static WRITE16_HANDLER( metro_irq_cause_w )
 {
-//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",activecpu_get_pc(),data);
+//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",cpu_get_pc(space->cpu),data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -214,22 +216,22 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 		if (data & 0x80)	requested_int[7] = 0;
 	}
 
-	update_irq_state(machine);
+	update_irq_state(space->machine);
 }
 
 
 static INTERRUPT_GEN( metro_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[0] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
@@ -239,7 +241,7 @@ static INTERRUPT_GEN( bangball_interrupt )
 {
 	requested_int[0] = 1;	// set scroll regs if a flag is set
 	requested_int[4] = 1;	// clear that flag
-	update_irq_state(machine);
+	update_irq_state(device->machine);
 }
 
 
@@ -251,19 +253,19 @@ static TIMER_CALLBACK( vblank_end_callback )
 /* lev 2-7 (lev 1 seems sound related) */
 static INTERRUPT_GEN( karatour_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[0] = 1;
 			requested_int[5] = 1;	// write the scroll registers
 			/* the duration is a guess */
 			timer_set(ATTOTIME_IN_USEC(2500), NULL, 0, vblank_end_callback);
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
@@ -285,39 +287,39 @@ static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 static INTERRUPT_GEN( mouja_interrupt )
 {
 	requested_int[1] = 1;
-	update_irq_state(machine);
+	update_irq_state(device->machine);
 }
 
 
 static INTERRUPT_GEN( gakusai_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
 
 static INTERRUPT_GEN( dokyusei_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 		case 1:	// needed?
 			requested_int[5] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
 
 static void ymf278b_interrupt(running_machine *machine, int active)
 {
-	cpunum_set_input_line(machine, 0, 2, active);
+	cpu_set_input_line(machine->cpu[0], 2, active);
 }
 
 /***************************************************************************
@@ -333,14 +335,16 @@ static int porta, portb, busy_sndcpu;
 
 static int metro_io_callback(int ioline, int state)
 {
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	UINT8 data = 0;
 
     switch ( ioline )
 	{
 		case UPD7810_RXD:	/* read the RxD line */
-			data = soundlatch_r(Machine,0);
+			data = soundlatch_r(space,0);
 			state = data & 1;
-			soundlatch_w(Machine, 0, data >> 1);
+			soundlatch_w(space, 0, data >> 1);
 			break;
 		default:
 			logerror("upd7810 ioline %d not handled\n", ioline);
@@ -353,9 +357,9 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_int();
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_spinuntil_int(space->cpu);
 		busy_sndcpu = 1;
 	}
 }
@@ -381,23 +385,23 @@ static WRITE16_HANDLER( metro_soundstatus_w )
 static WRITE8_HANDLER( metro_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(machine, "audio");
+	UINT8 *ROM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
 
-	memory_set_bankptr(1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 }
 
 static WRITE8_HANDLER( daitorid_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(machine, "audio");
+	UINT8 *ROM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
 
-	memory_set_bankptr(1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 }
 
 
@@ -437,9 +441,9 @@ static WRITE8_HANDLER( metro_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				ym2413_data_port_0_w(machine,0,porta);
+				ym2413_data_port_0_w(space,0,porta);
 			else
-				ym2413_register_port_0_w(machine,0,porta);
+				ym2413_register_port_0_w(space,0,porta);
 		}
 		portb = data;
 		return;
@@ -449,7 +453,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			okim6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(space,0,porta);
 	}
 	portb = data;
 }
@@ -481,15 +485,15 @@ static WRITE8_HANDLER( daitorid_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				ym2151_data_port_0_w(machine,0,porta);
+				ym2151_data_port_0_w(space,0,porta);
 			else
-				ym2151_register_port_0_w(machine,0,porta);
+				ym2151_register_port_0_w(space,0,porta);
 		}
 		if (!BIT(data,3))
 		{
 			/* read */
 			if (BIT(data,1))
-				porta = ym2151_status_port_0_r(machine,0);
+				porta = ym2151_status_port_0_r(space,0);
 		}
 		portb = data;
 		return;
@@ -499,20 +503,20 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			okim6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(space,0,porta);
 	}
 	if (BIT(portb,3) && !BIT(data,3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data,4))
-			porta = okim6295_status_0_r(machine,0);
+			porta = okim6295_status_0_r(space,0);
 	}
 	portb = data;
 }
 
 static void metro_sound_irq_handler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -523,7 +527,7 @@ static const ym2151_interface ym2151_config =
 
 static READ16_HANDLER( ymf278b_r )
 {
-	return ymf278b_status_port_0_r(machine, 0);
+	return ymf278b_status_port_0_r(space, 0);
 }
 
 static WRITE16_HANDLER( ymf278b_w )
@@ -532,22 +536,22 @@ static WRITE16_HANDLER( ymf278b_w )
 		switch(offset)
 		{
 			case 0:
-				ymf278b_control_port_0_a_w(machine, 0, data);
+				ymf278b_control_port_0_a_w(space, 0, data);
 				break;
 			case 1:
-				ymf278b_data_port_0_a_w(machine, 0, data);
+				ymf278b_data_port_0_a_w(space, 0, data);
 				break;
 			case 2:
-				ymf278b_control_port_0_b_w(machine, 0, data);
+				ymf278b_control_port_0_b_w(space, 0, data);
 				break;
 			case 3:
-				ymf278b_data_port_0_b_w(machine, 0, data);
+				ymf278b_data_port_0_b_w(space, 0, data);
 				break;
 			case 4:
-				ymf278b_control_port_0_c_w(machine, 0, data);
+				ymf278b_control_port_0_c_w(space, 0, data);
 				break;
 			case 5:
-				ymf278b_data_port_0_c_w(machine, 0, data);
+				ymf278b_data_port_0_c_w(space, 0, data);
 				break;
 		}
 }
@@ -576,14 +580,14 @@ static WRITE16_HANDLER( metro_coin_lockout_1word_w )
 //      coin_lockout_w(0, data & 1);
 //      coin_lockout_w(1, data & 2);
 	}
-	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",activecpu_get_pc(),data);
+	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(space->cpu),data);
 }
 
 
 static WRITE16_HANDLER( metro_coin_lockout_4words_w )
 {
 //  coin_lockout_w( (offset >> 1) & 1, offset & 1 );
-	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",activecpu_get_pc(),data);
+	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(space->cpu),data);
 }
 
 
@@ -609,8 +613,8 @@ static UINT16 *metro_rombank;
 
 static READ16_HANDLER( metro_bankedrom_r )
 {
-	UINT8 *ROM = memory_region( machine, "gfx1" );
-	size_t  len  = memory_region_length( machine, "gfx1" );
+	UINT8 *ROM = memory_region( space->machine, "gfx1" );
+	size_t  len  = memory_region_length( space->machine, "gfx1" );
 
 	offset = offset * 2 + 0x10000 * (*metro_rombank);
 
@@ -680,15 +684,15 @@ INLINE int blt_read(const UINT8 *ROM, const int offs)
 	return ROM[offs];
 }
 
-INLINE void blt_write(running_machine *machine, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
+INLINE void blt_write(const address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
 {
 	switch( tmap )
 	{
-		case 1:	metro_vram_0_w(machine,offs,data,mask);	break;
-		case 2:	metro_vram_1_w(machine,offs,data,mask);	break;
-		case 3:	metro_vram_2_w(machine,offs,data,mask);	break;
+		case 1:	metro_vram_0_w(space,offs,data,mask);	break;
+		case 2:	metro_vram_1_w(space,offs,data,mask);	break;
+		case 3:	metro_vram_2_w(space,offs,data,mask);	break;
 	}
-//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",activecpu_get_pc(),tmap,offs,data,mask);
+//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",cpu_get_pc(machine->activecpu),tmap,offs,data,mask);
 }
 
 
@@ -698,8 +702,8 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 	if (offset == 0xC/2)
 	{
-		UINT8 *src	=	memory_region(machine, "gfx1");
-		size_t  src_len	=	memory_region_length(machine, "gfx1");
+		UINT8 *src	=	memory_region(space->machine, "gfx1");
+		size_t  src_len	=	memory_region_length(space->machine, "gfx1");
 
 		UINT32 tmap		=	(metro_blitter_regs[ 0x00 / 2 ] << 16 ) +
 							 metro_blitter_regs[ 0x02 / 2 ];
@@ -711,7 +715,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 		int shift			=	(dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask		=	(dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",activecpu_get_pc(),tmap,src_offs,dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",cpu_get_pc(space->cpu),tmap,src_offs,dst_offs);
 
 		dst_offs >>= 7+1;
 		switch( tmap )
@@ -721,7 +725,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",activecpu_get_pc(),tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",cpu_get_pc(space->cpu),tmap);
 				return;
 		}
 
@@ -731,7 +735,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 			src_offs %= src_len;
 			b1 = blt_read(src,src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",cpu_get_pc(space->cpu),b1,src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -759,7 +763,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2,mask);
+						blt_write(space,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -775,7 +779,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2<<shift,mask);
+						blt_write(space,tmap,dst_offs,b2<<shift,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 						b2++;
 					}
@@ -792,7 +796,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2,mask);
+						blt_write(space,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -815,7 +819,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs-1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",cpu_get_pc(space->cpu),b1,src_offs-1);
 					return;
 			}
 
@@ -897,9 +901,9 @@ ADDRESS_MAP_END
 /* Really weird way of mapping 3 DSWs */
 static READ16_HANDLER( balcube_dsw_r )
 {
-	UINT16 dsw1 = input_port_read(machine, "DSW0") >> 0;
-	UINT16 dsw2 = input_port_read(machine, "DSW0") >> 8;
-	UINT16 dsw3 = input_port_read(machine, "IN2");
+	UINT16 dsw1 = input_port_read(space->machine, "DSW0") >> 0;
+	UINT16 dsw2 = input_port_read(space->machine, "DSW0") >> 8;
+	UINT16 dsw3 = input_port_read(space->machine, "IN2");
 
 	switch (offset*2)
 	{
@@ -921,7 +925,7 @@ static READ16_HANDLER( balcube_dsw_r )
 		case 0x17FFE:	return (dsw2 & 0x40) ? 0x40 : 0;
 		case 0x0FFFE:	return (dsw2 & 0x80) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n",cpu_get_pc(space->cpu),offset);
 	return 0xffff;
 }
 
@@ -965,6 +969,52 @@ static ADDRESS_MAP_START( balcube_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x6788aa, 0x6788ab) AM_WRITE(SMH_RAM) AM_BASE(&metro_rombank		)	// Rom Bank
 	AM_RANGE(0x6788ac, 0x6788ad) AM_WRITE(SMH_RAM) AM_BASE(&metro_screenctrl	)	// Screen Control
 	AM_RANGE(0x679700, 0x679713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
+ADDRESS_MAP_END
+
+/***************************************************************************
+                                    Daitoride (alt hardware)
+***************************************************************************/
+
+
+static ADDRESS_MAP_START( daitoa_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x400000, 0x400001) AM_READ(ymf278b_r				)	// Sound
+	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r			)	// DSW x 3
+	AM_RANGE(0x100000, 0x11ffff) AM_READ(SMH_RAM				)	// Layer 0
+	AM_RANGE(0x120000, 0x13ffff) AM_READ(SMH_RAM				)	// Layer 1
+	AM_RANGE(0x140000, 0x15ffff) AM_READ(SMH_RAM				)	// Layer 2
+	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r		)	// Banked ROM
+	AM_RANGE(0x170000, 0x173fff) AM_READ(SMH_RAM				)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0x178000, 0x1787ff) AM_READ(SMH_RAM				)	// Tiles Set
+	AM_RANGE(0x1788a2, 0x1788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN0")				// Inputs
+	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("IN1")				//
+	AM_RANGE(0x200006, 0x200007) AM_READ(SMH_NOP				)	//
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( daitoa_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
+	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// RAM
+	AM_RANGE(0x400000, 0x40000b) AM_WRITE(ymf278b_w						)	// Sound
+	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w	)	// Coin Lockout
+	AM_RANGE(0x170000, 0x173fff) AM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w  ) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size				)	// Sprites
+	AM_RANGE(0x100000, 0x11ffff) AM_WRITE(metro_vram_0_w) AM_BASE(&metro_vram_0	)	// Layer 0
+	AM_RANGE(0x120000, 0x13ffff) AM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
+	AM_RANGE(0x140000, 0x15ffff) AM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2	)	// Layer 2
+	AM_RANGE(0x178000, 0x1787ff) AM_WRITE(SMH_RAM) AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size		)	// Tiles Set
+	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs		)	// Tiles Blitter
+	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window				)	// Tilemap Window
+	AM_RANGE(0x178870, 0x17887b) AM_WRITE(SMH_RAM) AM_BASE(&metro_scroll		)	// Scroll
+	AM_RANGE(0x178880, 0x178881) AM_WRITE(SMH_NOP						)	// ? increasing
+	AM_RANGE(0x178890, 0x178891) AM_WRITE(SMH_NOP						)	// ? increasing
+	AM_RANGE(0x1788a2, 0x1788a3) AM_WRITE(metro_irq_cause_w				)	// IRQ Acknowledge
+	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITE(SMH_RAM) AM_BASE(&metro_irq_enable	)	// IRQ Enable
+	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITE(SMH_RAM) AM_BASE(&metro_rombank		)	// Rom Bank
+	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITE(SMH_RAM) AM_BASE(&metro_screenctrl	)	// Screen Control
+	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 ADDRESS_MAP_END
 
 
@@ -1173,7 +1223,7 @@ static READ16_HANDLER( karatour_vram_##_n_##_r ) \
 } \
 static WRITE16_HANDLER( karatour_vram_##_n_##_w ) \
 { \
-	metro_vram_##_n_##_w(machine,KARATOUR_OFFS(offset),data,mem_mask); \
+	metro_vram_##_n_##_w(space,KARATOUR_OFFS(offset),data,mem_mask); \
 }
 
 KARATOUR_VRAM( 0 )
@@ -1404,11 +1454,11 @@ static READ16_HANDLER( gakusai_input_r )
 {
 	UINT16 input_sel = (*gakusai_input_sel) ^ 0x3e;
 	// Bit 0 ??
-	if (input_sel & 0x0002)	return input_port_read(machine, "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(machine, "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(machine, "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(machine, "KEY3");
-	if (input_sel & 0x0020)	return input_port_read(machine, "KEY4");
+	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY0");
+	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY1");
+	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY2");
+	if (input_sel & 0x0010)	return input_port_read(space->machine, "KEY3");
+	if (input_sel & 0x0020)	return input_port_read(space->machine, "KEY4");
 	return 0xffff;
 }
 
@@ -1917,22 +1967,22 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( blzntrnd_sound_w )
 {
-	soundlatch_w(machine, offset, data>>8);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, data>>8);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
-	memory_set_bankptr(1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 }
 
 static void blzntrnd_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface blzntrnd_ym2610_interface =
@@ -2138,9 +2188,9 @@ static WRITE8_HANDLER( puzzlet_portb_w )
 }
 
 static ADDRESS_MAP_START( puzzlet_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE( H8_PORT7,		H8_PORT7	)	AM_READ_PORT("IN2")
-	AM_RANGE( H8_SERIAL_B,	H8_SERIAL_B	)	AM_READ_PORT("IN0")		// coin
-	AM_RANGE( H8_PORTB,		H8_PORTB	)	AM_READ_PORT("DSW0") AM_WRITE( puzzlet_portb_w )
+	AM_RANGE( H8_PORT_7,		H8_PORT_7	)	AM_READ_PORT("IN2")
+	AM_RANGE( H8_SERIAL_1,	H8_SERIAL_1	)	AM_READ_PORT("IN0")		// coin
+	AM_RANGE( H8_PORT_B,		H8_PORT_B	)	AM_READ_PORT("DSW0") AM_WRITE( puzzlet_portb_w )
 ADDRESS_MAP_END
 
 
@@ -3780,6 +3830,38 @@ static MACHINE_DRIVER_START( balcube )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( daitoa )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_PROGRAM_MAP(daitoa_readmem,daitoa_writemem)
+	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
+
+	MDRV_MACHINE_RESET(metro)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(320, 224)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+
+	MDRV_GFXDECODE(14220)
+	MDRV_PALETTE_LENGTH(8192)
+
+	MDRV_VIDEO_START(metro_14220)
+	MDRV_VIDEO_UPDATE(metro)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
+	MDRV_SOUND_CONFIG(ymf278b_config)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( bangball )
 
 	/* basic machine hardware */
@@ -4587,31 +4669,31 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( puzzlet_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		case 1:
 			requested_int[3] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		case 2:
 			requested_int[5] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		case 3:
 			requested_int[2] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		default:
 			// timer
-			h8_3002_InterruptRequest(24);
+			cpu_set_input_line(device->machine->cpu[0], H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }
@@ -4683,12 +4765,14 @@ static void metro_common(void)
 
 static DRIVER_INIT( metro )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	metro_common();
 
 	porta = 0x00;
 	portb = 0x00;
 	busy_sndcpu = 0;
-	metro_sound_rombank_w(machine, 0, 0x00);
+	metro_sound_rombank_w(space, 0, 0x00);
 }
 
 static DRIVER_INIT( karatour )
@@ -4706,12 +4790,14 @@ for (i = 0;i < (0x20000*3)/2;i++)
 
 static DRIVER_INIT( daitorid )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	metro_common();
 
 	porta = 0x00;
 	portb = 0x00;
 	busy_sndcpu = 0;
-	daitorid_sound_rombank_w(machine, 0, 0x00);
+	daitorid_sound_rombank_w(space, 0, 0x00);
 }
 
 
@@ -4820,6 +4906,28 @@ ROM_START( balcube )
 	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) )	    // Yamaha YRW801 2MB ROM with samples for the OPL4.
 	ROM_LOAD( "7",        0x200000, 0x080000, CRC(f769287d) SHA1(dd0f781b4a1a1fd6bf0a50048b4996f3cf41e155) )	    // PCM 16 Bit (Signed)
 ROM_END
+
+/***************************************************************************
+Daitoride (YMF278B version)
+***************************************************************************/
+
+
+ROM_START( daitoa )
+	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "dt_ja-6.6", 0x000000, 0x040000, CRC(c753954e) SHA1(f895c776ec6e2da063d3fbf9630f4812ba7bc455) )
+	ROM_LOAD16_BYTE( "dt_ja-5.5", 0x000001, 0x040000, CRC(c4340290) SHA1(6748572a8733d88a1dd03604628e3d0e90171cf0) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "dt_ja-2.2", 0x000000, 0x080000, CRC(6a262249) SHA1(93b58825a454403d568e7d9a3b4d998322d0baef) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dt_ja-4.4", 0x000002, 0x080000, CRC(cdcef57a) SHA1(4b386f5ebde1ab6866bbbe528e43b813eba99237) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dt_ja-1.1", 0x000004, 0x080000, CRC(a6ccb1d2) SHA1(87570b8d82af0529c054b3038b3d3e9aa550ce6a) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dt_ja-3.3", 0x000006, 0x080000, CRC(32353e04) SHA1(16ac82de9e6e43eabef3adab2d3a006bb50100fb) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x280000, "ymf", 0 )
+	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) )	    // Yamaha YRW801 2MB ROM with samples for the OPL4.
+	ROM_LOAD( "dt_ja-7.7",        0x200000, 0x080000, CRC(7a2d3222) SHA1(1a16bf483a5a086ad48029dd23dd16ad47c3740e) )	    // PCM 16 Bit (Signed)
+ROM_END
+
 
 
 /***************************************************************************
@@ -6106,6 +6214,7 @@ GAME( 1994, torid2gg, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",  
 GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II (Japan)",                 GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gunmast,  0,        pururun,  gunmast,  daitorid, ROT0,   "Metro",                                  "Gun Master",                        0 )
 GAME( 1995, daitorid, 0,        daitorid, daitorid, daitorid, ROT0,   "Metro",                                  "Daitoride",                         GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, daitoa,   daitorid, daitoa,   daitorid, balcube,  ROT0,   "Metro",                                  "Daitoride (YMF278B version)",                          0 )
 GAME( 1995, dokyusei, 0,        dokyusei, dokyusei, gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei",                0 )
 GAME( 1995, dokyusp,  0,        dokyusp,  gakusai,  gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei Special",        0 )
 GAME( 1995, pururun,  0,        pururun,  pururun,  daitorid, ROT0,   "Metro / Banpresto",                      "Pururun",                           0 )

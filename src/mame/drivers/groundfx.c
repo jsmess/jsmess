@@ -96,7 +96,7 @@ static WRITE32_HANDLER( color_ram_w )
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
 
-		palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -107,7 +107,7 @@ static WRITE32_HANDLER( color_ram_w )
 
 static TIMER_CALLBACK( groundfx_interrupt5 )
 {
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE); //from 5... ADC port
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE); //from 5... ADC port
 }
 
 
@@ -174,7 +174,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(machine);
+				watchdog_reset(space->machine);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -204,7 +204,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 static READ32_HANDLER( groundfx_adc_r )
 {
-	return (input_port_read(machine, "AN0") << 8) | input_port_read(machine, "AN1");
+	return (input_port_read(space->machine, "AN0") << 8) | input_port_read(space->machine, "AN1");
 }
 
 static WRITE32_HANDLER( groundfx_adc_w )
@@ -390,7 +390,7 @@ static MACHINE_RESET( groundfx )
 static INTERRUPT_GEN( groundfx_interrupt )
 {
 	frame_counter^=1;
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( groundfx )
@@ -467,12 +467,12 @@ ROM_END
 static READ32_HANDLER( irq_speedup_r_groundfx )
 {
 	int ptr;
-	if ((activecpu_get_sp()&2)==0) ptr=groundfx_ram[(activecpu_get_sp()&0x1ffff)/4];
-	else ptr=(((groundfx_ram[(activecpu_get_sp()&0x1ffff)/4])&0x1ffff)<<16) |
-	(groundfx_ram[((activecpu_get_sp()&0x1ffff)/4)+1]>>16);
+	if ((cpu_get_sp(space->cpu)&2)==0) ptr=groundfx_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4];
+	else ptr=(((groundfx_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4])&0x1ffff)<<16) |
+	(groundfx_ram[((cpu_get_sp(space->cpu)&0x1ffff)/4)+1]>>16);
 
-	if (activecpu_get_pc()==0x1ece && ptr==0x1b9a)
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x1ece && ptr==0x1b9a)
+		cpu_spinuntil_int(space->cpu);
 
 	return groundfx_ram[0xb574/4];
 }
@@ -486,7 +486,7 @@ static DRIVER_INIT( groundfx )
 	int data;
 
 	/* Speedup handlers */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

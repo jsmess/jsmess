@@ -12,7 +12,6 @@
 *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "t11.h"
 
 
@@ -34,6 +33,7 @@ typedef struct
     INT32	interrupt_cycles;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 } t11_Regs;
 
 static t11_Regs t11;
@@ -78,7 +78,7 @@ static int	t11_ICount;
 
 INLINE int ROPCODE(void)
 {
-	int val = cpu_readop16(PC);
+	int val = memory_decrypted_read_word(t11.program, PC);
 	PC += 2;
 	return val;
 }
@@ -224,7 +224,6 @@ static void t11_check_irqs(void)
 		PUSH(PC);
 		PCD = new_pc;
 		PSW = new_psw;
-		change_pc(PC);
 		t11_check_irqs();
 
 		/* count cycles and clear the WAIT flag */
@@ -273,7 +272,6 @@ static CPU_SET_CONTEXT( t11 )
 {
 	if (src)
 		t11 = *(t11_Regs *)src;
-	change_pc(PC);
 	t11_check_irqs();
 }
 
@@ -292,27 +290,28 @@ static CPU_INIT( t11 )
 		0xc000, 0x8000, 0x4000, 0x2000,
 		0x1000, 0x0000, 0xf600, 0xf400
 	};
-	const struct t11_setup *setup = config;
+	const struct t11_setup *setup = device->static_config;
 
 	t11.initial_pc = initial_pc[setup->mode >> 13];
 	t11.irq_callback = irqcallback;
 	t11.device = device;
+	t11.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("t11", index, t11.ppc.w.l);
-	state_save_register_item("t11", index, t11.reg[0].w.l);
-	state_save_register_item("t11", index, t11.reg[1].w.l);
-	state_save_register_item("t11", index, t11.reg[2].w.l);
-	state_save_register_item("t11", index, t11.reg[3].w.l);
-	state_save_register_item("t11", index, t11.reg[4].w.l);
-	state_save_register_item("t11", index, t11.reg[5].w.l);
-	state_save_register_item("t11", index, t11.reg[6].w.l);
-	state_save_register_item("t11", index, t11.reg[7].w.l);
-	state_save_register_item("t11", index, t11.psw.w.l);
-	state_save_register_item("t11", index, t11.op);
-	state_save_register_item("t11", index, t11.initial_pc);
-	state_save_register_item("t11", index, t11.wait_state);
-	state_save_register_item("t11", index, t11.irq_state);
-	state_save_register_item("t11", index, t11.interrupt_cycles);
+	state_save_register_item("t11", device->tag, 0, t11.ppc.w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[0].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[1].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[2].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[3].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[4].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[5].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[6].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[7].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.psw.w.l);
+	state_save_register_item("t11", device->tag, 0, t11.op);
+	state_save_register_item("t11", device->tag, 0, t11.initial_pc);
+	state_save_register_item("t11", device->tag, 0, t11.wait_state);
+	state_save_register_item("t11", device->tag, 0, t11.irq_state);
+	state_save_register_item("t11", device->tag, 0, t11.interrupt_cycles);
 }
 
 
@@ -336,7 +335,6 @@ static CPU_RESET( t11 )
 
 	/* initial PC comes from the setup word */
 	PC = t11.initial_pc;
-	change_pc(PC);
 
 	/* PSW starts off at highest priority */
 	PSW = 0xe0;
@@ -400,7 +398,7 @@ static CPU_EXECUTE( t11 )
 	{
 		t11.ppc = t11.reg[7];	/* copy PC to previous PC */
 
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device, PCD);
 
 		t11.op = ROPCODE();
 		(*opcode_table[t11.op >> 3])();
@@ -432,7 +430,7 @@ static CPU_SET_INFO( t11 )
 		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		set_irq_line(T11_IRQ3, info->i);		break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + T11_PC:				PC = info->i; change_pc(PC); 			break;
+		case CPUINFO_INT_REGISTER + T11_PC:				PC = info->i; 				 			break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + T11_SP:				SP = info->i;							break;
 		case CPUINFO_INT_REGISTER + T11_PSW:			PSW = info->i;							break;

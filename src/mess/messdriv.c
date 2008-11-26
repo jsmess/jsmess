@@ -36,6 +36,7 @@ const game_driver * const drivers[] =
 
 /****************CONSOLES****************************************************/
 
+#if 0	/* NPW 25-Nov-2008 - Disabling everything for now except mk2 */
 	/* 3DO */
 	DRIVER( 3do )		/* 3DO consoles										*/
 	DRIVER( 3do_pal )
@@ -1086,7 +1087,9 @@ XL/XE 16kB OS roms
 	/* Computer Electronic */
 	DRIVER( mk1 )		/* Chess Champion MK I								*/
 	/* Quelle International */
+#endif	/* NPW 25-Nov-2008 - Disabling everything for now except mk2 */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
+#if 0	/* NPW 25-Nov-2008 - Disabling everything for now except mk2 */
 	/* Novag */
 	DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
@@ -1106,5 +1109,6 @@ XL/XE 16kB OS roms
 
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
+#endif	/* NPW 25-Nov-2008 - Disabling everything for now except mk2 */
 
 #endif /* DRIVER_RECURSIVE */

@@ -67,6 +67,8 @@ A few notes:
 #include "sound/ay8910.h"
 #include "includes/btime.h"
 
+#define MASTER_CLOCK (XTAL_12MHz)
+
 static WRITE8_HANDLER( audio_command_w );
 
 static UINT8 *decrypted;
@@ -93,11 +95,11 @@ static void btime_decrypt(running_machine *machine)
 	/* xxxx xxx1 xxxx x1xx are encrypted. */
 
 	/* get the address of the next opcode */
-	addr = activecpu_get_pc();
+	addr = cpu_get_pc(machine->activecpu);
 
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
-	addr1 = activecpu_get_previouspc();
+	addr1 = cpu_get_previouspc(machine->activecpu);
 	src1 = (addr1 < 0x9000) ? rambase : memory_region(machine, "main");
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1+1] + 256 * src1[addr1+2];
@@ -114,15 +116,15 @@ static void btime_decrypt(running_machine *machine)
 static WRITE8_HANDLER( lnc_w )
 {
 	if      (offset <= 0x3bff)                       ;
-	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(machine,offset - 0x3c00,data); return; }
-	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(machine,offset - 0x7c00,data); return; }
+	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(space,offset - 0x3c00,data); return; }
+	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(space,offset - 0x7c00,data); return; }
 	else if (offset == 0x8000)                     { return; }  /* SMH_NOP */
-	else if (offset == 0x8001)                     { lnc_video_control_w(machine,0,data); return; }
+	else if (offset == 0x8001)                     { lnc_video_control_w(space,0,data); return; }
 	else if (offset == 0x8003)                       ;
 	else if (offset == 0x9000)                     { return; }  /* SMH_NOP */
-	else if (offset == 0x9002)                     { audio_command_w(machine,0,data); return; }
+	else if (offset == 0x9002)                     { audio_command_w(space,0,data); return; }
 	else if (offset >= 0xb000 && offset <= 0xb1ff)   ;
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 
 	rambase[offset] = data;
 
@@ -133,14 +135,14 @@ static WRITE8_HANDLER( lnc_w )
 static WRITE8_HANDLER( mmonkey_w )
 {
 	if      (offset <= 0x3bff)                       ;
-	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(machine,offset - 0x3c00,data); return; }
-	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(machine,offset - 0x7c00,data); return; }
-	else if (offset == 0x8001)                     { lnc_video_control_w(machine,0,data); return; }
+	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(space,offset - 0x3c00,data); return; }
+	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(space,offset - 0x7c00,data); return; }
+	else if (offset == 0x8001)                     { lnc_video_control_w(space,0,data); return; }
 	else if (offset == 0x8003)                       ;
 	else if (offset == 0x9000)                     { return; }  /* SMH_NOP */
-	else if (offset == 0x9002)                     { audio_command_w(machine,0,data); return; }
-	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(machine,offset - 0xb000, data); return; }
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else if (offset == 0x9002)                     { audio_command_w(space,0,data); return; }
+	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(space,offset - 0xb000, data); return; }
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 
 	rambase[offset] = data;
 
@@ -151,50 +153,50 @@ static WRITE8_HANDLER( mmonkey_w )
 static WRITE8_HANDLER( btime_w )
 {
 	if      (offset <= 0x07ff)                     ;
-	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(machine,offset - 0x0c00,data);
+	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(space,offset - 0x0c00,data);
 	else if (offset >= 0x1000 && offset <= 0x17ff) ;
-	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(machine,offset - 0x1800,data);
-	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(machine,offset - 0x1c00,data);
-	else if (offset == 0x4002)                     btime_video_control_w(machine,0,data);
-	else if (offset == 0x4003)                     audio_command_w(machine,0,data);
-	else if (offset == 0x4004)                     bnj_scroll1_w(machine,0,data);
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(space,offset - 0x1800,data);
+	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(space,offset - 0x1c00,data);
+	else if (offset == 0x4002)                     btime_video_control_w(space,0,data);
+	else if (offset == 0x4003)                     audio_command_w(space,0,data);
+	else if (offset == 0x4004)                     bnj_scroll1_w(space,0,data);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 
 	rambase[offset] = data;
 
-	btime_decrypt(machine);
+	btime_decrypt(space->machine);
 }
 
 static WRITE8_HANDLER( zoar_w )
 {
 	if      (offset <= 0x07ff) 					   ;
 	else if (offset >= 0x8000 && offset <= 0x87ff) ;
-	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(machine,offset - 0x8800,data);
-	else if (offset >= 0x8c00 && offset <= 0x8fff) btime_mirrorcolorram_w(machine,offset - 0x8c00,data);
-	else if (offset == 0x9000)					   zoar_video_control_w(machine,0, data);
+	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(space,offset - 0x8800,data);
+	else if (offset >= 0x8c00 && offset <= 0x8fff) btime_mirrorcolorram_w(space,offset - 0x8c00,data);
+	else if (offset == 0x9000)					   zoar_video_control_w(space,0, data);
 	else if (offset >= 0x9800 && offset <= 0x9803) ;
-	else if (offset == 0x9804)                     bnj_scroll2_w(machine,0,data);
-	else if (offset == 0x9805)                     bnj_scroll1_w(machine,0,data);
-	else if (offset == 0x9806)                     audio_command_w(machine,0,data);
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else if (offset == 0x9804)                     bnj_scroll2_w(space,0,data);
+	else if (offset == 0x9805)                     bnj_scroll1_w(space,0,data);
+	else if (offset == 0x9806)                     audio_command_w(space,0,data);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 
 	rambase[offset] = data;
 
-	btime_decrypt(machine);
+	btime_decrypt(space->machine);
 }
 
 static WRITE8_HANDLER( disco_w )
 {
 	if      (offset <= 0x04ff)                     ;
-	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(machine,offset - 0x2000,data);
+	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(space,offset - 0x2000,data);
 	else if (offset >= 0x8000 && offset <= 0x881f) ;
-	else if (offset == 0x9a00)                     audio_command_w(machine,0,data);
-	else if (offset == 0x9c00)                     disco_video_control_w(machine,0,data);
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else if (offset == 0x9a00)                     audio_command_w(space,0,data);
+	else if (offset == 0x9c00)                     disco_video_control_w(space,0,data);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 
 	rambase[offset] = data;
 
-	btime_decrypt(machine);
+	btime_decrypt(space->machine);
 }
 
 
@@ -351,25 +353,25 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted_irq_hi )
 {
 	if (newval)
-		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_irq_lo )
 {
 	if (!newval)
-		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi_lo )
 {
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 
@@ -1640,25 +1642,26 @@ ROM_START( sdtennis )
 	ROM_LOAD( "ao_04.10f",   0x1000, 0x1000, CRC(921952af) SHA1(4e9248f3493a5f4651278f27c11f507571242317) )
 ROM_END
 
-static void decrypt_C10707_cpu(running_machine *machine, int cpu, const char *cputag)
+static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
+	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_malloc(0x10000);
 	UINT8 *rom = memory_region(machine, cputag);
 	offs_t addr;
 
-	memory_set_decrypted_region(cpu, 0x0000, 0xffff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (addr = 0; addr < 0x10000; addr++)
 		decrypt[addr] = swap_bits_5_6(rom[addr]);
 
-	if (cpu == 0)
+	if (space->cpu == machine->cpu[0])
 		decrypted = decrypt;
 }
 
 static READ8_HANDLER( wtennis_reset_hack_r )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	/* Otherwise the game goes into test mode and there is no way out that I
        can see.  I'm not sure how it can work, it probably somehow has to do
@@ -1671,10 +1674,11 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 
 static void init_rom1(running_machine *machine)
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 
 	decrypted = auto_malloc(0x10000);
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 
 	/* For now, just copy the RAM array over to ROM. Decryption will happen */
 	/* at run time, since the CPU applies the decryption only if the previous */
@@ -1702,26 +1706,26 @@ static DRIVER_INIT( zoar )
 
 static DRIVER_INIT( lnc )
 {
-	decrypt_C10707_cpu(machine, 0, "main");
+	decrypt_C10707_cpu(machine, "main");
 }
 
 static DRIVER_INIT( cookrace )
 {
 	memcpy(&audio_rambase[0x200], memory_region(machine, "audio") + 0xf200, 0x200);
-	decrypt_C10707_cpu(machine, 0, "main");
+	decrypt_C10707_cpu(machine, "main");
 }
 
 static DRIVER_INIT( wtennis )
 {
 	memcpy(&audio_rambase[0x200], memory_region(machine, "audio") + 0xf200, 0x200);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
-	decrypt_C10707_cpu(machine, 0, "main");
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
+	decrypt_C10707_cpu(machine, "main");
 }
 
 static DRIVER_INIT( sdtennis )
 {
-	decrypt_C10707_cpu(machine, 0, "main");
-	decrypt_C10707_cpu(machine, 1, "audio");
+	decrypt_C10707_cpu(machine, "main");
+	decrypt_C10707_cpu(machine, "audio");
 }
 
 

@@ -83,7 +83,7 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -91,7 +91,7 @@ static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(screen->machine, 0);
+		atarigen_scanline_int_gen(screen->machine->cpu[0]);
 }
 
 
@@ -119,14 +119,14 @@ static MACHINE_RESET( arcadecl )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return (okim6295_status_0_r(machine, offset) << 8) | 0x00ff;
+	return (okim6295_status_0_r(space, offset) << 8) | 0x00ff;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_8_15)
-		okim6295_data_0_w(machine, offset, (data >> 8) & 0xff);
+		okim6295_data_0_w(space, offset, (data >> 8) & 0xff);
 }
 
 
@@ -149,7 +149,7 @@ static WRITE16_HANDLER( latch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(0, (data & 0x80) ? 0x40000 : 0x00000);
-		atarigen_set_oki6295_vol(machine, (data & 0x001f) * 100 / 0x1f);
+		atarigen_set_oki6295_vol(space->machine, (data & 0x001f) * 100 / 0x1f);
 	}
 }
 

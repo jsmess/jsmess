@@ -146,7 +146,7 @@ static const UINT16 mHoreKidProtData[] =
 
 static READ16_HANDLER( horekid_IN2_r )
 {
-	int data = input_port_read(machine, "IN2");
+	int data = input_port_read(space->machine, "IN2");
 
 	if (!(data & 0x40))		// FAKE button 3 for "Debug Mode"
 	{
@@ -159,12 +159,12 @@ static READ16_HANDLER( horekid_IN2_r )
 
 static WRITE16_HANDLER( amazon_sound_w )
 {
-	soundlatch_w(machine,0,((data & 0x7f) << 1) | 1);
+	soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(machine,0,0);
+	soundlatch_clear_w(space,0,0);
 	return 0;
 }
 
@@ -1019,7 +1019,7 @@ static DRIVER_INIT( amatelas )
 static DRIVER_INIT( horekid )
 {
 	mpProtData = mHoreKidProtData;
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x44004, 0x44005, 0, 0, horekid_IN2_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */

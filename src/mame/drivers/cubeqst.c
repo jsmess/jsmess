@@ -20,7 +20,6 @@
 #include "driver.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
 #include "sound/dac.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 #include "streams.h"
 #include "machine/laserdsc.h"
@@ -98,7 +97,7 @@ static PALETTE_INIT( cubeqst )
 
 static WRITE16_HANDLER( palette_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	COMBINE_DATA(&paletteram16[offset]);
 }
 
@@ -115,7 +114,7 @@ static VIDEO_UPDATE( cubeqst )
 	/* Bit 3 selects LD/#GRAPHICS */
 	fillbitmap(bitmap, colormap[255], cliprect);
 
-	cpuintrf_push_context(LINE_CPU);
+	cpu_push_context(screen->machine->cpu[LINE_CPU]);
 
 	/* TODO: Add 1 for linebuffering? */
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -174,21 +173,21 @@ static VIDEO_UPDATE( cubeqst )
 		}
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return 0;
 }
 
 static READ16_HANDLER( line_r )
 {
 	/* I think this is unusued */
-	return video_screen_get_vpos(machine->primary_screen);
+	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
 static INTERRUPT_GEN( vblank )
 {
 	int int_level = video_field == 0 ? 5 : 6;
 
-	cputag_set_input_line(machine, "main_cpu", int_level, HOLD_LINE);
+	cpu_set_input_line(device, int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
 	video_field ^= 1;
@@ -249,13 +248,13 @@ static WRITE16_HANDLER( control_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	cpuintrf_push_context(LINE_CPU);
+	cpu_push_context(machine->cpu[LINE_CPU]);
 	cubeqcpu_swap_line_banks();
 
 	/* TODO: This is a little dubious */
 	clear_stack();
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -276,9 +275,9 @@ static void swap_linecpu_banks(void)
 */
 static WRITE16_HANDLER( reset_w )
 {
-	cputag_set_input_line(machine, "rotate_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine, "line_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine, "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "rotate_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "line_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
 	if (!BIT(reset_latch, 0) && BIT(data, 0))
@@ -325,7 +324,7 @@ static WRITE16_HANDLER( io_w )
 
 static READ16_HANDLER( io_r )
 {
-	UINT16 port_data = input_port_read(machine, "IO");
+	UINT16 port_data = input_port_read(space->machine, "IO");
 
 	/*
          Certain bits depend on Q7 of the IO latch:
@@ -346,7 +345,7 @@ static READ16_HANDLER( io_r )
 /* Trackball ('CHOP') */
 static READ16_HANDLER( chop_r )
 {
-	return (input_port_read(machine, "TRACK_X") << 8) | input_port_read(machine, "TRACK_Y");
+	return (input_port_read(space->machine, "TRACK_X") << 8) | input_port_read(space->machine, "TRACK_Y");
 }
 
 

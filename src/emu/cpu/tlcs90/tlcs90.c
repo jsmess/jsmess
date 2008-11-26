@@ -8,6 +8,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "cpuexec.h"
 #include "tlcs90.h"
 
 typedef struct
@@ -18,6 +19,8 @@ typedef struct
 	UINT16		irq_state, irq_mask;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	int			extra_cycles;		// extra cycles for interrupts
 	UINT8		internal_registers[48];
 	UINT32		ixbase,iybase;
@@ -160,16 +163,16 @@ static UINT32	addr;
 #define R16D8( N,R,I )		mode##N = MODE_R16D8;	r##N = R;	r##N##b = I;
 #define R16R8( N,R,g )		mode##N = MODE_R16R8;	r##N = R;	r##N##b = g;
 
-INLINE UINT8  RM8 (UINT32 a)	{ return program_read_byte_8le( a ); }
+INLINE UINT8  RM8 (UINT32 a)	{ return memory_read_byte_8le( T90.program, a ); }
 INLINE UINT16 RM16(UINT32 a)	{ return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
 
-INLINE void WM8 (UINT32 a, UINT8  v)	{ program_write_byte_8le( a, v ); }
+INLINE void WM8 (UINT32 a, UINT8  v)	{ memory_write_byte_8le( T90.program, a, v ); }
 INLINE void WM16(UINT32 a, UINT16 v)	{ WM8(a,v);	WM8( (a+1) & 0xffff, v >> 8); }
 
-INLINE UINT8  RX8 (UINT32 a, UINT32 base)	{ return program_read_byte_8le( base | a ); }
+INLINE UINT8  RX8 (UINT32 a, UINT32 base)	{ return memory_read_byte_8le( T90.program, base | a ); }
 INLINE UINT16 RX16(UINT32 a, UINT32 base)	{ return RX8(a,base) | (RX8( (a+1) & 0xffff, base ) << 8); }
 
-INLINE void WX8 (UINT32 a, UINT8  v, UINT32 base)	{ program_write_byte_8le( base | a, v ); }
+INLINE void WX8 (UINT32 a, UINT8  v, UINT32 base)	{ memory_write_byte_8le( T90.program, base | a, v ); }
 INLINE void WX16(UINT32 a, UINT16 v, UINT32 base)	{ WX8(a,v,base);	WX8( (a+1) & 0xffff, v >> 8, base); }
 
 INLINE UINT8  READ8(void)	{ UINT8 b0 = RM8( addr++ ); addr &= 0xffff; return b0; }
@@ -983,7 +986,7 @@ static int sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_mode mod
 		case MODE_R16D8:	return	sprintf( buffer, "%s%s%c$%02X",		pre,	r16_names[r],	(rb&0x80)?'-':'+',	(rb&0x80)?((rb^0xff)+1):rb	);
 
 		default:
-			fatalerror("%04x: unimplemented addr mode = %d\n",activecpu_get_pc(),mode);
+			fatalerror("%04x: unimplemented addr mode = %d\n",cpu_get_pc(Machine->activecpu),mode);
 	}
 
 	return 0;
@@ -1020,7 +1023,7 @@ INLINE UINT16 r8( const e_r r )
 		case L:	return T90.hl.b.l;
 
 		default:
-			fatalerror("%04x: unimplemented r8 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented r8 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1037,7 +1040,7 @@ INLINE void w8( const e_r r, UINT16 value )
 		case L:	T90.hl.b.l = value;	return;
 
 		default:
-			fatalerror("%04x: unimplemented w8 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented w8 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1058,7 +1061,7 @@ case AF2:	return (T90.af2.w.l & (~IF)) | (T90.af.w.l & IF);
 		case PC:	return T90.pc.w.l;
 
 		default:
-			fatalerror("%04x: unimplemented r16 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented r16 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1074,10 +1077,10 @@ INLINE void w16( const e_r r, UINT16 value )
 		case SP:	T90.sp.w.l  = value;	return;
 		case AF:	T90.af.w.l  = value;	return;
 		case AF2:	T90.af2.w.l = value;	return;
-		case PC:	change_pc( T90.pc.d = value );	return;
+		case PC:	T90.pc.d = value;	return;
 
 		default:
-			fatalerror("%04x: unimplemented w16 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented w16 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1105,7 +1108,7 @@ INLINE UINT8 Read##N##_8(void)	{ \
 			} \
 			return RM8((UINT16)(r16(r##N) + (INT8)r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 	return 0; \
 } \
@@ -1130,7 +1133,7 @@ INLINE UINT16 Read##N##_16(void)	{ \
 			} \
 			return RM16((UINT16)(r16(r##N) + (INT8)r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 	return 0; \
 }
@@ -1156,7 +1159,7 @@ INLINE void Write##N##_8( UINT8 value )	{ \
 			} \
 			WM8((UINT16)(r16(r##N) + (INT8)r##N##b), value);	return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 } \
 INLINE void Write##N##_16( UINT16 value ) \
@@ -1178,7 +1181,7 @@ INLINE void Write##N##_16( UINT16 value ) \
 			} \
 			WM16((UINT16)(r16(r##N) + (INT8)r##N##b), value);	return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 }
 
@@ -1209,7 +1212,7 @@ INLINE int Test( UINT8 cond )
 		case NZ:	return !(F & ZF);
 		case NC:	return !(F & CF);
 		default:
-			fatalerror("%04x: unimplemented condition = %d\n",activecpu_get_pc(),cond);
+			fatalerror("%04x: unimplemented condition = %d\n",cpu_get_pc(Machine->activecpu),cond);
 	}
 	return 0;
 }
@@ -1283,7 +1286,6 @@ static void take_interrupt(e_irq irq)
 	F &= ~IF;
 
 	T90.pc.w.l = 0x10 + irq * 8;
-	change_pc( T90.pc.d );
 
 	T90.extra_cycles += 20*2;
 }
@@ -1331,7 +1333,7 @@ static CPU_EXECUTE( t90 )
 	do
 	{
 		T90.prvpc.d = T90.pc.d;
-		debugger_instruction_hook(Machine, T90.pc.d);
+		debugger_instruction_hook(device, T90.pc.d);
 
 		check_interrupts();
 
@@ -1460,7 +1462,6 @@ static CPU_EXECUTE( t90 )
 				if ( Test( Read1_8() ) )
 				{
 					T90.pc.w.l = Read2_16();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1469,7 +1470,6 @@ static CPU_EXECUTE( t90 )
 				if ( Test( Read1_8() ) )
 				{
 					T90.pc.w.l += /*2 +*/ (INT8)Read2_8();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1478,7 +1478,6 @@ static CPU_EXECUTE( t90 )
 				if ( Test( Read1_8() ) )
 				{
 					T90.pc.w.l += /*2 +*/ Read2_16();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1490,7 +1489,6 @@ static CPU_EXECUTE( t90 )
 				{
 					Push( PC );
 					T90.pc.w.l = Read2_16();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1498,7 +1496,6 @@ static CPU_EXECUTE( t90 )
 			case CALLR:
 				Push( PC );
 				T90.pc.w.l += /*2 +*/ Read1_16();
-				change_pc( T90.pc.d );
 				Cyc();
 				break;
 
@@ -1909,7 +1906,6 @@ static CPU_EXECUTE( t90 )
 				if ( --T90.bc.b.h )
 				{
 					T90.pc.w.l += /*2 +*/ (INT8)Read1_8();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1918,7 +1914,6 @@ static CPU_EXECUTE( t90 )
 				if ( --T90.bc.w.l )
 				{
 					T90.pc.w.l += /*2 +*/ (INT8)Read2_8();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1948,7 +1943,7 @@ static CPU_EXECUTE( t90 )
 				break;
 
 			default:
-				fatalerror("%04x: unimplemented opcode, op=%02x\n",activecpu_get_pc(),op);
+				fatalerror("%04x: unimplemented opcode, op=%02x\n",cpu_get_pc(device),op);
 		}
 
 		if ( op != EI )
@@ -1970,7 +1965,7 @@ static CPU_RESET( t90 )
 {
 	T90.irq_state = 0;
 	T90.irq_mask = 0;
-	change_pc( T90.pc.d = 0x0000 );
+	T90.pc.d = 0x0000;
 	F &= ~IF;
 /*
     P0/D0-D7 P1/A0-A7 P2/A8-A15 P6 P7 = INPUT
@@ -2000,7 +1995,6 @@ static CPU_SET_CONTEXT( t90 )
 {
 	if( src )
 		T90 = *(t90_Regs*)src;
-	change_pc(T90.pc.d);
 }
 
 
@@ -2277,7 +2271,7 @@ FFED    BX      R/W     Reset   Description
 
 static READ8_HANDLER( t90_internal_registers_r )
 {
-	#define RIO		io_read_byte_8le( T90_IOBASE+offset )
+	#define RIO		memory_read_byte_8le( T90.io, T90_IOBASE+offset )
 
 	UINT8 data = T90.internal_registers[offset];
 	switch ( T90_IOBASE + offset )
@@ -2320,22 +2314,22 @@ static void t90_start_timer(int i)
 			// 16-bit mode
 			if (i & 1)
 			{
-				logerror("%04X: CPU Timer %d clocked by Timer %d overflow signal\n", activecpu_get_pc(), i,i-1);
+				logerror("%04X: CPU Timer %d clocked by Timer %d overflow signal\n", cpu_get_pc(Machine->activecpu), i,i-1);
 				return;
 			}
 			break;
 		case 2:
-			logerror("%04X: CPU Timer %d, unsupported PPG mode\n", activecpu_get_pc(), i);
+			logerror("%04X: CPU Timer %d, unsupported PPG mode\n", cpu_get_pc(Machine->activecpu), i);
 			return;
 		case 3:
-			logerror("%04X: CPU Timer %d, unsupported PWM mode\n", activecpu_get_pc(), i);
+			logerror("%04X: CPU Timer %d, unsupported PWM mode\n", cpu_get_pc(Machine->activecpu), i);
 			return;
 	}
 
 	switch((T90.internal_registers[ T90_TCLK - T90_IOBASE ] >> (i * 2)) & 0x03)
 	{
-		case 0:	if (i & 1)	logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", activecpu_get_pc(), i,i-1);
-				else		logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", activecpu_get_pc(), i);
+		case 0:	if (i & 1)	logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", cpu_get_pc(Machine->activecpu), i,i-1);
+				else		logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", cpu_get_pc(Machine->activecpu), i);
 				return;
 		case 2:	prescaler =  16;	break;
 		case 3:	prescaler = 256;	break;
@@ -2348,7 +2342,7 @@ static void t90_start_timer(int i)
 
 	timer_adjust_periodic(T90.timer[i], period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %lf Hz\n", activecpu_get_pc(), i, 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer %d started at %lf Hz\n", cpu_get_pc(Machine->activecpu), i, 1.0 / attotime_to_double(period));
 }
 
 static void t90_start_timer4(void)
@@ -2362,7 +2356,7 @@ static void t90_start_timer4(void)
 	{
 		case 1:		prescaler =   1;	break;
 		case 2:		prescaler =  16;	break;
-		default:	logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", activecpu_get_pc(),T90.internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
+		default:	logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", cpu_get_pc(Machine->activecpu),T90.internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
 					return;
 	}
 
@@ -2370,14 +2364,14 @@ static void t90_start_timer4(void)
 
 	timer_adjust_periodic(T90.timer[4], period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %lf Hz\n", activecpu_get_pc(), 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer 4 started at %lf Hz\n", cpu_get_pc(Machine->activecpu), 1.0 / attotime_to_double(period));
 }
 
 
 static void t90_stop_timer(int i)
 {
 	timer_adjust_oneshot(T90.timer[i], attotime_never, i);
-	logerror("%04X: CPU Timer %d stopped\n", activecpu_get_pc(), i);
+	logerror("%04X: CPU Timer %d stopped\n", cpu_get_pc(Machine->activecpu), i);
 }
 
 static void t90_stop_timer4(void)
@@ -2485,7 +2479,7 @@ static TIMER_CALLBACK( t90_timer4_callback )
 
 static WRITE8_HANDLER( t90_internal_registers_w )
 {
-	#define WIO		io_write_byte_8le( T90_IOBASE+offset, data )
+	#define WIO		memory_write_byte_8le( T90.io, T90_IOBASE+offset, data )
 
 	UINT8 out_mask;
 	UINT8 old = T90.internal_registers[offset];
@@ -2625,7 +2619,7 @@ static CPU_INIT( t90 )
 {
 	int i, p;
 
-//  state_save_register_item("z80", index, Z80.prvpc.w.l);
+//  state_save_register_item("z80", device->tag, 0, Z80.prvpc.w.l);
 
 	for (i = 0; i < 256; i++)
 	{
@@ -2654,8 +2648,10 @@ static CPU_INIT( t90 )
 	memset(&T90, 0, sizeof(T90));
 	T90.irq_callback = irqcallback;
 	T90.device = device;
+	T90.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	T90.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), 8);
+	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device->machine->activecpu)), 8);
 
 	// Reset registers to their initial values
 
@@ -2703,7 +2699,7 @@ static CPU_SET_INFO( t90 )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1:		set_irq_line( INT1,   info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2:		set_irq_line( INT2,   info->i);				break;
 
-		case CPUINFO_INT_PC:								change_pc( T90.pc.d = info->i );			break;
+		case CPUINFO_INT_PC:								T90.pc.d = info->i;			break;
 		case CPUINFO_INT_REGISTER + T90_PC:					T90.pc.w.l = info->i;						break;
 		case CPUINFO_INT_SP:								T90.sp.w.l = info->i;						break;
 		case CPUINFO_INT_REGISTER + T90_SP:					T90.sp.w.l = info->i;						break;
@@ -2792,14 +2788,14 @@ CPU_GET_INFO( tmp90840 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP90840");			break;
-		case CPUINFO_STR_CORE_FAMILY:		strcpy(info->s = cpuintrf_temp_str(), "Toshiba TLCS-90");	break;
-		case CPUINFO_STR_CORE_VERSION:		strcpy(info->s = cpuintrf_temp_str(), "1.0");				break;
-		case CPUINFO_STR_CORE_FILE:			strcpy(info->s = cpuintrf_temp_str(), __FILE__);			break;
-		case CPUINFO_STR_CORE_CREDITS:		strcpy(info->s = cpuintrf_temp_str(), "Luca Elia");			break;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP90840");			break;
+		case CPUINFO_STR_CORE_FAMILY:		strcpy(info->s, "Toshiba TLCS-90");	break;
+		case CPUINFO_STR_CORE_VERSION:		strcpy(info->s, "1.0");				break;
+		case CPUINFO_STR_CORE_FILE:			strcpy(info->s, __FILE__);			break;
+		case CPUINFO_STR_CORE_CREDITS:		strcpy(info->s, "Luca Elia");			break;
 
 		case CPUINFO_STR_FLAGS:
-			sprintf(info->s = cpuintrf_temp_str(), "%c%c%c%c%c%c%c%c",
+			sprintf(info->s, "%c%c%c%c%c%c%c%c",
 				F & 0x80 ? 'S':'.',
 				F & 0x40 ? 'Z':'.',
 				F & 0x20 ? 'I':'.',
@@ -2810,21 +2806,21 @@ CPU_GET_INFO( tmp90840 )
 				F & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + T90_PC:		sprintf(info->s = cpuintrf_temp_str(), "PC:%04X", T90.pc.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_SP:		sprintf(info->s = cpuintrf_temp_str(), "SP:%04X", T90.sp.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_A:		sprintf(info->s = cpuintrf_temp_str(), "~A:%02X", T90.af.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_B:		sprintf(info->s = cpuintrf_temp_str(), "~B:%02X", T90.bc.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_C:		sprintf(info->s = cpuintrf_temp_str(), "~C:%02X", T90.bc.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_D:		sprintf(info->s = cpuintrf_temp_str(), "~D:%02X", T90.de.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_E:		sprintf(info->s = cpuintrf_temp_str(), "~E:%02X", T90.de.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_H:		sprintf(info->s = cpuintrf_temp_str(), "~H:%02X", T90.hl.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_L:		sprintf(info->s = cpuintrf_temp_str(), "~L:%02X", T90.hl.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_AF:		sprintf(info->s = cpuintrf_temp_str(), "AF:%04X", T90.af.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_BC:		sprintf(info->s = cpuintrf_temp_str(), "BC:%04X", T90.bc.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_DE:		sprintf(info->s = cpuintrf_temp_str(), "DE:%04X", T90.de.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_HL:		sprintf(info->s = cpuintrf_temp_str(), "HL:%04X", T90.hl.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_IX:		sprintf(info->s = cpuintrf_temp_str(), "IX:%04X", T90.ix.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_IY:		sprintf(info->s = cpuintrf_temp_str(), "IY:%04X", T90.iy.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_PC:		sprintf(info->s, "PC:%04X", T90.pc.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_SP:		sprintf(info->s, "SP:%04X", T90.sp.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_A:		sprintf(info->s, "~A:%02X", T90.af.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_B:		sprintf(info->s, "~B:%02X", T90.bc.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_C:		sprintf(info->s, "~C:%02X", T90.bc.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_D:		sprintf(info->s, "~D:%02X", T90.de.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_E:		sprintf(info->s, "~E:%02X", T90.de.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_H:		sprintf(info->s, "~H:%02X", T90.hl.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_L:		sprintf(info->s, "~L:%02X", T90.hl.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_AF:		sprintf(info->s, "AF:%04X", T90.af.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_BC:		sprintf(info->s, "BC:%04X", T90.bc.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_DE:		sprintf(info->s, "DE:%04X", T90.de.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_HL:		sprintf(info->s, "HL:%04X", T90.hl.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_IX:		sprintf(info->s, "IX:%04X", T90.ix.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_IY:		sprintf(info->s, "IY:%04X", T90.iy.w.l);	break;
 	}
 }
 
@@ -2838,7 +2834,7 @@ CPU_GET_INFO( tmp90841 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP90841");			return;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP90841");			return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);
@@ -2854,7 +2850,7 @@ CPU_GET_INFO( tmp91640 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP91640");			return;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP91640");			return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);
@@ -2870,7 +2866,7 @@ CPU_GET_INFO( tmp91641 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP91641");			return;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP91641");			return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);

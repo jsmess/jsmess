@@ -278,7 +278,7 @@ TODO:
 #if 0 // doesn't work for some reason
 static WRITE8_HANDLER(soundcpu_reset_w)
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 #endif
 
@@ -671,7 +671,7 @@ GFXDECODE_END
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1268,17 +1268,23 @@ ROM_START( bub68705 )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing */
 ROM_END
 
-static DRIVER_INIT( bublbobl )
+
+
+static void configure_banks(running_machine* machine)
 {
 	UINT8 *ROM = memory_region(machine, "main");
+	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
+}
 
-	/* in Bubble Bobble, bank 0 has code falling from 7fff to 8000, */
-	/* so I have to copy it there because bank switching wouldn't catch it */
-	memcpy(ROM + 0x08000, ROM + 0x10000, 0x4000);
+static DRIVER_INIT( bublbobl )
+{
+	configure_banks(machine);
 }
 
 static DRIVER_INIT( tokio )
 {
+	configure_banks(machine);
+
 	/* preemptively enable video, the bit is not mapped for this game and */
 	/* I don't know if it even has it. */
 	bublbobl_video_enable = 1;
@@ -1286,7 +1292,9 @@ static DRIVER_INIT( tokio )
 
 static DRIVER_INIT( tokiob )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
+	configure_banks(machine);
+
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
 
 	DRIVER_INIT_CALL(tokio);
 }

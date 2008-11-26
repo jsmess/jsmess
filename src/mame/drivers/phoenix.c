@@ -433,7 +433,7 @@ static const ay8910_interface survival_ay8910_interface =
 
 static MACHINE_RESET( phoenix )
 {
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x4000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x4000);
 }
 
 
@@ -1015,12 +1015,12 @@ ROM_END
 static DRIVER_INIT( condor )
 {
 	/* additional inputs for coinage */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5000, 0, 0, input_port_read_handler8(machine->portconfig, "DSW1") );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x5000, 0, 0, input_port_read_handler8(machine->portconfig, "DSW1") );
 }
 
 static DRIVER_INIT( survival )
 {
-	cpunum_set_info_fct(0, CPUINFO_PTR_I8085_SID_CALLBACK, (void*)survival_sid_callback);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_I8085_SID_CALLBACK, (void*)survival_sid_callback);
 }
 
 

@@ -51,19 +51,21 @@ static UINT8 r6532_porta_r(const device_config *device, UINT8 olddata)
 
 static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* handle 5220 read */
 	if ((olddata & 2) != 0 && (newdata & 2) == 0)
-		riot6532_portb_in_set(riot, tms5220_status_r(device->machine, 0), 0xff);
+		riot6532_portb_in_set(riot, tms5220_status_r(space, 0), 0xff);
 
 	/* handle 5220 write */
 	if ((olddata & 1) != 0 && (newdata & 1) == 0)
-		tms5220_data_w(device->machine, 0, riot6532_portb_out_get(riot));
+		tms5220_data_w(space, 0, riot6532_portb_out_get(riot));
 }
 
 
 static void snd_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, M6809_IRQ_LINE, state);
+	cpu_set_input_line(device->machine->cpu[1], M6809_IRQ_LINE, state);
 }
 
 
@@ -89,7 +91,7 @@ static TIMER_CALLBACK( sound_callback )
 {
 	riot6532_porta_in_set(riot, 0x40, 0x40);
 	main_data = param;
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -132,7 +134,7 @@ static TIMER_CALLBACK( main_callback )
 
 	riot6532_porta_in_set(riot, 0x80, 0x80);
 	sound_data = param;
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 WRITE8_HANDLER( starwars_main_wr_w )
@@ -146,5 +148,5 @@ WRITE8_HANDLER( starwars_soundrst_w )
 	riot6532_porta_in_set(riot, 0x00, 0xc0);
 
 	/* reset sound CPU here  */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }

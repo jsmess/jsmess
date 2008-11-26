@@ -34,9 +34,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -614,7 +614,7 @@ static STATE_POSTLOAD( updatevisiblearea )
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_x = m_n_screenwidth - 1;
 	visarea.max_y = m_n_screenheight - 1;
-	video_screen_configure(Machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
+	video_screen_configure(machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 static void psx_gpu_init( running_machine *machine )
@@ -738,7 +738,7 @@ static void psx_gpu_init( running_machine *machine )
 	}
 
 	// icky!!!
-	state_save_register_memory( "globals", 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	state_save_register_memory( "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
 	state_save_register_global_pointer( m_p_vram, m_n_vram_size );
 	state_save_register_global( m_n_gpu_buffer_offset );
@@ -3694,7 +3694,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			m_n_twy = 0;
 			m_n_twh = 255;
 			m_n_tww = 255;
-			updatevisiblearea(machine, NULL);
+			updatevisiblearea(space->machine, NULL);
 			break;
 		case 0x01:
 			verboselog( 1, "not handled: reset command buffer\n" );
@@ -3748,7 +3748,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			{
 				m_b_reverseflag = ( data >> 7 ) & 1;
 			}
-			updatevisiblearea(machine, NULL);
+			updatevisiblearea(space->machine, NULL);
 			break;
 		case 0x09:
 			verboselog( 1, "not handled: GPU Control 0x09: %08x\n", data );
@@ -3898,16 +3898,18 @@ READ32_HANDLER( psx_gpu_r )
 INTERRUPT_GEN( psx_vblank )
 {
 #if defined( MAME_DEBUG )
-	DebugCheckKeys(machine);
+	DebugCheckKeys(device->machine);
 #endif
 
 	m_n_gpustatus ^= ( 1L << 31 );
-	psx_irq_set( machine, 0x0001 );
+	psx_irq_set( device->machine, 0x0001 );
 }
 
 void psx_gpu_reset( running_machine *machine )
 {
-	psx_gpu_w( machine, 1, 0, 0xffffffff );
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	psx_gpu_w(space, 1, 0, 0xffffffff );
 }
 
 void psx_lightgun_set( int n_x, int n_y )

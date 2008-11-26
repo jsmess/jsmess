@@ -34,6 +34,7 @@ Notes:  Support is complete with the exception of the noise generator.
 #include "sound/discrete.h"
 
 #define BLOCKADE_LOG 0
+#define MASTER_CLOCK XTAL_20_079MHz
 
 /* These are used to simulate coin latch circuitry */
 
@@ -65,12 +66,12 @@ static DRIVER_INIT( blockade )
 
 static INTERRUPT_GEN( blockade_interrupt )
 {
-	cpunum_resume(0, SUSPEND_ANY_REASON);
+	cpu_resume(device, SUSPEND_ANY_REASON);
 
-	if ((input_port_read(machine, "IN0") & 0x80) == 0)
+	if ((input_port_read(device->machine, "IN0") & 0x80) == 0)
 	{
 		just_been_reset = 1;
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -78,7 +79,7 @@ static READ8_HANDLER( blockade_input_port_0_r )
 {
     /* coin latch is bit 7 */
 
-    UINT8 temp = (input_port_read(machine, "IN0") & 0x7f);
+    UINT8 temp = (input_port_read(space->machine, "IN0") & 0x7f);
     return (coin_latch<<7) | (temp);
 }
 
@@ -220,7 +221,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Boom Switch" )
+	PORT_DIPNAME( 0x04, 0x04, "Attract Sound" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Game_Time ) )
@@ -439,7 +440,7 @@ static PALETTE_INIT( bw )
 static MACHINE_DRIVER_START( blockade )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 2079000)
+	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/10)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", blockade_interrupt)

@@ -51,7 +51,7 @@ static WRITE16_HANDLER( pushman_flipscreen_w )
 static WRITE16_HANDLER( pushman_control_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(machine,0,(data>>8)&0xff);
+		soundlatch_w(space,0,(data>>8)&0xff);
 }
 
 static READ16_HANDLER( pushman_68705_r )
@@ -74,8 +74,8 @@ static WRITE16_HANDLER( pushman_68705_w )
 
 	if (offset==1)
 	{
-        cpunum_set_input_line(machine, 2,M68705_IRQ_LINE,HOLD_LINE);
-		cpu_spin();
+        cpu_set_input_line(space->machine->cpu[2],M68705_IRQ_LINE,HOLD_LINE);
+		cpu_spin(space->cpu);
 		new_latch=0;
 	}
 }
@@ -434,7 +434,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

@@ -212,21 +212,21 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
     TMS9928A_reset ();
     tms.LimitSprites = 1;
 
-	state_save_register_item("tms9928a", 0, tms.Regs[0]);
-	state_save_register_item("tms9928a", 0, tms.Regs[1]);
-	state_save_register_item("tms9928a", 0, tms.Regs[2]);
-	state_save_register_item("tms9928a", 0, tms.Regs[3]);
-	state_save_register_item("tms9928a", 0, tms.Regs[4]);
-	state_save_register_item("tms9928a", 0, tms.Regs[5]);
-	state_save_register_item("tms9928a", 0, tms.Regs[6]);
-	state_save_register_item("tms9928a", 0, tms.Regs[7]);
-	state_save_register_item("tms9928a", 0, tms.StatusReg);
-	state_save_register_item("tms9928a", 0, tms.ReadAhead);
-	state_save_register_item("tms9928a", 0, tms.FirstByte);
-	state_save_register_item("tms9928a", 0, tms.latch);
-	state_save_register_item("tms9928a", 0, tms.Addr);
-	state_save_register_item("tms9928a", 0, tms.INT);
-	state_save_register_item_pointer("tms9928a", 0, tms.vMem, intf->vram);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[0]);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[1]);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[2]);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[3]);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[4]);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[5]);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[6]);
+	state_save_register_item("tms9928a", NULL, 0, tms.Regs[7]);
+	state_save_register_item("tms9928a", NULL, 0, tms.StatusReg);
+	state_save_register_item("tms9928a", NULL, 0, tms.ReadAhead);
+	state_save_register_item("tms9928a", NULL, 0, tms.FirstByte);
+	state_save_register_item("tms9928a", NULL, 0, tms.latch);
+	state_save_register_item("tms9928a", NULL, 0, tms.Addr);
+	state_save_register_item("tms9928a", NULL, 0, tms.INT);
+	state_save_register_item_pointer("tms9928a", NULL, 0, tms.vMem, intf->vram);
 }
 
 const rectangle *TMS9928A_get_visarea (void)
@@ -273,7 +273,7 @@ READ8_HANDLER (TMS9928A_register_r) {
     tms.StatusReg = 0x1f;
     if (tms.INT) {
         tms.INT = 0;
-        if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
+        if (tms.INTCallback) tms.INTCallback (space->machine, tms.INT);
     }
     tms.latch = 0;
     return b;
@@ -287,13 +287,13 @@ WRITE8_HANDLER (TMS9928A_register_w) {
             /* register write */
 			reg = data & 7;
 			/*if (tms.FirstByte != tms.Regs[reg])*/ /* Removed to fix ColecoVision MESS Driver*/
-	            change_register (machine, reg, tms.FirstByte);
+	            change_register (space->machine, reg, tms.FirstByte);
         } else {
             /* set read/write address */
             tms.Addr = ((UINT16)data << 8 | tms.FirstByte) & (tms.vramsize - 1);
             if ( !(data & 0x40) ) {
 				/* read ahead */
-				TMS9928A_vram_r	(machine,0);
+				TMS9928A_vram_r	(space,0);
             }
         }
         tms.latch = 0;

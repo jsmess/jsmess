@@ -41,9 +41,9 @@ Notes:
 
 static READ8_HANDLER( trvquest_question_r )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 
-	return memory_region(machine, "questions")[*state->trvquest_question * 0x2000 + offset];
+	return memory_region(space->machine, "questions")[*state->trvquest_question * 0x2000 + offset];
 }
 
 static WRITE8_HANDLER( trvquest_coin_w )
@@ -149,7 +149,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpunum_set_input_line(machine, 0, 0, param);
+	cpu_set_input_line(machine->cpu[0], 0, param);
 }
 
 static void via_irq(running_machine *machine, int state)
@@ -195,8 +195,9 @@ static MACHINE_RESET( trvquest )
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	via_2_ca1_w(machine,0,1);
-	via_2_ca1_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	via_2_ca1_w(space,0,1);
+	via_2_ca1_w(space,0,0);
 }
 
 static MACHINE_DRIVER_START( trvquest )

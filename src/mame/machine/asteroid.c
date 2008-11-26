@@ -17,27 +17,27 @@ UINT8 *asteroid_ram1, *asteroid_ram2;
 INTERRUPT_GEN( asteroid_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
-	if (!(input_port_read(machine, "IN0") & 0x80))
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (!(input_port_read(device->machine, "IN0") & 0x80))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( asterock_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
-	if ((input_port_read(machine, "IN0") & 0x80))
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if ((input_port_read(device->machine, "IN0") & 0x80))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( llander_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
-	if (input_port_read(machine, "IN0") & 0x02)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "IN0") & 0x02)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_HANDLER( asteroid_IN0_r )
 {
-	int res = input_port_read(machine, "IN0");
+	int res = input_port_read(space->machine, "IN0");
 	int bitmask = (1 << offset);
 
 	if (res & bitmask)
@@ -51,7 +51,7 @@ READ8_HANDLER( asteroid_IN0_r )
 
 READ8_HANDLER( asterock_IN0_r )
 {
-	int res = input_port_read(machine, "IN0");
+	int res = input_port_read(space->machine, "IN0");
 	int bitmask = (1 << offset);
 
 	if (res & bitmask)
@@ -69,7 +69,7 @@ READ8_HANDLER( asterock_IN0_r )
 
 READ8_HANDLER( asteroid_IN1_r )
 {
-	int res = input_port_read(machine, "IN1");
+	int res = input_port_read(space->machine, "IN1");
 	int bitmask = (1 << (offset & 0x7));
 
 	if (res & bitmask)
@@ -86,7 +86,7 @@ READ8_HANDLER( asteroid_DSW1_r )
 	int res;
 	int res1;
 
-	res1 = input_port_read(machine, "DSW1");
+	res1 = input_port_read(space->machine, "DSW1");
 
 	res = 0xfc | ((res1 >> (2 * (3 - (offset & 0x3)))) & 0x3);
 	return res;
@@ -97,13 +97,13 @@ WRITE8_HANDLER( asteroid_bank_switch_w )
 {
 	if (data & 4)
 	{
-		memory_set_bankptr(1, asteroid_ram2);
-		memory_set_bankptr(2, asteroid_ram1);
+		memory_set_bankptr(space->machine, 1, asteroid_ram2);
+		memory_set_bankptr(space->machine, 2, asteroid_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(1, asteroid_ram1);
-		memory_set_bankptr(2, asteroid_ram2);
+		memory_set_bankptr(space->machine, 1, asteroid_ram1);
+		memory_set_bankptr(space->machine, 2, asteroid_ram2);
 	}
 
 	set_led_status (0, ~data & 0x02);
@@ -115,13 +115,13 @@ WRITE8_HANDLER( astdelux_bank_switch_w )
 {
 	if (data & 0x80)
 	{
-		memory_set_bankptr(1, asteroid_ram2);
-		memory_set_bankptr(2, asteroid_ram1);
+		memory_set_bankptr(space->machine, 1, asteroid_ram2);
+		memory_set_bankptr(space->machine, 2, asteroid_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(1, asteroid_ram1);
-		memory_set_bankptr(2, asteroid_ram2);
+		memory_set_bankptr(space->machine, 1, asteroid_ram1);
+		memory_set_bankptr(space->machine, 2, asteroid_ram2);
 	}
 }
 
@@ -134,6 +134,6 @@ WRITE8_HANDLER( astdelux_led_w )
 
 MACHINE_RESET( asteroid )
 {
-	asteroid_bank_switch_w(machine,0,0);
-	avgdvg_reset_w(machine,0,0);
+	asteroid_bank_switch_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
+	avgdvg_reset_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
 }

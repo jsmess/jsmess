@@ -35,7 +35,7 @@ static int firq_enable;
 
 static WRITE8_HANDLER( ajax_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress = 0;
 
 	/* rom select */
@@ -50,7 +50,7 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 
 	/* bank # (ROMS N11 and N12) */
 	bankaddress += 0x10000 + (data & 0x07)*0x2000;
-	memory_set_bankptr(2,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 2,&RAM[bankaddress]);
 }
 
 /*  ajax_lamps_w:
@@ -114,21 +114,21 @@ READ8_HANDLER( ajax_ls138_f10_r )
 	switch ((offset & 0x01c0) >> 6)
 	{
 		case 0x00:	/* ??? */
-			data = mame_rand(machine);
+			data = mame_rand(space->machine);
 			break;
 		case 0x04:	/* 2P inputs */
-			data = input_port_read(machine, "P2");
+			data = input_port_read(space->machine, "P2");
 			break;
 		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
 			index = offset & 0x01;
-			data = input_port_read(machine, (offset & 0x02) ? portnames[2 + index] : portnames[index]);
+			data = input_port_read(space->machine, (offset & 0x02) ? portnames[2 + index] : portnames[index]);
 			break;
 		case 0x07:	/* DIPSW #3 */
-			data = input_port_read(machine, "DSW3");
+			data = input_port_read(space->machine, "DSW3");
 			break;
 
 		default:
-			logerror("%04x: (ls138_f10) read from an unknown address %02x\n",activecpu_get_pc(), offset);
+			logerror("%04x: (ls138_f10) read from an unknown address %02x\n",cpu_get_pc(space->cpu), offset);
 	}
 
 	return data;
@@ -139,27 +139,27 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 	switch ((offset & 0x01c0) >> 6){
 		case 0x00:	/* NSFIRQ + AFR */
 			if (offset)
-				watchdog_reset_w(machine, 0, data);
+				watchdog_reset_w(space, 0, data);
 			else{
 				if (firq_enable)	/* Cause interrupt on slave CPU */
-					cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
 		case 0x01:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
-			soundlatch_w(machine,offset,data);
+			soundlatch_w(space,offset,data);
 			break;
 		case 0x03:	/* Bankswitch + coin counters + priority*/
-			ajax_bankswitch_w(machine, 0, data);
+			ajax_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:	/* Lamps + Joystick vibration + Control panel quaking */
-			ajax_lamps_w(machine, 0, data);
+			ajax_lamps_w(space, 0, data);
 			break;
 
 		default:
-			logerror("%04x: (ls138_f10) write %02x to an unknown address %02x\n",activecpu_get_pc(), data, offset);
+			logerror("%04x: (ls138_f10) write %02x to an unknown address %02x\n",cpu_get_pc(space->cpu), data, offset);
 	}
 }
 
@@ -180,7 +180,7 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 
 WRITE8_HANDLER( ajax_bankswitch_2_w )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 	int bankaddress;
 
 	/* enable char ROM reading through the video RAM */
@@ -194,18 +194,19 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 
 	/* bank # (ROMS G16 and I16) */
 	bankaddress = 0x10000 + (data & 0x0f)*0x2000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 }
 
 
 MACHINE_RESET( ajax )
 {
-	ajax_bankswitch_w(machine, 0, 0);
-	ajax_bankswitch_2_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	ajax_bankswitch_w(space, 0, 0);
+	ajax_bankswitch_2_w(space, 0, 0);
 }
 
 INTERRUPT_GEN( ajax_interrupt )
 {
 	if (K051960_is_IRQ_enabled())
-		cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }

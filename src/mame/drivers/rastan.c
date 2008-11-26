@@ -182,7 +182,7 @@ static WRITE8_HANDLER( rastan_bankswitch_w )
 	if (data == 0) offs = 0x0000;
 	else offs = (data-1) * 0x4000 + 0x10000;
 
-	memory_set_bankptr( 1, memory_region(machine, "audio") + offs );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "audio") + offs );
 }
 
 
@@ -358,7 +358,7 @@ GFXDECODE_END
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

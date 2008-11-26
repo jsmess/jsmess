@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "video/mc6845.h"
 #include "qix.h"
+#include "cpu/m6809/m6809.h"
 
 
 
@@ -87,7 +88,7 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
 
 WRITE8_HANDLER( qix_flip_screen_w )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	state->flip = data;
 }
@@ -111,7 +112,7 @@ WRITE8_HANDLER( qix_flip_screen_w )
 
 static READ8_HANDLER( qix_videoram_r )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -121,11 +122,11 @@ static READ8_HANDLER( qix_videoram_r )
 
 static WRITE8_HANDLER( qix_videoram_w )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -137,11 +138,11 @@ static WRITE8_HANDLER( qix_videoram_w )
 
 static WRITE8_HANDLER( slither_videoram_w )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -169,7 +170,7 @@ static WRITE8_HANDLER( slither_videoram_w )
 
 static READ8_HANDLER( qix_addresslatch_r )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -179,10 +180,10 @@ static READ8_HANDLER( qix_addresslatch_r )
 
 static WRITE8_HANDLER( qix_addresslatch_w )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -194,10 +195,10 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 
 static WRITE8_HANDLER( slither_addresslatch_w )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -219,7 +220,7 @@ static WRITE8_HANDLER( slither_addresslatch_w )
 
 static WRITE8_HANDLER( qix_paletteram_w )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	UINT8 old_data = state->paletteram[offset];
 
@@ -229,18 +230,18 @@ static WRITE8_HANDLER( qix_paletteram_w )
 	/* trigger an update if a currently visible pen has changed */
 	if (((offset >> 8) == state->palette_bank) &&
 	    (old_data != data))
-		video_screen_update_now(machine->primary_screen);
+		video_screen_update_now(space->machine->primary_screen);
 }
 
 
 WRITE8_HANDLER( qix_palettebank_w )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = space->machine->driver_data;
 
 	/* set the bank value */
 	if (state->palette_bank != (data & 3))
 	{
-		video_screen_update_now(machine->primary_screen);
+		video_screen_update_now(space->machine->primary_screen);
 		state->palette_bank = data & 3;
 	}
 
@@ -440,9 +441,16 @@ static const mc6845_interface mc6845_intf =
 };
 
 
+static const m6809_config encryption_config =
+{
+	TRUE,		/* encrypt only the first byte in 10 xx and 11 xx opcodes */
+};
+
+
 MACHINE_DRIVER_START( qix_video )
 	MDRV_CPU_ADD("video", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(qix_video_map,0)
+	MDRV_CPU_CONFIG(encryption_config)	// for kram3
 
 	MDRV_VIDEO_START(qix)
 	MDRV_VIDEO_UPDATE(qix)

@@ -126,17 +126,17 @@ INLINE void bg_changecolor_RRRRGGGGBBBBxxxx(running_machine *machine,pen_t color
 static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
 	bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(machine, offset / 2,bg_paletteram[offset | 1] | (bg_paletteram[offset & ~1] << 8));
+	bg_changecolor_RRRRGGGGBBBBxxxx(space->machine, offset / 2,bg_paletteram[offset | 1] | (bg_paletteram[offset & ~1] << 8));
 }
 
 static WRITE8_HANDLER( missb2_bg_bank_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "slave");
+	UINT8 *RAM = memory_region(space->machine, "slave");
 
 	// I don't know how this is really connected,bit 1 is always high afaik...
 	bankaddress = ((data & 2) ? 0x1000 : 0x0000) | ((data & 1) ? 0x4000 : 0x0000) | (0x8000);
-	memory_set_bankptr(2, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 2, &RAM[bankaddress]);
 }
 
 /* Memory Maps */
@@ -336,7 +336,7 @@ GFXDECODE_END
 static void irqhandler(running_machine *machine, int irq)
 {
 	logerror("YM3526 firing an IRQ\n");
-//  cpunum_set_input_line(machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =
@@ -348,7 +348,7 @@ static const ym3526_interface ym3526_config =
 
 static INTERRUPT_GEN( missb2_interrupt )
 {
-	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 /* Machine Driver */
@@ -431,18 +431,6 @@ ROM_START( missb2 )
 	ROM_LOAD( "a71-25.bin",  0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing - taken from bublbobl */
 ROM_END
 
-/* Driver Initialization */
-
-static DRIVER_INIT( missb2 )
-{
-	UINT8 *ROM = memory_region(machine, "main");
-
-	/* in Bubble Bobble, bank 0 has code falling from 7fff to 8000,
-       so I have to copy it there because bank switching wouldn't catch it */
-	memcpy(ROM+0x08000,ROM+0x10000,0x4000);
-
-}
-
 /* Game Drivers */
 
-GAME( 1996, missb2, 0, missb2, missb2, missb2, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, missb2, 0, missb2, missb2, 0, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

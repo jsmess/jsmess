@@ -221,7 +221,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt );
 static void set_m92_bank(running_machine *machine)
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(machine, 1,&RAM[bankaddress]);
 }
 
 static STATE_POSTLOAD( m92_postload )
@@ -254,14 +254,14 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	if (scanline == m92_raster_irq_position)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_2);
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M92_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_0);
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M92_IRQ_0);
 	}
 
 	/* adjust for next scanline */
@@ -274,15 +274,15 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 
 static READ16_HANDLER( m92_eeprom_r )
 {
-	UINT8 *RAM = memory_region(machine, "user1");
-//  logerror("%05x: EEPROM RE %04x\n",activecpu_get_pc(),offset);
+	UINT8 *RAM = memory_region(space->machine, "user1");
+//  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(space->cpu),offset);
 	return RAM[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_eeprom_w )
 {
-	UINT8 *RAM = memory_region(machine, "user1");
-//  logerror("%05x: EEPROM WR %04x\n",activecpu_get_pc(),offset);
+	UINT8 *RAM = memory_region(space->machine, "user1");
+//  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(space->cpu),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
 }
@@ -304,7 +304,7 @@ static WRITE16_HANDLER( m92_bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		bankaddress = 0x100000 + ((data & 0x7) * 0x10000);
-		set_m92_bank(machine);
+		set_m92_bank(space->machine);
 	}
 }
 
@@ -329,31 +329,31 @@ static TIMER_CALLBACK( setvector_callback )
 	}
 
 	if (irqvector & 0x2)		/* YM2151 has precedence */
-		cpunum_set_input_line_vector(1, 0, 0x18);
+		cpu_set_input_line_vector(machine->cpu[1], 0, 0x18);
 	else if (irqvector & 0x1)	/* V30 */
-		cpunum_set_input_line_vector(1, 0, 0x19);
+		cpu_set_input_line_vector(machine->cpu[1], 0, 0x19);
 
 	if (irqvector == 0)	/* no IRQs pending */
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( m92_soundlatch_w )
 {
 	timer_call_after_resynch(NULL, V30_ASSERT, setvector_callback);
-	soundlatch_w(machine, 0, data & 0xff);
+	soundlatch_w(space, 0, data & 0xff);
 }
 
 static READ16_HANDLER( m92_sound_status_r )
 {
-//logerror("%06x: read sound status\n",activecpu_get_pc());
+//logerror("%06x: read sound status\n",cpu_get_pc(space->cpu));
 	return sound_status;
 }
 
 static READ16_HANDLER( m92_soundlatch_r )
 {
-	return soundlatch_r(machine, offset) | 0xff00;
+	return soundlatch_r(space, offset) | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_sound_irq_ack_w )
@@ -364,7 +364,7 @@ static WRITE16_HANDLER( m92_sound_irq_ack_w )
 static WRITE16_HANDLER( m92_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_3);
+	cpu_set_input_line_and_vector(space->machine->cpu[0], 0, HOLD_LINE, M92_IRQ_3);
 }
 
 /*****************************************************************************/
@@ -908,7 +908,7 @@ static const ym2151_interface ym2151_config =
 
 void m92_sprite_interrupt(running_machine *machine)
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_1);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M92_IRQ_1);
 }
 
 static MACHINE_DRIVER_START( m92 )
@@ -1972,7 +1972,7 @@ static void init_m92(running_machine *machine, int hasbanks)
 
 		/* Mirror used by In The Hunt for protection */
 		memcpy(RAM+0xc0000,RAM+0x00000,0x10000);
-		memory_set_bankptr(2,&RAM[0xc0000]);
+		memory_set_bankptr(machine, 2,&RAM[0xc0000]);
 	}
 
 	RAM = memory_region(machine, "sound");
@@ -2027,7 +2027,7 @@ static DRIVER_INIT( majtitl2 )
 	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
 
 	m92_game_kludge=2;
 }
@@ -2049,7 +2049,7 @@ static DRIVER_INIT( lethalth )
 	m92_irq_vectorbase=0x20;
 
 	/* NOP out the bankswitcher */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x21, 0, 0, SMH_NOP);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0, SMH_NOP);
 }
 
 static DRIVER_INIT( nbbatman )

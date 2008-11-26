@@ -15,7 +15,6 @@
 
 #include "mb86233.h"
 #include "debugger.h"
-#include "deprecat.h"
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
@@ -46,6 +45,9 @@ typedef struct
 
 	UINT32			gpr[16];
 	UINT32			extport[0x30];
+
+	const device_config *device;
+	const address_space *program;
 
 	/* FIFO */
 	int				fifo_wait;
@@ -88,9 +90,9 @@ static int mb86233_icount;
 #define ALU(a)				mb86233_alu(a)
 #define GETREPCNT()			mb86233.repcnt
 
-#define ROPCODE(a)			cpu_readop32(a<<2)
-#define RDMEM(a)			program_read_dword_32le((a<<2))
-#define WRMEM(a,v)			program_write_dword_32le((a<<2),v)
+#define ROPCODE(a)			memory_decrypted_read_dword(mb86233.program, a<<2)
+#define RDMEM(a)			memory_read_dword_32le(mb86233.program, (a<<2))
+#define WRMEM(a,v)			memory_write_dword_32le(mb86233.program, (a<<2), v)
 
 /***************************************************************************
     Context Switching
@@ -107,7 +109,6 @@ static CPU_SET_CONTEXT( mb86233 )
 	/* copy the context */
 	if (src)
 		mb86233 = *(MB86233_REGS *)src;
-	change_pc(GETPC());
 }
 
 
@@ -117,12 +118,14 @@ static CPU_SET_CONTEXT( mb86233 )
 
 static CPU_INIT( mb86233 )
 {
-	mb86233_cpu_core * _config = (mb86233_cpu_core *)config;
+	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->static_config;
 	(void)index;
 	(void)clock;
 	(void)irqcallback;
 
 	memset(&mb86233, 0, sizeof( MB86233_REGS ) );
+	mb86233.device = device;
+	mb86233.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	if ( _config )
 	{
@@ -134,7 +137,7 @@ static CPU_INIT( mb86233 )
 	memset( mb86233.RAM, 0, 2 * 0x200 * sizeof(UINT32) );
 	mb86233.ARAM = &mb86233.RAM[0];
 	mb86233.BRAM = &mb86233.RAM[0x200];
-	mb86233.Tables = (UINT32*) memory_region(Machine, _config->tablergn);
+	mb86233.Tables = (UINT32*) memory_region(device->machine, _config->tablergn);
 
 	state_save_register_global_pointer(mb86233.RAM,2 * 0x200 * sizeof(UINT32));
 }
@@ -974,7 +977,7 @@ static CPU_EXECUTE( mb86233 )
 		UINT32		val;
 		UINT32		opcode;
 
-		debugger_instruction_hook(Machine, GETPC());
+		debugger_instruction_hook(device, GETPC());
 
 		opcode = ROPCODE(GETPC());
 
@@ -1436,7 +1439,6 @@ static CPU_EXECUTE( mb86233 )
 					{
 						case 0x00:	/* BRIF <addr> */
 							GETPC() = data - 1;
-							change_pc( GETPC() );
 						break;
 
 						case 0x02:	/* BRIF indirect */
@@ -1450,14 +1452,12 @@ static CPU_EXECUTE( mb86233 )
 								break;
 
 							GETPC() = data;
-							change_pc( GETPC() );
 						break;
 
 						case 0x04:	/* BSIF <addr> */
 							GETPCS()[GETPCSP()] = GETPC();
 							GETPCSP()++;
 							GETPC() = data - 1;
-							change_pc( GETPC() );
 						break;
 
 						case 0x06:	/* BSIF indirect */
@@ -1473,13 +1473,11 @@ static CPU_EXECUTE( mb86233 )
 								break;
 
 							GETPC() = data;
-							change_pc( GETPC() );
 						break;
 
 						case 0x0a:	/* RTIF */
 							--GETPCSP();
 							GETPC() = GETPCS()[GETPCSP()];
-							change_pc( GETPC() );
 						break;
 
 						case 0x0c:	/* LDIF */
@@ -1523,14 +1521,12 @@ static CPU_EXECUTE( mb86233 )
 								break;
 
 							GETPC() = data;
-							change_pc( GETPC() );
 						break;
 
 						case 0x04:	/* BSUL <addr> */
 							GETPCS()[GETPCSP()] = GETPC();
 							GETPCSP()++;
 							GETPC() = data - 1;
-							change_pc( GETPC() );
 						break;
 
 						case 0x06:	/* BSUL indirect */
@@ -1546,13 +1542,11 @@ static CPU_EXECUTE( mb86233 )
 								break;
 
 							GETPC() = data;
-							change_pc( GETPC() );
 						break;
 
 						case 0x0a:	/* RTUL */
 							--GETPCSP();
 							GETPC() = GETPCS()[GETPCSP()];
-							change_pc( GETPC() );
 						break;
 
 						case 0x0c:	/* LDUL */
@@ -1617,7 +1611,7 @@ static CPU_SET_INFO( mb86233 )
 	switch (state)
 	{
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + MB86233_PC:			GETPC() = info->i; change_pc(GETPC());	break;
+		case CPUINFO_INT_REGISTER + MB86233_PC:			GETPC() = info->i; 						break;
 		case CPUINFO_INT_REGISTER + MB86233_A:			GETA().u = info->i;						break;
 		case CPUINFO_INT_REGISTER + MB86233_B:			GETB().u = info->i;						break;
 		case CPUINFO_INT_REGISTER + MB86233_P:			GETP().u = info->i;						break;

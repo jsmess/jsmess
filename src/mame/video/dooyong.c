@@ -95,22 +95,22 @@ WRITE8_HANDLER( dooyong_fg2scroll8_w )
 
 WRITE16_HANDLER( dooyong_bgscroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_bgscroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_bgscroll8_w(space, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_bg2scroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_bg2scroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_bg2scroll8_w(space, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fgscroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_fgscroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_fgscroll8_w(space, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fg2scroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_fg2scroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_fg2scroll8_w(space, offset, data & 0x00ff);
 }
 
 
@@ -163,7 +163,7 @@ WRITE8_HANDLER( pollux_ctrl_w )
 WRITE8_HANDLER( primella_ctrl_w )
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(1, data & 0x07);
+	memory_set_bank(space->machine, 1, data & 0x07);
 
 	/* bit 3 disables tx layer */
 	tx_pri = data & 0x08;
@@ -173,7 +173,7 @@ WRITE8_HANDLER( primella_ctrl_w )
 
 	/* bit 5 used but unknown */
 
-//  logerror("%04x: bankswitch = %02x\n",activecpu_get_pc(),data&0xe0);
+//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(space->cpu),data&0xe0);
 }
 
 WRITE8_HANDLER( flytiger_ctrl_w )
@@ -904,10 +904,14 @@ VIDEO_START( popbingo )
 
 VIDEO_EOF( dooyong )
 {
-	buffer_spriteram_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram_w(space, 0, 0);
 }
 
 VIDEO_EOF( rshark )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

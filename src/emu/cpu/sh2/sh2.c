@@ -28,7 +28,7 @@
 /*****************************************************************************
     Changes
     20051129 Mariusz Wojcieszek
-    - introduced cpu_readop16() for opcode fetching
+    - introduced memory_decrypted_read_word() for opcode fetching
 
     20050813 Mariusz Wojcieszek
     - fixed 64 bit / 32 bit division in division unit
@@ -49,7 +49,6 @@
 
     20021020 O. Galibert
     - DMA implementation, lightly tested
-    - change_pc() crap fixed
     - delay slot in debugger fixed
     - add divide box mirrors
     - Nicola-ify the indentation
@@ -120,43 +119,43 @@ SH2 *sh2;
 INLINE UINT8 RB(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
 
 	if (A >= 0xc0000000)
-		return program_read_byte_32be(A);
+		return memory_read_byte_32be(sh2->program, A);
 
 	if (A >= 0x40000000)
 		return 0xa5;
 
-	return program_read_byte_32be(A & AM);
+	return memory_read_byte_32be(sh2->program, A & AM);
 }
 
 INLINE UINT16 RW(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
-		return program_read_word_32be(A);
+		return memory_read_word_32be(sh2->program, A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5;
 
-	return program_read_word_32be(A & AM);
+	return memory_read_word_32be(sh2->program, A & AM);
 }
 
 INLINE UINT32 RL(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return program_read_dword_32be(A);
+		return memory_read_dword_32be(sh2->program, A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return program_read_dword_32be(A & AM);
+  return memory_read_dword_32be(sh2->program, A & AM);
 }
 
 INLINE void WB(offs_t A, UINT8 V)
@@ -164,60 +163,60 @@ INLINE void WB(offs_t A, UINT8 V)
 
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(Machine, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));
+		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));
 		return;
 	}
 
 	if (A >= 0xc0000000)
 	{
-		program_write_byte_32be(A,V);
+		memory_write_byte_32be(sh2->program, A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	program_write_byte_32be(A & AM,V);
+	memory_write_byte_32be(sh2->program, A & AM,V);
 }
 
 INLINE void WW(offs_t A, UINT16 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(Machine, (A & 0x1fc)>>2, V << (((~A) & 2)*8), 0xffff << (((~A) & 2)*8));
+		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 2)*8), 0xffff << (((~A) & 2)*8));
 		return;
 	}
 
 	if (A >= 0xc0000000)
 	{
-		program_write_word_32be(A,V);
+		memory_write_word_32be(sh2->program, A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	program_write_word_32be(A & AM,V);
+	memory_write_word_32be(sh2->program, A & AM,V);
 }
 
 INLINE void WL(offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(Machine, (A & 0x1fc)>>2, V, 0xffffffff);
+		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
 		return;
 	}
 
 	if (A >= 0xc0000000)
 	{
-		program_write_dword_32be(A,V);
+		memory_write_dword_32be(sh2->program, A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	program_write_dword_32be(A & AM,V);
+	memory_write_dword_32be(sh2->program, A & AM,V);
 }
 
 /*  code                 cycles  t-bit
@@ -334,7 +333,6 @@ INLINE void BF(UINT32 d)
 	{
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh2->pc = sh2->ea = sh2->pc + disp * 2 + 2;
-		change_pc(sh2->pc & AM);
 		sh2_icount -= 2;
 	}
 }
@@ -425,7 +423,6 @@ INLINE void BT(UINT32 d)
 	{
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh2->pc = sh2->ea = sh2->pc + disp * 2 + 2;
-		change_pc(sh2->pc & AM);
 		sh2_icount -= 2;
 	}
 }
@@ -1742,7 +1739,6 @@ INLINE void TRAPA(UINT32 i)
 	WL( sh2->r[15], sh2->pc );
 
 	sh2->pc = RL( sh2->ea );
-	change_pc(sh2->pc & AM);
 
 	sh2_icount -= 7;
 }
@@ -2141,14 +2137,11 @@ static CPU_RESET( sh2 )
 {
 	void *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
-	int cpunum;
 	int save_is_slave;
 
 	void (*f)(UINT32 data);
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
-	cpunum = sh2->cpu_number;
 	m = sh2->m;
 	tsave = sh2->timer;
 	tsaved0 = sh2->dma_timer[0];
@@ -2156,7 +2149,6 @@ static CPU_RESET( sh2 )
 
 	f = sh2->ftcsr_read_callback;
 	save_irqcallback = sh2->irq_callback;
-	save_device = sh2->device;
 	save_is_slave = sh2->is_slave;
 	dma_callback_kludge = sh2->dma_callback_kludge;
 
@@ -2166,19 +2158,17 @@ static CPU_RESET( sh2 )
 	sh2->is_slave = save_is_slave;
 	sh2->ftcsr_read_callback = f;
 	sh2->irq_callback = save_irqcallback;
-	sh2->device = save_device;
+	sh2->device = device;
 
 	sh2->timer = tsave;
 	sh2->dma_timer[0] = tsaved0;
 	sh2->dma_timer[1] = tsaved1;
-	sh2->cpu_number = cpunum;
 	sh2->m = m;
 	memset(sh2->m, 0, 0x200);
 
 	sh2->pc = RL(0);
 	sh2->r[15] = RL(4);
 	sh2->sr = I;
-	change_pc(sh2->pc & AM);
 
 	sh2->internal_irq_level = -1;
 }
@@ -2207,14 +2197,13 @@ static CPU_EXECUTE( sh2 )
 
 		if (sh2->delay)
 		{
-			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh2->delay & AM)));
-			change_pc(sh2->pc & AM);
+			opcode = memory_decrypted_read_word(sh2->program, WORD_XOR_BE((UINT32)(sh2->delay & AM)));
 			sh2->pc -= 2;
 		}
 		else
-			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh2->pc & AM)));
+			opcode = memory_decrypted_read_word(sh2->program, WORD_XOR_BE((UINT32)(sh2->pc & AM)));
 
-		debugger_instruction_hook(Machine, sh2->pc);
+		debugger_instruction_hook(device, sh2->pc);
 
 		sh2->delay = 0;
 		sh2->pc += 2;
@@ -2277,7 +2266,7 @@ static CPU_INIT( sh2 )
 	memset(sh2, 0, sizeof(SH2));
 
 	/* initialize the common core parts */
-	sh2_common_init(0, device, index, clock, config, irqcallback);
+	sh2_common_init(0, device, index, clock, irqcallback);
 }
 
 /**************************************************************************
@@ -2335,7 +2324,7 @@ static CPU_SET_INFO( sh2 )
 		case CPUINFO_INT_REGISTER + SH2_R15:			sh2->r[15] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_EA:				sh2->ea = info->i;						break;
 
-		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(cpu_getactivecpu(), info->i); break;
+		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(cpunum_get_active(), info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;

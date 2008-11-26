@@ -13,8 +13,6 @@
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		cpu_readop32(pc)
-
 #define ABS(x) (((x) >= 0) ? (x) : -(x))
 
 

@@ -50,8 +50,8 @@ static UINT8 bslapstic_primed;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -81,7 +81,7 @@ static MACHINE_RESET( atarig1 )
 static WRITE16_HANDLER( mo_control_w )
 {
 	if (ACCESSING_BITS_0_7)
-		atarirle_control_w(machine, 0, data & 7);
+		atarirle_control_w(space->machine, 0, data & 7);
 }
 
 
@@ -101,7 +101,7 @@ static WRITE16_HANDLER( mo_command_w )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int temp = input_port_read(machine, "IN0");
+	int temp = input_port_read(space->machine, "IN0");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x1000;
 	temp ^= 0x2000;		/* A2DOK always high for now */
 	return temp;
@@ -120,11 +120,11 @@ static READ16_HANDLER( a2d_data_r )
 
 	/* Pit Fighter has no A2D, just another input port */
 	if (atarig1_pitfight)
-		return input_port_read(machine, "ADC0");
+		return input_port_read(space->machine, "ADC0");
 
 	/* otherwise, assume it's hydra */
 	if (which_input < 3)
-		return input_port_read(machine, adcnames[which_input]) << 8;
+		return input_port_read(space->machine, adcnames[which_input]) << 8;
 
 	return 0;
 }
@@ -192,7 +192,7 @@ static READ16_HANDLER( pitfighb_cheap_slapstic_r )
 static void pitfighb_cheap_slapstic_init(running_machine *machine)
 {
 	/* install a read handler */
-	bslapstic_base = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
+	bslapstic_base = memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
 
 	/* allocate memory for a copy of bank 0 */
 	bslapstic_bank0 = auto_malloc(0x2000);

@@ -7,6 +7,8 @@
 ***************************************************************************/
 
 #include "ppccom.h"
+#include "cpuexec.h"
+#include "mame.h"
 #include "deprecat.h"
 
 
@@ -121,7 +123,7 @@ INLINE void set_xer(powerpc_state *ppc, UINT32 value)
 
 INLINE UINT64 get_timebase(powerpc_state *ppc)
 {
-	return (cpunum_gettotalcycles(ppc->cpunum) - ppc->tb_zero_cycles) / ppc->tb_divisor;
+	return (cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) - ppc->tb_zero_cycles) / ppc->tb_divisor;
 }
 
 
@@ -131,7 +133,7 @@ INLINE UINT64 get_timebase(powerpc_state *ppc)
 
 INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 {
-	ppc->tb_zero_cycles = activecpu_gettotalcycles() - newtb * ppc->tb_divisor;
+	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->activecpu) - newtb * ppc->tb_divisor;
 }
 
 
@@ -142,7 +144,7 @@ INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 
 INLINE UINT32 get_decrementer(powerpc_state *ppc)
 {
-	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpunum_gettotalcycles(ppc->cpunum);
+	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 	cycles_until_zero = MAX(cycles_until_zero, 0);
 	return cycles_until_zero / ppc->tb_divisor;
 }
@@ -159,13 +161,13 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 
 	if (PRINTF_DECREMENTER)
 	{
-		UINT64 total = cpunum_gettotalcycles(ppc->cpunum);
+		UINT64 total = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 		mame_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
 				curdec, newdec, ppc->tb_divisor,
 				(UINT32)(total >> 32), (UINT32)total, (UINT32)(cycles_until_done >> 32), (UINT32)cycles_until_done);
 	}
 
-	ppc->dec_zero_cycles = cpunum_gettotalcycles(ppc->cpunum) + cycles_until_done;
+	ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) + cycles_until_done;
 	timer_adjust_oneshot(ppc->decrementer_int_timer, ATTOTIME_IN_CYCLES(cycles_until_done, ppc->cpunum), 0);
 
 	if ((INT32)curdec >= 0 && (INT32)newdec < 0)
@@ -183,11 +185,13 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, const powerpc_config *config, cpu_irq_callback irqcallback)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
+	const powerpc_config *config = device->static_config;
+
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
-	ppc->cpunum = cpu_getactivecpu();
+	ppc->cpunum = cpunum_get_active();
 	ppc->flavor = flavor;
 	ppc->cap = cap;
 	ppc->cache_line_size = 32;
@@ -195,11 +199,12 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->cpu_clock = clock;
 	ppc->irq_callback = irqcallback;
 	ppc->device = device;
+	ppc->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : clock;
 	ppc->tb_divisor = (ppc->tb_divisor * clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 
 	/* allocate the virtual TLB */
-	ppc->vtlb = vtlb_alloc(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, (cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);
+	ppc->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, (cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);
 
 	/* allocate a timer for the compare interrupt */
 	if (cap & PPCCAP_OEA)
@@ -213,40 +218,37 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 		ppc->spu.timer = timer_alloc(ppc4xx_spu_callback, ppc);
 	}
 
-	/* reset the state */
-	ppccom_reset(ppc);
-
 	/* register for save states */
-	state_save_register_item("ppc", index, ppc->pc);
-	state_save_register_item_array("ppc", index, ppc->r);
-	state_save_register_item_array("ppc", index, ppc->f);
-	state_save_register_item_array("ppc", index, ppc->cr);
-	state_save_register_item("ppc", index, ppc->xerso);
-	state_save_register_item("ppc", index, ppc->fpscr);
-	state_save_register_item("ppc", index, ppc->msr);
-	state_save_register_item_array("ppc", index, ppc->sr);
-	state_save_register_item_array("ppc", index, ppc->spr);
-	state_save_register_item_array("ppc", index, ppc->dcr);
+	state_save_register_item("ppc", device->tag, 0, ppc->pc);
+	state_save_register_item_array("ppc", device->tag, 0, ppc->r);
+	state_save_register_item_array("ppc", device->tag, 0, ppc->f);
+	state_save_register_item_array("ppc", device->tag, 0, ppc->cr);
+	state_save_register_item("ppc", device->tag, 0, ppc->xerso);
+	state_save_register_item("ppc", device->tag, 0, ppc->fpscr);
+	state_save_register_item("ppc", device->tag, 0, ppc->msr);
+	state_save_register_item_array("ppc", device->tag, 0, ppc->sr);
+	state_save_register_item_array("ppc", device->tag, 0, ppc->spr);
+	state_save_register_item_array("ppc", device->tag, 0, ppc->dcr);
 	if (cap & PPCCAP_4XX)
 	{
-		state_save_register_item_array("ppc", index, ppc->spu.regs);
-		state_save_register_item("ppc", index, ppc->spu.txbuf);
-		state_save_register_item("ppc", index, ppc->spu.rxbuf);
-		state_save_register_item_array("ppc", index, ppc->spu.rxbuffer);
-		state_save_register_item("ppc", index, ppc->spu.rxin);
-		state_save_register_item("ppc", index, ppc->spu.rxout);
-		state_save_register_item("ppc", index, ppc->pit_reload);
-		state_save_register_item("ppc", index, ppc->irqstate);
+		state_save_register_item_array("ppc", device->tag, 0, ppc->spu.regs);
+		state_save_register_item("ppc", device->tag, 0, ppc->spu.txbuf);
+		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxbuf);
+		state_save_register_item_array("ppc", device->tag, 0, ppc->spu.rxbuffer);
+		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxin);
+		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxout);
+		state_save_register_item("ppc", device->tag, 0, ppc->pit_reload);
+		state_save_register_item("ppc", device->tag, 0, ppc->irqstate);
 	}
 	if (cap & PPCCAP_603_MMU)
 	{
-		state_save_register_item("ppc", index, ppc->mmu603_cmp);
-		state_save_register_item_array("ppc", index, ppc->mmu603_hash);
-		state_save_register_item_array("ppc", index, ppc->mmu603_r);
+		state_save_register_item("ppc", device->tag, 0, ppc->mmu603_cmp);
+		state_save_register_item_array("ppc", device->tag, 0, ppc->mmu603_hash);
+		state_save_register_item_array("ppc", device->tag, 0, ppc->mmu603_r);
 	}
-	state_save_register_item("ppc", index, ppc->irq_pending);
-	state_save_register_item("ppc", index, ppc->tb_zero_cycles);
-	state_save_register_item("ppc", index, ppc->dec_zero_cycles);
+	state_save_register_item("ppc", device->tag, 0, ppc->irq_pending);
+	state_save_register_item("ppc", device->tag, 0, ppc->tb_zero_cycles);
+	state_save_register_item("ppc", device->tag, 0, ppc->dec_zero_cycles);
 }
 
 
@@ -278,7 +280,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->msr = MSROEA_IP;
 
 		/* reset the decrementer */
-		ppc->dec_zero_cycles = cpunum_gettotalcycles(ppc->cpunum);
+		ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 		decrementer_int_callback(Machine, ppc, 0);
 	}
 
@@ -299,7 +301,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->spr[SPR603_HID0] = 1;
 
 	/* time base starts here */
-	ppc->tb_zero_cycles = cpunum_gettotalcycles(ppc->cpunum);
+	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 
 	/* clear interrupts */
 	ppc->irq_pending = 0;
@@ -426,7 +428,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	for (hashnum = 0; hashnum < 2; hashnum++)
 	{
 		offs_t ptegaddr = hashbase | ((hash << 6) & hashmask);
-		UINT32 *ptegptr = memory_get_read_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, ptegaddr);
+		UINT32 *ptegptr = memory_get_read_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), ptegaddr);
 
 		/* should only have valid memory here, but make sure */
 		if (ptegptr != NULL)
@@ -1253,7 +1255,7 @@ static TIMER_CALLBACK( decrementer_int_callback )
 
 	/* advance by another full rev */
 	ppc->dec_zero_cycles += (UINT64)ppc->tb_divisor << 32;
-	cycles_until_next = ppc->dec_zero_cycles - cpunum_gettotalcycles(ppc->cpunum);
+	cycles_until_next = ppc->dec_zero_cycles - cpu_get_total_cycles(machine->cpu[ppc->cpunum]);
 	timer_adjust_oneshot(ppc->decrementer_int_timer, ATTOTIME_IN_CYCLES(cycles_until_next, ppc->cpunum), 0);
 }
 
@@ -1375,10 +1377,10 @@ static int ppc4xx_dma_fetch_transmit_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* fetch the data */
-	cpuintrf_push_context(ppc->cpunum);
-	*byte = program_read_byte(dmaregs[DCR4XX_DMADA0]++);
+	cpu_push_context(Machine->cpu[ppc->cpunum]);
+	*byte = memory_read_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return TRUE;
 }
 
@@ -1401,10 +1403,10 @@ static int ppc4xx_dma_handle_receive_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* store the data */
-	cpuintrf_push_context(ppc->cpunum);
-	program_write_byte(dmaregs[DCR4XX_DMADA0]++, byte);
+	cpu_push_context(Machine->cpu[ppc->cpunum]);
+	memory_write_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++, byte);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return TRUE;
 }
 
@@ -1456,7 +1458,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 1:
 					do
 					{
-						program_write_byte(dmaregs[DCR4XX_DMADA0], program_read_byte(dmaregs[DCR4XX_DMASA0]));
+						memory_write_byte(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_byte(ppc->program, dmaregs[DCR4XX_DMASA0]));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
@@ -1466,7 +1468,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 2:
 					do
 					{
-						program_write_word(dmaregs[DCR4XX_DMADA0], program_read_word(dmaregs[DCR4XX_DMASA0]));
+						memory_write_word(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_word(ppc->program, dmaregs[DCR4XX_DMASA0]));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
@@ -1476,7 +1478,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 4:
 					do
 					{
-						program_write_dword(dmaregs[DCR4XX_DMADA0], program_read_dword(dmaregs[DCR4XX_DMASA0]));
+						memory_write_dword(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_dword(ppc->program, dmaregs[DCR4XX_DMASA0]));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
@@ -1486,8 +1488,8 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 16:
 					do
 					{
-						program_write_qword(dmaregs[DCR4XX_DMADA0], program_read_qword(dmaregs[DCR4XX_DMASA0]));
-						program_write_qword(dmaregs[DCR4XX_DMADA0] + 8, program_read_qword(dmaregs[DCR4XX_DMASA0] + 8));
+						memory_write_qword(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_qword(ppc->program, dmaregs[DCR4XX_DMASA0]));
+						memory_write_qword(ppc->program, dmaregs[DCR4XX_DMADA0] + 8, memory_read_qword(ppc->program, dmaregs[DCR4XX_DMASA0] + 8));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
@@ -1720,7 +1722,7 @@ updateirq:
 
 static READ8_HANDLER( ppc4xx_spu_r )
 {
-	powerpc_state *ppc = activecpu_get_info_ptr(CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = cpu_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -1747,7 +1749,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 
 static WRITE8_HANDLER( ppc4xx_spu_w )
 {
-	powerpc_state *ppc = activecpu_get_info_ptr(CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = cpu_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)

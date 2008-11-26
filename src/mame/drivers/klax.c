@@ -32,7 +32,7 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_video_int_state || atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_video_int_state || atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -40,14 +40,14 @@ static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0 && !(input_port_read(screen->machine, "P1") & 0x800))
-		atarigen_scanline_int_gen(screen->machine, 0);
+		atarigen_scanline_int_gen(screen->machine->cpu[0]);
 }
 
 
 static WRITE16_HANDLER( interrupt_ack_w )
 {
-	atarigen_scanline_int_ack_w(machine, offset, data, mem_mask);
-	atarigen_video_int_ack_w(machine, offset, data, mem_mask);
+	atarigen_scanline_int_ack_w(space, offset, data, mem_mask);
+	atarigen_video_int_ack_w(space, offset, data, mem_mask);
 }
 
 
@@ -75,14 +75,14 @@ static MACHINE_RESET( klax )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return okim6295_status_0_r(machine, offset) | 0xff00;
+	return okim6295_status_0_r(space, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_data_0_w(machine, offset, data & 0xff);
+		okim6295_data_0_w(space, offset, data & 0xff);
 }
 
 

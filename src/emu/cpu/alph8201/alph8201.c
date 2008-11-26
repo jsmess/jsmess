@@ -195,6 +195,9 @@ typedef struct
 #if HANDLE_HALT_LINE
 	UINT8 halt;     /* halt input line                        */
 #endif
+
+	const device_config *device;
+	const address_space *program;
 } ALPHA8201_Regs;
 
 /* The opcode table now is a combination of cycle counts and function pointers */
@@ -282,7 +285,6 @@ INLINE void M_JMP(UINT8 dat)
 	PCL = dat;
 	/* update pc page */
 	R.pc.b.h  = R.ix0.b.h = R.ix1.b.h = R.ix2.b.h = R.mb & 3;
-	change_pc(PC);
 }
 
 INLINE void M_UNDEFINED(void)
@@ -664,27 +666,30 @@ static const s_opcode opcode_8301[256]=
  ****************************************************************************/
 static CPU_INIT( ALPHA8201 )
 {
-	state_save_register_item_array("ALPHA8201", index, R.RAM);
-	state_save_register_item("ALPHA8201", index, R.PREVPC);
-	state_save_register_item("ALPHA8201", index, PC);
-	state_save_register_item("ALPHA8201", index, regPTR);
-	state_save_register_item("ALPHA8201", index, ZF);
-	state_save_register_item("ALPHA8201", index, CF);
-	state_save_register_item("ALPHA8201", index, R.mb);
+	R.device = device;
+	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
+	state_save_register_item_array("ALPHA8201", device->tag, 0, R.RAM);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.PREVPC);
+	state_save_register_item("ALPHA8201", device->tag, 0, PC);
+	state_save_register_item("ALPHA8201", device->tag, 0, regPTR);
+	state_save_register_item("ALPHA8201", device->tag, 0, ZF);
+	state_save_register_item("ALPHA8201", device->tag, 0, CF);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.mb);
 #if HANDLE_HALT_LINE
-	state_save_register_item("ALPHA8201", index, R.halt);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.halt);
 #endif
-	state_save_register_item("ALPHA8201", index, IX0);
-	state_save_register_item("ALPHA8201", index, IX1);
-	state_save_register_item("ALPHA8201", index, IX2);
-	state_save_register_item("ALPHA8201", index, LP0);
-	state_save_register_item("ALPHA8201", index, LP1);
-	state_save_register_item("ALPHA8201", index, LP2);
-	state_save_register_item("ALPHA8201", index, R.A);
-	state_save_register_item("ALPHA8201", index, R.B);
-	state_save_register_item("ALPHA8201", index, R.retptr);
-	state_save_register_item("ALPHA8201", index, R.savec);
-	state_save_register_item("ALPHA8201", index, R.savez);
+	state_save_register_item("ALPHA8201", device->tag, 0, IX0);
+	state_save_register_item("ALPHA8201", device->tag, 0, IX1);
+	state_save_register_item("ALPHA8201", device->tag, 0, IX2);
+	state_save_register_item("ALPHA8201", device->tag, 0, LP0);
+	state_save_register_item("ALPHA8201", device->tag, 0, LP1);
+	state_save_register_item("ALPHA8201", device->tag, 0, LP2);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.A);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.B);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.retptr);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.savec);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.savez);
 }
 /****************************************************************************
  * Reset registers to their initial values
@@ -721,7 +726,7 @@ static CPU_EXIT( ALPHA8201 )
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 
-static int alpha8xxx_execute(const s_opcode *op_map,int cycles)
+static int alpha8xxx_execute(const device_config *device,const s_opcode *op_map,int cycles)
 {
 	unsigned opcode;
 	UINT8 pcptr;
@@ -787,7 +792,7 @@ mame_printf_debug("ALPHA8201 START ENTRY=%02X PC=%03X\n",pcptr,PC);
 
 		/* run */
 		R.PREVPC = PC;
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device, PC);
 		opcode =M_RDOP(PC);
 #if TRACE_PC
 mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
@@ -802,11 +807,11 @@ mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
 }
 
 #if (HAS_ALPHA8201)
-static CPU_EXECUTE( ALPHA8201 ) { return alpha8xxx_execute(opcode_8201,cycles); }
+static CPU_EXECUTE( ALPHA8201 ) { return alpha8xxx_execute(device,opcode_8201,cycles); }
 #endif
 
 #if (HAS_ALPHA8301)
-static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(opcode_8301,cycles); }
+static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(device,opcode_8301,cycles); }
 #endif
 
 /****************************************************************************
@@ -837,7 +842,6 @@ static void set_irq_line(int irqline, int state)
 	{
 		R.halt = (state==ASSERT_LINE) ? 1 : 0;
 /* mame_printf_debug("ALPHA8201 HALT %d\n",R.halt); */
-		change_pc(PC);
 	}
 }
 #endif

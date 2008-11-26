@@ -222,12 +222,13 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( raiden_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static VIDEO_EOF( raiden )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff); /* Could be a memory location instead */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 
 static MACHINE_DRIVER_START( raiden )
@@ -450,34 +451,34 @@ ROM_END
 /* Spin the sub-cpu if it is waiting on the master cpu */
 static READ16_HANDLER( sub_cpu_spin_r )
 {
-	int pc=activecpu_get_pc();
+	int pc=cpu_get_pc(space->cpu);
 	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde6 && ret!=0x40)
-		cpu_spin();
+		cpu_spin(space->cpu);
 
 	return ret;
 }
 
 static READ16_HANDLER( sub_cpu_spina_r )
 {
-	int pc=activecpu_get_pc();
+	int pc=cpu_get_pc(space->cpu);
 	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde8 && ret!=0x40)
-		cpu_spin();
+		cpu_spin(space->cpu);
 
 	return ret;
 }
 
 static DRIVER_INIT( raiden )
 {
-	memory_install_read16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
 }
 
 static void memory_patcha(running_machine *machine)
 {
-	memory_install_read16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spina_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4008, 0x4009, 0, 0, sub_cpu_spina_r);
 }
 
 /* This is based on code by Niclas Karlsson Mate, who figured out the

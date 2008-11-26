@@ -55,18 +55,18 @@ static int toggle_bit;
 
 static READ16_HANDLER( wheelfir_rand1 )
 {
-	return input_port_read(machine, "IN0") ^ toggle_bit;	// mame_rand(machine);
+	return input_port_read(space->machine, "IN0") ^ toggle_bit;	// mame_rand(space->machine);
 }
 
 static READ16_HANDLER( wheelfir_rand2 )
 {
-	return input_port_read(machine, "IN1");		// mame_rand(machine);
+	return input_port_read(space->machine, "IN1");		// mame_rand(space->machine);
 }
 
 
 static READ16_HANDLER( wheelfir_rand4 )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static UINT16 *wheelfir_myram;
@@ -151,8 +151,8 @@ static bitmap_t* render_bitmap;
 static WRITE16_HANDLER(wheelfir_blit_w)
 {
 	//wheelfir_blitdata[offset]=data;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = video_screen_get_width(space->machine->primary_screen);
+	int height = video_screen_get_height(space->machine->primary_screen);
 	int vpage=0;
 	COMBINE_DATA(&wheelfir_blitdata[offset]);
 
@@ -182,7 +182,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 		int x,y;
 		int xsize,ysize;
-		UINT8 *rom = memory_region(machine, "gfx1");
+		UINT8 *rom = memory_region(space->machine, "gfx1");
 		int dir=0;
 
 
@@ -575,7 +575,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	if (scanline_counter!=(total_scanlines-1))
 	{
 		scanline_counter++;
-		cpunum_set_input_line(machine, 0, 5, HOLD_LINE); // raster IRQ, changes scroll values for road
+		cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		timer_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0);
 
 		if (scanline_counter<256)
@@ -585,7 +585,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 		if (scanline_counter==256)
 		{
-			cpunum_set_input_line(machine, 0, 3, HOLD_LINE); // vblank IRQ?
+			cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE); // vblank IRQ?
 			toggle_bit = 0x8000; // must toggle..
 		}
 
@@ -623,7 +623,7 @@ static MACHINE_RESET(wheelfir)
 static INTERRUPT_GEN( wheelfir_irq )
 {
 	// we seem to need this interrupt at least once for every object drawn on the screen, otherwise things flicker + slowdown
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // blitter IRQ?
+	cpu_set_input_line(device, 1, HOLD_LINE); // blitter IRQ?
 }
 
 

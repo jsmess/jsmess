@@ -86,7 +86,7 @@ static int irq_enable;
 
 static READ8_HANDLER( topgunbl_rotary_r )
 {
-	return (1 << (input_port_read(machine, offset ? "DIAL1" : "DIAL0") * 8 / 256)) ^ 0xff;
+	return (1 << (input_port_read(space->machine, offset ? "DIAL1" : "DIAL0") * 8 / 256)) ^ 0xff;
 }
 
 static WRITE8_HANDLER( jackal_flipscreen_w )
@@ -291,8 +291,8 @@ static INTERRUPT_GEN( jackal_interrupt )
 {
 	if (irq_enable)
 	{
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

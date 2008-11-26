@@ -30,32 +30,29 @@
 #define IBWH	m6502->ind_bank.w.h
 #define IB		m6502->ind_bank.d
 
-#undef CHANGE_PC
-#define CHANGE_PC change_pc(PCD|PB)
-
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
 #undef RDOP
-#define RDOP() cpu_readop((PCW++)|PB); m6502->icount -= 1
+#define RDOP() memory_decrypted_read_byte(m6502->space, (PCW++)|PB); m6502->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #undef RDOPARG
-#define RDOPARG() cpu_readop_arg((PCW++)|PB); m6502->icount -= 1
+#define RDOPARG() memory_raw_read_byte(m6502->space, (PCW++)|PB); m6502->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
 #undef RDMEM
-#define RDMEM(addr) program_read_byte_8le(addr); m6502->icount -= 1
+#define RDMEM(addr) memory_read_byte_8le(m6502->space, addr); m6502->icount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
 #undef WRMEM
-#define WRMEM(addr,data) program_write_byte_8le(addr,data); m6502->icount -= 1
+#define WRMEM(addr,data) memory_write_byte_8le(m6502->space, addr,data); m6502->icount -= 1
 
 /***************************************************************
  * push a register onto the stack
@@ -177,7 +174,6 @@
 		EAW = PCW + (signed char)tmp;							\
 		m6502->icount -= (PCH == EAH) ? 1 : 2;					\
 		PCD = EAD|PB;											\
-		CHANGE_PC;												\
 	}															\
 	else														\
 	{															\
@@ -197,8 +193,7 @@
 	PUSH(PCL);													\
 	EAH = RDOPARG();											\
 	EAWH = PBWH;												\
-	PCD = EAD;													\
-	CHANGE_PC
+	PCD = EAD
 
 /* 6510 ********************************************************
  *  KIL Illegal opcode
@@ -208,4 +203,4 @@
 #undef KIL
 #define KIL 													\
 	PCW--;														\
-	logerror("M6509 KILL opcode %05x: %02x\n", PCD, cpu_readop(PCD))
+	logerror("M6509 KILL opcode %05x: %02x\n", PCD, memory_decrypted_read_byte(m6502->space, PCD))

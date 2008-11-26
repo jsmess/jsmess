@@ -482,7 +482,7 @@ static void c352_write_reg16(struct c352_info *info, unsigned long address, unsi
 	}
 }
 
-static void c352_init(struct c352_info *info, int sndindex)
+static void c352_init(struct c352_info *info, const char *tag)
 {
 	int i;
 	double x_max = 32752.0;
@@ -515,27 +515,27 @@ static void c352_init(struct c352_info *info, int sndindex)
 
 		sprintf(cname, "C352 v %02d", i);
 
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_l);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_r);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_l2);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_r2);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].bank);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].noise);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].noisebuf);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].noisecnt);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].pitch);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].start_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].end_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].repeat_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].flag);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].start);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].repeat);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].current_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].pos);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_l);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_r);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_l2);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_r2);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].bank);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].noise);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].noisebuf);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].noisecnt);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].pitch);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].start_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].end_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].repeat_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].flag);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].start);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].repeat);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].current_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].pos);
 	}
 }
 
-static void *c352_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( c352 )
 {
 	struct c352_info *info;
 
@@ -549,7 +549,7 @@ static void *c352_start(const char *tag, int sndindex, int clock, const void *co
 
 	info->stream = stream_create(0, 4, info->sample_rate_base, info, c352_update);
 
-	c352_init(info, sndindex);
+	c352_init(info, tag);
 
 	return info;
 }
@@ -582,7 +582,7 @@ WRITE16_HANDLER( c352_0_w )
  * Generic get_info
  **************************************************************************/
 
-static void c352_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( c352 )
 {
 	switch (state)
 	{
@@ -591,15 +591,15 @@ static void c352_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void c352_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( c352 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = c352_set_info;			break;
-		case SNDINFO_PTR_START:							info->start = c352_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c352 );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( c352 );				break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

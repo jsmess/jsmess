@@ -36,9 +36,9 @@ static UINT16 *rom_base[2];
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -51,7 +51,7 @@ static MACHINE_RESET( thunderj )
 
 	rom_base[0] = (UINT16 *)memory_region(machine, "main");
 	rom_base[1] = (UINT16 *)memory_region(machine, "extra");
-	memory_set_bankptr(1, shared_ram);
+	memory_set_bankptr(machine, 1, shared_ram);
 }
 
 
@@ -64,7 +64,7 @@ static MACHINE_RESET( thunderj )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int result = input_port_read(machine, "260012");
+	int result = input_port_read(space->machine, "260012");
 
 	if (atarigen_sound_to_cpu_ready) result ^= 0x0004;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0008;
@@ -81,14 +81,14 @@ static WRITE16_HANDLER( latch_w )
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 2-5 are the alpha bank */
 		if (thunderj_alpha_tile_bank != ((data >> 2) & 7))
 		{
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 			tilemap_mark_all_tiles_dirty(atarigen_alpha_tilemap);
 			thunderj_alpha_tile_bank = (data >> 2) & 7;
 		}
@@ -117,10 +117,10 @@ static READ16_HANDLER( shared_ram_r )
 	/* look for a byte access, and then check for the high bit and a TAS opcode */
 	if (mem_mask != 0xffff && (result & mem_mask & 0x8080))
 	{
-		offs_t ppc = activecpu_get_previouspc();
+		offs_t ppc = cpu_get_previouspc(space->cpu);
 		if (ppc < 0xa0000)
 		{
-			int cpunum = cpu_getactivecpu();
+			int cpunum = cpunum_get_active();
 			UINT16 opcode = rom_base[cpunum][ppc / 2];
 
 			/* look for TAS or BTST #$7; both CPUs spin waiting for these in order to */
@@ -151,7 +151,7 @@ static READ16_HANDLER( thunderj_atarivc_r )
        the beginning of interrupt and once near the end. It stores these values in a
        table starting at $163484. CPU #2 periodically looks at this table to make
        sure that it is getting interrupts at the appropriate times, and that the
-       VBLANK bit is set appropriately. Unfortunately, due to all the cpu_yield()
+       VBLANK bit is set appropriately. Unfortunately, due to all the cpu_yield(space->cpu)
        calls we make to synchronize the two CPUs, we occasionally get out of time
        and generate the interrupt outside of the tight tolerances CPU #2 expects.
 
@@ -163,17 +163,17 @@ static READ16_HANDLER( thunderj_atarivc_r )
 	/* Use these lines to detect when things go south: */
 
 #if 0
-	if (program_read_word(0x163482) > 0xfff)
+	if (memory_read_word(space, 0x163482) > 0xfff)
 		mame_printf_debug("You're screwed!");
 #endif
 
-	return atarivc_r(machine->primary_screen, offset);
+	return atarivc_r(space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( thunderj_atarivc_w )
 {
-	atarivc_w(machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
 }
 
 

@@ -30,7 +30,7 @@ static UINT8 *ram;
 static INTERRUPT_GEN( aliens_interrupt )
 {
 	if (K051960_is_IRQ_enabled())
-		cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -44,7 +44,7 @@ static READ8_HANDLER( bankedram_r )
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	else
 		ram[offset] = data;
 }
@@ -73,8 +73,8 @@ static WRITE8_HANDLER( aliens_coin_counter_w )
 
 static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( aliens_snd_bankswitch_w )
@@ -490,17 +490,17 @@ static void aliens_banking( int lines )
 	if (lines & 0x10) offs -= 0x8000;
 
 	offs += (lines & 0x0f)*0x2000;
-	memory_set_bankptr( 1, &RAM[offs] );
+	memory_set_bankptr(Machine,  1, &RAM[offs] );
 }
 
 static MACHINE_RESET( aliens )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)aliens_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)aliens_banking);
 
 	/* init the default bank */
-	memory_set_bankptr( 1, &RAM[0x10000] );
+	memory_set_bankptr(machine,  1, &RAM[0x10000] );
 }
 
 

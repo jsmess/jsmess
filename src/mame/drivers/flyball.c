@@ -6,6 +6,8 @@ Atari Flyball Driver
 
 #include "driver.h"
 
+#define MASTER_CLOCK ( XTAL_12_096MHz )
+
 extern VIDEO_START( flyball );
 extern VIDEO_UPDATE( flyball );
 
@@ -28,7 +30,7 @@ static TIMER_CALLBACK( flyball_joystick_callback )
 	int potsense = param;
 
 	if (potsense & ~flyball_potmask)
-		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, PULSE_LINE);
 
 	flyball_potsense |= potsense;
 }
@@ -79,12 +81,12 @@ static MACHINE_RESET( flyball )
 
 static READ8_HANDLER( flyball_input_r )
 {
-	return input_port_read(machine, "IN0") & input_port_read(machine, "IN1");
+	return input_port_read(space->machine, "IN0") & input_port_read(space->machine, "IN1");
 }
 
 static READ8_HANDLER( flyball_scanline_r )
 {
-	return video_screen_get_vpos(machine->primary_screen) & 0x3f;
+	return video_screen_get_vpos(space->machine->primary_screen) & 0x3f;
 }
 
 static READ8_HANDLER( flyball_potsense_r )
@@ -174,17 +176,15 @@ static INPUT_PORTS_START( flyball )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING( 0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING( 0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, "Innings Per Game" )
+	PORT_DIPNAME( 0x40, 0x40, "Innings Per Game" ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING( 0x00, "1" )
 	PORT_DIPSETTING( 0x40, "2" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "DSW1:1" )
 
 	PORT_START("STICK1_Y") /* IN1 */
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(1,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
@@ -255,7 +255,7 @@ static PALETTE_INIT( flyball )
 static MACHINE_DRIVER_START( flyball )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 12096000 / 16)
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(flyball_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

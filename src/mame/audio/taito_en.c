@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "taito_en.h"
@@ -36,7 +35,7 @@ WRITE16_HANDLER(f3_68000_share_w)
 
 WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	UINT32 max_banks_this_game=(memory_region_length(machine, "ensoniq.0")/0x200000)-1;
+	UINT32 max_banks_this_game=(memory_region_length(space->machine, "ensoniq.0")/0x200000)-1;
 
 #if 0
 {
@@ -73,8 +72,8 @@ static TIMER_CALLBACK( taito_en_timer_callback )
 {
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr&8) {
-		cpunum_set_input_line_vector(1, 6, vector_reg);
-		cpunum_set_input_line(machine, 1, 6, ASSERT_LINE);
+		cpu_set_input_line_vector(machine->cpu[1], 6, vector_reg);
+		cpu_set_input_line(machine->cpu[1], 6, ASSERT_LINE);
 		imr_status|=0x8;
 	}
 }
@@ -97,7 +96,7 @@ READ16_HANDLER(f3_68681_r)
 
 	/* IRQ ack */
 	if (offset==0xf) {
-		cpunum_set_input_line(machine, 1, 6, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 6, CLEAR_LINE);
 		return 0;
 	}
 
@@ -166,7 +165,7 @@ WRITE16_HANDLER(f3_68681_w)
 
 READ16_HANDLER(es5510_dsp_r)
 {
-//  logerror("%06x: DSP read offset %04x (data is %04x)\n",activecpu_get_pc(),offset,es5510_dsp_ram[offset]);
+//  logerror("%06x: DSP read offset %04x (data is %04x)\n",cpu_get_pc(space->cpu),offset,es5510_dsp_ram[offset]);
 //  if (es_tmp) return es5510_dsp_ram[offset];
 /*
     switch (offset) {
@@ -178,7 +177,7 @@ READ16_HANDLER(es5510_dsp_r)
 */
 //  offset<<=1;
 
-//if (offset<7 && es5510_dsp_ram[0]!=0xff) return mame_rand(machine)%0xffff;
+//if (offset<7 && es5510_dsp_ram[0]!=0xff) return mame_rand(space->machine)%0xffff;
 
 	if (offset==0x12) return 0;
 
@@ -190,10 +189,10 @@ READ16_HANDLER(es5510_dsp_r)
 
 WRITE16_HANDLER(es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)memory_region(machine, "ensoniq.0");
+	UINT8 *snd_mem = (UINT8 *)memory_region(space->machine, "ensoniq.0");
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
-//      logerror("%06x: DSP write offset %04x %04x\n",activecpu_get_pc(),offset,data);
+//      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 
 	COMBINE_DATA(&es5510_dsp_ram[offset]);
 
@@ -249,16 +248,18 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "audio");
-	memory_set_bankptr(1,&ROM[0x80000]);
-	memory_set_bankptr(2,&ROM[0x90000]);
-	memory_set_bankptr(3,&ROM[0xa0000]);
+	memory_set_bankptr(machine, 1,&ROM[0x80000]);
+	memory_set_bankptr(machine, 2,&ROM[0x90000]);
+	memory_set_bankptr(machine, 3,&ROM[0xa0000]);
 
 	sound_ram[0]=ROM[0x80000]; /* Stack and Reset vectors */
 	sound_ram[1]=ROM[0x80001];
 	sound_ram[2]=ROM[0x80002];
 	sound_ram[3]=ROM[0x80003];
 
-	//cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	/* reset CPU to catch any banking of startup vectors */
+	cpu_reset(cputag_get_cpu(machine, "audio"));
+	//cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 const es5505_interface es5505_taito_f3_config =

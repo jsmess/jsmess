@@ -110,6 +110,7 @@ Few words about protection:
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 
@@ -141,9 +142,9 @@ static VIDEO_START( ddealer )
 	back_tilemap = tilemap_create(get_back_tile_info,tilemap_scan_cols,8,8,64,32);
 }
 
-static void ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)
+static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 
 	{
 		INT16 sx, sy;
@@ -244,24 +245,24 @@ static VIDEO_UPDATE( ddealer )
 	{
 		if (ddealer_vregs[0xcc/2] & 0x80)
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
-			ddealer_draw_video_layer(&ddealer_vregs[0xcc/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0xcc/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 	}
 	else
 	{
 		if (ddealer_vregs[0xcc/2] & 0x80)
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0xcc/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0xcc/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 
 	}
@@ -430,8 +431,8 @@ static WRITE16_HANDLER( ddealer_mcu_shared_w )
 static WRITE16_HANDLER( YM2203_w )
 {
 	switch (offset) {
-	case 0: ym2203_control_port_0_w(machine,0,data & 0xff); break;
-	case 1: ym2203_write_port_0_w(machine,0,data & 0xff); break;
+	case 0: ym2203_control_port_0_w(space,0,data & 0xff); break;
+	case 1: ym2203_write_port_0_w(space,0,data & 0xff); break;
 	}
 }
 
@@ -578,7 +579,7 @@ static MACHINE_RESET (ddealer)
 
 static INTERRUPT_GEN( ddealer_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( ddealer )
@@ -635,7 +636,7 @@ static READ16_HANDLER( ddealer_mcu_r )
 
 static DRIVER_INIT( ddealer )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
 }
 
 ROM_START( ddealer )

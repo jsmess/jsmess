@@ -57,10 +57,16 @@ enum
 };
 
 #define M6502_IRQ_LINE		0
-/* use cpunum_set_input_line(machine, cpu, M6502_SET_OVERFLOW, level)
+/* use cpu_set_input_line(machine->cpu[cpu], M6502_SET_OVERFLOW, level)
    to change level of the so input line
    positiv edge sets overflow flag */
 #define M6502_SET_OVERFLOW	1
+
+typedef UINT8 (*m6502_read_indexed_func)(const address_space *space, offs_t address);
+typedef void (*m6502_write_indexed_func)(const address_space *space, offs_t address, UINT8 data);
+typedef UINT8 (*m6510_port_read_func)(const device_config *device, UINT8 direction);
+typedef void (*m6510_port_write_func)(const device_config *device, UINT8 direction, UINT8 data);
+
 
 enum
 {
@@ -177,7 +183,7 @@ extern CPU_GET_INFO( n2a03 );
    Bit 7 of address $4011 (the PSG's DPCM control register), when set,
    causes an IRQ to be generated.  This function allows the IRQ to be called
    from the PSG core when such an occasion arises. */
-extern void n2a03_irq(void);
+extern void n2a03_irq(const device_config *device);
 #endif
 
 

@@ -29,7 +29,7 @@ VIDEO_UPDATE( bottom9 );
 static INTERRUPT_GEN( bottom9_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 
@@ -38,37 +38,37 @@ static int zoomreadroms,K052109_selected;
 static READ8_HANDLER( bottom9_bankedram1_r )
 {
 	if (K052109_selected)
-		return K052109_051960_r(machine,offset);
+		return K052109_051960_r(space,offset);
 	else
 	{
 		if (zoomreadroms)
-			return K051316_rom_0_r(machine,offset);
+			return K051316_rom_0_r(space,offset);
 		else
-			return K051316_0_r(machine,offset);
+			return K051316_0_r(space,offset);
 	}
 }
 
 static WRITE8_HANDLER( bottom9_bankedram1_w )
 {
-	if (K052109_selected) K052109_051960_w(machine,offset,data);
-	else K051316_0_w(machine,offset,data);
+	if (K052109_selected) K052109_051960_w(space,offset,data);
+	else K051316_0_w(space,offset,data);
 }
 
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
-	if (K052109_selected) return K052109_051960_r(machine,offset + 0x2000);
+	if (K052109_selected) return K052109_051960_r(space,offset + 0x2000);
 	else return paletteram[offset];
 }
 
 static WRITE8_HANDLER( bottom9_bankedram2_w )
 {
-	if (K052109_selected) K052109_051960_w(machine,offset + 0x2000,data);
-	else paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+	if (K052109_selected) K052109_051960_w(space,offset + 0x2000,data);
+	else paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 }
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int offs;
 
 	/* bit 0 = RAM bank */
@@ -77,7 +77,7 @@ if ((data & 1) == 0) popmessage("bankswitch RAM bank 0");
 	/* bit 1-4 = ROM bank */
 	if (data & 0x10) offs = 0x20000 + (data & 0x06) * 0x1000;
 	else offs = 0x10000 + (data & 0x0e) * 0x1000;
-	memory_set_bankptr(1,&RAM[offs]);
+	memory_set_bankptr(space->machine, 1,&RAM[offs]);
 }
 
 static WRITE8_HANDLER( bottom9_1f90_w )
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static int nmienable;
@@ -109,7 +109,7 @@ static int nmienable;
 static INTERRUPT_GEN( bottom9_sound_interrupt )
 {
 	if (nmienable)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

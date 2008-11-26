@@ -85,7 +85,6 @@ Other references can be found on spies.com:
 
 */
 
-
 #include "debugger.h"
 #include "deprecat.h"
 #include "tms9900.h"
@@ -95,19 +94,19 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX ti990_10
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10 )
-	#define TMS99XX_CPU_NAME "TI990/10"
+	#define TMS99XX_cpu_get_name "TI990/10"
 
 #elif (TMS99XX_MODEL == TMS9900_ID)
 
 	#define TMS99XX_PREFIX tms9900
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900 )
-	#define TMS99XX_CPU_NAME "TMS9900"
+	#define TMS99XX_cpu_get_name "TMS9900"
 
 #elif (TMS99XX_MODEL == TMS9940_ID)
 
 	#define TMS99XX_PREFIX tms9940
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940 )
-	#define TMS99XX_CPU_NAME "TMS9940"
+	#define TMS99XX_cpu_get_name "TMS9940"
 
 	#error "tms9940 is not yet supported"
 
@@ -115,13 +114,13 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9980a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980a )
-	#define TMS99XX_CPU_NAME "TMS9980A/TMS9981"
+	#define TMS99XX_cpu_get_name "TMS9980A/TMS9981"
 
 #elif (TMS99XX_MODEL == TMS9985_ID)
 
 	#define TMS99XX_PREFIX tms9985
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985 )
-	#define TMS99XX_CPU_NAME "TMS9985"
+	#define TMS99XX_cpu_get_name "TMS9985"
 
 	#error "tms9985 is not yet supported"
 
@@ -129,7 +128,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9989
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989 )
-	#define TMS99XX_CPU_NAME "TMS9989"
+	#define TMS99XX_cpu_get_name "TMS9989"
 
 	#error "tms9989 is not yet supported"
 
@@ -137,13 +136,13 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9995
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995 )
-	#define TMS99XX_CPU_NAME "TMS9995"
+	#define TMS99XX_cpu_get_name "TMS9995"
 
 #elif (TMS99XX_MODEL == TMS99000_ID)
 
 	#define TMS99XX_PREFIX tms99000
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000 )
-	#define TMS99XX_CPU_NAME "TMS99000"
+	#define TMS99XX_cpu_get_name "TMS99000"
 
 	#error "tms99000 is not yet supported"
 
@@ -151,7 +150,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms99105a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105a )
-	#define TMS99XX_CPU_NAME "TMS99105A"
+	#define TMS99XX_cpu_get_name "TMS99105A"
 
 	#error "tms99105a is not yet supported"
 
@@ -159,7 +158,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms99110a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110a )
-	#define TMS99XX_CPU_NAME "TMS99110A"
+	#define TMS99XX_cpu_get_name "TMS99110A"
 
 	#error "tms99110a is not yet supported"
 
@@ -442,6 +441,8 @@ typedef struct
     retreive the value on IC0-IC3 (non-standard behaviour) */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 
 	UINT8 IDLE;       /* nonzero if processor is IDLE - i.e waiting for interrupt while writing
                         special data on CRU bus */
@@ -528,7 +529,7 @@ static void reset_decrementer(void);
 READ16_HANDLER(ti990_10_internal_r)
 {
 	//return I.ROM[offset];
-	return program_read_word_16be(0x1ffc00+offset);
+	return memory_read_word_16be(I.program, 0x1ffc00+offset);
 }
 
 #endif
@@ -576,14 +577,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				return program_read_word_16be(0x1f0000+addr);
+				return memory_read_word_16be(I.program, 0x1f0000+addr);
 			else
 				/* CPU ROM */
-				return program_read_word_16be(0x1f0000+addr);	/* hack... */
+				return memory_read_word_16be(I.program, 0x1f0000+addr);	/* hack... */
 		}
 		else if (! I.mapping_on)
 		{
-			return program_read_word_16be(addr);
+			return memory_read_word_16be(I.program, addr);
 		}
 		else
 		{
@@ -604,13 +605,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					I.error_interrupt_register |= EIR_MAPERR;
 					write_inhibit = 1;
 				}
-				return program_read_word_16be(addr);
+				return memory_read_word_16be(I.program, addr);
 			}
 			if ((! (I.error_interrupt_register & EIR_MAPERR)) && ! (I.diaglat))
 				I.mapper_address_latch = I.map_files[map_file].bias[map_index]+addr;
 			if ((I.latch_control[map_index]) && (! I.reset_maperr))
 				I.diaglat = 1;
-			return program_read_word_16be(I.map_files[map_file].bias[map_index]+addr);
+			return memory_read_word_16be(I.program, I.map_files[map_file].bias[map_index]+addr);
 		}
 	}
 
@@ -621,14 +622,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				program_write_word_16be(0x1f0000+addr, data);
+				memory_write_word_16be(I.program, 0x1f0000+addr, data);
 			else
 				/* CPU ROM */
-				program_write_word_16be(0x1f0000+addr, data);	/* hack... */
+				memory_write_word_16be(I.program, 0x1f0000+addr, data);	/* hack... */
 		}
 		else if (! I.mapping_on)
 		{
-			program_write_word_16be(addr, data);
+			memory_write_word_16be(I.program, addr, data);
 		}
 		else
 		{
@@ -650,16 +651,16 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					write_inhibit = 1;
 				}
 				if (write_inhibit)
-					(void)program_read_word_16be(addr);
+					(void)memory_read_word_16be(I.program, addr);
 				else
-					program_write_word_16be(addr, data);
+					memory_write_word_16be(I.program, addr, data);
 				return;
 			}
 			if ((! (I.error_interrupt_register & EIR_MAPERR)) && ! (I.diaglat))
 				I.mapper_address_latch = I.map_files[map_file].bias[map_index]+addr;
 			if ((I.latch_control[map_index]) && (! I.reset_maperr))
 				I.diaglat = 1;
-			program_write_word_16be(I.map_files[map_file].bias[map_index]+addr, data);
+			memory_write_word_16be(I.program, I.map_files[map_file].bias[map_index]+addr, data);
 		}
 	}
 
@@ -670,14 +671,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				return program_read_byte_16be(0x1f0000+addr);
+				return memory_read_byte_16be(I.program, 0x1f0000+addr);
 			else
 				/* CPU ROM */
-				return program_read_byte_16be(0x1f0000+addr);	/* hack... */
+				return memory_read_byte_16be(I.program, 0x1f0000+addr);	/* hack... */
 		}
 		else if (! I.mapping_on)
 		{
-			return program_read_byte_16be(addr);
+			return memory_read_byte_16be(I.program, addr);
 		}
 		else
 		{
@@ -698,13 +699,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					I.error_interrupt_register |= EIR_MAPERR;
 					write_inhibit = 1;
 				}
-				return program_read_byte_16be(addr);
+				return memory_read_byte_16be(I.program, addr);
 			}
 			if ((! (I.error_interrupt_register & EIR_MAPERR)) && ! (I.diaglat))
 				I.mapper_address_latch = I.map_files[map_file].bias[map_index]+addr;
 			if ((I.latch_control[map_index]) && (! I.reset_maperr))
 				I.diaglat = 1;
-			return program_read_byte_16be(I.map_files[map_file].bias[map_index]+addr);
+			return memory_read_byte_16be(I.program, I.map_files[map_file].bias[map_index]+addr);
 		}
 	}
 
@@ -715,14 +716,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				program_write_byte_16be(0x1f0000+addr, data);
+				memory_write_byte_16be(I.program, 0x1f0000+addr, data);
 			else
 				/* CPU ROM */
-				program_write_byte_16be(0x1f0000+addr, data);	/* hack... */
+				memory_write_byte_16be(I.program, 0x1f0000+addr, data);	/* hack... */
 		}
 		else if (! I.mapping_on)
 		{
-			program_write_byte_16be(addr, data);
+			memory_write_byte_16be(I.program, addr, data);
 		}
 		else
 		{
@@ -744,16 +745,16 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					write_inhibit = 1;
 				}
 				if (write_inhibit)
-					(void)program_read_byte_16be(addr);
+					(void)memory_read_byte_16be(I.program, addr);
 				else
-					program_write_byte_16be(addr, data);
+					memory_write_byte_16be(I.program, addr, data);
 				return;
 			}
 			if ((! (I.error_interrupt_register & EIR_MAPERR)) && ! (I.diaglat))
 				I.mapper_address_latch = I.map_files[map_file].bias[map_index]+addr;
 			if ((I.latch_control[map_index]) && (! I.reset_maperr))
 				I.diaglat = 1;
-			program_write_byte_16be(I.map_files[map_file].bias[map_index]+addr, data);
+			memory_write_byte_16be(I.program, I.map_files[map_file].bias[map_index]+addr, data);
 		}
 	}
 
@@ -764,11 +765,11 @@ WRITE8_HANDLER(tms9995_internal2_w)
     remember this when writing memory handlers.*/
 	/*This does not apply to tms9995 and tms99xxx, but does apply to tms9980 (see below).*/
 
-	#define readword(addr)        program_read_word_16be(addr)
-	#define writeword(addr,data)  program_write_word_16be((addr), (data))
+	#define readword(addr)        memory_read_word_16be(I.program, addr)
+	#define writeword(addr,data)  memory_write_word_16be(I.program, (addr), (data))
 
-	#define readbyte(addr)        program_read_byte_16be(addr)
-	#define writebyte(addr,data)  program_write_byte_16be((addr),(data))
+	#define readbyte(addr)        memory_read_byte_16be(I.program, addr)
+	#define writebyte(addr,data)  memory_write_byte_16be(I.program, (addr),(data))
 
 #elif (TMS99XX_MODEL == TMS9980_ID)
 	/*8-bit data bus, 14-bit address*/
@@ -781,14 +782,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		int val;
 
 		TMS99XX_ICOUNT -= 2;
-		val = program_read_byte_8be(addr);
-		return (val << 8) | program_read_byte_8be(addr+1);
+		val = memory_read_byte_8be(I.program, addr);
+		return (val << 8) | memory_read_byte_8be(I.program, addr+1);
 	}
-	#define writeword(addr,data)  { TMS99XX_ICOUNT -= 2; program_write_byte_8be((addr), (data) >> 8); program_write_byte_8be((addr) + 1, (data) & 0xff); }
+	#define writeword(addr,data)  { TMS99XX_ICOUNT -= 2; memory_write_byte_8be(I.program, (addr), (data) >> 8); memory_write_byte_8be(I.program, (addr) + 1, (data) & 0xff); }
 
 #if 0
-	#define readbyte(addr)        (TMS99XX_ICOUNT -= 2, program_read_byte_8be(addr))
-	#define writebyte(addr,data)  { TMS99XX_ICOUNT -= 2; program_write_byte_8be((addr),(data)); }
+	#define readbyte(addr)        (TMS99XX_ICOUNT -= 2, memory_read_byte_8be(I.program, addr))
+	#define writebyte(addr,data)  { TMS99XX_ICOUNT -= 2; memory_write_byte_8be(I.program, (addr),(data)); }
 #else
 	/*This is how it really works*/
 	/*Note that every writebyte must match a readbyte (which is indeed the case)*/
@@ -799,13 +800,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		TMS99XX_ICOUNT -= 2;
 		if (addr & 1)
 		{
-			extra_byte = program_read_byte_8be(addr-1);
-			return program_read_byte_8be(addr);
+			extra_byte = memory_read_byte_8be(I.program, addr-1);
+			return memory_read_byte_8be(I.program, addr);
 		}
 		else
 		{
-			int val = program_read_byte_8be(addr);
-			extra_byte = program_read_byte_8be(addr+1);
+			int val = memory_read_byte_8be(I.program, addr);
+			extra_byte = memory_read_byte_8be(I.program, addr+1);
 			return val;
 		}
 	}
@@ -814,13 +815,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		TMS99XX_ICOUNT -= 2;
 		if (addr & 1)
 		{
-			program_write_byte_8be(addr-1, extra_byte);
-			program_write_byte_8be(addr, data);
+			memory_write_byte_8be(I.program, addr-1, extra_byte);
+			memory_write_byte_8be(I.program, addr, data);
 		}
 		else
 		{
-			program_write_byte_8be(addr, data);
-			program_write_byte_8be(addr+1, extra_byte);
+			memory_write_byte_8be(I.program, addr, data);
+			memory_write_byte_8be(I.program, addr+1, extra_byte);
 		}
 	}
 #endif
@@ -840,7 +841,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else
 		{
 			TMS99XX_ICOUNT -= 2;
-			return (program_read_byte_8be(addr) << 8) + program_read_byte_8be(addr + 1);
+			return (memory_read_byte_8be(I.program, addr) << 8) + memory_read_byte_8be(I.program, addr + 1);
 		}
 	}
 	static void writeword(int addr, int data)
@@ -851,8 +852,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (!(addr < 0x2000))
 		{
 			TMS99XX_ICOUNT -= 2;
-			program_write_byte_8be(addr, data >> 8);
-			program_write_byte_8be(addr + 1, data & 0xff);
+			memory_write_byte_8be(I.program, addr, data >> 8);
+			memory_write_byte_8be(I.program, addr + 1, data & 0xff);
 		}
 	}
 
@@ -869,13 +870,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			TMS99XX_ICOUNT -= 2;
 			if (addr & 1)
 			{
-				extra_byte = program_read_byte_8be(addr-1);
-				return program_read_byte_8be(addr);
+				extra_byte = memory_read_byte_8be(I.program, addr-1);
+				return memory_read_byte_8be(I.program, addr);
 			}
 			else
 			{
-				int val = program_read_byte_8be(addr);
-				extra_byte = program_read_byte_8be(addr+1);
+				int val = memory_read_byte_8be(I.program, addr);
+				extra_byte = memory_read_byte_8be(I.program, addr+1);
 				return val;
 			}
 		}
@@ -890,13 +891,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			TMS99XX_ICOUNT -= 2;
 			if (addr & 1)
 			{
-				program_write_byte_8be(addr-1, extra_byte);
-				program_write_byte_8be(addr, data);
+				memory_write_byte_8be(I.program, addr-1, extra_byte);
+				memory_write_byte_8be(I.program, addr, data);
 			}
 			else
 			{
-				program_write_byte_8be(addr, data);
-				program_write_byte_8be(addr+1, extra_byte);
+				memory_write_byte_8be(I.program, addr, data);
+				memory_write_byte_8be(I.program, addr+1, extra_byte);
 		}
 	}
 	}
@@ -913,8 +914,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{
 			int reply;
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			reply = program_read_byte_8be(addr);
-			return (reply << 8) | program_read_byte_8be(addr + 1);
+			reply = memory_read_byte_8be(I.program, addr);
+			return (reply << 8) | memory_read_byte_8be(I.program, addr + 1);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -924,15 +925,15 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{
 			int reply;
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			reply = program_read_byte_8be(addr);
-			return (reply << 8) | program_read_byte_8be(addr + 1);
+			reply = memory_read_byte_8be(I.program, addr);
+			return (reply << 8) | memory_read_byte_8be(I.program, addr + 1);
 		}
 		else if (addr < 0xfffc)
 		{
 			/* read decrementer */
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				return ceil(ATTOTIME_TO_CYCLES(cpu_getactivecpu(), attotime_div(timer_timeleft(I.timer), 16)));
+				return ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				return I.decrementer_count;
@@ -948,8 +949,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (I.is_mp9537))
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			program_write_byte_8be(addr, data >> 8);
-			program_write_byte_8be(addr + 1, data & 0xff);
+			memory_write_byte_8be(I.program, addr, data >> 8);
+			memory_write_byte_8be(I.program, addr + 1, data & 0xff);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -958,8 +959,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			program_write_byte_8be(addr, data >> 8);
-			program_write_byte_8be(addr + 1, data & 0xff);
+			memory_write_byte_8be(I.program, addr, data >> 8);
+			memory_write_byte_8be(I.program, addr + 1, data & 0xff);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -978,7 +979,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (I.is_mp9537))
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			return program_read_byte_8be(addr);
+			return memory_read_byte_8be(I.program, addr);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -987,7 +988,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			return program_read_byte_8be(addr);
+			return memory_read_byte_8be(I.program, addr);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -996,7 +997,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				value = ceil(ATTOTIME_TO_CYCLES(cpu_getactivecpu(), attotime_div(timer_timeleft(I.timer), 16)));
+				value = ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				value = I.decrementer_count;
@@ -1017,7 +1018,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (I.is_mp9537))
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			program_write_byte_8be(addr, data);
+			memory_write_byte_8be(I.program, addr, data);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -1026,7 +1027,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			program_write_byte_8be(addr, data);
+			memory_write_byte_8be(I.program, addr, data);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -1203,90 +1204,92 @@ static void set_flag1(int val);
 
 /**************************************************************************/
 
-static void register_for_save_state(int index)
+static void register_for_save_state(const device_config *device)
 {
-	state_save_register_item("tms99xx", index, I.WP);
-	state_save_register_item("tms99xx", index, I.PC);
-	state_save_register_item("tms99xx", index, I.STATUS);
-	state_save_register_item("tms99xx", index, I.interrupt_pending);
+	state_save_register_item("tms99xx", device->tag, 0, I.WP);
+	state_save_register_item("tms99xx", device->tag, 0, I.PC);
+	state_save_register_item("tms99xx", device->tag, 0, I.STATUS);
+	state_save_register_item("tms99xx", device->tag, 0, I.interrupt_pending);
 
 #if ! ((TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID))
-	state_save_register_item("tms99xx", index, I.load_state);
+	state_save_register_item("tms99xx", device->tag, 0, I.load_state);
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID) || (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9980_ID)
-	state_save_register_item("tms99xx", index, I.irq_level);
-	state_save_register_item("tms99xx", index, I.irq_state);
+	state_save_register_item("tms99xx", device->tag, 0, I.irq_level);
+	state_save_register_item("tms99xx", device->tag, 0, I.irq_state);
 #elif (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", index, I.irq_level);
-	state_save_register_item("tms99xx", index, I.int_state);
-	state_save_register_item("tms99xx", index, I.int_latch);
+	state_save_register_item("tms99xx", device->tag, 0, I.irq_level);
+	state_save_register_item("tms99xx", device->tag, 0, I.int_state);
+	state_save_register_item("tms99xx", device->tag, 0, I.int_latch);
 #endif
 
-	state_save_register_item("tms99xx", index, I.IDLE);
+	state_save_register_item("tms99xx", device->tag, 0, I.IDLE);
 
 #if HAS_MAPPING
-	state_save_register_item("tms99xx", index, I.mapping_on);
-	state_save_register_item_array("tms99xx", index, I.map_files[0].L);
-	state_save_register_item_array("tms99xx", index, I.map_files[0].B);
-	state_save_register_item_array("tms99xx", index, I.map_files[0].limit);
-	state_save_register_item_array("tms99xx", index, I.map_files[0].bias);
-	state_save_register_item_array("tms99xx", index, I.map_files[1].L);
-	state_save_register_item_array("tms99xx", index, I.map_files[1].B);
-	state_save_register_item_array("tms99xx", index, I.map_files[1].limit);
-	state_save_register_item_array("tms99xx", index, I.map_files[1].bias);
-	state_save_register_item_array("tms99xx", index, I.map_files[2].L);
-	state_save_register_item_array("tms99xx", index, I.map_files[2].B);
-	state_save_register_item_array("tms99xx", index, I.map_files[2].limit);
-	state_save_register_item_array("tms99xx", index, I.map_files[2].bias);
-	state_save_register_item("tms99xx", index, I.cur_map);
-	state_save_register_item("tms99xx", index, I.cur_src_map);
-	state_save_register_item("tms99xx", index, I.cur_dst_map);
+	state_save_register_item("tms99xx", device->tag, 0, I.mapping_on);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].L);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].B);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].limit);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].bias);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].L);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].B);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].limit);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].bias);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].L);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].B);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].limit);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].bias);
+	state_save_register_item("tms99xx", device->tag, 0, I.cur_map);
+	state_save_register_item("tms99xx", device->tag, 0, I.cur_src_map);
+	state_save_register_item("tms99xx", device->tag, 0, I.cur_dst_map);
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_item("tms99xx", index, I.reset_maperr);
-	state_save_register_item("tms99xx", index, I.mapper_address_latch);
-	state_save_register_item("tms99xx", index, I.mapper_cru_read_register);
-	state_save_register_item("tms99xx", index, I.diaglat);
-	state_save_register_item_array("tms99xx", index, I.latch_control);
+	state_save_register_item("tms99xx", device->tag, 0, I.reset_maperr);
+	state_save_register_item("tms99xx", device->tag, 0, I.mapper_address_latch);
+	state_save_register_item("tms99xx", device->tag, 0, I.mapper_cru_read_register);
+	state_save_register_item("tms99xx", device->tag, 0, I.diaglat);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.latch_control);
 #endif
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_item("tms99xx", index, I.error_interrupt_register);
+	state_save_register_item("tms99xx", device->tag, 0, I.error_interrupt_register);
 #endif
 
 #if (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item_array("tms99xx", index, I.RAM);
+	state_save_register_item_array("tms99xx", device->tag, 0, I.RAM);
 #endif
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", index, I.decrementer_enabled);
-	state_save_register_item("tms99xx", index, I.decrementer_interval);
-	state_save_register_item("tms99xx", index, I.decrementer_count);
+	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_enabled);
+	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_interval);
+	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_count);
 #endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", index, I.flag);
-	state_save_register_item("tms99xx", index, I.MID_flag);
-	state_save_register_item("tms99xx", index, I.memory_wait_states_byte);
-	state_save_register_item("tms99xx", index, I.memory_wait_states_word);
-	state_save_register_item("tms99xx", index, I.is_mp9537);
+	state_save_register_item("tms99xx", device->tag, 0, I.flag);
+	state_save_register_item("tms99xx", device->tag, 0, I.MID_flag);
+	state_save_register_item("tms99xx", device->tag, 0, I.memory_wait_states_byte);
+	state_save_register_item("tms99xx", device->tag, 0, I.memory_wait_states_word);
+	state_save_register_item("tms99xx", device->tag, 0, I.is_mp9537);
 #endif
 
-	state_save_register_item("tms99xx", index, I.disable_interrupt_recognition);
+	state_save_register_item("tms99xx", device->tag, 0, I.disable_interrupt_recognition);
 }
 
 
 static CPU_INIT( tms99xx )
 {
-	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) config;
+	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->static_config;
 
-	register_for_save_state(index);
+	register_for_save_state(device);
 
 	I.irq_level = 16;
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	I.timer = timer_alloc(decrementer_callback, NULL);
@@ -1479,7 +1482,7 @@ static CPU_EXECUTE( tms99xx )
 			}
 		}
 
-		if ((Machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
+		if ((device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
 		{
 			#if 0		/* Trace */
 			logerror("> PC %4.4x :%4.4x %4.4x : R=%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x :T=%d\n",I.PC,I.STATUS,I.WP,I.FR[0],I.FR[1],I.FR[2],I.FR[3],I.FR[4],I.FR[5],I.FR[6],I.FR[7],I.FR[8],I.FR[9],I.FR[10],I.FR[11],I.FR[12],I.FR[13],I.FR[14],I.FR[15],TMS99XX_ICOUNT);
@@ -1506,7 +1509,7 @@ static CPU_EXECUTE( tms99xx )
 				#endif
 			#endif
 
-			debugger_instruction_hook(Machine, I.IR);
+			debugger_instruction_hook(device, I.IR);
 		}
 
 		if (I.IDLE)
@@ -1827,7 +1830,7 @@ static void reset_decrementer(void)
 
 	if (I.decrementer_enabled && ! (I.flag & 1))
 		{	/* timer */
-		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpu_getactivecpu());
+		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpunum_get_active());
 		timer_adjust_periodic(I.timer, period, 0, period);
 	}
 }
@@ -2049,7 +2052,7 @@ typedef enum
 	CRU_PRIVILEGE_VIOLATION = -1
 } cru_error_code;
 
-#define WRITEPORT(port, data) io_write_byte_8be(port, data)
+#define WRITEPORT(port, data) memory_write_byte_8be(I.io, port, data)
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)
 /* on tms9940, we have to handle internal CRU ports */
@@ -2268,7 +2271,7 @@ static void external_instruction_notify(int ext_op_ID)
     read at the same address.  This seems to be impossible to emulate efficiently, so, if you need
     to emulate this, you're in trouble.
 */
-#define READPORT(port) io_read_byte_8be(port)
+#define READPORT(port) memory_read_byte_8be(I.io, port)
 
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)
@@ -2479,10 +2482,10 @@ static void load_map_file(UINT16 src_addr, int src_map_file, int dst_file)
 
 	for (i=0; i<3; i++)
 {
-		I.map_files[dst_file].L[i] = program_read_word_16be(I.mapper_address_latch) & 0xffe0;
+		I.map_files[dst_file].L[i] = memory_read_word_16be(I.program, I.mapper_address_latch) & 0xffe0;
 		I.map_files[dst_file].limit[i] = (I.map_files[dst_file].L[i] ^ 0xffe0) | 0x001f;
 		I.mapper_address_latch = (I.mapper_address_latch+2) & 0x1fffff;
-		I.map_files[dst_file].B[i] = program_read_word_16be(I.mapper_address_latch);
+		I.map_files[dst_file].B[i] = memory_read_word_16be(I.program, I.mapper_address_latch);
 		I.map_files[dst_file].bias[i] = ((unsigned int) I.map_files[dst_file].B[i]) << 5;
 		I.mapper_address_latch = (I.mapper_address_latch+2) & 0x1fffff;
 	}
@@ -4679,7 +4682,7 @@ static CPU_SET_INFO( tms99xx )
  * Generic get_info
  **************************************************************************/
 
-void TMS99XX_GET_INFO(UINT32 state, cpuinfo *info)
+void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
@@ -4815,7 +4818,7 @@ void TMS99XX_GET_INFO(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &TMS99XX_ICOUNT;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, TMS99XX_CPU_NAME);		break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, TMS99XX_cpu_get_name);		break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments 9900"); break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;

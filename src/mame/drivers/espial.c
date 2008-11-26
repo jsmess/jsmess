@@ -32,7 +32,7 @@ MACHINE_RESET( espial )
 
 WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
 {
-	interrupt_enable_w(machine,offset,~data & 1);
+	interrupt_enable_w(space,offset,~data & 1);
 }
 
 
@@ -45,23 +45,23 @@ WRITE8_HANDLER( espial_sound_nmi_enable_w )
 INTERRUPT_GEN( espial_sound_nmi_gen )
 {
 	if (sound_nmi_enabled)
-		nmi_line_pulse(machine, cpunum);
+		nmi_line_pulse(device);
 }
 
 
 INTERRUPT_GEN( zodiac_master_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		nmi_line_pulse(machine, cpunum);
+	if (cpu_getiloops(device) == 0)
+		nmi_line_pulse(device);
 	else
-		irq0_line_hold(machine, cpunum);
+		irq0_line_hold(device);
 }
 
 
 WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
-	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 

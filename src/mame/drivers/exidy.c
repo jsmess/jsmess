@@ -172,9 +172,9 @@ static CUSTOM_INPUT( teetert_input_r )
 
 static WRITE8_HANDLER( fax_bank_select_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
-	memory_set_bankptr(1, &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
+	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
 	if ((data & 0x1f) > 0x17)
 		logerror("Banking to unpopulated ROM bank %02X!\n",data & 0x1f);
 }
@@ -1371,8 +1371,8 @@ static DRIVER_INIT( phantoma )
 	exidy_color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, "main") + 0xf800);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf800, 0xffff, 0, 0, SMH_BANK1);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0xf800);
 }
 
 
@@ -1402,10 +1402,12 @@ static DRIVER_INIT( pepper2 )
 
 static DRIVER_INIT( fax )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	exidy_video_config(0x04, 0x04, TRUE);
 
 	/* reset the ROM bank */
-	fax_bank_select_w(machine,0,0);
+	fax_bank_select_w(space,0,0);
 }
 
 

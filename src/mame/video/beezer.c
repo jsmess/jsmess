@@ -7,12 +7,14 @@ static int scanline=0;
 
 INTERRUPT_GEN( beezer_interrupt )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	scanline = (scanline + 1) % 0x80;
-	via_0_ca2_w (machine, 0, scanline & 0x10);
+	via_0_ca2_w (space, 0, scanline & 0x10);
 	if ((scanline & 0x78) == 0x78)
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(device, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 VIDEO_UPDATE( beezer )
@@ -59,7 +61,7 @@ WRITE8_HANDLER( beezer_map_w )
 	bit1 = (data >> 7) & 0x01;
 	b = 0x5f * bit0 + 0xa0 * bit1;
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
 
 READ8_HANDLER( beezer_line_r )

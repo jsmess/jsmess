@@ -28,6 +28,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
 #include "memconv.h"
@@ -68,22 +69,22 @@ static void mpc8240_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 
 static READ64_HANDLER( pci_config_addr_r )
 {
-	return pci_64be_r(machine, 0, U64(0x00000000ffffffff));
+	return pci_64be_r(space, 0, U64(0x00000000ffffffff));
 }
 
 static WRITE64_HANDLER( pci_config_addr_w )
 {
-	pci_64be_w(machine, 0, data, U64(0x00000000ffffffff));
+	pci_64be_w(space, 0, data, U64(0x00000000ffffffff));
 }
 
 static READ64_HANDLER( pci_config_data_r )
 {
-	return pci_64be_r(machine, 1, U64(0xffffffff00000000)) << 32;
+	return pci_64be_r(space, 1, U64(0xffffffff00000000)) << 32;
 }
 
 static WRITE64_HANDLER( pci_config_data_w )
 {
-	pci_64be_w(machine, 1, data >> 32, U64(0xffffffff00000000));
+	pci_64be_w(space, 1, data >> 32, U64(0xffffffff00000000));
 }
 
 
@@ -95,7 +96,7 @@ static READ32_HANDLER( epic_r )
 	int reg;
 	reg = offset * 4;
 
-	//printf("EPIC: read %08X, %08X at %08X\n", reg, mem_mask, activecpu_get_pc());
+	//printf("EPIC: read %08X, %08X at %08X\n", reg, mem_mask, cpu_get_pc(space->cpu));
 
 	switch (reg >> 16)
 	{
@@ -120,7 +121,7 @@ static WRITE32_HANDLER( epic_w )
 	int reg;
 	reg = offset * 4;
 
-	//printf("EPIC: write %08X, %08X, %08X at %08X\n", data, reg, mem_mask, activecpu_get_pc());
+	//printf("EPIC: write %08X, %08X, %08X at %08X\n", data, reg, mem_mask, cpu_get_pc(space->cpu));
 
 	switch (reg >> 16)
 	{
@@ -140,11 +141,11 @@ static WRITE32_HANDLER( epic_w )
 
 static READ64_HANDLER(epic_64be_r)
 {
-	return read64be_with_32le_handler(epic_r, machine, offset, mem_mask);
+	return read64be_with_32le_handler(epic_r, space, offset, mem_mask);
 }
 static WRITE64_HANDLER(epic_64be_w)
 {
-	write64be_with_32le_handler(epic_w, machine, offset, data, mem_mask);
+	write64be_with_32le_handler(epic_w, space, offset, data, mem_mask);
 }
 
 
@@ -179,7 +180,7 @@ static READ64_DEVICE_HANDLER(cf_card_data_r)
 
 			default:
 			{
-				fatalerror("cf_card_data_r: IDE reg %02X at %08X\n", offset & 0xf, activecpu_get_pc());
+				fatalerror("cf_card_data_r: IDE reg %02X at %08X\n", offset & 0xf, cpu_get_pc(device->machine->activecpu));
 			}
 		}
 	}
@@ -200,7 +201,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_data_w)
 
 			default:
 			{
-				fatalerror("cf_card_data_w: IDE reg %02X, %04X at %08X\n", offset & 0xf, (UINT16)(data >> 16), activecpu_get_pc());
+				fatalerror("cf_card_data_w: IDE reg %02X, %04X at %08X\n", offset & 0xf, (UINT16)(data >> 16), cpu_get_pc(device->machine->activecpu));
 			}
 		}
 	}
@@ -246,7 +247,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 
 				default:
 				{
-					printf("compact_flash_r: IDE reg %02X at %08X\n", offset & 0xf, activecpu_get_pc());
+					printf("compact_flash_r: IDE reg %02X at %08X\n", offset & 0xf, cpu_get_pc(device->machine->activecpu));
 				}
 			}
 		}
@@ -262,7 +263,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 			}
 			else
 			{
-				fatalerror("compact_flash_r: reg %02X at %08X\n", reg, activecpu_get_pc());
+				fatalerror("compact_flash_r: reg %02X at %08X\n", reg, cpu_get_pc(device->machine->activecpu));
 			}
 		}
 	}
@@ -271,7 +272,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 
 static WRITE64_DEVICE_HANDLER(cf_card_w)
 {
-	//printf("compact_flash_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), activecpu_get_pc());
+	//printf("compact_flash_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), cpu_get_pc(machine->activecpu));
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -309,7 +310,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 
 				default:
 				{
-					fatalerror("compact_flash_w: IDE reg %02X, data %04X at %08X\n", offset & 0xf, (UINT16)((data >> 16) & 0xffff), activecpu_get_pc());
+					fatalerror("compact_flash_w: IDE reg %02X, data %04X at %08X\n", offset & 0xf, (UINT16)((data >> 16) & 0xffff), cpu_get_pc(device->machine->activecpu));
 				}
 			}
 		}
@@ -335,7 +336,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 				}
 				default:
 				{
-					fatalerror("compact_flash_w: reg %02X, data %04X at %08X\n", offset, (UINT16)((data >> 16) & 0xffff), activecpu_get_pc());
+					fatalerror("compact_flash_w: reg %02X, data %04X at %08X\n", offset, (UINT16)((data >> 16) & 0xffff), cpu_get_pc(device->machine->activecpu));
 				}
 			}
 		}
@@ -442,7 +443,7 @@ static UINT32 voodoo3_pci_r(int function, int reg, UINT32 mem_mask)
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X", reg, activecpu_get_pc());
+			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(Machine->activecpu));
 	}
 	return 0;
 }
@@ -510,39 +511,39 @@ static void voodoo3_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, activecpu_get_pc());
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(Machine->activecpu));
 	}
 }
 
 #if 0
 static READ64_HANDLER(voodoo3_io_r)
 {
-	return read64be_with_32le_handler(banshee_io_0_r, machine, offset, mem_mask);
+	return read64be_with_32le_handler(banshee_io_0_r, space->machine, offset, mem_mask);
 }
 static WRITE64_HANDLER(voodoo3_io_w)
 {
-//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, activecpu_get_pc());
-	write64be_with_32le_handler(banshee_io_0_w, machine, offset, data, mem_mask);
+//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(space->cpu));
+	write64be_with_32le_handler(banshee_io_0_w, space->machine, offset, data, mem_mask);
 }
 
 static READ64_HANDLER(voodoo3_r)
 {
-	return read64be_with_32le_handler(banshee_0_r, machine, offset, mem_mask);
+	return read64be_with_32le_handler(banshee_0_r, space->machine, offset, mem_mask);
 }
 static WRITE64_HANDLER(voodoo3_w)
 {
-//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, activecpu_get_pc());
-	write64be_with_32le_handler(banshee_0_w, machine,  offset, data, mem_mask);
+//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(space->cpu));
+	write64be_with_32le_handler(banshee_0_w, space->machine,  offset, data, mem_mask);
 }
 
 static READ64_HANDLER(voodoo3_lfb_r)
 {
-	return read64be_with_32le_handler(banshee_fb_0_r, machine, offset, mem_mask);
+	return read64be_with_32le_handler(banshee_fb_0_r, space->machine, offset, mem_mask);
 }
 static WRITE64_HANDLER(voodoo3_lfb_w)
 {
-//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, activecpu_get_pc());
-	write64be_with_32le_handler(banshee_fb_0_w, machine, offset, data, mem_mask);
+//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(space->cpu));
+	write64be_with_32le_handler(banshee_fb_0_w, space->machine, offset, data, mem_mask);
 }
 #endif
 
@@ -653,8 +654,8 @@ static DRIVER_INIT(vipercf)
 
 	DRIVER_INIT_CALL(viper);
 
-	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
-	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
+	memory_install_readwrite64_device_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), ide, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
+	memory_install_readwrite64_device_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
 }
 
 

@@ -35,24 +35,24 @@ static UINT8 orbit_misc_flags;
  *
  *************************************/
 
-static TIMER_CALLBACK( nmi_32v )
+static TIMER_DEVICE_CALLBACK( nmi_32v )
 {
 	int scanline = param;
 	int nmistate = (scanline & 32) && (orbit_misc_flags & 4);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( orbit_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, irq_off);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_vblank_end(device->machine->primary_screen), NULL, 0, irq_off);
 }
 
 
@@ -65,6 +65,8 @@ static INTERRUPT_GEN( orbit_interrupt )
 
 static void update_misc_flags(running_machine *machine, UINT8 val)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	orbit_misc_flags = val;
 
 	/* BIT0 => UNUSED       */
@@ -76,7 +78,7 @@ static void update_misc_flags(running_machine *machine, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	discrete_sound_w(machine, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
+	discrete_sound_w(space, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
 
 	set_led_status(0, orbit_misc_flags & 0x08);
 	set_led_status(1, orbit_misc_flags & 0x40);
@@ -91,9 +93,9 @@ static WRITE8_HANDLER( orbit_misc_w )
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(machine, orbit_misc_flags | (1 << bit));
+		update_misc_flags(space->machine, orbit_misc_flags | (1 << bit));
 	else
-		update_misc_flags(machine, orbit_misc_flags & ~(1 << bit));
+		update_misc_flags(space->machine, orbit_misc_flags & ~(1 << bit));
 }
 
 
@@ -166,7 +168,7 @@ static INPUT_PORTS_START( orbit )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("DSW1")	/* 1800 */
-	PORT_DIPNAME( 0x07, 0x00, "Play Time Per Credit" )
+	PORT_DIPNAME( 0x07, 0x00, "Play Time Per Credit" ) PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING( 0x00, "0:30" )
 	PORT_DIPSETTING( 0x01, "1:00" )
 	PORT_DIPSETTING( 0x02, "1:30" )
@@ -175,20 +177,16 @@ static INPUT_PORTS_START( orbit )
 	PORT_DIPSETTING( 0x05, "3:00" )
 	PORT_DIPSETTING( 0x06, "3:30" )
 	PORT_DIPSETTING( 0x07, "4:00" )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING( 0x00, DEF_STR( English ) )
 	PORT_DIPSETTING( 0x08, DEF_STR( Spanish ) )
 	PORT_DIPSETTING( 0x10, DEF_STR( French ) )
 	PORT_DIPSETTING( 0x18, DEF_STR( German ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Free_Play ))
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Free_Play )) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ))
 	PORT_DIPSETTING( 0x20, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown )) /* probably unused */
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ))
-	PORT_DIPSETTING( 0x40, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown )) /* probably unused */
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ))
-	PORT_DIPSETTING( 0x80, DEF_STR( On ))
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "DSW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "DSW1:8" )
 
 	PORT_START("DSW2")	/* 2000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Game Reset") PORT_CODE(KEYCODE_PLUS_PAD)

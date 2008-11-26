@@ -685,8 +685,8 @@ static READ8_HANDLER( kageki_csport_r )
 {
 	int	dsw, dsw1, dsw2;
 
-	dsw1 = input_port_read(machine, "DSWA");
-	dsw2 = input_port_read(machine, "DSWB");
+	dsw1 = input_port_read(space->machine, "DSWA");
+	dsw2 = input_port_read(space->machine, "DSWB");
 
 	switch (kageki_csport_sel)
 	{
@@ -738,8 +738,8 @@ static WRITE8_HANDLER( kabukiz_sound_bank_w )
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
 	{
-		UINT8 *ROM = memory_region(machine, "audio");
-		memory_set_bankptr(3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
+		UINT8 *ROM = memory_region(space->machine, "audio");
+		memory_set_bankptr(space->machine, 3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
 
@@ -747,7 +747,7 @@ static WRITE8_HANDLER( kabukiz_sample_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
-		dac_0_data_w(machine, 0, data);
+		dac_0_data_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -839,8 +839,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -892,17 +892,6 @@ static ADDRESS_MAP_START( tnzsb_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( i8742_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0800, 0x08ff) AM_RAM				/* Internal i8742 RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8742_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE(SMH_RAM)	/* Internal i8742 RAM */
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( i8742_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(tnzs_port2_w)
 	AM_RANGE(I8X41_p1, I8X41_p1) AM_READ(tnzs_port1_r)
@@ -927,7 +916,7 @@ static WRITE8_HANDLER( jpopnics_palette_w )
 	b = (paldata >> 8) & 0x000f;
 	// the other bits seem to be used, and the colours are wrong..
 
-	palette_set_color_rgb(machine,offset,r<<4, g<<4, b<<4);
+	palette_set_color_rgb(space->machine,offset,r<<4, g<<4, b<<4);
 }
 
 static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -945,10 +934,10 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 
 	/* bits 0-1 select ROM bank */
-	memory_set_bankptr (2, &RAM[0x10000 + 0x2000 * (data & 3)]);
+	memory_set_bankptr (space->machine, 2, &RAM[0x10000 + 0x2000 * (data & 3)]);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1603,7 +1592,7 @@ static const ym2203_interface ym2203_config =
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface kageki_ym2203_interface =
@@ -1659,7 +1648,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1698,7 +1687,7 @@ static MACHINE_DRIVER_START( drtoppel )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1726,9 +1715,6 @@ static MACHINE_DRIVER_START( drtoppel )
 MACHINE_DRIVER_END
 
 
-static const i8x41_config i8042_config = { TYPE_I8X42 };
-
-
 static MACHINE_DRIVER_START( tnzs )
 
 	/* basic machine hardware */
@@ -1740,12 +1726,10 @@ static MACHINE_DRIVER_START( tnzs )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("mcu", I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(i8742_readmem,i8742_writemem)
+	MDRV_CPU_ADD("mcu", I8742 ,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_IO_MAP(i8742_io_map,0)
-	MDRV_CPU_CONFIG( i8042_config )
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1783,7 +1767,7 @@ static MACHINE_DRIVER_START( insectx )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1821,7 +1805,7 @@ static MACHINE_DRIVER_START( kageki )
 	MDRV_CPU_PROGRAM_MAP(kageki_sub_readmem,kageki_sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1870,7 +1854,7 @@ static MACHINE_DRIVER_START( tnzsb )
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
 	MDRV_CPU_IO_MAP(tnzsb_io_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1934,7 +1918,7 @@ static MACHINE_DRIVER_START( jpopnics )
 	MDRV_CPU_PROGRAM_MAP(jpopnics_sub_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

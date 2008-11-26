@@ -26,10 +26,9 @@
  * Core software takes care of traversing the netlist in the correct
  * order
  *
- * discrete_start()         - Read Node list, initialise & reset
- * discrete_stop()          - Shutdown discrete sound system
- * discrete_reset()         - Put sound system back to time 0
- * discrete_update()        - Update streams to current time
+ * SND_START(discrete)      - Read Node list, initialise & reset
+ * SND_STOP(discrete)       - Shutdown discrete sound system
+ * SND_RESET(discrete)      - Put sound system back to time 0
  * discrete_stream_update() - This does the real update to the sim
  *
  ************************************************************************/
@@ -67,11 +66,11 @@ discrete_info *discrete_current_context = NULL;
  *
  *************************************/
 
-static void init_nodes(discrete_info *info, discrete_sound_block *block_list);
+static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const char *tag);
 static void find_input_nodes(discrete_info *info, discrete_sound_block *block_list);
 static void setup_output_nodes(discrete_info *info);
 static void setup_disc_logs(discrete_info *info);
-static void discrete_reset(void *chip);
+static SND_RESET( discrete );
 
 
 
@@ -247,7 +246,7 @@ node_description *discrete_find_node(void *chip, int node)
  *
  *************************************/
 
-static void *discrete_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( discrete )
 {
 	discrete_sound_block *intf = (discrete_sound_block *)config;
 	discrete_info *info;
@@ -309,7 +308,7 @@ static void *discrete_start(const char *tag, int sndindex, int clock, const void
 	memset(info->indexed_node, 0, DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
 
 	/* initialize the node data */
-	init_nodes(info, intf);
+	init_nodes(info, intf, tag);
 
 	/* now go back and find pointers to all input nodes */
 	find_input_nodes(info, intf);
@@ -331,9 +330,9 @@ static void *discrete_start(const char *tag, int sndindex, int clock, const void
  *
  *************************************/
 
-static void discrete_stop(void *chip)
+static SND_STOP( discrete )
 {
-	discrete_info *info = chip;
+	discrete_info *info = token;
 	int log_num;
 
 #if (DISCRETE_PROFILING)
@@ -391,9 +390,9 @@ static void discrete_stop(void *chip)
  *
  *************************************/
 
-static void discrete_reset(void *chip)
+static SND_RESET( discrete )
 {
-	discrete_info *info = chip;
+	discrete_info *info = token;
 	int nodenum;
 
 	discrete_current_context = info;
@@ -412,9 +411,6 @@ static void discrete_reset(void *chip)
 		/* otherwise, just step it */
 		else if (node->module.step)
 			(*node->module.step)(node);
-
-		/* and register save state */
-		state_save_register_item_array("discrete", nodenum, node->output);
 	}
 
 	discrete_current_context = NULL;
@@ -522,7 +518,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
  *
  *************************************/
 
-static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
+static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const char *tag)
 {
 	int nodenum;
 
@@ -630,6 +626,8 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 			info->discrete_input_streams++;
 		}
 
+		/* and register save state */
+		state_save_register_item_array("discrete", tag, nodenum, node->output);
 	}
 
 	/* if no outputs, give an error */
@@ -744,7 +742,7 @@ static void setup_disc_logs(discrete_info *info)
  * Generic get_info
  **************************************************************************/
 
-static void discrete_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( discrete )
 {
 	switch (state)
 	{
@@ -753,17 +751,17 @@ static void discrete_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void discrete_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( discrete )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = discrete_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = discrete_start;			break;
-		case SNDINFO_PTR_STOP:							info->stop = discrete_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = discrete_reset;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( discrete );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( discrete );			break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( discrete );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( discrete );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "Discrete";					break;

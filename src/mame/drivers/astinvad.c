@@ -187,14 +187,14 @@ static VIDEO_UPDATE( spaceint )
 
 static TIMER_CALLBACK( kamikaze_int_off )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( kamizake_int_gen )
 {
 	/* interrupts are asserted on every state change of the 128V line */
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 	param ^= 128;
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
@@ -213,7 +213,7 @@ static MACHINE_START( kamikaze )
 static INPUT_CHANGED( spaceint_coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -230,9 +230,9 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset);
+		result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset);
 	if (!(offset & 8))
-		result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset);
+		result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset);
 	return result;
 }
 
@@ -241,9 +241,9 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset, data);
 	if (!(offset & 8))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset, data);
 }
 
 
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
 
 	if (bits_gone_hi & 0x04) sample_start(3, SND_INVADERHIT, 0);
 
-	screen_flip = (input_port_read(machine, "CABINET") & data & 0x80) ? 0xff : 0x00;
+	screen_flip = (input_port_read(space->machine, "CABINET") & data & 0x80) ? 0xff : 0x00;
 }
 
 

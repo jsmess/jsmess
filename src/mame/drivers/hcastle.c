@@ -28,16 +28,16 @@ WRITE8_HANDLER( hcastle_pf2_control_w );
 
 static WRITE8_HANDLER( hcastle_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x1f) * 0x2000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )
@@ -243,7 +243,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-//  cpunum_set_input_line(machine, 1,0,linestate);
+//  cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static void volume_callback(int v)

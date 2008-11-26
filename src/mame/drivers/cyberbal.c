@@ -36,8 +36,8 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 2, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -52,14 +52,14 @@ static MACHINE_RESET( cyberbal )
 	cyberbal_sound_reset(machine);
 
 	/* CPU 2 doesn't run until reset */
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
 static void cyberb2p_update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 3, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 3, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -81,7 +81,7 @@ static MACHINE_RESET( cyberb2p )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int temp = input_port_read(machine, "IN0");
+	int temp = input_port_read(space->machine, "IN0");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -89,7 +89,7 @@ static READ16_HANDLER( special_port0_r )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int temp = input_port_read(machine, "IN2");
+	int temp = input_port_read(space->machine, "IN2");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x2000;
 	return temp;
 }
@@ -112,7 +112,7 @@ static READ16_HANDLER( sound_state_r )
 
 static WRITE16_HANDLER( p2_reset_w )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

@@ -99,7 +99,7 @@ static void snkwave_update(void *param, stream_sample_t **inputs, stream_sample_
 }
 
 
-static void *snkwave_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( snkwave )
 {
 	struct snkwave_sound *chip;
 
@@ -123,10 +123,10 @@ static void *snkwave_start(const char *tag, int sndindex, int clock, const void 
 	chip->waveform_position = 0;
 
 	/* register with the save state system */
-	state_save_register_item("snkwave", sndindex, chip->frequency);
-	state_save_register_item("snkwave", sndindex, chip->counter);
-	state_save_register_item("snkwave", sndindex, chip->waveform_position);
-	state_save_register_item_pointer("snkwave", sndindex, chip->waveform, WAVEFORM_LENGTH);
+	state_save_register_item("snkwave", tag, 0, chip->frequency);
+	state_save_register_item("snkwave", tag, 0, chip->counter);
+	state_save_register_item("snkwave", tag, 0, chip->waveform_position);
+	state_save_register_item_pointer("snkwave", tag, 0, chip->waveform, WAVEFORM_LENGTH);
 
 	return chip;
 }
@@ -163,7 +163,7 @@ WRITE8_HANDLER( snkwave_w )
  * Generic get_info
  **************************************************************************/
 
-static void snkwave_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( snkwave )
 {
 	switch (state)
 	{
@@ -172,15 +172,15 @@ static void snkwave_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void snkwave_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( snkwave )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = snkwave_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = snkwave_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( snkwave );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( snkwave );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

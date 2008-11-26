@@ -137,13 +137,13 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 	if (wardner_membank != data) {
 		int bankaddress = 0;
 
-		UINT8 *RAM = memory_region(machine, "main");
+		UINT8 *RAM = memory_region(space->machine, "main");
 
 		wardner_membank = data;
 
 		if (data)
 		{
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK1);
 			switch (data)
 			{
 				case 2:  bankaddress = 0x10000; break;
@@ -155,26 +155,28 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 				case 6:  bankaddress = 0x30000; break; /* not used */
 				default: bankaddress = 0x00000; break; /* not used */
 			}
-			memory_set_bankptr(1,&RAM[bankaddress]);
+			memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 		}
 		else
 		{
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xadff, 0, 0, SMH_BANK4);
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xae00, 0xafff, 0, 0, SMH_BANK2);
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0, SMH_BANK3);
-			memory_set_bankptr(1, &RAM[0x0000]);
-			memory_set_bankptr(2, rambase_ae00);
-			memory_set_bankptr(3, rambase_c000);
-			memory_set_bankptr(4, paletteram);
+			memory_install_read8_handler(space, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
+			memory_install_read8_handler(space, 0xa000, 0xadff, 0, 0, SMH_BANK4);
+			memory_install_read8_handler(space, 0xae00, 0xafff, 0, 0, SMH_BANK2);
+			memory_install_read8_handler(space, 0xc000, 0xc7ff, 0, 0, SMH_BANK3);
+			memory_set_bankptr(space->machine, 1, &RAM[0x0000]);
+			memory_set_bankptr(space->machine, 2, rambase_ae00);
+			memory_set_bankptr(space->machine, 3, rambase_c000);
+			memory_set_bankptr(space->machine, 4, paletteram);
 		}
 	}
 }
 
 STATE_POSTLOAD( wardner_restore_bank )
 {
-	wardner_ramrom_bank_sw(machine,0,1);	/* Dummy value to ensure restoration */
-	wardner_ramrom_bank_sw(machine,0,wardner_membank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	wardner_ramrom_bank_sw(space,0,1);	/* Dummy value to ensure restoration */
+	wardner_ramrom_bank_sw(space,0,wardner_membank);
 }
 
 
@@ -413,7 +415,7 @@ static const gfx_layout spritelayout =
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate);
+	cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

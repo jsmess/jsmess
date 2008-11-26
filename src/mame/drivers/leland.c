@@ -764,7 +764,7 @@ static MACHINE_DRIVER_START( redline )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(leland)
 
-	MDRV_CPU_ADD("sound", I80186, MCU_CLOCK)
+	MDRV_CPU_ADD("audio", I80186, MCU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
 	MDRV_CPU_IO_MAP(redline_80186_map_io,0)
 
@@ -780,7 +780,7 @@ static MACHINE_DRIVER_START( quarterb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(redline)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_IO_MAP(leland_80186_map_io,0)
 
 	/* sound hardware */
@@ -1295,7 +1295,7 @@ ROM_START( redlin2p )
 	ROM_LOAD( "13913-01.u9",  0x1a000, 0x02000, CRC(02886071) SHA1(699f13677a3e76e8ec2ec73e62d4da4038f9f85d) )
 	ROM_CONTINUE(             0x26000, 0x02000 )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "17t",    0x0e0001, 0x10000, CRC(8d26f221) SHA1(cd5b1d88fec0ff1ab7af554a9fcffc43d33a12e7) )
 	ROM_LOAD16_BYTE( "28t",    0x0e0000, 0x10000, CRC(7aa21b2c) SHA1(5fd9f49d4bb1dc28393b9df76dfa19e28677639b) )
 
@@ -1340,7 +1340,7 @@ ROM_START( quarterb )
 	ROM_LOAD( "15206-01.u9",  0x1a000, 0x02000, CRC(6bf8d4ab) SHA1(cc9b3f1e651b2a667f17553aac655f0039983890) )
 	ROM_CONTINUE(             0x26000, 0x02000 )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "15222-02.45t", 0x040001, 0x10000, CRC(710bdc76) SHA1(610f7baa17adf2d16c9494b05556b49ae376fe81) )
 	ROM_LOAD16_BYTE( "15225-02.62t", 0x040000, 0x10000, CRC(041cecde) SHA1(91556a393d61979d3e92f75142832353e9081a15) )
 	ROM_LOAD16_BYTE( "15221-02.44t", 0x060001, 0x10000, CRC(e0459ddb) SHA1(811896fe3398ecc322ca20c2376b715b2d44992e) )
@@ -1385,7 +1385,7 @@ ROM_START( quartrba )
 	ROM_LOAD( "15206-01.u9",  0x1a000, 0x02000, CRC(6bf8d4ab) SHA1(cc9b3f1e651b2a667f17553aac655f0039983890) )
 	ROM_CONTINUE(             0x26000, 0x02000 )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "15222-01.45t", 0x040001, 0x10000, CRC(722d1a19) SHA1(b7c7c606798c4357cee58b64d95f2f6a6172d72e) )
 	ROM_LOAD16_BYTE( "15225-01.62t", 0x040000, 0x10000, CRC(f8c20496) SHA1(5f948a56743127e19d9fbd888b546ce82c0b05f6) )
 	ROM_LOAD16_BYTE( "15221-01.44t", 0x060001, 0x10000, CRC(bc6abaaf) SHA1(2ca9116c1861d7089679de034c2255bc51179338) )
@@ -1421,7 +1421,7 @@ ROM_START( viper )
 	ROM_LOAD( "viper.u3t",   0x20000, 0x10000, CRC(213bc02b) SHA1(53fadd81a0138525d3d39fd9c2ea258f90b2e6e7) )
 	ROM_LOAD( "viper.u4t",   0x30000, 0x10000, CRC(ce0b95b4) SHA1(1a322714ce1e9e5589da9966f2e684e9a2c22592) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "15620-02.45t", 0x040001, 0x10000, CRC(7380ece1) SHA1(c131c80c67503785ba1ec5b31366cd72f0f7e0e3) )
 	ROM_LOAD16_BYTE( "15623-02.62t", 0x040000, 0x10000, CRC(2921d8f9) SHA1(5ce6752ef3928b40263efdcd81fae376e2d86e36) )
 	ROM_LOAD16_BYTE( "15619-02.44t", 0x060001, 0x10000, CRC(c8507cc2) SHA1(aae9f19b3bc6790a137d94e3c4bb3e61e8670b42) )
@@ -1461,7 +1461,7 @@ ROM_START( teamqb )
 	ROM_LOAD( "15606-01.u7t",  0x60000, 0x10000, CRC(8eeb007c) SHA1(6f9d4132c7e5e6502108cb3e8eab9114f07848b4) )
 	ROM_LOAD( "15607-01.u8t",  0x70000, 0x10000, CRC(57cb6d2d) SHA1(56e364aedca25935a5cd7ab4460d9213fcc58b4a) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "15623-01.25t", 0x040001, 0x10000, CRC(710bdc76) SHA1(610f7baa17adf2d16c9494b05556b49ae376fe81) )
 	ROM_LOAD16_BYTE( "15620-01.13t", 0x040000, 0x10000, CRC(7e5cb8ad) SHA1(aaff4e93053638955b95951dceea3b35e842e80f) )
 	ROM_LOAD16_BYTE( "15624-01.26t", 0x060001, 0x10000, CRC(dd090d33) SHA1(09a3fa4fa3a50c6692be2bc5fec2c4e9a5072d5d) )
@@ -1501,7 +1501,7 @@ ROM_START( teamqb2 )
 	ROM_LOAD( "15606-01.u7t",  0x60000, 0x10000, CRC(8eeb007c) SHA1(6f9d4132c7e5e6502108cb3e8eab9114f07848b4) )
 	ROM_LOAD( "15607-01.u8t",  0x70000, 0x10000, CRC(57cb6d2d) SHA1(56e364aedca25935a5cd7ab4460d9213fcc58b4a) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "15623-01.25t", 0x040001, 0x10000, CRC(710bdc76) SHA1(610f7baa17adf2d16c9494b05556b49ae376fe81) )
 	ROM_LOAD16_BYTE( "15620-01.13t", 0x040000, 0x10000, CRC(7e5cb8ad) SHA1(aaff4e93053638955b95951dceea3b35e842e80f) )
 	ROM_LOAD16_BYTE( "15624-01.26t", 0x060001, 0x10000, CRC(dd090d33) SHA1(09a3fa4fa3a50c6692be2bc5fec2c4e9a5072d5d) )
@@ -1541,7 +1541,7 @@ ROM_START( aafb )
 	ROM_LOAD( "15606-01.u7t",  0x60000, 0x10000, CRC(8eeb007c) SHA1(6f9d4132c7e5e6502108cb3e8eab9114f07848b4) )
 	ROM_LOAD( "03-28002.u8",   0x70000, 0x10000, CRC(c3e09811) SHA1(9b6e036a53000c9bcb104677d9c71743f02fd841) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
     ROM_LOAD16_BYTE( "24019-01.u25", 0x040001, 0x10000, CRC(9e344768) SHA1(7f16d29c52f3d7f0046f414185c4d889f6128597) )
     ROM_LOAD16_BYTE( "24016-01.u13", 0x040000, 0x10000, CRC(6997025f) SHA1(5eda3bcae896933385fe97a4e1396ae2da7576cb) )
     ROM_LOAD16_BYTE( "24020-01.u26", 0x060001, 0x10000, CRC(0788f2a5) SHA1(75eb1ab00185f8efa71f1d46197b5f6d20d721f2) )
@@ -1581,7 +1581,7 @@ ROM_START( aafbb )
 	ROM_LOAD( "15606-01.u7t",  0x60000, 0x10000, CRC(8eeb007c) SHA1(6f9d4132c7e5e6502108cb3e8eab9114f07848b4) )
 	ROM_LOAD( "24002-02.u8t",  0x70000, 0x10000, CRC(3d9747c9) SHA1(4624ac39ff5336b0fd8c70bf35685041d5c38b1c) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
     ROM_LOAD16_BYTE( "24019-01.u25", 0x040001, 0x10000, CRC(9e344768) SHA1(7f16d29c52f3d7f0046f414185c4d889f6128597) )
     ROM_LOAD16_BYTE( "24016-01.u13", 0x040000, 0x10000, CRC(6997025f) SHA1(5eda3bcae896933385fe97a4e1396ae2da7576cb) )
     ROM_LOAD16_BYTE( "24020-01.u26", 0x060001, 0x10000, CRC(0788f2a5) SHA1(75eb1ab00185f8efa71f1d46197b5f6d20d721f2) )
@@ -1621,7 +1621,7 @@ ROM_START( aafbc )
 	ROM_LOAD( "15606-01.u7t",  0x60000, 0x10000, CRC(8eeb007c) SHA1(6f9d4132c7e5e6502108cb3e8eab9114f07848b4) )
 	ROM_LOAD( "24002-02.u8t",  0x70000, 0x10000, CRC(3d9747c9) SHA1(4624ac39ff5336b0fd8c70bf35685041d5c38b1c) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
     ROM_LOAD16_BYTE( "24019-01.u25", 0x040001, 0x10000, CRC(9e344768) SHA1(7f16d29c52f3d7f0046f414185c4d889f6128597) )
     ROM_LOAD16_BYTE( "24016-01.u13", 0x040000, 0x10000, CRC(6997025f) SHA1(5eda3bcae896933385fe97a4e1396ae2da7576cb) )
     ROM_LOAD16_BYTE( "24020-01.u26", 0x060001, 0x10000, CRC(0788f2a5) SHA1(75eb1ab00185f8efa71f1d46197b5f6d20d721f2) )
@@ -1661,7 +1661,7 @@ ROM_START( aafbd2p )
 	ROM_LOAD( "15606-01.u7t",  0x60000, 0x10000, CRC(8eeb007c) SHA1(6f9d4132c7e5e6502108cb3e8eab9114f07848b4) )
 	ROM_LOAD( "24002-02.u8t",  0x70000, 0x10000, CRC(3d9747c9) SHA1(4624ac39ff5336b0fd8c70bf35685041d5c38b1c) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
     ROM_LOAD16_BYTE( "24019-01.u25", 0x040001, 0x10000, CRC(9e344768) SHA1(7f16d29c52f3d7f0046f414185c4d889f6128597) )
     ROM_LOAD16_BYTE( "24016-01.u13", 0x040000, 0x10000, CRC(6997025f) SHA1(5eda3bcae896933385fe97a4e1396ae2da7576cb) )
     ROM_LOAD16_BYTE( "24020-01.u26", 0x060001, 0x10000, CRC(0788f2a5) SHA1(75eb1ab00185f8efa71f1d46197b5f6d20d721f2) )
@@ -1701,7 +1701,7 @@ ROM_START( offroad )
 	ROM_LOAD( "22111-01.u7",  0x60000, 0x10000, CRC(f79157a1) SHA1(a5731aa92f805123cb00c6ef93a0aed3dc84dae4) )
 	ROM_LOAD( "22112-01.u8",  0x70000, 0x10000, CRC(3eef38d3) SHA1(9131960592a44c8567ab483f72955d2cc8898445) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
     ROM_LOAD16_BYTE( "22116-03.u25", 0x040001, 0x10000, CRC(95bb31d3) SHA1(e7bc43b63126fd33663865b2e41bacc58e962628) )
     ROM_LOAD16_BYTE( "22113-03.u13", 0x040000, 0x10000, CRC(71b28df6) SHA1(caf8e4c98a1650dbaedf83f4d38da920d0976f78) )
     ROM_LOAD16_BYTE( "22117-03.u26", 0x060001, 0x10000, CRC(703d81ce) SHA1(caf5363fb468a461a260e0ec636b0a7a8dc9cd3d) )
@@ -1743,7 +1743,7 @@ ROM_START( offroadt )
 	ROM_LOAD( "ortpu7.bin",  0x60000, 0x10000, CRC(a5af5b4f) SHA1(e4992bfbf628d034a879bf9317377348ee4c24e9) )
 	ROM_LOAD( "ortpu8.bin",  0x70000, 0x10000, CRC(0f735078) SHA1(cb59b11fbed672cb372759384e5916418e6c3dc7) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "ortpu25.bin", 0x040001, 0x10000, CRC(f952f800) SHA1(0f1fc837b0b5f5495a666b0a42adb6068e58a57a) )
 	ROM_LOAD16_BYTE( "ortpu13.bin", 0x040000, 0x10000, CRC(7beec9fc) SHA1(b03b4a28217a8c7c02dc0314db97fef1d4ab6f20) )
 	ROM_LOAD16_BYTE( "ortpu26.bin", 0x060001, 0x10000, CRC(6227ea94) SHA1(26384af82f73452b7be8a0eeac9f8a3b464068f6) )
@@ -1784,7 +1784,7 @@ ROM_START( pigout )
 	ROM_LOAD( "poutu7t.bin",  0x60000, 0x10000, CRC(393bd990) SHA1(d66d3c5c6d97bb983549d5037bd69c481751b9bf) )
 	ROM_LOAD( "poutu8t.bin",  0x70000, 0x10000, CRC(cb9ffaad) SHA1(f39fb33e5a30619cd3017574739ccace80afbe1f) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "poutu25t.bin", 0x040001, 0x10000, CRC(92cd2617) SHA1(88e318f4a41c67fd9e91f013b3c29b6275b69c31) )
 	ROM_LOAD16_BYTE( "poutu13t.bin", 0x040000, 0x10000, CRC(9448c389) SHA1(7bb0bd49044ba4b302048d2922ed300f799a2efb) )
 	ROM_LOAD16_BYTE( "poutu26t.bin", 0x060001, 0x10000, CRC(ab57de8f) SHA1(28a366e7441bc85dfb814f7a7797aa704a0277ba) )
@@ -1825,7 +1825,7 @@ ROM_START( pigouta )
 	ROM_LOAD( "poutu7t.bin",  0x60000, 0x10000, CRC(393bd990) SHA1(d66d3c5c6d97bb983549d5037bd69c481751b9bf) )
 	ROM_LOAD( "poutu8t.bin",  0x70000, 0x10000, CRC(cb9ffaad) SHA1(f39fb33e5a30619cd3017574739ccace80afbe1f) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "audio", 0 )
 	ROM_LOAD16_BYTE( "poutu25t.bin", 0x040001, 0x10000, CRC(92cd2617) SHA1(88e318f4a41c67fd9e91f013b3c29b6275b69c31) )
 	ROM_LOAD16_BYTE( "poutu13t.bin", 0x040000, 0x10000, CRC(9448c389) SHA1(7bb0bd49044ba4b302048d2922ed300f799a2efb) )
 	ROM_LOAD16_BYTE( "poutu26t.bin", 0x060001, 0x10000, CRC(ab57de8f) SHA1(28a366e7441bc85dfb814f7a7797aa704a0277ba) )
@@ -1857,74 +1857,14 @@ ROM_END
  *
  *************************************/
 
-#if 0
-/*
-Copy this code into the init function and modify:
-{
-    UINT8 *ram = memory_region(machine, "master");
-    FILE *output;
-
-    output = fopen("indyheat.m", "w");
-    dasm_chunk("Resident",      &ram[0x00000], 0x0000, 0x2000, output);
-    dasm_chunk("Bank 0x02000:", &ram[0x02000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x10000:", &ram[0x10000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x18000:", &ram[0x18000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x20000:", &ram[0x20000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x28000:", &ram[0x28000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x30000:", &ram[0x30000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x38000:", &ram[0x38000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x40000:", &ram[0x40000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x48000:", &ram[0x48000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x50000:", &ram[0x50000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x58000:", &ram[0x58000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x60000:", &ram[0x60000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x68000:", &ram[0x68000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x70000:", &ram[0x70000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x78000:", &ram[0x78000], 0x2000, 0x8000, output);
-    fclose(output);
-}
-*/
-
-static void dasm_chunk(char *tag, UINT8 *base, UINT16 pc, UINT32 length, FILE *output)
-{
-	extern unsigned DasmZ80(char *buffer, unsigned _pc);
-
-	UINT8 *old_rom = opbase->rom;
-	UINT8 *old_ram = opbase->ram;
-	char buffer[256];
-	int count, offset, i;
-
-	fprintf(output, "\n\n\n%s:\n", tag);
-	opbase->rom = opbase->ram = &base[-pc];
-	for (offset = 0; offset < length; offset += count)
-	{
-		count = DasmZ80(buffer, pc);
-		for (i = 0; i < 4; i++)
-			if (i < count)
-				fprintf(output, "%c", (cpu_readop(pc + i) >= 32 && cpu_readop(pc + i) < 127) ? cpu_readop(pc + i) : ' ');
-			else
-				fprintf(output, " ");
-		fprintf(output, " %04X: ", pc);
-		for (i = 0; i < 4; i++)
-			if (i < count)
-				fprintf(output, "%02X ", cpu_readop(pc++));
-			else
-				fprintf(output, "   ");
-		fprintf(output, "%s\n", buffer);
-	}
-	opbase->rom = old_rom;
-	opbase->ram = old_ram;
-}
-#endif
-
 static void init_master_ports(running_machine *machine, UINT8 mvram_base, UINT8 io_base)
 {
 	/* set up the master CPU VRAM I/O */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, mvram_base, mvram_base + 0x1f, 0, 0, leland_mvram_port_r, leland_mvram_port_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), mvram_base, mvram_base + 0x1f, 0, 0, leland_mvram_port_r, leland_mvram_port_w);
 
 	/* set up the master CPU I/O ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, io_base, io_base + 0x1f, 0, 0, leland_master_input_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, io_base, io_base + 0x0f, 0, 0, leland_master_output_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), io_base, io_base + 0x1f, 0, 0, leland_master_input_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), io_base, io_base + 0x0f, 0, 0, leland_master_output_w);
 }
 
 
@@ -1951,16 +1891,16 @@ static DRIVER_INIT( cerberus )
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = cerberus_bankswitch;
-	memory_set_bankptr(1, memory_region(machine, "master") + 0x2000);
-	memory_set_bankptr(2, memory_region(machine, "master") + 0xa000);
-	memory_set_bankptr(3, memory_region(machine, "slave") + 0x2000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "master") + 0x2000);
+	memory_set_bankptr(machine, 2, memory_region(machine, "master") + 0xa000);
+	memory_set_bankptr(machine, 3, memory_region(machine, "slave") + 0x2000);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x80, 0x80, 0, 0, cerberus_dial_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x90, 0x90, 0, 0, cerberus_dial_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x80, 0x80, 0, 0, cerberus_dial_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x90, 0x90, 0, 0, cerberus_dial_2_r);
 }
 
 
@@ -2079,7 +2019,7 @@ static DRIVER_INIT( alleymas )
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	alleymas_kludge_mem = memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0ca, 0xe0ca, 0, 0, alleymas_joystick_kludge);
+	alleymas_kludge_mem = memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe0ca, 0xe0ca, 0, 0, alleymas_joystick_kludge);
 }
 
 
@@ -2132,9 +2072,9 @@ static DRIVER_INIT( dangerz )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf4, 0xf4, 0, 0, dangerz_input_upper_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, dangerz_input_y_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfc, 0xfc, 0, 0, dangerz_input_x_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf4, 0xf4, 0, 0, dangerz_input_upper_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, dangerz_input_y_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfc, 0xfc, 0, 0, dangerz_input_x_r);
 }
 
 
@@ -2225,10 +2165,10 @@ static DRIVER_INIT( redlin2p )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, redline_pedal_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xd0, 0xd0, 0, 0, redline_pedal_2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, redline_wheel_2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfb, 0xfb, 0, 0, redline_wheel_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc0, 0, 0, redline_pedal_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xd0, 0xd0, 0, 0, redline_pedal_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, redline_wheel_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, redline_wheel_1_r);
 }
 
 
@@ -2283,9 +2223,9 @@ static DRIVER_INIT( viper )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xa4, 0xa4, 0, 0, dangerz_input_upper_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xb8, 0, 0, dangerz_input_y_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xbc, 0xbc, 0, 0, dangerz_input_x_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xa4, 0xa4, 0, 0, dangerz_input_upper_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xb8, 0xb8, 0, 0, dangerz_input_y_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xbc, 0xbc, 0, 0, dangerz_input_x_r);
 }
 
 
@@ -2314,8 +2254,8 @@ static DRIVER_INIT( teamqb )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2344,8 +2284,8 @@ static DRIVER_INIT( aafb )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2374,8 +2314,8 @@ static DRIVER_INIT( aafbb )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2404,8 +2344,8 @@ static DRIVER_INIT( aafbd2p )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2440,9 +2380,9 @@ static DRIVER_INIT( offroad )
 	init_master_ports(machine, 0x40, 0x80);	/* yes, this is intentional */
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
 }
 
 
@@ -2476,9 +2416,9 @@ static DRIVER_INIT( offroadt )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
 }
 
 
@@ -2510,7 +2450,7 @@ static DRIVER_INIT( pigout )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
 }
 
 

@@ -51,10 +51,7 @@
  *                                                                          *
  \**************************************************************************/
 
-
-
 #include "debugger.h"
-#include "deprecat.h"
 #include "pic16c5x.h"
 
 
@@ -95,6 +92,10 @@ typedef struct
 	UINT16	prescaler;	/* Note: this is really an 8-bit register */
 	PAIR	opcode;
 	UINT8	internalram[8];
+	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 } pic16C5x_Regs;
 
 static pic16C5x_Regs R;
@@ -692,33 +693,38 @@ static const opcode_fn opcode_000_other[16]=
 
 static CPU_INIT( pic16C5x )
 {
-	state_save_register_item("pic16C5x", index, old_data);
-	state_save_register_item("pic16C5x", index, R.W);
-	state_save_register_item("pic16C5x", index, R.ALU);
-	state_save_register_item("pic16C5x", index, R.OPTION);
-	state_save_register_item("pic16C5x", index, R.TMR0);
-	state_save_register_item("pic16C5x", index, R.PCL);
-	state_save_register_item("pic16C5x", index, R.STATUS);
-	state_save_register_item("pic16C5x", index, R.FSR);
-	state_save_register_item("pic16C5x", index, R.PORTA);
-	state_save_register_item("pic16C5x", index, R.PORTB);
-	state_save_register_item("pic16C5x", index, R.PORTC);
-	state_save_register_item("pic16C5x", index, R.TRISA);
-	state_save_register_item("pic16C5x", index, R.TRISB);
-	state_save_register_item("pic16C5x", index, R.TRISC);
-	state_save_register_item("pic16C5x", index, old_T0);
-	state_save_register_item("pic16C5x", index, picRAMmask);
-	state_save_register_item("pic16C5x", index, R.WDT);
-	state_save_register_item("pic16C5x", index, R.prescaler);
-	state_save_register_item("pic16C5x", index, R.STACK[0]);
-	state_save_register_item("pic16C5x", index, R.STACK[1]);
-	state_save_register_item("pic16C5x", index, R.PC);
-	state_save_register_item("pic16C5x", index, R.PREVPC);
-	state_save_register_item("pic16C5x", index, R.CONFIG);
-	state_save_register_item("pic16C5x", index, R.opcode.d);
-	state_save_register_item("pic16C5x", index, delay_timer);
-	state_save_register_item("pic16C5x", index, picmodel);
-	state_save_register_item("pic16C5x", index, pic16C5x_reset_vector);
+	state_save_register_item("pic16C5x", device->tag, 0, old_data);
+	state_save_register_item("pic16C5x", device->tag, 0, R.W);
+	state_save_register_item("pic16C5x", device->tag, 0, R.ALU);
+	state_save_register_item("pic16C5x", device->tag, 0, R.OPTION);
+	state_save_register_item("pic16C5x", device->tag, 0, R.TMR0);
+	state_save_register_item("pic16C5x", device->tag, 0, R.PCL);
+	state_save_register_item("pic16C5x", device->tag, 0, R.STATUS);
+	state_save_register_item("pic16C5x", device->tag, 0, R.FSR);
+	state_save_register_item("pic16C5x", device->tag, 0, R.PORTA);
+	state_save_register_item("pic16C5x", device->tag, 0, R.PORTB);
+	state_save_register_item("pic16C5x", device->tag, 0, R.PORTC);
+	state_save_register_item("pic16C5x", device->tag, 0, R.TRISA);
+	state_save_register_item("pic16C5x", device->tag, 0, R.TRISB);
+	state_save_register_item("pic16C5x", device->tag, 0, R.TRISC);
+	state_save_register_item("pic16C5x", device->tag, 0, old_T0);
+	state_save_register_item("pic16C5x", device->tag, 0, picRAMmask);
+	state_save_register_item("pic16C5x", device->tag, 0, R.WDT);
+	state_save_register_item("pic16C5x", device->tag, 0, R.prescaler);
+	state_save_register_item("pic16C5x", device->tag, 0, R.STACK[0]);
+	state_save_register_item("pic16C5x", device->tag, 0, R.STACK[1]);
+	state_save_register_item("pic16C5x", device->tag, 0, R.PC);
+	state_save_register_item("pic16C5x", device->tag, 0, R.PREVPC);
+	state_save_register_item("pic16C5x", device->tag, 0, R.CONFIG);
+	state_save_register_item("pic16C5x", device->tag, 0, R.opcode.d);
+	state_save_register_item("pic16C5x", device->tag, 0, delay_timer);
+	state_save_register_item("pic16C5x", device->tag, 0, picmodel);
+	state_save_register_item("pic16C5x", device->tag, 0, pic16C5x_reset_vector);
+
+	R.device = device;
+	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 
@@ -841,7 +847,7 @@ static CPU_EXECUTE( pic16C5x )
 		if (PD == 0)						/* Sleep Mode */
 		{
 			inst_cycles = (1*CLK);
-			debugger_instruction_hook(Machine, R.PC);
+			debugger_instruction_hook(device, R.PC);
 			if (WDTE) {
 				pic16C5x_update_watchdog(1*CLK);
 			}
@@ -850,7 +856,7 @@ static CPU_EXECUTE( pic16C5x )
 		{
 			R.PREVPC = R.PC;
 
-			debugger_instruction_hook(Machine, R.PC);
+			debugger_instruction_hook(device, R.PC);
 
 			R.opcode.d = M_RDOP(R.PC);
 			R.PC++;

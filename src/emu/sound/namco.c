@@ -355,7 +355,7 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void *namco_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( namco )
 {
 	sound_channel *voice;
 	const namco_interface *intf = config;
@@ -396,15 +396,15 @@ static void *namco_start(const char *tag, int sndindex, int clock, const void *c
 	chip->sound_enable = 1;
 
 	/* register with the save state system */
-	state_save_register_item("namco", sndindex, chip->num_voices);
-	state_save_register_item("namco", sndindex, chip->sound_enable);
-	state_save_register_item_pointer("namco", sndindex, chip->waveform[0],
+	state_save_register_item("namco", tag, 0, chip->num_voices);
+	state_save_register_item("namco", tag, 0, chip->sound_enable);
+	state_save_register_item_pointer("namco", tag, 0, chip->waveform[0],
 										 MAX_VOLUME * 32 * 8 * (1+chip->wave_size));
 
 	/* reset all the voices */
 	for (voice = chip->channel_list; voice < chip->last_channel; voice++)
 	{
-		int state_index = sndindex * MAX_VOICES + (voice - chip->channel_list);
+		int voicenum = voice - chip->channel_list;
 
 		voice->frequency = 0;
 		voice->volume[0] = voice->volume[1] = 0;
@@ -417,15 +417,15 @@ static void *namco_start(const char *tag, int sndindex, int clock, const void *c
 		voice->noise_hold = 0;
 
 		/* register with the save state system */
-		state_save_register_item("namco", state_index, voice->frequency);
-		state_save_register_item("namco", state_index, voice->counter);
-		state_save_register_item_array("namco", state_index, voice->volume);
-		state_save_register_item("namco", state_index, voice->noise_sw);
-		state_save_register_item("namco", state_index, voice->noise_state);
-		state_save_register_item("namco", state_index, voice->noise_seed);
-		state_save_register_item("namco", state_index, voice->noise_hold);
-		state_save_register_item("namco", state_index, voice->noise_counter);
-		state_save_register_item("namco", state_index, voice->waveform_select);
+		state_save_register_item("namco", tag, voicenum, voice->frequency);
+		state_save_register_item("namco", tag, voicenum, voice->counter);
+		state_save_register_item_array("namco", tag, voicenum, voice->volume);
+		state_save_register_item("namco", tag, voicenum, voice->noise_sw);
+		state_save_register_item("namco", tag, voicenum, voice->noise_state);
+		state_save_register_item("namco", tag, voicenum, voice->noise_seed);
+		state_save_register_item("namco", tag, voicenum, voice->noise_hold);
+		state_save_register_item("namco", tag, voicenum, voice->noise_counter);
+		state_save_register_item("namco", tag, voicenum, voice->waveform_select);
 	}
 
 	return chip;
@@ -773,7 +773,7 @@ WRITE8_HANDLER( namcos1_cus30_w )
 		}
 	}
 	else if (offset < 0x140)
-		namcos1_sound_w(machine, offset - 0x100,data);
+		namcos1_sound_w(space, offset - 0x100,data);
 	else
 		namco_wavedata[offset] = data;
 }
@@ -806,7 +806,7 @@ WRITE8_HANDLER( _20pacgal_wavedata_w )
  * Generic get_info
  **************************************************************************/
 
-static void namco_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( namco )
 {
 	switch (state)
 	{
@@ -815,15 +815,15 @@ static void namco_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void namco_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( namco )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = namco_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = namco_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
@@ -840,7 +840,7 @@ void namco_get_info(void *token, UINT32 state, sndinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void namco_15xx_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( namco_15xx )
 {
 	switch (state)
 	{
@@ -849,15 +849,15 @@ static void namco_15xx_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void namco_15xx_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( namco_15xx )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = namco_15xx_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = namco_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_15xx );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
@@ -874,7 +874,7 @@ void namco_15xx_get_info(void *token, UINT32 state, sndinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void namco_cus30_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( namco_cus30 )
 {
 	switch (state)
 	{
@@ -883,15 +883,15 @@ static void namco_cus30_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void namco_cus30_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( namco_cus30 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = namco_cus30_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = namco_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_cus30 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

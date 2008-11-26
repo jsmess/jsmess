@@ -53,8 +53,8 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 	{
 		int bank = data & 7;
 		int bankaddr = question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = memory_region(machine, "user1") + bankaddr;
-		memory_set_bankptr(bank + 1,questions);
+		UINT8 *questions = memory_region(space->machine, "user1") + bankaddr;
+		memory_set_bankptr(space->machine, bank + 1,questions);
 
 	}
 }
@@ -74,13 +74,13 @@ static WRITE8_HANDLER( coin_w )
 
 static INTERRUPT_GEN( pingpong_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
-		if (intenable & 0x04) cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		if (intenable & 0x04) cpu_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2)
+	else if (cpu_getiloops(device) % 2)
 	{
-		if (intenable & 0x08) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (intenable & 0x08) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -593,22 +593,22 @@ static DRIVER_INIT( cashquiz )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, cashquiz_question_bank_high_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4000, 0, 0, cashquiz_question_bank_high_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
 
 	// 8 independents banks for questions
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x50ff, 0, 0, SMH_BANK1);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5100, 0x51ff, 0, 0, SMH_BANK2);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5200, 0x52ff, 0, 0, SMH_BANK3);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5300, 0x53ff, 0, 0, SMH_BANK4);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5400, 0x54ff, 0, 0, SMH_BANK5);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5500, 0x55ff, 0, 0, SMH_BANK6);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5600, 0x56ff, 0, 0, SMH_BANK7);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5700, 0x57ff, 0, 0, SMH_BANK8);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x50ff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5100, 0x51ff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5200, 0x52ff, 0, 0, SMH_BANK3);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5300, 0x53ff, 0, 0, SMH_BANK4);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5400, 0x54ff, 0, 0, SMH_BANK5);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5500, 0x55ff, 0, 0, SMH_BANK6);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5600, 0x56ff, 0, 0, SMH_BANK7);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, SMH_BANK8);
 
 	// setup default banks
 	for(i = 0; i < 8; i++)
-		memory_set_bankptr( i+1, memory_region(machine, "user1") + 0x100*i );
+		memory_set_bankptr(machine,  i+1, memory_region(machine, "user1") + 0x100*i );
 }
 
 

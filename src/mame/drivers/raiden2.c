@@ -566,7 +566,7 @@ static VIDEO_UPDATE ( raiden2 )
 static INTERRUPT_GEN( raiden2_interrupt )
 {
 
-	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
 }
 
@@ -682,18 +682,18 @@ WRITE16_HANDLER(sprcpt_flags_2_w)
 // XXX
 // write only: 4c0 4c1 500 501 502 503
 
-static UINT16 handle_io_r(int offset)
+static UINT16 handle_io_r(running_machine *machine, int offset)
 {
-	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], activecpu_get_pc());
+	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(machine->activecpu));
 	return mainram[offset];
 }
 
-static void handle_io_w(int offset, UINT16 data, UINT16 mem_mask)
+static void handle_io_w(running_machine *machine, int offset, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&mainram[offset]);
 	switch(offset) {
 	default:
-		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
+		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 }
 
@@ -702,7 +702,7 @@ static READ16_HANDLER(any_r)
 	c_r[offset]++;
 
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		return handle_io_r(offset);
+		return handle_io_r(space->machine, offset);
 
 	return mainram[offset];
 }
@@ -711,22 +711,22 @@ static WRITE16_HANDLER(any_w)
 {
 	int show = 0;
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		handle_io_w(offset, data, mem_mask);
+		handle_io_w(space->machine, offset, data, mem_mask);
 
 	c_w[offset]++;
-	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, activecpu_get_pc());
+	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(space->cpu));
 	if(mainram[offset] != data && offset >= 0x400 && offset < 0x800) {
 		if(0 &&
 		   offset != 0x4c0/2 && offset != 0x500/2 &&
 		   offset != 0x444/2 && offset != 0x6de/2 && offset != 0x47e/2 &&
 		   offset != 0x4a0/2 && offset != 0x620/2 && offset != 0x6c6/2 &&
 		   offset != 0x628/2 && offset != 0x62a/2)
-			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
+			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 
 	if(0 && c_w[offset]>1000 && !c_r[offset]) {
 		if(offset != 0x4c0/2 && (offset<0x500/2 || offset > 0x503/2))
-			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], activecpu_get_pc());
+			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], cpu_get_pc(space->cpu));
 	}
 
 	//  if(offset == 0x471 || (offset >= 0xb146 && offset < 0xb156))
@@ -737,10 +737,10 @@ static WRITE16_HANDLER(any_w)
 	//  show = offset == 0x704 || offset == 0x710 || offset == 0x71c;
 
 	if(show)
-		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
+		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 
 	//  if(offset == 0x700)
-	//      cpu_setbank(2, memory_region(machine, "user1")+0x20000*data);
+	//      cpu_setbank(2, memory_region(space->machine, "user1")+0x20000*data);
 
 	COMBINE_DATA(&mainram[offset]);
 }
@@ -749,7 +749,7 @@ static WRITE16_HANDLER(w1x)
 {
 	COMBINE_DATA(&w1ram[offset]);
 	if(0 && offset < 0x800/2)
-		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, activecpu_get_pc());
+		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1832,8 +1832,8 @@ static DRIVER_INIT (raiden2)
 	/* wrong , there must be some banking this just stops it crashing */
 	UINT8 *RAM = memory_region(machine, "user1");
 
-	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_set_bankptr(2,&RAM[0x040000]);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
+	memory_set_bankptr(machine, 2,&RAM[0x040000]);
 
 	raiden2_decrypt_sprites(machine);
 }
@@ -1882,7 +1882,7 @@ static WRITE16_HANDLER( rdx_v33_eeprom_w )
 
 static READ16_HANDLER( rdx_v33_eeprom_r )
 {
-	return input_port_read(machine, "SYSTEM");
+	return input_port_read(space->machine, "SYSTEM");
 }
 
 
@@ -1916,16 +1916,16 @@ static WRITE16_HANDLER( mcu_prog_offs_w )
 
 static READ16_HANDLER( r2_playerin_r )
 {
-	return input_port_read(machine, "INPUT");
+	return input_port_read(space->machine, "INPUT");
 }
 static READ16_HANDLER( rdx_v33_oki_r )
 {
-	return okim6295_status_0_r(machine,0);
+	return okim6295_status_0_r(space,0);
 }
 
 static WRITE16_HANDLER( rdx_v33_oki_w )
 {
-	if (ACCESSING_BITS_0_7) okim6295_data_0_w(machine, 0, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) okim6295_data_0_w(space, 0, data & 0x00ff);
 	if (ACCESSING_BITS_8_15) logerror("rdx_v33_oki_w MSB %04x\n",data);
 }
 
@@ -2049,7 +2049,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( rdx_v33_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, cpu_getactivecpu(), 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
 }
 
@@ -2095,20 +2095,20 @@ MACHINE_DRIVER_END
 static DRIVER_INIT(rdx_v33)
 {
 	UINT8 *prg = memory_region(machine, "main");
-	memory_set_bankptr(1,&prg[0x020000]);
-	memory_set_bankptr(2,&prg[0x030000]);
-	memory_set_bankptr(3,&prg[0x040000]);
-	memory_set_bankptr(4,&prg[0x050000]);
-	memory_set_bankptr(5,&prg[0x060000]);
-	memory_set_bankptr(6,&prg[0x070000]);
-	memory_set_bankptr(7,&prg[0x080000]);
-	memory_set_bankptr(8,&prg[0x090000]);
-	memory_set_bankptr(9,&prg[0x0a0000]);
-	memory_set_bankptr(10,&prg[0x0b0000]);
-	memory_set_bankptr(11,&prg[0x0c0000]);
-	memory_set_bankptr(12,&prg[0x0d0000]);
-	memory_set_bankptr(13,&prg[0x0e0000]);
-	memory_set_bankptr(14,&prg[0x0f0000]);
+	memory_set_bankptr(machine, 1,&prg[0x020000]);
+	memory_set_bankptr(machine, 2,&prg[0x030000]);
+	memory_set_bankptr(machine, 3,&prg[0x040000]);
+	memory_set_bankptr(machine, 4,&prg[0x050000]);
+	memory_set_bankptr(machine, 5,&prg[0x060000]);
+	memory_set_bankptr(machine, 6,&prg[0x070000]);
+	memory_set_bankptr(machine, 7,&prg[0x080000]);
+	memory_set_bankptr(machine, 8,&prg[0x090000]);
+	memory_set_bankptr(machine, 9,&prg[0x0a0000]);
+	memory_set_bankptr(machine, 10,&prg[0x0b0000]);
+	memory_set_bankptr(machine, 11,&prg[0x0c0000]);
+	memory_set_bankptr(machine, 12,&prg[0x0d0000]);
+	memory_set_bankptr(machine, 13,&prg[0x0e0000]);
+	memory_set_bankptr(machine, 14,&prg[0x0f0000]);
 
 	raiden2_decrypt_sprites(machine);
 }

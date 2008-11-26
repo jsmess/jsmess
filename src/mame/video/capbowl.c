@@ -23,7 +23,7 @@ static offs_t blitter_addr;
 
 static void generate_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, state);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state);
 }
 
 static const struct tms34061_interface tms34061intf =
@@ -110,7 +110,7 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 			break;
 
 		default:
-			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", activecpu_get_pc(), offset, data);
+			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 }
@@ -118,7 +118,7 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 
 READ8_HANDLER( bowlrama_blitter_r )
 {
-	UINT8 data = memory_region(machine, "gfx1")[blitter_addr];
+	UINT8 data = memory_region(space->machine, "gfx1")[blitter_addr];
 	UINT8 result = 0;
 
 	switch (offset)
@@ -141,7 +141,7 @@ READ8_HANDLER( bowlrama_blitter_r )
 			break;
 
 		default:
-			logerror("PC=%04X Read from unsupported blitter address %02X\n", activecpu_get_pc(), offset);
+			logerror("PC=%04X Read from unsupported blitter address %02X\n", cpu_get_pc(space->cpu), offset);
 			break;
 	}
 

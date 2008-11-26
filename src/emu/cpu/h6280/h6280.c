@@ -107,6 +107,7 @@
         - Improvements to the handling of taking of delayed interrupts.
 
 ******************************************************************************/
+
 #include "debugger.h"
 #include "deprecat.h"
 #include "h6280.h"
@@ -139,6 +140,8 @@ typedef struct
 	UINT8 irq_pending;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 
 #if LAZY_FLAGS
     INT32 NZ;             /* last value (lazy N and Z flag) */
@@ -159,49 +162,50 @@ static void set_irq_line(int irqline, int state);
 /*****************************************************************************/
 static CPU_INIT( h6280 )
 {
-	state_save_register_item("h6280", index, h6280.ppc.w.l);
-	state_save_register_item("h6280", index, h6280.pc.w.l);
-	state_save_register_item("h6280", index, h6280.sp.w.l);
-	state_save_register_item("h6280", index, h6280.zp.w.l);
-	state_save_register_item("h6280", index, h6280.ea.w.l);
-	state_save_register_item("h6280", index, h6280.a);
-	state_save_register_item("h6280", index, h6280.x);
-	state_save_register_item("h6280", index, h6280.y);
-	state_save_register_item("h6280", index, h6280.p);
-	state_save_register_item_array("h6280", index, h6280.mmr);
-	state_save_register_item("h6280", index, h6280.irq_mask);
-	state_save_register_item("h6280", index, h6280.timer_status);
-	state_save_register_item("h6280", index, h6280.timer_ack);
-	state_save_register_item("h6280", index, h6280.clocks_per_cycle);
-	state_save_register_item("h6280", index, h6280.timer_value);
-	state_save_register_item("h6280", index, h6280.timer_load);
-	state_save_register_item("h6280", index, h6280.nmi_state);
-	state_save_register_item("h6280", index, h6280.irq_state[0]);
-	state_save_register_item("h6280", index, h6280.irq_state[1]);
-	state_save_register_item("h6280", index, h6280.irq_state[2]);
-	state_save_register_item("h6280", index, h6280.irq_pending);
+	state_save_register_item("h6280", device->tag, 0, h6280.ppc.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.pc.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.sp.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.zp.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.ea.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.a);
+	state_save_register_item("h6280", device->tag, 0, h6280.x);
+	state_save_register_item("h6280", device->tag, 0, h6280.y);
+	state_save_register_item("h6280", device->tag, 0, h6280.p);
+	state_save_register_item_array("h6280", device->tag, 0, h6280.mmr);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_mask);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_status);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_ack);
+	state_save_register_item("h6280", device->tag, 0, h6280.clocks_per_cycle);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_value);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_load);
+	state_save_register_item("h6280", device->tag, 0, h6280.nmi_state);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[0]);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[1]);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[2]);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_pending);
 
 	#if LAZY_FLAGS
-	state_save_register_item("h6280", index, h6280.NZ);
+	state_save_register_item("h6280", device->tag, 0, h6280.NZ);
 	#endif
-	state_save_register_item("h6280", index, h6280.io_buffer);
+	state_save_register_item("h6280", device->tag, 0, h6280.io_buffer);
 
 	h6280.irq_callback = irqcallback;
 	h6280.device = device;
+	h6280.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	h6280.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_RESET( h6280 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 	int i;
 
 	/* wipe out the h6280 structure */
 	save_irqcallback = h6280.irq_callback;
-	save_device = h6280.device;
 	memset(&h6280, 0, sizeof(h6280_Regs));
 	h6280.irq_callback = save_irqcallback;
-	h6280.device = save_device;
+	h6280.device = device;
+	h6280.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* set I and B flags */
 	P = _fI | _fB;
@@ -250,7 +254,7 @@ static CPU_EXECUTE( h6280 )
     		CHANGE_PC;
 		h6280.ppc = h6280.pc;
 
-		debugger_instruction_hook(Machine, PCW);
+		debugger_instruction_hook(device, PCW);
 
 		/* Execute 1 instruction */
 		in=RDOP();

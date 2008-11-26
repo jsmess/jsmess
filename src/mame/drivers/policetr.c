@@ -121,14 +121,14 @@ static offs_t speedup_pc;
 
 static TIMER_CALLBACK( irq5_gen )
 {
-	cpunum_set_input_line(machine, 0, R3000_IRQ5, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], R3000_IRQ5, ASSERT_LINE);
 }
 
 
 static INTERRUPT_GEN( irq4_gen )
 {
-	cpunum_set_input_line(machine, 0, R3000_IRQ4, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, irq5_gen);
+	cpu_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, irq5_gen);
 }
 
 
@@ -163,13 +163,13 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		bsmt2000_data_0_w(machine, bsmt_data_bank, 0, 0xffff);
+		bsmt2000_data_0_w(space, bsmt_data_bank, 0, 0xffff);
 		sndti_reset(SOUND_BSMT2000, 0);
 	}
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", activecpu_get_previouspc(), data, mem_mask);
+		logerror("%08X: control_w = %08X & %08X\n", cpu_get_previouspc(space->cpu), data, mem_mask);
 }
 
 
@@ -183,7 +183,7 @@ static WRITE32_HANDLER( control_w )
 static WRITE32_HANDLER( bsmt2000_reg_w )
 {
 	if (control_data & 0x80000000)
-		bsmt2000_data_0_w(machine, bsmt_reg, data & 0xffff, mem_mask & 0xffff);
+		bsmt2000_data_0_w(space, bsmt_reg, data & 0xffff, mem_mask & 0xffff);
 	else
 		COMBINE_DATA(&bsmt_data_offset);
 }
@@ -200,7 +200,7 @@ static WRITE32_HANDLER( bsmt2000_data_w )
 
 static READ32_HANDLER( bsmt2000_data_r )
 {
-	return memory_region(machine, "bsmt")[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
+	return memory_region(space->machine, "bsmt")[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
 }
 
 
@@ -216,9 +216,9 @@ static WRITE32_HANDLER( speedup_w )
 	COMBINE_DATA(speedup_data);
 
 	/* see if the PC matches */
-	if ((activecpu_get_previouspc() & 0x1fffffff) == speedup_pc)
+	if ((cpu_get_previouspc(space->cpu) & 0x1fffffff) == speedup_pc)
 	{
-		UINT64 curr_cycles = activecpu_gettotalcycles();
+		UINT64 curr_cycles = cpu_get_total_cycles(space->cpu);
 
 		/* if less than 50 cycles from the last time, count it */
 		if (curr_cycles - last_cycles < 50)
@@ -227,7 +227,7 @@ static WRITE32_HANDLER( speedup_w )
 
 			/* more than 2 in a row and we spin */
 			if (loop_count > 2)
-				cpu_spinuntil_int();
+				cpu_spinuntil_int(space->cpu);
 		}
 		else
 			loop_count = 0;
@@ -700,26 +700,26 @@ ROM_END
 
 static DRIVER_INIT( policetr )
 {
-	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
-	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc028bc;
 }
 
 
 static DRIVER_INIT( sshooter )
 {
-	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
-	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc033e0;
 }
 

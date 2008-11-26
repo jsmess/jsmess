@@ -216,7 +216,7 @@ VIDEO_START( itech8 )
 
 WRITE8_HANDLER( itech8_palette_w )
 {
-	tlc34076_w(machine, offset/2, data);
+	tlc34076_w(space, offset/2, data);
 }
 
 
@@ -229,8 +229,8 @@ WRITE8_HANDLER( itech8_palette_w )
 
 WRITE8_HANDLER( itech8_page_w )
 {
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	logerror("%04x:display_page = %02X (%d)\n", activecpu_get_pc(), data, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(space->cpu), data, video_screen_get_vpos(space->machine->primary_screen));
 	page_select = data;
 }
 
@@ -308,7 +308,7 @@ INLINE void consume_rle(int count)
  *
  *************************************/
 
-static void perform_blit(running_machine *machine)
+static void perform_blit(const address_space *space)
 {
 	offs_t addr = tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
 	UINT8 shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
@@ -317,7 +317,7 @@ static void perform_blit(running_machine *machine)
 	int xdir = (BLITTER_FLAGS & BLITFLAG_XFLIP) ? -1 : 1;
 	int xflip = (BLITTER_FLAGS & BLITFLAG_XFLIP);
 	int rle = (BLITTER_FLAGS & BLITFLAG_RLE);
-	int color = tms34061_latch_r(machine, 0);
+	int color = tms34061_latch_r(space, 0);
 	int width = BLITTER_WIDTH;
 	int height = BLITTER_HEIGHT;
 	UINT8 transmaskhi, transmasklo;
@@ -328,7 +328,7 @@ static void perform_blit(running_machine *machine)
 	/* debugging */
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
-				video_screen_get_vpos(machine->primary_screen),
+				video_screen_get_vpos(space->machine->primary_screen),
 				(*itech8_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
@@ -467,7 +467,7 @@ READ8_HANDLER( itech8_blitter_r )
 	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", activecpu_get_previouspc(), offset / 2);
+	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", cpu_get_previouspc(space->cpu), offset / 2);
 
 	/* low bit seems to be ignored */
 	offset /= 2;
@@ -475,7 +475,7 @@ READ8_HANDLER( itech8_blitter_r )
 	/* a read from offset 3 clears the interrupt and returns the status */
 	if (offset == 3)
 	{
-		itech8_update_interrupts(machine, -1, -1, 0);
+		itech8_update_interrupts(space->machine, -1, -1, 0);
 		if (blit_in_progress)
 			result |= 0x80;
 		else
@@ -484,7 +484,7 @@ READ8_HANDLER( itech8_blitter_r )
 
 	/* a read from offsets 12-15 return input port values */
 	if (offset >= 12 && offset <= 15)
-		result = input_port_read_safe(machine, portnames[offset - 12], 0x00);
+		result = input_port_read_safe(space->machine, portnames[offset - 12], 0x00);
 
 	return result;
 }
@@ -519,7 +519,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 		}
 
 		/* perform the blit */
-		perform_blit(machine);
+		perform_blit(space);
 		blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
@@ -527,7 +527,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 	}
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", activecpu_get_previouspc(), offset, data);
+	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", cpu_get_previouspc(space->cpu), offset, data);
 }
 
 
@@ -585,7 +585,7 @@ WRITE8_HANDLER( grmatch_palette_w )
 WRITE8_HANDLER( grmatch_xscroll_w )
 {
 	/* update the X scroll value */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	grmatch_xscroll = data;
 }
 

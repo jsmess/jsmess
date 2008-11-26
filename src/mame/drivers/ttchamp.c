@@ -92,30 +92,30 @@ static WRITE16_HANDLER( paloff_w )
 static WRITE16_HANDLER( pcup_prgbank_w )
 {
     int bank;
-    UINT8 *ROM1 = memory_region(machine, "user1");
+    UINT8 *ROM1 = memory_region(space->machine, "user1");
 
     if (ACCESSING_BITS_0_7)
     {
         bank = (data>>4) &0x07;
-        memory_set_bankptr(2,&ROM1[0x80000*(bank)]);
+        memory_set_bankptr(space->machine, 2,&ROM1[0x80000*(bank)]);
     }
 }
 #endif
 
 static WRITE16_HANDLER( paldat_w )
 {
-    palette_set_color_rgb(machine,paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+    palette_set_color_rgb(space->machine,paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 static READ16_HANDLER( peno_rand )
 {
-    return 0xffff;// mame_rand(machine);
+    return 0xffff;// mame_rand(space->machine);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( peno_rand2 )
 {
-    return mame_rand(machine);
+    return mame_rand(space->machine);
 }
 #endif
 
@@ -218,7 +218,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( ttchamp_irq ) /* right? */
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( ttchamp )
@@ -322,8 +322,8 @@ ROM_END
 static DRIVER_INIT (ttchamp)
 {
 	UINT8 *ROM1 = memory_region(machine, "user1");
-	memory_set_bankptr(1,&ROM1[0x120000]);
-	memory_set_bankptr(2,&ROM1[0x180000]);
+	memory_set_bankptr(machine, 1,&ROM1[0x120000]);
+	memory_set_bankptr(machine, 2,&ROM1[0x180000]);
 }
 
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )

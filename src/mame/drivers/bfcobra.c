@@ -132,7 +132,7 @@ static void update_irqs(running_machine *machine)
 	if (newstate != irq_state)
 	{
 		irq_state = newstate;
-		cpunum_set_input_line(machine, 0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -440,7 +440,7 @@ static void RunBlit(running_machine *machine)
 		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
-			mame_printf_debug("\nBlitter (%x): Running command from 0x%.5x\n\n", activecpu_get_previouspc(), blitter.program.addr - 12);
+			mame_printf_debug("\nBlitter (%x): Running command from 0x%.5x\n\n", cpu_get_previouspc(machine->activecpu), blitter.program.addr - 12);
 			mame_printf_debug("Command Reg         %.2x",	blitter.command);
 			mame_printf_debug("		%s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",
@@ -692,7 +692,7 @@ static void RunBlit(running_machine *machine)
 	} while (blitter.command  & CMD_RUN);
 
 	/* Burn Z80 cycles while blitter is in operation */
-	cpu_spinuntil_time( ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
+	cpu_spinuntil_time(machine->activecpu,  ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
 }
 
 
@@ -709,7 +709,7 @@ static READ8_HANDLER( ramdac_r )
 			if (*count == 0)
 			{
 				rgb_t color;
-				color = palette_get_color(machine, ramdac.addr_r);
+				color = palette_get_color(space->machine, ramdac.addr_r);
 
 				ramdac.color_r[0] = RGB_RED(color);
 				ramdac.color_r[1] = RGB_GREEN(color);
@@ -730,7 +730,7 @@ static READ8_HANDLER( ramdac_r )
 		}
 		default:
 		{
-			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", activecpu_get_previouspc());
+			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", cpu_get_previouspc(space->cpu));
 		}
 	}
 
@@ -753,7 +753,7 @@ static WRITE8_HANDLER( ramdac_w )
 			ramdac.color_w[ramdac.count_w] = pal6bit(data);
 			if (++ramdac.count_w == 3)
 			{
-				palette_set_color_rgb(machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
+				palette_set_color_rgb(space->machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
 				ramdac.count_w = 0;
 				ramdac.addr_w++;
 			}
@@ -846,7 +846,7 @@ static READ8_HANDLER( chipset_r )
 			val = 0x1;
 
 			/* TODO */
-			update_irqs(machine);
+			update_irqs(space->machine);
 			break;
 		}
 		case 0x1C:
@@ -863,12 +863,12 @@ static READ8_HANDLER( chipset_r )
 		}
 		case 0x22:
 		{
-			val = 0x40 | input_port_read(machine, "JOYSTICK");
+			val = 0x40 | input_port_read(space->machine, "JOYSTICK");
 			break;
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, activecpu_get_previouspc());
+			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, cpu_get_previouspc(space->cpu));
 		}
 	}
 
@@ -884,11 +884,11 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x03:
 		{
 			if (data > 0x3f)
-				popmessage("%x: Unusual bank access (%x)\n", activecpu_get_previouspc(), data);
+				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(space->cpu), data);
 
 			data &= 0x3f;
 			bank[offset] = data;
-			z80_bank(machine, offset, data);
+			z80_bank(space->machine, offset, data);
 			break;
 		}
 
@@ -945,7 +945,7 @@ static WRITE8_HANDLER( chipset_w )
 			blitter.command = data;
 
 			if (data & CMD_RUN)
-				RunBlit(machine);
+				RunBlit(space->machine);
 			else
 				mame_printf_debug("Blitter stopped by IO.\n");
 
@@ -958,7 +958,7 @@ static WRITE8_HANDLER( chipset_w )
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, activecpu_get_previouspc());
+			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, cpu_get_previouspc(space->cpu));
 		}
 	}
 }
@@ -976,24 +976,24 @@ INLINE void z80_bank(running_machine *machine, int num, int data)
 
 		UINT32 offset = ((bank[0] >> 1) * 0x20000) + offs_table[bank[0] & 0x1][data];
 
-		memory_set_bankptr(num, memory_region(machine, "user1") + offset);
+		memory_set_bankptr(machine, num, memory_region(machine, "user1") + offset);
 	}
 	else if (data < 0x10)
 	{
-		memory_set_bankptr(num, &video_ram[(data - 0x08) * 0x4000]);
+		memory_set_bankptr(machine, num, &video_ram[(data - 0x08) * 0x4000]);
 	}
 	else
 	{
-		memory_set_bankptr(num, &work_ram[(data - 0x10) * 0x4000]);
+		memory_set_bankptr(machine, num, &work_ram[(data - 0x10) * 0x4000]);
 	}
 }
 
 static WRITE8_HANDLER( rombank_w )
 {
 	bank[0] = data;
-	z80_bank(machine, 1, bank[1]);
-	z80_bank(machine, 2, bank[2]);
-	z80_bank(machine, 3, bank[3]);
+	z80_bank(space->machine, 1, bank[1]);
+	z80_bank(space->machine, 2, bank[2]);
+	z80_bank(space->machine, 3, bank[3]);
 }
 
 
@@ -1114,7 +1114,7 @@ static READ8_HANDLER( fddata_r )
 				}
 
 				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memory_region(machine, "user2") + fdc.offset);
+				val = *(memory_region(space->machine, "user2") + fdc.offset);
 
 				/* Move on to next sector? */
 				if (fdc.byte_pos == 1024)
@@ -1378,7 +1378,7 @@ static WRITE8_HANDLER( meter_w )
 		if (changed & (1 << i))
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
-			cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, PULSE_LINE );
+			cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, PULSE_LINE );
 		}
  	}
 }
@@ -1408,7 +1408,7 @@ static WRITE8_HANDLER( latch_w )
 
 				/* Clock is low */
 				if (!(data & 0x08))
-					mux_input = input_port_read(machine, port[input_strobe]);
+					mux_input = input_port_read(space->machine, port[input_strobe]);
 			}
 			break;
 		}
@@ -1585,7 +1585,7 @@ static void z80_acia_irq(int state)
 
 static void m6809_data_irq(int state)
 {
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(Machine->cpu[1], M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*
@@ -1672,7 +1672,7 @@ static DRIVER_INIT( bfcobra )
 	bank[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	memory_set_bankptr(4, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 4, memory_region(machine, "user1"));
 
 	/* Configure the ACIAs */
 	acia6850_config(0, &z80_acia_if);
@@ -1701,14 +1701,14 @@ static DRIVER_INIT( bfcobra )
 /* TODO */
 static INTERRUPT_GEN( timer_irq )
 {
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(device, M6809_IRQ_LINE, PULSE_LINE);
 }
 
 /* TODO */
 static INTERRUPT_GEN( vblank_gen )
 {
 	vblank_irq = 1;
-	update_irqs(machine);
+	update_irqs(device->machine);
 }
 
 static MACHINE_DRIVER_START( bfcobra )

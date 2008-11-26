@@ -96,7 +96,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 8  is EEPROM data */
 	/* bit 9  is EEPROM ready */
 	/* bit 11 is service button */
-	res = input_port_read(machine, "START");
+	res = input_port_read(space->machine, "START");
 
 	if (init_eeprom_count)
 	{
@@ -159,7 +159,7 @@ static void gijoe_objdma(void)
 static TIMER_CALLBACK( dmaend_callback )
 {
 	if (cur_control2 & 0x0020)
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( gijoe_interrupt )
@@ -177,30 +177,30 @@ static INTERRUPT_GEN( gijoe_interrupt )
 
 	// trigger V-blank interrupt
 	if (cur_control2 & 0x0080)
-		cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+		cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		data &= 0xff;
-		soundlatch_w(machine, 0, data);
+		soundlatch_w(space, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch2_r(machine,0);
+	return soundlatch2_r(space,0);
 }
 
 static void sound_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( gijoe )

@@ -97,16 +97,16 @@ typedef UINT32 EXPRERR;
 
 
 /* callback functions for getting/setting a symbol value */
-typedef UINT64 (*symbol_getter_func)(void *ref);
-typedef void (*symbol_setter_func)(void *ref, UINT64 value);
+typedef UINT64 (*symbol_getter_func)(void *globalref, void *symref);
+typedef void (*symbol_setter_func)(void *globalref, void *symref, UINT64 value);
 
 /* callback function for execution a function */
-typedef UINT64 (*function_execute_func)(void *ref, UINT32 numparams, const UINT64 *paramlist);
+typedef UINT64 (*function_execute_func)(void *globalref, void *symref, UINT32 numparams, const UINT64 *paramlist);
 
 /* callback function for memory reads/writes */
-typedef UINT64 (*express_read_func)(const char *name, int space, UINT32 offset, int size);
-typedef void (*express_write_func)(const char *name, int space, UINT32 offset, int size, UINT64 value);
-typedef EXPRERR (*express_valid_func)(const char *name, int space);
+typedef UINT64 (*express_read_func)(void *cbparam, const char *name, int space, UINT32 offset, int size);
+typedef void (*express_write_func)(void *cbparam, const char *name, int space, UINT32 offset, int size, UINT64 value);
+typedef EXPRERR (*express_valid_func)(void *cbparam, const char *name, int space);
 
 
 /* callback parameter for executing expressions */
@@ -119,11 +119,16 @@ struct _express_callbacks
 };
 
 
+/* symbol_table is an opaque structure for holding a collection of symbols */
+typedef struct _symbol_table symbol_table;
+
+
 /* symbol_entry describes a symbol in a symbol table */
 typedef struct _symbol_entry symbol_entry;
 struct _symbol_entry
 {
 	void *			ref;						/* internal reference */
+	symbol_table *	table;						/* pointer back to the owning table */
 	UINT32			type;						/* type of symbol */
 	union
 	{
@@ -152,10 +157,6 @@ struct _symbol_entry
 };
 
 
-/* symbol_table is an opaque structure for holding a collection of symbols */
-typedef struct _symbol_table symbol_table;
-
-
 /* parsed_expression is an opaque structure for holding a pre-parsed expression */
 typedef struct _parsed_expression parsed_expression;
 
@@ -166,18 +167,19 @@ typedef struct _parsed_expression parsed_expression;
 ***************************************************************************/
 
 /* expression evaluation */
-EXPRERR 					expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, UINT64 *result);
-EXPRERR 					expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, parsed_expression **result);
+EXPRERR 					expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, UINT64 *result);
+EXPRERR 					expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, parsed_expression **result);
 EXPRERR 					expression_execute(parsed_expression *expr, UINT64 *result);
 void 						expression_free(parsed_expression *expr);
 const char *				expression_original_string(parsed_expression *expr);
 const char *				exprerr_to_string(EXPRERR error);
 
 /* symbol table manipulation */
-symbol_table *				symtable_alloc(symbol_table *parent);
+symbol_table *				symtable_alloc(symbol_table *parent, void *globalref);
+void *						symtable_get_globalref(symbol_table *table);
 int 						symtable_add(symbol_table *table, const char *name, const symbol_entry *entry);
-int 						symtable_add_register(symbol_table *table, const char *name, void *ref, symbol_getter_func getter, symbol_setter_func setter);
-int 						symtable_add_function(symbol_table *table, const char *name, void *ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute);
+int 						symtable_add_register(symbol_table *table, const char *name, void *symref, symbol_getter_func getter, symbol_setter_func setter);
+int 						symtable_add_function(symbol_table *table, const char *name, void *symref, UINT16 minparams, UINT16 maxparams, function_execute_func execute);
 int							symtable_add_value(symbol_table *table, const char *name, UINT64 value);
 const symbol_entry *		symtable_find(const symbol_table *table, const char *name);
 const char *				symtable_find_indexed(const symbol_table *table, int index, const symbol_entry **entry);

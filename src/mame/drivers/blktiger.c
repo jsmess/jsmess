@@ -41,19 +41,19 @@ VIDEO_EOF( blktiger );
 /* if a read from this address doesn't return the value it expects. */
 static READ8_HANDLER( blktiger_protection_r )
 {
-	int data = activecpu_get_reg(Z80_DE) >> 8;
-	logerror("protection read, PC: %04x Result:%02x\n",activecpu_get_pc(),data);
+	int data = cpu_get_reg(space->cpu, Z80_DE) >> 8;
+	logerror("protection read, PC: %04x Result:%02x\n",cpu_get_pc(space->cpu),data);
 	return data;
 }
 
 static WRITE8_HANDLER( blktiger_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 static WRITE8_HANDLER( blktiger_coinlockout_w )
 {
-	if (input_port_read(machine, "COIN_LOCKOUT") & 0x01)
+	if (input_port_read(space->machine, "COIN_LOCKOUT") & 0x01)
 	{
 		coin_lockout_w(0,~data & 0x01);
 		coin_lockout_w(1,~data & 0x02);
@@ -230,7 +230,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -246,7 +246,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( blktiger )
 {
 	/* configure bankswitching */
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static MACHINE_DRIVER_START( blktiger )

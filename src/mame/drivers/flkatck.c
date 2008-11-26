@@ -37,12 +37,12 @@ static MACHINE_RESET( flkatck )
 static INTERRUPT_GEN( flkatck_interrupt )
 {
 	if (flkatck_irq_enabled)
-		cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress = 0;
 
 	/* bits 3-4: coin counters */
@@ -52,7 +52,7 @@ static WRITE8_HANDLER( flkatck_bankswitch_w )
 	/* bits 0-1: bank # */
 	bankaddress += 0x10000 + (data & 0x03)*0x2000;
 	if ((data & 0x03) != 0x03)	/* for safety */
-		memory_set_bankptr(1,&RAM[bankaddress]);
+		memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 }
 
 static READ8_HANDLER( flkatck_ls138_r )
@@ -62,13 +62,13 @@ static READ8_HANDLER( flkatck_ls138_r )
 	switch ((offset & 0x1c) >> 2){
 		case 0x00:
 			if (offset & 0x02)
-				data = input_port_read(machine, (offset & 0x01) ? "COIN" : "DSW3");
+				data = input_port_read(space->machine, (offset & 0x01) ? "COIN" : "DSW3");
 			else
-				data = input_port_read(machine, (offset & 0x01) ? "P2" : "P1");
+				data = input_port_read(space->machine, (offset & 0x01) ? "P2" : "P1");
 			break;
 		case 0x01:
 			if (offset & 0x02)
-				data = input_port_read(machine, (offset & 0x01) ? "DSW1" : "DSW2");
+				data = input_port_read(space->machine, (offset & 0x01) ? "DSW1" : "DSW2");
 			break;
 	}
 
@@ -79,16 +79,16 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 {
 	switch ((offset & 0x1c) >> 2){
 		case 0x04:	/* bankswitch */
-			flkatck_bankswitch_w(machine, 0, data);
+			flkatck_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:	/* sound code number */
-			soundlatch_w(machine, 0, data);
+			soundlatch_w(space, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
-			watchdog_reset_w(machine, 0, data);
+			watchdog_reset_w(space, 0, data);
 			break;
 	}
 }

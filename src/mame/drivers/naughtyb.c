@@ -111,14 +111,14 @@ TODO:
 
 static READ8_HANDLER( in0_port_r )
 {
-	int in0 = input_port_read(machine, "IN0");
+	int in0 = input_port_read(space->machine, "IN0");
 
 	if ( naughtyb_cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
 		in0 = ( in0 & 0x03 ) |				// start buttons
-			  ( input_port_read(machine, "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
+			  ( input_port_read(space->machine, "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
 	}
 
 	return in0;
@@ -128,8 +128,8 @@ static READ8_HANDLER( dsw0_port_r )
 {
 	// vblank replaces the cabinet dip
 
-	return ( ( input_port_read(machine, "DSW0") & 0x7F ) |		// dsw0
-   			 ( input_port_read(machine, "FAKE") & 0x80 ) );		// vblank
+	return ( ( input_port_read(space->machine, "DSW0") & 0x7F ) |		// dsw0
+   			 ( input_port_read(space->machine, "FAKE") & 0x80 ) );		// vblank
 }
 
 /* Pop Flamer
@@ -150,16 +150,16 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 	return values[count];
 
 #if 0
-	if ( activecpu_get_pc() == (0x26F2 + 0x03) )
+	if ( cpu_get_pc(space->cpu) == (0x26F2 + 0x03) )
 	{
 		popflame_prot_count = 0;
 		return 0x01;
 	} /* Must not carry when rotated left */
 
-	if ( activecpu_get_pc() == (0x26F9 + 0x03) )
+	if ( cpu_get_pc(space->cpu) == (0x26F9 + 0x03) )
 		return 0x80; /* Must carry when rotated left */
 
-	if ( activecpu_get_pc() == (0x270F + 0x03) )
+	if ( cpu_get_pc(space->cpu) == (0x270F + 0x03) )
 	{
 		switch( popflame_prot_count++ )
 		{
@@ -169,7 +169,7 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 			case 3: return 0x38; /* x011 1xxx, matches 0x07 at $2693, stored in $400D */
 		}
 	}
-	logerror("CPU #0 PC %06x: unmapped protection read\n", activecpu_get_pc());
+	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(space->cpu));
 	return 0x00;
 #endif
 }
@@ -217,8 +217,8 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( naughtyb_interrupt )
 {
-	if (input_port_read(machine, "FAKE") & 1)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "FAKE") & 1)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( naughtyb )
@@ -770,14 +770,14 @@ ROM_END
 static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9000, 0, 0, popflame_protection_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
 }
 
 static int question_offset = 0;
 
 static READ8_HANDLER( trvmstr_questions_r )
 {
-	return memory_region(machine, "user1")[question_offset];
+	return memory_region(space->machine, "user1")[question_offset];
 }
 
 static WRITE8_HANDLER( trvmstr_questions_w )
@@ -799,7 +799,7 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
 }
 
 

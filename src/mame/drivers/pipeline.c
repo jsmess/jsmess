@@ -186,7 +186,7 @@ static WRITE8_HANDLER(vram2_w)
 		 if(offset<0x300)
 		 {
 		 	offset&=0xff;
-		 	palette_set_color_rgb(machine, offset, pal6bit(palram[offset]), pal6bit(palram[offset+0x100]), pal6bit(palram[offset+0x200]));
+		 	palette_set_color_rgb(space->machine, offset, pal6bit(palram[offset]), pal6bit(palram[offset+0x100]), pal6bit(palram[offset+0x200]));
 		 }
 	}
 }
@@ -210,7 +210,7 @@ static TIMER_CALLBACK( protection_deferred_w )
 static WRITE8_DEVICE_HANDLER(protection_w)
 {
 	timer_call_after_resynch(NULL, data, protection_deferred_w);
-	cpu_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 static ADDRESS_MAP_START( cpu0_mem, ADDRESS_SPACE_PROGRAM, 8 )

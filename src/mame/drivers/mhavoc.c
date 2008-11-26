@@ -206,9 +206,9 @@ static READ8_HANDLER( dual_pokey_r )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return pokey1_r(machine, pokey_reg);
+		return pokey1_r(space, pokey_reg);
 	else
-		return pokey2_r(machine, pokey_reg);
+		return pokey2_r(space, pokey_reg);
 }
 
 
@@ -219,9 +219,9 @@ static WRITE8_HANDLER( dual_pokey_w )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		pokey1_w(machine, pokey_reg, data);
+		pokey1_w(space, pokey_reg, data);
 	else
-		pokey2_w(machine, pokey_reg, data);
+		pokey2_w(space, pokey_reg, data);
 }
 
 
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( speech_data_w )
 
 static WRITE8_HANDLER( speech_strobe_w )
 {
-	tms5220_data_w(machine, 0, speech_write_buffer);
+	tms5220_data_w(space, 0, speech_write_buffer);
 }
 
 /*************************************
@@ -337,7 +337,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( clock_r )
 {
 	/* 2.4kHz (divide 2.5MHz by 1024) */
-	return (cpunum_gettotalcycles(0) & 0x400) ? 0 : 1;
+	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x400) ? 0 : 1;
 }
 
 
@@ -761,8 +761,8 @@ static DRIVER_INIT( mhavocrv )
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x5800, 0x5800, 0, 0, speech_data_w);
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x5900, 0x5900, 0, 0, speech_strobe_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5800, 0x5800, 0, 0, speech_data_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5900, 0x5900, 0, 0, speech_strobe_w);
 }
 
 

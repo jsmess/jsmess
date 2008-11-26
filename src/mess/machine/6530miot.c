@@ -227,7 +227,7 @@ WRITE8_DEVICE_HANDLER( miot6530_w )
 			if (port->out_func != NULL)
 				(*port->out_func)(device, data, olddata);
 			else
-				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag, 'A' + (offset & 1), safe_activecpu_get_pc(), data);
+				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag, 'A' + (offset & 1), safe_cpu_get_pc(device->machine->activecpu), data);
 		}
 	}
 }
@@ -289,7 +289,7 @@ READ8_DEVICE_HANDLER( miot6530_r )
 				port->in = (*port->in_func)(device, port->in);
 			}
 			else
-				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag, 'A' + (offset & 1), safe_activecpu_get_pc());
+				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag, 'A' + (offset & 1), safe_cpu_get_pc(device->machine->activecpu));
 
 			/* apply the DDR to the result */
 			val = (out & port->ddr) | (port->in & ~port->ddr);
@@ -379,7 +379,6 @@ static DEVICE_START( miot6530 )
 {
 	const miot6530_config *config = device->inline_config;
 	miot6530_state *miot = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -400,20 +399,18 @@ static DEVICE_START( miot6530 )
 	miot->timer = timer_alloc(timer_end_callback, (void *)device);
 
 	/* register for save states */
-	state_save_combine_module_and_tag(unique_tag, "miot6530", device->tag);
+	state_save_register_item("miot6530", device->tag, 0, miot->port[0].in);
+	state_save_register_item("miot6530", device->tag, 0, miot->port[0].out);
+	state_save_register_item("miot6530", device->tag, 0, miot->port[0].ddr);
+	state_save_register_item("miot6530", device->tag, 0, miot->port[1].in);
+	state_save_register_item("miot6530", device->tag, 0, miot->port[1].out);
+	state_save_register_item("miot6530", device->tag, 0, miot->port[1].ddr);
 
-	state_save_register_item(unique_tag, 0, miot->port[0].in);
-	state_save_register_item(unique_tag, 0, miot->port[0].out);
-	state_save_register_item(unique_tag, 0, miot->port[0].ddr);
-	state_save_register_item(unique_tag, 0, miot->port[1].in);
-	state_save_register_item(unique_tag, 0, miot->port[1].out);
-	state_save_register_item(unique_tag, 0, miot->port[1].ddr);
+	state_save_register_item("miot6530", device->tag, 0, miot->irqstate);
+	state_save_register_item("miot6530", device->tag, 0, miot->irqenable);
 
-	state_save_register_item(unique_tag, 0, miot->irqstate);
-	state_save_register_item(unique_tag, 0, miot->irqenable);
-
-	state_save_register_item(unique_tag, 0, miot->timershift);
-	state_save_register_item(unique_tag, 0, miot->timerstate);
+	state_save_register_item("miot6530", device->tag, 0, miot->timershift);
+	state_save_register_item("miot6530", device->tag, 0, miot->timerstate);
 
 	return DEVICE_START_OK;
 }

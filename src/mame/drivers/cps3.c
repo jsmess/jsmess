@@ -603,7 +603,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 
 
 
-static OPBASE_HANDLER( cps3_opbase_handler );
+static DIRECT_UPDATE_HANDLER( cps3_direct_handler );
 
 /* Encryption */
 
@@ -725,7 +725,7 @@ static DRIVER_INIT( cps3 )
 	int i;
 
 	// set strict verify
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
 
 	cps3_key1 = -1;
 	cps3_key2 = -1;
@@ -754,7 +754,7 @@ static DRIVER_INIT( cps3 )
 
 
 	cps3_0xc0000000_ram_decrypted = auto_malloc(0x400);
-	memory_set_opbase_handler(0, cps3_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
 
 	// flash roms
 
@@ -1340,38 +1340,38 @@ static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 
 
 
-static OPBASE_HANDLER( cps3_opbase_handler )
+static DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 {
 //  if(DEBUG_PRINTF) printf("address %04x\n",address);
 
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		opbase->rom = opbase->ram = memory_region(machine, "user1");
+		direct->raw = direct->decrypted = memory_region(space->machine, "user1");
 		return ~0;
 	}
 	/* RAM */
 	else if (address >= 0x06000000 && address <= 0x06ffffff)
 	{
-		opbase->rom = (UINT8*)decrypted_gamerom-0x06000000;
-		opbase->ram = (UINT8*)decrypted_gamerom-0x06000000;
+		direct->decrypted = (UINT8*)decrypted_gamerom-0x06000000;
+		direct->raw = (UINT8*)decrypted_gamerom-0x06000000;
 
-		if (cps3_altEncryption) opbase->ram = (UINT8*) memory_region(machine, "user4")-0x06000000;
+		if (cps3_altEncryption) direct->raw = (UINT8*) memory_region(space->machine, "user4")-0x06000000;
 
 
 		return ~0;
 	}
 	else if (address >= 0xc0000000 && address <= 0xc00003ff)
 	{
-		//opbase->rom = (void*)cps3_0xc0000000_ram_decrypted;
-		opbase->rom = (UINT8*)cps3_0xc0000000_ram_decrypted-0xc0000000;
-		opbase->ram = (UINT8*)cps3_0xc0000000_ram-0xc0000000;
+		//direct->decrypted = (void*)cps3_0xc0000000_ram_decrypted;
+		direct->decrypted = (UINT8*)cps3_0xc0000000_ram_decrypted-0xc0000000;
+		direct->raw = (UINT8*)cps3_0xc0000000_ram-0xc0000000;
 		return ~0;
 	}
 
 	/* anything else falls through to NOPs */
-	opbase->rom = (UINT8*)cps3_nops-address;
-	opbase->ram = (UINT8*)cps3_nops-address;
+	direct->decrypted = (UINT8*)cps3_nops-address;
+	direct->raw = (UINT8*)cps3_nops-address;
 	return ~0;
 }
 
@@ -1504,7 +1504,7 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
 	{
-		UINT32* romdata = (UINT32*)memory_region(machine, "user5");
+		UINT32* romdata = (UINT32*)memory_region(space->machine, "user5");
 		int real_offset = 0;
 		UINT32 newdata;
 		UINT8* ptr1 = intelflash_getmemptr(flash1);
@@ -1638,12 +1638,12 @@ static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, 
 
 static WRITE32_HANDLER( cps3_flash1_w )
 {
-	cps3_flashmain_w(machine,0,offset,data,mem_mask);
+	cps3_flashmain_w(space->machine,0,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cps3_flash2_w )
 {
-	cps3_flashmain_w(machine,4,offset,data,mem_mask);
+	cps3_flashmain_w(space->machine,4,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cram_gfxflash_bank_w )
@@ -1784,12 +1784,12 @@ static READ32_HANDLER( cps3_cdrom_r )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		retval |= ((UINT16)wd33c93_r(machine,0))<<16;
+		retval |= ((UINT16)wd33c93_r(space,0))<<16;
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		retval |= (UINT16)wd33c93_r(machine,1);
+		retval |= (UINT16)wd33c93_r(space,1);
 	}
 
 	return retval;
@@ -1799,12 +1799,12 @@ static WRITE32_HANDLER( cps3_cdrom_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		wd33c93_w(machine,0,(data & 0x00ff0000)>>16);
+		wd33c93_w(space,0,(data & 0x00ff0000)>>16);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		wd33c93_w(machine,1,(data & 0x000000ff)>>0);
+		wd33c93_w(space,1,(data & 0x000000ff)>>0);
 	}
 }
 
@@ -1871,7 +1871,7 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 			if (data & 0x0002)
 			{
 				int i;
-				UINT16* src = (UINT16*)memory_region(machine, "user5");
+				UINT16* src = (UINT16*)memory_region(space->machine, "user5");
 			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", paldma_source, paldma_realsource, paldma_dest, paldma_fade, paldma_other2, paldma_length);
 
 				for (i=0;i<paldma_length;i++)
@@ -1880,11 +1880,11 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 
 					//if (paldma_fade!=0) printf("%08x\n",paldma_fade);
 
-					cps3_set_mame_colours(machine, (paldma_dest+i)^1, coldata, paldma_fade);
+					cps3_set_mame_colours(space->machine, (paldma_dest+i)^1, coldata, paldma_fade);
 				}
 
 
-				cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
+				cpu_set_input_line(space->machine->cpu[0],10, ASSERT_LINE);
 
 
 			}
@@ -2105,14 +2105,14 @@ static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 				current_table_address = real_source;
 			}
-			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
 		}
 		else if  ( (dat1&0x00e00000) ==0x00400000 )
 		{
 			/* 6bpp DMA decompression
               - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma( machine, real_source, real_destination, real_length );
-			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
 
 		}
 		else if  ( (dat1&0x00e00000) ==0x00600000 )
@@ -2120,7 +2120,7 @@ static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 			/* 8bpp DMA decompression
               - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma( machine, real_source, real_destination, real_length);
-			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2158,7 +2158,7 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 				list_address = (chardma_source | ((chardma_other&0x003f0000)));
 
 				//printf("chardma_w activated %08x %08x (address = cram %08x)\n", chardma_source, chardma_other, list_address*4 );
-				cps3_process_character_dma(machine, list_address);
+				cps3_process_character_dma(space->machine, list_address);
 			}
 			else
 			{
@@ -2177,12 +2177,12 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 
 static WRITE32_HANDLER( cps3_irq10_ack_w )
 {
-	cpunum_set_input_line(machine, 0,10, CLEAR_LINE); return;
+	cpu_set_input_line(space->machine->cpu[0],10, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_irq12_ack_w )
 {
-	cpunum_set_input_line(machine, 0,12, CLEAR_LINE); return;
+	cpu_set_input_line(space->machine->cpu[0],12, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_unk_vidregs_w )
@@ -2203,12 +2203,12 @@ static WRITE32_HANDLER( cps3_colourram_w )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		cps3_set_mame_colours(machine, offset*2, (data & 0xffff0000) >> 16, 0);
+		cps3_set_mame_colours(space->machine, offset*2, (data & 0xffff0000) >> 16, 0);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		cps3_set_mame_colours(machine, offset*2+1, (data & 0x0000ffff) >> 0, 0);
+		cps3_set_mame_colours(space->machine, offset*2+1, (data & 0x0000ffff) >> 0, 0);
 	}
 }
 
@@ -2324,7 +2324,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN(cps3_vbl_interrupt)
 {
-	cpunum_set_input_line(machine, 0,12, ASSERT_LINE);
+	cpu_set_input_line(device,12, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(cps3_other_interrupt)
@@ -2332,7 +2332,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 	// this seems to need to be periodic (see the life bar portraits in sfiii2
 	// but also triggered on certain dma events (or warzard locks up in attract)
 	// what is the REAL source of IRQ10??
-	cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
+	cpu_set_input_line(device,10, ASSERT_LINE);
 }
 
 
@@ -2604,7 +2604,7 @@ static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 	}
 	else
 	{
-		//printf("PC %08x :src %08x, dst %08x, returning %08x\n", activecpu_get_pc(), src, dst, data);
+		//printf("PC %08x :src %08x, dst %08x, returning %08x\n", cpu_get_pc(machine->activecpu), src, dst, data);
 	}
 
 	/* I doubt this is endian safe.. needs checking / fixing */

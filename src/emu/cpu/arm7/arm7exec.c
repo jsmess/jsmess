@@ -47,7 +47,7 @@
     ARM7_ICOUNT = cycles;
     do
     {
-        debugger_instruction_hook(Machine, R15);
+        debugger_instruction_hook(arm7.device, R15);
 
         /* handle Thumb instructions if active */
         if (T_IS_SET(GET_CPSR))
@@ -58,7 +58,7 @@
             INT32 offs;
 
             pc = R15;
-            insn = cpu_readop16(pc & (~1));
+            insn = memory_decrypted_read_word(ARM7.program, pc & (~1));
             ARM7_ICOUNT -= (3 - thumbCycles[insn >> 8]);
             switch ((insn & THUMB_INSN_TYPE) >> THUMB_INSN_TYPE_SHIFT)
             {
@@ -513,7 +513,6 @@
                                             if (rd == 7)
                                             {
                                                 R15 += 2;
-                                                change_pc(R15);
                                             }
                                             break;
                                         case 0x3: /* Add HRd, HRs */
@@ -526,7 +525,6 @@
                                             if (rd == 7)
                                             {
                                                 R15 += 2;
-                                                change_pc(R15);
                                             }
                                             break;
                                         default:
@@ -595,7 +593,6 @@
                                             else
                                             {
                                                 R15 &= ~1;
-                                                change_pc(R15);
                                             }
                                             break;
                                         case 0x3:       // MOV Hd, Hs
@@ -616,7 +613,6 @@
                                             if (rd == 7)
                                             {
                                                 R15 &= ~1;
-                                                change_pc(R15);
                                             }
                                             break;
                                         default:
@@ -1168,7 +1164,7 @@
 
             /* load 32 bit instruction */
             pc = R15;
-            insn = cpu_readop32(pc);
+            insn = memory_decrypted_read_dword(ARM7.program, pc);
 
             /* process condition codes for this instruction */
             switch (insn >> INSN_COND_SHIFT)
@@ -1354,8 +1350,6 @@
                         ARM7_ICOUNT +=2;    //Any unexecuted instruction only takes 1 cycle (page 193)
             }
         }
-
-        change_pc(R15);
 
         ARM7_CHECKIRQ;
 

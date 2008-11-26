@@ -224,7 +224,7 @@ static UINT8 mt_cart_select_reg;
 
 static READ8_HANDLER( megatech_instr_r )
 {
-	UINT8* instr = memory_region(machine, "mtbios")+0x8000;
+	UINT8* instr = memory_region(space->machine, "mtbios")+0x8000;
 
 	return instr[offset/2];
 //  else
@@ -272,18 +272,18 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
-			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
+			memory_install_readwrite8_handler(space, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
 
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, memory_region(machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, memory_region(machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, memory_region(machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -306,19 +306,19 @@ READ8_HANDLER( md_sms_ioport_dd_r )
 static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r, sms_sn76496_w);
-	memory_install_write8_handler    (machine, 1, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, sms_sn76496_w);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r, md_sms_vdp_data_w);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r, md_sms_vdp_ctrl_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r, sms_sn76496_w);
+	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, sms_sn76496_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r, md_sms_vdp_data_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r, md_sms_vdp_ctrl_w);
 
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
 
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
 }
 
 static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
@@ -326,24 +326,24 @@ static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* fixed rom bank area */
 	sms_rom = auto_malloc(0x400000);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
-	memory_set_bankptr( 5, sms_rom );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
+	memory_set_bankptr(machine,  5, sms_rom );
 
 	memcpy(sms_rom, memory_region(machine, "main"), 0x400000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x2000); // 8kb of main ram
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK6, SMH_BANK6);
-	memory_set_bankptr( 6, sms_mainram );
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK7, SMH_BANK7);
-	memory_set_bankptr( 7, sms_mainram );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_BANK6, SMH_BANK6);
+	memory_set_bankptr(machine,  6, sms_mainram );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK7, SMH_BANK7);
+	memory_set_bankptr(machine,  7, sms_mainram );
 	memset(sms_mainram,0x00,0x2000);
 
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
 
 	megatech_set_genz80_as_sms_standard_ports(machine);
 //  smsgg_backupram = NULL;
@@ -358,10 +358,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 
 	printf("game 0 selected\n");
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	sndti_reset(SOUND_YM2612, 0);
 
 	sprintf(tempname, "game%d", gameno);
@@ -387,8 +387,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("SMS cart!!, CPU not running\n");
 			current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map(machine);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 
 
 		}
@@ -397,8 +397,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("Genesis Cart, CPU0 running\n");
 			current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80(machine);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 		}
 		else
 		{
@@ -407,10 +407,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
-	//  cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
-	//  cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
+	//  cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
 		memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
@@ -432,27 +432,27 @@ static WRITE8_HANDLER( megatech_cart_select_w )
 	mt_cart_select_reg = data;
 
 
-	megatech_select_game(machine, mt_cart_select_reg);
+	megatech_select_game(space->machine, mt_cart_select_reg);
 
 /*
     if (mt_cart_select_reg==2)
     {
         printf("game 2 selected\n");
-        memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "inst0"), 0x8000);
+        memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "inst0"), 0x8000);
     }
 //  else if (mt_cart_select_reg==0)
 //  {
 //      printf("game 0 selected\n");
-//      memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "inst2"), 0x8000);
+//      memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "inst2"), 0x8000);
 //  }
     else if (mt_cart_select_reg==6)
     {
         printf("game 6 selected\n");
-        memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "user6"), 0x8000);
+        memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "user6"), 0x8000);
     }
     else
     {
-        memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
+        memset(memory_region(space->machine, "mtbios")+0x8000, 0x00, 0x8000);
     }
 */
 

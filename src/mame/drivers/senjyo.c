@@ -88,7 +88,7 @@ static MACHINE_RESET( senjyo )
 
 static INTERRUPT_GEN( senjyo_interrupt )
 {
-	if (int_delay_kludge == 0) cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if (int_delay_kludge == 0) cpu_set_input_line(device, 0, HOLD_LINE);
 	else int_delay_kludge--;
 }
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( paletteram_IIBBGGRR_w )
 	b = (data >> 2) & 0x0c;
 	if (b) b |= i;
 
-	palette_set_color_rgb(machine,offset,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(space->machine,offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 

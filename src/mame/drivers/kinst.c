@@ -190,26 +190,26 @@ static MACHINE_START( kinst )
 	}
 
 	/* set the fastest DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x08000000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x087fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase2);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x08000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x087fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase2);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x0007ffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x0007ffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 2);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 }
 
 
@@ -268,20 +268,20 @@ static VIDEO_UPDATE( kinst )
 
 static TIMER_CALLBACK( irq0_stop )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( irq0_start )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq0_stop);
 }
 
 
 static void ide_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, 1, state);
+	cpu_set_input_line(device->machine->cpu[0], 1, state);
 }
 
 
@@ -335,7 +335,7 @@ static READ32_HANDLER( kinst_control_r )
 	switch (offset)
 	{
 		case 2:		/* $90 -- sound return */
-			result = input_port_read(machine, portnames[offset]);
+			result = input_port_read(space->machine, portnames[offset]);
 			result &= ~0x0002;
 			if (dcs_control_r() & 0x800)
 				result |= 0x0002;
@@ -344,13 +344,13 @@ static READ32_HANDLER( kinst_control_r )
 		case 0:		/* $80 */
 		case 1:		/* $88 */
 		case 3:		/* $98 */
-			result = input_port_read(machine, portnames[offset]);
+			result = input_port_read(space->machine, portnames[offset]);
 			break;
 
 		case 4:		/* $a0 */
-			result = input_port_read(machine, portnames[offset]);
-			if (activecpu_get_pc() == 0x802d428)
-				cpu_spinuntil_int();
+			result = input_port_read(space->machine, portnames[offset]);
+			if (cpu_get_pc(space->cpu) == 0x802d428)
+				cpu_spinuntil_int(space->cpu);
 			break;
 	}
 
@@ -891,7 +891,7 @@ static DRIVER_INIT( kinst )
 {
 	static const UINT8 kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
-	dcs_init();
+	dcs_init(machine);
 
 	/* set up the control register mapping */
 	control_map = kinst_control_map;
@@ -909,7 +909,7 @@ static DRIVER_INIT( kinst2 )
 	// write: $98 on ki2 = $80 on ki
 	// write: $a0 on ki2 = $98 on ki
 
-	dcs_init();
+	dcs_init(machine);
 
 	/* set up the control register mapping */
 	control_map = kinst2_control_map;

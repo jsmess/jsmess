@@ -4,6 +4,7 @@
 #include "machine/eeprom.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
+#include "deprecat.h"
 
 int simpsons_firq_enabled;
 
@@ -53,7 +54,7 @@ READ8_HANDLER( simpsons_eeprom_r )
 
 	res |= 0x20;//konami_eeprom_ack() << 5; /* add the ack */
 
-	res |= input_port_read(machine, "TEST") & 1; /* test switch */
+	res |= input_port_read(space->machine, "TEST") & 1; /* test switch */
 
 	if (init_eeprom_count)
 	{
@@ -72,7 +73,7 @@ WRITE8_HANDLER( simpsons_eeprom_w )
 	eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	simpsons_video_banking( machine, data & 3 );
+	simpsons_video_banking( space->machine, data & 3 );
 
 	simpsons_firq_enabled = data & 0x04;
 }
@@ -98,13 +99,13 @@ WRITE8_HANDLER( simpsons_coin_counter_w )
 
 READ8_HANDLER( simpsons_sound_interrupt_r )
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
 READ8_HANDLER( simpsons_sound_r )
 {
-	return k053260_0_r(machine, 2 + offset);
+	return k053260_0_r(space, 2 + offset);
 }
 
 
@@ -116,14 +117,14 @@ READ8_HANDLER( simpsons_sound_r )
 
 static void simpsons_banking( int lines )
 {
-	memory_set_bank(1, lines & 0x3f);
+	memory_set_bank(Machine, 1, lines & 0x3f);
 }
 
 MACHINE_RESET( simpsons )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)simpsons_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)simpsons_banking);
 
 	paletteram = &RAM[0x88000];
 	simpsons_xtraram = &RAM[0x89000];
@@ -132,12 +133,12 @@ MACHINE_RESET( simpsons )
 	simpsons_firq_enabled = 0;
 
 	/* init the default banks */
-	memory_configure_bank(1, 0, 64, memory_region(machine, "main") + 0x10000, 0x2000);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 64, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_set_bank(machine, 1, 0);
 
-	memory_configure_bank(2, 0, 2, memory_region(machine, "audio") + 0x10000, 0);
-	memory_configure_bank(2, 2, 6, memory_region(machine, "audio") + 0x10000, 0x4000);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x10000, 0);
+	memory_configure_bank(machine, 2, 2, 6, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_set_bank(machine, 2, 0);
 
 	simpsons_video_banking( machine, 0 );
 }

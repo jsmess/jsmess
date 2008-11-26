@@ -178,7 +178,7 @@ static UINT8 kangaroo_clock;
 
 static MACHINE_START( kangaroo )
 {
-	memory_configure_bank(1, 0, 2, memory_region(machine, "gfx1"), 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "gfx1"), 0x2000);
 	state_save_register_global(kangaroo_clock);
 }
 
@@ -186,7 +186,7 @@ static MACHINE_START( kangaroo )
 static MACHINE_START( kangaroo_mcu )
 {
 	MACHINE_START_CALL(kangaroo);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
 	kangaroo_clock = 0;
 }
 
@@ -204,7 +204,7 @@ static MACHINE_RESET( kangaroo )
 	/* the copy protection. */
 	/* Anyway, what I do here is just immediately generate the NMI, so the game */
 	/* properly starts. */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

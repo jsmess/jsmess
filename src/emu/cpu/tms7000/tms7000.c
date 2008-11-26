@@ -29,6 +29,7 @@
 // SJE: Implemented internal register file
 
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "debugger.h"
 #include "tms7000.h"
 #include "deprecat.h"
@@ -57,40 +58,12 @@ static int tms7000_icount;
 static int tms7000_div_by_16_trigger;
 static int tms7000_cycles_per_INT2;
 
-#define RM(Addr) ((unsigned)program_read_byte_8be(Addr))
-#define WM(Addr,Value) (program_write_byte_8be(Addr,Value))
+#define RM(Addr) ((unsigned)memory_read_byte_8be(tms7000.program, Addr))
+#define WM(Addr,Value) (memory_write_byte_8be(tms7000.program, Addr, Value))
 
-INLINE UINT16 RM16( UINT32 mAddr )	/* Read memory (16-bit) */
-{
-	UINT32 result = RM(mAddr) << 8;
-	return result | RM((mAddr+1)&0xffff);
-}
-
-#ifdef UNUSED_FUNCTION
-INLINE void WM16( UINT32 mAddr, PAIR p )	/*Write memory file (16 bit) */
-{
-	WM( mAddr, p.b.h );
-	WM( (mAddr+1)&0xffff, p.b.l );
-}
-#endif
-
-INLINE UINT16 RRF16( UINT32 mAddr )	/*Read register file (16 bit) */
-{
-	PAIR result;
-	result.b.h = RM((mAddr-1)&0xffff);
-	result.b.l = RM(mAddr);
-	return result.w.l;
-}
-
-INLINE void WRF16( UINT32 mAddr, PAIR p )	/*Write register file (16 bit) */
-{
-	WM( (mAddr-1)&0xffff, p.b.h );
-	WM( mAddr, p.b.l );
-}
-
-#define IMMBYTE(b)	b = ((unsigned)cpu_readop_arg(pPC)); pPC++
-#define SIMMBYTE(b)	b = ((signed)cpu_readop_arg(pPC)); pPC++
-#define IMMWORD(w)	w.b.h = (unsigned)cpu_readop_arg(pPC++); w.b.l = (unsigned)cpu_readop_arg(pPC++)
+#define IMMBYTE(b)	b = ((unsigned)memory_raw_read_byte(tms7000.program, pPC)); pPC++
+#define SIMMBYTE(b)	b = ((signed)memory_raw_read_byte(tms7000.program, pPC)); pPC++
+#define IMMWORD(w)	w.b.h = (unsigned)memory_raw_read_byte(tms7000.program, pPC++); w.b.l = (unsigned)memory_raw_read_byte(tms7000.program, pPC++)
 
 #define PUSHBYTE(b) pSP++; WM(pSP,b)
 #define PUSHWORD(w) pSP++; WM(pSP,w.b.h); pSP++; WM(pSP,w.b.l)
@@ -107,6 +80,8 @@ typedef struct
 	UINT8		pf[0x100];	/* Perpherial file */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	UINT8		t1_capture_latch; /* Timer 1 capture latch */
 	INT8		t1_prescaler;	/* Timer 1 prescaler (5 bits) */
 	INT16		t1_decrementer;	/* Timer 1 decrementer (8 bits) */
@@ -147,9 +122,6 @@ static tms7000_Regs tms7000;
 #define SETZ		pSR |= SR_Z
 #define SETN		pSR |= SR_N
 
-#define CHANGE_PC change_pc(pPC)
-
-
 static READ8_HANDLER( tms7000_internal_r );
 static WRITE8_HANDLER( tms7000_internal_w );
 static READ8_HANDLER( tms70x0_pf_r );
@@ -161,6 +133,34 @@ static ADDRESS_MAP_START(tms7000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
 ADDRESS_MAP_END
 
+
+INLINE UINT16 RM16( UINT32 mAddr )	/* Read memory (16-bit) */
+{
+	UINT32 result = RM(mAddr) << 8;
+	return result | RM((mAddr+1)&0xffff);
+}
+
+#ifdef UNUSED_FUNCTION
+INLINE void WM16( UINT32 mAddr, PAIR p )	/*Write memory file (16 bit) */
+{
+	WM( mAddr, p.b.h );
+	WM( (mAddr+1)&0xffff, p.b.l );
+}
+#endif
+
+INLINE UINT16 RRF16( UINT32 mAddr )	/*Read register file (16 bit) */
+{
+	PAIR result;
+	result.b.h = RM((mAddr-1)&0xffff);
+	result.b.l = RM(mAddr);
+	return result.w.l;
+}
+
+INLINE void WRF16( UINT32 mAddr, PAIR p )	/*Write register file (16 bit) */
+{
+	WM( (mAddr-1)&0xffff, p.b.h );
+	WM( mAddr, p.b.l );
+}
 
 
 /****************************************************************************
@@ -186,32 +186,32 @@ static CPU_SET_CONTEXT( tms7000 )
 
 static CPU_INIT( tms7000 )
 {
-	int cpu = cpu_getactivecpu();
-
 	tms7000.irq_callback = irqcallback;
 	tms7000.device = device;
+	tms7000.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	tms7000.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	memset(tms7000.pf, 0, 0x100);
 	memset(tms7000.rf, 0, 0x80);
 
 	/* Save register state */
-	state_save_register_item("tms7000", cpu, pPC);
-	state_save_register_item("tms7000", cpu, pSP);
-	state_save_register_item("tms7000", cpu, pSR);
+	state_save_register_item("tms7000", device->tag, 0, pPC);
+	state_save_register_item("tms7000", device->tag, 0, pSP);
+	state_save_register_item("tms7000", device->tag, 0, pSR);
 
 	/* Save Interrupt state */
-	state_save_register_item_array("tms7000", cpu, tms7000.irq_state);
+	state_save_register_item_array("tms7000", device->tag, 0, tms7000.irq_state);
 
 	/* Save register and perpherial file state */
-	state_save_register_item_array("tms7000", cpu, tms7000.rf);
-	state_save_register_item_array("tms7000", cpu, tms7000.pf);
+	state_save_register_item_array("tms7000", device->tag, 0, tms7000.rf);
+	state_save_register_item_array("tms7000", device->tag, 0, tms7000.pf);
 
 	/* Save timer state */
-	state_save_register_item("tms7000", cpu, tms7000.t1_prescaler);
-	state_save_register_item("tms7000", cpu, tms7000.t1_capture_latch);
-	state_save_register_item("tms7000", cpu, tms7000.t1_decrementer);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_prescaler);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_capture_latch);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_decrementer);
 
-	state_save_register_item("tms7000", cpu, tms7000.idle_state);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.idle_state);
 }
 
 static CPU_RESET( tms7000 )
@@ -246,7 +246,6 @@ static CPU_RESET( tms7000 )
 	WRA( tms7000.pc.b.h );	/* Write previous PC to A:B */
 	WRB( tms7000.pc.b.l );
 	pPC = RM16(0xfffe);		/* Load reset vector */
-	CHANGE_PC;
 
 	tms7000_div_by_16_trigger = -16;
 }
@@ -267,7 +266,7 @@ static CPU_SET_INFO( tms7000 )
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ3_LINE:	tms7000_set_irq_line(TMS7000_IRQ3_LINE, info->i);	break;
 
         case CPUINFO_INT_PC:
-        case CPUINFO_INT_REGISTER + TMS7000_PC:	pPC = info->i; CHANGE_PC;	break;
+        case CPUINFO_INT_REGISTER + TMS7000_PC:	pPC = info->i; break;
         case CPUINFO_INT_SP:
         case CPUINFO_INT_REGISTER + TMS7000_SP:	pSP = info->i;	break;
         case CPUINFO_INT_REGISTER + TMS7000_ST:	pSR = info->i;	tms7000_check_IRQ_lines();	break;
@@ -338,14 +337,14 @@ CPU_GET_INFO( tms7000 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case CPUINFO_STR_NAME:	strcpy(info->s = cpuintrf_temp_str(), "TMS7000"); break;
-        case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s = cpuintrf_temp_str(), "Texas Instriuments TMS7000"); break;
-        case CPUINFO_STR_CORE_VERSION:	strcpy(info->s = cpuintrf_temp_str(), "1.0"); break;
-        case CPUINFO_STR_CORE_FILE:	strcpy(info->s = cpuintrf_temp_str(), __FILE__); break;
-        case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(), "Copyright tim lindner"); break;
+        case CPUINFO_STR_NAME:	strcpy(info->s, "TMS7000"); break;
+        case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s, "Texas Instriuments TMS7000"); break;
+        case CPUINFO_STR_CORE_VERSION:	strcpy(info->s, "1.0"); break;
+        case CPUINFO_STR_CORE_FILE:	strcpy(info->s, __FILE__); break;
+        case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s, "Copyright tim lindner"); break;
 
         case CPUINFO_STR_FLAGS:
-                sprintf(info->s = cpuintrf_temp_str(),  "%c%c%c%c%c%c%c%c",
+                sprintf(info->s,  "%c%c%c%c%c%c%c%c",
                         tms7000.sr & 0x80 ? 'C':'c',
                         tms7000.sr & 0x40 ? 'N':'n',
                         tms7000.sr & 0x20 ? 'Z':'z',
@@ -356,13 +355,13 @@ CPU_GET_INFO( tms7000 )
                         tms7000.sr & 0x01 ? '?':'.' );
                 break;
 
-        case CPUINFO_STR_REGISTER + TMS7000_PC:	sprintf(info->s = cpuintrf_temp_str(), "PC:%04X", tms7000.pc.w.l); break;
-        case CPUINFO_STR_REGISTER + TMS7000_SP:	sprintf(info->s = cpuintrf_temp_str(), "S:%02X", tms7000.sp); break;
-        case CPUINFO_STR_REGISTER + TMS7000_ST:	sprintf(info->s = cpuintrf_temp_str(), "ST:%02X", tms7000.sr); break;
-		case CPUINFO_STR_REGISTER + TMS7000_IDLE: sprintf(info->s = cpuintrf_temp_str(), "Idle:%02X", tms7000.idle_state); break;
-		case CPUINFO_STR_REGISTER + TMS7000_T1_CL: sprintf(info->s = cpuintrf_temp_str(), "T1CL:%02X", tms7000.t1_capture_latch); break;
-		case CPUINFO_STR_REGISTER + TMS7000_T1_PS: sprintf(info->s = cpuintrf_temp_str(), "T1PS:%02X", tms7000.t1_prescaler & 0x1f); break;
-		case CPUINFO_STR_REGISTER + TMS7000_T1_DEC: sprintf(info->s = cpuintrf_temp_str(), "T1DEC:%02X", tms7000.t1_decrementer & 0xff); break;
+        case CPUINFO_STR_REGISTER + TMS7000_PC:	sprintf(info->s, "PC:%04X", tms7000.pc.w.l); break;
+        case CPUINFO_STR_REGISTER + TMS7000_SP:	sprintf(info->s, "S:%02X", tms7000.sp); break;
+        case CPUINFO_STR_REGISTER + TMS7000_ST:	sprintf(info->s, "ST:%02X", tms7000.sr); break;
+		case CPUINFO_STR_REGISTER + TMS7000_IDLE: sprintf(info->s, "Idle:%02X", tms7000.idle_state); break;
+		case CPUINFO_STR_REGISTER + TMS7000_T1_CL: sprintf(info->s, "T1CL:%02X", tms7000.t1_capture_latch); break;
+		case CPUINFO_STR_REGISTER + TMS7000_T1_PS: sprintf(info->s, "T1PS:%02X", tms7000.t1_prescaler & 0x1f); break;
+		case CPUINFO_STR_REGISTER + TMS7000_T1_DEC: sprintf(info->s, "T1DEC:%02X", tms7000.t1_decrementer & 0xff); break;
 
     }
 }
@@ -386,7 +385,7 @@ void tms7000_set_irq_line(int irqline, int state)
 	{	/* check for transition */
 		tms7000.irq_state[irqline] = state;
 
-		LOG(("tms7000: (cpu #%d) set_irq_line (INT%d, state %d)\n", cpu_getactivecpu(), irqline+1, state));
+		LOG(("tms7000: (cpu #%d) set_irq_line (INT%d, state %d)\n", cpunum_get_active(), irqline+1, state));
 
 		if (state == CLEAR_LINE)
 		{
@@ -446,7 +445,6 @@ static void tms7000_do_interrupt( UINT16 address, UINT8 line )
 	PUSHWORD( PC );			/* Push Program Counter */
 	pSR = 0;				/* Clear Status register */
 	pPC = RM16(address);	/* Load PC with interrupt vector */
-	CHANGE_PC;
 
 	if( tms7000.idle_state == 0 )
 		tms7000_icount -= 19;		/* 19 cycles used */
@@ -471,11 +469,11 @@ static CPU_EXECUTE( tms7000 )
 
 	do
 	{
-		debugger_instruction_hook(Machine, pPC);
+		debugger_instruction_hook(device, pPC);
 
 		if( tms7000.idle_state == 0 )
 		{
-			op = cpu_readop(pPC++);
+			op = memory_decrypted_read_byte(tms7000.program, pPC++);
 
 			opfn[op]();
 		}
@@ -510,12 +508,12 @@ static CPU_EXECUTE( tms7000_exl )
 
 	do
 	{
-		debugger_instruction_hook(Machine, pPC);
+		debugger_instruction_hook(device, pPC);
 
 		if( tms7000.idle_state == 0 )
 		{
 
-			op = cpu_readop(pPC++);
+			op = memory_decrypted_read_byte(tms7000.program, pPC++);
 
 			opfn_exl[op]();
 		}
@@ -562,14 +560,14 @@ static void tms7000_service_timer1( void )
         if( --tms7000.t1_decrementer < 0 ) /* Decrement timer1 register and check for underflow */
         {
             tms7000.t1_decrementer = tms7000.pf[2]; /* Reload decrementer (8 bit) */
-			cpunum_set_input_line(Machine, cpu_getactivecpu(), TMS7000_IRQ2_LINE, HOLD_LINE);
-            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick, tms7000_cycles_per_INT2-(activecpu_gettotalcycles() - tick) );
-			//tick = activecpu_gettotalcycles() );
+			cpu_set_input_line(Machine->activecpu, TMS7000_IRQ2_LINE, HOLD_LINE);
+            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", cpu_get_total_cycles(machine->activecpu), cpu_get_total_cycles(machine->activecpu) - tick, tms7000_cycles_per_INT2-(cpu_get_total_cycles(machine->activecpu) - tick) );
+			//tick = cpu_get_total_cycles(machine->activecpu) );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */
         }
     }
-//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", tms7000.t1_prescaler, tms7000.t1_decrementer, activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick2 ) );
-//  tick2 = activecpu_gettotalcycles();
+//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", tms7000.t1_prescaler, tms7000.t1_decrementer, cpu_get_total_cycles(machine->activecpu), cpu_get_total_cycles(machine->activecpu) - tick2 ) );
+//  tick2 = cpu_get_total_cycles(machine->activecpu);
 }
 
 static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
@@ -617,19 +615,19 @@ static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 			break;
 
 		case 0x06: /* Port B write */
-			io_write_byte_8be( TMS7000_PORTB, data );
+			memory_write_byte_8be( tms7000.io, TMS7000_PORTB, data );
 			tms7000.pf[ 0x06 ] = data;
 			break;
 
 		case 0x08: /* Port C write */
 			temp1 = data & tms7000.pf[ 0x09 ];	/* Mask off input bits */
-			io_write_byte_8be( TMS7000_PORTC, temp1 );
+			memory_write_byte_8be( tms7000.io, TMS7000_PORTC, temp1 );
 			tms7000.pf[ 0x08 ] = temp1;
 			break;
 
 		case 0x0a: /* Port D write */
 			temp1 = data & tms7000.pf[ 0x0b ];	/* Mask off input bits */
-			io_write_byte_8be( TMS7000_PORTD, temp1 );
+			memory_write_byte_8be( tms7000.io, TMS7000_PORTD, temp1 );
 			tms7000.pf[ 0x0a ] = temp1;
 			break;
 
@@ -664,7 +662,7 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 			break;
 
 		case 0x04: /* Port A read */
-			result = io_read_byte_8be( TMS7000_PORTA );
+			result = memory_read_byte_8be( tms7000.io, TMS7000_PORTA );
 			break;
 
 
@@ -675,14 +673,14 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 
 		case 0x08: /* Port C read */
 			temp1 = tms7000.pf[ 0x08 ] & tms7000.pf[ 0x09 ];	/* Get previous output bits */
-			temp2 = io_read_byte_8be( TMS7000_PORTC );			/* Read port */
+			temp2 = memory_read_byte_8be( tms7000.io, TMS7000_PORTC );			/* Read port */
 			temp3 = temp2 & (~tms7000.pf[ 0x09 ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;
 
 		case 0x0a: /* Port D read */
 			temp1 = tms7000.pf[ 0x0a ] & tms7000.pf[ 0x0b ];	/* Get previous output bits */
-			temp2 = io_read_byte_8be( TMS7000_PORTD );			/* Read port */
+			temp2 = memory_read_byte_8be( tms7000.io, TMS7000_PORTD );			/* Read port */
 			temp3 = temp2 & (~tms7000.pf[ 0x0b ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;

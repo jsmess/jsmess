@@ -33,7 +33,7 @@ WRITE8_HANDLER( xxmissio_paletteram_w );
 
 static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {
-	memory_set_bank(1, data & 7);
+	memory_set_bank(space->machine, 1, data & 7);
 }
 
 static CUSTOM_INPUT( xxmissio_status_r )
@@ -52,7 +52,7 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 
 		case 0x40:
 			xxmissio_status &= ~0x08;
-			cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0x10);
+			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0x10);
 			break;
 
 		case 0x80:
@@ -75,7 +75,7 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 
 		case 0x80:
 			xxmissio_status &= ~0x04;
-			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x10);
+			cpu_set_input_line_and_vector(space->machine->cpu[0],0,HOLD_LINE,0x10);
 			break;
 	}
 }
@@ -83,19 +83,19 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
 	xxmissio_status &= ~0x20;
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
 	xxmissio_status &= ~0x10;
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_START( xxmissio )
 {
-	memory_configure_bank(1, 0, 8, memory_region(machine, "user1"), 0x4000);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "user1"), 0x4000);
+	memory_set_bank(machine, 1, 0);
 }
 
 /****************************************************************************/

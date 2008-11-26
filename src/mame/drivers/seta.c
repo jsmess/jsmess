@@ -1322,17 +1322,17 @@ static struct st_chip {
 /*------------------------------
     uppdate timer
 ------------------------------*/
-static void uPD71054_update_timer( int no )
+static void uPD71054_update_timer( running_machine *machine, int no )
 {
 	UINT16 max = uPD71054.max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(0)), 16 * max);
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[0])), 16 * max);
 		timer_adjust_oneshot( uPD71054.timer[no], period, no );
 	} else {
 		timer_adjust_oneshot( uPD71054.timer[no], attotime_never, no);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				activecpu_get_pc(), no );
+				cpu_get_pc(machine->activecpu), no );
 	}
 }
 
@@ -1343,8 +1343,8 @@ static void uPD71054_update_timer( int no )
 ------------------------------*/
 static TIMER_CALLBACK( uPD71054_timer_callback )
 {
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE );
-	uPD71054_update_timer( param );
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE );
+	uPD71054_update_timer( machine, param );
 }
 
 
@@ -1390,7 +1390,7 @@ static WRITE16_HANDLER( timer_regs_w )
 			uPD71054.max[offset] = (uPD71054.max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054.max[offset] != 0 ) {
-			uPD71054_update_timer( offset );
+			uPD71054_update_timer( space->machine, offset );
 		}
 		break;
 	  case 0x0003:
@@ -1426,7 +1426,7 @@ static const x1_010_interface seta_sound_intf2 =
 
 static void utoukond_ym3438_interrupt(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, linestate);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, linestate);
 }
 
 static const ym3438_interface utoukond_ym3438_intf =
@@ -1457,7 +1457,7 @@ static READ16_HANDLER( mirror_ram_r )
 static WRITE16_HANDLER( mirror_ram_w )
 {
 	COMBINE_DATA(&mirror_ram[offset]);
-//  logerror("PC %06X - Mirror RAM Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
+//  logerror("PC %06X - Mirror RAM Written: %04X <- %04X\n", cpu_get_pc(space->cpu), offset*2, data);
 }
 
 
@@ -1499,7 +1499,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				if ( !(old_data&1) && (data&1) )
-					cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+					cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 				old_data = data;
 			}
 			break;
@@ -1508,11 +1508,11 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			break;
 
 		case 4/2:	// not sure
-			if (ACCESSING_BITS_0_7)	soundlatch_w(machine, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	soundlatch_w(space, 0, data & 0xff);
 			break;
 
 		case 6/2:	// not sure
-			if (ACCESSING_BITS_0_7)	soundlatch2_w(machine, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	soundlatch2_w(space, 0, data & 0xff);
 			break;
 	}
 
@@ -1522,7 +1522,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 /* DSW reading for 16 bit CPUs */
 static READ16_HANDLER( seta_dsw_r )
 {
-	UINT16 dsw = input_port_read(machine, "DSW");
+	UINT16 dsw = input_port_read(space->machine, "DSW");
 	if (offset == 0)	return (dsw >> 8) & 0xff;
 	else				return (dsw >> 0) & 0xff;
 }
@@ -1532,12 +1532,12 @@ static READ16_HANDLER( seta_dsw_r )
 
 static READ8_HANDLER( dsw1_r )
 {
-	return (input_port_read(machine, "DSW") >> 8) & 0xff;
+	return (input_port_read(space->machine, "DSW") >> 8) & 0xff;
 }
 
 static READ8_HANDLER( dsw2_r )
 {
-	return (input_port_read(machine, "DSW") >> 0) & 0xff;
+	return (input_port_read(space->machine, "DSW") >> 0) & 0xff;
 }
 
 
@@ -1656,15 +1656,15 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER ( calibr50_ip_r )
 {
-	int dir1 = input_port_read(machine, "ROT1") & 0xfff;	// analog port
-	int dir2 = input_port_read(machine, "ROT2") & 0xfff;	// analog port
+	int dir1 = input_port_read(space->machine, "ROT1") & 0xfff;	// analog port
+	int dir2 = input_port_read(space->machine, "ROT2") & 0xfff;	// analog port
 
 	switch (offset)
 	{
-		case 0x00/2:	return input_port_read(machine, "P1");	// p1
-		case 0x02/2:	return input_port_read(machine, "P2");	// p2
+		case 0x00/2:	return input_port_read(space->machine, "P1");	// p1
+		case 0x02/2:	return input_port_read(space->machine, "P2");	// p2
 
-		case 0x08/2:	return input_port_read(machine, "COINS");	// Coins
+		case 0x08/2:	return input_port_read(space->machine, "COINS");	// Coins
 
 		case 0x10/2:	return (dir1&0xff);			// lower 8 bits of p1 rotation
 		case 0x12/2:	return (dir1>>8);			// upper 4 bits of p1 rotation
@@ -1672,7 +1672,7 @@ static READ16_HANDLER ( calibr50_ip_r )
 		case 0x16/2:	return (dir2>>8);			// upper 4 bits of p2 rotation
 		case 0x18/2:	return 0xffff;				// ? (value's read but not used)
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
 			return 0;
 	}
 }
@@ -1681,9 +1681,9 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_word_w(machine,0,data,mem_mask);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
+		soundlatch_word_w(space,0,data,mem_mask);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 	}
 }
 
@@ -1731,10 +1731,10 @@ static READ16_HANDLER( usclssic_dsw_r )
 {
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read(machine, "DSW") >>  8) & 0xf;
-		case 2/2:	return (input_port_read(machine, "DSW") >> 12) & 0xf;
-		case 4/2:	return (input_port_read(machine, "DSW") >>  0) & 0xf;
-		case 6/2:	return (input_port_read(machine, "DSW") >>  4) & 0xf;
+		case 0/2:	return (input_port_read(space->machine, "DSW") >>  8) & 0xf;
+		case 2/2:	return (input_port_read(space->machine, "DSW") >> 12) & 0xf;
+		case 4/2:	return (input_port_read(space->machine, "DSW") >>  0) & 0xf;
+		case 6/2:	return (input_port_read(space->machine, "DSW") >>  4) & 0xf;
 	}
 	return 0;
 }
@@ -1744,8 +1744,8 @@ static READ16_HANDLER( usclssic_trackball_x_r )
 	static const char *const portx_name[2] = { "P1X", "P2X" };
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read(machine, portx_name[port_select]) >> 0) & 0xff;
-		case 2/2:	return (input_port_read(machine, portx_name[port_select]) >> 8) & 0xff;
+		case 0/2:	return (input_port_read(space->machine, portx_name[port_select]) >> 0) & 0xff;
+		case 2/2:	return (input_port_read(space->machine, portx_name[port_select]) >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -1755,8 +1755,8 @@ static READ16_HANDLER( usclssic_trackball_y_r )
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read(machine, porty_name[port_select]) >> 0) & 0xff;
-		case 2/2:	return (input_port_read(machine, porty_name[port_select]) >> 8) & 0xff;
+		case 0/2:	return (input_port_read(space->machine, porty_name[port_select]) >> 0) & 0xff;
+		case 2/2:	return (input_port_read(space->machine, porty_name[port_select]) >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -1774,7 +1774,7 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 		if (old_tiles_offset != seta_tiles_offset)	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		old_tiles_offset = seta_tiles_offset;
 
-		seta_coin_lockout_w(machine, data);
+		seta_coin_lockout_w(space->machine, data);
 	}
 }
 
@@ -1968,7 +1968,7 @@ static READ16_HANDLER( zombraid_gun_r ) // Serial interface
 {
 	static const char *const portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
-	int data = input_port_read(machine, portnames[gun_input_src]);	// Input Ports 5-8
+	int data = input_port_read(space->machine, portnames[gun_input_src]);	// Input Ports 5-8
 	return (data >> gun_input_bit) & 1;
 }
 
@@ -2379,10 +2379,10 @@ ADDRESS_MAP_END
 static READ16_HANDLER( krzybowl_input_r )
 {
 	// analog ports
-	int dir1x = input_port_read(machine, "TRACK1_X") & 0xfff;
-	int dir1y = input_port_read(machine, "TRACK1_Y") & 0xfff;
-	int dir2x = input_port_read(machine, "TRACK2_X") & 0xfff;
-	int dir2y = input_port_read(machine, "TRACK2_Y") & 0xfff;
+	int dir1x = input_port_read(space->machine, "TRACK1_X") & 0xfff;
+	int dir1y = input_port_read(space->machine, "TRACK1_Y") & 0xfff;
+	int dir2x = input_port_read(space->machine, "TRACK2_X") & 0xfff;
+	int dir2y = input_port_read(space->machine, "TRACK2_Y") & 0xfff;
 
 	switch (offset)
 	{
@@ -2395,7 +2395,7 @@ static READ16_HANDLER( krzybowl_input_r )
 		case 0xc/2:	return dir2y & 0xff;
 		case 0xe/2:	return dir2y >> 8;
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
 			return 0;
 	}
 }
@@ -2445,7 +2445,7 @@ static WRITE16_HANDLER( msgundam_vregs_w )
 		case 1:	offset = 2;	break;
 		case 2:	offset = 1;	break;
 	}
-	seta_vregs_w(machine,offset,data,mem_mask);
+	seta_vregs_w(space,offset,data,mem_mask);
 }
 
 /* Mirror RAM is necessary or startup, to clear Work RAM after the test */
@@ -2602,7 +2602,7 @@ static WRITE16_HANDLER( kiwame_nvram_w )
 
 static READ16_HANDLER( kiwame_input_r )
 {
-	int row_select = kiwame_nvram_r( machine,0x10a/2,0x00ff ) & 0x1f;
+	int row_select = kiwame_nvram_r( space, 0x10a/2,0x00ff ) & 0x1f;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
@@ -2611,14 +2611,14 @@ static READ16_HANDLER( kiwame_input_r )
 
 	switch( offset )
 	{
-		case 0x00/2:	return input_port_read(machine, keynames[i]);
+		case 0x00/2:	return input_port_read(space->machine, keynames[i]);
 		case 0x02/2:	return 0xffff;
-		case 0x04/2:	return input_port_read(machine, "COINS");
+		case 0x04/2:	return input_port_read(space->machine, "COINS");
 //      case 0x06/2:
 		case 0x08/2:	return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
 			return 0x0000;
 	}
 }
@@ -2654,12 +2654,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( thunderl_protection_r )
 {
-//  logerror("PC %06X - Protection Read\n", activecpu_get_pc());
+//  logerror("PC %06X - Protection Read\n", cpu_get_pc(space->cpu));
 	return 0x00dd;
 }
 static WRITE16_HANDLER( thunderl_protection_w )
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
+//  logerror("PC %06X - Protection Written: %04X <- %04X\n", cpu_get_pc(space->cpu), offset*2, data);
 }
 
 /* Similar to downtown etc. */
@@ -2711,7 +2711,7 @@ static READ8_HANDLER( wiggie_soundlatch_r )
 static WRITE16_HANDLER( wiggie_soundlatch_w )
 {
 	wiggie_soundlatch = data >> 8;
-	cpunum_set_input_line(machine, 1,0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1],0, HOLD_LINE);
 }
 
 
@@ -2769,8 +2769,8 @@ static WRITE16_HANDLER( utoukond_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
-		soundlatch_w(machine,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data & 0xff);
 	}
 }
 
@@ -2815,16 +2815,16 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sub_bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, "sub");
+	UINT8 *rom = memory_region(space->machine, "sub");
 	int bank = data >> 4;
 
-	memory_set_bankptr(1, &rom[bank * 0x4000 + 0xc000]);
+	memory_set_bankptr(space->machine, 1, &rom[bank * 0x4000 + 0xc000]);
 }
 
 static WRITE8_HANDLER( sub_bankswitch_lockout_w )
 {
-	sub_bankswitch_w(machine,offset,data);
-	seta_coin_lockout_w(machine, data);
+	sub_bankswitch_w(space,offset,data);
+	seta_coin_lockout_w(space->machine, data);
 }
 
 
@@ -2892,21 +2892,21 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( downtown_ip_r )
 {
-	int dir1 = input_port_read(machine, "ROT1");	// analog port
-	int dir2 = input_port_read(machine, "ROT2");	// analog port
+	int dir1 = input_port_read(space->machine, "ROT1");	// analog port
+	int dir2 = input_port_read(space->machine, "ROT2");	// analog port
 
 	dir1 = (~ (0x800 >> ((dir1 * 12)/0x100)) ) & 0xfff;
 	dir2 = (~ (0x800 >> ((dir2 * 12)/0x100)) ) & 0xfff;
 
 	switch (offset)
 	{
-		case 0:	return (input_port_read(machine, "COINS") & 0xf0) + (dir1 >> 8);	// upper 4 bits of p1 rotation + coins
+		case 0:	return (input_port_read(space->machine, "COINS") & 0xf0) + (dir1 >> 8);	// upper 4 bits of p1 rotation + coins
 		case 1:	return (dir1 & 0xff);					// lower 8 bits of p1 rotation
-		case 2:	return input_port_read(machine, "P1");	// p1
+		case 2:	return input_port_read(space->machine, "P1");	// p1
 		case 3:	return 0xff;							// ?
 		case 4:	return (dir2 >> 8);						// upper 4 bits of p2 rotation + ?
 		case 5:	return (dir2 & 0xff);					// lower 8 bits of p2 rotation
-		case 6:	return input_port_read(machine, "P2");	// p2
+		case 6:	return input_port_read(space->machine, "P2");	// p2
 		case 7:	return 0xff;							// ?
 	}
 
@@ -2937,13 +2937,14 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(calibr50)
 {
-	sub_bankswitch_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	sub_bankswitch_w(space, 0, 0);
 }
 
 static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
-	soundlatch2_w(machine,0,data);
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
+	soundlatch2_w(space,0,data);
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3021,14 +3022,14 @@ static READ16_HANDLER( pairlove_prot_r )
 {
 	int retdata;
 	retdata = pairslove_protram[offset];
-	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",activecpu_get_pc(), offset,retdata);
+	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",cpu_get_pc(space->cpu), offset,retdata);
 	pairslove_protram[offset]=pairslove_protram_old[offset];
 	return retdata;
 }
 
 static WRITE16_HANDLER( pairlove_prot_w )
 {
-//  mame_printf_debug("pairs love protection? write %06x %04x %04x\n",activecpu_get_pc(), offset,data);
+//  mame_printf_debug("pairs love protection? write %06x %04x %04x\n",cpu_get_pc(space->cpu), offset,data);
 	pairslove_protram_old[offset]=pairslove_protram[offset];
 	pairslove_protram[offset]=data;
 }
@@ -3071,8 +3072,8 @@ ADDRESS_MAP_END
                             Crazy Fight
 ***************************************************************************/
 
-static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_BITS_0_7)	ym3812_control_port_0_w(machine, 0, data & 0xff);	}
-static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_BITS_0_7)	ym3812_write_port_0_w(machine, 0, data & 0xff);		}
+static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_BITS_0_7)	ym3812_control_port_0_w(space, 0, data & 0xff);	}
+static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_BITS_0_7)	ym3812_write_port_0_w(space, 0, data & 0xff);		}
 
 static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -3104,9 +3105,9 @@ ADDRESS_MAP_END
 static READ16_HANDLER( inttoote_dsw_r )
 {
 	int shift = offset * 4;
-	return	((((input_port_read(machine, "DSW1") >> shift)       & 0xf)) << 0) |
-			((((input_port_read(machine, "DSW2_3") >> shift)     & 0xf)) << 4) |
-			((((input_port_read(machine, "DSW2_3") >> (shift+8)) & 0xf)) << 8) ;
+	return	((((input_port_read(space->machine, "DSW1") >> shift)       & 0xf)) << 0) |
+			((((input_port_read(space->machine, "DSW2_3") >> shift)     & 0xf)) << 4) |
+			((((input_port_read(space->machine, "DSW2_3") >> (shift+8)) & 0xf)) << 8) ;
 }
 
 static UINT16 *inttoote_key_select;
@@ -3114,13 +3115,13 @@ static READ16_HANDLER( inttoote_key_r )
 {
 	switch( *inttoote_key_select )
 	{
-		case 0x08:	return input_port_read(machine, "BET0");
-		case 0x10:	return input_port_read(machine, "BET1");
-		case 0x20:	return input_port_read(machine, "BET2");
-		case 0x40:	return input_port_read(machine, "BET3");
-		case 0x80:	return input_port_read(machine, "BET4");
+		case 0x08:	return input_port_read(space->machine, "BET0");
+		case 0x10:	return input_port_read(space->machine, "BET1");
+		case 0x20:	return input_port_read(space->machine, "BET2");
+		case 0x40:	return input_port_read(space->machine, "BET3");
+		case 0x80:	return input_port_read(space->machine, "BET4");
 	}
-	logerror("%06X: unknown read, select = %04x\n",activecpu_get_pc(),*inttoote_key_select);
+	logerror("%06X: unknown read, select = %04x\n",cpu_get_pc(space->cpu),*inttoote_key_select);
 	return 0xffff;
 }
 
@@ -6651,19 +6652,19 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( seta_interrupt_1_and_2 )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
+		case 0:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
 	}
 }
 
 static INTERRUPT_GEN( seta_interrupt_2_and_4 )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
+		case 0:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 1:		cpu_set_input_line(device, 4, HOLD_LINE);	break;
 	}
 }
 
@@ -6672,10 +6673,10 @@ static INTERRUPT_GEN( seta_interrupt_2_and_4 )
 
 static INTERRUPT_GEN( seta_sub_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);				break;
+		case 0:		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	break;
+		case 1:		cpu_set_input_line(device, 0, HOLD_LINE);				break;
 	}
 }
 
@@ -6701,10 +6702,10 @@ static const ym2203_interface tndrcade_ym2203_interface =
 #define TNDRCADE_SUB_INTERRUPTS_NUM	32	/* 16 IRQ, 1 NMI */
 static INTERRUPT_GEN( tndrcade_sub_interrupt )
 {
-	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
-	else if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	if (cpu_getiloops(device) & 1)
+		cpu_set_input_line(device, 0, HOLD_LINE);
+	else if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( tndrcade )
@@ -6848,13 +6849,13 @@ MACHINE_DRIVER_END
 #define calibr50_INTERRUPTS_NUM (4+1)
 static INTERRUPT_GEN( calibr50_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 		case 1:
 		case 2:
-		case 3:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
-		case 4:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
+		case 3:		cpu_set_input_line(device, 4, HOLD_LINE);	break;
+		case 4:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -7327,7 +7328,7 @@ MACHINE_DRIVER_END
 #if __uPD71054_TIMER
 static INTERRUPT_GEN( wrofaero_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 2, HOLD_LINE );
+	cpu_set_input_line(device, 2, HOLD_LINE );
 }
 
 static MACHINE_RESET( wrofaero ) { uPD71054_timer_init(); }
@@ -8072,10 +8073,10 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( crazyfgt_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
-		default:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;	// should this be triggered by the 3812?
+		case 0:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		default:	cpu_set_input_line(device, 2, HOLD_LINE);	break;	// should this be triggered by the 3812?
 	}
 }
 
@@ -8119,7 +8120,7 @@ MACHINE_DRIVER_END
 // Test mode shows a 16ms and 2ms counters
 static INTERRUPT_GEN( inttoote_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 		case 1:
@@ -8128,13 +8129,13 @@ static INTERRUPT_GEN( inttoote_interrupt )
 		case 4:
 		case 5:
 		case 6:
-		case 7:		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);	break;
+		case 7:		cpu_set_input_line(device, 6, HOLD_LINE);	break;
 
-		case 8:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
+		case 8:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
 
-		case 9:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		case 9:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
 
-		case 10:	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
+		case 10:	cpu_set_input_line(device, 4, HOLD_LINE);	break;
 	}
 }
 
@@ -9293,12 +9294,12 @@ static READ16_HANDLER( twineagl_debug_r )
 static UINT8 xram[8];
 static READ16_HANDLER( twineagl_200100_r )
 {
-logerror("%04x: twineagl_200100_r %d\n",activecpu_get_pc(),offset);
+logerror("%04x: twineagl_200100_r %d\n",cpu_get_pc(space->cpu),offset);
 	return xram[offset];
 }
 static WRITE16_HANDLER( twineagl_200100_w )
 {
-logerror("%04x: twineagl_200100_w %d = %02x\n",activecpu_get_pc(),offset,data);
+logerror("%04x: twineagl_200100_w %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	if (ACCESSING_BITS_0_7)
 		xram[offset] = data & 0xff;
 }
@@ -9306,10 +9307,10 @@ logerror("%04x: twineagl_200100_w %d = %02x\n",activecpu_get_pc(),offset,data);
 static DRIVER_INIT( twineagl )
 {
 	/* debug? */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
 }
 
 
@@ -9339,7 +9340,7 @@ static WRITE16_HANDLER( downtown_protection_w )
 
 static DRIVER_INIT( downtown )
 {
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
 }
 
 
@@ -9359,7 +9360,7 @@ static READ16_HANDLER( arbalest_debug_r )
 
 static DRIVER_INIT( arbalest )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
 }
 
 
@@ -9368,7 +9369,7 @@ static DRIVER_INIT( metafox )
 	UINT16 *RAM = (UINT16 *) memory_region(machine, "main");
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x21c000, 0x21ffff, 0, 0, SMH_NOP, SMH_NOP);
+//  memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0, SMH_NOP, SMH_NOP);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -9412,14 +9413,14 @@ static DRIVER_INIT ( blandia )
 
 static DRIVER_INIT( eightfrc )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500004, 0x500005, 0, 0, SMH_NOP);	// watchdog??
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0, SMH_NOP);	// watchdog??
 }
 
 
 static DRIVER_INIT( zombraid )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
 }
 
 
@@ -9437,7 +9438,7 @@ static DRIVER_INIT( kiwame )
 
 static DRIVER_INIT( rezon )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500006, 0x500007, 0, 0, SMH_NOP);	// irq ack?
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0, SMH_NOP);	// irq ack?
 }
 
 static DRIVER_INIT(wiggie)
@@ -9469,9 +9470,9 @@ static DRIVER_INIT(wiggie)
 	}
 
 	/* X1_010 is not used. */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x103fff, 0, 0, SMH_NOP, SMH_NOP);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0, SMH_NOP, SMH_NOP);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
 
 }
 

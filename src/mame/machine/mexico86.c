@@ -22,11 +22,11 @@ bit 0 = ? (unused?)
 */
 WRITE8_HANDLER( mexico86_f008_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
- 	if (machine->config->cpu[2].type != CPU_DUMMY)
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+ 	if (space->machine->config->cpu[2].type != CPU_DUMMY)
 	{
 		// mexico 86, knight boy
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -155,10 +155,10 @@ logerror("initialising MCU\n");
 INTERRUPT_GEN( kikikai_interrupt )
 {
 	if (kikikai_mcu_running)
-		mcu_simulate(machine);
+		mcu_simulate(device->machine);
 
-	cpunum_set_input_line_vector(0,0,mexico86_protection_ram[0]);
-	cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	cpu_set_input_line_vector(device,0,mexico86_protection_ram[0]);
+	cpu_set_input_line(device,0,HOLD_LINE);
 }
 
 
@@ -224,10 +224,10 @@ static void kiki_clogic(int address, int latch)
 INTERRUPT_GEN( mexico86_m68705_interrupt )
 {
 	/* I don't know how to handle the interrupt line so I just toggle it every time. */
-	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+	if (cpu_getiloops(device) & 1)
+		cpu_set_input_line(device,0,CLEAR_LINE);
 	else
-		cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
+		cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
 
@@ -236,13 +236,13 @@ static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( mexico86_68705_portA_r )
 {
-//logerror("%04x: 68705 port A read %02x\n",activecpu_get_pc(),portA_in);
+//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(space->cpu),portA_in);
 	return (portA_out & ddrA) | (portA_in & ~ddrA);
 }
 
 WRITE8_HANDLER( mexico86_68705_portA_w )
 {
-//logerror("%04x: 68705 port A write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(space->cpu),data);
 	portA_out = data;
 }
 
@@ -280,7 +280,7 @@ static int address,latch;
 
 WRITE8_HANDLER( mexico86_68705_portB_w )
 {
-//logerror("%04x: 68705 port B write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data);
 
 	if ((ddrB & 0x01) && (~data & 0x01) && (portB_out & 0x01))
 	{
@@ -289,7 +289,7 @@ WRITE8_HANDLER( mexico86_68705_portB_w )
 	if ((ddrB & 0x02) && (data & 0x02) && (~portB_out & 0x02)) /* positive edge trigger */
 	{
 		address = portA_out;
-//if (address >= 0x80) logerror("%04x: 68705 address %02x\n",activecpu_get_pc(),portA_out);
+//if (address >= 0x80) logerror("%04x: 68705 address %02x\n",cpu_get_pc(space->cpu),portA_out);
 	}
 	if ((ddrB & 0x08) && (~data & 0x08) && (portB_out & 0x08))
 	{
@@ -297,34 +297,34 @@ WRITE8_HANDLER( mexico86_68705_portB_w )
 		{
 			if (data & 0x04)
 			{
-//logerror("%04x: 68705 read %02x from address %04x\n",activecpu_get_pc(),shared[0x800+address],address);
+//logerror("%04x: 68705 read %02x from address %04x\n",cpu_get_pc(space->cpu),shared[0x800+address],address);
 				latch = mexico86_protection_ram[address];
 			}
 			else
 			{
-//logerror("%04x: 68705 read input port %04x\n",activecpu_get_pc(),address);
-				latch = input_port_read(machine, (address & 1) ? "IN2" : "IN1");
+//logerror("%04x: 68705 read input port %04x\n",cpu_get_pc(space->cpu),address);
+				latch = input_port_read(space->machine, (address & 1) ? "IN2" : "IN1");
 			}
 		}
 		else    /* write */
 		{
-//logerror("%04x: 68705 write %02x to address %04x\n",activecpu_get_pc(),portA_out,address);
+//logerror("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu),portA_out,address);
 				mexico86_protection_ram[address] = portA_out;
 		}
 	}
 	if ((ddrB & 0x20) && (data & 0x20) && (~portB_out & 0x20))
 	{
-		cpunum_set_input_line_vector(0,0,mexico86_protection_ram[0]);
-		//cpunum_set_input_line(machine, 0,0,PULSE_LINE);
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
+		cpu_set_input_line_vector(space->machine->cpu[0],0,mexico86_protection_ram[0]);
+		//cpu_set_input_line(space->machine->cpu[0],0,PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{
-logerror("%04x: 68705 unknown port B bit %02x\n",activecpu_get_pc(),data);
+logerror("%04x: 68705 unknown port B bit %02x\n",cpu_get_pc(space->cpu),data);
 	}
 	if ((ddrB & 0x80) && (~data & 0x80) && (portB_out & 0x80))
 	{
-logerror("%04x: 68705 unknown port B bit %02x\n",activecpu_get_pc(),data);
+logerror("%04x: 68705 unknown port B bit %02x\n",cpu_get_pc(space->cpu),data);
 	}
 
 	portB_out = data;

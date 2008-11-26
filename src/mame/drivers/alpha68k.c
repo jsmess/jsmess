@@ -246,7 +246,7 @@ static WRITE16_HANDLER( tnexspce_coin_counters_w )
 
 static WRITE16_HANDLER( tnexspce_unknown_w )
 {
-	logerror("tnexspce_unknown_w : PC = %04x - offset = %04x - data = %04x\n",activecpu_get_pc(),offset,data);
+	logerror("tnexspce_unknown_w : PC = %04x - offset = %04x - data = %04x\n",cpu_get_pc(space->cpu),offset,data);
 	if (offset==0)
 	{
 		alpha68k_flipscreen_w(data & 0x100);
@@ -255,7 +255,7 @@ static WRITE16_HANDLER( tnexspce_unknown_w )
 
 static WRITE16_HANDLER( alpha_microcontroller_w )
 {
-	logerror("%04x:  Alpha write trigger at %04x (%04x)\n",activecpu_get_pc(),offset,data);
+	logerror("%04x:  Alpha write trigger at %04x (%04x)\n",cpu_get_pc(space->cpu),offset,data);
 	/* 0x44 = coin clear signal to microcontroller? */
 	if (offset==0x2d && ACCESSING_BITS_0_7)
 		alpha68k_flipscreen_w(data & 1);
@@ -265,57 +265,57 @@ static WRITE16_HANDLER( alpha_microcontroller_w )
 
 static READ16_HANDLER( kyros_dip_r )
 {
-	return input_port_read(machine, "IN1")<<8;
+	return input_port_read(space->machine, "IN1")<<8;
 }
 
 static READ16_HANDLER( control_1_r )
 {
 	if (invert_controls)
-		return ~(input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
+		return ~(input_port_read(space->machine, "IN0") + (input_port_read(space->machine, "IN1") << 8));
 
-	return (input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
+	return (input_port_read(space->machine, "IN0") + (input_port_read(space->machine, "IN1") << 8));
 }
 
 static READ16_HANDLER( control_2_r )
 {
 	if (invert_controls)
-		return ~(input_port_read(machine, "IN3") + ((~(1 << (input_port_read(machine, "IN5") * 12 / 256))) << 8));
+		return ~(input_port_read(space->machine, "IN3") + ((~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))) << 8));
 
-	return input_port_read(machine, "IN3") + /* Low byte of CN1 */
-		((~(1 << (input_port_read(machine, "IN5") * 12 / 256))) << 8);
+	return input_port_read(space->machine, "IN3") + /* Low byte of CN1 */
+		((~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))) << 8);
 }
 
 static READ16_HANDLER( control_2_V_r )
 {
-	return input_port_read(machine, "IN3");
+	return input_port_read(space->machine, "IN3");
 }
 
 static READ16_HANDLER( control_3_r )
 {
 	if (invert_controls)
-		return ~((( ~(1 << (input_port_read(machine, "IN6") * 12 / 256)) )<<8) & 0xff00);
+		return ~((( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256)) )<<8) & 0xff00);
 
-	return (( ~(1 << (input_port_read(machine, "IN6") * 12 / 256)) )<<8) & 0xff00;
+	return (( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256)) )<<8) & 0xff00;
 }
 
 /* High 4 bits of CN1 & CN2 */
 static READ16_HANDLER( control_4_r )
 {
 	if (invert_controls)
-		return ~(((( ~(1 << (input_port_read(machine, "IN6") * 12 / 256))  ) <<4) & 0xf000)
-		 + ((( ~(1 << (input_port_read(machine, "IN5") * 12 / 256))  )    ) & 0x0f00));
+		return ~(((( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256))  ) <<4) & 0xf000)
+		 + ((( ~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))  )    ) & 0x0f00));
 
-	return ((( ~(1 << (input_port_read(machine, "IN6") * 12 / 256))  ) <<4) & 0xf000)
-		 + ((( ~(1 << (input_port_read(machine, "IN5") * 12 / 256))  )    ) & 0x0f00);
+	return ((( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256))  ) <<4) & 0xf000)
+		 + ((( ~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))  )    ) & 0x0f00);
 }
 
 static READ16_HANDLER( jongbou_inputs_r )
 {
-	UINT8 inp1 = input_port_read(machine, "IN3");
-	UINT8 inp2 = input_port_read(machine, "IN4");
+	UINT8 inp1 = input_port_read(space->machine, "IN3");
+	UINT8 inp2 = input_port_read(space->machine, "IN4");
 	inp1 = ((inp1 & 0x01) << 3) + ((inp1 & 0x02) << 1) + ((inp1 & 0x04) >> 1) + ((inp1 & 0x08) >> 3);
 	inp2 = ((inp2 & 0x01) << 3) + ((inp2 & 0x02) << 1) + ((inp2 & 0x04) >> 1) + ((inp2 & 0x08) >> 3);
-	return input_port_read(machine, "IN0") | inp1 | inp2 << 4;
+	return input_port_read(space->machine, "IN0") | inp1 | inp2 << 4;
 }
 
 /******************************************************************************/
@@ -323,20 +323,20 @@ static READ16_HANDLER( jongbou_inputs_r )
 static WRITE16_HANDLER( kyros_sound_w )
 {
 	if(ACCESSING_BITS_8_15)
-		soundlatch_w(machine, 0, (data>>8) & 0xff);
+		soundlatch_w(space, 0, (data>>8) & 0xff);
 }
 
 static WRITE16_HANDLER( alpha68k_II_sound_w )
 {
 	if(ACCESSING_BITS_0_7)
-		soundlatch_w(machine, 0, data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 }
 
 static WRITE16_HANDLER( alpha68k_V_sound_w )
 {
 	/* Sound & fix bank select are in the same word */
 	if(ACCESSING_BITS_0_7)
-		soundlatch_w(machine, 0, data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 	if(ACCESSING_BITS_8_15)
 		alpha68k_V_video_bank_w((data>>8) & 0xff);
 }
@@ -345,8 +345,8 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		soundlatch_w(space, 0, data);
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -354,8 +354,8 @@ static WRITE16_HANDLER( tnexspce_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, 0, data);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 //ZT
@@ -381,14 +381,14 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			return 0;
 		case 0x29: /* Query microcontroller for coin insert */
 			trigstate++;
-			if ((input_port_read(machine, "IN2") & 0x3) == 3) latch = 0;
-			if ((input_port_read(machine, "IN2") & 0x1) == 0 && !latch)
+			if ((input_port_read(space->machine, "IN2") & 0x3) == 3) latch = 0;
+			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !latch)
 			{
 				shared_ram[0x29] = (source & 0xff00) | (coin_id & 0xff);	// coinA
 				shared_ram[0x22] = (source & 0xff00) | 0x0;
 				latch = 1;
 
-				coinvalue = (~input_port_read(machine, "IN1")>>1) & 7;
+				coinvalue = (~input_port_read(space->machine, "IN1")>>1) & 7;
 				deposits1++;
 				if (deposits1 == coinage1[coinvalue][0])
 				{
@@ -398,13 +398,13 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 				else
 					credits = 0;
 			}
-			else if ((input_port_read(machine, "IN2") & 0x2) == 0 && !latch)
+			else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !latch)
 			{
 				shared_ram[0x29] = (source & 0xff00) | (coin_id>>8);	// coinB
 				shared_ram[0x22] = (source & 0xff00) | 0x0;
 				latch = 1;
 
-				coinvalue = (~input_port_read(machine, "IN1")>>1) & 7;
+				coinvalue = (~input_port_read(space->machine, "IN1")>>1) & 7;
 				deposits2++;
 				if (deposits2 == coinage2[coinvalue][0])
 				{
@@ -418,7 +418,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			{
 				if (microcontroller_id == 0x00ff)		/* Super Stingry */
 				{
-					if (trigstate >= 12 || !strcmp(machine->gamedrv->name, "jongbou"))	/* arbitrary value ! */
+					if (trigstate >= 12 || !strcmp(space->machine->gamedrv->name, "jongbou"))	/* arbitrary value ! */
 					{
 						trigstate = 0;
 						microcontroller_data = 0x21;			// timer
@@ -437,7 +437,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n",activecpu_get_pc(),offset);
+	logerror("%04x:  Alpha read trigger at %04x\n",cpu_get_pc(space->cpu),offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -460,7 +460,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			shared_ram[0] = (source & 0xff00) | input_port_read(machine, "IN4");
+			shared_ram[0] = (source & 0xff00) | input_port_read(space->machine, "IN4");
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -468,8 +468,8 @@ static READ16_HANDLER( alpha_II_trigger_r )
 			return 0;
 
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(machine, "IN2") & 0x3) == 3) latch = 0;
-			if ((input_port_read(machine, "IN2") & 0x1) == 0 && !latch)
+			if ((input_port_read(space->machine, "IN2") & 0x3) == 3) latch = 0;
+			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !latch)
 			{
 				shared_ram[0x29] = (source & 0xff00) | (coin_id & 0xff);	// coinA
 				shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -477,10 +477,10 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					if(!strcmp(machine->gamedrv->name, "btlfildb"))
-						coinvalue = (input_port_read(machine, "IN4")>>0) & 7;
+					if(!strcmp(space->machine->gamedrv->name, "btlfildb"))
+						coinvalue = (input_port_read(space->machine, "IN4")>>0) & 7;
 					else
-						coinvalue = (~input_port_read(machine, "IN4")>>0) & 7;
+						coinvalue = (~input_port_read(space->machine, "IN4")>>0) & 7;
 
 					deposits1++;
 					if (deposits1 == coinage1[coinvalue][0])
@@ -492,7 +492,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 						credits = 0;
 				}
 			}
-			else if ((input_port_read(machine, "IN2") & 0x2) == 0 && !latch)
+			else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !latch)
 			{
 				shared_ram[0x29] = (source & 0xff00) | (coin_id>>8);	// coinB
 				shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -500,10 +500,10 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					if(!strcmp(machine->gamedrv->name, "btlfildb"))
-						coinvalue = (input_port_read(machine, "IN4")>>0) & 7;
+					if(!strcmp(space->machine->gamedrv->name, "btlfildb"))
+						coinvalue = (input_port_read(space->machine, "IN4")>>0) & 7;
 					else
-						coinvalue = (~input_port_read(machine, "IN4")>>0) & 7;
+						coinvalue = (~input_port_read(space->machine, "IN4")>>0) & 7;
 
 					deposits2++;
 					if (deposits2 == coinage2[coinvalue][0])
@@ -533,7 +533,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n",activecpu_get_pc(),offset);
+	logerror("%04x:  Alpha read trigger at %04x\n",cpu_get_pc(space->cpu),offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -556,14 +556,14 @@ static READ16_HANDLER( alpha_V_trigger_r )
 	switch (offset)
 	{
 		case 0: /* Dipswitch 1 */
-			shared_ram[0] = (source & 0xff00) | input_port_read(machine, "IN4");
+			shared_ram[0] = (source & 0xff00) | input_port_read(space->machine, "IN4");
 			return 0;
 		case 0x22: /* Coin value */
 			shared_ram[0x22] = (source & 0xff00) | (credits&0x00ff);
 			return 0;
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(machine, "IN2") & 0x3) == 3) latch = 0;
-			if ((input_port_read(machine, "IN2") & 0x1) == 0 && !latch)
+			if ((input_port_read(space->machine, "IN2") & 0x3) == 3) latch = 0;
+			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !latch)
 			{
 				shared_ram[0x29] = (source & 0xff00) | (coin_id & 0xff);	// coinA
 				shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -571,7 +571,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
+					coinvalue = (~input_port_read(space->machine, "IN4")>>1) & 7;
 					deposits1++;
 					if (deposits1 == coinage1[coinvalue][0])
 					{
@@ -582,7 +582,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 						credits = 0;
 				}
 			}
-			else if ((input_port_read(machine, "IN2") & 0x2) == 0 && !latch)
+			else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !latch)
 			{
 				shared_ram[0x29] = (source & 0xff00) | (coin_id>>8);	// coinB
 				shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -590,7 +590,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
+					coinvalue = (~input_port_read(space->machine, "IN4")>>1) & 7;
 					deposits2++;
 					if (deposits2 == coinage2[coinvalue][0])
 					{
@@ -616,11 +616,11 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			break;
 
 		case 0x1f00: /* Dipswitch 1 */
-			shared_ram[0x1f00] = (source & 0xff00) | input_port_read(machine, "IN4");
+			shared_ram[0x1f00] = (source & 0xff00) | input_port_read(space->machine, "IN4");
 			return 0;
 		case 0x1f29: /* Query microcontroller for coin insert */
-			if ((input_port_read(machine, "IN2") & 0x3) == 3) latch = 0;
-			if ((input_port_read(machine, "IN2") & 0x1) == 0 && !latch)
+			if ((input_port_read(space->machine, "IN2") & 0x3) == 3) latch = 0;
+			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !latch)
 			{
 				shared_ram[0x1f29] = (source & 0xff00) | (coin_id & 0xff);	// coinA
 				shared_ram[0x1f22] = (source & 0xff00) | 0x0;
@@ -628,7 +628,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
+					coinvalue = (~input_port_read(space->machine, "IN4")>>1) & 7;
 					deposits1++;
 					if (deposits1 == coinage1[coinvalue][0])
 					{
@@ -639,7 +639,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 						credits = 0;
 				}
 			}
-			else if ((input_port_read(machine, "IN2") & 0x2) == 0 && !latch)
+			else if ((input_port_read(space->machine, "IN2") & 0x2) == 0 && !latch)
 			{
 				shared_ram[0x1f29] = (source & 0xff00) | (coin_id>>8);	// coinB
 				shared_ram[0x1f22] = (source & 0xff00) | 0x0;
@@ -647,7 +647,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
+					coinvalue = (~input_port_read(space->machine, "IN4")>>1) & 7;
 					deposits2++;
 					if (deposits2 == coinage2[coinvalue][0])
 					{
@@ -668,7 +668,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
                the microcontroller supplies it (it does for all the other games,
                but usually to 0x0 in RAM) when 0x21 is read (code at 0x009332) */
 			source=shared_ram[0x0163];
-			shared_ram[0x0163] = (source & 0x00ff) | (input_port_read(machine, "IN4")<<8);
+			shared_ram[0x0163] = (source & 0x00ff) | (input_port_read(space->machine, "IN4")<<8);
 
 			return 0;
 		case 0x1ffe:  /* Custom ID check */
@@ -679,7 +679,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n",activecpu_get_pc(),offset);
+	logerror("%04x:  Alpha read trigger at %04x\n",cpu_get_pc(space->cpu),offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -769,10 +769,10 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( sound_bank_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000 + (data) * 0x4000;
-	memory_set_bankptr(7,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 7,&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1876,7 +1876,7 @@ static const ym2203_interface ym2203_config =
 
 static void YM3812_irq(running_machine *machine, int param)
 {
-	cpunum_set_input_line(machine, 1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -1886,10 +1886,10 @@ static const ym3812_interface ym3812_config =
 
 static INTERRUPT_GEN( alpha68k_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, 1, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 //ZT
 
@@ -3029,8 +3029,8 @@ static READ16_HANDLER( timesold_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x9ea2 && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x9ea2 && (ret&0xff00)==0) {
+		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3041,8 +3041,8 @@ static READ16_HANDLER( timesol1_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x9e20 && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x9e20 && (ret&0xff00)==0) {
+		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3053,8 +3053,8 @@ static READ16_HANDLER( btlfield_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x9e1c && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x9e1c && (ret&0xff00)==0) {
+		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3065,8 +3065,8 @@ static READ16_HANDLER( skysoldr_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x1f4e && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x1f4e && (ret&0xff00)==0) {
+		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3077,8 +3077,8 @@ static READ16_HANDLER( skyadvnt_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x1f78 && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x1f78 && (ret&0xff00)==0) {
+		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3089,8 +3089,8 @@ static READ16_HANDLER( gangwars_cycle_r )
 {
 	int ret=shared_ram[0x103];
 
-	if (activecpu_get_pc()==0xbbb6) {
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0xbbb6) {
+		cpu_spinuntil_int(space->cpu);
 		return (ret+2) & 0xff;
 	}
 
@@ -3101,8 +3101,8 @@ static READ16_HANDLER( gangwarb_cycle_r )
 {
 	int ret=shared_ram[0x103];
 
-	if (activecpu_get_pc()==0xbbca) {
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0xbbca) {
+		cpu_spinuntil_int(space->cpu);
 		return (ret+2) & 0xff;
 	}
 
@@ -3135,7 +3135,7 @@ static DRIVER_INIT( jongbou )
 
 	alpha68k_video_banking = jongbou_video_banking;
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
 }
 
 static DRIVER_INIT( paddlema )
@@ -3146,7 +3146,7 @@ static DRIVER_INIT( paddlema )
 
 static DRIVER_INIT( timesold )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, timesold_cycle_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, timesold_cycle_r);
 	invert_controls=0;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3154,7 +3154,7 @@ static DRIVER_INIT( timesold )
 
 static DRIVER_INIT( timesol1 )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, timesol1_cycle_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, timesol1_cycle_r);
 	invert_controls=1;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3162,7 +3162,7 @@ static DRIVER_INIT( timesol1 )
 
 static DRIVER_INIT( btlfield )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, btlfield_cycle_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, btlfield_cycle_r);
 	invert_controls=1;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3177,8 +3177,8 @@ static DRIVER_INIT( btlfildb )
 
 static DRIVER_INIT( skysoldr )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skysoldr_cycle_r);
-	memory_set_bankptr(8, (memory_region(machine, "user1"))+0x40000);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skysoldr_cycle_r);
+	memory_set_bankptr(machine, 8, (memory_region(machine, "user1"))+0x40000);
 	invert_controls=0;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3193,7 +3193,7 @@ static DRIVER_INIT( goldmedl )
 
 static DRIVER_INIT( goldmeda )
 {
-	memory_set_bankptr(8, memory_region(machine, "main") + 0x20000);
+	memory_set_bankptr(machine, 8, memory_region(machine, "main") + 0x20000);
 	invert_controls=0;
 	microcontroller_id=0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	coin_id=0x23|(0x24<<8);
@@ -3201,7 +3201,7 @@ static DRIVER_INIT( goldmeda )
 
 static DRIVER_INIT( skyadvnt )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
 	invert_controls=0;
 	microcontroller_id=0x8814;
 	coin_id=0x22|(0x22<<8);
@@ -3209,7 +3209,7 @@ static DRIVER_INIT( skyadvnt )
 
 static DRIVER_INIT( skyadvnu )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
 	invert_controls=0;
 	microcontroller_id=0x8814;
 	coin_id=0x23|(0x24<<8);
@@ -3217,8 +3217,8 @@ static DRIVER_INIT( skyadvnu )
 
 static DRIVER_INIT( gangwars )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40206, 0x40207, 0, 0, gangwars_cycle_r);
-	memory_set_bankptr(8, memory_region(machine, "user1"));
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwars_cycle_r);
+	memory_set_bankptr(machine, 8, memory_region(machine, "user1"));
 	invert_controls=0;
 	microcontroller_id=0x8512;
 	coin_id=0x23|(0x24<<8);
@@ -3226,8 +3226,8 @@ static DRIVER_INIT( gangwars )
 
 static DRIVER_INIT( gangwarb )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40206, 0x40207, 0, 0, gangwarb_cycle_r);
-	memory_set_bankptr(8, memory_region(machine, "user1"));
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwarb_cycle_r);
+	memory_set_bankptr(machine, 8, memory_region(machine, "user1"));
 	invert_controls=0;
 	microcontroller_id=0x8512;
 	coin_id=0x23|(0x24<<8);

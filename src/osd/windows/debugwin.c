@@ -23,7 +23,6 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debugger.h"
-#include "deprecat.h"
 
 // MAMEOS headers
 #include "debugwin.h"
@@ -153,6 +152,8 @@ struct _debugwin_info
 	int						last_history;
 
 	HWND					otherwnd[MAX_OTHER_WND];
+
+	running_machine *		machine;
 };
 
 
@@ -203,7 +204,7 @@ static DWORD last_debugger_update;
 //  PROTOTYPES
 //============================================================
 
-static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler);
+static debugwin_info *debug_window_create(running_machine *machine, LPCSTR title, WNDPROC handler);
 static void debug_window_free(debugwin_info *info);
 static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
@@ -225,13 +226,13 @@ static void memory_update_menu(debugwin_info *info);
 static int memory_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 static int memory_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 
-static void disasm_create_window(void);
+static void disasm_create_window(running_machine *machine);
 static void disasm_recompute_children(debugwin_info *info);
 static void disasm_process_string(debugwin_info *info, const char *string);
 static void disasm_update_menu(debugwin_info *info);
 static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 static int disasm_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam);
-static void disasm_update_caption(HWND wnd);
+static void disasm_update_caption(running_machine *machine, HWND wnd);
 
 static void console_create_window(running_machine *machine);
 static void console_recompute_children(debugwin_info *info);
@@ -261,7 +262,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 
 	// update the views in the console to reflect the current CPU
 	if (main_console != NULL)
-		console_set_cpunum(machine, cpu_getactivecpu());
+		console_set_cpunum(machine, cpunum_get_active());
 
 	// when we are first stopped, adjust focus to us
 	if (firststop && main_console != NULL)
@@ -309,9 +310,9 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 //  debugwin_seq_pressed
 //============================================================
 
-static int debugwin_seq_pressed(void)
+static int debugwin_seq_pressed(running_machine *machine)
 {
-	const input_seq *seq = input_type_seq(Machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
+	const input_seq *seq = input_type_seq(machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
 	int result = FALSE;
 	int invert = FALSE;
 	int first = TRUE;
@@ -488,12 +489,12 @@ void debugwin_update_during_game(running_machine *machine)
 	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && mame_get_phase(machine) == MAME_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
-		if (debugwin_seq_pressed())
+		if (debugwin_seq_pressed(machine))
 		{
 			HWND focuswnd = GetFocus();
 			debugwin_info *info;
 
-			debug_cpu_halt_on_next_instruction(machine, -1, "User-initiated break\n");
+			debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(machine), "User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info; info = info->next)
@@ -512,7 +513,7 @@ void debugwin_update_during_game(running_machine *machine)
 //  debug_window_create
 //============================================================
 
-static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler)
+static debugwin_info *debug_window_create(running_machine *machine, LPCSTR title, WNDPROC handler)
 {
 	debugwin_info *info = NULL;
 	RECT work_bounds;
@@ -539,6 +540,8 @@ static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler)
 	info->handle_command = global_handle_command;
 	info->handle_key = global_handle_key;
 	strcpy(info->edit_defstr, "");
+
+	info->machine = machine;
 
 	// hook us in
 	info->next = window_list;
@@ -688,7 +691,7 @@ static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam,
 		case WM_CHAR:
 			if (info->ignore_char_lparam == (lparam >> 16))
 				info->ignore_char_lparam = 0;
-			else if (waiting_for_debugger || !debugwin_seq_pressed())
+			else if (waiting_for_debugger || !debugwin_seq_pressed(info->machine))
 				return DefWindowProc(wnd, message, wparam, lparam);
 			break;
 
@@ -775,7 +778,7 @@ static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam,
 			if (main_console && main_console->wnd == wnd)
 			{
 				smart_show_all(FALSE);
-				debug_cpu_go(~0);
+				debug_cpu_go(info->machine, ~0);
 			}
 			else
 				DestroyWindow(wnd);
@@ -823,7 +826,7 @@ static int debug_view_create(debugwin_info *info, int which, int type)
 		goto cleanup;
 
 	// create the debug view
-	view->view = debug_view_alloc(type);
+	view->view = debug_view_alloc(info->machine, type);
 	if (view->view == NULL)
 		goto cleanup;
 
@@ -1443,7 +1446,7 @@ static LRESULT CALLBACK debug_view_proc(HWND wnd, UINT message, WPARAM wparam, L
 		{
 			if (info->owner->ignore_char_lparam == (lparam >> 16))
 				info->owner->ignore_char_lparam = 0;
-			else if (waiting_for_debugger || !debugwin_seq_pressed())
+			else if (waiting_for_debugger || !debugwin_seq_pressed(info->owner->machine))
 			{
 				if (wparam >= 32 && wparam < 127 && debug_view_get_property_UINT32(info->view, DVP_SUPPORTS_CURSOR))
 					debug_view_set_property_UINT32(info->view, DVP_CHARACTER, wparam);
@@ -1583,7 +1586,7 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 			// ignore chars associated with keys we've handled
 			if (info->ignore_char_lparam == (lparam >> 16))
 				info->ignore_char_lparam = 0;
-			else if (waiting_for_debugger || !debugwin_seq_pressed())
+			else if (waiting_for_debugger || !debugwin_seq_pressed(info->machine))
 			{
 				switch (wparam)
 				{
@@ -1650,14 +1653,14 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 //============================================================
 
 #ifdef UNUSED_FUNCTION
-static void generic_create_window(int type)
+static void generic_create_window(running_machine *machine, int type)
 {
 	debugwin_info *info;
 	char title[256];
 
 	// create the window
 	_snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
-	info = debug_window_create(title, NULL);
+	info = debug_window_create(machine, title, NULL);
 	if (info == NULL || !debug_view_create(info, 0, type))
 		return;
 
@@ -1720,7 +1723,7 @@ static void log_create_window(running_machine *machine)
 
 	// create the window
 	_snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
-	info = debug_window_create(title, NULL);
+	info = debug_window_create(machine, title, NULL);
 	if (info == NULL || !debug_view_create(info, 0, DVT_LOG))
 		return;
 	info->view->is_textbuf = TRUE;
@@ -1764,10 +1767,10 @@ static void memory_determine_combo_items(running_machine *machine)
 	int itemnum;
 
 	// first add all the CPUs' address spaces
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 				if (cpuinfo->space[spacenum].databytes != 0)
 				{
@@ -1780,7 +1783,7 @@ static void memory_determine_combo_items(running_machine *machine)
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
 
 					t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
-					t_name = tstring_from_utf8(cpunum_name(cpunum));
+					t_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
 					t_space = tstring_from_utf8(address_space_names[spacenum]);
 					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d \"%s\" (%s) %s memory"), cpunum, t_tag, t_name, t_space);
 					free(t_space),
@@ -1790,7 +1793,7 @@ static void memory_determine_combo_items(running_machine *machine)
 					*tail = ci;
 					tail = &ci->next;
 				}
-	}
+		}
 
 	// then add all the memory regions
 	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
@@ -1874,13 +1877,13 @@ static void memory_update_selection(debugwin_info *info, memorycombo_item *ci)
 
 static void memory_create_window(running_machine *machine)
 {
-	int curcpu = cpu_getactivecpu(), cursel = 0;
+	int curcpu = cpunum_get_active(), cursel = 0;
 	memorycombo_item *ci, *selci = NULL;
 	debugwin_info *info;
 	HMENU optionsmenu;
 
 	// create the window
-	info = debug_window_create("Memory", NULL);
+	info = debug_window_create(machine, "Memory", NULL);
 	if (info == NULL || !debug_view_create(info, 0, DVT_MEMORY))
 		return;
 
@@ -2204,15 +2207,15 @@ static int memory_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 //  disasm_create_window
 //============================================================
 
-static void disasm_create_window(void)
+static void disasm_create_window(running_machine *machine)
 {
-	int curcpu = cpu_getactivecpu(), cursel = 0;
+	int curcpu = cpunum_get_active(), cursel = 0;
 	debugwin_info *info;
 	HMENU optionsmenu;
 	UINT32 cpunum;
 
 	// create the window
-	info = debug_window_create("Disassembly", NULL);
+	info = debug_window_create(machine, "Disassembly", NULL);
 	if (info == NULL || !debug_view_create(info, 0, DVT_DISASSEMBLY))
 		return;
 
@@ -2256,16 +2259,16 @@ static void disasm_create_window(void)
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		TCHAR* t_cpunum_name;
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			TCHAR* t_cpunum_name;
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
 			{
 				TCHAR name[100];
 				int item;
-				t_cpunum_name = tstring_from_utf8(cpunum_name(cpunum));
+				t_cpunum_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
 				_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
 				free(t_cpunum_name);
 				t_cpunum_name = NULL;
@@ -2273,7 +2276,7 @@ static void disasm_create_window(void)
 				if (cpunum == curcpu)
 					cursel = item;
 			}
-	}
+		}
 	SendMessage(info->otherwnd[0], CB_SETCURSEL, cursel, 0);
 
 	// set the child functions
@@ -2284,7 +2287,7 @@ static void disasm_create_window(void)
 	debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, (curcpu == -1) ? 0 : curcpu);
 
 	// set the caption
-	disasm_update_caption(info->wnd);
+	disasm_update_caption(machine, info->wnd);
 
 	// recompute the children once to get the maxwidth
 	disasm_recompute_children(info);
@@ -2402,19 +2405,19 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			{
 				// find the matching entry
 				UINT32 cpunum;
-				for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-				{
-					const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-					if (cpuinfo->valid)
+				for (cpunum = 0; cpunum < ARRAY_LENGTH(info->machine->cpu); cpunum++)
+					if (info->machine->cpu[cpunum] != NULL)
+					{
+						const cpu_debug_data *cpuinfo = cpu_get_debug_data(info->machine->cpu[cpunum]);
 						if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
 							if (sel-- == 0)
 							{
 								debug_view_begin_update(info->view[0].view);
 								debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, cpunum);
 								debug_view_end_update(info->view[0].view);
-								disasm_update_caption(info->wnd);
+								disasm_update_caption(info->machine, info->wnd);
 							}
-				}
+					}
 
 				// reset the focus
 				SetFocus(info->focuswnd);
@@ -2452,15 +2455,15 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					if (debug_view_get_property_UINT32(info->view[0].view, DVP_CURSOR_VISIBLE))
 					{
 						UINT32 cpu_num = 0;
-						debug_cpu_info *cpuinfo ;
+						cpu_debug_data *cpuinfo ;
 
 						/* for BYTE2ADDR */
 						cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
-						cpuinfo = (debug_cpu_info *)debug_get_cpu_info(cpu_num);
+						cpuinfo = (cpu_debug_data *)cpu_get_debug_data(info->machine->cpu[cpu_num]);
 
 						active_address = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_ACTIVE_ADDRESS);
 						sprintf(command, "go %X", BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM));
-						debug_console_execute_command(Machine, command, 1);
+						debug_console_execute_command(info->machine, command, 1);
 					}
 					return 1;
 
@@ -2468,7 +2471,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					if (debug_view_get_property_UINT32(info->view[0].view, DVP_CURSOR_VISIBLE))
 					{
 						UINT32 cpu_num = 0;
-						debug_cpu_info *cpuinfo ;
+						cpu_debug_data *cpuinfo ;
 						debug_cpu_breakpoint *bp;
 						INT8 bp_exists = 0;
 						UINT32 bp_num = 0;
@@ -2478,7 +2481,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 						/* is there already a breakpoint there? */
 						cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
-						cpuinfo = (debug_cpu_info*)debug_get_cpu_info(cpu_num);
+						cpuinfo = cpu_get_debug_data(info->machine->cpu[cpu_num]);
 
 						for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 						{
@@ -2494,7 +2497,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 							sprintf(command, "bpset %X", BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM));
 						else
 							sprintf(command, "bpclear %X", bp_num);
-						debug_console_execute_command(Machine, command, 1);
+						debug_console_execute_command(info->machine, command, 1);
 					}
 					return 1;
 			}
@@ -2558,7 +2561,7 @@ static int disasm_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 //  disasm_update_caption
 //============================================================
 
-static void disasm_update_caption(HWND wnd)
+static void disasm_update_caption(running_machine *machine, HWND wnd)
 {
 	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	char title[100];
@@ -2568,7 +2571,7 @@ static void disasm_update_caption(HWND wnd)
 	cpunum = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 
 	// then update the caption
-	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
+	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, info->machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
 	win_set_window_text_utf8(wnd, title);
 }
 
@@ -2587,7 +2590,7 @@ void console_create_window(running_machine *machine)
 	UINT32 cpunum;
 
 	// create the window
-	info = debug_window_create("Debug", NULL);
+	info = debug_window_create(machine, "Debug", NULL);
 	if (info == NULL)
 		return;
 	main_console = info;
@@ -2764,11 +2767,11 @@ static void console_process_string(debugwin_info *info, const char *string)
 
 	// an empty string is a single step
 	if (string[0] == 0)
-		debug_cpu_single_step(1);
+		debug_cpu_single_step(info->machine, 1);
 
 	// otherwise, just process the command
 	else
-		debug_console_execute_command(Machine, string, 1);
+		debug_console_execute_command(info->machine, string, 1);
 
 	// clear the edit text box
 	SendMessage(info->editwnd, WM_SETTEXT, 0, (LPARAM)&buffer);
@@ -2791,7 +2794,7 @@ static void console_set_cpunum(running_machine *machine, int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpu_getactivecpu(), Machine->config->cpu[cpu_getactivecpu()].tag, activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpunum_get_active(), machine->config->cpu[cpunum_get_active()].tag, cpu_get_name(machine->activecpu));
 	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 	if (strcmp(title, curtitle))
 		win_set_window_text_utf8(main_console->wnd, title);
@@ -2853,58 +2856,58 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 		switch (LOWORD(wparam))
 		{
 			case ID_NEW_MEMORY_WND:
-				memory_create_window(Machine);
+				memory_create_window(info->machine);
 				return 1;
 
 			case ID_NEW_DISASM_WND:
-				disasm_create_window();
+				disasm_create_window(info->machine);
 				return 1;
 
 			case ID_NEW_LOG_WND:
-				log_create_window(Machine);
+				log_create_window(info->machine);
 				return 1;
 
 			case ID_RUN_AND_HIDE:
 				smart_show_all(FALSE);
 			case ID_RUN:
-				debug_cpu_go(~0);
+				debug_cpu_go(info->machine, ~0);
 				return 1;
 
 			case ID_NEXT_CPU:
-				debug_cpu_next_cpu();
+				debug_cpu_next_cpu(info->machine);
 				return 1;
 
 			case ID_RUN_VBLANK:
-				debug_cpu_go_vblank();
+				debug_cpu_go_vblank(info->machine);
 				return 1;
 
 			case ID_RUN_IRQ:
-				debug_cpu_go_interrupt(-1);
+				debug_cpu_go_interrupt(info->machine, -1);
 				return 1;
 
 			case ID_STEP:
-				debug_cpu_single_step(1);
+				debug_cpu_single_step(info->machine, 1);
 				return 1;
 
 			case ID_STEP_OVER:
-				debug_cpu_single_step_over(1);
+				debug_cpu_single_step_over(info->machine, 1);
 				return 1;
 
 			case ID_STEP_OUT:
-				debug_cpu_single_step_out();
+				debug_cpu_single_step_out(info->machine);
 				return 1;
 
 			case ID_HARD_RESET:
-				mame_schedule_hard_reset(Machine);
+				mame_schedule_hard_reset(info->machine);
 				return 1;
 
 			case ID_SOFT_RESET:
-				mame_schedule_soft_reset(Machine);
-				debug_cpu_go(~0);
+				mame_schedule_soft_reset(info->machine);
+				debug_cpu_go(info->machine, ~0);
 				return 1;
 
 			case ID_EXIT:
-				mame_schedule_exit(Machine);
+				mame_schedule_exit(info->machine);
 				return 1;
 		}
 
@@ -2920,7 +2923,7 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 static int global_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 {
 	/* ignore any keys that are received while the debug key is down */
-	if (!waiting_for_debugger && debugwin_seq_pressed())
+	if (!waiting_for_debugger && debugwin_seq_pressed(info->machine))
 		return 1;
 
 	switch (wparam)

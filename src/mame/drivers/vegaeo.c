@@ -26,20 +26,20 @@ static WRITE32_HANDLER( vega_vram_w )
 	switch(mem_mask)
 	{
 		case 0xffffffff:
-			vega_vram_w(machine,offset,data,0xff000000);
-			vega_vram_w(machine,offset,data,0x00ff0000);
-			vega_vram_w(machine,offset,data,0x0000ff00);
-			vega_vram_w(machine,offset,data,0x000000ff);
+			vega_vram_w(space,offset,data,0xff000000);
+			vega_vram_w(space,offset,data,0x00ff0000);
+			vega_vram_w(space,offset,data,0x0000ff00);
+			vega_vram_w(space,offset,data,0x000000ff);
 			return;
 
 		case 0xffff0000:
-			vega_vram_w(machine,offset,data,0xff000000);
-			vega_vram_w(machine,offset,data,0x00ff0000);
+			vega_vram_w(space,offset,data,0xff000000);
+			vega_vram_w(space,offset,data,0x00ff0000);
 			return;
 
 		case 0x0000ffff:
-			vega_vram_w(machine,offset,data,0x0000ff00);
-			vega_vram_w(machine,offset,data,0x000000ff);
+			vega_vram_w(space,offset,data,0x0000ff00);
+			vega_vram_w(space,offset,data,0x000000ff);
 			return;
 
 		default:
@@ -63,7 +63,7 @@ static WRITE32_HANDLER( vega_palette_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paldata = paletteram32[offset] & 0x7fff;
-	palette_set_color_rgb(machine, offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(space->machine, offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 static WRITE32_HANDLER( vega_misc_w )
@@ -76,14 +76,14 @@ static WRITE32_HANDLER( vega_misc_w )
 
 static READ32_HANDLER( vegaeo_custom_read )
 {
-	eolith_speedup_read();
-	return input_port_read(machine, "SYSTEM");
+	eolith_speedup_read(space->machine);
+	return input_port_read(space->machine, "SYSTEM");
 }
 
 static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
-	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0xffffffff)
+	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0x000000ff)
 	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE(vega_palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITENOP // soundlatch

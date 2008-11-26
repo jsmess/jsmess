@@ -111,7 +111,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
 		timer_call_after_resynch(NULL, 0, NULL);
-//      logerror("PC %06X - Read coin port during Z80 NMI\n", activecpu_get_pc());
+//      logerror("PC %06X - Read coin port during Z80 NMI\n", cpu_get_pc(machine->activecpu));
 	}
 
 	return ret;
@@ -147,10 +147,10 @@ static READ32_HANDLER( sngkace_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return input_port_read(machine, "P1_P2");
-		case 0x1:	return input_port_read(machine, "DSW");
-		case 0x2:	return input_port_read(machine, "COIN");
-		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset * 2);
+		case 0x0:	return input_port_read(space->machine, "P1_P2");
+		case 0x1:	return input_port_read(space->machine, "DSW");
+		case 0x2:	return input_port_read(space->machine, "COIN");
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset * 2);
 					return 0;
 	}
 }
@@ -159,9 +159,9 @@ static READ32_HANDLER( gunbird_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return input_port_read(machine, "P1_P2");
-		case 0x1:	return input_port_read(machine, "DSW");
-		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+		case 0x0:	return input_port_read(space->machine, "P1_P2");
+		case 0x1:	return input_port_read(space->machine, "DSW");
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
 					return 0;
 	}
 }
@@ -170,7 +170,7 @@ static READ32_HANDLER( gunbird_input_r )
 static TIMER_CALLBACK( psikyo_soundlatch_callback )
 {
 	psikyo_soundlatch = param;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	z80_nmi = 1;
 }
 
@@ -280,12 +280,12 @@ static WRITE32_HANDLER( s1945_mcu_w )
 			s1945_mcu_latching |= 4;
 			break;
 		default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, s1945_mcu_direction, s1945_mcu_latch1, s1945_mcu_latch2, activecpu_get_pc());
+//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, s1945_mcu_direction, s1945_mcu_latch1, s1945_mcu_latch2, cpu_get_pc(space->cpu));
 			break;
 		}
 		break;
 	default:
-//      logerror("MCU.w %x, %02x (%x)\n", offset, data, activecpu_get_pc());
+//      logerror("MCU.w %x, %02x (%x)\n", offset, data, cpu_get_pc(space->cpu));
 		;
 	}
 }
@@ -315,10 +315,10 @@ static READ32_HANDLER( s1945_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return input_port_read(machine, "P1_P2");
-		case 0x1:	return (input_port_read(machine, "DSW") & 0xffff000f) | s1945_mcu_r(machine, offset-1, mem_mask);
-		case 0x2:	return s1945_mcu_r(machine, offset-1, mem_mask);
-		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+		case 0x0:	return input_port_read(space->machine, "P1_P2");
+		case 0x1:	return (input_port_read(space->machine, "DSW") & 0xffff000f) | s1945_mcu_r(space, offset-1, mem_mask);
+		case 0x2:	return s1945_mcu_r(space, offset-1, mem_mask);
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
 					return 0;
 	}
 }
@@ -336,9 +336,9 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
 	if (ACCESSING_BITS_16_31)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset*2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2+1, data, mem_mask);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset*2+1, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( psikyo_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -376,7 +376,7 @@ ADDRESS_MAP_END
 
 static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( psikyo_soundlatch_r )
@@ -386,7 +386,7 @@ static READ8_HANDLER( psikyo_soundlatch_r )
 
 static WRITE8_HANDLER( psikyo_clear_nmi_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	z80_nmi = 0;
 }
 
@@ -397,9 +397,9 @@ static WRITE8_HANDLER( psikyo_clear_nmi_w )
 
 static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bank = data & 3;
-	memory_set_bankptr(1, &RAM[bank * 0x8000 + 0x10000]);
+	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x8000 + 0x10000]);
 }
 
 static ADDRESS_MAP_START( sngkace_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -431,13 +431,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bank = (data >> 4) & 3;
 
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes
        of the rom not reachable. */
 
-	memory_set_bankptr(1, &RAM[bank * 0x8000 + 0x10000 + 0x200]);
+	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x8000 + 0x10000 + 0x200]);
 }
 
 static ADDRESS_MAP_START( gunbird_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1313,9 +1313,9 @@ MACHINE_DRIVER_END
 static void irqhandler(running_machine *machine, int linestate)
 {
 	if (linestate)
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -1456,10 +1456,10 @@ static DRIVER_INIT( sngkace )
 	}
 
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, sngkace_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, sngkace_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
 
 	psikyo_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 	psikyo_switch_banks(0, 0); // sngkace / samuraia don't use banking
@@ -1628,10 +1628,10 @@ ROM_END
 static DRIVER_INIT( gunbird )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
 
 	psikyo_ka302c_banking = 1;
 }
@@ -1686,10 +1686,10 @@ ROM_END
 static DRIVER_INIT( s1945jn )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	psikyo_ka302c_banking = 1;
 }
@@ -1893,13 +1893,13 @@ ROM_END
 static DRIVER_INIT( s1945 )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(s1945_table);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
@@ -1908,13 +1908,13 @@ static DRIVER_INIT( s1945 )
 static DRIVER_INIT( s1945a )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(s1945a_table);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
@@ -1923,13 +1923,13 @@ static DRIVER_INIT( s1945a )
 static DRIVER_INIT( s1945j )
 {
 	/* input ports*/
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(s1945j_table);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
@@ -2020,13 +2020,13 @@ ROM_END
 static DRIVER_INIT( tengai )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(0);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu

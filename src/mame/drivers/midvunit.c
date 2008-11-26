@@ -74,6 +74,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	cpu_reset(machine->cpu[0]);
 
 	timer[0] = timer_alloc(NULL, NULL);
 	timer[1] = timer_alloc(NULL, NULL);
@@ -86,6 +87,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	cpu_reset(machine->cpu[0]);
 
 	timer[0] = timer_alloc(NULL, NULL);
 	timer[1] = timer_alloc(NULL, NULL);
@@ -103,7 +105,7 @@ static MACHINE_RESET( midvplus )
 
 static READ32_HANDLER( port0_r )
 {
-	UINT16 val = input_port_read(machine, "IN0");
+	UINT16 val = input_port_read(space->machine, "IN0");
 	UINT16 diff = val ^ last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
@@ -133,7 +135,7 @@ static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
 	{
-		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
 		return adc_data << adc_shift;
 	}
 	else
@@ -144,7 +146,7 @@ static READ32_HANDLER( midvunit_adc_r )
 
 static TIMER_CALLBACK( adc_ready )
 {
-	cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 3, ASSERT_LINE);
 }
 
 
@@ -157,7 +159,7 @@ static WRITE32_HANDLER( midvunit_adc_w )
 		int which = (data >> adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		adc_data = input_port_read_safe(machine, adcnames[which], 0);
+		adc_data = input_port_read_safe(space->machine, adcnames[which], 0);
 		timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, adc_ready);
 	}
 	else
@@ -207,7 +209,7 @@ static WRITE32_HANDLER( midvunit_control_w )
 
 	/* bit 3 is the watchdog */
 	if ((olddata ^ control_data) & 0x0008)
-		watchdog_reset_w(machine, 0, 0);
+		watchdog_reset_w(space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
 	dcs_reset_w((~control_data >> 1) & 1);
@@ -228,7 +230,7 @@ static WRITE32_HANDLER( crusnwld_control_w )
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ control_data) & 0x0200)
-		watchdog_reset_w(machine, 0, 0);
+		watchdog_reset_w(space, 0, 0);
 
 	/* bit 8 is the LED */
 
@@ -260,13 +262,13 @@ static READ32_HANDLER( tms32031_control_r )
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		INT32 result = attotime_to_double(attotime_mul(timer_timeelapsed(timer[which]), timer_rate));
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", activecpu_get_pc(), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", activecpu_get_pc(), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(space->cpu), offset);
 
 	return tms32031_control[offset];
 }
@@ -284,18 +286,18 @@ static WRITE32_HANDLER( tms32031_control_w )
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 		if (data & 0x40)
 			timer_adjust_oneshot(timer[which], attotime_never, 0);
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
-			timer_rate = (double)(cpunum_get_clock(0) * 0.5);
+			timer_rate = (double)(cpu_get_clock(space->machine->cpu[0]) * 0.5);
 		else
 			timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -310,7 +312,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 static READ32_HANDLER( crusnwld_serial_status_r )
 {
 	int status = midway_serial_pic_status_r();
-	return (input_port_read(machine, "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (input_port_read(space->machine, "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -374,7 +376,7 @@ static WRITE32_HANDLER( bit_reset_w )
 static READ32_HANDLER( offroadc_serial_status_r )
 {
 	int status = midway_serial_pic2_status_r();
-	return (input_port_read(machine, "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (input_port_read(space->machine, "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -386,7 +388,7 @@ static READ32_HANDLER( offroadc_serial_data_r )
 
 static WRITE32_HANDLER( offroadc_serial_data_w )
 {
-	midway_serial_pic2_w(machine, data >> 16);
+	midway_serial_pic2_w(space->machine, data >> 16);
 }
 
 
@@ -417,7 +419,7 @@ static READ32_HANDLER( midvplus_misc_r )
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", activecpu_get_pc(), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(space->cpu), offset, result);
 	return result;
 }
 
@@ -435,7 +437,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 			/* bit 0x10 resets watchdog */
 			if ((olddata ^ midvplus_misc[offset]) & 0x0010)
 			{
-				watchdog_reset_w(machine, 0, 0);
+				watchdog_reset_w(space, 0, 0);
 				logit = 0;
 			}
 			break;
@@ -446,7 +448,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", activecpu_get_pc(), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -457,7 +459,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
  *
  *************************************/
 
-static void midvplus_xf1_w(UINT8 val)
+static void midvplus_xf1_w(const device_config *device, UINT8 val)
 {
 	static int lastval;
 //  mame_printf_debug("xf1_w = %d\n", val);
@@ -507,7 +509,7 @@ static ADDRESS_MAP_START( midvunit_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static const struct tms32031_config midvplus_config = { 0, NULL, midvplus_xf1_w };
+static const tms32031_config midvplus_config = { 0, NULL, midvplus_xf1_w };
 
 static ADDRESS_MAP_START( midvplus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(&ram_base)
@@ -1517,18 +1519,18 @@ ROM_END
 static UINT32 *generic_speedup;
 static READ32_HANDLER( generic_speedup_r )
 {
-	activecpu_eat_cycles(100);
+	cpu_eat_cycles(space->cpu, 100);
 	return generic_speedup[offset];
 }
 
 
 static void init_crusnusa_common(running_machine *machine, offs_t speedup)
 {
-	dcs_init();
+	dcs_init(machine);
 	adc_shift = 24;
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
 static DRIVER_INIT( crusnusa ) { init_crusnusa_common(machine, 0xc93e); }
 static DRIVER_INIT( crusnu40 ) { init_crusnusa_common(machine, 0xc957); }
@@ -1537,25 +1539,25 @@ static DRIVER_INIT( crusnu21 ) { init_crusnusa_common(machine, 0xc051); }
 
 static void init_crusnwld_common(running_machine *machine, offs_t speedup)
 {
-	dcs_init();
+	dcs_init(machine);
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 450 or 460 */
 	midway_serial_pic_init(machine, 450);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
 
 	/* install strange protection device */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
 
 	/* speedups */
 	if (speedup)
-		generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
+		generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
 static DRIVER_INIT( crusnwld ) { init_crusnwld_common(machine, 0xd4c0); }
 #if 0
@@ -1565,19 +1567,19 @@ static DRIVER_INIT( crusnw13 ) { init_crusnwld_common(machine, 0); }
 
 static DRIVER_INIT( offroadc )
 {
-	dcs_init();
+	dcs_init(machine);
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 230 or 234 */
 	midway_serial_pic2_init(machine, 230, 94);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
 }
 
 
@@ -1602,7 +1604,7 @@ static DRIVER_INIT( wargods )
 	midway_serial_pic2_set_default_nvram(default_nvram);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
 }
 
 

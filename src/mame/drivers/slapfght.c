@@ -513,7 +513,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(tigerh_status_r)
 {
-	return (slapfight_port_00_r(machine,0)&0xf9)| ((tigerh_mcu_status_r(machine,0)));
+	return (slapfight_port_00_r(space,0)&0xf9)| ((tigerh_mcu_status_r(space,0)));
 }
 
 static ADDRESS_MAP_START( tigerh_io_map, ADDRESS_SPACE_IO, 8 )
@@ -916,7 +916,8 @@ static const ay8910_interface ay8910_interface_2 =
 
 static VIDEO_EOF( perfrman )
 {
-	buffer_spriteram_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram_w(space,0,0);
 }
 
 static MACHINE_DRIVER_START( perfrman )
@@ -1768,12 +1769,12 @@ ROM_END
 
 static DRIVER_INIT( tigerh )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, tigerh_mcu_r, tigerh_mcu_w  );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerh_mcu_r, tigerh_mcu_w  );
 }
 
 static DRIVER_INIT( tigerhb )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, tigerhb_e803_r, tigerhb_e803_w  );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerhb_e803_r, tigerhb_e803_w  );
 }
 
 
@@ -1798,10 +1799,10 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6D38: 20 F8         jr   nz,$6D32
         6D3A: 10 E0         djnz $6D1C
     */
-	if (activecpu_get_pc() == 0x6d1e) return 0;
-	if (activecpu_get_pc() == 0x6d24) return 6;
-	if (activecpu_get_pc() == 0x6d2c) return 2;
-	if (activecpu_get_pc() == 0x6d34) return 4;
+	if (cpu_get_pc(space->cpu) == 0x6d1e) return 0;
+	if (cpu_get_pc(space->cpu) == 0x6d24) return 6;
+	if (cpu_get_pc(space->cpu) == 0x6d2c) return 2;
+	if (cpu_get_pc(space->cpu) == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
         6AD4: DB 00         in   a,($00)
@@ -1822,11 +1823,11 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6AF7: 20 FA         jr   nz,$6AF3
        This seems to be what used to be the MCU status.
     */
-	if (activecpu_get_pc() == 0x6ad6) return 2; /* bit 1 must be ON */
-	if (activecpu_get_pc() == 0x6ae4) return 2; /* bit 1 must be ON */
-	if (activecpu_get_pc() == 0x6af5) return 0; /* bit 2 must be OFF */
+	if (cpu_get_pc(space->cpu) == 0x6ad6) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(space->cpu) == 0x6ae4) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(space->cpu) == 0x6af5) return 0; /* bit 2 must be OFF */
 
-	logerror("Port Read PC=%04x\n",activecpu_get_pc());
+	logerror("Port Read PC=%04x\n",cpu_get_pc(space->cpu));
 
 	return 0;
 }
@@ -1836,13 +1837,13 @@ static READ8_HANDLER( gtstarb1_dpram_r )
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
-	if (activecpu_get_pc()==0x6d54) return 0xff;
+	if (cpu_get_pc(space->cpu)==0x6d54) return 0xff;
 	return slapfight_dpram[offset];
 }
 
 static void getstar_init( running_machine *machine )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w  );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w  );
 }
 
 static DRIVER_INIT( getstar )
@@ -1863,8 +1864,8 @@ static DRIVER_INIT( gtstarb1 )
 	getstar_init(machine);
 
 	/* specific handlers for this bootleg */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0, 0x0, 0, 0, gtstarb1_port_0_read );
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc80f, 0, 0, gtstarb1_dpram_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0, 0x0, 0, 0, gtstarb1_port_0_read );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xc80f, 0, 0, gtstarb1_dpram_r );
 }
 
 static DRIVER_INIT( gtstarb2 )
@@ -1881,8 +1882,8 @@ static READ8_HANDLER( slapfigh_mcu_r )
 	/* pass initial checks */
 	static const int protvalues[] = { 0xc7, 0x55, -1 };
 
-	if ((activecpu_get_pc()==0x1369) || // slapfigh
-		(activecpu_get_pc()==0x136d)) // slapfiga
+	if ((cpu_get_pc(space->cpu)==0x1369) || // slapfigh
+		(cpu_get_pc(space->cpu)==0x136d)) // slapfiga
 	{
 		int retdat = protvalues[slapfigh_prot_pos];
 		if (retdat == -1)
@@ -1894,15 +1895,15 @@ static READ8_HANDLER( slapfigh_mcu_r )
 		slapfigh_prot_pos++;
 		return retdat;
 	}
-	logerror("MCU Read PC=%04x\n",activecpu_get_pc());
+	logerror("MCU Read PC=%04x\n",cpu_get_pc(space->cpu));
 	return 0;
 }
 
 static DRIVER_INIT( slapfigh )
 {
 	slapfigh_prot_pos = 0;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, slapfigh_mcu_r );
-//  memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, slapfigh_mcu_r );
+//  memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
 }
 
 

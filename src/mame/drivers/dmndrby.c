@@ -41,7 +41,7 @@ static UINT8* dderby_vid;
 
 static READ8_HANDLER( dderby_random_reader )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
@@ -167,10 +167,10 @@ static VIDEO_UPDATE(dderby)
 
 static INTERRUPT_GEN( dderby_interrupt )
 {
-//  cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x8);  // almost certainly wrong?
-//  cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x10); // almost certainly wrong?
-//  cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x18); // almost certainly wrong?
-//  cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x20); // almost certainly wrong?
+//  cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x8);  // almost certainly wrong?
+//  cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10); // almost certainly wrong?
+//  cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x18); // almost certainly wrong?
+//  cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x20); // almost certainly wrong?
 }
 
 static MACHINE_DRIVER_START( dderby )

@@ -275,24 +275,24 @@ static int sound_status;
 
 READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
 WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
 WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*********************************************************************/
@@ -313,14 +313,14 @@ enum
 static WRITE8_HANDLER( marvins_soundlatch_w )
 {
 	marvins_sound_busy_flag = 1;
-	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( marvins_soundlatch_r )
 {
 	marvins_sound_busy_flag = 0;
-	return soundlatch_r(machine,0);
+	return soundlatch_r(space,0);
 }
 
 static CUSTOM_INPUT( marvins_sound_busy )
@@ -330,7 +330,7 @@ static CUSTOM_INPUT( marvins_sound_busy )
 
 static READ8_HANDLER( marvins_sound_nmi_ack_r )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -353,20 +353,20 @@ static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 			break;
 	}
 
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, (sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, (sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( sgladiat_soundlatch_w )
 {
-	soundlatch_w(machine, offset, data);
+	soundlatch_w(space, offset, data);
 	timer_call_after_resynch(NULL, CMDIRQ_BUSY_ASSERT, sgladiat_sndirq_update_callback);
 }
 
 static READ8_HANDLER( sgladiat_soundlatch_r )
 {
 	timer_call_after_resynch(NULL, BUSY_CLEAR, sgladiat_sndirq_update_callback);
-	return soundlatch_r(machine,0);
+	return soundlatch_r(space,0);
 }
 
 static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
@@ -377,7 +377,7 @@ static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 
 static READ8_HANDLER( sgladiat_sound_irq_ack_r )
 {
-	cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -438,7 +438,7 @@ static TIMER_CALLBACK( sndirq_update_callback )
 			break;
 	}
 
-	cpunum_set_input_line(machine, 2, 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -480,7 +480,7 @@ static const y8950_interface y8950_config_2 =
 
 static WRITE8_HANDLER( snk_soundlatch_w )
 {
-	soundlatch_w(machine, offset, data);
+	soundlatch_w(space, offset, data);
 	timer_call_after_resynch(NULL, CMDIRQ_BUSY_ASSERT, sndirq_update_callback);
 }
 
@@ -528,7 +528,7 @@ static READ8_HANDLER( tnk3_ymirq_ack_r )
 static READ8_HANDLER( tnk3_busy_clear_r )
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
-	soundlatch_clear_w(machine, 0, 0);
+	soundlatch_clear_w(space, 0, 0);
 	timer_call_after_resynch(NULL, BUSY_CLEAR, sndirq_update_callback);
 	return 0xff;
 }
@@ -6158,7 +6158,7 @@ ROM_END
 static DRIVER_INIT( countryc )
 {
 	// replace coin counter with trackball select
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc300, 0xc300, 0, 0, countryc_trackball_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc300, 0xc300, 0, 0, countryc_trackball_w);
 }
 
 

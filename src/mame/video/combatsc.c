@@ -340,15 +340,15 @@ WRITE8_HANDLER( combasc_vreg_w )
 
 static WRITE8_HANDLER( combascb_sh_irqtrigger_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static READ8_HANDLER( combascb_io_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "DSW1", "DSW2" };
 
-	return input_port_read(machine, portnames[offset]);
+	return input_port_read(space->machine, portnames[offset]);
 }
 
 static WRITE8_HANDLER( combascb_priority_w )
@@ -358,7 +358,7 @@ static WRITE8_HANDLER( combascb_priority_w )
 
 WRITE8_HANDLER( combasc_bankselect_w )
 {
-	UINT8 *page = memory_region(machine, "main") + 0x10000;
+	UINT8 *page = memory_region(space->machine, "main") + 0x10000;
 
 	if (data & 0x40)
 	{
@@ -377,11 +377,11 @@ WRITE8_HANDLER( combasc_bankselect_w )
 
 	if (data & 0x10)
 	{
-		memory_set_bankptr(1,page + 0x4000 * ((data & 0x0e) >> 1));
+		memory_set_bankptr(space->machine, 1,page + 0x4000 * ((data & 0x0e) >> 1));
 	}
 	else
 	{
-		memory_set_bankptr(1,page + 0x20000 + 0x4000 * (data & 1));
+		memory_set_bankptr(space->machine, 1,page + 0x20000 + 0x4000 * (data & 1));
 	}
 }
 
@@ -401,29 +401,29 @@ WRITE8_HANDLER( combascb_bankselect_w )
 	data = data & 0x1f;
 	if( data != combasc_bank_select )
 	{
-		UINT8 *page = memory_region(machine, "main") + 0x10000;
+		UINT8 *page = memory_region(space->machine, "main") + 0x10000;
 		combasc_bank_select = data;
 
 		if (data & 0x10)
 		{
-			memory_set_bankptr(1,page + 0x4000 * ((data & 0x0e) >> 1));
+			memory_set_bankptr(space->machine, 1,page + 0x4000 * ((data & 0x0e) >> 1));
 		}
 		else
 		{
-			memory_set_bankptr(1,page + 0x20000 + 0x4000 * (data & 1));
+			memory_set_bankptr(space->machine, 1,page + 0x20000 + 0x4000 * (data & 1));
 		}
 
 		if (data == 0x1f)
 		{
-			memory_set_bankptr(1,page + 0x20000 + 0x4000 * (data & 1));
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4400, 0x4403, 0, 0, combascb_io_r);/* IO RAM & Video Registers */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4400, 0x4400, 0, 0, combascb_priority_w);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4800, 0, 0, combascb_sh_irqtrigger_w);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4c00, 0x4c00, 0, 0, combasc_vreg_w);
+			memory_set_bankptr(space->machine, 1,page + 0x20000 + 0x4000 * (data & 1));
+			memory_install_read8_handler(space, 0x4400, 0x4403, 0, 0, combascb_io_r);/* IO RAM & Video Registers */
+			memory_install_write8_handler(space, 0x4400, 0x4400, 0, 0, combascb_priority_w);
+			memory_install_write8_handler(space, 0x4800, 0x4800, 0, 0, combascb_sh_irqtrigger_w);
+			memory_install_write8_handler(space, 0x4c00, 0x4c00, 0, 0, combasc_vreg_w);
 		}
 		else
 		{
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);	/* banked ROM */
+			memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);	/* banked ROM */
 		}
 	}
 }
@@ -431,7 +431,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 MACHINE_RESET( combasc )
 {
 	UINT8 *MEM = memory_region(machine, "main") + 0x38000;
-
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	combasc_io_ram  = MEM + 0x0000;
 	combasc_page[0] = MEM + 0x4000;
@@ -442,7 +442,7 @@ MACHINE_RESET( combasc )
 	memset( combasc_page[1], 0x00, 0x2000 );
 
 	combasc_bank_select = -1;
-	combasc_bankselect_w( machine,0,0 );
+	combasc_bankselect_w(space, 0, 0);
 }
 
 WRITE8_HANDLER( combasc_pf_control_w )
@@ -600,9 +600,10 @@ byte #4:
 
 static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	const gfx_element *gfx = machine->gfx[circuit+2];
 
-	int limit = ( circuit) ? (program_read_byte(0xc2)*256 + program_read_byte(0xc3)) : (program_read_byte(0xc0)*256 + program_read_byte(0xc1));
+	int limit = ( circuit) ? (memory_read_byte(space, 0xc2)*256 + memory_read_byte(space, 0xc3)) : (memory_read_byte(space, 0xc0)*256 + memory_read_byte(space, 0xc1));
 	const UINT8 *finish;
 
 	source+=0x1000;

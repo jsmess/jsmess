@@ -201,7 +201,7 @@ static WRITE8_HANDLER( nmi_sub_enable_w )
 
 static WRITE8_HANDLER(sound_w)
 {
-	soundlatch_w(machine,0,data);
+	soundlatch_w(space,0,data);
 }
 
 
@@ -427,7 +427,7 @@ static INTERRUPT_GEN( pturn_sub_intgen )
 {
 	if(nmi_sub)
 	{
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -435,13 +435,14 @@ static INTERRUPT_GEN( pturn_main_intgen )
 {
 	if (nmi_main)
 	{
-		cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
 static MACHINE_RESET( pturn )
 {
-	soundlatch_clear_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	soundlatch_clear_w(space,0,0);
 }
 
 static MACHINE_DRIVER_START( pturn )
@@ -520,8 +521,8 @@ ROM_END
 static DRIVER_INIT(pturn)
 {
 	/*
-    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
-    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
+    memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
+    memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
     */
 }
 

@@ -50,8 +50,8 @@ static WRITE16_HANDLER( bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(machine, "main");
-		memory_set_bankptr(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
+		UINT8 *RAM = memory_region(space->machine, "main");
+		memory_set_bankptr(space->machine, 1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
 	}
 }
 
@@ -75,14 +75,14 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	if (scanline == m107_raster_irq_position)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_2);
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_0);
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_0);
 	}
 
 	/* adjust for next scanline */
@@ -119,20 +119,20 @@ static TIMER_CALLBACK( setvector_callback )
 	}
 
 	if (irqvector & 0x2)		/* YM2151 has precedence */
-		cpunum_set_input_line_vector(1,0,0x18);
+		cpu_set_input_line_vector(machine->cpu[1],0,0x18);
 	else if (irqvector & 0x1)	/* V30 */
-		cpunum_set_input_line_vector(1,0,0x19);
+		cpu_set_input_line_vector(machine->cpu[1],0,0x19);
 
 	if (irqvector == 0)	/* no IRQs pending */
-		cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1],0,ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( m107_soundlatch_w )
 {
 	timer_call_after_resynch(NULL, V30_ASSERT,setvector_callback);
-	soundlatch_w(machine, 0, data & 0xff);
+	soundlatch_w(space, 0, data & 0xff);
 //      logerror("soundlatch_w %02x\n",data);
 }
 
@@ -145,7 +145,7 @@ static READ16_HANDLER( m107_sound_status_r )
 
 static READ16_HANDLER( m107_soundlatch_r )
 {
-	return soundlatch_r(machine, offset) | 0xff00;
+	return soundlatch_r(space, offset) | 0xff00;
 }
 
 static WRITE16_HANDLER( m107_sound_irq_ack_w )
@@ -156,7 +156,7 @@ static WRITE16_HANDLER( m107_sound_irq_ack_w )
 static WRITE16_HANDLER( m107_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_3);
+	cpu_set_input_line_and_vector(space->machine->cpu[0], 0, HOLD_LINE, M107_IRQ_3);
 }
 
 /*****************************************************************************/
@@ -631,7 +631,7 @@ static DRIVER_INIT( firebarr )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "sound");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
@@ -645,7 +645,7 @@ static DRIVER_INIT( dsoccr94 )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "sound");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
@@ -659,7 +659,7 @@ static DRIVER_INIT( wpksoc )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "sound");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */

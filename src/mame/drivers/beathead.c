@@ -144,7 +144,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;
@@ -204,7 +204,7 @@ static void update_interrupts(running_machine *machine)
 	{
 		irq_line_state = gen_int;
 //      if (irq_line_state != CLEAR_LINE)
-			cpunum_set_input_line(machine, 0, ASAP_IRQ0, irq_line_state);
+			cpu_set_input_line(machine->cpu[0], ASAP_IRQ0, irq_line_state);
 //      else
 //          asap_set_irq_line(ASAP_IRQ0, irq_line_state);
 	}
@@ -225,7 +225,7 @@ static WRITE32_HANDLER( interrupt_control_w )
 		irq_state[0] = irq_state[1] = irq_state[2] = 0;
 
 	/* update the current state */
-	update_interrupts(machine);
+	update_interrupts(space->machine);
 }
 
 
@@ -269,7 +269,7 @@ static WRITE32_HANDLER( eeprom_enable_w )
 
 static READ32_HANDLER( input_2_r )
 {
-	int result = input_port_read(machine, "IN2");
+	int result = input_port_read(space->machine, "IN2");
 	if (atarigen_sound_to_cpu_ready) result ^= 0x10;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x20;
 	return result;
@@ -285,21 +285,21 @@ static READ32_HANDLER( input_2_r )
 
 static READ32_HANDLER( sound_data_r )
 {
-	return atarigen_sound_r(machine,offset,0xffff);
+	return atarigen_sound_r(space,offset,0xffff);
 }
 
 
 static WRITE32_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		atarigen_sound_w(machine,offset, data, mem_mask);
+		atarigen_sound_w(space,offset, data, mem_mask);
 }
 
 
 static WRITE32_HANDLER( sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -479,8 +479,8 @@ static UINT32 *speedup_data;
 static READ32_HANDLER( speedup_r )
 {
 	int result = *speedup_data;
-	if ((activecpu_get_previouspc() & 0xfffff) == 0x006f0 && result == activecpu_get_reg(ASAP_R3))
-		cpu_spinuntil_int();
+	if ((cpu_get_previouspc(space->cpu) & 0xfffff) == 0x006f0 && result == cpu_get_reg(space->cpu, ASAP_R3))
+		cpu_spinuntil_int(space->cpu);
 	return result;
 }
 
@@ -489,12 +489,12 @@ static UINT32 *movie_speedup_data;
 static READ32_HANDLER( movie_speedup_r )
 {
 	int result = *movie_speedup_data;
-	if ((activecpu_get_previouspc() & 0xfffff) == 0x00a88 && (activecpu_get_reg(ASAP_R28) & 0xfffff) == 0x397c0 &&
-		movie_speedup_data[4] == activecpu_get_reg(ASAP_R1))
+	if ((cpu_get_previouspc(space->cpu) & 0xfffff) == 0x00a88 && (cpu_get_reg(space->cpu, ASAP_R28) & 0xfffff) == 0x397c0 &&
+		movie_speedup_data[4] == cpu_get_reg(space->cpu, ASAP_R1))
 	{
 		UINT32 temp = (INT16)result + movie_speedup_data[4] * 262;
-		if (temp - (UINT32)activecpu_get_reg(ASAP_R15) < (UINT32)activecpu_get_reg(ASAP_R23))
-			cpu_spinuntil_int();
+		if (temp - (UINT32)cpu_get_reg(space->cpu, ASAP_R15) < (UINT32)cpu_get_reg(space->cpu, ASAP_R23))
+			cpu_spinuntil_int(space->cpu);
 	}
 	return result;
 }
@@ -514,8 +514,8 @@ static DRIVER_INIT( beathead )
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	/* prepare the speedups */
-	speedup_data = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);
-	movie_speedup_data = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000804, 0x00000807, 0, 0, movie_speedup_r);
+	speedup_data = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);
+	movie_speedup_data = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000804, 0x00000807, 0, 0, movie_speedup_r);
 }
 
 

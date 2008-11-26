@@ -192,7 +192,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 
 
 
-static void *x1_010_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( x1_010 )
 {
 	int i;
 	const x1_010_interface *intf = config;
@@ -255,7 +255,7 @@ WRITE8_HANDLER( seta_sound_w )
 	 	info->smp_offset[channel] = 0;
 	 	info->env_offset[channel] = 0;
 	}
-	LOG_REGISTER_WRITE(("PC: %06X : offset %6X : data %2X\n", activecpu_get_pc(), offset, data ));
+	LOG_REGISTER_WRITE(("PC: %06X : offset %6X : data %2X\n", cpu_get_pc(space->cpu), offset, data ));
 	info->reg[offset] = data;
 }
 
@@ -270,8 +270,8 @@ READ16_HANDLER( seta_sound_word_r )
 	UINT16	ret;
 
 	ret = info->HI_WORD_BUF[offset]<<8;
-	ret += (seta_sound_r( machine, offset )&0xff);
-	LOG_REGISTER_READ(( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, ret ));
+	ret += (seta_sound_r( space, offset )&0xff);
+	LOG_REGISTER_READ(( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(space->cpu), offset, ret ));
 	return ret;
 }
 
@@ -279,8 +279,8 @@ WRITE16_HANDLER( seta_sound_word_w )
 {
 	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
 	info->HI_WORD_BUF[offset] = (data>>8)&0xff;
-	seta_sound_w( machine, offset, data&0xff );
-	LOG_REGISTER_WRITE(( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, data ));
+	seta_sound_w( space, offset, data&0xff );
+	LOG_REGISTER_WRITE(( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(space->cpu), offset, data ));
 }
 
 
@@ -289,7 +289,7 @@ WRITE16_HANDLER( seta_sound_word_w )
  * Generic get_info
  **************************************************************************/
 
-static void x1_010_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( x1_010 )
 {
 	switch (state)
 	{
@@ -298,15 +298,15 @@ static void x1_010_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void x1_010_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( x1_010 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = x1_010_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = x1_010_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( x1_010 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( x1_010 );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

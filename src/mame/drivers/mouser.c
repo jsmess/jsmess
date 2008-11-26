@@ -38,7 +38,7 @@ static WRITE8_HANDLER( mouser_nmi_enable_w )
 static INTERRUPT_GEN( mouser_nmi_interrupt )
 {
 	if ((mouser_nmi_enable & 1) == 1)
-		nmi_line_pulse(machine, cpunum);
+		nmi_line_pulse(device);
 }
 
 /* Sound CPU interrupted on write */
@@ -46,7 +46,7 @@ static INTERRUPT_GEN( mouser_nmi_interrupt )
 static WRITE8_HANDLER( mouser_sound_interrupt_w )
 {
 	mouser_sound_byte = data;
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mouser_sound_byte_r )
@@ -283,11 +283,12 @@ static DRIVER_INIT( mouser )
 	/* Decode the opcodes */
 
 	offs_t i;
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypted = auto_malloc(0x6000);
 	UINT8 *table = memory_region(machine, "user1");
 
-	memory_set_decrypted_region(0, 0x0000, 0x5fff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0x5fff, decrypted);
 
 	for (i = 0;i < 0x6000;i++)
 	{

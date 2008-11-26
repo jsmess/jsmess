@@ -207,22 +207,22 @@ VIDEO_UPDATE( gladiatr );
 /*Rom bankswitching*/
 static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, "main") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "main") + 0x10000;
 
-	memory_set_bankptr(1, rom + 0x6000 * (data & 0x01));
+	memory_set_bankptr(space->machine, 1, rom + 0x6000 * (data & 0x01));
 }
 
 
 static READ8_HANDLER( gladiator_dsw1_r )
 {
-	int orig = input_port_read(machine, "DSW1")^0xff;
+	int orig = input_port_read(space->machine, "DSW1")^0xff;
 
 	return BITSWAP8(orig, 0,1,2,3,4,5,6,7);
 }
 
 static READ8_HANDLER( gladiator_dsw2_r )
 {
-	int orig = input_port_read(machine, "DSW2")^0xff;
+	int orig = input_port_read(space->machine, "DSW2")^0xff;
 
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
@@ -231,15 +231,15 @@ static READ8_HANDLER( gladiator_controll_r )
 {
 	int coins = 0;
 
-	if( input_port_read(machine, "COINS") & 0xc0 ) coins = 0x80;
+	if( input_port_read(space->machine, "COINS") & 0xc0 ) coins = 0x80;
 	switch(offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read(machine, "IN0") | coins;
+		return input_port_read(space->machine, "IN0") | coins;
 	case 0x02: /* Player 1 Controller , coins */
-		return input_port_read(machine, "IN1") | coins;
+		return input_port_read(space->machine, "IN1") | coins;
 	case 0x04: /* Player 2 Controller , coins */
-		return input_port_read(machine, "IN2") | coins;
+		return input_port_read(space->machine, "IN2") | coins;
 	}
 	/* unknown */
 	return 0;
@@ -250,7 +250,7 @@ static READ8_HANDLER( gladiator_button3_r )
 	switch(offset)
 	{
 	case 0x01: /* button 3 */
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 	}
 	/* unknown */
 	return 0;
@@ -270,14 +270,15 @@ static MACHINE_RESET( gladiator )
 	/* 6809 bank memory set */
 	{
 		UINT8 *rom = memory_region(machine, "audio") + 0x10000;
-		memory_set_bankptr(2,rom);
+		memory_set_bankptr(machine, 2,rom);
+		cpu_reset(machine->cpu[2]);
 	}
 }
 
 /* YM2203 port A handler (input) */
 static READ8_HANDLER( gladiator_dsw3_r )
 {
-	return input_port_read(machine, "DSW3");
+	return input_port_read(space->machine, "DSW3");
 }
 /* YM2203 port B handler (output) */
 static WRITE8_HANDLER( gladiator_int_control_w )
@@ -290,16 +291,16 @@ static WRITE8_HANDLER( gladiator_int_control_w )
 static void gladiator_ym_irq(running_machine *machine, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
 static WRITE8_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = memory_region(machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
 
 	/* bit6 = bank offset */
-	memory_set_bankptr(2,rom + ((data & 0x40) ? 0xc000 : 0));
+	memory_set_bankptr(space->machine, 2,rom + ((data & 0x40) ? 0xc000 : 0));
 
 	msm5205_data_w(0,data);         /* bit0..3  */
 	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
@@ -308,14 +309,14 @@ static WRITE8_HANDLER( glad_adpcm_w )
 
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
 {
-	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( glad_cpu_sound_command_r )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(machine,0);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(space,0);
 }
 
 static WRITE8_HANDLER( gladiatr_flipscreen_w )
@@ -328,7 +329,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 #endif
 
@@ -361,9 +362,9 @@ static WRITE8_HANDLER(qx2_w){ }
 
 static WRITE8_HANDLER(qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return mame_rand(machine); }
+static READ8_HANDLER(qx2_r){ return mame_rand(space->machine); }
 
-static READ8_HANDLER(qx3_r){ return mame_rand(machine)&0xf; }
+static READ8_HANDLER(qx3_r){ return mame_rand(space->machine)&0xf; }
 
 static READ8_HANDLER(qx0_r)
 {
@@ -650,7 +651,7 @@ GFXDECODE_END
 
 static READ8_HANDLER(f1_r)
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static const ym2203_interface ppking_ym2203_interface =
@@ -1014,12 +1015,16 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x22000, rom + 0x28000, 0x2000);
 	swap_block(rom + 0x26000, rom + 0x2c000, 0x2000);
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
+
+	/* make sure bank is valid in cpu-reset */
+	rom = memory_region(machine, "audio") + 0x10000;
+	memory_set_bankptr(machine, 2,rom);
 }
 
 
 static READ8_HANDLER(f6a3_r)
 {
-	if(activecpu_get_previouspc()==0x8e)
+	if(cpu_get_previouspc(space->cpu)==0x8e)
 		generic_nvram[0x6a3]=1;
 
 	return generic_nvram[0x6a3];
@@ -1048,7 +1053,7 @@ static DRIVER_INIT(ppking)
 		}
 	}
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf6a3,0xf6a3,0,0, f6a3_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf6a3,0xf6a3,0,0, f6a3_r );
 }
 
 

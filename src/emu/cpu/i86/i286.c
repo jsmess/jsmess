@@ -4,7 +4,6 @@
 ****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "host.h"
 
 
@@ -60,6 +59,8 @@ typedef struct
 	} ldtr, tr;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
     INT32     AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
     UINT8	ParityVal;
 	UINT8	TF, IF; 	/* 0 or 1 valued flags */
@@ -227,7 +228,7 @@ static CPU_EXECUTE( i80286 )
 	while(i80286_ICount>0)
 	{
 		LOG(("[%04x:%04x]=%02x\tF:%04x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x %d%d%d%d%d%d%d%d%d\n",I.sregs[CS],I.pc - I.base[CS],ReadByte(I.pc),I.flags,I.regs.w[AX],I.regs.w[BX],I.regs.w[CX],I.regs.w[DX], I.AuxVal?1:0, I.OverVal?1:0, I.SignVal?1:0, I.ZeroVal?1:0, I.CarryVal?1:0, I.ParityVal?1:0,I.TF, I.IF, I.DirVal<0?1:0));
-		debugger_instruction_hook(Machine, I.pc);
+		debugger_instruction_hook(device, I.pc);
 
 		seg_prefix=FALSE;
 		I.prevpc = I.pc;
@@ -252,47 +253,49 @@ static CPU_DISASSEMBLE( i80286 )
 static CPU_INIT( i80286 )
 {
 	static const char type[] = "80286";
-	state_save_register_item_array(type, index, I.regs.w);
-	state_save_register_item(type, index, I.amask);
-	state_save_register_item(type, index, I.pc);
-	state_save_register_item(type, index, I.prevpc);
-	state_save_register_item(type, index, I.msw);
-	state_save_register_item_array(type, index, I.base);
-	state_save_register_item_array(type, index, I.sregs);
-	state_save_register_item_array(type, index, I.limit);
-	state_save_register_item_array(type, index, I.rights);
-	state_save_register_item(type, index, I.gdtr.base);
-	state_save_register_item(type, index, I.gdtr.limit);
-	state_save_register_item(type, index, I.idtr.base);
-	state_save_register_item(type, index, I.idtr.limit);
-	state_save_register_item(type, index, I.ldtr.sel);
-	state_save_register_item(type, index, I.ldtr.base);
-	state_save_register_item(type, index, I.ldtr.limit);
-	state_save_register_item(type, index, I.ldtr.rights);
-	state_save_register_item(type, index, I.tr.sel);
-	state_save_register_item(type, index, I.tr.base);
-	state_save_register_item(type, index, I.tr.limit);
-	state_save_register_item(type, index, I.tr.rights);
-	state_save_register_item(type, index, I.AuxVal);
-	state_save_register_item(type, index, I.OverVal);
-	state_save_register_item(type, index, I.SignVal);
-	state_save_register_item(type, index, I.ZeroVal);
-	state_save_register_item(type, index, I.CarryVal);
-	state_save_register_item(type, index, I.DirVal);
-	state_save_register_item(type, index, I.ParityVal);
-	state_save_register_item(type, index, I.TF);
-	state_save_register_item(type, index, I.IF);
-	state_save_register_item(type, index, I.int_vector);
-	state_save_register_item(type, index, I.nmi_state);
-	state_save_register_item(type, index, I.irq_state);
-	state_save_register_item(type, index, I.extra_cycles);
+	state_save_register_item_array(type, device->tag, 0, I.regs.w);
+	state_save_register_item(type, device->tag, 0, I.amask);
+	state_save_register_item(type, device->tag, 0, I.pc);
+	state_save_register_item(type, device->tag, 0, I.prevpc);
+	state_save_register_item(type, device->tag, 0, I.msw);
+	state_save_register_item_array(type, device->tag, 0, I.base);
+	state_save_register_item_array(type, device->tag, 0, I.sregs);
+	state_save_register_item_array(type, device->tag, 0, I.limit);
+	state_save_register_item_array(type, device->tag, 0, I.rights);
+	state_save_register_item(type, device->tag, 0, I.gdtr.base);
+	state_save_register_item(type, device->tag, 0, I.gdtr.limit);
+	state_save_register_item(type, device->tag, 0, I.idtr.base);
+	state_save_register_item(type, device->tag, 0, I.idtr.limit);
+	state_save_register_item(type, device->tag, 0, I.ldtr.sel);
+	state_save_register_item(type, device->tag, 0, I.ldtr.base);
+	state_save_register_item(type, device->tag, 0, I.ldtr.limit);
+	state_save_register_item(type, device->tag, 0, I.ldtr.rights);
+	state_save_register_item(type, device->tag, 0, I.tr.sel);
+	state_save_register_item(type, device->tag, 0, I.tr.base);
+	state_save_register_item(type, device->tag, 0, I.tr.limit);
+	state_save_register_item(type, device->tag, 0, I.tr.rights);
+	state_save_register_item(type, device->tag, 0, I.AuxVal);
+	state_save_register_item(type, device->tag, 0, I.OverVal);
+	state_save_register_item(type, device->tag, 0, I.SignVal);
+	state_save_register_item(type, device->tag, 0, I.ZeroVal);
+	state_save_register_item(type, device->tag, 0, I.CarryVal);
+	state_save_register_item(type, device->tag, 0, I.DirVal);
+	state_save_register_item(type, device->tag, 0, I.ParityVal);
+	state_save_register_item(type, device->tag, 0, I.TF);
+	state_save_register_item(type, device->tag, 0, I.IF);
+	state_save_register_item(type, device->tag, 0, I.int_vector);
+	state_save_register_item(type, device->tag, 0, I.nmi_state);
+	state_save_register_item(type, device->tag, 0, I.irq_state);
+	state_save_register_item(type, device->tag, 0, I.extra_cycles);
 
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
-	if( config )
-		I.amask = *(unsigned*)config;
+	if( device->static_config )
+		I.amask = *(unsigned*)device->static_config;
 	else
 		I.amask = 0x00ffff;
 

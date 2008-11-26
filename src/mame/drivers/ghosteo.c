@@ -77,7 +77,7 @@ static struct lcd_config
 
 static READ32_HANDLER( r1 )
 {
-//  int pc = activecpu_get_pc();
+//  int pc = cpu_get_pc(space->cpu);
 //  if(pc != 0x9a0 && pc != 0x7b4) printf("r1 @ %X\n",pc);
 
 	return 1;
@@ -85,8 +85,8 @@ static READ32_HANDLER( r1 )
 
 static READ32_HANDLER( r2 )
 {
-//  int pc = activecpu_get_pc();
-//  if(pc != 0xd64 && pc != 0xd3c ) printf("r2 @ %X\n",pc);
+//  int pc = cpu_get_pc(space->cpu);
+//  if(pc != 0xd64 && pc != 0xd3c )printf("r2 @ %X\n",pc);
 
 	return 2;
 }
@@ -98,23 +98,13 @@ static int flash_addr_step = 0;
 
 static WRITE32_HANDLER( flash_reg_w )
 {
-	static int old[3];
-
 	COMBINE_DATA(&flash_regs[offset]);
-
-
-	if(old[offset] != flash_regs[offset])
-	{
-		old[offset] = flash_regs[offset];
-
-//      printf("reg %d) %02X\n",offset,old[offset] = flash_regs[offset]);
-//      logerror("reg %d) %02X\n",offset,old[offset] = flash_regs[offset]);
-	}
 
 	switch(offset)
 	{
 	case 0:
-
+		//if((flash_regs[offset] & 0xff) != 0x60)
+		//  printf("%08x\n",flash_regs[offset]);
 		break;
 	case 1:
 		break;
@@ -147,16 +137,21 @@ static READ32_HANDLER( flash_reg_r )
 
 static READ32_HANDLER( flash_r )
 {
-	UINT8 *flash = (UINT8 *)memory_region(machine, "user1");
+	UINT8 *flash = (UINT8 *)memory_region(space->machine, "user1");
 	UINT8 value = flash[flash_addr];
-	flash_addr = (flash_addr + 1) % memory_region_length(machine, "user1");
+	flash_addr = (flash_addr + 1) % memory_region_length(space->machine, "user1");
 	return value;
 }
 
 static READ32_HANDLER( flash_ecc_r )
 {
-
 	//TODO
+
+	if((flash_addr & 0x0fff) == 0)
+	{
+		//printf("%08x\n",flash_addr);
+		return 1;
+	}
 
 	return 0;
 }
@@ -216,7 +211,7 @@ static READ32_HANDLER( lcd_control_r )
 	{
 		case 0x00/4:
 		{
-			int line_val = video_screen_get_vpos(machine->primary_screen) & 0x3ff;
+			int line_val = video_screen_get_vpos(space->machine->primary_screen) & 0x3ff;
 			return (lcd_control[offset] & ~(0x3ff << 18)) | ((lcd.line_val - line_val) << 18);
 		}
 
@@ -245,7 +240,7 @@ static WRITE32_HANDLER( lcd_control_w )
 	{
 		case 0x00/4:
 		{
-			int line_val = video_screen_get_vpos(machine->primary_screen) & 0x3ff;
+			int line_val = video_screen_get_vpos(space->machine->primary_screen) & 0x3ff;
 			int bpp_mode = (lcd_control[offset] & 0x1e) >> 1;
 			int screen_type = (lcd_control[offset] & 0x60) >> 5;
 
@@ -292,8 +287,8 @@ static WRITE32_HANDLER( lcd_control_w )
 
 		case 0x14/4:
 		{
-			int lcd_bank = (lcd_control[offset] >> 21) & 0x1ff;
-			int lcd_base_u = (lcd_control[offset] >> 0) & 0x1fffff;
+			UINT32 lcd_bank = (lcd_control[offset] >> 21) & 0x1ff;
+			UINT32 lcd_base_u = (lcd_control[offset] >> 0) & 0x1fffff;
 
 			lcd.lcd_bank = lcd_bank;
 			lcd.lcd_base_u = lcd_base_u;
@@ -303,9 +298,11 @@ static WRITE32_HANDLER( lcd_control_w )
 
 		case 0x18/4:
 		{
-			int lcd_base_sel = (lcd_control[offset] >> 0) & 0x1fffff;
+			UINT32 lcd_base_sel = (lcd_control[offset] >> 0) & 0x1fffff;
 
 			lcd.lcd_base_sel = lcd_base_sel;
+
+			//popmessage("%08x",lcd.lcd_base_sel);
 
 			break;
 		}
@@ -326,8 +323,11 @@ static WRITE32_HANDLER( lcd_control_w )
 
 static READ32_HANDLER( io_port_r )
 {
+//  printf("%08x\n",offset*4);
+
 	switch(offset)
 	{
+
 		case 0x64/4:
 		{
 			static int input = 0;
@@ -349,6 +349,7 @@ static READ32_HANDLER( io_port_r )
 static WRITE32_HANDLER( io_port_w )
 {
 	COMBINE_DATA(&io_port[offset]);
+//  printf("[%08x] <- %08x\n",offset*4,data);
 }
 
 
@@ -392,13 +393,13 @@ static VIDEO_UPDATE( bballoon )
 		printf("en = %d\n",irq_en);
 	}
 
-	if(input_code_pressed_once(KEYCODE_W))
+	if(input_code_pressed(KEYCODE_W))
 	{
 
 		printf("b = %d\n",++b);
 	}
 
-	if(input_code_pressed_once(KEYCODE_E))
+	if(input_code_pressed(KEYCODE_E))
 	{
 
 		printf("b = %d\n",--b);
@@ -417,21 +418,29 @@ static VIDEO_UPDATE( bballoon )
 
 		int start_addr = (lcd.lcd_bank << 22) - 0x30000000;
 
+		//popmessage("%08x %08x %08x",lcd.lcd_bank,lcd.lcd_base_sel,lcd.lcd_base_u);
+
 		if(start_addr > 0x1ffffff)
 			printf("max = %X\n",start_addr);
 		else
 		{
-			//printf("addr = %X\n",start_addr + lcd.lcd_base_u);
-
-			UINT32* videoram = system_memory + start_addr/4 + lcd.lcd_base_u/4 + 0x10000*b;
+			UINT32* videoram = system_memory + start_addr/4 + lcd.lcd_base_u/4;
 			int x,y,count;
 
-			// probably wrong...
+			//popmessage("%08x %08x %d",lcd.lcd_base_u,lcd.lcd_base_sel,test);
 
-			count = 0;
-			for (y=0;y <= cliprect->max_y;y++)
+			/*temp until I understand...*/
+			switch(lcd.lcd_base_sel)
 			{
-				for (x=0;x <= cliprect->max_x/2;x+=2)
+				case 0x1aac00: count = -81920; break;
+				case 0x192c00: count = -57344; break;
+				default: count = 0;
+			}
+			//count = test;//lcd.lcd_base_sel/4;
+
+			for (y=0;y <= 600;y++)
+			{
+				for (x=0;x < 400;x++)
 				{
 					UINT32 color;
 					UINT32 b;
@@ -443,22 +452,20 @@ static VIDEO_UPDATE( bballoon )
 					b = (color & 0x001f) << 3;
 					g = (color & 0x07e0) >> 2;
 					r = (color & 0xf800) >> 6;
-
-					*BITMAP_ADDR32(bitmap, y, x*2+0) = b | (g<<8) | (r<<16);
+					if(((x*2)+1)<cliprect->max_x && y<cliprect->max_y)
+					*BITMAP_ADDR32(bitmap, y, x*2+1) = b | (g<<8) | (r<<16);
 
 					color = videoram[count] & 0xffff;
 
 					b = (color & 0x001f) << 3;
 					g = (color & 0x07e0) >> 2;
 					r = (color & 0xf800) >> 6;
-
-					*BITMAP_ADDR32(bitmap, y, x*2+1) = b | (g<<8) | (r<<16);
+					if(((x*2)+0)<cliprect->max_x && y<cliprect->max_y)
+					*BITMAP_ADDR32(bitmap, y, x*2+0) = b | (g<<8) | (r<<16);
 
 					count++;
 				}
 			}
-
-
 		}
 
 	}
@@ -473,10 +480,10 @@ static VIDEO_UPDATE( bballoon )
 static INTERRUPT_GEN( bballoon_interrupt )
 {
 	if(irq_en)
-		cpunum_set_input_line(machine, 0, ARM7_IRQ_LINE, PULSE_LINE);
-		//cpunum_set_input_line(machine, 0, ARM7_FIRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(device, ARM7_IRQ_LINE, HOLD_LINE);
+	//cpu_set_input_line(device, ARM7_FIRQ_LINE, HOLD_LINE);
 
-	irq_en = 0;
+//  irq_en = 0;
 }
 
 static MACHINE_DRIVER_START( bballoon )
@@ -491,8 +498,10 @@ static MACHINE_DRIVER_START( bballoon )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(1024, 1024)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MDRV_SCREEN_SIZE(320, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
+//  MDRV_SCREEN_SIZE(1024, 1024)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 1023, 0, 1023)
 
 	MDRV_PALETTE_LENGTH(256)
 

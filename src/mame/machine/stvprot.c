@@ -4,15 +4,15 @@
  figure out properly
  clean up
  fix remaining games
- split apart? (this might be a per game thing rather than a generic device..)
+ split them on a per-game basis
 
  Known Protected ST-V Games
 
  Astra Superstars (text layer gfx transfer)
- Elandoree (gfx transfer of textures for some characters)
+ Elandoree (gfx transfer of textures)
  Final Fight Revenge (boot vectors etc.?)
- Radiant Silvergun (game start protection)
- Steep Slope Sliders (gfx transfer of some character portraits)
+ Radiant Silvergun (game start protection ?)
+ Steep Slope Sliders (gfx transfer of character portraits)
  Decathlete (transfer of all gfx data)
  Tecmo World Cup '98 (tecmo logo, player movement?)
 
@@ -48,7 +48,15 @@ the data used by the games in the various circumstances for reference:
  [0]        [1]        [2]        [3]
  No protection                               test mode
  No protection                               attract mode
- 0x000y0000 0x00000000 0xe69000f9 0xff7f0000 gameplay,VDP-1 write (textures on humans)
+ 0x000y0000 0x00000000 0x****00** 0xff7f0000 gameplay,VDP-1 write (textures on humans)
+ 0x000y0000 0x00000000 0x****00** 0xffbf0000 gameplay,VDP-1 write (textures on humans)
+
+ 0x000y0000 0x00000000 0x****00** 0xf9ff0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfbff0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfe7f0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfd7f0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfeff0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xf9bf0000 gameplay,VDP-1 write (textures on dragons)
 
 -Final Fight Revenge [ffreveng]
  [0]        [1]        [2]        [3]
@@ -118,17 +126,28 @@ Wrong vectors (at least not where I tested it):
 */
 static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
+#define ELANDORE_CTRL_1_HUMAN   0xff7f0000
+#define ELANDORE_CTRL_2_HUMAN   0xffbf0000
+
+#define ELANDORE_CTRL_1_DRAGON  0xf9ff0000
+#define ELANDORE_CTRL_2_DRAGON  0xfbff0000
+#define ELANDORE_CTRL_3_DRAGON  0xfe7f0000
+#define ELANDORE_CTRL_4_DRAGON  0xfd7f0000
+#define ELANDORE_CTRL_5_DRAGON  0xfeff0000
+#define ELANDORE_CTRL_6_DRAGON  0xf9bf0000
+
+
 static READ32_HANDLER( a_bus_ctrl_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",activecpu_get_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(space->cpu),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",activecpu_get_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(space->cpu),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -228,15 +247,16 @@ static READ32_HANDLER( a_bus_ctrl_r )
 					ctrl_index += 4;
 					return val;
 				}
-				case 0xff7f0000://elandore
-					if(a_bus[2] == 0xe69000f9)
-					{
-						ctrl_index++;
-						return ROM[ctrl_index];
-					}
-					else return 0x12345678;
-				case 0xffbf0000:
-					ctrl_index++;
+				//elandore
+				case ELANDORE_CTRL_1_HUMAN:
+				case ELANDORE_CTRL_2_HUMAN:
+				case ELANDORE_CTRL_1_DRAGON:
+				case ELANDORE_CTRL_2_DRAGON:
+				case ELANDORE_CTRL_3_DRAGON:
+				case ELANDORE_CTRL_4_DRAGON:
+				case ELANDORE_CTRL_5_DRAGON:
+				case ELANDORE_CTRL_6_DRAGON:
+					//ctrl_index++;
 					return ROM[ctrl_index];
 			}
 		}
@@ -252,9 +272,10 @@ static READ32_HANDLER( a_bus_ctrl_r )
 static WRITE32_HANDLER ( a_bus_ctrl_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",activecpu_get_pc(),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(space->cpu),offset,data);
 	if(offset == 3)
 	{
+		//printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
 		switch(a_bus[3])
 		{
 			/*astrass,I need an original test mode screen to compare...*/
@@ -277,8 +298,30 @@ static WRITE32_HANDLER ( a_bus_ctrl_w )
 			/*rsgun*/
 			case 0x77770000: ctrl_index = 0; break;
 			/*elandore*/
-			case 0xff7f0000: ctrl_index = ((0x400000)/4)-1; break;
-			case 0xffbf0000: ctrl_index = (0x1c40000/4)-1; break;
+			case ELANDORE_CTRL_1_HUMAN: // (human polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
+			case ELANDORE_CTRL_2_HUMAN: // (human polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
+			case ELANDORE_CTRL_1_DRAGON://KAIN / THUNDER (dragon polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
+			case ELANDORE_CTRL_2_DRAGON://REVI CURIO / DARK (dragon polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
+			case ELANDORE_CTRL_3_DRAGON://RUBONE / POISON (dragon polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
+			case ELANDORE_CTRL_4_DRAGON://TINA / MAGICAL GIRL (dragon polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
+			case ELANDORE_CTRL_5_DRAGON://KEYAKI / FIRE (dragon polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
+			case ELANDORE_CTRL_6_DRAGON://SION / WIND (dragon polygons)
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+				break;
 		}
 	}
 	//popmessage("%04x %04x",data,offset/4);
@@ -286,7 +329,7 @@ static WRITE32_HANDLER ( a_bus_ctrl_w )
 
 void install_standard_protection(running_machine *machine)
 {
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4fffff0, 0x4ffffff, 0, 0, a_bus_ctrl_r, a_bus_ctrl_w);
+	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, a_bus_ctrl_r, a_bus_ctrl_w);
 }
 
 static READ32_HANDLER(astrass_prot_r)
@@ -294,11 +337,11 @@ static READ32_HANDLER(astrass_prot_r)
 	if ( offset == 3 && ctrl_index != -1 )
 	{
 		UINT32 data = 0;
-		UINT32 *prot_data = (UINT32 *)memory_region(machine, "user2");
+		UINT32 *prot_data = (UINT32 *)memory_region(space->machine, "user2");
 
 		data = prot_data[ctrl_index++];
 
-		if ( ctrl_index >= memory_region_length(machine, "user2")/4 )
+		if ( ctrl_index >= memory_region_length(space->machine, "user2")/4 )
 		{
 			ctrl_index = -1;
 		}
@@ -320,7 +363,7 @@ static WRITE32_HANDLER(astrass_prot_w)
 void install_astrass_protection(running_machine *machine)
 {
 	ctrl_index = -1;
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4fffff0, 0x4ffffff, 0, 0, astrass_prot_r, astrass_prot_w);
+	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, astrass_prot_r, astrass_prot_w);
 }
 
 
@@ -335,7 +378,7 @@ static UINT16 decathlt_prottable2[128];
 
 static READ32_HANDLER( decathlt_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
 
 	if (offset==2)
 	{
@@ -348,7 +391,7 @@ static READ32_HANDLER( decathlt_prot_r )
 	}
 	else
 	{
-		mame_printf_info("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",activecpu_get_pc(), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		mame_printf_info("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",cpu_get_pc(space->cpu), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
 	}
 
 	return decathlt_protregs[offset];
@@ -365,7 +408,7 @@ static WRITE32_HANDLER( decathlt_prot_w )
 
 		if (decathlt_part==0) mame_printf_info("last count was %06x\n",decathlt_lastcount);
 		decathlt_lastcount = 0;
-		mame_printf_info("%06x Decathlete prot W offset %04x data %08x, regs %08x, %08x, %08x, %08x\n",activecpu_get_pc(), offset, data, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		mame_printf_info("%06x Decathlete prot W offset %04x data %08x, regs %08x, %08x, %08x, %08x\n",cpu_get_pc(space->cpu), offset, data, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
 	}
 
 	if (offset==1) // uploads 2 tables...
@@ -462,9 +505,9 @@ void install_decathlt_protection(running_machine *machine)
 {
 	/* It uploads 2 tables here, then performs what looks like a number of transfers, setting
        a source address of some kind (scrambled?) and then making many reads from a single address */
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x37FFFF0, 0x37FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
+	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x37FFFF0, 0x37FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
 	/* It uploads 2 tables here too, but nothing else, mirror? unused? */
-//  memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x27FFFF0, 0x27FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
+//  memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x27FFFF0, 0x27FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
 }
 
 void stv_register_protection_savestates(void)

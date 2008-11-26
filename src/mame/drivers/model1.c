@@ -646,13 +646,13 @@ static READ16_HANDLER( io_r )
 	static const char *const inputnames[] = { "IN0", "IN1", "IN2" };
 
 	if(offset < 0x8)
-		return input_port_read_safe(machine, analognames[offset], 0x00);
+		return input_port_read_safe(space->machine, analognames[offset], 0x00);
 
 	if(offset < 0x10)
 	{
 		offset -= 0x8;
 		if(offset < 3)
-			return input_port_read(machine, inputnames[offset]);
+			return input_port_read(space->machine, inputnames[offset]);
 		return 0xff;
 	}
 
@@ -670,7 +670,7 @@ static WRITE16_HANDLER( bank_w )
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			memory_set_bankptr(1, memory_region(machine, "main") + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -689,7 +689,7 @@ static void irq_raise(running_machine *machine, int level)
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
 	last_irq = level;
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK(irq_callback)
@@ -712,31 +712,31 @@ static IRQ_CALLBACK(irq_callback)
 
 static void irq_init(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 }
 
 static INTERRUPT_GEN(model1_interrupt)
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
-		irq_raise(machine, 1);
+		irq_raise(device->machine, 1);
 	}
 	else
 	{
-		irq_raise(machine, model1_sound_irq);
+		irq_raise(device->machine, model1_sound_irq);
 
 		// if the FIFO has something in it, signal the 68k too
 		if (fifo_rptr != fifo_wptr)
 		{
-			cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[1], 2, HOLD_LINE);
 		}
 	}
 }
 
 static MACHINE_RESET(model1)
 {
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x1000000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000000);
 	irq_init(machine);
 	model1_tgp_reset(!strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwara"));
 	if (!strcmp(machine->gamedrv->name, "swa"))
@@ -755,7 +755,7 @@ static MACHINE_RESET(model1)
 
 static MACHINE_RESET(model1_vr)
 {
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x1000000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000000);
 	irq_init(machine);
 	model1_vr_tgp_reset();
 	model1_sound_irq = 3;
@@ -783,7 +783,7 @@ static WRITE16_HANDLER(md1_w)
 	if(0 && offset)
 		return;
 	if(1 && model1_dump)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
+		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER(md0_w)
@@ -792,15 +792,15 @@ static WRITE16_HANDLER(md0_w)
 	if(0 && offset)
 		return;
 	if(1 && model1_dump)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
+		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER(p_w)
 {
 	UINT16 old = paletteram16[offset];
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 	if(0 && paletteram16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
+		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static UINT16 *mr;
@@ -808,7 +808,7 @@ static WRITE16_HANDLER(mr_w)
 {
 	COMBINE_DATA(mr+offset);
 	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, activecpu_get_pc());
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static UINT16 *mr2;
@@ -817,32 +817,32 @@ static WRITE16_HANDLER(mr2_w)
 	COMBINE_DATA(mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, activecpu_get_pc());
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", mr2[0x3680/2+1], mr2[0x3680/2], activecpu_get_pc());
+		logerror("MW f80[r25], %04x%04x (%x)\n", mr2[0x3680/2+1], mr2[0x3680/2], cpu_get_pc(space->cpu));
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", mr2[0x06ca/2+1], mr2[0x06ca/2], activecpu_get_pc());
+		logerror("MW fca[r19], %04x%04x (%x)\n", mr2[0x06ca/2+1], mr2[0x06ca/2], cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", mr2[0x1eca/2+1], mr2[0x1eca/2], activecpu_get_pc());
+		logerror("MW fca[r22], %04x%04x (%x)\n", mr2[0x1eca/2+1], mr2[0x1eca/2], cpu_get_pc(space->cpu));
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(mr2+0x1f08/2), activecpu_get_pc());
+		logerror("MW  8[r10], %f (%x)\n", *(float *)(mr2+0x1f08/2), cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(mr2+0x1f0c/2), activecpu_get_pc());
+		logerror("MW  c[r10], %f (%x)\n", *(float *)(mr2+0x1f0c/2), cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(mr2+0x1f10/2), activecpu_get_pc());
+		logerror("MW 10[r10], %f (%x)\n", *(float *)(mr2+0x1f10/2), cpu_get_pc(space->cpu));
 }
 
 static READ16_HANDLER( snd_68k_ready_r )
 {
-	int sr = cpunum_get_reg(1, M68K_SR);
+	int sr = cpu_get_reg(space->machine->cpu[1], M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -856,9 +856,9 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	if (fifo_wptr >= FIFO_SIZE) fifo_wptr = 0;
 
 	// signal the 68000 that there's data waiting
-	cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
 	// give the 68k time to reply
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 }
 
 static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -976,12 +976,12 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 
 static READ16_HANDLER( m1_snd_mpcm0_r )
 {
-	return multi_pcm_reg_0_r(machine, 0);
+	return multi_pcm_reg_0_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_w )
 {
-	multi_pcm_reg_0_w(machine, offset, data);
+	multi_pcm_reg_0_w(space, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
@@ -991,12 +991,12 @@ static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
 
 static READ16_HANDLER( m1_snd_mpcm1_r )
 {
-	return multi_pcm_reg_1_r(machine, 0);
+	return multi_pcm_reg_1_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_w )
 {
-	multi_pcm_reg_1_w(machine, offset, data);
+	multi_pcm_reg_1_w(space, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
@@ -1006,7 +1006,7 @@ static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 
 static READ16_HANDLER( m1_snd_ym_r )
 {
-	return ym3438_status_port_0_a_r(machine, 0);
+	return ym3438_status_port_0_a_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_ym_w )
@@ -1014,19 +1014,19 @@ static WRITE16_HANDLER( m1_snd_ym_w )
 	switch (offset)
 	{
 		case 0:
-			ym3438_control_port_0_a_w(machine, 0, data);
+			ym3438_control_port_0_a_w(space, 0, data);
 			break;
 
 		case 1:
-			ym3438_data_port_0_a_w(machine, 0, data);
+			ym3438_data_port_0_a_w(space, 0, data);
 			break;
 
 		case 2:
-			ym3438_control_port_0_b_w(machine, 0, data);
+			ym3438_control_port_0_b_w(space, 0, data);
 			break;
 
 		case 3:
-			ym3438_data_port_0_b_w(machine, 0, data);
+			ym3438_data_port_0_b_w(space, 0, data);
 			break;
 	}
 }

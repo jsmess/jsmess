@@ -56,7 +56,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
 {
-//  popmessage("%04x",activecpu_get_pc());
+//  popmessage("%04x",cpu_get_pc(machine->activecpu));
 	return (~(eeprom_read_bit()<<1) & 2);
 }
 
@@ -81,12 +81,12 @@ static WRITE8_HANDLER( rom_bank_w )
 	int new_bank = (data&0xff)>>0;
 
 	if(bank!=new_bank) {
-		UINT8 *ROM = memory_region(machine, "main");
+		UINT8 *ROM = memory_region(space->machine, "main");
 		UINT32 bankaddress;
 
 		bank = new_bank;
 		bankaddress = 0x10000 + 0x40 * bank;
-		memory_set_bankptr(1, &ROM[bankaddress]);
+		memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 	}
 }
 

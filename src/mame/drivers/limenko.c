@@ -67,13 +67,13 @@ static WRITE32_HANDLER( limenko_paletteram_w )
 	if(ACCESSING_BITS_0_15)
 	{
 		paldata = paletteram32[offset] & 0x7fff;
-		palette_set_color_rgb(machine, offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		palette_set_color_rgb(space->machine, offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 
 	if(ACCESSING_BITS_16_31)
 	{
 		paldata = (paletteram32[offset] >> 16) & 0x7fff;
-		palette_set_color_rgb(machine, offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		palette_set_color_rgb(space->machine, offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 }
 
@@ -97,7 +97,7 @@ static WRITE32_HANDLER( fg_videoram_w )
 
 static WRITE32_HANDLER( spotty_soundlatch_w )
 {
-	soundlatch_w(machine, 0, (data >> 16) & 0xff);
+	soundlatch_w(space, 0, (data >> 16) & 0xff);
 }
 
 static CUSTOM_INPUT( spriteram_bit_r )
@@ -122,12 +122,12 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	if(spriteram_bit)
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(machine,spriteram32_2,&clip,prev_sprites_count);
+		draw_sprites(space->machine,spriteram32_2,&clip,prev_sprites_count);
 	}
 	else
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(machine,spriteram32,&clip,prev_sprites_count);
+		draw_sprites(space->machine,spriteram32,&clip,prev_sprites_count);
 	}
 
 	// buffer the next number of sprites to draw
@@ -205,9 +205,9 @@ static READ8_HANDLER( spotty_sound_r )
 	// check spotty_sound_cmd bits...
 
 	if(spotty_sound_cmd == 0xf7)
-		return soundlatch_r(machine,0);
+		return soundlatch_r(space,0);
 	else
-		return okim6295_status_0_r(machine,0);
+		return okim6295_status_0_r(space,0);
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -967,9 +967,9 @@ ROM_END
 
 static READ32_HANDLER( dynabomb_speedup_r )
 {
-	if(activecpu_get_pc() == 0xc25b8)
+	if(cpu_get_pc(space->cpu) == 0xc25b8)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return mainram[0xe2784/4];
@@ -977,9 +977,9 @@ static READ32_HANDLER( dynabomb_speedup_r )
 
 static READ32_HANDLER( legendoh_speedup_r )
 {
-	if(activecpu_get_pc() == 0x23e32)
+	if(cpu_get_pc(space->cpu) == 0x23e32)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return mainram[0x32ab0/4];
@@ -987,9 +987,9 @@ static READ32_HANDLER( legendoh_speedup_r )
 
 static READ32_HANDLER( sb2003_speedup_r )
 {
-	if(activecpu_get_pc() == 0x26da4)
+	if(cpu_get_pc(space->cpu) == 0x26da4)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return mainram[0x135800/4];
@@ -997,9 +997,9 @@ static READ32_HANDLER( sb2003_speedup_r )
 
 static READ32_HANDLER( spotty_speedup_r )
 {
-	if(activecpu_get_pc() == 0x8560)
+	if(cpu_get_pc(space->cpu) == 0x8560)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return mainram[0x6626c/4];
@@ -1007,21 +1007,21 @@ static READ32_HANDLER( spotty_speedup_r )
 
 static DRIVER_INIT( dynabomb )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
 
 	spriteram_bit = 1;
 }
 
 static DRIVER_INIT( legendoh )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
 
 	spriteram_bit = 1;
 }
 
 static DRIVER_INIT( sb2003 )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 
 	spriteram_bit = 1;
 }
@@ -1041,7 +1041,7 @@ static DRIVER_INIT( spotty )
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
 
 	spriteram_bit = 1;
 }

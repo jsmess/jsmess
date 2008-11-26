@@ -889,7 +889,7 @@ void CreateCPUFolders(int parent_index)
 		LPTREEFOLDER lpTemp;
 
 		for (jj = 1; jj < i; jj++)
-			if (!strcmp(cputype_name(i), cputype_name(jj)))
+			if (!strcmp(cputype_get_name(i), cputype_get_name(jj)))
 				break;
 
 		if (i != jj)
@@ -897,9 +897,9 @@ void CreateCPUFolders(int parent_index)
 			map[i] = map[jj];
 			continue;
 		}
-		if( strlen( cputype_name(i) ) <=0 )
+		if( strlen( cputype_get_name(i) ) <=0 )
 			continue;
-		lpTemp = NewFolder(cputype_name(i), next_folder_id, parent_index, IDI_CPU,
+		lpTemp = NewFolder(cputype_get_name(i), next_folder_id, parent_index, IDI_CPU,
  						   GetFolderFlags(numFolders));
 		ExtraFolderData[next_folder_id] = malloc(sizeof(EXFOLDERDATA) );
 		memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
@@ -908,7 +908,7 @@ void CreateCPUFolders(int parent_index)
 		ExtraFolderData[next_folder_id]->m_nIconId = IDI_CPU;
 		ExtraFolderData[next_folder_id]->m_nParent = lpFolder->m_nFolderId;
 		ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
-		strcpy( ExtraFolderData[next_folder_id]->m_szTitle, cputype_name(i) );
+		strcpy( ExtraFolderData[next_folder_id]->m_szTitle, cputype_get_name(i) );
 		ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
 		AddFolder(lpTemp);
 		map[i] = treeFolders[nFolder++];

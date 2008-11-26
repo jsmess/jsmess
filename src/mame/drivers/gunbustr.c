@@ -64,13 +64,13 @@ static UINT32 *gunbustr_ram;
 
 static TIMER_CALLBACK( gunbustr_interrupt5 )
 {
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( gunbustr_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, gunbustr_interrupt5);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( gunbustr_palette_w )
@@ -79,10 +79,10 @@ static WRITE32_HANDLER( gunbustr_palette_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	a = paletteram32[offset] >> 16;
-	palette_set_color_rgb(machine,offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
+	palette_set_color_rgb(space->machine,offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 
 	a = paletteram32[offset] &0xffff;
-	palette_set_color_rgb(machine,offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
+	palette_set_color_rgb(space->machine,offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 }
 
 static CUSTOM_INPUT( coin_word_r )
@@ -110,7 +110,7 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)	/* $400000 is watchdog */
 			{
-				watchdog_reset(machine);
+				watchdog_reset(space->machine);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -136,7 +136,7 @@ popmessage(t);
 				coin_counter_w(1, data & 0x04000000);
 				coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",activecpu_get_pc(),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
 		}
 	}
 }
@@ -159,8 +159,8 @@ static WRITE32_HANDLER( motor_control_w )
 
 static READ32_HANDLER( gunbustr_gun_r )
 {
-	return ( input_port_read(machine, "LIGHT0_X") << 24) | (input_port_read(machine, "LIGHT0_Y") << 16) |
-		 ( input_port_read(machine, "LIGHT1_X") << 8)  |  input_port_read(machine, "LIGHT1_Y");
+	return ( input_port_read(space->machine, "LIGHT0_X") << 24) | (input_port_read(space->machine, "LIGHT0_Y") << 16) |
+		 ( input_port_read(space->machine, "LIGHT1_X") << 8)  |  input_port_read(space->machine, "LIGHT1_Y");
 }
 
 static WRITE32_HANDLER( gunbustr_gun_w )
@@ -422,8 +422,8 @@ ROM_END
 
 static READ32_HANDLER( main_cycle_r )
 {
-	if (activecpu_get_pc()==0x55a && (gunbustr_ram[0x3acc/4]&0xff000000)==0)
-		cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x55a && (gunbustr_ram[0x3acc/4]&0xff000000)==0)
+		cpu_spinuntil_int(space->cpu);
 
 	return gunbustr_ram[0x3acc/4];
 }
@@ -431,7 +431,7 @@ static READ32_HANDLER( main_cycle_r )
 static DRIVER_INIT( gunbustr )
 {
 	/* Speedup handler */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x203acc, 0x203acf, 0, 0, main_cycle_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x203acc, 0x203acf, 0, 0, main_cycle_r);
 }
 
 GAME( 1992, gunbustr, 0,      gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )

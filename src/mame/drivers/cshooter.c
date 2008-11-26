@@ -198,13 +198,13 @@ static VIDEO_UPDATE(cshooter)
 
 static INTERRUPT_GEN( cshooter_interrupt )
 {
-	if(cpu_getiloops())
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x08);
+	if(cpu_getiloops(device))
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
 	else
-      cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x10);
+      cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 
 	if(mainram!=NULL)
-		ar_coin_hack(machine);
+		ar_coin_hack(device->machine);
 
 }
 
@@ -221,7 +221,7 @@ static READ8_HANDLER ( cshooter_coin_r )
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (cshooter_counter++ & 1) ? 0xff : input_port_read(machine, "COIN") );
+	return ( (cshooter_counter++ & 1) ? 0xff : input_port_read(space->machine, "COIN") );
 }
 
 static WRITE8_HANDLER ( cshooter_c500_w )
@@ -234,7 +234,7 @@ static WRITE8_HANDLER ( cshooter_c700_w )
 
 static WRITE8_HANDLER ( bank_w )
 {
-	memory_set_bankptr(1,&memory_region(machine, "user1")[0x4000*((data>>4)&3)]);
+	memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "user1")[0x4000*((data>>4)&3)]);
 }
 
 
@@ -242,14 +242,14 @@ static WRITE8_HANDLER(pal_w)
 {
 	paletteram[offset]=data;
 	offset&=0xff;
-	palette_set_color_rgb(machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x100]));
+	palette_set_color_rgb(space->machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x100]));
 }
 
 static WRITE8_HANDLER(pal2_w)
 {
 	paletteram[offset]=data;
 	offset&=0x1ff;
-	palette_set_color_rgb(machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x200]));
+	palette_set_color_rgb(space->machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x200]));
 }
 
 static READ8_HANDLER(pal_r)
@@ -683,16 +683,17 @@ static DRIVER_INIT( cshooter )
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(1,&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, 1,&memory_region(machine, "user1")[0]);
 }
 
 static DRIVER_INIT( cshootre )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	int A;
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypt = auto_malloc(0x8000);
 
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	for (A = 0x0000;A < 0x8000;A++)
 	{
@@ -719,7 +720,7 @@ static DRIVER_INIT( cshootre )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(1,&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, 1,&memory_region(machine, "user1")[0]);
 	seibu_sound_decrypt(machine,"audio",0x2000);
 }
 

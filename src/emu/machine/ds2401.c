@@ -8,6 +8,7 @@
 
 #include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "state.h"
 #include "machine/ds2401.h"
 
@@ -22,9 +23,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -155,12 +156,12 @@ void ds2401_init( int which, const UINT8 *data )
 	c->t_pdh = ATTOTIME_IN_USEC( 15 );
 	c->t_pdl = ATTOTIME_IN_USEC( 60 );
 
-	state_save_register_item( "ds2401", which, c->state );
-	state_save_register_item( "ds2401", which, c->bit );
-	state_save_register_item( "ds2401", which, c->byte );
-	state_save_register_item( "ds2401", which, c->shift );
-	state_save_register_item( "ds2401", which, c->rx );
-	state_save_register_item( "ds2401", which, c->tx );
+	state_save_register_item( "ds2401", NULL, which, c->state );
+	state_save_register_item( "ds2401", NULL, which, c->bit );
+	state_save_register_item( "ds2401", NULL, which, c->byte );
+	state_save_register_item( "ds2401", NULL, which, c->shift );
+	state_save_register_item( "ds2401", NULL, which, c->rx );
+	state_save_register_item( "ds2401", NULL, which, c->tx );
 
 	c->timer = timer_alloc( ds2401_tick , NULL);
 	c->reset_timer = timer_alloc( ds2401_reset , NULL);

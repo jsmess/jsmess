@@ -150,7 +150,7 @@ static mips3_regs mips3;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		cpu_readop32(pc)
+#define ROPCODE(pc)		memory_decrypted_read_dword(mips3.core.program, pc)
 
 
 
@@ -318,7 +318,6 @@ static int update_pcbase(void)
 		return 0;
 	}
 	mips3.pcbase = entry & ~0xfff;
-	change_pc(mips3.pcbase);
 	return 1;
 }
 
@@ -476,7 +475,7 @@ INLINE UINT64 get_cop0_reg(int idx)
 			mips3.core.icount -= MIPS3_COUNT_READ_CYCLES;
 		else
 			mips3.core.icount = 0;
-		return (UINT32)((activecpu_gettotalcycles() - mips3.core.count_zero_time) / 2);
+		return (UINT32)((cpu_get_total_cycles(machine->activecpu) - mips3.core.count_zero_time) / 2);
 	}
 	else if (idx == COP0_Cause)
 	{
@@ -492,7 +491,7 @@ INLINE UINT64 get_cop0_reg(int idx)
 		int wired = mips3.core.cpr[0][COP0_Wired] & 0x3f;
 		int range = 48 - wired;
 		if (range > 0)
-			return ((activecpu_gettotalcycles() - mips3.core.count_zero_time) % range + wired) & 0x3f;
+			return ((cpu_get_total_cycles(machine->activecpu) - mips3.core.count_zero_time) % range + wired) & 0x3f;
 		else
 			return 47;
 	}
@@ -532,7 +531,7 @@ INLINE void set_cop0_reg(int idx, UINT64 val)
 
 		case COP0_Count:
 			mips3.core.cpr[0][idx] = val;
-			mips3.core.count_zero_time = activecpu_gettotalcycles() - ((UINT64)(UINT32)val * 2);
+			mips3.core.count_zero_time = cpu_get_total_cycles(machine->activecpu) - ((UINT64)(UINT32)val * 2);
 			mips3com_update_cycle_counting(&mips3.core);
 			break;
 
@@ -1677,7 +1676,7 @@ CPU_EXECUTE( mips3 )
 
 		/* debugging */
 		mips3.ppc = mips3.core.pc;
-		debugger_instruction_hook(Machine, mips3.core.pc);
+		debugger_instruction_hook(device, mips3.core.pc);
 
 		/* instruction fetch */
 		op = ROPCODE(mips3.pcbase | (mips3.core.pc & 0xfff));
@@ -2154,16 +2153,16 @@ CPU_GET_INFO( mips3 )
 #if (HAS_R4600)
 static CPU_INIT( r4600be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r4600le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, index, clock, irqcallback, memory);
 }
 
 CPU_GET_INFO( r4600be )
@@ -2212,16 +2211,16 @@ CPU_GET_INFO( r4600le )
 #if (HAS_R4650)
 static CPU_INIT( r4650be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r4650le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, index, clock, irqcallback, memory);
 }
 
 CPU_GET_INFO( r4650be )
@@ -2270,16 +2269,16 @@ CPU_GET_INFO( r4650le )
 #if (HAS_R4700)
 static CPU_INIT( r4700be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r4700le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, index, clock, irqcallback, memory);
 }
 
 CPU_GET_INFO( r4700be )
@@ -2329,16 +2328,16 @@ CPU_GET_INFO( r4700le )
 #if (HAS_R5000)
 static CPU_INIT( r5000be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r5000le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, index, clock, irqcallback, memory);
 }
 
 CPU_GET_INFO( r5000be )
@@ -2387,16 +2386,16 @@ CPU_GET_INFO( r5000le )
 #if (HAS_QED5271)
 static CPU_INIT( qed5271be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( qed5271le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, index, clock, irqcallback, memory);
 }
 
 CPU_GET_INFO( qed5271be )
@@ -2445,16 +2444,16 @@ CPU_GET_INFO( qed5271le )
 #if (HAS_RM7000)
 static CPU_INIT( rm7000be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( rm7000le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, device, index, clock, config, irqcallback, NULL);
+	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, device, index, clock, irqcallback, NULL);
 	void *memory = auto_malloc(memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, index, clock, config, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, index, clock, irqcallback, memory);
 }
 
 CPU_GET_INFO( rm7000be )

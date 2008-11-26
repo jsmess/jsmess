@@ -173,7 +173,7 @@ static WRITE8_HANDLER( sound_command_w )
 	for (c = 15;c >= 0;c--)
 		if (cmd & (1 << c)) break;
 
-	if (c >= 0) soundlatch_w(machine,0,15-c);
+	if (c >= 0) soundlatch_w(space,0,15-c);
 }
 
 
@@ -357,10 +357,10 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( olibochu_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 	else
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 static MACHINE_DRIVER_START( olibochu )

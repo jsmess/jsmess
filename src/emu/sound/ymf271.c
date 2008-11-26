@@ -108,11 +108,11 @@ typedef struct
 	UINT8 ext_read;
 
 	const UINT8 *rom;
-	read8_machine_func ext_mem_read;
-	write8_machine_func ext_mem_write;
+	read8_space_func ext_mem_read;
+	write8_space_func ext_mem_write;
 	void (*irq_callback)(running_machine *, int);
 
-	int index;
+	const char *tag;
 	UINT32 clock;
 	sound_stream * stream;
 } YMF271Chip;
@@ -1375,8 +1375,10 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_read ) {
-		return chip->ext_mem_read(Machine,address);
+		return chip->ext_mem_read(space,address);
 	} else {
 		if( address < 0x800000)
 			return chip->rom[address];
@@ -1386,8 +1388,10 @@ static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 
 static void ymf271_write_ext_memory(YMF271Chip *chip, UINT32 address, UINT8 data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_write ) {
-		chip->ext_mem_write(Machine, address, data);
+		chip->ext_mem_write(space, address, data);
 	}
 }
 
@@ -1651,83 +1655,80 @@ static void init_tables(void)
 
 static void init_state(YMF271Chip *chip)
 {
-	int i, instance;
+	int i;
 
-	for (i = 0; i < sizeof(chip->slots) / sizeof(chip->slots[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(chip->slots); i++)
 	{
-		instance = chip->index * (sizeof(chip->slots) / sizeof(chip->slots[0])) + i;
-
-		state_save_register_item("ymf271", instance, chip->slots[i].extout);
-		state_save_register_item("ymf271", instance, chip->slots[i].lfoFreq);
-		state_save_register_item("ymf271", instance, chip->slots[i].pms);
-		state_save_register_item("ymf271", instance, chip->slots[i].ams);
-		state_save_register_item("ymf271", instance, chip->slots[i].detune);
-		state_save_register_item("ymf271", instance, chip->slots[i].multiple);
-		state_save_register_item("ymf271", instance, chip->slots[i].tl);
-		state_save_register_item("ymf271", instance, chip->slots[i].keyscale);
-		state_save_register_item("ymf271", instance, chip->slots[i].ar);
-		state_save_register_item("ymf271", instance, chip->slots[i].decay1rate);
-		state_save_register_item("ymf271", instance, chip->slots[i].decay2rate);
-		state_save_register_item("ymf271", instance, chip->slots[i].decay1lvl);
-		state_save_register_item("ymf271", instance, chip->slots[i].relrate);
-		state_save_register_item("ymf271", instance, chip->slots[i].fns);
-		state_save_register_item("ymf271", instance, chip->slots[i].block);
-		state_save_register_item("ymf271", instance, chip->slots[i].feedback);
-		state_save_register_item("ymf271", instance, chip->slots[i].waveform);
-		state_save_register_item("ymf271", instance, chip->slots[i].accon);
-		state_save_register_item("ymf271", instance, chip->slots[i].algorithm);
-		state_save_register_item("ymf271", instance, chip->slots[i].ch0_level);
-		state_save_register_item("ymf271", instance, chip->slots[i].ch1_level);
-		state_save_register_item("ymf271", instance, chip->slots[i].ch2_level);
-		state_save_register_item("ymf271", instance, chip->slots[i].ch3_level);
-		state_save_register_item("ymf271", instance, chip->slots[i].startaddr);
-		state_save_register_item("ymf271", instance, chip->slots[i].loopaddr);
-		state_save_register_item("ymf271", instance, chip->slots[i].endaddr);
-		state_save_register_item("ymf271", instance, chip->slots[i].fs);
-		state_save_register_item("ymf271", instance, chip->slots[i].srcnote);
-		state_save_register_item("ymf271", instance, chip->slots[i].srcb);
-		state_save_register_item("ymf271", instance, chip->slots[i].step);
-		state_save_register_item("ymf271", instance, chip->slots[i].stepptr);
-		state_save_register_item("ymf271", instance, chip->slots[i].active);
-		state_save_register_item("ymf271", instance, chip->slots[i].bits);
-		state_save_register_item("ymf271", instance, chip->slots[i].volume);
-		state_save_register_item("ymf271", instance, chip->slots[i].env_state);
-		state_save_register_item("ymf271", instance, chip->slots[i].env_attack_step);
-		state_save_register_item("ymf271", instance, chip->slots[i].env_decay1_step);
-		state_save_register_item("ymf271", instance, chip->slots[i].env_decay2_step);
-		state_save_register_item("ymf271", instance, chip->slots[i].env_release_step);
-		state_save_register_item("ymf271", instance, chip->slots[i].feedback_modulation0);
-		state_save_register_item("ymf271", instance, chip->slots[i].feedback_modulation1);
-		state_save_register_item("ymf271", instance, chip->slots[i].lfo_phase);
-		state_save_register_item("ymf271", instance, chip->slots[i].lfo_step);
-		state_save_register_item("ymf271", instance, chip->slots[i].lfo_amplitude);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].extout);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfoFreq);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].pms);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ams);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].detune);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].multiple);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].tl);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].keyscale);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ar);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].decay1rate);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].decay2rate);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].decay1lvl);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].relrate);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].fns);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].block);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].feedback);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].waveform);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].accon);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].algorithm);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch0_level);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch1_level);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch2_level);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch3_level);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].startaddr);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].loopaddr);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].endaddr);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].fs);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].srcnote);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].srcb);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].step);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].stepptr);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].active);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].bits);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].volume);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_state);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_attack_step);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_decay1_step);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_decay2_step);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_release_step);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].feedback_modulation0);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].feedback_modulation1);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfo_phase);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfo_step);
+		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfo_amplitude);
 	}
 
 	for (i = 0; i < sizeof(chip->groups) / sizeof(chip->groups[0]); i++)
 	{
-		instance = chip->index * (sizeof(chip->groups) / sizeof(chip->groups[0])) + i;
-		state_save_register_item("ymf271", instance, chip->groups[i].sync);
-		state_save_register_item("ymf271", instance, chip->groups[i].pfm);
+		state_save_register_item("ymf271", chip->tag, i, chip->groups[i].sync);
+		state_save_register_item("ymf271", chip->tag, i, chip->groups[i].pfm);
 	}
 
-	state_save_register_item("ymf271", chip->index, chip->timerA);
-	state_save_register_item("ymf271", chip->index, chip->timerB);
-	state_save_register_item("ymf271", chip->index, chip->timerAVal);
-	state_save_register_item("ymf271", chip->index, chip->timerBVal);
-	state_save_register_item("ymf271", chip->index, chip->irqstate);
-	state_save_register_item("ymf271", chip->index, chip->status);
-	state_save_register_item("ymf271", chip->index, chip->enable);
-	state_save_register_item("ymf271", chip->index, chip->reg0);
-	state_save_register_item("ymf271", chip->index, chip->reg1);
-	state_save_register_item("ymf271", chip->index, chip->reg2);
-	state_save_register_item("ymf271", chip->index, chip->reg3);
-	state_save_register_item("ymf271", chip->index, chip->pcmreg);
-	state_save_register_item("ymf271", chip->index, chip->timerreg);
-	state_save_register_item("ymf271", chip->index, chip->ext_address);
-	state_save_register_item("ymf271", chip->index, chip->ext_read);
+	state_save_register_item("ymf271", chip->tag, 0, chip->timerA);
+	state_save_register_item("ymf271", chip->tag, 0, chip->timerB);
+	state_save_register_item("ymf271", chip->tag, 0, chip->timerAVal);
+	state_save_register_item("ymf271", chip->tag, 0, chip->timerBVal);
+	state_save_register_item("ymf271", chip->tag, 0, chip->irqstate);
+	state_save_register_item("ymf271", chip->tag, 0, chip->status);
+	state_save_register_item("ymf271", chip->tag, 0, chip->enable);
+	state_save_register_item("ymf271", chip->tag, 0, chip->reg0);
+	state_save_register_item("ymf271", chip->tag, 0, chip->reg1);
+	state_save_register_item("ymf271", chip->tag, 0, chip->reg2);
+	state_save_register_item("ymf271", chip->tag, 0, chip->reg3);
+	state_save_register_item("ymf271", chip->tag, 0, chip->pcmreg);
+	state_save_register_item("ymf271", chip->tag, 0, chip->timerreg);
+	state_save_register_item("ymf271", chip->tag, 0, chip->ext_address);
+	state_save_register_item("ymf271", chip->tag, 0, chip->ext_read);
 }
 
-static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_machine_func ext_read, write8_machine_func ext_write)
+static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_space_func ext_read, write8_space_func ext_write)
 {
 	chip->timA = timer_alloc(ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(ymf271_timer_b_tick, chip);
@@ -1742,7 +1743,7 @@ static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine
 	init_state(chip);
 }
 
-static void *ymf271_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ymf271 )
 {
 	static const ymf271_interface defintrf = { 0 };
 	const ymf271_interface *intf;
@@ -1751,7 +1752,7 @@ static void *ymf271_start(const char *tag, int sndindex, int clock, const void *
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	chip->index = sndindex;
+	chip->tag = tag;
 	chip->clock = clock;
 
 	intf = (config != NULL) ? config : &defintrf;
@@ -1797,7 +1798,7 @@ WRITE8_HANDLER( ymf271_1_w )
 	ymf271_w(1, offset, data);
 }
 
-static void ymf271_reset(void *token)
+static SND_RESET( ymf271 )
 {
 	int i;
 	YMF271Chip *chip = (YMF271Chip*)token;
@@ -1813,7 +1814,7 @@ static void ymf271_reset(void *token)
  * Generic get_info
  **************************************************************************/
 
-static void ymf271_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ymf271 )
 {
 	switch (state)
 	{
@@ -1822,17 +1823,17 @@ static void ymf271_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ymf271_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymf271 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ymf271_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ymf271_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf271 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf271 );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = ymf271_reset;				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ymf271 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YMF271";						break;

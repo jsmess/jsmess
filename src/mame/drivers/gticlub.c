@@ -252,17 +252,17 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static void voodoo_vblank_1(const device_config *device, int param)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hangplt )
@@ -470,10 +470,10 @@ static READ8_HANDLER( sysreg_r )
 		case 0:
 		case 1:
 		case 3:
-			return input_port_read(machine, portnames[offset]);
+			return input_port_read(space->machine, portnames[offset]);
 
 		case 2:
-			return adc1038_sars_r(machine) << 7;
+			return adc1038_sars_r(space->machine) << 7;
 
 		case 4:
 		{
@@ -515,13 +515,13 @@ static WRITE8_HANDLER( sysreg_w )
 
 		case 4:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_w((data >> 0) & 1);
-			adc1038_clk_w(machine, (data >> 1) & 1);
+			adc1038_clk_w(space->machine, (data >> 1) & 1);
 
 			set_cgboard_id((data >> 4) & 0x3);
 			break;
@@ -539,14 +539,14 @@ READ8_HANDLER( K056230_r )
 		}
 	}
 
-//  mame_printf_debug("K056230_r: %d at %08X\n", offset, activecpu_get_pc());
+//  mame_printf_debug("K056230_r: %d at %08X\n", offset, cpu_get_pc(space->cpu));
 
 	return 0;
 }
 
 static TIMER_CALLBACK( network_irq_clear )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
 }
 
 WRITE8_HANDLER( K056230_w )
@@ -562,14 +562,14 @@ WRITE8_HANDLER( K056230_w )
 			if (data & 0x20)
 			{
 				// Thunder Hurricane breaks otherwise...
-				if (mame_stricmp(machine->gamedrv->name, "thunderh") != 0)
+				if (mame_stricmp(space->machine->gamedrv->name, "thunderh") != 0)
 				{
-					cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
 					timer_set(ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
 				}
 			}
 //          else
-//              cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
+//              cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register
@@ -577,19 +577,19 @@ WRITE8_HANDLER( K056230_w )
 			break;
 		}
 	}
-//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, activecpu_get_pc());
+//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, cpu_get_pc(space->cpu));
 }
 
 UINT32 *lanc_ram;
 READ32_HANDLER( lanc_ram_r )
 {
-//  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+//  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 	return lanc_ram[offset & 0x7ff];
 }
 
 WRITE32_HANDLER( lanc_ram_w )
 {
-//  mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+//  mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(lanc_ram + (offset & 0x7ff));
 }
 
@@ -598,14 +598,14 @@ WRITE32_HANDLER( lanc_ram_w )
 static MACHINE_START( gticlub )
 {
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -896,7 +896,7 @@ INPUT_PORTS_END
 */
 static INTERRUPT_GEN( gticlub_vblank )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
@@ -907,7 +907,7 @@ static const sharc_config sharc_cfg =
 
 static MACHINE_RESET( gticlub )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( gticlub )
@@ -951,8 +951,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( hangplt )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( hangplt )
@@ -1153,13 +1153,13 @@ ROM_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(machine, 1, param, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], param, CLEAR_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cpunum_set_input_line(machine, 1, line, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 

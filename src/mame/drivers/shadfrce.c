@@ -195,16 +195,16 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 	switch (offset)
 	{
 		case 0 :
-			data = (input_port_read(machine, "P1") & 0xff) | ((input_port_read(machine, "DSW2") & 0xc0) << 6) | ((input_port_read(machine, "SYSTEM") & 0x0f) << 8);
+			data = (input_port_read(space->machine, "P1") & 0xff) | ((input_port_read(space->machine, "DSW2") & 0xc0) << 6) | ((input_port_read(space->machine, "SYSTEM") & 0x0f) << 8);
 			break;
 		case 1 :
-			data = (input_port_read(machine, "P2") & 0xff) | ((input_port_read(machine, "DSW2") & 0x3f) << 8);
+			data = (input_port_read(space->machine, "P2") & 0xff) | ((input_port_read(space->machine, "DSW2") & 0x3f) << 8);
 			break;
 		case 2 :
-			data = (input_port_read(machine, "EXTRA") & 0xff) | ((input_port_read(machine, "DSW1") & 0x3f) << 8);
+			data = (input_port_read(space->machine, "EXTRA") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (input_port_read(machine, "OTHER") & 0xff) | ((input_port_read(machine, "DSW1") & 0xc0) << 2) | ((input_port_read(machine, "MISC") & 0x38) << 8) | (vblank << 8);
+			data = (input_port_read(space->machine, "OTHER") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0xc0) << 2) | ((input_port_read(space->machine, "MISC") & 0x38) << 8) | (vblank << 8);
 			break;
 	}
 
@@ -216,8 +216,8 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine,1,data >> 8);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(space,1,data >> 8);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{
@@ -225,7 +225,7 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 		double brt = (data & 0xff) / 255.0;
 
 		for (i = 0; i < 0x4000; i++)
-			palette_set_pen_contrast(machine,i,brt);
+			palette_set_pen_contrast(space->machine,i,brt);
 	}
 }
 
@@ -238,13 +238,13 @@ static TIMER_CALLBACK( raster_interrupt )
 	shadfrce_scanline = (shadfrce_scanline + 1) % 256;
 
 	// fire another raster irq for the next scanline
-	cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
 	timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, shadfrce_scanline, 0), 0);
 }
 
 static WRITE16_HANDLER( shadfrce_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, offset ^ 3, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], offset ^ 3, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( shadfrce_irq_w )
@@ -260,7 +260,7 @@ static WRITE16_HANDLER( shadfrce_irq_w )
 		if( !timer_enabled(raster_irq_timer) )
 		{
 			timer_enable(raster_irq_timer, 1);
-			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, shadfrce_scanline, 0), 0);
+			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, shadfrce_scanline, 0), 0);
 		}
 	}
 
@@ -470,7 +470,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -483,7 +483,7 @@ static const ym2151_interface ym2151_config =
 */
 static INTERRUPT_GEN( shadfrce_interrupt )
 {
-	int scanline = 255 - cpu_getiloops();
+	int scanline = 255 - cpu_getiloops(device);
 
 	/* Vblank is lowered on scanline 0 (8) */
 	if (scanline == 0)
@@ -499,14 +499,14 @@ static INTERRUPT_GEN( shadfrce_interrupt )
 	else if (scanline==248)
 	{
 		if(shadfrce_irqs_enable)
-			cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
+			cpu_set_input_line(device, 3, ASSERT_LINE);
 	}
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline%16 == 0)
 	{
 		if(shadfrce_irqs_enable)
-			cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
+			cpu_set_input_line(device, 2, ASSERT_LINE);
 	}
 }
 

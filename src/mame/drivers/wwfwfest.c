@@ -113,7 +113,7 @@ static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r )
 static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	paletteram16_xxxxBBBBGGGGRRRR_word_w (machine, offset, data, mem_mask);
+	paletteram16_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -153,8 +153,8 @@ static WRITE8_HANDLER( oki_bankswitch_w )
 
 static WRITE16_HANDLER ( wwfwfest_soundwrite )
 {
-	soundlatch_w(machine,1,data & 0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(space,1,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************
@@ -332,10 +332,10 @@ GFXDECODE_END
 *******************************************************************************/
 
 static INTERRUPT_GEN( wwfwfest_interrupt ) {
-	if( cpu_getiloops() == 0 )
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+	if( cpu_getiloops(device) == 0 )
+		cpu_set_input_line(device, 3, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 /*******************************************************************************
@@ -346,7 +346,7 @@ static INTERRUPT_GEN( wwfwfest_interrupt ) {
 
 static void dd3_ymirq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -356,7 +356,9 @@ static const ym2151_interface ym2151_config =
 
 static VIDEO_EOF( wwfwfest )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
 /*******************************************************************************

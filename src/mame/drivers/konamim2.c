@@ -294,7 +294,7 @@ static UINT32 unk20004 = 0;
 static READ64_HANDLER(unk4_r)
 {
 	UINT64 r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), activecpu_get_pc());
+//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(space->cpu));
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -311,14 +311,14 @@ static READ64_HANDLER(unk4_r)
 static WRITE64_HANDLER(unk4_w)
 {
 //  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
-//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), activecpu_get_pc());
+//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(space->cpu));
 
 	if (ACCESSING_BITS_0_31)
 	{
 		if (data & 0x800000)
 		{
-			mame_printf_debug("CPU%d: CPU1 IRQ at %08X\n", cpu_getactivecpu(), activecpu_get_pc());
-			cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
+			mame_printf_debug("CPU%d: CPU1 IRQ at %08X\n", cpunum_get_active(), cpu_get_pc(space->cpu));
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		unk20004 = (UINT32)(data);
@@ -413,7 +413,7 @@ static WRITE64_HANDLER(reset_w)
 	{
 		if (data & U64(0x100000000))
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 			unk3 = 0;
 		}
 	}
@@ -786,7 +786,7 @@ static void cde_handle_reports(void)
 	}
 }
 
-static void cde_dma_transfer(int channel, int next)
+static void cde_dma_transfer(const address_space *space, int channel, int next)
 {
 	UINT32 address;
 	int length;
@@ -805,7 +805,7 @@ static void cde_dma_transfer(int channel, int next)
 
 	for (i=0; i < cde_dma[channel].next_length; i++)
 	{
-		program_write_byte_64be(address, 0xff);		// TODO: do the real transfer...
+		memory_write_byte(space, address, 0xff);		// TODO: do the real transfer...
 		address++;
 	}
 }
@@ -870,7 +870,7 @@ static READ64_HANDLER(cde_r)
 
 		default:
 		{
-	//      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, activecpu_get_pc());
+	//      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, cpu_get_pc(space->cpu));
 			break;
 		}
 	}
@@ -904,7 +904,7 @@ static WRITE64_HANDLER(cde_w)
 	{
 		case 0x028/4:		// Command write
 		{
-			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, activecpu_get_pc());
+			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(space->cpu));
 
 			if (d == 0x0180)
 			{
@@ -943,13 +943,13 @@ static WRITE64_HANDLER(cde_w)
 			{
 				cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(0, 0);
+				cde_dma_transfer(space, 0, 0);
 			}
 			if (d & 0x40)
 			{
 				cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(0, 1);
+				cde_dma_transfer(space, 0, 1);
 			}
 			break;
 		}
@@ -1032,7 +1032,7 @@ static WRITE64_HANDLER(cde_w)
 
 		default:
 		{
-	//      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, activecpu_get_pc());
+	//      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(space->cpu));
 			break;
 		}
 	}
@@ -1075,7 +1075,7 @@ static READ64_HANDLER(cpu_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)(cpu_getactivecpu() ? 0x80000000 : 0);
+		r = (UINT64)(cpunum_get_active() ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}
@@ -1127,7 +1127,7 @@ static INTERRUPT_GEN(m2)
         irq_active |= 0x8;
     }*/
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( m2 )

@@ -130,15 +130,15 @@ static int ctrl;
 static READ8_HANDLER( tugboat_input_r )
 {
 	if (~ctrl & 0x80)
-		return input_port_read(machine, "IN0");
+		return input_port_read(space->machine, "IN0");
 	else if (~ctrl & 0x40)
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	else if (~ctrl & 0x20)
-		return input_port_read(machine, "IN2");
+		return input_port_read(space->machine, "IN2");
 	else if (~ctrl & 0x10)
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 	else
-		return input_port_read(machine, "IN4");
+		return input_port_read(space->machine, "IN4");
 }
 
 static READ8_HANDLER( tugboat_ctrl_r )
@@ -167,7 +167,7 @@ static const pia6821_interface pia1_intf =
 
 static TIMER_CALLBACK( interrupt_gen )
 {
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, interrupt_gen);
 }
 

@@ -47,14 +47,14 @@ static TIMER_CALLBACK( battles_nmi_generate )
 
 	if( battles_customio_command & 0x10 ){
 		if( battles_customio_command_count == 0 ){
-			cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 		}else{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-			cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}else{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-		cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 	}
 	battles_customio_command_count++;
 }
@@ -62,7 +62,7 @@ static TIMER_CALLBACK( battles_nmi_generate )
 
 READ8_HANDLER( battles_customio0_r )
 {
-	logerror("CPU0 %04x: custom I/O Read = %02x\n",activecpu_get_pc(),battles_customio_command);
+	logerror("CPU0 %04x: custom I/O Read = %02x\n",cpu_get_pc(space->cpu),battles_customio_command);
 	return battles_customio_command;
 }
 
@@ -70,7 +70,7 @@ READ8_HANDLER( battles_customio3_r )
 {
 	int	return_data;
 
-	if( activecpu_get_pc() == 0xAE ){
+	if( cpu_get_pc(space->cpu) == 0xAE ){
 		/* CPU4 0xAA - 0xB9 : waiting for MB8851 ? */
 		return_data =	( (battles_customio_command & 0x10) << 3)
 						| 0x00
@@ -80,7 +80,7 @@ READ8_HANDLER( battles_customio3_r )
 						| 0x60
 						| (battles_customio_prev_command & 0x0f);
 	}
-	logerror("CPU3 %04x: custom I/O Read = %02x\n",activecpu_get_pc(),return_data);
+	logerror("CPU3 %04x: custom I/O Read = %02x\n",cpu_get_pc(space->cpu),return_data);
 
 	return return_data;
 }
@@ -88,7 +88,7 @@ READ8_HANDLER( battles_customio3_r )
 
 WRITE8_HANDLER( battles_customio0_w )
 {
-	logerror("CPU0 %04x: custom I/O Write = %02x\n",activecpu_get_pc(),data);
+	logerror("CPU0 %04x: custom I/O Write = %02x\n",cpu_get_pc(space->cpu),data);
 
 	battles_customio_command = data;
 	battles_customio_command_count = 0;
@@ -105,7 +105,7 @@ WRITE8_HANDLER( battles_customio0_w )
 
 WRITE8_HANDLER( battles_customio3_w )
 {
-	logerror("CPU3 %04x: custom I/O Write = %02x\n",activecpu_get_pc(),data);
+	logerror("CPU3 %04x: custom I/O Write = %02x\n",cpu_get_pc(space->cpu),data);
 
 	battles_customio_command = data;
 }
@@ -114,27 +114,27 @@ WRITE8_HANDLER( battles_customio3_w )
 
 READ8_HANDLER( battles_customio_data0_r )
 {
-	logerror("CPU0 %04x: custom I/O parameter %02x Read = %02x\n",activecpu_get_pc(),offset,battles_customio_data);
+	logerror("CPU0 %04x: custom I/O parameter %02x Read = %02x\n",cpu_get_pc(space->cpu),offset,battles_customio_data);
 
 	return battles_customio_data;
 }
 
 READ8_HANDLER( battles_customio_data3_r )
 {
-	logerror("CPU3 %04x: custom I/O parameter %02x Read = %02x\n",activecpu_get_pc(),offset,battles_customio_data);
+	logerror("CPU3 %04x: custom I/O parameter %02x Read = %02x\n",cpu_get_pc(space->cpu),offset,battles_customio_data);
 	return battles_customio_data;
 }
 
 
 WRITE8_HANDLER( battles_customio_data0_w )
 {
-	logerror("CPU0 %04x: custom I/O parameter %02x Write = %02x\n",activecpu_get_pc(),offset,data);
+	logerror("CPU0 %04x: custom I/O parameter %02x Write = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	battles_customio_data = data;
 }
 
 WRITE8_HANDLER( battles_customio_data3_w )
 {
-	logerror("CPU3 %04x: custom I/O parameter %02x Write = %02x\n",activecpu_get_pc(),offset,data);
+	logerror("CPU3 %04x: custom I/O parameter %02x Write = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	battles_customio_data = data;
 }
 
@@ -152,7 +152,7 @@ WRITE8_HANDLER( battles_CPU4_coin_w )
 
 WRITE8_HANDLER( battles_noise_sound_w )
 {
-	logerror("CPU3 %04x: 50%02x Write = %02x\n",activecpu_get_pc(),offset,data);
+	logerror("CPU3 %04x: 50%02x Write = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	if( (battles_sound_played == 0) && (data == 0xFF) ){
 		if( customio[0] == 0x40 ){
 			sample_start (0, 0, 0);
@@ -170,16 +170,16 @@ READ8_HANDLER( battles_input_port_r )
 	switch ( offset )
 	{
 		default:
-		case 0: return ~BITSWAP8(input_port_read(machine, "IN0"),6,7,5,4,3,2,1,0) >> 4;
-		case 1: return ~input_port_read(machine, "IN1") & 0x0f;
-		case 2: return ~input_port_read(machine, "IN1") >> 4;
-		case 3: return ~input_port_read(machine, "IN0") & 0x0f;
+		case 0: return ~BITSWAP8(input_port_read(space->machine, "IN0"),6,7,5,4,3,2,1,0) >> 4;
+		case 1: return ~input_port_read(space->machine, "IN1") & 0x0f;
+		case 2: return ~input_port_read(space->machine, "IN1") >> 4;
+		case 3: return ~input_port_read(space->machine, "IN0") & 0x0f;
 	}
 }
 
 
 INTERRUPT_GEN( battles_interrupt_4 )
 {
-	cpunum_set_input_line(machine, 3, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 

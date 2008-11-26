@@ -408,7 +408,7 @@ static emu_timer *nmi_timer, *adjuster_timer;
 
 static TIMER_CALLBACK( equites_nmi_callback )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -440,17 +440,17 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			cpunum_set_input_line(machine, 1, I8085_RST75_LINE, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[1], I8085_RST75_LINE, PULSE_LINE);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			cpunum_set_input_line(machine, 1, I8085_INTR_LINE, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[1], I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -476,7 +476,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 7:	// c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			soundlatch_clear_w(machine,0,0);
+			soundlatch_clear_w(space,0,0);
 			break;
 	}
 }
@@ -588,10 +588,10 @@ static void equites_msm5232_gate(int state)
 // Equites Hardware
 static INTERRUPT_GEN( equites_interrupt )
 {
-	if (cpu_getiloops())
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	if (cpu_getiloops(device))
+		cpu_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER(equites_8155_w)
@@ -619,7 +619,7 @@ static WRITE8_HANDLER(equites_8155_w)
 
 			break;
 		case 2: //logerror( "8155 I/O Port B write %x\n", data );
-			equites_8155_portb_w(machine,0,data);
+			equites_8155_portb_w(space,0,data);
 			break;
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
 			eq8155_port_c = data;
@@ -646,7 +646,7 @@ static WRITE8_HANDLER(equites_8155_w)
 #if HVOLTAGE_DEBUG
 static READ16_HANDLER(hvoltage_debug_r)
 {
-	return(input_port_read(machine, "FAKE"));
+	return(input_port_read(space->machine, "FAKE"));
 }
 #endif
 
@@ -694,12 +694,12 @@ static WRITE16_HANDLER(mcu_w)
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
@@ -1843,8 +1843,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1857,7 +1857,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
 #endif
 }
 

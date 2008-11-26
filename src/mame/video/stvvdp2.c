@@ -27,26 +27,28 @@ RBG1
 -- other crap
 EXBG (external)
 
-------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 
 Video emulation TODO:
 -all games:
  \-priorities (check myfairld,thunt)
  \-complete windows effects
  \-mosaic effect
- \-ODD bit/H/V Counter not yet emulated.
- \-Missing
+ \-ODD bit/H/V Counter not yet emulated properly
+ \-Reduction enable bits
+ \-Check if there are any remaining video registers that are yet to be macroized & added to the rumble.
 -batmanfr:
  \-If you reset the game after the character selection screen,when you get again to it there's garbage
    floating behind Batman.
+-elandore:
+ \-(BTANB) priorities at the VS. screen apparently is wrong,but it's like this on the Saturn version too.
 -hanagumi:
  \-ending screens have corrupt graphics. (*untested*)
 -kiwames:
- \-incorrect color emulation for the alpha blended flames on the title screen,it's caused by a bit
- that writes 1 to the NBG1 bitmap color bank.It should be 0 but I don't know what is going on,
- might be a SH-2 / irq issue.
+ \-incorrect color emulation for the alpha blended flames on the title screen,it's caused by a schizoid
+   linescroll emulation quirk.
  \-the VDP1 sprites refresh is too slow,causing the "Draw by request" mode to
-   flicker.Moved back to default ATM...
+   flicker.Moved back to default ATM.
 -pblbeach:
  \-Sprites are offset, because it doesn't clear vdp1 local coordinates set by bios,
    I guess that they are cleared when some vdp1 register is written (kludged for now)
@@ -56,26 +58,20 @@ Video emulation TODO:
 -seabass:
  \-Player sprite is corrupt/missing during movements,caused by incomplete framebuffer switching.
 
-Notes of Interest:
+Notes of Interest & Unclear features:
 
 -the test mode / bios is drawn with layer NBG3;
-
--hanagumi Puts a 'RED' dragon logo in tileram (base 0x64000, 4bpp, 8x8 tiles) but
-its not displayed in gurus video.Update:It's actually not drawn because its
-priority value is 0;
+-hanagumi puts a 'RED' dragon logo in tileram (base 0x64000, 4bpp, 8x8 tiles) but
+its not displayed because its priority value is 0.Left-over?
 
 -scrolling is screen display wise,meaning that a scrolling value is masked with the
 screen resolution size values;
 
--Bitmaps USES transparency pens,examples are:
-elandore's energy bars;
-mausuke's foreground(the one used on the playfield)(I guess that this is also
-alpha-blended);
-shanhigw's tile-based sprites;
-
-for now I've removed black pixels,it isn't 100% right so there MUST BE a better way
-for this...
-Update: some games uses transparent windows,others uses a transparency pen table like this:
+-Bitmaps uses transparency pens,examples are:
+\-elandore's energy bars;
+\-mausuke's foreground(the one used on the playfield)
+\-shanhigw's tile-based sprites;
+The transparency pen table is like this:
 
 |------------------|---------------------|
 | Character count  | Transparency code   |
@@ -86,8 +82,9 @@ Update: some games uses transparent windows,others uses a transparency pen table
 | 32,768 colors    |MSB=0 (bit 15)       |
 | 16,770,000 colors|MSB=0 (bit 31)       |
 |------------------|---------------------|
+In other words,the first three types uses the offset and not the color allocated.
 
-In other words,the first three types uses the offset and not the color allocated...
+-double density interlace setting (LSMD == 3) apparently does a lot of fancy stuff in the graphics sizes.
 
 -Debug key list(only if you enable the debug mode on top of this file):
     \-T: NBG3 layer toggle
@@ -115,9 +112,13 @@ static UINT8*  stv_vdp2_vram_dirty_8x8x8;
 static UINT8* stv_vdp2_gfx_decode;
 
 static int stv_vdp2_render_rbg0;
+int stv_hblank,stv_vblank;
+int horz_res,vert_res;
 
 UINT32* stv_vdp2_cram;
 static void stv_vdp2_dynamic_res_change(running_machine *machine);
+UINT8 get_vblank(running_machine *machine);
+UINT8 get_hblank(running_machine *machine);
 static void refresh_palette_data(running_machine *machine);
 static int stv_vdp2_window_process(int x,int y);
 static int stv_vdp2_apply_window_on_layer(rectangle *cliprect);
@@ -5157,7 +5158,7 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((stv_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((stv_vdp2_cram[offset] & 0x000000ff) >> 0);
-			palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+			palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 		}
 		break;
 		/*Mode 0*/
@@ -5168,11 +5169,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color_rgb(machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color_rgb(machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 		/*Mode 1*/
@@ -5183,11 +5184,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color_rgb(machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color_rgb(machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 	}
@@ -5259,8 +5260,33 @@ WRITE32_HANDLER ( stv_vdp2_regs_w )
 	if(old_crmd != STV_VDP2_CRMD)
 	{
 		old_crmd = STV_VDP2_CRMD;
-		refresh_palette_data(machine);
+		refresh_palette_data(space->machine);
 	}
+}
+
+UINT8 get_hblank(running_machine *machine)
+{
+	static int cur_h;
+
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	cur_h = video_screen_get_hpos(machine->primary_screen);
+
+	if (cur_h > visarea.max_x)
+		return 1;
+	else
+		return 0;
+}
+
+UINT8 get_vblank(running_machine *machine)
+{
+	static int cur_v;
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	cur_v = video_screen_get_vpos(machine->primary_screen);
+
+	if (cur_v > visarea.max_y)
+		return 1;
+	else
+		return 0;
 }
 
 READ32_HANDLER ( stv_vdp2_regs_r )
@@ -5270,15 +5296,34 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 	switch(offset)
 	{
 		case 0x4/4:
-		/*Screen Status Register*/
+		{
+			/*Screen Status Register*/
+			//rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+
+			//stv_hblank = 0;
+			//stv_vblank = 0;
+			//h = video_screen_get_height(machine->primary_screen);
+			//w = video_screen_get_width(machine->primary_screen);
+			//cur_h = video_screen_get_hpos(machine->primary_screen);
+			//cur_v = video_screen_get_vpos(machine->primary_screen);
+
+			//popmessage("%d %d",cur_h,cur_v);
+
+			//if (cur_h > visarea.max_x)
+			stv_hblank = get_hblank(space->machine);
+			//if (cur_v > visarea.max_y)
+			stv_vblank = get_vblank(space->machine);
+			/*ODD bit*/
+
 								   /*VBLANK              HBLANK            ODD         PAL    */
 			stv_vdp2_regs[offset] = (stv_vblank<<19) | (stv_hblank<<18) | (1 << 17) | (0 << 16);
-		break;
+			break;
+		}
 		case 0x8/4:
 		/*H/V Counter Register*/
 								     /*H-Counter                               V-Counter                                         */
-			stv_vdp2_regs[offset] = (((video_screen_get_visible_area(machine->primary_screen)->max_x - 1)<<16)&0x3ff0000)|(((video_screen_get_visible_area(machine->primary_screen)->max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
-			if(LOG_VDP2) logerror("CPU #%d PC(%08x) = VDP2: H/V counter read : %08x\n",cpu_getactivecpu(),activecpu_get_pc(),stv_vdp2_regs[offset]);
+			stv_vdp2_regs[offset] = (((video_screen_get_visible_area(space->machine->primary_screen)->max_x - 1)<<16)&0x3ff0000)|(((video_screen_get_visible_area(space->machine->primary_screen)->max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
+			if(LOG_VDP2) logerror("CPU #%d PC(%08x) = VDP2: H/V counter read : %08x\n",cpunum_get_active(),cpu_get_pc(space->cpu),stv_vdp2_regs[offset]);
 			stv_vdp2_regs[offset] = 0;
 		break;
 	}
@@ -5351,40 +5396,60 @@ VIDEO_START( stv_vdp2 )
 	debug.roz = 0;
 }
 
+/*TODO: frame_period should be different for every kind of resolution (needs tests on actual boards)*/
+/*    & height / width not yet understood (docs-wise MUST be bigger than normal visible area)*/
+static TIMER_CALLBACK( dyn_res_change )
+{
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	visarea.min_x = 0;
+	visarea.max_x = horz_res-1;
+	visarea.min_y = 0;
+	visarea.max_y = vert_res-1;
+
+	video_screen_configure(machine->primary_screen, horz_res*2, vert_res+2, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
+}
+
 static void stv_vdp2_dynamic_res_change(running_machine *machine)
 {
-	static UINT16 horz,vert;
+	static UINT8 old_vres = 0,old_hres = 0;
 
 	switch( STV_VDP2_VRES & 3 )
 	{
-		case 0: vert = 224; break;
-		case 1: vert = 240; break;
-		case 2: vert = 256; break;
+		case 0: vert_res = 224; break;
+		case 1: vert_res = 240; break;
+		case 2: vert_res = 256; break;
 		case 3:
 			if(LOG_VDP2) logerror("WARNING: V Res setting (3) not allowed!\n");
-			vert = 256;
+			vert_res = 256;
 			break;
 	}
 
 	/*Double-density interlace mode,doubles the vertical res*/
-	if((STV_VDP2_LSMD & 3) == 3) { vert*=2;  }
+	if((STV_VDP2_LSMD & 3) == 3) { vert_res*=2;  }
 
 	switch( STV_VDP2_HRES & 7 )
 	{
-		case 0: horz = 320; break;
-		case 1: horz = 352; break;
-		case 2: horz = 640; break;
-		case 3: horz = 704; break;
+		case 0: horz_res = 320; break;
+		case 1: horz_res = 352; break;
+		case 2: horz_res = 640; break;
+		case 3: horz_res = 704; break;
 		/*Exclusive modes,they sets the Vertical Resolution without considering the
             VRES register.*/
-		case 4: horz = 320; vert = 480; break;
-		case 5: horz = 352; vert = 480; break;
-		case 6: horz = 640; vert = 480; break;
-		case 7: horz = 704; vert = 480; break;
+		case 4: horz_res = 320; vert_res = 480; break;
+		case 5: horz_res = 352; vert_res = 480; break;
+		case 6: horz_res = 640; vert_res = 480; break;
+		case 7: horz_res = 704; vert_res = 480; break;
 	}
-
-	video_screen_set_visarea(machine->primary_screen, 0*8, horz-1,0*8, vert-1);
-	//if(LOG_VDP2) popmessage("%04d %04d",horz-1,vert-1);
+//  horz_res+=1;
+//  vert_res*=2;
+	if(old_vres != vert_res || old_hres != horz_res)
+	{
+		timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, dyn_res_change);
+		old_vres = vert_res;
+		old_hres = horz_res;
+	}
+//  video_screen_set_visarea(machine->primary_screen, 0*8, horz_res-1,0*8, vert_res-1);
+	//if(LOG_VDP2) popmessage("%04d %04d",horz_res-1,vert-1);
 }
 
 /*This is for calculating the rgb brightness*/
@@ -5564,6 +5629,9 @@ static void stv_vdp2_get_window1_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s
 static int stv_vdp2_window_process(int x,int y)
 {
 	UINT16 s_x=0,e_x=0,s_y=0,e_y=0;
+
+	if ((stv2_current_tilemap.window_control & 6) == 0)
+		return 0;
 
 	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
 

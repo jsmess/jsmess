@@ -18,19 +18,17 @@ UINT8 *bublbobl_mcu_sharedram;
 
 WRITE8_HANDLER( bublbobl_bankswitch_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
-
 	/* bits 0-2 select ROM bank */
-	memory_set_bankptr(1,&ROM[0x10000 + 0x4000 * ((data ^ 4) & 7)]);
+	memory_set_bank(space->machine, 1, (data ^ 4) & 7);
 
 	/* bit 3 n.c. */
 
 	/* bit 4 resets second Z80 */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
-	if (machine->config->cpu[3].type != CPU_DUMMY)	// only if we have a MCU
-		cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	if (space->machine->config->cpu[3].type != CPU_DUMMY)	// only if we have a MCU
+		cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
 	bublbobl_video_enable = data & 0x40;
@@ -41,10 +39,8 @@ WRITE8_HANDLER( bublbobl_bankswitch_w )
 
 WRITE8_HANDLER( tokio_bankswitch_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
-
 	/* bits 0-2 select ROM bank */
-	memory_set_bankptr(1,&ROM[0x10000 + 0x4000 * (data & 7)]);
+	memory_set_bank(space->machine, 1, data & 7);
 
 	/* bits 3-7 unknown */
 }
@@ -59,7 +55,7 @@ WRITE8_HANDLER( tokio_videoctrl_w )
 
 WRITE8_HANDLER( bublbobl_nmitrigger_w )
 {
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -98,13 +94,13 @@ static int sound_nmi_enable,pending_nmi;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+	if (sound_nmi_enable) cpu_set_input_line(machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 	else pending_nmi = 1;
 }
 
 WRITE8_HANDLER( bublbobl_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
+	soundlatch_w(space,offset,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -118,7 +114,7 @@ WRITE8_HANDLER( bublbobl_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -179,14 +175,14 @@ WRITE8_HANDLER( bublbobl_mcu_ddr4_w )
 
 READ8_HANDLER( bublbobl_mcu_port1_r )
 {
-//logerror("%04x: 6801U4 port 1 read\n",activecpu_get_pc());
-	port1_in = input_port_read(machine, "IN0");
+//logerror("%04x: 6801U4 port 1 read\n",cpu_get_pc(space->cpu));
+	port1_in = input_port_read(space->machine, "IN0");
 	return (port1_out & ddr1) | (port1_in & ~ddr1);
 }
 
 WRITE8_HANDLER( bublbobl_mcu_port1_w )
 {
-//logerror("%04x: 6801U4 port 1 write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 6801U4 port 1 write %02x\n",cpu_get_pc(space->cpu),data);
 
 	// bit 4: coin lockout
 	coin_lockout_global_w(~data & 0x10);
@@ -198,8 +194,8 @@ WRITE8_HANDLER( bublbobl_mcu_port1_w )
 	if ((port1_out & 0x40) && (~data & 0x40))
 	{
 //      logerror("triggering IRQ on main CPU\n");
-		cpunum_set_input_line_vector(0,0,bublbobl_mcu_sharedram[0]);
-		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+		cpu_set_input_line_vector(space->machine->cpu[0],0,bublbobl_mcu_sharedram[0]);
+		cpu_set_input_line(space->machine->cpu[0],0,HOLD_LINE);
 	}
 
 	// bit 7: select read or write shared RAM
@@ -209,13 +205,13 @@ WRITE8_HANDLER( bublbobl_mcu_port1_w )
 
 READ8_HANDLER( bublbobl_mcu_port2_r )
 {
-//logerror("%04x: 6801U4 port 2 read\n",activecpu_get_pc());
+//logerror("%04x: 6801U4 port 2 read\n",cpu_get_pc(space->cpu));
 	return (port2_out & ddr2) | (port2_in & ~ddr2);
 }
 
 WRITE8_HANDLER( bublbobl_mcu_port2_w )
 {
-//logerror("%04x: 6801U4 port 2 write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 6801U4 port 2 write %02x\n",cpu_get_pc(space->cpu),data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	// bits 0-3: bits 8-11 of shared RAM address
@@ -230,7 +226,7 @@ WRITE8_HANDLER( bublbobl_mcu_port2_w )
 		{
 			// read
 			if ((address & 0x0800) == 0x0000)
-				port3_in = input_port_read(machine, portnames[address & 3]);
+				port3_in = input_port_read(space->machine, portnames[address & 3]);
 			else if ((address & 0x0c00) == 0x0c00)
 				port3_in = bublbobl_mcu_sharedram[address & 0x03ff];
 //          logerror("reading %02x from shared RAM %04x\n",port3_in,address);
@@ -249,26 +245,26 @@ WRITE8_HANDLER( bublbobl_mcu_port2_w )
 
 READ8_HANDLER( bublbobl_mcu_port3_r )
 {
-//logerror("%04x: 6801U4 port 3 read\n",activecpu_get_pc());
+//logerror("%04x: 6801U4 port 3 read\n",cpu_get_pc(space->cpu));
 	return (port3_out & ddr3) | (port3_in & ~ddr3);
 }
 
 WRITE8_HANDLER( bublbobl_mcu_port3_w )
 {
-//logerror("%04x: 6801U4 port 3 write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 6801U4 port 3 write %02x\n",cpu_get_pc(space->cpu),data);
 
 	port3_out = data;
 }
 
 READ8_HANDLER( bublbobl_mcu_port4_r )
 {
-//logerror("%04x: 6801U4 port 4 read\n",activecpu_get_pc());
+//logerror("%04x: 6801U4 port 4 read\n",cpu_get_pc(space->cpu));
 	return (port4_out & ddr4) | (port4_in & ~ddr4);
 }
 
 WRITE8_HANDLER( bublbobl_mcu_port4_w )
 {
-//logerror("%04x: 6801U4 port 4 write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 6801U4 port 4 write %02x\n",cpu_get_pc(space->cpu),data);
 
 	// bits 0-7 of shared RAM address
 
@@ -290,12 +286,12 @@ static int ic43_a,ic43_b;
 READ8_HANDLER( boblbobl_ic43_a_r )
 {
 //  if (offset >= 2)
-//      logerror("%04x: ic43_a_r (offs %d) res = %02x\n",activecpu_get_pc(),offset,res);
+//      logerror("%04x: ic43_a_r (offs %d) res = %02x\n",cpu_get_pc(space->cpu),offset,res);
 
 	if (offset == 0)
 		return ic43_a << 4;
 	else
-		return mame_rand(machine) & 0xff;
+		return mame_rand(space->machine) & 0xff;
 }
 
 WRITE8_HANDLER( boblbobl_ic43_a_w )
@@ -340,13 +336,13 @@ WRITE8_HANDLER( boblbobl_ic43_b_w )
 {
 	static const int xor[4] = { 4, 1, 8, 2 };
 
-//  logerror("%04x: ic43_b_w (offs %d) %02x\n",activecpu_get_pc(),offset,data);
+//  logerror("%04x: ic43_b_w (offs %d) %02x\n",cpu_get_pc(space->cpu),offset,data);
 	ic43_b = (data >> 4) ^ xor[offset];
 }
 
 READ8_HANDLER( boblbobl_ic43_b_r )
 {
-//  logerror("%04x: ic43_b_r (offs %d)\n",activecpu_get_pc(),offset);
+//  logerror("%04x: ic43_b_r (offs %d)\n",cpu_get_pc(space->cpu),offset);
 	if (offset == 0)
 		return ic43_b << 4;
 	else
@@ -370,10 +366,10 @@ READ8_HANDLER( boblbobl_ic43_b_r )
 INTERRUPT_GEN( bublbobl_m68705_interrupt )
 {
 	/* I don't know how to handle the interrupt line so I just toggle it every time. */
-	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(machine, 3,0,CLEAR_LINE);
+	if (cpu_getiloops(device) & 1)
+		cpu_set_input_line(device,0,CLEAR_LINE);
 	else
-		cpunum_set_input_line(machine, 3,0,ASSERT_LINE);
+		cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
 
@@ -382,13 +378,13 @@ static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( bublbobl_68705_portA_r )
 {
-//logerror("%04x: 68705 port A read %02x\n",activecpu_get_pc(),portA_in);
+//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(space->cpu),portA_in);
 	return (portA_out & ddrA) | (portA_in & ~ddrA);
 }
 
 WRITE8_HANDLER( bublbobl_68705_portA_w )
 {
-//logerror("%04x: 68705 port A write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(space->cpu),data);
 	portA_out = data;
 }
 
@@ -429,7 +425,7 @@ static int address,latch;
 
 WRITE8_HANDLER( bublbobl_68705_portB_w )
 {
-//logerror("%04x: 68705 port B write %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	if ((ddrB & 0x01) && (~data & 0x01) && (portB_out & 0x01))
@@ -439,7 +435,7 @@ WRITE8_HANDLER( bublbobl_68705_portB_w )
 	if ((ddrB & 0x02) && (data & 0x02) && (~portB_out & 0x02)) /* positive edge trigger */
 	{
 		address = (address & 0xff00) | portA_out;
-//logerror("%04x: 68705 address %02x\n",activecpu_get_pc(),portA_out);
+//logerror("%04x: 68705 address %02x\n",cpu_get_pc(space->cpu),portA_out);
 	}
 	if ((ddrB & 0x04) && (data & 0x04) && (~portB_out & 0x04)) /* positive edge trigger */
 	{
@@ -451,43 +447,43 @@ WRITE8_HANDLER( bublbobl_68705_portB_w )
 		{
 			if ((address & 0x0800) == 0x0000)
 			{
-//logerror("%04x: 68705 read input port %02x\n",activecpu_get_pc(),address);
-				latch = input_port_read(machine, portnames[address & 3]);
+//logerror("%04x: 68705 read input port %02x\n",cpu_get_pc(space->cpu),address);
+				latch = input_port_read(space->machine, portnames[address & 3]);
 			}
 			else if ((address & 0x0c00) == 0x0c00)
 			{
-//logerror("%04x: 68705 read %02x from address %04x\n",activecpu_get_pc(),bublbobl_mcu_sharedram[address],address);
+//logerror("%04x: 68705 read %02x from address %04x\n",cpu_get_pc(space->cpu),bublbobl_mcu_sharedram[address],address);
 				latch = bublbobl_mcu_sharedram[address & 0x03ff];
 			}
 			else
-logerror("%04x: 68705 unknown read address %04x\n",activecpu_get_pc(),address);
+logerror("%04x: 68705 unknown read address %04x\n",cpu_get_pc(space->cpu),address);
 		}
 		else	/* write */
 		{
 			if ((address & 0x0c00) == 0x0c00)
 			{
-//logerror("%04x: 68705 write %02x to address %04x\n",activecpu_get_pc(),portA_out,address);
+//logerror("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu),portA_out,address);
 				bublbobl_mcu_sharedram[address & 0x03ff] = portA_out;
 			}
 			else
-logerror("%04x: 68705 unknown write to address %04x\n",activecpu_get_pc(),address);
+logerror("%04x: 68705 unknown write to address %04x\n",cpu_get_pc(space->cpu),address);
 		}
 	}
 	if ((ddrB & 0x20) && (~data & 0x20) && (portB_out & 0x20))
 	{
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
-		bublbobl_mcu_sharedram[0x7c] = mame_rand(machine)%6;
+		bublbobl_mcu_sharedram[0x7c] = mame_rand(space->machine)%6;
 
-		cpunum_set_input_line_vector(0,0,bublbobl_mcu_sharedram[0]);
-		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+		cpu_set_input_line_vector(space->machine->cpu[0],0,bublbobl_mcu_sharedram[0]);
+		cpu_set_input_line(space->machine->cpu[0],0,HOLD_LINE);
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{
-logerror("%04x: 68705 unknown port B bit %02x\n",activecpu_get_pc(),data);
+logerror("%04x: 68705 unknown port B bit %02x\n",cpu_get_pc(space->cpu),data);
 	}
 	if ((ddrB & 0x80) && (~data & 0x80) && (portB_out & 0x80))
 	{
-logerror("%04x: 68705 unknown port B bit %02x\n",activecpu_get_pc(),data);
+logerror("%04x: 68705 unknown port B bit %02x\n",cpu_get_pc(space->cpu),data);
 	}
 
 	portB_out = data;

@@ -76,16 +76,16 @@ static WRITE8_HANDLER( namco_54xx_O_w )
 {
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		discrete_sound_w(machine, NAMCO_54XX_1_DATA, out);
+		discrete_sound_w(space, NAMCO_54XX_1_DATA, out);
 	else
-		discrete_sound_w(machine, NAMCO_54XX_0_DATA, out);
+		discrete_sound_w(space, NAMCO_54XX_0_DATA, out);
 }
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
 {
 	UINT8 out = (data & 0x0f);
 
-	discrete_sound_w(machine, NAMCO_54XX_2_DATA, out);
+	discrete_sound_w(space, NAMCO_54XX_2_DATA, out);
 }
 
 
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( namco_54xx_irq_clear )
 {
-	cpunum_set_input_line(machine, param, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[param], 0, CLEAR_LINE);
 }
 
 void namco_54xx_write(UINT8 data)
@@ -122,7 +122,7 @@ void namco_54xx_write(UINT8 data)
 
 	timer_call_after_resynch(NULL, data, namco_54xx_latch_callback);
 
-	cpunum_set_input_line(Machine, cpunum, 0, ASSERT_LINE);
+	cpu_set_input_line(Machine->cpu[cpunum], 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.

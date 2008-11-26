@@ -591,16 +591,16 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
 	{
 		/* just modify lines that have changed */
-		if (periodic != -1) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
-		if (tms34061 != -1) cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
-		if (blitter != -1) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
+		if (periodic != -1) cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
+		if (tms34061 != -1) cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
+		if (blitter != -1) cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* handle the 68000 case */
 	else
 	{
-		cpunum_set_input_line(machine, 0, 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -621,23 +621,23 @@ static TIMER_CALLBACK( irq_off )
 static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
-	itech8_update_interrupts(machine, 1, -1, -1);
+	itech8_update_interrupts(device->machine, 1, -1, -1);
 	timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(device->machine->primary_screen));
 }
 
 
 static WRITE8_HANDLER( itech8_nmi_ack_w )
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
 static void generate_sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -668,7 +668,10 @@ static MACHINE_RESET( itech8 )
 {
 	/* make sure bank 0 is selected */
 	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
-		memory_set_bankptr(1, &memory_region(machine, "main")[0x4000]);
+	{
+		memory_set_bankptr(machine, 1, &memory_region(machine, "main")[0x4000]);
+		cpu_reset(machine->cpu[0]);
+	}
 
 	/* reset the PIA (if used) */
 	pia_reset();
@@ -728,17 +731,17 @@ static WRITE8_HANDLER( blitter_w )
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		memory_set_bankptr(1, &memory_region(machine, "main")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "main")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
-	itech8_blitter_w(machine, offset, data);
+	itech8_blitter_w(space, offset, data);
 }
 
 
 static WRITE8_HANDLER( rimrockn_bank_w )
 {
 	/* banking is controlled here instead of by the blitter output */
-	memory_set_bankptr(1, &memory_region(machine, "main")[0x4000 + 0xc000 * (data & 3)]);
+	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "main")[0x4000 + 0xc000 * (data & 3)]);
 }
 
 
@@ -777,7 +780,7 @@ static WRITE8_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	pia_portb_data = data;
-	ticket_dispenser_w(machine, 0, (data & 0x10) << 3);
+	ticket_dispenser_w(space, 0, (data & 0x10) << 3);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -791,7 +794,7 @@ static WRITE8_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	pia_portb_data = data;
-	ticket_dispenser_w(machine, 0, data & 0x80);
+	ticket_dispenser_w(space, 0, data & 0x80);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -806,7 +809,7 @@ static WRITE8_HANDLER( ym2203_portb_out )
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	sound_data = param;
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -829,7 +832,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -844,9 +847,9 @@ static READ8_HANDLER( sound_data_r )
 static void via_irq(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -867,14 +870,14 @@ static WRITE16_HANDLER( grom_bank16_w )
 static WRITE16_HANDLER( display_page16_w )
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_page_w(machine, 0, ~data >> 8);
+		itech8_page_w(space, 0, ~data >> 8);
 }
 
 
 static WRITE16_HANDLER( palette16_w )
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_palette_w(machine, offset / 8, data >> 8);
+		itech8_palette_w(space, offset / 8, data >> 8);
 }
 
 
@@ -2676,25 +2679,25 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0160, 0x0160, 0, 0, grmatch_palette_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01e0, 0x01ff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0, SMH_UNMAP);
 }
 
 
 static DRIVER_INIT( slikshot )
 {
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0180, 0x0180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
 }
 
 
 static DRIVER_INIT( sstrike )
 {
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1180, 0x1180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
 }
 
 
@@ -2729,15 +2732,15 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0161, 0x0161, 0, 0, input_port_read_handler8(machine->portconfig, "161"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0162, 0x0162, 0, 0, input_port_read_handler8(machine->portconfig, "162"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0163, 0x0163, 0, 0, input_port_read_handler8(machine->portconfig, "163"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0164, 0x0164, 0, 0, input_port_read_handler8(machine->portconfig, "164"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0165, 0x0165, 0, 0, input_port_read_handler8(machine->portconfig, "165"));
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, input_port_read_handler8(machine->portconfig, "161"));
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, input_port_read_handler8(machine->portconfig, "162"));
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, input_port_read_handler8(machine->portconfig, "163"));
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, input_port_read_handler8(machine->portconfig, "164"));
+	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, input_port_read_handler8(machine->portconfig, "165"));
 
 	/* different banking mechanism (disable the old one) */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
 }
 
 

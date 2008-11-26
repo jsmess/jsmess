@@ -30,9 +30,7 @@
 
 *****************************************************************************/
 
-
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6805.h"
 
 #define IRQ_LEVEL_DETECT 0
@@ -59,6 +57,7 @@ typedef struct
 	UINT16	pending_interrupts; /* MB */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
 } m6805_Regs;
@@ -202,7 +201,7 @@ static const UINT8 flags8d[256]= /* decrement */
 #define IDX1BYTE(b) {INDEXED1;b=RM(EAD);}
 #define IDX2BYTE(b) {INDEXED2;b=RM(EAD);}
 /* Macros for branch instructions */
-#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC+=SIGNED(t); change_pc(PC); if (t==0xfe) { /* speed up busy loops */ if(m6805_ICount > 0) m6805_ICount = 0; } } }
+#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC+=SIGNED(t); if (t==0xfe) { /* speed up busy loops */ if(m6805_ICount > 0) m6805_ICount = 0; } } }
 
 /* what they say it is ... */
 static const unsigned char cycles1[] =
@@ -299,13 +298,11 @@ static void m68705_Interrupt(void)
 			{
 				m6805.pending_interrupts &= ~(1<<M68705_IRQ_LINE);
 				RM16( 0xfffa, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<M68705_INT_TIMER))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<M68705_INT_TIMER);
 				RM16( 0xfff8, &pPC);
-				change_pc(PC);
 			}
 		}
 		m6805_ICount -= 11;
@@ -333,7 +330,6 @@ static void Interrupt(void)
 			(*m6805.irq_callback)(m6805.device, 0);
 
 		RM16( 0x1ffc, &pPC);
-		change_pc(PC);
 		m6805.pending_interrupts &= ~(1<<HD63705_INT_NMI);
 
 		m6805_ICount -= 11;
@@ -371,56 +367,47 @@ static void Interrupt(void)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_IRQ1);
 				RM16( 0x1ff8, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<HD63705_INT_IRQ2))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_IRQ2);
 				RM16( 0x1fec, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<HD63705_INT_ADCONV))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_ADCONV);
 				RM16( 0x1fea, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<HD63705_INT_TIMER1))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_TIMER1);
 				RM16( 0x1ff6, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<HD63705_INT_TIMER2))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_TIMER2);
 				RM16( 0x1ff4, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<HD63705_INT_TIMER3))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_TIMER3);
 				RM16( 0x1ff2, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<HD63705_INT_PCI))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_PCI);
 				RM16( 0x1ff0, &pPC);
-				change_pc(PC);
 			}
 			else if((m6805.pending_interrupts&(1<<HD63705_INT_SCI))!=0)
 			{
 				m6805.pending_interrupts &= ~(1<<HD63705_INT_SCI);
 				RM16( 0x1fee, &pPC);
-				change_pc(PC);
 			}
 		}
 		else
 #endif
 		{
 			RM16( 0xffff - 5, &pPC );
-			change_pc(PC);
 		}
 
 		}	// CC & IFLAG
@@ -430,31 +417,32 @@ static void Interrupt(void)
 	}
 }
 
-static void state_register(const char *type, int index)
+static void state_register(const char *type, const device_config *device)
 {
-	state_save_register_item(type, index, A);
-	state_save_register_item(type, index, PC);
-	state_save_register_item(type, index, S);
-	state_save_register_item(type, index, X);
-	state_save_register_item(type, index, CC);
-	state_save_register_item(type, index, m6805.pending_interrupts);
-	state_save_register_item_array(type, index, m6805.irq_state);
+	state_save_register_item(type, device->tag, 0, A);
+	state_save_register_item(type, device->tag, 0, PC);
+	state_save_register_item(type, device->tag, 0, S);
+	state_save_register_item(type, device->tag, 0, X);
+	state_save_register_item(type, device->tag, 0, CC);
+	state_save_register_item(type, device->tag, 0, m6805.pending_interrupts);
+	state_save_register_item_array(type, device->tag, 0, m6805.irq_state);
 }
 
 static CPU_INIT( m6805 )
 {
-	state_register("m6805", index);
+	state_register("m6805", device);
 	m6805.irq_callback = irqcallback;
 	m6805.device = device;
+	m6805.program = memory_find_address_space(m6805.device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m6805 )
 {
 	cpu_irq_callback save_irqcallback = m6805.irq_callback;
-	const device_config *save_device = m6805.device;
 	memset(&m6805, 0, sizeof(m6805));
 	m6805.irq_callback = save_irqcallback;
-	m6805.device = save_device;
+	m6805.device = device;
+	m6805.program = memory_find_address_space(m6805.device, ADDRESS_SPACE_PROGRAM);
 	/* Force CPU sub-type and relevant masks */
 	m6805.subtype	= SUBTYPE_M6805;
 	SP_MASK = 0x07f;
@@ -464,7 +452,6 @@ static CPU_RESET( m6805 )
 	/* IRQ disabled */
     SEI;
 	RM16( 0xfffe , &pPC );
-	change_pc(PC);
 }
 
 static CPU_EXIT( m6805 )
@@ -531,7 +518,7 @@ static CPU_EXECUTE( m6805 )
 			}
 		}
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		ireg=M_RDOP(PC++);
 
@@ -810,7 +797,7 @@ static CPU_EXECUTE( m6805 )
 #if (HAS_M68705)
 static CPU_INIT( m68705 )
 {
-	state_register("m68705", index);
+	state_register("m68705", device);
 	m6805.irq_callback = irqcallback;
 	m6805.device = device;
 }
@@ -838,7 +825,7 @@ static void m68705_set_irq_line(int irqline, int state)
 #if (HAS_HD63705)
 static CPU_INIT( hd63705 )
 {
-	state_register("hd63705", index);
+	state_register("hd63705", device);
 	m6805.irq_callback = irqcallback;
 	m6805.device = device;
 }
@@ -889,7 +876,7 @@ static CPU_SET_INFO( m6805 )
 
 		case CPUINFO_INT_REGISTER + M6805_A:			A = info->i;							break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + M6805_PC:			PC = info->i; change_pc(PC); 			break;
+		case CPUINFO_INT_REGISTER + M6805_PC:			PC = info->i; 				 			break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + M6805_S:			S = SP_ADJUST(info->i);					break;
 		case CPUINFO_INT_REGISTER + M6805_X:			X = info->i;							break;

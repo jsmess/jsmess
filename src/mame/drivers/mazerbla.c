@@ -283,7 +283,7 @@ static WRITE8_HANDLER( cfb_zpu_int_req_set_w )
 {
 	zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
 
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	cpu_set_input_line(space->machine->cpu[0], 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 static READ8_HANDLER( cfb_zpu_int_req_clr )
@@ -292,7 +292,7 @@ static READ8_HANDLER( cfb_zpu_int_req_clr )
 
 	/* clear the INT line when there are no more interrupt requests */
 	if (zpu_int_vector==0xff)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -440,7 +440,7 @@ static READ8_HANDLER( zpu_inputs_r )
 
 	if (bcd_7445<10)
 	{
-		ret = input_port_read(machine, strobenames[bcd_7445]);
+		ret = input_port_read(space->machine, strobenames[bcd_7445]);
 	}
 	return ret;
 }
@@ -574,7 +574,7 @@ static WRITE8_HANDLER(cfb_backgnd_color_w)
 		bit0 = (data >> 0) & 0x01;
 		b = combine_3_weights(weights_b, bit0, bit1, bit2);
 
-		palette_set_color(machine, 255, MAKE_RGB(r, g, b));
+		palette_set_color(space->machine, 255, MAKE_RGB(r, g, b));
 		//logerror("background color (port 01) write=%02x\n",data);
 	}
 }
@@ -595,13 +595,13 @@ static WRITE8_HANDLER(cfb_rom_bank_sel_w)	/* mazer blazer */
 {
 	gfx_rom_bank = data;
 
-	memory_set_bankptr( 1, memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 static WRITE8_HANDLER(cfb_rom_bank_sel_w_gg)	/* great guns */
 {
 	gfx_rom_bank = data>>1;
 
-	memory_set_bankptr( 1, memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 
 
@@ -673,7 +673,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-UINT8 * rom = memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     if ((mode<=0x07) || (mode>=0x10))
@@ -838,7 +838,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-UINT8 * rom = memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     //if (0) //(mode != 0x07)
@@ -962,7 +962,7 @@ UINT8 * rom = memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000
 						b = combine_3_weights(weights_b, bit0, bit1, bit2);
 
 						if ((x+y*16)<255)//keep color 255 free for use as background color
-							palette_set_color(machine, x+y*16, MAKE_RGB(r, g, b));
+							palette_set_color(space->machine, x+y*16, MAKE_RGB(r, g, b));
 
 						lookup_RAM[ lookup_offs + x + y*16 ] = colour;
 					}
@@ -1064,7 +1064,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	soundlatch = param;
 
 	/* cause NMI on sound CPU */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -1088,16 +1088,16 @@ ADDRESS_MAP_END
 /* frequency is 14.318 MHz/16/16/16/16 */
 static INTERRUPT_GEN( sound_interrupt )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_int_clear_w )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 static WRITE8_HANDLER( sound_nmi_clear_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gg_led_ctrl_w )
@@ -1426,7 +1426,7 @@ static MACHINE_RESET( mazerbla )
 {
 	game_id = MAZERBLA;
 	zpu_int_vector = 0xff;
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 }
 
 
@@ -1435,7 +1435,7 @@ static MACHINE_RESET( greatgun )
 	UINT8 *rom = memory_region(machine, "sub2");
 	game_id = GREATGUN;
 	zpu_int_vector = 0xff;
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 
 //patch VCU test

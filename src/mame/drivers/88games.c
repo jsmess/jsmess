@@ -29,7 +29,7 @@ VIDEO_UPDATE( 88games );
 static INTERRUPT_GEN( k88games_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		irq0_line_hold(machine, cpunum);
+		irq0_line_hold(device);
 }
 
 static int zoomreadroms;
@@ -40,16 +40,16 @@ static READ8_HANDLER( bankedram_r )
 	else
 	{
 		if (zoomreadroms)
-			return K051316_rom_0_r(machine,offset);
+			return K051316_rom_0_r(space,offset);
 		else
-			return K051316_0_r(machine,offset);
+			return K051316_0_r(space,offset);
 	}
 }
 
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (videobank) ram[offset] = data;
-	else K051316_0_w(machine,offset,data);
+	else K051316_0_w(space,offset,data);
 }
 
 static WRITE8_HANDLER( k88games_5f84_w )
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( k88games_5f84_w )
 
 static WRITE8_HANDLER( k88games_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
 /* handle fake button for speed cheat for players 1 and 2 */
@@ -78,9 +78,9 @@ static READ8_HANDLER( cheat1_r )
 	static int cheat = 0;
 	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
-	res = input_port_read(machine, "IN1");
+	res = input_port_read(space->machine, "IN1");
 
-	if ((input_port_read(machine, "IN0") & 0x08) == 0)
+	if ((input_port_read(space->machine, "IN0") & 0x08) == 0)
 	{
 		res |= 0x55;
 		res &= bits[cheat];
@@ -96,9 +96,9 @@ static READ8_HANDLER( cheat2_r )
 	static int cheat = 0;
 	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
-	res = input_port_read(machine, "IN2");
+	res = input_port_read(space->machine, "IN2");
 
-	if ((input_port_read(machine, "IN0") & 0x08) == 0)
+	if ((input_port_read(space->machine, "IN0") & 0x08) == 0)
 	{
 		res |= 0x55;
 		res &= bits[cheat];
@@ -474,7 +474,7 @@ static void k88games_banking( int lines )
 	UINT8 *RAM = memory_region(Machine, "main");
 	int offs;
 
-logerror("%04x: bank select %02x\n",activecpu_get_pc(),lines);
+logerror("%04x: bank select %02x\n",cpu_get_pc(Machine->activecpu),lines);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */
@@ -511,7 +511,7 @@ logerror("%04x: bank select %02x\n",activecpu_get_pc(),lines);
 
 static MACHINE_RESET( 88games )
 {
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)k88games_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)k88games_banking);
 	paletteram = &memory_region(machine, "main")[0x20000];
 }
 

@@ -257,8 +257,8 @@ static MACHINE_RESET( othunder )
 
 static void update_irq(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 6, ad_irq ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 5, vblank_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, ad_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 5, vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( irq_ack_w )
@@ -274,13 +274,13 @@ static WRITE16_HANDLER( irq_ack_w )
 			break;
 	}
 
-	update_irq(machine);
+	update_irq(space->machine);
 }
 
 static INTERRUPT_GEN( vblank_interrupt )
 {
 	vblank_irq = 1;
-	update_irq(machine);
+	update_irq(device->machine);
 }
 
 static TIMER_CALLBACK( ad_interrupt )
@@ -371,7 +371,7 @@ if (data & 4)
 				break;
 
 			default:
-				TC0220IOC_w(machine,offset,data & 0xff);
+				TC0220IOC_w(space,offset,data & 0xff);
 		}
 	}
 }
@@ -389,7 +389,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 			return eeprom_r();
 
 		default:
-			return TC0220IOC_r( machine, offset );
+			return TC0220IOC_r( space, offset );
 	}
 }
 
@@ -402,7 +402,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 static READ16_HANDLER( othunder_lightgun_r )
 {
 	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return input_port_read(machine, portname[offset]);
+	return input_port_read(space->machine, portname[offset]);
 }
 
 static WRITE16_HANDLER( othunder_lightgun_w )
@@ -424,7 +424,7 @@ static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( 10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
 }
 
 static STATE_POSTLOAD( othunder_postload )
@@ -443,21 +443,21 @@ static MACHINE_START( othunder )
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( othunder_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (machine, 0, data & 0xff);
+		taitosound_port_w (space, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (machine, 0, data & 0xff);
+		taitosound_comm_w (space, 0, data & 0xff);
 }
 
 static READ16_HANDLER( othunder_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (machine, 0) & 0xff));
+		return ((taitosound_comm_r (space, 0) & 0xff));
 	else return 0;
 }
 
@@ -675,7 +675,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

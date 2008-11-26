@@ -60,8 +60,8 @@ WRITE16_HANDLER( toki_foreground_videoram16_w );
 
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
-	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	soundlatch_w(space,0,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( pip16_r )
@@ -81,18 +81,18 @@ static void toki_adpcm_int (running_machine *machine, int data)
 
 	toggle ^= 1;
 	if (toggle)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	msm5205_reset_w(0,data & 0x08);
 }
@@ -809,13 +809,14 @@ static DRIVER_INIT(jujub)
 
 	/* Decrypt data for z80 program */
 	{
+		const address_space *space = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
 		UINT8 *decrypt = auto_malloc(0x20000);
 		UINT8 *rom = memory_region(machine, "audio");
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
 
-		memory_set_decrypted_region(1, 0x0000, 0x1fff, decrypt);
+		memory_set_decrypted_region(space, 0x0000, 0x1fff, decrypt);
 
 		for (i = 0;i < 0x2000;i++)
 		{

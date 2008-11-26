@@ -158,7 +158,7 @@ void cia_config(running_machine *machine, int which, const cia6526_interface *in
 	memset(cia, 0, sizeof(*cia));
 	cia->active = TRUE;
 	cia->type = intf->type;
-	cia->clock = (intf->clock != 0) ? intf->clock : cpunum_get_clock(0);
+	cia->clock = (intf->clock != 0) ? intf->clock : cpu_get_clock(machine->cpu[0]);
 	cia->irq_func = intf->irq_func;
 
 	/* setup ports */
@@ -187,38 +187,38 @@ void cia_config(running_machine *machine, int which, const cia6526_interface *in
 		add_exit_callback(machine, cia_exit);
 
 	/* state save support */
-	state_save_register_item("6526cia", which, cia->port[0].ddr);
-	state_save_register_item("6526cia", which, cia->port[0].latch);
-	state_save_register_item("6526cia", which, cia->port[0].in);
-	state_save_register_item("6526cia", which, cia->port[0].out);
-	state_save_register_item("6526cia", which, cia->port[0].mask_value);
-	state_save_register_item("6526cia", which, cia->port[1].ddr);
-	state_save_register_item("6526cia", which, cia->port[1].latch);
-	state_save_register_item("6526cia", which, cia->port[1].in);
-	state_save_register_item("6526cia", which, cia->port[1].out);
-	state_save_register_item("6526cia", which, cia->port[1].mask_value);
-	state_save_register_item("6526cia", which, cia->timer[0].latch);
-	state_save_register_item("6526cia", which, cia->timer[0].count);
-	state_save_register_item("6526cia", which, cia->timer[0].mode);
-	state_save_register_item("6526cia", which, cia->timer[0].irq);
-	state_save_register_item("6526cia", which, cia->timer[1].latch);
-	state_save_register_item("6526cia", which, cia->timer[1].count);
-	state_save_register_item("6526cia", which, cia->timer[1].mode);
-	state_save_register_item("6526cia", which, cia->timer[1].irq);
-	state_save_register_item("6526cia", which, cia->tod);
-	state_save_register_item("6526cia", which, cia->tod_latch);
-	state_save_register_item("6526cia", which, cia->tod_latched);
-	state_save_register_item("6526cia", which, cia->tod_running);
-	state_save_register_item("6526cia", which, cia->alarm);
-	state_save_register_item("6526cia", which, cia->icr);
-	state_save_register_item("6526cia", which, cia->ics);
-	state_save_register_item("6526cia", which, cia->irq);
-	state_save_register_item("6526cia", which, cia->loaded);
-	state_save_register_item("6526cia", which, cia->sdr);
-	state_save_register_item("6526cia", which, cia->sp);
-	state_save_register_item("6526cia", which, cia->cnt);
-	state_save_register_item("6526cia", which, cia->shift);
-	state_save_register_item("6526cia", which, cia->serial);
+	state_save_register_item("6526cia", NULL, which, cia->port[0].ddr);
+	state_save_register_item("6526cia", NULL, which, cia->port[0].latch);
+	state_save_register_item("6526cia", NULL, which, cia->port[0].in);
+	state_save_register_item("6526cia", NULL, which, cia->port[0].out);
+	state_save_register_item("6526cia", NULL, which, cia->port[0].mask_value);
+	state_save_register_item("6526cia", NULL, which, cia->port[1].ddr);
+	state_save_register_item("6526cia", NULL, which, cia->port[1].latch);
+	state_save_register_item("6526cia", NULL, which, cia->port[1].in);
+	state_save_register_item("6526cia", NULL, which, cia->port[1].out);
+	state_save_register_item("6526cia", NULL, which, cia->port[1].mask_value);
+	state_save_register_item("6526cia", NULL, which, cia->timer[0].latch);
+	state_save_register_item("6526cia", NULL, which, cia->timer[0].count);
+	state_save_register_item("6526cia", NULL, which, cia->timer[0].mode);
+	state_save_register_item("6526cia", NULL, which, cia->timer[0].irq);
+	state_save_register_item("6526cia", NULL, which, cia->timer[1].latch);
+	state_save_register_item("6526cia", NULL, which, cia->timer[1].count);
+	state_save_register_item("6526cia", NULL, which, cia->timer[1].mode);
+	state_save_register_item("6526cia", NULL, which, cia->timer[1].irq);
+	state_save_register_item("6526cia", NULL, which, cia->tod);
+	state_save_register_item("6526cia", NULL, which, cia->tod_latch);
+	state_save_register_item("6526cia", NULL, which, cia->tod_latched);
+	state_save_register_item("6526cia", NULL, which, cia->tod_running);
+	state_save_register_item("6526cia", NULL, which, cia->alarm);
+	state_save_register_item("6526cia", NULL, which, cia->icr);
+	state_save_register_item("6526cia", NULL, which, cia->ics);
+	state_save_register_item("6526cia", NULL, which, cia->irq);
+	state_save_register_item("6526cia", NULL, which, cia->loaded);
+	state_save_register_item("6526cia", NULL, which, cia->sdr);
+	state_save_register_item("6526cia", NULL, which, cia->sp);
+	state_save_register_item("6526cia", NULL, which, cia->cnt);
+	state_save_register_item("6526cia", NULL, which, cia->shift);
+	state_save_register_item("6526cia", NULL, which, cia->serial);
 }
 
 void cia_set_port_mask_value(int which, int port, int data)
@@ -784,8 +784,8 @@ UINT8 cia_get_output_a(int which)	{ return cia_array[which].port[0].out; }
 UINT8 cia_get_output_b(int which)	{ return cia_array[which].port[1].out; }
 int cia_get_irq(int which)			{ return cia_array[which].irq; }
 
-READ8_HANDLER( cia_0_r )	{ return cia_read(machine, 0, offset); }
-READ8_HANDLER( cia_1_r )	{ return cia_read(machine, 1, offset); }
+READ8_HANDLER( cia_0_r )	{ return cia_read(space->machine, 0, offset); }
+READ8_HANDLER( cia_1_r )	{ return cia_read(space->machine, 1, offset); }
 
-WRITE8_HANDLER( cia_0_w )	{ cia_write(machine, 0, offset, data); }
-WRITE8_HANDLER( cia_1_w )	{ cia_write(machine, 1, offset, data); }
+WRITE8_HANDLER( cia_0_w )	{ cia_write(space->machine, 0, offset, data); }
+WRITE8_HANDLER( cia_1_w )	{ cia_write(space->machine, 1, offset, data); }

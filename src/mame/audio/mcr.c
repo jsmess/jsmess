@@ -63,8 +63,8 @@ static UINT8 ssio_duty_cycle[2][3];
 static UINT8 ssio_ayvolume_lookup[16];
 static UINT8 ssio_custom_input_mask[5];
 static UINT8 ssio_custom_output_mask[2];
-static read8_machine_func ssio_custom_input[5];
-static write8_machine_func ssio_custom_output[2];
+static read8_space_func ssio_custom_input[5];
+static write8_space_func ssio_custom_output[2];
 
 /* Chip Squeak Deluxe-specific globals */
 static UINT8 csdeluxe_sound_cpu;
@@ -315,14 +315,14 @@ static INTERRUPT_GEN( ssio_14024_clock )
 
 	/* if the low 5 bits clocked to 0, bit 6 has changed state */
 	if ((ssio_14024_count & 0x3f) == 0)
-		cpunum_set_input_line(machine, ssio_sound_cpu, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(device, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( ssio_irq_clear )
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
-	cpunum_set_input_line(machine, ssio_sound_cpu, 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[ssio_sound_cpu], 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -398,7 +398,7 @@ void ssio_reset_w(int state)
 	{
 		int i;
 
-		cpunum_set_input_line(Machine, ssio_sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* latches also get reset */
 		for (i = 0; i < 4; i++)
@@ -408,16 +408,16 @@ void ssio_reset_w(int state)
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(Machine, ssio_sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ8_HANDLER( ssio_input_port_r )
 {
 	static const char *const port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
-	UINT8 result = input_port_read_safe(machine, port[offset], 0xff);
+	UINT8 result = input_port_read_safe(space->machine, port[offset], 0xff);
 	if (ssio_custom_input[offset])
 		result = (result & ~ssio_custom_input_mask[offset]) |
-		         ((*ssio_custom_input[offset])(machine, offset) & ssio_custom_input_mask[offset]);
+		         ((*ssio_custom_input[offset])(space, offset) & ssio_custom_input_mask[offset]);
 	return result;
 }
 
@@ -425,18 +425,18 @@ WRITE8_HANDLER( ssio_output_port_w )
 {
 	int which = offset >> 2;
 	if (which == 0)
-		mcr_control_port_w(machine, offset, data);
+		mcr_control_port_w(space, offset, data);
 	if (ssio_custom_output[which])
-		(*ssio_custom_output[which])(machine, offset, data & ssio_custom_output_mask[which]);
+		(*ssio_custom_output[which])(space, offset, data & ssio_custom_output_mask[which]);
 }
 
-void ssio_set_custom_input(int which, int mask, read8_machine_func handler)
+void ssio_set_custom_input(int which, int mask, read8_space_func handler)
 {
 	ssio_custom_input[which] = handler;
 	ssio_custom_input_mask[which] = mask;
 }
 
-void ssio_set_custom_output(int which, int mask, write8_machine_func handler)
+void ssio_set_custom_output(int which, int mask, write8_space_func handler)
 {
 	ssio_custom_output[which/4] = handler;
 	ssio_custom_output_mask[which/4] = mask;
@@ -534,17 +534,19 @@ static void csdeluxe_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
 
-  	cpunum_set_input_line(machine, csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+  	cpu_set_input_line(machine->cpu[csdeluxe_sound_cpu], 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
-	pia_0_portb_w(machine, 0, param & 0x0f);
-	pia_0_ca1_w(machine, 0, ~param & 0x10);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_0_portb_w(space, 0, param & 0x0f);
+	pia_0_ca1_w(space, 0, ~param & 0x10);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 static READ16_HANDLER( csdeluxe_pia_r )
@@ -554,17 +556,17 @@ static READ16_HANDLER( csdeluxe_pia_r )
 	/* using the MOVEP instruction outputs the same value on the high and */
 	/* low bytes. */
 	if (ACCESSING_BITS_8_15)
-		return pia_0_alt_r(machine, offset) << 8;
+		return pia_0_alt_r(space, offset) << 8;
 	else
-		return pia_0_alt_r(machine, offset);
+		return pia_0_alt_r(space, offset);
 }
 
 static WRITE16_HANDLER( csdeluxe_pia_w )
 {
 	if (ACCESSING_BITS_8_15)
-		pia_0_alt_w(machine, offset, data >> 8);
+		pia_0_alt_w(space, offset, data >> 8);
 	else
-		pia_0_alt_w(machine, offset, data);
+		pia_0_alt_w(space, offset, data);
 }
 
 
@@ -581,7 +583,7 @@ READ8_HANDLER( csdeluxe_status_r )
 
 void csdeluxe_reset_w(int state)
 {
-	cpunum_set_input_line(Machine, csdeluxe_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[csdeluxe_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -657,17 +659,19 @@ static void soundsgood_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
 
-  	cpunum_set_input_line(machine, soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+  	cpu_set_input_line(machine->cpu[soundsgood_sound_cpu], 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
-	pia_1_portb_w(machine, 0, (param >> 1) & 0x0f);
-	pia_1_ca1_w(machine, 0, ~param & 0x01);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_1_portb_w(space, 0, (param >> 1) & 0x0f);
+	pia_1_ca1_w(space, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(250));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(250));
 }
 
 
@@ -685,7 +689,7 @@ READ8_HANDLER( soundsgood_status_r )
 void soundsgood_reset_w(int state)
 {
 //if (state) mame_printf_debug("SG Reset\n");
-	cpunum_set_input_line(Machine, soundsgood_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[soundsgood_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -751,17 +755,19 @@ static void turbocs_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
 
-	cpunum_set_input_line(machine, turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[turbocs_sound_cpu], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
-	pia_0_portb_w(machine, 0, (param >> 1) & 0x0f);
-	pia_0_ca1_w(machine, 0, ~param & 0x01);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_0_portb_w(space, 0, (param >> 1) & 0x0f);
+	pia_0_ca1_w(space, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -778,7 +784,7 @@ READ8_HANDLER( turbocs_status_r )
 
 void turbocs_reset_w(int state)
 {
-	cpunum_set_input_line(Machine, turbocs_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[turbocs_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -859,21 +865,21 @@ static WRITE8_HANDLER( squawkntalk_portb2_w )
 	/* write strobe -- pass the current command to the TMS5200 */
 	if (((data ^ squawkntalk_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		tms5220_data_w(machine, offset, squawkntalk_tms_command);
+		tms5220_data_w(space, offset, squawkntalk_tms_command);
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(machine, 0, 1);
-		pia_1_ca2_w(machine, 0, 0);
+		pia_1_ca2_w(space, 0, 1);
+		pia_1_ca2_w(space, 0, 0);
 	}
 
 	/* read strobe -- read the current status from the TMS5200 */
 	else if (((data ^ squawkntalk_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		pia_1_porta_w(machine, 0, tms5220_status_r(machine, offset));
+		pia_1_porta_w(space, 0, tms5220_status_r(space, offset));
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(machine, 0, 1);
-		pia_1_ca2_w(machine, 0, 0);
+		pia_1_ca2_w(space, 0, 1);
+		pia_1_ca2_w(space, 0, 0);
 	}
 
 	/* remember the state */
@@ -884,13 +890,15 @@ static void squawkntalk_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
-	cpunum_set_input_line(machine, squawkntalk_sound_cpu, M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[squawkntalk_sound_cpu], M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
-	pia_0_porta_w(machine, 0, ~param & 0x0f);
-	pia_0_cb1_w(machine, 0, ~param & 0x10);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_0_porta_w(space, 0, ~param & 0x0f);
+	pia_0_cb1_w(space, 0, ~param & 0x10);
 }
 
 
@@ -902,7 +910,7 @@ WRITE8_HANDLER( squawkntalk_data_w )
 
 void squawkntalk_reset_w(int state)
 {
-	cpunum_set_input_line(Machine, squawkntalk_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[squawkntalk_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

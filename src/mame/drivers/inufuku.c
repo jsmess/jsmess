@@ -98,8 +98,8 @@ static WRITE16_HANDLER( inufuku_soundcommand_w )
 		if (data == 0x08) return;
 
 		pending_command = 1;
-		soundlatch_w(machine, 0, data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, 0, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -110,9 +110,9 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( inufuku_soundrombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "audio") + 0x10000;
+	UINT8 *ROM = memory_region(space->machine, "audio") + 0x10000;
 
-	memory_set_bankptr(1, ROM + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine, 1, ROM + (data & 0x03) * 0x8000);
 }
 
 
@@ -129,8 +129,9 @@ static MACHINE_RESET( inufuku )
 
 static DRIVER_INIT( inufuku )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	pending_command = 1;
-	inufuku_soundrombank_w(machine, 0, 0);
+	inufuku_soundrombank_w(space, 0, 0);
 }
 
 
@@ -353,7 +354,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

@@ -294,10 +294,10 @@ static WRITE16_HANDLER( batsugun_share2_w );
   Initialisation handlers
 ***************************************************************************/
 
-static void toaplan2_reset(void)
+static void toaplan2_reset(const device_config *device)
 {
-	if ( cpu_gettotalcpu() > 1 )
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+	if (device->machine->cpu[1] != NULL)
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( toaplan2 )
@@ -309,7 +309,7 @@ static MACHINE_RESET( toaplan2 )
       This is important for games with common RAM; the RAM test will fail
       when leaving service mode if the sound CPU is not reset.
     */
-	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)toaplan2_reset);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)toaplan2_reset);
 }
 
 static MACHINE_RESET( ghox )
@@ -337,8 +337,8 @@ static MACHINE_RESET( bgaregga )
 
 	// Set Z80 bank switch - default bank is 2
 	current_bank = 4;
-	memory_configure_bank(1, 0, 10, Z80, 0x4000);
-	memory_set_bank(1, 4);
+	memory_configure_bank(machine, 1, 0, 16, Z80, 0x4000);
+	memory_set_bank(machine, 1, 4);
 
 	if (memory_region(machine, "oki1") != NULL)
 		NMK112_init(0, "oki1", "oki2");
@@ -386,8 +386,8 @@ static DRIVER_INIT( fixeight )
 	#if USE_V25
 
 	#else
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2 );
-	memory_set_bankptr(2, fixeight_sec_cpu_mem);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2 );
+	memory_set_bankptr(machine, 2, fixeight_sec_cpu_mem);
 	#endif
 
 	toaplan2_sub_cpu = CPU_2_V25;
@@ -397,7 +397,7 @@ static DRIVER_INIT( fixeight )
 static DRIVER_INIT( fixeighb )
 {
 	UINT16 *bgdata = (UINT16 *)memory_region(machine, "main");
-	memory_set_bankptr(1, &bgdata[0x40000]); /* $80000 - $fffff */
+	memory_set_bankptr(machine, 1, &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
 	register_state_save();
@@ -515,13 +515,13 @@ static DRIVER_INIT( bbakradu )
 
 static READ16_HANDLER( toaplan2_inputport_0_word_r )
 {
-	return ((video_screen_get_vpos(machine->primary_screen) + 15) % 262) >= 245;
+	return ((video_screen_get_vpos(space->machine->primary_screen) + 15) % 262) >= 245;
 }
 
 
 static TIMER_CALLBACK( toaplan2_raise_irq )
 {
-	cpunum_set_input_line(machine, 0, param, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
@@ -530,9 +530,9 @@ static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0xe6, 0), NULL, irq_line, toaplan2_raise_irq);
 }
 
-static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(machine, 1); }
-static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(machine, 2); }
-static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(machine, 4); }
+static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(device->machine, 1); }
+static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(device->machine, 2); }
+static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(device->machine, 4); }
 
 static READ16_HANDLER( video_count_r )
 {
@@ -542,8 +542,8 @@ static READ16_HANDLER( video_count_r )
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = video_screen_get_hpos(machine->primary_screen);
-	int vpos = video_screen_get_vpos(machine->primary_screen);
+	int hpos = video_screen_get_hpos(space->machine->primary_screen);
+	int vpos = video_screen_get_vpos(space->machine->primary_screen);
 	video_status = 0xff00;						/* Set signals inactive */
 
 	vpos = (vpos + 15) % 262;
@@ -559,7 +559,7 @@ static READ16_HANDLER( video_count_r )
 	else
 		video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(machine->primary_screen));
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(space->machine->primary_screen));
 
 	return video_status;
 }
@@ -591,7 +591,7 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_coin_w(machine, offset, data & 0xff);
+		toaplan2_coin_w(space, offset, data & 0xff);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -605,12 +605,12 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_coin_w(machine, offset, data & 0x0f);
+		toaplan2_coin_w(space, offset, data & 0x0f);
 
 		#if USE_V25
 		/* only the ram-based V25 based games access the following bits */
-		//cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		//cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 		#endif
 
 	}
@@ -625,7 +625,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_coin_w(machine, offset, data & 0xff);
+		toaplan2_coin_w(space, offset, data & 0xff);
 		okim6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
@@ -661,7 +661,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 		else										/* Teki Paki */
 		{
 			mcu_data = data & 0xff;
-			logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n",activecpu_get_previouspc(),mcu_data);
+			logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n",cpu_get_previouspc(space->cpu),mcu_data);
 		}
 	}
 }
@@ -698,7 +698,7 @@ static READ16_HANDLER( ghox_p1_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_read(machine, "PAD1");
+	new_value = input_port_read(space->machine, "PAD1");
 	if (new_value == old_p1_paddle_h) return 0;
 	value = new_value - old_p1_paddle_h;
 	old_p1_paddle_h = new_value;
@@ -709,7 +709,7 @@ static READ16_HANDLER( ghox_p2_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_read(machine, "PAD2");
+	new_value = input_port_read(space->machine, "PAD2");
 	if (new_value == old_p2_paddle_h) return 0;
 	value = new_value - old_p2_paddle_h;
 	old_p2_paddle_h = new_value;
@@ -734,7 +734,7 @@ static WRITE16_HANDLER( ghox_mcu_w )
 		}
 		else
 		{
-			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n",activecpu_get_previouspc(),mcu_data);
+			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n",cpu_get_previouspc(space->cpu),mcu_data);
 		}
 		toaplan2_shared_ram16[0x56 / 2] = 0x004e;	/* Return a RTS instruction */
 		toaplan2_shared_ram16[0x58 / 2] = 0x0075;
@@ -811,7 +811,7 @@ static WRITE16_HANDLER( shared_ram_w )
 			case 0xcf8:
 			case 0xff8: toaplan2_shared_ram16[offset + 1] = data; /* Dogyuun */
 						toaplan2_shared_ram16[offset + 2] = data; /* FixEight */
-						logerror("PC:%08x Writing (%04x) to shared RAM at %04x\n",activecpu_get_previouspc(),data,(offset*2));
+						logerror("PC:%08x Writing (%04x) to shared RAM at %04x\n",cpu_get_previouspc(space->cpu),data,(offset*2));
 						if (data == 0x81) data = 0x0001;
 						break;
 			default:	break;
@@ -834,7 +834,7 @@ static READ16_HANDLER( toaplan2_snd_cpu_r )
 		mcu_data = 0xffff;
 	}
 
-	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),response);
+	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),response);
 	return response;
 }
 
@@ -843,9 +843,9 @@ static WRITE16_HANDLER( dogyuun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		dogyuun_okisnd_w(machine, data);
+		dogyuun_okisnd_w(space, data);
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
 
 static READ16_HANDLER( kbash_snd_cpu_r )
@@ -862,9 +862,9 @@ static WRITE16_HANDLER( kbash_snd_cpu_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kbash_okisnd_w(machine, data);
+		kbash_okisnd_w(space, data);
 	}
-	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",activecpu_get_previouspc(),data);
+	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",cpu_get_previouspc(space->cpu),data);
 }
 
 static READ16_HANDLER( fixeight_sec_cpu_r )
@@ -888,7 +888,7 @@ static READ16_HANDLER( fixeight_sec_cpu_r )
 	{
 		response = mcu_data;	/* Return the shared RAM data during POST */
 	}
-	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),response);
+	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),response);
 	return response;
 }
 
@@ -899,7 +899,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 		if (mcu_data & 0xff00)
 		{
 			mcu_data = (mcu_data & 0xff00) | (data & 0xff);
-			fixeight_okisnd_w(machine, data);
+			fixeight_okisnd_w(space, data);
 		}
 		else if (mcu_data == 0xff00)
 		{
@@ -913,11 +913,11 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
-			memory_set_bankptr(2, fixeight_sec_cpu_mem);
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
+			memory_install_readwrite16_handler(space, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
+			memory_set_bankptr(space->machine, 2, fixeight_sec_cpu_mem);
+			memory_install_readwrite16_handler(space, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
+			memory_install_readwrite16_handler(space, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
+			memory_install_readwrite16_handler(space, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(space->machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
 
 			mcu_data = data;
 		}
@@ -926,7 +926,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			mcu_data = data;
 		}
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
 
 static WRITE16_HANDLER( vfive_snd_cpu_w )
@@ -935,7 +935,7 @@ static WRITE16_HANDLER( vfive_snd_cpu_w )
 	{
 		mcu_data = data;
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",activecpu_get_previouspc(),mcu_data);
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
 
 static WRITE16_HANDLER( batsugun_snd_cpu_w )
@@ -943,9 +943,9 @@ static WRITE16_HANDLER( batsugun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		batsugun_okisnd_w(machine, data);
+		batsugun_okisnd_w(space, data);
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",activecpu_get_previouspc(),mcu_data,(offset*2));
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",cpu_get_previouspc(space->cpu),mcu_data,(offset*2));
 }
 
 static READ16_HANDLER( V25_sharedram_r )
@@ -976,7 +976,7 @@ static WRITE16_HANDLER( fixeighb_oki_bankswitch_w )
 		data &= 7;
 		if (data <= 4)
 		{
-			UINT8 *fixeighb_oki = memory_region(machine, "oki");
+			UINT8 *fixeighb_oki = memory_region(space->machine, "oki");
 			memcpy(&fixeighb_oki[0x30000], &fixeighb_oki[(data * 0x10000) + 0x40000], 0x10000);
 		}
 	}
@@ -1007,8 +1007,8 @@ static WRITE16_HANDLER( bgaregga_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, offset, data & 0xff);
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -1037,7 +1037,7 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		memory_set_bank(1, bank);
+		memory_set_bank(space->machine, 1, bank);
 	}
 }
 
@@ -1049,26 +1049,26 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
-	NMK112_okibank_w(machine, 0,  data		& 0x0f);	// chip 0 bank 0
-	NMK112_okibank_w(machine, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
+	NMK112_okibank_w(space, 0,  data		& 0x0f);	// chip 0 bank 0
+	NMK112_okibank_w(space, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 {
-	NMK112_okibank_w(machine, 2,  data		& 0x0f);	// chip 0 bank 2
-	NMK112_okibank_w(machine, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
+	NMK112_okibank_w(space, 2,  data		& 0x0f);	// chip 0 bank 2
+	NMK112_okibank_w(space, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 {
-	NMK112_okibank_w(machine, 4,  data		& 0x0f);	// chip 1 bank 0
-	NMK112_okibank_w(machine, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
+	NMK112_okibank_w(space, 4,  data		& 0x0f);	// chip 1 bank 0
+	NMK112_okibank_w(space, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 {
-	NMK112_okibank_w(machine, 6,  data		& 0x0f);	// chip 1 bank 2
-	NMK112_okibank_w(machine, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
+	NMK112_okibank_w(space, 6,  data		& 0x0f);	// chip 1 bank 2
+	NMK112_okibank_w(space, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
 }
 
 
@@ -1080,7 +1080,7 @@ static WRITE8_HANDLER( batrider_bankswitch_w )
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		memory_set_bank(1, bank);
+		memory_set_bank(space->machine, 1, bank);
 	}
 }
 
@@ -1108,7 +1108,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 
 static READ16_HANDLER( raizing_z80rom_r )
 {
-	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(machine, "audio");
+	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(space->machine, "audio");
 
 	if (offset < 0x8000)
 		return Z80_ROM_test[offset] & 0xff;
@@ -1122,8 +1122,8 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, offset, data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1132,8 +1132,8 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch2_w(machine, offset, data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		soundlatch2_w(space, offset, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1149,20 +1149,20 @@ static WRITE16_HANDLER( raizing_clear_sndirq_w )
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	cpunum_set_input_line(machine, 0, raizing_sndirq_line, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], raizing_sndirq_line, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_sndirq_w )
 {
 	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	cpunum_set_input_line(machine, 0, raizing_sndirq_line, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0], raizing_sndirq_line, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_clear_nmi_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1262,7 +1262,7 @@ static READ16_HANDLER( bbakraid_nvram_r )
 static WRITE16_HANDLER( bbakraid_nvram_w )
 {
 	if (data & ~0x001f)
-		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -1288,7 +1288,7 @@ static void bbakraid_irqhandler(running_machine *machine, int state)
 
 static INTERRUPT_GEN( bbakraid_snd_interrupt )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 
@@ -1488,7 +1488,7 @@ ADDRESS_MAP_END
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
 	/* 0x18 used */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 }
 #endif
 
@@ -3319,7 +3319,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate);
+	cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -3809,7 +3809,7 @@ MACHINE_DRIVER_END
 static MACHINE_RESET(batsugun)
 {
 	#if USE_V25
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	#endif
 }
 
@@ -4703,7 +4703,7 @@ ROM_START( bgaregga )
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f80c2fc2) SHA1(a9aac5c7f5439b6fe8d1b3db1fb02a27cc28fdf6) )
 	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4726,7 +4726,7 @@ ROM_START( bgareghk )
 	ROM_LOAD16_BYTE( "prg_0.rom", 0x000000, 0x080000, CRC(26e0019e) SHA1(5197001f5d59246b137e19ed1952a8207b25d4c0) )
 	ROM_LOAD16_BYTE( "prg_1.rom", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4749,7 +4749,7 @@ ROM_START( bgaregnv )
 	ROM_LOAD16_BYTE( "prg_0.bin", 0x000000, 0x080000, CRC(951ecc07) SHA1(a82e4b59e4a974566e59f3ab2fbae1aec7d88a2b) )
 	ROM_LOAD16_BYTE( "prg_1.bin", 0x000001, 0x080000, CRC(729a60c6) SHA1(cb6f5d138bb82c32910f42d8ee16fa573a23cef3) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4772,7 +4772,7 @@ ROM_START( bgaregt2 )
 	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x080000, CRC(84094099) SHA1(49fc68a8bcdae4477e20eade9dd569de88b0b798) )
 	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x080000, CRC(46f92fe4) SHA1(62a02cc1dbdc3ac362339aebb62368eb89b06bad) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4795,7 +4795,7 @@ ROM_START( bgaregcn )
 	ROM_LOAD16_BYTE( "u123", 0x000000, 0x080000, CRC(88a4e66a) SHA1(ca97e564eed0c5e028b937312e55da56400d5c8c) )
 	ROM_LOAD16_BYTE( "u65",  0x000001, 0x080000, CRC(5dea32a3) SHA1(59df6689e3eb5ea9e49a758604d21a64c65ca14d) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4943,7 +4943,7 @@ ROM_START( bbakraid )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 
@@ -4967,7 +4967,7 @@ ROM_START( bbakradu )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 

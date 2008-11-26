@@ -67,6 +67,7 @@
 #include "streams.h"
 #include "cpuintrf.h"
 #include "saa1099.h"
+#include "deprecat.h"
 #include <math.h>
 
 
@@ -310,7 +311,7 @@ static void saa1099_update(void *param, stream_sample_t **inputs, stream_sample_
 
 
 
-static void *saa1099_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( saa1099 )
 {
 	struct SAA1099 *saa;
 
@@ -333,7 +334,7 @@ static void saa1099_control_port_w( int chip, int reg, int data )
     if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-                logerror("%04x: (SAA1099 #%d) Unknown register selected\n",activecpu_get_pc(), chip);
+                logerror("%04x: (SAA1099 #%d) Unknown register selected\n",cpu_get_pc(Machine->activecpu), chip);
 	}
 
     saa->selected_reg = data & 0x1f;
@@ -419,7 +420,7 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%04x: (SAA1099 #%d) -reg 0x1c- Chip reset\n",activecpu_get_pc(), chip);
+			logerror("%04x: (SAA1099 #%d) -reg 0x1c- Chip reset\n",cpu_get_pc(Machine->activecpu), chip);
 			for (i = 0; i < 6; i++)
 			{
                 saa->channels[i].level = 0;
@@ -428,7 +429,7 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 		}
 		break;
 	default:	/* Error! */
-		logerror("%04x: (SAA1099 #%d) Unknown operation (reg:%02x, data:%02x)\n",activecpu_get_pc(), chip, reg, data);
+		logerror("%04x: (SAA1099 #%d) Unknown operation (reg:%02x, data:%02x)\n",cpu_get_pc(Machine->activecpu), chip, reg, data);
 	}
 }
 
@@ -487,7 +488,7 @@ WRITE16_HANDLER( saa1099_write_port_1_lsb_w )
  * Generic get_info
  **************************************************************************/
 
-static void saa1099_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( saa1099 )
 {
 	switch (state)
 	{
@@ -496,15 +497,15 @@ static void saa1099_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void saa1099_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( saa1099 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = saa1099_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = saa1099_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( saa1099 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( saa1099 );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

@@ -32,7 +32,7 @@ static int drmicro_nmi_enable;
 static INTERRUPT_GEN( drmicro_interrupt )
 {
 	if (drmicro_nmi_enable)
-		 cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		 cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
@@ -68,7 +68,7 @@ static void pcm_w(running_machine *machine, int irq)
 static WRITE8_HANDLER( pcm_set_w )
 {
 	pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(machine, 0);
+	pcm_w(space->machine, 0);
 }
 
 /****************************************************************************/

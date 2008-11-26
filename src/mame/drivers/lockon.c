@@ -64,93 +64,102 @@ static WRITE16_HANDLER( adrst_w )
 	lockon_ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
-	cpunum_set_input_line(machine, GROUND_CPU, INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, OBJECT_CPU, INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, SOUND_CPU,  INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[GROUND_CPU], INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[OBJECT_CPU], INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[SOUND_CPU],  INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ16_HANDLER( main_gnd_r )
 {
+	const address_space *gndspace = cpu_get_address_space(space->machine->cpu[GROUND_CPU], ADDRESS_SPACE_PROGRAM);
 	UINT16 result;
 
-	cpuintrf_push_context(GROUND_CPU);
-	result = program_read_word(V30_GND_ADDR | offset * 2);
-	cpuintrf_pop_context();
+	cpu_push_context(gndspace->cpu);
+	result = memory_read_word(gndspace, V30_GND_ADDR | offset * 2);
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE16_HANDLER( main_gnd_w )
 {
-	cpuintrf_push_context(GROUND_CPU);
+	const address_space *gndspace = cpu_get_address_space(space->machine->cpu[GROUND_CPU], ADDRESS_SPACE_PROGRAM);
+	cpu_push_context(gndspace->cpu);
 
 	if (ACCESSING_BITS_0_7)
-		program_write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
+		memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 0), data);
 	if (ACCESSING_BITS_8_15)
-		program_write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
+		memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 1), data >> 8);
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static READ16_HANDLER( main_obj_r )
 {
+	const address_space *objspace = cpu_get_address_space(space->machine->cpu[OBJECT_CPU], ADDRESS_SPACE_PROGRAM);
 	UINT16 result;
 
-	cpuintrf_push_context(OBJECT_CPU);
-	result = program_read_word(V30_OBJ_ADDR | offset * 2);
-	cpuintrf_pop_context();
+	cpu_push_context(objspace->cpu);
+	result = memory_read_word(objspace, V30_OBJ_ADDR | offset * 2);
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE16_HANDLER( main_obj_w )
 {
-	cpuintrf_push_context(OBJECT_CPU);
+	const address_space *objspace = cpu_get_address_space(space->machine->cpu[OBJECT_CPU], ADDRESS_SPACE_PROGRAM);
+	cpu_push_context(objspace->cpu);
 
 	if (ACCESSING_BITS_0_7)
-		program_write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
+		memory_write_byte(objspace, V30_OBJ_ADDR | (offset * 2 + 0), data);
 	if (ACCESSING_BITS_8_15)
-		program_write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
+		memory_write_byte(objspace, V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static WRITE16_HANDLER( tst_w )
 {
 	if (offset < 0x800)
 	{
-		cpuintrf_push_context(GROUND_CPU);
-		if (ACCESSING_BITS_0_7)
-			program_write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
-		if (ACCESSING_BITS_8_15)
-			program_write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
-		cpuintrf_pop_context();
+		const address_space *gndspace = cpu_get_address_space(space->machine->cpu[GROUND_CPU], ADDRESS_SPACE_PROGRAM);
+		const address_space *objspace = cpu_get_address_space(space->machine->cpu[OBJECT_CPU], ADDRESS_SPACE_PROGRAM);
 
-		cpuintrf_push_context(OBJECT_CPU);
+		cpu_push_context(gndspace->cpu);
 		if (ACCESSING_BITS_0_7)
-			program_write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
+			memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 0), data);
 		if (ACCESSING_BITS_8_15)
-			program_write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
-		cpuintrf_pop_context();
+			memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 1), data >> 8);
+		cpu_pop_context();
+
+		cpu_push_context(objspace->cpu);
+		if (ACCESSING_BITS_0_7)
+			memory_write_byte(objspace, V30_OBJ_ADDR | (offset * 2 + 0), data);
+		if (ACCESSING_BITS_8_15)
+			memory_write_byte(objspace, V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
+		cpu_pop_context();
 	}
 }
 
 static READ16_HANDLER( main_z80_r )
 {
+	const address_space *sndspace = cpu_get_address_space(space->machine->cpu[SOUND_CPU], ADDRESS_SPACE_PROGRAM);
 	UINT16 val;
 
-	cpuintrf_push_context(SOUND_CPU);
-	val = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_push_context(sndspace->cpu);
+	val = memory_read_byte(sndspace, offset);
+	cpu_pop_context();
 
 	return 0xff00 | val;
 }
 
 static WRITE16_HANDLER( main_z80_w )
 {
-	cpuintrf_push_context(SOUND_CPU);
-	program_write_byte(offset, data);
-	cpuintrf_pop_context();
+	const address_space *sndspace = cpu_get_address_space(space->machine->cpu[SOUND_CPU], ADDRESS_SPACE_PROGRAM);
+	cpu_push_context(sndspace->cpu);
+	memory_write_byte(sndspace, offset, data);
+	cpu_pop_context();
 }
 
 static WRITE16_HANDLER( inten_w )
@@ -160,7 +169,7 @@ static WRITE16_HANDLER( inten_w )
 
 static WRITE16_HANDLER( emres_w )
 {
-	watchdog_reset(machine);
+	watchdog_reset(space->machine);
 	lockon_main_inten = 0;
 }
 
@@ -361,10 +370,10 @@ static READ8_HANDLER( adc_r )
 {
 	switch (offset)
 	{
-		case 0:  return input_port_read(machine, "ADC_BANK");
-		case 1:  return input_port_read(machine, "ADC_PITCH");
-		case 2:  return input_port_read(machine, "ADC_MISSILE");
-		case 3:  return input_port_read(machine, "ADC_HOVER");
+		case 0:  return input_port_read(space->machine, "ADC_BANK");
+		case 1:  return input_port_read(space->machine, "ADC_PITCH");
+		case 2:  return input_port_read(space->machine, "ADC_MISSILE");
+		case 3:  return input_port_read(space->machine, "ADC_HOVER");
 		default: return 0;
 	}
 }
@@ -445,7 +454,7 @@ static WRITE8_HANDLER( sound_vol )
 
 static void ym2203_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, SOUND_CPU, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[SOUND_CPU], 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( ym2203_out_b )

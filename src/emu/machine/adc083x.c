@@ -7,6 +7,7 @@
 
 #include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/adc083x.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -20,9 +21,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -113,19 +114,19 @@ void adc083x_init( int chip, int type, double (*input_callback)(int input) )
 		break;
 	}
 
-	state_save_register_item( "adc083x", chip, c->CS );
-	state_save_register_item( "adc083x", chip, c->CLK );
-	state_save_register_item( "adc083x", chip, c->DI );
-	state_save_register_item( "adc083x", chip, c->SE );
-	state_save_register_item( "adc083x", chip, c->SARS );
-	state_save_register_item( "adc083x", chip, c->DO );
-	state_save_register_item( "adc083x", chip, c->SGL );
-	state_save_register_item( "adc083x", chip, c->ODD );
-	state_save_register_item( "adc083x", chip, c->SEL1 );
-	state_save_register_item( "adc083x", chip, c->SEL0 );
-	state_save_register_item( "adc083x", chip, c->state );
-	state_save_register_item( "adc083x", chip, c->bit );
-	state_save_register_item( "adc083x", chip, c->output );
+	state_save_register_item( "adc083x", NULL, chip, c->CS );
+	state_save_register_item( "adc083x", NULL, chip, c->CLK );
+	state_save_register_item( "adc083x", NULL, chip, c->DI );
+	state_save_register_item( "adc083x", NULL, chip, c->SE );
+	state_save_register_item( "adc083x", NULL, chip, c->SARS );
+	state_save_register_item( "adc083x", NULL, chip, c->DO );
+	state_save_register_item( "adc083x", NULL, chip, c->SGL );
+	state_save_register_item( "adc083x", NULL, chip, c->ODD );
+	state_save_register_item( "adc083x", NULL, chip, c->SEL1 );
+	state_save_register_item( "adc083x", NULL, chip, c->SEL0 );
+	state_save_register_item( "adc083x", NULL, chip, c->state );
+	state_save_register_item( "adc083x", NULL, chip, c->bit );
+	state_save_register_item( "adc083x", NULL, chip, c->output );
 }
 
 void adc083x_cs_write( int chip, int cs )

@@ -80,7 +80,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	int scanline = param;
 
 	/* assert/deassert the interrupt */
-	cpunum_set_input_line(machine, 0, 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* set the next timer */
 	scanline += 32;
@@ -92,7 +92,7 @@ static TIMER_CALLBACK( interrupt_gen )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -149,7 +149,7 @@ static MACHINE_RESET( atetris )
 static READ8_HANDLER( atetris_slapstic_r )
 {
 	int result = slapstic_base[0x2000 + offset];
-	int new_bank = slapstic_tweak(offset) & 1;
+	int new_bank = slapstic_tweak(space, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != current_bank)

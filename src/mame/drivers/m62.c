@@ -90,7 +90,7 @@ static READ8_HANDLER( ldrun2_bankswitch_r )
 
 		/* swap to bank #1 on second read */
 		if (ldrun2_bankswap == 0)
-			memory_set_bank(1, 1);
+			memory_set_bank(space->machine, 1, 1);
 	}
 	return 0;
 }
@@ -114,7 +114,7 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 logerror("unknown bank select %02x\n",data);
 			return;
 		}
-		memory_set_bank(1, banks[data-1]);
+		memory_set_bank(space->machine, 1, banks[data-1]);
 	}
 	else
 	{
@@ -142,30 +142,30 @@ static READ8_HANDLER( ldrun3_prot_7_r )
 
 static WRITE8_HANDLER( ldrun4_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x01);
+	memory_set_bank(space->machine, 1, data & 0x01);
 }
 
 static WRITE8_HANDLER( kidniki_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 #define battroad_bankswitch_w kidniki_bankswitch_w
 
 static WRITE8_HANDLER( spelunkr_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x03);
+	memory_set_bank(space->machine, 1, data & 0x03);
 }
 
 static WRITE8_HANDLER( spelunk2_bankswitch_w )
 {
-	memory_set_bank(1, (data & 0xc0)>>6);
-	memory_set_bank(2, (data & 0x3c)>>2);
+	memory_set_bank(space->machine, 1, (data & 0xc0)>>6);
+	memory_set_bank(space->machine, 2, (data & 0x3c)>>2);
 }
 
 static WRITE8_HANDLER( youjyudn_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x01);
+	memory_set_bank(space->machine, 1, data & 0x01);
 }
 
 
@@ -2212,19 +2212,19 @@ ROM_END
 static DRIVER_INIT( battroad )
 {
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun4 )
 {
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( kidniki )
@@ -2236,26 +2236,26 @@ static DRIVER_INIT( kidniki )
 	memcpy(ROM + 0x08000, ROM + 0x10000, 0x2000);
 
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunkr )
 {
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunk2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(1, 0,  4, memory_region(machine, "main") + 0x20000, 0x1000);
-	memory_configure_bank(2, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
+	memory_configure_bank(machine, 1, 0,  4, memory_region(machine, "main") + 0x20000, 0x1000);
+	memory_configure_bank(machine, 2, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
 }
 
 static DRIVER_INIT( youjyudn )
 {
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 GAME( 1984, kungfum,  0,        kungfum,  kungfum,  0,        ROT0,   "Irem", "Kung-Fu Master", 0 )

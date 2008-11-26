@@ -79,7 +79,7 @@ INTERRUPT_GEN( ygv608_timed_interrupt )
 	{
 		ygv608.ports.s.p6 |= p6_fv;
 		if (ygv608.regs.s.r14 & r14_iev)
-			irq2_line_hold(machine, cpunum);
+			irq2_line_hold(device);
 	}
 
 	/* once every 60Hz, set the position detection flag (somewhere) */
@@ -87,7 +87,7 @@ INTERRUPT_GEN( ygv608_timed_interrupt )
 	{
 		ygv608.ports.s.p6 |= p6_fp;
 		if (ygv608.regs.s.r14 & r14_iep)
-			irq2_line_hold(machine, cpunum);
+			irq2_line_hold(device);
 	}
 }
 
@@ -487,12 +487,12 @@ static STATE_POSTLOAD( ygv608_postload )
 
 static void ygv608_register_state_save(running_machine *machine)
 {
-	state_save_register_item_array("ygv608", 0, ygv608.ports.b);
-	state_save_register_item_array("ygv608", 0, ygv608.regs.b);
-	state_save_register_item_array("ygv608", 0, ygv608.pattern_name_table);
-	state_save_register_item_array("ygv608", 0, ygv608.sprite_attribute_table.b);
-	state_save_register_item_2d_array("ygv608", 0, ygv608.scroll_data_table);
-	state_save_register_item_2d_array("ygv608", 0, ygv608.colour_palette);
+	state_save_register_item_array("ygv608", NULL, 0, ygv608.ports.b);
+	state_save_register_item_array("ygv608", NULL, 0, ygv608.regs.b);
+	state_save_register_item_array("ygv608", NULL, 0, ygv608.pattern_name_table);
+	state_save_register_item_array("ygv608", NULL, 0, ygv608.sprite_attribute_table.b);
+	state_save_register_item_2d_array("ygv608", NULL, 0, ygv608.scroll_data_table);
+	state_save_register_item_2d_array("ygv608", NULL, 0, ygv608.colour_palette);
 
 	state_save_register_postload(machine, ygv608_postload, NULL);
 }
@@ -1221,7 +1221,7 @@ WRITE16_HANDLER( ygv608_w )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				palette_set_color_rgb(machine,ygv608.regs.s.cc,
+				palette_set_color_rgb(space->machine,ygv608.regs.s.cc,
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][0]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][1]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][2]) );
@@ -1432,7 +1432,7 @@ static void SetPostShortcuts( int reg )
 
 			if (yTile >= ygv608.page_y)
 				logerror ("setting pny(%d) >= page_y(%d) @ $%X\n",
-						yTile, ygv608.page_y, activecpu_get_pc() );
+						yTile, ygv608.page_y, cpu_get_pc(Machine->activecpu) );
 			yTile &= (ygv608.page_y - 1);
 			ygv608.regs.s.r0 &= ~r0_pny;
 			ygv608.regs.s.r0 |= yTile;
@@ -1445,7 +1445,7 @@ static void SetPostShortcuts( int reg )
 
 			if (xTile >= ygv608.page_x)
 				logerror ("setting pnx(%d) >= page_x(%d) @ $%X\n",
-						xTile, ygv608.page_x, activecpu_get_pc() );
+						xTile, ygv608.page_x, cpu_get_pc(Machine->activecpu) );
 			xTile &= (ygv608.page_x - 1);
 			ygv608.regs.s.r1 &= ~r1_pnx;
 			ygv608.regs.s.r1 |= xTile;

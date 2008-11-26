@@ -265,7 +265,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (newval == 0)
-		cpunum_set_input_line(field->port->machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, ASSERT_LINE);
 }
 
 
@@ -309,14 +309,14 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank)
 	if (showdown_bank_data[0] != NULL)
 	{
 		if (bank == 0 && exidy440_bank != 0)
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
 		else if (bank != 0 && exidy440_bank == 0)
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK1);
 	}
 
 	/* select the bank and update the bank pointer */
 	exidy440_bank = bank;
-	memory_set_bankptr(1, &memory_region(machine, "main")[0x10000 + exidy440_bank * 0x4000]);
+	memory_set_bankptr(machine, 1, &memory_region(machine, "main")[0x10000 + exidy440_bank * 0x4000]);
 }
 
 
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( bankram_w )
 	/* EEROM lives in the upper 8k of bank 15 */
 	if (exidy440_bank == 15 && offset >= 0x2000)
 	{
-		memory_region(machine, "main")[0x10000 + 15 * 0x4000 + offset] = data;
+		memory_region(space->machine, "main")[0x10000 + 15 * 0x4000 + offset] = data;
 		logerror("W EEROM[%04X] = %02X\n", offset - 0x2000, data);
 	}
 
@@ -343,8 +343,8 @@ static WRITE8_HANDLER( bankram_w )
 static READ8_HANDLER( exidy440_input_port_3_r )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
-	return input_port_read(machine, "IN3");
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	return input_port_read(space->machine, "IN3");
 }
 
 
@@ -368,7 +368,7 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 	exidy440_sound_command_ack = 0;
 
 	/* cause an FIRQ on the sound CPU */
-	cpunum_set_input_line(machine, 1, 1, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 1, ASSERT_LINE);
 }
 
 
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( exidy440_input_port_3_w )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -435,7 +435,7 @@ static READ8_HANDLER( claypign_protection_r )
 
 static READ8_HANDLER( topsecex_input_port_5_r )
 {
-	return (input_port_read(machine, "AN1") & 1) ? 0x01 : 0x02;
+	return (input_port_read(space->machine, "AN1") & 1) ? 0x01 : 0x02;
 }
 
 
@@ -1936,7 +1936,7 @@ static DRIVER_INIT( claypign )
 {
 	DRIVER_INIT_CALL(exidy440);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
 }
 
 
@@ -1945,11 +1945,11 @@ static DRIVER_INIT( topsecex )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec6, 0x2ec6, 0, 0, input_port_read_handler8(machine->portconfig, "AN0"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec7, 0x2ec7, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec6, 0x2ec6, 0, 0, input_port_read_handler8(machine->portconfig, "AN0"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec7, 0x2ec7, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
 
-	topsecex_yscroll = memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
+	topsecex_yscroll = memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
 }
 
 

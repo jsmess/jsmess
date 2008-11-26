@@ -246,13 +246,13 @@ static int sound_nmi_enable,pending_nmi;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	if (sound_nmi_enable) cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	else pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(machine,0,data);
+	soundlatch_w(space,0,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -266,7 +266,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -283,17 +283,17 @@ static WRITE8_HANDLER( fortyl_coin_counter_w )
 
 static READ8_HANDLER( fortyl_mcu_r )
 {
-	return buggychl_mcu_r(machine,offset);
+	return buggychl_mcu_r(space,offset);
 }
 
 static READ8_HANDLER( fortyl_mcu_status_r )
 {
-	return buggychl_mcu_status_r(machine,offset);
+	return buggychl_mcu_status_r(space,offset);
 }
 
 static WRITE8_HANDLER( fortyl_mcu_w )
 {
-	buggychl_mcu_w(machine,offset,data);
+	buggychl_mcu_w(space,offset,data);
 }
 
 static WRITE8_HANDLER( bank_select_w )
@@ -305,7 +305,7 @@ static WRITE8_HANDLER( bank_select_w )
 //      popmessage("WRONG BANK SELECT = %x !!!!\n",data);
 	}
 
-	memory_set_bank( 1, data&1 );
+	memory_set_bank(space->machine,  1, data&1 );
 }
 
 
@@ -598,7 +598,7 @@ static READ8_HANDLER( undoukai_mcu_status_r )
 static DRIVER_INIT( undoukai )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
 
 	from_mcu = 0xff;
 	mcu_cmd = -1;
@@ -612,7 +612,7 @@ static DRIVER_INIT( undoukai )
 static DRIVER_INIT( 40love )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack

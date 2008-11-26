@@ -30,7 +30,6 @@ SX008-14.BIN ; /
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/r3000.h"
 #include "sound/st0016.h"
 #include "st0016.h"
@@ -158,7 +157,7 @@ static WRITE32_HANDLER(spr_w)
 static READ32_HANDLER(data_r)
 {
 	UINT32 data;
-	const UINT8 *usr = memory_region(machine, "user2");
+	const UINT8 *usr = memory_region(space->machine, "user2");
 	data=((databank>>4)&0xf)*0x100000; //guess
 	data=usr[data+offset*2]+usr[data+offset*2+1]*256;
 	return data|(data<<16);
@@ -618,7 +617,7 @@ static const st0016_interface st0016_config =
 
  static INTERRUPT_GEN( irq4_gen )
 {
-	cpunum_set_input_line(machine, 1, R3000_IRQ4, ASSERT_LINE);
+	cpu_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
 }
 
 static const r3000_cpu_core config =

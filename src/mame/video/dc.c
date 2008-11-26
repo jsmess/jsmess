@@ -107,7 +107,7 @@ READ64_HANDLER( pvr_ctrl_r )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, activecpu_get_pc());
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(space->cpu));
 	#endif
 
 	return (UINT64)pvrctrl_regs[reg] << shift;
@@ -148,13 +148,13 @@ READ64_HANDLER( pvr_ta_r )
 	switch (reg)
 	{
 	case SPG_STATUS:
-		pvrta_regs[reg] = (video_screen_get_vblank(machine->primary_screen) << 13) | (video_screen_get_hblank(machine->primary_screen) << 12) | (video_screen_get_vpos(machine->primary_screen) & 0x3ff);
+		pvrta_regs[reg] = (video_screen_get_vblank(space->machine->primary_screen) << 13) | (video_screen_get_hblank(space->machine->primary_screen) << 12) | (video_screen_get_vpos(space->machine->primary_screen) & 0x3ff);
 		break;
 	}
 
 	#if DEBUG_PVRTA_REGS
 	if (reg != 0x43)
-		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, activecpu_get_pc());
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(space->cpu));
 	#endif
 	return (UINT64)pvrta_regs[reg] << shift;
 }
@@ -164,7 +164,9 @@ WRITE64_HANDLER( pvr_ta_w )
 	int reg;
 	UINT64 shift;
 	UINT32 old,dat;
-	//UINT32 sizera,offsetra,v;
+	#if DEBUG_PVRTA
+	UINT32 sizera,offsetra,v;
+	#endif
 	int a;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
@@ -213,28 +215,28 @@ WRITE64_HANDLER( pvr_ta_w )
 		offsetra=pvrta_regs[REGION_BASE];
 		for (;;)
 		{
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			mame_printf_verbose("Tile X:%d Y:%d\n  ", (v >> 2) & 0x3f, (v >> 8) & 0x3f);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("OLP %d ",v & 0xFFFFFC);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("OMVLP %d ",v & 0xFFFFFC);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("TLP %d ",v & 0xFFFFFC);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("TMVLP %d ",v & 0xFFFFFC);
 			if (sizera == 6)
 			{
 				offsetra = offsetra+4;
-				v=program_read_dword_64le(0x05000000+offsetra);
+				v=memory_read_dword(space,0x05000000+offsetra);
 				if (!(v & 0x80000000))
 					mame_printf_verbose("PTLP %d ",v & 0xFFFFFC);
 			}
@@ -448,7 +450,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 				break;
 			}
 			dc_sysctrl_regs[SB_ISTNRM] |= a;
-			update_interrupt_status();
+			dc_update_interrupt_status(space->machine);
 			state_ta.tafifo_listtype= -1; // no list being received
 			state_ta.listtype_used |= (2+8);
 		}
@@ -742,8 +744,9 @@ INLINE UINT32 alpha_blend_r16_565(UINT32 d, UINT32 s, UINT8 level)
 }
 #endif
 
-static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
+static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int cs,x,y,dx,dy,xi,yi,a,rs,ns;
 	float iu,iv,u,v;
 	UINT32 addrp;
@@ -760,7 +763,7 @@ static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 		return;
 	rs=state_ta.renderselect;
 	c=pvrta_regs[ISP_BACKGND_T];
-	c=program_read_dword_64le(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
+	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
 	fillbitmap(bitmap,c,cliprect);
 #if 0
 	stride=pvrta_regs[FB_W_LINESTRIDE] << 3;
@@ -768,9 +771,9 @@ static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 	a=(c & 0xfffff8) >> 1;
 	cs=(c >> 24) & 7;
 	cs=cs+3; // cs*2+3
-	c=program_read_dword_64le(0x05000000+a+3*4+(cs-1)*4);
-	dx=(int)u2f(program_read_dword_64le(0x05000000+a+3*4+cs*4+0));
-	dy=(int)u2f(program_read_dword_64le(0x05000000+a+3*4+2*cs*4+4));
+	c=memory_read_dword(space,0x05000000+a+3*4+(cs-1)*4);
+	dx=(int)u2f(memory_read_dword(space,0x05000000+a+3*4+cs*4+0));
+	dy=(int)u2f(memory_read_dword(space,0x05000000+a+3*4+2*cs*4+4));
 	for (y=0;y < dy;y++)
 	{
 		addrp=state_ta.grab[rs].fbwsof1+y*stride;
@@ -1025,7 +1028,7 @@ UINT32 a;
 
 	a=dc_sysctrl_regs[SB_ISTNRM] | IST_VBL_OUT;
 	dc_sysctrl_regs[SB_ISTNRM] = a; // V Blank-out interrupt
-	update_interrupt_status();
+	dc_update_interrupt_status(machine);
 
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 }
@@ -1072,13 +1075,13 @@ static int useframebuffer=1;
 	if (state_ta.start_render_received)
 	{
 		useframebuffer=0;
-		testdrawscreen(bitmap,cliprect);
+		testdrawscreen(screen->machine,bitmap,cliprect);
 		if (pvrta_regs[VO_CONTROL] & (1 << 3))
 			fillbitmap(bitmap,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF,cliprect);
 		state_ta.start_render_received=0;
 		state_ta.renderselect= -1;
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
-		update_interrupt_status();
+		dc_update_interrupt_status(screen->machine);
 		return 0;
 	}
 	else
@@ -1088,7 +1091,7 @@ static int useframebuffer=1;
 void dc_vblank(running_machine *machine)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
-	update_interrupt_status();
+	dc_update_interrupt_status(machine);
 
 	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }

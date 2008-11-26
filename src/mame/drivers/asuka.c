@@ -241,13 +241,13 @@ static int adpcm_data;
 
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, cadash_interrupt5);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);  /* interrupt vector 4 */
+	cpu_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
 
@@ -257,7 +257,7 @@ static INTERRUPT_GEN( cadash_interrupt )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr( 1, memory_region(machine, "audio") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "audio") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
 }
 
 
@@ -298,8 +298,8 @@ static WRITE8_HANDLER( asuka_msm5205_stop_w )
 static MACHINE_START( asuka )
 {
 	/* configure the banks */
-    memory_configure_bank(1, 0, 1, memory_region(machine, "audio"), 0);
-	memory_configure_bank(1, 1, 3, memory_region(machine, "audio") + 0x10000, 0x04000);
+    memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audio"), 0);
+	memory_configure_bank(machine, 1, 1, 3, memory_region(machine, "audio") + 0x10000, 0x04000);
 
 	state_save_register_global(adpcm_pos);
 }
@@ -753,7 +753,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

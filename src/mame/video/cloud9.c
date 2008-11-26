@@ -39,7 +39,7 @@ VIDEO_START( cloud9 )
 
 	/* allocate second bank of videoram */
 	videoram = auto_malloc(0x8000);
-	memory_set_bankptr(1, videoram);
+	memory_set_bankptr(machine, 1, videoram);
 
 	/* get pointers to our PROMs */
 	syncprom = memory_region(machine, "proms") + 0x000;
@@ -111,7 +111,7 @@ WRITE8_HANDLER( cloud9_paletteram_w )
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(bweights, bit0, bit1, bit2);
 
-	palette_set_color(machine, offset & 0x3f, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset & 0x3f, MAKE_RGB(r, g, b));
 }
 
 

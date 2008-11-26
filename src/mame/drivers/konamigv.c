@@ -521,7 +521,7 @@ static READ32_HANDLER( trackball_r )
 
 		for( axis = 0; axis < 2; axis++ )
 		{
-			value = input_port_read(machine, axisnames[axis]);
+			value = input_port_read(space->machine, axisnames[axis]);
 			diff = value - trackball_prev[ axis ];
 			trackball_prev[ axis ] = value;
 			trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -542,9 +542,9 @@ static DRIVER_INIT( simpbowl )
 	intelflash_init( 2, FLASH_FUJITSU_29F016A, NULL );
 	intelflash_init( 3, FLASH_FUJITSU_29F016A, NULL );
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f68008f, 0, 0, flash_r, flash_w );
-	memory_install_read32_handler     ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
-	memory_install_read32_handler     ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f6800c8, 0x1f6800cb, 0, 0, unknown_r ); /* ?? */
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, flash_r, flash_w );
+	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
+	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c8, 0x1f6800cb, 0, 0, unknown_r ); /* ?? */
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -595,7 +595,7 @@ static WRITE32_HANDLER( btcflash_w )
 
 static READ32_HANDLER( btc_trackball_r )
 {
-//  mame_printf_debug( "r %08x %08x %08x\n", activecpu_get_pc(), offset, mem_mask );
+//  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, mem_mask );
 
 	if( offset == 1 && mem_mask == 0xffff0000 )
 	{
@@ -606,7 +606,7 @@ static READ32_HANDLER( btc_trackball_r )
 
 		for( axis = 0; axis < 4; axis++ )
 		{
-			value = input_port_read(machine, axisnames[axis]);
+			value = input_port_read(space->machine, axisnames[axis]);
 			diff = value - btc_trackball_prev[ axis ];
 			btc_trackball_prev[ axis ] = value;
 			btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -617,7 +617,7 @@ static READ32_HANDLER( btc_trackball_r )
 
 static WRITE32_HANDLER( btc_trackball_w )
 {
-//  mame_printf_debug( "w %08x %08x %08x %08x\n", activecpu_get_pc(), offset, data, mem_mask );
+//  mame_printf_debug( "w %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, data, mem_mask );
 }
 
 static NVRAM_HANDLER( btchamp )
@@ -630,9 +630,9 @@ static DRIVER_INIT( btchamp )
 {
 	intelflash_init( 0, FLASH_SHARP_LH28F400, NULL );
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
-	memory_install_write32_handler    ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f6800e0, 0x1f6800e3, 0, 0, SMH_NOP );
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
+	memory_install_write32_handler    ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, SMH_NOP );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -686,8 +686,8 @@ static WRITE32_HANDLER( tokimeki_serial_w )
 
 static DRIVER_INIT( tokimosh )
 {
-	memory_install_read32_handler ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f680083, 0, 0, tokimeki_serial_r );
-	memory_install_write32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f680090, 0x1f680093, 0, 0, tokimeki_serial_w );
+	memory_install_read32_handler ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, tokimeki_serial_r );
+	memory_install_write32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, tokimeki_serial_w );
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -717,13 +717,13 @@ static DRIVER_INIT( kdeadeye )
 {
 	intelflash_init( 0, FLASH_SHARP_LH28F400, NULL );
 
-	memory_install_read32_handler     ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f680083, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX1") );
-	memory_install_read32_handler     ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f680090, 0x1f680093, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY1") );
-	memory_install_read32_handler     ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f6800a0, 0x1f6800a3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX2") );
-	memory_install_read32_handler     ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f6800b0, 0x1f6800b3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY2") );
-	memory_install_read32_handler     ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f6800c0, 0x1f6800c3, 0, 0, input_port_read_handler32(machine->portconfig, "BUTTONS") );
-	memory_install_write32_handler    ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f6800e0, 0x1f6800e3, 0, 0, kdeadeye_0_w );
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
+	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX1") );
+	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY1") );
+	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX2") );
+	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY2") );
+	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, input_port_read_handler32(machine->portconfig, "BUTTONS") );
+	memory_install_write32_handler    ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, kdeadeye_0_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 
 	DRIVER_INIT_CALL(konamigv);
 }

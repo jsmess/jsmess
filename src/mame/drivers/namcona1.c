@@ -409,7 +409,7 @@ static READ16_HANDLER( custom_key_r )
 	old_count = count;
 	do
 	{
-		count = mame_rand(machine);
+		count = mame_rand(space->machine);
 	} while( old_count == count );
 
 	switch( namcona1_gametype )
@@ -481,7 +481,7 @@ static READ16_HANDLER( custom_key_r )
 	default:
 		return 0;
 	}
-	return mame_rand(machine)&0xffff;
+	return mame_rand(space->machine)&0xffff;
 } /* custom_key_r */
 
 static WRITE16_HANDLER( custom_key_w )
@@ -498,6 +498,7 @@ static READ16_HANDLER( namcona1_vreg_r )
 static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 {
 	UINT16 data;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{
@@ -518,15 +519,15 @@ static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source 
 	}
 	if( dest>=0xf00000 && dest<0xf02000 )
 	{
-		namcona1_paletteram_w( machine, (dest-0xf00000)/2, data, 0xffff );
+		namcona1_paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
 	}
 	else if( dest>=0xf40000 && dest<0xf80000 )
 	{
-		namcona1_gfxram_w( machine, (dest-0xf40000)/2, data, 0xffff );
+		namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xffc000 )
 	{
-		namcona1_videoram_w( machine, (dest-0xff0000)/2, data, 0xffff );
+		namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
@@ -639,7 +640,7 @@ static void namcona1_blit( running_machine *machine )
 	(void)src0;
 /*
     logerror( "0x%08x: blt(%08x,%08x,numBytes=%04x);src=%04x %04x %04x; dst=%04x %04x %04x; gfx=%04x\n",
-        activecpu_get_pc(),
+        cpu_get_pc(machine->activecpu),
         dst_baseaddr,src_baseaddr,num_bytes,
         src0,src1,src2,
         dst0,dst1,dst2,
@@ -695,7 +696,7 @@ static WRITE16_HANDLER( namcona1_vreg_w )
 	switch( offset )
 	{
 	case 0x18/2:
-		namcona1_blit(machine);
+		namcona1_blit(space->machine);
 		/* see also 0x1e */
 		break;
 
@@ -721,7 +722,7 @@ static WRITE16_HANDLER( mcu_mailbox_w_68k )
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
 	if (offset == 4)
-		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[1], M37710_LINE_IRQ0, HOLD_LINE);
 
 	COMBINE_DATA(&mcu_mailbox[offset%8]);
 
@@ -789,7 +790,7 @@ static READ16_HANDLER( na1mcu_shared_r )
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, activecpu_get_pc());
+		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(space->cpu));
 	}
 #endif
 
@@ -806,19 +807,19 @@ static WRITE16_HANDLER( na1mcu_shared_w )
 
 static READ16_HANDLER(snd_r)
 {
-	return c140_r(machine,offset*2+1) | c140_r(machine,offset*2)<<8;
+	return c140_r(space,offset*2+1) | c140_r(space,offset*2)<<8;
 }
 
 static WRITE16_HANDLER(snd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		c140_w(machine,(offset*2)+1, data);
+		c140_w(space,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		c140_w(machine,(offset*2), data>>8);
+		c140_w(space,(offset*2), data>>8);
 	}
 }
 
@@ -843,10 +844,10 @@ static WRITE8_HANDLER( port4_w )
 {
 	if ((data & 0x08) && !(mcu_port4 & 0x08))
 	{
-		logerror("launching 68k, PC=%x\n", activecpu_get_pc());
+		logerror("launching 68k, PC=%x\n", cpu_get_pc(space->cpu));
 
 		// reset and launch the 68k
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	mcu_port4 = data;
@@ -882,19 +883,19 @@ static READ8_HANDLER( port7_r )
 	switch (mcu_port6 & 0xe0)
 	{
 		case 0x40:
-			return input_port_read(machine, "P1");
+			return input_port_read(space->machine, "P1");
 			break;
 
   		case 0x60:
-			return input_port_read(machine, "P2");
+			return input_port_read(space->machine, "P2");
 			break;
 
 		case 0x20:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 			break;
 
 		case 0x00:
-			return input_port_read(machine, "P4");
+			return input_port_read(space->machine, "P4");
 			break;
 	}
 
@@ -925,7 +926,7 @@ static MACHINE_START( namcona1 )
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
 static MACHINE_RESET( namcona1_mcu )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
 
 	mcu_port5 = 1;
 }
@@ -943,7 +944,7 @@ static MACHINE_RESET( namcona1_mcu )
 static READ8_HANDLER( portana_r )
 {
 	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = input_port_read(machine, "P3");
+	UINT8 port = input_port_read(space->machine, "P3");
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }
@@ -960,10 +961,10 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( namcona1_interrupt )
 {
-	int level = cpu_getiloops(); /* 0,1,2,3,4 */
+	int level = cpu_getiloops(device); /* 0,1,2,3,4 */
 	if( level==0 )
 	{
-		simulate_mcu( machine );
+		simulate_mcu( device->machine );
 	}
 	if( mEnableInterrupts )
 	{
@@ -974,10 +975,10 @@ static INTERRUPT_GEN( namcona1_interrupt )
 				int scanline = namcona1_vreg[0x8a/2]&0xff;
 				if( scanline )
 				{
-					video_screen_update_partial(machine->primary_screen, scanline );
+					video_screen_update_partial(device->machine->primary_screen, scanline );
 				}
 			}
-			cpunum_set_input_line(machine, 0, level+1, HOLD_LINE);
+			cpu_set_input_line(device, level+1, HOLD_LINE);
 		}
 	}
 }
@@ -988,13 +989,13 @@ static INTERRUPT_GEN( namcona1_interrupt )
 
 static INTERRUPT_GEN( mcu_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
- 		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ1, HOLD_LINE);
+ 		cpu_set_input_line(device, M37710_LINE_IRQ1, HOLD_LINE);
 	}
-	else if (cpu_getiloops() == 1)
+	else if (cpu_getiloops(device) == 1)
 	{
-		cpunum_set_input_line(machine, 1, M37710_LINE_ADC, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 

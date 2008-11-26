@@ -155,7 +155,7 @@ static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched 
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -165,14 +165,14 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 		data = data >> 8;	/* for Wgp */
 	cpua_ctrl = data;
 
-	parse_control(machine);
+	parse_control(space->machine);
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE16_HANDLER( darius_watchdog_w )
 {
-	watchdog_reset_w(machine,0,data);
+	watchdog_reset_w(space,0,data);
 }
 
 
@@ -185,25 +185,25 @@ static READ16_HANDLER( darius_ioc_r )
 	switch (offset)
 	{
 		case 0x01:
-			return (taitosound_comm_r(machine,0) & 0xff);	/* sound interface read */
+			return (taitosound_comm_r(space,0) & 0xff);	/* sound interface read */
 
 		case 0x04:
-			return input_port_read(machine, "P1");
+			return input_port_read(space->machine, "P1");
 
 		case 0x05:
-			return input_port_read(machine, "P2");
+			return input_port_read(space->machine, "P2");
 
 		case 0x06:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 
 		case 0x07:
 			return coin_word;	/* bits 3&4 coin lockouts, must return zero */
 
 		case 0x08:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(space->cpu),offset);
 
 	return 0xff;
 }
@@ -214,12 +214,12 @@ static WRITE16_HANDLER( darius_ioc_w )
 	{
 		case 0x00:	/* sound interface write */
 
-			taitosound_port_w (machine, 0, data & 0xff);
+			taitosound_port_w (space, 0, data & 0xff);
 			return;
 
 		case 0x01:	/* sound interface write */
 
-			taitosound_comm_w (machine, 0, data & 0xff);
+			taitosound_comm_w (space, 0, data & 0xff);
 			return;
 
 		case 0x28:	/* unknown, written by both cpus - always 0? */
@@ -238,7 +238,7 @@ static WRITE16_HANDLER( darius_ioc_w )
 			return;
 	}
 
-logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",activecpu_get_pc(),offset,data);
+logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 
@@ -298,15 +298,15 @@ static UINT8 nmi_enable = 0;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( STATIC_BANK1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
-//  memory_set_bankptr( 1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
+	memory_set_bankptr(machine,  STATIC_BANK1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
+//  memory_set_bankptr(machine,  1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
 
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 		banknum = data &0x03;
-		reset_sound_region(machine);
+		reset_sound_region(space->machine);
 //      banknum = data;
 //      reset_sound_region();
 }
@@ -517,7 +517,7 @@ ADDRESS_MAP_END
 static void darius_adpcm_int (running_machine *machine, int data)
 {
 	if (nmi_enable)
-		cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -528,7 +528,7 @@ static const msm5205_interface msm5205_config =
 
 static READ8_HANDLER( adpcm_command_read )
 {
-	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, activecpu_get_pc() ); */
+	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(space->cpu) ); */
 	return adpcm_command;
 }
 
@@ -545,13 +545,13 @@ static READ8_HANDLER( readport3 )
 static WRITE8_HANDLER ( adpcm_nmi_disable )
 {
 	nmi_enable = 0;
-	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, activecpu_get_pc() ); */
+	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(space->cpu) ); */
 }
 
 static WRITE8_HANDLER ( adpcm_nmi_enable )
 {
 	nmi_enable = 1;
-	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", activecpu_get_pc() ); */
+	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(space->cpu) ); */
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
@@ -794,7 +794,7 @@ GFXDECODE_END
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -1220,7 +1220,7 @@ static MACHINE_RESET( darius )
 		memcpy( RAM + 0x8000*i + 0x10000, RAM,            0x4000 );
 		memcpy( RAM + 0x8000*i + 0x14000, RAM + 0x4000*i, 0x4000 );
 	}
-	memory_set_bankptr(1, RAM);
+	memory_set_bankptr(machine, 1, RAM);
 
 	sound_global_enable( 1 );	/* mixer enabled */
 

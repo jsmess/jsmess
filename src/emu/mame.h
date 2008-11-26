@@ -18,6 +18,7 @@
 #include "restrack.h"
 #include "options.h"
 #include "inptport.h"
+#include "cpuintrf.h"
 #include <stdarg.h>
 
 #ifdef MESS
@@ -125,12 +126,14 @@ typedef void (*output_callback_func)(void *param, const char *format, va_list ar
 
 /* forward type declarations */
 typedef struct _mame_private mame_private;
+typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
 typedef struct _streams_private streams_private;
 typedef struct _devices_private devices_private;
 typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _cheat_private cheat_private;
+typedef struct _debugcpu_private debugcpu_private;
 
 
 /* description of the currently-running machine */
@@ -140,6 +143,10 @@ struct _running_machine
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
 	const input_port_config *portconfig;		/* points to a list of input port configurations */
+
+	/* CPU information */
+	const device_config *	activecpu;			/* active CPU (or NULL) -- deprecated soon */
+	const device_config *	cpu[MAX_CPU];		/* array of CPU devices */
 
 	/* game-related information */
 	const game_driver *		gamedrv;			/* points to the definition of the game machine */
@@ -163,12 +170,14 @@ struct _running_machine
 
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
+	memory_private *		memory_data;		/* internal data from memory.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
 	streams_private *		streams_data;		/* internal data from streams.c */
 	devices_private *		devices_data;		/* internal data from devices.c */
 	input_port_private *	input_port_data;	/* internal data from inptport.c */
 	ui_input_private *		ui_input_data;		/* internal data from uiinput.c */
 	cheat_private *			cheat_data;			/* internal data from cheat.c */
+	debugcpu_private *		debugcpu_data;		/* internal data from debugcpu.c */
 #ifdef MESS
 	images_private *		images_data;		/* internal data from image.c */
 	ui_mess_private *		ui_mess_data;		/* internal data from uimess.c */

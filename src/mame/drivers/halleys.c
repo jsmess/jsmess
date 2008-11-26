@@ -311,7 +311,7 @@ static void blit(int offset)
 
 #if HALLEYS_DEBUG
 if (0) {
-	logerror("%04x:[%04x]", activecpu_get_pc(), offset);
+	logerror("%04x:[%04x]", cpu_get_pc(machine->activecpu), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
 	logerror("\n"); }
 #endif
@@ -968,7 +968,7 @@ static WRITE8_HANDLER( bgtile_w )
 
 static READ8_HANDLER( blitter_status_r )
 {
-	if (game_id==GAME_HALLEYS && activecpu_get_pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (game_id==GAME_HALLEYS && cpu_get_pc(space->cpu)==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1003,7 +1003,7 @@ static WRITE8_HANDLER( blitter_w )
 		if (i==0 || (i==4 && !data))
 		{
 			blitter_busy = 0;
-			if (firq_level) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
+			if (firq_level) cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
 		}
 		else
 		{
@@ -1038,7 +1038,7 @@ static READ8_HANDLER( collision_id_r )
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (game_id==GAME_HALLEYS && activecpu_get_pc()==halleys_collision_detection) // HACK: collision detection bypass
+	if (game_id==GAME_HALLEYS && cpu_get_pc(space->cpu)==halleys_collision_detection) // HACK: collision detection bypass
 	{
 		if (collision_count) { collision_count--; return(collision_list[collision_count]); }
 
@@ -1164,13 +1164,13 @@ static WRITE8_HANDLER( halleys_paletteram_IIRRGGBB_w )
 	g = d    & 0x0c; g |= i;  g = g<<4 | g;
 	b = d<<2 & 0x0c; b |= i;  b = b<<4 | b;
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
-	palette_set_color(machine, offset+SP_2BACK, MAKE_RGB(r, g, b));
-	palette_set_color(machine, offset+SP_ALPHA, MAKE_RGB(r, g, b));
-	palette_set_color(machine, offset+SP_COLLD, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset+SP_2BACK, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset+SP_ALPHA, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset+SP_COLLD, MAKE_RGB(r, g, b));
 
-	halleys_decode_rgb(machine, &r, &g, &b, offset, 0);
-	palette_set_color(machine, offset+0x20, MAKE_RGB(r, g, b));
+	halleys_decode_rgb(space->machine, &r, &g, &b, offset, 0);
+	palette_set_color(space->machine, offset+0x20, MAKE_RGB(r, g, b));
 }
 
 
@@ -1480,7 +1480,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 	static int latch_delay = 0;
 	UINT8 latch_data;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 			/*
@@ -1503,8 +1503,8 @@ static INTERRUPT_GEN( halleys_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(machine, 0, latch_data);
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_w( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
+				cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 			}
 
 			// clear collision list of this frame unconditionally
@@ -1513,16 +1513,16 @@ static INTERRUPT_GEN( halleys_interrupt )
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 1:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
 		case 2:
-			mVectorType = 1; cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+			mVectorType = 1; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 
 		case 3:
-			mVectorType = 0; cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+			mVectorType = 0; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -1533,7 +1533,7 @@ static INTERRUPT_GEN( benberob_interrupt )
 	static int latch_delay = 0;
 	UINT8 latch_data;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 			if (latch_delay) latch_delay--; else
@@ -1543,19 +1543,19 @@ static INTERRUPT_GEN( benberob_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(machine, 0, latch_data);
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
+				cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 			}
 		break;
 
 		case 1:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		case 2:
 		case 3:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!blitter_busy) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE); else firq_level++;
+			if (!blitter_busy) cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else firq_level++;
 		break;
 	}
 }
@@ -1572,7 +1572,7 @@ static WRITE8_HANDLER( firq_ack_w )
 	io_ram[0x9c] = data;
 
 	if (firq_level) firq_level--;
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -1600,8 +1600,8 @@ static READ8_HANDLER( coin_lockout_r )
 	//   0x8599 : 'benberob'
 	//   0x83e2 : 'halleys', 'halleysc', 'halleycj'
 	//   0x83df : 'halley87'
-	int inp = input_port_read(machine, "IN0");
-	int result = ((input_port_read(machine, "DSW4")) & 0x20) >> 5;
+	int inp = input_port_read(space->machine, "IN0");
+	int result = ((input_port_read(space->machine, "DSW4")) & 0x20) >> 5;
 
 	if (inp & 0x80) result |= 0x02;
 	if (inp & 0x40) result |= 0x04;
@@ -1614,7 +1614,7 @@ static READ8_HANDLER( io_mirror_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(machine, portnames[offset]);
+	return input_port_read(space->machine, portnames[offset]);
 }
 
 

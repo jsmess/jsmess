@@ -99,17 +99,17 @@ extern VIDEO_UPDATE( 1942 );
 
 static WRITE8_HANDLER( c1942_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x03);
+	memory_set_bank(space->machine, 1, data & 0x03);
 }
 
 
 
 static INTERRUPT_GEN( c1942_interrupt )
 {
-	if (cpu_getiloops() != 0)
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);/* RST 08h */
+	if (cpu_getiloops(device) != 0)
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);/* RST 08h */
 	else
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 }
 
 
@@ -478,7 +478,7 @@ ROM_END
 static DRIVER_INIT( 1942 )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 3, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 3, &ROM[0x10000], 0x4000);
 }
 
 

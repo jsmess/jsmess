@@ -565,20 +565,20 @@ static WRITE32_HANDLER( hng64_videoram_w )
 
 static READ32_HANDLER( hng64_random_read )
 {
-	return mame_rand(machine)&0xffffffff;
+	return mame_rand(space->machine)&0xffffffff;
 }
 
 
 static READ32_HANDLER( hng64_com_r )
 {
-	logerror("com read  (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
+	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
 	return hng64_com_ram[offset] ;
 }
 
 
 static WRITE32_HANDLER( hng64_com_w )
 {
-	logerror("com write (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, mem_mask, data);
+	logerror("com write (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&hng64_com_ram[offset]);
 }
 
@@ -588,7 +588,7 @@ static UINT32 hng64_com_shared_b;
 
 static WRITE32_HANDLER( hng64_com_share_w )
 {
-	logerror("commw  (PC=%08x): %08x %08x %08x\n", activecpu_get_pc(), data, (offset*4)+0xc0001000, mem_mask);
+	logerror("commw  (PC=%08x): %08x %08x %08x\n", cpu_get_pc(space->cpu), data, (offset*4)+0xc0001000, mem_mask);
 
 	if (offset==0x0) COMBINE_DATA(&hng64_com_shared_a);
 	if (offset==0x1) COMBINE_DATA(&hng64_com_shared_b);
@@ -596,7 +596,7 @@ static WRITE32_HANDLER( hng64_com_share_w )
 
 static READ32_HANDLER( hng64_com_share_r )
 {
-	logerror("commr  (PC=%08x): %08x %08x\n", activecpu_get_pc(), (offset*4)+0xc0001000, mem_mask);
+	logerror("commr  (PC=%08x): %08x %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0001000, mem_mask);
 
 //  if(offset==0x0) return hng64_com_shared_a;
 //  if(offset==0x1) return hng64_com_shared_b;
@@ -620,31 +620,31 @@ static WRITE32_HANDLER( hng64_pal_w )
 	a = ((paletteram32[offset] & 0xff000000) >>24);
 
 	// a sure ain't alpha.
-	// alpha_set_level(mame_rand(machine)) ;
+	// alpha_set_level(mame_rand(space->machine)) ;
 	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r) ;
 
 	//if (a != 0)
 	//  popmessage("Alpha is not zero!") ;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( hng64_port_read )
 {
-	logerror("HNG64 port read (PC=%08x) 0x%08x\n", activecpu_get_pc(),offset*4);
+	logerror("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
 	if(offset==0x421) return 0x00000002;
  	if(offset==0x441) return hng64_interrupt_level_request;
 
 	if(offset==0x85b) return 0x00000010;
 
-	return mame_rand(machine)&0xffffffff;
+	return mame_rand(space->machine)&0xffffffff;
 }
 
 
 /* preliminary dma code, dma is used to copy program code -> ram */
 static int hng_dma_start,hng_dma_dst,hng_dma_len;
-static void hng64_do_dma (void)
+static void hng64_do_dma (const address_space *space)
 {
 	logerror("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
@@ -652,8 +652,8 @@ static void hng64_do_dma (void)
 	{
 		UINT32 dat;
 
-		dat = program_read_dword(hng_dma_start);
-		program_write_dword(hng_dma_dst,dat);
+		dat = memory_read_dword(space,hng_dma_start);
+		memory_write_dword(space,hng_dma_dst,dat);
 		hng_dma_start+=4;
 		hng_dma_dst+=4;
 		hng_dma_len--;
@@ -680,7 +680,7 @@ static WRITE32_HANDLER( hng_dma_len_w )
 {
 	logerror ("DMA Len Write %08x\n",data);
 	hng_dma_len = data;
-	hng64_do_dma();
+	hng64_do_dma(space);
 
 }
 
@@ -703,25 +703,25 @@ READ32_HANDLER( hng64_cart_r )
 
 static READ32_HANDLER( hng64_sram_r )
 {
-	logerror("HNG64 reading from SRAM 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sram[offset], activecpu_get_pc());
+	logerror("HNG64 reading from SRAM 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sram[offset], cpu_get_pc(space->cpu));
 	return hng64_sram[offset];
 }
 
 static WRITE32_HANDLER( hng64_sram_w )
 {
-	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, mem_mask, activecpu_get_pc());
+	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_sram[offset]);
 }
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], activecpu_get_pc());
+	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], activecpu_get_pc());
+	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
@@ -729,18 +729,18 @@ static READ32_HANDLER( hng64_dualport_r )
 		//SamSho64
 //      case 0x00:  toggi^=1; if (toggi==1) {return 0x00000400;} else {return 0x00000300;};
 		//RoadsEdge
-//      case 0x00:  return input_port_read(machine, "IPT_TEST");
+//      case 0x00:  return input_port_read(space->machine, "IPT_TEST");
 
 		//Fatfurwa
 		case 0x00:  return 0x00000400;
-		case 0x04:  return input_port_read(machine, "SYSTEM");
-		case 0x08:  return input_port_read(machine, "P1_P2");
+		case 0x04:  return input_port_read(space->machine, "SYSTEM");
+		case 0x08:  return input_port_read(space->machine, "P1_P2");
 
 		// This takes care of the 'machine' error code
 		case 0x600: return no_machine_error_code;
 	}
 
-	return mame_rand(machine)&0xffffffff;
+	return mame_rand(space->machine)&0xffffffff;
 	//return hng64_dualport[offset];
 }
 
@@ -805,7 +805,7 @@ static WRITE32_HANDLER( dl_w )
 //  if (offset == 0x85 && hng64_dl[offset] == 0x1)      // Just before the second half of the writes
 //      hng64_dl[0x86] = 0x2 ;                          // set 0x86 to 2 (so it drops into the loop)
 
-//  mame_printf_debug("dl W (%08x) : %.8x %.8x\n", activecpu_get_pc(), offset, hng64_dl[offset]) ;
+//  mame_printf_debug("dl W (%08x) : %.8x %.8x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 }
 
 static READ32_HANDLER( dl_r )
@@ -813,8 +813,8 @@ static READ32_HANDLER( dl_r )
 	// A read of 0x86 ONLY happens if there are more display lists than what are readily available.
 	// (PC = 8006fe1c)
 
-//  mame_printf_debug("dl R (%08x) : %x %x\n", activecpu_get_pc(), offset, hng64_dl[offset]) ;
-//  usrintf_showmessage("dl R (%08x) : %x %x", activecpu_get_pc(), offset, hng64_dl[offset]) ;
+//  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
+//  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 	return hng64_dl[offset] ;
 }
 
@@ -1070,9 +1070,9 @@ index=00000004  pagesize=01000000  vaddr=00000000C9000000  paddr=000000006900000
 #define KL5C_MMU_A(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[((xxx-1)*2)+1] << 2) | ((hng64_com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
 #define KL5C_MMU_B(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[(xxx-1)*2] & 0x3f) )
 
-static OPBASE_HANDLER( KL5C80_opbase_handler )
+static DIRECT_UPDATE_HANDLER( KL5C80_direct_handler )
 {
-	opbase->rom = opbase->ram = hng64_com_op_base;
+	direct->raw = direct->decrypted = hng64_com_op_base;
 	return ~0;
 }
 
@@ -1427,15 +1427,15 @@ static const mips3_config config =
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( irq_start )
 {
-	logerror("HNG64 interrupt level %x\n", cpu_getiloops());
+	logerror("HNG64 interrupt level %x\n", cpu_getiloops(device));
 
 	/* there are more, the sources are unknown at the moment */
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0x00: hng64_interrupt_level_request = 0;
 		break;
@@ -1445,7 +1445,7 @@ static INTERRUPT_GEN( irq_start )
 		break;
 	}
 
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
 }
 
@@ -1459,10 +1459,10 @@ static MACHINE_RESET(hyperneo)
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)hng64_soundram;
-	memory_set_bankptr(1,&RAM[0x1e0000]);
-	memory_set_bankptr(2,&RAM[0x001000]); // where..
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	memory_set_bankptr(machine, 1,&RAM[0x1e0000]);
+	memory_set_bankptr(machine, 2,&RAM[0x001000]); // where..
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 
 	/* Comm CPU */
@@ -1477,10 +1477,10 @@ static MACHINE_RESET(hyperneo)
 		hng64_com_virtual_mem[i] = rom[i] ;
 
 	KL5C80_virtual_mem_sync();
-	memory_set_opbase_handler(2, KL5C80_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
 
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
-//  cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 
 
@@ -1488,26 +1488,26 @@ static MACHINE_RESET(hyperneo)
 	activeBuffer = 0 ;
 
 	/* set the fastest DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x00ffffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, hng_mainram);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x00ffffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, hng_mainram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x04000000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x05ffffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, hng_cart);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x04000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x05ffffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, hng_cart);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 2);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 }
 
 

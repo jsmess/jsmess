@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "pool.h"
 
@@ -140,16 +141,13 @@ static void timer_remove(emu_timer *which);
 
 INLINE attotime get_current_time(void)
 {
-	int activecpu;
-
 	/* if we're currently in a callback, use the timer's expiration time as a base */
 	if (callback_timer != NULL)
 		return callback_timer_expire_time;
 
 	/* if we're executing as a particular CPU, use its local time as a base */
-	activecpu = cpu_getactivecpu();
-	if (activecpu >= 0)
-		return cpunum_get_localtime(activecpu);
+	if (Machine->activecpu != NULL)
+		return cpu_get_local_time(Machine->activecpu);
 
 	/* otherwise, return the current global base time */
 	return global_basetime;
@@ -298,8 +296,8 @@ void timer_init(running_machine *machine)
 
 	/* register with the save state system */
 	state_save_push_tag(0);
-	state_save_register_item("timer", 0, global_basetime.seconds);
-	state_save_register_item("timer", 0, global_basetime.attoseconds);
+	state_save_register_item("timer", NULL, 0, global_basetime.seconds);
+	state_save_register_item("timer", NULL, 0, global_basetime.attoseconds);
 	state_save_register_postload(machine, timer_postload, NULL);
 	state_save_pop_tag();
 
@@ -514,7 +512,6 @@ void timer_set_minimum_quantum(running_machine *machine, attoseconds_t quantum)
 
 static void timer_register_save(emu_timer *timer)
 {
-	char buf[256];
 	int count = 0;
 	emu_timer *t;
 
@@ -523,19 +520,16 @@ static void timer_register_save(emu_timer *timer)
 		if (!strcmp(t->func, timer->func))
 			count++;
 
-	/* make up a name */
-	sprintf(buf, "timer.%s", timer->func);
-
 	/* use different instances to differentiate the bits */
 	state_save_push_tag(0);
-	state_save_register_item(buf, count, timer->param);
-	state_save_register_item(buf, count, timer->enabled);
-	state_save_register_item(buf, count, timer->period.seconds);
-	state_save_register_item(buf, count, timer->period.attoseconds);
-	state_save_register_item(buf, count, timer->start.seconds);
-	state_save_register_item(buf, count, timer->start.attoseconds);
-	state_save_register_item(buf, count, timer->expire.seconds);
-	state_save_register_item(buf, count, timer->expire.attoseconds);
+	state_save_register_item("timer", timer->func, count, timer->param);
+	state_save_register_item("timer", timer->func, count, timer->enabled);
+	state_save_register_item("timer", timer->func, count, timer->period.seconds);
+	state_save_register_item("timer", timer->func, count, timer->period.attoseconds);
+	state_save_register_item("timer", timer->func, count, timer->start.seconds);
+	state_save_register_item("timer", timer->func, count, timer->start.attoseconds);
+	state_save_register_item("timer", timer->func, count, timer->expire.seconds);
+	state_save_register_item("timer", timer->func, count, timer->expire.attoseconds);
 	state_save_pop_tag();
 }
 
@@ -734,8 +728,8 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
-	if (which == timer_head && cpu_getexecutingcpu() >= 0)
-		activecpu_abort_timeslice();
+	if (which == timer_head && Machine->activecpu != NULL)
+		cpu_abort_timeslice(Machine->activecpu);
 }
 
 
@@ -1147,7 +1141,6 @@ static void timer_logtimers(void)
 static DEVICE_START( timer )
 {
 	timer_state *state = get_safe_token(device);
-	char unique_tag[50];
 	timer_config *config;
 	void *param;
 
@@ -1165,10 +1158,6 @@ static DEVICE_START( timer )
 
 	/* copy the pointer parameter */
 	state->ptr = config->ptr;
-
-	/* create the name for save states */
-	assert(strlen(device->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "timer_device", device->tag);
 
 	/* type based configuration */
 	switch (config->type)
@@ -1189,7 +1178,7 @@ static DEVICE_START( timer )
 			state->start_delay = attotime_zero;
 
 			/* register for state saves */
-			state_save_register_item(unique_tag, 0, state->param);
+			state_save_register_item("timer_device", device->tag, 0, state->param);
 
 			/* allocate the backing timer */
 			param = (void *)device;
@@ -1217,11 +1206,11 @@ static DEVICE_START( timer )
 				state->start_delay = attotime_zero;
 
 			/* register for state saves */
-			state_save_register_item(unique_tag, 0, state->start_delay.seconds);
-			state_save_register_item(unique_tag, 0, state->start_delay.attoseconds);
-			state_save_register_item(unique_tag, 0, state->period.seconds);
-			state_save_register_item(unique_tag, 0, state->period.attoseconds);
-			state_save_register_item(unique_tag, 0, state->param);
+			state_save_register_item("timer_device", device->tag, 0, state->start_delay.seconds);
+			state_save_register_item("timer_device", device->tag, 0, state->start_delay.attoseconds);
+			state_save_register_item("timer_device", device->tag, 0, state->period.seconds);
+			state_save_register_item("timer_device", device->tag, 0, state->period.attoseconds);
+			state_save_register_item("timer_device", device->tag, 0, state->param);
 
 			/* allocate the backing timer */
 			param = (void *)device;
@@ -1248,7 +1237,7 @@ static DEVICE_START( timer )
 			state->first_time = TRUE;
 
 			/* register for state saves */
-			state_save_register_item(unique_tag, 0, state->first_time);
+			state_save_register_item("timer_device", device->tag, 0, state->first_time);
 
 			/* fire it as soon as the emulation starts */
 			timer_adjust_oneshot(state->timer, attotime_zero, 0);

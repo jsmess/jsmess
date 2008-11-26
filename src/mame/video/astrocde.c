@@ -427,7 +427,7 @@ VIDEO_UPDATE( profpac )
 
 static TIMER_CALLBACK( interrupt_off )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -440,14 +440,14 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x01) == 0)
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector & 0xf0);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector & 0xf0);
 			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, interrupt_vector & 0xf0);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector & 0xf0);
 			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 
@@ -480,14 +480,14 @@ static TIMER_CALLBACK( scanline_callback )
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x04) == 0)
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector);
 			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, interrupt_vector);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector);
 			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 	}
@@ -532,51 +532,51 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 			break;
 
 		case 0x10:	/* player 1 handle */
-			result = input_port_read_safe(machine, "P1HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P1HANDLE", 0xff);
 			break;
 
 		case 0x11:	/* player 2 handle */
-			result = input_port_read_safe(machine, "P2HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P2HANDLE", 0xff);
 			break;
 
 		case 0x12:	/* player 3 handle */
-			result = input_port_read_safe(machine, "P3HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P3HANDLE", 0xff);
 			break;
 
 		case 0x13:	/* player 4 handle */
-			result = input_port_read_safe(machine, "P4HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P4HANDLE", 0xff);
 			break;
 
 		case 0x14:	/* keypad column 0 */
-			result = input_port_read_safe(machine, "KEYPAD0", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD0", 0xff);
 			break;
 
 		case 0x15:	/* keypad column 1 */
-			result = input_port_read_safe(machine, "KEYPAD1", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD1", 0xff);
 			break;
 
 		case 0x16:	/* keypad column 2 */
-			result = input_port_read_safe(machine, "KEYPAD2", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD2", 0xff);
 			break;
 
 		case 0x17:	/* keypad column 3 */
-			result = input_port_read_safe(machine, "KEYPAD3", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD3", 0xff);
 			break;
 
 		case 0x1c:	/* player 1 knob */
-			result = input_port_read_safe(machine, "P1_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P1_KNOB", 0xff);
 			break;
 
 		case 0x1d:	/* player 2 knob */
-			result = input_port_read_safe(machine, "P2_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P2_KNOB", 0xff);
 			break;
 
 		case 0x1e:	/* player 3 knob */
-			result = input_port_read_safe(machine, "P3_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P3_KNOB", 0xff);
 			break;
 
 		case 0x1f:	/* player 4 knob */
-			result = input_port_read_safe(machine, "P4_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P4_KNOB", 0xff);
 			break;
 	}
 
@@ -646,7 +646,7 @@ WRITE8_HANDLER( astrocade_data_chip_register_w )
 		case 0x17:	/* noise volume register */
 		case 0x18:	/* sound block transfer */
 			if (astrocade_video_config & AC_SOUND_PRESENT)
-				astrocade_sound1_w(machine, offset, data);
+				astrocade_sound1_w(space, offset, data);
 			break;
 
 		case 0x19:	/* expand register */
@@ -727,7 +727,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	/* OR/XOR */
 	if (funcgen_control & 0x30)
 	{
-		UINT8 olddata = program_read_byte(0x4000 + offset);
+		UINT8 olddata = memory_read_byte(space, 0x4000 + offset);
 
 		/* compute any intercepts */
 		funcgen_intercept &= 0x0f;
@@ -748,7 +748,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	}
 
 	/* write the result */
-	program_write_byte(0x4000 + offset, data);
+	memory_write_byte(space, 0x4000 + offset, data);
 }
 
 
@@ -788,7 +788,7 @@ INLINE void increment_dest(UINT8 curwidth)
 }
 
 
-static void execute_blit(void)
+static void execute_blit(const address_space *space)
 {
 	/*
         pattern_source = counter set U7/U16/U25/U34
@@ -842,7 +842,7 @@ static void execute_blit(void)
 			if (curwidth == 0 && (pattern_mode & 0x08) != 0)
 				busdata = 0;
 			else
-				busdata = program_read_byte(busaddr);
+				busdata = memory_read_byte(space, busaddr);
 
 			/* increment the appropriate address */
 			if ((pattern_mode & 0x01) == 0)
@@ -854,7 +854,7 @@ static void execute_blit(void)
 
 			/* address is selected between source/dest based on mode.d0 */
 			busaddr = ((pattern_mode & 0x01) != 0) ? pattern_source : pattern_dest;
-			program_write_byte(busaddr, busdata);
+			memory_write_byte(space, busaddr, busdata);
 
 			/* increment the appropriate address */
 			if ((pattern_mode & 0x01) == 0)
@@ -880,7 +880,7 @@ static void execute_blit(void)
 	} while (pattern_height-- != 0);
 
 	/* count cycles we ran the bus */
-	activecpu_adjust_icount(-cycles);
+	cpu_adjust_icount(space->cpu, -cycles);
 }
 
 
@@ -915,7 +915,7 @@ WRITE8_HANDLER( astrocade_pattern_board_w )
 
 		case 6:		/* height of blit and initiator */
 			pattern_height = data;
-			execute_blit();
+			execute_blit(cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM));
 			break;
 	}
 }

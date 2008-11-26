@@ -32,7 +32,9 @@ extern void (*toybox_mcu_run)(running_machine *machine);	/* one of the following
 void bloodwar_mcu_run(running_machine *machine);
 void bonkadv_mcu_run(running_machine *machine);
 void gtmr_mcu_run(running_machine *machine);
-
+void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT16*mcu_ram);
+DRIVER_INIT( decrypt_toybox_rom );
+DRIVER_INIT( decrypt_toybox_rom_alt );
 
 /*----------- defined in drivers/kaneko16.c -----------*/
 
@@ -96,7 +98,9 @@ extern kaneko16_priority_t kaneko16_priority;
 
 /* Machine */
 
+
 VIDEO_START( kaneko16_sprites );
+VIDEO_START( kaneko16_1xVIEW2_tilemaps );
 VIDEO_START( kaneko16_1xVIEW2 );
 VIDEO_START( kaneko16_2xVIEW2 );
 VIDEO_START( berlwall );
@@ -106,6 +110,7 @@ VIDEO_START( sandscrp_1xVIEW2 );
 VIDEO_UPDATE( kaneko16 );
 VIDEO_UPDATE( sandscrp );
 VIDEO_UPDATE( berlwall );
+VIDEO_UPDATE( jchan_view2 );
 
 VIDEO_START( galsnew );
 VIDEO_UPDATE( galsnew );
@@ -116,7 +121,7 @@ extern UINT16* galsnew_fg_pixram;
 
 /*----------- defined in drivers/galpani2.c -----------*/
 
-void galpani2_mcu_run(void);
+void galpani2_mcu_run(running_machine *machine);
 
 /*----------- defined in video/galpani2.c -----------*/
 

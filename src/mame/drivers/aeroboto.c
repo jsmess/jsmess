@@ -48,7 +48,7 @@ static READ8_HANDLER( aeroboto_201_r )
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
 	static const UINT8 res[4] = { 0xff,0x9f,0x1b,0x03};
 	static int count;
-	logerror("PC %04x: read 3004\n",activecpu_get_pc());
+	logerror("PC %04x: read 3004\n",cpu_get_pc(space->cpu));
 	return res[(count++)&3];
 }
 
@@ -56,7 +56,7 @@ static READ8_HANDLER( aeroboto_201_r )
 static INTERRUPT_GEN( aeroboto_interrupt )
 {
 	if (!disable_irq)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 		disable_irq--;
 }

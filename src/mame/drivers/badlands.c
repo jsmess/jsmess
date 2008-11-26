@@ -120,18 +120,20 @@ static UINT8 *bank_source_data;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void scanline_update(const device_config *screen, int scanline)
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_ack_r(screen->machine, 0);
+		atarigen_6502_irq_ack_r(space, 0);
 	else if (!(input_port_read(screen->machine, "FE4000") & 0x40))
-		atarigen_6502_irq_gen(screen->machine, 0);
+		atarigen_6502_irq_gen(screen->machine->cpu[1]);
 }
 
 
@@ -157,7 +159,7 @@ static MACHINE_RESET( badlands )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	int pedal_state = input_port_read(machine, "PEDALS");
+	int pedal_state = input_port_read(device->machine, "PEDALS");
 	int i;
 
 	/* update the pedals once per frame */
@@ -168,7 +170,7 @@ static INTERRUPT_GEN( vblank_int )
 			pedal_value[i]++;
 	}
 
-	atarigen_video_int_gen(machine, cpunum);
+	atarigen_video_int_gen(device);
 }
 
 
@@ -217,7 +219,7 @@ static READ8_HANDLER( audio_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(machine, offset);
+			result = atarigen_6502_sound_r(space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -231,15 +233,15 @@ static READ8_HANDLER( audio_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = input_port_read(machine, "AUDIO");
-			if (!(input_port_read(machine, "FE4000") & 0x0080)) result ^= 0x90;
+			result = input_port_read(space->machine, "AUDIO");
+			if (!(input_port_read(space->machine, "FE4000") & 0x0080)) result ^= 0x90;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
 			result ^= 0x10;
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(machine, 0);
+			atarigen_6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -265,7 +267,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(machine, 0);
+			atarigen_6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* n/c */
@@ -273,7 +275,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(machine, offset, data);
+			atarigen_6502_sound_w(space, offset, data);
 			break;
 
 		case 0x204:		/* WRIO */
@@ -603,7 +605,7 @@ GFXDECODE_END
 
 static void update_interrupts_bootleg(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -613,7 +615,7 @@ static void scanline_update_bootleg(const device_config *screen, int scanline)
 //  if (scanline & 32)
 //      atarigen_6502_irq_ack_r(screen->machine, 0);
 //  else if (!(input_port_read(machine, "FE4000") & 0x40))
-//      atarigen_6502_irq_gen(screen->machine, 0);
+//      atarigen_6502_irq_gen(screen->machine->cpu[1]);
 }
 
 

@@ -44,8 +44,8 @@ static WRITE8_HANDLER( thedeep_nmi_w )
 
 static WRITE8_HANDLER( thedeep_sound_w )
 {
-	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 protection_command, protection_data;
@@ -54,7 +54,7 @@ static int rombank;
 
 static MACHINE_RESET( thedeep )
 {
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + 0 * 0x4000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000 + 0 * 0x4000);
 	thedeep_scroll[0] = 0;
 	thedeep_scroll[1] = 0;
 	thedeep_scroll[2] = 0;
@@ -87,8 +87,8 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			int new_rombank = protection_command & 3;
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
-			rom = memory_region(machine, "main");
-			memory_set_bankptr(1, rom + 0x10000 + rombank * 0x4000);
+			rom = memory_region(space->machine, "main");
+			memory_set_bankptr(space->machine, 1, rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
 			memcpy(rom + 0x08000, rom + 0x10000 + rombank * 0x4000, 0x4000);
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				protection_data = memory_region(machine, "cpu3")[0x185+protection_index++];
+				protection_data = memory_region(space->machine, "cpu3")[0x185+protection_index++];
 			else
 				protection_data = 0xc9;
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 		break;
 
 		default:
-			logerror( "pc %04x: protection_command %02x\n", activecpu_get_pc(),protection_command);
+			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(space->cpu),protection_command);
 	}
 }
 
@@ -144,7 +144,7 @@ static READ8_HANDLER( thedeep_protection_r )
 static WRITE8_HANDLER( thedeep_e100_w )
 {
 	if (data != 1)
-		logerror("pc %04x: e100 = %02x\n", activecpu_get_pc(),data);
+		logerror("pc %04x: e100 = %02x\n", cpu_get_pc(space->cpu),data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -307,7 +307,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface thedeep_ym2203_intf =
@@ -322,11 +322,11 @@ static const ym2203_interface thedeep_ym2203_intf =
 
 static INTERRUPT_GEN( thedeep_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
 		if (protection_command != 0x59)
 		{
-			int coins = input_port_read(machine, "MCU");
+			int coins = input_port_read(device->machine, "MCU");
 			if		(coins & 1)	protection_data = 1;
 			else if	(coins & 2)	protection_data = 2;
 			else if	(coins & 4)	protection_data = 3;
@@ -336,14 +336,14 @@ static INTERRUPT_GEN( thedeep_interrupt )
 				protection_irq = 1;
 		}
 		if (protection_irq)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+			cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 	else
 	{
 		if (nmi_enable)
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);
 		}
 	}
 }

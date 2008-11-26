@@ -79,11 +79,12 @@ struct _m6509_Regs {
 	UINT8	so_state;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *space;
 
 	int 	icount;
 
-	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_machine_func wrmem_id;				/* readmem callback for indexed instructions */
+	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
+	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
 static void *token;
@@ -96,32 +97,29 @@ static void *token;
 
 static READ8_HANDLER( m6509_read_00000 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	return m6509->pc_bank.b.h2;
 }
 
 static READ8_HANDLER( m6509_read_00001 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	return m6509->ind_bank.b.h2;
 }
 
 static WRITE8_HANDLER( m6509_write_00000 )
 {
-	m6509_Regs *m6509 = token;
-	m6509_Regs *m6502 = m6509;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	m6509->pc_bank.b.h2=data&0xf;
 	m6509->pc.w.h=m6509->pc_bank.w.h;
-	change_pc(PCD);
-
 }
 
 static WRITE8_HANDLER( m6509_write_00001 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	m6509->ind_bank.b.h2=data&0xf;
 }
@@ -131,8 +129,8 @@ static ADDRESS_MAP_START(m6509_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE(m6509_read_00001, m6509_write_00001)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
-static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
+static UINT8 default_rdmem_id(const address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
+static void default_wdmem_id(const address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
 
 static CPU_INIT( m6509 )
 {
@@ -144,6 +142,7 @@ static CPU_INIT( m6509 )
 	m6509->wrmem_id = default_wdmem_id;
 	m6509->irq_callback = irqcallback;
 	m6509->device = device;
+	m6509->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m6509 )
@@ -166,8 +165,6 @@ static CPU_RESET( m6509 )
 	m6509->pending_irq = 0;	/* nonzero if an IRQ is pending */
 	m6509->after_cli = 0;	/* pending IRQ and last insn cleared I */
 	m6509->irq_callback = NULL;
-
-	change_pc(PCD);
 }
 
 static CPU_EXIT( m6509 )
@@ -187,7 +184,6 @@ static CPU_SET_CONTEXT( m6509 )
 	{
 		token = src;
 		m6502 = token;
-		change_pc(PCD);
 	}
 }
 
@@ -207,10 +203,9 @@ INLINE void m6509_take_irq(	m6509_Regs *m6502)
 		P |= F_I;		/* knock out D and set I flag */
 		PCL = RDMEM(EAD);
 		PCH = RDMEM(EAD+1);
-		LOG(("M6509#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
+		LOG(("M6509#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
-		change_pc(PCD);
 	}
 	m6502->pending_irq = 0;
 }
@@ -222,14 +217,12 @@ static CPU_EXECUTE( m6509 )
 
 	m6502->icount = cycles;
 
-	change_pc(PCD);
-
 	do
 	{
 		UINT8 op;
 		PPC = PCD;
 
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device, PCD);
 
 		/* if an irq is pending, take it now */
 		if( m6509->pending_irq )
@@ -241,7 +234,7 @@ static CPU_EXECUTE( m6509 )
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( m6509->after_cli )
 		{
-			LOG(("M6509#%d after_cli was >0", cpu_getactivecpu()));
+			LOG(("M6509#%d after_cli was >0", cpunum_get_active()));
 			m6509->after_cli = 0;
 			if (m6509->irq_state != CLEAR_LINE)
 			{
@@ -272,7 +265,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 		m6509->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6509#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(( "M6509#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
 			EAD = M6509_NMI_VEC;
 			EAWH = PBWH;
 			m6502->icount -= 2;
@@ -282,8 +275,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 			P |= F_I;		/* knock out D and set I flag */
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
-			LOG(("M6509#%d takes NMI ($%04x)\n", cpu_getactivecpu(), PCD));
-			change_pc(PCD);
+			LOG(("M6509#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
 		}
 	}
 	else
@@ -292,7 +284,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 		{
 			if( m6509->so_state && !state )
 			{
-				LOG(( "M6509#%d set overflow\n", cpu_getactivecpu()));
+				LOG(( "M6509#%d set overflow\n", cpunum_get_active()));
 				P|=F_V;
 			}
 			m6509->so_state=state;
@@ -301,7 +293,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 		m6509->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6509#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(( "M6509#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
 			m6509->pending_irq = 1;
 		}
 	}
@@ -313,7 +305,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 
 static CPU_SET_INFO( m6509 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = device->token;
 	m6509_Regs *m6502 = m6509;
 
 	switch (state)
@@ -323,7 +315,7 @@ static CPU_SET_INFO( m6509 )
 		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:m6509_set_irq_line(m6509, M6509_SET_OVERFLOW, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m6509_set_irq_line(m6509, INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							PCW = info->i; change_pc(PCD);			break;
+		case CPUINFO_INT_PC:							PCW = info->i; 							break;
 		case CPUINFO_INT_REGISTER + M6509_PC:			m6509->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6509_S:			m6509->sp.b.l = info->i;					break;
@@ -337,8 +329,8 @@ static CPU_SET_INFO( m6509 )
 		case CPUINFO_INT_REGISTER + M6509_ZP:			m6509->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509->rdmem_id = (read8_machine_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509->wrmem_id = (write8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 
@@ -350,7 +342,7 @@ static CPU_SET_INFO( m6509 )
 
 CPU_GET_INFO( m6509 )
 {
-	m6509_Regs *m6502 = token;
+	m6509_Regs *m6502 = (device != NULL) ? device->token : NULL;
 	m6509_Regs *m6509 = m6502;
 
 	switch (state)

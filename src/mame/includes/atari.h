@@ -57,12 +57,6 @@ void a5200_handle_keypads(running_machine *machine);
 
 /* video */
 
-/* Enable this to make the video code use readmem16 to retrieve data */
-/* Otherwise the RAM memory array is accessed and thus, if a display list would */
-/* point to memory mapped IO, the result is different from a real machine */
-#define ACCURATE_ANTIC_READMEM	1
-
-
 #define CYCLES_PER_LINE 114 	/* total number of cpu cycles per scanline (incl. hblank) */
 #define CYCLES_REFRESH	9		/* number of cycles lost for ANTICs RAM refresh using DMA */
 #define CYCLES_HSTART	32		/* where does the ANTIC DMA fetch start */
@@ -315,47 +309,39 @@ typedef struct {
 	UINT8   *uc_g3;				/* used colors for gfx GTIA 3 */
 }   ANTIC;
 
-#if ACCURATE_ANTIC_READMEM
-#define RDANTIC()	cpunum_read_byte(0, antic.dpage+antic.doffs)
-#define RDVIDEO(o)	cpunum_read_byte(0, antic.vpage+((antic.voffs+(o))&VOFFS))
-#define RDCHGEN(o)	cpunum_read_byte(0, antic.chbase+(o))
-#define RDPMGFXS(o) cpunum_read_byte(0, antic.pmbase_s+(o)+(antic.scanline>>1))
-#define RDPMGFXD(o) cpunum_read_byte(0, antic.pmbase_d+(o)+antic.scanline)
-#else
-#define RDANTIC()	(memory_region(machine, REGION_CPU1))[antic.dpage+antic.doffs]
-#define RDVIDEO(o)	(memory_region(machine, REGION_CPU1))[antic.vpage+((antic.voffs+(o))&VOFFS)]
-#define RDCHGEN(o)	(memory_region(machine, REGION_CPU1))[antic.chbase+(o)]
-#define RDPMGFXS(o) (memory_region(machine, REGION_CPU1))[antic.pmbase_s+(o)+(antic.scanline>>1)]
-#define RDPMGFXD(o) (memory_region(machine, REGION_CPU1))[antic.pmbase_d+(o)+antic.scanline]
-#endif
+#define RDANTIC(space)		memory_read_byte(space, antic.dpage+antic.doffs)
+#define RDVIDEO(space,o)	memory_read_byte(space, antic.vpage+((antic.voffs+(o))&VOFFS))
+#define RDCHGEN(space,o)	memory_read_byte(space, antic.chbase+(o))
+#define RDPMGFXS(space,o) 	memory_read_byte(space, antic.pmbase_s+(o)+(antic.scanline>>1))
+#define RDPMGFXD(space,o) 	memory_read_byte(space, antic.pmbase_d+(o)+antic.scanline)
 
 #define PREPARE()												\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET]
 
-#define PREPARE_TXT2(width) 									\
+#define PREPARE_TXT2(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(i) << 3;							\
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
 		if( ch & 0x400 )										\
 		{														\
-			ch = RDCHGEN((ch & 0x3f8) + antic.w.chbasl);		\
+			ch = RDCHGEN(space,(ch & 0x3f8) + antic.w.chbasl);	\
 			ch = (ch ^ antic.chxor) & antic.chand;				\
 		}														\
 		else													\
 		{														\
-			ch = RDCHGEN(ch + antic.w.chbasl);					\
+			ch = RDCHGEN(space,ch + antic.w.chbasl);			\
 		}														\
 		video->data[i] = ch;									\
 	}
 
-#define PREPARE_TXT3(width) 									\
+#define PREPARE_TXT3(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(i) << 3;							\
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
 		if( ch & 0x400 )										\
 		{														\
 			ch &= 0x3f8;										\
@@ -364,14 +350,14 @@ typedef struct {
 				if (antic.w.chbasl < 2) /* first two lines empty */ \
 					ch = 0x00;									\
 				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
-					ch = RDCHGEN(ch + (antic.w.chbasl & 7));	\
+					ch = RDCHGEN(space,ch + (antic.w.chbasl & 7));\
 			}													\
 			else												\
 			{													\
 				if (antic.w.chbasl > 7) /* last two lines empty */	\
 					ch = 0x00;									\
 				else /* lines 0..7 are standard */				\
-					ch = RDCHGEN(ch + antic.w.chbasl);			\
+					ch = RDCHGEN(space,ch + antic.w.chbasl);		\
 			}													\
 			ch = (ch ^ antic.chxor) & antic.chand;				\
 		}														\
@@ -382,87 +368,87 @@ typedef struct {
 				if (antic.w.chbasl < 2) /* first two lines empty */ \
 					ch = 0x00;									\
 				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
-					ch = RDCHGEN(ch + (antic.w.chbasl & 7));	\
+					ch = RDCHGEN(space,ch + (antic.w.chbasl & 7));\
 			}													\
 			else												\
 			{													\
 				if (antic.w.chbasl > 7) /* last two lines empty */	\
 					ch = 0x00;									\
 				else /* lines 0..7 are standard */				\
-					ch = RDCHGEN(ch + antic.w.chbasl);			\
+					ch = RDCHGEN(space,ch + antic.w.chbasl);		\
 			}													\
 		}														\
         video->data[i] = ch;                                    \
 	}
 
-#define PREPARE_TXT45(width,shift)								\
+#define PREPARE_TXT45(space,width,shift)							\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(i) << 3;							\
-		ch = ((ch>>2)&0x100)|RDCHGEN((ch&0x3f8)+(antic.w.chbasl>>shift)); \
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
+		ch = ((ch>>2)&0x100)|RDCHGEN(space,(ch&0x3f8)+(antic.w.chbasl>>shift)); \
 		video->data[i] = ch;									\
 	}
 
 
-#define PREPARE_TXT67(width,shift)								\
+#define PREPARE_TXT67(space,width,shift)							\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(i) << 3;							\
-		ch = (ch&0x600)|(RDCHGEN((ch&0x1f8)+(antic.w.chbasl>>shift))<<1); \
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
+		ch = (ch&0x600)|(RDCHGEN(space,(ch&0x1f8)+(antic.w.chbasl>>shift))<<1); \
 		video->data[i] = ch;									\
 	}
 
-#define PREPARE_GFX8(width)                                     \
+#define PREPARE_GFX8(space,width)                                 \
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i) << 2
+		video->data[i] = RDVIDEO(space,i) << 2
 
-#define PREPARE_GFX9BC(width)									\
+#define PREPARE_GFX9BC(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i) << 1
+		video->data[i] = RDVIDEO(space,i) << 1
 
-#define PREPARE_GFXA(width) 									\
+#define PREPARE_GFXA(space,width) 								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i) << 1
+		video->data[i] = RDVIDEO(space,i) << 1
 
-#define PREPARE_GFXDE(width)									\
+#define PREPARE_GFXDE(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXF(width) 									\
+#define PREPARE_GFXF(space,width) 								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXG1(width)									\
+#define PREPARE_GFXG1(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXG2(width)									\
+#define PREPARE_GFXG2(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXG3(width)									\
+#define PREPARE_GFXG3(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(i)
+		video->data[i] = RDVIDEO(space,i)
 
 /******************************************************************
  * common end of a single antic/gtia mode emulation function

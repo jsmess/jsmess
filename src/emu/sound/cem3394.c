@@ -315,7 +315,7 @@ static void cem3394_update(void *param, stream_sample_t **inputs, stream_sample_
 }
 
 
-static void *cem3394_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( cem3394 )
 {
 	const cem3394_interface *intf = config;
 	sound_chip *chip;
@@ -338,18 +338,18 @@ static void *cem3394_start(const char *tag, int sndindex, int clock, const void 
 	chip->mixer_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
 	chip->external_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
 
-	state_save_register_item_array("cem3394", sndindex, chip->values);
-	state_save_register_item("cem3394", sndindex, chip->wave_select);
-	state_save_register_item("cem3394", sndindex, chip->volume);
-	state_save_register_item("cem3394", sndindex, chip->mixer_internal);
-	state_save_register_item("cem3394", sndindex, chip->mixer_external);
-	state_save_register_item("cem3394", sndindex, chip->position);
-	state_save_register_item("cem3394", sndindex, chip->step);
-	state_save_register_item("cem3394", sndindex, chip->filter_position);
-	state_save_register_item("cem3394", sndindex, chip->filter_step);
-	state_save_register_item("cem3394", sndindex, chip->modulation_depth);
-	state_save_register_item("cem3394", sndindex, chip->last_ext);
-	state_save_register_item("cem3394", sndindex, chip->pulse_width);
+	state_save_register_item_array("cem3394", tag, 0, chip->values);
+	state_save_register_item("cem3394", tag, 0, chip->wave_select);
+	state_save_register_item("cem3394", tag, 0, chip->volume);
+	state_save_register_item("cem3394", tag, 0, chip->mixer_internal);
+	state_save_register_item("cem3394", tag, 0, chip->mixer_external);
+	state_save_register_item("cem3394", tag, 0, chip->position);
+	state_save_register_item("cem3394", tag, 0, chip->step);
+	state_save_register_item("cem3394", tag, 0, chip->filter_position);
+	state_save_register_item("cem3394", tag, 0, chip->filter_step);
+	state_save_register_item("cem3394", tag, 0, chip->modulation_depth);
+	state_save_register_item("cem3394", tag, 0, chip->last_ext);
+	state_save_register_item("cem3394", tag, 0, chip->pulse_width);
 
 	return chip;
 }
@@ -561,7 +561,7 @@ double cem3394_get_parameter(int chipnum, int input)
  * Generic get_info
  **************************************************************************/
 
-static void cem3394_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( cem3394 )
 {
 	switch (state)
 	{
@@ -570,15 +570,15 @@ static void cem3394_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void cem3394_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( cem3394 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = cem3394_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = cem3394_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cem3394 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cem3394 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
 
@@ -1073,7 +1074,7 @@ static TIMER_CALLBACK( antic_issue_dli )
 	{
 		LOG(("           @cycle #%3d issue DLI\n", cycle(machine)));
 		antic.r.nmist |= DLI_NMI;
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
@@ -1142,13 +1143,13 @@ static TIMER_CALLBACK( antic_line_done )
     {
 		LOG(("           @cycle #%3d release WSYNC\n", cycle(machine)));
         /* release the CPU if it was actually waiting for HSYNC */
-        cpu_trigger(machine, TRIGGER_HSYNC);
+        cpuexec_trigger(machine, TRIGGER_HSYNC);
         /* and turn off the 'wait for hsync' flag */
         antic.w.wsync = 0;
     }
 	LOG(("           @cycle #%3d release CPU\n", cycle(machine)));
     /* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
-	cpu_trigger(machine, TRIGGER_STEAL);
+	cpuexec_trigger(machine, TRIGGER_STEAL);
 
 	/* refresh the display (translate color clocks to pixels) */
     antic_linerefresh(machine);
@@ -1168,7 +1169,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
 	after(machine, antic.steal_cycles, antic_line_done, "antic_line_done");
     antic.steal_cycles = 0;
-	cpunum_spinuntil_trigger( 0, TRIGGER_STEAL );
+	cpu_spinuntil_trigger( machine->cpu[0], TRIGGER_STEAL );
 }
 
 
@@ -1182,6 +1183,8 @@ static TIMER_CALLBACK( antic_steal_cycles )
  *****************************************************************************/
 static TIMER_CALLBACK( antic_scanline_render )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
 
@@ -1197,16 +1200,16 @@ static TIMER_CALLBACK( antic_scanline_render )
             if( antic.w.dmactl & DMA_MISSILE )
             {
                 antic.steal_cycles += 1;
-                atari_gtia_w(machine, 0x11, RDPMGFXD(3*256));
+                atari_gtia_w(space, 0x11, RDPMGFXD(space, 3*256));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
                 antic.steal_cycles += 4;
-                atari_gtia_w(machine, 0x0d, RDPMGFXD(4*256));
-                atari_gtia_w(machine, 0x0e, RDPMGFXD(5*256));
-                atari_gtia_w(machine, 0x0f, RDPMGFXD(6*256));
-                atari_gtia_w(machine, 0x10, RDPMGFXD(7*256));
+                atari_gtia_w(space, 0x0d, RDPMGFXD(space, 4*256));
+                atari_gtia_w(space, 0x0e, RDPMGFXD(space, 5*256));
+                atari_gtia_w(space, 0x0f, RDPMGFXD(space, 6*256));
+                atari_gtia_w(space, 0x10, RDPMGFXD(space, 7*256));
             }
         }
         else
@@ -1216,17 +1219,17 @@ static TIMER_CALLBACK( antic_scanline_render )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 1;
-                atari_gtia_w(machine, 0x11, RDPMGFXS(3*128));
+                atari_gtia_w(space, 0x11, RDPMGFXS(space, 3*128));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 4;
-                atari_gtia_w(machine, 0x0d, RDPMGFXS(4*128));
-                atari_gtia_w(machine, 0x0e, RDPMGFXS(5*128));
-                atari_gtia_w(machine, 0x0f, RDPMGFXS(6*128));
-                atari_gtia_w(machine, 0x10, RDPMGFXS(7*128));
+                atari_gtia_w(space, 0x0d, RDPMGFXS(space, 4*128));
+                atari_gtia_w(space, 0x0e, RDPMGFXS(space, 5*128));
+                atari_gtia_w(space, 0x0f, RDPMGFXS(space, 6*128));
+                atari_gtia_w(space, 0x10, RDPMGFXS(space, 7*128));
             }
         }
     }
@@ -1250,9 +1253,10 @@ INLINE void LMS(int new_cmd)
      **************************************************************/
     if( new_cmd & ANTIC_LMS )
     {
-		int addr = RDANTIC();
+    	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		int addr = RDANTIC(space);
         antic.doffs = ++antic.doffs & DOFFS;
-        addr += 256 * RDANTIC();
+        addr += 256 * RDANTIC(space);
         antic.doffs = ++antic.doffs & DOFFS;
         antic.vpage = addr & VPAGE;
         antic.voffs = addr & VOFFS;
@@ -1274,6 +1278,7 @@ INLINE void LMS(int new_cmd)
  *****************************************************************************/
 static void antic_scanline_dma(running_machine *machine, int param)
 {
+   	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	LOG(("           @cycle #%3d DMA fetch\n", cycle(machine)));
 	if (antic.scanline == VBL_END)
 		antic.r.nmist &= ~VBL_NMI;
@@ -1287,7 +1292,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
 				UINT8 vscrol_subtract = 0;
 				UINT8 new_cmd;
 
-				new_cmd = RDANTIC();
+				new_cmd = RDANTIC(space);
 				antic.doffs = ++antic.doffs & DOFFS;
 				/* steal at one clock cycle from the CPU for fetching the command */
                 antic.steal_cycles += 1;
@@ -1350,9 +1355,9 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					/* load memory scan bit set ? */
 					if( new_cmd & ANTIC_LMS )
 					{
-						int addr = RDANTIC();
+						int addr = RDANTIC(space);
                         antic.doffs = ++antic.doffs & DOFFS;
-                        addr += 256 * RDANTIC();
+                        addr += 256 * RDANTIC(space);
                         antic.dpage = addr & DPAGE;
                         antic.doffs = addr & DOFFS;
                         /* produce empty scanlines until vblank start */
@@ -1363,9 +1368,9 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					}
 					else
 					{
-						int addr = RDANTIC();
+						int addr = RDANTIC(space);
                         antic.doffs = ++antic.doffs & DOFFS;
-                        addr += 256 * RDANTIC();
+                        addr += 256 * RDANTIC(space);
                         antic.dpage = addr & DPAGE;
                         antic.doffs = addr & DOFFS;
                         /* produce a single empty scanline */
@@ -1531,7 +1536,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			antic.r.nmist |= VBL_NMI;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
     }
 
@@ -1543,20 +1548,20 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 
 INTERRUPT_GEN( a400_interrupt )
 {
-	generic_atari_interrupt(machine, a800_handle_keyboard, 4);
+	generic_atari_interrupt(device->machine, a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800_interrupt )
 {
-	generic_atari_interrupt(machine, a800_handle_keyboard, 4);
+	generic_atari_interrupt(device->machine, a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800xl_interrupt )
 {
-	generic_atari_interrupt(machine, a800_handle_keyboard, 2);
+	generic_atari_interrupt(device->machine, a800_handle_keyboard, 2);
 }
 
 INTERRUPT_GEN( a5200_interrupt )
 {
-	generic_atari_interrupt(machine, a5200_handle_keypads, 4);
+	generic_atari_interrupt(device->machine, a5200_handle_keypads, 4);
 }

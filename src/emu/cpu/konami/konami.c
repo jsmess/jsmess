@@ -35,7 +35,6 @@
 *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "konami.h"
 
 #define VERBOSE 0
@@ -57,6 +56,7 @@ typedef struct
     int     extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
     UINT8   int_state;  /* SYNC and CWAI flags */
 	UINT8	nmi_state;
 	void 	(*setlines_callback)( int lines ); /* callback called when A16-A23 are set */
@@ -131,7 +131,6 @@ static PAIR ea;         /* effective address */
 		}																\
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */		\
 		PCD = RM16(0xfff6); 											\
-		change_pc(PC);					/* TS 971002 */ 				\
 		(void)(*konami.irq_callback)(konami.device, KONAMI_FIRQ_LINE);	\
 	}																	\
 	else																\
@@ -159,7 +158,6 @@ static PAIR ea;         /* effective address */
 		}																\
 		CC |= CC_II;					/* inhibit IRQ */				\
 		PCD = RM16(0xfff8); 											\
-		change_pc(PC);					/* TS 971002 */ 				\
 		(void)(*konami.irq_callback)(konami.device, KONAMI_IRQ_LINE);	\
 	}
 
@@ -291,7 +289,6 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 	if( f ) 							\
 	{									\
 		PC += SIGNED(t);				\
-		change_pc(PC);	/* TS 971002 */ \
 	}									\
 }
 
@@ -302,7 +299,6 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 	{									\
 		konami_ICount -= 1;				\
 		PC += t.w.l;					\
-		change_pc(PC);	/* TS 971002 */ \
 	}									\
 }
 
@@ -381,7 +377,6 @@ static CPU_SET_CONTEXT( konami )
 {
 	if( src )
 		konami = *(konami_Regs*)src;
-    change_pc(PC);    /* TS 971002 */
 
     CHECK_IRQ_LINES;
 }
@@ -393,19 +388,20 @@ static CPU_INIT( konami )
 {
 	konami.irq_callback = irqcallback;
 	konami.device = device;
+	konami.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("KONAMI", index, PC);
-	state_save_register_item("KONAMI", index, U);
-	state_save_register_item("KONAMI", index, S);
-	state_save_register_item("KONAMI", index, X);
-	state_save_register_item("KONAMI", index, Y);
-	state_save_register_item("KONAMI", index, D);
-	state_save_register_item("KONAMI", index, DP);
-	state_save_register_item("KONAMI", index, CC);
-	state_save_register_item("KONAMI", index, konami.int_state);
-	state_save_register_item("KONAMI", index, konami.nmi_state);
-	state_save_register_item("KONAMI", index, konami.irq_state[0]);
-	state_save_register_item("KONAMI", index, konami.irq_state[1]);
+	state_save_register_item("KONAMI", device->tag, 0, PC);
+	state_save_register_item("KONAMI", device->tag, 0, U);
+	state_save_register_item("KONAMI", device->tag, 0, S);
+	state_save_register_item("KONAMI", device->tag, 0, X);
+	state_save_register_item("KONAMI", device->tag, 0, Y);
+	state_save_register_item("KONAMI", device->tag, 0, D);
+	state_save_register_item("KONAMI", device->tag, 0, DP);
+	state_save_register_item("KONAMI", device->tag, 0, CC);
+	state_save_register_item("KONAMI", device->tag, 0, konami.int_state);
+	state_save_register_item("KONAMI", device->tag, 0, konami.nmi_state);
+	state_save_register_item("KONAMI", device->tag, 0, konami.irq_state[0]);
+	state_save_register_item("KONAMI", device->tag, 0, konami.irq_state[1]);
 }
 
 static CPU_RESET( konami )
@@ -421,7 +417,6 @@ static CPU_RESET( konami )
     CC |= CC_IF;        /* FIRQ disabled */
 
 	PCD = RM16(0xfffe);
-    change_pc(PC);    /* TS 971002 */
 }
 
 static CPU_EXIT( konami )
@@ -438,7 +433,7 @@ static void set_irq_line(int irqline, int state)
 	{
 		if (konami.nmi_state == state) return;
 		konami.nmi_state = state;
-		LOG(("KONAMI#%d set_nmi_line %d\n", cpu_getactivecpu(), state));
+		LOG(("KONAMI#%d set_nmi_line %d\n", cpunum_get_active(), state));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
@@ -466,11 +461,10 @@ static void set_irq_line(int irqline, int state)
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
 		PCD = RM16(0xfffc);
-		change_pc(PC);					/* TS 971002 */
 	}
 	else if (irqline < 2)
 	{
-	    LOG(("KONAMI#%d set_irq_line %d, %d\n", cpu_getactivecpu(), irqline, state));
+	    LOG(("KONAMI#%d set_irq_line %d, %d\n", cpunum_get_active(), irqline, state));
 		konami.irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
 		CHECK_IRQ_LINES;
@@ -499,7 +493,7 @@ static CPU_EXECUTE( konami )
 		{
 			pPPC = pPC;
 
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device, PCD);
 
 			konami.ireg = ROP(PCD);
 			PC++;
@@ -532,7 +526,7 @@ static CPU_SET_INFO( konami )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + KONAMI_PC:			PC = info->i; change_pc(PC);			break;
+		case CPUINFO_INT_REGISTER + KONAMI_PC:			PC = info->i; 							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + KONAMI_S:			S = info->i;							break;
 		case CPUINFO_INT_REGISTER + KONAMI_CC:			CC = info->i; CHECK_IRQ_LINES;			break;

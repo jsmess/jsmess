@@ -11,7 +11,6 @@
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "i386.h"
 #include "i386intf.h"
 
@@ -444,7 +443,7 @@ static void I386OP(decode_two_byte)(void)
 
 /*************************************************************************/
 
-static UINT64 i386_debug_segbase(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT32 result;
 	I386_SREG seg;
@@ -463,7 +462,7 @@ static UINT64 i386_debug_segbase(void *ref, UINT32 params, const UINT64 *param)
 	return result;
 }
 
-static UINT64 i386_debug_seglimit(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT32 result = 0;
 	I386_SREG seg;
@@ -480,8 +479,8 @@ static UINT64 i386_debug_seglimit(void *ref, UINT32 params, const UINT64 *param)
 
 static CPU_DEBUG_INIT( i386 )
 {
-	symtable_add_function(global_symtable, "segbase", NULL, 1, 1, i386_debug_segbase);
-	symtable_add_function(global_symtable, "seglimit", NULL, 1, 1, i386_debug_seglimit);
+	symtable_add_function(debug_cpu_get_symtable(device), "segbase", NULL, 1, 1, i386_debug_segbase);
+	symtable_add_function(debug_cpu_get_symtable(device), "seglimit", NULL, 1, 1, i386_debug_seglimit);
 }
 
 /*************************************************************************/
@@ -525,61 +524,63 @@ static CPU_INIT( i386 )
 
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item_array(state_type, index,	I.reg.d);
-	state_save_register_item(state_type, index, I.sreg[ES].selector);
-	state_save_register_item(state_type, index, I.sreg[ES].base);
-	state_save_register_item(state_type, index, I.sreg[ES].limit);
-	state_save_register_item(state_type, index, I.sreg[ES].flags);
-	state_save_register_item(state_type, index, I.sreg[CS].selector);
-	state_save_register_item(state_type, index, I.sreg[CS].base);
-	state_save_register_item(state_type, index, I.sreg[CS].limit);
-	state_save_register_item(state_type, index, I.sreg[CS].flags);
-	state_save_register_item(state_type, index, I.sreg[SS].selector);
-	state_save_register_item(state_type, index, I.sreg[SS].base);
-	state_save_register_item(state_type, index, I.sreg[SS].limit);
-	state_save_register_item(state_type, index, I.sreg[SS].flags);
-	state_save_register_item(state_type, index, I.sreg[DS].selector);
-	state_save_register_item(state_type, index, I.sreg[DS].base);
-	state_save_register_item(state_type, index, I.sreg[DS].limit);
-	state_save_register_item(state_type, index, I.sreg[DS].flags);
-	state_save_register_item(state_type, index, I.sreg[FS].selector);
-	state_save_register_item(state_type, index, I.sreg[FS].base);
-	state_save_register_item(state_type, index, I.sreg[FS].limit);
-	state_save_register_item(state_type, index, I.sreg[FS].flags);
-	state_save_register_item(state_type, index, I.sreg[GS].selector);
-	state_save_register_item(state_type, index, I.sreg[GS].base);
-	state_save_register_item(state_type, index, I.sreg[GS].limit);
-	state_save_register_item(state_type, index, I.sreg[GS].flags);
-	state_save_register_item(state_type, index, I.eip);
-	state_save_register_item(state_type, index, I.prev_eip);
-	state_save_register_item(state_type, index, I.CF);
-	state_save_register_item(state_type, index, I.DF);
-	state_save_register_item(state_type, index, I.SF);
-	state_save_register_item(state_type, index, I.OF);
-	state_save_register_item(state_type, index, I.ZF);
-	state_save_register_item(state_type, index, I.PF);
-	state_save_register_item(state_type, index, I.AF);
-	state_save_register_item(state_type, index, I.IF);
-	state_save_register_item(state_type, index, I.TF);
-	state_save_register_item_array(state_type, index,	I.cr);
-	state_save_register_item_array(state_type, index,	I.dr);
-	state_save_register_item_array(state_type, index,	I.tr);
-	state_save_register_item(state_type, index, I.idtr.base);
-	state_save_register_item(state_type, index, I.idtr.limit);
-	state_save_register_item(state_type, index, I.gdtr.base);
-	state_save_register_item(state_type, index, I.gdtr.limit);
-	state_save_register_item(state_type, index, I.task.base);
-	state_save_register_item(state_type, index, I.task.segment);
-	state_save_register_item(state_type, index, I.task.limit);
-	state_save_register_item(state_type, index, I.task.flags);
-	state_save_register_item(state_type, index, I.ldtr.base);
-	state_save_register_item(state_type, index, I.ldtr.segment);
-	state_save_register_item(state_type, index, I.ldtr.limit);
-	state_save_register_item(state_type, index, I.ldtr.flags);
-	state_save_register_item(state_type, index,  I.irq_state);
-	state_save_register_item(state_type, index, I.performed_intersegment_jump);
-	state_save_register_postload(Machine, i386_postload, NULL);
+	state_save_register_item_array(state_type, device->tag, 0,	I.reg.d);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[ES].selector);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[ES].base);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[ES].limit);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[ES].flags);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[CS].selector);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[CS].base);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[CS].limit);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[CS].flags);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[SS].selector);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[SS].base);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[SS].limit);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[SS].flags);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[DS].selector);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[DS].base);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[DS].limit);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[DS].flags);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[FS].selector);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[FS].base);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[FS].limit);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[FS].flags);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[GS].selector);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[GS].base);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[GS].limit);
+	state_save_register_item(state_type, device->tag, 0, I.sreg[GS].flags);
+	state_save_register_item(state_type, device->tag, 0, I.eip);
+	state_save_register_item(state_type, device->tag, 0, I.prev_eip);
+	state_save_register_item(state_type, device->tag, 0, I.CF);
+	state_save_register_item(state_type, device->tag, 0, I.DF);
+	state_save_register_item(state_type, device->tag, 0, I.SF);
+	state_save_register_item(state_type, device->tag, 0, I.OF);
+	state_save_register_item(state_type, device->tag, 0, I.ZF);
+	state_save_register_item(state_type, device->tag, 0, I.PF);
+	state_save_register_item(state_type, device->tag, 0, I.AF);
+	state_save_register_item(state_type, device->tag, 0, I.IF);
+	state_save_register_item(state_type, device->tag, 0, I.TF);
+	state_save_register_item_array(state_type, device->tag, 0,	I.cr);
+	state_save_register_item_array(state_type, device->tag, 0,	I.dr);
+	state_save_register_item_array(state_type, device->tag, 0,	I.tr);
+	state_save_register_item(state_type, device->tag, 0, I.idtr.base);
+	state_save_register_item(state_type, device->tag, 0, I.idtr.limit);
+	state_save_register_item(state_type, device->tag, 0, I.gdtr.base);
+	state_save_register_item(state_type, device->tag, 0, I.gdtr.limit);
+	state_save_register_item(state_type, device->tag, 0, I.task.base);
+	state_save_register_item(state_type, device->tag, 0, I.task.segment);
+	state_save_register_item(state_type, device->tag, 0, I.task.limit);
+	state_save_register_item(state_type, device->tag, 0, I.task.flags);
+	state_save_register_item(state_type, device->tag, 0, I.ldtr.base);
+	state_save_register_item(state_type, device->tag, 0, I.ldtr.segment);
+	state_save_register_item(state_type, device->tag, 0, I.ldtr.limit);
+	state_save_register_item(state_type, device->tag, 0, I.ldtr.flags);
+	state_save_register_item(state_type, device->tag, 0,  I.irq_state);
+	state_save_register_item(state_type, device->tag, 0, I.performed_intersegment_jump);
+	state_save_register_postload(device->machine, i386_postload, NULL);
 }
 
 static void build_opcode_table(UINT32 features)
@@ -616,13 +617,13 @@ static void build_opcode_table(UINT32 features)
 static CPU_RESET( i386 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
@@ -718,7 +719,7 @@ static CPU_EXECUTE( i386 )
 		I.segment_prefix = 0;
 		I.prev_eip = I.eip;
 
-		debugger_instruction_hook(Machine, I.pc);
+		debugger_instruction_hook(device, I.pc);
 
 		i386_check_irq_line();
 		I386OP(decode_opcode)();
@@ -1074,13 +1075,11 @@ static CPU_INIT( i486 )
 static CPU_RESET( i486 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
@@ -1184,13 +1183,11 @@ static CPU_INIT( pentium )
 static CPU_RESET( pentium )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
@@ -1314,13 +1311,11 @@ static CPU_INIT( mediagx )
 static CPU_RESET( mediagx )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;

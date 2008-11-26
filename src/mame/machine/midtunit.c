@@ -84,7 +84,7 @@ WRITE16_HANDLER( midtunit_cmos_w )
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", activecpu_get_pc(), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", cpu_get_pc(space->cpu), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -107,7 +107,7 @@ READ16_HANDLER( midtunit_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
 
-	return input_port_read(machine, portnames[offset]);
+	return input_port_read(space->machine, portnames[offset]);
 }
 
 
@@ -132,12 +132,12 @@ static const UINT8 mk_prot_values[] =
 
 static READ16_HANDLER( mk_prot_r )
 {
-	logerror("%08X:Protection R @ %05X = %04X\n", activecpu_get_pc(), offset, mk_prot_values[mk_prot_index] << 9);
+	logerror("%08X:Protection R @ %05X = %04X\n", cpu_get_pc(space->cpu), offset, mk_prot_values[mk_prot_index] << 9);
 
 	/* just in case */
 	if (mk_prot_index >= sizeof(mk_prot_values))
 	{
-		logerror("%08X:Unexpected protection R @ %05X\n", activecpu_get_pc(), offset);
+		logerror("%08X:Unexpected protection R @ %05X\n", cpu_get_pc(space->cpu), offset);
 		mk_prot_index = 0;
 	}
 
@@ -162,11 +162,11 @@ static WRITE16_HANDLER( mk_prot_w )
 		/* just in case */
 		if (i == sizeof(mk_prot_values))
 		{
-			logerror("%08X:Unhandled protection W @ %05X = %04X\n", activecpu_get_pc(), offset, data);
+			logerror("%08X:Unhandled protection W @ %05X = %04X\n", cpu_get_pc(space->cpu), offset, data);
 			mk_prot_index = 0;
 		}
 
-		logerror("%08X:Protection W @ %05X = %04X\n", activecpu_get_pc(), offset, data);
+		logerror("%08X:Protection W @ %05X = %04X\n", cpu_get_pc(space->cpu), offset, data);
 	}
 }
 
@@ -319,7 +319,7 @@ static const UINT8 jdredd_prot_values_80020[] =
 
 static WRITE16_HANDLER( jdredd_prot_w )
 {
-	logerror("%08X:jdredd_prot_w(%04X,%04X)\n", activecpu_get_previouspc(), offset*16, data);
+	logerror("%08X:jdredd_prot_w(%04X,%04X)\n", cpu_get_previouspc(space->cpu), offset*16, data);
 
 	switch (offset)
 	{
@@ -367,7 +367,7 @@ static READ16_HANDLER( jdredd_prot_r )
 	if (jdredd_prot_table && jdredd_prot_index < jdredd_prot_max)
 		result = jdredd_prot_table[jdredd_prot_index++] << 9;
 
-	logerror("%08X:jdredd_prot_r(%04X) = %04X\n", activecpu_get_previouspc(), offset*16, result);
+	logerror("%08X:jdredd_prot_r(%04X) = %04X\n", cpu_get_previouspc(space->cpu), offset*16, result);
 	return result;
 }
 
@@ -376,7 +376,7 @@ static READ16_HANDLER( jdredd_prot_r )
 static UINT16 *jdredd_hack;
 static READ16_HANDLER( jdredd_hack_r )
 {
-	if (activecpu_get_pc() == 0xFFBA7EB0)
+	if (cpu_get_pc(space->cpu) == 0xFFBA7EB0)
 	{
 		fprintf(stderr, "jdredd_hack_r\n");
 		return 0;
@@ -423,7 +423,7 @@ static void init_tunit_generic(running_machine *machine, int sound)
 			break;
 
 		case SOUND_DCS:
-			dcs_init();
+			dcs_init(machine);
 			break;
 	}
 
@@ -447,11 +447,11 @@ DRIVER_INIT( mktunit )
 	init_tunit_generic(machine, SOUND_ADPCM);
 
 	/* protection */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1b00000, 0x1b6ffff, 0, 0, mk_prot_r, mk_prot_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1b00000, 0x1b6ffff, 0, 0, mk_prot_r, mk_prot_w);
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfb9c, 0xfbc6, 0, 0, SMH_BANK9, SMH_BANK9);
-	memory_set_bankptr(9, auto_malloc(0x80));
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfb9c, 0xfbc6, 0, 0, SMH_BANK9, SMH_BANK9);
+	memory_set_bankptr(machine, 9, auto_malloc(0x80));
 }
 
 static void init_nbajam_common(running_machine *machine, int te_protection)
@@ -463,21 +463,21 @@ static void init_nbajam_common(running_machine *machine, int te_protection)
 	if (!te_protection)
 	{
 		nbajam_prot_table = nbajam_prot_values;
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1b14020, 0x1b2503f, 0, 0, nbajam_prot_r, nbajam_prot_w);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1b14020, 0x1b2503f, 0, 0, nbajam_prot_r, nbajam_prot_w);
 	}
 	else
 	{
 		nbajam_prot_table = nbajamte_prot_values;
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1b15f40, 0x1b37f5f, 0, 0, nbajam_prot_r, nbajam_prot_w);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1b95f40, 0x1bb7f5f, 0, 0, nbajam_prot_r, nbajam_prot_w);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1b15f40, 0x1b37f5f, 0, 0, nbajam_prot_r, nbajam_prot_w);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1b95f40, 0x1bb7f5f, 0, 0, nbajam_prot_r, nbajam_prot_w);
 	}
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfbaa, 0xfbd4, 0, 0, SMH_BANK9, SMH_BANK9);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfbaa, 0xfbd4, 0, 0, SMH_BANK9, SMH_BANK9);
 	else
-		memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfbec, 0xfc16, 0, 0, SMH_BANK9, SMH_BANK9);
-	memory_set_bankptr(9, auto_malloc(0x80));
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfbec, 0xfc16, 0, 0, SMH_BANK9, SMH_BANK9);
+	memory_set_bankptr(machine, 9, auto_malloc(0x80));
 }
 
 DRIVER_INIT( nbajam )
@@ -496,18 +496,18 @@ DRIVER_INIT( jdreddp )
 	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d81060, 0x01d8107f, 0, 0, SMH_NOP);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01d81060, 0x01d8107f, 0, 0, SMH_NOP);
 
 	/* protection */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1b00000, 0x1bfffff, 0, 0, jdredd_prot_r, jdredd_prot_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1b00000, 0x1bfffff, 0, 0, jdredd_prot_r, jdredd_prot_w);
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfbcf, 0xfbf9, 0, 0, SMH_BANK7, SMH_BANK9);
-	memory_set_bankptr(9, auto_malloc(0x80));
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, SMH_BANK7, SMH_BANK9);
+	memory_set_bankptr(machine, 9, auto_malloc(0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS
 	/* how about the final levels? */
-	jdredd_hack = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xFFBA7FF0, 0xFFBA7FFf, 0, 0, jdredd_hack_r);
+	jdredd_hack = memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xFFBA7FF0, 0xFFBA7FFf, 0, 0, jdredd_hack_r);
 #endif
 }
 
@@ -528,13 +528,13 @@ DRIVER_INIT( mk2 )
 	midtunit_gfx_rom_large = 1;
 
 	/* protection */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00f20c60, 0x00f20c7f, 0, 0, mk2_prot_w);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00f42820, 0x00f4283f, 0, 0, mk2_prot_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01a190e0, 0x01a190ff, 0, 0, mk2_prot_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01a191c0, 0x01a191df, 0, 0, mk2_prot_shift_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01a3d0c0, 0x01a3d0ff, 0, 0, mk2_prot_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d9d1e0, 0x01d9d1ff, 0, 0, mk2_prot_const_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01def920, 0x01def93f, 0, 0, mk2_prot_const_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00f20c60, 0x00f20c7f, 0, 0, mk2_prot_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00f42820, 0x00f4283f, 0, 0, mk2_prot_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01a190e0, 0x01a190ff, 0, 0, mk2_prot_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01a191c0, 0x01a191df, 0, 0, mk2_prot_shift_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01a3d0c0, 0x01a3d0ff, 0, 0, mk2_prot_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01d9d1e0, 0x01d9d1ff, 0, 0, mk2_prot_const_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01def920, 0x01def93f, 0, 0, mk2_prot_const_r);
 }
 
 
@@ -573,7 +573,7 @@ MACHINE_RESET( midtunit )
 
 READ16_HANDLER( midtunit_sound_state_r )
 {
-/*  logerror("%08X:Sound status read\n", activecpu_get_pc());*/
+/*  logerror("%08X:Sound status read\n", cpu_get_pc(space->cpu));*/
 
 	if (chip_type == SOUND_DCS)
 		return dcs_control_r() >> 4;
@@ -588,7 +588,7 @@ READ16_HANDLER( midtunit_sound_state_r )
 
 READ16_HANDLER( midtunit_sound_r )
 {
-	logerror("%08X:Sound data read\n", activecpu_get_pc());
+	logerror("%08X:Sound data read\n", cpu_get_pc(space->cpu));
 
 	if (chip_type == SOUND_DCS)
 		return dcs_data_r() & 0xff;
@@ -601,7 +601,7 @@ WRITE16_HANDLER( midtunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (!offset)
 	{
-		logerror("%08X:Unexpected write to sound (lo) = %04X\n", activecpu_get_pc(), data);
+		logerror("%08X:Unexpected write to sound (lo) = %04X\n", cpu_get_pc(space->cpu), data);
 		return;
 	}
 
@@ -619,7 +619,7 @@ WRITE16_HANDLER( midtunit_sound_w )
 				break;
 
 			case SOUND_DCS:
-				logerror("%08X:Sound write = %04X\n", activecpu_get_pc(), data);
+				logerror("%08X:Sound write = %04X\n", cpu_get_pc(space->cpu), data);
 				dcs_reset_w(~data & 0x100);
 				dcs_data_w(data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */

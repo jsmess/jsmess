@@ -18,6 +18,7 @@
 #include "debughlp.h"
 #include "debugvw.h"
 #include "render.h"
+#include "deprecat.h"
 #include <ctype.h>
 
 
@@ -57,12 +58,12 @@ static global_entry global_array[MAX_GLOBALS];
 
 static void debug_command_exit(running_machine *machine);
 
-static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64 *param);
 
-static UINT64 global_get(void *ref);
-static void global_set(void *ref, UINT64 value);
+static UINT64 global_get(void *globalref, void *ref);
+static void global_set(void *globalref, void *ref, UINT64 value);
 
 static void execute_help(running_machine *machine, int ref, int params, const char **param);
 static void execute_print(running_machine *machine, int ref, int params, const char **param);
@@ -125,13 +126,14 @@ static void execute_hardreset(running_machine *machine, int ref, int params, con
 
 void debug_command_init(running_machine *machine)
 {
+	symbol_table *symtable = debug_cpu_get_global_symtable(machine);
 	int cpunum, itemnum;
 	const char *name;
 
 	/* add a few simple global functions */
-	symtable_add_function(global_symtable, "min", NULL, 2, 2, execute_min);
-	symtable_add_function(global_symtable, "max", NULL, 2, 2, execute_max);
-	symtable_add_function(global_symtable, "if", NULL, 3, 3, execute_if);
+	symtable_add_function(symtable, "min", NULL, 2, 2, execute_min);
+	symtable_add_function(symtable, "max", NULL, 2, 2, execute_max);
+	symtable_add_function(symtable, "if", NULL, 3, 3, execute_if);
 
 	/* add all single-entry save state globals */
 	for (itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
@@ -151,7 +153,7 @@ void debug_command_init(running_machine *machine)
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
 			global_array[itemnum].base = base;
 			global_array[itemnum].size = valsize;
-			symtable_add_register(global_symtable, symname, &global_array, global_get, global_set);
+			symtable_add_register(symtable, symname, &global_array, global_get, global_set);
 		}
 	}
 
@@ -245,13 +247,14 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
 	/* ask all the CPUs if they would like to register functions or symbols */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-	{
-		cpu_debug_init_func debug_init;
-		debug_init = cpunum_get_info_fct(cpunum, CPUINFO_PTR_DEBUG_INIT);
-		if (debug_init != NULL)
-			(*debug_init)();
-	}
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			cpu_debug_init_func debug_init;
+			debug_init = (cpu_debug_init_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_DEBUG_INIT);
+			if (debug_init != NULL)
+				(*debug_init)(machine->cpu[cpunum]);
+		}
 
 	add_exit_callback(machine, debug_command_exit);
 
@@ -271,8 +274,9 @@ static void debug_command_exit(running_machine *machine)
 	int cpunum;
 
 	/* turn off all traces */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-		debug_cpu_trace(cpunum, NULL, 0, NULL);
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+			debug_cpu_trace(machine->cpu[cpunum], NULL, 0, NULL);
 }
 
 
@@ -287,7 +291,7 @@ static void debug_command_exit(running_machine *machine)
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -297,7 +301,7 @@ static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param)
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -307,7 +311,7 @@ static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param)
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -324,7 +328,7 @@ static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param)
     global_get - symbol table getter for globals
 -------------------------------------------------*/
 
-static UINT64 global_get(void *ref)
+static UINT64 global_get(void *globalref, void *ref)
 {
 	global_entry *global = ref;
 	switch (global->size)
@@ -342,7 +346,7 @@ static UINT64 global_get(void *ref)
     global_set - symbol table setter for globals
 -------------------------------------------------*/
 
-static void global_set(void *ref, UINT64 value)
+static void global_set(void *globalref, void *ref, UINT64 value)
 {
 	global_entry *global = ref;
 	switch (global->size)
@@ -367,9 +371,9 @@ static void global_set(void *ref, UINT64 value)
     number parameter
 -------------------------------------------------*/
 
-int debug_command_parameter_number(const char *param, UINT64 *result)
+int debug_command_parameter_number(running_machine *machine, const char *param, UINT64 *result)
 {
-	EXPRERR err = expression_evaluate(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, &debug_expression_callbacks, result);
+	EXPRERR err = expression_evaluate(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, result);
 	if (err == EXPRERR_NONE)
 		return 1;
 	debug_console_printf("Error in expression: %s\n", param);
@@ -380,13 +384,48 @@ int debug_command_parameter_number(const char *param, UINT64 *result)
 
 
 /*-------------------------------------------------
+    debug_command_parameter_cpu - validates a
+    number parameter as a cpu
+-------------------------------------------------*/
+
+int debug_command_parameter_cpu(running_machine *machine, const char *param, const device_config **result)
+{
+	UINT64 cpunum;
+	EXPRERR err;
+
+	/* first look for a tag match */
+	*result = cputag_get_cpu(machine, param);
+	if (*result != NULL)
+		return TRUE;
+
+	/* then evaluate as an expression; on an error assume it was a tag */
+	err = expression_evaluate(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, &cpunum);
+	if (err != EXPRERR_NONE)
+	{
+		debug_console_printf("Unable to find CPU '%s'\n", param);
+		return FALSE;
+	}
+
+	/* if out of range, complain */
+	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
+	{
+		debug_console_printf("Invalid CPU index %d\n", (UINT32) ((FPTR)*result));
+		return FALSE;
+	}
+
+	*result = machine->cpu[cpunum];
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
     debug_command_parameter_expression - validates
     an expression parameter
 -------------------------------------------------*/
 
-static int debug_command_parameter_expression(const char *param, parsed_expression **result)
+static int debug_command_parameter_expression(running_machine *machine, const char *param, parsed_expression **result)
 {
-	EXPRERR err = expression_parse(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, &debug_expression_callbacks, result);
+	EXPRERR err = expression_parse(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, result);
 	if (err == EXPRERR_NONE)
 		return 1;
 	debug_console_printf("Error in expression: %s\n", param);
@@ -444,7 +483,7 @@ static void execute_print(running_machine *machine, int ref, int params, const c
 
 	/* validate the other parameters */
 	for (i = 0; i < params; i++)
-		if (!debug_command_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(machine, param[i], &values[i]))
 			return;
 
 	/* then print each one */
@@ -565,7 +604,7 @@ static void execute_printf(running_machine *machine, int ref, int params, const 
 
 	/* validate the other parameters */
 	for (i = 1; i < params; i++)
-		if (!debug_command_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(machine, param[i], &values[i]))
 			return;
 
 	/* then do a printf */
@@ -586,7 +625,7 @@ static void execute_logerror(running_machine *machine, int ref, int params, cons
 
 	/* validate the other parameters */
 	for (i = 1; i < params; i++)
-		if (!debug_command_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(machine, param[i], &values[i]))
 			return;
 
 	/* then do a printf */
@@ -601,7 +640,7 @@ static void execute_logerror(running_machine *machine, int ref, int params, cons
 
 static void execute_tracelog(running_machine *machine, int ref, int params, const char *param[])
 {
-	FILE *file = debug_get_cpu_info(cpu_getactivecpu())->trace.file;
+	FILE *file = cpu_get_debug_data(machine->activecpu)->trace.file;
 	UINT64 values[MAX_COMMAND_PARAMS];
 	char buffer[1024];
 	int i;
@@ -612,7 +651,7 @@ static void execute_tracelog(running_machine *machine, int ref, int params, cons
 
 	/* validate the other parameters */
 	for (i = 1; i < params; i++)
-		if (!debug_command_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(machine, param[i], &values[i]))
 			return;
 
 	/* then do a printf */
@@ -639,7 +678,7 @@ static void execute_quit(running_machine *machine, int ref, int params, const ch
 static void execute_do(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 dummy;
-	debug_command_parameter_number(param[0], &dummy);
+	debug_command_parameter_number(machine, param[0], &dummy);
 }
 
 
@@ -652,10 +691,10 @@ static void execute_step(running_machine *machine, int ref, int params, const ch
 	UINT64 steps = 1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !debug_command_parameter_number(param[0], &steps))
+	if (params > 0 && !debug_command_parameter_number(machine, param[0], &steps))
 		return;
 
-	debug_cpu_single_step(steps);
+	debug_cpu_single_step(machine, steps);
 }
 
 
@@ -668,10 +707,10 @@ static void execute_over(running_machine *machine, int ref, int params, const ch
 	UINT64 steps = 1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !debug_command_parameter_number(param[0], &steps))
+	if (params > 0 && !debug_command_parameter_number(machine, param[0], &steps))
 		return;
 
-	debug_cpu_single_step_over(steps);
+	debug_cpu_single_step_over(machine, steps);
 }
 
 
@@ -681,7 +720,7 @@ static void execute_over(running_machine *machine, int ref, int params, const ch
 
 static void execute_out(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_single_step_out();
+	debug_cpu_single_step_out(machine);
 }
 
 
@@ -694,10 +733,10 @@ static void execute_go(running_machine *machine, int ref, int params, const char
 	UINT64 addr = ~0;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !debug_command_parameter_number(param[0], &addr))
+	if (params > 0 && !debug_command_parameter_number(machine, param[0], &addr))
 		return;
 
-	debug_cpu_go(addr);
+	debug_cpu_go(machine, addr);
 }
 
 
@@ -708,7 +747,7 @@ static void execute_go(running_machine *machine, int ref, int params, const char
 
 static void execute_go_vblank(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_go_vblank();
+	debug_cpu_go_vblank(machine);
 }
 
 
@@ -721,10 +760,10 @@ static void execute_go_interrupt(running_machine *machine, int ref, int params, 
 	UINT64 irqline = -1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !debug_command_parameter_number(param[0], &irqline))
+	if (params > 0 && !debug_command_parameter_number(machine, param[0], &irqline))
 		return;
 
-	debug_cpu_go_interrupt(irqline);
+	debug_cpu_go_interrupt(machine, irqline);
 }
 
 
@@ -737,10 +776,10 @@ static void execute_go_time(running_machine *machine, int ref, int params, const
 	UINT64 milliseconds = -1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !debug_command_parameter_number(param[0], &milliseconds))
+	if (params > 0 && !debug_command_parameter_number(machine, param[0], &milliseconds))
 		return;
 
-	debug_cpu_go_milliseconds(milliseconds);
+	debug_cpu_go_milliseconds(machine, milliseconds);
 }
 
 
@@ -750,7 +789,7 @@ static void execute_go_time(running_machine *machine, int ref, int params, const
 
 static void execute_next(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_next_cpu();
+	debug_cpu_next_cpu(machine);
 }
 
 
@@ -760,29 +799,21 @@ static void execute_next(running_machine *machine, int ref, int params, const ch
 
 static void execute_focus(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 cpuwhich;
+	const device_config *cpu;
 	int cpunum;
 
 	/* validate params */
-	if (!debug_command_parameter_number(param[0], &cpuwhich))
+	if (!debug_command_parameter_cpu(machine, param[0], &cpu))
 		return;
-	if (cpuwhich >= cpu_gettotalcpu())
-	{
-		debug_console_printf("Invalid CPU number!\n");
-		return;
-	}
 
 	/* first clear the ignore flag on the focused CPU */
-	debug_cpu_ignore_cpu(cpuwhich, 0);
+	debug_cpu_ignore_cpu(cpu, 0);
 
 	/* then loop over CPUs and set the ignore flags on all other CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		const debug_cpu_info *info = debug_get_cpu_info(cpunum);
-		if (info && info->valid && cpunum != cpuwhich)
-			debug_cpu_ignore_cpu(cpunum, 1);
-	}
-	debug_console_printf("Now focused on CPU %d\n", (int)cpuwhich);
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL && machine->cpu[cpunum] != cpu)
+			debug_cpu_ignore_cpu(machine->cpu[cpunum], 1);
+	debug_console_printf("Now focused on CPU '%s'\n", cpu->tag);
 }
 
 
@@ -792,7 +823,7 @@ static void execute_focus(running_machine *machine, int ref, int params, const c
 
 static void execute_ignore(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 cpuwhich[MAX_COMMAND_PARAMS];
+	const device_config *cpuwhich[MAX_COMMAND_PARAMS];
 	int cpunum, paramnum;
 	char buffer[100];
 	int buflen = 0;
@@ -801,17 +832,20 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 	if (params == 0)
 	{
 		/* loop over all CPUs */
-		for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		{
-			const debug_cpu_info *info = debug_get_cpu_info(cpunum);
-
-			/* build up a comma-separated list */
-			if (info && info->valid && (info->flags & DEBUG_FLAG_OBSERVING) == 0)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
 			{
-				if (buflen == 0) buflen += sprintf(&buffer[buflen], "Currently ignoring CPU %d", cpunum);
-				else buflen += sprintf(&buffer[buflen], ",%d", cpunum);
+				const cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+
+				/* build up a comma-separated list */
+				if ((info->flags & DEBUG_FLAG_OBSERVING) == 0)
+				{
+					if (buflen == 0)
+						buflen += sprintf(&buffer[buflen], "Currently ignoring CPU %d", cpunum);
+					else
+						buflen += sprintf(&buffer[buflen], ",%d", cpunum);
+				}
 			}
-		}
 
 		/* special message for none */
 		if (buflen == 0)
@@ -824,34 +858,25 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 	{
 		/* validate parameters */
 		for (paramnum = 0; paramnum < params; paramnum++)
-		{
-			if (!debug_command_parameter_number(param[paramnum], &cpuwhich[paramnum]))
+			if (!debug_command_parameter_cpu(machine, param[paramnum], &cpuwhich[paramnum]))
 				return;
-			if (cpuwhich[paramnum] >= cpu_gettotalcpu())
-			{
-				debug_console_printf("Invalid CPU number! (%d)\n", (int)cpuwhich[paramnum]);
-				return;
-			}
-		}
 
 		/* set the ignore flags */
 		for (paramnum = 0; paramnum < params; paramnum++)
 		{
 			/* make sure this isn't the last live CPU */
-			for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-			{
-				const debug_cpu_info *info = debug_get_cpu_info(cpunum);
-				if (cpunum != cpuwhich[paramnum] && info && info->valid && (info->flags & DEBUG_FLAG_OBSERVING) != 0)
-					break;
-			}
-			if (cpunum == MAX_CPU)
+			for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+				if (machine->cpu[cpunum] != NULL && machine->cpu[cpunum] != cpuwhich[paramnum])
+					if ((cpu_get_debug_data(machine->cpu[cpunum])->flags & DEBUG_FLAG_OBSERVING) != 0)
+						break;
+			if (cpunum == ARRAY_LENGTH(machine->cpu))
 			{
 				debug_console_printf("Can't ignore all CPUs!\n");
 				return;
 			}
 
 			debug_cpu_ignore_cpu(cpuwhich[paramnum], 1);
-			debug_console_printf("Now ignoring CPU %d\n", (int)cpuwhich[paramnum]);
+			debug_console_printf("Now ignoring CPU '%s'\n", cpuwhich[paramnum]->tag);
 		}
 	}
 }
@@ -863,7 +888,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 
 static void execute_observe(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 cpuwhich[MAX_COMMAND_PARAMS];
+	const device_config *cpuwhich[MAX_COMMAND_PARAMS];
 	int cpunum, paramnum;
 	char buffer[100];
 	int buflen = 0;
@@ -872,17 +897,20 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 	if (params == 0)
 	{
 		/* loop over all CPUs */
-		for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		{
-			const debug_cpu_info *info = debug_get_cpu_info(cpunum);
-
-			/* build up a comma-separated list */
-			if (info && info->valid && (info->flags & DEBUG_FLAG_OBSERVING) != 0)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
 			{
-				if (buflen == 0) buflen += sprintf(&buffer[buflen], "Currently observing CPU %d", cpunum);
-				else buflen += sprintf(&buffer[buflen], ",%d", cpunum);
+				const cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+
+				/* build up a comma-separated list */
+				if ((info->flags & DEBUG_FLAG_OBSERVING) != 0)
+				{
+					if (buflen == 0)
+						buflen += sprintf(&buffer[buflen], "Currently observing CPU %d", cpunum);
+					else
+						buflen += sprintf(&buffer[buflen], ",%d", cpunum);
+				}
 			}
-		}
 
 		/* special message for none */
 		if (buflen == 0)
@@ -895,21 +923,14 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 	{
 		/* validate parameters */
 		for (paramnum = 0; paramnum < params; paramnum++)
-		{
-			if (!debug_command_parameter_number(param[paramnum], &cpuwhich[paramnum]))
+			if (!debug_command_parameter_cpu(machine, param[paramnum], &cpuwhich[paramnum]))
 				return;
-			if (cpuwhich[paramnum] >= cpu_gettotalcpu())
-			{
-				debug_console_printf("Invalid CPU number! (%d)\n", (int)cpuwhich[paramnum]);
-				return;
-			}
-		}
 
 		/* clear the ignore flags */
 		for (paramnum = 0; paramnum < params; paramnum++)
 		{
 			debug_cpu_ignore_cpu(cpuwhich[paramnum], 0);
-			debug_console_printf("Now observing CPU %d\n", (int)cpuwhich[paramnum]);
+			debug_console_printf("Now observing CPU '%s'\n", cpuwhich[paramnum]->tag);
 		}
 	}
 }
@@ -921,10 +942,11 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 
 static void execute_comment(running_machine *machine, int ref, int params, const char *param[])
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 address;
 
 	/* param 1 is the address for the comment */
-	if (!debug_command_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(machine, param[0], &address))
 		return;
 
 	/* make sure param 2 exists */
@@ -935,7 +957,7 @@ static void execute_comment(running_machine *machine, int ref, int params, const
 	}
 
 	/* Now try adding the comment */
-	debug_comment_add(cpu_getactivecpu(), address, param[1], 0x00ff0000, debug_comment_get_opcode_crc32(address));
+	debug_comment_add(cpu, address, param[1], 0x00ff0000, debug_comment_get_opcode_crc32(cpu, address));
 	debug_view_update_type(DVT_DISASSEMBLY);
 }
 
@@ -946,15 +968,16 @@ static void execute_comment(running_machine *machine, int ref, int params, const
 
 static void execute_comment_del(running_machine *machine, int ref, int params, const char *param[])
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 address;
 
 	/* param 1 can either be a command or the address for the comment */
-	if (!debug_command_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(machine, param[0], &address))
 		return;
 
 	/* If it's a number, it must be an address */
 	/* The bankoff and cbn will be pulled from what's currently active */
-	debug_comment_remove(cpu_getactivecpu(), address, debug_comment_get_opcode_crc32(address));
+	debug_comment_remove(cpu, address, debug_comment_get_opcode_crc32(cpu, address));
 	debug_view_update_type(DVT_DISASSEMBLY);
 }
 
@@ -982,19 +1005,12 @@ static void execute_bpset(running_machine *machine, int ref, int params, const c
 	UINT64 address;
 	int bpnum;
 
-	/* make sure that there is an active CPU */
-	if (cpu_getactivecpu() < 0)
-	{
-		debug_console_printf("No active CPU!\n");
-		return;
-	}
-
 	/* param 1 is the address */
-	if (!debug_command_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(machine, param[0], &address))
 		return;
 
 	/* param 2 is the condition */
-	if (params > 1 && !debug_command_parameter_expression(param[1], &condition))
+	if (params > 1 && !debug_command_parameter_expression(machine, param[1], &condition))
 		return;
 
 	/* param 3 is the action */
@@ -1002,7 +1018,7 @@ static void execute_bpset(running_machine *machine, int ref, int params, const c
 		return;
 
 	/* set the breakpoint */
-	bpnum = debug_cpu_breakpoint_set(machine, cpu_getactivecpu(), address, condition, action);
+	bpnum = debug_cpu_breakpoint_set(debug_cpu_get_visible_cpu(machine), address, condition, action);
 	debug_console_printf("Breakpoint %X set\n", bpnum);
 }
 
@@ -1021,21 +1037,19 @@ static void execute_bpclear(running_machine *machine, int ref, int params, const
 	{
 		int cpunum;
 
-		for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		{
-			const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-			if (cpuinfo->valid)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
 			{
+				const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 				debug_cpu_breakpoint *bp;
 				while ((bp = cpuinfo->bplist) != NULL)
 					debug_cpu_breakpoint_clear(machine, bp->index);
 			}
-		}
 		debug_console_printf("Cleared all breakpoints\n");
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!debug_command_parameter_number(param[0], &bpindex))
+	else if (!debug_command_parameter_number(machine, param[0], &bpindex))
 		return;
 	else
 	{
@@ -1062,16 +1076,14 @@ static void execute_bpdisenable(running_machine *machine, int ref, int params, c
 	{
 		int cpunum;
 
-		for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		{
-			const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-			if (cpuinfo->valid)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
 			{
+				const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 				debug_cpu_breakpoint *bp;
 				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 					debug_cpu_breakpoint_enable(machine, bp->index, ref);
 			}
-		}
 		if (ref == 0)
 			debug_console_printf("Disabled all breakpoints\n");
 		else
@@ -1079,7 +1091,7 @@ static void execute_bpdisenable(running_machine *machine, int ref, int params, c
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!debug_command_parameter_number(param[0], &bpindex))
+	else if (!debug_command_parameter_number(machine, param[0], &bpindex))
 		return;
 	else
 	{
@@ -1103,30 +1115,31 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 	char buffer[256];
 
 	/* loop over all CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-
-		if (cpuinfo->valid && cpuinfo->bplist != NULL)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
 		{
-			debug_cpu_breakpoint *bp;
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 
-			debug_console_printf("CPU %d breakpoints:\n", cpunum);
-
-			/* loop over the breakpoints */
-			for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
+			if (cpuinfo->bplist != NULL)
 			{
-				int buflen;
-				buflen = sprintf(buffer, "%c%4X @ %08X", bp->enabled ? ' ' : 'D', bp->index, bp->address);
-				if (bp->condition)
-					buflen += sprintf(&buffer[buflen], " if %s", expression_original_string(bp->condition));
-				if (bp->action)
-					buflen += sprintf(&buffer[buflen], " do %s", bp->action);
-				debug_console_printf("%s\n", buffer);
-				printed++;
+				debug_cpu_breakpoint *bp;
+
+				debug_console_printf("CPU %d breakpoints:\n", cpunum);
+
+				/* loop over the breakpoints */
+				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
+				{
+					int buflen;
+					buflen = sprintf(buffer, "%c%4X @ %08X", bp->enabled ? ' ' : 'D', bp->index, bp->address);
+					if (bp->condition)
+						buflen += sprintf(&buffer[buflen], " if %s", expression_original_string(bp->condition));
+					if (bp->action)
+						buflen += sprintf(&buffer[buflen], " do %s", bp->action);
+					debug_console_printf("%s\n", buffer);
+					printed++;
+				}
 			}
 		}
-	}
 
 	if (!printed)
 		debug_console_printf("No breakpoints currently installed\n");
@@ -1147,11 +1160,11 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 	int wpnum;
 
 	/* param 1 is the address */
-	if (!debug_command_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(machine, param[0], &address))
 		return;
 
 	/* param 2 is the length */
-	if (!debug_command_parameter_number(param[1], &length))
+	if (!debug_command_parameter_number(machine, param[1], &length))
 		return;
 
 	/* param 3 is the type */
@@ -1168,7 +1181,7 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 	}
 
 	/* param 4 is the condition */
-	if (params > 3 && !debug_command_parameter_expression(param[3], &condition))
+	if (params > 3 && !debug_command_parameter_expression(machine, param[3], &condition))
 		return;
 
 	/* param 5 is the action */
@@ -1176,7 +1189,7 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 		return;
 
 	/* set the watchpoint */
-	wpnum = debug_cpu_watchpoint_set(machine, cpu_getactivecpu(), ref, type, address, length, condition, action);
+	wpnum = debug_cpu_watchpoint_set(cpu_get_address_space(debug_cpu_get_visible_cpu(machine), ref), type, address, length, condition, action);
 	debug_console_printf("Watchpoint %X set\n", wpnum);
 }
 
@@ -1195,11 +1208,10 @@ static void execute_wpclear(running_machine *machine, int ref, int params, const
 	{
 		int cpunum;
 
-		for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		{
-			const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-			if (cpuinfo->valid)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
 			{
+				const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 				int spacenum;
 
 				for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
@@ -1209,12 +1221,11 @@ static void execute_wpclear(running_machine *machine, int ref, int params, const
 						debug_cpu_watchpoint_clear(machine, wp->index);
 				}
 			}
-		}
 		debug_console_printf("Cleared all watchpoints\n");
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!debug_command_parameter_number(param[0], &wpindex))
+	else if (!debug_command_parameter_number(machine, param[0], &wpindex))
 		return;
 	else
 	{
@@ -1241,11 +1252,10 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 	{
 		int cpunum;
 
-		for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		{
-			const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-			if (cpuinfo->valid)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
 			{
+				const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 				int spacenum;
 
 				for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
@@ -1255,7 +1265,6 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 						debug_cpu_watchpoint_enable(machine, wp->index, ref);
 				}
 			}
-		}
 		if (ref == 0)
 			debug_console_printf("Disabled all watchpoints\n");
 		else
@@ -1263,7 +1272,7 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!debug_command_parameter_number(param[0], &wpindex))
+	else if (!debug_command_parameter_number(machine, param[0], &wpindex))
 		return;
 	else
 	{
@@ -1287,12 +1296,10 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 	char buffer[256];
 
 	/* loop over all CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-
-		if (cpuinfo->valid)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
 		{
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 			int spacenum;
 
 			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
@@ -1320,7 +1327,6 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 				}
 			}
 		}
-	}
 
 	if (!printed)
 		debug_console_printf("No watchpoints currently installed\n");
@@ -1334,27 +1340,29 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 
 static void execute_hotspot(running_machine *machine, int ref, int params, const char *param[])
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 threshhold;
-	UINT64 cpunum;
 	UINT64 count;
 
 	/* if no params, and there are live hotspots, clear them */
 	if (params == 0)
 	{
 		int cleared = FALSE;
+		int cpunum;
 
 		/* loop over CPUs and find live spots */
-		for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		{
-			const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-
-			if (cpuinfo->valid && cpuinfo->hotspots)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
 			{
-				debug_cpu_hotspot_track(machine, cpunum, 0, 0);
-				debug_console_printf("Cleared hotspot tracking on CPU %d\n", (int)cpunum);
-				cleared = TRUE;
+				const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
+
+				if (cpuinfo->hotspots != NULL)
+				{
+					debug_cpu_hotspot_track(cpuinfo->device, 0, 0);
+					debug_console_printf("Cleared hotspot tracking on CPU %d\n", (int)cpunum);
+					cleared = TRUE;
+				}
 			}
-		}
 
 		/* if we cleared, we're done */
 		if (cleared)
@@ -1362,19 +1370,18 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 	}
 
 	/* extract parameters */
-	cpunum = cpu_getactivecpu();
 	count = 64;
 	threshhold = 250;
-	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
+	if (params > 0 && !debug_command_parameter_cpu(machine, param[0], &cpu))
 		return;
-	if (params > 1 && !debug_command_parameter_number(param[1], &count))
+	if (params > 1 && !debug_command_parameter_number(machine, param[1], &count))
 		return;
-	if (params > 2 && !debug_command_parameter_number(param[2], &threshhold))
+	if (params > 2 && !debug_command_parameter_number(machine, param[2], &threshhold))
 		return;
 
 	/* attempt to install */
-	if (debug_cpu_hotspot_track(machine, cpunum, count, threshhold))
-		debug_console_printf("Now tracking hotspots on CPU %d using %d slots with a threshhold of %d\n", (int)cpunum, (int)count, (int)threshhold);
+	if (debug_cpu_hotspot_track(cpu, count, threshhold))
+		debug_console_printf("Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", cpu->tag, (int)count, (int)threshhold);
 	else
 		debug_console_printf("Error setting up the hotspot tracking\n");
 }
@@ -1386,22 +1393,29 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 
 static void execute_save(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length, cpunum = cpu_getactivecpu();
-	const debug_cpu_info *info;
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const address_space *space = cpu_get_address_space(cpu, ref);
+	UINT64 offset, endoffset, length;
+	const cpu_debug_data *info;
 	int spacenum = ref;
 	FILE *f;
 	UINT64 i;
 
 	/* validate parameters */
-	if (!debug_command_parameter_number(param[1], &offset))
+	if (space == NULL)
+	{
+		debug_console_printf("Invalid or non-existant address space %s on CPU '%s'\n", address_space_names[ref], cpu->tag);
 		return;
-	if (!debug_command_parameter_number(param[2], &length))
+	}
+	if (!debug_command_parameter_number(machine, param[1], &offset))
 		return;
-	if (params > 3 && !debug_command_parameter_number(param[3], &cpunum))
+	if (!debug_command_parameter_number(machine, param[2], &length))
+		return;
+	if (params > 3 && !debug_command_parameter_cpu(machine, param[3], &cpu))
 		return;
 
 	/* determine the addresses to write */
-	info = debug_get_cpu_info(cpunum);
+	info = cpu_get_debug_data(cpu);
 	endoffset = ADDR2BYTE_MASKED(offset + length - 1, info, spacenum);
 	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 
@@ -1414,13 +1428,13 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(cpu);
 	for (i = offset; i <= endoffset; i++)
 	{
-		UINT8 byte = debug_read_byte(spacenum, i, TRUE);
+		UINT8 byte = debug_read_byte(space, i, TRUE);
 		fwrite(&byte, 1, 1, f);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1434,31 +1448,33 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 
 static void execute_dump(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length, width = 0, ascii = 1, cpunum = cpu_getactivecpu();
-	const debug_cpu_info *info;
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const address_space *space = cpu_get_address_space(cpu, ref);
+	UINT64 offset, endoffset, length, width = 0, ascii = 1;
+	const cpu_debug_data *info;
 	int spacenum = ref;
 	FILE *f = NULL;
 	UINT64 i, j;
 
 	/* validate parameters */
-	if (!debug_command_parameter_number(param[1], &offset))
+	if (space == NULL)
+	{
+		debug_console_printf("Invalid or non-existant address space %s on CPU '%s'\n", address_space_names[ref], cpu->tag);
 		return;
-	if (!debug_command_parameter_number(param[2], &length))
+	}
+	if (!debug_command_parameter_number(machine, param[1], &offset))
 		return;
-	if (params > 3 && !debug_command_parameter_number(param[3], &width))
+	if (!debug_command_parameter_number(machine, param[2], &length))
 		return;
-	if (params > 4 && !debug_command_parameter_number(param[4], &ascii))
+	if (params > 3 && !debug_command_parameter_number(machine, param[3], &width))
 		return;
-	if (params > 5 && !debug_command_parameter_number(param[5], &cpunum))
+	if (params > 4 && !debug_command_parameter_number(machine, param[4], &ascii))
+		return;
+	if (params > 5 && !debug_command_parameter_cpu(machine, param[5], &cpu))
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
-	{
-		debug_console_printf("Invalid CPU number!\n");
-		return;
-	}
-	info = debug_get_cpu_info(cpunum);
+	info = cpu_get_debug_data(cpu);
 	if (width == 0)
 		width = info->space[spacenum].databytes;
 	if (width < ADDR2BYTE(1, info, spacenum))
@@ -1480,7 +1496,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(cpu);
 	for (i = offset; i <= endoffset; i += 16)
 	{
 		char output[200];
@@ -1498,9 +1514,9 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ, &curaddr))
+						if (info->translate == NULL || (*info->translate)(cpu, spacenum, TRANSLATE_READ, &curaddr))
 						{
-							UINT8 byte = debug_read_byte(ref, i + j, TRUE);
+							UINT8 byte = debug_read_byte(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %02X", byte);
 						}
 						else
@@ -1517,9 +1533,9 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+						if (info->translate == NULL || (*info->translate)(cpu, spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 						{
-							UINT16 word = debug_read_word(ref, i + j, TRUE);
+							UINT16 word = debug_read_word(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %04X", word);
 						}
 						else
@@ -1536,9 +1552,9 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+						if (info->translate == NULL || (*info->translate)(cpu, spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 						{
-							UINT32 dword = debug_read_dword(ref, i + j, TRUE);
+							UINT32 dword = debug_read_dword(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X", dword);
 						}
 						else
@@ -1555,9 +1571,9 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+						if (info->translate == NULL || (*info->translate)(cpu, spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 						{
-							UINT64 qword = debug_read_qword(ref, i + j, TRUE);
+							UINT64 qword = debug_read_qword(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X%08X", (UINT32)(qword >> 32), (UINT32)qword);
 						}
 						else
@@ -1576,9 +1592,9 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 			for (j = 0; j < 16 && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
-				if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+				if (info->translate == NULL || (*info->translate)(cpu, spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 				{
-					UINT8 byte = debug_read_byte(ref, i + j, TRUE);
+					UINT8 byte = debug_read_byte(space, i + j, TRUE);
 					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 128) ? byte : '.');
 				}
 				else
@@ -1589,7 +1605,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 		/* output the result */
 		fprintf(f, "%s\n", output);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1603,8 +1619,10 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 
 static void execute_find(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length, cpunum = cpu_getactivecpu();
-	const debug_cpu_info *info;
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const address_space *space = cpu_get_address_space(cpu, ref);
+	UINT64 offset, endoffset, length;
+	const cpu_debug_data *info;
 	UINT64 data_to_find[256];
 	UINT8 data_size[256];
 	int cur_data_size;
@@ -1614,18 +1632,18 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 	UINT64 i, j;
 
 	/* validate parameters */
-	if (!debug_command_parameter_number(param[0], &offset))
+	if (space == NULL)
+	{
+		debug_console_printf("Invalid or non-existant address space %s on CPU '%s'\n", address_space_names[ref], cpu->tag);
 		return;
-	if (!debug_command_parameter_number(param[1], &length))
+	}
+	if (!debug_command_parameter_number(machine, param[0], &offset))
+		return;
+	if (!debug_command_parameter_number(machine, param[1], &length))
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
-	{
-		debug_console_printf("Invalid CPU number!\n");
-		return;
-	}
-	info = debug_get_cpu_info(cpunum);
+	info = cpu_get_debug_data(cpu);
 	endoffset = ADDR2BYTE_MASKED(offset + length - 1, info, spacenum);
 	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 	cur_data_size = ADDR2BYTE(1, info, spacenum);
@@ -1662,13 +1680,13 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 				data_size[data_count++] |= 0x10;
 
 			/* otherwise, validate as a number */
-			else if (!debug_command_parameter_number(pdata, &data_to_find[data_count++]))
+			else if (!debug_command_parameter_number(machine, pdata, &data_to_find[data_count++]))
 				return;
 		}
 	}
 
 	/* now search */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(cpu);
 	for (i = offset; i <= endoffset; i += data_size[0])
 	{
 		int suboffset = 0;
@@ -1679,10 +1697,10 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 		{
 			switch (data_size[j])
 			{
-			case 1:	match = ((UINT8)debug_read_byte(spacenum, i + suboffset, TRUE) == (UINT8)data_to_find[j]);	break;
-			case 2:	match = ((UINT16)debug_read_word(spacenum, i + suboffset, TRUE) == (UINT16)data_to_find[j]);	break;
-			case 4:	match = ((UINT32)debug_read_dword(spacenum, i + suboffset, TRUE) == (UINT32)data_to_find[j]);	break;
-			case 8:	match = ((UINT64)debug_read_qword(spacenum, i + suboffset, TRUE) == (UINT64)data_to_find[j]);	break;
+				case 1:	match = ((UINT8)debug_read_byte(space, i + suboffset, TRUE) == (UINT8)data_to_find[j]);	break;
+				case 2:	match = ((UINT16)debug_read_word(space, i + suboffset, TRUE) == (UINT16)data_to_find[j]);	break;
+				case 4:	match = ((UINT32)debug_read_dword(space, i + suboffset, TRUE) == (UINT32)data_to_find[j]);	break;
+				case 8:	match = ((UINT64)debug_read_qword(space, i + suboffset, TRUE) == (UINT64)data_to_find[j]);	break;
 				default:	/* all other cases are wildcards */		break;
 			}
 			suboffset += data_size[j] & 0x0f;
@@ -1695,7 +1713,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 			debug_console_printf("Found at %*X\n", info->space[spacenum].logchars, (UINT32)BYTE2ADDR(i, info, spacenum));
 		}
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* print something if not found */
 	if (found == 0)
@@ -1709,33 +1727,30 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 
 static void execute_dasm(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, length, bytes = 1, cpunum = cpu_getactivecpu();
-	const debug_cpu_info *info;
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	UINT64 offset, length, bytes = 1;
+	const cpu_debug_data *info;
 	int minbytes, maxbytes, byteswidth;
 	FILE *f = NULL;
 	int i, j;
 
 	/* validate parameters */
-	if (!debug_command_parameter_number(param[1], &offset))
+	if (!debug_command_parameter_number(machine, param[1], &offset))
 		return;
-	if (!debug_command_parameter_number(param[2], &length))
+	if (!debug_command_parameter_number(machine, param[2], &length))
 		return;
-	if (params > 3 && !debug_command_parameter_number(param[3], &bytes))
+	if (params > 3 && !debug_command_parameter_number(machine, param[3], &bytes))
 		return;
-	if (params > 4 && !debug_command_parameter_number(param[4], &cpunum))
+	if (params > 4 && !debug_command_parameter_cpu(machine, param[4], &cpu))
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
-	{
-		debug_console_printf("Invalid CPU number!\n");
-		return;
-	}
-	info = debug_get_cpu_info(cpunum);
+	info = cpu_get_debug_data(cpu);
 
 	/* determine the width of the bytes */
-	minbytes = cpunum_min_instruction_bytes(cpunum);
-	maxbytes = cpunum_max_instruction_bytes(cpunum);
+	minbytes = cpu_get_min_opcode_bytes(cpu);
+	maxbytes = cpu_get_max_opcode_bytes(cpu);
 	byteswidth = 0;
 	if (bytes)
 	{
@@ -1752,7 +1767,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(cpu);
 	for (i = 0; i < length; )
 	{
 		int pcbyte = ADDR2BYTE_MASKED(offset + i, info, ADDRESS_SPACE_PROGRAM);
@@ -1767,19 +1782,19 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
-		if (info->translate == NULL || (*info->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &tempaddr))
+		if (info->translate == NULL || (*info->translate)(info->device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &tempaddr))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
 			/* fetch the bytes up to the maximum */
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, FALSE);
-				argbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, TRUE);
+				opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, FALSE);
+				argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 			}
 
 			/* disassemble the result */
-			i += numbytes = activecpu_dasm(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			i += numbytes = cpu_dasm(cpu, disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* print the bytes */
@@ -1791,23 +1806,23 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 			{
 				case 1:
 					for (j = 0; j < numbytes; j++)
-						outdex += sprintf(&output[outdex], "%02X ", (UINT32)debug_read_opcode(pcbyte + j, 1, FALSE));
+						outdex += sprintf(&output[outdex], "%02X ", (UINT32)debug_read_opcode(space, pcbyte + j, 1, FALSE));
 					break;
 
 				case 2:
 					for (j = 0; j < numbytes; j += 2)
-						outdex += sprintf(&output[outdex], "%04X ", (UINT32)debug_read_opcode(pcbyte + j, 2, FALSE));
+						outdex += sprintf(&output[outdex], "%04X ", (UINT32)debug_read_opcode(space, pcbyte + j, 2, FALSE));
 					break;
 
 				case 4:
 					for (j = 0; j < numbytes; j += 4)
-						outdex += sprintf(&output[outdex], "%08X ", (UINT32)debug_read_opcode(pcbyte + j, 4, FALSE));
+						outdex += sprintf(&output[outdex], "%08X ", (UINT32)debug_read_opcode(space, pcbyte + j, 4, FALSE));
 					break;
 
 				case 8:
 					for (j = 0; j < numbytes; j += 8)
 					{
-						UINT64 val = debug_read_opcode(pcbyte + j, 8, FALSE);
+						UINT64 val = debug_read_opcode(space, pcbyte + j, 8, FALSE);
 						outdex += sprintf(&output[outdex], "%08X%08X ", (UINT32)(val >> 32), (UINT32)val);
 					}
 					break;
@@ -1821,7 +1836,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		sprintf(&output[outdex], "%s", disasm);
 
 		/* attempt to add the comment */
-		comment = debug_comment_get_text(cpunum, tempaddr, debug_comment_get_opcode_crc32(tempaddr));
+		comment = debug_comment_get_text(cpu, tempaddr, debug_comment_get_opcode_crc32(cpu, tempaddr));
 		if (comment != NULL)
 		{
 			/* somewhat arbitrary guess as to how long most disassembly lines will be [column 60] */
@@ -1841,7 +1856,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		/* output the result */
 		fprintf(f, "%s\n", output);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1856,27 +1871,20 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 
 static void execute_trace_internal(running_machine *machine, int ref, int params, const char *param[], int trace_over)
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
 	const char *action = NULL, *filename = param[0];
 	FILE *f = NULL;
 	const char *mode;
-	UINT64 cpunum;
-
-	cpunum = cpu_getactivecpu();
 
 	/* validate parameters */
-	if (params > 1 && !debug_command_parameter_number(param[1], &cpunum))
+	if (params > 1 && !debug_command_parameter_cpu(machine, param[1], &cpu))
 		return;
 	if (params > 2 && !debug_command_parameter_command(machine, action = param[2]))
 		return;
 
 	/* further validation */
-	if (!mame_stricmp(filename, "off"))
+	if (mame_stricmp(filename, "off") == 0)
 		filename = NULL;
-	if (cpunum >= cpu_gettotalcpu())
-	{
-		debug_console_printf("Invalid CPU number!\n");
-		return;
-	}
 
 	/* open the file */
 	if (filename)
@@ -1899,11 +1907,11 @@ static void execute_trace_internal(running_machine *machine, int ref, int params
 	}
 
 	/* do it */
-	debug_cpu_trace(cpunum, f, trace_over, action);
+	debug_cpu_trace(cpu, f, trace_over, action);
 	if (f)
-		debug_console_printf("Tracing CPU %d to file %s\n", (int)cpunum, filename);
+		debug_console_printf("Tracing CPU '%s' to file %s\n", cpu->tag, filename);
 	else
-		debug_console_printf("Stopped tracing on CPU %d\n", (int)cpunum);
+		debug_console_printf("Stopped tracing on CPU '%s'\n", cpu->tag);
 }
 
 
@@ -1933,7 +1941,7 @@ static void execute_traceover(running_machine *machine, int ref, int params, con
 
 static void execute_traceflush(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_flush_traces();
+	debug_cpu_flush_traces(machine);
 }
 
 
@@ -1943,36 +1951,30 @@ static void execute_traceflush(running_machine *machine, int ref, int params, co
 
 static void execute_history(running_machine *machine, int ref, int params, const char *param[])
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	UINT64 count = DEBUG_HISTORY_SIZE;
-	const debug_cpu_info *info;
-	UINT64 cpunum;
+	const cpu_debug_data *info;
 	int i;
 
-	cpunum = cpu_getactivecpu();
-
 	/* validate parameters */
-	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
+	if (params > 0 && !debug_command_parameter_cpu(machine, param[0], &cpu))
 		return;
-	if (params > 1 && !debug_command_parameter_number(param[1], &count))
+	if (params > 1 && !debug_command_parameter_number(machine, param[1], &count))
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
-	{
-		debug_console_printf("Invalid CPU number!\n");
-		return;
-	}
 	if (count > DEBUG_HISTORY_SIZE)
 		count = DEBUG_HISTORY_SIZE;
 
-	info = debug_get_cpu_info(cpunum);
+	info = cpu_get_debug_data(cpu);
 
 	/* loop over lines */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(cpu);
 	for (i = 0; i < count; i++)
 	{
 		offs_t pc = info->pc_history[(info->pc_history_index + DEBUG_HISTORY_SIZE - count + i) % DEBUG_HISTORY_SIZE];
-		int maxbytes = activecpu_max_instruction_bytes();
+		int maxbytes = cpu_get_max_opcode_bytes(cpu);
 		UINT8 opbuf[64], argbuf[64];
 		char buffer[200];
 		offs_t pcbyte;
@@ -1982,15 +1984,15 @@ static void execute_history(running_machine *machine, int ref, int params, const
 		pcbyte = ADDR2BYTE_MASKED(pc, info, ADDRESS_SPACE_PROGRAM);
 		for (numbytes = 0; numbytes < maxbytes; numbytes++)
 		{
-			opbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, FALSE);
-			argbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, TRUE);
+			opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, FALSE);
+			argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 		}
 
-		activecpu_dasm(buffer, pc, opbuf, argbuf);
+		cpu_dasm(cpu, buffer, pc, opbuf, argbuf);
 
 		debug_console_printf("%0*X: %s\n", info->space[ADDRESS_SPACE_PROGRAM].logchars, pc, buffer);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -2059,16 +2061,17 @@ static void execute_source(running_machine *machine, int ref, int params, const 
 
 static void execute_map(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 address, cpunum = cpu_getactivecpu();
-	const debug_cpu_info *info;
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const cpu_debug_data *info;
 	int spacenum = ref;
 	offs_t taddress;
+	UINT64 address;
 	int intention;
 
 	/* validate parameters */
-	if (!debug_command_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(machine, param[0], &address))
 		return;
-	info = debug_get_cpu_info(cpunum);
+	info = cpu_get_debug_data(cpu);
 
 	/* do the translation first */
 	for (intention = TRANSLATE_READ_DEBUG; intention <= TRANSLATE_FETCH_DEBUG; intention++)
@@ -2077,9 +2080,9 @@ static void execute_map(running_machine *machine, int ref, int params, const cha
 		taddress = ADDR2BYTE_MASKED(address, info, spacenum);
 		if (info->translate != NULL)
 		{
-			if ((*info->translate)(spacenum, intention, &taddress))
+			if ((*info->translate)(info->device, spacenum, intention, &taddress))
 			{
-				const char *mapname = memory_get_handler_string(intention == TRANSLATE_WRITE_DEBUG, cpunum, spacenum, taddress);
+				const char *mapname = memory_get_handler_string(cpu_get_address_space(cpu, spacenum), intention == TRANSLATE_WRITE_DEBUG, taddress);
 				debug_console_printf("%7s: %08X logical == %08X physical -> %s\n", intnames[intention & 3], (UINT32)address, BYTE2ADDR(taddress, info, spacenum), mapname);
 			}
 			else
@@ -2087,7 +2090,7 @@ static void execute_map(running_machine *machine, int ref, int params, const cha
 		}
 		else
 		{
-			const char *mapname = memory_get_handler_string(intention == TRANSLATE_WRITE_DEBUG, cpunum, spacenum, taddress);
+			const char *mapname = memory_get_handler_string(cpu_get_address_space(cpu, spacenum), intention == TRANSLATE_WRITE_DEBUG, taddress);
 			debug_console_printf("%7s: %08X -> %s\n", intnames[intention & 3], BYTE2ADDR(taddress, info, spacenum), mapname);
 		}
 	}
@@ -2110,7 +2113,7 @@ static void execute_memdump(running_machine *machine, int ref, int params, const
 	file = fopen(filename, "w");
 	if (file)
 	{
-		memory_dump(file);
+		memory_dump(machine, file);
 		fclose(file);
 	}
 }
@@ -2129,25 +2132,25 @@ static int CLIB_DECL symbol_sort_compare(const void *item1, const void *item2)
 
 static void execute_symlist(running_machine *machine, int ref, int params, const char **param)
 {
+	const device_config *cpu = NULL;
 	const char *namelist[1000];
 	symbol_table *symtable;
-	UINT64 cpunum = 100000;
 	int symnum, count = 0;
 
 	/* validate parameters */
-	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
+	if (params > 0 && !debug_command_parameter_cpu(machine, param[0], &cpu))
 		return;
-	if (cpunum != 100000 && cpunum >= cpu_gettotalcpu())
-	{
-		debug_console_printf("Invalid CPU number!\n");
-		return;
-	}
-	symtable = (cpunum == 100000) ? global_symtable : debug_get_cpu_info(cpunum)->symtable;
 
-	if (symtable == global_symtable)
-		debug_console_printf("Global symbols:\n");
+	if (cpu != NULL)
+	{
+		symtable = debug_cpu_get_symtable(cpu);
+		debug_console_printf("CPU '%s' symbols:\n", cpu->tag);
+	}
 	else
-		debug_console_printf("CPU #%d symbols:\n", (UINT32)cpunum);
+	{
+		symtable = debug_cpu_get_global_symtable(machine);
+		debug_console_printf("Global symbols:\n");
+	}
 
 	/* gather names for all symbols */
 	for (symnum = 0; symnum < 100000; symnum++)
@@ -2176,7 +2179,7 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	for (symnum = 0; symnum < count; symnum++)
 	{
 		const symbol_entry *entry = symtable_find(symtable, namelist[symnum]);
-		UINT64 value = (*entry->info.reg.getter)(entry->ref);
+		UINT64 value = (*entry->info.reg.getter)(symtable_get_globalref(entry->table), entry->ref);
 		assert(entry != NULL);
 
 		/* only display "register" type symbols */

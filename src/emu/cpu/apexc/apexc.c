@@ -325,7 +325,6 @@ field:      X address   D           Function    Y address   D (part 2)
 
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "apexc.h"
 
 typedef struct
@@ -340,6 +339,10 @@ typedef struct
 
 	int running;	/* 1 flag: */
 				/* running: flag implied by the existence of the stop instruction */
+
+	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 } apexc_regs;
 
 static apexc_regs apexc;
@@ -448,12 +451,12 @@ static void word_write(int address, UINT32 data, UINT32 mask)
 
 static int papertape_read(void)
 {
-	return io_read_byte_8be(0) & 0x1f;
+	return memory_read_byte_8be(apexc.io, 0) & 0x1f;
 }
 
 static void papertape_punch(int data)
 {
-	io_write_byte_8be(0, data);
+	memory_write_byte_8be(apexc.io, 0, data);
 }
 
 /*
@@ -770,6 +773,9 @@ special_fetch:
 
 static CPU_INIT( apexc )
 {
+	apexc.device = device;
+	apexc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	apexc.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_RESET( apexc )
@@ -803,7 +809,7 @@ static CPU_EXECUTE( apexc )
 
 	do
 	{
-		debugger_instruction_hook(Machine, effective_address(apexc.ml));
+		debugger_instruction_hook(device, effective_address(apexc.ml));
 
 		if (apexc.running)
 			execute();
@@ -902,20 +908,20 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(apexc);			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &apexc_ICount;			break;
 
-	case CPUINFO_STR_NAME:							strcpy(info->s = cpuintrf_temp_str(), "APEXC"); break;
-	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s = cpuintrf_temp_str(), "APEC"); break;
-	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "1.0"); break;
-	case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__); break;
-	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "Raphael Nabet"); break;
+	case CPUINFO_STR_NAME:							strcpy(info->s, "APEXC"); break;
+	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "APEC"); break;
+	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0"); break;
+	case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__); break;
+	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Raphael Nabet"); break;
 
-	case CPUINFO_STR_FLAGS:							sprintf(info->s = cpuintrf_temp_str(), "%c", (apexc.running) ? 'R' : 'S'); break;
+	case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c", (apexc.running) ? 'R' : 'S'); break;
 
-	case CPUINFO_STR_REGISTER + APEXC_CR:			sprintf(info->s = cpuintrf_temp_str(), "CR:%08X", apexc.cr); break;
-	case CPUINFO_STR_REGISTER + APEXC_A:			sprintf(info->s = cpuintrf_temp_str(), "A :%08X", apexc.a); break;
-	case CPUINFO_STR_REGISTER + APEXC_R:			sprintf(info->s = cpuintrf_temp_str(), "R :%08X", apexc.r); break;
-	case CPUINFO_STR_REGISTER + APEXC_ML:			sprintf(info->s = cpuintrf_temp_str(), "ML:%03X", apexc.ml); break;
-	case CPUINFO_STR_REGISTER + APEXC_WS:			sprintf(info->s = cpuintrf_temp_str(), "WS:%01X", apexc.working_store); break;
+	case CPUINFO_STR_REGISTER + APEXC_CR:			sprintf(info->s, "CR:%08X", apexc.cr); break;
+	case CPUINFO_STR_REGISTER + APEXC_A:			sprintf(info->s, "A :%08X", apexc.a); break;
+	case CPUINFO_STR_REGISTER + APEXC_R:			sprintf(info->s, "R :%08X", apexc.r); break;
+	case CPUINFO_STR_REGISTER + APEXC_ML:			sprintf(info->s, "ML:%03X", apexc.ml); break;
+	case CPUINFO_STR_REGISTER + APEXC_WS:			sprintf(info->s, "WS:%01X", apexc.working_store); break;
 
-	case CPUINFO_STR_REGISTER + APEXC_STATE:		sprintf(info->s = cpuintrf_temp_str(), "CPU state:%01X", apexc.running ? TRUE : FALSE); break;
+	case CPUINFO_STR_REGISTER + APEXC_STATE:		sprintf(info->s, "CPU state:%01X", apexc.running ? TRUE : FALSE); break;
 	}
 }

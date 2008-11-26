@@ -8,6 +8,8 @@
 
 #include "mips3com.h"
 #include "deprecat.h"
+#include "cpuexec.h"
+#include "mame.h"
 
 
 /***************************************************************************
@@ -69,8 +71,9 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
     structure based on the configured type
 -------------------------------------------------*/
 
-void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, const mips3_config *config, cpu_irq_callback irqcallback)
+void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
+	const mips3_config *config = device->static_config;
 	int tlbindex;
 
 	/* initialize based on the config */
@@ -80,34 +83,35 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	mips->cpu_clock = clock;
 	mips->irq_callback = irqcallback;
 	mips->device = device;
+	mips->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	mips->icache_size = config->icache;
 	mips->dcache_size = config->dcache;
 	mips->system_clock = config->system_clock;
 
 	/* set up the endianness */
-	mips->memory = *memory_get_accessors(ADDRESS_SPACE_PROGRAM, 32, mips->bigendian ? CPU_IS_BE : CPU_IS_LE);
+	mips->memory = mips->program->accessors;
 
 	/* allocate the virtual TLB */
-	mips->vtlb = vtlb_alloc(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, 2 * MIPS3_TLB_ENTRIES + 2, 0);
+	mips->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, 2 * MIPS3_TLB_ENTRIES + 2, 0);
 
 	/* allocate a timer for the compare interrupt */
-	mips->compare_int_timer = timer_alloc(compare_int_callback, NULL);
+	mips->compare_int_timer = timer_alloc(compare_int_callback, (void *)device);
 
 	/* reset the state */
 	mips3com_reset(mips);
 
 	/* register for save states */
-	state_save_register_item("mips3", index, mips->pc);
-	state_save_register_item_array("mips3", index, mips->r);
-	state_save_register_item_2d_array("mips3", index, mips->cpr);
-	state_save_register_item_2d_array("mips3", index, mips->ccr);
-	state_save_register_item("mips3", index, mips->llbit);
-	state_save_register_item("mips3", index, mips->count_zero_time);
+	state_save_register_item("mips3", device->tag, 0, mips->pc);
+	state_save_register_item_array("mips3", device->tag, 0, mips->r);
+	state_save_register_item_2d_array("mips3", device->tag, 0, mips->cpr);
+	state_save_register_item_2d_array("mips3", device->tag, 0, mips->ccr);
+	state_save_register_item("mips3", device->tag, 0, mips->llbit);
+	state_save_register_item("mips3", device->tag, 0, mips->count_zero_time);
 	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
 	{
-		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].page_mask);
-		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_hi);
-		state_save_register_item_array("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_lo);
+		state_save_register_item("mips3", device->tag, tlbindex, mips->tlb[tlbindex].page_mask);
+		state_save_register_item("mips3", device->tag, tlbindex, mips->tlb[tlbindex].entry_hi);
+		state_save_register_item_array("mips3", device->tag, tlbindex, mips->tlb[tlbindex].entry_lo);
 	}
 }
 
@@ -140,7 +144,7 @@ void mips3com_reset(mips3_state *mips)
 	mips->cpr[0][COP0_Count] = 0;
 	mips->cpr[0][COP0_Config] = compute_config_register(mips);
 	mips->cpr[0][COP0_PRId] = compute_prid_register(mips);
-	mips->count_zero_time = activecpu_gettotalcycles();
+	mips->count_zero_time = cpu_get_total_cycles(mips->device);
 
 	/* initialize the TLB state */
 	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
@@ -187,14 +191,14 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 	/* modify the timer to go off */
 	if (mips->compare_armed && (mips->cpr[0][COP0_Status] & SR_IMEX5))
 	{
-		UINT32 count = (activecpu_gettotalcycles() - mips->count_zero_time) / 2;
+		UINT32 count = (cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
 		UINT32 delta = compare - count;
-		attotime newtime = ATTOTIME_IN_CYCLES(((UINT64)delta * 2), cpu_getactivecpu());
-		timer_adjust_oneshot(mips->compare_int_timer, newtime, cpu_getactivecpu());
+		attotime newtime = ATTOTIME_IN_CYCLES(((UINT64)delta * 2), cpu_get_index(mips->device));
+		timer_adjust_oneshot(mips->compare_int_timer, newtime, 0);
 		return;
 	}
-	timer_adjust_oneshot(mips->compare_int_timer, attotime_never, cpu_getactivecpu());
+	timer_adjust_oneshot(mips->compare_int_timer, attotime_never, 0);
 }
 
 
@@ -284,7 +288,7 @@ void mips3com_tlbwr(mips3_state *mips)
 
 	/* "random" is based off of the current cycle counting through the non-wired pages */
 	if (unwired > 0)
-		tlbindex = ((activecpu_gettotalcycles() - mips->count_zero_time) % unwired + wired) & 0x3f;
+		tlbindex = ((cpu_get_total_cycles(mips->device) - mips->count_zero_time) % unwired + wired) & 0x3f;
 
 	/* use the common handler to write to this tlbindex */
 	tlb_write_common(mips, tlbindex);
@@ -474,7 +478,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MIPS3_SR:			info->i = mips->cpr[0][COP0_Status];	break;
 		case CPUINFO_INT_REGISTER + MIPS3_EPC:			info->i = mips->cpr[0][COP0_EPC];		break;
 		case CPUINFO_INT_REGISTER + MIPS3_CAUSE:		info->i = mips->cpr[0][COP0_Cause];		break;
-		case CPUINFO_INT_REGISTER + MIPS3_COUNT:		info->i = ((activecpu_gettotalcycles() - mips->count_zero_time) / 2); break;
+		case CPUINFO_INT_REGISTER + MIPS3_COUNT:		info->i = ((cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2); break;
 		case CPUINFO_INT_REGISTER + MIPS3_COMPARE:		info->i = mips->cpr[0][COP0_Compare];	break;
 		case CPUINFO_INT_REGISTER + MIPS3_INDEX:		info->i = mips->cpr[0][COP0_Index];		break;
 		case CPUINFO_INT_REGISTER + MIPS3_RANDOM:		info->i = mips->cpr[0][COP0_Random];	break;
@@ -546,7 +550,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + MIPS3_SR:			sprintf(info->s, "SR: %08X", (UINT32)mips->cpr[0][COP0_Status]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_EPC:			sprintf(info->s, "EPC:%08X", (UINT32)mips->cpr[0][COP0_EPC]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_CAUSE: 		sprintf(info->s, "Cause:%08X", (UINT32)mips->cpr[0][COP0_Cause]); break;
-		case CPUINFO_STR_REGISTER + MIPS3_COUNT: 		sprintf(info->s, "Count:%08X", (UINT32)((activecpu_gettotalcycles() - mips->count_zero_time) / 2)); break;
+		case CPUINFO_STR_REGISTER + MIPS3_COUNT: 		sprintf(info->s, "Count:%08X", (UINT32)((cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2)); break;
 		case CPUINFO_STR_REGISTER + MIPS3_COMPARE:		sprintf(info->s, "Compare:%08X", (UINT32)mips->cpr[0][COP0_Compare]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_INDEX:		sprintf(info->s, "Index:%08X", (UINT32)mips->cpr[0][COP0_Index]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_RANDOM:		sprintf(info->s, "Random:%08X", (UINT32)mips->cpr[0][COP0_Random]); break;
@@ -705,7 +709,8 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 
 static TIMER_CALLBACK( compare_int_callback )
 {
-	cpunum_set_input_line(machine, param, MIPS3_IRQ5, ASSERT_LINE);
+	const device_config *device = ptr;
+	cpu_set_input_line(device, MIPS3_IRQ5, ASSERT_LINE);
 }
 
 

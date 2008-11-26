@@ -933,8 +933,8 @@ static WRITE8_DEVICE_HANDLER( n7751_command_w )
         D3    = /INT line
     */
 	n7751_command = data & 0x07;
-	cpunum_set_input_line(device->machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	cpu_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(device->machine->cpu[1], 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -952,7 +952,7 @@ static WRITE8_HANDLER( n7751_rom_offset_w )
 static WRITE8_HANDLER( n7751_rom_select_w )
 {
 	/* P7 - ROM selects */
-	int numroms = memory_region_length(machine, "n7751") / 0x1000;
+	int numroms = memory_region_length(space->machine, "n7751") / 0x1000;
 	sound_addr &= 0xfff;
 	if (!(data & 0x01) && numroms >= 1) sound_addr |= 0x0000;
 	if (!(data & 0x02) && numroms >= 2) sound_addr |= 0x1000;
@@ -964,7 +964,7 @@ static WRITE8_HANDLER( n7751_rom_select_w )
 static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
-	return memory_region(machine, "n7751")[sound_addr];
+	return memory_region(space->machine, "n7751")[sound_addr];
 }
 
 

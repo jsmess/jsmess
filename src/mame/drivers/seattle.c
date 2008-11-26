@@ -468,11 +468,11 @@ static UINT32 cmos_write_enabled;
  *
  *************************************/
 
-static void vblank_assert(running_machine *machine, int state);
+static void vblank_assert(const device_config *device, int state);
 static void update_vblank_irq(running_machine *machine);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
-static void galileo_perform_dma(running_machine *machine, int which);
+static void galileo_perform_dma(const address_space *space, int which);
 static void voodoo_stall(const device_config *device, int stall);
 static void widget_reset(running_machine *machine);
 static void update_widget_irq(running_machine *machine);
@@ -511,20 +511,20 @@ static MACHINE_START( seattle )
 	galileo.timer[3].timer = timer_alloc(galileo_timer_callback, NULL);
 
 	/* set the fastest DRC options, but strict verification */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* register for save states */
 	state_save_register_global_array(galileo.reg);
@@ -535,8 +535,8 @@ static MACHINE_START( seattle )
 	state_save_register_global_array(galileo.pci_ide_regs);
 	for (index = 0; index < ARRAY_LENGTH(galileo.timer); index++)
 	{
-		state_save_register_item("galileo", index, galileo.timer[index].count);
-		state_save_register_item("galileo", index, galileo.timer[index].active);
+		state_save_register_item("galileo", NULL, index, galileo.timer[index].count);
+		state_save_register_item("galileo", NULL, index, galileo.timer[index].active);
 	}
 	state_save_register_global(widget.ethernet_addr);
 	state_save_register_global(widget.irq_num);
@@ -567,15 +567,15 @@ static MACHINE_RESET( seattle )
 	cpu_stalled_on_voodoo = FALSE;
 
 	/* reset either the DCS2 board or the CAGE board */
-	if (mame_find_cpu_index(machine, "dcs2") != -1)
+	if (cputag_get_cpu(machine, "dcs2") != NULL)
 	{
 		dcs_reset_w(1);
 		dcs_reset_w(0);
 	}
-	else if (mame_find_cpu_index(machine, "cage") != -1)
+	else if (cputag_get_cpu(machine, "cage") != NULL)
 	{
-		cage_control_w(0);
-		cage_control_w(3);
+		cage_control_w(machine, 0);
+		cage_control_w(machine, 3);
 	}
 
 	/* reset the other devices */
@@ -594,7 +594,7 @@ static MACHINE_RESET( seattle )
 
 static void ide_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, IDE_IRQ_NUM, state);
+	cpu_set_input_line(device->machine->cpu[0], IDE_IRQ_NUM, state);
 }
 
 
@@ -605,17 +605,22 @@ static void ide_interrupt(const device_config *device, int state)
  *
  *************************************/
 
-static void ethernet_interrupt(running_machine *machine, int state)
+static void ethernet_interrupt_machine(running_machine *machine, int state)
 {
 	ethernet_irq_state = state;
 	if (board_config == FLAGSTAFF_CONFIG)
 	{
 		UINT8 assert = ethernet_irq_state && (*interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
 		if (ethernet_irq_num != 0)
-			cpunum_set_input_line(machine, 0, ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else if (board_config == SEATTLE_WIDGET_CONFIG)
 		update_widget_irq(machine);
+}
+
+static void ethernet_interrupt(const device_config *device, int state)
+{
+	ethernet_interrupt_machine(device->machine, state);
 }
 
 
@@ -628,7 +633,7 @@ static void ethernet_interrupt(running_machine *machine, int state)
 
 static void ioasic_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, IOASIC_IRQ_NUM, state);
+	cpu_set_input_line(machine->cpu[0], IOASIC_IRQ_NUM, state);
 }
 
 
@@ -650,7 +655,7 @@ static READ32_HANDLER( interrupt_state_r )
 
 static READ32_HANDLER( interrupt_state2_r )
 {
-	UINT32 result = interrupt_state_r(machine, offset, mem_mask);
+	UINT32 result = interrupt_state_r(space, offset, mem_mask);
 	result |= vblank_state << 8;
 	return result;
 }
@@ -663,7 +668,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 
 	/* VBLANK: clear anything pending on the old IRQ */
 	if (vblank_irq_num != 0)
-		cpunum_set_input_line(machine, 0, vblank_irq_num, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], vblank_irq_num, CLEAR_LINE);
 
 	/* VBLANK: compute the new IRQ vector */
 	irq = (*interrupt_config >> (2*VBLANK_IRQ_SHIFT)) & 3;
@@ -674,7 +679,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Widget: clear anything pending on the old IRQ */
 		if (widget.irq_num != 0)
-			cpunum_set_input_line(machine, 0, widget.irq_num, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], widget.irq_num, CLEAR_LINE);
 
 		/* Widget: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*WIDGET_IRQ_SHIFT)) & 3;
@@ -686,7 +691,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Ethernet: clear anything pending on the old IRQ */
 		if (ethernet_irq_num != 0)
-			cpunum_set_input_line(machine, 0, ethernet_irq_num, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], ethernet_irq_num, CLEAR_LINE);
 
 		/* Ethernet: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*ETHERNET_IRQ_SHIFT)) & 3;
@@ -694,8 +699,8 @@ static WRITE32_HANDLER( interrupt_config_w )
 	}
 
 	/* update the states */
-	update_vblank_irq(machine);
-	ethernet_interrupt(machine, ethernet_irq_state);
+	update_vblank_irq(space->machine);
+	ethernet_interrupt_machine(space->machine, ethernet_irq_state);
 }
 
 
@@ -706,9 +711,9 @@ static WRITE32_HANDLER( seattle_interrupt_enable_w )
 	if (old != *interrupt_enable)
 	{
 		if (vblank_latch)
-			update_vblank_irq(machine);
+			update_vblank_irq(space->machine);
 		if (ethernet_irq_state)
-			ethernet_interrupt(machine, ethernet_irq_state);
+			ethernet_interrupt_machine(space->machine, ethernet_irq_state);
 	}
 }
 
@@ -731,7 +736,7 @@ static void update_vblank_irq(running_machine *machine)
 	/* if the VBLANK has been latched, and the interrupt is enabled, assert */
 	if (vblank_latch && (*interrupt_enable & (1 << VBLANK_IRQ_SHIFT)))
 		state = ASSERT_LINE;
-	cpunum_set_input_line(machine, 0, vblank_irq_num, state);
+	cpu_set_input_line(machine->cpu[0], vblank_irq_num, state);
 }
 
 
@@ -739,11 +744,11 @@ static WRITE32_HANDLER( vblank_clear_w )
 {
 	/* clear the latch and update the IRQ */
 	vblank_latch = 0;
-	update_vblank_irq(machine);
+	update_vblank_irq(space->machine);
 }
 
 
-static void vblank_assert(running_machine *machine, int state)
+static void vblank_assert(const device_config *device, int state)
 {
 	/* cache the raw state */
 	vblank_state = state;
@@ -752,7 +757,7 @@ static void vblank_assert(running_machine *machine, int state)
 	if ((state && !(*interrupt_enable & 0x100)) || (!state && (*interrupt_enable & 0x100)))
 	{
 		vblank_latch = 1;
-		update_vblank_irq(machine);
+		update_vblank_irq(device->machine);
 	}
 }
 
@@ -764,7 +769,7 @@ static void vblank_assert(running_machine *machine, int state)
  *
  *************************************/
 
-static UINT32 pci_bridge_r(UINT8 reg, UINT8 type)
+static UINT32 pci_bridge_r(running_machine *machine, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_bridge_regs[reg];
 
@@ -780,16 +785,16 @@ static UINT32 pci_bridge_r(UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, result);
+		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_bridge_w(UINT8 reg, UINT8 type, UINT32 data)
+static void pci_bridge_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
 }
 
 
@@ -800,7 +805,7 @@ static void pci_bridge_w(UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static UINT32 pci_3dfx_r(UINT8 reg, UINT8 type)
+static UINT32 pci_3dfx_r(running_machine *machine, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_3dfx_regs[reg];
 
@@ -816,12 +821,12 @@ static UINT32 pci_3dfx_r(UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, result);
+		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_3dfx_w(UINT8 reg, UINT8 type, UINT32 data)
+static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_3dfx_regs[reg] = data;
 
@@ -838,7 +843,7 @@ static void pci_3dfx_w(UINT8 reg, UINT8 type, UINT32 data)
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, data);
+		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
 }
 
 
@@ -849,7 +854,7 @@ static void pci_3dfx_w(UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static UINT32 pci_ide_r(UINT8 reg, UINT8 type)
+static UINT32 pci_ide_r(running_machine *machine, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_ide_regs[reg];
 
@@ -865,16 +870,16 @@ static UINT32 pci_ide_r(UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, result);
+		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_ide_w(UINT8 reg, UINT8 type, UINT32 data)
+static void pci_ide_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
 }
 
 
@@ -892,7 +897,7 @@ static void update_galileo_irqs(running_machine *machine)
 	/* if any unmasked interrupts are live, we generate */
 	if (galileo.reg[GREG_INT_STATE] & galileo.reg[GREG_INT_MASK])
 		state = ASSERT_LINE;
-	cpunum_set_input_line(machine, 0, GALILEO_IRQ_NUM, state);
+	cpu_set_input_line(machine->cpu[0], GALILEO_IRQ_NUM, state);
 
 	if (LOG_GALILEO)
 		logerror("Galileo IRQ %s\n", (state == ASSERT_LINE) ? "asserted" : "cleared");
@@ -931,7 +936,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
  *
  *************************************/
 
-static int galileo_dma_fetch_next(running_machine *machine, int which)
+static int galileo_dma_fetch_next(const address_space *space, int which)
 {
 	offs_t address = 0;
 	UINT32 data;
@@ -946,32 +951,32 @@ static int galileo_dma_fetch_next(running_machine *machine, int which)
 		if (galileo.reg[GREG_DMA0_CONTROL + which] & 0x400)
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(machine);
+			update_galileo_irqs(space->machine);
 		}
 		galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 		return 0;
 	}
 
 	/* fetch the byte count */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_COUNT + which] = data;
 
 	/* fetch the source address */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_SOURCE + which] = data;
 
 	/* fetch the dest address */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_DEST + which] = data;
 
 	/* fetch the next record address */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_NEXT + which] = data;
 	return 1;
 }
 
 
-static void galileo_perform_dma(running_machine *machine, int which)
+static void galileo_perform_dma(const address_space *space, int which)
 {
 	do
 	{
@@ -1022,7 +1027,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(voodoo_device, (dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0xffffffff);
+				voodoo_w(voodoo_device, (dstaddr & 0xffffff) / 4, memory_read_dword(space, srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1034,7 +1039,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 		{
 			while (bytesleft > 0)
 			{
-				program_write_byte(dstaddr, program_read_byte(srcaddr));
+				memory_write_byte(space, dstaddr, memory_read_byte(space, srcaddr));
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft--;
@@ -1055,9 +1060,9 @@ static void galileo_perform_dma(running_machine *machine, int which)
 		if (!(galileo.reg[GREG_DMA0_CONTROL + which] & 0x400))
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(machine);
+			update_galileo_irqs(space->machine);
 		}
-	} while (galileo_dma_fetch_next(machine, which));
+	} while (galileo_dma_fetch_next(space, which));
 
 	galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 }
@@ -1099,10 +1104,10 @@ static READ32_HANDLER( galileo_r )
 			}
 
 			/* eat some time for those which poll this register */
-			activecpu_eat_cycles(100);
+			cpu_eat_cycles(space->cpu, 100);
 
 			if (LOG_TIMERS)
-				logerror("%08X:hires_timer_r = %08X\n", activecpu_get_pc(), result);
+				logerror("%08X:hires_timer_r = %08X\n", cpu_get_pc(space->cpu), result);
 			break;
 		}
 
@@ -1121,21 +1126,21 @@ static READ32_HANDLER( galileo_r )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				result = pci_bridge_r(reg, type);
+				result = pci_bridge_r(space->machine, reg, type);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				result = pci_3dfx_r(reg, type);
+				result = pci_3dfx_r(space->machine, reg, type);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				result = pci_ide_r(reg, type);
+				result = pci_ide_r(space->machine, reg, type);
 
 			/* anything else, just log */
 			else
 			{
 				result = ~0;
-				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", activecpu_get_pc(), bus, unit, func, reg, type, result);
+				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(space->cpu), bus, unit, func, reg, type, result);
 			}
 			break;
 		}
@@ -1145,11 +1150,11 @@ static READ32_HANDLER( galileo_r )
 		case GREG_INT_MASK:
 		case GREG_TIMER_CONTROL:
 //          if (LOG_GALILEO)
-//              logerror("%08X:Galileo read from offset %03X = %08X\n", activecpu_get_pc(), offset*4, result);
+//              logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			break;
 
 		default:
-			logerror("%08X:Galileo read from offset %03X = %08X\n", activecpu_get_pc(), offset*4, result);
+			logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			break;
 	}
 
@@ -1173,7 +1178,7 @@ static WRITE32_HANDLER( galileo_w )
 			int which = offset % 4;
 
 			if (LOG_DMA)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 
 			/* keep the read only activity bit */
 			galileo.reg[offset] &= ~0x4000;
@@ -1181,12 +1186,12 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* fetch next record */
 			if (data & 0x2000)
-				galileo_dma_fetch_next(machine, which);
+				galileo_dma_fetch_next(space, which);
 			galileo.reg[offset] &= ~0x2000;
 
 			/* if enabling, start the DMA */
 			if (!(oldata & 0x1000) && (data & 0x1000))
-				galileo_perform_dma(machine, which);
+				galileo_perform_dma(space, which);
 			break;
 		}
 
@@ -1203,7 +1208,7 @@ static WRITE32_HANDLER( galileo_w )
 			if (!timer->active)
 				timer->count = data;
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", activecpu_get_pc(), offset % 4, data, timer->count);
+				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", cpu_get_pc(space->cpu), offset % 4, data, timer->count);
 			break;
 		}
 
@@ -1212,7 +1217,7 @@ static WRITE32_HANDLER( galileo_w )
 			int which, mask;
 
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter control = %08X\n", activecpu_get_pc(), data);
+				logerror("%08X:timer/counter control = %08X\n", cpu_get_pc(space->cpu), data);
 			for (which = 0, mask = 0x01; which < 4; which++, mask <<= 2)
 			{
 				galileo_timer *timer = &galileo.timer[which];
@@ -1246,7 +1251,7 @@ static WRITE32_HANDLER( galileo_w )
 			if (LOG_GALILEO)
 				logerror("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
 			galileo.reg[offset] = oldata & data;
-			update_galileo_irqs(machine);
+			update_galileo_irqs(space->machine);
 			break;
 
 		case GREG_CONFIG_DATA:
@@ -1259,19 +1264,19 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				pci_bridge_w(reg, type, data);
+				pci_bridge_w(space->machine, reg, type, data);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				pci_3dfx_w(reg, type, data);
+				pci_3dfx_w(space->machine, reg, type, data);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				pci_ide_w(reg, type, data);
+				pci_ide_w(space->machine, reg, type, data);
 
 			/* anything else, just log */
 			else
-				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", activecpu_get_pc(), bus, unit, func, reg, type, data);
+				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(space->cpu), bus, unit, func, reg, type, data);
 			break;
 		}
 
@@ -1282,11 +1287,11 @@ static WRITE32_HANDLER( galileo_w )
 		case GREG_CONFIG_ADDRESS:
 		case GREG_INT_MASK:
 			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			break;
 
 		default:
-			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -1319,8 +1324,8 @@ static WRITE32_DEVICE_HANDLER( seattle_voodoo_w )
 	cpu_stalled_mem_mask = mem_mask;
 
 	/* spin until we send the magic trigger */
-	cpunum_spinuntil_trigger(0, 45678);
-	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", activecpu_get_pc());
+	cpu_spinuntil_trigger(device->machine->cpu[0], 45678);
+	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(device->machine->activecpu));
 }
 
 
@@ -1339,8 +1344,8 @@ static void voodoo_stall(const device_config *device, int stall)
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", activecpu_get_pc());
-			cpunum_spinuntil_trigger(0, 45678);
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->activecpu));
+			cpu_spinuntil_trigger(device->machine->cpu[0], 45678);
 		}
 	}
 
@@ -1353,15 +1358,16 @@ static void voodoo_stall(const device_config *device, int stall)
 		for (which = 0; which < 4; which++)
 			if (galileo.dma_stalled_on_voodoo[which])
 			{
+				const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */
 				galileo.dma_stalled_on_voodoo[which] = FALSE;
 
 				/* resume execution */
-				cpuintrf_push_context(0);
-				galileo_perform_dma(device->machine, which);
-				cpuintrf_pop_context();
+				cpu_push_context(space->cpu);
+				galileo_perform_dma(space, which);
+				cpu_pop_context();
 				break;
 			}
 
@@ -1375,7 +1381,7 @@ static void voodoo_stall(const device_config *device, int stall)
 
 			/* resume CPU execution */
 			if (LOG_DMA) logerror("Resuming CPU on voodoo\n");
-			cpu_trigger(device->machine, 45678);
+			cpuexec_trigger(device->machine, 45678);
 		}
 	}
 }
@@ -1399,8 +1405,8 @@ static WRITE32_HANDLER( analog_port_w )
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", activecpu_get_pc(), data);
-	pending_analog_read = input_port_read(machine, portnames[data & 7]);
+		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(space->cpu), data);
+	pending_analog_read = input_port_read(space->machine, portnames[data & 7]);
 }
 
 
@@ -1418,39 +1424,39 @@ static READ32_HANDLER( carnevil_gun_r )
 	switch (offset)
 	{
 		case 0:		/* low 8 bits of X */
-			result = (input_port_read(machine, "LIGHT0_X") << 4) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT0_X") << 4) & 0xff;
 			break;
 
 		case 1:		/* upper 4 bits of X */
-			result = (input_port_read(machine, "LIGHT0_X") >> 4) & 0x0f;
-			result |= (input_port_read(machine, "FAKE") & 0x03) << 4;
+			result = (input_port_read(space->machine, "LIGHT0_X") >> 4) & 0x0f;
+			result |= (input_port_read(space->machine, "FAKE") & 0x03) << 4;
 			result |= 0x40;
 			break;
 
 		case 2:		/* low 8 bits of Y */
-			result = (input_port_read(machine, "LIGHT0_Y") << 2) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT0_Y") << 2) & 0xff;
 			break;
 
 		case 3:		/* upper 4 bits of Y */
-			result = (input_port_read(machine, "LIGHT0_Y") >> 6) & 0x03;
+			result = (input_port_read(space->machine, "LIGHT0_Y") >> 6) & 0x03;
 			break;
 
 		case 4:		/* low 8 bits of X */
-			result = (input_port_read(machine, "LIGHT1_X") << 4) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT1_X") << 4) & 0xff;
 			break;
 
 		case 5:		/* upper 4 bits of X */
-			result = (input_port_read(machine, "LIGHT1_X") >> 4) & 0x0f;
-			result |= (input_port_read(machine, "FAKE") & 0x30);
+			result = (input_port_read(space->machine, "LIGHT1_X") >> 4) & 0x0f;
+			result |= (input_port_read(space->machine, "FAKE") & 0x30);
 			result |= 0x40;
 			break;
 
 		case 6:		/* low 8 bits of Y */
-			result = (input_port_read(machine, "LIGHT1_Y") << 2) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT1_Y") << 2) & 0xff;
 			break;
 
 		case 7:		/* upper 4 bits of Y */
-			result = (input_port_read(machine, "LIGHT1_Y") >> 6) & 0x03;
+			result = (input_port_read(space->machine, "LIGHT1_Y") >> 6) & 0x03;
 			break;
 	}
 	return result;
@@ -1511,7 +1517,7 @@ static void update_widget_irq(running_machine *machine)
 
 	/* update the IRQ state */
 	if (widget.irq_num != 0)
-		cpunum_set_input_line(machine, 0, widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1531,7 +1537,7 @@ static READ32_DEVICE_HANDLER( widget_r )
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(device->machine, 0, mem_mask);
+			result = analog_port_r(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1562,7 +1568,7 @@ static WRITE32_DEVICE_HANDLER( widget_w )
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(device->machine, 0, data, mem_mask);
+			analog_port_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1614,7 +1620,7 @@ static READ32_HANDLER( cmos_protect_r )
 
 static WRITE32_HANDLER( seattle_watchdog_w )
 {
-	activecpu_eat_cycles(100);
+	cpu_eat_cycles(space->cpu, 100);
 }
 
 
@@ -1622,13 +1628,13 @@ static WRITE32_HANDLER( asic_reset_w )
 {
 	COMBINE_DATA(asic_reset);
 	if (!(*asic_reset & 0x0002))
-		midway_ioasic_reset(machine);
+		midway_ioasic_reset(space->machine);
 }
 
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(machine, data);
+	midway_ioasic_fifo_w(space->machine, data);
 }
 
 
@@ -2762,22 +2768,22 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00400000, 0x007fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
 			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
-			memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
+			memory_install_readwrite32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
+			memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
 
 			/* set up the ethernet controller */
 			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
-			memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
+			memory_install_readwrite32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			break;
 	}
 
@@ -2785,12 +2791,12 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	speedup_index = 0;
 }
 
-static void add_speedup(offs_t pc, UINT32 op)
+static void add_speedup(running_machine *machine, offs_t pc, UINT32 op)
 {
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
 }
 
 
@@ -2800,9 +2806,9 @@ static DRIVER_INIT( wg3dh )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
-	add_speedup(0x8004413C, 0x0C0054B4);		/* confirmed */
-	add_speedup(0x80094930, 0x00A2102B);		/* confirmed */
-	add_speedup(0x80092984, 0x3C028011);		/* confirmed */
+	add_speedup(machine, 0x8004413C, 0x0C0054B4);		/* confirmed */
+	add_speedup(machine, 0x80094930, 0x00A2102B);		/* confirmed */
+	add_speedup(machine, 0x80092984, 0x3C028011);		/* confirmed */
 }
 
 
@@ -2812,7 +2818,7 @@ static DRIVER_INIT( mace )
 	init_common(machine, MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(0x800108F8, 0x8C420000);		/* confirmed */
+	add_speedup(machine, 0x800108F8, 0x8C420000);		/* confirmed */
 }
 
 
@@ -2822,9 +2828,9 @@ static DRIVER_INIT( sfrush )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	add_speedup(0x80059F34, 0x3C028012);		/* confirmed */
-	add_speedup(0x800A5AF4, 0x8E300010);		/* confirmed */
-	add_speedup(0x8004C260, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x80059F34, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x800A5AF4, 0x8E300010);		/* confirmed */
+	add_speedup(machine, 0x8004C260, 0x3C028012);		/* confirmed */
 }
 
 
@@ -2834,10 +2840,10 @@ static DRIVER_INIT( sfrushrk )
 	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	add_speedup(0x800343E8, 0x3C028012);		/* confirmed */
-	add_speedup(0x8008F4F0, 0x3C028012);		/* confirmed */
-	add_speedup(0x800A365C, 0x8E300014);		/* confirmed */
-	add_speedup(0x80051DAC, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x800343E8, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x8008F4F0, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x800A365C, 0x8E300014);		/* confirmed */
+	add_speedup(machine, 0x80051DAC, 0x3C028012);		/* confirmed */
 }
 
 
@@ -2848,8 +2854,8 @@ static DRIVER_INIT( calspeed )
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
-	add_speedup(0x80032534, 0x02221024);		/* confirmed */
-	add_speedup(0x800B1BE4, 0x8E110014);		/* confirmed */
+	add_speedup(machine, 0x80032534, 0x02221024);		/* confirmed */
+	add_speedup(machine, 0x800B1BE4, 0x8E110014);		/* confirmed */
 }
 
 
@@ -2859,9 +2865,9 @@ static DRIVER_INIT( vaportrx )
 	init_common(machine, MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	add_speedup(0x80049F14, 0x3C028020);		/* confirmed */
-	add_speedup(0x8004859C, 0x3C028020);		/* confirmed */
-	add_speedup(0x8005922C, 0x8E020014);		/* confirmed */
+	add_speedup(machine, 0x80049F14, 0x3C028020);		/* confirmed */
+	add_speedup(machine, 0x8004859C, 0x3C028020);		/* confirmed */
+	add_speedup(machine, 0x8005922C, 0x8E020014);		/* confirmed */
 }
 
 
@@ -2883,8 +2889,8 @@ static DRIVER_INIT( blitz )
 	rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	add_speedup(0x80135510, 0x3C028024);		/* confirmed */
-	add_speedup(0x800087DC, 0x8E820010);		/* confirmed */
+	add_speedup(machine, 0x80135510, 0x3C028024);		/* confirmed */
+	add_speedup(machine, 0x800087DC, 0x8E820010);		/* confirmed */
 }
 
 
@@ -2894,8 +2900,8 @@ static DRIVER_INIT( blitz99 )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(0x8014E41C, 0x3C038025);		/* confirmed */
-	add_speedup(0x80011F10, 0x8E020018);		/* confirmed */
+	add_speedup(machine, 0x8014E41C, 0x3C038025);		/* confirmed */
+	add_speedup(machine, 0x80011F10, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2905,8 +2911,8 @@ static DRIVER_INIT( blitz2k )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(0x8015773C, 0x3C038025);		/* confirmed */
-	add_speedup(0x80012CA8, 0x8E020018);		/* confirmed */
+	add_speedup(machine, 0x8015773C, 0x3C038025);		/* confirmed */
+	add_speedup(machine, 0x80012CA8, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2916,11 +2922,11 @@ static DRIVER_INIT( carnevil )
 	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
+	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
 
 	/* speedups */
-	add_speedup(0x8015176C, 0x3C03801A);		/* confirmed */
-	add_speedup(0x80011FBC, 0x8E020018);		/* confirmed */
+	add_speedup(machine, 0x8015176C, 0x3C03801A);		/* confirmed */
+	add_speedup(machine, 0x80011FBC, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2930,9 +2936,9 @@ static DRIVER_INIT( hyprdriv )
 	init_common(machine, MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	add_speedup(0x801643BC, 0x3C03801B);		/* confirmed */
-	add_speedup(0x80011FB8, 0x8E020018);		/* confirmed */
-	//add_speedup(0x80136A80, 0x3C02801D);      /* potential */
+	add_speedup(machine, 0x801643BC, 0x3C03801B);		/* confirmed */
+	add_speedup(machine, 0x80011FB8, 0x8E020018);		/* confirmed */
+	//add_speedup(machine, 0x80136A80, 0x3C02801D);      /* potential */
 }
 
 

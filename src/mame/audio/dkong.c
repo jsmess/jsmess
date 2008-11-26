@@ -1076,8 +1076,8 @@ Addresses found at @0x510, cpu2
 
 static WRITE8_HANDLER( M58817_command_w )
 {
-	tms5110_ctl_w(machine, 0, data & 0x0f);
-	tms5110_pdc_w(machine, 0, (data>>4) & 0x01);
+	tms5110_ctl_w(space, 0, data & 0x0f);
+	tms5110_pdc_w(space, 0, (data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
 }
 
@@ -1096,7 +1096,7 @@ static WRITE8_HANDLER( dkong_voice_w )
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
-static READ8_HANDLER( dkong_voice_status_r )
+static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 {
 	/* only provided for documentation purposes
      * not actually used
@@ -1111,18 +1111,18 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 
 	if ( page & 0x40 )
 	{
-		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device->machine,0)<<4);
+		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device,0)<<4);
 	}
 	else
 	{
-		/* printf("rom access at pc = %4x\n",activecpu_get_pc()); */
+		/* printf("rom access at pc = %4x\n",cpu_get_pc(machine->activecpu)); */
 		return (state->snd_rom[0x1000+(page & 7)*256+offset]);
 	}
 }
 
 static WRITE8_HANDLER( dkong_p1_w )
 {
-	discrete_sound_w(machine,DS_DAC,data);
+	discrete_sound_w(space,DS_DAC,data);
 }
 
 
@@ -1135,9 +1135,9 @@ static WRITE8_HANDLER( dkong_p1_w )
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 

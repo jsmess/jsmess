@@ -256,10 +256,11 @@ const pia6821_interface joust2_pia_1_intf =
 
 static TIMER_CALLBACK( williams_va11_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_1_cb1_w(machine, 0, scanline & 0x20);
+	pia_1_cb1_w(space, 0, scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -270,15 +271,19 @@ static TIMER_CALLBACK( williams_va11_callback )
 
 static TIMER_CALLBACK( williams_count240_off_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_1_ca1_w(machine, 0, 0);
+	pia_1_ca1_w(space, 0, 0);
 }
 
 
 static TIMER_CALLBACK( williams_count240_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_1_ca1_w(machine, 0, 1);
+	pia_1_ca1_w(space, 0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
@@ -293,14 +298,14 @@ static void williams_main_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void williams_main_firq(running_machine *machine, int state)
 {
 	/* FIRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -309,7 +314,7 @@ static void williams_snd_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(2) | pia_get_irq_b(2);
 
 	/* IRQ to the sound CPU */
-	cpunum_set_input_line(machine, 1, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -325,7 +330,7 @@ static void mysticm_main_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -334,7 +339,7 @@ static void tshoot_main_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -370,8 +375,8 @@ MACHINE_RESET( williams )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the memory bank */
-	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
+	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
 }
 
 
@@ -384,11 +389,12 @@ MACHINE_RESET( williams )
 
 static TIMER_CALLBACK( williams2_va11_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_0_cb1_w(machine, 0, scanline & 0x20);
-	pia_1_ca1_w(machine, 0, scanline & 0x20);
+	pia_0_cb1_w(space, 0, scanline & 0x20);
+	pia_1_ca1_w(space, 0, scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -399,15 +405,19 @@ static TIMER_CALLBACK( williams2_va11_callback )
 
 static TIMER_CALLBACK( williams2_endscreen_off_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_0_ca1_w(machine, 0, 1);
+	pia_0_ca1_w(space, 0, 1);
 }
 
 
 static TIMER_CALLBACK( williams2_endscreen_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_0_ca1_w(machine, 0, 0);
+	pia_0_ca1_w(space, 0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
@@ -426,21 +436,24 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 
 static STATE_POSTLOAD( williams2_postload )
 {
-	williams2_bank_select_w(machine, 0, vram_bank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	williams2_bank_select_w(space, 0, vram_bank);
 }
 
 
 MACHINE_RESET( williams2 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* reset the PIAs */
 	pia_reset();
 
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 4, memory_region(machine, "main") + 0x10000, 0x10000);
+	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, 1, 1, 4, memory_region(machine, "main") + 0x10000, 0x10000);
 
 	/* make sure our banking is reset */
-	williams2_bank_select_w(machine, 0, 0);
+	williams2_bank_select_w(space, 0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	scanline_timer = timer_alloc(williams2_va11_callback, NULL);
@@ -466,7 +479,7 @@ WRITE8_HANDLER( williams_vram_select_w )
 {
 	/* VRAM/ROM banking from bit 0 */
 	vram_bank = data & 0x01;
-	memory_set_bank(1, vram_bank);
+	memory_set_bank(space->machine, 1, vram_bank);
 
 	/* cocktail flip from bit 1 */
 	williams_cocktail = data & 0x02;
@@ -482,26 +495,26 @@ WRITE8_HANDLER( williams2_bank_select_w )
 	{
 		/* page 0 is video ram */
 		case 0:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
-			memory_set_bank(1, 0);
-			memory_set_bankptr(4, &williams_videoram[0x8000]);
+			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
+			memory_set_bank(space->machine, 1, 0);
+			memory_set_bankptr(space->machine, 4, &williams_videoram[0x8000]);
 			break;
 
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
-			memory_set_bank(1, 1 + ((vram_bank & 6) >> 1));
-			memory_set_bankptr(4, &williams_videoram[0x8000]);
+			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
+			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 6) >> 1));
+			memory_set_bankptr(space->machine, 4, &williams_videoram[0x8000]);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4, williams2_paletteram_w);
-			memory_set_bank(1, 1 + ((vram_bank & 4) >> 1));
-			memory_set_bankptr(4, paletteram);
+			memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4, williams2_paletteram_w);
+			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 4) >> 1));
+			memory_set_bankptr(space->machine, 4, paletteram);
 			break;
 	}
 }
@@ -516,30 +529,32 @@ WRITE8_HANDLER( williams2_bank_select_w )
 
 static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 {
-	pia_2_portb_w(machine, 0, param);
-	pia_2_cb1_w(machine, 0, (param == 0xff) ? 0 : 1);
+	const address_space *space = ptr;
+	pia_2_portb_w(space, 0, param);
+	pia_2_cb1_w(space, 0, (param == 0xff) ? 0 : 1);
 }
 
 WRITE8_HANDLER( williams_snd_cmd_w )
 {
 	/* the high two bits are set externally, and should be 1 */
-	timer_call_after_resynch(NULL, data | 0xc0, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch((void *)space, data | 0xc0, williams_deferred_snd_cmd_w);
 }
 
 WRITE8_HANDLER( playball_snd_cmd_w )
 {
-	timer_call_after_resynch(NULL, data, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch((void *)space, data, williams_deferred_snd_cmd_w);
 }
 
 
 static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 {
-	pia_2_porta_w(machine, 0, param);
+	const address_space *space = ptr;
+	pia_2_porta_w(space, 0, param);
 }
 
 static WRITE8_HANDLER( williams2_snd_cmd_w )
 {
-	timer_call_after_resynch(NULL, data, williams2_deferred_snd_cmd_w);
+	timer_call_after_resynch((void *)space, data, williams2_deferred_snd_cmd_w);
 }
 
 
@@ -593,16 +608,16 @@ CUSTOM_INPUT( williams_mux_r )
 READ8_HANDLER( williams_49way_port_0_r )
 {
 	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[input_port_read(machine, "49WAYX") >> 4] << 4) | translate49[input_port_read(machine, "49WAYY") >> 4];
+	return (translate49[input_port_read(space->machine, "49WAYX") >> 4] << 4) | translate49[input_port_read(space->machine, "49WAYY") >> 4];
 }
 
 
 READ8_HANDLER( williams_input_port_49way_0_5_r )
 {
 	if (port_select)
-		return williams_49way_port_0_r(machine,0);
+		return williams_49way_port_0_r(space,0);
 	else
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 }
 
 
@@ -638,7 +653,7 @@ WRITE8_HANDLER( williams_watchdog_reset_w )
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
-		watchdog_reset_w(machine,0,0);
+		watchdog_reset_w(space,0,0);
 }
 
 
@@ -646,7 +661,7 @@ WRITE8_HANDLER( williams2_watchdog_reset_w )
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
-		watchdog_reset_w(machine,0,0);
+		watchdog_reset_w(space,0,0);
 }
 
 
@@ -700,17 +715,20 @@ WRITE8_HANDLER( williams2_7segment_w )
 
 static STATE_POSTLOAD( defender_postload )
 {
-	defender_bank_select_w(machine, 0, vram_bank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	defender_bank_select_w(space, 0, vram_bank);
 }
 
 
 MACHINE_RESET( defender )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(1, 0, 9, &memory_region(machine, "main")[0x10000], 0x1000);
-	defender_bank_select_w(machine, 0, 0);
+	memory_configure_bank(machine, 1, 0, 9, &memory_region(machine, "main")[0x10000], 0x1000);
+	defender_bank_select_w(space, 0, 0);
 
 	state_save_register_postload(machine, defender_postload, NULL);
 }
@@ -731,7 +749,7 @@ WRITE8_HANDLER( defender_bank_select_w )
 	{
 		/* page 0 is I/O space */
 		case 0:
-			defender_install_io_space(machine);
+			defender_install_io_space(space);
 			break;
 
 		/* pages 1-9 map to ROM banks */
@@ -744,13 +762,13 @@ WRITE8_HANDLER( defender_bank_select_w )
 		case 7:
 		case 8:
 		case 9:
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-			memory_set_bank(1, vram_bank - 1);
+			memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+			memory_set_bank(space->machine, 1, vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
 		default:
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_NOP, SMH_NOP);
+			memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_NOP, SMH_NOP);
 			break;
 	}
 }
@@ -768,7 +786,7 @@ READ8_HANDLER( mayday_protection_r )
 	/* Mayday does some kind of protection check that is not currently understood  */
 	/* However, the results of that protection check are stored at $a190 and $a191 */
 	/* These are compared against $a193 and $a194, respectively. Thus, to prevent  */
-	/* the protection from resetting the machine, we just return $a193 for $a190,  */
+	/* the protection from resetting the space->machine, we just return $a193 for $a190,  */
 	/* and $a194 for $a191. */
 	return mayday_protection[offset + 3];
 }
@@ -784,7 +802,7 @@ READ8_HANDLER( mayday_protection_r )
 WRITE8_HANDLER( sinistar_vram_select_w )
 {
 	/* low two bits are standard */
-	williams_vram_select_w(machine, offset, data);
+	williams_vram_select_w(space, offset, data);
 
 	/* window enable from bit 2 (clips to 0x7400) */
 	williams_blitter_window_enable = data & 0x04;
@@ -803,20 +821,20 @@ MACHINE_RESET( blaster )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* banking is different for blaster */
-	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 16, memory_region(machine, "main") + 0x18000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, 1, 1, 16, memory_region(machine, "main") + 0x18000, 0x4000);
 
-	memory_configure_bank(2, 0, 1, williams_videoram + 0x4000, 0);
-	memory_configure_bank(2, 1, 16, memory_region(machine, "main") + 0x10000, 0x0000);
+	memory_configure_bank(machine, 2, 0, 1, williams_videoram + 0x4000, 0);
+	memory_configure_bank(machine, 2, 1, 16, memory_region(machine, "main") + 0x10000, 0x0000);
 
 	state_save_register_global(blaster_bank);
 }
 
 
-INLINE void update_blaster_banking(void)
+INLINE void update_blaster_banking(running_machine *machine)
 {
-	memory_set_bank(1, vram_bank * (blaster_bank + 1));
-	memory_set_bank(2, vram_bank * (blaster_bank + 1));
+	memory_set_bank(machine, 1, vram_bank * (blaster_bank + 1));
+	memory_set_bank(machine, 2, vram_bank * (blaster_bank + 1));
 }
 
 
@@ -824,7 +842,7 @@ WRITE8_HANDLER( blaster_vram_select_w )
 {
 	/* VRAM/ROM banking from bit 0 */
 	vram_bank = data & 0x01;
-	update_blaster_banking();
+	update_blaster_banking(space->machine);
 
 	/* cocktail flip from bit 1 */
 	williams_cocktail = data & 0x02;
@@ -837,7 +855,7 @@ WRITE8_HANDLER( blaster_vram_select_w )
 WRITE8_HANDLER( blaster_bank_select_w )
 {
 	blaster_bank = data & 15;
-	update_blaster_banking();
+	update_blaster_banking(space->machine);
 }
 
 
@@ -851,7 +869,7 @@ WRITE8_HANDLER( blaster_bank_select_w )
 static READ8_HANDLER( lottofun_input_port_0_r )
 {
 	/* merge in the ticket dispenser status */
-	return input_port_read(machine, "IN0") | ticket_dispenser_r(machine,offset);
+	return input_port_read(space->machine, "IN0") | ticket_dispenser_r(space,offset);
 }
 
 
@@ -865,7 +883,7 @@ static READ8_HANDLER( lottofun_input_port_0_r )
 static READ8_HANDLER( tshoot_input_port_0_3_r )
 {
 	/* merge in the gun inputs with the standard data */
-	int data = input_port_read(machine, "IN0");
+	int data = input_port_read(space->machine, "IN0");
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
 
@@ -876,7 +894,7 @@ static READ8_HANDLER( tshoot_input_port_0_3_r )
 static WRITE8_HANDLER( tshoot_maxvol_w )
 {
 	/* something to do with the sound volume */
-	logerror("tshoot maxvol = %d (pc:%x)\n", data, activecpu_get_pc());
+	logerror("tshoot maxvol = %d (pc:%x)\n", data, cpu_get_pc(space->cpu));
 }
 
 
@@ -930,14 +948,15 @@ MACHINE_RESET( joust2 )
 
 static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 {
-	pia_2_porta_w(machine, 0, param & 0xff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_2_porta_w(space, 0, param & 0xff);
 }
 
 
 static WRITE8_HANDLER( joust2_pia_3_cb1_w )
 {
 	joust2_current_sound_data = (joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
-	pia_3_cb1_w(machine, offset, data);
+	pia_3_cb1_w(space, offset, data);
 }
 
 

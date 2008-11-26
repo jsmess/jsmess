@@ -1530,7 +1530,7 @@ static void Z0D_ddN0_1001_imm16(void)
 static void Z0E_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext0e  $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: ext0e  $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -1544,7 +1544,7 @@ static void Z0E_imm8(void)
 static void Z0F_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext0f  $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: ext0f  $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -1841,7 +1841,6 @@ static void Z1E_ddN0_cccc(void)
 		case 14: if (CCE) PC = RW(dst); break;
 		case 15: if (CCF) PC = RW(dst); break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -1853,7 +1852,6 @@ static void Z1F_ddN0_0000(void)
 	GET_DST(OP0,NIB2);
 	PUSHW( SP, PC );
     PC = RW(dst);
-	change_pc(PC);
 }
 
 /******************************************
@@ -2274,7 +2272,7 @@ static void Z36_0000_0000(void)
 static void Z36_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd36 $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvd36 $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -2312,7 +2310,7 @@ static void Z37_ddN0_ssss_imm16(void)
 static void Z38_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd38 $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvd38 $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -2330,7 +2328,6 @@ static void Z39_ssN0_0000(void)
 	fcw = RDMEM_W( RW(src) );
 	PC	= RDMEM_W( (UINT16)(RW(src) + 2) );
 	CHANGE_FCW(fcw); /* check for user/system mode change */
-    change_pc(PC);
 }
 
 /******************************************
@@ -3785,7 +3782,6 @@ static void Z5E_0000_cccc_addr(void)
 		case 14: if (CCE) PC = addr; break;
 		case 15: if (CCF) PC = addr; break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -3816,7 +3812,6 @@ static void Z5E_ddN0_cccc_addr(void)
 		case 14: if (CCE) PC = addr; break;
 		case 15: if (CCF) PC = addr; break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -3828,7 +3823,6 @@ static void Z5F_0000_0000_addr(void)
 	GET_ADDR(OP1);
 	PUSHW( SP, PC );
 	PC = addr;
-	change_pc(PC);
 }
 
 /******************************************
@@ -3842,7 +3836,6 @@ static void Z5F_ddN0_0000_addr(void)
 	PUSHW( SP, PC );
 	addr += RW(dst);
 	PC = addr;
-	change_pc(PC);
 }
 
 /******************************************
@@ -4354,7 +4347,7 @@ static void Z77_ddN0_ssss_0000_xxxx_0000_0000(void)
 static void Z78_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd78 $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvd78 $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4372,7 +4365,6 @@ static void Z79_0000_0000_addr(void)
 	fcw = RDMEM_W(addr);
 	PC	= RDMEM_W((UINT16)(addr + 2));
 	CHANGE_FCW(fcw); /* check for user/system mode change */
-    change_pc(PC);
 }
 
 /******************************************
@@ -4388,7 +4380,6 @@ static void Z79_ssN0_0000_addr(void)
 	fcw = RDMEM_W(addr);
 	PC	= RDMEM_W((UINT16)(addr + 2));
 	CHANGE_FCW(fcw); /* check for user/system mode change */
-    change_pc(PC);
 }
 
 /******************************************
@@ -4413,8 +4404,7 @@ static void Z7B_0000_0000(void)
 	PC	= POPW( SP );	/* get PC   */
     IRQ_SRV &= ~tag;    /* remove IRQ serviced flag */
 	CHANGE_FCW(fcw);		 /* check for user/system mode change */
-    change_pc(PC);
-	LOG(("Z8K#%d IRET tag $%04x, fcw $%04x, pc $%04x\n", cpu_getactivecpu(), tag, fcw, PC));
+	LOG(("Z8K#%d IRET tag $%04x, fcw $%04x, pc $%04x\n", cpunum_get_active(), tag, fcw, PC));
 }
 
 /******************************************
@@ -4499,7 +4489,7 @@ static void Z7D_dddd_0ccc(void)
 			RW(dst) = NSP;
 			break;
 		default:
-			LOG(("Z8K#%d LDCTL R%d,%d\n", cpu_getactivecpu(), dst, imm3));
+			LOG(("Z8K#%d LDCTL R%d,%d\n", cpunum_get_active(), dst, imm3));
     }
 }
 
@@ -4529,7 +4519,7 @@ static void Z7D_ssss_1ccc(void)
 			NSP = RW(src);
 			break;
 		default:
-			LOG(("Z8K#%d LDCTL %d,R%d\n", cpu_getactivecpu(), imm3, src));
+			LOG(("Z8K#%d LDCTL %d,R%d\n", cpunum_get_active(), imm3, src));
     }
 }
 
@@ -4540,7 +4530,7 @@ static void Z7D_ssss_1ccc(void)
 static void Z7E_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd7e $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvd7e $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4836,7 +4826,7 @@ static void Z8D_imm4_0101(void)
 static void Z8E_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext8e  $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: ext8e  $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4850,7 +4840,7 @@ static void Z8E_imm8(void)
 static void Z8F_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext8f  $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: ext8f  $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5008,7 +4998,7 @@ static void Z9C_dddd_1000(void)
 static void Z9D_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd9d $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvd9d $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5040,7 +5030,6 @@ static void Z9E_0000_cccc(void)
 		case 14: if (CCE) PC = POPW( SP ); break;
 		case 15: if (CCF) PC = POPW( SP ); break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -5050,7 +5039,7 @@ static void Z9E_0000_cccc(void)
 static void Z9F_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd9f $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvd9f $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5751,7 +5740,7 @@ static void ZB8_ddN0_1100_0000_rrrr_ssN0_0000(void)
 static void ZB9_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvdb9 $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvdb9 $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -6409,7 +6398,7 @@ static void ZBE_aaaa_bbbb(void)
 static void ZBF_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvdbf $%02x\n", cpu_getactivecpu(), PC, imm8));
+	LOG(("Z8K#%d %04x: rsvdbf $%02x\n", cpunum_get_active(), PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -6438,7 +6427,6 @@ static void ZD_dsp12(void)
 	PUSHW( SP, PC );
 	dsp12 = (dsp12 & 2048) ? 4096 -2 * (dsp12 & 2047) : -2 * (dsp12 & 2047);
 	PC += dsp12;
-	change_pc(PC);
 }
 
 /******************************************
@@ -6467,7 +6455,6 @@ static void ZE_cccc_dsp8(void)
 		case 14: if (CCE) PC += dsp8 * 2; break;
 		case 15: if (CCF) PC += dsp8 * 2; break;
     }
-	change_pc(PC);
 }
 
 /******************************************
@@ -6481,7 +6468,6 @@ static void ZF_dddd_0dsp7(void)
     RB(dst) -= 1;
     if (RB(dst)) {
         PC = PC - 2 * dsp7;
-        change_pc(PC);
     }
 }
 
@@ -6496,7 +6482,6 @@ static void ZF_dddd_1dsp7(void)
 	RW(dst) -= 1;
 	if (RW(dst)) {
 		PC = PC - 2 * dsp7;
-		change_pc(PC);
 	}
 }
 

@@ -114,10 +114,10 @@ static UINT8 *palette_ram;
 static UINT8 *empty_ram;
 static UINT8 *shared_ram;
 
-static read8_machine_func porte0_r;
-static read8_machine_func porte1_r;
-static read8_machine_func portf0_r;
-static read8_machine_func portf1_r;
+static read8_space_func porte0_r;
+static read8_space_func porte1_r;
+static read8_space_func portf0_r;
+static read8_space_func portf1_r;
 
 static int adpcm_pos;
 static int adpcm_data;
@@ -143,7 +143,7 @@ static void palette_notifier(int addr)
 
 	if(addr > 0x200)
 	{
-logerror("Large palette ? %03x (%04x)\n", addr, activecpu_get_pc());
+logerror("Large palette ? %03x (%04x)\n", addr, cpu_get_pc(Machine->activecpu));
 	}
 	else
 	{
@@ -170,10 +170,10 @@ static void machine_init(running_machine *machine)
 		cur_rambank[i] = 0x80;
 		current_base[i] = palette_ram;
 		current_notifier[i] = palette_notifier;
-		memory_set_bankptr(2+i, current_base[i]);
+		memory_set_bankptr(machine, 2+i, current_base[i]);
 	}
 	cur_rombank = cur_rombank2 = 0;
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
 
 	for(i=0;i<512;i++)
 	{
@@ -295,27 +295,27 @@ static IRQ_CALLBACK(irq_callback)
 
 static INTERRUPT_GEN( vbl_interrupt )
 {
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(device, irq_callback);
 
 	/* kludge to make plgirls boot */
-	if (cpunum_get_reg(0,Z80_IM) != 2) return;
+	if (cpu_get_reg(device,Z80_IM) != 2) return;
 
 	// What is really generating interrupts 0 and 1 is still to be found
 
-	if (cpu_getiloops() == 1 && (irq_enable & 1))
+	if (cpu_getiloops(device) == 1 && (irq_enable & 1))
 	{
 		last_irq_level = 0;
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops() == 2 && (irq_enable & 2))
+	else if (cpu_getiloops(device) == 2 && (irq_enable & 2))
 	{
 		last_irq_level = 1;
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops() == 0 && (irq_enable & 4))
+	else if (cpu_getiloops(device) == 0 && (irq_enable & 4))
 	{
 		last_irq_level = 2;
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -337,7 +337,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	// fix Plotting test mode
 	if ((irq_enable & (1 << last_irq_level)) == 0)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( irq_enable_r )
@@ -356,9 +356,9 @@ static WRITE8_HANDLER( rombankswitch_w )
 			logerror("New rom size : %x\n", (high+1)*0x2000);
 		}
 
-//      logerror("robs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
+//      logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
 		cur_rombank = data;
-		memory_set_bankptr(1, memory_region(machine, "main")+0x10000+0x2000*cur_rombank);
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main")+0x10000+0x2000*cur_rombank);
 	}
 }
 
@@ -374,10 +374,10 @@ static WRITE8_HANDLER( rombank2switch_w )
 			logerror("New rom2 size : %x\n", (high2+1)*0x4000);
 		}
 
-//      logerror("robs2 %02x (%04x)\n", data, activecpu_get_pc());
+//      logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 
 		cur_rombank2 = data;
-		memory_set_bankptr(6, memory_region(machine, "slave")+0x10000+0x4000*cur_rombank2);
+		memory_set_bankptr(space->machine, 6, memory_region(space->machine, "slave")+0x10000+0x4000*cur_rombank2);
 	}
 }
 
@@ -396,7 +396,7 @@ static WRITE8_HANDLER( rambankswitch_w )
 	if(cur_rambank[offset]!=data)
 	{
 		cur_rambank[offset]=data;
-//logerror("rabs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
+//logerror("rabs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
 		if(data>=0x14 && data<=0x1f)
 		{
 			data -= 0x14;
@@ -410,11 +410,11 @@ static WRITE8_HANDLER( rambankswitch_w )
 		}
 		else
 		{
-logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
+logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
 			current_notifier[offset] = 0;
 			current_base[offset] = empty_ram;
 		}
-		memory_set_bankptr(2+offset, current_base[offset]);
+		memory_set_bankptr(space->machine, 2+offset, current_base[offset]);
 	}
 }
 
@@ -473,26 +473,26 @@ static WRITE8_HANDLER( control2_w )
 
 static READ8_HANDLER( portA_r )
 {
-	if (extport == 0) return porte0_r(machine,0);
-	else return porte1_r(machine,0);
+	if (extport == 0) return porte0_r(space,0);
+	else return porte1_r(space,0);
 }
 
 static READ8_HANDLER( portB_r )
 {
-	if (extport == 0) return portf0_r(machine,0);
-	else return portf1_r(machine,0);
+	if (extport == 0) return portf0_r(space,0);
+	else return portf1_r(space,0);
 }
 
 static READ8_HANDLER( ym2203_data0_r )
 {
 	extport = 0;
-	return ym2203_read_port_0_r(machine,offset);
+	return ym2203_read_port_0_r(space,offset);
 }
 
 static READ8_HANDLER( ym2203_data1_r )
 {
 	extport = 1;
-	return ym2203_read_port_0_r(machine,offset);
+	return ym2203_read_port_0_r(space,offset);
 }
 
 static const UINT8 puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
@@ -500,8 +500,8 @@ static const UINT8 puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0
 static WRITE8_HANDLER( mcu_data_w )
 {
 	last_data = data;
-	last_data_adr = activecpu_get_pc();
-//  logerror("mcu write %02x (%04x)\n", data, activecpu_get_pc());
+	last_data_adr = cpu_get_pc(space->cpu);
+//  logerror("mcu write %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 	switch(data)
 	{
 	case 0x43:
@@ -514,12 +514,12 @@ static WRITE8_HANDLER( mcu_data_w )
 
 static WRITE8_HANDLER( mcu_control_w )
 {
-//  logerror("mcu control %02x (%04x)\n", data, activecpu_get_pc());
+//  logerror("mcu control %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 }
 
 static READ8_HANDLER( mcu_data_r )
 {
-//  logerror("mcu read (%04x) [%02x, %04x]\n", activecpu_get_pc(), last_data, last_data_adr);
+//  logerror("mcu read (%04x) [%02x, %04x]\n", cpu_get_pc(space->cpu), last_data, last_data_adr);
 	if(mcu_pos==mcu_reply_len)
 		return 0;
 
@@ -528,14 +528,14 @@ static READ8_HANDLER( mcu_data_r )
 
 static READ8_HANDLER( mcu_control_r )
 {
-//  logerror("mcu control read (%04x)\n", activecpu_get_pc());
+//  logerror("mcu control read (%04x)\n", cpu_get_pc(space->cpu));
 	return 0x1;
 }
 
 #if 0
 static WRITE8_HANDLER( sound_w )
 {
-	logerror("Sound_w %02x (%04x)\n", data, activecpu_get_pc());
+	logerror("Sound_w %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 }
 #endif
 
@@ -554,17 +554,17 @@ static READ8_HANDLER( mux_r )
 	switch(mux_ctrl)
 	{
 	case 0:
-		return input_port_read(machine, "DSWA");
+		return input_port_read(space->machine, "DSWA");
 	case 1:
-		return input_port_read(machine, "DSWB");
+		return input_port_read(space->machine, "DSWB");
 	case 2:
-		return input_port_read(machine, "IN0");
+		return input_port_read(space->machine, "IN0");
 	case 3:
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	case 7:
-		return input_port_read(machine, "IN2");
+		return input_port_read(space->machine, "IN2");
 	default:
-		logerror("Mux read from unknown port %d (%04x)\n", mux_ctrl, activecpu_get_pc());
+		logerror("Mux read from unknown port %d (%04x)\n", mux_ctrl, cpu_get_pc(space->cpu));
 		return 0xff;
 	}
 }
@@ -574,10 +574,10 @@ static WRITE8_HANDLER( mux_w )
 	switch(mux_ctrl)
 	{
 	case 4:
-		control2_w(machine,0, data);
+		control2_w(space,0, data);
 		break;
 	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", mux_ctrl, data, activecpu_get_pc());
+		logerror("Mux write to unknown port %d, %02x (%04x)\n", mux_ctrl, data, cpu_get_pc(space->cpu));
 	}
 }
 
@@ -635,35 +635,35 @@ static WRITE8_HANDLER( champwr_msm5205_volume_w )
 static READ8_HANDLER( horshoes_tracky_reset_r )
 {
 	/* reset the trackball counter */
-	tracky = input_port_read(machine, "AN0");
+	tracky = input_port_read(space->machine, "AN0");
 	return 0;
 }
 
 static READ8_HANDLER( horshoes_trackx_reset_r )
 {
 	/* reset the trackball counter */
-	trackx = input_port_read(machine, "AN1");
+	trackx = input_port_read(space->machine, "AN1");
 	return 0;
 }
 
 static READ8_HANDLER( horshoes_tracky_lo_r )
 {
-	return (input_port_read(machine, "AN0") - tracky) & 0xff;
+	return (input_port_read(space->machine, "AN0") - tracky) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_tracky_hi_r )
 {
-	return (input_port_read(machine, "AN0") - tracky) >> 8;
+	return (input_port_read(space->machine, "AN0") - tracky) >> 8;
 }
 
 static READ8_HANDLER( horshoes_trackx_lo_r )
 {
-	return (input_port_read(machine, "AN1") - trackx) & 0xff;
+	return (input_port_read(space->machine, "AN1") - trackx) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_trackx_hi_r )
 {
-	return (input_port_read(machine, "AN1") - trackx) >> 8;
+	return (input_port_read(space->machine, "AN1") - trackx) >> 8;
 }
 
 
@@ -807,10 +807,10 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int banknum = (data - 1) & 3;
 
-	memory_set_bankptr (7, &RAM [0x10000 + (banknum * 0x4000)]);
+	memory_set_bankptr (space->machine, 7, &RAM [0x10000 + (banknum * 0x4000)]);
 }
 
 static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1057,7 +1057,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER (evilston_snd_w)
 {
 	shared_ram[0x7fe]=data&0x7f;
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -2055,7 +2055,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( portA_w )
@@ -2063,12 +2063,12 @@ static WRITE8_HANDLER( portA_w )
 	if (cur_bank != (data & 0x03) )
 	{
 		int bankaddress;
-		UINT8 *RAM = memory_region(machine, "audio");
+		UINT8 *RAM = memory_region(space->machine, "audio");
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
-		memory_set_bankptr(7,&RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n",cur_bank, activecpu_get_pc() );
+		memory_set_bankptr(space->machine, 7,&RAM[bankaddress]);
+		//logerror ("YM2203 bank change val=%02x  pc=%04x\n",cur_bank, cpu_get_pc(space->cpu) );
 	}
 }
 
@@ -2939,7 +2939,7 @@ static DRIVER_INIT( evilston )
 {
 	UINT8 *ROM = memory_region(machine, "audio");
 	ROM[0x72]=0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }
 
 

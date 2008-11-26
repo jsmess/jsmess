@@ -58,14 +58,14 @@ static UINT16 *cninja_ram;
 
 static WRITE16_HANDLER( cninja_sound_w )
 {
-	soundlatch_w(machine,0,data&0xff);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	soundlatch_w(space,0,data&0xff);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
 static WRITE16_HANDLER( stoneage_sound_w )
 {
-	soundlatch_w(machine,0,data&0xff);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,0,data&0xff);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_CALLBACK( interrupt_gen )
@@ -83,7 +83,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[3]&0xffff;
 	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[4]&0xffff;
 
-	cpunum_set_input_line(machine, 0, (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
 	timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
 }
 
@@ -95,12 +95,12 @@ static READ16_HANDLER( cninja_irq_r )
 		return cninja_scanline;
 
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 4, CLEAR_LINE);
 		return 0;
 	}
 
-	logerror("%08x:  Unmapped IRQ read %d\n",activecpu_get_pc(),offset);
+	logerror("%08x:  Unmapped IRQ read %d\n",cpu_get_pc(space->cpu),offset);
 	return 0;
 }
 
@@ -113,14 +113,14 @@ static WRITE16_HANDLER( cninja_irq_w )
             0xc8:   Raster IRQ turned on (68k IRQ level 4)
             0xd8:   Raster IRQ turned on (68k IRQ level 3)
         */
-		logerror("%08x:  IRQ write %d %08x\n",activecpu_get_pc(),offset,data);
+		logerror("%08x:  IRQ write %d %08x\n",cpu_get_pc(space->cpu),offset,data);
 		cninja_irq_mask=data&0xff;
 		return;
 
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		cninja_scanline=data&0xff;
 		if ((cninja_irq_mask&0x2)==0 && cninja_scanline>0 && cninja_scanline<240)
-			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, cninja_scanline, 0), cninja_scanline);
+			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, cninja_scanline, 0), cninja_scanline);
 		else
 			timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		return;
@@ -129,23 +129,23 @@ static WRITE16_HANDLER( cninja_irq_w )
 		return;
 	}
 
-	logerror("%08x:  Unmapped IRQ write %d %04x\n",activecpu_get_pc(),offset,data);
+	logerror("%08x:  Unmapped IRQ write %d %04x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 static READ16_HANDLER( robocop2_prot_r )
 {
  	switch (offset<<1) {
 		case 0x41a: /* Player 1 & 2 input ports */
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 		case 0x320: /* Coins */
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 		case 0x4e6: /* Dip switches */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
-			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",activecpu_get_pc(),offset);
+			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(space->cpu),offset);
 			return 0x84;
 	}
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",activecpu_get_pc(),offset);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(space->cpu),offset);
 	return 0;
 }
 
@@ -749,12 +749,12 @@ static MACHINE_RESET( cninja )
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
+	cpu_set_input_line(machine->cpu[1],1,state); /* IRQ 2 */
 }
 
 static void sound_irq2(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,0,state);
+	cpu_set_input_line(machine->cpu[1],0,state);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -1769,13 +1769,13 @@ static void cninja_patch(running_machine *machine)
 
 static DRIVER_INIT( cninja )
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
 	cninja_patch(machine);
 }
 
 static DRIVER_INIT( stoneage )
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
 }
 
 static DRIVER_INIT( mutantf )

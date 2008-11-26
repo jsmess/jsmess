@@ -35,7 +35,7 @@ static READ8_HANDLER( strnskil_d800_r )
 {
 /* bit0: interrupt type?, bit1: CPU2 busack? */
 
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(space->cpu) == 0)
 		return 0;
 	return 1;
 }
@@ -46,18 +46,18 @@ static READ8_HANDLER( pettanp_protection_r )
 {
 	int res;
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x6066:	res = 0xa5;	break;
 		case 0x60dc:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x615d:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61b9:	res = 0x60|(mame_rand(machine)&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61b9:	res = 0x60|(mame_rand(space->machine)&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6219:	res = 0x77;	break;
 		case 0x626c:	res = 0xb4;	break;
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",activecpu_get_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(space->cpu),res);
 	return res;
 }
 
@@ -65,24 +65,24 @@ static READ8_HANDLER( banbam_protection_r )
 {
 	int res;
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x6094:	res = 0xa5;	break;
 		case 0x6118:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x6199:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61f5:	res = 0x60|(mame_rand(machine)&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61f5:	res = 0x60|(mame_rand(space->machine)&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6255:	res = 0x77;	break;
 		case 0x62a8:	res = 0xb4;	break;
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",activecpu_get_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(space->cpu),res);
 	return res;
 }
 
 static WRITE8_HANDLER( protection_w )
 {
-	logerror("%04x: protection_w %02x\n",activecpu_get_pc(),data);
+	logerror("%04x: protection_w %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 /****************************************************************************/
@@ -517,16 +517,16 @@ static DRIVER_INIT( pettanp )
 //  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd806, 0xd806, 0, 0, pettanp_protection_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd80d, 0xd80d, 0, 0, protection_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd806, 0xd806, 0, 0, pettanp_protection_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd80d, 0xd80d, 0, 0, protection_w);
 
 }
 
 static DRIVER_INIT( banbam )
 {
 	/* Fujitsu MB8841 4-Bit MCU */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd806, 0xd806, 0, 0, banbam_protection_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd80d, 0xd80d, 0, 0, protection_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd806, 0xd806, 0, 0, banbam_protection_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd80d, 0xd80d, 0, 0, protection_w);
 }
 
 GAME( 1984, strnskil, 0,        strnskil, strnskil, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )

@@ -26,7 +26,7 @@ static UINT8 *ram;
 
 static INTERRUPT_GEN( surpratk_interrupt )
 {
-	if (K052109_is_IRQ_enabled()) cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	if (K052109_is_IRQ_enabled()) cpu_set_input_line(device,0,HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -39,7 +39,7 @@ static READ8_HANDLER( bankedram_r )
 			return paletteram[offset];
 	}
 	else if (videobank & 0x01)
-		return K053245_r(machine,offset);
+		return K053245_r(space,offset);
 	else
 		return ram[offset];
 }
@@ -49,19 +49,19 @@ static WRITE8_HANDLER( bankedram_w )
 	if (videobank & 0x02)
 	{
 		if (videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset + 0x0800,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
 	else if (videobank & 0x01)
-		K053245_w(machine,offset,data);
+		K053245_w(space,offset,data);
 	else
 		ram[offset] = data;
 }
 
 static WRITE8_HANDLER( surpratk_videobank_w )
 {
-logerror("%04x: videobank = %02x\n",activecpu_get_pc(),data);
+logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
 	/* bit 2 = select palette bank 0 or 1 */
@@ -70,7 +70,7 @@ logerror("%04x: videobank = %02x\n",activecpu_get_pc(),data);
 
 static WRITE8_HANDLER( surpratk_5fc0_w )
 {
-	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",activecpu_get_pc(),data);
+	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -224,7 +224,7 @@ INPUT_PORTS_END
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 0,KONAMI_FIRQ_LINE,linestate);
+	cpu_set_input_line(machine->cpu[0],KONAMI_FIRQ_LINE,linestate);
 }
 
 static const ym2151_interface ym2151_config =
@@ -330,16 +330,16 @@ static void surpratk_banking(int lines)
 	UINT8 *RAM = memory_region(Machine, "main");
 	int offs = 0;
 
-logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
+logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
 
 	offs = 0x10000 + ((lines & 0x1f) * 0x2000);
 	if (offs >= 0x48000) offs -= 0x40000;
-	memory_set_bankptr(1,&RAM[offs]);
+	memory_set_bankptr(Machine, 1,&RAM[offs]);
 }
 
 static MACHINE_RESET( surpratk )
 {
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)surpratk_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)surpratk_banking);
 
 	paletteram = &memory_region(machine, "main")[0x48000];
 }

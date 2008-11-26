@@ -328,7 +328,7 @@ static WRITE32_HANDLER( paletteram32_macrossp_w )
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 
@@ -338,7 +338,7 @@ static READ32_HANDLER ( macrossp_soundstatus_r )
 {
 	static int toggle;
 
-//  logerror("%08x read soundstatus\n",activecpu_get_pc());
+//  logerror("%08x read soundstatus\n",cpu_get_pc(space->cpu));
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
@@ -352,20 +352,20 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		//logerror("%08x write soundcmd %08x (%08x)\n",activecpu_get_pc(),data,mem_mask);
-		soundlatch_word_w(machine,0,data >> 16,0xffff);
+		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(space->cpu),data,mem_mask);
+		soundlatch_word_w(space,0,data >> 16,0xffff);
 		sndpending = 1;
-		cpunum_set_input_line(machine, 1,2,HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[1],2,HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
 	}
 }
 
 static READ16_HANDLER( macrossp_soundcmd_r )
 {
-//  logerror("%06x read soundcmd\n",activecpu_get_pc());
+//  logerror("%06x read soundcmd\n",cpu_get_pc(space->cpu));
 	sndpending = 0;
-	return soundlatch_word_r(machine,offset,mem_mask);
+	return soundlatch_word_r(space,offset,mem_mask);
 }
 
 static INT32 fade_effect,old_fade;
@@ -397,7 +397,7 @@ static WRITE32_HANDLER( macrossp_palette_fade_w )
 	if(old_fade != fade_effect)
 	{
 		old_fade = fade_effect;
-		update_colors(machine);
+		update_colors(space->machine);
 	}
 }
 
@@ -618,7 +618,7 @@ static void irqhandler(running_machine *machine, int irq)
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-//  cpunum_set_input_line(machine, 1,1,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(machine->cpu[1],1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const es5506_interface es5506_config =
@@ -778,26 +778,26 @@ PC :0001810A 01810A: cmp.w   $f10140.l, D0
 PC :00018110 018110: beq     18104
 */
 	COMBINE_DATA(&macrossp_mainram[0x10158/4]);
-	if (activecpu_get_pc()==0x001810A) cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x001810A) cpu_spinuntil_int(space->cpu);
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER( quizmoon_speedup_w )
 {
 	COMBINE_DATA(&macrossp_mainram[0x00020/4]);
-	if (activecpu_get_pc()==0x1cc) cpu_spinuntil_int();
+	if (cpu_get_pc(space->cpu)==0x1cc) cpu_spinuntil_int(space->cpu);
 }
 #endif
 
 static DRIVER_INIT( macrossp )
 {
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
 }
 
 static DRIVER_INIT( quizmoon )
 {
 #ifdef UNUSED_FUNCTION
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
 #endif
 }
 

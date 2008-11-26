@@ -140,7 +140,7 @@ WRITE8_HANDLER( c1943_colorram_w )
 WRITE8_HANDLER( c1943_c804_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(0, data & 0x01);
@@ -148,7 +148,7 @@ WRITE8_HANDLER( c1943_c804_w )
 
 	/* bits 2, 3 and 4 select the ROM bank */
 	bankaddress = 0x10000 + (data & 0x1c) * 0x1000;
-	memory_set_bankptr(1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 
 	/* bit 5 resets the sound CPU - we ignore it */
 

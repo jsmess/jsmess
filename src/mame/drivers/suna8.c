@@ -74,14 +74,15 @@ static DRIVER_INIT( hardhead )
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
 static DRIVER_INIT( hardhedb )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x48000);
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x48000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -92,12 +93,13 @@ static DRIVER_INIT( hardhedb )
 
 static UINT8 *brickzn_decrypt(running_machine *machine)
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "main");
 	size_t	size	=	memory_region_length(machine, "main");
 	UINT8   *decrypt = auto_malloc(size);
 	int i;
 
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	/* Opcodes and data */
 	for (i = 0; i < 0x50000; i++)
@@ -159,8 +161,8 @@ static DRIVER_INIT( brickzn )
 	decrypt[0x24b5] = 0x00;	// HALT -> NOP
 	decrypt[0x2583] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(1, 0, 16, decrypt + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypt + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( brickzn3 )
@@ -190,8 +192,8 @@ static DRIVER_INIT( brickzn3 )
 	decrypt[0x2487] = 0x00;	// HALT -> NOP
 	decrypt[0x256c] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(1, 0, 16, decrypt + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypt + 0x10000, 0x4000);
 }
 
 
@@ -201,13 +203,14 @@ static DRIVER_INIT( brickzn3 )
 
 static DRIVER_INIT( hardhea2 )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "main");
 	size_t	size	=	memory_region_length(machine, "main");
 	UINT8   *decrypt = 	auto_malloc(size);
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -276,8 +279,8 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_configure_bank(2, 0, 2, auto_malloc(0x2000 * 2), 0x2000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 2, 0, 2, auto_malloc(0x2000 * 2), 0x2000);
 }
 
 
@@ -287,13 +290,14 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 static DRIVER_INIT( starfigh )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "main");
 	size_t	size	=	memory_region_length(machine, "main");
 	UINT8   *decrypt = 	auto_malloc(size);
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -344,7 +348,7 @@ static DRIVER_INIT( starfigh )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
 	}
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 
@@ -354,13 +358,14 @@ static DRIVER_INIT( starfigh )
 
 static DRIVER_INIT( sparkman )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "main");
 	size_t	size	=	memory_region_length(machine, "main");
 	UINT8   *decrypt = 	auto_malloc(size);
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -411,7 +416,7 @@ static DRIVER_INIT( sparkman )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
 	}
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -464,12 +469,12 @@ static READ8_HANDLER( hardhead_ip_r )
 {
 	switch (*hardhead_ip)
 	{
-		case 0:	return input_port_read(machine, "P1");
-		case 1:	return input_port_read(machine, "P2");
-		case 2:	return input_port_read(machine, "DSW1");
-		case 3:	return input_port_read(machine, "DSW2");
+		case 0:	return input_port_read(space->machine, "P1");
+		case 1:	return input_port_read(space->machine, "P2");
+		case 2:	return input_port_read(space->machine, "DSW1");
+		case 3:	return input_port_read(space->machine, "DSW2");
 		default:
-			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n",activecpu_get_pc(),*hardhead_ip);
+			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n",cpu_get_pc(space->cpu),*hardhead_ip);
 			return 0xff;
 	}
 }
@@ -483,8 +488,8 @@ static WRITE8_HANDLER( hardhead_bankswitch_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0xef) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",activecpu_get_pc(),data);
-	memory_set_bank(1, bank);
+	if (data & ~0xef) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	memory_set_bank(space->machine, 1, bank);
 }
 
 
@@ -550,9 +555,9 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
 	int bank = data & 0x07;
 	if ((~data & 0x10) && (bank >= 4))	bank += 4;
 
-	if (data & ~0xf7) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0xf7) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 
 	flip_screen_set(    data & 0x20);
 	coin_lockout_w ( 0,	data & 0x40);
@@ -622,10 +627,10 @@ static READ8_HANDLER( brickzn_c140_r )
 static WRITE8_HANDLER( brickzn_palettebank_w )
 {
 	suna8_palettebank = (data >> 1) & 1;
-	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	/* Also used as soundlatch - depending on c0c0? */
-	soundlatch_w(machine,0,data);
+	soundlatch_w(space,0,data);
 }
 
 /*
@@ -636,7 +641,7 @@ static WRITE8_HANDLER( brickzn_palettebank_w )
 static WRITE8_HANDLER( brickzn_spritebank_w )
 {
 	suna8_spritebank = (data >> 1) & 1;
-	if (data & ~0x03) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x03) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 	flip_screen_set( data & 0x01 );
 }
 
@@ -653,9 +658,9 @@ static WRITE8_HANDLER( brickzn_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 	suna8_rombank = data;
 }
 
@@ -697,7 +702,7 @@ static UINT8 suna8_nmi_enable;
 static WRITE8_HANDLER( hardhea2_nmi_w )
 {
 	suna8_nmi_enable = data & 0x01;
-//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",activecpu_get_pc(),data);
+//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -707,7 +712,7 @@ static WRITE8_HANDLER( hardhea2_nmi_w )
 static WRITE8_HANDLER( hardhea2_flipscreen_w )
 {
 	flip_screen_set(data & 0x01);
-	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( hardhea2_leds_w )
@@ -715,7 +720,7 @@ static WRITE8_HANDLER( hardhea2_leds_w )
 	set_led_status(0, data & 0x01);
 	set_led_status(1, data & 0x02);
 	coin_counter_w(0, data & 0x04);
-	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -726,7 +731,7 @@ static WRITE8_HANDLER( hardhea2_leds_w )
 static WRITE8_HANDLER( hardhea2_spritebank_w )
 {
 	suna8_spritebank = (data >> 1) & 1;
-	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -737,9 +742,9 @@ static WRITE8_HANDLER( hardhea2_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 	suna8_rombank = data;
 }
 
@@ -754,11 +759,11 @@ static WRITE8_HANDLER( hardhea2_spritebank_1_w )
 
 static WRITE8_HANDLER( hardhea2_rambank_0_w )
 {
-	memory_set_bank(2, 0);
+	memory_set_bank(space->machine, 2, 0);
 }
 static WRITE8_HANDLER( hardhea2_rambank_1_w )
 {
-	memory_set_bank(2, 1);
+	memory_set_bank(space->machine, 2, 1);
 }
 
 
@@ -819,7 +824,7 @@ static UINT8 spritebank_latch;
 static WRITE8_HANDLER( starfigh_spritebank_latch_w )
 {
 	spritebank_latch = (data >> 2) & 1;
-	if (data & ~0x04) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x04) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( starfigh_spritebank_w )
@@ -862,7 +867,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( sparkman_nmi_w )
 {
 	suna8_nmi_enable = data & 0x01;
-	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -872,7 +877,7 @@ static WRITE8_HANDLER( sparkman_nmi_w )
 static WRITE8_HANDLER( sparkman_flipscreen_w )
 {
 	flip_screen_set(data & 0x01);
-	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( sparkman_leds_w )
@@ -880,7 +885,7 @@ static WRITE8_HANDLER( sparkman_leds_w )
 	set_led_status(0, data & 0x01);
 	set_led_status(1, data & 0x02);
 	coin_counter_w(0, data & 0x04);
-	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -891,7 +896,7 @@ static WRITE8_HANDLER( sparkman_leds_w )
 static WRITE8_HANDLER( sparkman_spritebank_w )
 {
 	suna8_spritebank = (data >> 1) & 1;
-	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -902,15 +907,15 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 	suna8_rombank = data;
 }
 
 static READ8_HANDLER( sparkman_c0a3_r )
 {
-	return (video_screen_get_frame_number(machine->primary_screen) & 1) ? 0x80 : 0;
+	return (video_screen_get_frame_number(space->machine->primary_screen) & 1) ? 0x80 : 0;
 }
 
 static ADDRESS_MAP_START( sparkman_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1446,7 +1451,7 @@ GFXDECODE_END
 
 static void soundirq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cpu_set_input_line(machine->cpu[1], 0, state);
 }
 
 /* In games with only 2 CPUs, port A&B of the AY8910 are used
@@ -1581,8 +1586,8 @@ static const ym3812_interface brickzn_ym3812_interface =
 
 static INTERRUPT_GEN( brickzn_interrupt )
 {
-	if (cpu_getiloops()) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	else				 cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if (cpu_getiloops(device)) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	else				 cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( brickzn )
@@ -1648,16 +1653,17 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( hardhea2_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
-		if (suna8_nmi_enable)	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (suna8_nmi_enable)	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	else cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_RESET( hardhea2 )
 {
-	hardhea2_rambank_0_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	hardhea2_rambank_0_w(space,0,0);
 }
 
 static MACHINE_DRIVER_START( hardhea2 )
@@ -1738,11 +1744,11 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( sparkman_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
-		if (suna8_nmi_enable)	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (suna8_nmi_enable)	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	else cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( sparkman )
@@ -2316,7 +2322,7 @@ ROM_END
 
 static DRIVER_INIT( suna8 )
 {
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 /* Working Games */

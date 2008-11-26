@@ -80,18 +80,21 @@ static MACHINE_RESET( galpani2 )
 	kaneko16_sprite_yoffs = 0x000;
 }
 
-static void galpani2_write_kaneko(void)
+static void galpani2_write_kaneko(running_machine *machine)
 {
-	cpunum_write_byte(0,0x100000,0x4b);
-	cpunum_write_byte(0,0x100001,0x41);
-	cpunum_write_byte(0,0x100002,0x4e);
-	cpunum_write_byte(0,0x100003,0x45);
-	cpunum_write_byte(0,0x100004,0x4b);
-	cpunum_write_byte(0,0x100005,0x4f);
+	const address_space *dstspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_write_byte(dstspace,0x100000,0x4b);
+	memory_write_byte(dstspace,0x100001,0x41);
+	memory_write_byte(dstspace,0x100002,0x4e);
+	memory_write_byte(dstspace,0x100003,0x45);
+	memory_write_byte(dstspace,0x100004,0x4b);
+	memory_write_byte(dstspace,0x100005,0x4f);
 }
 
-void galpani2_mcu_run(void)
+void galpani2_mcu_run(running_machine *machine)
 {
+	const address_space *srcspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
 	int i,x;
 
 	/* Write "KANEKO" to 100000-100005, but do not clash with ram test */
@@ -99,30 +102,32 @@ void galpani2_mcu_run(void)
 	x  = 0;
 
 	for (i = 0x100000; i < 0x100007; i++)
-		x |= cpunum_read_byte(0,i);
+		x |= memory_read_byte(srcspace,i);
 
 	if	( x == 0 )
 	{
-		galpani2_write_kaneko();
-		cpunum_write_byte(1,0x100006,1);
+		galpani2_write_kaneko(machine);
+		memory_write_byte(dstspace,0x100006,1);
 		logerror("MCU executes CHECK0\n");
 	}
 }
 
-static void galpani2_mcu_nmi(void)
+static void galpani2_mcu_nmi(running_machine *machine)
 {
+	const address_space *srcspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_src, mcu_dst, mcu_size;
 
 	/* "Last Check" */
-	galpani2_write_kaneko();
+	galpani2_write_kaneko(machine);
 
 	for ( mcu_list = 0x100020; mcu_list < (0x100020 + 0x40); mcu_list += 4 )
 	{
-		mcu_command		=	cpunum_read_byte(0, mcu_list + 1 );
+		mcu_command		=	memory_read_byte(srcspace, mcu_list + 1 );
 
 		mcu_address		=	0x100000 +
-							(cpunum_read_byte(0, mcu_list + 2)<<8) +
-							(cpunum_read_byte(0, mcu_list + 3)<<0) ;
+							(memory_read_byte(srcspace, mcu_list + 2)<<8) +
+							(memory_read_byte(srcspace, mcu_list + 3)<<0) ;
 
 		switch (mcu_command)
 		{
@@ -130,47 +135,47 @@ static void galpani2_mcu_nmi(void)
 			break;
 
 		case 0x0a:	// Copy N bytes from RAM1 to RAM2
-			mcu_src		=	(cpunum_read_byte(0, mcu_address + 2)<<8) +
-							(cpunum_read_byte(0, mcu_address + 3)<<0) ;
+			mcu_src		=	(memory_read_byte(srcspace, mcu_address + 2)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 3)<<0) ;
 
-			mcu_dst		=	(cpunum_read_byte(0, mcu_address + 6)<<8) +
-							(cpunum_read_byte(0, mcu_address + 7)<<0) ;
+			mcu_dst		=	(memory_read_byte(srcspace, mcu_address + 6)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 7)<<0) ;
 
-			mcu_size	=	(cpunum_read_byte(0, mcu_address + 8)<<8) +
-							(cpunum_read_byte(0, mcu_address + 9)<<0) ;
+			mcu_size	=	(memory_read_byte(srcspace, mcu_address + 8)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 9)<<0) ;
 
-			logerror("CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",activecpu_get_pc(),mcu_src,mcu_size,mcu_dst);
+			logerror("CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",cpu_get_pc(machine->activecpu),mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
 				mcu_src &= 0xffff;	mcu_dst &= 0xffff;
-				cpunum_write_byte(1,0x100000 + mcu_dst,cpunum_read_byte(0,0x100000 + mcu_src));
+				memory_write_byte(dstspace,0x100000 + mcu_dst,memory_read_byte(srcspace,0x100000 + mcu_src));
 				mcu_src ++;			mcu_dst ++;
 			}
 
 			/* Raise a "job done" flag */
-			cpunum_write_byte(0,mcu_address+0,0xff);
-			cpunum_write_byte(0,mcu_address+1,0xff);
+			memory_write_byte(srcspace,mcu_address+0,0xff);
+			memory_write_byte(srcspace,mcu_address+1,0xff);
 
 			break;
 
 		default:
 			/* Raise a "job done" flag */
-			cpunum_write_byte(0,mcu_address+0,0xff);
-			cpunum_write_byte(0,mcu_address+1,0xff);
+			memory_write_byte(srcspace,mcu_address+0,0xff);
+			memory_write_byte(srcspace,mcu_address+1,0xff);
 
-			logerror("CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",activecpu_get_pc(),mcu_command);
+			logerror("CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",cpu_get_pc(machine->activecpu),mcu_command);
 		}
 
 		/* Erase command? */
-		cpunum_write_byte(0,mcu_list + 1,0x00);
+		memory_write_byte(srcspace,mcu_list + 1,0x00);
 	}
 }
 
 static WRITE16_HANDLER( galpani2_mcu_nmi_w )
 {
 	static UINT16 old = 0;
-	if ( (data & 1) && !(old & 1) )	galpani2_mcu_nmi();
+	if ( (data & 1) && !(old & 1) )	galpani2_mcu_nmi(space->machine);
 	old = data;
 }
 
@@ -202,8 +207,8 @@ static WRITE16_HANDLER( galpani2_oki_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = memory_region(machine, "oki1");
-		logerror("CPU #0 PC %06X : OKI 0 bank %08X\n",activecpu_get_pc(),data);
+		UINT8 *ROM = memory_region(space->machine, "oki1");
+		logerror("CPU #0 PC %06X : OKI 0 bank %08X\n",cpu_get_pc(space->cpu),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 	}
 }
@@ -213,7 +218,7 @@ static WRITE16_HANDLER( galpani2_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * (data & 0xf) );
-		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -266,8 +271,8 @@ static UINT16 *galpani2_rombank;
 
 static READ16_HANDLER( galpani2_bankedrom_r )
 {
-	UINT16 *ROM = (UINT16 *) memory_region( machine, "user1" );
-	size_t    len = memory_region_length( machine, "user1" ) / 2;
+	UINT16 *ROM = (UINT16 *) memory_region( space->machine, "user1" );
+	size_t    len = memory_region_length( space->machine, "user1" ) / 2;
 
 	offset += (0x800000/2) * (*galpani2_rombank & 0x0003);
 
@@ -435,12 +440,12 @@ GFXDECODE_END
 #define GALPANI2_INTERRUPTS_NUM	4
 static INTERRUPT_GEN( galpani2_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 3:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
-		case 2:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;	// vblank?
-		case 0:  cpunum_set_input_line(machine, 0, 6, HOLD_LINE); break;	// hblank?
+		case 3:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 5, HOLD_LINE); break;	// vblank?
+		case 0:  cpu_set_input_line(device, 6, HOLD_LINE); break;	// hblank?
 	}
 }
 
@@ -449,11 +454,11 @@ static INTERRUPT_GEN( galpani2_interrupt )
 #define GALPANI2_INTERRUPTS_NUM2	3
 static INTERRUPT_GEN( galpani2_interrupt2 )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpunum_set_input_line(machine, 1, 3, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 1, 4, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(machine, 1, 5, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
 	}
 }
 

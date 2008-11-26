@@ -85,10 +85,11 @@ static int ARM7_ICOUNT;
 static CPU_INIT( arm7 )
 {
     // must call core
-    arm7_core_init("arm7", index);
+    arm7_core_init("arm7", device);
 
     ARM7.irq_callback = irqcallback;
     ARM7.device = device;
+    ARM7.program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 #if TEST_COPROC_FUNCS
     // setup co-proc callbacks example
@@ -103,7 +104,7 @@ static CPU_INIT( arm7 )
 static CPU_RESET( arm7 )
 {
     // must call core reset
-    arm7_core_reset();
+    arm7_core_reset(device);
 }
 
 static CPU_EXIT( arm7 )

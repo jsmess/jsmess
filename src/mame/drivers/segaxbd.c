@@ -91,23 +91,23 @@ static void update_main_irqs(running_machine *machine)
 	if (timer_irq_state)
 		irq |= 2;
 	else
-		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
 
 	if (vblank_irq_state)
 		irq |= 4;
 	else
-		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 4, CLEAR_LINE);
 
 	if (gprider_hack && irq > 4)
 		irq = 4;
 
 	if (!(irq==6))
-		cpunum_set_input_line(machine, 0, 6, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 6, CLEAR_LINE);
 
 	if (irq)
 	{
-		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpu_set_input_line(machine->cpu[0], irq, ASSERT_LINE);
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
 
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 223)
 	{
 		vblank_irq_state = update = 1;
-		cpunum_set_input_line(machine, 1, 4, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 4, ASSERT_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -135,7 +135,7 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		vblank_irq_state = 0;
 		update = 1;
-		cpunum_set_input_line(machine, 1, 4, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 4, CLEAR_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -165,12 +165,14 @@ static void timer_ack_callback(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	soundlatch_w(machine, 0, param);
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	soundlatch_w(space, 0, param);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-static void sound_data_w(UINT8 data)
+static void sound_data_w(running_machine *machine, UINT8 data)
 {
 	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
 }
@@ -178,14 +180,14 @@ static void sound_data_w(UINT8 data)
 
 static void sound_cpu_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 2, 0, state);
+	cpu_set_input_line(machine->cpu[2], 0, state);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(machine, offset);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(space, offset);
 }
 
 
@@ -196,20 +198,20 @@ static READ8_HANDLER( sound_data_r )
  *
  *************************************/
 
-static void xboard_reset(void)
+static void xboard_reset(const device_config *device)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
-	cpu_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
 static MACHINE_RESET( xboard )
 {
-	fd1094_machine_init();
+	fd1094_machine_init(machine->cpu[0]);
 	segaic16_tilemap_reset(0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)xboard_reset);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)xboard_reset);
 
 	/* set up the compare/timer chip */
 	segaic16_compare_timer_init(0, sound_data_w, timer_ack_callback);
@@ -233,7 +235,7 @@ static READ16_HANDLER( adc_r )
 	int which = (iochip_regs[0][2] >> 2) & 7;
 
 	/* on the write, latch the selected input port and stash the value */
-	int value = input_port_read_safe(machine, ports[which], 0x0010);
+	int value = input_port_read_safe(space->machine, ports[which], 0x0010);
 
 	/* reverse some port values */
 	if (adc_reverse[which])
@@ -293,11 +295,11 @@ static READ16_HANDLER( iochip_0_r )
                 D6: /INTR of ADC0804
                 D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
             */
-			return iochip_r(0, 0, input_port_read(machine, "IO0PORTA"));
+			return iochip_r(0, 0, input_port_read(space->machine, "IO0PORTA"));
 
 		case 1:
 			/* I/O port: CN C pins 17,15,13,11,9,7,5,3 */
-			return iochip_r(0, 1, input_port_read(machine, "IO0PORTB"));
+			return iochip_r(0, 1, input_port_read(space->machine, "IO0PORTB"));
 
 		case 2:
 			/* Output port */
@@ -343,9 +345,9 @@ static WRITE16_HANDLER( iochip_0_w )
                 D1: (CONT) - affects sprite hardware
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(machine,0,0);
-			segaic16_set_display_enable(machine, data & 0x20);
-			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(space,0,0);
+			segaic16_set_display_enable(space->machine, data & 0x20);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 3:
@@ -368,19 +370,19 @@ static READ16_HANDLER( iochip_1_r )
 	{
 		case 0:
 			/* Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 0, input_port_read(machine, "IO1PORTA"));
+			return iochip_r(1, 0, input_port_read(space->machine, "IO1PORTA"));
 
 		case 1:
 			/* Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 1, input_port_read(machine, "IO1PORTB"));
+			return iochip_r(1, 1, input_port_read(space->machine, "IO1PORTB"));
 
 		case 2:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 2, input_port_read(machine, "IO1PORTC"));
+			return iochip_r(1, 2, input_port_read(space->machine, "IO1PORTC"));
 
 		case 3:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 3, input_port_read(machine, "IO1PORTD"));
+			return iochip_r(1, 3, input_port_read(space->machine, "IO1PORTD"));
 
 		case 4:
 			/* Unused */
@@ -455,7 +457,7 @@ static UINT16 *loffire_sync;
 static WRITE16_HANDLER( loffire_sync0_w )
 {
 	COMBINE_DATA(&loffire_sync[offset]);
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 
@@ -468,14 +470,14 @@ static WRITE16_HANDLER( loffire_sync0_w )
 
 static READ16_HANDLER( smgp_excs_r )
 {
-	logerror("%06X:smgp_excs_r(%04X)\n", activecpu_get_pc(), offset*2);
+	logerror("%06X:smgp_excs_r(%04X)\n", cpu_get_pc(space->cpu), offset*2);
 	return 0xffff;
 }
 
 
 static WRITE16_HANDLER( smgp_excs_w )
 {
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
+	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 
@@ -2598,7 +2600,7 @@ static DRIVER_INIT( aburner2 )
 	xboard_generic_init(machine);
 	xboard_set_road_priority(0);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
 }
 
 
@@ -2615,14 +2617,14 @@ static DRIVER_INIT( loffire )
 	adc_reverse[1] = adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
-	loffire_sync = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
+	loffire_sync = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
 }
 
 
 static DRIVER_INIT( smgp )
 {
 	xboard_generic_init(machine);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
 }
 
 

@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "scsidev.h"
+#include "deprecat.h"
 
 typedef struct
 {
@@ -27,7 +28,7 @@ static int scsidev_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			return 0;
 
 		default:
-			logerror( "%08x: SCSIDEV unknown command %02x\n", activecpu_get_pc(), command[ 0 ] );
+			logerror( "%08x: SCSIDEV unknown command %02x\n", cpu_get_pc(Machine->activecpu), command[ 0 ] );
 			return 0;
 	}
 }
@@ -42,7 +43,7 @@ static void scsidev_read_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%08x: SCSIDEV unknown read %02x\n", activecpu_get_pc(), command[ 0 ] );
+			logerror( "%08x: SCSIDEV unknown read %02x\n", cpu_get_pc(Machine->activecpu), command[ 0 ] );
 			break;
 	}
 }
@@ -57,7 +58,7 @@ static void scsidev_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dat
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%08x: SCSIDEV unknown write %02x\n", activecpu_get_pc(), command[ 0 ] );
+			logerror( "%08x: SCSIDEV unknown write %02x\n", cpu_get_pc(Machine->activecpu), command[ 0 ] );
 			break;
 	}
 }
@@ -100,13 +101,10 @@ static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
-	char tag[256];
 
-	state_save_combine_module_and_tag(tag, "scsidev", diskregion);
-
-	state_save_register_item_array( tag, 0, our_this->command );
-	state_save_register_item( tag, 0, our_this->commandLength );
-	state_save_register_item( tag, 0, our_this->phase );
+	state_save_register_item_array( "scsidev", diskregion, 0, our_this->command );
+	state_save_register_item( "scsidev", diskregion, 0, our_this->commandLength );
+	state_save_register_item( "scsidev", diskregion, 0, our_this->phase );
 }
 
 static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptrparm )

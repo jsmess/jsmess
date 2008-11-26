@@ -66,7 +66,7 @@ INTERRUPT_GEN( segag80r_vblank_start )
 
 	/* if interrupts are enabled, clock one */
 	if (video_control & 0x04)
-		irq0_line_hold(machine, cpunum);
+		irq0_line_hold(device);
 }
 
 
@@ -77,7 +77,7 @@ INTERRUPT_GEN( sindbadm_vblank_start )
 	/* interrupts appear to always be enabled, but they have a manual */
 	/* acknowledge rather than an automatic ack; they are also not masked */
 	/* by bit 2 of video_control like a standard G80 */
-	irq0_line_assert(machine, cpunum);
+	irq0_line_assert(device);
 }
 
 
@@ -279,7 +279,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 	{
 		offset &= 0x3f;
 		paletteram[offset] = data;
-		g80_set_palette_entry(machine, offset, data);
+		g80_set_palette_entry(space->machine, offset, data);
 		return;
 	}
 
@@ -303,7 +303,7 @@ READ8_HANDLER( segag80r_video_port_r )
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_r(%d)\n", activecpu_get_pc(), offset);
+		logerror("%04X:segag80r_video_port_r(%d)\n", cpu_get_pc(space->cpu), offset);
 		return 0xff;
 	}
 	else
@@ -323,7 +323,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", activecpu_get_pc(), offset, data);
+		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", cpu_get_pc(space->cpu), offset, data);
 	}
 	else
 	{
@@ -350,7 +350,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
 READ8_HANDLER( spaceod_back_port_r )
 {
 	/* force an update to get the current detection value */
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 	return 0xfe | spaceod_bg_detect;
 }
 
@@ -403,7 +403,7 @@ WRITE8_HANDLER( spaceod_back_port_w )
 
 		/* port 3: clears the background detection flag */
 		case 3:
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 			spaceod_bg_detect = 0;
 			break;
 
@@ -443,13 +443,13 @@ WRITE8_HANDLER( monsterb_videoram_w )
 	{
 		offs_t paloffs = offset & 0x3f;
 		paletteram[paloffs | 0x40] = data;
-		g80_set_palette_entry(machine, paloffs | 0x40, data);
+		g80_set_palette_entry(space->machine, paloffs | 0x40, data);
 		/* note that since the background board is not integrated with the main board */
 		/* writes here also write through to regular videoram */
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(machine, offset, data);
+	segag80r_videoram_w(space, offset, data);
 }
 
 
@@ -513,12 +513,12 @@ WRITE8_HANDLER( pignewt_videoram_w )
 	{
 		offs_t paloffs = offset & 0x3f;
 		paletteram[paloffs | 0x40] = data;
-		g80_set_palette_entry(machine, paloffs | 0x40, data);
+		g80_set_palette_entry(space->machine, paloffs | 0x40, data);
 		return;
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(machine, offset, data);
+	segag80r_videoram_w(space, offset, data);
 }
 
 
@@ -596,12 +596,12 @@ WRITE8_HANDLER( sindbadm_videoram_w )
 	{
 		offs_t paloffs = offset & 0x3f;
 		paletteram[paloffs | 0x40] = data;
-		g80_set_palette_entry(machine, paloffs | 0x40, data);
+		g80_set_palette_entry(space->machine, paloffs | 0x40, data);
 		return;
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(machine, offset, data);
+	segag80r_videoram_w(space, offset, data);
 }
 
 
@@ -611,7 +611,7 @@ WRITE8_HANDLER( sindbadm_back_port_w )
 	{
 		/* port 0: irq ack */
 		case 0:
-			cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		/* port 1: background control

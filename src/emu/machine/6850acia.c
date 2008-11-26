@@ -186,29 +186,29 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	timer_reset(acia_p->rx_timer, attotime_never);
 	timer_reset(acia_p->tx_timer, attotime_never);
 
-	state_save_register_item("acia6850", which, acia_p->ctrl);
-	state_save_register_item("acia6850", which, acia_p->status);
-	state_save_register_item("acia6850", which, acia_p->rx_clock);
-	state_save_register_item("acia6850", which, acia_p->tx_clock);
-	state_save_register_item("acia6850", which, acia_p->rx_counter);
-	state_save_register_item("acia6850", which, acia_p->tx_counter);
-	state_save_register_item("acia6850", which, acia_p->rx_shift);
-	state_save_register_item("acia6850", which, acia_p->tx_shift);
-	state_save_register_item("acia6850", which, acia_p->rdr);
-	state_save_register_item("acia6850", which, acia_p->tdr);
-	state_save_register_item("acia6850", which, acia_p->rx_bits);
-	state_save_register_item("acia6850", which, acia_p->tx_bits);
-	state_save_register_item("acia6850", which, acia_p->rx_parity);
-	state_save_register_item("acia6850", which, acia_p->tx_parity);
-	state_save_register_item("acia6850", which, acia_p->tx_int);
+	state_save_register_item("acia6850", NULL, which, acia_p->ctrl);
+	state_save_register_item("acia6850", NULL, which, acia_p->status);
+	state_save_register_item("acia6850", NULL, which, acia_p->rx_clock);
+	state_save_register_item("acia6850", NULL, which, acia_p->tx_clock);
+	state_save_register_item("acia6850", NULL, which, acia_p->rx_counter);
+	state_save_register_item("acia6850", NULL, which, acia_p->tx_counter);
+	state_save_register_item("acia6850", NULL, which, acia_p->rx_shift);
+	state_save_register_item("acia6850", NULL, which, acia_p->tx_shift);
+	state_save_register_item("acia6850", NULL, which, acia_p->rdr);
+	state_save_register_item("acia6850", NULL, which, acia_p->tdr);
+	state_save_register_item("acia6850", NULL, which, acia_p->rx_bits);
+	state_save_register_item("acia6850", NULL, which, acia_p->tx_bits);
+	state_save_register_item("acia6850", NULL, which, acia_p->rx_parity);
+	state_save_register_item("acia6850", NULL, which, acia_p->tx_parity);
+	state_save_register_item("acia6850", NULL, which, acia_p->tx_int);
 
-	state_save_register_item("acia6850", which, acia_p->divide);
-	state_save_register_item("acia6850", which, acia_p->overrun);
-	state_save_register_item("acia6850", which, acia_p->reset);
-	state_save_register_item("acia6850", which, acia_p->first_reset);
-	state_save_register_item("acia6850", which, acia_p->rts);
-	state_save_register_item("acia6850", which, acia_p->brk);
-	state_save_register_item("acia6850", which, acia_p->status_read);
+	state_save_register_item("acia6850", NULL, which, acia_p->divide);
+	state_save_register_item("acia6850", NULL, which, acia_p->overrun);
+	state_save_register_item("acia6850", NULL, which, acia_p->reset);
+	state_save_register_item("acia6850", NULL, which, acia_p->first_reset);
+	state_save_register_item("acia6850", NULL, which, acia_p->rts);
+	state_save_register_item("acia6850", NULL, which, acia_p->brk);
+	state_save_register_item("acia6850", NULL, which, acia_p->status_read);
 }
 
 
@@ -354,7 +354,7 @@ static void acia6850_check_interrupts(int which)
 /*
     Write transmit register
 */
-static void acia6850_data_w(int which, UINT8 data)
+static void acia6850_data_w(running_machine *machine, int which, UINT8 data)
 {
 	acia_6850 *acia_p = &acia[which];
 
@@ -366,7 +366,7 @@ static void acia6850_data_w(int which, UINT8 data)
 	}
 	else
 	{
-		logerror("ACIA %d: Data write while in reset! (%x)\n", which, activecpu_get_previouspc());
+		logerror("ACIA %d: Data write while in reset! (%x)\n", which, cpu_get_previouspc(machine->activecpu));
 	}
 }
 
@@ -752,10 +752,10 @@ WRITE8_HANDLER( acia6850_1_ctrl_w ) { acia6850_ctrl_w(1, data); }
 WRITE8_HANDLER( acia6850_2_ctrl_w ) { acia6850_ctrl_w(2, data); }
 WRITE8_HANDLER( acia6850_3_ctrl_w ) { acia6850_ctrl_w(3, data); }
 
-WRITE8_HANDLER( acia6850_0_data_w ) { acia6850_data_w(0, data); }
-WRITE8_HANDLER( acia6850_1_data_w ) { acia6850_data_w(1, data); }
-WRITE8_HANDLER( acia6850_2_data_w ) { acia6850_data_w(2, data); }
-WRITE8_HANDLER( acia6850_3_data_w ) { acia6850_data_w(3, data); }
+WRITE8_HANDLER( acia6850_0_data_w ) { acia6850_data_w(space->machine, 0, data); }
+WRITE8_HANDLER( acia6850_1_data_w ) { acia6850_data_w(space->machine, 1, data); }
+WRITE8_HANDLER( acia6850_2_data_w ) { acia6850_data_w(space->machine, 2, data); }
+WRITE8_HANDLER( acia6850_3_data_w ) { acia6850_data_w(space->machine, 3, data); }
 
 READ8_HANDLER( acia6850_0_stat_r ) { return acia6850_stat_r(0); }
 READ8_HANDLER( acia6850_1_stat_r ) { return acia6850_stat_r(1); }
@@ -797,12 +797,12 @@ WRITE16_HANDLER( acia6850_1_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl
 WRITE16_HANDLER( acia6850_2_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(2, data & 0xff); }
 WRITE16_HANDLER( acia6850_3_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(3, data & 0xff); }
 
-WRITE16_HANDLER( acia6850_0_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(0, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_1_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(1, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_2_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_3_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(3, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_0_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 0, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_1_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 1, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_2_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 2, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_3_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 3, (data >> 8) & 0xff); }
 
-WRITE16_HANDLER( acia6850_0_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(0, data & 0xff); }
-WRITE16_HANDLER( acia6850_1_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(1, data & 0xff); }
-WRITE16_HANDLER( acia6850_2_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(2, data & 0xff); }
-WRITE16_HANDLER( acia6850_3_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(3, data & 0xff); }
+WRITE16_HANDLER( acia6850_0_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 0, data & 0xff); }
+WRITE16_HANDLER( acia6850_1_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 1, data & 0xff); }
+WRITE16_HANDLER( acia6850_2_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 2, data & 0xff); }
+WRITE16_HANDLER( acia6850_3_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 3, data & 0xff); }

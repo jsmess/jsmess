@@ -41,8 +41,8 @@ extern VIDEO_UPDATE( popeye );
 static INTERRUPT_GEN( popeye_interrupt )
 {
 	/* NMIs are enabled by the I register?? How can that be? */
-	if (activecpu_get_reg(Z80_I) & 1)	/* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (cpu_get_reg(device, Z80_I) & 1)	/* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -455,8 +455,8 @@ static READ8_HANDLER( popeye_portA_r )
 	int res;
 
 
-	res = input_port_read(machine, "DSW0");
-	res |= (input_port_read(machine, "DSW1") << (7-dswbit)) & 0x80;
+	res = input_port_read(space->machine, "DSW0");
+	res |= (input_port_read(space->machine, "DSW1") << (7-dswbit)) & 0x80;
 
 	return res;
 }

@@ -169,7 +169,6 @@ INLINE void pc_stack_pop(adsp2100_state *adsp)
 			adsp->sstat |= PC_EMPTY;
 	}
 	adsp->pc = adsp->pc_stack[adsp->pc_sp];
-	CHANGEPC(adsp);
 }
 
 INLINE UINT32 pc_stack_pop_val(adsp2100_state *adsp)
@@ -556,10 +555,10 @@ INLINE void data_write_dag1(adsp2100_state *adsp, UINT32 op, INT32 val)
 	if ( adsp->mstat & MSTAT_REVERSE )
 	{
 		UINT32 ir = reverse_table[ i & 0x3fff ];
-		WWORD_DATA(ir, val);
+		WWORD_DATA(adsp, ir, val);
 	}
 	else
-		WWORD_DATA(i, val);
+		WWORD_DATA(adsp, i, val);
 
 	i += adsp->m[mreg];
 	if (i < base) i += l;
@@ -580,10 +579,10 @@ INLINE UINT32 data_read_dag1(adsp2100_state *adsp, UINT32 op)
 	if (adsp->mstat & MSTAT_REVERSE)
 	{
 		UINT32 ir = reverse_table[i & 0x3fff];
-		res = RWORD_DATA(ir);
+		res = RWORD_DATA(adsp, ir);
 	}
 	else
-		res = RWORD_DATA(i);
+		res = RWORD_DATA(adsp, i);
 
 	i += adsp->m[mreg];
 	if (i < base) i += l;
@@ -601,7 +600,7 @@ INLINE void data_write_dag2(adsp2100_state *adsp, UINT32 op, INT32 val)
 	UINT32 i = adsp->i[ireg];
 	UINT32 l = adsp->l[ireg];
 
-	WWORD_DATA(i, val);
+	WWORD_DATA(adsp, i, val);
 
 	i += adsp->m[mreg];
 	if (i < base) i += l;
@@ -618,7 +617,7 @@ INLINE UINT32 data_read_dag2(adsp2100_state *adsp, UINT32 op)
 	UINT32 i = adsp->i[ireg];
 	UINT32 l = adsp->l[ireg];
 
-	UINT32 res = RWORD_DATA(i);
+	UINT32 res = RWORD_DATA(adsp, i);
 
 	i += adsp->m[mreg];
 	if (i < base) i += l;
@@ -640,7 +639,7 @@ INLINE void pgm_write_dag2(adsp2100_state *adsp, UINT32 op, INT32 val)
 	UINT32 i = adsp->i[ireg];
 	UINT32 l = adsp->l[ireg];
 
-	WWORD_PGM(i, (val << 8) | adsp->px);
+	WWORD_PGM(adsp, i, (val << 8) | adsp->px);
 
 	i += adsp->m[mreg];
 	if (i < base) i += l;
@@ -658,7 +657,7 @@ INLINE UINT32 pgm_read_dag2(adsp2100_state *adsp, UINT32 op)
 	UINT32 l = adsp->l[ireg];
 	UINT32 res;
 
-	res = RWORD_PGM(i);
+	res = RWORD_PGM(adsp, i);
 	adsp->px = res;
 	res >>= 8;
 

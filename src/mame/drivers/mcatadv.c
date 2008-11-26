@@ -148,8 +148,8 @@ UINT16* mcatadv_vidregs;
 
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
-	soundlatch_w(machine, 0, data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -167,7 +167,7 @@ static WRITE16_HANDLER( mcat_coin_w )
 
 static READ16_HANDLER( mcat_wd_r )
 {
-	watchdog_reset_r(machine,0);
+	watchdog_reset_r(space,0);
 	return 0xc00;
 }
 
@@ -226,9 +226,9 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( mcatadv_sound_bw_w )
 {
-	UINT8 *rom = memory_region(machine, "sound") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "sound") + 0x10000;
 
-	memory_set_bankptr(1,rom + data * 0x4000);
+	memory_set_bankptr(space->machine, 1,rom + data * 0x4000);
 }
 
 
@@ -460,7 +460,7 @@ GFXDECODE_END
 /* Stolen from Psikyo.c */
 static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym2610_interface mcatadv_ym2610_interface =
 {
@@ -520,7 +520,7 @@ static DRIVER_INIT( mcatadv )
 {
 	UINT8 *z80rom = memory_region(machine, "sound") + 0x10000;
 
-	memory_set_bankptr(1, z80rom + 0x4000);
+	memory_set_bankptr(machine, 1, z80rom + 0x4000);
 }
 
 

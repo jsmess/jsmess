@@ -145,23 +145,23 @@ static void omegaf_io_protection_reset(void);
 
 static INTERRUPT_GEN( ninjakd2_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_set_bank(machine, 1, 0);
 }
 
 static void robokid_init_banks(running_machine *machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0,  2, memory_region(machine, "main"), 0x4000);
-	memory_configure_bank(1, 2, 14, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0,  2, memory_region(machine, "main"), 0x4000);
+	memory_configure_bank(machine, 1, 2, 14, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_set_bank(machine, 1, 0);
 }
 
 static MACHINE_RESET( robokid )
@@ -179,19 +179,19 @@ static MACHINE_RESET( omegaf )
 
 static WRITE8_HANDLER( ninjakd2_bankselect_w )
 {
-	memory_set_bank(1, data & 0x7);
+	memory_set_bank(space->machine, 1, data & 0x7);
 }
 
 static WRITE8_HANDLER( robokid_bankselect_w )
 {
-	memory_set_bank(1, data & 0xf);
+	memory_set_bank(space->machine, 1, data & 0xf);
 }
 
 
 static WRITE8_HANDLER( ninjakd2_soundreset_w )
 {
 	// bit 4 resets sound CPU
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(data & 0x80);
@@ -220,12 +220,12 @@ static void ninjakd2_init_samples(void)
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	const UINT8* const rom = memory_region(machine, "samples");
+	const UINT8* const rom = memory_region(space->machine, "samples");
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = memory_region_length(machine, "samples");
+		const int length = memory_region_length(space->machine, "samples");
 
 		const int start = data << 8;
 
@@ -325,8 +325,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 1:	// dip switches
 			switch (offset)
 			{
-				case 0: result = input_port_read(machine, "DIPSW1"); break;
-				case 1: result = input_port_read(machine, "DIPSW2"); break;
+				case 0: result = input_port_read(space->machine, "DIPSW1"); break;
+				case 1: result = input_port_read(space->machine, "DIPSW2"); break;
 				case 2: result = 0x02;                         break;
 			}
 			break;
@@ -334,8 +334,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 2:	// player inputs
 			switch (offset)
 			{
-				case 0: result = input_port_read(machine, "PAD1"); break;
-				case 1: result = input_port_read(machine, "PAD2"); break;
+				case 0: result = input_port_read(space->machine, "PAD1"); break;
+				case 1: result = input_port_read(space->machine, "PAD2"); break;
 				case 2: result = 0x01;                       break;
 			}
 			break;
@@ -899,7 +899,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1201,7 +1201,6 @@ ROM_START( robokid )
 	ROM_LOAD( "robokid2.18k", 0x18000, 0x10000, CRC(ddef8c5a) SHA1(a1dd2f51205863c3d5d3527991d538ca8adf7587) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
-	ROM_COPY( "main",    0x10000, 0x8000, 0x4000 ) /* to avoid crash because of code that crosses bank boundary */
 
 	ROM_REGION( 0x10000, "sound", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
@@ -1250,7 +1249,6 @@ ROM_START( robokidj )
 	ROM_LOAD( "2.30",         0x18000, 0x10000, CRC(e3f73476) SHA1(bd1c8946d637df21432bd52ae9324255251570b9) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
-	ROM_COPY( "main",    0x10000, 0x8000, 0x4000 ) /* to avoid crash because of code that crosses bank boundary */
 
 	ROM_REGION( 0x10000, "sound", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
@@ -1299,7 +1297,6 @@ ROM_START( robokdj2 )
 	ROM_LOAD( "2_rom30.18k",  0x18000, 0x10000, CRC(c0228b63) SHA1(8f7e3a29a35723abc8b10bf511fc8611e31a2961) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
-	ROM_COPY( "main",    0x10000, 0x8000, 0x4000 ) /* to avoid crash because of code that crosses bank boundary */
 
 	ROM_REGION( 0x10000, "sound", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
@@ -1457,7 +1454,8 @@ static DRIVER_INIT( ninjakd2 )
 
 static DRIVER_INIT( bootleg )
 {
-	memory_set_decrypted_region(1, 0x0000, 0x7fff, memory_region(machine, "sound") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "sound", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "sound") + 0x10000);
 
 	gfx_unscramble(machine);
 }

@@ -15,6 +15,7 @@
 #define __MCONFIG_H__
 
 #include "devintrf.h"
+#include "cpuexec.h"
 #include <stddef.h>
 
 
@@ -46,7 +47,7 @@ enum
 	MCONFIG_TOKEN_CPU_MODIFY,
 	MCONFIG_TOKEN_CPU_REMOVE,
 	MCONFIG_TOKEN_CPU_REPLACE,
-	MCONFIG_TOKEN_CPU_FLAGS,
+	MCONFIG_TOKEN_cpu_get_flags,
 	MCONFIG_TOKEN_CPU_CONFIG,
 	MCONFIG_TOKEN_CPU_PROGRAM_MAP,
 	MCONFIG_TOKEN_CPU_DATA_MAP,
@@ -170,7 +171,7 @@ union _machine_config_token
 	const gfx_decode_entry *gfxdecode;
 	const addrmap_token *addrmap;
 	device_type devtype;
-	void (*interrupt)(running_machine *machine, int cpunum);
+	void (*interrupt)(const device_config *device);
 	driver_init_func driver_init;
 	nvram_handler_func nvram_handler;
 	memcard_handler_func memcard_handler;
@@ -294,7 +295,7 @@ union _machine_config_token
 
 /* CPU parameters */
 #define MDRV_CPU_FLAGS(_flags) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_FLAGS, 8, _flags, 24),
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_cpu_get_flags, 8, _flags, 24),
 
 #define MDRV_CPU_CONFIG(_config) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_CONFIG, 8), \

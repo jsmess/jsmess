@@ -13,6 +13,7 @@
 
 #include "cpuintrf.h"
 #include "ppc.h"
+#include "timer.h"
 #include "cpu/vtlb.h"
 
 
@@ -554,6 +555,7 @@ struct _powerpc_state
 	int				cpunum;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 	UINT32			irq_pending;
 	UINT32			system_clock;
 	UINT32			cpu_clock;
@@ -571,7 +573,7 @@ struct _powerpc_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, const powerpc_config *config, cpu_irq_callback irqcallback);
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
 void ppccom_exit(powerpc_state *ppc);
 
 void ppccom_reset(powerpc_state *ppc);

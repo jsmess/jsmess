@@ -213,6 +213,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "cpuexec.h"
 #include "eminline.h"
 #include "e132xs.h"
 #include "osd_cpu.h"
@@ -222,16 +223,6 @@
 #else
 #define DEBUG_PRINTF(x) do { } while (0)
 #endif
-
-static UINT8  (*hyp_cpu_read_byte)(offs_t address);
-static UINT16 (*hyp_cpu_read_half_word)(offs_t address);
-static UINT32 (*hyp_cpu_read_word)(offs_t address);
-static UINT32 (*hyp_cpu_read_io_word)(offs_t address);
-static void (*hyp_cpu_write_byte)(offs_t address, UINT8 data);
-static void (*hyp_cpu_write_half_word)(offs_t address, UINT16 data);
-static void (*hyp_cpu_write_word)(offs_t address, UINT32 data);
-static void (*hyp_cpu_write_io_word)(offs_t address, UINT32 data);
-int hyp_type_16bit;
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
@@ -333,6 +324,9 @@ typedef struct
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
+	UINT32 opcodexor;
 
 	INT32 instruction_length;
 	INT32 intblock;
@@ -384,31 +378,6 @@ static void check_interrupts(void);
 #define SAME_SRC_DST   (decode)->same_src_dst
 #define SAME_SRC_DSTF  (decode)->same_src_dstf
 #define SAME_SRCF_DST  (decode)->same_srcf_dst
-
-#if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
-static UINT32 internal_program_read_dword_16be(offs_t address)
-{
-	return (program_read_word_16be(address & ~1) << 16) | program_read_word_16be((address & ~1) + 2);
-}
-
-static void internal_program_write_dword_16be(offs_t address, UINT32 data)
-{
-	program_write_word_16be(address & ~1, (data & 0xffff0000)>>16);
-	program_write_word_16be((address & ~1)+2, data & 0xffff);
-}
-
-static UINT32 internal_io_read_dword_16be(offs_t address)
-{
-	return (io_read_word_16be(address & ~1)<< 16) | io_read_word_16be((address & ~1) + 2);
-}
-
-static void internal_io_write_dword_16be(offs_t address, UINT32 data)
-{
-	io_write_word_16be(address & ~1, (data & 0xffff0000)>>16);
-	io_write_word_16be((address & ~1)+2, data & 0xffff);
-}
-#endif
-
 
 // 4Kb IRAM (On-Chip Memory)
 #if (HAS_E116T || HAS_GMS30C2116)
@@ -604,7 +573,7 @@ static void hyperstone_set_trap_entry(int which)
 
 static UINT32 compute_tr(void)
 {
-	UINT64 cycles_since_base = activecpu_gettotalcycles() - hyperstone.tr_base_cycles;
+	UINT64 cycles_since_base = cpu_get_total_cycles(Machine->activecpu) - hyperstone.tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
 	return hyperstone.tr_base_value + (clocks_since_base / hyperstone.tr_clocks_per_tick);
 }
@@ -620,15 +589,15 @@ static void update_timer_prescale(void)
 	hyperstone.clock_cycles_6 = 6 << hyperstone.clock_scale;
 	hyperstone.tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
 	hyperstone.tr_base_value = prevtr;
-	hyperstone.tr_base_cycles = activecpu_gettotalcycles();
+	hyperstone.tr_base_cycles = cpu_get_total_cycles(Machine->activecpu);
 }
 
 static void adjust_timer_interrupt(void)
 {
-	UINT64 cycles_since_base = activecpu_gettotalcycles() - hyperstone.tr_base_cycles;
+	UINT64 cycles_since_base = cpu_get_total_cycles(Machine->activecpu) - hyperstone.tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
 	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << hyperstone.clock_scale);
-	int cpunum = cpu_getactivecpu();
+	int cpunum = cpunum_get_active();
 
 	if (cycles_until_next_clock == 0)
 		cycles_until_next_clock = (UINT64)(1 << hyperstone.clock_scale);
@@ -669,7 +638,7 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	int update = param & 1;
 	int cpunum = param >> 1;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 
 	/* update the values if necessary */
 	if (update)
@@ -683,7 +652,7 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	else
 		adjust_timer_interrupt();
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -740,7 +709,6 @@ INLINE void set_global_register(UINT8 code, UINT32 val)
 	if( code == PC_REGISTER )
 	{
 		SET_PC(val);
-		change_pc(PC);
 	}
 	else if( code == SR_REGISTER )
 	{
@@ -800,7 +768,7 @@ INLINE void set_global_register(UINT8 code, UINT32 val)
 */
 			case TR_REGISTER:
 				hyperstone.tr_base_value = val;
-				hyperstone.tr_base_cycles = activecpu_gettotalcycles();
+				hyperstone.tr_base_cycles = cpu_get_total_cycles(Machine->activecpu);
 				adjust_timer_interrupt();
 				break;
 
@@ -1297,7 +1265,6 @@ INLINE void execute_br(struct regs_decode *decode)
 {
 	PPC = PC;
 	PC += EXTRA_S;
-	change_pc(PC);
 	SET_M(0);
 
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
@@ -1335,7 +1302,6 @@ static void execute_trap(UINT32 addr)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
@@ -1365,7 +1331,6 @@ static void execute_int(UINT32 addr)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
@@ -1394,7 +1359,6 @@ static void execute_exception(UINT32 addr)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 
 	DEBUG_PRINTF(("EXCEPTION! PPC = %08X PC = %08X\n",PPC-2,PC-2));
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
@@ -1434,7 +1398,6 @@ static void execute_software(struct regs_decode *decode)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 }
 
 
@@ -1565,157 +1528,137 @@ static void set_irq_line(int irqline, int state)
 		ISR &= ~(1 << irqline);
 }
 
-static void hyperstone_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int scale_mask)
+static void hyperstone_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
-	state_save_register_item_array("E132XS", index, hyperstone.global_regs);
-	state_save_register_item_array("E132XS", index, hyperstone.local_regs);
-	state_save_register_item("E132XS", index, hyperstone.ppc);
-	state_save_register_item("E132XS", index, hyperstone.trap_entry);
-	state_save_register_item("E132XS", index, hyperstone.delay.delay_pc);
-	state_save_register_item("E132XS", index, hyperstone.instruction_length);
-	state_save_register_item("E132XS", index, hyperstone.intblock);
-	state_save_register_item("E132XS", index, hyperstone.delay.delay_cmd);
-	state_save_register_item("E132XS", index, hyperstone.tr_clocks_per_tick);
+	state_save_register_item_array("E132XS", device->tag, 0, hyperstone.global_regs);
+	state_save_register_item_array("E132XS", device->tag, 0, hyperstone.local_regs);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.ppc);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.trap_entry);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.delay.delay_pc);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.instruction_length);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.intblock);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.delay.delay_cmd);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.tr_clocks_per_tick);
 
 	hyperstone.irq_callback = irqcallback;
 	hyperstone.device = device;
+	hyperstone.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	hyperstone.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	hyperstone.timer = timer_alloc(e132xs_timer_callback, NULL);
 	hyperstone.clock_scale_mask = scale_mask;
 }
 
 #if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
-static void e116_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int scale_mask)
+static void e116_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
-	hyp_cpu_read_byte      = program_read_byte_16be;
-	hyp_cpu_read_half_word = program_read_word_16be;
-	hyp_cpu_read_word      = internal_program_read_dword_16be;
-	hyp_cpu_read_io_word   = internal_io_read_dword_16be;
-
-	hyp_cpu_write_byte      = program_write_byte_16be;
-	hyp_cpu_write_half_word = program_write_word_16be;
-	hyp_cpu_write_word      = internal_program_write_dword_16be;
-	hyp_cpu_write_io_word   = internal_io_write_dword_16be;
-
-	hyp_type_16bit = 1;
-
-	hyperstone_init(device, index, clock, config, irqcallback, scale_mask);
+	hyperstone_init(device, index, clock, irqcallback, scale_mask);
+	hyperstone.opcodexor = 0;
 }
 #endif
 
 #if (HAS_E116T)
 static CPU_INIT( e116t )
 {
-	e116_init(device, index, clock, config, irqcallback, 0);
+	e116_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E116XT)
 static CPU_INIT( e116xt )
 {
-	e116_init(device, index, clock, config, irqcallback, 3);
+	e116_init(device, index, clock, irqcallback, 3);
 }
 #endif
 
 #if (HAS_E116XS)
 static CPU_INIT( e116xs )
 {
-	e116_init(device, index, clock, config, irqcallback, 7);
+	e116_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_E116XSR)
 static CPU_INIT( e116xsr )
 {
-	e116_init(device, index, clock, config, irqcallback, 7);
+	e116_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_GMS30C2116)
 static CPU_INIT( gms30c2116 )
 {
-	e116_init(device, index, clock, config, irqcallback, 0);
+	e116_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_GMS30C2216)
 static CPU_INIT( gms30c2216 )
 {
-	e116_init(device, index, clock, config, irqcallback, 0);
+	e116_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E132N || HAS_E132T || HAS_E132XN || HAS_E132XT || HAS_E132XS || HAS_E132XSR || HAS_GMS30C2132 || HAS_GMS30C2232)
-static void e132_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int scale_mask)
+static void e132_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
-	hyp_cpu_read_byte      = program_read_byte_32be;
-	hyp_cpu_read_half_word = program_read_word_32be;
-	hyp_cpu_read_word      = program_read_dword_32be;
-	hyp_cpu_read_io_word   = io_read_dword_32be;
-
-	hyp_cpu_write_byte      = program_write_byte_32be;
-	hyp_cpu_write_half_word = program_write_word_32be;
-	hyp_cpu_write_word      = program_write_dword_32be;
-	hyp_cpu_write_io_word   = io_write_dword_32be;
-
-	hyp_type_16bit = 0;
-
-	hyperstone_init(device, index, clock, config, irqcallback, scale_mask);
+	hyperstone_init(device, index, clock, irqcallback, scale_mask);
+	hyperstone.opcodexor = WORD_XOR_BE(0);
 }
 #endif
 
 #if (HAS_E132N)
 static CPU_INIT( e132n )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E132T)
 static CPU_INIT( e132t )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E132XN)
 static CPU_INIT( e132xn )
 {
-	e132_init(device, index, clock, config, irqcallback, 3);
+	e132_init(device, index, clock, irqcallback, 3);
 }
 #endif
 
 #if (HAS_E132XT)
 static CPU_INIT( e132xt )
 {
-	e132_init(device, index, clock, config, irqcallback, 3);
+	e132_init(device, index, clock, irqcallback, 3);
 }
 #endif
 
 #if (HAS_E132XS)
 static CPU_INIT( e132xs )
 {
-	e132_init(device, index, clock, config, irqcallback, 7);
+	e132_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_E132XSR)
 static CPU_INIT( e132xsr )
 {
-	e132_init(device, index, clock, config, irqcallback, 7);
+	e132_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_GMS30C2132)
 static CPU_INIT( gms30c2132 )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_GMS30C2232)
 static CPU_INIT( gms30c2232 )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
@@ -1724,15 +1667,18 @@ static CPU_RESET( hyperstone )
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	emu_timer *save_timer;
-	const device_config *save_device;
 	cpu_irq_callback save_irqcallback;
+	UINT32 save_opcodexor;
 
 	save_timer = hyperstone.timer;
 	save_irqcallback = hyperstone.irq_callback;
-	save_device = hyperstone.device;
+	save_opcodexor = hyperstone.opcodexor;
 	memset(&hyperstone, 0, sizeof(hyperstone_regs));
 	hyperstone.irq_callback = save_irqcallback;
-	hyperstone.device = save_device;
+	hyperstone.opcodexor = save_opcodexor;
+	hyperstone.device = device;
+	hyperstone.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	hyperstone.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	hyperstone.timer = save_timer;
 
 	hyperstone.tr_clocks_per_tick = 2;
@@ -1745,7 +1691,6 @@ static CPU_RESET( hyperstone )
 	set_global_register(TPR_REGISTER, 0xc000000);
 
 	PC = get_trap_addr(TRAPNO_RESET);
-	change_pc(PC);
 
 	SET_FP(0);
 	SET_FL(2);
@@ -1833,7 +1778,6 @@ INLINE void hyperstone_movd(struct regs_decode *decode)
 			PPC = PC;
 
 			PC = SET_PC(SREG);
-			change_pc(PC);
 			SR = (SREGF & 0xffe00000) | ((SREG & 0x01) << 18 ) | (SREGF & 0x3ffff);
 			if (hyperstone.intblock < 1)
 				hyperstone.intblock = 1;
@@ -4550,7 +4494,6 @@ INLINE void hyperstone_call(struct regs_decode *decode)
 
 	PPC = PC;
 	PC = EXTRA_S; // const value
-	change_pc(PC);
 
 	hyperstone.intblock = 2;
 
@@ -4766,7 +4709,7 @@ static CPU_EXECUTE( hyperstone )
 		UINT16 opcode;
 
 		PPC = PC;	/* copy PC to previous PC */
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		opcode = READ_OP(PC);
 		PC += 2;
@@ -4807,9 +4750,9 @@ static CPU_SET_INFO( hyperstone )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + E132XS_PC:			PC = info->i; change_pc(PC);			break;
-		case CPUINFO_INT_REGISTER + E132XS_SR:			SR = info->i;							break;
-		case CPUINFO_INT_REGISTER + E132XS_FER:			FER = info->i;							break;
+		case CPUINFO_INT_REGISTER + E132XS_PC:			PC = info->i; 						break;
+		case CPUINFO_INT_REGISTER + E132XS_SR:			SR = info->i;						break;
+		case CPUINFO_INT_REGISTER + E132XS_FER:			FER = info->i;						break;
 		case CPUINFO_INT_REGISTER + E132XS_G3:			set_global_register(3, info->i);	break;
 		case CPUINFO_INT_REGISTER + E132XS_G4:			set_global_register(4, info->i);	break;
 		case CPUINFO_INT_REGISTER + E132XS_G5:			set_global_register(5, info->i);	break;

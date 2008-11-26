@@ -73,11 +73,11 @@ static READ16_HANDLER( eeprom_r )
 {
 	int res;
 
-logerror("%06x eeprom_r\n",activecpu_get_pc());
+logerror("%06x eeprom_r\n",cpu_get_pc(space->cpu));
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = input_port_read(machine, "EEPROM");
+	res = input_port_read(space->machine, "EEPROM");
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -89,7 +89,7 @@ logerror("%06x eeprom_r\n",activecpu_get_pc());
 
 static WRITE16_HANDLER( eeprom_w )
 {
-logerror("%06x: write %04x to 108000\n",activecpu_get_pc(),data);
+logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
@@ -113,20 +113,20 @@ logerror("%06x: write %04x to 108000\n",activecpu_get_pc(),data);
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch2_r(machine,0);
+	return soundlatch2_r(space,0);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
 	if (ACCESSING_BITS_0_7) {
 		data &= 0xff;
-		soundlatch_w(machine, 0, data);
+		soundlatch_w(space, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 //int xmen_irqenabled;
@@ -135,7 +135,7 @@ static WRITE16_HANDLER( xmen_18fa00_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		/* bit 2 is interrupt enable */
-		interrupt_enable_w(machine,0,data & 0x04);
+		interrupt_enable_w(space,0,data & 0x04);
 	//  xmen_irqenabled = data;
 	}
 }
@@ -144,13 +144,13 @@ static UINT8 sound_curbank;
 
 static void sound_reset_bank(running_machine *machine)
 {
-	memory_set_bankptr(4, memory_region(machine, "audio") + 0x10000 + (sound_curbank & 0x07) * 0x4000);
+	memory_set_bankptr(machine, 4, memory_region(machine, "audio") + 0x10000 + (sound_curbank & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	sound_curbank = data;
-	sound_reset_bank(machine);
+	sound_reset_bank(space->machine);
 }
 
 
@@ -414,8 +414,8 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( xmen_interrupt )
 {
-	if (cpu_getiloops() == 0) irq5_line_hold(machine, cpunum);
-	else irq3_line_hold(machine, cpunum);
+	if (cpu_getiloops(device) == 0) irq5_line_hold(device);
+	else irq3_line_hold(device);
 }
 
 static STATE_POSTLOAD( xmen_postload )
@@ -477,9 +477,9 @@ static MACHINE_RESET(xmen6p)
 
 static INTERRUPT_GEN( xmen6p_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
-		irq5_line_hold(machine, cpunum);
+		irq5_line_hold(device);
 
 
 	}
@@ -487,7 +487,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 	{
 //      if (xmen_irqenabled&0x04)
 //      {
-			irq3_line_hold(machine, cpunum);
+			irq3_line_hold(device);
 //          xmen_current_frame = 0x00;
 
 //      }

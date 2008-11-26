@@ -17,7 +17,6 @@
 
 #include "arm.h"
 #include "debugger.h"
-#include "deprecat.h"
 
 #define READ8(addr)			cpu_read8(addr)
 #define WRITE8(addr,data)	cpu_write8(addr,data)
@@ -232,6 +231,7 @@ typedef struct
 	UINT8 pendingFiq;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 } ARM_REGS;
 
 static ARM_REGS arm;
@@ -253,18 +253,18 @@ static void arm_check_irq_state(void);
 INLINE void cpu_write32( int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
-	program_write_dword_32le(addr&ADDRESS_MASK,data);
+	memory_write_dword_32le(arm.program, addr&ADDRESS_MASK,data);
 	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
 INLINE void cpu_write8( int addr, UINT8 data )
 {
-	program_write_byte_32le(addr,data);
+	memory_write_byte_32le(arm.program,addr,data);
 }
 
 INLINE UINT32 cpu_read32( int addr )
 {
-	UINT32 result = program_read_dword_32le(addr&ADDRESS_MASK);
+	UINT32 result = memory_read_dword_32le(arm.program,addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
 	if (addr&3) {
@@ -284,7 +284,7 @@ INLINE UINT32 cpu_read32( int addr )
 
 INLINE UINT8 cpu_read8( int addr )
 {
-	return program_read_byte_32le(addr);
+	return memory_read_byte_32le(arm.program, addr);
 }
 
 INLINE UINT32 GetRegister( int rIndex )
@@ -295,8 +295,6 @@ INLINE UINT32 GetRegister( int rIndex )
 INLINE void SetRegister( int rIndex, UINT32 value )
 {
 	arm.sArmRegister[sRegisterTable[MODE][rIndex]] = value;
-	if (rIndex == eR15)
-		change_pc(value & ADDRESS_MASK);
 }
 
 /***************************************************************************/
@@ -304,14 +302,13 @@ INLINE void SetRegister( int rIndex, UINT32 value )
 static CPU_RESET( arm )
 {
 	cpu_irq_callback save_irqcallback = arm.irq_callback;
-	const device_config *save_device = arm.device;
 	memset(&arm, 0, sizeof(arm));
 	arm.irq_callback = save_irqcallback;
-	arm.device = save_device;
+	arm.device = device;
+	arm.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
-	change_pc(R15 & ADDRESS_MASK);
 }
 
 static CPU_EXIT( arm )
@@ -327,11 +324,11 @@ static CPU_EXECUTE( arm )
 	arm_icount = cycles;
 	do
 	{
-		debugger_instruction_hook(Machine, R15);
+		debugger_instruction_hook(device, R15);
 
 		/* load instruction */
 		pc = R15;
-		insn = cpu_readop32( pc & ADDRESS_MASK );
+		insn = memory_decrypted_read_dword( arm.program, pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{
@@ -415,7 +412,6 @@ static CPU_EXECUTE( arm )
 			R15 = eARM_MODE_SVC;	/* Set SVC mode so PC is saved to correct R14 bank */
 			SetRegister( 14, pc );	/* save PC */
 			R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x8|eARM_MODE_SVC|I_MASK|(pc&MODE_MASK);
-			change_pc(pc&ADDRESS_MASK);
 			arm_icount -= 2 * S_CYCLE + N_CYCLE;
 		}
 		else /* Undefined */
@@ -447,7 +443,6 @@ static CPU_SET_CONTEXT( arm )
 	if (src)
 	{
 		memcpy( &arm, src, sizeof(arm) );
-		change_pc(R15 & ADDRESS_MASK);
 	}
 }
 
@@ -469,7 +464,6 @@ static void arm_check_irq_state(void)
 		R15 = eARM_MODE_FIQ;	/* Set FIQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );	/* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
-		change_pc(R15 & ADDRESS_MASK);
 		arm.pendingFiq=0;
 		return;
 	}
@@ -478,7 +472,6 @@ static void arm_check_irq_state(void)
 		R15 = eARM_MODE_IRQ;	/* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );	/* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
-		change_pc(R15 & ADDRESS_MASK);
 		arm.pendingIrq=0;
 		return;
 	}
@@ -516,11 +509,12 @@ static CPU_INIT( arm )
 {
 	arm.irq_callback = irqcallback;
 	arm.device = device;
+	arm.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item_array("arm", index, arm.sArmRegister);
-	state_save_register_item_array("arm", index, arm.coproRegister);
-	state_save_register_item("arm", index, arm.pendingIrq);
-	state_save_register_item("arm", index, arm.pendingFiq);
+	state_save_register_item_array("arm", device->tag, 0, arm.sArmRegister);
+	state_save_register_item_array("arm", device->tag, 0, arm.coproRegister);
+	state_save_register_item("arm", device->tag, 0, arm.pendingIrq);
+	state_save_register_item("arm", device->tag, 0, arm.pendingFiq);
 }
 
 /***************************************************************************/
@@ -544,7 +538,6 @@ static void HandleBranch(  UINT32 insn )
 	{
 		R15 += off + 8;
 	}
-	change_pc(R15 & ADDRESS_MASK);
 	arm_icount -= 2 * S_CYCLE + N_CYCLE;
 }
 
@@ -620,7 +613,6 @@ static void HandleMemSingle( UINT32 insn )
 			if (rd == eR15)
 			{
 				R15 = (READ32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
-				change_pc(R15 & ADDRESS_MASK);
 
 				/*
                 The docs are explicit in that the bottom bits should be masked off
@@ -856,7 +848,6 @@ static void HandleALU( UINT32 insn )
 		{
 			/* Merge the old NZCV flags into the new PC value */
 			R15 = (rd & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & IRQ_MASK) | (R15&MODE_MASK);
-			change_pc(R15 & ADDRESS_MASK);
 			arm_icount -= S_CYCLE + N_CYCLE;
 		}
 		else

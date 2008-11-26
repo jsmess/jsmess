@@ -1,10 +1,16 @@
 ﻿0.128.1
 
+NOTE:  DUE TO THE IMPACT OF THE MAME 0.128u4 MERGE; MANY DRIVERS HAVE BEEN
+TEMPORARILY DISABLED.  AS THESE DRIVERS ARE PORTED TO THE NEW CORE, THEY
+WILL BE REENABLED.
+
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Ivel Ultra [Miodrag Milanovic]
 - Pecom 64 [Miodrag Milanovic]
 - Sharp MZ80K [Miodrag Milanovic]
+
+
 
 System Driver Changes:
 ----------------------
@@ -51,7 +57,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.128u3.  This incorporates all features of the
+- The core is based on MAME 0.128u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 

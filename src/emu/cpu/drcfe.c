@@ -19,6 +19,7 @@
 
 #include <stddef.h>
 #include "cpuintrf.h"
+#include "mame.h"
 #include "drcfe.h"
 
 
@@ -55,6 +56,8 @@ struct _drcfe_state
 	void *				param;						/* parameter for the callback */
 
 	/* CPU parameters */
+	const device_config *device;					/* CPU device object */
+	const address_space *program;					/* program address space for this CPU */
 	offs_t				pageshift;					/* shift to convert address to a page index */
 	cpu_translate_func	translate;					/* pointer to translation function */
 	offs_t				codexor;					/* XOR to reach code */
@@ -121,7 +124,7 @@ INLINE void desc_free(drcfe_state *drcfe, opcode_desc *desc)
     drcfe_init - initializate the drcfe state
 -------------------------------------------------*/
 
-drcfe_state *drcfe_init(const drcfe_config *config, void *param)
+drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, void *param)
 {
 	drcfe_state *drcfe;
 
@@ -141,14 +144,16 @@ drcfe_state *drcfe_init(const drcfe_config *config, void *param)
 	drcfe->param = param;
 
 	/* initialize the state */
-	drcfe->pageshift = activecpu_page_shift(ADDRESS_SPACE_PROGRAM);
-	drcfe->translate = (cpu_translate_func)activecpu_get_info_fct(CPUINFO_PTR_TRANSLATE);
+	drcfe->device = cpu;
+	drcfe->program = memory_find_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
+	drcfe->translate = (cpu_translate_func)cpu_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
 #ifdef LSB_FIRST
-	if (activecpu_endianness() == CPU_IS_BE)
+	if (cpu_get_endianness(cpu) == CPU_IS_BE)
 #else
-	if (activecpu_endianness() == CPU_IS_LE)
+	if (cpu_get_endianness(cpu) == CPU_IS_LE)
 #endif
-		drcfe->codexor = (activecpu_databus_width(ADDRESS_SPACE_PROGRAM) / 8 / activecpu_min_instruction_bytes() - 1) * activecpu_min_instruction_bytes();
+		drcfe->codexor = (cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8 / cpu_get_min_opcode_bytes(cpu) - 1) * cpu_get_min_opcode_bytes(cpu);
 
 	return drcfe;
 }
@@ -287,7 +292,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_
 	desc->targetpc = BRANCH_TARGET_DYNAMIC;
 
 	/* compute the physical PC */
-	if (drcfe->translate != NULL && !(*drcfe->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
+	if (drcfe->translate != NULL && !(*drcfe->translate)(drcfe->device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
 	{
 		/* uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and */
 		/* mark as needing to validate; otherwise, just end the sequence here */
@@ -296,8 +301,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_
 	}
 
 	/* get a pointer to the physical address */
-	memory_set_opbase(desc->physpc);
-	desc->opptr.v = cpu_opptr(desc->physpc ^ drcfe->codexor);
+	desc->opptr.v = memory_decrypted_read_ptr(drcfe->program, desc->physpc ^ drcfe->codexor);
 	assert(desc->opptr.v != NULL);
 	if (desc->opptr.v == NULL)
 	{

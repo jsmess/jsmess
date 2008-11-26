@@ -44,7 +44,7 @@ WRITE8_HANDLER( liberate_videoram_w );
 
 static READ8_HANDLER( deco16_bank_r )
 {
-	const UINT8 *ROM = memory_region(machine, "user1");
+	const UINT8 *ROM = memory_region(space->machine, "user1");
 
 	/* The tilemap bank can be swapped into main memory */
 	if (deco16_bank)
@@ -53,10 +53,10 @@ static READ8_HANDLER( deco16_bank_r )
 	/* Else the handler falls through to read the usual address */
 	if (offset<0x800) return videoram[offset];
 	if (offset<0x1000) return spriteram[offset-0x800];
-	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",activecpu_get_pc(),offset); return 0; }
+	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
 	if (offset<0x2800) return scratchram[offset-0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n",activecpu_get_pc(),offset);
+	logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset);
 	return 0;
 }
 
@@ -67,16 +67,16 @@ static WRITE8_HANDLER( deco16_bank_w )
 
 static READ8_HANDLER( deco16_io_r )
 {
-	const UINT8 *ROM = memory_region(machine, "main");
+	const UINT8 *ROM = memory_region(space->machine, "main");
 
 	if (deco16_bank) {
-		if (offset==0) return input_port_read(machine, "IN1"); /* Player 1 controls */
-		if (offset==1) return input_port_read(machine, "IN2"); /* Player 2 controls */
-		if (offset==2) return input_port_read(machine, "IN3"); /* Vblank, coins */
-		if (offset==3) return input_port_read(machine, "DSW1"); /* Dip 1 */
-		if (offset==4) return input_port_read(machine, "DSW2"); /* Dip 2 */
+		if (offset==0) return input_port_read(space->machine, "IN1"); /* Player 1 controls */
+		if (offset==1) return input_port_read(space->machine, "IN2"); /* Player 2 controls */
+		if (offset==2) return input_port_read(space->machine, "IN3"); /* Vblank, coins */
+		if (offset==3) return input_port_read(space->machine, "DSW1"); /* Dip 1 */
+		if (offset==4) return input_port_read(space->machine, "DSW2"); /* Dip 2 */
 
-		logerror("%04x:  Read input %d\n",activecpu_get_pc(),offset);
+		logerror("%04x:  Read input %d\n",cpu_get_pc(space->cpu),offset);
 		return 0xff;
 	}
 	return ROM[0x8000+offset];
@@ -494,10 +494,10 @@ GFXDECODE_END
 static INTERRUPT_GEN( deco16_interrupt )
 {
 	static int latch = 0;
-	int p = ~input_port_read(machine, "IN3");
+	int p = ~input_port_read(device->machine, "IN3");
 	if ((p & 0x43) && !latch)
 	{
-		cpunum_set_input_line(machine, 0, DECO16_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
 		latch = 1;
 	}
 	else
@@ -898,6 +898,7 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine *machine)
 {
+	const address_space *space = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x4000);
 	UINT8 *rom = memory_region(machine, "audio");
 	int i;
@@ -906,7 +907,7 @@ static void sound_cpu_decrypt(running_machine *machine)
 	for (i=0xc000; i<0x10000; i++)
 		decrypted[i-0xc000]=((rom[i] & 0x20) << 1) | ((rom[i] & 0x40) >> 1) | (rom[i] & 0x9f);
 
-	memory_set_decrypted_region(1, 0xc000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0xc000, 0xffff, decrypted);
 }
 
 static DRIVER_INIT( prosport )
@@ -925,16 +926,17 @@ static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, input_port_0_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, input_port_0_r);
 }
 
 static DRIVER_INIT( liberate )
 {
 	int A;
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x10000);
 	UINT8 *ROM = memory_region(machine, "main");
 
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 
 	/* Swap bits for opcodes only, not data */
 	for (A = 0;A < 0x10000;A++) {

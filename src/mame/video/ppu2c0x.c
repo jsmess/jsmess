@@ -1313,7 +1313,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
  *  Sprite DMA
  *
  *************************************/
-void ppu2c0x_spriteram_dma (int num, const UINT8 page)
+void ppu2c0x_spriteram_dma (const address_space *space, int num, const UINT8 page)
 {
 	int i;
 	int address = page << 8;
@@ -1328,12 +1328,12 @@ void ppu2c0x_spriteram_dma (int num, const UINT8 page)
 //logerror("   sprite DMA: %d (scanline: %d)\n", page, chips[num].scanline);
 	for (i = 0; i < SPRITERAM_SIZE; i++)
 	{
-		UINT8 spriteData = program_read_byte(address + i);
+		UINT8 spriteData = memory_read_byte(space, address + i);
 		ppu2c0x_w (num, PPU_SPRITE_DATA, spriteData);
 	}
 
 	// should last 513 CPU cycles.
-	activecpu_adjust_icount(-513);
+	cpu_adjust_icount(chips[num].machine->activecpu, -513);
 
 	// ????TODO : need to account for PPU rendering - this is roughly 4.5 scanlines eaten up.
 	// Because the DMA is only useful during vblank, this may not be strictly necessary since

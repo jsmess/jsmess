@@ -64,30 +64,28 @@
 
 #define PPC m6502->ppc.d
 
-#define RDMEM_ID(a)		m6502->rdmem_id(Machine,a)
-#define WRMEM_ID(a,d)	m6502->wrmem_id(Machine,a,d)
-
-#define CHANGE_PC change_pc(PCD)
+#define RDMEM_ID(a)		m6502->rdmem_id(m6502->space,a)
+#define WRMEM_ID(a,d)	m6502->wrmem_id(m6502->space,a,d)
 
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
-#define RDOP() cpu_readop(PCW++); m6502->icount -= 1
+#define RDOP() memory_decrypted_read_byte(m6502->space, PCW++); m6502->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
-#define RDOPARG() cpu_readop_arg(PCW++); m6502->icount -= 1
+#define RDOPARG() memory_raw_read_byte(m6502->space, PCW++); m6502->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
-#define RDMEM(addr) program_read_byte_8le(addr); m6502->icount -= 1
+#define RDMEM(addr) memory_read_byte_8le(m6502->space, addr); m6502->icount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
-#define WRMEM(addr,data) program_write_byte_8le(addr,data); m6502->icount -= 1
+#define WRMEM(addr,data) memory_write_byte_8le(m6502->space, addr,data); m6502->icount -= 1
 
 /***************************************************************
  *  BRA  branch relative
@@ -104,7 +102,6 @@
 				RDMEM( (PCH << 8 ) | EAL) ;							\
 			}														\
 			PCD = EAD;												\
-			CHANGE_PC;												\
 		}															\
 	}
 
@@ -409,8 +406,7 @@
 	PUSH(P | F_B);												\
 	P = (P | F_I);												\
 	PCL = RDMEM(M6502_IRQ_VEC); 								\
-	PCH = RDMEM(M6502_IRQ_VEC+1);								\
-	CHANGE_PC
+	PCH = RDMEM(M6502_IRQ_VEC+1)
 
 /* 6502 ********************************************************
  * BVC  Branch if overflow clear
@@ -508,7 +504,7 @@
  *  ILL Illegal opcode
  ***************************************************************/
 #define ILL 													\
-	logerror("M6502 illegal opcode %04x: %02x\n",(PCW-1)&0xffff, cpu_readop((PCW-1)&0xffff))
+	logerror("M6502 illegal opcode %04x: %02x\n",(PCW-1)&0xffff, memory_decrypted_read_byte(m6502->space, (PCW-1)&0xffff))
 
 /* 6502 ********************************************************
  *  INC Increment memory
@@ -538,8 +534,7 @@
 #define JMP 													\
 	if( EAD == PPC && !m6502->pending_irq && !m6502->after_cli )	\
 		if( m6502->icount > 0 ) m6502->icount = 0;				\
-	PCD = EAD;													\
-	CHANGE_PC
+	PCD = EAD
 
 /* 6502 ********************************************************
  *  JSR Jump to subroutine
@@ -552,8 +547,7 @@
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	EAH = RDOPARG();											\
-	PCD = EAD;													\
-	CHANGE_PC
+	PCD = EAD
 
 /* 6502 ********************************************************
  *  LDA Load accumulator
@@ -626,7 +620,7 @@
 	if ( P & F_I ) {											\
 		PULL(P);												\
 		if ((m6502->irq_state != CLEAR_LINE) && !(P & F_I)) {	\
-			LOG(("M6502#%d PLP sets after_cli\n",cpu_getactivecpu()));	\
+			LOG(("M6502#%d PLP sets after_cli\n",cpunum_get_active()));	\
 			m6502->after_cli = 1;								\
 		}														\
 	} else {													\
@@ -668,10 +662,9 @@
 	P |= F_T | F_B; 											\
 	if( (m6502->irq_state != CLEAR_LINE) && !(P & F_I) )			\
 	{															\
-		LOG(("M6502#%d RTI sets after_cli\n",cpu_getactivecpu())); 	\
+		LOG(("M6502#%d RTI sets after_cli\n",cpunum_get_active())); 	\
 		m6502->after_cli = 1;									\
-	}															\
-	CHANGE_PC
+	}
 
 /* 6502 ********************************************************
  *  RTS Return from subroutine
@@ -682,8 +675,7 @@
 	RDMEM(SPD);													\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	RDMEM(PCW); PCW++;											\
-	CHANGE_PC
+	RDMEM(PCW); PCW++
 
 /* 6502 ********************************************************
  *  SBC Subtract with carry

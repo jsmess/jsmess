@@ -127,7 +127,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	/* compute vector and set the interrupt line */
 	int vpos = video_screen_get_vpos(machine->primary_screen);
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
 	if (vpos == SPACEFB_INT_TRIGGER_COUNT_1)
@@ -173,10 +173,11 @@ static MACHINE_START( spacefb )
 
 static MACHINE_RESET( spacefb )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 	/* the 3 output ports are cleared on reset */
-	spacefb_port_0_w(machine, 0, 0);
-	spacefb_port_1_w(machine, 0, 0);
-	spacefb_port_2_w(machine, 0, 0);
+	spacefb_port_0_w(space, 0, 0);
+	spacefb_port_1_w(space, 0, 0);
+	spacefb_port_2_w(space, 0, 0);
 
 	start_interrupt_timer(machine);
 }

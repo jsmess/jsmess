@@ -67,7 +67,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 8  is EEPROM data */
 	/* bit 9  is EEPROM ready */
 	/* bit 10 is service button */
-	res = input_port_read(machine, "IN1");
+	res = input_port_read(space->machine, "IN1");
 
 	if (init_eeprom_count)
 	{
@@ -110,29 +110,29 @@ static INTERRUPT_GEN( asterix_interrupt )
 	// global interrupt masking
 	if (!K056832_is_IRQ_enabled(0)) return;
 
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the
+	cpu_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the
                                               mask used is 0 or 7 */
 }
 
 static READ16_HANDLER( asterix_sound_r )
 {
-	return k053260_0_r(machine,2 + offset);
+	return k053260_0_r(space,2 + offset);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(5), NULL,0,nmi_callback);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 // Check the routine at 7f30 in the ead version.
@@ -152,10 +152,10 @@ static WRITE16_HANDLER( protection_w )
 		{
 		case 0x64:
 		{
-			UINT32 param1 = (program_read_word(cmd & 0xffffff) << 16)
-				| program_read_word((cmd & 0xffffff) + 2);
-			UINT32 param2 = (program_read_word((cmd & 0xffffff) + 4) << 16)
-				| program_read_word((cmd & 0xffffff) + 6);
+			UINT32 param1 = (memory_read_word(space, cmd & 0xffffff) << 16)
+				| memory_read_word(space, (cmd & 0xffffff) + 2);
+			UINT32 param2 = (memory_read_word(space, (cmd & 0xffffff) + 4) << 16)
+				| memory_read_word(space, (cmd & 0xffffff) + 6);
 
 			switch (param1 >> 24)
 			{
@@ -166,7 +166,7 @@ static WRITE16_HANDLER( protection_w )
 				param2 &= 0xffffff;
 				while(size >= 0)
 				{
-					program_write_word(param2, program_read_word(param1));
+					memory_write_word(space, param2, memory_read_word(space, param1));
 					param1 += 2;
 					param2 += 2;
 					size--;

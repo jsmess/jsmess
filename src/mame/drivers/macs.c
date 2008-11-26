@@ -83,7 +83,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(rambank_w)
 {
-	memory_set_bankptr( 3, &macs_ram1[0x10000+(data&1)*0x800] );
+	memory_set_bankptr(space->machine,  3, &macs_ram1[0x10000+(data&1)*0x800] );
 }
 
 static READ8_HANDLER( macs_input_r )
@@ -95,24 +95,24 @@ static READ8_HANDLER( macs_input_r )
 			/*It's bit-wise*/
 			switch(macs_mux_data&0x0f)
 			{
-				case 0x00: return input_port_read(machine, "IN0");
-				case 0x01: return input_port_read(machine, "IN1");
-				case 0x02: return input_port_read(machine, "IN2");
-				case 0x04: return input_port_read(machine, "IN3");
-				case 0x08: return input_port_read(machine, "IN4");
+				case 0x00: return input_port_read(space->machine, "IN0");
+				case 0x01: return input_port_read(space->machine, "IN1");
+				case 0x02: return input_port_read(space->machine, "IN2");
+				case 0x04: return input_port_read(space->machine, "IN3");
+				case 0x08: return input_port_read(space->machine, "IN4");
 				default:
 				logerror("Unmapped mahjong panel mux data %02x\n",macs_mux_data);
 				return 0xff;
 			}
 		}
-		case 1: return input_port_read(machine, "SYS0");
-		case 2: return input_port_read(machine, "DSW0");
-		case 3: return input_port_read(machine, "DSW1");
-		case 4: return input_port_read(machine, "DSW2");
-		case 5: return input_port_read(machine, "DSW3");
-		case 6: return input_port_read(machine, "DSW4");
-		case 7: return input_port_read(machine, "SYS1");
-		default: 	popmessage("Unmapped I/O read at PC = %06x offset = %02x",activecpu_get_pc(),offset+0xc0);
+		case 1: return input_port_read(space->machine, "SYS0");
+		case 2: return input_port_read(space->machine, "DSW0");
+		case 3: return input_port_read(space->machine, "DSW1");
+		case 4: return input_port_read(space->machine, "DSW2");
+		case 5: return input_port_read(space->machine, "DSW3");
+		case 6: return input_port_read(space->machine, "DSW4");
+		case 7: return input_port_read(space->machine, "SYS1");
+		default: 	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(space->cpu),offset+0xc0);
 	}
 
 	return 0xff;
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( macs_output_w )
 {
 	switch(offset)
 	{
-		case 0: memory_set_bankptr( 2, &macs_ram1[((data&0x20)>>5)*0x1000+0x800] );break;
+		case 0: memory_set_bankptr(space->machine,  2, &macs_ram1[((data&0x20)>>5)*0x1000+0x800] );break;
 		case 2: macs_mux_data = data; break;
 
 	}
@@ -583,9 +583,9 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x0ff9]=0x07;
 		macs_ram1[0x1ff9]=0x07;
 
-		memory_set_bankptr( 1, memory_region(machine, "main") + 0x10000 );
-		memory_set_bankptr( 2, macs_ram1+0x800);
-		memory_set_bankptr( 3, macs_ram1+0x10000);
+		memory_set_bankptr(machine,  1, memory_region(machine, "main") + 0x10000 );
+		memory_set_bankptr(machine,  2, macs_ram1+0x800);
+		memory_set_bankptr(machine,  3, macs_ram1+0x10000);
 }
 
 static DRIVER_INIT(macs)

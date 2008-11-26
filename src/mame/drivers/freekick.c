@@ -82,17 +82,17 @@ static WRITE8_HANDLER( spinner_select_w )
 
 static READ8_HANDLER( spinner_r )
 {
-	return input_port_read(machine, spinner ? "IN3" : "IN2");
+	return input_port_read(space->machine, spinner ? "IN3" : "IN2");
 }
 
 static MACHINE_RESET( pbillrd )
 {
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
 {
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static INTERRUPT_GEN( freekick_irqgen )
 {
-	if (nmi_en) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
+	if (nmi_en) cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER(oigas_5_w)
@@ -1051,7 +1051,8 @@ ROM_END
 
 static DRIVER_INIT(gigas)
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
 }
 
 

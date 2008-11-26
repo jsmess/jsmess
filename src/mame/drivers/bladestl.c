@@ -42,12 +42,12 @@ WRITE8_HANDLER( bladestl_vreg_w );
 
 static INTERRUPT_GEN( bladestl_interrupt )
 {
-	if (cpu_getiloops() == 0){
+	if (cpu_getiloops(device) == 0){
 		if (K007342_is_INT_enabled())
-			cpunum_set_input_line(machine, 0, HD6309_FIRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device, HD6309_FIRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2){
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	else if (cpu_getiloops(device) % 2){
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -57,7 +57,7 @@ static READ8_HANDLER( trackball_r )
 	int curr,delta;
 	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
 
-	curr = input_port_read(machine, port[offset]);
+	curr = input_port_read(space->machine, port[offset]);
 	delta = (curr - last[offset]) & 0xff;
 	last[offset] = curr;
 	return (delta & 0x80) | (curr >> 1);
@@ -65,7 +65,7 @@ static READ8_HANDLER( trackball_r )
 
 static WRITE8_HANDLER( bladestl_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	/* bits 0 & 1 = coin counters */
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 	/* bits 5-6 = bank number */
 	bankaddress = 0x10000 + ((data & 0x60) >> 5) * 0x2000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bit 7 = select sprite bank */
 	bladestl_spritebank = (data & 0x80) << 3;
@@ -89,8 +89,8 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
-	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 

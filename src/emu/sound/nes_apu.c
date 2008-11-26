@@ -45,6 +45,7 @@
  *****************************************************************************/
 
 #include "sndintrf.h"
+#include "cpuexec.h"
 #include "streams.h"
 #include "deprecat.h"
 #include "nes_apu.h"
@@ -366,7 +367,7 @@ static int8 apu_dpcm(struct nesapu_info *info, dpcm_t *chan)
                if (chan->regs[0] & 0x80) /* IRQ Generator */
                {
                   chan->irq_occurred = TRUE;
-                  n2a03_irq();
+                  n2a03_irq(info->APU.dpcm.memory->cpu);
                }
                break;
             }
@@ -377,7 +378,7 @@ static int8 apu_dpcm(struct nesapu_info *info, dpcm_t *chan)
          bit_pos = 7 - (chan->bits_left & 7);
          if (7 == bit_pos)
          {
-            chan->cur_byte = program_read_byte(chan->address);
+            chan->cur_byte = memory_read_byte(info->APU.dpcm.memory, chan->address);
             chan->address++;
             chan->length--;
          }
@@ -601,7 +602,7 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 {
    int accum;
 
-	cpuintrf_push_context( info->APU.dpcm.cpu_num );
+	cpu_push_context( info->APU.dpcm.memory->cpu );
    while (samples--)
    {
       accum = apu_square(info, &info->APU.squ[0]);
@@ -618,7 +619,7 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 
       *(buffer16++)=accum<<8;
    }
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 /* READ VALUES FROM REGISTERS */
@@ -669,7 +670,7 @@ static void nes_psg_update_sound(void *param, stream_sample_t **inputs, stream_s
 
 
 /* INITIALIZE APU SYSTEM */
-static void *nesapu_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( nesapu )
 {
 	const nes_interface *intf = config;
 	struct nesapu_info *info;
@@ -694,63 +695,63 @@ static void *nesapu_start(const char *tag, int sndindex, int clock, const void *
 	info->buffer_size+=info->samps_per_sync;
 
 	/* Initialize individual chips */
-	(info->APU.dpcm).cpu_num= mame_find_cpu_index(Machine, intf->cpu_tag);
+	(info->APU.dpcm).memory = cputag_get_address_space(Machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
 
 	info->stream = stream_create(0, 1, rate, info, nes_psg_update_sound);
 
 	/* register for save */
 	for (i = 0; i < 2; i++)
 	{
-		state_save_register_item_array("apu", sndindex + i * 100, info->APU.squ[i].regs);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].vbl_length);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].freq);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].phaseacc);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].output_vol);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].env_phase);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].sweep_phase);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].adder);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].env_vol);
-		state_save_register_item("apu", sndindex + i * 100, info->APU.squ[i].enabled);
+		state_save_register_item_array("apu", tag, i, info->APU.squ[i].regs);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].vbl_length);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].freq);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].phaseacc);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].output_vol);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].env_phase);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].sweep_phase);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].adder);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].env_vol);
+		state_save_register_item("apu", tag, i, info->APU.squ[i].enabled);
 	}
 
-	state_save_register_item_array("apu", sndindex, info->APU.tri.regs);
-	state_save_register_item("apu", sndindex, info->APU.tri.linear_length);
-	state_save_register_item("apu", sndindex, info->APU.tri.vbl_length);
-	state_save_register_item("apu", sndindex, info->APU.tri.write_latency);
-	state_save_register_item("apu", sndindex, info->APU.tri.phaseacc);
-	state_save_register_item("apu", sndindex, info->APU.tri.output_vol);
-	state_save_register_item("apu", sndindex, info->APU.tri.adder);
-	state_save_register_item("apu", sndindex, info->APU.tri.counter_started);
-	state_save_register_item("apu", sndindex, info->APU.tri.enabled);
+	state_save_register_item_array("apu", tag, 0, info->APU.tri.regs);
+	state_save_register_item("apu", tag, 0, info->APU.tri.linear_length);
+	state_save_register_item("apu", tag, 0, info->APU.tri.vbl_length);
+	state_save_register_item("apu", tag, 0, info->APU.tri.write_latency);
+	state_save_register_item("apu", tag, 0, info->APU.tri.phaseacc);
+	state_save_register_item("apu", tag, 0, info->APU.tri.output_vol);
+	state_save_register_item("apu", tag, 0, info->APU.tri.adder);
+	state_save_register_item("apu", tag, 0, info->APU.tri.counter_started);
+	state_save_register_item("apu", tag, 0, info->APU.tri.enabled);
 
-	state_save_register_item_array("apu", sndindex, info->APU.noi.regs);
-	state_save_register_item("apu", sndindex, info->APU.noi.cur_pos);
-	state_save_register_item("apu", sndindex, info->APU.noi.vbl_length);
-	state_save_register_item("apu", sndindex, info->APU.noi.phaseacc);
-	state_save_register_item("apu", sndindex, info->APU.noi.output_vol);
-	state_save_register_item("apu", sndindex, info->APU.noi.env_phase);
-	state_save_register_item("apu", sndindex, info->APU.noi.env_vol);
-	state_save_register_item("apu", sndindex, info->APU.noi.enabled);
+	state_save_register_item_array("apu", tag, 0, info->APU.noi.regs);
+	state_save_register_item("apu", tag, 0, info->APU.noi.cur_pos);
+	state_save_register_item("apu", tag, 0, info->APU.noi.vbl_length);
+	state_save_register_item("apu", tag, 0, info->APU.noi.phaseacc);
+	state_save_register_item("apu", tag, 0, info->APU.noi.output_vol);
+	state_save_register_item("apu", tag, 0, info->APU.noi.env_phase);
+	state_save_register_item("apu", tag, 0, info->APU.noi.env_vol);
+	state_save_register_item("apu", tag, 0, info->APU.noi.enabled);
 
-	state_save_register_item_array("apu", sndindex, info->APU.dpcm.regs);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.address);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.length);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.bits_left);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.phaseacc);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.output_vol);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.cur_byte);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.enabled);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.irq_occurred);
-	state_save_register_item("apu", sndindex, info->APU.dpcm.vol);
+	state_save_register_item_array("apu", tag, 0, info->APU.dpcm.regs);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.address);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.length);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.bits_left);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.phaseacc);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.output_vol);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.cur_byte);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.enabled);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.irq_occurred);
+	state_save_register_item("apu", tag, 0, info->APU.dpcm.vol);
 
-	state_save_register_item_array("apu", sndindex, info->APU.regs);
+	state_save_register_item_array("apu", tag, 0, info->APU.regs);
 
 #ifdef USE_QUEUE
-	state_save_register_item_array("apu", sndindex, info->APU.queue);
-	state_save_register_item("apu", sndindex, info->APU.head);
-	state_save_register_item("apu", sndindex, info->APU.tail);
+	state_save_register_item_array("apu", tag, 0, info->APU.queue);
+	state_save_register_item("apu", tag, 0, info->APU.head);
+	state_save_register_item("apu", tag, 0, info->APU.tail);
 #else
-	state_save_register_item("apu", sndindex, info->APU.buf_pos);
+	state_save_register_item("apu", tag, 0, info->APU.buf_pos);
 #endif
 
 	return info;
@@ -761,7 +762,7 @@ static void *nesapu_start(const char *tag, int sndindex, int clock, const void *
  * Generic get_info
  **************************************************************************/
 
-static void nesapu_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( nesapu )
 {
 	switch (state)
 	{
@@ -770,15 +771,15 @@ static void nesapu_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void nesapu_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( nesapu )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = nesapu_set_info;       break;
-		case SNDINFO_PTR_START:							info->start = nesapu_start;		break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nesapu );       break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nesapu );		break;
 		case SNDINFO_PTR_STOP:							/* Nothing */				break;
 		case SNDINFO_PTR_RESET:							/* Nothing */				break;
 

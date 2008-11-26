@@ -708,7 +708,7 @@ WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
 	{
 		int code = offset/32;
 		COMBINE_DATA(&toaplan2_tx_gfxram16[offset]);
-		decodechar(machine->gfx[2], code, toaplan2_tx_gfxram);
+		decodechar(space->machine->gfx[2], code, toaplan2_tx_gfxram);
 
 		tilemap_mark_all_tiles_dirty(tx_tilemap);
 	}
@@ -751,7 +751,7 @@ WRITE16_HANDLER( batrider_textdata_decode )
 
 	/* Decode text characters */
 	for (code = 0; code < 1024; code++)
-		decodechar (machine->gfx[2], code, raizing_tx_gfxram);
+		decodechar (space->machine->gfx[2], code, raizing_tx_gfxram);
 	tilemap_mark_all_tiles_dirty(tx_tilemap);
 }
 
@@ -1005,7 +1005,7 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 						/* HACK! When tilted, sound CPU needs to be reset. */
 						if (machine->config->sound[0].type == SOUND_YM3812)
 						{
-							cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+							cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 							sndti_reset(SOUND_YM3812, 0);
 						}
 					}
@@ -1083,12 +1083,12 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 
 WRITE16_HANDLER( toaplan2_0_scroll_reg_data_w )
 {
-	toaplan2_scroll_reg_data_w(machine, offset, data, mem_mask, 0);
+	toaplan2_scroll_reg_data_w(space->machine, offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_scroll_reg_data_w )
 {
-	toaplan2_scroll_reg_data_w(machine, offset, data, mem_mask, 1);
+	toaplan2_scroll_reg_data_w(space->machine, offset, data, mem_mask, 1);
 }
 
 
@@ -1113,7 +1113,7 @@ WRITE16_HANDLER( pipibibi_scroll_w )
 		}
 
 		toaplan2_scroll_reg[0] = offset;
-		toaplan2_scroll_reg_data_w(machine, offset, data, mem_mask, 0);
+		toaplan2_scroll_reg_data_w(space->machine, offset, data, mem_mask, 0);
 	}
 }
 

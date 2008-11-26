@@ -124,12 +124,12 @@ static UINT8 sound_command;
 static MACHINE_RESET( pipedrm )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main") + 0x10000, 0x2000);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_set_bank(machine, 1, 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(2, 0, 2, memory_region(machine, "audio") + 0x10000, 0x8000);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x10000, 0x8000);
+	memory_set_bank(machine, 2, 0);
 	/* state save */
 	state_save_register_global(pending_command);
 	state_save_register_global(sound_command);
@@ -151,17 +151,17 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
     */
 
 	/* set the memory bank on the Z80 using the low 3 bits */
-	memory_set_bank(1, data & 0x7);
+	memory_set_bank(space->machine, 1, data & 0x7);
 
 	/* map to the fromance gfx register */
-	fromance_gfxreg_w(machine, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
+	fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
 							  ((~data >> 2) & 0x02));	/* videoram select */
 }
 
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(2, data & 0x01);
+	memory_set_bank(space->machine, 2, data & 0x01);
 }
 
 
@@ -181,7 +181,7 @@ static TIMER_CALLBACK( delayed_command_w	)
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
 	if (param & 0x100)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	pending_command = 0;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -526,7 +526,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -743,15 +743,15 @@ static DRIVER_INIT( pipedrm )
 	/* sprite RAM lives at the end of palette RAM */
 	spriteram = &paletteram[0xc00];
 	spriteram_size = 0x400;
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcfff, 0, 0, SMH_BANK3, SMH_BANK3);
-	memory_set_bankptr(3, spriteram);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, SMH_BANK3, SMH_BANK3);
+	memory_set_bankptr(machine, 3, spriteram);
 }
 
 
 static DRIVER_INIT( hatris )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0, sound_command_nonmi_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x21, 0x21, 0, 0, fromance_gfxreg_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x20, 0x20, 0, 0, sound_command_nonmi_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fromance_gfxreg_w);
 }
 
 

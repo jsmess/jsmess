@@ -49,11 +49,12 @@ static int stfight_coin_mech_query;
 
 DRIVER_INIT( empcity )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
 	decrypt = auto_malloc(0x8000);
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	for (A = 0;A < 0x8000;A++)
 	{
@@ -92,6 +93,7 @@ DRIVER_INIT( stfight )
 
 MACHINE_RESET( stfight )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	adpcm_data_offs = adpcm_data_end = 0;
 	toggle = 0;
 	fm_data = 0;
@@ -102,16 +104,16 @@ MACHINE_RESET( stfight )
 	stfight_coin_mech_query = 0;
 
     // initialise rom bank
-    stfight_bank_w( machine, 0, 0 );
+    stfight_bank_w( space, 0, 0 );
 }
 
 // It's entirely possible that this bank is never switched out
 // - in fact I don't even know how/where it's switched in!
 static WRITE8_HANDLER( stfight_bank_w )
 {
-	UINT8   *ROM2 = memory_region(machine, "main") + 0x10000;
+	UINT8   *ROM2 = memory_region(space->machine, "main") + 0x10000;
 
-	memory_set_bankptr( 1, &ROM2[data<<14] );
+	memory_set_bankptr(space->machine,  1, &ROM2[data<<14] );
 }
 
 /*
@@ -121,13 +123,13 @@ static WRITE8_HANDLER( stfight_bank_w )
 static TIMER_CALLBACK( stfight_interrupt_1 )
 {
     // Do a RST08
-    cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xcf);
+    cpu_set_input_line_and_vector(machine->cpu[0],0,HOLD_LINE,0xcf);
 }
 
 INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
-    cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xd7);
+    cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7);
     timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 
@@ -138,7 +140,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 // Perhaps define dipswitches as active low?
 READ8_HANDLER( stfight_dsw_r )
 {
-    return( ~input_port_read(machine, offset ? "DSW1" : "DSW0") );
+    return( ~input_port_read(space->machine, offset ? "DSW1" : "DSW0") );
 }
 
 READ8_HANDLER( stfight_coin_r )
@@ -160,7 +162,7 @@ READ8_HANDLER( stfight_coin_r )
      *        since it's read by the 30Hz interrupt ISR
      */
 
-    coin_mech_data = input_port_read(machine, "COIN");
+    coin_mech_data = input_port_read(space->machine, "COIN");
 
     for( i=0; i<2; i++ )
     {

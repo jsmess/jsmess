@@ -44,24 +44,24 @@ static void check_interrupt(running_machine *machine)
 {
 	if (!timer_int || !data_rdy_int || !ssi_data_request)
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
 static TIMER_CALLBACK( intrq_tick )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( intrq_w )
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
 
 	timer_set(ATTOTIME_IN_USEC(8250), NULL, 0, intrq_tick);
 }
@@ -90,14 +90,14 @@ static WRITE8_HANDLER( timer_int_ack_w )
 {
 	timer_int = 1;
 
-	check_interrupt(machine);
+	check_interrupt(space->machine);
 }
 
 static WRITE8_HANDLER( data_rdy_int_ack_w )
 {
 	data_rdy_int = 1;
 
-	check_interrupt(machine);
+	check_interrupt(space->machine);
 }
 
 static WRITE8_HANDLER( cop_d_w )
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( cop_d_w )
 		data_rdy_int = 0;
 	}
 
-	check_interrupt(machine);
+	check_interrupt(space->machine);
 }
 
 /* COP Communication */
@@ -248,7 +248,7 @@ static READ8_HANDLER(cop_si_r)
 
 			sprintf(port, "R%d", keylatch);
 
-			data = BIT(input_port_read(machine, port), rx_bit - 5);
+			data = BIT(input_port_read(space->machine, port), rx_bit - 5);
 
 			return data;
 		}
@@ -301,13 +301,13 @@ static WRITE8_HANDLER( control2_w )
 
 	if (!BIT(data, 2) & cart_present)
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 
 static READ8_HANDLER( dsw_b_r )
 {
-	return (input_port_read(machine, "COIN") & 0xf0) | (input_port_read(machine, "DSWB") & 0x0f);
+	return (input_port_read(space->machine, "COIN") & 0xf0) | (input_port_read(space->machine, "DSWB") & 0x0f);
 }
 
 static READ8_HANDLER( laserdsc_data_r )
@@ -451,7 +451,7 @@ static WRITE8_HANDLER( ssi263_register_w )
 		ssi263.p = data & 0x3f;
 
 		ssi_data_request = 1;
-		check_interrupt(machine);
+		check_interrupt(space->machine);
 
 		switch (ssi263.mode)
 		{
@@ -569,10 +569,6 @@ static ADDRESS_MAP_START( thayers_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf5, 0xf5) AM_WRITE(laserdsc_control_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(den1_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( thayers_cop_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thayers_cop_io_map, ADDRESS_SPACE_IO, 8 )
@@ -751,7 +747,7 @@ static MACHINE_RESET( thayers )
 
 static COP400_INTERFACE( thayers_cop_intf )
 {
-	COP400_CKI_DIVISOR_16, // ???
+	COP400_CKI_DIVISOR_4, // ???
 	COP400_CKO_OSCILLATOR_OUTPUT, // ???
 	COP400_MICROBUS_DISABLED
 };
@@ -765,7 +761,6 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_CPU_IO_MAP(thayers_io_map, 0)
 
 	MDRV_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MDRV_CPU_PROGRAM_MAP(thayers_cop_map, 0)
 	MDRV_CPU_IO_MAP(thayers_cop_io_map, 0)
 	MDRV_CPU_CONFIG(thayers_cop_intf)
 

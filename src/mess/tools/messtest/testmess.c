@@ -958,9 +958,9 @@ static void command_trace(running_machine *machine)
 	FILE *file;
 	char filename[256];
 
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+	for (cpunum = 0; (cpunum < ARRAY_LENGTH(machine->cpu)) && (machine->cpu[cpunum] != NULL); cpunum++)
 	{
-		if (cpu_gettotalcpu() == 1)
+		if (machine->cpu[1] == NULL)
 			snprintf(filename, sizeof(filename) / sizeof(filename[0]), "_%s.tr", current_testcase.name);
 		else
 			snprintf(filename, sizeof(filename) / sizeof(filename[0]), "_%s.%d.tr", current_testcase.name, cpunum);
@@ -969,7 +969,7 @@ static void command_trace(running_machine *machine)
 		if (file)
 		{
 			report_message(MSG_INFO, "Tracing CPU #%d: %s", cpunum, filename);
-			debug_cpu_trace(cpunum, file, FALSE, NULL);
+			debug_cpu_trace(machine->cpu[cpunum], file, FALSE, NULL);
 			fclose(file);
 		}
 	}
@@ -1067,10 +1067,10 @@ void osd_update(running_machine *machine, int skip_redraw)
 	/* update the runtime hash */
 	if (0)
 	{
-		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+		for (cpunum = 0; (cpunum < ARRAY_LENGTH(machine->cpu)) && (machine->cpu[cpunum] != NULL); cpunum++)
 		{
 			runtime_hash *= 57;
-			runtime_hash ^= cpunum_get_reg(cpunum, REG_PC);	/* TODO - Add more registers? */
+			runtime_hash ^= cpu_get_reg(machine->cpu[cpunum], REG_PC);	/* TODO - Add more registers? */
 		}
 	}
 

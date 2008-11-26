@@ -170,7 +170,7 @@ static WRITE16_HANDLER( color_ram_word_w )
 		g = (color_ram[offset] &0xff00) >> 8;
 		b = (color_ram[offset] &0xff);
 
-		palette_set_color(machine,offset/2,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine,offset/2,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -181,14 +181,14 @@ static WRITE16_HANDLER( color_ram_word_w )
 
 static TIMER_CALLBACK( slapshot_interrupt6 )
 {
-	cpunum_set_input_line(machine, 0,6,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
 }
 
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, slapshot_interrupt6);
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpu_set_input_line(device,5,HOLD_LINE);
 }
 
 
@@ -201,11 +201,11 @@ static READ16_HANDLER( slapshot_service_input_r )
 	switch (offset)
 	{
 		case 0x03:
-			return ((input_port_read(machine, "IN1") & 0xef) |
-				  (input_port_read(machine, "SERVICE") & 0x10))  << 8;	/* IN3 + service switch */
+			return ((input_port_read(space->machine, "IN1") & 0xef) |
+				  (input_port_read(space->machine, "SERVICE") & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
-			return TC0640FIO_r(machine,offset) << 8;
+			return TC0640FIO_r(space,offset) << 8;
 	}
 }
 
@@ -213,13 +213,13 @@ static READ16_HANDLER( opwolf3_adc_r )
 {
 	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
 
-	return input_port_read(machine, adcnames[offset]) << 8;
+	return input_port_read(space->machine, adcnames[offset]) << 8;
 }
 
 static WRITE16_HANDLER( opwolf3_adc_req_w )
 {
 	/* 4 writes a frame - one for each analogue port */
-	cpunum_set_input_line(machine, 0,3,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE);
 }
 
 /*****************************************************
@@ -230,7 +230,7 @@ static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( 10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
 }
 
 static STATE_POSTLOAD( slapshot_postload )
@@ -249,15 +249,15 @@ static MACHINE_START( slapshot )
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( slapshot_msb_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (machine,0,(data >> 8) & 0xff);
+		taitosound_port_w (space,0,(data >> 8) & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (machine,0,(data >> 8) & 0xff);
+		taitosound_comm_w (space,0,(data >> 8) & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff)
@@ -268,7 +268,7 @@ static WRITE16_HANDLER( slapshot_msb_sound_w )
 static READ16_HANDLER( slapshot_msb_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (machine, 0) & 0xff) << 8);
+		return ((taitosound_comm_r (space, 0) & 0xff) << 8);
 	else return 0;
 }
 
@@ -512,7 +512,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

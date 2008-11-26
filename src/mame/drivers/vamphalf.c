@@ -47,7 +47,7 @@ static UINT8 *finalgdr_backupram;
 static READ16_HANDLER( oki_r )
 {
 	if(offset)
-		return okim6295_status_0_r(machine, 0);
+		return okim6295_status_0_r(space, 0);
 	else
 		return 0;
 }
@@ -55,23 +55,23 @@ static READ16_HANDLER( oki_r )
 static WRITE16_HANDLER( oki_w )
 {
 	if(offset)
-		okim6295_data_0_w(machine, 0, data);
+		okim6295_data_0_w(space, 0, data);
 }
 
 static READ32_HANDLER( oki32_r )
 {
-	return okim6295_status_0_r(machine, 0) << 8;
+	return okim6295_status_0_r(space, 0) << 8;
 }
 
 static WRITE32_HANDLER( oki32_w )
 {
-	okim6295_data_0_w(machine, 0, (data >> 8) & 0xff);
+	okim6295_data_0_w(space, 0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( ym2151_status_r )
 {
 	if(offset)
-		return ym2151_status_port_0_r(machine, 0);
+		return ym2151_status_port_0_r(space, 0);
 	else
 		return 0;
 }
@@ -79,28 +79,28 @@ static READ16_HANDLER( ym2151_status_r )
 static WRITE16_HANDLER( ym2151_data_w )
 {
 	if(offset)
-		ym2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(space, 0, data);
 }
 
 static WRITE16_HANDLER( ym2151_register_w )
 {
 	if(offset)
-		ym2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(space, 0, data);
 }
 
 static READ32_HANDLER( ym2151_status32_r )
 {
-	return ym2151_status_port_0_r(machine, 0) << 8;
+	return ym2151_status_port_0_r(space, 0) << 8;
 }
 
 static WRITE32_HANDLER( ym2151_data32_w )
 {
-	ym2151_data_port_0_w(machine, 0, (data >> 8) & 0xff);
+	ym2151_data_port_0_w(space, 0, (data >> 8) & 0xff);
 }
 
 static WRITE32_HANDLER( ym2151_register32_w )
 {
-	ym2151_register_port_0_w(machine, 0, (data >> 8) & 0xff);
+	ym2151_register_port_0_w(space, 0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( eeprom_r )
@@ -160,10 +160,10 @@ static WRITE32_HANDLER( paletteram32_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paldata = paletteram32[offset] & 0xffff;
-	palette_set_color_rgb(machine, offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(space->machine, offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 
 	paldata = (paletteram32[offset] >> 16) & 0xffff;
-	palette_set_color_rgb(machine, offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(space->machine, offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 static READ32_HANDLER( wyvernwg_prot_r )
@@ -1136,9 +1136,9 @@ ROM_START( dquizgo2 )
 	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
 ROM_END
 
-static int irq_active(void)
+static int irq_active(running_machine *machine)
 {
-	UINT32 FCR = activecpu_get_reg(27);
+	UINT32 FCR = cpu_get_reg(machine->activecpu, 27);
 	if( !(FCR&(1<<29)) ) // int 2 (irq 4)
 		return 1;
 	else
@@ -1147,12 +1147,12 @@ static int irq_active(void)
 
 static READ16_HANDLER( vamphalf_speedup_r )
 {
-	if(activecpu_get_pc() == 0x82de)
+	if(cpu_get_pc(space->cpu) == 0x82de)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x4a6d0/2)+offset];
@@ -1160,12 +1160,12 @@ static READ16_HANDLER( vamphalf_speedup_r )
 
 static READ16_HANDLER( misncrft_speedup_r )
 {
-	if(activecpu_get_pc() == 0xecc8)
+	if(cpu_get_pc(space->cpu) == 0xecc8)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x72eb4/2)+offset];
@@ -1173,12 +1173,12 @@ static READ16_HANDLER( misncrft_speedup_r )
 
 static READ16_HANDLER( coolmini_speedup_r )
 {
-	if(activecpu_get_pc() == 0x75f7a)
+	if(cpu_get_pc(space->cpu) == 0x75f7a)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0xd2e80/2)+offset];
@@ -1186,12 +1186,12 @@ static READ16_HANDLER( coolmini_speedup_r )
 
 static READ16_HANDLER( suplup_speedup_r )
 {
-	if(activecpu_get_pc() == 0xaf18a )
+	if(cpu_get_pc(space->cpu) == 0xaf18a )
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x11605c/2)+offset];
@@ -1199,12 +1199,12 @@ static READ16_HANDLER( suplup_speedup_r )
 
 static READ16_HANDLER( luplup_speedup_r )
 {
-	if(activecpu_get_pc() == 0xaefac )
+	if(cpu_get_pc(space->cpu) == 0xaefac )
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x115e84/2)+offset];
@@ -1212,12 +1212,12 @@ static READ16_HANDLER( luplup_speedup_r )
 
 static READ16_HANDLER( luplup29_speedup_r )
 {
-	if(activecpu_get_pc() == 0xae6c0 )
+	if(cpu_get_pc(space->cpu) == 0xae6c0 )
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x113f08/2)+offset];
@@ -1225,12 +1225,12 @@ static READ16_HANDLER( luplup29_speedup_r )
 
 static READ16_HANDLER( puzlbang_speedup_r )
 {
-	if(activecpu_get_pc() == 0xae6d2 )
+	if(cpu_get_pc(space->cpu) == 0xae6d2 )
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x113ecc/2)+offset];
@@ -1238,12 +1238,12 @@ static READ16_HANDLER( puzlbang_speedup_r )
 
 static READ32_HANDLER( wyvernwg_speedup_r )
 {
-	if(activecpu_get_pc() == 0x10758 )
+	if(cpu_get_pc(space->cpu) == 0x10758 )
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram32[0x00b56fc/4];
@@ -1251,12 +1251,12 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 
 static READ32_HANDLER( finalgdr_speedup_r )
 {
-	if(activecpu_get_pc() == 0x1c212 )
+	if(cpu_get_pc(space->cpu) == 0x1c212 )
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram32[0x005e874/4];
@@ -1264,12 +1264,12 @@ static READ32_HANDLER( finalgdr_speedup_r )
 
 static READ16_HANDLER( dquizgo2_speedup_r )
 {
-	if(activecpu_get_pc() == 0xaa622)
+	if(cpu_get_pc(space->cpu) == 0xaa622)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0xcde70/2)+offset];
@@ -1278,7 +1278,7 @@ static READ16_HANDLER( dquizgo2_speedup_r )
 
 static DRIVER_INIT( vamphalf )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0004a6d0, 0x0004a6d3, 0, 0, vamphalf_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0004a6d0, 0x0004a6d3, 0, 0, vamphalf_speedup_r );
 
 	palshift = 0;
 	flip_bit = 0x80;
@@ -1286,7 +1286,7 @@ static DRIVER_INIT( vamphalf )
 
 static DRIVER_INIT( misncrft )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00072eb4, 0x00072eb7, 0, 0, misncrft_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00072eb4, 0x00072eb7, 0, 0, misncrft_speedup_r );
 
 	palshift = 0;
 	flip_bit = 1;
@@ -1294,7 +1294,7 @@ static DRIVER_INIT( misncrft )
 
 static DRIVER_INIT( coolmini )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000d2e80, 0x000d2e83, 0, 0, coolmini_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000d2e80, 0x000d2e83, 0, 0, coolmini_speedup_r );
 
 	palshift = 0;
 	flip_bit = 1;
@@ -1302,7 +1302,7 @@ static DRIVER_INIT( coolmini )
 
 static DRIVER_INIT( suplup )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0011605c, 0x0011605f, 0, 0, suplup_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0011605c, 0x0011605f, 0, 0, suplup_speedup_r );
 
 	palshift = 8;
 	/* no flipscreen */
@@ -1310,7 +1310,7 @@ static DRIVER_INIT( suplup )
 
 static DRIVER_INIT( luplup )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00115e84, 0x00115e87, 0, 0, luplup_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00115e84, 0x00115e87, 0, 0, luplup_speedup_r );
 
 	palshift = 8;
 	/* no flipscreen */
@@ -1318,7 +1318,7 @@ static DRIVER_INIT( luplup )
 
 static DRIVER_INIT( luplup29 )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00113f08, 0x00113f0b, 0, 0, luplup29_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00113f08, 0x00113f0b, 0, 0, luplup29_speedup_r );
 
 	palshift = 8;
 	/* no flipscreen */
@@ -1326,7 +1326,7 @@ static DRIVER_INIT( luplup29 )
 
 static DRIVER_INIT( puzlbang )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00113ecc, 0x00113ecf, 0, 0, puzlbang_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00113ecc, 0x00113ecf, 0, 0, puzlbang_speedup_r );
 
 	palshift = 8;
 	/* no flipscreen */
@@ -1334,7 +1334,7 @@ static DRIVER_INIT( puzlbang )
 
 static DRIVER_INIT( wyvernwg )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00b56fc, 0x00b56ff, 0, 0, wyvernwg_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00b56fc, 0x00b56ff, 0, 0, wyvernwg_speedup_r );
 
 	palshift = 0;
 	flip_bit = 1;
@@ -1346,7 +1346,7 @@ static DRIVER_INIT( wyvernwg )
 static DRIVER_INIT( finalgdr )
 {
 	finalgdr_backupram = auto_malloc(0x80*0x100);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
 
 	palshift = 0;
 	flip_bit = 1; //?
@@ -1357,7 +1357,7 @@ static DRIVER_INIT( finalgdr )
 
 static DRIVER_INIT( dquizgo2 )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00cde70, 0x00cde73, 0, 0, dquizgo2_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00cde70, 0x00cde73, 0, 0, dquizgo2_speedup_r );
 
 	palshift = 0;
 	flip_bit = 1;

@@ -67,8 +67,8 @@ void hdsnd_init(running_machine *machine)
 
 static void update_68k_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, hdcpu_sound, 1, mainflag ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, hdcpu_sound, 3, irq68k   ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_sound], 1, mainflag ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_sound], 3, irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -82,7 +82,7 @@ static void update_68k_interrupts(running_machine *machine)
 READ16_HANDLER( hd68k_snd_data_r )
 {
 	soundflag = 0;
-	logerror("%06X:main read from sound=%04X\n", activecpu_get_previouspc(), sounddata);
+	logerror("%06X:main read from sound=%04X\n", cpu_get_previouspc(space->cpu), sounddata);
 	return sounddata;
 }
 
@@ -104,17 +104,17 @@ static TIMER_CALLBACK( delayed_68k_w )
 WRITE16_HANDLER( hd68k_snd_data_w )
 {
 	timer_call_after_resynch(NULL, data, delayed_68k_w);
-	logerror("%06X:main write to sound=%04X\n", activecpu_get_previouspc(), data);
+	logerror("%06X:main write to sound=%04X\n", cpu_get_previouspc(space->cpu), data);
 }
 
 
 WRITE16_HANDLER( hd68k_snd_reset_w )
 {
-	cpunum_set_input_line(machine, hdcpu_sound, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, hdcpu_sound, INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[hdcpu_sound], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[hdcpu_sound], INPUT_LINE_RESET, CLEAR_LINE);
 	mainflag = soundflag = 0;
-	update_68k_interrupts(machine);
-	logerror("%06X:Reset sound\n", activecpu_get_previouspc());
+	update_68k_interrupts(space->machine);
+	logerror("%06X:Reset sound\n", cpu_get_previouspc(space->cpu));
 }
 
 
@@ -128,8 +128,8 @@ WRITE16_HANDLER( hd68k_snd_reset_w )
 READ16_HANDLER( hdsnd68k_data_r )
 {
 	mainflag = 0;
-	update_68k_interrupts(machine);
-	logerror("%06X:sound read from main=%04X\n", activecpu_get_previouspc(), maindata);
+	update_68k_interrupts(space->machine);
+	logerror("%06X:sound read from main=%04X\n", cpu_get_previouspc(space->cpu), maindata);
 	return maindata;
 }
 
@@ -138,7 +138,7 @@ WRITE16_HANDLER( hdsnd68k_data_w )
 {
 	COMBINE_DATA(&sounddata);
 	soundflag = 1;
-	logerror("%06X:sound write to main=%04X\n", activecpu_get_previouspc(), data);
+	logerror("%06X:sound write to main=%04X\n", cpu_get_previouspc(space->cpu), data);
 }
 
 
@@ -151,14 +151,14 @@ WRITE16_HANDLER( hdsnd68k_data_w )
 
 READ16_HANDLER( hdsnd68k_switches_r )
 {
-	logerror("%06X:hdsnd68k_switches_r(%04X)\n", activecpu_get_previouspc(), offset);
+	logerror("%06X:hdsnd68k_switches_r(%04X)\n", cpu_get_previouspc(space->cpu), offset);
 	return 0;
 }
 
 
 READ16_HANDLER( hdsnd68k_320port_r )
 {
-	logerror("%06X:hdsnd68k_320port_r(%04X)\n", activecpu_get_previouspc(), offset);
+	logerror("%06X:hdsnd68k_320port_r(%04X)\n", cpu_get_previouspc(space->cpu), offset);
 	return 0;
 }
 
@@ -170,8 +170,8 @@ READ16_HANDLER( hdsnd68k_status_r )
 //            D14 = 'Sound Flag'
 //            D13 = Test Switch
 //            D12 = 5220 Ready Flag (0=Ready)
-	logerror("%06X:hdsnd68k_status_r(%04X)\n", activecpu_get_previouspc(), offset);
-	return (mainflag << 15) | (soundflag << 14) | 0x2000 | 0;//((input_port_read(machine, "IN0") & 0x0020) << 8) | 0;
+	logerror("%06X:hdsnd68k_status_r(%04X)\n", cpu_get_previouspc(space->cpu), offset);
+	return (mainflag << 15) | (soundflag << 14) | 0x2000 | 0;//((input_port_read(space->machine, "IN0") & 0x0020) << 8) | 0;
 }
 
 
@@ -193,17 +193,17 @@ WRITE16_HANDLER( hdsnd68k_latches_w )
 	{
 		case 0:	/* SPWR - 5220 write strobe */
 			/* data == 0 means high, 1 means low */
-			logerror("%06X:SPWR=%d\n", activecpu_get_previouspc(), data);
+			logerror("%06X:SPWR=%d\n", cpu_get_previouspc(space->cpu), data);
 			break;
 
 		case 1:	/* SPRES - 5220 hard reset */
 			/* data == 0 means low, 1 means high */
-			logerror("%06X:SPRES=%d\n", activecpu_get_previouspc(), data);
+			logerror("%06X:SPRES=%d\n", cpu_get_previouspc(space->cpu), data);
 			break;
 
 		case 2:	/* SPRATE */
 			/* data == 0 means 8kHz, 1 means 10kHz */
-			logerror("%06X:SPRATE=%d\n", activecpu_get_previouspc(), data);
+			logerror("%06X:SPRATE=%d\n", cpu_get_previouspc(space->cpu), data);
 			break;
 
 		case 3:	/* CRAMEN */
@@ -212,9 +212,9 @@ WRITE16_HANDLER( hdsnd68k_latches_w )
 			break;
 
 		case 4:	/* RES320 */
-			logerror("%06X:RES320=%d\n", activecpu_get_previouspc(), data);
+			logerror("%06X:RES320=%d\n", cpu_get_previouspc(space->cpu), data);
 			if (hdcpu_sounddsp != -1)
-				cpunum_set_input_line(machine, hdcpu_sounddsp, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+				cpu_set_input_line(space->machine->cpu[hdcpu_sounddsp], INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 7:	/* LED */
@@ -225,14 +225,14 @@ WRITE16_HANDLER( hdsnd68k_latches_w )
 
 WRITE16_HANDLER( hdsnd68k_speech_w )
 {
-	logerror("%06X:hdsnd68k_speech_w(%04X)=%04X\n", activecpu_get_previouspc(), offset, data);
+	logerror("%06X:hdsnd68k_speech_w(%04X)=%04X\n", cpu_get_previouspc(space->cpu), offset, data);
 }
 
 
 WRITE16_HANDLER( hdsnd68k_irqclr_w )
 {
 	irq68k = 0;
-	update_68k_interrupts(machine);
+	update_68k_interrupts(space->machine);
 }
 
 
@@ -257,19 +257,21 @@ WRITE16_HANDLER( hdsnd68k_320ram_w )
 
 READ16_HANDLER( hdsnd68k_320ports_r )
 {
+	const address_space *iospace = cpu_get_address_space(space->machine->cpu[hdcpu_sounddsp], ADDRESS_SPACE_IO);
 	UINT16 result;
-	cpuintrf_push_context(hdcpu_sounddsp);
-	result = TMS32010_In(offset & 7);
-	cpuintrf_pop_context();
+	cpu_push_context(iospace->cpu);
+	result = memory_read_word(iospace, (offset & 7) << 1);
+	cpu_pop_context();
 	return result;
 }
 
 
 WRITE16_HANDLER( hdsnd68k_320ports_w )
 {
-	cpuintrf_push_context(hdcpu_sounddsp);
-	TMS32010_Out(offset & 7, data);
-	cpuintrf_pop_context();
+	const address_space *iospace = cpu_get_address_space(space->machine->cpu[hdcpu_sounddsp], ADDRESS_SPACE_IO);
+	cpu_push_context(iospace->machine->cpu[hdcpu_sounddsp]);
+	memory_write_word(iospace, (offset & 7) << 1, data);
+	cpu_pop_context();
 }
 
 
@@ -278,7 +280,7 @@ READ16_HANDLER( hdsnd68k_320com_r )
 	if (cramen)
 		return comram[offset & 0x1ff];
 
-	logerror("%06X:hdsnd68k_320com_r(%04X) -- not allowed\n", activecpu_get_previouspc(), offset);
+	logerror("%06X:hdsnd68k_320com_r(%04X) -- not allowed\n", cpu_get_previouspc(space->cpu), offset);
 	return 0xffff;
 }
 
@@ -288,7 +290,7 @@ WRITE16_HANDLER( hdsnd68k_320com_w )
 	if (cramen)
 		COMBINE_DATA(&comram[offset & 0x1ff]);
 	else
-		logerror("%06X:hdsnd68k_320com_w(%04X)=%04X -- not allowed\n", activecpu_get_previouspc(), offset, data);
+		logerror("%06X:hdsnd68k_320com_w(%04X)=%04X -- not allowed\n", cpu_get_previouspc(space->cpu), offset, data);
 }
 
 
@@ -301,17 +303,17 @@ WRITE16_HANDLER( hdsnd68k_320com_w )
 
 READ16_HANDLER( hdsnddsp_get_bio )
 {
-	UINT64 cycles_since_last_bio = activecpu_gettotalcycles() - last_bio_cycles;
+	UINT64 cycles_since_last_bio = cpu_get_total_cycles(space->cpu) - last_bio_cycles;
 	INT32 cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;
 
 	/* if we're not at the next BIO yet, advance us there */
 	if (cycles_until_bio > 0)
 	{
-		activecpu_adjust_icount(-cycles_until_bio);
+		cpu_adjust_icount(space->cpu, -cycles_until_bio);
 		last_bio_cycles += CYCLES_PER_BIO;
 	}
 	else
-		last_bio_cycles = activecpu_gettotalcycles();
+		last_bio_cycles = cpu_get_total_cycles(space->cpu);
 	return ASSERT_LINE;
 }
 
@@ -334,7 +336,7 @@ WRITE16_HANDLER( hdsnddsp_dac_w )
 WRITE16_HANDLER( hdsnddsp_comport_w )
 {
 	/* COM port TD0-7 */
-	logerror("%06X:hdsnddsp_comport_w=%d\n", activecpu_get_previouspc(), data);
+	logerror("%06X:hdsnddsp_comport_w=%d\n", cpu_get_previouspc(space->cpu), data);
 }
 
 
@@ -342,7 +344,7 @@ WRITE16_HANDLER( hdsnddsp_mute_w )
 {
 	/* mute DAC audio, D0=1 */
 /*  dacmute = data & 1;     -- NOT STUFFED */
-	logerror("%06X:mute DAC=%d\n", activecpu_get_previouspc(), data);
+	logerror("%06X:mute DAC=%d\n", cpu_get_previouspc(space->cpu), data);
 }
 
 
@@ -350,7 +352,7 @@ WRITE16_HANDLER( hdsnddsp_gen68kirq_w )
 {
 	/* generate 68k IRQ */
 	irq68k = 1;
-	update_68k_interrupts(machine);
+	update_68k_interrupts(space->machine);
 }
 
 
@@ -386,6 +388,6 @@ READ16_HANDLER( hdsnddsp_comram_r )
 
 READ16_HANDLER( hdsnddsp_compare_r )
 {
-	logerror("%06X:hdsnddsp_compare_r(%04X)\n", activecpu_get_previouspc(), offset);
+	logerror("%06X:hdsnddsp_compare_r(%04X)\n", cpu_get_previouspc(space->cpu), offset);
 	return 0;
 }

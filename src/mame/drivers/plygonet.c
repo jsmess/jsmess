@@ -34,17 +34,51 @@
     - Priorities.  From the original board it appears they're fixed, in front to back order:
       (all the way in front) TTL text layer -> polygons -> PSAC2 (all the way in back)
 
-Notes:
+    Tech info by Phil Bennett, from the schematics:
 
- (R. Belmont)
- 506000 is the DSP control
- 506004 is DSP status (in bit 0, where 0 = not ready, 1 = ready)
- 50600C and 50600E are the DSP comms ports (read/write)
+    68000 address map
+    =================
+
+    400000-43ffff = PSAC
+    440000-47ffff = PSVR
+    480000-4bffff = IO
+    4c0000-4fffff = SYS
+    500000-53ffff = DSP			    
+    540000-57ffff = FIX
+    580000-5bffff = OP1
+    5c0000-5fffff = UNUSED
+
+
+    SYS (Write only?)
+    =================
+
+    D28 = /FIXKILL     - Disable 'FIX' layer?
+    D27 = MUTE
+    D26 = EEPROM CLK
+    D25 = EEPROM CS
+    D24 = EEPROM DATA
+    D23 = BRMAS        - 68k bus error mask
+    D22 = L7MAS        - L7 interrupt mask (unusued - should always be '1')
+    D21 = /L5MAS       - L5 interrupt mask/acknowledge
+    D20 = L3MAS        - L3 interrupt mask
+    D19 = VFLIP        - Flip video vertically
+    D18 = HFLIP        - Flip video horizontally
+    D17 = COIN2        - Coin counter 2
+    D16 = COIN1        - Coin counter 1
+
+
+    DSP
+    ===
+
+    500000-503fff = HCOM     - 16kB common RAM
+    504000-504fff = CONTROL  - DSP/Host Control
+			        D10? = COMBNK - Switch between 68k and DSP access to common RAM
+			        D08? = RESN   - Reset DSP
+    506000-506fff = HEN      - DSP/Host interface
 
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -108,8 +142,8 @@ static READ32_HANDLER( polygonet_eeprom_r )
 	}
 	else
 	{
-		UINT8 lowInputBits = input_port_read(machine, "IN1");
-		UINT8 highInputBits = input_port_read(machine, "IN0");
+		UINT8 lowInputBits = input_port_read(space->machine, "IN1");
+		UINT8 highInputBits = input_port_read(space->machine, "IN0");
 		return ((highInputBits << 24) | (lowInputBits << 16));
 	}
 
@@ -135,7 +169,7 @@ static WRITE32_HANDLER( polygonet_eeprom_w )
 static READ32_HANDLER( ttl_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(machine, "gfx1");
+	ROM = (UINT32 *)memory_region(space->machine, "gfx1");
 
 	return ROM[offset];
 }
@@ -144,7 +178,7 @@ static READ32_HANDLER( ttl_rom_r )
 static READ32_HANDLER( psac_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(machine, "gfx2");
+	ROM = (UINT32 *)memory_region(space->machine, "gfx2");
 
 	return ROM[offset];
 }
@@ -156,14 +190,14 @@ static READ32_HANDLER( psac_rom_r )
 
 static INTERRUPT_GEN(polygonet_interrupt)
 {
-	cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
+	cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
 
 static READ32_HANDLER( sound_r )
 {
-	int latch = soundlatch3_r(machine, 0);
+	int latch = soundlatch3_r(space, 0);
 
 	if (latch == 0xe) latch = 0xf;	/* hack: until 54539 NMI disable found */
 
@@ -174,17 +208,17 @@ static WRITE32_HANDLER( sound_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine, 0, (data>>8)&0xff);
+		soundlatch_w(space, 0, (data>>8)&0xff);
 	}
 	else
 	{
-		soundlatch2_w(machine, 0, data&0xff);
+		soundlatch2_w(space, 0, data&0xff);
 	}
 }
 
 static WRITE32_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, mame_find_cpu_index(machine, "sound"), 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "sound", 0, HOLD_LINE);
 }
 
 /* DSP communications */
@@ -201,7 +235,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
-	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, activecpu_get_pc());
+	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(space->cpu));
 
 	return value;
 }
@@ -215,7 +249,7 @@ static WRITE32_HANDLER( shared_ram_write )
 																              0xc000 + (offset<<1),
 																              0xc000 +((offset<<1)+1),
 																		      mem_mask,
-																		      activecpu_get_pc());
+																		      cpu_get_pc(space->cpu));
 
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))
@@ -238,16 +272,16 @@ static WRITE32_HANDLER( dsp_w_lines )
 	if ((data >> 24) & 0x01)
 	{
 		logerror("RESET CLEARED\n");
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
 		logerror("RESET ASSERTED\n");
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODA, ASSERT_LINE);
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODB, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
 	/* 0x04000000 is the ??? line */
@@ -285,16 +319,16 @@ static READ16_HANDLER( dsp56k_bootload_r )
 	return 0x7fff;
 }
 
-static OPBASE_HANDLER( plygonet_dsp56k_opbase_handler )
+static DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
 {
 	if (address >= 0x7000 && address <= 0x7fff)
 	{
-		opbase->rom = opbase->ram = (void*)(dsp56k_p_mirror - 0x7000);
+		direct->raw = direct->decrypted = (void*)(dsp56k_p_mirror - 0x7000);
 		return ~0;
 	}
 	else if (address >= 0x8000 && address <= 0x87ff)
 	{
-		opbase->rom = opbase->ram = (void*)(dsp56k_p_8000 - 0x8000);
+		direct->raw = direct->decrypted = (void*)(dsp56k_p_8000 - 0x8000);
 		return ~0;
 	}
 
@@ -472,7 +506,7 @@ WRITE32_HANDLER( plygonet_palette_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 
@@ -480,10 +514,10 @@ WRITE32_HANDLER( plygonet_palette_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)	// is all of this region the palette?
-	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSAC2 lineram? */
-	AM_RANGE(0x480000, 0x480003) AM_READ(polygonet_eeprom_r)
-	AM_RANGE(0x4C0000, 0x4C0003) AM_WRITE(polygonet_eeprom_w)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSVR: PSAC2 VRAM? */
+	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
+	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
 	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
 	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
@@ -491,7 +525,6 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
 	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP	/* network RAM | registers? */
-//  AM_RANGE(0x600000, 0x600000)
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
@@ -524,18 +557,18 @@ static int cur_sound_region;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(2, memory_region(machine, "sound") + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(machine, 2, memory_region(machine, "sound") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = (data & 0x1f);
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static INTERRUPT_GEN(audio_interrupt)
 {
-	cpunum_set_input_line(machine, mame_find_cpu_index(machine, "sound"), INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -586,9 +619,9 @@ static MACHINE_START(polygonet)
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	/* TODO: This should work, but the MAME core appears to do something funny.
              Not a big deal - it's hacked in dsp_w_lines. */
-	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), INPUT_LINE_RESET, ASSERT_LINE);
-	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODA, ASSERT_LINE);
-	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODB, CLEAR_LINE);
+	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	//cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
+	//cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 }
 
 static MACHINE_DRIVER_START( plygonet )
@@ -596,7 +629,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", polygonet_interrupt)
 
-	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz */
+	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
 	MDRV_CPU_PROGRAM_MAP(dsp_program_map, 0)
 	MDRV_CPU_DATA_MAP(dsp_data_map, 0)
 
@@ -610,7 +643,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_NVRAM_HANDLER(polygonet)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-	MDRV_INTERLEAVE(50000)
+	MDRV_INTERLEAVE(20000)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -682,7 +715,7 @@ static DRIVER_INIT(polygonet)
 	memset(dsp56k_bank04_ram,    0, 2 * 8 * dsp56k_bank04_size		  * sizeof(UINT16));
 
 	/* The dsp56k occasionally executes out of mapped memory */
-	memory_set_opbase_handler(1, plygonet_dsp56k_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
 }
 
 ROM_START( plygonet )

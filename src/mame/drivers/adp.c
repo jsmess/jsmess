@@ -148,7 +148,6 @@ Video board has additional chips:
 #include "video/hd63484.h"
 #include "machine/microtch.h"
 #include "machine/68681.h"
-#include "deprecat.h"
 
 static UINT8 register_active;
 static struct
@@ -164,7 +163,7 @@ static struct
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpunum_set_input_line_and_vector(device->machine, 0, 4, HOLD_LINE, vector);
+	cpu_set_input_line_and_vector(device->machine->cpu[0], 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
@@ -182,7 +181,7 @@ static void microtouch_tx(UINT8 data)
 
 static UINT8 duart_input(const device_config *device)
 {
-	return input_port_read(Machine, "DSW1");
+	return input_port_read(device->machine, "DSW1");
 }
 
 static MACHINE_START( skattv )
@@ -351,14 +350,14 @@ return 0x4;
 	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
 
 	// return 0x0004 ^ 0xffff; // 0x0004
-	switch (mame_rand(machine) & 3)
+	switch (mame_rand(space->machine) & 3)
 	{
 		case 0:
 			return 0;
 		case 1:
 			return 0xffff;
 		default:
-			return mame_rand(machine) & 0xffff;
+			return mame_rand(space->machine) & 0xffff;
 	}
 }
 
@@ -382,14 +381,14 @@ static READ16_HANDLER(test1_r)
     if (input_code_pressed(KEYCODE_J)) return 0x4000;
     if (input_code_pressed(KEYCODE_K)) return 0x8000;
 
-    switch (mame_rand(machine) & 3)
+    switch (mame_rand(space->machine) & 3)
     {
         case 0:
             return 0;
         case 1:
             return 0xffff;
         default:
-            return mame_rand(machine) % 0xffff;
+            return mame_rand(space->machine) % 0xffff;
     }
 }
 */
@@ -419,14 +418,14 @@ static READ16_HANDLER(rh1_r)
 
         }
 */
-	switch (mame_rand(machine) & 3)
+	switch (mame_rand(space->machine) & 3)
 	{
 		case 0:
 			return 0;
 		case 1:
 			return 0xffff;
 		default:
-			return mame_rand(machine) % 0xffff;
+			return mame_rand(space->machine) % 0xffff;
 	}
 }
 
@@ -492,7 +491,7 @@ INPUT_PORTS_END
 /*
 static INTERRUPT_GEN( adp_int )
 {
-    cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+    cpu_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
 

@@ -182,156 +182,156 @@ Notes:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(1, (data - 1) & 3);
+	memory_set_bank(space->machine, 1, (data - 1) & 3);
 }
 
 static TIMER_CALLBACK( rsaga2_interrupt2  )
 {
-	cpunum_set_input_line(machine, 0,2,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],2,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rastansaga2_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, rsaga2_interrupt2);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( crimec_interrupt3 )
 {
-	cpunum_set_input_line(machine, 0,3,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],3,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( crimec_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, crimec_interrupt3);
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( hitice_interrupt6 )
 {
-	cpunum_set_input_line(machine, 0,6,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( hitice_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, hitice_interrupt6);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( rambo3_interrupt1 )
 {
-	cpunum_set_input_line(machine, 0,1,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],1,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rambo3_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, rambo3_interrupt1);
-	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+	cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( pbobble_interrupt5 )
 {
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( pbobble_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, pbobble_interrupt5);
-	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+	cpu_set_input_line(device, 3, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( viofight_interrupt1 )
 {
-	cpunum_set_input_line(machine, 0,1,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],1,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( viofight_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, viofight_interrupt1);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( masterw_interrupt4 )
 {
-	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( masterw_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, masterw_interrupt4);
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( silentd_interrupt4 )
 {
-	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( silentd_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, silentd_interrupt4);
-	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+	cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( selfeena_interrupt4 )
 {
-	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( selfeena_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(5000,0), NULL, 0, selfeena_interrupt4);
-	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+	cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( sbm_interrupt5 )//4
 {
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( sbm_interrupt )//5
 {
 	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, sbm_interrupt5);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 
 
 static READ16_HANDLER( tracky1_hi_r )
 {
-	return input_port_read(machine, "TRACKX1");
+	return input_port_read(space->machine, "TRACKX1");
 }
 static READ16_HANDLER( tracky1_lo_r )
 {
-	return (input_port_read(machine, "TRACKX1") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKX1") & 0xff) <<8;
 }
 static READ16_HANDLER( trackx1_hi_r )
 {
-	return input_port_read(machine, "TRACKY1");
+	return input_port_read(space->machine, "TRACKY1");
 }
 static READ16_HANDLER( trackx1_lo_r )
 {
-	return (input_port_read(machine, "TRACKY1") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKY1") & 0xff) <<8;
 }
 static READ16_HANDLER( tracky2_hi_r )
 {
-	return input_port_read(machine, "TRACKX2");
+	return input_port_read(space->machine, "TRACKX2");
 }
 static READ16_HANDLER( tracky2_lo_r )
 {
-	return (input_port_read(machine, "TRACKX2") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKX2") & 0xff) <<8;
 }
 static READ16_HANDLER( trackx2_hi_r )
 {
-	return input_port_read(machine, "TRACKY2");
+	return input_port_read(space->machine, "TRACKY2");
 }
 static READ16_HANDLER( trackx2_lo_r )
 {
-	return (input_port_read(machine, "TRACKY2") & 0xff) <<8;
+	return (input_port_read(space->machine, "TRACKY2") & 0xff) <<8;
 }
 
 
@@ -388,7 +388,7 @@ static READ16_HANDLER( eeprom_r )
 	int res;
 
 	res = (eeprom_read_bit() & 0x01);
-	res |= input_port_read(machine, "DSWB") & 0xfe;	/* coin inputs */
+	res |= input_port_read(space->machine, "DSWB") & 0xfe;	/* coin inputs */
 
 	return res;
 }
@@ -457,10 +457,10 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 	switch (offset)
 	{
 		case 0x01:
-			return eeprom_r(machine, 0, mem_mask) << 8;
+			return eeprom_r(space, 0, mem_mask) << 8;
 
 		default:
-			return TC0640FIO_r(machine, offset) << 8;
+			return TC0640FIO_r(space, offset) << 8;
 	}
 }
 
@@ -2355,7 +2355,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -3773,7 +3773,7 @@ ROM_END
 
 static DRIVER_INIT( taito_b )
 {
-	memory_configure_bank(1, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )

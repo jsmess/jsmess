@@ -133,9 +133,9 @@ static READ8_HANDLER( pix_data_r )
 
 static INTERRUPT_GEN( sbw_interrupt )
 {
-	int vector = video_screen_get_vblank(machine->primary_screen) ? 0xcf : 0xd7;	/* RST 08h/10h */
+	int vector = video_screen_get_vblank(device->machine->primary_screen) ? 0xcf : 0xd7;	/* RST 08h/10h */
 
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 }
 
 static WRITE8_HANDLER (system_w)
@@ -153,7 +153,7 @@ static WRITE8_HANDLER (system_w)
 	{
 		int offs;
 		for (offs = 0;offs < videoram_size; offs++)
-			sbw_videoram_w(machine, offs, videoram[offs]);
+			sbw_videoram_w(space, offs, videoram[offs]);
 	}
 	sbw_system = data;
 }
@@ -177,9 +177,9 @@ static WRITE8_HANDLER(graph_control_w)
 static READ8_HANDLER (controls_r)
 {
 	if(sbw_system & 2)
-		return input_port_read(machine, "TRACKY");
+		return input_port_read(space->machine, "TRACKY");
 	else
-		return input_port_read(machine, "TRACKX");
+		return input_port_read(space->machine, "TRACKX");
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

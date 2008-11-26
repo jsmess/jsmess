@@ -93,18 +93,18 @@ static int lastscroll;
 
 INTERRUPT_GEN( spdodgeb_interrupt )
 {
-	int iloop = cpu_getiloops();
+	int iloop = cpu_getiloops(device);
 	int scanline = (32-iloop) * 8;
 
 	if (iloop > 1 && iloop < 32)
 	{
-		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
-		video_screen_update_partial(machine->primary_screen, scanline+7);
+		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);
+		video_screen_update_partial(device->machine->primary_screen, scanline+7);
 	}
 	else if (!iloop)
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-		video_screen_update_partial(machine->primary_screen, 256);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		video_screen_update_partial(device->machine->primary_screen, 256);
 	}
 }
 
@@ -115,13 +115,13 @@ WRITE8_HANDLER( spdodgeb_scrollx_lo_w )
 
 WRITE8_HANDLER( spdodgeb_ctrl_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
 	/* bit 0 = flip screen */
 	flip_screen_set(data & 0x01);
 
 	/* bit 1 = ROM bank switch */
-	memory_set_bankptr(1,rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
+	memory_set_bankptr(space->machine, 1,rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
 
 	/* bit 2 = scroll high bit */
 	lastscroll = (lastscroll & 0x0ff) | ((data & 0x04) << 6);

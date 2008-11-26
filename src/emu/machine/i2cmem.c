@@ -20,7 +20,8 @@ Up to 4096 bytes can be addressed.
 
 */
 
-#include <driver.h>
+#include "driver.h"
+#include "deprecat.h"
 #include "machine/i2cmem.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -34,9 +35,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -120,19 +121,19 @@ void i2cmem_init( int chip, int slave_address, int page_size, int data_size, uns
 	c->data = data;
 	c->page = page;
 
-	state_save_register_item( "i2cmem", chip, c->scl );
-	state_save_register_item( "i2cmem", chip, c->sdaw );
-	state_save_register_item( "i2cmem", chip, c->e0 );
-	state_save_register_item( "i2cmem", chip, c->e1 );
-	state_save_register_item( "i2cmem", chip, c->e2 );
-	state_save_register_item( "i2cmem", chip, c->wc );
-	state_save_register_item( "i2cmem", chip, c->sdar );
-	state_save_register_item( "i2cmem", chip, c->state );
-	state_save_register_item( "i2cmem", chip, c->bits );
-	state_save_register_item( "i2cmem", chip, c->shift );
-	state_save_register_item( "i2cmem", chip, c->devsel );
-	state_save_register_item( "i2cmem", chip, c->byteaddr );
-	state_save_register_item_pointer( "i2cmem", chip, c->data, c->data_size );
+	state_save_register_item( "i2cmem", NULL, chip, c->scl );
+	state_save_register_item( "i2cmem", NULL, chip, c->sdaw );
+	state_save_register_item( "i2cmem", NULL, chip, c->e0 );
+	state_save_register_item( "i2cmem", NULL, chip, c->e1 );
+	state_save_register_item( "i2cmem", NULL, chip, c->e2 );
+	state_save_register_item( "i2cmem", NULL, chip, c->wc );
+	state_save_register_item( "i2cmem", NULL, chip, c->sdar );
+	state_save_register_item( "i2cmem", NULL, chip, c->state );
+	state_save_register_item( "i2cmem", NULL, chip, c->bits );
+	state_save_register_item( "i2cmem", NULL, chip, c->shift );
+	state_save_register_item( "i2cmem", NULL, chip, c->devsel );
+	state_save_register_item( "i2cmem", NULL, chip, c->byteaddr );
+	state_save_register_item_pointer( "i2cmem", NULL, chip, c->data, c->data_size );
 }
 
 static int select_device( struct i2cmem_chip *c )

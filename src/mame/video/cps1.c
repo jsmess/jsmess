@@ -20,9 +20,9 @@ Known A-board revisions:
 
 NAME                                        Year  B-board #      B-board PALs      C-board #         CPS-B #           C-board PALs
 ------------------------------------------- ----  --------  ---------------------  ---------  -----------------------  -------------
-Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  None
-  (alt B-board revision)                          88621B-2  LW621            LWIO  ?
-Ghouls 'n Ghosts (World / US)               1988  88620-B-2 DM620            LWIO  None       CPS-B-01  DL-0411-10001  None
+Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  N/A
+  (alt B-board revision)                          88621B-2  LW621            LWIO  None       CPS-B-01  DL-0411-10001  N/A
+Ghouls 'n Ghosts (World / US)               1988  88620-B-2 DM620            LWIO  None       CPS-B-01  DL-0411-10001  N/A
   (alt B-board revision - Japan)                  88622B-2  DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
   (alt B-board revision - Japan)                  91634B-2  DAM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
 Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
@@ -433,6 +433,9 @@ CPS_B_21_QSx are various battery configurations in Q-Sound games
 */
 
 
+// LWCHR and LW621 are equivalent as far as the game is concerned, though the
+// equations are different
+
 #define mapper_LWCHR	{ 0x8000, 0x8000, 0, 0 }, mapper_LWCHR_table
 static const struct gfx_range mapper_LWCHR_table[] =
 {
@@ -440,6 +443,38 @@ static const struct gfx_range mapper_LWCHR_table[] =
 	// bank 0 = pin 19 (ROMs 1,5,8,12)
 	// bank 1 = pin 16 (ROMs 2,6,9,13)
 	// pin 12 and pin 14 are always enabled (except for stars)
+	// note that allowed codes go up to 0x1ffff but physical ROM is half that size
+
+	/* type            start    end      bank */
+	{ GFXTYPE_SPRITES, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x00000, 0x1ffff, 0 },
+
+	{ GFXTYPE_STARS,   0x00000, 0x1ffff, 1 },
+	{ GFXTYPE_SCROLL2, 0x00000, 0x1ffff, 1 },
+	{ GFXTYPE_SCROLL3, 0x00000, 0x1ffff, 1 },
+	{ 0 }
+};
+
+#define mapper_LW621	{ 0x8000, 0x8000, 0, 0 }, mapper_LW621_table
+static const struct gfx_range mapper_LW621_table[] =
+{
+	// verified from PAL dump (PAL @ 1A):
+	// bank 0 = pin 18
+	// bank 1 = pin 14
+	// pins 19, 16, 17, and 12 give an alternate half-size mapping which would
+	// allow to use smaller ROMs:
+	// pin 19
+	// 0 00000-03fff
+	// pin 16
+	// 0 04000-07fff
+	// 1 00000-1ffff
+	// pin 17
+	// 2 00000-1ffff
+	// 3 00000-1ffff
+	// 4 00000-1ffff
+	// pin 12
+	// 3 00000-1ffff
+	//
 	// note that allowed codes go up to 0x1ffff but physical ROM is half that size
 
 	/* type            start    end      bank */
@@ -1199,7 +1234,7 @@ static const struct CPS1config cps1_config_table[]=
 {
 	/* name       CPSB         gfx mapper   in2  in3  out2   kludge */
 	{"forgottn", CPS_B_01,     mapper_LWCHR },
-	{"forgott1", CPS_B_01,     mapper_LWCHR },
+	{"forgott1", CPS_B_01,     mapper_LW621 },
 	{"lostwrld", CPS_B_01,     mapper_LWCHR },
 	{"ghouls",   CPS_B_01,     mapper_DM620 },
 	{"ghoulsu",  CPS_B_01,     mapper_DM620 },
@@ -1277,6 +1312,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2cej",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2rb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2rb2",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2rb3",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2red",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2v004",  CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2accp2", CPS_B_21_DEF, mapper_S9263B, 0x36 },
@@ -1527,7 +1563,7 @@ WRITE16_HANDLER( cps1_cps_a_w )
     fixes glitches in the ghouls intro, but it might happen at next vblank.
     */
 	if (offset == CPS1_PALETTE_BASE)
-		cps1_build_palette(machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
+		cps1_build_palette(space->machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
 
 	// pzloop2 write to register 24 on startup. This is probably just a bug.
 	if (offset == 0x24/2 && cps_version == 2)
@@ -1557,10 +1593,10 @@ READ16_HANDLER( cps1_cps_b_r )
 				cps1_cps_b_regs[cps1_game_config->mult_factor2/2]) >> 16;
 
 	if (offset == cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
-		return input_port_read(machine, "IN2");
+		return input_port_read(space->machine, "IN2");
 
 	if (offset == cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 
 	if (cps_version == 2)
 	{
@@ -1909,6 +1945,7 @@ static TILEMAP_MAPPER( tilemap2_scan )
 	return (row & 0x07) + ((col & 0x3f) << 3) + ((row & 0x38) << 6);
 }
 
+static UINT8 empty_tile8x8[8*8];
 static UINT8 empty_tile[32*32/2];
 
 static TILE_GET_INFO( get_tile0_info )
@@ -1934,7 +1971,7 @@ static TILE_GET_INFO( get_tile0_info )
 	// for out of range tiles, switch to fully transparent data
 	// (but still call SET_TILE_INFO, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
-		tileinfo->pen_data = empty_tile;
+		tileinfo->pen_data = empty_tile8x8;
 }
 
 static TILE_GET_INFO( get_tile1_info )
@@ -2010,7 +2047,8 @@ static VIDEO_START( cps )
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();
 
-	memset(empty_tile,0xff,sizeof(empty_tile));
+	memset(empty_tile8x8,0x0f,sizeof(empty_tile8x8));
+	memset(empty_tile,0xff,sizeof(empty_tile));	// 16x16 and 32x32 use packed graphics, 8x8 does not
 
 	for (i = 0;i < cps1_palette_entries*16;i++)
 	{

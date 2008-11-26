@@ -45,7 +45,7 @@ static void s24_fd1094_setstate_and_decrypt(int state)
 
 	fd1094_state = state;
 
-	cpunum_set_info_int(1, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
+	cpu_set_reg(Machine->cpu[1], M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the s24_fd1094 state ready to decrypt.. */
 	state = fd1094_set_state(s24_fd1094_key,state) & 0xff;
@@ -57,8 +57,8 @@ static void s24_fd1094_setstate_and_decrypt(int state)
 		{
 			/* copy cached state */
 			s24_fd1094_userregion=s24_fd1094_cacheregion[i];
-			memory_set_decrypted_region(1, 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
-			m68k_set_encrypted_opcode_range(1,0,s24_fd1094_cpuregionsize);
+			memory_set_decrypted_region(cpu_get_address_space(Machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
+			m68k_set_encrypted_opcode_range(Machine->cpu[1],0,s24_fd1094_cpuregionsize);
 
 			return;
 		}
@@ -78,8 +78,8 @@ static void s24_fd1094_setstate_and_decrypt(int state)
 
 	/* copy newly decrypted data to user region */
 	s24_fd1094_userregion=s24_fd1094_cacheregion[fd1094_current_cacheposition];
-	memory_set_decrypted_region(1, 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
-	m68k_set_encrypted_opcode_range(1,0,s24_fd1094_cpuregionsize);
+	memory_set_decrypted_region(cpu_get_address_space(Machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
+	m68k_set_encrypted_opcode_range(Machine->cpu[1],0,s24_fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;
 
@@ -91,7 +91,7 @@ static void s24_fd1094_setstate_and_decrypt(int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-static void s24_fd1094_cmp_callback(UINT32 val, int reg)
+static void s24_fd1094_cmp_callback(const device_config *device, UINT32 val, int reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -106,7 +106,7 @@ static IRQ_CALLBACK(s24_fd1094_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static void s24_fd1094_rte_callback (void)
+static void s24_fd1094_rte_callback (const device_config *device)
 {
 	s24_fd1094_setstate_and_decrypt(FD1094_STATE_RTE);
 }
@@ -132,9 +132,11 @@ void s24_fd1094_machine_init(void)
 	s24_fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	s24_fd1094_kludge_reset_values();
 
-	cpunum_set_info_fct(1, CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)s24_fd1094_cmp_callback);
-	cpunum_set_info_fct(1, CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)s24_fd1094_rte_callback);
-	cpunum_set_irq_callback(1, s24_fd1094_int_callback);
+	cpu_set_info_fct(Machine->cpu[1], CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)s24_fd1094_cmp_callback);
+	cpu_set_info_fct(Machine->cpu[1], CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)s24_fd1094_rte_callback);
+	cpu_set_irq_callback(Machine->cpu[1], s24_fd1094_int_callback);
+
+	cpu_reset(Machine->cpu[1]);
 }
 
 static STATE_POSTLOAD( s24_fd1094_postload )

@@ -483,8 +483,8 @@ static struct dynamic_address
 {
 	offs_t			start;
 	offs_t			end;
-	read32_machine_func	mread;
-	write32_machine_func mwrite;
+	read32_space_func	mread;
+	write32_space_func mwrite;
 	read32_device_func	dread;
 	write32_device_func dwrite;
 	const device_config *device;
@@ -545,20 +545,20 @@ static MACHINE_START( vegas )
 		dcs_idma_cs = 0;
 
 	/* set the fastest DRC options, but strict verification */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, ramsize - 1);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, ramsize - 1);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* register for save states */
 	state_save_register_global(nile_irq_state);
@@ -627,7 +627,7 @@ static WRITE32_HANDLER( timekeeper_w )
 		cmos_unlocked = 0;
 	}
 	else
-		logerror("%08X:timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%08X:timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 }
 
 
@@ -646,7 +646,7 @@ static READ32_HANDLER( timekeeper_r )
 	{
 		/* get the time */
 		mame_system_time systime;
-		mame_get_base_datetime(machine, &systime);
+		mame_get_base_datetime(space->machine, &systime);
 
 		/* return portions thereof */
 		switch (offset*4)
@@ -710,7 +710,7 @@ static READ32_HANDLER( pci_bridge_r )
 	}
 
 	if (LOG_PCI)
-		logerror("%06X:PCI bridge read: reg %d = %08X\n", activecpu_get_pc(), offset, result);
+		logerror("%06X:PCI bridge read: reg %d = %08X\n", cpu_get_pc(space->cpu), offset, result);
 	return result;
 }
 
@@ -719,7 +719,7 @@ static WRITE32_HANDLER( pci_bridge_w )
 {
 	pci_bridge_regs[offset] = data;
 	if (LOG_PCI)
-		logerror("%06X:PCI bridge write: reg %d = %08X\n", activecpu_get_pc(), offset, data);
+		logerror("%06X:PCI bridge write: reg %d = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -748,7 +748,7 @@ static READ32_HANDLER( pci_ide_r )
 	}
 
 	if (LOG_PCI)
-		logerror("%06X:PCI IDE read: reg %d = %08X\n", activecpu_get_pc(), offset, result);
+		logerror("%06X:PCI IDE read: reg %d = %08X\n", cpu_get_pc(space->cpu), offset, result);
 	return result;
 }
 
@@ -761,26 +761,26 @@ static WRITE32_HANDLER( pci_ide_w )
 	{
 		case 0x04:		/* address register */
 			pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses(machine);
+			remap_dynamic_addresses(space->machine);
 			break;
 
 		case 0x05:		/* address register */
 			pci_ide_regs[offset] &= 0xfffffffc;
-			remap_dynamic_addresses(machine);
+			remap_dynamic_addresses(space->machine);
 			break;
 
 		case 0x08:		/* address register */
 			pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses(machine);
+			remap_dynamic_addresses(space->machine);
 			break;
 
 		case 0x14:		/* interrupt pending */
 			if (data & 4)
-				ide_interrupt(device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide"), 0);
+				ide_interrupt(device_list_find_by_tag(space->machine->config->devicelist, IDE_CONTROLLER, "ide"), 0);
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%06X:PCI IDE write: reg %d = %08X\n", activecpu_get_pc(), offset, data);
+		logerror("%06X:PCI IDE write: reg %d = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -819,7 +819,7 @@ static READ32_HANDLER( pci_3dfx_r )
 	}
 
 	if (LOG_PCI)
-		logerror("%06X:PCI 3dfx read: reg %d = %08X\n", activecpu_get_pc(), offset, result);
+		logerror("%06X:PCI 3dfx read: reg %d = %08X\n", cpu_get_pc(space->cpu), offset, result);
 	return result;
 }
 
@@ -837,14 +837,14 @@ static WRITE32_HANDLER( pci_3dfx_w )
 				pci_3dfx_regs[offset] &= 0xff000000;
 			else
 				pci_3dfx_regs[offset] &= 0xfe000000;
-			remap_dynamic_addresses(machine);
+			remap_dynamic_addresses(space->machine);
 			break;
 
 		case 0x05:		/* address register */
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				pci_3dfx_regs[offset] &= 0xfe000000;
-				remap_dynamic_addresses(machine);
+				remap_dynamic_addresses(space->machine);
 			}
 			break;
 
@@ -852,7 +852,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				pci_3dfx_regs[offset] &= 0xffffff00;
-				remap_dynamic_addresses(machine);
+				remap_dynamic_addresses(space->machine);
 			}
 			break;
 
@@ -860,7 +860,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				pci_3dfx_regs[offset] &= 0xffff0000;
-				remap_dynamic_addresses(machine);
+				remap_dynamic_addresses(space->machine);
 			}
 			break;
 
@@ -870,7 +870,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 
 	}
 	if (LOG_PCI)
-		logerror("%06X:PCI 3dfx write: reg %d = %08X\n", activecpu_get_pc(), offset, data);
+		logerror("%06X:PCI 3dfx write: reg %d = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -933,12 +933,12 @@ static void update_nile_irqs(running_machine *machine)
 		if (irq[i])
 		{
 			if (LOG_NILE_IRQS) logerror(" 1");
-			cpunum_set_input_line(machine, 0, MIPS3_IRQ0 + i, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0 + i, ASSERT_LINE);
 		}
 		else
 		{
 			if (LOG_NILE_IRQS) logerror(" 0");
-			cpunum_set_input_line(machine, 0, MIPS3_IRQ0 + i, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0 + i, CLEAR_LINE);
 		}
 	}
 	if (LOG_NILE_IRQS) logerror("\n");
@@ -986,37 +986,37 @@ static READ32_HANDLER( nile_r )
 	{
 		case NREG_CPUSTAT+0:	/* CPU status */
 		case NREG_CPUSTAT+1:	/* CPU status */
-			if (LOG_NILE) logerror("%08X:NILE READ: CPU status(%03X) = %08X\n", activecpu_get_pc(), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: CPU status(%03X) = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTCTRL+0:	/* Interrupt control */
 		case NREG_INTCTRL+1:	/* Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt control(%03X) = %08X\n", activecpu_get_pc(), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt control(%03X) = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
 		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 0(%03X) = %08X\n", activecpu_get_pc(), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 0(%03X) = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
 		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 1/enable(%03X) = %08X\n", activecpu_get_pc(), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 1/enable(%03X) = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTCLR+0:		/* Interrupt clear */
 		case NREG_INTCLR+1:		/* Interrupt clear */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt clear(%03X) = %08X\n", activecpu_get_pc(), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt clear(%03X) = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTPPES+0:	/* PCI Interrupt control */
 		case NREG_INTPPES+1:	/* PCI Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE READ: PCI interrupt control(%03X) = %08X\n", activecpu_get_pc(), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: PCI interrupt control(%03X) = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			logit = 0;
 			break;
 
@@ -1043,7 +1043,7 @@ static READ32_HANDLER( nile_r )
 				result = nile_regs[offset + 1] = attotime_to_double(timer_timeleft(timer[which])) * (double)SYSTEM_CLOCK;
 			}
 
-			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", activecpu_get_pc(), which, offset*4, result);
+			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", cpu_get_pc(space->cpu), which, offset*4, result);
 			logit = 0;
 			break;
 
@@ -1078,13 +1078,13 @@ static READ32_HANDLER( nile_r )
 		case NREG_BAR7:
 		case NREG_BAR8:
 		case NREG_BARB:
-			result = pci_bridge_r(machine, offset & 0x3f, mem_mask);
+			result = pci_bridge_r(space, offset & 0x3f, mem_mask);
 			break;
 
 	}
 
 	if (LOG_NILE && logit)
-		logerror("%06X:nile read from offset %03X = %08X\n", activecpu_get_pc(), offset*4, result);
+		logerror("%06X:nile read from offset %03X = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 	return result;
 }
 
@@ -1100,42 +1100,42 @@ static WRITE32_HANDLER( nile_w )
 	{
 		case NREG_CPUSTAT+0:	/* CPU status */
 		case NREG_CPUSTAT+1:	/* CPU status */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
 		case NREG_INTCTRL+0:	/* Interrupt control */
 		case NREG_INTCTRL+1:	/* Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs(machine);
+			update_nile_irqs(space->machine);
 			break;
 
 		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
 		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs(machine);
+			update_nile_irqs(space->machine);
 			break;
 
 		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
 		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs(machine);
+			update_nile_irqs(space->machine);
 			break;
 
 		case NREG_INTCLR+0:		/* Interrupt clear */
 		case NREG_INTCLR+1:		/* Interrupt clear */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
 			nile_irq_state &= ~(nile_regs[offset] & ~0xf00);
-			update_nile_irqs(machine);
+			update_nile_irqs(space->machine);
 			break;
 
 		case NREG_INTPPES+0:	/* PCI Interrupt control */
 		case NREG_INTPPES+1:	/* PCI Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt control(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt control(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
@@ -1151,7 +1151,7 @@ static WRITE32_HANDLER( nile_w )
 
 		case NREG_PCIINIT1+0:	/* PCI master */
 			if (((olddata & 0xe) == 0xa) != ((nile_regs[offset] & 0xe) == 0xa))
-				remap_dynamic_addresses(machine);
+				remap_dynamic_addresses(space->machine);
 			logit = 0;
 			break;
 
@@ -1160,7 +1160,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_T2CTRL+1:		/* general purpose timer control (control bits) */
 		case NREG_T3CTRL+1:		/* watchdog timer control (control bits) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", activecpu_get_pc(), which, offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			/* timer just enabled? */
@@ -1189,7 +1189,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_T2CNTR:		/* general purpose timer control (counter) */
 		case NREG_T3CNTR:		/* watchdog timer control (counter) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", activecpu_get_pc(), which, offset*4, data, mem_mask);
+			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", cpu_get_pc(space->cpu), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			if (nile_regs[offset - 1] & 1)
@@ -1205,7 +1205,7 @@ static WRITE32_HANDLER( nile_w )
 			logit = 0;
 			break;
 		case NREG_UARTIER:		/* serial interrupt enable */
-			update_nile_irqs(machine);
+			update_nile_irqs(space->machine);
 			break;
 
 		case NREG_VID:
@@ -1227,7 +1227,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_BAR7:
 		case NREG_BAR8:
 		case NREG_BARB:
-			pci_bridge_w(machine, offset & 0x3f, data, mem_mask);
+			pci_bridge_w(space, offset & 0x3f, data, mem_mask);
 			break;
 
 		case NREG_DCS2:
@@ -1239,12 +1239,12 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_DCS8:
 		case NREG_PCIW0:
 		case NREG_PCIW1:
-			remap_dynamic_addresses(machine);
+			remap_dynamic_addresses(space->machine);
 			break;
 	}
 
 	if (LOG_NILE && logit)
-		logerror("%06X:nile write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+		logerror("%06X:nile write to offset %03X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 }
 
 
@@ -1283,20 +1283,20 @@ static void update_sio_irqs(running_machine *machine)
 }
 
 
-static void vblank_assert(running_machine *machine, int state)
+static void vblank_assert(const device_config *device, int state)
 {
 	if (!vblank_state && state)
 	{
 		sio_irq_state |= 0x20;
-		update_sio_irqs(machine);
+		update_sio_irqs(device->machine);
 	}
 	vblank_state = state;
 
 	/* if we have stalled DMA, restart */
-//  if (dma_pending_on_vblank[0]) { cpuintrf_push_context(0); perform_dma(0); cpuintrf_pop_context(); }
-//  if (dma_pending_on_vblank[1]) { cpuintrf_push_context(0); perform_dma(1); cpuintrf_pop_context(); }
-//  if (dma_pending_on_vblank[2]) { cpuintrf_push_context(0); perform_dma(2); cpuintrf_pop_context(); }
-//  if (dma_pending_on_vblank[3]) { cpuintrf_push_context(0); perform_dma(3); cpuintrf_pop_context(); }
+//  if (dma_pending_on_vblank[0]) { cpu_push_context(machine->cpu[0]); perform_dma(0); cpu_pop_context(); }
+//  if (dma_pending_on_vblank[1]) { cpu_push_context(machine->cpu[0]); perform_dma(1); cpu_pop_context(); }
+//  if (dma_pending_on_vblank[2]) { cpu_push_context(machine->cpu[0]); perform_dma(2); cpu_pop_context(); }
+//  if (dma_pending_on_vblank[3]) { cpu_push_context(machine->cpu[0]); perform_dma(3); cpu_pop_context(); }
 }
 
 
@@ -1335,7 +1335,7 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 		/* bit 0x01 seems to be used to reset the IOASIC */
 		if (!(data & 0x01))
 		{
-			midway_ioasic_reset(machine);
+			midway_ioasic_reset(space->machine);
 			dcs_reset_w(data & 0x01);
 		}
 
@@ -1343,7 +1343,7 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 		if (!(data & 0x08))
 		{
 			sio_irq_state &= ~0x20;
-			update_sio_irqs(machine);
+			update_sio_irqs(space->machine);
 		}
 	}
 }
@@ -1360,7 +1360,7 @@ static WRITE32_HANDLER( sio_irq_enable_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		sio_irq_enable = data;
-		update_sio_irqs(machine);
+		update_sio_irqs(space->machine);
 	}
 }
 
@@ -1404,7 +1404,7 @@ static WRITE32_HANDLER( sio_w )
 	if (ACCESSING_BITS_16_23) offset += 2;
 	if (ACCESSING_BITS_24_31) offset += 3;
 	if (LOG_SIO && offset != 0)
-		logerror("%08X:sio write to offset %X = %02X\n", activecpu_get_pc(), offset, data >> (offset*8));
+		logerror("%08X:sio write to offset %X = %02X\n", cpu_get_pc(space->cpu), offset, data >> (offset*8));
 	if (offset < 4)
 		sio_data[offset] = data >> (offset*8);
 	if (offset == 1)
@@ -1422,7 +1422,7 @@ static READ32_HANDLER( sio_r )
 	if (offset < 4)
 		result = sio_data[0] | (sio_data[1] << 8) | (sio_data[2] << 16) | (sio_data[3] << 24);
 	if (LOG_SIO && offset != 2)
-		logerror("%08X:sio read from offset %X = %02X\n", activecpu_get_pc(), offset, result >> (offset*8));
+		logerror("%08X:sio read from offset %X = %02X\n", cpu_get_pc(space->cpu), offset, result >> (offset*8));
 	return result;
 }
 
@@ -1445,8 +1445,8 @@ static WRITE32_HANDLER( analog_port_w )
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", activecpu_get_pc(), data);
-	pending_analog_read = input_port_read_safe(machine, portnames[data & 7], 0);
+		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(space->cpu), data);
+	pending_analog_read = input_port_read_safe(space->machine, portnames[data & 7], 0);
 }
 
 
@@ -1459,13 +1459,13 @@ static WRITE32_HANDLER( analog_port_w )
 
 static WRITE32_HANDLER( vegas_watchdog_w )
 {
-	activecpu_eat_cycles(100);
+	cpu_eat_cycles(space->cpu, 100);
 }
 
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(machine, data);
+	midway_ioasic_fifo_w(space->machine, data);
 }
 
 
@@ -1515,7 +1515,7 @@ static WRITE32_DEVICE_HANDLER( ethernet_w )
 
 static WRITE32_HANDLER( dcs3_fifo_full_w )
 {
-	midway_ioasic_fifo_full_w(machine, data);
+	midway_ioasic_fifo_full_w(space->machine, data);
 }
 
 
@@ -1529,7 +1529,7 @@ static WRITE32_HANDLER( dcs3_fifo_full_w )
 #define add_dynamic_address(s,e,r,w)			_add_dynamic_address(s,e,r,w,#r,#w)
 #define add_dynamic_device_address(d,s,e,r,w)	_add_dynamic_device_address(d,s,e,r,w,#r,#w)
 
-INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_machine_func read, write32_machine_func write, const char *rdname, const char *wrname)
+INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_space_func read, write32_space_func write, const char *rdname, const char *wrname)
 {
 	dynamic[dynamic_count].start = start;
 	dynamic[dynamic_count].end = end;
@@ -1568,7 +1568,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < dynamic_count; addr++)
-		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
 	/* the build the list of stuff */
 	dynamic_count = 0;
@@ -1688,9 +1688,9 @@ static void remap_dynamic_addresses(running_machine *machine)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
 		if (dynamic[addr].mread != NULL || dynamic[addr].mwrite != NULL)
-			_memory_install_handler32(machine, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+			_memory_install_handler32(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 		if (dynamic[addr].dread != NULL || dynamic[addr].dwrite != NULL)
-			_memory_install_device_handler32(dynamic[addr].device, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+			_memory_install_device_handler32(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 	}
 
 	if (LOG_DYNAMIC)
@@ -2481,12 +2481,12 @@ static void init_common(running_machine *machine, int ioasic, int serialnum)
 	speedup_index = 0;
 }
 
-static void add_speedup(offs_t pc, UINT32 op)
+static void add_speedup(running_machine *machine, offs_t pc, UINT32 op)
 {
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
 }
 
 
@@ -2496,10 +2496,10 @@ static DRIVER_INIT( gauntleg )
 	init_common(machine, MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	add_speedup(0x80015430, 0x8CC38060);		/* confirmed */
-	add_speedup(0x80015464, 0x3C09801E);		/* confirmed */
-	add_speedup(0x800C8918, 0x8FA2004C);		/* confirmed */
-	add_speedup(0x800C8890, 0x8FA20024);		/* confirmed */
+	add_speedup(machine, 0x80015430, 0x8CC38060);		/* confirmed */
+	add_speedup(machine, 0x80015464, 0x3C09801E);		/* confirmed */
+	add_speedup(machine, 0x800C8918, 0x8FA2004C);		/* confirmed */
+	add_speedup(machine, 0x800C8890, 0x8FA20024);		/* confirmed */
 }
 
 
@@ -2509,10 +2509,10 @@ static DRIVER_INIT( gauntdl )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
-	add_speedup(0x800158B8, 0x8CC3CC40);		/* confirmed */
-	add_speedup(0x800158EC, 0x3C0C8022);		/* confirmed */
-	add_speedup(0x800D40C0, 0x8FA2004C);		/* confirmed */
-	add_speedup(0x800D4038, 0x8FA20024);		/* confirmed */
+	add_speedup(machine, 0x800158B8, 0x8CC3CC40);		/* confirmed */
+	add_speedup(machine, 0x800158EC, 0x3C0C8022);		/* confirmed */
+	add_speedup(machine, 0x800D40C0, 0x8FA2004C);		/* confirmed */
+	add_speedup(machine, 0x800D4038, 0x8FA20024);		/* confirmed */
 }
 
 
@@ -2522,7 +2522,7 @@ static DRIVER_INIT( warfa )
 	init_common(machine, MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
-	add_speedup(0x8009436C, 0x0C031663);		/* confirmed */
+	add_speedup(machine, 0x8009436C, 0x0C031663);		/* confirmed */
 }
 
 
@@ -2532,10 +2532,10 @@ static DRIVER_INIT( tenthdeg )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
-	add_speedup(0x80051CD8, 0x0C023C15);		/* confirmed */
-	add_speedup(0x8005E674, 0x3C028017);		/* confirmed */
-	add_speedup(0x8002DBCC, 0x8FA2002C);		/* confirmed */
-	add_speedup(0x80015930, 0x8FC20244);		/* confirmed */
+	add_speedup(machine, 0x80051CD8, 0x0C023C15);		/* confirmed */
+	add_speedup(machine, 0x8005E674, 0x3C028017);		/* confirmed */
+	add_speedup(machine, 0x8002DBCC, 0x8FA2002C);		/* confirmed */
+	add_speedup(machine, 0x80015930, 0x8FC20244);		/* confirmed */
 }
 
 

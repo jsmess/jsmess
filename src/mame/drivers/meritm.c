@@ -213,11 +213,11 @@ static void ds1204_init(const UINT8* key, const UINT8* nvram)
 	if (nvram)
 		memcpy(ds1204.nvram, nvram, sizeof(ds1204.nvram));
 
-	state_save_register_item("ds1204", 0, ds1204.state);
-	state_save_register_item("ds1204", 0, ds1204.read_ptr);
-	state_save_register_item("ds1204", 0, ds1204.last_clk);
-	state_save_register_item("ds1204", 0, ds1204.out_bit);
-	state_save_register_item_array("ds1204", 0, ds1204.command);
+	state_save_register_item("ds1204", NULL, 0, ds1204.state);
+	state_save_register_item("ds1204", NULL, 0, ds1204.read_ptr);
+	state_save_register_item("ds1204", NULL, 0, ds1204.last_clk);
+	state_save_register_item("ds1204", NULL, 0, ds1204.out_bit);
+	state_save_register_item_array("ds1204", NULL, 0, ds1204.command);
 };
 
 /*************************************
@@ -381,7 +381,7 @@ static void meritm_crt250_switch_banks( void )
 	int rombank = (meritm_bank & 0x07) ^ 0x07;
 
 	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, meritm_bank );
-	memory_set_bank(1, rombank );
+	memory_set_bank(Machine, 1, rombank );
 };
 
 static WRITE8_HANDLER(meritm_crt250_bank_w)
@@ -398,15 +398,15 @@ static void meritm_switch_banks( void )
 			  (meritm_psd_a15 & 0x1);
 
 	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, meritm_bank, rambank);
-	memory_set_bank(1, rombank );
-	memory_set_bank(2, rombank | 0x01);
-	memory_set_bank(3, rambank);
+	memory_set_bank(Machine, 1, rombank );
+	memory_set_bank(Machine, 2, rombank | 0x01);
+	memory_set_bank(Machine, 3, rambank);
 };
 
 static WRITE8_HANDLER(meritm_psd_a15_w)
 {
 	meritm_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, activecpu_get_pc() );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(space->cpu) );
 	meritm_switch_banks();
 };
 
@@ -446,7 +446,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 		return;
 	}
 
-	dst = memory_region(machine, "main") + 0x70000 + 2;
+	dst = memory_region(space->machine, "main") + 0x70000 + 2;
 
 	if (data == 0)
 	{
@@ -475,7 +475,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
 		logerror( "Reading question byte at %06X\n", questions_address | questions_loword_address);
-		*dst = memory_region(machine, "user1")[questions_address | questions_loword_address];
+		*dst = memory_region(space->machine, "user1")[questions_address | questions_loword_address];
 	}
 };
 
@@ -518,7 +518,7 @@ static READ8_HANDLER(meritm_ds1644_r)
 	{
 		//logerror( "Reading RTC, reg = %x\n", offset);
 
-		mame_get_current_datetime(machine, &systime);
+		mame_get_current_datetime(space->machine, &systime);
 		meritm_ram[0x7ff9] = binary_to_BCD(systime.local_time.second);
 		meritm_ram[0x7ffa] = binary_to_BCD(systime.local_time.minute);
 		meritm_ram[0x7ffb] = binary_to_BCD(systime.local_time.hour);
@@ -725,7 +725,7 @@ static const ppi8255_interface crt250_ppi8255_intf =
 
 static READ8_HANDLER(meritm_ay8930_port_a_r)
 {
-	return input_port_read_safe(machine, "DSW", 0);
+	return input_port_read_safe(space->machine, "DSW", 0);
 };
 
 static WRITE8_HANDLER(meritm_ay8930_port_b_w)
@@ -752,13 +752,13 @@ static const ay8910_interface ay8910_config =
 static void meritm_audio_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(0) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 static void meritm_io_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(1) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 
@@ -847,7 +847,7 @@ static MACHINE_START(merit_common)
 
 static MACHINE_START(meritm_crt250)
 {
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main"), 0x10000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main"), 0x10000);
 	meritm_bank = 0xff;
 	meritm_crt250_switch_banks();
 	MACHINE_START_CALL(merit_common);
@@ -865,9 +865,9 @@ static MACHINE_START(meritm_crt260)
 {
 	meritm_ram = auto_malloc( 0x8000 );
 	memset( meritm_ram, 0x8000, 0x00 );
-	memory_configure_bank(1, 0, 128, memory_region(machine, "main"), 0x8000);
-	memory_configure_bank(2, 0, 128, memory_region(machine, "main"), 0x8000);
-	memory_configure_bank(3, 0, 4, meritm_ram, 0x2000);
+	memory_configure_bank(machine, 1, 0, 128, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 2, 0, 128, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 3, 0, 4, meritm_ram, 0x2000);
 	meritm_bank = 0xff;
 	meritm_psd_a15 = 0;
 	meritm_switch_banks();
@@ -1384,7 +1384,7 @@ static DRIVER_INIT(megat3te)
 
 	ds1204_init(megat3_ds1204_key, megat3_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 
@@ -1403,7 +1403,7 @@ static DRIVER_INIT(megat4te)
 
 	ds1204_init(0, megat4te_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 

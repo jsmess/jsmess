@@ -78,18 +78,18 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 {
 	COMBINE_DATA(&sshangha_prot_data[offset]);
 
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",activecpu_get_pc(),offset<<1,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 
 	if (offset == (0x260 >> 1)) {
 		//soundlatch_w(0,data&0xff);
-		//cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		//cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE16_HANDLER( sshangha_sound_w )
 {
-	soundlatch_w(machine,0,data&0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data&0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Protection/IO chip 146 */
@@ -98,16 +98,16 @@ static READ16_HANDLER( sshangha_protection16_r )
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		// Protection TODO
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",activecpu_get_pc(),offset<<1);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	return sshangha_prot_data[offset];
 }
 
@@ -116,11 +116,11 @@ static READ16_HANDLER( sshanghb_protection16_r )
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 	}
 	return sshangha_prot_data[offset];
 }
@@ -135,13 +135,14 @@ static READ16_HANDLER( deco_71_r )
 
 static MACHINE_RESET( sshangha )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* Such thing is needed as there is no code to turn the screen
        to normal orientation when the game is reset.
        I'm using the value that forces the screen to be in normal
          orientation when entering the "test mode"
          (check the game code from 0x0006b8 to 0x0006f0).
        I can't tell however if this is accurate or not. */
-	sshangha_control_0_w(machine, 0, 0x10, 0x00ff);
+	sshangha_control_0_w(space, 0, 0x10, 0x00ff);
 }
 
 /******************************************************************************/
@@ -323,7 +324,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,0,state);
+	cpu_set_input_line(machine->cpu[1],0,state);
 }
 
 static const ym2203_interface ym2203_config =

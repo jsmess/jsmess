@@ -3271,6 +3271,20 @@
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
 
+/*************************************
+ *
+ *  Interface & Naming
+ *
+ *************************************/
+
+#define DISCRETE_STEP_NAME( _func )  _func ## _step
+#define DISCRETE_RESET_NAME( _func ) _func ## _reset
+
+#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (node_description *node)
+#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (node_description *node)
+
+#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
+#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
 
 /*************************************
  *
@@ -4276,7 +4290,17 @@ extern discrete_info *discrete_current_context;
 
 node_description *discrete_find_node(void *chip, int node);
 
+void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data);
+UINT8 discrete_sound_n_r(void *chip, offs_t offset);
+
 WRITE8_HANDLER(discrete_sound_w);
-READ8_HANDLER( discrete_sound_r);
+WRITE8_HANDLER(discrete_sound_1_w);
+WRITE8_HANDLER(discrete_sound_2_w);
+WRITE8_HANDLER(discrete_sound_3_w);
+
+READ8_HANDLER(discrete_sound_r);
+READ8_HANDLER(discrete_sound_1_r);
+READ8_HANDLER(discrete_sound_2_r);
+READ8_HANDLER(discrete_sound_3_r);
 
 #endif /* __DISCRETE_H__ */

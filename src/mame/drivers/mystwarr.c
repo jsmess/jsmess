@@ -119,7 +119,7 @@ static READ16_HANDLER( mweeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read(machine, "IN1");
+		int res = input_port_read(space->machine, "IN1");
 
 		if (init_eeprom_count)
 		{
@@ -139,7 +139,7 @@ static READ16_HANDLER( vseeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read(machine, "IN1");
+		int res = input_port_read(space->machine, "IN1");
 
 		if (init_eeprom_count)
 		{
@@ -173,10 +173,10 @@ static READ16_HANDLER( dddeeprom_r )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return input_port_read(machine, "IN1") << 8;
+		return input_port_read(space->machine, "IN1") << 8;
 	}
 
-	return input_port_read(machine, "P2");
+	return input_port_read(space->machine, "P2");
 }
 
 static WRITE16_HANDLER( mmeeprom_w )
@@ -198,36 +198,36 @@ static INTERRUPT_GEN(mystwarr_interrupt)
 {
 	if (!(mw_irq_control & 0x01)) return;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
 		break;
 
 		case 1:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 		break;
 
 		case 2:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_6, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 		break;
 	}
 }
 
 static INTERRUPT_GEN(metamrph_interrupt)
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 		break;
 
 		case 15:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_6, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 		break;
 
 		case 39:
-			if (K053246_is_IRQ_enabled()) cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
+			if (K053246_is_IRQ_enabled()) cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 		break;
 	}
 }
@@ -236,21 +236,21 @@ static INTERRUPT_GEN(mchamp_interrupt)
 {
 	if (!(mw_irq_control & 0x02)) return;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (K053246_is_IRQ_enabled()) cpunum_set_input_line(machine, 0, MC68000_IRQ_6, HOLD_LINE);
+			if (K053246_is_IRQ_enabled()) cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 		break;
 
 		case 1:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
 		break;
 	}
 }
 
 static INTERRUPT_GEN(ddd_interrupt)
 {
-	cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
+	cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 }
 
 
@@ -258,34 +258,34 @@ static INTERRUPT_GEN(ddd_interrupt)
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	soundlatch_w(machine, 0, data&0xff);
+	soundlatch_w(space, 0, data&0xff);
 }
 
 static WRITE16_HANDLER( sound_cmd1_msb_w )
 {
-	soundlatch_w(machine, 0, data>>8);
+	soundlatch_w(space, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
-	soundlatch2_w(machine, 0, data&0xff);
+	soundlatch2_w(space, 0, data&0xff);
 	return;
 }
 
 static WRITE16_HANDLER( sound_cmd2_msb_w )
 {
-	soundlatch2_w(machine, 0, data>>8);
+	soundlatch2_w(space, 0, data>>8);
 	return;
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	int latch = soundlatch3_r(machine,0);
+	int latch = soundlatch3_r(space,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -294,7 +294,7 @@ static READ16_HANDLER( sound_status_r )
 
 static READ16_HANDLER( sound_status_msb_r )
 {
-	int latch = soundlatch3_r(machine,0);
+	int latch = soundlatch3_r(space,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -303,7 +303,7 @@ static READ16_HANDLER( sound_status_msb_r )
 
 static WRITE16_HANDLER( irq_ack_w )
 {
-	K056832_b_word_w(machine, offset, data, mem_mask);
+	K056832_b_word_w(space, offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
@@ -316,27 +316,27 @@ static WRITE16_HANDLER( irq_ack_w )
 
 static READ16_HANDLER( player1_r )
 {
-	return input_port_read(machine, "P1") | (input_port_read(machine, "P2")<<8);
+	return input_port_read(space->machine, "P1") | (input_port_read(space->machine, "P2")<<8);
 }
 
 static READ16_HANDLER( player2_r )
 {
-	return input_port_read(machine, "P3") | (input_port_read(machine, "P4")<<8);
+	return input_port_read(space->machine, "P3") | (input_port_read(space->machine, "P4")<<8);
 }
 
 static READ16_HANDLER( mmplayer1_r )
 {
-	return input_port_read(machine, "P1") | (input_port_read(machine, "P3")<<8);
+	return input_port_read(space->machine, "P1") | (input_port_read(space->machine, "P3")<<8);
 }
 
 static READ16_HANDLER( mmplayer2_r )
 {
-	return input_port_read(machine, "P2") | (input_port_read(machine, "P4")<<8);
+	return input_port_read(space->machine, "P2") | (input_port_read(space->machine, "P4")<<8);
 }
 
 static READ16_HANDLER( mmcoins_r )
 {
-	int res = input_port_read(machine, "IN0");
+	int res = input_port_read(space->machine, "IN0");
 
 	if (init_eeprom_count)
 	{
@@ -349,7 +349,7 @@ static READ16_HANDLER( mmcoins_r )
 
 static READ16_HANDLER( dddcoins_r )
 {
-	int res = (input_port_read(machine, "IN0")<<8) | input_port_read(machine, "P1");
+	int res = (input_port_read(space->machine, "IN0")<<8) | input_port_read(space->machine, "P1");
 
 	if (init_eeprom_count)
 	{
@@ -369,7 +369,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return K053247_word_r(machine,offset,mem_mask);
+		return K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -377,14 +377,14 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 {
 	if (offset & 0x0078)
 	{
-//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, activecpu_get_pc());
+//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
 		COMBINE_DATA(spriteram16+offset);
 	}
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		K053247_word_w(machine,offset,data,mem_mask);
+		K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -557,7 +557,7 @@ static READ16_HANDLER( K053247_martchmp_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-		return K053247_word_r(machine,offset,mem_mask);
+		return K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -571,7 +571,7 @@ static WRITE16_HANDLER( K053247_martchmp_word_w )
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
 
-		K053247_word_w(machine,offset,data,mem_mask);
+		K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -772,13 +772,13 @@ static int cur_sound_region;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(2, memory_region(machine, "sound") + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(machine, 2, memory_region(machine, "sound") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = (data & 0xf);
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 /* sound memory maps
@@ -1545,6 +1545,39 @@ ROM_END
 ROM_START( viostrmu )
 	/* main program */
 	ROM_REGION( 0x200000, "main", 0)
+	ROM_LOAD16_BYTE( "168uac01.15h", 0x000001, 0x80000, CRC(49853530) SHA1(dc8fa1a929848949cb0ad02f5a2a8a5f820fd6c1) )
+	ROM_LOAD16_BYTE( "168uac01.15h", 0x000000, 0x80000, CRC(055ca6fe) SHA1(31565ea515120555f94c4358b8e1a719c7d092d7) )
+
+	/* sound program */
+	ROM_REGION( 0x030000, "sound", 0 )
+	ROM_LOAD("168a05.7c", 0x000000, 0x020000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
+	ROM_RELOAD(         0x010000, 0x020000 )
+
+	/* tiles */
+	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
+	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00)
+	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
+	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
+	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
+	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 2*1024*1024, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
+
+	/* road generator */
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00)
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0)
+	ROM_LOAD( "168a06.1c", 0x000000, 2*1024*1024, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
+	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
+ROM_END
+
+
+ROM_START( viostmub )
+	/* main program */
+	ROM_REGION( 0x200000, "main", 0)
 	ROM_LOAD16_BYTE( "168uab01.15h", 0x000001, 0x80000, CRC(2d6a9fa3) SHA1(a2f82702896eddb11cd2b2f9ed5fff730f6baf0f) )
 	ROM_LOAD16_BYTE( "168uab02.15f", 0x000000, 0x80000, CRC(0e75f7cc) SHA1(57af86703dc728ba83ca12889246c93b9f8d4576) )
 
@@ -2150,7 +2183,8 @@ GAME( 1993, mystwaru, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "
 GAME( 1993, mmaulers, 0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, dadandrn, mmaulers, dadandrn, dadandrn, 0,        ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, viostorm, 0,        viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostrmu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostrmu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostmub, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, viostrmj, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, viostrma, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, metamrph, 0,        metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS )

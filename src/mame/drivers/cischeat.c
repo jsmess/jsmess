@@ -240,17 +240,17 @@ static WRITE16_HANDLER( bigrun_paletteram16_w )
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x0e00/2) && (offset <= 0x0fff/2) ) { palette_set_color(machine, 0x000 + offset - 0x0e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x0e00/2) && (offset <= 0x0fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x0e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x1600/2) && (offset <= 0x17ff/2) ) { palette_set_color(machine, 0x100 + offset - 0x1600/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1600/2) && (offset <= 0x17ff/2) ) { palette_set_color(space->machine, 0x100 + offset - 0x1600/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x1800/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine, 0x200 + offset - 0x1800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1800/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x1800/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x2000/2) && (offset <= 0x27ff/2) ) { palette_set_color(machine, 0x600 + offset - 0x2000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2000/2) && (offset <= 0x27ff/2) ) { palette_set_color(space->machine, 0x600 + offset - 0x2000/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x2800/2) && (offset <= 0x2fff/2) ) { palette_set_color(machine, 0xa00 + offset - 0x2800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2800/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine, 0xa00 + offset - 0x2800/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x3600/2) && (offset <= 0x37ff/2) ) { palette_set_color(machine, 0xe00 + offset - 0x3600/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3600/2) && (offset <= 0x37ff/2) ) { palette_set_color(space->machine, 0xe00 + offset - 0x3600/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 static ADDRESS_MAP_START( bigrun_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -312,17 +312,17 @@ static WRITE16_HANDLER( cischeat_paletteram16_w )
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1c00/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine, 0x000 + offset - 0x1c00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1c00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x1c00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x2c00/2) && (offset <= 0x2fff/2) ) { palette_set_color(machine, 0x200 + offset - 0x2c00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2c00/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x2c00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x6c00/2) && (offset <= 0x6fff/2) ) { palette_set_color(machine, 0x400 + offset - 0x6c00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x6c00/2) && (offset <= 0x6fff/2) ) { palette_set_color(space->machine, 0x400 + offset - 0x6c00/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(machine, 0x600 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine, 0x600 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(machine, 0xa00 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine, 0xa00 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(machine, 0xe00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(space->machine, 0xe00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 static ADDRESS_MAP_START( cischeat_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -380,17 +380,17 @@ static WRITE16_HANDLER( f1gpstar_paletteram16_w )
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine, 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x2e00/2) && (offset <= 0x2fff/2) ) { palette_set_color(machine, 0x100 + offset - 0x2e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x2e00/2) && (offset <= 0x2fff/2) ) { palette_set_color(space->machine, 0x100 + offset - 0x2e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x6e00/2) && (offset <= 0x6fff/2) ) { palette_set_color(machine, 0x200 + offset - 0x6e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x6e00/2) && (offset <= 0x6fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x6e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(machine, 0x300 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine, 0x300 + offset - 0x3800/2, MAKE_RGB(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(machine, 0x700 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine, 0x700 + offset - 0x4800/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(machine, 0xb00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(space->machine, 0xb00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 /*  F1 GP Star tests:
@@ -493,11 +493,11 @@ static WRITE16_HANDLER( scudhamm_paletteram16_w )
 	int b = pal5bit(((newword >> 3 ) & 0x1E ) | ((newword >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine, 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(space->machine, 0x000 + offset - 0x1e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x4e00/2) && (offset <= 0x4fff/2) ) { palette_set_color(machine, 0x100 + offset - 0x4e00/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x4e00/2) && (offset <= 0x4fff/2) ) { palette_set_color(space->machine, 0x100 + offset - 0x4e00/2, MAKE_RGB(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x3000/2) && (offset <= 0x3fff/2) ) { palette_set_color(machine, 0x200 + offset - 0x3000/2, MAKE_RGB(r,g,b) ); return;}
+	if ( (offset >= 0x3000/2) && (offset <= 0x3fff/2) ) { palette_set_color(space->machine, 0x200 + offset - 0x3000/2, MAKE_RGB(r,g,b) ); return;}
 }
 
 
@@ -513,7 +513,7 @@ UINT16 scudhamm_motor_command;
 
 READ16_HANDLER( scudhamm_motor_status_r )
 {
-//  return 1 << (mame_rand(machine)&1);         // Motor Status
+//  return 1 << (mame_rand(space->machine)&1);         // Motor Status
 	return scudhamm_motor_command;	// Motor Status
 }
 
@@ -540,7 +540,7 @@ static WRITE16_HANDLER( scudhamm_motor_command_w )
 
 READ16_HANDLER( scudhamm_analog_r )
 {
-	return input_port_read(machine, "IN1");
+	return input_port_read(space->machine, "IN1");
 }
 
 /*
@@ -635,17 +635,17 @@ static READ16_HANDLER( armchmp2_analog_r )
 	int armdelta;
 	static int armold = 0;
 
-	armdelta = input_port_read(machine, "IN1") - armold;
-	armold = input_port_read(machine, "IN1");
+	armdelta = input_port_read(space->machine, "IN1") - armold;
+	armold = input_port_read(space->machine, "IN1");
 
 	return ~( scudhamm_motor_command + armdelta );	// + x : x<=0 and player loses, x>0 and player wins
 }
 
 static READ16_HANDLER( armchmp2_buttons_r )
 {
-	int arm_x = input_port_read(machine, "IN1");
+	int arm_x = input_port_read(space->machine, "IN1");
 
-	UINT16 ret = input_port_read(machine, "IN0");
+	UINT16 ret = input_port_read(space->machine, "IN0");
 
 	if (arm_x < 0x40)		ret &= ~1;
 	else if (arm_x > 0xc0)	ret &= ~2;
@@ -1739,12 +1739,12 @@ GFXDECODE_END
 #define CISCHEAT_INTERRUPT_NUM	3
 static INTERRUPT_GEN( cischeat_interrupt )
 {
-	if (cpu_getiloops()==0)
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE); /* Once */
+	if (cpu_getiloops(device)==0)
+		cpu_set_input_line(device, 4, HOLD_LINE); /* Once */
 	else
 	{
-		if (cpu_getiloops()%2)	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
-		else 					cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		if (cpu_getiloops(device)%2)	cpu_set_input_line(device, 2, HOLD_LINE);
+		else 					cpu_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 
@@ -1894,10 +1894,10 @@ MACHINE_DRIVER_END
 #define INTERRUPT_NUM_SCUDHAMM		30
 static INTERRUPT_GEN( interrupt_scudhamm )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	// update palette, layers etc. Not the sprites.
-		case 14:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	// "real" vblank. It just sets a flag that
+		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	// update palette, layers etc. Not the sprites.
+		case 14:	cpu_set_input_line(device, 2, HOLD_LINE);	// "real" vblank. It just sets a flag that
 														// the main loop polls before updating the sprites.
 	}
 }
@@ -1947,10 +1947,10 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( interrupt_armchmp2)
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
-		case 14:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		case 0:		cpu_set_input_line(device, 4, HOLD_LINE);
+		case 14:	cpu_set_input_line(device, 2, HOLD_LINE);
 	}
 }
 
@@ -2703,7 +2703,7 @@ ROM_END
 
 static DRIVER_INIT( wildplt )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
 
 	DRIVER_INIT_CALL(f1gpstar);
 }

@@ -149,14 +149,14 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin1_inserted )
 {
 	/* left coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_CHANGED( coin2_inserted )
 {
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, HOLD_LINE);
 }
 
 
@@ -961,11 +961,12 @@ static DRIVER_INIT( dorodon )
 	/* decode the opcodes */
 
 	offs_t i;
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x6000);
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *table = memory_region(machine, "user1");
 
-	memory_set_decrypted_region(0, 0x0000, 0x5fff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0x5fff, decrypted);
 
 	for (i = 0; i < 0x6000; i++)
 		decrypted[i] = table[rom[i]];

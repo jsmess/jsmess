@@ -33,7 +33,7 @@ static UINT8 *pmcram;
 static INTERRUPT_GEN( spy_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 
@@ -50,12 +50,12 @@ static READ8_HANDLER( spy_bankedram1_r )
 	{
 		if (pmcbank)
 		{
-			//logerror("%04x read pmcram %04x\n",activecpu_get_pc(),offset);
+			//logerror("%04x read pmcram %04x\n",cpu_get_pc(space->cpu),offset);
 			return pmcram[offset];
 		}
 		else
 		{
-			//logerror("%04x read pmc internal ram %04x\n",activecpu_get_pc(),offset);
+			//logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(space->cpu),offset);
 			return 0;
 		}
 	}
@@ -67,17 +67,17 @@ static WRITE8_HANDLER( spy_bankedram1_w )
 {
 	if (rambank & 1)
 	{
-		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
 	else if (rambank & 2)
 	{
 		if (pmcbank)
 		{
-			//logerror("%04x pmcram %04x = %02x\n",activecpu_get_pc(),offset,data);
+			//logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(space->cpu),offset,data);
 			pmcram[offset] = data;
 		}
 		//else
-			//logerror("%04x pmc internal ram %04x = %02x\n",activecpu_get_pc(),offset,data);
+			//logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	}
 	else
 		ram[offset] = data;
@@ -153,7 +153,7 @@ this is the data written to internal ram on startup:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int offs;
 
 	/* bit 0 = RAM bank? */
@@ -162,7 +162,7 @@ if ((data & 1) == 0) popmessage("bankswitch RAM bank 0");
 	/* bit 1-4 = ROM bank */
 	if (data & 0x10) offs = 0x20000 + (data & 0x06) * 0x1000;
 	else offs = 0x10000 + (data & 0x0e) * 0x1000;
-	memory_set_bankptr(1,&rom[offs]);
+	memory_set_bankptr(space->machine, 1,&rom[offs]);
 }
 
 //AT
@@ -304,7 +304,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 	/* bit 7 = PMC-BK */
 	pmcbank = (data & 0x80) >> 7;
 
-//logerror("%04x: 3f90_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 3f90_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 6 = PMC-START */
 	if ((data & 0x40) && !(old & 0x40))
 	{
@@ -324,7 +324,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 		}
 		spy_collision();
 //ZT
-		cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
 	}
 
 	old = data;
@@ -333,7 +333,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 
 static WRITE8_HANDLER( spy_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )
@@ -521,7 +521,7 @@ static const k007232_interface k007232_interface_2 =
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, linestate);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, linestate);
 }
 
 static const ym3812_interface ym3812_config =

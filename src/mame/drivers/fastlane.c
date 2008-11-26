@@ -26,22 +26,22 @@ VIDEO_UPDATE( fastlane );
 
 static INTERRUPT_GEN( fastlane_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		if (K007121_ctrlram[0][0x07] & 0x02)
-			cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2)
+	else if (cpu_getiloops(device) % 2)
 	{
 		if (K007121_ctrlram[0][0x07] & 0x01)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( k007121_registers_w )
 {
 	if (offset < 8)
-		K007121_ctrl_0_w(machine,offset,data);
+		K007121_ctrl_0_w(space,offset,data);
 	else	/* scroll registers */
 		fastlane_k007121_regs[offset] = data;
 }
@@ -49,7 +49,7 @@ static WRITE8_HANDLER( k007121_registers_w )
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -57,7 +57,7 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 
 	/* bits 2 & 3 = bank number */
 	bankaddress = 0x10000 + ((data & 0x0c) >> 2) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
 	k007232_set_bank(1,0 + ((data & 0x10) >> 4),2 + ((data & 0x10) >> 4));
@@ -70,19 +70,19 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 
 static READ8_HANDLER( fastlane_k007232_read_port_0_r )
 {
-	return k007232_read_port_0_r(machine, offset ^ 1);
+	return k007232_read_port_0_r(space, offset ^ 1);
 }
 static WRITE8_HANDLER( fastlane_k007232_write_port_0_w )
 {
-	k007232_write_port_0_w(machine, offset ^ 1, data);
+	k007232_write_port_0_w(space, offset ^ 1, data);
 }
 static READ8_HANDLER( fastlane_k007232_read_port_1_r )
 {
-	return k007232_read_port_1_r(machine, offset ^ 1);
+	return k007232_read_port_1_r(space, offset ^ 1);
 }
 static WRITE8_HANDLER( fastlane_k007232_write_port_1_w )
 {
-	k007232_write_port_1_w(machine, offset ^ 1, data);
+	k007232_write_port_1_w(space, offset ^ 1, data);
 }
 
 

@@ -52,6 +52,7 @@ struct _debug_view_callbacks
 /* typedef struct _debug_view debug_view -- defined in debugvw.h */
 struct _debug_view
 {
+	running_machine *machine;					/* machine associated with this view */
 	debug_view *	next;						/* link to the next view */
 	UINT8			type;						/* type of view */
 	void *			extra_data;					/* extra view-specific data */
@@ -113,8 +114,8 @@ struct _debug_view_disasm
 	UINT8			right_column;				/* right column? */
 	UINT32			backwards_steps;			/* number of backwards steps */
 	UINT32			dasm_width;					/* width of the disassembly area */
-	UINT8 *			last_opbase_rom;			/* last opbase.rom */
-	UINT8 *			last_opbase_ram;			/* last opbase.ram */
+	UINT8 *			last_direct_raw;			/* last direct raw value */
+	UINT8 *			last_direct_decrypted;		/* last direct decrypted value */
 	UINT32			last_change_count;			/* last comment change count */
 	offs_t			last_pcbyte;				/* last PC byte value */
 	UINT32			active_address;				/* the address cursor_row is pointing to */
@@ -263,7 +264,7 @@ void debug_view_exit(running_machine *machine)
     view
 -------------------------------------------------*/
 
-debug_view *debug_view_alloc(int type)
+debug_view *debug_view_alloc(running_machine *machine, int type)
 {
 	debug_view *view;
 
@@ -274,6 +275,7 @@ debug_view *debug_view_alloc(int type)
 	memset(view, 0, sizeof(*view));
 
 	/* set the view type information */
+	view->machine = machine;
 	view->type = type;
 	view->cb = callback_table[type];
 
@@ -951,7 +953,7 @@ static void add_register(debug_view *view, int regnum, const char *str)
 
 	/* note the register number and info */
 	regdata->reg[view->total_rows].lastval  =
-	regdata->reg[view->total_rows].currval  = cpunum_get_reg(regdata->cpunum, regnum);
+	regdata->reg[view->total_rows].currval  = cpu_get_reg(Machine->cpu[regdata->cpunum], regnum);
 	regdata->reg[view->total_rows].regnum   = regnum;
 	regdata->reg[view->total_rows].tagstart = tagstart;
 	regdata->reg[view->total_rows].taglen   = taglen;
@@ -973,7 +975,7 @@ static void add_register(debug_view *view, int regnum, const char *str)
 static void registers_recompute(debug_view *view)
 {
 	debug_view_registers *regdata = view->extra_data;
-	const int *list = cpunum_debug_register_list(regdata->cpunum);
+	const int *list = cpu_get_debug_register_list(Machine->cpu[regdata->cpunum]);
 	int regnum, maxtaglen, maxvallen;
 
 	/* reset the view parameters */
@@ -1026,7 +1028,7 @@ static void registers_recompute(debug_view *view)
 	regdata->reg[view->total_rows].tagstart = 0;
 	regdata->reg[view->total_rows].taglen   = 5;
 	regdata->reg[view->total_rows].valstart = 6;
-	regdata->reg[view->total_rows].vallen   = (UINT32)strlen(cpunum_flags(regdata->cpunum));
+	regdata->reg[view->total_rows].vallen   = (UINT32)strlen(cpu_get_flags_string(Machine->cpu[regdata->cpunum]));
 	maxtaglen = MAX(maxtaglen, regdata->reg[view->total_rows].taglen);
 	maxvallen = MAX(maxvallen, regdata->reg[view->total_rows].vallen);
 	view->total_rows++;
@@ -1053,7 +1055,7 @@ static void registers_recompute(debug_view *view)
 			break;
 
 		/* retrieve the string for this register */
-		str = cpunum_reg_string(regdata->cpunum, regid);
+		str = cpu_get_reg_string(Machine->cpu[regdata->cpunum], regid);
 
 		/* did we get a string? */
 		if (str && str[0] != '\0' && str[0] != '~')
@@ -1079,9 +1081,9 @@ static void registers_update(debug_view *view)
 	const device_config *screen = Machine->primary_screen;
 
 	/* cannot update if no active CPU */
-	if (cpu_getactivecpu() < 0)
+	if (cpunum_get_active() < 0)
 		return;
-	total_cycles = activecpu_gettotalcycles();
+	total_cycles = cpu_get_total_cycles(Machine->activecpu);
 
 	/* if our assumptions changed, revisit them */
 	if (regdata->recompute)
@@ -1119,8 +1121,8 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 1:
-						sprintf(dummy, "cycles:%-8d", activecpu_get_icount());
-						reg->currval = activecpu_get_icount();
+						sprintf(dummy, "cycles:%-8d", *cpu_get_icount_ptr(Machine->activecpu));
+						reg->currval = *cpu_get_icount_ptr(Machine->activecpu);
 						break;
 
 					case MAX_REGS + 2:
@@ -1134,16 +1136,16 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 4:
-						sprintf(dummy, "flags:%s", activecpu_flags());
+						sprintf(dummy, "flags:%s", cpu_get_flags_string(Machine->activecpu));
 						break;
 				}
 			}
 			else
 			{
-				data = (char *)cpunum_reg_string(regdata->cpunum, reg->regnum);
+				data = (char *)cpu_get_reg_string(Machine->cpu[regdata->cpunum], reg->regnum);
 				if (regdata->last_update != total_cycles)
 					reg->lastval = reg->currval;
-				reg->currval = cpunum_get_reg(regdata->cpunum, reg->regnum);
+				reg->currval = cpu_get_reg(Machine->cpu[regdata->cpunum], reg->regnum);
 			}
 
 			/* see if we changed */
@@ -1270,8 +1272,9 @@ static int disasm_alloc(debug_view *view)
 	memset(dasmdata, 0, sizeof(*dasmdata));
 
 	/* count the number of comments */
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-		total_comments += debug_comment_get_count(i);
+	for (i = 0; i < ARRAY_LENGTH(Machine->cpu); i++)
+		if (Machine->cpu[i] != NULL)
+			total_comments += debug_comment_get_count(Machine->cpu[i]);
 
 	/* initialize */
 	dasmdata->recompute = TRUE;
@@ -1322,10 +1325,11 @@ static void disasm_free(debug_view *view)
     of instructions from the given PC
 -------------------------------------------------*/
 
-static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t startpc, int numinstrs)
+static offs_t disasm_back_up(int cpunum, const cpu_debug_data *cpuinfo, offs_t startpc, int numinstrs)
 {
-	int minlen = BYTE2ADDR(activecpu_min_instruction_bytes(), cpuinfo, ADDRESS_SPACE_PROGRAM);
-	int maxlen = BYTE2ADDR(activecpu_max_instruction_bytes(), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	int minlen = BYTE2ADDR(cpu_get_min_opcode_bytes(cpuinfo->device), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	int maxlen = BYTE2ADDR(cpu_get_max_opcode_bytes(cpuinfo->device), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
 	UINT32 addrmask = cpuinfo->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
 	offs_t curpc, lastgoodpc = startpc, temppc;
 	UINT8 opbuf[1024], argbuf[1024];
@@ -1343,8 +1347,8 @@ static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t s
 	/* prefetch the opcode bytes */
 	for (temppc = curpc; temppc < startpc; temppc++)
 	{
-		opbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, FALSE);
-		argbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, TRUE);
+		opbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, FALSE);
+		argbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, TRUE);
 	}
 
 	/* loop until we hit it */
@@ -1360,8 +1364,8 @@ static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t s
 
 			/* get the disassembly, but only if mapped */
 			instlen = 1;
-			if (cpuinfo->translate == NULL || (*cpuinfo->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &pcbyte))
-				instlen = activecpu_dasm(dasmbuffer, testpc & addrmask, &opbuf[1000 + testpc - startpc], &argbuf[1000 + testpc - startpc]) & DASMFLAG_LENGTHMASK;
+			if (cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &pcbyte))
+				instlen = cpu_dasm(cpuinfo->device, dasmbuffer, testpc & addrmask, &opbuf[1000 + testpc - startpc], &argbuf[1000 + testpc - startpc]) & DASMFLAG_LENGTHMASK;
 
 			/* count this one */
 			instcount++;
@@ -1387,8 +1391,8 @@ static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t s
 		/* prefetch the opcode bytes */
 		for (temppc = nextcurpc; temppc < curpc; temppc++)
 		{
-			opbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, FALSE);
-			argbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, TRUE);
+			opbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, FALSE);
+			argbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, TRUE);
 		}
 
 		/* update curpc once we're done fetching */
@@ -1404,8 +1408,9 @@ static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t s
     byte values
 -------------------------------------------------*/
 
-static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const debug_cpu_info *cpuinfo, int minbytes, char *string, int maxchars, int encrypted)
+static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const cpu_debug_data *cpuinfo, int minbytes, char *string, int maxchars, int encrypted)
 {
+	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
 	int byte, offset = 0;
 	UINT64 val;
 
@@ -1413,32 +1418,32 @@ static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const debug_cpu_i
 	{
 		case 1:
 			if (maxchars >= 2)
-				offset = sprintf(string, "%02X", (UINT32)debug_read_opcode(pcbyte, 1, FALSE));
+				offset = sprintf(string, "%02X", (UINT32)debug_read_opcode(space, pcbyte, 1, FALSE));
 			for (byte = 1; byte < numbytes && offset + 3 < maxchars; byte++)
-				offset += sprintf(&string[offset], " %02X", (UINT32)debug_read_opcode(pcbyte + byte, 1, encrypted));
+				offset += sprintf(&string[offset], " %02X", (UINT32)debug_read_opcode(space, pcbyte + byte, 1, encrypted));
 			break;
 
 		case 2:
 			if (maxchars >= 4)
-				offset = sprintf(string, "%04X", (UINT32)debug_read_opcode(pcbyte, 2, FALSE));
+				offset = sprintf(string, "%04X", (UINT32)debug_read_opcode(space, pcbyte, 2, FALSE));
 			for (byte = 2; byte < numbytes && offset + 5 < maxchars; byte += 2)
-				offset += sprintf(&string[offset], " %04X", (UINT32)debug_read_opcode(pcbyte + byte, 2, encrypted));
+				offset += sprintf(&string[offset], " %04X", (UINT32)debug_read_opcode(space, pcbyte + byte, 2, encrypted));
 			break;
 
 		case 4:
 			if (maxchars >= 8)
-				offset = sprintf(string, "%08X", (UINT32)debug_read_opcode(pcbyte, 4, FALSE));
+				offset = sprintf(string, "%08X", (UINT32)debug_read_opcode(space, pcbyte, 4, FALSE));
 			for (byte = 4; byte < numbytes && offset + 9 < maxchars; byte += 4)
-				offset += sprintf(&string[offset], " %08X", (UINT32)debug_read_opcode(pcbyte + byte, 4, encrypted));
+				offset += sprintf(&string[offset], " %08X", (UINT32)debug_read_opcode(space, pcbyte + byte, 4, encrypted));
 			break;
 
 		case 8:
-			val = debug_read_opcode(pcbyte, 8, FALSE);
+			val = debug_read_opcode(space, pcbyte, 8, FALSE);
 			if (maxchars >= 16)
 				offset = sprintf(string, "%08X%08X", (UINT32)(val >> 32), (UINT32)val);
 			for (byte = 8; byte < numbytes && offset + 17 < maxchars; byte += 8)
 			{
-				val = debug_read_opcode(pcbyte + byte, 8, encrypted);
+				val = debug_read_opcode(space, pcbyte + byte, 8, encrypted);
 				offset += sprintf(&string[offset], " %08X%08X", (UINT32)(val >> 32), (UINT32)val);
 			}
 			break;
@@ -1462,9 +1467,9 @@ static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const debug_cpu_i
 
 static int disasm_recompute(debug_view *view, offs_t pc, int startline, int lines, int original_cpunum)
 {
-	extern opbase_data opbase;
 	debug_view_disasm *dasmdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[dasmdata->cpunum]);
+	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
 	int chunksize, minbytes, maxbytes, maxbytes_clamped;
 	int changed = FALSE;
 	UINT32 addrmask;
@@ -1480,13 +1485,13 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 	dasmdata->divider2 = dasmdata->divider1 + 1 + dasmdata->dasm_width + 1;
 
 	/* determine how many bytes we might need to display */
-	minbytes = activecpu_min_instruction_bytes();
-	maxbytes = activecpu_max_instruction_bytes();
+	minbytes = cpu_get_min_opcode_bytes(cpuinfo->device);
+	maxbytes = cpu_get_max_opcode_bytes(cpuinfo->device);
 
 	/* set the width of the third column according to display mode */
 	if (dasmdata->right_column == DVP_DASM_RIGHTCOL_RAW || dasmdata->right_column == DVP_DASM_RIGHTCOL_ENCRYPTED)
 	{
-		chunksize = activecpu_databus_width(ADDRESS_SPACE_PROGRAM) / 8;
+		chunksize = cpu_get_databus_width(cpuinfo->device, ADDRESS_SPACE_PROGRAM) / 8;
 		maxbytes_clamped = maxbytes;
 		if (maxbytes_clamped > DASM_MAX_BYTES)
 			maxbytes_clamped = DASM_MAX_BYTES;
@@ -1538,19 +1543,19 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
-		if (cpuinfo->translate == NULL || (*cpuinfo->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &tempaddr))
+		if (cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &tempaddr))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
 			/* fetch the bytes up to the maximum */
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, FALSE);
-				argbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, TRUE);
+				opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, FALSE);
+				argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 			}
 
 			/* disassemble the result */
-			pc += numbytes = activecpu_dasm(buffer, pc & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			pc += numbytes = cpu_dasm(cpuinfo->device, buffer, pc & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 		else
 			sprintf(buffer, "<unmapped>");
@@ -1568,7 +1573,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 			offs_t comment_address = BYTE2ADDR(dasmdata->address[instr], cpuinfo, ADDRESS_SPACE_PROGRAM) ;
 
 			/* get and add the comment */
-			if (debug_comment_get_text(cpu_getactivecpu(), comment_address, debug_comment_get_opcode_crc32(comment_address)) != 0x00)
+			if (debug_comment_get_text(cpuinfo->device, comment_address, debug_comment_get_opcode_crc32(cpuinfo->device, comment_address)) != 0x00)
 			{
 				int i ;
 				char bob[DEBUG_COMMENT_MAX_LINE_LENGTH] ;
@@ -1580,7 +1585,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 					destbuf[dasmdata->divider2+i] = pre[i] ;
 
 				// Stick in the comment itself
-				strcpy(bob, debug_comment_get_text(cpu_getactivecpu(), comment_address, debug_comment_get_opcode_crc32(comment_address))) ;
+				strcpy(bob, debug_comment_get_text(cpuinfo->device, comment_address, debug_comment_get_opcode_crc32(cpuinfo->device, comment_address))) ;
 				for (i = 0; i < (dasmdata->allocated_cols - dasmdata->divider2 - strlen(pre) - 1); i++)
 					destbuf[dasmdata->divider2+i+strlen(pre)] = bob[i] ;
 			}
@@ -1593,14 +1598,10 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 			changed = TRUE;
 	}
 
-	/* reset the opcode base */
-	if (dasmdata->cpunum == original_cpunum)
-		memory_set_opbase(activecpu_get_physical_pc_byte());
-
 	/* update opcode base information */
-	dasmdata->last_opbase_rom = opbase.rom;
-	dasmdata->last_opbase_ram = opbase.ram;
-	dasmdata->last_change_count = debug_comment_all_change_count();
+	dasmdata->last_direct_decrypted = space->direct.decrypted;
+	dasmdata->last_direct_raw = space->direct.raw;
+	dasmdata->last_change_count = debug_comment_all_change_count(Machine);
 
 	/* now longer need to recompute */
 	dasmdata->recompute = FALSE;
@@ -1615,19 +1616,19 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 
 static void disasm_update(debug_view *view)
 {
-	extern opbase_data opbase;
 	debug_view_disasm *dasmdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
-	offs_t pc = cpunum_get_reg(dasmdata->cpunum, REG_PC);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[dasmdata->cpunum]);
+	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
+	offs_t pc = cpu_get_reg(Machine->cpu[dasmdata->cpunum], REG_PC);
 	offs_t pcbyte = ADDR2BYTE_MASKED(pc, cpuinfo, ADDRESS_SPACE_PROGRAM);
 	debug_view_char *dest = view->viewdata;
-	int original_cpunum = cpu_getactivecpu();
+	int original_cpunum = cpunum_get_active();
 	int recomputed_this_time = FALSE;
 	EXPRERR exprerr;
 	UINT32 row;
 
 	/* switch to the CPU's context */
-	cpuintrf_push_context(dasmdata->cpunum);
+	cpu_push_context(Machine->cpu[dasmdata->cpunum]);
 
 	/* if our expression is dirty, fix it */
 	if (dasmdata->expression_dirty && dasmdata->expression_string)
@@ -1635,7 +1636,7 @@ static void disasm_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(dasmdata->expression_string, debug_get_cpu_info(dasmdata->cpunum)->symtable, &debug_expression_callbacks, &expr);
+		exprerr = expression_parse(dasmdata->expression_string, cpu_get_debug_data(Machine->cpu[dasmdata->cpunum])->symtable, &debug_expression_callbacks, Machine, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)
@@ -1679,11 +1680,11 @@ static void disasm_update(debug_view *view)
 	}
 
 	/* if the opcode base has changed, rework things */
-	if (opbase.rom != dasmdata->last_opbase_rom || opbase.ram != dasmdata->last_opbase_ram)
+	if (space->direct.decrypted != dasmdata->last_direct_decrypted || space->direct.raw != dasmdata->last_direct_raw)
 		dasmdata->recompute = TRUE;
 
 	/* if the comments have changed, redo it */
-	if (dasmdata->last_change_count != debug_comment_all_change_count())
+	if (dasmdata->last_change_count != debug_comment_all_change_count(Machine))
 		dasmdata->recompute = TRUE;
 
 	/* if we need to recompute, do it */
@@ -1694,7 +1695,7 @@ recompute:
 		offs_t backpc = disasm_back_up(dasmdata->cpunum, cpuinfo, (UINT32)dasmdata->last_result, dasmdata->backwards_steps);
 
 		/* recompute the view */
-		if (dasmdata->last_change_count != debug_comment_all_change_count())
+		if (dasmdata->last_change_count != debug_comment_all_change_count(Machine))
 		{
 			/* smoosh us against the left column, but not the top row */
 			view->left_col = 0;
@@ -1803,7 +1804,7 @@ recompute:
 	}
 
 	/* restore the original CPU context */
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -1850,8 +1851,8 @@ static void disasm_handle_char(debug_view *view, char chval)
 
 		case DCH_HOME:				/* set the active column to the PC */
 		{
-			const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
-			offs_t pc = cpunum_get_reg(dasmdata->cpunum, REG_PC);
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[dasmdata->cpunum]);
+			offs_t pc = cpu_get_reg(Machine->cpu[dasmdata->cpunum], REG_PC);
 			int i;
 
 			pc = ADDR2BYTE_MASKED(pc, cpuinfo, ADDRESS_SPACE_PROGRAM);
@@ -2288,14 +2289,14 @@ static void memory_set_cursor_pos(debug_view *view, offs_t address, UINT8 shift)
 
 
 /*-------------------------------------------------
-    memory_read_byte - generic byte reader
+    generic_read_byte - generic byte reader
 -------------------------------------------------*/
 
-static UINT8 memory_read_byte(debug_view_memory *memdata, offs_t offs, int apply_translation)
+static UINT8 generic_read_byte(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_byte(memdata->spacenum, offs, apply_translation);
+		return debug_read_byte(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* all 0xff if out of bounds */
 	offs ^= memdata->raw_offset_xor;
@@ -2306,69 +2307,69 @@ static UINT8 memory_read_byte(debug_view_memory *memdata, offs_t offs, int apply
 
 
 /*-------------------------------------------------
-    memory_read_word - generic word reader
+    generic_read_word - generic word reader
 -------------------------------------------------*/
 
-static UINT16 memory_read_word(debug_view_memory *memdata, offs_t offs, int apply_translation)
+static UINT16 generic_read_word(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_word(memdata->spacenum, offs, apply_translation);
+		return debug_read_word(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* otherwise, decompose into bytes */
 	if (memdata->raw_little_endian)
-		return memory_read_byte(memdata, offs + 0, apply_translation) | (memory_read_byte(memdata, offs + 1, apply_translation) << 8);
+		return generic_read_byte(memdata, offs + 0, apply_translation) | (generic_read_byte(memdata, offs + 1, apply_translation) << 8);
 	else
-		return memory_read_byte(memdata, offs + 1, apply_translation) | (memory_read_byte(memdata, offs + 0, apply_translation) << 8);
+		return generic_read_byte(memdata, offs + 1, apply_translation) | (generic_read_byte(memdata, offs + 0, apply_translation) << 8);
 }
 
 
 /*-------------------------------------------------
-    memory_read_dword - generic dword reader
+    generic_read_dword - generic dword reader
 -------------------------------------------------*/
 
-static UINT32 memory_read_dword(debug_view_memory *memdata, offs_t offs, int apply_translation)
+static UINT32 generic_read_dword(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_dword(memdata->spacenum, offs, apply_translation);
+		return debug_read_dword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* otherwise, decompose into words */
 	if (memdata->raw_little_endian)
-		return memory_read_word(memdata, offs + 0, apply_translation) | (memory_read_word(memdata, offs + 2, apply_translation) << 16);
+		return generic_read_word(memdata, offs + 0, apply_translation) | (generic_read_word(memdata, offs + 2, apply_translation) << 16);
 	else
-		return memory_read_word(memdata, offs + 2, apply_translation) | (memory_read_word(memdata, offs + 0, apply_translation) << 16);
+		return generic_read_word(memdata, offs + 2, apply_translation) | (generic_read_word(memdata, offs + 0, apply_translation) << 16);
 }
 
 
 /*-------------------------------------------------
-    memory_read_qword - generic qword reader
+    generic_read_qword - generic qword reader
 -------------------------------------------------*/
 
-static UINT64 memory_read_qword(debug_view_memory *memdata, offs_t offs, int apply_translation)
+static UINT64 generic_read_qword(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_qword(memdata->spacenum, offs, apply_translation);
+		return debug_read_qword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* otherwise, decompose into dwords */
 	if (memdata->raw_little_endian)
-		return memory_read_dword(memdata, offs + 0, apply_translation) | ((UINT64)memory_read_dword(memdata, offs + 4, apply_translation) << 32);
+		return generic_read_dword(memdata, offs + 0, apply_translation) | ((UINT64)generic_read_dword(memdata, offs + 4, apply_translation) << 32);
 	else
-		return memory_read_dword(memdata, offs + 4, apply_translation) | ((UINT64)memory_read_dword(memdata, offs + 0, apply_translation) << 32);
+		return generic_read_dword(memdata, offs + 4, apply_translation) | ((UINT64)generic_read_dword(memdata, offs + 0, apply_translation) << 32);
 }
 
 
 /*-------------------------------------------------
-    memory_write_byte - generic byte writer
+    generic_write_byte - generic byte writer
 -------------------------------------------------*/
 
-static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 data, int apply_translation)
+static void generic_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_byte(memdata->spacenum, offs, data, apply_translation);
+		debug_write_byte(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
@@ -2380,7 +2381,7 @@ static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 dat
 
 /* hack for FD1094 editing */
 #ifdef FD1094_HACK
-	if (memdata->raw_base == memory_region(machine, "user2"))
+	if (memdata->raw_base == memory_region(Machine, "user2"))
 	{
 		extern void fd1094_regenerate_key(void);
 		fd1094_regenerate_key();
@@ -2390,82 +2391,82 @@ static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 dat
 
 
 /*-------------------------------------------------
-    memory_write_word - generic word writer
+    generic_write_word - generic word writer
 -------------------------------------------------*/
 
-static void memory_write_word(debug_view_memory *memdata, offs_t offs, UINT16 data, int apply_translation)
+static void generic_write_word(debug_view_memory *memdata, offs_t offs, UINT16 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_word(memdata->spacenum, offs, data, apply_translation);
+		debug_write_word(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
 	/* otherwise, decompose into bytes */
 	if (memdata->raw_little_endian)
 	{
-		memory_write_byte(memdata, offs + 0, data, apply_translation);
-		memory_write_byte(memdata, offs + 1, data >> 8, apply_translation);
+		generic_write_byte(memdata, offs + 0, data, apply_translation);
+		generic_write_byte(memdata, offs + 1, data >> 8, apply_translation);
 	}
 	else
 	{
-		memory_write_byte(memdata, offs + 1, data, apply_translation);
-		memory_write_byte(memdata, offs + 0, data >> 8, apply_translation);
+		generic_write_byte(memdata, offs + 1, data, apply_translation);
+		generic_write_byte(memdata, offs + 0, data >> 8, apply_translation);
 	}
 }
 
 
 /*-------------------------------------------------
-    memory_write_dword - generic dword writer
+    generic_write_dword - generic dword writer
 -------------------------------------------------*/
 
-static void memory_write_dword(debug_view_memory *memdata, offs_t offs, UINT32 data, int apply_translation)
+static void generic_write_dword(debug_view_memory *memdata, offs_t offs, UINT32 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_dword(memdata->spacenum, offs, data, apply_translation);
+		debug_write_dword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
 	/* otherwise, decompose into words */
 	if (memdata->raw_little_endian)
 	{
-		memory_write_word(memdata, offs + 0, data, apply_translation);
-		memory_write_word(memdata, offs + 2, data >> 16, apply_translation);
+		generic_write_word(memdata, offs + 0, data, apply_translation);
+		generic_write_word(memdata, offs + 2, data >> 16, apply_translation);
 	}
 	else
 	{
-		memory_write_word(memdata, offs + 2, data, apply_translation);
-		memory_write_word(memdata, offs + 0, data >> 16, apply_translation);
+		generic_write_word(memdata, offs + 2, data, apply_translation);
+		generic_write_word(memdata, offs + 0, data >> 16, apply_translation);
 	}
 }
 
 
 /*-------------------------------------------------
-    memory_write_qword - generic qword writer
+    generic_write_qword - generic qword writer
 -------------------------------------------------*/
 
-static void memory_write_qword(debug_view_memory *memdata, offs_t offs, UINT64 data, int apply_translation)
+static void generic_write_qword(debug_view_memory *memdata, offs_t offs, UINT64 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_qword(memdata->spacenum, offs, data, apply_translation);
+		debug_write_qword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
 	/* otherwise, decompose into dwords */
 	if (memdata->raw_little_endian)
 	{
-		memory_write_dword(memdata, offs + 0, data, apply_translation);
-		memory_write_dword(memdata, offs + 4, data >> 32, apply_translation);
+		generic_write_dword(memdata, offs + 0, data, apply_translation);
+		generic_write_dword(memdata, offs + 4, data >> 32, apply_translation);
 	}
 	else
 	{
-		memory_write_dword(memdata, offs + 4, data, apply_translation);
-		memory_write_dword(memdata, offs + 0, data >> 32, apply_translation);
+		generic_write_dword(memdata, offs + 4, data, apply_translation);
+		generic_write_dword(memdata, offs + 0, data >> 32, apply_translation);
 	}
 }
 
@@ -2478,7 +2479,7 @@ static void memory_write_qword(debug_view_memory *memdata, offs_t offs, UINT64 d
 static void memory_handle_char(debug_view *view, char chval)
 {
 	debug_view_memory *memdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(memdata->cpunum);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[memdata->cpunum]);
 	static const char hexvals[] = "0123456789abcdef";
 	char *hexchar = strchr(hexvals, tolower(chval));
 	UINT32 bytes_per_row;
@@ -2558,13 +2559,13 @@ static void memory_handle_char(debug_view *view, char chval)
 	}
 
 	/* switch off of the current chunk size */
-	cpuintrf_push_context(memdata->cpunum);
+	cpu_push_context(Machine->cpu[memdata->cpunum]);
 	switch (memdata->bytes_per_chunk)
 	{
 		default:
 		case 1:
 			if (hexchar)
-				memory_write_byte(memdata, address, (memory_read_byte(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
+				generic_write_byte(memdata, address, (generic_read_byte(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
 			if (hexchar || chval == DCH_RIGHT)
 			{
 				if (shift == 0) { shift = 8-4; if (address != maxaddr) address++; }
@@ -2579,7 +2580,7 @@ static void memory_handle_char(debug_view *view, char chval)
 
 		case 2:
 			if (hexchar)
-				memory_write_word(memdata, address, (memory_read_word(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
+				generic_write_word(memdata, address, (generic_read_word(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
 			if (hexchar || chval == DCH_RIGHT)
 			{
 				if (shift == 0) { shift = 16-4; if (address != maxaddr) address += 2; }
@@ -2594,7 +2595,7 @@ static void memory_handle_char(debug_view *view, char chval)
 
 		case 4:
 			if (hexchar)
-				memory_write_dword(memdata, address, (memory_read_dword(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
+				generic_write_dword(memdata, address, (generic_read_dword(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
 			if (hexchar || chval == DCH_RIGHT)
 			{
 				if (shift == 0) { shift = 32-4; if (address != maxaddr) address += 4; }
@@ -2609,7 +2610,7 @@ static void memory_handle_char(debug_view *view, char chval)
 
 		case 8:
 			if (hexchar)
-				memory_write_qword(memdata, address, (memory_read_qword(memdata, address, !memdata->no_translation) & ~((UINT64)0xf << shift)) | ((UINT64)(hexchar - hexvals) << shift), !memdata->no_translation);
+				generic_write_qword(memdata, address, (generic_read_qword(memdata, address, !memdata->no_translation) & ~((UINT64)0xf << shift)) | ((UINT64)(hexchar - hexvals) << shift), !memdata->no_translation);
 			if (hexchar || chval == DCH_RIGHT)
 			{
 				if (shift == 0) { shift = 64-4; if (address != maxaddr) address += 8; }
@@ -2622,7 +2623,7 @@ static void memory_handle_char(debug_view *view, char chval)
 			}
 			break;
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* set a new position */
 	memory_set_cursor_pos(view, address, shift);
@@ -2637,7 +2638,7 @@ static void memory_handle_char(debug_view *view, char chval)
 static void memory_update(debug_view *view)
 {
 	debug_view_memory *memdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(memdata->cpunum);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[memdata->cpunum]);
 	debug_view_char *dest = view->viewdata;
 	char addrformat[16];
 	EXPRERR exprerr;
@@ -2650,7 +2651,7 @@ static void memory_update(debug_view *view)
 
 	/* switch to the CPU's context */
 	if (memdata->raw_base == NULL)
-		cpuintrf_push_context(memdata->cpunum);
+		cpu_push_context(Machine->cpu[memdata->cpunum]);
 
 	/* determine maximum address and number of characters for that */
 	if (memdata->raw_base != NULL)
@@ -2706,7 +2707,7 @@ static void memory_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(memdata->expression_string, debug_get_cpu_info(memdata->cpunum)->symtable, &debug_expression_callbacks, &expr);
+		exprerr = expression_parse(memdata->expression_string, cpu_get_debug_data(Machine->cpu[memdata->cpunum])->symtable, &debug_expression_callbacks, Machine, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)
@@ -2771,8 +2772,8 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "   ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
-								len += sprintf(&data[len], "%02X ", memory_read_byte(memdata, addrbyte + i, !memdata->no_translation));
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+								len += sprintf(&data[len], "%02X ", generic_read_byte(memdata, addrbyte + i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "** ");
 						}
@@ -2785,8 +2786,8 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "      ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
-								len += sprintf(&data[len], " %04X ", memory_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+								len += sprintf(&data[len], " %04X ", generic_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], " **** ");
 						}
@@ -2799,8 +2800,8 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "            ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
-								len += sprintf(&data[len], "  %08X  ", memory_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+								len += sprintf(&data[len], "  %08X  ", generic_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "  ********  ");
 						}
@@ -2813,9 +2814,9 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "                        ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 							{
-								UINT64 qword = memory_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
+								UINT64 qword = generic_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
 								len += sprintf(&data[len], "    %08X%08X    ", (UINT32)(qword >> 32), (UINT32)qword);
 							}
 							else
@@ -2830,7 +2831,7 @@ static void memory_update(debug_view *view)
 					{
 						if (addrbyte + i <= maxaddr)
 						{
-							char c = memory_read_byte(memdata, addrbyte + i, !memdata->no_translation);
+							char c = generic_read_byte(memdata, addrbyte + i, !memdata->no_translation);
 							len += sprintf(&data[len], "%c", isprint((UINT8)c) ? c : '.');
 						}
 						else
@@ -2848,7 +2849,7 @@ static void memory_update(debug_view *view)
 					{
 						if (addrbyte + i <= maxaddr)
 						{
-							char c = memory_read_byte(memdata, addrbyte + i, !memdata->no_translation);
+							char c = generic_read_byte(memdata, addrbyte + i, !memdata->no_translation);
 							len += sprintf(&data[len], "%c", isprint((UINT8)c) ? c : '.');
 						}
 						else
@@ -2867,8 +2868,8 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "   ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
-								len += sprintf(&data[len], "%02X ", memory_read_byte(memdata, addrbyte + i, !memdata->no_translation));
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+								len += sprintf(&data[len], "%02X ", generic_read_byte(memdata, addrbyte + i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "** ");
 						}
@@ -2881,8 +2882,8 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "      ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
-								len += sprintf(&data[len], " %04X ", memory_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+								len += sprintf(&data[len], " %04X ", generic_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], " **** ");
 						}
@@ -2895,8 +2896,8 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "            ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
-								len += sprintf(&data[len], "  %08X  ", memory_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+								len += sprintf(&data[len], "  %08X  ", generic_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "  ********  ");
 						}
@@ -2909,9 +2910,9 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "                        ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 							{
-								UINT64 qword = memory_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
+								UINT64 qword = generic_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
 								len += sprintf(&data[len], "    %08X%08X    ", (UINT32)(qword >> 32), (UINT32)qword);
 							}
 							else
@@ -2949,7 +2950,7 @@ static void memory_update(debug_view *view)
 
 	/* restore the context */
 	if (memdata->raw_base == NULL)
-		cpuintrf_pop_context();
+		cpu_pop_context();
 }
 
 

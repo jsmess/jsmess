@@ -114,7 +114,7 @@ static double freq_to_step;
 
 static void update_irq_state(running_machine *machine, /* unused */ int state)
 {
-	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, (pia_get_irq_b(1) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6502_IRQ_LINE, (pia_get_irq_b(1) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -399,23 +399,24 @@ static void r6532_irq(const device_config *device, int state)
 static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
 	if (has_mc3417)
-		cpunum_set_input_line(device->machine, 2, INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (has_tms5220)
 	{
 		if ((olddata & 0x01) && !(newdata & 0x01))
 		{
-			riot6532_porta_in_set(riot, tms5220_status_r(device->machine, 0), 0xff);
-			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), tms5220_status_r(device->machine, 0));
+			riot6532_porta_in_set(riot, tms5220_status_r(space, 0), 0xff);
+			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(device->machine->activecpu), tms5220_status_r(space, 0));
 		}
 		if ((olddata & 0x02) && !(newdata & 0x02))
 		{
-			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot6532_porta_out_get(riot));
-			tms5220_data_w(device->machine, 0, riot6532_porta_out_get(riot));
+			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(device->machine->activecpu), riot6532_porta_out_get(riot));
+			tms5220_data_w(space, 0, riot6532_porta_out_get(riot));
 		}
 	}
 }
@@ -505,7 +506,7 @@ static READ8_HANDLER( exidy_sh8253_r )
 
 static READ8_HANDLER( exidy_sh6840_r )
 {
-	logerror("%04X:exidy_sh6840_r - unexpected read", activecpu_get_pc());
+	logerror("%04X:exidy_sh6840_r - unexpected read", cpu_get_pc(space->cpu));
 	return 0;
 }
 
@@ -788,7 +789,7 @@ READ8_HANDLER( victory_sound_response_r )
 {
 	UINT8 ret = pia_get_output_b(1);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", activecpu_get_previouspc(), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(space->cpu), ret);
 
 	pia_set_input_cb1(1, 0);
 
@@ -800,7 +801,7 @@ READ8_HANDLER( victory_sound_status_r )
 {
 	UINT8 ret = (pia_get_input_ca1(1) << 7) | (pia_get_input_cb1(1) << 6);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", activecpu_get_previouspc(), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(space->cpu), ret);
 
 	return ret;
 }
@@ -814,7 +815,7 @@ static TIMER_CALLBACK( delayed_command_w )
 
 WRITE8_HANDLER( victory_sound_command_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", activecpu_get_previouspc(), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(space->cpu), data);
 
 	timer_call_after_resynch(NULL, data, delayed_command_w);
 }
@@ -822,7 +823,7 @@ WRITE8_HANDLER( victory_sound_command_w )
 
 static WRITE8_HANDLER( victory_sound_irq_clear_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", activecpu_get_previouspc(), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", cpu_get_previouspc(space->cpu), data);
 
 	if (!data) pia_set_input_ca1(1, 1);
 }
@@ -830,7 +831,7 @@ static WRITE8_HANDLER( victory_sound_irq_clear_w )
 
 static WRITE8_HANDLER( victory_main_ack_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", activecpu_get_previouspc(), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", cpu_get_previouspc(space->cpu), data);
 
 	if (victory_sound_response_ack_clk && !data)
 		pia_set_input_cb1(1, 1);

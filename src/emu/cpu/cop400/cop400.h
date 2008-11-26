@@ -14,28 +14,36 @@
 #ifndef __COP400__
 #define __COP400__
 
-#define COP400_PORT_L	0x100
-#define COP400_PORT_G	0x101
-#define COP400_PORT_D	0x102
-#define	COP400_PORT_IN	0x103
-#define	COP400_PORT_SK	0x104
-#define	COP400_PORT_SIO	0x105
-#define	COP400_PORT_CKO	0x106
+enum
+{
+	COP400_PORT_L = 0x100,
+	COP400_PORT_G,
+	COP400_PORT_D,
+	COP400_PORT_H,
+	COP400_PORT_R,
+	COP400_PORT_IN,
+	COP400_PORT_SK,
+	COP400_PORT_SIO,
+	COP400_PORT_CKO
+};
 
 enum
 {
-	COP400_PC=1,
+	COP400_PC = 1,
 	COP400_A,
 	COP400_B,
 	COP400_C,
 	COP400_G,
+	COP400_H,
+	COP400_R,
 	COP400_EN,
 	COP400_Q,
     COP400_SA,
     COP400_SB,
     COP400_SC,
     COP400_SIO,
-    COP400_SKL
+    COP400_SKL,
+    COP400_T
 };
 
 typedef enum _cop400_cki_bond cop400_cki_bond;
@@ -102,5 +110,6 @@ extern CPU_GET_INFO( cop445 );
 
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
+CPU_DISASSEMBLE( cop444 );
 
 #endif  /* __COP400__ */

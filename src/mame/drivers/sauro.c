@@ -103,13 +103,13 @@ VIDEO_UPDATE( trckydoc );
 static WRITE8_HANDLER( sauro_sound_command_w )
 {
 	data |= 0x80;
-	soundlatch_w(machine, offset, data);
+	soundlatch_w(space, offset, data);
 }
 
 static READ8_HANDLER( sauro_sound_command_r )
 {
-	int ret	= soundlatch_r(machine, offset);
-	soundlatch_clear_w(machine, offset, 0);
+	int ret	= soundlatch_r(space, offset);
+	soundlatch_clear_w(space, offset, 0);
 	return ret;
 }
 
@@ -132,13 +132,13 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	sp0256_ALD_w(machine, 0, data);
+	sp0256_ALD_w(space, 0, data);
 }
 
 static void lrq_callback(int state)
 {
-	//cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, state);
+	//cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, state);
 }
 
 static ADDRESS_MAP_START( sauro_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -353,7 +353,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sauro_interrupt )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( tecfri )

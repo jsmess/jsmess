@@ -62,7 +62,6 @@ Address  Function Register  R/W  When Reset          Remarks
 
 #include <limits.h>
 #include "debugger.h"
-#include "deprecat.h"
 #include "spc700.h"
 
 /* ======================================================================== */
@@ -124,6 +123,7 @@ typedef struct
 	uint ir;		/* Instruction Register */
 	cpu_irq_callback int_ack;
 	const device_config *device;
+	const address_space *program;
 	uint stopped;	/* stopped status */
 } spc700i_cpu_struct;
 
@@ -1261,6 +1261,7 @@ CPU_INIT( spc700 )
 {
 	INT_ACK = irqcallback;
 	spc700i_cpu.device = device;
+	spc700i_cpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 
@@ -1366,7 +1367,7 @@ void spc700_set_irq_callback(cpu_irq_callback callback)
 void spc700_state_save(void *file)
 {
 #if 0
-	int cpu = cpu_getactivecpu();
+	int cpu = cpunum_get_active();
 	uint p = GET_REG_P();
 	state_save_UINT16(file,"spc700",cpu,"PC",&REG_PC,2);
 	state_save_UINT16(file,"spc700",cpu,"PPC",&REG_PPC,2);
@@ -1384,7 +1385,7 @@ void spc700_state_save(void *file)
 void spc700_state_load(void *file)
 {
 #if 0
-	int cpu = cpu_getactivecpu();
+	int cpu = cpunum_get_active();
 	uint p;
 	state_load_UINT16(file,"spc700",cpu,"PC",&REG_PC,2);
 	state_load_UINT16(file,"spc700",cpu,"PPC",&REG_PPC,2);
@@ -1411,7 +1412,7 @@ CPU_EXECUTE( spc700 )
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
-		debugger_instruction_hook(Machine, REG_PC);
+		debugger_instruction_hook(device, REG_PC);
 		REG_PC++;
 
 #if 0

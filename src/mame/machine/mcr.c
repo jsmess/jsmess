@@ -140,7 +140,7 @@ READ8_HANDLER( zwackery_port_2_r );
 
 static READ8_HANDLER( zwackery_port_1_r )
 {
-	UINT8 ret = input_port_read(machine, "IN1");
+	UINT8 ret = input_port_read(space->machine, "IN1");
 
 	pia_set_port_a_z_mask(3, ret);
 
@@ -150,7 +150,7 @@ static READ8_HANDLER( zwackery_port_1_r )
 
 static READ8_HANDLER( zwackery_port_3_r )
 {
-	UINT8 ret = input_port_read(machine, "IN3");
+	UINT8 ret = input_port_read(space->machine, "IN3");
 
 	pia_set_port_a_z_mask(4, ret);
 
@@ -311,10 +311,10 @@ MACHINE_START( mcr68 )
 
 		m6840->timer = timer_alloc(counter_fired_callback, NULL);
 
-		state_save_register_item("m6840", i, m6840->control);
-		state_save_register_item("m6840", i, m6840->latch);
-		state_save_register_item("m6840", i, m6840->count);
-		state_save_register_item("m6840", i, m6840->timer_active);
+		state_save_register_item("m6840", NULL, i, m6840->control);
+		state_save_register_item("m6840", NULL, i, m6840->latch);
+		state_save_register_item("m6840", NULL, i, m6840->count);
+		state_save_register_item("m6840", NULL, i, m6840->timer_active);
 	}
 
 	state_save_register_global(m6840_status);
@@ -329,7 +329,7 @@ MACHINE_START( mcr68 )
 }
 
 
-static void mcr68_common_init(void)
+static void mcr68_common_init(running_machine *machine)
 {
 	int i;
 
@@ -354,7 +354,7 @@ static void mcr68_common_init(void)
 	}
 
 	/* initialize the clock */
-	m6840_internal_counter_period = ATTOTIME_IN_HZ(cpunum_get_clock(0) / 10);
+	m6840_internal_counter_period = ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[0]) / 10);
 
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;
@@ -367,7 +367,7 @@ static void mcr68_common_init(void)
 MACHINE_RESET( mcr68 )
 {
 	/* for the most part all MCR/68k games are the same */
-	mcr68_common_init();
+	mcr68_common_init(machine);
 	v493_callback = mcr68_493_callback;
 
 	/* vectors are 1 and 2 */
@@ -390,7 +390,7 @@ MACHINE_START( zwackery )
 MACHINE_RESET( zwackery )
 {
 	/* for the most part all MCR/68k games are the same */
-	mcr68_common_init();
+	mcr68_common_init(machine);
 	v493_callback = zwackery_493_callback;
 
 	/* append our PIA state onto the existing one and reinit */
@@ -411,7 +411,7 @@ MACHINE_RESET( zwackery )
 
 INTERRUPT_GEN( mcr_interrupt )
 {
-	const device_config *ctc = devtag_get_device(machine, Z80CTC, "ctc");
+	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ctc");
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
@@ -420,7 +420,7 @@ INTERRUPT_GEN( mcr_interrupt )
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		z80ctc_trg3_w(ctc, 0, 1);
 		z80ctc_trg3_w(ctc, 0, 0);
@@ -430,11 +430,11 @@ INTERRUPT_GEN( mcr_interrupt )
 
 INTERRUPT_GEN( mcr_ipu_interrupt )
 {
-	const device_config *ctc = devtag_get_device(machine, Z80CTC, "ipu_ctc");
+	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ipu_ctc");
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		z80ctc_trg3_w(ctc, 0, 1);
 		z80ctc_trg3_w(ctc, 0, 0);
@@ -446,7 +446,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 {
 	/* update the 6840 VBLANK clock */
 	if (!m6840_state[0].timer_active)
-		subtract_from_counter(machine, 0, 1);
+		subtract_from_counter(device->machine, 0, 1);
 
 	logerror("--- VBLANK ---\n");
 
@@ -466,8 +466,8 @@ INTERRUPT_GEN( mcr68_interrupt )
 
 static void update_mcr68_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, v493_irq_vector, v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, m6840_irq_vector, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], v493_irq_vector, v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], m6840_irq_vector, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -567,7 +567,7 @@ WRITE8_HANDLER( mcr_scroll_value_w )
 WRITE8_HANDLER( zwackery_pia_2_w )
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) watchdog_reset_w(machine, offset, data);
+	if (!(data & 0x80)) watchdog_reset_w(space, offset, data);
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */
@@ -583,7 +583,7 @@ WRITE8_HANDLER( zwackery_pia_3_w )
 
 WRITE8_HANDLER( zwackery_ca2_w )
 {
-	csdeluxe_data_w(machine, offset, (data << 4) | zwackery_sound_data);
+	csdeluxe_data_w(space, offset, (data << 4) | zwackery_sound_data);
 }
 
 
@@ -596,13 +596,16 @@ static void zwackery_pia_irq(running_machine *machine, int state)
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	pia_2_ca1_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_2_ca1_w(space, 0, 0);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	pia_2_ca1_w(machine, 0, 1);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_2_ca1_w(space, 0, 1);
 	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
 }
 
@@ -809,20 +812,20 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			}
 
 			m6840_status = 0;
-			update_interrupts(machine);
+			update_interrupts(space->machine);
 		}
 
 		/* changing the clock source? (needed for Zwackery) */
 		if (diffs & 0x02)
 			reload_count(counter);
 
-		LOG(("%06X:Counter %d control = %02X\n", activecpu_get_previouspc(), counter, data));
+		LOG(("%06X:Counter %d control = %02X\n", cpu_get_previouspc(space->cpu), counter, data));
 	}
 
 	/* offsets 2, 4, and 6 are MSB buffer registers */
 	else if ((offset & 1) == 0)
 	{
-		LOG(("%06X:MSB = %02X\n", activecpu_get_previouspc(), data));
+		LOG(("%06X:MSB = %02X\n", cpu_get_previouspc(space->cpu), data));
 		m6840_msb_buffer = data;
 	}
 
@@ -834,13 +837,13 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 
 		/* clear the interrupt */
 		m6840_status &= ~(1 << counter);
-		update_interrupts(machine);
+		update_interrupts(space->machine);
 
 		/* reload the count if in an appropriate mode */
 		if (!(m6840_state[counter].control & 0x10))
 			reload_count(counter);
 
-		LOG(("%06X:Counter %d latch = %04X\n", activecpu_get_previouspc(), counter, m6840_state[counter].latch));
+		LOG(("%06X:Counter %d latch = %04X\n", cpu_get_previouspc(space->cpu), counter, m6840_state[counter].latch));
 	}
 }
 
@@ -854,7 +857,7 @@ static READ16_HANDLER( mcr68_6840_r_common )
 	/* offset 1 is the status register */
 	else if (offset == 1)
 	{
-		LOG(("%06X:Status read = %04X\n", activecpu_get_previouspc(), m6840_status));
+		LOG(("%06X:Status read = %04X\n", cpu_get_previouspc(space->cpu), m6840_status));
 		m6840_status_read_since_int |= m6840_status & 0x07;
 		return m6840_status;
 	}
@@ -868,11 +871,11 @@ static READ16_HANDLER( mcr68_6840_r_common )
 		/* clear the interrupt if the status has been read */
 		if (m6840_status_read_since_int & (1 << counter))
 			m6840_status &= ~(1 << counter);
-		update_interrupts(machine);
+		update_interrupts(space->machine);
 
 		m6840_lsb_buffer = result & 0xff;
 
-		LOG(("%06X:Counter %d read = %04X\n", activecpu_get_previouspc(), counter, result));
+		LOG(("%06X:Counter %d read = %04X\n", cpu_get_previouspc(space->cpu), counter, result));
 		return result >> 8;
 	}
 
@@ -885,26 +888,26 @@ static READ16_HANDLER( mcr68_6840_r_common )
 WRITE16_HANDLER( mcr68_6840_upper_w )
 {
 	if (ACCESSING_BITS_8_15)
-		mcr68_6840_w_common(machine, offset, (data >> 8) & 0xff);
+		mcr68_6840_w_common(space, offset, (data >> 8) & 0xff);
 }
 
 
 WRITE16_HANDLER( mcr68_6840_lower_w )
 {
 	if (ACCESSING_BITS_0_7)
-		mcr68_6840_w_common(machine, offset, data & 0xff);
+		mcr68_6840_w_common(space, offset, data & 0xff);
 }
 
 
 READ16_HANDLER( mcr68_6840_upper_r )
 {
-	return (mcr68_6840_r_common(machine,offset,0) << 8) | 0x00ff;
+	return (mcr68_6840_r_common(space,offset,0) << 8) | 0x00ff;
 }
 
 
 READ16_HANDLER( mcr68_6840_lower_r )
 {
-	return mcr68_6840_r_common(machine,offset,0) | 0xff00;
+	return mcr68_6840_r_common(space,offset,0) | 0xff00;
 }
 
 
@@ -949,7 +952,7 @@ WRITE8_HANDLER( mcr_ipu_laserdisk_w )
 	/* bit 1 enables (1) LD left channel audio */
 	/* bit 0 enables (1) LD video if PIX SW == 1 */
 	if (data != 0)
-		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", activecpu_get_pc(), offset, data);
+		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -975,5 +978,5 @@ READ8_HANDLER( mcr_ipu_watchdog_r )
 
 WRITE8_HANDLER( mcr_ipu_watchdog_w )
 {
-	mcr_ipu_watchdog_r(machine,0);
+	mcr_ipu_watchdog_r(space,0);
 }

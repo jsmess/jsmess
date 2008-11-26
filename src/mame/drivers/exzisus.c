@@ -69,7 +69,7 @@ VIDEO_UPDATE( exzisus );
 
 static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	static int exzisus_cpua_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpua_bank )
@@ -77,7 +77,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 		exzisus_cpua_bank = data & 0x0f;
 		if (exzisus_cpua_bank >= 2)
 		{
-			memory_set_bankptr( 2, &RAM[ 0x10000 + ( (exzisus_cpua_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine,  2, &RAM[ 0x10000 + ( (exzisus_cpua_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
@@ -86,7 +86,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 
 static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "cpub");
+	UINT8 *RAM = memory_region(space->machine, "cpub");
 	static int exzisus_cpub_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpub_bank )
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 		exzisus_cpub_bank = data & 0x0f;
 		if (exzisus_cpub_bank >= 2)
 		{
-			memory_set_bankptr( 1, &RAM[ 0x10000 + ( (exzisus_cpub_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine,  1, &RAM[ 0x10000 + ( (exzisus_cpub_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( exzisus_sharedram_ac_w )
 
 static WRITE8_HANDLER( exzisus_cpub_reset_w )
 {
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0
@@ -312,7 +312,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

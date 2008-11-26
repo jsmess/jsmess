@@ -353,24 +353,24 @@ static int dac0_value, dac1_value, dac0_gain, dac1_gain;
 
 static WRITE8_HANDLER( namcos1_sub_firq_w )
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, cpu_getactivecpu(), 0, CLEAR_LINE);
+	cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( firq_ack_w )
 {
-	cpunum_set_input_line(machine, cpu_getactivecpu(), M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->cpu, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 
 static READ8_HANDLER( dsw_r )
 {
-	int ret = input_port_read(machine, "DIPSW");
+	int ret = input_port_read(space->machine, "DIPSW");
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }
@@ -949,7 +949,7 @@ GFXDECODE_END
 
 static void namcos1_sound_interrupt( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(machine, 2, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

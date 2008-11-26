@@ -120,7 +120,7 @@ static STATE_POSTLOAD( ym2610_intf_postload )
 }
 
 
-static void *ym2610_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2610 )
 {
 	static const ym2610_interface generic_2610 = { 0 };
 	static const ay8910_interface generic_ay8910 =
@@ -142,7 +142,7 @@ static void *ym2610_start(const char *tag, int sndindex, int clock, const void *
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610, sndindex, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610, tag, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -165,7 +165,7 @@ static void *ym2610_start(const char *tag, int sndindex, int clock, const void *
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,sndindex,clock,rate,
+	info->chip = ym2610_init(info,tag,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 
@@ -186,7 +186,7 @@ static void ym2610b_stream_update(void *param, stream_sample_t **inputs, stream_
 	ym2610b_update_one(info->chip, buffers, length);
 }
 
-static void *ym2610b_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2610b )
 {
 	static const ym2610_interface generic_2610 = { 0 };
 	static const ay8910_interface generic_ay8910 =
@@ -208,7 +208,7 @@ static void *ym2610b_start(const char *tag, int sndindex, int clock, const void 
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610B, sndindex, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610B, tag, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -231,7 +231,7 @@ static void *ym2610b_start(const char *tag, int sndindex, int clock, const void 
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,sndindex,clock,rate,
+	info->chip = ym2610_init(info,tag,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 	if (info->chip)
@@ -242,14 +242,14 @@ static void *ym2610b_start(const char *tag, int sndindex, int clock, const void 
 }
 #endif
 
-static void ym2610_stop(void *token)
+static SND_STOP( ym2610 )
 {
 	struct ym2610_info *info = token;
 	ym2610_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
-static void ym2610_reset(void *token)
+static SND_RESET( ym2610 )
 {
 	struct ym2610_info *info = token;
 	ym2610_reset_chip(info->chip);
@@ -260,28 +260,28 @@ static void ym2610_reset(void *token)
 /************************************************/
 READ8_HANDLER( ym2610_status_port_0_a_r )
 {
-//logerror("PC %04x: 2610 S0A=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,0));
+//logerror("PC %04x: 2610 S0A=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,0));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,0);
 }
 
 READ16_HANDLER( ym2610_status_port_0_a_lsb_r )
 {
-//logerror("PC %04x: 2610 S0A=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,0));
+//logerror("PC %04x: 2610 S0A=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,0));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,0);
 }
 
 READ8_HANDLER( ym2610_status_port_0_b_r )
 {
-//logerror("PC %04x: 2610 S0B=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,2));
+//logerror("PC %04x: 2610 S0B=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,2));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,2);
 }
 
 READ16_HANDLER( ym2610_status_port_0_b_lsb_r )
 {
-//logerror("PC %04x: 2610 S0B=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,2));
+//logerror("PC %04x: 2610 S0B=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,2));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,2);
 }
@@ -341,14 +341,14 @@ READ16_HANDLER( ym2610_read_port_1_lsb_r ){
 /************************************************/
 WRITE8_HANDLER( ym2610_control_port_0_a_w )
 {
-//logerror("PC %04x: 2610 Reg A %02X",activecpu_get_pc(),data);
+//logerror("PC %04x: 2610 Reg A %02X",cpu_get_pc(space->cpu),data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	ym2610_write(info->chip,0,data);
 }
 
 WRITE16_HANDLER( ym2610_control_port_0_a_lsb_w )
 {
-//logerror("PC %04x: 2610 Reg A %02X",activecpu_get_pc(),data);
+//logerror("PC %04x: 2610 Reg A %02X",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);
@@ -358,14 +358,14 @@ WRITE16_HANDLER( ym2610_control_port_0_a_lsb_w )
 
 WRITE8_HANDLER( ym2610_control_port_0_b_w )
 {
-//logerror("PC %04x: 2610 Reg B %02X",activecpu_get_pc(),data);
+//logerror("PC %04x: 2610 Reg B %02X",cpu_get_pc(space->cpu),data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	ym2610_write(info->chip,2,data);
 }
 
 WRITE16_HANDLER( ym2610_control_port_0_b_lsb_w )
 {
-//logerror("PC %04x: 2610 Reg B %02X",activecpu_get_pc(),data);
+//logerror("PC %04x: 2610 Reg B %02X",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);
@@ -479,7 +479,7 @@ WRITE16_HANDLER( ym2610_data_port_1_b_lsb_w ){
  **************************************************************************/
 
 #if BUILD_YM2610
-static void ym2610_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym2610 )
 {
 	switch (state)
 	{
@@ -488,17 +488,17 @@ static void ym2610_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym2610_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2610 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym2610_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2610_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2610_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2610_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2610 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2610 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2610 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2610 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM2610";						break;
@@ -516,7 +516,7 @@ void ym2610_get_info(void *token, UINT32 state, sndinfo *info)
  **************************************************************************/
 
 #if BUILD_YM2610B
-static void ym2610b_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym2610b )
 {
 	switch (state)
 	{
@@ -525,17 +525,17 @@ static void ym2610b_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym2610b_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2610b )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym2610b_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2610b_start;			break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2610_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2610_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2610b );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2610b );			break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2610 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2610 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM2610B";					break;

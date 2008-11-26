@@ -175,32 +175,32 @@ static WRITE8_HANDLER( xain_sharedram_w )
 	/* so let's resync every time they are changed to avoid deadlocks */
 	if ((offset == 0x003d || offset == 0x003e)
 			&& xain_sharedram[offset] != data)
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 	xain_sharedram[offset] = data;
 }
 
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	xain_pri=data&0x7;
 
-	if (data & 0x08) {memory_set_bankptr(1,&RAM[0x10000]);}
-	else {memory_set_bankptr(1,&RAM[0x4000]);}
+	if (data & 0x08) {memory_set_bankptr(space->machine, 1,&RAM[0x10000]);}
+	else {memory_set_bankptr(space->machine, 1,&RAM[0x4000]);}
 }
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 
-	if (data & 0x01) {memory_set_bankptr(2,&RAM[0x10000]);}
-	else {memory_set_bankptr(2,&RAM[0x4000]);}
+	if (data & 0x01) {memory_set_bankptr(space->machine, 2,&RAM[0x10000]);}
+	else {memory_set_bankptr(space->machine, 2,&RAM[0x4000]);}
 }
 
 static WRITE8_HANDLER( xain_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 2,M6809_IRQ_LINE,HOLD_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[2],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( xain_main_irq_w )
@@ -208,28 +208,28 @@ static WRITE8_HANDLER( xain_main_irq_w )
 	switch (offset)
 	{
 	case 0: /* 0x3a09 - NMI clear */
-		cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
 		break;
 	case 1: /* 0x3a0a - FIRQ clear */
-		cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,CLEAR_LINE);
 		break;
 	case 2: /* 0x3a0b - IRQ clear */
-		cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
-		cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( xain_irqA_assert_w )
 {
-	cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( xain_irqB_clear_w )
 {
-	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
 }
 
 static READ8_HANDLER( xain_68705_r )
@@ -250,15 +250,15 @@ static CUSTOM_INPUT( xain_vblank_r )
 
 static INTERRUPT_GEN( xain_interrupt )
 {
-	int scanline = 255 - cpu_getiloops();
+	int scanline = 255 - cpu_getiloops(device);
 
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
 	if (scanline & 0x08)
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (scanline == 248)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* VBLANK input bit is held high from scanlines 248-255 */
 	if (scanline >= 248-1) // -1 is a hack - see notes above
@@ -434,7 +434,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2],M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -450,9 +450,10 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* initialize the bank pointers */
-	xainCPUA_bankswitch_w(machine,0,0);
-	xainCPUB_bankswitch_w(machine,0,0);
+	xainCPUA_bankswitch_w(space,0,0);
+	xainCPUB_bankswitch_w(space,0,0);
 }
 
 

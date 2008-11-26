@@ -12,6 +12,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/x76f041.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -25,9 +26,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -152,24 +153,24 @@ void x76f041_init( int chip, UINT8 *data )
 	c->configuration_registers = &data[ offset ]; offset += SIZE_CONFIGURATION_REGISTERS;
 	c->data = &data[ offset ]; offset += SIZE_DATA;
 
-	state_save_register_item( "x76f041", chip, c->cs );
-	state_save_register_item( "x76f041", chip, c->rst );
-	state_save_register_item( "x76f041", chip, c->scl );
-	state_save_register_item( "x76f041", chip, c->sdaw );
-	state_save_register_item( "x76f041", chip, c->sdar );
-	state_save_register_item( "x76f041", chip, c->state );
-	state_save_register_item( "x76f041", chip, c->shift );
-	state_save_register_item( "x76f041", chip, c->bit );
-	state_save_register_item( "x76f041", chip, c->byte );
-	state_save_register_item( "x76f041", chip, c->command );
-	state_save_register_item( "x76f041", chip, c->address );
-	state_save_register_item_array( "x76f041", chip, c->write_buffer );
-	state_save_register_item_pointer( "x76f041", chip, c->response_to_reset, SIZE_RESPONSE_TO_RESET );
-	state_save_register_item_pointer( "x76f041", chip, c->write_password, SIZE_WRITE_PASSWORD );
-	state_save_register_item_pointer( "x76f041", chip, c->read_password, SIZE_READ_PASSWORD );
-	state_save_register_item_pointer( "x76f041", chip, c->configuration_password, SIZE_CONFIGURATION_PASSWORD );
-	state_save_register_item_pointer( "x76f041", chip, c->configuration_registers, SIZE_CONFIGURATION_REGISTERS );
-	state_save_register_item_pointer( "x76f041", chip, c->data, SIZE_DATA );
+	state_save_register_item( "x76f041", NULL, chip, c->cs );
+	state_save_register_item( "x76f041", NULL, chip, c->rst );
+	state_save_register_item( "x76f041", NULL, chip, c->scl );
+	state_save_register_item( "x76f041", NULL, chip, c->sdaw );
+	state_save_register_item( "x76f041", NULL, chip, c->sdar );
+	state_save_register_item( "x76f041", NULL, chip, c->state );
+	state_save_register_item( "x76f041", NULL, chip, c->shift );
+	state_save_register_item( "x76f041", NULL, chip, c->bit );
+	state_save_register_item( "x76f041", NULL, chip, c->byte );
+	state_save_register_item( "x76f041", NULL, chip, c->command );
+	state_save_register_item( "x76f041", NULL, chip, c->address );
+	state_save_register_item_array( "x76f041", NULL, chip, c->write_buffer );
+	state_save_register_item_pointer( "x76f041", NULL, chip, c->response_to_reset, SIZE_RESPONSE_TO_RESET );
+	state_save_register_item_pointer( "x76f041", NULL, chip, c->write_password, SIZE_WRITE_PASSWORD );
+	state_save_register_item_pointer( "x76f041", NULL, chip, c->read_password, SIZE_READ_PASSWORD );
+	state_save_register_item_pointer( "x76f041", NULL, chip, c->configuration_password, SIZE_CONFIGURATION_PASSWORD );
+	state_save_register_item_pointer( "x76f041", NULL, chip, c->configuration_registers, SIZE_CONFIGURATION_REGISTERS );
+	state_save_register_item_pointer( "x76f041", NULL, chip, c->data, SIZE_DATA );
 }
 
 void x76f041_cs_write( int chip, int cs )

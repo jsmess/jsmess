@@ -5,7 +5,6 @@
 /* 26.March 2000 PeT changed set_irq_line */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "cpuintrf.h"
 
 #include "host.h"
@@ -42,6 +41,8 @@ typedef struct
 	UINT16 flags;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	INT32 AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal;		/* 0 or non-0 valued flags */
 	UINT8 ParityVal;
 	UINT8 TF, IF;				   /* 0 or 1 valued flags */
@@ -91,30 +92,30 @@ static struct i80x86_timing timing;
 
 
 /***************************************************************************/
-static void i8086_state_register(int index)
+static void i8086_state_register(const device_config *device)
 {
 	static const char type[] = "I8086";
-	state_save_register_item_array(type, index, I.regs.w);
-	state_save_register_item(type, index, I.pc);
-	state_save_register_item(type, index, I.prevpc);
-	state_save_register_item_array(type, index, I.base);
-	state_save_register_item_array(type, index, I.sregs);
-	state_save_register_item(type, index, I.flags);
-	state_save_register_item(type, index, I.AuxVal);
-	state_save_register_item(type, index, I.OverVal);
-	state_save_register_item(type, index, I.SignVal);
-	state_save_register_item(type, index, I.ZeroVal);
-	state_save_register_item(type, index, I.CarryVal);
-	state_save_register_item(type, index, I.DirVal);
-	state_save_register_item(type, index, I.ParityVal);
-	state_save_register_item(type, index, I.TF);
-	state_save_register_item(type, index, I.IF);
-	state_save_register_item(type, index, I.MF);
-	state_save_register_item(type, index, I.int_vector);
-	state_save_register_item(type, index, I.nmi_state);
-	state_save_register_item(type, index, I.irq_state);
-	state_save_register_item(type, index, I.extra_cycles);
-	state_save_register_item(type, index, I.test_state);	/* PJB 03/05 */
+	state_save_register_item_array(type, device->tag, 0, I.regs.w);
+	state_save_register_item(type, device->tag, 0, I.pc);
+	state_save_register_item(type, device->tag, 0, I.prevpc);
+	state_save_register_item_array(type, device->tag, 0, I.base);
+	state_save_register_item_array(type, device->tag, 0, I.sregs);
+	state_save_register_item(type, device->tag, 0, I.flags);
+	state_save_register_item(type, device->tag, 0, I.AuxVal);
+	state_save_register_item(type, device->tag, 0, I.OverVal);
+	state_save_register_item(type, device->tag, 0, I.SignVal);
+	state_save_register_item(type, device->tag, 0, I.ZeroVal);
+	state_save_register_item(type, device->tag, 0, I.CarryVal);
+	state_save_register_item(type, device->tag, 0, I.DirVal);
+	state_save_register_item(type, device->tag, 0, I.ParityVal);
+	state_save_register_item(type, device->tag, 0, I.TF);
+	state_save_register_item(type, device->tag, 0, I.IF);
+	state_save_register_item(type, device->tag, 0, I.MF);
+	state_save_register_item(type, device->tag, 0, I.int_vector);
+	state_save_register_item(type, device->tag, 0, I.nmi_state);
+	state_save_register_item(type, device->tag, 0, I.irq_state);
+	state_save_register_item(type, device->tag, 0, I.extra_cycles);
+	state_save_register_item(type, device->tag, 0, I.test_state);	/* PJB 03/05 */
 }
 
 static CPU_INIT( i8086 )
@@ -144,8 +145,10 @@ static CPU_INIT( i8086 )
 
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	i8086_state_register(index);
+	i8086_state_register(device);
 	configure_memory_16bit();
 }
 
@@ -160,23 +163,21 @@ static CPU_INIT( i8088 )
 static CPU_RESET( i8086 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
     memory_interface save_mem;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	save_mem = I.mem;
 	memset(&I, 0, sizeof (I));
-	I.device = save_device;
 	I.irq_callback = save_irqcallback;
 	I.mem = save_mem;
+	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	I.sregs[CS] = 0xf000;
 	I.base[CS] = SegBase(CS);
 	I.pc = 0xffff0 & AMASK;
 	ExpandFlags(I.flags);
-
-	change_pc(I.pc);
 }
 
 static CPU_EXIT( i8086 )
@@ -201,7 +202,6 @@ static CPU_SET_CONTEXT( i8086 )
 		I.base[DS] = SegBase(DS);
 		I.base[ES] = SegBase(ES);
 		I.base[SS] = SegBase(SS);
-		change_pc(I.pc);
 	}
 }
 
@@ -250,7 +250,7 @@ static CPU_EXECUTE( i8086 )
 		LOG(("[%04x:%04x]=%02x\tF:%04x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x %d%d%d%d%d%d%d%d%d\n",
 				I.sregs[CS], I.pc - I.base[CS], ReadByte(I.pc), I.flags, I.regs.w[AX], I.regs.w[BX], I.regs.w[CX], I.regs.w[DX], I.AuxVal ? 1 : 0, I.OverVal ? 1 : 0,
 				I.SignVal ? 1 : 0, I.ZeroVal ? 1 : 0, I.CarryVal ? 1 : 0, I.ParityVal ? 1 : 0, I.TF, I.IF, I.DirVal < 0 ? 1 : 0));
-		debugger_instruction_hook(Machine, I.pc);
+		debugger_instruction_hook(device, I.pc);
 
 		seg_prefix = FALSE;
 		I.prevpc = I.pc;
@@ -303,7 +303,7 @@ static CPU_EXECUTE( i80186 )
 	{
 		LOG(("[%04x:%04x]=%02x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x\n", I.sregs[CS], I.pc, ReadByte(I.pc), I.regs.w[AX],
 			   I.regs.w[BX], I.regs.w[CX], I.regs.w[DX]));
-		debugger_instruction_hook(Machine, I.pc);
+		debugger_instruction_hook(device, I.pc);
 
 		seg_prefix = FALSE;
 		I.prevpc = I.pc;

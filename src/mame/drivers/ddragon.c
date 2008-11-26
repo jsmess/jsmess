@@ -153,11 +153,11 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
 	if (++scanline >= screen_height)
@@ -176,7 +176,7 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 static MACHINE_START( ddragon )
 {
 	/* configure banks */
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	/* allocate timer for scanlines */
 	scanline_timer = timer_alloc(ddragon_scanline_callback, NULL);
@@ -221,9 +221,9 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 	if (data & 0x10)
 		dd_sub_cpu_busy = 0;
 	else if (dd_sub_cpu_busy == 0)
-		cpunum_set_input_line(machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(1, (data & 0xe0) >> 5);
+	memory_set_bank(space->machine, 1, (data & 0xe0) >> 5);
 }
 
 
@@ -237,24 +237,24 @@ static WRITE8_HANDLER( toffy_bankswitch_w )
 	/* bit 3 unknown */
 
 	/* I don't know ... */
-	memory_set_bank(1, (data & 0x20) >> 5);
+	memory_set_bank(space->machine, 1, (data & 0x20) >> 5);
 }
 
 
 static READ8_HANDLER( darktowr_mcu_bank_r )
 {
-	// logerror("BankRead %05x %08x\n",activecpu_get_pc(),offset);
+	// logerror("BankRead %05x %08x\n",cpu_get_pc(space->cpu),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
    so just hack around the protection here.  (The hacks are 'right' as I have
    the original source code & notes to this version of TStrike to examine).
    */
-	if (!strcmp(machine->gamedrv->name, "tstrike"))
+	if (!strcmp(space->machine->gamedrv->name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
-		if (activecpu_get_pc() == 0x9ace)
+		if (cpu_get_pc(space->cpu) == 0x9ace)
 			return 0;
-		if (activecpu_get_pc() == 0x9ae4)
+		if (cpu_get_pc(space->cpu) == 0x9ae4)
 			return 0x63;
 
 		/* Just return whatever the code is expecting */
@@ -271,7 +271,7 @@ static READ8_HANDLER( darktowr_mcu_bank_r )
 
 static WRITE8_HANDLER( darktowr_mcu_bank_w )
 {
-	logerror("BankWrite %05x %08x %08x\n", activecpu_get_pc(), offset, data);
+	logerror("BankWrite %05x %08x %08x\n", cpu_get_pc(space->cpu), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
 	{
@@ -283,7 +283,7 @@ static WRITE8_HANDLER( darktowr_mcu_bank_w )
 
 static WRITE8_HANDLER( darktowr_bankswitch_w )
 {
-	int oldbank = memory_get_bank(1);
+	int oldbank = memory_get_bank(space->machine, 1);
 	int newbank = (data & 0xe0) >> 5;
 
 	ddragon_scrollx_hi = ((data & 0x01) << 8);
@@ -296,13 +296,13 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	if (data & 0x10)
 		dd_sub_cpu_busy = 0;
 	else if (dd_sub_cpu_busy == 0)
-		cpunum_set_input_line(machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(1, newbank);
+	memory_set_bank(space->machine, 1, newbank);
 	if (newbank == 4 && oldbank != 4)
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
+		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
 	else if (newbank != 4 && oldbank == 4)
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 }
 
 
@@ -318,20 +318,20 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 	switch (offset)
 	{
 		case 0: /* 380b - NMI ack */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: /* 380c - FIRQ ack */
-			cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 2: /* 380d - IRQ ack */
-			cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 380e - SND irq */
-			soundlatch_w(machine, 0, data);
-			cpunum_set_input_line(machine, snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			soundlatch_w(space, 0, data);
+			cpu_set_input_line(space->machine->cpu[snd_cpu], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */
@@ -343,19 +343,19 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 
 static WRITE8_HANDLER( ddragon2_sub_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 1, sprite_irq, CLEAR_LINE );
+	cpu_set_input_line(space->machine->cpu[1], sprite_irq, CLEAR_LINE );
 }
 
 
 static WRITE8_HANDLER( ddragon2_sub_irq_w )
 {
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[snd_cpu], ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -374,14 +374,14 @@ static CUSTOM_INPUT( sub_cpu_busy )
 
 static WRITE8_HANDLER( darktowr_mcu_w )
 {
-	logerror("McuWrite %05x %08x %08x\n",activecpu_get_pc(),offset,data);
+	logerror("McuWrite %05x %08x %08x\n",cpu_get_pc(space->cpu),offset,data);
 	darktowr_mcu_ports[offset]=data;
 }
 
 
 static READ8_HANDLER( ddragon_hd63701_internal_registers_r )
 {
-	logerror("%04x: read %d\n", activecpu_get_pc(), offset);
+	logerror("%04x: read %d\n", cpu_get_pc(space->cpu), offset);
 	return 0;
 }
 
@@ -396,8 +396,8 @@ static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
         it's quite obvious from the Double Dragon 2 code, below). */
 		if (data & 3)
 		{
-			cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
-			cpunum_set_input_line(machine, 1, sprite_irq, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], sprite_irq, CLEAR_LINE);
 		}
 	}
 }
@@ -413,7 +413,7 @@ static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
 static READ8_HANDLER( ddragon_spriteram_r )
 {
 	/* Double Dragon crash fix - see notes above */
-	if (offset == 0x49 && activecpu_get_pc() == 0x6261 && ddragon_spriteram[offset] == 0x1f)
+	if (offset == 0x49 && cpu_get_pc(space->cpu) == 0x6261 && ddragon_spriteram[offset] == 0x1f)
 		return 0x1;
 
 	return ddragon_spriteram[offset];
@@ -422,7 +422,7 @@ static READ8_HANDLER( ddragon_spriteram_r )
 
 static WRITE8_HANDLER( ddragon_spriteram_w )
 {
-	if (cpu_getactivecpu() == 1 && offset == 0)
+	if (cpunum_get_active() == 1 && offset == 0)
 		dd_sub_cpu_busy = 1;
 
 	ddragon_spriteram[offset] = data;
@@ -573,8 +573,8 @@ ADDRESS_MAP_END
 /* might not be 100% accurate, check bits written */
 static WRITE8_HANDLER( ddragnba_port_w )
 {
-	cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
-	cpunum_set_input_line(machine, 1,sprite_irq, CLEAR_LINE );
+	cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1],sprite_irq, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( ddragnba_sub_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1932,7 +1932,7 @@ static DRIVER_INIT( darktowr )
 	sound_irq = M6809_IRQ_LINE;
 	ym_irq = M6809_FIRQ_LINE;
 	technos_video_hw = 0;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3808, 0x3808, 0, 0, darktowr_bankswitch_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3808, 0x3808, 0, 0, darktowr_bankswitch_w);
 }
 
 
@@ -1944,7 +1944,7 @@ static DRIVER_INIT( toffy )
 	sound_irq = M6809_IRQ_LINE;
 	ym_irq = M6809_FIRQ_LINE;
 	technos_video_hw = 0;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
 
 	/* the program rom has a simple bitswap encryption */
 	rom = memory_region(machine, "main");

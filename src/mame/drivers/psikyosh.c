@@ -413,7 +413,7 @@ static READ32_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return input_port_read(machine, "JP4");
+		return input_port_read(space->machine, "JP4");
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -423,7 +423,7 @@ static READ32_HANDLER( psh_eeprom_r )
 
 static INTERRUPT_GEN(psikyosh_interrupt)
 {
-	cpunum_set_input_line(machine, 0, 4, ASSERT_LINE);
+	cpu_set_input_line(device, 4, ASSERT_LINE);
 }
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
@@ -432,7 +432,7 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 {
 	if (!(data & 0x00c00000))
 	{
-		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 4, CLEAR_LINE);
 	}
 }
 
@@ -445,7 +445,7 @@ static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static WRITE32_HANDLER( psikyosh_vidregs_w )
@@ -457,8 +457,8 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
-			UINT8 *ROM = memory_region(machine, "gfx1");
-			memory_set_bankptr(2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
+			UINT8 *ROM = memory_region(space->machine, "gfx1");
+			memory_set_bankptr(space->machine, 2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
 		}
 	}
 #endif
@@ -469,7 +469,7 @@ static UINT32 sample_offs = 0;
 
 static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 {
-	UINT8 *ROM = memory_region(machine, "ymf");
+	UINT8 *ROM = memory_region(space->machine, "ymf");
 
 	return ROM[sample_offs++]<<16;
 }
@@ -477,29 +477,29 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 
 static READ32_HANDLER( psh_ymf_fm_r )
 {
-	return ymf278b_status_port_0_r(machine,0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
+	return ymf278b_status_port_0_r(space,0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
 }
 
 static WRITE32_HANDLER( psh_ymf_fm_w )
 {
 	if (ACCESSING_BITS_24_31)	// FM bank 1 address (OPL2/OPL3 compatible)
 	{
-		ymf278b_control_port_0_a_w(machine, 0, data>>24);
+		ymf278b_control_port_0_a_w(space, 0, data>>24);
 	}
 
 	if (ACCESSING_BITS_16_23)	// FM bank 1 data
 	{
-		ymf278b_data_port_0_a_w(machine, 0, data>>16);
+		ymf278b_data_port_0_a_w(space, 0, data>>16);
 	}
 
 	if (ACCESSING_BITS_8_15)	// FM bank 2 address (OPL3/YMF 262 extended)
 	{
-		ymf278b_control_port_0_b_w(machine, 0, data>>8);
+		ymf278b_control_port_0_b_w(space, 0, data>>8);
 	}
 
 	if (ACCESSING_BITS_0_7)	// FM bank 2 data
 	{
-		ymf278b_data_port_0_b_w(machine, 0, data);
+		ymf278b_data_port_0_b_w(space, 0, data);
 	}
 }
 
@@ -507,7 +507,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 {
 	if (ACCESSING_BITS_24_31)	// PCM address (OPL4/YMF 278B extended)
 	{
-		ymf278b_control_port_0_c_w(machine, 0, data>>24);
+		ymf278b_control_port_0_c_w(space, 0, data>>24);
 
 #if ROMTEST
 		if (data>>24 == 0x06)	// Reset Sample reading (They always write this code immediately before reading data)
@@ -519,7 +519,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 
 	if (ACCESSING_BITS_16_23)	// PCM data
 	{
-		ymf278b_data_port_0_c_w(machine, 0, data>>16);
+		ymf278b_data_port_0_c_w(space, 0, data>>16);
 	}
 }
 
@@ -597,9 +597,9 @@ ADDRESS_MAP_END
 static void irqhandler(running_machine *machine, int linestate)
 {
 	if (linestate)
-		cpunum_set_input_line(machine, 0, 12, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 12, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 12, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 12, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -1139,61 +1139,61 @@ ROM_END
 
 static DRIVER_INIT( soldivid )
 {
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[0x100000]);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[0x100000]);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[0x100000]);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }

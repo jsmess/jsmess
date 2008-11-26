@@ -319,9 +319,9 @@ static READ8_HANDLER( solarfox_ip0_r )
 	/* game in cocktail mode, they don't work at all. So we fake-mux   */
 	/* the controls through player 1's ports */
 	if (mcr_cocktail_flip)
-		return input_port_read(machine, "SSIO.IP0") | 0x08;
+		return input_port_read(space->machine, "SSIO.IP0") | 0x08;
 	else
-		return ((input_port_read(machine, "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(machine, "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(machine, "SSIO.IP2") & 0x01) << 4);
+		return ((input_port_read(space->machine, "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(space->machine, "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(space->machine, "SSIO.IP2") & 0x01) << 4);
 }
 
 
@@ -329,9 +329,9 @@ static READ8_HANDLER( solarfox_ip1_r )
 {
 	/*  same deal as above */
 	if (mcr_cocktail_flip)
-		return input_port_read(machine, "SSIO.IP1") | 0xf0;
+		return input_port_read(space->machine, "SSIO.IP1") | 0xf0;
 	else
-		return (input_port_read(machine, "SSIO.IP1") >> 4) | 0xf0;
+		return (input_port_read(space->machine, "SSIO.IP1") >> 4) | 0xf0;
 }
 
 
@@ -344,7 +344,7 @@ static READ8_HANDLER( solarfox_ip1_r )
 
 static READ8_HANDLER( kick_ip1_r )
 {
-	return (input_port_read(machine, "DIAL2") << 4) & 0xf0;
+	return (input_port_read(space->machine, "DIAL2") << 4) & 0xf0;
 }
 
 
@@ -364,18 +364,18 @@ static WRITE8_HANDLER( wacko_op4_w )
 static READ8_HANDLER( wacko_ip1_r )
 {
 	if (!input_mux)
-		return input_port_read(machine, "SSIO.IP1");
+		return input_port_read(space->machine, "SSIO.IP1");
 	else
-		return input_port_read(machine, "SSIO.IP1.ALT");
+		return input_port_read(space->machine, "SSIO.IP1.ALT");
 }
 
 
 static READ8_HANDLER( wacko_ip2_r )
 {
 	if (!input_mux)
-		return input_port_read(machine, "SSIO.IP2");
+		return input_port_read(space->machine, "SSIO.IP2");
 	else
-		return input_port_read(machine, "SSIO.IP2.ALT");
+		return input_port_read(space->machine, "SSIO.IP2.ALT");
 }
 
 
@@ -388,7 +388,7 @@ static READ8_HANDLER( wacko_ip2_r )
 
 static READ8_HANDLER( kroozr_ip1_r )
 {
-	int dial = input_port_read(machine, "DIAL");
+	int dial = input_port_read(space->machine, "DIAL");
 	return ((dial & 0x80) >> 1) | ((dial & 0x70) >> 4);
 }
 
@@ -487,7 +487,7 @@ static WRITE8_HANDLER( dotron_op4_w )
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(machine, offset, data);
+	squawkntalk_data_w(space, offset, data);
 }
 
 
@@ -523,18 +523,18 @@ static READ8_HANDLER( nflfoot_ip2_r )
 			nflfoot_serial_in_active = FALSE;
 	}
 
-	if (activecpu_get_pc() != 0x107)
-		logerror("%04X:ip2_r = %02X\n", activecpu_get_pc(), val);
+	if (cpu_get_pc(space->cpu) != 0x107)
+		logerror("%04X:ip2_r = %02X\n", cpu_get_pc(space->cpu), val);
 	return val;
 }
 
 
 static WRITE8_HANDLER( nflfoot_op4_w )
 {
-	const device_config *sio = devtag_get_device(machine, Z80SIO, "ipu_sio");
+	const device_config *sio = devtag_get_device(space->machine, Z80SIO, "ipu_sio");
 
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
-	logerror("%04X:op4_w(%d%d%d)\n", activecpu_get_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
+	logerror("%04X:op4_w(%d%d%d)\n", cpu_get_pc(space->cpu), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
 
 	/* look for a non-zero start bit to go active */
 	if (!nflfoot_serial_out_active && (data & 0x80))
@@ -570,7 +570,7 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(machine, offset, data);
+	squawkntalk_data_w(space, offset, data);
 }
 
 
@@ -583,13 +583,13 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 static READ8_HANDLER( demoderb_ip1_r )
 {
-	return input_port_read(machine, input_mux ? "SSIO.IP1.ALT" : "SSIO.IP1");
+	return input_port_read(space->machine, input_mux ? "SSIO.IP1.ALT" : "SSIO.IP1");
 }
 
 
 static READ8_HANDLER( demoderb_ip2_r )
 {
-	return input_port_read(machine, input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
+	return input_port_read(space->machine, input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
 }
 
 
@@ -597,7 +597,7 @@ static WRITE8_HANDLER( demoderb_op4_w )
 {
 	if (data & 0x40) input_mux = 1;
 	if (data & 0x80) input_mux = 0;
-	turbocs_data_w(machine, offset, data);
+	turbocs_data_w(space, offset, data);
 }
 
 
@@ -1806,12 +1806,12 @@ ROM_END
 
 ROM_START( tron )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "scpu_pga.bin", 0x0000, 0x2000, CRC(5151770b) SHA1(26f4d830de7be228528e462dd628f439629a2641) )
+	ROM_LOAD( "pro0.d2",      0x0000, 0x2000, CRC(0de0471a) SHA1(378847604a6a9c079d887348010ab9539d5f6195) )
 	ROM_LOAD( "scpu_pgb.bin", 0x2000, 0x2000, CRC(8ddf8717) SHA1(e0c294afa8ba0b0ba89e3e0fb3ff6d8fc4398e32) )
 	ROM_LOAD( "scpu_pgc.bin", 0x4000, 0x2000, CRC(4241e3a0) SHA1(24c1bd2f31e194542571c391c5dccf21354115c2) )
 	ROM_LOAD( "scpu_pgd.bin", 0x6000, 0x2000, CRC(035d2fe7) SHA1(1b827ca30a439d2f4cc94fcc0e90ee0cf87e018c) )
 	ROM_LOAD( "scpu_pge.bin", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) )
-	ROM_LOAD( "scpu_pgf.bin", 0xa000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
+	ROM_LOAD( "scpu_pgf.bin", 0xA000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
 
 	ROM_REGION( 0x10000, "ssio", 0 )
 	ROM_LOAD( "ssi_0a.bin",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
@@ -1834,12 +1834,12 @@ ROM_END
 
 ROM_START( tron2 )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "pro0.d2",      0x0000, 0x2000, CRC(0de0471a) SHA1(378847604a6a9c079d887348010ab9539d5f6195) )
+	ROM_LOAD( "scpu_pga.bin", 0x0000, 0x2000, CRC(5151770b) SHA1(26f4d830de7be228528e462dd628f439629a2641) )
 	ROM_LOAD( "scpu_pgb.bin", 0x2000, 0x2000, CRC(8ddf8717) SHA1(e0c294afa8ba0b0ba89e3e0fb3ff6d8fc4398e32) )
 	ROM_LOAD( "scpu_pgc.bin", 0x4000, 0x2000, CRC(4241e3a0) SHA1(24c1bd2f31e194542571c391c5dccf21354115c2) )
 	ROM_LOAD( "scpu_pgd.bin", 0x6000, 0x2000, CRC(035d2fe7) SHA1(1b827ca30a439d2f4cc94fcc0e90ee0cf87e018c) )
 	ROM_LOAD( "scpu_pge.bin", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) )
-	ROM_LOAD( "scpu_pgf.bin", 0xA000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
+	ROM_LOAD( "scpu_pgf.bin", 0xa000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
 
 	ROM_REGION( 0x10000, "ssio", 0 )
 	ROM_LOAD( "ssi_0a.bin",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
@@ -2479,7 +2479,7 @@ static DRIVER_INIT( twotiger )
 	mcr_init(90010, 91399, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
 }
 
 
@@ -2548,7 +2548,7 @@ static DRIVER_INIT( demoderb )
 	ssio_set_custom_output(4, 0xff, demoderb_op4_w);
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);
+	cpu_suspend(machine->cpu[1], SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -2568,10 +2568,10 @@ GAME( 1981, kickc,    kick,     mcr_90009,     kickc,    kick,      ROT90,      
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, shollow2, shollow,  mcr_90010,     shollow,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, tron,     0,        mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, tron2,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, tron3,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, tron4,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (set 4)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tron,     0,        mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (8/9)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tron2,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (6/25)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tron3,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tron4,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", GAME_SUPPORTS_SAVE )
 GAME( 1982, domino,   0,        mcr_90010,     domino,   mcr_90010, ROT0,  "Bally Midway", "Domino Man", GAME_SUPPORTS_SAVE )
 GAME( 1982, wacko,    0,        mcr_90010,     wacko,    wacko,     ROT0,  "Bally Midway", "Wacko", GAME_SUPPORTS_SAVE )
 GAME( 1984, twotigrc, twotiger, mcr_90010,     twotigrc, mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", GAME_SUPPORTS_SAVE )

@@ -74,23 +74,23 @@ static UINT8 sound_latch;
 
 static WRITE8_HANDLER( shangkid_maincpu_bank_w )
 {
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 }
 
 static WRITE8_HANDLER( shangkid_bbx_enable_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, data?0:1 );
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, data?0:1 );
 }
 
 static WRITE8_HANDLER( shangkid_cpu_reset_w )
 {
 	if( data == 0 )
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 	}
 	else if( data == 1 )
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( shangkid_sound_enable_w )
 static WRITE8_HANDLER( shangkid_bbx_AY8910_control_w )
 {
 	bbx_AY8910_control = data;
-	ay8910_control_port_0_w( machine, offset, data );
+	ay8910_control_port_0_w( space, offset, data );
 }
 
 static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
@@ -114,7 +114,7 @@ static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
 		{
 			if( data == 0x01 )
 				/* 0->1 transition triggers interrupt on Sound CPU */
-				cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
+				cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE );
 		}
 		break;
 
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
 		break;
 
 	default:
-		ay8910_write_port_0_w( machine, offset, data );
+		ay8910_write_port_0_w( space, offset, data );
 		break;
 	}
 }
@@ -137,10 +137,10 @@ static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 		{
 			if( data == 0x01 )
 				/* 0->1 transition triggers interrupt on Sound CPU */
-				cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
+				cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE );
 		}
 		else
-			memory_set_bank(2, data ? 0 : 1);
+			memory_set_bank(space->machine, 2, data ? 0 : 1);
 		break;
 
 	case 0x0f:
@@ -148,7 +148,7 @@ static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 		break;
 
 	default:
-		ay8910_write_port_0_w( machine, offset, data );
+		ay8910_write_port_0_w( space, offset, data );
 		break;
 	}
 }
@@ -172,23 +172,23 @@ static DRIVER_INIT( shangkid )
 	shangkid_gfx_type = 1;
 
 	/* set up banking */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x8000, 0x8000);
-	memory_configure_bank(2, 0, 2, memory_region(machine, "audio") + 0x0000, 0x10000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x8000, 0x8000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/
 
 static MACHINE_RESET( chinhero )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, 1 );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, 1 );
 }
 
 static MACHINE_RESET( shangkid )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, 1 );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, 1 );
 
-	memory_set_bank(1, 0);
-	memory_set_bank(2, 0);
+	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, 2, 0);
 }
 
 /***************************************************************************************/

@@ -125,7 +125,6 @@
 /*int survival_prot = 0; */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "i8085.h"
 #include "i8085cpu.h"
 #include "i8085daa.h"
@@ -150,6 +149,8 @@ typedef struct {
 	INT8	irq_state[4];
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	void	(*sod_callback)(int state);
 	int		(*sid_callback)(void);
 }	i8085_Regs;
@@ -163,20 +164,20 @@ static UINT8 RIM_IEN = 0; //AT: IEN status latch used by the RIM instruction
 static UINT8 ROP(void)
 {
 	I.STATUS = 0xa2; // instruction fetch
-	return cpu_readop(I.PC.w.l++);
+	return memory_decrypted_read_byte(I.program, I.PC.w.l++);
 }
 
 static UINT8 ARG(void)
 {
-	return cpu_readop_arg(I.PC.w.l++);
+	return memory_raw_read_byte(I.program, I.PC.w.l++);
 }
 
 static UINT16 ARG16(void)
 {
 	UINT16 w;
-	w  = cpu_readop_arg(I.PC.d);
+	w  = memory_raw_read_byte(I.program, I.PC.d);
 	I.PC.w.l++;
-	w += cpu_readop_arg(I.PC.d) << 8;
+	w += memory_raw_read_byte(I.program, I.PC.d) << 8;
 	I.PC.w.l++;
 	return w;
 }
@@ -184,13 +185,13 @@ static UINT16 ARG16(void)
 static UINT8 RM(UINT32 a)
 {
 	I.STATUS = 0x82; // memory read
-	return program_read_byte_8le(a);
+	return memory_read_byte_8le(I.program, a);
 }
 
 static void WM(UINT32 a, UINT8 v)
 {
 	I.STATUS = 0x00; // memory write
-	program_write_byte_8le(a, v);
+	memory_write_byte_8le(I.program, a, v);
 }
 
 INLINE void execute_one(int opcode)
@@ -1083,7 +1084,6 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0xe9: i8085_ICount -= (I.cputype) ? 6 : 5;	/* PCHL */
 			I.PC.d = I.HL.w.l;
-			change_pc(I.PC.d);
 			break;
 		case 0xea: i8085_ICount -= 10;	/* JPE  nnnn */
 			M_JMP( I.AF.b.l & VF );
@@ -1279,7 +1279,6 @@ static void Interrupt(void)
 		case 0xc30000:	/* JMP  nnnn */
 			i8085_ICount -= 10;
 			I.PC.d = I.IRQ1 & 0xffff;
-			change_pc(I.PC.d);
 			break;
 		default:
 			switch( I.ISRV )
@@ -1293,7 +1292,6 @@ static void Interrupt(void)
 						I.PC.d = I.IRQ1;
 					else
 						I.PC.d = 0x3c;
-					change_pc(I.PC.d);
 					break;
 				default:
 					LOG(("i8085 take int $%02x\n", I.IRQ1));
@@ -1308,7 +1306,7 @@ static CPU_EXECUTE( i8085 )
 	i8085_ICount = cycles;
 	do
 	{
-		debugger_instruction_hook(Machine, I.PC.d);
+		debugger_instruction_hook(device, I.PC.d);
 		/* interrupts enabled or TRAP pending ? */
 		if ( (I.IM & IM_IEN) || (I.IREQ & IM_TRAP) )
 		{
@@ -1363,22 +1361,24 @@ static CPU_INIT( i8085 )
 	I.cputype = 1;
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("i8085", index, I.AF.w.l);
-	state_save_register_item("i8085", index, I.BC.w.l);
-	state_save_register_item("i8085", index, I.DE.w.l);
-	state_save_register_item("i8085", index, I.HL.w.l);
-	state_save_register_item("i8085", index, I.SP.w.l);
-	state_save_register_item("i8085", index, I.PC.w.l);
-	state_save_register_item("i8085", index, I.HALT);
-	state_save_register_item("i8085", index, I.IM);
-	state_save_register_item("i8085", index, I.IREQ);
-	state_save_register_item("i8085", index, I.ISRV);
-	state_save_register_item("i8085", index, I.INTR);
-	state_save_register_item("i8085", index, I.IRQ2);
-	state_save_register_item("i8085", index, I.IRQ1);
-	state_save_register_item("i8085", index, I.STATUS);
-	state_save_register_item_array("i8085", index, I.irq_state);
+	state_save_register_item("i8085", device->tag, 0, I.AF.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.BC.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.DE.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.HL.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.SP.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.PC.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.HALT);
+	state_save_register_item("i8085", device->tag, 0, I.IM);
+	state_save_register_item("i8085", device->tag, 0, I.IREQ);
+	state_save_register_item("i8085", device->tag, 0, I.ISRV);
+	state_save_register_item("i8085", device->tag, 0, I.INTR);
+	state_save_register_item("i8085", device->tag, 0, I.IRQ2);
+	state_save_register_item("i8085", device->tag, 0, I.IRQ1);
+	state_save_register_item("i8085", device->tag, 0, I.STATUS);
+	state_save_register_item_array("i8085", device->tag, 0, I.irq_state);
 }
 
 /****************************************************************************
@@ -1387,22 +1387,21 @@ static CPU_INIT( i8085 )
 static CPU_RESET( i8085 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 	void (*save_sodcallback)(int);
 	int (*save_sidcallback)(void);
 	int cputype_bak = I.cputype;
 
 	init_tables();
-	save_device = I.device;
 	save_irqcallback = I.irq_callback;
 	save_sodcallback = I.sod_callback;
 	save_sidcallback = I.sid_callback;
 	memset(&I, 0, sizeof(i8085_Regs));
-	I.device = save_device;
 	I.irq_callback = save_irqcallback;
 	I.sod_callback = save_sodcallback;
 	I.sid_callback = save_sidcallback;
-	change_pc(I.PC.d);
+	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	I.cputype = cputype_bak;
 }
@@ -1432,7 +1431,6 @@ static CPU_SET_CONTEXT( i8085 )
 	if( src )
 	{
 		I = *(i8085_Regs*)src;
-		change_pc(I.PC.d);
 	}
 }
 
@@ -1603,21 +1601,21 @@ static CPU_INIT( i8080 )
 	I.irq_callback = irqcallback;
 	I.device = device;
 
-	state_save_register_item("i8080", index, I.AF.w.l);
-	state_save_register_item("i8080", index, I.BC.w.l);
-	state_save_register_item("i8080", index, I.DE.w.l);
-	state_save_register_item("i8080", index, I.HL.w.l);
-	state_save_register_item("i8080", index, I.SP.w.l);
-	state_save_register_item("i8080", index, I.PC.w.l);
-	state_save_register_item("i8080", index, I.HALT);
-	state_save_register_item("i8085", index, I.IM);
-	state_save_register_item("i8080", index, I.IREQ);
-	state_save_register_item("i8080", index, I.ISRV);
-	state_save_register_item("i8080", index, I.INTR);
-	state_save_register_item("i8080", index, I.IRQ2);
-	state_save_register_item("i8080", index, I.IRQ1);
-	state_save_register_item("i8080", index, I.STATUS);
-	state_save_register_item_array("i8080", index, I.irq_state);
+	state_save_register_item("i8080", device->tag, 0, I.AF.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.BC.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.DE.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.HL.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.SP.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.PC.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.HALT);
+	state_save_register_item("i8085", device->tag, 0, I.IM);
+	state_save_register_item("i8080", device->tag, 0, I.IREQ);
+	state_save_register_item("i8080", device->tag, 0, I.ISRV);
+	state_save_register_item("i8080", device->tag, 0, I.INTR);
+	state_save_register_item("i8080", device->tag, 0, I.IRQ2);
+	state_save_register_item("i8080", device->tag, 0, I.IRQ1);
+	state_save_register_item("i8080", device->tag, 0, I.STATUS);
+	state_save_register_item_array("i8080", device->tag, 0, I.irq_state);
 }
 
 static void i8080_set_irq_line(int irqline, int state)
@@ -1660,7 +1658,7 @@ static CPU_SET_INFO( i8085 )
 		case CPUINFO_INT_INPUT_STATE + I8085_RST75_LINE:i8085_set_irq_line(I8085_RST75_LINE, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	i8085_set_irq_line(INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							I.PC.w.l = info->i; change_pc(I.PC.d);	break;
+		case CPUINFO_INT_PC:							I.PC.w.l = info->i; 					break;
 		case CPUINFO_INT_REGISTER + I8085_PC:			I.PC.w.l = info->i;						break;
 		case CPUINFO_INT_SP:							I.SP.w.l = info->i;						break;
 		case CPUINFO_INT_REGISTER + I8085_SP:			I.SP.w.l = info->i;						break;

@@ -144,23 +144,23 @@ SH2 *sh2;
 INLINE UINT16 RW(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
-		return program_read_word_32be(A);
+		return memory_read_word_32be(sh2->program, A);
 
-	return program_read_word_32be(A & AM);
+	return memory_read_word_32be(sh2->program, A & AM);
 }
 
 INLINE UINT32 RL(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return program_read_dword_32be(A);
+		return memory_read_dword_32be(sh2->program, A);
 
-	return program_read_dword_32be(A & AM);
+	return memory_read_dword_32be(sh2->program, A & AM);
 }
 
 /*-------------------------------------------------
@@ -687,7 +687,7 @@ static CPU_INIT( sh2 )
 	memset(sh2, 0, sizeof(SH2));
 
 	/* initialize the common core parts */
-	sh2_common_init(0, device, index, clock, config, irqcallback);
+	sh2_common_init(0, device, index, clock, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	sh2->cache = cache;
@@ -702,7 +702,7 @@ static CPU_INIT( sh2 )
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	sh2->drcuml = drcuml_alloc(cache, flags, 1, 32, 1);
+	sh2->drcuml = drcuml_alloc(device, cache, flags, 1, 32, 1);
 	if (sh2->drcuml == NULL)
 		fatalerror("Error initializing the UML");
 
@@ -725,7 +725,7 @@ static CPU_INIT( sh2 )
 	/* initialize the front-end helper */
 	if (SINGLE_INSTRUCTION_MODE)
 		feconfig.max_sequence = 1;
-	sh2->drcfe = drcfe_init(&feconfig, sh2);
+	sh2->drcfe = drcfe_init(device, &feconfig, sh2);
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 16; regnum++)
@@ -781,13 +781,10 @@ static CPU_RESET( sh2 )
 {
 	void *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
-	int cpunum;
 
 	void (*f)(UINT32 data);
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
-	cpunum = sh2->cpu_number;
 	m = sh2->m;
 	tsave = sh2->timer;
 	tsaved0 = sh2->dma_timer[0];
@@ -795,7 +792,6 @@ static CPU_RESET( sh2 )
 
 	f = sh2->ftcsr_read_callback;
 	save_irqcallback = sh2->irq_callback;
-	save_device = sh2->device;
 
 	sh2->ppc = sh2->pc = sh2->pr = sh2->sr = sh2->gbr = sh2->vbr = sh2->mach = sh2->macl = 0;
 	sh2->evec = sh2->irqsr = 0;
@@ -811,19 +807,17 @@ static CPU_RESET( sh2 )
 
 	sh2->ftcsr_read_callback = f;
 	sh2->irq_callback = save_irqcallback;
-	sh2->device = save_device;
+	sh2->device = device;
 
 	sh2->timer = tsave;
 	sh2->dma_timer[0] = tsaved0;
 	sh2->dma_timer[1] = tsaved1;
-	sh2->cpu_number = cpunum;
 	sh2->m = m;
 	memset(sh2->m, 0, 0x200);
 
-	sh2->pc = program_read_dword_32be(0);
-	sh2->r[15] = program_read_dword_32be(4);
+	sh2->pc = memory_read_dword_32be(sh2->program, 0);
+	sh2->r[15] = memory_read_dword_32be(sh2->program, 4);
 	sh2->sr = I;
-	change_pc(sh2->pc & AM);
 
 	sh2->internal_irq_level = -1;
 
@@ -968,7 +962,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */
@@ -3395,7 +3389,7 @@ static CPU_SET_INFO( sh2 )
 		case CPUINFO_INT_REGISTER + SH2_R15:			sh2->r[15] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_EA:				sh2->ea = info->i;						break;
 
-		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(cpu_getactivecpu(), info->i); break;
+		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(cpunum_get_active(), info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;

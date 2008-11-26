@@ -89,7 +89,7 @@ static READ8_HANDLER(sharedram_r)
 {
 	static INT32 oldinput=0;
 	INT32 coincnt;
-	INT32 input = input_port_read(machine, "COIN");
+	INT32 input = input_port_read(space->machine, "COIN");
 
 	if(input&3)
 	{
@@ -114,7 +114,7 @@ static WRITE8_HANDLER(sharedram_w)
 static READ8_HANDLER(ffight2b_coin_r)
 {
 	static INT32 oldinput=0;
-	INT32 input = input_port_read(machine, "COIN");
+	INT32 input = input_port_read(space->machine, "COIN");
 
 	if( ((input&1)==1)&&((oldinput&1)==0))
 	{
@@ -148,19 +148,19 @@ static READ8_HANDLER(sb2b_6a6xxx_r)
 		case 0xfb7:	return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, activecpu_get_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, cpu_get_pc(space->cpu));
 
 	return 0;
 }
 
 static READ8_HANDLER(sb2b_770071_r)
 {
- 	return input_port_read(machine, "DSW");
+ 	return input_port_read(space->machine, "DSW");
 }
 
 static READ8_HANDLER(sb2b_770079_r)
 {
- 	return input_port_read(machine, "COIN");
+ 	return input_port_read(space->machine, "COIN");
 }
 
 static READ8_HANDLER(sb2b_7xxx_r)
@@ -182,12 +182,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(machine, offset + 0x100);
+	return spc_ram_r(space, offset + 0x100);
 }
 
 static WRITE8_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(machine, offset + 0x100, data);
+	spc_ram_w(space, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -584,7 +584,7 @@ static DRIVER_INIT(kinstb)
 	}
 
 	shared_ram=auto_malloc(0x100);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
 
 	DRIVER_INIT_CALL(snes_hirom);
 }
@@ -626,7 +626,7 @@ static DRIVER_INIT( ffight2b )
 	rom[0x7ffc]=0x54;
 
 	ffight2b_coins=0;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
 
 
 	DRIVER_INIT_CALL(snes);
@@ -688,15 +688,15 @@ static DRIVER_INIT( sblast2b )
     dst[0xfffd]=0x7a;
 
    	/*  protection checks */
- 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
-  	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
+ 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
+  	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
 
   	/* extra inputs */
-   	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x770071, 0x770071, 0, 0, sb2b_770071_r);
-    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x770079, 0x770079, 0, 0, sb2b_770079_r);
+   	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, sb2b_770071_r);
+    memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, sb2b_770079_r);
 
     /* handler to read boot code */
-    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x007000, 0x007fff, 0, 0, sb2b_7xxx_r);
+    memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x007000, 0x007fff, 0, 0, sb2b_7xxx_r);
 
 	DRIVER_INIT_CALL(snes_hirom);
 }

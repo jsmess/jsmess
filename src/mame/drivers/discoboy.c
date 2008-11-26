@@ -170,7 +170,7 @@ void discoboy_setrombank(UINT8 data)
 {
 	UINT8 *ROM = memory_region(machine, "main");
 	data &=0x2f;
-	memory_set_bankptr(1, &ROM[0x6000+(data*0x1000)] );
+	memory_set_bankptr(space->machine, 1, &ROM[0x6000+(data*0x1000)] );
 }
 #endif
 
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( discoboy_port_00_w )
 
 static WRITE8_HANDLER( discoboy_port_01_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	int rombank;
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
@@ -197,15 +197,15 @@ static WRITE8_HANDLER( discoboy_port_01_w )
 	discoboy_gfxbank = data&0xf0;
 	rombank = data&0x07;
 
-	memory_set_bankptr(1, &ROM[0x10000 + rombank * 0x4000] );
+	memory_set_bankptr(space->machine, 1, &ROM[0x10000 + rombank * 0x4000] );
 }
 
 static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
 {
 //  printf("unk discoboy_port_03_w %02x\n",data);
-//  cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,HOLD_LINE);
-	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+//  cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,HOLD_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( discoboy_port_06_w )
@@ -254,7 +254,7 @@ static READ8_HANDLER( rambank2_r )
 		printf( "unk rb2_r\n");
 	}
 
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER( rambank2_w )
@@ -525,7 +525,7 @@ static DRIVER_INIT( discoboy )
 
 	discoboy_ram_bank = 0;
 
-	memory_set_bankptr(1, &ROM[0x10000] );
+	memory_set_bankptr(machine, 1, &ROM[0x10000] );
 }
 
 ROM_START( discoboy )

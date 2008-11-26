@@ -59,14 +59,14 @@ Flying Tiger
 
 static WRITE8_HANDLER( lastday_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x07);
+	memory_set_bank(space->machine, 1, data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
 static MACHINE_START( lastday )
 {
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -812,7 +812,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( unk_r )
@@ -1088,10 +1088,10 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( rshark_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, 5, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+		cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( rshark )

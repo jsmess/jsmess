@@ -40,7 +40,7 @@ static WRITE32_HANDLER( igs_cg_videoram_w )
 {
 	COMBINE_DATA(&igs_cg_videoram[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",activecpu_get_pc(),offset ,igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(space->cpu),offset ,igs_cg_videoram[offset]);
 
 
 
@@ -359,7 +359,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( igs_majhong_interrupt )
 {
-	cpunum_set_input_line(machine, 0, ARM7_FIRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(device, ARM7_FIRQ_LINE, PULSE_LINE);
 }
 
 

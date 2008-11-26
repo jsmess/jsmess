@@ -55,7 +55,7 @@ static UINT8 di;
 static INTERRUPT_GEN( dribling_irq_gen )
 {
 	if (di)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 7 = di */
 	di = (data >> 7) & 1;
 	if (!di)
-		cpunum_set_input_line(device->machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 
@@ -112,7 +112,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 1 = (10) = PC1 */
 	/* bit 0 = (32) = PC0 */
 	input_mux = data & 7;
-	logerror("%04X:misc_w(%02X)\n", activecpu_get_previouspc(), data);
+	logerror("%04X:misc_w(%02X)\n", cpu_get_previouspc(device->machine->activecpu), data);
 }
 
 
@@ -126,14 +126,14 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	/* bit 2 = folla a */
 	/* bit 1 = folla m */
 	/* bit 0 = folla b */
-	logerror("%04X:sound_w(%02X)\n", activecpu_get_previouspc(), data);
+	logerror("%04X:sound_w(%02X)\n", cpu_get_previouspc(device->machine->activecpu), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pb_w )
 {
 	/* write PB0-7 */
-	logerror("%04X:pb_w(%02X)\n", activecpu_get_previouspc(), data);
+	logerror("%04X:pb_w(%02X)\n", cpu_get_previouspc(device->machine->activecpu), data);
 }
 
 
@@ -158,9 +158,9 @@ static WRITE8_DEVICE_HANDLER( shr_w )
 static READ8_HANDLER( ioread )
 {
 	if (offset & 0x08)
-		return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3);
+		return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3);
+		return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
 	return 0xff;
 }
 
@@ -168,9 +168,9 @@ static READ8_HANDLER( ioread )
 static WRITE8_HANDLER( iowrite )
 {
 	if (offset & 0x08)
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3, data);
 	else if (offset & 0x40)
 	{
 		dr = ds;

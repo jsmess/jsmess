@@ -197,13 +197,13 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
-			memory_set_bankptr( 1, namcofl_workram );
-			memory_set_bankptr( 2, memory_region(machine, "main") );
+			memory_set_bankptr(space->machine,  1, namcofl_workram );
+			memory_set_bankptr(space->machine,  2, memory_region(space->machine, "main") );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr( 1, memory_region(machine, "main") );
-			memory_set_bankptr( 2, namcofl_workram );
+			memory_set_bankptr(space->machine,  1, memory_region(space->machine, "main") );
+			memory_set_bankptr(space->machine,  2, namcofl_workram );
 		}
 	}
 }
@@ -217,7 +217,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, triggerscanline, 0), 0);
+		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(space->machine->primary_screen, triggerscanline, 0), 0);
 	}
 }
 
@@ -348,14 +348,14 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( network_interrupt_callback )
 {
-	cpunum_set_input_line(machine, 0, I960_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], I960_IRQ0, ASSERT_LINE);
 	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	cpunum_set_input_line(machine, 0, I960_IRQ2, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], I960_IRQ2, ASSERT_LINE);
 	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
@@ -363,7 +363,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	cpunum_set_input_line(machine, 0, I960_IRQ1, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], I960_IRQ1, ASSERT_LINE);
 	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
 }
 
@@ -565,8 +565,8 @@ static void namcofl_common_init(running_machine *machine)
 {
 	namcofl_workram = auto_malloc(0x100000);
 
-	memory_set_bankptr( 1, memory_region(machine, "main") );
-	memory_set_bankptr( 2, namcofl_workram );
+	memory_set_bankptr(machine,  1, memory_region(machine, "main") );
+	memory_set_bankptr(machine,  2, namcofl_workram );
 
 	namcoc7x_on_driver_init(machine);
 	namcoc7x_set_host_ram(namcofl_mcuram);

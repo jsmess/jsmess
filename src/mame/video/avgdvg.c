@@ -1249,7 +1249,7 @@ WRITE8_HANDLER( avgdvg_go_w )
 
 WRITE16_HANDLER( avgdvg_go_word_w )
 {
-	avgdvg_go_w(machine, offset, data);
+	avgdvg_go_w(space, offset, data);
 }
 
 
@@ -1267,12 +1267,12 @@ WRITE8_HANDLER( avgdvg_reset_w )
 
 WRITE16_HANDLER( avgdvg_reset_word_w )
 {
-	avgdvg_reset_w (machine,0,0);
+	avgdvg_reset_w (space,0,0);
 }
 
 MACHINE_RESET( avgdvg )
 {
-	avgdvg_reset_w (machine,0,0);
+	avgdvg_reset_w (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
 }
 
 
@@ -1417,37 +1417,37 @@ static const vgconf avg_quantum =
 
 static void register_state (void)
 {
-	state_save_register_item("AVG", 0, vg->pc);
-	state_save_register_item("AVG", 0, vg->sp);
-	state_save_register_item("AVG", 0, vg->dvx);
-	state_save_register_item("AVG", 0, vg->dvy);
-	state_save_register_item("AVG", 0, vg->dvy12);
-	state_save_register_item("AVG", 0, vg->timer);
-	state_save_register_item_array("AVG", 0, vg->stack);
-	state_save_register_item("AVG", 0, vg->data);
-	state_save_register_item("AVG", 0, vg->state_latch);
-	state_save_register_item("AVG", 0, vg->int_latch);
-	state_save_register_item("AVG", 0, vg->scale);
-	state_save_register_item("AVG", 0, vg->bin_scale);
-	state_save_register_item("AVG", 0, vg->intensity);
-	state_save_register_item("AVG", 0, vg->color);
-	state_save_register_item("AVG", 0, vg->enspkl);
-	state_save_register_item("AVG", 0, vg->spkl_shift);
-	state_save_register_item("AVG", 0, vg->map);
-	state_save_register_item("AVG", 0, vg->hst);
-	state_save_register_item("AVG", 0, vg->lst);
-	state_save_register_item("AVG", 0, vg->izblank);
-	state_save_register_item("AVG", 0, vg->op);
-	state_save_register_item("AVG", 0, vg->halt);
-	state_save_register_item("AVG", 0, vg->sync_halt);
-	state_save_register_item("AVG", 0, vg->xdac_xor);
-	state_save_register_item("AVG", 0, vg->ydac_xor);
-	state_save_register_item("AVG", 0, vg->xpos);
-	state_save_register_item("AVG", 0, vg->ypos);
-	state_save_register_item("AVG", 0, vg->clipx_min);
-	state_save_register_item("AVG", 0, vg->clipy_min);
-	state_save_register_item("AVG", 0, vg->clipx_max);
-	state_save_register_item("AVG", 0, vg->clipy_max);
+	state_save_register_item("AVG", NULL, 0, vg->pc);
+	state_save_register_item("AVG", NULL, 0, vg->sp);
+	state_save_register_item("AVG", NULL, 0, vg->dvx);
+	state_save_register_item("AVG", NULL, 0, vg->dvy);
+	state_save_register_item("AVG", NULL, 0, vg->dvy12);
+	state_save_register_item("AVG", NULL, 0, vg->timer);
+	state_save_register_item_array("AVG", NULL, 0, vg->stack);
+	state_save_register_item("AVG", NULL, 0, vg->data);
+	state_save_register_item("AVG", NULL, 0, vg->state_latch);
+	state_save_register_item("AVG", NULL, 0, vg->int_latch);
+	state_save_register_item("AVG", NULL, 0, vg->scale);
+	state_save_register_item("AVG", NULL, 0, vg->bin_scale);
+	state_save_register_item("AVG", NULL, 0, vg->intensity);
+	state_save_register_item("AVG", NULL, 0, vg->color);
+	state_save_register_item("AVG", NULL, 0, vg->enspkl);
+	state_save_register_item("AVG", NULL, 0, vg->spkl_shift);
+	state_save_register_item("AVG", NULL, 0, vg->map);
+	state_save_register_item("AVG", NULL, 0, vg->hst);
+	state_save_register_item("AVG", NULL, 0, vg->lst);
+	state_save_register_item("AVG", NULL, 0, vg->izblank);
+	state_save_register_item("AVG", NULL, 0, vg->op);
+	state_save_register_item("AVG", NULL, 0, vg->halt);
+	state_save_register_item("AVG", NULL, 0, vg->sync_halt);
+	state_save_register_item("AVG", NULL, 0, vg->xdac_xor);
+	state_save_register_item("AVG", NULL, 0, vg->ydac_xor);
+	state_save_register_item("AVG", NULL, 0, vg->xpos);
+	state_save_register_item("AVG", NULL, 0, vg->ypos);
+	state_save_register_item("AVG", NULL, 0, vg->clipx_min);
+	state_save_register_item("AVG", NULL, 0, vg->clipy_min);
+	state_save_register_item("AVG", NULL, 0, vg->clipx_max);
+	state_save_register_item("AVG", NULL, 0, vg->clipy_max);
 }
 
 static VIDEO_START( avg_common )

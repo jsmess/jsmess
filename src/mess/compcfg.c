@@ -130,13 +130,15 @@ const char *ram_string(char *buffer, UINT32 ram)
 
 /* ----------------------------------------------------------------------- */
 
+#if 0
+/* NPW 25-Nov-2008 - Disabled in 0.128u4 */
 UINT8 *memory_install_ram8_handler(running_machine *machine, int cpunum, int spacenum, offs_t start, offs_t end, offs_t ram_offset, int bank)
 {
-	read8_machine_func read_bank = (read8_machine_func) (FPTR)(STATIC_BANK1 + bank - 1);
-	write8_machine_func write_bank = (write8_machine_func) (FPTR)(STATIC_BANK1 + bank - 1);
+	read8_space_func read_bank = (read8_space_func) (FPTR)(STATIC_BANK1 + bank - 1);
+	write8_space_func write_bank = (write8_space_func) (FPTR)(STATIC_BANK1 + bank - 1);
 	offs_t bank_size = end - start + 1;
 
-	memory_set_bankptr(bank, mess_ram + ram_offset);
+	memory_set_bankptr(machine, bank, mess_ram + ram_offset);
 
 	memory_install_read8_handler(machine, cpunum, spacenum, start,
 		MIN(end, start - ram_offset + mess_ram_size - 1), 0, 0, read_bank);
@@ -150,5 +152,5 @@ UINT8 *memory_install_ram8_handler(running_machine *machine, int cpunum, int spa
 	}
 	return mess_ram + ram_offset;
 }
-
+#endif
 

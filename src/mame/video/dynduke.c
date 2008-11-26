@@ -15,7 +15,7 @@ WRITE16_HANDLER( dynduke_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	color=paletteram16[offset];
-	palette_set_color_rgb(machine,offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+	palette_set_color_rgb(space->machine,offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 }
 
 WRITE16_HANDLER( dynduke_background_w )
@@ -244,5 +244,7 @@ VIDEO_UPDATE( dynduke )
 
 VIDEO_EOF( dynduke )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff); // Could be a memory location instead
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram16_w(space,0,0,0xffff); // Could be a memory location instead
 }

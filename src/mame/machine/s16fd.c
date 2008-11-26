@@ -43,7 +43,7 @@ static void set_decrypted_region(void)
 	if (fd1094_set_decrypted != NULL)
 		(*fd1094_set_decrypted)(Machine, (UINT8 *)fd1094_userregion);
 	else
-		memory_set_decrypted_region(0, 0, fd1094_cpuregionsize - 1, fd1094_userregion);
+		memory_set_decrypted_region(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, fd1094_cpuregionsize - 1, fd1094_userregion);
 }
 
 /* this function checks the cache to see if the current state is cached,
@@ -65,7 +65,7 @@ static void fd1094_setstate_and_decrypt(int state)
 
 	fd1094_state = state;
 
-	cpunum_set_info_int(0, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
+	cpu_set_reg(Machine->cpu[0], M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the FD1094 state ready to decrypt.. */
 	state = fd1094_set_state(fd1094_key,state) & 0xff;
@@ -78,7 +78,7 @@ static void fd1094_setstate_and_decrypt(int state)
 			/* copy cached state */
 			fd1094_userregion=fd1094_cacheregion[i];
 			set_decrypted_region();
-			m68k_set_encrypted_opcode_range(0,0,fd1094_cpuregionsize);
+			m68k_set_encrypted_opcode_range(Machine->cpu[0],0,fd1094_cpuregionsize);
 
 			return;
 		}
@@ -97,7 +97,7 @@ static void fd1094_setstate_and_decrypt(int state)
 	/* copy newly decrypted data to user region */
 	fd1094_userregion=fd1094_cacheregion[fd1094_current_cacheposition];
 	set_decrypted_region();
-	m68k_set_encrypted_opcode_range(0,0,fd1094_cpuregionsize);
+	m68k_set_encrypted_opcode_range(Machine->cpu[0],0,fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;
 
@@ -109,7 +109,7 @@ static void fd1094_setstate_and_decrypt(int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-static void fd1094_cmp_callback(UINT32 val, int reg)
+static void fd1094_cmp_callback(const device_config *device, UINT32 val, int reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -124,7 +124,7 @@ static IRQ_CALLBACK(fd1094_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static void fd1094_rte_callback (void)
+static void fd1094_rte_callback (const device_config *device)
 {
 	fd1094_setstate_and_decrypt(FD1094_STATE_RTE);
 }
@@ -141,7 +141,7 @@ static void fd1094_kludge_reset_values(void)
 
 
 /* function, to be called from MACHINE_RESET (every reset) */
-void fd1094_machine_init(void)
+void fd1094_machine_init(const device_config *device)
 {
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
 	if (!fd1094_key)
@@ -150,9 +150,11 @@ void fd1094_machine_init(void)
 	fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	fd1094_kludge_reset_values();
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)fd1094_cmp_callback);
-	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)fd1094_rte_callback);
-	cpunum_set_irq_callback(0, fd1094_int_callback);
+	cpu_set_info_fct(device, CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)fd1094_cmp_callback);
+	cpu_set_info_fct(device, CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)fd1094_rte_callback);
+	cpu_set_irq_callback(device, fd1094_int_callback);
+
+	cpu_reset(device);
 }
 
 static STATE_POSTLOAD( fd1094_postload )
@@ -162,7 +164,7 @@ static STATE_POSTLOAD( fd1094_postload )
 		int selected_state = fd1094_selected_state;
 		int state = fd1094_state;
 
-		fd1094_machine_init();
+		fd1094_machine_init(machine->cpu[0]);
 
 		fd1094_setstate_and_decrypt(selected_state);
 		fd1094_setstate_and_decrypt(state);
@@ -188,7 +190,7 @@ static void key_changed(void)
 	fd1094_current_cacheposition = 1;
 
 	/* flush the prefetch queue */
-	cpunum_set_info_int(0, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);
+	cpu_set_reg(Machine->cpu[0], M68K_PREF_ADDR, 0x0010);
 }
 
 

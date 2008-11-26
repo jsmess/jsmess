@@ -28,7 +28,7 @@
 #define S	h6280.sp.b.l
 
 #define TRANSLATED(addr)	((h6280.mmr[(addr)>>13] << 13) | ((addr)&0x1fff))
-#define CHANGE_PC			do { offs_t temp = TRANSLATED(PCW); change_pc(temp); } while (0)
+#define CHANGE_PC
 #define H6280_CYCLES(cyc)											\
 	{																\
 		h6280_ICount -= ((cyc) * h6280.clocks_per_cycle);			\
@@ -79,7 +79,6 @@
 	P = (P & ~_fD) | _fI;	/* knock out D and set I flag */	\
 	PCL = RDMEM(vector);										\
 	PCH = RDMEM((vector+1));									\
-	CHANGE_PC;													\
 }
 
 #define CHECK_AND_TAKE_IRQ_LINES 								\
@@ -127,7 +126,7 @@
  ***************************************************************/
 INLINE UINT8 RDMEM(offs_t addr) {
 	CHECK_VDC_VCE_PENALTY(addr);
-	return program_read_byte_8le(TRANSLATED(addr));
+	return memory_read_byte_8le(h6280.program, TRANSLATED(addr));
 }
 
 /***************************************************************
@@ -135,60 +134,60 @@ INLINE UINT8 RDMEM(offs_t addr) {
  ***************************************************************/
 INLINE void WRMEM(offs_t addr, UINT8 data) {
 	CHECK_VDC_VCE_PENALTY(addr);
-	program_write_byte_8le(TRANSLATED(addr),data);
+	memory_write_byte_8le(h6280.program, TRANSLATED(addr),data);
 }
 
 /***************************************************************
  *  RDMEMZ   read memory - zero page
  ***************************************************************/
 #define RDMEMZ(addr) 											\
-	program_read_byte_8le( (h6280.mmr[1] << 13) | ((addr)&0x1fff));
+	memory_read_byte_8le(h6280.program, (h6280.mmr[1] << 13) | ((addr)&0x1fff));
 
 /***************************************************************
  *  WRMEMZ   write memory - zero page
  ***************************************************************/
 #define WRMEMZ(addr,data) 										\
-	program_write_byte_8le( (h6280.mmr[1] << 13) | ((addr)&0x1fff),data);
+	memory_write_byte_8le(h6280.program, (h6280.mmr[1] << 13) | ((addr)&0x1fff),data);
 
 /***************************************************************
  *  RDMEMW   read word from memory
  ***************************************************************/
 #define RDMEMW(addr)											\
-	program_read_byte_8le(TRANSLATED(addr)) \
-| ( program_read_byte_8le(TRANSLATED(addr+1)) << 8 )
+	memory_read_byte_8le(h6280.program, TRANSLATED(addr)) \
+| ( memory_read_byte_8le(h6280.program, TRANSLATED(addr+1)) << 8 )
 
 /***************************************************************
  *  RDZPWORD    read a word from a zero page address
  ***************************************************************/
 #define RDZPWORD(addr)											\
 	((addr&0xff)==0xff) ?										\
-		program_read_byte_8le( (h6280.mmr[1] << 13) | ((addr)&0x1fff))				\
-		+(program_read_byte_8le( (h6280.mmr[1] << 13) | ((addr-0xff)&0x1fff))<<8) : \
-		program_read_byte_8le( (h6280.mmr[1] << 13) | ((addr)&0x1fff))				\
-		+(program_read_byte_8le( (h6280.mmr[1] << 13) | ((addr+1)&0x1fff))<<8)
+		memory_read_byte_8le(h6280.program, (h6280.mmr[1] << 13) | ((addr)&0x1fff))				\
+		+(memory_read_byte_8le(h6280.program, (h6280.mmr[1] << 13) | ((addr-0xff)&0x1fff))<<8) : \
+		memory_read_byte_8le(h6280.program, (h6280.mmr[1] << 13) | ((addr)&0x1fff))				\
+		+(memory_read_byte_8le(h6280.program, (h6280.mmr[1] << 13) | ((addr+1)&0x1fff))<<8)
 
 
 /***************************************************************
  * push a register onto the stack
  ***************************************************************/
-#define PUSH(Rg) program_write_byte_8le( (h6280.mmr[1] << 13) | h6280.sp.d,Rg); S--
+#define PUSH(Rg) memory_write_byte_8le(h6280.program, (h6280.mmr[1] << 13) | h6280.sp.d,Rg); S--
 
 /***************************************************************
  * pull a register from the stack
  ***************************************************************/
-#define PULL(Rg) S++; Rg = program_read_byte_8le( (h6280.mmr[1] << 13) | h6280.sp.d)
+#define PULL(Rg) S++; Rg = memory_read_byte_8le(h6280.program, (h6280.mmr[1] << 13) | h6280.sp.d)
 
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
 #define RDOP()													\
-	cpu_readop(TRANSLATED(PCW))
+	memory_decrypted_read_byte(h6280.program, TRANSLATED(PCW))
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #define RDOPARG()												\
-	cpu_readop_arg(TRANSLATED(PCW))
+	memory_raw_read_byte(h6280.program, TRANSLATED(PCW))
 
 /***************************************************************
  *  BRA  branch relative
@@ -202,7 +201,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 		PCW++;													\
 		EAW = PCW + (signed char)tmp;							\
 		PCD = EAD;												\
-		CHANGE_PC;												\
 	}															\
 	else														\
 	{															\
@@ -558,7 +556,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  *  set I flag, reset D flag and jump via IRQ vector
  ***************************************************************/
 #define BRK 													\
-	logerror("BRK %04x\n",activecpu_get_pc());	\
+	logerror("BRK %04x\n",cpu_get_pc(Machine->activecpu));	\
 	CLEAR_T;													\
 	PCW++;														\
 	PUSH(PCH);													\
@@ -567,7 +565,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	P = (P & ~_fD) | _fI;										\
 	PCL = RDMEM(H6280_IRQ2_VEC); 								\
 	PCH = RDMEM(H6280_IRQ2_VEC+1);								\
-	CHANGE_PC
 
 /* 6280 ********************************************************
  *  BSR Branch to subroutine
@@ -765,7 +762,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 #define JMP 													\
 	CLEAR_T;													\
 	PCD = EAD;													\
-	CHANGE_PC
 
 /* 6280 ********************************************************
  *  JSR Jump to subroutine
@@ -778,7 +774,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	PCD = EAD;													\
-	CHANGE_PC
 
 /* 6280 ********************************************************
  *  LDA Load accumulator
@@ -957,7 +952,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 		 ((P & _fZ) ^ _fZ); 									\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	CHANGE_PC;													\
 	CHECK_IRQ_LINES
 #else
 
@@ -966,7 +960,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	P |= _fB;													\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	CHANGE_PC;													\
 	CHECK_IRQ_LINES
 #endif
 
@@ -978,8 +971,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	CLEAR_T;													\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	PCW++;														\
-	CHANGE_PC
+	PCW++;
 
 /* 6280 ********************************************************
  *  SAX Swap accumulator and index X
@@ -1106,7 +1098,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  ***************************************************************/
 #define SET 													\
 	P |= _fT;													\
-	logerror("%04x: WARNING H6280 SET\n",activecpu_get_pc())
+	logerror("%04x: WARNING H6280 SET\n",cpu_get_pc(Machine->activecpu))
 
 /* 6280 ********************************************************
  *  SMB Set memory bit
@@ -1120,21 +1112,21 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  ***************************************************************/
 #define ST0                                                     \
 	CLEAR_T;													\
-    io_write_byte_8le(0x0000,tmp)
+    memory_write_byte_8le(h6280.io,0x0000,tmp)
 
 /* 6280 ********************************************************
  *  ST1 Store at hardware address 2
  ***************************************************************/
 #define ST1                                                     \
 	CLEAR_T;													\
-    io_write_byte_8le(0x0002,tmp)
+    memory_write_byte_8le(h6280.io,0x0002,tmp)
 
 /* 6280 ********************************************************
  *  ST2 Store at hardware address 3
  ***************************************************************/
 #define ST2                                                     \
 	CLEAR_T;													\
-    io_write_byte_8le(0x0003,tmp)
+    memory_write_byte_8le(h6280.io,0x0003,tmp)
 
 /* 6280 ********************************************************
  *  STA Store accumulator
@@ -1203,8 +1195,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
     if (tmp&0x10) h6280.mmr[4] = A;                             \
     if (tmp&0x20) h6280.mmr[5] = A;                             \
     if (tmp&0x40) h6280.mmr[6] = A;                             \
-    if (tmp&0x80) h6280.mmr[7] = A;								\
-    CHANGE_PC
+    if (tmp&0x80) h6280.mmr[7] = A
 
 /* 6280 ********************************************************
  *  TAX Transfer accumulator to index X

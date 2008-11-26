@@ -44,7 +44,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "z8000.h"
 #include "z8000cpu.h"
 #include "osd_cpu.h"
@@ -80,6 +79,8 @@ typedef struct {
 	int irq_state[2];	/* IRQ line states (NVI, VI) */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 }   z8000_Regs;
 
 static int z8000_ICount;
@@ -188,53 +189,53 @@ static UINT64   *const pRQ[16] = {
 
 INLINE UINT16 RDOP(void)
 {
-	UINT16 res = cpu_readop16(PC);
+	UINT16 res = memory_decrypted_read_word(Z.program, PC);
     PC += 2;
     return res;
 }
 
 INLINE UINT8 RDMEM_B(UINT16 addr)
 {
-	return program_read_byte_16be(addr);
+	return memory_read_byte_16be(Z.program, addr);
 }
 
 INLINE UINT16 RDMEM_W(UINT16 addr)
 {
 	addr &= ~1;
-	return program_read_word_16be(addr);
+	return memory_read_word_16be(Z.program, addr);
 }
 
 INLINE UINT32 RDMEM_L(UINT16 addr)
 {
 	UINT32 result;
 	addr &= ~1;
-	result = program_read_word_16be(addr) << 16;
-	return result + program_read_word_16be(addr + 2);
+	result = memory_read_word_16be(Z.program, addr) << 16;
+	return result + memory_read_word_16be(Z.program, addr + 2);
 }
 
 INLINE void WRMEM_B(UINT16 addr, UINT8 value)
 {
-	program_write_byte_16be(addr, value);
+	memory_write_byte_16be(Z.program, addr, value);
 }
 
 INLINE void WRMEM_W(UINT16 addr, UINT16 value)
 {
 	addr &= ~1;
-	program_write_word_16be(addr, value);
+	memory_write_word_16be(Z.program, addr, value);
 }
 
 INLINE void WRMEM_L(UINT16 addr, UINT32 value)
 {
 	addr &= ~1;
-	program_write_word_16be(addr, value >> 16);
-	program_write_word_16be((UINT16)(addr + 2), value & 0xffff);
+	memory_write_word_16be(Z.program, addr, value >> 16);
+	memory_write_word_16be(Z.program, (UINT16)(addr + 2), value & 0xffff);
 }
 
 INLINE UINT8 RDPORT_B(int mode, UINT16 addr)
 {
 	if( mode == 0 )
 	{
-		return io_read_byte_8le(addr);
+		return memory_read_byte_8le(Z.io, addr);
 	}
 	else
 	{
@@ -247,8 +248,8 @@ INLINE UINT16 RDPORT_W(int mode, UINT16 addr)
 {
 	if( mode == 0 )
 	{
-		return io_read_byte_8le((UINT16)(addr)) +
-			  (io_read_byte_8le((UINT16)(addr+1)) << 8);
+		return memory_read_byte_8le(Z.io, (UINT16)(addr)) +
+			  (memory_read_byte_8le(Z.io, (UINT16)(addr+1)) << 8);
 	}
 	else
 	{
@@ -262,10 +263,10 @@ INLINE UINT32 RDPORT_L(int mode, UINT16 addr)
 {
 	if( mode == 0 )
 	{
-		return	io_read_byte_8le((UINT16)(addr)) +
-			   (io_read_byte_8le((UINT16)(addr+1)) <<  8) +
-			   (io_read_byte_8le((UINT16)(addr+2)) << 16) +
-			   (io_read_byte_8le((UINT16)(addr+3)) << 24);
+		return	memory_read_byte_8le(Z.io, (UINT16)(addr)) +
+			   (memory_read_byte_8le(Z.io, (UINT16)(addr+1)) <<  8) +
+			   (memory_read_byte_8le(Z.io, (UINT16)(addr+2)) << 16) +
+			   (memory_read_byte_8le(Z.io, (UINT16)(addr+3)) << 24);
 	}
 	else
 	{
@@ -279,7 +280,7 @@ INLINE void WRPORT_B(int mode, UINT16 addr, UINT8 value)
 {
 	if( mode == 0 )
 	{
-        io_write_byte_8le(addr,value);
+        memory_write_byte_8le(Z.io, addr,value);
 	}
 	else
 	{
@@ -291,8 +292,8 @@ INLINE void WRPORT_W(int mode, UINT16 addr, UINT16 value)
 {
 	if( mode == 0 )
 	{
-		io_write_byte_8le((UINT16)(addr),value & 0xff);
-		io_write_byte_8le((UINT16)(addr+1),(value >> 8) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr),value & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+1),(value >> 8) & 0xff);
 	}
 	else
 	{
@@ -305,10 +306,10 @@ INLINE void WRPORT_L(int mode, UINT16 addr, UINT32 value)
 {
 	if( mode == 0 )
 	{
-		io_write_byte_8le((UINT16)(addr),value & 0xff);
-		io_write_byte_8le((UINT16)(addr+1),(value >> 8) & 0xff);
-		io_write_byte_8le((UINT16)(addr+2),(value >> 16) & 0xff);
-		io_write_byte_8le((UINT16)(addr+3),(value >> 24) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr),value & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+1),(value >> 8) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+2),(value >> 16) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+3),(value >> 24) & 0xff);
 	}
 	else
 	{
@@ -350,7 +351,7 @@ INLINE void set_irq(int type)
             IRQ_REQ = type;
             break;
         case Z8000_SYSCALL >> 8:
-            LOG(("Z8K#%d SYSCALL $%02x\n", cpu_getactivecpu(), type & 0xff));
+            LOG(("Z8K#%d SYSCALL $%02x\n", cpunum_get_active(), type & 0xff));
             IRQ_REQ = type;
             break;
         default:
@@ -388,7 +389,7 @@ INLINE void Interrupt(void)
         IRQ_SRV = IRQ_REQ;
         IRQ_REQ &= ~Z8000_TRAP;
         PC = TRAP;
-        LOG(("Z8K#%d trap $%04x\n", cpu_getactivecpu(), PC ));
+        LOG(("Z8K#%d trap $%04x\n", cpunum_get_active(), PC ));
    }
    else
    if ( IRQ_REQ & Z8000_SYSCALL )
@@ -400,7 +401,7 @@ INLINE void Interrupt(void)
         IRQ_SRV = IRQ_REQ;
         IRQ_REQ &= ~Z8000_SYSCALL;
         PC = SYSCALL;
-        LOG(("Z8K#%d syscall $%04x\n", cpu_getactivecpu(), PC ));
+        LOG(("Z8K#%d syscall $%04x\n", cpunum_get_active(), PC ));
    }
    else
    if ( IRQ_REQ & Z8000_SEGTRAP )
@@ -412,7 +413,7 @@ INLINE void Interrupt(void)
         IRQ_SRV = IRQ_REQ;
         IRQ_REQ &= ~Z8000_SEGTRAP;
         PC = SEGTRAP;
-        LOG(("Z8K#%d segtrap $%04x\n", cpu_getactivecpu(), PC ));
+        LOG(("Z8K#%d segtrap $%04x\n", cpunum_get_active(), PC ));
    }
    else
    if ( IRQ_REQ & Z8000_NMI )
@@ -427,7 +428,7 @@ INLINE void Interrupt(void)
         IRQ_REQ &= ~Z8000_NMI;
         CHANGE_FCW(fcw);
         PC = NMI;
-        LOG(("Z8K#%d NMI $%04x\n", cpu_getactivecpu(), PC ));
+        LOG(("Z8K#%d NMI $%04x\n", cpunum_get_active(), PC ));
     }
     else
     if ( (IRQ_REQ & Z8000_NVI) && (FCW & F_NVIE) )
@@ -441,7 +442,7 @@ INLINE void Interrupt(void)
         PC = RDMEM_W( NVI + 2 );
         IRQ_REQ &= ~Z8000_NVI;
         CHANGE_FCW(fcw);
-        LOG(("Z8K#%d NVI $%04x\n", cpu_getactivecpu(), PC ));
+        LOG(("Z8K#%d NVI $%04x\n", cpunum_get_active(), PC ));
     }
     else
     if ( (IRQ_REQ & Z8000_VI) && (FCW & F_VIE) )
@@ -455,7 +456,7 @@ INLINE void Interrupt(void)
         PC = RDMEM_W( VEC00 + 2 * (IRQ_REQ & 0xff) );
         IRQ_REQ &= ~Z8000_VI;
         CHANGE_FCW(fcw);
-        LOG(("Z8K#%d VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpu_getactivecpu(), IRQ_VEC, VEC00 + VEC00 + 2 * (IRQ_REQ & 0xff), FCW, PC ));
+        LOG(("Z8K#%d VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpunum_get_active(), IRQ_VEC, VEC00 + VEC00 + 2 * (IRQ_REQ & 0xff), FCW, PC ));
     }
 }
 
@@ -463,13 +464,13 @@ INLINE void Interrupt(void)
 static CPU_RESET( z8000 )
 {
 	cpu_irq_callback save_irqcallback = Z.irq_callback;
-	const device_config *save_device = Z.device;
 	memset(&Z, 0, sizeof(z8000_Regs));
 	Z.irq_callback = save_irqcallback;
-	Z.device = save_device;
+	Z.device = device;
+	Z.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	Z.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	FCW = RDMEM_W( 2 ); /* get reset FCW */
 	PC	= RDMEM_W( 4 ); /* get reset PC  */
-	change_pc(PC);
 }
 
 static CPU_EXIT( z8000 )
@@ -487,7 +488,7 @@ static CPU_EXECUTE( z8000 )
         if (IRQ_REQ)
 			Interrupt();
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		if (IRQ_REQ & Z8000_HALT)
         {
@@ -525,7 +526,6 @@ static CPU_SET_CONTEXT( z8000 )
 	if( src )
 	{
 		Z = *(z8000_Regs*)src;
-		change_pc(PC);
 	}
 }
 
@@ -593,7 +593,7 @@ static CPU_SET_INFO( z8000 )
 		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(0, info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(1, info->i);				break;
 
-		case CPUINFO_INT_PC:							PC = info->i; change_pc(PC);	 		break;
+		case CPUINFO_INT_PC:							PC = info->i; 					 		break;
 		case CPUINFO_INT_REGISTER + Z8000_PC:			PC = info->i;							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + Z8000_NSP:			NSP = info->i;							break;

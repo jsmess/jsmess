@@ -110,7 +110,7 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_status = 1;
-		soundlatch_w(machine, 0, data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
@@ -145,7 +145,7 @@ static WRITE8_HANDLER( adpcm_w )
 static READ8_HANDLER( sound_latch_r )
 {
 	soundlatch_status = 0;
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( sound_latch_status_r )
@@ -292,7 +292,7 @@ GFXDECODE_END
 
 static void ym2203_irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( ym2203_write_a )
@@ -306,7 +306,7 @@ static WRITE8_HANDLER( ym2203_write_a )
 
 static WRITE8_HANDLER( ym2203_write_b )
 {
-	memory_set_bankptr(4, memory_region(machine, "adpcm") + ((data & 0xf) * 0x8000));
+	memory_set_bankptr(space->machine, 4, memory_region(space->machine, "adpcm") + ((data & 0xf) * 0x8000));
 }
 
 static const ym2203_interface ym2203_config =
@@ -331,7 +331,7 @@ static void ashnojoe_vclk_cb(running_machine *machine, int data)
 	else
 	{
 		msm5205_data_w(0, adpcm_byte & 0xf);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	msm5205_vclk_toggle ^= 1;
@@ -346,7 +346,7 @@ static const msm5205_interface msm5205_config =
 
 static DRIVER_INIT( ashnojoe )
 {
-	memory_set_bankptr(4, memory_region(machine, "adpcm"));
+	memory_set_bankptr(machine, 4, memory_region(machine, "adpcm"));
 }
 
 static MACHINE_DRIVER_START( ashnojoe )

@@ -137,7 +137,7 @@ static void okim6258_update(void *param, stream_sample_t **inputs, stream_sample
 			/* Compute the new amplitude and update the current step */
 			int nibble = (chip->data_in >> nibble_shift) & 0xf;
 
-			/* Output to the buffer */	
+			/* Output to the buffer */
 			INT16 sample = clock_adpcm(chip, nibble);
 
 			nibble_shift ^= 4;
@@ -165,19 +165,15 @@ static void okim6258_update(void *param, stream_sample_t **inputs, stream_sample
 
 ***********************************************************************************************/
 
-static void okim6258_state_save_register(struct okim6258 *info, int sndindex)
+static void okim6258_state_save_register(struct okim6258 *info, const char *tag)
 {
-	char buf[20];
-
-	sprintf(buf, "OKIM6258");
-
-	state_save_register_item(buf, sndindex, info->status);
-	state_save_register_item(buf, sndindex, info->master_clock);
-	state_save_register_item(buf, sndindex, info->divider);
-	state_save_register_item(buf, sndindex, info->data_in);
-	state_save_register_item(buf, sndindex, info->nibble_shift);
-	state_save_register_item(buf, sndindex, info->signal);
-	state_save_register_item(buf, sndindex, info->step);
+	state_save_register_item("OKIM6258", tag, 0, info->status);
+	state_save_register_item("OKIM6258", tag, 0, info->master_clock);
+	state_save_register_item("OKIM6258", tag, 0, info->divider);
+	state_save_register_item("OKIM6258", tag, 0, info->data_in);
+	state_save_register_item("OKIM6258", tag, 0, info->nibble_shift);
+	state_save_register_item("OKIM6258", tag, 0, info->signal);
+	state_save_register_item("OKIM6258", tag, 0, info->step);
 }
 
 
@@ -187,10 +183,10 @@ static void okim6258_state_save_register(struct okim6258 *info, int sndindex)
 
 ***********************************************************************************************/
 
-static void *okim6258_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( okim6258 )
 {
 	const okim6258_interface *intf = config;
-	struct okim6258 *info;           
+	struct okim6258 *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
@@ -209,7 +205,7 @@ static void *okim6258_start(const char *tag, int sndindex, int clock, const void
 	info->signal = -2;
 	info->step = 0;
 
-	okim6258_state_save_register(info, sndindex);
+	okim6258_state_save_register(info, tag);
 
 	return info;
 }
@@ -221,9 +217,9 @@ static void *okim6258_start(const char *tag, int sndindex, int clock, const void
 
 ***********************************************************************************************/
 
-static void okim6258_reset(void *chip)
+static SND_RESET( okim6258 )
 {
-	struct okim6258 *info = chip;
+	struct okim6258 *info = token;
 
 	stream_update(info->stream);
 
@@ -243,7 +239,7 @@ void okim6258_set_divider(int which, int val)
 {
 	struct okim6258 *info = sndti_token(SOUND_OKIM6258, which);
 	int divider = dividers[val];
-	
+
 	info->divider = dividers[val];
 	stream_set_sample_rate(info->stream, info->master_clock / divider);
 }
@@ -466,7 +462,7 @@ WRITE16_HANDLER( okim6258_ctrl_0_lsb_w )
  * Generic get_info
  **************************************************************************/
 
-static void okim6258_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( okim6258 )
 {
 	switch (state)
 	{
@@ -475,17 +471,17 @@ static void okim6258_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void okim6258_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( okim6258 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = okim6258_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = okim6258_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME(okim6258); break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME(okim6258);	break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = okim6258_reset;			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME(okim6258);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "OKI6258";					break;

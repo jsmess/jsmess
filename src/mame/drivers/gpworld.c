@@ -229,9 +229,9 @@ static READ8_HANDLER( ldp_read )
 static READ8_HANDLER( pedal_in )
 {
 	if (brake_gas)
-		return 	input_port_read(machine, "INACCEL");
+		return 	input_port_read(space->machine, "INACCEL");
 
-	return 	input_port_read(machine, "INBRAKE");
+	return 	input_port_read(space->machine, "INBRAKE");
 
 }
 
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( palette_write )
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(machine, pal_index, MAKE_ARGB(a, r, g, b));
+	palette_set_color(space->machine, pal_index, MAKE_ARGB(a, r, g, b));
 }
 
 /* PROGRAM MAP */
@@ -405,7 +405,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( vblank_callback_gpworld )
@@ -415,11 +415,11 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 	{
 		laserdisc_data_w(laserdisc,ldp_write_latch);
 		ldp_read_latch  = laserdisc_data_r(laserdisc);
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
 }
 

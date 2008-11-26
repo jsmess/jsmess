@@ -79,7 +79,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = memory_region(machine, "user2");
+		rom = memory_region(space->machine, "user2");
 
 		switch(data & 0xf)
 		{
@@ -95,8 +95,8 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 		address |= (data & 0x10) ? 0x10000 : 0;
 
-		memory_set_bankptr(1, &rom[address]);
-		memory_set_bankptr(2, &rom[address + 0x1000]);
+		memory_set_bankptr(space->machine, 1, &rom[address]);
+		memory_set_bankptr(space->machine, 2, &rom[address + 0x1000]);
 	}
 	else
 	{
@@ -107,7 +107,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 				//logerror("port80 = %02X\n",data);
 			}
 
-		rom = memory_region(machine, "user1");
+		rom = memory_region(space->machine, "user1");
 
 		/*
         7
@@ -135,14 +135,14 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 //      printf("add = %X\n",address);
 
-		memory_set_bankptr(1, &rom[address]);
+		memory_set_bankptr(space->machine, 1, &rom[address]);
 	}
 }
 
 static WRITE8_HANDLER( trvmadns_gfxram_w )
 {
 	trvmadns_gfxram[offset] = data;
-	decodechar(machine->gfx[0], offset/16, trvmadns_gfxram);
+	decodechar(space->machine->gfx[0], offset/16, trvmadns_gfxram);
 
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 }
@@ -159,7 +159,7 @@ static WRITE8_HANDLER( trvmadns_palette_w )
 	g = (paletteram[offset | 1] & 0xf0) >> 4;
 	b = paletteram[offset | 1] & 0xf;
 
-	palette_set_color_rgb(machine, offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 #endif
 
@@ -183,12 +183,12 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 {
 	if(offset==0)
 	{
-		if(activecpu_get_previouspc()==0x29e9)// || activecpu_get_previouspc()==0x1b3f) //29f5
+		if(cpu_get_previouspc(space->cpu)==0x29e9)// || cpu_get_previouspc(space->cpu)==0x1b3f) //29f5
 		{
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE);
 		}
 //      else
-//          printf("%x \n", activecpu_get_previouspc());
+//          printf("%x \n", cpu_get_previouspc(space->cpu));
 
 	}
 

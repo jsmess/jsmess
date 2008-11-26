@@ -189,7 +189,7 @@ static WRITE8_HANDLER ( question_offset_high_w )
 
 static READ8_HANDLER (statriv2_questions_read)
 {
-	UINT8 *question_data    = memory_region       ( machine, "user1" );
+	UINT8 *question_data    = memory_region       ( space->machine, "user1" );
 	int offs;
 
 	question_offset_low++;
@@ -261,7 +261,7 @@ static READ8_HANDLER (statriv2_questions_read)
 
 static READ8_HANDLER (supertr2_questions_read)
 {
-	UINT8 *question_data = memory_region( machine, "user1" );
+	UINT8 *question_data = memory_region( space->machine, "user1" );
 	int offs;
 	int XORval;
 
@@ -278,7 +278,7 @@ static READ8_HANDLER (supertr2_questions_read)
 
 static READ8_HANDLER (supertr3_questions_read)
 {
-	UINT8 *question_data = memory_region( machine, "user1" );
+	UINT8 *question_data = memory_region( space->machine, "user1" );
 	int offs;
 
 	offs = (question_offset_high << 16) | (question_offset_med << 8) | question_offset_low;
@@ -288,7 +288,7 @@ static READ8_HANDLER (supertr3_questions_read)
 
 static READ8_HANDLER (hangman_questions_read)
 {
-	UINT8 *question_data = memory_region( machine, "user1" );
+	UINT8 *question_data = memory_region( space->machine, "user1" );
 	int offs;
 
 	offs = (question_offset_high << 16) | (question_offset_med << 8) | question_offset_low;
@@ -598,7 +598,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( statriv2_interrupt )
 {
-	cpunum_set_input_line(machine, 0, I8085_RST75_LINE, HOLD_LINE);
+	cpu_set_input_line(device, I8085_RST75_LINE, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( statriv2 )

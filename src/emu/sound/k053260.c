@@ -64,8 +64,8 @@ static void InitDeltaTable( struct k053260_chip_def *ic, int rate, int clock ) {
 	}
 }
 
-static void k053260_reset( void *chip ) {
-	struct k053260_chip_def *ic = chip;
+static SND_RESET( k053260 ) {
+	struct k053260_chip_def *ic = token;
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
@@ -194,7 +194,7 @@ static void k053260_update( void * param, stream_sample_t **inputs, stream_sampl
 	}
 }
 
-static void *k053260_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( k053260 )
 {
 	static const k053260_interface defintrf = { 0 };
 	struct k053260_chip_def *ic;
@@ -211,7 +211,7 @@ static void *k053260_start(const char *tag, int sndindex, int clock, const void 
 	ic->rom = memory_region(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag);
 	ic->rom_size = memory_region_length(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag) - 1;
 
-	k053260_reset( ic );
+	SND_RESET_NAME( k053260 )( ic );
 
 	for ( i = 0; i < 0x30; i++ )
 		ic->regs[i] = 0;
@@ -390,7 +390,7 @@ static UINT8 k053260_read( int chip, offs_t offset )
 				ic->channels[0].pos += ( 1 << 16 );
 
 				if ( offs > ic->rom_size ) {
-					logerror("%06x: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n",activecpu_get_pc(),offs,ic->rom_size );
+					logerror("%06x: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n",cpu_get_pc(Machine->activecpu),offs,ic->rom_size );
 
 					return 0;
 				}
@@ -429,23 +429,23 @@ WRITE8_HANDLER( k053260_1_w )
 WRITE16_HANDLER( k053260_0_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k053260_0_w (machine, offset, data & 0xff);
+		k053260_0_w (space, offset, data & 0xff);
 }
 
 READ16_HANDLER( k053260_0_lsb_r )
 {
-	return k053260_0_r(machine, offset);
+	return k053260_0_r(space, offset);
 }
 
 WRITE16_HANDLER( k053260_1_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k053260_1_w (machine, offset, data & 0xff);
+		k053260_1_w (space, offset, data & 0xff);
 }
 
 READ16_HANDLER( k053260_1_lsb_r )
 {
-	return k053260_1_r(machine, offset);
+	return k053260_1_r(space, offset);
 }
 
 
@@ -455,7 +455,7 @@ READ16_HANDLER( k053260_1_lsb_r )
  * Generic get_info
  **************************************************************************/
 
-static void k053260_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( k053260 )
 {
 	switch (state)
 	{
@@ -464,17 +464,17 @@ static void k053260_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void k053260_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( k053260 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = k053260_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = k053260_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k053260 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k053260 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							/* nothing */							break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( k053260);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "K053260";					break;

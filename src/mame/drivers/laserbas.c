@@ -72,7 +72,7 @@ static READ8_HANDLER( read_unk )
 
 static WRITE8_HANDLER(palette_w)
 {
-	palette_set_color_rgb(machine,offset,pal3bit(data>>5),pal3bit(data>>2),pal2bit(data));
+	palette_set_color_rgb(space->machine,offset,pal3bit(data>>5),pal3bit(data>>2),pal2bit(data));
 }
 
 static WRITE8_HANDLER(vrambank_w)
@@ -121,10 +121,10 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( laserbas_interrupt )
 {
-	if(video_screen_get_vblank(machine->primary_screen))
-		 cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if(video_screen_get_vblank(device->machine->primary_screen))
+		 cpu_set_input_line(device, 0, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( laserbas )

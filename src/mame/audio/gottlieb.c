@@ -43,7 +43,7 @@ static int random_offset;
 
 
 static void gottlieb1_sh_w(const device_config *riot, UINT8 data);
-static void gottlieb2_sh_w(running_machine *machine, UINT8 data);
+static void gottlieb2_sh_w(const address_space *space, UINT8 data);
 static void trigger_sample(running_machine *machine, UINT8 data);
 
 
@@ -56,13 +56,13 @@ static void trigger_sample(running_machine *machine, UINT8 data);
 
 WRITE8_HANDLER( gottlieb_sh_w )
 {
-	const device_config *riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
+	const device_config *riot = device_list_find_by_tag(space->machine->config->devicelist, RIOT6532, "riot");
 
 	/* identify rev1 boards by the presence of a 6532 RIOT device */
 	if (riot != NULL)
 		gottlieb1_sh_w(riot, data);
 	else
-		gottlieb2_sh_w(machine, data);
+		gottlieb2_sh_w(space, data);
 }
 
 
@@ -96,7 +96,7 @@ static void gottlieb1_sh_w(const device_config *riot, UINT8 data)
 
 static void snd_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, M6502_IRQ_LINE, state);
+	cpu_set_input_line(device->machine->cpu[1], M6502_IRQ_LINE, state);
 }
 
 
@@ -109,7 +109,7 @@ static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
 static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
 	/* unsure if this is ever used, but the NMI is connected to the RIOT's PB7 */
-	cpunum_set_input_line(device->machine, 1, INPUT_LINE_NMI, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -221,7 +221,7 @@ void gottlieb_knocker(void)
 /* callback for the timer */
 static TIMER_CALLBACK( gottlieb_nmi_generate )
 {
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -373,20 +373,20 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void gottlieb2_sh_w(running_machine *machine, UINT8 data)
+static void gottlieb2_sh_w(const address_space *space, UINT8 data)
 {
 	/* when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested */
 	if (data != 0xff)
 	{
 		/* each CPU has its own latch */
-		soundlatch_w(machine, 0, data);
-		soundlatch2_w(machine, 0, data);
+		soundlatch_w(space, 0, data);
+		soundlatch2_w(space, 0, data);
 
 		/* if the previous data was 0xff, clock an IRQ on each */
 		if (last_command == 0xff)
 		{
-			cputag_set_input_line(machine, "audio", M6502_IRQ_LINE, ASSERT_LINE);
-			cputag_set_input_line(machine, "speech", M6502_IRQ_LINE, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "audio", M6502_IRQ_LINE, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "speech", M6502_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	last_command = data;
@@ -395,22 +395,22 @@ static void gottlieb2_sh_w(running_machine *machine, UINT8 data)
 
 static READ8_HANDLER( speech_data_r )
 {
-	cputag_set_input_line(machine, "speech", M6502_IRQ_LINE, CLEAR_LINE);
-	return soundlatch_r(machine, offset);
+	cputag_set_input_line(space->machine, "speech", M6502_IRQ_LINE, CLEAR_LINE);
+	return soundlatch_r(space, offset);
 }
 
 
 static READ8_HANDLER( audio_data_r )
 {
-	cputag_set_input_line(machine, "audio", M6502_IRQ_LINE, CLEAR_LINE);
-	return soundlatch2_r(machine, offset);
+	cputag_set_input_line(space->machine, "audio", M6502_IRQ_LINE, CLEAR_LINE);
+	return soundlatch2_r(space, offset);
 }
 
 
 static WRITE8_HANDLER( signal_audio_nmi_w )
 {
-	cputag_set_input_line(machine, "audio", INPUT_LINE_NMI, ASSERT_LINE);
-	cputag_set_input_line(machine, "audio", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -499,7 +499,7 @@ static WRITE8_HANDLER( speech_control_w )
 	speech_control = data;
 
 	/* bit 0 enables/disables the NMI line */
-	nmi_state_update(machine);
+	nmi_state_update(space->machine);
 
 	/* bit 1 controls a LED on the sound board */
 
@@ -511,17 +511,17 @@ static WRITE8_HANDLER( speech_control_w )
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				ay8910_control_port_0_w(machine, 0, *psg_latch);
+				ay8910_control_port_0_w(space, 0, *psg_latch);
 			else
-				ay8910_write_port_0_w(machine, 0, *psg_latch);
+				ay8910_write_port_0_w(space, 0, *psg_latch);
 		}
 		else
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				ay8910_control_port_1_w(machine, 0, *psg_latch);
+				ay8910_control_port_1_w(space, 0, *psg_latch);
 			else
-				ay8910_write_port_1_w(machine, 0, *psg_latch);
+				ay8910_write_port_1_w(space, 0, *psg_latch);
 		}
 	}
 
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( speech_control_w )
 
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
-		sp0250_w(machine, 0, *sp0250_latch);
+		sp0250_w(space, 0, *sp0250_latch);
 
 	/* bit 7 goes to the speech chip RESET pin */
 	if ((previous ^ data) & 0x80)

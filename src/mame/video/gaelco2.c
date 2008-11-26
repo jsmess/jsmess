@@ -241,7 +241,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 	b = pal5bit(b);
 
 	/* update game palette */
-	palette_set_color(machine, 4096*0 + offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, 4096*0 + offset, MAKE_RGB(r, g, b));
 
 	/* update shadow/highligh palettes */
 	for (i = 1; i < 16; i++){
@@ -253,7 +253,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 		auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
 		auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
 
-		palette_set_color(machine, 4096*i + offset, MAKE_RGB(auxr, auxg, auxb));
+		palette_set_color(space->machine, 4096*i + offset, MAKE_RGB(auxr, auxg, auxb));
 	}
 }
 
@@ -509,6 +509,8 @@ VIDEO_UPDATE( gaelco2_dual )
 
 VIDEO_EOF( gaelco2 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* sprites are one frame ahead */
-	buffer_spriteram16_w(machine, 0, 0, 0xffff);
+	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

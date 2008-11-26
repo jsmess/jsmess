@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 
@@ -21,9 +22,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -71,12 +72,12 @@ static void psx_irq_update( running_machine *machine )
 	if( ( m_n_irqdata & m_n_irqmask ) != 0 )
 	{
 		verboselog( 2, "psx irq assert\n" );
-		cpunum_set_input_line(machine, 0, MIPS_IRQ0, ASSERT_LINE );
+		cpu_set_input_line(machine->cpu[0], PSXCPU_IRQ0, ASSERT_LINE );
 	}
 	else
 	{
 		verboselog( 2, "psx irq clear\n" );
-		cpunum_set_input_line(machine, 0, MIPS_IRQ0, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[0], PSXCPU_IRQ0, CLEAR_LINE );
 	}
 }
 
@@ -87,7 +88,7 @@ WRITE32_HANDLER( psx_irq_w )
 	case 0x00:
 		verboselog( 2, "psx irq data ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqdata, ( m_n_irqdata & ~mem_mask ) | ( m_n_irqdata & m_n_irqmask & data ) );
 		m_n_irqdata = ( m_n_irqdata & ~mem_mask ) | ( m_n_irqdata & m_n_irqmask & data );
-		psx_irq_update(machine);
+		psx_irq_update(space->machine);
 		break;
 	case 0x01:
 		verboselog( 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqmask, ( m_n_irqmask & ~mem_mask ) | data );
@@ -96,7 +97,7 @@ WRITE32_HANDLER( psx_irq_w )
 		{
 			verboselog( 0, "psx_irq_w( %08x, %08x, %08x ) unknown irq\n", offset, data, mem_mask );
 		}
-		psx_irq_update(machine);
+		psx_irq_update(space->machine);
 		break;
 	default:
 		verboselog( 0, "psx_irq_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
@@ -314,7 +315,7 @@ WRITE32_HANDLER( psx_dma_w )
 				{
 					verboselog( 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_read[ n_channel ]( n_address, n_size );
-					dma_finished( machine, n_channel );
+					dma_finished( space->machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000200 &&
 					m_p_fn_dma_read[ n_channel ] != NULL )
@@ -327,7 +328,7 @@ WRITE32_HANDLER( psx_dma_w )
 					}
 					else
 					{
-						dma_finished( machine, n_channel );
+						dma_finished( space->machine, n_channel );
 					}
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000201 &&
@@ -335,7 +336,7 @@ WRITE32_HANDLER( psx_dma_w )
 				{
 					verboselog( 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
-					dma_finished( machine, n_channel );
+					dma_finished( space->machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11050100 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
@@ -343,7 +344,7 @@ WRITE32_HANDLER( psx_dma_w )
 					/* todo: check this is a write not a read... */
 					verboselog( 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
-					dma_finished( machine, n_channel );
+					dma_finished( space->machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11150100 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
@@ -351,7 +352,7 @@ WRITE32_HANDLER( psx_dma_w )
 					/* todo: check this is a write not a read... */
 					verboselog( 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
-					dma_finished( machine, n_channel );
+					dma_finished( space->machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000401 &&
 					n_channel == 2 &&
@@ -360,7 +361,7 @@ WRITE32_HANDLER( psx_dma_w )
 					verboselog( 1, "dma %d write linked list %08x\n",
 						n_channel, m_p_n_dmabase[ n_channel ] );
 
-					dma_finished( machine, n_channel );
+					dma_finished( space->machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11000002 &&
 					n_channel == 6 )
@@ -417,7 +418,7 @@ WRITE32_HANDLER( psx_dma_w )
             }
 */
 			verboselog( 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, m_n_dicr );
-			dma_interrupt_update(machine);
+			dma_interrupt_update(space->machine);
 			break;
 		default:
 			verboselog( 0, "psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", offset, data, mem_mask );
@@ -486,7 +487,7 @@ static UINT64 m_p_n_root_start[ 3 ];
 static UINT64 psxcpu_gettotalcycles( void )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpunum_gettotalcycles(0) * 2;
+	return cpu_get_total_cycles(Machine->cpu[0]) * 2;
 }
 
 static int root_divider( int n_counter )

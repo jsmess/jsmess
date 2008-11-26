@@ -18,7 +18,7 @@
 // to change if a different ROM set ever surfaces.
 static READ8_HANDLER( fastfred_custom_io_r )
 {
-    switch (activecpu_get_pc())
+    switch (cpu_get_pc(space->cpu))
     {
     case 0x03c0: return 0x9d;
     case 0x03e6: return 0x9f;
@@ -44,14 +44,14 @@ static READ8_HANDLER( fastfred_custom_io_r )
     case 0x7b58: return 0x20;
     }
 
-    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, activecpu_get_pc());
+    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(space->cpu));
     return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom1_io_r )
 {
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(space->cpu))
 	{
 	 case 0x049d: return 0xad;	/* compare */
 	 case 0x04b9:			/* compare with 0x9e ??? When ??? */
@@ -72,14 +72,14 @@ static READ8_HANDLER( flyboy_custom1_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, activecpu_get_pc());
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(space->cpu));
 	return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom2_io_r )
 {
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(space->cpu))
 	{
 	 case 0x0395: return 0xf7;	/* $C900 compare         */
 	 case 0x03f5:			/* $c8fd                 */
@@ -97,7 +97,7 @@ static READ8_HANDLER( flyboy_custom2_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, activecpu_get_pc());
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(space->cpu));
 	return 0x00;
 }
 
@@ -119,7 +119,7 @@ static UINT8 imago_sprites_bank = 0;
 
 static WRITE8_HANDLER( imago_dma_irq_w )
 {
-	cpunum_set_input_line(machine, 0, 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( imago_sprites_bank_w )
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( imago_sprites_bank_w )
 
 static WRITE8_HANDLER( imago_sprites_dma_w )
 {
-	UINT8 *rom = (UINT8 *)memory_region(machine, "gfx2");
+	UINT8 *rom = (UINT8 *)memory_region(space->machine, "gfx2");
 	UINT8 sprites_data;
 
 	sprites_data = rom[imago_sprites_address + 0x2000*0 + imago_sprites_bank * 0x1000];
@@ -141,7 +141,7 @@ static WRITE8_HANDLER( imago_sprites_dma_w )
 	sprites_data = rom[imago_sprites_address + 0x2000*2 + imago_sprites_bank * 0x1000];
 	imago_sprites[offset + 0x800*2] = sprites_data;
 
-	decodechar(machine->gfx[1], offset/32, imago_sprites);
+	decodechar(space->machine->gfx[1], offset/32, imago_sprites);
 }
 
 static READ8_HANDLER( imago_sprites_offset_r )
@@ -948,8 +948,8 @@ ROM_END
 
 static DRIVER_INIT( flyboy )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
 	fastfred_hardware_type = 1;
 }
 
@@ -960,19 +960,19 @@ static DRIVER_INIT( flyboyb )
 
 static DRIVER_INIT( fastfred )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, SMH_NOP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84 )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 2;
 }
 

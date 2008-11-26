@@ -149,7 +149,7 @@ static READ8_HANDLER( custom_cpu_r )
 		case 3:
 		case 4:
 		case 5:
-			return input_port_read(machine, comnames[offset]);
+			return input_port_read(space->machine, comnames[offset]);
 
 		/* busy flag; this is polled to check the custom CPU's readiness */
 		/* we just toggle it on and off until the main CPU gets the result */
@@ -165,7 +165,7 @@ static READ8_HANDLER( custom_cpu_r )
 
 		/* error cases */
 		default:
-			logerror("Input Port %04X read.  PC=%04X\n", offset+0xd7f0, activecpu_get_pc());
+			logerror("Input Port %04X read.  PC=%04X\n", offset+0xd7f0, cpu_get_pc(space->cpu));
 	}
 	return 0;
 }
@@ -436,8 +436,8 @@ ROM_END
 
 static DRIVER_INIT( arabian )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd34b, 0xd34b, 0, 0, custom_flip_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd400, 0xd401, 0, 0, custom_cocktail_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd34b, 0xd34b, 0, 0, custom_flip_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd400, 0xd401, 0, 0, custom_cocktail_w);
 }
 
 

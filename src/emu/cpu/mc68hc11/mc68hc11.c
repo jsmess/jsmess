@@ -5,7 +5,6 @@
  */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "mc68hc11.h"
 
 enum
@@ -54,6 +53,8 @@ typedef struct
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	int icount;
 	int ram_position;
 	int reg_position;
@@ -75,7 +76,7 @@ static UINT8 hc11_regs_r(UINT32 address)
 	switch(reg)
 	{
 		case 0x00:		/* PORTA */
-			return io_read_byte(MC68HC11_IO_PORTA);
+			return memory_read_byte(hc11.io, MC68HC11_IO_PORTA);
 		case 0x01:		/* DDRA */
 			return 0;
 		case 0x09:		/* DDRD */
@@ -88,44 +89,44 @@ static UINT8 hc11_regs_r(UINT32 address)
 		{
 			if (hc11.adctl & 0x10)
 			{
-				return io_read_byte((hc11.adctl & 0x4) + MC68HC11_IO_AD0);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x4) + MC68HC11_IO_AD0);
 			}
 			else
 			{
-				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x32:		/* ADR2 */
 		{
 			if (hc11.adctl & 0x10)
 			{
-				return io_read_byte((hc11.adctl & 0x4) + MC68HC11_IO_AD1);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x4) + MC68HC11_IO_AD1);
 			}
 			else
 			{
-				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x33:		/* ADR3 */
 		{
 			if (hc11.adctl & 0x10)
 			{
-				return io_read_byte((hc11.adctl & 0x4) + MC68HC11_IO_AD2);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x4) + MC68HC11_IO_AD2);
 			}
 			else
 			{
-				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x34:		/* ADR4 */
 		{
 			if (hc11.adctl & 0x10)
 			{
-				return io_read_byte((hc11.adctl & 0x4) + MC68HC11_IO_AD3);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x4) + MC68HC11_IO_AD3);
 			}
 			else
 			{
-				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
+				return memory_read_byte(hc11.io, (hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x38:		/* OPT2 */
@@ -141,9 +142,9 @@ static UINT8 hc11_regs_r(UINT32 address)
 		case 0x74:		/* SCSR1 */
 			return 0x40;
 		case 0x7c:		/* PORTH */
-			return io_read_byte(MC68HC11_IO_PORTH);
+			return memory_read_byte(hc11.io, MC68HC11_IO_PORTH);
 		case 0x7e:		/* PORTG */
-			return io_read_byte(MC68HC11_IO_PORTG);
+			return memory_read_byte(hc11.io, MC68HC11_IO_PORTG);
 		case 0x7f:		/* DDRG */
 			return 0;
 
@@ -152,7 +153,7 @@ static UINT8 hc11_regs_r(UINT32 address)
 		case 0x89:		/* SPSR2 */
 			return 0x80;
 		case 0x8a:		/* SPDR2 */
-			return io_read_byte(MC68HC11_IO_SPI2_DATA);
+			return memory_read_byte(hc11.io, MC68HC11_IO_SPI2_DATA);
 
 		case 0x8b:		/* OPT4 */
 			return 0;
@@ -169,13 +170,13 @@ static void hc11_regs_w(UINT32 address, UINT8 value)
 	switch(reg)
 	{
 		case 0x00:		/* PORTA */
-			io_write_byte(MC68HC11_IO_PORTA, value);
+			memory_write_byte(hc11.io, MC68HC11_IO_PORTA, value);
 			return;
 		case 0x01:		/* DDRA */
 			//mame_printf_debug("HC11: ddra = %02X\n", value);
 			return;
 		case 0x08:		/* PORTD */
-			io_write_byte(MC68HC11_IO_PORTD, value);
+			memory_write_byte(hc11.io, MC68HC11_IO_PORTD, value);
 			return;
 		case 0x09:		/* DDRD */
 			//mame_printf_debug("HC11: ddrd = %02X\n", value);
@@ -223,13 +224,13 @@ static void hc11_regs_w(UINT32 address, UINT8 value)
 		case 0x77:		/* SCDRL */
 			return;
 		case 0x7c:		/* PORTH */
-			io_write_byte(MC68HC11_IO_PORTH, value);
+			memory_write_byte(hc11.io, MC68HC11_IO_PORTH, value);
 			return;
 		case 0x7d:		/* DDRH */
 			//mame_printf_debug("HC11: ddrh = %02X at %04X\n", value, hc11.pc);
 			return;
 		case 0x7e:		/* PORTG */
-			io_write_byte(MC68HC11_IO_PORTG, value);
+			memory_write_byte(hc11.io, MC68HC11_IO_PORTG, value);
 			return;
 		case 0x7f:		/* DDRG */
 			//mame_printf_debug("HC11: ddrg = %02X at %04X\n", value, hc11.pc);
@@ -240,7 +241,7 @@ static void hc11_regs_w(UINT32 address, UINT8 value)
 		case 0x89:		/* SPSR2 */
 			return;
 		case 0x8a:		/* SPDR2 */
-			io_write_byte(MC68HC11_IO_SPI2_DATA, value);
+			memory_write_byte(hc11.io, MC68HC11_IO_SPI2_DATA, value);
 			return;
 
 		case 0x8b:		/* OPT4 */
@@ -254,13 +255,13 @@ static void hc11_regs_w(UINT32 address, UINT8 value)
 
 INLINE UINT8 FETCH(void)
 {
-	return cpu_readop(hc11.pc++);
+	return memory_decrypted_read_byte(hc11.program, hc11.pc++);
 }
 
 INLINE UINT16 FETCH16(void)
 {
 	UINT16 w;
-	w = (cpu_readop(hc11.pc) << 8) | (cpu_readop(hc11.pc+1));
+	w = (memory_decrypted_read_byte(hc11.program, hc11.pc) << 8) | (memory_decrypted_read_byte(hc11.program, hc11.pc+1));
 	hc11.pc += 2;
 	return w;
 }
@@ -275,7 +276,7 @@ INLINE UINT8 READ8(UINT32 address)
 	{
 		return internal_ram[address-hc11.ram_position];
 	}
-	return program_read_byte(address);
+	return memory_read_byte(hc11.program, address);
 }
 
 INLINE void WRITE8(UINT32 address, UINT8 value)
@@ -290,7 +291,7 @@ INLINE void WRITE8(UINT32 address, UINT8 value)
 		internal_ram[address-hc11.ram_position] = value;
 		return;
 	}
-	program_write_byte(address, value);
+	memory_write_byte(hc11.program, address, value);
 }
 
 INLINE UINT16 READ16(UINT32 address)
@@ -352,6 +353,8 @@ static CPU_INIT( hc11 )
 	hc11.ram_position = 0x100;
 	hc11.irq_callback = irqcallback;
 	hc11.device = device;
+	hc11.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	hc11.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_RESET( hc11 )
@@ -376,7 +379,6 @@ static CPU_SET_CONTEXT( hc11 )
 	if (src) {
 		hc11 = *(HC11_REGS*)src;
 	}
-	change_pc(hc11.pc);
 }
 
 static CPU_EXECUTE( hc11 )
@@ -388,7 +390,7 @@ static CPU_EXECUTE( hc11 )
 		UINT8 op;
 
 		hc11.ppc = hc11.pc;
-		debugger_instruction_hook(Machine, hc11.pc);
+		debugger_instruction_hook(device, hc11.pc);
 
 		op = FETCH();
 		hc11_optable[op]();
@@ -405,7 +407,7 @@ static CPU_SET_INFO( mc68hc11 )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:							hc11.pc = info->i;						break;
-		case CPUINFO_INT_REGISTER + HC11_PC:			hc11.pc = info->i; change_pc(hc11.pc);	break;
+		case CPUINFO_INT_REGISTER + HC11_PC:			hc11.pc = info->i; 						break;
 		case CPUINFO_INT_REGISTER + HC11_SP:			hc11.sp = info->i;						break;
 		case CPUINFO_INT_REGISTER + HC11_A:				hc11.d.d8.a = info->i;					break;
 		case CPUINFO_INT_REGISTER + HC11_B:				hc11.d.d8.b = info->i;					break;

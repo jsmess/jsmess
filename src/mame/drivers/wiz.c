@@ -192,19 +192,19 @@ static WRITE8_HANDLER( sound_command_w )
 	{
 		// 0x90 triggers a jump to non-existant address(development system?) and must be filtered
 		case 0x00:
-			if (data != 0x90) soundlatch_w(machine, 0, data);
+			if (data != 0x90) soundlatch_w(space, 0, data);
 		break;
 
 		// explosion sound trigger(analog?)
 		case 0x08:
-			discrete_sound_w(machine, STINGER_BOOM_EN1, dsc1);
-			discrete_sound_w(machine, STINGER_BOOM_EN2, dsc1^=1);
+			discrete_sound_w(space, STINGER_BOOM_EN1, dsc1);
+			discrete_sound_w(space, STINGER_BOOM_EN2, dsc1^=1);
 		break;
 
 		// player shot sound trigger(analog?)
 		case 0x0a:
-			discrete_sound_w(machine, STINGER_SHOT_EN1, dsc0);
-			discrete_sound_w(machine, STINGER_SHOT_EN2, dsc0^=1);
+			discrete_sound_w(space, STINGER_SHOT_EN1, dsc0);
+			discrete_sound_w(space, STINGER_SHOT_EN2, dsc0^=1);
 		break;
 	}
 }
@@ -1037,13 +1037,14 @@ static DRIVER_INIT( stinger )
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	int size = memory_region_length(machine, "main");
 	UINT8 *decrypt = auto_malloc(size);
 	int A;
 	const UINT8 *tbl;
 
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
 	for (A = 0x0000;A < 0x10000;A++)
 	{
@@ -1073,13 +1074,13 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4001, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0, SMH_NOP);
 }
 
 
 static DRIVER_INIT( wiz )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd400, 0xd400, 0, 0, wiz_protection_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
 }
 
 

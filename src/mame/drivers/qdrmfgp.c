@@ -126,8 +126,8 @@ static WRITE16_HANDLER( gp2_control_w )
 
 static READ16_HANDLER( v_rom_r )
 {
-	UINT8 *mem8 = memory_region(machine, "gfx1");
-	int bank = K056832_word_r(machine, 0x34/2, 0xffff);
+	UINT8 *mem8 = memory_region(space->machine, "gfx1");
+	int bank = K056832_word_r(space, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
 
@@ -141,33 +141,33 @@ static READ16_HANDLER( v_rom_r )
 static READ16_HANDLER( gp2_vram_r )
 {
 	if (offset < 0x1000/2)
-		return K056832_ram_word_r(machine, offset*2+1, mem_mask);
+		return K056832_ram_word_r(space, offset*2+1, mem_mask);
 	else
-		return K056832_ram_word_r(machine, (offset-0x1000/2)*2, mem_mask);
+		return K056832_ram_word_r(space, (offset-0x1000/2)*2, mem_mask);
 }
 
 static READ16_HANDLER( gp2_vram_mirror_r )
 {
 	if (offset < 0x1000/2)
-		return K056832_ram_word_r(machine, offset*2, mem_mask);
+		return K056832_ram_word_r(space, offset*2, mem_mask);
 	else
-		return K056832_ram_word_r(machine, (offset-0x1000/2)*2+1, mem_mask);
+		return K056832_ram_word_r(space, (offset-0x1000/2)*2+1, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_w )
 {
 	if (offset < 0x1000/2)
-		K056832_ram_word_w(machine, offset*2+1, data, mem_mask);
+		K056832_ram_word_w(space, offset*2+1, data, mem_mask);
 	else
-		K056832_ram_word_w(machine, (offset-0x1000/2)*2, data, mem_mask);
+		K056832_ram_word_w(space, (offset-0x1000/2)*2, data, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_mirror_w )
 {
 	if (offset < 0x1000/2)
-		K056832_ram_word_w(machine, offset*2, data, mem_mask);
+		K056832_ram_word_w(space, offset*2, data, mem_mask);
 	else
-		K056832_ram_word_w(machine, (offset-0x1000/2)*2+1, data, mem_mask);
+		K056832_ram_word_w(space, (offset-0x1000/2)*2+1, data, mem_mask);
 }
 
 
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( sndram_w )
 static READ16_HANDLER( k054539_word_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return k054539_0_r(machine, offset);
+		return k054539_0_r(space, offset);
 
 	return 0;
 }
@@ -202,7 +202,7 @@ static READ16_HANDLER( k054539_word_r )
 static WRITE16_HANDLER( k054539_word_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_0_w(machine, offset, data);
+		k054539_0_w(space, offset, data);
 }
 
 /*************/
@@ -247,10 +247,10 @@ static READ16_DEVICE_HANDLER( gp2_ide_std_r )
 	{
 		if (offset == 0x07)
 		{
-			switch (activecpu_get_previouspc())
+			switch (cpu_get_previouspc(device->machine->activecpu))
 			{
 				case 0xdb4c:
-					if ((workram[0x5fa4/2] - activecpu_get_reg(M68K_D0)) <= 0x10)
+					if ((workram[0x5fa4/2] - cpu_get_reg(device->machine->activecpu, M68K_D0)) <= 0x10)
 						gp2_irq_control = 1;
 					break;
 				case 0xdec2:
@@ -274,17 +274,17 @@ static READ16_DEVICE_HANDLER( gp2_ide_std_r )
 
 static INTERRUPT_GEN(qdrmfgp_interrupt)
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 			if (control & 0x0001)
-				cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+				cpu_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 1:
 			/* trigger V-blank interrupt */
 			if (control & 0x0004)
-				cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+				cpu_set_input_line(device, 3, HOLD_LINE);
 			break;
 	}
 }
@@ -294,9 +294,9 @@ static void ide_interrupt(const device_config *device, int state)
 	if (control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
-			cpunum_set_input_line(device->machine, 0, 4, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[0], 4, HOLD_LINE);
 		else
-			cpunum_set_input_line(device->machine, 0, 4, CLEAR_LINE);
+			cpu_set_input_line(device->machine->cpu[0], 4, CLEAR_LINE);
 	}
 }
 
@@ -305,14 +305,14 @@ static void ide_interrupt(const device_config *device, int state)
 static TIMER_CALLBACK( gp2_timer_callback )
 {
 	if (control & 0x0004)
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
 {
 	/* trigger V-blank interrupt */
 	if (control & 0x0008)
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(const device_config *device, int state)
@@ -324,9 +324,9 @@ static void gp2_ide_interrupt(const device_config *device, int state)
 			if (gp2_irq_control)
 				gp2_irq_control = 0;
 			else
-				cpunum_set_input_line(device->machine, 0, 5, HOLD_LINE);
+				cpu_set_input_line(device->machine->cpu[0], 5, HOLD_LINE);
 		} else {
-			cpunum_set_input_line(device->machine, 0, 5, CLEAR_LINE);
+			cpu_set_input_line(device->machine->cpu[0], 5, CLEAR_LINE);
 		}
 	}
 }
@@ -601,7 +601,7 @@ INPUT_PORTS_END
 static void sound_irq(running_machine *machine)
 {
 	if (control & 0x0001)
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, HOLD_LINE);
 }
 
 static const k054539_interface k054539_config =

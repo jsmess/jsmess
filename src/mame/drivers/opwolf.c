@@ -149,13 +149,13 @@ static WRITE16_HANDLER( cchip_w )
 static READ16_HANDLER( opwolf_in_r )
 {
 	static const char *const inname[2] = { "IN0", "IN1" };
-	return input_port_read(machine, inname[offset]);
+	return input_port_read(space->machine, inname[offset]);
 }
 
 static READ16_HANDLER( opwolf_dsw_r )
 {
 	static const char *const dswname[2] = { "DSWA", "DSWB" };
-	return input_port_read(machine, dswname[offset]);
+	return input_port_read(space->machine, dswname[offset]);
 }
 
 static READ16_HANDLER( opwolf_lightgun_r )
@@ -165,10 +165,10 @@ static READ16_HANDLER( opwolf_lightgun_r )
 	switch (offset)
 	{
 		case 0x00:	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
-			scaled=(input_port_read(machine, P1X_PORT_TAG) * 320 ) / 256;
+			scaled=(input_port_read(space->machine, P1X_PORT_TAG) * 320 ) / 256;
 			return (scaled + 0x15 + opwolf_gun_xoffs);
 		case 0x01:	/* P1Y */
-			return (input_port_read(machine, P1Y_PORT_TAG) - 0x24 + opwolf_gun_yoffs);
+			return (input_port_read(space->machine, P1Y_PORT_TAG) - 0x24 + opwolf_gun_yoffs);
 	}
 
 	return 0xff;
@@ -176,12 +176,12 @@ static READ16_HANDLER( opwolf_lightgun_r )
 
 static READ8_HANDLER( z80_input1_r )
 {
-	return input_port_read(machine, "IN0");	/* irrelevant mirror ? */
+	return input_port_read(space->machine, "IN0");	/* irrelevant mirror ? */
 }
 
 static READ8_HANDLER( z80_input2_r )
 {
-	return input_port_read(machine, "IN0");	/* needed for coins */
+	return input_port_read(space->machine, "IN0");	/* needed for coins */
 }
 
 
@@ -191,7 +191,7 @@ static READ8_HANDLER( z80_input2_r )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(10, (data-1) & 0x03);
+	memory_set_bank(space->machine, 10, (data-1) & 0x03);
 }
 
 /***********************************************************
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( opwolf_adpcm_b_w )
 		msm5205_reset_w(0, 0);
 	}
 
-//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,activecpu_get_pc() );
+//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(space->cpu) );
 }
 
 
@@ -381,18 +381,18 @@ static WRITE8_HANDLER( opwolf_adpcm_c_w )
 		msm5205_reset_w(1, 0);
 	}
 
-//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,activecpu_get_pc() );
+//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(space->cpu) );
 }
 
 
 static WRITE8_HANDLER( opwolf_adpcm_d_w )
 {
-//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,activecpu_get_pc() );
+//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(space->cpu) );
 }
 
 static WRITE8_HANDLER( opwolf_adpcm_e_w )
 {
-//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,activecpu_get_pc() );
+//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(space->cpu) );
 }
 
 
@@ -550,7 +550,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -805,7 +805,7 @@ static DRIVER_INIT( opwolf )
 	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 
@@ -819,7 +819,7 @@ static DRIVER_INIT( opwolfb )
 	opwolf_gun_xoffs = -2;
 	opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 

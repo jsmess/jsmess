@@ -47,7 +47,7 @@ static const int scramble_timer[10] =
 
 READ8_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(activecpu_gettotalcycles()/512) % 10];
+	return scramble_timer[(cpu_get_total_cycles(space->cpu)/512) % 10];
 }
 
 
@@ -76,7 +76,7 @@ static const int frogger_timer[10] =
 
 READ8_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(activecpu_gettotalcycles()/512) % 10];
+	return frogger_timer[(cpu_get_total_cycles(space->cpu)/512) % 10];
 }
 
 
@@ -145,25 +145,25 @@ static void scramble_sh_7474_callback(void)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpunum_set_input_line(Machine, 1, 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[1], 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void sfx_sh_7474_callback(void)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpunum_set_input_line(Machine, 2, 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[2], 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( hotshock_soundlatch_r )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
-	return soundlatch_r(machine,0);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	return soundlatch_r(space,0);
 }
 
 static void filter_w(int chip, int channel, int data)
@@ -211,7 +211,7 @@ static const struct TTL7474_interface sfx_sh_7474_intf =
 
 void scramble_sh_init(void)
 {
-	cpunum_set_irq_callback(1, scramble_sh_irq_callback);
+	cpu_set_irq_callback(Machine->cpu[1], scramble_sh_irq_callback);
 
 	TTL7474_config(2, &scramble_sh_7474_intf);
 
@@ -221,7 +221,7 @@ void scramble_sh_init(void)
 
 void sfx_sh_init(void)
 {
-	cpunum_set_irq_callback(2, sfx_sh_irq_callback);
+	cpu_set_irq_callback(Machine->cpu[2], sfx_sh_irq_callback);
 
 	TTL7474_config(3, &sfx_sh_7474_intf);
 
@@ -301,6 +301,8 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* only 16 bytes needed ... The original dump is bad. This
      * is what is needed to get speech to work. The prom data has
      * been updated and marked as BAD_DUMP. The information below
@@ -327,8 +329,8 @@ static TIMER_CALLBACK( ad2083_step )
 	if (ctrl & 0x40)
 		speech_rom_address = 0;
 
-	tms5110_ctl_w(machine, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
-	tms5110_pdc_w(machine, 0, ctrl & 0x02 ? 0 : 1);
+	tms5110_ctl_w(space, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
+	tms5110_pdc_w(space, 0, ctrl & 0x02 ? 0 : 1);
 
 	if (!(ctrl & 0x80))
 		timer_set(ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);

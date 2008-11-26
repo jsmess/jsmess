@@ -232,6 +232,8 @@ static struct
 	int offset1;
 } kbdc8042;
 
+static int poll_delay;
+
 static void at_8042_check_keyboard(void);
 
 
@@ -266,6 +268,7 @@ static TIMER_CALLBACK( kbdc8042_time )
 
 void kbdc8042_init(const struct kbdc8042_interface *intf)
 {
+	poll_delay = 10;
 	memset(&kbdc8042, 0, sizeof(kbdc8042));
 	kbdc8042.type = intf->type;
 	kbdc8042.set_gate_a20 = intf->set_gate_a20;
@@ -347,7 +350,6 @@ static void at_8042_clear_keyboard_received(void)
 
 READ8_HANDLER(kbdc8042_8_r)
 {
-	static int poll_delay = 10;
 	UINT8 data = 0;
 
 	switch (offset) {
@@ -386,7 +388,7 @@ READ8_HANDLER(kbdc8042_8_r)
 		break;
 
 	case 2:
-		if (kbdc8042.get_out2(machine))
+		if (kbdc8042.get_out2(space->machine))
 			data |= 0x20;
 		else
 			data &= ~0x20;
@@ -514,7 +516,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			at_8042_receive(PS2_MOUSE_ON ? 0x00 : 0xff);
 			break;
 		case 0xaa:	/* selftest */
-			if (machine->config->cpu[0].type == CPU_I486)
+			if (space->machine->config->cpu[0].type == CPU_I486)
 				timer_set(ATTOTIME_IN_MSEC(10), NULL, 0x55, at_8042_receive_timer); /* HACK */
 			else
 				at_8042_receive(0x55);
@@ -592,7 +594,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
              * the bits low set in the command byte.  The only pulse that has
              * an effect currently is bit 0, which pulses the CPU's reset line
              */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 			at_8042_set_outport(kbdc8042.outport | 0x02, 0);
 			break;
 		}
@@ -605,26 +607,26 @@ WRITE8_HANDLER(kbdc8042_8_w)
 
 READ32_HANDLER( kbdc8042_32le_r )
 {
-	return read32le_with_read8_handler(kbdc8042_8_r, machine, offset, mem_mask);
+	return read32le_with_read8_handler(kbdc8042_8_r, space, offset, mem_mask);
 }
 
 
 
 WRITE32_HANDLER( kbdc8042_32le_w )
 {
-	write32le_with_write8_handler(kbdc8042_8_w, machine, offset, data, mem_mask);
+	write32le_with_write8_handler(kbdc8042_8_w, space, offset, data, mem_mask);
 }
 
 
 
 READ64_HANDLER( kbdc8042_64be_r )
 {
-	return read64be_with_read8_handler(kbdc8042_8_r, machine, offset, mem_mask);
+	return read64be_with_read8_handler(kbdc8042_8_r, space, offset, mem_mask);
 }
 
 
 
 WRITE64_HANDLER( kbdc8042_64be_w )
 {
-	write64be_with_write8_handler(kbdc8042_8_w, machine, offset, data, mem_mask);
+	write64be_with_write8_handler(kbdc8042_8_w, space, offset, data, mem_mask);
 }

@@ -21,7 +21,7 @@
 
 static CDP1802_MODE_READ( cidelsa_mode_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data;
 
 	return state->cdp1802_mode;
 }
@@ -35,12 +35,12 @@ static CDP1802_EF_READ( cidelsa_ef_r )
         EF4     Coin 1
     */
 
-	return input_port_read(machine, "EF");
+	return input_port_read(device->machine, "EF");
 }
 
 static CDP1802_Q_WRITE( cidelsa_q_w )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data;
 
 	state->cdp1802_q = level;
 }
@@ -72,12 +72,12 @@ static WRITE8_HANDLER( draco_sound_bankswitch_w )
 
 	int bank = BIT(data, 3);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 }
 
 static WRITE8_HANDLER( draco_sound_g_w )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	/*
 
@@ -93,36 +93,36 @@ static WRITE8_HANDLER( draco_sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		ay8910_write_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_write_port_0_w(space, 0, state->draco_ay_latch);
 		break;
 
 	case 0x02:
-		state->draco_ay_latch = ay8910_read_port_0_r(machine, 0);
+		state->draco_ay_latch = ay8910_read_port_0_r(space, 0);
 		break;
 
 	case 0x03:
-		ay8910_control_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_control_port_0_w(space, 0, state->draco_ay_latch);
 		break;
 	}
 }
 
 static READ8_HANDLER( draco_sound_in_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	return ~(state->draco_sound) & 0x07;
 }
 
 static READ8_HANDLER( draco_sound_ay8910_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	return state->draco_ay_latch;
 }
 
 static WRITE8_HANDLER( draco_sound_ay8910_w )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	state->draco_ay_latch = data;
 }
@@ -226,8 +226,6 @@ static CDP1852_DATA_WRITE( altair_out1_w )
 
 static CDP1852_DATA_WRITE( draco_out1_w )
 {
-	cidelsa_state *state = device->machine->driver_data;
-
 	/*
       bit   description
 
@@ -240,6 +238,8 @@ static CDP1852_DATA_WRITE( draco_out1_w )
         6   SONIDO B -> COP402 IN1
         7   SONIDO C -> COP402 IN2
     */
+
+	cidelsa_state *state = device->machine->driver_data;
 
     state->draco_sound = (data & 0xe0) >> 5;
 }
@@ -548,12 +548,12 @@ static MACHINE_START( cidelsa )
 {
 	cidelsa_state *state = machine->driver_data;
 
-	// reset the CPU
+	/* reset the CPU */
 
 	state->cdp1802_mode = CDP1802_MODE_RESET;
 	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
-	// register save states
+	/* register for state saving */
 
 	state_save_register_global(state->cdp1802_mode);
 }
@@ -564,12 +564,12 @@ static MACHINE_START( draco )
 
 	MACHINE_START_CALL( cidelsa );
 
-	// COP402 memory banking
+	/* setup COP402 memory banking */
 
-	memory_configure_bank(1, 0, 2, memory_region(machine, "audio"), 0x400);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "audio"), 0x400);
+	memory_set_bank(machine, 1, 0);
 
-	// register save states
+	/* register for state saving */
 
 	state_save_register_global(state->draco_sound);
 	state_save_register_global(state->draco_ay_latch);
@@ -579,7 +579,7 @@ static MACHINE_START( draco )
 
 static MACHINE_RESET( cidelsa )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(machine, "main", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /* Machine Drivers */
@@ -689,7 +689,7 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_MACHINE_START(draco)
 	MDRV_MACHINE_RESET(cidelsa)
 
-	MDRV_CPU_ADD("audio", COP420, DRACO_SND_CHR1) // COP402N
+	MDRV_CPU_ADD("audio", COP402, DRACO_SND_CHR1) // COP402N
 	MDRV_CPU_PROGRAM_MAP(draco_sound_map, 0)
 	MDRV_CPU_IO_MAP(draco_sound_io_map, 0)
 	MDRV_CPU_CONFIG(draco_cop_intf)

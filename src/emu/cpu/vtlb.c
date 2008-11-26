@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "vtlb.h"
+#include "mame.h"
 
 
 
@@ -29,6 +30,7 @@
 /* VTLB state */
 struct _vtlb_state
 {
+	const device_config *device;			/* CPU device */
 	int					space;				/* address space */
 	int 				dynamic;			/* number of dynamic entries */
 	int					fixed;				/* number of fixed entries */
@@ -53,7 +55,7 @@ struct _vtlb_state
     given CPU
 -------------------------------------------------*/
 
-vtlb_state *vtlb_alloc(int cpunum, int space, int fixed_entries, int dynamic_entries)
+vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, int dynamic_entries)
 {
 	vtlb_state *vtlb;
 
@@ -62,12 +64,13 @@ vtlb_state *vtlb_alloc(int cpunum, int space, int fixed_entries, int dynamic_ent
 	memset(vtlb, 0, sizeof(*vtlb));
 
 	/* fill in CPU information */
+	vtlb->device = cpu;
 	vtlb->space = space;
 	vtlb->dynamic = dynamic_entries;
 	vtlb->fixed = fixed_entries;
-	vtlb->pageshift = cpunum_page_shift(cpunum, space);
-	vtlb->addrwidth = cpunum_logaddr_width(cpunum, space);
-	vtlb->translate = (cpu_translate_func)cpunum_get_info_fct(cpunum, CPUINFO_PTR_TRANSLATE);
+	vtlb->pageshift = cpu_get_page_shift(cpu, space);
+	vtlb->addrwidth = cpu_get_logaddr_width(cpu, space);
+	vtlb->translate = (cpu_translate_func)cpu_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
 
 	/* validate CPU information */
 	assert((1 << vtlb->pageshift) > VTLB_FLAGS_MASK);
@@ -77,19 +80,19 @@ vtlb_state *vtlb_alloc(int cpunum, int space, int fixed_entries, int dynamic_ent
 	/* allocate the entry array */
 	vtlb->live = malloc_or_die(sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
 	memset(vtlb->live, 0, sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
-	state_save_register_item_pointer("vtlb", cpunum * ADDRESS_SPACES + space, vtlb->live, fixed_entries + dynamic_entries);
+	state_save_register_item_pointer("vtlb", cpu->tag, space, vtlb->live, fixed_entries + dynamic_entries);
 
 	/* allocate the lookup table */
 	vtlb->table = malloc_or_die(sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
 	memset(vtlb->table, 0, sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
-	state_save_register_item_pointer("vtlb", cpunum * ADDRESS_SPACES + space, vtlb->table, 1 << (vtlb->addrwidth - vtlb->pageshift));
+	state_save_register_item_pointer("vtlb", cpu->tag, space, vtlb->table, 1 << (vtlb->addrwidth - vtlb->pageshift));
 
 	/* allocate the fixed page count array */
 	if (fixed_entries > 0)
 	{
 		vtlb->fixedpages = malloc_or_die(sizeof(vtlb->fixedpages[0]) * fixed_entries);
 		memset(vtlb->fixedpages, 0, sizeof(vtlb->fixedpages[0]) * fixed_entries);
-		state_save_register_item_pointer("vtlb", cpunum * ADDRESS_SPACES + space, vtlb->fixedpages, fixed_entries);
+		state_save_register_item_pointer("vtlb", cpu->tag, space, vtlb->fixedpages, fixed_entries);
 	}
 	return vtlb;
 }
@@ -148,7 +151,7 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 
 	/* ask the CPU core to translate for us */
 	taddress = address;
-	if (!(*vtlb->translate)(vtlb->space, intention, &taddress))
+	if (!(*vtlb->translate)(vtlb->device, vtlb->space, intention, &taddress))
 	{
 		if (PRINTF_TLB)
 			printf("failed: no translation\n");

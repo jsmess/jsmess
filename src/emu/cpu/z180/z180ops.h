@@ -24,7 +24,7 @@
  ***************************************************************/
 #define IN(port)												\
 	(((port ^ IO_IOCR) & 0xffc0) == 0) ?						\
-		z180_readcontrol(port) : io_read_byte_8le(port)
+		z180_readcontrol(port) : memory_read_byte_8le(Z180.iospace, port)
 
 /***************************************************************
  * Output a byte to given I/O port
@@ -32,7 +32,7 @@
 #define OUT(port,value) 										\
 	if (((port ^ IO_IOCR) & 0xffc0) == 0)						\
 		z180_writecontrol(port,value);							\
-	else io_write_byte_8le(port,value)
+	else memory_write_byte_8le(Z180.iospace,port,value)
 
 /***************************************************************
  * MMU calculate the memory managemant lookup table
@@ -68,7 +68,7 @@ INLINE void z180_mmu( void )
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(addr)	program_read_byte_8le(MMU_REMAP_ADDR(addr))
+#define RM(addr)	memory_read_byte_8le(Z180.program, MMU_REMAP_ADDR(addr))
 UINT8 z180_readmem(offs_t offset)
 {
 	return RM(offset);
@@ -77,7 +77,7 @@ UINT8 z180_readmem(offs_t offset)
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-#define WM(addr,value) program_write_byte_8le(MMU_REMAP_ADDR(addr),value)
+#define WM(addr,value) memory_write_byte_8le(Z180.program, MMU_REMAP_ADDR(addr),value)
 void z180_writemem(offs_t offset, UINT8 data)
 {
 	WM(offset, data);
@@ -111,7 +111,7 @@ INLINE UINT8 ROP(void)
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return cpu_readop(MMU_REMAP_ADDR(addr));
+	return memory_decrypted_read_byte(Z180.program, MMU_REMAP_ADDR(addr));
 }
 
 /****************************************************************
@@ -124,23 +124,21 @@ INLINE UINT8 ARG(void)
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return cpu_readop_arg(MMU_REMAP_ADDR(addr));
+	return memory_raw_read_byte(Z180.program, MMU_REMAP_ADDR(addr));
 }
 
 INLINE UINT32 ARG16(void)
 {
 	offs_t addr = _PCD;
 	_PC += 2;
-	return cpu_readop_arg(MMU_REMAP_ADDR(addr)) | (cpu_readop_arg(MMU_REMAP_ADDR(addr+1)) << 8);
+	return memory_raw_read_byte(Z180.program, MMU_REMAP_ADDR(addr)) | (memory_raw_read_byte(Z180.program, MMU_REMAP_ADDR(addr+1)) << 8);
 }
 
 /****************************************************************************
  * Change program counter - MMU lookup
  ****************************************************************************/
-#define z180_change_pc(addr) change_pc(MMU_REMAP_ADDR(addr))
 void z180_setOPbase(int pc)
 {
-	z180_change_pc(pc);
 }
 
 /***************************************************************
@@ -165,7 +163,6 @@ void z180_setOPbase(int pc)
  ***************************************************************/
 #define JP {													\
 	_PCD = ARG16(); 											\
-	z180_change_pc(_PCD);										\
 }
 
 /***************************************************************
@@ -176,7 +173,6 @@ void z180_setOPbase(int pc)
 	if( cond )													\
 	{															\
 		_PCD = ARG16(); 										\
-		z180_change_pc(_PCD);									\
 	}															\
 	else														\
 	{															\
@@ -191,7 +187,6 @@ void z180_setOPbase(int pc)
 	unsigned oldpc = _PCD-1;									\
 	INT8 arg = (INT8)ARG(); /* ARG() also increments _PC */ 	\
 	_PC += arg; 			/* so don't do _PC += ARG() */      \
-	z180_change_pc(_PCD);										\
 	/* speed up busy loop */									\
 	if( _PCD == oldpc ) 										\
 	{															\
@@ -200,7 +195,7 @@ void z180_setOPbase(int pc)
 	}															\
 	else														\
 	{															\
-		UINT8 op = cpu_readop(_PCD);							\
+		UINT8 op = memory_decrypted_read_byte(Z180.program, _PCD);							\
 		if( _PCD == oldpc-1 )									\
 		{														\
 			/* NOP - JR $-1 or EI - JR $-1 */					\
@@ -231,7 +226,6 @@ void z180_setOPbase(int pc)
 		INT8 arg = (INT8)ARG(); /* ARG() also increments _PC */ \
 		_PC += arg; 			/* so don't do _PC += ARG() */  \
 		CC(ex,opcode);											\
-		z180_change_pc(_PCD);									\
 	}															\
 	else _PC++; 												\
 
@@ -241,8 +235,7 @@ void z180_setOPbase(int pc)
 #define CALL()													\
 	EA = ARG16();												\
 	PUSH( PC ); 												\
-	_PCD = EA;													\
-	z180_change_pc(_PCD)
+	_PCD = EA;
 
 /***************************************************************
  * CALL_COND
@@ -254,7 +247,6 @@ void z180_setOPbase(int pc)
 		PUSH( PC ); 											\
 		_PCD = EA;												\
 		CC(ex,opcode);											\
-		z180_change_pc(_PCD);									\
 	}															\
 	else														\
 	{															\
@@ -268,7 +260,6 @@ void z180_setOPbase(int pc)
 	if( cond )													\
 	{															\
 		POP(PC);												\
-		z180_change_pc(_PCD);									\
 		CC(ex,opcode);											\
 	}
 
@@ -276,9 +267,8 @@ void z180_setOPbase(int pc)
  * RETN
  ***************************************************************/
 #define RETN	{												\
-	LOG(("Z180 #%d RETN IFF1:%d IFF2:%d\n", cpu_getactivecpu(), _IFF1, _IFF2)); \
+	LOG(("Z180 #%d RETN IFF1:%d IFF2:%d\n", cpunum_get_active(), _IFF1, _IFF2)); \
 	POP(PC);													\
-	z180_change_pc(_PCD);										\
 	_IFF1 = _IFF2;												\
 }
 
@@ -287,7 +277,6 @@ void z180_setOPbase(int pc)
  ***************************************************************/
 #define RETI	{												\
 	POP(PC);													\
-	z180_change_pc(_PCD);										\
 /* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */	\
 /*  _IFF1 = _IFF2;  */											\
 	if (Z180.daisy)												\
@@ -330,8 +319,7 @@ void z180_setOPbase(int pc)
  ***************************************************************/
 #define RST(addr)												\
 	PUSH( PC ); 												\
-	_PCD = addr;												\
-	z180_change_pc(_PCD)
+	_PCD = addr;
 
 /***************************************************************
  * INC  r8

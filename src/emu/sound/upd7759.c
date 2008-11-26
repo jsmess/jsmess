@@ -552,8 +552,9 @@ static TIMER_CALLBACK( upd7759_slave_update )
 
 *************************************************************/
 
-static void upd7759_reset(struct upd7759_chip *chip)
+static SND_RESET( upd7759 )
 {
+	struct upd7759_chip *chip = token;
 	chip->pos                = 0;
 	chip->fifo_in            = 0;
 	chip->drq                = 0;
@@ -587,40 +588,40 @@ static STATE_POSTLOAD( upd7759_postload )
 }
 
 
-static void register_for_save(struct upd7759_chip *chip, int index)
+static void register_for_save(struct upd7759_chip *chip, const char *tag)
 {
-	state_save_register_item("upd7759", index, chip->pos);
-	state_save_register_item("upd7759", index, chip->step);
+	state_save_register_item("upd7759", tag, 0, chip->pos);
+	state_save_register_item("upd7759", tag, 0, chip->step);
 
-	state_save_register_item("upd7759", index, chip->fifo_in);
-	state_save_register_item("upd7759", index, chip->reset);
-	state_save_register_item("upd7759", index, chip->start);
-	state_save_register_item("upd7759", index, chip->drq);
+	state_save_register_item("upd7759", tag, 0, chip->fifo_in);
+	state_save_register_item("upd7759", tag, 0, chip->reset);
+	state_save_register_item("upd7759", tag, 0, chip->start);
+	state_save_register_item("upd7759", tag, 0, chip->drq);
 
-	state_save_register_item("upd7759", index, chip->state);
-	state_save_register_item("upd7759", index, chip->clocks_left);
-	state_save_register_item("upd7759", index, chip->nibbles_left);
-	state_save_register_item("upd7759", index, chip->repeat_count);
-	state_save_register_item("upd7759", index, chip->post_drq_state);
-	state_save_register_item("upd7759", index, chip->post_drq_clocks);
-	state_save_register_item("upd7759", index, chip->req_sample);
-	state_save_register_item("upd7759", index, chip->last_sample);
-	state_save_register_item("upd7759", index, chip->block_header);
-	state_save_register_item("upd7759", index, chip->sample_rate);
-	state_save_register_item("upd7759", index, chip->first_valid_header);
-	state_save_register_item("upd7759", index, chip->offset);
-	state_save_register_item("upd7759", index, chip->repeat_offset);
+	state_save_register_item("upd7759", tag, 0, chip->state);
+	state_save_register_item("upd7759", tag, 0, chip->clocks_left);
+	state_save_register_item("upd7759", tag, 0, chip->nibbles_left);
+	state_save_register_item("upd7759", tag, 0, chip->repeat_count);
+	state_save_register_item("upd7759", tag, 0, chip->post_drq_state);
+	state_save_register_item("upd7759", tag, 0, chip->post_drq_clocks);
+	state_save_register_item("upd7759", tag, 0, chip->req_sample);
+	state_save_register_item("upd7759", tag, 0, chip->last_sample);
+	state_save_register_item("upd7759", tag, 0, chip->block_header);
+	state_save_register_item("upd7759", tag, 0, chip->sample_rate);
+	state_save_register_item("upd7759", tag, 0, chip->first_valid_header);
+	state_save_register_item("upd7759", tag, 0, chip->offset);
+	state_save_register_item("upd7759", tag, 0, chip->repeat_offset);
 
-	state_save_register_item("upd7759", index, chip->adpcm_state);
-	state_save_register_item("upd7759", index, chip->adpcm_data);
-	state_save_register_item("upd7759", index, chip->sample);
+	state_save_register_item("upd7759", tag, 0, chip->adpcm_state);
+	state_save_register_item("upd7759", tag, 0, chip->adpcm_data);
+	state_save_register_item("upd7759", tag, 0, chip->sample);
 
-	state_save_register_item("upd7759", index, chip->romoffset);
+	state_save_register_item("upd7759", tag, 0, chip->romoffset);
 	state_save_register_postload(Machine, upd7759_postload, chip);
 }
 
 
-static void *upd7759_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( upd7759 )
 {
 	static const upd7759_interface defintrf = { 0 };
 	const upd7759_interface *intf = (config != NULL) ? config : &defintrf;
@@ -654,9 +655,9 @@ static void *upd7759_start(const char *tag, int sndindex, int clock, const void 
 	chip->start = 1;
 
 	/* toggle the reset line to finish the reset */
-	upd7759_reset(chip);
+	SND_RESET_NAME( upd7759 )(chip);
 
-	register_for_save(chip, sndindex);
+	register_for_save(chip, tag);
 
 	return chip;
 }
@@ -681,7 +682,7 @@ void upd7759_reset_w(int which, UINT8 data)
 
 	/* on the falling edge, reset everything */
 	if (oldreset && !chip->reset)
-		upd7759_reset(chip);
+		SND_RESET_NAME( upd7759 )(chip);
 }
 
 void upd7759_start_w(int which, UINT8 data)
@@ -770,7 +771,7 @@ READ8_HANDLER(upd7759_0_busy_r)
  * Generic get_info
  **************************************************************************/
 
-static void upd7759_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( upd7759 )
 {
 	switch (state)
 	{
@@ -779,17 +780,17 @@ static void upd7759_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void upd7759_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( upd7759 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = upd7759_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = upd7759_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( upd7759 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( upd7759 );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( upd7759 );							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "UPD7759";					break;

@@ -57,15 +57,15 @@ static WRITE32_HANDLER( aga_overlay_w )
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(1, data & 1);
+		memory_set_bank(space->machine, 1, data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_BANK1);
+			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, SMH_BANK1);
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_UNMAP);
+			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, SMH_UNMAP);
 	}
 }
 
@@ -116,14 +116,14 @@ static void cd32_cia_0_porta_w(UINT8 data)
 static UINT8 cd32_cia_0_portb_r(void)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_r\n", activecpu_get_pc());
+	logerror("%06x:CIA0_portb_r\n", cpu_get_pc(Machine->activecpu));
 	return 0xff;
 }
 
 static void cd32_cia_0_portb_w(UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_w(%02x)\n", activecpu_get_pc(), data);
+	logerror("%06x:CIA0_portb_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
 }
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -337,8 +337,8 @@ static DRIVER_INIT( cd32 )
 	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(1, 0, 1, amiga_chip_ram32, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram32, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* intialize akiko */
 	amiga_akiko_init(machine);

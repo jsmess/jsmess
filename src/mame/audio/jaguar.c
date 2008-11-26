@@ -190,15 +190,15 @@ static TIMER_CALLBACK( serial_callback );
  *
  *************************************/
 
-void jaguar_dsp_suspend(void)
+void jaguar_dsp_suspend(running_machine *machine)
 {
-	cpunum_suspend(2, SUSPEND_REASON_SPIN, 1);
+	cpu_suspend(machine->cpu[2], SUSPEND_REASON_SPIN, 1);
 }
 
 
-void jaguar_dsp_resume(void)
+void jaguar_dsp_resume(running_machine *machine)
 {
-	cpunum_resume(2, SUSPEND_REASON_SPIN);
+	cpu_resume(machine->cpu[2], SUSPEND_REASON_SPIN);
 }
 
 
@@ -213,11 +213,11 @@ static void update_gpu_irq(void)
 {
 	if (gpu_irq_state & dsp_regs[JINTCTRL] & 0x1f)
 	{
-		cpunum_set_input_line(Machine, 1, 1, ASSERT_LINE);
-		jaguar_gpu_resume();
+		cpu_set_input_line(Machine->cpu[1], 1, ASSERT_LINE);
+		jaguar_gpu_resume(Machine);
 	}
 	else
-		cpunum_set_input_line(Machine, 1, 1, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[1], 1, CLEAR_LINE);
 }
 
 
@@ -271,7 +271,7 @@ void cojag_sound_init(running_machine *machine)
 	}
 
 #if ENABLE_SPEEDUP_HACKS
-	memory_install_write32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
 #endif
 }
 
@@ -303,7 +303,7 @@ void cojag_sound_reset(void)
 READ16_HANDLER( jaguar_jerry_regs_r )
 {
 	if (offset != JINTCTRL && offset != JINTCTRL+2)
-		logerror("%08X:jerry read register @ F10%03X\n", activecpu_get_previouspc(), offset * 2);
+		logerror("%08X:jerry read register @ F10%03X\n", cpu_get_previouspc(space->cpu), offset * 2);
 
 	switch (offset)
 	{
@@ -328,7 +328,7 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 	}
 
 	if (offset != JINTCTRL && offset != JINTCTRL+2 && offset != ASICTRL)
-		logerror("%08X:jerry write register @ F10%03X = %04X\n", activecpu_get_previouspc(), offset * 2, data);
+		logerror("%08X:jerry write register @ F10%03X = %04X\n", cpu_get_previouspc(space->cpu), offset * 2, data);
 }
 
 
@@ -341,13 +341,13 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 
 READ32_HANDLER( jaguar_jerry_regs32_r )
 {
-	return read32be_with_16be_handler(jaguar_jerry_regs_r, machine, offset, mem_mask);
+	return read32be_with_16be_handler(jaguar_jerry_regs_r, space, offset, mem_mask);
 }
 
 
 WRITE32_HANDLER( jaguar_jerry_regs32_w )
 {
-	write32be_with_16be_handler(jaguar_jerry_regs_w, machine, offset, data, mem_mask);
+	write32be_with_16be_handler(jaguar_jerry_regs_w, space, offset, data, mem_mask);
 }
 
 
@@ -363,18 +363,18 @@ WRITE32_HANDLER( jaguar_jerry_regs32_w )
 static WRITE32_HANDLER( dsp_flags_w )
 {
 	/* write the data through */
-	jaguardsp_ctrl_w(2, offset, data, mem_mask);
+	jaguardsp_ctrl_w(space->machine->cpu[2], offset, data, mem_mask);
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
-	if (cpu_getactivecpu() == 2 && ACCESSING_BITS_8_15 && (data & 0x400))
+	if (space->cpu == space->machine->cpu[2] && ACCESSING_BITS_8_15 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
-		if (!(data & 0x04000) && activecpu_get_reg(JAGUAR_R22) != 0)
+		if (!(data & 0x04000) && cpu_get_reg(space->cpu, JAGUAR_R22) != 0)
 		{
-			UINT32 r30 = activecpu_get_reg(JAGUAR_R30) & 0xffffff;
+			UINT32 r30 = cpu_get_reg(space->cpu, JAGUAR_R30) & 0xffffff;
 			if (r30 >= 0xf1b124 && r30 <= 0xf1b126)
-				jaguar_dsp_suspend();
+				jaguar_dsp_suspend(space->machine);
 		}
 	}
 }
@@ -394,8 +394,8 @@ static WRITE32_HANDLER( dsp_flags_w )
 static TIMER_CALLBACK( serial_chunky_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cpunum_set_input_line(machine, 2, 1, ASSERT_LINE);
-	jaguar_dsp_resume();
+	cpu_set_input_line(machine->cpu[2], 1, ASSERT_LINE);
+	jaguar_dsp_resume(machine);
 
 	/* fix flaky code in interrupt handler which thwarts our speedup */
 	if ((jaguar_dsp_ram[0x3e/4] & 0xffff) == 0xbfbc &&
@@ -413,8 +413,8 @@ static TIMER_CALLBACK( serial_chunky_callback )
 static TIMER_CALLBACK( serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cpunum_set_input_line(machine, 2, 1, ASSERT_LINE);
-	jaguar_dsp_resume();
+	cpu_set_input_line(machine->cpu[2], 1, ASSERT_LINE);
+	jaguar_dsp_resume(machine);
 }
 
 #endif
@@ -429,7 +429,7 @@ static TIMER_CALLBACK( serial_callback )
 
 READ32_HANDLER( jaguar_serial_r )
 {
-	logerror("%08X:jaguar_serial_r(%X)\n", activecpu_get_previouspc(), offset);
+	logerror("%08X:jaguar_serial_r(%X)\n", cpu_get_previouspc(space->cpu), offset);
 	return 0;
 }
 
@@ -465,7 +465,7 @@ WRITE32_HANDLER( jaguar_serial_w )
 			break;
 
 		default:
-			logerror("%08X:jaguar_serial_w(%X,%X)\n", activecpu_get_previouspc(), offset, data);
+			logerror("%08X:jaguar_serial_w(%X,%X)\n", cpu_get_previouspc(space->cpu), offset, data);
 			break;
 	}
 }

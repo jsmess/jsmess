@@ -534,7 +534,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, const powerpc_config *config, cpu_irq_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -558,7 +558,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const 
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
-	ppccom_init(ppc, flavor, cap, tb_divisor, device, index, clock, config, irqcallback);
+	ppccom_init(ppc, flavor, cap, tb_divisor, device, index, clock, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	ppc->impstate = drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
@@ -572,7 +572,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const 
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	ppc->impstate->drcuml = drcuml_alloc(cache, flags, 8, 32, 2);
+	ppc->impstate->drcuml = drcuml_alloc(device, cache, flags, 8, 32, 2);
 	if (ppc->impstate->drcuml == NULL)
 		fatalerror("Error initializing the UML");
 
@@ -622,7 +622,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const 
 	/* initialize the front-end helper */
 	if (SINGLE_INSTRUCTION_MODE)
 		feconfig.max_sequence = 1;
-	ppc->impstate->drcfe = drcfe_init(&feconfig, ppc);
+	ppc->impstate->drcfe = drcfe_init(device, &feconfig, ppc);
 
 	/* initialize the implementation state tables */
 	memcpy(ppc->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
@@ -976,7 +976,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);					// <checksum>
 
 		/* label this instruction, if it may be jumped to locally */
@@ -1437,7 +1437,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
-	int fastxor = BYTE8_XOR_BE(0) >> (activecpu_databus_width(ADDRESS_SPACE_PROGRAM) < 64);
+	int fastxor = BYTE8_XOR_BE(0) >> (cpu_get_databus_width(Machine->activecpu, ADDRESS_SPACE_PROGRAM) < 64);
 	drcuml_block *block;
 	jmp_buf errorbuf;
 	int translate_type;
@@ -4220,7 +4220,7 @@ static CPU_SET_INFO( ppcdrc4xx )
 
 static CPU_INIT( ppc403ga )
 {
-	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, device, index, clock, irqcallback);
 }
 
 
@@ -4259,7 +4259,7 @@ CPU_GET_INFO( ppc403ga )
 
 static CPU_INIT( ppc403gcx )
 {
-	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, device, index, clock, irqcallback);
 }
 
 
@@ -4303,7 +4303,7 @@ CPU_GET_INFO( ppc403gcx )
 
 static CPU_INIT( ppc601 )
 {
-	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, device, index, clock, irqcallback);
 }
 
 
@@ -4341,7 +4341,7 @@ CPU_GET_INFO( ppc601 )
 
 static CPU_INIT( ppc602 )
 {
-	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
 }
 
 
@@ -4379,7 +4379,7 @@ CPU_GET_INFO( ppc602 )
 
 static CPU_INIT( ppc603 )
 {
-	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
 }
 
 
@@ -4417,7 +4417,7 @@ CPU_GET_INFO( ppc603 )
 
 static CPU_INIT( ppc603e )
 {
-	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
 }
 
 
@@ -4455,7 +4455,7 @@ CPU_GET_INFO( ppc603e )
 
 static CPU_INIT( ppc603r )
 {
-	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
 }
 
 
@@ -4493,7 +4493,7 @@ CPU_GET_INFO( ppc603r )
 
 static CPU_INIT( ppc604 )
 {
-	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, device, index, clock, irqcallback);
 }
 
 
@@ -4536,7 +4536,7 @@ CPU_GET_INFO( ppc604 )
 
 static CPU_INIT( mpc8240 )
 {
-	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, device, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, device, index, clock, irqcallback);
 }
 
 

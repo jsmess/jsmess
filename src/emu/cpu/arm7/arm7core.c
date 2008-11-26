@@ -139,19 +139,19 @@ char *(*arm7_dasm_cop_do_callback)(char *pBuf, UINT32 opcode, char *pConditionCo
 INLINE void arm7_cpu_write32(UINT32 addr, UINT32 data)
 {
     addr &= ~3;
-    program_write_dword_32le(addr, data);
+    memory_write_dword_32le(ARM7.program, addr, data);
 }
 
 
 INLINE void arm7_cpu_write16(UINT32 addr, UINT16 data)
 {
     addr &= ~1;
-    program_write_word_32le(addr, data);
+    memory_write_word_32le(ARM7.program, addr, data);
 }
 
 INLINE void arm7_cpu_write8(UINT32 addr, UINT8 data)
 {
-    program_write_byte_32le(addr, data);
+    memory_write_byte_32le(ARM7.program, addr, data);
 }
 
 INLINE UINT32 arm7_cpu_read32(offs_t addr)
@@ -160,12 +160,12 @@ INLINE UINT32 arm7_cpu_read32(offs_t addr)
 
     if (addr & 3)
     {
-        result = program_read_dword_32le(addr & ~3);
+        result = memory_read_dword_32le(ARM7.program, addr & ~3);
         result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
     }
     else
     {
-        result = program_read_dword_32le(addr);
+        result = memory_read_dword_32le(ARM7.program, addr);
     }
 
     return result;
@@ -175,7 +175,7 @@ INLINE UINT16 arm7_cpu_read16(offs_t addr)
 {
     UINT16 result;
 
-    result = program_read_word_32le(addr & ~1);
+    result = memory_read_word_32le(ARM7.program, addr & ~1);
 
     if (addr & 1)
     {
@@ -188,7 +188,7 @@ INLINE UINT16 arm7_cpu_read16(offs_t addr)
 INLINE UINT8 arm7_cpu_read8(offs_t addr)
 {
     // Handle through normal 8 bit handler (for 32 bit cpu)
-    return program_read_byte_32le(addr);
+    return memory_read_byte_32le(ARM7.program, addr);
 }
 
 /***************
@@ -508,32 +508,31 @@ static int storeDec(UINT32 pat, UINT32 rbv)
  ***************************************************************************/
 
 // CPU INIT
-static void arm7_core_init(const char *cpuname, int index)
+static void arm7_core_init(const char *cpuname, const device_config *device)
 {
-    state_save_register_item_array(cpuname, index, ARM7.sArmRegister);
-    state_save_register_item(cpuname, index, ARM7.pendingIrq);
-    state_save_register_item(cpuname, index, ARM7.pendingFiq);
-    state_save_register_item(cpuname, index, ARM7.pendingAbtD);
-    state_save_register_item(cpuname, index, ARM7.pendingAbtP);
-    state_save_register_item(cpuname, index, ARM7.pendingUnd);
-    state_save_register_item(cpuname, index, ARM7.pendingSwi);
+    state_save_register_item_array(cpuname, device->tag, 0, ARM7.sArmRegister);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingIrq);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingFiq);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingAbtD);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingAbtP);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingUnd);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingSwi);
 }
 
 // CPU RESET
-static void arm7_core_reset(void)
+static void arm7_core_reset(const device_config *device)
 {
     cpu_irq_callback save_irqcallback = ARM7.irq_callback;
-    const device_config *save_device = ARM7.device;
 
     memset(&ARM7, 0, sizeof(ARM7));
     ARM7.irq_callback = save_irqcallback;
-    ARM7.device = save_device;
+    ARM7.device = device;
+    ARM7.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(eARM7_MODE_SVC);
     SET_CPSR(GET_CPSR | I_MASK | F_MASK | 0x10);
     R15 = 0;
-    change_pc(R15);
 }
 
 // Execute used to be here.. moved to separate file (arm7exec.c) to be included by cpu cores separately
@@ -564,7 +563,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x10;                             /* IRQ Vector address */
-        change_pc(R15);
         ARM7.pendingAbtD = 0;
         return;
     }
@@ -577,7 +575,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x1c;                             /* IRQ Vector address */
-        change_pc(R15);
         return;
     }
 
@@ -589,7 +586,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x18;                             /* IRQ Vector address */
-        change_pc(R15);
         return;
     }
 
@@ -601,7 +597,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x0c;                             /* IRQ Vector address */
-        change_pc(R15);
         ARM7.pendingAbtP = 0;
         return;
     }
@@ -614,7 +609,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x04;                             /* IRQ Vector address */
-        change_pc(R15);
         ARM7.pendingUnd = 0;
         return;
     }
@@ -635,7 +629,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
         R15 = 0x08;                             /* Jump to the SWI vector */
-        change_pc(R15);
         ARM7.pendingSwi = 0;
         return;
     }
@@ -678,7 +671,7 @@ static void HandleCoProcDO(UINT32 insn)
 {
     // This instruction simply instructs the co-processor to do something, no data is returned to ARM7 core
     if (arm7_coproc_do_callback)
-        arm7_coproc_do_callback(Machine, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
+        arm7_coproc_do_callback(ARM7.program, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
     else
         LOG(("%08x: Co-Processor Data Operation executed, but no callback defined!\n", R15));
 }
@@ -694,7 +687,7 @@ static void HandleCoProcRT(UINT32 insn)
     {
         if (arm7_coproc_rt_r_callback)
         {
-            UINT32 res = arm7_coproc_rt_r_callback(Machine, insn, 0);   // RT Read handler must parse opcode & return appropriate result
+            UINT32 res = arm7_coproc_rt_r_callback(ARM7.program, insn, 0);   // RT Read handler must parse opcode & return appropriate result
             SET_REGISTER((insn >> 12) & 0xf, res);
         }
         else
@@ -704,7 +697,7 @@ static void HandleCoProcRT(UINT32 insn)
     else
     {
         if (arm7_coproc_rt_r_callback)
-            arm7_coproc_rt_w_callback(Machine, insn, GET_REGISTER((insn >> 12) & 0xf), 0);
+            arm7_coproc_rt_w_callback(ARM7.program, insn, GET_REGISTER((insn >> 12) & 0xf), 0);
         else
             LOG(("%08x: Co-Processor Register Transfer executed, but no RT Write callback defined!\n", R15));
     }
@@ -792,8 +785,6 @@ static void HandleBranch(UINT32 insn)
     {
         R15 += off + 8;
     }
-
-    change_pc(R15);
 }
 
 static void HandleMemSingle(UINT32 insn)
@@ -866,7 +857,6 @@ static void HandleMemSingle(UINT32 insn)
             {
                 R15 = READ32(rnv);
                 R15 -= 4;
-                change_pc(R15);
                 // LDR, PC takes 2S + 2N + 1I (5 total cycles)
                 ARM7_ICOUNT -= 2;
             }
@@ -1100,7 +1090,6 @@ static void HandleHalfWordDT(UINT32 insn)
             }
         }
     }
-    change_pc(R15);
 }
 
 static void HandleSwap(UINT32 insn)
@@ -1234,7 +1223,6 @@ static void HandleALU(UINT32 insn)
 {
     UINT32 op2, sc = 0, rd, rn, opcode;
     UINT32 by, rdn;
-    UINT32 oldR15 = R15;
 
     opcode = (insn & INSN_OPCODE) >> INSN_OPCODE_SHIFT;
 
@@ -1396,9 +1384,6 @@ static void HandleALU(UINT32 insn)
 #endif
         }
     }
-
-    if (oldR15 != R15)
-        change_pc(R15);
 }
 
 static void HandleMul(UINT32 insn)
@@ -1512,7 +1497,6 @@ static void HandleMemBlock(UINT32 insn)
 {
     UINT32 rb = (insn & INSN_RN) >> INSN_RN_SHIFT;
     UINT32 rbp = GET_REGISTER(rb);
-    UINT32 oldR15 = R15;
     int result;
 
 #if ARM7_DEBUG_CORE
@@ -1687,7 +1671,4 @@ static void HandleMemBlock(UINT32 insn)
         // STM takes (n+1)S+2N+1I cycles (n = # of register transfers)
         ARM7_ICOUNT -= (result + 1) + 2 + 1;
     }
-
-    if (oldR15 != R15)
-        change_pc(R15);
 } /* HandleMemBlock */

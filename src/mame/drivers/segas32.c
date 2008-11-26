@@ -358,13 +358,13 @@ static UINT16 sound_bank;
 
 /* I/O chips and custom I/O */
 static UINT8 misc_io_data[2][0x10];
-static read16_machine_func custom_io_r[2];
-static write16_machine_func custom_io_w[2];
+static read16_space_func custom_io_r[2];
+static write16_space_func custom_io_w[2];
 static UINT8 analog_bank;
 static UINT8 analog_value[4];
 static UINT8 sonic_last[6];
 
-static void (*system32_prot_vblank)(void);
+static void (*system32_prot_vblank)(const device_config *device);
 
 
 
@@ -396,7 +396,7 @@ static MACHINE_RESET( system32 )
 	v60_irq_timer[1] = timer_alloc(signal_v60_irq_callback, NULL);
 
 	/* clear IRQ lines */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -417,13 +417,13 @@ static void update_irq_state(running_machine *machine)
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, vector);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 5)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -445,11 +445,11 @@ static TIMER_CALLBACK( signal_v60_irq_callback )
 }
 
 
-static void int_control_w(running_machine *machine, int offset, UINT8 data)
+static void int_control_w(const address_space *space, int offset, UINT8 data)
 {
 	int duration;
 
-//  logerror("%06X:int_control_w(%X) = %02X\n", activecpu_get_pc(), offset, data);
+//  logerror("%06X:int_control_w(%X) = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
 	switch (offset)
 	{
 		case 0:
@@ -466,12 +466,12 @@ static void int_control_w(running_machine *machine, int offset, UINT8 data)
 
 		case 6:			/* mask */
 			v60_irq_control[offset] = data;
-			update_irq_state(machine);
+			update_irq_state(space->machine);
 			break;
 
 		case 7:			/* acknowledge */
 			v60_irq_control[offset] &= data;
-			update_irq_state(machine);
+			update_irq_state(space->machine);
 			break;
 
 		case 8:
@@ -500,7 +500,7 @@ static void int_control_w(running_machine *machine, int offset, UINT8 data)
 		case 13:
 		case 14:
 		case 15:		/* signal IRQ to sound CPU */
-			signal_sound_irq(machine, SOUND_IRQ_V60);
+			signal_sound_irq(space->machine, SOUND_IRQ_V60);
 			break;
 	}
 }
@@ -527,9 +527,9 @@ static READ16_HANDLER( interrupt_control_16_r )
 static WRITE16_HANDLER( interrupt_control_16_w )
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(machine, offset*2+0, data);
+		int_control_w(space, offset*2+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(machine, offset*2+1, data >> 8);
+		int_control_w(space, offset*2+1, data >> 8);
 }
 
 
@@ -550,13 +550,13 @@ static READ32_HANDLER( interrupt_control_32_r )
 static WRITE32_HANDLER( interrupt_control_32_w )
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(machine, offset*4+0, data);
+		int_control_w(space, offset*4+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(machine, offset*4+1, data >> 8);
+		int_control_w(space, offset*4+1, data >> 8);
 	if (ACCESSING_BITS_16_23)
-		int_control_w(machine, offset*4+2, data >> 16);
+		int_control_w(space, offset*4+2, data >> 16);
 	if (ACCESSING_BITS_24_31)
-		int_control_w(machine, offset*4+3, data >> 24);
+		int_control_w(space, offset*4+3, data >> 24);
 }
 
 
@@ -569,11 +569,11 @@ static TIMER_CALLBACK( end_of_vblank_int )
 
 static INTERRUPT_GEN( start_of_vblank_int )
 {
-	signal_v60_irq(machine, MAIN_IRQ_VBSTART);
+	signal_v60_irq(device->machine, MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
-		(*system32_prot_vblank)();
+		(*system32_prot_vblank)(device);
 }
 
 
@@ -584,7 +584,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
  *
  *************************************/
 
-static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
+static UINT16 common_io_chip_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
 {
 	static const char *const portnames[2][8] =
 			{
@@ -609,7 +609,7 @@ static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offse
 				return misc_io_data[which][offset];
 
 			/* otherwise, return an input port */
-			return input_port_read_safe(machine, portnames[which][offset], 0xffff);
+			return input_port_read_safe(space->machine, portnames[which][offset], 0xffff);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -635,7 +635,7 @@ static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offse
 }
 
 
-static void common_io_chip_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_io_chip_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT8 old;
 
@@ -690,7 +690,7 @@ static void common_io_chip_w(running_machine *machine, int which, offs_t offset,
 		case 0x1c/2:
 			system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -698,45 +698,45 @@ static void common_io_chip_w(running_machine *machine, int which, offs_t offset,
 
 static READ16_HANDLER( io_chip_r )
 {
-	return common_io_chip_r(machine, 0, offset, mem_mask);
+	return common_io_chip_r(space, 0, offset, mem_mask);
 }
 
 
 static WRITE16_HANDLER( io_chip_w )
 {
-	common_io_chip_w(machine, 0, offset, data, mem_mask);
+	common_io_chip_w(space, 0, offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( io_chip_0_r )
 {
-	return common_io_chip_r(machine, 0, offset*2+0, mem_mask) |
-	      (common_io_chip_r(machine, 0, offset*2+1, mem_mask >> 16) << 16);
+	return common_io_chip_r(space, 0, offset*2+0, mem_mask) |
+	      (common_io_chip_r(space, 0, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
 static WRITE32_HANDLER( io_chip_0_w )
 {
 	if (ACCESSING_BITS_0_15)
-		common_io_chip_w(machine, 0, offset*2+0, data, mem_mask);
+		common_io_chip_w(space, 0, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_io_chip_w(machine, 0, offset*2+1, data >> 16, mem_mask >> 16);
+		common_io_chip_w(space, 0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
 static READ32_HANDLER( io_chip_1_r )
 {
-	return common_io_chip_r(machine, 1, offset*2+0, mem_mask) |
-	      (common_io_chip_r(machine, 1, offset*2+1, mem_mask >> 16) << 16);
+	return common_io_chip_r(space, 1, offset*2+0, mem_mask) |
+	      (common_io_chip_r(space, 1, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
 static WRITE32_HANDLER( io_chip_1_w )
 {
 	if (ACCESSING_BITS_0_15)
-		common_io_chip_w(machine, 1, offset*2+0, data, mem_mask);
+		common_io_chip_w(space, 1, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_io_chip_w(machine, 1, offset*2+1, data >> 16, mem_mask >> 16);
+		common_io_chip_w(space, 1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -750,9 +750,9 @@ static WRITE32_HANDLER( io_chip_1_w )
 static READ16_HANDLER( io_expansion_r )
 {
 	if (custom_io_r[0])
-		return (*custom_io_r[0])(machine, offset, mem_mask);
+		return (*custom_io_r[0])(space, offset, mem_mask);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
+		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(space->cpu), offset);
 	return 0xffff;
 }
 
@@ -764,19 +764,19 @@ static WRITE16_HANDLER( io_expansion_w )
 		return;
 
 	if (custom_io_w[0])
-		(*custom_io_w[0])(machine, offset, data, mem_mask);
+		(*custom_io_w[0])(space, offset, data, mem_mask);
 	else
-		logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+		logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 }
 
 
 static READ32_HANDLER( io_expansion_0_r )
 {
 	if (custom_io_r[0])
-		return (*custom_io_r[0])(machine, offset*2+0, mem_mask) |
-			  ((*custom_io_r[0])(machine, offset*2+1, mem_mask >> 16) << 16);
+		return (*custom_io_r[0])(space, offset*2+0, mem_mask) |
+			  ((*custom_io_r[0])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
+		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(space->cpu), offset);
 	return 0xffffffff;
 }
 
@@ -787,16 +787,16 @@ static WRITE32_HANDLER( io_expansion_0_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (custom_io_w[0])
-			(*custom_io_w[0])(machine, offset*2+0, data, mem_mask);
+			(*custom_io_w[0])(space, offset*2+0, data, mem_mask);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
 		if (custom_io_w[0])
-			(*custom_io_w[0])(machine, offset*2+1, data >> 16, mem_mask >> 16);
+			(*custom_io_w[0])(space, offset*2+1, data >> 16, mem_mask >> 16);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}
 }
 
@@ -804,10 +804,10 @@ static WRITE32_HANDLER( io_expansion_0_w )
 static READ32_HANDLER( io_expansion_1_r )
 {
 	if (custom_io_r[1])
-		return (*custom_io_r[1])(machine, offset*2+0, mem_mask) |
-			  ((*custom_io_r[1])(machine, offset*2+1, mem_mask >> 16) << 16);
+		return (*custom_io_r[1])(space, offset*2+0, mem_mask) |
+			  ((*custom_io_r[1])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
+		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(space->cpu), offset);
 	return 0xffffffff;
 }
 
@@ -818,16 +818,16 @@ static WRITE32_HANDLER( io_expansion_1_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (custom_io_w[1])
-			(*custom_io_w[1])(machine, offset*2+0, data, mem_mask);
+			(*custom_io_w[1])(space, offset*2+0, data, mem_mask);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
 		if (custom_io_w[1])
-			(*custom_io_w[1])(machine, offset*2+1, data >> 16, mem_mask >> 16);
+			(*custom_io_w[1])(space, offset*2+1, data >> 16, mem_mask >> 16);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}
 }
 
@@ -852,7 +852,7 @@ static READ16_HANDLER( analog_custom_io_r )
 			analog_value[offset & 3] <<= 1;
 			return result;
 	}
-	logerror("%06X:unknown analog_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask);
+	logerror("%06X:unknown analog_custom_io_r(%X) & %04X\n", cpu_get_pc(space->cpu), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -866,10 +866,10 @@ static WRITE16_HANDLER( analog_custom_io_w )
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			analog_value[offset & 3] = input_port_read_safe(machine, names[offset & 3], 0);
+			analog_value[offset & 3] = input_port_read_safe(space->machine, names[offset & 3], 0);
 			return;
 	}
-	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
+	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 
@@ -882,10 +882,10 @@ static READ16_HANDLER( extra_custom_io_r )
 		case 0x22/2:
 		case 0x24/2:
 		case 0x26/2:
-			return input_port_read_safe(machine, names[offset & 3], 0xffff);
+			return input_port_read_safe(space->machine, names[offset & 3], 0xffff);
 	}
 
-	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask);
+	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", cpu_get_pc(space->cpu), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -899,14 +899,14 @@ static WRITE16_HANDLER( orunners_custom_io_w )
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			analog_value[offset & 3] = input_port_read_safe(machine, names[analog_bank * 4 + (offset & 3)], 0);
+			analog_value[offset & 3] = input_port_read_safe(space->machine, names[analog_bank * 4 + (offset & 3)], 0);
 			return;
 
 		case 0x20/2:
 			analog_bank = data & 1;
 			return;
 	}
-	logerror("%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
+	logerror("%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 
@@ -922,10 +922,10 @@ static READ16_HANDLER( sonic_custom_io_r )
 		case 0x0c/2:
 		case 0x10/2:
 		case 0x14/2:
-			return (UINT8)(input_port_read(machine, names[offset/2]) - sonic_last[offset/2]);
+			return (UINT8)(input_port_read(space->machine, names[offset/2]) - sonic_last[offset/2]);
 	}
 
-	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask);
+	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", cpu_get_pc(space->cpu), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -939,12 +939,12 @@ static WRITE16_HANDLER( sonic_custom_io_w )
 		case 0x00/2:
 		case 0x08/2:
 		case 0x10/2:
-			sonic_last[offset/2 + 0] = input_port_read(machine, names[offset/2 + 0]);
-			sonic_last[offset/2 + 1] = input_port_read(machine, names[offset/2 + 1]);
+			sonic_last[offset/2 + 0] = input_port_read(space->machine, names[offset/2 + 0]);
+			sonic_last[offset/2 + 1] = input_port_read(space->machine, names[offset/2 + 1]);
 			return;
 	}
 
-	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
+	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 
@@ -957,22 +957,22 @@ static WRITE16_HANDLER( sonic_custom_io_w )
 
 static WRITE16_HANDLER( random_number_16_w )
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
+//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 static READ16_HANDLER( random_number_16_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE32_HANDLER( random_number_32_w )
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
+//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 static READ32_HANDLER( random_number_32_r )
 {
-	return mame_rand(machine) ^ (mame_rand(machine) << 16);
+	return mame_rand(space->machine) ^ (mame_rand(space->machine) << 16);
 }
 
 
@@ -1035,13 +1035,13 @@ static void update_sound_irq_state(running_machine *machine)
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 2 * vector);
+			cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 2 * vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 3)
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 
@@ -1073,19 +1073,19 @@ static WRITE8_HANDLER( sound_int_control_lo_w )
 	if (offset & 1)
 	{
 		sound_irq_input &= data;
-		update_sound_irq_state(machine);
+		update_sound_irq_state(space->machine);
 	}
 
 	/* high offsets signal an IRQ to the v60 */
 	if (offset & 4)
-		signal_v60_irq(machine, MAIN_IRQ_SOUND);
+		signal_v60_irq(space->machine, MAIN_IRQ_SOUND);
 }
 
 
 static WRITE8_HANDLER( sound_int_control_hi_w )
 {
 	sound_irq_control[offset] = data;
-	update_sound_irq_state(machine);
+	update_sound_irq_state(space->machine);
 }
 
 
@@ -1108,14 +1108,14 @@ static void ym3438_irq_handler(running_machine *machine, int state)
 static WRITE8_HANDLER( sound_bank_lo_w )
 {
 	sound_bank = (sound_bank & ~0x3f) | (data & 0x3f);
-	memory_set_bankptr(1, memory_region(machine, "sound") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + 0x100000 + 0x2000 * sound_bank);
 }
 
 
 static WRITE8_HANDLER( sound_bank_hi_w )
 {
 	sound_bank = (sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	memory_set_bankptr(1, memory_region(machine, "sound") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + 0x100000 + 0x2000 * sound_bank);
 }
 
 
@@ -1891,6 +1891,11 @@ static INPUT_PORTS_START( scross )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_W)		/*  */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_S)		/* brake */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2_A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -3738,7 +3743,7 @@ ROM_END
  *
  *************************************/
 
-static void segas32_common_init(read16_machine_func custom_r, write16_machine_func custom_w, const UINT8 *default_eeprom)
+static void segas32_common_init(read16_space_func custom_r, write16_space_func custom_w, const UINT8 *default_eeprom)
 {
 	/* reset the custom handlers and other pointers */
 	custom_io_r[0] = custom_r;
@@ -3786,14 +3791,14 @@ static READ16_HANDLER( arescue_slavebusy_r )
 static DRIVER_INIT( arescue )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
 
 	dual_pcb_comms = auto_malloc(0x1000);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810000, 0x810001, 0, 0, arescue_handshake_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810001, 0, 0, arescue_handshake_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
 }
 
 
@@ -3802,8 +3807,8 @@ static DRIVER_INIT( arabfgt )
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00100, 0xa0011f, 0, 0, arf_wakeup_protection_r);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa00fff, 0, 0, arabfgt_protection_r, arabfgt_protection_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00100, 0xa0011f, 0, 0, arf_wakeup_protection_r);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, arabfgt_protection_r, arabfgt_protection_w);
 }
 
 
@@ -3813,8 +3818,8 @@ static DRIVER_INIT( brival )
 
 	/* install protection handlers */
 	system32_protram = auto_malloc (0x1000);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
 }
 
 
@@ -3823,7 +3828,7 @@ static DRIVER_INIT( darkedge )
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
 	system32_prot_vblank = darkedge_fd1149_vblank;
 }
 
@@ -3832,14 +3837,14 @@ static DRIVER_INIT( dbzvrvs )
 	segas32_common_init(NULL, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa7ffff, 0, 0, dbzvrvs_protection_r, dbzvrvs_protection_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, dbzvrvs_protection_r, dbzvrvs_protection_w);
 }
 
 static WRITE16_HANDLER( f1en_comms_echo_w )
 {
 	// pretend that slave is following master op, enables attract mode video with sound
 	if (ACCESSING_BITS_0_7)
-		program_write_byte( 0x810049, data );
+		memory_write_byte( space, 0x810049, data );
 }
 
 static DRIVER_INIT( f1en )
@@ -3847,10 +3852,10 @@ static DRIVER_INIT( f1en )
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
 
 	dual_pcb_comms = auto_malloc(0x1000);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
 }
 
 
@@ -3865,7 +3870,7 @@ static DRIVER_INIT( ga2 )
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
 	decrypt_ga2_protrom(machine);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
 }
 
 
@@ -3940,7 +3945,7 @@ static DRIVER_INIT( radr )
 static DRIVER_INIT( scross )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xb0, 0xbf, 0, 0, scross_bank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xb0, 0xbf, 0, 0, scross_bank_w);
 }
 
 
@@ -3955,7 +3960,7 @@ static DRIVER_INIT( sonic )
 	segas32_common_init(sonic_custom_io_r, sonic_custom_io_w, NULL);
 
 	/* install protection handlers */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20E5C4, 0x20E5C5, 0, 0, sonic_level_load_protection);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20E5C4, 0x20E5C5, 0, 0, sonic_level_load_protection);
 }
 
 
@@ -3980,7 +3985,7 @@ static DRIVER_INIT( svf )
 static DRIVER_INIT( jleague )
 {
 	segas32_common_init(NULL, NULL, NULL);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20F700, 0x20F705, 0, 0, jleague_protection_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20F700, 0x20F705, 0, 0, jleague_protection_w);
 }
 
 

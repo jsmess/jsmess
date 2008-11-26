@@ -129,7 +129,7 @@ static MACHINE_RESET( polyplay )
 
 static INTERRUPT_GEN( periodic_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x4e);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x4e);
 }
 
 
@@ -137,12 +137,12 @@ static INTERRUPT_GEN( coin_interrupt )
 {
 	static int last = 0;
 
-	if (input_port_read(machine, "INPUT") & 0x80)
+	if (input_port_read(device->machine, "INPUT") & 0x80)
 		last = 0;
 	else
 	{
 		if (last == 0)    /* coin inserted */
-			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x50);
+			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50);
 
 		last = 1;
 	}
@@ -242,7 +242,7 @@ static WRITE8_HANDLER( polyplay_start_timer2 )
 
 static READ8_HANDLER( polyplay_random_read )
 {
-	return mame_rand(machine) & 0xff;
+	return mame_rand(space->machine) & 0xff;
 }
 
 /* graphic structures */
@@ -355,7 +355,7 @@ ROM_END
 
 static TIMER_CALLBACK( polyplay_timer_callback )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x4c);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0x4c);
 }
 
 /* game driver */

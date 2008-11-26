@@ -28,30 +28,30 @@ extern VIDEO_UPDATE( ironhors );
 
 static INTERRUPT_GEN( ironhors_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		if (*ironhors_interrupt_enable & 4)
-			cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2)
+	else if (cpu_getiloops(device) % 2)
 	{
 		if (*ironhors_interrupt_enable & 1)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( ironhors_filter_w )
 {
 	if (sndti_exists(SOUND_DISCRETE, 2))
 	{
-		discrete_sound_w(machine, NODE_11, (data & 0x04) >> 2);
-		discrete_sound_w(machine, NODE_12, (data & 0x02) >> 1);
-		discrete_sound_w(machine, NODE_13, (data & 0x01) >> 0);
+		discrete_sound_w(space, NODE_11, (data & 0x04) >> 2);
+		discrete_sound_w(space, NODE_12, (data & 0x02) >> 1);
+		discrete_sound_w(space, NODE_13, (data & 0x01) >> 0);
 	}
 }
 

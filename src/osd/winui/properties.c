@@ -617,12 +617,12 @@ static char *GameInfoCPU(UINT nIndex)
 			if (config->cpu[chipnum].clock >= 1000000)
 			{
 				sprintf(&buf[strlen(buf)], "%s %d.%06d MHz",
-					cputype_name(config->cpu[chipnum].type),
+					cputype_get_name(config->cpu[chipnum].type),
 					config->cpu[chipnum].clock / 1000000,
 					config->cpu[chipnum].clock % 1000000);
 			} else {
 				sprintf(&buf[strlen(buf)], "%s %d.%03d kHz",
-					cputype_name(config->cpu[chipnum].type),
+					cputype_get_name(config->cpu[chipnum].type),
 					config->cpu[chipnum].clock / 1000,
 					config->cpu[chipnum].clock % 1000);
 			}

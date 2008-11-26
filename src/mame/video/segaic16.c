@@ -591,9 +591,9 @@ WRITE16_HANDLER( segaic16_paletteram_w )
 	b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
 
 	/* normal colors */
-	palette_set_color_rgb(machine, offset + 0 * palette.entries, palette.normal[r],  palette.normal[g],  palette.normal[b]);
-	palette_set_color_rgb(machine, offset + 1 * palette.entries, palette.shadow[r],  palette.shadow[g],  palette.shadow[b]);
-	palette_set_color_rgb(machine, offset + 2 * palette.entries, palette.hilight[r], palette.hilight[g], palette.hilight[b]);
+	palette_set_color_rgb(space->machine, offset + 0 * palette.entries, palette.normal[r],  palette.normal[g],  palette.normal[b]);
+	palette_set_color_rgb(space->machine, offset + 1 * palette.entries, palette.shadow[r],  palette.shadow[g],  palette.shadow[b]);
+	palette_set_color_rgb(space->machine, offset + 2 * palette.entries, palette.hilight[r], palette.hilight[g], palette.hilight[b]);
 }
 
 
@@ -1439,7 +1439,7 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 
 	COMBINE_DATA(&segaic16_textram_0[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap[0].textmap, offset);
@@ -2727,13 +2727,13 @@ void segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
 	if (buffer)
 		info->buffer = auto_malloc(info->ramsize);
 
-	state_save_register_item("segaic16_sp", which, info->flip);
-	state_save_register_item("segaic16_sp", which, info->shadow);
-	state_save_register_item_array("segaic16_sp", which, info->bank);
-	state_save_register_item("segaic16_sp", which, info->colorbase);
-	state_save_register_item("segaic16_sp", which, info->xoffs);
+	state_save_register_item("segaic16_sp", NULL, which, info->flip);
+	state_save_register_item("segaic16_sp", NULL, which, info->shadow);
+	state_save_register_item_array("segaic16_sp", NULL, which, info->bank);
+	state_save_register_item("segaic16_sp", NULL, which, info->colorbase);
+	state_save_register_item("segaic16_sp", NULL, which, info->xoffs);
 	if (buffer)
-		state_save_register_item_pointer("segaic16_sp", which, ((UINT8 *) info->buffer), info->ramsize);
+		state_save_register_item_pointer("segaic16_sp", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
 }
 
 
@@ -3498,8 +3498,8 @@ void segaic16_rotate_init(int which, int type, int colorbase)
 	/* allocate a buffer for swapping */
 	info->buffer = auto_malloc(info->ramsize);
 
-	state_save_register_item("segaic16_rot", which, info->colorbase);
-	state_save_register_item_pointer("segaic16_rot", which, ((UINT8 *) info->buffer), info->ramsize);
+	state_save_register_item("segaic16_rot", NULL, which, info->colorbase);
+	state_save_register_item_pointer("segaic16_rot", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
 }
 
 

@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 
 #include "sc61860.h"
 #include "sc.h"
@@ -53,6 +52,9 @@ typedef struct
     int carry, zero;
 
     struct { int t2ms, t512ms; int count;} timer;
+
+    const device_config *device;
+    const address_space *program;
 }   SC61860_Regs;
 
 static int sc61860_ICount = 0;
@@ -83,13 +85,14 @@ static CPU_RESET( sc61860 )
 	sc61860.timer.t512ms=0;
 	sc61860.timer.count=256;
 	sc61860.pc=0;
-	change_pc(sc61860.pc);
 }
 
 static CPU_INIT( sc61860 )
 {
-	sc61860.config = (sc61860_cpu_core *) config;
+	sc61860.config = (sc61860_cpu_core *) device->static_config;
 	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
+	sc61860.device = device;
+	sc61860.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_GET_CONTEXT( sc61860 )
@@ -103,7 +106,6 @@ static CPU_SET_CONTEXT( sc61860 )
 	if( src )
 	{
 		sc61860 = *(SC61860_Regs*)src;
-		change_pc(sc61860.pc);
 	}
 }
 
@@ -111,13 +113,11 @@ static CPU_EXECUTE( sc61860 )
 {
 	sc61860_ICount = cycles;
 
-	change_pc(sc61860.pc);
-
 	do
 	{
 		sc61860.oldpc = sc61860.pc;
 
-		debugger_instruction_hook(Machine, sc61860.pc);
+		debugger_instruction_hook(device, sc61860.pc);
 
 		sc61860_instruction();
 
@@ -151,7 +151,7 @@ static CPU_SET_INFO( sc61860 )
 	{
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SC61860_PC:			sc61860.pc = info->i; change_pc(sc61860.pc); break;
+		case CPUINFO_INT_REGISTER + SC61860_PC:			sc61860.pc = info->i; break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + SC61860_R:			sc61860.r = info->i & 0x7F;						break;
 		case CPUINFO_INT_REGISTER + SC61860_DP:			sc61860.dp = info->i;			break;
@@ -218,32 +218,32 @@ CPU_GET_INFO( sc61860 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sc61860_ICount;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s = cpuintrf_temp_str(), "SC61860"); break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s = cpuintrf_temp_str(), "SC61860"); break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "1.0beta"); break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__); break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "Copyright Peter Trauner, all rights reserved."); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "SC61860"); break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "SC61860"); break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0beta"); break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Peter Trauner, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
-			sprintf(info->s = cpuintrf_temp_str(), "%c%c", sc61860.zero?'Z':'.', sc61860.carry ? 'C':'.');
+			sprintf(info->s, "%c%c", sc61860.zero?'Z':'.', sc61860.carry ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + SC61860_PC:		sprintf(info->s = cpuintrf_temp_str(), "PC:%.4x", sc61860.pc);break;
-		case CPUINFO_STR_REGISTER + SC61860_DP:		sprintf(info->s = cpuintrf_temp_str(), "DP:%.4x", sc61860.dp);break;
-		case CPUINFO_STR_REGISTER + SC61860_P:		sprintf(info->s = cpuintrf_temp_str(), "P:%.2x", sc61860.p);break;
-		case CPUINFO_STR_REGISTER + SC61860_Q:		sprintf(info->s = cpuintrf_temp_str(), "Q:%.2x", sc61860.q);break;
-		case CPUINFO_STR_REGISTER + SC61860_R:		sprintf(info->s = cpuintrf_temp_str(), "R:%.2x", sc61860.r);break;
-		case CPUINFO_STR_REGISTER + SC61860_I:		sprintf(info->s = cpuintrf_temp_str(), "I:%.2x", sc61860.ram[I]);break;
-		case CPUINFO_STR_REGISTER + SC61860_J:		sprintf(info->s = cpuintrf_temp_str(), "J:%.2x", sc61860.ram[J]);break;
-		case CPUINFO_STR_REGISTER + SC61860_K:		sprintf(info->s = cpuintrf_temp_str(), "K:%.2x", sc61860.ram[K]);break;
-		case CPUINFO_STR_REGISTER + SC61860_L:		sprintf(info->s = cpuintrf_temp_str(), "L:%.2x", sc61860.ram[L]);break;
-		case CPUINFO_STR_REGISTER + SC61860_V:		sprintf(info->s = cpuintrf_temp_str(), "V:%.2x", sc61860.ram[V]);break;
-		case CPUINFO_STR_REGISTER + SC61860_W:		sprintf(info->s = cpuintrf_temp_str(), "W:%.2x", sc61860.ram[W]);break;
-		case CPUINFO_STR_REGISTER + SC61860_H:		sprintf(info->s = cpuintrf_temp_str(), "W:%.2x", sc61860.h);break;
-		case CPUINFO_STR_REGISTER + SC61860_BA:		sprintf(info->s = cpuintrf_temp_str(), "BA:%.2x%.2x", sc61860.ram[B], sc61860.ram[A]);break;
-		case CPUINFO_STR_REGISTER + SC61860_X:		sprintf(info->s = cpuintrf_temp_str(), "X: %.2x%.2x", sc61860.ram[XH], sc61860.ram[XL]);break;
-		case CPUINFO_STR_REGISTER + SC61860_Y:		sprintf(info->s = cpuintrf_temp_str(), "Y: %.2x%.2x", sc61860.ram[YH], sc61860.ram[YL]);break;
-		case CPUINFO_STR_REGISTER + SC61860_CARRY:	sprintf(info->s = cpuintrf_temp_str(), "Carry: %d", sc61860.carry);break;
-		case CPUINFO_STR_REGISTER + SC61860_ZERO:	sprintf(info->s = cpuintrf_temp_str(), "Zero: %d", sc61860.zero);break;
+		case CPUINFO_STR_REGISTER + SC61860_PC:		sprintf(info->s, "PC:%.4x", sc61860.pc);break;
+		case CPUINFO_STR_REGISTER + SC61860_DP:		sprintf(info->s, "DP:%.4x", sc61860.dp);break;
+		case CPUINFO_STR_REGISTER + SC61860_P:		sprintf(info->s, "P:%.2x", sc61860.p);break;
+		case CPUINFO_STR_REGISTER + SC61860_Q:		sprintf(info->s, "Q:%.2x", sc61860.q);break;
+		case CPUINFO_STR_REGISTER + SC61860_R:		sprintf(info->s, "R:%.2x", sc61860.r);break;
+		case CPUINFO_STR_REGISTER + SC61860_I:		sprintf(info->s, "I:%.2x", sc61860.ram[I]);break;
+		case CPUINFO_STR_REGISTER + SC61860_J:		sprintf(info->s, "J:%.2x", sc61860.ram[J]);break;
+		case CPUINFO_STR_REGISTER + SC61860_K:		sprintf(info->s, "K:%.2x", sc61860.ram[K]);break;
+		case CPUINFO_STR_REGISTER + SC61860_L:		sprintf(info->s, "L:%.2x", sc61860.ram[L]);break;
+		case CPUINFO_STR_REGISTER + SC61860_V:		sprintf(info->s, "V:%.2x", sc61860.ram[V]);break;
+		case CPUINFO_STR_REGISTER + SC61860_W:		sprintf(info->s, "W:%.2x", sc61860.ram[W]);break;
+		case CPUINFO_STR_REGISTER + SC61860_H:		sprintf(info->s, "W:%.2x", sc61860.h);break;
+		case CPUINFO_STR_REGISTER + SC61860_BA:		sprintf(info->s, "BA:%.2x%.2x", sc61860.ram[B], sc61860.ram[A]);break;
+		case CPUINFO_STR_REGISTER + SC61860_X:		sprintf(info->s, "X: %.2x%.2x", sc61860.ram[XH], sc61860.ram[XL]);break;
+		case CPUINFO_STR_REGISTER + SC61860_Y:		sprintf(info->s, "Y: %.2x%.2x", sc61860.ram[YH], sc61860.ram[YL]);break;
+		case CPUINFO_STR_REGISTER + SC61860_CARRY:	sprintf(info->s, "Carry: %d", sc61860.carry);break;
+		case CPUINFO_STR_REGISTER + SC61860_ZERO:	sprintf(info->s, "Zero: %d", sc61860.zero);break;
 	}
 }

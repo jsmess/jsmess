@@ -181,9 +181,9 @@ VIDEO_START( phoenix )
 	videoram_pg[0] = auto_malloc(0x1000);
 	videoram_pg[1] = auto_malloc(0x1000);
 
-	memory_configure_bank(1, 0, 1, videoram_pg[0], 0);
-	memory_configure_bank(1, 1, 1, videoram_pg[1], 0);
-	memory_set_bank(1, 0);
+	memory_configure_bank(machine, 1, 0, 1, videoram_pg[0], 0);
+	memory_configure_bank(machine, 1, 1, 1, videoram_pg[1], 0);
+	memory_set_bank(machine, 1, 0);
 
     videoram_pg_index = 0;
 	palette_bank = 0;
@@ -229,7 +229,7 @@ VIDEO_START( phoenix )
 
 WRITE8_HANDLER( phoenix_videoram_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
 	videoram_pg[videoram_pg_index][offset] = data;
 
@@ -252,9 +252,9 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 	{
 		/* set memory bank */
 		videoram_pg_index = data & 1;
-		memory_set_bank(1, videoram_pg_index);
+		memory_set_bank(space->machine, 1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_read(machine, "CAB") & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read(space->machine, "CAB") & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -275,9 +275,9 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 	{
 		/* set memory bank */
 		videoram_pg_index = data & 1;
-		memory_set_bank(1, videoram_pg_index);
+		memory_set_bank(space->machine, 1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_read(machine, "CAB") & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read(space->machine, "CAB") & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -300,7 +300,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 	pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
-	pleiads_sound_control_c_w(machine, offset, data);
+	pleiads_sound_control_c_w(space, offset, data);
 }
 
 
@@ -334,7 +334,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 		return 1;
 		break;
 	default:
-		logerror("Unknown protection question %02X at %04X\n", pleiads_protection_question, safe_activecpu_get_pc());
+		logerror("Unknown protection question %02X at %04X\n", pleiads_protection_question, safe_cpu_get_pc(field->port->machine->activecpu));
 		return 0;
 	}
 }
@@ -370,7 +370,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
 READ8_HANDLER( survival_input_port_0_r )
 {
-	UINT8 ret = ~input_port_read(machine, "IN0");
+	UINT8 ret = ~input_port_read(space->machine, "IN0");
 
 	if( survival_input_readc++ == 2 )
 	{

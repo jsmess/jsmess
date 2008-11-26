@@ -227,35 +227,35 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(snd_porta_r)
 {
-	//mame_printf_debug("PA R @%x\n",activecpu_get_pc());
-	return mame_rand(machine);
+	//mame_printf_debug("PA R @%x\n",cpu_get_pc(space->cpu));
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER(snd_portb_r)
 {
-	//mame_printf_debug("PB R @%x\n",activecpu_get_pc());
-	return mame_rand(machine);
+	//mame_printf_debug("PB R @%x\n",cpu_get_pc(space->cpu));
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER(snd_portc_r)
 {
-	//mame_printf_debug("PC R @%x\n",activecpu_get_pc());
-	return mame_rand(machine);
+	//mame_printf_debug("PC R @%x\n",cpu_get_pc(space->cpu));
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(snd_porta_w)
 {
-	//mame_printf_debug("PA W %x @%x\n",data,activecpu_get_pc());
+	//mame_printf_debug("PA W %x @%x\n",data,cpu_get_pc(space->cpu));
 }
 
 static WRITE8_HANDLER(snd_portb_w)
 {
-	//mame_printf_debug("PB W %x @%x\n",data,activecpu_get_pc());
+	//mame_printf_debug("PB W %x @%x\n",data,cpu_get_pc(space->cpu));
 }
 
 static WRITE8_HANDLER(snd_portc_w)
 {
-	//mame_printf_debug("PC W %x @%x\n",data,activecpu_get_pc());
+	//mame_printf_debug("PC W %x @%x\n",data,cpu_get_pc(space->cpu));
 }
 
 static ADDRESS_MAP_START( snd_io, ADDRESS_SPACE_IO, 8 )
@@ -266,7 +266,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( snd_irq )
 {
-	cpunum_set_input_line(machine, 1,UPD7810_INTF2,HOLD_LINE);
+	cpu_set_input_line(device,UPD7810_INTF2,HOLD_LINE);
 }
 
 static const UPD7810_CONFIG sound_cpu_config =
@@ -984,7 +984,7 @@ static DRIVER_INIT( fitfight )
 {
 //  UINT16 *mem16 = (UINT16 *)memory_region(machine, "main");
 //  mem16[0x0165B2/2]=0x4e71; // for now so it boots
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x700001, 0, 0, fitfight_700000_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x700000, 0x700001, 0, 0, fitfight_700000_r);
 	bbprot_kludge = 0;
 }
 
@@ -992,7 +992,7 @@ static DRIVER_INIT( histryma )
 {
 //  UINT16 *mem16 = (UINT16 *)memory_region(machine, "main");
 //  mem16[0x017FDC/2]=0x4e71; // for now so it boots
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x700001, 0, 0, histryma_700000_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x700000, 0x700001, 0, 0, histryma_700000_r);
 	bbprot_kludge = 0;
 }
 

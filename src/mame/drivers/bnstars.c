@@ -312,13 +312,13 @@ static void update_color(running_machine *machine, int color, int screen)
 static WRITE32_HANDLER( ms32_pal0_ram_w )
 {
 	COMBINE_DATA(&ms32_pal_ram[0][offset]);
-	update_color(machine, offset/2, 0);
+	update_color(space->machine, offset/2, 0);
 }
 
 static WRITE32_HANDLER( ms32_pal1_ram_w )
 {
 	COMBINE_DATA(&ms32_pal_ram[1][offset]);
-	update_color(machine, offset/2, 1);
+	update_color(space->machine, offset/2, 1);
 }
 
 static int ms32_reverse_sprite_order = 0;
@@ -1203,28 +1203,28 @@ static READ32_HANDLER( bnstars1_r )
 			return 0xffffffff;
 
 		case 0x0000:
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 
 		case 0x0080:
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 
 		case 0x2000:
-			return input_port_read(machine, "IN2");
+			return input_port_read(space->machine, "IN2");
 
 		case 0x2080:
-			return input_port_read(machine, "IN3");
+			return input_port_read(space->machine, "IN3");
 
 	}
 }
 
 static READ32_HANDLER( bnstars2_r )
 {
-	return input_port_read(machine, "IN4");
+	return input_port_read(space->machine, "IN4");
 }
 
 static READ32_HANDLER( bnstars3_r )
 {
-	return input_port_read(machine, "IN5");
+	return input_port_read(space->machine, "IN5");
 }
 
 static WRITE32_HANDLER( bnstars1_mahjong_select_w )
@@ -1286,28 +1286,28 @@ static IRQ_CALLBACK(irq_callback)
 	for(i=15; i>=0 && !(irqreq & (1<<i)); i--);
 	irqreq &= ~(1<<i);
 	if(!irqreq)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(device, 0, CLEAR_LINE);
 	return i;
 }
 
 static void irq_init(running_machine *machine)
 {
 	irqreq = 0;
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)
 {
 	irqreq |= (1<<level);
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 }
 
 
 static INTERRUPT_GEN(ms32_interrupt)
 {
-	if( cpu_getiloops() == 0 ) irq_raise(machine, 10);
-	if( cpu_getiloops() == 1 ) irq_raise(machine, 9);
+	if( cpu_getiloops(device) == 0 ) irq_raise(device->machine, 10);
+	if( cpu_getiloops(device) == 1 ) irq_raise(device->machine, 9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
        kirarast needs it too, at least 8 per frame, but waits for a variable amount
        47pi2 needs ?? per frame (otherwise it hangs when you lose)
@@ -1316,7 +1316,7 @@ static INTERRUPT_GEN(ms32_interrupt)
        desertwr
        p47aces
        */
-	if( cpu_getiloops() >= 3 && cpu_getiloops() <= 32 ) irq_raise(machine, 0);
+	if( cpu_getiloops(device) >= 3 && cpu_getiloops(device) <= 32 ) irq_raise(device->machine, 0);
 }
 
 static MACHINE_RESET( ms32 )
@@ -1442,7 +1442,7 @@ static DRIVER_INIT (bnstars)
 	decrypt_ms32_tx(machine, 0x00020,0x7e, "gfx7");
 	decrypt_ms32_bg(machine, 0x00001,0x9b, "gfx6");
 
-	memory_set_bankptr(1, memory_region(machine, "main"));
+	memory_set_bankptr(machine, 1, memory_region(machine, "main"));
 }
 
 GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_NO_SOUND )

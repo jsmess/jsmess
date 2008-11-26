@@ -53,8 +53,8 @@ static UINT8 williams_sound_int_state;
 static UINT8 audio_talkback;
 static UINT8 audio_sync;
 
-static INT8 sound_cpunum;
-static INT8 soundalt_cpunum;
+static const device_config *sound_cpu;
+static const device_config *soundalt_cpu;
 static UINT8 williams_pianum;
 
 
@@ -265,8 +265,8 @@ void williams_cvsd_init(int pianum)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpunum = mame_find_cpu_index(Machine, "cvsd");
-	soundalt_cpunum = -1;
+	sound_cpu = cputag_get_cpu(Machine, "cvsd");
+	soundalt_cpu = NULL;
 
 	/* configure the PIA */
 	williams_pianum = pianum;
@@ -282,9 +282,9 @@ void williams_cvsd_init(int pianum)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * ((bank >> 2) & 3) + 0x20000 * (bank & 3);
-		memory_configure_bank(5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bank(5, 0);
+	memory_set_bank(sound_cpu->machine, 5, 0);
 
 	/* reset the IRQ state */
 	pia_set_input_ca1(williams_pianum, 1);
@@ -301,8 +301,8 @@ void williams_narc_init(void)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpunum = mame_find_cpu_index(Machine, "narc1");
-	soundalt_cpunum = mame_find_cpu_index(Machine, "narc2");
+	sound_cpu = cputag_get_cpu(Machine, "narc1");
+	soundalt_cpu = cputag_get_cpu(Machine, "narc2");
 
 	/* configure master CPU banks */
 	ROM = memory_region(Machine, "narc1");
@@ -314,9 +314,9 @@ void williams_narc_init(void)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(sound_cpu->machine, 6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
 	ROM = memory_region(Machine, "narc2");
@@ -328,9 +328,9 @@ void williams_narc_init(void)
             D3 -> A16
         */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(7, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(Machine, 7, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(sound_cpu->machine, 8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* register for save states */
 	state_save_register_global(williams_sound_int_state);
@@ -344,13 +344,13 @@ void williams_adpcm_init(void)
 	UINT8 *ROM;
 
 	/* configure the CPU */
-	sound_cpunum = mame_find_cpu_index(Machine, "adpcm");
-	soundalt_cpunum = -1;
+	sound_cpu = cputag_get_cpu(Machine, "adpcm");
+	soundalt_cpu = NULL;
 
 	/* configure banks */
 	ROM = memory_region(Machine, "adpcm");
-	memory_configure_bank(5, 0, 8, &ROM[0x10000], 0x8000);
-	memory_set_bankptr(6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
+	memory_configure_bank(Machine, 5, 0, 8, &ROM[0x10000], 0x8000);
+	memory_set_bankptr(sound_cpu->machine, 6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
@@ -384,17 +384,17 @@ static void init_audio_state(running_machine *machine)
 
 	/* clear all the interrupts */
 	williams_sound_int_state = 0;
-	if (sound_cpunum != -1)
+	if (sound_cpu != NULL)
 	{
-		cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, sound_cpunum, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
-	if (soundalt_cpunum != -1)
+	if (soundalt_cpu != NULL)
 	{
-		cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, soundalt_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, soundalt_cpunum, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(soundalt_cpu, M6809_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(soundalt_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -412,13 +412,13 @@ static void cvsd_ym2151_irq(running_machine *machine, int state)
 
 static void cvsd_irqa(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void cvsd_irqb(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, sound_cpunum, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -429,7 +429,7 @@ static void cvsd_irqb(running_machine *machine, int state)
 
 static void adpcm_ym2151_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -440,7 +440,7 @@ static void adpcm_ym2151_irq(running_machine *machine, int state)
 
 static WRITE8_HANDLER( cvsd_bank_select_w )
 {
-	memory_set_bank(5, data & 0x0f);
+	memory_set_bank(space->machine, 5, data & 0x0f);
 }
 
 
@@ -484,16 +484,18 @@ void williams_cvsd_data_w(int data)
 
 void williams_cvsd_reset_w(int state)
 {
+	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+
 	/* going high halts the CPU */
 	if (state)
 	{
-		cvsd_bank_select_w(Machine, 0, 0);
-		init_audio_state(Machine);
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		cvsd_bank_select_w(space, 0, 0);
+		init_audio_state(space->machine);
+		cpu_set_input_line(space->cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -504,35 +506,35 @@ void williams_cvsd_reset_w(int state)
 
 static WRITE8_HANDLER( narc_master_bank_select_w )
 {
-	memory_set_bank(5, data & 0x0f);
+	memory_set_bank(space->machine, 5, data & 0x0f);
 }
 
 
 static WRITE8_HANDLER( narc_slave_bank_select_w )
 {
-	memory_set_bank(7, data & 0x0f);
+	memory_set_bank(space->machine, 7, data & 0x0f);
 }
 
 
 static READ8_HANDLER( narc_command_r )
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
 	williams_sound_int_state = 0;
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 
 static WRITE8_HANDLER( narc_command2_w )
 {
-	soundlatch2_w(machine, 0, data & 0xff);
-	cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, ASSERT_LINE);
+	soundlatch2_w(space, 0, data & 0xff);
+	cpu_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( narc_command2_r )
 {
-	cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
-	return soundlatch2_r(machine, 0);
+	cpu_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	return soundlatch2_r(space, 0);
 }
 
 
@@ -577,11 +579,13 @@ static WRITE8_HANDLER( narc_slave_sync_w )
 
 void williams_narc_data_w(int data)
 {
-	soundlatch_w(Machine, 0, data & 0xff);
-	cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
+	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+
+	soundlatch_w(space, 0, data & 0xff);
+	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x200))
 	{
-		cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
 	}
 }
@@ -592,17 +596,18 @@ void williams_narc_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		narc_master_bank_select_w(Machine, 0, 0);
-		narc_slave_bank_select_w(Machine, 0, 0);
-		init_audio_state(Machine);
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(Machine, soundalt_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+		narc_master_bank_select_w(space, 0, 0);
+		narc_slave_bank_select_w(space, 0, 0);
+		init_audio_state(space->machine);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(soundalt_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
 	{
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(Machine, soundalt_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(soundalt_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 
@@ -620,7 +625,7 @@ int williams_narc_talkback_r(void)
 
 static WRITE8_HANDLER( adpcm_bank_select_w )
 {
-	memory_set_bank(5, data & 0x07);
+	memory_set_bank(space->machine, 5, data & 0x07);
 }
 
 
@@ -638,12 +643,12 @@ static TIMER_CALLBACK( clear_irq_state )
 
 static READ8_HANDLER( adpcm_command_r )
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, clear_irq_state);
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 
@@ -661,12 +666,13 @@ static WRITE8_HANDLER( adpcm_talkback_w )
 
 void williams_adpcm_data_w(int data)
 {
-	soundlatch_w(Machine, 0, data & 0xff);
+	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+	soundlatch_w(space, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
-		cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
-		cpu_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
 
@@ -676,13 +682,14 @@ void williams_adpcm_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		adpcm_bank_select_w(Machine, 0, 0);
-		init_audio_state(Machine);
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+		adpcm_bank_select_w(space, 0, 0);
+		init_audio_state(space->machine);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

@@ -313,33 +313,33 @@ static void rf5c400_init_chip(const char *tag, struct rf5c400_info *info, int sn
 
 	for (i = 0; i < ARRAY_LENGTH(info->channels); i++)
 	{
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].startH);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].startL);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].freq);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].endL);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].endHloopH);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].loopL);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].pan);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].effect);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].volume);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].attack);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].decay);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].release);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].cutoff);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].pos);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].step);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].keyon);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_phase);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_level);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_step);
-		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_scale);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].startH);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].startL);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].freq);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].endL);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].endHloopH);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].loopL);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].pan);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].effect);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].volume);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].attack);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].decay);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].release);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].cutoff);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].pos);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].step);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].keyon);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].env_phase);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].env_level);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].env_step);
+		state_save_register_item("rf5c400", tag, i, info->channels[i].env_scale);
 	}
 
 	info->stream = stream_create(0, 2, clock/384, info, rf5c400_update);
 }
 
 
-static void *rf5c400_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( rf5c400 )
 {
 	struct rf5c400_info *info;
 
@@ -443,11 +443,11 @@ static void rf5c400_w(int chipnum, int offset, UINT16 data)
 
 			default:
 			{
-				//mame_printf_debug("rf5c400_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+				//mame_printf_debug("rf5c400_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 				break;
 			}
 		}
-		//mame_printf_debug("rf5c400_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+		//mame_printf_debug("rf5c400_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 	else
 	{
@@ -567,7 +567,7 @@ WRITE16_HANDLER( rf5c400_0_w )
  * Generic get_info
  **************************************************************************/
 
-static void rf5c400_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( rf5c400 )
 {
 	switch (state)
 	{
@@ -576,15 +576,15 @@ static void rf5c400_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void rf5c400_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( rf5c400 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = rf5c400_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = rf5c400_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( rf5c400 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( rf5c400 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

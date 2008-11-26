@@ -695,12 +695,12 @@ static int fifoout_read_request = 0;
 
 static UINT8 sb_coin_latch = 0;
 
-static UINT8 z80_fifoout_pop(void)
+static UINT8 z80_fifoout_pop(running_machine *machine)
 {
 	UINT8 r;
 	if (fifoout_wpos == fifoout_rpos)
 	{
-		logerror("Sound FIFOOUT underflow at %08X\n", activecpu_get_pc());
+		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(machine->activecpu));
 	}
 	r = fifoout_data[fifoout_rpos++];
 	if(fifoout_rpos == FIFO_SIZE)
@@ -716,7 +716,7 @@ static UINT8 z80_fifoout_pop(void)
 	return r;
 }
 
-static void z80_fifoout_push(UINT8 data)
+static void z80_fifoout_push(running_machine *machine, UINT8 data)
 {
 	fifoout_data[fifoout_wpos++] = data;
 	if (fifoout_wpos == FIFO_SIZE)
@@ -725,18 +725,18 @@ static void z80_fifoout_push(UINT8 data)
 	}
 	if(fifoout_wpos == fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X", activecpu_get_pc());
+		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(machine->activecpu));
 	}
 
 	fifoout_read_request = 1;
 }
 
-static UINT8 z80_fifoin_pop(void)
+static UINT8 z80_fifoin_pop(running_machine *machine)
 {
 	UINT8 r;
 	if (fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X", activecpu_get_pc());
+		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(machine->activecpu));
 	}
 	r = fifoin_data[fifoin_rpos++];
 	if(fifoin_rpos == FIFO_SIZE)
@@ -752,7 +752,7 @@ static UINT8 z80_fifoin_pop(void)
 	return r;
 }
 
-static void z80_fifoin_push(UINT8 data)
+static void z80_fifoin_push(running_machine *machine, UINT8 data)
 {
 	fifoin_data[fifoin_wpos++] = data;
 	if(fifoin_wpos == FIFO_SIZE)
@@ -761,7 +761,7 @@ static void z80_fifoin_push(UINT8 data)
 	}
 	if(fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X", activecpu_get_pc());
+		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(machine->activecpu));
 	}
 
 	fifoin_read_request = 1;
@@ -785,7 +785,7 @@ static WRITE8_HANDLER( sb_coin_w )
 
 static READ32_HANDLER( sound_fifo_r )
 {
-	UINT8 r = z80_fifoout_pop();
+	UINT8 r = z80_fifoout_pop(space->machine);
 
 	return r;
 }
@@ -793,7 +793,7 @@ static READ32_HANDLER( sound_fifo_r )
 static WRITE32_HANDLER( sound_fifo_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		z80_fifoin_push(data & 0xff);
+		z80_fifoin_push(space->machine, data & 0xff);
 	}
 }
 
@@ -809,7 +809,7 @@ static READ32_HANDLER( sound_fifo_status_r )
 
 static READ32_HANDLER( spi_int_r )
 {
-	cpunum_set_input_line(machine, 0, 0,CLEAR_LINE );
+	cpu_set_input_line(space->machine->cpu[0], 0,CLEAR_LINE );
 	return 0xffffffff;
 }
 
@@ -821,14 +821,14 @@ static READ32_HANDLER( spi_unknown_r )
 static WRITE32_HANDLER( ds2404_reset_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		DS2404_1W_reset_w(machine, offset, data);
+		DS2404_1W_reset_w(space, offset, data);
 	}
 }
 
 static READ32_HANDLER( ds2404_data_r )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		return DS2404_data_r(machine, offset);
+		return DS2404_data_r(space, offset);
 	}
 	return 0;
 }
@@ -836,14 +836,14 @@ static READ32_HANDLER( ds2404_data_r )
 static WRITE32_HANDLER( ds2404_data_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		DS2404_data_w(machine, offset, data);
+		DS2404_data_w(space, offset, data);
 	}
 }
 
 static WRITE32_HANDLER( ds2404_clk_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		DS2404_clk_w(machine, offset, data);
+		DS2404_clk_w(space, offset, data);
 	}
 }
 
@@ -881,9 +881,9 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( ACCESSING_BITS_0_7 ) {
 		if( data & 0x1 ) {
 			z80_prg_fifo_pos = 0;
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE );
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
 		}
 	}
 }
@@ -892,7 +892,7 @@ static READ32_HANDLER( spi_controls1_r )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(machine, "INPUTS");
+		return input_port_read(space->machine, "INPUTS");
 	}
 	return 0xffffffff;
 }
@@ -901,32 +901,32 @@ static READ32_HANDLER( spi_controls2_r )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(machine, "SYSTEM");
+		return input_port_read(space->machine, "SYSTEM");
 	}
 	return 0xffffffff;
 }
 
 static READ32_HANDLER( spi_6295_0_r )
 {
-	return okim6295_status_0_r(machine, 0);
+	return okim6295_status_0_r(space, 0);
 }
 
 static READ32_HANDLER( spi_6295_1_r )
 {
-	return okim6295_status_1_r(machine, 0);
+	return okim6295_status_1_r(space, 0);
 }
 
 static WRITE32_HANDLER( spi_6295_0_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_0_w(machine, 0, data & 0xff);
+		okim6295_data_0_w(space, 0, data & 0xff);
 	}
 }
 
 static WRITE32_HANDLER( spi_6295_1_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_1_w(machine, 0, data & 0xff);
+		okim6295_data_1_w(space, 0, data & 0xff);
 	}
 }
 
@@ -934,14 +934,14 @@ static WRITE32_HANDLER( spi_6295_1_w )
 
 static READ8_HANDLER( z80_soundfifo_r )
 {
-	UINT8 r = z80_fifoin_pop();
+	UINT8 r = z80_fifoin_pop(space->machine);
 
 	return r;
 }
 
 static WRITE8_HANDLER( z80_soundfifo_w )
 {
-	z80_fifoout_push(data);
+	z80_fifoout_push(space->machine, data);
 }
 
 static READ8_HANDLER( z80_soundfifo_status_r )
@@ -959,24 +959,24 @@ static WRITE8_HANDLER( z80_bank_w )
 	if ((data & 7) != z80_lastbank)
 	{
 		z80_lastbank = (data & 7);
-		memory_set_bankptr(4, z80_rom + (0x8000 * z80_lastbank));
+		memory_set_bankptr(space->machine, 4, z80_rom + (0x8000 * z80_lastbank));
 	}
 }
 
 static READ8_HANDLER( z80_jp1_r )
 {
-	return input_port_read(machine, "JP1");
+	return input_port_read(space->machine, "JP1");
 }
 
 static READ8_HANDLER( z80_coin_r )
 {
-	return input_port_read(machine, "COIN");
+	return input_port_read(space->machine, "COIN");
 }
 
 static READ32_HANDLER( soundrom_r )
 {
-	UINT8 *sound = (UINT8*)memory_region(machine, "user2");
-	UINT16 *sound16 = (UINT16*)memory_region(machine, "user2");
+	UINT8 *sound = (UINT8*)memory_region(space->machine, "user2");
+	UINT16 *sound16 = (UINT16*)memory_region(space->machine, "user2");
 
 	if (mem_mask == 0x000000ff)
 	{
@@ -1078,9 +1078,9 @@ static WRITE8_HANDLER( flashrom_write )
 static void irqhandler(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
+		cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ymf271_interface ymf271_config =
@@ -1687,7 +1687,7 @@ static NVRAM_HANDLER( sxx2f )
 
 static INTERRUPT_GEN( spi_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE );
+	cpu_set_input_line(device, 0, ASSERT_LINE );
 }
 
 static IRQ_CALLBACK(spi_irq_callback)
@@ -1705,16 +1705,16 @@ static MACHINE_RESET( spi )
 	UINT8 *rombase = memory_region(machine, "user1");
 	UINT8 flash_data = rombase[0x1ffffc];
 
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
-	cpunum_set_irq_callback(0, spi_irq_callback);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
+	cpu_set_irq_callback(machine->cpu[0], spi_irq_callback);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
 
 	z80_rom = auto_malloc(0x40000);
-	memory_set_bankptr(4, z80_rom);
-	memory_set_bankptr(5, z80_rom);
+	memory_set_bankptr(machine, 4, z80_rom);
+	memory_set_bankptr(machine, 5, z80_rom);
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
@@ -1776,14 +1776,14 @@ static MACHINE_RESET( sxx2f )
 	UINT8 *rom = memory_region(machine, "sound");
 
 	z80_rom = auto_malloc(0x40000);
-	memory_set_bankptr(4, z80_rom);
-	memory_set_bankptr(5, z80_rom);
+	memory_set_bankptr(machine, 4, z80_rom);
+	memory_set_bankptr(machine, 5, z80_rom);
 
 	memcpy(z80_rom, rom, 0x40000);
 
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sb_coin_r);
-	cpunum_set_irq_callback(0, spi_irq_callback);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000680, 0x00000683, 0, 0, sb_coin_r);
+	cpu_set_irq_callback(machine->cpu[0], spi_irq_callback);
 
 	sb_coin_latch = 0;
 }
@@ -1818,25 +1818,25 @@ MACHINE_DRIVER_END
 
 static READ32_HANDLER ( senkyu_speedup_r )
 {
-	if (activecpu_get_pc()==0x00305bb2) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x00305bb2) cpu_spinuntil_int(space->cpu); // idle
 	return spimainram[(0x0018cb4-0x800)/4];
 }
 
 static READ32_HANDLER( senkyua_speedup_r )
 {
-	if (activecpu_get_pc()== 0x30582e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)== 0x30582e) cpu_spinuntil_int(space->cpu); // idle
 	return spimainram[(0x0018c9c-0x800)/4];
 }
 
 static READ32_HANDLER ( batlball_speedup_r )
 {
-//  printf("activecpu_get_pc() %06x\n", activecpu_get_pc());
+//  printf("cpu_get_pc(space->cpu) %06x\n", cpu_get_pc(space->cpu));
 
 	/* batlbalu */
-	if (activecpu_get_pc()==0x00305996) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x00305996) cpu_spinuntil_int(space->cpu); // idle
 
 	/* batlball */
-	if (activecpu_get_pc()==0x003058aa) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x003058aa) cpu_spinuntil_int(space->cpu); // idle
 
 	return spimainram[(0x0018db4-0x800)/4];
 }
@@ -1844,21 +1844,21 @@ static READ32_HANDLER ( batlball_speedup_r )
 static READ32_HANDLER ( rdft_speedup_r )
 {
 	/* rdft */
-	if (activecpu_get_pc()==0x0203f0a) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f0a) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftau */
-	if (activecpu_get_pc()==0x0203f16) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f16) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftj */
-	if (activecpu_get_pc()==0x0203f22) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f22) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftdi */
-	if (activecpu_get_pc()==0x0203f46) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f46) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftu */
-	if (activecpu_get_pc()==0x0203f3a) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f3a) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 	return spimainram[(0x00298d0-0x800)/4];
 }
@@ -1866,15 +1866,15 @@ static READ32_HANDLER ( rdft_speedup_r )
 static READ32_HANDLER ( viprp1_speedup_r )
 {
 	/* viprp1 */
-	if (activecpu_get_pc()==0x0202769) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0202769) cpu_spinuntil_int(space->cpu); // idle
 
 	/* viprp1s */
-	if (activecpu_get_pc()==0x02027e9) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x02027e9) cpu_spinuntil_int(space->cpu); // idle
 
 	/* viprp1ot */
-	if (activecpu_get_pc()==0x02026bd) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x02026bd) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 	return spimainram[(0x001e2e0-0x800)/4];
 }
@@ -1882,8 +1882,8 @@ static READ32_HANDLER ( viprp1_speedup_r )
 static READ32_HANDLER ( viprp1o_speedup_r )
 {
 	/* viperp1o */
-	if (activecpu_get_pc()==0x0201f99) cpu_spinuntil_int(); // idle
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+	if (cpu_get_pc(space->cpu)==0x0201f99) cpu_spinuntil_int(space->cpu); // idle
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 	return spimainram[(0x001d49c-0x800)/4];
 }
 
@@ -1891,8 +1891,8 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 // causes input problems?
 READ32_HANDLER ( ejanhs_speedup_r )
 {
-// mame_printf_debug("%08x\n",activecpu_get_pc());
- if (activecpu_get_pc()==0x03032c7) cpu_spinuntil_int(); // idle
+// mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
+ if (cpu_get_pc(space->cpu)==0x03032c7) cpu_spinuntil_int(space->cpu); // idle
  return spimainram[(0x002d224-0x800)/4];
 }
 #endif
@@ -1901,18 +1901,18 @@ static READ32_HANDLER ( rf2_speedup_r )
 {
 
 	/* rdft22kc */
-	if (activecpu_get_pc()==0x0203926) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0203926) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdft2, rdft2j */
-	if (activecpu_get_pc()==0x0204372) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0204372) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdft2us */
-	if (activecpu_get_pc()==0x020420e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x020420e) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdft2a */
-	if (activecpu_get_pc()==0x0204366) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0204366) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 	return spimainram[(0x0282AC-0x800)/4];
 }
@@ -1920,22 +1920,22 @@ static READ32_HANDLER ( rf2_speedup_r )
 static READ32_HANDLER ( rfjet_speedup_r )
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (activecpu_get_pc()==0x0206082) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0206082) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rfjetus */
-	if (activecpu_get_pc()==0x0205b39)
+	if (cpu_get_pc(space->cpu)==0x0205b39)
 	{
 		UINT32 r;
-		cpu_spinuntil_int(); // idle
+		cpu_spinuntil_int(space->cpu); // idle
 		// Hack to enter test mode
 		r = spimainram[(0x002894c-0x800)/4] & (~0x400);
-		return r | (((input_port_read(machine, "SYSTEM") ^ 0xff)<<8) & 0x400);
+		return r | (((input_port_read(space->machine, "SYSTEM") ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (activecpu_get_pc()==0x0205f2e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(space->cpu)==0x0205f2e) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 
 	return spimainram[(0x002894c-0x800)/4];
@@ -1953,28 +1953,28 @@ static void init_spi(running_machine *machine)
 
 static DRIVER_INIT( rdft )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00298d0, 0x00298d3, 0, 0, rdft_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00298d0, 0x00298d3, 0, 0, rdft_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyu )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0018cb4, 0x0018cb7, 0, 0, senkyu_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0018cb4, 0x0018cb7, 0, 0, senkyu_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyua )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0018c9c, 0x0018c9f, 0, 0, senkyua_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0018c9c, 0x0018c9f, 0, 0, senkyua_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( batlball )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0018db4, 0x0018db7, 0, 0, batlball_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0018db4, 0x0018db7, 0, 0, batlball_speedup_r );
 
 	init_spi(machine);
 }
@@ -1982,21 +1982,21 @@ static DRIVER_INIT( batlball )
 static DRIVER_INIT( ejanhs )
 {
 //  idle skip doesn't work properly?
-//  memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002d224, 0x002d227, 0, 0, ejanhs_speedup_r );
+//  memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x002d224, 0x002d227, 0, 0, ejanhs_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1 )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x001e2e0, 0x001e2e3, 0, 0, viprp1_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x001e2e0, 0x001e2e3, 0, 0, viprp1_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1o )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x001d49c, 0x001d49f, 0, 0, viprp1o_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x001d49c, 0x001d49f, 0, 0, viprp1o_speedup_r );
 
 	init_spi(machine);
 }
@@ -2008,12 +2008,12 @@ static void init_rf2(running_machine *machine)
 	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
 	seibuspi_rise10_text_decrypt(memory_region(machine, "gfx1"));
 	seibuspi_rise10_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
 	seibuspi_rise10_sprite_decrypt(memory_region(machine, "gfx3"), 0x600000);
 
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
 
 static DRIVER_INIT( rdft2 )
@@ -2032,12 +2032,12 @@ static DRIVER_INIT( rfjet )
 	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
 	seibuspi_rise11_text_decrypt(memory_region(machine, "gfx1"));
 	seibuspi_rise11_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
 	seibuspi_rise11_sprite_decrypt(memory_region(machine, "gfx3"), 0x800000);
 
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
 
 /* SYS386 */
@@ -2049,7 +2049,7 @@ static DRIVER_INIT( rdft22kc )
 
 static MACHINE_RESET( seibu386 )
 {
-	cpunum_set_irq_callback(0, spi_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], spi_irq_callback);
 }
 
 static MACHINE_DRIVER_START( seibu386 )

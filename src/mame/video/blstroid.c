@@ -98,15 +98,17 @@ VIDEO_START( blstroid )
 
 static TIMER_CALLBACK( irq_off )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* clear the interrupt */
-	atarigen_scanline_int_ack_w(machine, 0, 0, 0xffff);
+	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
 }
 
 
 static TIMER_CALLBACK( irq_on )
 {
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine, 0);
+	atarigen_scanline_int_gen(machine->cpu[0]);
 	atarigen_update_interrupts(machine);
 }
 

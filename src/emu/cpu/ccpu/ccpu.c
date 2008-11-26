@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "ccpu.h"
 
 
@@ -39,6 +38,11 @@ typedef struct
 
 	UINT8		waiting;
 	UINT8		watchdog;
+
+	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 } ccpuRegs;
 
 
@@ -56,13 +60,13 @@ static int ccpu_icount;
     MACROS
 ***************************************************************************/
 
-#define READOP(a) 			(cpu_readop(a))
+#define READOP(a) 			(memory_decrypted_read_byte(ccpu.program, a))
 
-#define RDMEM(a)			(data_read_word_16be((a) * 2) & 0xfff)
-#define WRMEM(a,v)			(data_write_word_16be((a) * 2, (v)))
+#define RDMEM(a)			(memory_read_word_16be(ccpu.data, (a) * 2) & 0xfff)
+#define WRMEM(a,v)			(memory_write_word_16be(ccpu.data, (a) * 2, (v)))
 
-#define READPORT(a)			(io_read_byte_8be(a))
-#define WRITEPORT(a,v)		(io_write_byte_8be((a), (v)))
+#define READPORT(a)			(memory_read_byte_8be(ccpu.io, a))
+#define WRITEPORT(a,v)		(memory_write_byte_8be(ccpu.io, (a), (v)))
 
 #define SET_A0()			do { ccpu.a0flag = ccpu.A; } while (0)
 #define SET_CMP_VAL(x)		do { ccpu.cmpacc = *ccpu.acc; ccpu.cmpval = (x) & 0xfff; } while (0)
@@ -108,7 +112,6 @@ static CPU_SET_CONTEXT( ccpu )
 	/* copy the context */
 	if (src)
 		ccpu = *(ccpuRegs *)src;
-	change_pc(ccpu.PC);
 }
 
 
@@ -136,31 +139,35 @@ void ccpu_wdt_timer_trigger(void)
 
 static CPU_INIT( ccpu )
 {
-	const ccpu_config *configdata = config;
+	const ccpu_config *configdata = device->static_config;
 
 	/* copy input params */
 	ccpu.external_input = configdata->external_input ? configdata->external_input : read_jmi;
 	ccpu.vector_callback = configdata->vector_callback;
+	ccpu.device = device;
+	ccpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	ccpu.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	ccpu.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("ccpu", clock, ccpu.PC);
-	state_save_register_item("ccpu", clock, ccpu.A);
-	state_save_register_item("ccpu", clock, ccpu.B);
-	state_save_register_item("ccpu", clock, ccpu.I);
-	state_save_register_item("ccpu", clock, ccpu.J);
-	state_save_register_item("ccpu", clock, ccpu.P);
-	state_save_register_item("ccpu", clock, ccpu.X);
-	state_save_register_item("ccpu", clock, ccpu.Y);
-	state_save_register_item("ccpu", clock, ccpu.T);
-	state_save_register_item("ccpu", clock, ccpu.a0flag);
-	state_save_register_item("ccpu", clock, ccpu.ncflag);
-	state_save_register_item("ccpu", clock, ccpu.cmpacc);
-	state_save_register_item("ccpu", clock, ccpu.cmpval);
-	state_save_register_item("ccpu", clock, ccpu.miflag);
-	state_save_register_item("ccpu", clock, ccpu.nextmiflag);
-	state_save_register_item("ccpu", clock, ccpu.nextnextmiflag);
-	state_save_register_item("ccpu", clock, ccpu.drflag);
-	state_save_register_item("ccpu", clock, ccpu.waiting);
-	state_save_register_item("ccpu", clock, ccpu.watchdog);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.PC);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.A);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.B);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.I);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.J);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.P);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.X);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.Y);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.T);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.a0flag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.ncflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.cmpacc);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.cmpval);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.miflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.nextmiflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.nextnextmiflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.drflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.waiting);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.watchdog);
 }
 
 
@@ -213,7 +220,7 @@ static CPU_EXECUTE( ccpu )
 		ccpu.nextmiflag = ccpu.nextnextmiflag;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(Machine, ccpu.PC);
+		debugger_instruction_hook(device, ccpu.PC);
 		opcode = READOP(ccpu.PC++);
 
 		switch (opcode)
@@ -288,7 +295,6 @@ static CPU_EXECUTE( ccpu )
 			/* T4K */
 			case 0x50:
 				ccpu.PC = (ccpu.P << 12) + ccpu.J;
-				change_pc(ccpu.PC);
 				NEXT_ACC_B(); CYCLES(4);
 				break;
 
@@ -704,7 +710,7 @@ static CPU_SET_INFO( ccpu )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + CCPU_PC:			ccpu.PC = info->i;						break;
-		case CPUINFO_INT_REGISTER + CCPU_FLAGS:
+		case CPUINFO_INT_REGISTER + Ccpu_get_flags:
 				ccpu.a0flag = (info->i & 0x01) ? 1 : 0;
 				ccpu.ncflag = (info->i & 0x02) ? 0x0000 : 0x1000;
 				ccpu.cmpacc = 1;
@@ -760,7 +766,7 @@ CPU_GET_INFO( ccpu )
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + CCPU_PC: 			info->i = ccpu.PC;						break;
-		case CPUINFO_INT_REGISTER + CCPU_FLAGS:			info->i = 0;
+		case CPUINFO_INT_REGISTER + Ccpu_get_flags:			info->i = 0;
 				if (TEST_A0()) info->i |= 0x01;
 				if (TEST_NC()) info->i |= 0x02;
 				if (TEST_LT()) info->i |= 0x04;
@@ -807,7 +813,7 @@ CPU_GET_INFO( ccpu )
 	        		TEST_DR() ? 'D' : 'd');
 	        break;
 
-        case CPUINFO_STR_REGISTER + CCPU_FLAGS:
+        case CPUINFO_STR_REGISTER + Ccpu_get_flags:
     		sprintf(info->s, "FL:%c%c%c%c%c%c",
 	        		TEST_A0() ? '0' : 'o',
 	        		TEST_NC() ? 'N' : 'n',

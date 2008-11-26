@@ -185,7 +185,7 @@ static UINT8 mxtc_config_r(int function, int reg)
 
 static void mxtc_config_w(running_machine *machine, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("MXTC: write %d, %02X, %02X at %08X\n", function, reg, data, activecpu_get_pc());
+//  mame_printf_debug("MXTC: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
 
 	switch(reg)
 	{
@@ -193,11 +193,11 @@ static void mxtc_config_w(running_machine *machine, int function, int reg, UINT8
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(1, bios_ram);
+				memory_set_bankptr(machine, 1, bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
+				memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
 			}
 			break;
 		}
@@ -269,7 +269,7 @@ static UINT8 piix4_config_r(int function, int reg)
 
 static void piix4_config_w(int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("PIIX4: write %d, %02X, %02X at %08X\n", function, reg, data, activecpu_get_pc());
+//  mame_printf_debug("PIIX4: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
 	piix4_config_reg[function][reg] = data;
 }
 
@@ -421,13 +421,14 @@ static WRITE8_HANDLER(at_page8_w)
 
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpuintrf_push_context(0);
-	result = program_read_byte(page_offset + offset);
-	cpuintrf_pop_context();
+	cpu_push_context(space->cpu);
+	result = memory_read_byte(space, page_offset + offset);
+	cpu_pop_context();
 
 	return result;
 }
@@ -435,12 +436,13 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 
 static DMA8237_MEM_WRITE( pc_dma_write_byte )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpuintrf_push_context(0);
-	program_write_byte(page_offset + offset, data);
-	cpuintrf_pop_context();
+	cpu_push_context(space->cpu);
+	memory_write_byte(space, page_offset + offset, data);
+	cpu_pop_context();
 }
 
 
@@ -473,13 +475,13 @@ static const struct dma8237_interface dma8237_2_config =
 
 static READ32_HANDLER(at_page32_r)
 {
-	return read32le_with_read8_handler(at_page8_r, machine, offset, mem_mask);
+	return read32le_with_read8_handler(at_page8_r, space, offset, mem_mask);
 }
 
 
 static WRITE32_HANDLER(at_page32_w)
 {
-	write32le_with_write8_handler(at_page8_w, machine, offset, data, mem_mask);
+	write32le_with_write8_handler(at_page8_w, space, offset, data, mem_mask);
 }
 
 
@@ -586,9 +588,9 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_RESET(gamecstl)
 {
-	memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
 
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	gamecstl_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
 	gamecstl_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
@@ -605,7 +607,7 @@ static MACHINE_RESET(gamecstl)
  *************************************************************/
 
 static PIC8259_SET_INT_LINE( gamecstl_pic8259_1_set_int_line ) {
-	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -709,7 +711,7 @@ static const struct pci_device_info intel82371ab =
 
 static void set_gate_a20(int a20)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_A20, a20);
+	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(int state)

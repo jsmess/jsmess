@@ -151,13 +151,13 @@ static int coin;
 static WRITE8_HANDLER( sprite_dma_0_w )
 {
     int source = ( data & 7 );
-     ppu2c0x_spriteram_dma( 0, source );
+     ppu2c0x_spriteram_dma( space, 0, source );
 }
 
 static WRITE8_HANDLER( sprite_dma_1_w )
 {
     int source = ( data & 7 );
-    ppu2c0x_spriteram_dma( 1, source );
+    ppu2c0x_spriteram_dma( space, 1, source );
 }
 
 static WRITE8_HANDLER( vsnes_coin_counter_w )
@@ -166,7 +166,7 @@ static WRITE8_HANDLER( vsnes_coin_counter_w )
 	coin = data;
 	if( data & 0xfe ) //"bnglngby" and "cluclu"
 	{
-		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", activecpu_get_pc(), data);
+		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 	if( data & 0xfe ) //vsbball service mode
 	{
 		//do something?
-		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", activecpu_get_pc(), data);
+		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(space->cpu), data);
 	}
 
 }
@@ -190,32 +190,32 @@ static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(machine, 0x15);
+	return nes_psg_0_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(machine, 0x15, data);
+	nes_psg_0_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(machine, 0x17, data);
+	nes_psg_0_w(space, 0x17, data);
 }
 
 static READ8_HANDLER( psg1_4015_r )
 {
-	return nes_psg_1_r(machine, 0x15);
+	return nes_psg_1_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg1_4015_w )
 {
-	nes_psg_1_w(machine, 0x15, data);
+	nes_psg_1_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg1_4017_w )
 {
-	nes_psg_1_w(machine, 0x17, data);
+	nes_psg_1_w(space, 0x17, data);
 }
 
 static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1888,6 +1888,18 @@ ROM_START( suprmria )
 	ROM_LOAD( "mds-sm4.2a",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 ROM_END
 
+ROM_START( skatekds )
+	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000,CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
+	ROM_LOAD( "mds-sm4.1c",  0xa000, 0x2000,CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) )
+	ROM_LOAD( "mds-sm4.1b",  0xc000, 0x2000,CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
+	ROM_LOAD( "mds-sm4.1a",  0xe000, 0x2000,CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
+
+	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
+	ROM_LOAD( "mds-sm4.2b",  0x0000, 0x2000,CRC(f3980303) SHA1(b9a25c906d1861c89e2e40e878a34d318daf6619) )
+	ROM_LOAD( "mds-sm4.2a",  0x2000, 0x2000,CRC(7a0ab7eb) SHA1(b6c32791481fafddc8504adb4eaed30a2fb3a03e) )
+ROM_END
+
 ROM_START( iceclimb )
 	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
 	ROM_LOAD( "ic-1d",  0x8000, 0x2000, CRC(65e21765) SHA1(900f1efe5e8005ee8cdccbf5039914dfe466aa3d) )
@@ -2512,6 +2524,7 @@ GAME( 1986, rbibb,    0,        vsnes,   rbibb,    rbibb,    ROT0, "Namco",     
 GAME( 1986, rbibba,	  rbibb,    vsnes,   rbibb,    rbibb,    ROT0, "Namco",     "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, suprmrio, ROT0, "Nintendo",  "Vs. Super Mario Bros.", 0 )
 GAME( 1986, suprmria, suprmrio, vsnes,   suprmrio, suprmrio, ROT0, "Nintendo",  "Vs. Super Mario Bros. (alt)", 0 )
+GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, suprmrio, ROT0, "hack",      "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, MMC3,	 ROT0, "Namco",     "Vs. Super SkyKid" , 0 )
 GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, tkoboxng, ROT0, "Namco LTD.","Vs. TKO Boxing", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, smgolf,   0,        vsnes,   golf4s,   machridr, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Men Version, set 1)", 0 )

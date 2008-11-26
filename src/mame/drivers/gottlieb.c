@@ -257,9 +257,9 @@ static MACHINE_START( gottlieb )
 	if (laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		laserdisc_bit_timer = timer_alloc(laserdisc_bit_callback, NULL);
@@ -315,8 +315,8 @@ static CUSTOM_INPUT( analog_delta_r )
 static WRITE8_HANDLER( gottlieb_analog_reset_w )
 {
 	/* reset the trackball counters */
-	track[0] = input_port_read_safe(machine, "TRACKX", 0);
-	track[1] = input_port_read_safe(machine, "TRACKY", 0);
+	track[0] = input_port_read_safe(space->machine, "TRACKX", 0);
+	track[1] = input_port_read_safe(space->machine, "TRACKY", 0);
 }
 
 
@@ -338,9 +338,9 @@ static WRITE8_HANDLER( general_output_w )
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
 	if (laserdisc == NULL)
-		gottlieb_video_control_w(machine, offset, data);
+		gottlieb_video_control_w(space, offset, data);
 	else
-		gottlieb_laserdisc_video_control_w(machine, offset, data);
+		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 controls the coin meter */
 	coin_counter_w(0, data & 0x10);
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( general_output_w )
 
 static WRITE8_HANDLER( reactor_output_w )
 {
-	general_output_w(machine, offset, data & ~0xe0);
+	general_output_w(space, offset, data & ~0xe0);
 	set_led_status(0, data & 0x20);
 	set_led_status(1, data & 0x40);
 	set_led_status(2, data & 0x80);
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( reactor_output_w )
 
 static WRITE8_HANDLER( stooges_output_w )
 {
-	general_output_w(machine, offset, data & ~0x60);
+	general_output_w(space, offset, data & ~0x60);
 	joystick_select = (data >> 5) & 0x03;
 }
 
@@ -664,15 +664,15 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 
 static TIMER_CALLBACK( nmi_clear )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
+	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
 
 	/* if we have a laserdisc, update it */
 	if (laserdisc != NULL)
@@ -2541,7 +2541,7 @@ static DRIVER_INIT( romtiles )
 static DRIVER_INIT( stooges )
 {
 	DRIVER_INIT_CALL(ramtiles);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
 }
 
 

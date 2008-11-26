@@ -56,11 +56,11 @@ static READ8_HANDLER( triothep_control_r )
 {
 	switch (trio_control_select)
 	{
-		case 0: return input_port_read(machine, "P1");
-		case 1: return input_port_read(machine, "P2");
-		case 2: return input_port_read(machine, "DSW1");
-		case 3: return input_port_read(machine, "DSW2");
-		case 4: return input_port_read(machine, "SYSTEM");	/* VBL */
+		case 0: return input_port_read(space->machine, "P1");
+		case 1: return input_port_read(space->machine, "P2");
+		case 2: return input_port_read(space->machine, "DSW1");
+		case 3: return input_port_read(space->machine, "DSW2");
+		case 4: return input_port_read(space->machine, "SYSTEM");	/* VBL */
 	}
 
 	return 0xff;
@@ -68,8 +68,8 @@ static READ8_HANDLER( triothep_control_r )
 
 static WRITE8_HANDLER( actfancr_sound_w )
 {
-	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -278,7 +278,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate); /* IRQ */
+	cpu_set_input_line(machine->cpu[1],0,linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -546,13 +546,13 @@ ROM_END
 
 static READ8_HANDLER( cycle_r )
 {
-	int pc=activecpu_get_pc();
+	int pc=cpu_get_pc(space->cpu);
 	int ret=actfancr_ram[0x26];
 
 	if (offset==1) return actfancr_ram[0x27];
 
 	if (pc==0xe29a && ret==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(space->cpu);
 		return 1;
 	}
 
@@ -561,13 +561,13 @@ static READ8_HANDLER( cycle_r )
 
 static READ8_HANDLER( cyclej_r )
 {
-	int pc=activecpu_get_pc();
+	int pc=cpu_get_pc(space->cpu);
 	int ret=actfancr_ram[0x26];
 
 	if (offset==1) return actfancr_ram[0x27];
 
 	if (pc==0xe2b1 && ret==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(space->cpu);
 		return 1;
 	}
 
@@ -576,12 +576,12 @@ static READ8_HANDLER( cyclej_r )
 
 static DRIVER_INIT( actfancr )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f0026, 0x1f0027, 0, 0, cycle_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
 }
 
 static DRIVER_INIT( actfancj )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
 }
 
 

@@ -77,7 +77,6 @@ Hitachi HD647180 series:
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "driver.h"
 #include "z180.h"
 #include "cpu/z80/z80daisy.h"
@@ -119,6 +118,8 @@ typedef struct {
 	z80_daisy_state *daisy;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *iospace;
 }	Z180_Regs;
 
 #define CF	0x01
@@ -813,7 +814,7 @@ static CPU_SET_INFO( z180 );
 static UINT8 z180_readcontrol(offs_t port)
 {
 	/* normal external readport */
-	UINT8 data = io_read_byte_8le(port);
+	UINT8 data = memory_read_byte_8le(Z180.iospace, port);
 
 	/* remap internal I/O registers */
 	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
@@ -824,68 +825,68 @@ static UINT8 z180_readcontrol(offs_t port)
 	{
 	case Z180_CNTLA0:
 		data = IO_CNTLA0 & Z180_CNTLA0_RMASK;
-		LOG(("Z180 #%d CNTLA0 rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CNTLA0 rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CNTLA1:
 		data = IO_CNTLA1 & Z180_CNTLA1_RMASK;
-		LOG(("Z180 #%d CNTLA1 rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CNTLA1 rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CNTLB0:
 		data = IO_CNTLB0 & Z180_CNTLB0_RMASK;
-		LOG(("Z180 #%d CNTLB0 rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CNTLB0 rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CNTLB1:
 		data = IO_CNTLB1 & Z180_CNTLB1_RMASK;
-		LOG(("Z180 #%d CNTLB1 rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CNTLB1 rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_STAT0:
 		data = IO_STAT0 & Z180_STAT0_RMASK;
 data |= 0x02; // kludge for 20pacgal
-		LOG(("Z180 #%d STAT0  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d STAT0  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_STAT1:
 		data = IO_STAT1 & Z180_STAT1_RMASK;
-		LOG(("Z180 #%d STAT1  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d STAT1  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_TDR0:
 		data = IO_TDR0 & Z180_TDR0_RMASK;
-		LOG(("Z180 #%d TDR0   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TDR0   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_TDR1:
 		data = IO_TDR1 & Z180_TDR1_RMASK;
-		LOG(("Z180 #%d TDR1   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TDR1   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_RDR0:
 		data = IO_RDR0 & Z180_RDR0_RMASK;
-		LOG(("Z180 #%d RDR0   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d RDR0   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_RDR1:
 		data = IO_RDR1 & Z180_RDR1_RMASK;
-		LOG(("Z180 #%d RDR1   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d RDR1   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CNTR:
 		data = IO_CNTR & Z180_CNTR_RMASK;
-		LOG(("Z180 #%d CNTR   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CNTR   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_TRDR:
 		data = IO_TRDR & Z180_TRDR_RMASK;
-		LOG(("Z180 #%d TRDR   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TRDR   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_TMDR0L:
 		data = Z180.tmdr_value[0] & Z180_TMDR0L_RMASK;
-		LOG(("Z180 #%d TMDR0L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TMDR0L rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		/* if timer is counting, latch the MSB and set the latch flag */
 		if ((IO_TCR & Z180_TCR_TDE0) == 0)
 		{
@@ -925,17 +926,17 @@ data |= 0x02; // kludge for 20pacgal
 		{
 			Z180.read_tcr_tmdr[0] = 1;
 		}
-		LOG(("Z180 #%d TMDR0H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TMDR0H rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR0L:
 		data = IO_RLDR0L & Z180_RLDR0L_RMASK;
-		LOG(("Z180 #%d RLDR0L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d RLDR0L rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR0H:
 		data = IO_RLDR0H & Z180_RLDR0H_RMASK;
-		LOG(("Z180 #%d RLDR0H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d RLDR0H rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_TCR:
@@ -961,27 +962,27 @@ data |= 0x02; // kludge for 20pacgal
 			Z180.read_tcr_tmdr[1] = 1;
 		}
 
-		LOG(("Z180 #%d TCR    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TCR    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IO11:
 		data = IO_IO11 & Z180_IO11_RMASK;
-		LOG(("Z180 #%d IO11   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IO11   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_ASEXT0:
 		data = IO_ASEXT0 & Z180_ASEXT0_RMASK;
-		LOG(("Z180 #%d ASEXT0 rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d ASEXT0 rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_ASEXT1:
 		data = IO_ASEXT1 & Z180_ASEXT1_RMASK;
-		LOG(("Z180 #%d ASEXT1 rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d ASEXT1 rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_TMDR1L:
 		data = Z180.tmdr_value[1] & Z180_TMDR1L_RMASK;
-		LOG(("Z180 #%d TMDR1L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TMDR1L rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		/* if timer is counting, latch the MSB and set the latch flag */
 		if ((IO_TCR & Z180_TCR_TDE1) == 0)
 		{
@@ -1021,217 +1022,217 @@ data |= 0x02; // kludge for 20pacgal
 		{
 			Z180.read_tcr_tmdr[1] = 1;
 		}
-		LOG(("Z180 #%d TMDR1H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d TMDR1H rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR1L:
 		data = IO_RLDR1L & Z180_RLDR1L_RMASK;
-		LOG(("Z180 #%d RLDR1L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d RLDR1L rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR1H:
 		data = IO_RLDR1H & Z180_RLDR1H_RMASK;
-		LOG(("Z180 #%d RLDR1H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d RLDR1H rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_FRC:
 		data = IO_FRC & Z180_FRC_RMASK;
-		LOG(("Z180 #%d FRC    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d FRC    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IO19:
 		data = IO_IO19 & Z180_IO19_RMASK;
-		LOG(("Z180 #%d IO19   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IO19   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC0L:
 		data = IO_ASTC0L & Z180_ASTC0L_RMASK;
-		LOG(("Z180 #%d ASTC0L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d ASTC0L rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC0H:
 		data = IO_ASTC0H & Z180_ASTC0H_RMASK;
-		LOG(("Z180 #%d ASTC0H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d ASTC0H rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC1L:
 		data = IO_ASTC1L & Z180_ASTC1L_RMASK;
-		LOG(("Z180 #%d ASTC1L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d ASTC1L rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC1H:
 		data = IO_ASTC1H & Z180_ASTC1H_RMASK;
-		LOG(("Z180 #%d ASTC1H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d ASTC1H rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CMR:
 		data = IO_CMR & Z180_CMR_RMASK;
-		LOG(("Z180 #%d CMR    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CMR    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CCR:
 		data = IO_CCR & Z180_CCR_RMASK;
-		LOG(("Z180 #%d CCR    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CCR    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_SAR0L:
 		data = IO_SAR0L & Z180_SAR0L_RMASK;
-		LOG(("Z180 #%d SAR0L  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d SAR0L  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_SAR0H:
 		data = IO_SAR0H & Z180_SAR0H_RMASK;
-		LOG(("Z180 #%d SAR0H  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d SAR0H  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_SAR0B:
 		data = IO_SAR0B & Z180_SAR0B_RMASK;
-		LOG(("Z180 #%d SAR0B  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d SAR0B  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_DAR0L:
 		data = IO_DAR0L & Z180_DAR0L_RMASK;
-		LOG(("Z180 #%d DAR0L  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d DAR0L  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_DAR0H:
 		data = IO_DAR0H & Z180_DAR0H_RMASK;
-		LOG(("Z180 #%d DAR0H  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d DAR0H  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_DAR0B:
 		data = IO_DAR0B & Z180_DAR0B_RMASK;
-		LOG(("Z180 #%d DAR0B  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d DAR0B  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_BCR0L:
 		data = IO_BCR0L & Z180_BCR0L_RMASK;
-		LOG(("Z180 #%d BCR0L  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d BCR0L  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_BCR0H:
 		data = IO_BCR0H & Z180_BCR0H_RMASK;
-		LOG(("Z180 #%d BCR0H  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d BCR0H  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_MAR1L:
 		data = IO_MAR1L & Z180_MAR1L_RMASK;
-		LOG(("Z180 #%d MAR1L  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d MAR1L  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_MAR1H:
 		data = IO_MAR1H & Z180_MAR1H_RMASK;
-		LOG(("Z180 #%d MAR1H  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d MAR1H  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_MAR1B:
 		data = IO_MAR1B & Z180_MAR1B_RMASK;
-		LOG(("Z180 #%d MAR1B  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d MAR1B  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IAR1L:
 		data = IO_IAR1L & Z180_IAR1L_RMASK;
-		LOG(("Z180 #%d IAR1L  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IAR1L  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IAR1H:
 		data = IO_IAR1H & Z180_IAR1H_RMASK;
-		LOG(("Z180 #%d IAR1H  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IAR1H  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IAR1B:
 		data = IO_IAR1B & Z180_IAR1B_RMASK;
-		LOG(("Z180 #%d IAR1B  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IAR1B  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_BCR1L:
 		data = IO_BCR1L & Z180_BCR1L_RMASK;
-		LOG(("Z180 #%d BCR1L  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d BCR1L  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_BCR1H:
 		data = IO_BCR1H & Z180_BCR1H_RMASK;
-		LOG(("Z180 #%d BCR1H  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d BCR1H  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_DSTAT:
 		data = IO_DSTAT & Z180_DSTAT_RMASK;
-		LOG(("Z180 #%d DSTAT  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d DSTAT  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_DMODE:
 		data = IO_DMODE & Z180_DMODE_RMASK;
-		LOG(("Z180 #%d DMODE  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d DMODE  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_DCNTL:
 		data = IO_DCNTL & Z180_DCNTL_RMASK;
-		LOG(("Z180 #%d DCNTL  rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d DCNTL  rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IL:
 		data = IO_IL & Z180_IL_RMASK;
-		LOG(("Z180 #%d IL     rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IL     rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_ITC:
 		data = IO_ITC & Z180_ITC_RMASK;
-		LOG(("Z180 #%d ITC    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d ITC    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IO35:
 		data = IO_IO35 & Z180_IO35_RMASK;
-		LOG(("Z180 #%d IO35   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IO35   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_RCR:
 		data = IO_RCR & Z180_RCR_RMASK;
-		LOG(("Z180 #%d RCR    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d RCR    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IO37:
 		data = IO_IO37 & Z180_IO37_RMASK;
-		LOG(("Z180 #%d IO37   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IO37   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CBR:
 		data = IO_CBR & Z180_CBR_RMASK;
-		LOG(("Z180 #%d CBR    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CBR    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_BBR:
 		data = IO_BBR & Z180_BBR_RMASK;
-		LOG(("Z180 #%d BBR    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d BBR    rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_CBAR:
 		data = IO_CBAR & Z180_CBAR_RMASK;
-		LOG(("Z180 #%d CBAR   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d CBAR   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IO3B:
 		data = IO_IO3B & Z180_IO3B_RMASK;
-		LOG(("Z180 #%d IO3B   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IO3B   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IO3C:
 		data = IO_IO3C & Z180_IO3C_RMASK;
-		LOG(("Z180 #%d IO3C   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IO3C   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IO3D:
 		data = IO_IO3D & Z180_IO3D_RMASK;
-		LOG(("Z180 #%d IO3D   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IO3D   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_OMCR:
 		data = IO_OMCR & Z180_OMCR_RMASK;
-		LOG(("Z180 #%d OMCR   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d OMCR   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 
 	case Z180_IOCR:
 		data = IO_IOCR & Z180_IOCR_RMASK;
-		LOG(("Z180 #%d IOCR   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
+		LOG(("Z180 #%d IOCR   rd $%02x ($%02x)\n", cpunum_get_active(), data, Z180.io[port & 0x3f]));
 		break;
 	}
 
@@ -1241,7 +1242,7 @@ data |= 0x02; // kludge for 20pacgal
 static void z180_writecontrol(offs_t port, UINT8 data)
 {
 	/* normal external write port */
-	io_write_byte_8le(port, data);
+	memory_write_byte_8le(Z180.iospace, port, data);
 
 	/* remap internal I/O registers */
 	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
@@ -1251,251 +1252,251 @@ static void z180_writecontrol(offs_t port, UINT8 data)
 	switch (port + Z180_CNTLA0)
 	{
 	case Z180_CNTLA0:
-		LOG(("Z180 #%d CNTLA0 wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CNTLA0_WMASK));
+		LOG(("Z180 #%d CNTLA0 wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CNTLA0_WMASK));
 		IO_CNTLA0 = (IO_CNTLA0 & ~Z180_CNTLA0_WMASK) | (data & Z180_CNTLA0_WMASK);
 		break;
 
 	case Z180_CNTLA1:
-		LOG(("Z180 #%d CNTLA1 wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CNTLA1_WMASK));
+		LOG(("Z180 #%d CNTLA1 wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CNTLA1_WMASK));
 		IO_CNTLA1 = (IO_CNTLA1 & ~Z180_CNTLA1_WMASK) | (data & Z180_CNTLA1_WMASK);
 		break;
 
 	case Z180_CNTLB0:
-		LOG(("Z180 #%d CNTLB0 wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CNTLB0_WMASK));
+		LOG(("Z180 #%d CNTLB0 wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CNTLB0_WMASK));
 		IO_CNTLB0 = (IO_CNTLB0 & ~Z180_CNTLB0_WMASK) | (data & Z180_CNTLB0_WMASK);
 		break;
 
 	case Z180_CNTLB1:
-		LOG(("Z180 #%d CNTLB1 wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CNTLB1_WMASK));
+		LOG(("Z180 #%d CNTLB1 wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CNTLB1_WMASK));
 		IO_CNTLB1 = (IO_CNTLB1 & ~Z180_CNTLB1_WMASK) | (data & Z180_CNTLB1_WMASK);
 		break;
 
 	case Z180_STAT0:
-		LOG(("Z180 #%d STAT0  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_STAT0_WMASK));
+		LOG(("Z180 #%d STAT0  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_STAT0_WMASK));
 		IO_STAT0 = (IO_STAT0 & ~Z180_STAT0_WMASK) | (data & Z180_STAT0_WMASK);
 		break;
 
 	case Z180_STAT1:
-		LOG(("Z180 #%d STAT1  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_STAT1_WMASK));
+		LOG(("Z180 #%d STAT1  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_STAT1_WMASK));
 		IO_STAT1 = (IO_STAT1 & ~Z180_STAT1_WMASK) | (data & Z180_STAT1_WMASK);
 		break;
 
 	case Z180_TDR0:
-		LOG(("Z180 #%d TDR0   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TDR0_WMASK));
+		LOG(("Z180 #%d TDR0   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TDR0_WMASK));
 		IO_TDR0 = (IO_TDR0 & ~Z180_TDR0_WMASK) | (data & Z180_TDR0_WMASK);
 		break;
 
 	case Z180_TDR1:
-		LOG(("Z180 #%d TDR1   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TDR1_WMASK));
+		LOG(("Z180 #%d TDR1   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TDR1_WMASK));
 		IO_TDR1 = (IO_TDR1 & ~Z180_TDR1_WMASK) | (data & Z180_TDR1_WMASK);
 		break;
 
 	case Z180_RDR0:
-		LOG(("Z180 #%d RDR0   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_RDR0_WMASK));
+		LOG(("Z180 #%d RDR0   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_RDR0_WMASK));
 		IO_RDR0 = (IO_RDR0 & ~Z180_RDR0_WMASK) | (data & Z180_RDR0_WMASK);
 		break;
 
 	case Z180_RDR1:
-		LOG(("Z180 #%d RDR1   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_RDR1_WMASK));
+		LOG(("Z180 #%d RDR1   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_RDR1_WMASK));
 		IO_RDR1 = (IO_RDR1 & ~Z180_RDR1_WMASK) | (data & Z180_RDR1_WMASK);
 		break;
 
 	case Z180_CNTR:
-		LOG(("Z180 #%d CNTR   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CNTR_WMASK));
+		LOG(("Z180 #%d CNTR   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CNTR_WMASK));
 		IO_CNTR = (IO_CNTR & ~Z180_CNTR_WMASK) | (data & Z180_CNTR_WMASK);
 		break;
 
 	case Z180_TRDR:
-		LOG(("Z180 #%d TRDR   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TRDR_WMASK));
+		LOG(("Z180 #%d TRDR   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TRDR_WMASK));
 		IO_TRDR = (IO_TRDR & ~Z180_TRDR_WMASK) | (data & Z180_TRDR_WMASK);
 		break;
 
 	case Z180_TMDR0L:
-		LOG(("Z180 #%d TMDR0L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR0L_WMASK));
+		LOG(("Z180 #%d TMDR0L wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TMDR0L_WMASK));
 		IO_TMDR0L = data & Z180_TMDR0L_WMASK;
 		Z180.tmdr_value[0] = (Z180.tmdr_value[0] & 0xff00) | IO_TMDR0L;
 		break;
 
 	case Z180_TMDR0H:
-		LOG(("Z180 #%d TMDR0H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR0H_WMASK));
+		LOG(("Z180 #%d TMDR0H wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TMDR0H_WMASK));
 		IO_TMDR0H = data & Z180_TMDR0H_WMASK;
 		Z180.tmdr_value[0] = (Z180.tmdr_value[0] & 0x00ff) | (IO_TMDR0H << 8);
 		break;
 
 	case Z180_RLDR0L:
-		LOG(("Z180 #%d RLDR0L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_RLDR0L_WMASK));
+		LOG(("Z180 #%d RLDR0L wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_RLDR0L_WMASK));
 		IO_RLDR0L = (IO_RLDR0L & ~Z180_RLDR0L_WMASK) | (data & Z180_RLDR0L_WMASK);
 		break;
 
 	case Z180_RLDR0H:
-		LOG(("Z180 #%d RLDR0H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_RLDR0H_WMASK));
+		LOG(("Z180 #%d RLDR0H wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_RLDR0H_WMASK));
 		IO_RLDR0H = (IO_RLDR0H & ~Z180_RLDR0H_WMASK) | (data & Z180_RLDR0H_WMASK);
 		break;
 
 	case Z180_TCR:
-		LOG(("Z180 #%d TCR    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TCR_WMASK));
+		LOG(("Z180 #%d TCR    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TCR_WMASK));
 		IO_TCR = (IO_TCR & ~Z180_TCR_WMASK) | (data & Z180_TCR_WMASK);
 		break;
 
 	case Z180_IO11:
-		LOG(("Z180 #%d IO11   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IO11_WMASK));
+		LOG(("Z180 #%d IO11   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IO11_WMASK));
 		IO_IO11 = (IO_IO11 & ~Z180_IO11_WMASK) | (data & Z180_IO11_WMASK);
 		break;
 
 	case Z180_ASEXT0:
-		LOG(("Z180 #%d ASEXT0 wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_ASEXT0_WMASK));
+		LOG(("Z180 #%d ASEXT0 wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_ASEXT0_WMASK));
 		IO_ASEXT0 = (IO_ASEXT0 & ~Z180_ASEXT0_WMASK) | (data & Z180_ASEXT0_WMASK);
 		break;
 
 	case Z180_ASEXT1:
-		LOG(("Z180 #%d ASEXT1 wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_ASEXT1_WMASK));
+		LOG(("Z180 #%d ASEXT1 wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_ASEXT1_WMASK));
 		IO_ASEXT1 = (IO_ASEXT1 & ~Z180_ASEXT1_WMASK) | (data & Z180_ASEXT1_WMASK);
 		break;
 
 	case Z180_TMDR1L:
-		LOG(("Z180 #%d TMDR1L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR1L_WMASK));
+		LOG(("Z180 #%d TMDR1L wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TMDR1L_WMASK));
 		IO_TMDR1L = data & Z180_TMDR1L_WMASK;
 		Z180.tmdr_value[1] = (Z180.tmdr_value[1] & 0xff00) | IO_TMDR1L;
 		break;
 
 	case Z180_TMDR1H:
-		LOG(("Z180 #%d TMDR1H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR1H_WMASK));
+		LOG(("Z180 #%d TMDR1H wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_TMDR1H_WMASK));
 		IO_TMDR1H = data & Z180_TMDR1H_WMASK;
 		Z180.tmdr_value[1] = (Z180.tmdr_value[1] & 0x00ff) | IO_TMDR1H;
 		break;
 
 	case Z180_RLDR1L:
-		LOG(("Z180 #%d RLDR1L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_RLDR1L_WMASK));
+		LOG(("Z180 #%d RLDR1L wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_RLDR1L_WMASK));
 		IO_RLDR1L = (IO_RLDR1L & ~Z180_RLDR1L_WMASK) | (data & Z180_RLDR1L_WMASK);
 		break;
 
 	case Z180_RLDR1H:
-		LOG(("Z180 #%d RLDR1H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_RLDR1H_WMASK));
+		LOG(("Z180 #%d RLDR1H wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_RLDR1H_WMASK));
 		IO_RLDR1H = (IO_RLDR1H & ~Z180_RLDR1H_WMASK) | (data & Z180_RLDR1H_WMASK);
 		break;
 
 	case Z180_FRC:
-		LOG(("Z180 #%d FRC    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_FRC_WMASK));
+		LOG(("Z180 #%d FRC    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_FRC_WMASK));
 		IO_FRC = (IO_FRC & ~Z180_FRC_WMASK) | (data & Z180_FRC_WMASK);
 		break;
 
 	case Z180_IO19:
-		LOG(("Z180 #%d IO19   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IO19_WMASK));
+		LOG(("Z180 #%d IO19   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IO19_WMASK));
 		IO_IO19 = (IO_IO19 & ~Z180_IO19_WMASK) | (data & Z180_IO19_WMASK);
 		break;
 
 	case Z180_ASTC0L:
-		LOG(("Z180 #%d ASTC0L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_ASTC0L_WMASK));
+		LOG(("Z180 #%d ASTC0L wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_ASTC0L_WMASK));
 		IO_ASTC0L = (IO_ASTC0L & ~Z180_ASTC0L_WMASK) | (data & Z180_ASTC0L_WMASK);
 		break;
 
 	case Z180_ASTC0H:
-		LOG(("Z180 #%d ASTC0H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_ASTC0H_WMASK));
+		LOG(("Z180 #%d ASTC0H wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_ASTC0H_WMASK));
 		IO_ASTC0H = (IO_ASTC0H & ~Z180_ASTC0H_WMASK) | (data & Z180_ASTC0H_WMASK);
 		break;
 
 	case Z180_ASTC1L:
-		LOG(("Z180 #%d ASTC1L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_ASTC1L_WMASK));
+		LOG(("Z180 #%d ASTC1L wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_ASTC1L_WMASK));
 		IO_ASTC1L = (IO_ASTC1L & ~Z180_ASTC1L_WMASK) | (data & Z180_ASTC1L_WMASK);
 		break;
 
 	case Z180_ASTC1H:
-		LOG(("Z180 #%d ASTC1H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_ASTC1H_WMASK));
+		LOG(("Z180 #%d ASTC1H wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_ASTC1H_WMASK));
 		IO_ASTC1H = (IO_ASTC1H & ~Z180_ASTC1H_WMASK) | (data & Z180_ASTC1H_WMASK);
 		break;
 
 	case Z180_CMR:
-		LOG(("Z180 #%d CMR    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CMR_WMASK));
+		LOG(("Z180 #%d CMR    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CMR_WMASK));
 		IO_CMR = (IO_CMR & ~Z180_CMR_WMASK) | (data & Z180_CMR_WMASK);
 		break;
 
 	case Z180_CCR:
-		LOG(("Z180 #%d CCR    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CCR_WMASK));
+		LOG(("Z180 #%d CCR    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CCR_WMASK));
 		IO_CCR = (IO_CCR & ~Z180_CCR_WMASK) | (data & Z180_CCR_WMASK);
 		break;
 
 	case Z180_SAR0L:
-		LOG(("Z180 #%d SAR0L  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_SAR0L_WMASK));
+		LOG(("Z180 #%d SAR0L  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_SAR0L_WMASK));
 		IO_SAR0L = (IO_SAR0L & ~Z180_SAR0L_WMASK) | (data & Z180_SAR0L_WMASK);
 		break;
 
 	case Z180_SAR0H:
-		LOG(("Z180 #%d SAR0H  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_SAR0H_WMASK));
+		LOG(("Z180 #%d SAR0H  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_SAR0H_WMASK));
 		IO_SAR0H = (IO_SAR0H & ~Z180_SAR0H_WMASK) | (data & Z180_SAR0H_WMASK);
 		break;
 
 	case Z180_SAR0B:
-		LOG(("Z180 #%d SAR0B  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_SAR0B_WMASK));
+		LOG(("Z180 #%d SAR0B  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_SAR0B_WMASK));
 		IO_SAR0B = (IO_SAR0B & ~Z180_SAR0B_WMASK) | (data & Z180_SAR0B_WMASK);
 		break;
 
 	case Z180_DAR0L:
-		LOG(("Z180 #%d DAR0L  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_DAR0L_WMASK));
+		LOG(("Z180 #%d DAR0L  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_DAR0L_WMASK));
 		IO_DAR0L = (IO_DAR0L & ~Z180_DAR0L_WMASK) | (data & Z180_DAR0L_WMASK);
 		break;
 
 	case Z180_DAR0H:
-		LOG(("Z180 #%d DAR0H  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_DAR0H_WMASK));
+		LOG(("Z180 #%d DAR0H  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_DAR0H_WMASK));
 		IO_DAR0H = (IO_DAR0H & ~Z180_DAR0H_WMASK) | (data & Z180_DAR0H_WMASK);
 		break;
 
 	case Z180_DAR0B:
-		LOG(("Z180 #%d DAR0B  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_DAR0B_WMASK));
+		LOG(("Z180 #%d DAR0B  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_DAR0B_WMASK));
 		IO_DAR0B = (IO_DAR0B & ~Z180_DAR0B_WMASK) | (data & Z180_DAR0B_WMASK);
 		break;
 
 	case Z180_BCR0L:
-		LOG(("Z180 #%d BCR0L  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_BCR0L_WMASK));
+		LOG(("Z180 #%d BCR0L  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_BCR0L_WMASK));
 		IO_BCR0L = (IO_BCR0L & ~Z180_BCR0L_WMASK) | (data & Z180_BCR0L_WMASK);
 		break;
 
 	case Z180_BCR0H:
-		LOG(("Z180 #%d BCR0H  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_BCR0H_WMASK));
+		LOG(("Z180 #%d BCR0H  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_BCR0H_WMASK));
 		IO_BCR0H = (IO_BCR0H & ~Z180_BCR0H_WMASK) | (data & Z180_BCR0H_WMASK);
 		break;
 
 	case Z180_MAR1L:
-		LOG(("Z180 #%d MAR1L  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_MAR1L_WMASK));
+		LOG(("Z180 #%d MAR1L  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_MAR1L_WMASK));
 		IO_MAR1L = (IO_MAR1L & ~Z180_MAR1L_WMASK) | (data & Z180_MAR1L_WMASK);
 		break;
 
 	case Z180_MAR1H:
-		LOG(("Z180 #%d MAR1H  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_MAR1H_WMASK));
+		LOG(("Z180 #%d MAR1H  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_MAR1H_WMASK));
 		IO_MAR1H = (IO_MAR1H & ~Z180_MAR1H_WMASK) | (data & Z180_MAR1H_WMASK);
 		break;
 
 	case Z180_MAR1B:
-		LOG(("Z180 #%d MAR1B  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_MAR1B_WMASK));
+		LOG(("Z180 #%d MAR1B  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_MAR1B_WMASK));
 		IO_MAR1B = (IO_MAR1B & ~Z180_MAR1B_WMASK) | (data & Z180_MAR1B_WMASK);
 		break;
 
 	case Z180_IAR1L:
-		LOG(("Z180 #%d IAR1L  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IAR1L_WMASK));
+		LOG(("Z180 #%d IAR1L  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IAR1L_WMASK));
 		IO_IAR1L = (IO_IAR1L & ~Z180_IAR1L_WMASK) | (data & Z180_IAR1L_WMASK);
 		break;
 
 	case Z180_IAR1H:
-		LOG(("Z180 #%d IAR1H  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IAR1H_WMASK));
+		LOG(("Z180 #%d IAR1H  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IAR1H_WMASK));
 		IO_IAR1H = (IO_IAR1H & ~Z180_IAR1H_WMASK) | (data & Z180_IAR1H_WMASK);
 		break;
 
 	case Z180_IAR1B:
-		LOG(("Z180 #%d IAR1B  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IAR1B_WMASK));
+		LOG(("Z180 #%d IAR1B  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IAR1B_WMASK));
 		IO_IAR1B = (IO_IAR1B & ~Z180_IAR1B_WMASK) | (data & Z180_IAR1B_WMASK);
 		break;
 
 	case Z180_BCR1L:
-		LOG(("Z180 #%d BCR1L  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_BCR1L_WMASK));
+		LOG(("Z180 #%d BCR1L  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_BCR1L_WMASK));
 		IO_BCR1L = (IO_BCR1L & ~Z180_BCR1L_WMASK) | (data & Z180_BCR1L_WMASK);
 		break;
 
 	case Z180_BCR1H:
-		LOG(("Z180 #%d BCR1H  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_BCR1H_WMASK));
+		LOG(("Z180 #%d BCR1H  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_BCR1H_WMASK));
 		IO_BCR1H = (IO_BCR1H & ~Z180_BCR1H_WMASK) | (data & Z180_BCR1H_WMASK);
 		break;
 
 	case Z180_DSTAT:
-		LOG(("Z180 #%d DSTAT  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_DSTAT_WMASK));
+		LOG(("Z180 #%d DSTAT  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_DSTAT_WMASK));
 		IO_DSTAT = (IO_DSTAT & ~Z180_DSTAT_WMASK) | (data & Z180_DSTAT_WMASK);
 		if ((data & (Z180_DSTAT_DE1 | Z180_DSTAT_DWE1)) == Z180_DSTAT_DE1)
 			IO_DSTAT |= Z180_DSTAT_DME;  /* DMA enable */
@@ -1504,80 +1505,80 @@ static void z180_writecontrol(offs_t port, UINT8 data)
 		break;
 
 	case Z180_DMODE:
-		LOG(("Z180 #%d DMODE  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_DMODE_WMASK));
+		LOG(("Z180 #%d DMODE  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_DMODE_WMASK));
 		IO_DMODE = (IO_DMODE & ~Z180_DMODE_WMASK) | (data & Z180_DMODE_WMASK);
 		break;
 
 	case Z180_DCNTL:
-		LOG(("Z180 #%d DCNTL  wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_DCNTL_WMASK));
+		LOG(("Z180 #%d DCNTL  wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_DCNTL_WMASK));
 		IO_DCNTL = (IO_DCNTL & ~Z180_DCNTL_WMASK) | (data & Z180_DCNTL_WMASK);
 		break;
 
 	case Z180_IL:
-		LOG(("Z180 #%d IL     wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IL_WMASK));
+		LOG(("Z180 #%d IL     wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IL_WMASK));
 		IO_IL = (IO_IL & ~Z180_IL_WMASK) | (data & Z180_IL_WMASK);
 		break;
 
 	case Z180_ITC:
-		LOG(("Z180 #%d ITC    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_ITC_WMASK));
+		LOG(("Z180 #%d ITC    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_ITC_WMASK));
 		IO_ITC = (IO_ITC & ~Z180_ITC_WMASK) | (data & Z180_ITC_WMASK);
 		break;
 
 	case Z180_IO35:
-		LOG(("Z180 #%d IO35   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IO35_WMASK));
+		LOG(("Z180 #%d IO35   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IO35_WMASK));
 		IO_IO35 = (IO_IO35 & ~Z180_IO35_WMASK) | (data & Z180_IO35_WMASK);
 		break;
 
 	case Z180_RCR:
-		LOG(("Z180 #%d RCR    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_RCR_WMASK));
+		LOG(("Z180 #%d RCR    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_RCR_WMASK));
 		IO_RCR = (IO_RCR & ~Z180_RCR_WMASK) | (data & Z180_RCR_WMASK);
 		break;
 
 	case Z180_IO37:
-		LOG(("Z180 #%d IO37   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IO37_WMASK));
+		LOG(("Z180 #%d IO37   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IO37_WMASK));
 		IO_IO37 = (IO_IO37 & ~Z180_IO37_WMASK) | (data & Z180_IO37_WMASK);
 		break;
 
 	case Z180_CBR:
-		LOG(("Z180 #%d CBR    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CBR_WMASK));
+		LOG(("Z180 #%d CBR    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CBR_WMASK));
 		IO_CBR = (IO_CBR & ~Z180_CBR_WMASK) | (data & Z180_CBR_WMASK);
 		z180_mmu();
 		break;
 
 	case Z180_BBR:
-		LOG(("Z180 #%d BBR    wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_BBR_WMASK));
+		LOG(("Z180 #%d BBR    wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_BBR_WMASK));
 		IO_BBR = (IO_BBR & ~Z180_BBR_WMASK) | (data & Z180_BBR_WMASK);
 		z180_mmu();
 		break;
 
 	case Z180_CBAR:
-		LOG(("Z180 #%d CBAR   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CBAR_WMASK));
+		LOG(("Z180 #%d CBAR   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_CBAR_WMASK));
 		IO_CBAR = (IO_CBAR & ~Z180_CBAR_WMASK) | (data & Z180_CBAR_WMASK);
 		z180_mmu();
 		break;
 
 	case Z180_IO3B:
-		LOG(("Z180 #%d IO3B   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IO3B_WMASK));
+		LOG(("Z180 #%d IO3B   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IO3B_WMASK));
 		IO_IO3B = (IO_IO3B & ~Z180_IO3B_WMASK) | (data & Z180_IO3B_WMASK);
 		break;
 
 	case Z180_IO3C:
-		LOG(("Z180 #%d IO3C   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IO3C_WMASK));
+		LOG(("Z180 #%d IO3C   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IO3C_WMASK));
 		IO_IO3C = (IO_IO3C & ~Z180_IO3C_WMASK) | (data & Z180_IO3C_WMASK);
 		break;
 
 	case Z180_IO3D:
-		LOG(("Z180 #%d IO3D   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IO3D_WMASK));
+		LOG(("Z180 #%d IO3D   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IO3D_WMASK));
 		IO_IO3D = (IO_IO3D & ~Z180_IO3D_WMASK) | (data & Z180_IO3D_WMASK);
 		break;
 
 	case Z180_OMCR:
-		LOG(("Z180 #%d OMCR   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_OMCR_WMASK));
+		LOG(("Z180 #%d OMCR   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_OMCR_WMASK));
 		IO_OMCR = (IO_OMCR & ~Z180_OMCR_WMASK) | (data & Z180_OMCR_WMASK);
 		break;
 
 	case Z180_IOCR:
-		LOG(("Z180 #%d IOCR   wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_IOCR_WMASK));
+		LOG(("Z180 #%d IOCR   wr $%02x ($%02x)\n", cpunum_get_active(), data,  data & Z180_IOCR_WMASK));
 		IO_IOCR = (IO_IOCR & ~Z180_IOCR_WMASK) | (data & Z180_IOCR_WMASK);
 		break;
 	}
@@ -1606,18 +1607,18 @@ static void z180_dma0(void)
 		switch( IO_DMODE & (Z180_DMODE_SM | Z180_DMODE_DM) )
 		{
 		case 0x00:	/* memory SAR0+1 to memory DAR0+1 */
-			program_write_byte_8le(dar0++, program_read_byte_8le(sar0++));
+			memory_write_byte_8le(Z180.program, dar0++, memory_read_byte_8le(Z180.program, sar0++));
 			break;
 		case 0x04:	/* memory SAR0-1 to memory DAR0+1 */
-			program_write_byte_8le(dar0++, program_read_byte_8le(sar0--));
+			memory_write_byte_8le(Z180.program, dar0++, memory_read_byte_8le(Z180.program, sar0--));
 			break;
 		case 0x08:	/* memory SAR0 fixed to memory DAR0+1 */
-			program_write_byte_8le(dar0++, program_read_byte_8le(sar0));
+			memory_write_byte_8le(Z180.program, dar0++, memory_read_byte_8le(Z180.program, sar0));
 			break;
 		case 0x0c:	/* I/O SAR0 fixed to memory DAR0+1 */
 			if (Z180.iol & Z180_DREQ0)
 			{
-				program_write_byte_8le(dar0++, IN(sar0));
+				memory_write_byte_8le(Z180.program, dar0++, IN(sar0));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1627,18 +1628,18 @@ static void z180_dma0(void)
 			}
 			break;
 		case 0x10:	/* memory SAR0+1 to memory DAR0-1 */
-			program_write_byte_8le(dar0--, program_read_byte_8le(sar0++));
+			memory_write_byte_8le(Z180.program, dar0--, memory_read_byte_8le(Z180.program, sar0++));
 			break;
 		case 0x14:	/* memory SAR0-1 to memory DAR0-1 */
-			program_write_byte_8le(dar0--, program_read_byte_8le(sar0--));
+			memory_write_byte_8le(Z180.program, dar0--, memory_read_byte_8le(Z180.program, sar0--));
 			break;
 		case 0x18:	/* memory SAR0 fixed to memory DAR0-1 */
-			program_write_byte_8le(dar0--, program_read_byte_8le(sar0));
+			memory_write_byte_8le(Z180.program, dar0--, memory_read_byte_8le(Z180.program, sar0));
 			break;
 		case 0x1c:	/* I/O SAR0 fixed to memory DAR0-1 */
 			if (Z180.iol & Z180_DREQ0)
             {
-				program_write_byte_8le(dar0--, IN(sar0));
+				memory_write_byte_8le(Z180.program, dar0--, IN(sar0));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1648,10 +1649,10 @@ static void z180_dma0(void)
 			}
 			break;
 		case 0x20:	/* memory SAR0+1 to memory DAR0 fixed */
-			program_write_byte_8le(dar0, program_read_byte_8le(sar0++));
+			memory_write_byte_8le(Z180.program, dar0, memory_read_byte_8le(Z180.program, sar0++));
 			break;
 		case 0x24:	/* memory SAR0-1 to memory DAR0 fixed */
-			program_write_byte_8le(dar0, program_read_byte_8le(sar0--));
+			memory_write_byte_8le(Z180.program, dar0, memory_read_byte_8le(Z180.program, sar0--));
 			break;
 		case 0x28:	/* reserved */
 			break;
@@ -1660,7 +1661,7 @@ static void z180_dma0(void)
 		case 0x30:	/* memory SAR0+1 to I/O DAR0 fixed */
 			if (Z180.iol & Z180_DREQ0)
             {
-				OUT(dar0, program_read_byte_8le(sar0++));
+				OUT(dar0, memory_read_byte_8le(Z180.program, sar0++));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1672,7 +1673,7 @@ static void z180_dma0(void)
 		case 0x34:	/* memory SAR0-1 to I/O DAR0 fixed */
 			if (Z180.iol & Z180_DREQ0)
             {
-				OUT(dar0, program_read_byte_8le(sar0--));
+				OUT(dar0, memory_read_byte_8le(Z180.program, sar0--));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1737,16 +1738,16 @@ static void z180_dma1(void)
 	switch (IO_DCNTL & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
 	case 0x00:	/* memory MAR1+1 to I/O IAR1 fixed */
-		io_write_byte_8le(iar1, program_read_byte_8le(mar1++));
+		memory_write_byte_8le(Z180.iospace, iar1, memory_read_byte_8le(Z180.program, mar1++));
 		break;
 	case 0x01:	/* memory MAR1-1 to I/O IAR1 fixed */
-		io_write_byte_8le(iar1, program_read_byte_8le(mar1--));
+		memory_write_byte_8le(Z180.iospace, iar1, memory_read_byte_8le(Z180.program, mar1--));
 		break;
 	case 0x02:	/* I/O IAR1 fixed to memory MAR1+1 */
-		program_write_byte_8le(mar1++, io_read_byte_8le(iar1));
+		memory_write_byte_8le(Z180.program, mar1++, memory_read_byte_8le(Z180.iospace, iar1));
 		break;
 	case 0x03:	/* I/O IAR1 fixed to memory MAR1-1 */
-		program_write_byte_8le(mar1--, io_read_byte_8le(iar1));
+		memory_write_byte_8le(Z180.program, mar1--, memory_read_byte_8le(Z180.iospace, iar1));
 		break;
 	}
 
@@ -1780,120 +1781,120 @@ static void z180_write_iolines(UINT32 data)
     /* I/O asynchronous clock 0 (active high) or DREQ0 (mux) */
 	if (changes & Z180_CKA0)
 	{
-		LOG(("Z180 #%d CKA0   %d\n", cpu_getactivecpu(), data & Z180_CKA0 ? 1 : 0));
+		LOG(("Z180 #%d CKA0   %d\n", cpunum_get_active(), data & Z180_CKA0 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_CKA0) | (data & Z180_CKA0);
     }
 
     /* I/O asynchronous clock 1 (active high) or TEND1 (mux) */
 	if (changes & Z180_CKA1)
 	{
-		LOG(("Z180 #%d CKA1   %d\n", cpu_getactivecpu(), data & Z180_CKA1 ? 1 : 0));
+		LOG(("Z180 #%d CKA1   %d\n", cpunum_get_active(), data & Z180_CKA1 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_CKA1) | (data & Z180_CKA1);
     }
 
     /* I/O serial clock (active high) */
 	if (changes & Z180_CKS)
 	{
-		LOG(("Z180 #%d CKS    %d\n", cpu_getactivecpu(), data & Z180_CKS ? 1 : 0));
+		LOG(("Z180 #%d CKS    %d\n", cpunum_get_active(), data & Z180_CKS ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_CKS) | (data & Z180_CKS);
     }
 
     /* I   clear to send 0 (active low) */
 	if (changes & Z180_CTS0)
 	{
-		LOG(("Z180 #%d CTS0   %d\n", cpu_getactivecpu(), data & Z180_CTS0 ? 1 : 0));
+		LOG(("Z180 #%d CTS0   %d\n", cpunum_get_active(), data & Z180_CTS0 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_CTS0) | (data & Z180_CTS0);
     }
 
     /* I   clear to send 1 (active low) or RXS (mux) */
 	if (changes & Z180_CTS1)
 	{
-		LOG(("Z180 #%d CTS1   %d\n", cpu_getactivecpu(), data & Z180_CTS1 ? 1 : 0));
+		LOG(("Z180 #%d CTS1   %d\n", cpunum_get_active(), data & Z180_CTS1 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_CTS1) | (data & Z180_CTS1);
     }
 
     /* I   data carrier detect (active low) */
 	if (changes & Z180_DCD0)
 	{
-		LOG(("Z180 #%d DCD0   %d\n", cpu_getactivecpu(), data & Z180_DCD0 ? 1 : 0));
+		LOG(("Z180 #%d DCD0   %d\n", cpunum_get_active(), data & Z180_DCD0 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_DCD0) | (data & Z180_DCD0);
     }
 
     /* I   data request DMA ch 0 (active low) or CKA0 (mux) */
 	if (changes & Z180_DREQ0)
 	{
-		LOG(("Z180 #%d DREQ0  %d\n", cpu_getactivecpu(), data & Z180_DREQ0 ? 1 : 0));
+		LOG(("Z180 #%d DREQ0  %d\n", cpunum_get_active(), data & Z180_DREQ0 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_DREQ0) | (data & Z180_DREQ0);
     }
 
     /* I   data request DMA ch 1 (active low) */
 	if (changes & Z180_DREQ1)
 	{
-		LOG(("Z180 #%d DREQ1  %d\n", cpu_getactivecpu(), data & Z180_DREQ1 ? 1 : 0));
+		LOG(("Z180 #%d DREQ1  %d\n", cpunum_get_active(), data & Z180_DREQ1 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_DREQ1) | (data & Z180_DREQ1);
     }
 
     /* I   asynchronous receive data 0 (active high) */
 	if (changes & Z180_RXA0)
 	{
-		LOG(("Z180 #%d RXA0   %d\n", cpu_getactivecpu(), data & Z180_RXA0 ? 1 : 0));
+		LOG(("Z180 #%d RXA0   %d\n", cpunum_get_active(), data & Z180_RXA0 ? 1 : 0));
         Z180.iol = (Z180.iol & ~Z180_RXA0) | (data & Z180_RXA0);
     }
 
     /* I   asynchronous receive data 1 (active high) */
 	if (changes & Z180_RXA1)
 	{
-		LOG(("Z180 #%d RXA1   %d\n", cpu_getactivecpu(), data & Z180_RXA1 ? 1 : 0));
+		LOG(("Z180 #%d RXA1   %d\n", cpunum_get_active(), data & Z180_RXA1 ? 1 : 0));
 		Z180.iol = (Z180.iol & ~Z180_RXA1) | (data & Z180_RXA1);
     }
 
     /* I   clocked serial receive data (active high) or CTS1 (mux) */
 	if (changes & Z180_RXS)
 	{
-		LOG(("Z180 #%d RXS    %d\n", cpu_getactivecpu(), data & Z180_RXS ? 1 : 0));
+		LOG(("Z180 #%d RXS    %d\n", cpunum_get_active(), data & Z180_RXS ? 1 : 0));
         Z180.iol = (Z180.iol & ~Z180_RXS) | (data & Z180_RXS);
     }
 
     /*   O request to send (active low) */
 	if (changes & Z180_RTS0)
 	{
-		LOG(("Z180 #%d RTS0   won't change output\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d RTS0   won't change output\n", cpunum_get_active()));
     }
 
     /*   O transfer end 0 (active low) or CKA1 (mux) */
 	if (changes & Z180_TEND0)
 	{
-		LOG(("Z180 #%d TEND0  won't change output\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d TEND0  won't change output\n", cpunum_get_active()));
     }
 
     /*   O transfer end 1 (active low) */
 	if (changes & Z180_TEND1)
 	{
-		LOG(("Z180 #%d TEND1  won't change output\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d TEND1  won't change output\n", cpunum_get_active()));
     }
 
     /*   O transfer out (PRT channel, active low) or A18 (mux) */
 	if (changes & Z180_A18_TOUT)
 	{
-		LOG(("Z180 #%d TOUT   won't change output\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d TOUT   won't change output\n", cpunum_get_active()));
     }
 
     /*   O asynchronous transmit data 0 (active high) */
 	if (changes & Z180_TXA0)
 	{
-		LOG(("Z180 #%d TXA0   won't change output\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d TXA0   won't change output\n", cpunum_get_active()));
     }
 
     /*   O asynchronous transmit data 1 (active high) */
 	if (changes & Z180_TXA1)
 	{
-		LOG(("Z180 #%d TXA1   won't change output\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d TXA1   won't change output\n", cpunum_get_active()));
     }
 
     /*   O clocked serial transmit data (active high) */
 	if (changes & Z180_TXS)
 	{
-		LOG(("Z180 #%d TXS    won't change output\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d TXS    won't change output\n", cpunum_get_active()));
     }
 }
 
@@ -1901,36 +1902,38 @@ static void z180_write_iolines(UINT32 data)
 static CPU_INIT( z180 )
 {
 	Z180.daisy = NULL;
-	if (config)
-		Z180.daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
+	if (device->static_config)
+		Z180.daisy = z80daisy_init(device, device->static_config);
 	Z180.irq_callback = irqcallback;
 	Z180.device = device;
+	Z180.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	Z180.iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("z180", index, Z180.AF.w.l);
-	state_save_register_item("z180", index, Z180.BC.w.l);
-	state_save_register_item("z180", index, Z180.DE.w.l);
-	state_save_register_item("z180", index, Z180.HL.w.l);
-	state_save_register_item("z180", index, Z180.IX.w.l);
-	state_save_register_item("z180", index, Z180.IY.w.l);
-	state_save_register_item("z180", index, Z180.PC.w.l);
-	state_save_register_item("z180", index, Z180.SP.w.l);
-	state_save_register_item("z180", index, Z180.AF2.w.l);
-	state_save_register_item("z180", index, Z180.BC2.w.l);
-	state_save_register_item("z180", index, Z180.DE2.w.l);
-	state_save_register_item("z180", index, Z180.HL2.w.l);
-	state_save_register_item("z180", index, Z180.R);
-	state_save_register_item("z180", index, Z180.R2);
-	state_save_register_item("z180", index, Z180.IFF1);
-	state_save_register_item("z180", index, Z180.IFF2);
-	state_save_register_item("z180", index, Z180.HALT);
-	state_save_register_item("z180", index, Z180.IM);
-	state_save_register_item("z180", index, Z180.I);
-	state_save_register_item("z180", index, Z180.nmi_state);
-	state_save_register_item("z180", index, Z180.nmi_pending);
-	state_save_register_item("z180", index, Z180.irq_state[0]);
-	state_save_register_item("z180", index, Z180.irq_state[1]);
-	state_save_register_item("z180", index, Z180.irq_state[2]);
-	state_save_register_item("z180", index, Z180.after_EI);
+	state_save_register_item("z180", device->tag, 0, Z180.AF.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.BC.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.DE.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.HL.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.IX.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.IY.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.PC.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.SP.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.AF2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.BC2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.DE2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.HL2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.R);
+	state_save_register_item("z180", device->tag, 0, Z180.R2);
+	state_save_register_item("z180", device->tag, 0, Z180.IFF1);
+	state_save_register_item("z180", device->tag, 0, Z180.IFF2);
+	state_save_register_item("z180", device->tag, 0, Z180.HALT);
+	state_save_register_item("z180", device->tag, 0, Z180.IM);
+	state_save_register_item("z180", device->tag, 0, Z180.I);
+	state_save_register_item("z180", device->tag, 0, Z180.nmi_state);
+	state_save_register_item("z180", device->tag, 0, Z180.nmi_pending);
+	state_save_register_item("z180", device->tag, 0, Z180.irq_state[0]);
+	state_save_register_item("z180", device->tag, 0, Z180.irq_state[1]);
+	state_save_register_item("z180", device->tag, 0, Z180.irq_state[2]);
+	state_save_register_item("z180", device->tag, 0, Z180.after_EI);
 }
 
 /****************************************************************************
@@ -1940,7 +1943,6 @@ static CPU_RESET( z180 )
 {
 	z80_daisy_state *save_daisy;
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 	int i, p;
 #if BIG_FLAGS_ARRAY
 	int oldval, newval, val;
@@ -2021,11 +2023,12 @@ static CPU_RESET( z180 )
 
 	save_daisy = Z180.daisy;
 	save_irqcallback = Z180.irq_callback;
-	save_device = Z180.device;
 	memset(&Z180, 0, sizeof(Z180));
 	Z180.daisy = save_daisy;
 	Z180.irq_callback = save_irqcallback;
 	Z180.device = device;
+	Z180.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	Z180.iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	_IX = _IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	_F = ZF;			/* Zero flag is set */
 	Z180.nmi_state = CLEAR_LINE;
@@ -2040,6 +2043,7 @@ static CPU_RESET( z180 )
 	Z180.read_tcr_tmdr[1] = 0;
 	Z180.tmdr_value[0] = 0xffff;
 	Z180.tmdr_value[1] = 0xffff;
+	Z180.device = device;
 
 	/* reset io registers */
 	IO_CNTLA0  = Z180_CNTLA0_RESET;
@@ -2110,7 +2114,6 @@ static CPU_RESET( z180 )
 	if (Z180.daisy)
 		z80daisy_reset(Z180.daisy);
 	z180_mmu();
-	z180_change_pc(_PCD);
 }
 
 /* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
@@ -2197,7 +2200,7 @@ static CPU_EXECUTE( z180 )
 	/* to just check here */
 	if (Z180.nmi_pending)
 	{
-		LOG(("Z180 #%d take NMI\n", cpu_getactivecpu()));
+		LOG(("Z180 #%d take NMI\n", cpunum_get_active()));
 		_PPC = -1;			/* there isn't a valid previous program counter */
 		LEAVE_HALT; 		/* Check if processor was halted */
 
@@ -2220,7 +2223,7 @@ again:
 		if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(Machine, _PCD);
+			debugger_instruction_hook(device, _PCD);
 
 			z180_dma0();
 			old_icount = handle_timers(z180_icount, old_icount);
@@ -2233,7 +2236,7 @@ again:
 				Z180.after_EI = 0;
 
 				_PPC = _PCD;
-				debugger_instruction_hook(Machine, _PCD);
+				debugger_instruction_hook(device, _PCD);
 				_R++;
 
 				EXEC_INLINE(op,ROP());
@@ -2260,7 +2263,7 @@ again:
 			Z180.after_EI = 0;
 
 			_PPC = _PCD;
-			debugger_instruction_hook(Machine, _PCD);
+			debugger_instruction_hook(device, _PCD);
 			_R++;
 			EXEC_INLINE(op,ROP());
 			old_icount = handle_timers(z180_icount, old_icount);
@@ -2304,7 +2307,6 @@ static CPU_SET_CONTEXT( z180 )
 {
 	if( src )
 		Z180 = *(Z180_Regs*)src;
-	z180_change_pc(_PCD);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -2335,7 +2337,7 @@ static void set_irq_line(int irqline, int state)
 	}
 	else
 	{
-		LOG(("Z180 #%d set_irq_line %d = %d\n",cpu_getactivecpu() , irqline,state));
+		LOG(("Z180 #%d set_irq_line %d = %d\n",cpunum_get_active() , irqline,state));
 
 		/* update the IRQ state */
 		Z180.irq_state[irqline] = state;
@@ -2370,7 +2372,7 @@ static CPU_SET_INFO( z180 )
 		case CPUINFO_INT_INPUT_STATE + Z180_INT1:		set_irq_line(Z180_INT1, info->i);		break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT2:		set_irq_line(Z180_INT2, info->i);		break;
 
-		case CPUINFO_INT_PC:							_PC = info->i; z180_change_pc(_PCD);	break;
+		case CPUINFO_INT_PC:							_PC = info->i; 							break;
 		case CPUINFO_INT_REGISTER + Z180_PC:			Z180.PC.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							_SP = info->i;							break;
 		case CPUINFO_INT_REGISTER + Z180_SP:			Z180.SP.w.l = info->i;					break;

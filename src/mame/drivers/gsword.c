@@ -215,13 +215,13 @@ static READ8_HANDLER( gsword_8741_2_r )
 	switch (offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read(machine, "IN0");
+		return input_port_read(space->machine, "IN0");
 	case 0x02: /* Player 1 Controller */
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	case 0x04: /* Player 2 Controller */
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 //  default:
-//      logerror("8741-2 unknown read %d PC=%04x\n",offset,activecpu_get_pc());
+//      logerror("8741-2 unknown read %d PC=%04x\n",offset,cpu_get_pc(space->cpu));
 	}
 	/* unknown */
 	return 0;
@@ -232,14 +232,14 @@ static READ8_HANDLER( gsword_8741_3_r )
 	switch (offset)
 	{
 	case 0x01: /* start button  */
-		return input_port_read(machine, "IN2");
+		return input_port_read(space->machine, "IN2");
 	case 0x02: /* Player 1 Controller? */
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	case 0x04: /* Player 2 Controller? */
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 	}
 	/* unknown */
-//  logerror("8741-3 unknown read %d PC=%04x\n",offset,activecpu_get_pc());
+//  logerror("8741-3 unknown read %d PC=%04x\n",offset,cpu_get_pc(space->cpu));
 	return 0;
 }
 
@@ -275,7 +275,7 @@ static INTERRUPT_GEN( josvolly_snd_interrupt )
 {
 	if(josvolly_nmi_enable)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		josvolly_nmi_enable = 0;
 	}
 }
@@ -285,7 +285,7 @@ static INTERRUPT_GEN( gsword_snd_interrupt )
 {
 	if(gsword_nmi_enable)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -331,12 +331,12 @@ static WRITE8_HANDLER( josvolly_nmi_enable_w )
 
 static WRITE8_HANDLER( gsword_AY8910_control_port_0_w )
 {
-	ay8910_control_port_0_w(machine,offset,data);
+	ay8910_control_port_0_w(space,offset,data);
 	fake8910_0 = data;
 }
 static WRITE8_HANDLER( gsword_AY8910_control_port_1_w )
 {
-	ay8910_control_port_1_w(machine,offset,data);
+	ay8910_control_port_1_w(space,offset,data);
 	fake8910_1 = data;
 }
 
@@ -358,8 +358,8 @@ static WRITE8_HANDLER( gsword_adpcm_data_w )
 
 static WRITE8_HANDLER( adpcm_soundcommand_w )
 {
-	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( cpu1_map, 0 , 8 )
@@ -941,7 +941,7 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 
@@ -956,7 +956,7 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 

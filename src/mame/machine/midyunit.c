@@ -56,7 +56,7 @@ static UINT16 *t2_hack_mem;
 
 WRITE16_HANDLER( midyunit_cmos_w )
 {
-	logerror("%08x:CMOS Write @ %05X\n", activecpu_get_pc(), offset);
+	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(space->cpu), offset);
 	COMBINE_DATA(&midyunit_cmos_ram[offset + midyunit_cmos_page]);
 }
 
@@ -78,7 +78,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 {
 	cmos_w_enable = (~data >> 9) & 1;
 
-	logerror("%08x:Protection write = %04X\n", activecpu_get_pc(), data);
+	logerror("%08x:Protection write = %04X\n", cpu_get_pc(space->cpu), data);
 
 	/* only go down this path if we have a data structure */
 	if (prot_data)
@@ -96,7 +96,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 		{
 			if (data == 0x500)
 			{
-				prot_result = program_read_word(TOBYTE(0x10a4390)) << 4;
+				prot_result = memory_read_word(space, TOBYTE(0x10a4390)) << 4;
 				logerror("  desired result = %04X\n", prot_result);
 			}
 		}
@@ -127,7 +127,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 READ16_HANDLER( midyunit_protection_r )
 {
 	/* return the most recently clocked value */
-	logerror("%08X:Protection read = %04X\n", activecpu_get_pc(), prot_result);
+	logerror("%08X:Protection read = %04X\n", cpu_get_pc(space->cpu), prot_result);
 	return prot_result;
 }
 
@@ -143,7 +143,7 @@ READ16_HANDLER( midyunit_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
 
-	return input_port_read(machine, portnames[offset]);
+	return input_port_read(space->machine, portnames[offset]);
 }
 
 
@@ -159,15 +159,15 @@ static READ16_HANDLER( term2_input_r )
 	static const char *const portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
 
 	if (offset != 2)
-		return input_port_read(machine, portnames[offset]);
+		return input_port_read(space->machine, portnames[offset]);
 
 	switch (term2_analog_select)
 	{
 		default:
-		case 0:  return input_port_read(machine, "STICK0_X");  break;
-		case 1:  return input_port_read(machine, "STICK0_Y");  break;
-		case 2:  return input_port_read(machine, "STICK1_X");  break;
-		case 3:  return input_port_read(machine, "STICK1_Y");  break;
+		case 0:  return input_port_read(space->machine, "STICK0_X");  break;
+		case 1:  return input_port_read(space->machine, "STICK0_Y");  break;
+		case 2:  return input_port_read(space->machine, "STICK1_X");  break;
+		case 3:  return input_port_read(space->machine, "STICK1_Y");  break;
 	}
 }
 
@@ -190,7 +190,7 @@ static WRITE16_HANDLER( term2_sound_w )
 
 static WRITE16_HANDLER( term2_hack_w )
 {
-    if (offset == 0 && activecpu_get_pc() == 0xffce5230)
+    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce5230)
     {
         t2_hack_mem[offset] = 0;
         return;
@@ -200,7 +200,7 @@ static WRITE16_HANDLER( term2_hack_w )
 
 static WRITE16_HANDLER( term2la2_hack_w )
 {
-    if (offset == 0 && activecpu_get_pc() == 0xffce4b80)
+    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce4b80)
     {
         t2_hack_mem[offset] = 0;
         return;
@@ -210,7 +210,7 @@ static WRITE16_HANDLER( term2la2_hack_w )
 
 static WRITE16_HANDLER( term2la1_hack_w )
 {
-    if (offset == 0 && activecpu_get_pc() == 0xffce33f0)
+    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce33f0)
     {
         t2_hack_mem[offset] = 0;
         return;
@@ -293,26 +293,26 @@ static void init_generic(running_machine *machine, int bpp, int sound, int prot_
 	{
 		case SOUND_CVSD_SMALL:
 			williams_cvsd_init(0);
-			memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, cvsd_protection_w);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, cvsd_protection_w);
 			cvsd_protection_base = memory_region(machine, "cvsd") + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
 			williams_cvsd_init(0);
-			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
-			memory_set_bankptr(9, auto_malloc(0x80));
+			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
+			memory_set_bankptr(machine, 9, auto_malloc(0x80));
 			break;
 
 		case SOUND_ADPCM:
 			williams_adpcm_init();
-			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
-			memory_set_bankptr(9, auto_malloc(0x80));
+			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
+			memory_set_bankptr(machine, 9, auto_malloc(0x80));
 			break;
 
 		case SOUND_NARC:
 			williams_narc_init();
-			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
-			memory_set_bankptr(9, auto_malloc(0x80));
+			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
+			memory_set_bankptr(machine, 9, auto_malloc(0x80));
 			break;
 
 		case SOUND_YAWDIM:
@@ -466,7 +466,7 @@ DRIVER_INIT( mkyawdim )
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(running_machine *machine, write16_machine_func hack_w)
+static void term2_init_common(running_machine *machine, write16_space_func hack_w)
 {
 	/* protection */
 	static const struct protection_data term2_protection_data =
@@ -480,12 +480,12 @@ static void term2_init_common(running_machine *machine, write16_machine_func hac
 	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	/* special inputs */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c00000, 0x01c0005f, 0, 0, term2_input_r);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01e00000, 0x01e0001f, 0, 0, term2_sound_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01c00000, 0x01c0005f, 0, 0, term2_input_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01e00000, 0x01e0001f, 0, 0, term2_sound_w);
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	t2_hack_mem = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010aa0e0, 0x010aa0ff, 0, 0, hack_w);
+	t2_hack_mem = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x010aa0e0, 0x010aa0ff, 0, 0, hack_w);
 }
 
 DRIVER_INIT( term2 ) { term2_init_common(machine, term2_hack_w); }
@@ -558,7 +558,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", activecpu_get_pc(), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(space->cpu), data);
 		return;
 	}
 
@@ -582,8 +582,8 @@ WRITE16_HANDLER( midyunit_sound_w )
 				break;
 
 			case SOUND_YAWDIM:
-				soundlatch_w(machine, 0, data);
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_w(space, 0, data);
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}
 }

@@ -37,31 +37,32 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
       that as well to be 100% accurate.
      */
 	int i;
-	UINT8 *ROM = memory_region(machine, "user1");
-	UINT8 *prom1 = memory_region(machine, "proms") + (data & 0xf0);
-	UINT8 *prom2 = memory_region(machine, "proms") + 0x100 + ((data & 0x0f) << 4);
+	UINT8 *ROM = memory_region(space->machine, "user1");
+	UINT8 *prom1 = memory_region(space->machine, "proms") + (data & 0xf0);
+	UINT8 *prom2 = memory_region(space->machine, "proms") + 0x100 + ((data & 0x0f) << 4);
 
 	for (i = 0x05;i < 0x10;i++)
 	{
 		int bank = ((prom1[i] & 0x03) << 4) | (prom2[i] & 0x0f);
 		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
-		memory_set_bankptr(i+1,&ROM[bank*0x1000]);
+		memory_set_bankptr(space->machine, i+1,&ROM[bank*0x1000]);
 	}
 }
 
 static MACHINE_RESET( srumbler )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* initialize banked ROM pointers */
-	srumbler_bankswitch_w(machine,0,0);
+	srumbler_bankswitch_w(space,0,0);
 }
 
 static INTERRUPT_GEN( srumbler_interrupt )
 {
-	if (cpu_getiloops()==0)
-		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	if (cpu_getiloops(device)==0)
+		cpu_set_input_line(device,0,HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 

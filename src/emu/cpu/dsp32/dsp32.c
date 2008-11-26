@@ -186,6 +186,7 @@ typedef struct
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
 	const device_config *device;
+	const address_space *program;
 } dsp32_regs;
 
 
@@ -211,17 +212,17 @@ static int dsp32_icount;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)			cpu_readop32(pc)
+#define ROPCODE(pc)			memory_decrypted_read_dword(dsp32.program, pc)
 
-#define RBYTE(addr)			program_read_byte_32le(addr)
-#define WBYTE(addr,data)	program_write_byte_32le((addr), data)
+#define RBYTE(addr)			memory_read_byte_32le(dsp32.program, addr)
+#define WBYTE(addr,data)	memory_write_byte_32le(dsp32.program, (addr), data)
 
 #if (!DETECT_MISALIGNED_MEMORY)
 
-#define RWORD(addr)			program_read_word_32le(addr)
-#define WWORD(addr,data)	program_write_word_32le((addr), data)
-#define RLONG(addr)			program_read_dword_32le(addr)
-#define WLONG(addr,data)	program_write_dword_32le((addr), data)
+#define RWORD(addr)			memory_read_word_32le(dsp32.program, addr)
+#define WWORD(addr,data)	memory_write_word_32le(dsp32.program, (addr), data)
+#define RLONG(addr)			memory_read_dword_32le(dsp32.program, addr)
+#define WLONG(addr,data)	memory_write_dword_32le(dsp32.program, (addr), data)
 
 #else
 
@@ -229,7 +230,7 @@ INLINE UINT16 RWORD(offs_t addr)
 {
 	UINT16 data;
 	if (addr & 1) fprintf(stderr, "Unaligned word read @ %06X, PC=%06X\n", addr, dsp32.PC);
-	data = program_read_word_32le(addr);
+	data = memory_read_word_32le(dsp32.program, addr);
 	return data;
 }
 
@@ -237,20 +238,20 @@ INLINE UINT32 RLONG(offs_t addr)
 {
 	UINT32 data;
 	if (addr & 3) fprintf(stderr, "Unaligned long read @ %06X, PC=%06X\n", addr, dsp32.PC);
-	data = program_write_word_32le(addr);
+	data = memory_write_word_32le(dsp32.program, addr);
 	return data;
 }
 
 INLINE void WWORD(offs_t addr, UINT16 data)
 {
 	if (addr & 1) fprintf(stderr, "Unaligned word write @ %06X, PC=%06X\n", addr, dsp32.PC);
-	program_read_dword_32le((addr), data);
+	memory_read_dword_32le(dsp32.program, (addr), data);
 }
 
 INLINE void WLONG(offs_t addr, UINT32 data)
 {
 	if (addr & 3) fprintf(stderr, "Unaligned long write @ %06X, PC=%06X\n", addr, dsp32.PC);
-	program_write_dword_32le((addr), data);
+	memory_write_dword_32le(dsp32.program, (addr), data);
 }
 
 #endif
@@ -335,7 +336,6 @@ static CPU_SET_CONTEXT( dsp32c )
 	/* copy the context */
 	if (src)
 		dsp32 = *(dsp32_regs *)src;
-	memory_set_opbase(dsp32.PC);
 
 	/* check for IRQs */
 	check_irqs();
@@ -349,13 +349,14 @@ static CPU_SET_CONTEXT( dsp32c )
 
 static CPU_INIT( dsp32c )
 {
-	const dsp32_config *configdata = config;
+	const dsp32_config *configdata = device->static_config;
 
 	/* copy in config data */
 	if (configdata)
 		dsp32.output_pins_changed = configdata->output_pins_changed;
 
 	dsp32.device = device;
+	dsp32.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 
@@ -363,7 +364,6 @@ static CPU_RESET( dsp32c )
 {
 	/* reset goes to 0 */
 	dsp32.PC = 0;
-	memory_set_opbase(dsp32.PC);
 
 	/* clear some registers */
 	dsp32.pcw &= 0x03ff;
@@ -451,17 +451,6 @@ static CPU_DISASSEMBLE( dsp32c )
 /***************************************************************************
     PARALLEL INTERFACE WRITES
 ***************************************************************************/
-
-/* context finder */
-#ifdef UNUSED_FUNCTION
-INLINE dsp32_regs *FINDCONTEXT(int cpu)
-{
-	dsp32_regs *context = cpunum_get_context_ptr(cpu);
-	if (!context)
-		context = &dsp32;
-	return context;
-}
-#endif
 
 static const UINT32 regmap[4][16] =
 {
@@ -560,7 +549,7 @@ void dsp32c_pio_w(int cpunum, int reg, int data)
 	UINT16 mask;
 	UINT8 mode;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
@@ -628,7 +617,7 @@ void dsp32c_pio_w(int cpunum, int reg, int data)
 			break;
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -642,7 +631,7 @@ int dsp32c_pio_r(int cpunum, int reg)
 	UINT16 mask, result = 0xffff;
 	UINT8 mode, shift = 0;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
@@ -702,7 +691,7 @@ int dsp32c_pio_r(int cpunum, int reg)
 			break;
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return (result >> shift) & ~mask;
 }
 

@@ -161,7 +161,8 @@ Pin #11(+) | | R               |
 
 static CUSTOM_INPUT( ticket_status )
 {
-	return ticket_dispenser_0_r(field->port->machine, 0) >> 7;
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	return ticket_dispenser_0_r(space, 0) >> 7;
 }
 
 
@@ -182,14 +183,14 @@ static CUSTOM_INPUT( cclownz_paddle )
 static WRITE16_HANDLER( ripribit_control_w )
 {
 	coin_counter_w(0, data & 1);
-	ticket_dispenser_0_w(machine, 0, ((data >> 1) & 1) << 7);
+	ticket_dispenser_0_w(space, 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
 
 
 static WRITE16_HANDLER( cfarm_control_w )
 {
-	ticket_dispenser_0_w(machine, 0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_0_w(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
@@ -199,7 +200,7 @@ static WRITE16_HANDLER( cfarm_control_w )
 
 static WRITE16_HANDLER( cclownz_control_w )
 {
-	ticket_dispenser_0_w(machine, 0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_0_w(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);
@@ -906,21 +907,21 @@ ROM_END
 static DRIVER_INIT( ripribit )
 {
 	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
 }
 
 
 static DRIVER_INIT( cfarm )
 {
 	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
 }
 
 
 static DRIVER_INIT( cclownz )
 {
 	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
 }
 
 

@@ -160,11 +160,11 @@ static MACHINE_RESET( megasys1_hachoo )
 #define INTERRUPT_NUM_A		3
 static INTERRUPT_GEN( interrupt_A )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
-		case 2:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 2:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 
@@ -207,11 +207,11 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_B		3
 static INTERRUPT_GEN( interrupt_B )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
-		case 1:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE); break;
-		default:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE); break;
+		case 0:		cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 1:		cpu_set_input_line(device, 1, HOLD_LINE); break;
+		default:	cpu_set_input_line(device, 2, HOLD_LINE); break;
 	}
 }
 
@@ -246,11 +246,11 @@ static READ16_HANDLER( ip_select_r )
 
 	switch (i)
 	{
-			case 0 :	return input_port_read(machine, "SYSTEM");	break;
-			case 1 :	return input_port_read(machine, "P1");		break;
-			case 2 :	return input_port_read(machine, "P2");		break;
-			case 3 :	return input_port_read(machine, "DSW1");	break;
-			case 4 :	return input_port_read(machine, "DSW2");	break;
+			case 0 :	return input_port_read(space->machine, "SYSTEM");	break;
+			case 1 :	return input_port_read(space->machine, "P1");		break;
+			case 2 :	return input_port_read(space->machine, "P2");		break;
+			case 3 :	return input_port_read(space->machine, "DSW1");	break;
+			case 4 :	return input_port_read(space->machine, "DSW2");	break;
 			default	 :	return 0x0006;
 	}
 }
@@ -258,7 +258,7 @@ static READ16_HANDLER( ip_select_r )
 static WRITE16_HANDLER( ip_select_w )
 {
 	COMBINE_DATA(&ip_select);
-	cpunum_set_input_line(machine, 0,2,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],2,HOLD_LINE);
 }
 
 
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( interrupt_D )
 {
-	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( readmem_D, ADDRESS_SPACE_PROGRAM, 16 )
@@ -431,7 +431,7 @@ ADDRESS_MAP_END
 static void megasys1_sound_irq(running_machine *machine, int irq)
 {
 	if (irq)
-		cpunum_set_input_line(machine, 1, 4, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 4, HOLD_LINE);
 }
 
 static READ16_HANDLER( oki_status_0_r )
@@ -439,7 +439,7 @@ static READ16_HANDLER( oki_status_0_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return okim6295_status_0_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_0_lsb_r(space,offset,mem_mask);
 }
 
 static READ16_HANDLER( oki_status_1_r )
@@ -447,7 +447,7 @@ static READ16_HANDLER( oki_status_1_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return okim6295_status_1_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_1_lsb_r(space,offset,mem_mask);
 }
 
 /***************************************************************************
@@ -751,7 +751,7 @@ MACHINE_DRIVER_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -3037,8 +3037,8 @@ static READ16_HANDLER( protection_peekaboo_r )
 	switch (protection_val)
 	{
 		case 0x02:	return 0x03;
-		case 0x51:	return input_port_read(machine, "P1");
-		case 0x52:	return input_port_read(machine, "P2");
+		case 0x51:	return input_port_read(space->machine, "P1");
+		case 0x52:	return input_port_read(space->machine, "P2");
 		default:	return protection_val;
 	}
 }
@@ -3051,7 +3051,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 
 	if ((protection_val & 0x90) == 0x90)
 	{
-		UINT8 *RAM = memory_region(machine, "oki1");
+		UINT8 *RAM = memory_region(space->machine, "oki1");
 		int new_bank = (protection_val & 0x7) % 7;
 
 		if (bank != new_bank)
@@ -3061,7 +3061,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],4,HOLD_LINE);
 }
 
 
@@ -3451,11 +3451,12 @@ static INPUT_PORTS_START( stdragon )
 INPUT_PORTS_END
 
 
+
+
 /***************************************************************************
 
                                 [ Soldam ]
 
-(Japan version)
 f00c2.l *** score/10 (BCD) ***
 
 The country code is at ROM address $3a9d, copied to RAM address
@@ -3464,16 +3465,50 @@ text in english.
 
 ***************************************************************************/
 
+ROM_START( soldam )
+	ROM_REGION( 0x60000, "main", 0 )		/* Main CPU Code */
+	ROM_LOAD16_BYTE( "2ver1j.bin",0x000000, 0x020000, CRC(45444b07) SHA1(d991dd52904671fbd8cfcfe07c956d9fd45b3470) )
+	ROM_LOAD16_BYTE( "1euro.bin", 0x000001, 0x020000, CRC(9f9da28a) SHA1(8ce9cd72d12cf66f0b1611ec3933383d2995e5f2) )
+	ROM_LOAD16_BYTE( "3ver1.bin", 0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
+	ROM_LOAD16_BYTE( "4ver1.bin", 0x040001, 0x010000, CRC(1df7816f) SHA1(7c069470ec0e884eae5a52581f2be17d9e692105) )
+
+	ROM_REGION( 0x20000, "sound", 0 )		/* Sound CPU Code */
+	ROM_LOAD16_BYTE( "5ver1.bin", 0x000000, 0x010000, CRC(d1019a67) SHA1(32d77914a67c009bf1bb397772f195594f7cc03f) )
+	ROM_LOAD16_BYTE( "6ver1.bin", 0x000001, 0x010000, CRC(3ed219b4) SHA1(afffa5596027181ae94488d54d6266f8a7ead180) )
+
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE ) /* Scroll 0 */
+	ROM_LOAD( "14ver1.bin", 0x000000, 0x080000, CRC(73c90610) SHA1(044462fd41e8502ba57f814c61db6f0cfb1cc18b) )
+
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE ) /* Scroll 1 */
+	ROM_LOAD( "18ver1.bin", 0x000000, 0x080000, CRC(e91a1afd) SHA1(66a686d61de105ee571fbdabc774ed0b848bf426) )
+
+	ROM_REGION( 0x020000, "gfx3", ROMREGION_DISPOSE ) /* Scroll 2 */
+	ROM_LOAD( "19ver1.bin", 0x000000, 0x020000, CRC(38465da1) SHA1(461fc0d81b711d0646dc366c057da66d4b8c6e23) )
+
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD( "23ver1.bin", 0x000000, 0x080000, CRC(0ca09432) SHA1(c9b12d564032c2a668e18ba95fd71ab540e798ce) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )		/* Samples */
+	ROM_LOAD( "10ver1.bin", 0x000000, 0x040000, CRC(8d5613bf) SHA1(eee217dd2ab64d86b7f5eda55a3c331d862c079e) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )		/* Samples */
+	ROM_LOAD( "8ver1.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
+
+	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
+	ROM_LOAD( "pr-91023.m14",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+ROM_END
+
+
 ROM_START( soldamj )
 	ROM_REGION( 0x60000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD16_BYTE( "soldam2.bin", 0x000000, 0x020000, CRC(c73d29e4) SHA1(2a6bffd6835506a0a1449047dec69445d2242fca) )
 	ROM_LOAD16_BYTE( "soldam1.bin", 0x000001, 0x020000, CRC(e7cb0c20) SHA1(7b1adf439cd4022ec110ec18359fb50ac137f253) )
-	ROM_LOAD16_BYTE( "soldam3.bin", 0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
-	ROM_LOAD16_BYTE( "soldam4.bin", 0x040001, 0x010000, CRC(1df7816f) SHA1(7c069470ec0e884eae5a52581f2be17d9e692105) )
+	ROM_LOAD16_BYTE( "3ver1.bin",   0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
+	ROM_LOAD16_BYTE( "4ver1.bin",   0x040001, 0x010000, CRC(1df7816f) SHA1(7c069470ec0e884eae5a52581f2be17d9e692105) )
 
 	ROM_REGION( 0x20000, "sound", 0 )		/* Sound CPU Code */
-	ROM_LOAD16_BYTE( "soldam5.bin", 0x000000, 0x010000, CRC(d1019a67) SHA1(32d77914a67c009bf1bb397772f195594f7cc03f) )
-	ROM_LOAD16_BYTE( "soldam6.bin", 0x000001, 0x010000, CRC(3ed219b4) SHA1(afffa5596027181ae94488d54d6266f8a7ead180) )
+	ROM_LOAD16_BYTE( "5ver1.bin", 0x000000, 0x010000, CRC(d1019a67) SHA1(32d77914a67c009bf1bb397772f195594f7cc03f) )
+	ROM_LOAD16_BYTE( "6ver1.bin", 0x000001, 0x010000, CRC(3ed219b4) SHA1(afffa5596027181ae94488d54d6266f8a7ead180) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE ) /* Scroll 0 */
 	ROM_LOAD( "soldam14.bin", 0x000000, 0x080000, CRC(26cea54a) SHA1(00beb1fe2973daf8bab288a0cb9d5fff26a00415) )
@@ -3482,19 +3517,19 @@ ROM_START( soldamj )
 	ROM_LOAD( "soldam18.bin", 0x000000, 0x080000, CRC(7d8e4712) SHA1(d16455648dcba467336e51daac8b23e463a74230) )
 
 	ROM_REGION( 0x020000, "gfx3", ROMREGION_DISPOSE ) /* Scroll 2 */
-	ROM_LOAD( "soldam19.bin", 0x000000, 0x020000, CRC(38465da1) SHA1(461fc0d81b711d0646dc366c057da66d4b8c6e23) )
+	ROM_LOAD( "19ver1.bin", 0x000000, 0x020000, CRC(38465da1) SHA1(461fc0d81b711d0646dc366c057da66d4b8c6e23) )
 
 	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD( "soldam23.bin", 0x000000, 0x080000, CRC(0ca09432) SHA1(c9b12d564032c2a668e18ba95fd71ab540e798ce) )
+	ROM_LOAD( "23ver1.bin", 0x000000, 0x080000, CRC(0ca09432) SHA1(c9b12d564032c2a668e18ba95fd71ab540e798ce) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )		/* Samples */
-	ROM_LOAD( "soldam10.bin", 0x000000, 0x040000, CRC(8d5613bf) SHA1(eee217dd2ab64d86b7f5eda55a3c331d862c079e) )
+	ROM_LOAD( "10ver1.bin", 0x000000, 0x040000, CRC(8d5613bf) SHA1(eee217dd2ab64d86b7f5eda55a3c331d862c079e) )
 
 	ROM_REGION( 0x040000, "oki2", 0 )		/* Samples */
-	ROM_LOAD( "soldam8.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
+	ROM_LOAD( "8ver1.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
-	ROM_LOAD( "soldam.m14",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "pr-91023.m14",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 static INPUT_PORTS_START( soldamj )
@@ -3959,13 +3994,13 @@ static DRIVER_INIT( iganinju )
 
 static WRITE16_HANDLER( okim6295_data_0_both_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_data_0_w(machine, 0, (data >> 0) & 0xff );
-	else				okim6295_data_0_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_0_w(space, 0, (data >> 0) & 0xff );
+	else				okim6295_data_0_w(space, 0, (data >> 8) & 0xff );
 }
 static WRITE16_HANDLER( okim6295_data_1_both_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_data_1_w(machine, 0, (data >> 0) & 0xff );
-	else				okim6295_data_1_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_1_w(space, 0, (data >> 0) & 0xff );
+	else				okim6295_data_1_w(space, 0, (data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )
@@ -3981,13 +4016,13 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xa0003, 0, 0, okim6295_data_0_both_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc0003, 0, 0, okim6295_data_1_both_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xa0000, 0xa0003, 0, 0, okim6295_data_0_both_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc0000, 0xc0003, 0, 0, okim6295_data_1_both_w);
 }
 
 static DRIVER_INIT( peekaboo )
 {
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
 }
 
 static DRIVER_INIT( phantasm )
@@ -4018,12 +4053,20 @@ static DRIVER_INIT( rodlandj )
 	astyanax_rom_decode(machine, "main");
 }
 
-static DRIVER_INIT( soldam )
+static DRIVER_INIT( soldamj )
 {
 	astyanax_rom_decode(machine, "main");
 
-	/* Sprite RAM is mirrored. Why? */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+	/* Sprite RAM is mirrored */
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+}
+
+static DRIVER_INIT( soldam )
+{
+	phantasm_rom_decode(machine, "main");
+
+	/* Sprite RAM is mirrored */
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 
@@ -4047,7 +4090,7 @@ static DRIVER_INIT( monkelf )
 	UINT16 *ROM = (UINT16*)memory_region(machine, "main");
 	ROM[0x00744/2] = 0x4e71;
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
 
 	megasys1_ram += 0x10000/2;
 
@@ -4080,7 +4123,8 @@ GAME( 1991, edf,      0,        system_B,          edf,      edf,      ROT0,   "
 GAME( 1991, edfu,     edf,      system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
 GAME( 1991, 64street, 0,        system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streej, 64street, system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
-GAME( 1992, soldamj,  0,        system_A,          soldamj,  soldam,   ROT0,   "Jaleco", "Soldam (Japan)", 0 )
+GAME( 1992, soldam,   0,        system_A,          soldamj,  soldam,   ROT0,   "Jaleco", "Soldam", 0 )
+GAME( 1992, soldamj,  soldam,   system_A,          soldamj,  soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
 GAME( 1993, chimerab, 0,        system_C,          chimerab, chimerab, ROT0,   "Jaleco", "Chimera Beast (prototype)", 0 )
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )

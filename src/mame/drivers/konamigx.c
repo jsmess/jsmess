@@ -203,7 +203,7 @@ static struct sprite_entry {
 	UINT32 adr;
 } sprites[0x100];
 
-static void generate_sprites(UINT32 src, UINT32 spr, int count)
+static void generate_sprites(const address_space *space, UINT32 src, UINT32 spr, int count)
 {
 	int i;
 	int scount;
@@ -214,9 +214,9 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 	for(i=0; i<count; i++) {
 		UINT32 adr = src + 0x100*i;
 		int pri;
-		if(!program_read_word(adr+2))
+		if(!memory_read_word(space, adr+2))
 			continue;
-		pri = program_read_word(adr+28);
+		pri = memory_read_word(space, adr+28);
 
 		if(pri < 256) {
 			sprites[ecount].pri = pri;
@@ -229,39 +229,39 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 	for(i=0; i<ecount; i++) {
 		UINT32 adr = sprites[i].adr;
 		if(adr) {
-			UINT32 set =(program_read_word(adr) << 16)|program_read_word(adr+2);
-			UINT16 glob_x = program_read_word(adr+4);
-			UINT16 glob_y = program_read_word(adr+8);
-			UINT16 flip_x = program_read_word(adr+12) ? 0x1000 : 0x0000;
-			UINT16 flip_y = program_read_word(adr+14) ? 0x2000 : 0x0000;
+			UINT32 set =(memory_read_word(space, adr) << 16)|memory_read_word(space, adr+2);
+			UINT16 glob_x = memory_read_word(space, adr+4);
+			UINT16 glob_y = memory_read_word(space, adr+8);
+			UINT16 flip_x = memory_read_word(space, adr+12) ? 0x1000 : 0x0000;
+			UINT16 flip_y = memory_read_word(space, adr+14) ? 0x2000 : 0x0000;
 			UINT16 glob_f = flip_x | (flip_y ^ 0x2000);
-			UINT16 zoom_x = program_read_word(adr+20);
-			UINT16 zoom_y = program_read_word(adr+22);
+			UINT16 zoom_x = memory_read_word(space, adr+20);
+			UINT16 zoom_y = memory_read_word(space, adr+22);
 			UINT16 color_val    = 0x0000;
 			UINT16 color_mask   = 0xffff;
 			UINT16 color_set    = 0x0000;
 			UINT16 color_rotate = 0x0000;
 			UINT16 v;
 
-			v = program_read_word(adr+24);
+			v = memory_read_word(space, adr+24);
 			if(v & 0x8000) {
 				color_mask = 0xf3ff;
 				color_val |= (v & 3) << 10;
 			}
 
-			v = program_read_word(adr+26);
+			v = memory_read_word(space, adr+26);
 			if(v & 0x8000) {
 				color_mask &= 0xfcff;
 				color_val  |= (v & 3) << 8;
 			}
 
-			v = program_read_word(adr+18);
+			v = memory_read_word(space, adr+18);
 			if(v & 0x8000) {
 				color_mask &= 0xff1f;
 				color_val  |= v & 0xe0;
 			}
 
-			v = program_read_word(adr+16);
+			v = memory_read_word(space, adr+16);
 			if(v & 0x8000)
 				color_set = v & 0x1f;
 			if(v & 0x4000)
@@ -274,14 +274,14 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 
 			if(set >= 0x200000 && set < 0xd00000)
 			{
-				UINT16 count2 = program_read_word(set);
+				UINT16 count2 = memory_read_word(space, set);
 				set += 2;
 				while(count2) {
-					UINT16 idx  = program_read_word(set);
-					UINT16 flip = program_read_word(set+2);
-					UINT16 col  = program_read_word(set+4);
-					short y = program_read_word(set+6);
-					short x = program_read_word(set+8);
+					UINT16 idx  = memory_read_word(space, set);
+					UINT16 flip = memory_read_word(space, set+2);
+					UINT16 col  = memory_read_word(space, set+4);
+					short y = memory_read_word(space, set+6);
+					short x = memory_read_word(space, set+8);
 
 					if(idx == 0xffff) {
 						set = (flip<<16) | col;
@@ -316,13 +316,13 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 					if(color_rotate)
 						col = (col & 0xffe0) | ((col + color_rotate) & 0x1f);
 
-					program_write_word(spr   , (flip ^ glob_f) | sprites[i].pri);
-					program_write_word(spr+ 2, idx);
-					program_write_word(spr+ 4, y);
-					program_write_word(spr+ 6, x);
-					program_write_word(spr+ 8, zoom_y);
-					program_write_word(spr+10, zoom_x);
-					program_write_word(spr+12, col);
+					memory_write_word(space, spr   , (flip ^ glob_f) | sprites[i].pri);
+					memory_write_word(space, spr+ 2, idx);
+					memory_write_word(space, spr+ 4, y);
+					memory_write_word(space, spr+ 6, x);
+					memory_write_word(space, spr+ 8, zoom_y);
+					memory_write_word(space, spr+10, zoom_x);
+					memory_write_word(space, spr+12, col);
 					spr += 16;
 					scount++;
 					if(scount == 256)
@@ -335,45 +335,45 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 		}
 	}
 	while(scount < 256) {
-		program_write_word(spr, scount);
+		memory_write_word(space, spr, scount);
 		scount++;
 		spr += 16;
 	}
 }
 
-static void tkmmpzdm_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tkmmpzdm_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x0142, 0x100, 0);
 }
 
-static void dragoonj_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void dragoonj_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x5c00, 0x100, 0);
 }
 
-static void sal2_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sal2_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x1c8c, 0x172, 1);
 }
 
-static void sexyparo_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sexyparo_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	// The d20000 should probably be p3
-	generate_sprites(0xc00604, 0xd20000, 0xfc);
+	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
 }
 
-static void tbyahhoo_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tbyahhoo_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	generate_sprites(0xc00000, 0xd20000, 0x100);
+	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-static void daiskiss_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void daiskiss_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	generate_sprites(0xc00000, 0xd20000, 0x100);
+	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
 static UINT8 esc_program[4096];
-static void (*esc_cb)(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
+static void (*esc_cb)(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 
 static WRITE32_HANDLER( esc_w )
 {
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( esc_w )
 	}
 
 	/* the master opcode can be at an unaligned address, so get it "safely" */
-	opcode = (program_read_word(data+2))|(program_read_word(data)<<16);
+	opcode = (memory_read_word(space, data+2))|(memory_read_word(space, data)<<16);
 
 	/* if there's an OBJECT_MAGIC_ID, that means
        there is a valid ESC command packet. */
@@ -401,15 +401,15 @@ static WRITE32_HANDLER( esc_w )
 	{
 		int i;
 		/* get the subop now */
-		opcode = program_read_byte(data+8);
-		params = (program_read_word(data+12) << 16) | program_read_word(data+14);
+		opcode = memory_read_byte(space, data+8);
+		params = (memory_read_word(space, data+12) << 16) | memory_read_word(space, data+14);
 
 		switch(opcode) {
 		case 5: // Reset
 			break;
 		case 2: // Load program
 			for(i=0; i<4096; i++)
-				esc_program[i] = program_read_byte(params+i);
+				esc_program[i] = memory_read_byte(space, params+i);
 /*
             {
                 FILE *f;
@@ -424,23 +424,23 @@ static WRITE32_HANDLER( esc_w )
 			break;
 		case 1: // Run program
 			if(esc_cb) {
-				UINT32 p1 = (program_read_word(params+0)<<16) | program_read_word(params+2);
-				UINT32 p2 = (program_read_word(params+4)<<16) | program_read_word(params+6);
-				UINT32 p3 = (program_read_word(params+8)<<16) | program_read_word(params+10);
-				UINT32 p4 = (program_read_word(params+12)<<16) | program_read_word(params+14);
-				esc_cb(p1, p2, p3, p4);
+				UINT32 p1 = (memory_read_word(space, params+0)<<16) | memory_read_word(space, params+2);
+				UINT32 p2 = (memory_read_word(space, params+4)<<16) | memory_read_word(space, params+6);
+				UINT32 p3 = (memory_read_word(space, params+8)<<16) | memory_read_word(space, params+10);
+				UINT32 p4 = (memory_read_word(space, params+12)<<16) | memory_read_word(space, params+14);
+				esc_cb(space, p1, p2, p3, p4);
 			}
 			break;
 		default:
 //          logerror("Unknown ESC opcode %d\n", opcode);
 			break;
 		}
-		program_write_byte(data+9, ESTATE_END);
+		memory_write_byte(space, data+9, ESTATE_END);
 
 		if (konamigx_wrport1_1 & 0x10)
 		{
 			gx_rdport1_3 &= ~8;
-			cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 4, HOLD_LINE);
 		}
 	}
 	else
@@ -524,7 +524,7 @@ static WRITE32_HANDLER( eeprom_w )
         */
 
 		konamigx_wrport1_1 = (data>>16)&0xff;
-//      logerror("write %x to IRQ register (PC=%x)\n", konamigx_wrport1_1, activecpu_get_pc());
+//      logerror("write %x to IRQ register (PC=%x)\n", konamigx_wrport1_1, cpu_get_pc(space->cpu));
 
 		// gx_syncen is to ensure each IRQ is trigger at least once after being enabled
 		if (konamigx_wrport1_1 & 0x80) gx_syncen |= konamigx_wrport1_1 & 0x1f;
@@ -552,13 +552,13 @@ static WRITE32_HANDLER( control_w )
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -588,9 +588,9 @@ static READ32_HANDLER(waitskip_r)
 {
 	UINT32 data = gx_workram[waitskip.offs+offset];
 
-	if (activecpu_get_pc() == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
+	if (cpu_get_pc(space->cpu) == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
 	{
-		cpu_spinuntil_trigger(resume_trigger);
+		cpu_spinuntil_trigger(space->cpu, resume_trigger);
 		suspension_active = 1;
 	}
 
@@ -621,14 +621,14 @@ static WRITE32_HANDLER( ccu_w )
 		// vblank interrupt ACK
 		if (ACCESSING_BITS_24_31)
 		{
-			cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
 		if (ACCESSING_BITS_8_15)
 		{
-			cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 2, CLEAR_LINE);
 			gx_syncen |= 0x40;
 		}
 	}
@@ -646,7 +646,7 @@ static WRITE32_HANDLER( ccu_w )
 static TIMER_CALLBACK( dmaend_callback )
 {
 	// foul-proof (CPU0 could be deactivated while we wait)
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(machine, resume_trigger); }
 
 	// DMA busy flag must be cleared before triggering IRQ 3
 	gx_rdport1_3 &= ~2;
@@ -658,7 +658,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// lower OBJINT-REQ flag and trigger interrupt
 		gx_rdport1_3 &= ~0x80;
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);
 	}
 }
 
@@ -682,7 +682,7 @@ static void dmastart_callback(int data)
 static INTERRUPT_GEN(konamigx_vbinterrupt)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(device->machine, resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	if (gx_syncen & 0x20)
@@ -692,7 +692,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+			cpu_set_input_line(device, 1, HOLD_LINE);
 		}
 	}
 
@@ -702,7 +702,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(device->machine, resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
@@ -714,7 +714,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+			cpu_set_input_line(device, 1, HOLD_LINE);
 		}
 	}
 
@@ -723,9 +723,9 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 
 static INTERRUPT_GEN(konamigx_hbinterrupt)
 {
-	if (!cpu_getiloops())
+	if (!cpu_getiloops(device))
 	{
-		konamigx_vbinterrupt_type4(machine, cpunum);
+		konamigx_vbinterrupt_type4(device);
 	}
 	else	// hblank
 	{
@@ -737,7 +737,7 @@ static INTERRUPT_GEN(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x82) == 0x82 || (gx_syncen & 2))
 			{
 				gx_syncen &= ~2;
-				cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+				cpu_set_input_line(device, 2, HOLD_LINE);
 			}
 		}
 	}
@@ -769,7 +769,7 @@ static READ32_HANDLER( sound020_r )
 		rv |= LSW<<8;
 	}
 
-//  mame_printf_debug("Read 68k @ %x (PC=%x)\n", reg, activecpu_get_pc());
+//  mame_printf_debug("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
 
 	// we clearly have some problem because some games require these hacks
 	// perhaps 68000/68020 timing is skewed?
@@ -779,31 +779,31 @@ static READ32_HANDLER( sound020_r )
 			if (reg == 0) rv |= 0xff00;
 			break;
 		case 2: // Winning Spike
-			if (activecpu_get_pc() == 0x2026fe) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x2026fe) rv = 0xc0c0c0c0;
 			break;
 		case 3: // Run'n Gun 2
-			if (activecpu_get_pc() == 0x24f122) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24f122) rv = 0xc0c0c0c0;
 			break;
 		case 4:	// Rushing Heroes
-			if (activecpu_get_pc() == 0x20eda6) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x20eda6) rv = 0xc0c0c0c0;
 			break;
 		case 5:	// Vs. Net Soccer ver. UAB
-			if (activecpu_get_pc() == 0x24c63e) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c63e) rv = 0xc0c0c0c0;
 			break;
 		case 6: // Slam Dunk 2
-			if (activecpu_get_pc() == 0x24f21c) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24f21c) rv = 0xc0c0c0c0;
 			break;
 		case 7:	// Vs. Net Soccer ver. AAA
-			if (activecpu_get_pc() == 0x24c722) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c722) rv = 0xc0c0c0c0;
 			break;
 		case 8:	// Vs. Net Soccer ver. EAD
-			if (activecpu_get_pc() == 0x24c482) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c482) rv = 0xc0c0c0c0;
 			break;
 		case 9:	// Vs. Net Soccer ver. EAB
-			if (activecpu_get_pc() == 0x24c46c) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c46c) rv = 0xc0c0c0c0;
 			break;
 		case 10: // Vs. Net Soccer ver. JAB
-			if (activecpu_get_pc() == 0x24c5f0) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c5f0) rv = 0xc0c0c0c0;
 			break;
 	}
 
@@ -816,7 +816,7 @@ INLINE void write_snd_020(running_machine *machine, int reg, int val)
 
 	if (reg == 7)
 	{
-		cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE);
 	}
 }
 
@@ -828,14 +828,14 @@ static WRITE32_HANDLER( sound020_w )
 	{
 		reg = offset<<1;
 		val = data>>24;
-		write_snd_020(machine, reg, val);
+		write_snd_020(space->machine, reg, val);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		reg = (offset<<1)+1;
 		val = (data>>8)&0xff;
-		write_snd_020(machine, reg, val);
+		write_snd_020(space->machine, reg, val);
 	}
 }
 
@@ -873,16 +873,16 @@ static double adc0834_callback( int input )
 
 static READ32_HANDLER( le2_gun_H_r )
 {
-	int p1x = input_port_read(machine, "LIGHT0_X")*290/0xff+20;
-	int p2x = input_port_read(machine, "LIGHT1_X")*290/0xff+20;
+	int p1x = input_port_read(space->machine, "LIGHT0_X")*290/0xff+20;
+	int p2x = input_port_read(space->machine, "LIGHT1_X")*290/0xff+20;
 
 	return (p1x<<16)|p2x;
 }
 
 static READ32_HANDLER( le2_gun_V_r )
 {
-	int p1y = input_port_read(machine, "LIGHT0_Y")*224/0xff;
-	int p2y = input_port_read(machine, "LIGHT1_Y")*224/0xff;
+	int p1y = input_port_read(space->machine, "LIGHT0_Y")*224/0xff;
+	int p2y = input_port_read(space->machine, "LIGHT1_Y")*224/0xff;
 
 	// make "off the bottom" reload too
 	if (p1y >= 0xdf) p1y = 0;
@@ -892,7 +892,7 @@ static READ32_HANDLER( le2_gun_V_r )
 
 static READ32_HANDLER( service_r )
 {
-	int res = input_port_read(machine, "SERVICE");
+	int res = input_port_read(space->machine, "SERVICE");
 
 	if (init_eeprom_count)
 	{
@@ -909,24 +909,24 @@ static READ32_HANDLER( service_r )
 
 static READ32_HANDLER( gx5bppspr_r )
 {
-	return (K055673_rom_word_r(machine, offset*2+1, 0xffff) | K055673_rom_word_r(machine, offset*2, 0xffff)<<16);
+	return (K055673_rom_word_r(space, offset*2+1, 0xffff) | K055673_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 static READ32_HANDLER( gx6bppspr_r )
 {
-	return (K055673_GX6bpp_rom_word_r(machine, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(machine, offset*2, 0xffff)<<16);
+	return (K055673_GX6bpp_rom_word_r(space, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 static READ32_HANDLER( type1_roz_r1 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "gfx3");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "gfx3");
 
 	return ROM[offset];
 }
 
 static READ32_HANDLER( type1_roz_r2 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "gfx3");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "gfx3");
 
 	ROM += (0x600000/2);
 
@@ -1052,15 +1052,15 @@ static WRITE32_HANDLER( type4_prot_w )
 					// memcpy from c01000 to c01400 for 0x400 bytes (startup check for type 4 games)
 					for (i = 0; i < 0x400; i += 2)
 					{
-						program_write_word(0xc01400+i, program_read_word(0xc01000+i));
+						memory_write_word(space, 0xc01400+i, memory_read_word(space, 0xc01000+i));
 					}
 				}
 				else if(last_prot_op == 0x57a)	// winspike
 				{
-					program_write_dword(0xc10f00, program_read_dword(0xc00f10));
-					program_write_dword(0xc10f04, program_read_dword(0xc00f14));
-					program_write_dword(0xc0fe00, program_read_dword(0xc00f30));
-					program_write_dword(0xc0fe04, program_read_dword(0xc00f34));
+					memory_write_dword(space, 0xc10f00, memory_read_dword(space, 0xc00f10));
+					memory_write_dword(space, 0xc10f04, memory_read_dword(space, 0xc00f14));
+					memory_write_dword(space, 0xc0fe00, memory_read_dword(space, 0xc00f30));
+					memory_write_dword(space, 0xc0fe04, memory_read_dword(space, 0xc00f34));
 				}
 				else if(last_prot_op == 0xd97)	// rushhero
 				{
@@ -1072,7 +1072,7 @@ static WRITE32_HANDLER( type4_prot_w )
 					{
 						for (i = 0; i <= 0x10; i += 4)
 						{
-							program_write_dword(dst + i, program_read_dword(src+i));
+							memory_write_dword(space, dst + i, memory_read_dword(space, src+i));
 						}
 
 						src -= 0x10;
@@ -1081,13 +1081,13 @@ static WRITE32_HANDLER( type4_prot_w )
 				}
 				else
 				{
-					logerror("GXT4: unknown protection command %x (PC=%x)\n", last_prot_op, activecpu_get_pc());
+					logerror("GXT4: unknown protection command %x (PC=%x)\n", last_prot_op, cpu_get_pc(space->cpu));
 				}
 
 				if (konamigx_wrport1_1 & 0x10)
 				{
 					gx_rdport1_3 &= ~8;
-					cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+					cpu_set_input_line(space->machine->cpu[0], 4, HOLD_LINE);
 				}
 
 				// don't accidentally do a phony command
@@ -1198,9 +1198,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_1_r(machine, offset);
+		ret |= k054539_1_r(space, offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_0_r(machine, offset)<<8;
+		ret |= k054539_0_r(space, offset)<<8;
 
 	return ret;
 }
@@ -1208,9 +1208,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_1_w(machine, offset, data);
+		k054539_1_w(space, offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_0_w(machine, offset, data>>8);
+		k054539_0_w(space, offset, data>>8);
 }
 
 static READ16_HANDLER( sndcomm68k_r )
@@ -3259,7 +3259,7 @@ static MACHINE_RESET(konamigx)
 	tms57002_init();
 
 	// sound CPU initially disabled?
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
 	{
@@ -3356,8 +3356,8 @@ static DRIVER_INIT(konamigx)
 			switch (gameDefs[i].special)
 	{
 				case 1:	// LE2 guns
-					memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd44000, 0xd44003, 0, 0, le2_gun_H_r );
-					memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd44004, 0xd44007, 0, 0, le2_gun_V_r );
+					memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd44000, 0xd44003, 0, 0, le2_gun_H_r );
+					memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd44004, 0xd44007, 0, 0, le2_gun_V_r );
 					break;
 
 				case 2:	// tkmmpzdm hack
@@ -3393,7 +3393,7 @@ static DRIVER_INIT(konamigx)
 					break;
 
 				case 7:	// install type 4 Xilinx protection for non-type 3/4 games
-		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xcc0000, 0xcc0007, 0, 0, type4_prot_w );
+		memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcc0000, 0xcc0007, 0, 0, type4_prot_w );
 					break;
 
 				case 8: // tbyahhoo
@@ -3408,14 +3408,14 @@ static DRIVER_INIT(konamigx)
 	switch (readback)
 	{
 		case BPP5:
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd4a000, 0xd4a00f, 0, 0, gx5bppspr_r);
+			memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx5bppspr_r);
 		break;
 
 		case BPP66:
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd00000, 0xd01fff, 0, 0, K056832_6bpp_rom_long_r);
+			memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd00000, 0xd01fff, 0, 0, K056832_6bpp_rom_long_r);
 
 		case BPP6:
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd4a000, 0xd4a00f, 0, 0, gx6bppspr_r);
+			memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx6bppspr_r);
 		break;
 	}
 

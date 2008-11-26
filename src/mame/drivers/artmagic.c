@@ -29,8 +29,8 @@
 #include "sound/okim6295.h"
 
 
-#define MASTER_CLOCK_40MHz		(40000000)
-#define MASTER_CLOCK_25MHz		(25000000)
+#define MASTER_CLOCK_40MHz		(XTAL_40MHz)
+#define MASTER_CLOCK_25MHz		(XTAL_25MHz)
 
 
 static UINT16 *control;
@@ -57,8 +57,8 @@ static void (*protection_handler)(running_machine *);
 
 static void update_irq_state(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, tms_irq  ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 5, hack_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, tms_irq  ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 5, hack_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -93,13 +93,13 @@ static MACHINE_RESET( artmagic )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(1, offset);
+	return tms34010_host_r(space->machine->cpu[1], offset);
 }
 
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(1, offset, data);
+	tms34010_host_w(space->machine->cpu[1], offset, data);
 }
 
 
@@ -116,9 +116,9 @@ static WRITE16_HANDLER( control_w )
 
 	/* OKI banking here */
 	if (offset == 0)
-		okim6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(machine, "oki"));
+		okim6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(space->machine, "oki"));
 
-	logerror("%06X:control_w(%d) = %04X\n", activecpu_get_pc(), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -138,13 +138,13 @@ static TIMER_CALLBACK( irq_off )
 static READ16_HANDLER( ultennis_hack_r )
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	if (activecpu_get_pc() == 0x18c2)
+	if (cpu_get_pc(space->cpu) == 0x18c2)
 	{
 		hack_irq = 1;
-		update_irq_state(machine);
+		update_irq_state(space->machine);
 		timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 	}
-	return input_port_read(machine, "300000");
+	return input_port_read(space->machine, "300000");
 }
 
 
@@ -397,7 +397,7 @@ static WRITE16_HANDLER( protection_bit_w )
 		prot_bit_index = 0;
 
 		/* update the protection state */
-		(*protection_handler)(machine);
+		(*protection_handler)(space->machine);
 	}
 }
 
@@ -879,7 +879,7 @@ static DRIVER_INIT( ultennis )
 	protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x300001, 0, 0, ultennis_hack_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x300001, 0, 0, ultennis_hack_r);
 }
 
 

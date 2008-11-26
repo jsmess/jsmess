@@ -84,7 +84,7 @@ static DRIVER_INIT( fromanc4 )
 
 static INTERRUPT_GEN( fromanc2_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
 
@@ -94,10 +94,10 @@ static INTERRUPT_GEN( fromanc2_interrupt )
 
 static WRITE16_HANDLER( fromanc2_sndcmd_w )
 {
-	soundlatch_w(machine, offset, (data >> 8) & 0xff);	// 1P (LEFT)
-	soundlatch2_w(machine, offset, data & 0xff);			// 2P (RIGHT)
+	soundlatch_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
+	soundlatch2_w(space, offset, data & 0xff);			// 2P (RIGHT)
 
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	fromanc2_sndcpu_nmi_flag = 0;
 }
 
@@ -115,12 +115,12 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 	UINT16 ret;
 
 	switch (fromanc2_portselect) {
-		case 0x01:	ret = input_port_read(machine, "KEY0"); break;
-		case 0x02:	ret = input_port_read(machine, "KEY1"); break;
-		case 0x04:	ret = input_port_read(machine, "KEY2"); break;
-		case 0x08:	ret = input_port_read(machine, "KEY3"); break;
+		case 0x01:	ret = input_port_read(space->machine, "KEY0"); break;
+		case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
+		case 0x04:	ret = input_port_read(space->machine, "KEY2"); break;
+		case 0x08:	ret = input_port_read(space->machine, "KEY3"); break;
 		default:	ret = 0xffff;
-					logerror("PC:%08X unknown %02X\n", activecpu_get_pc(), fromanc2_portselect);
+					logerror("PC:%08X unknown %02X\n", cpu_get_pc(space->cpu), fromanc2_portselect);
 					break;
 	}
 
@@ -194,13 +194,13 @@ static WRITE16_HANDLER( fromanc2_subcpu_w )
 {
 	fromanc2_datalatch1 = data;
 
-	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
 	fromanc2_subcpu_int_flag = 0;
 }
 
 static READ16_HANDLER( fromanc2_subcpu_r )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 	fromanc2_subcpu_nmi_flag = 0;
 
 	return (fromanc2_datalatch_2h << 8) | fromanc2_datalatch_2l;
@@ -242,16 +242,16 @@ static READ8_HANDLER( fromanc2_sndcpu_nmi_clr )
 
 static WRITE8_HANDLER( fromanc2_subcpu_rombank_w )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 	int rombank = data & 0x03;
 	int rambank = (data & 0x0c) >> 2;
 
 	// Change ROM BANK
-	memory_set_bankptr(1, &RAM[rombank * 0x4000]);
+	memory_set_bankptr(space->machine, 1, &RAM[rombank * 0x4000]);
 
 	// Change RAM BANK
-	if (rambank != 0) memory_set_bankptr(2, &RAM[0x10000 + (rambank * 0x4000)]);
-	else memory_set_bankptr(2, &RAM[0x8000]);
+	if (rambank != 0) memory_set_bankptr(space->machine, 2, &RAM[0x10000 + (rambank * 0x4000)]);
+	else memory_set_bankptr(space->machine, 2, &RAM[0x8000]);
 }
 
 
@@ -602,7 +602,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
