@@ -355,7 +355,6 @@ void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( cdp1864 )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -387,18 +386,16 @@ static DEVICE_START( cdp1864 )
 	cdp1864->dma_timer = timer_alloc(cdp1864_dma_tick, (void *)device);
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "CDP1864", device->tag);
+	state_save_register_item("cdp1864", device->tag, 0, cdp1864->disp);
+	state_save_register_item("cdp1864", device->tag, 0, cdp1864->dmaout);
+	state_save_register_item("cdp1864", device->tag, 0, cdp1864->bgcolor);
 
-	state_save_register_item(unique_tag, 0, cdp1864->disp);
-	state_save_register_item(unique_tag, 0, cdp1864->dmaout);
-	state_save_register_item(unique_tag, 0, cdp1864->bgcolor);
+	state_save_register_item("cdp1864", device->tag, 0, cdp1864->audio);
+	state_save_register_item("cdp1864", device->tag, 0, cdp1864->latch);
+	state_save_register_item("cdp1864", device->tag, 0, cdp1864->signal);
+	state_save_register_item("cdp1864", device->tag, 0, cdp1864->incr);
 
-	state_save_register_item(unique_tag, 0, cdp1864->audio);
-	state_save_register_item(unique_tag, 0, cdp1864->latch);
-	state_save_register_item(unique_tag, 0, cdp1864->signal);
-	state_save_register_item(unique_tag, 0, cdp1864->incr);
-
-	state_save_register_bitmap(unique_tag, 0, "cdp1864->bitmap", cdp1864->bitmap);
+	state_save_register_bitmap("cdp1864", device->tag, 0, "cdp1864->bitmap", cdp1864->bitmap);
 	return DEVICE_START_OK;
 }
 
