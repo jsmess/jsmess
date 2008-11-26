@@ -12,8 +12,9 @@
         - Only memory to memory is tested!
 
     TODO:
-        - implement missing features
+		- refactor according to new memory system
         - implement interrupt support (not used in dkong3 and mario)
+        - implement missing features
         - implement more asserts
         - implement a INPUT_LINE_BUSREQ for Z80. As a workaround,
           HALT is used. This implies burst mode.
@@ -23,6 +24,7 @@
 #include "driver.h"
 #include "memconv.h"
 #include "z80dma.h"
+#include "cpu/z80/z80daisy.h"
 
 #define VERBOSE 0
 
@@ -409,12 +411,33 @@ WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
 
 	param = (data ? 1 : 0);
 	LOG(("RDY: %d Active High: %d\n", data, READY_ACTIVE_HIGH(z80dma)));
-	timer_call_after_resynch((void *) device, param, z80dma_rdy_write_callback);
+	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
 }
 
-/* ----------------------------------------------------------------------- */
 
-/* device interface */
+/***************************************************************************
+    DAISY CHAIN INTERFACE
+***************************************************************************/
+
+static int z80dma_irq_state(const device_config *device)
+{
+	int state = 0;
+
+	return state;
+}
+
+static int z80dma_irq_ack(const device_config *device)
+{
+	return 0;
+}
+
+static void z80dma_irq_reti(const device_config *device)
+{
+}
+
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
 
 static DEVICE_START( z80dma )
 {
@@ -426,7 +449,7 @@ static DEVICE_START( z80dma )
 
 	z80dma->intf = device->static_config;
 
-	z80dma->timer = timer_alloc(z80dma_timerproc, (void *) device);
+	z80dma->timer = timer_alloc(device->machine, z80dma_timerproc, (void *) device);
 
 	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs);
 	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs_follow);
@@ -483,6 +506,9 @@ DEVICE_GET_INFO( z80dma )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(z80dma);break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(z80dma);break;
+		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)z80dma_irq_state;		break;
+		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)z80dma_irq_ack;		break;
+		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)z80dma_irq_reti;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "Z80DMA";						break;
