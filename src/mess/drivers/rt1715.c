@@ -18,8 +18,8 @@
 
 WRITE8_HANDLER (rt1717_set_bank )
 {
-	memory_set_bankptr(1, mess_ram);
-	memory_set_bankptr(3, mess_ram);
+	memory_set_bankptr(space->machine, 1, mess_ram);
+	memory_set_bankptr(space->machine, 3, mess_ram);
 }
 
 /* Address maps */

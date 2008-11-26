@@ -17,6 +17,7 @@ extern READ8_HANDLER (sapi1_keyboard_r );
 extern WRITE8_HANDLER(sapi1_keyboard_w );
 
 /*----------- defined in video/sapi1.c -----------*/
+extern UINT8* sapi_video_ram;
 
 extern VIDEO_START( sapi1 );
 extern VIDEO_UPDATE( sapi1 );

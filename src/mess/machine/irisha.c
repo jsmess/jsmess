@@ -64,7 +64,7 @@ READ8_HANDLER (irisha_keyboard_r)
 {
 	UINT8 keycode;
  	if (irisha_keyboard_cnt!=0 && irisha_keyboard_cnt<11) {
-		keycode = input_port_read(machine, keynames[irisha_keyboard_cnt-1]) ^ 0xff;
+		keycode = input_port_read(space->machine, keynames[irisha_keyboard_cnt-1]) ^ 0xff;
 	} else {
 		keycode = 0xff;
 	}
@@ -99,7 +99,7 @@ const ppi8255_interface irisha_ppi8255_interface =
 
 static PIC8259_SET_INT_LINE( irisha_pic_set_int_line )
 {
-	cpunum_set_input_line(device->machine, 0, 0,interrupt ?  HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0,interrupt ?  HOLD_LINE : CLEAR_LINE);
 }
 
 const struct pic8259_interface irisha_pic8259_config = {

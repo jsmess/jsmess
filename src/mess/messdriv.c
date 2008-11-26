@@ -1005,7 +1005,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER (homelab4)
 	
 	/* Irisha */
-//128u4	DRIVER (irisha)
+	DRIVER (irisha)
 	
 	/* PK-8020 */
 //128u4	DRIVER (korvet)
@@ -1014,8 +1014,8 @@ XL/XE 16kB OS roms
 //128u4	DRIVER (vector06)
 
 	/* Robotron 1715 */
-//128u4	DRIVER (rt1715)
-//128u4	DRIVER (rt1715w)
+	DRIVER (rt1715)
+	DRIVER (rt1715w)
 
 	/* PP-01 */
 //128u4	DRIVER (pp01)
@@ -1025,7 +1025,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER (ondrav)
 
 	/* SAPI-1 */
-//128u4	DRIVER (sapi1)
+	DRIVER (sapi1)
 
   /* Spectrum clones */
   	

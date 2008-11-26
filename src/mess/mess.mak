@@ -370,6 +370,9 @@ DRVLIBS = \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/votrax.a \
+	$(MESSOBJ)/rt1715.a \
+	$(MESSOBJ)/irisha.a \
+	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/acorn.a \
@@ -418,7 +421,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/homelab.a \
 #	$(MESSOBJ)/hp48.a \
 #	$(MESSOBJ)/intv.a \
-#	$(MESSOBJ)/irisha.a \
 #	$(MESSOBJ)/jupiter.a \
 #	$(MESSOBJ)/kaypro.a \
 #	$(MESSOBJ)/kim1.a \
@@ -455,9 +457,7 @@ DRVLIBS = \
 #	$(MESSOBJ)/radio.a \
 #	$(MESSOBJ)/rca.a \
 #	$(MESSOBJ)/rockwell.a \
-#	$(MESSOBJ)/rt1715.a \
 #	$(MESSOBJ)/samcoupe.a \
-#	$(MESSOBJ)/sapi1.a \
 #	$(MESSOBJ)/sega.a \
 #	$(MESSOBJ)/sgi.a \
 #	$(MESSOBJ)/sharp.a \

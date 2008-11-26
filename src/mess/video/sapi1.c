@@ -85,6 +85,7 @@ UINT8 MHB2501[] = {
 };
 
 static UINT8 refresh_counter;
+UINT8* sapi_video_ram;
 
 VIDEO_START( sapi1 )
 {
@@ -99,11 +100,11 @@ VIDEO_UPDATE( sapi1 )
   
 	for(y = 0; y < 24; y++ )
 	{
-		addr = 0x3800 + y*64;
+		addr = y*64;
 		xpos = 0;
 		for(x = 0; x < 40; x++ )
 		{
-			UINT8 code = program_read_byte(addr + x);
+			UINT8 code = sapi_video_ram[addr + x];
 			UINT8 attr = (code >> 6) & 3;
 			code &= 0x3f;						
 			for(j = 0; j < 9; j++ )

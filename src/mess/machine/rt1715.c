@@ -20,7 +20,7 @@ DRIVER_INIT(rt1715)
 
 MACHINE_RESET( rt1715 )
 {
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000);
-	memory_set_bankptr(2, mess_ram + 0x0800);
-	memory_set_bankptr(3, mess_ram);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
+	memory_set_bankptr(machine, 2, mess_ram + 0x0800);
+	memory_set_bankptr(machine, 3, mess_ram);
 }
