@@ -905,11 +905,11 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( tx0_8kw )	/* 1962 MIT TX-0 (8kw RAM)							*/
 
 	/* Luxor Datorer AB */
-//128u4	DRIVER( abc80 )
-//128u4	DRIVER( abc802 )
-//128u4	DRIVER( abc800m )
-//128u4	DRIVER( abc800c )
-//128u4	DRIVER( abc806 )
+	DRIVER( abc80 )
+	DRIVER( abc802 )
+	DRIVER( abc800m )
+	DRIVER( abc800c )
+	DRIVER( abc806 )
 
 	/* Be Incorporated */
 //128u4	DRIVER( bebox )		/* BeBox Dual603-66									*/

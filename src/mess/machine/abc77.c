@@ -48,7 +48,7 @@ void abc77_rxd_w(const device_config *device, int level)
 {
 	abc77_t *abc77 = get_safe_token(device);
 
-	cpunum_set_input_line(device->machine, abc77->cpunum, MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[abc77->cpunum], MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( clock_tick )
@@ -64,7 +64,7 @@ static TIMER_CALLBACK( reset_tick )
 	const device_config *device = ptr;
 	abc77_t *abc77 = get_safe_token(device);
 
-	cpunum_set_input_line(device->machine, abc77->cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[abc77->cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 void abc77_reset_w(const device_config *device, int level)
@@ -77,10 +77,10 @@ void abc77_reset_w(const device_config *device, int level)
 		int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
 		int ea = BIT(input_port_read(device->machine, "ABC77_DSW"), 7);
 
-		cpunum_set_input_line(device->machine, abc77->cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[abc77->cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 		timer_adjust_oneshot(abc77->reset_timer, ATTOTIME_IN_MSEC(t), 0);
 		
-		cpunum_set_input_line(device->machine, abc77->cpunum, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[abc77->cpunum], MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	abc77->reset = level;
@@ -88,7 +88,7 @@ void abc77_reset_w(const device_config *device, int level)
 
 static READ8_HANDLER( abc77_clock_r )
 {
-	const device_config *device = devtag_get_device(machine, ABC77, ABC77_TAG);
+	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	return abc77->clock;
@@ -96,7 +96,7 @@ static READ8_HANDLER( abc77_clock_r )
 
 static READ8_HANDLER( abc77_data_r )
 {
-	const device_config *device = devtag_get_device(machine, ABC77, ABC77_TAG);
+	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	static const char *keynames[] = { "ABC77_X0", "ABC77_X1", "ABC77_X2", "ABC77_X3", "ABC77_X4", "ABC77_X5", "ABC77_X6", "ABC77_X7", "ABC77_X8", "ABC77_X9", "ABC77_X10", "ABC77_X11" };
@@ -106,7 +106,7 @@ static READ8_HANDLER( abc77_data_r )
 
 static WRITE8_HANDLER( abc77_data_w )
 {
-	const device_config *device = devtag_get_device(machine, ABC77, ABC77_TAG);
+	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->keylatch = data & 0x0f;
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( abc77_data_w )
 	}
 
 	/* beep */
-	discrete_sound_w(device->machine, NODE_01, BIT(data, 4));
+	discrete_sound_w(space, NODE_01, BIT(data, 4));
 
 	/* transmit data */
 	abc77->intf->txd_w(device, BIT(data, 5));
@@ -318,7 +318,6 @@ ROM_END
 static DEVICE_START( abc77 )
 {
 	abc77_t *abc77 = device->token;
-	char unique_tag[30];
 	astring *tempstring = astring_alloc();
 
 	/* validate arguments */
@@ -343,12 +342,10 @@ static DEVICE_START( abc77 )
 
 	/* register for state saving */
 
-	state_save_combine_module_and_tag(unique_tag, "ABC77", device->tag);
-
-	state_save_register_item(unique_tag, 0, abc77->keylatch);
-	state_save_register_item(unique_tag, 0, abc77->clock);
-	state_save_register_item(unique_tag, 0, abc77->hys);
-	state_save_register_item(unique_tag, 0, abc77->reset);
+	state_save_register_item("abc77", device->tag, 0, abc77->keylatch);
+	state_save_register_item("abc77", device->tag, 0, abc77->clock);
+	state_save_register_item("abc77", device->tag, 0, abc77->hys);
+	state_save_register_item("abc77", device->tag, 0, abc77->reset);
 
 	return DEVICE_START_OK;
 }

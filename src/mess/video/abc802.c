@@ -21,14 +21,14 @@ static PALETTE_INIT( abc802 )
 
 READ8_HANDLER( abc802_charram_r )
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = space->machine->driver_data;
 
 	return state->charram[offset];
 }
 
 WRITE8_HANDLER( abc802_charram_w )
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = space->machine->driver_data;
 
 	state->charram[offset] = data;
 }

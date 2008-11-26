@@ -1,11 +1,11 @@
 /***************************************************************************
 
-    Z80 PIO (Z8420) implementation
+    Z80 PIO Parallel Input/Output Controller emulation
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
-***************************************************************************
+****************************************************************************
                             _____   _____
                     D2   1 |*    \_/     | 40  D3
                     D7   2 |             | 39  D4
@@ -33,6 +33,18 @@
 #ifndef __Z80PIO_H__
 #define __Z80PIO_H__
 
+/***************************************************************************
+    CALLBACK FUNCTION PROTOTYPES
+***************************************************************************/
+
+typedef void (*z80pio_on_int_changed_func) (const device_config *device, int state);
+#define Z80PIO_ON_INT_CHANGED(name) void name(const device_config *device, int state)
+
+typedef void (*z80pio_on_ardy_changed_func) (const device_config *device, int state);
+#define Z80PIO_ON_ARDY_CHANGED(name) void name(const device_config *device, int state)
+
+typedef void (*z80pio_on_brdy_changed_func) (const device_config *device, int state);
+#define Z80PIO_ON_BRDY_CHANGED(name) void name(const device_config *device, int state)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -41,16 +53,31 @@
 typedef struct _z80pio_interface z80pio_interface;
 struct _z80pio_interface
 {
-	void (*intr)(const device_config *device, int which);    /* callback when change interrupt status */
-	read8_device_func portAread;    /* port A read callback */
-	read8_device_func portBread;    /* port B read callback */
-	write8_device_func portAwrite;  /* port A write callback */
-	write8_device_func portBwrite;  /* port B write callback */
-	void (*rdyA)(int data);     /* portA ready active callback (do not support yet)*/
-	void (*rdyB)(int data);     /* portB ready active callback (do not support yet)*/
+	const char *cpu;				/* CPU whose clock we use for our base */
+	int clock;						/* clock (pin 25) of the chip */
+
+	/* this gets called for every change of the _INT pin (pin 23) */
+	z80pio_on_int_changed_func		on_int_changed;
+
+	/* this gets called for every read from port A */
+	read8_device_func				port_a_r;
+
+	/* this gets called for every read from port B */
+	read8_device_func				port_b_r;
+
+	/* this gets called for every write to port A */
+	write8_device_func				port_a_w;
+
+	/* this gets called for every write to port B */
+	write8_device_func				port_b_w;
+
+	/* this gets called for every change of the ARDY pin (pin 18) */
+	z80pio_on_ardy_changed_func		on_ardy_changed;
+
+	/* this gets called for every change of the BRDY pin (pin 21) */
+	z80pio_on_brdy_changed_func		on_brdy_changed;
 };
-
-
+#define Z80PIO_INTERFACE(name) const z80pio_interface (name)=
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -63,31 +90,21 @@ struct _z80pio_interface
 #define MDRV_Z80PIO_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, Z80PIO)
 
-
-
 /***************************************************************************
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( z80pio_c_w );
 READ8_DEVICE_HANDLER( z80pio_c_r );
+WRITE8_DEVICE_HANDLER( z80pio_c_w );
 
+READ8_DEVICE_HANDLER( lh0081_c_r );
 
 /***************************************************************************
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( z80pio_d_w );
 READ8_DEVICE_HANDLER( z80pio_d_r );
-
-
-/***************************************************************************
-    PORT I/O
-***************************************************************************/
-
-WRITE8_DEVICE_HANDLER( z80pio_p_w );
-READ8_DEVICE_HANDLER( z80pio_p_r );
-
+WRITE8_DEVICE_HANDLER( z80pio_d_w );
 
 /***************************************************************************
     STROBE STATE MANAGEMENT
@@ -96,17 +113,34 @@ READ8_DEVICE_HANDLER( z80pio_p_r );
 void z80pio_astb_w(const device_config *device, int state);
 void z80pio_bstb_w(const device_config *device, int state);
 
-
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
+
+/* A0 = B/A
+   A1 = C/D */
 READ8_DEVICE_HANDLER(z80pio_r);
 WRITE8_DEVICE_HANDLER(z80pio_w);
 
+/* A0 = C/D
+   A1 = B/A */
+READ8_DEVICE_HANDLER(z80pio_alt_r);
+WRITE8_DEVICE_HANDLER(z80pio_alt_w);
 
-/* ----- device interface ----- */
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
 
 #define Z80PIO DEVICE_GET_INFO_NAME(z80pio)
 DEVICE_GET_INFO( z80pio );
+
+#define Z8420 DEVICE_GET_INFO_NAME(z8420)
+DEVICE_GET_INFO( z8420 );
+
+#define LH0081 DEVICE_GET_INFO_NAME(lh0081)
+DEVICE_GET_INFO( lh0081 );
+
+#define MK3881 DEVICE_GET_INFO_NAME(mk3881)
+DEVICE_GET_INFO( mk3881 );
 
 #endif

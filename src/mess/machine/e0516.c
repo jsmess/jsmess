@@ -188,7 +188,6 @@ void e0516_cs_w(const device_config *device, int level)
 static DEVICE_START( e0516 )
 {
 	e0516_t *e0516 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -205,17 +204,15 @@ static DEVICE_START( e0516 )
 	timer_adjust_periodic(e0516->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(e0516->intf->clock / 32768));
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "E0516", device->tag);
+	state_save_register_item("e0516", device->tag, 0, e0516->cs);
+	state_save_register_item("e0516", device->tag, 0, e0516->data_latch);
+	state_save_register_item("e0516", device->tag, 0, e0516->reg_latch);
+	state_save_register_item("e0516", device->tag, 0, e0516->read_write);
+	state_save_register_item("e0516", device->tag, 0, e0516->state);
+	state_save_register_item("e0516", device->tag, 0, e0516->bits);
+	state_save_register_item("e0516", device->tag, 0, e0516->dio);
 
-	state_save_register_item(unique_tag, 0, e0516->cs);
-	state_save_register_item(unique_tag, 0, e0516->data_latch);
-	state_save_register_item(unique_tag, 0, e0516->reg_latch);
-	state_save_register_item(unique_tag, 0, e0516->read_write);
-	state_save_register_item(unique_tag, 0, e0516->state);
-	state_save_register_item(unique_tag, 0, e0516->bits);
-	state_save_register_item(unique_tag, 0, e0516->dio);
-
-	state_save_register_item_array(unique_tag, 0, e0516->reg);
+	state_save_register_item_array("e0516", device->tag, 0, e0516->reg);
 	return DEVICE_START_OK;
 }
 

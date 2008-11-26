@@ -49,6 +49,12 @@
 	IN 1	_STAT	status in
 	IN 7	RST		reset
 
+
+	ABCBUS_CHANNEL_ABC850_852_856 = 36,
+	ABCBUS_CHANNEL_ABC832_834_850 = 44,
+	ABCBUS_CHANNEL_ABC830 = 45,
+	ABCBUS_CHANNEL_ABC838 = 46
+
 */
 
 /*
@@ -74,18 +80,7 @@
 #ifndef __ABCBUS__
 #define __ABCBUS__
 
-enum
-{
-	DEVINFO_FCT_CARD_SELECT = DEVINFO_FCT_DEVICE_SPECIFIC,	/* R/O: abcbus_daisy_cs */
-};
-
-enum
-{
-	ABCBUS_CHANNEL_ABC850_852_856 = 36,
-	ABCBUS_CHANNEL_ABC832_834_850 = 44,
-	ABCBUS_CHANNEL_ABC830 = 45,
-	ABCBUS_CHANNEL_ABC838 = 46
-};
+#define DEVINFO_FCT_ABCBUS_CARD_SELECT	DEVINFO_FCT_DEVICE_SPECIFIC
 
 enum
 {
@@ -100,6 +95,10 @@ enum
 	ABCBUS_RST = 7
 };
 
+/* macros */
+#define ABCBUS_CARD_SELECT_NAME(name)	abcbus_card_select_##name
+#define ABCBUS_CARD_SELECT(name)		void ABCBUS_CARD_SELECT_NAME(name)(const device_config *device, UINT8 data)
+
 /* per-device callback functions */
 typedef void (*abcbus_card_select)(const device_config *device, UINT8 data);
 
@@ -107,8 +106,8 @@ typedef void (*abcbus_card_select)(const device_config *device, UINT8 data);
 typedef struct _abcbus_daisy_chain abcbus_daisy_chain;
 struct _abcbus_daisy_chain
 {
-	device_type		devtype;					/* type of device */
-	const char *	devname;					/* name of the device */
+	device_type		devtype;	/* type of device */
+	const char		*devname;	/* name of the device */
 };
 #define ABCBUS_CONFIG(name) const abcbus_daisy_chain (name)[] =
 

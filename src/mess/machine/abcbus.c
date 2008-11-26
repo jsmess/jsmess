@@ -26,7 +26,7 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 		(*tailptr)->device = devtag_get_device(machine, daisy->devtype, device_inherit_tag(tempstring, cputag, daisy->devname));
 		if ((*tailptr)->device == NULL)
 			fatalerror("Unable to locate device '%s'", daisy->devname);
-		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_CARD_SELECT);
+		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_ABCBUS_CARD_SELECT);
 		tailptr = &(*tailptr)->next;
 	}
 	
@@ -51,6 +51,14 @@ READ8_HANDLER( abcbus_reset_r )
 	/* loop over all devices and call their reset function */
 	for ( ; daisy != NULL; daisy = daisy->next)
 		device_reset(daisy->device);
+
+	/* uninstall I/O handlers */
+	memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_INP, ABCBUS_OUT, 0x18, 0, SMH_NOP, SMH_NOP);
+	memory_install_read8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C1, ABCBUS_C1, 0x18, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C3, ABCBUS_C3, 0x18, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
 
 	return 0xff;
 }

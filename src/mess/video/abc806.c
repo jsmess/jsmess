@@ -51,7 +51,7 @@ WRITE8_HANDLER( abc806_hrs_w )
 
 	*/
 
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 	
 	state->hrs = data;
 }
@@ -60,7 +60,7 @@ WRITE8_HANDLER( abc806_hrs_w )
 
 WRITE8_HANDLER( abc806_hrc_w )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	int reg = (offset >> 8) & 0x0f;
 
@@ -71,7 +71,7 @@ WRITE8_HANDLER( abc806_hrc_w )
 
 READ8_HANDLER( abc806_charram_r )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	state->attr_data = state->colorram[offset];
 
@@ -80,7 +80,7 @@ READ8_HANDLER( abc806_charram_r )
 
 WRITE8_HANDLER( abc806_charram_w )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	state->colorram[offset] = state->attr_data;
 	state->charram[offset] = data;
@@ -90,14 +90,14 @@ WRITE8_HANDLER( abc806_charram_w )
 
 READ8_HANDLER( abc806_ami_r )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	return state->attr_data;
 }
 
 WRITE8_HANDLER( abc806_amo_w )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	state->attr_data = data;
 }
@@ -106,7 +106,7 @@ WRITE8_HANDLER( abc806_amo_w )
 
 READ8_HANDLER( abc806_cli_r )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	/*
 
@@ -155,7 +155,7 @@ READ8_HANDLER( abc806_sti_r )
 
 WRITE8_HANDLER( abc806_sto_w )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	int level = BIT(data, 7);
 
@@ -199,7 +199,7 @@ WRITE8_HANDLER( abc806_sto_w )
 
 WRITE8_HANDLER( abc806_sso_w )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	state->sync = data & 0x3f;
 }

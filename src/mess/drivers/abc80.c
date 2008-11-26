@@ -93,7 +93,7 @@ Notes:
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 /* Read/Write Handlers */
@@ -231,11 +231,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0x17)
 	AM_RANGE(0x01, 0x01) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(abc80_sound_w)
 	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -348,7 +348,7 @@ static const sn76477_interface abc80_sn76477_interface =
 
 static INTERRUPT_GEN( abc80_nmi_interrupt )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Z80 PIO */
@@ -365,7 +365,7 @@ static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 
 static Z80PIO_ON_INT_CHANGED( abc80_pio_interrupt )
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, state);
 }
 
 static READ8_DEVICE_HANDLER( abc80_pio_port_a_r )

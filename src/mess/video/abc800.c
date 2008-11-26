@@ -21,14 +21,14 @@
 
 READ8_HANDLER( abc800_charram_r )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = space->machine->driver_data;
 
 	return state->charram[offset];
 }
 
 WRITE8_HANDLER( abc800_charram_w )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = space->machine->driver_data;
 
 	state->charram[offset] = data;
 }
@@ -57,14 +57,14 @@ static PALETTE_INIT( abc800c )
 
 WRITE8_HANDLER( abc800_hrs_w )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = space->machine->driver_data;
 
 	state->hrs = data;
 }
 
 WRITE8_HANDLER( abc800_hrc_w )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = space->machine->driver_data;
 
 	state->fgctl = data;
 }

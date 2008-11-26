@@ -87,7 +87,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 /* Discrete Sound */
@@ -268,8 +268,8 @@ static void abc806_bankswitch(running_machine *machine)
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
 			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-			memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
-			memory_set_bank(bank, 1);
+			memory_configure_bank(machine, bank, 1, 1, state->videoram + videoram_offset, 0);
+			memory_set_bank(machine, bank, 1);
 		}
 
 		for (bank = 9; bank <= 16; bank++)
@@ -282,7 +282,7 @@ static void abc806_bankswitch(running_machine *machine)
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
 			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-			memory_set_bank(bank, 0);
+			memory_set_bank(machine, bank, 0);
 		}
 	}
 	else
@@ -302,8 +302,8 @@ static void abc806_bankswitch(running_machine *machine)
 				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
 				memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-				memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
-				memory_set_bank(bank, 1);
+				memory_configure_bank(machine, bank, 1, 1, state->videoram + videoram_offset, 0);
+				memory_set_bank(machine, bank, 1);
 			}
 			else
 			{
@@ -316,7 +316,7 @@ static void abc806_bankswitch(running_machine *machine)
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
 					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_UNMAP);
-					memory_set_bank(bank, 0);
+					memory_set_bank(machine, bank, 0);
 					break;
 
 				case 8:
@@ -325,7 +325,7 @@ static void abc806_bankswitch(running_machine *machine)
 
 					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_UNMAP);
 					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
-					memory_set_bank(bank, 0);
+					memory_set_bank(machine, bank, 0);
 					break;
 
 				default:
@@ -333,7 +333,7 @@ static void abc806_bankswitch(running_machine *machine)
 					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
 					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-					memory_set_bank(bank, 0);
+					memory_set_bank(machine, bank, 0);
 					break;
 				}
 			}
@@ -366,15 +366,15 @@ static void abc806_bankswitch(running_machine *machine)
 				memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 			}
 
-			memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
-			memory_set_bank(bank, 1);
+			memory_configure_bank(machine, bank, 1, 1, state->videoram + videoram_offset, 0);
+			memory_set_bank(machine, bank, 1);
 		}
 	}
 }
 
 static READ8_HANDLER( abc806_mai_r )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	int bank = offset >> 12;
 
@@ -398,13 +398,13 @@ static WRITE8_HANDLER( abc806_mao_w )
 
 	*/
 
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	int bank = offset >> 12;
 
 	state->map[bank] = data;
 
-	abc806_bankswitch(machine);
+	abc806_bankswitch(space->machine);
 }
 
 /* Z80 SIO/2 */
@@ -449,22 +449,22 @@ static WRITE8_DEVICE_HANDLER( sio2_w )
 
 static READ8_HANDLER( abc800_pling_r )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = space->machine->driver_data;
 
 	state->pling = !state->pling;
 
-	discrete_sound_w(machine, NODE_01, state->pling);
+	discrete_sound_w(space, NODE_01, state->pling);
 
 	return 0xff;
 }
 
 static READ8_HANDLER( abc802_pling_r )
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = space->machine->driver_data;
 
 	state->pling = !state->pling;
 
-	discrete_sound_w(machine, NODE_01, state->pling);
+	discrete_sound_w(space, NODE_01, state->pling);
 
 	return 0xff;
 }
@@ -785,7 +785,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 static void ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( ctc_z0_w )
@@ -854,7 +854,7 @@ static const z80ctc_interface ctc_intf =
 
 static void sio_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sio_dtr_w )
@@ -900,7 +900,7 @@ static z80sio_interface sio_intf =
 
 static Z80DART_ON_INT_CHANGED( dart_interrupt )
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, state);
 }
 
 static Z80DART_RXD_READ( abc800_dart_rxd_r )
@@ -1193,9 +1193,9 @@ static MACHINE_START( abc806 )
 
 	for (bank = 1; bank <= 16; bank++)
 	{
-		memory_configure_bank(bank, 0, 1, mem + (0x1000 * (bank - 1)), 0);
-		memory_configure_bank(bank, 1, 1, state->videoram, 0);
-		memory_set_bank(bank, 0);
+		memory_configure_bank(machine, bank, 0, 1, mem + (0x1000 * (bank - 1)), 0);
+		memory_configure_bank(machine, bank, 1, 1, state->videoram, 0);
+		memory_set_bank(machine, bank, 0);
 	}
 
 	/* register for state saving */
@@ -1217,7 +1217,7 @@ static MACHINE_RESET( abc806 )
 
 	for (bank = 1; bank <= 16; bank++)
 	{
-		memory_set_bank(bank, 0);
+		memory_set_bank(machine, bank, 0);
 	}
 
 	abc806_bankswitch(machine);
@@ -1664,18 +1664,18 @@ SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
-static OPBASE_HANDLER( abc800_opbase_handler )
+static DIRECT_UPDATE_HANDLER( abc800_direct_update_handler )
 {
-	abc800_state *state = machine->driver_data;
+	abc800_state *state = space->machine->driver_data;
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		opbase->rom = opbase->ram = memory_region(machine, Z80_TAG);
+		direct->raw = direct->decrypted = memory_region(space->machine, Z80_TAG);
 
 		if (!state->fetch_charram)
 		{
 			state->fetch_charram = 1;
-			abc800_bankswitch(machine);
+			abc800_bankswitch(space->machine);
 		}
 
 		return ~0;
@@ -1684,45 +1684,45 @@ static OPBASE_HANDLER( abc800_opbase_handler )
 	if (state->fetch_charram)
 	{
 		state->fetch_charram = 0;
-		abc800_bankswitch(machine);
+		abc800_bankswitch(space->machine);
 	}
 
 	return address;
 }
 
-static OPBASE_HANDLER( abc802_opbase_handler )
+static DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 {
-	abc802_state *state = machine->driver_data;
+	abc802_state *state = space->machine->driver_data;
 
 	if (state->lrs)
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			opbase->rom = opbase->ram = memory_region(machine, Z80_TAG);
+			direct->raw = direct->decrypted = memory_region(space->machine, Z80_TAG);
 			return ~0;
 		}
 	}
 	else
 	{
-		opbase->rom = opbase->ram = mess_ram;
+		direct->raw = direct->decrypted = mess_ram;
 		return ~0;
 	}
 
 	return address;
 }
 
-static OPBASE_HANDLER( abc806_opbase_handler )
+static DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 {
-	abc806_state *state = machine->driver_data;
+	abc806_state *state = space->machine->driver_data;
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		opbase->rom = opbase->ram = memory_region(machine, Z80_TAG);
+		direct->raw = direct->decrypted = memory_region(space->machine, Z80_TAG);
 
 		if (!state->fetch_charram)
 		{
 			state->fetch_charram = 1;
-			abc806_bankswitch(machine);
+			abc806_bankswitch(space->machine);
 		}
 
 		return ~0;
@@ -1731,7 +1731,7 @@ static OPBASE_HANDLER( abc806_opbase_handler )
 	if (state->fetch_charram)
 	{
 		state->fetch_charram = 0;
-		abc806_bankswitch(machine);
+		abc806_bankswitch(space->machine);
 	}
 
 	return address;
@@ -1739,17 +1739,17 @@ static OPBASE_HANDLER( abc806_opbase_handler )
 
 static DRIVER_INIT( abc800 )
 {
-	memory_set_opbase_handler(0, abc800_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), abc800_direct_update_handler);
 }
 
 static DRIVER_INIT( abc802 )
 {
-	memory_set_opbase_handler(0, abc802_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), abc802_direct_update_handler);
 }
 
 static DRIVER_INIT( abc806 )
 {
-	memory_set_opbase_handler(0, abc806_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), abc806_direct_update_handler);
 }
 
 /* System Drivers */
