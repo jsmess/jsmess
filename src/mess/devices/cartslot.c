@@ -81,8 +81,8 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 			int cputype = image->machine->config->cpu[cpunum].type;
 			if (cputype != 0)
 			{
-				datawidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;
-				littleendian = (cputype_endianness(cputype) == CPU_IS_LE);
+				datawidth = cputype_get_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;
+				littleendian = (cputype_get_endianness(cputype) == CPU_IS_LE);
 			}
 		}
 
