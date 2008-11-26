@@ -70,7 +70,7 @@ static CDP1869_ON_PRD_CHANGED( pecom_prd_w )
 	{
 		state->dma = 0;
 
-		cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 	else
 	{

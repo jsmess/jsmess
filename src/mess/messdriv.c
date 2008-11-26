@@ -1063,7 +1063,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER(kramermc) /* 1987 Kramer MC				*/
 
 	/* Ei Nis */
-//128u4	DRIVER(pecom64)
+	DRIVER(pecom64)
 		
 	/* Bondwell */
 //128u4	DRIVER( bw2 )
