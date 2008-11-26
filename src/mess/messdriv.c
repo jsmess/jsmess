@@ -954,12 +954,12 @@ XL/XE 16kB OS roms
 	DRIVER( orao103 )
 
 	/* UT-88 */
-//128u4	DRIVER( ut88 )
-//128u4	DRIVER( ut88mini )
+	DRIVER( ut88 )
+	DRIVER( ut88mini )
 
 	/* Mikro-80 */
-//128u4	DRIVER( mikro80 )
-//128u4	DRIVER( radio99 )
+	DRIVER( mikro80 )
+	DRIVER( radio99 )
 
 	/* Specialist */
 	DRIVER( special )

@@ -22,8 +22,8 @@ DRIVER_INIT(ut88)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "main");	
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
-  	memory_configure_bank(1, 1, 2, RAM, 0x0000);
-	memory_configure_bank(1, 0, 2, RAM, 0xf800);
+  	memory_configure_bank(machine, 1, 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, 1, 0, 2, RAM, 0xf800);
 }
 
 static READ8_DEVICE_HANDLER (ut88_8255_portb_r )
@@ -62,13 +62,13 @@ const ppi8255_interface ut88_ppi8255_interface =
 
 static TIMER_CALLBACK( ut88_reset )
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 MACHINE_RESET( ut88 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, ut88_reset);
-	memory_set_bank(1, 1);	
+	memory_set_bank(machine, 1, 1);	
 	ut88_keyboard_mask = 0;
 }
 
@@ -87,13 +87,13 @@ WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
 WRITE8_HANDLER( ut88_sound_w )
 {
 	dac_data_w(0,data); //beeper
-	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),data & 0x01 ? 1 : -1);	
+	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),data & 0x01 ? 1 : -1);	
 }
 
 
 READ8_HANDLER( ut88_tape_r )
 {
-	double level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
+	double level = cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
 	if (level <  0) { 
 		 	return 0x00; 
  	}
@@ -103,20 +103,20 @@ READ8_HANDLER( ut88_tape_r )
 READ8_HANDLER( ut88mini_keyboard_r )
 {
 	// This is real keyboard implementation
-	UINT8 *keyrom1 = memory_region(machine, "main")+ 0x10000;
-	UINT8 *keyrom2 = memory_region(machine, "main")+ 0x10100;
+	UINT8 *keyrom1 = memory_region(space->machine, "main")+ 0x10000;
+	UINT8 *keyrom2 = memory_region(space->machine, "main")+ 0x10100;
 	
-	UINT8 key = keyrom2[input_port_read(machine, "LINE1")];
+	UINT8 key = keyrom2[input_port_read(space->machine, "LINE1")];
 	// if keyboard 2nd part returned 0 on 4th bit output from 
 	// first part is used
 	if ((key & 0x08) ==0x00) {		
-		key = keyrom1[input_port_read(machine, "LINE0")];	
+		key = keyrom1[input_port_read(space->machine, "LINE0")];	
 	}	
 	// for delete key there is special key producing code 0x80
-	key = (input_port_read(machine, "LINE2") & 0x80)==0x80 ? key : 0x80; 	
+	key = (input_port_read(space->machine, "LINE2") & 0x80)==0x80 ? key : 0x80; 	
 	// If key 0 is pressed it value is 0x10 this is done by additional 
 	// discrete logic
-	key = (input_port_read(machine, "LINE0") & 0x01)==0x01 ? key : 0x10;
+	key = (input_port_read(space->machine, "LINE0") & 0x01)==0x01 ? key : 0x10;
 	return key;
 }
 

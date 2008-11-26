@@ -377,6 +377,7 @@ DRVLIBS = \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/irisha.a \
 	$(MESSOBJ)/kramermc.a \
+	$(MESSOBJ)/mikro80.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
@@ -388,6 +389,7 @@ DRVLIBS = \
 	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/special.a \
+	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/shared.a \
@@ -442,7 +444,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/mc10.a \
 #	$(MESSOBJ)/memotech.a \
 #	$(MESSOBJ)/mephisto.a \
-#	$(MESSOBJ)/mikro80.a \
 #	$(MESSOBJ)/mk1.a \
 #	$(MESSOBJ)/motorola.a \
 #	$(MESSOBJ)/multitch.a \
@@ -482,7 +483,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/trs80.a \
 #	$(MESSOBJ)/tutor.a \
 #	$(MESSOBJ)/tx0.a \
-#	$(MESSOBJ)/ut88.a \
 #	$(MESSOBJ)/vc4000.a \
 #	$(MESSOBJ)/veb.a \
 #	$(MESSOBJ)/vtech.a \

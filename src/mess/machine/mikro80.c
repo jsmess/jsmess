@@ -21,8 +21,8 @@ DRIVER_INIT(mikro80)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "main");
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
-  	memory_configure_bank(1, 1, 2, RAM, 0x0000);
-	memory_configure_bank(1, 0, 2, RAM, 0xf800);
+  	memory_configure_bank(machine, 1, 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, 1, 0, 2, RAM, 0xf800);
 	mikro80_key_mask = 0x7f;
 }
 
@@ -35,20 +35,20 @@ DRIVER_INIT(radio99)
 READ8_HANDLER (mikro80_8255_portb_r )
 {
 	UINT8 key = 0xff;
-	if ((mikro80_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
-	if ((mikro80_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
-	if ((mikro80_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
-	if ((mikro80_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
-	if ((mikro80_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
-	if ((mikro80_keyboard_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
-	if ((mikro80_keyboard_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
-	if ((mikro80_keyboard_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
+	if ((mikro80_keyboard_mask & 0x01)!=0) { key &= input_port_read(space->machine,"LINE0"); }
+	if ((mikro80_keyboard_mask & 0x02)!=0) { key &= input_port_read(space->machine,"LINE1"); }
+	if ((mikro80_keyboard_mask & 0x04)!=0) { key &= input_port_read(space->machine,"LINE2"); }
+	if ((mikro80_keyboard_mask & 0x08)!=0) { key &= input_port_read(space->machine,"LINE3"); }
+	if ((mikro80_keyboard_mask & 0x10)!=0) { key &= input_port_read(space->machine,"LINE4"); }
+	if ((mikro80_keyboard_mask & 0x20)!=0) { key &= input_port_read(space->machine,"LINE5"); }
+	if ((mikro80_keyboard_mask & 0x40)!=0) { key &= input_port_read(space->machine,"LINE6"); }
+	if ((mikro80_keyboard_mask & 0x80)!=0) { key &= input_port_read(space->machine,"LINE7"); }
 	return key & mikro80_key_mask;
 }
 
 READ8_HANDLER (mikro80_8255_portc_r )
 {
-	return input_port_read(machine, "LINE8");
+	return input_port_read(space->machine, "LINE8");
 }
 
 WRITE8_HANDLER (mikro80_8255_porta_w )
@@ -60,9 +60,9 @@ WRITE8_HANDLER (mikro80_8255_portc_w )
 {
 }
 
-static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(device->machine, offset); }
-static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(device->machine, offset); }
-static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(device->machine, offset, data); }
+static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset); }
+static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset); }
+static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset, data); }
 
 const ppi8255_interface mikro80_ppi8255_interface =
 {
@@ -77,13 +77,13 @@ const ppi8255_interface mikro80_ppi8255_interface =
 
 static TIMER_CALLBACK( mikro80_reset )
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(machine,1, 0);
 }
 
 MACHINE_RESET( mikro80 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, mikro80_reset);
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 	mikro80_keyboard_mask = 0;
 }
 
@@ -101,13 +101,13 @@ WRITE8_DEVICE_HANDLER( mikro80_keyboard_w )
 
 WRITE8_HANDLER( mikro80_tape_w )
 {
-	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),data & 0x01 ? 1 : -1);
+	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),data & 0x01 ? 1 : -1);
 }
 
 
 READ8_HANDLER( mikro80_tape_r )
 {
-	double level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
+	double level = cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ));
 	if (level <  0) {
 		 	return 0x00;
  	}
