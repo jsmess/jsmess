@@ -540,6 +540,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/pclpt.o    \
 	$(MESS_MACHINE)/z80dart.o	\
 	$(MESS_VIDEO)/msm6255.o	\
+	$(MESS_MACHINE)/mc6850.o	\
 
 
 
@@ -875,7 +876,6 @@ $(MESSOBJ)/p2000.a:    \
 	$(MESS_VIDEO)/p2000m.o	 \
 	$(MESS_DRIVERS)/p2000t.o	 \
 	$(MESS_MACHINE)/p2000t.o	 \
-	$(MESS_MACHINE)/mc6850.o	 \
 	$(MESS_DRIVERS)/osi.o	\
 
 $(MESSOBJ)/amstrad.a:  \
