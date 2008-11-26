@@ -149,23 +149,23 @@ void pc_lpt_handshake_in(int nr, int data, int mask)
 	This->status=neu;
 }
 
-READ8_HANDLER ( pc_parallelport0_r) { return pc_LPT_r(machine, 0, offset); }
-READ8_HANDLER ( pc_parallelport1_r) { return pc_LPT_r(machine, 1, offset); }
-READ8_HANDLER ( pc_parallelport2_r) { return pc_LPT_r(machine, 2, offset); }
-WRITE8_HANDLER ( pc_parallelport0_w ) { pc_LPT_w(machine,0,offset,data); }
-WRITE8_HANDLER ( pc_parallelport1_w ) { pc_LPT_w(machine,1,offset,data); }
-WRITE8_HANDLER ( pc_parallelport2_w ) { pc_LPT_w(machine,2,offset,data); }
+READ8_HANDLER ( pc_parallelport0_r) { return pc_LPT_r(space->machine, 0, offset); }
+READ8_HANDLER ( pc_parallelport1_r) { return pc_LPT_r(space->machine, 1, offset); }
+READ8_HANDLER ( pc_parallelport2_r) { return pc_LPT_r(space->machine, 2, offset); }
+WRITE8_HANDLER ( pc_parallelport0_w ) { pc_LPT_w(space->machine, 0, offset, data); }
+WRITE8_HANDLER ( pc_parallelport1_w ) { pc_LPT_w(space->machine, 1, offset, data); }
+WRITE8_HANDLER ( pc_parallelport2_w ) { pc_LPT_w(space->machine, 2, offset, data); }
 
-READ16_HANDLER ( pc16le_parallelport0_r ) { return read16le_with_read8_handler(pc_parallelport0_r, machine, offset, mem_mask); }
-READ16_HANDLER ( pc16le_parallelport1_r ) { return read16le_with_read8_handler(pc_parallelport1_r, machine, offset, mem_mask); }
-READ16_HANDLER ( pc16le_parallelport2_r ) { return read16le_with_read8_handler(pc_parallelport2_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( pc16le_parallelport0_w ) { write16le_with_write8_handler(pc_parallelport0_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER( pc16le_parallelport1_w ) { write16le_with_write8_handler(pc_parallelport1_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER( pc16le_parallelport2_w ) { write16le_with_write8_handler(pc_parallelport2_w, machine, offset, data, mem_mask); }
+READ16_HANDLER ( pc16le_parallelport0_r ) { return read16le_with_read8_handler(pc_parallelport0_r, space, offset, mem_mask); }
+READ16_HANDLER ( pc16le_parallelport1_r ) { return read16le_with_read8_handler(pc_parallelport1_r, space, offset, mem_mask); }
+READ16_HANDLER ( pc16le_parallelport2_r ) { return read16le_with_read8_handler(pc_parallelport2_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc16le_parallelport0_w ) { write16le_with_write8_handler(pc_parallelport0_w, space, offset, data, mem_mask); }
+WRITE16_HANDLER( pc16le_parallelport1_w ) { write16le_with_write8_handler(pc_parallelport1_w, space, offset, data, mem_mask); }
+WRITE16_HANDLER( pc16le_parallelport2_w ) { write16le_with_write8_handler(pc_parallelport2_w, space, offset, data, mem_mask); }
 
-READ32_HANDLER ( pc32le_parallelport0_r ) { return read32le_with_read8_handler(pc_parallelport0_r, machine, offset, mem_mask); }
-READ32_HANDLER ( pc32le_parallelport1_r ) { return read32le_with_read8_handler(pc_parallelport1_r, machine, offset, mem_mask); }
-READ32_HANDLER ( pc32le_parallelport2_r ) { return read32le_with_read8_handler(pc_parallelport2_r, machine, offset, mem_mask); }
-WRITE32_HANDLER( pc32le_parallelport0_w ) { write32le_with_write8_handler(pc_parallelport0_w, machine, offset, data, mem_mask); }
-WRITE32_HANDLER( pc32le_parallelport1_w ) { write32le_with_write8_handler(pc_parallelport1_w, machine, offset, data, mem_mask); }
-WRITE32_HANDLER( pc32le_parallelport2_w ) { write32le_with_write8_handler(pc_parallelport2_w, machine, offset, data, mem_mask); }
+READ32_HANDLER ( pc32le_parallelport0_r ) { return read32le_with_read8_handler(pc_parallelport0_r, space, offset, mem_mask); }
+READ32_HANDLER ( pc32le_parallelport1_r ) { return read32le_with_read8_handler(pc_parallelport1_r, space, offset, mem_mask); }
+READ32_HANDLER ( pc32le_parallelport2_r ) { return read32le_with_read8_handler(pc_parallelport2_r, space, offset, mem_mask); }
+WRITE32_HANDLER( pc32le_parallelport0_w ) { write32le_with_write8_handler(pc_parallelport0_w, space, offset, data, mem_mask); }
+WRITE32_HANDLER( pc32le_parallelport1_w ) { write32le_with_write8_handler(pc_parallelport1_w, space, offset, data, mem_mask); }
+WRITE32_HANDLER( pc32le_parallelport2_w ) { write32le_with_write8_handler(pc_parallelport2_w, space, offset, data, mem_mask); }
