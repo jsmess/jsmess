@@ -40,14 +40,14 @@ would commence ($C00000).
 
 static READ16_HANDLER( amiga_clock_r )
 {
-	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
 	return msm6242_r(rtc, offset / 2);
 }
 
 
 static WRITE16_HANDLER( amiga_clock_w )
 { 
-	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
 	msm6242_w(rtc, offset / 2, data);
 }
 
@@ -310,7 +310,7 @@ static UINT8 amiga_cia_0_portA_r( void )
 static void amiga_cia_0_portA_w( UINT8 data )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(1, data & 1);
+	memory_set_bank(Machine, 1, data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
@@ -321,13 +321,13 @@ static void amiga_cia_0_portA_w( UINT8 data )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK1);
+		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK1);
 
 		amiga_cart_check_overlay(Machine);
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, SMH_UNMAP);
 
 	set_led_status( 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
@@ -380,12 +380,12 @@ static void amiga_reset(void)
 	if (input_port_read(Machine, "hardware") & 0x08)
 	{
 		/* Install RTC */
-		memory_install_readwrite16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
+		memory_install_readwrite16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
 	}
 	else
 	{
 		/* No RTC support */
-		memory_install_readwrite16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xdc0000, 0xdc003f, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 }
 
@@ -411,8 +411,8 @@ static DRIVER_INIT( amiga )
 	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
-	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine);
@@ -477,8 +477,8 @@ static DRIVER_INIT( cdtv )
 	amiga_machine_config(machine, &amiga_intf);
 
 	/* set up memory */
-	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
 	amigakbd_init();
