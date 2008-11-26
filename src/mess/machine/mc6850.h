@@ -26,17 +26,17 @@
 
 struct acia6850_interface
 {
-	read8_machine_func in_status_func;
-	read8_machine_func in_recv_func;
-	write8_machine_func out_status_func;
-	write8_machine_func out_tran_func;
+	read8_space_func in_status_func;
+	read8_space_func in_recv_func;
+	write8_space_func out_status_func;
+	write8_space_func out_tran_func;
 };
 
 void acia6850_unconfig(void);
 void acia6850_config_old( int which, const struct acia6850_interface *intf);
 void acia6850_reset(void);
-int acia6850_read(running_machine *machine, int which, int offset);
-void acia6850_write(running_machine *machine, int which, int offset, int data);
+int acia6850_read(const address_space *space, int which, int offset);
+void acia6850_write(const address_space *space, int which, int offset, int data);
 
  READ8_HANDLER( acia6850_0_r );
  READ8_HANDLER( acia6850_1_r );

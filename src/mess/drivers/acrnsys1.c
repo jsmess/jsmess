@@ -35,7 +35,7 @@ static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_0_w(device->machine, 0, data & 0x07);
+	ttl74145_0_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )

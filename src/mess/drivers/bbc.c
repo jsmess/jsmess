@@ -696,8 +696,8 @@ ROM_END
 
 static INTERRUPT_GEN( bbcb_vsync )
 {
-	via_0_ca1_w(machine, 0,1);
-	via_0_ca1_w(machine, 0,0);
+	via_0_ca1_w(cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0,1);
+	via_0_ca1_w(cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0,0);
 	bbc_frameclock();
 }
 

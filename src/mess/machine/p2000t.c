@@ -47,15 +47,15 @@ READ8_HANDLER (	p2000t_port_000f_r )
 
 	if (p2000t_ports.port_101f & P2000M_101F_KEYINT)
 	{
-		return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") &
-		input_port_read(machine, "KEY2") & input_port_read(machine, "KEY3") &
-		input_port_read(machine, "KEY4") & input_port_read(machine, "KEY5") &
-		input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") &
-		input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
+		return (input_port_read(space->machine, "KEY0") & input_port_read(space->machine, "KEY1") &
+		input_port_read(space->machine, "KEY2") & input_port_read(space->machine, "KEY3") &
+		input_port_read(space->machine, "KEY4") & input_port_read(space->machine, "KEY5") &
+		input_port_read(space->machine, "KEY6") & input_port_read(space->machine, "KEY7") &
+		input_port_read(space->machine, "KEY8") & input_port_read(space->machine, "KEY9"));
 	}
 	else if (offset < 10)
 	{
-		return (input_port_read(machine, keynames[offset]));
+		return (input_port_read(space->machine, keynames[offset]));
 	}
 	return (0xff);
 }

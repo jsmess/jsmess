@@ -208,7 +208,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( p2000_interrupt )
 {
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 }
 
 /* Machine definition */

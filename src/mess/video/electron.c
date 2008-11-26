@@ -246,13 +246,13 @@ VIDEO_UPDATE( electron )
 
 INTERRUPT_GEN( electron_scanline_interrupt )
 {
-	switch (video_screen_get_vpos(machine->primary_screen))
+	switch (video_screen_get_vpos(device->machine->primary_screen))
 	{
 	case 43:
-		electron_interrupt_handler( machine, INT_SET, INT_RTC );
+		electron_interrupt_handler( device->machine, INT_SET, INT_RTC );
 		break;
 	case 199:
-		electron_interrupt_handler( machine, INT_SET, INT_DISPLAY_END );
+		electron_interrupt_handler( device->machine, INT_SET, INT_DISPLAY_END );
 		break;
 	case 255:
 		ula.screen_addr = ula.screen_start - ula.screen_base;

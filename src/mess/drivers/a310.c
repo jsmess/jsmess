@@ -233,7 +233,7 @@ static READ32_HANDLER(logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)memory_region(machine, "main");
+		rom = (UINT32 *)memory_region(space->machine, "main");
 
 		return rom[offset & 0x1fffff];
 	}
@@ -286,7 +286,7 @@ static WRITE32_HANDLER(logical_w)
 	}
 }
 
-static OPBASE_HANDLER( a310_setopbase )
+static DIRECT_UPDATE_HANDLER( a310_setopbase )
 {
 	// if we're not in logical memory, MAME can do the right thing
 	if (address > 0x1ffffff)
@@ -297,19 +297,19 @@ static OPBASE_HANDLER( a310_setopbase )
 	// if the boot ROM is mapped in, do some trickery to make it show up
 	if (a310_latchrom)
 	{
-		opbase->mask = 0x1fffff;
-		opbase->mem_min = 0;
-		opbase->mem_max = 0x1fffff;
-		opbase->rom = opbase->ram = memory_region(machine, "main");
+		direct->mask = 0x1fffff;
+		direct->min = 0;
+		direct->max = 0x1fffff;
+		direct->raw = direct->decrypted = memory_region(space->machine, "main");
 	}
 	else	// executing from logical memory
 	{
 		UINT32 page = address / page_sizes[a310_pagesize];
 
-		opbase->mask = page_sizes[a310_pagesize]-1;
-		opbase->mem_min = page * page_sizes[a310_pagesize];
-		opbase->mem_max = opbase->mem_min + opbase->mask;
-		opbase->rom = opbase->ram = (UINT8 *)&a310_physmem[(a310_pages[page] * page_sizes[a310_pagesize])>>2];
+		direct->mask = page_sizes[a310_pagesize]-1;
+		direct->min = page * page_sizes[a310_pagesize];
+		direct->max = direct->min + direct->mask;
+		direct->raw = direct->decrypted = (UINT8 *)&a310_physmem[(a310_pages[page] * page_sizes[a310_pagesize])>>2];
 	}
 
 	return ~0;
@@ -317,7 +317,7 @@ static OPBASE_HANDLER( a310_setopbase )
 
 static DRIVER_INIT(a310)
 {
-	memory_set_opbase_handler(0, a310_setopbase);
+	memory_set_direct_update_handler( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), a310_setopbase);
 }
 
 static const char *const ioc_regnames[] =
@@ -372,7 +372,7 @@ static READ32_HANDLER(ioc_r)
 		switch (offset & 0x1f)
 		{
 			case 1:	// keyboard read
-				a310_request_irq_b(machine, A310_IRQB_KBD_XMIT_EMPTY);
+				a310_request_irq_b(space->machine, A310_IRQB_KBD_XMIT_EMPTY);
 				break;
 
 			case 16:	// timer 0 read
@@ -401,13 +401,13 @@ static READ32_HANDLER(ioc_r)
 				break;
 		}
 
-		logerror("IOC: R %s = %02x (PC=%x)\n", ioc_regnames[offset&0x1f], a310_iocregs[offset&0x1f], activecpu_get_pc());
+		logerror("IOC: R %s = %02x (PC=%x)\n", ioc_regnames[offset&0x1f], a310_iocregs[offset&0x1f], cpu_get_pc( space->cpu ));
 		return a310_iocregs[offset&0x1f];
 	}
 	else if (offset >= 0xc4000 && offset <= 0xc4010)
 	{
 		logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-		return wd17xx_data_r(machine, offset&0xf);
+		return wd17xx_data_r(space, offset&0xf);
 	}
 	else
 	{
@@ -422,7 +422,7 @@ static WRITE32_HANDLER(ioc_w)
 {
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
-//      logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], activecpu_get_pc());
+//      logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
 
 		switch (offset&0x1f)
 		{
@@ -436,7 +436,7 @@ static WRITE32_HANDLER(ioc_w)
 				// if that did it, clear the IRQ
 				if (a310_iocregs[4] == 0)
 				{
-					cpu_set_input_line(machine->cpu[0], ARM_IRQ_LINE, CLEAR_LINE);
+					cpu_set_input_line(space->machine->cpu[0], ARM_IRQ_LINE, CLEAR_LINE);
 				}
 				break;
 
@@ -504,7 +504,7 @@ static WRITE32_HANDLER(ioc_w)
 	else if (offset >= 0xc4000 && offset <= 0xc4010)
 	{
 		logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-		wd17xx_data_w(machine, offset&0xf, data&0xff);
+		wd17xx_data_w(space, offset&0xf, data&0xff);
 	}
 	else if (offset == 0xd40006)
 	{
@@ -586,7 +586,7 @@ static WRITE32_HANDLER(vidc_w)
 				a310_vidregs[0x80], a310_vidregs[0xa0],
 				visarea.max_x, visarea.max_y);
 
-			video_screen_configure(machine->primary_screen, a310_vidregs[0x80], a310_vidregs[0xa0], &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+			video_screen_configure(space->machine->primary_screen, a310_vidregs[0x80], a310_vidregs[0xa0], &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
 
 			// slightly hacky: fire off a VBL right now.  the BIOS doesn't wait long enough otherwise.
 			timer_adjust_oneshot(vbl_timer, attotime_zero, 0);

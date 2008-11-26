@@ -29,12 +29,12 @@ ADDRESS_MAP_END
 
 static void tms_interrupt(running_machine *machine, int dummy)
 {
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( bbcbc_interrupt )
 {
-    TMS9928A_interrupt(machine);
+    TMS9928A_interrupt(device->machine);
 }
 
 static const TMS9928a_interface tms9129_interface =
@@ -46,17 +46,15 @@ static const TMS9928a_interface tms9129_interface =
 };
 
 /* TODO */
-static Z80PIO_INTERFACE( bbcbc_z80pio_intf )
+static const z80pio_interface bbcbc_z80pio_intf =
 {
-	"main",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	NULL,	/* int callback */
+	NULL,	/* port a read */
+	NULL,	/* port b read */
+	NULL,	/* port a write */
+	NULL,	/* port b write */
+	NULL,	/* ready a */
+	NULL	/* ready b */
 };
 
 static MACHINE_START( bbcbc )

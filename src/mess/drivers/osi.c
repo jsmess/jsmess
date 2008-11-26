@@ -79,14 +79,14 @@ static READ8_HANDLER( osi_keyboard_r )
 {
 	UINT8 key_column_data = 0xff;
 
-	if (!(key_row_latch & 0x01)) key_column_data &= input_port_read(machine, "ROW0");
-	if (!(key_row_latch & 0x02)) key_column_data &= input_port_read(machine, "ROW1");
-	if (!(key_row_latch & 0x04)) key_column_data &= input_port_read(machine, "ROW2");
-	if (!(key_row_latch & 0x08)) key_column_data &= input_port_read(machine, "ROW3");
-	if (!(key_row_latch & 0x10)) key_column_data &= input_port_read(machine, "ROW4");
-	if (!(key_row_latch & 0x20)) key_column_data &= input_port_read(machine, "ROW5");
-	if (!(key_row_latch & 0x40)) key_column_data &= input_port_read(machine, "ROW6");
-	if (!(key_row_latch & 0x80)) key_column_data &= input_port_read(machine, "ROW7");
+	if (!(key_row_latch & 0x01)) key_column_data &= input_port_read(space->machine, "ROW0");
+	if (!(key_row_latch & 0x02)) key_column_data &= input_port_read(space->machine, "ROW1");
+	if (!(key_row_latch & 0x04)) key_column_data &= input_port_read(space->machine, "ROW2");
+	if (!(key_row_latch & 0x08)) key_column_data &= input_port_read(space->machine, "ROW3");
+	if (!(key_row_latch & 0x10)) key_column_data &= input_port_read(space->machine, "ROW4");
+	if (!(key_row_latch & 0x20)) key_column_data &= input_port_read(space->machine, "ROW5");
+	if (!(key_row_latch & 0x40)) key_column_data &= input_port_read(space->machine, "ROW6");
+	if (!(key_row_latch & 0x80)) key_column_data &= input_port_read(space->machine, "ROW7");
 
 	return key_column_data;
 }
@@ -94,7 +94,7 @@ static READ8_HANDLER( osi_keyboard_r )
 static WRITE8_HANDLER ( sb2m600b_keyboard_w )
 {
 	key_row_latch = data;
-	discrete_sound_w(machine, NODE_01, (data >> 2) & 0x0f);
+	discrete_sound_w(space, NODE_01, (data >> 2) & 0x0f);
 }
 
 static WRITE8_HANDLER ( uk101_keyboard_w )

@@ -44,11 +44,11 @@ static void atom_via_irq_func(running_machine *machine, int state)
 {
 	if (state)
 	{
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	}
 }
 
@@ -69,7 +69,7 @@ static  READ8_HANDLER(atom_via_in_a_func)
 
 	data = atom_printer_data;
 
-	if (!printer_is_ready(printer_image(machine)))
+	if (!printer_is_ready(printer_image(space->machine)))
 	{
 		/* offline */
 		data |=0x080;
@@ -99,7 +99,7 @@ static WRITE8_HANDLER(atom_via_out_ca2_func)
 		if (data & 0x01)
 		{
 			/* output data to printer */
-			printer_output(printer_image(machine), atom_printer_data);
+			printer_output(printer_image(space->machine), atom_printer_data);
 		}
 	}
 
@@ -151,7 +151,7 @@ static void atom_8271_interrupt_callback(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(Machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
@@ -220,22 +220,22 @@ static TIMER_CALLBACK(atom_timer_callback)
 }
 
 
-static OPBASE_HANDLER(atom_opbase_handler)
+static DIRECT_UPDATE_HANDLER(atom_opbase_handler)
 {
 	/* clear op base override */
-	memory_set_opbase_handler(0,0);
+	memory_set_direct_update_handler(space, NULL);
 
 	/* this is temporary */
 	/* Kees van Oss mentions that address 8-b are used for the random number
 	generator. I don't know if this is hardware, or random data because the
 	ram chips are not cleared at start-up. So at this time, these numbers
 	are poked into the memory to simulate it. When I have more details I will fix it */
-	memory_region(machine, "main")[0x08] = mame_rand(machine) & 0x0ff;
-	memory_region(machine, "main")[0x09] = mame_rand(machine) & 0x0ff;
-	memory_region(machine, "main")[0x0a] = mame_rand(machine) & 0x0ff;
-	memory_region(machine, "main")[0x0b] = mame_rand(machine) & 0x0ff;
+	memory_region(space->machine, "main")[0x08] = mame_rand(space->machine) & 0x0ff;
+	memory_region(space->machine, "main")[0x09] = mame_rand(space->machine) & 0x0ff;
+	memory_region(space->machine, "main")[0x0a] = mame_rand(space->machine) & 0x0ff;
+	memory_region(space->machine, "main")[0x0b] = mame_rand(space->machine) & 0x0ff;
 
-	return activecpu_get_pc() & 0x0ffff;
+	return cpu_get_pc( space->cpu ) & 0x0ffff;
 }
 
 MACHINE_RESET( atom )
@@ -253,7 +253,7 @@ MACHINE_RESET( atom )
 	timer_state = 0;
 	timer_pulse(ATTOTIME_IN_HZ(2400*2), NULL, 0, atom_timer_callback);
 
-	memory_set_opbase_handler(0,atom_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),atom_opbase_handler);
 }
 
 struct atm
@@ -316,14 +316,14 @@ QUICKLOAD_LOAD(atom)
 	/* copy data into memory */
 	for (i=size-1; i>=0; i--)
 	{
-		program_write_byte(addr, data[0]);
+		memory_write_byte( cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), addr, data[0]);
 		addr++;
 		data++;
 	}
 
 
 	/* set new pc address */
-	activecpu_set_reg(REG_PC, exec);
+	cpu_set_reg( Machine->cpu[0], REG_PC, exec);
 
 	/* free the data */
 	free(quickload_data);
@@ -428,9 +428,9 @@ READ8_HANDLER(atom_8271_r)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			return i8271_r(machine, offset);
+			return i8271_r(space, offset);
 		case 4:
-			return i8271_data_r(machine, offset);
+			return i8271_data_r(space, offset);
 		default:
 			break;
 	}
@@ -447,10 +447,10 @@ WRITE8_HANDLER(atom_8271_w)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			i8271_w(machine, offset, data);
+			i8271_w(space, offset, data);
 			return;
 		case 4:
-			i8271_data_w(machine, offset, data);
+			i8271_data_w(space, offset, data);
 			return;
 		default:
 			break;
@@ -469,7 +469,7 @@ static void atom_eprom_box_refresh(running_machine *machine)
 	/* get address of eprom data */
 	eprom_data = memory_region(machine, "main") + 0x010000 + (selected_eprom<<12);
 	/* set bank address */
-	memory_set_bankptr(1, eprom_data);
+	memory_set_bankptr(machine, 1, eprom_data);
 }
 
 void atom_eprom_box_init(running_machine *machine)
@@ -486,7 +486,7 @@ WRITE8_HANDLER(atom_eprom_box_w)
 {
 	selected_eprom = data & 0x0f;
 
-	atom_eprom_box_refresh(machine);
+	atom_eprom_box_refresh(space->machine);
 }
 
 /* read from eprom box register, can this be done in the real hardware */

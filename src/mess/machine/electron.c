@@ -105,7 +105,7 @@ static READ8_HANDLER( electron_read_keyboard )
 	for( i = 0; i < 14; i++ ) 
 	{
 		if( !(offset & 1) ) 
-			data |= input_port_read(machine, keynames[i]) & 0x0f;
+			data |= input_port_read(space->machine, keynames[i]) & 0x0f;
 
 		offset = offset >> 1;
 	}
@@ -128,7 +128,7 @@ WRITE8_HANDLER( electron_1mhz_w ) {
 }
 
 READ8_HANDLER( electron_ula_r ) {
-	UINT8 data = ((UINT8 *)memory_region(machine, "user1"))[0x43E00 + offset];
+	UINT8 data = ((UINT8 *)memory_region(space->machine, "user1"))[0x43E00 + offset];
 	switch ( offset & 0x0f ) {
 	case 0x00:	/* Interrupt status */
 		data = ula.interrupt_status;
@@ -137,7 +137,7 @@ READ8_HANDLER( electron_ula_r ) {
 	case 0x01:	/* Unknown */
 		break;
 	case 0x04:	/* Casette data shift register */
-		electron_interrupt_handler( machine, INT_CLEAR, INT_RECEIVE_FULL );
+		electron_interrupt_handler( space->machine, INT_CLEAR, INT_RECEIVE_FULL );
 		data = ula.tape_byte;
 		break;
 	}
@@ -178,20 +178,20 @@ WRITE8_HANDLER( electron_ula_w ) {
 			ula.rompage = data & 0x0f;
 			if ( ula.rompage == 8 || ula.rompage == 9 ) {
 				ula.rompage = 8;
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, electron_read_keyboard );
+				memory_install_read8_handler( space, 0x8000, 0xbfff, 0, 0, electron_read_keyboard );
 			} else {
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2 );
+				memory_install_read8_handler( space, 0x8000, 0xbfff, 0, 0, SMH_BANK2 );
 			}
-			memory_set_bank(machine, 2, ula.rompage);
+			memory_set_bank(space->machine, 2, ula.rompage);
 		}
 		if ( data & 0x10 ) {
-			electron_interrupt_handler( machine, INT_CLEAR, INT_DISPLAY_END );
+			electron_interrupt_handler( space->machine, INT_CLEAR, INT_DISPLAY_END );
 		}
 		if ( data & 0x20 ) {
-			electron_interrupt_handler( machine, INT_CLEAR, INT_RTC );
+			electron_interrupt_handler( space->machine, INT_CLEAR, INT_RTC );
 		}
 		if ( data & 0x40 ) {
-			electron_interrupt_handler( machine, INT_CLEAR, INT_HIGH_TONE );
+			electron_interrupt_handler( space->machine, INT_CLEAR, INT_HIGH_TONE );
 		}
 		if ( data & 0x80 ) {
 		}
@@ -224,10 +224,10 @@ WRITE8_HANDLER( electron_ula_w ) {
 		ula.screen_mode = ( data >> 3 ) & 0x07;
 		ula.screen_base = electron_screen_base[ ula.screen_mode ];
 		ula.screen_size = 0x8000 - ula.screen_base;
-		ula.vram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, ula.screen_base );
+		ula.vram = memory_get_read_ptr( space, ula.screen_base );
 		logerror( "ULA: screen mode set to %d\n", ula.screen_mode );
 		ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
-		cassette_change_state( cassette_device_image( machine ), ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( cassette_device_image( space->machine ), ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		ula.capslock_mode = ( data >> 7 ) & 0x01;
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:
@@ -286,7 +286,7 @@ static void electron_reset(running_machine *machine)
 	ula.screen_size = 0x8000 - 0x3000;
 	ula.screen_addr = 0;
 	ula.tape_running = 0;
-	ula.vram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, ula.screen_base );
+	ula.vram = memory_get_read_ptr( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), ula.screen_base );
 }
 
 MACHINE_START( electron )
