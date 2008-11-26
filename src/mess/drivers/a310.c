@@ -89,7 +89,7 @@ static void a310_request_irq_a(running_machine *machine, int mask)
 
 	if (a310_iocregs[6] & mask)
 	{
-		cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], ARM_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
@@ -99,7 +99,7 @@ static void a310_request_irq_b(running_machine *machine, int mask)
 
 	if (a310_iocregs[10] & mask)
 	{
-		cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], ARM_IRQ_LINE, PULSE_LINE);
 	}
 }
 
@@ -109,7 +109,7 @@ static void a310_request_fiq(running_machine *machine, int mask)
 
 	if (a310_iocregs[14] & mask)
 	{
-		cpunum_set_input_line(machine, 0, ARM_FIRQ_LINE, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], ARM_FIRQ_LINE, PULSE_LINE);
 	}
 }
 
@@ -436,7 +436,7 @@ static WRITE32_HANDLER(ioc_w)
 				// if that did it, clear the IRQ
 				if (a310_iocregs[4] == 0)
 				{
-					cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, CLEAR_LINE);
+					cpu_set_input_line(machine->cpu[0], ARM_IRQ_LINE, CLEAR_LINE);
 				}
 				break;
 

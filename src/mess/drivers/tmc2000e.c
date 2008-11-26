@@ -267,7 +267,7 @@ static MACHINE_RESET( tmc2000e )
 	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
 	cdp1864->reset(cdp1864);
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 
 	// reset program counter to 0xc000
 }

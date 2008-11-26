@@ -308,12 +308,12 @@ static void nc_update_interrupts(running_machine *machine)
 	{
 		logerror("int set %02x\n",nc_irq_status & nc_irq_mask);
 		/* set int */
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	}
 	else
 	{
 		/* clear int */
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	}
 }
 
@@ -534,7 +534,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 				case NC_TYPE_1xx:
 				{
 			        LOG(("nmi triggered\n"));
-				    cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+				    cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 

@@ -49,7 +49,7 @@ int galaxy_interrupts_enabled = TRUE;
 
 INTERRUPT_GEN( galaxy_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK ( galaxy_irq_callback )
@@ -123,8 +123,8 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			break;
 	}
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 SNAPSHOT_LOAD( galaxy )

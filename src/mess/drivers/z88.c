@@ -45,13 +45,13 @@ static void z88_interrupt_refresh(running_machine *machine)
 			)
 		{
 			logerror("set int\n");
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 			return;
 		}
 	}
 
 	logerror("clear int\n");
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static void z88_update_rtc_interrupt(void)

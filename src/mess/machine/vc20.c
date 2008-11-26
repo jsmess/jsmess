@@ -74,7 +74,7 @@ UINT8 *vc20_memory_9400;
 */
 static void vc20_via0_irq (running_machine *machine, int level)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, level);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, level);
 }
 
 static READ8_HANDLER( vc20_via0_read_ca1 )
@@ -146,7 +146,7 @@ static WRITE8_HANDLER( vc20_via0_write_porta )
  */
 static void vc20_via1_irq (running_machine *machine, int level)
 {
-	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, level);
+	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, level);
 }
 
 static READ8_HANDLER( vc20_via1_read_porta )

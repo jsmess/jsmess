@@ -245,7 +245,7 @@ static WRITE8_HANDLER( ramcard_bank_w )
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	}
 
-	memory_configure_bank(1, BANK_RAMCARD_RAM, 1, ramcard_ram + bank_offset, 0);
+	memory_configure_bank(machine, 1, BANK_RAMCARD_RAM, 1, ramcard_ram + bank_offset, 0);
 	memory_set_bank(1, bank);
 }
 
@@ -306,21 +306,21 @@ static void bw2_wd17xx_callback(running_machine *machine, wd17xx_state_t state, 
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case WD17XX_IRQ_SET:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
 			break;
 
 		case WD17XX_DRQ_CLR:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case WD17XX_DRQ_SET:
 			if (cpunum_get_reg(0, Z80_HALT))
 			{
-				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, HOLD_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
 			}
 			break;
 	}
@@ -608,13 +608,13 @@ static MACHINE_RESET( bw2 )
 	{
 		// RAMCARD installed
 		
-		memory_configure_bank(1, BANK_RAM1, 1, mess_ram, 0);
-		memory_configure_bank(1, BANK_VRAM, 1, videoram, 0);
-		memory_configure_bank(1, BANK_RAMCARD_ROM, 1, memory_region(machine, "ramcard"), 0);
-		memory_configure_bank(1, BANK_RAM3, 2, mess_ram + 0x8000, 0x8000);
-		memory_configure_bank(1, BANK_RAMCARD_RAM, 1, ramcard_ram, 0);
-		memory_configure_bank(1, BANK_RAM6, 1, mess_ram + 0x18000, 0);
-		memory_configure_bank(1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
+		memory_configure_bank(machine, 1, BANK_RAM1, 1, mess_ram, 0);
+		memory_configure_bank(machine, 1, BANK_VRAM, 1, videoram, 0);
+		memory_configure_bank(machine, 1, BANK_RAMCARD_ROM, 1, memory_region(machine, "ramcard"), 0);
+		memory_configure_bank(machine, 1, BANK_RAM3, 2, mess_ram + 0x8000, 0x8000);
+		memory_configure_bank(machine, 1, BANK_RAMCARD_RAM, 1, ramcard_ram, 0);
+		memory_configure_bank(machine, 1, BANK_RAM6, 1, mess_ram + 0x18000, 0);
+		memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
 	}
@@ -622,10 +622,10 @@ static MACHINE_RESET( bw2 )
 	{
 		// no RAMCARD
 
-		memory_configure_bank(1, BANK_RAM1, 1, mess_ram, 0);
-		memory_configure_bank(1, BANK_VRAM, 1, videoram, 0);
-		memory_configure_bank(1, BANK_RAM2, 5, mess_ram + 0x8000, 0x8000);
-		memory_configure_bank(1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
+		memory_configure_bank(machine, 1, BANK_RAM1, 1, mess_ram, 0);
+		memory_configure_bank(machine, 1, BANK_VRAM, 1, videoram, 0);
+		memory_configure_bank(machine, 1, BANK_RAM2, 5, mess_ram + 0x8000, 0x8000);
+		memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, SMH_UNMAP);
 	}

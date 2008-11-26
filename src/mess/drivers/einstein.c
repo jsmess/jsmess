@@ -359,19 +359,19 @@ static void einstein_update_interrupts(running_machine *machine)
 	/* NPW 21-Jul-2005 - Not sure how to update this for MAME 0.98u2 */
 /*
     if (einstein_int & einstein_int_mask & EINSTEIN_KEY_INT)
-        cpunum_set_input_line(machine, 0, Z80_INT_REQ, PULSE_LINE);
+        cpu_set_input_line(machine->cpu[0], Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(machine, 0, Z80_INT_IEO, PULSE_LINE);
+        cpu_set_input_line(machine->cpu[0], Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_ADC_INT)
-        cpunum_set_input_line(machine, 0, Z80_INT_REQ, PULSE_LINE);
+        cpu_set_input_line(machine->cpu[0], Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(machine, 0, Z80_INT_IEO, PULSE_LINE);
+        cpu_set_input_line(machine->cpu[0], Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_FIRE_INT)
-        cpunum_set_input_line(machine, 0, Z80_INT_REQ, PULSE_LINE);
+        cpu_set_input_line(machine->cpu[0], Z80_INT_REQ, PULSE_LINE);
     else
-        cpunum_set_input_line(machine, 0, Z80_INT_IEO, PULSE_LINE);
+        cpu_set_input_line(machine->cpu[0], Z80_INT_IEO, PULSE_LINE);
 */
 }
 

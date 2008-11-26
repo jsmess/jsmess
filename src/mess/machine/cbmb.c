@@ -219,7 +219,7 @@ static void cbmb_irq (running_machine *machine, int level)
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos6509", ("irq %s\n", level ? "start" : "end"));
-		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, level);
+		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, level);
 		old_level = level;
 	}
 }

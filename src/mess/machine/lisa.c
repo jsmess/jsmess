@@ -254,7 +254,7 @@ static void set_parity_error_pending(running_machine *machine, int value)
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, M68K_IRQ_7, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], M68K_IRQ_7, CLEAR_LINE);
 	}
 #else
 	/* work-around... */
@@ -422,7 +422,7 @@ static void scan_keyboard(running_machine *machine)
 #if 0
 						if (keycode == NMIcode)
 						{	/* generate NMI interrupt */
-							cpunum_set_input_line(machine, 0, M68K_IRQ_7, PULSE_LINE);
+							cpu_set_input_line(machine->cpu[0], M68K_IRQ_7, PULSE_LINE);
 							cpunum_set_input_line_vector(0, M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif

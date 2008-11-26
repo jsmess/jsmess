@@ -61,11 +61,11 @@ static void mbee_fdc_callback(running_machine *machine, wd17xx_state_t state, vo
 	switch( state )
 	{
 	case WD17XX_IRQ_CLR:
-//		cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
+//		cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
 		fdc_status &= ~0x40;
         break;
 	case WD17XX_IRQ_SET:
-//		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+//		cpu_set_input_line(machine->cpu[0],0,HOLD_LINE);
 		fdc_status |= 0x40;
         break;
 	case WD17XX_DRQ_CLR:

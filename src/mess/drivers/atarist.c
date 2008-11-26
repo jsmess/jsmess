@@ -1433,7 +1433,7 @@ static void atarist_configure_memory(running_machine *machine)
 		break;
 	}
 
-	memory_configure_bank(1, 0, 1, RAM + 0x000008, 0);
+	memory_configure_bank(machine, 1, 0, 1, RAM + 0x000008, 0);
 	memory_set_bank(1, 0);
 
 	memory_configure_bank(2, 0, 1, RAM + 0x200000, 0);
@@ -1601,7 +1601,7 @@ static void stbook_configure_memory(running_machine *machine)
 		break;
 	}
 
-	memory_configure_bank(1, 0, 1, RAM + 0x000008, 0);
+	memory_configure_bank(machine, 1, 0, 1, RAM + 0x000008, 0);
 	memory_set_bank(1, 0);
 
 	memory_configure_bank(2, 0, 1, RAM + 0x200000, 0);

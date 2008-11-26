@@ -1023,7 +1023,7 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel, int *a
 		{
 			amstrad_plus_irq_cause = channel * 2;
 			amstrad_plus_asic_ram[0x2c0f] |= (0x40 >> channel);
-			cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0],0,ASSERT_LINE);
 			logerror("DMA %i: INT\n",channel);
 		}
 		if(command & 0x20)  // Stop processing on this channel
@@ -1158,7 +1158,7 @@ static void amstrad_Set_HS(int offset, int data)
 				{
 					if(amstrad_plus_pri == 0 || amstrad_plus_asic_enabled == 0)
 					{
-						cpunum_set_input_line(machine, 0,0, ASSERT_LINE);
+						cpu_set_input_line(machine->cpu[0],0, ASSERT_LINE);
 					}
 				}
 				amstrad_CRTC_HS_Counter = 0;
@@ -1170,7 +1170,7 @@ static void amstrad_Set_HS(int offset, int data)
 			amstrad_CRTC_HS_Counter = 0;
 			if(amstrad_plus_pri == 0 || amstrad_plus_asic_enabled == 0)
 			{
-				cpunum_set_input_line(machine, 0,0, ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[0],0, ASSERT_LINE);
 			}
 		}
 		if(amstrad_plus_asic_enabled != 0)
@@ -1181,7 +1181,7 @@ static void amstrad_Set_HS(int offset, int data)
 				if(m6845_get_row_counter() == ((amstrad_plus_pri >> 3) & 0x1f) && m6845_get_scanline_counter() == (amstrad_plus_pri & 0x07))
 				{
 //					logerror("PRI: triggered, scanline %i, VSync width = %i\n",amstrad_scanline,vid.vertical_sync_width);
-					cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
+					cpu_set_input_line(machine->cpu[0],0,ASSERT_LINE);
 					amstrad_plus_irq_cause = 0x06;  // raster interrupt vector
 					amstrad_CRTC_HS_Counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
 				}

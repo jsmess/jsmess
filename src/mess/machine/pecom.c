@@ -147,7 +147,7 @@ static CDP1802_SC_WRITE( pecom64_sc_w )
 		
 	case CDP1802_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cpunum_set_input_line(machine, 0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 	case CDP1802_STATE_CODE_S3_INTERRUPT:
 		break;

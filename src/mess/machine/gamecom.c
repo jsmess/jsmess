@@ -66,7 +66,7 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
 	UINT8 val = ( ( internal_registers[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	internal_registers[SM8521_CLKT] = ( internal_registers[SM8521_CLKT] & 0xC0 ) | val;
-	cpunum_set_input_line(machine, 0, CK_INT, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[0], CK_INT, HOLD_LINE );
 }
 
 MACHINE_RESET( gamecom )

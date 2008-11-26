@@ -119,7 +119,7 @@ static MACHINE_RESET( dc_console )
 
 static void aica_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const aica_interface dc_aica_interface =

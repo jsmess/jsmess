@@ -571,7 +571,7 @@ static MACHINE_START( vip )
 
 	/* RAM banking */
 
-	memory_configure_bank(1, 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
 
 	/* ROM banking */
 

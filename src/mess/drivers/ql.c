@@ -130,28 +130,28 @@ static WRITE8_HANDLER( ipc_port2_w )
 		switch (ipl)
 		{
 		case 0:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_5, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_7, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, HOLD_LINE);
 			break;
 
 		case 1:
 			// CTRL-ALT-7 pressed
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_7, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, CLEAR_LINE);
 			break;
 
 		case 2:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_5, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_7, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, CLEAR_LINE);
 			break;
 
 		case 3:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_5, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_7, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, CLEAR_LINE);
 			break;
 		}
 
@@ -187,7 +187,7 @@ static READ8_HANDLER( ipc_port2_r )
 
 	int irq = (ipc.ser2_rxd | ipc.ser1_txd);
 
-	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, irq);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ0, irq);
 
 	return (ipc.comdata << 7) | irq;
 }
@@ -557,7 +557,7 @@ static MACHINE_START( ql )
 	/* configure ROM cartridge */
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00ffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0x00c000, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x00c000, 0);
 	memory_set_bank(1, 0);
 
 	/* configure RAM */

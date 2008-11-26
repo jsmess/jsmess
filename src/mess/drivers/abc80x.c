@@ -1102,8 +1102,8 @@ static MACHINE_START( abc800 )
 
 	state->videoram = auto_malloc(ABC800_VIDEO_RAM_SIZE);
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(1, 1, 1, state->videoram, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, 1, 1, 1, state->videoram, 0);
 
 	/* register for state saving */
 
@@ -1135,8 +1135,8 @@ static MACHINE_START( abc802 )
 
 	/* configure memory */
 
-	memory_configure_bank(1, 0, 1, mess_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, Z80_TAG), 0);
 
 	/* register for state saving */
 

@@ -499,7 +499,7 @@ DEVICE_IMAGE_LOAD( ti99_cart )
 	/* There is a circuitry in TI99/4(a) that resets the console when a
 	cartridge is inserted or removed.  We emulate this instead of resetting the
 	emulator (which is the default in MESS). */
-	/*cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	/*cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 	tms9901_reset(0);
 	if (! has_evpc)
 		TMS9928A_reset();
@@ -618,7 +618,7 @@ DEVICE_IMAGE_UNLOAD( ti99_cart )
 	/* There is a circuitry in TI99/4(a) that resets the console when a
 	cartridge is inserted or removed.  We emulate this instead of resetting the
 	emulator (which is the default in MESS). */
-	/*cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	/*cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 	tms9901_reset(0);
 	if (! has_evpc)
 		TMS9928A_reset();

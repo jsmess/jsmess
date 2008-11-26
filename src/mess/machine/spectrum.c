@@ -281,9 +281,9 @@ void spectrum_setup_sp(running_machine *machine, unsigned char *pSnapshot, unsig
 	}
 
 	data = (status & 0x10)>>4;
-	cpunum_set_input_line(machine, 0, 0, data);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, data);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
+	cpu_set_input_line(machine->cpu[0], 0, data);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, data);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
 
 	spectrum_page_basicrom(machine);
 
@@ -384,9 +384,9 @@ void spectrum_setup_sna(running_machine *machine, unsigned char *pSnapshot, unsi
 	set_last_border_color(pSnapshot[26] & 0x07);
 	force_border_redraw();
 
-	cpunum_set_input_line(machine, 0, 0, data);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, data);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
+	cpu_set_input_line(machine->cpu[0], 0, data);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, data);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
 
 	if (SnapshotSize == 49179)
 		/* 48K Snapshot */
@@ -692,9 +692,9 @@ void spectrum_setup_z80(running_machine *machine, unsigned char *pSnapshot, unsi
 		/* cpunum_set_reg(0, Z80_IRQ_STATE, 1); */
 	}
 
-	cpunum_set_input_line(machine, 0, 0, data);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, data);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
+	cpu_set_input_line(machine->cpu[0], 0, data);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, data);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
 
 	/* IFF2 */
 	if (pSnapshot[28] != 0)

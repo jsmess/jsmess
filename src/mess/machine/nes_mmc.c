@@ -100,7 +100,7 @@ static emu_timer	*nes_irq_timer;
 
 static TIMER_CALLBACK(nes_irq_callback)
 {
-	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 	timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
 }
 

@@ -434,7 +434,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( maria_dli )
 	{
 		maria_dli = 0;
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 }

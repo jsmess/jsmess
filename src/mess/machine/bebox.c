@@ -250,7 +250,7 @@ WRITE64_HANDLER( bebox_processor_resets_w )
 
 	if (b & 0x20)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -1070,8 +1070,8 @@ MACHINE_RESET( bebox )
 
 	timer_set( attotime_zero, NULL, 0, bebox_get_devices );
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static void bebox_exit(running_machine *machine)

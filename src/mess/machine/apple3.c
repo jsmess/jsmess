@@ -487,7 +487,7 @@ static WRITE8_HANDLER(apple3_via_1_out_b) { apple3_via_out(machine, &via_1_b, da
 static void apple2_via_1_irq_func(running_machine *machine, int state)
 {
 	if (!via_1_irq && state)
-		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, PULSE_LINE);
 	via_1_irq = state;
 }
 

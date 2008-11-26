@@ -971,12 +971,12 @@ static TIMER_CALLBACK( super80_halfspeed )
 	if (!go_fast)
 	{
 		if (!int_sw)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
 
 		int_sw++;
 		if (int_sw > 1)
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
 			int_sw = 0;
 		}
 	}
@@ -984,7 +984,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 	{
 		if (int_sw < 8)								// @2mhz, reset just once
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 			int_sw = 8;							// ...not every time
 		}
 	}
@@ -1116,7 +1116,7 @@ MACHINE_DRIVER_END
 static void driver_init_common( running_machine *machine )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xc000);
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xc000);
 	timer_pulse(ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
 }
 

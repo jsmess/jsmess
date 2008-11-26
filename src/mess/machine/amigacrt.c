@@ -84,7 +84,7 @@ static IRQ_CALLBACK(amiga_ar1_irqack)
 static TIMER_CALLBACK( amiga_ar1_delayed_nmi )
 {
 	(void)param;
-	cpunum_set_input_line(machine, 0, 7, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], 7, PULSE_LINE);
 }
 
 static void amiga_ar1_nmi( void )
@@ -280,7 +280,7 @@ static void amiga_ar23_freeze( running_machine *machine )
 		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
 
 		/* trigger NMI irq */
-		cpunum_set_input_line(machine, 0, 7, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], 7, PULSE_LINE);
 	}
 }
 
@@ -381,9 +381,9 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	memory_set_bankptr(2, memory_region(machine, "user2"));
 	memory_set_bankptr(3, ar_ram);
 
-	memory_configure_bank(1, 0, 2, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 2, memory_region(machine, "user1"), 0);
-	memory_configure_bank(1, 2, 2, memory_region(machine, "user2"), 0);
+	memory_configure_bank(machine, 1, 0, 2, amiga_chip_ram, 0);
+	memory_configure_bank(machine, 1, 1, 2, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, 1, 2, 2, memory_region(machine, "user2"), 0);
 
 	amiga_ar23_mode = 3;
 }

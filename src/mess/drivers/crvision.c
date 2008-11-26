@@ -201,7 +201,7 @@ static INTERRUPT_GEN( crvision_int )
 
 static void crvision_vdp_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9918_intf =
@@ -512,7 +512,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		return INIT_FAIL;
 	}
 
-	memory_configure_bank(1, 0, 1, mem + 0x8000, 0);
+	memory_configure_bank(machine, 1, 0, 1, mem + 0x8000, 0);
 	memory_set_bank(1, 0);
 
 	memory_configure_bank(2, 0, 1, mem + 0x4000, 0);

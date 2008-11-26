@@ -348,7 +348,7 @@ static const sn76477_interface abc80_sn76477_interface =
 
 static INTERRUPT_GEN( abc80_nmi_interrupt )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Z80 PIO */
@@ -474,7 +474,7 @@ static MACHINE_START( abc80 )
 
 	/* configure RAM expansion */
 
-	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
 	memory_set_bank(1, 0);
 
 	switch (mess_ram_size)

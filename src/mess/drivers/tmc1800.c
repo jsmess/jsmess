@@ -757,7 +757,7 @@ static MACHINE_START( tmc2000 )
 
 	/* RAM banking */
 
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main"), 0x8000);
 
 	/* ROM/colorram banking */
 
@@ -809,7 +809,7 @@ static MACHINE_START( oscnano )
 
 	/* RAM/ROM banking */
 
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main"), 0x8000);
 
 	/* allocate monitor timer */
 	

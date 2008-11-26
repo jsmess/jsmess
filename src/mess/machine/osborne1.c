@@ -236,11 +236,11 @@ static void osborne1_update_irq_state(running_machine *machine)
 
 	if ( osborne1.pia_1_irq_state )
 	{
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE );
+		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE );
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE );
 	}
 }
 

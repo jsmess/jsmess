@@ -104,8 +104,8 @@ static DRIVER_INIT(tutor)
 {
 	tape_interrupt_timer = timer_alloc(tape_interrupt_handler, NULL);
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + basic_base, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "main") + cartridge_base, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + basic_base, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + cartridge_base, 0);
 	memory_set_bank(1, 0);
 }
 
@@ -270,7 +270,7 @@ static WRITE8_HANDLER(tutor_mapper_w)
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//assert(tape_interrupt_enable);
-	cpunum_set_input_line(machine, 0, 1, (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
@@ -306,7 +306,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 				else
 				{
 					timer_adjust_oneshot(tape_interrupt_timer, attotime_never, 0);
-					cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+					cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 				}
 			}
 			break;

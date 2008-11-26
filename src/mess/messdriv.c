@@ -166,7 +166,7 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( intvsrs )	/* Intellivision (Sears License) - 19??				*/
 
 	/* ENTEX */
-//128u4	DRIVER( advision )	/* Adventurevision									*/
+	DRIVER( advision )	/* Adventurevision									*/
 
 	/* CAPCOM */
 //128u4	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/

@@ -74,9 +74,9 @@ static void *motor_on_timer;
 static void fdc_handle_hold(running_machine *machine)
 {
 	if (DSKhold && (!DRQ_IRQ_status) && DVENA)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 /*

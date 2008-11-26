@@ -756,9 +756,9 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state ) 
 	}
 
 	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY ) ) {
-		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE );
+		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE );
 	} else {
-		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE );
 	}
 }
 

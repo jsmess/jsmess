@@ -133,11 +133,11 @@ static void pcw16_refresh_ints(running_machine *machine)
 	/* any bits set excluding vsync */
 	if ((pcw16_system_status & (~0x04))!=0)
 	{
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	}
 }
 
@@ -1011,7 +1011,7 @@ static void pcw16_trigger_fdc_int(running_machine *machine)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+					cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}

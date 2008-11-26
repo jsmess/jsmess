@@ -48,7 +48,7 @@ static int ACCCON_IRR=0;
 
 static void bbc_setirq(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, via_system_irq|via_user_irq|MC6850_irq|ACCCON_IRR);
+	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, via_system_irq|via_user_irq|MC6850_irq|ACCCON_IRR);
 }
 
 /************************
@@ -1709,7 +1709,7 @@ static void bbc_wd177x_callback(running_machine *machine, wd17xx_state_t event, 
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,PULSE_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 

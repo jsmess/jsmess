@@ -314,7 +314,7 @@ ADDRESS_MAP_END
 static TIMER_CALLBACK( irq_off )
 {
 	/* clear interrupt */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	
 	/* adjust STATUS register */
 	samcoupe_regs.status |= param;
@@ -324,7 +324,7 @@ static TIMER_CALLBACK( irq_off )
 void samcoupe_irq(running_machine *machine, UINT8 src)
 {
 	/* set irq and a timer to set it off again */
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	timer_set(ATTOTIME_IN_USEC(20), NULL, src, irq_off);
 	
 	/* adjust STATUS register */

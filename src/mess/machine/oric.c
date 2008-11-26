@@ -84,11 +84,11 @@ static void oric_refresh_ints(running_machine *machine)
 	/* any irq set? */
 	if ((oric_irqs & 0x0f)!=0)
 	{
-		cpunum_set_input_line(machine, 0,0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0],0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0,0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0],0, CLEAR_LINE);
 	}
 }
 

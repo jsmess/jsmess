@@ -38,7 +38,7 @@ static int serial_atn = 1, serial_clock = 1, serial_data = 1;
 INTERRUPT_GEN( primo_vblank_interrupt )
 {
 	if (primo_nmi)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************

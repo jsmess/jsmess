@@ -838,7 +838,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( exidy )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xe000);
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xe000);
 }
 
 /***************************************************************************

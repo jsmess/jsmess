@@ -150,7 +150,7 @@ DEVICE_IMAGE_LOAD( kc85_floppy )
 #if 0
 static void kc85_disc_hw_ctc_interrupt(int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cpu_set_input_line(machine->cpu[1], 0, state);
 }
 #endif
 
@@ -243,7 +243,7 @@ static void kc_disc_interface_init(running_machine *machine)
 	nec765_init(machine, &kc_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 
 	/* hold cpu at reset */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 /*****************/

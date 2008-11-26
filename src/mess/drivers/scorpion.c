@@ -245,7 +245,7 @@ static TIMER_CALLBACK(nmi_check_callback)
 	if ((input_port_read(machine, "NMI") & 1)==1) {
 		scorpion_256_port_1ffd_data |= 0x02;
 		scorpion_update_memory(machine);
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

@@ -328,7 +328,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( aquarius_interrupt )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 /* Sound Interface */
@@ -385,7 +385,7 @@ static MACHINE_RESET( aquarius )
 		break;
 	}
 
-	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
 	memory_set_bank(1, 0);
 
 	/* cartridge */

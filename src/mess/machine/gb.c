@@ -1819,7 +1819,7 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	if ( ! SIOCount ) {
 		SIOCONT &= 0x7F;
 		timer_enable( gb_serial_timer, 0 );
-		cpunum_set_input_line(machine, 0, SIO_INT, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], SIO_INT, HOLD_LINE);
 	}
 }
 
@@ -1829,7 +1829,7 @@ INLINE void gb_timer_check_irq( running_machine *machine ) {
 		gb_timer.triggering_irq = 0;
 		if ( TIMECNT == 0 ) {
 			TIMECNT = TIMEMOD;
-			cpunum_set_input_line(machine, 0, TIM_INT, HOLD_LINE );
+			cpu_set_input_line(machine->cpu[0], TIM_INT, HOLD_LINE );
 			gb_timer.reloading = 1;
 		}
 	}

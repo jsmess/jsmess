@@ -443,7 +443,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( spec_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 static const cassette_config spectrum_cassette_config =

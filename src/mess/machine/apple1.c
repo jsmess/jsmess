@@ -304,14 +304,14 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 		if (!reset_flag) {
 			reset_flag = 1;
 			/* using PULSE_LINE does not allow us to press and hold key */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
 			pia_reset();
 		}
 	}
 	else if (reset_flag) {
 		/* RESET released--allow the processor to continue. */
 		reset_flag = 0;
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	/* The CLEAR SCREEN switch clears the video hardware. */

@@ -680,7 +680,7 @@ static TIMER_CALLBACK( hp48_timer1_cb )
 		LOG(( "generate timer1 interrupt\n" ));
 		hp48_io[0x2e] |= 8; /* set service request */
 		hp48_io[0x18] |= 4; /* set service request */
-		cpunum_set_input_line(machine, 0, SATURN_NMI_LINE, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], SATURN_NMI_LINE, PULSE_LINE);
 	}
 }
 
@@ -704,7 +704,7 @@ static TIMER_CALLBACK( hp48_timer2_cb )
 		LOG(( "generate timer2 interrupt\n" ));
 		hp48_io[0x2f] |= 8;                                      /* set service request */
 		hp48_io[0x18] |= 4;                                      /* set service request */
-		cpunum_set_input_line(machine, 0, SATURN_NMI_LINE, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], SATURN_NMI_LINE, PULSE_LINE);
 	}
 }
 

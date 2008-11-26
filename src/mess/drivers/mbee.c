@@ -451,7 +451,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( mbee )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0x8000);
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0x8000);
 	memory_configure_bank(2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(3, 0, 2, &RAM[0x11800], 0x4000);
 	memory_set_bank(2, 1);
@@ -461,7 +461,7 @@ static DRIVER_INIT( mbee )
 static DRIVER_INIT( mbee56 )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &RAM[0x0000], 0xe000);
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xe000);
 	memory_configure_bank(2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(3, 0, 2, &RAM[0x11800], 0x4000);
 	memory_set_bank(2, 1);

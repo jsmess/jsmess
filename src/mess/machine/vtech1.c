@@ -85,7 +85,7 @@ static int vtech1_fdc_latch = 0;
 static void common_init_machine(running_machine *machine, int base)
 {
 	/* internal ram */
-	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
 	memory_set_bank(1, 0);
 
 	/* expansion memory configuration */

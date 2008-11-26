@@ -142,7 +142,7 @@ static void wswan_handle_irqs( running_machine *machine ) {
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_STX ) {
 		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_STX );
 	} else {
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE );
 	}
 }
 

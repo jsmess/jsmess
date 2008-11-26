@@ -583,15 +583,15 @@ MACHINE_START( comx35p )
 
 	/* card slot banking */
 
-	memory_configure_bank(1, 0, 1, memory_region(machine, CDP1802_TAG) + 0xc000, 0);
-	memory_configure_bank(1, BANK_FLOPPY, 1, memory_region(machine, "fdc"), 0);
-	memory_configure_bank(1, BANK_PRINTER_PARALLEL, 1, memory_region(machine, "printer"), 0);
-	memory_configure_bank(1, BANK_PRINTER_PARALLEL_FM, 1, memory_region(machine, "printer_fm"), 0);
-	memory_configure_bank(1, BANK_PRINTER_SERIAL, 1, memory_region(machine, "rs232"), 0);
-	memory_configure_bank(1, BANK_PRINTER_THERMAL, 1, memory_region(machine, "thermal"), 0);
-	memory_configure_bank(1, BANK_JOYCARD, 1, memory_region(machine, CDP1802_TAG), 0);
-	memory_configure_bank(1, BANK_80_COLUMNS, 1, memory_region(machine, "80column"), 0);
-	memory_configure_bank(1, BANK_RAMCARD, 4, mess_ram, 0x2000);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, CDP1802_TAG) + 0xc000, 0);
+	memory_configure_bank(machine, 1, BANK_FLOPPY, 1, memory_region(machine, "fdc"), 0);
+	memory_configure_bank(machine, 1, BANK_PRINTER_PARALLEL, 1, memory_region(machine, "printer"), 0);
+	memory_configure_bank(machine, 1, BANK_PRINTER_PARALLEL_FM, 1, memory_region(machine, "printer_fm"), 0);
+	memory_configure_bank(machine, 1, BANK_PRINTER_SERIAL, 1, memory_region(machine, "rs232"), 0);
+	memory_configure_bank(machine, 1, BANK_PRINTER_THERMAL, 1, memory_region(machine, "thermal"), 0);
+	memory_configure_bank(machine, 1, BANK_JOYCARD, 1, memory_region(machine, CDP1802_TAG), 0);
+	memory_configure_bank(machine, 1, BANK_80_COLUMNS, 1, memory_region(machine, "80column"), 0);
+	memory_configure_bank(machine, 1, BANK_RAMCARD, 4, mess_ram, 0x2000);
 
 	memory_set_bank(1, 0);
 

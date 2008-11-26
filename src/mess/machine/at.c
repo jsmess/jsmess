@@ -486,7 +486,7 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 
 	at_set_gate_a20( ( data & 0x02 ) ? 1 : 0 );
 	
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 1 : 0;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;

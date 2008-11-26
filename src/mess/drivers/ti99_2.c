@@ -109,7 +109,7 @@ static MACHINE_RESET( ti99_2 )
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
 	/* We trigger a level-4 interrupt.  The PULSE_LINE is a mere guess. */
-	cpunum_set_input_line(machine, 0, 1, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, PULSE_LINE);
 }
 
 

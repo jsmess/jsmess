@@ -381,7 +381,7 @@ static VIDEO_UPDATE( pasogo )
 
 static INTERRUPT_GEN( pasogo_interrupt )
 {
-  //  cpunum_set_input_line(machine, 0, UPD7810_INTFE1, PULSE_LINE);
+  //  cpu_set_input_line(machine->cpu[0], UPD7810_INTFE1, PULSE_LINE);
 }
 
 #if 0

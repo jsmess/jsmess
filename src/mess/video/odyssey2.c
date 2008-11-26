@@ -189,7 +189,7 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa1:
 			data = control_status;
 			iff = 0;
-			cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			control_status &= ~ 0x08;
 			if ( video_screen_get_hpos( machine->primary_screen ) < I824X_START_ACTIVE_SCAN || video_screen_get_hpos( machine->primary_screen ) > I824X_END_ACTIVE_SCAN ) {
 				data |= 1;
@@ -508,7 +508,7 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 	if ( vpos == start_vblank ) {
 		control_status |= 0x08;
 		if ( ! iff ) {
-			cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 			iff = 1;
 		}
 	}

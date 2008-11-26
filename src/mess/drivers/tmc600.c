@@ -286,7 +286,7 @@ static MACHINE_START( tmc600 )
 
 	/* configure RAM */
 
-	memory_configure_bank(1, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
 	memory_set_bank(1, 0);
 
 	switch (mess_ram_size)
@@ -313,7 +313,7 @@ static MACHINE_START( tmc600 )
 
 static MACHINE_RESET( tmc600 )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /* Machine Drivers */

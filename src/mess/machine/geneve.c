@@ -342,7 +342,7 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 static void inta_callback(running_machine *machine, int state)
 {
 	tms9901_set_single_int(0, 1, state);
-	cpunum_set_input_line(machine, 0, 1, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*

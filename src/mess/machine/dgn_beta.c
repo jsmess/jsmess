@@ -666,7 +666,7 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 			HALT_DMA=CLEAR_LINE;
 
 		LOG_HALT(("DMA_CPU HALT=%d\n",HALT_DMA));
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, HALT_DMA);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA==CLEAR_LINE)
@@ -709,7 +709,7 @@ static WRITE8_HANDLER(d_pia1_pb_w)
 		else
 			HALT_CPU=ASSERT_LINE;
 		LOG_HALT(("MAIN_CPU HALT=%d\n",HALT_CPU));
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, HALT_CPU);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, HALT_CPU);
 
 		d_pia1_pb_last=data & 0x02;
 
@@ -760,13 +760,13 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 		LOG_INTS(("cpu1 NMI : %d\n",NMI));
 		if(!NMI)
 		{
-			cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,ASSERT_LINE);
 			logerror("cpu_yield()\n");
 			cpu_yield();	/* Let DMA CPU run */
 		}
 		else
 		{
-			cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,CLEAR_LINE);
 		}
 
 		DMA_NMI_LAST=NMI;	/* Save it for next time */
@@ -850,7 +850,7 @@ static void cpu0_recalc_irq(running_machine *machine, int state)
 	else
 		IRQ = CLEAR_LINE;
 
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, IRQ);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, IRQ);
 	LOG_INTS(("cpu0 IRQ : %d\n",IRQ));
 }
 
@@ -864,7 +864,7 @@ static void cpu0_recalc_firq(running_machine *machine, int state)
 	else
 		FIRQ = CLEAR_LINE;
 
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, FIRQ);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, FIRQ);
 
 	LOG_INTS(("cpu0 FIRQ : %d\n",FIRQ));
 }
@@ -873,7 +873,7 @@ static void cpu0_recalc_firq(running_machine *machine, int state)
 
 static void cpu1_recalc_firq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, state);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, state);
 	LOG_INTS(("cpu1 FIRQ : %d\n",state));
 }
 
@@ -1025,7 +1025,7 @@ static void dgnbeta_reset(running_machine *machine)
 	system_rom = memory_region(machine, "main");
 
 	/* Make sure CPU 1 is started out halted ! */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */

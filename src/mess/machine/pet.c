@@ -180,8 +180,8 @@ static void pet_irq (running_machine *machine, int level)
 	{
 		DBG_LOG (3, "mos6502", ("irq %s\n", level ? "start" : "end"));
 		if (superpet)
-			cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, level);
-		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, level);
+			cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, level);
+		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, level);
 		old_level = level;
 	}
 }
@@ -536,7 +536,7 @@ WRITE8_HANDLER(superpet_w)
 		case 4:
 		case 5:
 			spet.bank = data & 0xf;
-			memory_configure_bank(1, 0, 16, superpet_memory, 0x1000);
+			memory_configure_bank(machine, 1, 0, 16, superpet_memory, 0x1000);
 			memory_set_bank(1, spet.bank);
 			/* 7 low writeprotects systemlatch */
 			break;
@@ -662,7 +662,7 @@ DRIVER_INIT( superpet )
 
 	superpet_memory = auto_malloc(0x10000);
 
-	memory_configure_bank(1, 0, 16, superpet_memory, 0x1000);
+	memory_configure_bank(machine, 1, 0, 16, superpet_memory, 0x1000);
 	memory_set_bank(1, 0);
 
 	superpet_vh_init(machine);
@@ -678,14 +678,14 @@ MACHINE_RESET( pet )
 		spet.rom = 0;
 		if (input_port_read(machine, "CFG") & 0x04)
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
 			pet_font = 2;
 		}
 		else
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
 			pet_font = 0;
 		}
 	}
@@ -714,14 +714,14 @@ INTERRUPT_GEN( pet_frame_interrupt )
 	{
 		if (input_port_read(machine, "CFG") & 0x04) 
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
 			pet_font |= 2;
 		} 
 		else 
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 0);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, 1);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
 			pet_font &= ~2;
 		}
 	}

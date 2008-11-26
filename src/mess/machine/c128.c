@@ -555,8 +555,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 			memory_set_context(machine, 0);
 			c128_bankswitch_z80(machine);
 			memory_set_context(machine, 1);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
@@ -565,8 +565,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 			memory_set_context(machine, 1);
 			c128_bankswitch_128(machine, reset);
 			memory_set_context(machine, 0);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 
 			/* NPW 19-Nov-2005 - In the C128, CPU #0 starts out and hands over
 			 * control to CPU #1.  CPU #1 seems to execute garbage from 0x0000
@@ -968,8 +968,8 @@ MACHINE_RESET( c128 )
 
 	c64mode = 0;
 	c128_mmu8722_reset (machine);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 VIDEO_START( c128 )

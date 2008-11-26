@@ -229,13 +229,13 @@ static void mac_field_interrupts(running_machine *machine)
 
 	if (last_taken_interrupt != -1)
 	{
-		cpunum_set_input_line(machine, 0, last_taken_interrupt, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], last_taken_interrupt, CLEAR_LINE);
 		last_taken_interrupt = -1;
 	}
 
 	if (take_interrupt != -1)
 	{
-		cpunum_set_input_line(machine, 0, take_interrupt, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], take_interrupt, ASSERT_LINE);
 		last_taken_interrupt = take_interrupt;
 	}
 }
@@ -842,7 +842,7 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 			scc_set_status(scc, 0x02);
 	}
 
-	//cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
+	//cpu_set_input_line(machine->cpu[0], 2, ASSERT_LINE);
 	set_scc_interrupt(machine, 1);
 }
 
@@ -1619,7 +1619,7 @@ static WRITE8_HANDLER(mac_via_out_b)
 static void mac_via_irq(running_machine *machine, int state)
 {
 	/* interrupt the 68k (level 1) */
-	//cpunum_set_input_line(machine, 0, 1, state);
+	//cpu_set_input_line(machine->cpu[0], 1, state);
 	set_via_interrupt(machine, state);
 }
 

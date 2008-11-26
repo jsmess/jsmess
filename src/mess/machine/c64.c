@@ -119,17 +119,17 @@ static void c64_nmi(running_machine *machine)
 			if (cpu_getactivecpu() == 0)
 			{
 				/* z80 */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 			}
 			else
 			{
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+				cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 			}
 		}
 		
 		else
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 		}
 		
 		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
@@ -331,16 +331,16 @@ static void c64_irq (running_machine *machine, int level)
 		{
 			if (0 && (cpu_getactivecpu() == 0))
 			{
-				cpunum_set_input_line(machine, 0, 0, level);
+				cpu_set_input_line(machine->cpu[0], 0, level);
 			}
 			else
 			{
-				cpunum_set_input_line(machine, 1, M6510_IRQ_LINE, level);
+				cpu_set_input_line(machine->cpu[1], M6510_IRQ_LINE, level);
 			}
 		}
 		else
 		{
-			cpunum_set_input_line(machine, 0, M6510_IRQ_LINE, level);
+			cpu_set_input_line(machine->cpu[0], M6510_IRQ_LINE, level);
 		}
 		old_level = level;
 	}
