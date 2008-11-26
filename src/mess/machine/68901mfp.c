@@ -1368,7 +1368,7 @@ int mc68901_get_vector(const device_config *device)
 		}
 	}
 
-	return MC68000_INT_ACK_SPURIOUS;
+	return M68K_INT_ACK_SPURIOUS;
 }
 
 /* Device Interface */
@@ -1376,7 +1376,6 @@ int mc68901_get_vector(const device_config *device)
 static DEVICE_START( mc68901 )
 {
 	mc68901_t *mc68901 = device->token;
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device->machine != NULL);
@@ -1412,42 +1411,40 @@ static DEVICE_START( mc68901 )
 	}
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "MC68901", device->tag);
-
-	state_save_register_item(unique_tag, 0, mc68901->gpip);
-	state_save_register_item(unique_tag, 0, mc68901->aer);
-	state_save_register_item(unique_tag, 0, mc68901->ddr);
-	state_save_register_item(unique_tag, 0, mc68901->ier);
-	state_save_register_item(unique_tag, 0, mc68901->ipr);
-	state_save_register_item(unique_tag, 0, mc68901->isr);
-	state_save_register_item(unique_tag, 0, mc68901->imr);
-	state_save_register_item(unique_tag, 0, mc68901->vr);
-	state_save_register_item(unique_tag, 0, mc68901->tacr);
-	state_save_register_item(unique_tag, 0, mc68901->tbcr);
-	state_save_register_item(unique_tag, 0, mc68901->tcdcr);
-	state_save_register_item_array(unique_tag, 0, mc68901->tdr);
-	state_save_register_item_array(unique_tag, 0, mc68901->tmc);
-	state_save_register_item_array(unique_tag, 0, mc68901->to);
-	state_save_register_item_array(unique_tag, 0, mc68901->ti);
-	state_save_register_item(unique_tag, 0, mc68901->scr);
-	state_save_register_item(unique_tag, 0, mc68901->ucr);
-	state_save_register_item(unique_tag, 0, mc68901->rsr);
-	state_save_register_item(unique_tag, 0, mc68901->tsr);
-	state_save_register_item(unique_tag, 0, mc68901->udr);
-	state_save_register_item(unique_tag, 0, mc68901->rx_bits);
-	state_save_register_item(unique_tag, 0, mc68901->tx_bits);
-	state_save_register_item(unique_tag, 0, mc68901->rx_parity);
-	state_save_register_item(unique_tag, 0, mc68901->tx_parity);
-	state_save_register_item(unique_tag, 0, mc68901->rx_state);
-	state_save_register_item(unique_tag, 0, mc68901->tx_state);
-	state_save_register_item(unique_tag, 0, mc68901->rx_buffer);
-	state_save_register_item(unique_tag, 0, mc68901->tx_buffer);
-	state_save_register_item(unique_tag, 0, mc68901->xmit_state);
-	state_save_register_item(unique_tag, 0, mc68901->rxtx_word);
-	state_save_register_item(unique_tag, 0, mc68901->rxtx_start);
-	state_save_register_item(unique_tag, 0, mc68901->rxtx_stop);
-	state_save_register_item(unique_tag, 0, mc68901->rsr_read);
-	state_save_register_item(unique_tag, 0, mc68901->next_rsr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->gpip);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->aer);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->ddr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->ier);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->ipr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->isr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->imr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->vr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tacr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tbcr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tcdcr);
+	state_save_register_item_array("MC68901",device->tag, 0, mc68901->tdr);
+	state_save_register_item_array("MC68901",device->tag, 0, mc68901->tmc);
+	state_save_register_item_array("MC68901",device->tag, 0, mc68901->to);
+	state_save_register_item_array("MC68901",device->tag, 0, mc68901->ti);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->scr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->ucr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rsr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tsr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->udr);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_bits);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_bits);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_parity);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_parity);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_state);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_state);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_buffer);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_buffer);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->xmit_state);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rxtx_word);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rxtx_start);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rxtx_stop);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->rsr_read);
+	state_save_register_item("MC68901",device->tag, 0, mc68901->next_rsr);
 	return DEVICE_START_OK;
 }
 
