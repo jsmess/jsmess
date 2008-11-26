@@ -20,23 +20,24 @@ emu_timer *gal_video_timer = NULL;
 
 TIMER_CALLBACK( gal_video )
 {	
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int y,x;
 	if (galaxy_interrupts_enabled==TRUE) {
 		UINT8 *gfx = memory_region(machine, "gfx1");
 		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
 		if ((gal_cnt >= 48 * 2) && (gal_cnt < 48 * 210)) { // display on screen just first 208 lines
 			UINT8 mode = (gal_latch_value >> 1) & 1; // bit 2 latch represents mode
-			UINT16 addr = (cpunum_get_reg(0, Z80_I) << 8) | cpunum_get_reg(0, Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);
+			UINT16 addr = (cpu_get_reg(machine->cpu[0], Z80_I) << 8) | cpu_get_reg(machine->cpu[0], Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);
   			if (mode == 0){
   				// Text mode
-	  			if (first==0 && (cpunum_get_reg(0, Z80_R) & 0x1f) ==0) {
+	  			if (first==0 && (cpu_get_reg(machine->cpu[0], Z80_R) & 0x1f) ==0) {
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of double
 		  			// first char in each row
 		  			code = 0x00;
 		  			first = 1;
 				} else {
-					code = program_read_byte(addr) & 0xbf;
+					code = memory_read_byte(space,addr) & 0xbf;
 					code += (code & 0x80) >> 1;
 					code = gfx[(code & 0x7f) +(dat << 7 )] ^ 0xff;
 					first = 0;
@@ -55,14 +56,14 @@ TIMER_CALLBACK( gal_video )
 			}
 			else 
 			{ // Graphics mode
-	  			if (first<4 && (cpunum_get_reg(0, Z80_R) & 0x1f) ==0) {
+	  			if (first<4 && (cpu_get_reg(machine->cpu[0], Z80_R) & 0x1f) ==0) {
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of 4 times
 		  			// first char in each row
 		  			code = 0x00;
 		  			first++;
 				} else {
-					code = program_read_byte(addr) ^ 0xff;
+					code = memory_read_byte(space,addr) ^ 0xff;
 					first = 0;
 				}
 				y = gal_cnt / 48 - 2;
@@ -73,7 +74,7 @@ TIMER_CALLBACK( gal_video )
 					start_addr = addr;
 				}
 				if ((x/8 >=11) && (x/8<44)) {
-					code = program_read_byte(start_addr + y * 32 + (gal_cnt % 48)-11) ^ 0xff;
+					code = memory_read_byte(space,start_addr + y * 32 + (gal_cnt % 48)-11) ^ 0xff;
 				} else {
 					code = 0x00;
 				}

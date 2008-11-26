@@ -372,6 +372,7 @@ DRVLIBS = \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bk.a \
+	$(MESSOBJ)/galaxy.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/irisha.a \
 	$(MESSOBJ)/mk2.a \
@@ -419,7 +420,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/exeltel.a \
 #	$(MESSOBJ)/exidy.a \
 #	$(MESSOBJ)/fairch.a \
-#	$(MESSOBJ)/galaxy.a \
 #	$(MESSOBJ)/gce.a \
 #	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/gmaster.a \

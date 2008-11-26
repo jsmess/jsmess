@@ -817,8 +817,8 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( exidyd )	/* Sorcerer (diskless)								*/
 
 	/* GALAKSIJA */
-//128u4	DRIVER( galaxy )
-//128u4	DRIVER( galaxyp )
+	DRIVER( galaxy )
+	DRIVER( galaxyp )
 
 	/* Lviv/L'vov */
 //128u4	DRIVER( lviv )		/* Lviv/L'vov										*/

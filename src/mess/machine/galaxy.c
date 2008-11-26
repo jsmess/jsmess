@@ -22,12 +22,12 @@ READ8_HANDLER( galaxy_keyboard_r )
 
 	if (offset == 0) 
 	{
-		double level = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
+		double level = cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ));
 		return (level >  0) ? 0xfe : 0xff;
 	} 
 	else 
 	{
-		return input_port_read(machine, keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
+		return input_port_read(space->machine, keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
 }
 
@@ -37,7 +37,7 @@ WRITE8_HANDLER( galaxy_latch_w )
 {	
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;			
 	gal_latch_value = data;
-	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), val);
+	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), val);
 }
 
 
@@ -49,7 +49,7 @@ int galaxy_interrupts_enabled = TRUE;
 
 INTERRUPT_GEN( galaxy_interrupt )
 {
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK ( galaxy_irq_callback )
@@ -72,51 +72,51 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 	switch (size)
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
-			cpunum_set_reg(0, Z80_AF,   data[0x00] | data[0x01]<<8);
-			cpunum_set_reg(0, Z80_BC,   data[0x04] | data[0x05]<<8);
-			cpunum_set_reg(0, Z80_DE,   data[0x08] | data[0x09]<<8);
-			cpunum_set_reg(0, Z80_HL,   data[0x0c] | data[0x0d]<<8);
-			cpunum_set_reg(0, Z80_IX,   data[0x10] | data[0x11]<<8);
-			cpunum_set_reg(0, Z80_IY,   data[0x14] | data[0x15]<<8);
-			cpunum_set_reg(0, Z80_PC,   data[0x18] | data[0x19]<<8);
-			cpunum_set_reg(0, Z80_SP,   data[0x1c] | data[0x1d]<<8);
-			cpunum_set_reg(0, Z80_AF2,  data[0x20] | data[0x21]<<8);
-			cpunum_set_reg(0, Z80_BC2,  data[0x24] | data[0x25]<<8);
-			cpunum_set_reg(0, Z80_DE2,  data[0x28] | data[0x29]<<8);
-			cpunum_set_reg(0, Z80_HL2,  data[0x2c] | data[0x2d]<<8);
-			cpunum_set_reg(0, Z80_IFF1, data[0x30]);
-			cpunum_set_reg(0, Z80_IFF2, data[0x34]);
-			cpunum_set_reg(0, Z80_HALT, data[0x38]);
-			cpunum_set_reg(0, Z80_IM,   data[0x3c]);
-			cpunum_set_reg(0, Z80_I,    data[0x40]);
-			cpunum_set_reg(0, Z80_R,    (data[0x44]&0x7f) | (data[0x48]&0x80));
+			cpu_set_reg(machine->cpu[0], Z80_AF,   data[0x00] | data[0x01]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_BC,   data[0x04] | data[0x05]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_DE,   data[0x08] | data[0x09]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_HL,   data[0x0c] | data[0x0d]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_IX,   data[0x10] | data[0x11]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_IY,   data[0x14] | data[0x15]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_PC,   data[0x18] | data[0x19]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_SP,   data[0x1c] | data[0x1d]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_AF2,  data[0x20] | data[0x21]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_BC2,  data[0x24] | data[0x25]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_DE2,  data[0x28] | data[0x29]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_HL2,  data[0x2c] | data[0x2d]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_IFF1, data[0x30]);
+			cpu_set_reg(machine->cpu[0], Z80_IFF2, data[0x34]);
+			cpu_set_reg(machine->cpu[0], Z80_HALT, data[0x38]);
+			cpu_set_reg(machine->cpu[0], Z80_IM,   data[0x3c]);
+			cpu_set_reg(machine->cpu[0], Z80_I,    data[0x40]);
+			cpu_set_reg(machine->cpu[0], Z80_R,    (data[0x44]&0x7f) | (data[0x48]&0x80));
 
 			memcpy (mess_ram, data+0x084c, (mess_ram_size < 0x1800) ? mess_ram_size : 0x1800);
 
 			break;
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			cpunum_set_reg(0, Z80_AF,   data[0x00] | data[0x01]<<8);
-			cpunum_set_reg(0, Z80_BC,   data[0x02] | data[0x03]<<8);
-			cpunum_set_reg(0, Z80_DE,   data[0x04] | data[0x05]<<8);
-			cpunum_set_reg(0, Z80_HL,   data[0x06] | data[0x07]<<8);
-			cpunum_set_reg(0, Z80_IX,   data[0x08] | data[0x09]<<8);
-			cpunum_set_reg(0, Z80_IY,   data[0x0a] | data[0x0b]<<8);
-			cpunum_set_reg(0, Z80_PC,   data[0x0c] | data[0x0d]<<8);
-			cpunum_set_reg(0, Z80_SP,   data[0x0e] | data[0x0f]<<8);
-			cpunum_set_reg(0, Z80_AF2,  data[0x10] | data[0x11]<<8);
-			cpunum_set_reg(0, Z80_BC2,  data[0x12] | data[0x13]<<8);
-			cpunum_set_reg(0, Z80_DE2,  data[0x14] | data[0x15]<<8);
-			cpunum_set_reg(0, Z80_HL2,  data[0x16] | data[0x17]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_AF,   data[0x00] | data[0x01]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_BC,   data[0x02] | data[0x03]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_DE,   data[0x04] | data[0x05]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_HL,   data[0x06] | data[0x07]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_IX,   data[0x08] | data[0x09]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_IY,   data[0x0a] | data[0x0b]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_PC,   data[0x0c] | data[0x0d]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_SP,   data[0x0e] | data[0x0f]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_AF2,  data[0x10] | data[0x11]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_BC2,  data[0x12] | data[0x13]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_DE2,  data[0x14] | data[0x15]<<8);
+			cpu_set_reg(machine->cpu[0], Z80_HL2,  data[0x16] | data[0x17]<<8);
 
-			cpunum_set_reg(0, Z80_IFF1, data[0x18]&0x01);
-			cpunum_set_reg(0, Z80_IFF2, 0);
+			cpu_set_reg(machine->cpu[0], Z80_IFF1, data[0x18]&0x01);
+			cpu_set_reg(machine->cpu[0], Z80_IFF2, 0);
 
-			cpunum_set_reg(0, Z80_HALT, 0);
+			cpu_set_reg(machine->cpu[0], Z80_HALT, 0);
 
-			cpunum_set_reg(0, Z80_IM,   (data[0x18]>>1)&0x03);
+			cpu_set_reg(machine->cpu[0], Z80_IM,   (data[0x18]>>1)&0x03);
 
-			cpunum_set_reg(0, Z80_I,    data[0x19]);
-			cpunum_set_reg(0, Z80_R,    data[0x1a]);
+			cpu_set_reg(machine->cpu[0], Z80_I,    data[0x19]);
+			cpu_set_reg(machine->cpu[0], Z80_R,    data[0x1a]);
 
 			memcpy (mess_ram, data+0x0834, (mess_ram_size < 0x1800) ? mess_ram_size : 0x1800);
 
@@ -155,14 +155,15 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT( galaxy )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2800+mess_ram_size-1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2800+mess_ram_size-1, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, mess_ram);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_install_read8_handler(space, 0x2800, 0x2800+mess_ram_size-1, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(space, 0x2800, 0x2800+mess_ram_size-1, 0, 0, SMH_BANK1);
+	memory_set_bankptr(machine,1, mess_ram);
 
 	if (mess_ram_size < (6+48)*1024)
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800+mess_ram_size, 0xffff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800+mess_ram_size, 0xffff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(space, 0x2800+mess_ram_size, 0xffff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0x2800+mess_ram_size, 0xffff, 0, 0, SMH_NOP);
 	}
 }
 
@@ -172,12 +173,14 @@ DRIVER_INIT( galaxy )
 
 MACHINE_RESET( galaxy )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
 	/* ROM 2 enable/disable */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, input_port_read(machine, "ROM2") ? SMH_BANK10 : SMH_NOP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, SMH_NOP);
-	memory_set_bankptr(10, memory_region(machine, "main") + 0x1000);
+	memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, input_port_read(machine, "ROM2") ? SMH_BANK10 : SMH_NOP);
+	memory_install_write8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_NOP);
+	memory_set_bankptr(machine,10, memory_region(machine, "main") + 0x1000);
 
-	cpunum_set_irq_callback(0, galaxy_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], galaxy_irq_callback);
 	galaxy_interrupts_enabled = TRUE;
 
 	gal_video_timer = timer_alloc(gal_video, NULL);
@@ -192,17 +195,18 @@ DRIVER_INIT( galaxyp )
 MACHINE_RESET( galaxyp )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-
-	cpunum_set_irq_callback(0, galaxy_irq_callback);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
+	cpu_set_irq_callback(machine->cpu[0], galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;
 	ROM[0x03fa] = 0x00;
 	ROM[0x03fb] = 0xe0;
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_BANK11);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);
-	memory_set_bankptr(11, memory_region(machine, "main") + 0xe000);
+	memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_BANK11);
+	memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
+	memory_set_bankptr(machine,11, memory_region(machine, "main") + 0xe000);
 	galaxy_interrupts_enabled = TRUE;
 
 	gal_video_timer = timer_alloc(gal_video, NULL);
