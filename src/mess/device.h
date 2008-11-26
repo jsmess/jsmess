@@ -82,6 +82,9 @@ enum
 	MESS_DEVINFO_STR_DEV_SPECIFIC = 0x28000,					/* R/W: Device-specific values start here */
 };
 
+#define TEMP_STRING_POOL_ENTRIES 16
+static char temp_string_pool[TEMP_STRING_POOL_ENTRIES][256];
+static int temp_string_pool_index;
 
 typedef void (*device_getdispositions_func)(int id, unsigned int *readable, unsigned int *writeable, unsigned int *creatable);
 
@@ -163,8 +166,9 @@ INLINE const char *mess_device_get_info_string(const mess_device_class *devclass
 
 INLINE char *device_temp_str(void)
 {
-	extern char *cpuintrf_temp_str(void);
-	return cpuintrf_temp_str();
+	char *string = &temp_string_pool[temp_string_pool_index++ % TEMP_STRING_POOL_ENTRIES][0];
+	string[0] = 0;
+	return string;
 }
 
 
