@@ -193,11 +193,11 @@ static void pokemini_check_irqs( running_machine *machine )
 	{
 		//logerror("Triggering IRQ with vector %02x\n", vector );
 		/* Trigger interrupt and set vector */
-		cpunum_set_input_line_and_vector( machine, 0, 0, ASSERT_LINE, vector );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, ASSERT_LINE, vector );
 	}
 	else
 	{
-		cpunum_set_input_line( machine, 0, 0, CLEAR_LINE );
+		cpu_set_input_line( machine->cpu[0], 0, CLEAR_LINE );
 	}
 }
 
@@ -422,7 +422,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
 
-	//logerror( "%0X: Write to hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+	//logerror( "%0X: Write to hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
 
 	switch( offset )
 	{
@@ -436,7 +436,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 	case 0x02:	/* CPU related?
 			   Bit 0-7 R/W Unknown
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
 		break;
 	case 0x08:	/* Seconds-timer control
 			   Bit 0   R/W Timer enable
@@ -468,7 +468,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 5   R   Battery status: 0 - battery OK, 1 - battery low
 			   Bit 6-7     Unused
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
 		break;
 	case 0x18:	/* Timer 1 pre-scale + enable
 			   Bit 0-2 R/W low timer 1 prescaler select
@@ -806,7 +806,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 6-7 R/W VDraw/VBlank trigger Interrupt #1-#2
 			*/
 		pm_reg[0x20] = data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		break;
 	case 0x21:	/* Event #15-#22 priority
 			   Bit 0-1 R/W Unknown
@@ -814,14 +814,14 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 4-7 R/W Unknown
 			*/
 		pm_reg[0x21] = data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		break;
 	case 0x22:	/* Event #9-#14 priority
 			   Bit 0-1 R/W All #9 - #14 events - Interrupt #9-#14
 			   Bit 2-7     Unused
 			*/
 		pm_reg[0x22] = data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		break;
 	case 0x23:	/* Event #1-#8 enable
 			   Bit 0   R/W Timer 3 overflow (mirror) - Enable Interrupt #8
@@ -834,14 +834,14 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 7   R/W V-Blank trigger - Enable Interrupt #1
 			*/
 		pm_reg[0x23] = data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		break;
 	case 0x24:	/* Event #9-#12 enable
 			   Bit 0-5 R/W Unknown
 			   Bit 6-7     Unused
 			*/
 		pm_reg[0x24] = data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		break;
 	case 0x25:	/* Event #15-#22 enable
 			   Bit 0   R/W Press key "A" event - Enable interrupt #22
@@ -854,7 +854,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 7   R/W Press power button event - Enable interrupt #15
 			*/
 		pm_reg[0x25] = data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		break;
 	case 0x26:	/* Event #13-#14 enable
 			   Bit 0-2 R/W Unknown
@@ -864,7 +864,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 7   R/W IR receiver - low to high trigger - Enable interrupt #13
 			*/
 		pm_reg[0x26] = data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		break;
 	case 0x27:	/* Interrupt active flag #1-#8
 			   Bit 0       Timer 3 overflow (mirror) / Clear interrupt #8
@@ -877,7 +877,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 7       VBlank trigger / Clear interrupt #1
 			*/
 		pm_reg[0x27] &= ~data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		return;
 	case 0x28:	/* Interrupt active flag #9-#12
 			   Bit 0-1     Unknown
@@ -888,7 +888,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 6-7     Unknown
 			*/
 		pm_reg[0x28] &= ~data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		return;
 	case 0x29:	/* Interrupt active flag #15-#22
 			   Bit 0       Press key "A" event / Clear interrupt #22
@@ -901,7 +901,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 7       Press power button event / Clear interrupt #15
 			*/
 		pm_reg[0x29] &= ~data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		return;
 	case 0x2A:	/* Interrupt active flag #13-#14
 			   Bit 0-5     Unknown
@@ -909,7 +909,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 7       Unknown / Clear interrupt #13
 			*/
 		pm_reg[0x2A] &= ~data;
-		pokemini_check_irqs( machine );
+		pokemini_check_irqs( space->machine );
 		return;
 	case 0x30:	/* Timer 1 control 1
 			   Bit 0   R/W Unknown
@@ -983,7 +983,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			*/
 	case 0x35:	/* Timer 1 sound-pivot (high, unused)
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
 		break;
 	case 0x36:	/* Timer 1 counter (low), read only
 			*/
@@ -1062,7 +1062,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			*/
 	case 0x3D:	/* Timer 2 sound-pivot (high, unused)
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
 		break;
 	case 0x3E:	/* Timer 2 counter (low), read only
 			   Bit 0-7 R/W Timer 2 counter value bit 0-7
@@ -1122,7 +1122,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			timer_enable( timers.timer3_hi, 0 );
 		}
 		pm_reg[0x48] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x49:	/* Timer 3 control 2
 			   Bit 0   R/W Unknown
@@ -1148,25 +1148,25 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			timer_enable( timers.timer3_hi, 0 );
 		}
 		pm_reg[0x49] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x4A:	/* Timer 3 preset value (low)
 			   Bit 0-7 R/W Timer 3 preset value bit 0-7
 			*/
 		pm_reg[0x4A] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x4B:	/* Timer 3 preset value (high)
 			   Bit 0-7 R/W Timer 3 preset value bit 8-15
 			*/
 		pm_reg[0x4B] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x4C:	/* Timer 3 sound-pivot (low)
 			   Bit 0-7 R/W Timer 3 sound-pivot value bit 0-7
 			*/
 		pm_reg[0x4C] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x4D:	/* Timer 3 sound-pivot (high)
 			   Bit 0-7 R/W Timer 3 sound-pivot value bit 8-15
@@ -1177,7 +1177,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Pulse-Width of 100% = Same as preset-value
 			*/
 		pm_reg[0x4D] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x4E:	/* Timer 3 counter (low), read only
 			   Bit 0-7 R/W Timer 3 counter value bit 0-7
@@ -1227,7 +1227,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 		break;
 	case 0x70:	/* Sound related */
 		pm_reg[0x70] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x71:	/* Sound volume
 			   Bit 0-1 R/W Sound volume
@@ -1239,7 +1239,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 3-7     Unused
 			*/
 		pm_reg[0x71] = data;
-		pokemini_update_sound( machine );
+		pokemini_update_sound( space->machine );
 		break;
 	case 0x80:	/* LCD control
 			   Bit 0   R/W Invert colors; 0 - normal, 1 - inverted
@@ -1327,7 +1327,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			               Map size 2: 0x00 to 0x60
 			   Bit 7       Unused
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
 		break;
 	case 0x87:	/* Sprite tile data memory offset (low)
 			   Bit 0-5     Always "0"
@@ -1368,7 +1368,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 //		lcd_data_w( data );
 		break;
 	default:
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", cpu_get_pc( space->cpu ), offset, data );
 		break;
 	}
 	pm_reg[offset] = data;
@@ -1380,7 +1380,7 @@ READ8_HANDLER( pokemini_hwreg_r )
 
 	switch( offset )
 	{
-	case 0x52:	return input_port_read(machine, "INPUTS");
+	case 0x52:	return input_port_read(space->machine, "INPUTS");
 	case 0x61:
 		if ( ! ( pm_reg[0x60] & 0x04 ) )
 		{
@@ -1437,6 +1437,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 
 static TIMER_CALLBACK( pokemini_prc_counter_callback )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	prc.count++;
 
 	/* Check for overflow */
@@ -1460,7 +1461,7 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 						UINT8 tile = pokemini_ram[ 0x360 + ( y * prc.map_size_x ) + x ];
 						int i;
 						for( i = 0; i < 8; i++ ) {
-							pokemini_ram[ ( y * 96 ) + ( x * 8 ) + i ] = program_read_byte( prc.bg_tiles + ( tile * 8 ) + i );
+							pokemini_ram[ ( y * 96 ) + ( x * 8 ) + i ] = memory_read_byte( space, prc.bg_tiles + ( tile * 8 ) + i );
 						}
 					}
 				}
@@ -1491,8 +1492,8 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 								int rel_x = ( spr_flag & 0x01 ) ? 15 - i : i;
 								UINT32	s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
 
-								mask = ~ ( program_read_byte( s ) | ( program_read_byte( s + 8 ) << 8 ) );
-								gfx = program_read_byte( s + 16 ) | ( program_read_byte( s + 24 ) << 8 );
+								mask = ~ ( memory_read_byte( space, s ) | ( memory_read_byte( space, s + 8 ) << 8 ) );
+								gfx = memory_read_byte( space, s + 16 ) | ( memory_read_byte( space, s + 24 ) << 8 );
 
 								/* Are the colors inverted? */
 								if ( spr_flag & 0x04 )

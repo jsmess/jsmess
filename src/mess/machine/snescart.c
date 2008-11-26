@@ -336,6 +336,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 {
 	int i, supported_type = 0;
 	running_machine *machine = image->machine;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	int total_blocks, read_blocks;
 	UINT32 offset;
 	UINT8 header[512];
@@ -574,7 +575,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	}
 
 	/* Find the amount of sram */
-	snes_cart.sram = snes_r_bank1(machine, 0x00ffd8);
+	snes_cart.sram = snes_r_bank1(space, 0x00ffd8);
 	if( snes_cart.sram > 0 )
 	{
 		snes_cart.sram = ((1 << (snes_cart.sram + 3)) / 8);
@@ -584,7 +585,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 	/* Find the type of cart and detect special chips */
 	/* Info mostly taken from http://snesemu.black-ship.net/misc/-from%20nsrt.edgeemu.com-chipinfo.htm */
-	switch (snes_r_bank1(machine, 0x00ffd6))
+	switch (snes_r_bank1(space, 0x00ffd6))
 	{
 			case 0x00:
 			case 0x01:
@@ -594,7 +595,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				break;
 
 			case 0x03:
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x30)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x30)
 					has_addon_chip = HAS_DSP4;
 				else
 				{
@@ -609,13 +610,13 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				break;
 
 			case 0x05:
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x20)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x20)
 				{
 					has_addon_chip = HAS_DSP2;
 					supported_type = 1;
 				}
 				/* DSP-3 is hard to detect. We exploit the fact that the only game has been manufactured by Bandai */
-				else if ((snes_r_bank1(machine, 0x00ffd5) == 0x30) && (snes_r_bank1(machine, 0x00ffda) == 0xb2))
+				else if ((snes_r_bank1(space, 0x00ffd5) == 0x30) && (snes_r_bank1(space, 0x00ffda) == 0xb2))
 					has_addon_chip = HAS_DSP3;
 				else
 				{
@@ -628,7 +629,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x14:	// GSU-x
 			case 0x15:	// GSU-x
 			case 0x1a:	// GSU-1 (21 Mhz at start)
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x20)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x20)
 					has_addon_chip = HAS_SUPERFX;
 				break;
 
@@ -640,18 +641,18 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x32:	// needed by a Sample game (according to ZSNES)
 			case 0x34:
 			case 0x35:
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x23)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x23)
 					has_addon_chip = HAS_SA1;
 				break;
 
 			case 0x43:
 			case 0x45:
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x32)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x32)
 					has_addon_chip = HAS_SDD1;
 				break;
 
 			case 0x55:
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x35)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x35)
 					has_addon_chip = HAS_RTC;
 				break;
 
@@ -664,23 +665,23 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				break;
 			
 			case 0xf5:
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x30)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x30)
 					has_addon_chip = HAS_ST018;
-				else if (snes_r_bank1(machine, 0x00ffd5) == 0x3a)
+				else if (snes_r_bank1(space, 0x00ffd5) == 0x3a)
 					has_addon_chip = HAS_SPC7110;
 				break;
 
 			case 0xf6:
 				/* These Seta ST-01X chips have both 0x30 at 0x00ffd5, 
 				they only differ for the 'size' at 0x00ffd7 */
-				if (snes_r_bank1(machine, 0x00ffd7) < 0x0a)
+				if (snes_r_bank1(space, 0x00ffd7) < 0x0a)
 					has_addon_chip = HAS_ST011;
 				else
 					has_addon_chip = HAS_ST010;
 				break;
 
 			case 0xf9:
-				if (snes_r_bank1(machine, 0x00ffd5) == 0x3a)
+				if (snes_r_bank1(space, 0x00ffd5) == 0x3a)
 					has_addon_chip = HAS_SPC7110_RTC;
 				break;
 			
@@ -696,30 +697,30 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 		/* Company */
 		for( i = 0; i < 2; i++ )
-			company_id[i] = snes_r_bank1(machine, 0x00ffb0 + i);
+			company_id[i] = snes_r_bank1(space, 0x00ffb0 + i);
 		company = (char_to_int_conv(company_id[0]) << 4) + char_to_int_conv(company_id[1]);
 		if (company == 0) 
-			company = snes_r_bank1(machine, 0x00ffda);
+			company = snes_r_bank1(space, 0x00ffda);
 
 		/* ROM ID */
 		for( i = 0; i < 4; i++ )
-			rom_id[i] = snes_r_bank1(machine, 0x00ffb2 + i);
+			rom_id[i] = snes_r_bank1(space, 0x00ffb2 + i);
 
 		/* Title */
 		for( i = 0; i < 21; i++ )
-			title[i] = snes_r_bank1(machine, 0x00ffc0 + i);
+			title[i] = snes_r_bank1(space, 0x00ffc0 + i);
 
 		/* RAM */
-		if (((snes_r_bank1(machine, 0x00ffd6) & 0xf) == 1) ||
-				((snes_r_bank1(machine, 0x00ffd6) & 0xf) == 2) ||
-				((snes_r_bank1(machine, 0x00ffd6) & 0xf) == 4) ||
-				((snes_r_bank1(machine, 0x00ffd6) & 0xf) == 5))
+		if (((snes_r_bank1(space, 0x00ffd6) & 0xf) == 1) ||
+				((snes_r_bank1(space, 0x00ffd6) & 0xf) == 2) ||
+				((snes_r_bank1(space, 0x00ffd6) & 0xf) == 4) ||
+				((snes_r_bank1(space, 0x00ffd6) & 0xf) == 5))
 			has_ram = 1;
 
 		/* SRAM */
-		if (((snes_r_bank1(machine, 0x00ffd6) & 0xf) == 2) ||
-				((snes_r_bank1(machine, 0x00ffd6) & 0xf) == 5) ||
-				((snes_r_bank1(machine, 0x00ffd6) & 0xf) == 6))
+		if (((snes_r_bank1(space, 0x00ffd6) & 0xf) == 2) ||
+				((snes_r_bank1(space, 0x00ffd6) & 0xf) == 5) ||
+				((snes_r_bank1(space, 0x00ffd6) & 0xf) == 6))
 			has_sram = 1;
 
 		logerror( "ROM DETAILS\n" );
@@ -734,25 +735,25 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		logerror( "HEADER DETAILS\n" );
 		logerror( "==============\n\n" );
 		logerror( "\tName:          %.21s\n", title );
-		logerror( "\tSpeed:         %s [%d]\n", ((snes_r_bank1(machine, 0x00ffd5) & 0xf0)) ? "FastROM" : "SlowROM", (snes_r_bank1(machine, 0x00ffd5) & 0xf0) >> 4 );
-		logerror( "\tBank size:     %s [%d]\n", (snes_r_bank1(machine, 0x00ffd5) & 0xf) ? "HiROM" : "LoROM", snes_r_bank1(machine, 0x00ffd5) & 0xf );
+		logerror( "\tSpeed:         %s [%d]\n", ((snes_r_bank1(space, 0x00ffd5) & 0xf0)) ? "FastROM" : "SlowROM", (snes_r_bank1(space, 0x00ffd5) & 0xf0) >> 4 );
+		logerror( "\tBank size:     %s [%d]\n", (snes_r_bank1(space, 0x00ffd5) & 0xf) ? "HiROM" : "LoROM", snes_r_bank1(space, 0x00ffd5) & 0xf );
 
 		logerror( "\tType:          %s", types[has_addon_chip]);
 		if (has_ram)
 			logerror( ", RAM");
 		if (has_sram)
 			logerror( ", SRAM");
-		logerror( " [%d]\n", snes_r_bank1(machine, 0x00ffd6) );
+		logerror( " [%d]\n", snes_r_bank1(space, 0x00ffd6) );
 
-		logerror( "\tSize:          %d megabits [%d]\n", 1 << (snes_r_bank1(machine, 0x00ffd7) - 7), snes_r_bank1(machine, 0x00ffd7) );
+		logerror( "\tSize:          %d megabits [%d]\n", 1 << (snes_r_bank1(space, 0x00ffd7) - 7), snes_r_bank1(space, 0x00ffd7) );
 		logerror( "\tSRAM:          %d kilobits [%d]\n", snes_cart.sram * 8, snes_ram[0xffd8] );
-		logerror( "\tCountry:       %s [%d]\n", countries[snes_r_bank1(machine, 0x00ffd9)], snes_r_bank1(machine, 0x00ffd9) );
-		logerror( "\tLicense:       %s [%X]\n", companies[snes_r_bank1(machine, 0x00ffda)], snes_r_bank1(machine, 0x00ffda) );
-		logerror( "\tVersion:       1.%d\n", snes_r_bank1(machine, 0x00ffdb) );
-		logerror( "\tInv Checksum:  %X %X\n", snes_r_bank1(machine, 0x00ffdd), snes_r_bank1(machine, 0x00ffdc) );
-		logerror( "\tChecksum:      %X %X\n", snes_r_bank1(machine, 0x00ffdf), snes_r_bank1(machine, 0x00ffde) );
-		logerror( "\tNMI Address:   %2X%2Xh\n", snes_r_bank1(machine, 0x00fffb), snes_r_bank1(machine, 0x00fffa) );
-		logerror( "\tStart Address: %2X%2Xh\n\n", snes_r_bank1(machine, 0x00fffd), snes_r_bank1(machine, 0x00fffc) );
+		logerror( "\tCountry:       %s [%d]\n", countries[snes_r_bank1(space, 0x00ffd9)], snes_r_bank1(space, 0x00ffd9) );
+		logerror( "\tLicense:       %s [%X]\n", companies[snes_r_bank1(space, 0x00ffda)], snes_r_bank1(space, 0x00ffda) );
+		logerror( "\tVersion:       1.%d\n", snes_r_bank1(space, 0x00ffdb) );
+		logerror( "\tInv Checksum:  %X %X\n", snes_r_bank1(space, 0x00ffdd), snes_r_bank1(space, 0x00ffdc) );
+		logerror( "\tChecksum:      %X %X\n", snes_r_bank1(space, 0x00ffdf), snes_r_bank1(space, 0x00ffde) );
+		logerror( "\tNMI Address:   %2X%2Xh\n", snes_r_bank1(space, 0x00fffb), snes_r_bank1(space, 0x00fffa) );
+		logerror( "\tStart Address: %2X%2Xh\n\n", snes_r_bank1(space, 0x00fffd), snes_r_bank1(space, 0x00fffc) );
 
 		if (!supported_type)
 			logerror("WARNING: This cart type \"%s\" is not supported yet!\n", types[has_addon_chip]);

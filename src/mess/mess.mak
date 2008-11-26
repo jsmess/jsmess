@@ -392,6 +392,7 @@ DRVLIBS = \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
+	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ut88.a \
@@ -451,7 +452,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/nascom1.a \
 #	$(MESSOBJ)/nec.a \
 #	$(MESSOBJ)/necpc.a \
-#	$(MESSOBJ)/nintendo.a \
 #	$(MESSOBJ)/osborne.a \
 #	$(MESSOBJ)/pasogo.a \
 #	$(MESSOBJ)/pc.a \

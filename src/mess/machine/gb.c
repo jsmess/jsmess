@@ -166,40 +166,42 @@ static void gb_init_regs(running_machine *machine) {
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w( machine, 0x05, 0x00 );		/* TIMECNT */
-	gb_io_w( machine, 0x06, 0x00 );		/* TIMEMOD */
+	gb_io_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
+	gb_io_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
 }
 
-static void gb_rom16_0000( UINT8 *addr ) {
-	memory_set_bankptr( 5, addr );
-	memory_set_bankptr( 10, addr + 0x0100 );
+static void gb_rom16_0000( running_machine *machine, UINT8 *addr ) {
+	memory_set_bankptr( machine, 5, addr );
+	memory_set_bankptr( machine, 10, addr + 0x0100 );
 }
 
-static void gb_rom16_4000( UINT8 *addr ) {
-	memory_set_bankptr( 1, addr );
-	memory_set_bankptr( 4, addr + 0x2000 );
+static void gb_rom16_4000( running_machine *machine, UINT8 *addr ) {
+	memory_set_bankptr( machine, 1, addr );
+	memory_set_bankptr( machine, 4, addr + 0x2000 );
 }
 
-static void gb_rom8_4000( UINT8 *addr ) {
-	memory_set_bankptr( 1, addr );
+static void gb_rom8_4000( running_machine *machine, UINT8 *addr ) {
+	memory_set_bankptr( machine, 1, addr );
 }
 
-static void gb_rom8_6000( UINT8 *addr ) {
-	memory_set_bankptr( 4, addr );
+static void gb_rom8_6000( running_machine *machine, UINT8 *addr ) {
+	memory_set_bankptr( machine, 4, addr );
 }
 
 static void gb_init(running_machine *machine) {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	/* Initialize the memory banks */
 	MBC1Mode = 0;
 	MBC3RTCBank = 0;
 	ROMBank = ROMBank00 + 1;
 	RAMBank = 0;
 	if ( MBCType != MBC_MEGADUCK ) {
-		gb_rom16_4000( ROMMap[ROMBank] );
-		memory_set_bankptr (2, RAMMap[RAMBank] ? RAMMap[RAMBank] : gb_dummy_ram_bank);
+		gb_rom16_4000( machine, ROMMap[ROMBank] );
+		memory_set_bankptr (machine, 2, RAMMap[RAMBank] ? RAMMap[RAMBank] : gb_dummy_ram_bank);
 	} else {
-		memory_set_bankptr( 1, ROMMap[ROMBank] );
-		memory_set_bankptr( 10, ROMMap[0] );
+		memory_set_bankptr( machine, 1, ROMMap[ROMBank] );
+		memory_set_bankptr( machine, 10, ROMMap[0] );
 	}
 
 	/* Set handlers based on the Memory Bank Controller in the cart */
@@ -208,63 +210,63 @@ static void gb_init(running_machine *machine) {
 		case MBC_NONE:
 			break;
 		case MBC_MMM01:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_rom_bank_mmm01_0000_w );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_mmm01_2000_w);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, gb_rom_bank_mmm01_4000_w);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, gb_rom_bank_mmm01_6000_w);
+			memory_install_write8_handler( space, 0x0000, 0x1fff, 0, 0, gb_rom_bank_mmm01_0000_w );
+			memory_install_write8_handler( space, 0x2000, 0x3fff, 0, 0, gb_rom_bank_mmm01_2000_w);
+			memory_install_write8_handler( space, 0x4000, 0x5fff, 0, 0, gb_rom_bank_mmm01_4000_w);
+			memory_install_write8_handler( space, 0x6000, 0x7fff, 0, 0, gb_rom_bank_mmm01_6000_w);
 			break;
 		case MBC_MBC1:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable );	/* We don't emulate RAM enable yet */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc1 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc1 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, gb_mem_mode_select_mbc1 );
+			memory_install_write8_handler( space, 0x0000, 0x1fff, 0, 0, gb_ram_enable );	/* We don't emulate RAM enable yet */
+			memory_install_write8_handler( space, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc1 );
+			memory_install_write8_handler( space, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc1 );
+			memory_install_write8_handler( space, 0x6000, 0x7fff, 0, 0, gb_mem_mode_select_mbc1 );
 			break;
 		case MBC_MBC2:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc2 );
+			memory_install_write8_handler( space, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc2 );
 			break;
 		case MBC_MBC3:
 		case MBC_HUC1:	/* Possibly wrong */
 		case MBC_HUC3:	/* Possibly wrong */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable );	/* We don't emulate RAM enable yet */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc3 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc3 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, gb_mem_mode_select_mbc3 );
+			memory_install_write8_handler( space, 0x0000, 0x1fff, 0, 0, gb_ram_enable );	/* We don't emulate RAM enable yet */
+			memory_install_write8_handler( space, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc3 );
+			memory_install_write8_handler( space, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc3 );
+			memory_install_write8_handler( space, 0x6000, 0x7fff, 0, 0, gb_mem_mode_select_mbc3 );
 			break;
 		case MBC_MBC5:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc5 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc5 );
+			memory_install_write8_handler( space, 0x0000, 0x1fff, 0, 0, gb_ram_enable );
+			memory_install_write8_handler( space, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc5 );
+			memory_install_write8_handler( space, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc5 );
 			break;
 		case MBC_MBC6:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_bank_select_mbc6 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, gb_rom_bank_select_mbc6_1 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, gb_rom_bank_select_mbc6_2 );
+			memory_install_write8_handler( space, 0x0000, 0x1fff, 0, 0, gb_ram_bank_select_mbc6 );
+			memory_install_write8_handler( space, 0x2000, 0x2fff, 0, 0, gb_rom_bank_select_mbc6_1 );
+			memory_install_write8_handler( space, 0x3000, 0x3fff, 0, 0, gb_rom_bank_select_mbc6_2 );
 			break;
 		case MBC_MBC7:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, gb_rom_bank_select_mbc7 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x7fff, 0, 0, gb_rom_bank_unknown_mbc7 );
+			memory_install_write8_handler( space, 0x0000, 0x1fff, 0, 0, gb_ram_enable );
+			memory_install_write8_handler( space, 0x2000, 0x2fff, 0, 0, gb_rom_bank_select_mbc7 );
+			memory_install_write8_handler( space, 0x3000, 0x7fff, 0, 0, gb_rom_bank_unknown_mbc7 );
 			break;
 		case MBC_TAMA5:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, gb_ram_tama5 );
+			memory_install_write8_handler( space, 0xA000, 0xBFFF, 0, 0, gb_ram_tama5 );
 			break;
 		case MBC_WISDOM:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, gb_rom_bank_select_wisdom );
+			memory_install_write8_handler( space, 0x0000, 0x3fff, 0, 0, gb_rom_bank_select_wisdom );
 			break;
 		case MBC_MBC1_KOR:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable ); /* We don't emulate RAM enable yet */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc1_kor );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc1_kor );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, gb_mem_mode_select_mbc1_kor );
+			memory_install_write8_handler( space, 0x0000, 0x1fff, 0, 0, gb_ram_enable ); /* We don't emulate RAM enable yet */
+			memory_install_write8_handler( space, 0x2000, 0x3fff, 0, 0, gb_rom_bank_select_mbc1_kor );
+			memory_install_write8_handler( space, 0x4000, 0x5fff, 0, 0, gb_ram_bank_select_mbc1_kor );
+			memory_install_write8_handler( space, 0x6000, 0x7fff, 0, 0, gb_mem_mode_select_mbc1_kor );
 			break;
 
 		case MBC_MEGADUCK:
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0001, 0x0001, 0, 0, megaduck_rom_bank_select_type1 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xB000, 0xB000, 0, 0, megaduck_rom_bank_select_type2 );
+			memory_install_write8_handler( space, 0x0001, 0x0001, 0, 0, megaduck_rom_bank_select_type1 );
+			memory_install_write8_handler( space, 0xB000, 0xB000, 0, 0, megaduck_rom_bank_select_type2 );
 			break;
 	}
 
-	gb_sound_w( machine, 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w( space, 0x16, 0x00 );       /* Initialize sound hardware */
 
 	/* Allocate the serial timer, and disable it */
 	gb_serial_timer = timer_alloc( gb_serial_timer_proc , NULL);
@@ -287,8 +289,8 @@ MACHINE_RESET( gb )
 	gb_video_init( machine, GB_VIDEO_DMG );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(5, memory_region(machine, "main") );
-	memory_set_bankptr(10, ROMMap[ROMBank00] + 0x0100 );
+	memory_set_bankptr(machine, 5, memory_region(machine, "main") );
+	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] + 0x0100 );
 
 	gb_timer.divcount = 0x0004;
 }
@@ -301,16 +303,16 @@ MACHINE_RESET( sgb )
 
 	gb_init_regs(machine);
 
-	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
-	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100 );
+	memory_set_bankptr(machine, 5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
+	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100 );
 
 	sgb_tile_data = auto_malloc( 0x2000 );
 	memset( sgb_tile_data, 0, 0x2000 );
 
 	/* Initialize the Sound Registers */
-	gb_sound_w(machine, 0x16,0xF0);	/* F0 for SGB */
-	gb_sound_w(machine, 0x15,0xF3);
-	gb_sound_w(machine, 0x14,0x77);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x16,0xF0);	/* F0 for SGB */
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x15,0xF3);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x14,0x77);
 
 	sgb_window_mask = 0;
 	memset( sgb_pal_map, 0, sizeof(sgb_pal_map) );
@@ -338,13 +340,13 @@ MACHINE_RESET( gbpocket )
 	gb_init_regs(machine);
 
 	/* Initialize the Sound registers */
-	gb_sound_w(machine, 0x16,0x80);
-	gb_sound_w(machine, 0x15,0xF3);
-	gb_sound_w(machine, 0x14,0x77);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x16,0x80);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x15,0xF3);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
-	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
-	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
+	memory_set_bankptr(machine, 5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
+	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
 
 	gb_timer.divcount = 0xABC8;
 }
@@ -360,28 +362,28 @@ MACHINE_RESET( gbc )
 	gb_init_regs(machine);
 
 	/* Initialize the Sound registers */
-	gb_sound_w(machine, 0x16, 0x80);
-	gb_sound_w(machine, 0x15, 0xF3);
-	gb_sound_w(machine, 0x14, 0x77);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x16, 0x80);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x15, 0xF3);
+	gb_sound_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x14, 0x77);
 
-	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
-	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
+	memory_set_bankptr(machine, 5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
+	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ ) {
 		GBC_RAMMap[ii] = mess_ram + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (GBC_RAMMap[ii], 0, 0x1000);
 	}
-	gbc_io2_w( machine, 0x30, 0x00 );
+	gbc_io2_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x30, 0x00 );
 
 	/* Initialise registers */
-	gb_io_w( machine, 0x6C, 0xFE );
-	gb_io_w( machine, 0x72, 0x00 );
-	gb_io_w( machine, 0x73, 0x00 );
-	gb_io_w( machine, 0x74, 0x8F );
-	gb_io_w( machine, 0x75, 0x00 );
-	gb_io_w( machine, 0x76, 0x00 );
-	gb_io_w( machine, 0x77, 0x00 );
+	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x6C, 0xFE );
+	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x72, 0x00 );
+	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x73, 0x00 );
+	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x74, 0x8F );
+	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x75, 0x00 );
+	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x76, 0x00 );
+	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x77, 0x00 );
 
 	/* Are we in colour or mono mode? */
 	if( gb_cart[0x143] == 0x80 || gb_cart[0x143] == 0xC0 )
@@ -404,9 +406,9 @@ static void gb_machine_stop(running_machine *machine)
 	image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), gb_cart_ram, RAMBanks * 0x2000 );
 }
 
-static void gb_set_mbc1_banks( void ) {
-	gb_rom16_4000( ROMMap[ ROMBank ] );
-	memory_set_bankptr( 2, RAMMap[ MBC1Mode ? ( ROMBank >> 5 ) : 0 ] );
+static void gb_set_mbc1_banks( running_machine *machine ) {
+	gb_rom16_4000( machine, ROMMap[ ROMBank ] );
+	memory_set_bankptr( machine, 2, RAMMap[ MBC1Mode ? ( ROMBank >> 5 ) : 0 ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
@@ -418,7 +420,7 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc1 )
 
 	ROMBank = ( ROMBank & 0x01E0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_banks();
+	gb_set_mbc1_banks( space->machine );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc2 )
@@ -432,12 +434,12 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc2 )
 	if( offset & 0x0100 )
 		ROMBank = ( ROMBank & 0x100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( ROMMap[ROMBank] );
+	gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
 {
-	logerror( "0x%04X: write to mbc3 rom bank select register 0x%04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+	logerror( "0x%04X: write to mbc3 rom bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 	data &= 0x7F; /* Only uses lower 7 bits */
 	/* Selecting bank 0 == selecting bank 1 */
 	if( data == 0 )
@@ -445,7 +447,7 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc3 )
 
 	ROMBank = ( ROMBank & 0x0100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( ROMMap[ROMBank] );
+	gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
@@ -454,25 +456,25 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc5 )
 	  Writing into 2000-2FFF sets the lower 8 bits
 	  Writing into 3000-3FFF sets the 9th bit
 	*/
-	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 	if( offset & 0x1000 ) {
 		ROMBank = (ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
 	} else {
 		ROMBank = (ROMBank & 0x100 ) | data;
 	}
 	/* Switch banks */
-	gb_rom16_4000( ROMMap[ROMBank] );
+	gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc6 ) {
-	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 ) {
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", activecpu_get_pc(), 0x2000 + offset, data );
+	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x2000 + offset, data );
 	if ( offset & 0x0800 ) {
 		if ( data == 0x00 ) {
-			gb_rom8_4000( ROMMap[ROMBank>>1] + ( ( ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_4000( space->machine, ROMMap[ROMBank>>1] + ( ( ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	} else {
 		ROMBank = data;
@@ -480,10 +482,10 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc6_1 ) {
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 ) {
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", activecpu_get_pc(), 0x3000 + offset, data );
+	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x3000 + offset, data );
 	if ( offset & 0x0800 ) {
 		if ( data == 0x00 ) {
-			gb_rom8_6000( ROMMap[ROMBank00>>1] + ( ( ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_6000( space->machine, ROMMap[ROMBank00>>1] + ( ( ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	} else {
 		ROMBank00 = data;
@@ -491,16 +493,16 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc6_2 ) {
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc7 ) {
-	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", activecpu_get_pc(), 0x2000 + offset, data );
+	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x2000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 ) {
 		ROMBank = data;
-		gb_rom16_4000( ROMMap[ROMBank] );
+		gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 	}
 }
 
 static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 ) {
-        logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", activecpu_get_pc(), 0x3000 + offset, data );
+        logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0x3000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 ) {
 		switch( offset & 0x7000 ) {
@@ -515,12 +517,12 @@ static WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 ) {
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_wisdom ) {
-	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", activecpu_get_pc(), offset );
+	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", cpu_get_pc( space->cpu ), offset );
 	/* The address determines the bank to select */
 	ROMBank = ( offset << 1 ) & 0x1FF;
-	memory_set_bankptr( 5, ROMMap[ ROMBank ] );
-	memory_set_bankptr( 10, ROMMap[ ROMBank ] + 0x0100 );
-	gb_rom16_4000( ROMMap[ ROMBank + 1 ] );
+	memory_set_bankptr( space->machine, 5, ROMMap[ ROMBank ] );
+	memory_set_bankptr( space->machine, 10, ROMMap[ ROMBank ] + 0x0100 );
+	gb_rom16_4000( space->machine, ROMMap[ ROMBank + 1 ] );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
@@ -531,56 +533,56 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
 	ROMBank = ( ROMBank & 0x1F ) | ( data << 5 );
 
 	/* Switch banks */
-	gb_set_mbc1_banks();
+	gb_set_mbc1_banks( space->machine );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc3 )
 {
-	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 	if( data & 0x8 ) {	/* RTC banks */
 		if ( CartType & TIMER ) {
 			MBC3RTCBank = data & 0x07;
 			if ( data < 5 ) {
 				memset( MBC3RTCData, MBC3RTCMap[MBC3RTCBank], 0x2000 );
-				memory_set_bankptr( 2, MBC3RTCData );
+				memory_set_bankptr( space->machine, 2, MBC3RTCData );
 			}
 		}
 	} else {	/* RAM banks */
 		RAMBank = data & 0x3;
 		MBC3RTCBank = 0xFF;
 		/* Switch banks */
-		memory_set_bankptr( 2, RAMMap[RAMBank] );
+		memory_set_bankptr( space->machine, 2, RAMMap[RAMBank] );
 	}
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc5 )
 {
-	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 	data &= 0x0F;
 	if( CartType & RUMBLE ) {
 		data &= 0x7;
 	}
 	RAMBank = data;
 	/* Switch banks */
-	memory_set_bankptr (2, RAMMap[RAMBank] );
+	memory_set_bankptr (space->machine, 2, RAMMap[RAMBank] );
 }
 
 WRITE8_HANDLER ( gb_ram_enable )
 {
 	/* FIXME: Currently we don't handle this, but a value of 0xA will enable
 	 * writing to the cart's RAM banks */
-	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 }
 
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1 )
 {
 	MBC1Mode = data & 0x1;
-	gb_set_mbc1_banks();
+	gb_set_mbc1_banks( space->machine );
 }
 
 static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 {
-        logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", activecpu_get_pc(), offset, data );
+        logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), offset, data );
 	if( CartType & TIMER ) {
 		/* FIXME: RTC Latch goes here */
 		MBC3RTCMap[0] = 50;    /* Seconds */
@@ -592,17 +594,17 @@ static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 }
 
 static WRITE8_HANDLER( gb_ram_tama5 ) {
-	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", activecpu_get_pc(), 0xA000 + offset, data );
+	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", cpu_get_pc( space->cpu ), 0xA000 + offset, data );
 	switch( offset & 0x0001 ) {
 	case 0x0000:    /* Write to data register */
 		switch( gbLastTama5Command ) {
 		case 0x00:      /* Bits 0-3 for rom bank selection */
 			ROMBank = ( ROMBank & 0xF0 ) | ( data & 0x0F );
-			gb_rom16_4000( ROMMap[ROMBank] );
+			gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 			break;
 		case 0x01:      /* Bit 4(-7?) for rom bank selection */
 			ROMBank = ( ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			gb_rom16_4000( ROMMap[ROMBank] );
+			gb_rom16_4000( space->machine, ROMMap[ROMBank] );
 			break;
 		case 0x04:      /* Data to write lo */
 			gbTama5Byte = ( gbTama5Byte & 0xF0 ) | ( data & 0x0F );
@@ -632,7 +634,7 @@ static WRITE8_HANDLER( gb_ram_tama5 ) {
 				}
 			case 0x80:      /* Unknown, some kind of read (when 07=01)/write (when 07=00/02) */
 			default:
-				logerror( "0x%04X: Unknown addressing mode\n", activecpu_get_pc() );
+				logerror( "0x%04X: Unknown addressing mode\n", cpu_get_pc( space->cpu ) );
 				break;
 			}
 			break;
@@ -649,7 +651,7 @@ static WRITE8_HANDLER( gb_ram_tama5 ) {
 			break;
 		case 0x0A:      /* Are we ready for the next command? */
 			MBC3RTCData[0] = 0x01;
-			memory_set_bankptr( 2, MBC3RTCData );
+			memory_set_bankptr( space->machine, 2, MBC3RTCData );
 			break;
 		case 0x0C:      /* Data read register lo */
 			MBC3RTCData[0] = gbTama5Byte & 0x0F;
@@ -658,7 +660,7 @@ static WRITE8_HANDLER( gb_ram_tama5 ) {
 			MBC3RTCData[0] = ( gbTama5Byte & 0xF0 ) >> 4;
 			break;
 		default:
-			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", activecpu_get_pc(), data );
+			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", cpu_get_pc( space->cpu ), data );
 			break;
 		}
 		gbLastTama5Command = data;
@@ -674,32 +676,32 @@ static UINT8 mmm01_bank;
 static UINT8 mmm01_bank_mask;
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w ) {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x000 );
 	if ( data & 0x40 ) {
 		mmm01_bank_offset = mmm01_reg1;
-		memory_set_bankptr( 5, ROMMap[ mmm01_bank_offset ] );
-		memory_set_bankptr( 10, ROMMap[ mmm01_bank_offset ] + 0x0100 );
-		gb_rom16_4000( ROMMap[ mmm01_bank_offset + mmm01_bank ] );
+		memory_set_bankptr( space->machine, 5, ROMMap[ mmm01_bank_offset ] );
+		memory_set_bankptr( space->machine, 10, ROMMap[ mmm01_bank_offset ] + 0x0100 );
+		gb_rom16_4000( space->machine, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
 	}
 }
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w ) {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x2000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x2000 );
 
 	mmm01_reg1 = data & ROMMask;
 	mmm01_bank = mmm01_reg1 & mmm01_bank_mask;
 	if ( mmm01_bank == 0 ) {
 		mmm01_bank = 1;
 	}
-	gb_rom16_4000( ROMMap[ mmm01_bank_offset + mmm01_bank ] );
+	gb_rom16_4000( space->machine, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w ) {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x4000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x4000 );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w ) {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x6000 );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", cpu_get_pc( space->cpu ), data, offset+0x6000 );
 	/* Not sure if this is correct, Taito Variety Pack sets these values */
 	/* Momotarou Collection 2 writes 01 and 21 here */
 	switch( data ) {
@@ -711,12 +713,12 @@ static WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w ) {
 
 /* Korean MBC1 variant mapping */
 
-static void gb_set_mbc1_kor_banks( void ) {
+static void gb_set_mbc1_kor_banks( running_machine *machine ) {
 	if ( ROMBank & 0x30 ) {
-		gb_rom16_0000( ROMMap[ ROMBank & 0x30 ] );
+		gb_rom16_0000( machine, ROMMap[ ROMBank & 0x30 ] );
 	}
-	gb_rom16_4000( ROMMap[ ROMBank ] );
-	memory_set_bankptr( 2, RAMMap[ MBC1Mode ? ( ROMBank >> 5 ) : 0 ] );
+	gb_rom16_4000( machine, ROMMap[ ROMBank ] );
+	memory_set_bankptr( machine, 2, RAMMap[ MBC1Mode ? ( ROMBank >> 5 ) : 0 ] );
 }
 
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
@@ -728,7 +730,7 @@ static WRITE8_HANDLER( gb_rom_bank_select_mbc1_kor )
 
 	ROMBank = ( ROMBank & 0x01F0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_kor_banks();
+	gb_set_mbc1_kor_banks( space->machine );
 }
 
 static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor )
@@ -739,13 +741,13 @@ static WRITE8_HANDLER( gb_ram_bank_select_mbc1_kor )
 	ROMBank = ( ROMBank & 0x0F ) | ( data << 4 );
 
 	/* Switch banks */
-	gb_set_mbc1_kor_banks();
+	gb_set_mbc1_kor_banks( space->machine );
 }
 
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1_kor )
 {
 	MBC1Mode = data & 0x1;
-	gb_set_mbc1_kor_banks();
+	gb_set_mbc1_kor_banks( space->machine );
 }
 
 WRITE8_HANDLER ( gb_io_w )
@@ -757,9 +759,9 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x00:						/* JOYP - Joypad */
 		JOYPAD = 0xCF | data;
 		if (!(data & 0x20))
-			JOYPAD &= (input_port_read(machine, "INPUTS") >> 4) | 0xF0;
+			JOYPAD &= (input_port_read(space->machine, "INPUTS") >> 4) | 0xF0;
 		if (!(data & 0x10))
-			JOYPAD &= input_port_read(machine, "INPUTS") | 0xF0;
+			JOYPAD &= input_port_read(space->machine, "INPUTS") | 0xF0;
 		return;
 	case 0x01:						/* SB - Serial transfer data */
 		break;
@@ -781,7 +783,7 @@ WRITE8_HANDLER ( gb_io_w )
 	case 0x04:						/* DIV - Divider register */
 		/* Force increment of TIMECNT register */
 		if ( gb_timer.divcount >= 16 )
-			gb_timer_increment(machine);
+			gb_timer_increment(space->machine);
 		gb_timer.divcount = 0;
 		return;
 	case 0x05:						/* TIMA - Timer counter */
@@ -802,7 +804,7 @@ WRITE8_HANDLER ( gb_io_w )
 		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) ) {
 			/* Check if TIMECNT should be incremented */
 			if ( ( gb_timer.divcount & ( gb_timer.shift_cycles - 1 ) ) >= ( gb_timer.shift_cycles >> 1 ) ) {
-				gb_timer_increment(machine);
+				gb_timer_increment(space->machine);
 			}
 		}
 		gb_timer.shift = timer_shifts[data & 0x03];
@@ -810,7 +812,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
-		cpunum_set_reg( 0, LR35902_IF, data );
+		cpu_set_reg( space->machine->cpu[0], LR35902_IF, data );
 		break;
 	}
 
@@ -821,9 +823,9 @@ WRITE8_HANDLER ( gb_io2_w )
 {
 	if ( offset == 0x10 ) {
 		/* disable BIOS ROM */
-		memory_set_bankptr(5, ROMMap[ROMBank00]);
+		memory_set_bankptr(space->machine, 5, ROMMap[ROMBank00]);
 	} else {
-		gb_video_w( machine, offset, data );
+		gb_video_w( space, offset, data );
 	}
 }
 
@@ -878,7 +880,7 @@ WRITE8_HANDLER ( sgb_io_w )
 				sgb_bitcount = 0;
 				sgb_start = 1;
 				sgb_rest = 0;
-				JOYPAD = 0x0F & ((input_port_read(machine, "INPUTS") >> 4) | input_port_read(machine, "INPUTS") | 0xF0);
+				JOYPAD = 0x0F & ((input_port_read(space->machine, "INPUTS") >> 4) | input_port_read(space->machine, "INPUTS") | 0xF0);
 				break;
 			case 0x10:				   /* data true */
 				if (sgb_rest)
@@ -900,7 +902,7 @@ WRITE8_HANDLER ( sgb_io_w )
 					}
 					sgb_rest = 0;
 				}
-				JOYPAD = 0x1F & ((input_port_read(machine, "INPUTS") >> 4) | 0xF0);
+				JOYPAD = 0x1F & ((input_port_read(space->machine, "INPUTS") >> 4) | 0xF0);
 				break;
 			case 0x20:				/* data false */
 				if (sgb_rest)
@@ -1321,7 +1323,7 @@ WRITE8_HANDLER ( sgb_io_w )
 					}
 					sgb_rest = 0;
 				}
-				JOYPAD = 0x2F & (input_port_read(machine, "INPUTS") | 0xF0);
+				JOYPAD = 0x2F & (input_port_read(space->machine, "INPUTS") | 0xF0);
 				break;
 			case 0x30:				   /* rest condition */
 				if (sgb_start)
@@ -1340,7 +1342,7 @@ WRITE8_HANDLER ( sgb_io_w )
 			return;
 		default:
 			/* we didn't handle the write, so pass it to the GB handler */
-			gb_io_w( machine, offset, data );
+			gb_io_w( space, offset, data );
 			return;
 	}
 
@@ -1350,12 +1352,12 @@ WRITE8_HANDLER ( sgb_io_w )
 /* Interrupt Enable register */
 READ8_HANDLER( gb_ie_r )
 {
-	return cpunum_get_reg( 0, LR35902_IE );
+	return cpu_get_reg( space->machine->cpu[0], LR35902_IE );
 }
 
 WRITE8_HANDLER ( gb_ie_w )
 {
-	cpunum_set_reg( 0, LR35902_IE, data & 0x1F );
+	cpu_set_reg( space->machine->cpu[0], LR35902_IE, data & 0x1F );
 }
 
 /* IO read */
@@ -1375,7 +1377,7 @@ READ8_HANDLER ( gb_io_r )
 			return gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | cpunum_get_reg( 0, LR35902_IF );
+			return 0xE0 | cpu_get_reg( space->machine->cpu[0], LR35902_IF );
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -1870,30 +1872,30 @@ WRITE8_HANDLER ( gbc_io2_w )
 {
 	switch( offset ) {
 		case 0x0D:	/* KEY1 - Prepare speed switch */
-			cpunum_set_reg( 0, LR35902_SPEED, data );
+			cpu_set_reg( space->machine->cpu[0], LR35902_SPEED, data );
 			return;
 		case 0x16:	/* RP - Infrared port */
 			break;
 		case 0x30:	/* SVBK - RAM bank select */
 			GBC_RAMBank = data & 0x7;
-			memory_set_bankptr (3, GBC_RAMMap[GBC_RAMBank]);
+			memory_set_bankptr (space->machine, 3, GBC_RAMMap[GBC_RAMBank]);
 			break;
 		default:
 			break;
 	}
-	gbc_video_w( machine, offset, data );
+	gbc_video_w( space, offset, data );
 }
 
 READ8_HANDLER( gbc_io2_r ) {
 	switch( offset ) {
 	case 0x0D:	/* KEY1 */
-		return cpunum_get_reg( 0, LR35902_SPEED );
+		return cpu_get_reg( space->machine->cpu[0], LR35902_SPEED );
 	case 0x16:	/* RP - Infrared port */
 		break;
 	default:
 		break;
 	}
-	return gbc_video_r( machine, offset );
+	return gbc_video_r( space, offset );
 }
 
 /****************************************************************************
@@ -1953,7 +1955,7 @@ MACHINE_RESET( megaduck )
 	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) ) {
 		offset ^= 0x0C;
 	}
-	data = gb_video_r( machine, offset );
+	data = gb_video_r( space, offset );
 	if ( offset )
 		return data;
 	return BITSWAP8(data,7,0,5,4,6,3,2,1);
@@ -1967,7 +1969,7 @@ WRITE8_HANDLER ( megaduck_video_w )
 	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) ) {
 		offset ^= 0x0C;
 	}
-	gb_video_w(machine, offset, data );
+	gb_video_w(space, offset, data );
 }
 
 /* Map megaduck audio offset to game boy audio offsets */
@@ -1976,24 +1978,24 @@ static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 
 
 WRITE8_HANDLER( megaduck_sound_w1 )
 {
-	gb_sound_w( machine, megaduck_sound_offsets[offset], data );
+	gb_sound_w( space, megaduck_sound_offsets[offset], data );
 }
 
  READ8_HANDLER( megaduck_sound_r1 )
 {
-	return gb_sound_r( machine, megaduck_sound_offsets[offset] );
+	return gb_sound_r( space, megaduck_sound_offsets[offset] );
 }
 
 WRITE8_HANDLER( megaduck_sound_w2 )
 {
 	switch(offset) {
-		case 0x00:	gb_sound_w( machine, 0x10, data );	break;
-		case 0x01:	gb_sound_w( machine, 0x12, data );	break;
-		case 0x02:	gb_sound_w( machine, 0x11, data );	break;
-		case 0x03:	gb_sound_w( machine, 0x13, data );	break;
-		case 0x04:	gb_sound_w( machine, 0x14, data );	break;
-		case 0x05:	gb_sound_w( machine, 0x16, data );	break;
-		case 0x06:	gb_sound_w( machine, 0x15, data );	break;
+		case 0x00:	gb_sound_w( space, 0x10, data );	break;
+		case 0x01:	gb_sound_w( space, 0x12, data );	break;
+		case 0x02:	gb_sound_w( space, 0x11, data );	break;
+		case 0x03:	gb_sound_w( space, 0x13, data );	break;
+		case 0x04:	gb_sound_w( space, 0x14, data );	break;
+		case 0x05:	gb_sound_w( space, 0x16, data );	break;
+		case 0x06:	gb_sound_w( space, 0x15, data );	break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -2009,7 +2011,7 @@ WRITE8_HANDLER( megaduck_sound_w2 )
 
 READ8_HANDLER( megaduck_sound_r2 )
 {
-	return gb_sound_r(machine, 0x10 + megaduck_sound_offsets[offset]);
+	return gb_sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
 }
 
 WRITE8_HANDLER( megaduck_rom_bank_select_type1 )
@@ -2019,7 +2021,7 @@ WRITE8_HANDLER( megaduck_rom_bank_select_type1 )
 		ROMBank = data & ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr (1, ROMMap[ROMBank]);
+		memory_set_bankptr (space->machine, 1, ROMMap[ROMBank]);
 	}
 }
 
@@ -2030,8 +2032,8 @@ WRITE8_HANDLER( megaduck_rom_bank_select_type2 )
 		ROMBank = (data << 1) & ROMMask;
 
 		/* Switch banks */
-		memory_set_bankptr( 10, ROMMap[ROMBank]);
-		memory_set_bankptr( 1, ROMMap[ROMBank + 1]);
+		memory_set_bankptr( space->machine, 10, ROMMap[ROMBank]);
+		memory_set_bankptr( space->machine, 1, ROMMap[ROMBank + 1]);
 	}
 }
 

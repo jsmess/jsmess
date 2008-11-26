@@ -21,22 +21,22 @@
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(machine, 0x15);
+	return nes_psg_0_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(machine, 0x15, data);
+	nes_psg_0_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(machine, 0x17, data);
+	nes_psg_0_w(space, 0x17, data);
 }
 
 static WRITE8_HANDLER(nes_vh_sprite_dma_w)
 {
-	ppu2c0x_spriteram_dma(0, data);
+	ppu2c0x_spriteram_dma(space, 0, data);
 }
 
 static ADDRESS_MAP_START( nes_map, ADDRESS_SPACE_PROGRAM, 8 )
