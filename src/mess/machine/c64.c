@@ -116,7 +116,7 @@ static void c64_nmi(running_machine *machine)
 	{
 		if (is_c128(machine))
 		{
-			if (cpu_getactivecpu() == 0)
+			if (1) // this was never valid, there is no active CPU during a timer firing!  cpu_getactivecpu() == 0)
 			{
 				/* z80 */
 				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
@@ -329,7 +329,7 @@ static void c64_irq (running_machine *machine, int level)
 		DBG_LOG (3, "mos6510", ("irq %s\n", level ? "start" : "end"));
 		if (is_c128(machine))
 		{
-			if (0 && (cpu_getactivecpu() == 0))
+			if (0) // && (cpu_getactivecpu() == 0))
 			{
 				cpu_set_input_line(machine->cpu[0], 0, level);
 			}
@@ -449,17 +449,17 @@ WRITE8_HANDLER( c64_write_io )
 {
 	c64_io_mirror[ offset ] = data;
 	if (offset < 0x400) {
-		vic2_port_w (machine, offset & 0x3ff, data);
+		vic2_port_w (space, offset & 0x3ff, data);
 	} else if (offset < 0x800) {
-		sid6581_0_port_w (machine, offset & 0x3ff, data);
+		sid6581_0_port_w (space, offset & 0x3ff, data);
 	} else if (offset < 0xc00)
 		c64_colorram[offset & 0x3ff] = data | 0xf0;
 	else if (offset < 0xd00)
-		cia_0_w(machine, offset, data);
+		cia_0_w(space, offset, data);
 	else if (offset < 0xe00)
 	{
 		if (c64_cia1_on)
-			cia_1_w(machine, offset, data);
+			cia_1_w(space, offset, data);
 		else
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 	}
@@ -479,7 +479,7 @@ WRITE8_HANDLER(c64_ioarea_w)
 {
 	if (c64_io_enabled) 
 	{
-		c64_write_io(machine, offset, data);
+		c64_write_io(space, offset, data);
 	} 
 	else 
 	{
@@ -490,31 +490,31 @@ WRITE8_HANDLER(c64_ioarea_w)
 READ8_HANDLER( c64_read_io )
 {
 	if (offset < 0x400)
-		return vic2_port_r (machine, offset & 0x3ff);
+		return vic2_port_r (space, offset & 0x3ff);
 
 	else if (offset < 0x800)
-		return sid6581_0_port_r (machine, offset & 0x3ff);
+		return sid6581_0_port_r (space, offset & 0x3ff);
 
 	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];
 
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(0, 0, input_port_read(machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return cia_0_r(machine, offset);
+			cia_set_port_mask_value(0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+			return cia_0_r(space, offset);
 		}
 
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(0, 1, input_port_read(machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return cia_0_r(machine, offset);
+			cia_set_port_mask_value(0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+			return cia_0_r(space, offset);
 		}
 
 	else if (offset < 0xd00)
-		return cia_0_r(machine, offset);
+		return cia_0_r(space, offset);
 
 	else if (c64_cia1_on && (offset < 0xe00))
-		return cia_1_r(machine, offset);
+		return cia_1_r(space, offset);
 
 	DBG_LOG (1, "io read", ("%.3x\n", offset));
 
@@ -523,7 +523,7 @@ READ8_HANDLER( c64_read_io )
 
 READ8_HANDLER(c64_ioarea_r)
 {
-	return c64_io_enabled ? c64_read_io(machine, offset) : c64_io_ram_r_ptr[offset];
+	return c64_io_enabled ? c64_read_io(space, offset) : c64_io_ram_r_ptr[offset];
 }
 
 
@@ -645,7 +645,7 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	static int old = -1, exrom, game;
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
-	int data = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT) & 0x07;
+	int data = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
 
 	/* If nothing has changed or reset = 0, don't do anything */
 	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset) 
@@ -666,35 +666,35 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	{
 			c64_io_enabled = 1;		// charen has no effect in ultimax_mode
 
-			memory_set_bankptr (1, roml);
-			memory_set_bankptr (2, c64_memory + 0x8000);
-			memory_set_bankptr (3, c64_memory + 0xa000);
-			memory_set_bankptr (4, romh);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_NOP);
+			memory_set_bankptr (machine, 1, roml);
+			memory_set_bankptr (machine, 2, c64_memory + 0x8000);
+			memory_set_bankptr (machine, 3, c64_memory + 0xa000);
+			memory_set_bankptr (machine, 4, romh);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_NOP);
 	}
 	else
 	{
 		/* 0x8000-0x9000 */
 		if (loram && hiram && !c64_exrom)
 		{
-			memory_set_bankptr (1, roml);
-			memory_set_bankptr (2, c64_memory + 0x8000);
+			memory_set_bankptr (machine, 1, roml);
+			memory_set_bankptr (machine, 2, c64_memory + 0x8000);
 		}
 		else
 		{
-			memory_set_bankptr (1, c64_memory + 0x8000);
-			memory_set_bankptr (2, c64_memory + 0x8000);
+			memory_set_bankptr (machine, 1, c64_memory + 0x8000);
+			memory_set_bankptr (machine, 2, c64_memory + 0x8000);
 		}
 
 		/* 0xa000 */
 		if (hiram && !c64_game && !c64_exrom)
-			memory_set_bankptr (3, romh);
+			memory_set_bankptr (machine, 3, romh);
 
 		else if (loram && hiram && c64_game)
-			memory_set_bankptr (3, c64_basic);
+			memory_set_bankptr (machine, 3, c64_basic);
 
 		else
-			memory_set_bankptr (3, c64_memory + 0xa000);
+			memory_set_bankptr (machine, 3, c64_memory + 0xa000);
 
 		/* 0xd000 */
 		// RAM
@@ -724,8 +724,8 @@ static void c64_bankswitch(running_machine *machine, int reset)
 		}
 
 		/* 0xe000-0xf000 */
-		memory_set_bankptr (4, hiram ? c64_kernal : c64_memory + 0xe000);
-		memory_set_bankptr (5, c64_memory + 0xe000);
+		memory_set_bankptr (machine, 4, hiram ? c64_kernal : c64_memory + 0xe000);
+		memory_set_bankptr (machine, 5, c64_memory + 0xe000);
 	}
 
 	/* make sure the opbase function gets called each time */
@@ -796,14 +796,14 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 	if (is_c65(Machine))
 	{
 		// NPW 8-Feb-2004 - Don't know why I have to do this
-		//c65_bankswitch(Machine);
+		//c65_bankswitch(machine);
 	}
 
 	else if (!ultimax)
-		c64_bankswitch(Machine, 0);
+		c64_bankswitch(machine, 0);
 
-	c64_memory[0x000] = program_read_byte( 0 );
-	c64_memory[0x001] = program_read_byte( 1 );
+	c64_memory[0x000] = memory_read_byte( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0 );
+	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 1 );
 }
 
 UINT8 c64_m6510_port_read(UINT8 direction)
@@ -994,8 +994,8 @@ static void c64_common_driver_init (running_machine *machine)
 	cia6526_interface cia_intf[2];
 
 	/* configure the M6510 port */
-	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
-	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
 
 	if (!ultimax) 
 	{
@@ -1088,6 +1088,8 @@ void c64_common_init_machine (running_machine *machine)
 	vicirq = 0;
 }
 
+// FIXME: opbase handlers don't exist anymore!
+#if 0
 static OPBASE_HANDLER( c64_opbase ) 
 {
 	if ((address & 0xf000) == 0xd000) 
@@ -1113,7 +1115,7 @@ static OPBASE_HANDLER( c64_opbase )
 	}
 	return address;
 }
-
+#endif
 
 MACHINE_START( c64 )
 {
@@ -1128,7 +1130,7 @@ MACHINE_START( c64 )
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
 
-	memory_set_opbase_handler( 0, c64_opbase );
+//	memory_set_opbase_handler( 0, c64_opbase );
 }
 
 
@@ -1148,6 +1150,7 @@ static TIMER_CALLBACK( lightpen_tick )
 
 INTERRUPT_GEN( c64_frame_interrupt )
 {
+	running_machine *machine = Machine;
 	static int monitor = -1;
 	int value, i;
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
@@ -1297,7 +1300,8 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		c65_keyline = value;
 	}
 
-	vic2_frame_interrupt (machine, cpunum);
+// vic2_frame_interrupt does nothing so this is not necessary
+//	vic2_frame_interrupt (machine, cpunum);
 
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
 	timer_set(attotime_zero, NULL, 0, lightpen_tick);

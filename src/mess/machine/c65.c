@@ -51,7 +51,7 @@ static READ8_HANDLER(c65_read_mem)
 	if (offset <= 0x0FFFF)
 		result = c64_memory[offset];
 	else
-		result = program_read_byte(offset);
+		result = memory_read_byte(space, offset);
 	return result;
 }
 
@@ -60,7 +60,7 @@ static WRITE8_HANDLER(c65_write_mem)
 	if (offset <= 0x0FFFF)
 		c64_memory[offset] = data;
 	else
-		program_write_byte(offset, data);
+		memory_write_byte(space, offset, data);
 }
 
 static struct {
@@ -98,6 +98,7 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 	PAIR pair, src, dst, len;
 	UINT8 cmd, fill;
 	int i;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	switch (offset&3) {
 	case 2:
@@ -109,18 +110,18 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 		pair.b.h2=dma.data[2];
 		pair.b.h=dma.data[1];
 		pair.b.l=dma.data[0]=value;
-		cmd=c65_read_mem(machine, pair.d++);
+		cmd=c65_read_mem(space, pair.d++);
 		len.w.h=0;
-		len.b.l=c65_read_mem(machine, pair.d++);
-		len.b.h=c65_read_mem(machine, pair.d++);
+		len.b.l=c65_read_mem(space, pair.d++);
+		len.b.h=c65_read_mem(space, pair.d++);
 		src.b.h3=0;
-		fill=src.b.l=c65_read_mem(machine, pair.d++);
-		src.b.h=c65_read_mem(machine, pair.d++);
-		src.b.h2=c65_read_mem(machine, pair.d++);
+		fill=src.b.l=c65_read_mem(space, pair.d++);
+		src.b.h=c65_read_mem(space, pair.d++);
+		src.b.h2=c65_read_mem(space, pair.d++);
 		dst.b.h3=0;
-		dst.b.l=c65_read_mem(machine, pair.d++);
-		dst.b.h=c65_read_mem(machine, pair.d++);
-		dst.b.h2=c65_read_mem(machine, pair.d++);
+		dst.b.l=c65_read_mem(space, pair.d++);
+		dst.b.h=c65_read_mem(space, pair.d++);
+		dst.b.h2=c65_read_mem(space, pair.d++);
 
 		switch (cmd) {
 		case 0:
@@ -128,50 +129,50 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 			if (dump)
 				DBG_LOG(1,"dma copy job",
 						("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
-						 len.w.l, src.d, dst.d, c65_read_mem(machine, pair.d),
-						 c65_read_mem(machine, pair.d+1) ) );
+						 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
+						 c65_read_mem(space, pair.d+1) ) );
 			if ( (dma.version==1)
 				 &&( (src.d&0x400000)||(dst.d&0x400000)) ) {
 				if ( !(src.d&0x400000) ) {
 					dst.d&=~0x400000;
 					for (i=0; i<len.w.l; i++)
-						c65_write_mem(machine, dst.d--,c65_read_mem(machine, src.d++));
+						c65_write_mem(space, dst.d--,c65_read_mem(space, src.d++));
 				} else if ( !(dst.d&0x400000) ) {
 					src.d&=~0x400000;
 					for (i=0; i<len.w.l; i++)
-						c65_write_mem(machine, dst.d++,c65_read_mem(machine, src.d--));
+						c65_write_mem(space, dst.d++,c65_read_mem(space, src.d--));
 				} else {
 					src.d&=~0x400000;
 					dst.d&=~0x400000;
 					for (i=0; i<len.w.l; i++)
-						c65_write_mem(machine, --dst.d,c65_read_mem(machine, --src.d));
+						c65_write_mem(space, --dst.d,c65_read_mem(space, --src.d));
 				}
 			} else {
 				for (i=0; i<len.w.l; i++)
-					c65_write_mem(machine, dst.d++,c65_read_mem(machine, src.d++));
+					c65_write_mem(space, dst.d++,c65_read_mem(space, src.d++));
 			}
 			break;
 		case 3:
 			DBG_LOG(3,"dma fill job",
 					("len:%.4x value:%.2x dst:%.6x sub:%.2x modrm:%.2x\n",
-					 len.w.l, fill, dst.d, c65_read_mem(machine, pair.d),
-					 c65_read_mem(machine, pair.d+1)));
+					 len.w.l, fill, dst.d, c65_read_mem(space, pair.d),
+					 c65_read_mem(space, pair.d+1)));
 				for (i=0; i<len.w.l; i++)
-					c65_write_mem(machine, dst.d++,fill);
+					c65_write_mem(space, dst.d++,fill);
 				break;
 		case 0x30:
 			DBG_LOG(1,"dma copy down",
 					("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
-					 len.w.l, src.d, dst.d, c65_read_mem(machine, pair.d),
-					 c65_read_mem(machine, pair.d+1) ) );
+					 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
+					 c65_read_mem(space, pair.d+1) ) );
 			for (i=0; i<len.w.l; i++)
-				c65_write_mem(machine, dst.d--,c65_read_mem(machine, src.d--));
+				c65_write_mem(space, dst.d--,c65_read_mem(space, src.d--));
 			break;
 		default:
 			DBG_LOG(1,"dma job",
 					("cmd:%.2x len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
-					 cmd,len.w.l, src.d, dst.d, c65_read_mem(machine, pair.d),
-					 c65_read_mem(machine, pair.d+1)));
+					 cmd,len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
+					 c65_read_mem(space, pair.d+1)));
 		}
 		break;
 	default:
@@ -336,7 +337,7 @@ static void c65_fdc_state(void)
 
 static void c65_fdc_w(running_machine *machine, int offset, int data)
 {
-	DBG_LOG (1, "fdc write", ("%.5x %.2x %.2x\n", activecpu_get_pc(), offset, data));
+	DBG_LOG (1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->cpu[0]), offset, data));
 	switch (offset&0xf) {
 	case 0:
 		c65_fdc.reg[0]=data;
@@ -417,7 +418,7 @@ static int c65_fdc_r(running_machine *machine, int offset)
 		data=c65_fdc.reg[offset&0xf];
 		break;
 	}
-	DBG_LOG (1, "fdc read", ("%.5x %.2x %.2x\n", activecpu_get_pc(), offset, data));
+	DBG_LOG (1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->cpu[0]), offset, data));
 	return data;
 }
 
@@ -460,13 +461,13 @@ static WRITE8_HANDLER(c65_ram_expansion_w)
 		expansion_ram_begin = 0x80000;
 		expansion_ram_end = 0x80000 + (mess_ram_size - 128*1024) - 1;
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
+		memory_install_read8_handler(space, expansion_ram_begin, expansion_ram_end,
 			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, expansion_ram_begin, expansion_ram_end,
+		memory_install_write8_handler(space, expansion_ram_begin, expansion_ram_end,
 			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
 
 		if (data == 0x00)
-			memory_set_bankptr(16, mess_ram + 128*1024);
+			memory_set_bankptr(space->machine, 16, mess_ram + 128*1024);
 	}
 }
 
@@ -475,22 +476,22 @@ static WRITE8_HANDLER ( c65_write_io )
 	switch(offset&0xf00) {
 	case 0x000:
 		if (offset < 0x80)
-			vic3_port_w (machine, offset & 0x7f, data);
+			vic3_port_w (space, offset & 0x7f, data);
 		else if (offset < 0xa0) {
-			c65_fdc_w(machine, offset&0x1f,data);
+			c65_fdc_w(space->machine, offset&0x1f,data);
 		} else {
-			c65_ram_expansion_w(machine, offset&0x1f, data);
+			c65_ram_expansion_w(space, offset&0x1f, data);
 			/*ram expansion crtl optional */
 		}
 		break;
 	case 0x100:case 0x200: case 0x300:
-		vic3_palette_w(machine, offset-0x100,data);
+		vic3_palette_w(space, offset-0x100,data);
 		break;
 	case 0x400:
 		if (offset<0x420) /* maybe 0x20 */
-			sid6581_0_port_w (machine, offset & 0x3f, data);
+			sid6581_0_port_w (space, offset & 0x3f, data);
 		else if (offset<0x440)
-			sid6581_1_port_w(machine, offset&0x3f, data);
+			sid6581_1_port_w(space, offset&0x3f, data);
 		else
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
@@ -498,10 +499,10 @@ static WRITE8_HANDLER ( c65_write_io )
 		DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
 	case 0x600:
-		c65_6511_port_w(machine, offset&0xff,data);
+		c65_6511_port_w(space->machine, offset&0xff,data);
 		break;
 	case 0x700:
-		c65_dma_port_w(machine, offset&0xff, data);
+		c65_dma_port_w(space->machine, offset&0xff, data);
 		break;
 	}
 }
@@ -510,10 +511,10 @@ static WRITE8_HANDLER ( c65_write_io_dc00 )
 {
 	switch(offset&0xf00) {
 	case 0x000:
-		cia_0_w(machine, offset, data);
+		cia_0_w(space, offset, data);
 		break;
 	case 0x100:
-		cia_1_w(machine, offset, data);
+		cia_1_w(space, offset, data);
 		break;
 	case 0x200:
 	case 0x300:
@@ -527,11 +528,11 @@ static READ8_HANDLER ( c65_read_io )
 	switch(offset&0xf00) {
 	case 0x000:
 		if (offset < 0x80)
-			return vic3_port_r (machine, offset & 0x7f);
+			return vic3_port_r (space, offset & 0x7f);
 		if (offset < 0xa0) {
-			return c65_fdc_r(machine, offset&0x1f);
+			return c65_fdc_r(space->machine, offset&0x1f);
 		} else {
-			return c65_ram_expansion_r(machine, offset&0x1f);
+			return c65_ram_expansion_r(space, offset&0x1f);
 			/*return; ram expansion crtl optional */
 		}
 		break;
@@ -541,18 +542,18 @@ static READ8_HANDLER ( c65_read_io )
 		break;
 	case 0x400:
 		if (offset<0x420)
-			return sid6581_0_port_r(machine, offset & 0x3f);
+			return sid6581_0_port_r(space, offset & 0x3f);
 		if (offset<0x440)
-			return sid6581_1_port_r(machine, offset&0x3f);
+			return sid6581_1_port_r(space, offset&0x3f);
 		DBG_LOG (1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x500:
 		DBG_LOG (1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x600:
-		return c65_6511_port_r(machine, offset&0xff);
+		return c65_6511_port_r(space->machine, offset&0xff);
 	case 0x700:
-		return c65_dma_port_r(machine, offset&0xff);
+		return c65_dma_port_r(space->machine, offset&0xff);
 	}
 	return 0xff;
 }
@@ -561,9 +562,9 @@ static READ8_HANDLER ( c65_read_io_dc00 )
 {
 	switch(offset&0x300) {
 	case 0x000:
-		return cia_0_r(machine, offset);
+		return cia_0_r(space, offset);
 	case 0x100:
-		return cia_1_r(machine, offset);
+		return cia_1_r(space, offset);
 	case 0x200:
 	case 0x300:
 		DBG_LOG (1, "io read", ("%.3x\n", offset+0xc00));
@@ -586,8 +587,8 @@ static int c65_io_on=0, c65_io_dc00_on=0;
 static void c65_bankswitch_interface(int value)
 {
 	static int old=0;
-	read8_machine_func rh;
-	write8_machine_func wh;
+	read8_space_func rh;
+	write8_space_func wh;
 
 	DBG_LOG (2, "c65 bankswitch", ("%.2x\n",value));
 
@@ -595,8 +596,8 @@ static void c65_bankswitch_interface(int value)
 	{
 		if (value&1)
 		{
-			memory_set_bankptr (8, c64_colorram + 0x400);
-			memory_set_bankptr (9, c64_colorram + 0x400);
+			memory_set_bankptr (Machine, 8, c64_colorram + 0x400);
+			memory_set_bankptr (Machine, 9, c64_colorram + 0x400);
 			rh = SMH_BANK8;
 			wh = SMH_BANK9;
 		}
@@ -605,27 +606,27 @@ static void c65_bankswitch_interface(int value)
 			rh = c65_read_io_dc00;
 			wh = c65_write_io_dc00;
 		}
-		memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh);
-		memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh);
+		memory_install_read8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh);
+		memory_install_write8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh);
 	}
 
 	c65_io_dc00_on=!(value&1);
 #if 0
 	/* cartridge roms !?*/
-	if (value&0x08) { memory_set_bankptr (1, c64_roml); }
-	else { memory_set_bankptr (1, c64_memory + 0x8000); }
-	if (value&0x10) { memory_set_bankptr (2, c64_basic); }
-	else { memory_set_bankptr (2, c64_memory + 0xa000); }
+	if (value&0x08) { memory_set_bankptr (machine, 1, c64_roml); }
+	else { memory_set_bankptr (machine, 1, c64_memory + 0x8000); }
+	if (value&0x10) { memory_set_bankptr (machine, 2, c64_basic); }
+	else { memory_set_bankptr (machine, 2, c64_memory + 0xa000); }
 #endif
 	if ((old^value)&0x20) { /* bankswitching faulty when doing actual page */
-		if (value&0x20) { memory_set_bankptr (3, c65_interface); }
-		else { memory_set_bankptr (3, c64_memory + 0xc000); }
+		if (value&0x20) { memory_set_bankptr (Machine, 3, c65_interface); }
+		else { memory_set_bankptr (Machine, 3, c64_memory + 0xc000); }
 	}
 	c65_charset_select=value&0x40;
 #if 0
 	/* cartridge roms !?*/
-	if (value&0x80) { memory_set_bankptr (8, c64_kernal); }
-	else { memory_set_bankptr (6, c64_memory + 0xe000); }
+	if (value&0x80) { memory_set_bankptr (machine, 8, c64_kernal); }
+	else { memory_set_bankptr (machine, 6, c64_memory + 0xe000); }
 #endif
 	old=value;
 }
@@ -634,10 +635,10 @@ void c65_bankswitch (running_machine *machine)
 {
 	static int old = -1;
 	int data, loram, hiram, charen;
-	read8_machine_func rh4, rh8;
-	write8_machine_func wh5, wh9;
+	read8_space_func rh4, rh8;
+	write8_space_func wh5, wh9;
 
-	data = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT);
+	data = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 	if (data == old)
 		return;
 
@@ -649,25 +650,25 @@ void c65_bankswitch (running_machine *machine)
 	if ((!c64_game && c64_exrom)
 		|| (loram && hiram && !c64_exrom))
 	{
-		memory_set_bankptr (1, c64_roml);
+		memory_set_bankptr (machine, 1, c64_roml);
 	}
 	else
 	{
-		memory_set_bankptr (1, c64_memory + 0x8000);
+		memory_set_bankptr (machine, 1, c64_memory + 0x8000);
 	}
 
 	if ((!c64_game && c64_exrom && hiram)
 		|| (!c64_exrom))
 	{
-		memory_set_bankptr (2, c64_romh);
+		memory_set_bankptr (machine, 2, c64_romh);
 	}
 	else if (loram && hiram)
 	{
-		memory_set_bankptr (2, c64_basic);
+		memory_set_bankptr (machine, 2, c64_basic);
 	}
 	else
 	{
-		memory_set_bankptr (2, c64_memory + 0xa000);
+		memory_set_bankptr (machine, 2, c64_memory + 0xa000);
 	}
 
 	if ((!c64_game && c64_exrom)
@@ -676,8 +677,8 @@ void c65_bankswitch (running_machine *machine)
 		c65_io_on = 1;
 		rh4 = c65_read_io;
 		wh5 = c65_write_io;
-		memory_set_bankptr (6, c64_colorram);
-		memory_set_bankptr (7, c64_colorram);
+		memory_set_bankptr (machine, 6, c64_colorram);
+		memory_set_bankptr (machine, 7, c64_colorram);
 
 		if (c65_io_dc00_on)
 		{
@@ -688,49 +689,49 @@ void c65_bankswitch (running_machine *machine)
 		{
 			rh8 = SMH_BANK8;
 			wh9 = SMH_BANK9;
-			memory_set_bankptr (8, c64_colorram+0x400);
-			memory_set_bankptr (9, c64_colorram+0x400);
+			memory_set_bankptr (machine, 8, c64_colorram+0x400);
+			memory_set_bankptr (machine, 9, c64_colorram+0x400);
 		}
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, rh8);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0dc00, 0x0dfff, 0, 0, wh9);
+		memory_install_read8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh8);
+		memory_install_write8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh9);
 	}
 	else
 	{
 		c65_io_on = 0;
 		rh4 = SMH_BANK4;
 		wh5 = SMH_BANK5;
-		memory_set_bankptr(5, c64_memory+0xd000);
-		memory_set_bankptr(7, c64_memory+0xd800);
-		memory_set_bankptr(9, c64_memory+0xdc00);
+		memory_set_bankptr(machine, 5, c64_memory+0xd000);
+		memory_set_bankptr(machine, 7, c64_memory+0xd800);
+		memory_set_bankptr(machine, 9, c64_memory+0xdc00);
 		if (!charen && (loram || hiram))
 		{
-			memory_set_bankptr (4, c64_chargen);
-			memory_set_bankptr (6, c64_chargen+0x800);
-			memory_set_bankptr (8, c64_chargen+0xc00);
+			memory_set_bankptr (machine, 4, c64_chargen);
+			memory_set_bankptr (machine, 6, c64_chargen+0x800);
+			memory_set_bankptr (machine, 8, c64_chargen+0xc00);
 		}
 		else
 		{
-			memory_set_bankptr (4, c64_memory + 0xd000);
-			memory_set_bankptr (6, c64_memory + 0xd800);
-			memory_set_bankptr (8, c64_memory + 0xdc00);
+			memory_set_bankptr (machine, 4, c64_memory + 0xd000);
+			memory_set_bankptr (machine, 6, c64_memory + 0xd800);
+			memory_set_bankptr (machine, 8, c64_memory + 0xdc00);
 		}
 	}
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, rh4);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d000, 0x0d7ff, 0, 0, wh5);
+	memory_install_read8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, rh4);
+	memory_install_write8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, wh5);
 
 	if (!c64_game && c64_exrom)
 	{
-		memory_set_bankptr (10, c64_romh);
+		memory_set_bankptr (machine, 10, c64_romh);
 	}
 	else
 	{
 		if (hiram)
 		{
-			memory_set_bankptr (10, c64_kernal);
+			memory_set_bankptr (machine, 10, c64_kernal);
 		}
 		else
 		{
-			memory_set_bankptr (10, c64_memory + 0xe000);
+			memory_set_bankptr (machine, 10, c64_memory + 0xe000);
 		}
 	}
 	old = data;
@@ -779,11 +780,11 @@ static void c65_common_driver_init (running_machine *machine)
 {
 	c64_memory = auto_malloc(0x10000);
 	memset(c64_memory, 0, 0x10000);
-	memory_set_bankptr(11, c64_memory + 0x00000);
-	memory_set_bankptr(12, c64_memory + 0x08000);
-	memory_set_bankptr(13, c64_memory + 0x0a000);
-	memory_set_bankptr(14, c64_memory + 0x0c000);
-	memory_set_bankptr(15, c64_memory + 0x0e000);
+	memory_set_bankptr(machine, 11, c64_memory + 0x00000);
+	memory_set_bankptr(machine, 12, c64_memory + 0x08000);
+	memory_set_bankptr(machine, 13, c64_memory + 0x0a000);
+	memory_set_bankptr(machine, 14, c64_memory + 0x0c000);
+	memory_set_bankptr(machine, 15, c64_memory + 0x0e000);
 
 	/* C65 had no datasette port */
 	c64_tape_on = 0;

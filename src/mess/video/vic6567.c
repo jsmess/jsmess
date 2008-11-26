@@ -565,7 +565,7 @@ WRITE8_HANDLER ( vic2_port_w )
 		break;
 	}
 
-	cycles = (int)(activecpu_gettotalcycles() - vic2.rasterline_start_cpu_cycles);
+	cycles = (int)(cpu_get_total_cycles(space->cpu) - vic2.rasterline_start_cpu_cycles);
 
 	if (cycles > VIC2_CYCLESPERLINE - 1) cycles = VIC2_CYCLESPERLINE;
 	startx = VIC2_FIRSTRASTERCOLUMNS + cycles * 8 * (63 / vic2.totalcycles);
@@ -1407,9 +1407,10 @@ INTERRUPT_GEN( vic2_raster_irq )
 {
 	int i,j;
 //	int scanline = param;
+	running_machine *machine = device->machine;	
 
 	vic2.rasterline++;
-	vic2.rasterline_start_cpu_cycles = activecpu_gettotalcycles();
+	vic2.rasterline_start_cpu_cycles = cpu_get_total_cycles(machine->cpu[0]);
 
 	// update sprites registers
 	for (i=0x00; i <= 0x10; i++)
