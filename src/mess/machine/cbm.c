@@ -8,7 +8,7 @@
 #include "includes/cbm.h"
 #include "formats/cbm_tap.h"
 
-
+#include "deprecat.h"
 
 /***********************************************
 
@@ -25,6 +25,7 @@ static int general_cbm_loadsnap(const device_config *image, const char *file_typ
 	UINT32 bytesread;
 	UINT16 address = 0;
 	int i;
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	if (!file_type)
 		goto error;
@@ -73,7 +74,7 @@ static int general_cbm_loadsnap(const device_config *image, const char *file_typ
 		goto error;
 
 	for (i = 0; i < snapshot_size; i++)
-		program_write_byte(address + i + offset, data[i]);
+		memory_write_byte(space, address + i + offset, data[i]);
 
 	cbm_sethiaddress(address + snapshot_size);
 	free(data);
@@ -87,12 +88,14 @@ error:
 
 static void cbm_quick_sethiaddress(UINT16 hiaddress)
 {
-	program_write_byte(0x31, hiaddress & 0xff);
-	program_write_byte(0x2f, hiaddress & 0xff);
-	program_write_byte(0x2d, hiaddress & 0xff);
-	program_write_byte(0x32, hiaddress >> 8);
-	program_write_byte(0x30, hiaddress >> 8);
-	program_write_byte(0x2e, hiaddress >> 8);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	memory_write_byte(space, 0x31, hiaddress & 0xff);
+	memory_write_byte(space, 0x2f, hiaddress & 0xff);
+	memory_write_byte(space, 0x2d, hiaddress & 0xff);
+	memory_write_byte(space, 0x32, hiaddress >> 8);
+	memory_write_byte(space, 0x30, hiaddress >> 8);
+	memory_write_byte(space, 0x2e, hiaddress >> 8);
 }
 
 QUICKLOAD_LOAD( cbm_c16 )
@@ -112,12 +115,14 @@ QUICKLOAD_LOAD( cbm_vc20 )
 
 static void cbm_pet_quick_sethiaddress(UINT16 hiaddress)
 {
-	program_write_byte(0x2e, hiaddress & 0xff);
-	program_write_byte(0x2c, hiaddress & 0xff);
-	program_write_byte(0x2a, hiaddress & 0xff);
-	program_write_byte(0x2f, hiaddress >> 8);
-	program_write_byte(0x2d, hiaddress >> 8);
-	program_write_byte(0x2b, hiaddress >> 8);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	memory_write_byte(space, 0x2e, hiaddress & 0xff);
+	memory_write_byte(space, 0x2c, hiaddress & 0xff);
+	memory_write_byte(space, 0x2a, hiaddress & 0xff);
+	memory_write_byte(space, 0x2f, hiaddress >> 8);
+	memory_write_byte(space, 0x2d, hiaddress >> 8);
+	memory_write_byte(space, 0x2b, hiaddress >> 8);
 }
 
 QUICKLOAD_LOAD( cbm_pet )
@@ -127,12 +132,14 @@ QUICKLOAD_LOAD( cbm_pet )
 
 static void cbm_pet1_quick_sethiaddress(UINT16 hiaddress)
 {
-	program_write_byte(0x80, hiaddress & 0xff);
-	program_write_byte(0x7e, hiaddress & 0xff);
-	program_write_byte(0x7c, hiaddress & 0xff);
-	program_write_byte(0x81, hiaddress >> 8);
-	program_write_byte(0x7f, hiaddress >> 8);
-	program_write_byte(0x7d, hiaddress >> 8);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	memory_write_byte(space, 0x80, hiaddress & 0xff);
+	memory_write_byte(space, 0x7e, hiaddress & 0xff);
+	memory_write_byte(space, 0x7c, hiaddress & 0xff);
+	memory_write_byte(space, 0x81, hiaddress >> 8);
+	memory_write_byte(space, 0x7f, hiaddress >> 8);
+	memory_write_byte(space, 0x7d, hiaddress >> 8);
 }
 
 QUICKLOAD_LOAD( cbm_pet1 )
@@ -142,8 +149,10 @@ QUICKLOAD_LOAD( cbm_pet1 )
 
 static void cbmb_quick_sethiaddress(UINT16 hiaddress)
 {
-	program_write_byte(0xf0046, hiaddress & 0xff);
-	program_write_byte(0xf0047, hiaddress >> 8);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	memory_write_byte(space, 0xf0046, hiaddress & 0xff);
+	memory_write_byte(space, 0xf0047, hiaddress >> 8);
 }
 
 QUICKLOAD_LOAD( cbmb )
@@ -158,8 +167,10 @@ QUICKLOAD_LOAD( p500 )
 
 static void cbm_c65_quick_sethiaddress(UINT16 hiaddress)
 {
-	program_write_byte(0x82, hiaddress & 0xff);
-	program_write_byte(0x83, hiaddress >> 8);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	memory_write_byte(space, 0x82, hiaddress & 0xff);
+	memory_write_byte(space, 0x83, hiaddress >> 8);
 }
 
 QUICKLOAD_LOAD( cbm_c65 )

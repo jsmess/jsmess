@@ -459,42 +459,42 @@ void tpi6525_1_irq4_level(running_machine *machine, int level)
 
  READ8_HANDLER ( tpi6525_0_port_r )
 {
-	return tpi6525_port_r(machine, tpi6525, offset);
+	return tpi6525_port_r(space->machine, tpi6525, offset);
 }
 
  READ8_HANDLER ( tpi6525_1_port_r )
 {
-	return tpi6525_port_r(machine, tpi6525+1, offset);
+	return tpi6525_port_r(space->machine, tpi6525+1, offset);
 }
 
  READ8_HANDLER ( tpi6525_2_port_r )
 {
-	return tpi6525_port_r(machine, tpi6525+2, offset);
+	return tpi6525_port_r(space->machine, tpi6525+2, offset);
 }
 
  READ8_HANDLER ( tpi6525_3_port_r )
 {
-	return tpi6525_port_r(machine, tpi6525+3, offset);
+	return tpi6525_port_r(space->machine, tpi6525+3, offset);
 }
 
 WRITE8_HANDLER ( tpi6525_0_port_w )
 {
-	tpi6525_port_w(machine, tpi6525, offset, data);
+	tpi6525_port_w(space->machine, tpi6525, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_1_port_w )
 {
-	tpi6525_port_w(machine, tpi6525+1, offset, data);
+	tpi6525_port_w(space->machine, tpi6525+1, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_2_port_w )
 {
-	tpi6525_port_w(machine, tpi6525+2, offset, data);
+	tpi6525_port_w(space->machine, tpi6525+2, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_3_port_w )
 {
-	tpi6525_port_w(machine, tpi6525+3, offset, data);
+	tpi6525_port_w(space->machine, tpi6525+3, offset, data);
 }
 
  READ8_HANDLER ( tpi6525_0_port_a_r )

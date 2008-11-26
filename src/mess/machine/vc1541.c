@@ -606,8 +606,8 @@ static TIMER_CALLBACK(drive_timer)
 	
 		if (drive->type == type_1541) 
 		{
-			cpunum_set_input_line(machine, drive->cpunumber, M6502_SET_OVERFLOW, 1);
-			via_3_ca1_w(machine, 0,1);
+			cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 1);
+			via_3_ca1_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0,1);
 		}
 
 		drive->clock = 1;
@@ -642,8 +642,8 @@ static TIMER_CALLBACK(drive_timer)
 
 	if (drive->type == type_1541) 
 	{
-		cpunum_set_input_line(machine, drive->cpunumber, M6502_SET_OVERFLOW, 0);
-		via_3_ca1_w(machine, 0, 0);
+		cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 0);
+		via_3_ca1_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0, 0);
 	}
 
 	drive->clock = 0;
@@ -671,7 +671,7 @@ static void vc1541_via0_irq (running_machine *machine, int level)
 	drive->via0irq = level;
 	DBG_LOG(2, "vc1541 via0 irq",("level %d %d\n",drive->via0irq,drive->via1irq));
 
-	cpunum_set_input_line (machine, drive->cpunumber, M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
+	cpu_set_input_line (machine->cpu[drive->cpunumber], M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
 }
 
 static READ8_HANDLER( vc1541_via0_read_portb )
@@ -724,7 +724,7 @@ static WRITE8_HANDLER( vc1541_via0_write_portb )
 		vc1541_serial_clock_write (1, drive->drive.serial.serial_clock = !(data & 0x08));
 	}
 
-	vc1541_serial_atn_write (machine, 1, drive->drive.serial.serial_atn = 1);
+	vc1541_serial_atn_write (space->machine, 1, drive->drive.serial.serial_atn = 1);
 }
 
 
@@ -761,7 +761,7 @@ static void vc1541_via1_irq (running_machine *machine, int level)
 	drive->via1irq = level;
 	DBG_LOG(2, "vc1541 via1 irq", ("level %d %d\n", drive->via0irq, drive->via1irq));
 
-	cpunum_set_input_line (machine, drive->cpunumber, M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
+	cpu_set_input_line (machine->cpu[drive->cpunumber], M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
 }
 
 static READ8_HANDLER( vc1541_via1_read_porta )
@@ -940,10 +940,12 @@ void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 			serial.atn[0] = serial.atn[1] && serial.atn[2];
 			if (serial.atn[0] == level)
 			{
+			#if 0
 				DBG_LOG(1, "vc1541",("%d:%.4x atn %s\n",
 									 cpu_getactivecpu (),
 									 activecpu_get_pc(),
 									 serial.atn[0]?"ATN":"atn"));
+			#endif
 				via_set_input_ca1 (machine, 2, !level);
 #if 0
 				value=drive->drive.serial.data;
@@ -979,6 +981,7 @@ void vc1541_serial_data_write (int which, int level)
 		if (serial.data[0] != level)
 		{
 			serial.data[0] = serial.data[1] && serial.data[2];
+			#if 0
 			if (serial.data[0] == level)
 			{
 				DBG_LOG(1, "vc1541",("%d:%.4x data %s\n",
@@ -986,6 +989,7 @@ void vc1541_serial_data_write (int which, int level)
 									 activecpu_get_pc(),
 									 serial.data[0]?"DATA":"data"));
 			}
+			#endif
 		}
 	}
 }
@@ -1011,10 +1015,10 @@ void vc1541_serial_clock_write (int which, int level)
 			serial.clock[0] = serial.clock[1] && serial.clock[2];
 			if (serial.clock[0] == level)
 			{
-				DBG_LOG(1, "vc1541",("%d:%.4x clock %s\n",
+/*				DBG_LOG(1, "vc1541",("%d:%.4x clock %s\n",
 									 cpu_getactivecpu (),
 									 activecpu_get_pc(),
-									 serial.clock[0]?"CLOCK":"clock"));
+									 serial.clock[0]?"CLOCK":"clock"));*/
 			}
 		}
 	}
@@ -1085,7 +1089,7 @@ ADDRESS_MAP_END
  */
 static TIMER_CALLBACK(c1551_irq_timer)
 {
-	cpunum_set_input_line(machine, drive->cpunumber, M6502_IRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_IRQ_LINE, PULSE_LINE);
 }
 
 /*
@@ -1254,12 +1258,11 @@ ADDRESS_MAP_END
 
 static void c1551x_write_data (running_machine *machine, TPI6525 *This, int data)
 {
-	DBG_LOG(1, "c1551 cpu", ("%d write data %.2x\n", cpu_getactivecpu (), data));
+//	DBG_LOG(1, "c1551 cpu", ("%d write data %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-
-	tpi6525_0_port_a_w(machine, 0,data);
+	tpi6525_0_port_a_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0,data);
 }
 
 static int c1551x_read_data (running_machine *machine, TPI6525 *This)
@@ -1269,19 +1272,19 @@ static int c1551x_read_data (running_machine *machine, TPI6525 *This)
 	cpu_sync ();
 #endif
 
-	data = tpi6525_0_port_a_r(machine, 0);
-	DBG_LOG(2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
+	data = tpi6525_0_port_a_r(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0);
+//	DBG_LOG(2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
 static void c1551x_write_handshake (running_machine *machine, TPI6525 *This, int data)
 {
-	DBG_LOG(1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
+//	DBG_LOG(1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
 
-	tpi6525_0_port_c_w(machine, 0,data&0x40?0xff:0x7f);
+	tpi6525_0_port_c_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0,data&0x40?0xff:0x7f);
 }
 
 static int c1551x_read_handshake (running_machine *machine, TPI6525 *This)
@@ -1291,8 +1294,8 @@ static int c1551x_read_handshake (running_machine *machine, TPI6525 *This)
 	cpu_sync();
 #endif
 
-	data = tpi6525_0_port_c_r(machine, 0) & 0x08 ? 0x80 : 0x00;
-	DBG_LOG(2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
+	data = tpi6525_0_port_c_r(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0) & 0x08 ? 0x80 : 0x00;
+//	DBG_LOG(2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
@@ -1303,8 +1306,8 @@ static int c1551x_read_status (running_machine *machine, TPI6525 *This)
 	cpu_sync();
 #endif
 
-	data = tpi6525_0_port_c_r(machine, 0) & 0x03;
-	DBG_LOG(1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
+	data = tpi6525_0_port_c_r(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0) & 0x03;
+//	DBG_LOG(1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
 
 	return data;
 }
