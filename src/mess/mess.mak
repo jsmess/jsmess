@@ -370,7 +370,6 @@ DRVLIBS = \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
-	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bk.a \
@@ -397,7 +396,9 @@ DRVLIBS = \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/shared.a \
+	$(MESSOBJ)/cbmshare.a \
 
+#	$(MESSOBJ)/amiga.a \
 #	$(MESSOBJ)/amstrad.a \
 #	$(MESSOBJ)/apexc.a \
 #	$(MESSOBJ)/apf.a \
@@ -412,7 +413,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/be.a \
 #	$(MESSOBJ)/bondwell.a \
 #	$(MESSOBJ)/cbm.a \
-#	$(MESSOBJ)/cbmshare.a \
 #	$(MESSOBJ)/cgenie.a \
 #	$(MESSOBJ)/coco.a \
 #	$(MESSOBJ)/coleco.a \
