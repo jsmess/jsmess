@@ -999,10 +999,10 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( mikrosha )
 //128u4	DRIVER( partner )
 
-  /* Homelab */  
-//128u4	DRIVER (homelab2)
-//128u4	DRIVER (homelab3)
-//128u4	DRIVER (homelab4)
+  	/* Homelab */  
+	DRIVER (homelab2)
+	DRIVER (homelab3)
+	DRIVER (homelab4)
 	
 	/* Irisha */
 	DRIVER (irisha)

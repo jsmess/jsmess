@@ -19,12 +19,13 @@ VIDEO_UPDATE( homelab )
 {
 	int x,y,j,b;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 25; y++ )
 	{
 		for(x = 0; x < 40; x++ )
 		{
-			int code = program_read_byte(0xc000+ x + y*40);		
+			int code = memory_read_byte(space,0xc000+ x + y*40);		
 			for(j = 0; j < 8; j++ )
 			{
 				for(b = 0; b < 8; b++ )
@@ -41,12 +42,13 @@ VIDEO_UPDATE( homelab3 )
 {
 	int x,y,j,b;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 25; y++ )
 	{
 		for(x = 0; x < 80; x++ )
 		{
-			int code = program_read_byte(0xf000+ x + y*80);		
+			int code = memory_read_byte(space, 0xf000+ x + y*80);		
 			for(j = 0; j < 8; j++ )
 			{
 				for(b = 0; b < 8; b++ )

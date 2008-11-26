@@ -377,6 +377,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/vector06.a \
+	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/acorn.a \
@@ -422,7 +423,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/gmaster.a \
 #	$(MESSOBJ)/grundy.a \
-#	$(MESSOBJ)/homelab.a \
 #	$(MESSOBJ)/hp48.a \
 #	$(MESSOBJ)/intv.a \
 #	$(MESSOBJ)/jupiter.a \

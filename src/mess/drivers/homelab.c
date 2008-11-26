@@ -19,14 +19,14 @@ READ8_HANDLER (homelab_keyboard_r)
 {
 	UINT8 key_mask = (offset ^ 0xff) & 0xff;
 	UINT8 key = 0xff;
-	if ((key_mask & 0x01)!=0) { key &= input_port_read(machine,"LINE0"); }
-	if ((key_mask & 0x02)!=0) { key &= input_port_read(machine,"LINE1"); }
-	if ((key_mask & 0x04)!=0) { key &= input_port_read(machine,"LINE2"); }
-	if ((key_mask & 0x08)!=0) { key &= input_port_read(machine,"LINE3"); }
-	if ((key_mask & 0x10)!=0) { key &= input_port_read(machine,"LINE4"); }
-	if ((key_mask & 0x20)!=0) { key &= input_port_read(machine,"LINE5"); }
-	if ((key_mask & 0x40)!=0) { key &= input_port_read(machine,"LINE6"); }
-	if ((key_mask & 0x80)!=0) { key &= input_port_read(machine,"LINE7"); }
+	if ((key_mask & 0x01)!=0) { key &= input_port_read(space->machine,"LINE0"); }
+	if ((key_mask & 0x02)!=0) { key &= input_port_read(space->machine,"LINE1"); }
+	if ((key_mask & 0x04)!=0) { key &= input_port_read(space->machine,"LINE2"); }
+	if ((key_mask & 0x08)!=0) { key &= input_port_read(space->machine,"LINE3"); }
+	if ((key_mask & 0x10)!=0) { key &= input_port_read(space->machine,"LINE4"); }
+	if ((key_mask & 0x20)!=0) { key &= input_port_read(space->machine,"LINE5"); }
+	if ((key_mask & 0x40)!=0) { key &= input_port_read(space->machine,"LINE6"); }
+	if ((key_mask & 0x80)!=0) { key &= input_port_read(space->machine,"LINE7"); }
 	return key;
 }
 
@@ -38,8 +38,8 @@ static ADDRESS_MAP_START(homelab2_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x1800, 0x1fff ) AM_ROM  // ROM 4
     AM_RANGE( 0x2000, 0x27ff ) AM_ROM  // ROM 5
     AM_RANGE( 0x2800, 0x2fff ) AM_ROM  // ROM 6
-		AM_RANGE( 0x3000, 0x37ff ) AM_ROM  // Empty
-		AM_RANGE( 0x3800, 0x3fff ) AM_READWRITE(homelab_keyboard_r,homelab_keyboard_w)
+	AM_RANGE( 0x3000, 0x37ff ) AM_ROM  // Empty
+	AM_RANGE( 0x3800, 0x3fff ) AM_READWRITE(homelab_keyboard_r,homelab_keyboard_w)
     AM_RANGE( 0x4000, 0x7fff ) AM_RAM
     AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_MIRROR(0x3c00) // Video RAM 1K    
 ADDRESS_MAP_END
