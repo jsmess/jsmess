@@ -1304,7 +1304,6 @@ static DEVICE_START( z80dart )
 {
 	const z80dart_interface *intf = device->static_config;
 	z80dart_t *z80dart = get_safe_token(device);
-	char unique_tag[30];
 	int cpunum = -1;
 
 	assert(intf != NULL);
@@ -1349,10 +1348,7 @@ static DEVICE_START( z80dart )
 		timer_adjust_periodic(z80dart->rxtxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->rx_tx_clock_b));
 
 	/* register for state saving */
-
-	state_save_combine_module_and_tag(unique_tag, "z80dart", device->tag);
-
-	//state_save_register_item_array(unique_tag, 0, z80dart->);
+	//state_save_register_item_array("z80dart", device->tag, 0, z80dart->);
 
 	return DEVICE_START_OK;
 }
