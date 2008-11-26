@@ -53,7 +53,7 @@ static READ8_HANDLER( cassette_r )
 	
 	*/
 
-	return (cassette_input(cassette_device_image(machine)) < +0.0) ? 0 : 1;
+	return (cassette_input(cassette_device_image(space->machine)) < +0.0) ? 0 : 1;
 }
 
 static WRITE8_HANDLER( cassette_w )
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( cassette_w )
 
 	speaker_level_w(0, data & 0x01);
 
-	cassette_output(cassette_device_image(machine), (data & 0x01) ? +1.0 : -1.0);
+	cassette_output(cassette_device_image(space->machine), (data & 0x01) ? +1.0 : -1.0);
 }
 
 static READ8_HANDLER( vsync_r )
@@ -152,7 +152,7 @@ static READ8_HANDLER( keyboard_r )
 	for (row = 0; row < 8; row++)
 	{
 		if (!BIT(keylatch, row))
-			return input_port_read(machine, rownames[row]);
+			return input_port_read(space->machine, rownames[row]);
 	}
 
 	return 0xff;
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( scrambler_w )
 
 	*/
 
-	UINT8 *ROM = memory_region(machine, "main") + 0xc000;
+	UINT8 *ROM = memory_region(space->machine, "main") + 0xc000;
 	UINT16 addr;
 
 	scrambler = data;
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( aquarius_reset )
 {
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_RESET, (input_port_read(field->port->machine, "RESET") ? CLEAR_LINE : ASSERT_LINE));
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_RESET, (input_port_read(field->port->machine, "RESET") ? CLEAR_LINE : ASSERT_LINE));
 }
 
 static INPUT_PORTS_START(aquarius)
@@ -328,19 +328,19 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( aquarius_interrupt )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 /* Sound Interface */
 
 static READ8_HANDLER( aquarius_ay8910_port_a_r )
 {
-	return input_port_read(machine, "RIGHT");
+	return input_port_read(space->machine, "RIGHT");
 }
 
 static READ8_HANDLER( aquarius_ay8910_port_b_r )
 {
-	return input_port_read(machine, "LEFT");
+	return input_port_read(space->machine, "LEFT");
 }
 
 static const ay8910_interface aquarius_ay8910_interface =
@@ -367,31 +367,31 @@ static MACHINE_RESET( aquarius )
 	switch (mess_ram_size)
 	{
 	case 4 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 8 * 1024: // 4K expansion
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 20 * 1024: // 16K expansion
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x8fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 36 * 1024: // 32K expansion (prototype)
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
 		break;
 	}
 
 	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* cartridge */
 
-	memory_configure_bank(2, 0, 1, decrypt_rom, 0);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 2, 0, 1, decrypt_rom, 0);
+	memory_set_bank(machine, 2, 0);
 }
 
 /* Machine Driver */
@@ -468,11 +468,11 @@ static DEVICE_IMAGE_LOAD( aquarius_cart )
 	switch (size)
 	{
 	case 8 * 1024:
-		memory_install_readwrite8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0x2000, SMH_BANK2, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, SMH_BANK2, SMH_UNMAP);
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_UNMAP);
 		break;
 	}
 

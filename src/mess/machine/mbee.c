@@ -42,13 +42,13 @@ UINT8 *mbee_workram;
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( mbee_reset )
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 MACHINE_RESET( mbee )
 {
 	timer_set(ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 }
 
 MACHINE_START( mbee )

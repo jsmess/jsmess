@@ -86,7 +86,7 @@ static void common_init_machine(running_machine *machine, int base)
 {
 	/* internal ram */
 	memory_configure_bank(machine, 1, 0, 1, mess_ram, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* expansion memory configuration */
 	switch (mess_ram_size) {
@@ -96,8 +96,8 @@ static void common_init_machine(running_machine *machine, int base)
 			/* install 16KB memory expansion */
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0x3fff, 0, 0, SMH_BANK2);
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0x3fff, 0, 0, SMH_BANK2);
-			memory_configure_bank(2, 0, 1, mess_ram + base - 0x7800, 0);
-			memory_set_bank(2, 0);
+			memory_configure_bank(machine, 2, 0, 1, mess_ram + base - 0x7800, 0);
+			memory_set_bank(machine, 2, 0);
 
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base + 0x4000, 0xffff, 0, 0, SMH_NOP);
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base + 0x4000, 0xffff, 0, 0, SMH_NOP);
@@ -110,8 +110,8 @@ static void common_init_machine(running_machine *machine, int base)
 			/* install fixed first bank */
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2);
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2);
-			memory_configure_bank(2, 0, 1, mess_ram + 0x800, 0);
-			memory_set_bank(2, 0);
+			memory_configure_bank(machine, 2, 0, 1, mess_ram + 0x800, 0);
+			memory_set_bank(machine, 2, 0);
 
 			/* install the others, dynamically banked in */
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK3);

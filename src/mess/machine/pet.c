@@ -537,7 +537,7 @@ WRITE8_HANDLER(superpet_w)
 		case 5:
 			spet.bank = data & 0xf;
 			memory_configure_bank(machine, 1, 0, 16, superpet_memory, 0x1000);
-			memory_set_bank(1, spet.bank);
+			memory_set_bank(machine, 1, spet.bank);
 			/* 7 low writeprotects systemlatch */
 			break;
 
@@ -663,7 +663,7 @@ DRIVER_INIT( superpet )
 	superpet_memory = auto_malloc(0x10000);
 
 	memory_configure_bank(machine, 1, 0, 16, superpet_memory, 0x1000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	superpet_vh_init(machine);
 }

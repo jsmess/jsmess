@@ -1434,10 +1434,10 @@ static void atarist_configure_memory(running_machine *machine)
 	}
 
 	memory_configure_bank(machine, 1, 0, 1, RAM + 0x000008, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
-	memory_configure_bank(2, 0, 1, RAM + 0x200000, 0);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 2, 0, 1, RAM + 0x200000, 0);
+	memory_set_bank(machine, 2, 0);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
@@ -1602,10 +1602,10 @@ static void stbook_configure_memory(running_machine *machine)
 	}
 
 	memory_configure_bank(machine, 1, 0, 1, RAM + 0x000008, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
-	memory_configure_bank(2, 0, 1, RAM + 0x200000, 0);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 2, 0, 1, RAM + 0x200000, 0);
+	memory_set_bank(machine, 2, 0);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 

@@ -556,45 +556,45 @@ static MACHINE_START( ql )
 {
 	/* configure ROM cartridge */
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00ffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x00c000, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* configure RAM */
 
 	switch (mess_ram_size)
 	{
 	case 128*1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x040000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 192*1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x04ffff, 0, 0, SMH_BANK2, SMH_BANK2);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x050000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x040000, 0x04ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x050000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 256*1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x05ffff, 0, 0, SMH_BANK2, SMH_BANK2);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x040000, 0x05ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x060000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 384*1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x07ffff, 0, 0, SMH_BANK2, SMH_BANK2);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x040000, 0x07ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x080000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 640*1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x0bffff, 0, 0, SMH_BANK2, SMH_BANK2);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x040000, 0x0bffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 896*1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x0fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x040000, 0x0fffff, 0, 0, SMH_BANK2, SMH_BANK2);
 		break;
 	}
 
-	memory_configure_bank(2, 0, 1, memory_region(machine, "main") + 0x050000, 0);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, "main") + 0x050000, 0);
+	memory_set_bank(machine, 2, 0);
 
 	// IPC
 

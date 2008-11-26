@@ -274,24 +274,24 @@ static WRITE8_HANDLER( bankswitch_w )
 {
 	/* enable RAM */
 
-	memory_set_bank(1, VIP_BANK_RAM);
+	memory_set_bank(machine, 1, VIP_BANK_RAM);
 
 	switch (mess_ram_size)
 	{
 	case 1 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0x7c00, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0x7c00, SMH_BANK1, SMH_BANK1);
 		break;
 
 	case 2 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07ff, 0, 0x7800, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x07ff, 0, 0x7800, SMH_BANK1, SMH_BANK1);
 		break;
 
 	case 4 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 		break;
 	}
 }
@@ -575,9 +575,9 @@ static MACHINE_START( vip )
 
 	/* ROM banking */
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
-	memory_configure_bank(2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x8000, 0);
-	memory_set_bank(2, 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
+	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x8000, 0);
+	memory_set_bank(machine, 2, 0);
 
 	/* randomize RAM contents */
 
@@ -652,8 +652,8 @@ static MACHINE_RESET( vip )
 
 	/* enable ROM mirror at 0x0000 */
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_UNMAP);
-	memory_set_bank(1, VIP_BANK_ROM);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_UNMAP);
+	memory_set_bank(machine, 1, VIP_BANK_ROM);
 }
 
 /* Machine Drivers */

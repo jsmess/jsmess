@@ -48,7 +48,7 @@ WRITE8_HANDLER( dai_stack_interrupt_circuit_w )
 
 static void dai_update_memory (int dai_rom_bank)
 {
-	memory_set_bank(2, dai_rom_bank);
+	memory_set_bank(machine, 2, dai_rom_bank);
 }
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
@@ -144,7 +144,7 @@ MACHINE_START( dai )
 	memory_set_opbase_handler(0, dai_opbaseoverride);
 
 	memory_set_bankptr(1, mess_ram);
-	memory_configure_bank(2, 0, 4, memory_region(machine, "main") + 0x010000, 0x1000);
+	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "main") + 0x010000, 0x1000);
 
 	tms5501_init(0, &dai_tms5501_init_param);
 

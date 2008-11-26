@@ -330,7 +330,7 @@ static const CENTRONICS_CONFIG exidy_cent_config[1]={
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( exidy_reset )
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static MACHINE_START( exidyd )
@@ -361,7 +361,7 @@ static MACHINE_RESET( exidyd )
 	exidy_fe_port_w(machine, 0, 0);
 
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 }
 
 static MACHINE_RESET( exidy )

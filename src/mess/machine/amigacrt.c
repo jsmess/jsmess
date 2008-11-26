@@ -229,7 +229,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 		{
 			UINT32 mirror_mask = amiga_chip_ram_size;
 
-			memory_set_bank(1, 0);
+			memory_set_bank(machine, 1, 0);
 
 			while( (mirror_mask<<1) < 0x100000 )
 			{
@@ -274,7 +274,7 @@ static void amiga_ar23_freeze( running_machine *machine )
 		}
 
 		/* overlay the cart rom's in chipram */
-		memory_set_bank(1, 2);
+		memory_set_bank(machine, 1, 2);
 
 		/* writes go to chipram */
 		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, amiga_chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);

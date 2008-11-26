@@ -200,7 +200,7 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 
 	/* enable RAM */
 
-	memory_set_bank(1, TMC2000_BANK_RAM);
+	memory_set_bank(machine, 1, TMC2000_BANK_RAM);
 
 	switch (mess_ram_size)
 	{
@@ -219,7 +219,7 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 
 	/* enable monitor or color RAM */
 
-	memory_set_bank(2, bank);
+	memory_set_bank(machine, 2, bank);
 
 	switch (bank)
 	{
@@ -241,7 +241,7 @@ static WRITE8_DEVICE_HANDLER( oscnano_bankswitch_w )
 {
 	/* enable RAM */
 
-	memory_set_bank(1, OSCNANO_BANK_RAM);
+	memory_set_bank(machine, 1, OSCNANO_BANK_RAM);
 
 	memory_install_readwrite8_handler(device->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
 
@@ -763,8 +763,8 @@ static MACHINE_START( tmc2000 )
 
 	state->colorram = auto_malloc(TMC2000_COLORRAM_SIZE);
 
-	memory_configure_bank(2, TMC2000_BANK_MONITOR, 1, memory_region(machine, "main") + 0x8000, 0);
-	memory_configure_bank(2, TMC2000_BANK_COLORRAM, 1, state->colorram, 0);
+	memory_configure_bank(machine, 2, TMC2000_BANK_MONITOR, 1, memory_region(machine, "main") + 0x8000, 0);
+	memory_configure_bank(machine, 2, TMC2000_BANK_COLORRAM, 1, state->colorram, 0);
 
 	/* randomize color RAM contents */
 
@@ -790,15 +790,15 @@ static MACHINE_RESET( tmc2000 )
 
 	/* enable monitor mirror at 0x0000 */
 
-	memory_set_bank(1, TMC2000_BANK_ROM);
+	memory_set_bank(machine, 1, TMC2000_BANK_ROM);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_UNMAP);
 
 	/* enable monitor */
 
-	memory_set_bank(2, TMC2000_BANK_MONITOR);
+	memory_set_bank(machine, 2, TMC2000_BANK_MONITOR);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
 }
 
 // OSCOM Nano
@@ -836,9 +836,9 @@ static MACHINE_RESET( oscnano )
 
 	/* enable ROM */
 
-	memory_set_bank(1, OSCNANO_BANK_ROM);
+	memory_set_bank(machine, 1, OSCNANO_BANK_ROM);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_BANK1);
 }
 
 /* Machine Drivers */

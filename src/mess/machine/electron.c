@@ -182,7 +182,7 @@ WRITE8_HANDLER( electron_ula_w ) {
 			} else {
 				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2 );
 			}
-			memory_set_bank(2, ula.rompage);
+			memory_set_bank(machine, 2, ula.rompage);
 		}
 		if ( data & 0x10 ) {
 			electron_interrupt_handler( machine, INT_CLEAR, INT_DISPLAY_END );
@@ -274,7 +274,7 @@ static TIMER_CALLBACK(setup_beep)
 
 static void electron_reset(running_machine *machine)
 {
-	memory_set_bank(2, 0);
+	memory_set_bank(machine, 2, 0);
 
 	ula.communication_mode = 0x04;
 	ula.screen_mode = 0;
@@ -291,7 +291,7 @@ static void electron_reset(running_machine *machine)
 
 MACHINE_START( electron )
 {
-	memory_configure_bank(2, 0, 16, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, 2, 0, 16, memory_region(machine, "user1"), 0x4000);
 
 	ula.interrupt_status = 0x82;
 	ula.interrupt_control = 0x00;

@@ -513,10 +513,10 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	}
 
 	memory_configure_bank(machine, 1, 0, 1, mem + 0x8000, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
-	memory_configure_bank(2, 0, 1, mem + 0x4000, 0);
-	memory_set_bank(2, 0);
+	memory_configure_bank(machine, 2, 0, 1, mem + 0x4000, 0);
+	memory_set_bank(machine, 2, 0);
 
 	return INIT_PASS;
 }

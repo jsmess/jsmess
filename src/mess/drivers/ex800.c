@@ -172,7 +172,7 @@ static INPUT_CHANGED( online_switch )
 
 	if (newval)
 	{
-		cpunum_set_input_line(field->port->machine, 0, UPD7810_INTF1, state);
+		cpu_set_input_line(field->port->machine->cpu[0], UPD7810_INTF1, state);
 		state = (state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }

@@ -809,7 +809,7 @@ XL/XE 16kB OS roms
 	/* MATTEL */
 //128u4	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
 						/* (Test marketed, later recalled)					*/
-//128u4	DRIVER( aquarius )	/* 1983 Aquarius									*/
+	DRIVER( aquarius )	/* 1983 Aquarius									*/
 //	DRIVER( aquariu2 )	/* 1984 Aquarius II									*/
 
 	/*EXIDY INC */

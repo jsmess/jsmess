@@ -369,6 +369,7 @@ DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/advision.a \
+	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bk.a \
 	$(MESSOBJ)/irisha.a \
@@ -389,7 +390,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/apexc.a \
 #	$(MESSOBJ)/apf.a \
 #	$(MESSOBJ)/apple.a \
-#	$(MESSOBJ)/aquarius.a \
 #	$(MESSOBJ)/arcadia.a \
 #	$(MESSOBJ)/ascii.a \
 #	$(MESSOBJ)/at.a \

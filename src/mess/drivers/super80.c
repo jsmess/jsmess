@@ -994,7 +994,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( super80_reset )
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static MACHINE_RESET( super80 )
@@ -1004,7 +1004,7 @@ static MACHINE_RESET( super80 )
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 }
 
 static const cassette_config super80_cassette_config =

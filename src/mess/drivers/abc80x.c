@@ -215,15 +215,15 @@ static void abc800_bankswitch(running_machine *machine)
 	if (state->fetch_charram)
 	{
 		/* HR video RAM selected */
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	}
 	else
 	{
 		/* BASIC ROM selected */
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_UNMAP);
 	}
 
-	memory_set_bank(1, state->fetch_charram);
+	memory_set_bank(machine, 1, state->fetch_charram);
 }
 
 static void abc802_bankswitch(running_machine *machine)
@@ -233,16 +233,16 @@ static void abc802_bankswitch(running_machine *machine)
 	if (state->lrs)
 	{
 		/* ROM and video RAM selected */
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x77ff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7fff, 0, 0, abc802_charram_r, abc802_charram_w);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x77ff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7800, 0x7fff, 0, 0, abc802_charram_r, abc802_charram_w);
 	}
 	else
 	{
 		/* low RAM selected */
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	}
 
-	memory_set_bank(1, state->lrs);
+	memory_set_bank(machine, 1, state->lrs);
 }
 
 static void abc806_bankswitch(running_machine *machine)
@@ -267,7 +267,7 @@ static void abc806_bankswitch(running_machine *machine)
 			
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 			memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
 			memory_set_bank(bank, 1);
 		}
@@ -281,7 +281,7 @@ static void abc806_bankswitch(running_machine *machine)
 			
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 			memory_set_bank(bank, 0);
 		}
 	}
@@ -301,7 +301,7 @@ static void abc806_bankswitch(running_machine *machine)
 				/* map to video RAM */
 				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
-				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+				memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 				memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
 				memory_set_bank(bank, 1);
 			}
@@ -315,7 +315,7 @@ static void abc806_bankswitch(running_machine *machine)
 					/* ROM */
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_UNMAP);
+					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_UNMAP);
 					memory_set_bank(bank, 0);
 					break;
 
@@ -323,8 +323,8 @@ static void abc806_bankswitch(running_machine *machine)
 					/* ROM/char RAM */
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_UNMAP);
-					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
+					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_UNMAP);
+					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
 					memory_set_bank(bank, 0);
 					break;
 
@@ -332,7 +332,7 @@ static void abc806_bankswitch(running_machine *machine)
 					/* work RAM */
 					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
-					memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+					memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 					memory_set_bank(bank, 0);
 					break;
 				}
@@ -358,12 +358,12 @@ static void abc806_bankswitch(running_machine *machine)
 
 			if (start_addr == 0x7000)
 			{
-				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
-				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
+				memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7000, 0x77ff, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+				memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7800, 0x7fff, 0, 0, abc806_charram_r, abc806_charram_w);
 			}
 			else
 			{
-				memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+				memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
 			}
 
 			memory_configure_bank(bank, 1, 1, state->videoram + videoram_offset, 0);
@@ -1152,7 +1152,7 @@ static MACHINE_RESET( abc802 )
 	UINT8 config = input_port_read(machine, "CONFIG");
 
 	/* memory banking */
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 
 	/* clear screen time out (S1) */
 	z80sio_set_dcd(state->z80sio, 1, BIT(config, 0));

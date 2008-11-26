@@ -106,7 +106,7 @@ static DRIVER_INIT(tutor)
 
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + basic_base, 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + cartridge_base, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static const TMS9928a_interface tms9929a_interface =
@@ -232,13 +232,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
 		cartridge_enable = 0;
-		memory_set_bank(1, 0);
+		memory_set_bank(machine, 1, 0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
 		cartridge_enable = 1;
-		memory_set_bank(1, 1);
+		memory_set_bank(machine, 1, 1);
 		break;
 
 	default:
