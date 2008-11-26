@@ -15,7 +15,7 @@
 #include "includes/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "profiler.h"
-
+#include "deprecat.h"
 
 #define LCDCONT		gb_vid_regs[0x00]	/* LCD control register                       */
 #define LCDSTAT		gb_vid_regs[0x01]	/* LCD status register                        */
@@ -1156,13 +1156,15 @@ enum {
 	GB_LCD_STATE_LY00_M0
 };
 
-static TIMER_CALLBACK( gb_video_init_vbl ) {
-	cpunum_set_input_line( machine, 0, VBL_INT, ASSERT_LINE );
+static TIMER_CALLBACK( gb_video_init_vbl )
+{
+	cpu_set_input_line( machine->cpu[0], VBL_INT, ASSERT_LINE );
 }
 
 void gb_video_init( running_machine *machine, int mode ) {
 	int	i;
 	int vram_size = 0x2000;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	switch( mode ) {
 	case GB_VIDEO_CGB:	vram_size = 0x4000; break;
@@ -1224,10 +1226,10 @@ void gb_video_init( running_machine *machine, int mode ) {
 		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
-		gb_video_w( machine, 0x0, 0x91 );    /* LCDCONT */
-		gb_video_w( machine, 0x7, 0xFC );    /* BGRDPAL */
-		gb_video_w( machine, 0x8, 0xFC );    /* SPR0PAL */
-		gb_video_w( machine, 0x9, 0xFC );    /* SPR1PAL */
+ 		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
+		gb_video_w( space, 0x7, 0xFC );    /* BGRDPAL */
+		gb_video_w( space, 0x8, 0xFC );    /* SPR0PAL */
+		gb_video_w( space, 0x9, 0xFC );    /* SPR1PAL */
 
 		CURLINE = gb_lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
@@ -1252,10 +1254,10 @@ void gb_video_init( running_machine *machine, int mode ) {
 		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
-		gb_video_w( machine, 0x0, 0x91 );    /* LCDCONT */
-		gb_video_w( machine, 0x7, 0xFC );    /* BGRDPAL */
-		gb_video_w( machine, 0x8, 0xFC );    /* SPR0PAL */
-		gb_video_w( machine, 0x9, 0xFC );    /* SPR1PAL */
+		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
+		gb_video_w( space, 0x7, 0xFC );    /* BGRDPAL */
+		gb_video_w( space, 0x8, 0xFC );    /* SPR0PAL */
+		gb_video_w( space, 0x9, 0xFC );    /* SPR1PAL */
 
 		CURLINE = gb_lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
@@ -1284,11 +1286,11 @@ void gb_video_init( running_machine *machine, int mode ) {
 		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
-		gbc_video_w( machine, 0x0, 0x91 );    /* LCDCONT */
-		gbc_video_w( machine, 0x7, 0xFC );    /* BGRDPAL */
-		gbc_video_w( machine, 0x8, 0xFC );    /* SPR0PAL */
-		gbc_video_w( machine, 0x9, 0xFC );    /* SPR1PAL */
-		gbc_video_w( machine, 0x0F, 0x00 );
+		gbc_video_w( space, 0x0, 0x91 );    /* LCDCONT */
+		gbc_video_w( space, 0x7, 0xFC );    /* BGRDPAL */
+		gbc_video_w( space, 0x8, 0xFC );    /* SPR0PAL */
+		gbc_video_w( space, 0x9, 0xFC );    /* SPR1PAL */
+		gbc_video_w( space, 0x0F, 0x00 );
 		CURLINE = gb_lcd.current_line = 0x90;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x01;
 		gb_lcd.mode = 1;
@@ -1302,12 +1304,13 @@ void gb_video_init( running_machine *machine, int mode ) {
 
 static void gbc_hdma(UINT16 length) {
 	UINT16 src, dst;
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
 	dst |= 0x8000;
 	while( length > 0 ) {
-		program_write_byte( dst++, program_read_byte( src++ ) );
+		memory_write_byte( space, dst++, memory_read_byte( space, src++ ) );
 		length--;
 	}
 	HDMA1 = src >> 8;
@@ -1345,7 +1348,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				if ( ! gb_lcd.mode_irq ) {
 					if ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) {
 						gb_lcd.mode_irq = 1;
-						cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+						cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 					}
 				} else {
 					gb_lcd.mode_irq = 0;
@@ -1381,7 +1384,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Generate lcd interrupt if requested */
 			if ( ! gb_lcd.mode_irq && ( LCDSTAT & 0x08 ) &&
 			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
@@ -1393,7 +1396,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					if ( ! gb_lcd.mode_irq ) {
 						if ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) {
 							gb_lcd.mode_irq = 1;
-							cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+							cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 						}
 					} else {
 						gb_lcd.mode_irq = 0;
@@ -1409,7 +1412,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.line_irq = 0;
 			if ( ! gb_lcd.mode_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! gb_lcd.triggering_mode_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			/* Reset LY==LYC STAT bit */
 			LCDSTAT &= 0xFB;
@@ -1423,7 +1426,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				if ( ! gb_lcd.mode_irq && gb_lcd.triggering_mode_irq &&
 					 ( ( ! gb_lcd.triggering_line_irq && ! gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
 					gb_lcd.mode_irq = 1;
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
 				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2);
 			}
@@ -1435,7 +1438,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
 			if ( ( LCDSTAT & 0x20 ) && ! gb_lcd.line_irq && ! gb_lcd.line_irq ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			/* Check for regular compensation of x-scroll register */
 			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
@@ -1449,7 +1452,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Generate lcd interrupt if requested */
 			if ( ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
 				 ( ! gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_mode_irq ) ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			gb_lcd.line_irq = gb_lcd.triggering_line_irq;
 			gb_lcd.triggering_mode_irq = 0;
@@ -1477,13 +1480,13 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
 			if ( CURLINE == 144 ) {
 				/* Trigger VBlank interrupt */
-				cpunum_set_input_line( machine, 0, VBL_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], VBL_INT, HOLD_LINE );
 				/* Set VBlank lcdstate */
 				gb_lcd.mode = 1;
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
 				/* Trigger LCD interrupt if requested */
 				if ( LCDSTAT & 0x10 ) {
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
 			}
 			/* Check if LY==LYC STAT bit should be set */
@@ -1491,7 +1494,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				LCDSTAT |= 0x04;
 			}
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC);
 			break;
@@ -1502,7 +1505,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.line_irq = 0;
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			/* Reset LY==LYC STAT bit */
 			LCDSTAT &= 0xFB;
@@ -1516,7 +1519,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check LY=LYC for line #153 */
 			if ( gb_lcd.delayed_line_irq ) {
 				if ( gb_lcd.triggering_line_irq ) {
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
 			}
 			gb_lcd.delayed_line_irq = gb_lcd.delayed_line_irq | gb_lcd.line_irq;
@@ -1532,14 +1535,14 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
@@ -1576,7 +1579,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				if ( ! gb_lcd.mode_irq ) {
 					if ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) {
 						gb_lcd.mode_irq = 1;
-						cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+						cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 					}
 				} else {
 					gb_lcd.mode_irq = 0;
@@ -1613,7 +1616,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Generate lcd interrupt if requested */
 			if ( ! gb_lcd.mode_irq && gb_lcd.triggering_mode_irq &&
 			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				gb_lcd.triggering_mode_irq = 0;
 			}
 			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
@@ -1640,7 +1643,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 					if ( ! gb_lcd.mode_irq ) {
 						if ( ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq ) {
 							gb_lcd.mode_irq = 1;
-							cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+							cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 						}
 					} else {
 						gb_lcd.mode_irq = 0;
@@ -1656,7 +1659,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.line_irq = 0;
 			if ( ! gb_lcd.mode_irq && ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			gb_lcd.hdma_possible = 0;
 			/* Check if we're going into VBlank next */
@@ -1669,7 +1672,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				if ( ! gb_lcd.mode_irq && ( LCDSTAT & 0x20 ) &&
 					 ( ( ! gb_lcd.triggering_line_irq && ! gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
 					gb_lcd.mode_irq = 1;
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
 				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2);
 			}
@@ -1681,7 +1684,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
 			if ( ( LCDSTAT & 0x20 ) && ! gb_lcd.line_irq && ! gb_lcd.line_irq ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			/* Check for regular compensation of x-scroll register */
 			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
@@ -1695,7 +1698,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Generate lcd interrupt if requested */
 			if ( ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
 				 ( !gb_lcd.mode_irq && ! gb_lcd.line_irq && ! gb_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			gb_lcd.line_irq = gb_lcd.triggering_line_irq;
 			/* Check if LY==LYC STAT bit should be set */
@@ -1725,14 +1728,14 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
 			if ( CURLINE == 144 ) {
 				/* Trigger VBlank interrupt */
-				cpunum_set_input_line( machine, 0, VBL_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				/* Set VBlank lcdstate */
 				gb_lcd.mode = 1;
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
 				/* Trigger LCD interrupt if requested */
 				if ( LCDSTAT & 0x10 ) {
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
-				}
+					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
+				}	
 			}
 			/* Check if LY==LYC STAT bit should be set */
 			if ( CURLINE == CMPLINE ) {
@@ -1741,7 +1744,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				LCDSTAT &= ~0x04;
 			}
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC);
 			break;
@@ -1752,7 +1755,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.line_irq = 0;
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			if ( gb_lcd.current_line == 153 ) {
 				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1);
@@ -1764,7 +1767,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check LY=LYC for line #153 */
 			if ( gb_lcd.delayed_line_irq ) {
 				if ( gb_lcd.triggering_line_irq ) {
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
 			}
 			gb_lcd.delayed_line_irq = gb_lcd.delayed_line_irq | gb_lcd.line_irq;
@@ -1782,14 +1785,14 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
@@ -1826,7 +1829,7 @@ static void gb_lcd_switch_on( running_machine *machine ) {
 		LCDSTAT |= 0x04;
 		/* Generate lcd interrupt if requested */
 		if ( LCDSTAT & 0x40 ) {
-			cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+			cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 		}
 	}
 	gb_lcd.state = GB_LCD_STATE_LY00_M2;
@@ -1875,7 +1878,7 @@ WRITE8_HANDLER ( gb_video_w ) {
 		}
 		/* If LCD is being switched on */
 		if ( !( LCDCONT & 0x80 ) && ( data & 0x80 ) ) {
-			gb_lcd_switch_on( machine );
+			gb_lcd_switch_on( space->machine );
 		}
 		break;
 	case 0x01:						/* STAT - LCD Status */
@@ -1907,7 +1910,7 @@ WRITE8_HANDLER ( gb_video_w ) {
 				( ( LCDSTAT & 0x60 ) == 0x00 && ( data & 0x60 ) == 0x20 ) ||
 				( ( LCDSTAT & 0x60 ) == 0x20 && ( data & 0x40 ) )
 				) ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( space->machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			/*
 			   - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
@@ -1915,7 +1918,7 @@ WRITE8_HANDLER ( gb_video_w ) {
 			   - 0x00 -> 0xXX (mode 0) - trigger stat bug
 			*/
 			if ( gb_lcd.mode_irq && gb_lcd.mode == 0 ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( space->machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 		}
 		break;
@@ -1928,7 +1931,7 @@ WRITE8_HANDLER ( gb_video_w ) {
 					LCDSTAT |= 0x04;
 					/* Generate lcd interrupt if requested */
 					if ( LCDSTAT & 0x40 ) {
-						cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+						cpu_set_input_line( space->machine->cpu[0], LCD_INT, HOLD_LINE );
 					}
 				}
 			} else {
@@ -1942,11 +1945,11 @@ WRITE8_HANDLER ( gb_video_w ) {
 			UINT8 *P = gb_oam;
 			offset = (UINT16) data << 8;
 			for (data = 0; data < 0xA0; data++)
-				*P++ = program_read_byte (offset++);
+				*P++ = memory_read_byte (space, offset++);
 		}
 		return;
 	case 0x07:						/* BGP - Background Palette */
-		update_scanline( machine );
+		update_scanline( space->machine );
 		gb_bpal[0] = data & 0x3;
 		gb_bpal[1] = (data & 0xC) >> 2;
 		gb_bpal[2] = (data & 0x30) >> 4;
@@ -1968,7 +1971,7 @@ WRITE8_HANDLER ( gb_video_w ) {
 		break;
 	case 0x02:						/* SCY - Scroll Y */
 	case 0x03:						/* SCX - Scroll X */
-		update_scanline( machine );
+		update_scanline( space->machine );
 	case 0x0A:						/* WY - Window Y position */
 	case 0x0B:						/* WX - Window X position */
 		break;
@@ -2018,7 +2021,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		}
 		/* If LCD is being switched on */
 		if ( !( LCDCONT & 0x80 ) && ( data & 0x80 ) ) {
-			gb_lcd_switch_on( machine );
+			gb_lcd_switch_on( space->machine );
 		}
 		break;
 	case 0x01:      /* STAT - LCD Status */
@@ -2028,7 +2031,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			   - 0x20 -> 0x08/0x18/0x28/0x48 (mode 0, after m2int) - trigger
 			*/
 			if ( gb_lcd.mode_irq && gb_lcd.mode == 0 && ( LCDSTAT & 0x28 ) == 0x20 && ( data & 0x08 ) ) {
-				cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+				cpu_set_input_line( space->machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			/* Check if line irqs are being disabled */
 			if ( ! ( data & 0x40 ) ) {
@@ -2038,7 +2041,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			if ( ! ( LCDSTAT & 0x40 ) && ( data & 0x40 ) ) {
 				if ( CMPLINE == CURLINE ) {
 					gb_lcd.line_irq = 1;
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( space->machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
 			}
 		}
@@ -2050,7 +2053,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 				LCDSTAT |= 0x04;
 				/* Generate lcd interrupt if requested */
 				if ( LCDSTAT & 0x40 ) {
-					cpunum_set_input_line( machine, 0, LCD_INT, HOLD_LINE );
+					cpu_set_input_line( space->machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
 			} else {
 				LCDSTAT &= 0xFB;
@@ -2062,7 +2065,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 	case 0x07:      /* BGP - GB background palette */
 		/* Some GBC games are lazy and still call this */
 		if( gbc_mode == GBC_MODE_MONO ) {
-			update_scanline( machine );
+			update_scanline( space->machine );
 			cgb_bpal[0] = gbc_to_gb_pal[(data & 0x03)];
 			cgb_bpal[1] = gbc_to_gb_pal[(data & 0x0C) >> 2];
 			cgb_bpal[2] = gbc_to_gb_pal[(data & 0x30) >> 4];
@@ -2191,7 +2194,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		return;
 	default:
 		/* we didn't handle the write, so pass it to the GB handler */
-		gb_video_w( machine, offset, data );
+		gb_video_w( space, offset, data );
 		return;
 	}
 

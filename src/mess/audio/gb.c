@@ -384,7 +384,7 @@ WRITE8_HANDLER( gb_sound_w )
 		return;
 	}
 
-	gb_sound_w_internal( machine, offset, data );
+	gb_sound_w_internal( space->machine, offset, data );
 }
 
 
