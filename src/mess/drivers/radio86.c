@@ -316,23 +316,23 @@ MACHINE_DRIVER_END
 
 static UINT8 *radio16_io_mirror = NULL;
 
-static OPBASE_HANDLER( radio16_opbase )
+static DIRECT_UPDATE_HANDLER( radio16_direct )
 {	
-	if (address >= 0x4000 && address <=0x7FFF) {
-			opbase->mask = 0xffff;
-			opbase->ram = radio16_io_mirror;
-			opbase->rom = radio16_io_mirror;
-			opbase->mem_min = 0x4000;
-			opbase->mem_max = 0x7fff;
-			radio16_io_mirror[address] = cpunum_get_reg(0, I8080_STATUS);
-	} 
+/*	if (address >= 0x4000 && address <=0x7FFF) {
+			direct->mask = 0xffff;
+			direct->ram = radio16_io_mirror;
+			direct->rom = radio16_io_mirror;
+			direct->mem_min = 0x4000;
+			direct->mem_max = 0x7fff;
+			radio16_io_mirror[address] = cpu_get_reg(machine->cpu[0], I8080_STATUS);
+	} */
 	return address;
 }
 
 static MACHINE_START( radio16 )
 {
 	radio16_io_mirror = auto_malloc( 0x8000 );
-	memory_set_opbase_handler( 0, radio16_opbase );
+	memory_set_direct_update_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), radio16_direct );
 }
 
 static MACHINE_DRIVER_START( radio16 )

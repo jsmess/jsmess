@@ -32,8 +32,8 @@ DRIVER_INIT(radio86)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "main");
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
-  	memory_configure_bank(1, 1, 2, RAM, 0x0000);
-	memory_configure_bank(1, 0, 2, RAM, 0xf800);
+  	memory_configure_bank(machine, 1, 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, 1, 0, 2, RAM, 0xf800);
 	radio86_init_keyboard();
 }
 
@@ -137,9 +137,9 @@ static I8275_DMA_REQUEST(radio86_video_dma_request) {
 READ8_DEVICE_HANDLER(radio86_dma_read_byte)
 {
 	UINT8 result;
-	cpuintrf_push_context(0);
-	result = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_push_context(device->machine->cpu[0]);
+	result = memory_read_byte(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),offset);
+	cpu_pop_context();
 	return result;
 }
 
@@ -163,30 +163,30 @@ const dma8257_interface radio86_dma =
 
 static TIMER_CALLBACK( radio86_reset )	
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static UINT8 romdisk_lsb,romdisk_msb, disk_sel;
 
 READ8_HANDLER (radio_cpu_state_r )
 {
-	return cpunum_get_reg(0, I8080_STATUS);	
+	return cpu_get_reg(space->cpu, I8080_STATUS);	
 }
 
 READ8_HANDLER (radio_io_r )
 {
-	return program_read_byte((offset << 8) + offset);
+	return memory_read_byte(space,(offset << 8) + offset);
 }
 
 WRITE8_HANDLER(radio_io_w )
 {
-	program_write_byte((offset << 8) + offset,data);
+	memory_write_byte(space,(offset << 8) + offset,data);
 }
 
 MACHINE_RESET( radio86 )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 
 	radio86_keyboard_mask = 0;
 	disk_sel = 0;

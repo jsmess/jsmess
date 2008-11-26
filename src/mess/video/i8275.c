@@ -490,8 +490,6 @@ void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle
 static DEVICE_START( i8275 )
 {
 	i8275_t *i8275 = get_safe_token(device);
-	char unique_tag[30];
-
 	// validate arguments
 
 	assert(device != NULL);
@@ -510,32 +508,30 @@ static DEVICE_START( i8275 )
 	assert(i8275->screen != NULL);
 
 	// register for state saving
-	state_save_combine_module_and_tag(unique_tag, "I8275", device->tag);
+	state_save_register_item("I8275", NULL, 0, i8275->status_reg);
+	state_save_register_item("I8275", NULL, 0, i8275->num_of_params);
+	state_save_register_item("I8275", NULL, 0, i8275->current_command);
+	state_save_register_item("I8275", NULL, 0, i8275->param_type);
 
-	state_save_register_item(unique_tag, 0, i8275->status_reg);
-	state_save_register_item(unique_tag, 0, i8275->num_of_params);
-	state_save_register_item(unique_tag, 0, i8275->current_command);
-	state_save_register_item(unique_tag, 0, i8275->param_type);
+	state_save_register_item("I8275", NULL, 0, i8275->cursor_col);
+	state_save_register_item("I8275", NULL, 0, i8275->cursor_row);
 
-	state_save_register_item(unique_tag, 0, i8275->cursor_col);
-	state_save_register_item(unique_tag, 0, i8275->cursor_row);
+	state_save_register_item("I8275", NULL, 0, i8275->light_pen_col);
+	state_save_register_item("I8275", NULL, 0, i8275->light_pen_row);
 
-	state_save_register_item(unique_tag, 0, i8275->light_pen_col);
-	state_save_register_item(unique_tag, 0, i8275->light_pen_row);
+	state_save_register_item("I8275", NULL, 0, i8275->rows_type);
+	state_save_register_item("I8275", NULL, 0, i8275->chars_per_row);
+	state_save_register_item("I8275", NULL, 0, i8275->vert_retrace_rows);
+	state_save_register_item("I8275", NULL, 0, i8275->rows_per_frame);
+	state_save_register_item("I8275", NULL, 0, i8275->undeline_line_num);
+	state_save_register_item("I8275", NULL, 0, i8275->lines_per_row);
+	state_save_register_item("I8275", NULL, 0, i8275->line_counter_mode);
+	state_save_register_item("I8275", NULL, 0, i8275->field_attribute_mode);
+	state_save_register_item("I8275", NULL, 0, i8275->cursor_format);
+	state_save_register_item("I8275", NULL, 0, i8275->hor_retrace_count);
 
-	state_save_register_item(unique_tag, 0, i8275->rows_type);
-	state_save_register_item(unique_tag, 0, i8275->chars_per_row);
-	state_save_register_item(unique_tag, 0, i8275->vert_retrace_rows);
-	state_save_register_item(unique_tag, 0, i8275->rows_per_frame);
-	state_save_register_item(unique_tag, 0, i8275->undeline_line_num);
-	state_save_register_item(unique_tag, 0, i8275->lines_per_row);
-	state_save_register_item(unique_tag, 0, i8275->line_counter_mode);
-	state_save_register_item(unique_tag, 0, i8275->field_attribute_mode);
-	state_save_register_item(unique_tag, 0, i8275->cursor_format);
-	state_save_register_item(unique_tag, 0, i8275->hor_retrace_count);
-
-	state_save_register_item(unique_tag, 0, i8275->burst_space_code);
-	state_save_register_item(unique_tag, 0, i8275->burst_count_code);
+	state_save_register_item("I8275", NULL, 0, i8275->burst_space_code);
+	state_save_register_item("I8275", NULL, 0, i8275->burst_count_code);
 	return DEVICE_START_OK;
 }
 

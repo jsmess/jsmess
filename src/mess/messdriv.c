@@ -962,20 +962,20 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( radio99 )
 
 	/* Specialist */
-//128u4	DRIVER( special )
-//128u4	DRIVER( specialp )
-//128u4	DRIVER( lik )
-//128u4	DRIVER( erik )
-//128u4	DRIVER( specimx )
+	DRIVER( special )
+	DRIVER( specialp )
+	DRIVER( lik )
+	DRIVER( erik )
+	DRIVER( specimx )
 
 	/* Orion */
-//128u4	DRIVER( orion128 )
-//128u4	DRIVER( orionms )
-//128u4	DRIVER( orionz80 )
-//128u4	DRIVER( orionide )
-//128u4	DRIVER( orionzms )
-//128u4	DRIVER( orionidm )
-//128u4	DRIVER( orionpro )
+	DRIVER( orion128 )
+	DRIVER( orionms )
+	DRIVER( orionz80 )
+	DRIVER( orionide )
+	DRIVER( orionzms )
+	DRIVER( orionidm )
+	DRIVER( orionpro )
 
 	/* BK */
 	DRIVER( bk0010 )
@@ -987,17 +987,17 @@ XL/XE 16kB OS roms
 	DRIVER( b2mrom )
 
 	/* Radio-86RK */
-//128u4	DRIVER( radio86 )
-//128u4	DRIVER( radio16 )
-//128u4	DRIVER( radio4k )
-//128u4	DRIVER( rk7007 )
-//128u4	DRIVER( rk700716 )
-//128u4	DRIVER( radiorom )
-//128u4	DRIVER( radioram )
-//128u4	DRIVER( spektr01 )
-//128u4	DRIVER( apogee )
-//128u4	DRIVER( mikrosha )
-//128u4	DRIVER( partner )
+	DRIVER( radio86 )
+	DRIVER( radio16 )
+	DRIVER( radio4k )
+	DRIVER( rk7007 )
+	DRIVER( rk700716 )
+	DRIVER( radiorom )
+	DRIVER( radioram )
+	DRIVER( spektr01 )
+	DRIVER( apogee )
+	DRIVER( mikrosha )
+	DRIVER( partner )
 
   	/* Homelab */  
 	DRIVER (homelab2)
@@ -1060,7 +1060,7 @@ XL/XE 16kB OS roms
 	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
-//128u4	DRIVER(kramermc) /* 1987 Kramer MC				*/
+	DRIVER(kramermc) /* 1987 Kramer MC				*/
 
 	/* Ei Nis */
 	DRIVER(pecom64)

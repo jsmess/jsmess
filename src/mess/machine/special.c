@@ -31,8 +31,8 @@ DRIVER_INIT(special)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "main");	
 	memset(RAM,0x0000,0x3000); // make frist page empty by default
-	memory_configure_bank(1, 1, 2, RAM, 0x0000);
-	memory_configure_bank(1, 0, 2, RAM, 0xc000);	
+	memory_configure_bank(machine, 1, 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, 1, 0, 2, RAM, 0xc000);	
 }
 
 static READ8_DEVICE_HANDLER (specialist_8255_porta_r )
@@ -117,24 +117,24 @@ const ppi8255_interface specialist_ppi8255_interface =
 
 static TIMER_CALLBACK( special_reset )
 {
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 
 MACHINE_RESET( special )
 {
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, special_reset);
-	memory_set_bank(1, 1);	
+	memory_set_bank(machine, 1, 1);	
 }
 
 READ8_HANDLER( specialist_keyboard_r )
 {	
-	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), (offset & 3));
+	return ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), (offset & 3));
 }
 
 WRITE8_HANDLER( specialist_keyboard_w )
 {	
-	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), (offset & 3) , data );
+	ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), (offset & 3) , data );
 }
 
 
@@ -160,43 +160,44 @@ READ8_HANDLER (specimx_video_color_r )
 
 static void specimx_set_bank(running_machine *machine, int i,int data)
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffbf, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xffc0, 0xffdf, 0, 0, SMH_BANK4);
-	memory_set_bankptr(4, mess_ram + 0xffc0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_install_write8_handler(space, 0xc000, 0xffbf, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(space, 0xffc0, 0xffdf, 0, 0, SMH_BANK4);
+	memory_set_bankptr(machine, 4, mess_ram + 0xffc0);
 	switch(i) {
 		case 0 :			  
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, video_memory_w);
+				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, video_memory_w);
 			
-				memory_set_bankptr(1, mess_ram);
-				memory_set_bankptr(2, mess_ram + 0x9000);
-				memory_set_bankptr(3, mess_ram + 0xc000);				
+				memory_set_bankptr(machine, 1, mess_ram);
+				memory_set_bankptr(machine, 2, mess_ram + 0x9000);
+				memory_set_bankptr(machine, 3, mess_ram + 0xc000);				
 				break;
 		case 1 :
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK2);
+				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_BANK2);
 			
-				memory_set_bankptr(1, mess_ram + 0x10000);
-				memory_set_bankptr(2, mess_ram + 0x19000);
-				memory_set_bankptr(3, mess_ram + 0x1c000);								
+				memory_set_bankptr(machine, 1, mess_ram + 0x10000);
+				memory_set_bankptr(machine, 2, mess_ram + 0x19000);
+				memory_set_bankptr(machine, 3, mess_ram + 0x1c000);								
 				break;
 		case 2 :
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_UNMAP);
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
+				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_UNMAP);
+				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
 			
-				memory_set_bankptr(1, memory_region(machine, "main") + 0x10000);
-				memory_set_bankptr(2, memory_region(machine, "main") + 0x19000);
+				memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
+				memory_set_bankptr(machine, 2, memory_region(machine, "main") + 0x19000);
 			  if (data & 0x80) {
-					memory_set_bankptr(3, mess_ram + 0x1c000);					
+					memory_set_bankptr(machine, 3, mess_ram + 0x1c000);					
 				} else {
-					memory_set_bankptr(3, mess_ram + 0xc000);					
+					memory_set_bankptr(machine, 3, mess_ram + 0xc000);					
 				}
 				break;
 	}
 }
 WRITE8_HANDLER( specimx_select_bank )
 {	
-	specimx_set_bank(machine, offset, data);	
+	specimx_set_bank(space->machine, offset, data);	
 }
 
 DRIVER_INIT(specimx)
@@ -333,62 +334,63 @@ static void erik_set_bank(running_machine *machine) {
 	UINT8 bank3 = ((RR_register >> 4) & 3);
 	UINT8 bank4 = ((RR_register >> 6) & 3);
 	UINT8 *mem = memory_region(machine, "main");
-
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_BANK4);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_BANK5);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK6);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);	
+	
+	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(space, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(space, 0xc000, 0xefff, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(space, 0xf000, 0xf7ff, 0, 0, SMH_BANK5);
+	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK6);
 	
 	switch(bank1) {
 		case 	1: 						
 		case 	2:
 		case 	3: 			
-						memory_set_bankptr(1, mess_ram + 0x10000*(bank1-1));			 
+						memory_set_bankptr(machine, 1, mess_ram + 0x10000*(bank1-1));			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(1, mem + 0x10000);	
+						memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(machine, 1, mem + 0x10000);	
 						break;
 	}
 	switch(bank2) {
 		case 	1: 						
 		case 	2:
 		case 	3: 			
-						memory_set_bankptr(2, mess_ram + 0x10000*(bank2-1) + 0x4000);			 
+						memory_set_bankptr(machine, 2, mess_ram + 0x10000*(bank2-1) + 0x4000);			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x8fff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(2, mem + 0x14000);	
+						memory_install_write8_handler(space, 0x4000, 0x8fff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(machine, 2, mem + 0x14000);	
 						break;
 	}
 	switch(bank3) {
 		case 	1: 												
 		case 	2:
 		case 	3: 			
-						memory_set_bankptr(3, mess_ram + 0x10000*(bank3-1) + 0x9000);			 
+						memory_set_bankptr(machine, 3, mess_ram + 0x10000*(bank3-1) + 0x9000);			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(3, mem + 0x19000);	
+						memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(machine, 3, mem + 0x19000);	
 						break;
 	}
 	switch(bank4) {
 		case 	1: 						
 		case 	2:
 		case 	3: 			
-						memory_set_bankptr(4, mess_ram + 0x10000*(bank4-1) + 0x0c000);			 
-						memory_set_bankptr(5, mess_ram + 0x10000*(bank4-1) + 0x0f000);			 
-						memory_set_bankptr(6, mess_ram + 0x10000*(bank4-1) + 0x0f800);			 
+						memory_set_bankptr(machine, 4, mess_ram + 0x10000*(bank4-1) + 0x0c000);			 
+						memory_set_bankptr(machine, 5, mess_ram + 0x10000*(bank4-1) + 0x0f000);			 
+						memory_set_bankptr(machine, 6, mess_ram + 0x10000*(bank4-1) + 0x0f800);			 
 						break;		
 		case 	0: 
-						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, SMH_UNMAP);
-						memory_set_bankptr(4, mem + 0x1c000);	
-						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
-						memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xf7ff, 0, 0, SMH_NOP);
-						memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);
-						memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, specialist_keyboard_r);
+						memory_install_write8_handler(space, 0xc000, 0xefff, 0, 0, SMH_UNMAP);
+						memory_set_bankptr(machine, 4, mem + 0x1c000);	
+						memory_install_write8_handler(space, 0xf000, 0xf7ff, 0, 0, SMH_UNMAP);
+						memory_install_read8_handler(space, 0xf000, 0xf7ff, 0, 0, SMH_NOP);
+						memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, specialist_keyboard_w);
+						memory_install_read8_handler(space, 0xf800, 0xffff, 0, 0, specialist_keyboard_r);
 						break;
 	}
 }
@@ -422,7 +424,7 @@ READ8_HANDLER ( erik_rr_reg_r )
 WRITE8_HANDLER( erik_rr_reg_w ) 
 {
 	RR_register = data;
-	erik_set_bank(machine);
+	erik_set_bank(space->machine);
 }
 
 READ8_HANDLER ( erik_rc_reg_r ) 

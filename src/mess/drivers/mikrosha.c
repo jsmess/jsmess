@@ -133,23 +133,23 @@ static const cassette_config mikrosha_cassette_config =
 
 static UINT8 *mikrosha_io_mirror = NULL;
 
-static OPBASE_HANDLER( mikrosha_opbase )
-{	
-	if (address >= 0x8000 && address <=0xFFFF) {
+static DIRECT_UPDATE_HANDLER( mikrosha_direct )
+{		
+/*	if (address >= 0x8000 && address <=0xFFFF) {
 			opbase->mask = 0xffff;
 			opbase->ram = mikrosha_io_mirror;
 			opbase->rom = mikrosha_io_mirror;
 			opbase->mem_min = 0x8000;
 			opbase->mem_max = 0xffff;
 			mikrosha_io_mirror[address] = cpunum_get_reg(0, I8080_STATUS);
-	} 
+	} */
 	return address;
 }
 
 static MACHINE_START( mikrosha )
 {
 	mikrosha_io_mirror = auto_malloc( 0x10000 );
-	memory_set_opbase_handler( 0, mikrosha_opbase );
+	memory_set_direct_update_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), mikrosha_direct );
 }
 
 static PIT8253_OUTPUT_CHANGED(mikrosha_pit_out2)
