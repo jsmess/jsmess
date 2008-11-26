@@ -22,12 +22,12 @@ DRIVER_INIT(pp01)
 MACHINE_RESET( pp01 )
 {
 	UINT8 *mem = memory_region(machine, "main");
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
-	memory_set_bankptr(1, mem + 0x010000);
-	memory_set_bankptr(2, mess_ram + 0x4000);
-	memory_set_bankptr(3, mess_ram + 0x8000);
-	memory_set_bankptr(4, mem + 0x010000);
+	memory_set_bankptr(machine, 1, mem + 0x010000);
+	memory_set_bankptr(machine, 2, mess_ram + 0x4000);
+	memory_set_bankptr(machine, 3, mess_ram + 0x8000);
+	memory_set_bankptr(machine, 4, mem + 0x010000);
 
 }
 

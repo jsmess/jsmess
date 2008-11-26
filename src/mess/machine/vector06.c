@@ -55,7 +55,7 @@ WRITE8_HANDLER(vector06_color_set)
 	UINT8 r = (data & 7) << 4;
 	UINT8 g = ((data >> 3) & 7) << 4;
 	UINT8 b = ((data >>6) & 3) << 5;
-	palette_set_color( machine, vector_color_index, MAKE_RGB(r,g,b) );
+	palette_set_color( space->machine, vector_color_index, MAKE_RGB(r,g,b) );
 }
 
 const ppi8255_interface vector06_ppi8255_interface =
@@ -69,18 +69,18 @@ const ppi8255_interface vector06_ppi8255_interface =
 };
 
 READ8_HANDLER(vector_8255_1_r) {
-	return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), (offset ^ 0x03));
+	return ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector_8255_1_w) {
-	ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), (offset ^0x03) , data );
+	ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), (offset ^0x03) , data );
 
 }
 
 
 INTERRUPT_GEN( vector06_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK (  vector06_irq_callback )
@@ -91,16 +91,18 @@ static IRQ_CALLBACK (  vector06_irq_callback )
 
 MACHINE_RESET( vector06 )
 {
-	cpunum_set_irq_callback(0, vector06_irq_callback);
-	memory_install_read8_handler (machine,0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_BANK2);
-	memory_install_read8_handler (machine,0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(machine,0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, SMH_BANK4);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
+	cpu_set_irq_callback(machine->cpu[0], vector06_irq_callback);
+	memory_install_read8_handler (space, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler (space, 0x8000, 0xffff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK4);
 
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000);
-	memory_set_bankptr(2, mess_ram + 0x0000);
-	memory_set_bankptr(3, mess_ram + 0x8000);
-	memory_set_bankptr(4, mess_ram + 0x8000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
+	memory_set_bankptr(machine, 2, mess_ram + 0x0000);
+	memory_set_bankptr(machine, 3, mess_ram + 0x8000);
+	memory_set_bankptr(machine, 4, mess_ram + 0x8000);
 
 	vector06_keyboard_mask = 0;
 }

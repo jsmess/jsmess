@@ -1008,21 +1008,21 @@ XL/XE 16kB OS roms
 	DRIVER (irisha)
 	
 	/* PK-8020 */
-//128u4	DRIVER (korvet)
+	DRIVER (korvet)
 
 	/* Vector-06c */
-//128u4	DRIVER (vector06)
+	DRIVER (vector06)
 
 	/* Robotron 1715 */
 	DRIVER (rt1715)
 	DRIVER (rt1715w)
 
 	/* PP-01 */
-//128u4	DRIVER (pp01)
+	DRIVER (pp01)
 
 	/* Ondra */
-//128u4	DRIVER (ondrat)
-//128u4	DRIVER (ondrav)
+	DRIVER (ondrat)
+	DRIVER (ondrav)
 
 	/* SAPI-1 */
 	DRIVER (sapi1)
