@@ -368,18 +368,18 @@ SOUNDS += SP0256
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/3do.a \
-	$(MESSOBJ)/mk2.a \
-	$(MESSOBJ)/votrax.a \
-	$(MESSOBJ)/rt1715.a \
+	$(MESSOBJ)/b2m.a \
+	$(MESSOBJ)/bk.a \
 	$(MESSOBJ)/irisha.a \
-	$(MESSOBJ)/sapi1.a \
-	$(MESSOBJ)/pp01.a \
+	$(MESSOBJ)/mk2.a \
+	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/pk8020.a \
+	$(MESSOBJ)/pp01.a \
+	$(MESSOBJ)/rt1715.a \
+	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/vector06.a \
-	$(MESSOBJ)/homelab.a \
-	$(MESSOBJ)/bk.a \
-	$(MESSOBJ)/b2m.a \
+	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/acorn.a \
