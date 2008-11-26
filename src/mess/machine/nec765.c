@@ -1621,7 +1621,7 @@ void nec765_update_state(running_machine *machine)
 		fdc.FDC_main |= 0x10;                      /* set BUSY */
 
 		if (LOG_VERBOSE)
-			logerror("nec765(): pc=0x%08x command=0x%02x\n", activecpu_get_pc(), fdc.nec765_data_reg);
+			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(machine->activecpu), fdc.nec765_data_reg);
 
 		/* seek in progress? */
 		if (fdc.nec765_flags & NEC765_SEEK_ACTIVE)
@@ -1652,7 +1652,7 @@ void nec765_update_state(running_machine *machine)
 
     case NEC765_COMMAND_PHASE_BYTES:
 		if (LOG_VERBOSE)
-			logerror("nec765(): pc=0x%08x command=0x%02x\n", activecpu_get_pc(), fdc.nec765_data_reg);
+			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(machine->activecpu), fdc.nec765_data_reg);
 
 		fdc.nec765_command_bytes[fdc.nec765_transfer_bytes_count] = fdc.nec765_data_reg;
 		fdc.nec765_transfer_bytes_count++;
@@ -1704,7 +1704,7 @@ READ8_HANDLER(nec765_data_r)
 		nec765_clear_data_request();
 
 		/* update state */
-		nec765_update_state(machine);
+		nec765_update_state(space->machine);
 	}
 
 	if (LOG_EXTRA)
@@ -1736,7 +1736,7 @@ WRITE8_HANDLER(nec765_data_w)
 		nec765_clear_data_request();
 
 		/* update state */
-		nec765_update_state(machine);
+		nec765_update_state(space->machine);
 	}
 }
 
@@ -2100,7 +2100,7 @@ WRITE8_HANDLER(nec765_dack_w)
 	nec765_set_dma_drq(CLEAR_LINE);
 
 	/* write data */
-	nec765_data_w(machine, offset, data);
+	nec765_data_w(space, offset, data);
 }
 
 READ8_HANDLER(nec765_dack_r)
@@ -2109,7 +2109,7 @@ READ8_HANDLER(nec765_dack_r)
 	nec765_set_dma_drq(CLEAR_LINE);
 
 	/* read data */
-	return nec765_data_r(machine, offset);
+	return nec765_data_r(space, offset);
 }
 
 
