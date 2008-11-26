@@ -2,7 +2,7 @@
 //
 //  debugosx.c - MacOS X debug window handling
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2008, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
@@ -40,10 +40,9 @@
 #include "window.h"
 #include "video.h"
 #include "config.h"
-#include "deprecat.h"
 
 #define OSX_POPUP_COMMAND		'popu'
-#define OSX_BASE_ID				'cmd0'
+#define OSX_BASE_ID	    		'cmd0'
 
 enum
 {
@@ -56,9 +55,9 @@ enum
 	KEY_F7			= 0x62,
 	KEY_F8			= 0x64,
 	KEY_F9			= 0x65,
-	KEY_F10       	= 0x6D,
+	KEY_F10       		= 0x6D,
 	KEY_F11			= 0x67,
-	KEY_F12       	= 0x6F,
+	KEY_F12       		= 0x6F,
 	KEY_F13			= 0x69,
 	KEY_F14			= 0x6B,
 	KEY_F15			= 0x71
@@ -194,6 +193,8 @@ struct _debugwin_info
 	
 	MenuRef					contextualMenu;
 	HIViewRef				contentView;
+
+	running_machine				*machine;
 };
 
 
@@ -247,8 +248,8 @@ static int osx_inited_debugger = 0;
 //  PROTOTYPES
 //============================================================
 
-static int debugwin_init_windows(void);
-static debugwin_info *debug_window_create(const char * title, void *unused);
+static int debugwin_init_windows(running_machine *machine);
+static debugwin_info *debug_window_create(running_machine *machine, const char * title, void *unused);
 static void debug_window_free(debugwin_info *info);
 static OSStatus debug_window_proc(EventHandlerCallRef inHandler, EventRef inEvent, void * inUserData);
 
@@ -273,7 +274,7 @@ static void memory_update_checkmarks(debugwin_info *info);
 static int memory_handle_command(debugwin_info *info, EventRef inEvent);
 static int memory_handle_key(debugwin_info *info, EventRef inEvent);
 
-static void disasm_create_window(void);
+static void disasm_create_window(running_machine *machine);
 static void disasm_recompute_children(debugwin_info *info);
 static void disasm_process_string(debugwin_info *info, const char *string);
 static void disasm_update_checkmarks(debugwin_info *info);
@@ -298,11 +299,11 @@ static void smart_show_all(int show);
 //  OSX stubs
 //============================================================
 
-INLINE void osx_init_debugger( void )
+INLINE void osx_init_debugger(running_machine *machine)
 {
 	if ( osx_inited_debugger == 0 )
 	{
-		if ( debugwin_init_windows() != 0 )
+		if ( debugwin_init_windows(machine) != 0 )
 		{
 			mame_printf_error( "Could not init debugger\n" );
 			exit( -1 );
@@ -371,7 +372,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 	EventRef		message;
 	EventTargetRef	target = GetEventDispatcherTarget();
 
-	osx_init_debugger();
+	osx_init_debugger(machine);
 
 	// create a console window
 	if (!main_console)
@@ -379,7 +380,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 
 	// update the views in the console to reflect the current CPU
 	if (main_console)
-		console_set_cpunum(machine, cpu_getactivecpu());
+		console_set_cpunum(machine, cpunum_get_active());
 
 	// make sure the debug windows are visible
 	waiting_for_debugger = TRUE;
@@ -403,7 +404,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 //  debugwin_init_windows
 //============================================================
 
-static int debugwin_init_windows(void)
+static int debugwin_init_windows(running_machine *machine)
 {
 	SInt32		val;
 
@@ -483,7 +484,9 @@ void debugwin_show(int type)
 
 void debugwin_update_during_game(running_machine *machine)
 {
-	osx_init_debugger();
+	osx_init_debugger(machine);
+
+	if (!machine->debugcpu_data) return;
 
 	// if we're running live, do some checks
 	if ( ! debug_cpu_is_stopped(machine) )
@@ -525,7 +528,7 @@ void debugwin_update_during_game(running_machine *machine)
 //  debug_window_create
 //============================================================
 
-static debugwin_info *debug_window_create(const char *title, void *unused)
+static debugwin_info *debug_window_create(running_machine *machine, const char *title, void *unused)
 {
 	CGDirectDisplayID	mainID = CGMainDisplayID();
 
@@ -541,6 +544,7 @@ static debugwin_info *debug_window_create(const char *title, void *unused)
 	memset(info, 0, sizeof(*info));
 
 	info->wnd = NULL;
+	info->machine = machine;
 
 	// create the window
 	work_bounds.top = work_bounds.left = 0;
@@ -796,7 +800,7 @@ static OSStatus debug_window_proc(EventHandlerCallRef inHandler, EventRef inEven
 				if (main_console && main_console->wnd == info->wnd)
 				{
 					smart_show_all(FALSE);
-					debug_cpu_go(~0);
+					debug_cpu_go(info->machine, ~0);
 					return noErr;
 				}
 				
@@ -903,7 +907,7 @@ static int debug_view_create(debugwin_info *info, int which, int type)
 	SetControlProperty(view->vscroll, 'MAME', 'info', sizeof( view ), &view );
 
 	// create the debug view
-	view->view = debug_view_alloc(type);
+	view->view = debug_view_alloc(info->machine, type);
 	if (!view->view)
 		goto cleanup;
 
@@ -970,6 +974,8 @@ static void debug_view_draw_contents(debugview_info *view, CGContextRef dc)
 	visrows = debug_view_get_property_UINT32(view->view, DVP_VISIBLE_ROWS);
 	viscols = debug_view_get_property_UINT32(view->view, DVP_VISIBLE_COLS);
 	viewdata = debug_view_get_property_ptr(view->view, DVP_VIEW_DATA);
+
+	if (!viewdata) return;
 
 	// set the font
 	CGContextSelectFont(dc, OSX_DEBUGGER_FONT_NAME, OSX_DEBUGGER_FONT_SIZE, kCGEncodingMacRoman);
@@ -1833,42 +1839,6 @@ static OSStatus debug_edit_proc(EventHandlerCallRef inHandler, EventRef inEvent,
 	return eventNotHandledErr;
 }
 
-#if 0
-//============================================================
-//  generic_create_window
-//============================================================
-
-static void generic_create_window(int type)
-{
-	debugwin_info *info;
-	char title[256];
-	Rect	bounds;
-
-	// create the window
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
-	info = debug_window_create(title, NULL);
-	if (!info || !debug_view_create(info, 0, type))
-		return;
-
-	// set the child function
-	info->recompute_children = generic_recompute_children;
-
-	// recompute the children once to get the maxwidth
-	generic_recompute_children(info);
-
-	// position the window and recompute children again
-	bounds.top = bounds.left = 100;
-	bounds.right = bounds.left + info->maxwidth;
-	bounds.bottom = bounds.top + 200;
-	
-	SetWindowBounds(info->wnd, kWindowStructureRgn, &bounds );
-	ShowWindow(info->wnd);
-	SelectWindow(info->wnd);
-	
-	generic_recompute_children(info);
-}
-#endif
-
 
 //============================================================
 //  generic_recompute_children
@@ -1922,7 +1892,7 @@ static void log_create_window(running_machine *machine)
 
 	// create the window
 	snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
-	info = debug_window_create(title, NULL);
+	info = debug_window_create(machine, title, NULL);
 	if (!info || !debug_view_create(info, 0, DVT_LOG))
 		return;
 	info->view->is_textbuf = TRUE;
@@ -1974,9 +1944,11 @@ static void memory_determine_combo_items(running_machine *machine)
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
+		if (machine->cpu[cpunum] != NULL)
+		{
+       			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			{
 				if (cpuinfo->space[spacenum].databytes)
 				{
 					memorycombo_item *ci = malloc_or_die(sizeof(*ci));
@@ -1984,10 +1956,12 @@ static void memory_determine_combo_items(running_machine *machine)
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
-					snprintf(ci->name, ARRAY_LENGTH(ci->name), "CPU #%d \"%s\" (%s) %s memory", cpunum, machine->config->cpu[cpunum].tag, cpunum_name(cpunum), address_space_names[spacenum]);
+					snprintf(ci->name, ARRAY_LENGTH(ci->name), "CPU #%d \"%s\" (%s) %s memory", cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]), address_space_names[spacenum]);
 					*tail = ci;
 					tail = &ci->next;
 				}
+			}
+		}
 	}
 
 	// then add all the memory regions
@@ -2072,7 +2046,7 @@ static void memory_update_selection(debugwin_info *info, memorycombo_item *ci)
 
 static void memory_create_window(running_machine *machine)
 {
-	int curcpu = cpu_getactivecpu(), cursel = 0;
+	int curcpu = cpunum_get_active(), cursel = 0;
 	memorycombo_item *ci, *selci = NULL;
 	debugwin_info *info;
 	MenuRef optionsmenu,popupmenu;
@@ -2083,7 +2057,7 @@ static void memory_create_window(running_machine *machine)
 	ControlButtonContentInfo	content;
 
 	// create the window
-	info = debug_window_create("Memory", NULL);
+	info = debug_window_create(machine, "Memory", NULL);
 	if (!info || !debug_view_create(info, 0, DVT_MEMORY))
 		return;
 
@@ -2581,9 +2555,9 @@ static int memory_handle_key(debugwin_info *info, EventRef inEvent)
 //  disasm_create_window
 //============================================================
 
-static void disasm_create_window(void)
+static void disasm_create_window(running_machine *machine)
 {
-	int curcpu = cpu_getactivecpu(), cursel = 0;
+	int curcpu = cpunum_get_active(), cursel = 0;
 	debugwin_info *info;
 	MenuRef optionsmenu, popupmenu;
 	UINT32 cpunum;
@@ -2594,7 +2568,7 @@ static void disasm_create_window(void)
 	ControlButtonContentInfo	content;
 
 	// create the window
-	info = debug_window_create("Disassembly", NULL);
+	info = debug_window_create(machine, "Disassembly", NULL);
 	if (!info || !debug_view_create(info, 0, DVT_DISASSEMBLY))
 		return;
 
@@ -2677,15 +2651,16 @@ static void disasm_create_window(void)
 	// populate the combobox
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
+		if (machine->cpu[cpunum] != NULL)
+		{
+       			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
 			{
 				CFStringRef		cfName;
 				char			name[100];
 				UInt16			item;
 
-				snprintf(name, ARRAY_LENGTH(name), "CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
+				snprintf(name, ARRAY_LENGTH(name), "CPU #%d \"%s\" (%s)", cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
 				
 				cfName = CFStringCreateWithCString( NULL, name, CFStringGetSystemEncoding() );
 				AppendMenuItemTextWithCFString( popupmenu, cfName, 0, 0, &item );
@@ -2694,6 +2669,7 @@ static void disasm_create_window(void)
 				if (cpunum == curcpu)
 					cursel = item;
 			}
+		}
 	}
 	
 	SetControlData(info->otherwnd[0], kControlEntireControl, kControlPopupButtonOwnedMenuRefTag, sizeof(popupmenu),&popupmenu);
@@ -2884,9 +2860,11 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 				UINT32 cpunum;
 				for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 				{
-					const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-					if (cpuinfo->valid)
+					if (info->machine->cpu[cpunum] != NULL)
+					{
+			       			const cpu_debug_data *cpuinfo = cpu_get_debug_data(info->machine->cpu[cpunum]);
 						if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
+						{
 							if (--sel == 0)
 							{
 								debug_view_begin_update(info->view[0].view);
@@ -2894,6 +2872,8 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 								debug_view_end_update(info->view[0].view);
 								disasm_update_caption(info);
 							}
+						}
+					}
 				}
 
 				// reset the focus
@@ -2932,7 +2912,7 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 			{
 				active_address = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_ACTIVE_ADDRESS);
 				sprintf(command, "go %X", active_address);
-				debug_console_execute_command(Machine, command, 1);
+				debug_console_execute_command(info->machine, command, 1);
 			}
 			return 1;
 
@@ -2940,7 +2920,7 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 			if (debug_view_get_property_UINT32(info->view[0].view, DVP_CURSOR_VISIBLE))
 			{
 				UINT32 cpu_num = 0;
-				debug_cpu_info *cpuinfo ;
+				cpu_debug_data *cpuinfo ;
 				debug_cpu_breakpoint *bp;
 				INT8 bp_exists = 0;
 				UINT32 bp_num = 0;
@@ -2950,7 +2930,7 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 
 				/* is there already a breakpoint there? */
 				cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
-				cpuinfo = (debug_cpu_info*)debug_get_cpu_info(cpu_num);
+				cpuinfo = (cpu_debug_data*)cpu_get_debug_data(info->machine->cpu[cpu_num]); 
 
 				for (bp = cpuinfo->bplist; bp; bp = bp->next)
 				{
@@ -2966,7 +2946,7 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 					sprintf(command, "bpset %X", BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM));
 				else
 					sprintf(command, "bpclear %X", bp_num);
-				debug_console_execute_command(Machine, command, 1);
+				debug_console_execute_command(info->machine, command, 1);
 			}
 			return 1;
 	}
@@ -3026,7 +3006,7 @@ static int disasm_handle_key(debugwin_info *info, EventRef inEvent)
 				{
 					active_address = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_ACTIVE_ADDRESS);
 					sprintf(command, "go %X", active_address);
-					debug_console_execute_command(Machine, command, 1);
+					debug_console_execute_command(info->machine, command, 1);
 				}
 				return 1;
 			
@@ -3034,7 +3014,7 @@ static int disasm_handle_key(debugwin_info *info, EventRef inEvent)
 				if (debug_view_get_property_UINT32(info->view[0].view, DVP_CURSOR_VISIBLE))
 				{
 					UINT32 cpu_num = 0;
-					debug_cpu_info *cpuinfo ;
+					cpu_debug_data *cpuinfo ;
 					debug_cpu_breakpoint *bp;
 					INT8 bp_exists = 0;
 					UINT32 bp_num = 0;
@@ -3044,7 +3024,7 @@ static int disasm_handle_key(debugwin_info *info, EventRef inEvent)
 
 					/* is there already a breakpoint there? */
 					cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
-					cpuinfo = (debug_cpu_info*)debug_get_cpu_info(cpu_num);
+					cpuinfo = (cpu_debug_data*)cpu_get_debug_data(info->machine->cpu[cpu_num]); 
 
 					for (bp = cpuinfo->bplist; bp; bp = bp->next)
 					{
@@ -3060,7 +3040,7 @@ static int disasm_handle_key(debugwin_info *info, EventRef inEvent)
 						sprintf(command, "bpset %X", BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM));
 					else
 						sprintf(command, "bpclear %X", bp_num);
-					debug_console_execute_command(Machine, command, 1);
+					debug_console_execute_command(info->machine, command, 1);
 				}
 				return 1;
 		}
@@ -3069,7 +3049,7 @@ static int disasm_handle_key(debugwin_info *info, EventRef inEvent)
 		{
 			if (debug_view_get_property_UINT32(info->view[0].view, DVP_CURSOR_VISIBLE))
 			{
-				debug_cpu_single_step(1);
+				debug_cpu_single_step(info->machine, 1);
 				return 1;
 			}
 		}
@@ -3094,7 +3074,7 @@ static void disasm_update_caption(debugwin_info *info)
 	cpunum = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
+	snprintf(title, ARRAY_LENGTH(title), "Disassembly: CPU #%d \"%s\" (%s)", cpunum, info->machine->config->cpu[cpunum].tag, cpu_get_name(info->machine->cpu[cpunum]));
 
 	cftitle = CFStringCreateWithCString( NULL, title, CFStringGetSystemEncoding() );
 	
@@ -3125,11 +3105,11 @@ void console_create_window(running_machine *machine)
 	ControlButtonContentInfo	content;
 
 	// create the window
-	info = debug_window_create("Debug", NULL);
+	info = debug_window_create(machine, "Debug", NULL);
 	if (!info)
 		return;
 	main_console = info;
-	console_set_cpunum(Machine, 0);
+	console_set_cpunum(machine, 0);
 
 	// create the views
 	if (!debug_view_create(info, 0, DVT_DISASSEMBLY))
@@ -3217,7 +3197,7 @@ void console_create_window(running_machine *machine)
 	info->minwidth = 0;
 	info->maxwidth = 0;
 	for (cpunum = MAX_CPU - 1; (INT32)cpunum >= 0; cpunum--)
-		if (Machine->config->cpu[cpunum].type != CPU_DUMMY)
+		if (machine->config->cpu[cpunum].type != CPU_DUMMY)
 		{
 			UINT32 regchars, dischars, conchars;
 			UINT32 minwidth, maxwidth;
@@ -3376,11 +3356,11 @@ static void console_process_string(debugwin_info *info, const char *string)
 
 	// an empty string is a single step
 	if (string[0] == 0)
-		debug_cpu_single_step(1);
+		debug_cpu_single_step(info->machine, 1);
 
 	// otherwise, just process the command
 	else
-		debug_console_execute_command(Machine, string, 1);
+		debug_console_execute_command(info->machine, string, 1);
 
 	// clear the edit text box
 	SetControlData(info->editwnd, kControlEntireControl, kControlEditTextTextTag, 0, &buffer);
@@ -3404,7 +3384,7 @@ static void console_set_cpunum(running_machine *machine, int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpu_getactivecpu(), machine->config->cpu[cpu_getactivecpu()].tag, activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
 	
 	cftitle = CFStringCreateWithCString( NULL, title, CFStringGetSystemEncoding() );
 	
@@ -3482,58 +3462,58 @@ static int global_handle_command(debugwin_info *info, EventRef inEvent)
 	switch( cmd.commandID )
 	{
 		case ID_NEW_MEMORY_WND:
-			memory_create_window(Machine);
+			memory_create_window(info->machine);
 			return 1;
 
 		case ID_NEW_DISASM_WND:
-			disasm_create_window();
+			disasm_create_window(info->machine);
 			return 1;
 
 		case ID_NEW_LOG_WND:
-			log_create_window(Machine);
+			log_create_window(info->machine);
 			return 1;
 
 		case ID_RUN_AND_HIDE:
 			smart_show_all(FALSE);
 		case ID_RUN:
-			debug_cpu_go(~0);
+			debug_cpu_go(info->machine, ~0);
 			return 1;
 
 		case ID_NEXT_CPU:
-			debug_cpu_next_cpu();
+			debug_cpu_next_cpu(info->machine);
 			return 1;
 
 		case ID_RUN_VBLANK:
-			debug_cpu_go_vblank();
+			debug_cpu_go_vblank(info->machine);
 			return 1;
 
 		case ID_RUN_IRQ:
-			debug_cpu_go_interrupt(-1);
+			debug_cpu_go_interrupt(info->machine, -1);
 			return 1;
 
 		case ID_STEP:
-			debug_cpu_single_step(1);
+			debug_cpu_single_step(info->machine, 1);
 			return 1;
 
 		case ID_STEP_OVER:
-			debug_cpu_single_step_over(1);
+			debug_cpu_single_step_over(info->machine, 1);
 			return 1;
 
 		case ID_STEP_OUT:
-			debug_cpu_single_step_out();
+			debug_cpu_single_step_out(info->machine);
 			return 1;
 
 		case ID_HARD_RESET:
-			mame_schedule_hard_reset(Machine);
+			mame_schedule_hard_reset(info->machine);
 			return 1;
 
 		case ID_SOFT_RESET:
-			mame_schedule_soft_reset(Machine);
-			debug_cpu_go(~0);
+			mame_schedule_soft_reset(info->machine);
+			debug_cpu_go(info->machine, ~0);
 			return 1;
 
 		case ID_EXIT:
-			mame_schedule_exit(Machine);
+			mame_schedule_exit(info->machine);
 			return 1;
 	}
 	
@@ -3552,7 +3532,7 @@ static int global_handle_key(debugwin_info *info, EventRef inEvent)
 	int ignoreme;
 
 	/* ignore any keys that are received while the debug key is down */
-	ignoreme = ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK);
+	ignoreme = ui_input_pressed(info->machine, IPT_UI_DEBUG_BREAK);
 	if (ignoreme)
 		return 1;
 
@@ -3562,49 +3542,49 @@ static int global_handle_key(debugwin_info *info, EventRef inEvent)
 		{
 			case KEY_F3:
 				if ( event.modifiers & shiftKey )
-					mame_schedule_hard_reset(Machine);
+					mame_schedule_hard_reset(info->machine);
 				else
 				{
-					mame_schedule_soft_reset(Machine);
-					debug_cpu_go(~0);
+					mame_schedule_soft_reset(info->machine);
+					debug_cpu_go(info->machine,~0);
 				}
 				return 1;
 			
 			case KEY_F4:
 				if ( event.modifiers & optionKey )
-					mame_schedule_exit(Machine);
+					mame_schedule_exit(info->machine);
 				return 1;
 				
 			case KEY_F5:
-				debug_cpu_go(~0);
+				debug_cpu_go(info->machine, ~0);
 				return 1;
 			
 			case KEY_F6:
-				debug_cpu_next_cpu();
+				debug_cpu_next_cpu(info->machine);
 				return 1;
 			
 			case KEY_F7:
-				debug_cpu_go_interrupt(-1);
+				debug_cpu_go_interrupt(info->machine, -1);
 				return 1;
 			
 			case KEY_F8:
-				debug_cpu_go_vblank();
+				debug_cpu_go_vblank(info->machine);
 				return 1;
 			
 			case KEY_F10:
-				debug_cpu_single_step_over(1);
+				debug_cpu_single_step_over(info->machine, 1);
 				return 1;
 			
 			case KEY_F11:
 				if ( event.modifiers & shiftKey )
-					debug_cpu_single_step_out();
+					debug_cpu_single_step_out(info->machine);
 				else
-					debug_cpu_single_step(1);
+					debug_cpu_single_step(info->machine, 1);
 				return 1;
 			
 			case KEY_F12:
 				smart_show_all(FALSE);
-				debug_cpu_go(~0);
+				debug_cpu_go(info->machine, ~0);
 				return 1;
 		}
 		
@@ -3614,17 +3594,17 @@ static int global_handle_key(debugwin_info *info, EventRef inEvent)
 			{
 				case 'm':
 				case 'M':
-					memory_create_window(Machine);
+					memory_create_window(info->machine);
 					return 1;
 				
 				case 'd':
 				case 'D':
-					disasm_create_window();
+					disasm_create_window(info->machine);
 					return 1;
 				
 				case 'l':
 				case 'L':
-					log_create_window(Machine);
+					log_create_window(info->machine);
 					return 1;
 			}
 		}

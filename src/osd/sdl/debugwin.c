@@ -2,7 +2,7 @@
 //
 //  debugwin.c - SDL/GTK+ debug window handling
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2009, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -14,12 +14,10 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "dview.h"
 #include "debug-intf.h"
 #include "debug-sup.h"
 #include "debug-cb.h"
-
-#include "dview.h"
-#include "deprecat.h"
 
 typedef struct hentry {
 	struct hentry *h;
@@ -31,8 +29,9 @@ typedef struct {
 	struct hentry *h, *ch;
 	char *hold;
 	int keep_last;
-	void (*cb)(const char *, void *);
+	void (*cb)(running_machine *,const char *, void *);
 	void *cbp;
+	running_machine *machine;
 } edit;
 
 typedef struct {
@@ -43,6 +42,7 @@ typedef struct {
 	debug_view *disasm;
 	debug_view *registers;
 	int cpu;
+	running_machine *machine;
 } debugmain_i;
 
 typedef struct memorywin_i {
@@ -52,6 +52,7 @@ typedef struct memorywin_i {
 	edit ed;
 	GtkComboBox *zone_w;
 	debug_view *memory;
+	running_machine *machine;
 } memorywin_i;
 
 typedef struct disasmwin_i {
@@ -61,6 +62,7 @@ typedef struct disasmwin_i {
 	edit ed;
 	GtkComboBox *cpu_w;
 	debug_view *disasm;
+	running_machine *machine;
 } disasmwin_i;
 
 typedef struct logwin_i {
@@ -68,6 +70,7 @@ typedef struct logwin_i {
 	GtkWidget *win;
 	DView *log_w;
 	debug_view *log;
+	running_machine *machine;
 } logwin_i;
 
 typedef struct memorycombo_item
@@ -81,6 +84,7 @@ typedef struct memorycombo_item
 	UINT8					offset_xor;
 	UINT8					little_endian;
 	UINT8					prefsize;
+	running_machine *machine;
 } memorycombo_item;
 
 
@@ -91,7 +95,7 @@ static logwin_i    *logwin_list;
 
 static memorycombo_item *memorycombo;
 
-static void debugmain_init(void);
+static void debugmain_init(running_machine *machine);
 
 static void debugwin_show(int show)
 {
@@ -125,22 +129,28 @@ static void memory_determine_combo_items(running_machine *machine)
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
+		if (machine->cpu[cpunum] != NULL)
+		{
+       			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
+
 			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			{
 				if (cpuinfo->space[spacenum].databytes)
 				{
 					memorycombo_item *ci = malloc_or_die(sizeof(*ci));
 					memset(ci, 0, sizeof(*ci));
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
+					ci->machine = machine;
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
 
-					snprintf(ci->name, ARRAY_LENGTH(ci->name), "CPU #%d \"%s\" (%s) %s memory", cpunum, machine->config->cpu[cpunum].tag, cpunum_name(cpunum), address_space_names[spacenum]);
+					snprintf(ci->name, ARRAY_LENGTH(ci->name), "CPU #%d \"%s\" (%s) %s memory", cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]), address_space_names[spacenum]);
 
 					*tail = ci;
 					tail = &ci->next;
 				}
+			}
+		}
 	}
 
 	// then add all the memory regions
@@ -157,6 +167,7 @@ static void memory_determine_combo_items(running_machine *machine)
 		ci->prefsize = MIN(width, 8);
 		ci->offset_xor = width - 1;
 		ci->little_endian = little_endian;
+		ci->machine = machine;
 
 		snprintf(ci->name, ARRAY_LENGTH(ci->name), "Region \"%s\"", rgntag);
 
@@ -185,6 +196,7 @@ static void memory_determine_combo_items(running_machine *machine)
 			ci->length = valcount * valsize;
 			ci->prefsize = MIN(valsize, 8);
 			ci->little_endian = TRUE;
+			ci->machine = machine;
 			strcpy(ci->name, strrchr(name, '/') + 1);
 			*tail = ci;
 			tail = &ci->next;
@@ -225,7 +237,7 @@ static void edit_activate(GtkEntry *item, gpointer user_data)
 	edit *e = user_data;
 	const char *text = gtk_entry_get_text(e->edit_w);
 	edit_add_hist(e, text);
-	e->cb(text, e->cbp);
+	e->cb(e->machine, text, e->cbp);
 	edit_set_field(e);
 	
 }
@@ -283,18 +295,20 @@ static void edit_hist_forward(edit *e)
 
 static gboolean edit_key(GtkWidget *item, GdkEventKey *k, gpointer user_data)
 {
+	edit *e = (edit *)user_data;
+
 	switch(k->keyval) {
 	case GDK_Up:
-		edit_hist_back((edit *)user_data);
+		edit_hist_back(e);
 		return TRUE;
 	case GDK_Down:
-		edit_hist_forward((edit *)user_data);
+		edit_hist_forward(e);
 		return TRUE;
 	}
 	return FALSE;
 }
 
-static void edit_init(edit *e, GtkWidget *w, const char *ft, int kl, void (*cb)(const char *, void *), void *cbp)
+static void edit_init(running_machine *machine, edit *e, GtkWidget *w, const char *ft, int kl, void (*cb)(running_machine *, const char *, void *), void *cbp)
 {
 	e->edit_w = GTK_ENTRY(w);
 	e->h = 0;
@@ -303,6 +317,7 @@ static void edit_init(edit *e, GtkWidget *w, const char *ft, int kl, void (*cb)(
 	e->keep_last = kl;
 	e->cb = cb;
 	e->cbp = cbp;
+	e->machine = machine;
 	if(ft)
 		edit_add_hist(e, ft);
 	edit_set_field(e);
@@ -370,7 +385,7 @@ static void debugmain_set_cpunum(running_machine *machine, int cpunum)
 		debug_view_set_property_UINT32(dmain->registers, DVP_REGS_CPUNUM, cpunum);
 
 		// then update the caption
-		sprintf(title, "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpunum, machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
+		sprintf(title, "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		debugmain_update_checks(dmain);
 	}
@@ -385,11 +400,11 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 	if(!dmain) {
 		// GTK init should probably be done earlier
 		gtk_init(0, 0);
-		debugmain_init();
+		debugmain_init(machine);
 	}
 
 	// update the views in the console to reflect the current CPU
-	debugmain_set_cpunum(machine, cpu_getactivecpu());
+	debugmain_set_cpunum(machine, cpunum_get_active());
 
 	debugwin_show(1);
 	gtk_main_iteration();
@@ -401,33 +416,36 @@ void debugwin_update_during_game(running_machine *machine)
 		gtk_main_iteration_do(FALSE);
 }
 
-static void debugmain_process_string(const char *str, void *dmp)
+static void debugmain_process_string(running_machine *machine, const char *str, void *dmp)
 {
 	if(!str[0])
-		debug_cpu_single_step(1);
+		debug_cpu_single_step(machine, 1);
 	else
-		debug_console_execute_command(Machine, str, 1);
+		debug_console_execute_command(machine, str, 1);
 }
 
 static void debugmain_destroy(GtkObject *obj, gpointer user_data)
 {
-	mame_schedule_exit(Machine);
+	debugmain_i *dmain = (debugmain_i *)user_data;
+
+	mame_schedule_exit(dmain->machine);
 }
 
-static void debugmain_init(void)
+static void debugmain_init(running_machine *machine)
 {
 	dmain = malloc(sizeof(*dmain));
 	memset(dmain, 0, sizeof(*dmain));
-	dmain->win = create_debugmain();
+	dmain->win = create_debugmain(machine);
 	dmain->cpu = -1;
+	dmain->machine = machine;
 
 	dmain->console_w   = DVIEW(lookup_widget(dmain->win, "console"));
 	dmain->disasm_w    = DVIEW(lookup_widget(dmain->win, "disasm"));
 	dmain->registers_w = DVIEW(lookup_widget(dmain->win, "registers"));
 
-	dmain->console   = debug_view_alloc(DVT_CONSOLE);
-	dmain->disasm    = debug_view_alloc(DVT_DISASSEMBLY);
-	dmain->registers = debug_view_alloc(DVT_REGISTERS);
+	dmain->console   = debug_view_alloc(machine, DVT_CONSOLE);
+	dmain->disasm    = debug_view_alloc(machine, DVT_DISASSEMBLY);
+	dmain->registers = debug_view_alloc(machine, DVT_REGISTERS);
 
 	dview_set_debug_view(dmain->console_w,   dmain->console);
 	dview_set_debug_view(dmain->disasm_w,    dmain->disasm);
@@ -435,14 +453,14 @@ static void debugmain_init(void)
 
 	dview_this_one_is_stupidly_autoscrolling(dmain->console_w);
 
-	edit_init(&dmain->ed, lookup_widget(dmain->win, "edit"), 0, 0, debugmain_process_string, &dmain);
+	edit_init(machine, &dmain->ed, lookup_widget(dmain->win, "edit"), 0, 0, debugmain_process_string, &dmain);
 
 	debug_view_begin_update(dmain->disasm);
 	debug_view_set_property_string(dmain->disasm, DVP_DASM_EXPRESSION, "curpc");
 	debug_view_set_property_UINT32(dmain->disasm, DVP_DASM_TRACK_LIVE, 1);
 	debug_view_end_update(dmain->disasm);
 
-	g_signal_connect(dmain->win, "destroy", G_CALLBACK(debugmain_destroy), 0);
+	g_signal_connect(dmain->win, "destroy", G_CALLBACK(debugmain_destroy), dmain);
 	g_signal_connect(lookup_widget(dmain->win, "raw_opcodes"), "activate", G_CALLBACK(debugmain_raw_opcodes_activate), dmain);
 	g_signal_connect(lookup_widget(dmain->win, "enc_opcodes"), "activate", G_CALLBACK(debugmain_enc_opcodes_activate), dmain);
 	g_signal_connect(lookup_widget(dmain->win, "comments"),    "activate", G_CALLBACK(debugmain_comments_activate), dmain);
@@ -483,7 +501,7 @@ static void memorywin_zone_changed(GtkComboBox *zone_w, memorywin_i *mem)
 	memorywin_update_selection(mem, ci);
 }
 
-static void memorywin_process_string(const char *str, void *memp)
+static void memorywin_process_string(running_machine *machine, const char *str, void *memp)
 {
 	memorywin_i *mem = memp;
 	debug_view_set_property_string(mem->memory, DVP_MEM_EXPRESSION, str);
@@ -506,23 +524,24 @@ static void memorywin_destroy(GtkObject *obj, gpointer user_data)
 static void memorywin_new(running_machine *machine)
 {
 	memorywin_i *mem;
-	int item, cursel, curcpu = cpu_getactivecpu();
+	int item, cursel, curcpu = cpunum_get_active();
 	memorycombo_item *ci, *selci = NULL;
 
 	mem = malloc(sizeof(*mem));
 	memset(mem, 0, sizeof(*mem));
 	mem->next = memorywin_list;
 	memorywin_list = mem;
-	mem->win = create_memorywin();
+	mem->win = create_memorywin(machine);
+	mem->machine = machine;
 
 	mem->memory_w = DVIEW(lookup_widget(mem->win, "memoryview"));
 	mem->zone_w   = GTK_COMBO_BOX(lookup_widget(mem->win, "zone"));
 
-	mem->memory = debug_view_alloc(DVT_MEMORY);
+	mem->memory = debug_view_alloc(machine, DVT_MEMORY);
 
 	dview_set_debug_view(mem->memory_w, mem->memory);
 
-	edit_init(&mem->ed, lookup_widget(mem->win, "edit"), "0", 1, memorywin_process_string, mem);
+	edit_init(machine, &mem->ed, lookup_widget(mem->win, "edit"), "0", 1, memorywin_process_string, mem);
 
 	debug_view_begin_update(mem->memory);
 	debug_view_set_property_string(mem->memory, DVP_MEM_EXPRESSION, "0");
@@ -578,7 +597,7 @@ static void disasmwin_update_selection(disasmwin_i *info, int cpunum)
 
 	disasmwin_update_checks(info);
 
-	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
+	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, info->machine->config->cpu[cpunum].tag, cpu_get_name(info->machine->cpu[cpunum]));
 	gtk_window_set_title(GTK_WINDOW(info->win), title);
 }
 
@@ -589,8 +608,10 @@ static void disasmwin_cpu_changed(GtkComboBox *cpu_w, disasmwin_i *dis)
 	item = 0;
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
+		if (dis->machine->cpu[cpunum] != NULL)
+		{
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(dis->machine->cpu[cpunum]);
+
 			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
 			{
 				if(item == sel) {
@@ -599,6 +620,7 @@ static void disasmwin_cpu_changed(GtkComboBox *cpu_w, disasmwin_i *dis)
 				}
 				item++;
 			}
+		}
 	}
 }
 
@@ -632,7 +654,7 @@ void disasmwin_comments_activate(GtkMenuItem *item, gpointer user_data)
 	}
 }
 
-static void disasmwin_process_string(const char *str, void *disp)
+static void disasmwin_process_string(running_machine *machine, const char *str, void *disp)
 {
 	disasmwin_i *dis = disp;
 	debug_view_set_property_string(dis->disasm, DVP_DASM_EXPRESSION, str);
@@ -652,26 +674,27 @@ static void disasmwin_destroy(GtkObject *obj, gpointer user_data)
 	free(dis);
 }
 
-static void disasmwin_new(void)
+static void disasmwin_new(running_machine *machine)
 {
 	disasmwin_i *dis;
-	int cpunum, curcpu = cpu_getactivecpu();
+	int cpunum, curcpu = cpunum_get_active();
 	int item, citem;
 
 	dis = malloc(sizeof(*dis));
 	memset(dis, 0, sizeof(*dis));
 	dis->next = disasmwin_list;
 	disasmwin_list = dis;
-	dis->win = create_disasmwin();
+	dis->win = create_disasmwin(machine);
+	dis->machine = machine;
 
 	dis->disasm_w = DVIEW(lookup_widget(dis->win, "disasmview"));
 	dis->cpu_w    = GTK_COMBO_BOX(lookup_widget(dis->win, "cpu"));
 
-	dis->disasm = debug_view_alloc(DVT_DISASSEMBLY);
+	dis->disasm = debug_view_alloc(machine, DVT_DISASSEMBLY);
 
 	dview_set_debug_view(dis->disasm_w, dis->disasm);
 
-	edit_init(&dis->ed, lookup_widget(dis->win, "edit"), "curpc", 1, disasmwin_process_string, dis);
+	edit_init(machine, &dis->ed, lookup_widget(dis->win, "edit"), "curpc", 1, disasmwin_process_string, dis);
 
 	debug_view_begin_update(dis->disasm);
 	debug_view_set_property_string(dis->disasm, DVP_DASM_EXPRESSION, "curpc");
@@ -683,17 +706,19 @@ static void disasmwin_new(void)
 	citem = -1;
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
 			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
 			{
 				char name[100];
-				sprintf(name, "CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
+				sprintf(name, "CPU #%d \"%s\" (%s)", cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
 				gtk_combo_box_append_text(dis->cpu_w, name);
 				if(cpunum == curcpu)
 					citem = item;
 				item++;
 			}
+		}
 	}
 
 	if(citem == -1) {
@@ -727,7 +752,7 @@ static void logwin_destroy(GtkObject *obj, gpointer user_data)
 	free(log);
 }
 
-static void logwin_new(void)
+static void logwin_new(running_machine *machine)
 {
 	logwin_i *log;
 
@@ -735,11 +760,12 @@ static void logwin_new(void)
 	memset(log, 0, sizeof(*log));
 	log->next = logwin_list;
 	logwin_list = log;
-	log->win = create_logwin();
+	log->win = create_logwin(machine);
+	log->machine = machine;
 
 	log->log_w = DVIEW(lookup_widget(log->win, "logview"));
 
-	log->log = debug_view_alloc(DVT_LOG);
+	log->log = debug_view_alloc(machine, DVT_LOG);
 
 	dview_this_one_is_stupidly_autoscrolling(log->log_w);
 	dview_set_debug_view(log->log_w, log->log);
@@ -750,74 +776,74 @@ static void logwin_new(void)
 
 void on_new_mem_activate(GtkMenuItem *item, gpointer user_data)
 {
-	memorywin_new(Machine);
+	memorywin_new((running_machine *)user_data);
 }
 
 void on_new_disasm_activate(GtkMenuItem *item, gpointer user_data)
 {
-	disasmwin_new();
+	disasmwin_new((running_machine *)user_data);
 }
 
 void on_new_errorlog_activate(GtkMenuItem *item, gpointer user_data)
 {
-	logwin_new();
+	logwin_new((running_machine *)user_data);
 }
 
 void on_run_activate(GtkMenuItem *item, gpointer user_data)
 {
-	debug_cpu_go(~0);
+	debug_cpu_go((running_machine *)user_data, ~0);
 }
 
 void on_run_h_activate(GtkMenuItem *item, gpointer user_data)
 {
 	debugwin_show(0);
-	debug_cpu_go(~0);
+	debug_cpu_go((running_machine *)user_data, ~0);
 }
 
 void on_run_cpu_activate(GtkMenuItem *item, gpointer user_data)
 {
-	debug_cpu_next_cpu();
+	debug_cpu_next_cpu((running_machine *)user_data);
 }
 
 void on_run_irq_activate(GtkMenuItem *item, gpointer user_data)
 {
-	debug_cpu_go_interrupt(-1);
+	debug_cpu_go_interrupt((running_machine *)user_data, -1);
 }
 
 void on_run_vbl_activate(GtkMenuItem *item, gpointer user_data)
 {
-	debug_cpu_go_vblank();
+	debug_cpu_go_vblank((running_machine *)user_data);
 }
 
 void on_step_into_activate(GtkMenuItem *item, gpointer user_data)
 {
-	debug_cpu_single_step(1);
+	debug_cpu_single_step((running_machine *)user_data, 1);
 }
 
 void on_step_over_activate(GtkMenuItem *item, gpointer user_data)
 {
-	debug_cpu_single_step_over(1);
+	debug_cpu_single_step_over((running_machine *)user_data, 1);
 }
 
 void on_step_out_activate(GtkMenuItem *item, gpointer user_data)
 {
-	debug_cpu_single_step_out();
+	debug_cpu_single_step_out((running_machine *)user_data);
 }
 
 void on_hard_reset_activate(GtkMenuItem *item, gpointer user_data)
 {
-	mame_schedule_hard_reset(Machine);
+	mame_schedule_hard_reset((running_machine *)user_data);
 }
 
 void on_soft_reset_activate(GtkMenuItem *item, gpointer user_data)
 {
-	mame_schedule_soft_reset(Machine);
-	debug_cpu_go(~0);
+	mame_schedule_soft_reset((running_machine *)user_data);
+	debug_cpu_go((running_machine *)user_data, ~0);
 }
 
 void on_exit_activate(GtkMenuItem *item, gpointer user_data)
 {
-	mame_schedule_exit(Machine);
+	mame_schedule_exit((running_machine *)user_data);
 }
 
 void on_chunks_1_activate(GtkMenuItem *item, gpointer user_data)

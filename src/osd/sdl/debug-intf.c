@@ -15,6 +15,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "driver.h"
 #include "debug-cb.h"
 #include "debug-intf.h"
 #include "debug-sup.h"
@@ -29,7 +30,7 @@
   g_object_set_data (G_OBJECT (component), name, widget)
 
 GtkWidget*
-create_debugmain (void)
+create_debugmain (running_machine *machine)
 {
   GtkWidget *debugmain;
   GtkWidget *vbox1;
@@ -298,46 +299,46 @@ create_debugmain (void)
 
   g_signal_connect ((gpointer) new_mem, "activate",
                     G_CALLBACK (on_new_mem_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) new_disasm, "activate",
                     G_CALLBACK (on_new_disasm_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) new_errorlog, "activate",
                     G_CALLBACK (on_new_errorlog_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) run, "activate",
                     G_CALLBACK (on_run_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) run_h, "activate",
                     G_CALLBACK (on_run_h_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) run_cpu, "activate",
                     G_CALLBACK (on_run_cpu_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) run_irq, "activate",
                     G_CALLBACK (on_run_irq_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) run_vbl, "activate",
                     G_CALLBACK (on_run_vbl_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) step_into, "activate",
                     G_CALLBACK (on_step_into_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) step_over, "activate",
                     G_CALLBACK (on_step_over_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) step_out, "activate",
                     G_CALLBACK (on_step_out_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) soft_reset, "activate",
                     G_CALLBACK (on_soft_reset_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) hard_reset, "activate",
                     G_CALLBACK (on_hard_reset_activate),
-                    NULL);
+                    machine);
   g_signal_connect ((gpointer) exit, "activate",
                     G_CALLBACK (on_exit_activate),
-                    NULL);
+                    machine);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (debugmain, debugmain, "debugmain");
@@ -381,7 +382,7 @@ create_debugmain (void)
 }
 
 GtkWidget*
-create_memorywin (void)
+create_memorywin (running_machine *machine)
 {
   GtkWidget *memorywin;
   GtkWidget *vbox3;
@@ -673,46 +674,46 @@ create_memorywin (void)
 
   g_signal_connect ((gpointer) new_mem, "activate",
                     G_CALLBACK (on_new_mem_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) new_disasm, "activate",
                     G_CALLBACK (on_new_disasm_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) new_errorlog, "activate",
                     G_CALLBACK (on_new_errorlog_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) run, "activate",
                     G_CALLBACK (on_run_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) run_h, "activate",
                     G_CALLBACK (on_run_h_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) run_cpu, "activate",
                     G_CALLBACK (on_run_cpu_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) run_irq, "activate",
                     G_CALLBACK (on_run_irq_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) run_vbl, "activate",
                     G_CALLBACK (on_run_vbl_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) step_into, "activate",
                     G_CALLBACK (on_step_into_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) step_over, "activate",
                     G_CALLBACK (on_step_over_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) step_out, "activate",
                     G_CALLBACK (on_step_out_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) soft_reset, "activate",
                     G_CALLBACK (on_soft_reset_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) hard_reset, "activate",
                     G_CALLBACK (on_hard_reset_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) exit, "activate",
                     G_CALLBACK (on_exit_activate),
-                    NULL);
+		    machine);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (memorywin, memorywin, "memorywin");
@@ -758,7 +759,7 @@ create_memorywin (void)
 }
 
 GtkWidget*
-create_disasmwin (void)
+create_disasmwin (running_machine *machine)
 {
   GtkWidget *disasmwin;
   GtkWidget *vbox4;
@@ -1009,46 +1010,46 @@ create_disasmwin (void)
 
   g_signal_connect ((gpointer) menuitem6, "activate",
                     G_CALLBACK (on_new_mem_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem7, "activate",
                     G_CALLBACK (on_new_disasm_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem8, "activate",
                     G_CALLBACK (on_new_errorlog_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem9, "activate",
                     G_CALLBACK (on_run_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem10, "activate",
                     G_CALLBACK (on_run_h_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem11, "activate",
                     G_CALLBACK (on_run_cpu_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem12, "activate",
                     G_CALLBACK (on_run_irq_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem13, "activate",
                     G_CALLBACK (on_run_vbl_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem14, "activate",
                     G_CALLBACK (on_step_into_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem15, "activate",
                     G_CALLBACK (on_step_over_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem16, "activate",
                     G_CALLBACK (on_step_out_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem17, "activate",
                     G_CALLBACK (on_soft_reset_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem18, "activate",
                     G_CALLBACK (on_hard_reset_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem19, "activate",
                     G_CALLBACK (on_exit_activate),
-                    NULL);
+		    machine);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (disasmwin, disasmwin, "disasmwin");
@@ -1089,7 +1090,7 @@ create_disasmwin (void)
 }
 
 GtkWidget*
-create_logwin (void)
+create_logwin (running_machine *machine)
 {
   GtkWidget *logwin;
   GtkWidget *vbox5;
@@ -1277,46 +1278,46 @@ create_logwin (void)
 
   g_signal_connect ((gpointer) menuitem27, "activate",
                     G_CALLBACK (on_new_mem_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem28, "activate",
                     G_CALLBACK (on_new_disasm_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem29, "activate",
                     G_CALLBACK (on_new_errorlog_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem30, "activate",
                     G_CALLBACK (on_run_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem31, "activate",
                     G_CALLBACK (on_run_h_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem32, "activate",
                     G_CALLBACK (on_run_cpu_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem33, "activate",
                     G_CALLBACK (on_run_irq_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem34, "activate",
                     G_CALLBACK (on_run_vbl_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem35, "activate",
                     G_CALLBACK (on_step_into_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem36, "activate",
                     G_CALLBACK (on_step_over_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem37, "activate",
                     G_CALLBACK (on_step_out_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem38, "activate",
                     G_CALLBACK (on_soft_reset_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem39, "activate",
                     G_CALLBACK (on_hard_reset_activate),
-                    NULL);
+		    machine);
   g_signal_connect ((gpointer) menuitem40, "activate",
                     G_CALLBACK (on_exit_activate),
-                    NULL);
+		    machine);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (logwin, logwin, "logwin");
