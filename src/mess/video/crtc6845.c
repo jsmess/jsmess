@@ -134,8 +134,8 @@ struct mscrtc6845 *mscrtc6845_init(const struct mscrtc6845_config *config)
 		}
 	}
 
-	state_save_register_item_array("mscrtc6845", 0, crtc->reg);
-	state_save_register_item("mscrtc6845", 0, crtc->idx);
+	state_save_register_item_array("mscrtc6845", NULL, 0, crtc->reg);
+	state_save_register_item("mscrtc6845", NULL, 0, crtc->idx);
 	return crtc;
 }
 
