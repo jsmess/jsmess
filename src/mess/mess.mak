@@ -539,7 +539,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_MACHINE)/pclpt.o    \
 	$(MESS_MACHINE)/z80dart.o	\
-#	$(MESS_VIDEO)/msm6255.o	\
+	$(MESS_VIDEO)/msm6255.o	\
 
 
 

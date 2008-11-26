@@ -344,7 +344,6 @@ void msm6255_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( msm6255 )
 {
 	msm6255_t *msm6255 = get_safe_token(device);
-	char unique_tag[30];
 
 	// validate arguments
 
@@ -363,22 +362,19 @@ static DEVICE_START( msm6255 )
 	assert(msm6255->screen != NULL);
 
 	// register for state saving
+	state_save_register_item("msm6255", device->tag, 0, msm6255->ir);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->mor);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->pr);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->hnr);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->dvr);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->cpr);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->slr);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->sur);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->clr);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->cur);
 
-	state_save_combine_module_and_tag(unique_tag, "MSM6255", device->tag);
-
-	state_save_register_item(unique_tag, 0, msm6255->ir);
-	state_save_register_item(unique_tag, 0, msm6255->mor);
-	state_save_register_item(unique_tag, 0, msm6255->pr);
-	state_save_register_item(unique_tag, 0, msm6255->hnr);
-	state_save_register_item(unique_tag, 0, msm6255->dvr);
-	state_save_register_item(unique_tag, 0, msm6255->cpr);
-	state_save_register_item(unique_tag, 0, msm6255->slr);
-	state_save_register_item(unique_tag, 0, msm6255->sur);
-	state_save_register_item(unique_tag, 0, msm6255->clr);
-	state_save_register_item(unique_tag, 0, msm6255->cur);
-
-	state_save_register_item(unique_tag, 0, msm6255->cursor);
-	state_save_register_item(unique_tag, 0, msm6255->frame);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->cursor);
+	state_save_register_item("msm6255", device->tag, 0, msm6255->frame);
 	return DEVICE_START_OK;
 }
 
