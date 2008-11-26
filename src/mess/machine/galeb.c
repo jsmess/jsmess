@@ -11,8 +11,7 @@
 #include "driver.h"
 #include "sound/dac.h"
 #include "includes/galeb.h"
-  
-  
+ 
 /* Driver initialization */
 DRIVER_INIT(galeb)
 {
@@ -26,7 +25,7 @@ READ8_HANDLER( galeb_keyboard_r )
 {
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(machine, keynames[offset]);
+	return input_port_read(space->machine, keynames[offset]);
 }
 
 WRITE8_HANDLER( galeb_speaker_w )

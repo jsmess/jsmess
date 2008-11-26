@@ -947,11 +947,11 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( super80v )
 
 	/* Galeb */
-//128u4	DRIVER( galeb )
+	DRIVER( galeb )
 
 	/* Orao */
-//128u4	DRIVER( orao )
-//128u4	DRIVER( orao103 )
+	DRIVER( orao )
+	DRIVER( orao103 )
 
 	/* UT-88 */
 //128u4	DRIVER( ut88 )

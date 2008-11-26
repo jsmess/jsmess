@@ -22,6 +22,7 @@ extern WRITE8_HANDLER( orao_io_w );
 
 
 /*----------- defined in video/orao.c -----------*/
+extern UINT8 *orao_video_ram;
 
 extern VIDEO_START( orao );
 extern VIDEO_UPDATE( orao );

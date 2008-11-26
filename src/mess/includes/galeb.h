@@ -19,6 +19,7 @@ extern WRITE8_HANDLER( galeb_speaker_w );
 /*----------- defined in video/galeb.c -----------*/
 
 extern const gfx_layout galeb_charlayout;
+extern UINT8 *galeb_video_ram;
 
 extern VIDEO_START( galeb );
 extern VIDEO_UPDATE( galeb );
