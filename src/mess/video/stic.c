@@ -121,7 +121,7 @@ WRITE16_HANDLER( stic_w )
 		case 0x29:
 		case 0x2a:
 		case 0x2b:
-			logerror("Setting color_stack[%x] = %x (%x)\n",offset&0x3,data&0xf,activecpu_get_pc());
+			logerror("Setting color_stack[%x] = %x (%x)\n",offset&0x3,data&0xf,cpu_get_pc(space->cpu));
 			intv_color_stack[offset&0x3] = data&0xf;
 			break;
 		/* Border Color */

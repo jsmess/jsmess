@@ -20,7 +20,7 @@ WRITE16_HANDLER ( intvkbd_dualport16_w )
 	COMBINE_DATA(&intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memory_region(machine, "keyboard");
+	RAM	 = memory_region(space->machine, "keyboard");
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
@@ -37,7 +37,7 @@ WRITE8_HANDLER ( intvkbd_dualport8_lsb_w )
 	intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memory_region(machine, "keyboard");
+	RAM	 = memory_region(space->machine, "keyboard");
 	RAM[offset] = data;
 }
 
@@ -56,27 +56,27 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 		switch (offset)
 		{
 			case 0x000:
-				rv = input_port_read(machine, "TEST") & 0x80;
+				rv = input_port_read(space->machine, "TEST") & 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
 				break;
 			case 0x001:
-				rv = (input_port_read(machine, "TEST") & 0x40) << 1;
+				rv = (input_port_read(space->machine, "TEST") & 0x40) << 1;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
 				break;
 			case 0x002:
-				rv = (input_port_read(machine, "TEST") & 0x20) << 2;
+				rv = (input_port_read(space->machine, "TEST") & 0x20) << 2;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 				break;
 			case 0x003:
-				rv = (input_port_read(machine, "TEST") & 0x10) << 3;
+				rv = (input_port_read(space->machine, "TEST") & 0x10) << 3;
 				logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 				break;
 			case 0x004:
-				rv = (input_port_read(machine, "TEST") & 0x08) << 4;
+				rv = (input_port_read(space->machine, "TEST") & 0x08) << 4;
 				logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 				break;
 			case 0x005:
-				rv = (input_port_read(machine, "TEST") & 0x04) << 5;
+				rv = (input_port_read(space->machine, "TEST") & 0x04) << 5;
 				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
@@ -96,25 +96,25 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 			case 0x060:	/* Keyboard Read */
 				rv = 0xff;
 				if (intvkbd_keyboard_col == 0)
-					rv = input_port_read(machine, "ROW0");
+					rv = input_port_read(space->machine, "ROW0");
 				if (intvkbd_keyboard_col == 1)
-					rv = input_port_read(machine, "ROW1");
+					rv = input_port_read(space->machine, "ROW1");
 				if (intvkbd_keyboard_col == 2)
-					rv = input_port_read(machine, "ROW2");
+					rv = input_port_read(space->machine, "ROW2");
 				if (intvkbd_keyboard_col == 3)
-					rv = input_port_read(machine, "ROW3");
+					rv = input_port_read(space->machine, "ROW3");
 				if (intvkbd_keyboard_col == 4)
-					rv = input_port_read(machine, "ROW4");
+					rv = input_port_read(space->machine, "ROW4");
 				if (intvkbd_keyboard_col == 5)
-					rv = input_port_read(machine, "ROW5");
+					rv = input_port_read(space->machine, "ROW5");
 				if (intvkbd_keyboard_col == 6)
-					rv = input_port_read(machine, "ROW6");
+					rv = input_port_read(space->machine, "ROW6");
 				if (intvkbd_keyboard_col == 7)
-					rv = input_port_read(machine, "ROW7");
+					rv = input_port_read(space->machine, "ROW7");
 				if (intvkbd_keyboard_col == 8)
-					rv = input_port_read(machine, "ROW8");
+					rv = input_port_read(space->machine, "ROW8");
 				if (intvkbd_keyboard_col == 9)
-					rv = input_port_read(machine, "ROW9");
+					rv = input_port_read(space->machine, "ROW9");
 				break;
 			case 0x80:
 				rv = 0x00;
@@ -143,7 +143,7 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 			case 0xce:
 			case 0xcf:
 				/* TMS9927 regs */
-				rv = intvkbd_tms9927_r(machine, offset-0xc0);
+				rv = intvkbd_tms9927_r(space, offset-0xc0);
 				break;
 			default:
 				rv = (intvkbd_dualport_ram[offset]&0x0300)>>8;
@@ -261,10 +261,10 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 			case 0xce:
 			case 0xcf:
 				/* TMS9927 regs */
-				intvkbd_tms9927_w(machine, offset-0xc0, data);
+				intvkbd_tms9927_w(space, offset-0xc0, data);
 				break;
 			default:
-				logerror("%04X: Unknown write %02x to 0x40%02x\n",activecpu_get_pc(),data,offset);
+				logerror("%04X: Unknown write %02x to 0x40%02x\n",cpu_get_pc(space->cpu),data,offset);
 				break;
 		}
 	}
@@ -507,11 +507,11 @@ DRIVER_INIT( intv )
 /* Set Reset and INTR/INTRM Vector */
 MACHINE_RESET( intv )
 {
-	cpunum_set_input_line_vector(0, CP1610_RESET, 0x1000);
+	cpu_set_input_line_vector(machine->cpu[0], CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
-	cpunum_set_input_line_vector(0, CP1610_INT_INTRM, 0x1004);
-	cpunum_set_input_line_vector(0, CP1610_INT_INTR,  0x1004);
+	cpu_set_input_line_vector(machine->cpu[0], CP1610_INT_INTRM, 0x1004);
+	cpu_set_input_line_vector(machine->cpu[0], CP1610_INT_INTR,  0x1004);
 
 	return;
 }
@@ -524,10 +524,10 @@ static TIMER_CALLBACK(intv_interrupt_complete)
 
 INTERRUPT_GEN( intv_interrupt )
 {
-	cpu_set_input_line(machine->cpu[0], CP1610_INT_INTRM, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], CP1610_INT_INTRM, ASSERT_LINE);
 	sr1_int_pending = 1;
 	timer_set(ATTOTIME_IN_CYCLES(3791, 0), NULL, 0, intv_interrupt_complete);
-	stic_screenrefresh(machine);
+	stic_screenrefresh(device->machine);
 }
 
 static const UINT8 controller_table[] =
@@ -549,13 +549,13 @@ static const UINT8 controller_table[] =
 		switch(byte)
 		{
 			case 0:
-				value = input_port_read(machine, "IN0");
+				value = input_port_read(space->machine, "IN0");
 				break;
 			case 1:
-				value = input_port_read(machine, "IN1");
+				value = input_port_read(space->machine, "IN1");
 				break;
 			case 2:
-				value = input_port_read(machine, "IN2");
+				value = input_port_read(space->machine, "IN2");
 				break;
 		}
 		for(bit=7; bit>=0; bit--)
