@@ -1085,7 +1085,7 @@ XL/XE 16kB OS roms
 
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
-//128u4	DRIVER( votrpss ) /* Votrax Personal Speech System */
+	DRIVER( votrpss ) /* Votrax Personal Speech System */
 
 /****************Games*******************************************************/
 	/* Computer Electronic */
