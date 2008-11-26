@@ -177,7 +177,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		EventList_AddItemOffset(machine, 0x0fe, data & 0x07, ATTOTIME_TO_CYCLES(0,attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))));
+		EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, ATTOTIME_TO_CYCLES(0,attotime_mul(video_screen_get_scan_period(space->machine->primary_screen), video_screen_get_vpos(space->machine->primary_screen))));
 	}
 
 	if ((Changed & (1<<4))!=0)
@@ -189,7 +189,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & (1<<3))!=0)
 	{
 		/* write cassette data */
-		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & (1<<3)) ? -1.0 : +1.0);
+		cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), (data & (1<<3)) ? -1.0 : +1.0);
 	}
 
 	PreviousFE = data;
@@ -209,16 +209,16 @@ READ8_HANDLER(spectrum_port_fe_r)
    int lines = offset>>8;
    int data = 0xff;
 
-   int cs_extra1 = input_port_read(machine, "PLUS0")  & 0x1f;
-   int cs_extra2 = input_port_read(machine, "PLUS1")  & 0x1f;
-   int cs_extra3 = input_port_read(machine, "PLUS2") & 0x1f;
-   int ss_extra1 = input_port_read(machine, "PLUS3") & 0x1f;
-   int ss_extra2 = input_port_read(machine, "PLUS4") & 0x1f;
+   int cs_extra1 = input_port_read(space->machine, "PLUS0")  & 0x1f;
+   int cs_extra2 = input_port_read(space->machine, "PLUS1")  & 0x1f;
+   int cs_extra3 = input_port_read(space->machine, "PLUS2") & 0x1f;
+   int ss_extra1 = input_port_read(space->machine, "PLUS3") & 0x1f;
+   int ss_extra2 = input_port_read(space->machine, "PLUS4") & 0x1f;
 
    /* Caps - V */
    if ((lines & 1)==0)
    {
-		data &= input_port_read(machine, "LINE0");
+		data &= input_port_read(space->machine, "LINE0");
 		/* CAPS for extra keys */
 		if (cs_extra1 != 0x1f || cs_extra2 != 0x1f || cs_extra3 != 0x1f)
 			data &= ~0x01;
@@ -226,32 +226,32 @@ READ8_HANDLER(spectrum_port_fe_r)
 
    /* A - G */
    if ((lines & 2)==0)
-		data &= input_port_read(machine, "LINE1");
+		data &= input_port_read(space->machine, "LINE1");
 
    /* Q - T */
    if ((lines & 4)==0)
-		data &= input_port_read(machine, "LINE2");
+		data &= input_port_read(space->machine, "LINE2");
 
    /* 1 - 5 */
    if ((lines & 8)==0)
-		data &= input_port_read(machine, "LINE3") & cs_extra1;
+		data &= input_port_read(space->machine, "LINE3") & cs_extra1;
 
    /* 6 - 0 */
    if ((lines & 16)==0)
-		data &= input_port_read(machine, "LINE4") & cs_extra2;
+		data &= input_port_read(space->machine, "LINE4") & cs_extra2;
 
    /* Y - P */
    if ((lines & 32)==0)
-		data &= input_port_read(machine, "LINE5") & ss_extra1;
+		data &= input_port_read(space->machine, "LINE5") & ss_extra1;
 
    /* H - Enter */
    if ((lines & 64)==0)
-		data &= input_port_read(machine, "LINE6");
+		data &= input_port_read(space->machine, "LINE6");
 
 	/* B - Space */
 	if ((lines & 128)==0)
 	{
-		data &= input_port_read(machine, "LINE7") & cs_extra3 & ss_extra2;
+		data &= input_port_read(space->machine, "LINE7") & cs_extra3 & ss_extra2;
 		/* SYMBOL SHIFT for extra keys */
 		if (ss_extra1 != 0x1f || ss_extra2 != 0x1f)
 			data &= ~0x02;
@@ -260,14 +260,14 @@ READ8_HANDLER(spectrum_port_fe_r)
 	data |= (0xe0); /* Set bits 5-7 - as reset above */
 
 	/* cassette input from wav */
-	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038 )
+	if (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038 )
 	{
 		data &= ~0x40;
 	}
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
     Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (input_port_read(machine, "CONFIG") & 0x80)
+	if (input_port_read(space->machine, "CONFIG") & 0x80)
 		data ^= (0x40);
 	return data;
 }
@@ -275,24 +275,24 @@ READ8_HANDLER(spectrum_port_fe_r)
 /* kempston joystick interface */
 READ8_HANDLER(spectrum_port_1f_r)
 {
-	return input_port_read(machine, "KEMPSTON") & 0x1f;
+	return input_port_read(space->machine, "KEMPSTON") & 0x1f;
 }
 
 /* fuller joystick interface */
 READ8_HANDLER(spectrum_port_7f_r)
 {
-	return input_port_read(machine, "FULLER") | (0xff^0x8f);
+	return input_port_read(space->machine, "FULLER") | (0xff^0x8f);
 }
 
 /* mikrogen joystick interface */
 READ8_HANDLER(spectrum_port_df_r)
 {
-	return input_port_read(machine, "MIKROGEN") | (0xff^0x1f);
+	return input_port_read(space->machine, "MIKROGEN") | (0xff^0x1f);
 }
 
 static  READ8_HANDLER ( spectrum_port_ula_r )
 {
-	return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_colorram[(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
+	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_colorram[(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
 /* ports are not decoded full.
@@ -443,7 +443,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( spec_interrupt )
 {
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static const cassette_config spectrum_cassette_config =

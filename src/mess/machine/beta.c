@@ -68,7 +68,7 @@ void betadisk_wd179x_callback(running_machine *machine, wd17xx_state_t state, vo
 READ8_HANDLER(betadisk_status_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_status_r(machine, offset); 
+		return wd17xx_status_r(space, offset); 
 	} else {
 		return 0xff;
 	}
@@ -77,7 +77,7 @@ READ8_HANDLER(betadisk_status_r)
 READ8_HANDLER(betadisk_track_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_track_r(machine, offset); 
+		return wd17xx_track_r(space, offset); 
 	} else {
 		return 0xff;
 	}
@@ -86,7 +86,7 @@ READ8_HANDLER(betadisk_track_r)
 READ8_HANDLER(betadisk_sector_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_sector_r(machine, offset); 
+		return wd17xx_sector_r(space, offset); 
 	} else {
 		return 0xff;
 	}
@@ -95,7 +95,7 @@ READ8_HANDLER(betadisk_sector_r)
 READ8_HANDLER(betadisk_data_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_data_r(machine, offset); 
+		return wd17xx_data_r(space, offset); 
 	} else {
 		return 0xff;
 	}
@@ -118,7 +118,7 @@ WRITE8_HANDLER(betadisk_param_w)
   		wd17xx_set_density(data & 0x20 ? DEN_MFM_HI : DEN_FM_LO );
   		if ((data & 0x04) == 0) // reset
   		{
-  			wd17xx_reset(machine);	
+  			wd17xx_reset(space->machine);	
   		}    		
   		betadisk_status = (data & 0x3f) | betadisk_status;
   	}
@@ -127,28 +127,28 @@ WRITE8_HANDLER(betadisk_param_w)
 WRITE8_HANDLER(betadisk_command_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_command_w(machine, offset, data);
+		wd17xx_command_w(space, offset, data);
 	}	
 }
 
 WRITE8_HANDLER(betadisk_track_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_track_w(machine, offset, data);
+		wd17xx_track_w(space, offset, data);
 	}	
 }
 
 WRITE8_HANDLER(betadisk_sector_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_sector_w(machine, offset, data);
+		wd17xx_sector_w(space, offset, data);
 	}	
 }
 
 WRITE8_HANDLER(betadisk_data_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_data_w(machine, offset, data);
+		wd17xx_data_w(space, offset, data);
 	}	
 }
 

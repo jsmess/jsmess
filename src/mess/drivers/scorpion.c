@@ -196,14 +196,15 @@ static int ROMSelection;
 
 static void scorpion_update_memory(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	spectrum_128_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(4, mess_ram + (((spectrum_128_port_7ffd_data & 0x07) | ((scorpion_256_port_1ffd_data & 0x10)>>1)) * 0x4000));
+	memory_set_bankptr(machine, 4, mess_ram + (((spectrum_128_port_7ffd_data & 0x07) | ((scorpion_256_port_1ffd_data & 0x10)>>1)) * 0x4000));
 
 	if ((scorpion_256_port_1ffd_data & 0x01)==0x01)
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-		memory_set_bankptr(1, mess_ram+(8<<14));		
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_set_bankptr(machine, 1, mess_ram+(8<<14));		
 	}
 	else
 	{
@@ -214,28 +215,28 @@ static void scorpion_update_memory(running_machine *machine)
 			/* ROM switching */
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}			
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(1, memory_region(machine, "main") + 0x010000 + (ROMSelection<<14));		
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x010000 + (ROMSelection<<14));		
 	}
 	
 	
 }
 
-static OPBASE_HANDLER( scorpion_opbase )
+static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {	
 	if (betadisk_is_active()) {
-		if (activecpu_get_pc() >= 0x4000) {
+		if (cpu_get_pc(space->machine->cpu[0]) >= 0x4000) {
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable();
-			memory_set_bankptr(1, memory_region(machine, "main") + 0x010000 + 0x4000*ROMSelection); // Set BASIC ROM
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x010000 + 0x4000*ROMSelection); // Set BASIC ROM
+			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 		} 	
-	} else if (((activecpu_get_pc() & 0xff00) == 0x3d00) && (ROMSelection==1))
+	} else if (((cpu_get_pc(space->machine->cpu[0]) & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
 		ROMSelection = 3;
 		betadisk_enable();
-		memory_set_bankptr(1, memory_region(machine, "main") + 0x01c000); // Set TRDOS ROM			
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x01c000); // Set TRDOS ROM			
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	} 
 	return address;
 }
@@ -259,7 +260,7 @@ static WRITE8_HANDLER(scorpion_port_7ffd_w)
 	spectrum_128_port_7ffd_data = data;
 
 	/* update memory */
-	scorpion_update_memory(machine);
+	scorpion_update_memory(space->machine);
 }
 
 static WRITE8_HANDLER(scorpion_port_1ffd_w)
@@ -268,7 +269,7 @@ static WRITE8_HANDLER(scorpion_port_1ffd_w)
 	if ((spectrum_128_port_7ffd_data & 0x20)==0)
 	{
 		scorpion_256_port_1ffd_data = data;
-		scorpion_update_memory(machine);
+		scorpion_update_memory(space->machine);
 	}
 }
   
@@ -289,20 +290,22 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( scorpion )
 {	
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
+	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	
 	betadisk_disable();
 	betadisk_clear_status();
 
-	memory_set_opbase_handler( 0, scorpion_opbase ); 
+	memory_set_direct_update_handler(space, scorpion_direct ); 
 	
 	memset(mess_ram,0,256*1024);
 	
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(2, mess_ram + (5<<14));
+	memory_set_bankptr(machine, 2, mess_ram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(3, mess_ram + (2<<14));
+	memory_set_bankptr(machine, 3, mess_ram + (2<<14));
 
 	spectrum_128_port_7ffd_data = 0;
 	scorpion_256_port_1ffd_data = 0;

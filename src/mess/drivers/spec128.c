@@ -182,7 +182,7 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 	spectrum_128_port_7ffd_data = data;
 
 	/* update memory */
-	spectrum_128_update_memory(machine);
+	spectrum_128_update_memory(space->machine);
 }
 
 void spectrum_128_update_memory(running_machine *machine)
@@ -209,7 +209,7 @@ void spectrum_128_update_memory(running_machine *machine)
 			ram_page = spectrum_128_port_7ffd_data & 0x07;
 			ram_data = mess_ram + (ram_page<<14);
 
-			memory_set_bankptr(4, ram_data);
+			memory_set_bankptr(machine, 4, ram_data);
 
 			logerror("RAM at 0xc000: %02x\n",ram_page);
 	}
@@ -221,14 +221,14 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	ChosenROM = memory_region(machine, "main") + 0x010000 + (ROMSelection<<14);
 
-	memory_set_bankptr(1, ChosenROM);
+	memory_set_bankptr(machine, 1, ChosenROM);
 
 	logerror("rom switch: %02x\n", ROMSelection);
 }
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
 {
-	return video_screen_get_vpos(machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(machine->primary_screen)&0xf8)<<2]:0xff;
+	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
 static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
@@ -255,10 +255,10 @@ static MACHINE_RESET( spectrum_128 )
 	/* 0x0000-0x3fff always holds ROM */
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(2, mess_ram + (5<<14));
+	memory_set_bankptr(machine, 2, mess_ram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(3, mess_ram + (2<<14));
+	memory_set_bankptr(machine, 3, mess_ram + (2<<14));
 
 	/* set initial ram config */
 	spectrum_128_port_7ffd_data = 0;

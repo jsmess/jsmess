@@ -456,33 +456,33 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
 
 	/* SINCLAIR RESEARCH */
-//128u4	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
-//128u4	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
-//128u4	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
-//128u4	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
-//128u4	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
-//128u4	DRIVER( lambda )	/* Lambda 8300										*/
+	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
+	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
+	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
+	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
+	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
+	DRIVER( lambda )	/* Lambda 8300										*/
 
-//128u4	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
-//128u4	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
-//128u4	DRIVER( specide ) /* 1995 ZX Spectrum IDE							*/
-//128u4	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
-//128u4	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
-//128u4	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
-//128u4	DRIVER( tc2048 )	/* 198? TC2048										*/
-//128u4	DRIVER( ts2068 )	/* 1983 TS2068										*/
-//128u4	DRIVER( uk2086 )	/* 1986 UK2086										*/  
-
-//128u4	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
-//128u4	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
-//128u4	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/	
-//128u4	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
-//128u4	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
-//128u4	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
-//128u4	DRIVER( sp3ezcf )  	/* 2002 ZX Spectrum +3e	ZXCF   				*/
-//128u4	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/	
-//128u4	DRIVER( scorpion )
-//128u4	DRIVER( pentagon )
+	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
+	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
+	DRIVER( specide ) /* 1995 ZX Spectrum IDE							*/
+	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
+	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
+	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
+	DRIVER( tc2048 )	/* 198? TC2048										*/
+	DRIVER( ts2068 )	/* 1983 TS2068										*/
+	DRIVER( uk2086 )	/* 1986 UK2086										*/  
+	
+	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
+	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
+	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/	
+	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
+	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
+	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
+	DRIVER( sp3ezcf )  	/* 2002 ZX Spectrum +3e	ZXCF   				*/
+	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/	
+	DRIVER( scorpion )
+	DRIVER( pentagon )
 
 //128u4	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
 //128u4	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
@@ -1030,34 +1030,34 @@ XL/XE 16kB OS roms
   /* Spectrum clones */
   	
   /* ICE-Felix */
-//128u4	DRIVER( hc85 )    /* 1985 HC-85										  */
-//128u4	DRIVER( hc90 )    /* 1990 HC-90										  */
-//128u4	DRIVER( hc91 )    /* 1991 HC-91										  */
-//128u4	DRIVER( hc128 )   /* 1991 HC-128									  */
-//128u4	DRIVER( hc2000 )  /* 1992 HC-2000									  */
-  
-//128u4	DRIVER( cip03 )   /* 1988 CIP-03										  */
-//128u4	DRIVER( jet )     /* 1990 JET										  */
+	DRIVER( hc85 )    /* 1985 HC-85										  */
+	DRIVER( hc90 )    /* 1990 HC-90										  */
+	DRIVER( hc91 )    /* 1991 HC-91										  */
+	DRIVER( hc128 )   /* 1991 HC-128									  */
+	DRIVER( hc2000 )  /* 1992 HC-2000									  */
+
+	DRIVER( cip03 )   /* 1988 CIP-03										  */
+	DRIVER( jet )     /* 1990 JET										  */
   
   /* Didaktik Skalica */
-//128u4	DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
-//128u4	DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
-//128u4	DRIVER( dgama89)  /* 1989 Didaktik Gama 89          */
-//128u4	DRIVER( didakt90) /* 1990 Didaktik Skalica 90       */
-//128u4	DRIVER( didakm91) /* 1991 Didaktik M 91             */
-//128u4	DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
-//128u4	DRIVER( didakm93) /* 1993 Didaktik M 93             */
-
-//128u4	DRIVER( mistrum ) /* 1988 Mistrum										*/
+	DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
+	DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
+	DRIVER( dgama89)  /* 1989 Didaktik Gama 89          */
+	DRIVER( didakt90) /* 1990 Didaktik Skalica 90       */
+	DRIVER( didakm91) /* 1991 Didaktik M 91             */
+	DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
+	DRIVER( didakm93) /* 1993 Didaktik M 93             */
+	
+	DRIVER( mistrum ) /* 1988 Mistrum										*/
 	
   /* Russian clones */
 
-//128u4	DRIVER( blitz )     /* 1990 Blic                     */
-//128u4	DRIVER( byte )      /* 1990 Byte                     */
-//128u4	DRIVER( orizon )    /* 199? Orizon-Micro             */
-//128u4	DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
-//128u4	DRIVER( magic6 )    /* 1993 Magic 6                  */
-//128u4	DRIVER( compani1 )  /* 1990 Kompanion 1              */
+	DRIVER( blitz )     /* 1990 Blic                     */
+	DRIVER( byte )      /* 1990 Byte                     */
+	DRIVER( orizon )    /* 199? Orizon-Micro             */
+	DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
+	DRIVER( magic6 )    /* 1993 Magic 6                  */
+	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
 //128u4	DRIVER(kramermc) /* 1987 Kramer MC				*/

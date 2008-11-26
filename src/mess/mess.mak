@@ -380,6 +380,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pp01.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
+	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/shared.a \
@@ -462,7 +463,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/sega.a \
 #	$(MESSOBJ)/sgi.a \
 #	$(MESSOBJ)/sharp.a \
-#	$(MESSOBJ)/sinclair.a \
 #	$(MESSOBJ)/sony.a \
 #	$(MESSOBJ)/sord.a \
 #	$(MESSOBJ)/special.a \
@@ -742,10 +742,10 @@ $(MESSOBJ)/sinclair.a: \
 	$(MESS_MACHINE)/spectrum.o		\
 	$(MESS_MACHINE)/beta.o		\
 	$(MESS_FORMATS)/zx81_p.o		\
-	$(MESS_DRIVERS)/ql.o		\
-	$(MESS_VIDEO)/zx8301.o		\
-	$(MESS_MACHINE)/zx8302.o		\
 	$(MESS_FORMATS)/tzx_cas.o		\
+#	$(MESS_DRIVERS)/ql.o		\
+#	$(MESS_VIDEO)/zx8301.o		\
+#	$(MESS_MACHINE)/zx8302.o		\
 
 $(MESSOBJ)/apple.a:   \
 	$(MESS_VIDEO)/apple2.o		\

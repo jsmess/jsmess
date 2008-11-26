@@ -111,7 +111,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 
 	r.min_y = r.max_y = ula_scanline_count;
 	fillbitmap(bitmap, 1, &r);
-//	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
+//	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(machine->cpu[0], Z80_R), (unsigned) cpu_get_reg(machine->cpu[0], Z80_PC));
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
@@ -127,7 +127,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 	 */
 	if (ula_irq_active)
 	{
-//		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
+//		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(machine->cpu[0], Z80_R), (unsigned) cpu_get_reg(machine->cpu[0], Z80_PC));
 
 		ula_irq_active = 0;
 		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
@@ -145,8 +145,8 @@ void zx_ula_r(running_machine *machine, int offs, const char *region)
 	{
 		bitmap_t *bitmap = tmpbitmap;
 		UINT16 y, *scanline;
-		UINT16 ireg = cpunum_get_reg(0, Z80_I) << 8;
-		UINT8 creg = cpunum_get_reg(0, Z80_C);
+		UINT16 ireg = cpu_get_reg(machine->cpu[0], Z80_I) << 8;
+		UINT8 creg = cpu_get_reg(machine->cpu[0], Z80_C);
 		UINT8 data, *chrgen;
 		chrgen = memory_region(machine, region);
 
