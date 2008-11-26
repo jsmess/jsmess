@@ -48,6 +48,7 @@ static const TMS9928a_interface tms9129_interface =
 /* TODO */
 static const z80pio_interface bbcbc_z80pio_intf =
 {
+	NULL, 0, 
 	NULL,	/* int callback */
 	NULL,	/* port a read */
 	NULL,	/* port b read */
