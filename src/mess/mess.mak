@@ -396,8 +396,8 @@ DRVLIBS = \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/shared.a \
-	$(MESSOBJ)/cbmshare.a \
 
+#	$(MESSOBJ)/cbmshare.a \
 #	$(MESSOBJ)/amiga.a \
 #	$(MESSOBJ)/amstrad.a \
 #	$(MESSOBJ)/apexc.a \
