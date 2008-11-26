@@ -378,6 +378,8 @@ DRVLIBS = \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/homelab.a \
+	$(MESSOBJ)/bk.a \
+	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/acorn.a \
@@ -393,11 +395,9 @@ DRVLIBS = \
 #	$(MESSOBJ)/at.a \
 #	$(MESSOBJ)/atari.a \
 #	$(MESSOBJ)/avigo.a \
-#	$(MESSOBJ)/b2m.a \
 #	$(MESSOBJ)/bally.a \
 #	$(MESSOBJ)/bandai.a \
 #	$(MESSOBJ)/be.a \
-#	$(MESSOBJ)/bk.a \
 #	$(MESSOBJ)/bondwell.a \
 #	$(MESSOBJ)/cbm.a \
 #	$(MESSOBJ)/cbmshare.a \
@@ -532,12 +532,12 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mm58274c.o \
 	$(MESS_FORMATS)/rk_cas.o	\
 	$(MESS_MACHINE)/nec765.o   \
+	$(MESS_MACHINE)/wd17xx.o   \
 	$(MESS_MACHINE)/68901mfp.o \
 #	$(MESS_DEVICES)/z80bin.o	\
 #	$(MESS_VIDEO)/cdp1864.o		\
 #	$(MESS_VIDEO)/crtc6845.o	\
 #	$(MESS_MACHINE)/pclpt.o    \
-#	$(MESS_MACHINE)/wd17xx.o   \
 #	$(MESS_MACHINE)/z80dart.o	\
 #	$(MESS_VIDEO)/msm6255.o	\
 

@@ -978,13 +978,13 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( orionpro )
 
 	/* BK */
-//128u4	DRIVER( bk0010 )
-//128u4	DRIVER( bk001001 )
-//128u4	DRIVER( bk0010fd )
+	DRIVER( bk0010 )
+	DRIVER( bk001001 )
+	DRIVER( bk0010fd )
 
 	/* Bashkiria-2M */
-//128u4	DRIVER( b2m )
-//128u4	DRIVER( b2mrom )
+	DRIVER( b2m )
+	DRIVER( b2mrom )
 
 	/* Radio-86RK */
 //128u4	DRIVER( radio86 )

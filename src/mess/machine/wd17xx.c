@@ -1056,7 +1056,7 @@ void wd17xx_set_pause_time(int usec)
 	wd17xx_info *w = &wd;
 	int result = w->status;
 
-	wd17xx_callback(machine, w, WD17XX_IRQ_CLR);
+	wd17xx_callback(space->machine, w, WD17XX_IRQ_CLR);
 //	if (w->busy_count)
 //	{
 //		if (!--w->busy_count)
@@ -1139,7 +1139,7 @@ READ8_HANDLER ( wd17xx_sector_r )
 	if (w->data_count >= 1)
 	{
 		/* clear data request */
-		wd17xx_clear_data_request(machine);
+		wd17xx_clear_data_request(space->machine);
 
 		/* yes */
 		w->data = w->buffer[w->data_offset++];
@@ -1214,7 +1214,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 	floppy_drive_set_motor_state(wd17xx_current_image(), 1);
 	floppy_drive_set_ready_state(wd17xx_current_image(), 1,0);
 	/* also cleared by writing command */
-	wd17xx_callback(machine, w, WD17XX_IRQ_CLR);
+	wd17xx_callback(space->machine, w, WD17XX_IRQ_CLR);
 
 	/* clear write protected. On read sector, read track and read dam, write protected bit is clear */
 	w->status &= ~((1<<6) | (1<<5) | (1<<4));
@@ -1228,7 +1228,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 		w->data_offset = 0;
 		w->status &= ~(STA_2_BUSY);
 
-		wd17xx_clear_data_request(machine);
+		wd17xx_clear_data_request(space->machine);
 
 		if (data & 0x0f)
 		{
@@ -1260,7 +1260,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 			w->command_type = TYPE_II;
 			w->status &= ~STA_2_LOST_DAT;
 			w->status |= STA_2_BUSY;
-			wd17xx_clear_data_request(machine);
+			wd17xx_clear_data_request(space->machine);
 
 			wd17xx_timed_read_sector_request();
 
@@ -1277,7 +1277,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 			w->command_type = TYPE_II;
 			w->status &= ~STA_2_LOST_DAT;
 			w->status |= STA_2_BUSY;
-			wd17xx_clear_data_request(machine);
+			wd17xx_clear_data_request(space->machine);
 
 			wd17xx_timed_write_sector_request();
 
@@ -1292,11 +1292,11 @@ WRITE8_HANDLER ( wd17xx_command_w )
 			w->command = data & ~FDC_MASK_TYPE_III;
 			w->command_type = TYPE_III;
 			w->status &= ~STA_2_LOST_DAT;
-			wd17xx_clear_data_request(machine);
+			wd17xx_clear_data_request(space->machine);
 #if 1
 //			w->status = seek(w, w->track, w->head, w->sector);
 			if (w->status == 0)
-				read_track(machine, w);
+				read_track(space->machine, w);
 #endif
 			return;
 		}
@@ -1308,7 +1308,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 
 			w->command_type = TYPE_III;
 			w->status &= ~STA_2_LOST_DAT;
-			wd17xx_clear_data_request(machine);
+			wd17xx_clear_data_request(space->machine);
 
 			if (!floppy_drive_get_flag_state(wd17xx_current_image(), FLOPPY_DRIVE_READY))
             {
@@ -1330,7 +1330,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
                     w->command = data & ~FDC_MASK_TYPE_III;
                     w->data_offset = 0;
                     w->data_count = (w->density) ? TRKSIZE_DD : TRKSIZE_SD;
-                    wd17xx_set_data_request(machine);
+                    wd17xx_set_data_request(space->machine);
 
                     w->status |= STA_2_BUSY;
                     w->busy_count = 0;
@@ -1346,7 +1346,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 
 			w->command_type = TYPE_III;
 			w->status &= ~STA_2_LOST_DAT;
-  			wd17xx_clear_data_request(machine);
+  			wd17xx_clear_data_request(space->machine);
 
 			if (!floppy_drive_get_flag_state(wd17xx_current_image(), FLOPPY_DRIVE_READY))
             {
@@ -1354,7 +1354,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
             }
             else
             {
-                wd17xx_read_id(machine, w);
+                wd17xx_read_id(space->machine, w);
             }
 			return;
 		}
@@ -1375,7 +1375,7 @@ WRITE8_HANDLER ( wd17xx_command_w )
 		if (VERBOSE)
 			logerror("wd17xx_command_w $%02X RESTORE\n", data);
 
-		wd17xx_restore(machine, w);
+		wd17xx_restore(space->machine, w);
 	}
 
 	if ((data & ~FDC_MASK_TYPE_I) == FDC_SEEK)
@@ -1546,7 +1546,7 @@ WRITE8_HANDLER ( wd17xx_data_w )
 	if (w->data_count > 0)
 	{
 		/* clear data request */
-		wd17xx_clear_data_request(machine);
+		wd17xx_clear_data_request(space->machine);
 
 		/* put byte into buffer */
 		if (VERBOSE_DATA)
@@ -1588,16 +1588,16 @@ WRITE8_HANDLER ( wd17xx_data_w )
 
 	switch(offset % 4) {
 	case 0:
-		result = wd17xx_status_r(machine, 0);
+		result = wd17xx_status_r(space, 0);
 		break;
 	case 1:
-		result = wd17xx_track_r(machine, 0);
+		result = wd17xx_track_r(space, 0);
 		break;
 	case 2:
-		result = wd17xx_sector_r(machine, 0);
+		result = wd17xx_sector_r(space, 0);
 		break;
 	case 3:
-		result = wd17xx_data_r(machine, 0);
+		result = wd17xx_data_r(space, 0);
 		break;
 	}
 	return result;
@@ -1609,16 +1609,16 @@ WRITE8_HANDLER( wd17xx_w )
 {
 	switch(offset % 4) {
 	case 0:
-		wd17xx_command_w(machine, 0, data);
+		wd17xx_command_w(space, 0, data);
 		break;
 	case 1:
-		wd17xx_track_w(machine, 0, data);
+		wd17xx_track_w(space, 0, data);
 		break;
 	case 2:
-		wd17xx_sector_w(machine, 0, data);
+		wd17xx_sector_w(space, 0, data);
 		break;
 	case 3:
-		wd17xx_data_w(machine, 0, data);
+		wd17xx_data_w(space, 0, data);
 		break;
 	}
 }
