@@ -55,9 +55,9 @@ WRITE8_HANDLER ( mbee_pcg_color_latch_w )
 {
 	mbee_pcg_color_latch = data;
 	if (data & 0x40)
-		memory_set_bank( 3, 1);
+		memory_set_bank(space->machine, 3, 1);
 	else
-		memory_set_bank( 3, 0);
+		memory_set_bank(space->machine, 3, 0);
 }
 
  READ8_HANDLER ( mbee_pcg_color_latch_r )
@@ -73,11 +73,11 @@ WRITE8_HANDLER ( mbee_videoram_w )
 WRITE8_HANDLER ( mbee_pcg_w )
 {
 	if( pcgram[0x0800+offset] != data )
-       	{
+	{
 		int chr = 0x80 + offset / 16;
 		pcgram[0x0800+offset] = data;
 		/* decode character graphics again */
-		decodechar(machine->gfx[0], chr, pcgram);
+		decodechar(space->machine->gfx[0], chr, pcgram);
 	}
 }
 
@@ -86,11 +86,11 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 	if( (m6545_video_bank & 0x01) || (mbee_pcg_color_latch & 0x40) == 0 )
 	{
 		if( pcgram[0x0800+offset] != data )
-        	{
+		{
 			int chr = 0x80 + offset / 16;
 			pcgram[0x0800+offset] = data;
 			/* decode character graphics again */
-			decodechar(machine->gfx[0], chr, pcgram);
+			decodechar(space->machine->gfx[0], chr, pcgram);
 		}
 	}
 	else
@@ -162,9 +162,9 @@ WRITE8_HANDLER ( mbee_video_bank_w )
 {
 	m6545_video_bank = data;
 	if (data & 1)
-		memory_set_bank( 2, 0);
+		memory_set_bank(space->machine, 2, 0);
 	else
-		memory_set_bank( 2, 1);
+		memory_set_bank(space->machine, 2, 1);
 }
 
 static void m6545_update_strobe(running_machine *machine, int param)
@@ -178,10 +178,10 @@ static void m6545_update_strobe(running_machine *machine, int param)
 
 READ8_HANDLER ( m6545_status_r )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	const device_config *screen = video_screen_first(space->machine->config);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	int data = 0, y = video_screen_get_vpos(machine->primary_screen);
+	int data = 0, y = video_screen_get_vpos(space->machine->primary_screen);
 
 	if( y < visarea->min_y ||
 		y > visarea->max_y )
@@ -261,7 +261,7 @@ READ8_HANDLER ( m6545_status_r )
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
 //		logerror("6545 transp_latch $%04X\n", addr);
-		m6545_update_strobe(machine, addr);
+		m6545_update_strobe(space->machine, addr);
 		break;
 	default:
 		logerror("6545 read unmapped port $%X\n", crt.idx);
@@ -287,7 +287,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		break;
 	case 1:
 		crt.horizontal_displayed = data;
-		mc6845_screen_configure(machine);
+		mc6845_screen_configure(space->machine);
 		break;
 	case 2:
 		if( crt.horizontal_sync_pos == data )
@@ -309,7 +309,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		break;
 	case 6:
 		crt.vertical_displayed = data;
-		mc6845_screen_configure(machine);
+		mc6845_screen_configure(space->machine);
 		break;
 	case 7:
 		if( crt.vertical_sync_pos == data )
@@ -334,7 +334,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		if( crt.scan_lines == data )
 			break;
 		crt.scan_lines = data;
-		mc6845_screen_configure(machine);
+		mc6845_screen_configure(space->machine);
 		mc6845_cursor_configure();
 		break;
 	case 10:
@@ -351,9 +351,9 @@ WRITE8_HANDLER ( m6545_data_w )
 			break;
 		crt.screen_address_hi = data;
 		addr = 0x17000+((data & 32) << 6);
-		memcpy(pcgram, memory_region(machine, "main")+addr, 0x800);
+		memcpy(pcgram, memory_region(space->machine, "main")+addr, 0x800);
 		for (i = 0; i < 128; i++)
-				decodechar(machine->gfx[0],i, pcgram);
+			decodechar(space->machine->gfx[0],i, pcgram);
 		break;
 	case 13:
 		crt.screen_address_lo = data;
@@ -383,7 +383,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
 //		logerror("6545 transp_latch $%04X\n", addr);
-		m6545_update_strobe(machine, addr);
+		m6545_update_strobe(space->machine, addr);
 		break;
 	default:
 		logerror("6545 write unmapped port $%X <- $%02X\n", crt.idx, data);

@@ -372,9 +372,9 @@ DRVLIBS = \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bk.a \
+	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/irisha.a \
 	$(MESSOBJ)/mk2.a \
-	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/pp01.a \
