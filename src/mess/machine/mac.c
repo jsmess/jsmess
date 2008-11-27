@@ -114,7 +114,7 @@ static WRITE8_HANDLER(mac_via_out_b);
 static WRITE8_HANDLER(mac_adb_via_out_cb2);
 static WRITE8_HANDLER(mac_via_out_cb2);
 static void mac_via_irq(running_machine *machine, int state);
-static offs_t mac_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+static offs_t mac_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 static const struct via6522_interface mac_via6522_intf =
 {
@@ -182,22 +182,23 @@ void mac_fdc_set_enable_lines(int enable_mask)
 static void mac_install_memory(running_machine *machine, offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, int bank)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	offs_t memory_mask;
-	read16_machine_func rh;
-	write16_machine_func wh;
+	read16_space_func rh;
+	write16_space_func wh;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
 	memory_mask = memory_size - 1;
 
-	rh = (read16_machine_func) (FPTR)bank;
-	wh = is_rom ? SMH_UNMAP : (write16_machine_func) (FPTR)bank;
+	rh = (read16_space_func) (FPTR)bank;
+	wh = is_rom ? SMH_UNMAP : (write16_space_func) (FPTR)bank;
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
+	memory_install_read16_handler(space, memory_begin,
 		memory_end, memory_mask, 0, rh);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memory_begin,
+	memory_install_write16_handler(space, memory_begin,
 		memory_end, memory_mask, 0, wh);
 
-	memory_set_bankptr(bank, memory_data);
+	memory_set_bankptr(machine,bank, memory_data);
 
 	if (LOG_MEMORY)
 	{
@@ -783,7 +784,7 @@ READ16_HANDLER ( macplus_scsi_r )
 		reg = R5380_CURDATA_DTACK;
 	}
 
-	return ncr5380_r(machine, reg)<<8;
+	return ncr5380_r(space, reg)<<8;
 }
 
 WRITE16_HANDLER ( macplus_scsi_w )
@@ -795,7 +796,7 @@ WRITE16_HANDLER ( macplus_scsi_w )
 		reg = R5380_OUTDATA_DTACK;
 	}
 
-	ncr5380_w(machine, reg, data);
+	ncr5380_w(space, reg, data);
 }
 
 static void mac_scsi_irq(running_machine *machine, int state)
@@ -850,7 +851,7 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 
 READ16_HANDLER ( mac_scc_r )
 {
-	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 	UINT16 result;
 
 	result = scc_r(scc, offset);
@@ -861,7 +862,7 @@ READ16_HANDLER ( mac_scc_r )
 
 WRITE16_HANDLER ( mac_scc_w )
 {
-	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 	scc_w(scc, offset, (UINT8) data);
 }
 
@@ -1217,7 +1218,7 @@ READ16_HANDLER ( mac_iwm_r )
 	 */
 
 	UINT16 result = 0;
-	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
 		IWM,
 		"fdc");
 
@@ -1230,7 +1231,7 @@ READ16_HANDLER ( mac_iwm_r )
 
 WRITE16_HANDLER ( mac_iwm_w )
 {
-	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
+	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
 		IWM,
 		"fdc");
 
@@ -1542,7 +1543,7 @@ static READ8_HANDLER(mac_via_in_b)
 	int val = 0;
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (video_screen_get_vpos(machine->primary_screen) >= MAC_V_VIS)
+	if (video_screen_get_vpos(space->machine->primary_screen) >= MAC_V_VIS)
 		val |= 0x40;
 
 	if (has_adb())
@@ -1560,7 +1561,7 @@ static READ8_HANDLER(mac_via_in_b)
 			val |= 0x20;
 		if (mouse_bit_x)	/* Mouse X2 */
 			val |= 0x10;
-		if ((input_port_read(machine, "MOUSE0") & 0x01) == 0)
+		if ((input_port_read(space->machine, "MOUSE0") & 0x01) == 0)
 			val |= 0x08;
 	}
 	if (rtc_data_out)
@@ -1589,7 +1590,7 @@ static WRITE8_HANDLER(mac_via_out_a)
 	 * possibly later models), overlay was set on reset, but cleared on the
 	 * first access to the ROM. */
 	if (mac_model < MODEL_MAC_SE)
-		set_memory_overlay(machine, (data & 0x10) >> 4);
+		set_memory_overlay(space->machine, (data & 0x10) >> 4);
 }
 
 static WRITE8_HANDLER(mac_via_out_b)
@@ -1632,7 +1633,7 @@ READ16_HANDLER ( mac_via_r )
 
 	if (LOG_VIA)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
-	data = via_0_r(machine, offset);
+	data = via_0_r(space, offset);
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1646,7 +1647,7 @@ WRITE16_HANDLER ( mac_via_w )
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_8_15)
-		via_0_w(machine, offset, (data >> 8) & 0xff);
+		via_0_w(space, offset, (data >> 8) & 0xff);
 }
 
 
@@ -1712,7 +1713,7 @@ static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 	{
 		if ((address >= 0x400000) && (address <= 0x4fffff))
 		{
-			set_memory_overlay(machine, 0);		// kill the overlay
+			set_memory_overlay(space->machine, 0);		// kill the overlay
 			mac_overlay = -1;
 		}
 	}
@@ -1740,7 +1741,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(mess_ram, 0, mess_ram_size);
 
-		memory_set_direct_update_handler(0, overlay_opbaseoverride);
+		memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), overlay_opbaseoverride);
 		mac_overlay = 1;
 	}
 
@@ -1760,7 +1761,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	inquiry_timeout = timer_alloc(inquiry_timeout_func, NULL);
 
-	cpuintrf_set_dasm_override(0, mac_dasm_override);
+	cpu_set_dasm_override(machine->cpu[0], mac_dasm_override);
 
 	/* save state stuff */
 	state_save_register_global(mac_overlay);
@@ -1863,7 +1864,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 {
 	int scanline;
 
-	cpuintrf_push_context(0);
+	cpu_push_context(machine->cpu[0]);
 
 	mac_sh_updatebuffer();
 
@@ -1877,7 +1878,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 
 	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1) % MAC_V_TOTAL, 0), 0);
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -2708,7 +2709,7 @@ static const char *lookup_trap(UINT16 opcode)
 
 
 
-static offs_t mac_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static offs_t mac_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT16 opcode;
 	unsigned result = 0;

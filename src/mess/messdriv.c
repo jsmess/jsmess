@@ -236,37 +236,37 @@ const game_driver * const drivers[] =
 	DRIVER( nc200 )		/* 19?? NC200										*/
 
 	/* APPLE */
-//128u4	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/
-//128u4	DRIVER( apple2 )	/* Apr 1977 Apple ][								*/
-//128u4	DRIVER( apple2p )	/* Jun 1979 Apple ][+								*/
-//128u4	DRIVER( apple2jp )	/* ??? ???? Apple ][j+								*/
-//128u4	DRIVER( apple2e )	/* Jan 1983 Apple //128u4e								*/
-//128u4	DRIVER( apple2ee )	/* Mar 1985 Apple //128u4e Enhanced						*/
-//128u4	DRIVER( apple2ep )	/* Jan 1987 Apple //128u4e Platinum						*/
-//128u4	DRIVER( apple2c )	/* Apr 1984 Apple //128u4c								*/
-//128u4	DRIVER( apple2c0 )	/* ??? 1985 Apple //128u4c (3.5 ROM)						*/
-//128u4	DRIVER( apple2c3 )	/* Sep 1986 Apple //128u4c (Original Mem. Exp.)			*/
-//128u4	DRIVER( apple2c4 )	/* ??? 198? Apple //128u4c (rev 4)						*/
-//128u4	DRIVER( apple2cp )	/* Sep 1988 Apple //128u4c+								*/
-//128u4	DRIVER( apple2g0 )	/* Sep 1986 Apple IIgs ROM00						*/
-//128u4	DRIVER( apple2g1 )	/* Sep 1987 Apple IIgs ROM01						*/
-//128u4	DRIVER( apple2gs )	/* Aug 1989 Apple IIgs ROM03						*/
-//128u4	DRIVER( apple3 )	/* May 1980 Apple //128u4/								*/
-						/* Dec 1983 Apple //128u4/+								*/
-//128u4	DRIVER( ace100 )	/* ??? 1982 Franklin Ace 100						*/
-//128u4	DRIVER( laser128 )	/* ??? 1987 Laser 128								*/
-//128u4	DRIVER( las128ex )	/* ??? 1987 Laser 128 EX							*/
-//128u4	DRIVER( las3000 )	/* ??? 1983 Laser 3000								*/
-//128u4	DRIVER( ivelultr )	/* Ivasim Ivel Ultra								*/
+	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/
+	DRIVER( apple2 )	/* Apr 1977 Apple ][								*/
+	DRIVER( apple2p )	/* Jun 1979 Apple ][+								*/
+	DRIVER( apple2jp )	/* ??? ???? Apple ][j+								*/
+	DRIVER( apple2e )	/* Jan 1983 Apple //128u4e								*/
+	DRIVER( apple2ee )	/* Mar 1985 Apple //128u4e Enhanced						*/
+	DRIVER( apple2ep )	/* Jan 1987 Apple //128u4e Platinum						*/
+	DRIVER( apple2c )	/* Apr 1984 Apple //128u4c								*/
+	DRIVER( apple2c0 )	/* ??? 1985 Apple //128u4c (3.5 ROM)						*/
+	DRIVER( apple2c3 )	/* Sep 1986 Apple //128u4c (Original Mem. Exp.)			*/
+	DRIVER( apple2c4 )	/* ??? 198? Apple //128u4c (rev 4)						*/
+	DRIVER( apple2cp )	/* Sep 1988 Apple //128u4c+								*/
+	DRIVER( apple2g0 )	/* Sep 1986 Apple IIgs ROM00						*/
+	DRIVER( apple2g1 )	/* Sep 1987 Apple IIgs ROM01						*/
+	DRIVER( apple2gs )	/* Aug 1989 Apple IIgs ROM03						*/
+	DRIVER( apple3 )	/* May 1980 Apple //128u4/								*/
+					/* Dec 1983 Apple //128u4/+								*/
+	DRIVER( ace100 )	/* ??? 1982 Franklin Ace 100						*/
+	DRIVER( laser128 )	/* ??? 1987 Laser 128								*/
+	DRIVER( las128ex )	/* ??? 1987 Laser 128 EX							*/
+	DRIVER( las3000 )	/* ??? 1983 Laser 3000								*/
+	DRIVER( ivelultr )	/* Ivasim Ivel Ultra								*/
 
 /*
  * Lisa 				 January			 1983
  * Lisa 2 				 January			 1984
  * Macintosh XL 		 January			 1985
  */
-//128u4	DRIVER( lisa2 )		/* 1984 Apple Lisa 2								*/
-//128u4	DRIVER( lisa210 )	/* 1984 Apple Lisa 2/10								*/
-//128u4	DRIVER( macxl )		/* 1984 Apple Macintosh XL							*/
+	DRIVER( lisa2 )		/* 1984 Apple Lisa 2								*/
+	DRIVER( lisa210 )	/* 1984 Apple Lisa 2/10								*/
+	DRIVER( macxl )		/* 1984 Apple Macintosh XL							*/
 /*
  * Macintosh			January				1984
  * Macintosh 512k		July?				1984
@@ -275,12 +275,12 @@ const game_driver * const drivers[] =
  * Macintosh SE			March				1987
  * Macintosh II			March				1987
  */
-//128u4 	DRIVER( mac128k )	/* 1984 Apple Macintosh								*/
-//128u4	DRIVER( mac512k )	/* 1985 Apple Macintosh 512k						*/
-//128u4	DRIVER( mac512ke )	/* 1986 Apple Macintosh 512ke						*/
-//128u4	DRIVER( macplus )	/* 1986 Apple Macintosh Plus						*/
-//128u4	DRIVER( macse )		/* 1987 Apple Macintosh SE							*/
-//128u4	DRIVER( macclasc )	/* 1990 Apple Macintosh Classic						*/
+ 	DRIVER( mac128k )	/* 1984 Apple Macintosh								*/
+	DRIVER( mac512k )	/* 1985 Apple Macintosh 512k						*/
+	DRIVER( mac512ke )	/* 1986 Apple Macintosh 512ke						*/
+	DRIVER( macplus )	/* 1986 Apple Macintosh Plus						*/
+	DRIVER( macse )		/* 1987 Apple Macintosh SE							*/
+	DRIVER( macclasc )	/* 1990 Apple Macintosh Classic						*/
 
 	/* ATARI */
 /*

@@ -101,11 +101,12 @@ void apple2_setup_memory(running_machine *machine, const apple2_memmap_config *c
 
 void apple2_update_memory(running_machine *machine)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	int i, bank, rbank, wbank;
 	int full_update = 0;
 	apple2_meminfo meminfo;
-	read8_machine_func rh;
-	write8_machine_func wh;
+	read8_space_func rh;
+	write8_space_func wh;
 	offs_t begin, end_r, end_w;
 	UINT8 *rbase, *wbase, *rom, *slot_ram;
 	UINT32 rom_length, slot_length, offset;
@@ -145,7 +146,7 @@ void apple2_update_memory(running_machine *machine)
 			rbank = (bank_disposition != A2MEM_IO) ? bank : 0;
 			begin = apple2_mem_config.memmap[i].begin;
 			end_r = apple2_mem_config.memmap[i].end;
-			rh = (read8_machine_func) (STATIC_BANK1 + (FPTR)(rbank - 1));
+			rh = (read8_space_func) (STATIC_BANK1 + (FPTR)(rbank - 1));
 
 			LOG(("apple2_update_memory():  Updating RD {%06X..%06X} [#%02d] --> %08X\n",
 				begin, end_r, rbank, meminfo.read_mem));
@@ -194,16 +195,16 @@ void apple2_update_memory(running_machine *machine)
 
 			/* install the actual handlers */
 			if (begin <= end_r)
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end_r, 0, 0, rh);
+				memory_install_read8_handler(space, begin, end_r, 0, 0, rh);
 
 			/* did we 'go past the end?' */
 			if (end_r < apple2_mem_config.memmap[i].end)
-				memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
+				memory_install_read8_handler(space, end_r + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
 
 			/* set the memory bank */
 			if (rbase)
 			{
-				memory_set_bankptr(rbank, rbase);
+				memory_set_bankptr(machine, rbank, rbase);
 			}
 
 			/* record the current settings */
@@ -225,7 +226,7 @@ void apple2_update_memory(running_machine *machine)
 				wbank = 0;
 			begin = apple2_mem_config.memmap[i].begin;
 			end_w = apple2_mem_config.memmap[i].end;
-			wh = (write8_machine_func) (STATIC_BANK1 + (FPTR)(wbank - 1));
+			wh = (write8_space_func) (STATIC_BANK1 + (FPTR)(wbank - 1));
 
 			LOG(("apple2_update_memory():  Updating WR {%06X..%06X} [#%02d] --> %08X\n",
 				begin, end_w, wbank, meminfo.write_mem));
@@ -269,16 +270,16 @@ void apple2_update_memory(running_machine *machine)
 
 			/* install the actual handlers */
 			if (begin <= end_w)
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end_w, 0, 0, wh);
+				memory_install_write8_handler(space, begin, end_w, 0, 0, wh);
 
 			/* did we 'go past the end?' */
 			if (end_w < apple2_mem_config.memmap[i].end)
-				memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
+				memory_install_write8_handler(space, end_w + 1, apple2_mem_config.memmap[i].end, 0, 0, SMH_NOP);
 
 			/* set the memory bank */
 			if (wbase)
 			{
-				memory_set_bankptr(wbank, wbase);
+				memory_set_bankptr(machine, wbank, wbase);
 			}
 
 			/* record the current settings */
@@ -304,7 +305,7 @@ static STATE_POSTLOAD( apple2_update_memory_postload )
 
 READ8_HANDLER(apple2_c0xx_r)
 {
-	static const read8_machine_func handlers[] =
+	static const read8_space_func handlers[] =
 	{
 		apple2_c00x_r,
 		apple2_c01x_r,
@@ -325,7 +326,7 @@ READ8_HANDLER(apple2_c0xx_r)
 	{
 		/* normal handler */
 		if (handlers[offset / 0x10])
-			result = handlers[offset / 0x10](machine, offset % 0x10);
+			result = handlers[offset / 0x10](space, offset % 0x10);
 	}
 	else
 	{
@@ -333,7 +334,7 @@ READ8_HANDLER(apple2_c0xx_r)
 		slotnum = (offset - 0x80) / 0x10;
 
 		/* now identify the device */
-		slotdevice = apple2_slot(machine, slotnum);
+		slotdevice = apple2_slot(space->machine, slotnum);
 
 		/* and if we can, read from the slot */
 		if (slotdevice != NULL)
@@ -346,7 +347,7 @@ READ8_HANDLER(apple2_c0xx_r)
 
 WRITE8_HANDLER(apple2_c0xx_w)
 {
-	static const write8_machine_func handlers[] =
+	static const write8_space_func handlers[] =
 	{
 		apple2_c00x_w,
 		apple2_c01x_w,
@@ -366,7 +367,7 @@ WRITE8_HANDLER(apple2_c0xx_w)
 	{
 		/* normal handler */
 		if (handlers[offset / 0x10])
-			handlers[offset / 0x10](machine, offset % 0x10, data);
+			handlers[offset / 0x10](space, offset % 0x10, data);
 	}
 	else
 	{
@@ -374,7 +375,7 @@ WRITE8_HANDLER(apple2_c0xx_w)
 		slotnum = (offset - 0x80) / 0x10;
 
 		/* now identify the device */
-		slotdevice = apple2_slot(machine, slotnum);
+		slotdevice = apple2_slot(space->machine, slotnum);
 
 		/* and if we can, write to the slot */
 		if (slotdevice != NULL)
@@ -569,7 +570,7 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
-	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, (unsigned int) cpunum_get_reg(0, REG_PC)));
+	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, (unsigned int) cpu_get_reg(machine->cpu[0], REG_PC)));
 
 	assert((val & mask) == val);
 
@@ -628,7 +629,7 @@ UINT8 apple2_getfloatingbusvalue(void)
 
 	// video scanner data
 	//
-	i = activecpu_gettotalcycles() % kClocksPerVSync; // cycles into this VSync
+	i = cpu_get_total_cycles(Machine->cpu[0]) % kClocksPerVSync; // cycles into this VSync
 
 	// machine state switches
 	//
@@ -775,7 +776,7 @@ INTERRUPT_GEN( apple2_interrupt )
 
 	profiler_mark(PROFILER_A2INT);
 
-	scanline = video_screen_get_vpos(machine->primary_screen);
+	scanline = video_screen_get_vpos(device->machine->primary_screen);
 
 	if (scanline > 190)
 	{
@@ -784,10 +785,10 @@ INTERRUPT_GEN( apple2_interrupt )
 			irq_freq = 1;
 
 		if (irq_freq)
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, PULSE_LINE);
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, PULSE_LINE);
 	}
 
-	video_screen_update_partial(machine->primary_screen, scanline);
+	video_screen_update_partial(device->machine->primary_screen, scanline);
 
 	profiler_mark(PROFILER_END);
 }
@@ -870,7 +871,7 @@ WRITE8_HANDLER ( apple2_c00x_w )
 {
 	UINT32 mask;
 	mask = 1 << (offset / 2);
-	apple2_setvar(machine, (offset & 1) ? mask : 0, mask);
+	apple2_setvar(space->machine, (offset & 1) ? mask : 0, mask);
 }
 
 
@@ -897,7 +898,7 @@ READ8_HANDLER ( apple2_c01x_r )
 		case 0x06:			result |= (a2 & VAR_ALTZP)		? 0x80 : 0x00;	break;
 		case 0x07:			result |= (a2 & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
 		case 0x08:			result |= (a2 & VAR_80STORE)	? 0x80 : 0x00;	break;
-		case 0x09:			result |= !video_screen_get_vblank(machine->primary_screen)		? 0x80 : 0x00;	break;
+		case 0x09:			result |= !video_screen_get_vblank(space->machine->primary_screen)		? 0x80 : 0x00;	break;
 		case 0x0A:			result |= (a2 & VAR_TEXT)		? 0x80 : 0x00;	break;
 		case 0x0B:			result |= (a2 & VAR_MIXED)		? 0x80 : 0x00;	break;
 		case 0x0C:			result |= (a2 & VAR_PAGE2)		? 0x80 : 0x00;	break;
@@ -932,7 +933,7 @@ WRITE8_HANDLER( apple2_c01x_w )
 
 READ8_HANDLER( apple2_c02x_r )
 {
-	apple2_c02x_w(machine, offset, 0);
+	apple2_c02x_w(space, offset, 0);
 	return apple2_getfloatingbusvalue();
 }
 
@@ -947,7 +948,7 @@ WRITE8_HANDLER( apple2_c02x_w )
 	switch(offset)
 	{
 		case 0x08:
-			apple2_setvar(machine, (a2 & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
+			apple2_setvar(space->machine, (a2 & VAR_ROMSWITCH) ^ VAR_ROMSWITCH, VAR_ROMSWITCH);
 			break;
 	}
 }
@@ -979,7 +980,7 @@ READ8_HANDLER ( apple2_c03x_r )
 
 WRITE8_HANDLER ( apple2_c03x_w )
 {
-	apple2_c03x_r(machine, offset);
+	apple2_c03x_r(space, offset);
 }
 
 
@@ -997,7 +998,7 @@ READ8_HANDLER ( apple2_c05x_r )
 		offset ^= 1;
 
 	mask = 0x100 << (offset / 2);
-	apple2_setvar(machine, (offset & 1) ? mask : 0, mask);
+	apple2_setvar(space->machine, (offset & 1) ? mask : 0, mask);
 	return apple2_getfloatingbusvalue();
 }
 
@@ -1009,7 +1010,7 @@ READ8_HANDLER ( apple2_c05x_r )
 
 WRITE8_HANDLER ( apple2_c05x_w )
 {
-	apple2_c05x_r(machine, offset);
+	apple2_c05x_r(space, offset);
 }
 
 
@@ -1025,15 +1026,15 @@ READ8_HANDLER ( apple2_c06x_r )
 	{
 		case 0x01:
 			/* Open-Apple/Joystick button 0 */
-			result = apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON0);
+			result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON0);
 			break;
 		case 0x02:
 			/* Closed-Apple/Joystick button 1 */
-			result = apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON1);
+			result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON1);
 			break;
 		case 0x03:
 			/* Joystick button 2. Later revision motherboards connected this to SHIFT also */
-			result = apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON2);
+			result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON2);
 			break;
 		case 0x04:
 			/* X Joystick 1 axis */
@@ -1074,10 +1075,10 @@ READ8_HANDLER ( apple2_c07x_r )
 
 	if (offset == 0)
 	{
-		joystick_x1_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(machine, "joystick_1_x");
-		joystick_y1_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(machine, "joystick_1_y");
-		joystick_x2_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(machine, "joystick_2_x");
-		joystick_y2_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(machine, "joystick_2_y");
+		joystick_x1_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(space->machine, "joystick_1_x");
+		joystick_y1_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(space->machine, "joystick_1_y");
+		joystick_x2_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(space->machine, "joystick_2_x");
+		joystick_y2_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(space->machine, "joystick_2_y");
 	}
 	return 0;
 }
@@ -1090,7 +1091,7 @@ READ8_HANDLER ( apple2_c07x_r )
 
 WRITE8_HANDLER ( apple2_c07x_w )
 {
-	apple2_c07x_r(machine, offset);
+	apple2_c07x_r(space, offset);
 }
 
 

@@ -795,7 +795,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 	int scanline;
 
 	// make sure we're in the 65816's context
-	cpuintrf_push_context(0);
+	cpu_push_context(machine->cpu[0]);
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
 	video_screen_update_partial(machine->primary_screen, scanline);
@@ -831,12 +831,12 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 		/* call Apple II interrupt handler */
 		if ((video_screen_get_vpos(machine->primary_screen) % 8) == 7)
-			apple2_interrupt(machine, 0);
+			apple2_interrupt(machine->cpu[0]);
 	}
 
 	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1)%262, 0), 0);
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -866,7 +866,7 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				sndglu_dummy_read = es5503_reg_0_r(machine, sndglu_addr);
+				sndglu_dummy_read = es5503_reg_0_r(space, sndglu_addr);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment
@@ -905,7 +905,7 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				es5503_reg_0_w(machine, sndglu_addr, data);
+				es5503_reg_0_w(space, sndglu_addr, data);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment
@@ -965,7 +965,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 	switch(offset)
 	{
 		case 0x19:	/* C019 - RDVBLBAR */
-			result = (video_screen_get_vpos(machine->primary_screen) >= (192+BORDER_TOP)) ? 0x80 : 0x00;
+			result = (video_screen_get_vpos(space->machine->primary_screen) >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
 		case 0x22:	/* C022 - TBCOLOR */
@@ -978,7 +978,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x24:	/* C024 - MOUSEDATA */
-			result = adb_read_mousedata(machine);
+			result = adb_read_mousedata(space->machine);
 			break;
 
 		case 0x25:	/* C025 - KEYMODREG */
@@ -1006,17 +1006,17 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x2E:	/* C02E - VERTCNT */
-			result = apple2gs_get_vpos(machine) >> 1;
+			result = apple2gs_get_vpos(space->machine) >> 1;
 			break;
 
 		case 0x2F:	/* C02F - HORIZCNT */
-			result = video_screen_get_hpos(machine->primary_screen) / 11;
+			result = video_screen_get_hpos(space->machine->primary_screen) / 11;
 			if (result > 0)
 			{
 				result += 0x40;
 			}
 
-			if (apple2gs_get_vpos(machine) & 1)
+			if (apple2gs_get_vpos(space->machine) & 1)
 			{
 				result |= 0x80;
 			}
@@ -1046,7 +1046,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+			scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 			result = scc_r(scc, offset & 0x03);
 			break;
 
@@ -1054,7 +1054,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x3D:	/* C03D - SOUNDDATA */
 		case 0x3E:	/* C03E - SOUNDADRL */
 		case 0x3F:	/* C03F - SOUNDADRH */
-			result = gssnd_r(machine, offset & 0x03);
+			result = gssnd_r(space, offset & 0x03);
 			break;
 
 		case 0x41:	/* C041 - INTEN */
@@ -1079,8 +1079,8 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			offset |= (memory_region_length(machine, "main") - 1) & ~0x3FFF;
-			result = memory_region(machine, "main")[offset];
+			offset |= (memory_region_length(space->machine, "main") - 1) & ~0x3FFF;
+			result = memory_region(space->machine, "main")[offset];
 			break;
 
 		case 0x21:	/* C021 - MONOCOLOR */
@@ -1088,7 +1088,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			result = 0x00;
 
 		default:
-			result = apple2_c0xx_r(machine, offset);
+			result = apple2_c0xx_r(space, offset);
 			break;
 	}
 
@@ -1130,7 +1130,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
 		case 0x26:	/* C026 - DATAREG */
-			adb_write_datareg(machine, data);
+			adb_write_datareg(space->machine, data);
 			break;
 
 		case 0x27:	/* C027 - KMSTATUS */
@@ -1147,15 +1147,15 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 
 		case 0x2D:	/* C02D - SLTROMSEL */
 			apple2gs_sltromsel = data;
-			apple2_update_memory(machine);
+			apple2_update_memory(space->machine);
 			break;
 
 		case 0x31:	/* C031 - DISKREG */
-			apple2_iwm_setdiskreg(machine, data);
+			apple2_iwm_setdiskreg(space->machine, data);
 			break;
 
 		case 0x32:	/* C032 - SCANINT */
-			apple2gs_set_scanint(machine, data);
+			apple2gs_set_scanint(space->machine, data);
 			break;
 
 		case 0x33:	/* C033 - CLOCKDATA */
@@ -1173,20 +1173,20 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			if (apple2gs_shadow != data)
 			{
 				apple2gs_shadow = data;
-				apple2_update_memory(machine);
+				apple2_update_memory(space->machine);
 			}
 			break;
 
 		case 0x36:	/* C036 - CYAREG */
 			apple2gs_cyareg = data & ~0x20;
-			cpunum_set_clock(machine, 0, (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
+			cpu_set_clock(space->machine->cpu[0], (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
 			break;
 
 		case 0x38:	/* C038 - SCCBREG */
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+			scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 			scc_w(scc, offset & 0x03, data);
 			break;
 
@@ -1194,25 +1194,25 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 		case 0x3D:	/* C03D - SOUNDDATA */
 		case 0x3E:	/* C03E - SOUNDADRL */
 		case 0x3F:	/* C03F - SOUNDADRH */
-			gssnd_w(machine, offset & 0x03, data);
+			gssnd_w(space, offset & 0x03, data);
 			break;
 
 		case 0x41:	/* C041 - INTEN */
 			apple2gs_inten = data & 0x1F;
 			if ((apple2gs_inten & 0x10) == 0x00)
-				apple2gs_remove_irq(machine, IRQ_INTEN_QSECOND);
+				apple2gs_remove_irq(space->machine, IRQ_INTEN_QSECOND);
 			if ((apple2gs_inten & 0x08) == 0x00)
-				apple2gs_remove_irq(machine, IRQ_INTEN_VBL);
+				apple2gs_remove_irq(space->machine, IRQ_INTEN_VBL);
 			break;
 
 		case 0x47:	/* C047 - CLRVBLINT */
 			apple2gs_intflag &= ~0x18;
-			apple2gs_remove_irq(machine, IRQ_INTEN_QSECOND);
-			apple2gs_remove_irq(machine, IRQ_INTEN_VBL);
+			apple2gs_remove_irq(space->machine, IRQ_INTEN_QSECOND);
+			apple2gs_remove_irq(space->machine, IRQ_INTEN_VBL);
 			break;
 
 		case 0x68:	/* C068 - STATEREG */
-			apple2_setvar(machine,
+			apple2_setvar(space->machine,
 				((data & 0x80) ? VAR_ALTZP : 0) |
 				((data & 0x40) ? VAR_PAGE2 : 0) |
 				((data & 0x20) ? VAR_RAMRD : 0) |
@@ -1224,7 +1224,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
 		default:
-			apple2_c0xx_w(machine, offset, data);
+			apple2_c0xx_w(space, offset, data);
 			break;
 	}
 }
@@ -1311,7 +1311,7 @@ static WRITE8_HANDLER( apple2gs_aux4000_w )
 			{
 				int color = (offset - 0x19e00) >> 1;
 
-				palette_set_color_rgb(machine, color + 16,
+				palette_set_color_rgb(space->machine, color + 16,
 					((apple2gs_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
 					((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
 					((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
@@ -1541,7 +1541,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		result = apple2gs_c0xx_r(machine, address);
+		result = apple2gs_c0xx_r(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), address);
 	}
 	else
 	{
@@ -1567,7 +1567,7 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		apple2gs_c0xx_w(machine, address, data);
+		apple2gs_c0xx_w(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), address, data);
 	}
 	else
 	{
@@ -1594,22 +1594,22 @@ static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 		else if ((address & 0x000F00) == 0x000000)
 		{
 			if (((address & 0xFF) >= 0x71) && ((address & 0xFF) <= 0x7F))
-				opptr = apple2gs_getslotmem(machine, address);
+				opptr = apple2gs_getslotmem(space->machine, address);
 		}
 		else
 		{
 			slot = (address & 0x000F00) / 0x100;
 
 			if ((slot > 7) || ((apple2gs_sltromsel & (1 << slot)) == 0))
-				opptr = apple2gs_getslotmem(machine, address);
+				opptr = apple2gs_getslotmem(space->machine, address);
 		}
 
 		if (opptr != NULL)
 		{
-			opbase->mask = ~0;
+			direct->mask = ~0;
 			direct->raw = direct->decrypted = opptr - address;
-			opbase->mem_min = address;
-			opbase->mem_max = address;
+			direct->min = address;
+			direct->max = address;
 			address = ~0;
 		}
 	}
@@ -1618,25 +1618,25 @@ static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 
 
 
-static READ8_HANDLER( apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0x00C000); }
-static READ8_HANDLER( apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0x01C000); }
-static READ8_HANDLER( apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0xE0C000); }
-static READ8_HANDLER( apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(machine, offset | 0xE1C000); }
+static READ8_HANDLER( apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine, offset | 0x00C000); }
+static READ8_HANDLER( apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine, offset | 0x01C000); }
+static READ8_HANDLER( apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine, offset | 0xE0C000); }
+static READ8_HANDLER( apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine, offset | 0xE1C000); }
 
-static WRITE8_HANDLER( apple2gs_00Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0x00C000, data); }
-static WRITE8_HANDLER( apple2gs_01Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0x01C000, data); }
-static WRITE8_HANDLER( apple2gs_E0Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0xE0C000, data); }
-static WRITE8_HANDLER( apple2gs_E1Cxxx_w) { apple2gs_xxCxxx_w(machine, offset | 0xE1C000, data); }
+static WRITE8_HANDLER( apple2gs_00Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0x00C000, data); }
+static WRITE8_HANDLER( apple2gs_01Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0x01C000, data); }
+static WRITE8_HANDLER( apple2gs_E0Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0xE0C000, data); }
+static WRITE8_HANDLER( apple2gs_E1Cxxx_w) { apple2gs_xxCxxx_w(space->machine, offset | 0xE1C000, data); }
 
 static WRITE8_HANDLER( apple2gs_Exxxxx_w )
 {
 	apple2gs_slowmem[offset] = data;
 }
 
-static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x00400, data); }
-static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x02000, data); }
-static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x10400, data); }
-static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(machine, offset + 0x12000, data); }
+static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x00400, data); }
+static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x02000, data); }
+static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x10400, data); }
+static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x12000, data); }
 
 static WRITE8_HANDLER( apple2gs_slowmem_w )
 {
@@ -1646,7 +1646,7 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 	{
 		int color = (offset - 0x19e00) >> 1;
 
-		palette_set_color_rgb(machine, color + 16,
+		palette_set_color_rgb(space->machine, color + 16,
 			((apple2gs_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
 			((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
 			((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
@@ -1656,6 +1656,7 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 
 static void apple2gs_setup_memory(running_machine *machine)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	offs_t begin, end;
 	apple2_memmap_config cfg;
 
@@ -1663,43 +1664,43 @@ static void apple2gs_setup_memory(running_machine *machine)
 	apple2gs_slowmem = auto_malloc(128*1024);
 	memset(apple2gs_slowmem, 0, 128*1024);
 
-	state_save_register_item_array("APPLE2GS_SLOWMEM", 0, apple2gs_slowmem);
+	state_save_register_item_array("APPLE2GS_SLOWMEM", NULL, 0, apple2gs_slowmem);
 
 	/* install expanded memory */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, mess_ram + 0x010000);
+	memory_install_read8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_set_bankptr(machine,1, mess_ram + 0x010000);
 
 	/* install hi memory */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe10400, 0xe107ff, 0, 0, apple2gs_E104xx_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe12000, 0xe13fff, 0, 0, apple2gs_E12xxx_w);
-	memory_set_bankptr(2, apple2gs_slowmem);
+	memory_install_read8_handler(space, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(space, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
+	memory_install_write8_handler(space, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
+	memory_install_write8_handler(space, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
+	memory_install_write8_handler(space, 0xe10400, 0xe107ff, 0, 0, apple2gs_E104xx_w);
+	memory_install_write8_handler(space, 0xe12000, 0xe13fff, 0, 0, apple2gs_E12xxx_w);
+	memory_set_bankptr(machine,2, apple2gs_slowmem);
 
 	/* install alternate ROM bank */
 	begin = 0x1000000 - memory_region_length(machine, "main");
 	end = 0xffffff;
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, SMH_BANK3);
-	memory_set_bankptr(3, memory_region(machine, "main"));
+	memory_install_read8_handler(space, begin, end, 0, 0, SMH_BANK3);
+	memory_set_bankptr(machine,3, memory_region(machine, "main"));
 
 	/* install new xxC000-xxCFFF handlers */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_w);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_w);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_w);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
-	memory_set_direct_update_handler(0, apple2gs_opbase);
+	memory_install_read8_handler(space, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_r);
+	memory_install_write8_handler(space, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_w);
+	memory_install_read8_handler(space, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_r);
+	memory_install_write8_handler(space, 0x01c000, 0x01cfff, 0, 0, apple2gs_01Cxxx_w);
+	memory_install_read8_handler(space, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_r);
+	memory_install_write8_handler(space, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_w);
+	memory_install_read8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
+	memory_install_write8_handler(space, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
+	memory_set_direct_update_handler(space, apple2gs_opbase);
 
 	/* install aux memory writes (for shadowing) */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x012000, 0x013FFF, 0, 0, apple2gs_aux2000_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x014000, 0x019FFF, 0, 0, apple2gs_aux4000_w);
+	memory_install_write8_handler(space, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);
+	memory_install_write8_handler(space, 0x012000, 0x013FFF, 0, 0, apple2gs_aux2000_w);
+	memory_install_write8_handler(space, 0x014000, 0x019FFF, 0, 0, apple2gs_aux4000_w);
 
 	/* setup the Apple II memory system */
 	memset(&cfg, 0, sizeof(cfg));
@@ -1741,7 +1742,7 @@ MACHINE_START( apple2gs )
 	apple2_init_common(machine);
 
 	/* set up Apple IIgs vectoring */
-	cpunum_set_info_fct(0, CPUINFO_PTR_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);
 
 	/* setup globals */
 	apple2gs_cur_slot6_image = NULL;
@@ -1792,46 +1793,46 @@ MACHINE_START( apple2gs )
 	/* save state stuff.  note that the driver takes care of docram. */
 	state_save_register_global_array(mess_ram);
 
-	state_save_register_item("NEWVIDEO", 0, apple2gs_newvideo);
+	state_save_register_item("NEWVIDEO", NULL, 0, apple2gs_newvideo);
 
-	state_save_register_item("VGCINT", 0, apple2gs_vgcint);
-	state_save_register_item("LANGSEL", 0, apple2gs_langsel);
-	state_save_register_item("SLTROMSEL", 0, apple2gs_sltromsel);
-	state_save_register_item("CYAREG", 0, apple2gs_cyareg);
-	state_save_register_item("INTEN", 0, apple2gs_inten);
-	state_save_register_item("INTFLAG", 0, apple2gs_intflag);
-	state_save_register_item("SHADOW", 0, apple2gs_shadow);
-	state_save_register_item("PENDIRQ", 0, apple2gs_pending_irqs);
-	state_save_register_item("MX", 0, apple2gs_mouse_x);
-	state_save_register_item("MY", 0, apple2gs_mouse_y);
-	state_save_register_item("MDX", 0, apple2gs_mouse_dx);
-	state_save_register_item("MDY", 0, apple2gs_mouse_dy);
+	state_save_register_item("VGCINT", NULL,0, apple2gs_vgcint);
+	state_save_register_item("LANGSEL", NULL,0, apple2gs_langsel);
+	state_save_register_item("SLTROMSEL", NULL,0, apple2gs_sltromsel);
+	state_save_register_item("CYAREG", NULL,0, apple2gs_cyareg);
+	state_save_register_item("INTEN", NULL,0, apple2gs_inten);
+	state_save_register_item("INTFLAG", NULL,0, apple2gs_intflag);
+	state_save_register_item("SHADOW", NULL,0, apple2gs_shadow);
+	state_save_register_item("PENDIRQ", NULL,0, apple2gs_pending_irqs);
+	state_save_register_item("MX", NULL,0, apple2gs_mouse_x);
+	state_save_register_item("MY", NULL,0, apple2gs_mouse_y);
+	state_save_register_item("MDX", NULL,0, apple2gs_mouse_dx);
+	state_save_register_item("MDY", NULL,0, apple2gs_mouse_dy);
 
-	state_save_register_item("CLKDATA", 0, clock_data);
-	state_save_register_item("CLKCTRL", 0, clock_control);
-	state_save_register_item("CLKRD", 0, clock_read);
-	state_save_register_item("CLKREG1", 0, clock_reg1);
-	state_save_register_item("CLKCURTIME", 0, clock_curtime);
-	state_save_register_item("CLKCURTIMEINT", 0, clock_curtime_interval);
-	state_save_register_item("CLKMODE", 0, clock_mode);
+	state_save_register_item("CLKDATA", NULL,0, clock_data);
+	state_save_register_item("CLKCTRL", NULL,0, clock_control);
+	state_save_register_item("CLKRD", NULL,0, clock_read);
+	state_save_register_item("CLKREG1", NULL,0, clock_reg1);
+	state_save_register_item("CLKCURTIME", NULL,0, clock_curtime);
+	state_save_register_item("CLKCURTIMEINT", NULL,0, clock_curtime_interval);
+	state_save_register_item("CLKMODE", NULL,0, clock_mode);
 	state_save_register_global_array(clock_bram);
 
 	state_save_register_global_array(adb_memory);
 	state_save_register_global_array(adb_command_bytes);
 	state_save_register_global_array(adb_response_bytes);
-	state_save_register_item("ADB", 0, adb_state);
-	state_save_register_item("ADB", 0, adb_command);
-	state_save_register_item("ADB", 0, adb_mode);
-	state_save_register_item("ADB", 0, adb_kmstatus);
-	state_save_register_item("ADB", 0, adb_latent_result);
-	state_save_register_item("ADB", 0, adb_command_length);
-	state_save_register_item("ADB", 0, adb_command_pos);
-	state_save_register_item("ADB", 0, adb_response_length);
-	state_save_register_item("ADB", 0, adb_response_pos);
-	state_save_register_item("ADB", 0, adb_address_keyboard);
-	state_save_register_item("ADB", 0, adb_address_mouse);
+	state_save_register_item("ADB", NULL,0, adb_state);
+	state_save_register_item("ADB", NULL,0, adb_command);
+	state_save_register_item("ADB", NULL,0, adb_mode);
+	state_save_register_item("ADB", NULL,0, adb_kmstatus);
+	state_save_register_item("ADB", NULL,0, adb_latent_result);
+	state_save_register_item("ADB", NULL,0, adb_command_length);
+	state_save_register_item("ADB", NULL,0, adb_command_pos);
+	state_save_register_item("ADB", NULL,0, adb_response_length);
+	state_save_register_item("ADB", NULL,0, adb_response_pos);
+	state_save_register_item("ADB", NULL,0, adb_address_keyboard);
+	state_save_register_item("ADB", NULL,0, adb_address_mouse);
 
-	state_save_register_item("SNDGLUCTRL", 0, sndglu_ctrl);
-	state_save_register_item("SNDGLUADDR", 0, sndglu_addr);
-	state_save_register_item("SNDGLUDUMMYRD", 0, sndglu_dummy_read);
+	state_save_register_item("SNDGLUCTRL", NULL,0, sndglu_ctrl);
+	state_save_register_item("SNDGLUADDR", NULL,0, sndglu_addr);
+	state_save_register_item("SNDGLUDUMMYRD", NULL,0, sndglu_dummy_read);
 }

@@ -131,7 +131,7 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 		default:
 			if (LOG_MOCKINGBOARD)
-				logerror("mockingboard_r unmapped, offset: %02x, pc: %04x\n", offset, (unsigned) cpunum_get_reg(0, REG_PC));
+				logerror("mockingboard_r unmapped, offset: %02x, pc: %04x\n", offset, (unsigned) cpu_get_reg(device->machine->cpu[0], REG_PC));
 			break;
 	}
 	return 0x00;
@@ -145,6 +145,7 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 WRITE8_DEVICE_HANDLER(mockingboard_w)
 {
+	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	mockingboard_token *token = get_token(device);
 
 	if (LOG_MOCKINGBOARD)
@@ -162,10 +163,10 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 				case 0x04: /* make inactive */
 					break;
 				case 0x06: /* write data */
-					ay8910_write_port_0_w(device->machine, 0, token->latch0);
+					ay8910_write_port_0_w(space, 0, token->latch0);
 					break;
 				case 0x07: /* set register */
-					ay8910_control_port_0_w(device->machine, 0, token->latch0);
+					ay8910_control_port_0_w(space, 0, token->latch0);
 					break;
 			}
 			break;
@@ -187,10 +188,10 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 				case 0x04: /* make inactive */
 					break;
 				case 0x06: /* write data */
-					ay8910_write_port_1_w(device->machine, 0, token->latch1);
+					ay8910_write_port_1_w(space, 0, token->latch1);
 					break;
 				case 0x07: /* set register */
-					ay8910_control_port_1_w(device->machine, 0, token->latch1);
+					ay8910_control_port_1_w(space, 0, token->latch1);
 					break;
 			}
 			break;

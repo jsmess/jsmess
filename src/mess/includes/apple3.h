@@ -38,7 +38,7 @@ WRITE8_HANDLER( apple3_00xx_w );
 
 VIDEO_START( apple3 );
 VIDEO_UPDATE( apple3 );
-void apple3_write_charmem(void);
+void apple3_write_charmem(running_machine *machine);
 
 
 #endif /* APPLE3_H_ */

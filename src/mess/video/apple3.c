@@ -39,8 +39,9 @@ static UINT8 *char_mem;
 static UINT32 *hgr_map;
 
 
-void apple3_write_charmem(void)
+void apple3_write_charmem(running_machine *machine)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	static const UINT32 screen_hole_map[] =
 	{
 		0x478, 0x4f8, 0x578, 0x5f8, 0x678, 0x6f8, 0x778, 0x7f8

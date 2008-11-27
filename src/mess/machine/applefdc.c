@@ -183,10 +183,10 @@ static void applefdc_start(const device_config *device, applefdc_t type)
 	fdc->mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
 
 	/* register save states */
-	state_save_register_item("applefdc", 0, fdc->write_byte);
-	state_save_register_item("applefdc", 0, fdc->lines);
-	state_save_register_item("applefdc", 0, fdc->mode);
-	state_save_register_item("applefdc", 0, fdc->handshake_hack);
+	state_save_register_item("applefdc", NULL, 0, fdc->write_byte);
+	state_save_register_item("applefdc", NULL, 0, fdc->lines);
+	state_save_register_item("applefdc", NULL, 0, fdc->mode);
+	state_save_register_item("applefdc", NULL, 0, fdc->handshake_hack);
 }
 
 

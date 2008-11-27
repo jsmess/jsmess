@@ -94,7 +94,7 @@ WRITE8_HANDLER(ncr5380_w)
 	int reg = offset & 7;
 
 	if (VERBOSE)
-		logerror("NCR5380: %02x to %s (reg %d) [PC=%x]\n", data, wnames[reg], reg, activecpu_get_pc());
+		logerror("NCR5380: %02x to %s (reg %d) [PC=%x]\n", data, wnames[reg], reg, cpu_get_pc(space->machine->cpu[0]));
 
 	switch( reg )
 	{
@@ -354,7 +354,7 @@ READ8_HANDLER(ncr5380_r)
 	}
 
 	if (VERBOSE)
-		logerror("NCR5380: read %s (reg %d) = %02x [PC=%x]\n", rnames[reg], reg, rv, activecpu_get_pc());
+		logerror("NCR5380: read %s (reg %d) = %02x [PC=%x]\n", rnames[reg], reg, rv, cpu_get_pc(space->machine->cpu[0]));
 
 	return rv;
 }
@@ -375,13 +375,13 @@ void ncr5380_init( const struct NCR5380interface *interface )
 		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
 	}
 
-	state_save_register_item_array("ncr5380", 0, n5380_Registers);
-	state_save_register_item_array("ncr5380", 0, n5380_Command);
-	state_save_register_item_array("ncr5380", 0, n5380_Data);
-	state_save_register_item("ncr5380", 0, last_id);
-	state_save_register_item("ncr5380", 0, cmd_ptr);
-	state_save_register_item("ncr5380", 0, d_ptr);
-	state_save_register_item("ncr5380", 0, d_limit);
+	state_save_register_item_array("ncr5380", NULL, 0, n5380_Registers);
+	state_save_register_item_array("ncr5380", NULL, 0, n5380_Command);
+	state_save_register_item_array("ncr5380", NULL, 0, n5380_Data);
+	state_save_register_item("ncr5380", NULL, 0, last_id);
+	state_save_register_item("ncr5380", NULL, 0, cmd_ptr);
+	state_save_register_item("ncr5380", NULL, 0, d_ptr);
+	state_save_register_item("ncr5380", NULL, 0, d_limit);
 }
 
 void ncr5380_exit( const struct NCR5380interface *interface )

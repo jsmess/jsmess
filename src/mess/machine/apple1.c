@@ -145,12 +145,13 @@ static int apple1_kbd_data = 0;
 
 DRIVER_INIT( apple1 )
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_read8_handler(space,
 								 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_write8_handler(space,
 								  0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, mess_ram);
+	memory_set_bankptr(machine,1, mess_ram);
 
 	pia_config(0, &apple1_pia0);
 
@@ -262,7 +263,7 @@ SNAPSHOT_LOAD(apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 		 addr <= end_addr;
 		 addr++, snapptr++)
-		memory_write_byte(space, addr, *snapptr);
+		memory_write_byte(cpu_get_address_space(image->machine->cpu[0],ADDRESS_SPACE_PROGRAM), addr, *snapptr);
 
 	return INIT_PASS;
 }
@@ -416,7 +417,7 @@ static WRITE8_HANDLER( apple1_pia0_dsp_write_signal )
 	   write.  Thus the write delay depends on the cursor position and
 	   where the display is in the refresh cycle. */
 	if (!data)
-		timer_set(apple1_vh_dsp_time_to_ready(machine), NULL, 0, apple1_dsp_ready_start);
+		timer_set(apple1_vh_dsp_time_to_ready(space->machine), NULL, 0, apple1_dsp_ready_start);
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_start)
@@ -509,7 +510,7 @@ static void cassette_toggle_output(running_machine *machine)
 
 READ8_HANDLER( apple1_cassette_r )
 {
-	cassette_toggle_output(machine);
+	cassette_toggle_output(space->machine);
 
 	if (offset <= 0x7f)
 	{
@@ -535,7 +536,7 @@ READ8_HANDLER( apple1_cassette_r )
 		/* (Don't try putting a non-zero "noise threshhold" here,
 		   because it can cause tape header bits on real cassette
 		   images to be misread as data bits.) */
-		if (cassette_input(cassette_device_image(machine)) > 0.0)
+		if (cassette_input(cassette_device_image(space->machine)) > 0.0)
 			return memory_read_byte(space, 0xc100 + (offset & ~1));
 		else
 			return memory_read_byte(space, 0xc100 + offset);
@@ -551,5 +552,5 @@ WRITE8_HANDLER( apple1_cassette_w )
 	   However, we still have to handle writes, since they may be done
 	   by user code. */
 
-	cassette_toggle_output(machine);
+	cassette_toggle_output(space->machine);
 }
