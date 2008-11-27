@@ -788,14 +788,14 @@ MACHINE_RESET( ti99 )
 		UINT8* mem = memory_region(machine, "main");
 
 		/* set up system ROM and scratch pad pointers */
-		memory_set_bankptr(1, mem + offset_rom0_4p);	/* system ROM */
-		memory_set_bankptr(2, mem + offset_sram_4p);	/* scratch pad */
-		memory_set_bankptr(11, mem + offset_dram_4p);	/* extra RAM for debugger */
+		memory_set_bankptr(machine, 1, mem + offset_rom0_4p);	/* system ROM */
+		memory_set_bankptr(machine, 2, mem + offset_sram_4p);	/* scratch pad */
+		memory_set_bankptr(machine, 11, mem + offset_dram_4p);	/* extra RAM for debugger */
 	}
 	else
 	{
 		/* set up scratch pad pointer */
-		memory_set_bankptr(1, memory_region(machine, "main") + offset_sram);
+		memory_set_bankptr(machine, 1, memory_region(machine, "main") + offset_sram);
 	}
 
 	if (ti99_model != model_99_4p)

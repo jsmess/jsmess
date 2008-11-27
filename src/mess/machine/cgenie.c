@@ -134,7 +134,7 @@ MACHINE_RESET( cgenie )
 		{
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK10);
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
-			memory_set_bankptr(10, &ROM[0x0c000]);
+			memory_set_bankptr(machine, 10, &ROM[0x0c000]);
 			logerror("cgenie DOS enabled\n");
 			memcpy(&ROM[0x0c000],&ROM[0x10000], 0x2000);
 		}
@@ -200,7 +200,7 @@ MACHINE_START( cgenie )
 	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, cgenie_videoram_w);
 	videoram = mess_ram;
-	memory_set_bankptr(1, mess_ram);
+	memory_set_bankptr(machine, 1, mess_ram);
 
 	/* set up FDC */
 	wd17xx_init(machine, WD_TYPE_179X, cgenie_fdc_callback, NULL);

@@ -171,7 +171,7 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 		offs_t ram_limit = 0x100000 + mess_ram_size - 0x0a0000;
 		memory_install_read_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
 		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000,  ram_limit - 1, 0, 0, 1);
-		memory_set_bankptr(1, mess_ram + 0xa0000);
+		memory_set_bankptr(machine, 1, mess_ram + 0xa0000);
 	}
 }
 

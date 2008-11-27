@@ -1241,7 +1241,7 @@ static MACHINE_RESET( ip225015 )
 	timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, ip22_timer);
 
 	// set up low RAM mirror
-	memory_set_bankptr(1, ip22_mainram);
+	memory_set_bankptr(machine, 1, ip22_mainram);
 
 	nPBUS_DMA_Active = 0;
 

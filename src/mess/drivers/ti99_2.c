@@ -101,9 +101,9 @@ static DRIVER_INIT( ti99_2_32 )
 static MACHINE_RESET( ti99_2 )
 {
 	if (! ROM_paged)
-		memory_set_bankptr(1, memory_region(machine, "main")+0x4000);
+		memory_set_bankptr(machine, 1, memory_region(machine, "main")+0x4000);
 	else
-		memory_set_bankptr(1, TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(machine, 1, TI99_2_32_ROMPAGE0);
 }
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
@@ -213,7 +213,7 @@ static WRITE8_HANDLER ( ti99_2_write_kbd )
 	/* now, we handle ROM paging */
 	if (ROM_paged)
 	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
-		memory_set_bankptr(1, (KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(machine, 1, (KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 

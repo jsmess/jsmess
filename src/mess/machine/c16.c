@@ -151,7 +151,7 @@ UINT8 c16_m7501_port_read(void)
 static void c16_bankswitch (running_machine *machine)
 {
 	UINT8 *rom = memory_region(machine, "main");
-	memory_set_bankptr(9, mess_ram);
+	memory_set_bankptr(machine, 9, mess_ram);
 
 	switch (lowrom)
 	{
@@ -540,23 +540,23 @@ MACHINE_RESET( c16 )
 #endif
 	if ((read_cfg1(machine) & 0x0c ) == 0x00)		/* is it C16? */
 	{
-		memory_set_bankptr(1, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr(machine, 1, mess_ram + (0x4000 % mess_ram_size));
 
-		memory_set_bankptr(5, mess_ram + (0x4000 % mess_ram_size));
-		memory_set_bankptr(6, mess_ram + (0x8000 % mess_ram_size));
-		memory_set_bankptr(7, mess_ram + (0xc000 % mess_ram_size));
+		memory_set_bankptr(machine, 5, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr(machine, 6, mess_ram + (0x8000 % mess_ram_size));
+		memory_set_bankptr(machine, 7, mess_ram + (0xc000 % mess_ram_size));
 
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff20, 0xff3d, 0, 0, SMH_BANK10);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff40, 0xffff, 0, 0, SMH_BANK11);
-		memory_set_bankptr(10, mess_ram + (0xff20 % mess_ram_size));
-		memory_set_bankptr(11, mess_ram + (0xff40 % mess_ram_size));
+		memory_set_bankptr(machine, 10, mess_ram + (0xff20 % mess_ram_size));
+		memory_set_bankptr(machine, 11, mess_ram + (0xff40 % mess_ram_size));
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
 	else
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xfcff, 0, 0, SMH_BANK10);
-		memory_set_bankptr(10, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr(machine, 10, mess_ram + (0x4000 % mess_ram_size));
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}

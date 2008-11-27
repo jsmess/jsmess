@@ -205,7 +205,7 @@ GFXDECODE_END
 static MACHINE_RESET( comquest )
 {
 //  UINT8 *mem=memory_region(machine, "user1");
-//  memory_set_bankptr(1,mem+0x00000);
+//  memory_set_bankptr(machine, 1,mem+0x00000);
 }
 
 static const UINT32 amask= 0xffff;

@@ -1143,8 +1143,8 @@ static void kc85_4_update_0x08000(running_machine *machine)
 
 		mem_ptr = mess_ram+0x08000+(ram8_block<<14);
 
-		memory_set_bankptr(3, mem_ptr);
-		memory_set_bankptr(4, mem_ptr+0x02800);
+		memory_set_bankptr(machine, 3, mem_ptr);
+		memory_set_bankptr(machine, 4, mem_ptr+0x02800);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK3);
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK4);
 
@@ -1162,8 +1162,8 @@ static void kc85_4_update_0x08000(running_machine *machine)
 			/* ram8 is enabled and write enabled */
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK9);
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK10);
-			memory_set_bankptr(9, mem_ptr);
-			memory_set_bankptr(10, mem_ptr+0x02800);
+			memory_set_bankptr(machine, 9, mem_ptr);
+			memory_set_bankptr(machine, 10, mem_ptr+0x02800);
 		}
     }
     else
@@ -1182,15 +1182,15 @@ static void kc85_4_update_0x08000(running_machine *machine)
 		/* IRM enabled - has priority over RAM8 enabled */
 		ram_page = kc85_4_get_video_ram_base((kc85_84_data & 0x04), (kc85_84_data & 0x02));
 
-		memory_set_bankptr(3, ram_page);
-		memory_set_bankptr(9, ram_page);
+		memory_set_bankptr(machine, 3, ram_page);
+		memory_set_bankptr(machine, 9, ram_page);
 		memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK3);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK9);
 
 		ram_page = kc85_4_get_video_ram_base(0, 0);
 
 		memory_set_bankptr( 4, ram_page + 0x2800);
-		memory_set_bankptr(10, ram_page + 0x2800);
+		memory_set_bankptr(machine, 10, ram_page + 0x2800);
 		memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK4);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK10);
 	}
@@ -1206,7 +1206,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 		/* yes; set address of bank */
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-		memory_set_bankptr(1, mess_ram);
+		memory_set_bankptr(machine, 1, mess_ram);
 
 		/* write protect ram? */
 		if ((kc85_pio_data[0] & (1<<3))==0)
@@ -1223,14 +1223,14 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 			/* ram is enabled and write enabled; and set address of bank */
 			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK7);
-			memory_set_bankptr(7, mess_ram);
+			memory_set_bankptr(machine, 7, mess_ram);
 		}
 	}
 	else
 	{
 		LOG(("no memory at ram0!\n"));
 
-//		memory_set_bankptr(1,memory_region(machine, "main") + 0x013000);
+//		memory_set_bankptr(machine, 1,memory_region(machine, "main") + 0x013000);
 		/* ram is disabled */
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_NOP);
@@ -1253,7 +1253,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 		/* yes */
 		rh = SMH_BANK2;
 		/* set address of bank */
-		memory_set_bankptr(2, mem_ptr);
+		memory_set_bankptr(machine, 2, mem_ptr);
 
 		/* write protect ram? */
 		if ((kc85_86_data & (1<<1))==0)
@@ -1271,7 +1271,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 			/* ram is enabled and write enabled */
 			wh = SMH_BANK8;
 			/* set address of bank */
-			memory_set_bankptr(8, mem_ptr);
+			memory_set_bankptr(machine, 8, mem_ptr);
 		}
 	}
 	else
@@ -1297,7 +1297,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
 
-		memory_set_bankptr(5,memory_region(machine, "main") + 0x012000);
+		memory_set_bankptr(machine, 5,memory_region(machine, "main") + 0x012000);
 		rh = SMH_BANK5;
 	}
 	else if (kc85_pio_data[0] & (1<<7))
@@ -1305,7 +1305,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 		/* BASIC takes next priority */
         	LOG(("BASIC rom 0x0c000\n"));
 
-        memory_set_bankptr(5, memory_region(machine, "main") + 0x010000);
+        memory_set_bankptr(machine, 5, memory_region(machine, "main") + 0x010000);
 		rh = SMH_BANK5;
 	}
 	else
@@ -1314,7 +1314,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 		{
 			LOG(("module rom at 0xc000\n"));
 
-			memory_set_bankptr(5, kc85_module_rom);
+			memory_set_bankptr(machine, 5, kc85_module_rom);
 			rh = SMH_BANK5;
 		}
 		else
@@ -1338,7 +1338,7 @@ static void kc85_4_update_0x0e000(running_machine *machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
-		memory_set_bankptr(6,memory_region(machine, "main") + 0x013000);
+		memory_set_bankptr(machine, 6,memory_region(machine, "main") + 0x013000);
 		rh = SMH_BANK6;
 	}
 	else
@@ -1452,7 +1452,7 @@ static void kc85_3_update_0x0c000(running_machine *machine)
 		/* BASIC takes next priority */
 		LOG(("BASIC rom 0x0c000\n"));
 
-		memory_set_bankptr(4, memory_region(machine, "main") + 0x010000);
+		memory_set_bankptr(machine, 4, memory_region(machine, "main") + 0x010000);
 		rh = SMH_BANK4;
 	}
 	else
@@ -1474,7 +1474,7 @@ static void kc85_3_update_0x0e000(running_machine *machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 
-		memory_set_bankptr(5,memory_region(machine, "main") + 0x012000);
+		memory_set_bankptr(machine, 5,memory_region(machine, "main") + 0x012000);
         rh = SMH_BANK5;
 	}
 	else
@@ -1502,7 +1502,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 		/* yes */
 		rh = SMH_BANK1;
 		/* set address of bank */
-		memory_set_bankptr(1, mess_ram);
+		memory_set_bankptr(machine, 1, mess_ram);
 
 		/* write protect ram? */
 		if ((kc85_pio_data[0] & (1<<3))==0)
@@ -1520,7 +1520,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 			/* ram is enabled and write enabled */
 			wh = SMH_BANK6;
 			/* set address of bank */
-			memory_set_bankptr(6, mess_ram);
+			memory_set_bankptr(machine, 6, mess_ram);
 		}
 	}
 	else
@@ -1550,8 +1550,8 @@ static void kc85_3_update_0x08000(running_machine *machine)
         LOG(("IRM enabled\n"));
 		ram_page = mess_ram+0x08000;
 
-		memory_set_bankptr(3, ram_page);
-		memory_set_bankptr(8, ram_page);
+		memory_set_bankptr(machine, 3, ram_page);
+		memory_set_bankptr(machine, 8, ram_page);
 
 		rh = SMH_BANK3;
 		wh = SMH_BANK8;
@@ -1562,7 +1562,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
 		LOG(("RAM8 enabled\n"));
 		ram_page = mess_ram + 0x04000;
 
-		memory_set_bankptr(3, ram_page);
+		memory_set_bankptr(machine, 3, ram_page);
 		rh = SMH_BANK3;
 
 		/* write protect RAM8 ? */
@@ -1577,7 +1577,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
 			LOG(("RAM8 write enabled\n"));
 			/* ram8 is enabled and write enabled */
 			wh = SMH_BANK8;
-			memory_set_bankptr(8,ram_page);
+			memory_set_bankptr(machine, 8,ram_page);
 		}
     }
     else
@@ -1895,8 +1895,8 @@ MACHINE_RESET( kc85_3 )
 	kc85_pio_data[0] = 0x0f;
 	kc85_pio_data[1] = 0x0f1;
 
-	memory_set_bankptr(2,mess_ram+0x0c000);
-	memory_set_bankptr(7,mess_ram+0x0c000);
+	memory_set_bankptr(machine, 2,mess_ram+0x0c000);
+	memory_set_bankptr(machine, 7,mess_ram+0x0c000);
 
 	kc85_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
 

@@ -721,27 +721,27 @@ WRITE8_HANDLER( adamnet_w )
 	{
 		if (data&0x02)
 		{
-			memory_set_bankptr(1, BankBase+0x32000); /* No data here */
-			memory_set_bankptr(2, BankBase+0x34000); /* No data here */
-			memory_set_bankptr(3, BankBase+0x36000); /* No data here */
-			memory_set_bankptr(4, BankBase+0x38000); /* EOS ROM */
+			memory_set_bankptr(machine, 1, BankBase+0x32000); /* No data here */
+			memory_set_bankptr(machine, 2, BankBase+0x34000); /* No data here */
+			memory_set_bankptr(machine, 3, BankBase+0x36000); /* No data here */
+			memory_set_bankptr(machine, 4, BankBase+0x38000); /* EOS ROM */
 
-			memory_set_bankptr(6, BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(7, BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(8, BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(9, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 6, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 7, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 8, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 9, BankBase+0x3A000); /* Write protecting ROM */
 		}
 		else
 		{
-			memory_set_bankptr(1, BankBase+0x20000); /* SmartWriter ROM */
-			memory_set_bankptr(2, BankBase+0x22000);
-			memory_set_bankptr(3, BankBase+0x24000);
-			memory_set_bankptr(4, BankBase+0x26000);
+			memory_set_bankptr(machine, 1, BankBase+0x20000); /* SmartWriter ROM */
+			memory_set_bankptr(machine, 2, BankBase+0x22000);
+			memory_set_bankptr(machine, 3, BankBase+0x24000);
+			memory_set_bankptr(machine, 4, BankBase+0x26000);
 
-			memory_set_bankptr(6, BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(7, BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(8, BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(9, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 6, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 7, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 8, BankBase+0x3A000); /* Write protecting ROM */
+			memory_set_bankptr(machine, 9, BankBase+0x3A000); /* Write protecting ROM */
 		}
 	}
 	adam_net_data = data;

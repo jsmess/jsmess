@@ -283,8 +283,8 @@ int is_pc8801_vram_select(running_machine *machine)
       rh6 = SMH_BANK6; \
       wh5 = write_gvram##n##_bank5; \
       wh6 = write_gvram##n##_bank6; \
-      memory_set_bankptr(5, gVRAM + 0x4000*n ); \
-      memory_set_bankptr(6, gVRAM + 0x4000*n + 0x3000 ); \
+      memory_set_bankptr(machine, 5, gVRAM + 0x4000*n ); \
+      memory_set_bankptr(machine, 6, gVRAM + 0x4000*n + 0x3000 ); \
       return 1;
 
       VVV

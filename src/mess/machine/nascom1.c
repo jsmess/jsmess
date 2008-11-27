@@ -322,7 +322,7 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0x5000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_set_bankptr(1, mess_ram);
+		memory_set_bankptr(machine, 1, mess_ram);
 		break;
 
 	case 32 * 1024:
@@ -330,13 +330,13 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x8fff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0x9000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_set_bankptr(1, mess_ram);
+		memory_set_bankptr(machine, 1, mess_ram);
 		break;
 
 	case 40 * 1024:
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0x1400, 0xafff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_set_bankptr(1, mess_ram);
+		memory_set_bankptr(machine, 1, mess_ram);
 		break;
 	}
 }

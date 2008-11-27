@@ -425,7 +425,7 @@ WRITE8_HANDLER(cbm8096_w)
 		if (data & 0x20)
 		{
 			pet80_bank1_base = pet_memory + 0x8000;
-			memory_set_bankptr(1, pet80_bank1_base);
+			memory_set_bankptr(machine, 1, pet80_bank1_base);
 			wh = pet80_bank1_w;
 		}
 		else
@@ -447,70 +447,70 @@ WRITE8_HANDLER(cbm8096_w)
 			if (!(data & 0x20)) 
 			{
 				pet80_bank1_base = pet_memory + 0x14000;
-				memory_set_bankptr(1, pet80_bank1_base);
+				memory_set_bankptr(machine, 1, pet80_bank1_base);
 			}
-			memory_set_bankptr(2, pet_memory + 0x15000);
-			memory_set_bankptr(3, pet_memory + 0x16000);
-			memory_set_bankptr(4, pet_memory + 0x17000);
+			memory_set_bankptr(machine, 2, pet_memory + 0x15000);
+			memory_set_bankptr(machine, 3, pet_memory + 0x16000);
+			memory_set_bankptr(machine, 4, pet_memory + 0x17000);
 		} 
 		else 
 		{
 			if (!(data & 0x20)) 
 			{
 				pet80_bank1_base = pet_memory + 0x10000;
-				memory_set_bankptr(1, pet80_bank1_base);
+				memory_set_bankptr(machine, 1, pet80_bank1_base);
 			}
-			memory_set_bankptr(2, pet_memory + 0x11000);
-			memory_set_bankptr(3, pet_memory + 0x12000);
-			memory_set_bankptr(4, pet_memory + 0x13000);
+			memory_set_bankptr(machine, 2, pet_memory + 0x11000);
+			memory_set_bankptr(machine, 3, pet_memory + 0x12000);
+			memory_set_bankptr(machine, 4, pet_memory + 0x13000);
 		}
 
 		if (data & 8) 
 		{
 			if (!(data & 0x40)) 
 			{
-				memory_set_bankptr(7, pet_memory + 0x1e800);
+				memory_set_bankptr(machine, 7, pet_memory + 0x1e800);
 			}
-			memory_set_bankptr(6, pet_memory + 0x1c000);
-			memory_set_bankptr(8, pet_memory + 0x1f000);
-			memory_set_bankptr(9, pet_memory + 0x1fff1);
+			memory_set_bankptr(machine, 6, pet_memory + 0x1c000);
+			memory_set_bankptr(machine, 8, pet_memory + 0x1f000);
+			memory_set_bankptr(machine, 9, pet_memory + 0x1fff1);
 		} 
 		else 
 		{
 			if (!(data & 0x40)) 
 			{
-				memory_set_bankptr(7, pet_memory+ 0x1a800);
+				memory_set_bankptr(machine, 7, pet_memory+ 0x1a800);
 			}
-			memory_set_bankptr(6, pet_memory + 0x18000);
-			memory_set_bankptr(8, pet_memory + 0x1b000);
-			memory_set_bankptr(9, pet_memory + 0x1bff1);
+			memory_set_bankptr(machine, 6, pet_memory + 0x18000);
+			memory_set_bankptr(machine, 8, pet_memory + 0x1b000);
+			memory_set_bankptr(machine, 9, pet_memory + 0x1bff1);
 		}
 	}
 	else
 	{
 		pet80_bank1_base = pet_memory + 0x8000;
-		memory_set_bankptr(1, pet80_bank1_base );
+		memory_set_bankptr(machine, 1, pet80_bank1_base );
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, pet80_bank1_w);
 
-		memory_set_bankptr(2, pet_memory + 0x9000);
+		memory_set_bankptr(machine, 2, pet_memory + 0x9000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(3, pet_memory + 0xa000);
+		memory_set_bankptr(machine, 3, pet_memory + 0xa000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(4, pet_memory + 0xb000);
+		memory_set_bankptr(machine, 4, pet_memory + 0xb000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(6, pet_memory + 0xc000);
+		memory_set_bankptr(machine, 6, pet_memory + 0xc000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xe7ff, 0, 0, SMH_UNMAP);
 
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, cbm8096_io_r);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, cbm8096_io_w);
 
-		memory_set_bankptr(8, pet_memory + 0xf000);
+		memory_set_bankptr(machine, 8, pet_memory + 0xf000);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffef, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(9, pet_memory + 0xfff1);
+		memory_set_bankptr(machine, 9, pet_memory + 0xfff1);
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff1, 0xffff, 0, 0, SMH_UNMAP);
 	}
 }
@@ -584,7 +584,7 @@ static void pet_common_driver_init(running_machine *machine)
 
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
-	memory_set_bankptr(10, pet_memory);
+	memory_set_bankptr(machine, 10, pet_memory);
 
 	if (mess_ram_size < 0x8000)
 	{

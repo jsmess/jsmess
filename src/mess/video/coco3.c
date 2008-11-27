@@ -811,7 +811,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 
 	/* incidentals */
 	paletteram = video->palette_ram;
-	memory_set_bankptr(10, paletteram);
+	memory_set_bankptr(machine, 10, paletteram);
 
 	/* font */
 	rom = memory_region(machine, "main");

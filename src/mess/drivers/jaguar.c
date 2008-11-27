@@ -109,18 +109,18 @@ static MACHINE_RESET( jaguar )
 
 #if 0
 	/* set up main CPU RAM/ROM banks */
-	memory_set_bankptr(3, jaguar_gpu_ram);
+	memory_set_bankptr(machine, 3, jaguar_gpu_ram);
 
 	/* set up DSP RAM/ROM banks */
-	memory_set_bankptr(10, jaguar_shared_ram);
-	memory_set_bankptr(11, jaguar_gpu_clut);
-	memory_set_bankptr(12, jaguar_gpu_ram);
-	memory_set_bankptr(13, jaguar_dsp_ram);
-	memory_set_bankptr(14, jaguar_shared_ram);
+	memory_set_bankptr(machine, 10, jaguar_shared_ram);
+	memory_set_bankptr(machine, 11, jaguar_gpu_clut);
+	memory_set_bankptr(machine, 12, jaguar_gpu_ram);
+	memory_set_bankptr(machine, 13, jaguar_dsp_ram);
+	memory_set_bankptr(machine, 14, jaguar_shared_ram);
 #endif
-	memory_set_bankptr(15, cart_base);
-	memory_set_bankptr(16, rom_base);
-//  memory_set_bankptr(17, jaguar_gpu_ram);
+	memory_set_bankptr(machine, 15, cart_base);
+	memory_set_bankptr(machine, 16, rom_base);
+//  memory_set_bankptr(machine, 17, jaguar_gpu_ram);
 
 	/* clear any spinuntil stuff */
 	jaguar_gpu_resume();

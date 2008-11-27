@@ -346,7 +346,7 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 DRIVER_INIT( mtx512 )
 {
 	/* configure memory */
-	memory_set_bankptr(1, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 	memory_configure_bank(machine, 2, 0, 8, memory_region(machine, "user2"), 0x2000);
 	memory_configure_bank(3, 0, mess_ram_size/0x4000/2, mess_ram, 0x4000);
 	memory_configure_bank(4, 0, mess_ram_size/0x4000/2, mess_ram + mess_ram_size/2, 0x4000);

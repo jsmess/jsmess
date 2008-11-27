@@ -805,14 +805,14 @@ static void einstein_page_rom(running_machine *machine)
 {
 	if (einstein_rom_enabled)
 	{
-		memory_set_bankptr(1, memory_region(machine, "main")+0x010000);
+		memory_set_bankptr(machine, 1, memory_region(machine, "main")+0x010000);
 	}
 	else
 	{
 #ifdef EINSTEIN_DUMP_RAM
 		einstein_dump_ram();
 #endif
-		memory_set_bankptr(1, mess_ram);
+		memory_set_bankptr(machine, 1, mess_ram);
 	}
 }
 
@@ -1436,9 +1436,9 @@ static MACHINE_START( einstein )
 
 static MACHINE_RESET( einstein )
 {
-	memory_set_bankptr(2, mess_ram+0x02000);
-	memory_set_bankptr(3, mess_ram);
-	memory_set_bankptr(4, mess_ram+0x02000);
+	memory_set_bankptr(machine, 2, mess_ram+0x02000);
+	memory_set_bankptr(machine, 3, mess_ram);
+	memory_set_bankptr(machine, 4, mess_ram+0x02000);
 
 	msm8251_init(&einstein_msm8251_intf);
 

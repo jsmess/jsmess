@@ -505,7 +505,7 @@ static void oric_install_apple2_interface(running_machine *machine)
 
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0300, 0x030f, 0, 0, oric_IO_w);
 	memory_install_write8_device_handler(fdc, 0, ADDRESS_SPACE_PROGRAM, 0x0310, 0x031f, 0, 0, applefdc_w);
-	memory_set_bankptr(4, 	memory_region(machine, "main") + 0x014000 + 0x020);
+	memory_set_bankptr(machine, 4, 	memory_region(machine, "main") + 0x014000 + 0x020);
 }
 
 
@@ -551,7 +551,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 /*	logerror("apple 2 interface v2 rom page: %01x\n",(offset & 0x02)>>1); */
 
 	/* bit 0 is 0 for page 0, 1 for page 1 */
-	memory_set_bankptr(4, memory_region(machine, "main") + 0x014000 + 0x0100 + (((offset & 0x02)>>1)<<8));
+	memory_set_bankptr(machine, 4, memory_region(machine, "main") + 0x014000 + 0x0100 + (((offset & 0x02)>>1)<<8));
 
 	oric_enable_memory(machine, 1, 3, TRUE, TRUE);
 
@@ -564,24 +564,24 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 
 		/* enable rom */
 		rom_ptr = memory_region(machine, "main") + 0x010000;
-		memory_set_bankptr(1, rom_ptr);
-		memory_set_bankptr(2, rom_ptr+0x02000);
-		memory_set_bankptr(3, rom_ptr+0x03800);
-		memory_set_bankptr(5, oric_ram_0x0c000);
-		memory_set_bankptr(6, oric_ram_0x0c000+0x02000);
-		memory_set_bankptr(7, oric_ram_0x0c000+0x03800);
+		memory_set_bankptr(machine, 1, rom_ptr);
+		memory_set_bankptr(machine, 2, rom_ptr+0x02000);
+		memory_set_bankptr(machine, 3, rom_ptr+0x03800);
+		memory_set_bankptr(machine, 5, oric_ram_0x0c000);
+		memory_set_bankptr(machine, 6, oric_ram_0x0c000+0x02000);
+		memory_set_bankptr(machine, 7, oric_ram_0x0c000+0x03800);
 	}
 	else
 	{
 		/*logerror("apple 2 interface v2: ram enabled\n"); */
 
 		/* enable ram */
-		memory_set_bankptr(1, oric_ram_0x0c000);
-		memory_set_bankptr(2, oric_ram_0x0c000+0x02000);
-		memory_set_bankptr(3, oric_ram_0x0c000+0x03800);
-		memory_set_bankptr(5, oric_ram_0x0c000);
-		memory_set_bankptr(6, oric_ram_0x0c000+0x02000);
-		memory_set_bankptr(7, oric_ram_0x0c000+0x03800);
+		memory_set_bankptr(machine, 1, oric_ram_0x0c000);
+		memory_set_bankptr(machine, 2, oric_ram_0x0c000+0x02000);
+		memory_set_bankptr(machine, 3, oric_ram_0x0c000+0x03800);
+		memory_set_bankptr(machine, 5, oric_ram_0x0c000);
+		memory_set_bankptr(machine, 6, oric_ram_0x0c000+0x02000);
+		memory_set_bankptr(machine, 7, oric_ram_0x0c000+0x03800);
 	}
 }
 
@@ -642,9 +642,9 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 			oric_enable_memory(machine, 1, 3, TRUE, FALSE);
 
 			rom_ptr = memory_region(machine, "main") + 0x010000;
-			memory_set_bankptr(1, rom_ptr);
-			memory_set_bankptr(2, rom_ptr+0x02000);
-			memory_set_bankptr(3, rom_ptr+0x03800);
+			memory_set_bankptr(machine, 1, rom_ptr);
+			memory_set_bankptr(machine, 2, rom_ptr+0x02000);
+			memory_set_bankptr(machine, 3, rom_ptr+0x03800);
 		}
 		else
 		{
@@ -652,12 +652,12 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 
 			oric_enable_memory(machine, 1, 3, TRUE, TRUE);
 
-			memory_set_bankptr(1, oric_ram_0x0c000);
-			memory_set_bankptr(2, oric_ram_0x0c000+0x02000);
-			memory_set_bankptr(3, oric_ram_0x0c000+0x03800);
-			memory_set_bankptr(5, oric_ram_0x0c000);
-			memory_set_bankptr(6, oric_ram_0x0c000+0x02000);
-			memory_set_bankptr(7, oric_ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, 1, oric_ram_0x0c000);
+			memory_set_bankptr(machine, 2, oric_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, 3, oric_ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, 5, oric_ram_0x0c000);
+			memory_set_bankptr(machine, 6, oric_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, 7, oric_ram_0x0c000+0x03800);
 		}
 	}
 	else
@@ -676,10 +676,10 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 			/*logerror("&c000-&f8ff is ram!\n"); */
 			oric_enable_memory(machine, 1, 2, TRUE, TRUE);
 
-			memory_set_bankptr(1, oric_ram_0x0c000);
-			memory_set_bankptr(2, oric_ram_0x0c000+0x02000);
-			memory_set_bankptr(5, oric_ram_0x0c000);
-			memory_set_bankptr(6, oric_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, 1, oric_ram_0x0c000);
+			memory_set_bankptr(machine, 2, oric_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, 5, oric_ram_0x0c000);
+			memory_set_bankptr(machine, 6, oric_ram_0x0c000+0x02000);
 		}
 
 		{
@@ -690,8 +690,8 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 			/* jasmin rom enabled */
 			oric_enable_memory(machine, 3, 3, TRUE, TRUE);
 			rom_ptr = memory_region(machine, "main") + 0x010000+0x04000+0x02000;
-			memory_set_bankptr(3, rom_ptr);
-			memory_set_bankptr(7, rom_ptr);
+			memory_set_bankptr(machine, 3, rom_ptr);
+			memory_set_bankptr(machine, 7, rom_ptr);
 		}
 	}
 }
@@ -897,8 +897,8 @@ static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 		/*logerror("&c000-&dfff is ram\n"); */
 		/* rom disabled enable ram */
 		oric_enable_memory(machine, 1, 1, TRUE, TRUE);
-		memory_set_bankptr(1, oric_ram_0x0c000);
-		memory_set_bankptr(5, oric_ram_0x0c000);
+		memory_set_bankptr(machine, 1, oric_ram_0x0c000);
+		memory_set_bankptr(machine, 5, oric_ram_0x0c000);
 	}
 	else
 	{
@@ -907,8 +907,8 @@ static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 		/* basic rom */
 		oric_enable_memory(machine, 1, 1, TRUE, FALSE);
 		rom_ptr = memory_region(machine, "main") + 0x010000;
-		memory_set_bankptr(1, rom_ptr);
-		memory_set_bankptr(5, rom_ptr);
+		memory_set_bankptr(machine, 1, rom_ptr);
+		memory_set_bankptr(machine, 5, rom_ptr);
 	}
 
 	/* for 0x0e000-0x0ffff */
@@ -920,10 +920,10 @@ static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 		/* basic rom */
 		oric_enable_memory(machine, 2, 3, TRUE, FALSE);
 		rom_ptr = memory_region(machine, "main") + 0x010000;
-		memory_set_bankptr(2, rom_ptr+0x02000);
-		memory_set_bankptr(3, rom_ptr+0x03800);
-		memory_set_bankptr(6, rom_ptr+0x02000);
-		memory_set_bankptr(7, rom_ptr+0x03800);
+		memory_set_bankptr(machine, 2, rom_ptr+0x02000);
+		memory_set_bankptr(machine, 3, rom_ptr+0x03800);
+		memory_set_bankptr(machine, 6, rom_ptr+0x02000);
+		memory_set_bankptr(machine, 7, rom_ptr+0x03800);
 
 	}
 	else
@@ -936,18 +936,18 @@ static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 			oric_enable_memory(machine, 2, 3, TRUE, FALSE);
 			/* enable rom of microdisc interface */
 			rom_ptr = memory_region(machine, "main") + 0x014000;
-			memory_set_bankptr(2, rom_ptr);
-			memory_set_bankptr(3, rom_ptr+0x01800);
+			memory_set_bankptr(machine, 2, rom_ptr);
+			memory_set_bankptr(machine, 3, rom_ptr+0x01800);
 		}
 		else
 		{
 			/*logerror("&e000-&ffff is ram\n"); */
 			/* rom disabled enable ram */
 			oric_enable_memory(machine, 2, 3, TRUE, TRUE);
-			memory_set_bankptr(2, oric_ram_0x0c000+0x02000);
-			memory_set_bankptr(3, oric_ram_0x0c000+0x03800);
-			memory_set_bankptr(6, oric_ram_0x0c000+0x02000);
-			memory_set_bankptr(7, oric_ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, 2, oric_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, 3, oric_ram_0x0c000+0x03800);
+			memory_set_bankptr(machine, 6, oric_ram_0x0c000+0x02000);
+			memory_set_bankptr(machine, 7, oric_ram_0x0c000+0x03800);
 		}
 	}
 }
@@ -1159,12 +1159,12 @@ MACHINE_RESET( oric )
 			/* os rom */
 			oric_enable_memory(machine, 1, 3, TRUE, FALSE);
 			rom_ptr = memory_region(machine, "main") + 0x010000;
-			memory_set_bankptr(1, rom_ptr);
-			memory_set_bankptr(2, rom_ptr+0x02000);
-			memory_set_bankptr(3, rom_ptr+0x03800);
-			memory_set_bankptr(5, rom_ptr);
-			memory_set_bankptr(6, rom_ptr+0x02000);
-			memory_set_bankptr(7, rom_ptr+0x03800);
+			memory_set_bankptr(machine, 1, rom_ptr);
+			memory_set_bankptr(machine, 2, rom_ptr+0x02000);
+			memory_set_bankptr(machine, 3, rom_ptr+0x03800);
+			memory_set_bankptr(machine, 5, rom_ptr);
+			memory_set_bankptr(machine, 6, rom_ptr+0x02000);
+			memory_set_bankptr(machine, 7, rom_ptr+0x03800);
 
 
 			if (disc_interface_id==ORIC_FLOPPY_INTERFACE_APPLE2)
@@ -1364,8 +1364,8 @@ static void	telestrat_refresh_mem(running_machine *machine)
 		{
 			rh = SMH_BANK1;
 			wh = SMH_BANK2;
-			memory_set_bankptr(1, mem_block->ptr);
-			memory_set_bankptr(2, mem_block->ptr);
+			memory_set_bankptr(machine, 1, mem_block->ptr);
+			memory_set_bankptr(machine, 2, mem_block->ptr);
 		}
 		break;
 
@@ -1373,7 +1373,7 @@ static void	telestrat_refresh_mem(running_machine *machine)
 		{
 			rh = SMH_BANK1;
 			wh = SMH_NOP;
-			memory_set_bankptr(1, mem_block->ptr);
+			memory_set_bankptr(machine, 1, mem_block->ptr);
 		}
 		break;
 
