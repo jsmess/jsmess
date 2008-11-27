@@ -451,7 +451,7 @@ INTERRUPT_GEN( vc4000_video_line )
 {
 	int x,y,i;
 	UINT8 collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
-	assert(ARRAY_LENGTH(collision) >= video_screen_get_width(machine->primary_screen));
+	assert(ARRAY_LENGTH(collision) >= video_screen_get_width(device->machine->primary_screen));
 
 	vc4000_video.line++;
 	vc4000_video.line%=312;
