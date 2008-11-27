@@ -415,12 +415,12 @@ DRVLIBS = \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/super80.a \
+	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
-	$(MESSOBJ)/trs80.a \
-	$(MESSOBJ)/shared.a \
 	$(MESSOBJ)/vtech.a \
+	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/at.a \
 #	$(MESSOBJ)/atari.a \
