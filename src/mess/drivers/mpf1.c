@@ -45,7 +45,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", activecpu_get_pc(), buf );
+		logerror( "%08x: %s", cpu_get_pc(space->cpu), buf );
 	}
 }
 
@@ -369,7 +369,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
         The next statement converts this to the following assignment: (which is compatible with draw_led())
         bit      7 6 5 4 3 2 1 0
         segment  p g f e d c b a */
-	if( data | ( activecpu_get_pc() != 0x63C ) )
+	if( data | ( cpu_get_pc(space->cpu) != 0x63C ) )
 	{
 		data = ( (data & 0x08) >> 3 ) |
 		       ( (data & 0x10) >> 3 ) |

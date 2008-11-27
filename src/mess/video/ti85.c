@@ -155,6 +155,7 @@ VIDEO_START( ti85 )
 
 VIDEO_UPDATE( ti85 )
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int x,y,b;
 	int brightnes;
 	int lcdmem;

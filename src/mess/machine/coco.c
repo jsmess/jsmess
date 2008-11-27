@@ -457,15 +457,15 @@ static int load_pak_into_region(const device_config *image, int *pakbase, int *p
 
 static void pak_load_trailer(const pak_decodedtrailer *trailer)
 {
-	cpunum_set_reg(0, M6809_PC, trailer->reg_pc);
-	cpunum_set_reg(0, M6809_X, trailer->reg_x);
-	cpunum_set_reg(0, M6809_Y, trailer->reg_y);
-	cpunum_set_reg(0, M6809_U, trailer->reg_u);
-	cpunum_set_reg(0, M6809_S, trailer->reg_s);
-	cpunum_set_reg(0, M6809_DP, trailer->reg_dp);
-	cpunum_set_reg(0, M6809_B, trailer->reg_b);
-	cpunum_set_reg(0, M6809_A, trailer->reg_a);
-	cpunum_set_reg(0, M6809_CC, trailer->reg_cc);
+	cpu_set_reg(machine->cpu[0], M6809_PC, trailer->reg_pc);
+	cpu_set_reg(machine->cpu[0], M6809_X, trailer->reg_x);
+	cpu_set_reg(machine->cpu[0], M6809_Y, trailer->reg_y);
+	cpu_set_reg(machine->cpu[0], M6809_U, trailer->reg_u);
+	cpu_set_reg(machine->cpu[0], M6809_S, trailer->reg_s);
+	cpu_set_reg(machine->cpu[0], M6809_DP, trailer->reg_dp);
+	cpu_set_reg(machine->cpu[0], M6809_B, trailer->reg_b);
+	cpu_set_reg(machine->cpu[0], M6809_A, trailer->reg_a);
+	cpu_set_reg(machine->cpu[0], M6809_CC, trailer->reg_cc);
 
 	/* I seem to only be able to get a small amount of the PIA state from the
 	 * snapshot trailers. Thus I am going to configure the PIA myself. The
@@ -630,7 +630,7 @@ QUICKLOAD_LOAD ( coco )
 		if (preamble != 0)
 		{
 			/* start address - just set the address and return */
-			cpunum_set_reg(0, REG_PC, block_address);
+			cpu_set_reg(machine->cpu[0], REG_PC, block_address);
 			done = TRUE;
 		}
 		else
@@ -2384,7 +2384,7 @@ WRITE8_HANDLER(coco3_gime_w)
 	int timer_was_off = (coco3_gimereg[4] == 0x00) && (coco3_gimereg[5] == 0x00);	coco3_gimereg[offset] = data;
 
 	if (LOG_GIME)
-		logerror("CoCo3 GIME: $%04x <== $%02x pc=$%04x\n", offset + 0xff90, data, activecpu_get_pc());
+		logerror("CoCo3 GIME: $%04x <== $%02x pc=$%04x\n", offset + 0xff90, data, cpu_get_pc(space->cpu));
 
 	/* Features marked with '!' are not yet implemented */
 	switch(offset)
@@ -2905,7 +2905,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 static void generic_coco12_dragon_init(running_machine *machine, const machine_init_interface *init)
 {
 	/* Set default RAM mapping */
-	memory_set_bankptr(1, &mess_ram[0]);
+	memory_set_bankptr(machine, 1, &mess_ram[0]);
 
 	/* Do generic Inits */
 	generic_init_machine(machine, init);

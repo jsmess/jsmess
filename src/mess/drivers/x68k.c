@@ -220,7 +220,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.iera & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | (x+8);
-                    cpunum_set_input_line_and_vector(machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
+                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | (x+8),sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -239,7 +239,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.ierb & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | x;
-                    cpunum_set_input_line_and_vector(machine, 0,sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
+                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | x,sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -796,7 +796,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
-//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",activecpu_get_pc(),data,offset);
+//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",cpu_get_pc(space->cpu),data,offset);
 		break;
 	}
 }
@@ -1001,7 +1001,7 @@ static WRITE16_HANDLER( x68k_sysport_w )
 		sys.sysport.sram_writeprotect = data;
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",activecpu_get_pc(),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",cpu_get_pc(space->cpu),data,offset);
 		break;
 	}
 }
@@ -1039,7 +1039,7 @@ READ16_HANDLER( x68k_mfp_r )
     int ret;
     // Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
-//  logerror("MFP: [%08x] Reading offset %i\n",activecpu_get_pc(),offset);
+//  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(space->cpu),offset);
     switch(offset)
     {
     case 0x00:  // GPIP - General purpose I/O register (read-only)
@@ -1052,7 +1052,7 @@ READ16_HANDLER( x68k_mfp_r )
 //          ret |= 0x08;  // FM IRQ signal
         if(video_screen_get_hpos(machine->primary_screen) > sys.crtc.width - 32)
             ret |= 0x80;  // Hsync signal
-//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",activecpu_get_pc(),offset,ret);
+//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",cpu_get_pc(space->cpu),offset,ret);
         return ret;  // bit 5 is always 1
     case 3:
         return sys.mfp.iera;
@@ -1091,7 +1091,7 @@ READ16_HANDLER( x68k_mfp_r )
     case 23:
         return x68k_keyboard_pop_scancode();
     default:
-//      logerror("MFP: [%08x] Offset %i read\n",activecpu_get_pc(),offset);
+//      logerror("MFP: [%08x] Offset %i read\n",cpu_get_pc(space->cpu),offset);
         return 0xff;
     }
 }
@@ -1217,7 +1217,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 			// Keyboard control command.
 			sys.mfp.usart.send_buffer = data;
 			x68k_keyboard_ctrl_w(data);
-//          logerror("MFP: [%08x] USART Sent data %04x\n",activecpu_get_pc(),data);
+//          logerror("MFP: [%08x] USART Sent data %04x\n",cpu_get_pc(space->cpu),data);
 		}
 		break;
 	default:
@@ -1441,7 +1441,7 @@ static READ16_HANDLER( x68k_exp_r )
 		if(ACCESSING_BITS_0_7)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
+//      cpu_set_input_line_and_vector(machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
 }
@@ -1457,7 +1457,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		if(ACCESSING_BITS_0_7)
 			offset++;
 		timer_set(ATTOTIME_IN_CYCLES(16,0), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpunum_set_input_line_and_vector(machine, 0,2,ASSERT_LINE,current_vector[2]);
+//      cpu_set_input_line_and_vector(machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 	}
 }
 

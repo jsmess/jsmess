@@ -188,19 +188,19 @@ static MACHINE_START(ex800)
 
 static READ8_HANDLER(ex800_porta_r)
 {
-	logerror("PA R @%x\n", activecpu_get_pc());
+	logerror("PA R @%x\n", cpu_get_pc(space->cpu));
 	return mame_rand(machine);
 }
 
 static READ8_HANDLER(ex800_portb_r)
 {
-	logerror("PB R @%x\n", activecpu_get_pc());
+	logerror("PB R @%x\n", cpu_get_pc(space->cpu));
 	return mame_rand(machine);
 }
 
 static READ8_HANDLER(ex800_portc_r)
 {
-	logerror("PC R @%x\n", activecpu_get_pc());
+	logerror("PC R @%x\n", cpu_get_pc(space->cpu));
 	return mame_rand(machine);
 }
 
@@ -209,31 +209,31 @@ static WRITE8_HANDLER(ex800_porta_w)
 	if (PA6) logerror("BNK0 selected.\n");
 	if (PA7) logerror("BNK1 selected.\n");
 
-	logerror("PA W %x @%x\n", data, activecpu_get_pc());
+	logerror("PA W %x @%x\n", data, cpu_get_pc(space->cpu));
 }
 
 static WRITE8_HANDLER(ex800_portb_w)
 {
 	if (data & 3)
-		logerror("PB0/1 Line feed @%x\n", activecpu_get_pc());
+		logerror("PB0/1 Line feed @%x\n", cpu_get_pc(space->cpu));
 	if (!(data & 4))
-		logerror("PB2 Line feed @%x\n", activecpu_get_pc());
+		logerror("PB2 Line feed @%x\n", cpu_get_pc(space->cpu));
 	if (data & 8)
-		logerror("PB3 Online LED on @%x\n", activecpu_get_pc());
+		logerror("PB3 Online LED on @%x\n", cpu_get_pc(space->cpu));
 	else
-		logerror("PB3 Online LED off @%x\n", activecpu_get_pc());
+		logerror("PB3 Online LED off @%x\n", cpu_get_pc(space->cpu));
 	if (data & 16)
-		logerror("PB4 Serial @%x\n", activecpu_get_pc());
+		logerror("PB4 Serial @%x\n", cpu_get_pc(space->cpu));
 	if (data & 32)
-		logerror("PB4 Serial @%x\n", activecpu_get_pc());
+		logerror("PB4 Serial @%x\n", cpu_get_pc(space->cpu));
 	if (data & 64)
-		logerror("PB4 Serial @%x\n", activecpu_get_pc());
+		logerror("PB4 Serial @%x\n", cpu_get_pc(space->cpu));
 	if (data & 128)
-		logerror("PB3 Paper empty LED on @%x\n", activecpu_get_pc());
+		logerror("PB3 Paper empty LED on @%x\n", cpu_get_pc(space->cpu));
 	else
-		logerror("PB3 Paper empty LED off @%x\n", activecpu_get_pc());
+		logerror("PB3 Paper empty LED off @%x\n", cpu_get_pc(space->cpu));
 
-//  logerror("PB W %x @%x\n", data, activecpu_get_pc());
+//  logerror("PB W %x @%x\n", data, cpu_get_pc(space->cpu));
 }
 
 static WRITE8_HANDLER(ex800_portc_w)
@@ -243,7 +243,7 @@ static WRITE8_HANDLER(ex800_portc_w)
 	else
 		beep_set_state(0, 1);
 
-	logerror("PC W %x @%x\n", data, activecpu_get_pc());
+	logerror("PC W %x @%x\n", data, cpu_get_pc(space->cpu));
 }
 
 
@@ -251,46 +251,46 @@ static WRITE8_HANDLER(ex800_portc_w)
 
 static READ8_HANDLER(ex800_devsel_r)
 {
-	logerror("DEVSEL R @%x with offset %x\n", activecpu_get_pc(), offset);
+	logerror("DEVSEL R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
 	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_devsel_w)
 {
-	logerror("DEVSEL W %x @%x with offset %x\n", data, activecpu_get_pc(), offset);
+	logerror("DEVSEL W %x @%x with offset %x\n", data, cpu_get_pc(space->cpu), offset);
 }
 
 static READ8_HANDLER(ex800_gate5a_r)
 {
-	logerror("GATE5A R @%x with offset %x\n", activecpu_get_pc(), offset);
+	logerror("GATE5A R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
 	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_gate5a_w)
 {
-	logerror("GATE5A W %x @%x with offset %x\n", data, activecpu_get_pc(), offset);
+	logerror("GATE5A W %x @%x with offset %x\n", data, cpu_get_pc(space->cpu), offset);
 }
 
 static READ8_HANDLER(ex800_iosel_r)
 {
-	logerror("IOSEL R @%x with offset %x\n", activecpu_get_pc(), offset);
+	logerror("IOSEL R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
 	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_iosel_w)
 {
-	logerror("IOSEL W %x @%x with offset %x\n", data, activecpu_get_pc(), offset);
+	logerror("IOSEL W %x @%x with offset %x\n", data, cpu_get_pc(space->cpu), offset);
 }
 
 static READ8_HANDLER(ex800_gate7a_r)
 {
-	logerror("GATE7A R @%x with offset %x\n", activecpu_get_pc(), offset);
+	logerror("GATE7A R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
 	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(ex800_gate7a_w)
 {
-	logerror("GATE7A W %x @%x with offset %x\n", data, activecpu_get_pc(), offset);
+	logerror("GATE7A W %x @%x with offset %x\n", data, cpu_get_pc(space->cpu), offset);
 }
 
 

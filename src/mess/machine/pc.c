@@ -172,7 +172,7 @@ const struct dma8237_interface ibm5150_dma8237_config =
 
 static PIC8259_SET_INT_LINE( pc_pic8259_master_set_int_line )
 {
-	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -226,7 +226,7 @@ static PIC8259_SET_INT_LINE( pcjr_pic8259_master_set_int_line )
 	}
 	else
 	{
-		cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 	}
 }
 
@@ -448,7 +448,7 @@ static UINT8	nmi_enabled;
 
 WRITE8_HANDLER( pc_nmi_enable_w )
 {
-	logerror( "%08X: changing NMI state to %s\n", activecpu_get_pc(), data & 0x80 ? "enabled" : "disabled" );
+	logerror( "%08X: changing NMI state to %s\n", cpu_get_pc(space->cpu), data & 0x80 ? "enabled" : "disabled" );
 
 	nmi_enabled = data & 0x80;
 }

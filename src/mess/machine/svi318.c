@@ -69,7 +69,7 @@ static void svi318_set_banks(running_machine *machine);
 static INS8250_INTERRUPT( svi318_ins8250_interrupt )
 {
 	if (svi.bankLow != SVI_CART) {
-		cpunum_set_input_line(device->machine, 0, 0, (state ? HOLD_LINE : CLEAR_LINE));
+		cpu_set_input_line(device->machine->cpu[0], 0, (state ? HOLD_LINE : CLEAR_LINE));
 	}
 }
 
@@ -565,7 +565,7 @@ MACHINE_RESET( svi328_806 )
 
 void svi318_vdp_interrupt(running_machine *machine, int i)
 {
-	cpunum_set_input_line(machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cpu_set_input_line(machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 DRIVER_INIT( svi318 )
