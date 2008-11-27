@@ -3,9 +3,6 @@
 **
 ** Sean Young, Tomas Karlsson
 **
-** Todo:
-** - modem port
-** - svi_cas format
 */
 
 #include "driver.h"
@@ -263,7 +260,7 @@ WRITE8_DEVICE_HANDLER( svi318_ppi_w )
 
 /* Printer port */
 
-static const device_config *printer_device(running_machine *machine)
+static const device_config *printer_image(running_machine *machine)
 {
 	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
 }
@@ -275,7 +272,7 @@ static WRITE8_HANDLER( svi318_printer_w )
 	else
 	{
 		if ( (svi.prn_strobe & 1) && !(data & 1) )
-			printer_output(printer_device(machine), svi.prn_data);
+			printer_output(printer_image(space->machine), svi.prn_data);
 
 		svi.prn_strobe = data;
 	}
@@ -283,7 +280,7 @@ static WRITE8_HANDLER( svi318_printer_w )
 
 static READ8_HANDLER( svi318_printer_r )
 {
-	return printer_is_ready(printer_device(machine)) ? 0xfe:0xff;		/* 0xfe if printer is ready to work */
+	return printer_is_ready(printer_image(space->machine)) ? 0xfe:0xff;		/* 0xfe if printer is ready to work */
 }
 
 /* PSG */
@@ -303,7 +300,7 @@ static READ8_HANDLER( svi318_printer_r )
 
 READ8_HANDLER( svi318_psg_port_a_r )
 {
-	return input_port_read(machine, "JOYSTICKS");
+	return input_port_read(space->machine, "JOYSTICKS");
 }
 
 /*
@@ -328,7 +325,7 @@ WRITE8_HANDLER( svi318_psg_port_b_w )
 		set_led_status (0, !(data & 0x20) );
 
 	svi.bank_switch = data;
-	svi318_set_banks(machine);
+	svi318_set_banks(space->machine);
 }
 
 /* Disk drives  */
@@ -484,8 +481,10 @@ static void svi806_set_crtc_register(UINT8 reg, UINT8 data) {
 	*/
 }
 
-static TIMER_CALLBACK(svi318_80col_init_registers) {
-	cpuintrf_push_context( 0 );
+static TIMER_CALLBACK(svi318_80col_init_registers)
+{
+	cpu_push_context(machine->cpu[0]);
+
 	/* set some default values for the 6845 controller */
 	svi806_set_crtc_register(  0, 109 );
 	svi806_set_crtc_register(  1,  80 );
@@ -503,7 +502,8 @@ static TIMER_CALLBACK(svi318_80col_init_registers) {
 	svi806_set_crtc_register( 13,   0 );
 	svi806_set_crtc_register( 14,   0 );
 	svi806_set_crtc_register( 15,   0 );
-	cpuintrf_pop_context();
+
+	cpu_pop_context();
 }
 
 /* 80 column card init */
@@ -522,7 +522,7 @@ static void svi318_80col_init(running_machine *machine)
 static WRITE8_HANDLER( svi806_ram_enable_w )
 {
 	svi.svi806_ram_enabled = ( data & 0x01 );
-	svi318_set_banks(machine);
+	svi318_set_banks(space->machine);
 }
 
 VIDEO_START( svi328_806 )
@@ -585,7 +585,7 @@ DRIVER_INIT( svi318 )
 		svi.svi318 = 1;
 	}
 
-	cpunum_set_input_line_vector (0, 0, 0xff);
+	cpu_set_input_line_vector(machine->cpu[0], 0, 0xff);
 
 	/* memory */
 	svi.empty_bank = auto_malloc (0x8000);
@@ -597,7 +597,7 @@ DRIVER_INIT( svi318 )
 		UINT8 *table = auto_malloc (0x100);
 		const UINT8 *old_table;
 
-		old_table = cpunum_get_info_ptr (0, CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i]);
+		old_table = cpu_get_info_ptr(machine->cpu[0], CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i]);
 		memcpy (table, old_table, 0x100);
 
 		if (z80_cycle_table[i] == Z80_TABLE_ex)
@@ -618,7 +618,7 @@ DRIVER_INIT( svi318 )
 				}
 			}
 		}
-		cpunum_set_info_ptr(0, CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i], (void*)table);
+		cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i], (void*)table);
 	}
 }
 
@@ -667,9 +667,9 @@ INTERRUPT_GEN( svi318_interrupt )
 {
 	int set;
 
-	set = input_port_read(machine, "CONFIG");
+	set = input_port_read(device->machine, "CONFIG");
 	TMS9928A_set_spriteslimit (set & 0x20);
-	TMS9928A_interrupt(machine);
+	TMS9928A_interrupt(device->machine);
 }
 
 /* Memory */
@@ -792,16 +792,16 @@ static void svi318_set_banks(running_machine *machine)
 		}
 	}
 
-	memory_set_bankptr( 1, svi.bankLow_ptr );
-	memory_set_bankptr( 2, svi.bankHigh1_ptr );
-	memory_set_bankptr( 3, svi.bankHigh2_ptr );
+	memory_set_bankptr(machine, 1, svi.bankLow_ptr );
+	memory_set_bankptr(machine, 2, svi.bankHigh1_ptr );
+	memory_set_bankptr(machine, 3, svi.bankHigh2_ptr );
 
 	/* SVI-806 80 column card specific banking */
 	if ( svi.svi806_present ) {
 		if ( svi.svi806_ram_enabled ) {
-			memory_set_bankptr( 4, svi.svi806_ram );
+			memory_set_bankptr(machine, 4, svi.svi806_ram );
 		} else {
-			memory_set_bankptr( 4, svi.bankHigh2_ptr + 0x3000 );
+			memory_set_bankptr(machine, 4, svi.bankHigh2_ptr + 0x3000 );
 		}
 	}
 }
@@ -829,7 +829,7 @@ READ8_HANDLER( svi318_io_ext_r )
 
 	switch( offset ) {
 	case 0x12:
-		data = svi318_printer_r(machine, 0);
+		data = svi318_printer_r(space, 0);
 		break;
 
 	case 0x20:
@@ -840,7 +840,7 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		data = ins8250_r(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ), offset & 7);
+		data = ins8250_r(device_list_find_by_tag( space->machine->config->devicelist, INS8250, "ins8250_0" ), offset & 7);
 		break;
 
 	case 0x28:
@@ -851,26 +851,26 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		data = ins8250_r(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7);
+		data = ins8250_r(device_list_find_by_tag( space->machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7);
 		break;
 
 	case 0x30:
-		data = wd17xx_status_r(machine, 0);
+		data = wd17xx_status_r(space, 0);
 		break;
 	case 0x31:
-		data = wd17xx_track_r(machine, 0);
+		data = wd17xx_track_r(space, 0);
 		break;
 	case 0x32:
-		data = wd17xx_sector_r(machine, 0);
+		data = wd17xx_sector_r(space, 0);
 		break;
 	case 0x33:
-		data = wd17xx_data_r(machine, 0);
+		data = wd17xx_data_r(space, 0);
 		break;
 	case 0x34:
-		data = svi318_fdc_irqdrq_r(machine, 0);
+		data = svi318_fdc_irqdrq_r(space, 0);
 		break;
 	case 0x51: {
-		device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+		device_config *devconf = (device_config *) device_list_find_by_tag( space->machine->config->devicelist, MC6845, "crtc");
 		data = mc6845_register_r(devconf, 0);
 		}
 		break;
@@ -888,7 +888,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	switch( offset ) {
 	case 0x10:
 	case 0x11:
-		svi318_printer_w(machine, offset & 1, data);
+		svi318_printer_w(space, offset & 1, data);
 		break;
 
 	case 0x20:
@@ -899,7 +899,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		ins8250_w(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ), offset & 7, data);
+		ins8250_w(device_list_find_by_tag( space->machine->config->devicelist, INS8250, "ins8250_0" ), offset & 7, data);
 		break;
 
 	case 0x28:
@@ -910,41 +910,41 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		ins8250_w(device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7, data);
+		ins8250_w(device_list_find_by_tag( space->machine->config->devicelist, INS8250, "ins8250_1" ), offset & 7, data);
 		break;
 
 	case 0x30:
-		wd17xx_command_w(machine, 0, data);
+		wd17xx_command_w(space, 0, data);
 		break;
 	case 0x31:
-		wd17xx_track_w(machine, 0, data);
+		wd17xx_track_w(space, 0, data);
 		break;
 	case 0x32:
-		wd17xx_sector_w(machine, 0, data);
+		wd17xx_sector_w(space, 0, data);
 		break;
 	case 0x33:
-		wd17xx_data_w(machine, 0, data);
+		wd17xx_data_w(space, 0, data);
 		break;
 	case 0x34:
-		svi318_fdc_drive_motor_w(machine, 0, data);
+		svi318_fdc_drive_motor_w(space, 0, data);
 		break;
 	case 0x38:
-		svi318_fdc_density_side_w(machine, 0, data);
+		svi318_fdc_density_side_w(space, 0, data);
 		break;
 
 	case 0x50: {
-		device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+		device_config *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, "crtc");
 		mc6845_address_w(devconf, 0, data);
 		}
 		break;
 	case 0x51: {
-		device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+		device_config *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, "crtc");
 		mc6845_register_w(devconf, 0, data);
 		}
 		break;
 
 	case 0x58:
-		svi806_ram_enable_w(machine, 0, data);
+		svi806_ram_enable_w(space, 0, data);
 		break;
 	}
 }
