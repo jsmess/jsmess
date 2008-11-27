@@ -567,7 +567,7 @@ MACHINE_START( comx35p )
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x1000, 0); // normal ROM
 	memory_configure_bank(machine, 2, 1, 1, memory_region(machine, CDP1802_TAG) + 0xe000, 0); // expansion box ROM
 
-	memory_configure_bank(3, 0, 1, memory_region(machine, CDP1802_TAG) + 0xe000, 0);
+	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, CDP1802_TAG) + 0xe000, 0);
 	memory_set_bank(3, 0);
 
 	if (expansion_box_installed(machine))

@@ -1725,12 +1725,12 @@ WRITE8_DEVICE_HANDLER ( kc85_ctc_w )
 
 static Z80PIO_ON_INT_CHANGED( kc85_pio_interrupt )
 {
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 static void kc85_ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, 1, state);
+	cpu_set_input_line(device->machine->cpu[0], 1, state);
 }
 
 /* callback for ardy output from PIO */

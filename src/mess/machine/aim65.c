@@ -160,7 +160,7 @@ void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata)
 
 void aim65_riot_irq(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

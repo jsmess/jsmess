@@ -408,13 +408,13 @@ static TIMER_CALLBACK(einstein_keyboard_timer_callback)
 static void einstein_ctc_interrupt(const device_config *device, int state)
 {
 	logerror("ctc irq state: %02x\n",state);
-	cpunum_set_input_line(device->machine, 0, 1, state);
+	cpu_set_input_line(device->machine->cpu[0], 1, state);
 }
 
 static Z80PIO_ON_INT_CHANGED( einstein_pio_interrupt )
 {
 	logerror("pio irq state: %02x\n",state);
-	cpunum_set_input_line(device->machine, 0, 3, state);
+	cpu_set_input_line(device->machine->cpu[0], 3, state);
 }
 
 static WRITE8_DEVICE_HANDLER(einstein_serial_transmit_clock)

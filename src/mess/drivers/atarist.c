@@ -1378,7 +1378,7 @@ static IRQ_CALLBACK( atarist_int_ack )
 
 static MC68901_ON_IRQ_CHANGED( mfp_interrupt )
 {
-	cpunum_set_input_line(device->machine, 0, MC68000_IRQ_6, level);
+	cpu_set_input_line(device->machine->cpu[0], MC68000_IRQ_6, level);
 }
 
 static UINT8 mfp_rx, mfp_tx;
@@ -1441,7 +1441,7 @@ static void atarist_configure_memory(running_machine *machine)
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
-	memory_configure_bank(3, 0, 1, RAM + 0xfa0000, 0);
+	memory_configure_bank(machine, 3, 0, 1, RAM + 0xfa0000, 0);
 	memory_set_bank(3, 0);
 }
 
@@ -1609,7 +1609,7 @@ static void stbook_configure_memory(running_machine *machine)
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
-	memory_configure_bank(3, 0, 1, RAM + 0xfa0000, 0);
+	memory_configure_bank(machine, 3, 0, 1, RAM + 0xfa0000, 0);
 	memory_set_bank(3, 0);
 }
 

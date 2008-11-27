@@ -802,9 +802,9 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( pdp1 )		/* 1961 DEC PDP1									*/
 
 	/* MEMOTECH */
-//128u4	DRIVER( mtx512 )	/* 1983 Memotech MTX 512							*/
-//128u4	DRIVER( mtx500 )	/* 1983 Memotech MTX 500							*/
-//128u4	DRIVER( rs128 )		/* 1984 Memotech RS 128								*/
+	DRIVER( mtx512 )	/* 1983 Memotech MTX 512							*/
+	DRIVER( mtx500 )	/* 1983 Memotech MTX 500							*/
+	DRIVER( rs128 )		/* 1984 Memotech RS 128								*/
 
 	/* MATTEL */
 //128u4	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/

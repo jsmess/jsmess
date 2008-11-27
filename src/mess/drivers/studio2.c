@@ -224,12 +224,12 @@ static int cdp1861_efx;
 
 static CDP1861_ON_INT_CHANGED( studio2_int_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1861_ON_DMAO_CHANGED( studio2_dmao_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1861_ON_EFX_CHANGED( studio2_efx_w )
@@ -259,12 +259,12 @@ static int cdp1864_efx;
 
 static CDP1864_ON_INT_CHANGED( mpt02_int_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1864_ON_DMAO_CHANGED( mpt02_dmao_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1864_ON_EFX_CHANGED( mpt02_efx_w )

@@ -63,7 +63,7 @@ static const TMS9928a_interface tms9928a_interface =
 
 INTERRUPT_GEN( mtx_interrupt )
 {
-	TMS9928A_interrupt(machine);
+	TMS9928A_interrupt(device->machine);
 }
 
 
@@ -134,7 +134,7 @@ static const device_config *mtx_printer_image(running_machine *machine)
 READ8_HANDLER( mtx_strobe_r )
 {
 	if (mtx_prt_strobe == 0)
-		printer_output(mtx_printer_image(machine), mtx_prt_data);
+		printer_output(mtx_printer_image(space->machine), mtx_prt_data);
 
 	mtx_prt_strobe = 1;
 
@@ -146,7 +146,7 @@ READ8_HANDLER( mtx_prt_r )
 {
 	mtx_prt_strobe = 0;
 
-	return MTX_PRT_NOERROR | (printer_is_ready(mtx_printer_image(machine))
+	return MTX_PRT_NOERROR | (printer_is_ready(mtx_printer_image(space->machine))
 			? MTX_PRT_SELECTED : 0);
 }
 
@@ -172,30 +172,30 @@ READ8_HANDLER( mtx_key_lo_r )
 {
 	UINT8 data = 0xff;
 
-	if (!(key_sense & 0x01)) data &= input_port_read(machine, "keyboard_low_0");
-	if (!(key_sense & 0x02)) data &= input_port_read(machine, "keyboard_low_1");
-	if (!(key_sense & 0x04)) data &= input_port_read(machine, "keyboard_low_2");
-	if (!(key_sense & 0x08)) data &= input_port_read(machine, "keyboard_low_3");
-	if (!(key_sense & 0x10)) data &= input_port_read(machine, "keyboard_low_4");
-	if (!(key_sense & 0x20)) data &= input_port_read(machine, "keyboard_low_5");
-	if (!(key_sense & 0x40)) data &= input_port_read(machine, "keyboard_low_6");
-	if (!(key_sense & 0x80)) data &= input_port_read(machine, "keyboard_low_7");
+	if (!(key_sense & 0x01)) data &= input_port_read(space->machine, "keyboard_low_0");
+	if (!(key_sense & 0x02)) data &= input_port_read(space->machine, "keyboard_low_1");
+	if (!(key_sense & 0x04)) data &= input_port_read(space->machine, "keyboard_low_2");
+	if (!(key_sense & 0x08)) data &= input_port_read(space->machine, "keyboard_low_3");
+	if (!(key_sense & 0x10)) data &= input_port_read(space->machine, "keyboard_low_4");
+	if (!(key_sense & 0x20)) data &= input_port_read(space->machine, "keyboard_low_5");
+	if (!(key_sense & 0x40)) data &= input_port_read(space->machine, "keyboard_low_6");
+	if (!(key_sense & 0x80)) data &= input_port_read(space->machine, "keyboard_low_7");
 
 	return data;
 }
 
 READ8_HANDLER( mtx_key_hi_r )
 {
-	UINT8 data = input_port_read(machine, "country_code");
+	UINT8 data = input_port_read(space->machine, "country_code");
 
-	if (!(key_sense & 0x01)) data &= input_port_read(machine, "keyboard_high_0");
-	if (!(key_sense & 0x02)) data &= input_port_read(machine, "keyboard_high_1");
-	if (!(key_sense & 0x04)) data &= input_port_read(machine, "keyboard_high_2");
-	if (!(key_sense & 0x08)) data &= input_port_read(machine, "keyboard_high_3");
-	if (!(key_sense & 0x10)) data &= input_port_read(machine, "keyboard_high_4");
-	if (!(key_sense & 0x20)) data &= input_port_read(machine, "keyboard_high_5");
-	if (!(key_sense & 0x40)) data &= input_port_read(machine, "keyboard_high_6");
-	if (!(key_sense & 0x80)) data &= input_port_read(machine, "keyboard_high_7");
+	if (!(key_sense & 0x01)) data &= input_port_read(space->machine, "keyboard_high_0");
+	if (!(key_sense & 0x02)) data &= input_port_read(space->machine, "keyboard_high_1");
+	if (!(key_sense & 0x04)) data &= input_port_read(space->machine, "keyboard_high_2");
+	if (!(key_sense & 0x08)) data &= input_port_read(space->machine, "keyboard_high_3");
+	if (!(key_sense & 0x10)) data &= input_port_read(space->machine, "keyboard_high_4");
+	if (!(key_sense & 0x20)) data &= input_port_read(space->machine, "keyboard_high_5");
+	if (!(key_sense & 0x40)) data &= input_port_read(space->machine, "keyboard_high_6");
+	if (!(key_sense & 0x80)) data &= input_port_read(space->machine, "keyboard_high_7");
 
 	return data;
 }
@@ -211,7 +211,7 @@ READ8_HANDLER( mtx_key_hi_r )
 static void mtx_ctc_interrupt(const device_config *device, int state)
 {
 //  logerror("mtx_ctc_interrupt: %02x\n", state);
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 READ8_DEVICE_HANDLER( mtx_ctc_r )
@@ -312,26 +312,26 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 	UINT8 ram_page = data >> 0 & 0x0f;
 
 	/* set rom bank (switches between basic and assembler rom or cartridges) */
-	memory_set_bank(machine, 2, rom_page);
+	memory_set_bank(space->machine, 2, rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
 	if (ram_page >= mess_ram_size/0x8000)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 	else if (ram_page + 1 == mess_ram_size/0x8000)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
-		memory_set_bank(4, ram_page);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_set_bank(space->machine, 4, ram_page);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK3, SMH_BANK3);
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
-		memory_set_bank(3, ram_page);
-		memory_set_bank(4, ram_page);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK3, SMH_BANK3);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_set_bank(space->machine, 3, ram_page);
+		memory_set_bank(space->machine, 4, ram_page);
 	}
 }
 
@@ -348,8 +348,8 @@ DRIVER_INIT( mtx512 )
 	/* configure memory */
 	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 	memory_configure_bank(machine, 2, 0, 8, memory_region(machine, "user2"), 0x2000);
-	memory_configure_bank(3, 0, mess_ram_size/0x4000/2, mess_ram, 0x4000);
-	memory_configure_bank(4, 0, mess_ram_size/0x4000/2, mess_ram + mess_ram_size/2, 0x4000);
+	memory_configure_bank(machine, 3, 0, mess_ram_size/0x4000/2, mess_ram, 0x4000);
+	memory_configure_bank(machine, 4, 0, mess_ram_size/0x4000/2, mess_ram + mess_ram_size/2, 0x4000);
 
 	/* setup tms9928a */
 	TMS9928A_configure(&tms9928a_interface);
@@ -357,11 +357,16 @@ DRIVER_INIT( mtx512 )
 
 DRIVER_INIT( rs128 )
 {
+	const device_config *device;
+	const address_space *space;
+
 	DRIVER_INIT_CALL(mtx512);
 
 	/* install handlers for dart interface */
-	memory_install_readwrite8_device_handler(device_list_find_by_tag(machine->config->devicelist, Z80DART, "z80dart"), 0, ADDRESS_SPACE_IO, 0x0c, 0x0d, 0, 0, mtx_dart_data_r, mtx_dart_data_w);
-	memory_install_readwrite8_device_handler(device_list_find_by_tag(machine->config->devicelist, Z80DART, "z80dart"), 0, ADDRESS_SPACE_IO, 0x0e, 0x0f, 0, 0, mtx_dart_control_r, mtx_dart_control_w);
+	device = device_list_find_by_tag(machine->config->devicelist, Z80DART, "z80dart");
+	space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	memory_install_readwrite8_device_handler(space, device, 0x0c, 0x0d, 0, 0, mtx_dart_data_r, mtx_dart_data_w);
+	memory_install_readwrite8_device_handler(space, device, 0x0e, 0x0f, 0, 0, mtx_dart_control_r, mtx_dart_control_w);
 }
 
 MACHINE_RESET( rs128 )

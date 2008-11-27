@@ -136,12 +136,12 @@ static int cdp1864_efx;
 
 static CDP1864_ON_INT_CHANGED( tmc2000e_int_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1864_ON_DMAO_CHANGED( tmc2000e_dmao_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1864_ON_EFX_CHANGED( tmc2000e_efx_w )

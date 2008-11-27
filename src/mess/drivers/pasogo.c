@@ -426,7 +426,7 @@ static const struct pit8253_config pc_pit8254_config =
 
 
 static PIC8259_SET_INT_LINE( pasogo_pic8259_set_int_line ) {
-	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 

@@ -62,7 +62,7 @@ static CDP1869_ON_PRD_CHANGED( comx35_prd_w )
 
 	if (!state->iden && !prd)
 	{
-		cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, ASSERT_LINE);
 	}
 
 	state->cdp1869_prd = prd;

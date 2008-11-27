@@ -9,12 +9,12 @@
 
 static CDP1861_ON_INT_CHANGED( tmc1800_int_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1861_ON_DMAO_CHANGED( tmc1800_dmao_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1861_ON_EFX_CHANGED( tmc1800_efx_w )
@@ -46,12 +46,12 @@ static VIDEO_UPDATE( tmc1800 )
 
 static CDP1864_ON_INT_CHANGED( tmc2000_int_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1864_ON_DMAO_CHANGED( tmc2000_dmao_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1864_ON_EFX_CHANGED( tmc2000_efx_w )
@@ -88,12 +88,12 @@ static VIDEO_UPDATE( tmc2000 )
 
 static CDP1864_ON_INT_CHANGED( oscnano_int_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1864_ON_DMAO_CHANGED( oscnano_dmao_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1864_ON_EFX_CHANGED( oscnano_efx_w )

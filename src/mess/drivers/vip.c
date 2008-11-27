@@ -379,12 +379,12 @@ INPUT_PORTS_END
 
 static CDP1861_ON_INT_CHANGED( vip_int_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_INT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1861_ON_DMAO_CHANGED( vip_dmao_w )
 {
-	cpunum_set_input_line(device->machine, 0, CDP1802_INPUT_LINE_DMAOUT, level);
+	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1861_ON_EFX_CHANGED( vip_efx_w )

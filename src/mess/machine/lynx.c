@@ -1364,7 +1364,7 @@ static void lynx_timer_signal_irq(running_machine *machine, int which)
 {
 	if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) { // irq flag handling later
 		mikey.data[0x81] |= ( 1 << which );
-		cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
 	switch ( which ) {
 	case 0:
@@ -1545,7 +1545,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 	if (uart.serctl & 0x80) 
 	{
 		mikey.data[0x81] |= 0x10;
-		cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, ASSERT_LINE);
     }
 }
 
@@ -1701,7 +1701,7 @@ WRITE8_HANDLER(mikey_write)
 		mikey.data[0x81] &= ~data; // clear interrupt source
 		logerror("mikey write %.2x %.2x\n", offset, data);
 		if (!mikey.data[0x81])
-			cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */
@@ -1794,11 +1794,11 @@ WRITE8_HANDLER( lynx_memory_config_w )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfd00, 0xfdff, 0, 0, (data & 2) ? SMH_BANK2 : mikey_write);
 
 	if (data & 1)
-		memory_set_bankptr(1, lynx_mem_fc00);
+		memory_set_bankptr(machine, 1, lynx_mem_fc00);
 	if (data & 2)
-		memory_set_bankptr(2, lynx_mem_fd00);
-	memory_set_bank(3, (data & 4) ? 1 : 0);
-	memory_set_bank(4, (data & 8) ? 1 : 0);
+		memory_set_bankptr(machine, 2, lynx_mem_fd00);
+	memory_set_bank(machine, 3, (data & 4) ? 1 : 0);
+	memory_set_bank(machine, 4, (data & 8) ? 1 : 0);
 }
 
 static void lynx_reset(running_machine *machine)
@@ -1806,7 +1806,7 @@ static void lynx_reset(running_machine *machine)
 	int i;
 	lynx_memory_config_w(machine, 0, 0);
 
-	cpunum_set_input_line(machine, 0, M65SC02_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
 
 	memset(&suzy, 0, sizeof(suzy));
 	memset(&mikey, 0, sizeof(mikey));
@@ -1849,10 +1849,10 @@ MACHINE_START( lynx )
 	state_save_register_global_pointer(lynx_mem_fe00, lynx_mem_fe00_size);
 	state_save_register_postload(machine, lynx_postload, NULL);
 
-	memory_configure_bank(3, 0, 1, memory_region(machine, "main") + 0x0000, 0);
-	memory_configure_bank(3, 1, 1, lynx_mem_fe00, 0);
-	memory_configure_bank(4, 0, 1, memory_region(machine, "main") + 0x01fa, 0);
-	memory_configure_bank(4, 1, 1, lynx_mem_fffa, 0);
+	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, "main") + 0x0000, 0);
+	memory_configure_bank(machine, 3, 1, 1, lynx_mem_fe00, 0);
+	memory_configure_bank(machine, 4, 0, 1, memory_region(machine, "main") + 0x01fa, 0);
+	memory_configure_bank(machine, 4, 1, 1, lynx_mem_fffa, 0);
 
 	memset(&suzy, 0, sizeof(suzy));
 
