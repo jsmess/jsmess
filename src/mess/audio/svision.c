@@ -32,7 +32,7 @@ WRITE8_HANDLER( svision_sounddma_w )
 			svision_dma.size = (data ? data : 0x100) * 32;
 			break;
 		case 3:
-			svision_dma.step = cpunum_get_clock(0) / (256.0 * machine->sample_rate * (1 + (data & 3)));
+			svision_dma.step = cpu_get_clock(space->machine->cpu[0]) / (256.0 * space->machine->sample_rate * (1 + (data & 3)));
 			svision_dma.right = data & 4;
 			svision_dma.left = data & 8;
 			svision_dma.ca14to16 = ((data & 0x70) >> 4) << 14;
@@ -55,7 +55,7 @@ WRITE8_HANDLER( svision_noise_w )
 	{
 		case 0:
 			svision_noise.volume=data&0xf;
-			svision_noise.step= cpunum_get_clock(0) / (256.0*machine->sample_rate*(1+(data>>4)));
+			svision_noise.step= cpu_get_clock(space->machine->cpu[0]) / (256.0*space->machine->sample_rate*(1+(data>>4)));
 			break;
 		case 1:
 			svision_noise.count = data + 1;
@@ -87,7 +87,7 @@ void svision_soundport_w (running_machine *machine, SVISION_CHANNEL *channel, in
 			if (size)
 			{
 				//	channel->size=(int)(machine->sample_rate*(size<<5)/4e6);
-				channel->size= (int) (machine->sample_rate * (size << 5) / cpunum_get_clock(0));
+				channel->size= (int) (machine->sample_rate * (size << 5) / cpu_get_clock(machine->cpu[0]));
 			}
 			else
 			{
@@ -195,7 +195,7 @@ static void svision_update (void *param,stream_sample_t **inputs, stream_sample_
 			}
 			else
 			{
-				sample = memory_read_byte(space, addr);
+				sample = memory_read_byte(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr);
 			}
 			if (((unsigned)svision_dma.pos) & 1)
 				s = (sample & 0xf);

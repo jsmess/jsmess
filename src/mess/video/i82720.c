@@ -205,8 +205,8 @@ void gdc_fifo_enqueue(TYP_GDC* gdcp, UINT8 data, UINT8 cmdflag)
       /* We cannot go higher than 15 */
       gdcp->fifo.write_pos = (gdcp->fifo.write_pos + 1) & 0x0f;
    } else {
-      LOG(("gdc_fifo_enqueue: The fifo is full at PC = %04X\n",
-                    activecpu_get_pc()));
+//      LOG(("gdc_fifo_enqueue: The fifo is full at PC = %04X\n",
+                    //cpu_get_pc(space->cpu)));
    }
 }
 
@@ -1274,7 +1274,7 @@ WRITE16_HANDLER ( compis_gdc_w )
 
 		default:
 			logerror("%04X: GDC UNKNOWN Port Write %04X = %04X\n",
-                  activecpu_get_pc(), offset, data);
+                  cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 }
@@ -1294,7 +1294,7 @@ READ16_HANDLER (compis_gdc_r)
 		case 0x00:	/* Status register */
 
 			LOG(("%04X: GDC Port %04X (Status) Read",
-                       activecpu_get_pc(), offset));
+                       cpu_get_pc(space->cpu), offset));
          /* Optimize this later, i.e. when we know what to return */
 			data = ( gdc_fifo_reading(&gdc) && !gdc_fifo_empty(&gdc)) |
             (gdc_fifo_full(&gdc) << 1) |
@@ -1308,7 +1308,7 @@ READ16_HANDLER (compis_gdc_r)
 		case 0x01:	/* FIFO Read */
 
 			LOG(("%04X: GDC Port %04X (Fifo) Read",
-                       activecpu_get_pc(),
+                       cpu_get_pc(space->cpu),
                        offset));
          if ( gdc_fifo_reading(&gdc)) {
             UINT8* data_p = gdc_fifo_dequeue(&gdc);
@@ -1325,11 +1325,11 @@ READ16_HANDLER (compis_gdc_r)
 
       default:
          LOG(("%04X: GDC UNKNOWN Port Read %04X",
-                          activecpu_get_pc(), offset));
+                          cpu_get_pc(space->cpu), offset));
          data = 0x44;
-         if ( activecpu_get_pc() == 0xF952D ) {
+         if ( cpu_get_pc(space->cpu) == 0xF952D ) {
             data = 0x04;
-         } else if ( activecpu_get_pc() == 0xF953B ) {
+         } else if ( cpu_get_pc(space->cpu) == 0xF953B ) {
             data = 0x64;
          }
          /* If we return 0xff zoom will be 2 */

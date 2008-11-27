@@ -390,6 +390,7 @@ DRVLIBS = \
 	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/cgenie.a \
 	$(MESSOBJ)/coleco.a \
+	$(MESSOBJ)/compis.a \
 	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
@@ -422,6 +423,7 @@ DRVLIBS = \
 	$(MESSOBJ)/mikro80.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/motorola.a \
+	$(MESSOBJ)/multitch.a \
 	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
@@ -455,8 +457,10 @@ DRVLIBS = \
 	$(MESSOBJ)/ssystem3.a \
 	$(MESSOBJ)/super80.a \
 	$(MESSOBJ)/svi.a \
+	$(MESSOBJ)/svision.a \
 	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
+	$(MESSOBJ)/teamconc.a \
 	$(MESSOBJ)/telmac.a \
 	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
@@ -475,17 +479,13 @@ DRVLIBS = \
 	$(MESSOBJ)/atari.a \
 
 #	$(MESSOBJ)/coco.a \
-#	$(MESSOBJ)/compis.a \
 #	$(MESSOBJ)/dgn_beta.a \
 #	$(MESSOBJ)/epson.a \
 #	$(MESSOBJ)/exeltel.a \
 #	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/mephisto.a \
 #	$(MESSOBJ)/mk1.a \
-#	$(MESSOBJ)/multitch.a \
-#	$(MESSOBJ)/svision.a \
 #	$(MESSOBJ)/synertec.a \
-#	$(MESSOBJ)/teamconc.a \
 
 
 

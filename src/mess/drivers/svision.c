@@ -93,7 +93,7 @@ static READ8_HANDLER(svision_r)
 	switch (offset)
 	{
 		case 0x20:
-			data = input_port_read(machine, "JOY");
+			data = input_port_read(space->machine, "JOY");
 			break;
 		case 0x21:
 			data &= ~0xf;
@@ -115,11 +115,11 @@ static READ8_HANDLER(svision_r)
 			break;
 		case 0x24:
 			svision.timer_shot = FALSE;
-			svision_irq( machine );
+			svision_irq( space->machine );
 			break;
 		case 0x25:
 			svision_dma.finished = FALSE;
-			svision_irq( machine );
+			svision_irq( space->machine );
 			break;
 		default:
 			logerror("%.6f svision read %04x %02x\n", attotime_to_double(timer_get_time()),offset,data);
@@ -143,8 +143,8 @@ static WRITE8_HANDLER(svision_w)
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
 			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time()),offset,data);
-			memory_set_bankptr(machine, 1, memory_region(machine, "user1") + ((svision_reg[0x26] & 0xe0) << 9));
-			svision_irq( machine );
+			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user1") + ((svision_reg[0x26] & 0xe0) << 9));
+			svision_irq( space->machine );
 			break;
 		case 0x23: /* delta hero irq routine write */
 			value = data;
@@ -158,16 +158,16 @@ static WRITE8_HANDLER(svision_w)
 			timer_reset(svision.timer1, ATTOTIME_IN_CYCLES(value * delay, 0));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
-			svision_soundport_w(machine, svision_channel + 0, offset & 3, data);
+			svision_soundport_w(space->machine, svision_channel + 0, offset & 3, data);
 			break;
 		case 0x14: case 0x15: case 0x16: case 0x17:
-			svision_soundport_w(machine, svision_channel + 1, offset & 3, data);
+			svision_soundport_w(space->machine, svision_channel + 1, offset & 3, data);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			svision_sounddma_w(machine, offset - 0x18, data);
+			svision_sounddma_w(space, offset - 0x18, data);
 			break;
 		case 0x28: case 0x29: case 0x2a:
-			svision_noise_w(machine, offset - 0x28, data);
+			svision_noise_w(space, offset - 0x28, data);
 			break;
 		default:
 			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time()), offset, data);
@@ -183,11 +183,11 @@ static READ8_HANDLER(tvlink_r)
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				/* strange effects when modifying palette */
-				return svision_r(machine, offset);
+				return svision_r(space, offset);
 			}
 			else
 			{
-				return svision_r(machine, offset);
+				return svision_r(space, offset);
 			}
 	}
 }
@@ -217,7 +217,7 @@ static WRITE8_HANDLER(tvlink_w)
 			}
 			break;
 		default:
-			svision_w(machine, offset,data);
+			svision_w(space, offset,data);
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				UINT16 c;
@@ -429,7 +429,7 @@ static VIDEO_UPDATE( tvlink )
 static INTERRUPT_GEN( svision_frame_int )
 {
 	if (BANK&1)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
 	if (svision_channel->count)
 		svision_channel->count--;
@@ -453,7 +453,7 @@ static DRIVER_INIT( svisions )
 	svision.timer1 = timer_alloc(svision_timer, NULL);
 	svision_pet.on = TRUE;
 	svision_pet.timer = timer_alloc(svision_pet_timer, NULL);
-	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/cpunum_get_clock(0)), NULL, 0, svision_pet_timer);
+	timer_pulse(attotime_mul(ATTOTIME_IN_SEC(8), 256/cpu_get_clock(machine->cpu[0])), NULL, 0, svision_pet_timer);
 }
 
 static MACHINE_RESET( svision )

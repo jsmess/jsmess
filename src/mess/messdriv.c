@@ -178,11 +178,11 @@ const game_driver * const drivers[] =
 	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
 
 	/* WATARA */
-//128u4	DRIVER( svision )	/* Supervision Handheld								*/
-//128u4	DRIVER( svisions )
-//128u4	DRIVER( svisionp )
-//128u4	DRIVER( svisionn )
-//128u4	DRIVER( tvlinkp )
+	DRIVER( svision )	/* Supervision Handheld								*/
+	DRIVER( svisions )
+	DRIVER( svisionp )
+	DRIVER( svisionn )
+	DRIVER( tvlinkp )
 
 	/* INTERTON */
 	DRIVER( vc4000 )	/* Interton vc4000									*/
@@ -850,7 +850,7 @@ XL/XE 16kB OS roms
 
 	/* Team Concepts */
 	/* CPU not known, else should be easy, look into drivers/comquest.c */
-//128u4	DRIVER( comquest )	/* Comquest Plus German								*/
+	DRIVER( comquest )	/* Comquest Plus German								*/
 
 	/* Hewlett Packard */
 	DRIVER( hp48s )		/* HP48 S */
@@ -859,12 +859,12 @@ XL/XE 16kB OS roms
 	DRIVER( hp48gx )	/* HP48 GX */
 
 	/* SpectraVideo */
-//128u4	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
-//128u4	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
-//128u4	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
-//128u4	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
-//128u4	DRIVER( sv328p80 )	/* SVI-328 (PAL) + SVI-806 80 column card			*/
-//128u4	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
+	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
+	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
+	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
+	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
+	DRIVER( sv328p80 )	/* SVI-328 (PAL) + SVI-806 80 column card			*/
+	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
 //	DRIVER( apexc53 )	/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
@@ -883,11 +883,11 @@ XL/XE 16kB OS roms
 	DRIVER(dai)			/* DAI												*/
 
 	/* Telenova */
-//128u4	DRIVER(compis)		/* 1985 Telenova Compis								*/
+	DRIVER(compis)		/* 1985 Telenova Compis								*/
 
 	/* Multitech */
-//128u4	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
-//128u4	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
+	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
+	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
 
 	/* Telercas Oy */
 //	DRIVER(tmc1800)

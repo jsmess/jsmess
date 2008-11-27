@@ -334,9 +334,9 @@ READ16_HANDLER (compis_fdc_dack_r)
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
-  	if (input_port_read(machine, "DSW1"))
+  	if (input_port_read(space->machine, "DSW1"))
   	{
-		data = nec765_dack_r(machine, 0);
+		data = nec765_dack_r(space, 0);
 	}
 
 	return data;
@@ -347,7 +347,7 @@ WRITE16_HANDLER (compis_fdc_w)
 	switch(offset)
 	{
 		case 2:
-			nec765_data_w(machine, 0, data);
+			nec765_data_w(space, 0, data);
 			break;
 		default:
 			logerror("FDC Unknown Port Write %04X = %04X\n", offset, data);
@@ -362,10 +362,10 @@ READ16_HANDLER (compis_fdc_r)
 	switch(offset)
 	{
 		case 0:
-			data = nec765_status_r(machine, 0);
+			data = nec765_status_r(space, 0);
 			break;
 		case 1:
-			data = nec765_data_r(machine, 0);
+			data = nec765_data_r(space, 0);
 			break;
 		default:
 			logerror("FDC Unknown Port Read %04X\n", offset);
@@ -554,7 +554,7 @@ static const struct msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	return msm8251_data_r(machine, offset);
+	return msm8251_data_r(space, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
@@ -562,10 +562,10 @@ WRITE16_HANDLER ( compis_usart_w )
 	switch (offset)
 	{
 		case 0x00:
-			msm8251_data_w(machine, 0, data);
+			msm8251_data_w(space, 0, data);
 			break;
 		case 0x01:
-			msm8251_control_w(machine, 0, data);
+			msm8251_control_w(space, 0, data);
 			break;
 		default:
 			logerror("USART Unknown Port Write %04X = %04X\n", offset, data);
@@ -584,7 +584,7 @@ static IRQ_CALLBACK(int_callback)
 		logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time()), i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(device, 0, CLEAR_LINE);
 	i186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */
@@ -692,15 +692,15 @@ generate_int:
 	/* generate the appropriate interrupt */
 	i186.intr.poll_status = 0x8000 | new_vector;
 	if (!i186.intr.pending)
-		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE);
 	i186.intr.pending = 1;
-	cpu_trigger(machine, CPU_RESUME_TRIGGER);
+	cpuexec_trigger(machine, CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time()), new_vector);
 }
 
 
-static void handle_eoi(int data)
+static void handle_eoi(running_machine *machine,int data)
 {
 	int i, j;
 
@@ -719,7 +719,7 @@ static void handle_eoi(int data)
 			case 0x0d:	i186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	i186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(space->cpu), data & 0x1f);
+			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->cpu[0]), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time()), data & 0x1f);
 	}
@@ -890,7 +890,7 @@ static void internal_timer_update(int which,
 		diff = new_control ^ t->control;
 		if (diff & 0x001c)
 		  logerror("%05X:ERROR! -unsupported timer mode %04X\n",
-			   cpu_get_pc(space->cpu),
+			   cpu_get_pc(Machine->cpu[0]),
 			   new_control);
 
 		/* if we have real changes, update things */
@@ -992,7 +992,7 @@ static void update_dma_control(int which, int new_control)
 	diff = new_control ^ d->control;
 	if (diff & 0x6811)
 	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
-		   cpu_get_pc(space->cpu),
+		   cpu_get_pc(Machine->cpu[0]),
 		   new_control);
 
 	/* if we're going live, set a timer */
@@ -1055,7 +1055,7 @@ READ16_HANDLER( i186_internal_port_r )
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", cpu_get_pc(space->cpu));
 			if (i186.intr.poll_status & 0x8000)
-				int_callback(machine, 0);
+				int_callback(space->machine->cpu[0],0);
 			return i186.intr.poll_status;
 
 		case 0x13:
@@ -1232,8 +1232,8 @@ WRITE16_HANDLER( i186_internal_port_w )
 	{
 		case 0x11:
 			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X\n", cpu_get_pc(space->cpu), data16);
-			handle_eoi(0x8000);
-			update_interrupt_state(machine);
+			handle_eoi(space->machine,0x8000);
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x12:
@@ -1253,31 +1253,31 @@ WRITE16_HANDLER( i186_internal_port_w )
 			i186.intr.ext[1] = (i186.intr.ext[1] & ~0x08) | ((data16 >> 2) & 0x08);
 			i186.intr.ext[2] = (i186.intr.ext[2] & ~0x08) | ((data16 >> 3) & 0x08);
 			i186.intr.ext[3] = (i186.intr.ext[3] & ~0x08) | ((data16 >> 4) & 0x08);
-			update_interrupt_state(machine);
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x15:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt priority mask = %04X\n", cpu_get_pc(space->cpu), data16);
 			i186.intr.priority_mask = data16 & 0x0007;
-			update_interrupt_state(machine);
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x16:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt in-service = %04X\n", cpu_get_pc(space->cpu), data16);
 			i186.intr.in_service = data16 & 0x00ff;
-			update_interrupt_state(machine);
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x17:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt request = %04X\n", cpu_get_pc(space->cpu), data16);
 			i186.intr.request = (i186.intr.request & ~0x00c0) | (data16 & 0x00c0);
-			update_interrupt_state(machine);
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x18:
 			if (LOG_PORTS) logerror("%05X:WARNING - wrote to 80186 interrupt status = %04X\n", cpu_get_pc(space->cpu), data16);
 			i186.intr.status = (i186.intr.status & ~0x8007) | (data16 & 0x8007);
-			update_interrupt_state(machine);
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x19:
@@ -1386,7 +1386,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 			/* we need to do this at a time when the I86 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			cpunum_set_irq_callback(0, int_callback);
+			cpu_set_irq_callback(space->cpu, int_callback);
 			break;
 
 		case 0x60:
@@ -1446,14 +1446,14 @@ WRITE16_HANDLER( i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read16_handler(machine, 2, ADDRESS_SPACE_PROGRAM, temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(machine, 2, ADDRESS_SPACE_PROGRAM, temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_r);
+				memory_install_write16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read16_handler(machine, 2, ADDRESS_SPACE_IO, temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(machine, 2, ADDRESS_SPACE_IO, temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_r);
+				memory_install_write16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_w);
 			}
 /*			popmessage("Sound CPU reset");*/
 			break;
@@ -1529,7 +1529,7 @@ static const compis_gdc_interface i82720_interface =
 DRIVER_INIT( compis )
 {
 	compis_init( &i82720_interface );
-	cpunum_set_irq_callback(0, compis_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], compis_irq_callback);
 	memset (&compis, 0, sizeof (compis) );
 }
 
@@ -1556,7 +1556,7 @@ MACHINE_RESET( compis )
 	compis_keyb_init();
 
 	/* OSP PIC 8259 */
-	cpunum_set_irq_callback(0, compis_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], compis_irq_callback);
 
 	compis_devices.pic8259_master = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
 	compis_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
@@ -1569,5 +1569,5 @@ MACHINE_RESET( compis )
 INTERRUPT_GEN( compis_vblank_int )
 {
 //	compis_gdc_vblank_int();
-	compis_keyb_update(machine);
+	compis_keyb_update(device->machine);
 }
