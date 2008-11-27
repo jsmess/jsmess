@@ -310,100 +310,100 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( sym1 )		/* Synertek SYM-1									*/
 //128u4	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
-//128u4	DRIVER( pet2001 )	/* PET 2001											*/
-//128u4	DRIVER( pet2001n )	/* PET 2001-N										*/
-//128u4	DRIVER( pet2001b )	/* PET 2001-B										*/
-//128u4	DRIVER( cbm30 )		/* CBM 30xx											*/
-//128u4	DRIVER( cbm30b )	/* CBM 30xx (Business keyboard)						*/
-//128u4	DRIVER( cbm30nor )	/* CBM 30xx (Norway, Business keyboard)				*/
-//128u4	DRIVER( pet40on )	/* PET 40xx (Basic 4, no CRTC, Normal keyboard)		*/
-//128u4	DRIVER( pet40ob )	/* PET 40xx (Basic 4, no CRTC, Business keyboard)	*/
-//128u4	DRIVER( pet40n )	/* PET 40xx (Basic 4, CRTC 60Hz, 40 columns)		*/
-//128u4	DRIVER( pet40b )	/* PET 40xx (Basic 4, CRTC 60Hz, 80 columns)		*/
-//128u4	DRIVER( cbm40o )	/* CBM 40xx (Basic 4, no CRTC, Normal keyboard)		*/
-//128u4	DRIVER( cbm40ob )	/* CBM 40xx (Basic 4, no CRTC, Business keyboard)	*/
-//128u4	DRIVER( cbm40n )	/* CBM 40xx (Basic 4, CRTC 50Hz, 40 columns)		*/
-//128u4	DRIVER( cbm40b )	/* CBM 40xx (Basic 4, CRTC 50Hz, 80 columns)		*/
-//128u4	DRIVER( pet80 )		/* PET 80xx (Basic 4, CRTC 60Hz, 80 columns)		*/
-//128u4	DRIVER( cbm80 )		/* CBM 80xx (Basic 4, CRTC 50Hz, 80 columns)		*/
-//128u4	DRIVER( cbm80ger )	/* CBM 80xx (Germany, Basic 4, CRTC 50Hz, 80 cols)	*/
-//128u4	DRIVER( cbm80hun )	/* CBM 80xx (Hungary, Basic 4, CRTC 50Hz, 80 cols)	*/
-//128u4	DRIVER( cbm80swe )	/* CBM 80xx (Sweden, Basic 4, CRTC 50Hz, 80 cols)	*/
-//128u4	DRIVER( cbm8296 )	/* CBM 8296 (Basic 4, CRTC 50Hz, 80 columns)		*/
-//128u4	DRIVER( cbm8296d )	/* CBM 8296D										*/
-//128u4	DRIVER( superpet )	/* SuperPET											*/
-//128u4	DRIVER( sp9000 )	/* CBM SP9000 / MiniMainFrame 9000					*/
-//128u4	DRIVER( mmf9000s )	/* MiniMainFrame 9000 (Sweden)						*/
+	DRIVER( pet2001 )	/* PET 2001											*/
+	DRIVER( pet2001n )	/* PET 2001-N										*/
+	DRIVER( pet2001b )	/* PET 2001-B										*/
+	DRIVER( cbm30 )		/* CBM 30xx											*/
+	DRIVER( cbm30b )	/* CBM 30xx (Business keyboard)						*/
+	DRIVER( cbm30nor )	/* CBM 30xx (Norway, Business keyboard)				*/
+	DRIVER( pet40on )	/* PET 40xx (Basic 4, no CRTC, Normal keyboard)		*/
+	DRIVER( pet40ob )	/* PET 40xx (Basic 4, no CRTC, Business keyboard)	*/
+	DRIVER( pet40n )	/* PET 40xx (Basic 4, CRTC 60Hz, 40 columns)		*/
+	DRIVER( pet40b )	/* PET 40xx (Basic 4, CRTC 60Hz, 80 columns)		*/
+	DRIVER( cbm40o )	/* CBM 40xx (Basic 4, no CRTC, Normal keyboard)		*/
+	DRIVER( cbm40ob )	/* CBM 40xx (Basic 4, no CRTC, Business keyboard)	*/
+	DRIVER( cbm40n )	/* CBM 40xx (Basic 4, CRTC 50Hz, 40 columns)		*/
+	DRIVER( cbm40b )	/* CBM 40xx (Basic 4, CRTC 50Hz, 80 columns)		*/
+	DRIVER( pet80 )		/* PET 80xx (Basic 4, CRTC 60Hz, 80 columns)		*/
+	DRIVER( cbm80 )		/* CBM 80xx (Basic 4, CRTC 50Hz, 80 columns)		*/
+	DRIVER( cbm80ger )	/* CBM 80xx (Germany, Basic 4, CRTC 50Hz, 80 cols)	*/
+	DRIVER( cbm80hun )	/* CBM 80xx (Hungary, Basic 4, CRTC 50Hz, 80 cols)	*/
+	DRIVER( cbm80swe )	/* CBM 80xx (Sweden, Basic 4, CRTC 50Hz, 80 cols)	*/
+	DRIVER( cbm8296 )	/* CBM 8296 (Basic 4, CRTC 50Hz, 80 columns)		*/
+	DRIVER( cbm8296d )	/* CBM 8296D										*/
+	DRIVER( superpet )	/* SuperPET											*/
+	DRIVER( sp9000 )	/* CBM SP9000 / MiniMainFrame 9000					*/
+	DRIVER( mmf9000s )	/* MiniMainFrame 9000 (Sweden)						*/
 
-//128u4	DRIVER( vic1001 )	/* Commodore VIC-1001 (Japan)						*/
-//128u4	DRIVER( vic20 )		/* Commodore VIC 20 (NTSC)							*/
-//128u4	DRIVER( vic20cr )	/* Commodore VIC 20CR (NTSC)						*/
-//128u4	DRIVER( vic20i )	/* Commodore VIC 20 (NTSC, IEEE488 Interface)		*/
-//128u4	DRIVER( vic20v )	/* Commodore VIC 20 (NTSC, VC1540)					*/
-//128u4	DRIVER( vic20pal )	/* Commodore VIC 20 (PAL)							*/
-//128u4	DRIVER( vic20crp )	/* Commodore VIC 20CR (PAL)							*/
-//128u4	DRIVER( vic20plv )	/* Commodore VIC 20 (PAL, VC1541)					*/
-//128u4	DRIVER( vc20 )		/* Commodore VIC 20 (PAL, Germany)					*/
-//128u4	DRIVER( vc20v )		/* Commodore VIC 20 (PAL, VC1541)					*/
-//128u4	DRIVER( vic20swe )	/* Commodore VIC 20 (Swedish Expanson Kit)			*/
+	DRIVER( vic1001 )	/* Commodore VIC-1001 (Japan)						*/
+	DRIVER( vic20 )		/* Commodore VIC 20 (NTSC)							*/
+	DRIVER( vic20cr )	/* Commodore VIC 20CR (NTSC)						*/
+	DRIVER( vic20i )	/* Commodore VIC 20 (NTSC, IEEE488 Interface)		*/
+	DRIVER( vic20v )	/* Commodore VIC 20 (NTSC, VC1540)					*/
+	DRIVER( vic20pal )	/* Commodore VIC 20 (PAL)							*/
+	DRIVER( vic20crp )	/* Commodore VIC 20CR (PAL)							*/
+	DRIVER( vic20plv )	/* Commodore VIC 20 (PAL, VC1541)					*/
+	DRIVER( vc20 )		/* Commodore VIC 20 (PAL, Germany)					*/
+	DRIVER( vc20v )		/* Commodore VIC 20 (PAL, VC1541)					*/
+	DRIVER( vic20swe )	/* Commodore VIC 20 (Swedish Expanson Kit)			*/
 
-//128u4	DRIVER( max )		/* Commodore Max Machine (Japan)					*/
-//128u4	DRIVER( c64 )		/* Commodore 64 (NTSC)								*/
-//128u4	DRIVER( c64pal )	/* Commodore 64 (PAL)								*/
-//128u4	DRIVER( c64jpn )	/* Commodore 64 (Japan)								*/
-//128u4	DRIVER( c64swe )	/* Commodore 64 (Sweden)							*/
-//128u4	DRIVER( vic64s )	/* Commodore VIC 64S (Sweden)						*/
-//128u4	DRIVER( pet64 )		/* Commodore PET 64									*/
-//128u4	DRIVER( cbm4064 )	/* Commodore CBM 4064								*/
-//128u4	DRIVER( edu64 )		/* Commodore Educator 64							*/
-//128u4	DRIVER( sx64 )		/* Commodore SX-64 Executive Machine (PAL)			*/
-//128u4	DRIVER( vip64 )		/* Commodore VIP64 (SX64, PAL, Swedish)				*/
-//	DRIVER( dx64 )		/* Commodore DX-64 - Prototype						*/
-//128u4	DRIVER( c64c )		/* Commodore 64C (NTSC)								*/
-//128u4	DRIVER( c64cpal )	/* Commodore 64C (PAL)								*/
-//128u4	DRIVER( c64g )		/* Commodore 64G (PAL)								*/
-//128u4	DRIVER( c64gs )		/* Commodore 64 Games System						*/
+	DRIVER( max )		/* Commodore Max Machine (Japan)					*/
+	DRIVER( c64 )		/* Commodore 64 (NTSC)								*/
+	DRIVER( c64pal )	/* Commodore 64 (PAL)								*/
+	DRIVER( c64jpn )	/* Commodore 64 (Japan)								*/
+	DRIVER( c64swe )	/* Commodore 64 (Sweden)							*/
+	DRIVER( vic64s )	/* Commodore VIC 64S (Sweden)						*/
+	DRIVER( pet64 )		/* Commodore PET 64									*/
+	DRIVER( cbm4064 )	/* Commodore CBM 4064								*/
+	DRIVER( edu64 )		/* Commodore Educator 64							*/
+	DRIVER( sx64 )		/* Commodore SX-64 Executive Machine (PAL)			*/
+	DRIVER( vip64 )		/* Commodore VIP64 (SX64, PAL, Swedish)				*/
+	DRIVER( dx64 )		/* Commodore DX-64 - Prototype						*/
+	DRIVER( c64c )		/* Commodore 64C (NTSC)								*/
+	DRIVER( c64cpal )	/* Commodore 64C (PAL)								*/
+	DRIVER( c64g )		/* Commodore 64G (PAL)								*/
+	DRIVER( c64gs )		/* Commodore 64 Games System						*/
 
-//128u4	DRIVER( b500 )		/* Commodore B500									*/
-//128u4	DRIVER( b128 )		/* Commodore B128									*/
-//128u4	DRIVER( b256 )		/* Commodore B256									*/
-//128u4	DRIVER( cbm610 )	/* Commodore CBM 610								*/
-//128u4	DRIVER( cbm620 )	/* Commodore CBM 620								*/
-//128u4	DRIVER( cbm620hu )	/* Commodore CBM 620 (Hungary)						*/
-//128u4	DRIVER( b128hp )	/* Commodore B128HP									*/
-//128u4	DRIVER( b256hp )	/* Commodore B256HP									*/
-//128u4	DRIVER( bx256hp )	/* Commodore BX256HP								*/
-//128u4	DRIVER( cbm710 )	/* Commodore CBM 710								*/
-//128u4	DRIVER( cbm720 )	/* Commodore CBM 720								*/
-//128u4	DRIVER( cbm720se )	/* Commodore CBM 720 (Sweden / Finland)				*/
-//128u4	DRIVER( p500 )		/* Commodore P500 (proto, a.k.a. C128-40, PET-II)	*/
+	DRIVER( b500 )		/* Commodore B500									*/
+	DRIVER( b128 )		/* Commodore B128									*/
+	DRIVER( b256 )		/* Commodore B256									*/
+	DRIVER( cbm610 )	/* Commodore CBM 610								*/
+	DRIVER( cbm620 )	/* Commodore CBM 620								*/
+	DRIVER( cbm620hu )	/* Commodore CBM 620 (Hungary)						*/
+	DRIVER( b128hp )	/* Commodore B128HP									*/
+	DRIVER( b256hp )	/* Commodore B256HP									*/
+	DRIVER( bx256hp )	/* Commodore BX256HP								*/
+	DRIVER( cbm710 )	/* Commodore CBM 710								*/
+	DRIVER( cbm720 )	/* Commodore CBM 720								*/
+	DRIVER( cbm720se )	/* Commodore CBM 720 (Sweden / Finland)				*/
+	DRIVER( p500 )		/* Commodore P500 (proto, a.k.a. C128-40, PET-II)	*/
 
-//128u4	DRIVER( c16 )		/* Commodore 16										*/
-//128u4	DRIVER( c16c )		/* Commodore 16  c1551								*/
-//128u4	DRIVER( c16v )		/* Commodore 16  vc1541								*/
-//128u4	DRIVER( c16hun )	/* Commodore 16 Novotrade (Hungarian Character Set)	*/
-//128u4	DRIVER( c116 )		/* Commodore 116									*/
-//128u4	DRIVER( c116c )		/* Commodore 116  c1551								*/
-//128u4	DRIVER( c116v )		/* Commodore 116  vc1541							*/
-//128u4	DRIVER( plus4 )		/* Commodore +4										*/
-//128u4	DRIVER( plus4c )	/* Commodore +4  c1551								*/
-//128u4	DRIVER( plus4v )	/* Commodore +4  vc1541								*/
-//128u4	DRIVER( c232 )		/* Commodore 232 - Prototype						*/
-//128u4	DRIVER( c264 )		/* Commodore 264 - Prototype						*/
-//128u4	DRIVER( c364 )		/* Commodore V364 - Prototype						*/
+	DRIVER( c16 )		/* Commodore 16										*/
+	DRIVER( c16c )		/* Commodore 16  c1551								*/
+	DRIVER( c16v )		/* Commodore 16  vc1541								*/
+	DRIVER( c16hun )	/* Commodore 16 Novotrade (Hungarian Character Set)	*/
+	DRIVER( c116 )		/* Commodore 116									*/
+	DRIVER( c116c )		/* Commodore 116  c1551								*/
+	DRIVER( c116v )		/* Commodore 116  vc1541							*/
+	DRIVER( plus4 )		/* Commodore +4										*/
+	DRIVER( plus4c )	/* Commodore +4  c1551								*/
+	DRIVER( plus4v )	/* Commodore +4  vc1541								*/
+	DRIVER( c232 )		/* Commodore 232 - Prototype						*/
+	DRIVER( c264 )		/* Commodore 264 - Prototype						*/
+	DRIVER( c364 )		/* Commodore V364 - Prototype						*/
 
-//128u4	DRIVER( c128 )		/* Commodore 128 - NTSC								*/
-//128u4	DRIVER( c128cr )	/* Commodore 128CR - NTSC (proto?)					*/
-//128u4	DRIVER( c128fin )	/* Commodore 128 - PAL (Finnish)					*/
-//128u4	DRIVER( c128fra )	/* Commodore 128 - PAL (French)						*/
-//128u4	DRIVER( c128ger )	/* Commodore 128 - PAL (German)						*/
-//128u4	DRIVER( c128nor )	/* Commodore 128 - PAL (Norwegian)					*/
-//128u4	DRIVER( c128d )		/* Commodore 128D - PAL								*/
-//128u4	DRIVER( c128dpr )	/* Commodore 128D - NTSC (proto)					*/
-//128u4	DRIVER( c128dcr )	/* Commodore 128DCR - NTSC							*/
-//128u4	DRIVER( c128drde )	/* Commodore 128DCR - PAL (German)					*/
-//128u4	DRIVER( c128drit )	/* Commodore 128DCR - PAL (Italian)					*/
-//128u4	DRIVER( c128drsw )	/* Commodore 128DCR - PAL (Swedish)					*/
+	DRIVER( c128 )		/* Commodore 128 - NTSC								*/
+	DRIVER( c128cr )	/* Commodore 128CR - NTSC (proto?)					*/
+	DRIVER( c128fin )	/* Commodore 128 - PAL (Finnish)					*/
+	DRIVER( c128fra )	/* Commodore 128 - PAL (French)						*/
+	DRIVER( c128ger )	/* Commodore 128 - PAL (German)						*/
+	DRIVER( c128nor )	/* Commodore 128 - PAL (Norwegian)					*/
+	DRIVER( c128d )		/* Commodore 128D - PAL								*/
+	DRIVER( c128dpr )	/* Commodore 128D - NTSC (proto)					*/
+	DRIVER( c128dcr )	/* Commodore 128DCR - NTSC							*/
+	DRIVER( c128drde )	/* Commodore 128DCR - PAL (German)					*/
+	DRIVER( c128drit )	/* Commodore 128DCR - PAL (Italian)					*/
+	DRIVER( c128drsw )	/* Commodore 128DCR - PAL (Swedish)					*/
 
 	DRIVER( a500n )		/* Commodore Amiga 500 - NTSC						*/
 	DRIVER( a500p )		/* Commodore Amiga 500 - PAL						*/
@@ -411,8 +411,8 @@ XL/XE 16kB OS roms
 	DRIVER( a1000p )	/* Commodore Amiga 1000 - PAL						*/
 	DRIVER( cdtv )
 
-//128u4	DRIVER( c65 )		/* 1991 C65 / C64DX (Prototype, NTSC)				*/
-//128u4	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
+	DRIVER( c65 )		/* 1991 C65 / C64DX (Prototype, NTSC)				*/
+	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
 
 	/* IBM PC & Clones */
 //128u4	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/

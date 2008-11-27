@@ -29,6 +29,8 @@
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 
+#include "deprecat.h"
+
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
 	{ \
@@ -79,7 +81,7 @@ static void vc20_via0_irq (running_machine *machine, int level)
 
 static READ8_HANDLER( vc20_via0_read_ca1 )
 {
-	return !( input_port_read(machine, "SPECIAL") & 0x02 );
+	return !( input_port_read(space->machine, "SPECIAL") & 0x02 );
 }
 
 static READ8_HANDLER( vc20_via0_read_ca2 )
@@ -94,12 +96,12 @@ static WRITE8_HANDLER( vc20_via0_write_ca2 )
 
 	if(via0_ca2)
 	{
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	}
 	else
 	{
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette_timer, attotime_never);
 	}
 }
@@ -108,18 +110,18 @@ static  READ8_HANDLER( vc20_via0_read_porta )
 {
 	UINT8 value = 0xff;
 
-	value &= ~(input_port_read(machine, "JOY") & 0x3c);
+	value &= ~(input_port_read(space->machine, "JOY") & 0x3c);
 
 	/* to short to be recognized normally */
 	/* should be reduced to about 1 or 2 microseconds */
-	/*  if ((input_port_read(machine, "CTRLSEL") & 0x20 ) && (input_port_read(machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
+	/*  if ((input_port_read(space->machine, "CTRLSEL") & 0x20 ) && (input_port_read(space->machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
 		value &= ~0x20; */
 	if (!serial_clock || !cbm_serial_clock_read ())
 		value &= ~0x01;
 	if (!serial_data || !cbm_serial_data_read ())
 		value &= ~0x02;
 
-	if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		value &= ~0x40;
 	else
 		value |=  0x40;
@@ -182,7 +184,7 @@ static READ8_HANDLER( vc20_via1_read_porta )
 
 static  READ8_HANDLER( vc20_via1_read_ca1 )
 {
-	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
 	return data;
 }
 
@@ -307,7 +309,7 @@ static  READ8_HANDLER( vc20_via1_read_portb )
 		value &= t;
     }
 
-	value &= ~(input_port_read(machine, "JOY") & 0x80);
+	value &= ~(input_port_read(space->machine, "JOY") & 0x80);
 
 	return value;
 }
@@ -321,7 +323,7 @@ static WRITE8_HANDLER( vc20_via1_write_porta )
 static WRITE8_HANDLER( vc20_via1_write_portb )
 {
 /*  logerror("via1_write_portb: $%02X\n", data); */
-	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 	via1_portb = data;
 }
 
@@ -475,7 +477,7 @@ int vic6560_dma_read_color (int offset)
 int vic6560_dma_read (int offset)
 {
 	/* should read real system bus between 0x9000 and 0xa000 */
-	return memory_read_byte(space, VIC6560ADDR2VC20ADDR (offset));
+	return memory_read_byte(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), VIC6560ADDR2VC20ADDR (offset));
 }
 
 WRITE8_HANDLER( vc20_0400_w ) 
@@ -552,7 +554,7 @@ static void vc20_memory_init(running_machine *machine)
 static TIMER_CALLBACK( vic20_tape_timer )
 {
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
-	via_1_ca1_w(machine, 0, data);
+	via_1_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
 static void vc20_common_driver_init (running_machine *machine)
@@ -634,14 +636,14 @@ MACHINE_RESET( vic20 )
 	}
 
 	via_reset ();
-	via_0_ca1_w(machine, 0, vc20_via0_read_ca1(machine, 0));
+	via_0_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, vc20_via0_read_ca1(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0));
 
 	/* Set up memory banks */
-	memory_set_bankptr( 1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x0400 );
-	memory_set_bankptr( 2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x2000 ) );
-	memory_set_bankptr( 3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x4000 ) );
-	memory_set_bankptr( 4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x6000 ) );
-	memory_set_bankptr( 5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "main") + 0xa000 ) );
+	memory_set_bankptr (machine,  1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x0400 );
+	memory_set_bankptr (machine,  2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x2000 ) );
+	memory_set_bankptr (machine,  3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x4000 ) );
+	memory_set_bankptr (machine,  4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x6000 ) );
+	memory_set_bankptr (machine,  5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "main") + 0xa000 ) );
 }
 
 
@@ -661,20 +663,20 @@ static TIMER_CALLBACK( lightpen_tick )
 
 INTERRUPT_GEN( vic20_frame_interrupt )
 {
-	via_0_ca1_w(machine, 0, vc20_via0_read_ca1 (machine, 0));
-	keyboard[0] = input_port_read(machine, "ROW0");
-	keyboard[1] = input_port_read(machine, "ROW1");
-	keyboard[2] = input_port_read(machine, "ROW2");
-	keyboard[3] = input_port_read(machine, "ROW3");
-	keyboard[4] = input_port_read(machine, "ROW4");
-	keyboard[5] = input_port_read(machine, "ROW5");
-	keyboard[6] = input_port_read(machine, "ROW6");
-	keyboard[7] = input_port_read(machine, "ROW7");
+	via_0_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, vc20_via0_read_ca1 (cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0));
+	keyboard[0] = input_port_read(device->machine, "ROW0");
+	keyboard[1] = input_port_read(device->machine, "ROW1");
+	keyboard[2] = input_port_read(device->machine, "ROW2");
+	keyboard[3] = input_port_read(device->machine, "ROW3");
+	keyboard[4] = input_port_read(device->machine, "ROW4");
+	keyboard[5] = input_port_read(device->machine, "ROW5");
+	keyboard[6] = input_port_read(device->machine, "ROW6");
+	keyboard[7] = input_port_read(device->machine, "ROW7");
 
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
 	timer_set(attotime_zero, NULL, 0, lightpen_tick);
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x01 ? 1 : 0);		/* Shift Lock */
+	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x01 ? 1 : 0);		/* Shift Lock */
 }
 
 

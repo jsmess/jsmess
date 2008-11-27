@@ -793,7 +793,7 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 		}
 	}
 
-	if (is_c65(Machine))
+	if (is_c65(machine))
 	{
 		// NPW 8-Feb-2004 - Don't know why I have to do this
 		//c65_bankswitch(machine);
@@ -1088,7 +1088,7 @@ void c64_common_init_machine (running_machine *machine)
 	vicirq = 0;
 }
 
-static DIRECT_UPDATE_HANDLER( c64_opbase ) 
+static DIRECT_UPDATE_HANDLER( c64_direct ) 
 {
 	if ((address & 0xf000) == 0xd000) 
 	{
@@ -1127,7 +1127,7 @@ MACHINE_START( c64 )
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
 
-	memory_set_direct_update_handler( 0, c64_opbase );
+	memory_set_direct_update_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), c64_direct );
 }
 
 
@@ -1147,36 +1147,35 @@ static TIMER_CALLBACK( lightpen_tick )
 
 INTERRUPT_GEN( c64_frame_interrupt )
 {
-	running_machine *machine = Machine;
 	static int monitor = -1;
 	int value, i;
-	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
+	int controller1 = input_port_read(device->machine, "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(device->machine, "CTRLSEL") & 0x70;
 	static const char *c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 	static const char *c128ports[] = { "KP0", "KP1", "KP2" };
 
-	c64_nmi(machine);
+	c64_nmi(device->machine);
 
-	 if (is_c128(machine))
+	 if (is_c128(device->machine))
 	 {
-	 	if ((input_port_read(machine, "SPECIAL") & 0x08) != monitor)
+	 	if ((input_port_read(device->machine, "SPECIAL") & 0x08) != monitor)
 		{
-			if (input_port_read(machine, "SPECIAL") & 0x08)
+			if (input_port_read(device->machine, "SPECIAL") & 0x08)
 			{
 				vic2_set_rastering(0);
 				vdc8563_set_rastering(1);
-				video_screen_set_visarea(machine->primary_screen, 0, 655, 0, 215);
+				video_screen_set_visarea(device->machine->primary_screen, 0, 655, 0, 215);
 			}
 			else
 			{
 				vic2_set_rastering(1);
 				vdc8563_set_rastering(0);
 				if (c64_pal)
-					video_screen_set_visarea(machine->primary_screen, VIC6569_STARTVISIBLECOLUMNS, VIC6569_STARTVISIBLECOLUMNS + VIC6569_VISIBLECOLUMNS - 1, VIC6569_STARTVISIBLELINES, VIC6569_STARTVISIBLELINES + VIC6569_VISIBLELINES - 1);
+					video_screen_set_visarea(device->machine->primary_screen, VIC6569_STARTVISIBLECOLUMNS, VIC6569_STARTVISIBLECOLUMNS + VIC6569_VISIBLECOLUMNS - 1, VIC6569_STARTVISIBLELINES, VIC6569_STARTVISIBLELINES + VIC6569_VISIBLELINES - 1);
 				else
-					video_screen_set_visarea(machine->primary_screen, VIC6567_STARTVISIBLECOLUMNS, VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1);
+					video_screen_set_visarea(device->machine->primary_screen, VIC6567_STARTVISIBLECOLUMNS, VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1);
 			}
-			monitor = input_port_read(machine, "SPECIAL") & 0x08;
+			monitor = input_port_read(device->machine, "SPECIAL") & 0x08;
 		}
 	}
 
@@ -1184,10 +1183,10 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	for (i = 0; i < 8; i++)
 	{
 		value = 0xff;
-		value &= ~input_port_read(machine, c64ports[i]);
+		value &= ~input_port_read(device->machine, c64ports[i]);
 
 		/* Shift Lock is mapped on Left Shift */
-		if ((i == 1) && (input_port_read(machine, "SPECIAL") & 0x40) && !is_c128(machine))	// Fix Me! Currently, neither left Shift nor Shift Lock works in c128, but reading this in c128 produces a bug!
+		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x40) && !is_c128(device->machine))	// Fix Me! Currently, neither left Shift nor Shift Lock works in c128, but reading this in c128 produces a bug!
 			value &= ~0x80;			
 
 		c64_keyline[i] = value;
@@ -1198,30 +1197,30 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	switch(controller1)
 	{
 		case 0x00:
-			value &= ~input_port_read(machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
+			value &= ~input_port_read(device->machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
 			break;
 		
 		case 0x01:
-			if (input_port_read(machine, "OTHER") & 0x40)			/* Paddle2 Button */
+			if (input_port_read(device->machine, "OTHER") & 0x40)			/* Paddle2 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "OTHER") & 0x80)			/* Paddle1 Button */
+			if (input_port_read(device->machine, "OTHER") & 0x80)			/* Paddle1 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x02:
-			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
+			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
+			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 			
 		case 0x03:
-			value &= ~(input_port_read(machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
+			value &= ~(input_port_read(device->machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
 			break;
 		
 		case 0x04:
 /* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
 //				value &= ?? ;
 			break;
 
@@ -1240,30 +1239,30 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	switch(controller2)
 	{
 		case 0x00:
-			value &= ~input_port_read(machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
+			value &= ~input_port_read(device->machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
 			break;
 		
 		case 0x10:
-			if (input_port_read(machine, "OTHER") & 0x10)			/* Paddle4 Button */
+			if (input_port_read(device->machine, "OTHER") & 0x10)			/* Paddle4 Button */
 				value &= ~0x08;
-			if (input_port_read(machine, "OTHER") & 0x20)			/* Paddle3 Button */
+			if (input_port_read(device->machine, "OTHER") & 0x20)			/* Paddle3 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x20:
-			if (input_port_read(machine, "OTHER") & 0x02)			/* Mouse Button Left */
+			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
 				value &= ~0x10;
-			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
+			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
 		
 		case 0x30:
-			value &= ~(input_port_read(machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
+			value &= ~(input_port_read(device->machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x40:
 /* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
 //				value &= ?? ;
 			break;
 
@@ -1278,33 +1277,33 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	c64_keyline[9] = value;
 
 	/* C128 only : keypad input ports */
-	if (is_c128(machine)) 
+	if (is_c128(device->machine)) 
 	{
 		for (i = 0; i < 3; i++)
 		{
 			value = 0xff;
-			value &= ~input_port_read(machine, c128ports[i]);
+			value &= ~input_port_read(device->machine, c128ports[i]);
 			c128_keyline[i] = value;
 		}
 	}
 
 	/* C65 only : function keys input ports */
-	if (is_c65(machine)) 
+	if (is_c65(device->machine)) 
 	{
 		value = 0xff;
 
-		value &= ~input_port_read(machine, "FUNCT");
+		value &= ~input_port_read(device->machine, "FUNCT");
 		c65_keyline = value;
 	}
 
 // vic2_frame_interrupt does nothing so this is not necessary
-//	vic2_frame_interrupt (machine, cpunum);
+//	vic2_frame_interrupt (device);
 
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
 	timer_set(attotime_zero, NULL, 0, lightpen_tick);
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
-	set_led_status (0, input_port_read(machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */ 
+	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
+	set_led_status (0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */ 
 }
 
 

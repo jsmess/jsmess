@@ -453,7 +453,8 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 	c64_keyline[9] = value;
 #endif
 
-	vic2_frame_interrupt (machine, 0);
+// 128u4 FIXME
+//	vic2_frame_interrupt (device);
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
 }

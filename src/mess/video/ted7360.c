@@ -503,8 +503,8 @@ static int lines;
 static int timer1_active, timer2_active, timer3_active;
 static emu_timer *timer1, *timer2, *timer3;
 static int cursor1 = FALSE;
-static read8_machine_func vic_dma_read;
-static read8_machine_func vic_dma_read_rom;
+static read8_space_func vic_dma_read;
+static read8_space_func vic_dma_read_rom;
 static int chargenaddr, bitmapaddr, videoaddr;
 
 static int x_begin, x_end;
@@ -547,8 +547,8 @@ void ted7360_init (int pal)
 	timer3 = timer_alloc(ted7360_timer_timeout, NULL);
 }
 
-void ted7360_set_dma (read8_machine_func dma_read,
-					  read8_machine_func dma_read_rom)
+void ted7360_set_dma (read8_space_func dma_read,
+					  read8_space_func dma_read_rom)
 {
 	vic_dma_read = dma_read;
 	vic_dma_read_rom = dma_read_rom;
@@ -643,7 +643,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x10:
 	case 0x11:
 	case 0x12:
-		ted7360_soundport_w (machine, offset, data);
+		ted7360_soundport_w (space->machine, offset, data);
 		break;
 	}
 	switch (offset)
@@ -693,7 +693,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 6:
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			if (LINES25)
 			{
@@ -711,7 +711,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 7:
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			if (COLUMNS40)
 			{
@@ -733,13 +733,13 @@ WRITE8_HANDLER ( ted7360_port_w )
 		break;
 	case 9:
 		if (data & 8)
-			ted7360_clear_interrupt (machine, 8);
+			ted7360_clear_interrupt (space->machine, 8);
 		if (data & 0x10)
-			ted7360_clear_interrupt (machine, 0x10);
+			ted7360_clear_interrupt (space->machine, 0x10);
 		if (data & 0x40)
-			ted7360_clear_interrupt (machine, 0x40);
+			ted7360_clear_interrupt (space->machine, 0x40);
 		if (data & 2)
-			ted7360_clear_interrupt (machine, 2);
+			ted7360_clear_interrupt (space->machine, 2);
 		break;
 	case 0xa:
 		old = data;
@@ -747,7 +747,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 #if 0
 		ted7360[9] = (ted7360[9] & 0xa1) | (ted7360[9] & data & 0x5e);
 		if (ted7360[9] & 0x80)
-			ted7360_clear_interrupt (machine, 0);
+			ted7360_clear_interrupt (space->machine, 0);
 #endif
 		if ((data ^ old) & 1)
 		{
@@ -757,7 +757,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0xb:
 		if (data != ted7360[offset])
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			/*  DBG_LOG(1,"set rasterline lo",("soll:%d\n",RASTERLINE)); */
 		}
@@ -766,14 +766,14 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0xd:
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 		}
 		break;
 	case 0x12:
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			bitmapaddr = BITMAPADDR;
 			chargenaddr = CHARGENADDR;
@@ -784,7 +784,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x13:
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			chargenaddr = CHARGENADDR;
 			DBG_LOG (3, "ted7360_port_w", ("chargen %.4x %s %d\n",
@@ -795,7 +795,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x14:
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			videoaddr = VIDEOADDR;
 			DBG_LOG (3, "ted7360_port_w", ("videoram %.4x\n",
@@ -805,7 +805,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x15:						   /* backgroundcolor */
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			monoinversed[1] = mono[0] = bitmapmulti[0] = multi[0] = colors[0] =
 				BACKGROUNDCOLOR;
@@ -814,7 +814,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x16:						   /* foregroundcolor */
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			bitmapmulti[3] = multi[1] = colors[1] = FOREGROUNDCOLOR;
 		}
@@ -822,7 +822,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x17:						   /* multicolor 1 */
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			multi[2] = colors[2] = MULTICOLOR1;
 		}
@@ -830,7 +830,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x18:						   /* multicolor 2 */
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			colors[3] = MULTICOLOR2;
 		}
@@ -838,7 +838,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 	case 0x19:						   /* framecolor */
 		if (ted7360[offset] != data)
 		{
-			ted7360_drawlines (machine, lastline, rasterline);
+			ted7360_drawlines (space->machine, lastline, rasterline);
 			ted7360[offset] = data;
 			colors[4] = FRAMECOLOR;
 		}
@@ -923,11 +923,11 @@ WRITE8_HANDLER ( ted7360_port_w )
 			val |= 1;
 		break;
 	case 0x1c:						   /*rasterline */
-		ted7360_drawlines (machine, lastline, rasterline);
+		ted7360_drawlines (space->machine, lastline, rasterline);
 		val = ((RASTERLINE_2_C16 (rasterline) & 0x100) >> 8) | 0xfe;	/* expected by matrix */
 		break;
 	case 0x1d:						   /*rasterline */
-		ted7360_drawlines (machine, lastline, rasterline);
+		ted7360_drawlines (space->machine, lastline, rasterline);
 		val = RASTERLINE_2_C16 (rasterline) & 0xff;
 		break;
 	case 0x1e:						   /*rastercolumn */
@@ -978,9 +978,9 @@ static void ted7360_draw_character (running_machine *machine, int ybegin, int ye
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = vic_dma_read_rom (machine, chargenaddr + ch * 8 + y);
+			code = vic_dma_read_rom (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		else
-			code = vic_dma_read (machine, chargenaddr + ch * 8 + y);
+			code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) = color[code >> 7];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = color[(code >> 6) & 1];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) = color[(code >> 5) & 1];
@@ -1000,9 +1000,9 @@ static void ted7360_draw_character_multi (running_machine *machine, int ybegin, 
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = vic_dma_read_rom (machine, chargenaddr + ch * 8 + y);
+			code = vic_dma_read_rom (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		else
-			code = vic_dma_read (machine, chargenaddr + ch * 8 + y);
+			code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) =
 			*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = multi[code >> 6];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) =
@@ -1021,7 +1021,7 @@ static void ted7360_draw_bitmap (running_machine *machine, int ybegin, int yend,
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read (machine, bitmapaddr + ch * 8 + y);
+		code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), bitmapaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) = c16_bitmap[code >> 7];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = c16_bitmap[(code >> 6) & 1];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) = c16_bitmap[(code >> 5) & 1];
@@ -1040,7 +1040,7 @@ static void ted7360_draw_bitmap_multi (running_machine *machine, int ybegin, int
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read (machine, bitmapaddr + ch * 8 + y);
+		code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), bitmapaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) =
 			*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = bitmapmulti[code >> 6];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) =
@@ -1129,8 +1129,8 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 		{
 			if (HIRESON)
 			{
-				ch = vic_dma_read (machine, (videoaddr | 0x400) + offs);
-				attr = vic_dma_read (machine, ((videoaddr) + offs));
+				ch = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), (videoaddr | 0x400) + offs);
+				attr = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), ((videoaddr) + offs));
 				c1 = ((ch >> 4) & 0xf) | (attr << 4);
 				c2 = (ch & 0xf) | (attr & 0x70);
 				bitmapmulti[1] = c16_bitmap[1] = c1 & 0x7f;
@@ -1146,8 +1146,8 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 			}
 			else
 			{
-				ch = vic_dma_read (machine, (videoaddr | 0x400) + offs);
-				attr = vic_dma_read (machine, ((videoaddr) + offs));
+				ch = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), (videoaddr | 0x400) + offs);
+				attr = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), ((videoaddr) + offs));
 				// levente harsfalvi's docu says cursor off in ecm and multicolor
 				if (ECMON)
 				{
@@ -1226,13 +1226,13 @@ INTERRUPT_GEN( ted7360_raster_interrupt )
 	if (rasterline >= lines)
 	{
 		rasterline = 0;
-		ted7360_drawlines (machine, lastline, TED7360_LINES);
+		ted7360_drawlines (device->machine, lastline, TED7360_LINES);
 		lastline = 0;
 	}
 	if (rasterline == C16_2_RASTERLINE (RASTERLINE))
 	{
-		ted7360_drawlines (machine, lastline, rasterline);
-		ted7360_set_interrupt (machine, 2);
+		ted7360_drawlines (device->machine, lastline, rasterline);
+		ted7360_set_interrupt (device->machine, 2);
 	}
 }
 

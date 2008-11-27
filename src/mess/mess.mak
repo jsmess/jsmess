@@ -381,6 +381,7 @@ DRVLIBS = \
 	$(MESSOBJ)/avigo.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bk.a \
+	$(MESSOBJ)/cbm.a \
 	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/coleco.a \
 	$(MESSOBJ)/dai.a \
@@ -432,7 +433,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/bandai.a \
 #	$(MESSOBJ)/be.a \
 #	$(MESSOBJ)/bondwell.a \
-#	$(MESSOBJ)/cbm.a \
 #	$(MESSOBJ)/cgenie.a \
 #	$(MESSOBJ)/coco.a \
 #	$(MESSOBJ)/compis.a \
@@ -630,9 +630,9 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MESS_DRIVERS)/pokemini.o	\
 
 $(MESSOBJ)/amiga.a: \
-	$(MAME_VIDEO)/amiga.o			\
-	$(MAME_MACHINE)/amiga.o			\
-	$(MAME_AUDIO)/amiga.o			\
+	$(MAME_VIDEO)/amiga.o		\
+	$(MAME_MACHINE)/amiga.o		\
+	$(MAME_AUDIO)/amiga.o		\
 	$(MESS_MACHINE)/amigafdc.o	\
 	$(MESS_MACHINE)/amigacrt.o	\
 	$(MESS_MACHINE)/amigacd.o	\
@@ -651,6 +651,8 @@ $(MESSOBJ)/cbmshare.a: \
 	$(MESS_MACHINE)/cbmipt.o   	\
 	$(MESS_MACHINE)/c64.o    	\
 	$(MESS_MACHINE)/c65.o		\
+	$(MESS_MACHINE)/c128.o		\
+	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o
 
 $(MESSOBJ)/cbm.a: \
@@ -668,9 +670,7 @@ $(MESSOBJ)/cbm.a: \
 	$(MESS_MACHINE)/cbmb.o		\
 	$(MESS_VIDEO)/cbmb.o		\
 	$(MESS_DRIVERS)/c65.o		\
-	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_DRIVERS)/c128.o		\
-	$(MESS_MACHINE)/c128.o		\
 	$(MESS_AUDIO)/vic6560.o		\
 	$(MESS_VIDEO)/ted7360.o		\
 	$(MESS_VIDEO)/vic6560.o  
