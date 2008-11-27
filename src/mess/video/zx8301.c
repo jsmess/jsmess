@@ -105,7 +105,7 @@ READ8_DEVICE_HANDLER( zx8301_ram_r )
 
 	if (zx8301->vda)
 	{
-		cpu_spinuntil_time(video_screen_get_time_until_pos(zx8301->screen, 256, 0));
+		cpu_spinuntil_time(device->machine->cpu[0],video_screen_get_time_until_pos(zx8301->screen, 256, 0));
 	}
 
 	return zx8301->intf->ram_r(device, offset);
@@ -119,7 +119,7 @@ WRITE8_DEVICE_HANDLER( zx8301_ram_w )
 
 	if (zx8301->vda)
 	{
-		cpu_spinuntil_time(video_screen_get_time_until_pos(zx8301->screen, 256, 0));
+		cpu_spinuntil_time(device->machine->cpu[0],video_screen_get_time_until_pos(zx8301->screen, 256, 0));
 	}
 
 	zx8301->intf->ram_w(device, offset, data);
@@ -231,8 +231,6 @@ void zx8301_update(const device_config *device, bitmap_t *bitmap, const rectangl
 static DEVICE_START( zx8301 )
 {
 	zx8301_t *zx8301 = get_safe_token(device);
-	char unique_tag[30];
-
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
@@ -261,14 +259,12 @@ static DEVICE_START( zx8301 )
 	timer_adjust_periodic(zx8301->flash_timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "zx8301", device->tag);
-
-	state_save_register_item(unique_tag, 0, zx8301->dispoff);
-	state_save_register_item(unique_tag, 0, zx8301->mode8);
-	state_save_register_item(unique_tag, 0, zx8301->base);
-	state_save_register_item(unique_tag, 0, zx8301->flash);
-	state_save_register_item(unique_tag, 0, zx8301->vsync);
-	state_save_register_item(unique_tag, 0, zx8301->vda);
+	state_save_register_item("zx8301",NULL , 0, zx8301->dispoff);
+	state_save_register_item("zx8301",NULL , 0, zx8301->mode8);
+	state_save_register_item("zx8301",NULL , 0, zx8301->base);
+	state_save_register_item("zx8301",NULL , 0, zx8301->flash);
+	state_save_register_item("zx8301",NULL , 0, zx8301->vsync);
+	state_save_register_item("zx8301",NULL , 0, zx8301->vda);
 	return DEVICE_START_OK;
 }
 

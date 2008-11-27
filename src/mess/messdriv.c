@@ -484,15 +484,15 @@ XL/XE 16kB OS roms
 	DRIVER( scorpion )
 	DRIVER( pentagon )
 
-//128u4	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
-//128u4	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
-//128u4	DRIVER( ql_es )		/* 1984 Sinclair QL	(Spain)							*/
-//128u4	DRIVER( ql_fr )		/* 1984 Sinclair QL	(France)						*/
-//128u4	DRIVER( ql_de )		/* 1984 Sinclair QL	(Germany)						*/
-//128u4	DRIVER( ql_it )		/* 1984 Sinclair QL	(Italy)							*/
-//128u4	DRIVER( ql_se )		/* 1984 Sinclair QL	(Sweden)						*/
-//128u4	DRIVER( ql_dk )		/* 1984 Sinclair QL	(Denmark)						*/
-//128u4	DRIVER( ql_gr )		/* 1984 Sinclair QL	(Greece)						*/
+	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
+	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
+	DRIVER( ql_es )		/* 1984 Sinclair QL	(Spain)							*/
+	DRIVER( ql_fr )		/* 1984 Sinclair QL	(France)						*/
+	DRIVER( ql_de )		/* 1984 Sinclair QL	(Germany)						*/
+	DRIVER( ql_it )		/* 1984 Sinclair QL	(Italy)							*/
+	DRIVER( ql_se )		/* 1984 Sinclair QL	(Sweden)						*/
+	DRIVER( ql_dk )		/* 1984 Sinclair QL	(Denmark)						*/
+	DRIVER( ql_gr )		/* 1984 Sinclair QL	(Greece)						*/
 //	DRIVER( tonto )
 //	DRIVER( megaopd )
 

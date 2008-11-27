@@ -568,7 +568,6 @@ void zx8302_vsync_w(const device_config *device, int level)
 static DEVICE_START( zx8302 )
 {
 	zx8302_t *zx8302 = get_safe_token(device);
-	char unique_tag[30];
 	int i;
 
 	/* validate arguments */
@@ -606,37 +605,36 @@ static DEVICE_START( zx8302 )
 	timer_adjust_periodic(zx8302->gap_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(31));
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "zx8302", device->tag);
 
-	state_save_register_item(unique_tag, 0, zx8302->idr);
-	state_save_register_item(unique_tag, 0, zx8302->tcr);
-	state_save_register_item(unique_tag, 0, zx8302->tdr);
-	state_save_register_item(unique_tag, 0, zx8302->irq);
-	state_save_register_item(unique_tag, 0, zx8302->ctr);
-	state_save_register_item(unique_tag, 0, zx8302->status);
+	state_save_register_item("zx8302",NULL , 0, zx8302->idr);
+	state_save_register_item("zx8302",NULL , 0, zx8302->tcr);
+	state_save_register_item("zx8302",NULL , 0, zx8302->tdr);
+	state_save_register_item("zx8302",NULL , 0, zx8302->irq);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ctr);
+	state_save_register_item("zx8302",NULL , 0, zx8302->status);
 
-	state_save_register_item(unique_tag, 0, zx8302->comdata);
-	state_save_register_item(unique_tag, 0, zx8302->comctl);
-	state_save_register_item(unique_tag, 0, zx8302->ipc_state);
-	state_save_register_item(unique_tag, 0, zx8302->ipc_rx);
-	state_save_register_item(unique_tag, 0, zx8302->ipc_busy);
-	state_save_register_item(unique_tag, 0, zx8302->baudx4);
+	state_save_register_item("zx8302",NULL , 0, zx8302->comdata);
+	state_save_register_item("zx8302",NULL , 0, zx8302->comctl);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ipc_state);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ipc_rx);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ipc_busy);
+	state_save_register_item("zx8302",NULL , 0, zx8302->baudx4);
 	
-	state_save_register_item(unique_tag, 0, zx8302->tx_bits);
-	state_save_register_item(unique_tag, 0, zx8302->ser1_rxd);
-	state_save_register_item(unique_tag, 0, zx8302->ser1_cts);
-	state_save_register_item(unique_tag, 0, zx8302->ser2_txd);
-	state_save_register_item(unique_tag, 0, zx8302->ser2_dtr);
-	state_save_register_item(unique_tag, 0, zx8302->netout);
-	state_save_register_item(unique_tag, 0, zx8302->netin);
+	state_save_register_item("zx8302",NULL , 0, zx8302->tx_bits);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ser1_rxd);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ser1_cts);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ser2_txd);
+	state_save_register_item("zx8302",NULL , 0, zx8302->ser2_dtr);
+	state_save_register_item("zx8302",NULL , 0, zx8302->netout);
+	state_save_register_item("zx8302",NULL , 0, zx8302->netin);
 
-	state_save_register_item(unique_tag, 0, zx8302->mdrdw);
-	state_save_register_item(unique_tag, 0, zx8302->mdselck);
-	state_save_register_item(unique_tag, 0, zx8302->mdseld);
-	state_save_register_item(unique_tag, 0, zx8302->erase);
+	state_save_register_item("zx8302",NULL , 0, zx8302->mdrdw);
+	state_save_register_item("zx8302",NULL , 0, zx8302->mdselck);
+	state_save_register_item("zx8302",NULL , 0, zx8302->mdseld);
+	state_save_register_item("zx8302",NULL , 0, zx8302->erase);
 	
-	state_save_register_item(unique_tag, 0, zx8302->mdv_motor);
-	state_save_register_item_array(unique_tag, 0, zx8302->mdv_offset);
+	state_save_register_item("zx8302",NULL , 0, zx8302->mdv_motor);
+	state_save_register_item_array("zx8302",NULL , 0, zx8302->mdv_offset);
 	return DEVICE_START_OK;
 }
 

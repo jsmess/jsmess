@@ -78,7 +78,7 @@ static WRITE8_HANDLER( ipc_w )
 {
 	// pulse COMCTL line
 
-	const device_config *zx8302 = device_list_find_by_tag(machine->config->devicelist, ZX8302, ZX8302_TAG);
+	const device_config *zx8302 = device_list_find_by_tag(space->machine->config->devicelist, ZX8302, ZX8302_TAG);
 
 	zx8302_comctl_w(zx8302, 0);
 	zx8302_comctl_w(zx8302, 1);
@@ -121,7 +121,7 @@ static WRITE8_HANDLER( ipc_port2_w )
 
     */
 
-	const device_config *zx8302 = device_list_find_by_tag(machine->config->devicelist, ZX8302, ZX8302_TAG);
+	const device_config *zx8302 = device_list_find_by_tag(space->machine->config->devicelist, ZX8302, ZX8302_TAG);
 
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);
 
@@ -130,28 +130,28 @@ static WRITE8_HANDLER( ipc_port2_w )
 		switch (ipl)
 		{
 		case 0:
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_2, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_5, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_7, HOLD_LINE);
 			break;
 
 		case 1:
 			// CTRL-ALT-7 pressed
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, HOLD_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_2, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_5, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_7, CLEAR_LINE);
 			break;
 
 		case 2:
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, HOLD_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_2, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_5, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_7, CLEAR_LINE);
 			break;
 
 		case 3:
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_7, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_2, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_5, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_7, CLEAR_LINE);
 			break;
 		}
 
@@ -187,7 +187,7 @@ static READ8_HANDLER( ipc_port2_r )
 
 	int irq = (ipc.ser2_rxd | ipc.ser1_txd);
 
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ0, irq);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ0, irq);
 
 	return (ipc.comdata << 7) | irq;
 }
@@ -216,14 +216,14 @@ static READ8_HANDLER( ipc_bus_r )
 
 	UINT8 data = 0;
 
-	if (BIT(ipc.keylatch, 0)) data |= input_port_read(machine, "ROW0") | input_port_read(machine, "JOY0");
-	if (BIT(ipc.keylatch, 1)) data |= input_port_read(machine, "ROW1") | input_port_read(machine, "JOY1");
-	if (BIT(ipc.keylatch, 2)) data |= input_port_read(machine, "ROW2");
-	if (BIT(ipc.keylatch, 3)) data |= input_port_read(machine, "ROW3");
-	if (BIT(ipc.keylatch, 4)) data |= input_port_read(machine, "ROW4");
-	if (BIT(ipc.keylatch, 5)) data |= input_port_read(machine, "ROW5");
-	if (BIT(ipc.keylatch, 6)) data |= input_port_read(machine, "ROW6");
-	if (BIT(ipc.keylatch, 7)) data |= input_port_read(machine, "ROW7");
+	if (BIT(ipc.keylatch, 0)) data |= input_port_read(space->machine, "ROW0") | input_port_read(space->machine, "JOY0");
+	if (BIT(ipc.keylatch, 1)) data |= input_port_read(space->machine, "ROW1") | input_port_read(space->machine, "JOY1");
+	if (BIT(ipc.keylatch, 2)) data |= input_port_read(space->machine, "ROW2");
+	if (BIT(ipc.keylatch, 3)) data |= input_port_read(space->machine, "ROW3");
+	if (BIT(ipc.keylatch, 4)) data |= input_port_read(space->machine, "ROW4");
+	if (BIT(ipc.keylatch, 5)) data |= input_port_read(space->machine, "ROW5");
+	if (BIT(ipc.keylatch, 6)) data |= input_port_read(space->machine, "ROW6");
+	if (BIT(ipc.keylatch, 7)) data |= input_port_read(space->machine, "ROW7");
 
 	return data;
 }
@@ -517,7 +517,7 @@ static ZX8301_INTERFACE( ql_zx8301_intf )
 
 static ZX8302_IRQ_CALLBACK( ql_irq_w )
 {
-	cpunum_set_input_line(device->machine, 0, MC68000_IRQ_2, state);
+	cpu_set_input_line(device->machine->cpu[0], M68K_IRQ_2, state);
 }
 
 static ZX8302_ON_BAUDX4_CHANGED( ql_baudx4_w )
@@ -867,7 +867,7 @@ static DEVICE_IMAGE_LOAD( ql_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0x00c000, 0x00ffff, 0, 0, SMH_BANK1, SMH_UNMAP);
+			memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK1, SMH_UNMAP);
 
 			return INIT_PASS;
 		}
