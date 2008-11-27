@@ -204,7 +204,7 @@ WRITE8_HANDLER(kc85_disc_interface_latch_w)
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 {
 	logerror("kc85 disc hw tc w: %02x\n",data);
-	nec765_set_tc_state(machine, data & 0x01);
+	nec765_set_tc_state(space->machine, data & 0x01);
 }
 
 
@@ -232,7 +232,7 @@ static const struct nec765_interface kc_fdc_interface=
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
-	cpunum_set_reg(1, REG_PC, 0x0f000);
+	cpu_set_reg(machine->cpu[1], REG_PC, 0x0f000);
 	cpu_set_reg(machine->cpu[0], REG_PC, 0x0f000);
 }
 
@@ -1131,6 +1131,7 @@ bit 0: ram 4
 
 static void kc85_4_update_0x08000(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	unsigned char *ram_page;
 
     if (kc85_pio_data[1] & (1<<5))
@@ -1145,23 +1146,23 @@ static void kc85_4_update_0x08000(running_machine *machine)
 
 		memory_set_bankptr(machine, 3, mem_ptr);
 		memory_set_bankptr(machine, 4, mem_ptr+0x02800);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK3);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK4);
+		memory_install_read8_handler(space, 0x8000, 0xa7ff, 0, 0, SMH_BANK3);
+		memory_install_read8_handler(space, 0xa800, 0xbfff, 0, 0, SMH_BANK4);
 
 		/* write protect RAM8 ? */
 		if ((kc85_pio_data[1] & (1<<6))==0)
 		{
 			/* ram8 is enabled and write protected */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_NOP);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(space, 0x8000, 0xa7ff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(space, 0xa800, 0xbfff, 0, 0, SMH_NOP);
 		}
 		else
 		{
 			LOG(("RAM8 write enabled\n"));
 
 			/* ram8 is enabled and write enabled */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK9);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK10);
+			memory_install_write8_handler(space, 0x8000, 0xa7ff, 0, 0, SMH_BANK9);
+			memory_install_write8_handler(space, 0xa800, 0xbfff, 0, 0, SMH_BANK10);
 			memory_set_bankptr(machine, 9, mem_ptr);
 			memory_set_bankptr(machine, 10, mem_ptr+0x02800);
 		}
@@ -1170,10 +1171,10 @@ static void kc85_4_update_0x08000(running_machine *machine)
     {
 		LOG(("no memory at ram8\n"));
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_NOP);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(space, 0x8000, 0xa7ff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(space, 0xa800, 0xbfff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0x8000, 0xa7ff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0xa800, 0xbfff, 0, 0, SMH_NOP);
     }
 
 	/* if IRM is enabled override block 3/9 settings */
@@ -1184,28 +1185,30 @@ static void kc85_4_update_0x08000(running_machine *machine)
 
 		memory_set_bankptr(machine, 3, ram_page);
 		memory_set_bankptr(machine, 9, ram_page);
-		memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK3);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xa7ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(space, 0x8000, 0xa7ff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(space, 0x8000, 0xa7ff, 0, 0, SMH_BANK9);
 
 		ram_page = kc85_4_get_video_ram_base(0, 0);
 
-		memory_set_bankptr( 4, ram_page + 0x2800);
+		memory_set_bankptr(machine, 4, ram_page + 0x2800);
 		memory_set_bankptr(machine, 10, ram_page + 0x2800);
-		memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK4);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xbfff, 0, 0, SMH_BANK10);
+		memory_install_read8_handler(space, 0xa800, 0xbfff, 0, 0, SMH_BANK4);
+		memory_install_write8_handler(space, 0xa800, 0xbfff, 0, 0, SMH_BANK10);
 	}
 }
 
 /* update status of memory area 0x0000-0x03fff */
 static void kc85_4_update_0x00000(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
 	{
 		LOG(("ram0 enabled\n"));
 
 		/* yes; set address of bank */
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 		memory_set_bankptr(machine, 1, mess_ram);
 
 		/* write protect ram? */
@@ -1215,14 +1218,14 @@ static void kc85_4_update_0x00000(running_machine *machine)
 			LOG(("ram0 write protected\n"));
 
 			/* ram is enabled and write protected */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 		}
 		else
 		{
 			LOG(("ram0 write enabled\n"));
 
 			/* ram is enabled and write enabled; and set address of bank */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK7);
+			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK7);
 			memory_set_bankptr(machine, 7, mess_ram);
 		}
 	}
@@ -1232,16 +1235,17 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 //		memory_set_bankptr(machine, 1,memory_region(machine, "main") + 0x013000);
 		/* ram is disabled */
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_NOP);
 	}
 }
 
 /* update status of memory area 0x4000-0x07fff */
 static void kc85_4_update_0x04000(running_machine *machine)
 {
-	read8_machine_func rh;
-	write8_machine_func wh;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	read8_space_func rh;
+	write8_space_func wh;
 
 	/* access ram? */
 	if (kc85_86_data & (1<<0))
@@ -1282,15 +1286,16 @@ static void kc85_4_update_0x04000(running_machine *machine)
 		rh = SMH_NOP;
 		wh = SMH_NOP;
 	}
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, rh);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, wh);
+	memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, rh);
+	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, wh);
 }
 
 
 /* update memory address 0x0c000-0x0e000 */
 static void kc85_4_update_0x0c000(running_machine *machine)
 {
-	read8_machine_func rh;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	read8_space_func rh;
 
 	if (kc85_86_data & (1<<7))
 	{
@@ -1325,13 +1330,14 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 			rh = SMH_NOP;
 		}
 	}
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, rh);
+	memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, rh);
 }
 
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_4_update_0x0e000(running_machine *machine)
 {
-	read8_machine_func rh;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	read8_space_func rh;
 
 	if (kc85_pio_data[0] & (1<<0))
 	{
@@ -1347,7 +1353,7 @@ static void kc85_4_update_0x0e000(running_machine *machine)
 
 		rh = SMH_NOP;
 	}
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, rh);
+	memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, rh);
 }
 
 /* PIO PORT A: port 0x088:
@@ -1382,12 +1388,12 @@ WRITE8_HANDLER ( kc85_4_pio_data_w )
 
 		case 0:
 		{
-			kc85_4_update_0x0c000(machine);
-			kc85_4_update_0x0e000(machine);
-			kc85_4_update_0x08000(machine);
-			kc85_4_update_0x00000(machine);
+			kc85_4_update_0x0c000(space->machine);
+			kc85_4_update_0x0e000(space->machine);
+			kc85_4_update_0x08000(space->machine);
+			kc85_4_update_0x00000(space->machine);
 
-			kc_cassette_set_motor(machine, (data>>6) & 0x01);
+			kc_cassette_set_motor(space->machine, (data>>6) & 0x01);
 		}
 		break;
 
@@ -1395,7 +1401,7 @@ WRITE8_HANDLER ( kc85_4_pio_data_w )
 		{
 			int speaker_level;
 
-			kc85_4_update_0x08000(machine);
+			kc85_4_update_0x08000(space->machine);
 
 			/* 16 speaker levels */
 			speaker_level = (data>>1) & 0x0f;
@@ -1415,8 +1421,8 @@ WRITE8_HANDLER ( kc85_4_86_w )
 
 	kc85_86_data = data;
 
-	kc85_4_update_0x0c000(machine);
-	kc85_4_update_0x04000(machine);
+	kc85_4_update_0x0c000(space->machine);
+	kc85_4_update_0x04000(space->machine);
 }
 
  READ8_HANDLER ( kc85_4_86_r )
@@ -1433,7 +1439,7 @@ WRITE8_HANDLER ( kc85_4_84_w )
 
 	kc85_4_video_ram_select_bank(data & 0x01);
 
-	kc85_4_update_0x08000(machine);
+	kc85_4_update_0x08000(space->machine);
 }
 
  READ8_HANDLER ( kc85_4_84_r )
@@ -1445,7 +1451,8 @@ WRITE8_HANDLER ( kc85_4_84_w )
 /* update memory region 0x0c000-0x0e000 */
 static void kc85_3_update_0x0c000(running_machine *machine)
 {
-	read8_machine_func rh;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	read8_space_func rh;
 
 	if (kc85_pio_data[0] & (1<<7))
 	{
@@ -1461,13 +1468,14 @@ static void kc85_3_update_0x0c000(running_machine *machine)
 
 		rh = SMH_NOP;
 	}
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, rh);
+	memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, rh);
 }
 
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_3_update_0x0e000(running_machine *machine)
 {
-	read8_machine_func rh;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	read8_space_func rh;
 
 	if (kc85_pio_data[0] & (1<<0))
 	{
@@ -1483,7 +1491,7 @@ static void kc85_3_update_0x0e000(running_machine *machine)
 
 		rh = SMH_NOP;
 	}
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, rh);
+	memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, rh);
 }
 
 /* update status of memory area 0x0000-0x03fff */
@@ -1491,8 +1499,9 @@ static void kc85_3_update_0x0e000(running_machine *machine)
 for write operations */
 static void kc85_3_update_0x00000(running_machine *machine)
 {
-	read8_machine_func rh;
-	write8_machine_func wh;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	read8_space_func rh;
+	write8_space_func wh;
 
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
@@ -1532,16 +1541,17 @@ static void kc85_3_update_0x00000(running_machine *machine)
 		wh = SMH_NOP;
 	}
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, rh);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, wh);
+	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, rh);
+	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, wh);
 }
 
 /* update status of memory area 0x08000-0x0ffff */
 /* SMH_BANK3 is used for read, SMH_BANK8 is used for write */
 static void kc85_3_update_0x08000(running_machine *machine)
 {
-	read8_machine_func rh;
-	write8_machine_func wh;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	read8_space_func rh;
+	write8_space_func wh;
     unsigned char *ram_page;
 
     if (kc85_pio_data[0] & (1<<2))
@@ -1587,8 +1597,8 @@ static void kc85_3_update_0x08000(running_machine *machine)
 		wh = SMH_NOP;
     }
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, rh);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, wh);
+	memory_install_read8_handler(space, 0x8000, 0xbfff, 0, 0, rh);
+	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, wh);
 }
 
 
@@ -1624,11 +1634,11 @@ WRITE8_HANDLER ( kc85_3_pio_data_w )
 
 		case 0:
 		{
-			kc85_3_update_0x0c000(machine);
-			kc85_3_update_0x0e000(machine);
-			kc85_3_update_0x00000(machine);
+			kc85_3_update_0x0c000(space->machine);
+			kc85_3_update_0x0e000(space->machine);
+			kc85_3_update_0x00000(space->machine);
 
-			kc_cassette_set_motor(machine, (data>>6) & 0x01);
+			kc_cassette_set_motor(space->machine, (data>>6) & 0x01);
 		}
 		break;
 
@@ -1636,7 +1646,7 @@ WRITE8_HANDLER ( kc85_3_pio_data_w )
 		{
 			int speaker_level;
 
-			kc85_3_update_0x08000(machine);
+			kc85_3_update_0x08000(space->machine);
 
 			/* 16 speaker levels */
 			speaker_level = (data>>1) & 0x0f;

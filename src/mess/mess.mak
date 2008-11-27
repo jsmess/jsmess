@@ -458,6 +458,7 @@ DRVLIBS = \
 	$(MESSOBJ)/tutor.a \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vc4000.a \
+	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
@@ -485,7 +486,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/teamconc.a \
 #	$(MESSOBJ)/ti99.a \
 #	$(MESSOBJ)/tx0.a \
-#	$(MESSOBJ)/veb.a \
 
 
 
