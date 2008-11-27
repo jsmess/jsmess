@@ -167,11 +167,11 @@ static void set_display_settings( running_machine *machine )
 }
 
  READ8_HANDLER(sms_vdp_vcount_r) {
-	return ( smsvdp.sms_frame_timing[ INIT_VCOUNT ] + video_screen_get_vpos(machine->primary_screen) ) & 0xFF;
+	return ( smsvdp.sms_frame_timing[ INIT_VCOUNT ] + video_screen_get_vpos(space->machine->primary_screen) ) & 0xFF;
 }
 
 READ8_HANDLER(sms_vdp_hcount_r) {
-	return video_screen_get_hpos(machine->primary_screen) >> 1;
+	return video_screen_get_hpos(space->machine->primary_screen) >> 1;
 }
 
 void sms_set_ggsmsmode( int mode ) {
@@ -240,7 +240,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 
 	/* Check if we're on the last line of a frame */
 	if ( vpos == vpos_limit - 1 ) {
-		sms_check_pause_button( machine );
+		sms_check_pause_button( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM) );
 		return;
 	}
 
@@ -390,7 +390,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 	if (smsvdp.irq_state == 1) {
 		smsvdp.irq_state = 0;
 		if ( smsvdp.int_callback ) {
-			smsvdp.int_callback( machine, CLEAR_LINE );
+			smsvdp.int_callback( space->machine, CLEAR_LINE );
 		}
 	}
 
@@ -454,11 +454,11 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 				logerror("overscan enabled.\n");
 			}
 			if ( regNum == 0 || regNum == 1 ) {
-				set_display_settings( machine );
+				set_display_settings( space->machine );
 			}
 			if ( ( regNum == 1 ) && ( smsvdp.reg[0x01] & 0x20 ) && ( smsvdp.status & STATUS_VINT ) ) {
 				smsvdp.irq_state = 1;
-				smsvdp.int_callback( machine, ASSERT_LINE );
+				smsvdp.int_callback( space->machine, ASSERT_LINE );
 			}
 			smsvdp.addrmode = 0;
 			break;

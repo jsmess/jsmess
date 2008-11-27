@@ -203,7 +203,7 @@ static UINT16* sound_ram;
 
 static int saturn_region;
 
-int stv_vblank,stv_hblank;
+extern int stv_vblank,stv_hblank;
 int stv_enable_slave_sh2;
 /*SMPC stuff*/
 static UINT8 NMI_reset;
@@ -229,12 +229,29 @@ static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
 			  scu_size_1,		/* lv 1*/
 			  scu_size_2;		/* lv 2*/
 
-static void dma_direct_lv0(running_machine *machine);	/*DMA level 0 direct transfer function*/
-static void dma_direct_lv1(running_machine *machine);   /*DMA level 1 direct transfer function*/
-static void dma_direct_lv2(running_machine *machine);   /*DMA level 2 direct transfer function*/
-static void dma_indirect_lv0(running_machine *machine); /*DMA level 0 indirect transfer function*/
-static void dma_indirect_lv1(running_machine *machine); /*DMA level 1 indirect transfer function*/
-static void dma_indirect_lv2(running_machine *machine); /*DMA level 2 indirect transfer function*/
+struct
+{
+	UINT8 vblank_out;
+	UINT8 vblank_in;
+	UINT8 hblank_in;
+	UINT8 timer_0;
+	UINT8 timer_1;
+	UINT8 dsp_end;
+	UINT8 sound_req;
+	UINT8 smpc;
+	UINT8 pad;
+	UINT8 dma_end[3];
+	UINT8 dma_ill;
+	UINT8 vdp1_end;
+	UINT8 abus;
+}stv_irq;
+
+static void dma_direct_lv0(const address_space *space);	/*DMA level 0 direct transfer function*/
+static void dma_direct_lv1(const address_space *space);   /*DMA level 1 direct transfer function*/
+static void dma_direct_lv2(const address_space *space);   /*DMA level 2 direct transfer function*/
+static void dma_indirect_lv0(const address_space *space); /*DMA level 0 indirect transfer function*/
+static void dma_indirect_lv1(const address_space *space); /*DMA level 1 indirect transfer function*/
+static void dma_indirect_lv2(const address_space *space); /*DMA level 2 indirect transfer function*/
 
 
 int minit_boost,sinit_boost;
@@ -490,7 +507,7 @@ static void smpc_intbackhelper(running_machine *machine)
 	intback_stage++;
 }
 
-static UINT8 stv_SMPC_r8 (int offset)
+static UINT8 stv_SMPC_r8(const address_space *space, int offset)
 {
 	int return_data;
 
@@ -541,16 +558,17 @@ static UINT8 stv_SMPC_r8 (int offset)
 
 	if (offset == 0x33) return_data = saturn_region;
 
-	if (LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", cpu_getactivecpu(), cpu_get_pc(space->cpu), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), offset, offset>>1, return_data);
 
 
 	return return_data;
 }
 
-static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
+static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 {
 	mame_system_time systime;
 	UINT8 last;
+	running_machine *machine = space->machine;
 
 	/* get the current date/time from the core */
 	mame_get_current_datetime(machine, &systime);
@@ -635,19 +653,19 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpu_trigger(machine, 1000);
+				cpuexec_trigger(machine, 1000);
 				cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
 				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
 				/* wrong? */
 				smpc_ram[0x5f]=0x06;
-				cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 				en_68k = 1;
 				break;
 			case 0x07:
 				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
-				cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 				en_68k = 0;
 				smpc_ram[0x5f]=0x07;
 				break;
@@ -663,17 +681,17 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				cpunum_set_clock(machine, 0, MASTER_CLOCK_352/2);
-				cpunum_set_clock(machine, 1, MASTER_CLOCK_352/2);
-				cpunum_set_clock(machine, 2, MASTER_CLOCK_352/5);
+				cpu_set_clock(machine->cpu[0], MASTER_CLOCK_352/2);
+				cpu_set_clock(machine->cpu[1], MASTER_CLOCK_352/2);
+				cpu_set_clock(machine->cpu[2], MASTER_CLOCK_352/5);
 				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				cpunum_set_clock(machine, 0, MASTER_CLOCK_320/2);
-				cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
-				cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
+				cpu_set_clock(machine->cpu[0], MASTER_CLOCK_320/2);
+				cpu_set_clock(machine->cpu[1], MASTER_CLOCK_320/2);
+				cpu_set_clock(machine->cpu[2], MASTER_CLOCK_320/5);
 				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
@@ -771,7 +789,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: undocumented Command %02x\n", cpu_getactivecpu(), cpu_get_pc(space->cpu), data);
+				if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), data);
 		}
 
 		// we've processed the command, clear status flag
@@ -788,10 +806,10 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	/* registers are all byte accesses, convert here */
 	offset = offset << 2; // multiply offset by 4
 
-	if (!(~mem_mask & 0xff000000))	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
-	if (!(~mem_mask & 0x00ff0000))	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
-	if (!(~mem_mask & 0x0000ff00))	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
-	if (!(~mem_mask & 0x000000ff))	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
+	if (!(~mem_mask & 0xff000000))	{ byte = 0; readdata = stv_SMPC_r8(space, offset+byte) << 24; }
+	if (!(~mem_mask & 0x00ff0000))	{ byte = 1; readdata = stv_SMPC_r8(space, offset+byte) << 16; }
+	if (!(~mem_mask & 0x0000ff00))	{ byte = 2; readdata = stv_SMPC_r8(space, offset+byte) << 8;  }
+	if (!(~mem_mask & 0x000000ff))	{ byte = 3; readdata = stv_SMPC_r8(space, offset+byte) << 0;  }
 
 	return readdata;
 }
@@ -813,7 +831,7 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 
 	offset += byte;
 
-	stv_SMPC_w8(machine, offset,writedata);
+	stv_SMPC_w8(space, offset,writedata);
 }
 
 
@@ -838,84 +856,122 @@ SCU register[40] is for IRQ masking.
 
 /* to do, update bios idle skips so they work better with this arrangement.. */
 
+static emu_timer *vblank_in_timer,*scan_timer,*t1_timer;
+static int h_sync,v_sync;
+static int cur_scan;
 
+#define VBLANK_OUT_IRQ	\
+timer_0 = 0; \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
+	cpu_set_input_line_and_vector(device->machine->cpu[0], 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
+} \
+
+#define VBLANK_IN_IRQ \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
+} \
+
+#define HBLANK_IN_IRQ \
+timer_1 = stv_scu[37] & 0x1ff; \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
+} \
+
+#define TIMER_0_IRQ \
+if(timer_0 == (stv_scu[36] & 0x3ff)) \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
+} \
+
+#define TIMER_1_IRQ	\
+if((stv_scu[38] & 1)) \
+{ \
+	if(!(stv_scu[38] & 0x80)) \
+	{ \
+		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
+		cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+	} \
+	else \
+	{ \
+		if((timer_0) == (stv_scu[36] & 0x3ff)) \
+		{ \
+			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
+			cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+		} \
+	} \
+} \
+
+#define VDP1_IRQ \
+{ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d); \
+} \
+
+static TIMER_CALLBACK( hblank_in_irq )
+{
+	int scanline = param;
+
+//  h = video_screen_get_height(machine->primary_screen);
+//  w = video_screen_get_width(machine->primary_screen);
+
+	TIMER_0_IRQ;
+	HBLANK_IN_IRQ;
+
+	if((scanline+1) < v_sync)
+	{
+		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, h_sync), scanline+1);
+		/*set the first Timer-1 event*/
+		cur_scan = scanline+1;
+		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, 0), 0);
+	}
+
+	timer_0++;
+}
+
+static TIMER_CALLBACK( timer1_irq )
+{
+	int cur_point = param;
+
+	TIMER_1_IRQ;
+
+	if((cur_point+1) < h_sync)
+	{
+		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, cur_scan, cur_point+1), cur_point+1);
+	}
+
+	if(timer_1 > 0) timer_1--;
+}
+
+static TIMER_CALLBACK( vdp1_irq )
+{
+	VDP1_IRQ;
+}
+
+static TIMER_CALLBACK( vblank_in_irq )
+{
+	VBLANK_IN_IRQ;
+}
+
+/*V-Blank-OUT event*/
 static INTERRUPT_GEN( stv_interrupt )
 {
-	scanline = 261-cpu_getiloops();
+//  scanline = 0;
+	h_sync = video_screen_get_height(device->machine->primary_screen)/2;//horz
+	v_sync = video_screen_get_width(device->machine->primary_screen)-2;//vert
 
-	stv_hblank = 0;
+	VBLANK_OUT_IRQ;
 
-	if(scanline == 0)
-	{
-		if(!(stv_scu[40] & 2))/*VBLANK-OUT*/
-		{
-			if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT at scanline %04x, Vector 0x41 Level 0x0e\n",scanline);
-			cpu_set_input_line_and_vector(machine->cpu[0], 0xe, HOLD_LINE , 0x41);
-		}
-		stv_vblank = 0;
-	}
-	else if(scanline <= 223 && scanline >= 1)/*Correct?*/
-	{
-		timer_0++;
-		timer_1++;
-		stv_hblank = 1;
-		/*TODO: check this...*/
-		/*Timer 1 handling*/
-		if((stv_scu[38] & 1))
-		{
-			if((!(stv_scu[40] & 0x10)) && (!(stv_scu[38] & 0x80)))
-			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
-				cpu_set_input_line_and_vector(machine->cpu[0], 0xb, HOLD_LINE, 0x44 );
-			}
-			else if((!(stv_scu[40] & 0x10)) && (stv_scu[38] & 0x80))
-			{
-				if(timer_1 == (stv_scu[36] & 0x1ff))
-				{
-					if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
-					cpu_set_input_line_and_vector(machine->cpu[0], 0xb, HOLD_LINE, 0x44 );
-				}
-			}
-		}
-		if(timer_0 == (stv_scu[36] & 0x1ff))
-		{
-			if(!(stv_scu[40] & 8))/*Timer 0*/
-			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
-				cpu_set_input_line_and_vector(machine->cpu[0], 0xc, HOLD_LINE, 0x43 );
-			}
-		}
+	/*Next V-Blank-IN event*/
+	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
+	/*Set the first Hblank-IN event*/
+	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
 
-		/*TODO:use this *at the end* of the draw line.*/
-		if(!(stv_scu[40] & 4))/*HBLANK-IN*/
-		{
-			if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);
-			cpu_set_input_line_and_vector(machine->cpu[0], 0xd, HOLD_LINE , 0x42);
-		}
-	}
-	else if(scanline == 224)
-	{
-		timer_0 = 0;
-		timer_1 = 0;
-
-		if(!(stv_scu[40] & 1))/*VBLANK-IN*/
-		{
-			if(LOG_IRQ) logerror ("Interrupt: VBlank IN at scanline %04x, Vector 0x40 Level 0x0f\n",scanline);
-			cpu_set_input_line_and_vector(machine->cpu[0], 0xf, HOLD_LINE , 0x40);
-		}
-		stv_vblank = 1;
-
-		if(timer_0 == (stv_scu[36] & 0x1ff))
-		{
-			if(!(stv_scu[40] & 8))/*Timer 0*/
-			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
-				cpu_set_input_line_and_vector(machine->cpu[0], 0xc, HOLD_LINE, 0x43 );
-			}
-		}
-		if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-			cpu_set_input_line_and_vector(machine->cpu[0], 2, HOLD_LINE , 0x4d);
-	}
+	/*TODO: timing of this one (related to the VDP1 speed)*/
+	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
 }
 
 static UINT8 port_sel,mux_data;
@@ -1052,28 +1108,37 @@ static READ32_HANDLER( stv_scu_r32 )
 	//{
 		//Super Major League reads here???
 	//}
-
-	// Saturn BIOS needs this (need to investigate further)
-	if (offset == 32)
-	{
-		return 0x00100000;
-	}
-
 	if (offset == 31)
 	{
 		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(space->cpu));
-			return stv_scu[offset];
+		return stv_scu[offset];
 	}
 	else if ( offset == 35 )
 	{
         if(LOG_SCU) logerror( "DSP mem read at %08X\n", stv_scu[34]);
         return dsp_ram_addr_r();
     }
-    else if( offset == 41)
+    else if( offset == 41) /*IRQ reg status read*/
     {
-		logerror("(PC=%08x) IRQ status reg read\n",cpu_get_pc(space->cpu));
-		/*TODO:for now we're activating everything here,but we need to return the proper active irqs*/
-		return 0xffffffff;
+		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x\n",cpu_get_pc(space->cpu),mem_mask);
+
+		stv_scu[41] = (stv_irq.vblank_in & 1)<<0;
+		stv_scu[41]|= (stv_irq.vblank_out & 1)<<1;
+		stv_scu[41]|= (stv_irq.hblank_in & 1)<<2;
+		stv_scu[41]|= (stv_irq.timer_0 & 1)<<3;
+		stv_scu[41]|= (stv_irq.timer_1 & 1)<<4;
+		stv_scu[41]|= (stv_irq.dsp_end & 1)<<5;
+		stv_scu[41]|= (stv_irq.sound_req & 1)<<6;
+		stv_scu[41]|= (stv_irq.smpc & 1)<<7;
+		stv_scu[41]|= (stv_irq.pad & 1)<<8;
+		stv_scu[41]|= (stv_irq.dma_end[0] & 1)<<9;
+		stv_scu[41]|= (stv_irq.dma_end[1] & 1)<<10;
+		stv_scu[41]|= (stv_irq.dma_end[2] & 1)<<11;
+		stv_scu[41]|= (stv_irq.dma_ill & 1)<<12;
+		stv_scu[41]|= (stv_irq.vdp1_end & 1)<<13;
+		stv_scu[41]|= (stv_irq.abus & 1)<<15;
+
+		return stv_scu[41] ^ 0xffffffff;
 	}
 	else if( offset == 50 )
 	{
@@ -1129,22 +1194,22 @@ static WRITE32_HANDLER( stv_scu_w32 )
 */
 		if(stv_scu[4] & 1 && ((stv_scu[5] & 7) == 7) && stv_scu[4] & 0x100)
 		{
-			if(DIRECT_MODE(0)) { dma_direct_lv0(machine); }
-			else			   { dma_indirect_lv0(machine); }
+			if(DIRECT_MODE(0)) { dma_direct_lv0(space); }
+			else			   { dma_indirect_lv0(space); }
 
 			stv_scu[4]^=1;//disable starting bit.
 
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
-						cpu_set_input_line_and_vector(machine->cpu[0], 3, HOLD_LINE, 0x4c);
+						cpu_set_input_line_and_vector(space->machine->cpu[0], 3, HOLD_LINE, 0x4c);
 						logerror("SCU: Illegal DMA interrupt\n");
 					}
 				}
@@ -1190,15 +1255,15 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 12:
 		if(stv_scu[12] & 1 && ((stv_scu[13] & 7) == 7) && stv_scu[12] & 0x100)
 		{
-			if(DIRECT_MODE(1)) { dma_direct_lv1(machine); }
-			else			   { dma_indirect_lv1(machine); }
+			if(DIRECT_MODE(1)) { dma_direct_lv1(space); }
+			else			   { dma_indirect_lv1(space); }
 
 			stv_scu[12]^=1;
 
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1240,15 +1305,15 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 20:
 		if(stv_scu[20] & 1 && ((stv_scu[21] & 7) == 7) && stv_scu[20] & 0x100)
 		{
-			if(DIRECT_MODE(2)) { dma_direct_lv2(machine); }
-			else			   { dma_indirect_lv2(machine); }
+			if(DIRECT_MODE(2)) { dma_direct_lv2(space); }
+			else			   { dma_indirect_lv2(space); }
 
 			stv_scu[20]^=1;
 
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1270,7 +1335,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		/*DSP section*/
 		/*Use functions so it is easier to work out*/
 		case 32:
-		dsp_prg_ctrl(machine, data);
+		dsp_prg_ctrl(space, data);
 		if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 		break;
 		case 33:
@@ -1291,15 +1356,30 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 40:
 		/*An interrupt is masked when his specific bit is 1.*/
 		/*Are bit 16-bit 31 for External A-Bus irq mask like the status register?*/
-		/*What is 0x00000080 setting?Is it valid?*/
+
+		stv_irq.vblank_in =  (((stv_scu[40] & 0x0001)>>0) ^ 1);
+		stv_irq.vblank_out = (((stv_scu[40] & 0x0002)>>1) ^ 1);
+		stv_irq.hblank_in =  (((stv_scu[40] & 0x0004)>>2) ^ 1);
+		stv_irq.timer_0 = 	 (((stv_scu[40] & 0x0008)>>3) ^ 1);
+		stv_irq.timer_1 =    (((stv_scu[40] & 0x0010)>>4) ^ 1);
+		stv_irq.dsp_end =    (((stv_scu[40] & 0x0020)>>5) ^ 1);
+		stv_irq.sound_req =  (((stv_scu[40] & 0x0040)>>6) ^ 1);
+		stv_irq.smpc =       (((stv_scu[40] & 0x0080)>>7)); //NOTE: SCU bug
+		stv_irq.pad =        (((stv_scu[40] & 0x0100)>>8) ^ 1);
+		stv_irq.dma_end[0] = (((stv_scu[40] & 0x0200)>>9) ^ 1);
+		stv_irq.dma_end[1] = (((stv_scu[40] & 0x0400)>>10) ^ 1);
+		stv_irq.dma_end[2] = (((stv_scu[40] & 0x0800)>>11) ^ 1);
+		stv_irq.dma_ill =    (((stv_scu[40] & 0x1000)>>12) ^ 1);
+		stv_irq.vdp1_end =   (((stv_scu[40] & 0x2000)>>13) ^ 1);
+		stv_irq.abus =       (((stv_scu[40] & 0x8000)>>15) ^ 1);
 
 		/*Take out the common settings to keep logging quiet.*/
 		if(stv_scu[40] != 0xfffffffe &&
 		   stv_scu[40] != 0xfffffffc &&
 		   stv_scu[40] != 0xffffffff)
 		{
-			if(LOG_SCU) logerror("cpu #%d (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
-			cpu_getactivecpu(), cpu_get_pc(space->cpu),
+			if(LOG_SCU) logerror("cpu %s (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
+			space->cpu->tag, cpu_get_pc(space->cpu),
 			stv_scu[offset],
 			stv_scu[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
 			stv_scu[offset] & 0x4000 ? 1 : 0, /*<reserved>*/
@@ -1319,9 +1399,27 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			stv_scu[offset] & 0x0001 ? 1 : 0);/*VBlank-IN*/
 		}
 		break;
+		/*Interrupt Control reg Set*/
 		case 41:
 		/*This is r/w by introdon...*/
-		if(LOG_SCU) logerror("IRQ status reg set:%08x\n",stv_scu[41]);
+		if(LOG_SCU) logerror("IRQ status reg set:%08x %08x\n",stv_scu[41],mem_mask);
+
+		stv_irq.vblank_in =  ((stv_scu[41] & 0x0001)>>0);
+		stv_irq.vblank_out = ((stv_scu[41] & 0x0002)>>1);
+		stv_irq.hblank_in =  ((stv_scu[41] & 0x0004)>>2);
+		stv_irq.timer_0 =    ((stv_scu[41] & 0x0008)>>3);
+		stv_irq.timer_1 =    ((stv_scu[41] & 0x0010)>>4);
+		stv_irq.dsp_end =    ((stv_scu[41] & 0x0020)>>5);
+		stv_irq.sound_req =  ((stv_scu[41] & 0x0040)>>6);
+		stv_irq.smpc =       ((stv_scu[41] & 0x0080)>>7);
+		stv_irq.pad =        ((stv_scu[41] & 0x0100)>>8);
+		stv_irq.dma_end[0] = ((stv_scu[41] & 0x0200)>>9);
+		stv_irq.dma_end[1] = ((stv_scu[41] & 0x0400)>>10);
+		stv_irq.dma_end[2] = ((stv_scu[41] & 0x0800)>>11);
+		stv_irq.dma_ill =    ((stv_scu[41] & 0x1000)>>12);
+		stv_irq.vdp1_end =   ((stv_scu[41] & 0x2000)>>13);
+		stv_irq.abus =       ((stv_scu[41] & 0x8000)>>15);
+
 		break;
 		case 42: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",stv_scu[42]); break;
 		case 49: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",stv_scu[49]); break;
@@ -1329,7 +1427,31 @@ static WRITE32_HANDLER( stv_scu_w32 )
 	}
 }
 
-static void dma_direct_lv0(running_machine *machine)
+/*Lv 0 DMA end irq*/
+static TIMER_CALLBACK( dma_lv0_ended )
+{
+	cpu_set_input_line_and_vector(machine->cpu[0], 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
+
+	D0MV_0;
+}
+
+/*Lv 1 DMA end irq*/
+static TIMER_CALLBACK( dma_lv1_ended )
+{
+	cpu_set_input_line_and_vector(machine->cpu[0], 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
+
+	D1MV_0;
+}
+
+/*Lv 2 DMA end irq*/
+static TIMER_CALLBACK( dma_lv2_ended )
+{
+	cpu_set_input_line_and_vector(machine->cpu[0], 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
+
+	D2MV_0;
+}
+
+static void dma_direct_lv0(const address_space *space)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 0 transfer START\n"
@@ -1403,18 +1525,18 @@ static void dma_direct_lv0(running_machine *machine)
 	for (; scu_size_0 > 0; scu_size_0-=scu_dst_add_0)
 	{
 		if(scu_dst_add_0 == 2)
-			program_write_word(scu_dst_0,program_read_word(scu_src_0));
+			memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
 		else if(scu_dst_add_0 == 8)
 		{
-			program_write_word(scu_dst_0,program_read_word(scu_src_0));
-			program_write_word(scu_dst_0+2,program_read_word(scu_src_0));
-			program_write_word(scu_dst_0+4,program_read_word(scu_src_0+2));
-			program_write_word(scu_dst_0+6,program_read_word(scu_src_0+2));
+			memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
+			memory_write_word(space,scu_dst_0+2,memory_read_word(space,scu_src_0));
+			memory_write_word(space,scu_dst_0+4,memory_read_word(space,scu_src_0+2));
+			memory_write_word(space,scu_dst_0+6,memory_read_word(space,scu_src_0+2));
 		}
 		else
 		{
-			program_write_word(scu_dst_0,program_read_word(scu_src_0));
-			program_write_word(scu_dst_0+2,program_read_word(scu_src_0+2));
+			memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
+			memory_write_word(space,scu_dst_0+2,memory_read_word(space,scu_src_0+2));
 		}
 
 		scu_dst_0+=scu_dst_add_0;
@@ -1426,8 +1548,9 @@ static void dma_direct_lv0(running_machine *machine)
 	if(!(DWUP(0))) scu_dst_0 = tmp_dst;
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
-	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 5, HOLD_LINE , 0x4b);
+
+	/*TODO: timing of this*/
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1435,11 +1558,9 @@ static void dma_direct_lv0(running_machine *machine)
 		scu_src_add_0 = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
-
-	D0MV_0;
 }
 
-static void dma_direct_lv1(running_machine *machine)
+static void dma_direct_lv1(const address_space *space)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 1 transfer START\n"
@@ -1513,11 +1634,11 @@ static void dma_direct_lv1(running_machine *machine)
 	for (; scu_size_1 > 0; scu_size_1-=scu_dst_add_1)
 	{
 		if(scu_dst_add_1 == 2)
-			program_write_word(scu_dst_1,program_read_word(scu_src_1));
+			memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
 		else
 		{
-			program_write_word(scu_dst_1,program_read_word(scu_src_1));
-			program_write_word(scu_dst_1+2,program_read_word(scu_src_1+2));
+			memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
+			memory_write_word(space,scu_dst_1+2,memory_read_word(space,scu_src_1+2));
 		}
 
 		scu_dst_1+=scu_dst_add_1;
@@ -1529,8 +1650,8 @@ static void dma_direct_lv1(running_machine *machine)
 	if(!(DWUP(1))) scu_dst_1 = tmp_dst;
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
-	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x4a);
+
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1538,11 +1659,9 @@ static void dma_direct_lv1(running_machine *machine)
 		scu_src_add_1 = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
-
-	D1MV_0;
 }
 
-static void dma_direct_lv2(running_machine *machine)
+static void dma_direct_lv2(const address_space *space)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 2 transfer START\n"
@@ -1616,11 +1735,11 @@ static void dma_direct_lv2(running_machine *machine)
 	for (; scu_size_2 > 0; scu_size_2-=scu_dst_add_2)
 	{
 		if(scu_dst_add_2 == 2)
-			program_write_word(scu_dst_2,program_read_word(scu_src_2));
+			memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
 		else
 		{
-			program_write_word(scu_dst_2,program_read_word(scu_src_2));
-			program_write_word(scu_dst_2+2,program_read_word(scu_src_2+2));
+			memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
+			memory_write_word(space,scu_dst_2+2,memory_read_word(space,scu_src_2+2));
 		}
 
 		scu_dst_2+=scu_dst_add_2;
@@ -1632,8 +1751,8 @@ static void dma_direct_lv2(running_machine *machine)
 	if(!(DWUP(2))) scu_dst_2 = tmp_dst;
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
-	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x49);
+
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1641,11 +1760,9 @@ static void dma_direct_lv2(running_machine *machine)
 		scu_src_add_2 = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
-
-	D2MV_0;
 }
 
-static void dma_indirect_lv0(running_machine *machine)
+static void dma_indirect_lv0(const address_space *space)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1662,9 +1779,9 @@ static void dma_indirect_lv0(running_machine *machine)
 		tmp_src = scu_index_0;
 
 		/*Thanks for Runik of Saturnin for pointing this out...*/
-		scu_size_0 = program_read_dword(scu_index_0);
-		scu_src_0 =  program_read_dword(scu_index_0+8);
-		scu_dst_0 =  program_read_dword(scu_index_0+4);
+		scu_size_0 = memory_read_dword(space,scu_index_0);
+		scu_src_0 =  memory_read_dword(space,scu_index_0+8);
+		scu_dst_0 =  memory_read_dword(space,scu_index_0+4);
 
 		/*Indirect Mode end factor*/
 		if(scu_src_0 & 0x80000000)
@@ -1688,7 +1805,7 @@ static void dma_indirect_lv0(running_machine *machine)
 		for (; scu_size_0 > 0; scu_size_0-=scu_dst_add_0)
 		{
 			if(scu_dst_add_0 == 2)
-				program_write_word(scu_dst_0,program_read_word(scu_src_0));
+				memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1696,27 +1813,24 @@ static void dma_indirect_lv0(running_machine *machine)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				program_write_word(scu_dst_0,program_read_word(scu_src_0));
-				program_write_word(scu_dst_0+2,program_read_word(scu_src_0+2));
+				memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
+				memory_write_word(space,scu_dst_0+2,memory_read_word(space,scu_src_0+2));
 			}
 			scu_dst_0+=scu_dst_add_0;
 			scu_src_0+=scu_src_add_0;
 		}
 
-		//if(DRUP(0))   program_write_dword(tmp_src+8,scu_src_0|job_done ? 0x80000000 : 0);
-		//if(DWUP(0)) program_write_dword(tmp_src+4,scu_dst_0);
+		//if(DRUP(0))   memory_write_dword(space,tmp_src+8,scu_src_0|job_done ? 0x80000000 : 0);
+		//if(DWUP(0)) memory_write_dword(space,tmp_src+4,scu_dst_0);
 
 		scu_index_0 = tmp_src+0xc;
 
 	}while(job_done == 0);
 
-	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 5, HOLD_LINE , 0x4b);
-
-	D0MV_0;
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 }
 
-static void dma_indirect_lv1(running_machine *machine)
+static void dma_indirect_lv1(const address_space *space)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1732,9 +1846,9 @@ static void dma_indirect_lv1(running_machine *machine)
 	do{
 		tmp_src = scu_index_1;
 
-		scu_size_1 = program_read_dword(scu_index_1);
-		scu_src_1 =  program_read_dword(scu_index_1+8);
-		scu_dst_1 =  program_read_dword(scu_index_1+4);
+		scu_size_1 = memory_read_dword(space,scu_index_1);
+		scu_src_1 =  memory_read_dword(space,scu_index_1+8);
+		scu_dst_1 =  memory_read_dword(space,scu_index_1+4);
 
 		/*Indirect Mode end factor*/
 		if(scu_src_1 & 0x80000000)
@@ -1760,7 +1874,7 @@ static void dma_indirect_lv1(running_machine *machine)
 		{
 
 			if(scu_dst_add_1 == 2)
-				program_write_word(scu_dst_1,program_read_word(scu_src_1));
+				memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1768,27 +1882,24 @@ static void dma_indirect_lv1(running_machine *machine)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				program_write_word(scu_dst_1,program_read_word(scu_src_1));
-				program_write_word(scu_dst_1+2,program_read_word(scu_src_1+2));
+				memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
+				memory_write_word(space,scu_dst_1+2,memory_read_word(space,scu_src_1+2));
 			}
 			scu_dst_1+=scu_dst_add_1;
 			scu_src_1+=scu_src_add_1;
 		}
 
-		//if(DRUP(1))   program_write_dword(tmp_src+8,scu_src_1|job_done ? 0x80000000 : 0);
-		//if(DWUP(1)) program_write_dword(tmp_src+4,scu_dst_1);
+		//if(DRUP(1))   memory_write_dword(space,tmp_src+8,scu_src_1|job_done ? 0x80000000 : 0);
+		//if(DWUP(1)) memory_write_dword(space,tmp_src+4,scu_dst_1);
 
 		scu_index_1 = tmp_src+0xc;
 
 	}while(job_done == 0);
 
-	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x4a);
-
-	D1MV_0;
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 }
 
-static void dma_indirect_lv2(running_machine *machine)
+static void dma_indirect_lv2(const address_space *space)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1804,9 +1915,9 @@ static void dma_indirect_lv2(running_machine *machine)
 	do{
 		tmp_src = scu_index_2;
 
-		scu_size_2 = program_read_dword(scu_index_2);
-		scu_src_2 =  program_read_dword(scu_index_2+8);
-		scu_dst_2 =  program_read_dword(scu_index_2+4);
+		scu_size_2 = memory_read_dword(space,scu_index_2);
+		scu_src_2 =  memory_read_dword(space,scu_index_2+8);
+		scu_dst_2 =  memory_read_dword(space,scu_index_2+4);
 
 		/*Indirect Mode end factor*/
 		if(scu_src_2 & 0x80000000)
@@ -1830,7 +1941,7 @@ static void dma_indirect_lv2(running_machine *machine)
 		for (; scu_size_2 > 0; scu_size_2-=scu_dst_add_2)
 		{
 			if(scu_dst_add_2 == 2)
-				program_write_word(scu_dst_2,program_read_word(scu_src_2));
+				memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1838,25 +1949,22 @@ static void dma_indirect_lv2(running_machine *machine)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				program_write_word(scu_dst_2,program_read_word(scu_src_2));
-				program_write_word(scu_dst_2+2,program_read_word(scu_src_2+2));
+				memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
+				memory_write_word(space,scu_dst_2+2,memory_read_word(space,scu_src_2+2));
 			}
 
 			scu_dst_2+=scu_dst_add_2;
 			scu_src_2+=scu_src_add_2;
 		}
 
-		//if(DRUP(2))   program_write_dword(tmp_src+8,scu_src_2|job_done ? 0x80000000 : 0);
-		//if(DWUP(2)) program_write_dword(tmp_src+4,scu_dst_2);
+		//if(DRUP(2))   memory_write_dword(space,tmp_src+8,scu_src_2|job_done ? 0x80000000 : 0);
+		//if(DWUP(2)) memory_write_dword(space,tmp_src+4,scu_dst_2);
 
 		scu_index_2 = tmp_src+0xc;
 
 	}while(job_done == 0);
 
-	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x49);
-
-	D2MV_0;
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 }
 
 
@@ -1878,31 +1986,31 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
 	offset <<= 1;
-	return (scsp_0_r(machine, offset+1, 0xffff) | (scsp_0_r(machine, offset, 0xffff)<<16));
+	return (scsp_0_r(space, offset+1, 0xffff) | (scsp_0_r(space, offset, 0xffff)<<16));
 }
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
 	offset <<= 1;
-	scsp_0_w(machine, offset + 0, data >> 16, mem_mask >> 16);
-	scsp_0_w(machine, offset + 1, data >>  0, mem_mask);
+	scsp_0_w(space, offset, data>>16, mem_mask >> 16);
+	scsp_0_w(space, offset+1, data, mem_mask);
 }
 
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  *
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
 {
-	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), cpu_get_pc(space->cpu),data);
-	cpu_boost_interleave(machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
-	cpu_trigger(machine, 1000);
-	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
+	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
+	cpuexec_trigger(space->machine, 1000);
+	cpu_set_info_int(space->machine->cpu[1], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
-	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpu_getactivecpu(), cpu_get_pc(space->cpu),data);
-	cpu_boost_interleave(machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
+	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
+	cpu_set_info_int(space->machine->cpu[0], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
 static UINT32 backup[64*1024/4];
@@ -2073,8 +2181,8 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	saturn_region = rgn;
 
 	// set compatible options
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	cpunum_set_info_int(1, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* get the current date/time from the core */
 	mame_get_current_datetime(machine, &systime);
@@ -2089,24 +2197,17 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	stv_scu = auto_malloc (0x100);
 	scsp_regs = auto_malloc (0x1000);
 
-  	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
-    smpc_ram[0x25] = DectoBCD(systime.local_time.year % 100);
-    smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-    smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-    smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-    smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-    smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
-    smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  smpc_ram[0x33] = input_port_read(machine, "???");
+	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
+	smpc_ram[0x25] = DectoBCD(systime.local_time.year % 100);
+	smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+	smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+	smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+	smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+	smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+	smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
+//	smpc_ram[0x33] = input_port_read(machine, "???");
  	smpc_ram[0x5f] = 0x10;
 }
-
-#ifdef UNUSED_FUNCTION
-DRIVER_INIT( saturn )
-{
-	saturn_init_driver(machine, 0);
-}
-#endif
 
 static DRIVER_INIT( saturnus )
 {
@@ -2164,7 +2265,7 @@ static MACHINE_RESET( saturn )
 	// don't let the slave cpu and the 68k go anywhere
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	stv_enable_slave_sh2 = 0;
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 
 	smpcSR = 0x40;	// this bit is always on according to docs
 
@@ -2179,11 +2280,18 @@ static MACHINE_RESET( saturn )
 	memset(stv_workram_l, 0, 0x100000);
 	memset(stv_workram_h, 0, 0x100000);
 
-	cpunum_set_clock(machine, 0, MASTER_CLOCK_320/2);
-	cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
-	cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
+	cpu_set_clock(machine->cpu[0], MASTER_CLOCK_320/2);
+	cpu_set_clock(machine->cpu[1], MASTER_CLOCK_320/2);
+	cpu_set_clock(machine->cpu[2], MASTER_CLOCK_320/5);
 
 	stvcd_reset( machine );
+
+	/* set the first scanline 0 timer to go off */
+	scan_timer = timer_alloc(hblank_in_irq, NULL);
+	t1_timer = timer_alloc(timer1_irq,NULL);
+	vblank_in_timer = timer_alloc(vblank_in_irq,NULL);
+	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
 }
 
 static const gfx_layout tiles8x8x4_layout =
@@ -2271,15 +2379,15 @@ static void scsp_irq(running_machine *machine, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(machine, 2, irq, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
 	{
-		cpunum_set_input_line(machine, 2, -irq, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], -irq, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 2, scsp_last_line, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], scsp_last_line, CLEAR_LINE);
 	}
 }
 

@@ -104,20 +104,20 @@ static WRITE8_HANDLER( tvdraw_axis_w )
 {
 	if (data & 0x01)
 	{
-		tvdraw_data = input_port_read(machine, "TVDRAW_X");
+		tvdraw_data = input_port_read(space->machine, "TVDRAW_X");
 
 		if (tvdraw_data < 4) tvdraw_data = 4;
 		if (tvdraw_data > 251) tvdraw_data = 251;
 	}
 	else
 	{
-		tvdraw_data = input_port_read(machine, "TVDRAW_Y") + 32;
+		tvdraw_data = input_port_read(space->machine, "TVDRAW_Y") + 32;
 	}
 }
 
 static READ8_HANDLER( tvdraw_status_r )
 {
-	return input_port_read(machine, "TVDRAW_PEN");
+	return input_port_read(space->machine, "TVDRAW_PEN");
 }
 
 static READ8_HANDLER( tvdraw_data_r )
@@ -433,7 +433,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( sg1000_int )
 {
-    TMS9928A_interrupt(machine);
+    TMS9928A_interrupt(device->machine);
 }
 
 static void sg1000_vdp_interrupt(running_machine *machine, int state)
@@ -658,7 +658,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	}
 
 	/* ROM selection */
-	memory_set_bank(machine, 1, (data & 0x40) >> 6);
+	memory_set_bank(device->machine, 1, (data & 0x40) >> 6);
 
 	/* printer strobe */
 	centronics_write_handshake(1, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
@@ -881,16 +881,18 @@ ROM_END
 
 static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	switch (size)
 	{
 	case 40 * 1024:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
 		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
 		memory_set_bank(machine, 1, 0);
 		break;
 
 	case 48 * 1024:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
 		memory_set_bank(machine, 1, 0);
 		break;
@@ -899,14 +901,14 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 		if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
 		{
 			/* Terebi Oekaki */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, &tvdraw_axis_w);
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, &tvdraw_status_r);
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, &tvdraw_data_r, SMH_NOP);
+			memory_install_write8_handler(space, 0x6000, 0x6000, 0, 0, &tvdraw_axis_w);
+			memory_install_read8_handler(space, 0x8000, 0x8000, 0, 0, &tvdraw_status_r);
+			memory_install_readwrite8_handler(space, 0xa000, 0xa000, 0, 0, &tvdraw_data_r, SMH_NOP);
 		}
 		else if (!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
 		{
 			/* The Castle */
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
+			memory_install_readwrite8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
 		}
 		break;
 	}
@@ -926,7 +928,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	sg1000_map_cartridge_memory(image->machine, ptr, size);
 
 	/* work RAM banking */
-	memory_install_readwrite8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2, SMH_BANK2);
+	memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2, SMH_BANK2);
 
 	return INIT_PASS;
 }

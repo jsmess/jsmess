@@ -76,16 +76,16 @@ static TIMER_CALLBACK( rapid_fire_callback ) {
 static WRITE8_HANDLER( sms_input_write ) {
 	switch( offset ) {
 	case 0:
-		switch( input_port_read(machine, "CTRLSEL") & 0x0F ) {
+		switch( input_port_read(space->machine, "CTRLSEL") & 0x0F ) {
 		case 0x03:	/* Sports Pad */
 			if ( data != sports_pad_last_data_1 ) {
-				UINT32 cpu_cycles = activecpu_gettotalcycles();
+				UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
 
 				sports_pad_last_data_1 = data;
 				if ( cpu_cycles - last_sports_pad_time_1 > 512 ) {
 					sports_pad_state_1 = 3;
-					sports_pad_1_x = input_port_read(machine, "SPORT0");
-					sports_pad_1_y = input_port_read(machine, "SPORT1");
+					sports_pad_1_x = input_port_read(space->machine, "SPORT0");
+					sports_pad_1_y = input_port_read(space->machine, "SPORT1");
 				}
 				last_sports_pad_time_1 = cpu_cycles;
 				sports_pad_state_1 = ( sports_pad_state_1 + 1 ) & 3;
@@ -94,16 +94,16 @@ static WRITE8_HANDLER( sms_input_write ) {
 		}
 		break;
 	case 1:
-		switch( input_port_read(machine, "CTRLSEL") >> 4 ) {
+		switch( input_port_read(space->machine, "CTRLSEL") >> 4 ) {
 		case 0x03:	/* Sports Pad */
 			if ( data != sports_pad_last_data_2 ) {
-				UINT32 cpu_cycles = activecpu_gettotalcycles();
+				UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
 
 				sports_pad_last_data_2 = data;
 				if ( cpu_cycles - last_sports_pad_time_2 > 2048 ) {
 					sports_pad_state_2 = 3;
-					sports_pad_2_x = input_port_read(machine, "SPORT2");
-					sports_pad_2_y = input_port_read(machine, "SPORT3");
+					sports_pad_2_x = input_port_read(space->machine, "SPORT2");
+					sports_pad_2_y = input_port_read(space->machine, "SPORT3");
 				}
 				last_sports_pad_time_2 = cpu_cycles;
 				sports_pad_state_2 = ( sports_pad_state_2 + 1 ) & 3;
@@ -114,9 +114,10 @@ static WRITE8_HANDLER( sms_input_write ) {
 	}
 }
 
-static void sms_get_inputs(running_machine *machine) {
+static void sms_get_inputs(const address_space *space) {
 	UINT8 data = 0x00;
-	UINT32 cpu_cycles = activecpu_gettotalcycles();
+	UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
+	running_machine *machine = space->machine;
 
 	sms_input_port0 = 0xFF;
 	sms_input_port1 = 0xFF;
@@ -229,7 +230,7 @@ READ8_HANDLER(sms_fm_detect_r) {
 		if ( biosPort & IO_CHIP ) {
 			return 0xFF;
 		} else {
-			sms_get_inputs(machine);
+			sms_get_inputs(space);
 			return sms_input_port0;
 		}
 	}
@@ -240,10 +241,10 @@ WRITE8_HANDLER(sms_version_w) {
 		smsVersion = (data & 0xA0);
 	}
 	if ( data & 0x08 ) {
-		sms_input_write( machine, 0, ( data & 0x20 ) >> 5 );
+		sms_input_write( space, 0, ( data & 0x20 ) >> 5 );
 	}
 	if ( data & 0x02 ) {
-		sms_input_write( machine, 1, ( data & 0x80 ) >> 7 );
+		sms_input_write( space, 1, ( data & 0x80 ) >> 7 );
 	}
 }
 
@@ -263,7 +264,7 @@ READ8_HANDLER(sms_version_r) {
 	}
 
 	/* Merge version data with input port #2 data */
-	sms_get_inputs(machine);
+	sms_get_inputs(space);
 	temp = (temp & 0xC0) | (sms_input_port1 & 0x3F);
 
 	return (temp);
@@ -271,19 +272,19 @@ READ8_HANDLER(sms_version_r) {
 
 READ8_HANDLER(sms_count_r) {
 	if ( offset & 0x01 ) {
-		return sms_vdp_hcount_r(machine, offset);
+		return sms_vdp_hcount_r(space, offset);
 	} else {
 		/* VCount read */
-		return sms_vdp_vcount_r(machine, offset);
+		return sms_vdp_vcount_r(space, offset);
 	}
 }
 
-void sms_check_pause_button( running_machine *machine ) {
+void sms_check_pause_button(const address_space *space) {
 	if ( ! IS_GAMEGEAR ) {
-		if ( ! (input_port_read(machine, "PAUSE") & 0x80) ) {
+		if ( ! (input_port_read(space->machine, "PAUSE") & 0x80) ) {
 			if ( ! smsPaused ) {
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE );
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE );
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE );
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE );
 			}
 			smsPaused = 1;
 		} else {
@@ -296,27 +297,27 @@ READ8_HANDLER(sms_input_port_0_r) {
 	if (biosPort & IO_CHIP) {
 		return (0xFF);
 	} else {
-		sms_get_inputs(machine);
+		sms_get_inputs(space);
 		return sms_input_port0;
 	}
 }
 
 WRITE8_HANDLER(sms_ym2413_register_port_0_w) {
 	if ( HAS_FM ) {
-		ym2413_register_port_0_w(machine, offset, (data & 0x3F));
+		ym2413_register_port_0_w(space, offset, (data & 0x3F));
 	}
 }
 
 WRITE8_HANDLER(sms_ym2413_data_port_0_w) {
 	if ( HAS_FM ) {
 		logerror("data_port_0_w %x %x\n", offset, data);
-		ym2413_data_port_0_w(machine, offset, data);
+		ym2413_data_port_0_w(space, offset, data);
 	}
 }
 
  READ8_HANDLER(gg_input_port_2_r) {
 	//logerror("joy 2 read, val: %02x, pc: %04x\n", (( IS_REGION_JAPAN ? 0x00 : 0x40) | (input_port_read(machine, "START") & 0x80)), activecpu_get_pc());
-	return (( IS_REGION_JAPAN ? 0x00 : 0x40 ) | (input_port_read(machine, "START") & 0x80));
+	return (( IS_REGION_JAPAN ? 0x00 : 0x40 ) | (input_port_read(space->machine, "START") & 0x80));
 }
 
  READ8_HANDLER(sms_mapper_r)
@@ -383,8 +384,8 @@ WRITE8_HANDLER(sms_mapper_w)
 					LOG(("ram 0 paged.\n"));
 					SOURCE = sms_cartridge[sms_current_cartridge].cartSRAM;
 				}
-				memory_set_bankptr( 4, SOURCE );
-				memory_set_bankptr( 5, SOURCE + 0x2000 );
+				memory_set_bankptr(space->machine,  4, SOURCE );
+				memory_set_bankptr(space->machine,  5, SOURCE + 0x2000 );
 			} else { /* it's rom */
 				if ( biosPort & IO_BIOS_ROM || ! HAS_BIOS ) {
 					page = ( rom_page_count > 0) ? sms_mapper[3] % rom_page_count : 0;
@@ -394,8 +395,8 @@ WRITE8_HANDLER(sms_mapper_w)
 					SOURCE = sms_banking_bios[4];
 				}
 				LOG(("rom 2 paged in %x.\n", page));
-				memory_set_bankptr( 4, SOURCE );
-				memory_set_bankptr( 5, SOURCE + 0x2000 );
+				memory_set_bankptr(space->machine,  4, SOURCE );
+				memory_set_bankptr(space->machine,  5, SOURCE + 0x2000 );
 			}
 			break;
 		case 1: /* Select 16k ROM bank for 0400-3FFF */
@@ -405,7 +406,7 @@ WRITE8_HANDLER(sms_mapper_w)
 			if ( IS_GAMEGEAR ) {
 				SOURCE = SOURCE_CART;
 			}
-			memory_set_bankptr( 2, SOURCE + 0x0400 );
+			memory_set_bankptr(space->machine,  2, SOURCE + 0x0400 );
 			break;
 		case 2: /* Select 16k ROM bank for 4000-7FFF */
 			LOG(("rom 1 paged in %x.\n", page));
@@ -414,7 +415,7 @@ WRITE8_HANDLER(sms_mapper_w)
 			if ( IS_GAMEGEAR ) {
 				SOURCE = SOURCE_CART;
 			}
-			memory_set_bankptr( 3, SOURCE );
+			memory_set_bankptr(space->machine,  3, SOURCE );
 			break;
 		case 3: /* Select 16k ROM bank for 8000-BFFF */
 			sms_banking_bios[4] = SOURCE_BIOS;
@@ -430,8 +431,8 @@ WRITE8_HANDLER(sms_mapper_w)
 			}
 			if ( ! ( sms_mapper[0] & 0x08 ) ) { /* is RAM disabled? */
 				LOG(("rom 2 paged in %x.\n", page));
-				memory_set_bankptr( 4, SOURCE );
-				memory_set_bankptr( 5, SOURCE + 0x2000 );
+				memory_set_bankptr(space->machine,  4, SOURCE );
+				memory_set_bankptr(space->machine,  5, SOURCE + 0x2000 );
 			}
 			break;
 	}
@@ -442,8 +443,8 @@ static WRITE8_HANDLER(sms_codemasters_page0_w) {
 		UINT8 rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
 		sms_banking_cart[1] = sms_cartridge[sms_current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
 		sms_banking_cart[2] = sms_banking_cart[1] + 0x0400;
-		memory_set_bankptr( 1, sms_banking_cart[1] );
-		memory_set_bankptr( 2, sms_banking_cart[2] );
+		memory_set_bankptr(space->machine, 1, sms_banking_cart[1] );
+		memory_set_bankptr(space->machine,  2, sms_banking_cart[2] );
 	}
 }
 
@@ -452,12 +453,12 @@ static WRITE8_HANDLER(sms_codemasters_page1_w) {
 		/* Check if we need to switch in some RAM */
 		if ( data & 0x80 ) {
 			sms_cartridge[sms_current_cartridge].ram_page = data & 0x07;
-			memory_set_bankptr( 5, sms_cartridge[sms_current_cartridge].cartRAM + sms_cartridge[sms_current_cartridge].ram_page * 0x2000 );
+			memory_set_bankptr(space->machine,  5, sms_cartridge[sms_current_cartridge].cartRAM + sms_cartridge[sms_current_cartridge].ram_page * 0x2000 );
 		} else {
 			UINT8 rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
 			sms_banking_cart[3] = sms_cartridge[sms_current_cartridge].ROM + ( ( rom_page_count > 0) ? data % rom_page_count : 0 ) * 0x4000;
-			memory_set_bankptr( 3, sms_banking_cart[3] );
-			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
+			memory_set_bankptr(space->machine,  3, sms_banking_cart[3] );
+			memory_set_bankptr(space->machine,  5, sms_banking_cart[4] + 0x2000 );
 		}
 	}
 }
@@ -465,9 +466,9 @@ static WRITE8_HANDLER(sms_codemasters_page1_w) {
 WRITE8_HANDLER(sms_bios_w) {
 	biosPort = data;
 
-	logerror("bios write %02x, pc: %04x\n", data, activecpu_get_pc());
+	logerror("bios write %02x, pc: %04x\n", data, cpu_get_pc(space->cpu));
 
-	setup_rom(machine);
+	setup_rom(space);
 }
 
 WRITE8_HANDLER(sms_cartram2_w) {
@@ -488,8 +489,8 @@ WRITE8_HANDLER(sms_cartram2_w) {
 		if ( ! sms_cartridge[sms_current_cartridge].ROM )
 			return;
 		sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
-		memory_set_bankptr( 4, sms_banking_cart[4] );
-		memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
+		memory_set_bankptr(space->machine,  4, sms_banking_cart[4] );
+		memory_set_bankptr(space->machine,  5, sms_banking_cart[4] + 0x2000 );
 		LOG(("rom 2 paged in %x dodgeball king.\n", page));
 	}
 }
@@ -511,8 +512,8 @@ WRITE8_HANDLER(sms_cartram_w) {
 			if ( ! sms_cartridge[sms_current_cartridge].ROM )
 				return;
 			sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
-			memory_set_bankptr( 4, sms_banking_cart[4] );
-			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
+			memory_set_bankptr(space->machine,  4, sms_banking_cart[4] );
+			memory_set_bankptr(space->machine,  5, sms_banking_cart[4] + 0x2000 );
 			LOG(("rom 2 paged in %x codemasters.\n", page));
 		} else if ( sms_cartridge[sms_current_cartridge].features & CF_ONCART_RAM ) {
 			sms_cartridge[sms_current_cartridge].cartRAM[offset & ( sms_cartridge[sms_current_cartridge].ram_size - 1 ) ] = data;
@@ -584,14 +585,16 @@ static void sms_machine_stop(running_machine *machine) {
 	}
 }
 
-void setup_rom(running_machine *machine)
+void setup_rom(const address_space *space)
 {
+	running_machine *machine = space->machine;
+
 	/* 1. set up bank pointers to point to nothing */
-	memory_set_bankptr( 1, sms_banking_none[1] );
-	memory_set_bankptr( 2, sms_banking_none[2] );
-	memory_set_bankptr( 3, sms_banking_none[3] );
-	memory_set_bankptr( 4, sms_banking_none[4] );
-	memory_set_bankptr( 5, sms_banking_none[4] + 0x2000 );
+	memory_set_bankptr(machine,  1, sms_banking_none[1] );
+	memory_set_bankptr(machine,  2, sms_banking_none[2] );
+	memory_set_bankptr(machine,  3, sms_banking_none[3] );
+	memory_set_bankptr(machine,  4, sms_banking_none[4] );
+	memory_set_bankptr(machine,  5, sms_banking_none[4] + 0x2000 );
 
 	/* 2. check and set up expansion port */
 	if (!(biosPort & IO_EXPANSION) && (biosPort & IO_CARTRIDGE) && (biosPort & IO_CARD)) {
@@ -609,11 +612,11 @@ void setup_rom(running_machine *machine)
 	/* if ( ( !(biosPort & IO_CARTRIDGE) && (biosPort & IO_EXPANSION) && (biosPort & IO_CARD) ) || IS_GAMEGEAR ) { */
 	/* Out Run Europa initially writes a value to port 3E where IO_CARTRIDGE, IO_EXPANSION and IO_CARD are reset */
 	if ( ( ! ( biosPort & IO_CARTRIDGE ) ) || IS_GAMEGEAR ) {
-		memory_set_bankptr( 1, sms_banking_cart[1] );
-		memory_set_bankptr( 2, sms_banking_cart[2] );
-		memory_set_bankptr( 3, sms_banking_cart[3] );
-		memory_set_bankptr( 4, sms_banking_cart[4] );
-		memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
+		memory_set_bankptr(machine,  1, sms_banking_cart[1] );
+		memory_set_bankptr(machine,  2, sms_banking_cart[2] );
+		memory_set_bankptr(machine,  3, sms_banking_cart[3] );
+		memory_set_bankptr(machine,  4, sms_banking_cart[4] );
+		memory_set_bankptr(machine,  5, sms_banking_cart[4] + 0x2000 );
 		logerror( "Switched in cartridge rom.\n" );
 	}
 
@@ -621,28 +624,28 @@ void setup_rom(running_machine *machine)
 	if ( !(biosPort & IO_BIOS_ROM) ) {
 		/* 0x0400 bioses */
 		if ( HAS_BIOS_0400 ) {
-			memory_set_bankptr( 1, sms_banking_bios[1] );
+			memory_set_bankptr(machine,  1, sms_banking_bios[1] );
 			logerror( "Switched in 0x0400 bios.\n" );
 		}
 		/* 0x2000 bioses */
 		if ( HAS_BIOS_2000 ) {
-			memory_set_bankptr( 1, sms_banking_bios[1] );
-			memory_set_bankptr( 2, sms_banking_bios[2] );
+			memory_set_bankptr(machine,  1, sms_banking_bios[1] );
+			memory_set_bankptr(machine,  2, sms_banking_bios[2] );
 			logerror( "Switched in 0x2000 bios.\n" );
 		}
 		if ( HAS_BIOS_FULL ) {
-			memory_set_bankptr( 1, sms_banking_bios[1] );
-			memory_set_bankptr( 2, sms_banking_bios[2] );
-			memory_set_bankptr( 3, sms_banking_bios[3] );
-			memory_set_bankptr( 4, sms_banking_bios[4] );
-			memory_set_bankptr( 5, sms_banking_bios[4] + 0x2000 );
+			memory_set_bankptr(machine,  1, sms_banking_bios[1] );
+			memory_set_bankptr(machine,  2, sms_banking_bios[2] );
+			memory_set_bankptr(machine,  3, sms_banking_bios[3] );
+			memory_set_bankptr(machine,  4, sms_banking_bios[4] );
+			memory_set_bankptr(machine,  5, sms_banking_bios[4] + 0x2000 );
 			logerror( "Switched in full bios.\n" );
 		}
 	}
 
 	if ( sms_cartridge[sms_current_cartridge].features & CF_ONCART_RAM ) {
-		memory_set_bankptr( 4, sms_cartridge[sms_current_cartridge].cartRAM );
-		memory_set_bankptr( 5, sms_cartridge[sms_current_cartridge].cartRAM );
+		memory_set_bankptr(machine,  4, sms_cartridge[sms_current_cartridge].cartRAM );
+		memory_set_bankptr(machine,  5, sms_cartridge[sms_current_cartridge].cartRAM );
 	}
 }
 
@@ -737,6 +740,7 @@ static int detect_korean_mapper( UINT8 *rom ) {
 
 DEVICE_START( sms_cart ) {
 	running_machine *machine = device->machine;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	for ( i = 0; i < MAX_CARTRIDGES; i++ ) {
@@ -770,6 +774,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	const char *fname = image_filename( image );
 	int fname_len = fname ? strlen( fname ) : 0;
 	const char *extrainfo = image_extrainfo( image );
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* Check for 512-byte header */
 	if ((size / 512) & 1)
@@ -915,17 +920,19 @@ MACHINE_START(sms) {
 
 MACHINE_RESET(sms)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	smsVersion = 0x00;
 	if ( HAS_FM ) {
 		smsFMDetect = 0x01;
 	}
 
-	sms_mapper_ram = memory_get_write_ptr( 0, ADDRESS_SPACE_PROGRAM, 0xDFFC );
+	sms_mapper_ram = memory_get_write_ptr( space, 0xDFFC );
 
 	if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER ) {
 		/* Install special memory handlers */
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
+		memory_install_write8_handler(space, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
+		memory_install_write8_handler(space, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
 	}
 
 	/* Initialize SIO stuff for GG */
@@ -939,7 +946,7 @@ MACHINE_RESET(sms)
 
 	setup_banks(machine);
 
-	setup_rom(machine);
+	setup_rom(space);
 
 	rapid_fire_state_1 = 0;
 	rapid_fire_state_2 = 0;
@@ -975,8 +982,8 @@ WRITE8_HANDLER(sms_store_cart_select_w) {
 		sms_current_cartridge = slot;
 	}
 	setup_cart_banks();
-	memory_set_bankptr( 10, sms_banking_cart[3] + 0x2000 );
-	setup_rom(machine);
+	memory_set_bankptr(space->machine,  10, sms_banking_cart[3] + 0x2000 );
+	setup_rom(space);
 }
 
 READ8_HANDLER(sms_store_select1) {
@@ -992,13 +999,13 @@ READ8_HANDLER(sms_store_control_r) {
 }
 
 WRITE8_HANDLER(sms_store_control_w) {
-	logerror( "0x%04X: sms_store_control write 0x%02X\n", activecpu_get_pc(), data );
+	logerror( "0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(space->cpu), data );
 	if ( data & 0x02 ) {
-		cpunum_resume( 0, SUSPEND_REASON_HALT );
+		cpu_resume( space->machine->cpu[0], SUSPEND_REASON_HALT );
 	} else {
 		/* Pull reset line of CPU #0 low */
-		cpunum_suspend( 0, SUSPEND_REASON_HALT, 1 );
-		cpu_reset(machine->cpu[0]);
+		cpu_suspend( space->machine->cpu[0], SUSPEND_REASON_HALT, 1 );
+		cpu_reset(space->machine->cpu[0]);
 	}
 	sms_store_control = data;
 }
@@ -1008,6 +1015,6 @@ void sms_int_callback( running_machine *machine, int state ) {
 }
 
 void sms_store_int_callback( running_machine *machine, int state ) {
-	cpunum_set_input_line(machine, sms_store_control & 0x01 ? 1 : 0, 0, state );
+	cpu_set_input_line(machine->cpu[0], sms_store_control & 0x01 ? 1 : 0, state );
 }
 

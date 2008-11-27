@@ -23,13 +23,13 @@
 #define FLAG_FM				0x00100000
 #define FLAG_REGION_JAPAN		0x00200000
 
-#define IS_GAMEGEAR			( machine->gamedrv->flags & FLAG_GAMEGEAR )
-#define HAS_BIOS_0400			( machine->gamedrv->flags & FLAG_BIOS_0400 )
-#define HAS_BIOS_2000			( machine->gamedrv->flags & FLAG_BIOS_2000 )
-#define HAS_BIOS_FULL			( machine->gamedrv->flags & FLAG_BIOS_FULL )
-#define HAS_BIOS			( machine->gamedrv->flags & ( FLAG_BIOS_0400 | FLAG_BIOS_2000 | FLAG_BIOS_FULL ) )
-#define HAS_FM				( machine->gamedrv->flags & FLAG_FM )
-#define IS_REGION_JAPAN			( machine->gamedrv->flags & FLAG_REGION_JAPAN )
+#define IS_GAMEGEAR			( space->machine->gamedrv->flags & FLAG_GAMEGEAR )
+#define HAS_BIOS_0400			( space->machine->gamedrv->flags & FLAG_BIOS_0400 )
+#define HAS_BIOS_2000			( space->machine->gamedrv->flags & FLAG_BIOS_2000 )
+#define HAS_BIOS_FULL			( space->machine->gamedrv->flags & FLAG_BIOS_FULL )
+#define HAS_BIOS			( space->machine->gamedrv->flags & ( FLAG_BIOS_0400 | FLAG_BIOS_2000 | FLAG_BIOS_FULL ) )
+#define HAS_FM				( space->machine->gamedrv->flags & FLAG_FM )
+#define IS_REGION_JAPAN			( space->machine->gamedrv->flags & FLAG_REGION_JAPAN )
 
 
 /*----------- defined in machine/sms.c -----------*/
@@ -54,9 +54,9 @@ WRITE8_HANDLER(gg_sio_w);
 WRITE8_HANDLER(gg_psg_w);
  READ8_HANDLER(gg_input_port_2_r);
 
-void setup_rom(running_machine *machine);
+void setup_rom(const address_space *space);
 
-void sms_check_pause_button( running_machine *machine );
+void sms_check_pause_button(const address_space *space);
 
 DEVICE_START( sms_cart );
 DEVICE_IMAGE_LOAD( sms_cart );
