@@ -67,18 +67,18 @@ const game_driver * const drivers[] =
 //	DRIVER( falcon40 )	/* Atari Falcon040 (prototype)						*/
 
 	/* NINTENDO */
-//128u4	DRIVER( nes )		/* Nintendo Entertainment System					*/
-//128u4	DRIVER( nespal )	/* Nintendo Entertainment System					*/
-//128u4	DRIVER( famicom )
-//128u4	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
-//128u4	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
-//128u4	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
-//128u4	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
-//128u4	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
-//128u4	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
-//128u4	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
-//128u4	DRIVER( n64 )		/* Nintendo N64										*/
-//128u4	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
+	DRIVER( nes )		/* Nintendo Entertainment System					*/
+	DRIVER( nespal )	/* Nintendo Entertainment System					*/
+	DRIVER( famicom )
+	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
+	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
+	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
+	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
+	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
+	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
+	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
+	DRIVER( n64 )		/* Nintendo N64										*/
+	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
 
 //128u4	DRIVER( megaduck )	/* Megaduck											*/
 
@@ -162,8 +162,8 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( raaspec )	/* RA+A Spectrum - Modified Vectrex					*/
 
 	/* MATTEL */
-//128u4	DRIVER( intv )		/* Mattel Intellivision - 1979 AKA INTV				*/
-//128u4	DRIVER( intvsrs )	/* Intellivision (Sears License) - 19??				*/
+	DRIVER( intv )		/* Mattel Intellivision - 1979 AKA INTV				*/
+	DRIVER( intvsrs )	/* Intellivision (Sears License) - 19??				*/
 
 	/* ENTEX */
 	DRIVER( advision )	/* Adventurevision									*/
@@ -200,16 +200,16 @@ const game_driver * const drivers[] =
 
 /****************COMPUTERS***************************************************/
     /* ACORN */
-//128u4	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
-//128u4	DRIVER( atom )		/* 1979 Acorn Atom									*/
-//128u4	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
-//128u4	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/
-//128u4	DRIVER( bbcb )		/* 1981 BBC Micro Model B							*/
-//128u4	DRIVER( bbcbp )		/* 198? BBC Micro Model B+ 64K						*/
-//128u4	DRIVER( bbcbp128 )	/* 198? BBC Micro Model B+ 128K						*/
-//128u4	DRIVER( bbcm)		/* 198? BBC Master									*/
-//128u4	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
-//128u4	DRIVER( electron )	/* 1983 Acorn Electron								*/
+	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
+	DRIVER( atom )		/* 1979 Acorn Atom									*/
+	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
+	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/
+	DRIVER( bbcb )		/* 1981 BBC Micro Model B							*/
+	DRIVER( bbcbp )		/* 198? BBC Micro Model B+ 64K						*/
+	DRIVER( bbcbp128 )	/* 198? BBC Micro Model B+ 128K						*/
+	DRIVER( bbcm)		/* 198? BBC Master									*/
+	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
+	DRIVER( electron )	/* 1983 Acorn Electron								*/
 //	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 
 	/* CAMBRIDGE COMPUTERS */
@@ -405,11 +405,11 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( c128drit )	/* Commodore 128DCR - PAL (Italian)					*/
 //128u4	DRIVER( c128drsw )	/* Commodore 128DCR - PAL (Swedish)					*/
 
-//128u4	DRIVER( a500n )		/* Commodore Amiga 500 - NTSC						*/
-//128u4	DRIVER( a500p )		/* Commodore Amiga 500 - PAL						*/
-//128u4	DRIVER( a1000n )	/* Commodore Amiga 1000 - NTSC						*/
-//128u4	DRIVER( a1000p )	/* Commodore Amiga 1000 - PAL						*/
-//128u4	DRIVER( cdtv )
+	DRIVER( a500n )		/* Commodore Amiga 500 - NTSC						*/
+	DRIVER( a500p )		/* Commodore Amiga 500 - PAL						*/
+	DRIVER( a1000n )	/* Commodore Amiga 1000 - NTSC						*/
+	DRIVER( a1000p )	/* Commodore Amiga 1000 - PAL						*/
+	DRIVER( cdtv )
 
 //128u4	DRIVER( c65 )		/* 1991 C65 / C64DX (Prototype, NTSC)				*/
 //128u4	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
@@ -653,8 +653,8 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( telstrat )	/* ??? Oric Telestrat/Stratos						*/
 
 	/* PHILIPS */
-//128u4	DRIVER( p2000t )	/* 1980 P2000T										*/
-//128u4	DRIVER( p2000m )	/* 1980 P2000M										*/
+	DRIVER( p2000t )	/* 1980 P2000T										*/
+	DRIVER( p2000m )	/* 1980 P2000M										*/
 //128u4	DRIVER( videopac )	/* 1979 Videopac G7000/C52							*/
 //128u4	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
@@ -871,10 +871,10 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( apexc )		/* 1955(?) APEXC: All-Purpose Electronic X-ray Computer */
 
 	/* Sony */
-//128u4	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
-//128u4	DRIVER( psu )		/* 1995 Sony PlayStation (USA)						*/
-//128u4	DRIVER( pse )		/* 1995 Sony PlayStation (Europe)					*/
-//128u4	DRIVER( psa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
+	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
+	DRIVER( psu )		/* 1995 Sony PlayStation (USA)						*/
+	DRIVER( pse )		/* 1995 Sony PlayStation (Europe)					*/
+	DRIVER( psa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
 
 	/* Corvus */
 //128u4	DRIVER(concept)		/* 1982 Corvus Concept								*/
