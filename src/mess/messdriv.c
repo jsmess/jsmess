@@ -136,7 +136,7 @@ const game_driver * const drivers[] =
 //	DRIVER( shmc1200 )
 
 	/* FAIRCHILD */
-//128u4	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/
+	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/
 
 	/* COLECO */
 	DRIVER( coleco )	/* ColecoVision (Original BIOS)						*/
