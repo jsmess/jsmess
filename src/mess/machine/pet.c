@@ -20,6 +20,8 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 
+#include "deprecat.h"
+
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
 	{ \
@@ -49,19 +51,19 @@ static emu_timer *datasette2_timer;
 
 static READ8_HANDLER( pet_mc6845_register_r )
 {
-	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	device_config *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, "crtc");
 	return mc6845_register_r(devconf, offset);
 }
 
 static WRITE8_HANDLER( pet_mc6845_register_w )
 {
-	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	device_config *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, "crtc");
 	mc6845_register_w(devconf, offset, data);
 }
 
 static WRITE8_HANDLER( pet_mc6845_address_w )
 {
-	device_config *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	device_config *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, "crtc");
 	mc6845_address_w(devconf, offset, data);
 }
 
@@ -83,10 +85,10 @@ static  READ8_HANDLER ( pet_pia0_port_a_read )
 {
 	int data = 0xf0 | pet_keyline_select;
 
-	if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 
-	if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x20;
 
 	if (!cbm_ieee_eoi_r()) 
@@ -109,9 +111,9 @@ static  READ8_HANDLER ( pet_pia0_port_b_read )
 	
 	if (pet_keyline_select < 10) 
 	{
-		data = input_port_read(machine, keynames[pet_keyline_select]);
+		data = input_port_read(space->machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
-		if ((pet_keyline_select == 8) && (input_port_read(machine, "SPECIAL") & 0x80)) 
+		if ((pet_keyline_select == 8) && (input_port_read(space->machine, "SPECIAL") & 0x80)) 
 			data &= 0xfe;
 	}
 	return data;
@@ -126,18 +128,18 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 	
 	if (pet_keyline_select < 10) 
 	{
-		data = input_port_read(machine, keynames[pet_keyline_select]);
+		data = input_port_read(space->machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */
 		if (superpet)
 		{
-			if ((pet_keyline_select == 6) && !(input_port_read(machine, "SPECIAL") & 0x80)) 
+			if ((pet_keyline_select == 6) && !(input_port_read(space->machine, "SPECIAL") & 0x80)) 
 				data &= 0xfe;
 		}		
 		else
 		{
-			if ((pet_keyline_select == 6) && (input_port_read(machine, "SPECIAL") & 0x80)) 
+			if ((pet_keyline_select == 6) && (input_port_read(space->machine, "SPECIAL") & 0x80)) 
 				data &= 0xfe;
 		}
 	}
@@ -148,7 +150,7 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 static READ8_HANDLER( pet_pia0_ca1_in )
 {
 	// cassette 1 read
-	return (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > +0.0) ? 1 : 0;
+	return (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" )) > +0.0) ? 1 : 0;
 }
 
 
@@ -161,12 +163,12 @@ static WRITE8_HANDLER( pet_pia0_cb2_out )
 {
 	if (!data)
 	{
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette1_timer, attotime_never);
 	}
 }
@@ -304,12 +306,12 @@ static  READ8_HANDLER( pet_via_port_b_r )
 
 	if (!(data & 0x10))
 	{
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette2_timer, attotime_never);
 	}
 
@@ -324,7 +326,7 @@ static  READ8_HANDLER( pet_via_port_b_r )
 static READ8_HANDLER( pet_via_cb1_r )
 {
 	// cassette 2 read
-	return (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
+	return (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
 }
 
 
@@ -356,27 +358,27 @@ static struct {
 static WRITE8_HANDLER(cbm8096_io_w)
 {
 	if (offset < 0x10) ;
-	else if (offset < 0x14) pia_0_w(machine, offset & 3, data);
+	else if (offset < 0x14) pia_0_w(space, offset & 3, data);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) pia_1_w(machine, offset & 3, data);
+	else if (offset < 0x24) pia_1_w(space, offset & 3, data);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) via_0_w(machine, offset & 0xf, data);
+	else if (offset < 0x50) via_0_w(space, offset & 0xf, data);
 	else if (offset < 0x80) ;
-	else if (offset == 0x80) pet_mc6845_address_w(machine, offset, data);
-	else if (offset == 0x81) pet_mc6845_register_w(machine, offset, data);
+	else if (offset == 0x80) pet_mc6845_address_w(space, offset, data);
+	else if (offset == 0x81) pet_mc6845_register_w(space, offset, data);
 }
 
 static READ8_HANDLER(cbm8096_io_r)
 {
 	int data = 0xff;
 	if (offset < 0x10) ;
-	else if (offset < 0x14) data = pia_0_r(machine, offset & 3);
+	else if (offset < 0x14) data = pia_0_r(space, offset & 3);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) data = pia_1_r(machine, offset & 3);
+	else if (offset < 0x24) data = pia_1_r(space, offset & 3);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) data = via_0_r(machine, offset & 0xf);
+	else if (offset < 0x50) data = via_0_r(space, offset & 0xf);
 	else if (offset < 0x80) ;
-	else if (offset == 0x81) data = pet_mc6845_register_r(machine, offset);
+	else if (offset == 0x81) data = pet_mc6845_register_r(space, offset);
 	return data;
 }
 
@@ -397,8 +399,8 @@ static WRITE8_HANDLER(pet80_bank1_w) {
 */
 WRITE8_HANDLER(cbm8096_w)
 {
-	read8_machine_func rh;
-	write8_machine_func wh;
+	read8_space_func rh;
+	write8_space_func wh;
 
 	if (data & 0x80)
 	{
@@ -415,17 +417,17 @@ WRITE8_HANDLER(cbm8096_w)
 			else
 				wh = SMH_NOP;
 		}
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, rh);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, wh);
+		memory_install_read8_handler(space, 0xe800, 0xefff, 0, 0, rh);
+		memory_install_write8_handler(space, 0xe800, 0xefff, 0, 0, wh);
 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xe7ff, 0, 0, (data & 2) == 0 ? SMH_BANK6 : SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffef, 0, 0, (data & 2) == 0 ? SMH_BANK8 : SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff1, 0xffff, 0, 0, (data & 2) == 0 ? SMH_BANK9 : SMH_NOP);
+		memory_install_write8_handler(space, 0xc000, 0xe7ff, 0, 0, (data & 2) == 0 ? SMH_BANK6 : SMH_NOP);
+		memory_install_write8_handler(space, 0xf000, 0xffef, 0, 0, (data & 2) == 0 ? SMH_BANK8 : SMH_NOP);
+		memory_install_write8_handler(space, 0xfff1, 0xffff, 0, 0, (data & 2) == 0 ? SMH_BANK9 : SMH_NOP);
 
 		if (data & 0x20)
 		{
 			pet80_bank1_base = pet_memory + 0x8000;
-			memory_set_bankptr(machine, 1, pet80_bank1_base);
+			memory_set_bankptr (space->machine, 1, pet80_bank1_base);
 			wh = pet80_bank1_w;
 		}
 		else
@@ -435,11 +437,11 @@ WRITE8_HANDLER(cbm8096_w)
 			else
 				wh = SMH_NOP;
 		}
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, wh);
+		memory_install_write8_handler(space, 0x8000, 0x8fff, 0, 0, wh);
 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, (data & 1) == 0 ? SMH_BANK2 : SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, (data & 1) == 0 ? SMH_BANK3 : SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, (data & 1) == 0 ? SMH_BANK4 : SMH_NOP);
+		memory_install_write8_handler(space, 0x9000, 0x9fff, 0, 0, (data & 1) == 0 ? SMH_BANK2 : SMH_NOP);
+		memory_install_write8_handler(space, 0xa000, 0xafff, 0, 0, (data & 1) == 0 ? SMH_BANK3 : SMH_NOP);
+		memory_install_write8_handler(space, 0xb000, 0xbfff, 0, 0, (data & 1) == 0 ? SMH_BANK4 : SMH_NOP);
 
 
 		if (data & 4) 
@@ -447,71 +449,71 @@ WRITE8_HANDLER(cbm8096_w)
 			if (!(data & 0x20)) 
 			{
 				pet80_bank1_base = pet_memory + 0x14000;
-				memory_set_bankptr(machine, 1, pet80_bank1_base);
+				memory_set_bankptr (space->machine, 1, pet80_bank1_base);
 			}
-			memory_set_bankptr(machine, 2, pet_memory + 0x15000);
-			memory_set_bankptr(machine, 3, pet_memory + 0x16000);
-			memory_set_bankptr(machine, 4, pet_memory + 0x17000);
+			memory_set_bankptr (space->machine, 2, pet_memory + 0x15000);
+			memory_set_bankptr (space->machine, 3, pet_memory + 0x16000);
+			memory_set_bankptr (space->machine, 4, pet_memory + 0x17000);
 		} 
 		else 
 		{
 			if (!(data & 0x20)) 
 			{
 				pet80_bank1_base = pet_memory + 0x10000;
-				memory_set_bankptr(machine, 1, pet80_bank1_base);
+				memory_set_bankptr (space->machine, 1, pet80_bank1_base);
 			}
-			memory_set_bankptr(machine, 2, pet_memory + 0x11000);
-			memory_set_bankptr(machine, 3, pet_memory + 0x12000);
-			memory_set_bankptr(machine, 4, pet_memory + 0x13000);
+			memory_set_bankptr (space->machine, 2, pet_memory + 0x11000);
+			memory_set_bankptr (space->machine, 3, pet_memory + 0x12000);
+			memory_set_bankptr (space->machine, 4, pet_memory + 0x13000);
 		}
 
 		if (data & 8) 
 		{
 			if (!(data & 0x40)) 
 			{
-				memory_set_bankptr(machine, 7, pet_memory + 0x1e800);
+				memory_set_bankptr (space->machine, 7, pet_memory + 0x1e800);
 			}
-			memory_set_bankptr(machine, 6, pet_memory + 0x1c000);
-			memory_set_bankptr(machine, 8, pet_memory + 0x1f000);
-			memory_set_bankptr(machine, 9, pet_memory + 0x1fff1);
+			memory_set_bankptr (space->machine, 6, pet_memory + 0x1c000);
+			memory_set_bankptr (space->machine, 8, pet_memory + 0x1f000);
+			memory_set_bankptr (space->machine, 9, pet_memory + 0x1fff1);
 		} 
 		else 
 		{
 			if (!(data & 0x40)) 
 			{
-				memory_set_bankptr(machine, 7, pet_memory+ 0x1a800);
+				memory_set_bankptr (space->machine, 7, pet_memory+ 0x1a800);
 			}
-			memory_set_bankptr(machine, 6, pet_memory + 0x18000);
-			memory_set_bankptr(machine, 8, pet_memory + 0x1b000);
-			memory_set_bankptr(machine, 9, pet_memory + 0x1bff1);
+			memory_set_bankptr (space->machine, 6, pet_memory + 0x18000);
+			memory_set_bankptr (space->machine, 8, pet_memory + 0x1b000);
+			memory_set_bankptr (space->machine, 9, pet_memory + 0x1bff1);
 		}
 	}
 	else
 	{
 		pet80_bank1_base = pet_memory + 0x8000;
-		memory_set_bankptr(machine, 1, pet80_bank1_base );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, pet80_bank1_w);
+		memory_set_bankptr (space->machine, 1, pet80_bank1_base );
+		memory_install_write8_handler(space, 0x8000, 0x8fff, 0, 0, pet80_bank1_w);
 
-		memory_set_bankptr(machine, 2, pet_memory + 0x9000);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9fff, 0, 0, SMH_UNMAP);
+		memory_set_bankptr (space->machine, 2, pet_memory + 0x9000);
+		memory_install_write8_handler(space, 0x9000, 0x9fff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(machine, 3, pet_memory + 0xa000);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xafff, 0, 0, SMH_UNMAP);
+		memory_set_bankptr (space->machine, 3, pet_memory + 0xa000);
+		memory_install_write8_handler(space, 0xa000, 0xafff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(machine, 4, pet_memory + 0xb000);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xbfff, 0, 0, SMH_UNMAP);
+		memory_set_bankptr (space->machine, 4, pet_memory + 0xb000);
+		memory_install_write8_handler(space, 0xb000, 0xbfff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(machine, 6, pet_memory + 0xc000);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xe7ff, 0, 0, SMH_UNMAP);
+		memory_set_bankptr (space->machine, 6, pet_memory + 0xc000);
+		memory_install_write8_handler(space, 0xc000, 0xe7ff, 0, 0, SMH_UNMAP);
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, cbm8096_io_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0, cbm8096_io_w);
+		memory_install_read8_handler(space, 0xe800, 0xefff, 0, 0, cbm8096_io_r);
+		memory_install_write8_handler(space, 0xe800, 0xefff, 0, 0, cbm8096_io_w);
 
-		memory_set_bankptr(machine, 8, pet_memory + 0xf000);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffef, 0, 0, SMH_UNMAP);
+		memory_set_bankptr (space->machine, 8, pet_memory + 0xf000);
+		memory_install_write8_handler(space, 0xf000, 0xffef, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(machine, 9, pet_memory + 0xfff1);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff1, 0xffff, 0, 0, SMH_UNMAP);
+		memory_set_bankptr (space->machine, 9, pet_memory + 0xfff1);
+		memory_install_write8_handler(space, 0xfff1, 0xffff, 0, 0, SMH_UNMAP);
 	}
 }
 
@@ -536,8 +538,8 @@ WRITE8_HANDLER(superpet_w)
 		case 4:
 		case 5:
 			spet.bank = data & 0xf;
-			memory_configure_bank(machine, 1, 0, 16, superpet_memory, 0x1000);
-			memory_set_bank(machine, 1, spet.bank);
+			memory_configure_bank(space->machine, 1, 0, 16, superpet_memory, 0x1000);
+			memory_set_bank(space->machine, 1, spet.bank);
 			/* 7 low writeprotects systemlatch */
 			break;
 
@@ -552,7 +554,7 @@ static TIMER_CALLBACK(pet_interrupt)
 {
 	static int level = 0;
 
-	pia_0_cb1_w(machine, 0, level);
+	pia_0_cb1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, level);
 	level = !level;
 }
 
@@ -562,7 +564,7 @@ static TIMER_CALLBACK( pet_tape1_timer )
 {
 //	cassette 1
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > +0.0) ? 1 : 0;
-	pia_0_ca1_w(machine, 0, data);
+	pia_0_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
 /* NOT WORKING - Just placeholder */
@@ -570,7 +572,7 @@ static TIMER_CALLBACK( pet_tape2_timer )
 {
 //	cassette 2
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
-	via_0_cb1_w(machine, 0, data);
+	via_0_cb1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
 
@@ -582,14 +584,14 @@ static void pet_common_driver_init(running_machine *machine)
 	if (!pet_memory)
 		pet_memory = mess_ram;
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
-	memory_set_bankptr(machine, 10, pet_memory);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
+	memory_set_bankptr (machine, 10, pet_memory);
 
 	if (mess_ram_size < 0x8000)
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
@@ -694,13 +696,13 @@ MACHINE_RESET( pet )
 	{
 		if (input_port_read(machine, "CFG") & 0x08)
 		{
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff0, 0xfff0, 0, 0, cbm8096_w);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, cbm8096_w);
 		}
 		else
 		{
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff0, 0xfff0, 0, 0, SMH_NOP);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, SMH_NOP);
 		}
-		cbm8096_w(machine, 0, 0);
+		cbm8096_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
 	}
 
 	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
@@ -712,21 +714,21 @@ INTERRUPT_GEN( pet_frame_interrupt )
 {
 	if (superpet)
 	{
-		if (input_port_read(machine, "CFG") & 0x04) 
+		if (input_port_read(device->machine, "CFG") & 0x04) 
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
+			cpu_set_input_line(device, INPUT_LINE_HALT, 1);
+			cpu_set_input_line(device, INPUT_LINE_HALT, 0);
 			pet_font |= 2;
 		} 
 		else 
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
+			cpu_set_input_line(device, INPUT_LINE_HALT, 0);
+			cpu_set_input_line(device, INPUT_LINE_HALT, 1);
 			pet_font &= ~2;
 		}
 	}
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
 }
 
 

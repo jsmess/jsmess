@@ -128,7 +128,7 @@ UINT8 c16_m7501_port_read(void)
 {
 	running_machine *machine = Machine;
 	UINT8 data = 0xff;
-	UINT8 c16_port7501 = (UINT8) cpunum_get_info_int(0, CPUINFO_INT_M6510_PORT);
+	UINT8 c16_port7501 = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	if ((c16_port7501 & 0x01) || !cbm_serial_data_read())
 		data &= ~0x80;
@@ -151,50 +151,50 @@ UINT8 c16_m7501_port_read(void)
 static void c16_bankswitch (running_machine *machine)
 {
 	UINT8 *rom = memory_region(machine, "main");
-	memory_set_bankptr(machine, 9, mess_ram);
+	memory_set_bankptr (machine, 9, mess_ram);
 
 	switch (lowrom)
 	{
 	case 0:
-		memory_set_bankptr (2, rom + 0x10000);
+		memory_set_bankptr (machine, 2, rom + 0x10000);
 		break;
 	case 1:
-		memory_set_bankptr (2, rom + 0x18000);
+		memory_set_bankptr (machine, 2, rom + 0x18000);
 		break;
 	case 2:
-		memory_set_bankptr (2, rom + 0x20000);
+		memory_set_bankptr (machine, 2, rom + 0x20000);
 		break;
 	case 3:
-		memory_set_bankptr (2, rom + 0x28000);
+		memory_set_bankptr (machine, 2, rom + 0x28000);
 		break;
 	}
 
 	switch (highrom)
 	{
 	case 0:
-		memory_set_bankptr (3, rom + 0x14000);
-		memory_set_bankptr (8, rom + 0x17f20);
+		memory_set_bankptr (machine, 3, rom + 0x14000);
+		memory_set_bankptr (machine, 8, rom + 0x17f20);
 		break;
 	case 1:
-		memory_set_bankptr (3, rom + 0x1c000);
-		memory_set_bankptr (8, rom + 0x1ff20);
+		memory_set_bankptr (machine, 3, rom + 0x1c000);
+		memory_set_bankptr (machine, 8, rom + 0x1ff20);
 		break;
 	case 2:
-		memory_set_bankptr (3, rom + 0x24000);
-		memory_set_bankptr (8, rom + 0x27f20);
+		memory_set_bankptr (machine, 3, rom + 0x24000);
+		memory_set_bankptr (machine, 8, rom + 0x27f20);
 		break;
 	case 3:
-		memory_set_bankptr (3, rom + 0x2c000);
-		memory_set_bankptr (8, rom + 0x2ff20);
+		memory_set_bankptr (machine, 3, rom + 0x2c000);
+		memory_set_bankptr (machine, 8, rom + 0x2ff20);
 		break;
 	}
-	memory_set_bankptr (4, rom + 0x17c00);
+	memory_set_bankptr (machine, 4, rom + 0x17c00);
 }
 
 WRITE8_HANDLER(c16_switch_to_rom)
 {
 	ted7360_rom = 1;
-	c16_bankswitch(machine);
+	c16_bankswitch(space->machine);
 }
 
 /* write access to fddX load data flipflop
@@ -215,16 +215,16 @@ WRITE8_HANDLER(c16_select_roms)
 	lowrom = offset & 0x03;
 	highrom = (offset & 0x0c) >> 2;
 	if (ted7360_rom)
-		c16_bankswitch(machine);
+		c16_bankswitch(space->machine);
 }
 
 WRITE8_HANDLER(c16_switch_to_ram)
 {
 	ted7360_rom = 0;
-	memory_set_bankptr (2, mess_ram + (0x8000 % mess_ram_size));
-	memory_set_bankptr (3, mess_ram + (0xc000 % mess_ram_size));
-	memory_set_bankptr (4, mess_ram + (0xfc00 % mess_ram_size));
-	memory_set_bankptr (8, mess_ram + (0xff20 % mess_ram_size));
+	memory_set_bankptr (space->machine, 2, mess_ram + (0x8000 % mess_ram_size));
+	memory_set_bankptr (space->machine, 3, mess_ram + (0xc000 % mess_ram_size));
+	memory_set_bankptr (space->machine, 4, mess_ram + (0xfc00 % mess_ram_size));
+	memory_set_bankptr (space->machine, 8, mess_ram + (0xff20 % mess_ram_size));
 }
 
 int c16_read_keyboard (int databus)
@@ -302,20 +302,20 @@ WRITE8_HANDLER(plus4_6529_port_w)
 {
 }
 
- READ8_HANDLER(plus4_6529_port_r)
+READ8_HANDLER(plus4_6529_port_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }
 
- READ8_HANDLER(c16_fd1x_r)
+READ8_HANDLER(c16_fd1x_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }
@@ -433,11 +433,11 @@ static void c16_common_driver_init (running_machine *machine)
 	UINT8 *rom;
 
 	/* configure the M7501 port */
-	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTREAD, (genf *) c16_m7501_port_read);
-	cpunum_set_info_fct(0, CPUINFO_PTR_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c16_m7501_port_read);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
 
-	c16_select_roms (machine, 0, 0);
-	c16_switch_to_rom (machine, 0, 0);
+	c16_select_roms (cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
+	c16_switch_to_rom (cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
 
 	if (has_c1551)		/* C1551 */
 	 {
@@ -521,17 +521,17 @@ MACHINE_RESET( c16 )
 
 	if (read_cfg1(machine) & 0x80)  /* SID card present */
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfd40, 0xfd5f, 0, 0, sid6581_0_port_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfd40, 0xfd5f, 0, 0, sid6581_0_port_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe80, 0xfe9f, 0, 0, sid6581_0_port_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfe80, 0xfe9f, 0, 0, sid6581_0_port_w);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfd40, 0xfd5f, 0, 0, sid6581_0_port_r);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfd40, 0xfd5f, 0, 0, sid6581_0_port_w);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe80, 0xfe9f, 0, 0, sid6581_0_port_r);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfe80, 0xfe9f, 0, 0, sid6581_0_port_w);
 	}
 	else
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfd40, 0xfd5f, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfd40, 0xfd5f, 0, 0, SMH_NOP);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe80, 0xfe9f, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfe80, 0xfe9f, 0, 0, SMH_NOP);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfd40, 0xfd5f, 0, 0, SMH_NOP);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfd40, 0xfd5f, 0, 0, SMH_NOP);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe80, 0xfe9f, 0, 0, SMH_NOP);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfe80, 0xfe9f, 0, 0, SMH_NOP);
 	}
 
 #if 0
@@ -540,46 +540,46 @@ MACHINE_RESET( c16 )
 #endif
 	if ((read_cfg1(machine) & 0x0c ) == 0x00)		/* is it C16? */
 	{
-		memory_set_bankptr(machine, 1, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr (machine, 1, mess_ram + (0x4000 % mess_ram_size));
 
-		memory_set_bankptr(machine, 5, mess_ram + (0x4000 % mess_ram_size));
-		memory_set_bankptr(machine, 6, mess_ram + (0x8000 % mess_ram_size));
-		memory_set_bankptr(machine, 7, mess_ram + (0xc000 % mess_ram_size));
+		memory_set_bankptr (machine, 5, mess_ram + (0x4000 % mess_ram_size));
+		memory_set_bankptr (machine, 6, mess_ram + (0x8000 % mess_ram_size));
+		memory_set_bankptr (machine, 7, mess_ram + (0xc000 % mess_ram_size));
 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff20, 0xff3d, 0, 0, SMH_BANK10);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xff40, 0xffff, 0, 0, SMH_BANK11);
-		memory_set_bankptr(machine, 10, mess_ram + (0xff20 % mess_ram_size));
-		memory_set_bankptr(machine, 11, mess_ram + (0xff40 % mess_ram_size));
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff20, 0xff3d, 0, 0, SMH_BANK10);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff40, 0xffff, 0, 0, SMH_BANK11);
+		memory_set_bankptr (machine, 10, mess_ram + (0xff20 % mess_ram_size));
+		memory_set_bankptr (machine, 11, mess_ram + (0xff40 % mess_ram_size));
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xfcff, 0, 0, SMH_BANK10);
-		memory_set_bankptr(machine, 10, mess_ram + (0x4000 % mess_ram_size));
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0xfcff, 0, 0, SMH_BANK10);
+		memory_set_bankptr (machine, 10, mess_ram + (0x4000 % mess_ram_size));
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 	}
 
 	if (has_c1551 || has_iec8)		/* IEC8 on || C1551 */
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfee0, 0xfeff, 0, 0, tpi6525_2_port_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfee0, 0xfeff, 0, 0, tpi6525_2_port_r);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfee0, 0xfeff, 0, 0, tpi6525_2_port_w);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfee0, 0xfeff, 0, 0, tpi6525_2_port_r);
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfee0, 0xfeff, 0, 0, SMH_NOP);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfee0, 0xfeff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfee0, 0xfeff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfee0, 0xfeff, 0, 0, SMH_NOP);
 	}
 	if (has_iec9)					/* IEC9 on */
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfec0, 0xfedf, 0, 0, tpi6525_3_port_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfec0, 0xfedf, 0, 0, tpi6525_3_port_r);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfec0, 0xfedf, 0, 0, tpi6525_3_port_w);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfec0, 0xfedf, 0, 0, tpi6525_3_port_r);
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,  0xfec0, 0xfedf, 0, 0, SMH_NOP);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfec0, 0xfedf, 0, 0, SMH_NOP);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xfec0, 0xfedf, 0, 0, SMH_NOP);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfec0, 0xfedf, 0, 0, SMH_NOP);
 	}
 
 	if (has_c1551 || has_vc1541)		/* c1551 or vc1541 */
@@ -606,57 +606,57 @@ INTERRUPT_GEN( c16_frame_interrupt )
 	for (i = 0; i < 8; i++)
 	{
 		value = 0xff;
-		value &= ~input_port_read(machine, c16ports[i]);
+		value &= ~input_port_read(device->machine, c16ports[i]);
 
 		/* Shift Lock is mapped on Left/Right Shift */
-		if ((i == 1) && (input_port_read(machine, "SPECIAL") & 0x80))
+		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x80))
 			value &= ~0x80;			
 
 		keyline[i] = value;
 	}
 
-	if (input_port_read(machine, "DSW0") & 0x80) 
+	if (input_port_read(device->machine, "DSW0") & 0x80) 
 	{
 		value = 0xff;
-		if (input_port_read(machine, "JOY0") & 0x10)			/* Joypad1_Button */
+		if (input_port_read(device->machine, "JOY0") & 0x10)			/* Joypad1_Button */
 			{
-				if (input_port_read(machine, "SPECIAL") & 0x40)
+				if (input_port_read(device->machine, "SPECIAL") & 0x40)
 					value &= ~0x80;
 				else
 					value &= ~0x40;
 			}
 
-		value &= ~(input_port_read(machine, "JOY0") & 0x0f);	/* Other Inputs Joypad1 */
+		value &= ~(input_port_read(device->machine, "JOY0") & 0x0f);	/* Other Inputs Joypad1 */
 
-		if (input_port_read(machine, "SPECIAL") & 0x40)
+		if (input_port_read(device->machine, "SPECIAL") & 0x40)
 			keyline[9] = value;
 		else
 			keyline[8] = value;
 	}
 
-	if (input_port_read(machine, "DSW0") & 0x40) 
+	if (input_port_read(device->machine, "DSW0") & 0x40) 
 	{
 		value = 0xff;
-		if (input_port_read(machine, "JOY1") & 0x10)			/* Joypad2_Button */
+		if (input_port_read(device->machine, "JOY1") & 0x10)			/* Joypad2_Button */
 			{
-				if (input_port_read(machine, "SPECIAL") & 0x40)
+				if (input_port_read(device->machine, "SPECIAL") & 0x40)
 					value &= ~0x40;
 				else
 					value &= ~0x80;
 			}
 
-		value &= ~(input_port_read(machine, "JOY1") & 0x0f);	/* Other Inputs Joypad2 */
+		value &= ~(input_port_read(device->machine, "JOY1") & 0x0f);	/* Other Inputs Joypad2 */
 		
-		if (input_port_read(machine, "SPECIAL") & 0x40)
+		if (input_port_read(device->machine, "SPECIAL") & 0x40)
 			keyline[8] = value;
 		else
 			keyline[9] = value;
 	}
 
-	ted7360_frame_interrupt (machine, cpunum);
+	ted7360_frame_interrupt (device);
 
-	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
-	set_led_status (0, input_port_read(machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Joystick Swap */
+	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status (0, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Joystick Swap */
 }
 
 
