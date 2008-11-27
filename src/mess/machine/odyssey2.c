@@ -22,17 +22,17 @@ static void odyssey2_switch_banks(running_machine *machine)
 	switch ( cart_size ) {
 	case 12288:
 		/* 12KB cart support (for instance, KTAA as released) */
-		memory_set_bankptr( 1, memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 );
-		memory_set_bankptr( 2, memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 + 0x800 );
+		memory_set_bankptr( machine, 1, memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 );
+		memory_set_bankptr( machine, 2, memory_region(machine, "user1") + (p1 & 0x03) * 0xC00 + 0x800 );
 		break;
 	case 16384:
 		/* 16KB cart support (for instance, full sized version KTAA) */
-		memory_set_bankptr( 1, memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0x400 );
-		memory_set_bankptr( 2, memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0xC00 );
+		memory_set_bankptr( machine, 1, memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0x400 );
+		memory_set_bankptr( machine, 2, memory_region(machine, "user1") + (p1 & 0x03) * 0x1000 + 0xC00 );
 		break;
 	default:
-		memory_set_bankptr(1, memory_region(machine, "user1") + (p1 & 0x03) * 0x800);
-		memory_set_bankptr(2, memory_region(machine, "user1") + (p1 & 0x03) * 0x800 );
+		memory_set_bankptr(machine, 1, memory_region(machine, "user1") + (p1 & 0x03) * 0x800);
+		memory_set_bankptr(machine, 2, memory_region(machine, "user1") + (p1 & 0x03) * 0x800 );
 		break;
 	}
 }
@@ -71,7 +71,7 @@ MACHINE_RESET( odyssey2 )
 READ8_HANDLER( odyssey2_bus_r )
 {
     if ((p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
-		return odyssey2_video_r(machine, offset); /* seems to have higher priority than ram??? */
+		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
 
     else if (!(p1 & P1_EXT_RAM_ENABLE))
 		return ram[offset];
@@ -86,7 +86,7 @@ WRITE8_HANDLER( odyssey2_bus_w )
 		if ( offset & 0x80 ) {
 			if ( data & 0x20 ) {
 				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, p1 );
-				sp0256_ALD_w( machine, 0, offset & 0x7F );
+				sp0256_ALD_w( space, 0, offset & 0x7F );
 			} else {
 				/* TODO: Reset sp0256 in this case */
 			}
@@ -94,13 +94,13 @@ WRITE8_HANDLER( odyssey2_bus_w )
 	}
 
     else if (!(p1 & P1_VDC_ENABLE))
-		odyssey2_video_w(machine, offset, data);
+		odyssey2_video_w(space, offset, data);
 }
 
 READ8_HANDLER( g7400_bus_r )
 {
 	if ((p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0) {
-		return odyssey2_video_r(machine, offset); /* seems to have higher priority than ram??? */
+		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
 	}
 	else if (!(p1 & P1_EXT_RAM_ENABLE)) {
 		return ram[offset];
@@ -117,7 +117,7 @@ WRITE8_HANDLER( g7400_bus_w )
 		ram[offset] = data;
 	}
 	else if (!(p1 & P1_VDC_ENABLE)) {
-		odyssey2_video_w(machine, offset, data);
+		odyssey2_video_w(space, offset, data);
 	} else {
 //		ef9341_w( offset & 0x02, offset & 0x01, data );
 	}
@@ -137,9 +137,9 @@ WRITE8_HANDLER( odyssey2_putp1 )
 {
 	p1 = data;
 
-	odyssey2_switch_banks(machine);
+	odyssey2_switch_banks(space->machine);
 
-	odyssey2_lum_w ( machine, 0, p1 >> 7 );
+	odyssey2_lum_w ( space, 0, p1 >> 7 );
 
 	logerror("%.6f p1 written %.2x\n", attotime_to_double(timer_get_time()), data);
 }
@@ -154,7 +154,7 @@ READ8_HANDLER( odyssey2_getp2 )
 	{
 		if ((p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
 		{
-			h &= input_port_read(machine, keynames[p2 & P2_KEYBOARD_SELECT_MASK]);
+			h &= input_port_read(space->machine, keynames[p2 & P2_KEYBOARD_SELECT_MASK]);
 		}
 
 		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)
@@ -191,10 +191,10 @@ READ8_HANDLER( odyssey2_getbus )
     UINT8 data = 0xff;
 
     if ((p2 & P2_KEYBOARD_SELECT_MASK) == 1)
-		data &= input_port_read(machine, "JOY0");       /* read joystick 1 */
+		data &= input_port_read(space->machine, "JOY0");       /* read joystick 1 */
 
     if ((p2 & P2_KEYBOARD_SELECT_MASK) == 0)
-		data &= input_port_read(machine, "JOY1");       /* read joystick 2 */
+		data &= input_port_read(space->machine, "JOY1");       /* read joystick 2 */
 
     logerror("%.6f bus read %.2x\n", attotime_to_double(timer_get_time()), data);
     return data;

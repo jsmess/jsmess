@@ -172,7 +172,7 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/
 
 	/* MAGNAVOX */
-//128u4	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
+	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
 	/* Hartung, Watara, ...*/
 //128u4	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
@@ -655,8 +655,8 @@ XL/XE 16kB OS roms
 	/* PHILIPS */
 	DRIVER( p2000t )	/* 1980 P2000T										*/
 	DRIVER( p2000m )	/* 1980 P2000M										*/
-//128u4	DRIVER( videopac )	/* 1979 Videopac G7000/C52							*/
-//128u4	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
+	DRIVER( videopac )	/* 1979 Videopac G7000/C52							*/
+	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
 	/* COMPUKIT */
 //128u4	DRIVER( uk101 )		/* 1979 UK101										*/

@@ -386,6 +386,7 @@ DRVLIBS = \
 	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kramermc.a \
 	$(MESSOBJ)/luxor.a \
+	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/mc10.a \
 	$(MESSOBJ)/mikro80.a \
 	$(MESSOBJ)/mk2.a \
@@ -447,7 +448,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/kim1.a \
 #	$(MESSOBJ)/lviv.a \
 #	$(MESSOBJ)/lynx.a \
-#	$(MESSOBJ)/magnavox.a \
 #	$(MESSOBJ)/mbee.a \
 #	$(MESSOBJ)/memotech.a \
 #	$(MESSOBJ)/mephisto.a \

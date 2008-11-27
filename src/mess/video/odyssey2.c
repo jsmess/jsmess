@@ -189,9 +189,9 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa1:
 			data = control_status;
 			iff = 0;
-			cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			control_status &= ~ 0x08;
-			if ( video_screen_get_hpos( machine->primary_screen ) < I824X_START_ACTIVE_SCAN || video_screen_get_hpos( machine->primary_screen ) > I824X_END_ACTIVE_SCAN ) {
+			if ( video_screen_get_hpos( space->machine->primary_screen ) < I824X_START_ACTIVE_SCAN || video_screen_get_hpos( space->machine->primary_screen ) > I824X_END_ACTIVE_SCAN ) {
 				data |= 1;
 			}
 
@@ -206,7 +206,7 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa4:
 
             if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
-                y_beam_pos = video_screen_get_vpos( machine->primary_screen ) - start_vpos;
+                y_beam_pos = video_screen_get_vpos( space->machine->primary_screen ) - start_vpos;
 
             data = y_beam_pos;
 
@@ -216,7 +216,7 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa5:
 
             if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY)) {
-                x_beam_pos = video_screen_get_hpos( machine->primary_screen );
+                x_beam_pos = video_screen_get_hpos( space->machine->primary_screen );
 				if ( x_beam_pos < I824X_START_ACTIVE_SCAN ) {
 					x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
 				} else {
@@ -247,14 +247,14 @@ WRITE8_HANDLER( odyssey2_video_w )
              && !(data & VDC_CONTROL_REG_STROBE_XY))
         {
             /* Toggling strobe bit, tuck away values */
-            x_beam_pos = video_screen_get_hpos( machine->primary_screen );
+            x_beam_pos = video_screen_get_hpos( space->machine->primary_screen );
 			if ( x_beam_pos < I824X_START_ACTIVE_SCAN ) {
 				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
 			} else {
 				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN;
 			}
 
-            y_beam_pos = video_screen_get_vpos( machine->primary_screen ) - start_vpos;
+            y_beam_pos = video_screen_get_vpos( space->machine->primary_screen ) - start_vpos;
 
             /* This is wrong but more games work with it, TODO: Figure
              * out correct change.  Maybe update the screen here??
@@ -275,8 +275,8 @@ WRITE8_HANDLER ( odyssey2_lum_w ) {
 
 READ8_HANDLER( odyssey2_t1_r )
 {
-	if ( video_screen_get_vpos( machine->primary_screen ) > start_vpos && video_screen_get_vpos( machine->primary_screen ) < start_vblank ) {
-		if ( video_screen_get_hpos( machine->primary_screen ) >= I824X_START_ACTIVE_SCAN && video_screen_get_hpos( machine->primary_screen ) < I824X_END_ACTIVE_SCAN ) {
+	if ( video_screen_get_vpos( space->machine->primary_screen ) > start_vpos && video_screen_get_vpos( space->machine->primary_screen ) < start_vblank ) {
+		if ( video_screen_get_hpos( space->machine->primary_screen ) >= I824X_START_ACTIVE_SCAN && video_screen_get_hpos( space->machine->primary_screen ) < I824X_END_ACTIVE_SCAN ) {
 			return 1;
 		}
 	}
