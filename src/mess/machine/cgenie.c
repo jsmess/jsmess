@@ -19,8 +19,8 @@
 
 
 #define AYWriteReg(chip,port,value) \
-	ay8910_control_port_0_w(machine, 0,port);  \
-	ay8910_write_port_0_w(machine, 0,value)
+	ay8910_control_port_0_w(space, 0,port);  \
+	ay8910_write_port_0_w(space, 0,value)
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"
 
@@ -97,6 +97,7 @@ static void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, 
 
 MACHINE_RESET( cgenie )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	UINT8 *ROM = memory_region(machine, "main");
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
@@ -132,23 +133,23 @@ MACHINE_RESET( cgenie )
 	{
 		if ( input_port_read(machine, "DSW0") & 0x80 )
 		{
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK10);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
+			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK10);
+			memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 			memory_set_bankptr(machine, 10, &ROM[0x0c000]);
 			logerror("cgenie DOS enabled\n");
 			memcpy(&ROM[0x0c000],&ROM[0x10000], 0x2000);
 		}
 		else
 		{
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
+			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 			logerror("cgenie DOS disabled (no floppy image given)\n");
 		}
 	}
 	else
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 		logerror("cgenie DOS disabled\n");
 		memset(&memory_region(machine, "main")[0x0c000], 0x00, 0x2000);
 	}
@@ -156,16 +157,16 @@ MACHINE_RESET( cgenie )
 	/* copy EXT ROM, if enabled or wipe out that memory area */
 	if( input_port_read(machine, "DSW0") & 0x20 )
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_ROM);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_ROM);
+		memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_ROM);
+		memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_ROM);
 		logerror("cgenie EXT enabled\n");
 		memcpy(&memory_region(machine, "main")[0x0e000],
 			   &memory_region(machine, "main")[0x12000], 0x1000);
 	}
 	else
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, SMH_NOP);
+		memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
+		memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
 		logerror("cgenie EXT disabled\n");
 		memset(&memory_region(machine, "main")[0x0e000], 0x00, 0x1000);
 	}
@@ -177,6 +178,7 @@ MACHINE_RESET( cgenie )
 
 MACHINE_START( cgenie )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	UINT8 *gfx = memory_region(machine, "gfx2");
 	int i;
 
@@ -197,8 +199,8 @@ MACHINE_START( cgenie )
 		memset(gfx + i * 8, i, 8);
 
 	/* set up RAM */
-	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, cgenie_videoram_w);
+	memory_install_read8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, cgenie_videoram_w);
 	videoram = mess_ram;
 	memory_set_bankptr(machine, 1, mess_ram);
 
@@ -324,7 +326,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 {
 	int port_ff_changed = port_ff ^ data;
 
-	cassette_output ( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), data & 0x01 ? -1.0 : 1.0 );
+	cassette_output ( device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), data & 0x01 ? -1.0 : 1.0 );
 
 	/* background bits changed ? */
 	if( port_ff_changed & FF_BGD )
@@ -372,7 +374,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 				b = 15;
 			}
 		}
-		palette_set_color_rgb(machine, 0, r, g, b);
+		palette_set_color_rgb(space->machine, 0, r, g, b);
 	}
 
 	/* character mode changed ? */
@@ -429,16 +431,16 @@ static UINT8 psg_b_inp = 0x00;
 		/* comparator value */
 		psg_b_inp = 0x00;
 
-		if( input_port_read(machine, "JOY0") > psg_a_out )
+		if( input_port_read(space->machine, "JOY0") > psg_a_out )
 			psg_b_inp |= 0x80;
 
-		if( input_port_read(machine, "JOY1") > psg_a_out )
+		if( input_port_read(space->machine, "JOY1") > psg_a_out )
 			psg_b_inp |= 0x40;
 
-		if( input_port_read(machine, "JOY2") > psg_a_out )
+		if( input_port_read(space->machine, "JOY2") > psg_a_out )
 			psg_b_inp |= 0x20;
 
-		if( input_port_read(machine, "JOY3") > psg_a_out )
+		if( input_port_read(space->machine, "JOY3") > psg_a_out )
 			psg_b_inp |= 0x10;
 	}
 	else
@@ -447,22 +449,22 @@ static UINT8 psg_b_inp = 0x00;
 		psg_b_inp = 0xFF;
 
 		if( !(psg_a_out & 0x01) )
-			psg_b_inp &= ~input_port_read(machine, "KP0");
+			psg_b_inp &= ~input_port_read(space->machine, "KP0");
 
 		if( !(psg_a_out & 0x02) )
-			psg_b_inp &= ~input_port_read(machine, "KP1");
+			psg_b_inp &= ~input_port_read(space->machine, "KP1");
 
 		if( !(psg_a_out & 0x04) )
-			psg_b_inp &= ~input_port_read(machine, "KP2");
+			psg_b_inp &= ~input_port_read(space->machine, "KP2");
 
 		if( !(psg_a_out & 0x08) )
-			psg_b_inp &= ~input_port_read(machine, "KP3");
+			psg_b_inp &= ~input_port_read(space->machine, "KP3");
 
 		if( !(psg_a_out & 0x10) )
-			psg_b_inp &= ~input_port_read(machine, "KP4");
+			psg_b_inp &= ~input_port_read(space->machine, "KP4");
 
 		if( !(psg_a_out & 0x20) )
-			psg_b_inp &= ~input_port_read(machine, "KP5");
+			psg_b_inp &= ~input_port_read(space->machine, "KP5");
 	}
 	return psg_b_inp;
 }
@@ -480,65 +482,65 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
  READ8_HANDLER( cgenie_status_r )
 {
 	/* If the floppy isn't emulated, return 0 */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0;
-	return wd17xx_status_r(machine, offset);
+	return wd17xx_status_r(space, offset);
 }
 
  READ8_HANDLER( cgenie_track_r )
 {
 	/* If the floppy isn't emulated, return 0xff */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_track_r(machine, offset);
+	return wd17xx_track_r(space, offset);
 }
 
  READ8_HANDLER( cgenie_sector_r )
 {
 	/* If the floppy isn't emulated, return 0xff */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_sector_r(machine, offset);
+	return wd17xx_sector_r(space, offset);
 }
 
  READ8_HANDLER(cgenie_data_r )
 {
 	/* If the floppy isn't emulated, return 0xff */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_data_r(machine, offset);
+	return wd17xx_data_r(space, offset);
 }
 
 WRITE8_HANDLER( cgenie_command_w )
 {
 	/* If the floppy isn't emulated, return immediately */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_command_w(machine, offset, data);
+	wd17xx_command_w(space, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_track_w )
 {
 	/* If the floppy isn't emulated, ignore the write */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_track_w(machine, offset, data);
+	wd17xx_track_w(space, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_sector_w )
 {
 	/* If the floppy isn't emulated, ignore the write */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_sector_w(machine, offset, data);
+	wd17xx_sector_w(space, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_data_w )
 {
 	/* If the floppy isn't emulated, ignore the write */
-	if( (input_port_read(machine, "DSW0") & 0x80) == 0 )
+	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_data_w(machine, offset, data);
+	wd17xx_data_w(space, offset, data);
 }
 
  READ8_HANDLER( cgenie_irq_status_r )
@@ -554,16 +556,7 @@ INTERRUPT_GEN( cgenie_timer_interrupt )
 	if( (irq_status & IRQ_TIMER) == 0 )
 	{
 		irq_status |= IRQ_TIMER;
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
-	}
-}
-
-static INTERRUPT_GEN( cgenie_fdc_interrupt )
-{
-	if( (irq_status & IRQ_FDC) == 0 )
-	{
-		irq_status |= IRQ_FDC;
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 	}
 }
 
@@ -579,7 +572,11 @@ void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *p
 			irq_status &= ~IRQ_FDC;
 			break;
 		case WD17XX_IRQ_SET:
-			cgenie_fdc_interrupt(machine, 0);
+			if( (irq_status & IRQ_FDC) == 0 )
+			{
+				irq_status |= IRQ_FDC;
+				cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+			}
 			break;
 		case WD17XX_DRQ_CLR:
 		case WD17XX_DRQ_SET:
@@ -624,28 +621,28 @@ WRITE8_HANDLER( cgenie_motor_w )
 	int result = 0;
 
 	if( offset & 0x01 )
-		result |= input_port_read(machine, "ROW0");
+		result |= input_port_read(space->machine, "ROW0");
 
 	if( offset & 0x02 )
-		result |= input_port_read(machine, "ROW1");
+		result |= input_port_read(space->machine, "ROW1");
 
 	if( offset & 0x04 )
-		result |= input_port_read(machine, "ROW2");
+		result |= input_port_read(space->machine, "ROW2");
 
 	if( offset & 0x08 )
-		result |= input_port_read(machine, "ROW3");
+		result |= input_port_read(space->machine, "ROW3");
 
 	if( offset & 0x10 )
-		result |= input_port_read(machine, "ROW4");
+		result |= input_port_read(space->machine, "ROW4");
 
 	if( offset & 0x20 )
-		result |= input_port_read(machine, "ROW5");
+		result |= input_port_read(space->machine, "ROW5");
 
 	if( offset & 0x40 )
-		result |= input_port_read(machine, "ROW6");
+		result |= input_port_read(space->machine, "ROW6");
 
 	if( offset & 0x80 )
-		result |= input_port_read(machine, "ROW7");
+		result |= input_port_read(space->machine, "ROW7");
 
 	return result;
 }
@@ -702,7 +699,7 @@ WRITE8_HANDLER( cgenie_fontram_w )
 	cgenie_fontram[offset] = data;
 
 	/* convert eight pixels */
-	dp = &machine->gfx[0]->gfxdata[(256 * 8 + offset) * machine->gfx[0]->width];
+	dp = &space->machine->gfx[0]->gfxdata[(256 * 8 + offset) * space->machine->gfx[0]->width];
 	dp[0] = (data & 0x80) ? 1 : 0;
 	dp[1] = (data & 0x40) ? 1 : 0;
 	dp[2] = (data & 0x20) ? 1 : 0;
@@ -721,11 +718,11 @@ WRITE8_HANDLER( cgenie_fontram_w )
 
 INTERRUPT_GEN( cgenie_frame_interrupt )
 {
-	if( cgenie_tv_mode != (input_port_read(machine, "DSW0") & 0x10) )
+	if( cgenie_tv_mode != (input_port_read(device->machine, "DSW0") & 0x10) )
 	{
-		cgenie_tv_mode = input_port_read(machine, "DSW0") & 0x10;
+		cgenie_tv_mode = input_port_read(device->machine, "DSW0") & 0x10;
 		/* force setting of background color */
 		port_ff ^= FF_BGD0;
-		cgenie_port_ff_w(machine, 0, port_ff ^ FF_BGD0);
+		cgenie_port_ff_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, port_ff ^ FF_BGD0);
 	}
 }
