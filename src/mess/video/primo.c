@@ -14,7 +14,7 @@
 UINT16 primo_video_memory_base;
 
 
-static void primo_draw_scanline(bitmap_t *bitmap, int primo_scanline)
+static void primo_draw_scanline(running_machine *machine,bitmap_t *bitmap, int primo_scanline)
 {
 	int x, i;
 	UINT8 data;
@@ -23,7 +23,7 @@ static void primo_draw_scanline(bitmap_t *bitmap, int primo_scanline)
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, primo_scanline, 0);
 
 	/* address of current line in Primo video memory */
-	const UINT8* primo_video_ram_line = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, primo_video_memory_base + 32*primo_scanline);
+	const UINT8* primo_video_ram_line = memory_get_read_ptr(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), primo_video_memory_base + 32*primo_scanline);
 
 	for (x=0; x<256; x+=8)
 	{
@@ -41,6 +41,6 @@ VIDEO_UPDATE( primo )
 	int primo_scanline;
 
 	for (primo_scanline=0; primo_scanline<192; primo_scanline++)
-		primo_draw_scanline(bitmap, primo_scanline);
+		primo_draw_scanline(screen->machine, bitmap, primo_scanline);
 	return 0;
 }
