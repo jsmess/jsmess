@@ -38,7 +38,7 @@ void amstrad_setup_machine(running_machine *machine)
 /* load CPCEMU style snapshots */
 void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	int RegData;
 	int i;
 

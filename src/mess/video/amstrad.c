@@ -974,6 +974,7 @@ DMA commands
 static void amstrad_plus_dma_parse(running_machine *machine, int channel, int *addr)
 {
 	unsigned short command;
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 
 	if(*addr & 0x01)
 		(*addr)++;  // align to even address
@@ -993,9 +994,9 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel, int *a
 	switch(command & 0xf000)
 	{
 	case 0x0000:  // Load PSG register
-		ay8910_control_port_0_w(machine, 0,(command & 0x0f00) >> 8);
-		ay8910_write_port_0_w(machine, 0,command & 0x00ff);
-		ay8910_control_port_0_w(machine, 0,prev_reg);
+		ay8910_control_port_0_w(space, 0,(command & 0x0f00) >> 8);
+		ay8910_write_port_0_w(space, 0,command & 0x00ff);
+		ay8910_control_port_0_w(space, 0,prev_reg);
 		logerror("DMA %i: LOAD %i, %i\n",channel,(command & 0x0f00) >> 8, command & 0x00ff);
 		break;
 	case 0x1000:  // Pause for n HSYNCs (0 - 4095)
