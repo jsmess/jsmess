@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( pcfx )
 {
-	memory_set_bankptr( 1, memory_region(machine, "user1") );
+	memory_set_bankptr( machine, 1, memory_region(machine, "user1") );
 }
 
 

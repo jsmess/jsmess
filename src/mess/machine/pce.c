@@ -99,13 +99,15 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state );
 static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
 
 
-static WRITE8_HANDLER( pce_sf2_banking_w ) {
-	memory_set_bankptr( 2, memory_region(machine, "user1") + offset * 0x080000 + 0x080000 );
-	memory_set_bankptr( 3, memory_region(machine, "user1") + offset * 0x080000 + 0x088000 );
-	memory_set_bankptr( 4, memory_region(machine, "user1") + offset * 0x080000 + 0x0D0000 );
+static WRITE8_HANDLER( pce_sf2_banking_w ) 
+{
+	memory_set_bankptr( space->machine, 2, memory_region(space->machine, "user1") + offset * 0x080000 + 0x080000 );
+	memory_set_bankptr( space->machine, 3, memory_region(space->machine, "user1") + offset * 0x080000 + 0x088000 );
+	memory_set_bankptr( space->machine, 4, memory_region(space->machine, "user1") + offset * 0x080000 + 0x0D0000 );
 }
 
-static WRITE8_HANDLER( pce_cartridge_ram_w ) {
+static WRITE8_HANDLER( pce_cartridge_ram_w ) 
+{
 	cartridge_ram[ offset ] = data;
 }
 
@@ -190,50 +192,58 @@ DEVICE_IMAGE_LOAD(pce_cart)
 			memcpy( ROM + 0x080000, ROM, 0x080000 );
 	}
 
-	memory_set_bankptr( 1, ROM );
-	memory_set_bankptr( 2, ROM + 0x080000 );
-	memory_set_bankptr( 3, ROM + 0x088000 );
-	memory_set_bankptr( 4, ROM + 0x0D0000 );
+	memory_set_bankptr( image->machine, 1, ROM );
+	memory_set_bankptr( image->machine, 2, ROM + 0x080000 );
+	memory_set_bankptr( image->machine, 3, ROM + 0x088000 );
+	memory_set_bankptr( image->machine, 4, ROM + 0x0D0000 );
 
 	/* Check for Street fighter 2 */
-	if ( size == PCE_ROM_MAXSIZE ) {
-		memory_install_write8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
+	if ( size == PCE_ROM_MAXSIZE ) 
+	{
+		memory_install_write8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
 	}
 
 	/* Check for Populous */
-	if ( ! memcmp( ROM + 0x1F26, "POPULOUS", 8 ) ) {
+	if ( ! memcmp( ROM + 0x1F26, "POPULOUS", 8 ) ) 
+	{
 		cartridge_ram = auto_malloc( 0x8000 );
-		memory_set_bankptr( 2, cartridge_ram );
-		memory_install_write8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
+		memory_set_bankptr( image->machine, 2, cartridge_ram );
+		memory_install_write8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
 	}
 
 	/* Check for CD system card */
 	pce_sys3_card = 0;
-	if ( ! memcmp( ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23 ) ) {
+	if ( ! memcmp( ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23 ) ) 
+	{
 		/* Check if 192KB additional system card ram should be used */
-		if ( ! memcmp( ROM + 0x29D1, "VER. 3.", 7 ) || ! memcmp( ROM + 0x29C4, "VER. 3.", 7 ) ) {
+		if ( ! memcmp( ROM + 0x29D1, "VER. 3.", 7 ) || ! memcmp( ROM + 0x29C4, "VER. 3.", 7 ) ) 
+		{
 			pce_sys3_card = 1;
 			cartridge_ram = auto_malloc( 0x30000 );
-			memory_set_bankptr( 4, cartridge_ram );
-			memory_install_write8_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
+			memory_set_bankptr( image->machine, 4, cartridge_ram );
+			memory_install_write8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
 		}
 	}
 	return 0;
 }
 
-DRIVER_INIT( pce ) {
+DRIVER_INIT( pce ) 
+{
 	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT( tg16 ) {
+DRIVER_INIT( tg16 ) 
+{
 	pce.io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT( sgx ) {
+DRIVER_INIT( sgx ) 
+{
 	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-MACHINE_RESET( pce ) {
+MACHINE_RESET( pce ) 
+{
 	pce_cd_init( machine );
 }
 
@@ -260,7 +270,7 @@ WRITE8_HANDLER ( pce_joystick_w )
 READ8_HANDLER ( pce_joystick_r )
 {
 	UINT8 ret;
-	int data = input_port_read(machine, "JOY");
+	int data = input_port_read(space->machine, "JOY");
 	if(joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | pce.io_port_options;
 #ifdef UNIFIED_PCE
@@ -283,8 +293,9 @@ NVRAM_HANDLER( pce )
 	}
 }
 
-static void pce_set_cd_bram( void ) {
-	memory_set_bankptr( 10, pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
+static void pce_set_cd_bram( running_machine *machine ) 
+{
+	memory_set_bankptr( machine, 10, pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
 }
 
 /* Callback for new data from the MSM5205.
@@ -292,11 +303,15 @@ static void pce_set_cd_bram( void ) {
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-static void pce_cd_msm5205_int( running_machine *machine, int chip ) {
+static void pce_cd_msm5205_int( running_machine *machine, int chip ) 
+{
 	pce_cd.adpcm_clock_count = ( pce_cd.adpcm_clock_count + 1 ) % pce_cd.adpcm_clock_divider;
-	if ( ! pce_cd.adpcm_clock_count ) {
+	if ( ! pce_cd.adpcm_clock_count ) 
+	{
 		/* Supply new ADPCM data */
-	} else {
+	} 
+	else 
+	{
 		/* Make sure the sample does not change */
 	}
 }
@@ -304,44 +319,55 @@ static void pce_cd_msm5205_int( running_machine *machine, int chip ) {
 #define	SCSI_STATUS_OK			0x00
 #define SCSI_CHECK_CONDITION	0x02
 
-static void pce_cd_reply_status_byte( UINT8 status ) {
+static void pce_cd_reply_status_byte( UINT8 status ) 
+{
 logerror("Setting CD in reply_status_byte\n");
 	pce_cd.scsi_CD = pce_cd.scsi_IO = pce_cd.scsi_REQ = 1;
 	pce_cd.scsi_MSG = 0;
 	pce_cd.message_after_status = 1;
 	pce_cd.status_sent = pce_cd.message_sent = 0;
 
-	if ( status == SCSI_STATUS_OK ) {
+	if ( status == SCSI_STATUS_OK ) 
+	{
 		pce_cd.regs[0x01] = 0x00;
-	} else {
+	} 
+	else 
+	{
 		pce_cd.regs[0x01] = 0x01;
 	}
 }
 
 /* 0x00 - TEST UNIT READY */
-static void pce_cd_test_unit_ready( void ) {
+static void pce_cd_test_unit_ready( void ) 
+{
 	logerror("test unit ready\n");
-	if ( pce_cd.cd ) {
+	if ( pce_cd.cd ) 
+	{
 		logerror( "Sending STATUS_OK status\n" );
 		pce_cd_reply_status_byte( SCSI_STATUS_OK );
-	} else {
+	} 
+	else 
+	{
 		logerror( "Sending CHECK_CONDITION status\n" );
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 	}
 }
 
 /* 0x08 - READ (6) */
-static void pce_cd_read_6( void ) {
+static void pce_cd_read_6( void ) 
+{
 	UINT32 frame = ( ( pce_cd.command_buffer[1] & 0x1F ) << 16 ) | ( pce_cd.command_buffer[2] << 8 ) | pce_cd.command_buffer[3];
 	UINT32 frame_count = pce_cd.command_buffer[4];
 
 	/* Check for presence of a CD */
-	if ( ! pce_cd.cd ) {
+	if ( ! pce_cd.cd ) 
+	{
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 		return;
 	}
 
-	if ( pce_cd.cdda_status != PCE_CD_CDDA_OFF ) {
+	if ( pce_cd.cdda_status != PCE_CD_CDDA_OFF ) 
+	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( 0 );
 	}
@@ -349,24 +375,30 @@ static void pce_cd_read_6( void ) {
 	pce_cd.current_frame = frame;
 	pce_cd.end_frame = frame + frame_count;
 
-	if ( frame_count == 0 ) {
+	if ( frame_count == 0 ) 
+	{
 		pce_cd_reply_status_byte( SCSI_STATUS_OK );
-	} else {
+	} 
+	else 
+	{
 		timer_adjust_periodic(pce_cd.data_timer, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ), 0, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ));
 	}
 }
 
 /* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
-static void pce_cd_nec_set_audio_start_position( void ) {
+static void pce_cd_nec_set_audio_start_position( void ) 
+{
 	UINT32	frame = 0;
 
-	if ( ! pce_cd.cd ) {
+	if ( ! pce_cd.cd ) 
+	{
 		/* Throw some error here */
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 		return;
 	}
 
-	switch( pce_cd.command_buffer[9] & 0xC0 ) {
+	switch( pce_cd.command_buffer[9] & 0xC0 ) 
+	{
 	case 0x00:
 		frame = ( pce_cd.command_buffer[3] << 16 ) | ( pce_cd.command_buffer[4] << 8 ) | pce_cd.command_buffer[5];
 		break;
@@ -383,10 +415,13 @@ static void pce_cd_nec_set_audio_start_position( void ) {
 
 	pce_cd.current_frame = frame;
 	pce_cd.cdda_play_mode = pce_cd.command_buffer[1];
-	if ( pce_cd.cdda_play_mode ) {
+	if ( pce_cd.cdda_play_mode ) 
+	{
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
 		cdda_start_audio( 0, pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
-	} else {
+	} 
+	else 
+	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( 0 );
 		pce_cd.end_frame = pce_cd.last_frame;
@@ -397,16 +432,19 @@ static void pce_cd_nec_set_audio_start_position( void ) {
 }
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
-static void pce_cd_nec_set_audio_stop_position( void ) {
+static void pce_cd_nec_set_audio_stop_position( void ) 
+{
 	UINT32  frame = 0;
 
-	if ( ! pce_cd.cd ) {
+	if ( ! pce_cd.cd ) 
+	{
 		/* Throw some error here */
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 		return;
 	}
 
-	switch( pce_cd.command_buffer[9] & 0xC0 ) {
+	switch( pce_cd.command_buffer[9] & 0xC0 ) 
+	{
 	case 0x00:
 		frame = ( pce_cd.command_buffer[3] << 16 ) | ( pce_cd.command_buffer[4] << 8 ) | pce_cd.command_buffer[5];
 		break;
@@ -423,14 +461,20 @@ static void pce_cd_nec_set_audio_stop_position( void ) {
 
 	pce_cd.end_frame = frame;
 	pce_cd.cdda_play_mode = pce_cd.command_buffer[1];
-	if ( pce_cd.cdda_play_mode ) {
-		if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED ) {
+	if ( pce_cd.cdda_play_mode ) 
+	{
+		if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED ) 
+		{
 			cdda_pause_audio( 0, 0 );
-		} else {
+		} 
+		else 
+		{
 			cdda_start_audio( 0, pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 		}
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
-	} else {
+	} 
+	else 
+	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( 0 );
 		pce_cd.end_frame = pce_cd.last_frame;
@@ -442,16 +486,19 @@ static void pce_cd_nec_set_audio_stop_position( void ) {
 }
 
 /* 0xDA - PAUSE (NEC) */
-static void pce_cd_nec_pause( void ) {
+static void pce_cd_nec_pause( void ) 
+{
 
 	/* If no cd mounted throw an error */
-	if ( ! pce_cd.cd ) {
+	if ( ! pce_cd.cd ) 
+	{
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 		return;
 	}
 
 	/* If there was no cdda playing, throw an error */
-	if ( pce_cd.cdda_status == PCE_CD_CDDA_OFF ) {
+	if ( pce_cd.cdda_status == PCE_CD_CDDA_OFF ) 
+	{
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 		return;
 	}
@@ -463,11 +510,13 @@ static void pce_cd_nec_pause( void ) {
 }
 
 /* 0xDD - READ SUBCHANNEL Q (NEC) */
-static void pce_cd_nec_get_subq( void ) {
+static void pce_cd_nec_get_subq( void ) 
+{
 	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
 	UINT32 msf_abs, msf_rel, track, frame;
 
-	if ( ! pce_cd.cd ) {
+	if ( ! pce_cd.cd ) 
+	{
 		/* Throw some error here */
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 		return;
@@ -475,7 +524,8 @@ static void pce_cd_nec_get_subq( void ) {
 
 	frame = pce_cd.current_frame;
 
-	switch( pce_cd.cdda_status ) {
+	switch( pce_cd.cdda_status ) 
+	{
 	case PCE_CD_CDDA_PAUSED:
 		pce_cd.data_buffer[0] = 2;
 		frame = cdda_get_audio_lba( 0 );
@@ -511,19 +561,22 @@ static void pce_cd_nec_get_subq( void ) {
 }
 
 /* 0xDE - GET DIR INFO (NEC) */
-static void pce_cd_nec_get_dir_info( void ) {
+static void pce_cd_nec_get_dir_info( void ) 
+{
 	UINT32 frame, msf, track = 0;
 	const cdrom_toc	*toc;
 	logerror("nec get dir info\n");
 
-	if ( ! pce_cd.cd ) {
+	if ( ! pce_cd.cd ) 
+	{
 		/* Throw some error here */
 		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
 	}
 
 	toc = cdrom_get_toc( pce_cd.cd );
 
-	switch( pce_cd.command_buffer[1] ) {
+	switch( pce_cd.command_buffer[1] ) 
+	{
 	case 0x00:		/* Get first and last track numbers */
 		pce_cd.data_buffer[0] = dec_2_bcd(1);
 		pce_cd.data_buffer[1] = dec_2_bcd(toc->numtrks);
@@ -540,11 +593,13 @@ static void pce_cd_nec_get_dir_info( void ) {
 		pce_cd.data_buffer_size = 3;
 		break;
 	case 0x02:		/* Get track information */
-		if ( pce_cd.command_buffer[2] == 0xAA ) {
+		if ( pce_cd.command_buffer[2] == 0xAA ) 
+		{
 			frame = toc->tracks[toc->numtrks-1].physframeofs;
 			frame += toc->tracks[toc->numtrks-1].frames;
 			pce_cd.data_buffer[3] = 0x04;	/* correct? */
-		} else {
+		} else 
+		{
 			track = MAX( bcd_2_dec( pce_cd.command_buffer[2] ), 1 );
 			frame = toc->tracks[track-1].physframeofs;
 			pce_cd.data_buffer[3] = ( toc->tracks[track-1].trktype == CD_TRACK_AUDIO ) ? 0x00 : 0x04;
@@ -567,7 +622,8 @@ static void pce_cd_nec_get_dir_info( void ) {
 	pce_cd.scsi_CD = 0;
 }
 
-static void pce_cd_handle_data_output( void ) {
+static void pce_cd_handle_data_output( void ) 
+{
 	static const struct {
 		UINT8	command_byte;
 		UINT8	command_size;
@@ -583,7 +639,8 @@ static void pce_cd_handle_data_output( void ) {
 		{ 0xFF, 0, NULL }									/* end of list marker */
 	};
 
-	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) {
+	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) 
+	{
 		/* Command byte received */
 		logerror( "Command byte $%02X received\n", pce_cd.regs[0x01] );
 
@@ -595,7 +652,8 @@ static void pce_cd_handle_data_output( void ) {
 		pce_cd.scsi_REQ = 0;
 	}
 
-	if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && pce_cd.command_buffer_index ) {
+	if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && pce_cd.command_buffer_index ) 
+	{
 		int i = 0;
 
 		logerror( "Check if command done\n" );
@@ -603,53 +661,70 @@ static void pce_cd_handle_data_output( void ) {
 		for( i = 0; pce_cd.command_buffer[0] > pce_cd_commands[i].command_byte; i++ );
 
 		/* Check for unknown commands */
-		if ( pce_cd.command_buffer[0] != pce_cd_commands[i].command_byte ) {
+		if ( pce_cd.command_buffer[0] != pce_cd_commands[i].command_byte ) 
+		{
 			logerror("Unrecognized command: %02X\n", pce_cd.command_buffer[0] );
 		}
 		assert( pce_cd.command_buffer[0] == pce_cd_commands[i].command_byte );
 
-		if ( pce_cd.command_buffer_index == pce_cd_commands[i].command_size ) {
+		if ( pce_cd.command_buffer_index == pce_cd_commands[i].command_size ) 
+		{
 			(pce_cd_commands[i].command_handler)();
 			pce_cd.command_buffer_index = 0;
-		} else {
+		} 
+		else 
+		{
 			pce_cd.scsi_REQ = 1;
 		}
 	}
 }
 
-static void pce_cd_handle_data_input( void ) {
-	if ( pce_cd.scsi_CD ) {
+static void pce_cd_handle_data_input( void ) 
+{
+	if ( pce_cd.scsi_CD ) 
+	{
 		/* Command / Status byte */
-		if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) {
+		if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) 
+		{
 			logerror( "status sent\n" );
 			pce_cd.scsi_REQ = 0;
 			pce_cd.status_sent = 1;
 		}
 
-		if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && pce_cd.status_sent ) {
+		if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && pce_cd.status_sent ) 
+		{
 			pce_cd.status_sent = 0;
-			if ( pce_cd.message_after_status ) {
+			if ( pce_cd.message_after_status ) 
+			{
 				logerror( "message after status\n" );
 				pce_cd.message_after_status = 0;
 				pce_cd.scsi_MSG = pce_cd.scsi_REQ = 1;
 				pce_cd.regs[0x01] = 0;
 			}
 		}
-	} else {
+	} 
+	else 
+	{
 		/* Data */
-		if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) {
+		if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) 
+		{
 			pce_cd.scsi_REQ = 0;
 		}
 
-		if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK ) {
-			if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size ) {
+		if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK ) 
+		{
+			if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size ) 
+			{
 				pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_READY, CLEAR_LINE );
-				if ( pce_cd.data_transferred ) {
+				if ( pce_cd.data_transferred ) 
+				{
 					pce_cd.data_transferred = 0;
 					pce_cd_reply_status_byte( SCSI_STATUS_OK );
 					pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 				}
-			} else {
+			} 
+			else 
+			{
 				logerror("Transfer byte from offset %d\n", pce_cd.data_buffer_index);
 				pce_cd.regs[0x01] = pce_cd.data_buffer[pce_cd.data_buffer_index];
 				pce_cd.data_buffer_index++;
@@ -659,29 +734,37 @@ static void pce_cd_handle_data_input( void ) {
 	}
 }
 
-static void pce_cd_handle_message_output( void ) {
-	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) {
+static void pce_cd_handle_message_output( void ) 
+{
+	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) 
+	{
 		pce_cd.scsi_REQ = 0;
 	}
 }
 
-static void pce_cd_handle_message_input( void ) {
-	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) {
+static void pce_cd_handle_message_input( void ) 
+{
+	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) 
+	{
 		pce_cd.scsi_REQ = 0;
 		pce_cd.message_sent = 1;
 	}
 
-	if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && pce_cd.message_sent ) {
+	if ( ! pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && pce_cd.message_sent ) 
+	{
 		pce_cd.message_sent = 0;
 		pce_cd.scsi_BSY = 0;
 	}
 }
 
 /* Update internal CD statuses */
-static void pce_cd_update( running_machine *machine ) {
+static void pce_cd_update( running_machine *machine ) 
+{
 	/* Check for reset of CD unit */
-	if ( pce_cd.scsi_RST != pce_cd.scsi_last_RST ) {
-		if ( pce_cd.scsi_RST ) {
+	if ( pce_cd.scsi_RST != pce_cd.scsi_last_RST ) 
+	{
+		if ( pce_cd.scsi_RST ) 
+		{
 			logerror("Performing CD reset\n");
 			/* Reset internal data */
 			pce_cd.scsi_BSY = pce_cd.scsi_SEL = pce_cd.scsi_CD = pce_cd.scsi_IO = 0;
@@ -693,7 +776,8 @@ static void pce_cd_update( running_machine *machine ) {
 	}
 
 	/* Check if bus can be freed */
-	if ( ! pce_cd.scsi_SEL && ! pce_cd.scsi_BSY && pce_cd.selected ) {
+	if ( ! pce_cd.scsi_SEL && ! pce_cd.scsi_BSY && pce_cd.selected ) 
+	{
 		logerror( "freeing bus\n" );
 		pce_cd.selected = 0;
 		pce_cd.scsi_CD = pce_cd.scsi_MSG = pce_cd.scsi_IO = pce_cd.scsi_REQ = 0;
@@ -701,8 +785,10 @@ static void pce_cd_update( running_machine *machine ) {
 	}
 
 	/* Select the CD device */
-	if ( pce_cd.scsi_SEL ) {
-		if ( ! pce_cd.selected ) {
+	if ( pce_cd.scsi_SEL ) 
+	{
+		if ( ! pce_cd.selected ) 
+		{
 			pce_cd.selected = 1;
 logerror("Setting CD in device selection\n");
 			pce_cd.scsi_BSY = pce_cd.scsi_REQ = pce_cd.scsi_CD = 1;
@@ -710,23 +796,36 @@ logerror("Setting CD in device selection\n");
 		}
 	}
 
-	if ( pce_cd.scsi_ATN ) {
-	} else {
+	if ( pce_cd.scsi_ATN ) 
+	{
+	} 
+	else 
+	{
 		/* Check for data and pessage phases */
-		if ( pce_cd.scsi_BSY ) {
-			if ( pce_cd.scsi_MSG ) {
+		if ( pce_cd.scsi_BSY ) 
+		{
+			if ( pce_cd.scsi_MSG ) 
+			{
 				/* message phase */
-				if ( pce_cd.scsi_IO ) {
+				if ( pce_cd.scsi_IO ) 
+				{
 					pce_cd_handle_message_input();
-				} else {
+				} 
+				else 
+				{
 					pce_cd_handle_message_output();
 				}
-			} else {
+			} 
+			else 
+			{
 				/* data phase */
-				if ( pce_cd.scsi_IO ) {
+				if ( pce_cd.scsi_IO ) 
+				{
 					/* Reading data from target */
 					pce_cd_handle_data_input();
-				} else {
+				} 
+				else 
+				{
 					/* Sending data to target */
 					pce_cd_handle_data_output();
 				}
@@ -735,19 +834,27 @@ logerror("Setting CD in device selection\n");
 	}
 }
 
-static void pce_cd_set_irq_line( running_machine *machine, int num, int state ) {
-	switch( num ) {
+static void pce_cd_set_irq_line( running_machine *machine, int num, int state ) 
+{
+	switch( num ) 
+	{
 	case PCE_CD_IRQ_TRANSFER_DONE:
-		if ( state == ASSERT_LINE ) {
+		if ( state == ASSERT_LINE ) 
+		{
 			pce_cd.regs[0x03] |= PCE_CD_IRQ_TRANSFER_DONE;
-		} else {
+		} 
+		else 
+		{
 			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_TRANSFER_DONE;
 		}
 		break;
 	case PCE_CD_IRQ_TRANSFER_READY:
-		if ( state == ASSERT_LINE ) {
+		if ( state == ASSERT_LINE ) 
+		{
 			pce_cd.regs[0x03] |= PCE_CD_IRQ_TRANSFER_READY;
-		} else {
+		} 
+		else 
+		{
 			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_TRANSFER_READY;
 		}
 		break;
@@ -755,20 +862,28 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state ) 
 		break;
 	}
 
-	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY ) ) {
+	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY ) ) 
+	{
 		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE );
-	} else {
+	} 
+	else 
+	{
 		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE );
 	}
 }
 
-static TIMER_CALLBACK( pce_cd_data_timer_callback ) {
-	if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size ) {
+static TIMER_CALLBACK( pce_cd_data_timer_callback ) 
+{
+	if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size ) 
+	{
 		/* Read next data sector */
 		logerror("read sector %d\n", pce_cd.current_frame );
-		if ( ! cdrom_read_data( pce_cd.cd, pce_cd.current_frame, pce_cd.data_buffer, CD_TRACK_MODE1 ) ) {
+		if ( ! cdrom_read_data( pce_cd.cd, pce_cd.current_frame, pce_cd.data_buffer, CD_TRACK_MODE1 ) ) 
+		{
 			logerror("Mode1 CD read failed for frame #%d\n", pce_cd.current_frame );
-		} else {
+		} 
+		else 
+		{
 			logerror("Succesfully read mode1 frame #%d\n", pce_cd.current_frame );
 		}
 
@@ -779,18 +894,22 @@ static TIMER_CALLBACK( pce_cd_data_timer_callback ) {
 		pce_cd.scsi_IO = 1;
 		pce_cd.scsi_CD = 0;
 
-		if ( pce_cd.current_frame == pce_cd.end_frame ) {
+		if ( pce_cd.current_frame == pce_cd.end_frame ) 
+		{
 			/* We are done, disable the timer */
 			logerror("Last frame read from CD\n");
 			pce_cd.data_transferred = 1;
 			timer_adjust_oneshot(pce_cd.data_timer, attotime_never, 0);
-		} else {
+		} 
+		else 
+		{
 			pce_cd.data_transferred = 0;
 		}
 	}
 }
 
-static void pce_cd_init( running_machine *machine ) {
+static void pce_cd_init( running_machine *machine ) 
+{
 	const device_config *device;
 
 	/* Initialize pce_cd struct */
@@ -801,7 +920,7 @@ static void pce_cd_init( running_machine *machine ) {
 	memset( pce_cd.bram, 0, PCE_BRAM_SIZE );
 	memset( pce_cd.bram + PCE_BRAM_SIZE, 0xFF, PCE_BRAM_SIZE );
 	pce_cd.bram_locked = 1;
-	pce_set_cd_bram();
+	pce_set_cd_bram(machine);
 
 	/* set up adpcm related things */
 	pce_cd.adpcm_ram = auto_malloc( PCE_ADPCM_RAM_SIZE );
@@ -840,21 +959,25 @@ static void pce_cd_init( running_machine *machine ) {
 	timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0);
 }
 
-WRITE8_HANDLER( pce_cd_bram_w ) {
-	if ( ! pce_cd.bram_locked ) {
+WRITE8_HANDLER( pce_cd_bram_w ) 
+{
+	if ( ! pce_cd.bram_locked ) 
+	{
 		pce_cd.bram[ offset ] = data;
 	}
 }
 
-WRITE8_HANDLER( pce_cd_intf_w ) {
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", activecpu_get_pc(), offset, data );
-	pce_cd_update(machine);
+WRITE8_HANDLER( pce_cd_intf_w ) 
+{
+	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(space->cpu), offset, data );
+	pce_cd_update(space->machine);
 
-	switch( offset ) {
+	switch( offset ) 
+	{
 	case 0x00:	/* CDC status */
 		/* select device (which bits??) */
 		pce_cd.scsi_SEL = 1;
-		pce_cd_update(machine);
+		pce_cd_update(space->machine);
 		pce_cd.scsi_SEL = 0;
 		break;
 	case 0x01:	/* CDC command / status / data */
@@ -867,7 +990,7 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 				/* bit 2 - ?? irq */
 		pce_cd.scsi_ACK = data & 0x80;
 		/* Don't set or reset any irq lines, but just verify the current state */
-		pce_cd_set_irq_line( machine, 0, 0 );
+		pce_cd_set_irq_line( space->machine, 0, 0 );
 		break;
 	case 0x03:	/* BRAM lock / CD status / IRQ - Read Only register */
 		break;
@@ -878,9 +1001,10 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 	case 0x06:	/* PCM data */
 		break;
 	case 0x07:	/* BRAM unlock / CD status */
-		if ( data & 0x80 ) {
+		if ( data & 0x80 ) 
+		{
 			pce_cd.bram_locked = 0;
-			pce_set_cd_bram();
+			pce_set_cd_bram(space->machine);
 		}
 		break;
 	case 0x08:	/* ADPCM address (LSB) / CD data */
@@ -889,11 +1013,13 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 	case 0x0A:	/* ADPCM RAM data port */
 		break;
 	case 0x0B:	/* ADPCM DMA control */
-		if ( ! ( pce_cd.regs[0x0B] & 0x02 ) && ( data & 0x02 ) ) {
+		if ( ! ( pce_cd.regs[0x0B] & 0x02 ) && ( data & 0x02 ) ) 
+		{
 			/* Start CD to ADPCM transfer */
 			timer_adjust_periodic(pce_cd.adpcm_dma_timer, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ), 0, ATTOTIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ) );
 		}
-		if ( ( pce_cd.regs[0x0B] & 0x02 ) && ! ( data & 0x02 ) ) {
+		if ( ( pce_cd.regs[0x0B] & 0x02 ) && ! ( data & 0x02 ) ) 
+		{
 			/* Stop CD to ADPCM transfer (?) */
 			timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0);
 		}
@@ -901,19 +1027,23 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 	case 0x0C:	/* ADPCM status */
 		break;
 	case 0x0D:	/* ADPCM address control */
-		if ( ( pce_cd.regs[0x0D] & 0x80 ) && ! ( data & 0x80 ) ) {
+		if ( ( pce_cd.regs[0x0D] & 0x80 ) && ! ( data & 0x80 ) ) 
+		{
 			/* Reset ADPCM hardware */
 			pce_cd.adpcm_read_ptr = 0;
 			pce_cd.adpcm_write_ptr = 0;
 			msm5205_reset_w( 0, 0 );
 		}
-		if ( data & 0x10 ) {
+		if ( data & 0x10 ) 
+		{
 			pce_cd.adpcm_length = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
 		}
-		if ( data & 0x08 ) {
+		if ( data & 0x08 ) 
+		{
 			pce_cd.adpcm_read_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
 		}
-		if ( ( data & 0x03 ) == 0x03 ) {
+		if ( ( data & 0x03 ) == 0x03 ) 
+		{
 			pce_cd.adpcm_write_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
 		}
 		break;
@@ -927,22 +1057,27 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 		return;
 	}
 	pce_cd.regs[offset] = data;
-	pce_cd_update(machine);
+	pce_cd_update(space->machine);
 }
 
-static TIMER_CALLBACK( pce_cd_clear_ack ) {
+static TIMER_CALLBACK( pce_cd_clear_ack ) 
+{
 	pce_cd_update(machine);
 	pce_cd.scsi_ACK = 0;
 	pce_cd_update(machine);
-	if ( pce_cd.scsi_CD ) {
+	if ( pce_cd.scsi_CD ) 
+	{
 		pce_cd.regs[0x0B] &= 0xFE;
 	}
 }
 
-static UINT8 pce_cd_get_cd_data_byte( void ) {
+static UINT8 pce_cd_get_cd_data_byte( void ) 
+{
 	UINT8 data = pce_cd.regs[0x01];
-	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD ) {
-		if ( pce_cd.scsi_IO ) {
+	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD ) 
+	{
+		if ( pce_cd.scsi_IO ) 
+		{
 			pce_cd.scsi_ACK = 1;
 			timer_set( ATTOTIME_IN_CYCLES( 15, 0 ), NULL, 0, pce_cd_clear_ack );
 		}
@@ -950,20 +1085,25 @@ static UINT8 pce_cd_get_cd_data_byte( void ) {
 	return data;
 }
 
-static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback ) {
-	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD && pce_cd.scsi_IO ) {
+
+static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback ) 
+{
+	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD && pce_cd.scsi_IO ) 
+	{
 		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = pce_cd_get_cd_data_byte();
 		pce_cd.adpcm_write_ptr = ( pce_cd.adpcm_write_ptr + 1 ) & 0xFFFF;
 	}
 }
 
-READ8_HANDLER( pce_cd_intf_r ) {
+READ8_HANDLER( pce_cd_intf_r ) 
+{
 	UINT8 data = pce_cd.regs[offset & 0x0F];
 
-	pce_cd_update(machine);
+	pce_cd_update(space->machine);
 
-	logerror("%04X: read from CD interface offset %02X\n", activecpu_get_pc(), offset );
-	switch( offset ) {
+	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(space->cpu), offset );
+	switch( offset ) 
+	{
 	case 0x00:	/* CDC status */
 		data &= 0x07;
 		data |= pce_cd.scsi_BSY ? 0x80 : 0;
@@ -980,7 +1120,7 @@ READ8_HANDLER( pce_cd_intf_r ) {
 		/* bit 4 set when CD motor is on */
 		/* bit 2 set when less than half of the ADPCM data is remaining ?? */
 		pce_cd.bram_locked = 1;
-		pce_set_cd_bram();
+		pce_set_cd_bram(space->machine);
 		data = data & 0x6E;
 		data |= ( pce_cd.cd_motor_on ? 0x10 : 0 );
 		pce_cd.regs[0x03] ^= 0x02;			/* TODO: get rid of this hack */

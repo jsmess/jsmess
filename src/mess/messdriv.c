@@ -148,10 +148,10 @@ const game_driver * const drivers[] =
 	DRIVER( adam )		/* Coleco Adam										*/
 
 	/* NEC */
-//128u4	DRIVER( pce )		/* PC/Engine NEC 1987-1993							*/
-//128u4	DRIVER( tg16 )		/* Turbo Grafix-16  NEC 1989-1993					*/
-//128u4	DRIVER( sgx )		/* SuperGrafX NEC 1989								*/
-//128u4	DRIVER( pcfx)		/* PC-FX NEC 1994									*/
+	DRIVER( pce )		/* PC/Engine NEC 1987-1993							*/
+	DRIVER( tg16 )		/* Turbo Grafix-16  NEC 1989-1993					*/
+	DRIVER( sgx )		/* SuperGrafX NEC 1989								*/
+	DRIVER( pcfx)		/* PC-FX NEC 1994									*/
 
 	DRIVER( arcadia )	/* Emerson Arcadia 2001								*/
 	DRIVER( vcg )		/* Palladium Video-Computer-Game					*/
@@ -195,7 +195,7 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
 	/* KOEI */
-//128u4	DRIVER( pasogo )	/* KOEI PasoGo										*/
+	DRIVER( pasogo )	/* KOEI PasoGo										*/
 
 
 /****************COMPUTERS***************************************************/
@@ -537,7 +537,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( ti99_8e )	/* 1983 TI-99/8 with 50Hz video						*/
 
 	/* TI 99 clones */
-//128u4	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
+	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
 //128u4	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
 //128u4	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
 //128u4	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/

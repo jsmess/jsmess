@@ -135,7 +135,7 @@ static MACHINE_RESET(tutor)
 static INTERRUPT_GEN( tutor_vblank_interrupt )
 {
 	/* No vblank interrupt? */
-	TMS9928A_interrupt(machine);
+	TMS9928A_interrupt(device->machine);
 }
 
 static const device_config *printer_fp(void)
@@ -164,13 +164,13 @@ static READ8_HANDLER(read_keyboard)
 	UINT8 value;
 
 	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
-	value = input_port_read(machine, port);
+	value = input_port_read(space->machine, port);
 
 	/* hack for ports overlapping with joystick */
 	if (offset == 4 || offset == 5)
 	{
 		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
-		value |= input_port_read(machine, port);
+		value |= input_port_read(space->machine, port);
 	}
 
 	return value;
@@ -232,13 +232,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
 		cartridge_enable = 0;
-		memory_set_bank(machine, 1, 0);
+		memory_set_bank(space->machine, 1, 0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
 		cartridge_enable = 1;
-		memory_set_bank(machine, 1, 1);
+		memory_set_bank(space->machine, 1, 1);
 		break;
 
 	default:
@@ -276,7 +276,7 @@ static TIMER_CALLBACK(tape_interrupt_handler)
 /* CRU handler */
 static  READ8_HANDLER(tutor_cassette_r)
 {
-	return (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0) ? 1 : 0;
+	return (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
@@ -293,7 +293,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		{
 		case 0:
 			/* data out */
-			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data) ? +1.0 : -1.0);
+			cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), (data) ? +1.0 : -1.0);
 			break;
 		case 1:
 			/* interrupt control??? */
@@ -306,7 +306,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 				else
 				{
 					timer_adjust_oneshot(tape_interrupt_timer, attotime_never, 0);
-					cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
+					cpu_set_input_line(space->machine->cpu[0], 1, CLEAR_LINE);
 				}
 			}
 			break;
