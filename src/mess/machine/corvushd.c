@@ -1693,7 +1693,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	// to the user with us Ready for more data and in Host-to-Controller mode.
 	//
 	if(c->offset == c->recv_bytes) {						// We've received enough data to process
-		corvus_process_command_packet(machine, invalid_command_flag);
+		corvus_process_command_packet(space->machine, invalid_command_flag);
 	} else {
 		//
 		// Reset the four-second timer since we received some data

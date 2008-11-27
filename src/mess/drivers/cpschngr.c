@@ -32,11 +32,11 @@ void slammast_decode(running_machine *machine) { }
 void forogttn_dummy_function(running_machine *machine)
 {
 	/* Forgotten Worlds has extra inputs on the B-board CN-MOWS connector for the dial controls. */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800040, 0x800041, 0, 0, forgottn_dial_0_reset_w);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800048, 0x800049, 0, 0, forgottn_dial_1_reset_w);
-	memory_install_read16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
-	memory_install_read16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
-	cps1_hack_dsw_r(machine, 0, 0);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800040, 0x800041, 0, 0, forgottn_dial_0_reset_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800048, 0x800049, 0, 0, forgottn_dial_1_reset_w);
+	memory_install_read16_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
+	memory_install_read16_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
+	cps1_hack_dsw_r(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
 	driver_init_sf2mdt(machine);
 }
 
@@ -140,4 +140,3 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY     FULLNAME */
 CONS( 1995, sfzch,    0,        0,		cps1_10MHz,	  sfzch,    cps1,	NULL,	"Capcom", "CPS Changer (Street Fighter ZERO)" , 0)
-

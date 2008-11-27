@@ -75,10 +75,10 @@ static UINT32 KeyStateSave[/*4*/3];
 
 static struct
 {
-	read8_machine_func reg_read;
-	write8_machine_func reg_write;
-	read8_machine_func rom_read;
-	write8_machine_func rom_write;
+	read8_space_func reg_read;
+	write8_space_func reg_write;
+	read8_space_func rom_read;
+	write8_space_func rom_write;
 } expansion_slots[4];
 
 static void concept_fdc_init(running_machine *machine, int slot);
@@ -110,8 +110,8 @@ MACHINE_START(concept)
 }
 
 static void install_expansion_slot(int slot,
-									read8_machine_func reg_read, write8_machine_func reg_write,
-									read8_machine_func rom_read, write8_machine_func rom_write)
+									read8_space_func reg_read, write8_space_func reg_write,
+									read8_space_func rom_read, write8_space_func rom_write)
 {
 	expansion_slots[slot].reg_read = reg_read;
 	expansion_slots[slot].reg_write = reg_write;
@@ -208,7 +208,7 @@ static void poll_keyboard(running_machine *machine)
 
 INTERRUPT_GEN( concept_interrupt )
 {
-	poll_keyboard(machine);
+	poll_keyboard(device->machine);
 }
 
 /*
@@ -247,11 +247,11 @@ static WRITE8_HANDLER(via_out_a)
 	6: boot switch 0 (I)
 	7: boot switch 1 (I)
 */
-static  READ8_HANDLER(via_in_b)
+static READ8_HANDLER(via_in_b)
 {
 	UINT8 status;
 
-	status = ((input_port_read(machine, "DSW0") & 0x80) >> 1) | ((input_port_read(machine, "DSW0") & 0x40) << 1);
+	status = ((input_port_read(space->machine, "DSW0") & 0x80) >> 1) | ((input_port_read(space->machine, "DSW0") & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }
@@ -299,7 +299,7 @@ READ16_HANDLER(concept_io_r)
 			{
 				int slot = ((offset >> 4) & 7) - 1;
 				if (expansion_slots[slot].reg_read)
-					return expansion_slots[slot].reg_read(machine, offset & 0xf);
+					return expansion_slots[slot].reg_read(space, offset & 0xf);
 			}
 			break;
 
@@ -322,7 +322,7 @@ READ16_HANDLER(concept_io_r)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", slot, offset << 1));
 			if (expansion_slots[slot].rom_read)
-				return expansion_slots[slot].rom_read(machine, offset & 0xff);
+				return expansion_slots[slot].rom_read(space, offset & 0xff);
 		}
 		break;
 
@@ -360,7 +360,7 @@ READ16_HANDLER(concept_io_r)
 				}
 
 				if (!KeyQueueLen)
-					concept_set_interrupt(machine, KEYINT_level, 0);
+					concept_set_interrupt(space->machine, KEYINT_level, 0);
 
 				return reply;
 
@@ -382,7 +382,7 @@ READ16_HANDLER(concept_io_r)
 		case 3:
 			/* NVIA versatile system interface */
 			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
-			return via_read(machine, 0, offset & 0xf);
+			return via_read(space->machine, 0, offset & 0xf);
 			break;
 
 		case 4:
@@ -438,7 +438,7 @@ WRITE16_HANDLER(concept_io_w)
 				LOG(("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data));
 				if (expansion_slots[slot].reg_write)
-					expansion_slots[slot].reg_write(machine, offset & 0xf, data);
+					expansion_slots[slot].reg_write(space, offset & 0xf, data);
 			}
 			break;
 
@@ -461,7 +461,7 @@ WRITE16_HANDLER(concept_io_w)
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", slot, offset << 1, data));
 			if (expansion_slots[slot].rom_write)
-				expansion_slots[slot].rom_write(machine, offset & 0xff, data);
+				expansion_slots[slot].rom_write(space, offset & 0xff, data);
 		}
 		break;
 
@@ -492,7 +492,7 @@ WRITE16_HANDLER(concept_io_w)
 
 		case 3:
 			/* NVIA versatile system interface */
-			via_write(machine, 0, offset & 0xf, data);
+			via_write(space->machine, 0, offset & 0xf, data);
 			break;
 
 		case 4:
@@ -612,22 +612,22 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 	case 8:
 		/* FDC STATUS REG */
-		return wd17xx_status_r(machine, offset);
+		return wd17xx_status_r(space, offset);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		return wd17xx_track_r(machine, offset);
+		return wd17xx_track_r(space, offset);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		return wd17xx_sector_r(machine, offset);
+		return wd17xx_sector_r(space, offset);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		return wd17xx_data_r(machine, offset);
+		return wd17xx_data_r(space, offset);
 		break;
 	}
 
@@ -656,22 +656,22 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 
 	case 8:
 		/* FDC COMMAMD REG */
-		wd17xx_command_w(machine, offset, data);
+		wd17xx_command_w(space, offset, data);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		wd17xx_track_w(machine, offset, data);
+		wd17xx_track_w(space, offset, data);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		wd17xx_sector_w(machine, offset, data);
+		wd17xx_sector_w(space, offset, data);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		wd17xx_data_w(machine, offset, data);
+		wd17xx_data_w(space, offset, data);
 		break;
 	}
 }
@@ -703,18 +703,18 @@ static void concept_hdc_init(running_machine *machine, int slot)
 /*
  *	Handle reads against the Hard Disk Controller's onboard registers
  */
-static  READ8_HANDLER(concept_hdc_reg_r)
+static READ8_HANDLER(concept_hdc_reg_r)
 {
 	switch (offset)
 	{
 	case 0:
 		/* HDC Data Register */
-		return corvus_hdc_data_r(machine, offset);
+		return corvus_hdc_data_r(space, offset);
 		break;
 
 	case 1:
 		/* HDC Status Register */
-		return corvus_hdc_status_r(machine, offset);
+		return corvus_hdc_status_r(space, offset);
 		break;
 	}
 
@@ -730,7 +730,7 @@ static WRITE8_HANDLER(concept_hdc_reg_w)
 	{
 	case 0:
 		/* HDC Data Register */
-		corvus_hdc_data_w(machine, offset, data);
+		corvus_hdc_data_w(space, offset, data);
 		break;
 	}
 }

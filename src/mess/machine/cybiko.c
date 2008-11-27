@@ -81,9 +81,9 @@ static void cybiko_rs232_reset( void);
 
 static void init_ram_handler(running_machine *machine, offs_t start, offs_t size, offs_t mirror)
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, mirror - size, STATIC_BANK1);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, mirror - size, STATIC_BANK1);
-	memory_set_bankptr( 1, mess_ram);
+	memory_install_read_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, STATIC_BANK1);
+	memory_install_write_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, STATIC_BANK1);
+	memory_set_bankptr( machine, 1, mess_ram);
 }
 
 DRIVER_INIT( cybikov1 )
@@ -210,7 +210,7 @@ MACHINE_START( cybikov2 )
 	// multi-purpose flash
 	sst39vfx_init( SST39VF020, 16, CPU_IS_BE);
 	nvram_system_load( machine, "flash2", &sst39vfx_load, 1);
-	memory_set_bankptr( 2, sst39vfx_get_base());
+	memory_set_bankptr( machine, 2, sst39vfx_get_base());
 	// serial port
 	cybiko_rs232_init();
 	// other
@@ -226,7 +226,7 @@ MACHINE_START( cybikoxt )
 	// multi-purpose flash
 	sst39vfx_init( SST39VF400A, 16, CPU_IS_BE);
 	nvram_system_load( machine, "flash1", &sst39vfx_load, 1);
-	memory_set_bankptr( 2, sst39vfx_get_base());
+	memory_set_bankptr( machine, 2, sst39vfx_get_base());
 	// serial port
 	cybiko_rs232_init();
 	// other
@@ -428,7 +428,7 @@ static READ8_HANDLER( cybiko_key_r_byte )
 	for (i=1; i<10; i++) 
 	{
 		if (!(offset & (1 << i))) 
-			data &= input_port_read(machine, keynames[i-1]);
+			data &= input_port_read(space->machine, keynames[i-1]);
 	}
 	// A0
 	if (!(offset & (1 <<  0))) 
@@ -441,8 +441,8 @@ READ16_HANDLER( cybiko_key_r )
 {
 	UINT16 data = 0;
 	_logerror( 2, ("cybiko_key_r (%08X/%04X)\n", offset, mem_mask));
-	if ACCESSING_BITS_8_15 data = data | (cybiko_key_r_byte(machine, offset * 2 + 0) << 8);
-	if ACCESSING_BITS_0_7 data = data | (cybiko_key_r_byte(machine, offset * 2 + 1) << 0);
+	if ACCESSING_BITS_8_15 data = data | (cybiko_key_r_byte(space, offset * 2 + 0) << 8);
+	if ACCESSING_BITS_0_7 data = data | (cybiko_key_r_byte(space, offset * 2 + 1) << 0);
 	_logerror( 2, ("%04X\n", data));
 	return data;
 }
@@ -456,7 +456,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			//if (input_port_read(machine, "A1") & 0x02) data = data | 0x08; else data = data & (~0x08); // "esc" key
+			//if (input_port_read(space->machine, "A1") & 0x02) data = data | 0x08; else data = data & (~0x08); // "esc" key
 			data = data | 0x08;
 		}
 		break;
@@ -512,13 +512,13 @@ static WRITE8_HANDLER( cybiko_io_reg_w )
 READ8_HANDLER( cybikov1_io_reg_r )
 {
 	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
-	return cybiko_io_reg_r(machine, offset);
+	return cybiko_io_reg_r(space, offset);
 }
 
 READ8_HANDLER( cybikov2_io_reg_r )
 {
 	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
-	return cybiko_io_reg_r(machine, offset);
+	return cybiko_io_reg_r(space, offset);
 }
 
 READ8_HANDLER( cybikoxt_io_reg_r )
@@ -530,7 +530,7 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 		// rs232
 		case H8S_IO_PORT3 : if (cybiko_rs232_pin_rxd()) data = data | H8S_P3_RXD1; break;
 		// default
-		default : data = cybiko_io_reg_r(machine, offset);
+		default : data = cybiko_io_reg_r(space, offset);
 	}
 	return data;
 }
@@ -538,13 +538,13 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 WRITE8_HANDLER( cybikov1_io_reg_w )
 {
 	_logerror( 2, ("cybikov1_io_reg_w (%08X/%02X)\n", offset, data));
-	cybiko_io_reg_w(machine, offset, data);
+	cybiko_io_reg_w(space, offset, data);
 }
 
 WRITE8_HANDLER( cybikov2_io_reg_w )
 {
 	_logerror( 2, ("cybikov2_io_reg_w (%08X/%02X)\n", offset, data));
-	cybiko_io_reg_w(machine, offset, data);
+	cybiko_io_reg_w(space, offset, data);
 }
 
 WRITE8_HANDLER( cybikoxt_io_reg_w )
@@ -560,7 +560,7 @@ WRITE8_HANDLER( cybikoxt_io_reg_w )
 		}
 		break;
 		// default
-		default : cybiko_io_reg_w(machine, offset, data);
+		default : cybiko_io_reg_w(space, offset, data);
 	}
 }
 

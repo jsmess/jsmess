@@ -57,8 +57,8 @@ void sst39vfx_reset( void)
 static void sst39vfx_state_save( void)
 {
 	const char *name = "sst39vfx";
-	state_save_register_item_pointer( name, 0, flash.data, flash.size);
-	state_save_register_item( name, 0, flash.swap);
+	state_save_register_item_pointer( name, NULL, 0, flash.data, flash.size);
+	state_save_register_item( name, NULL, 0, flash.swap);
 }
 
 UINT8* sst39vfx_get_base( void)

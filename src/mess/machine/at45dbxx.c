@@ -119,15 +119,15 @@ static void at45dbxx_state_save( void)
 {
 	const char *name = "at45dbxx";
 	// data
-	state_save_register_item_pointer( name, 0, flash.data, flash.size);
+	state_save_register_item_pointer( name, NULL, 0, flash.data, flash.size);
 	// pins
-	state_save_register_item( name, 0, flash.pin.cs);
-	state_save_register_item( name, 0, flash.pin.sck);
-	state_save_register_item( name, 0, flash.pin.si);
-	state_save_register_item( name, 0, flash.pin.so);
-	state_save_register_item( name, 0, flash.pin.wp);
-	state_save_register_item( name, 0, flash.pin.reset);
-	state_save_register_item( name, 0, flash.pin.busy);
+	state_save_register_item( name, NULL, 0, flash.pin.cs);
+	state_save_register_item( name, NULL, 0, flash.pin.sck);
+	state_save_register_item( name, NULL, 0, flash.pin.si);
+	state_save_register_item( name, NULL, 0, flash.pin.so);
+	state_save_register_item( name, NULL, 0, flash.pin.wp);
+	state_save_register_item( name, NULL, 0, flash.pin.reset);
+	state_save_register_item( name, NULL, 0, flash.pin.busy);
 }
 
 static UINT8 at45dbxx_read_byte( void)
