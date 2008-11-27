@@ -497,20 +497,20 @@ XL/XE 16kB OS roms
 //	DRIVER( megaopd )
 
 	/* SHARP */
-//128u4	DRIVER( pc1251 )	/* Pocket Computer 1251								*/
-//128u4	DRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
-//128u4	DRIVER( pc1401 )	/* Pocket Computer 1401								*/
-//128u4	DRIVER( pc1402 )	/* Pocket Computer 1402								*/
-//128u4	DRIVER( pc1350 )	/* Pocket Computer 1350								*/
-//128u4	DRIVER( pc1403 )	/* Pocket Computer 1403								*/
-//128u4	DRIVER( pc1403h )	/* Pocket Computer 1403H							*/
+	DRIVER( pc1251 )	/* Pocket Computer 1251								*/
+	DRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
+	DRIVER( pc1401 )	/* Pocket Computer 1401								*/
+	DRIVER( pc1402 )	/* Pocket Computer 1402								*/
+	DRIVER( pc1350 )	/* Pocket Computer 1350								*/
+	DRIVER( pc1403 )	/* Pocket Computer 1403								*/
+	DRIVER( pc1403h )	/* Pocket Computer 1403H							*/
 
-//128u4	DRIVER( mz700 )		/* 1982 Sharp MZ700									*/
-//128u4	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
-//128u4	DRIVER( mz800 )		/* 1982 Sharp MZ800									*/
+	DRIVER( mz700 )		/* 1982 Sharp MZ700									*/
+	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
+	DRIVER( mz800 )		/* 1982 Sharp MZ800									*/
 	
-//128u4	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
-//128u4	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
+	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
+	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
 
 	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
 
