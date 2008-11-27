@@ -34,11 +34,14 @@ static void mpc105_update_memory(running_machine *machine)
 
 	if (mpc105->bank_base > 0)
 	{
-		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+		/* TODO: Fix me properly! changing all cpus???? */
+		for (cpunum = 0; cpunum < 2 /*cpu_gettotalcpu()*/; cpunum++)
 		{
+			const address_space *space = cpu_get_address_space( machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM );
+
 			/* first clear everything out */
-			memory_install_read64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
-			memory_install_write64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
+			memory_install_read64_handler(space, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
+			memory_install_write64_handler(space, 0x00000000, 0x3FFFFFFF, 0, 0, SMH_NOP);
 		}
 	}
 
@@ -62,14 +65,17 @@ static void mpc105_update_memory(running_machine *machine)
 
 				if (mpc105->bank_base > 0)
 				{
-					for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+					/* TODO: Fix me properly! changing all cpus??? */
+					for (cpunum = 0; cpunum < 2 /*cpu_gettotalcpu()*/; cpunum++)
 					{
-						memory_install_read64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
-							0, 0, (read64_machine_func) (FPTR)(bank + mpc105->bank_base));
-						memory_install_write64_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, begin, end,
-							0, 0, (write64_machine_func) (FPTR)(bank + mpc105->bank_base));
+						const address_space *space = cpu_get_address_space( machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM );
+
+						memory_install_read64_handler(space, begin, end,
+							0, 0, (read64_space_func) (FPTR)(bank + mpc105->bank_base));
+						memory_install_write64_handler(space, begin, end,
+							0, 0, (write64_space_func) (FPTR)(bank + mpc105->bank_base));
 					}
-					memory_set_bankptr(bank + mpc105->bank_base, mess_ram);
+					memory_set_bankptr(machine, bank + mpc105->bank_base, mess_ram);
 				}
 			}
 		}
@@ -111,7 +117,8 @@ static UINT32 mpc105_pci_read(int function, int offset, UINT32 mem_mask)
 			break;
 
 		case 0xA8:	/* processor interface configuration 1 */
-			switch(cpu_getactivecpu())
+			/* TODO: Fix me! */
+			switch(/*cpu_getactivecpu()*/0)
 			{
 				case 0:
 					result = 0xFF000010;
