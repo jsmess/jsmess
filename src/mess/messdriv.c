@@ -80,7 +80,7 @@ const game_driver * const drivers[] =
 	DRIVER( n64 )		/* Nintendo N64										*/
 	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
 
-//128u4	DRIVER( megaduck )	/* Megaduck											*/
+	DRIVER( megaduck )	/* Megaduck											*/
 
 	/* SEGA */
 	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/
@@ -122,8 +122,8 @@ const game_driver * const drivers[] =
 	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box */
 
 	/* BALLY */
-//128u4	DRIVER( astrocde )	/* Bally Astrocade									*/
-//128u4	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
+	DRIVER( astrocde )	/* Bally Astrocade									*/
+	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
 
 	/* RCA */
 	DRIVER( vip )		/* 1977 Cosmac VIP VP-711							*/
@@ -307,7 +307,7 @@ XL/XE 16kB OS roms
 
 	/* COMMODORE */
 	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
-//128u4	DRIVER( sym1 )		/* Synertek SYM-1									*/
+	DRIVER( sym1 )		/* Synertek SYM-1									*/
 	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
 	DRIVER( pet2001 )	/* PET 2001											*/
@@ -415,42 +415,42 @@ XL/XE 16kB OS roms
 	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
 
 	/* IBM PC & Clones */
-//128u4	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
-//128u4	DRIVER( dgone )		/* 1984 Data General/One */
-//128u4	DRIVER( pcmda )		/* 1987 PC with MDA									*/
-//128u4	DRIVER( pcherc )	/* 1987 PC with Hercules (for testing hercules)		*/
-//128u4	DRIVER( pc )		/* 1987 PC with CGA									*/
-//128u4	DRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
-//128u4	DRIVER( europc )	/* 1988	Schneider Euro PC (CGA or Hercules)			*/
+	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
+	DRIVER( dgone )		/* 1984 Data General/One */
+	DRIVER( pcmda )		/* 1987 PC with MDA									*/
+	DRIVER( pcherc )	/* 1987 PC with Hercules (for testing hercules)		*/
+	DRIVER( pc )		/* 1987 PC with CGA									*/
+	DRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
+	DRIVER( europc )	/* 1988	Schneider Euro PC (CGA or Hercules)			*/
 
 	/* pc junior */
-//128u4	DRIVER( ibmpcjr )	/* 1984 IBM PC Jr									*/
-//128u4	DRIVER( t1000hx )	/* 1987 Tandy 1000HX (similiar to PCJr)				*/
-//128u4	DRIVER( t1000sx )	/* 1987 Tandy 1000SX (similiar to PCJr)				*/
+	DRIVER( ibmpcjr )	/* 1984 IBM PC Jr									*/
+	DRIVER( t1000hx )	/* 1987 Tandy 1000HX (similiar to PCJr)				*/
+	DRIVER( t1000sx )	/* 1987 Tandy 1000SX (similiar to PCJr)				*/
 
 	/* xt */
-//128u4	DRIVER( ibm5160 )	/* 1982	IBM XT 5160									*/
-//128u4	DRIVER( ibm5162 )	/* 1986 IBM XT 5162 (XT w/80286)					*/
-//128u4	DRIVER( pc200 )		/* 1988 Sinclair PC200								*/
-//128u4	DRIVER( pc20 )		/* 1988 Amstrad PC20								*/
-//128u4	DRIVER( ppc512 )	/* 1987 Amstrad PPC512								*/
-//128u4	DRIVER( ppc640 )	/* 1987 Amstrad PPC640								*/
-//128u4	DRIVER( pc1512 )	/* 1986 Amstrad PC1512 v1 (CGA compatible)			*/
-//128u4	DRIVER( pc1512v2 )	/* 1986 Amstrad PC1512 v2 (CGA compatible)			*/
-//128u4	DRIVER( pc1640 )	/* 1987 Amstrad PC1640 (EGA compatible)				*/
+	DRIVER( ibm5160 )	/* 1982	IBM XT 5160									*/
+	DRIVER( ibm5162 )	/* 1986 IBM XT 5162 (XT w/80286)					*/
+	DRIVER( pc200 )		/* 1988 Sinclair PC200								*/
+	DRIVER( pc20 )		/* 1988 Amstrad PC20								*/
+	DRIVER( ppc512 )	/* 1987 Amstrad PPC512								*/
+	DRIVER( ppc640 )	/* 1987 Amstrad PPC640								*/
+	DRIVER( pc1512 )	/* 1986 Amstrad PC1512 v1 (CGA compatible)			*/
+	DRIVER( pc1512v2 )	/* 1986 Amstrad PC1512 v2 (CGA compatible)			*/
+	DRIVER( pc1640 )	/* 1987 Amstrad PC1640 (EGA compatible)				*/
 
-//128u4	DRIVER( xtvga )		/* 198? PC-XT (VGA, MF2 Keyboard)					*/
+	DRIVER( xtvga )		/* 198? PC-XT (VGA, MF2 Keyboard)					*/
 
 	/* at */
-//128u4	DRIVER( ibm5170 )	/* 1984 IBM PC/AT 5170, original 6 MHz model		*/
-//128u4	DRIVER( ibm5170a )	/* 1985	IBM PC/AT 5170, enhanced 8 MHz model		*/
-//128u4	DRIVER( i8530286 )	/* 1988 IBM PS2 Model 30 286 (VGA)					*/
-//128u4	DRIVER( at )		/* 1987 AMI Bios and Diagnostics					*/
-//128u4	DRIVER( atvga )		/* 19?? AT VGA										*/
-//128u4	DRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
-//128u4	DRIVER( at386 )		/* 19?? IBM AT 386									*/
-//128u4	DRIVER( at486 )		/* 19?? IBM AT 486									*/
-//128u4	DRIVER( at586 )		/* 19?? AT 586										*/
+	DRIVER( ibm5170 )	/* 1984 IBM PC/AT 5170, original 6 MHz model		*/
+	DRIVER( ibm5170a )	/* 1985	IBM PC/AT 5170, enhanced 8 MHz model		*/
+	DRIVER( i8530286 )	/* 1988 IBM PS2 Model 30 286 (VGA)					*/
+	DRIVER( at )		/* 1987 AMI Bios and Diagnostics					*/
+	DRIVER( atvga )		/* 19?? AT VGA										*/
+	DRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
+	DRIVER( at386 )		/* 19?? IBM AT 386									*/
+	DRIVER( at486 )		/* 19?? IBM AT 486									*/
+	DRIVER( at586 )		/* 19?? AT 586										*/
 
 	/* OSBORNE */
 	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
@@ -604,25 +604,25 @@ XL/XE 16kB OS roms
 	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
 	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
 
-//128u4	DRIVER( coco )		/* Color Computer									*/
-//128u4	DRIVER( cocoe )		/* Color Computer (Extended BASIC 1.0)				*/
-//128u4	DRIVER( coco2 )		/* Color Computer 2									*/
-//128u4	DRIVER( coco2b )	/* Color Computer 2B (uses M6847T1 video chip)		*/
-//128u4	DRIVER( coco3 )		/* Color Computer 3 (NTSC)							*/
-//128u4	DRIVER( coco3p )	/* Color Computer 3 (PAL)							*/
-//128u4	DRIVER( coco3h )	/* Hacked Color Computer 3 (6309)					*/
-//128u4	DRIVER( dragon32 )	/* Dragon 32										*/
-//128u4	DRIVER( dragon64 )	/* Dragon 64										*/
-//128u4	DRIVER( d64plus )	/* Dragon 64 + Compusense Plus addon				*/
-//128u4	DRIVER( dgnalpha )	/* Dragon Alpha										*/
-//128u4	DRIVER( dgnbeta )	/* Dragon Beta										*/
-//128u4	DRIVER( tanodr64 )	/* Tano Dragon 64 (NTSC)							*/
-//128u4	DRIVER( cp400 )		/* Prologica CP400									*/
+	DRIVER( coco )		/* Color Computer									*/
+	DRIVER( cocoe )		/* Color Computer (Extended BASIC 1.0)				*/
+	DRIVER( coco2 )		/* Color Computer 2									*/
+	DRIVER( coco2b )	/* Color Computer 2B (uses M6847T1 video chip)		*/
+	DRIVER( coco3 )		/* Color Computer 3 (NTSC)							*/
+	DRIVER( coco3p )	/* Color Computer 3 (PAL)							*/
+	DRIVER( coco3h )	/* Hacked Color Computer 3 (6309)					*/
+	DRIVER( dragon32 )	/* Dragon 32										*/
+	DRIVER( dragon64 )	/* Dragon 64										*/
+	DRIVER( d64plus )	/* Dragon 64 + Compusense Plus addon				*/
+	DRIVER( dgnalpha )	/* Dragon Alpha										*/
+	DRIVER( dgnbeta )	/* Dragon Beta										*/
+	DRIVER( tanodr64 )	/* Tano Dragon 64 (NTSC)							*/
+	DRIVER( cp400 )		/* Prologica CP400									*/
 	DRIVER( mc10 )		/* MC-10											*/
-//128u4	DRIVER( alice )		/* Matra & Hachette Ordinateur Alice				*/
+	DRIVER( alice )		/* Matra & Hachette Ordinateur Alice				*/
 
 	/* EACA */
-//128u4	DRIVER( cgenie )	/* Colour Genie EG2000								*/
+	DRIVER( cgenie )	/* Colour Genie EG2000								*/
 	/* system 80 trs80 compatible */
 
 	/* VIDEO TECHNOLOGY */
@@ -659,10 +659,10 @@ XL/XE 16kB OS roms
 	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
 	/* COMPUKIT */
-//128u4	DRIVER( uk101 )		/* 1979 UK101										*/
+	DRIVER( uk101 )		/* 1979 UK101										*/
 
 	/* OHIO SCIENTIFIC */
-//128u4	DRIVER( sb2m600b )	/* 1979 Superboard II								*/
+	DRIVER( sb2m600b )	/* 1979 Superboard II								*/
 
 	/* ASCII & MICROSOFT */
 	DRIVER( msx )		/* 1983 MSX 										*/
@@ -807,7 +807,7 @@ XL/XE 16kB OS roms
 	DRIVER( rs128 )		/* 1984 Memotech RS 128								*/
 
 	/* MATTEL */
-//128u4	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
+	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
 						/* (Test marketed, later recalled)					*/
 	DRIVER( aquarius )	/* 1983 Aquarius									*/
 //	DRIVER( aquariu2 )	/* 1984 Aquarius II									*/
@@ -912,8 +912,8 @@ XL/XE 16kB OS roms
 	DRIVER( abc806 )
 
 	/* Be Incorporated */
-//128u4	DRIVER( bebox )		/* BeBox Dual603-66									*/
-//128u4	DRIVER( bebox2 )	/* BeBox Dual603-133								*/
+	DRIVER( bebox )		/* BeBox Dual603-66									*/
+	DRIVER( bebox2 )	/* BeBox Dual603-133								*/
 
 	/* Tiger Electronics */
 	DRIVER( gamecom )	/* Tiger Game.com									*/
@@ -1068,7 +1068,7 @@ XL/XE 16kB OS roms
 	DRIVER( bw2 )
 
 	/* Exeltel */
-//128u4	DRIVER( exl100 )
+	DRIVER( exl100 )
 //	DRIVER( exeltel )
 
 	/* Comx World Operations Ltd */
@@ -1088,7 +1088,7 @@ XL/XE 16kB OS roms
 
 /****************Games*******************************************************/
 	/* Computer Electronic */
-//128u4	DRIVER( mk1 )		/* Chess Champion MK I								*/
+	DRIVER( mk1 )		/* Chess Champion MK I								*/
 	/* Quelle International */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
 
@@ -1097,17 +1097,17 @@ XL/XE 16kB OS roms
 
 	/* Hegener & Glaser Munich */
 //	DRIVER( mephisto )	/* Mephisto											*/
-//128u4	DRIVER( mm4 )		/* Mephisto 4										*/
-//128u4	DRIVER( mm5 )		/* Mephisto 5.1 ROM									*/
-//128u4	DRIVER( mm50 )		/* Mephisto 5.0 ROM									*/
-//128u4	DRIVER( rebel5 )		/* Mephisto 5									*/
-//128u4	DRIVER( glasgow )		/* Glasgow										*/
-//128u4	DRIVER( amsterd )		/* Amsterdam									*/
-//128u4	DRIVER( dallas )		/* Dallas										*/
-//128u4	DRIVER( dallas16 )		/* Dallas										*/
-//128u4	DRIVER( dallas32 )		/* Dallas										*/
-//128u4	DRIVER( roma )			/* Roma											*/
-//128u4	DRIVER( roma32 )		/* Roma											*/
+	DRIVER( mm4 )		/* Mephisto 4										*/
+	DRIVER( mm5 )		/* Mephisto 5.1 ROM									*/
+	DRIVER( mm50 )		/* Mephisto 5.0 ROM									*/
+	DRIVER( rebel5 )		/* Mephisto 5									*/
+	DRIVER( glasgow )		/* Glasgow										*/
+	DRIVER( amsterd )		/* Amsterdam									*/
+	DRIVER( dallas )		/* Dallas										*/
+	DRIVER( dallas16 )		/* Dallas										*/
+	DRIVER( dallas32 )		/* Dallas										*/
+	DRIVER( roma )			/* Roma											*/
+	DRIVER( roma32 )		/* Roma											*/
 
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
