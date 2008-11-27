@@ -428,6 +428,7 @@ DRVLIBS = \
 	$(MESSOBJ)/memotech.a \
 	$(MESSOBJ)/mephisto.a \
 	$(MESSOBJ)/mikro80.a \
+	$(MESSOBJ)/mk1.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/motorola.a \
 	$(MESSOBJ)/multitch.a \
@@ -484,8 +485,6 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
-
-#	$(MESSOBJ)/mk1.a \
 
 
 
