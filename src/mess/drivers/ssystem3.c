@@ -82,7 +82,7 @@ static void ssystem3_playfield_reset(void)
   //  playfield.on=TRUE; //input_port_read(machine, "Configuration")&1;
 }
 
-static void ssystem3_playfield_write(int reset, int signal)
+static void ssystem3_playfield_write(running_machine *machine, int reset, int signal)
 {
   int d=FALSE;
 
@@ -110,7 +110,7 @@ static void ssystem3_playfield_write(int reset, int signal)
       if (d) playfield.data|=1<<(playfield.bit^7);
       playfield.bit++;
       if (playfield.bit==8) {
-	logerror("%.4x playfield wrote %d %02x\n",(int)activecpu_get_pc(), playfield.count, playfield.data);
+	logerror("%.4x playfield wrote %d %02x\n",(int)cpu_get_pc(machine->cpu[0]), playfield.count, playfield.data);
 	playfield.u.data[playfield.count]=playfield.data;
 	playfield.bit=0;
 	playfield.count=(playfield.count+1)%ARRAY_LENGTH(playfield.u.data);
@@ -134,49 +134,49 @@ static void ssystem3_playfield_read(running_machine *machine, int *on, int *read
 	*ready=FALSE;
 }
 
-static void ssystem3_via_write_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+static WRITE8_HANDLER(ssystem3_via_write_a)
 {
   ssystem3.porta=data;
   //  logerror("%.4x via port a write %02x\n",(int)activecpu_get_pc(), data);
 }
 
-static UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset)
+static READ8_HANDLER(ssystem3_via_read_a)
 {
   UINT8 data=0xff;
 #if 1 // time switch
-  if (!(ssystem3.porta&0x10)) data&=input_port_read(machine, "matrix1")|0xf1;
-  if (!(ssystem3.porta&0x20)) data&=input_port_read(machine, "matrix2")|0xf1;
-  if (!(ssystem3.porta&0x40)) data&=input_port_read(machine, "matrix3")|0xf1;
-  if (!(ssystem3.porta&0x80)) data&=input_port_read(machine, "matrix4")|0xf1;
+  if (!(ssystem3.porta&0x10)) data&=input_port_read(space->machine, "matrix1")|0xf1;
+  if (!(ssystem3.porta&0x20)) data&=input_port_read(space->machine, "matrix2")|0xf1;
+  if (!(ssystem3.porta&0x40)) data&=input_port_read(space->machine, "matrix3")|0xf1;
+  if (!(ssystem3.porta&0x80)) data&=input_port_read(space->machine, "matrix4")|0xf1;
 #else
-  if (!(ssystem3.porta&0x10)) data&=input_port_read(machine, "matrix1")|0xf0;
-  if (!(ssystem3.porta&0x20)) data&=input_port_read(machine, "matrix2")|0xf0;
-  if (!(ssystem3.porta&0x40)) data&=input_port_read(machine, "matrix3")|0xf0;
-  if (!(ssystem3.porta&0x80)) data&=input_port_read(machine, "matrix4")|0xf0;
+  if (!(ssystem3.porta&0x10)) data&=input_port_read(space->machine, "matrix1")|0xf0;
+  if (!(ssystem3.porta&0x20)) data&=input_port_read(space->machine, "matrix2")|0xf0;
+  if (!(ssystem3.porta&0x40)) data&=input_port_read(space->machine, "matrix3")|0xf0;
+  if (!(ssystem3.porta&0x80)) data&=input_port_read(space->machine, "matrix4")|0xf0;
 #endif
   if (!(ssystem3.porta&1)) {
-    if (!(input_port_read(machine, "matrix1")&1)) data&=~0x10;
-    if (!(input_port_read(machine, "matrix2")&1)) data&=~0x20;
-    if (!(input_port_read(machine, "matrix3")&1)) data&=~0x40;
-    if (!(input_port_read(machine, "matrix4")&1)) data&=~0x80;
+    if (!(input_port_read(space->machine, "matrix1")&1)) data&=~0x10;
+    if (!(input_port_read(space->machine, "matrix2")&1)) data&=~0x20;
+    if (!(input_port_read(space->machine, "matrix3")&1)) data&=~0x40;
+    if (!(input_port_read(space->machine, "matrix4")&1)) data&=~0x80;
   }
   if (!(ssystem3.porta&2)) {
-    if (!(input_port_read(machine, "matrix1")&2)) data&=~0x10;
-    if (!(input_port_read(machine, "matrix2")&2)) data&=~0x20;
-    if (!(input_port_read(machine, "matrix3")&2)) data&=~0x40;
-    if (!(input_port_read(machine, "matrix4")&2)) data&=~0x80;
+    if (!(input_port_read(space->machine, "matrix1")&2)) data&=~0x10;
+    if (!(input_port_read(space->machine, "matrix2")&2)) data&=~0x20;
+    if (!(input_port_read(space->machine, "matrix3")&2)) data&=~0x40;
+    if (!(input_port_read(space->machine, "matrix4")&2)) data&=~0x80;
   }
   if (!(ssystem3.porta&4)) {
-    if (!(input_port_read(machine, "matrix1")&4)) data&=~0x10;
-    if (!(input_port_read(machine, "matrix2")&4)) data&=~0x20;
-    if (!(input_port_read(machine, "matrix3")&4)) data&=~0x40;
-    if (!(input_port_read(machine, "matrix4")&4)) data&=~0x80;
+    if (!(input_port_read(space->machine, "matrix1")&4)) data&=~0x10;
+    if (!(input_port_read(space->machine, "matrix2")&4)) data&=~0x20;
+    if (!(input_port_read(space->machine, "matrix3")&4)) data&=~0x40;
+    if (!(input_port_read(space->machine, "matrix4")&4)) data&=~0x80;
   }
   if (!(ssystem3.porta&8)) {
-    if (!(input_port_read(machine, "matrix1")&8)) data&=~0x10;
-    if (!(input_port_read(machine, "matrix2")&8)) data&=~0x20;
-    if (!(input_port_read(machine, "matrix3")&8)) data&=~0x40;
-    if (!(input_port_read(machine, "matrix4")&8)) data&=~0x80;
+    if (!(input_port_read(space->machine, "matrix1")&8)) data&=~0x10;
+    if (!(input_port_read(space->machine, "matrix2")&8)) data&=~0x20;
+    if (!(input_port_read(space->machine, "matrix3")&8)) data&=~0x40;
+    if (!(input_port_read(space->machine, "matrix4")&8)) data&=~0x80;
   }
   //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
   return data;
@@ -204,27 +204,26 @@ static UINT8 ssystem3_via_read_a(ATTR_UNUSED running_machine *machine, ATTR_UNUS
    bit 5: input low x/$37 4 (else 1)
 
  */
-static UINT8 ssystem3_via_read_b(running_machine *machine, ATTR_UNUSED offs_t offset)
+static READ8_HANDLER(ssystem3_via_read_b)
 {
   UINT8 data=0xff;
   int on, ready;
-  ssystem3_playfield_read(machine, &on, &ready);
+  ssystem3_playfield_read(space->machine, &on, &ready);
   if (!on) data&=~0x20;
   if (!ready) data&=~0x10;
   return data;
 }
 
-static void ssystem3_via_write_b(ATTR_UNUSED running_machine *machine, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+static WRITE8_HANDLER(ssystem3_via_write_b)
 {
-  UINT8 d;
-  ssystem3_playfield_write(data&1, data&8);
-  ssystem3_lcd_write(data&4, data&2);
+	UINT8 d;
+	ssystem3_playfield_write(space->machine, data&1, data&8);
+	ssystem3_lcd_write(space->machine, data&4, data&2);
 
-  d=ssystem3_via_read_b(machine, 0)&~0x40;
-  if (data&0x80) d|=0x40;
-  //  d&=~0x8f;
-  via_set_input_b( 0, d );
-
+	d=ssystem3_via_read_b(space, 0)&~0x40;
+	if (data&0x80) d|=0x40;
+	//  d&=~0x8f;
+	via_set_input_b( 0, d );
 }
 
 static const struct via6522_interface config=

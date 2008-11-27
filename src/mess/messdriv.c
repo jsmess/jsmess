@@ -1093,7 +1093,7 @@ XL/XE 16kB OS roms
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
 
 	/* Novag */
-//128u4	DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
+	DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 	/* Hegener & Glaser Munich */
 //	DRIVER( mephisto )	/* Mephisto											*/
