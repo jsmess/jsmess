@@ -381,6 +381,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/avigo.a \
 	$(MESSOBJ)/b2m.a \
+	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
 	$(MESSOBJ)/bk.a \
 	$(MESSOBJ)/bondwell.a \
@@ -446,7 +447,6 @@ DRVLIBS = \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/atari.a \
-#	$(MESSOBJ)/bally.a \
 #	$(MESSOBJ)/be.a \
 #	$(MESSOBJ)/cgenie.a \
 #	$(MESSOBJ)/coco.a \
