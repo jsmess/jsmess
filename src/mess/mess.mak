@@ -433,6 +433,7 @@ DRVLIBS = \
 	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
+	$(MESSOBJ)/sega.a \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
@@ -476,9 +477,7 @@ DRVLIBS = \
 #	$(MESSOBJ)/pdp1.a \
 #	$(MESSOBJ)/rockwell.a \
 #	$(MESSOBJ)/samcoupe.a \
-#	$(MESSOBJ)/sega.a \
 #	$(MESSOBJ)/sgi.a \
-#	$(MESSOBJ)/sony.a \
 #	$(MESSOBJ)/svi.a \
 #	$(MESSOBJ)/svision.a \
 #	$(MESSOBJ)/synertec.a \
@@ -581,6 +580,8 @@ $(MESSOBJ)/sega.a:			\
 	$(MESS_DRIVERS)/sg1000.o	\
 	$(MESS_DRIVERS)/dc.o		\
 	$(MAME_MACHINE)/dc.o 		\
+	$(MAME_MACHINE)/naomibd.o	\
+	$(MAME_MACHINE)/gdcrypt.o	\
 	$(MAME_VIDEO)/dc.o		\
 
 $(MESSOBJ)/atari.a:						\
