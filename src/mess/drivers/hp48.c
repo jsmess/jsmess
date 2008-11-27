@@ -1,4 +1,4 @@
-﻿/**********************************************************************
+/**********************************************************************
 
   Copyright (C) Antoine Mine' 2008
 
@@ -140,7 +140,7 @@
 
   References:
 
-  - Voyage au centre de la HP48 S/SX, by Paul Courbis & Sébastien Lalande
+  - Voyage au centre de la HP48 S/SX, by Paul Courbis & S�bastien Lalande
     (English version: HP48 machine language - a journey to the center 
      of the HP48 s/sx)
     available at http://www.courbis.com
