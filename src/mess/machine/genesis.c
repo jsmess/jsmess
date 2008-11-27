@@ -85,7 +85,7 @@ static int cart_type = STANDARD;
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
 	static int lastoffset = -1,lastdata = -1;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	if ((lastoffset != offset) || (lastdata != data)) {
 		lastoffset = offset; lastdata = data;
@@ -206,7 +206,7 @@ static WRITE16_HANDLER( g_l3alt_bank_w )
 	{
 		case 0:
 		{
-		UINT8 *ROM = memory_region(machine, "main");
+		UINT8 *ROM = memory_region(space->machine, "main");
 		/* printf("%06x data %04x\n",activecpu_get_pc(), data); */
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + (data&0xffff)*0x8000], 0x8000);
 		}
@@ -231,7 +231,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 {
 	int bankdata = (data >> 9) & 0x7;
 
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	realtek_old_bank_addr = realtek_bank_addr;
 	realtek_bank_addr = (realtek_bank_addr & 0x7) | bankdata<<3;
@@ -243,7 +243,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 static WRITE16_HANDLER( realtec_404000_w )
 {
 	int bankdata = (data >> 8) & 0x3;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	realtek_old_bank_addr = realtek_bank_addr;
 	realtek_bank_addr = (realtek_bank_addr & 0xf8)|bankdata;
@@ -257,7 +257,7 @@ static WRITE16_HANDLER( realtec_404000_w )
 
 static WRITE16_HANDLER( g_chifi3_bank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	if (data==0xf100) // *hit player
 	{
@@ -293,7 +293,7 @@ static WRITE16_HANDLER( g_chifi3_bank_w )
 	}
 	else
 	{
-		logerror("%06x chifi3, bankw? %04x %04x\n",activecpu_get_pc(), offset,data);
+		logerror("%06x chifi3, bankw? %04x %04x\n",cpu_get_pc(space->cpu), offset,data);
 	}
 
 }
@@ -310,47 +310,47 @@ static READ16_HANDLER( g_chifi3_prot_r )
 	04cefa chifi3, prot_r? 65262
 	*/
 
-	if (activecpu_get_pc()==0x01782) // makes 'VS' screen appear
+	if (cpu_get_pc(space->cpu)==0x01782) // makes 'VS' screen appear
 	{
-		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
 		retdat<<=8;
 		return retdat;
 	}
-	else if (activecpu_get_pc()==0x1c24) // background gfx etc.
+	else if (cpu_get_pc(space->cpu)==0x1c24) // background gfx etc.
 	{
-		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
 		retdat<<=8;
 		return retdat;
 	}
-	else if (activecpu_get_pc()==0x10c4a) // unknown
+	else if (cpu_get_pc(space->cpu)==0x10c4a) // unknown
 	{
-		return mame_rand(machine);
+		return mame_rand(space->machine);
 	}
-	else if (activecpu_get_pc()==0x10c50) // unknown
+	else if (cpu_get_pc(space->cpu)==0x10c50) // unknown
 	{
-		return mame_rand(machine);
+		return mame_rand(space->machine);
 	}
-	else if (activecpu_get_pc()==0x10c52) // relates to the game speed..
+	else if (cpu_get_pc(space->cpu)==0x10c52) // relates to the game speed..
 	{
-		retdat = activecpu_get_reg(M68K_D4)&0xff;
+		retdat = cpu_get_reg(space->cpu, M68K_D4)&0xff;
 		retdat<<=8;
 		return retdat;
 	}
-	else if (activecpu_get_pc()==0x061ae)
+	else if (cpu_get_pc(space->cpu)==0x061ae)
 	{
-		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
 		retdat<<=8;
 		return retdat;
 	}
-	else if (activecpu_get_pc()==0x061b0)
+	else if (cpu_get_pc(space->cpu)==0x061b0)
 	{
-		retdat = activecpu_get_reg(M68K_D3)&0xff;
+		retdat = cpu_get_reg(space->cpu, M68K_D3)&0xff;
 		retdat<<=8;
 		return retdat;
 	}
 	else
 	{
-		logerror("%06x chifi3, prot_r? %04x\n",activecpu_get_pc(), offset);
+		logerror("%06x chifi3, prot_r? %04x\n",cpu_get_pc(space->cpu), offset);
 	}
 
 	return 0;
@@ -358,14 +358,14 @@ static READ16_HANDLER( g_chifi3_prot_r )
 
 static WRITE16_HANDLER( s19in1_bank )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	memcpy(ROM + 0x000000, ROM + 0x400000+((offset << 1)*0x10000), 0x80000);
 }
 
 // Kaiju? (Pokemon Stadium) handler from HazeMD
 static WRITE16_HANDLER( g_kaiju_bank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	memcpy(ROM + 0x000000, ROM + 0x400000+(data&0x7f)*0x8000, 0x8000);
 }
 
@@ -452,7 +452,7 @@ static READ16_HANDLER( kof99_0xA13000_r )
 static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset&0x3f;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	memcpy(ROM, ROM +  (bank*0x10000)+0x400000, 0x400000);
 	return 0;
 }
@@ -620,7 +620,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000);
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
 
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa130f0, 0xa130ff, 0, 0, genesis_ssf2_bank_w);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130ff, 0, 0, genesis_ssf2_bank_w);
 	}
 
 	if (cart_type == LIONK3 || cart_type == SKINGKONG)
@@ -628,8 +628,8 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
 		memcpy(&ROM[0x200000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
 
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_protw);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x7fffff, 0, 0, g_l3alt_bank_w);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_protw);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, g_l3alt_bank_w);
 	}
 
 	if (cart_type == SDK99)
@@ -637,14 +637,14 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x300000); /* default rom */
 		memcpy(&ROM[0x300000], &ROM[VIRGIN_COPY_GEN], 0x100000); /* default rom */
 
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_protw);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x7fffff, 0, 0, g_l3alt_bank_w);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, g_l3alt_prot_r, g_l3alt_protw);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, g_l3alt_bank_w);
 	}
 
 	if (cart_type == REDCLIFF)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, redclif_prot2_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
 	}
 
 	if (cart_type == REDCL_EN)
@@ -658,8 +658,8 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + 4], 0x200000); /* default rom */
 
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, redclif_prot2_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, redclif_prot_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, redclif_prot2_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
 	}
 
 	if (cart_type == RADICA)
@@ -667,49 +667,49 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
 		memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN], 0x400000); // wraparound banking (from hazemd code)
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa1307f, 0, 0, radica_bank_select);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1307f, 0, 0, radica_bank_select);
 	}
 
 	if (cart_type == KOF99)
 	{
 		//memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x300000);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, kof99_0xA13000_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13002, 0xa13003, 0, 0, kof99_0xA13002_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa1303e, 0xa1303f, 0, 0, kof99_00A1303E_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, kof99_0xA13000_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13002, 0xa13003, 0, 0, kof99_0xA13002_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa1303e, 0xa1303f, 0, 0, kof99_00A1303E_r);
 	}
 
 	if (cart_type == SOULBLAD)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, soulb_0x400002_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, soulb_0x400004_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, soulb_0x400006_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, soulb_0x400002_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, soulb_0x400004_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, soulb_0x400006_r);
 	}
 
 	if (cart_type == MJLOVER)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r);
 	}
 
 	if (cart_type == SQUIRRELK)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
 	}
 
 	if (cart_type == SMOUSE)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400007, 0, 0, smous_prot_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, smous_prot_r);
 	}
 
 	if (cart_type == SMB)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, smbro_prot_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smbro_prot_r);
 	}
 
 	if (cart_type == SMB2)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, smb2_extra_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smb2_extra_r);
 	}
 
 	if (cart_type == KAIJU)
@@ -718,7 +718,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000);
 
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x7fffff, 0, 0, g_kaiju_bank_w);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, g_kaiju_bank_w);
 	}
 
 	if (cart_type == CHINFIGHT3)
@@ -727,53 +727,53 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000);
 
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x4fffff, 0, 0, g_chifi3_prot_r);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000, 0x6fffff, 0, 0, g_chifi3_bank_w);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x4fffff, 0, 0, g_chifi3_prot_r);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, g_chifi3_bank_w);
 	}
 
 	if (cart_type == LIONK2)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, lion2_prot1_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, lion2_prot2_r);
-		memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, lion2_prot1_w);
-		memory_install_write16_handler(machine, 0,ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, lion2_prot2_w);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, lion2_prot1_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, lion2_prot2_r);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, lion2_prot1_w);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, lion2_prot2_w);
 	}
 
 	if (cart_type == BUGSLIFE)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, bugl_extra_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, bugl_extra_r);
 	}
 
 	if (cart_type == ELFWOR)
 	{
 	/* It return (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). It is probably best to add handlers for all 4 addresses. */
 
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, elfwor_0x400000_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, elfwor_0x400002_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400005, 0, 0, elfwor_0x400004_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400006, 0x400007, 0, 0, elfwor_0x400006_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, elfwor_0x400000_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, elfwor_0x400002_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, elfwor_0x400004_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, elfwor_0x400006_r);
 	}
 
 	if (cart_type == ROCKMANX3)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13001, 0, 0, rx3_extra_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, rx3_extra_r);
 	}
 
 	if (cart_type == SBUBBOB)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, sbub_extra1_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400002, 0x400003, 0, 0, sbub_extra2_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sbub_extra1_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, sbub_extra2_r);
 	}
 
 	if (cart_type == KOF98)
 	{
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x480000, 0x480001, 0, 0, g_kof98_aa_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800e0, 0x4800e1, 0, 0, g_kof98_aa_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4824a0, 0x4824a1, 0, 0, g_kof98_aa_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x488880, 0x488881, 0, 0, g_kof98_aa_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x480000, 0x480001, 0, 0, g_kof98_aa_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800e0, 0x4800e1, 0, 0, g_kof98_aa_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4824a0, 0x4824a1, 0, 0, g_kof98_aa_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x488880, 0x488881, 0, 0, g_kof98_aa_r);
 
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a8820, 0x4a8821, 0, 0, g_kof98_0a_r);
-		memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f8820, 0x4f8821, 0, 0, g_kof98_00_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4a8820, 0x4a8821, 0, 0, g_kof98_0a_r);
+		memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4f8820, 0x4f8821, 0, 0, g_kof98_00_r);
 	}
 
 	if (cart_type == REALTEC)
@@ -788,33 +788,33 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 			memcpy(ROM + mirroraddr, ROM + relocate + 0x7e000, 0x002000); /* copy last 8kb across the whole rom region */
 		}
 
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, realtec_400000_w);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x402000, 0x402001, 0, 0, realtec_402000_w);
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x404000, 0x404001, 0, 0, realtec_404000_w);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, realtec_400000_w);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x402000, 0x402001, 0, 0, realtec_402000_w);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x404000, 0x404001, 0, 0, realtec_404000_w);
 	}
 
 	if (cart_type == SUP19IN1)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // allow hard reset to menu
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13039, 0, 0, s19in1_bank);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
 	}
 
 	if (cart_type == SUP15IN1)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000); // allow hard reset to menu
-		memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa13000, 0xa13039, 0, 0, s19in1_bank);
+		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
 	}
 
 	if (has_sram)
 	{
-        memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_read);
-        memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_write);
-        memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
+        memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_read);
+        memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_write);
+        memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
 	}
 
 
 	/* install NOP handler for TMSS */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa14000, 0xa14003, 0, 0, genesis_TMSS_bank_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa14000, 0xa14003, 0, 0, genesis_TMSS_bank_w);
 }
 
 
