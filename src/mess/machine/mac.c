@@ -1253,11 +1253,28 @@ static int adb_listenreg, adb_listenaddr;
 
 // ADB mouse state
 static int adb_mouseaddr = 3;
-static int adb_lastmousex, adb_lastmousey;
+static int adb_lastmousex, adb_lastmousey, adb_mouse_wanted_srq, adb_mouse_initialized;
+
+// ADB keyboard state
+static int adb_keybaddr = 2;
+static int adb_keybinitialized, adb_keyb_wanted_srq;
 
 #if LOG_ADB
 static const char *adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 #endif
+
+static void mac_adb_pollmouse(running_machine *machine)
+{
+	int NewX, NewY;
+
+	NewX = input_port_read(machine, "MOUSE2"); 
+	NewY = input_port_read(machine, "MOUSE1"); 
+
+	if ((NewX != adb_lastmousex) || (NewY != adb_lastmousey))
+	{
+		adb_mouse_wanted_srq = 1;
+	}
+}
 
 static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *MouseY )
 {
@@ -1296,6 +1313,8 @@ static void mac_adb_accummouse( running_machine *machine, UINT8 *MouseX, UINT8 *
 		MouseCountY += diff;
 		adb_lastmousey = NewY;
 	}
+
+	adb_mouse_wanted_srq = 0;
 
 	*MouseX = (UINT8)MouseCountX;
 	*MouseY = (UINT8)MouseCountY;
@@ -1366,11 +1385,51 @@ static void mac_adb_talk(running_machine *machine)
 							adb_buffer[0] = 0x60 | ((adb_mouseaddr<<8)&0xf);	// SRQ enable, no exceptional event
 							adb_buffer[1] = 0x01;	// handler 1
 							adb_datasize = 2;
+
+							adb_mouse_initialized = 1;
 							break;
 
 						default:
 							break;
 					}
+				}
+				else if (addr == adb_keybaddr)
+				{
+//					printf("Talking to keyboard, register %x\n", reg);
+
+					switch (reg)
+					{
+						// read keyboard
+						case 0:	
+							adb_buffer[0] = adb_buffer[1] = 0x80;	  // nothing pressed
+							adb_datasize = 2;
+							break;
+
+						// read modifier keys
+						case 2:
+							adb_buffer[0] = 0xff;	// nothing pressed
+							adb_buffer[1] = 0;
+							adb_datasize = 2;
+							break;
+
+						// get ID/handler
+						case 3:
+							adb_buffer[0] = 0x60 | ((adb_keybaddr<<8)&0xf);	// SRQ enable, no exceptional event
+							adb_buffer[1] = 0x01;	// handler 1
+							adb_datasize = 2;
+
+							adb_keybinitialized = 1;
+							break;
+
+						default:
+							break;
+					}
+				}
+
+				// if the mouse has new data and it's not what we're polling, yank SRQ
+				if ((addr != adb_mouseaddr) && (adb_mouse_initialized))
+				{
+					mac_adb_pollmouse(machine);
 				}
 				break;
 		}
@@ -1480,6 +1539,20 @@ static void mac_adb_newaction(int state)
 	}
 }
 
+static void adb_vblank(running_machine *machine)
+{
+	// if any device has a service request, show it on the VIA
+	// (no need to actually generate an IRQ, the Mac will see it)
+	if ((adb_mouse_wanted_srq) || (adb_keyb_wanted_srq))
+	{
+		adb_irq_pending = 1;
+	}
+	else
+	{
+		adb_irq_pending = 0;
+	}
+}
+
 static void adb_reset(void)
 {
 	adb_irq_pending = 0;		// no interrupt
@@ -1495,6 +1568,13 @@ static void adb_reset(void)
 	// mouse
 	adb_mouseaddr = 3;
 	adb_lastmousex = adb_lastmousey = 0;
+	adb_mouse_wanted_srq = 0;
+	adb_mouse_initialized = 0;
+
+	// keyboard
+	adb_keybaddr = 2;
+	adb_keyb_wanted_srq = 0;
+	adb_keybinitialized = 0;
 }
 
 /* *************************************************************************
@@ -1825,6 +1905,12 @@ DRIVER_INIT(macclassic)
 static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
+
+	/* handle ADB keyboard/mouse */
+	if (has_adb())
+	{
+		adb_vblank(machine);
+	}
 
 	/* handle keyboard */
 	if (kbd_comm == TRUE)
