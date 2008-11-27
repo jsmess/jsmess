@@ -628,7 +628,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			case 0x13:	// Mario Chip 1
 			case 0x14:	// GSU-x
 			case 0x15:	// GSU-x
-			case 0x1a:	// GSU-1 (21 Mhz at start)
+			case 0x1a:	// GSU-1 (21 MHz at start)
 				if (snes_r_bank1(space, 0x00ffd5) == 0x20)
 					has_addon_chip = HAS_SUPERFX;
 				break;

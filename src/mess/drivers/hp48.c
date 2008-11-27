@@ -1,4 +1,4 @@
-/**********************************************************************
+﻿/**********************************************************************
 
   Copyright (C) Antoine Mine' 2008
 
@@ -63,7 +63,7 @@
 
   S series specific:
   - Clarke IC
-  - clock speed: 2Mhz
+  - clock speed: 2 MHz
   - 256 KB ROM (various revisions, identical in S and SX)
 
   - S model specific: 
@@ -79,7 +79,7 @@
 
   G series specific:
   - Yorke IC
-  - clock speed: ~4Mhz
+  - clock speed: ~4 MHz
   - 512 KB ROM (various revisions, identical in G and GX)
 
   - G model specific:

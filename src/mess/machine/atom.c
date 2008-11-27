@@ -6,8 +6,8 @@
 	interrupts, I/O ports)
 
 	Many thanks to Kees van Oss for:
-	1.	Tape input/output circuit diagram. It describes in great detail how the 2.4khz
-		tone, 2.4khz tone enable, tape output and tape input are connected.
+	1.	Tape input/output circuit diagram. It describes in great detail how the 2.4 kHz
+		tone, 2.4 kHz tone enable, tape output and tape input are connected.
 	2.	The DOS rom for the Atom so I could complete the floppy disc emulation.
 	3.	Details of the eprom expansion board for the Atom.
 	4.	His demo programs which I used to test the driver.
@@ -37,7 +37,7 @@ UINT8 atom_8255_portc;
 /* printer data written */
 static char atom_printer_data = 0x07f;
 
-/* I am not sure if this is correct, the atom appears to have a 2.4Khz timer used for reading tapes?? */
+/* I am not sure if this is correct, the atom appears to have a 2.4 kHz timer used for reading tapes?? */
 static int	timer_state = 0;
 
 static void atom_via_irq_func(running_machine *machine, int state)
@@ -198,7 +198,7 @@ static TIMER_CALLBACK(atom_timer_callback)
 	/* change timer state */
 	timer_state^=1;
 
-	/* the 2.4khz signal is notted (A), and nand'ed with the 2.4kz enable, resulting
+	/* the 2.4 kHz signal is notted (A), and nand'ed with the 2.4kz enable, resulting
 	in B. The final cassette output is the result of tape output nand'ed with B */
 
 
@@ -207,9 +207,9 @@ static TIMER_CALLBACK(atom_timer_callback)
 		unsigned char B;
 		unsigned char result;
 
-		/* 2.4khz signal - notted */
+		/* 2.4 kHz signal - notted */
 		A = (~timer_state);
-		/* 2.4khz signal notted, and anded with 2.4khz enable */
+		/* 2.4 kHz signal notted, and anded with 2.4 kHz enable */
 		B = (~(A & (atom_8255_portc>>1))) & 0x01;
 
 		result = (~(B & atom_8255_portc)) & 0x01;
@@ -375,7 +375,7 @@ READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 		atom_8255_portc |= (1<<5);
 	}
 
-	/* 2.4khz input */
+	/* 2.4 kHz input */
 	if (timer_state)
 	{
 		atom_8255_portc |= (1<<4);

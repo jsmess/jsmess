@@ -669,7 +669,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( at386 )
     /* basic machine hardware */
-	/* original at 6 mhz, at03 8 megahertz */
+	/* original at 6 MHz, at03 8 megahertz */
 	MDRV_CPU_ATPC(at386, at386, I386, 12000000)
 
 	MDRV_MACHINE_START( at )

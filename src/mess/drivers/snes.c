@@ -19,7 +19,7 @@
     - Add horizontal mosaic, hi-res. interlaced etc to video emulation.
     - Fix support for Mode 7. (In Progress)
     - Handle interleaved roms (maybe even multi-part roms, but how?)
-    - Add support for running at 3.58Mhz at the appropriate time.
+    - Add support for running at 3.58 MHz at the appropriate time.
     - I'm sure there's lots more ...
 
 ***************************************************************************/
@@ -193,10 +193,10 @@ static const custom_sound_interface snes_sound_interface =
 
 static MACHINE_DRIVER_START( snes )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", G65816, MCLK_NTSC/6)	/* 2.68Mhz, also 3.58Mhz */
+	MDRV_CPU_ADD("main", G65816, MCLK_NTSC/6)	/* 2.68 MHz, also 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(snes_map, 0)
 
-	MDRV_CPU_ADD("sound", SPC700, 1024000)	/* 1.024 Mhz */
+	MDRV_CPU_ADD("sound", SPC700, 1024000)	/* 1.024 MHz */
 	MDRV_CPU_PROGRAM_MAP(spc_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(NULL, 0)
 

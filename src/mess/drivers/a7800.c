@@ -262,7 +262,7 @@ static PALETTE_INIT(a7800p)
 
 static MACHINE_DRIVER_START( a7800 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, CLK_NTSC)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
+	MDRV_CPU_ADD("main", M6502, CLK_NTSC)	/* 1.79 MHz (note: The clock switches to 1.19 MHz
                                                  * when the TIA or RIOT are accessed) */
 	MDRV_CPU_PROGRAM_MAP(a7800_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 262)
@@ -310,7 +310,7 @@ static MACHINE_DRIVER_START( a7800_pal )
 	MDRV_RIOT6532_ADD("riot", 3546894/3, r6532_interface_pal)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", M6502, CLK_PAL)	/* 1.79Mhz (note: The clock switches to 1.19Mhz
+	MDRV_CPU_REPLACE("main", M6502, CLK_PAL)	/* 1.79 MHz (note: The clock switches to 1.19 MHz
                                                  * when the TIA or RIOT are accessed) */
 	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 312)
 

@@ -328,8 +328,8 @@ ACCCON
 
 b7 IRR	1=Causes an IRQ to the processor
 b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
-b5 IFJ  1=Internal 1Mhz bus
-		0=External 1Mhz bus
+b5 IFJ  1=Internal 1 MHz bus
+		0=External 1MHz bus
 b4 ITU  1=Internal Tube
 		0=External Tube
 b3 Y	1=Read/Write HAZEL &C000-&DFFF RAM
@@ -559,12 +559,12 @@ WRITE8_HANDLER ( memorybm7_w )
 &30-&33 ROMSEL			-						ROM Select				 4 ( 1 byte  x  4 )
 &34-&37 ACCCON			ACCCON select reg.		ACCCON select reg		 4 ( 1 byte  x  4 )
 &38-&3F NC				-						-
-&40-&5F 6522 VIA		SYSTEM VIA				SYSTEM VIA				32 (16 bytes x	2 ) 1Mhz
-&60-&7F 6522 VIA		USER VIA				USER VIA				32 (16 bytes x	2 ) 1Mhz
+&40-&5F 6522 VIA		SYSTEM VIA				SYSTEM VIA				32 (16 bytes x	2 ) 1MHz
+&60-&7F 6522 VIA		USER VIA				USER VIA				32 (16 bytes x	2 ) 1MHz
 &80-&9F Int. Modem		Int. Modem				Int Modem
-&A0-&BF 68B54 ADLC		ECONET controller		ECONET controller		32 ( 4 bytes x	8 ) 2Mhz
+&A0-&BF 68B54 ADLC		ECONET controller		ECONET controller		32 ( 4 bytes x	8 ) 2MHz
 &C0-&DF NC				-						-
-&E0-&FF Tube ULA		Tube system interface	Tube system interface	32 (32 bytes x  1 ) 2Mhz
+&E0-&FF Tube ULA		Tube system interface	Tube system interface	32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
 READ8_HANDLER ( bbcm_r )
@@ -2038,7 +2038,7 @@ READ8_HANDLER( bbc_disc_r )
 		break;
 	/* case 6 is the Opus challenger interface */
 	case 6:
-		/* not connected here, opus drive is connected via the 1Mhz Bus */
+		/* not connected here, opus drive is connected via the 1MHz Bus */
 		break;
 	/* case 7 in no disc controller */
 	case 7:
@@ -2064,7 +2064,7 @@ WRITE8_HANDLER ( bbc_disc_w )
 		break;
 	/* case 6 is the Opus challenger interface */
 	case 6:
-		/* not connected here, opus drive is connected via the 1Mhz Bus */
+		/* not connected here, opus drive is connected via the 1MHz Bus */
 		break;
 	/* case 7 in no disc controller */
 	case 7:

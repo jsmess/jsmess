@@ -43,7 +43,7 @@
 	   80 mouse port enabled
 	  100 joystick port enabled
 
-  fe1e2 fdc0c cpu speed is 4.77 mhz
+  fe1e2 fdc0c cpu speed is 4.77 MHz
   fe1e5 ff9c0 keyboard processor error
   fe1eb fc617 external lpt1 at 0x3bc
   fe1ee fe8ee external coms at

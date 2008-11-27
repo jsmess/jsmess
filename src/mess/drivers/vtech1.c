@@ -310,7 +310,7 @@ static const cassette_config laser_cassette_config =
 
 static MACHINE_DRIVER_START(laser110)
     /* basic machine hardware */
-    MDRV_CPU_ADD("main", Z80, VTECH1_CLK)  /* 3.57950 Mhz */
+    MDRV_CPU_ADD("main", Z80, VTECH1_CLK)  /* 3.57950 MHz */
     MDRV_CPU_PROGRAM_MAP(laser110_mem, 0)
     MDRV_CPU_IO_MAP(vtech1_io, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -360,7 +360,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser310)
     MDRV_IMPORT_FROM( laser200 )
-    MDRV_CPU_REPLACE( "main", Z80, VZ300_XTAL1_CLK/5)  /* 3.546894 Mhz */
+    MDRV_CPU_REPLACE( "main", Z80, VZ300_XTAL1_CLK/5)  /* 3.546894 MHz */
     MDRV_CPU_PROGRAM_MAP(laser310_mem, 0)
 
     MDRV_MACHINE_START(laser310)

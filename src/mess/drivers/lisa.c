@@ -87,11 +87,11 @@ static const applefdc_interface lisa210_fdc_interface =
 /* Lisa1 and Lisa 2 machine */
 static MACHINE_DRIVER_START( lisa )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 5093760)        /* 20.37504 Mhz / 4 */
+	MDRV_CPU_ADD("main", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MDRV_CPU_PROGRAM_MAP(lisa_map, 0)
 	MDRV_CPU_VBLANK_INT("main", lisa_interrupt)
 
-	MDRV_CPU_ADD("fdc", M6502, 2000000)        /* 16.000 Mhz / 8 in when DIS asserted, 16.000 Mhz / 9 otherwise (?) */
+	MDRV_CPU_ADD("fdc", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MDRV_CPU_PROGRAM_MAP(lisa_fdc_map, 0)
 
 	MDRV_INTERLEAVE(1)

@@ -1753,7 +1753,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	{
 		via_config(0, &mac_via6522_intf);
 	}
-	via_set_clock(0, 1000000);	/* 6522 = 1 Mhz, 6522a = 2 Mhz */
+	via_set_clock(0, 1000000);	/* 6522 = 1 MHz, 6522a = 2 MHz */
 
 	/* setup keyboard */
 	keyboard_init();

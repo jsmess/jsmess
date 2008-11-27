@@ -11,7 +11,7 @@ Consolidation and enhancment of documentation by Manfred Schneider based on prev
  
  1. General
    SYSTEM
-- Signetics 2650 CPU at 3.58/4 Mhz(for NTSC) or at 4,433/5 (for PAL)
+- Signetics 2650 CPU at 3.58/4 MHz(for NTSC) or at 4,433/5 (for PAL)
 - 1k x 8 of RAM (physically present but only 512 byte available)
 - 2 x 2 axis Analogue Joysticks
 - 2 x 12 button Controllers
@@ -443,7 +443,7 @@ static PALETTE_INIT( arcadia )
 
 static MACHINE_DRIVER_START( arcadia )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 3580000/4)        /* 0.895 Mhz */
+	MDRV_CPU_ADD("main", S2650, 3580000/4)        /* 0.895 MHz */
 	MDRV_CPU_PROGRAM_MAP(arcadia_mem, 0)
 	MDRV_CPU_IO_MAP(arcadia_io, 0)
 	MDRV_CPU_PERIODIC_INT(arcadia_video_line, 262*60)

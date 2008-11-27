@@ -124,7 +124,7 @@ QUICKLOAD_LOAD(kc)
 /******************/
 /* used by KC85/2, KC85/3 and KC85/4 */
 /* floppy disc interface has:
-- Z80 at 4Mhz
+- Z80 at 4 MHz
 - Z80 CTC
 - 1k ram
 - NEC765 floppy disc controller
@@ -904,7 +904,7 @@ static void kc_keyboard_init(running_machine *machine)
 	/* head and tail of list is at beginning */
 	keyboard_data.head = (keyboard_data.tail = 0);
 
-	/* 50hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
+	/* 50 Hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
 	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, kc_keyboard_update);
 
 	/* timer to transmit pulses to kc base unit */
@@ -1839,9 +1839,9 @@ static void	kc85_common_init(running_machine *machine)
 	kc_cassette_init();
 	kc_keyboard_init(machine);
 
-	/* kc85 has a 50hz input to the ctc channel 2 and 3 */
+	/* kc85 has a 50 Hz input to the ctc channel 2 and 3 */
 	/* channel 2 this controls the video colour flash */
-	/* kc85 has a 15khz (?) input to the ctc channel 0 and 1 */
+	/* kc85 has a 15 kHz (?) input to the ctc channel 0 and 1 */
 	/* channel 0 and channel 1 are used for cassette write */
 	kc85_50hz_state = 0;
 	kc85_15khz_state = 0;

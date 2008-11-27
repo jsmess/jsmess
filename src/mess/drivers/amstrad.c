@@ -10,7 +10,7 @@
             - 6845 (either HD6845S, UM6845R or M6845) crtc graphics display
               controller
             - NEC765 floppy disc controller (CPC664,CPC6128)
-            - Z80 CPU running at 4Mhz (slowed by wait states on memory
+            - Z80 CPU running at 4 MHz (slowed by wait states on memory
               access)
             - custom ASIC "Gate Array" controlling rom paging, ram paging,
                 current display mode and colour palette
@@ -303,7 +303,7 @@ Bit Description
 7   Cassette read data
 6   Parallel/Printer port ready signal ("1" = not ready, "0" = Ready)
 5   /EXP signal on expansion port (note 6)
-4   50/60hz (link on PCB. For this MESS driver I have used the dipswitch feature) (note 5)
+4   50/60 Hz (link on PCB. For this MESS driver I have used the dipswitch feature) (note 5)
 3   | PCB links to define manufacturer name. For this MESS driver I have used the dipswitch feature. (note 1) (note 4)
 2   | (note 2)
 1   | (note 3)
@@ -315,7 +315,7 @@ Note:
 2 On CPC464,CPC664,CPC6128 and GX4000 this is LK2 on the PCB. On the CPC464+ and CPC6128+ this is LK102 on the PCB. On the KC compact this is "0".
 3 On CPC464,CPC664,CPC6128 and GX4000 this is LK1 on the PCB. On the CPC464+ and CPC6128+ this is LK101 on the PCB. On the KC compact this is /TEST signal from the expansion port.
 4 On the CPC464,CPC664,CPC6128,CPC464+,CPC6128+ and GX4000 bits 3,2 and 1 define the manufacturer name. See below to see the options available. The manufacturer name is defined on the PCB and cannot be changed through software.
-5 On the CPC464,CPC664,CPC6128,CPC464+,CPC6128+ and GX4000 bit 4 defines the Screen refresh frequency. "1" = 50Hz, "0" = 60Hz. This is defined on the PCB and cannot be changed with software. On the KC compact bit 4 is "1"
+5 On the CPC464,CPC664,CPC6128,CPC464+,CPC6128+ and GX4000 bit 4 defines the Screen refresh frequency. "1" = 50 Hz, "0" = 60 Hz. This is defined on the PCB and cannot be changed with software. On the KC compact bit 4 is "1"
 6 This bit is connected to /EXP signal on the expansion port.
   On the KC Compact this bit is used to define bit 7 of the printer data.
   On the CPC, it is possible to use this bit to define bit 7 of the printer data, so a 8-bit printer port is made, with a hardware modification,
@@ -339,7 +339,7 @@ static READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 			data |= (1<<6);
 		}
 	}
-/* Set b4-b1 50hz/60hz state and manufacturer name defined by links on PCB */
+/* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
 	data |= (ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
 
 /*  Set b0 with VSync state from the CRTC */
@@ -2911,14 +2911,14 @@ GFXDECODE_END
  *
  *************************************/
 
-/* actual clock to CPU is 4Mhz, but it is slowed by memory
+/* actual clock to CPU is 4 MHz, but it is slowed by memory
 accessess. A HALT is used for every memory access by the CPU.
 This stretches the timing for opcodes, and gives an effective
-speed of 3.8Mhz */
+speed of 3.8 MHz */
 
 /* Info about structures below:
 
-    The Amstrad has a CPU running at 4Mhz, slowed with wait states.
+    The Amstrad has a CPU running at 4 MHz, slowed with wait states.
     I have measured 19968 NOP instructions per frame, which gives,
     50.08 fps as the tv refresh rate.
 

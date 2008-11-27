@@ -399,7 +399,7 @@ static const struct msm8251_interface pmd85_msm8251_interface =
 		GATE0	- external interfaces connector (K2), default = 1
 	Timer 1:
 		OUT0	- external interfaces connector (K2), msm8251 (for V24 only)
-		CLK0	- hardwired to 2Mhz system clock
+		CLK0	- hardwired to 2 MHz system clock
 		GATE0	- external interfaces connector (K2), default = 1
 	Timer 2:
 		OUT0	- unused

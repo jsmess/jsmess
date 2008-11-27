@@ -31,7 +31,7 @@
  c1551
   used with commodore c16
   m6510t? processor (4 MHz???),
-  (m6510t internal 4mhz clock?, 8 port pins?)
+  (m6510t internal 4 MHz clock?, 8 port pins?)
   VIA6522 ?, CIA6526 ?,
   2 KByte RAM, 16 KByte ROM
   connector commodore C16 expansion cartridge
@@ -1085,7 +1085,7 @@ ADDRESS_MAP_END
 
 /*
   c1551 irq line
-  only timing related??? (60 hz?), delivered from c16?
+  only timing related??? (60 Hz?), delivered from c16?
  */
 static TIMER_CALLBACK(c1551_irq_timer)
 {
