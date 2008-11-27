@@ -169,7 +169,7 @@ const game_driver * const drivers[] =
 	DRIVER( advision )	/* Adventurevision									*/
 
 	/* CAPCOM */
-//128u4	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/
+	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/
 
 	/* MAGNAVOX */
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
@@ -877,7 +877,7 @@ XL/XE 16kB OS roms
 	DRIVER( psa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
 
 	/* Corvus */
-//128u4	DRIVER(concept)		/* 1982 Corvus Concept								*/
+	DRIVER(concept)		/* 1982 Corvus Concept								*/
 
 	/* DAI */
 	DRIVER(dai)			/* DAI												*/
@@ -934,9 +934,9 @@ XL/XE 16kB OS roms
 	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
-//128u4	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
-//128u4	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
-//128u4	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
+	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
+	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
+	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
 	DRIVER( super80 )
