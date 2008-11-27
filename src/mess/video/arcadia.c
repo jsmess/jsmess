@@ -359,47 +359,47 @@ READ8_HANDLER(arcadia_video_r)
     UINT8 data=0;
     switch (offset) {
     case 0xff: data=arcadia_video.charline|0xf0;break;
-    case 0x100: data=input_port_read(machine, "controller1_col1");break;
-    case 0x101: data=input_port_read(machine, "controller1_col2");break;
-    case 0x102: data=input_port_read(machine, "controller1_col3");break;
-    case 0x103: data=input_port_read(machine, "controller1_extra");break;
-    case 0x104: data=input_port_read(machine, "controller2_col1");break;
-    case 0x105: data=input_port_read(machine, "controller2_col2");break;
-    case 0x106: data=input_port_read(machine, "controller2_col3");break;
-    case 0x107: data=input_port_read(machine, "controller2_extra");break;
-    case 0x108: data=input_port_read(machine, "panel");break;
+    case 0x100: data=input_port_read(space->machine, "controller1_col1");break;
+    case 0x101: data=input_port_read(space->machine, "controller1_col2");break;
+    case 0x102: data=input_port_read(space->machine, "controller1_col3");break;
+    case 0x103: data=input_port_read(space->machine, "controller1_extra");break;
+    case 0x104: data=input_port_read(space->machine, "controller2_col1");break;
+    case 0x105: data=input_port_read(space->machine, "controller2_col2");break;
+    case 0x106: data=input_port_read(space->machine, "controller2_col3");break;
+    case 0x107: data=input_port_read(space->machine, "controller2_extra");break;
+    case 0x108: data=input_port_read(space->machine, "panel");break;
 #if 0
     case 0x1fe:
 	if (arcadia_video.ad_select)
-		data=input_port_read(machine, "controller1_joy_y")<<3;
+		data=input_port_read(space->machine, "controller1_joy_y")<<3;
 	else
-		data=input_port_read(machine, "controller1_joy_x")<<3;
+		data=input_port_read(space->machine, "controller1_joy_x")<<3;
 	break;
     case 0x1ff:
 	if (arcadia_video.ad_select) 
-		data=input_port_read(machine, "controller2_joy_y")<<3;
+		data=input_port_read(space->machine, "controller2_joy_y")<<3;
 	else 
-		data=input_port_read(machine, "controller2_joy_x")<<3;
+		data=input_port_read(space->machine, "controller2_joy_x")<<3;
 	break;
 #else
     case 0x1fe:
 	data = 0x80;
 	if (arcadia_video.ad_select) {
-	    if (input_port_read(machine, "joysticks")&0x10) data=0;
-	    if (input_port_read(machine, "joysticks")&0x20) data=0xff;
+	    if (input_port_read(space->machine, "joysticks")&0x10) data=0;
+	    if (input_port_read(space->machine, "joysticks")&0x20) data=0xff;
 	} else {
-	    if (input_port_read(machine, "joysticks")&0x40) data=0xff;
-	    if (input_port_read(machine, "joysticks")&0x80) data=0;
+	    if (input_port_read(space->machine, "joysticks")&0x40) data=0xff;
+	    if (input_port_read(space->machine, "joysticks")&0x80) data=0;
 	}
 	break;
     case 0x1ff:
 	data = 0x6f; // 0x7f too big for alien invaders (movs right)
 	if (arcadia_video.ad_select) {
-	    if (input_port_read(machine, "joysticks")&0x1) data=0;
-	    if (input_port_read(machine, "joysticks")&0x2) data=0xff;
+	    if (input_port_read(space->machine, "joysticks")&0x1) data=0;
+	    if (input_port_read(space->machine, "joysticks")&0x2) data=0xff;
 	} else {
-	    if (input_port_read(machine, "joysticks")&0x4) data=0xff;
-	    if (input_port_read(machine, "joysticks")&0x8) data=0;
+	    if (input_port_read(space->machine, "joysticks")&0x4) data=0xff;
+	    if (input_port_read(space->machine, "joysticks")&0x8) data=0;
 	}
 	break;
 #endif
@@ -417,11 +417,11 @@ WRITE8_HANDLER(arcadia_video_w)
 	arcadia_video.ypos=255-data+YPOS;
 	break;
     case 0xfd:
-	arcadia_soundport_w(machine, offset&3, data);
+	arcadia_soundport_w(space->machine, offset&3, data);
 	arcadia_video.multicolor=data&0x80;
 	break;
     case 0xfe:
-	arcadia_soundport_w(machine, offset&3, data);
+	arcadia_soundport_w(space->machine, offset&3, data);
 	arcadia_video.shift=(data>>5);
 	break;
     case 0xf0: case 0xf2: case 0xf4: case 0xf6:
@@ -643,7 +643,7 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 
 INTERRUPT_GEN( arcadia_video_line )
 {
-	const device_config *screen = video_screen_first(machine->config);
+	const device_config *screen = video_screen_first(device->machine->config);
 	int width = video_screen_get_width(screen);
 
 	if (arcadia_video.ad_delay<=0)
@@ -670,7 +670,7 @@ INTERRUPT_GEN( arcadia_video_line )
 		{
 			if (((arcadia_video.line-arcadia_video.ypos)&(h-1))==0) 
 			{
-				arcadia_vh_draw_line(machine, arcadia_video.bitmap, arcadia_video.charline*h+arcadia_video.ypos,
+				arcadia_vh_draw_line(device->machine, arcadia_video.bitmap, arcadia_video.charline*h+arcadia_video.ypos,
 					arcadia_video.reg.d.chars1[arcadia_video.charline]);
 			}
 		}
@@ -679,7 +679,7 @@ INTERRUPT_GEN( arcadia_video_line )
 			{
 				if (((arcadia_video.line-arcadia_video.ypos)&(h-1))==0)
 				{
-					arcadia_vh_draw_line(machine, arcadia_video.bitmap, arcadia_video.charline*h+arcadia_video.ypos,
+					arcadia_vh_draw_line(device->machine, arcadia_video.bitmap, arcadia_video.charline*h+arcadia_video.ypos,
 						arcadia_video.reg.d.chars2[arcadia_video.charline-13]);
 				}
 			arcadia_video.charline-=13;
@@ -692,7 +692,7 @@ INTERRUPT_GEN( arcadia_video_line )
 			}
 	}
 	if (arcadia_video.line==261)
-		arcadia_draw_sprites(machine, arcadia_video.bitmap);
+		arcadia_draw_sprites(device->machine, arcadia_video.bitmap);
 }
 
 READ8_HANDLER(arcadia_vsync_r)

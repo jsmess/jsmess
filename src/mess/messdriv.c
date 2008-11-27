@@ -153,8 +153,8 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( sgx )		/* SuperGrafX NEC 1989								*/
 //128u4	DRIVER( pcfx)		/* PC-FX NEC 1994									*/
 
-//128u4	DRIVER( arcadia )	/* Emerson Arcadia 2001								*/
-//128u4	DRIVER( vcg )		/* Palladium Video-Computer-Game					*/
+	DRIVER( arcadia )	/* Emerson Arcadia 2001								*/
+	DRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 
 	/* GCE */
 //128u4	DRIVER( vectrex )	/* General Consumer Electric Vectrex - 1982-1984	*/
@@ -542,7 +542,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
 //128u4	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
-//128u4	DRIVER( avigo )		/*													*/
+	DRIVER( avigo )		/*													*/
 
 	/* TEXAS INSTRUMENTS CALCULATORS */
 //128u4	DRIVER( ti81 )		/* 1990 TI-81 (Z80 2 MHz)							*/

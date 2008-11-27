@@ -94,22 +94,23 @@ static NVRAM_HANDLER( avigo )
 	}
 }
 
-static void avigo_setbank(running_machine *machine, int bank, void *address, read8_machine_func rh, write8_machine_func wh)
+static void avigo_setbank(running_machine *machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	if (address)
 	{
-		memory_set_bankptr(1+bank, address);
-		memory_set_bankptr(5+bank, address);
+		memory_set_bankptr(machine, 1+bank, address);
+		memory_set_bankptr(machine, 5+bank, address);
 		avigo_banked_opbase[bank] = ((UINT8 *) address) - (bank * 0x4000);
 	}
 	if (rh)
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
+		memory_install_read8_handler(space, (bank * 0x4000),
 			(bank * 0x4000) + 0x3FFF, 0, 0, rh);
 	}
 	if (wh)
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, (bank * 0x4000),
+		memory_install_write8_handler(space, (bank * 0x4000),
 			(bank * 0x4000) + 0x3FFF, 0, 0, wh);
 	}
 }
@@ -437,7 +438,7 @@ static MACHINE_RESET( avigo )
 	/* clear */
 	memset(mess_ram, 0, 128*1024);
 
-	memory_set_direct_update_handler(0, avigo_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), avigo_opbase_handler);
 
 	addr = (unsigned char *)intelflash_getmemptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
@@ -472,17 +473,17 @@ static  READ8_HANDLER(avigo_key_data_read_r)
 
 	if (avigo_key_line & 0x01)
 	{
-		data &= input_port_read(machine, "LINE0");
+		data &= input_port_read(space->machine, "LINE0");
 	}
 
 	if (avigo_key_line & 0x02)
 	{
-		data &= input_port_read(machine, "LINE1");
+		data &= input_port_read(space->machine, "LINE1");
 	}
 
 	if (avigo_key_line & 0x04)
 	{
-		data &= input_port_read(machine, "LINE2");
+		data &= input_port_read(space->machine, "LINE2");
 
 	}
 
@@ -511,7 +512,7 @@ static WRITE8_HANDLER(avigo_irq_w)
 {
 	avigo_irq &= ~data;
 
-	avigo_refresh_ints(machine);
+	avigo_refresh_ints(space->machine);
 }
 
 static  READ8_HANDLER(avigo_rom_bank_l_r)
@@ -542,7 +543,7 @@ static WRITE8_HANDLER(avigo_rom_bank_l_w)
 
         avigo_rom_bank_l = data & 0x03f;
 
-        avigo_refresh_memory(machine);
+        avigo_refresh_memory(space->machine);
 }
 
 static WRITE8_HANDLER(avigo_rom_bank_h_w)
@@ -562,7 +563,7 @@ static WRITE8_HANDLER(avigo_rom_bank_h_w)
 	avigo_rom_bank_h = data;
 
 
-        avigo_refresh_memory(machine);
+        avigo_refresh_memory(space->machine);
 }
 
 static WRITE8_HANDLER(avigo_ram_bank_l_w)
@@ -571,7 +572,7 @@ static WRITE8_HANDLER(avigo_ram_bank_l_w)
 
         avigo_ram_bank_l = data & 0x03f;
 
-        avigo_refresh_memory(machine);
+        avigo_refresh_memory(space->machine);
 }
 
 static WRITE8_HANDLER(avigo_ram_bank_h_w)
@@ -580,7 +581,7 @@ static WRITE8_HANDLER(avigo_ram_bank_h_w)
 
 	avigo_ram_bank_h = data;
 
-        avigo_refresh_memory(machine);
+        avigo_refresh_memory(space->machine);
 }
 
 static  READ8_HANDLER(avigo_ad_control_status_r)
