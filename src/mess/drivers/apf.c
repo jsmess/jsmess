@@ -53,13 +53,13 @@ static  READ8_HANDLER(apf_m1000_pia_in_a_func)
 
   UINT8 data=~0;
   if (!(pad_data & 0x08))
-    data &= input_port_read(machine, "joy3");
+    data &= input_port_read(space->machine, "joy3");
   if (!(pad_data & 0x04))
-    data &= input_port_read(machine, "joy2");
+    data &= input_port_read(space->machine, "joy2");
   if (!(pad_data & 0x02))
-    data &= input_port_read(machine, "joy1");
+    data &= input_port_read(space->machine, "joy1");
   if (!(pad_data & 0x01))
-    data &= input_port_read(machine, "joy0");
+    data &= input_port_read(space->machine, "joy0");
 
 	return data;
 }
@@ -207,7 +207,7 @@ static READ8_HANDLER(apf_imagination_pia_in_b_func)
 
 	data = 0x000;
 
-	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
+	if (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
 		data =(1<<7);
 
 	return data;
@@ -251,15 +251,15 @@ static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
 	static const char *keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-	keyboard_data = input_port_read(machine, keynames[keyboard_line]);
+	keyboard_data = input_port_read(space->machine, keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+	cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
@@ -362,42 +362,42 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {
-	wd17xx_command_w(machine, offset,~data);
+	wd17xx_command_w(space, offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w(machine, offset,~data);
+	wd17xx_track_w(space, offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w(machine, offset,~data);
+	wd17xx_sector_w(space, offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w(machine, offset,~data);
+	wd17xx_data_w(space, offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r(machine, offset);
+	return ~wd17xx_status_r(space, offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r(machine, offset);
+	return ~wd17xx_track_r(space, offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r(machine, offset);
+	return ~wd17xx_sector_r(space, offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd17xx_data_r(machine, offset);
+	return wd17xx_data_r(space, offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)

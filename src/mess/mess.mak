@@ -372,6 +372,8 @@ DRVLIBS = \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
+	$(MESSOBJ)/apexc.a \
+	$(MESSOBJ)/apf.a \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/b2m.a \
@@ -416,8 +418,6 @@ DRVLIBS = \
 	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/apexc.a \
-#	$(MESSOBJ)/apf.a \
 #	$(MESSOBJ)/apple.a \
 #	$(MESSOBJ)/arcadia.a \
 #	$(MESSOBJ)/at.a \

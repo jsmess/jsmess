@@ -22,7 +22,7 @@ static MACHINE_START(apexc)
 
 /*
     APEXC RAM loading/saving from cylinder image
-
+	
     Note that, in an actual APEXC, the RAM contents are not read from the cylinder :
     the cylinder IS the RAM.
 
@@ -207,7 +207,7 @@ static WRITE8_HANDLER(tape_write)
 	if (apexc_tapes[1].fd)
 		image_fwrite(apexc_tapes[1].fd, & data5, 1);
 
-	apexc_teletyper_putchar(machine, data & 0x1f);	/* display on screen */
+	apexc_teletyper_putchar(space->machine, data & 0x1f);	/* display on screen */
 }
 
 /*
@@ -326,6 +326,7 @@ static UINT32 panel_data_reg;	/* value of a data register on the control panel w
 */
 static INTERRUPT_GEN( apexc_interrupt )
 {
+	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 
@@ -336,7 +337,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of edit keys */
-	edit_keys = (input_port_read(machine, "data1") << 16) | input_port_read(machine, "data2");
+	edit_keys = (input_port_read(device->machine, "data1") << 16) | input_port_read(device->machine, "data2");
 
 	/* toggle data reg according to transitions */
 	panel_data_reg ^= edit_keys & (~ old_edit_keys);
@@ -346,7 +347,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read(machine, "panel");
+	control_keys = input_port_read(device->machine, "panel");
 
 	/* compute transitions */
 	control_transitions = control_keys & (~ old_control_keys);
@@ -355,7 +356,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 	if (control_transitions & panel_run)
 	{	/* toggle run/stop state */
-		cpunum_set_reg(0, APEXC_STATE, ! cpunum_get_reg(0, APEXC_STATE));
+		cpu_set_reg(device, APEXC_STATE, ! cpu_get_reg(device, APEXC_STATE));
 	}
 
 	while (control_transitions & (panel_CR | panel_A | panel_R | panel_ML | panel_HB))
@@ -397,22 +398,24 @@ static INTERRUPT_GEN( apexc_interrupt )
 			/* read/write register #reg_id */
 			if (control_keys & panel_write)
 				/* write reg */
-				cpunum_set_reg(0, reg_id, panel_data_reg);
+				cpu_set_reg(device, reg_id, panel_data_reg);
 			else
 				/* read reg */
-				panel_data_reg = cpunum_get_reg(0, reg_id);
+				panel_data_reg = cpu_get_reg(device, reg_id);
 		}
 	}
 
 	if (control_transitions & panel_mem)
 	{	/* read/write memory */
 
-		if (control_keys & panel_write)
+		if (control_keys & panel_write) {
 			/* write memory */
-			apexc_writemem(cpunum_get_reg(0, APEXC_ML_FULL), panel_data_reg);
-		else
+			memory_write_dword_32be(space, cpu_get_reg(device, APEXC_ML_FULL)<<2, panel_data_reg);
+		}
+		else {
 			/* read memory */
-			panel_data_reg = apexc_readmem(cpunum_get_reg(0, APEXC_ML_FULL));
+			panel_data_reg = memory_read_dword_32be(space, cpu_get_reg(device, APEXC_ML_FULL)<<2);
+		}
 	}
 
 	/* remember new state of control keys */
@@ -539,7 +542,7 @@ static VIDEO_UPDATE( apexc )
 
 	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, cpunum_get_reg(0, APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(screen->machine->cpu[0], APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{

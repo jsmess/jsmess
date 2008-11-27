@@ -567,8 +567,8 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( srdm5fd5 )
 
 	/* APF Electronics Inc. */
-//128u4	DRIVER( apfm1000 )
-//128u4	DRIVER( apfimag )
+	DRIVER( apfm1000 )
+	DRIVER( apfimag )
 
 	/* Tatung */
 //128u4	DRIVER( einstein )
@@ -868,7 +868,7 @@ XL/XE 16kB OS roms
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
 //	DRIVER( apexc53 )	/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
-//128u4	DRIVER( apexc )		/* 1955(?) APEXC: All-Purpose Electronic X-ray Computer */
+	DRIVER( apexc )		/* 1955(?) APEXC: All-Purpose Electronic X-ray Computer */
 
 	/* Sony */
 	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
