@@ -796,7 +796,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
 
 	/* MOTOROLA */
-//128u4	DRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
+	DRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 
 	/* DEC */
 //128u4	DRIVER( pdp1 )		/* 1961 DEC PDP1									*/
