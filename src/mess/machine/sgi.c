@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "sgi.h"
-
+#include "deprecat.h"
 
 #define VERBOSE_LEVEL ( 1 )
 
@@ -21,7 +21,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", (unsigned) activecpu_get_reg(REG_PC), buf );
+		logerror( "%08x: %s", (unsigned) cpu_get_pc(Machine->cpu[0]), buf );
 	}
 }
 
