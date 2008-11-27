@@ -1663,9 +1663,9 @@ static int kc85_15khz_count;
 }
 
 #if 0
-static OPBASE_HANDLER( kc85_3_opbaseoverride )
+static DIRECT_UPDATE_HANDLER( kc85_3_opbaseoverride )
 {
-	memory_set_opbase_handler(0,0);
+	memory_set_direct_update_handler(0,0);
 
 	kc85_3_update_0x00000(machine);
 
@@ -1673,9 +1673,9 @@ static OPBASE_HANDLER( kc85_3_opbaseoverride )
 }
 
 
-static OPBASE_HANDLER( kc85_4_opbaseoverride )
+static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 {
-	memory_set_opbase_handler(0,0);
+	memory_set_direct_update_handler(0,0);
 
 	kc85_4_update_0x00000(machine);
 
@@ -1880,7 +1880,7 @@ MACHINE_RESET( kc85_4 )
 	at address 0x0000-0x01000 which has a single jump in it,
 	can't see yet where it disables it later!!!! so for now
 	here will be a override */
-	memory_set_opbase_handler(0, kc85_4_opbaseoverride);
+	memory_set_direct_update_handler(0, kc85_4_opbaseoverride);
 #endif
 }
 
@@ -1914,6 +1914,6 @@ MACHINE_RESET( kc85_3 )
 	at address 0x0000-0x01000 which has a single jump in it,
 	can't see yet where it disables it later!!!! so for now
 	here will be a override */
-	memory_set_opbase_handler(0, kc85_3_opbaseoverride);
+	memory_set_direct_update_handler(0, kc85_3_opbaseoverride);
 #endif
 }

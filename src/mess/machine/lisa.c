@@ -924,7 +924,7 @@ VIDEO_UPDATE( lisa )
 }
 
 
-static OPBASE_HANDLER (lisa_OPbaseoverride)
+static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 {
 	/* upper 7 bits -> segment # */
 	int segment = (address >> 17) & 0x7f;
@@ -1012,7 +1012,7 @@ static OPBASE_HANDLER (lisa_OPbaseoverride)
 	return -1;
 }
 
-static OPBASE_HANDLER (lisa_fdc_OPbaseoverride)
+static DIRECT_UPDATE_HANDLER (lisa_fdc_OPbaseoverride)
 {
 	/* 8kb of address space -> wraparound */
 	return (address & 0x1fff);
@@ -1125,8 +1125,8 @@ MACHINE_RESET( lisa )
 
 	videoROM_ptr = memory_region(machine, "gfx1");
 
-	memory_set_opbase_handler(0, lisa_OPbaseoverride);
-	memory_set_opbase_handler(1, lisa_fdc_OPbaseoverride);
+	memory_set_direct_update_handler(0, lisa_OPbaseoverride);
+	memory_set_direct_update_handler(1, lisa_fdc_OPbaseoverride);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)/*lisa_reset_instr_callback*/NULL);
 

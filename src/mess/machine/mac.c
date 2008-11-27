@@ -1706,7 +1706,7 @@ static STATE_POSTLOAD( mac_state_load )
 }
 
 
-static OPBASE_HANDLER (overlay_opbaseoverride)
+static DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 {
 	if (mac_overlay != -1)
 	{
@@ -1740,7 +1740,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(mess_ram, 0, mess_ram_size);
 
-		memory_set_opbase_handler(0, overlay_opbaseoverride);
+		memory_set_direct_update_handler(0, overlay_opbaseoverride);
 		mac_overlay = 1;
 	}
 

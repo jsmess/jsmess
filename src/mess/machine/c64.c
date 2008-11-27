@@ -1088,9 +1088,7 @@ void c64_common_init_machine (running_machine *machine)
 	vicirq = 0;
 }
 
-// FIXME: opbase handlers don't exist anymore!
-#if 0
-static OPBASE_HANDLER( c64_opbase ) 
+static DIRECT_UPDATE_HANDLER( c64_opbase ) 
 {
 	if ((address & 0xf000) == 0xd000) 
 	{
@@ -1115,7 +1113,6 @@ static OPBASE_HANDLER( c64_opbase )
 	}
 	return address;
 }
-#endif
 
 MACHINE_START( c64 )
 {
@@ -1130,7 +1127,7 @@ MACHINE_START( c64 )
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
 
-//	memory_set_opbase_handler( 0, c64_opbase );
+	memory_set_direct_update_handler( 0, c64_opbase );
 }
 
 

@@ -533,7 +533,7 @@ static TIMER_CALLBACK( reset_tick )
 	state->cdp1802_mode = CDP1802_MODE_RUN;
 }
 
-static OPBASE_HANDLER( comx35_opbase_handler )
+static DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 {
 	if (address >= 0x0dd0 && address <= 0x0ddf)
 	{
@@ -559,7 +559,7 @@ MACHINE_START( comx35p )
 
 	/* opbase handling for DOS Card */
 
-	memory_set_opbase_handler(0, comx35_opbase_handler);
+	memory_set_direct_update_handler(0, comx35_opbase_handler);
 
 	/* BASIC ROM banking */
 

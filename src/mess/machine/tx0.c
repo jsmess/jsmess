@@ -141,7 +141,7 @@ enum
 };
 
 
-static OPBASE_HANDLER(setOPbasefunc)
+static DIRECT_UPDATE_HANDLER(setOPbasefunc)
 {
 	/* just to get rid of the warnings */
 	return -1;
@@ -165,7 +165,7 @@ static void tx0_machine_stop(running_machine *machine)
 
 MACHINE_START( tx0 )
 {
-	memory_set_opbase_handler(0, setOPbasefunc);;
+	memory_set_direct_update_handler(0, setOPbasefunc);;
 
 	tape_reader.timer = timer_alloc(reader_callback, NULL);
 	tape_puncher.timer = timer_alloc(puncher_callback, NULL);

@@ -141,39 +141,39 @@ static READ8_HANDLER( jupiter_io_r )
 
 	if ( ! ( offset & 0x0100 ) )
 	{
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY0" ) );
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY0" ) );
 	}
 	if ( ! ( offset & 0x0200 ) )
 	{
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY1" ) );
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY1" ) );
 	}
 	if ( ! ( offset & 0x0400 ) )
 	{
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY2" ) );
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY2" ) );
 	}
 	if ( ! ( offset & 0x0800 ) )
 	{
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY3" ) );
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY3" ) );
 	}
 	if ( ! ( offset & 0x1000 ) )
 	{
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY4" ) );
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY4" ) );
 	}
 	if ( ! ( offset & 0x2000 ) )
 	{
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY5" ) );
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY5" ) );
 	}
 	if ( ! ( offset & 0x4000 ) )
 	{
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY6" ) );
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY6" ) );
 	}
 	if ( ! ( offset & 0x8000 ) )
 	{
-//		cassette_output( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), -1 );
+//		cassette_output( device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), -1 );
 		speaker_level_w(0,0);
-		data = ( data & 0xe0 ) | ( data & input_port_read( machine, "KEY7" ) );;
+		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY7" ) );;
 	}
-	if ( cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0 )
+	if ( cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0 )
 	{
 		data &= ~0x20;
 	}
@@ -192,12 +192,12 @@ static WRITE8_HANDLER( jupiter_expram_w )
 {
 	if ( offset > 0x4000 )
 	{
-		if ( input_port_read(machine, "CFG") >= 1 )
+		if ( input_port_read(space->machine, "CFG") >= 1 )
 			jupiter_expram[offset] = data;
 	}
 	else
 	{
-		if ( input_port_read(machine, "CFG") == 2 )
+		if ( input_port_read(space->machine, "CFG") == 2 )
 			jupiter_expram[offset] = data;
 	}
 }
@@ -240,20 +240,20 @@ static WRITE8_HANDLER( jupiter_vh_charram_w )
 	jupiter_charram[offset] = data;
 
 	/* decode character graphics again */
-	decodechar(machine->gfx[0], offset / 8, jupiter_charram);
-	decodechar(machine->gfx[1], offset / 8, jupiter_charram);
+	decodechar(space->machine->gfx[0], offset / 8, jupiter_charram);
+	decodechar(space->machine->gfx[1], offset / 8, jupiter_charram);
 }
 
 
 static TIMER_CALLBACK( jupiter_set_irq_callback )
 {
-	cpunum_set_input_line( machine, 0, 0, ASSERT_LINE );
+	cpu_set_input_line( machine->cpu[0], 0, ASSERT_LINE );
 }
 
 
 static TIMER_CALLBACK( jupiter_clear_irq_callback )
 {
-	cpunum_set_input_line( machine, 0, 0, CLEAR_LINE );
+	cpu_set_input_line( machine->cpu[0], 0, CLEAR_LINE );
 }
 
 

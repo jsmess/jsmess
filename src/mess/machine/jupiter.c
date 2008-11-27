@@ -37,7 +37,7 @@ static void jupiter_machine_stop(running_machine *machine);
 
 /* only gets called at the start of a cpu time slice */
 
-OPBASE_HANDLER( jupiter_opbaseoverride )
+DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride )
 {
 	int loop;
 	unsigned short tmpword;
@@ -90,7 +90,7 @@ MACHINE_START( jupiter )
 	if (jupiter_data)
 	{
 		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);
-		memory_set_opbase_handler(0, jupiter_opbaseoverride);
+		memory_set_direct_update_handler(0, jupiter_opbaseoverride);
 	}
 
 	add_exit_callback(machine, jupiter_machine_stop);

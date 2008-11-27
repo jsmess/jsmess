@@ -385,7 +385,7 @@ static const ins8250_interface avigo_com_interface =
 };
 
 /* this is needed because this driver uses handlers in memory that gets executed */
-static OPBASE_HANDLER( avigo_opbase_handler )
+static DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
 {
 	void *opbase_ptr;
 
@@ -437,7 +437,7 @@ static MACHINE_RESET( avigo )
 	/* clear */
 	memset(mess_ram, 0, 128*1024);
 
-	memory_set_opbase_handler(0, avigo_opbase_handler);
+	memory_set_direct_update_handler(0, avigo_opbase_handler);
 
 	addr = (unsigned char *)intelflash_getmemptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);

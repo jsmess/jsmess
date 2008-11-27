@@ -32,7 +32,7 @@ static UINT8 dai_paddle_enable;
 static UINT8 dai_cassette_motor[2];
 
 
-static OPBASE_HANDLER(dai_opbaseoverride)
+static DIRECT_UPDATE_HANDLER(dai_opbaseoverride)
 {
 	tms5501_set_pio_bit_7 (0, (input_port_read(machine, "IN8") & 0x04) ? 1:0);
 	return address;
@@ -141,7 +141,7 @@ const struct pit8253_config dai_pit8253_intf =
 
 MACHINE_START( dai )
 {
-	memory_set_opbase_handler(0, dai_opbaseoverride);
+	memory_set_direct_update_handler(0, dai_opbaseoverride);
 
 	memory_set_bankptr(1, mess_ram);
 	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "main") + 0x010000, 0x1000);

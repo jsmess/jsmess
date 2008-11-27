@@ -560,7 +560,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24KHz)		*/
 
 	/* CANTAB */
-//128u4	DRIVER( jupiter )	/* Jupiter Ace										*/
+	DRIVER( jupiter )	/* Jupiter Ace										*/
 
 	/* SORD */
 //128u4	DRIVER( sordm5 )

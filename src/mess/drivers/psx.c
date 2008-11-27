@@ -47,7 +47,7 @@ static struct
 
 static UINT8 *m_p_psxexe;
 
-static OPBASE_HANDLER( psx_setopbase )
+static DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
 	if( address == 0x80030000 )
 	{
@@ -90,7 +90,7 @@ static OPBASE_HANDLER( psx_setopbase )
 			cpu_set_reg(machine->activecpu,  MIPS_R30, n_stack );
 		}
 
-		memory_set_opbase_handler( 0, NULL );
+		memory_set_direct_update_handler( 0, NULL );
 
 		return ~0;
 	}
@@ -147,7 +147,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return INIT_FAIL;
 	}
 	image_fread( image, m_p_psxexe, m_psxexe_header.t_size );
-	memory_set_opbase_handler( 0, psx_setopbase );
+	memory_set_direct_update_handler( 0, psx_setopbase );
 	return INIT_PASS;
 }
 #endif

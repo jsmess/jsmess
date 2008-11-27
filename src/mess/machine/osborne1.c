@@ -212,7 +212,7 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 }
 
 
-static OPBASE_HANDLER( osborne1_opbase )
+static DIRECT_UPDATE_HANDLER( osborne1_opbase )
 {
 	if ( ( address & 0xF000 ) == 0x2000 )
 	{
@@ -498,7 +498,7 @@ MACHINE_RESET( osborne1 )
 
 	timer_set( attotime_zero, NULL, 0, setup_beep );
 
-	memory_set_opbase_handler( 0, osborne1_opbase );
+	memory_set_direct_update_handler( 0, osborne1_opbase );
 }
 
 

@@ -149,7 +149,7 @@ static parallel_drum_t parallel_drum;
 #define PARALLEL_DRUM_ROTATION_TIME ATTOTIME_IN_NSEC(8500*4096)
 
 
-static OPBASE_HANDLER(setOPbasefunc)
+static DIRECT_UPDATE_HANDLER(setOPbasefunc)
 {
 	/* just to get rid of the warnings */
 	return -1;
@@ -329,7 +329,7 @@ MACHINE_START( pdp1 )
 	dst = memory_region(machine, "gfx1");
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	memory_set_opbase_handler(0, setOPbasefunc);
+	memory_set_direct_update_handler(0, setOPbasefunc);
 
 	add_exit_callback(machine, pdp1_machine_stop);
 }

@@ -46,7 +46,7 @@ DRIVER_INIT ( zx )
 }
 
 #if 0
-static OPBASE_HANDLER ( zx_setdirect )
+static DIRECT_UPDATE_HANDLER ( zx_setdirect )
 {
 	if ((address > 0xc029) && (address < 0xc300))
 	{

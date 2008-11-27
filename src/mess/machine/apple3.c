@@ -640,7 +640,7 @@ static WRITE8_HANDLER( apple3_indexed_write )
 
 
 
-static OPBASE_HANDLER( apple3_opbase )
+static DIRECT_UPDATE_HANDLER( apple3_opbase )
 {
 	UINT8 *opptr;
 
@@ -729,7 +729,7 @@ DRIVER_INIT( apple3 )
 	via_1_irq = 0;
 	apple3_update_memory(machine);
 
-	memory_set_opbase_handler(0, apple3_opbase);
+	memory_set_direct_update_handler(0, apple3_opbase);
 
 	/* the Apple /// does some weird tricks whereby it monitors the SYNC pin
 	 * on the CPU to check for indexed instructions and directs them to

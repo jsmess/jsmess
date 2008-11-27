@@ -10,7 +10,7 @@
 
 /*----------- defined in machine/jupiter.c -----------*/
 
-OPBASE_HANDLER( jupiter_opbaseoverride );
+DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride );
 MACHINE_START( jupiter );
 
 DEVICE_IMAGE_LOAD( jupiter_ace );

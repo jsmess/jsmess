@@ -1580,7 +1580,7 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 
 
 
-static OPBASE_HANDLER( apple2gs_opbase )
+static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 {
 	UINT8 *opptr = NULL;
 	int slot;
@@ -1694,7 +1694,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0c000, 0xe0cfff, 0, 0, apple2gs_E0Cxxx_w);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe1c000, 0xe1cfff, 0, 0, apple2gs_E1Cxxx_w);
-	memory_set_opbase_handler(0, apple2gs_opbase);
+	memory_set_direct_update_handler(0, apple2gs_opbase);
 
 	/* install aux memory writes (for shadowing) */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010400, 0x0107FF, 0, 0, apple2gs_aux0400_w);
