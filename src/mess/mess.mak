@@ -377,6 +377,7 @@ DRVLIBS = \
 	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/arcadia.a \
 	$(MESSOBJ)/at.a \
+	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/avigo.a \
@@ -405,6 +406,7 @@ DRVLIBS = \
 	$(MESSOBJ)/fairch.a \
 	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/galaxy.a \
+	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/homelab.a \
@@ -478,11 +480,9 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
-	$(MESSOBJ)/atari.a \
 
 #	$(MESSOBJ)/coco.a \
 #	$(MESSOBJ)/dgn_beta.a \
-#	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/mephisto.a \
 #	$(MESSOBJ)/mk1.a \
 #	$(MESSOBJ)/synertec.a \

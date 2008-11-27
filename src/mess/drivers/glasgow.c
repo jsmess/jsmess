@@ -189,8 +189,8 @@ static READ16_HANDLER( read_keys ) // Glasgow, Dallas
 {
 	UINT16 data;
 	data = 0x0300;
-	key_low = input_port_read(machine, "LINE0");
-	key_hi = input_port_read(machine, "LINE1");
+	key_low = input_port_read(space->machine, "LINE0");
+	key_hi = input_port_read(space->machine, "LINE1");
 	//logerror("Keyboard Offset = %x Data = %x\n  ",offset,data);
 	if (key_select == key_low)
 		data = data & 0x100;
@@ -205,9 +205,9 @@ static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
 	UINT16 data;
 
 	if (key_selector == 0) 
-		data = input_port_read(machine, "LINE0");
+		data = input_port_read(space->machine, "LINE0");
 	else 
-		data = input_port_read(machine, "LINE1");
+		data = input_port_read(space->machine, "LINE1");
 
 	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, key_selector);
 	data = data << 8;
@@ -358,9 +358,9 @@ static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
 {
 	UINT32 data;
 	if (key_selector == 0) 
-		data = input_port_read(machine, "LINE0");
+		data = input_port_read(space->machine, "LINE0");
 	else 
-		data = input_port_read(machine, "LINE1");
+		data = input_port_read(space->machine, "LINE1");
 	//if (key_selector==1) data=input_port_read(machine, "LINE0");else data=0;
 	logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
 	data = data << 24;
@@ -401,17 +401,17 @@ static WRITE32_HANDLER ( write_beeper32 )
 
 static TIMER_CALLBACK( update_nmi )
 {
-	//cpu_set_input_line_and_vector(machine->cpu[0],  MC68000_IRQ_7,irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, MC68000_INT_ACK_AUTOVECTOR);
-		cpu_set_input_line_and_vector(machine->cpu[0],  MC68000_IRQ_7,ASSERT_LINE, MC68000_INT_ACK_AUTOVECTOR);
-		cpu_set_input_line_and_vector(machine->cpu[0],  MC68000_IRQ_7,CLEAR_LINE, MC68000_INT_ACK_AUTOVECTOR);
+	//cpu_set_input_line_and_vector(machine->cpu[0],  M68K_IRQ_7,irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpu_set_input_line_and_vector(machine->cpu[0],  M68K_IRQ_7,ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpu_set_input_line_and_vector(machine->cpu[0],  M68K_IRQ_7,CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
    	irq_edge=~irq_edge;
 }
 
 static TIMER_CALLBACK( update_nmi32 )
 {
-	// cpu_set_input_line_and_vector(machine->cpu[0],  MC68020_IRQ_7, irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, MC68020_INT_ACK_AUTOVECTOR);
-		cpu_set_input_line_and_vector(machine->cpu[0],  MC68020_IRQ_7, ASSERT_LINE, MC68020_INT_ACK_AUTOVECTOR);
-		cpu_set_input_line_and_vector(machine->cpu[0],  MC68020_IRQ_7, CLEAR_LINE, MC68020_INT_ACK_AUTOVECTOR);
+	// cpu_set_input_line_and_vector(machine->cpu[0],  M68K_IRQ_7, irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpu_set_input_line_and_vector(machine->cpu[0],  M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpu_set_input_line_and_vector(machine->cpu[0],  M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
     irq_edge=~irq_edge;
 }
 
