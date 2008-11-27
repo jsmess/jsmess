@@ -71,7 +71,7 @@ static MACHINE_RESET( exelv )
 {
 	tms3556_reset();
 	io_reset();
-	memory_set_bankptr( 1, memory_region(machine, "user1") + 0x0200 );
+	memory_set_bankptr( machine, 1, memory_region(machine, "user1") + 0x0200 );
 }
 
 static INTERRUPT_GEN( exelv_hblank_interrupt )
@@ -417,7 +417,7 @@ static READ8_HANDLER(mailbox_r)
 	mailbox_out = 0x00;
 
 	/* see if there are other messages to post */
-	io_iterate(machine);
+	io_iterate(space->machine);
 
 	return reply;
 }
@@ -480,7 +480,7 @@ static READ8_HANDLER(exelv_porta_r)
 
 static WRITE8_HANDLER(exelv_portb_w)
 {
-	set_io_hsk(machine, (data & 0x1) != 0);
+	set_io_hsk(space->machine, (data & 0x1) != 0);
 	set_io_ack((data & 0x2) != 0);
 }
 
