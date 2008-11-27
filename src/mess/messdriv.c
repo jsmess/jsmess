@@ -48,7 +48,7 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( a2600 )		/* Atari 2600										*/
 //128u4	DRIVER( a2600p )	/* Atari 2600 PAL									*/
 //128u4	DRIVER( a5200 )		/* Atari 5200										*/
-//128u4 DRIVER( a5200a )	/* Atari 5200 alt									*/
+//128u4	DRIVER( a5200a )	/* Atari 5200 alt									*/
 //128u4	DRIVER( a7800 )		/* Atari 7800 NTSC									*/
 //128u4	DRIVER( a7800p )	/* Atari 7800 PAL									*/
 //128u4	DRIVER( lynx )		/* Atari Lynx Handheld								*/
@@ -442,8 +442,8 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( xtvga )		/* 198? PC-XT (VGA, MF2 Keyboard)					*/
 
 	/* at */
-//128u4	DRIVER( ibm5170 )	/* 1984 IBM PC/AT 5170, original 6 Mhz model		*/
-//128u4	DRIVER( ibm5170a )	/* 1985	IBM PC/AT 5170, enhanced 8 Mhz model		*/
+//128u4	DRIVER( ibm5170 )	/* 1984 IBM PC/AT 5170, original 6 MHz model		*/
+//128u4	DRIVER( ibm5170a )	/* 1985	IBM PC/AT 5170, enhanced 8 MHz model		*/
 //128u4	DRIVER( i8530286 )	/* 1988 IBM PS2 Model 30 286 (VGA)					*/
 //128u4	DRIVER( at )		/* 1987 AMI Bios and Diagnostics					*/
 //128u4	DRIVER( atvga )		/* 19?? AT VGA										*/
@@ -1050,8 +1050,7 @@ XL/XE 16kB OS roms
 	
 	DRIVER( mistrum ) /* 1988 Mistrum										*/
 	
-  /* Russian clones */
-
+	/* Russian clones */
 	DRIVER( blitz )     /* 1990 Blic                     */
 	DRIVER( byte )      /* 1990 Byte                     */
 	DRIVER( orizon )    /* 199? Orizon-Micro             */

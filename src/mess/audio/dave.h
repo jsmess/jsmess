@@ -30,7 +30,7 @@ typedef struct DAVE
 	unsigned char Regs[32];
 
 
-	/* int latches (used by 1hz, int1 and int2) */
+	/* int latches (used by 1Hz, int1 and int2) */
 	unsigned long int_latch;
 	/* int enables */
 	unsigned long int_enable;
@@ -42,19 +42,19 @@ typedef struct DAVE
 	/* INTERRUPTS */
 
 	/* internal timer */
-	/* bit 2: 1khz timer irq */
-	/* bit 1: 50khz timer irq */
+	/* bit 2: 1kHz timer irq */
+	/* bit 1: 50kHz timer irq */
 	int timer_irq;
-	/* 1khz timer - divided into 1khz, 50hz and 1hz timer */
+	/* 1khz timer - divided into 1kHz, 50Hz and 1Hz timer */
 	void	*int_timer;
-	/* state of 1khz timer */
+	/* state of 1kHz timer */
 	unsigned long one_khz_state;
-	/* state of 50hz timer */
+	/* state of 50Hz timer */
 	unsigned long fifty_hz_state;
 
-	/* counter used to trigger 50hz from 1khz timer */
+	/* counter used to trigger 50Hz from 1kHz timer */
 	unsigned long fifty_hz_count;
-	/* counter used to trigger 1hz from 1khz timer */
+	/* counter used to trigger 1Hz from 1kHz timer */
 	unsigned long one_hz_count;
 
 

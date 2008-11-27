@@ -208,7 +208,7 @@ static void kc85_draw_8_pixels(bitmap_t *bitmap,int x,int y, unsigned char colou
 	- The vertical states comprise top border, main display, bottom border and vertical retrace timing.
 
 
-	- if frame rate is 50hz, and there are 312 lines, then the line rate is 15600hz.
+	- if frame rate is 50Hz, and there are 312 lines, then the line rate is 15600Hz.
 	- Each frame takes 0.02 seconds, and each line takes 0.0000064 seconds - approx 64microseconds per line
 
 	- the event list is based on cpu time
@@ -491,7 +491,7 @@ static void kc85_common_vh_process_lines(struct video_update_state *video_update
 
 
 /* the kc85 screen is 320 pixels wide and 256 pixels tall */
-/* if we assume a 50hz display, there are 312 lines for the complete frame, leaving 56 lines not visible */
+/* if we assume a 50Hz display, there are 312 lines for the complete frame, leaving 56 lines not visible */
 static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
 {
 	int cycles_remaining_in_frame = KC85_CYCLES_PER_FRAME;

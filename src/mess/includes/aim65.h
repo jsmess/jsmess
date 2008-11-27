@@ -12,7 +12,7 @@
 
 /** R6502 Clock.
  *
- * The R6502 on AIM65 operates at 1 MHz. The frequency reference is a 4 Mhz
+ * The R6502 on AIM65 operates at 1 MHz. The frequency reference is a 4 MHz
  * crystal controlled oscillator. Dual D-type flip-flop Z10 divides the 4 MHz
  * signal by four to drive the R6502 phase 0 (O0) input with a 1 MHz clock.
  */

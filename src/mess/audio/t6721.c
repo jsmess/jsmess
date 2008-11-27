@@ -58,7 +58,7 @@
  2 0..7 sample data
 
 seems to be a toshiba t6721a build in
-(8 khz 9bit output)
+(8 kHz 9bit output)
 generates output for 20ms (or 10ms) out of 6 byte voice data!
 (P?ARCOR voice synthesizing and analyzing method
  Nippon Telegraph and Telephon Public Corporation)

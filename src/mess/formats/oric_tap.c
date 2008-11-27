@@ -8,7 +8,7 @@
 #define ORIC_SYNC_BYTE	0x016
 
 /* frequency of wave */
-/* tapes use 1200hz and 2400hz samples */
+/* tapes use 1200Hz and 2400Hz samples */
 #define ORIC_WAV_FREQUENCY	4800
 
 /* 13 bits define a byte on the cassette */
@@ -32,9 +32,9 @@ enum
 #define WAVEENTRY_NULL  0
 
 /* to write a bit to the tape, the rom routines output either 4 periods at 1200 Hz for a 0 or 8 periods at 2400 Hz for a 1  */
-/* 4800 is twice 2400hz */
+/* 4800 is twice 2400Hz */
 
-/* 8 periods at 2400hz */
+/* 8 periods at 2400Hz */
 /* hi,lo, hi,lo, hi,lo, hi,lo */
 
 static INT16 wave_state = WAVEENTRY_HIGH;
@@ -52,7 +52,7 @@ static INT16 *oric_emit_level(INT16 *p, int count)
 	return p;
 }
 
-/* 4 periods at 1200hz */
+/* 4 periods at 1200Hz */
 static INT16* oric_output_bit(INT16 *p, UINT8 b)
 {
 	p = oric_emit_level(p,1);

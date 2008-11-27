@@ -7,7 +7,7 @@ DAVE SOUND CHIP FOUND IN ENTERPRISE
 
 	- pure tone
 	- sampled sounds
-	- 1khz, 50hz and 1hz ints
+	- 1kHz, 50Hz and 1Hz ints
 	- external ints (int1 and int2) - not correct speed yet
 
 */
@@ -57,10 +57,10 @@ static void dave_refresh_ints(void)
 
 static void dave_refresh_selectable_int(void)
 {
-	/* update 1khz/50hz/tg latch and int input */
+	/* update 1kHz/50Hz/tg latch and int input */
 	switch ((dave.Regs[7]>>5) & 0x03)
 	{
-		/* 1khz */
+		/* 1kHz */
 		case 0:
 		{
 			dave.int_latch &=~(1<<1);
@@ -72,7 +72,7 @@ static void dave_refresh_selectable_int(void)
 		}
 		break;
 
-		/* 50hz */
+		/* 50Hz */
 		case 1:
 		{
 			dave.int_latch &=~(1<<1);
@@ -94,7 +94,7 @@ static void dave_refresh_selectable_int(void)
 
 static TIMER_CALLBACK(dave_1khz_callback)
 {
-//	logerror("1khz int\n");
+//	logerror("1kHz int\n");
 
 	/* time over - want int */
 	dave.one_khz_state^=0x0ffffffff;
@@ -106,7 +106,7 @@ static TIMER_CALLBACK(dave_1khz_callback)
 	}
 
 
-	/* update fifty hz counter */
+	/* update fifty Hz counter */
 	dave.fifty_hz_count--;
 
 	if (dave.fifty_hz_count==0)
@@ -159,7 +159,7 @@ void	Dave_Init(running_machine *machine)
 	/* temp! */
 	nick_virq = 0;
 
-	/* initialise 1khz timer */
+	/* initialise 1kHz timer */
 	dave.int_latch = 0;
 	dave.int_input = 0;
 	dave.int_enable = 0;
@@ -298,7 +298,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 			int count = 0;
 			int channel_index = offset>>1;
 
-			/* Fout = 125,000 / (n+1) hz */
+			/* Fout = 125,000 / (n+1) Hz */
 
 			/* sample rate/clock */
 
@@ -366,13 +366,13 @@ static WRITE8_HANDLER(Dave_sound_w)
 			{
 				case 0:
 				{
-					logerror("1khz\n");
+					logerror("1kHz\n");
 				}
 				break;
 
 				case 1:
 				{
-					logerror("50hz\n");
+					logerror("50Hz\n");
 				}
 				break;
 
@@ -503,7 +503,7 @@ WRITE8_HANDLER ( Dave_reg_w )
 			/* clear latches */
 			dave.int_latch &=~(data & 0x0aa);
 
-			/* reset 1khz, 50hz latch */
+			/* reset 1kHz, 50Hz latch */
 			if (data & (1<<1))
 			{
 				dave.int_irq = 0;
@@ -667,9 +667,9 @@ b6 = INT2 input pin
 b5 = 1: INT1 latch set
 b4 = INT1 input pin
 b3 = 1: 1Hz latch set
-b2 = 1hz input pin
-b1 = 1: 1khz/50hz/TG latch set
-b0 = 1khz/50hz/TG input
+b2 = 1Hz input pin
+b1 = 1: 1kHz/50Hz/TG latch set
+b0 = 1kHz/50Hz/TG input
 
 Reg 4 WRITE:
 
@@ -677,10 +677,10 @@ b7 = 1: Reset INT2 latch
 b6 = 1: Enable INT2
 b5 = 1: Reset INT1 latch
 b4 = 1: Enable INT1
-b3 = 1: Reset 1hz interrupt latch
-b2 = 1: Enable 1hz interrupt
-b1 = 1: Reset 1khz/50hz/TG latch
-b0 = 1: Enable 1khz/50Hz/TG latch
+b3 = 1: Reset 1Hz interrupt latch
+b2 = 1: Enable 1Hz interrupt
+b1 = 1: Reset 1kHz/50hz/TG latch
+b0 = 1: Enable 1kHz/50Hz/TG latch
 */
 
 #if 0

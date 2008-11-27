@@ -18,7 +18,7 @@ TODO - Write documentation
 	      | | | | | |           value in the Graphics Controllers.
 	      | | | | | +------ clock select bit 0
 	      | | | | +-------- clock select bit 1
-	      | | | |           00 = 14Mhz from Processor I/O channel
+	      | | | |           00 = 14MHz from Processor I/O channel
 	      | | | |           01 = 16MHz on-bord clock
 	      | | | |           10 = External clock from feature connector
 	      | | | |           11 = reserved/unused

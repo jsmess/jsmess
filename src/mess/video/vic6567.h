@@ -33,7 +33,7 @@
 #define VIC6567_CLOCK	(1022725 /* (8181800/8) */ )
 #define VIC6569_CLOCK	( 985248 /* (7880000/8) */ )
 
-/* pixel clock 8 mhz */
+/* pixel clock 8 MHz */
 /* accesses to memory with 2 megahertz */
 /* needs 2 memory accesses for 8 pixel */
 /* + sprite + */

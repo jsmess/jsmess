@@ -40,7 +40,7 @@ extern void ted7360_set_dma (read8_machine_func dma_read,
 /* video timing (these are used in c16/c116/plus4) */
 #define TED7360NTSC_CLOCK	(14318180/4)
 #define TED7360PAL_CLOCK	(17734470/5)
-/* pixel clock 8 mhz */
+/* pixel clock 8 MHz */
 /* accesses to memory with 4 megahertz */
 /* needs 3 memory accesses for 8 pixel */
 /* but system clock 1 megahertz */

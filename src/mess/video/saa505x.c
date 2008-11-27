@@ -1,5 +1,3 @@
-
-
 /************************************************************************
 SAA505X Teletext
 
@@ -47,8 +45,8 @@ Remote Control Data Decoder and Store
 Timing Generator/Flash Counter
 ------------------------------
 13	DEW		in		data entry window
-19	TR6		in		6Mhz input
-20	F1		in		1Mhz input
+19	TR6		in		6MHz input
+20	F1		in		1MHz input
 26	LOSE		in		load output shift register enable
 
 Character Rounding
@@ -73,7 +71,7 @@ It is also used internally to derive the 'flash' period.
 
 20 F1
 -----
-This input is a 1Mhz equal mark/space ration signal. It is used to latch the 7-bit parallel character data into the input latches.
+This input is a 1MHz equal mark/space ration signal. It is used to latch the 7-bit parallel character data into the input latches.
 
 26 LOSE Load output shift register enable
 -----------------------------------------

@@ -31,7 +31,7 @@ static INT16 *apf_emit_level(INT16 *p, int count)
 	return p;
 }
 
-/* 4 periods at 1200hz */
+/* 4 periods at 1200Hz */
 static INT16* apf_output_bit(INT16 *p, UINT8 b)
 {
 	if (b)
