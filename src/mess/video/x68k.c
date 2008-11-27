@@ -488,7 +488,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		}
 		break;
 	}
-//	logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",activecpu_get_pc(),data,offset);
+//	logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(space->machine->cpu[0]),data,offset);
 }
 
 READ16_HANDLER( x68k_crtc_r )
@@ -1093,7 +1093,7 @@ VIDEO_UPDATE( x68000 )
 		sys.mfp.isra = 0;
 		sys.mfp.isrb = 0;
 //		mfp_trigger_irq(MFP_IRQ_GPIP6);
-//		cpunum_set_input_line_and_vector(machine, 0,6,ASSERT_LINE,0x43);
+//		cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x43);
 	}
 	if(input_code_pressed(KEYCODE_9))
 	{

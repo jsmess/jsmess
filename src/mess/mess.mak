@@ -118,7 +118,7 @@ CPUS += HD6309
 CPUS += M6809
 CPUS += M6809E
 #CPUS += KONAMI
-#CPUS += M680X0
+CPUS += M680X0
 CPUS += T11
 CPUS += S2650
 #CPUS += TMS340X0
@@ -246,11 +246,11 @@ CPUS += TMS7000_EXL
 CPUS += SM8500
 CPUS += MINX
 CPUS += I8X41
-CPUS += M68000
-CPUS += M68008
+#CPUS += M68000
+#CPUS += M68008
 #CPUS += M68010
-CPUS += M68EC020
-CPUS += M68020
+#CPUS += M68EC020
+#CPUS += M68020
 #CPUS += M68040
 #CPUS += TMS34010
 #CPUS += TMS34020
@@ -397,6 +397,7 @@ DRVLIBS = \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
+	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/special.a \
@@ -466,7 +467,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/samcoupe.a \
 #	$(MESSOBJ)/sega.a \
 #	$(MESSOBJ)/sgi.a \
-#	$(MESSOBJ)/sharp.a \
 #	$(MESSOBJ)/sony.a \
 #	$(MESSOBJ)/sord.a \
 #	$(MESSOBJ)/ssystem3.a \
@@ -765,7 +765,6 @@ $(MESSOBJ)/apple.a:   \
 	$(MESS_MACHINE)/lisa.o			\
 	$(MESS_DRIVERS)/lisa.o			\
 	$(MESS_MACHINE)/applefdc.o		\
-	$(MESS_MACHINE)/8530scc.o		\
 	$(MESS_DEVICES)/sonydriv.o		\
 	$(MESS_DEVICES)/appldriv.o		\
 	$(MESS_AUDIO)/mac.o			\
@@ -1039,6 +1038,7 @@ $(MESSOBJ)/sharp.a:    \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/rp5c15.o	\
 	$(MESS_MACHINE)/x68k_hdc.o	\
+	$(MESS_MACHINE)/8530scc.o		\
 	$(MESS_DRIVERS)/mz80.o		\
 	$(MESS_VIDEO)/mz80.o		\
 	$(MESS_MACHINE)/mz80.o	\

@@ -512,7 +512,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
 //128u4	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
 
-//128u4	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
+	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
 
 	/* SILICON GRAPHICS */
 //128u4	DRIVER( ip204415 )	/* IP20 Indigo2										*/
