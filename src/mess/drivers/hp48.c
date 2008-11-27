@@ -943,103 +943,92 @@ static const char layout_hp48s [] = "hp48s";
 /*************************** driver ********************************/
 
 
-
 static MACHINE_DRIVER_START ( hp48_common )
-
 	MDRV_MACHINE_RESET ( hp48 )
 
 	/* cpu */
-        MDRV_CPU_ADD ( "main", SATURN, 3937007 ) /* almost 4 MHz */
-        MDRV_CPU_PROGRAM_MAP ( hp48, 0 )
-        MDRV_CPU_CONFIG( hp48_config )
+	MDRV_CPU_ADD ( "main", SATURN, 3937007 ) /* almost 4 MHz */
+	MDRV_CPU_PROGRAM_MAP ( hp48, 0 )
+	MDRV_CPU_CONFIG( hp48_config )
  
-        /* memory */
-        MDRV_NVRAM_HANDLER( generic_0fill )
-    
-	/* video */
-        MDRV_SCREEN_ADD( "main", RASTER )
-	MDRV_SCREEN_REFRESH_RATE( 64 )
-        MDRV_SCREEN_VBLANK_TIME(0)
-        MDRV_INTERLEAVE ( 0 )
-        MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-        MDRV_SCREEN_SIZE ( 131, 64 )
-        MDRV_SCREEN_VISIBLE_AREA( 0, 130, 0, 63 )
-        MDRV_PALETTE_LENGTH( 256 ) /* monochrome, but with varying contrast and grayscale */
-        MDRV_PALETTE_INIT( hp48 )
-        MDRV_VIDEO_UPDATE( hp48 )
-     
-        /* sound */
-        MDRV_SPEAKER_STANDARD_MONO( "mono" )
-        MDRV_SOUND_ADD( "dac",  DAC, 0 )
-        MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit beeper */
+	/* memory */
+	MDRV_NVRAM_HANDLER( generic_0fill )
 
+	/* video */
+	MDRV_SCREEN_ADD( "main", RASTER )
+	MDRV_SCREEN_REFRESH_RATE( 64 )
+	MDRV_SCREEN_VBLANK_TIME(0)
+	MDRV_INTERLEAVE ( 0 )
+	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MDRV_SCREEN_SIZE ( 131, 64 )
+	MDRV_SCREEN_VISIBLE_AREA( 0, 130, 0, 63 )
+	MDRV_PALETTE_LENGTH( 256 ) /* monochrome, but with varying contrast and grayscale */
+	MDRV_PALETTE_INIT( hp48 )
+	MDRV_VIDEO_UPDATE( hp48 )
+
+	/* sound */
+	MDRV_SPEAKER_STANDARD_MONO( "mono" )
+	MDRV_SOUND_ADD( "dac",  DAC, 0 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit beeper */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48gx )
-
-        MDRV_IMPORT_FROM    ( hp48_common )
+	MDRV_IMPORT_FROM    ( hp48_common )
 	MDRV_MACHINE_START  ( hp48gx )
-        MDRV_DEFAULT_LAYOUT ( layout_hp48gx )
+	MDRV_DEFAULT_LAYOUT ( layout_hp48gx )
 
-        /* expansion ports */
-        MDRV_DEVICE_ADD     ( "port1", HP48_PORT )
-        MDRV_DEVICE_CONFIG  ( hp48gx_port1_config )
-        MDRV_DEVICE_ADD     ( "port2", HP48_PORT )
-        MDRV_DEVICE_CONFIG  ( hp48gx_port2_config )
-
-        /* serial I/O */
-        MDRV_DEVICE_ADD( "rs232_x", XMODEM )
-        MDRV_DEVICE_CONFIG( hp48_xmodem_rs232_conf )
-        MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-        MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
-
+	/* expansion ports */
+	MDRV_DEVICE_ADD     ( "port1", HP48_PORT )
+	MDRV_DEVICE_CONFIG  ( hp48gx_port1_config )
+	MDRV_DEVICE_ADD     ( "port2", HP48_PORT )
+	MDRV_DEVICE_CONFIG  ( hp48gx_port2_config )
+		
+	/* serial I/O */
+	MDRV_DEVICE_ADD( "rs232_x", XMODEM )
+	MDRV_DEVICE_CONFIG( hp48_xmodem_rs232_conf )
+	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
+	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48g )
-
-        MDRV_IMPORT_FROM    ( hp48_common )
+	MDRV_IMPORT_FROM    ( hp48_common )
 	MDRV_MACHINE_START  ( hp48g )
-        MDRV_DEFAULT_LAYOUT ( layout_hp48g )
+	MDRV_DEFAULT_LAYOUT ( layout_hp48g )
 
-        /* serial I/O */
-        MDRV_DEVICE_ADD( "rs232_x", XMODEM )
-        MDRV_DEVICE_CONFIG( hp48_xmodem_rs232_conf )
-        MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-        MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
-
+	/* serial I/O */
+	MDRV_DEVICE_ADD( "rs232_x", XMODEM )
+	MDRV_DEVICE_CONFIG( hp48_xmodem_rs232_conf )
+	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
+	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START ( hp48sx )
-
-        MDRV_IMPORT_FROM    ( hp48_common )
-        MDRV_CPU_REPLACE    ( "main", SATURN, 2000000 )
+	MDRV_IMPORT_FROM    ( hp48_common )
+	MDRV_CPU_REPLACE    ( "main", SATURN, 2000000 )
 	MDRV_MACHINE_START  ( hp48sx )
-        MDRV_DEFAULT_LAYOUT ( layout_hp48sx )
+	MDRV_DEFAULT_LAYOUT ( layout_hp48sx )
 
-        /* expansion ports */
-        MDRV_DEVICE_ADD     ( "port1", HP48_PORT )
-        MDRV_DEVICE_CONFIG  ( hp48sx_port1_config )
-        MDRV_DEVICE_ADD     ( "port2", HP48_PORT )
-        MDRV_DEVICE_CONFIG  ( hp48sx_port2_config )
+	/* expansion ports */
+	MDRV_DEVICE_ADD     ( "port1", HP48_PORT )
+	MDRV_DEVICE_CONFIG  ( hp48sx_port1_config )
+	MDRV_DEVICE_ADD     ( "port2", HP48_PORT )
+	MDRV_DEVICE_CONFIG  ( hp48sx_port2_config )
 
-        /* serial I/O */
-        MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-        MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
-
+	/* serial I/O */
+	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
+	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48s )
-
-        MDRV_IMPORT_FROM    ( hp48_common )
-        MDRV_CPU_REPLACE    ( "main", SATURN, 2000000 )
+	MDRV_IMPORT_FROM    ( hp48_common )
+	MDRV_CPU_REPLACE    ( "main", SATURN, 2000000 )
 	MDRV_MACHINE_START  ( hp48s )
-        MDRV_DEFAULT_LAYOUT ( layout_hp48s )
+	MDRV_DEFAULT_LAYOUT ( layout_hp48s )
 
-        /* serial I/O */
-        MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-        MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
-
+	/* serial I/O */
+	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
+	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 
@@ -1049,4 +1038,3 @@ COMP ( 1990, hp48sx, 0     , 0, hp48sx, hp48sx, hp48, NULL, "Hewlett Packard", "
 COMP ( 1991, hp48s , hp48sx, 0, hp48s,  hp48sx, hp48, NULL, "Hewlett Packard", "HP48S", 0 )
 COMP ( 1993, hp48gx, 0     , 0, hp48gx, hp48gx, hp48, NULL, "Hewlett Packard", "HP48GX", 0 )
 COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48, NULL, "Hewlett Packard", "HP48G", 0 )
-

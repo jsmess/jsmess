@@ -89,5 +89,3 @@ extern MACHINE_RESET( hp48 );
 
 extern VIDEO_UPDATE ( hp48 );
 extern PALETTE_INIT ( hp48 );
-
-

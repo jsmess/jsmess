@@ -13,6 +13,7 @@
 
 #include "includes/hp48.h"
 
+#include "deprecat.h"
 
 /***************************************************************************
     DEBUGGING
@@ -132,7 +133,7 @@ PALETTE_INIT ( hp48 )
 	data >>= 1
 
 #define draw_quart					\
-	UINT8 data = memory_read_byte(space,  addr );	\
+	UINT8 data = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM),  addr );	\
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 

@@ -49,8 +49,8 @@ typedef struct
 {
 	/* static part */
 	UINT32 off_mask;             /* offset bit-mask, indicates the real size */
-	read8_machine_func read;
-	write8_machine_func write;
+	read8_space_func read;
+	write8_space_func write;
 	void* data;                  /* non-NULL for banks */
 
 	/* configurable part */
@@ -216,8 +216,8 @@ static void hp48_rs232_send_byte( running_machine *machine )
 	
 	UINT8 data = HP48_IO_8(0x16); /* byte to send */
 
-	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n", 
-		     activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+//	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n", 
+//		     activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 
 	hp48_io[0x12] |= 3;           /* set byte sending and send buffer full */
 
@@ -298,8 +298,8 @@ static const chardev_interface hp48_chardev_iface =
 /* CPU sets OUT register (keyboard + beeper) */
 void hp48_reg_out( running_machine* machine, int out )
 {
-	LOG(( "%05x %f hp48_reg_out: %03x\n",
-	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), out ));
+//	LOG(( "%05x %f hp48_reg_out: %03x\n",
+//	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), out ));
 
 	/* bits 0-8: keyboard lines */
 	hp48_out = out & 0x1ff;
@@ -335,8 +335,8 @@ static int hp48_get_in( running_machine *machine )
 int hp48_reg_in( running_machine* machine )
 {
 	int in = hp48_get_in( machine );
-	LOG(( "%05x %f hp48_reg_in: %04x\n",
-	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), in ));
+//	LOG(( "%05x %f hp48_reg_in: %04x\n",
+//	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), in ));
 	return in;
 }
 
@@ -378,7 +378,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 /* RSI opcode */
 void hp48_rsi( running_machine *machine )
 {
-	LOG(( "%05x %f hp48_rsi\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()) ));
+//	LOG(( "%05x %f hp48_rsi\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()) ));
 
 	/* enables interrupts on key repeat 
 	   (normally, there is only one interrupt, when the key is pressed)
@@ -420,7 +420,7 @@ static void hp48_update_annunciators( running_machine *machine, void* param )
 static WRITE8_HANDLER ( hp48_io_w )
 {
 	LOG(( "%05x %f hp48_io_w: off=%02x data=%x\n", 
-	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, data ));
+	      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset, data ));
 
 	switch( offset )
 	{
@@ -435,7 +435,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 	case 0x0b:
 	case 0x0c:
 		hp48_io[offset] = data;
-		hp48_update_annunciators( machine, NULL );
+		hp48_update_annunciators( space->machine, NULL );
 		break;
 
 	/* cntrl ROM */
@@ -445,7 +445,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 		hp48_io[offset] = data;
 		if ( old_cntrl != (data & 8) ) 
 		{
-			hp48_apply_modules( machine, NULL );
+			hp48_apply_modules( space->machine, NULL );
 		}
 		break;
 	}
@@ -463,13 +463,13 @@ static WRITE8_HANDLER ( hp48_io_w )
 
 	/* cards */
 	case 0x0e:
-		LOG(( "%05x: card control write %02x\n", activecpu_get_previouspc(), data ));
+		LOG(( "%05x: card control write %02x\n", cpu_get_previouspc(space->cpu), data ));
 		/* bit 0: software interrupt */
 		if ( data & 1 )
 		{
 			LOG(( "%f hp48_io_w: software interrupt requested\n", 
 			      attotime_to_double(timer_get_time()) ));
-			cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+			cpu_set_input_line( space->machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
 			data &= ~1;
 		}
 
@@ -481,7 +481,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 		break;
 
 	case 0x0f:
-		LOG(( "%05x: card info write %02x\n", activecpu_get_previouspc(), data ));
+		LOG(( "%05x: card info write %02x\n", cpu_get_previouspc(space->cpu), data ));
 		hp48_io[0x0f] = data;
 		break;
 
@@ -496,7 +496,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 	case 0x17:
 		/* second nibble of sent data */
 		hp48_io[offset] = data;
-		hp48_rs232_send_byte( machine );
+		hp48_rs232_send_byte( space->machine );
 		break;
 
 	/* XXX not implemented:
@@ -552,7 +552,7 @@ static READ8_HANDLER ( hp48_io_r )
 			   bit 3: battery in port 2			   
 			   bit 2: battery in port 1
 			 */
-			switch ( input_port_read( machine, "BATTERY" ) )
+			switch ( input_port_read( space->machine, "BATTERY" ) )
 			{
 			case 1: data = 2; break; /* low */
 			case 2: data = 3; break; /* low | critical */
@@ -565,7 +565,7 @@ static READ8_HANDLER ( hp48_io_r )
 	case 0x29:
 	{
 		int last_line = HP48_IO_8(0x28) & 0x3f; /* last line of main bitmap before menu */
-		int cur_line = video_screen_get_vpos( machine->primary_screen ); 
+		int cur_line = video_screen_get_vpos( space->machine->primary_screen ); 
 		if ( last_line <= 1 ) last_line = 0x3f;
 		data = ( cur_line >= 0 && cur_line <= last_line ) ? last_line - cur_line : 0;
 		if ( offset == 0x29 )
@@ -596,8 +596,8 @@ static READ8_HANDLER ( hp48_io_r )
 	{
                 /* second nibble of received data */
 
-		const device_config *xmodem = device_list_find_by_tag( machine->config->devicelist, XMODEM, "rs232-x" );
-		const device_config *kermit = device_list_find_by_tag( machine->config->devicelist, KERMIT, "rs232-k" );
+		const device_config *xmodem = device_list_find_by_tag( space->machine->config->devicelist, XMODEM, "rs232-x" );
+		const device_config *kermit = device_list_find_by_tag( space->machine->config->devicelist, KERMIT, "rs232-k" );
 
 		hp48_io[0x11] &= ~1;  /* clear byte received */
 		data = hp48_io[offset];
@@ -611,7 +611,7 @@ static READ8_HANDLER ( hp48_io_r )
 	/* cards */
 	case 0x0e: /* detection */
 		data = hp48_io[0x0e];
-		LOG(( "%05x: card control read %02x\n", activecpu_get_previouspc(), data ));
+		LOG(( "%05x: card control read %02x\n", cpu_get_previouspc(space->cpu), data ));
 		break;
 	case 0x0f: /* card info */
 		data = 0;
@@ -629,7 +629,7 @@ static READ8_HANDLER ( hp48_io_r )
 			if ( hp48_port_size[0] && hp48_port_write[0] ) data |= 4;
 			if ( hp48_port_size[1] && hp48_port_write[1] ) data |= 8;
 		}
-		LOG(( "%05x: card info read %02x\n", activecpu_get_previouspc(), data ));
+		LOG(( "%05x: card info read %02x\n", cpu_get_previouspc(space->cpu), data ));
 		break;
 
 
@@ -637,7 +637,7 @@ static READ8_HANDLER ( hp48_io_r )
 	}
 
 	LOG(( "%05x %f hp48_io_r: off=%02x data=%x\n", 
-	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, data ));
+	      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset, data ));
 	return data;
 }
 
@@ -650,9 +650,9 @@ static READ8_HANDLER ( hp48_bank_r )
 	offset &= 0x7e;
 	if ( hp48_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp48_bank_r: off=%03x\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset ));
+		LOG(( "%05x %f hp48_bank_r: off=%03x\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset ));
 		hp48_bank_switch = offset;
-		hp48_apply_modules( machine, NULL );
+		hp48_apply_modules( space->machine, NULL );
 	}
 	return 0;
 }
@@ -812,15 +812,15 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 				  select_mask, hp48_module_names[i] );
 			continue;
 		}
-		memory_install_read8_handler( machine, 0, ADDRESS_SPACE_PROGRAM, base, end, 0, mirror, hp48_modules[i].read );
-		memory_install_write8_handler( machine, 0, ADDRESS_SPACE_PROGRAM, base, end, 0, mirror, hp48_modules[i].write );
+		memory_install_read8_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, end, 0, mirror, hp48_modules[i].read );
+		memory_install_write8_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, end, 0, mirror, hp48_modules[i].write );
 
 		LOG(( "hp48_mem_config: module %s configured at %05x-%05x, mirror %05x\n",
 		      hp48_module_names[i], base, end, mirror ));
 
 		if ( hp48_modules[i].data )
 		{
-			memory_set_bankptr( i, hp48_modules[i].data );
+			memory_set_bankptr( machine, i, hp48_modules[i].data );
 		}
 
 		if ( i == 0 )
@@ -856,7 +856,7 @@ static void hp48_reset_modules( running_machine *machine )
 /* RESET opcode */
 void hp48_mem_reset( running_machine* machine )
 {
-	LOG(( "%05x %f hp48_mem_reset\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()) ));
+//	LOG(( "%05x %f hp48_mem_reset\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()) ));
 	hp48_reset_modules( machine );
 }
 
@@ -866,7 +866,7 @@ void hp48_mem_config( running_machine* machine, int v )
 {	
 	int i;
 
-	LOG(( "%05x %f hp48_mem_config: %05x\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), v ));
+//	LOG(( "%05x %f hp48_mem_config: %05x\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), v ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -897,7 +897,7 @@ void hp48_mem_config( running_machine* machine, int v )
 void hp48_mem_unconfig( running_machine* machine, int v )
 {	
 	int i;
-	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), v ));
+//	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), v ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -939,8 +939,8 @@ int  hp48_mem_id( running_machine* machine )
 		}
 	}
 
-	LOG(( "%05x %f hp48_mem_id = %02x\n", 
-	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+//	LOG(( "%05x %f hp48_mem_id = %02x\n", 
+//	      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
 
 	return data; /* everything is configured */
 }
@@ -1210,9 +1210,9 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	state_save_register_global( hp48_bank_switch );
 	for ( i = 0; i < 6; i++ ) 
 	{
-		state_save_register_item( "globals", i, hp48_modules[i].state );
-		state_save_register_item( "globals", i, hp48_modules[i].base );
-		state_save_register_item( "globals", i, hp48_modules[i].mask );
+		state_save_register_item( "globals", NULL, i, hp48_modules[i].state );
+		state_save_register_item( "globals", NULL, i, hp48_modules[i].base );
+		state_save_register_item( "globals", NULL, i, hp48_modules[i].mask );
 	}
 	state_save_register_global_array( hp48_io );
 	state_save_register_global_pointer( generic_nvram, generic_nvram_size );
@@ -1248,4 +1248,3 @@ MACHINE_START( hp48gx )
 {
 	hp48_machine_start( machine, HP48_GX );
 }
-

@@ -9,6 +9,7 @@
 #include "devices/cartslot.h"
 #include "hash.h"
 
+#include "deprecat.h"
 
 static UINT16 lynx_granularity = 1;
 static int lynx_line;
@@ -786,7 +787,7 @@ static void lynx_blitter(void)
 	int i; int o;int colors;
 
 	blitter.memory_accesses = 0;
-	blitter.mem = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
+	blitter.mem = memory_get_read_ptr(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000);
 
 	blitter.xoff   = GET_WORD(suzy.data, 0x04);
 	blitter.yoff   = GET_WORD(suzy.data, 0x06);
@@ -1019,7 +1020,7 @@ READ8_HANDLER( suzy_read )
 				value |= 0x40;
 			break;
 		case 0xb0:
-			input = input_port_read(machine, "JOY");
+			input = input_port_read(space->machine, "JOY");
 			switch (lynx_rotate) 
 			{
 				case 1:
@@ -1051,10 +1052,10 @@ READ8_HANDLER( suzy_read )
 				value = input;
 			break;
 		case 0xb1: 
-			value = input_port_read(machine, "PAUSE");
+			value = input_port_read(space->machine, "PAUSE");
 			break;
 		case 0xb2:
-			value = *(memory_region(machine, "user1") + (suzy.high * lynx_granularity) + suzy.low);
+			value = *(memory_region(space->machine, "user1") + (suzy.high * lynx_granularity) + suzy.low);
 			suzy.low = (suzy.low + 1) & (lynx_granularity - 1);
 			break;
 		case 0xb3: /* we need bank 1 emulation!!! */
@@ -1663,7 +1664,7 @@ READ8_HANDLER(mikey_read)
 
 	case 0x8c: 
 	case 0x8d:
-		value = lynx_uart_r(machine, offset);
+		value = lynx_uart_r(space, offset);
 		break;
 
 	default:
@@ -1701,7 +1702,7 @@ WRITE8_HANDLER(mikey_write)
 		mikey.data[0x81] &= ~data; // clear interrupt source
 		logerror("mikey write %.2x %.2x\n", offset, data);
 		if (!mikey.data[0x81])
-			cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */
@@ -1730,7 +1731,7 @@ WRITE8_HANDLER(mikey_write)
 		break;
 
 	case 0x8c: case 0x8d:
-		lynx_uart_w(machine, offset, data);
+		lynx_uart_w(space, offset, data);
 		break;
 
 	case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
@@ -1738,10 +1739,10 @@ WRITE8_HANDLER(mikey_write)
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 	case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 		mikey.data[offset] = data;
-		lynx_draw_lines(machine, lynx_line);
+		lynx_draw_lines(space->machine, lynx_line);
 
 		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
-		lynx_palette[offset & 0x0f] = machine->pens[
+		lynx_palette[offset & 0x0f] = space->machine->pens[
 			((mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
 			((mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
 			((mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4)];
@@ -1788,23 +1789,23 @@ WRITE8_HANDLER( lynx_memory_config_w )
 	 * when these are safe in the cpu */
 	lynx_memory_config = data;
 
-	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_read);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_write);
-	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xfd00, 0xfdff, 0, 0, (data & 2) ? SMH_BANK2 : mikey_read);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfd00, 0xfdff, 0, 0, (data & 2) ? SMH_BANK2 : mikey_write);
+	memory_install_read8_handler(space, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_read);
+	memory_install_write8_handler(space, 0xfc00, 0xfcff, 0, 0, (data & 1) ? SMH_BANK1 : suzy_write);
+	memory_install_read8_handler(space, 0xfd00, 0xfdff, 0, 0, (data & 2) ? SMH_BANK2 : mikey_read);
+	memory_install_write8_handler(space, 0xfd00, 0xfdff, 0, 0, (data & 2) ? SMH_BANK2 : mikey_write);
 
 	if (data & 1)
-		memory_set_bankptr(machine, 1, lynx_mem_fc00);
+		memory_set_bankptr(space->machine, 1, lynx_mem_fc00);
 	if (data & 2)
-		memory_set_bankptr(machine, 2, lynx_mem_fd00);
-	memory_set_bank(machine, 3, (data & 4) ? 1 : 0);
-	memory_set_bank(machine, 4, (data & 8) ? 1 : 0);
+		memory_set_bankptr(space->machine, 2, lynx_mem_fd00);
+	memory_set_bank(space->machine, 3, (data & 4) ? 1 : 0);
+	memory_set_bank(space->machine, 4, (data & 8) ? 1 : 0);
 }
 
 static void lynx_reset(running_machine *machine)
 {
 	int i;
-	lynx_memory_config_w(machine, 0, 0);
+	lynx_memory_config_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
 
 	cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
 
@@ -1840,7 +1841,7 @@ static void lynx_reset(running_machine *machine)
 
 static STATE_POSTLOAD( lynx_postload )
 {
-	lynx_memory_config_w(machine, 0, lynx_memory_config);
+	lynx_memory_config_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, lynx_memory_config);
 }
 
 MACHINE_START( lynx )
@@ -1906,8 +1907,8 @@ int lynx_verify_cart (char *header, int kind)
 INTERRUPT_GEN( lynx_frame_int )
 {
     lynx_rotate = rotate;
-    if ((input_port_read(machine, "ROTATION") & 0x03) != 0x03)
-		lynx_rotate=input_port_read(machine, "ROTATION") & 0x03;
+    if ((input_port_read(device->machine, "ROTATION") & 0x03) != 0x03)
+		lynx_rotate=input_port_read(device->machine, "ROTATION") & 0x03;
 }
 
 void lynx_crc_keyword(const device_config *image)

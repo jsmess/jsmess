@@ -51,8 +51,8 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( a5200a )	/* Atari 5200 alt									*/
 //128u4	DRIVER( a7800 )		/* Atari 7800 NTSC									*/
 //128u4	DRIVER( a7800p )	/* Atari 7800 PAL									*/
-//128u4	DRIVER( lynx )		/* Atari Lynx Handheld								*/
-//128u4	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
+	DRIVER( lynx )		/* Atari Lynx Handheld								*/
+	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
 //128u4	DRIVER( jaguar )	/* Atari Jaguar										*/
 //128u4	DRIVER( atarist )	/* Atari ST											*/
 //128u4	DRIVER( megast )	/* Atari Mega ST									*/
