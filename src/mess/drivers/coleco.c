@@ -74,13 +74,13 @@ static int joy_status[2];
 
 static READ8_HANDLER( paddle_1_r )
 {
-	UINT8 inport6 = input_port_read_safe(machine, "IN6", 0);
+	UINT8 inport6 = input_port_read_safe(space->machine, "IN6", 0);
 
 	/* Keypad and fire 1 (SAC Yellow Button) */
 	if (joy_mode==0)
 	{
-		UINT8 inport0 = input_port_read(machine, "IN0");
-		UINT8 inport1 = input_port_read(machine, "IN1");
+		UINT8 inport0 = input_port_read(space->machine, "IN0");
+		UINT8 inport1 = input_port_read(space->machine, "IN1");
 
 		/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 		than one, a real ColecoVision think that it is a third button, so we are going to emulate
@@ -108,7 +108,7 @@ static READ8_HANDLER( paddle_1_r )
 	/* Joystick and fire 2 (SAC Red Button) */
 	else
 	{
-		UINT8 data = input_port_read(machine, "IN2") & 0xCF;
+		UINT8 data = input_port_read(space->machine, "IN2") & 0xCF;
 
 		if (inport6 & 0x07) /* If Extra Contollers enabled */
 		{
@@ -125,8 +125,8 @@ static READ8_HANDLER( paddle_2_r )
 	/* Keypad and fire 1 */
 	if (joy_mode == 0)
 	{
-		UINT8 inport3 = input_port_read(machine, "IN3");
-		UINT8 inport4 = input_port_read(machine, "IN4");
+		UINT8 inport3 = input_port_read(space->machine, "IN3");
+		UINT8 inport4 = input_port_read(space->machine, "IN4");
 
 		/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
 		than one, a real ColecoVision think that it is a third button, so we are going to emulate
@@ -152,8 +152,8 @@ static READ8_HANDLER( paddle_2_r )
 	/* Joystick and fire 2*/
 	else
 	{
-		UINT8 data = input_port_read(machine, "IN5") & 0xCF;
-		UINT8 inport6 = input_port_read_safe(machine, "IN6", 0);
+		UINT8 data = input_port_read(space->machine, "IN5") & 0xCF;
+		UINT8 inport6 = input_port_read_safe(space->machine, "IN6", 0);
 
 		if (inport6 & 0x02) /* If Roller Controller enabled */
 		{
@@ -344,7 +344,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( coleco_interrupt )
 {
-    TMS9928A_interrupt(machine);
+    TMS9928A_interrupt(device->machine);
 }
 
 static void coleco_vdp_interrupt(running_machine *machine, int state)

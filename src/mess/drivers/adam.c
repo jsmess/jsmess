@@ -422,8 +422,8 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( adam_interrupt )
 {
-    TMS9928A_interrupt(machine);
-    adam_explore_keyboard(machine);
+    TMS9928A_interrupt(device->machine);
+    adam_explore_keyboard(device->machine);
 }
 
 static void adam_vdp_interrupt (running_machine *machine, int state)
@@ -458,7 +458,7 @@ static TIMER_CALLBACK(adam_paddle_callback)
 		adam_joy_stat[1] = 1;
 
 	if (adam_joy_stat[0] || adam_joy_stat[1])
-		cpunum_set_input_line (machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 void adam_set_memory_banks(running_machine *machine)

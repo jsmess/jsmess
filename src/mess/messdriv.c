@@ -139,13 +139,13 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/
 
 	/* COLECO */
-//128u4	DRIVER( coleco )	/* ColecoVision (Original BIOS)						*/
-//128u4	DRIVER( colecoa )	/* ColecoVision (Thick Characters)					*/
-//128u4	DRIVER( colecob )	/* Spectravideo SVI-603 Coleco Game Adapter			*/
-//128u4	DRIVER( czz50 )		/* Bit Corporation Chuang Zao Zhe 50				*/
-//128u4	DRIVER( dina )		/* Telegames Dina									*/
-//128u4	DRIVER( prsarcde )	/* Telegames Personal Arcade						*/
-//128u4	DRIVER( adam )		/* Coleco Adam										*/
+	DRIVER( coleco )	/* ColecoVision (Original BIOS)						*/
+	DRIVER( colecoa )	/* ColecoVision (Thick Characters)					*/
+	DRIVER( colecob )	/* Spectravideo SVI-603 Coleco Game Adapter			*/
+	DRIVER( czz50 )		/* Bit Corporation Chuang Zao Zhe 50				*/
+	DRIVER( dina )		/* Telegames Dina									*/
+	DRIVER( prsarcde )	/* Telegames Personal Arcade						*/
+	DRIVER( adam )		/* Coleco Adam										*/
 
 	/* NEC */
 //128u4	DRIVER( pce )		/* PC/Engine NEC 1987-1993							*/
