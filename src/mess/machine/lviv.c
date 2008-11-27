@@ -27,17 +27,17 @@ static UINT8 lviv_ppi_port_outputs[2][3];
 static UINT8 startup_mem_map;
 
 
-static void lviv_update_memory (void)
+static void lviv_update_memory (running_machine *machine)
 {
 	if (lviv_ppi_port_outputs[0][2] & 0x02)
 	{
-		memory_set_bankptr(1, mess_ram);
-		memory_set_bankptr(2, mess_ram + 0x4000);
+		memory_set_bankptr(machine,1, mess_ram);
+		memory_set_bankptr(machine,2, mess_ram + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(1, mess_ram + 0x8000);
-		memory_set_bankptr(2, lviv_video_ram);
+		memory_set_bankptr(machine,1, mess_ram + 0x8000);
+		memory_set_bankptr(machine,2, lviv_video_ram);
 	}
 }
 
@@ -46,9 +46,9 @@ static TIMER_CALLBACK( lviv_reset )
 	mame_schedule_soft_reset(machine);
 }
 
-static OPBASE_HANDLER(lviv_opbaseoverride)
+static DIRECT_UPDATE_HANDLER(lviv_directoverride)
 {
-	if (input_port_read(machine, "RESET") & 0x01)
+	if (input_port_read(space->machine, "RESET") & 0x01)
 		timer_set(ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
 	return address;
 }
@@ -90,7 +90,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory
 	if (lviv_ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(0, data&0x01);
 	cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x01) ? -1.0 : 1.0);
-	lviv_update_memory();
+	lviv_update_memory(device->machine);
 }
 
 static READ8_DEVICE_HANDLER ( lviv_ppi_1_porta_r )
@@ -146,11 +146,11 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
+			return ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
 			break;
 
 		case 1:
-			return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
+			return ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 			break;
 
 		case 2:
@@ -164,30 +164,31 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 
 WRITE8_HANDLER ( lviv_io_w )
 {
+	const address_space *cpuspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (startup_mem_map)
 	{
 		startup_mem_map = 0;
 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK3);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(cpuspace, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(cpuspace, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
+		memory_install_write8_handler(cpuspace, 0x8000, 0xbfff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(cpuspace, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
 
-		memory_set_bankptr(1, mess_ram);
-		memory_set_bankptr(2, mess_ram + 0x4000);
-		memory_set_bankptr(3, mess_ram + 0x8000);
-		memory_set_bankptr(4, memory_region(machine, "main") + 0x010000);
+		memory_set_bankptr(space->machine,1, mess_ram);
+		memory_set_bankptr(space->machine,2, mess_ram + 0x4000);
+		memory_set_bankptr(space->machine,3, mess_ram + 0x8000);
+		memory_set_bankptr(space->machine,4, memory_region(space->machine, "main") + 0x010000);
 	}
 	else
 	{
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3, data);
+			ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3, data);
 			break;
 
 		case 1:
-			ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);
+			ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);
 			break;
 
 		case 2:
@@ -221,21 +222,22 @@ const ppi8255_interface lviv_ppi8255_interface_1 =
 
 MACHINE_RESET( lviv )
 {
-	memory_set_opbase_handler(0, lviv_opbaseoverride);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_set_direct_update_handler(space, lviv_directoverride);
 
 	lviv_video_ram = mess_ram + 0xc000;
 
 	startup_mem_map = 1;
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_UNMAP);
+	memory_install_write8_handler(space, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
 
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x010000);
-	memory_set_bankptr(2, memory_region(machine, "main") + 0x010000);
-	memory_set_bankptr(3, memory_region(machine, "main") + 0x010000);
-	memory_set_bankptr(4, memory_region(machine, "main") + 0x010000);
+	memory_set_bankptr(machine,1, memory_region(machine, "main") + 0x010000);
+	memory_set_bankptr(machine,2, memory_region(machine, "main") + 0x010000);
+	memory_set_bankptr(machine,3, memory_region(machine, "main") + 0x010000);
+	memory_set_bankptr(machine,4, memory_region(machine, "main") + 0x010000);
 
 	/*timer_pulse(TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
 
@@ -258,29 +260,29 @@ Lviv snapshot files (SAV)
 1411D - 1412A:  ??? (something additional)
 *******************************************************************************/
 
-static void lviv_setup_snapshot (UINT8 * data)
+static void lviv_setup_snapshot (running_machine *machine,UINT8 * data)
 {
 	unsigned char lo,hi;
 
 	/* Set registers */
 	lo = data[0x14112] & 0x0ff;
 	hi = data[0x14111] & 0x0ff;
-	cpunum_set_reg(0, I8080_BC, (hi << 8) | lo);
+	cpu_set_reg(machine->cpu[0], I8080_BC, (hi << 8) | lo);
 	lo = data[0x14114] & 0x0ff;
 	hi = data[0x14113] & 0x0ff;
-	cpunum_set_reg(0, I8080_DE, (hi << 8) | lo);
+	cpu_set_reg(machine->cpu[0], I8080_DE, (hi << 8) | lo);
 	lo = data[0x14116] & 0x0ff;
 	hi = data[0x14115] & 0x0ff;
-	cpunum_set_reg(0, I8080_HL, (hi << 8) | lo);
+	cpu_set_reg(machine->cpu[0], I8080_HL, (hi << 8) | lo);
 	lo = data[0x14118] & 0x0ff;
 	hi = data[0x14117] & 0x0ff;
-	cpunum_set_reg(0, I8080_AF, (hi << 8) | lo);
+	cpu_set_reg(machine->cpu[0], I8080_AF, (hi << 8) | lo);
 	lo = data[0x14119] & 0x0ff;
 	hi = data[0x1411a] & 0x0ff;
-	cpunum_set_reg(0, I8080_SP, (hi << 8) | lo);
+	cpu_set_reg(machine->cpu[0], I8080_SP, (hi << 8) | lo);
 	lo = data[0x1411b] & 0x0ff;
 	hi = data[0x1411c] & 0x0ff;
-	cpunum_set_reg(0, I8080_PC, (hi << 8) | lo);
+	cpu_set_reg(machine->cpu[0], I8080_PC, (hi << 8) | lo);
 
 	/* Memory dump */
 	memcpy (mess_ram, data+0x0011, 0xc000);
@@ -291,17 +293,17 @@ static void lviv_setup_snapshot (UINT8 * data)
 	lviv_ppi_port_outputs[0][1] = data[0x14011+0xc1];
 	lviv_update_palette (lviv_ppi_port_outputs[0][1]&0x7f);
 	lviv_ppi_port_outputs[0][2] = data[0x14011+0xc2];
-	lviv_update_memory();
+	lviv_update_memory(machine);
 }
 
-static void dump_registers(void)
+static void dump_registers(running_machine *machine)
 {
-	logerror("PC   = %04x\n", (unsigned) cpunum_get_reg(0, I8080_PC));
-	logerror("SP   = %04x\n", (unsigned) cpunum_get_reg(0, I8080_SP));
-	logerror("AF   = %04x\n", (unsigned) cpunum_get_reg(0, I8080_AF));
-	logerror("BC   = %04x\n", (unsigned) cpunum_get_reg(0, I8080_BC));
-	logerror("DE   = %04x\n", (unsigned) cpunum_get_reg(0, I8080_DE));
-	logerror("HL   = %04x\n", (unsigned) cpunum_get_reg(0, I8080_HL));
+	logerror("PC   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8080_PC));
+	logerror("SP   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8080_SP));
+	logerror("AF   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8080_AF));
+	logerror("BC   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8080_BC));
+	logerror("DE   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8080_DE));
+	logerror("HL   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8080_HL));
 }
 
 static int lviv_verify_snapshot (UINT8 * data, UINT32 size)
@@ -343,9 +345,9 @@ SNAPSHOT_LOAD( lviv )
 		return INIT_FAIL;
 	}
 
-	lviv_setup_snapshot (lviv_snapshot_data);
+	lviv_setup_snapshot (image->machine,lviv_snapshot_data);
 
-	dump_registers();
+	dump_registers(image->machine);
 
 	free(lviv_snapshot_data);
 

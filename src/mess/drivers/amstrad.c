@@ -1579,7 +1579,7 @@ static DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 		  multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
 
 		 /* clear op base override */
-				memory_set_direct_update_handler(0,0);
+				memory_set_direct_update_handler(space,0);
 		}
 
 		return pc;
@@ -1645,7 +1645,7 @@ void multiface_stop(running_machine *machine)
 		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 
 		/* initialise 0065 override to monitor calls to 0065 */
-		memory_set_direct_update_handler(0,amstrad_multiface_directoverride);
+		memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),amstrad_multiface_directoverride);
 	}
 
 }

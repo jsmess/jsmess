@@ -821,7 +821,7 @@ XL/XE 16kB OS roms
 	DRIVER( galaxyp )
 
 	/* Lviv/L'vov */
-//128u4	DRIVER( lviv )		/* Lviv/L'vov										*/
+	DRIVER( lviv )		/* Lviv/L'vov										*/
 
 	/* Tesla */
 //128u4	DRIVER( pmd851 )	/* PMD-85.1											*/
