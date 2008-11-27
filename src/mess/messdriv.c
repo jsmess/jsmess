@@ -939,12 +939,12 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
-//128u4	DRIVER( super80 )
-//128u4	DRIVER( super80d )
-//128u4	DRIVER( super80e )
-//128u4	DRIVER( super80m )
-//128u4	DRIVER( super80r )
-//128u4	DRIVER( super80v )
+	DRIVER( super80 )
+	DRIVER( super80d )
+	DRIVER( super80e )
+	DRIVER( super80m )
+	DRIVER( super80r )
+	DRIVER( super80v )
 
 	/* Galeb */
 	DRIVER( galeb )

@@ -10,6 +10,7 @@
 #include "sound/speaker.h"
 #include "machine/centroni.h"
 #include "devices/printer.h"
+#include "deprecat.h"
 
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
@@ -152,7 +153,7 @@ static WRITE8_HANDLER( super80v_high_w )
 			pcgram[0x800+offset] = data;
 
 			/* decode character graphics again */
-			decodechar(machine->gfx[0], chr, pcgram);
+			decodechar(space->machine->gfx[0], chr, pcgram);
 		}
 	}
 }
@@ -239,7 +240,7 @@ static VIDEO_UPDATE( super80 )
 		for (x=0; x<32; x++)
 		{
 			if (screen_on)
-				code = memory_read_byte(space, vidpg + x + (y<<5));
+				code = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));
 
 			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10,
 				cliprect, TRANSPARENCY_NONE, 0);
@@ -274,9 +275,9 @@ static VIDEO_UPDATE( super80m )
 		{
 			if (screen_on)
 			{
-				code = memory_read_byte(space, vidpg + x + (y<<5));		/* get character to display */
+				code = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));		/* get character to display */
 
-				if (!(options & 0x40)) col = memory_read_byte(space, 0xfe00 + x + (y<<5));	/* byte of colour to display */
+				if (!(options & 0x40)) col = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xfe00 + x + (y<<5));	/* byte of colour to display */
 			}
 
 			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,
@@ -348,7 +349,7 @@ static UINT8 keylatch;
 
 static Z80PIO_ON_INT_CHANGED( pio_interrupt )
 {
-	cpunum_set_input_line( device->machine, 0, 0, state ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line( device->machine->cpu[0], 0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
@@ -494,7 +495,7 @@ static READ8_HANDLER( super80_dc_r )
 	/* bit 7 = printer busy
 	0 = printer is not busy */
 
-	if (printer_is_ready(printer_device(machine))==0 )
+	if (printer_is_ready(printer_device(space->machine))==0 )
 		data |= 0x80;
 
 	return data;
@@ -502,7 +503,7 @@ static READ8_HANDLER( super80_dc_r )
 
 static READ8_HANDLER( super80_f2_r )
 {
-	UINT8 data = input_port_read(machine, "DSW") & 0xf0;	// dip switches on pcb
+	UINT8 data = input_port_read(space->machine, "DSW") & 0xf0;	// dip switches on pcb
 	data |= cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
 	data |= 0x08;				// bit 3 - not used
 	return data;
@@ -516,7 +517,7 @@ static WRITE8_HANDLER( super80v_10_w )
 static WRITE8_HANDLER( super80v_11_w )
 {
 	if (mc6845_ind < 16) mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
-	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9)) mc6845_screen_configure(machine); /* adjust screen size */
+	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9)) mc6845_screen_configure(space->machine); /* adjust screen size */
 	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape */
 }
 
@@ -538,8 +539,8 @@ static WRITE8_HANDLER( super80_f0_w )
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80_mhz = (data & 4) ? 1 : 2;				/* bit 2 - video on/off */
-	if (bits & 2) cassette_motor( machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	if (bits & 1) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -550,8 +551,8 @@ static WRITE8_HANDLER( super80r_f0_w )
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
-	if (bits & 2) cassette_motor( machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	if (bits & 1) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -564,8 +565,8 @@ static WRITE8_HANDLER( super80v_f0_w )
 	super80v_rom_pcg = data & 0x10;					/* bit 4 - bankswitch gfx rom or pcg */
 	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80v_vid_col = data & 4;					/* bit 2 - bankswitch video or colour ram */
-	if (bits & 2) cassette_motor( machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	if (bits & 1) cassette_output(cassette_device_image(machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }

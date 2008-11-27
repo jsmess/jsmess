@@ -401,6 +401,7 @@ DRVLIBS = \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/special.a \
+	$(MESSOBJ)/super80.a \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
@@ -470,7 +471,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/sony.a \
 #	$(MESSOBJ)/sord.a \
 #	$(MESSOBJ)/ssystem3.a \
-#	$(MESSOBJ)/super80.a \
 #	$(MESSOBJ)/svi.a \
 #	$(MESSOBJ)/svision.a \
 #	$(MESSOBJ)/synertec.a \
