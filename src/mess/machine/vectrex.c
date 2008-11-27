@@ -13,8 +13,13 @@
 #define VC_BLUE     MAKE_RGB(0x00, 0x00, 0xff)
 #define VC_DARKRED  MAKE_RGB(0x80, 0x00, 0x00)
 
-#define PORTB 0
-#define PORTA 1
+#define DAMPC (-0.2)
+#define MMI (5.0)
+
+enum {
+	PORTB = 0,
+	PORTA
+};
 
 
 /*********************************************************************
@@ -56,7 +61,8 @@ static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 static const double *vectrex_imager_angles = unknown_game_angles;
 static unsigned char vectrex_imager_pinlevel;
 
-static int vectrex_verify_cart (char *data)
+
+static int vectrex_verify_cart(char *data)
 {
 	/* Verify the file is accepted by the Vectrex bios */
 	if (!memcmp(data,"g GCE", 5))
@@ -72,7 +78,7 @@ static int vectrex_verify_cart (char *data)
 
 *********************************************************************/
 
-DEVICE_IMAGE_LOAD( vectrex_cart )
+DEVICE_IMAGE_LOAD(vectrex_cart)
 {
 	UINT8 *mem = memory_region(image->machine, "main");
 	image_fread(image, mem, 0x8000);
@@ -94,17 +100,17 @@ DEVICE_IMAGE_LOAD( vectrex_cart )
 	/* slightly prettier than having to hardcode CRCs */
 
 	/* handle 3D Narrow Escape but skip the 2-d hack of it from Fred Taft */
-	if (!memcmp(mem+0x11,"NARROW",6) && (((char*)mem)[0x39] == 0x0c))
+	if (!memcmp(mem + 0x11,"NARROW",6) && (((char*)mem)[0x39] == 0x0c))
 	{
 		vectrex_imager_angles = narrow_escape_angles;
 	}
 
-	if (!memcmp(mem+0x11,"CRAZY COASTER",13))
+	if (!memcmp(mem + 0x11,"CRAZY COASTER", 13))
 	{
 		vectrex_imager_angles = crazy_coaster_angles;
 	}
 
-	if (!memcmp(mem+0x11,"3D MINE STORM",13))
+	if (!memcmp(mem + 0x11,"3D MINE STORM", 13))
 	{
 		vectrex_imager_angles = minestorm_3d_angles;
 
@@ -137,60 +143,60 @@ void vectrex_configuration(running_machine *machine)
 
 		vector_add_point_function = cport & 0x02 ? vectrex_add_point_stereo: vectrex_add_point;
 
-		switch ((cport>>2) & 0x07)
+		switch ((cport >> 2) & 0x07)
 		{
 		case 0x00:
-			imager_colors[0]=imager_colors[1]=imager_colors[2]=RGB_BLACK;
+			imager_colors[0] = imager_colors[1] = imager_colors[2] = RGB_BLACK;
 			break;
 		case 0x01:
-			imager_colors[0]=imager_colors[1]=imager_colors[2]=VC_DARKRED;
+			imager_colors[0] = imager_colors[1] = imager_colors[2] = VC_DARKRED;
 			break;
 		case 0x02:
-			imager_colors[0]=imager_colors[1]=imager_colors[2]=VC_GREEN;
+			imager_colors[0] = imager_colors[1] = imager_colors[2] = VC_GREEN;
 			break;
 		case 0x03:
-			imager_colors[0]=imager_colors[1]=imager_colors[2]=VC_BLUE;
+			imager_colors[0] = imager_colors[1] = imager_colors[2] = VC_BLUE;
 			break;
 		case 0x04:
 			/* mine3 has a different color sequence */
 			if (vectrex_imager_angles == minestorm_3d_angles)
 			{
-				imager_colors[0]=VC_GREEN;
-				imager_colors[1]=VC_RED;
+				imager_colors[0] = VC_GREEN;
+				imager_colors[1] = VC_RED;
 			}
 			else
 			{
-				imager_colors[0]=VC_RED;
-				imager_colors[1]=VC_GREEN;
+				imager_colors[0] = VC_RED;
+				imager_colors[1] = VC_GREEN;
 			}
 			imager_colors[2]=VC_BLUE;
 			break;
 		}
 
-		switch ((cport>>5) & 0x07)
+		switch ((cport >> 5) & 0x07)
 		{
 		case 0x00:
-			imager_colors[3]=imager_colors[4]=imager_colors[5]=RGB_BLACK;
+			imager_colors[3] = imager_colors[4] = imager_colors[5] = RGB_BLACK;
 			break;
 		case 0x01:
-			imager_colors[3]=imager_colors[4]=imager_colors[5]=VC_DARKRED;
+			imager_colors[3] = imager_colors[4] = imager_colors[5] = VC_DARKRED;
 			break;
 		case 0x02:
-			imager_colors[3]=imager_colors[4]=imager_colors[5]=VC_GREEN;
+			imager_colors[3] = imager_colors[4] = imager_colors[5] = VC_GREEN;
 			break;
 		case 0x03:
-			imager_colors[3]=imager_colors[4]=imager_colors[5]=VC_BLUE;
+			imager_colors[3] = imager_colors[4] = imager_colors[5] = VC_BLUE;
 			break;
 		case 0x04:
 			if (vectrex_imager_angles == minestorm_3d_angles)
 			{
-				imager_colors[3]=VC_GREEN;
-				imager_colors[4]=VC_RED;
+				imager_colors[3] = VC_GREEN;
+				imager_colors[4] = VC_RED;
 			}
 			else
 			{
-				imager_colors[3]=VC_RED;
-				imager_colors[4]=VC_GREEN;
+				imager_colors[3] = VC_RED;
+				imager_colors[4] = VC_GREEN;
 			}
 			imager_colors[5]=VC_BLUE;
 			break;
@@ -200,10 +206,11 @@ void vectrex_configuration(running_machine *machine)
 	{
 		vector_add_point_function = vectrex_add_point;
 		vectrex_beam_color = RGB_WHITE;
-		imager_colors[0]=imager_colors[1]=imager_colors[2]=imager_colors[3]=imager_colors[4]=imager_colors[5]=RGB_WHITE;
+		imager_colors[0] = imager_colors[1] = imager_colors[2] = imager_colors[3] = imager_colors[4] = imager_colors[5] = RGB_WHITE;
 	}
 	vectrex_lightpen_port = input_port_read(machine, "LPENCONF") & 0x03;
 }
+
 
 /*********************************************************************
 
@@ -211,17 +218,18 @@ void vectrex_configuration(running_machine *machine)
 
 *********************************************************************/
 
-void v_via_irq (running_machine *machine, int level)
+void v_via_irq(running_machine *machine, int level)
 {
 	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, level);
 }
 
-READ8_HANDLER( v_via_pb_r )
+
+READ8_HANDLER(v_via_pb_r)
 {
 	int pot;
 	static const char *ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
-	pot = input_port_read(machine, ctrlnames[(vectrex_via_out[PORTB] & 0x6) >> 1]) - 0x80; 
+	pot = input_port_read(space->machine, ctrlnames[(vectrex_via_out[PORTB] & 0x6) >> 1]) - 0x80; 
 	
 	if (pot > (signed char)vectrex_via_out[PORTA])
 		vectrex_via_out[PORTB] |= 0x20;
@@ -231,20 +239,22 @@ READ8_HANDLER( v_via_pb_r )
 	return vectrex_via_out[PORTB];
 }
 
-READ8_HANDLER( v_via_pa_r )
+
+READ8_HANDLER(v_via_pa_r)
 {
 	if ((!(vectrex_via_out[PORTB] & 0x10)) && (vectrex_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		vectrex_via_out[PORTA] = ay8910_read_port_0_r(machine, 0)
+		vectrex_via_out[PORTA] = ay8910_read_port_0_r(space, 0)
 			& ~(vectrex_imager_pinlevel & 0x80);
 	}
 	return vectrex_via_out[PORTA];
 }
 
-READ8_HANDLER( s1_via_pb_r )
+
+READ8_HANDLER(s1_via_pb_r)
 {
-	return (vectrex_via_out[PORTB] & ~0x40) | (input_port_read(machine, "COIN") & 0x40);
+	return (vectrex_via_out[PORTB] & ~0x40) | (input_port_read(space->machine, "COIN") & 0x40);
 }
 
 
@@ -259,11 +269,13 @@ static TIMER_CALLBACK(vectrex_imager_change_color)
 	vectrex_beam_color = param;
 }
 
+
 static TIMER_CALLBACK(update_level)
 {
 	if (ptr)
 		* (UINT8 *) ptr = param;
 }
+
 
 TIMER_CALLBACK(vectrex_imager_eye)
 {
@@ -291,10 +303,8 @@ TIMER_CALLBACK(vectrex_imager_eye)
 	}
 }
 
-#define DAMPC (-0.2)
-#define MMI (5.0)
 
-WRITE8_HANDLER ( vectrex_psg_port_w )
+WRITE8_HANDLER(vectrex_psg_port_w)
 {
 	static int state;
 	static double sl, pwl;
@@ -337,7 +347,8 @@ WRITE8_HANDLER ( vectrex_psg_port_w )
 	}
 }
 
-DRIVER_INIT( vectrex )
+
+DRIVER_INIT(vectrex)
 {
 	/*
 	 * Uninitialized RAM needs to return 0xff. Otherwise the mines in
