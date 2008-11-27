@@ -813,8 +813,8 @@ XL/XE 16kB OS roms
 //	DRIVER( aquariu2 )	/* 1984 Aquarius II									*/
 
 	/*EXIDY INC */
-//128u4	DRIVER( exidy )		/* Sorcerer											*/
-//128u4	DRIVER( exidyd )	/* Sorcerer (diskless)								*/
+	DRIVER( exidy )		/* Sorcerer											*/
+	DRIVER( exidyd )	/* Sorcerer (cassette only)								*/
 
 	/* GALAKSIJA */
 	DRIVER( galaxy )

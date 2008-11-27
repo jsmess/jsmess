@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "includes/exidy.h"
+#include "deprecat.h"
 
 
 VIDEO_UPDATE( exidy )
@@ -27,10 +28,10 @@ VIDEO_UPDATE( exidy )
 			int ch;
 
 			/* get char from z80 address space */
-			ch = memory_read_byte(space, 0x0f080 + (y<<6) + x) & 0x0ff;
+			ch = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x0f080 + (y<<6) + x) & 0x0ff;
 
 			/* prom at 0x0f800, user chars from 0x0fc00 */
-			char_addr = 0x0f800 + (ch<<3);
+			char_addr = 0x0f800 | (ch<<3);
 
 			for (cheight=0; cheight<8; cheight++)
 			{
@@ -39,10 +40,10 @@ VIDEO_UPDATE( exidy )
 
 				/* read byte of graphics data from z80 memory */
 				/* either prom or ram */
-				byte = memory_read_byte(space, char_addr+cheight);
+				byte = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), char_addr|cheight);
 
 				px = (x<<3);
-				py = (y<<3)+cheight;
+				py = (y<<3)|cheight;
 				for (cwidth=0; cwidth<8; cwidth++)
 				{
 					int pen;

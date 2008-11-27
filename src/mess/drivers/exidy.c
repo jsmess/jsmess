@@ -148,6 +148,7 @@ So far, it has been tested to work at 300 baud.
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
 #include "machine/ay31015.h"
+#include "deprecat.h"
 
 
 static const device_config *exidy_ay31015;
@@ -358,7 +359,7 @@ static MACHINE_RESET( exidyd )
 	centronics_config(0, exidy_cent_config);
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	exidy_fe_port_w(machine, 0, 0);
+	exidy_fe_port_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
 
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
 	memory_set_bank(machine, 1, 1);
@@ -376,13 +377,13 @@ static  READ8_HANDLER ( exidy_wd179x_r )
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd17xx_status_r(machine, offset);
+		return wd17xx_status_r(space, offset);
 	case 1:
-		return wd17xx_track_r(machine, offset);
+		return wd17xx_track_r(space, offset);
 	case 2:
-		return wd17xx_sector_r(machine, offset);
+		return wd17xx_sector_r(space, offset);
 	case 3:
-		return wd17xx_data_r(machine, offset);
+		return wd17xx_data_r(space, offset);
 	default:
 		return 0xff;
 	}
@@ -393,16 +394,16 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd17xx_command_w(machine, offset, data);
+		wd17xx_command_w(space, offset, data);
 		return;
 	case 1:
-		wd17xx_track_w(machine, offset, data);
+		wd17xx_track_w(space, offset, data);
 		return;
 	case 2:
-		wd17xx_sector_w(machine, offset, data);
+		wd17xx_sector_w(space, offset, data);
 		return;
 	case 3:
-		wd17xx_data_w(machine, offset, data);
+		wd17xx_data_w(space, offset, data);
 		return;
 	default:
 		break;
@@ -444,31 +445,31 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 
 	/* bits 4..5 */
 	/* does user want to hear the sound? */
-	if ((input_port_read(machine, "CONFIG") & 8) && (data & EXIDY_CASSETTE_MOTOR_MASK))
+	if ((input_port_read(space->machine, "CONFIG") & 8) && (data & EXIDY_CASSETTE_MOTOR_MASK))
 	{
 		if (data & 0x20)
 		{
-			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 		else
 		{
-			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 	}
 	else
 	{
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 	}
 
 	/* cassette 1 motor */
-	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ),
+	cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette 2 motor */
-	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ),
+	cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ),
 		(data & 0x20) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if ((data & EXIDY_CASSETTE_MOTOR_MASK) && (~data & 0x80))
@@ -502,7 +503,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 static WRITE8_HANDLER(exidy_ff_port_w)
 {
 	/* reading the config switch */
-	switch (input_port_read(machine, "CONFIG") & 0x06)
+	switch (input_port_read(space->machine, "CONFIG") & 0x06)
 	{
 		case 0: /* speaker */
 			speaker_level_w(0, (data) ? 1 : 0);
@@ -561,10 +562,10 @@ static READ8_HANDLER(exidy_fe_port_r)
 										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15" };
 
 	/* bit 5 - vsync (inverted) */
-	data |= (((~input_port_read(machine, "VS")) & 0x01)<<5);
+	data |= (((~input_port_read(space->machine, "VS")) & 0x01)<<5);
 
 	/* bits 4..0 - keyboard data */
-	data |= (input_port_read(machine, keynames[exidy_keyboard_line]) & 0x1f);
+	data |= (input_port_read(space->machine, keynames[exidy_keyboard_line]) & 0x1f);
 
 	return data;
 }
@@ -586,7 +587,7 @@ static READ8_HANDLER(exidy_ff_port_r)
 	/* bit 7 = printer busy
 	0 = printer is not busy */
 
-	if (printer_is_ready(printer_device(machine))==0 )
+	if (printer_is_ready(printer_device(space->machine))==0 )
 		data |= 0x80;
 
 	return data;
@@ -872,7 +873,7 @@ ROM_END
 
 static Z80BIN_EXECUTE( exidy )
 {
-	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (memory_read_byte(space, 0xdffa) != 0xc3))
+	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xdffa) != 0xc3))
 		return;					/* can't run a program if the cartridge isn't in */
 
 	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
@@ -892,24 +893,24 @@ static Z80BIN_EXECUTE( exidy )
 			0xc3, 0x89, 0xc6,};	// JP C689	;run program
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			memory_write_byte(space, 0xf01f + i, data[i]);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xf01f + i, data[i]);
 
 		if (!autorun)
-			program_write_word_16le(0xf028,0xc3dd);
+			memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xf028,0xc3dd);
 
 		/* tell BASIC where program ends */
-		memory_write_byte(space, 0x1b7, (end_address >> 0) & 0xff);
-		memory_write_byte(space, 0x1b8, (end_address >> 8) & 0xff);
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x1b7, (end_address >> 0) & 0xff);
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x1b8, (end_address >> 8) & 0xff);
 
 		if ((execute_address != 0xc858) && autorun)
-			program_write_word_16le(0xf028, execute_address);
+			memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xf028, execute_address);
 
-		cpunum_set_reg(0, REG_PC, 0xf01f);
+		cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpunum_set_reg(0, REG_PC, execute_address);
+			cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, execute_address);
 	}
 }
 
