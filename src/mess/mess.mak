@@ -386,6 +386,7 @@ DRVLIBS = \
 	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/ep128.a \
 	$(MESSOBJ)/exidy.a \
+	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/galaxy.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/intv.a \
@@ -443,7 +444,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/epson.a \
 #	$(MESSOBJ)/exeltel.a \
 #	$(MESSOBJ)/fairch.a \
-#	$(MESSOBJ)/gce.a \
 #	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/gmaster.a \
 #	$(MESSOBJ)/grundy.a \
