@@ -332,18 +332,19 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
 }
 
 
-static const read8_machine_func nc_bankhandler_r[]={
+static const read8_space_func nc_bankhandler_r[]={
 SMH_BANK1, SMH_BANK2, SMH_BANK3, SMH_BANK4};
 
-static const write8_machine_func nc_bankhandler_w[]={
+static const write8_space_func nc_bankhandler_w[]={
 SMH_BANK5, SMH_BANK6, SMH_BANK7, SMH_BANK8};
 
 static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int mem_type;
 	int mem_bank;
-	read8_machine_func read_handler;
-	write8_machine_func write_handler = NULL;
+	read8_space_func read_handler;
+	write8_space_func write_handler = NULL;
 
 	mem_type = (nc_memory_config[bank]>>6) & 0x03;
 	mem_bank = nc_memory_config[bank] & 0x03f;
@@ -362,7 +363,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			addr = (memory_region(machine, "main")+0x010000) + (mem_bank<<14);
 
-			memory_set_bankptr(bank+1, addr);
+			memory_set_bankptr(machine, bank+1, addr);
 
 			write_handler = SMH_NOP;
 			LOG(("BANK %d: ROM %d\n",bank,mem_bank));
@@ -378,8 +379,8 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			addr = mess_ram + (mem_bank<<14);
 
-			memory_set_bankptr(bank+1, addr);
-			memory_set_bankptr(bank+5, addr);
+			memory_set_bankptr(machine, bank+1, addr);
+			memory_set_bankptr(machine, bank+5, addr);
 
 			write_handler = nc_bankhandler_w[bank];
 			LOG(("BANK %d: RAM\n",bank));
@@ -397,13 +398,13 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 				mem_bank = mem_bank & nc_membank_card_ram_mask;
 				addr = nc_card_ram + (mem_bank<<14);
 
-				memory_set_bankptr(bank+1, addr);
+				memory_set_bankptr(machine, bank+1, addr);
 
 				/* write enabled? */
 				if (input_port_read(machine, "EXTRA") & 0x02)
 				{
 					/* yes */
-					memory_set_bankptr(bank+5, addr);
+					memory_set_bankptr(machine, bank+5, addr);
 
 					write_handler = nc_bankhandler_w[bank];
 				}
@@ -425,12 +426,12 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 		break;
 	}
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_read8_handler(space,
 		(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, read_handler);
 
 	if (write_handler)
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_write8_handler(space,
 			(bank * 0x4000), (bank * 0x4000) + 0x3fff, 0, 0, write_handler);
 	}
 }
@@ -623,7 +624,7 @@ static WRITE8_HANDLER(nc_memory_management_w)
 	LOG(("Memory management W: %02x %02x\n",offset,data));
         nc_memory_config[offset] = data;
 
-        nc_refresh_memory_config(machine);
+        nc_refresh_memory_config(space->machine);
 }
 
 static WRITE8_HANDLER(nc_irq_mask_w)
@@ -634,7 +635,7 @@ static WRITE8_HANDLER(nc_irq_mask_w)
 	/* writing mask clears ints that are to be masked? */
 	nc_irq_mask = data;
 
-	nc_update_interrupts(machine);
+	nc_update_interrupts(space->machine);
 }
 
 static WRITE8_HANDLER(nc_irq_status_w)
@@ -651,7 +652,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 			/* set timer to occur again */
 			timer_reset(nc_keyboard_timer, ATTOTIME_IN_MSEC(10));
 
-			nc_update_interrupts(machine);
+			nc_update_interrupts(space->machine);
 		}
 	}
 
@@ -671,7 +672,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 #endif
         nc_irq_status &=~data;
 
-        nc_update_interrupts(machine);
+        nc_update_interrupts(space->machine);
 }
 
 static READ8_HANDLER(nc_irq_status_r)
@@ -693,10 +694,10 @@ static READ8_HANDLER(nc_key_data_in_r)
 		/* set timer to occur again */
 		timer_reset(nc_keyboard_timer, ATTOTIME_IN_MSEC(10));
 
-		nc_update_interrupts(machine);
+		nc_update_interrupts(space->machine);
 	}
 
-	return input_port_read(machine, keynames[offset]);
+	return input_port_read(space->machine, keynames[offset]);
 }
 
 
@@ -853,7 +854,7 @@ static WRITE8_HANDLER(nc100_display_memory_start_w)
 
 static WRITE8_HANDLER(nc100_uart_control_w)
 {
-	nc_uart_control_w(machine, offset,data);
+	nc_uart_control_w(space, offset,data);
 
 //  /* is this correct?? */
 //  if (data & (1<<3))
@@ -1022,7 +1023,7 @@ static  READ8_HANDLER(nc100_card_battery_status_r)
 		nc_card_battery_status &=~(1<<7);
 	}
 
-	if (input_port_read(machine, "EXTRA") & 0x02)
+	if (input_port_read(space->machine, "EXTRA") & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);
@@ -1442,7 +1443,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 		nc_card_battery_status&=~(1<<7);
 	}
 
-	if (input_port_read(machine, "EXTRA") & 0x02)
+	if (input_port_read(space->machine, "EXTRA") & 0x02)
 	{
 		/* card write enable */
 		nc_card_battery_status &=~(1<<6);
@@ -1486,17 +1487,17 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 	reset_fdc = (nc_uart_control^data) & (1<<5);
 
-	nc_uart_control_w(machine, offset,data);
+	nc_uart_control_w(space, offset,data);
 
 	if (data & (1<<3))
 	{
 		nc200_uart_interrupt_irq &=~3;
 
-		nc200_refresh_uart_interrupt(machine);
+		nc200_refresh_uart_interrupt(space->machine);
 	}
 
 	/* bit 5 is used in disk interface */
-	LOG_DEBUG(("bit 5: PC: %04x %02x\n",activecpu_get_pc(), data & (1<<5)));
+	LOG_DEBUG(("bit 5: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]), data & (1<<5)));
 }
 
 
@@ -1514,12 +1515,12 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
-	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",activecpu_get_pc(),data));
+	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),data));
 #if 0
 	floppy_drive_set_motor_state(0,1);
 	floppy_drive_set_ready_state(0,1,1);
 #endif
-	nec765_set_tc_state(machine, (data & 0x01));
+	nec765_set_tc_state(space->machine, (data & 0x01));
 }
 
 /* bit 2: backlight: 1=off, 0=on */
@@ -1527,7 +1528,7 @@ static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 /* bit 0 seems to be the same as nc100 */
 static WRITE8_HANDLER(nc200_poweroff_control_w)
 {
-	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", activecpu_get_pc(),data));
+	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),data));
 
 	nc200_video_set_backlight(((data^(1<<2))>>2) & 0x01);
 }

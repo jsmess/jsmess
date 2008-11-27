@@ -19,7 +19,7 @@ READ8_HANDLER ( pc_JOY_r )
 	UINT8 data = 0;
 	int delta;
 	attotime new_time = timer_get_time();
-	const input_port_config *joystick_port = input_port_by_tag(machine->portconfig, "pc_joy");
+	const input_port_config *joystick_port = input_port_by_tag(space->machine->portconfig, "pc_joy");
 
 	if (joystick_port != NULL)
 	{
@@ -33,10 +33,10 @@ READ8_HANDLER ( pc_JOY_r )
 		else
 		{
 			delta = attotime_mul(attotime_sub(new_time, JOY_time), 256 * 1000).seconds;
-			if (input_port_read(machine, "pc_joy_1") < delta) data &= ~0x01;
-			if (input_port_read(machine, "pc_joy_2") < delta) data &= ~0x02;
-			if (input_port_read(machine, "pc_joy_3") < delta) data &= ~0x04;
-			if (input_port_read(machine, "pc_joy_4") < delta) data &= ~0x08;
+			if (input_port_read(space->machine, "pc_joy_1") < delta) data &= ~0x01;
+			if (input_port_read(space->machine, "pc_joy_2") < delta) data &= ~0x02;
+			if (input_port_read(space->machine, "pc_joy_3") < delta) data &= ~0x04;
+			if (input_port_read(space->machine, "pc_joy_4") < delta) data &= ~0x08;
 		}
 	}
 	return data;
@@ -51,8 +51,8 @@ WRITE8_HANDLER ( pc_JOY_w )
 
 
 
-READ16_HANDLER ( pc16le_JOY_r ) { return read16le_with_read8_handler(pc_JOY_r, machine, offset, mem_mask); }
-WRITE16_HANDLER ( pc16le_JOY_w ) { write16le_with_write8_handler(pc_JOY_w, machine, offset, data, mem_mask); }
+READ16_HANDLER ( pc16le_JOY_r ) { return read16le_with_read8_handler(pc_JOY_r, space, offset, mem_mask); }
+WRITE16_HANDLER ( pc16le_JOY_w ) { write16le_with_write8_handler(pc_JOY_w, space, offset, data, mem_mask); }
 
 
 

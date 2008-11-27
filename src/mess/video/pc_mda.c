@@ -94,15 +94,16 @@ MACHINE_DRIVER_END
 VIDEO_START( pc_mda )
 {
 	int buswidth;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0x07000, SMH_BANK11 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0x07000, pc_video_videoram_w );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_MDA_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_MDA_w );
+			memory_install_read8_handler(space, 0xb0000, 0xb0fff, 0, 0x07000, SMH_BANK11 );
+			memory_install_write8_handler(space, 0xb0000, 0xb0fff, 0, 0x07000, pc_video_videoram_w );
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_MDA_r );
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_MDA_w );
 			break;
 
 		default:
@@ -116,7 +117,7 @@ VIDEO_START( pc_mda )
 
 	videoram_size = 0x1000;	/* This is actually 0x1000 in reality */
 	videoram = auto_malloc(videoram_size);
-	memory_set_bankptr(11, videoram);
+	memory_set_bankptr(machine,11, videoram);
 }
 
 
@@ -355,7 +356,7 @@ static int pc_mda_status_r(void)
  *************************************************************************/
 WRITE8_HANDLER ( pc_MDA_w )
 {
-	device_config   *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, MDA_MC6845_NAME);
+	device_config   *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, MDA_MC6845_NAME);
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -372,7 +373,7 @@ WRITE8_HANDLER ( pc_MDA_w )
 
  READ8_HANDLER ( pc_MDA_r )
 {
-	device_config   *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, MDA_MC6845_NAME);
+	device_config   *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, MDA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -443,15 +444,16 @@ MACHINE_DRIVER_END
 static VIDEO_START( pc_hercules )
 {
 	int buswidth;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 	case 8:
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, SMH_BANK11 );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc_video_videoram_w );
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_hercules_r );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_hercules_w );
+		memory_install_read8_handler(space, 0xb0000, 0xbffff, 0, 0, SMH_BANK11 );
+		memory_install_write8_handler(space, 0xb0000, 0xbffff, 0, 0, pc_video_videoram_w );
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_hercules_r );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_hercules_w );
 		break;
 
 	default:
@@ -465,7 +467,7 @@ static VIDEO_START( pc_hercules )
 
 	videoram_size = 0x10000;
 	videoram = auto_malloc(videoram_size);
-	memory_set_bankptr(11, videoram);
+	memory_set_bankptr(machine,11, videoram);
 }
 
 
@@ -556,7 +558,7 @@ static void hercules_config_w(int data)
 
 static WRITE8_HANDLER ( pc_hercules_w )
 {
-	device_config   *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
+	device_config   *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
 
 	switch( offset )
 	{
@@ -567,7 +569,7 @@ static WRITE8_HANDLER ( pc_hercules_w )
 		mc6845_register_w( devconf, offset, data );
 		break;
 	case 8:
-		hercules_mode_control_w(machine, data);
+		hercules_mode_control_w(space->machine, data);
 		break;
 	case 15:
 		hercules_config_w(data);
@@ -596,7 +598,7 @@ static int pc_hercules_status_r(void)
 
 static READ8_HANDLER ( pc_hercules_r )
 {
-	device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
+	device_config	*devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, HERCULES_MC6845_NAME);
 	int data = 0xff;
 
 	switch( offset )

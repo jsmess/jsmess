@@ -32,7 +32,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 	if (val != ti->cur_val)
 	{
 		ti->cur_val = val;
-		cpunum_set_clockscale(machine, ti->cpunum, val ? ti->on_speed : ti->off_speed);
+		cpu_set_clockscale(machine->cpu[ti->cpunum], val ? ti->on_speed : ti->off_speed);
 	}
 }
 

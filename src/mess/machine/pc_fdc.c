@@ -170,7 +170,7 @@ int	pc_fdc_dack_r(running_machine *machine)
 	/* if dma is not enabled, dacks are not acknowledged */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
-		data = nec765_dack_r(machine, 0);
+		data = nec765_dack_r(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0);
 	}
 
 	return data;
@@ -184,7 +184,7 @@ void pc_fdc_dack_w(running_machine *machine, int data)
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_DMA_ENABLED)!=0)
 	{
 		/* dma acknowledge - and send byte to fdc */
-		nec765_dack_w(machine, 0,data);
+		nec765_dack_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0,data);
 	}
 }
 
@@ -426,10 +426,10 @@ READ8_HANDLER ( pc_fdc_r )
 		case 3: /* tape drive select? */
 			break;
 		case 4:
-			data = nec765_status_r(machine, 0);
+			data = nec765_status_r(space, 0);
 			break;
 		case 5:
-			data = nec765_data_r(machine, offset);
+			data = nec765_data_r(space, offset);
 			break;
 		case 6: /* FDC reserved */
 			break;
@@ -439,7 +439,7 @@ READ8_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_PC), offset, data);
 	return data;
 }
 
@@ -448,7 +448,7 @@ READ8_HANDLER ( pc_fdc_r )
 WRITE8_HANDLER ( pc_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_PC), offset, data);
 
 	switch(offset)
 	{
@@ -456,16 +456,16 @@ WRITE8_HANDLER ( pc_fdc_w )
 		case 1:	/* n/a */
 			break;
 		case 2:
-			pc_fdc_dor_w(machine, data);
+			pc_fdc_dor_w(space->machine, data);
 			break;
 		case 3:
 			/* tape drive select? */
 			break;
 		case 4:
-			pc_fdc_data_rate_w(machine, data);
+			pc_fdc_data_rate_w(space->machine, data);
 			break;
 		case 5:
-			nec765_data_w(machine, 0, data);
+			nec765_data_w(space, 0, data);
 			break;
 		case 6:
 			/* FDC reserved */
@@ -487,15 +487,15 @@ WRITE8_HANDLER ( pc_fdc_w )
 WRITE8_HANDLER ( pcjr_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) activecpu_get_reg(REG_PC), offset, data);
+		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_PC), offset, data);
 
 	switch(offset)
 	{
 		case 2:
-			pcjr_fdc_dor_w( machine, data );
+			pcjr_fdc_dor_w( space->machine, data );
 			break;
 		default:
-			pc_fdc_w( machine, offset, data );
+			pc_fdc_w( space, offset, data );
 			break;
 	}
 }

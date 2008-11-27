@@ -28,32 +28,33 @@
 
 static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch (page) {
 	case 1:
 	case 2:
 	case 3:
-		memory_set_bankptr (page, mem);
+		memory_set_bankptr (machine,page, mem);
 		break;
 	case 4:
-		memory_set_bankptr (4, mem);
-		memory_set_bankptr (5, mem + 0x1ff8);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7ff8, 0x7fff, 0, 0, SMH_BANK5);
+		memory_set_bankptr (machine,4, mem);
+		memory_set_bankptr (machine,5, mem + 0x1ff8);
+		memory_install_read8_handler(space, 0x7ff8, 0x7fff, 0, 0, SMH_BANK5);
 		break;
 	case 5:
-		memory_set_bankptr (6, mem);
-		memory_set_bankptr (7, mem + 0x1800);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9fff, 0, 0, SMH_BANK7);
+		memory_set_bankptr (machine,6, mem);
+		memory_set_bankptr (machine,7, mem + 0x1800);
+		memory_install_read8_handler(space, 0x9800, 0x9fff, 0, 0, SMH_BANK7);
 		break;
 	case 6:
-		memory_set_bankptr (8, mem);
-		memory_set_bankptr (9, mem + 0x1800);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xbfff, 0, 0, SMH_BANK9);
+		memory_set_bankptr (machine,8, mem);
+		memory_set_bankptr (machine,9, mem + 0x1800);
+		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0, SMH_BANK9);
 		break;
 	case 7:
-		memory_set_bankptr (10, mem);
+		memory_set_bankptr (machine,10, mem);
 		break;
 	case 8:
-		memory_set_bankptr (11, mem);
+		memory_set_bankptr (machine,11, mem);
 		msx1.top_page = mem;
 		break;
 	}
@@ -339,7 +340,7 @@ static  READ8_HANDLER (konami_scc_bank5)
 		return 0xff;
 	}
 	else {
-		return k051649_waveform_r (machine, offset & 0x7f);
+		return k051649_waveform_r (space, offset & 0x7f);
 	}
 }
 
@@ -357,7 +358,7 @@ MSX_SLOT_MAP(konami_scc)
 	case 2:
 		msx_cpu_setbank (machine, 5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9fff, 0, 0,
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9800, 0x9fff, 0, 0,
 				state->cart.scc.active ? konami_scc_bank5 : SMH_BANK7);
 		break;
 	case 3:
@@ -368,6 +369,7 @@ MSX_SLOT_MAP(konami_scc)
 
 MSX_SLOT_WRITE(konami_scc)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (addr >= 0x5000 && addr < 0x5800) {
 		state->banks[0] = val & state->bank_mask;
 		slot_konami_scc_map (machine, state, 1);
@@ -394,18 +396,18 @@ MSX_SLOT_WRITE(konami_scc)
 		int offset = addr & 0xff;
 
 		if (offset < 0x80) {
-			k051649_waveform_w (machine, offset, val);
+			k051649_waveform_w (space, offset, val);
 		}
 		else if (offset < 0xa0) {
 			offset &= 0xf;
 			if (offset < 0xa) {
-				k051649_frequency_w (machine, offset, val);
+				k051649_frequency_w (space, offset, val);
 			}
 			else if (offset < 0xf) {
-				k051649_volume_w (machine, offset - 0xa, val);
+				k051649_volume_w (space, offset - 0xa, val);
 			}
 			else {
-				k051649_keyonoff_w (machine, 0, val);
+				k051649_keyonoff_w (space, 0, val);
 			}
 		}
 #if 0
@@ -1131,10 +1133,10 @@ MSX_SLOT_RESET(diskrom)
 static READ8_HANDLER (msx_diskrom_page1_r)
 {
 	switch (offset) {
-	case 0: return wd17xx_status_r (machine, 0);
-	case 1: return wd17xx_track_r (machine, 0);
-	case 2: return wd17xx_sector_r (machine, 0);
-	case 3: return wd17xx_data_r (machine, 0);
+	case 0: return wd17xx_status_r (space, 0);
+	case 1: return wd17xx_track_r (space, 0);
+	case 2: return wd17xx_sector_r (space, 0);
+	case 3: return wd17xx_data_r (space, 0);
 	case 7: return msx1.dsk_stat;
 	default:
 		return msx1.state[1]->mem[offset + 0x3ff8];
@@ -1146,13 +1148,13 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 	if (offset >= 0x7f8) {
 		switch (offset) {
 		case 0x7f8:
-			return wd17xx_status_r (machine, 0);
+			return wd17xx_status_r (space, 0);
 		case 0x7f9:
-			return wd17xx_track_r (machine, 0);
+			return wd17xx_track_r (space, 0);
 		case 0x7fa:
-			return wd17xx_sector_r (machine, 0);
+			return wd17xx_sector_r (space, 0);
 		case 0x7fb:
-			return wd17xx_data_r (machine, 0);
+			return wd17xx_data_r (space, 0);
 		case 0x7ff:
 			return msx1.dsk_stat;
 		default:
@@ -1166,6 +1168,7 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 
 MSX_SLOT_MAP(diskrom)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -1174,12 +1177,12 @@ MSX_SLOT_MAP(diskrom)
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem);
 		msx_cpu_setbank (machine, 4, state->mem + 0x2000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7ff8, 0x7fff, 0, 0, msx_diskrom_page1_r);
+		memory_install_read8_handler(space, 0x7ff8, 0x7fff, 0, 0, msx_diskrom_page1_r);
 		break;
 	case 2:
 		msx_cpu_setbank (machine, 5, msx1.empty);
 		msx_cpu_setbank (machine, 6, msx1.empty);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xbfff, 0, 0, msx_diskrom_page2_r);
+		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0, msx_diskrom_page2_r);
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, msx1.empty);
@@ -1190,21 +1193,22 @@ MSX_SLOT_MAP(diskrom)
 
 MSX_SLOT_WRITE(diskrom)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
 	switch (addr) {
 	case 0x7ff8:
-		wd17xx_command_w (machine, 0, val);
+		wd17xx_command_w (space, 0, val);
 		break;
 	case 0x7ff9:
-		wd17xx_track_w (machine, 0, val);
+		wd17xx_track_w (space, 0, val);
 		break;
 	case 0x7ffa:
-		wd17xx_sector_w (machine, 0, val);
+		wd17xx_sector_w (space, 0, val);
 		break;
 	case 0x7ffb:
-		wd17xx_data_w (machine, 0, val);
+		wd17xx_data_w (space, 0, val);
 		break;
 	case 0x7ffc:
 		wd17xx_set_side (val & 1);
@@ -1242,10 +1246,10 @@ MSX_SLOT_RESET(diskrom2)
 static READ8_HANDLER (msx_diskrom2_page1_r)
 {
 	switch (offset) {
-	case 0: return wd17xx_status_r(machine, 0);
-	case 1: return wd17xx_track_r(machine, 0);
-	case 2: return wd17xx_sector_r(machine, 0);
-	case 3: return wd17xx_data_r(machine, 0);
+	case 0: return wd17xx_status_r(space, 0);
+	case 1: return wd17xx_track_r(space, 0);
+	case 2: return wd17xx_sector_r(space, 0);
+	case 3: return wd17xx_data_r(space, 0);
 	case 4: return msx1.dsk_stat;
 	default:
 		return msx1.state[1]->mem[offset + 0x3ff8];
@@ -1257,13 +1261,13 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 	if (offset >= 0x7b8) {
 		switch (offset) {
 		case 0x7b8:
-			return wd17xx_status_r (machine, 0);
+			return wd17xx_status_r (space, 0);
 		case 0x7b9:
-			return wd17xx_track_r (machine, 0);
+			return wd17xx_track_r (space, 0);
 		case 0x7ba:
-			return wd17xx_sector_r (machine, 0);
+			return wd17xx_sector_r (space, 0);
 		case 0x7bb:
-			return wd17xx_data_r (machine, 0);
+			return wd17xx_data_r (space, 0);
 		case 0x7bc:
 			return msx1.dsk_stat;
 		default:
@@ -1277,6 +1281,7 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 
 MSX_SLOT_MAP(diskrom2)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, msx1.empty);
@@ -1285,12 +1290,12 @@ MSX_SLOT_MAP(diskrom2)
 	case 1:
 		msx_cpu_setbank (machine, 3, state->mem);
 		msx_cpu_setbank (machine, 4, state->mem + 0x2000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7fb8, 0x7fbc, 0, 0, msx_diskrom2_page1_r);
+		memory_install_read8_handler(space, 0x7fb8, 0x7fbc, 0, 0, msx_diskrom2_page1_r);
 		break;
 	case 2:
 		msx_cpu_setbank (machine, 5, msx1.empty);
 		msx_cpu_setbank (machine, 6, msx1.empty);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xbfbc, 0, 0, msx_diskrom2_page2_r);
+		memory_install_read8_handler(space, 0xb800, 0xbfbc, 0, 0, msx_diskrom2_page2_r);
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, msx1.empty);
@@ -1300,21 +1305,22 @@ MSX_SLOT_MAP(diskrom2)
 
 MSX_SLOT_WRITE(diskrom2)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
 	switch (addr) {
 	case 0x7fb8:
-		wd17xx_command_w (machine, 0, val);
+		wd17xx_command_w (space, 0, val);
 		break;
 	case 0x7fb9:
-		wd17xx_track_w (machine, 0, val);
+		wd17xx_track_w (space, 0, val);
 		break;
 	case 0x7fba:
-		wd17xx_sector_w (machine, 0, val);
+		wd17xx_sector_w (space, 0, val);
 		break;
 	case 0x7fbb:
-		wd17xx_data_w (machine, 0, val);
+		wd17xx_data_w (space, 0, val);
 		break;
 	case 0x7fbc:
 		wd17xx_set_side (val & 1);
@@ -1521,6 +1527,7 @@ MSX_SLOT_MAP(fmpac)
 
 MSX_SLOT_WRITE(fmpac)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i, data;
 
 	if (addr >= 0x4000 && addr < 0x6000 && state->cart.fmpac.sram_support) {
@@ -1536,12 +1543,12 @@ MSX_SLOT_WRITE(fmpac)
 	switch (addr) {
 	case 0x7ff4:
 		if (state->cart.fmpac.opll_active) {
-			ym2413_register_port_0_w (machine, 0, val);
+			ym2413_register_port_0_w (space, 0, val);
 		}
 		break;
 	case 0x7ff5:
 		if (state->cart.fmpac.opll_active) {
-			ym2413_data_port_0_w (machine, 0, val);
+			ym2413_data_port_0_w (space, 0, val);
 		}
 		break;
 	case 0x7ff6:
@@ -1984,14 +1991,14 @@ static  READ8_HANDLER (soundcartridge_scc)
 	reg = offset & 0xff;
 
 	if (reg < 0x80) {
-		return k051649_waveform_r (machine, reg);
+		return k051649_waveform_r (space, reg);
 	}
 	else if (reg < 0xa0) {
 		/* nothing */
 	}
 	else if (reg < 0xc0) {
 		/* read wave 5 */
-		return k051649_waveform_r (machine, 0x80 + (reg & 0x1f));
+		return k051649_waveform_r (space, 0x80 + (reg & 0x1f));
 	}
 #if 0
 	else if (reg < 0xe0) {
@@ -2014,7 +2021,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 	reg = offset & 0xff;
 
 	if (reg < 0xa0) {
-		return k051649_waveform_r (machine, reg);
+		return k051649_waveform_r (space, reg);
 	}
 #if 0
 	else if (reg >= 0xc0 && reg < 0xe0) {
@@ -2027,6 +2034,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 MSX_SLOT_MAP(soundcartridge)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch (page) {
 	case 0:
 		msx_cpu_setbank (machine, 1, state->mem + state->banks[2] * 0x2000);
@@ -2039,9 +2047,9 @@ MSX_SLOT_MAP(soundcartridge)
 	case 2:
 		msx_cpu_setbank (machine, 5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9fff, 0, 0,
+		memory_install_read8_handler(space, 0x9800, 0x9fff, 0, 0,
 			state->cart.sccp.scc_active ? soundcartridge_scc : SMH_BANK7);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb800, 0xbfff, 0, 0,
+		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0,
 			state->cart.sccp.sccp_active ? soundcartridge_sccp : SMH_BANK9);
 		break;
 	case 3:
@@ -2053,6 +2061,7 @@ MSX_SLOT_MAP(soundcartridge)
 
 MSX_SLOT_WRITE(soundcartridge)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	if (addr < 0x4000) {
@@ -2103,19 +2112,19 @@ MSX_SLOT_WRITE(soundcartridge)
 			int offset = addr & 0xff;
 
 			if (offset < 0x80) {
-				k051649_waveform_w (machine, offset, val);
+				k051649_waveform_w (space, offset, val);
 			}
 			else if (offset < 0xa0) {
 				offset &= 0xf;
 
 				if (offset < 0xa) {
-					k051649_frequency_w (machine, offset, val);
+					k051649_frequency_w (space, offset, val);
 				}
 				else if (offset < 0x0f) {
-					k051649_volume_w (machine, offset - 0xa, val);
+					k051649_volume_w (space, offset - 0xa, val);
 				}
 				else if (offset == 0x0f) {
-					k051649_keyonoff_w (machine, 0, val);
+					k051649_keyonoff_w (space, 0, val);
 				}
 			}
 #if 0
@@ -2143,19 +2152,19 @@ MSX_SLOT_WRITE(soundcartridge)
 			int offset = addr & 0xff;
 
 			if (offset < 0xa0) {
-				k052539_waveform_w (machine, offset, val);
+				k052539_waveform_w (space, offset, val);
 			}
 			else if (offset < 0xc0) {
 				offset &= 0x0f;
 
 				if (offset < 0x0a) {
-					k051649_frequency_w (machine, offset, val);
+					k051649_frequency_w (space, offset, val);
 				}
 				else if (offset < 0x0f) {
-					k051649_volume_w (machine, offset - 0x0a, val);
+					k051649_volume_w (space, offset - 0x0a, val);
 				}
 				else if (offset == 0x0f) {
-					k051649_keyonoff_w (machine, 0, val);
+					k051649_keyonoff_w (space, 0, val);
 				}
 			}
 #if 0

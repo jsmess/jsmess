@@ -542,7 +542,7 @@ static PALETTE_INIT( pc_ega )
 }
 
 
-static void pc_ega_install_banks( void )
+static void pc_ega_install_banks( running_machine *machine )
 {
 	switch ( ega.graphics_controller.data[6] & 0x0c )
 	{
@@ -567,56 +567,58 @@ static void pc_ega_install_banks( void )
 		ega.videoram_b8000 = ega.videoram;
 		break;
 	}
-	memory_set_bankptr( 11, ega.videoram_a0000 ? ega.videoram_a0000 : ega.videoram_nothing );
-	memory_set_bankptr( 12, ega.videoram_b0000 ? ega.videoram_b0000 : ega.videoram_nothing );
-	memory_set_bankptr( 13, ega.videoram_b8000 ? ega.videoram_b8000 : ega.videoram_nothing );
+	memory_set_bankptr(machine,  11, ega.videoram_a0000 ? ega.videoram_a0000 : ega.videoram_nothing );
+	memory_set_bankptr(machine,  12, ega.videoram_b0000 ? ega.videoram_b0000 : ega.videoram_nothing );
+	memory_set_bankptr(machine,  13, ega.videoram_b8000 ? ega.videoram_b8000 : ega.videoram_nothing );
 }
 
 
 static VIDEO_START( pc_ega )
 {
 	int buswidth;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *spaceio = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 
-	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram_w );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_w );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_w );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_w );
+			memory_install_read8_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
+			memory_install_read8_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
+			memory_install_read8_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_write8_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram_w );
+			memory_install_read8_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_r );
+			memory_install_write8_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_w );
+			memory_install_read8_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_r );
+			memory_install_write8_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega8_3c0_w );
+			memory_install_read8_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_r );
+			memory_install_write8_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega8_3d0_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram16le_w );
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_r );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_w );
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_r );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_w );
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_r );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_w );
+			memory_install_read16_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
+			memory_install_read16_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
+			memory_install_read16_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_write16_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram16le_w );
+			memory_install_read16_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_r );
+			memory_install_write16_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_w );
+			memory_install_read16_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_r );
+			memory_install_write16_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega16le_3c0_w );
+			memory_install_read16_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_r );
+			memory_install_write16_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega16le_3d0_w );
 			break;
 
 		case 32:
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram32le_w );
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_r );
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_w );
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_r );
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_w );
-			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_r );
-			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_w );
+			memory_install_read32_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
+			memory_install_read32_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
+			memory_install_read32_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_write32_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram32le_w );
+			memory_install_read32_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_r );
+			memory_install_write32_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_w );
+			memory_install_read32_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_r );
+			memory_install_write32_handler(spaceio, 0x3c0, 0x3cf, 0, 0, pc_ega32le_3c0_w );
+			memory_install_read32_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_r );
+			memory_install_write32_handler(spaceio, 0x3d0, 0x3db, 0, 0, pc_ega32le_3d0_w );
 			break;
 
 		default:
@@ -633,7 +635,7 @@ static VIDEO_START( pc_ega )
 
 	ega.videoram_nothing = ega.videoram + ( 256 * 1024 );
 
-	pc_ega_install_banks();
+	pc_ega_install_banks(machine);
 
 	ega.crtc_ega = device_list_find_by_tag(machine->config->devicelist, CRTC_EGA, EGA_CRTC_NAME);
 	ega.update_row = NULL;
@@ -860,13 +862,13 @@ static WRITE8_HANDLER( pc_ega8_3X0_w )
 
 static READ8_HANDLER( pc_ega8_3b0_r )
 {
-	return ( ega.misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r( machine, offset );
+	return ( ega.misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r( space, offset );
 }
 
 
 static READ8_HANDLER( pc_ega8_3d0_r )
 {
-	return ( ega.misc_output & 0x01 ) ? pc_ega8_3X0_r( machine, offset ) : 0xFF;
+	return ( ega.misc_output & 0x01 ) ? pc_ega8_3X0_r( space, offset ) : 0xFF;
 }
 
 
@@ -874,7 +876,7 @@ static WRITE8_HANDLER( pc_ega8_3b0_w )
 {
 	if ( ! ( ega.misc_output & 0x01 ) )
 	{
-		pc_ega8_3X0_w( machine, offset, data );
+		pc_ega8_3X0_w( space, offset, data );
 	}
 }
 
@@ -883,7 +885,7 @@ static WRITE8_HANDLER( pc_ega8_3d0_w )
 {
 	if ( ega.misc_output & 0x01 )
 	{
-		pc_ega8_3X0_w( machine, offset, data );
+		pc_ega8_3X0_w( space, offset, data );
 	}
 }
 
@@ -1022,27 +1024,27 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 		{
 		case 0x06:		/* GR06 */
 			pc_ega_change_mode( ega.crtc_ega );
-			pc_ega_install_banks();
+			pc_ega_install_banks(space->machine);
 			break;
 		}
 		break;
 	}
 }
 
-static READ16_HANDLER( pc_ega16le_3b0_r ) { return read16le_with_read8_handler(pc_ega8_3b0_r,machine,  offset, mem_mask); }
-static WRITE16_HANDLER( pc_ega16le_3b0_w ) { write16le_with_write8_handler(pc_ega8_3b0_w, machine, offset, data, mem_mask); }
-static READ32_HANDLER( pc_ega32le_3b0_r ) { return read32le_with_read8_handler(pc_ega8_3b0_r, machine, offset, mem_mask); }
-static WRITE32_HANDLER( pc_ega32le_3b0_w ) { write32le_with_write8_handler(pc_ega8_3b0_w, machine, offset, data, mem_mask); }
+static READ16_HANDLER( pc_ega16le_3b0_r ) { return read16le_with_read8_handler(pc_ega8_3b0_r,space,  offset, mem_mask); }
+static WRITE16_HANDLER( pc_ega16le_3b0_w ) { write16le_with_write8_handler(pc_ega8_3b0_w, space, offset, data, mem_mask); }
+static READ32_HANDLER( pc_ega32le_3b0_r ) { return read32le_with_read8_handler(pc_ega8_3b0_r, space, offset, mem_mask); }
+static WRITE32_HANDLER( pc_ega32le_3b0_w ) { write32le_with_write8_handler(pc_ega8_3b0_w, space, offset, data, mem_mask); }
 
-static READ16_HANDLER( pc_ega16le_3c0_r ) { return read16le_with_read8_handler(pc_ega8_3c0_r,machine,  offset, mem_mask); }
-static WRITE16_HANDLER( pc_ega16le_3c0_w ) { write16le_with_write8_handler(pc_ega8_3c0_w, machine, offset, data, mem_mask); }
-static READ32_HANDLER( pc_ega32le_3c0_r ) { return read32le_with_read8_handler(pc_ega8_3c0_r, machine, offset, mem_mask); }
-static WRITE32_HANDLER( pc_ega32le_3c0_w ) { write32le_with_write8_handler(pc_ega8_3c0_w, machine, offset, data, mem_mask); }
+static READ16_HANDLER( pc_ega16le_3c0_r ) { return read16le_with_read8_handler(pc_ega8_3c0_r,space,  offset, mem_mask); }
+static WRITE16_HANDLER( pc_ega16le_3c0_w ) { write16le_with_write8_handler(pc_ega8_3c0_w, space, offset, data, mem_mask); }
+static READ32_HANDLER( pc_ega32le_3c0_r ) { return read32le_with_read8_handler(pc_ega8_3c0_r, space, offset, mem_mask); }
+static WRITE32_HANDLER( pc_ega32le_3c0_w ) { write32le_with_write8_handler(pc_ega8_3c0_w, space, offset, data, mem_mask); }
 
-static READ16_HANDLER( pc_ega16le_3d0_r ) { return read16le_with_read8_handler(pc_ega8_3d0_r,machine,  offset, mem_mask); }
-static WRITE16_HANDLER( pc_ega16le_3d0_w ) { write16le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
-static READ32_HANDLER( pc_ega32le_3d0_r ) { return read32le_with_read8_handler(pc_ega8_3d0_r, machine, offset, mem_mask); }
-static WRITE32_HANDLER( pc_ega32le_3d0_w ) { write32le_with_write8_handler(pc_ega8_3d0_w, machine, offset, data, mem_mask); }
+static READ16_HANDLER( pc_ega16le_3d0_r ) { return read16le_with_read8_handler(pc_ega8_3d0_r,space,  offset, mem_mask); }
+static WRITE16_HANDLER( pc_ega16le_3d0_w ) { write16le_with_write8_handler(pc_ega8_3d0_w, space, offset, data, mem_mask); }
+static READ32_HANDLER( pc_ega32le_3d0_r ) { return read32le_with_read8_handler(pc_ega8_3d0_r, space, offset, mem_mask); }
+static WRITE32_HANDLER( pc_ega32le_3d0_w ) { write32le_with_write8_handler(pc_ega8_3d0_w, space, offset, data, mem_mask); }
 
 static WRITE8_HANDLER( pc_ega_videoram_w )
 {
@@ -1070,6 +1072,6 @@ static WRITE8_HANDLER( pc_ega_videoram_w )
 	}
 }
 
-static WRITE16_HANDLER( pc_ega_videoram16le_w ) { write16le_with_write8_handler(pc_ega_videoram_w, machine, offset, data, mem_mask); }
-static WRITE32_HANDLER( pc_ega_videoram32le_w ) { write32le_with_write8_handler(pc_ega_videoram_w, machine, offset, data, mem_mask); }
+static WRITE16_HANDLER( pc_ega_videoram16le_w ) { write16le_with_write8_handler(pc_ega_videoram_w, space, offset, data, mem_mask); }
+static WRITE32_HANDLER( pc_ega_videoram32le_w ) { write32le_with_write8_handler(pc_ega_videoram_w, space, offset, data, mem_mask); }
 

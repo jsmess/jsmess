@@ -371,7 +371,9 @@ DRVLIBS = \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
+	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/aquarius.a \
+	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bk.a \
 	$(MESSOBJ)/cbmshare.a \
@@ -391,6 +393,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/p2000.a \
+	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/pp01.a \
@@ -408,12 +411,10 @@ DRVLIBS = \
 	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/amstrad.a \
 #	$(MESSOBJ)/apexc.a \
 #	$(MESSOBJ)/apf.a \
 #	$(MESSOBJ)/apple.a \
 #	$(MESSOBJ)/arcadia.a \
-#	$(MESSOBJ)/ascii.a \
 #	$(MESSOBJ)/at.a \
 #	$(MESSOBJ)/atari.a \
 #	$(MESSOBJ)/avigo.a \
@@ -459,7 +460,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/osborne.a \
 #	$(MESSOBJ)/pasogo.a \
 #	$(MESSOBJ)/pc.a \
-#	$(MESSOBJ)/pcshare.a \
 #	$(MESSOBJ)/pdp1.a \
 #	$(MESSOBJ)/pmd85.a \
 #	$(MESSOBJ)/primo.a \

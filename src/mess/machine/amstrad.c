@@ -38,75 +38,76 @@ void amstrad_setup_machine(running_machine *machine)
 /* load CPCEMU style snapshots */
 void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int RegData;
 	int i;
 
 	/* init Z80 */
 	RegData = (pSnapshot[0x011] & 0x0ff) | ((pSnapshot[0x012] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_AF, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_AF, RegData);
 
 	RegData = (pSnapshot[0x013] & 0x0ff) | ((pSnapshot[0x014] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_BC, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_BC, RegData);
 
 	RegData = (pSnapshot[0x015] & 0x0ff) | ((pSnapshot[0x016] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_DE, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_DE, RegData);
 
 	RegData = (pSnapshot[0x017] & 0x0ff) | ((pSnapshot[0x018] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_HL, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_HL, RegData);
 
 	RegData = (pSnapshot[0x019] & 0x0ff) ;
-	cpunum_set_reg(0,Z80_R, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_R, RegData);
 
 	RegData = (pSnapshot[0x01a] & 0x0ff);
-	cpunum_set_reg(0,Z80_I, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_I, RegData);
 
 	if ((pSnapshot[0x01b] & 1)==1)
 	{
-		cpunum_set_reg(0,Z80_IFF1, 1);
+		cpu_set_reg(machine->cpu[0],Z80_IFF1, 1);
 	}
 	else
 	{
-		cpunum_set_reg(0,Z80_IFF1, 0);
+		cpu_set_reg(machine->cpu[0],Z80_IFF1, 0);
 	}
 
 	if ((pSnapshot[0x01c] & 1)==1)
 	{
-		cpunum_set_reg(0,Z80_IFF2, 1);
+		cpu_set_reg(machine->cpu[0],Z80_IFF2, 1);
 	}
 	else
 	{
-		cpunum_set_reg(0,Z80_IFF2, 0);
+		cpu_set_reg(machine->cpu[0],Z80_IFF2, 0);
 	}
 
 	RegData = (pSnapshot[0x01d] & 0x0ff) | ((pSnapshot[0x01e] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_IX, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_IX, RegData);
 
 	RegData = (pSnapshot[0x01f] & 0x0ff) | ((pSnapshot[0x020] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_IY, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_IY, RegData);
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_SP, RegData);
-	cpunum_set_reg(0,REG_SP,RegData);
+	cpu_set_reg(machine->cpu[0],Z80_SP, RegData);
+	cpu_set_reg(machine->cpu[0],REG_SP,RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
 
-	cpunum_set_reg(0,Z80_PC, RegData);
-//	cpunum_set_reg(0,REG_SP,RegData);
+	cpu_set_reg(machine->cpu[0],Z80_PC, RegData);
+//	cpu_set_reg(machine->cpu[0],REG_SP,RegData);
 
 	RegData = (pSnapshot[0x025] & 0x0ff);
-	cpunum_set_reg(0,Z80_IM, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_IM, RegData);
 
 	RegData = (pSnapshot[0x026] & 0x0ff) | ((pSnapshot[0x027] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_AF2, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_AF2, RegData);
 
 	RegData = (pSnapshot[0x028] & 0x0ff) | ((pSnapshot[0x029] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_BC2, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_BC2, RegData);
 
 	RegData = (pSnapshot[0x02a] & 0x0ff) | ((pSnapshot[0x02b] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_DE2, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_DE2, RegData);
 
 	RegData = (pSnapshot[0x02c] & 0x0ff) | ((pSnapshot[0x02d] & 0x0ff)<<8);
-	cpunum_set_reg(0,Z80_HL2, RegData);
+	cpu_set_reg(machine->cpu[0],Z80_HL2, RegData);
 
 	/* init GA */
 	for (i=0; i<17; i++)
@@ -144,12 +145,12 @@ void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 	/* PSG */
 	for (i=0; i<16; i++)
 	{
-		ay8910_control_port_0_w(machine, 0,i);
+		ay8910_control_port_0_w(space, 0,i);
 
-		ay8910_write_port_0_w(machine, 0,pSnapshot[0x05b + i] & 0x0ff);
+		ay8910_write_port_0_w(space, 0,pSnapshot[0x05b + i] & 0x0ff);
 	}
 
-	ay8910_control_port_0_w(machine, 0,pSnapshot[0x05a]);
+	ay8910_control_port_0_w(space, 0,pSnapshot[0x05a]);
 
 	{
 		int MemSize;

@@ -9,7 +9,7 @@ WRITE8_HANDLER( kb_keytronic_set_data_signal );
 /* The code expects kb_keytronic_set_host_interface to be called at init or reset time to
    initialize the internal callbacks.
  */
-void kb_keytronic_set_host_interface( running_machine *machine, write8_machine_func clock_cb, write8_machine_func data_cb );
+void kb_keytronic_set_host_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb );
 
 INPUT_PORTS_EXTERN( kb_keytronic );
 MACHINE_DRIVER_EXTERN( kb_keytronic );

@@ -512,7 +512,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
 		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) cpunum_get_reg(0, REG_PC), cmd, command_name, drv);
+			(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -550,7 +550,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc read pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpunum_get_reg(0, REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(n))
@@ -565,7 +565,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc write pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpunum_get_reg(0, REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(n))
@@ -674,7 +674,7 @@ static void pc_hdc_data_w(int n, int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpunum_get_reg(0, REG_PC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(Machine->cpu[0], REG_PC));
 
             status[n] &= ~STA_COMMAND;
 			status[n] &= ~STA_REQUEST;
@@ -716,7 +716,7 @@ static void pc_hdc_control_w(int n, int data)
 	int irq = irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpunum_get_reg(0, REG_PC), data);
+		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(Machine->cpu[0], REG_PC), data);
 
 	hdc_control = data;
 
@@ -798,7 +798,7 @@ static UINT8 pc_HDC_r(int chip, offs_t offs)
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", activecpu_get_pc(), chip, offs, data);
+		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", cpu_get_pc(Machine->cpu[0]), chip, offs, data);
 
 	return data;
 }
@@ -808,7 +808,7 @@ static UINT8 pc_HDC_r(int chip, offs_t offs)
 static void pc_HDC_w(int chip, offs_t offs, UINT8 data)
 {
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", activecpu_get_pc(), chip, offs, data);
+		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", cpu_get_pc(Machine->cpu[0]), chip, offs, data);
 
 	switch( offs )
 	{
@@ -831,15 +831,15 @@ READ8_HANDLER ( pc_HDC2_r ) { return pc_HDC_r(1, offset); }
 WRITE8_HANDLER ( pc_HDC1_w ) { pc_HDC_w(0, offset, data); }
 WRITE8_HANDLER ( pc_HDC2_w ) { pc_HDC_w(1, offset, data); }
 
-READ16_HANDLER ( pc16le_HDC1_r ) { return read16le_with_read8_handler(pc_HDC1_r, machine, offset, mem_mask); }
-READ16_HANDLER ( pc16le_HDC2_r ) { return read16le_with_read8_handler(pc_HDC2_r, machine, offset, mem_mask); }
-WRITE16_HANDLER ( pc16le_HDC1_w ) { write16le_with_write8_handler(pc_HDC1_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER ( pc16le_HDC2_w ) { write16le_with_write8_handler(pc_HDC2_w, machine, offset, data, mem_mask); }
+READ16_HANDLER ( pc16le_HDC1_r ) { return read16le_with_read8_handler(pc_HDC1_r, space, offset, mem_mask); }
+READ16_HANDLER ( pc16le_HDC2_r ) { return read16le_with_read8_handler(pc_HDC2_r, space, offset, mem_mask); }
+WRITE16_HANDLER ( pc16le_HDC1_w ) { write16le_with_write8_handler(pc_HDC1_w, space, offset, data, mem_mask); }
+WRITE16_HANDLER ( pc16le_HDC2_w ) { write16le_with_write8_handler(pc_HDC2_w, space, offset, data, mem_mask); }
 
-READ32_HANDLER ( pc32le_HDC1_r ) { return read32le_with_read8_handler(pc_HDC1_r, machine, offset, mem_mask); }
-READ32_HANDLER ( pc32le_HDC2_r ) { return read32le_with_read8_handler(pc_HDC2_r, machine, offset, mem_mask); }
-WRITE32_HANDLER ( pc32le_HDC1_w ) { write32le_with_write8_handler(pc_HDC1_w, machine, offset, data, mem_mask); }
-WRITE32_HANDLER ( pc32le_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, machine, offset, data, mem_mask); }
+READ32_HANDLER ( pc32le_HDC1_r ) { return read32le_with_read8_handler(pc_HDC1_r, space, offset, mem_mask); }
+READ32_HANDLER ( pc32le_HDC2_r ) { return read32le_with_read8_handler(pc_HDC2_r, space, offset, mem_mask); }
+WRITE32_HANDLER ( pc32le_HDC1_w ) { write32le_with_write8_handler(pc_HDC1_w, space, offset, data, mem_mask); }
+WRITE32_HANDLER ( pc32le_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, space, offset, data, mem_mask); }
 
 
 MACHINE_DRIVER_START( pc_hdc )

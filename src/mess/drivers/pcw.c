@@ -250,7 +250,7 @@ static  READ8_HANDLER(pcw_keyboard_r)
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15" };
 
-	return input_port_read(machine, keynames[offset]);
+	return input_port_read(space->machine, keynames[offset]);
 }
 
 
@@ -260,23 +260,24 @@ static  READ8_HANDLER(pcw_keyboard_r)
 
 static void pcw_update_read_memory_block(running_machine *machine, int block, int bank)
 {
-	memory_set_bankptr(block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_set_bankptr(machine, block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
 
 	/* bank 3? */
 	if (bank == 3)
 	{
 		/* when upper 16 bytes are accessed use keyboard read
            handler */
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(space,
 			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, 0, 0,
 			pcw_keyboard_r);
 	}
 	else
 	{
 		/* restore bank handler across entire block */
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(space,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
-			(read8_machine_func) (STATIC_BANK1 + (FPTR)block));
+			(read8_space_func) (STATIC_BANK1 + (FPTR)block));
 	}
 }
 
@@ -284,7 +285,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 
 static void pcw_update_write_memory_block(int block, int bank)
 {
-	memory_set_bankptr(block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
+	memory_set_bankptr(Machine, block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
 }
 
 
@@ -364,7 +365,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 
 		FakeROM = &memory_region(machine, "main")[0x010000];
 
-		memory_set_bankptr(1, FakeROM);
+		memory_set_bankptr(machine, 1, FakeROM);
 	}
 }
 
@@ -381,11 +382,11 @@ static READ8_HANDLER(pcw_interrupt_counter_r)
 	/* from Jacob Nevins docs */
 
 	/* get data */
-	data = pcw_get_sys_status(machine);
+	data = pcw_get_sys_status(space->machine);
 	/* clear int counter */
 	pcw_interrupt_counter = 0;
 	/* update interrupt */
-	pcw_interrupt_handle(machine);
+	pcw_interrupt_handle(space->machine);
 	/* return data */
 	return data;
 }
@@ -396,17 +397,17 @@ static WRITE8_HANDLER(pcw_bank_select_w)
 	LOG(("BANK: %2x %x\n",offset, data));
 	pcw_banks[offset] = data;
 
-	pcw_update_mem(machine, offset, data);
+	pcw_update_mem(space->machine, offset, data);
 }
 
 static WRITE8_HANDLER(pcw_bank_force_selection_w)
 {
 	pcw_bank_force = data;
 
-	pcw_update_mem(machine, 0, pcw_banks[0]);
-	pcw_update_mem(machine, 1, pcw_banks[1]);
-	pcw_update_mem(machine, 2, pcw_banks[2]);
-	pcw_update_mem(machine, 3, pcw_banks[3]);
+	pcw_update_mem(space->machine, 0, pcw_banks[0]);
+	pcw_update_mem(space->machine, 1, pcw_banks[1]);
+	pcw_update_mem(space->machine, 2, pcw_banks[2]);
+	pcw_update_mem(space->machine, 3, pcw_banks[3]);
 }
 
 
@@ -439,7 +440,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		case 0:
 		{
 			pcw_boot = 0;
-			pcw_update_mem(machine, 0, pcw_banks[0]);
+			pcw_update_mem(space->machine, 0, pcw_banks[0]);
 		}
 		break;
 
@@ -461,10 +462,10 @@ static WRITE8_HANDLER(pcw_system_control_w)
 			{
 				/* yes */
 
-				pcw_interrupt_handle(machine);
+				pcw_interrupt_handle(space->machine);
 			}
 
-			pcw_trigger_fdc_int(machine);
+			pcw_trigger_fdc_int(space->machine);
 		}
 		break;
 
@@ -483,11 +484,11 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* clear nmi interrupt */
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 			}
 
 			/* re-issue interrupt */
-			pcw_interrupt_handle(machine);
+			pcw_interrupt_handle(space->machine);
 		}
 		break;
 
@@ -505,25 +506,25 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* Clear NMI */
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 
 			}
 
-			pcw_interrupt_handle(machine);
+			pcw_interrupt_handle(space->machine);
 		}
 		break;
 
 		/* set fdc terminal count */
 		case 5:
 		{
-			nec765_set_tc_state(machine, 1);
+			nec765_set_tc_state(space->machine, 1);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			nec765_set_tc_state(machine, 0);
+			nec765_set_tc_state(space->machine, 0);
 		}
 		break;
 
@@ -582,7 +583,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 static READ8_HANDLER(pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
-	return pcw_get_sys_status(machine);
+	return pcw_get_sys_status(space->machine);
 }
 
 /* read from expansion hardware - additional hardware not part of
@@ -596,9 +597,9 @@ static  READ8_HANDLER(pcw_expansion_r)
 		case 0x0e0:
 		{
 			/* spectravideo joystick */
-			if (input_port_read(machine, "EXTRA") & 0x020)
+			if (input_port_read(space->machine, "EXTRA") & 0x020)
 			{
-				return input_port_read(machine, "SPECTRAVIDEO");
+				return input_port_read(space->machine, "SPECTRAVIDEO");
 			}
 			else
 			{
@@ -610,7 +611,7 @@ static  READ8_HANDLER(pcw_expansion_r)
 		{
 
 			/* kempston joystick */
-			return input_port_read(machine, "KEMPSTON");
+			return input_port_read(space->machine, "KEMPSTON");
 		}
 
 		case 0x0e1:
@@ -653,10 +654,10 @@ static READ8_HANDLER(pcw_fdc_r)
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		return nec765_data_r(machine, 0);
+		return nec765_data_r(space, 0);
 	}
 
-	return nec765_status_r(machine, 0);
+	return nec765_status_r(space, 0);
 }
 
 static WRITE8_HANDLER(pcw_fdc_w)
@@ -664,7 +665,7 @@ static WRITE8_HANDLER(pcw_fdc_w)
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		nec765_data_w(machine, 0,data);
+		nec765_data_w(space, 0,data);
 	}
 }
 

@@ -78,8 +78,8 @@ static struct {
 	UINT8					p3;
 	UINT8					clock_signal;
 	UINT8					data_signal;
-	write8_machine_func		clock_callback;
-	write8_machine_func		data_callback;
+	write8_space_func		clock_callback;
+	write8_space_func		data_callback;
 	int						cpunum;
 	UINT16					last_write_addr;
 } kb_keytronic;
@@ -294,7 +294,7 @@ INPUT_PORTS_END
 WRITE8_HANDLER( kb_keytronic_set_clock_signal )
 {
 	kb_keytronic.clock_signal = data;
-	cpunum_set_input_line( machine, kb_keytronic.cpunum, MCS51_INT0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line( space->machine->cpu[kb_keytronic.cpunum], MCS51_INT0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -302,11 +302,11 @@ WRITE8_HANDLER( kb_keytronic_set_clock_signal )
 WRITE8_HANDLER( kb_keytronic_set_data_signal )
 {
 	kb_keytronic.data_signal = data;
-	cpunum_set_input_line( machine, kb_keytronic.cpunum, MCS51_T0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line( space->machine->cpu[kb_keytronic.cpunum], MCS51_T0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
-void kb_keytronic_set_host_interface( running_machine *machine, write8_machine_func clock_cb, write8_machine_func data_cb )
+void kb_keytronic_set_host_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb )
 {
 	kb_keytronic.clock_callback = clock_cb;
 	kb_keytronic.data_callback = data_cb;
@@ -380,8 +380,8 @@ static READ8_HANDLER( kb_keytronic_data_r )
 	kb_keytronic.data_signal = ( offset & 0x0100 ) ? 1 : 0;
 	kb_keytronic.clock_signal = ( offset & 0x0200 ) ? 1 : 0;
 
-	kb_keytronic.data_callback( machine, 0, kb_keytronic.data_signal );
-	kb_keytronic.clock_callback( machine, 0, kb_keytronic.clock_signal );
+	kb_keytronic.data_callback( space, 0, kb_keytronic.data_signal );
+	kb_keytronic.clock_callback( space, 0, kb_keytronic.clock_signal );
 
 	return 0xFF;
 }
@@ -400,43 +400,43 @@ static WRITE8_HANDLER( kb_keytronic_data_w )
 		case 0x0e:
 			break;
 		case 0x0f:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0f" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_0f" );
 			break;
 		case 0x30:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_30_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_30_0" );
 			break;
 		case 0x31:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_31_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_31_0" );
 			break;
 		case 0x32:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_32_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_32_0" );
 			break;
 		case 0x33:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_33_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_33_0" );
 			break;
 		case 0x34:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_34_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_34_0" );
 			break;
 		case 0x35:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_35_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_35_0" );
 			break;
 		case 0x36:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_36_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_36_0" );
 			break;
 		case 0x37:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_37_0" ) | ( input_port_read( machine, "kb_keytronic_36_0" ) & 0x01 );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_37_0" ) | ( input_port_read( space->machine, "kb_keytronic_36_0" ) & 0x01 );
 			break;
 		case 0x38:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_38_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_38_0" );
 			break;
 		case 0x39:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_39_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_39_0" );
 			break;
 		case 0x3a:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_3a_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_3a_0" );
 			break;
 		case 0x3b:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_3b_0" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_3b_0" );
 			break;
 		}
 	}
@@ -447,31 +447,31 @@ static WRITE8_HANDLER( kb_keytronic_data_w )
 		switch ( kb_keytronic.p1 )
 		{
 		case 0x0b:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_0b" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_0b" );
 			break;
 		case 0x30:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_30_1" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_30_1" );
 			break;
 		case 0x31:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_31_1" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_31_1" );
 			break;
 		case 0x32:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_32_1" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_32_1" );
 			break;
 		case 0x33:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_33_1" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_33_1" );
 			break;
 		case 0x34:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_34_1" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_34_1" );
 			break;
 		case 0x35:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_35_1" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_35_1" );
 			break;
 		case 0x36:
 			kb_keytronic.p1_data = 0xFF;
 			break;
 		case 0x37:
-			kb_keytronic.p1_data = input_port_read( machine, "kb_keytronic_37_1" );
+			kb_keytronic.p1_data = input_port_read( space->machine, "kb_keytronic_37_1" );
 			break;
 		case 0x38:
 			kb_keytronic.p1_data = 0xFF;
