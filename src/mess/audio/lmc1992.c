@@ -136,7 +136,6 @@ void lmc1992_enable_w(const device_config *device, int level)
 static DEVICE_START( lmc1992 )
 {
 	lmc1992_t *lmc1992 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -148,20 +147,19 @@ static DEVICE_START( lmc1992 )
 //	assert(lmc1992->intf != NULL);
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "LMC1992", device->tag);
 
-	state_save_register_item(unique_tag, 0, lmc1992->enable);
-	state_save_register_item(unique_tag, 0, lmc1992->data);
-	state_save_register_item(unique_tag, 0, lmc1992->clock);
-	state_save_register_item(unique_tag, 0, lmc1992->si);
-	state_save_register_item(unique_tag, 0, lmc1992->input);
-	state_save_register_item(unique_tag, 0, lmc1992->bass);
-	state_save_register_item(unique_tag, 0, lmc1992->treble);
-	state_save_register_item(unique_tag, 0, lmc1992->volume);
-	state_save_register_item(unique_tag, 0, lmc1992->fader_rf);
-	state_save_register_item(unique_tag, 0, lmc1992->fader_lf);
-	state_save_register_item(unique_tag, 0, lmc1992->fader_rr);
-	state_save_register_item(unique_tag, 0, lmc1992->fader_lr);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->enable);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->data);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->clock);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->si);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->input);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->bass);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->treble);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->volume);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->fader_rf);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->fader_lf);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->fader_rr);
+	state_save_register_item("LMC1992", device->tag, 0, lmc1992->fader_lr);
 	return DEVICE_START_OK;
 }
 

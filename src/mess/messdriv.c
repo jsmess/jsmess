@@ -45,21 +45,21 @@ const game_driver * const drivers[] =
 	DRIVER( 3do_pal )
 
 	/* ATARI */
-//128u4	DRIVER( a2600 )		/* Atari 2600										*/
-//128u4	DRIVER( a2600p )	/* Atari 2600 PAL									*/
-//128u4	DRIVER( a5200 )		/* Atari 5200										*/
-//128u4	DRIVER( a5200a )	/* Atari 5200 alt									*/
-//128u4	DRIVER( a7800 )		/* Atari 7800 NTSC									*/
-//128u4	DRIVER( a7800p )	/* Atari 7800 PAL									*/
+	DRIVER( a2600 )		/* Atari 2600										*/
+	DRIVER( a2600p )	/* Atari 2600 PAL									*/
+	DRIVER( a5200 )		/* Atari 5200										*/
+	DRIVER( a5200a )	/* Atari 5200 alt									*/
+	DRIVER( a7800 )		/* Atari 7800 NTSC									*/
+	DRIVER( a7800p )	/* Atari 7800 PAL									*/
 	DRIVER( lynx )		/* Atari Lynx Handheld								*/
 	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
-//128u4	DRIVER( jaguar )	/* Atari Jaguar										*/
-//128u4	DRIVER( atarist )	/* Atari ST											*/
-//128u4	DRIVER( megast )	/* Atari Mega ST									*/
+	DRIVER( jaguar )	/* Atari Jaguar										*/
+	DRIVER( atarist )	/* Atari ST											*/
+	DRIVER( megast )	/* Atari Mega ST									*/
 //	DRIVER( stacy )		/* Atari STacy										*/
-//128u4	DRIVER( atariste )	/* Atari STe										*/
-//128u4	DRIVER( stbook )	/* Atari STBook										*/
-//128u4	DRIVER( megaste )	/* Atari Mega STe									*/
+	DRIVER( atariste )	/* Atari STe										*/
+	DRIVER( stbook )	/* Atari STBook										*/
+	DRIVER( megaste )	/* Atari Mega STe									*/
 //	DRIVER( stpad )		/* Atari STPad (prototype)							*/
 //	DRIVER( tt030 )		/* Atari TT030										*/
 //	DRIVER( fx1 )		/* Atari FX-1 (prototype)							*/
@@ -188,8 +188,8 @@ const game_driver * const drivers[] =
 	DRIVER( vc4000 )	/* Interton vc4000									*/
 
 	/* BANDAI */
-//128u4	DRIVER( wswan )		/* Bandai WonderSwan Handheld						*/
-//128u4	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
+	DRIVER( wswan )		/* Bandai WonderSwan Handheld						*/
+	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
 
 	/* EPOCH */
 	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
@@ -299,11 +299,11 @@ XL/XE 16kB OS roms
 4    XEGS    05/07/1987  0x1eaf4002  C101687
 */
 
-//128u4	DRIVER( a400 )		/* 1979 Atari 400									*/
-//128u4	DRIVER( a400pal )	/* 1979 Atari 400 PAL								*/
-//128u4	DRIVER( a800 )		/* 1979 Atari 800									*/
-//128u4	DRIVER( a800pal )	/* 1979 Atari 800 PAL								*/
-//128u4	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
+	DRIVER( a400 )		/* 1979 Atari 400									*/
+	DRIVER( a400pal )	/* 1979 Atari 400 PAL								*/
+	DRIVER( a800 )		/* 1979 Atari 800									*/
+	DRIVER( a800pal )	/* 1979 Atari 800 PAL								*/
+	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
 
 	/* COMMODORE */
 	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/

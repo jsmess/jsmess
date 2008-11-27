@@ -69,11 +69,11 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 		{
 			if (fdc.mode & ATARIST_FLOPPY_MODE_WRITE)
 			{
-				wd17xx_data_w(machine, 0, RAM[fdc.dmabase]);
+				wd17xx_data_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, RAM[fdc.dmabase]);
 			}
 			else
 			{
-				RAM[fdc.dmabase] = wd17xx_data_r(machine, 0);
+				RAM[fdc.dmabase] = wd17xx_data_r(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0);
 			}
 
 			fdc.dmabase++;
@@ -136,7 +136,7 @@ static READ16_HANDLER( atarist_fdc_data_r )
 		}
 		else
 		{
-			return wd17xx_r(machine, (fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
+			return wd17xx_r(space, (fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
 		}
 	}
 }
@@ -165,7 +165,7 @@ static WRITE16_HANDLER( atarist_fdc_data_w )
 		}
 		else
 		{
-			wd17xx_w(machine, (fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
+			wd17xx_w(space, (fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
 		}
 	}
 }
@@ -287,7 +287,7 @@ static READ8_HANDLER( ikbd_port2_r )
 
     */
 
-	return (ikbd.tx << 3) | (input_port_read_safe(machine, "IKBD_JOY1", 0xff) & 0x06);
+	return (ikbd.tx << 3) | (input_port_read_safe(space->machine, "IKBD_JOY1", 0xff) & 0x06);
 }
 
 static WRITE8_HANDLER( ikbd_port2_w )
@@ -326,13 +326,13 @@ static WRITE8_HANDLER( ikbd_port3_w )
 
 	set_led_status(1, data & 0x01);
 
-	if (~data & 0x02) ikbd.keylatch = input_port_read(machine, "P31");
-	if (~data & 0x04) ikbd.keylatch = input_port_read(machine, "P32");
-	if (~data & 0x08) ikbd.keylatch = input_port_read(machine, "P33");
-	if (~data & 0x10) ikbd.keylatch = input_port_read(machine, "P34");
-	if (~data & 0x20) ikbd.keylatch = input_port_read(machine, "P35");
-	if (~data & 0x40) ikbd.keylatch = input_port_read(machine, "P36");
-	if (~data & 0x80) ikbd.keylatch = input_port_read(machine, "P37");
+	if (~data & 0x02) ikbd.keylatch = input_port_read(space->machine, "P31");
+	if (~data & 0x04) ikbd.keylatch = input_port_read(space->machine, "P32");
+	if (~data & 0x08) ikbd.keylatch = input_port_read(space->machine, "P33");
+	if (~data & 0x10) ikbd.keylatch = input_port_read(space->machine, "P34");
+	if (~data & 0x20) ikbd.keylatch = input_port_read(space->machine, "P35");
+	if (~data & 0x40) ikbd.keylatch = input_port_read(space->machine, "P36");
+	if (~data & 0x80) ikbd.keylatch = input_port_read(space->machine, "P37");
 }
 
 static READ8_HANDLER( ikbd_port4_r )
@@ -352,7 +352,7 @@ static READ8_HANDLER( ikbd_port4_r )
 
     */
 
-	if (input_port_read(machine, "config") & 0x01)
+	if (input_port_read(space->machine, "config") & 0x01)
 	{
 		/*
 
@@ -363,9 +363,9 @@ static READ8_HANDLER( ikbd_port4_r )
 
         */
 
-		UINT8 data = input_port_read_safe(machine, "IKBD_JOY0", 0xff) & 0xf0;
-		UINT8 x = input_port_read_safe(machine, "IKBD_MOUSEX", 0x00);
-		UINT8 y = input_port_read_safe(machine, "IKBD_MOUSEY", 0x00);
+		UINT8 data = input_port_read_safe(space->machine, "IKBD_JOY0", 0xff) & 0xf0;
+		UINT8 x = input_port_read_safe(space->machine, "IKBD_MOUSEX", 0x00);
+		UINT8 y = input_port_read_safe(space->machine, "IKBD_MOUSEY", 0x00);
 
 		if (x == ikbd.mouse_x)
 		{
@@ -412,7 +412,7 @@ static READ8_HANDLER( ikbd_port4_r )
 	}
 	else
 	{
-		return input_port_read_safe(machine, "IKBD_JOY0", 0xff);
+		return input_port_read_safe(space->machine, "IKBD_JOY0", 0xff);
 	}
 }
 
@@ -433,14 +433,14 @@ static WRITE8_HANDLER( ikbd_port4_w )
 
     */
 
-	if (~data & 0x01) ikbd.keylatch = input_port_read(machine, "P40");
-	if (~data & 0x02) ikbd.keylatch = input_port_read(machine, "P41");
-	if (~data & 0x04) ikbd.keylatch = input_port_read(machine, "P42");
-	if (~data & 0x08) ikbd.keylatch = input_port_read(machine, "P43");
-	if (~data & 0x10) ikbd.keylatch = input_port_read(machine, "P44");
-	if (~data & 0x20) ikbd.keylatch = input_port_read(machine, "P45");
-	if (~data & 0x40) ikbd.keylatch = input_port_read(machine, "P46");
-	if (~data & 0x80) ikbd.keylatch = input_port_read(machine, "P47");
+	if (~data & 0x01) ikbd.keylatch = input_port_read(space->machine, "P40");
+	if (~data & 0x02) ikbd.keylatch = input_port_read(space->machine, "P41");
+	if (~data & 0x04) ikbd.keylatch = input_port_read(space->machine, "P42");
+	if (~data & 0x08) ikbd.keylatch = input_port_read(space->machine, "P43");
+	if (~data & 0x10) ikbd.keylatch = input_port_read(space->machine, "P44");
+	if (~data & 0x20) ikbd.keylatch = input_port_read(space->machine, "P45");
+	if (~data & 0x40) ikbd.keylatch = input_port_read(space->machine, "P46");
+	if (~data & 0x80) ikbd.keylatch = input_port_read(space->machine, "P47");
 }
 
 /* DMA Sound */
@@ -588,13 +588,13 @@ static WRITE16_HANDLER( atariste_sound_dma_control_w )
 	{
 		if (!dmasound.active)
 		{
-			atariste_dmasound_set_state(machine, 1);
+			atariste_dmasound_set_state(space->machine, 1);
 			timer_adjust_periodic(dmasound_timer, attotime_zero, 0, ATTOTIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]));
 		}
 	}
 	else
 	{
-		atariste_dmasound_set_state(machine, 0);
+		atariste_dmasound_set_state(space->machine, 0);
 		timer_enable(dmasound_timer, 0);
 	}
 }
@@ -737,7 +737,7 @@ static READ16_HANDLER( megaste_cache_r )
 static WRITE16_HANDLER( megaste_cache_w )
 {
 	megaste_cache = data;
-	cpunum_set_clock(machine, 0, (data & 0x01) ? Y2/2 : Y2/4);
+	cpu_set_clock(space->machine->cpu[0], (data & 0x01) ? Y2/2 : Y2/4);
 }
 
 /* ST Book */
@@ -767,7 +767,7 @@ static READ16_HANDLER( stbook_config_r )
 
     */
 
-	return (input_port_read(machine, "SW400") << 8) | 0xff;
+	return (input_port_read(space->machine, "SW400") << 8) | 0xff;
 }
 
 static WRITE16_HANDLER( stbook_lcd_control_w )
@@ -1366,19 +1366,19 @@ static MC68901_GPIO_READ( mfp_gpio_r )
 
 static IRQ_CALLBACK( atarist_int_ack )
 {
-	const device_config *mc68901 = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *mc68901 = device_list_find_by_tag(device->machine->config->devicelist, MC68901, MC68901_TAG);
 
-	if (irqline == MC68000_IRQ_6)
+	if (irqline == M68K_IRQ_6)
 	{
 		return mc68901_get_vector(mc68901);
 	}
 
-	return MC68000_INT_ACK_AUTOVECTOR;
+	return M68K_INT_ACK_AUTOVECTOR;
 }
 
 static MC68901_ON_IRQ_CHANGED( mfp_interrupt )
 {
-	cpu_set_input_line(device->machine->cpu[0], MC68000_IRQ_6, level);
+	cpu_set_input_line(device->machine->cpu[0], M68K_IRQ_6, level);
 }
 
 static UINT8 mfp_rx, mfp_tx;
@@ -1412,24 +1412,24 @@ static void atarist_configure_memory(running_machine *machine)
 	switch (mess_ram_size)
 	{
 	case 256 * 1024:
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000008, 0x03ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x040000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 512 * 1024:
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000008, 0x07ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x080000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000008, 0x0fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 2048 * 1024:
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
 		break;
 	}
 
@@ -1439,10 +1439,10 @@ static void atarist_configure_memory(running_machine *machine)
 	memory_configure_bank(machine, 2, 0, 1, RAM + 0x200000, 0);
 	memory_set_bank(machine, 2, 0);
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
 	memory_configure_bank(machine, 3, 0, 1, RAM + 0xfa0000, 0);
-	memory_set_bank(3, 0);
+	memory_set_bank(machine, 3, 0);
 }
 
 static void atarist_state_save(void)
@@ -1485,7 +1485,7 @@ static MACHINE_START( atarist )
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 
-	cpunum_set_irq_callback(0, atarist_int_ack);
+	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
 }
 
 static const struct rp5c15_interface rtc_intf =
@@ -1572,7 +1572,7 @@ static MACHINE_START( atariste )
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 
-	cpunum_set_irq_callback(0, atarist_int_ack);
+	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
 
 	dmasound_timer = timer_alloc(atariste_dmasound_tick, NULL);
 	microwire_timer = timer_alloc(atariste_microwire_tick, NULL);
@@ -1592,12 +1592,12 @@ static void stbook_configure_memory(running_machine *machine)
 	switch (mess_ram_size)
 	{
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
 		break;
 	}
 
@@ -1607,10 +1607,10 @@ static void stbook_configure_memory(running_machine *machine)
 	memory_configure_bank(machine, 2, 0, 1, RAM + 0x200000, 0);
 	memory_set_bank(machine, 2, 0);
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
 	memory_configure_bank(machine, 3, 0, 1, RAM + 0xfa0000, 0);
-	memory_set_bank(3, 0);
+	memory_set_bank(machine, 3, 0);
 }
 
 static WRITE8_HANDLER( stbook_ym2149_port_a_w )
@@ -1713,7 +1713,7 @@ static MACHINE_START( stbook )
 	acia6850_config(1, &acia_midi_intf);
 	rp5c15_init(machine, &rtc_intf);
 
-	cpunum_set_irq_callback(0, atarist_int_ack);
+	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
 }
 
 static MACHINE_DRIVER_START( atarist )
@@ -2105,7 +2105,7 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite16_handler(image->machine, 0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
+			memory_install_readwrite16_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
 
 			return INIT_PASS;
 		}

@@ -171,13 +171,13 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 	if ((y == shifter.vblank_start) && (x == 0))
 	{
-		cpu_set_input_line(machine->cpu[0], MC68000_IRQ_4, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], M68K_IRQ_4, HOLD_LINE);
 		shifter.ofs = shifter.base;
 	}
 
 	if (x == shifter.hblank_start)
 	{
-		cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], M68K_IRQ_2, HOLD_LINE);
 		shifter.ofs += (shifter.lineofs * 2); // STe
 	}
 }
@@ -282,7 +282,7 @@ WRITE16_HANDLER( atarist_shifter_palette_w )
 	shifter.palette[offset] = data;
 	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
-	palette_set_color_rgb(machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
+	palette_set_color_rgb(space->machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }
 
 /* Atari STe Shifter */
@@ -341,7 +341,7 @@ WRITE16_HANDLER( atariste_shifter_palette_w )
 	shifter.palette[offset] = data;
 	logerror("SHIFTER palette %x = %x\n", offset, data);
 
-	palette_set_color_rgb(machine, offset, r, g, b);
+	palette_set_color_rgb(space->machine, offset, r, g, b);
 }
 
 READ16_HANDLER( atariste_shifter_lineofs_r )

@@ -472,8 +472,8 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
+	$(MESSOBJ)/atari.a \
 
-#	$(MESSOBJ)/atari.a \
 #	$(MESSOBJ)/coco.a \
 #	$(MESSOBJ)/compis.a \
 #	$(MESSOBJ)/dgn_beta.a \
@@ -584,12 +584,12 @@ $(MESSOBJ)/sega.a:			\
 	$(MAME_MACHINE)/gdcrypt.o	\
 	$(MAME_VIDEO)/dc.o		\
 
-$(MESSOBJ)/atari.a:						\
-	$(MAME_VIDEO)/tia.o			\
-	$(MAME_MACHINE)/atari.o			\
-	$(MAME_VIDEO)/atari.o			\
-	$(MAME_VIDEO)/antic.o			\
-	$(MAME_VIDEO)/gtia.o			\
+$(MESSOBJ)/atari.a:			\
+	$(MAME_VIDEO)/tia.o		\
+	$(MAME_MACHINE)/atari.o		\
+	$(MAME_VIDEO)/atari.o		\
+	$(MAME_VIDEO)/antic.o		\
+	$(MAME_VIDEO)/gtia.o		\
 	$(MESS_MACHINE)/atarifdc.o	\
 	$(MESS_DRIVERS)/atari.o		\
 	$(MESS_MACHINE)/a7800.o		\
@@ -597,16 +597,16 @@ $(MESSOBJ)/atari.a:						\
 	$(MESS_VIDEO)/a7800.o		\
 	$(MESS_DRIVERS)/a2600.o		\
 	$(MESS_DRIVERS)/jaguar.o	\
-	$(MAME_AUDIO)/jaguar.o			\
-	$(MAME_VIDEO)/jaguar.o			\
+	$(MAME_AUDIO)/jaguar.o		\
+	$(MAME_VIDEO)/jaguar.o		\
 	$(MESS_FORMATS)/a26_cas.o	\
-	$(MESS_DRIVERS)/atarist.o \
-	$(MESS_VIDEO)/atarist.o \
-	$(MESS_AUDIO)/lmc1992.o
+	$(MESS_DRIVERS)/atarist.o 	\
+	$(MESS_VIDEO)/atarist.o 	\
+	$(MESS_AUDIO)/lmc1992.o		\
 
-$(MESSOBJ)/gce.a:	                     \
+$(MESSOBJ)/gce.a:	           	\
 	$(MESS_DRIVERS)/vectrex.o	\
-	$(MESS_VIDEO)/vectrex.o	\
+	$(MESS_VIDEO)/vectrex.o		\
 	$(MESS_MACHINE)/vectrex.o	\
 
 $(MESSOBJ)/nintendo.a:			\
