@@ -618,7 +618,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( dgnbeta )	/* Dragon Beta										*/
 //128u4	DRIVER( tanodr64 )	/* Tano Dragon 64 (NTSC)							*/
 //128u4	DRIVER( cp400 )		/* Prologica CP400									*/
-//128u4	DRIVER( mc10 )		/* MC-10											*/
+	DRIVER( mc10 )		/* MC-10											*/
 //128u4	DRIVER( alice )		/* Matra & Hachette Ordinateur Alice				*/
 
 	/* EACA */

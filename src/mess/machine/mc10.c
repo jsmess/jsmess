@@ -42,9 +42,9 @@ MACHINE_START( mc10 )
 	mc10_bfff = 0x00;
 	mc10_keyboard_strobe = 0x00;
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
 			0x4000,	0x4000 + mess_ram_size - 1,	0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr(1, mess_ram);
+	memory_set_bankptr(machine, 1, mess_ram);
 
 	state_save_register_global(mc10_bfff);
 	state_save_register_global(mc10_keyboard_strobe);
@@ -69,17 +69,17 @@ READ8_HANDLER ( mc10_bfff_r )
 
 	int val = 0x40;
 
-	if ((input_port_read(machine, "LINE0") | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(space->machine, "LINE0") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x01;
-	if ((input_port_read(machine, "LINE1") | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(space->machine, "LINE1") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x02;
-	if ((input_port_read(machine, "LINE2") | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(space->machine, "LINE2") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x04;
-	if ((input_port_read(machine, "LINE3") | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(space->machine, "LINE3") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x08;
-	if ((input_port_read(machine, "LINE4") | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(space->machine, "LINE4") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x10;
-	if ((input_port_read(machine, "LINE5") | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(space->machine, "LINE5") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x20;
 
 	return val;
@@ -135,10 +135,10 @@ READ8_HANDLER ( mc10_port2_r )
      *   BIT 4 CASSETTE TAPE INPUT
      */
 
-	const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
 	int val = 0xed;
 
-	if ((input_port_read(machine, "LINE6") | mc10_keyboard_strobe) == 0xff)
+	if ((input_port_read(space->machine, "LINE6") | mc10_keyboard_strobe) == 0xff)
 		val |= 0x02;
 
 	if (cassette_input(img) >= 0)
@@ -150,7 +150,7 @@ READ8_HANDLER ( mc10_port2_r )
 
 WRITE8_HANDLER ( mc10_port2_w )
 {
-	const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
 
 	/*   BIT 0 PRINTER OUTFUT & CASS OUTPUT
      */
