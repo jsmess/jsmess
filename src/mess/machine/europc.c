@@ -111,18 +111,18 @@ extern WRITE8_HANDLER ( europc_jim_w )
 		}
 //		mode= data&0x10?AGA_COLOR:AGA_MONO;
 //		mode= data&0x10?AGA_COLOR:AGA_OFF;
-		pc_aga_set_mode(machine,europc_jim.mode);
+		pc_aga_set_mode(space->machine,europc_jim.mode);
 		if (data&0x80) europc_jim.state=0;
 		break;
 	case 4:
 		switch(data&0xc0) {
-		case 0x00: cpunum_set_clockscale(machine, 0, 1.0/2);break;
-		case 0x40: cpunum_set_clockscale(machine, 0, 3.0/4);break;
-		default: cpunum_set_clockscale(machine, 0, 1);break;
+		case 0x00: cpu_set_clockscale(space->machine->cpu[0], 1.0/2);break;
+		case 0x40: cpu_set_clockscale(space->machine->cpu[0], 3.0/4);break;
+		default: cpu_set_clockscale(space->machine->cpu[0], 1);break;
 		}
 		break;
 	case 0xa:
-		europc_rtc_w(machine, 0, data);
+		europc_rtc_w(space, 0, data);
 		return;
 	}
 	logerror("jim write %.2x %.2x\n",offset,data);
@@ -135,7 +135,7 @@ READ8_HANDLER ( europc_jim_r )
 	switch(offset) {
 	case 4: case 5: case 6: case 7: data=europc_jim.data[offset];break;
 	case 0: case 1: case 2: case 3: data=0;break;
-	case 0xa: return europc_rtc_r(machine, 0);
+	case 0xa: return europc_rtc_r(space, 0);
 	}
 	return data;
 }
@@ -170,7 +170,7 @@ WRITE8_HANDLER( europc_pio_w )
 		europc_pio.port61=data;
 //		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
 //		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
-		pit8253_gate_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
+		pit8253_gate_w( (device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 		pc_speaker_set_spkrdata( data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		break;
@@ -192,7 +192,7 @@ WRITE8_HANDLER( europc_pio_w )
 		data=europc_pio.port61;
 		break;
 	case 2:
-		if (pit8253_get_output(device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ),2)) data|=0x20;
+		if (pit8253_get_output(device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ),2)) data|=0x20;
 		break;
 	}
 	return data;

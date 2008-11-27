@@ -154,7 +154,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 		pc1640.port61=data;
 		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
 		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
-		pit8253_gate_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
+		pit8253_gate_w( (device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 		pc_speaker_set_spkrdata( data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		break;
@@ -192,7 +192,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 
 	case 2:
 		data = pc1640.port62;
-		if (pit8253_get_output(device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2))
+		if (pit8253_get_output(device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 2))
 			data |= 0x20;
 		break;
 	}
@@ -201,32 +201,32 @@ WRITE8_HANDLER( pc1640_port60_w )
 
  READ8_HANDLER( pc200_port378_r )
 {
-	int data=pc_parallelport1_r(machine, offset);
+	int data=pc_parallelport1_r(space, offset);
 	if (offset == 1) 
-		data = (data & ~7) | (input_port_read(machine, "DSW0") & 7);
+		data = (data & ~7) | (input_port_read(space->machine, "DSW0") & 7);
 	if (offset == 2) 
-		data = (data & ~0xe0) | (input_port_read(machine, "DSW0") & 0xc0);
+		data = (data & ~0xe0) | (input_port_read(space->machine, "DSW0") & 0xc0);
 	return data;
 }
 
 
  READ8_HANDLER( pc1640_port378_r )
 {
-	int data=pc_parallelport1_r(machine, offset);
+	int data=pc_parallelport1_r(space, offset);
 	if (offset == 1) 
-		data=(data & ~7) | (input_port_read(machine, "DSW0") & 7);
+		data=(data & ~7) | (input_port_read(space->machine, "DSW0") & 7);
 	if (offset == 2) 
 	{
 		switch (pc1640.dipstate) 
 		{
 		case 0:
-			data = (data&~0xe0) | (input_port_read(machine, "DSW0") & 0xe0);
+			data = (data&~0xe0) | (input_port_read(space->machine, "DSW0") & 0xe0);
 			break;
 		case 1:
-			data = (data&~0xe0) | ((input_port_read(machine, "DSW0") & 0xe000)>>8);
+			data = (data&~0xe0) | ((input_port_read(space->machine, "DSW0") & 0xe000)>>8);
 			break;
 		case 2:
-			data = (data&~0xe0) | ((input_port_read(machine, "DSW0") & 0xe00)>>4);
+			data = (data&~0xe0) | ((input_port_read(space->machine, "DSW0") & 0xe00)>>4);
 			break;
 
 		}
@@ -237,7 +237,7 @@ WRITE8_HANDLER( pc1640_port60_w )
  READ8_HANDLER( pc1640_port3d0_r )
 {
 	if (offset==0xa) pc1640.dipstate=0;
-	return vga_port_03d0_r(machine, offset);
+	return vga_port_03d0_r(space, offset);
 }
 
  READ8_HANDLER( pc1640_port4278_r )
@@ -256,28 +256,28 @@ READ8_HANDLER( pc1640_port278_r )
 
 static READ8_HANDLER( pc1640_mouse_x_r )
 {
-	return pc1640.mouse.x - input_port_read(machine, "pc_mouse_x");
+	return pc1640.mouse.x - input_port_read(space->machine, "pc_mouse_x");
 }
 
 static READ8_HANDLER( pc1640_mouse_y_r )
 {
-	return pc1640.mouse.y - input_port_read(machine, "pc_mouse_y");
+	return pc1640.mouse.y - input_port_read(space->machine, "pc_mouse_y");
 }
 
 static WRITE8_HANDLER( pc1640_mouse_x_w )
 {
-	pc1640.mouse.x = data + input_port_read(machine, "pc_mouse_x");
+	pc1640.mouse.x = data + input_port_read(space->machine, "pc_mouse_x");
 }
 
 static WRITE8_HANDLER( pc1640_mouse_y_w )
 {
-	pc1640.mouse.y = data + input_port_read(machine, "pc_mouse_y");
+	pc1640.mouse.y = data + input_port_read(space->machine, "pc_mouse_y");
 }
 
-READ16_HANDLER( pc1640_16le_mouse_x_r )	 { return read16le_with_read8_handler(pc1640_mouse_x_r, machine, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_mouse_y_r )  { return read16le_with_read8_handler(pc1640_mouse_y_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( pc1640_16le_mouse_x_w ) { write16le_with_write8_handler(pc1640_mouse_x_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER( pc1640_16le_mouse_y_w ) { write16le_with_write8_handler(pc1640_mouse_y_w, machine, offset, data, mem_mask); }
+READ16_HANDLER( pc1640_16le_mouse_x_r )	 { return read16le_with_read8_handler(pc1640_mouse_x_r, space, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_mouse_y_r )  { return read16le_with_read8_handler(pc1640_mouse_y_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc1640_16le_mouse_x_w ) { write16le_with_write8_handler(pc1640_mouse_x_w, space, offset, data, mem_mask); }
+WRITE16_HANDLER( pc1640_16le_mouse_y_w ) { write16le_with_write8_handler(pc1640_mouse_y_w, space, offset, data, mem_mask); }
 
 INPUT_PORTS_START( amstrad_keyboard )
 
@@ -408,11 +408,11 @@ INPUT_PORTS_START( amstrad_keyboard )
 INPUT_PORTS_END
 
 
-READ16_HANDLER( pc1640_16le_port60_r ) { return read16le_with_read8_handler(pc1640_port60_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( pc1640_16le_port60_w ) { write16le_with_write8_handler(pc1640_port60_w, machine, offset, data, mem_mask); }
+READ16_HANDLER( pc1640_16le_port60_r ) { return read16le_with_read8_handler(pc1640_port60_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc1640_16le_port60_w ) { write16le_with_write8_handler(pc1640_port60_w, space, offset, data, mem_mask); }
 
-READ16_HANDLER( pc200_16le_port378_r ) { return read16le_with_read8_handler(pc200_port378_r, machine, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port378_r ) { return read16le_with_read8_handler(pc1640_port378_r, machine, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port3d0_r ) { return read16le_with_read8_handler(pc1640_port3d0_r, machine, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port4278_r ) { return read16le_with_read8_handler(pc1640_port4278_r, machine, offset, mem_mask); }
-READ16_HANDLER( pc1640_16le_port278_r ) { return read16le_with_read8_handler(pc1640_port278_r, machine, offset, mem_mask); }
+READ16_HANDLER( pc200_16le_port378_r ) { return read16le_with_read8_handler(pc200_port378_r, space, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port378_r ) { return read16le_with_read8_handler(pc1640_port378_r, space, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port3d0_r ) { return read16le_with_read8_handler(pc1640_port3d0_r, space, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port4278_r ) { return read16le_with_read8_handler(pc1640_port4278_r, space, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port278_r ) { return read16le_with_read8_handler(pc1640_port278_r, space, offset, mem_mask); }

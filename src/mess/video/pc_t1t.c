@@ -743,11 +743,11 @@ WRITE8_HANDLER ( pc_T1T_w )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, T1000_MC6845_NAME);
+			devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, T1000_MC6845_NAME);
 			mc6845_address_w( devconf, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, T1000_MC6845_NAME);
+			devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, T1000_MC6845_NAME);
 			mc6845_register_w( devconf, offset, data );
 			break;
 		case 8:
@@ -770,7 +770,7 @@ WRITE8_HANDLER ( pc_T1T_w )
 			pc_t1t_vga_data_w(data);
 			break;
 		case 15:
-			pc_t1t_bank_w(machine, data);
+			pc_t1t_bank_w(space->machine, data);
 			break;
     }
 }
@@ -783,11 +783,11 @@ WRITE8_HANDLER( pc_pcjr_w )
 	switch( offset )
 	{
 		case 0: case 4: 
-			devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, T1000_MC6845_NAME);
+			devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, T1000_MC6845_NAME);
 			mc6845_address_w( devconf, offset, data );
 			break;
 		case 1: case 5:
-			devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, T1000_MC6845_NAME);
+			devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, T1000_MC6845_NAME);
 			mc6845_register_w( devconf, offset, data );
 			break;
 		case 10:
@@ -807,7 +807,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 		case 12:
 			break;
 		case 15:
-			pc_pcjr_bank_w(machine, data);
+			pc_pcjr_bank_w(space->machine, data);
 			break;
 
 		default:
@@ -828,7 +828,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 			break;
 
 		case 1: case 3: case 5: case 7:
-			devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, T1000_MC6845_NAME);
+			devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, T1000_MC6845_NAME);
 			data = mc6845_register_r( devconf, offset );
 			break;
 

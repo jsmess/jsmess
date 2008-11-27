@@ -171,7 +171,7 @@ TODO: Which clock signals are available in a PC Jr?
 static READ8_HANDLER( pc_ym3812_0_r )
 {
 	if ((offset % 1) == 0)
-		return ym3812_status_port_0_r(machine, 0);
+		return ym3812_status_port_0_r(space, 0);
 	else
 		return 0x00;
 }
@@ -179,9 +179,9 @@ static READ8_HANDLER( pc_ym3812_0_r )
 static WRITE8_HANDLER( pc_ym3812_0_w )
 {
 	if ((offset % 1) == 0)
-		ym3812_control_port_0_w(machine, 0, data);
+		ym3812_control_port_0_w(space, 0, data);
 	else
-		ym3812_write_port_0_w(machine, 0, data);
+		ym3812_write_port_0_w(space, 0, data);
 }
 
 #ifdef UNUSED_FUNCTION

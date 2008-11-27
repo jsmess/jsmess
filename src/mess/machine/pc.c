@@ -101,9 +101,9 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x0F0000;
 
-	cpuintrf_push_context(0);
-	result = memory_read_byte(space, page_offset + offset);
-	cpuintrf_pop_context();
+	cpu_push_context( device->machine->cpu[0] );
+	result = memory_read_byte( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), page_offset + offset);
+	cpu_pop_context();
 
 	return result;
 }
@@ -114,9 +114,9 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x0F0000;
 
-	cpuintrf_push_context(0);
-	memory_write_byte(space, page_offset + offset, data);
-	cpuintrf_pop_context();
+	cpu_push_context( device->machine->cpu[0] );
+	memory_write_byte( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), page_offset + offset, data);
+	cpu_pop_context();
 }
 
 
@@ -214,13 +214,13 @@ static emu_timer	*pc_int_delay_timer;
 
 static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
 {
-    cpunum_set_input_line(pc_devices.pic8259_master->machine, 0, 0, param ? HOLD_LINE : CLEAR_LINE);
+    cpu_set_input_line(machine->cpu[0], 0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static PIC8259_SET_INT_LINE( pcjr_pic8259_master_set_int_line )
 {
-	if ( cpunum_get_reg( 0, REG_PC ) == 0xF0454 )
+	if ( cpu_get_reg( device->machine->cpu[0], REG_PC ) == 0xF0454 )
 	{
 		timer_adjust_oneshot( pc_int_delay_timer, ATTOTIME_IN_CYCLES(1,0), interrupt );
 	}
@@ -560,7 +560,7 @@ static void pcjr_set_keyb_int(int state)
 			pcjr_keyb.latch = 1;
 			if ( nmi_enabled & 0x80 )
 			{
-				cpunum_set_input_line( Machine, 0, INPUT_LINE_NMI, PULSE_LINE );
+				cpu_set_input_line( Machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
 			}
 		}
 	}
@@ -645,8 +645,8 @@ static struct {
 	UINT8					data_signal;
 	UINT8					shift_register;
 	UINT8					shift_enable;
-	write8_machine_func		clock_callback;
-	write8_machine_func		data_callback;
+	write8_space_func		clock_callback;
+	write8_space_func		data_callback;
 } pc_ppi={ 0 };
 
 
@@ -792,7 +792,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 
 	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
 
-	pc_ppi.clock_callback( device->machine, 0, pc_ppi.clock_signal );
+	pc_ppi.clock_callback( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0, pc_ppi.clock_signal );
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( pc_ppi.keyboard_clear )
@@ -831,14 +831,14 @@ static WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 						pic8259_set_irq_line(pc_devices.pic8259_master, 1, 1);
 						pc_ppi.shift_enable = 0;
 						pc_ppi.clock_signal = 0;
-						pc_ppi.clock_callback( machine, 0, 0 );
+						pc_ppi.clock_callback( space, 0, 0 );
 					}
 				}
 			}
 		}
 	}
 
-	pc_ppi.clock_callback( machine, 0, pc_ppi.clock_signal );
+	pc_ppi.clock_callback( space, 0, pc_ppi.clock_signal );
 }
 
 
@@ -846,11 +846,11 @@ static WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 {
 	pc_ppi.data_signal = data;
 
-	pc_ppi.data_callback( machine, 0, pc_ppi.data_signal );
+	pc_ppi.data_callback( space, 0, pc_ppi.data_signal );
 }
 
 
-static void ibm5150_set_keyboard_interface( running_machine *machine, write8_machine_func clock_cb, write8_machine_func data_cb )
+static void ibm5150_set_keyboard_interface( running_machine *machine, write8_space_func clock_cb, write8_space_func data_cb )
 {
 	pc_ppi.clock_callback = clock_cb;
 	pc_ppi.data_callback = data_cb;
@@ -1090,7 +1090,7 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 
 	/* MESS managed RAM */
 	if ( mess_ram )
-		memory_set_bankptr( 10, mess_ram );
+		memory_set_bankptr( machine, 10, mess_ram );
 
 	/* FDC/HDC hardware */
 	pc_hdc_setup(set_hdc_int_func);
@@ -1174,6 +1174,8 @@ DRIVER_INIT( t1000hx )
 
 DRIVER_INIT( pc200 )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *io_space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
 	int i;
 
@@ -1181,17 +1183,19 @@ DRIVER_INIT( pc200 )
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
+	memory_install_read16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
+	memory_install_write16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
 	videoram_size=0x10000;
 	videoram=memory_region(machine, "main")+0xb0000;
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc200_16le_port378_r );
+	memory_install_read16_handler( io_space, 0x278, 0x27b, 0, 0, pc200_16le_port378_r );
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT( pc1512 )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *io_space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
 	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
 	int i;
 
@@ -1199,13 +1203,13 @@ DRIVER_INIT( pc1512 )
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbbfff, 0, 0x0C000, SMH_BANK1 );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbbfff, 0, 0x0C000, pc1512_videoram16le_w );
+	memory_install_read16_handler( space, 0xb8000, 0xbbfff, 0, 0x0C000, SMH_BANK1 );
+	memory_install_write16_handler( space, 0xb8000, 0xbbfff, 0, 0x0C000, pc1512_videoram16le_w );
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc1512_16le_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc1512_16le_w );
+	memory_install_read16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_r );
+	memory_install_write16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_w );
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc16le_parallelport2_r );
+	memory_install_read16_handler( io_space, 0x278, 0x27b, 0, 0, pc16le_parallelport2_r );
 
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
@@ -1220,18 +1224,19 @@ DRIVER_INIT( pcjr )
 
 
 
-static void pc_map_vga_memory(offs_t begin, offs_t end, read8_machine_func rh, write8_machine_func wh)
+static void pc_map_vga_memory(offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
+	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	int buswidth;
-	buswidth = cputype_databus_width(Machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
-			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
+			memory_install_read8_handler(space, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
+			memory_install_write8_handler(space, 0xA0000, 0xBFFFF, 0, 0, SMH_NOP);
 
-			memory_install_read8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, rh);
-			memory_install_write8_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, wh);
+			memory_install_read8_handler(space, begin, end, 0, 0, rh);
+			memory_install_write8_handler(space, begin, end, 0, 0, wh);
 			break;
 
 		default:
@@ -1257,25 +1262,28 @@ static const struct pc_vga_interface vga_interface =
 
 DRIVER_INIT( pc1640 )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *io_space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
+
 	pc_vga_init(machine, &vga_interface, NULL);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK1 );
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK2 );
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK3 );
+	memory_install_read16_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK1 );
+	memory_install_read16_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK2 );
+	memory_install_read16_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK3 );
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xaffff, 0, 0, SMH_BANK1 );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb7fff, 0, 0, SMH_BANK2 );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, SMH_BANK3 );
+	memory_install_write16_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK1 );
+	memory_install_write16_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK2 );
+	memory_install_write16_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK3 );
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, vga_port16le_03b0_r );
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, paradise_ega16le_03c0_r );
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc1640_16le_port3d0_r );
+	memory_install_read16_handler(io_space, 0x3b0, 0x3bf, 0, 0, vga_port16le_03b0_r );
+	memory_install_read16_handler(io_space, 0x3c0, 0x3cf, 0, 0, paradise_ega16le_03c0_r );
+	memory_install_read16_handler(io_space, 0x3d0, 0x3df, 0, 0, pc1640_16le_port3d0_r );
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, vga_port16le_03b0_w );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c0, 0x3cf, 0, 0, vga_port16le_03c0_w );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, vga_port16le_03d0_w );
+	memory_install_write16_handler(io_space, 0x3b0, 0x3bf, 0, 0, vga_port16le_03b0_w );
+	memory_install_write16_handler(io_space, 0x3c0, 0x3cf, 0, 0, vga_port16le_03c0_w );
+	memory_install_write16_handler(io_space, 0x3d0, 0x3df, 0, 0, vga_port16le_03d0_w );
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
+	memory_install_read16_handler(io_space, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
+	memory_install_read16_handler(io_space, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
@@ -1303,7 +1311,7 @@ MACHINE_START( pc )
 
 MACHINE_RESET( pc )
 {
-	cpunum_set_irq_callback(0, pc_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], pc_irq_callback);
 
 	pc_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
 	pc_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );

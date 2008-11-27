@@ -129,8 +129,8 @@ WRITE8_HANDLER( pc_rtc_w )
 	}
 }
 
-READ16_HANDLER( pc16le_rtc_r ) { return read16le_with_read8_handler(pc_rtc_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( pc16le_rtc_w ) { write16le_with_write8_handler(pc_rtc_w, machine, offset, data, mem_mask); }
+READ16_HANDLER( pc16le_rtc_r ) { return read16le_with_read8_handler(pc_rtc_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc16le_rtc_w ) { write16le_with_write8_handler(pc_rtc_w, space, offset, data, mem_mask); }
 
 /*************************************************************************
  *

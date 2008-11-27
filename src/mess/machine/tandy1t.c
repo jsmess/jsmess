@@ -148,9 +148,9 @@ static struct {
 
 WRITE8_HANDLER ( pc_t1t_p37x_w )
 {
-//	DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", activecpu_get_pc(),offset, data));
+//	DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", cpu_get_pc( space->cpu),offset, data));
 	if (offset!=4)
-		logerror("T1T_p37x_w %.5x #%d $%02x\n", activecpu_get_pc(),offset, data);
+		logerror("T1T_p37x_w %.5x #%d $%02x\n", cpu_get_pc( space->cpu),offset, data);
 	tandy.data[offset]=data;
 	switch( offset )
 	{
@@ -163,7 +163,7 @@ WRITE8_HANDLER ( pc_t1t_p37x_w )
  READ8_HANDLER ( pc_t1t_p37x_r )
 {
 	int data = tandy.data[offset];
-//	DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", activecpu_get_pc(), offset, data));
+//	DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", cpu_get_pc( space->cpu), offset, data));
     return data;
 }
 
@@ -184,7 +184,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	switch (offset) {
 	case 1:
 		tandy_ppi.portb = data;
-		pit8253_gate_w( (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
+		pit8253_gate_w( (device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
 		pc_speaker_set_spkrdata( data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		if ( data & 0x80 ) {
@@ -193,8 +193,8 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		break;
 	case 2:
 		tandy_ppi.portc = data;
-		if (data&8) cpunum_set_clockscale(machine, 0, 1);
-		else cpunum_set_clockscale(machine, 0, 4.77/8);
+		if (data&8) cpu_set_clockscale(space->machine->cpu[0], 1);
+		else cpu_set_clockscale(space->machine->cpu[0], 4.77/8);
 		break;
 	}
 }

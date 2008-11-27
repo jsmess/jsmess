@@ -16,7 +16,7 @@
 #include "video/cgapal.h"
 
 
-#define CGA_MONITOR		(input_port_read(machine, "VIDEO") & 0x1C)
+#define CGA_MONITOR		(input_port_read(space->machine, "VIDEO") & 0x1C)
 #define CGA_MONITOR_RGB			0x00	/* Colour RGB */
 #define CGA_MONITOR_MONO		0x04	/* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE	0x08	/* Colour composite */
@@ -480,7 +480,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		device_config   *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, MDA_MC6845_NAME);
+		device_config   *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, MDA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:
@@ -490,7 +490,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 			data = mc6845_register_r( devconf, offset );
 			break;
 		case 10:
-			data = (input_port_read(machine, "IN0") & 0x80 ) | 0x08 | aga.mda_status;
+			data = (input_port_read(space->machine, "IN0") & 0x80 ) | 0x08 | aga.mda_status;
 			aga.mda_status ^= 0x01;
 			break;
 		/* 12, 13, 14  are the LPT1 ports */
@@ -502,7 +502,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if ( aga.mode == AGA_MONO ) {
-		device_config   *devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, AGA_MC6845_NAME);
+		device_config   *devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, AGA_MC6845_NAME);
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
@@ -535,7 +535,7 @@ static READ8_HANDLER ( pc_aga_cga_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_COLOR ) {
-		device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, AGA_MC6845_NAME);
+		device_config	*devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, AGA_MC6845_NAME);
 		switch( offset ) {
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
@@ -581,7 +581,7 @@ static void pc_aga_set_palette_luts(void) {
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if ( aga.mode == AGA_COLOR ) {
-		device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, AGA_MC6845_NAME);
+		device_config	*devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, AGA_MC6845_NAME);
 
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
@@ -651,10 +651,10 @@ static WRITE8_HANDLER ( pc_aga_cga_w )
 }
 
 
-static READ16_HANDLER ( pc16le_aga_mda_r ) { return read16le_with_read8_handler(pc_aga_mda_r, machine, offset, mem_mask); }
-static WRITE16_HANDLER ( pc16le_aga_mda_w ) { write16le_with_write8_handler(pc_aga_mda_w, machine, offset, data, mem_mask); }
-static READ16_HANDLER ( pc16le_aga_cga_r ) { return read16le_with_read8_handler(pc_aga_cga_r, machine, offset, mem_mask); }
-static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_aga_cga_w, machine, offset, data, mem_mask); }
+static READ16_HANDLER ( pc16le_aga_mda_r ) { return read16le_with_read8_handler(pc_aga_mda_r, space, offset, mem_mask); }
+static WRITE16_HANDLER ( pc16le_aga_mda_w ) { write16le_with_write8_handler(pc_aga_mda_w, space, offset, data, mem_mask); }
+static READ16_HANDLER ( pc16le_aga_cga_r ) { return read16le_with_read8_handler(pc_aga_cga_r, space, offset, mem_mask); }
+static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_aga_cga_w, space, offset, data, mem_mask); }
 
 
 
@@ -681,22 +681,23 @@ void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 
 VIDEO_START( pc_aga )
 {
-	int buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
+	int buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_w );
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_aga_cga_w );
+			memory_install_read8_handler(space, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r );
+			memory_install_write8_handler(space, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_w );
+			memory_install_read8_handler(space, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r );
+			memory_install_write8_handler(space, 0x3d0, 0x3df, 0, 0, pc_aga_cga_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_w );
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_r );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_w );
+			memory_install_read16_handler(space, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r );
+			memory_install_write16_handler(space, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_w );
+			memory_install_read16_handler(space, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_r );
+			memory_install_write16_handler(space, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_w );
 			break;
 
 		default:
@@ -714,21 +715,22 @@ VIDEO_START( pc_aga )
 
 VIDEO_START( pc200 )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
 	int buswidth;
 
 	VIDEO_START_CALL(pc_aga);
 
-	buswidth = cputype_databus_width(machine->config->cpu[0].type, ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga_r );
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga_w );
+			memory_install_read8_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga_r );
+			memory_install_write8_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga16le_r );
-			memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga16le_w );
+			memory_install_read16_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga16le_r );
+			memory_install_write16_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga16le_w );
 			break;
 
 		default:
@@ -751,10 +753,10 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 	switch (aga.mode) {
 	case AGA_COLOR:
 		if (offset>=0x8000)
-			pc_video_videoram_w(machine, offset-0x8000, data);
+			pc_video_videoram_w(space, offset-0x8000, data);
 		break;
 	case AGA_MONO:
-		pc_video_videoram_w(machine, offset,data);
+		pc_video_videoram_w(space, offset,data);
 		break;
 	case AGA_OFF: break;
 	}
@@ -792,16 +794,16 @@ WRITE8_HANDLER ( pc200_videoram_w )
 	{
 		default:
 			if (offset>=0x8000)
-				pc_video_videoram_w(machine, offset-0x8000, data);
+				pc_video_videoram_w(space, offset-0x8000, data);
 			break;
 		case AGA_MONO:
-			pc_video_videoram_w(machine, offset,data);
+			pc_video_videoram_w(space, offset,data);
 			break;
 	}
 }
 
-READ16_HANDLER( pc200_videoram16le_r )	{ return read16le_with_read8_handler(pc200_videoram_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( pc200_videoram16le_w )	{ write16le_with_write8_handler(pc200_videoram_w, machine, offset, data, mem_mask); }
+READ16_HANDLER( pc200_videoram16le_r )	{ return read16le_with_read8_handler(pc200_videoram_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc200_videoram16le_w )	{ write16le_with_write8_handler(pc200_videoram_w, space, offset, data, mem_mask); }
 
 
 static struct {
@@ -815,12 +817,12 @@ WRITE8_HANDLER( pc200_cga_w )
 	switch(offset) {
 	case 4:
 		pc200.portd |= 0x20;
-//		pc_cga8_w(machine, offset,data);
+//		pc_cga8_w(space, offset,data);
 		break;
 	case 8:
 		pc200.port8 = data;
 		pc200.portd |= 0x80;
-//		pc_cga8_w(machine, offset,data);
+//		pc_cga8_w(space, offset,data);
 		break;
 	case 0xe:
 		pc200.portd = 0x1f;
@@ -835,17 +837,17 @@ WRITE8_HANDLER( pc200_cga_w )
 		if ((pc200.porte & 7) != (data & 7))
 		{
 			if (data & 4)
-				pc_aga_set_mode(machine, AGA_OFF);
+				pc_aga_set_mode(space->machine, AGA_OFF);
 			else if (data & 2)
-				pc_aga_set_mode(machine, AGA_MONO);
+				pc_aga_set_mode(space->machine, AGA_MONO);
 			else
-				pc_aga_set_mode(machine, AGA_COLOR);
+				pc_aga_set_mode(space->machine, AGA_COLOR);
 		}
 		pc200.porte = data;
 		break;
 
 	default:
-//		pc_cga8_w(machine, offset,data);
+//		pc_cga8_w(space, offset,data);
 		break;
 	}
 }
@@ -868,15 +870,15 @@ READ8_HANDLER ( pc200_cga_r )
 	case 0xe:
 		// 0x20 low cga
 		// 0x10 low special
-		result = input_port_read(machine, "DSW0") & 0x38;
+		result = input_port_read(space->machine, "DSW0") & 0x38;
 		break;
 
 	default:
-//		result = pc_cga8_r(machine, offset);
+//		result = pc_cga8_r(space, offset);
 		break;
 	}
 	return result;
 }
 
-READ16_HANDLER( pc200_cga16le_r ) { return read16le_with_read8_handler(pc200_cga_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( pc200_cga16le_w ) { write16le_with_write8_handler(pc200_cga_w, machine, offset, data, mem_mask); }
+READ16_HANDLER( pc200_cga16le_r ) { return read16le_with_read8_handler(pc200_cga_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc200_cga16le_w ) { write16le_with_write8_handler(pc200_cga_w, space, offset, data, mem_mask); }
