@@ -654,14 +654,14 @@ static PALETTE_INIT( atari )
 
 
 
-static READ8_HANDLER( analog_0_r ) { return (UINT8) input_port_read(machine, "analog_0"); }
-static READ8_HANDLER( analog_1_r ) { return (UINT8) input_port_read(machine, "analog_1"); }
-static READ8_HANDLER( analog_2_r ) { return (UINT8) input_port_read(machine, "analog_2"); }
-static READ8_HANDLER( analog_3_r ) { return (UINT8) input_port_read(machine, "analog_3"); }
-static READ8_HANDLER( analog_4_r ) { return (UINT8) input_port_read(machine, "analog_4"); }
-static READ8_HANDLER( analog_5_r ) { return (UINT8) input_port_read(machine, "analog_5"); }
-static READ8_HANDLER( analog_6_r ) { return (UINT8) input_port_read(machine, "analog_6"); }
-static READ8_HANDLER( analog_7_r ) { return (UINT8) input_port_read(machine, "analog_7"); }
+static READ8_HANDLER( analog_0_r ) { return (UINT8) input_port_read(space->machine, "analog_0"); }
+static READ8_HANDLER( analog_1_r ) { return (UINT8) input_port_read(space->machine, "analog_1"); }
+static READ8_HANDLER( analog_2_r ) { return (UINT8) input_port_read(space->machine, "analog_2"); }
+static READ8_HANDLER( analog_3_r ) { return (UINT8) input_port_read(space->machine, "analog_3"); }
+static READ8_HANDLER( analog_4_r ) { return (UINT8) input_port_read(space->machine, "analog_4"); }
+static READ8_HANDLER( analog_5_r ) { return (UINT8) input_port_read(space->machine, "analog_5"); }
+static READ8_HANDLER( analog_6_r ) { return (UINT8) input_port_read(space->machine, "analog_6"); }
+static READ8_HANDLER( analog_7_r ) { return (UINT8) input_port_read(space->machine, "analog_7"); }
 
 
 

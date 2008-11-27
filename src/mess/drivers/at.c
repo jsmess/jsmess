@@ -118,15 +118,15 @@ static READ8_HANDLER(at_adlib_r)
 	if ( offset )
 		return 0xFF;
 	else
-		return ym3812_status_port_0_r( machine, 0 );
+		return ym3812_status_port_0_r( space, 0 );
 }
 
 static WRITE8_HANDLER(at_adlib_w)
 {
 	if ( offset )
-		ym3812_write_port_0_w( machine, 0, data );
+		ym3812_write_port_0_w( space, 0, data );
 	else
-		ym3812_control_port_0_w( machine, 0, data );
+		ym3812_control_port_0_w( space, 0, data );
 }
 #endif
 

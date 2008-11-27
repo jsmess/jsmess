@@ -53,13 +53,13 @@ static UINT8 *ROM;
 /* TODO: Convert the definitions into a syntax accepting input_port_read */
 
 static UINT8 riot_input_port_0_r(const device_config *device, UINT8 olddata)
-{
-	return input_port_0_r(device->machine, 0);
+{	
+	return input_port_0_r(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0);
 }
 
 static UINT8 riot_input_port_3_r(const device_config *device, UINT8 olddata)
 {
-	return input_port_3_r(device->machine, 0);
+	return input_port_3_r(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0);
 }
 
 const riot6532_interface r6532_interface_ntsc =
@@ -84,6 +84,7 @@ const riot6532_interface r6532_interface_pal =
 
 static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	ROM = memory_region(machine, "main");
 	a7800_ispal = ispal;
 	a7800_lines = lines;
@@ -94,11 +95,11 @@ static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 	memory_set_bankptr(machine, 7, &ROM[0x2000]);		/* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
+	memory_install_read8_handler(space, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
+	memory_install_write8_handler(space, 0x0480, 0x04FF, 0, 0, SMH_BANK10);
 	memory_set_bankptr(machine, 10, ROM + 0x0480);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
+	memory_install_read8_handler(space, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
+	memory_install_write8_handler(space, 0x1800, 0x27FF, 0, 0, SMH_BANK11);
 	memory_set_bankptr(machine, 11, ROM + 0x1800);
 }
 
@@ -121,6 +122,7 @@ DRIVER_INIT( a7800_pal )
 MACHINE_RESET( a7800 )
 {
 	UINT8 *memory;
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 
 	a7800_ctrl_lock = 0;
 	a7800_ctrl_reg = 0;
@@ -128,16 +130,16 @@ MACHINE_RESET( a7800 )
 
 	/* set banks to default states */
 	memory = memory_region(machine, "main");
-	memory_set_bankptr( 1, memory + 0x4000 );
-	memory_set_bankptr( 2, memory + 0x8000 );
-	memory_set_bankptr( 3, memory + 0xA000 );
-	memory_set_bankptr( 4, memory + 0xC000 );
+	memory_set_bankptr(machine,  1, memory + 0x4000 );
+	memory_set_bankptr(machine,  2, memory + 0x8000 );
+	memory_set_bankptr(machine,  3, memory + 0xA000 );
+	memory_set_bankptr(machine,  4, memory + 0xC000 );
 
 	/* pokey cartridge */
 	if (a7800_cart_type & 0x01)
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7FFF, 0, 0, pokey1_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7FFF, 0, 0, pokey1_w);
+		memory_install_read8_handler(space, 0x4000, 0x7FFF, 0, 0, pokey1_r);
+		memory_install_write8_handler(space, 0x4000, 0x7FFF, 0, 0, pokey1_w);
 	}
 }
 
@@ -345,20 +347,20 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	switch(offset)
 	{
 		case 0x08:
-			  return((input_port_read(machine, "buttons") & 0x02) << 6);
+			  return((input_port_read(space->machine, "buttons") & 0x02) << 6);
 		case 0x09:
-			  return((input_port_read(machine, "buttons") & 0x08) << 4);
+			  return((input_port_read(space->machine, "buttons") & 0x08) << 4);
 		case 0x0A:
-			  return((input_port_read(machine, "buttons") & 0x01) << 7);
+			  return((input_port_read(space->machine, "buttons") & 0x01) << 7);
 		case 0x0B:
-			  return((input_port_read(machine, "buttons") & 0x04) << 5);
+			  return((input_port_read(space->machine, "buttons") & 0x04) << 5);
 		case 0x0c:
-			if((input_port_read(machine, "buttons") & 0x08) ||(input_port_read(machine, "buttons") & 0x02))
+			if((input_port_read(space->machine, "buttons") & 0x08) ||(input_port_read(space->machine, "buttons") & 0x02))
 				return 0x00;
 			else
 				return 0x80;
 		case 0x0d:
-			if((input_port_read(machine, "buttons") & 0x01) ||(input_port_read(machine, "buttons") & 0x04))
+			if((input_port_read(space->machine, "buttons") & 0x01) ||(input_port_read(space->machine, "buttons") & 0x04))
 				return 0x00;
 			else
 				return 0x80;
@@ -389,7 +391,7 @@ WRITE8_HANDLER( a7800_TIA_w )
 		}
 		break;
 	}
-	tia_sound_w(machine, offset,data);
+	tia_sound_w(space, offset,data);
 	ROM[offset] = data;
 }
 
@@ -405,7 +407,7 @@ WRITE8_HANDLER( a7800_RAM0_w )
 
 WRITE8_HANDLER( a7800_cart_w )
 {
-	UINT8 *memory = memory_region(machine, "main");
+	UINT8 *memory = memory_region(space->machine, "main");
 
 	if(offset < 0x4000)
 	{
@@ -415,7 +417,7 @@ WRITE8_HANDLER( a7800_cart_w )
 		}
 		else if(a7800_cart_type & 0x01)
 		{
-			pokey1_w(machine, offset,data);
+			pokey1_w(space, offset,data);
 		}
 		else
 		{
@@ -434,8 +436,8 @@ WRITE8_HANDLER( a7800_cart_w )
 		{
 			data &= 0x07;
 		}
-		memory_set_bankptr(machine, 2,memory + 0x10000 + (data << 14));
-		memory_set_bankptr(machine, 3,memory + 0x12000 + (data << 14));
+		memory_set_bankptr(space->machine, 2,memory + 0x10000 + (data << 14));
+		memory_set_bankptr(space->machine, 3,memory + 0x12000 + (data << 14));
 	/*	logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
@@ -444,11 +446,11 @@ WRITE8_HANDLER( a7800_cart_w )
 		/*logerror( "F18 BANK SEL: %d\n", data );*/
 		if( data & 1 )
 		{
-			memory_set_bankptr(machine, 1,memory + 0x10000 );
+			memory_set_bankptr(space->machine, 1,memory + 0x10000 );
 		}
 		else if( data & 2 )
 		{
-			memory_set_bankptr(machine, 1,memory + 0x14000 );
+			memory_set_bankptr(space->machine, 1,memory + 0x14000 );
 		}
 	}
 	else if(( a7800_cart_type == MBANK_TYPE_ACTIVISION ) &&( offset >= 0xBF80 ) )
@@ -458,8 +460,8 @@ WRITE8_HANDLER( a7800_cart_w )
 
 		/*logerror( "Activision BANK SEL: %d\n", data );*/
 
-		memory_set_bankptr( 3, memory + 0x10000 + ( data << 14 ) );
-		memory_set_bankptr( 4, memory + 0x12000 + ( data << 14 ) );
+		memory_set_bankptr(space->machine,  3, memory + 0x10000 + ( data << 14 ) );
+		memory_set_bankptr(space->machine,  4, memory + 0x12000 + ( data << 14 ) );
 	}
 }
 

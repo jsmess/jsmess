@@ -104,8 +104,9 @@ VIDEO_START( a7800 )
 
 ***************************************************************************/
 
-static void maria_draw_scanline(void)
+static void maria_draw_scanline(running_machine *machine)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	unsigned int graph_adr,data_addr;
 	int width,hpos,pal,mode,ind;
 	unsigned int dl;
@@ -338,8 +339,9 @@ static void maria_draw_scanline(void)
 INTERRUPT_GEN( a7800_interrupt )
 {
 	int frame_scanline;
-	UINT8 *ROM = memory_region(machine, "main");
-
+	UINT8 *ROM = memory_region(device->machine, "main");
+	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	
 	maria_scanline++;
 
 	/* why + 1? */
@@ -352,7 +354,7 @@ INTERRUPT_GEN( a7800_interrupt )
 
 	if( maria_wsync )
 	{
-		cpu_trigger( machine, TRIGGER_HSYNC );
+		cpuexec_trigger( device->machine, TRIGGER_HSYNC );
 		maria_wsync = 0;
 	}
 
@@ -410,7 +412,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( ( frame_scanline > 15 ) && maria_dodma )
 	{
 		if (maria_scanline < ( a7800_lines - 4 ) )
-			maria_draw_scanline();
+			maria_draw_scanline(device->machine);
 
 		if( maria_offset == 0 )
 		{
@@ -434,7 +436,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( maria_dli )
 	{
 		maria_dli = 0;
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 }
@@ -457,7 +459,7 @@ VIDEO_UPDATE( a7800 )
 
  READ8_HANDLER( a7800_MARIA_r )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	switch (offset)
 	{
 		case 0x08:
@@ -471,7 +473,7 @@ VIDEO_UPDATE( a7800 )
 
 WRITE8_HANDLER( a7800_MARIA_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	switch (offset)
 	{
 		case 0x00:
@@ -496,7 +498,7 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			maria_palette[0][3] = data;
 			break;
 		case 0x04:
-			cpu_spinuntil_trigger(TRIGGER_HSYNC);
+			cpu_spinuntil_trigger(space->machine->cpu[0],TRIGGER_HSYNC);
 			maria_wsync=1;
 			break;
 

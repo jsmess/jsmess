@@ -607,73 +607,73 @@ static int next_bank(void)
 static void modeF8_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void modeFA_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void modeF6_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void modeF4_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void mode3F_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void modeUA_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + (offset >> 6) * 0x1000;
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void modeE0_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	int bank = 1 + (offset >> 3);
 	bank_base[bank] = CART + 0x400 * (offset & 7);
-	memory_set_bankptr(bank, bank_base[bank]);
+	memory_set_bankptr(machine,bank, bank_base[bank]);
 }
 static void modeE7_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * offset;
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void modeE7_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(machine, 9, extra_RAM + (4 + offset) * 256 );
+	memory_set_bankptr(machine,9, extra_RAM + (4 + offset) * 256 );
 }
 static void modeDC_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * next_bank();
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 }
 static void mode3E_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
-	memory_set_bankptr(machine, 1, bank_base[1]);
+	memory_set_bankptr(machine,1, bank_base[1]);
 	mode3E_ram_enabled = 0;
 }
 static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	ram_base = extra_RAM + 0x200 * ( data & 0x3F );
-	memory_set_bankptr(machine, 1, ram_base );
+	memory_set_bankptr(machine,1, ram_base );
 	mode3E_ram_enabled = 1;
 }
 static void modeFV_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	//printf("ModeFV %04x\n",offset);
-	if (!FVlocked && ( activecpu_get_pc() & 0x1F00 ) == 0x1F00 ) {
+	if (!FVlocked && ( cpu_get_pc(machine->cpu[0]) & 0x1F00 ) == 0x1F00 ) {
 		FVlocked = 1;
 		current_bank = current_bank ^ 0x01;
 		bank_base[1] = CART + 0x1000 * current_bank;
-		memory_set_bankptr(machine, 1, bank_base[1]);
+		memory_set_bankptr(machine,1, bank_base[1]);
 	}
 }
 static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
@@ -684,53 +684,53 @@ static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
 		current_bank ^= 1;
 		break;
 	default:
-		printf("%04X: write to unknown mapper address %02X\n", activecpu_get_pc(), 0xfa0 + offset );
+		printf("%04X: write to unknown mapper address %02X\n", cpu_get_pc(machine->cpu[0]), 0xfa0 + offset );
 		break;
 	}
 	bank_base[1] = CART + 0x1000 * current_bank;
-	memory_set_bankptr( 1, bank_base[1] );
+	memory_set_bankptr(machine, 1, bank_base[1] );
 }
 
 
 /* These read handlers will return the byte from the new bank */
-static  READ8_HANDLER(modeF8_switch_r) { modeF8_switch(machine, offset, 0); return bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(modeFA_switch_r) { modeFA_switch(machine, offset, 0); return bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(modeF6_switch_r) { modeF6_switch(machine, offset, 0); return bank_base[1][0xff6 + offset]; }
-static  READ8_HANDLER(modeF4_switch_r) { modeF4_switch(machine, offset, 0); return bank_base[1][0xff4 + offset]; }
-static  READ8_HANDLER(modeE0_switch_r) { modeE0_switch(machine, offset, 0); return bank_base[4][0x3e0 + offset]; }
-static  READ8_HANDLER(modeE7_switch_r) { modeE7_switch(machine, offset, 0); return bank_base[1][0xfe0 + offset]; }
-static  READ8_HANDLER(modeE7_RAM_switch_r) { modeE7_RAM_switch(machine, offset, 0); return 0; }
-static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(machine, offset, 0); return 0; }
-static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(machine, offset, 0); return bank_base[1][0xff0 + offset]; }
-static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(machine, offset, 0); return bank_base[1][0xfd0 + offset]; }
-static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(machine, offset, 0); return riot_ram[ 0x20 + offset ]; }
+static  READ8_HANDLER(modeF8_switch_r) { modeF8_switch(space->machine, offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(modeFA_switch_r) { modeFA_switch(space->machine, offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(modeF6_switch_r) { modeF6_switch(space->machine, offset, 0); return bank_base[1][0xff6 + offset]; }
+static  READ8_HANDLER(modeF4_switch_r) { modeF4_switch(space->machine, offset, 0); return bank_base[1][0xff4 + offset]; }
+static  READ8_HANDLER(modeE0_switch_r) { modeE0_switch(space->machine, offset, 0); return bank_base[4][0x3e0 + offset]; }
+static  READ8_HANDLER(modeE7_switch_r) { modeE7_switch(space->machine, offset, 0); return bank_base[1][0xfe0 + offset]; }
+static  READ8_HANDLER(modeE7_RAM_switch_r) { modeE7_RAM_switch(space->machine, offset, 0); return 0; }
+static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(space->machine, offset, 0); return 0; }
+static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(space->machine, offset, 0); return bank_base[1][0xff0 + offset]; }
+static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(space->machine, offset, 0); return bank_base[1][0xfd0 + offset]; }
+static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(space->machine, offset, 0); return riot_ram[ 0x20 + offset ]; }
 
 
-static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeFA_switch_w) { modeFA_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeF6_switch_w) { modeF6_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeF4_switch_w) { modeF4_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeE0_switch_w) { modeE0_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeE7_switch_w) { modeE7_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeE7_RAM_switch_w) { modeE7_RAM_switch(machine, offset, data); }
-static WRITE8_HANDLER(mode3F_switch_w) { mode3F_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(machine, offset, data); }
-static WRITE8_HANDLER(mode3E_switch_w) { mode3E_switch(machine, offset, data); }
-static WRITE8_HANDLER(mode3E_RAM_switch_w) { mode3E_RAM_switch(machine, offset, data); }
+static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeFA_switch_w) { modeFA_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeF6_switch_w) { modeF6_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeF4_switch_w) { modeF4_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeE0_switch_w) { modeE0_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeE7_switch_w) { modeE7_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeE7_RAM_switch_w) { modeE7_RAM_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(mode3F_switch_w) { mode3F_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(mode3E_switch_w) { mode3E_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(mode3E_RAM_switch_w) { mode3E_RAM_switch(space->machine, offset, data); }
 static WRITE8_HANDLER(mode3E_RAM_w) {
 	if ( mode3E_ram_enabled ) {
 		ram_base[offset] = data;
 	}
 }
-static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(machine, offset, data); }
-static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(machine, offset, data); riot_ram[ 0x20 + offset ] = data; }
+static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(space->machine, offset, data); }
+static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(space->machine, offset, data); riot_ram[ 0x20 + offset ] = data; }
 
 
 static DIRECT_UPDATE_HANDLER( modeF6_opbase )
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 ) {
-		modeF6_switch_w( machine, ( address & 0x1FFF ) - 0x1FF6, 0 );
+		modeF6_switch_w( space, ( address & 0x1FFF ) - 0x1FF6, 0 );
 	}
 	return address;
 }
@@ -738,9 +738,9 @@ static DIRECT_UPDATE_HANDLER( modeF6_opbase )
 static DIRECT_UPDATE_HANDLER( modeSS_opbase )
 {
 	if ( address & 0x1000 ) {
-		opbase->mask = 0x7ff;
-		opbase->mem_min = ( address & 0xf800 );
-		opbase->mem_max = ( address & 0xf800 ) | 0x7ff;
+		direct->mask = 0x7ff;
+		direct->min = ( address & 0xf800 );
+		direct->max = ( address & 0xf800 ) | 0x7ff;
 		if ( address & 0x800 ) {
 			direct->decrypted = bank_base[2];
 			direct->raw = bank_base[2];
@@ -757,21 +757,21 @@ static READ8_HANDLER(modeSS_r)
 {
 	UINT8 data = ( offset & 0x800 ) ? bank_base[2][offset & 0x7FF] : bank_base[1][offset];
 
-	//logerror("%04X: read from modeSS area offset = %04X\n", activecpu_get_pc(), offset);
+	//logerror("%04X: read from modeSS area offset = %04X\n", cpu_get_pc(machine->cpu[0]), offset);
 	/* Check for control register "write" */
 	if ( offset == 0xFF8 ) {
-		//logerror("%04X: write to modeSS control register data = %02X\n", activecpu_get_pc(), modeSS_byte);
+		//logerror("%04X: write to modeSS control register data = %02X\n", cpu_get_pc(machine->cpu[0]), modeSS_byte);
 		modeSS_write_enabled = modeSS_byte & 0x02;
 		modeSS_write_delay = modeSS_byte >> 5;
 		switch ( modeSS_byte & 0x1C ) {
 		case 0x00:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
 			bank_base[1] = extra_RAM;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
@@ -786,12 +786,12 @@ static READ8_HANDLER(modeSS_r)
 			break;
 		case 0x10:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
 			bank_base[1] = extra_RAM + 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(machine, "main") + 0x1800 : CART;
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:
@@ -805,20 +805,20 @@ static READ8_HANDLER(modeSS_r)
 			modeSS_high_ram_enabled = 1;
 			break;
 		}
-		memory_set_bankptr( 1, bank_base[1] );
-		memory_set_bankptr( 2, bank_base[2] );
+		memory_set_bankptr(space->machine, 1, bank_base[1] );
+		memory_set_bankptr(space->machine, 2, bank_base[2] );
 
 		/* Check if we should stop the tape */
-		if ( cpu_getactivecpu() >= 0 && activecpu_get_pc() == 0x00FD ) {
-			const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+		if ( cpu_get_pc(space->machine->cpu[0]) == 0x00FD ) {
+			const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
 			if ( img ) {
 				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 			}
 		}
 	} else if ( offset == 0xFF9 ) {
 		/* Cassette port read */
-		double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
-		//logerror("%04X: Cassette port read, tap_val = %f\n", activecpu_get_pc(), tap_val);
+		double tap_val = cassette_input( device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ) );
+		//logerror("%04X: Cassette port read, tap_val = %f\n", cpu_get_pc(machine->cpu[0]), tap_val);
 		if ( tap_val < 0 ) {
 			data = 0x00;
 		} else {
@@ -827,10 +827,10 @@ static READ8_HANDLER(modeSS_r)
 	} else {
 		/* Possible RAM write */
 		if ( modeSS_write_enabled ) {
-			int diff = activecpu_gettotalcycles() - modeSS_byte_started;
-			//logerror("%04X: offset = %04X, %d\n", activecpu_get_pc(), offset, diff);
+			int diff = cpu_get_total_cycles(space->machine->cpu[0]) - modeSS_byte_started;
+			//logerror("%04X: offset = %04X, %d\n", cpu_get_pc(machine->cpu[0]), offset, diff);
 			if ( diff - modeSS_diff_adjust == 5 ) {
-				//logerror("%04X: RAM write offset = %04X, data = %02X\n", activecpu_get_pc(), offset, modeSS_byte );
+				//logerror("%04X: RAM write offset = %04X, data = %02X\n", cpu_get_pc(machine->cpu[0]), offset, modeSS_byte );
 				if ( offset & 0x800 ) {
 					if ( modeSS_high_ram_enabled ) {
 						bank_base[2][offset & 0x7FF] = modeSS_byte;
@@ -842,7 +842,7 @@ static READ8_HANDLER(modeSS_r)
 				}
 			} else if ( offset < 0x0100 ) {
 				modeSS_byte = offset;
-				modeSS_byte_started = activecpu_gettotalcycles();
+				modeSS_byte_started = cpu_get_total_cycles(space->machine->cpu[0]);
 			}
 			/* Check for dummy read from same address */
 			if ( diff == 2 ) {
@@ -852,13 +852,13 @@ static READ8_HANDLER(modeSS_r)
 			}
 		} else if ( offset < 0x0100 ) {
 			modeSS_byte = offset;
-			modeSS_byte_started = activecpu_gettotalcycles();
+			modeSS_byte_started = cpu_get_total_cycles(space->machine->cpu[0]);
 		}
 	}
 	/* Because the mame core caches opcode data and doesn't perform reads like normal */
 	/* we have to put in this little hack here to get Suicide Mission to work. */
-	if ( offset != 0xFF8 && ( activecpu_get_pc() & 0x1FFF ) == 0x1FF8 ) {
-		modeSS_r( machine, 0xFF8 );
+	if ( offset != 0xFF8 && ( cpu_get_pc(space->machine->cpu[0]) & 0x1FFF ) == 0x1FF8 ) {
+		modeSS_r( space, 0xFF8 );
 	}
 	return data;
 }
@@ -912,7 +912,7 @@ static READ8_HANDLER(modeDPC_r)
 	UINT8	data_fetcher = offset & 0x07;
 	UINT8	data = 0xFF;
 
-	logerror("%04X: Read from DPC offset $%02X\n", activecpu_get_pc(), offset);
+	logerror("%04X: Read from DPC offset $%02X\n", cpu_get_pc(space->machine->cpu[0]), offset);
 	if ( offset < 0x08 ) {
 		switch( offset & 0x06 ) {
 		case 0x00:		/* Random number generator */
@@ -936,7 +936,7 @@ static READ8_HANDLER(modeDPC_r)
 			return ( dpc.dlc ? dpc.movamt & 0xF0 : 0 ) | dpc_amplitude[data];
 		}
 	} else {
-		UINT8	display_data = CART[0x2000 + ( ~ ( ( dpc.df[data_fetcher].low | ( dpc.df[data_fetcher].high << 8 ) ) ) & 0x7FF ) ];
+		UINT8	display_data = memory_region(space->machine, "user1")[0x2000 + ( ~ ( ( dpc.df[data_fetcher].low | ( dpc.df[data_fetcher].high << 8 ) ) ) & 0x7FF ) ];
 
 		switch( offset & 0x38 ) {
 		case 0x08:			/* display data */
@@ -1006,13 +1006,13 @@ static WRITE8_HANDLER(modeDPC_w)
 		dpc.movamt = data;
 		break;
 	case 0x28:			/* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(space->machine->cpu[0]), offset, data);
 		break;
 	case 0x30:			/* Random number generator reset */
 		dpc.shift_reg = 0;
 		break;
 	case 0x38:			/* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(space->machine->cpu[0]), offset, data);
 		break;
 	}
 }
@@ -1029,7 +1029,7 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
 
  */
 
-static opbase_handler_func FE_old_opbase_handler;
+static direct_update_func FE_old_opbase_handler;
 static int FETimer;
 
 static DIRECT_UPDATE_HANDLER(modeFE_opbase_handler)
@@ -1039,10 +1039,10 @@ static DIRECT_UPDATE_HANDLER(modeFE_opbase_handler)
 		/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
            cpu should be the last byte that was on the data bus and so should determine the bank
            we should switch in. */
-		bank_base[1] = CART + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
-		memory_set_bankptr( 1, bank_base[1] );
+		bank_base[1] = memory_region(space->machine, "user1") + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
+		memory_set_bankptr(space->machine, 1, bank_base[1] );
 		/* and restore old opbase handler */
-		memory_set_direct_update_handler(0, FE_old_opbase_handler);
+		memory_set_direct_update_handler(space, FE_old_opbase_handler);
 	}
 	else
 	{
@@ -1052,25 +1052,26 @@ static DIRECT_UPDATE_HANDLER(modeFE_opbase_handler)
 	return address;
 }
 
-static void modeFE_switch(UINT16 offset, UINT8 data)
+static void modeFE_switch(running_machine *machine,UINT16 offset, UINT8 data)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
        should be the last byte that was on the data bus
     */
 	FETimer = 1;
-	FE_old_opbase_handler = memory_set_direct_update_handler(0, modeFE_opbase_handler);
+	FE_old_opbase_handler = memory_set_direct_update_handler(space, modeFE_opbase_handler);
 }
 
 static READ8_HANDLER(modeFE_switch_r)
 {
-	modeFE_switch(offset, 0 );
+	modeFE_switch(space->machine,offset, 0 );
 	return memory_read_byte(space,  0xFE );
 }
 
 static WRITE8_HANDLER(modeFE_switch_w)
 {
 	memory_write_byte(space,  0xFE, data );
-	modeFE_switch(offset, 0 );
+	modeFE_switch(space->machine,offset, 0 );
 }
 
 static  READ8_HANDLER(current_bank_r)
@@ -1167,7 +1168,7 @@ static void irq_callback(const device_config *device, int state)
 
 static UINT8 riot_input_port_8_r(const device_config *device, UINT8 olddata)
 {
-	return input_port_8_r(device->machine, 0);
+	return input_port_8_r(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0);
 }
 
 static const riot6532_interface r6532_interface =
@@ -1187,7 +1188,7 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 
 	for (i = 0; i < count; i++)
 	{
-		static const read8_machine_func handler[] =
+		static const read8_space_func handler[] =
 		{
 			SMH_BANK1,
 			SMH_BANK2,
@@ -1195,12 +1196,12 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 			SMH_BANK4,
 		};
 
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM),
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 
 		bank_base[i + 1] = cart + init;
-		memory_set_bankptr(i + 1, bank_base[i + 1]);
+		memory_set_bankptr(machine,i + 1, bank_base[i + 1]);
 	}
 }
 
@@ -1209,15 +1210,15 @@ static READ16_HANDLER(a2600_read_input_port) {
 
 	switch( offset ) {
 	case 0:	/* Left controller port PIN 5 */
-		switch ( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT ) {
+		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
-			return input_port_read(machine, "PADDLE1");
+			return input_port_read(space->machine, "PADDLE1");
 		case 0x03:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
-					if ( ( input_port_read(machine, "KEYPAD_L") >> 3*i ) & 0x01 ) {
+					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x01 ) {
 						return TIA_INPUT_PORT_ALWAYS_ON;
 					} else {
 						return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1226,21 +1227,21 @@ static READ16_HANDLER(a2600_read_input_port) {
 			}
 			return TIA_INPUT_PORT_ALWAYS_ON;
 		case 0x05:	/* Boostergrip joystick */
-			return ( input_port_read(machine, "BUTTONS_L") & 0x40 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
+			return ( input_port_read(space->machine, "BUTTONS_L") & 0x40 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
 	case 1:	/* Right controller port PIN 5 */
-		switch ( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT ) {
+		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
-			return input_port_read(machine, "PADDLE3");
+			return input_port_read(space->machine, "PADDLE3");
 		case 0x03:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
-					if ( ( input_port_read(machine, "KEYPAD_L") >> 3*i ) & 0x02 ) {
+					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x02 ) {
 						return TIA_INPUT_PORT_ALWAYS_ON;
 					} else {
 						return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1249,21 +1250,21 @@ static READ16_HANDLER(a2600_read_input_port) {
 			}
 			return TIA_INPUT_PORT_ALWAYS_ON;
 		case 0x05:	/* Joystick w/Boostergrip */
-			return ( input_port_read(machine, "BUTTONS_L") & 0x20 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
+			return ( input_port_read(space->machine, "BUTTONS_L") & 0x20 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
 	case 2:	/* Left controller port PIN 9 */
-		switch ( input_port_read(machine, "CONTROLLERS") % CATEGORY_SELECT ) {
+		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
-			return input_port_read(machine, "PADDLE2");
+			return input_port_read(space->machine, "PADDLE2");
 		case 0x03:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
-					if ( ( input_port_read(machine, "KEYPAD_R") >> 3*i ) & 0x01 ) {
+					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x01 ) {
 						return TIA_INPUT_PORT_ALWAYS_ON;
 					} else {
 						return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1272,21 +1273,21 @@ static READ16_HANDLER(a2600_read_input_port) {
 			}
 			return TIA_INPUT_PORT_ALWAYS_ON;
 		case 0x05:	/* Joystick w/Boostergrip */
-			return ( input_port_read(machine, "BUTTONS_R") & 0x40 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
+			return ( input_port_read(space->machine, "BUTTONS_R") & 0x40 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
 	case 3:	/* Right controller port PIN 9 */
-		switch ( input_port_read(machine, "CONTROLLERS") % CATEGORY_SELECT ) {
+		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
-			return input_port_read(machine, "PADDLE4");
+			return input_port_read(space->machine, "PADDLE4");
 		case 0x03:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
-					if ( ( input_port_read(machine, "KEYPAD_R") >> 3*i ) & 0x02 ) {
+					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x02 ) {
 						return TIA_INPUT_PORT_ALWAYS_ON;
 					} else {
 						return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1295,24 +1296,24 @@ static READ16_HANDLER(a2600_read_input_port) {
 			}
 			return TIA_INPUT_PORT_ALWAYS_ON;
 		case 0x05:	/* Joystick w/Boostergrip */
-			return ( input_port_read(machine, "BUTTONS_R") & 0x20 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
+			return ( input_port_read(space->machine, "BUTTONS_R") & 0x20 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
 	case 4:	/* Left controller port PIN 6 */
-		switch ( input_port_read(machine, "CONTROLLERS") / CATEGORY_SELECT ) {
+		switch ( input_port_read(space->machine, "CONTROLLERS") / CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 		case 0x05:	/* Joystick w/Boostergrip */
-			return input_port_read(machine, "BUTTONS_L");
+			return input_port_read(space->machine, "BUTTONS_L");
 		case 0x01:	/* Paddle */
 			return 0xff;
 		case 0x02:	/* Driving */
-			return input_port_read(machine, "BUTTONS_L") << 3;
+			return input_port_read(space->machine, "BUTTONS_L") << 3;
 		case 0x03:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
-					if ( ( input_port_read(machine, "KEYPAD_L") >> 3*i ) & 0x04 ) {
+					if ( ( input_port_read(space->machine, "KEYPAD_L") >> 3*i ) & 0x04 ) {
 						return 0xff;
 					} else {
 						return 0x00;
@@ -1321,24 +1322,24 @@ static READ16_HANDLER(a2600_read_input_port) {
 			}
 			return 0xff;
 		case 0x06:	/* Trakball CX-22 */
-			return input_port_read(machine, "BUTTONS_L") << 4;
+			return input_port_read(space->machine, "BUTTONS_L") << 4;
 		default:
 			return 0xff;
 		}
 		break;
 	case 5:	/* Right controller port PIN 6 */
-		switch ( input_port_read(machine, "CONTROLLERS") % CATEGORY_SELECT ) {
+		switch ( input_port_read(space->machine, "CONTROLLERS") % CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 		case 0x05:	/* Joystick w/Boostergrip */
-			return input_port_read(machine, "BUTTONS_R");
+			return input_port_read(space->machine, "BUTTONS_R");
 		case 0x01:	/* Paddle */
 			return 0xff;
 		case 0x02:	/* Driving */
-			return input_port_read(machine, "BUTTONS_R") << 3;
+			return input_port_read(space->machine, "BUTTONS_R") << 3;
 		case 0x03:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
-					if ( ( input_port_read(machine, "KEYPAD_R") >> 3*i ) & 0x04 ) {
+					if ( ( input_port_read(space->machine, "KEYPAD_R") >> 3*i ) & 0x04 ) {
 						return 0xff;
 					} else {
 						return 0x00;
@@ -1347,7 +1348,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 			}
 			return 0xff;
 		case 0x06:	/* Trakball CX-22 */
-			return input_port_read(machine, "BUTTONS_R") << 4;
+			return input_port_read(space->machine, "BUTTONS_R") << 4;
 		default:
 			return 0xff;
 		}
@@ -1368,7 +1369,7 @@ static READ8_HANDLER(a2600_get_databus_contents) {
 	UINT16	last_address, prev_address;
 	UINT8	last_byte, prev_byte;
 
-	last_address = activecpu_get_pc() - 1;
+	last_address = cpu_get_pc(space->machine->cpu[0]) - 1;
 	if ( ! ( last_address & 0x1080 ) ) {
 		return offset;
 	}
@@ -1495,7 +1496,7 @@ static void set_controller( running_machine *machine, const char *controller, un
 
 static MACHINE_RESET( a2600 )
 {
-
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	int chip = 0xFF;
 	unsigned long controltemp;
 	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
@@ -1669,7 +1670,7 @@ static MACHINE_RESET( a2600 )
 
 	if (banking_mode == modeDC)
 	{
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fec, 0x1fec, 0, 0, current_bank_r);
+		memory_install_read8_handler(space, 0x1fec, 0x1fec, 0, 0, current_bank_r);
 	}
 
 	/* set up bank switch registers */
@@ -1677,72 +1678,72 @@ static MACHINE_RESET( a2600 )
 	switch (banking_mode)
 	{
 	case modeF8:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
+		memory_install_write8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
+		memory_install_read8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		break;
 
 	case modeFA:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_r);
+		memory_install_write8_handler(space, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_w);
+		memory_install_read8_handler(space, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_r);
 		break;
 
 	case modeF6:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_r);
+		memory_install_write8_handler(space, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_w);
+		memory_install_read8_handler(space, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_r);
 		memory_set_direct_update_handler( 0, modeF6_opbase );
 		break;
 
 	case modeF4:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_r);
+		memory_install_write8_handler(space, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_w);
+		memory_install_read8_handler(space, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_r);
 		break;
 
 	case modeE0:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_r);
+		memory_install_write8_handler(space, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_w);
+		memory_install_read8_handler(space, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_r);
 		break;
 
 	case mode3F:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00, 0x3f, 0, 0, mode3F_switch_w);
+		memory_install_write8_handler(space, 0x00, 0x3f, 0, 0, mode3F_switch_w);
 		break;
 
 	case modeUA:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, modeUA_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, modeUA_switch_r);
+		memory_install_write8_handler(space, 0x200, 0x27f, 0, 0, modeUA_switch_w);
+		memory_install_read8_handler(space, 0x200, 0x27f, 0, 0, modeUA_switch_r);
 		break;
 
 	case modeE7:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, SMH_BANK9);
-		memory_set_bankptr( 9, extra_RAM + 4 * 256 );
+		memory_install_write8_handler(space, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_w);
+		memory_install_read8_handler(space, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
+		memory_install_write8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
+		memory_install_read8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
+		memory_install_write8_handler(space, 0x1800, 0x18ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(space, 0x1900, 0x19ff, 0, 0, SMH_BANK9);
+		memory_set_bankptr(machine, 9, extra_RAM + 4 * 256 );
 		break;
 
 	case modeDC:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_r);
+		memory_install_write8_handler(space, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_w);
+		memory_install_read8_handler(space, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_r);
 		break;
 
 	case modeFE:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_r);
+		memory_install_write8_handler(space, 0x01fe, 0x01fe, 0, 0, modeFE_switch_w);
+		memory_install_read8_handler(space, 0x01fe, 0x01fe, 0, 0, modeFE_switch_r);
 		break;
 
 	case mode3E:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
+		memory_install_write8_handler(space, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
+		memory_install_write8_handler(space, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
+		memory_install_write8_handler(space, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
 		break;
 
 	case modeSS:
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, modeSS_r);
+		memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, modeSS_r);
 		bank_base[1] = extra_RAM + 2 * 0x800;
 		bank_base[2] = CART;
-		memory_set_bankptr( 1, bank_base[1] );
-		memory_set_bankptr( 2, bank_base[2] );
+		memory_set_bankptr(machine, 1, bank_base[1] );
+		memory_set_bankptr(machine, 2, bank_base[2] );
 		modeSS_write_enabled = 0;
 		modeSS_byte_started = 0;
 		memory_set_direct_update_handler( 0, modeSS_opbase );
@@ -1751,15 +1752,15 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeFV:
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_r);
+		memory_install_write8_handler(space, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_w);
+		memory_install_read8_handler(space, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_r);
 		break;
 
 	case modeDPC:
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x103f, 0, 0, modeDPC_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1040, 0x107f, 0, 0, modeDPC_w);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
+		memory_install_read8_handler(space, 0x1000, 0x103f, 0, 0, modeDPC_r);
+		memory_install_write8_handler(space, 0x1040, 0x107f, 0, 0, modeDPC_w);
+		memory_install_write8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
+		memory_install_read8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		memory_set_direct_update_handler( 0, modeDPC_opbase_handler );
 		{
 			int	data_fetcher;
@@ -1774,13 +1775,13 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case mode32in1:
-		memory_set_bankptr( 1, CART + current_reset_bank_counter * 0x800 );
-		memory_set_bankptr( 2, CART + current_reset_bank_counter * 0x800 );
+		memory_set_bankptr(machine, 1, CART + current_reset_bank_counter * 0x800 );
+		memory_set_bankptr(machine, 2, CART + current_reset_bank_counter * 0x800 );
 		break;
 
 	case modeJVP:
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_w);
+		memory_install_read8_handler(space, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_r);
+		memory_install_write8_handler(space, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_w);
 		break;
 	}
 
@@ -1788,26 +1789,26 @@ static MACHINE_RESET( a2600 )
 
 	if (banking_mode == modeFA)
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x10ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1100, 0x11ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(space, 0x1000, 0x10ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(space, 0x1100, 0x11ff, 0, 0, SMH_BANK9);
 
-		memory_set_bankptr(machine, 9, extra_RAM);
+		memory_set_bankptr(machine,9, extra_RAM);
 	}
 
 	if (banking_mode == modeCV)
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x13ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(space, 0x1400, 0x17ff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(space, 0x1000, 0x13ff, 0, 0, SMH_BANK9);
 
-		memory_set_bankptr(machine, 9, extra_RAM);
+		memory_set_bankptr(machine,9, extra_RAM);
 	}
 
 	if (chip)
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x107f, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1080, 0x10ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(space, 0x1000, 0x107f, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(space, 0x1080, 0x10ff, 0, 0, SMH_BANK9);
 
-		memory_set_bankptr(machine, 9, extra_RAM);
+		memory_set_bankptr(machine,9, extra_RAM);
 	}
 }
 
