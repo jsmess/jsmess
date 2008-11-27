@@ -49,14 +49,18 @@ ATTR_CONST UINT8 coco_get_attributes(UINT8 c)
 
 static void coco_horizontal_sync_callback(int data)
 {
-	pia_0_ca1_w(Machine, 0, data);
+	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
+	pia_0_ca1_w(space, 0, data);
 }
 
 
 
 static void coco_field_sync_callback(int data)
 {
-	pia_0_cb1_w(Machine, 0, data);
+	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
+	pia_0_cb1_w(space, 0, data);
 }
 
 
