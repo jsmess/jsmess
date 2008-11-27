@@ -87,10 +87,10 @@ static READ8_HANDLER( samcoupe_disk_r )
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: return wd17xx_status_r(machine, 0);
-	case 1: return wd17xx_track_r(machine, 0);
-	case 2: return wd17xx_sector_r(machine, 0);
-	case 3: return wd17xx_data_r(machine, 0);
+	case 0: return wd17xx_status_r(space, 0);
+	case 1: return wd17xx_track_r(space, 0);
+	case 2: return wd17xx_sector_r(space, 0);
+	case 3: return wd17xx_data_r(space, 0);
 	}
 
 	return 0xff;
@@ -106,10 +106,10 @@ static WRITE8_HANDLER( samcoupe_disk_w )
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: wd17xx_command_w(machine, 0, data); break;
-	case 1: wd17xx_track_w(machine, 0, data);   break;
-	case 2: wd17xx_sector_w(machine, 0, data);  break;
-	case 3: wd17xx_data_w(machine, 0, data);    break;
+	case 0: wd17xx_command_w(space, 0, data); break;
+	case 1: wd17xx_track_w(space, 0, data);   break;
+	case 2: wd17xx_sector_w(space, 0, data);  break;
+	case 3: wd17xx_data_w(space, 0, data);    break;
 	}
 }
 
@@ -121,13 +121,13 @@ static READ8_HANDLER( samcoupe_pen_r )
 	if (offset & 0x100)
 	{
 		/* return either the current line or 192 for the vblank area */
-		int line = video_screen_get_vpos(machine->primary_screen); 
-		data = video_screen_get_vblank(machine->primary_screen) ? 192 : line;
+		int line = video_screen_get_vpos(space->machine->primary_screen); 
+		data = video_screen_get_vblank(space->machine->primary_screen) ? 192 : line;
 	}
 	else
 	{
 		/* horizontal position is encoded into bits 3 to 8 */
-		data = video_screen_get_hpos(machine->primary_screen) & 0xfc;
+		data = video_screen_get_hpos(space->machine->primary_screen) & 0xfc;
 	}
 
 	return data;
@@ -145,14 +145,14 @@ static READ8_HANDLER( samcoupe_status_r )
 	UINT8 data = 0xe0;
 	UINT8 row = ~(offset >> 8);
 
-	if (row & 0x80) data &= input_port_read(machine, "keyboard_row_7f") & 0xe0;
-	if (row & 0x40) data &= input_port_read(machine, "keyboard_row_bf") & 0xe0;
-	if (row & 0x20) data &= input_port_read(machine, "keyboard_row_df") & 0xe0;
-	if (row & 0x10) data &= input_port_read(machine, "keyboard_row_ef") & 0xe0;
-	if (row & 0x08) data &= input_port_read(machine, "keyboard_row_f7") & 0xe0;
-	if (row & 0x04) data &= input_port_read(machine, "keyboard_row_fb") & 0xe0;
-	if (row & 0x02) data &= input_port_read(machine, "keyboard_row_fd") & 0xe0;
-	if (row & 0x01) data &= input_port_read(machine, "keyboard_row_fe") & 0xe0;
+	if (row & 0x80) data &= input_port_read(space->machine, "keyboard_row_7f") & 0xe0;
+	if (row & 0x40) data &= input_port_read(space->machine, "keyboard_row_bf") & 0xe0;
+	if (row & 0x20) data &= input_port_read(space->machine, "keyboard_row_df") & 0xe0;
+	if (row & 0x10) data &= input_port_read(space->machine, "keyboard_row_ef") & 0xe0;
+	if (row & 0x08) data &= input_port_read(space->machine, "keyboard_row_f7") & 0xe0;
+	if (row & 0x04) data &= input_port_read(space->machine, "keyboard_row_fb") & 0xe0;
+	if (row & 0x02) data &= input_port_read(space->machine, "keyboard_row_fd") & 0xe0;
+	if (row & 0x01) data &= input_port_read(space->machine, "keyboard_row_fe") & 0xe0;
 
 	return data | samcoupe_regs.status;
 }
@@ -173,7 +173,7 @@ static READ8_HANDLER( samcoupe_lmpr_r )
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
 	samcoupe_regs.lmpr = data;
-	samcoupe_update_memory(machine);
+	samcoupe_update_memory(space->machine);
 }
 
 
@@ -186,7 +186,7 @@ static READ8_HANDLER( samcoupe_hmpr_r )
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
 	samcoupe_regs.hmpr = data;
-	samcoupe_update_memory(machine);
+	samcoupe_update_memory(space->machine);
 }
 
 
@@ -199,7 +199,7 @@ static READ8_HANDLER( samcoupe_vmpr_r )
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
 	samcoupe_regs.vmpr = data;
-	samcoupe_update_memory(machine);
+	samcoupe_update_memory(space->machine);
 }
 
 
@@ -223,18 +223,18 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 	if (row == 0)
 	{
-		data &= input_port_read(machine, "keyboard_row_ff") & 0x1f;
+		data &= input_port_read(space->machine, "keyboard_row_ff") & 0x1f;
 	}
 	else
 	{
-		if (row & 0x80) data &= input_port_read(machine, "keyboard_row_7f") & 0x1f;
-		if (row & 0x40) data &= input_port_read(machine, "keyboard_row_bf") & 0x1f;
-		if (row & 0x20) data &= input_port_read(machine, "keyboard_row_df") & 0x1f;
-		if (row & 0x10) data &= input_port_read(machine, "keyboard_row_ef") & 0x1f;
-		if (row & 0x08) data &= input_port_read(machine, "keyboard_row_f7") & 0x1f;
-		if (row & 0x04) data &= input_port_read(machine, "keyboard_row_fb") & 0x1f;
-		if (row & 0x02) data &= input_port_read(machine, "keyboard_row_fd") & 0x1f;
-		if (row & 0x01) data &= input_port_read(machine, "keyboard_row_fe") & 0x1f;
+		if (row & 0x80) data &= input_port_read(space->machine, "keyboard_row_7f") & 0x1f;
+		if (row & 0x40) data &= input_port_read(space->machine, "keyboard_row_bf") & 0x1f;
+		if (row & 0x20) data &= input_port_read(space->machine, "keyboard_row_df") & 0x1f;
+		if (row & 0x10) data &= input_port_read(space->machine, "keyboard_row_ef") & 0x1f;
+		if (row & 0x08) data &= input_port_read(space->machine, "keyboard_row_f7") & 0x1f;
+		if (row & 0x04) data &= input_port_read(space->machine, "keyboard_row_fb") & 0x1f;
+		if (row & 0x02) data &= input_port_read(space->machine, "keyboard_row_fd") & 0x1f;
+		if (row & 0x01) data &= input_port_read(space->machine, "keyboard_row_fe") & 0x1f;
 	}
 
 	return data | 0xe0;
@@ -252,7 +252,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 
 static READ8_HANDLER( samcoupe_attributes_r )
 {
-	if (video_screen_get_vblank(machine->primary_screen))
+	if (video_screen_get_vblank(space->machine->primary_screen))
 	{
 		/* Border areas return 0xff */
 		return 0xff;
@@ -269,9 +269,9 @@ static READ8_HANDLER( samcoupe_attributes_r )
 static WRITE8_HANDLER( samcoupe_sound_w )
 {
 	if (offset & 0x100)
-		saa1099_control_port_0_w(machine, 0, data);
+		saa1099_control_port_0_w(space, 0, data);
 	else
-		saa1099_write_port_0_w(machine, 0, data);
+		saa1099_write_port_0_w(space, 0, data);
 }
 
 
@@ -335,7 +335,7 @@ void samcoupe_irq(running_machine *machine, UINT8 src)
 static INTERRUPT_GEN( samcoupe_frame_interrupt )
 {
 	/* signal frame interrupt */
-	samcoupe_irq(machine, 0x08);
+	samcoupe_irq(device->machine, 0x08);
 }
 
 

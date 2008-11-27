@@ -63,9 +63,9 @@ static MACHINE_RESET(ti990_4)
 static INTERRUPT_GEN( ti990_4_line_interrupt )
 {
 #if VIDEO_911
-	vdt911_keyboard(machine, 0);
+	vdt911_keyboard(device->machine, 0);
 #else
-	asr733_keyboard(machine, 0);
+	asr733_keyboard(device->machine, 0);
 #endif
 
 	ti990_line_interrupt();
@@ -95,7 +95,7 @@ static WRITE8_HANDLER ( ckon_ckof_callback )
 static WRITE8_HANDLER ( lrex_callback )
 {
 	/* right??? */
-	ti990_hold_load(machine);
+	ti990_hold_load(space->machine);
 }
 
 #if VIDEO_911

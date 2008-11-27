@@ -553,7 +553,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 5: /* CKON: set DECKCONTROL */
 		LED_state |= 0x20;
 		{
-			const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+			const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
 			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -561,13 +561,13 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 6: /* CKOF: clear DECKCONTROL */
 		LED_state &= ~0x20;
 		{
-			const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+			const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
 			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
 
 	case 7: /* LREX: trigger LOAD */
-		hold_load(machine);
+		hold_load(space->machine);
 		break;
 	}
 }
@@ -604,9 +604,9 @@ static  READ8_HANDLER(video_vdp_r)
     it. */
 
 	if (offset & 2)
-		reply = TMS9928A_register_r(machine, 0);
+		reply = TMS9928A_register_r(space, 0);
 	else
-		reply = TMS9928A_vram_r(machine, 0);
+		reply = TMS9928A_vram_r(space, 0);
 
 	if (!(offset & 1))
 		bogus_read_save = reply;
@@ -621,15 +621,15 @@ static WRITE8_HANDLER(video_vdp_w)
 	if (offset & 1)
 	{
 		if (offset & 2)
-			TMS9928A_register_w(machine, 0, data);
+			TMS9928A_register_w(space, 0, data);
 		else
-			TMS9928A_vram_w(machine, 0, data);
+			TMS9928A_vram_w(space, 0, data);
 	}
 }
 
 static READ8_HANDLER(video_joy_r)
 {
-	int reply = input_port_read(machine, "BUTTONS");
+	int reply = input_port_read(space->machine, "BUTTONS");
 
 
 	if (attotime_compare(timer_timeleft(joy1x_timer), attotime_zero) < 0)
@@ -649,10 +649,10 @@ static READ8_HANDLER(video_joy_r)
 
 static WRITE8_HANDLER(video_joy_w)
 {
-	timer_reset(joy1x_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY1_X")*28+28));
-	timer_reset(joy1y_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY1_Y")*28+28));
-	timer_reset(joy2x_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY2_X")*28+28));
-	timer_reset(joy2y_timer, ATTOTIME_IN_USEC(input_port_read(machine, "JOY2_Y")*28+28));
+	timer_reset(joy1x_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY1_X")*28+28));
+	timer_reset(joy1y_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY1_Y")*28+28));
+	timer_reset(joy2x_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY2_X")*28+28));
+	timer_reset(joy2y_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY2_Y")*28+28));
 }
 
 

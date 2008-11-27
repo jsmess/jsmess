@@ -84,8 +84,9 @@ static void aim65_printer_cr(void) {
 
 TIMER_CALLBACK(aim65_printer_timer)
 {
-	via_0_cb1_w(machine, 0, printer_level);
-	via_0_ca1_w(machine, 0, !printer_level);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	via_0_cb1_w(space, 0, printer_level);
+	via_0_ca1_w(space, 0, !printer_level);
 	printer_level = !printer_level;
 	aim65_printer_inc();
 }
@@ -97,7 +98,7 @@ WRITE8_HANDLER( aim65_printer_on )
 	{
 		aim65_printer_cr();
 		timer_adjust_periodic(print_timer, attotime_zero, 0, ATTOTIME_IN_USEC(10));
-		via_0_cb1_w(machine, 0, 0);
+		via_0_cb1_w(space, 0, 0);
 		printer_level = 1;
 	}
 	else

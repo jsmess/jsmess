@@ -24,18 +24,19 @@ struct samcoupe_asic samcoupe_regs;
 
 static void samcoupe_update_bank(running_machine *machine, int bank, UINT8 *memory, int is_readonly)
 {
-	read8_machine_func rh = SMH_NOP;
-	write8_machine_func wh = SMH_NOP;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	read8_space_func rh = SMH_NOP;
+	write8_space_func wh = SMH_NOP;
 
 	if (memory)
 	{
-		memory_set_bankptr(bank, memory);
-		rh = (read8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1);
-		wh = is_readonly ? SMH_UNMAP : (write8_machine_func) (STATIC_BANK1 + (FPTR)bank - 1);
+		memory_set_bankptr(machine,bank, memory);
+		rh = (read8_space_func) (STATIC_BANK1 + (FPTR)bank - 1);
+		wh = is_readonly ? SMH_UNMAP : (write8_space_func) (STATIC_BANK1 + (FPTR)bank - 1);
 	}
 
-	memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, rh);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, wh);
+	memory_install_read8_handler(space, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, rh);
+	memory_install_write8_handler(space, ((bank-1) * 0x4000), ((bank-1) * 0x4000) + 0x3FFF, 0, 0, wh);
 }
 
 
@@ -142,27 +143,28 @@ WRITE8_HANDLER( samcoupe_ext_mem_w )
 	/* external RAM enabled? */
 	if (samcoupe_regs.hmpr & HMPR_MCNTRL)
 	{
-		samcoupe_install_ext_mem(machine);
+		samcoupe_install_ext_mem(space->machine);
 	}
 }
 
 
 static READ8_HANDLER( samcoupe_rtc_r )
 {
-	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "sambus_clock");
+	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "sambus_clock");
 	return msm6242_r(rtc, offset >> 12);
 }
 
 
 static WRITE8_HANDLER( samcoupe_rtc_w )
 {
-	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "sambus_clock");
+	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "sambus_clock");
 	msm6242_w(rtc, offset >> 12, data);
 }
 
 
 MACHINE_RESET( samcoupe )
 {
+	const address_space *spaceio = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 	memset(&samcoupe_regs, 0, sizeof(samcoupe_regs));
 	
 	samcoupe_regs.lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
@@ -174,12 +176,12 @@ MACHINE_RESET( samcoupe )
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
+		memory_install_readwrite8_handler(spaceio, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
 	}
 	else
 	{
 		/* no RTC support */
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(spaceio, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
 	}
 
 	samcoupe_update_memory(machine);

@@ -124,8 +124,6 @@ static const int dl1416t_segments[128] = {
 static DEVICE_START( dl1416 )
 {
 	dl1416_t *dl1416 = device->token;
-	char unique_tag[30];
-
 	/* validate arguments */
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
@@ -133,12 +131,10 @@ static DEVICE_START( dl1416 )
 	dl1416->intf = device->static_config;
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "dl1416", device->tag);
-
-	state_save_register_item(unique_tag, 0, dl1416->chip_enable);
-	state_save_register_item(unique_tag, 0, dl1416->cursor_enable);
-	state_save_register_item(unique_tag, 0, dl1416->write_enable);
-	state_save_register_item_array(unique_tag, 0, dl1416->cursor_ram);
+	state_save_register_item("dl1416", NULL, 0, dl1416->chip_enable);
+	state_save_register_item("dl1416", NULL, 0, dl1416->cursor_enable);
+	state_save_register_item("dl1416", NULL, 0, dl1416->write_enable);
+	state_save_register_item_array("dl1416", NULL, 0, dl1416->cursor_ram);
 	return DEVICE_START_OK;
 }
 

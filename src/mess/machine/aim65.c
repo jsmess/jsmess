@@ -90,14 +90,14 @@ static void aim65_pia(running_machine *machine)
 static WRITE8_HANDLER( aim65_pia_a_w )
 {
 	pia_a = data;
-	aim65_pia(machine);
+	aim65_pia(space->machine);
 }
 
 
 static WRITE8_HANDLER( aim65_pia_b_w )
 {
 	pia_b = data;
-	aim65_pia(machine);
+	aim65_pia(space->machine);
 }
 
 
@@ -184,7 +184,7 @@ static WRITE8_HANDLER( aim65_via0_b_w )
 
 static READ8_HANDLER( aim65_via0_b_r )
 {
-	return input_port_read(machine, "switches");
+	return input_port_read(space->machine, "switches");
 }
 
 
@@ -220,19 +220,21 @@ static const struct via6522_interface user_via =
 DRIVER_INIT( aim65 )
 {
 	/* Init RAM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
+	memory_install_readwrite8_handler(space,
 		0, mess_ram_size - 1, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(machine, 1, mess_ram);
 
 	if (mess_ram_size < 4 * 1024)
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(space,
 			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 
 	pia_config(0, &pia);
 
 	via_config(0, &via0);
-	via_0_cb1_w(machine, 1, 1);
-	via_0_ca1_w(machine, 1, 0);
+	via_0_cb1_w(space, 1, 1);
+	via_0_ca1_w(space, 1, 0);
 
 	via_config(1, &user_via);
 	via_reset();

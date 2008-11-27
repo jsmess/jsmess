@@ -95,21 +95,21 @@ static DRIVER_INIT( ti99_2_32 )
 	ROM_paged = 1;
 }
 
-#define TI99_2_32_ROMPAGE0 (memory_region(machine, "main")+0x4000)
-#define TI99_2_32_ROMPAGE1 (memory_region(machine, "main")+0x10000)
+#define TI99_2_32_ROMPAGE0 (memory_region(space->machine, "main")+0x4000)
+#define TI99_2_32_ROMPAGE1 (memory_region(space->machine, "main")+0x10000)
 
 static MACHINE_RESET( ti99_2 )
 {
 	if (! ROM_paged)
 		memory_set_bankptr(machine, 1, memory_region(machine, "main")+0x4000);
 	else
-		memory_set_bankptr(machine, 1, TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(machine, 1, (memory_region(machine, "main")+0x4000));
 }
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
 	/* We trigger a level-4 interrupt.  The PULSE_LINE is a mere guess. */
-	cpu_set_input_line(machine->cpu[0], 1, PULSE_LINE);
+	cpu_set_input_line(device, 1, PULSE_LINE);
 }
 
 
@@ -213,7 +213,7 @@ static WRITE8_HANDLER ( ti99_2_write_kbd )
 	/* now, we handle ROM paging */
 	if (ROM_paged)
 	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
-		memory_set_bankptr(machine, 1, (KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(space->machine, 1, (KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 
@@ -249,7 +249,7 @@ static  READ8_HANDLER ( ti99_2_read_kbd )
 {
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(machine, keynames[KeyRow]);
+	return input_port_read(space->machine, keynames[KeyRow]);
 }
 
 static  READ8_HANDLER ( ti99_2_read_misc_cru )

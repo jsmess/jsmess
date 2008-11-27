@@ -484,7 +484,7 @@ static int write_sector(int unit, unsigned int lba, const void *buffer, unsigned
 /*
 	Handle the store registers command: read the drive geometry.
 */
-static void store_registers(void)
+static void store_registers(running_machine *machine)
 {
 	int dma_address;
 	int byte_count;
@@ -530,7 +530,7 @@ static void store_registers(void)
 	if (! (hdc.w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			program_write_word_16be(dma_address, buffer[i]);
+			memory_write_word_16be(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -613,7 +613,7 @@ static void write_format(void)
 /*
 	Handle the read data command: read a variable number of sectors from disk.
 */
-static void read_data(void)
+static void read_data(running_machine *machine)
 {
 	int dma_address;
 	int byte_count;
@@ -685,7 +685,7 @@ static void read_data(void)
 		if (! (hdc.w[1] & w1_transfer_inhibit))
 			for (i=0; i<bytes_read; i+=2)
 			{
-				program_write_word_16be(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+				memory_write_word_16be(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 				dma_address = (dma_address + 2) & 0x1ffffe;
 			}
 
@@ -713,7 +713,7 @@ static void read_data(void)
 /*
 	Handle the write data command: write a variable number of sectors from disk.
 */
-static void write_data(void)
+static void write_data(running_machine *machine)
 {
 	int dma_address;
 	int byte_count;
@@ -781,7 +781,7 @@ static void write_data(void)
 		/* DMA */
 		for (i=0; (i<byte_count) && (i<hdc.d[dsk_sel].bytes_per_sector); i+=2)
 		{
-			word = program_read_word_16be(dma_address);
+			word = memory_read_word_16be(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),dma_address);
 			buffer[i] = word >> 8;
 			buffer[i+1] = word & 0xff;
 
@@ -825,7 +825,7 @@ static void write_data(void)
 /*
 	Handle the unformatted read command: read drive geometry information.
 */
-static void unformatted_read(void)
+static void unformatted_read(running_machine *machine)
 {
 	int dma_address;
 	int byte_count;
@@ -888,7 +888,7 @@ static void unformatted_read(void)
 	if (! (hdc.w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			program_write_word_16be(dma_address, buffer[i]);
+			memory_write_word_16be(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -931,7 +931,7 @@ static void restore(void)
 /*
 	Parse command code and execute the command.
 */
-static void execute_command(void)
+static void execute_command(running_machine *machine)
 {
 	/* hack */
 	hdc.w[0] &= 0xff;
@@ -944,7 +944,7 @@ static void execute_command(void)
 	case 0x00: //0b000:
 		/* store registers */
 		logerror("store registers\n");
-		store_registers();
+		store_registers(machine);
 		break;
 	case 0x01: //0b001:
 		/* write format */
@@ -954,17 +954,17 @@ static void execute_command(void)
 	case 0x02: //0b010:
 		/* read data */
 		logerror("read data\n");
-		read_data();
+		read_data(machine);
 		break;
 	case 0x03: //0b011:
 		/* write data */
 		logerror("write data\n");
-		write_data();
+		write_data(machine);
 		break;
 	case 0x04: //0b100:
 		/* unformatted read */
 		logerror("unformatted read\n");
-		unformatted_read();
+		unformatted_read(machine);
 		break;
 	case 0x05: //0b101:
 		/* unformatted write */
@@ -1019,7 +1019,7 @@ WRITE16_HANDLER(ti990_hdc_w)
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
 			{	/* idle has been cleared: start command execution */
-				execute_command();
+				execute_command(space->machine);
 			}
 		}
 	}

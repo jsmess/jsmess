@@ -308,7 +308,7 @@ XL/XE 16kB OS roms
 	/* COMMODORE */
 	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
 //128u4	DRIVER( sym1 )		/* Synertek SYM-1									*/
-//128u4	DRIVER( aim65 )		/* Rockwell AIM65									*/
+	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
 	DRIVER( pet2001 )	/* PET 2001											*/
 	DRIVER( pet2001n )	/* PET 2001-N										*/
@@ -521,26 +521,26 @@ XL/XE 16kB OS roms
 	DRIVER( ip244415 )
 
 	/* TEXAS INSTRUMENTS */
-//128u4	DRIVER( ti990_10 )	/* 1975 TI 990/10									*/
-//128u4	DRIVER( ti990_4 )	/* 1976 TI 990/4									*/
-//128u4	DRIVER( 990189 )	/* 1978 TM 990/189									*/
-//128u4	DRIVER( 990189v )	/* 1980 TM 990/189 with Color Video Board			*/
+	DRIVER( ti990_10 )	/* 1975 TI 990/10									*/
+	DRIVER( ti990_4 )	/* 1976 TI 990/4									*/
+	DRIVER( 990189 )	/* 1978 TM 990/189									*/
+	DRIVER( 990189v )	/* 1980 TM 990/189 with Color Video Board			*/
 
-//128u4	DRIVER( ti99_224 )	/* 1983 TI 99/2 (24kb ROMs)							*/
-//128u4	DRIVER( ti99_232 )	/* 1983 TI 99/2 (32kb ROMs)							*/
-//128u4	DRIVER( ti99_4 )	/* 1979 TI-99/4										*/
-//128u4	DRIVER( ti99_4e )	/* 1980 TI-99/4 with 50Hz video						*/
-//128u4	DRIVER( ti99_4a )	/* 1981 TI-99/4A									*/
-//128u4	DRIVER( ti99_4ae )	/* 1981 TI-99/4A with 50Hz video					*/
-//128u4	DRIVER( ti99_4ev)	/* 1994 TI-99/4A with EVPC video card				*/
-//128u4	DRIVER( ti99_8 )	/* 1983 TI-99/8										*/
-//128u4	DRIVER( ti99_8e )	/* 1983 TI-99/8 with 50Hz video						*/
+	DRIVER( ti99_224 )	/* 1983 TI 99/2 (24kb ROMs)							*/
+	DRIVER( ti99_232 )	/* 1983 TI 99/2 (32kb ROMs)							*/
+	DRIVER( ti99_4 )	/* 1979 TI-99/4										*/
+	DRIVER( ti99_4e )	/* 1980 TI-99/4 with 50Hz video						*/
+	DRIVER( ti99_4a )	/* 1981 TI-99/4A									*/
+	DRIVER( ti99_4ae )	/* 1981 TI-99/4A with 50Hz video					*/
+	DRIVER( ti99_4ev)	/* 1994 TI-99/4A with EVPC video card				*/
+	DRIVER( ti99_8 )	/* 1983 TI-99/8										*/
+	DRIVER( ti99_8e )	/* 1983 TI-99/8 with 50Hz video						*/
 
 	/* TI 99 clones */
 	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
-//128u4	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
-//128u4	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
-//128u4	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
+	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
+	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
+	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
 	DRIVER( avigo )		/*													*/
 
@@ -571,8 +571,8 @@ XL/XE 16kB OS roms
 	DRIVER( apfimag )
 
 	/* Tatung */
-//128u4	DRIVER( einstein )
-//128u4	DRIVER( einstei2 )
+	DRIVER( einstein )
+	DRIVER( einstei2 )
 
 	/* INTELLIGENT SOFTWARE */
 	DRIVER( ep128 )		/* Enterprise 128 k									*/
@@ -582,9 +582,9 @@ XL/XE 16kB OS roms
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */
-//128u4	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
-//128u4	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
-//128u4	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
+	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
+	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
+	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
 	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
@@ -793,13 +793,13 @@ XL/XE 16kB OS roms
 	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
 
 	/* MILES GORDON TECHNOLOGY */
-//128u4	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
+	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
 
 	/* MOTOROLA */
 	DRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 
 	/* DEC */
-//128u4	DRIVER( pdp1 )		/* 1961 DEC PDP1									*/
+	DRIVER( pdp1 )		/* 1961 DEC PDP1									*/
 
 	/* MEMOTECH */
 	DRIVER( mtx512 )	/* 1983 Memotech MTX 512							*/
@@ -901,8 +901,8 @@ XL/XE 16kB OS roms
 	DRIVER(oscnano)
 
 	/* MIT */
-//128u4	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
-//128u4	DRIVER( tx0_8kw )	/* 1962 MIT TX-0 (8kw RAM)							*/
+	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
+	DRIVER( tx0_8kw )	/* 1962 MIT TX-0 (8kw RAM)							*/
 
 	/* Luxor Datorer AB */
 	DRIVER( abc80 )

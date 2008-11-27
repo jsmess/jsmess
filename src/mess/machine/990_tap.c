@@ -223,7 +223,7 @@ static void update_interrupt(void)
 /*
 	Handle the read binary forward command: read the next record on tape.
 */
-static void cmd_read_binary_forward(void)
+static void cmd_read_binary_forward(running_machine *machine)
 {
 	UINT8 buffer[256];
 	int reclen;
@@ -359,7 +359,7 @@ static void cmd_read_binary_forward(void)
 		/* DMA */
 		for (i=0; i<bytes_read; i+=2)
 		{
-			program_write_word_16be(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+			memory_write_word_16be(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -868,7 +868,7 @@ static void read_transport_status(void)
 /*
 	Parse command code and execute the command.
 */
-static void execute_command(void)
+static void execute_command(running_machine *machine)
 {
 	/* hack */
 	tpc.w[0] &= 0xff;
@@ -904,7 +904,7 @@ static void execute_command(void)
 	case 0x04:
 		/* read binary forward */
 		logerror("read binary forward\n");
-		cmd_read_binary_forward();
+		cmd_read_binary_forward(machine);
 		break;
 	case 0x05:
 		/* record skip forward - not tested */
@@ -983,7 +983,7 @@ WRITE16_HANDLER(ti990_tpc_w)
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
 			{	/* idle has been cleared: start command execution */
-				execute_command();
+				execute_command(space->machine);
 			}
 		}
 	}

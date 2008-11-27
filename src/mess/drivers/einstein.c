@@ -290,9 +290,9 @@ static  READ8_HANDLER(einstein_80col_r)
 		case 5:
 		case 6:
 		case 7:
-			return einstein_80col_ram_r(machine, offset);
+			return einstein_80col_ram_r(space, offset);
 		case 0x0c:
-			return einstein_80col_state_r(machine, offset);
+			return einstein_80col_state_r(space, offset);
 		default:
 			break;
 	}
@@ -312,13 +312,13 @@ static WRITE8_HANDLER(einstein_80col_w)
 		case 5:
 		case 6:
 		case 7:
-			einstein_80col_ram_w(machine, offset,data);
+			einstein_80col_ram_w(space, offset,data);
 			break;
 		case 8:
-			mc6845_address_w( devtag_get_token(machine, MC6845, "crtc"), offset, data );
+			mc6845_address_w( devtag_get_token(space->machine, MC6845, "crtc"), offset, data );
 			break;
 		case 9:
-			mc6845_register_w( devtag_get_token(machine, MC6845, "crtc"), offset, data );
+			mc6845_register_w( devtag_get_token(space->machine, MC6845, "crtc"), offset, data );
 			break;
 		default:
 			break;
@@ -573,10 +573,10 @@ static  READ8_HANDLER(einstein_vdp_r)
 
 	if (offset & 0x01)
 	{
-		return TMS9928A_register_r(machine, offset & 0x01);
+		return TMS9928A_register_r(space, offset & 0x01);
 	}
 
-	return TMS9928A_vram_r(machine, offset & 0x01);
+	return TMS9928A_vram_r(space, offset & 0x01);
 }
 
 static WRITE8_HANDLER(einstein_vdp_w)
@@ -585,42 +585,42 @@ static WRITE8_HANDLER(einstein_vdp_w)
 
 	if (offset & 0x01)
 	{
-		TMS9928A_register_w(machine, offset & 0x01,data);
+		TMS9928A_register_w(space, offset & 0x01,data);
 		return;
 	}
 
-	TMS9928A_vram_w(machine, offset & 0x01,data);
+	TMS9928A_vram_w(space, offset & 0x01,data);
 }
 
 static WRITE8_HANDLER(einstein_fdc_w)
 {
 	int reg = offset & 0x03;
 
-	logerror("fdc w: PC: %04x %04x %02x\n",activecpu_get_pc(),offset,data);
+	logerror("fdc w: PC: %04x %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),offset,data);
 
 	switch (reg)
 	{
 		case 0:
 		{
-			wd17xx_command_w(machine, reg, data);
+			wd17xx_command_w(space, reg, data);
 		}
 		break;
 
 		case 1:
 		{
-			wd17xx_track_w(machine, reg, data);
+			wd17xx_track_w(space, reg, data);
 		}
 		break;
 
 		case 2:
 		{
-			wd17xx_sector_w(machine, reg, data);
+			wd17xx_sector_w(space, reg, data);
 		}
 		break;
 
 		case 3:
 		{
-			wd17xx_data_w(machine, reg, data);
+			wd17xx_data_w(space, reg, data);
 		}
 		break;
 	}
@@ -631,31 +631,31 @@ static  READ8_HANDLER(einstein_fdc_r)
 {
 	int reg = offset & 0x03;
 
-	logerror("fdc r: PC: %04x %04x\n",activecpu_get_pc(),offset);
+	logerror("fdc r: PC: %04x %04x\n",cpu_get_pc(space->machine->cpu[0]),offset);
 
 	switch (reg)
 	{
 		case 0:
 		{
-			return wd17xx_status_r(machine, reg);
+			return wd17xx_status_r(space, reg);
 		}
 		break;
 
 		case 1:
 		{
-			return wd17xx_track_r(machine, reg);
+			return wd17xx_track_r(space, reg);
 		}
 		break;
 
 		case 2:
 		{
-			return wd17xx_sector_r(machine, reg);
+			return wd17xx_sector_r(space, reg);
 		}
 		break;
 
 		case 3:
 		{
-			return wd17xx_data_r(machine, reg);
+			return wd17xx_data_r(space, reg);
 		}
 		break;
 	}
@@ -699,11 +699,11 @@ static WRITE8_HANDLER(einstein_serial_w)
 
 	if ((reg)==0)
 	{
-		msm8251_data_w(machine, reg,data);
+		msm8251_data_w(space, reg,data);
 		return;
 	}
 
-	msm8251_control_w(machine, reg,data);
+	msm8251_control_w(space, reg,data);
 }
 
 
@@ -715,10 +715,10 @@ static  READ8_HANDLER(einstein_serial_r)
 
 	if ((reg)==0)
 	{
-		return msm8251_data_r(machine, reg);
+		return msm8251_data_r(space, reg);
 	}
 
-	return msm8251_status_r(machine, reg);
+	return msm8251_status_r(space, reg);
 }
 
 /*
@@ -757,13 +757,13 @@ static WRITE8_HANDLER(einstein_psg_w)
 		/* case 0 and 1 are not handled */
 		case 2:
 		{
-			ay8910_control_port_0_w(machine, 0, data);
+			ay8910_control_port_0_w(space, 0, data);
 		}
 		break;
 
 		case 3:
 		{
-			ay8910_write_port_0_w(machine, 0, data);
+			ay8910_write_port_0_w(space, 0, data);
 		}
 		break;
 
@@ -780,7 +780,7 @@ static  READ8_HANDLER(einstein_psg_r)
 	{
 		/* case 0 and 1 are not handled */
 		case 2:
-			return ay8910_read_port_0_r(machine, 0);
+			return ay8910_read_port_0_r(space, 0);
 
 		default:
 			break;
@@ -824,7 +824,7 @@ static WRITE8_HANDLER(einstein_drive_w)
 	/* bit 1: select drive 1 */
 	/* bit 0: select drive 0 */
 
-	logerror("drive w: PC: %04x %04x %02x\n",activecpu_get_pc(),offset,data);
+	logerror("drive w: PC: %04x %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),offset,data);
 
 	wd17xx_set_side((data>>4) & 0x01);
 
@@ -852,7 +852,7 @@ static WRITE8_HANDLER(einstein_drive_w)
 static WRITE8_HANDLER(einstein_rom_w)
 {
 	einstein_rom_enabled^=1;
-	einstein_page_rom(machine);
+	einstein_page_rom(space->machine);
 }
 
 static READ8_HANDLER(einstein_key_int_r)
@@ -863,7 +863,7 @@ static READ8_HANDLER(einstein_key_int_r)
 	/* clear key int. a read of this I/O port will do this or a reset */
 	einstein_int &= ~EINSTEIN_KEY_INT;
 
-	einstein_update_interrupts(machine);
+	einstein_update_interrupts(space->machine);
 
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	centronics_handshake = centronics_read_handshake(0);
@@ -876,7 +876,7 @@ static READ8_HANDLER(einstein_key_int_r)
 	/* bit 2: 1=printer busy */
 	/* bit 1: fire 1 */
 	/* bit 0: fire 0 */
-	data = ((input_port_read(machine, "EXTRA") & 0x07)<<5) | (input_port_read(machine, "BUTTONS") & 0x03) | 0x01c;
+	data = ((input_port_read(space->machine, "EXTRA") & 0x07)<<5) | (input_port_read(space->machine, "BUTTONS") & 0x03) | 0x01c;
 
 	/* error? */
 	if (centronics_handshake & CENTRONICS_NO_ERROR)
@@ -926,7 +926,7 @@ static WRITE8_HANDLER(einstein_key_int_w)
 		einstein_int_mask |= EINSTEIN_KEY_INT;
 	}
 
-	einstein_update_interrupts(machine);
+	einstein_update_interrupts(space->machine);
 }
 
 static WRITE8_HANDLER(einstein_adc_int_w)
@@ -946,7 +946,7 @@ static WRITE8_HANDLER(einstein_adc_int_w)
 		einstein_int_mask |= EINSTEIN_ADC_INT;
 	}
 
-	einstein_update_interrupts(machine);
+	einstein_update_interrupts(space->machine);
 }
 
 static WRITE8_HANDLER(einstein_fire_int_w)
@@ -967,7 +967,7 @@ static WRITE8_HANDLER(einstein_fire_int_w)
 		einstein_int_mask |= EINSTEIN_FIRE_INT;
 	}
 
-	einstein_update_interrupts(machine);
+	einstein_update_interrupts(space->machine);
 }
 
 
@@ -983,7 +983,7 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			return einstein_psg_r(machine, offset);
+			return einstein_psg_r(space, offset);
 		case 0x08:
 		case 0x09:
 		case 0x0a:
@@ -992,7 +992,7 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			return einstein_vdp_r(machine, offset);
+			return einstein_vdp_r(space, offset);
 		case 0x10:
 		case 0x11:
 		case 0x12:
@@ -1001,7 +1001,7 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			return einstein_serial_r(machine, offset);
+			return einstein_serial_r(space, offset);
 		case 0x18:
 		case 0x19:
 		case 0x1a:
@@ -1010,9 +1010,9 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			return einstein_fdc_r(machine, offset);
+			return einstein_fdc_r(space, offset);
 		case 0x20:
-			return einstein_key_int_r(machine, offset);
+			return einstein_key_int_r(space, offset);
 		case 0x28:
 		case 0x29:
 		case 0x2a:
@@ -1021,7 +1021,7 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			return einstein_ctc_r( device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), offset);
+			return einstein_ctc_r( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset);
 		case 0x30:
 		case 0x31:
 		case 0x32:
@@ -1030,7 +1030,7 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			return einstein_pio_r(machine, offset);
+			return einstein_pio_r(space, offset);
 		case 0x40:
 		case 0x41:
 		case 0x42:
@@ -1047,7 +1047,7 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x4d:
 		case 0x4e:
 		case 0x4f:
-			return einstein_80col_r(machine, offset);
+			return einstein_80col_r(space, offset);
 
 		default:
 			break;
@@ -1070,7 +1070,7 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			einstein_psg_w(machine, offset,data);
+			einstein_psg_w(space, offset,data);
 			return;
 		case 0x08:
 		case 0x09:
@@ -1080,7 +1080,7 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			einstein_vdp_w(machine, offset,data);
+			einstein_vdp_w(space, offset,data);
 			return;
 		case 0x10:
 		case 0x11:
@@ -1090,7 +1090,7 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			einstein_serial_w(machine, offset,data);
+			einstein_serial_w(space, offset,data);
 			return;
 		case 0x18:
 		case 0x19:
@@ -1100,22 +1100,22 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			einstein_fdc_w(machine, offset,data);
+			einstein_fdc_w(space, offset,data);
 			return;
 		case 0x20:
-			einstein_key_int_w(machine, offset,data);
+			einstein_key_int_w(space, offset,data);
 			return;
 		case 0x21:
-			einstein_adc_int_w(machine, offset,data);
+			einstein_adc_int_w(space, offset,data);
 			return;
 		case 0x23:
-			einstein_drive_w(machine, offset,data);
+			einstein_drive_w(space, offset,data);
 			return;
 		case 0x24:
-			einstein_rom_w(machine, offset,data);
+			einstein_rom_w(space, offset,data);
 			return;
 		case 0x25:
-			einstein_fire_int_w(machine, offset,data);
+			einstein_fire_int_w(space, offset,data);
 			return;
 		case 0x28:
 		case 0x29:
@@ -1125,7 +1125,7 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			einstein_ctc_w( device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), offset,data);
+			einstein_ctc_w( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset,data);
 			return;
 		case 0x30:
 		case 0x31:
@@ -1135,7 +1135,7 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			einstein_pio_w(machine, offset,data);
+			einstein_pio_w(space, offset,data);
 			return;
 		case 0x40:
 		case 0x41:
@@ -1153,7 +1153,7 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x4d:
 		case 0x4e:
 		case 0x4f:
-			einstein_80col_w(machine, offset,data);
+			einstein_80col_w(space, offset,data);
 			return;
 
 		default:
@@ -1176,7 +1176,7 @@ static  READ8_HANDLER(einstein_port_r)
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			return einstein_psg_r(machine, offset);
+			return einstein_psg_r(space, offset);
 		case 0x08:
 		case 0x09:
 		case 0x0a:
@@ -1185,7 +1185,7 @@ static  READ8_HANDLER(einstein_port_r)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			return einstein_vdp_r(machine, offset);
+			return einstein_vdp_r(space, offset);
 		case 0x10:
 		case 0x11:
 		case 0x12:
@@ -1194,7 +1194,7 @@ static  READ8_HANDLER(einstein_port_r)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			return einstein_serial_r(machine, offset);
+			return einstein_serial_r(space, offset);
 		case 0x18:
 		case 0x19:
 		case 0x1a:
@@ -1203,9 +1203,9 @@ static  READ8_HANDLER(einstein_port_r)
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			return einstein_fdc_r(machine, offset);
+			return einstein_fdc_r(space, offset);
 		case 0x20:
-			return einstein_key_int_r(machine, offset);
+			return einstein_key_int_r(space, offset);
 		case 0x28:
 		case 0x29:
 		case 0x2a:
@@ -1214,7 +1214,7 @@ static  READ8_HANDLER(einstein_port_r)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			return einstein_ctc_r( device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), offset);
+			return einstein_ctc_r( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset);
 		case 0x30:
 		case 0x31:
 		case 0x32:
@@ -1223,7 +1223,7 @@ static  READ8_HANDLER(einstein_port_r)
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			return einstein_pio_r(machine, offset);
+			return einstein_pio_r(space, offset);
 
 		default:
 			break;
@@ -1246,7 +1246,7 @@ static WRITE8_HANDLER(einstein_port_w)
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			einstein_psg_w(machine, offset,data);
+			einstein_psg_w(space, offset,data);
 			return;
 		case 0x08:
 		case 0x09:
@@ -1256,7 +1256,7 @@ static WRITE8_HANDLER(einstein_port_w)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			einstein_vdp_w(machine, offset,data);
+			einstein_vdp_w(space, offset,data);
 			return;
 		case 0x10:
 		case 0x11:
@@ -1266,7 +1266,7 @@ static WRITE8_HANDLER(einstein_port_w)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			einstein_serial_w(machine, offset,data);
+			einstein_serial_w(space, offset,data);
 			return;
 		case 0x18:
 		case 0x19:
@@ -1276,22 +1276,22 @@ static WRITE8_HANDLER(einstein_port_w)
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			einstein_fdc_w(machine, offset,data);
+			einstein_fdc_w(space, offset,data);
 			return;
 		case 0x20:
-			einstein_key_int_w(machine, offset,data);
+			einstein_key_int_w(space, offset,data);
 			return;
 		case 0x21:
-			einstein_adc_int_w(machine, offset,data);
+			einstein_adc_int_w(space, offset,data);
 			return;
 		case 0x23:
-			einstein_drive_w(machine, offset,data);
+			einstein_drive_w(space, offset,data);
 			return;
 		case 0x24:
-			einstein_rom_w(machine, offset,data);
+			einstein_rom_w(space, offset,data);
 			return;
 		case 0x25:
-			einstein_fire_int_w(machine, offset,data);
+			einstein_fire_int_w(space, offset,data);
 			return;
 		case 0x28:
 		case 0x29:
@@ -1301,7 +1301,7 @@ static WRITE8_HANDLER(einstein_port_w)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			einstein_ctc_w( device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), offset,data);
+			einstein_ctc_w( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset,data);
 			return;
 		case 0x30:
 		case 0x31:
@@ -1311,7 +1311,7 @@ static WRITE8_HANDLER(einstein_port_w)
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			einstein_pio_w(machine, offset,data);
+			einstein_pio_w(space, offset,data);
 			return;
 
 		default:
@@ -1455,7 +1455,7 @@ static MACHINE_RESET( einstein )
 	einstein_int_mask = 0;
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 
-	cpunum_set_irq_callback(0, einstein_cpu_acknowledge_int);
+	cpu_set_irq_callback(machine->cpu[0], einstein_cpu_acknowledge_int);
 
 	/* the einstein keyboard can generate a interrupt */
 	/* the int is actually clocked at the system clock 4Mhz, but this would be too fast for our
@@ -1595,12 +1595,12 @@ static WRITE8_HANDLER(einstein_port_a_write)
 //  logerror("line: %02x\n",einstein_keyboard_line);
 
 	/* re-scan the keyboard */
-	einstein_scan_keyboard(machine);
+	einstein_scan_keyboard(space->machine);
 }
 
 static READ8_HANDLER(einstein_port_b_read)
 {
-	einstein_scan_keyboard(machine);
+	einstein_scan_keyboard(space->machine);
 
 //  logerror("key: %02x\n",einstein_keyboard_data);
 

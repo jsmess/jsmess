@@ -412,7 +412,7 @@ void asr733_cru_w(running_machine *machine, int offset, int data, int unit)
 
 WRITE8_HANDLER(asr733_0_cru_w)
 {
-	asr733_cru_w(machine, offset, data, 0);
+	asr733_cru_w(space->machine, offset, data, 0);
 }
 
 

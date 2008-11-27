@@ -575,16 +575,16 @@ static  READ8_HANDLER(fdc_mem_r)
 	switch (offset)
 	{
 	case 0x1FF0:					/* Status register */
-		return (wd17xx_status_r(machine, offset) ^ 0xFF);
+		return (wd17xx_status_r(space, offset) ^ 0xFF);
 		break;
 	case 0x1FF2:					/* Track register */
-		return wd17xx_track_r(machine, offset) ^ 0xFF;
+		return wd17xx_track_r(space, offset) ^ 0xFF;
 		break;
 	case 0x1FF4:					/* Sector register */
-		return wd17xx_sector_r(machine, offset) ^ 0xFF;
+		return wd17xx_sector_r(space, offset) ^ 0xFF;
 		break;
 	case 0x1FF6:					/* Data register */
-		return wd17xx_data_r(machine, offset) ^ 0xFF;
+		return wd17xx_data_r(space, offset) ^ 0xFF;
 		break;
 	default:						/* DSR ROM */
 		return ti99_disk_DSR[offset];
@@ -602,16 +602,16 @@ static WRITE8_HANDLER(fdc_mem_w)
 	switch (offset)
 	{
 	case 0x1FF8:					/* Command register */
-		wd17xx_command_w(machine, offset, data);
+		wd17xx_command_w(space, offset, data);
 		break;
 	case 0x1FFA:					/* Track register */
-		wd17xx_track_w(machine, offset, data);
+		wd17xx_track_w(space, offset, data);
 		break;
 	case 0x1FFC:					/* Sector register */
-		wd17xx_sector_w(machine, offset, data);
+		wd17xx_sector_w(space, offset, data);
 		break;
 	case 0x1FFE:					/* Data register */
-		wd17xx_data_w(machine, offset, data);
+		wd17xx_data_w(space, offset, data);
 		break;
 	}
 }
@@ -1047,16 +1047,16 @@ static  READ8_HANDLER(bwg_mem_r)
 			switch (offset)
 			{
 			case 0x1FF0:					/* Status register */
-				reply = wd17xx_status_r(machine, offset);
+				reply = wd17xx_status_r(space, offset);
 				break;
 			case 0x1FF2:					/* Track register */
-				reply = wd17xx_track_r(machine, offset);
+				reply = wd17xx_track_r(space, offset);
 				break;
 			case 0x1FF4:					/* Sector register */
-				reply = wd17xx_sector_r(machine, offset);
+				reply = wd17xx_sector_r(space, offset);
 				break;
 			case 0x1FF6:					/* Data register */
-				reply = wd17xx_data_r(machine, offset);
+				reply = wd17xx_data_r(space, offset);
 				break;
 			default:
 				reply = 0;
@@ -1091,16 +1091,16 @@ static WRITE8_HANDLER(bwg_mem_w)
 			switch (offset)
 			{
 			case 0x1FF8:					/* Command register */
-				wd17xx_command_w(machine, offset, data);
+				wd17xx_command_w(space, offset, data);
 				break;
 			case 0x1FFA:					/* Track register */
-				wd17xx_track_w(machine, offset, data);
+				wd17xx_track_w(space, offset, data);
 				break;
 			case 0x1FFC:					/* Sector register */
-				wd17xx_sector_w(machine, offset, data);
+				wd17xx_sector_w(space, offset, data);
 				break;
 			case 0x1FFE:					/* Data register */
-				wd17xx_data_w(machine, offset, data);
+				wd17xx_data_w(space, offset, data);
 				break;
 			}
 		}

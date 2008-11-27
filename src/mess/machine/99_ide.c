@@ -249,7 +249,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = device_list_find_by_tag(space->machine->config->devicelist, IDE_CONTROLLER, "ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 0, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -261,7 +261,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 3:		/* IDE registers set 2 (CS3Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = device_list_find_by_tag(space->machine->config->devicelist, IDE_CONTROLLER, "ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 1, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -327,7 +327,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = device_list_find_by_tag(space->machine->config->devicelist, IDE_CONTROLLER, "ide");
 				ide_bus_w(ide_device, 0, (offset >> 1) & 0x7, output_latch);
 			}
 			break;
@@ -345,7 +345,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				const device_config *ide_device = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = device_list_find_by_tag(space->machine->config->devicelist, IDE_CONTROLLER, "ide");
 				ide_bus_w(ide_device, 1, (offset >> 1) & 0x7, output_latch);
 			}
 			break;
