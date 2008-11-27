@@ -126,21 +126,21 @@ static const UINT8 ws_fake_bios_code[] = {
 
 static void wswan_handle_irqs( running_machine *machine ) {
 	if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_HBLTMR );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_HBLTMR );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_VBL ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBL );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBL );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBLTMR );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_VBLTMR );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_LCMP ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_LCMP );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_LCMP );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_SRX ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_SRX );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_SRX );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_RTC ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_RTC );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_RTC );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_KEY ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_KEY );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_KEY );
 	} else if ( ws_portram[0xb2] & ws_portram[0xb6] & WSWAN_IFLAG_STX ) {
-		cpunum_set_input_line_and_vector( machine, 0, 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_STX );
+		cpu_set_input_line_and_vector( machine->cpu[0], 0, HOLD_LINE, ws_portram[0xb0] + WSWAN_INT_STX );
 	} else {
 		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE );
 	}
@@ -221,14 +221,16 @@ MACHINE_START( wscolor ) {
 
 MACHINE_RESET( wswan )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	/* Intialize ports */
 	memcpy( ws_portram, ws_portram_init, 256 );
 
 	/* Initialize VDP */
 	memset( &vdp, 0, sizeof( vdp ) );
 
-	vdp.vram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, 0 );
-	vdp.palette_vram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, ( system_type == WSC ) ? 0xFE00 : 0 );
+	vdp.vram = memory_get_read_ptr( space, 0 );
+	vdp.palette_vram = memory_get_read_ptr( space, ( system_type == WSC ) ? 0xFE00 : 0 );
 	vdp.current_line = 145;  /* Randomly chosen, beginning of VBlank period to give cart some time to boot up */
 	vdp.new_display_vertical = ROMMap[ROMBanks-1][0xfffc] & 0x01;
 	vdp.display_vertical = ~vdp.new_display_vertical;
@@ -240,22 +242,22 @@ MACHINE_RESET( wswan )
 	memset( &sound_dma, 0, sizeof( sound_dma ) );
 
 	/* Switch in the banks */
-	memory_set_bankptr( 2, ROMMap[(ROMBanks - 1) & (ROMBanks - 1)] );
-	memory_set_bankptr( 3, ROMMap[(ROMBanks - 1) & (ROMBanks - 1)] );
-	memory_set_bankptr( 4, ROMMap[(ROMBanks - 12) & (ROMBanks - 1)] );
-	memory_set_bankptr( 5, ROMMap[(ROMBanks - 11) & (ROMBanks - 1)] );
-	memory_set_bankptr( 6, ROMMap[(ROMBanks - 10) & (ROMBanks - 1)] );
-	memory_set_bankptr( 7, ROMMap[(ROMBanks - 9) & (ROMBanks - 1)] );
-	memory_set_bankptr( 8, ROMMap[(ROMBanks - 8) & (ROMBanks - 1)] );
-	memory_set_bankptr( 9, ROMMap[(ROMBanks - 7) & (ROMBanks - 1)] );
-	memory_set_bankptr( 10, ROMMap[(ROMBanks - 6) & (ROMBanks - 1)] );
-	memory_set_bankptr( 11, ROMMap[(ROMBanks - 5) & (ROMBanks - 1)] );
-	memory_set_bankptr( 12, ROMMap[(ROMBanks - 4) & (ROMBanks - 1)] );
-	memory_set_bankptr( 13, ROMMap[(ROMBanks - 3) & (ROMBanks - 1)] );
-	memory_set_bankptr( 14, ROMMap[(ROMBanks - 2) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 2, ROMMap[(ROMBanks - 1) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 3, ROMMap[(ROMBanks - 1) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 4, ROMMap[(ROMBanks - 12) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 5, ROMMap[(ROMBanks - 11) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 6, ROMMap[(ROMBanks - 10) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 7, ROMMap[(ROMBanks - 9) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 8, ROMMap[(ROMBanks - 8) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 9, ROMMap[(ROMBanks - 7) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 10, ROMMap[(ROMBanks - 6) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 11, ROMMap[(ROMBanks - 5) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 12, ROMMap[(ROMBanks - 4) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 13, ROMMap[(ROMBanks - 3) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 14, ROMMap[(ROMBanks - 2) & (ROMBanks - 1)] );
 	wswan_bios_disabled = 0;
-	memory_set_bankptr( 15, ws_bios_bank );
-//	memory_set_bankptr( 15, ROMMap[(ROMBanks - 1) & (ROMBanks - 1)] );
+	memory_set_bankptr( machine, 15, ws_bios_bank );
+//	memory_set_bankptr( machine, 15, ROMMap[(ROMBanks - 1) & (ROMBanks - 1)] );
 
 	/* Set up RTC timer */
 	if ( rtc.present ) {
@@ -300,7 +302,7 @@ READ8_HANDLER( wswan_port_r )
 	UINT8 value = ws_portram[offset];
 
 	if ( offset != 2 )
-	logerror( "PC=%X: port read %02X\n", activecpu_get_pc(), offset );
+	logerror( "PC=%X: port read %02X\n", cpu_get_pc( space->cpu ), offset );
 	switch( offset )
 	{
 		case 0x02:		/* Current line */
@@ -365,7 +367,7 @@ READ8_HANDLER( wswan_port_r )
 
 WRITE8_HANDLER( wswan_port_w )
 {
-	logerror( "PC=%X: port write %02X <- %02X\n", activecpu_get_pc(), offset, data );
+	logerror( "PC=%X: port write %02X <- %02X\n", cpu_get_pc( space->cpu ), offset, data );
 	switch( offset )
 	{
 		case 0x00:	/* Display control
@@ -827,7 +829,7 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 0-3 - Master volume
 				   Bit 4-7 - Unknown
 				*/
-			wswan_sound_port_w( machine, offset, data );
+			wswan_sound_port_w( space, offset, data );
 			break;
 		case 0xa0:	/* Hardware type - this is probably read only
 				   Bit 0   - Enable cartridge slot and/or disable bios
@@ -836,7 +838,7 @@ WRITE8_HANDLER( wswan_port_w )
 				*/
 			if ( ( data & 0x01 ) && !wswan_bios_disabled ) {
 				wswan_bios_disabled = 1;
-				memory_set_bankptr( 15, ROMMap[ ( ( ( ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( ROMBanks - 1 ) ] );
+				memory_set_bankptr( space->machine, 15, ROMMap[ ( ( ( ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xa2:	/* Timer control
@@ -943,13 +945,13 @@ WRITE8_HANDLER( wswan_port_w )
 			switch( data ) 
 			{
 			case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-				data = data | input_port_read(machine, "CURSY");
+				data = data | input_port_read(space->machine, "CURSY");
 				break;
 			case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
-				data = data | input_port_read(machine, "CURSX");
+				data = data | input_port_read(space->machine, "CURSX");
 				break;
 			case 0x40:	/* Read buttons: START - A - B */
-				data = data | input_port_read(machine, "BUTTONS");
+				data = data | input_port_read(space->machine, "BUTTONS");
 				break;
 			}
 			break;
@@ -963,7 +965,7 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 6   - VBlank interrupt acknowledge
 				   Bit 7   - HBlank timer interrupt acknowledge
 				*/
-			wswan_clear_irq_line( machine, data );
+			wswan_clear_irq_line( space->machine, data );
 			data = ws_portram[0xB6];
 			break;
 		case 0xba:	/* Internal EEPROM data (low)
@@ -1009,19 +1011,19 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 0-3 - ROM bank base register for banks 4-15
 				   Bit 4-7 - Unknown
 				*/
-			memory_set_bankptr( 4, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 5, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 6, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 7, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 8, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 9, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 10, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 11, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 12, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 13, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( ROMBanks - 1 ) ] );
-			memory_set_bankptr( 14, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 4, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 5, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 6, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 7, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 8, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 9, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 10, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 11, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 12, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 13, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( ROMBanks - 1 ) ] );
+			memory_set_bankptr( space->machine, 14, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( ROMBanks - 1 ) ] );
 			if ( wswan_bios_disabled ) {
-				memory_set_bankptr( 15, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( ROMBanks - 1 ) ] );
+				memory_set_bankptr( space->machine, 15, ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xc1:	/* SRAM bank select
@@ -1034,12 +1036,12 @@ WRITE8_HANDLER( wswan_port_w )
 		case 0xc2:	/* ROM bank select for segment 2 (0x20000 - 0x2ffff)
 				   Bit 0-7 - ROM bank for segment 2
 				*/
-			memory_set_bankptr( 2, ROMMap[ data & ( ROMBanks - 1 ) ]);
+			memory_set_bankptr( space->machine, 2, ROMMap[ data & ( ROMBanks - 1 ) ]);
 			break;
 		case 0xc3:	/* ROM bank select for segment 3 (0x30000-0x3ffff)
 				   Bit 0-7 - ROM bank for segment 3
 				*/
-			memory_set_bankptr( 3, ROMMap[ data & ( ROMBanks - 1 ) ]);
+			memory_set_bankptr( space->machine, 3, ROMMap[ data & ( ROMBanks - 1 ) ]);
 			break;
 		case 0xc6:	/* EEPROM address lower bits port/EEPROM address and command port
 				   1KBit EEPROM:
@@ -1200,7 +1202,7 @@ WRITE8_HANDLER( wswan_port_w )
 				ws_portram[0xcb] = rtc.year;
 				break;
 			default:
-				logerror( "%X: Unknown RTC command (%X) requested\n", activecpu_get_pc(), data );
+				logerror( "%X: Unknown RTC command (%X) requested\n", cpu_get_pc( space->cpu ), data );
 			}
 			break;
 		case 0xcb:	/* RTC Data */
@@ -1289,7 +1291,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	UINT32 ii;
 	const char *sram_str;
 
-	ws_ram = memory_get_read_ptr( 0, ADDRESS_SPACE_PROGRAM, 0 );
+	ws_ram = memory_get_read_ptr( cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0 );
 	memset( ws_ram, 0, 0xFFFF );
 	ROMBanks = image_length( image ) / 65536;
 
@@ -1370,14 +1372,15 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 				vdp.timer_hblank_reload = 0;
 			}
 			logerror( "trigerring hbltmr interrupt\n" );
-			wswan_set_irq_line( machine, WSWAN_IFLAG_HBLTMR );
+			wswan_set_irq_line( device->machine, WSWAN_IFLAG_HBLTMR );
 		}
 	}
 
 	/* Handle Sound DMA */
 	if ( ( sound_dma.enable & 0x88 ) == 0x80 ) {
+		const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 		/* TODO: Output sound DMA byte */
-		wswan_port_w( machine, 0x89, memory_read_byte(space,  sound_dma.source ) );
+		wswan_port_w( space, 0x89, memory_read_byte(space,  sound_dma.source ) );
 		sound_dma.size--;
 		sound_dma.source = ( sound_dma.source + 1 ) & 0x0FFFFF;
 		if ( sound_dma.size == 0 ) {
@@ -1388,7 +1391,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 //	vdp.current_line = (vdp.current_line + 1) % 159;
 
 	if( vdp.current_line == 144 ) {
-		wswan_set_irq_line( machine, WSWAN_IFLAG_VBL );
+		wswan_set_irq_line( device->machine, WSWAN_IFLAG_VBL );
 		/* Decrement 75Hz (VBlank) counter */
 		if ( vdp.timer_vblank_enable && vdp.timer_vblank_reload != 0 ) {
 			vdp.timer_vblank_count--;
@@ -1400,7 +1403,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 					vdp.timer_vblank_reload = 0;
 				}
 				logerror( "triggering vbltmr interrupt\n" );
-				wswan_set_irq_line( machine, WSWAN_IFLAG_VBLTMR );
+				wswan_set_irq_line( device->machine, WSWAN_IFLAG_VBLTMR );
 			}
 		}
 	}
@@ -1408,7 +1411,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 //	vdp.current_line = (vdp.current_line + 1) % 159;
 
 	if ( vdp.current_line == vdp.line_compare ) {
-		wswan_set_irq_line( machine, WSWAN_IFLAG_LCMP );
+		wswan_set_irq_line( device->machine, WSWAN_IFLAG_LCMP );
 	}
 
 	vdp.current_line = (vdp.current_line + 1) % 159;
@@ -1417,9 +1420,9 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 		if ( vdp.display_vertical != vdp.new_display_vertical ) {
 			vdp.display_vertical = vdp.new_display_vertical;
 			if ( vdp.display_vertical ) {
-				video_screen_set_visarea( machine->primary_screen, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
+				video_screen_set_visarea( device->machine->primary_screen, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
 			} else {
-				video_screen_set_visarea( machine->primary_screen, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
+				video_screen_set_visarea( device->machine->primary_screen, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
 			}
 		}
 	}
