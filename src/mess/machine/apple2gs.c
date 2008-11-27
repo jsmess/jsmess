@@ -1718,7 +1718,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 
 static READ8_HANDLER( apple2gs_read_vector )
 {
-	return program_read_byte(offset | 0xFF0000);
+	return memory_read_byte(space, offset | 0xFF0000);
 }
 
 MACHINE_RESET( apple2gs )

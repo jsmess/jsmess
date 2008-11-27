@@ -641,7 +641,7 @@ QUICKLOAD_LOAD ( coco )
 			/* read the block into memory */
 			for (i = 0; i < block_length; i++)
 			{
-				program_write_byte(block_address + i, ptr[position + i]);
+				memory_write_byte(space, block_address + i, ptr[position + i]);
 			}
 
 			/* and advance */

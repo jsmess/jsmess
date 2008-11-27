@@ -207,20 +207,20 @@ SNAPSHOT_LOAD(vtech1)
 	switch (header[21])
 	{
 	case VZ_BASIC:		/* 0xF0 */
-		program_write_byte(0x78a4, start % 256); /* start of basic program */
-		program_write_byte(0x78a5, start / 256);
-		program_write_byte(0x78f9, end % 256); /* end of basic program */
-		program_write_byte(0x78fa, end / 256);
-		program_write_byte(0x78fb, end % 256); /* start variable table */
-		program_write_byte(0x78fc, end / 256);
-		program_write_byte(0x78fd, end % 256); /* start free mem, end variable table */
-		program_write_byte(0x78fe, end / 256);
+		memory_write_byte(space, 0x78a4, start % 256); /* start of basic program */
+		memory_write_byte(space, 0x78a5, start / 256);
+		memory_write_byte(space, 0x78f9, end % 256); /* end of basic program */
+		memory_write_byte(space, 0x78fa, end / 256);
+		memory_write_byte(space, 0x78fb, end % 256); /* start variable table */
+		memory_write_byte(space, 0x78fc, end / 256);
+		memory_write_byte(space, 0x78fd, end % 256); /* start free mem, end variable table */
+		memory_write_byte(space, 0x78fe, end / 256);
 		image_message(image, " %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
 	case VZ_MCODE:		/* 0xF1 */
-		program_write_byte(0x788e, start % 256); /* usr subroutine address */
-		program_write_byte(0x788f, start / 256);
+		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
+		memory_write_byte(space, 0x788f, start / 256);
 		image_message(image, " %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		cpunum_set_reg(0, REG_PC, start);				/* start program */
 		break;

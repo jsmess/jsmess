@@ -445,10 +445,10 @@ static Z80BIN_EXECUTE( vtech1 )
 			0xc3, 0xcf, 0x36,};	// JP 36CF	;enter bios at autorun point
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			program_write_byte(0x791e + i, data[i]);
+			memory_write_byte(space, 0x791e + i, data[i]);
 
 		if (!autorun)
-			program_write_byte(0x7929, 0xb6);	/* turn off autorun */
+			memory_write_byte(space, 0x7929, 0xb6);	/* turn off autorun */
 
 		cpunum_set_reg(0, REG_PC, 0x791e);
 	}

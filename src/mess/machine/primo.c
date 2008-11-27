@@ -303,7 +303,7 @@ static void primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 	/* memory */
 
 	for (i=0; i<0xc000; i++)
-		program_write_byte(i+0x4000, snapshot_data[i+38]);
+		memory_write_byte(space, i+0x4000, snapshot_data[i+38]);
 }
 
 SNAPSHOT_LOAD( primo )
@@ -349,7 +349,7 @@ static void primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
 	start_addr = quickload_data[2] + quickload_data[3]*256;
 
 	for (i=4; i<quickload_size; i++)
-		program_write_byte(start_addr+i-4, quickload_data[i]);
+		memory_write_byte(space, start_addr+i-4, quickload_data[i]);
 
 	cpunum_set_reg(0, Z80_PC, start_addr);
 

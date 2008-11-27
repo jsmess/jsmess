@@ -644,9 +644,9 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 		/* build the bios jump table */
 		cpm_jumptable();
 		bc = curdisk;
-		activecpu_set_reg( Z80_BC, bc );
-		activecpu_set_reg( Z80_SP, 0x0080  );
-		activecpu_set_reg( Z80_PC, CCP + 3 );
+		cpu_set_reg(machine->activecpu,  Z80_BC, bc );
+		cpu_set_reg(machine->activecpu,  Z80_SP, 0x0080  );
+		cpu_set_reg(machine->activecpu,  Z80_PC, CCP + 3 );
 		break;
 
 	case 0x02: /* CSTAT */
@@ -660,7 +660,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 	case 0x03: /* CONIN */
 		if ( io_read_byte(BIOS_CONST) == 0 )
 		{
-			activecpu_set_reg( Z80_PC, activecpu_get_reg(Z80_PC) - 2 );
+			cpu_set_reg(machine->activecpu,  Z80_PC, activecpu_get_reg(Z80_PC) - 2 );
 			break;
 		}
 		tmp = io_read_byte(BIOS_CONIN) & 0xff;
@@ -786,7 +786,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 			/* DAD B   */
 			hl += bc;
 			/* MOV A,M */
-			af = (af & 0xff) | ( program_read_byte(hl) << 8);
+			af = (af & 0xff) | ( memory_read_byte(space, hl) << 8);
 			/* MOV L,A */
 			hl = (hl & 0xff00) | (af >> 8);
 		}
@@ -810,9 +810,9 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 	}
 
 	/* Write back the possibly modified Z80 basic registers */
-	activecpu_set_reg( Z80_AF, af );
-	activecpu_set_reg( Z80_BC, bc );
-	activecpu_set_reg( Z80_DE, de );
-	activecpu_set_reg( Z80_HL, hl );
+	cpu_set_reg(machine->activecpu,  Z80_AF, af );
+	cpu_set_reg(machine->activecpu,  Z80_BC, bc );
+	cpu_set_reg(machine->activecpu,  Z80_DE, de );
+	cpu_set_reg(machine->activecpu,  Z80_HL, hl );
 }
 

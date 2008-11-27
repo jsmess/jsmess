@@ -249,7 +249,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 		& 0xFF0000;
 
 	cpuintrf_push_context(0);
-	result = program_read_byte(page_offset + offset);
+	result = memory_read_byte(space, page_offset + offset);
 	cpuintrf_pop_context();
 
 	return result;
@@ -262,7 +262,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 		& 0xFF0000;
 
 	cpuintrf_push_context(0);
-	program_write_byte(page_offset + offset, data);
+	memory_write_byte(space, page_offset + offset, data);
 	cpuintrf_pop_context();
 }
 

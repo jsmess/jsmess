@@ -400,6 +400,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
+	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/amstrad.a \
@@ -481,7 +482,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/ti85.a \
 #	$(MESSOBJ)/ti99.a \
 #	$(MESSOBJ)/tiger.a \
-#	$(MESSOBJ)/trs80.a \
 #	$(MESSOBJ)/tutor.a \
 #	$(MESSOBJ)/tx0.a \
 #	$(MESSOBJ)/vc4000.a \

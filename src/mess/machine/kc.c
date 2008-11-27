@@ -175,7 +175,7 @@ WRITE8_HANDLER(kc85_disc_interface_ram_w)
 
 	logerror("interface ram w: %04x %02x\n",addr,data);
 
-	program_write_byte(addr|0x0f000,data);
+	memory_write_byte(space, addr|0x0f000,data);
 }
 
 READ8_HANDLER(kc85_disc_interface_ram_r)
@@ -187,7 +187,7 @@ READ8_HANDLER(kc85_disc_interface_ram_r)
 
 	logerror("interface ram r: %04x\n",addr);
 
-	return program_read_byte(addr|0x0f000);
+	return memory_read_byte(space, addr|0x0f000);
 }
 
 /* 4-bit latch used to reset disc interface etc */

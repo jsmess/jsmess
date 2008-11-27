@@ -72,6 +72,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 
 QUICKLOAD_LOAD( trs80_cmd )
 {
+	const address_space *space = cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 entry = 0, block_ofs = 0, block_len = 0;
 	unsigned offs = 0;
 	UINT8 *cmd_buff;
@@ -100,7 +101,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			LOG(("trs80_cmd_load block ($%02X) %d at $%04X\n", data, block_len, block_ofs));
 			while( block_len && quickload_size )
 			{
-				program_write_byte(block_ofs, cmd_buff[offs]);
+				memory_write_byte(space, block_ofs, cmd_buff[offs]);
 				offs++;
 				block_ofs++;
 				block_len--;
@@ -129,7 +130,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			quickload_size--;
 		}
 	}
-	activecpu_set_reg(Z80_PC, entry);
+	cpu_set_reg(image->machine->activecpu, Z80_PC, entry);
 
 	free(cmd_buff);
 	return INIT_PASS;
@@ -309,7 +310,7 @@ MACHINE_START( trs80 )
 WRITE8_HANDLER( trs80_port_ff_w )
 {
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	const device_config *cass = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	const device_config *cass = device_list_find_by_tag(space->machine->config->devicelist, CASSETTE, "cassette" );
 
 	cassette_change_state( cass, ( data & 0x04 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
@@ -336,17 +337,22 @@ INTERRUPT_GEN( trs80_timer_interrupt )
 	if( (irq_status & IRQ_TIMER) == 0 )
 	{
 		irq_status |= IRQ_TIMER;
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
-INTERRUPT_GEN( trs80_fdc_interrupt )
+static void trs80_fdc_interrupt_internal(running_machine *machine)
 {
 	if ((irq_status & IRQ_FDC) == 0)
 	{
 		irq_status |= IRQ_FDC;
 		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	}
+}
+
+INTERRUPT_GEN( trs80_fdc_interrupt )
+{
+	trs80_fdc_interrupt_internal(device->machine);
 }
 
 void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
@@ -357,7 +363,7 @@ void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *pa
 			irq_status &= ~IRQ_FDC;
 			break;
 		case WD17XX_IRQ_SET:
-			trs80_fdc_interrupt(machine, 0);
+			trs80_fdc_interrupt_internal(machine);
 			break;
 		case WD17XX_DRQ_CLR:
 		case WD17XX_DRQ_SET:
@@ -448,26 +454,26 @@ WRITE8_HANDLER( trs80_motor_w )
 /*************************************
  *		Keyboard					 *
  *************************************/
- READ8_HANDLER( trs80_keyboard_r )
+READ8_HANDLER( trs80_keyboard_r )
 {
 	int result = 0;
 
 	if (offset & 1)
-		result |= input_port_read(machine, "LINE0");
+		result |= input_port_read(space->machine, "LINE0");
 	if (offset & 2)
-		result |= input_port_read(machine, "LINE1");
+		result |= input_port_read(space->machine, "LINE1");
 	if (offset & 4)
-		result |= input_port_read(machine, "LINE2");
+		result |= input_port_read(space->machine, "LINE2");
 	if (offset & 8)
-		result |= input_port_read(machine, "LINE3");
+		result |= input_port_read(space->machine, "LINE3");
 	if (offset & 16)
-		result |= input_port_read(machine, "LINE4");
+		result |= input_port_read(space->machine, "LINE4");
 	if (offset & 32)
-		result |= input_port_read(machine, "LINE5");
+		result |= input_port_read(space->machine, "LINE5");
 	if (offset & 64)
-		result |= input_port_read(machine, "LINE6");
+		result |= input_port_read(space->machine, "LINE6");
 	if (offset & 128)
-		result |= input_port_read(machine, "LINE7");
+		result |= input_port_read(space->machine, "LINE7");
 
 	return result;
 }

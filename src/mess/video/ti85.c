@@ -174,7 +174,7 @@ VIDEO_UPDATE( ti85 )
 
         for (y=0; y<ti_screen_y_size; y++)
 		for (x=0; x<ti_screen_x_size; x++)
-			*(ti85_frames+(ti_number_of_frames-1)*ti_video_memory_size+y*ti_screen_x_size+x) = program_read_byte(lcdmem+y*ti_screen_x_size+x);
+			*(ti85_frames+(ti_number_of_frames-1)*ti_video_memory_size+y*ti_screen_x_size+x) = memory_read_byte(space, lcdmem+y*ti_screen_x_size+x);
 
        	for (y=0; y<ti_screen_y_size; y++)
 		for (x=0; x<ti_screen_x_size; x++)

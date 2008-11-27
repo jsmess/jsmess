@@ -47,35 +47,35 @@ OPBASE_HANDLER( jupiter_opbaseoverride )
 		if (jupiter_data_type == JUPITER_ACE)
 		{
 			for (loop = 0; loop < 0x6000; loop++)
-				program_write_byte(loop + 0x2000, jupiter_data[loop]);
+				memory_write_byte(space, loop + 0x2000, jupiter_data[loop]);
 		}
 		else if (jupiter_data_type == JUPITER_TAP)
 		{
 
 			for (loop = 0; loop < jupiter_tape.dat_len; loop++)
-				program_write_byte(loop + jupiter_tape.hdr_addr, jupiter_data[loop]);
+				memory_write_byte(space, loop + jupiter_tape.hdr_addr, jupiter_data[loop]);
 
-			program_write_byte(0x3c27, 0x01);
+			memory_write_byte(space, 0x3c27, 0x01);
 
 			for (loop = 0; loop < 8; loop++)
-				program_write_byte(loop + 0x3c31, jupiter_tape.hdr_vars[loop]);
-			program_write_byte(0x3c39, 0x00);
-			program_write_byte(0x3c3a, 0x00);
+				memory_write_byte(space, loop + 0x3c31, jupiter_tape.hdr_vars[loop]);
+			memory_write_byte(space, 0x3c39, 0x00);
+			memory_write_byte(space, 0x3c3a, 0x00);
 
-			tmpword = program_read_byte(0x3c3b) + program_read_byte(0x3c3c) * 256 + jupiter_tape.hdr_len;
+			tmpword = memory_read_byte(space, 0x3c3b) + memory_read_byte(space, 0x3c3c) * 256 + jupiter_tape.hdr_len;
 
-			program_write_byte(0x3c3b, tmpword & 0xff);
-			program_write_byte(0x3c3c, (tmpword >> 8) & 0xff);
+			memory_write_byte(space, 0x3c3b, tmpword & 0xff);
+			memory_write_byte(space, 0x3c3c, (tmpword >> 8) & 0xff);
 
-			program_write_byte(0x3c45, 0x0c);	/* ? */
+			memory_write_byte(space, 0x3c45, 0x0c);	/* ? */
 
-			program_write_byte(0x3c4c, jupiter_tape.hdr_3c4c);
-			program_write_byte(0x3c4d, jupiter_tape.hdr_3c4d);
+			memory_write_byte(space, 0x3c4c, jupiter_tape.hdr_3c4c);
+			memory_write_byte(space, 0x3c4d, jupiter_tape.hdr_3c4d);
 
-			if (!program_read_byte(0x3c57) && !program_read_byte(0x3c58))
+			if (!memory_read_byte(space, 0x3c57) && !memory_read_byte(space, 0x3c58))
 			{
-				program_write_byte(0x3c57, 0x49);
-				program_write_byte(0x3c58, 0x3c);
+				memory_write_byte(space, 0x3c57, 0x49);
+				memory_write_byte(space, 0x3c58, 0x3c);
 			}
 		}
 	}

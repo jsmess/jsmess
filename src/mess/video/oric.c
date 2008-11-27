@@ -298,7 +298,7 @@ VIDEO_UPDATE( oric )
 			}
 
 			/* fetch data */
-			c = RAM ? RAM[read_addr] : program_read_byte(read_addr);
+			c = RAM ? RAM[read_addr] : memory_read_byte(space, read_addr);
 
 			/* if bits 6 and 5 are zero, the byte contains a serial attribute */
 			if ((c & ((1<<6) | (1<<5)))==0)

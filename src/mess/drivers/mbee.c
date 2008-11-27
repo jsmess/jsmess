@@ -573,7 +573,7 @@ static QUICKLOAD_LOAD( mbee )
 			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
 
 			if ((j < mbee_size) || (j > 0xefff))
-				program_write_byte(j, data);
+				memory_write_byte(space, j, data);
 			else
 				return INIT_FAIL;
 		}
@@ -596,7 +596,7 @@ static QUICKLOAD_LOAD( mbee )
 			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
 
 			if ((j < mbee_size) || (j > 0xefff))
-				program_write_byte(j, data);
+				memory_write_byte(space, j, data);
 			else
 				return INIT_FAIL;
 		}

@@ -715,7 +715,7 @@ static DMA8237_MEM_READ( bebox_dma_read_byte )
 {
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x7FFF0000;
-	return program_read_byte(page_offset + offset);
+	return memory_read_byte(space, page_offset + offset);
 }
 
 
@@ -723,7 +723,7 @@ static DMA8237_MEM_WRITE( bebox_dma_write_byte )
 {
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x7FFF0000;
-	program_write_byte(page_offset + offset, data);
+	memory_write_byte(space, page_offset + offset, data);
 }
 
 

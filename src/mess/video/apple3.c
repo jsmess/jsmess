@@ -52,12 +52,12 @@ void apple3_write_charmem(void)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			addr = 0x7f & program_read_byte(screen_hole_map[i] + 0x400 + j + 0);
-			val = program_read_byte(screen_hole_map[i] + j + 0);
+			addr = 0x7f & memory_read_byte(space, screen_hole_map[i] + 0x400 + j + 0);
+			val = memory_read_byte(space, screen_hole_map[i] + j + 0);
 			char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x3ff] = val;
 
-			addr = 0x7f & program_read_byte(screen_hole_map[i] + 0x400 + j + 4);
-			val = program_read_byte(screen_hole_map[i] + j + 4);
+			addr = 0x7f & memory_read_byte(space, screen_hole_map[i] + 0x400 + j + 4);
+			val = memory_read_byte(space, screen_hole_map[i] + j + 4);
 			char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x3ff] = val;
 		}
 	}

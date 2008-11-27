@@ -475,7 +475,7 @@ int vic6560_dma_read_color (int offset)
 int vic6560_dma_read (int offset)
 {
 	/* should read real system bus between 0x9000 and 0xa000 */
-	return program_read_byte(VIC6560ADDR2VC20ADDR (offset));
+	return memory_read_byte(space, VIC6560ADDR2VC20ADDR (offset));
 }
 
 WRITE8_HANDLER( vc20_0400_w ) 

@@ -617,7 +617,7 @@ static READ8_HANDLER( apple3_indexed_read )
 
 	addr = apple3_get_indexed_addr(offset);
 	if (!addr)
-		result = program_read_byte(offset);
+		result = memory_read_byte(space, offset);
 	else if (addr != (UINT8 *) ~0)
 		result = *addr;
 	else
@@ -633,7 +633,7 @@ static WRITE8_HANDLER( apple3_indexed_write )
 
 	addr = apple3_get_indexed_addr(offset);
 	if (!addr)
-		program_write_byte(offset, data);
+		memory_write_byte(space, offset, data);
 	else if (addr != (UINT8 *) ~0)
 		*addr = data;
 }

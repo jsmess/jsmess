@@ -132,7 +132,7 @@ PALETTE_INIT ( hp48 )
 	data >>= 1
 
 #define draw_quart					\
-	UINT8 data = program_read_byte( addr );	\
+	UINT8 data = memory_read_byte(space,  addr );	\
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 

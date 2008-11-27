@@ -263,14 +263,14 @@ SNAPSHOT_LOAD( nascom1 )
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
 		{
-			program_write_byte(addr++, b0);
-			program_write_byte(addr++, b1);
-			program_write_byte(addr++, b2);
-			program_write_byte(addr++, b3);
-			program_write_byte(addr++, b4);
-			program_write_byte(addr++, b5);
-			program_write_byte(addr++, b6);
-			program_write_byte(addr++, b7);
+			memory_write_byte(space, addr++, b0);
+			memory_write_byte(space, addr++, b1);
+			memory_write_byte(space, addr++, b2);
+			memory_write_byte(space, addr++, b3);
+			memory_write_byte(space, addr++, b4);
+			memory_write_byte(space, addr++, b5);
+			memory_write_byte(space, addr++, b6);
+			memory_write_byte(space, addr++, b7);
 		}
 	}
 

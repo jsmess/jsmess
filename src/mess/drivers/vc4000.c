@@ -324,12 +324,12 @@ QUICKLOAD_LOAD(vc4000)
 	//if ((quick_addr + quick_length - 5) > 0x1000)
 	//	return INIT_FAIL;
 	
-	program_write_byte(0x08be, quick_data[3]);	
-	program_write_byte(0x08bf, quick_data[4]);	
+	memory_write_byte(space, 0x08be, quick_data[3]);	
+	memory_write_byte(space, 0x08bf, quick_data[4]);	
 	
 	for (i = 0; i < quick_length - 5; i++)
 	{	if ((quick_addr + i) < 0x1000)
-			program_write_byte(i + quick_addr, quick_data[i+5]);
+			memory_write_byte(space, i + quick_addr, quick_data[i+5]);
 	}
 	
 	logerror("quick loading at %.4x size:%.4x\n", quick_addr, (quick_length-5));

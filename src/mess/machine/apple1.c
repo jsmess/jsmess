@@ -262,7 +262,7 @@ SNAPSHOT_LOAD(apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 		 addr <= end_addr;
 		 addr++, snapptr++)
-		program_write_byte(addr, *snapptr);
+		memory_write_byte(space, addr, *snapptr);
 
 	return INIT_PASS;
 }
@@ -518,7 +518,7 @@ READ8_HANDLER( apple1_cassette_r )
 		   always comes from the corresponding cassette ROM location
 		   in $C100-$C17F. */
 
-		return program_read_byte(0xc100 + offset);
+		return memory_read_byte(space, 0xc100 + offset);
 	}
     else
 	{
@@ -536,9 +536,9 @@ READ8_HANDLER( apple1_cassette_r )
 		   because it can cause tape header bits on real cassette
 		   images to be misread as data bits.) */
 		if (cassette_input(cassette_device_image(machine)) > 0.0)
-			return program_read_byte(0xc100 + (offset & ~1));
+			return memory_read_byte(space, 0xc100 + (offset & ~1));
 		else
-			return program_read_byte(0xc100 + offset);
+			return memory_read_byte(space, 0xc100 + offset);
 	}
 }
 

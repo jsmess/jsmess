@@ -172,7 +172,7 @@ static QUICKLOAD_LOAD( lynx )
 		return INIT_FAIL;
 
 	for (i = 0; i < length; i++)
-		program_write_byte(start + i, data[i]);
+		memory_write_byte(space, start + i, data[i]);
 
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;

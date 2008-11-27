@@ -594,15 +594,15 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
-//128u4	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
-//128u4	DRIVER( trs80l2 )	/* TRS-80 Model I - Level II BASIC					*/
-//128u4	DRIVER( sys80 )		/* EACA System 80									*/
-//128u4	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
-//128u4	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
-//128u4	DRIVER( trs80m4 )
-//128u4	DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
-//128u4	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
-//128u4	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
+	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
+	DRIVER( trs80l2 )	/* TRS-80 Model I - Level II BASIC					*/
+	DRIVER( sys80 )		/* EACA System 80									*/
+	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
+	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
+	DRIVER( trs80m4 )
+	DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
+	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
+	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
 
 //128u4	DRIVER( coco )		/* Color Computer									*/
 //128u4	DRIVER( cocoe )		/* Color Computer (Extended BASIC 1.0)				*/

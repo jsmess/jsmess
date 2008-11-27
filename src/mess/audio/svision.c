@@ -195,7 +195,7 @@ static void svision_update (void *param,stream_sample_t **inputs, stream_sample_
 			}
 			else
 			{
-				sample = program_read_byte(addr);
+				sample = memory_read_byte(space, addr);
 			}
 			if (((unsigned)svision_dma.pos) & 1)
 				s = (sample & 0xf);

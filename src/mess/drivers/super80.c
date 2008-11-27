@@ -239,7 +239,7 @@ static VIDEO_UPDATE( super80 )
 		for (x=0; x<32; x++)
 		{
 			if (screen_on)
-				code = program_read_byte(vidpg + x + (y<<5));
+				code = memory_read_byte(space, vidpg + x + (y<<5));
 
 			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10,
 				cliprect, TRANSPARENCY_NONE, 0);
@@ -274,9 +274,9 @@ static VIDEO_UPDATE( super80m )
 		{
 			if (screen_on)
 			{
-				code = program_read_byte(vidpg + x + (y<<5));		/* get character to display */
+				code = memory_read_byte(space, vidpg + x + (y<<5));		/* get character to display */
 
-				if (!(options & 0x40)) col = program_read_byte(0xfe00 + x + (y<<5));	/* byte of colour to display */
+				if (!(options & 0x40)) col = memory_read_byte(space, 0xfe00 + x + (y<<5));	/* byte of colour to display */
 			}
 
 			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,

@@ -856,8 +856,8 @@ static void c128_m6510_port_write(UINT8 direction, UINT8 data)
 
 	c128_bankswitch_64 (Machine, 0);
 
-	c64_memory[0x000] = program_read_byte( 0 );
-	c64_memory[0x001] = program_read_byte( 1 );
+	c64_memory[0x000] = memory_read_byte(space,  0 );
+	c64_memory[0x001] = memory_read_byte(space,  1 );
 }
 
 static UINT8 c128_m6510_port_read(UINT8 direction)
