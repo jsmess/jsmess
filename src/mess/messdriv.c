@@ -1110,7 +1110,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( roma32 )		/* Roma											*/
 
 /*********** Misc ***********************************************************/
-//128u4	DRIVER( ex800 )
+	DRIVER( ex800 )
 
 
 #endif /* DRIVER_RECURSIVE */

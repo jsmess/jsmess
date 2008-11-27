@@ -189,19 +189,19 @@ static MACHINE_START(ex800)
 static READ8_HANDLER(ex800_porta_r)
 {
 	logerror("PA R @%x\n", cpu_get_pc(space->cpu));
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER(ex800_portb_r)
 {
 	logerror("PB R @%x\n", cpu_get_pc(space->cpu));
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER(ex800_portc_r)
 {
 	logerror("PC R @%x\n", cpu_get_pc(space->cpu));
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(ex800_porta_w)
@@ -252,7 +252,7 @@ static WRITE8_HANDLER(ex800_portc_w)
 static READ8_HANDLER(ex800_devsel_r)
 {
 	logerror("DEVSEL R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(ex800_devsel_w)
@@ -263,7 +263,7 @@ static WRITE8_HANDLER(ex800_devsel_w)
 static READ8_HANDLER(ex800_gate5a_r)
 {
 	logerror("GATE5A R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(ex800_gate5a_w)
@@ -274,7 +274,7 @@ static WRITE8_HANDLER(ex800_gate5a_w)
 static READ8_HANDLER(ex800_iosel_r)
 {
 	logerror("IOSEL R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(ex800_iosel_w)
@@ -285,7 +285,7 @@ static WRITE8_HANDLER(ex800_iosel_w)
 static READ8_HANDLER(ex800_gate7a_r)
 {
 	logerror("GATE7A R @%x with offset %x\n", cpu_get_pc(space->cpu), offset);
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(ex800_gate7a_w)
