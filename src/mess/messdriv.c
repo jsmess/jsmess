@@ -840,13 +840,13 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( c2717 )		/* Consul 2717 (PMD-85.2 clone)				*/
 	
 	/* Microkey */
-//128u4	DRIVER( primoa32 )	/* Primo A-32										*/
-//128u4	DRIVER( primoa48 )	/* Primo A-48										*/
-//128u4	DRIVER( primoa64 )	/* Primo A-64										*/
-//128u4	DRIVER( primob32 )	/* Primo B-32										*/
-//128u4	DRIVER( primob48 )	/* Primo B-48										*/
-//128u4	DRIVER( primob64 )	/* Primo B-64										*/
-//128u4	DRIVER( primoc64 )	/* Primo C-64										*/
+	DRIVER( primoa32 )	/* Primo A-32										*/
+	DRIVER( primoa48 )	/* Primo A-48										*/
+	DRIVER( primoa64 )	/* Primo A-64										*/
+	DRIVER( primob32 )	/* Primo B-32										*/
+	DRIVER( primob48 )	/* Primo B-48										*/
+	DRIVER( primob64 )	/* Primo B-64										*/
+	DRIVER( primoc64 )	/* Primo C-64										*/
 
 	/* Team Concepts */
 	/* CPU not known, else should be easy, look into drivers/comquest.c */
