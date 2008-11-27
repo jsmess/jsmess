@@ -563,8 +563,8 @@ XL/XE 16kB OS roms
 	DRIVER( jupiter )	/* Jupiter Ace										*/
 
 	/* SORD */
-//128u4	DRIVER( sordm5 )
-//128u4	DRIVER( srdm5fd5 )
+	DRIVER( sordm5 )
+	DRIVER( srdm5fd5 )
 
 	/* APF Electronics Inc. */
 	DRIVER( apfm1000 )

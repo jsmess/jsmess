@@ -240,7 +240,7 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 	int		bank_end;
 	int		MapPage;
 
-	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,activecpu_get_pc()));
+	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,cpu_get_pc(space->cpu)));
 	for(Page=first;Page<=last;Page++)
 	{
 		bank_start	= bank_info[Page].start;
@@ -670,7 +670,7 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA==CLEAR_LINE)
-			cpu_yield();
+			cpu_yield(space->cpu);
 
 		d_pia1_pa_last=data & 0x80;
 	}
@@ -715,7 +715,7 @@ static WRITE8_HANDLER(d_pia1_pb_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU==CLEAR_LINE)
-			cpu_yield();
+			cpu_yield(space->cpu);
 	}
 }
 
@@ -762,7 +762,7 @@ static WRITE8_HANDLER(d_pia2_pa_w)
 		{
 			cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,ASSERT_LINE);
 			logerror("cpu_yield()\n");
-			cpu_yield();	/* Let DMA CPU run */
+			cpu_yield(space->cpu);	/* Let DMA CPU run */
 		}
 		else
 		{
