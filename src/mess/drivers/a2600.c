@@ -742,11 +742,11 @@ static DIRECT_UPDATE_HANDLER( modeSS_opbase )
 		opbase->mem_min = ( address & 0xf800 );
 		opbase->mem_max = ( address & 0xf800 ) | 0x7ff;
 		if ( address & 0x800 ) {
-			opbase->ram = bank_base[2];
-			opbase->rom = bank_base[2];
+			direct->decrypted = bank_base[2];
+			direct->raw = bank_base[2];
 		} else {
-			opbase->ram = bank_base[1];
-			opbase->rom = bank_base[1];
+			direct->decrypted = bank_base[1];
+			direct->raw = bank_base[1];
 		}
 		return ~0;
 	}

@@ -648,7 +648,7 @@ static DIRECT_UPDATE_HANDLER( apple3_opbase )
 	{
 		opptr = apple3_get_zpa_addr(address);
 		opbase->mask = ~0;
-		opbase->rom = opbase->ram = opptr - address;
+		direct->raw = direct->decrypted = opptr - address;
 		opbase->mem_min = address;
 		opbase->mem_max = address;
 		address = ~0;

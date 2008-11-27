@@ -1607,7 +1607,7 @@ static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 		if (opptr != NULL)
 		{
 			opbase->mask = ~0;
-			opbase->rom = opbase->ram = opptr - address;
+			direct->raw = direct->decrypted = opptr - address;
 			opbase->mem_min = address;
 			opbase->mem_max = address;
 			address = ~0;

@@ -392,7 +392,7 @@ static DIRECT_UPDATE_HANDLER( avigo_opbase_handler )
 	opbase_ptr = avigo_banked_opbase[address / 0x4000];
 	if (opbase_ptr != NULL)
 	{
-		opbase->rom = opbase->ram = opbase_ptr;
+		direct->raw = direct->decrypted = opbase_ptr;
 		address = ~0;
 	}
 	return address;

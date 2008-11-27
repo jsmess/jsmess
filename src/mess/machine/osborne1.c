@@ -219,8 +219,8 @@ static DIRECT_UPDATE_HANDLER( osborne1_opbase )
 		if ( ! osborne1.bank2_enabled )
 		{
 			opbase->mask = 0x0fff;
-			opbase->ram = mess_ram + 0x2000;
-			opbase->rom = mess_ram + 0x2000;
+			direct->decrypted = mess_ram + 0x2000;
+			direct->raw = mess_ram + 0x2000;
 			opbase->mem_min = 0x2000;
 			opbase->mem_max = 0x2fff;
 			return ~0;

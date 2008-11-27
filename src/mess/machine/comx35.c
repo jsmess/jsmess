@@ -540,7 +540,7 @@ static DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 		if (dos_card_active(machine))
 		{
 			// read opcode from DOS ROM
-			opbase->rom = opbase->ram = memory_region(machine, "fdc");
+			direct->raw = direct->decrypted = memory_region(machine, "fdc");
 			return ~0;
 		}
 	}

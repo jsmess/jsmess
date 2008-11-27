@@ -1094,20 +1094,20 @@ static DIRECT_UPDATE_HANDLER( c64_opbase )
 	{
 		if (c64_io_enabled) 
 		{
-			opbase->mask = 0x0fff;
-			opbase->ram = c64_io_mirror;
-			opbase->rom = c64_io_mirror;
-			opbase->mem_min = 0x0000;
-			opbase->mem_max = 0xcfff;
-			c64_io_mirror[address & 0x0fff] = c64_read_io( machine, address & 0x0fff );
+			direct->mask = 0x0fff;
+			direct->decrypted = c64_io_mirror;
+			direct->raw = c64_io_mirror;
+			direct->min = 0x0000;
+			direct->max = 0xcfff;
+			c64_io_mirror[address & 0x0fff] = c64_read_io( space, address & 0x0fff );
 		} 
 		else 
 		{
-			opbase->mask = 0x0fff;
-			opbase->ram = c64_io_ram_r_ptr;
-			opbase->rom = c64_io_ram_r_ptr;
-			opbase->mem_min = 0x0000;
-			opbase->mem_max = 0xcfff;
+			direct->mask = 0x0fff;
+			direct->decrypted = c64_io_ram_r_ptr;
+			direct->raw = c64_io_ram_r_ptr;
+			direct->min = 0x0000;
+			direct->max = 0xcfff;
 		}
 		return ~0;
 	}

@@ -950,7 +950,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			else
 			{	/* system ROMs */
 				opbase->mask = 0xffffff;
-				opbase->rom = opbase->ram = lisa_rom_ptr - (address & 0xffc000);
+				direct->raw = direct->decrypted = lisa_rom_ptr - (address & 0xffc000);
 				opbase->mem_min = (address & 0xffc000);
 				opbase->mem_max = (address & 0xffc000) + 0x003fff;
 				/*logerror("ROM (setup mode)\n");*/
@@ -982,7 +982,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 				logerror("illegal opbase address%lX\n", (long) address);
 			}
 			opbase->mask = 0xffffff;
-			opbase->rom = opbase->ram = lisa_ram_ptr + mapped_address - address;
+			direct->raw = direct->decrypted = lisa_ram_ptr + mapped_address - address;
 			opbase->mem_min = (address & 0xffc000);
 			opbase->mem_max = (address & 0xffc000) + 0x003fff;
 			/*logerror("RAM\n");*/
@@ -998,7 +998,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 		case special_IO:
 			opbase->mask = 0xffffff;
-			opbase->rom = opbase->ram = lisa_rom_ptr + (mapped_address & 0x003fff) - address;
+			direct->raw = direct->decrypted = lisa_rom_ptr + (mapped_address & 0x003fff) - address;
 			opbase->mem_min = (address & 0xffc000);
 			opbase->mem_max = (address & 0xffc000) + 0x003fff;
 			/*logerror("ROM\n");*/
