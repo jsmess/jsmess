@@ -56,6 +56,7 @@
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
+#include "deprecat.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -290,7 +291,7 @@ static int mbee_vsync;
 
 static Z80PIO_ON_INT_CHANGED( pio_interrupt )
 {
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
@@ -453,9 +454,9 @@ static DRIVER_INIT( mbee )
 	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0x8000);
 	memory_configure_bank(machine, 2, 0, 2, &RAM[0x11000], 0x4000);
-	memory_configure_bank(3, 0, 2, &RAM[0x11800], 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
 	memory_set_bank(machine, 2, 1);
-	memory_set_bank(3, 0);
+	memory_set_bank(machine, 3, 0);
 }
 
 static DRIVER_INIT( mbee56 )
@@ -463,9 +464,9 @@ static DRIVER_INIT( mbee56 )
 	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xe000);
 	memory_configure_bank(machine, 2, 0, 2, &RAM[0x11000], 0x4000);
-	memory_configure_bank(3, 0, 2, &RAM[0x11800], 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
 	memory_set_bank(machine, 2, 1);
-	memory_set_bank(3, 0);
+	memory_set_bank(machine, 3, 0);
 }
 
 ROM_START( mbee )
@@ -545,16 +546,16 @@ ROM_END
 
 static Z80BIN_EXECUTE( mbee )
 {
-	program_write_word_16le(0xa6, execute_address);			/* fix the EXEC command */
+	memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xa6, execute_address);			/* fix the EXEC command */
 
 	if (autorun)
 	{
-		program_write_word_16le(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
-		cpunum_set_reg(0, REG_PC, execute_address);
+		memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
+		cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, execute_address);
 	}
 	else
 	{
-		program_write_word_16le(0xa2, 0x8517);
+		memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xa2, 0x8517);
 	}
 }
 
@@ -573,18 +574,18 @@ static QUICKLOAD_LOAD( mbee )
 			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
 
 			if ((j < mbee_size) || (j > 0xefff))
-				memory_write_byte(space, j, data);
+				memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), j, data);
 			else
 				return INIT_FAIL;
 		}
 
 		if (sw)
 		{
-			program_write_word_16le(0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
-			cpunum_set_reg(0, REG_PC, 0x801e);
+			memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
+			cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, 0x801e);
 		}
 		else
-			program_write_word_16le(0xa2,0x8517);
+			memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xa2,0x8517);
 	}
 	else if (!mame_stricmp(image_filetype(image), "com"))
 	{
@@ -596,12 +597,12 @@ static QUICKLOAD_LOAD( mbee )
 			if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
 
 			if ((j < mbee_size) || (j > 0xefff))
-				memory_write_byte(space, j, data);
+				memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), j, data);
 			else
 				return INIT_FAIL;
 		}
 
-		if (sw) cpunum_set_reg(0, REG_PC, 0x100);
+		if (sw) cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, 0x100);
 	}
 
 	return INIT_PASS;

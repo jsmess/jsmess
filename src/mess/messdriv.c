@@ -587,11 +587,11 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
-//128u4	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
-//128u4	DRIVER( mbeeic )	/* Microbee 32 IC									*/
-//128u4	DRIVER( mbeepc )	/* Microbee 32 PC									*/
-//128u4	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
-//128u4	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
+	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
+	DRIVER( mbeeic )	/* Microbee 32 IC									*/
+	DRIVER( mbeepc )	/* Microbee 32 PC									*/
+	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
+	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
 	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
