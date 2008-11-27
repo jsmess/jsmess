@@ -233,7 +233,7 @@ static const struct nec765_interface kc_fdc_interface=
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
 	cpunum_set_reg(1, REG_PC, 0x0f000);
-	cpunum_set_reg(0, REG_PC, 0x0f000);
+	cpu_set_reg(machine->cpu[0], REG_PC, 0x0f000);
 }
 
 static void kc_disc_interface_init(running_machine *machine)
@@ -1686,7 +1686,7 @@ static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 
 static TIMER_CALLBACK(kc85_reset_timer_callback)
 {
-	cpunum_set_reg(0, REG_PC, 0x0f000);
+	cpu_set_reg(machine->cpu[0], REG_PC, 0x0f000);
 }
 
  READ8_HANDLER ( kc85_pio_data_r )

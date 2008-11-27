@@ -524,7 +524,7 @@ static QUICKLOAD_LOAD( jaguar )
 	offs_t quickload_begin = 0x4000;
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
 	image_fread(image, &memory_region(image->machine, "main")[quickload_begin], quickload_size);
-	cpunum_set_reg(0, REG_PC, quickload_begin);
+	cpu_set_reg(machine->cpu[0], REG_PC, quickload_begin);
 	return INIT_PASS;
 }
 

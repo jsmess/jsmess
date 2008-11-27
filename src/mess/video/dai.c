@@ -58,6 +58,7 @@ VIDEO_START( dai )
 
 VIDEO_UPDATE( dai )
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i, j, k, l;
 
 	UINT8* char_rom = memory_region(screen->machine, "gfx1");

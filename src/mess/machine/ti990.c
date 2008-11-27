@@ -32,7 +32,7 @@ void ti990_set_int_line(running_machine *machine, int line, int state)
 	{
 		for (level = 0; ! (intlines & (1 << level)); level++)
 			;
-		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, level);	/* interrupt it, baby */
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, level);	/* interrupt it, baby */
 	}
 	else
 		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);

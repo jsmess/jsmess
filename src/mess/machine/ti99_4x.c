@@ -2240,7 +2240,7 @@ static void tms9901_interrupt_callback(int intreq, int ic)
 	{
 		/* On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
 		 * but hard-wired to force level 1 interrupts */
-		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 1);	/* interrupt it, baby */
+		cpu_set_input_line_and_vector(Machine->cpu[0], 0, ASSERT_LINE, 1);	/* interrupt it, baby */
 	}
 	else
 	{

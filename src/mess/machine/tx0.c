@@ -341,7 +341,7 @@ static TIMER_CALLBACK(reader_callback)
 				/* shuffle and insert data into AC */
 				ac = (ac /*& 0333333*/) | ((data & 001) << 17) | ((data & 002) << 13) | ((data & 004) << 9) | ((data & 010) << 5) | ((data & 020) << 1) | ((data & 040) >> 3);
 				/* write modified AC */
-				cpunum_set_reg(0, TX0_AC, ac);
+				cpu_set_reg(machine->cpu[0], TX0_AC, ac);
 
 				tape_reader.rc = (tape_reader.rc+1) & 3;
 
@@ -595,7 +595,7 @@ DEVICE_IMAGE_UNLOAD( tx0_magtape )
 		if ((magtape.state == MTS_SELECTED) || ((magtape.state == MTS_SELECTING) && (magtape.command == 2)))
 		{	/* unit has become unavailable */
 			magtape.state = MTS_UNSELECTING;
-			cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
+			cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
 			schedule_unselect();
 		}
 	}
@@ -623,7 +623,7 @@ static void magtape_callback(int dummy)
 			if ((mar & 03) != 1)
 			{	/* unimplemented device: remain in unselected state and set rwc
 				flag? */
-				cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
+				cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
 			}
 			else
 			{
@@ -681,7 +681,7 @@ static void magtape_callback(int dummy)
 			if (image_ftell(magtape.img) == 0)
 			{	/* tape at ldp */
 				magtape.state = MTS_UNSELECTING;
-				cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
+				cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
 				schedule_unselect();
 			}
 			else if (image_fseek(magtape.img, -1, SEEK_CUR))
@@ -750,7 +750,7 @@ static void magtape_callback(int dummy)
 							logerror("invalid longitudinal parity\n");
 						/* set EOR and unselect... */
 						magtape.state = MTS_UNSELECTING;
-						cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_EOR);
+						cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_EOR);
 						schedule_unselect();
 						magtape.irg_pos = MTIRGP_ENDMINUS1;
 					}
@@ -806,7 +806,7 @@ static void magtape_callback(int dummy)
 					/*image_unload(magtape.img);*/
 					/* Or do we stop at EOT mark??? */
 					magtape.state = MTS_UNSELECTING;
-					cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_EOT);
+					cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_EOT);
 					schedule_unselect();
 				}
 			}
@@ -824,11 +824,11 @@ static void magtape_callback(int dummy)
 						{	/* read command */
 							magtape.u.read.space_flag = FALSE;
 							tx0_pulse_io_complete();
-							cpunum_set_reg(0, TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
+							cpu_set_reg(machine->cpu[0], TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
 														| ((buf & 040) << 12) | ((buf & 020) << 10) | ((buf & 010) << 8) | ((buf & 004) << 6) | ((buf & 002) << 4) | ((buf & 001) << 2));
 							/* check parity */
 							if (! (((buf ^ (buf >> 1) ^ (buf >> 2) ^ (buf >> 3) ^ (buf >> 4) ^ (buf >> 5) ^ (buf >> 6) ^ (buf >> 7)) & 1) ^ magtape.binary_flag))
-								cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
+								cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
 						}
 						else
 						{	/* space command */
@@ -847,11 +847,11 @@ static void magtape_callback(int dummy)
 					}
 					if (!magtape.u.read.space_flag)
 					{
-						cpunum_set_reg(0, TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
+						cpu_set_reg(machine->cpu[0], TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
 													| ((buf & 040) << 12) | ((buf & 020) << 10) | ((buf & 010) << 8) | ((buf & 004) << 6) | ((buf & 002) << 4) | ((buf & 001) << 2));
 						/* check parity */
 						if (! (((buf ^ (buf >> 1) ^ (buf >> 2) ^ (buf >> 3) ^ (buf >> 4) ^ (buf >> 5) ^ (buf >> 6) ^ (buf >> 7)) & 1) ^ magtape.binary_flag))
-							cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
+							cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
 					}
 					magtape.u.read.state = MTRDS_STATE2;
 					break;
@@ -865,16 +865,16 @@ static void magtape_callback(int dummy)
 					}
 					if (!magtape.u.read.space_flag)
 					{
-						cpunum_set_reg(0, TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
+						cpu_set_reg(machine->cpu[0], TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
 													| ((buf & 040) << 12) | ((buf & 020) << 10) | ((buf & 010) << 8) | ((buf & 004) << 6) | ((buf & 002) << 4) | ((buf & 001) << 2));
 						/* check parity */
 						if (! (((buf ^ (buf >> 1) ^ (buf >> 2) ^ (buf >> 3) ^ (buf >> 4) ^ (buf >> 5) ^ (buf >> 6) ^ (buf >> 7)) & 1) ^ magtape.binary_flag))
-							cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
+							cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
 						/* synchronize with cpy instruction */
 						if (magtape.cpy_pending)
 							tx0_pulse_io_complete();
 						else
-							cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
+							cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_RWC);
 					}
 					magtape.u.read.state = MTRDS_STATE3;
 					break;
@@ -886,11 +886,11 @@ static void magtape_callback(int dummy)
 						magtape.u.read.state = MTRDS_STATE1;
 						if (!magtape.u.read.space_flag)
 						{
-							cpunum_set_reg(0, TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
+							cpu_set_reg(machine->cpu[0], TX0_LR, ((cpunum_get_reg(0, TX0_LR) >> 1) & 0333333)
 														| ((buf & 040) << 12) | ((buf & 020) << 10) | ((buf & 010) << 8) | ((buf & 004) << 6) | ((buf & 002) << 4) | ((buf & 001) << 2));
 							/* check parity */
 							if (! (((buf ^ (buf >> 1) ^ (buf >> 2) ^ (buf >> 3) ^ (buf >> 4) ^ (buf >> 5) ^ (buf >> 6) ^ (buf >> 7)) & 1) ^ magtape.binary_flag))
-								cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
+								cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
 						}
 					}
 					else
@@ -930,11 +930,11 @@ static void magtape_callback(int dummy)
 						logerror("invalid longitudinal parity\n");
 						/* no idea if the original tx-0 magtape controller
 						checks parity, but can't harm if we do */
-						cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
+						cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_PC);
 					}
 					/* set EOR and unselect... */
 					magtape.state = MTS_UNSELECTING;
-					cpunum_set_reg(0, TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_EOR);
+					cpu_set_reg(machine->cpu[0], TX0_PF, cpunum_get_reg(0, TX0_PF) | PF_EOR);
 					schedule_unselect();
 					magtape.irg_pos = MTIRGP_START;
 					break;
@@ -975,7 +975,7 @@ static void magtape_callback(int dummy)
 					lr = cpunum_get_reg(0, TX0_LR);
 					buf = ((lr >> 10) & 040) | ((lr >> 8) & 020) | ((lr >> 6) & 010) | ((lr >> 4) & 004) | ((lr >> 2) & 002) | (lr & 001);
 					buf |= ((buf << 1) ^ (buf << 2) ^ (buf << 3) ^ (buf << 4) ^ (buf << 5) ^ (buf << 6) ^ ((!magtape.binary_flag) << 6)) & 0100;
-					cpunum_set_reg(0, TX0_LR, lr >> 1);
+					cpu_set_reg(machine->cpu[0], TX0_LR, lr >> 1);
 				}
 				else
 				{
@@ -985,7 +985,7 @@ static void magtape_callback(int dummy)
 						lr = cpunum_get_reg(0, TX0_LR);
 						buf = ((lr >> 10) & 040) | ((lr >> 8) & 020) | ((lr >> 6) & 010) | ((lr >> 4) & 004) | ((lr >> 2) & 002) | (lr & 001);
 						buf |= ((buf << 1) ^ (buf << 2) ^ (buf << 3) ^ (buf << 4) ^ (buf << 5) ^ (buf << 6) ^ ((!magtape.binary_flag) << 6)) & 0100;
-						cpunum_set_reg(0, TX0_LR, lr >> 1);
+						cpu_set_reg(machine->cpu[0], TX0_LR, lr >> 1);
 						magtape.u.write.counter = 2;
 						break;
 					}
@@ -1139,7 +1139,7 @@ static void tx0_keyboard(running_machine *machine)
 			previous LR */
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
-			cpunum_set_reg(0, TX0_LR, lr);
+			cpu_set_reg(machine->cpu[0], TX0_LR, lr);
 			tx0_typewriter_drawchar(machine, charcode);	/* we want to echo input */
 			break;
 		}
@@ -1175,31 +1175,31 @@ INTERRUPT_GEN( tx0_interrupt )
 
 		if (control_transitions & tx0_stop_cyc0)
 		{
-			cpunum_set_reg(0, TX0_STOP_CYC0, !cpunum_get_reg(0, TX0_STOP_CYC0));
+			cpu_set_reg(machine->cpu[0], TX0_STOP_CYC0, !cpunum_get_reg(0, TX0_STOP_CYC0));
 		}
 		if (control_transitions & tx0_stop_cyc1)
 		{
-			cpunum_set_reg(0, TX0_STOP_CYC1, !cpunum_get_reg(0, TX0_STOP_CYC1));
+			cpu_set_reg(machine->cpu[0], TX0_STOP_CYC1, !cpunum_get_reg(0, TX0_STOP_CYC1));
 		}
 		if (control_transitions & tx0_gbl_cm_sel)
 		{
-			cpunum_set_reg(0, TX0_GBL_CM_SEL, !cpunum_get_reg(0, TX0_GBL_CM_SEL));
+			cpu_set_reg(machine->cpu[0], TX0_GBL_CM_SEL, !cpunum_get_reg(0, TX0_GBL_CM_SEL));
 		}
 		if (control_transitions & tx0_stop)
 		{
-			cpunum_set_reg(0, TX0_RUN, 0);
-			cpunum_set_reg(0, TX0_RIM, 0);
+			cpu_set_reg(machine->cpu[0], TX0_RUN, 0);
+			cpu_set_reg(machine->cpu[0], TX0_RIM, 0);
 		}
 		if (control_transitions & tx0_restart)
 		{
-			cpunum_set_reg(0, TX0_RUN, 1);
-			cpunum_set_reg(0, TX0_RIM, 0);
+			cpu_set_reg(machine->cpu[0], TX0_RUN, 1);
+			cpu_set_reg(machine->cpu[0], TX0_RIM, 0);
 		}
 		if (control_transitions & tx0_read_in)
 		{	/* set cpu to read instructions from perforated tape */
 			tx0_pulse_reset();
-			cpunum_set_reg(0, TX0_RUN, 0);
-			cpunum_set_reg(0, TX0_RIM, 1);
+			cpu_set_reg(machine->cpu[0], TX0_RUN, 0);
+			cpu_set_reg(machine->cpu[0], TX0_RIM, 1);
 		}
 		if (control_transitions & tx0_toggle_dn)
 		{
@@ -1218,7 +1218,7 @@ INTERRUPT_GEN( tx0_interrupt )
 			if (tsr_index >= 2)
 			{
 				UINT32 cm_sel = (UINT32) cpunum_get_reg(0, TX0_CM_SEL);
-				cpunum_set_reg(0, TX0_CM_SEL, cm_sel ^ (1 << (tsr_index - 2)));
+				cpu_set_reg(machine->cpu[0], TX0_CM_SEL, cm_sel ^ (1 << (tsr_index - 2)));
 			}
 		}
 		if (control_transitions & tx0_lr_sel)
@@ -1226,7 +1226,7 @@ INTERRUPT_GEN( tx0_interrupt )
 			if (tsr_index >= 2)
 			{
 				UINT32 lr_sel = (UINT32) cpunum_get_reg(0, TX0_LR_SEL);
-				cpunum_set_reg(0, TX0_LR_SEL, (lr_sel ^ (1 << (tsr_index - 2))));
+				cpu_set_reg(machine->cpu[0], TX0_LR_SEL, (lr_sel ^ (1 << (tsr_index - 2))));
 			}
 		}
 
@@ -1242,7 +1242,7 @@ INTERRUPT_GEN( tx0_interrupt )
 
 		/* update toggle switch register */
 		if (tsr_transitions)
-			cpunum_set_reg(0, TX0_TBR+tsr_index, cpunum_get_reg(0, TX0_TBR+tsr_index) ^ tsr_transitions);
+			cpu_set_reg(machine->cpu[0], TX0_TBR+tsr_index, cpunum_get_reg(0, TX0_TBR+tsr_index) ^ tsr_transitions);
 
 		/* remember new state of toggle switch register keys */
 		old_tsr_keys = tsr_keys;

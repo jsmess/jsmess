@@ -156,10 +156,10 @@ static void concept_set_interrupt(running_machine *machine, int level, int state
 
 	if (final_level)
 		/* assert interrupt */
-		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_1+final_level-1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_1+final_level-1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		cpunum_set_input_line_and_vector(machine, 0, M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 INLINE void post_in_KeyQueue(int keycode)

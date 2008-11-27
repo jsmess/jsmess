@@ -528,7 +528,7 @@ static TIMER_CALLBACK(reader_callback)
 					tape_reader.rcl = 0;
 					if (tape_reader.rcp)
 					{
-						cpunum_set_reg(0, PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
+						cpu_set_reg(machine->cpu[0], PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
 						pdp1_pulse_iot_done();
 					}
 					else
@@ -923,7 +923,7 @@ void iot_tyi(int op2, int nac, int mb, int *io, int ac)
 	{
 		io_status &= ~io_st_tyi;
 		if (USE_SBS)
-			cpunum_set_input_line_and_vector(Machine, 0, 0, CLEAR_LINE, 0);	/* interrupt it, baby */
+			cpu_set_input_line_and_vector(Machine->cpu[0], 0, CLEAR_LINE, 0);	/* interrupt it, baby */
 	}
 }
 
@@ -993,7 +993,7 @@ void iot_dpy(int op2, int nac, int mb, int *io, int ac)
 	{
 		io_status |= io_st_pen;
 
-		cpunum_set_reg(0, PDP1_PF3, 1);
+		cpu_set_reg(machine->cpu[0], PDP1_PF3, 1);
 	}
 
 	if (nac)
@@ -1149,7 +1149,7 @@ void iot_dcc(int op2, int nac, int mb, int *io, int ac)
 	} while (parallel_drum.wc);
 	activecpu_adjust_icount(-ATTOTIME_TO_CYCLES(0, delay));
 	/* if no error, skip */
-	cpunum_set_reg(0, PDP1_PC, cpunum_get_reg(0, PDP1_PC)+1);
+	cpu_set_reg(machine->cpu[0], PDP1_PC, cpunum_get_reg(0, PDP1_PC)+1);
 }
 
 void iot_dra(int op2, int nac, int mb, int *io, int ac)
@@ -1276,9 +1276,9 @@ static void pdp1_keyboard(running_machine *machine)
 			typewriter.tb = (i << 4) + j;
 			io_status |= io_st_tyi;
 			#if USE_SBS
-				cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 0);	/* interrupt it, baby */
+				cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
-			cpunum_set_reg(0, PDP1_PF1, 1);
+			cpu_set_reg(machine->cpu[0], PDP1_PF1, 1);
 			pdp1_typewriter_drawchar(machine, typewriter.tb);	/* we want to echo input */
 			break;
 		}
@@ -1359,7 +1359,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 	int ta_transitions;
 
 
-	cpunum_set_reg(0, PDP1_SS, input_port_read(machine, "SENSE"));
+	cpu_set_reg(machine->cpu[0], PDP1_SS, input_port_read(machine, "SENSE"));
 
 	/* read new state of control keys */
 	control_keys = input_port_read(machine, "CSW");
@@ -1371,68 +1371,68 @@ INTERRUPT_GEN( pdp1_interrupt )
 
 		if (control_transitions & pdp1_extend)
 		{
-			cpunum_set_reg(0, PDP1_EXTEND_SW, ! cpunum_get_reg(0, PDP1_EXTEND_SW));
+			cpu_set_reg(machine->cpu[0], PDP1_EXTEND_SW, ! cpunum_get_reg(0, PDP1_EXTEND_SW));
 		}
 		if (control_transitions & pdp1_start_nobrk)
 		{
 			pdp1_pulse_start_clear();	/* pulse Start Clear line */
-			cpunum_set_reg(0, PDP1_EXD, cpunum_get_reg(0, PDP1_EXTEND_SW));
-			cpunum_set_reg(0, PDP1_SBM, 0);
-			cpunum_set_reg(0, PDP1_OV, 0);
-			cpunum_set_reg(0, PDP1_PC, cpunum_get_reg(0, PDP1_TA));
-			cpunum_set_reg(0, PDP1_RUN, 1);
+			cpu_set_reg(machine->cpu[0], PDP1_EXD, cpunum_get_reg(0, PDP1_EXTEND_SW));
+			cpu_set_reg(machine->cpu[0], PDP1_SBM, 0);
+			cpu_set_reg(machine->cpu[0], PDP1_OV, 0);
+			cpu_set_reg(machine->cpu[0], PDP1_PC, cpunum_get_reg(0, PDP1_TA));
+			cpu_set_reg(machine->cpu[0], PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_start_brk)
 		{
 			pdp1_pulse_start_clear();	/* pulse Start Clear line */
-			cpunum_set_reg(0, PDP1_EXD, cpunum_get_reg(0, PDP1_EXTEND_SW));
-			cpunum_set_reg(0, PDP1_SBM, 1);
-			cpunum_set_reg(0, PDP1_OV, 0);
-			cpunum_set_reg(0, PDP1_PC, cpunum_get_reg(0, PDP1_TA));
-			cpunum_set_reg(0, PDP1_RUN, 1);
+			cpu_set_reg(machine->cpu[0], PDP1_EXD, cpunum_get_reg(0, PDP1_EXTEND_SW));
+			cpu_set_reg(machine->cpu[0], PDP1_SBM, 1);
+			cpu_set_reg(machine->cpu[0], PDP1_OV, 0);
+			cpu_set_reg(machine->cpu[0], PDP1_PC, cpunum_get_reg(0, PDP1_TA));
+			cpu_set_reg(machine->cpu[0], PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_stop)
 		{
-			cpunum_set_reg(0, PDP1_RUN, 0);
-			cpunum_set_reg(0, PDP1_RIM, 0);	/* bug : we stop after reading an even-numbered word
+			cpu_set_reg(machine->cpu[0], PDP1_RUN, 0);
+			cpu_set_reg(machine->cpu[0], PDP1_RIM, 0);	/* bug : we stop after reading an even-numbered word
 											(i.e. data), whereas a real pdp-1 stops after reading
 											an odd-numbered word (i.e. dio instruciton) */
 		}
 		if (control_transitions & pdp1_continue)
 		{
-			cpunum_set_reg(0, PDP1_RUN, 1);
+			cpu_set_reg(machine->cpu[0], PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_examine)
 		{
 			pdp1_pulse_start_clear();	/* pulse Start Clear line */
-			cpunum_set_reg(0, PDP1_PC, cpunum_get_reg(0, PDP1_TA));
-			cpunum_set_reg(0, PDP1_MA, cpunum_get_reg(0, PDP1_PC));
-			cpunum_set_reg(0, PDP1_IR, LAC);	/* this instruction is actually executed */
+			cpu_set_reg(machine->cpu[0], PDP1_PC, cpunum_get_reg(0, PDP1_TA));
+			cpu_set_reg(machine->cpu[0], PDP1_MA, cpunum_get_reg(0, PDP1_PC));
+			cpu_set_reg(machine->cpu[0], PDP1_IR, LAC);	/* this instruction is actually executed */
 
-			cpunum_set_reg(0, PDP1_MB, READ_PDP_18BIT(cpunum_get_reg(0, PDP1_MA)));
-			cpunum_set_reg(0, PDP1_AC, cpunum_get_reg(0, PDP1_MB));
+			cpu_set_reg(machine->cpu[0], PDP1_MB, READ_PDP_18BIT(cpunum_get_reg(0, PDP1_MA)));
+			cpu_set_reg(machine->cpu[0], PDP1_AC, cpunum_get_reg(0, PDP1_MB));
 		}
 		if (control_transitions & pdp1_deposit)
 		{
 			pdp1_pulse_start_clear();	/* pulse Start Clear line */
-			cpunum_set_reg(0, PDP1_PC, cpunum_get_reg(0, PDP1_TA));
-			cpunum_set_reg(0, PDP1_MA, cpunum_get_reg(0, PDP1_PC));
-			cpunum_set_reg(0, PDP1_AC, cpunum_get_reg(0, PDP1_TW));
-			cpunum_set_reg(0, PDP1_IR, DAC);	/* this instruction is actually executed */
+			cpu_set_reg(machine->cpu[0], PDP1_PC, cpunum_get_reg(0, PDP1_TA));
+			cpu_set_reg(machine->cpu[0], PDP1_MA, cpunum_get_reg(0, PDP1_PC));
+			cpu_set_reg(machine->cpu[0], PDP1_AC, cpunum_get_reg(0, PDP1_TW));
+			cpu_set_reg(machine->cpu[0], PDP1_IR, DAC);	/* this instruction is actually executed */
 
-			cpunum_set_reg(0, PDP1_MB, cpunum_get_reg(0, PDP1_AC));
+			cpu_set_reg(machine->cpu[0], PDP1_MB, cpunum_get_reg(0, PDP1_AC));
 			WRITE_PDP_18BIT(cpunum_get_reg(0, PDP1_MA), cpunum_get_reg(0, PDP1_MB));
 		}
 		if (control_transitions & pdp1_read_in)
 		{	/* set cpu to read instructions from perforated tape */
 			pdp1_pulse_start_clear();	/* pulse Start Clear line */
-			cpunum_set_reg(0, PDP1_PC, (cpunum_get_reg(0, PDP1_TA) & 0170000)
+			cpu_set_reg(machine->cpu[0], PDP1_PC, (cpunum_get_reg(0, PDP1_TA) & 0170000)
 										|  (cpunum_get_reg(0, PDP1_PC) & 0007777));	/* transfer ETA to EPC */
-			/*cpunum_set_reg(0, PDP1_MA, cpunum_get_reg(0, PDP1_PC));*/
-			cpunum_set_reg(0, PDP1_EXD, cpunum_get_reg(0, PDP1_EXTEND_SW));
-			cpunum_set_reg(0, PDP1_OV, 0);		/* right??? */
-			cpunum_set_reg(0, PDP1_RUN, 0);
-			cpunum_set_reg(0, PDP1_RIM, 1);
+			/*cpu_set_reg(machine->cpu[0], PDP1_MA, cpunum_get_reg(0, PDP1_PC));*/
+			cpu_set_reg(machine->cpu[0], PDP1_EXD, cpunum_get_reg(0, PDP1_EXTEND_SW));
+			cpu_set_reg(machine->cpu[0], PDP1_OV, 0);		/* right??? */
+			cpu_set_reg(machine->cpu[0], PDP1_RUN, 0);
+			cpu_set_reg(machine->cpu[0], PDP1_RIM, 1);
 		}
 		if (control_transitions & pdp1_reader)
 		{
@@ -1442,11 +1442,11 @@ INTERRUPT_GEN( pdp1_interrupt )
 		}
 		if (control_transitions & pdp1_single_step)
 		{
-			cpunum_set_reg(0, PDP1_SNGL_STEP, ! cpunum_get_reg(0, PDP1_SNGL_STEP));
+			cpu_set_reg(machine->cpu[0], PDP1_SNGL_STEP, ! cpunum_get_reg(0, PDP1_SNGL_STEP));
 		}
 		if (control_transitions & pdp1_single_inst)
 		{
-			cpunum_set_reg(0, PDP1_SNGL_INST, ! cpunum_get_reg(0, PDP1_SNGL_INST));
+			cpu_set_reg(machine->cpu[0], PDP1_SNGL_INST, ! cpunum_get_reg(0, PDP1_SNGL_INST));
 		}
 
 		/* remember new state of control keys */
@@ -1460,7 +1460,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		tw_transitions = tw_keys & (~ old_tw_keys);
 
 		if (tw_transitions)
-			cpunum_set_reg(0, PDP1_TW, cpunum_get_reg(0, PDP1_TW) ^ tw_transitions);
+			cpu_set_reg(machine->cpu[0], PDP1_TW, cpunum_get_reg(0, PDP1_TW) ^ tw_transitions);
 
 		/* remember new state of test word keys */
 		old_tw_keys = tw_keys;
@@ -1473,7 +1473,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 		ta_transitions = ta_keys & (~ old_ta_keys);
 
 		if (ta_transitions)
-			cpunum_set_reg(0, PDP1_TA, cpunum_get_reg(0, PDP1_TA) ^ ta_transitions);
+			cpu_set_reg(machine->cpu[0], PDP1_TA, cpunum_get_reg(0, PDP1_TA) ^ ta_transitions);
 
 		/* remember new state of test word keys */
 		old_ta_keys = ta_keys;

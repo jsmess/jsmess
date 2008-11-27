@@ -880,7 +880,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER(concept)		/* 1982 Corvus Concept								*/
 
 	/* DAI */
-//128u4	DRIVER(dai)			/* DAI												*/
+	DRIVER(dai)			/* DAI												*/
 
 	/* Telenova */
 //128u4	DRIVER(compis)		/* 1985 Telenova Compis								*/
