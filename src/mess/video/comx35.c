@@ -140,14 +140,14 @@ static VIDEO_UPDATE( comx35 )
 
 READ8_HANDLER( comx35_videoram_r )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = space->machine->driver_data;
 
 	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( comx35_videoram_w )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = space->machine->driver_data;
 
 	state->videoram[offset] = data;
 }
