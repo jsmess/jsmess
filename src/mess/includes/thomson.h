@@ -268,7 +268,7 @@ extern VIDEO_EOF    ( thom );
 extern void thom_set_init_callback ( void (*cb) ( int init ) );
 
 /* TO7 TO7/70 MO5 video bank switch */
-extern void thom_set_mode_point ( int point );
+extern void thom_set_mode_point ( running_machine *machine, int point );
 
 /* set the palette index for the border color */
 extern void thom_set_border_color ( unsigned color );

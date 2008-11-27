@@ -864,11 +864,11 @@ static UINT32 thom_floppy_rcount;
 
 
 
-void thom_set_mode_point ( int point )
+void thom_set_mode_point ( running_machine *machine, int point )
 {
 	assert( point >= 0 && point <= 1 );
 	thom_mode_point = ( ! point ) * 0x2000;
-	memory_set_bank( THOM_VRAM_BANK, ! point );
+	memory_set_bank( machine, THOM_VRAM_BANK, ! point );
 }
 
 
@@ -1143,7 +1143,7 @@ VIDEO_START ( thom )
 
 	thom_mode_point = 0;
 	state_save_register_global( thom_mode_point );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 
 	thom_floppy_rcount = 0;
 	thom_floppy_wcount = 0;

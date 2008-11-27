@@ -9,7 +9,7 @@
 #ifndef MEA8000
 #define MEA8000
 
-extern void mea8000_config ( running_machine *machine, int channel, write8_machine_func req_out_func );
+extern void mea8000_config ( running_machine *machine, int channel, write8_space_func req_out_func );
 
 /* reset by external signal */
 extern void mea8000_reset ( running_machine *machine );

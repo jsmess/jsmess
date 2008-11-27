@@ -916,22 +916,22 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( bebox2 )	/* BeBox Dual603-133								*/
 
 	/* Tiger Electronics */
-//128u4	DRIVER( gamecom )	/* Tiger Game.com									*/
+	DRIVER( gamecom )	/* Tiger Game.com									*/
 
 	/* Thomson */
-//128u4	DRIVER( t9000 )		/* 1980 Thomson T9000 (TO7 prototype)				*/
-//128u4	DRIVER( to7 )		/* 1982 Thomson TO7									*/
-//128u4	DRIVER( to770 )		/* 1984 Thomson TO7/70								*/
-//128u4	DRIVER( to770a )	/* 198? Thomson TO7/70 arabic version				*/
-//128u4	DRIVER( mo5 )		/* 1984 Thomson MO5									*/
-//128u4	DRIVER( mo5e )		/* 1986 Thomson MO5E (export version)				*/
-//128u4	DRIVER( to9 )		/* 1985 Thomson T09									*/
-//128u4	DRIVER( to8 )		/* 1986 Thomson T08									*/
-//128u4	DRIVER( to8d )		/* 1987 Thomson T08D								*/
-//128u4	DRIVER( to9p )		/* 1986 Thomson T09+								*/
-//128u4	DRIVER( mo6 )		/* 1986 Thomson MO6									*/
-//128u4	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
-//128u4	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
+	DRIVER( t9000 )		/* 1980 Thomson T9000 (TO7 prototype)				*/
+	DRIVER( to7 )		/* 1982 Thomson TO7									*/
+	DRIVER( to770 )		/* 1984 Thomson TO7/70								*/
+	DRIVER( to770a )	/* 198? Thomson TO7/70 arabic version				*/
+	DRIVER( mo5 )		/* 1984 Thomson MO5									*/
+	DRIVER( mo5e )		/* 1986 Thomson MO5E (export version)				*/
+	DRIVER( to9 )		/* 1985 Thomson T09									*/
+	DRIVER( to8 )		/* 1986 Thomson T08									*/
+	DRIVER( to8d )		/* 1987 Thomson T08D								*/
+	DRIVER( to9p )		/* 1986 Thomson T09+								*/
+	DRIVER( mo6 )		/* 1986 Thomson MO6									*/
+	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
+	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
 //128u4	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */

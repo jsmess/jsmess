@@ -777,7 +777,7 @@ READ8_HANDLER ( mc6854_r )
 	case 0: /* status register 1 */
 		mc6854_update_sr1();
 		LOG(( "%f $%04x mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
-		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->sr1,
+		      attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), mc6854->sr1,
 		      ( mc6854->sr1 & RDA) ? 1 : 0, ( mc6854->sr1 & S2RQ) ? 1 : 0,
 		      ( mc6854->sr1 & FD ) ? 1 : 0, ( mc6854->sr1 & CTS ) ? 1 : 0,
 		      ( mc6854->sr1 & TU ) ? 1 : 0, ( mc6854->sr1 & TDRA) ? 1 : 0,
@@ -787,7 +787,7 @@ READ8_HANDLER ( mc6854_r )
 	case 1: /* status register 2 */
 		mc6854_update_sr2();
 		LOG(( "%f $%04x mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
-		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->sr2,
+		      attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), mc6854->sr2,
 		      ( mc6854->sr2 & AP   ) ? 1 : 0, ( mc6854->sr2 & FV  ) ? 1 : 0,
 		      ( mc6854->sr2 & RIDLE) ? 1 : 0, ( mc6854->sr2 & RABT) ? 1 : 0,
 		      ( mc6854->sr2 & ERR  ) ? 1 : 0, ( mc6854->sr2 & DCD ) ? 1 : 0,
@@ -799,12 +799,12 @@ READ8_HANDLER ( mc6854_r )
 	{
 		UINT8 data = mc6854_rfifo_pop();
 		LOG(( "%f $%04x mc6854_r: get data $%02X\n",
-		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
+		      attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), data ));
 		return data;
 	}
 
 	default:
-		logerror( "$%04x mc6854 invalid read offset %i\n", activecpu_get_previouspc(), offset );
+		logerror( "$%04x mc6854 invalid read offset %i\n", cpu_get_previouspc(space->cpu), offset );
 	}
 	return 0;
 }
@@ -819,7 +819,7 @@ WRITE8_HANDLER ( mc6854_w )
 	case 0: /* control register 1 */
 		mc6854->cr1 = data;
 		LOG(( "%f $%04x mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n",
-		      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr1,
+		      attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), mc6854->cr1,
 		      AC ? 1 : 0,
 		      RIE ? 'r' : '-', TIE ? 't' : '-',
 		      DISCONTINUE ? "discontinue," : "",
@@ -827,7 +827,7 @@ WRITE8_HANDLER ( mc6854_w )
 			    ));
 		if ( mc6854->cr1 & 0xc )
 			logerror( "$%04x mc6854 DMA not handled (CR1=$%02X)\n",
-				  activecpu_get_previouspc(), mc6854->cr1 );
+				  cpu_get_previouspc(space->cpu), mc6854->cr1 );
 		if ( DISCONTINUE )
 		{
 			/* abort receive FIFO but keeps shift register & synchro */
@@ -856,15 +856,15 @@ WRITE8_HANDLER ( mc6854_w )
 			/* control register 3 */
 			mc6854->cr3 = data;
 			LOG(( "%f $%04x mc6854_w: set CR3=$%02X (lcf=%i,aex=%i,idl=%i,fdse=%i,loop=%i,tst=%i,dtr=%i)\n",
-			      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr3,
+			      attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), mc6854->cr3,
 			      LCF ? (CEX ? 16 : 8) : 0,  AEX ? 1 : 0,
 			      IDL0 ? 0 : 1, FDSE ? 1 : 0, LOOP ? 1 : 0,
 			      TST ? 1 : 0, DTR ? 1 : 0
 				    ));
 			if ( LOOP )
-				logerror( "$%04x mc6854 loop mode not handled (CR3=$%02X)\n", activecpu_get_previouspc(), mc6854->cr3 );
+				logerror( "$%04x mc6854 loop mode not handled (CR3=$%02X)\n", cpu_get_previouspc(space->cpu), mc6854->cr3 );
 			if ( TST )
-				logerror( "$%04x mc6854 test mode not handled (CR3=$%02X)\n", activecpu_get_previouspc(), mc6854->cr3 );
+				logerror( "$%04x mc6854 test mode not handled (CR3=$%02X)\n", cpu_get_previouspc(space->cpu), mc6854->cr3 );
 
 			if ( mc6854->iface->out_dtr )
 				mc6854->iface->out_dtr( DTR ? 1 : 0 );
@@ -875,13 +875,13 @@ WRITE8_HANDLER ( mc6854_w )
 			/* control register 2 */
 			mc6854->cr2 = data;
 			LOG(( "%f $%04x mc6854_w: set CR2=$%02X (pse=%i,bytes=%i,fmidle=%i,%s,tlast=%i,clr=%c%c,rts=%i)\n",
-			      attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr2,
+			      attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), mc6854->cr2,
 			      PSE ? 1 : 0,  TWOBYTES ? 2 : 1,  FMIDLE ? 1 : 0,
 			      FCTDRA ? "fc" : "tdra", TLAST ? 1 : 0,
 			      data & 0x20 ? 'r' : '-',  data & 0x40 ? 't' : '-',
 			      RTS ? 1 : 0 ));
 			if ( PSE )
-				logerror( "$%04x mc6854 status prioritization not handled (CR2=$%02X)\n", activecpu_get_previouspc(), mc6854->cr2 );
+				logerror( "$%04x mc6854 status prioritization not handled (CR2=$%02X)\n", cpu_get_previouspc(space->cpu), mc6854->cr2 );
 			if ( TLAST )
 				mc6854_tfifo_terminate();
 			if ( data & 0x20 )
@@ -906,7 +906,7 @@ WRITE8_HANDLER ( mc6854_w )
 		break;
 
 	case 2: /* transmitter data: continue data */
-		LOG(( "%f $%04xmc6854_w: push data=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
+		LOG(( "%f $%04xmc6854_w: push data=$%02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), data ));
 		mc6854_tfifo_push( data );
 		break;
 
@@ -915,7 +915,7 @@ WRITE8_HANDLER ( mc6854_w )
 		{
 			/* control register 4 */
 			mc6854->cr4 = data;
-			LOG(( "%f $%04x mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), mc6854->cr4,
+			LOG(( "%f $%04x mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), mc6854->cr4,
 			      TWOINTER ? 2 : 1,
 			      TWL, RWL,
 			      ABT ? ( ABTEX ? "abort-ext," : "abort,") : "",
@@ -930,14 +930,14 @@ WRITE8_HANDLER ( mc6854_w )
 		else
 		{
 			/* transmitter data: last data */
-			LOG(( "%f $%04x mc6854_w: push last-data=$%02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), data ));
+			LOG(( "%f $%04x mc6854_w: push last-data=$%02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(space->cpu), data ));
 			mc6854_tfifo_push( data );
 			mc6854_tfifo_terminate();
 		}
 		break;
 
 	default:
-		logerror( "$%04x mc6854 invalid write offset %i (data=$%02X)\n", activecpu_get_previouspc(), offset, data );
+		logerror( "$%04x mc6854 invalid write offset %i (data=$%02X)\n", cpu_get_previouspc(space->cpu), offset, data );
 	}
 }
 
@@ -975,24 +975,24 @@ void mc6854_config ( const mc6854_interface* iface )
 	assert( mc6854 );
 	mc6854->iface = iface;
 	mc6854->ttimer = timer_alloc( mc6854_tfifo_cb , NULL);
-	state_save_register_item( "mc6854", 0, mc6854->cr1 );
-	state_save_register_item( "mc6854", 0, mc6854->cr2 );
-	state_save_register_item( "mc6854", 0, mc6854->cr3 );
-	state_save_register_item( "mc6854", 0, mc6854->cr4 );
-	state_save_register_item( "mc6854", 0, mc6854->sr1 );
-	state_save_register_item( "mc6854", 0, mc6854->sr2 );
-	state_save_register_item( "mc6854", 0, mc6854->cts );
-	state_save_register_item( "mc6854", 0, mc6854->dcd );
-	state_save_register_item( "mc6854", 0, mc6854->tstate );
-	state_save_register_item_array( "mc6854", 0, mc6854->tfifo );
-	state_save_register_item( "mc6854", 0, mc6854->tones );
-	state_save_register_item( "mc6854", 0, mc6854->rstate );
-	state_save_register_item( "mc6854", 0, mc6854->rreg );
-	state_save_register_item( "mc6854", 0, mc6854->rones );
-	state_save_register_item( "mc6854", 0, mc6854->rsize );
-	state_save_register_item_array( "mc6854", 0, mc6854->rfifo );
-	state_save_register_item_array( "mc6854", 0, mc6854->frame );
-	state_save_register_item( "mc6854", 0, mc6854->flen );
-	state_save_register_item( "mc6854", 0, mc6854->fpos );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->cr1 );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->cr2 );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->cr3 );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->cr4 );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->sr1 );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->sr2 );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->cts );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->dcd );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->tstate );
+	state_save_register_item_array( "mc6854", NULL, 0, mc6854->tfifo );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->tones );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->rstate );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->rreg );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->rones );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->rsize );
+	state_save_register_item_array( "mc6854", NULL, 0, mc6854->rfifo );
+	state_save_register_item_array( "mc6854", NULL, 0, mc6854->frame );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->flen );
+	state_save_register_item( "mc6854", NULL, 0, mc6854->fpos );
 	mc6854_reset();
 }

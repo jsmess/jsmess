@@ -75,7 +75,7 @@ static struct
 	/* configuration parameters */
 
 	int channel;                  /* first argument for dac_data_w */
-	write8_machine_func req_out_func;  /* 1-bit 'ready' output, not negated */
+	write8_space_func req_out_func;  /* 1-bit 'ready' output, not negated */
 
 	/* state */
 
@@ -200,7 +200,7 @@ static void mea8000_update_req( running_machine *machine )
 	   frame end to compose a new frame.
 	*/
 	if (mea8000.req_out_func)
-		mea8000.req_out_func(machine, 0, mea8000_accept_byte());
+		mea8000.req_out_func(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, mea8000_accept_byte());
 }
 
 
@@ -551,7 +551,7 @@ READ8_HANDLER ( mea8000_r )
 		return mea8000_accept_byte() << 7;
 
 	default:
-		logerror( "$%04x mea8000_r invalid read offset %i\n", activecpu_get_previouspc(), offset );
+		logerror( "$%04x mea8000_r invalid read offset %i\n", cpu_get_previouspc(space->cpu), offset );
 	}
 	return 0;
 }
@@ -566,19 +566,19 @@ WRITE8_HANDLER ( mea8000_w )
 		{
 			/* got pitch byte before first frame */
 			mea8000.pitch = 2 * data;
-			LOG(( "$%04x %f: mea8000_w pitch %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mea8000.pitch ));
+			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), mea8000.pitch ));
 			mea8000.state = MEA8000_WAIT_FIRST;
 			mea8000.bufpos = 0;
 		}
 		else if (mea8000.bufpos == 4)
 		{
 			/* overflow */
-			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 		}
 		else
 		{
 			/* enqueue frame byte */
-			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 			      data, mea8000.bufpos ));
 			mea8000.buf[mea8000.bufpos] = data;
 			mea8000.bufpos++;
@@ -595,7 +595,7 @@ WRITE8_HANDLER ( mea8000_w )
 				mea8000.state = MEA8000_STARTED;
 			}
 		}
-		mea8000_update_req(machine);
+		mea8000_update_req(space->machine);
 		break;
 
 	case 1: /* command register */
@@ -612,15 +612,15 @@ WRITE8_HANDLER ( mea8000_w )
 			mea8000_stop_frame();
 
 		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
-		      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
+		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data,
 		      stop, mea8000.cont, mea8000.roe ));
 
-		mea8000_update_req(machine);
+		mea8000_update_req(space->machine);
 		break;
 	}
 
 	default:
-		logerror( "$%04x mea8000_w invalid write offset %i\n", activecpu_get_previouspc(), offset );
+		logerror( "$%04x mea8000_w invalid write offset %i\n", cpu_get_previouspc(space->cpu), offset );
 	}
 }
 
@@ -654,7 +654,7 @@ void mea8000_reset ( running_machine *machine )
 
 
 
-void mea8000_config ( running_machine *machine, int channel, write8_machine_func req_out_func )
+void mea8000_config ( running_machine *machine, int channel, write8_space_func req_out_func )
 {
 	int i;
 	mea8000_init_tables(machine);
@@ -662,31 +662,31 @@ void mea8000_config ( running_machine *machine, int channel, write8_machine_func
 	mea8000.req_out_func = req_out_func;
 	mea8000.timer = timer_alloc( mea8000_timer_expire , NULL);
 
-	state_save_register_item( "mea8000", 0, mea8000.state );
-	state_save_register_item_array( "mea8000", 0, mea8000.buf );
-	state_save_register_item( "mea8000", 0, mea8000.bufpos );
-	state_save_register_item( "mea8000", 0, mea8000.cont );
-	state_save_register_item( "mea8000", 0, mea8000.roe );
-	state_save_register_item( "mea8000", 0, mea8000.framelength );
-	state_save_register_item( "mea8000", 0, mea8000.framepos );
-	state_save_register_item( "mea8000", 0, mea8000.framelog );
-	state_save_register_item( "mea8000", 0, mea8000.lastsample );
-	state_save_register_item( "mea8000", 0, mea8000.sample );
-	state_save_register_item( "mea8000", 0, mea8000.phi );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.state );
+	state_save_register_item_array( "mea8000", NULL, 0, mea8000.buf );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.bufpos );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.cont );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.roe );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.framelength );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.framepos );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.framelog );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.lastsample );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.sample );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.phi );
 	for (i=0; i<4; i++)
 	{
-		state_save_register_item( "mea8000", i, mea8000.f[i].fm );
-		state_save_register_item( "mea8000", i, mea8000.f[i].last_fm );
-		state_save_register_item( "mea8000", i, mea8000.f[i].bw );
-		state_save_register_item( "mea8000", i, mea8000.f[i].last_bw );
-		state_save_register_item( "mea8000", i, mea8000.f[i].output );
-		state_save_register_item( "mea8000", i, mea8000.f[i].last_output );
+		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].fm );
+		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].last_fm );
+		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].bw );
+		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].last_bw );
+		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].output );
+		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].last_output );
 	}
-	state_save_register_item( "mea8000", 0, mea8000.last_ampl );
-	state_save_register_item( "mea8000", 0, mea8000.ampl );
-	state_save_register_item( "mea8000", 0, mea8000.last_pitch );
-	state_save_register_item( "mea8000", 0, mea8000.pitch );
-	state_save_register_item( "mea8000", 0, mea8000.noise );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.last_ampl );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.ampl );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.last_pitch );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.pitch );
+	state_save_register_item( "mea8000", NULL, 0, mea8000.noise );
 
 	mea8000_reset(machine);
 }

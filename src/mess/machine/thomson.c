@@ -105,9 +105,9 @@ static int to7_get_cassette ( running_machine *machine )
 			/* hack, feed existing bits */
 			if ( bitpos >= to7_k7_bitsize )
 				bitpos = to7_k7_bitsize -1;
-			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
-				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos,
-				to7_k7_bits[ bitpos ] ));
+//			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
+//				cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), state, pos, bitpos,
+//				to7_k7_bits[ bitpos ] ));
 			return to7_k7_bits[ bitpos ];
 		}
 		else
@@ -126,9 +126,9 @@ static int to7_get_cassette ( running_machine *machine )
 					chg++;
 			}
 			k = ( chg >= 13 ) ? 1 : 0;
-			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
-				activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos, bitpos,
-				k, chg ));
+//			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
+//				cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), state, pos, bitpos,
+//				k, chg ));
 			return k;
 		}
 
@@ -150,12 +150,12 @@ static void to7_set_cassette ( running_machine *machine, int data )
 
 static WRITE8_HANDLER ( to7_set_cassette_motor )
 {
-	const device_config* img = thom_cassette_img(machine);
+	const device_config* img = thom_cassette_img(space->machine);
 	cassette_state state = cassette_get_state( img );
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
+	       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ? "off" : "on",
 	       (int) (pos / TO7_BIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
@@ -204,9 +204,9 @@ static int mo5_get_cassette ( running_machine *machine )
 		cassette_get_sample( cass, 0, pos, 0, &hbit );
 		hbit = hbit >= 0;
 
-		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
-			activecpu_get_previouspc(), attotime_to_double(timer_get_time()), state, pos,
-			(int) (pos / MO5_HBIT_LENGTH), hbit ));
+//		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
+//			cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), state, pos,
+//			(int) (pos / MO5_HBIT_LENGTH), hbit ));
 		return hbit;
 	}
 	else
@@ -225,12 +225,12 @@ static void mo5_set_cassette ( running_machine *machine, int data )
 
 static WRITE8_HANDLER ( mo5_set_cassette_motor )
 {
-	const device_config* img = thom_cassette_img(machine);
+	const device_config* img = thom_cassette_img(space->machine);
 	cassette_state state = cassette_get_state( img );
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ? "off" : "on",
+	       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ? "off" : "on",
 	       (int) (pos / MO5_HBIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
@@ -514,13 +514,13 @@ static void to7_update_cart_bank(running_machine *machine)
 	if ( thom_cart_nb_banks )
 	{
 		bank = thom_cart_bank % thom_cart_nb_banks;
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, to7_cartridge_r );
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0003, 0, 0, to7_cartridge_r );
 	}
 
 	if ( bank != old_bank )
 		LOG_BANK(( "to7_update_cart_bank: CART is cartridge bank %i\n", bank ));
 
-	memory_set_bank( THOM_CART_BANK, bank );
+	memory_set_bank( machine, THOM_CART_BANK, bank );
 	old_bank = bank;
 }
 
@@ -540,7 +540,7 @@ WRITE8_HANDLER ( to7_cartridge_w )
 		return;
 
 	thom_cart_bank = offset & 3;
-	to7_update_cart_bank(machine);
+	to7_update_cart_bank(space->machine);
 }
 
 
@@ -548,10 +548,10 @@ WRITE8_HANDLER ( to7_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to7_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, "main" ) + 0x10000;
+	UINT8* pos = memory_region( space->machine, "main" ) + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
-	to7_update_cart_bank(machine);
+	to7_update_cart_bank(space->machine);
 	return data;
 }
 
@@ -563,7 +563,7 @@ READ8_HANDLER ( to7_cartridge_r )
 
 static WRITE8_HANDLER ( to7_timer_port_out )
 {
-	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
+	thom_set_mode_point( space->machine, data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
 	thom_set_border_color( ((data & 0x10) ? 1 : 0) | /* bits 4-6: border color */
 			       ((data & 0x20) ? 2 : 0) |
@@ -581,8 +581,8 @@ static WRITE8_HANDLER ( to7_timer_cp2_out )
 
 static READ8_HANDLER ( to7_timer_port_in )
 {
-	int lightpen = (input_port_read(machine, "lightpen_button") & 1) ? 2 : 0;
-	int cass = to7_get_cassette(machine) ? 0x80 : 0;
+	int lightpen = (input_port_read(space->machine, "lightpen_button") & 1) ? 2 : 0;
+	int cass = to7_get_cassette(space->machine) ? 0x80 : 0;
 	return lightpen | cass;
 }
 
@@ -591,7 +591,7 @@ static READ8_HANDLER ( to7_timer_port_in )
 static WRITE8_HANDLER ( to7_timer_tco_out )
 {
 	/* 1-bit cassette output */
-	to7_set_cassette( machine, data );
+	to7_set_cassette( space->machine, data );
 }
 
 
@@ -669,7 +669,7 @@ static READ8_HANDLER ( to7_sys_porta_in )
 	if ( to7_lightpen )
 	{
 		/* lightpen hi */
-		return to7_lightpen_gpl( machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step ) >> 8;
+		return to7_lightpen_gpl( space->machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step ) >> 8;
 	}
 	else
 	{
@@ -683,7 +683,7 @@ static READ8_HANDLER ( to7_sys_porta_in )
 		for ( i = 0; i < 8; i++ )
 		{
 			if ( ! (keyline & (1 << i)) )
-				val &= input_port_read(machine, keynames[i]);
+				val &= input_port_read(space->machine, keynames[i]);
 		}
 		return val;
 	}
@@ -694,7 +694,7 @@ static READ8_HANDLER ( to7_sys_porta_in )
 static READ8_HANDLER ( to7_sys_portb_in )
 {
 	/* lightpen low */
-	return to7_lightpen_gpl( machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step ) & 0xff;
+	return to7_lightpen_gpl( space->machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step ) & 0xff;
 }
 
 
@@ -764,7 +764,7 @@ static WRITE8_HANDLER ( to7_io_porta_out )
 	int tx  = data & 1;
 	int dtr = ( data & 2 ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), tx, dtr ));
+	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), tx, dtr ));
 	if ( dtr )
 		to7_io_line.State |=  SERIAL_STATE_DTR;
 	else
@@ -782,12 +782,12 @@ static READ8_HANDLER ( to7_io_porta_in )
 	int dsr = ( to7_io_line.input_state & SERIAL_STATE_DSR ) ? 0 : 1;
 	int rd  = get_in_data_bit( to7_io_line.input_state );
 
-	if ( to7_io_mode(machine) == TO7_IO_RS232 )
+	if ( to7_io_mode(space->machine) == TO7_IO_RS232 )
 		cts = to7_io_line.input_state & SERIAL_STATE_CTS ? 0 : 1;
 	else
 		cts = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_io_mode(machine), cts, dsr, rd ));
+	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to7_io_mode(space->machine), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
@@ -798,7 +798,7 @@ static WRITE8_HANDLER ( to7_io_portb_out )
 {
 	/* set 8-bit data */
 
-	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 
 	centronics_write_data( 0, data );
 }
@@ -809,7 +809,7 @@ static WRITE8_HANDLER ( to7_io_cb2_out )
 {
 	/* send STROBE to printer */
 
-	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 
 	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 }
@@ -975,13 +975,13 @@ static void to7_modem_init( void )
 
 READ8_HANDLER ( to7_modem_mea8000_r )
 {
-	if ( input_port_read(machine, "mconfig") & 1 )
-		return mea8000_r( machine, offset );
+	if ( input_port_read(space->machine, "mconfig") & 1 )
+		return mea8000_r( space, offset );
 	else
 	{
 		switch ( offset ) {
-		case 0: return acia6850_0_stat_r( machine, 0 );
-		case 1: return acia6850_0_data_r( machine, 0 );
+		case 0: return acia6850_0_stat_r( space, 0 );
+		case 1: return acia6850_0_data_r( space, 0 );
 		default: return 0;
 		}
 	}
@@ -991,13 +991,13 @@ READ8_HANDLER ( to7_modem_mea8000_r )
 
 WRITE8_HANDLER ( to7_modem_mea8000_w )
 {
-	if ( input_port_read(machine, "mconfig") & 1 )
-		mea8000_w( machine, offset, data );
+	if ( input_port_read(space->machine, "mconfig") & 1 )
+		mea8000_w( space, offset, data );
 	else
 	{
 		switch ( offset ) {
-		case 0: acia6850_0_ctrl_w( machine, 0, data ); break;
-		case 1: acia6850_0_data_w( machine, 0, data ); break;
+		case 0: acia6850_0_ctrl_w( space, 0, data ); break;
+		case 1: acia6850_0_data_w( space, 0, data ); break;
 		}
 	}
 }
@@ -1060,16 +1060,16 @@ static void to7_game_sound_update ( void )
 static READ8_HANDLER ( to7_game_porta_in )
 {
 	UINT8 data;
-	if ( input_port_read(machine, "config") & 1 )
+	if ( input_port_read(space->machine, "config") & 1 )
 	{
 		/* mouse */
-		data = to7_get_mouse_signal(machine) & 0x0c;             /* XB, YB */
-		data |= input_port_read(machine, "mouse_button") & 3; /* buttons */
+		data = to7_get_mouse_signal(space->machine) & 0x0c;             /* XB, YB */
+		data |= input_port_read(space->machine, "mouse_button") & 3; /* buttons */
 	}
 	else
 	{
 		/* joystick */
-		data = input_port_read(machine, "game_port_directions");
+		data = input_port_read(space->machine, "game_port_directions");
 		/* bit 0=0 => P1 up      bit 4=0 => P2 up
 		   bit 1=0 => P1 down    bit 5=0 => P2 down
 		   bit 2=0 => P1 left    bit 6=0 => P2 left
@@ -1101,10 +1101,10 @@ static READ8_HANDLER ( to7_game_porta_in )
 static READ8_HANDLER ( to7_game_portb_in )
 {
 	UINT8 data;
-	if ( input_port_read(machine, "config") & 1 )
+	if ( input_port_read(space->machine, "config") & 1 )
 	{
 		/* mouse */
-		UINT8 mouse =  to7_get_mouse_signal(machine);
+		UINT8 mouse =  to7_get_mouse_signal(space->machine);
 		data = 0;
 		if ( mouse & 1 )
 			data |= 0x04; /* XA */
@@ -1118,7 +1118,7 @@ static READ8_HANDLER ( to7_game_portb_in )
 		/* bits 2-3: action buttons B (0=pressed) */
 		/* bits 4-5: unused (ouput) */
 		/* bits 0-1: unknown! */
-		data = input_port_read(machine, "game_port_buttons");
+		data = input_port_read(space->machine, "game_port_buttons");
 	}
 	return data;
 }
@@ -1295,7 +1295,7 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
 		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
-			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to7_midi_status,
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to7_midi_status,
 			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -1313,7 +1313,7 @@ READ8_HANDLER ( to7_midi_r )
 			to7_midi_status &= ~ACIA_6850_OVRN;
 		to7_midi_overrun = 0;
 		LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
-			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 		to7_midi_update_irq();
 		return data;
 	}
@@ -1321,7 +1321,7 @@ READ8_HANDLER ( to7_midi_r )
 
 	default:
 		logerror( "$%04x to7_midi_r: invalid offset %i\n",
-			  activecpu_get_previouspc(),  offset );
+			  cpu_get_previouspc(space->cpu),  offset );
 		return 0;
 	}
 }
@@ -1340,7 +1340,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		if ( (data & 3) == 3 )
 		{
 			/* reset */
-			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
 			to7_midi_intr = 0;
@@ -1357,7 +1357,7 @@ WRITE8_HANDLER ( to7_midi_w )
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
-					  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+					  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 					  data,
 					  bits[ (data >> 2) & 7 ],
 					  stop[ (data >> 2) & 7 ],
@@ -1371,7 +1371,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	case 1: /* output data */
-		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 		if ( data == 0x55 )
 			/* cable-detect: shortcut */
 			chardev_fake_in( to7_midi_chardev, 0x55 );
@@ -1385,7 +1385,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	default:
-		logerror( "$%04x to7_midi_w: invalid offset %i (data=$%02X) \n", activecpu_get_previouspc(), offset, data );
+		logerror( "$%04x to7_midi_w: invalid offset %i (data=$%02X) \n", cpu_get_previouspc(space->cpu), offset, data );
 	}
 }
 
@@ -1482,7 +1482,7 @@ MACHINE_RESET ( to7 )
 	thom_set_video_mode( THOM_VMODE_TO770 );
 	thom_set_init_callback( to7_set_init );
 	thom_set_lightpen_callback( 3, to7_lightpen_cb );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
 
@@ -1517,24 +1517,24 @@ MACHINE_START ( to7 )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = mess_ram;
-	memory_configure_bank( THOM_BASE_BANK, 0, 1, mess_ram + 0x4000, 0x2000 );
-	memory_configure_bank( THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
-	memory_configure_bank( THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_set_bank( THOM_BASE_BANK, 0 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
-	memory_set_bank( THOM_CART_BANK, 0 );
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, mess_ram + 0x4000, 0x2000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
+	memory_set_bank( machine, THOM_BASE_BANK, 0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
 
 	if ( mess_ram_size > 24*1024 )
 	{
 		/* install 16 KB or 16 KB + 8 KB memory extensions */
 		/* BASIC instruction to see free memory: ?FRE(0) */
 		int extram = mess_ram_size - 24*1024;
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000 + extram - 1, 0, 0,
-					       (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000 + extram - 1, 0, 0,
-					       (read8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
-		memory_configure_bank( THOM_RAM_BANK,  0, 1, mess_ram + 0x6000, extram );
-		memory_set_bank( THOM_RAM_BANK, 0 );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000 + extram - 1, 0, 0,
+					       (write8_space_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000 + extram - 1, 0, 0,
+					       (read8_space_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
+		memory_configure_bank( machine, THOM_RAM_BANK,  0, 1, mess_ram + 0x6000, extram );
+		memory_set_bank( machine, THOM_RAM_BANK, 0 );
 	}
 
 	/* force 2 topmost color bits to 1 */
@@ -1562,7 +1562,7 @@ MACHINE_START ( to7 )
 static WRITE8_HANDLER ( to770_sys_cb2_out )
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
-	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", activecpu_get_previouspc(), data ));
+	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", cpu_get_previouspc(space->cpu), data ));
 }
 
 
@@ -1574,7 +1574,7 @@ static READ8_HANDLER ( to770_sys_porta_in )
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 	int keyline = pia_get_output_b( THOM_PIA_SYS ) & 7;
 	
-	return input_port_read(machine, keynames[7 - keyline]);
+	return input_port_read(space->machine, keynames[7 - keyline]);
 }
 
 
@@ -1610,12 +1610,12 @@ static void to770_update_ram_bank(running_machine *machine)
 
 	if ( mess_ram_size == 128*1024 || bank < 2 )
 	{
-		memory_set_bank( THOM_RAM_BANK, bank );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
+		memory_set_bank( machine, THOM_RAM_BANK, bank );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xdfff, 0, 0, (write8_space_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, SMH_UNMAP );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xdfff, 0, 0, SMH_UNMAP );
 	}
 
 	old_bank = bank;
@@ -1632,7 +1632,7 @@ static STATE_POSTLOAD ( to770_update_ram_bank_postload )
 
 static WRITE8_HANDLER ( to770_sys_portb_out )
 {
-	to770_update_ram_bank(machine);
+	to770_update_ram_bank(space->machine);
 }
 
 
@@ -1653,7 +1653,7 @@ static const pia6821_interface to770_sys =
 
 static WRITE8_HANDLER ( to770_timer_port_out )
 {
-	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
+	thom_set_mode_point( space->machine, data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
 	thom_set_border_color( ((data & 0x10) ? 1 : 0) | /* 4-bit border color */
 			       ((data & 0x20) ? 2 : 0) |
@@ -1679,7 +1679,7 @@ static const mc6846_interface to770_timer =
 READ8_HANDLER ( to770_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine, TO7_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -1693,7 +1693,7 @@ READ8_HANDLER ( to770_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x to770_gatearray_r: invalid offset %i\n", activecpu_get_previouspc(), offset );
+		logerror( "$%04x to770_gatearray_r: invalid offset %i\n", cpu_get_previouspc(space->cpu), offset );
 		return 0;
 	}
 }
@@ -1732,7 +1732,7 @@ MACHINE_RESET( to770 )
 	thom_set_video_mode( THOM_VMODE_TO770 );
 	thom_set_init_callback( to7_set_init );
 	thom_set_lightpen_callback( 3, to7_lightpen_cb );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( 8 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
 
@@ -1768,14 +1768,14 @@ MACHINE_START ( to770 )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = mess_ram;
-	memory_configure_bank( THOM_BASE_BANK, 0, 1, mess_ram + 0x4000, 0x4000 );
-	memory_configure_bank( THOM_RAM_BANK,  0, 6, mess_ram + 0x8000, 0x4000 );
-	memory_configure_bank( THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
-	memory_configure_bank( THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_set_bank( THOM_BASE_BANK, 0 );
-	memory_set_bank( THOM_RAM_BANK,  0 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
-	memory_set_bank( THOM_CART_BANK, 0 );
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, mess_ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, THOM_RAM_BANK,  0, 6, mess_ram + 0x8000, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
+	memory_set_bank( machine, THOM_BASE_BANK, 0 );
+	memory_set_bank( machine, THOM_RAM_BANK,  0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -1844,9 +1844,9 @@ static void mo5_init_timer(void)
 
 static WRITE8_HANDLER ( mo5_sys_porta_out )
 {
-	thom_set_mode_point( data & 1 );						/* bit 0: video bank switch */
+	thom_set_mode_point( space->machine, data & 1 );						/* bit 0: video bank switch */
 	thom_set_border_color( (data >> 1) & 15 );				/* bit 1-4: border color */
-	mo5_set_cassette( machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
+	mo5_set_cassette( space->machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
 }
 
 
@@ -1854,8 +1854,8 @@ static WRITE8_HANDLER ( mo5_sys_porta_out )
 static READ8_HANDLER ( mo5_sys_porta_in )
 {
 	return
-		(mo5_get_cassette(machine) ? 0x80 : 0) |     /* bit 7: cassette input */
-		((input_port_read(machine, "lightpen_button") & 1) ? 0x20 : 0)
+		(mo5_get_cassette(space->machine) ? 0x80 : 0) |     /* bit 7: cassette input */
+		((input_port_read(space->machine, "lightpen_button") & 1) ? 0x20 : 0)
 		/* bit 5: lightpen button */;
 }
 
@@ -1876,7 +1876,7 @@ static READ8_HANDLER ( mo5_sys_portb_in )
 	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 	
-	return ( input_port_read(machine, keynames[lin]) & (1 << col) ) ? 0x80 : 0;
+	return ( input_port_read(space->machine, keynames[lin]) & (1 << col) ) ? 0x80 : 0;
 }
 
 
@@ -1902,7 +1902,7 @@ static const pia6821_interface mo5_sys =
 READ8_HANDLER ( mo5_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, MO5_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine, MO5_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -1915,7 +1915,7 @@ READ8_HANDLER ( mo5_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x mo5_gatearray_r: invalid offset %i\n",  activecpu_get_previouspc(), offset );
+		logerror( "$%04x mo5_gatearray_r: invalid offset %i\n",  cpu_get_previouspc(space->cpu), offset );
 		return 0;
 	}
 }
@@ -1990,13 +1990,13 @@ static void mo5_update_cart_bank(running_machine *machine)
 	int rom_is_ram = mo5_reg_cart & 4;
 	int bank = 0;
 
-	memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0,
-				      (read8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0,
+				      (read8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
 
 	if ( rom_is_ram && thom_cart_nb_banks == 4 )
 	{
 		/* 64 KB ROM from "JANE" cartridge */
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, SMH_NOP );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, SMH_NOP );
 		bank = mo5_reg_cart & 3;
 		if ( bank != old_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank ));
@@ -2006,24 +2006,24 @@ static void mo5_update_cart_bank(running_machine *machine)
 		/* 64 KB RAM from network extension */
 		int write_enable = mo5_reg_cart & 8;
 		bank = 4 + ( mo5_reg_cart & 3 );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, write_enable ?
-					       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, write_enable ?
+					       (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
 		if ( bank != old_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (write-enable=%i)\n", mo5_reg_cart & 3, write_enable ? 1 : 0 ));
 	}
 	else
 	{
 		/* regular cartridge bank switch */
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, mo5_cartridge_w );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, mo5_cartridge_w );
 		if ( thom_cart_nb_banks )
 		{
 			bank = thom_cart_bank % thom_cart_nb_banks;
-			memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xbffc, 0xbfff, 0, 0, mo5_cartridge_r );
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xbffc, 0xbfff, 0, 0, mo5_cartridge_r );
 		}
 		if ( bank != old_bank )
 			LOG_BANK(( "mo5_update_cart_bank: CART is internal / cartridge bank %i\n", thom_cart_bank ));
 	}
-	memory_set_bank( THOM_CART_BANK, bank );
+	memory_set_bank( machine, THOM_CART_BANK, bank );
 	old_bank = bank;
 }
 
@@ -2043,7 +2043,7 @@ WRITE8_HANDLER ( mo5_cartridge_w )
 		return;
 
 	thom_cart_bank = offset & 3;
-	mo5_update_cart_bank(machine);
+	mo5_update_cart_bank(space->machine);
 }
 
 
@@ -2051,10 +2051,10 @@ WRITE8_HANDLER ( mo5_cartridge_w )
 /* read signal to bffc-bfff generates a bank switch */
 READ8_HANDLER ( mo5_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, "main" ) + 0x10000;
+	UINT8* pos = memory_region( space->machine, "main" ) + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
-	mo5_update_cart_bank(machine);
+	mo5_update_cart_bank(space->machine);
 	return data;
 }
 
@@ -2064,7 +2064,7 @@ READ8_HANDLER ( mo5_cartridge_r )
 WRITE8_HANDLER ( mo5_ext_w )
 {
 	mo5_reg_cart = data;
-	mo5_update_cart_bank(machine);
+	mo5_update_cart_bank(space->machine);
 }
 
 
@@ -2093,7 +2093,7 @@ MACHINE_RESET( mo5 )
 	/* video */
 	thom_set_video_mode( THOM_VMODE_MO5 );
 	thom_set_lightpen_callback( 3, mo5_lightpen_cb );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( 0 );
 	pia_set_input_ca1( THOM_PIA_SYS, 0 );
 
@@ -2130,13 +2130,13 @@ MACHINE_START ( mo5 )
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
 	thom_vram = mess_ram;
-	memory_configure_bank( THOM_BASE_BANK, 0, 1, mess_ram + 0x4000, 0x8000 );
-	memory_configure_bank( THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 4, 4, mess_ram + 0xc000, 0x4000 );
-	memory_configure_bank( THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
-	memory_set_bank( THOM_BASE_BANK, 0 );
-	memory_set_bank( THOM_CART_BANK, 0 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, mess_ram + 0x4000, 0x8000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 4, 4, mess_ram + 0xc000, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
+	memory_set_bank( machine, THOM_BASE_BANK, 0 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -2164,14 +2164,14 @@ MACHINE_START ( mo5 )
 
 WRITE8_HANDLER ( to9_ieee_w )
 {
-	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data, offset );
+	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data, offset );
 }
 
 
 
 READ8_HANDLER  ( to9_ieee_r )
 {
-	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset );
+	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset );
 	return 0;
 }
 
@@ -2188,7 +2188,7 @@ READ8_HANDLER  ( to9_ieee_r )
 READ8_HANDLER ( to9_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, TO9_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine, TO9_LIGHTPEN_DECAL, to7_lightpen_step - 1, 0 );
 	int count, inil, init, lt3;
 	count = to7_lightpen ? l.count : v.count;
 	inil  = to7_lightpen ? l.inil  : v.inil;
@@ -2202,7 +2202,7 @@ READ8_HANDLER ( to9_gatearray_r )
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (v.init << 7) | (init << 6); /* != TO7/70 */
 	default:
-		logerror( "$%04x to9_gatearray_r: invalid offset %i\n", activecpu_get_previouspc(), offset );
+		logerror( "$%04x to9_gatearray_r: invalid offset %i\n", cpu_get_previouspc(space->cpu), offset );
 		return 0;
 	}
 }
@@ -2297,7 +2297,7 @@ READ8_HANDLER  ( to9_vreg_r )
 
 WRITE8_HANDLER ( to9_vreg_w )
 {
-	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, 0xe7da + offset, data ));
+	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -2357,7 +2357,7 @@ static void to9_update_cart_bank(running_machine *machine)
 	int slot = ( mc6846_get_output_port(machine) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	/* reset cartridge read handler */
-	memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, (read8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0003, 0, 0, (read8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
 
 	switch ( slot )
 	{
@@ -2384,14 +2384,14 @@ static void to9_update_cart_bank(running_machine *machine)
 		if ( thom_cart_nb_banks )
 		{
 			bank = thom_cart_bank % thom_cart_nb_banks;
-			memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, to7_cartridge_r );
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0003, 0, 0, to7_cartridge_r );
 		}
 		if ( bank != old_bank )
 			LOG_BANK(( "to9_update_cart_bank: CART is cartridge bank %i\n",  thom_cart_bank ));
 		break;
 	}
 
-	memory_set_bank( THOM_CART_BANK, bank );
+	memory_set_bank( machine, THOM_CART_BANK, bank );
 	old_bank = bank;
 }
 
@@ -2407,7 +2407,7 @@ static STATE_POSTLOAD( to9_update_cart_bank_postload )
 /* write signal to 0000-1fff generates a bank switch */
 WRITE8_HANDLER ( to9_cartridge_w )
 {
-	int slot = ( mc6846_get_output_port(machine) >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( mc6846_get_output_port(space->machine) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	if ( offset >= 0x2000 )
 		return;
@@ -2416,7 +2416,7 @@ WRITE8_HANDLER ( to9_cartridge_w )
 		thom_cart_bank = offset & 3;
 	else
 		to9_soft_bank = offset & 3;
-	to9_update_cart_bank(machine);
+	to9_update_cart_bank(space->machine);
 }
 
 
@@ -2424,10 +2424,10 @@ WRITE8_HANDLER ( to9_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to9_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, "main" ) + 0x10000;
+	UINT8* pos = memory_region( space->machine, "main" ) + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
-	to9_update_cart_bank(machine);
+	to9_update_cart_bank(space->machine);
 	return data;
 }
 
@@ -2467,12 +2467,12 @@ static void to9_update_ram_bank (running_machine *machine)
 
 	if ( mess_ram_size == 192*1024 || bank < 6 )
 	{
-		memory_set_bank( THOM_RAM_BANK, bank );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, (write8_machine_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
+		memory_set_bank( machine, THOM_RAM_BANK, bank );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xdfff, 0, 0, (write8_space_func)(STATIC_BANK1 + THOM_RAM_BANK - 1) );
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xdfff, 0, 0, SMH_NOP );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xdfff, 0, 0, SMH_NOP );
 	}
 
 	old_bank = bank;
@@ -2592,7 +2592,7 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 7:     interrupt */
 
 		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
-			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_status,
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to9_kbd_status,
 			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -2607,12 +2607,12 @@ READ8_HANDLER ( to9_kbd_r )
 		else
 			to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 		to9_kbd_overrun = 0;
-		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), to9_kbd_in ));
-		to9_kbd_update_irq(machine);
+		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to9_kbd_in ));
+		to9_kbd_update_irq(space->machine);
 		return to9_kbd_in;
 
 	default:
-		logerror( "$%04x to9_kbd_r: invalid offset %i\n", activecpu_get_previouspc(),  offset );
+		logerror( "$%04x to9_kbd_r: invalid offset %i\n", cpu_get_previouspc(space->cpu),  offset );
 		return 0;
 	}
 }
@@ -2634,7 +2634,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_overrun = 0;
 			to9_kbd_status = ACIA_6850_TDRE;
 			to9_kbd_intr = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 		}
 		else
 		{
@@ -2648,19 +2648,19 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_intr = data >> 5;
 
 			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
-				  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+				  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 				  data, to9_kbd_parity, to9_kbd_intr >> 2,
 				  (to9_kbd_intr & 3) ? 1 : 0 ));
 		}
-		to9_kbd_update_irq(machine);
+		to9_kbd_update_irq(space->machine);
 		break;
 
 	case 1: /* output data */
 		to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_TDRE);
-		to9_kbd_update_irq(machine);
+		to9_kbd_update_irq(space->machine);
 		/* TODO: 1 ms delay here ? */
 		to9_kbd_status |= ACIA_6850_TDRE; /* data transmit ready again */
-		to9_kbd_update_irq(machine);
+		to9_kbd_update_irq(space->machine);
 
 		switch ( data )
 		{
@@ -2679,19 +2679,19 @@ WRITE8_HANDLER ( to9_kbd_w )
 		case 0xFE: to9_kbd_periph = 0; break;
 
 		default:
-			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data );
+			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data );
 		}
 
 		thom_set_caps_led( ! to9_kbd_caps );
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
-		      activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
+		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data,
 		      to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
 
 		break;
 
 	default:
-		logerror( "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", activecpu_get_previouspc(), offset, data );
+		logerror( "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", cpu_get_previouspc(space->cpu), offset, data );
 	}
 }
 
@@ -2963,16 +2963,16 @@ static void to9_update_centronics ( running_machine *machine )
 	centronics_write_data( 0, data );
 	centronics_write_handshake( 0, (b & 2) ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 
-	LOG_IO(( "$%04x %f to9_update_centronics: data=$%02X strobe=%i\n",
-		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data,
-		  (b & 2) ? 1 : 0 ));
+//	LOG_IO(( "$%04x %f to9_update_centronics: data=$%02X strobe=%i\n",
+//		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data,
+//		  (b & 2) ? 1 : 0 ));
 }
 
 
 
 static READ8_HANDLER ( to9_sys_porta_in )
 {
-	UINT8 ktest = to9_kbd_ktest(machine);
+	UINT8 ktest = to9_kbd_ktest(space->machine);
 
 	LOG_KBD(( "to9_sys_porta_in: ktest=%i\n", ktest ));
 
@@ -2983,15 +2983,15 @@ static READ8_HANDLER ( to9_sys_porta_in )
 
 static WRITE8_HANDLER ( to9_sys_porta_out )
 {
-	to9_update_centronics(machine); /* bits 1-7: printer */
+	to9_update_centronics(space->machine); /* bits 1-7: printer */
 }
 
 
 
 static WRITE8_HANDLER ( to9_sys_portb_out )
 {
-	to9_update_centronics(machine); /* bits 0-1: printer */
-	to9_update_ram_bank(machine);
+	to9_update_centronics(space->machine); /* bits 0-1: printer */
+	to9_update_ram_bank(space->machine);
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
 		LOG(( "to9_sys_portb_out: video overlay not handled\n" ));
@@ -3018,9 +3018,9 @@ static const CENTRONICS_CONFIG to9_centronics = { PRINTER_CENTRONICS, NULL };
 
 static WRITE8_HANDLER ( to9_timer_port_out )
 {
-	thom_set_mode_point( data & 1 ); /* bit 0: video bank */
-	to9_update_ram_bank(machine);
-	to9_update_cart_bank(machine);
+	thom_set_mode_point( space->machine, data & 1 ); /* bit 0: video bank */
+	to9_update_ram_bank(space->machine);
+	to9_update_cart_bank(space->machine);
 }
 
 
@@ -3060,7 +3060,7 @@ MACHINE_RESET ( to9 )
 	thom_set_video_mode( THOM_VMODE_TO9 );
 	thom_set_lightpen_callback( 3, to7_lightpen_cb );
 	thom_set_border_color( 8 );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
 
 	/* memory */
@@ -3098,14 +3098,14 @@ MACHINE_START ( to9 )
 	/* memory */
 	thom_vram = mess_ram;
 	thom_cart_bank = 0;
-	memory_configure_bank( THOM_VRAM_BANK, 0,  2, thom_vram, 0x2000 );
-	memory_configure_bank( THOM_CART_BANK, 0, 12, mem + 0x10000, 0x4000 );
-	memory_configure_bank( THOM_BASE_BANK, 0,  1, mess_ram + 0x4000, 0x4000 );
-	memory_configure_bank( THOM_RAM_BANK,  0, 10, mess_ram + 0x8000, 0x4000 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
-	memory_set_bank( THOM_CART_BANK, 0 );
-	memory_set_bank( THOM_BASE_BANK, 0 );
-	memory_set_bank( THOM_RAM_BANK,  0 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, thom_vram, 0x2000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0, 12, mem + 0x10000, 0x4000 );
+	memory_configure_bank( machine, THOM_BASE_BANK, 0,  1, mess_ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, THOM_RAM_BANK,  0, 10, mess_ram + 0x8000, 0x4000 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	memory_set_bank( machine, THOM_BASE_BANK, 0 );
+	memory_set_bank( machine, THOM_RAM_BANK,  0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -3471,7 +3471,7 @@ static UINT8  to8_bios_bank;
 
 
 
-static void to8_update_floppy_bank( void )
+static void to8_update_floppy_bank(running_machine *machine)
 {
 	static int old_bank = -1;
 	int bank = (to8_reg_sys1 & 0x80) ? to7_floppy_bank : (to8_bios_bank + TO7_NB_FLOP_BANK);
@@ -3480,7 +3480,7 @@ static void to8_update_floppy_bank( void )
 		LOG_BANK(( "to8_update_floppy_bank: floppy ROM is %s bank %i\n",
 			  (to8_reg_sys1 & 0x80) ? "external" : "internal",
 			  bank % TO7_NB_FLOP_BANK ));
-	memory_set_bank( THOM_FLOP_BANK, bank );
+	memory_set_bank( machine, THOM_FLOP_BANK, bank );
 	old_bank = bank;
 }
 
@@ -3488,7 +3488,7 @@ static void to8_update_floppy_bank( void )
 
 static STATE_POSTLOAD( to8_update_floppy_bank_postload )
 {
-	to8_update_floppy_bank();
+	to8_update_floppy_bank(machine);
 }
 
 
@@ -3535,15 +3535,15 @@ static void to8_update_ram_bank (running_machine *machine)
 	to8_data_vpage = bank;
 	if ( mess_ram_size == 512*1024 || to8_data_vpage < 16 )
 	{
-		memory_set_bank( TO8_DATA_LO, to8_data_vpage );
-		memory_set_bank( TO8_DATA_HI, to8_data_vpage );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, to8_data_vpage <= 4 ? to8_data_lo_w : (write8_machine_func)(STATIC_BANK1 + TO8_DATA_LO - 1) );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, to8_data_vpage <= 4 ? to8_data_hi_w : (write8_machine_func)(STATIC_BANK1 + TO8_DATA_HI - 1) );
+		memory_set_bank( machine, TO8_DATA_LO, to8_data_vpage );
+		memory_set_bank( machine, TO8_DATA_HI, to8_data_vpage );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, to8_data_vpage <= 4 ? to8_data_lo_w : (write8_space_func)(STATIC_BANK1 + TO8_DATA_LO - 1) );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, to8_data_vpage <= 4 ? to8_data_hi_w : (write8_space_func)(STATIC_BANK1 + TO8_DATA_HI - 1) );
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, SMH_NOP );
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_NOP );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, SMH_NOP );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_NOP );
 	}
 }
 
@@ -3562,24 +3562,24 @@ static void to8_update_cart_bank (running_machine *machine)
 	int bank = 0;
 
 	/* reset bank switch */
-	memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, (read8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0003, 0, 0, (read8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
 
 	if ( to8_reg_cart & 0x20 )
 	{
 		/* RAM space */
 		to8_cart_vpage = to8_reg_cart & 31;
 		bank = 8 + to8_cart_vpage;
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0,
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0,
 					       ((to8_cart_vpage < 8 || mess_ram_size == 512*1024) && (to8_reg_cart & 0x40)) ?
 					       (to8_cart_vpage <= 4) ? to8_vcart_w :
-					       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :
+					       (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :
 					       SMH_NOP );
 		if ( bank != old_bank )
 			LOG_BANK(( "to8_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, to8_cartridge_w );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, to8_cartridge_w );
 		if ( to8_soft_select )
 		{
 			/* internal software ROM space */
@@ -3594,7 +3594,7 @@ static void to8_update_cart_bank (running_machine *machine)
 			if ( thom_cart_nb_banks )
 			{
 				bank = thom_cart_bank % thom_cart_nb_banks;
-				memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0003, 0, 0, to8_cartridge_r );
+				memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0003, 0, 0, to8_cartridge_r );
 
 			}
 
@@ -3605,7 +3605,7 @@ static void to8_update_cart_bank (running_machine *machine)
 
 	if ( mess_ram_size == 512*1024 || bank < 16 ) 
 	{
-		memory_set_bank( THOM_CART_BANK, bank );
+		memory_set_bank( machine, THOM_CART_BANK, bank );
 	}
 
 	old_bank = bank;
@@ -3631,7 +3631,7 @@ WRITE8_HANDLER ( to8_cartridge_w )
 	else
 		thom_cart_bank = offset & 3;
 
-	to8_update_cart_bank(machine);
+	to8_update_cart_bank(space->machine);
 }
 
 
@@ -3639,10 +3639,10 @@ WRITE8_HANDLER ( to8_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to8_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, "main" ) + 0x10000;
+	UINT8* pos = memory_region( space->machine, "main" ) + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
-	to8_update_cart_bank(machine);
+	to8_update_cart_bank(space->machine);
 	return data;
 }
 
@@ -3665,7 +3665,7 @@ static void to8_floppy_reset( running_machine *machine )
 	to7_floppy_reset(machine);
 	if ( THOM_FLOPPY_INT )
 		thmfc_floppy_reset(machine);
-	memory_configure_bank( THOM_FLOP_BANK, TO7_NB_FLOP_BANK, 2, mem + 0x30000, 0x2000 );
+	memory_configure_bank( machine, THOM_FLOP_BANK, TO7_NB_FLOP_BANK, 2, mem + 0x30000, 0x2000 );
 }
 
 
@@ -3674,10 +3674,10 @@ READ8_HANDLER ( to8_floppy_r )
 {
 	if ( (to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
 		/* external controller */
-		return to7_floppy_r( machine, offset );
+		return to7_floppy_r( space, offset );
 	else if ( ! (to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
-		return thmfc_floppy_r( machine, offset );
+		return thmfc_floppy_r( space, offset );
 	else
 		/* no controller */
 		return 0;
@@ -3689,10 +3689,10 @@ WRITE8_HANDLER ( to8_floppy_w )
 {
 	if ( (to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
 		/* external controller */
-		to7_floppy_w( machine, offset, data );
+		to7_floppy_w( space, offset, data );
 	else if ( ! (to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
-		thmfc_floppy_w( machine, offset, data );
+		thmfc_floppy_w( space, offset, data );
 }
 
 
@@ -3708,7 +3708,7 @@ WRITE8_HANDLER ( to8_floppy_w )
 READ8_HANDLER ( to8_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, TO8_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine, TO8_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
 	UINT8 res;
 	count = to7_lightpen ? l.count : v.count;
@@ -3729,7 +3729,7 @@ READ8_HANDLER ( to8_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( to7_lightpen )
 		{
-			thom_firq_2( machine, 0 );
+			thom_firq_2( space->machine, 0 );
 			to8_lightpen_intr = 0;
 			res = count & 0xff;
 		}
@@ -3749,12 +3749,12 @@ READ8_HANDLER ( to8_gatearray_r )
 		break;
 
 	default:
-		logerror( "$%04x to8_gatearray_r: invalid offset %i\n", activecpu_get_previouspc(), offset );
+		logerror( "$%04x to8_gatearray_r: invalid offset %i\n", cpu_get_previouspc(space->cpu), offset );
 		res = 0;
 	}
 
 	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 		  offset, 0xe7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -3765,7 +3765,7 @@ READ8_HANDLER ( to8_gatearray_r )
 WRITE8_HANDLER ( to8_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 		  offset, 0xe7e4 + offset, data ));
 
 	switch ( offset )
@@ -3779,25 +3779,25 @@ WRITE8_HANDLER ( to8_gatearray_w )
 		if ( to8_reg_sys1 & 0x10 )
 		{
 			to8_reg_ram = data;
-			to8_update_ram_bank(machine);
+			to8_update_ram_bank(space->machine);
 		}
 		break;
 
 	case 2: /* cartridge register */
 		to8_reg_cart = data;
-		to8_update_cart_bank(machine);
+		to8_update_cart_bank(space->machine);
 		break;
 
 	case 3: /* system register 1 */
 		to8_reg_sys1 = data;
-		to8_update_floppy_bank();
-		to8_update_ram_bank(machine);
-		to8_update_cart_bank(machine);
+		to8_update_floppy_bank(space->machine);
+		to8_update_ram_bank(space->machine);
+		to8_update_cart_bank(space->machine);
 		break;
 
 	default:
 		logerror( "$%04x to8_gatearray_w: invalid offset %i (data=$%02X)\n",
-			  activecpu_get_previouspc(), offset, data );
+			  cpu_get_previouspc(space->cpu), offset, data );
 	}
 }
 
@@ -3813,7 +3813,7 @@ READ8_HANDLER  ( to8_vreg_r )
 	if ( ( offset == 3 ) && ( to8_reg_ram & 0x80 ) && ( to8_reg_sys1 & 0x80 ) )
 	{
 		if ( THOM_FLOPPY_EXT )
-			return to7_floppy_r( machine, 0xc );
+			return to7_floppy_r( space, 0xc );
 		else
 			return 0;
 	}
@@ -3846,7 +3846,7 @@ READ8_HANDLER  ( to8_vreg_r )
 WRITE8_HANDLER ( to8_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 		  offset, 0xe7da + offset, data ));
 
 	switch ( offset )
@@ -3877,7 +3877,7 @@ WRITE8_HANDLER ( to8_vreg_w )
 		if ( ( offset == 3 ) && ( to8_reg_ram & 0x80 ) && ( to8_reg_sys1 & 0x80 ) )
 		{
 			if ( THOM_FLOPPY_EXT )
-				to7_floppy_w( machine, 0xc, data );
+				to7_floppy_w( space, 0xc, data );
 		}
 		else
 		{
@@ -3900,9 +3900,9 @@ WRITE8_HANDLER ( to8_vreg_w )
 
 static READ8_HANDLER ( to8_sys_porta_in )
 {
-	int ktest = to8_kbd_ktest (machine);
+	int ktest = to8_kbd_ktest (space->machine);
 
-	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), ktest ));
+	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), ktest ));
 
 	return ktest;
 }
@@ -3911,8 +3911,8 @@ static READ8_HANDLER ( to8_sys_porta_in )
 
 static WRITE8_HANDLER ( to8_sys_portb_out )
 {
-	to9_update_centronics(machine); /* bits 0-1: printer */
-	to8_update_ram_bank(machine);
+	to9_update_centronics(space->machine); /* bits 0-1: printer */
+	to8_update_ram_bank(space->machine);
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
 		LOG(( "to8_sys_portb_out: video overlay not handled\n" ));
@@ -3936,8 +3936,8 @@ static const pia6821_interface to8_sys =
 
 static READ8_HANDLER ( to8_timer_port_in )
 {
-	int lightpen = (input_port_read(machine, "lightpen_button") & 1) ? 2 : 0;
-	int cass = to7_get_cassette(machine) ? 0x80 : 0;
+	int lightpen = (input_port_read(space->machine, "lightpen_button") & 1) ? 2 : 0;
+	int cass = to7_get_cassette(space->machine) ? 0x80 : 0;
 	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	int lock = to8_kbd_caps ? 0 : 8; /* undocumented! */
 	return lightpen | cass | dtr | lock;
@@ -3949,11 +3949,11 @@ static WRITE8_HANDLER ( to8_timer_port_out )
 {
 	int ack = (data & 0x20) ? 1 : 0;       /* bit 5: keyboard ACK */
 	to8_bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank*/
-	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
-	memory_set_bank( TO8_BIOS_BANK, to8_bios_bank );
+	thom_set_mode_point( space->machine, data & 1 );       /* bit 0: video bank switch */
+	memory_set_bank( space->machine, TO8_BIOS_BANK, to8_bios_bank );
 	to8_soft_select = (data & 0x04) ? 1 : 0; /* bit 2: internal ROM select */
-	to8_update_floppy_bank();
-	to8_update_cart_bank(machine);
+	to8_update_floppy_bank(space->machine);
+	to8_update_cart_bank(space->machine);
 	to8_kbd_set_ack( ack );
 }
 
@@ -4029,7 +4029,7 @@ MACHINE_RESET ( to8 )
 	thom_set_video_mode( THOM_VMODE_TO770 );
 	thom_set_lightpen_callback( 4, to8_lightpen_cb );
 	thom_set_border_color( 0 );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
 
 	/* memory */
@@ -4039,8 +4039,8 @@ MACHINE_RESET ( to8 )
 	to8_bios_bank = 0;
 	to8_update_ram_bank(machine);
 	to8_update_cart_bank(machine);
-	to8_update_floppy_bank();
-	memory_set_bank( TO8_BIOS_BANK, 0 );
+	to8_update_floppy_bank(machine);
+	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 	/* thom_cart_bank not reset */
 }
 
@@ -4069,21 +4069,21 @@ MACHINE_START ( to8 )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = mess_ram;
-	memory_configure_bank( THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 8, 32, mess_ram, 0x4000 );
-	memory_configure_bank( THOM_VRAM_BANK, 0,  2, mess_ram, 0x2000 );
-	memory_configure_bank( TO8_SYS_LO,     0,  1, mess_ram + 0x6000, 0x4000 );
-	memory_configure_bank( TO8_SYS_HI,     0,  1, mess_ram + 0x4000, 0x4000 );
-	memory_configure_bank( TO8_DATA_LO,    0, 32, mess_ram + 0x2000, 0x4000 );
-	memory_configure_bank( TO8_DATA_HI,    0, 32, mess_ram + 0x0000, 0x4000 );
-	memory_configure_bank( TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
-	memory_set_bank( THOM_CART_BANK, 0 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
-	memory_set_bank( TO8_SYS_LO,  0 );
-	memory_set_bank( TO8_SYS_HI,  0 );
-	memory_set_bank( TO8_DATA_LO, 0 );
-	memory_set_bank( TO8_DATA_HI, 0 );
-	memory_set_bank( TO8_BIOS_BANK, 0 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, mess_ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, mess_ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, mess_ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, mess_ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, mess_ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, mess_ram + 0x0000, 0x4000 );
+	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, TO8_SYS_LO,  0 );
+	memory_set_bank( machine, TO8_SYS_HI,  0 );
+	memory_set_bank( machine, TO8_DATA_LO, 0 );
+	memory_set_bank( machine, TO8_DATA_HI, 0 );
+	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -4132,8 +4132,8 @@ static const pia6821_interface to9p_sys =
 
 static READ8_HANDLER ( to9p_timer_port_in )
 {
-	int lightpen = (input_port_read(machine, "lightpen_button") & 1) ? 2 : 0;
-	int cass = to7_get_cassette(machine) ? 0x80 : 0;
+	int lightpen = (input_port_read(space->machine, "lightpen_button") & 1) ? 2 : 0;
+	int cass = to7_get_cassette(space->machine) ? 0x80 : 0;
 	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	return lightpen | cass | dtr;
 }
@@ -4143,11 +4143,11 @@ static READ8_HANDLER ( to9p_timer_port_in )
 static WRITE8_HANDLER ( to9p_timer_port_out )
 {
 	int bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank */
-	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
-	memory_set_bank( TO8_BIOS_BANK, bios_bank );
+	thom_set_mode_point( space->machine, data & 1 );       /* bit 0: video bank switch */
+	memory_set_bank( space->machine, TO8_BIOS_BANK, bios_bank );
 	to8_soft_select = (data & 0x04) ? 1 : 0; /* bit 2: internal ROM select */
-	to8_update_floppy_bank();
-	to8_update_cart_bank(machine);
+	to8_update_floppy_bank(space->machine);
+	to8_update_cart_bank(space->machine);
 }
 
 
@@ -4196,7 +4196,7 @@ MACHINE_RESET ( to9p )
 	thom_set_video_mode( THOM_VMODE_TO770 );
 	thom_set_lightpen_callback( 4, to8_lightpen_cb );
 	thom_set_border_color( 0 );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
 
 	/* memory */
@@ -4206,8 +4206,8 @@ MACHINE_RESET ( to9p )
 	to8_bios_bank = 0;
 	to8_update_ram_bank(machine);
 	to8_update_cart_bank(machine);
-	to8_update_floppy_bank();
-	memory_set_bank( TO8_BIOS_BANK, 0 );
+	to8_update_floppy_bank(machine);
+	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 	/* thom_cart_bank not reset */
 }
 
@@ -4236,21 +4236,21 @@ MACHINE_START ( to9p )
 	/* memory */
 	thom_cart_bank = 0;
 	thom_vram = mess_ram;
-	memory_configure_bank( THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 8, 32, mess_ram, 0x4000 );
-	memory_configure_bank( THOM_VRAM_BANK, 0,  2, mess_ram, 0x2000 );
-	memory_configure_bank( TO8_SYS_LO,     0,  1, mess_ram + 0x6000, 0x4000 );
-	memory_configure_bank( TO8_SYS_HI,     0,  1, mess_ram + 0x4000, 0x4000 );
-	memory_configure_bank( TO8_DATA_LO,    0, 32, mess_ram + 0x2000, 0x4000 );
-	memory_configure_bank( TO8_DATA_HI,    0, 32, mess_ram + 0x0000, 0x4000 );
-	memory_configure_bank( TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
-	memory_set_bank( THOM_CART_BANK, 0 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
-	memory_set_bank( TO8_SYS_LO,  0 );
-	memory_set_bank( TO8_SYS_HI,  0 );
-	memory_set_bank( TO8_DATA_LO, 0 );
-	memory_set_bank( TO8_DATA_HI, 0 );
-	memory_set_bank( TO8_BIOS_BANK, 0 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, mess_ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, mess_ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, mess_ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, mess_ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, mess_ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, mess_ram + 0x0000, 0x4000 );
+	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, TO8_SYS_LO,  0 );
+	memory_set_bank( machine, TO8_SYS_HI,  0 );
+	memory_set_bank( machine, TO8_DATA_LO, 0 );
+	memory_set_bank( machine, TO8_DATA_HI, 0 );
+	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -4283,7 +4283,7 @@ MACHINE_START ( to9p )
 
 
 
-static void mo6_update_ram_bank ( void )
+static void mo6_update_ram_bank (running_machine *machine)
 {
 	UINT8 bank = 0;
 
@@ -4294,15 +4294,15 @@ static void mo6_update_ram_bank ( void )
 			LOG_BANK(( "mo6_update_ram_bank: select bank %i (new style)\n", bank ));
 	}
 	to8_data_vpage = bank;
-	memory_set_bank( TO8_DATA_LO, to8_data_vpage );
-	memory_set_bank( TO8_DATA_HI, to8_data_vpage );
+	memory_set_bank( machine, TO8_DATA_LO, to8_data_vpage );
+	memory_set_bank( machine, TO8_DATA_HI, to8_data_vpage );
 }
 
 
 
 static STATE_POSTLOAD( mo6_update_ram_bank_postload )
 {
-	mo6_update_ram_bank();
+	mo6_update_ram_bank(machine);
 }
 
 
@@ -4313,7 +4313,7 @@ static void mo6_update_cart_bank (running_machine *machine)
 	static int old_bank = -1;
 	int bank = 0;
 
-	memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, (read8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, (read8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
 
 	if ( ( ( to8_reg_sys1 & 0x40 ) && ( to8_reg_cart & 0x20 ) ) || ( ! ( to8_reg_sys1 & 0x40 ) && ( mo5_reg_cart & 4 ) ) )
 	{
@@ -4323,16 +4323,16 @@ static void mo6_update_cart_bank (running_machine *machine)
 			/* use a7e6 */
 			to8_cart_vpage = to8_reg_cart & 7; /* 128 KB RAM only = 8 pages */
 			bank = 8 + to8_cart_vpage;
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0,
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0,
 						       (to8_reg_cart & 0x40) ? (to8_cart_vpage <= 4) ? to8_vcart_w :
-						       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) : SMH_NOP );
+						       (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) : SMH_NOP );
 			if ( bank != old_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i)\n", to8_cart_vpage, (to8_reg_cart & 0x40) ? 1 : 0 ));
 		}
 		else if ( thom_cart_nb_banks == 4 )
 		{
 			/* "JANE"-style cartridge bank switching */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, SMH_NOP );
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, SMH_NOP );
 			bank = mo5_reg_cart & 3;
 			if ( bank != old_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
@@ -4343,8 +4343,8 @@ static void mo6_update_cart_bank (running_machine *machine)
 			int write_enable = mo5_reg_cart & 8;
 			to8_cart_vpage = (mo5_reg_cart & 3) | 4;
 			bank = 8 + to8_cart_vpage;
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, write_enable ?
-						       (write8_machine_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, write_enable ?
+						       (write8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) :  SMH_NOP );
 			if ( bank != old_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (write-enable=%i) (MO5 compat.)\n", to8_cart_vpage, write_enable ? 1 : 0 ));
 		}
@@ -4352,7 +4352,7 @@ static void mo6_update_cart_bank (running_machine *machine)
 	else
 	{
 		/* ROM space */
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, SMH_NOP );
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, SMH_NOP );
 		if ( to8_reg_sys2 & 0x20 )
 		{
 			/* internal ROM */
@@ -4366,11 +4366,11 @@ static void mo6_update_cart_bank (running_machine *machine)
 		else
 		{
 			/* cartridge */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xefff, 0, 0, mo6_cartridge_w );
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xefff, 0, 0, mo6_cartridge_w );
 			if ( thom_cart_nb_banks )
 			{
 				bank = thom_cart_bank % thom_cart_nb_banks;
-				memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xbffc, 0xbfff, 0, 0, mo6_cartridge_r );
+				memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xbffc, 0xbfff, 0, 0, mo6_cartridge_r );
 			}
 			if ( bank != old_bank )
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank ));
@@ -4378,8 +4378,8 @@ static void mo6_update_cart_bank (running_machine *machine)
 	}
 
 	old_bank = bank;
-	memory_set_bank( THOM_CART_BANK, bank );
-	memory_set_bank( TO8_BIOS_BANK, b );
+	memory_set_bank( machine, THOM_CART_BANK, bank );
+	memory_set_bank( machine, TO8_BIOS_BANK, b );
 }
 
 
@@ -4398,7 +4398,7 @@ WRITE8_HANDLER ( mo6_cartridge_w )
 		return;
 
 	thom_cart_bank = offset & 3;
-	mo6_update_cart_bank(machine);
+	mo6_update_cart_bank(space->machine);
 }
 
 
@@ -4406,10 +4406,10 @@ WRITE8_HANDLER ( mo6_cartridge_w )
 /* read signal generates a bank switch */
 READ8_HANDLER ( mo6_cartridge_r )
 {
-	UINT8* pos = memory_region( machine, "main" ) + 0x10000;
+	UINT8* pos = memory_region( space->machine, "main" ) + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
-	mo6_update_cart_bank(machine);
+	mo6_update_cart_bank(space->machine);
 	return data;
 }
 
@@ -4419,7 +4419,7 @@ WRITE8_HANDLER ( mo6_ext_w )
 {
 	/* MO5 network extension compatible */
 	mo5_reg_cart = data;
-	mo6_update_cart_bank(machine);
+	mo6_update_cart_bank(space->machine);
 }
 
 
@@ -4433,7 +4433,7 @@ WRITE8_HANDLER ( mo6_ext_w )
 static WRITE8_HANDLER ( mo6_game_porta_out )
 {
 	/* centronics data */
-	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 	centronics_write_data( 0, data );
 }
 
@@ -4443,7 +4443,7 @@ static READ8_HANDLER ( mo6_game_cb1_in )
 {
 	int dtr = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 0 : 1;
 	/* note: printer busy signal replaces button */
-	LOG (( "$%04x %f mo6_game_cb1_in: CENTRONICS get dtr=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), dtr ));
+	LOG (( "$%04x %f mo6_game_cb1_in: CENTRONICS get dtr=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), dtr ));
 	return dtr;
 }
 
@@ -4452,7 +4452,7 @@ static READ8_HANDLER ( mo6_game_cb1_in )
 static WRITE8_HANDLER ( mo6_game_cb2_out )
 {
 	/* centronics strobe */
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data ));
+	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
 	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0,
 				    CENTRONICS_STROBE );
 }
@@ -4519,9 +4519,9 @@ static void mo6_game_reset ( void )
 static READ8_HANDLER ( mo6_sys_porta_in )
 {
 	return
-		(mo5_get_cassette(machine) ? 0x80 : 0) |     /* bit 7: cassette input */
+		(mo5_get_cassette(space->machine) ? 0x80 : 0) |     /* bit 7: cassette input */
 		8 |                                   /* bit 3: kbd-line float up to 1 */
-		((input_port_read(machine, "lightpen_button") & 1) ? 2 : 0);
+		((input_port_read(space->machine, "lightpen_button") & 1) ? 2 : 0);
 	/* bit 1: lightpen button */;
 }
 
@@ -4541,7 +4541,7 @@ static READ8_HANDLER ( mo6_sys_portb_in )
 		lin = 8;     /* A bit 3: 9-th kbd line select */
 
 	return
-		( input_port_read(machine, keynames[lin]) & (1 << col) ) ?  0x80 : 0; 
+		( input_port_read(space->machine, keynames[lin]) & (1 << col) ) ?  0x80 : 0; 
 	/* bit 7: key up */
 }
 
@@ -4549,11 +4549,11 @@ static READ8_HANDLER ( mo6_sys_portb_in )
 
 static WRITE8_HANDLER ( mo6_sys_porta_out )
 {
-	thom_set_mode_point( data & 1 );						/* bit 0: video bank switch */
+	thom_set_mode_point( space->machine, data & 1 );						/* bit 0: video bank switch */
 	to7_game_mute = data & 4;								/* bit 2: sound mute */
 	thom_set_caps_led( (data & 16) ? 0 : 1 ) ;				/* bit 4: keyboard led */
-	mo5_set_cassette( machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
-	mo6_update_cart_bank(machine);							/* bit 5: rom bank */
+	mo5_set_cassette( space->machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
+	mo6_update_cart_bank(space->machine);							/* bit 5: rom bank */
 	to7_game_sound_update();
 }
 
@@ -4593,7 +4593,7 @@ static const pia6821_interface mo6_sys =
 READ8_HANDLER ( mo6_gatearray_r )
 {
 	struct thom_vsignal v = thom_get_vsignal();
-	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, MO6_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( space->machine, MO6_LIGHTPEN_DECAL, to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
 	UINT8 res;
 	count = to7_lightpen ? l.count : v.count;
@@ -4614,7 +4614,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( to7_lightpen )
 		{
-			thom_firq_2( machine, 0 );
+			thom_firq_2( space->machine, 0 );
 			to8_lightpen_intr = 0;
 			res =  count & 0xff;
 		}
@@ -4634,12 +4634,12 @@ READ8_HANDLER ( mo6_gatearray_r )
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_r: invalid offset %i\n", activecpu_get_previouspc(), offset );
+		logerror( "$%04x mo6_gatearray_r: invalid offset %i\n", cpu_get_previouspc(space->cpu), offset );
 		res = 0;
 	}
 
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 		  offset, 0xa7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -4650,7 +4650,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 WRITE8_HANDLER ( mo6_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 		  offset, 0xa7e4 + offset, data ));
 
 	switch ( offset )
@@ -4664,23 +4664,23 @@ WRITE8_HANDLER ( mo6_gatearray_w )
 		if ( to8_reg_sys1 & 0x10 )
 		{
 			to8_reg_ram = data;
-			mo6_update_ram_bank();
+			mo6_update_ram_bank(space->machine);
 		}
 		break;
 
 	case 2: /* cartridge register */
 		to8_reg_cart = data;
-		mo6_update_cart_bank(machine);
+		mo6_update_cart_bank(space->machine);
 		break;
 
 	case 3: /* system register 1 */
 		to8_reg_sys1 = data;
-		mo6_update_ram_bank();
-		mo6_update_cart_bank(machine);
+		mo6_update_ram_bank(space->machine);
+		mo6_update_cart_bank(space->machine);
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", activecpu_get_previouspc(), offset, data );
+		logerror( "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", cpu_get_previouspc(space->cpu), offset, data );
 	}
 }
 
@@ -4693,14 +4693,14 @@ READ8_HANDLER ( mo6_vreg_r )
 {
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( to8_reg_ram & 0x80 ) )
-		return to7_floppy_r( machine, 0xc );
+		return to7_floppy_r( space, 0xc );
 
 	switch ( offset )
 	{
 
 	case 0: /* palette data */
 	case 1: /* palette address */
-		return to8_vreg_r( machine, offset );
+		return to8_vreg_r( space, offset );
 
 	case 2:
 	case 3:
@@ -4717,7 +4717,7 @@ READ8_HANDLER ( mo6_vreg_r )
 WRITE8_HANDLER ( mo6_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  activecpu_get_previouspc(), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
 		  offset, 0xa7da + offset, data ));
 
 	switch ( offset )
@@ -4725,12 +4725,12 @@ WRITE8_HANDLER ( mo6_vreg_w )
 
 	case 0: /* palette data */
 	case 1: /* palette address */
-		to8_vreg_w( machine, offset, data );
+		to8_vreg_w( space, offset, data );
 		return;
 
 	case 2: /* display / external floppy register */
 		if ( ( to8_reg_sys1 & 0x80 ) && ( to8_reg_ram & 0x80 ) )
-			to7_floppy_w( machine, 0xc, data );
+			to7_floppy_w( space, 0xc, data );
 		else
 			to9_set_video_mode( data, 2 );
 		break;
@@ -4738,13 +4738,13 @@ WRITE8_HANDLER ( mo6_vreg_w )
 	case 3: /* system register 2 */
 		/* 0xa7dc from external floppy drive aliases the video gate-array */
 		if ( ( offset == 3 ) && ( to8_reg_ram & 0x80 ) )
-			to7_floppy_w( machine, 0xc, data );
+			to7_floppy_w( space, 0xc, data );
 		else
 		{
 			to8_reg_sys2 = data;
 			thom_set_video_page( data >> 6 );
 			thom_set_border_color( data & 15 );
-			mo6_update_cart_bank(machine);
+			mo6_update_cart_bank(space->machine);
 		}
 		break;
 
@@ -4788,13 +4788,13 @@ MACHINE_RESET ( mo6 )
 	thom_set_video_mode( THOM_VMODE_MO5 );
 	thom_set_lightpen_callback( 3, to8_lightpen_cb );
 	thom_set_border_color( 0 );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	pia_set_input_ca1( THOM_PIA_SYS, 0 );
 
 	/* memory */
 	to8_cart_vpage = 0;
 	to8_data_vpage = 0;
-	mo6_update_ram_bank();
+	mo6_update_ram_bank(machine);
 	mo6_update_cart_bank(machine);
 	/* mo5_reg_cart not reset */
 	/* thom_cart_bank not reset */
@@ -4825,23 +4825,23 @@ MACHINE_START ( mo6 )
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
 	thom_vram = mess_ram;
-	memory_configure_bank( THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 8, 8, mess_ram, 0x4000 );
-	memory_configure_bank( THOM_VRAM_BANK, 0, 2, mess_ram, 0x2000 );
-	memory_configure_bank( TO8_SYS_LO,     0, 1, mess_ram + 0x6000, 0x4000 );
-	memory_configure_bank( TO8_SYS_HI,     0, 1, mess_ram + 0x4000, 0x4000 );
-	memory_configure_bank( TO8_DATA_LO,    0, 8, mess_ram + 0x2000, 0x4000 );
-	memory_configure_bank( TO8_DATA_HI,    0, 8, mess_ram + 0x0000, 0x4000 );
-	memory_configure_bank( TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
-	memory_set_bank( THOM_CART_BANK, 0 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
-	memory_set_bank( TO8_SYS_LO,  0 );
-	memory_set_bank( TO8_SYS_HI,  0 );
-	memory_set_bank( TO8_DATA_LO, 0 );
-	memory_set_bank( TO8_DATA_HI, 0 );
-	memory_set_bank( TO8_BIOS_BANK, 0 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, mess_ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, mess_ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, mess_ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, mess_ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, mess_ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, mess_ram + 0x0000, 0x4000 );
+	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, TO8_SYS_LO,  0 );
+	memory_set_bank( machine, TO8_SYS_HI,  0 );
+	memory_set_bank( machine, TO8_DATA_LO, 0 );
+	memory_set_bank( machine, TO8_DATA_HI, 0 );
+	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
@@ -4874,12 +4874,12 @@ MACHINE_START ( mo6 )
 READ8_HANDLER ( mo5nr_net_r )
 {
 	if ( to7_controller_type )
-		return to7_floppy_r ( machine, offset );
+		return to7_floppy_r ( space, offset );
 
-	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset );
+	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset );
 
 	if ( to7_controller_type )
-		return to7_floppy_r ( machine, offset );
+		return to7_floppy_r ( space, offset );
 
 	return 0;
 }
@@ -4889,10 +4889,10 @@ READ8_HANDLER ( mo5nr_net_r )
 WRITE8_HANDLER ( mo5nr_net_w )
 {
 	if ( to7_controller_type )
-		to7_floppy_w ( machine, offset, data );
+		to7_floppy_w ( space, offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
-			  activecpu_get_previouspc(), attotime_to_double(timer_get_time()), data, offset );
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data, offset );
 }
 
 
@@ -4920,7 +4920,7 @@ READ8_HANDLER ( mo5nr_prn_r )
 			return 0x80;
 
 	default:
-		logerror( "$%04x %f mo5nr_prn_r: unhandled read from reg %i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset );
+		logerror( "$%04x %f mo5nr_prn_r: unhandled read from reg %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset );
 		return 0;
 	}
 }
@@ -4942,7 +4942,7 @@ WRITE8_HANDLER ( mo5nr_prn_w )
 		break;
 
 	default:
-		logerror( "$%04x %f mo5nr_prn_w: unhandled to reg %i (data=$%02X)\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), offset, data );
+		logerror( "$%04x %f mo5nr_prn_w: unhandled to reg %i (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset, data );
 	}
 }
 
@@ -4961,7 +4961,7 @@ static READ8_HANDLER ( mo5nr_sys_portb_in )
 	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 	
-	return ( input_port_read(machine, keynames[lin]) & (1 << col) ) ? 0x80 : 0; 
+	return ( input_port_read(space->machine, keynames[lin]) & (1 << col) ) ? 0x80 : 0; 
 	/* bit 7: key up */
 }
 
@@ -4970,10 +4970,10 @@ static READ8_HANDLER ( mo5nr_sys_portb_in )
 static WRITE8_HANDLER ( mo5nr_sys_porta_out )
 {
 	/* no keyboard LED */
-	thom_set_mode_point( data & 1 );						/* bit 0: video bank switch */
+	thom_set_mode_point( space->machine, data & 1 );						/* bit 0: video bank switch */
 	to7_game_mute = data & 4;								/* bit 2: sound mute */
-	mo5_set_cassette( machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
-	mo6_update_cart_bank(machine);							/* bit 5: rom bank */
+	mo5_set_cassette( space->machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
+	mo6_update_cart_bank(space->machine);							/* bit 5: rom bank */
 	to7_game_sound_update();
 }
 
@@ -5062,13 +5062,13 @@ MACHINE_RESET ( mo5nr )
 	thom_set_video_mode( THOM_VMODE_MO5 );
 	thom_set_lightpen_callback( 3, to8_lightpen_cb );
 	thom_set_border_color( 0 );
-	thom_set_mode_point( 0 );
+	thom_set_mode_point( machine, 0 );
 	pia_set_input_ca1( THOM_PIA_SYS, 0 );
 
 	/* memory */
 	to8_cart_vpage = 0;
 	to8_data_vpage = 0;
-	mo6_update_ram_bank();
+	mo6_update_ram_bank(machine);
 	mo6_update_cart_bank(machine);
 	/* mo5_reg_cart not reset */
 	/* thom_cart_bank not reset */
@@ -5099,23 +5099,23 @@ MACHINE_START ( mo5nr )
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
 	thom_vram = mess_ram;
-	memory_configure_bank( THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( THOM_CART_BANK, 8, 8, mess_ram, 0x4000 );
-	memory_configure_bank( THOM_VRAM_BANK, 0, 2, mess_ram, 0x2000 );
-	memory_configure_bank( TO8_SYS_LO,     0, 1, mess_ram + 0x6000, 0x4000 );
-	memory_configure_bank( TO8_SYS_HI,     0, 1, mess_ram + 0x4000, 0x4000 );
-	memory_configure_bank( TO8_DATA_LO,    0, 8, mess_ram + 0x2000, 0x4000 );
-	memory_configure_bank( TO8_DATA_HI,    0, 8, mess_ram + 0x0000, 0x4000 );
-	memory_configure_bank( TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
-	memory_set_bank( THOM_CART_BANK, 0 );
-	memory_set_bank( THOM_VRAM_BANK, 0 );
-	memory_set_bank( TO8_SYS_LO,  0 );
-	memory_set_bank( TO8_SYS_HI,  0 );
-	memory_set_bank( TO8_DATA_LO, 0 );
-	memory_set_bank( TO8_DATA_HI, 0 );
-	memory_set_bank( TO8_BIOS_BANK, 0 );
+	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, mess_ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, mess_ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, mess_ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, mess_ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, mess_ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, mess_ram + 0x0000, 0x4000 );
+	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
+	memory_set_bank( machine, THOM_CART_BANK, 0 );
+	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	memory_set_bank( machine, TO8_SYS_LO,  0 );
+	memory_set_bank( machine, TO8_SYS_HI,  0 );
+	memory_set_bank( machine, TO8_DATA_LO, 0 );
+	memory_set_bank( machine, TO8_DATA_HI, 0 );
+	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
 	state_save_register_global( thom_cart_nb_banks );
