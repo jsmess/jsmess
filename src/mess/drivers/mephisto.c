@@ -85,9 +85,9 @@ static READ8_HANDLER(read_keys)
 
 	data = 0xff;
 	if (((led_status & 0x80) == 0x00))
-		data=input_port_read(machine, keynames[0][offset]);
+		data=input_port_read(space->machine, keynames[0][offset]);
 	else
-		data=input_port_read(machine, keynames[1][offset]);
+		data=input_port_read(space->machine, keynames[1][offset]);
 
 	logerror("Keyboard Port = %s Data = %d\n  ", ((led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
