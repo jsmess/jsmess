@@ -145,7 +145,7 @@ const struct pit8253_config at_pit8254_config =
 static void at_set_gate_a20(int a20)
 {
 	/* set the CPU's A20 line */
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_A20, a20);
+	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_A20, a20);
 }
 
 

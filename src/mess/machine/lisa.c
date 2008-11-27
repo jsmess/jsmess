@@ -423,7 +423,7 @@ static void scan_keyboard(running_machine *machine)
 						if (keycode == NMIcode)
 						{	/* generate NMI interrupt */
 							cpu_set_input_line(machine->cpu[0], M68K_IRQ_7, PULSE_LINE);
-							cpunum_set_input_line_vector(0, M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							cpu_set_input_line_vector(machine->cpu[0], M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
 						COPS_queue_data(machine, & keycode, 1);

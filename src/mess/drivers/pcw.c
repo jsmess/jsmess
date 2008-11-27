@@ -754,7 +754,7 @@ static DRIVER_INIT(pcw)
 {
 	pcw_boot = 1;
 
-	cpunum_set_input_line_vector(0, 0,0x0ff);
+	cpu_set_input_line_vector(machine->cpu[0], 0,0x0ff);
 
 
 	/* ram paging is actually undefined at power-on */

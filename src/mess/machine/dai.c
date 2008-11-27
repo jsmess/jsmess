@@ -82,7 +82,7 @@ static void dai_interrupt_callback(int intreq, UINT8 vector)
 	if (intreq)
 		cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, vector);
 	else
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static const tms5501_init_param dai_tms5501_init_param =

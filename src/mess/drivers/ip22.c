@@ -169,7 +169,7 @@ static void int3_raise_local1_irq(UINT8 source_mask)
 	// if it's not masked, also assert it now at the CPU
 	if (int3_regs[2] & source_mask)
 	{
-		cpunum_set_input_line(Machine, 0, MIPS3_IRQ1, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[0], MIPS3_IRQ1, ASSERT_LINE);
 	}
 }
 

@@ -66,14 +66,14 @@ static unsigned char * Enterprise_Pages_Write[256];
 static int Enterprise_KeyboardLine = 0;
 
 /* set read/write pointers for CPU page */
-static void	Enterprise_SetMemoryPage(int CPU_Page, int EP_Page)
+static void	Enterprise_SetMemoryPage(running_machine *machine, int CPU_Page, int EP_Page)
 {
-	memory_set_bankptr((CPU_Page+1), Enterprise_Pages_Read[EP_Page & 0x0ff]);
-	memory_set_bankptr((CPU_Page+5), Enterprise_Pages_Write[EP_Page & 0x0ff]);
+	memory_set_bankptr(machine, (CPU_Page+1), Enterprise_Pages_Read[EP_Page & 0x0ff]);
+	memory_set_bankptr(machine, (CPU_Page+5), Enterprise_Pages_Write[EP_Page & 0x0ff]);
 }
 
 /* EP specific handling of dave register write */
-static void enterprise_dave_reg_write(int RegIndex, int Data)
+static void enterprise_dave_reg_write(running_machine *machine, int RegIndex, int Data)
 {
 	switch (RegIndex)
 	{
@@ -81,28 +81,28 @@ static void enterprise_dave_reg_write(int RegIndex, int Data)
 	case 0x010:
 		{
 		  /* set CPU memory page 0 */
-			Enterprise_SetMemoryPage(0, Data);
+			Enterprise_SetMemoryPage(machine, 0, Data);
 		}
 		break;
 
 	case 0x011:
 		{
 		  /* set CPU memory page 1 */
-			Enterprise_SetMemoryPage(1, Data);
+			Enterprise_SetMemoryPage(machine, 1, Data);
 		}
 		break;
 
 	case 0x012:
 		{
 		  /* set CPU memory page 2 */
-			Enterprise_SetMemoryPage(2, Data);
+			Enterprise_SetMemoryPage(machine, 2, Data);
 		}
 		break;
 
 	case 0x013:
 		{
 		  /* set CPU memory page 3 */
-			Enterprise_SetMemoryPage(3, Data);
+			Enterprise_SetMemoryPage(machine, 3, Data);
 		}
 		break;
 
@@ -118,18 +118,16 @@ static void enterprise_dave_reg_write(int RegIndex, int Data)
 	}
 }
 
-static void enterprise_dave_reg_read(int RegIndex)
+static void enterprise_dave_reg_read(running_machine *machine, int RegIndex)
 {
 	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", 
 										"LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-	running_machine *machine = Machine;
-
 	switch (RegIndex)
 	{
 	case 0x015:
 		{
 		/* read keyboard line */
-		Dave_setreg(machine, 0x015, input_port_read(machine, keynames[Enterprise_KeyboardLine]));
+			Dave_setreg(machine, 0x015, input_port_read(machine, keynames[Enterprise_KeyboardLine]));
 		}
 		break;
 
@@ -156,12 +154,12 @@ static void enterprise_dave_reg_read(int RegIndex)
 	}
 }
 
-static void enterprise_dave_interrupt(int state)
+static void enterprise_dave_interrupt(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(Machine, 0,0,HOLD_LINE);
+		cpu_set_input_line(Machine->cpu[0],0,HOLD_LINE);
 	else
-		cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[0],0,CLEAR_LINE);
 }
 
 /* enterprise interface to dave - ok, so Dave chip is unique
@@ -180,6 +178,7 @@ static void enterp_wd177x_callback(running_machine *machine, wd17xx_state_t even
 static void enterprise_reset(running_machine *machine)
 {
 	int i;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	for (i=0; i<256; i++)
 	{
@@ -225,12 +224,12 @@ static void enterprise_reset(running_machine *machine)
 
 	Dave_SetIFace(&enterprise_dave_interface);
 
-	Dave_reg_w(machine, 0x010,0);
-	Dave_reg_w(machine, 0x011,0);
-	Dave_reg_w(machine, 0x012,0);
-	Dave_reg_w(machine, 0x013,0);
+	Dave_reg_w(space, 0x010,0);
+	Dave_reg_w(space, 0x011,0);
+	Dave_reg_w(space, 0x012,0);
+	Dave_reg_w(space, 0x013,0);
 
-	cpunum_set_input_line_vector(0,0,0x0ff);
+	cpu_set_input_line_vector(machine->cpu[0],0,0x0ff);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
@@ -241,18 +240,18 @@ static MACHINE_START(enterprise)
 	add_reset_callback(machine, enterprise_reset);
 }
 
-static  READ8_HANDLER ( enterprise_wd177x_read )
+static READ8_HANDLER ( enterprise_wd177x_read )
 {
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd17xx_status_r(machine, offset);
+		return wd17xx_status_r(space, offset);
 	case 1:
-		return wd17xx_track_r(machine, offset);
+		return wd17xx_track_r(space, offset);
 	case 2:
-		return wd17xx_sector_r(machine, offset);
+		return wd17xx_sector_r(space, offset);
 	case 3:
-		return wd17xx_data_r(machine, offset);
+		return wd17xx_data_r(space, offset);
 	default:
 		break;
 	}
@@ -265,16 +264,16 @@ static WRITE8_HANDLER (	enterprise_wd177x_write )
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd17xx_command_w(machine, offset, data);
+		wd17xx_command_w(space, offset, data);
 		return;
 	case 1:
-		wd17xx_track_w(machine, offset, data);
+		wd17xx_track_w(space, offset, data);
 		return;
 	case 2:
-		wd17xx_sector_w(machine, offset, data);
+		wd17xx_sector_w(space, offset, data);
 		return;
 	case 3:
-		wd17xx_data_w(machine, offset, data);
+		wd17xx_data_w(space, offset, data);
 		return;
 	default:
 		break;

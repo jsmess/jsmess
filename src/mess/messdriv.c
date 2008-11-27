@@ -575,7 +575,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( einstei2 )
 
 	/* INTELLIGENT SOFTWARE */
-//128u4	DRIVER( ep128 )		/* Enterprise 128 k									*/
+	DRIVER( ep128 )		/* Enterprise 128 k									*/
 
 	/* NON LINEAR SYSTEMS */
 //128u4	DRIVER( kaypro )	/* Kaypro 2X										*/

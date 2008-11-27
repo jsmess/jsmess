@@ -17,9 +17,9 @@ DAVE SOUND CHIP
 
 typedef struct DAVE_INTERFACE
 {
-	void (*reg_r)(int);
-	void (*reg_w)(int,int);
-	void (*int_callback)(int);
+	void (*reg_r)(running_machine *, int);
+	void (*reg_w)(running_machine *, int,int);
+	void (*int_callback)(running_machine *, int);
 } DAVE_INTERFACE;
 
 #define DAVE_FIFTY_HZ_COUNTER_RELOAD 20
@@ -90,16 +90,16 @@ enum
 	DAVE_INT2_ID
 };
 
-void	Dave_Init(running_machine *machine);
+void Dave_Init(running_machine *machine);
 /* set external int state */
-void	Dave_SetExternalIntState(int IntID, int State);
+void Dave_SetExternalIntState(running_machine *machine, int IntID, int State);
 
-extern int	Dave_getreg(int);
-extern WRITE8_HANDLER ( Dave_setreg );
+extern int Dave_getreg(int);
+extern void Dave_setreg(running_machine *machine, offs_t offset, UINT8 data);
 
-extern  READ8_HANDLER ( 	Dave_reg_r );
+extern READ8_HANDLER ( Dave_reg_r );
 extern WRITE8_HANDLER (	Dave_reg_w );
 
-void	Dave_SetIFace(const struct DAVE_INTERFACE *newInterface);
+void Dave_SetIFace(const struct DAVE_INTERFACE *newInterface);
 
 #endif

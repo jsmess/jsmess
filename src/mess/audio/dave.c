@@ -40,7 +40,7 @@ static void Dave_reset(void)
 }
 
 
-static void dave_refresh_ints(void)
+static void dave_refresh_ints(running_machine *machine)
 {
 	int int_wanted;
 
@@ -50,12 +50,12 @@ static void dave_refresh_ints(void)
 
 	if (dave_iface->int_callback)
 	{
-		dave_iface->int_callback(int_wanted);
+		dave_iface->int_callback(machine, int_wanted);
 	}
 }
 
 
-static void dave_refresh_selectable_int(void)
+static void dave_refresh_selectable_int(running_machine *machine)
 {
 	/* update 1kHz/50Hz/tg latch and int input */
 	switch ((dave.Regs[7]>>5) & 0x03)
@@ -89,7 +89,7 @@ static void dave_refresh_selectable_int(void)
 			break;
 	}
 
-	dave_refresh_ints();
+	dave_refresh_ints(machine);
 }
 
 static TIMER_CALLBACK(dave_1khz_callback)
@@ -113,7 +113,7 @@ static TIMER_CALLBACK(dave_1khz_callback)
 	{
 		/* these two lines are temp here */
 		nick_virq^=0x0ffffffff;
-		Dave_SetExternalIntState(DAVE_INT1_ID, nick_virq);
+		Dave_SetExternalIntState(machine, DAVE_INT1_ID, nick_virq);
 
 
 		dave.fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
@@ -143,12 +143,12 @@ static TIMER_CALLBACK(dave_1khz_callback)
 		}
 	}
 
-	dave_refresh_selectable_int();
+	dave_refresh_selectable_int(machine);
 }
 
 
 
-void	Dave_Init(running_machine *machine)
+void Dave_Init(running_machine *machine)
 {
 	int i;
 
@@ -323,7 +323,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 			count++;
 
 
-			dave.Period[channel_index] = ((STEP  * machine->sample_rate)/125000) * count;
+			dave.Period[channel_index] = ((STEP  * space->machine->sample_rate)/125000) * count;
 
 		}
 		break;
@@ -484,7 +484,7 @@ WRITE8_HANDLER ( Dave_reg_w )
 {
 	logerror("dave w: %04x %02x\n",offset,data);
 
-	Dave_sound_w(machine, offset, data);
+	Dave_sound_w(space, offset, data);
 
 	dave.Regs[offset & 0x01f] = data;
 
@@ -492,7 +492,7 @@ WRITE8_HANDLER ( Dave_reg_w )
 	{
 		case 0x07:
 		{
-			dave_refresh_selectable_int();
+			dave_refresh_selectable_int(space->machine);
 		}
 		break;
 
@@ -510,7 +510,7 @@ WRITE8_HANDLER ( Dave_reg_w )
 			}
 
 			/* refresh ints */
-			dave_refresh_ints();
+			dave_refresh_ints(space->machine);
 		}
 		break;
 
@@ -520,12 +520,12 @@ WRITE8_HANDLER ( Dave_reg_w )
 
 	if (dave_iface!=NULL)
 	{
-		dave_iface->reg_w(offset, data);
+		dave_iface->reg_w(space->machine, offset, data);
 	}
 }
 
 
-WRITE8_HANDLER ( Dave_setreg )
+void Dave_setreg(running_machine *machine, offs_t offset, UINT8 data)
 {
 	dave.Regs[offset & 0x01f] = data;
 }
@@ -536,7 +536,7 @@ READ8_HANDLER (	Dave_reg_r )
 
 	if (dave_iface!=NULL)
 	{
-		dave_iface->reg_r(offset);
+		dave_iface->reg_r(space->machine, offset);
 	}
 
 	switch (offset)
@@ -579,7 +579,7 @@ READ8_HANDLER (	Dave_reg_r )
 }
 
 /* negative edge triggered */
-void	Dave_SetExternalIntState(int IntID, int State)
+void	Dave_SetExternalIntState(running_machine *machine, int IntID, int State)
 {
 	switch (IntID)
 	{
@@ -606,7 +606,7 @@ void	Dave_SetExternalIntState(int IntID, int State)
 					/* int request */
 					dave.int_latch |= (1<<5);
 
-					dave_refresh_ints();
+					dave_refresh_ints(machine);
 				}
 			}
 
@@ -635,7 +635,7 @@ void	Dave_SetExternalIntState(int IntID, int State)
 					/* int request */
 					dave.int_latch|=(1<<7);
 
-					dave_refresh_ints();
+					dave_refresh_ints(machine);
 				}
 			}
 		}

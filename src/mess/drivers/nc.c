@@ -879,7 +879,7 @@ static void	nc100_tc8521_alarm_callback(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(Machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 

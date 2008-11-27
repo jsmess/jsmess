@@ -1340,7 +1340,7 @@ static void poll_mouse(running_machine *machine)
 static void tms9901_interrupt_callback(int intreq, int ic)
 {
 	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
-	cpunum_set_input_line(Machine, 0, 0, intreq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[0], 0, intreq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*

@@ -2244,7 +2244,7 @@ static void tms9901_interrupt_callback(int intreq, int ic)
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[0], 0, CLEAR_LINE);
 	}
 }
 
