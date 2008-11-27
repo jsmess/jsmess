@@ -4,7 +4,7 @@
 
 WRITE8_HANDLER( tmc600_vismac_register_w )
 {
-	tmc600_state *state = machine->driver_data;
+	tmc600_state *state = space->machine->driver_data;
 
 	state->vismac_reg_latch = data;
 }

@@ -88,8 +88,6 @@ Notes:
 #include "includes/tmc600.h"
 #include "video/cdp1869.h"
 
-static QUICKLOAD_LOAD( tmc600 );
-
 static const device_config *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, CASSETTE, "cassette");
@@ -99,7 +97,7 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 static WRITE8_HANDLER( keyboard_latch_w )
 {
-	tmc600_state *state = machine->driver_data;
+	tmc600_state *state = space->machine->driver_data;
 
 	state->keylatch = data;
 }
@@ -111,7 +109,7 @@ static const device_config *printer_device(running_machine *machine)
 
 static WRITE8_HANDLER( printer_w )
 {
-	printer_output(printer_device(machine), data);
+	printer_output(printer_device(space->	machine), data);
 }
 
 /* Memory Maps */
@@ -228,7 +226,7 @@ INPUT_PORTS_END
 
 static CDP1802_MODE_READ( tmc600_mode_r )
 {
-	if (input_port_read(machine, "RUN") & 0x01)
+	if (input_port_read(device->machine, "RUN") & 0x01)
 	{
 		return CDP1802_MODE_RESET;
 	}
@@ -240,7 +238,7 @@ static CDP1802_MODE_READ( tmc600_mode_r )
 
 static CDP1802_EF_READ( tmc600_ef_r )
 {
-	tmc600_state *state = machine->driver_data;
+	tmc600_state *state = device->machine->driver_data;
 
 	int flags = 0x0f;
 	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
@@ -254,18 +252,18 @@ static CDP1802_EF_READ( tmc600_ef_r )
 
 	// tape in
 
-	if (cassette_input(cassette_device_image(machine)) < +0.0) flags -= EF2;
+	if (cassette_input(cassette_device_image(device->machine)) < +0.0) flags -= EF2;
 
 	// keyboard
 
-	flags -= (~input_port_read(machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) ? EF3 : 0;
+	flags -= (~input_port_read(device->machine, keynames[state->keylatch / 8]) & (1 << (state->keylatch % 8))) ? EF3 : 0;
 
 	return flags;
 }
 
 static CDP1802_Q_WRITE( tmc600_q_w )
 {
-	cassette_output(cassette_device_image(machine), level ? +1.0 : -1.0);
+	cassette_output(cassette_device_image(device->machine), level ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( tmc600_cdp1802_config )
@@ -352,9 +350,6 @@ static MACHINE_DRIVER_START( tmc600 )
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
-	/* quickload */
-	MDRV_QUICKLOAD_ADD(tmc600, "sbp", 0)
-
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", tmc600_cassette_config )
 MACHINE_DRIVER_END
@@ -386,15 +381,6 @@ ROM_START( tmc600s2 )
 ROM_END
 
 /* System Configuration */
-
-static QUICKLOAD_LOAD( tmc600 )
-{
-	void *ptr = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x6300);
-
-	image_fread(image, ptr, 0x9500);
-
-	return INIT_PASS;
-}
 
 static void tmc600_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {

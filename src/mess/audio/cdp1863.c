@@ -132,7 +132,6 @@ static void cdp1863_sound_update(const device_config *device, stream_sample_t **
 static DEVICE_START( cdp1863 )
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -147,12 +146,10 @@ static DEVICE_START( cdp1863 )
 	cdp1863->oe = 1;
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "CDP1863", device->tag);
-
-	state_save_register_item(unique_tag, 0, cdp1863->oe);
-	state_save_register_item(unique_tag, 0, cdp1863->latch);
-	state_save_register_item(unique_tag, 0, cdp1863->signal);
-	state_save_register_item(unique_tag, 0, cdp1863->incr);
+	state_save_register_item("cdp1863", device->tag, 0, cdp1863->oe);
+	state_save_register_item("cdp1863", device->tag, 0, cdp1863->latch);
+	state_save_register_item("cdp1863", device->tag, 0, cdp1863->signal);
+	state_save_register_item("cdp1863", device->tag, 0, cdp1863->incr);
 
 	return DEVICE_START_OK;
 }

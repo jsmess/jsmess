@@ -204,14 +204,14 @@ INPUT_PORTS_END
 
 static CDP1802_MODE_READ( comx35_mode_r )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = device->machine->driver_data;
 
 	return state->cdp1802_mode;
 }
 
 static CDP1802_EF_READ( comx35_ef_r )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = device->machine->driver_data;
 
 	int flags = 0x0f;
 
@@ -240,14 +240,14 @@ static CDP1802_EF_READ( comx35_ef_r )
 	if (!state->cdp1871_efxa) flags -= EF3;
 
 	// cassette input, expansion device flag
-	if ((cassette_input(cassette_device_image(machine)) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
+	if ((cassette_input(cassette_device_image(device->machine)) < +0.0) || !state->cdp1802_ef4) flags -= EF4;
 
 	return flags;
 }
 
 static CDP1802_SC_WRITE( comx35_sc_w )
 {
-	comx35_state *driver_state = machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data;
 
 	switch (state)
 	{
@@ -263,7 +263,7 @@ static CDP1802_SC_WRITE( comx35_sc_w )
 
 			if (!driver_state->iden)
 			{
-				cpu_set_input_line(machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+				cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
 			}
 		}
 		else
@@ -274,19 +274,19 @@ static CDP1802_SC_WRITE( comx35_sc_w )
 
 	case CDP1802_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cpu_set_input_line(machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 
 	case CDP1802_STATE_CODE_S3_INTERRUPT:
 		// interrupt acknowledge clears the INT request
-		cpu_set_input_line(machine->cpu[0], CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 		break;
 	}
 }
 
 static CDP1802_Q_WRITE( comx35_q_w )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = device->machine->driver_data;
 
 	state->cdp1802_q = level;
 
@@ -297,7 +297,7 @@ static CDP1802_Q_WRITE( comx35_q_w )
 	}
 
 	// cassette output
-	cassette_output(cassette_device_image(machine), level ? +1.0 : -1.0);
+	cassette_output(cassette_device_image(device->machine), level ? +1.0 : -1.0);
 }
 
 static CDP1802_INTERFACE( comx35_cdp1802_config )

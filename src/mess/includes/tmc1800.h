@@ -9,23 +9,27 @@
 typedef struct _tmc1800_state tmc1800_state;
 struct _tmc1800_state
 {
+	/* cpu state */
+	int reset;				/* reset activated */
+
 	/* video state */
 	int cdp1861_efx;		/* EFx */
 
 	/* keyboard state */
 	int keylatch;			/* key latch */
-	int reset;				/* reset activated */
+
+	/* devices */
+	const device_config *cdp1861;
 };
 
 typedef struct _osc1000b_state osc1000b_state;
 struct _osc1000b_state
 {
-	/* video state */
-	int cdp1861_efx;		/* EFx */
+	/* cpu state */
+	int reset;				/* reset activated */
 
 	/* keyboard state */
 	int keylatch;			/* key latch */
-	int reset;				/* reset activated */
 };
 
 typedef struct _tmc2000_state tmc2000_state;
@@ -33,12 +37,15 @@ struct _tmc2000_state
 {
 	/* video state */
 	int cdp1864_efx;		/* EFx */
+	int reset;				/* reset activated */
 
 	UINT8 *colorram;		/* color memory */
 
 	/* keyboard state */
 	int keylatch;			/* key latch */
-	int reset;				/* reset activated */
+
+	/* devices */
+	const device_config *cdp1864;
 };
 
 typedef struct _oscnano_state oscnano_state;
@@ -46,16 +53,19 @@ struct _oscnano_state
 {
 	/* cpu state */
 	int monitor_ef4;		/* EF4 line */
+	int reset;				/* reset activated */
 
 	/* video state */
 	int cdp1864_efx;		/* EFx */
 
 	/* keyboard state */
 	int keylatch;			/* key latch */
-	int reset;				/* reset activated */
 
 	/* timers */
 	emu_timer *ef4_timer;	/* EF4 line RC timer */
+
+	/* devices */
+	const device_config *cdp1864;
 };
 
 /* ---------- defined in video/tmc1800.c ---------- */

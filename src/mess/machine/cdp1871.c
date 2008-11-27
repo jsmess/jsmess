@@ -291,7 +291,6 @@ INPUT_PORTS_END
 static DEVICE_START( cdp1871 )
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -313,17 +312,15 @@ static DEVICE_START( cdp1871 )
 	timer_adjust_periodic(cdp1871->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cdp1871->intf->clock));
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "CDP1871", device->tag);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->inhibit);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->sense);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->drive);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->modifiers);
 
-	state_save_register_item(unique_tag, 0, cdp1871->inhibit);
-	state_save_register_item(unique_tag, 0, cdp1871->sense);
-	state_save_register_item(unique_tag, 0, cdp1871->drive);
-	state_save_register_item(unique_tag, 0, cdp1871->modifiers);
-
-	state_save_register_item(unique_tag, 0, cdp1871->da);
-	state_save_register_item(unique_tag, 0, cdp1871->next_da);
-	state_save_register_item(unique_tag, 0, cdp1871->rpt);
-	state_save_register_item(unique_tag, 0, cdp1871->next_rpt);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->da);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->next_da);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->rpt);
+	state_save_register_item("cdp1871", device->tag, 0, cdp1871->next_rpt);
 	return DEVICE_START_OK;
 }
 

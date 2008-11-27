@@ -173,9 +173,9 @@ static void comx35_fdc_callback(running_machine *machine, wd17xx_state_t event, 
 	}
 }
 
-static UINT8 fdc_r(running_machine *machine)
+static UINT8 fdc_r(const address_space *space)
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = space->machine->driver_data;
 
 	UINT8 data;
 
@@ -185,13 +185,13 @@ static UINT8 fdc_r(running_machine *machine)
 	}
 	else
 	{
-		data = wd17xx_r(machine, state->fdc_addr);
+		data = wd17xx_r(space, state->fdc_addr);
 	}
 
 	return data;
 }
 
-static void fdc_w(running_machine *machine, UINT8 data)
+static void fdc_w(const address_space *space, UINT8 data)
 {
 	/*
 
@@ -206,7 +206,7 @@ static void fdc_w(running_machine *machine, UINT8 data)
 
 	*/
 
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = space->machine->driver_data;
 
 	if (state->cdp1802_q)
 	{
@@ -236,7 +236,7 @@ static void fdc_w(running_machine *machine, UINT8 data)
 	{
 		// write data to WD1770
 
-		wd17xx_w(machine, state->fdc_addr, data);
+		wd17xx_w(space, state->fdc_addr, data);
 	}
 }
 
@@ -356,52 +356,53 @@ static void get_active_bank(running_machine *machine, UINT8 data)
 static void set_active_bank(running_machine *machine)
 {
 	comx35_state *state = machine->driver_data;
+	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int bank = state->bank;
 
 	switch (state->bank)
 	{
 	case BANK_NONE:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_FLOPPY:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_PARALLEL:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc800, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_PARALLEL_FM:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xd000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_SERIAL:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc800, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_THERMAL:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xd000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_JOYCARD:
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_80_COLUMNS:
 		{
 			const device_config *mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
 
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP); // ROM
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd000, 0xd7ff, 0, 0, comx35_videoram_r, comx35_videoram_w);
-			memory_install_readwrite8_device_handler(mc6845, 0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xd800, 0, 0, SMH_UNMAP, mc6845_address_w);
-			memory_install_readwrite8_device_handler(mc6845, 0, ADDRESS_SPACE_PROGRAM, 0xd801, 0xd801, 0, 0, mc6845_register_r, mc6845_register_w);
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd802, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP); // ROM
+			memory_install_readwrite8_handler(program, 0xc800, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite8_handler(program, 0xd000, 0xd7ff, 0, 0, comx35_videoram_r, comx35_videoram_w);
+			memory_install_readwrite8_device_handler(program, mc6845, 0xd800, 0xd800, 0, 0, SMH_UNMAP, mc6845_address_w);
+			memory_install_readwrite8_device_handler(program, mc6845, 0xd801, 0xd801, 0, 0, mc6845_register_r, mc6845_register_w);
+			memory_install_readwrite8_handler(program, 0xd802, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
 		break;
 
@@ -409,7 +410,7 @@ static void set_active_bank(running_machine *machine)
 		{
 			bank = BANK_RAMCARD + state->rambank;
 
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_BANK1, SMH_BANK1);
+			memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK1, SMH_BANK1);
 		}
 		break;
 	}
@@ -419,13 +420,13 @@ static void set_active_bank(running_machine *machine)
 
 WRITE8_HANDLER( comx35_bank_select_w )
 {
-	get_active_bank(machine, data);
-	set_active_bank(machine);
+	get_active_bank(space->machine, data);
+	set_active_bank(space->machine);
 }
 
 READ8_HANDLER( comx35_io_r )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = space->machine->driver_data;
 
 	UINT8 data = 0xff;
 
@@ -435,18 +436,18 @@ READ8_HANDLER( comx35_io_r )
 		break;
 
 	case BANK_FLOPPY:
-		data = fdc_r(machine);
+		data = fdc_r(space);
 		break;
 
 	case BANK_PRINTER_PARALLEL:
 	case BANK_PRINTER_PARALLEL_FM:
 	case BANK_PRINTER_SERIAL:
 	case BANK_PRINTER_THERMAL:
-		data = printer_r(machine);
+		data = printer_r(space->machine);
 		break;
 
 	case BANK_JOYCARD:
-		data = input_port_read(machine, "JOY1");
+		data = input_port_read(space->machine, "JOY1");
 		break;
 
 	case BANK_80_COLUMNS:
@@ -461,7 +462,7 @@ READ8_HANDLER( comx35_io_r )
 
 READ8_HANDLER( comx35_io2_r )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = space->machine->driver_data;
 
 	UINT8 data = 0xff;
 
@@ -480,7 +481,7 @@ READ8_HANDLER( comx35_io2_r )
 		break;
 
 	case BANK_JOYCARD:
-		data = input_port_read(machine, "JOY2");
+		data = input_port_read(space->machine, "JOY2");
 		break;
 
 	case BANK_80_COLUMNS:
@@ -495,7 +496,7 @@ READ8_HANDLER( comx35_io2_r )
 
 WRITE8_HANDLER( comx35_io_w )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *state = space->machine->driver_data;
 
 	switch (state->bank)
 	{
@@ -503,14 +504,14 @@ WRITE8_HANDLER( comx35_io_w )
 		break;
 
 	case BANK_FLOPPY:
-		fdc_w(machine, data);
+		fdc_w(space, data);
 		break;
 
 	case BANK_PRINTER_PARALLEL:
 	case BANK_PRINTER_PARALLEL_FM:
 	case BANK_PRINTER_SERIAL:
 	case BANK_PRINTER_THERMAL:
-		printer_w(machine, data);
+		printer_w(space->machine, data);
 		break;
 
 	case BANK_JOYCARD:
@@ -537,10 +538,10 @@ static DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 {
 	if (address >= 0x0dd0 && address <= 0x0ddf)
 	{
-		if (dos_card_active(machine))
+		if (dos_card_active(space->machine))
 		{
 			// read opcode from DOS ROM
-			direct->raw = direct->decrypted = memory_region(machine, "fdc");
+			direct->raw = direct->decrypted = memory_region(space->machine, "fdc");
 			return ~0;
 		}
 	}
@@ -556,28 +557,29 @@ static STATE_POSTLOAD( comx35_state_save_postload )
 MACHINE_START( comx35p )
 {
 	comx35_state *state = machine->driver_data;
+	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* opbase handling for DOS Card */
 
-	memory_set_direct_update_handler(0, comx35_opbase_handler);
+	memory_set_direct_update_handler(program, comx35_opbase_handler);
 
 	/* BASIC ROM banking */
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x17ff, 0, 0, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(program, 0x1000, 0x17ff, 0, 0, SMH_BANK2, SMH_UNMAP);
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x1000, 0); // normal ROM
 	memory_configure_bank(machine, 2, 1, 1, memory_region(machine, CDP1802_TAG) + 0xe000, 0); // expansion box ROM
 
 	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, CDP1802_TAG) + 0xe000, 0);
-	memory_set_bank(3, 0);
+	memory_set_bank(machine, 3, 0);
 
 	if (expansion_box_installed(machine))
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xefff, 0, 0, SMH_BANK3, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xe000, 0xefff, 0, 0, SMH_BANK3, SMH_UNMAP);
 		memory_set_bank(machine, 2, 1);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xefff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xe000, 0xefff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		memory_set_bank(machine, 2, 0);
 	}
 
@@ -669,13 +671,15 @@ INPUT_CHANGED( comx35_reset )
 
 static void image_fread_memory(const device_config *image, UINT16 addr, UINT32 count)
 {
-	void *ptr = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, addr);
+	void *ptr = memory_get_write_ptr(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr);
 
 	image_fread(image, ptr, count);
 }
 
 QUICKLOAD_LOAD( comx35 )
 {
+	const address_space *program = cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	UINT8 header[16] = {0};
 	int size = image_length(image);
 
@@ -799,16 +803,16 @@ QUICKLOAD_LOAD( comx35 )
 			image_fread(image, header, 2);
 
 			array_length = (header[0] << 8) | header[1];
-			start_array = (memory_read_byte(space, 0x4295) << 8) | memory_read_byte(space, 0x4296);
+			start_array = (memory_read_byte(program, 0x4295) << 8) | memory_read_byte(program, 0x4296);
 			end_array = start_array + (size - 7);
 
-			memory_write_byte(space, 0x4299, end_array >> 8);
-			memory_write_byte(space, 0x429a, end_array & 0xff);
+			memory_write_byte(program, 0x4299, end_array >> 8);
+			memory_write_byte(program, 0x429a, end_array & 0xff);
 			
 			start_string = start_array + array_length;
 
-			memory_write_byte(space, 0x4292, start_string >> 8);
-			memory_write_byte(space, 0x4293, start_string & 0xff);
+			memory_write_byte(program, 0x4292, start_string >> 8);
+			memory_write_byte(program, 0x4293, start_string & 0xff);
 
 			image_fread_memory(image, start_array, size);
 		}

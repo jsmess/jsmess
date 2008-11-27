@@ -248,7 +248,7 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 
 static VIDEO_UPDATE( studio2 )
 {
-	const device_config *cdp1861 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1861, CDP1861_TAG);
+	const device_config *cdp1861 = devtag_get_device(screen->machine, CDP1861, CDP1861_TAG);
 
 	cdp1861_update(cdp1861, bitmap, cliprect);
 
@@ -288,7 +288,7 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 static VIDEO_UPDATE( mpt02 )
 {
-	const device_config *cdp1864 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1864, CDP1864_TAG);
+	const device_config *cdp1864 = devtag_get_device(screen->machine, CDP1864, CDP1864_TAG);
 
 	cdp1864_update(cdp1864, bitmap, cliprect);
 
@@ -310,8 +310,8 @@ static CDP1802_EF_READ( studio2_ef_r )
 
 	if (cdp1861_efx) ef -= EF1;
 
-	if (input_port_read(machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (input_port_read(machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(device->machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(device->machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }
@@ -323,7 +323,7 @@ static CDP1802_Q_WRITE( studio2_q_w )
 
 static CDP1802_DMA_WRITE( studio2_dma_w )
 {
-	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+	const device_config *cdp1861 = devtag_get_device(device->machine, CDP1861, CDP1861_TAG);
 
 	cdp1861_dma_w(cdp1861, data);
 }
@@ -344,15 +344,15 @@ static CDP1802_EF_READ( mpt02_ef_r )
 
 	if (cdp1864_efx) ef -= EF1;
 
-	if (input_port_read(machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (input_port_read(machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(device->machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
+	if (input_port_read(device->machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
 
 	return ef;
 }
 
 static CDP1802_DMA_WRITE( mpt02_dma_w )
 {
-	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
+	const device_config *cdp1864 = devtag_get_device(device->machine, CDP1864, CDP1864_TAG);
 
 	UINT8 color = colorram[ma / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
 
@@ -384,7 +384,8 @@ static MACHINE_START( studio2 )
 
 static MACHINE_RESET( studio2 )
 {
-	const device_config *cdp1861 = device_list_find_by_tag(machine->config->devicelist, CDP1861, CDP1861_TAG);
+	const device_config *cdp1861 = devtag_get_device(machine, CDP1861, CDP1861_TAG);
+	
 	cdp1861->reset(cdp1861);
 }
 
@@ -397,7 +398,8 @@ static MACHINE_START( mpt02 )
 
 static MACHINE_RESET( mpt02 )
 {
-	const device_config *cdp1864 = device_list_find_by_tag(machine->config->devicelist, CDP1864, CDP1864_TAG);
+	const device_config *cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
+	
 	cdp1864->reset(cdp1864);
 
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);

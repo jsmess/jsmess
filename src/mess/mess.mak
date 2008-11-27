@@ -381,15 +381,18 @@ DRVLIBS = \
 	$(MESSOBJ)/avigo.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bk.a \
+	$(MESSOBJ)/bondwell.a \
 	$(MESSOBJ)/cbm.a \
 	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/coleco.a \
+	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/ep128.a \
 	$(MESSOBJ)/exidy.a \
 	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/galaxy.a \
+	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/irisha.a \
@@ -416,6 +419,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pp01.a \
 	$(MESSOBJ)/primo.a \
 	$(MESSOBJ)/radio.a \
+	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sharp.a \
@@ -425,6 +429,7 @@ DRVLIBS = \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ssystem3.a \
 	$(MESSOBJ)/super80.a \
+	$(MESSOBJ)/telmac.a \
 	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vector06.a \
@@ -437,11 +442,9 @@ DRVLIBS = \
 #	$(MESSOBJ)/bally.a \
 #	$(MESSOBJ)/bandai.a \
 #	$(MESSOBJ)/be.a \
-#	$(MESSOBJ)/bondwell.a \
 #	$(MESSOBJ)/cgenie.a \
 #	$(MESSOBJ)/coco.a \
 #	$(MESSOBJ)/compis.a \
-#	$(MESSOBJ)/comx.a \
 #	$(MESSOBJ)/concept.a \
 #	$(MESSOBJ)/cpschngr.a \
 #	$(MESSOBJ)/cybiko.a \
@@ -452,7 +455,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/fairch.a \
 #	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/gmaster.a \
-#	$(MESSOBJ)/grundy.a \
 #	$(MESSOBJ)/hp48.a \
 #	$(MESSOBJ)/kaypro.a \
 #	$(MESSOBJ)/kim1.a \
@@ -466,7 +468,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/pasogo.a \
 #	$(MESSOBJ)/pc.a \
 #	$(MESSOBJ)/pdp1.a \
-#	$(MESSOBJ)/rca.a \
 #	$(MESSOBJ)/rockwell.a \
 #	$(MESSOBJ)/samcoupe.a \
 #	$(MESSOBJ)/sega.a \
@@ -478,7 +479,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/tangerin.a \
 #	$(MESSOBJ)/tatung.a \
 #	$(MESSOBJ)/teamconc.a \
-#	$(MESSOBJ)/telmac.a \
 #	$(MESSOBJ)/thomson.a \
 #	$(MESSOBJ)/ti85.a \
 #	$(MESSOBJ)/ti99.a \

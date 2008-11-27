@@ -236,17 +236,17 @@ static WRITE8_HANDLER( ramcard_bank_w )
 	UINT8 ramcard_bank = data & 0x0f;
 	UINT32 bank_offset = ramcard_bank * 0x8000;
 
-	if ((get_ramdisk_size(machine) == 256) && (ramcard_bank > 7))
+	if ((get_ramdisk_size(space->machine) == 256) && (ramcard_bank > 7))
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	}
 
-	memory_configure_bank(machine, 1, BANK_RAMCARD_RAM, 1, ramcard_ram + bank_offset, 0);
-	memory_set_bank(machine, 1, bank);
+	memory_configure_bank(space->machine, 1, BANK_RAMCARD_RAM, 1, ramcard_ram + bank_offset, 0);
+	memory_set_bank(space->machine, 1, bank);
 }
 
 /* Serial */
@@ -318,7 +318,7 @@ static void bw2_wd17xx_callback(running_machine *machine, wd17xx_state_t state, 
 			break;
 
 		case WD17XX_DRQ_SET:
-			if (cpunum_get_reg(0, Z80_HALT))
+			if (cpu_get_reg(machine->cpu[0], Z80_HALT))
 			{
 				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
 			}
@@ -330,19 +330,19 @@ static READ8_HANDLER( bw2_wd2797_r )
 {
 	UINT8 result = 0xff;
 
-	switch(offset & 0x03)
+	switch (offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_status_r(machine, 0);
+			result = wd17xx_status_r(space, 0);
 			break;
 		case 1:
-			result = wd17xx_track_r(machine, 0);
+			result = wd17xx_track_r(space, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(machine, 0);
+			result = wd17xx_sector_r(space, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(machine, 0);
+			result = wd17xx_data_r(space, 0);
 			break;
 	}
 
@@ -351,7 +351,7 @@ static READ8_HANDLER( bw2_wd2797_r )
 
 static WRITE8_HANDLER( bw2_wd2797_w )
 {
-	switch(offset & 0x3)
+	switch (offset & 0x3)
 	{
 		case 0:
 			/* disk side is encoded in bit 1 of Type II/III commands */
@@ -368,17 +368,17 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 				}
 			}
 
-			wd17xx_command_w(machine, 0, data);
+			wd17xx_command_w(space, 0, data);
 
 			break;
 		case 1:
-			wd17xx_track_w(machine, 0, data);
+			wd17xx_track_w(space, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(machine, 0, data);
+			wd17xx_sector_w(space, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(machine, 0, data);
+			wd17xx_data_w(space, 0, data);
 			break;
 	};
 }
@@ -616,7 +616,7 @@ static MACHINE_RESET( bw2 )
 		memory_configure_bank(machine, 1, BANK_RAM6, 1, mess_ram + 0x18000, 0);
 		memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
 	}
 	else
 	{
@@ -627,7 +627,7 @@ static MACHINE_RESET( bw2 )
 		memory_configure_bank(machine, 1, BANK_RAM2, 5, mess_ram + 0x8000, 0x8000);
 		memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x30, 0x30, 0, 0x0f, SMH_UNMAP);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x30, 0x30, 0, 0x0f, SMH_UNMAP);
 	}
 
 	memory_set_bank(machine, 1, BANK_ROM);

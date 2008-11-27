@@ -32,7 +32,7 @@ INLINE cdp1861_t *get_safe_token(const device_config *device)
 
 /* Timer Callbacks */
 
-static TIMER_CALLBACK(cdp1861_int_tick)
+static TIMER_CALLBACK( cdp1861_int_tick )
 {
 	const device_config *device = ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
@@ -59,7 +59,7 @@ static TIMER_CALLBACK(cdp1861_int_tick)
 	}
 }
 
-static TIMER_CALLBACK(cdp1861_efx_tick)
+static TIMER_CALLBACK( cdp1861_efx_tick )
 {
 	const device_config *device = ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
@@ -90,7 +90,7 @@ static TIMER_CALLBACK(cdp1861_efx_tick)
 	}
 }
 
-static TIMER_CALLBACK(cdp1861_dma_tick)
+static TIMER_CALLBACK( cdp1861_dma_tick )
 {
 	const device_config *device = ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
@@ -187,7 +187,6 @@ void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( cdp1861 )
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -215,11 +214,9 @@ static DEVICE_START( cdp1861 )
 	cdp1861->dma_timer = timer_alloc(cdp1861_dma_tick, (void *)device);
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "CDP1861", device->tag);
-
-	state_save_register_item(unique_tag, 0, cdp1861->disp);
-	state_save_register_item(unique_tag, 0, cdp1861->dmaout);
-	state_save_register_bitmap(unique_tag, 0, "cdp1861->bitmap", cdp1861->bitmap);
+	state_save_register_item("cdp1861", device->tag, 0, cdp1861->disp);
+	state_save_register_item("cdp1861", device->tag, 0, cdp1861->dmaout);
+	state_save_register_bitmap("cdp1861", device->tag, 0, "cdp1861->bitmap", cdp1861->bitmap);
 
 	return DEVICE_START_OK;
 }

@@ -135,7 +135,6 @@ READ8_DEVICE_HANDLER( adc080x_data_r )
 static DEVICE_START( adc080x )
 {
 	adc080x_t *adc080x = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
@@ -155,16 +154,14 @@ static DEVICE_START( adc080x )
 	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(adc080x->intf->clock));
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "adc080x", device->tag);
-
-	state_save_register_item(unique_tag, 0, adc080x->address);
-	state_save_register_item(unique_tag, 0, adc080x->ale);
-	state_save_register_item(unique_tag, 0, adc080x->start);
-	state_save_register_item(unique_tag, 0, adc080x->eoc);
-	state_save_register_item(unique_tag, 0, adc080x->next_eoc);
-	state_save_register_item(unique_tag, 0, adc080x->sar);
-	state_save_register_item(unique_tag, 0, adc080x->cycle);
-	state_save_register_item(unique_tag, 0, adc080x->bit);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->address);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->ale);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->start);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->eoc);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->next_eoc);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->sar);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->cycle);
+	state_save_register_item("adc080x", device->tag, 0, adc080x->bit);
 	return DEVICE_START_OK;
 }
 

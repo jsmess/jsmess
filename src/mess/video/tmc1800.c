@@ -35,9 +35,9 @@ static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 
 static VIDEO_UPDATE( tmc1800 )
 {
-	const device_config *cdp1861 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1861, CDP1861_TAG);
+	tmc1800_state *state = screen->machine->driver_data;
 
-	cdp1861_update(cdp1861, bitmap, cliprect);
+	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
 	return 0;
 }
@@ -77,9 +77,9 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 
 static VIDEO_UPDATE( tmc2000 )
 {
-	const device_config *cdp1864 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1864, CDP1864_TAG);
+	tmc2000_state *state = screen->machine->driver_data;
 
-	cdp1864_update(cdp1864, bitmap, cliprect);
+	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
 	return 0;
 }
@@ -119,9 +119,9 @@ static CDP1864_INTERFACE( oscnano_cdp1864_intf )
 
 static VIDEO_UPDATE( oscnano )
 {
-	const device_config *cdp1864 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1864, CDP1864_TAG);
+	oscnano_state *state = screen->machine->driver_data;
 
-	cdp1864_update(cdp1864, bitmap, cliprect);
+	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
 	return 0;
 }

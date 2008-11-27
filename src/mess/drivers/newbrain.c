@@ -95,7 +95,7 @@ static WRITE8_HANDLER( enrg1_w )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	//logerror("ENRG1: %02x\n", data);
 
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( a_enrg1_w )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->enrg1 = data;
 }
@@ -141,7 +141,7 @@ static READ8_HANDLER( ust_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	UINT8 data = (state->copint << 7) | (state->aciaint << 6) | (state->clkint << 5) | (state->userint << 4);
 
@@ -224,7 +224,7 @@ static READ8_HANDLER( a_ust_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	return (state->copint << 7) | (state->clkint << 5) | (state->pwrup << 1) | 0x01;
 }
@@ -246,7 +246,7 @@ static READ8_HANDLER( user_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->user = 0;
 
@@ -255,7 +255,7 @@ static READ8_HANDLER( user_r )
 
 static WRITE8_HANDLER( user_w )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->user = data;
 }
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( user_w )
 
 static READ8_HANDLER( clclk_r )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->clkint = 1;
 
@@ -273,14 +273,14 @@ static READ8_HANDLER( clclk_r )
 
 static WRITE8_HANDLER( clclk_w )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->clkint = 1;
 }
 
 static READ8_HANDLER( clusr_r )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->userint = 1;
 
@@ -289,7 +289,7 @@ static READ8_HANDLER( clusr_r )
 
 static WRITE8_HANDLER( clusr_w )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->userint = 1;
 }
@@ -300,7 +300,7 @@ static READ8_HANDLER( newbrain_cop_l_r )
 {
 	// connected to the Z80 data bus
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	return state->cop_bus;
 }
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( newbrain_cop_l_w )
 {
 	// connected to the Z80 data bus
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->cop_bus = data;
 }
@@ -327,16 +327,16 @@ static WRITE8_HANDLER( newbrain_cop_g_w )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, BIT(data, 0) ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, BIT(data, 0) ? HOLD_LINE : CLEAR_LINE);
 
 	state->copint = BIT(data, 0);
 
 	/* tape motor enable */
 
-	cassette_change_state(cassette_device_image(machine, 0), BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-	cassette_change_state(cassette_device_image(machine, 1), BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(cassette_device_image(space->machine, 0), BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(cassette_device_image(space->machine, 1), BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 static READ8_HANDLER( newbrain_cop_g_r )
@@ -352,7 +352,7 @@ static READ8_HANDLER( newbrain_cop_g_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	return (BIT(state->keydata, 3) << 3) | (BIT(state->keydata, 0) << 2) | (BIT(state->keydata, 1) << 1);
 }
@@ -370,7 +370,7 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 	static const char *keynames[] = { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
 										"D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15" };
 
@@ -385,8 +385,8 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 
 	state->cop_tdo = BIT(data, 1);
 
-	cassette_output(cassette_device_image(machine, 0), state->cop_tdo ? -1.0 : +1.0);
-	cassette_output(cassette_device_image(machine, 1), state->cop_tdo ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(space->machine, 0), state->cop_tdo ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(space->machine, 1), state->cop_tdo ? -1.0 : +1.0);
 
 	/* keyboard and display clock */
 
@@ -399,7 +399,7 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 			state->keylatch = 0;
 		}
 
-		state->keydata = input_port_read(machine, keynames[state->keylatch]);
+		state->keydata = input_port_read(space->machine, keynames[state->keylatch]);
 
 		output_set_digit_value(state->keylatch, state->segment_data[state->keylatch]);
 	}
@@ -418,7 +418,7 @@ static READ8_HANDLER( newbrain_cop_in_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	return (state->cop_rd << 3) | (state->cop_access << 2) | (state->cop_rd << 1) | BIT(state->keydata, 2);
 }
@@ -427,7 +427,7 @@ static WRITE8_HANDLER( newbrain_cop_so_w )
 {
 	// connected to K1
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->cop_so = data;
 }
@@ -436,7 +436,7 @@ static WRITE8_HANDLER( newbrain_cop_sk_w )
 {
 	// connected to K2
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->segment_data[state->keylatch] >>= 1;
 	state->segment_data[state->keylatch] = (state->cop_so << 15) | (state->segment_data[state->keylatch] & 0x7fff);
@@ -446,9 +446,9 @@ static READ8_HANDLER( newbrain_cop_si_r )
 {
 	// connected to TDI
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
-	state->cop_tdi = ((cassette_input(cassette_device_image(machine, 0)) > +1.0) || (cassette_input(cassette_device_image(machine, 1)) > +1.0)) ^ state->cop_tdo;
+	state->cop_tdi = ((cassette_input(cassette_device_image(space->machine, 0)) > +1.0) || (cassette_input(cassette_device_image(space->machine, 1)) > +1.0)) ^ state->cop_tdo;
 
 	return state->cop_tdi;
 }
@@ -489,7 +489,7 @@ static WRITE8_HANDLER( m_pr_w )
 
 static READ8_HANDLER( tvl_r )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	if (offset)
 	{
@@ -505,7 +505,7 @@ static READ8_HANDLER( tvl_r )
 
 static WRITE8_HANDLER( tvl_w )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	if (offset)
 	{
@@ -534,7 +534,7 @@ static WRITE8_HANDLER( tvctl_w )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->tvctl = data;
 }
@@ -561,9 +561,9 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), BIT(data, 0));
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
 
-	nec765_set_reset_state(machine, BIT(data, 1));
+	nec765_set_reset_state(space->machine, BIT(data, 1));
 
-	nec765_set_tc_state(machine, BIT(data, 2));
+	nec765_set_tc_state(space->machine, BIT(data, 2));
 }
 
 static READ8_HANDLER( fdc_control_r )
@@ -583,7 +583,7 @@ static READ8_HANDLER( fdc_control_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	return (state->fdc_att << 7) | (state->paging << 6) | (state->fdc_int << 5);
 }
@@ -610,7 +610,7 @@ static READ8_HANDLER( ust2_r )
 
 static READ8_HANDLER( cop_r )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 	UINT8 data;
 
 	state->cop_rd = 0;
@@ -628,7 +628,7 @@ static READ8_HANDLER( cop_r )
 
 static WRITE8_HANDLER( cop_w )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->cop_rd = 1;
 	state->cop_wr = 0;
@@ -660,7 +660,7 @@ static WRITE8_HANDLER( ei_enrg2_w )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->enrg2 = data;
 }
@@ -675,7 +675,7 @@ static WRITE8_HANDLER( ei_pr_w )
 
 static READ8_HANDLER( ei_user_r )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->user = 0xff;
 
@@ -684,7 +684,7 @@ static READ8_HANDLER( ei_user_r )
 
 static WRITE8_HANDLER( ei_user_w )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->user = data;
 }
@@ -727,7 +727,7 @@ static READ8_HANDLER( ei_st0_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	return (state->copint << 7) | (state->aciaint << 6) | (state->clkint << 5) | (state->userint << 4) | (state->userint0 << 3) | (state->pwrup) << 1;
 }
@@ -749,7 +749,7 @@ static READ8_HANDLER( ei_st1_r )
 
 	*/
 
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	return (state->tvcnsl << 6) | 0x10 | 0x08 | 0x04;
 }
@@ -785,7 +785,7 @@ static WRITE8_HANDLER( ei_usbs_w )
 
 static WRITE8_HANDLER( ei_paging_w )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = space->machine->driver_data;
 
 	state->paging = data;
 
@@ -827,7 +827,7 @@ static WRITE8_HANDLER( ei_paging_w )
 
 		*/
 
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, BIT(data, 5) ? HOLD_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, BIT(data, 5) ? HOLD_LINE : CLEAR_LINE);
 
 		state->fdc_att = BIT(data, 7);
 	}
@@ -952,10 +952,6 @@ static ADDRESS_MAP_START( newbrain_v_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( newbrain_cop_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newbrain_cop_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1152,8 +1148,8 @@ static TIMER_CALLBACK( pwrup_tick )
 
 	for (bank = 1; bank < 9; bank++)
 	{
-		memory_configure_bank(bank, 0, 1, memory_region(machine, Z80_TAG) + (bank - 1) * 0x2000, 0);
-		memory_set_bank(bank, 0);
+		memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + (bank - 1) * 0x2000, 0);
+		memory_set_bank(machine, bank, 0);
 	}
 }
 
@@ -1166,8 +1162,8 @@ static MACHINE_START( newbrain )
 
 	for (bank = 1; bank < 9; bank++)
 	{
-		memory_configure_bank(bank, 0, 1, memory_region(machine, Z80_TAG) + 0xe000, 0);
-		memory_set_bank(bank, 0);
+		memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + 0xe000, 0);
+		memory_set_bank(machine, bank, 0);
 	}
 
 	/* initialize devices */
@@ -1211,11 +1207,11 @@ static MACHINE_RESET( newbrain )
 
 static INTERRUPT_GEN( newbrain_interrupt )
 {
-	newbrain_state *state = machine->driver_data;
+	newbrain_state *state = device->machine->driver_data;
 	
 	if (!(state->enrg1 & NEWBRAIN_ENRG1_CLK))
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
 
 		state->clkint = 0;
 	}
@@ -1249,7 +1245,6 @@ static MACHINE_DRIVER_START( newbrain )
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
-	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
 
@@ -1286,7 +1281,6 @@ static MACHINE_DRIVER_START( newbraim )
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
-	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
 
@@ -1314,7 +1308,6 @@ static MACHINE_DRIVER_START( newbraia )
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
-	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
 
@@ -1340,7 +1333,6 @@ static MACHINE_DRIVER_START( newbraiv )
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
-	MDRV_CPU_PROGRAM_MAP(newbrain_cop_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
 

@@ -126,9 +126,9 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
 
 	/* RCA */
-//128u4	DRIVER( vip )		/* 1977 Cosmac VIP VP-711							*/
-//128u4	DRIVER( vp111 )		/* 1977 Cosmac VIP VP-111							*/
-//128u4	DRIVER( studio2 )	/* 1977 Studio II									*/
+	DRIVER( vip )		/* 1977 Cosmac VIP VP-711							*/
+	DRIVER( vp111 )		/* 1977 Cosmac VIP VP-111							*/
+	DRIVER( studio2 )	/* 1977 Studio II									*/
 //	DRIVER( visicom )
 //	DRIVER( mpt02s )
 //	DRIVER( mpt02h )
@@ -891,14 +891,14 @@ XL/XE 16kB OS roms
 
 	/* Telercas Oy */
 //	DRIVER(tmc1800)
-//128u4	DRIVER(tmc2000)
-//128u4	DRIVER(tmc2000e)
+	DRIVER(tmc2000)
+	DRIVER(tmc2000e)
 //	DRIVER(tmc600s1)
-//128u4	DRIVER(tmc600s2)
+	DRIVER(tmc600s2)
 
 	/* OSCOM Oy */
 //	DRIVER(osc1000b)
-//128u4	DRIVER(oscnano)
+	DRIVER(oscnano)
 
 	/* MIT */
 //128u4	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
@@ -1065,22 +1065,22 @@ XL/XE 16kB OS roms
 	DRIVER(pecom64)
 		
 	/* Bondwell */
-//128u4	DRIVER( bw2 )
+	DRIVER( bw2 )
 
 	/* Exeltel */
 //128u4	DRIVER( exl100 )
 //	DRIVER( exeltel )
 
 	/* Comx World Operations Ltd */
-//128u4	DRIVER( comx35p )
-//128u4	DRIVER( comx35n )
+	DRIVER( comx35p )
+	DRIVER( comx35n )
 //	DRIVER( comxpl80 )
 
 	/* Grundy Business Systems Ltd */
-//128u4	DRIVER( newbrain )
-//128u4	DRIVER( newbraim )
-//128u4	DRIVER( newbraia )
-//128u4	DRIVER( newbraiv )
+	DRIVER( newbrain )
+	DRIVER( newbraim )
+	DRIVER( newbraia )
+	DRIVER( newbraiv )
 
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
