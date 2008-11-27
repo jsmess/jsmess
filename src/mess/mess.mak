@@ -403,6 +403,8 @@ DRVLIBS = \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/irisha.a \
 	$(MESSOBJ)/jupiter.a \
+	$(MESSOBJ)/kaypro.a \
+	$(MESSOBJ)/kim1.a \
 	$(MESSOBJ)/kramermc.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
@@ -465,8 +467,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/gmaster.a \
 #	$(MESSOBJ)/hp48.a \
-#	$(MESSOBJ)/kaypro.a \
-#	$(MESSOBJ)/kim1.a \
 #	$(MESSOBJ)/lynx.a \
 #	$(MESSOBJ)/mephisto.a \
 #	$(MESSOBJ)/mk1.a \

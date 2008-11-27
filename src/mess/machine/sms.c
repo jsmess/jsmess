@@ -998,7 +998,7 @@ WRITE8_HANDLER(sms_store_control_w) {
 	} else {
 		/* Pull reset line of CPU #0 low */
 		cpunum_suspend( 0, SUSPEND_REASON_HALT, 1 );
-		cpunum_reset( 0 );
+		cpu_reset(machine->cpu[0]);
 	}
 	sms_store_control = data;
 }

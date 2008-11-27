@@ -77,9 +77,10 @@ static void cpm_exit(running_machine *machine);
  *	initialize bios functions at addresses BIOS_00 .. BIOS_11
  *	and the central bios execute function at BIOS_EXEC
  *****************************************************************************/
-static void cpm_jumptable(void)
+static void cpm_jumptable(running_machine *machine)
 {
-	UINT8 * RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	UINT8 * RAM = memory_get_write_ptr(space, 0x0000);
 	int i;
 	int jmp_addr, fun_addr;
 
@@ -132,7 +133,8 @@ DEVICE_IMAGE_LOAD( cpm_floppy )
  *****************************************************************************/
 int cpm_init( running_machine *machine, int n, const char *const ids[])
 {
-	UINT8 * RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	UINT8 * RAM = memory_get_write_ptr(space, 0x0000);
 	const dsk_fmt *f;
 	int i, d;
 
@@ -258,7 +260,7 @@ int cpm_init( running_machine *machine, int n, const char *const ids[])
 	/* create a file to receive list output (ie. PIP LST:=FILE.EXT) */
 	mame_fopen(SEARCHPATH_IMAGE, "cpm.lst", OPEN_FLAG_WRITE, &lp);
 
-	cpm_jumptable();
+	cpm_jumptable(machine);
 
 	add_exit_callback(machine, cpm_exit);
 	return 0;
@@ -293,19 +295,20 @@ static void cpm_exit(running_machine *machine)
  * cpm_conout_chr
  * send a character to the console
  *****************************************************************************/
-static void cpm_conout_chr(int data)
+static void cpm_conout_chr(running_machine *machine, int data)
 {
-	io_write_byte(BIOS_CONOUT, data);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	memory_write_byte(space, BIOS_CONOUT, data);
 }
 
 /*****************************************************************************
  * cpm_conout_str
  * send a zero terminated string to the console
  *****************************************************************************/
-static void cpm_conout_str(const char *src)
+static void cpm_conout_str(running_machine *machine, const char *src)
 {
 	while (*src)
-		cpm_conout_chr(*src++);
+		cpm_conout_chr(machine, *src++);
 }
 
 /*****************************************************************************
@@ -500,9 +503,10 @@ void cpm_disk_set_dma(int d)
 	dma = d;
 }
 
-static void dump_sector(void)
+static void dump_sector(running_machine *machine)
 {
-	UINT8 *DMA = ((UINT8 *) memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000)) + dma;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	UINT8 *DMA = ((UINT8 *) memory_get_write_ptr(space, 0x0000)) + dma;
 
 	{
 		int i;
@@ -522,12 +526,13 @@ static void dump_sector(void)
 	}
 }
 
-int cpm_disk_read_sector(void)
+int cpm_disk_read_sector(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int result = -1;
 
 	/* TODO: remove this */
-	unsigned char *RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
+	unsigned char *RAM = memory_get_write_ptr(space, 0x0000);
 
 	if (curdisk >= 0 &&
 		curdisk < num_disks &&
@@ -548,16 +553,17 @@ int cpm_disk_read_sector(void)
 	{
 		logerror("BDOS Err on %c: Select\n", curdisk + 'A');
 	}
-		dump_sector();
+	dump_sector(machine);
 	return result;
 }
 
-int cpm_disk_write_sector(void)
+int cpm_disk_write_sector(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int result = -1;
 
 	/* TODO: remove this */
-	unsigned char *RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
+	unsigned char *RAM = memory_get_write_ptr(space, 0x0000);
 
 	if (curdisk >= 0 &&
 		curdisk < num_disks &&
@@ -588,15 +594,16 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 {
 	const dsk_fmt *f;
 	char buff[256];
-	UINT8 * RAM = memory_get_write_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0000);
+	const address_space *program_space = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	UINT8 * RAM = memory_get_write_ptr(program_space, 0x0000);
 	UINT16 tmp, af, bc, de, hl;
 	int i;
 
 	/* Get the values of the basic Z80 registers */
-	af = activecpu_get_reg( Z80_AF );
-	bc = activecpu_get_reg( Z80_BC );
-	de = activecpu_get_reg( Z80_DE );
-	hl = activecpu_get_reg( Z80_HL );
+	af = cpu_get_reg( space->machine->cpu[0], Z80_AF );
+	bc = cpu_get_reg( space->machine->cpu[0], Z80_BC );
+	de = cpu_get_reg( space->machine->cpu[0], Z80_DE );
+	hl = cpu_get_reg( space->machine->cpu[0], Z80_HL );
 
 	switch( data )
 	{
@@ -604,7 +611,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 		if (VERBOSE)
 			logerror("BIOS 00 cold boot\n");
 
-		cpm_conout_str("MESS CP/M 2.2 Emulator\r\n\n");
+		cpm_conout_str(space->machine, "MESS CP/M 2.2 Emulator\r\n\n");
 		for (i = 0; i < NDSK; i++)
 		{
 			if (fmt[i] != -1)
@@ -619,7 +626,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 					(f->density == DEN_FM_LO || f->density == DEN_FM_HI) ? "SD" : "DD",
 					f->spt, f->seclen,
 					f->dpb.dsm + 1, (RECL << f->dpb.bsh) / 1024);
-				cpm_conout_str(buff);
+				cpm_conout_str(space->machine, buff);
 			}
 		}
 		/* change vector at 0000 to warm start */
@@ -639,18 +646,18 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 
 		/* copy the CP/M 2.2 image to Z80 memory space */
 		for (i = 0; i < 0x1600; i++)
-			RAM[CCP + i] = memory_region(machine, "cpu1")[i];
+			RAM[CCP + i] = memory_region(space->machine, "cpu1")[i];
 
 		/* build the bios jump table */
-		cpm_jumptable();
+		cpm_jumptable(space->machine);
 		bc = curdisk;
-		cpu_set_reg(machine->activecpu,  Z80_BC, bc );
-		cpu_set_reg(machine->activecpu,  Z80_SP, 0x0080  );
-		cpu_set_reg(machine->activecpu,  Z80_PC, CCP + 3 );
+		cpu_set_reg(space->machine->cpu[0],  Z80_BC, bc );
+		cpu_set_reg(space->machine->cpu[0],  Z80_SP, 0x0080  );
+		cpu_set_reg(space->machine->cpu[0],  Z80_PC, CCP + 3 );
 		break;
 
 	case 0x02: /* CSTAT */
-		tmp = io_read_byte(BIOS_CONST) & 0xff;
+		tmp = memory_read_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), BIOS_CONST) & 0xff;
 		af = (af & 0xff) | (tmp << 8);
 
 		if (VERBOSE_CONIO)
@@ -658,12 +665,12 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 		break;
 
 	case 0x03: /* CONIN */
-		if ( io_read_byte(BIOS_CONST) == 0 )
+		if ( memory_read_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), BIOS_CONST) == 0 )
 		{
-			cpu_set_reg(machine->activecpu,  Z80_PC, activecpu_get_reg(Z80_PC) - 2 );
+			cpu_set_reg(space->machine->cpu[0], Z80_PC, cpu_get_reg(space->machine->cpu[0], Z80_PC) - 2 );
 			break;
 		}
-		tmp = io_read_byte(BIOS_CONIN) & 0xff;
+		tmp = memory_read_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), BIOS_CONIN) & 0xff;
 		af = (af & 0xff) | (tmp << 8);
 		if (VERBOSE_CONIO)
 			logerror("BIOS 03 console input       A:%02X\n", tmp);
@@ -673,7 +680,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 		tmp = bc & 0xff;
 		if (VERBOSE_CONIO)
 			logerror("BIOS 04 console output      C:%02X\n", tmp);
-		cpm_conout_chr( tmp );
+		cpm_conout_chr( space->machine, tmp );
 		break;
 
 	case 0x05: /* LSTOUT */
@@ -751,7 +758,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 
 
 	case 0x0d: /* RDSEC */
-		tmp = cpm_disk_read_sector();
+		tmp = cpm_disk_read_sector(space->machine);
 		af = (af & 0xff) | (tmp << 8);
 
 		if (VERBOSE_BIOS)
@@ -760,7 +767,7 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 
 
 	case 0x0e: /* WRSEC */
-		tmp = cpm_disk_write_sector();
+		tmp = cpm_disk_write_sector(space->machine);
 		af = (af & 0xff) | (tmp << 8);
 
 		if (VERBOSE_BIOS)
@@ -805,14 +812,14 @@ WRITE8_HANDLER ( cpm_bios_command_w )
 
 
 	case 0x11: /* TRAP */
-		cpm_conout_str(buff);
+		cpm_conout_str(space->machine, buff);
 		break;
 	}
 
 	/* Write back the possibly modified Z80 basic registers */
-	cpu_set_reg(machine->activecpu,  Z80_AF, af );
-	cpu_set_reg(machine->activecpu,  Z80_BC, bc );
-	cpu_set_reg(machine->activecpu,  Z80_DE, de );
-	cpu_set_reg(machine->activecpu,  Z80_HL, hl );
+	cpu_set_reg(space->machine->cpu[0], Z80_AF, af );
+	cpu_set_reg(space->machine->cpu[0], Z80_BC, bc );
+	cpu_set_reg(space->machine->cpu[0], Z80_DE, de );
+	cpu_set_reg(space->machine->cpu[0], Z80_HL, hl );
 }
 

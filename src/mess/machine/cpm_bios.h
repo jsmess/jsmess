@@ -159,7 +159,7 @@ extern void cpm_disk_home(void);
 extern void cpm_disk_set_track(int t);
 extern void cpm_disk_set_sector(int s);
 extern void cpm_disk_set_dma(int d);
-extern int cpm_disk_read_sector(void);
-extern int cpm_disk_write_sector(void);
+extern int cpm_disk_read_sector(running_machine *machine);
+extern int cpm_disk_write_sector(running_machine *machine);
 
 #endif  /* _CPM_BIOS_H */

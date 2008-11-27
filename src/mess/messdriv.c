@@ -306,7 +306,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
 
 	/* COMMODORE */
-//128u4	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
+	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
 //128u4	DRIVER( sym1 )		/* Synertek SYM-1									*/
 //128u4	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
@@ -578,7 +578,7 @@ XL/XE 16kB OS roms
 	DRIVER( ep128 )		/* Enterprise 128 k									*/
 
 	/* NON LINEAR SYSTEMS */
-//128u4	DRIVER( kaypro )	/* Kaypro 2X										*/
+	DRIVER( kaypro )	/* Kaypro 2X										*/
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */

@@ -152,6 +152,7 @@ MACHINE_RESET( kaypro )
  ******************************************************/
 INTERRUPT_GEN( kaypro_interrupt )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int mod, row, col, chg, new;
 	static int lastrow = 0, mask = 0x00, key = 0x00, repeat = 0, repeater = 0;
 
@@ -167,18 +168,18 @@ INTERRUPT_GEN( kaypro_interrupt )
 	}
 
 	row = 9;
-	new = input_port_read(machine, "ROW9");
+	new = input_port_read(device->machine, "ROW9");
 	chg = keyrows[row] ^ new;
 
-	if (!chg) { new = input_port_read(machine, "ROW8"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW7"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW6"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW5"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW4"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW3"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW2"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW1"); chg = keyrows[--row] ^ new; }
-	if (!chg) { new = input_port_read(machine, "ROW0"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW8"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW7"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW6"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW5"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW4"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW3"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW2"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW1"); chg = keyrows[--row] ^ new; }
+	if (!chg) { new = input_port_read(device->machine, "ROW0"); chg = keyrows[--row] ^ new; }
 	if (!chg) --row;
 
 	if (row >= 0)
@@ -222,11 +223,11 @@ INTERRUPT_GEN( kaypro_interrupt )
 			if( key )	/* normal key */
 			{
 				repeater = 30;
-				kaypro_conin_w(machine, 0, key);
+				kaypro_conin_w(space, 0, key);
 			}
 			else
 			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-				kaypro_conin_w(machine, 0, 0);
+				kaypro_conin_w(space, 0, 0);
 			keyrows[row] |= new;
 		}
 		else
@@ -237,7 +238,7 @@ INTERRUPT_GEN( kaypro_interrupt )
 	}
 	else if ( key && (keyrows[lastrow] & mask) && repeat == 0 )
 	{
-		kaypro_conin_w(machine, 0, key);
+		kaypro_conin_w(space, 0, key);
 	}
 }
 
