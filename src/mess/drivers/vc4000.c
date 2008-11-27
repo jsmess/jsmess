@@ -57,25 +57,25 @@ static READ8_HANDLER(vc4000_key_r)
 	UINT8 data=0;
 	switch(offset & 0x0f) {
 	case 0x08:
-		data = input_port_read(machine, "KEYPAD1_1");
+		data = input_port_read(space->machine, "KEYPAD1_1");
 		break;
 	case 0x09:
-		data = input_port_read(machine, "KEYPAD1_2");
+		data = input_port_read(space->machine, "KEYPAD1_2");
 		break;
 	case 0x0a:
-		data = input_port_read(machine, "KEYPAD1_3");
+		data = input_port_read(space->machine, "KEYPAD1_3");
 		break;
 	case 0x0b:
-		data = input_port_read(machine, "PANEL");
+		data = input_port_read(space->machine, "PANEL");
 		break;
 	case 0x0c:
-		data = input_port_read(machine, "KEYPAD2_1");
+		data = input_port_read(space->machine, "KEYPAD2_1");
 		break;
 	case 0x0d:
-		data = input_port_read(machine, "KEYPAD2_2");
+		data = input_port_read(space->machine, "KEYPAD2_2");
 		break;
 	case 0x0e:
-		data = input_port_read(machine, "KEYPAD2_3");
+		data = input_port_read(space->machine, "KEYPAD2_3");
 		break;
 	}
 	return data;
@@ -226,48 +226,49 @@ ROM_END
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine *machine = image->machine;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int size = image_length(image);
 
 	switch (size)
 	{
 	case 0x0800: // 2K
 		image_fread(image, memory_region(machine, "main") + 0x0000, 0x0800);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
+		memory_install_read8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
+		memory_install_write8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
 		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x0000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
+		memory_install_read8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
+		memory_install_write8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
 		memory_set_bankptr(machine, 2, mess_ram);
 		memory_set_bankptr(machine, 6, mess_ram);
 		break;
 
 	case 0x1000: // 4K
 		image_fread(image, memory_region(machine, "main") + 0x0000, 0x1000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
+		memory_install_read8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
+		memory_install_write8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
 		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x0000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
+		memory_install_read8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
+		memory_install_write8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
 		memory_set_bankptr(machine, 2, memory_region(machine, "main") + 0x0800);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK7);
+		memory_install_read8_handler(space, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
+		memory_install_write8_handler(space, 0x1000, 0x15FF, 0, 0, SMH_BANK7);
 		memory_set_bankptr(machine, 3, mess_ram);
 		memory_set_bankptr(machine, 7, mess_ram);
 		break;
 
 	case 0x1800: // 6K
 		image_fread(image, memory_region(machine, "main") + 0x0000, 0x15FF);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
+		memory_install_read8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
+		memory_install_write8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
 		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x0000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
+		memory_install_read8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
+		memory_install_write8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
 		memory_set_bankptr(machine, 2, memory_region(machine, "main") + 0x0800);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0800, 0x15FF, 0, 0, SMH_BANK7);
+		memory_install_read8_handler(space, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
+		memory_install_write8_handler(space, 0x0800, 0x15FF, 0, 0, SMH_BANK7);
 		memory_set_bankptr(machine, 3, memory_region(machine, "main") + 0x1000);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, SMH_BANK4); 
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1BFF, 0, 0, SMH_BANK8);
+		memory_install_read8_handler(space, 0x1800, 0x1BFF, 0, 0, SMH_BANK4); 
+		memory_install_write8_handler(space, 0x1800, 0x1BFF, 0, 0, SMH_BANK8);
 		memory_set_bankptr(machine, 4, mess_ram);
 		memory_set_bankptr(machine, 8, mess_ram);
 		break;
@@ -301,6 +302,7 @@ static void vc4000_cartslot_getinfo(const mess_device_class *devclass, UINT32 st
 
 QUICKLOAD_LOAD(vc4000)
 {
+	const address_space *space = cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int quick_length;

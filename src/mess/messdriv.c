@@ -185,7 +185,7 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( tvlinkp )
 
 	/* INTERTON */
-//128u4	DRIVER( vc4000 )	/* Interton vc4000									*/
+	DRIVER( vc4000 )	/* Interton vc4000									*/
 
 	/* BANDAI */
 //128u4	DRIVER( wswan )		/* Bandai WonderSwan Handheld						*/

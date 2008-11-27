@@ -153,29 +153,29 @@ READ8_HANDLER(vc4000_video_r)
 	case 0xcc:
 		data = 0x66;
 		// between 20 and 225
-		if (!activecpu_get_reg(S2650_FO))
+		if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
 		{
-			if (input_port_read(machine, "JOYS") & 0x1) data=20;
-			if (input_port_read(machine, "JOYS") & 0x2) data=225;
+			if (input_port_read(space->machine, "JOYS") & 0x1) data=20;
+			if (input_port_read(space->machine, "JOYS") & 0x2) data=225;
 		}
 		else
 		{
-			if (input_port_read(machine, "JOYS") & 0x4) data=225;
-			if (input_port_read(machine, "JOYS") & 0x8) data=20;
+			if (input_port_read(space->machine, "JOYS") & 0x4) data=225;
+			if (input_port_read(space->machine, "JOYS") & 0x8) data=20;
 		}
 		break;
 
 	case 0xcd:
 		data = 0x66;
-		if (!activecpu_get_reg(S2650_FO))
+		if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
 		{
-			if (input_port_read(machine, "JOYS") & 0x10) data=20;
-			if (input_port_read(machine, "JOYS") & 0x20) data=225;
+			if (input_port_read(space->machine, "JOYS") & 0x10) data=20;
+			if (input_port_read(space->machine, "JOYS") & 0x20) data=225;
 		}
 		else
 		{
-			if (input_port_read(machine, "JOYS") & 0x40) data=225;
-			if (input_port_read(machine, "JOYS") & 0x80) data=20;
+			if (input_port_read(space->machine, "JOYS") & 0x40) data=225;
+			if (input_port_read(space->machine, "JOYS") & 0x80) data=20;
 		}
 		break;
 #endif
@@ -210,7 +210,7 @@ WRITE8_HANDLER(vc4000_video_w)
 		
 	case 0xc7:						// Soundregister
 		vc4000_video.reg.data[offset]=data;
-		vc4000_soundport_w(machine, 0, data);
+		vc4000_soundport_w(space->machine, 0, data);
 		break;
 
 	case 0xca:			// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
@@ -466,7 +466,7 @@ INTERRUPT_GEN( vc4000_video_line )
 
 	if (vc4000_video.line <= 270)
 	{
-		vc4000_draw_grid(machine, collision);
+		vc4000_draw_grid(device->machine, collision);
 
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[0]);
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[1]);
@@ -501,7 +501,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(vc4000_video.sprites[1].finished_now) |
 		(vc4000_video.sprites[0].finished_now))
 	{
-		cpunum_set_input_line_and_vector(machine,0, 0, PULSE_LINE, 3);
+		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, PULSE_LINE, 3);
 	}
 }
 
