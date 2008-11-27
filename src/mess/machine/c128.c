@@ -891,8 +891,8 @@ static void c128_common_driver_init(running_machine *machine)
 	cia6526_interface cia_intf[2];
 
 	/* configure the M6510 port */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c128_m6510_port_read);
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
+	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTREAD, (genf *) c128_m6510_port_read);
+	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
 
 	c64_memory = ram;
 
