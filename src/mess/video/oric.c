@@ -14,7 +14,7 @@
 #include "includes/oric.h"
 
 static void oric_vh_update_flash(void);
-static void oric_vh_update_attribute(int c);
+static void oric_vh_update_attribute(running_machine *machine,int c);
 static void oric_refresh_charset(void);
 
 /* current state of the display */
@@ -69,7 +69,7 @@ VIDEO_START( oric )
 	vh_state.flash_state = 0;
 	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, oric_vh_timer_callback);
 	/* mode */
-	oric_vh_update_attribute((1<<3)|(1<<4));
+	oric_vh_update_attribute(machine,(1<<3)|(1<<4));
 }
 
 
@@ -117,10 +117,11 @@ static void oric_refresh_charset(void)
 }
 
 /* update video hardware state depending on the new attribute */
-static void oric_vh_update_attribute(int c)
+static void oric_vh_update_attribute(running_machine *machine,int c)
 {
 	/* attribute */
 	int attribute = c & 0x03f;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	switch ((attribute>>3) & 0x03)
 	{
@@ -167,7 +168,7 @@ static void oric_vh_update_attribute(int c)
 				if (oric_ram)
 					vh_state.char_base = oric_ram + (unsigned long)0x09800;
 				else
-					vh_state.char_base = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x09800);
+					vh_state.char_base = memory_get_read_ptr(space, 0x09800);
 
 				/* changing the mode also changes the position of the standard charset
 				and alternative charset */
@@ -180,7 +181,7 @@ static void oric_vh_update_attribute(int c)
 				if (oric_ram)
 					vh_state.char_base = oric_ram + (unsigned long)0x0b400;
 				else
-					vh_state.char_base = memory_get_read_ptr(0, ADDRESS_SPACE_PROGRAM, 0x0b400);
+					vh_state.char_base = memory_get_read_ptr(space, 0x0b400);
 
 				/* changing the mode also changes the position of the standard charset
 				and alternative charset */
@@ -261,11 +262,11 @@ VIDEO_UPDATE( oric )
 		int x = 0;
 
 		/* foreground colour white */
-		oric_vh_update_attribute(7);
+		oric_vh_update_attribute(screen->machine,7);
 		/* background colour black */
-		oric_vh_update_attribute((1<<3));
+		oric_vh_update_attribute(screen->machine,(1<<3));
 
-		oric_vh_update_attribute((1<<4));
+		oric_vh_update_attribute(screen->machine,(1<<4));
 
 		for (byte_offset=0; byte_offset<40; byte_offset++)
 		{
@@ -298,12 +299,12 @@ VIDEO_UPDATE( oric )
 			}
 
 			/* fetch data */
-			c = RAM ? RAM[read_addr] : memory_read_byte(space, read_addr);
+			c = RAM ? RAM[read_addr] : memory_read_byte(cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM), read_addr);
 
 			/* if bits 6 and 5 are zero, the byte contains a serial attribute */
 			if ((c & ((1<<6) | (1<<5)))==0)
 			{
-				oric_vh_update_attribute(c);
+				oric_vh_update_attribute(screen->machine,c);
 
 				/* display background colour when attribute has been found */
 				oric_vh_render_6pixels(bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, 0,(c & 0x080));

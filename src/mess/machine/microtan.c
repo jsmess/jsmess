@@ -169,7 +169,7 @@ static const device_config *cassette_device_image(running_machine *machine)
  **************************************************************/
 static  READ8_HANDLER (via_0_in_a )
 {
-    int data = input_port_read(machine, "JOY");
+    int data = input_port_read(space->machine, "JOY");
     LOG(("microtan_via_0_in_a %02X\n", data));
     return data;
 }
@@ -218,7 +218,7 @@ static WRITE8_HANDLER (via_0_out_b )
 {
     LOG(("microtan_via_0_out_b %02X\n", data));
     /* bit #7 is the cassette output signal */
-    cassette_output(cassette_device_image(machine), data & 0x80 ? +1.0 : -1.0);
+    cassette_output(cassette_device_image(space->machine), data & 0x80 ? +1.0 : -1.0);
 }
 
 static WRITE8_HANDLER ( via_0_out_ca2 )
@@ -397,7 +397,7 @@ WRITE8_HANDLER ( microtan_bffx_w )
         LOG(("microtan_bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data));
         microtan_keyboard_ascii &= ~0x80;
         kbd_irq_line = CLEAR_LINE;
-        microtan_set_irq_line(machine);
+        microtan_set_irq_line(space->machine);
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
@@ -622,12 +622,12 @@ INTERRUPT_GEN( microtan_interrupt )
 
 
     row = 9;
-    new = input_port_read(machine, "ROW8");
+    new = input_port_read(device->machine, "ROW8");
     chg = keyrows[--row] ^ new;
 
 	while ( !chg && row > 0)
 	{
-		new = input_port_read(machine, keynames[row - 1]); 
+		new = input_port_read(device->machine, keynames[row - 1]); 
 		chg = keyrows[--row] ^ new; 
 	}
     if (!chg) 
@@ -674,11 +674,11 @@ INTERRUPT_GEN( microtan_interrupt )
             if( key )   /* normal key */
             {
                 repeater = 30;
-                store_key(machine, key);
+                store_key(device->machine, key);
             }
             else
             if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-                store_key(machine, 0);
+                store_key(device->machine, 0);
             keyrows[row] |= new;
         }
         else
@@ -690,11 +690,11 @@ INTERRUPT_GEN( microtan_interrupt )
     else
     if ( key && (keyrows[lastrow] & mask) && repeat == 0 )
     {
-        store_key(machine, key);
+        store_key(device->machine, key);
     }
 }
 
-static void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
+static void microtan_set_cpu_regs(running_machine *machine,const UINT8 *snapshot_buff, int base)
 {
     LOG(("microtan_snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
         snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
@@ -710,7 +710,8 @@ static void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
     UINT8 *RAM = memory_region(machine, "main");
-
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
     /* check for .DMP file format */
     if (snapshot_size == 8263)
     {
@@ -732,7 +733,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
             microtan_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
         }
         base += 64;
-        microtan_set_cpu_regs(snapshot_buff, base);
+        microtan_set_cpu_regs(machine, snapshot_buff, base);
     }
     else
     {
@@ -765,35 +766,35 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 
         /* first set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_0_w(machine, i, snapshot_buff[base++]);
+            via_0_w(space, i, snapshot_buff[base++]);
 
         /* second set of VIA6522 registers */
         for (i = 0; i < 16; i++ )
-            via_1_w(machine, i, snapshot_buff[base++]);
+            via_1_w(space, i, snapshot_buff[base++]);
 
         /* microtan IO bff0-bfff */
         for (i = 0; i < 16; i++ )
         {
             RAM[0xbff0+i] = snapshot_buff[base++];
             if (i < 4)
-                microtan_bffx_w(machine, i, RAM[0xbff0+i]);
+                microtan_bffx_w(space, i, RAM[0xbff0+i]);
         }
 
-        microtan_sound_w(machine, 0, snapshot_buff[base++]);
+        microtan_sound_w(space, 0, snapshot_buff[base++]);
         microtan_chunky_graphics = snapshot_buff[base++];
 
         /* first set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            ay8910_control_port_0_w(machine, 0, i);
-            ay8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
+            ay8910_control_port_0_w(space, 0, i);
+            ay8910_write_port_0_w(space, 0, snapshot_buff[base++]);
         }
 
         /* second set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            ay8910_control_port_0_w(machine, 0, i);
-            ay8910_write_port_0_w(machine, 0, snapshot_buff[base++]);
+            ay8910_control_port_0_w(space, 0, i);
+            ay8910_write_port_0_w(space, 0, snapshot_buff[base++]);
         }
 
         for (i = 0; i < 32*16; i++)
@@ -802,7 +803,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
         }
         base += 64;
 
-        microtan_set_cpu_regs(snapshot_buff, base);
+        microtan_set_cpu_regs(machine, snapshot_buff, base);
     }
 }
 
@@ -861,6 +862,7 @@ DRIVER_INIT( microtan )
 {
     UINT8 *dst = memory_region(machine, "gfx2");
     int i;
+    const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {
@@ -901,18 +903,18 @@ DRIVER_INIT( microtan )
     switch (read_dsw(machine) & 3)
     {
         case 0:  // 1K only :)
-            memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_NOP);
-            memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_NOP);
+            memory_install_read8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_NOP);
+            memory_install_write8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_NOP);
             break;
         case 1:  // +7K TANEX
-            memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0x1fff, 0, 0, SMH_RAM);
-            memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0x1fff, 0, 0, SMH_RAM);
-            memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0xbbff, 0, 0, SMH_NOP);
-            memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0xbbff, 0, 0, SMH_NOP);
+            memory_install_read8_handler(space, 0x0400, 0x1fff, 0, 0, SMH_RAM);
+            memory_install_write8_handler(space, 0x0400, 0x1fff, 0, 0, SMH_RAM);
+            memory_install_read8_handler(space, 0x2000, 0xbbff, 0, 0, SMH_NOP);
+            memory_install_write8_handler(space, 0x2000, 0xbbff, 0, 0, SMH_NOP);
             break;
         default: // +7K TANEX + 40K TANRAM
-            memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_RAM);
-            memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0400, 0xbbff, 0, 0, SMH_RAM);
+            memory_install_read8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_RAM);
+            memory_install_write8_handler(space, 0x0400, 0xbbff, 0, 0, SMH_RAM);
             break;
     }
 

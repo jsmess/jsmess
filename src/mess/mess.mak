@@ -434,6 +434,7 @@ DRVLIBS = \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ssystem3.a \
 	$(MESSOBJ)/super80.a \
+	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/telmac.a \
 	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
@@ -480,7 +481,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/svi.a \
 #	$(MESSOBJ)/svision.a \
 #	$(MESSOBJ)/synertec.a \
-#	$(MESSOBJ)/tangerin.a \
 #	$(MESSOBJ)/tatung.a \
 #	$(MESSOBJ)/teamconc.a \
 #	$(MESSOBJ)/ti99.a \

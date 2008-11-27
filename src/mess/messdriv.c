@@ -644,13 +644,13 @@ XL/XE 16kB OS roms
 	DRIVER( laser700 )	/* 1984? Laser 700									*/
 
 	/* TANGERINE */
-//128u4	DRIVER( microtan )	/* 1979 Microtan 65									*/
+	DRIVER( microtan )	/* 1979 Microtan 65									*/
 
-//128u4	DRIVER( oric1 )		/* 1983 Oric 1										*/
-//128u4	DRIVER( orica )		/* 1984 Oric Atmos									*/
-//128u4	DRIVER( prav8d )	/* 1985 Pravetz 8D									*/
-//128u4	DRIVER( prav8dd )	/* 1989 Pravetz 8D (Disk ROM)						*/
-//128u4	DRIVER( telstrat )	/* ??? Oric Telestrat/Stratos						*/
+	DRIVER( oric1 )		/* 1983 Oric 1										*/
+	DRIVER( orica )		/* 1984 Oric Atmos									*/
+	DRIVER( prav8d )	/* 1985 Pravetz 8D									*/
+	DRIVER( prav8dd )	/* 1989 Pravetz 8D (Disk ROM)						*/
+	DRIVER( telstrat )	/* ??? Oric Telestrat/Stratos						*/
 
 	/* PHILIPS */
 	DRIVER( p2000t )	/* 1980 P2000T										*/
