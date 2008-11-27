@@ -213,7 +213,7 @@ const game_driver * const drivers[] =
 //	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 
 	/* CAMBRIDGE COMPUTERS */
-//128u4	DRIVER( z88 )		/*													*/
+	DRIVER( z88 )		/*													*/
 
 	/* AMSTRAD */
 	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
@@ -453,7 +453,7 @@ XL/XE 16kB OS roms
 //128u4	DRIVER( at586 )		/* 19?? AT 586										*/
 
 	/* OSBORNE */
-//128u4	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
+	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
 
 	/* SINCLAIR RESEARCH */
 	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/

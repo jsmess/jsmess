@@ -395,6 +395,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
+	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/p2000.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pel.a \
@@ -457,7 +458,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/nascom1.a \
 #	$(MESSOBJ)/nec.a \
 #	$(MESSOBJ)/necpc.a \
-#	$(MESSOBJ)/osborne.a \
 #	$(MESSOBJ)/pasogo.a \
 #	$(MESSOBJ)/pc.a \
 #	$(MESSOBJ)/pdp1.a \

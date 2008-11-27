@@ -85,33 +85,33 @@ READ8_HANDLER( osborne1_2000_r )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100:	/* Floppy */
-			data = wd17xx_r( machine, offset );
+			data = wd17xx_r( space, offset );
 			break;
 		case 0x200:	/* Keyboard */
 			/* Row 0 */
-			if ( offset & 0x01 )	data &= input_port_read(machine, "ROW0");
+			if ( offset & 0x01 )	data &= input_port_read(space->machine, "ROW0");
 			/* Row 1 */
-			if ( offset & 0x02 )	data &= input_port_read(machine, "ROW1");
+			if ( offset & 0x02 )	data &= input_port_read(space->machine, "ROW1");
 			/* Row 2 */
-			if ( offset & 0x04 )	data &= input_port_read(machine, "ROW3");
+			if ( offset & 0x04 )	data &= input_port_read(space->machine, "ROW3");
 			/* Row 3 */
-			if ( offset & 0x08 )	data &= input_port_read(machine, "ROW4");
+			if ( offset & 0x08 )	data &= input_port_read(space->machine, "ROW4");
 			/* Row 4 */
-			if ( offset & 0x10 )	data &= input_port_read(machine, "ROW5");
+			if ( offset & 0x10 )	data &= input_port_read(space->machine, "ROW5");
 			/* Row 5 */
-			if ( offset & 0x20 )	data &= input_port_read(machine, "ROW2");
+			if ( offset & 0x20 )	data &= input_port_read(space->machine, "ROW2");
 			/* Row 6 */
-			if ( offset & 0x40 )	data &= input_port_read(machine, "ROW6");
+			if ( offset & 0x40 )	data &= input_port_read(space->machine, "ROW6");
 			/* Row 7 */
-			if ( offset & 0x80 )	data &= input_port_read(machine, "ROW7");
+			if ( offset & 0x80 )	data &= input_port_read(space->machine, "ROW7");
 			break;
 		case 0x900:	/* IEEE488 PIA */
-			data = pia_0_r( machine, offset & 0x03 );
+			data = pia_0_r( space, offset & 0x03 );
 			break;
 		case 0xA00:	/* Serial */
 			break;
 		case 0xC00:	/* Video PIA */
-			data = pia_1_r( machine, offset & 0x03 );
+			data = pia_1_r( space, offset & 0x03 );
 			break;
 		}
 	}
@@ -136,15 +136,15 @@ WRITE8_HANDLER( osborne1_2000_w )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100:	/* Floppy */
-			wd17xx_w( machine, offset, data );
+			wd17xx_w( space, offset, data );
 			break;
 		case 0x900:	/* IEEE488 PIA */
-			pia_0_w( machine, offset & 0x03, data );
+			pia_0_w( space, offset & 0x03, data );
 			break;
 		case 0xA00:	/* Serial */
 			break;
 		case 0xC00:	/* Video PIA */
-			pia_1_w( machine, offset & 0x03, data );
+			pia_1_w( space, offset & 0x03, data );
 			break;
 		}
 	}
@@ -195,18 +195,18 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	}
 	if ( osborne1.bank2_enabled )
 	{
-		memory_set_bankptr( 1, memory_region(machine, "main") );
-		memory_set_bankptr( 2, osborne1.empty_4K );
-		memory_set_bankptr( 3, osborne1.empty_4K );
+		memory_set_bankptr(space->machine,1, memory_region(space->machine, "main") );
+		memory_set_bankptr(space->machine,2, osborne1.empty_4K );
+		memory_set_bankptr(space->machine,3, osborne1.empty_4K );
 	}
 	else
 	{
-		memory_set_bankptr( 1, mess_ram );
-		memory_set_bankptr( 2, mess_ram + 0x1000 );
-		memory_set_bankptr( 3, mess_ram + 0x3000 );
+		memory_set_bankptr(space->machine,1, mess_ram );
+		memory_set_bankptr(space->machine,2, mess_ram + 0x1000 );
+		memory_set_bankptr(space->machine,3, mess_ram + 0x3000 );
 	}
 	osborne1.bank4_ptr = mess_ram + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
-	memory_set_bankptr( 4, osborne1.bank4_ptr );
+	memory_set_bankptr(space->machine,4, osborne1.bank4_ptr );
 	osborne1.bankswitch = offset;
 	osborne1.in_irq_handler = 0;
 }
@@ -218,11 +218,11 @@ static DIRECT_UPDATE_HANDLER( osborne1_opbase )
 	{
 		if ( ! osborne1.bank2_enabled )
 		{
-			opbase->mask = 0x0fff;
+			direct->mask = 0x0fff;
 			direct->decrypted = mess_ram + 0x2000;
 			direct->raw = mess_ram + 0x2000;
-			opbase->mem_min = 0x2000;
-			opbase->mem_max = 0x2fff;
+			direct->min = 0x2000;
+			direct->max = 0x2fff;
 			return ~0;
 		}
 	}
@@ -338,6 +338,7 @@ static const pia6821_interface osborne1_video_pia_config =
 
 static TIMER_CALLBACK(osborne1_video_callback)
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	int y = video_screen_get_vpos(machine->primary_screen);
 
 	/* Check for start of frame */
@@ -346,12 +347,12 @@ static TIMER_CALLBACK(osborne1_video_callback)
 		/* Clear CA1 on video PIA */
 		osborne1.start_y = ( osborne1.new_start_y - 1 ) & 0x1F;
 		osborne1.charline = 0;
-		pia_1_ca1_w( machine, 0, 0 );
+		pia_1_ca1_w( space, 0, 0 );
 	}
 	if ( y == 240 )
 	{
 		/* Set CA1 on video PIA */
-		pia_1_ca1_w( machine, 0, 0xFF );
+		pia_1_ca1_w( space, 0, 0xFF );
 	}
 	if ( y < 240 )
 	{
@@ -479,8 +480,9 @@ MACHINE_START( osborne1 )
 
 MACHINE_RESET( osborne1 )
 {
+	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	/* Initialize memory configuration */
-	osborne1_bankswitch_w( machine, 0x00, 0 );
+	osborne1_bankswitch_w( space, 0x00, 0 );
 
 	osborne1.pia_0_irq_state = FALSE;
 	osborne1.pia_1_irq_state = FALSE;
@@ -494,11 +496,11 @@ MACHINE_RESET( osborne1 )
 
 	osborne1.video_timer = timer_alloc( osborne1_video_callback , NULL);
 	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0 ), 0);
-	pia_1_ca1_w( machine, 0, 0 );
+	pia_1_ca1_w( space, 0, 0 );
 
 	timer_set( attotime_zero, NULL, 0, setup_beep );
 
-	memory_set_direct_update_handler( 0, osborne1_opbase );
+	memory_set_direct_update_handler( space, osborne1_opbase );
 }
 
 
@@ -533,7 +535,9 @@ static int osborne1_daisy_irq_ack(const device_config *device)
 {
     /* Enable ROM and I/O when IRQ is acknowledged */
     UINT8	old_bankswitch = osborne1.bankswitch;
-    osborne1_bankswitch_w( device->machine, 0, 0 );
+    const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+    
+    osborne1_bankswitch_w( space, 0, 0 );
     osborne1.bankswitch = old_bankswitch;
     osborne1.in_irq_handler = 1;
     return 0xF8;
