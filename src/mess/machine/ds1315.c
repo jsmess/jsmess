@@ -44,7 +44,7 @@ void ds1315_init( void )
 			/* entire pattern matched */
 			ds1315_count = 0;
 			ds1315_mode = ds_calendar_io;
-			ds1315_fill_raw_data(machine);
+			ds1315_fill_raw_data(space->machine);
 		}
 
 		return 0;

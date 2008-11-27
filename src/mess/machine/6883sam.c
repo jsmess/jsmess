@@ -135,8 +135,8 @@ void sam_init(running_machine *machine, const sam6883_interface *intf)
 	add_reset_callback(machine, sam_reset);
 
 	/* save state registration */
-	state_save_register_item("6883sam", 0, sam.state);
-	state_save_register_item("6883sam", 0, sam.video_position);
+	state_save_register_item("6883sam", NULL, 0, sam.state);
+	state_save_register_item("6883sam", NULL, 0, sam.video_position);
 	state_save_register_postload(machine, update_sam_postload, NULL);
 }
 

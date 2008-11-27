@@ -208,7 +208,7 @@ static void setup_memory_map(running_machine *machine);
 #define GIME_TYPE_1987	0
 
 #ifdef MAME_DEBUG
-static offs_t coco_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+static offs_t coco_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif /* MAME_DEBUG */
 
 
@@ -455,7 +455,7 @@ static int load_pak_into_region(const device_config *image, int *pakbase, int *p
 	return 0;
 }
 
-static void pak_load_trailer(const pak_decodedtrailer *trailer)
+static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer *trailer)
 {
 	cpu_set_reg(machine->cpu[0], M6809_PC, trailer->reg_pc);
 	cpu_set_reg(machine->cpu[0], M6809_X, trailer->reg_x);
@@ -586,7 +586,7 @@ static int generic_pak_load(const device_config *image, int rambase_index, int r
 	memcpy(pakbase, rambase + 0xC000, 0x3F00);
 
 	if (trailer_load)
-		pak_load_trailer(&trailer);
+		pak_load_trailer(Machine, &trailer);
 	return INIT_PASS;
 }
 
@@ -630,11 +630,13 @@ QUICKLOAD_LOAD ( coco )
 		if (preamble != 0)
 		{
 			/* start address - just set the address and return */
-			cpu_set_reg(machine->cpu[0], REG_PC, block_address);
+			cpu_set_reg(image->machine->cpu[0], REG_PC, block_address);
 			done = TRUE;
 		}
 		else
 		{
+			const address_space *space = cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 			/* data block - need to cap the maximum length of the block */
 			block_length = MIN(block_length, length - position);
 
@@ -781,9 +783,9 @@ static void d_recalc_irq(running_machine *machine)
 	UINT8 pia0_irq_b = pia_get_irq_b(0);
 
 	if (pia0_irq_a || pia0_irq_b)
-		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static void d_recalc_firq(running_machine *machine)
@@ -794,15 +796,15 @@ static void d_recalc_firq(running_machine *machine)
 	UINT8 pia2_firq_b = pia_get_irq_b(2);
 
 	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 static void coco3_recalc_irq(running_machine *machine)
 {
 	if ((coco3_gimereg[0] & 0x20) && gime_irq)
-		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_irq(machine);
 }
@@ -810,7 +812,7 @@ static void coco3_recalc_irq(running_machine *machine)
 static void coco3_recalc_firq(running_machine *machine)
 {
 	if ((coco3_gimereg[0] & 0x10) && gime_firq)
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_firq(machine);
 }
@@ -902,7 +904,9 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 
 void coco3_horizontal_sync_callback(int data)
 {
-	pia_0_ca1_w(Machine, 0, data);
+	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
+	pia_0_ca1_w(space, 0, data);
 	coco3_raise_interrupt(Machine, COCO3_INT_HBORD, data);
 }
 
@@ -910,7 +914,9 @@ void coco3_horizontal_sync_callback(int data)
 
 void coco3_field_sync_callback(int data)
 {
-	pia_0_cb1_w(Machine, 0, data);
+	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
+	pia_0_cb1_w(space, 0, data);
 }
 
 void coco3_gime_field_sync_callback(running_machine *machine)
@@ -1413,14 +1419,14 @@ static UINT8 coco3_update_keyboard(running_machine *machine)
 
 
 /* three functions that update the keyboard in varying ways */
-static WRITE8_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(machine); }
+static WRITE8_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(space->machine); }
 INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(field->port->machine); }
 static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(machine); }
 
 static WRITE8_HANDLER ( d_pia0_pa_w )
 {
-	if (get_input_device(machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
-		coco_hiresjoy_w(machine, data & 0x04);
+	if (get_input_device(space->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
+		coco_hiresjoy_w(space->machine, data & 0x04);
 }
 
 
@@ -1447,7 +1453,7 @@ static WRITE8_HANDLER ( d_pia0_pa_w )
 
 static WRITE8_HANDLER ( d_pia1_cb2_w )
 {
-	soundmux_update(machine);
+	soundmux_update(space->machine);
 }
 
 /* Printer output functions used by d_pia1_pa_w */
@@ -1483,7 +1489,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 
 	coco_sound_update();
 
-	if (get_input_device(machine, INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
+	if (get_input_device(space->machine, INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
 	{
 		int dclg_this_bit = ((data & 2) >> 1);
 
@@ -1526,13 +1532,13 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	}
 	else
 	{
-		cassette_output(cassette_device_image(machine), ((int) dac - 0x80) / 128.0);
+		cassette_output(cassette_device_image(space->machine), ((int) dac - 0x80) / 128.0);
 	}
 
-	(*update_keyboard)(machine);
+	(*update_keyboard)(space->machine);
 
-	if (get_input_device(machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
-		coco_hiresjoy_w(machine, dac >= 0x80);
+	if (get_input_device(space->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
+		coco_hiresjoy_w(space->machine, dac >= 0x80);
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
 
@@ -1564,7 +1570,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 {
 	int ddr;
 
-	d_pia1_pb_w(machine, 0, data);
+	d_pia1_pb_w(space, 0, data);
 
 	ddr = ~pia_get_port_b_z_mask(1);
 
@@ -1574,7 +1580,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 	/* always be high (enabling 32k basic rom) */
 	if (ddr & 0x04)
 	{
-		dragon_page_rom(machine, data & 0x04);
+		dragon_page_rom(space->machine, data & 0x04);
 	}
 }
 
@@ -1599,7 +1605,7 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 	/* always be high (enabling boot rom) */
 	/* PIA FIXME if (pia_get_ddr_a(2) & 0x04) */
 	{
-		dragon_page_rom(machine, data & 0x04);	/* bit 2 controls boot or basic rom */
+		dragon_page_rom(space->machine, data & 0x04);	/* bit 2 controls boot or basic rom */
 	}
 
 	/* Bits 0 and 1 for pia2 port a control the BCDIR and BC1 lines of the */
@@ -1611,13 +1617,13 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 		case 0x00	: 		/* Inactive, do nothing */
 			break;
 		case 0x01	: 		/* Write to selected port */
-			ay8910_write_port_0_w(machine, 0, pia_get_output_b(2));
+			ay8910_write_port_0_w(space, 0, pia_get_output_b(2));
 			break;
 		case 0x02	: 		/* Read from selected port */
-			pia_set_input_b(2, ay8910_read_port_0_r(machine, 0));
+			pia_set_input_b(2, ay8910_read_port_0_r(space, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
-			ay8910_control_port_0_w(machine, 0, pia_get_output_b(2));
+			ay8910_control_port_0_w(space, 0, pia_get_output_b(2));
 			break;
 	}
 }
@@ -1649,10 +1655,13 @@ static void	dgnalpha_fdc_callback(running_machine *machine, wd17xx_state_t event
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
 	/* for pia1 cb1 */
+
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	switch(event)
 	{
 		case WD17XX_IRQ_CLR:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 		case WD17XX_IRQ_SET:
 			if(dgnalpha_just_reset)
@@ -1662,14 +1671,14 @@ static void	dgnalpha_fdc_callback(running_machine *machine, wd17xx_state_t event
 			else
 			{
 				if (pia_get_output_ca2_z(2))
-					cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+					cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
-			pia_2_cb1_w(machine, 0, CARTLINE_CLEAR);
+			pia_2_cb1_w(space, 0, CARTLINE_CLEAR);
 			break;
 		case WD17XX_DRQ_SET:
-			pia_2_cb1_w(machine, 0, CARTLINE_ASSERTED);
+			pia_2_cb1_w(space, 0, CARTLINE_ASSERTED);
 			break;
 	}
 }
@@ -1682,16 +1691,16 @@ READ8_HANDLER(wd2797_r)
 	switch(offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_data_r(machine, 0);
+			result = wd17xx_data_r(space, 0);
 			break;
 		case 1:
-			result = wd17xx_sector_r(machine, 0);
+			result = wd17xx_sector_r(space, 0);
 			break;
 		case 2:
-			result = wd17xx_track_r(machine, 0);
+			result = wd17xx_track_r(space, 0);
 			break;
 		case 3:
-			result = wd17xx_status_r(machine, 0);
+			result = wd17xx_status_r(space, 0);
 			break;
 		default:
 			break;
@@ -1705,16 +1714,16 @@ WRITE8_HANDLER(wd2797_w)
     switch(offset & 0x3)
 	{
 		case 0:
-			wd17xx_data_w(machine, 0, data);
+			wd17xx_data_w(space, 0, data);
 			break;
 		case 1:
-			wd17xx_sector_w(machine, 0, data);
+			wd17xx_sector_w(space, 0, data);
 			break;
 		case 2:
-			wd17xx_track_w(machine, 0, data);
+			wd17xx_track_w(space, 0, data);
 			break;
 		case 3:
-			wd17xx_command_w(machine, 0, data);
+			wd17xx_command_w(space, 0, data);
 
 			/* disk head is encoded in the command byte */
 			wd17xx_set_side((data & 0x02) ? 1 : 0);
@@ -1734,7 +1743,7 @@ WRITE8_HANDLER(alpha_modem_w)
 static WRITE8_HANDLER ( d_pia1_ca2_w )
 {
 	cassette_change_state(
-		cassette_device_image(machine),
+		cassette_device_image(space->machine),
 		data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 }
@@ -1743,7 +1752,7 @@ static WRITE8_HANDLER ( d_pia1_ca2_w )
 
 static READ8_HANDLER ( d_pia1_pa_r )
 {
-	return (cassette_input(cassette_device_image(machine)) >= 0) ? 1 : 0;
+	return (cassette_input(cassette_device_image(space->machine)) >= 0) ? 1 : 0;
 }
 
 
@@ -1847,7 +1856,7 @@ WRITE8_HANDLER ( plus_reg_w )
 		default	: bottom_32k=&mess_ram[0x00000]; break; // Just to shut the compiler up !
 	}
 
-	setup_memory_map(machine);
+	setup_memory_map(space->machine);
 }
 
 
@@ -1880,7 +1889,7 @@ static void d_sam_set_mpurate(int val)
 	 * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
 	 * access but RAM was not.  I don't know how to simulate this.
 	 */
-    cpunum_set_clockscale(Machine, 0, val ? 2 : 1);
+    cpu_set_clockscale(Machine->cpu[0], val ? 2 : 1);
 }
 
 READ8_HANDLER(dragon_alpha_mapped_irq_r)
@@ -1940,6 +1949,7 @@ static void setup_memory_map(running_machine *machine)
 	};
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	UINT8 memsize	= get_sam_memorysize();
 	UINT8 maptype	= get_sam_maptype();
 //	UINT8 pagemode	= get_sam_pagemode();
@@ -1974,17 +1984,17 @@ static void setup_memory_map(running_machine *machine)
 		{
 			/* This deals with the bottom 32K page switch and the Dragon Plus paged ram */
 			if(block_index<8)
-				memory_set_bankptr(block_index+1,&bottom_32k[memmap[wbank-1].start]);
+				memory_set_bankptr(machine, block_index+1,&bottom_32k[memmap[wbank-1].start]);
 			else
-				memory_set_bankptr(block_index+1,&mess_ram[memmap[wbank-1].start]);
+				memory_set_bankptr(machine, block_index+1,&mess_ram[memmap[wbank-1].start]);
 
-			memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
-			memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
+			memory_install_read_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
+			memory_install_write_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, block_index+1);
 		}
 		else
 		{
-			memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
-			memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
+			memory_install_read_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
+			memory_install_write_handler(space, memmap[block_index].start, memmap[block_index].end, 0, 0, STATIC_NOP);
 		}
 	}
 
@@ -2001,8 +2011,8 @@ static void setup_memory_map(running_machine *machine)
 			else
 				offset=&coco_rom[0x4000+(0x1000*(block_index-4))];
 
-			memory_set_bankptr(block_index + 9,offset);
-			memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_NOP);
+			memory_set_bankptr(machine, block_index + 9,offset);
+			memory_install_write_handler(space, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_NOP);
 		}
 	}
 }
@@ -2278,6 +2288,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		{ 0xfe00, 0xfeff }
 	};
 
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	int i, offset, writebank;
 	UINT8 *readbank;
 
@@ -2298,8 +2309,8 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		}
 
 		/* set up the banks */
-		memory_set_bankptr(i + 1, readbank);
-		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, bank_info[i].start, bank_info[i].end, 0, 0, writebank);
+		memory_set_bankptr(machine, i + 1, readbank);
+		memory_install_write_handler(space, bank_info[i].start, bank_info[i].end, 0, 0, writebank);
 
 		if (LOG_MMU)
 		{
@@ -2330,7 +2341,7 @@ WRITE8_HANDLER(coco3_mmu_w)
 	if ((offset >> 3) == (coco3_gimereg[1] & 1))
 	{
 		offset &= 7;
-		coco3_mmu_update(machine, offset, (offset == 7) ? 8 : offset);
+		coco3_mmu_update(space->machine, offset, (offset == 7) ? 8 : offset);
 	}
 }
 
@@ -2349,7 +2360,7 @@ READ8_HANDLER(coco3_gime_r)
 		result = gime_irq;
 		if (result) {
 			gime_irq = 0;
-			coco3_recalc_irq(machine);
+			coco3_recalc_irq(space->machine);
 		}
 		break;
 
@@ -2357,7 +2368,7 @@ READ8_HANDLER(coco3_gime_r)
 		result = gime_firq;
 		if (result) {
 			gime_firq = 0;
-			coco3_recalc_firq(machine);
+			coco3_recalc_firq(space->machine);
 		}
 		break;
 
@@ -2400,7 +2411,7 @@ WRITE8_HANDLER(coco3_gime_w)
 			*		  Bit 1 MC1 ROM map control
 			*		  Bit 0 MC0 ROM map control
 			*/
-			coco3_mmu_update(machine, 0, 8);
+			coco3_mmu_update(space->machine, 0, 8);
 			break;
 
 		case 1:
@@ -2414,7 +2425,7 @@ WRITE8_HANDLER(coco3_gime_w)
 			*		  Bit 1 Unused
 			*		  Bit 0 TR Task register select
 			*/
-			coco3_mmu_update(machine, 0, 8);
+			coco3_mmu_update(space->machine, 0, 8);
 			coco3_timer_reset();
 			break;
 
@@ -2620,7 +2631,7 @@ WRITE8_HANDLER(coco_cartridge_w)
 READ8_HANDLER(coco3_cartridge_r)
 {
 	/* this behavior is documented in Super Extended Basic Unravelled, page 14 */
-	return ((coco3_gimereg[0] & 0x04) || (offset >= 0x10)) ? coco_cartridge_r(machine, offset) : 0;
+	return ((coco3_gimereg[0] & 0x04) || (offset >= 0x10)) ? coco_cartridge_r(space, offset) : 0;
 }
 
 
@@ -2634,7 +2645,7 @@ WRITE8_HANDLER(coco3_cartridge_w)
 {
 	/* this behavior is documented in Super Extended Basic Unravelled, page 14 */
 	if ((coco3_gimereg[0] & 0x04) || (offset >= 0x10))
-		coco_cartridge_w(machine, offset, data);
+		coco_cartridge_w(space, offset, data);
 }
 
 
@@ -2645,7 +2656,9 @@ WRITE8_HANDLER(coco3_cartridge_w)
 
 static void coco_cart_timer_w(running_machine *machine, int data)
 {
-	pia_1_cb1_w(machine, 0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
+	pia_1_cb1_w(space, 0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* special code for Q state */
 	if ((data == 0x02) || (data == 0x03) || (data == 0x04))
@@ -2687,7 +2700,7 @@ static TIMER_CALLBACK(coco3_cart_timer_proc)
 static TIMER_CALLBACK(halt_timer_proc)
 {
 	int data = param;
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2699,7 +2712,7 @@ static TIMER_CALLBACK(halt_timer_proc)
 static TIMER_CALLBACK(nmi_timer_proc)
 {
 	int data = param;
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2795,7 +2808,7 @@ static void twiddle_cart_line_if_q(void)
 
 WRITE8_HANDLER(coco_pia_1_w)
 {
-	pia_1_w(machine, offset, data);
+	pia_1_w(space, offset, data);
 	twiddle_cart_line_if_q();
 }
 
@@ -2893,7 +2906,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	coco_cart = cococart_init(machine, cart_hardware, &cart_config);
 
 #ifdef MAME_DEBUG
-	cpuintrf_set_dasm_override(0, coco_dasm_override);
+	cpu_set_dasm_override(machine->cpu[0], coco_dasm_override);
 #endif
 
 	state_save_register_global(mux_sel1);
@@ -3294,7 +3307,7 @@ static const char *const os9syscalls[] =
 };
 
 
-static offs_t coco_dasm_override(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static offs_t coco_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	unsigned call;
 	unsigned result = 0;
