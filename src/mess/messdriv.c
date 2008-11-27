@@ -556,8 +556,8 @@ XL/XE 16kB OS roms
 //	DRIVER( ti84pse )	/* 2004 TI-84 Plus Silver Edition					*/
 
 	/* NEC */
-//128u4	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15KHz)		*/
-//128u4	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24KHz)		*/
+	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15KHz)		*/
+	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24KHz)		*/
 
 	/* CANTAB */
 	DRIVER( jupiter )	/* Jupiter Ace										*/
@@ -789,8 +789,8 @@ XL/XE 16kB OS roms
 
 
 	/* NASCOM MICROCOMPUTERS */
-//128u4	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
-//128u4	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
+	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
+	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
 
 	/* MILES GORDON TECHNOLOGY */
 //128u4	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/

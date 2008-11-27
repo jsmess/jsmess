@@ -158,8 +158,8 @@ static WRITE8_HANDLER(write_gvram)
 	XXX(2)
 
 #define XXX(n) \
-static WRITE8_HANDLER(write_gvram##n##_bank5){write_gvram(machine, offset+0x4000*n,data);} \
-static WRITE8_HANDLER(write_gvram##n##_bank6){write_gvram(machine, offset+0x4000*n+0x3000,data);}
+static WRITE8_HANDLER(write_gvram##n##_bank5){write_gvram(space, offset+0x4000*n,data);} \
+static WRITE8_HANDLER(write_gvram##n##_bank6){write_gvram(space, offset+0x4000*n+0x3000,data);}
 	VVV
 #undef XXX
 
@@ -190,8 +190,8 @@ static  READ8_HANDLER(read_gvram_alu##x) \
     (x & 2 ? gVRAM[offset+0x4000] : ~gVRAM[offset+0x4000]) & \
     (x & 4 ? gVRAM[offset+0x8000] : ~gVRAM[offset+0x8000]); \
 } \
-static  READ8_HANDLER(read_gvram_alu##x##_bank5){return read_gvram_alu##x(machine, offset);} \
-static  READ8_HANDLER(read_gvram_alu##x##_bank6){return read_gvram_alu##x(machine, offset+0x3000);}
+static  READ8_HANDLER(read_gvram_alu##x##_bank5){return read_gvram_alu##x(space, offset);} \
+static  READ8_HANDLER(read_gvram_alu##x##_bank6){return read_gvram_alu##x(space, offset+0x3000);}
 
 YYY
 
@@ -202,13 +202,13 @@ static WRITE8_HANDLER(write_gvram_alu0)
 #define WWW(x) \
   switch(ALU1&(0x11<<x)) { \
   case 0x00<<x: \
-    write_gvram(machine, offset+x*0x4000,gVRAM[offset+x*0x4000]&(~data)); \
+    write_gvram(space, offset+x*0x4000,gVRAM[offset+x*0x4000]&(~data)); \
     break; \
   case 0x01<<x: \
-    write_gvram(machine, offset+x*0x4000,gVRAM[offset+x*0x4000]|data); \
+    write_gvram(space, offset+x*0x4000,gVRAM[offset+x*0x4000]|data); \
     break; \
   case 0x10<<x: \
-    write_gvram(machine, offset+x*0x4000,gVRAM[offset+x*0x4000]^data); \
+    write_gvram(space, offset+x*0x4000,gVRAM[offset+x*0x4000]^data); \
     break; \
   case 0x11<<x: \
     break; \
@@ -222,16 +222,16 @@ static WRITE8_HANDLER(write_gvram_alu0)
 }
 static WRITE8_HANDLER(write_gvram_alu1)
 {
-  write_gvram(machine, offset+0x0000 , ALU_save0);
-  write_gvram(machine, offset+0x4000 , ALU_save1);
-  write_gvram(machine, offset+0x8000 , ALU_save2);
+  write_gvram(space, offset+0x0000 , ALU_save0);
+  write_gvram(space, offset+0x4000 , ALU_save1);
+  write_gvram(space, offset+0x8000 , ALU_save2);
 }
-static WRITE8_HANDLER(write_gvram_alu2){write_gvram(machine, offset+0x0000,ALU_save1);}
-static WRITE8_HANDLER(write_gvram_alu3){write_gvram(machine, offset+0x4000,ALU_save0);}
+static WRITE8_HANDLER(write_gvram_alu2){write_gvram(space, offset+0x0000,ALU_save1);}
+static WRITE8_HANDLER(write_gvram_alu3){write_gvram(space, offset+0x4000,ALU_save0);}
 
 #define XXX(x) \
-static WRITE8_HANDLER(write_gvram_alu##x##_bank5){write_gvram_alu##x(machine, offset,data);} \
-static WRITE8_HANDLER(write_gvram_alu##x##_bank6){write_gvram_alu##x(machine, offset+0x3000,data);}
+static WRITE8_HANDLER(write_gvram_alu##x##_bank5){write_gvram_alu##x(space, offset,data);} \
+static WRITE8_HANDLER(write_gvram_alu##x##_bank6){write_gvram_alu##x(space, offset+0x3000,data);}
 
 ZZZ
 
@@ -239,8 +239,8 @@ ZZZ
 
 int is_pc8801_vram_select(running_machine *machine)
 {
-	read8_machine_func rh5 = NULL, rh6 = NULL;
-	write8_machine_func wh5 = NULL, wh6 = NULL;
+	read8_space_func rh5 = NULL, rh6 = NULL;
+	write8_space_func wh5 = NULL, wh6 = NULL;
 
   if(ALUON) {
     /* ALU mode */
@@ -298,17 +298,17 @@ int is_pc8801_vram_select(running_machine *machine)
   }
 
 
-	if (rh5) memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, rh5);
-	if (wh5) memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xefff, 0, 0, wh5);
-	if (rh6) memory_install_read8_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, rh6);
-	if (wh6) memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf000, 0xffff, 0, 0, wh6);
+	if (rh5) memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, rh5);
+	if (wh5) memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, wh5);
+	if (rh6) memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, rh6);
+	if (wh6) memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, wh6);
 }
 
 WRITE8_HANDLER(pc88sr_disp_32)
 {
   analog_palette=((data & 0x20) != 0x00);
   ALUON=((data & 0x40) != 0x00);
-  pc8801_update_bank(machine);
+  pc8801_update_bank(space->machine);
 }
 
 WRITE8_HANDLER(pc88sr_ALU)
@@ -321,7 +321,7 @@ WRITE8_HANDLER(pc88sr_ALU)
     ALU2=data;
     break;
   }
-  pc8801_update_bank(machine);
+  pc8801_update_bank(space->machine);
 }
 
 WRITE8_HANDLER(pc8801_vramsel)
@@ -331,7 +331,7 @@ WRITE8_HANDLER(pc8801_vramsel)
   } else {
     selected_vram=offset+1;
   }
-  pc8801_update_bank(machine);
+  pc8801_update_bank(space->machine);
 }
 
  READ8_HANDLER(pc8801_vramtest)
@@ -924,5 +924,5 @@ WRITE8_HANDLER(pc8801_palette_out)
 	r[offset] = (data & 2) ? 0xff : 0x00;
 	g[offset] = (data & 4) ? 0xff : 0x00;
   }
-  colortable_palette_set_color(machine->colortable, palno, MAKE_RGB(r[offset],g[offset],b[offset]));
+  colortable_palette_set_color(space->machine->colortable, palno, MAKE_RGB(r[offset],g[offset],b[offset]));
 }

@@ -18,6 +18,7 @@
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 
+#include "deprecat.h"
 
 #define NASCOM1_KEY_RESET	0x02
 #define NASCOM1_KEY_INCR	0x01
@@ -153,7 +154,7 @@ READ8_HANDLER ( nascom1_port_00_r )
 	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
 	if (nascom1_portstat.stat_count < 9)
-		return (input_port_read(machine, keynames[nascom1_portstat.stat_count]) | ~0x7f);
+		return (input_port_read(space->machine, keynames[nascom1_portstat.stat_count]) | ~0x7f);
 	
 	return (0xff);
 }
@@ -162,18 +163,24 @@ READ8_HANDLER ( nascom1_port_00_r )
 WRITE8_HANDLER( nascom1_port_00_w )
 {
 
-	cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),
+	cassette_change_state( device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
-	if (!(data & NASCOM1_KEY_RESET)) {
+	if (!(data & NASCOM1_KEY_RESET)) 
+	{
 		if (nascom1_portstat.stat_flags & NASCOM1_KEY_RESET)
 			nascom1_portstat.stat_count = 0;
-	} else nascom1_portstat.stat_flags = NASCOM1_KEY_RESET;
+	} 
+	else 
+		nascom1_portstat.stat_flags = NASCOM1_KEY_RESET;
 
-	if (!(data & NASCOM1_KEY_INCR)) {
+	if (!(data & NASCOM1_KEY_INCR)) 
+	{
 		if (nascom1_portstat.stat_flags & NASCOM1_KEY_INCR)
 			nascom1_portstat.stat_count++;
-	} else nascom1_portstat.stat_flags = NASCOM1_KEY_INCR;
+	} 
+	else 
+		nascom1_portstat.stat_flags = NASCOM1_KEY_INCR;
 }
 
 
@@ -263,14 +270,14 @@ SNAPSHOT_LOAD( nascom1 )
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
 		{
-			memory_write_byte(space, addr++, b0);
-			memory_write_byte(space, addr++, b1);
-			memory_write_byte(space, addr++, b2);
-			memory_write_byte(space, addr++, b3);
-			memory_write_byte(space, addr++, b4);
-			memory_write_byte(space, addr++, b5);
-			memory_write_byte(space, addr++, b6);
-			memory_write_byte(space, addr++, b7);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b0);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b1);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b2);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b3);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b4);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b5);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b6);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), addr++, b7);
 		}
 	}
 
@@ -313,28 +320,28 @@ DRIVER_INIT( nascom1 )
 	switch (mess_ram_size)
 	{
 	case 1 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
 			0x1400, 0x9000, 0, 0, SMH_NOP, SMH_NOP);
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
 			0x1400, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
 			0x5000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
 		memory_set_bankptr(machine, 1, mess_ram);
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
 			0x1400, 0x8fff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
 			0x9000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
 		memory_set_bankptr(machine, 1, mess_ram);
 		break;
 
 	case 40 * 1024:
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
 			0x1400, 0xafff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_set_bankptr(machine, 1, mess_ram);
 		break;
