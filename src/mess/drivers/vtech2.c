@@ -395,7 +395,7 @@ static PALETTE_INIT( vtech2 )
 
 static INTERRUPT_GEN( vtech2_interrupt )
 {
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 }
 
 static const cassette_config laser_cassette_config =

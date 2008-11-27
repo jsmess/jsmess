@@ -53,7 +53,7 @@ Todo:
 #include "devices/printer.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
-
+#include "deprecat.h"
 
 #define LOG_VTECH1_LATCH 0
 #define LOG_VTECH1_FDC   0
@@ -94,13 +94,13 @@ static void common_init_machine(running_machine *machine, int base)
 		case 22 * 1024:
 		case 32 * 1024:
 			/* install 16KB memory expansion */
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0x3fff, 0, 0, SMH_BANK2);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base, base + 0x3fff, 0, 0, SMH_BANK2);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, base + 0x3fff, 0, 0, SMH_BANK2);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, base + 0x3fff, 0, 0, SMH_BANK2);
 			memory_configure_bank(machine, 2, 0, 1, mess_ram + base - 0x7800, 0);
 			memory_set_bank(machine, 2, 0);
 
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base + 0x4000, 0xffff, 0, 0, SMH_NOP);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base + 0x4000, 0xffff, 0, 0, SMH_NOP);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base + 0x4000, 0xffff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base + 0x4000, 0xffff, 0, 0, SMH_NOP);
 			break;
 
 		case 66 * 1024:
@@ -108,22 +108,22 @@ static void common_init_machine(running_machine *machine, int base)
 			/* 64KB/4MB memory expansion */
 
 			/* install fixed first bank */
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK2);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK2);
 			memory_configure_bank(machine, 2, 0, 1, mess_ram + 0x800, 0);
 			memory_set_bank(machine, 2, 0);
 
 			/* install the others, dynamically banked in */
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK3);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK3);
-			memory_configure_bank(3, 0, (mess_ram_size - 0x4800) / 0x4000, mess_ram + 0x4800, 0x4000);
-			memory_set_bank(3, 0);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK3);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK3);
+			memory_configure_bank(machine, 3, 0, (mess_ram_size - 0x4800) / 0x4000, mess_ram + 0x4800, 0x4000);
+			memory_set_bank(machine, 3, 0);
 			break;
 
 		default:
 			/* no memory expansion */
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base, 0xffff, 0, 0, SMH_NOP);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, base, 0xffff, 0, 0, SMH_NOP);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, 0xffff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, 0xffff, 0, 0, SMH_NOP);
 			break;
 	}
 }
@@ -157,7 +157,7 @@ WRITE8_HANDLER (vtech1_memory_bank_w)
 
 	if (data >= 1)
 		if ((data <= 3 && (mess_ram_size == (66 * 1024))) || (mess_ram_size == (4098 * 1024)))
-			memory_set_bank(3, data - 1);
+			memory_set_bank(space->machine, 3, data - 1);
 }
 
 
@@ -207,22 +207,22 @@ SNAPSHOT_LOAD(vtech1)
 	switch (header[21])
 	{
 	case VZ_BASIC:		/* 0xF0 */
-		memory_write_byte(space, 0x78a4, start % 256); /* start of basic program */
-		memory_write_byte(space, 0x78a5, start / 256);
-		memory_write_byte(space, 0x78f9, end % 256); /* end of basic program */
-		memory_write_byte(space, 0x78fa, end / 256);
-		memory_write_byte(space, 0x78fb, end % 256); /* start variable table */
-		memory_write_byte(space, 0x78fc, end / 256);
-		memory_write_byte(space, 0x78fd, end % 256); /* start free mem, end variable table */
-		memory_write_byte(space, 0x78fe, end / 256);
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78a4, start % 256); /* start of basic program */
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78a5, start / 256);
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78f9, end % 256); /* end of basic program */
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fa, end / 256);
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fb, end % 256); /* start variable table */
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fc, end / 256);
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fd, end % 256); /* start free mem, end variable table */
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fe, end / 256);
 		image_message(image, " %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
 	case VZ_MCODE:		/* 0xF1 */
-		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
-		memory_write_byte(space, 0x788f, start / 256);
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x788e, start % 256); /* usr subroutine address */
+		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x788f, start / 256);
 		image_message(image, " %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpunum_set_reg(0, REG_PC, start);				/* start program */
+		cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, start);				/* start program */
 		break;
 
 	default:
@@ -468,13 +468,13 @@ READ8_HANDLER(vtech1_joystick_r)
     int data = 0xff;
 
 	if (!(offset & 1))
-		data &= input_port_read(machine, "joystick_0");
+		data &= input_port_read(space->machine, "joystick_0");
 	if (!(offset & 2))
-		data &= input_port_read(machine, "joystick_0_arm");
+		data &= input_port_read(space->machine, "joystick_0_arm");
 	if (!(offset & 4))
-		data &= input_port_read(machine, "joystick_1");
+		data &= input_port_read(space->machine, "joystick_1");
 	if (!(offset & 8))
-		data &= input_port_read(machine, "joystick_1_arm");
+		data &= input_port_read(space->machine, "joystick_1_arm");
 
     return data;
 }
@@ -491,14 +491,14 @@ READ8_HANDLER(vtech1_keyboard_r)
 	for (row = 0; row < 8; row++) 
 	{
 		if (!(offset & (1 << row)))
-			data &= input_port_read(machine, keynames[row]);
+			data &= input_port_read(space->machine, keynames[row]);
 	}
 
-	if (video_screen_get_vblank(machine->primary_screen))
+	if (video_screen_get_vblank(space->machine->primary_screen))
         data &= ~0x80;
 
 	/* cassette input is bit 5 (0x40) */
-	level = cassette_input(cassette_device_image(machine));
+	level = cassette_input(cassette_device_image(space->machine));
 	if (level < -0.008)
 		cassette_bit = 0x00;
 	if (level > +0.008)
@@ -529,7 +529,7 @@ WRITE8_HANDLER(vtech1_latch_w)
 	if ((vtech1_latch ^ data ) & 0x06)
 	{
 		static double amp[4] = { +1.0, +0.5, -0.5, -1.0 };
-		cassette_output(cassette_device_image(machine), amp[(data >> 1) & 3]);
+		cassette_output(cassette_device_image(space->machine), amp[(data >> 1) & 3]);
 	}
 
 	/* speaker data bits toggle? */
@@ -559,7 +559,7 @@ READ8_HANDLER(vtech1_printer_r)
 {
 	int data = 0xff;
 
-	if (printer_is_ready(printer_device(machine)))
+	if (printer_is_ready(printer_device(space->machine)))
 		data &= ~0x01;
 
 	return data;
@@ -571,7 +571,7 @@ WRITE8_HANDLER(vtech1_printer_w)
 
 	switch (offset) {
 		case 0x0d:	/* strobe data to printer */
-			printer_output(printer_device(machine), prn_data);
+			printer_output(printer_device(space->machine), prn_data);
 			break;
 		case 0x0e:	/* load output latch */
 			prn_data = data;

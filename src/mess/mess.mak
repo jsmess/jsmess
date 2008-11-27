@@ -417,6 +417,7 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/shared.a \
+	$(MESSOBJ)/vtech.a \
 
 #	$(MESSOBJ)/apple.a \
 #	$(MESSOBJ)/arcadia.a \
@@ -486,7 +487,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/tx0.a \
 #	$(MESSOBJ)/vc4000.a \
 #	$(MESSOBJ)/veb.a \
-#	$(MESSOBJ)/vtech.a \
 
 
 

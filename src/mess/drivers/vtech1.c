@@ -113,7 +113,7 @@ Notes:
 #include "devices/printer.h"
 #include "devices/z80bin.h"
 #include "formats/vt_cas.h"
-
+#include "deprecat.h"
 
 static Z80BIN_EXECUTE(vtech1);
 
@@ -430,8 +430,8 @@ static Z80BIN_EXECUTE( vtech1 )
 		7ae9 = start (load) address of a conventional basic program
 		791e = custom routine to fix basic pointers */
 
-	program_write_word_16le(0x791c, end_address + 1);
-	program_write_word_16le(0x781e, execute_address);
+	memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x791c, end_address + 1);
+	memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x781e, execute_address);
 
 	if (start_address == 0x7ae9)
 	{
@@ -445,17 +445,17 @@ static Z80BIN_EXECUTE( vtech1 )
 			0xc3, 0xcf, 0x36,};	// JP 36CF	;enter bios at autorun point
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			memory_write_byte(space, 0x791e + i, data[i]);
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x791e + i, data[i]);
 
 		if (!autorun)
-			memory_write_byte(space, 0x7929, 0xb6);	/* turn off autorun */
+			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x7929, 0xb6);	/* turn off autorun */
 
-		cpunum_set_reg(0, REG_PC, 0x791e);
+		cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, 0x791e);
 	}
 	else
 	{
 		if (autorun)
-			cpunum_set_reg(0, REG_PC, execute_address);
+			cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, execute_address);
 	}
 }
 
