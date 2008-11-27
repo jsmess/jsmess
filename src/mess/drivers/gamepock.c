@@ -63,7 +63,7 @@ static MACHINE_DRIVER_START( gamepock )
 MACHINE_DRIVER_END
 
 static DEVICE_START(gamepock_cart) {
-	memory_set_bankptr( 1, memory_region(device->machine,  "user1" ) );
+	memory_set_bankptr( device->machine, 1, memory_region(device->machine,  "user1" ) );
 	return DEVICE_START_OK;
 }
 
@@ -76,7 +76,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 		return INIT_FAIL;
 	}
 
-	memory_set_bankptr( 1, memory_region(image->machine,  "user1" ) );
+	memory_set_bankptr( image->machine, 1, memory_region(image->machine,  "user1" ) );
 
 	return INIT_PASS;
 }

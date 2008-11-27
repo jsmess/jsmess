@@ -175,7 +175,7 @@ const game_driver * const drivers[] =
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
 	/* Hartung, Watara, ...*/
-//128u4	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
+	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
 
 	/* WATARA */
 //128u4	DRIVER( svision )	/* Supervision Handheld								*/
@@ -192,7 +192,7 @@ const game_driver * const drivers[] =
 //128u4	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
 
 	/* EPOCH */
-//128u4	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
+	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
 	/* KOEI */
 	DRIVER( pasogo )	/* KOEI PasoGo										*/

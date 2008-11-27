@@ -31,18 +31,18 @@ static READ8_HANDLER( gmaster_io_r )
 {
     UINT8 data=0;
     if (gmaster.ports[2]&1) {
-	data=memory_region(machine, "main")[0x4000+offset];
-	logerror("%.4x external memory %.4x read %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), 0x4000+offset,data);
+	data=memory_region(space->machine, "main")[0x4000+offset];
+	logerror("%.4x external memory %.4x read %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000+offset,data);
     } else {
 	switch (offset) {
 	case 1:
 	    data=gmaster_video.pixels[gmaster_video.y][gmaster_video.x];
-	    logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), gmaster_video.x, gmaster_video.y, 0x4000+offset,data);
+	    logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), gmaster_video.x, gmaster_video.y, 0x4000+offset,data);
 	    if (!(gmaster_video.mode)&&gmaster_video.delayed) gmaster_video.x++;
 	    gmaster_video.delayed=TRUE;
 	    break;
 	default:
-	  logerror("%.4x memory %.4x read %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), 0x4000+offset,data);
+	  logerror("%.4x memory %.4x read %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000+offset,data);
 	}
     }
     return data;
@@ -53,13 +53,13 @@ static READ8_HANDLER( gmaster_io_r )
 static WRITE8_HANDLER( gmaster_io_w )
 {
     if (gmaster.ports[2]&1) {
-	memory_region(machine, "main")[0x4000+offset]=data;
-	logerror("%.4x external memory %.4x written %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), 0x4000+offset, data);
+	memory_region(space->machine, "main")[0x4000+offset]=data;
+	logerror("%.4x external memory %.4x written %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000+offset, data);
     } else {
 	switch (offset) {
 	case 0:
 	    gmaster_video.delayed=FALSE;
-	    logerror("%.4x lcd %.4x written %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), 0x4000+offset, data);
+	    logerror("%.4x lcd %.4x written %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000+offset, data);
 	    // e2 af a4 a0 a9 falling block init for both halves
 	    if ((data&0xfc)==0xb8) {
 		gmaster_video.index=0;
@@ -78,7 +78,7 @@ static WRITE8_HANDLER( gmaster_io_w )
 	    if (gmaster_video.x<ARRAY_LENGTH(gmaster_video.pixels[0])) // continental galaxy flutlicht
 		gmaster_video.pixels[gmaster_video.y][gmaster_video.x]=data;
 	    logerror("%.4x lcd x:%.2x y:%.2x %.4x written %.2x\n",
-		     (int)activecpu_get_reg(CPUINFO_INT_PC), gmaster_video.x, gmaster_video.y, 0x4000+offset, data);
+		     (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), gmaster_video.x, gmaster_video.y, 0x4000+offset, data);
 	    gmaster_video.x++;
 /* 02 b8 1a
    02 bb 1a
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( gmaster_io_w )
 */
 	    break;
 	default:
-	  logerror("%.4x memory %.4x written %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), 0x4000+offset, data);
+	  logerror("%.4x memory %.4x written %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000+offset, data);
 	}
     }
 }
@@ -107,10 +107,10 @@ static READ8_HANDLER( gmaster_port_r )
     UINT8 data=0xff;
     switch (offset) {
     case UPD7810_PORTA:
-	data=input_port_read(machine, "JOY");
+	data=input_port_read(space->machine, "JOY");
 	break;
     default:
-      logerror("%.4x port %d read %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC),offset,data);
+      logerror("%.4x port %d read %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC),offset,data);
     }
     return data;
 }
@@ -118,7 +118,7 @@ static READ8_HANDLER( gmaster_port_r )
 static WRITE8_HANDLER( gmaster_port_w )
 {
     gmaster.ports[offset]=data;
-    logerror("%.4x port %d written %.2x\n",(int)activecpu_get_reg(CPUINFO_INT_PC), offset, data);
+    logerror("%.4x port %d written %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), offset, data);
     switch (offset) {
     case UPD7810_PORTC:
 	gmaster_video.y=BLITTER_Y;
@@ -203,7 +203,7 @@ static VIDEO_UPDATE( gmaster )
 
 static INTERRUPT_GEN( gmaster_interrupt )
 {
-  cpu_set_input_line(machine->cpu[0], UPD7810_INTFE1, PULSE_LINE);
+  cpu_set_input_line(device->machine->cpu[0], UPD7810_INTFE1, PULSE_LINE);
 }
 
 static UPD7810_CONFIG config={

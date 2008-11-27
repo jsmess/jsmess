@@ -15,24 +15,31 @@ static UINT8 gamepock_port_a;
 static UINT8 gamepock_port_b;
 static HD44102CH hd44102ch[3];
 
-static void hd44102ch_w( int which, int c_d, UINT8 data ) {
-	if ( c_d ) {
+static void hd44102ch_w( int which, int c_d, UINT8 data ) 
+{
+	if ( c_d ) 
+	{
 		UINT8	y;
 		/* Data */
 		hd44102ch[which].ram[ hd44102ch[which].address ] = data;
 
 		/* Increment/decrement Y counter */
 		y = ( hd44102ch[which].address & 0x3F ) + hd44102ch[which].y_inc;
-		if ( y == 0xFF ) {
+		if ( y == 0xFF ) 
+		{
 			y = 49;
 		}
-		if ( y == 50 ) {
+		if ( y == 50 ) 
+		{
 			y = 0;
 		}
 		hd44102ch[which].address = ( hd44102ch[which].address & 0xC0 ) | y;
-	} else {
+	} 
+	else 
+	{
 		/* Command */
-		switch ( data ) {
+		switch ( data ) 
+		{
 		case 0x38:		/* Display off */
 			hd44102ch[which].enabled = 0;
 			break;
@@ -52,7 +59,8 @@ static void hd44102ch_w( int which, int c_d, UINT8 data ) {
 			hd44102ch[which].start_page = data & 0xC0;
 			break;
 		default:
-			if ( ( data & 0x3F ) < 50 ) {
+			if ( ( data & 0x3F ) < 50 ) 
+			{
 				hd44102ch[which].address = data;
 			}
 			break;
@@ -60,77 +68,91 @@ static void hd44102ch_w( int which, int c_d, UINT8 data ) {
 	}
 }
 
-static void hd44102ch_init( int which ) {
+static void hd44102ch_init( int which ) 
+{
 	memset( &hd44102ch[which], 0, sizeof( HD44102CH ) );
 	hd44102ch[which].y_inc = 0x01;
 }
 
-static void gamepock_lcd_update(void) {
+static void gamepock_lcd_update(void) 
+{
 	/* Check whether HD44102CH #1 is enabled */
-	if ( gamepock_port_a & 0x08 ) {
+	if ( gamepock_port_a & 0x08 ) 
+	{
 		hd44102ch_w( 0, gamepock_port_a & 0x04, gamepock_port_b );
 	}
 
 	/* Check whether HD44102CH #2 is enabled */
-	if ( gamepock_port_a & 0x10 ) {
+	if ( gamepock_port_a & 0x10 ) 
+	{
 		hd44102ch_w( 1, gamepock_port_a & 0x04, gamepock_port_b );
 	}
 
 	/* Check whether HD44102CH #3 is enabled */
-	if ( gamepock_port_a & 0x20 ) {
+	if ( gamepock_port_a & 0x20 ) 
+	{
 		hd44102ch_w( 2, gamepock_port_a & 0x04, gamepock_port_b );
 	}
 }
 
-WRITE8_HANDLER( gamepock_port_a_w ) {
+WRITE8_HANDLER( gamepock_port_a_w ) 
+{
 	UINT8	old_port_a = gamepock_port_a;
 
 	gamepock_port_a = data;
 
-	if ( ! ( old_port_a & 0x02 ) && ( gamepock_port_a & 0x02 ) ) {
+	if ( ! ( old_port_a & 0x02 ) && ( gamepock_port_a & 0x02 ) ) 
+	{
 		gamepock_lcd_update();
 	}
 }
 
-WRITE8_HANDLER( gamepock_port_b_w ) {
+WRITE8_HANDLER( gamepock_port_b_w ) 
+{
 	gamepock_port_b = data;
 }
 
-READ8_HANDLER( gamepock_port_b_r ) {
+READ8_HANDLER( gamepock_port_b_r ) 
+{
 	logerror("gamepock_port_b_r: not implemented\n");
 	return 0xFF;
 }
 
-READ8_HANDLER( gamepock_port_c_r ) {
+READ8_HANDLER( gamepock_port_c_r ) 
+{
 	UINT8	data = 0xFF;
 
 	if ( gamepock_port_a & 0x80 ) 
 	{
-		data &= input_port_read(machine, "IN0");
+		data &= input_port_read(space->machine, "IN0");
 	}
 
 	if ( gamepock_port_a & 0x40 ) 
 	{
-		data &= input_port_read(machine, "IN1");
+		data &= input_port_read(space->machine, "IN1");
 	}
 
 	return data;
 }
 
-MACHINE_RESET( gamepock ) {
+MACHINE_RESET( gamepock ) 
+{
 	hd44102ch_init( 0 );
 	hd44102ch_init( 1 );
 	hd44102ch_init( 2 );
 }
 
-VIDEO_UPDATE( gamepock ) {
+VIDEO_UPDATE( gamepock ) 
+{
 	UINT8	ad;
 	int		i,j;
 
 	/* Handle HD44102CH #0 */
 	ad = hd44102ch[0].start_page;
-	for ( i = 0; i < 4; i++ ) {
-		for ( j = 0; j < 50; j++ ) {
+	for ( i = 0; i < 4; i++ ) 
+	{
+		for ( j = 0; j < 50; j++ ) 
+		{
 			*BITMAP_ADDR16(bitmap, i * 8 + 0, 49 - j ) = ( hd44102ch[0].ram[ad+j] & 0x01 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, i * 8 + 1, 49 - j ) = ( hd44102ch[0].ram[ad+j] & 0x02 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, i * 8 + 2, 49 - j ) = ( hd44102ch[0].ram[ad+j] & 0x04 ) ? 0 : 1;
@@ -145,8 +167,10 @@ VIDEO_UPDATE( gamepock ) {
 
 	/* Handle HD44102CH #1 */
 	ad = hd44102ch[1].start_page;
-	for ( i = 4; i < 8; i++ ) {
-		for ( j = 0; j < 50; j++ ) {
+	for ( i = 4; i < 8; i++ ) 
+	{
+		for ( j = 0; j < 50; j++ ) 
+		{
 			*BITMAP_ADDR16(bitmap, i * 8 + 0, j ) = ( hd44102ch[1].ram[ad+j] & 0x01 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, i * 8 + 1, j ) = ( hd44102ch[1].ram[ad+j] & 0x02 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, i * 8 + 2, j ) = ( hd44102ch[1].ram[ad+j] & 0x04 ) ? 0 : 1;
@@ -161,8 +185,10 @@ VIDEO_UPDATE( gamepock ) {
 
 	/* Handle HD44102CH #2 */
 	ad = hd44102ch[2].start_page;
-	for ( i = 0; i < 4; i++ ) {
-		for ( j = 0; j < 25; j++ ) {
+	for ( i = 0; i < 4; i++ ) 
+	{
+		for ( j = 0; j < 25; j++ ) 
+		{
 			*BITMAP_ADDR16(bitmap, i * 8 + 0, 50 + j ) = ( hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, i * 8 + 1, 50 + j ) = ( hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, i * 8 + 2, 50 + j ) = ( hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
@@ -172,7 +198,8 @@ VIDEO_UPDATE( gamepock ) {
 			*BITMAP_ADDR16(bitmap, i * 8 + 6, 50 + j ) = ( hd44102ch[2].ram[ad+j] & 0x40 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, i * 8 + 7, 50 + j ) = ( hd44102ch[2].ram[ad+j] & 0x80 ) ? 0 : 1;
 		}
-		for ( j = 25; j < 50; j++ ) {
+		for ( j = 25; j < 50; j++ ) 
+		{
 			*BITMAP_ADDR16(bitmap, 32 + i * 8 + 0, 25 + j ) = ( hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, 32 + i * 8 + 1, 25 + j ) = ( hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
 			*BITMAP_ADDR16(bitmap, 32 + i * 8 + 2, 25 + j ) = ( hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
@@ -189,8 +216,10 @@ VIDEO_UPDATE( gamepock ) {
 }
 
 /* This is called whenever the T0 pin switches state */
-int gamepock_io_callback( int ioline, int state ) {
-	if ( ioline == UPD7810_TO ) {
+int gamepock_io_callback( int ioline, int state ) 
+{
+	if ( ioline == UPD7810_TO ) 
+	{
 		speaker_level_w(0, state & 1 );
 	}
 	return 0;
