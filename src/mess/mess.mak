@@ -412,6 +412,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pk8020.a \
+	$(MESSOBJ)/pmd85.a \
 	$(MESSOBJ)/pp01.a \
 	$(MESSOBJ)/primo.a \
 	$(MESSOBJ)/radio.a \
@@ -464,7 +465,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/pasogo.a \
 #	$(MESSOBJ)/pc.a \
 #	$(MESSOBJ)/pdp1.a \
-#	$(MESSOBJ)/pmd85.a \
 #	$(MESSOBJ)/rca.a \
 #	$(MESSOBJ)/rockwell.a \
 #	$(MESSOBJ)/samcoupe.a \

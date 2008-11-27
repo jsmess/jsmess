@@ -824,20 +824,20 @@ XL/XE 16kB OS roms
 	DRIVER( lviv )		/* Lviv/L'vov										*/
 
 	/* Tesla */
-//128u4	DRIVER( pmd851 )	/* PMD-85.1											*/
-//128u4	DRIVER( pmd852 )	/* PMD-85.2											*/
-//128u4	DRIVER( pmd852a )	/* PMD-85.2A										*/
-//128u4	DRIVER( pmd852b )	/* PMD-85.2B										*/
-//128u4	DRIVER( pmd853 )	/* PMD-85.3											*/
+	DRIVER( pmd851 )	/* PMD-85.1											*/
+	DRIVER( pmd852 )	/* PMD-85.2											*/
+	DRIVER( pmd852a )	/* PMD-85.2A										*/
+	DRIVER( pmd852b )	/* PMD-85.2B										*/
+	DRIVER( pmd853 )	/* PMD-85.3											*/
 
 	/* Didaktik */
-//128u4	DRIVER( alfa )		/* Alfa (PMD-85.1 clone)							*/
+	DRIVER( alfa )		/* Alfa (PMD-85.1 clone)							*/
 
 	/* Statny */
-//128u4	DRIVER( mato )		/* Mato (PMD-85.2 clone)							*/
+	DRIVER( mato )		/* Mato (PMD-85.2 clone)							*/
 	
 	/* Zbrojovka Brno */
-//128u4	DRIVER( c2717 )		/* Consul 2717 (PMD-85.2 clone)				*/
+	DRIVER( c2717 )		/* Consul 2717 (PMD-85.2 clone)				*/
 	
 	/* Microkey */
 	DRIVER( primoa32 )	/* Primo A-32										*/
