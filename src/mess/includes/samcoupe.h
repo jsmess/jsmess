@@ -12,7 +12,8 @@
 #define SAMCOUPE_H_
 
 
-struct samcoupe_asic
+typedef struct _coupe_asic coupe_asic;
+struct _coupe_asic
 {
 	UINT8 lmpr, hmpr, vmpr; /* memory pages */
 	UINT8 lext, hext;       /* extended memory page */
@@ -25,14 +26,12 @@ struct samcoupe_asic
 
 /*----------- defined in drivers/samcoupe.c -----------*/
 
-void samcoupe_irq(running_machine *machine, UINT8 src);
+void samcoupe_irq(const device_config *device, UINT8 src);
 
 
 /*----------- defined in machine/samcoupe.c -----------*/
 
-extern struct samcoupe_asic samcoupe_regs; 
-
-void samcoupe_update_memory(running_machine *machine);
+void samcoupe_update_memory(const address_space *space);
 
 WRITE8_HANDLER( samcoupe_ext_mem_w );
 MACHINE_START( samcoupe );

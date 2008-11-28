@@ -25,15 +25,15 @@ Changes:
                   the future to support others
 
 Note on the bioses:
- SAM Coupé ROM Images
+ SAM Coupe ROM Images
  --------------------
 
- This archive contains many versions of the SAM Coupé 32K ROM image, released
+ This archive contains many versions of the SAM Coupe 32K ROM image, released
  with kind permission from the ROM author, Dr Andy Wright.
 
  Thanks to Simon N Goodwin for supplying the files, which include two dumped
  from pre-production hardware (and which only work with the early hardware!).
-	
+
  Beware - the early ROMs are very buggy, and tend to go mad once BASIC starts
  paging.  ROM 10 (version 1.0) requires the CALL after F9 or BOOT because the
  ROM loads the bootstrap but fails to execute it. The address depends on the
@@ -121,7 +121,7 @@ static READ8_HANDLER( samcoupe_pen_r )
 	if (offset & 0x100)
 	{
 		/* return either the current line or 192 for the vblank area */
-		int line = video_screen_get_vpos(space->machine->primary_screen); 
+		int line = video_screen_get_vpos(space->machine->primary_screen);
 		data = video_screen_get_vblank(space->machine->primary_screen) ? 192 : line;
 	}
 	else
@@ -135,13 +135,15 @@ static READ8_HANDLER( samcoupe_pen_r )
 
 
 static WRITE8_HANDLER( samcoupe_clut_w )
-{	
-	samcoupe_regs.clut[(offset >> 8) & 0x0f] = data & 0x7f;
+{
+	coupe_asic *asic = space->machine->driver_data;
+	asic->clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 
 static READ8_HANDLER( samcoupe_status_r )
 {
+	coupe_asic *asic = space->machine->driver_data;
 	UINT8 data = 0xe0;
 	UINT8 row = ~(offset >> 8);
 
@@ -154,52 +156,62 @@ static READ8_HANDLER( samcoupe_status_r )
 	if (row & 0x02) data &= input_port_read(space->machine, "keyboard_row_fd") & 0xe0;
 	if (row & 0x01) data &= input_port_read(space->machine, "keyboard_row_fe") & 0xe0;
 
-	return data | samcoupe_regs.status;
+	return data | asic->status;
 }
 
 
 static WRITE8_HANDLER( samcoupe_line_int_w )
 {
-	samcoupe_regs.line_int = data;
+	coupe_asic *asic = space->machine->driver_data;
+	asic->line_int = data;
 }
 
 
 static READ8_HANDLER( samcoupe_lmpr_r )
 {
-	return samcoupe_regs.lmpr;
+	coupe_asic *asic = space->machine->driver_data;
+	return asic->lmpr;
 }
 
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
-	samcoupe_regs.lmpr = data;
-	samcoupe_update_memory(space->machine);
+	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	coupe_asic *asic = space->machine->driver_data;
+	asic->lmpr = data;
+	samcoupe_update_memory(space_program);
 }
 
 
 static READ8_HANDLER( samcoupe_hmpr_r )
 {
-	return samcoupe_regs.hmpr;
+	coupe_asic *asic = space->machine->driver_data;
+	return asic->hmpr;
 }
 
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
-	samcoupe_regs.hmpr = data;
-	samcoupe_update_memory(space->machine);
+	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	coupe_asic *asic = space->machine->driver_data;
+	asic->hmpr = data;
+	samcoupe_update_memory(space_program);
 }
 
 
 static READ8_HANDLER( samcoupe_vmpr_r )
 {
-	return samcoupe_regs.vmpr;
+	coupe_asic *asic = space->machine->driver_data;
+	return asic->vmpr;
 }
 
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
-	samcoupe_regs.vmpr = data;
-	samcoupe_update_memory(space->machine);
+	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	coupe_asic *asic = space->machine->driver_data;
+	asic->vmpr = data;
+	samcoupe_update_memory(space_program);
 }
 
 
@@ -243,7 +255,8 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
-	samcoupe_regs.border = data;
+	coupe_asic *asic = space->machine->driver_data;
+	asic->border = data;
 
 	/* DAC output state */
 	speaker_level_w(0,(data >> 4) & 0x01);
@@ -260,7 +273,7 @@ static READ8_HANDLER( samcoupe_attributes_r )
 	else
 	{
 		/* TODO: This actually needs to return various attributes
-		 * of the currently displayed screen data */
+         * of the currently displayed screen data */
 		return 0x00;
 	}
 }
@@ -313,29 +326,33 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( irq_off )
 {
+	coupe_asic *asic = machine->driver_data;
+
 	/* clear interrupt */
 	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	
+
 	/* adjust STATUS register */
-	samcoupe_regs.status |= param;
+	asic->status |= param;
 }
 
 
-void samcoupe_irq(running_machine *machine, UINT8 src)
+void samcoupe_irq(const device_config *device, UINT8 src)
 {
+	coupe_asic *asic = device->machine->driver_data;
+
 	/* set irq and a timer to set it off again */
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 	timer_set(ATTOTIME_IN_USEC(20), NULL, src, irq_off);
-	
+
 	/* adjust STATUS register */
-	samcoupe_regs.status &= ~src;
+	asic->status &= ~src;
 }
 
 
 static INTERRUPT_GEN( samcoupe_frame_interrupt )
 {
 	/* signal frame interrupt */
-	samcoupe_irq(device->machine, 0x08);
+	samcoupe_irq(device, 0x08);
 }
 
 
@@ -514,6 +531,7 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	/* devices */
+	MDRV_DRIVER_DATA(coupe_asic)
 	MDRV_DEVICE_ADD("sambus_clock", MSM6242)
 
 	/* sound hardware */
@@ -532,10 +550,10 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-/* 
-	The bios is actually 32K. This is the combined version of the two old 16K MESS roms.
-	It does match the 3.0 one the most, but the first half differs in one byte 
-	and in the second half, the case of the "plc" in the company string differs.
+/*
+    The bios is actually 32K. This is the combined version of the two old 16K MESS roms.
+    It does match the 3.0 one the most, but the first half differs in one byte
+    and in the second half, the case of the "plc" in the company string differs.
 */
 ROM_START( samcoupe )
 	ROM_REGION( 0x8000, "main", 0 )

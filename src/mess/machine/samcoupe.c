@@ -19,18 +19,14 @@
 #define HMPR_MCNTRL  0x80	/* If set external RAM is enabled */
 
 
-struct samcoupe_asic samcoupe_regs;
-
-
-static void samcoupe_update_bank(running_machine *machine, int bank, UINT8 *memory, int is_readonly)
+static void samcoupe_update_bank(const address_space *space, int bank, UINT8 *memory, int is_readonly)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	read8_space_func rh = SMH_NOP;
 	write8_space_func wh = SMH_NOP;
 
 	if (memory)
 	{
-		memory_set_bankptr(machine,bank, memory);
+		memory_set_bankptr(space->machine, bank, memory);
 		rh = (read8_space_func) (STATIC_BANK1 + (FPTR)bank - 1);
 		wh = is_readonly ? SMH_UNMAP : (write8_space_func) (STATIC_BANK1 + (FPTR)bank - 1);
 	}
@@ -40,40 +36,42 @@ static void samcoupe_update_bank(running_machine *machine, int bank, UINT8 *memo
 }
 
 
-static void samcoupe_install_ext_mem(running_machine *machine)
+static void samcoupe_install_ext_mem(const address_space *space)
 {
+	coupe_asic *asic = space->machine->driver_data;
 	UINT8 *mem;
 
 	/* bank 3 */
-	if (samcoupe_regs.lext >> 6 < mess_ram_size >> 20)
-		mem = &mess_ram[(mess_ram_size & 0xfffff) + (samcoupe_regs.lext >> 6) * 0x100000 + (samcoupe_regs.lext & 0x3f) * 0x4000];
+	if (asic->lext >> 6 < mess_ram_size >> 20)
+		mem = &mess_ram[(mess_ram_size & 0xfffff) + (asic->lext >> 6) * 0x100000 + (asic->lext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
-	samcoupe_update_bank(machine, 3, mem, FALSE);
+	samcoupe_update_bank(space, 3, mem, FALSE);
 
 	/* bank 4 */
-	if (samcoupe_regs.hext >> 6 < mess_ram_size >> 20)
-		mem = &mess_ram[(mess_ram_size & 0xfffff) + (samcoupe_regs.hext >> 6) * 0x100000 + (samcoupe_regs.hext & 0x3f) * 0x4000];
+	if (asic->hext >> 6 < mess_ram_size >> 20)
+		mem = &mess_ram[(mess_ram_size & 0xfffff) + (asic->hext >> 6) * 0x100000 + (asic->hext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
-	samcoupe_update_bank(machine, 4, mem, FALSE);
+	samcoupe_update_bank(space, 4, mem, FALSE);
 }
 
 
-void samcoupe_update_memory(running_machine *machine)
+void samcoupe_update_memory(const address_space *space)
 {
+	coupe_asic *asic = space->machine->driver_data;
 	const int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	UINT8 *memory;
 	int is_readonly;
 
 	/* BANK1 */
-    if (samcoupe_regs.lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
+    if (asic->lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
 	{
-		if ((samcoupe_regs.lmpr & 0x1F) <= PAGE_MASK)
-			memory = &mess_ram[(samcoupe_regs.lmpr & PAGE_MASK) * 0x4000];
+		if ((asic->lmpr & 0x1F) <= PAGE_MASK)
+			memory = &mess_ram[(asic->lmpr & PAGE_MASK) * 0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		is_readonly = FALSE;
@@ -83,67 +81,70 @@ void samcoupe_update_memory(running_machine *machine)
 		memory = rom;	/* Rom0 paged in */
 		is_readonly = TRUE;
 	}
-	samcoupe_update_bank(machine, 1, memory, is_readonly);
+	samcoupe_update_bank(space, 1, memory, is_readonly);
 
 
 	/* BANK2 */
-	if (((samcoupe_regs.lmpr + 1) & 0x1f) <= PAGE_MASK)
-		memory = &mess_ram[((samcoupe_regs.lmpr + 1) & PAGE_MASK) * 0x4000];
+	if (((asic->lmpr + 1) & 0x1f) <= PAGE_MASK)
+		memory = &mess_ram[((asic->lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
 		memory = NULL;	/* Attempt to page in non existant ram region */
-	samcoupe_update_bank(machine, 2, memory, FALSE);
+	samcoupe_update_bank(space, 2, memory, FALSE);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
-	if (samcoupe_regs.hmpr & HMPR_MCNTRL)
+	if (asic->hmpr & HMPR_MCNTRL)
 	{
-		samcoupe_install_ext_mem(machine);
+		samcoupe_install_ext_mem(space);
 	}
 	else
 	{
 		/* BANK3 */
-		if ((samcoupe_regs.hmpr & 0x1F) <= PAGE_MASK )
-			memory = &mess_ram[(samcoupe_regs.hmpr & PAGE_MASK)*0x4000];
+		if ((asic->hmpr & 0x1F) <= PAGE_MASK )
+			memory = &mess_ram[(asic->hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
-		samcoupe_update_bank(machine, 3, memory, FALSE);
+		samcoupe_update_bank(space, 3, memory, FALSE);
 
 
 		/* BANK4 */
-		if (samcoupe_regs.lmpr & LMPR_ROM1)	/* Is Rom1 paged in at bank 4 */
+		if (asic->lmpr & LMPR_ROM1)	/* Is Rom1 paged in at bank 4 */
 		{
 			memory = rom + 0x4000;
 			is_readonly = TRUE;
 		}
 		else
 		{
-			if (((samcoupe_regs.hmpr + 1) & 0x1f) <= PAGE_MASK)
-				memory = &mess_ram[((samcoupe_regs.hmpr + 1) & PAGE_MASK) * 0x4000];
+			if (((asic->hmpr + 1) & 0x1f) <= PAGE_MASK)
+				memory = &mess_ram[((asic->hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
 				memory = NULL;	/* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
 		}
-		samcoupe_update_bank(machine, 4, memory, FALSE);
+		samcoupe_update_bank(space, 4, memory, FALSE);
 	}
 
 	/* video memory location */
-	if (samcoupe_regs.vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		videoram = &mess_ram[((samcoupe_regs.vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+	if (asic->vmpr & 0x40)	/* if bit set in 2 bank screen mode */
+		videoram = &mess_ram[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		videoram = &mess_ram[((samcoupe_regs.vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		videoram = &mess_ram[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 
 WRITE8_HANDLER( samcoupe_ext_mem_w )
 {
+	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	coupe_asic *asic = space->machine->driver_data;
+
 	if (offset & 1)
-		samcoupe_regs.hext = data;
+		asic->hext = data;
 	else
-		samcoupe_regs.lext = data;
+		asic->lext = data;
 
 	/* external RAM enabled? */
-	if (samcoupe_regs.hmpr & HMPR_MCNTRL)
+	if (asic->hmpr & HMPR_MCNTRL)
 	{
-		samcoupe_install_ext_mem(space->machine);
+		samcoupe_install_ext_mem(space_program);
 	}
 }
 
@@ -164,14 +165,15 @@ static WRITE8_HANDLER( samcoupe_rtc_w )
 
 MACHINE_RESET( samcoupe )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	const address_space *spaceio = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
-	memset(&samcoupe_regs, 0, sizeof(samcoupe_regs));
-	
-	samcoupe_regs.lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
-	samcoupe_regs.hmpr = 0x01;
-	samcoupe_regs.vmpr = 0x81;
-	samcoupe_regs.line_int = 0xff;  /* line interrupts disabled */
-	samcoupe_regs.status = 0x1f;    /* no interrupts active */
+	coupe_asic *asic = machine->driver_data;
+
+	asic->lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */
+	asic->hmpr = 0x01;
+	asic->vmpr = 0x81;
+	asic->line_int = 0xff;  /* line interrupts disabled */
+	asic->status = 0x1f;    /* no interrupts active */
 
 	if (input_port_read(machine, "config") & 0x01)
 	{
@@ -184,7 +186,7 @@ MACHINE_RESET( samcoupe )
 		memory_install_readwrite8_handler(spaceio, 0xef, 0xef, 0xffff, 0xff00, SMH_UNMAP, SMH_UNMAP);
 	}
 
-	samcoupe_update_memory(machine);
+	samcoupe_update_memory(space);
 }
 
 

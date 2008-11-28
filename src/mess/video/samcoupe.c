@@ -13,14 +13,15 @@
 #include "includes/samcoupe.h"
 
 
-static void drawMode4_line(bitmap_t *bitmap,int y)
+static void draw_mode4_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
+	coupe_asic *asic = screen->machine->driver_data;
 	int x;
-	unsigned char tmp=0;
 
-	for (x=0;x<256;)
+	for (x = 0; x < 256;)
 	{
-		tmp=*(videoram + (x/2) + (y*128));
+		UINT8 tmp = *(videoram + (x/2) + (y*128));
+
 #ifdef MONO
 		if (tmp>>4)
 		{
@@ -45,114 +46,111 @@ static void drawMode4_line(bitmap_t *bitmap,int y)
 		}
 		x++;
 #else
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = samcoupe_regs.clut[tmp>>4];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = samcoupe_regs.clut[tmp>>4];
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = asic->clut[tmp >> 4];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = asic->clut[tmp >> 4];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = samcoupe_regs.clut[tmp&0x0F];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = samcoupe_regs.clut[tmp&0x0F];
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = asic->clut[tmp & 0x0f];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = asic->clut[tmp & 0x0f];
 		x++;
 #endif
 	}
 }
 
-static void drawMode3_line(bitmap_t *bitmap,int y)
+static void draw_mode3_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
+	coupe_asic *asic = screen->machine->driver_data;
 	int x;
-	unsigned char tmp=0;
 
-	for (x=0;x<512;)
+	for (x = 0; x < 512;)
 	{
-		tmp=*(videoram + (x/4) + (y*128));
+		UINT8 tmp = *(videoram + (x/4) + (y*128));
+
 #ifdef MONO
-		if (tmp>>6)
-			plot_pixel(bitmap,x,y,127);
+		if (tmp >> 6)
+			plot_pixel(bitmap, x, y, 127);
 		else
-			plot_pixel(bitmap,x,y,0);
+			plot_pixel(bitmap, x, y, 0);
 		x++;
-		if ((tmp>>4)&0x03)
-			plot_pixel(bitmap,x,y,127);
+		if ((tmp >> 4) & 0x03)
+			plot_pixel(bitmap, x, y, 127);
 		else
-			plot_pixel(bitmap,x,y,0);
+			plot_pixel(bitmap, x, y, 0);
 		x++;
-		if ((tmp>>2)&0x03)
-			plot_pixel(bitmap,x,y,127);
+		if ((tmp >> 2) & 0x03)
+			plot_pixel(bitmap, x, y, 127);
 		else
-			plot_pixel(bitmap,x,y,0);
+			plot_pixel(bitmap, x, y, 0);
 		x++;
-		if (tmp&0x03)
-			plot_pixel(bitmap,x,y,127);
+		if (tmp & 0x03)
+			plot_pixel(bitmap, x, y, 127);
 		else
-			plot_pixel(bitmap,x,y,0);
+			plot_pixel(bitmap, x, y, 0);
 		x++;
 #else
-		*BITMAP_ADDR16(bitmap, y, x) = samcoupe_regs.clut[tmp>>6];
+		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[tmp >> 6];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = samcoupe_regs.clut[(tmp>>4)&0x03];
+		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[(tmp >> 4) & 0x03];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = samcoupe_regs.clut[(tmp>>2)&0x03];
+		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[(tmp >> 2) & 0x03];
 		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = samcoupe_regs.clut[tmp&0x03];
+		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[tmp & 0x03];
 		x++;
 #endif
 	}
 }
 
-static void drawMode2_line(bitmap_t *bitmap,int y)
+static void draw_mode2_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
-	int x,b,scrx;
-	unsigned char tmp=0;
-	unsigned short ink,pap;
-	unsigned char *attr;
+	coupe_asic *asic = screen->machine->driver_data;
+	int b, scrx = 0;
+	UINT16 ink = 127, pap = 0;
+	UINT8 *attr = videoram + 32*192 + y*32;
+	int x;
 
-	attr=videoram + 32*192 + y*32;
-
-	scrx=0;
-	for (x=0;x<256/8;x++)
+	for (x = 0; x < 256/8; x++)
 	{
-		tmp=*(videoram + x + (y*32));
-#ifdef MONO
-		ink = 127;
-		pap = 0;
-#else
-		ink = samcoupe_regs.clut[(*attr) & 0x07];
-		pap = samcoupe_regs.clut[((*attr)>>3) & 0x07];
+		UINT8 tmp = *(videoram + x + (y*32));
+
+#ifndef MONO
+		ink = asic->clut[(*attr) & 0x07];
+		pap = asic->clut[((*attr) >> 3) & 0x07];
 #endif
+
 		attr++;
 
-		for (b=0x80;b!=0;b>>=1)
+		for (b = 0x80; b!= 0; b >>= 1)
 		{
-			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? ink : pap;
-			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? ink : pap;
+			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp & b) ? ink : pap;
+			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp & b) ? ink : pap;
 		}
 	}
 }
 
-static void drawMode1_line(bitmap_t *bitmap,int y)
+static void draw_mode1_line(const device_config *screen, bitmap_t *bitmap, int y)
 {
-	int x,b,scrx,scry;
-	unsigned char tmp=0;
-	unsigned short ink,pap;
-	unsigned char *attr;
+	coupe_asic *asic = screen->machine->driver_data;
+	int x, b;
+	UINT16 ink = 127, pap = 0;
+	UINT8 *attr = videoram + 32*192 + (y/8)*32;
 
-	attr=videoram + 32*192 + (y/8)*32;
+	int scrx = 0;
+	int scry = ((y & 7) * 8) + ((y & 0x38) >> 3) + (y & 0xc0);
 
-	scrx=0;
-	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-	for (x=0;x<256/8;x++)
+	for (x = 0; x < 256/8; x++)
 	{
-		tmp=*(videoram + x + (y*32));
-#ifdef MONO
-		ink = 127;
-		pap = 0;
-#else
-		ink = samcoupe_regs.clut[(*attr) & 0x07];
-		pap = samcoupe_regs.clut[((*attr)>>3) & 0x07];
+		UINT8 tmp = *(videoram + x + (y*32));
+
+#ifndef MONO
+		ink = asic->clut[(*attr) & 0x07];
+		pap = asic->clut[((*attr)>>3) & 0x07];
 #endif
+
 		attr++;
-		for (b=0x80;b!=0;b>>=1)
+
+		for (b = 0x80; b != 0; b>>= 1)
 		{
-			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? ink : pap;
-			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? ink : pap;
+			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp & b) ? ink : pap;
+			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp & b) ? ink : pap;
 		}
 	}
 }
@@ -160,31 +158,27 @@ static void drawMode1_line(bitmap_t *bitmap,int y)
 VIDEO_UPDATE( samcoupe )
 {
 	int scanline = video_screen_get_vpos(screen);
+	coupe_asic *asic = screen->machine->driver_data;
 
 	/* line interrupt? */
-	if (samcoupe_regs.line_int == scanline) samcoupe_irq(screen->machine, 0x01);
+	if (asic->line_int == scanline)
+		samcoupe_irq(screen->machine->cpu[0], 0x01);
 
 	/* display disabled? (only in mode 3 or 4) */
-	if ((samcoupe_regs.vmpr & 0x40) && (samcoupe_regs.border & 0x80))
+	if ((asic->vmpr & 0x40) && (asic->border & 0x80))
 	{
+		/* display is disabled, draw a black screen */
 		fillbitmap(bitmap, 0, cliprect);
 	}
 	else
 	{
-		switch ((samcoupe_regs.vmpr & 0x60) >> 5)
+		/* display enabled, draw line in the right screen mode */
+		switch ((asic->vmpr & 0x60) >> 5)
 		{
-		case 0: /* mode 1 */
-			drawMode1_line(bitmap, scanline);
-			break;
-		case 1: /* mode 2 */
-			drawMode2_line(bitmap, scanline);
-			break;
-		case 2: /* mode 3 */
-			drawMode3_line(bitmap, scanline);
-			break;
-		case 3: /* mode 4 */
-			drawMode4_line(bitmap, scanline);
-			break;
+		case 0:	draw_mode1_line(screen, bitmap, scanline); break;
+		case 1:	draw_mode2_line(screen, bitmap, scanline); break;
+		case 2:	draw_mode3_line(screen, bitmap, scanline); break;
+		case 3:	draw_mode4_line(screen, bitmap, scanline); break;
 		}
 	}
 
