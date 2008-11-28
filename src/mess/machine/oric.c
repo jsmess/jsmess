@@ -1205,6 +1205,7 @@ MACHINE_RESET( oric )
 		}
 		break;
 	}
+	cpu_reset(cputag_get_cpu(machine, "main"));
 }
 
 
