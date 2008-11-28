@@ -19,7 +19,7 @@
 #include "machine/6532riot.h"
 #include "machine/74145.h"
 #include "sound/speaker.h"
-
+#include "deprecat.h"
 
 #define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
 
@@ -198,16 +198,16 @@ static WRITE8_HANDLER( sym1_via2_a_w )
 {
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	memory_install_write8_handler(space, 0xa600, 0xa67f, 0, 0,
+	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0xa600, 0xa67f, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
 
-	memory_install_write8_handler(space, 0x0400, 0x07ff, 0, 0,
+	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x0400, 0x07ff, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
 
-	memory_install_write8_handler(space, 0x0800, 0x0bff, 0, 0,
+	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x0800, 0x0bff, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
 
-	memory_install_write8_handler(space, 0x0c00, 0x0fff, 0, 0,
+	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x0c00, 0x0fff, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
 }
 
@@ -277,8 +277,7 @@ DRIVER_INIT( sym1 )
 	/* wipe expansion memory banks that are not installed */
 	if (mess_ram_size < 4*1024)
 	{
-		const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-		memory_install_readwrite8_handler(space,
+		memory_install_readwrite8_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),
 			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 
@@ -297,14 +296,13 @@ DRIVER_INIT( sym1 )
 
 MACHINE_RESET( sym1 )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-
 	via_reset();
 	ttl74145_reset(0);
 
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */
-	memory_install_readwrite8_handler(space,
+	memory_install_readwrite8_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),
 			0xf800, 0xffff, 0, 0, SMH_BANK1, SMH_NOP);
 	memory_set_bankptr(machine, 1, sym1_monitor + 0x800);
+	cpu_reset(cputag_get_cpu(machine, "main"));
 }
