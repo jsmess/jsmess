@@ -240,19 +240,19 @@ const game_driver * const drivers[] =
 	DRIVER( apple2 )	/* Apr 1977 Apple ][								*/
 	DRIVER( apple2p )	/* Jun 1979 Apple ][+								*/
 	DRIVER( apple2jp )	/* ??? ???? Apple ][j+								*/
-	DRIVER( apple2e )	/* Jan 1983 Apple //128u4e								*/
-	DRIVER( apple2ee )	/* Mar 1985 Apple //128u4e Enhanced						*/
-	DRIVER( apple2ep )	/* Jan 1987 Apple //128u4e Platinum						*/
-	DRIVER( apple2c )	/* Apr 1984 Apple //128u4c								*/
-	DRIVER( apple2c0 )	/* ??? 1985 Apple //128u4c (3.5 ROM)						*/
-	DRIVER( apple2c3 )	/* Sep 1986 Apple //128u4c (Original Mem. Exp.)			*/
-	DRIVER( apple2c4 )	/* ??? 198? Apple //128u4c (rev 4)						*/
-	DRIVER( apple2cp )	/* Sep 1988 Apple //128u4c+								*/
+	DRIVER( apple2e )	/* Jan 1983 Apple //e								*/
+	DRIVER( apple2ee )	/* Mar 1985 Apple //e Enhanced						*/
+	DRIVER( apple2ep )	/* Jan 1987 Apple //e Platinum						*/
+	DRIVER( apple2c )	/* Apr 1984 Apple //c								*/
+	DRIVER( apple2c0 )	/* ??? 1985 Apple //c (3.5 ROM)						*/
+	DRIVER( apple2c3 )	/* Sep 1986 Apple //c (Original Mem. Exp.)			*/
+	DRIVER( apple2c4 )	/* ??? 198? Apple //c (rev 4)						*/
+	DRIVER( apple2cp )	/* Sep 1988 Apple //c+								*/
 	DRIVER( apple2g0 )	/* Sep 1986 Apple IIgs ROM00						*/
 	DRIVER( apple2g1 )	/* Sep 1987 Apple IIgs ROM01						*/
 	DRIVER( apple2gs )	/* Aug 1989 Apple IIgs ROM03						*/
-	DRIVER( apple3 )	/* May 1980 Apple //128u4/								*/
-					/* Dec 1983 Apple //128u4/+								*/
+	DRIVER( apple3 )	/* May 1980 Apple ///								*/
+					/* Dec 1983 Apple ///+								*/
 	DRIVER( ace100 )	/* ??? 1982 Franklin Ace 100						*/
 	DRIVER( laser128 )	/* ??? 1987 Laser 128								*/
 	DRIVER( las128ex )	/* ??? 1987 Laser 128 EX							*/
