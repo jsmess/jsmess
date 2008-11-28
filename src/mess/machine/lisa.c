@@ -1085,6 +1085,8 @@ NVRAM_HANDLER(lisa)
 
 DRIVER_INIT( lisa2 )
 {
+	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
 	lisa_model = lisa2;
 	lisa_features.has_fast_timers = 0;
 	lisa_features.floppy_hardware = sony_lisa2;
@@ -1096,6 +1098,8 @@ DRIVER_INIT( lisa2 )
 
 DRIVER_INIT( lisa210 )
 {
+	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
 	lisa_model = lisa210;
 	lisa_features.has_fast_timers = 1;
 	lisa_features.floppy_hardware = sony_lisa210;
@@ -1107,6 +1111,8 @@ DRIVER_INIT( lisa210 )
 
 DRIVER_INIT( mac_xl )
 {
+	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
 	lisa_model = mac_xl;
 	lisa_features.has_fast_timers = 1;
 	lisa_features.floppy_hardware = sony_lisa210;
@@ -1460,7 +1466,6 @@ READ16_HANDLER ( lisa_r )
 	/* upper 7 bits -> segment # */
 	int segment = (offset >> 16) & 0x7f;
 
-
 	/*logerror("read, logical address%lX\n", offset);*/
 
 	if (setup)
@@ -1528,6 +1533,7 @@ READ16_HANDLER ( lisa_r )
 				mem_err_addr_latch = address >> 5;
 				set_parity_error_pending(space->machine, 1);
 			}
+
 			break;
 
 		case RAM_r:
@@ -1545,16 +1551,19 @@ READ16_HANDLER ( lisa_r )
 				mem_err_addr_latch = address >> 5;
 				set_parity_error_pending(space->machine, 1);
 			}
+
 			break;
 
 		case IO:
 			answer = lisa_IO_r(space, (address & 0x00ffff) >> 1, mem_mask);
+
 			break;
 
 		case invalid:		/* unmapped segment */
 			/* bus error */
 
 			answer = 0;
+
 			break;
 
 		case special_IO:
@@ -1613,6 +1622,7 @@ READ16_HANDLER ( lisa_r )
 				}
 
 			}
+
 			break;
 		}
 	}
