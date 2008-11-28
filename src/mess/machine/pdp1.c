@@ -196,6 +196,7 @@ static void pdp1_machine_stop(running_machine *machine)
 MACHINE_START( pdp1 )
 {
 	UINT8 *dst;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	static const unsigned char fontdata6x8[pdp1_fontdata_size] =
 	{	/* ASCII characters */
@@ -329,7 +330,7 @@ MACHINE_START( pdp1 )
 	dst = memory_region(machine, "gfx1");
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	memory_set_direct_update_handler(0, setOPbasefunc);
+	memory_set_direct_update_handler(space, setOPbasefunc);
 
 	add_exit_callback(machine, pdp1_machine_stop);
 }

@@ -84,13 +84,15 @@ DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride )
 
 MACHINE_START( jupiter )
 {
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	logerror("jupiter_init\r\n");
 	logerror("data: %p\n", jupiter_data);
 
 	if (jupiter_data)
 	{
 		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);
-		memory_set_direct_update_handler(0, jupiter_opbaseoverride);
+		memory_set_direct_update_handler(space, jupiter_opbaseoverride);
 	}
 
 	add_exit_callback(machine, jupiter_machine_stop);

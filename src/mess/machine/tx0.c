@@ -165,7 +165,8 @@ static void tx0_machine_stop(running_machine *machine)
 
 MACHINE_START( tx0 )
 {
-	memory_set_direct_update_handler(0, setOPbasefunc);;
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	memory_set_direct_update_handler(space, setOPbasefunc);;
 
 	tape_reader.timer = timer_alloc(reader_callback, NULL);
 	tape_puncher.timer = timer_alloc(puncher_callback, NULL);
