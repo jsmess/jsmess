@@ -1,9 +1,5 @@
 ﻿0.128.1
 
-NOTE:  DUE TO THE IMPACT OF THE MAME 0.128u4 MERGE; MANY DRIVERS HAVE BEEN
-TEMPORARILY DISABLED.  AS THESE DRIVERS ARE PORTED TO THE NEW CORE, THEY
-WILL BE REENABLED.
-
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Ivel Ultra [Miodrag Milanovic]
@@ -14,7 +10,6 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-
 - [ABC800M] Added HR graphics. [Curt Coder, Erik Isaksson]
 
 - [ABC802] Added keyboard simulation. [Curt Coder]
@@ -106,7 +101,6 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-
 - [ABC80] Made keyboard a little less hacky. [Curt Coder]
 
 - [ABC800M] Added keyboard hack to enable system use. [Curt Coder]
