@@ -194,6 +194,8 @@ static int scorpion_256_port_1ffd_data = 0;
 
 static int ROMSelection;
 
+//static UINT8 *rom_pointer;
+
 static void scorpion_update_memory(running_machine *machine)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
@@ -204,7 +206,8 @@ static void scorpion_update_memory(running_machine *machine)
 	if ((scorpion_256_port_1ffd_data & 0x01)==0x01)
 	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-		memory_set_bankptr(machine, 1, mess_ram+(8<<14));		
+		memory_set_bankptr(machine, 1, mess_ram+(8<<14));	
+		logerror("RAM\n");	
 	}
 	else
 	{
@@ -212,7 +215,6 @@ static void scorpion_update_memory(running_machine *machine)
 		{
 			ROMSelection = 2;			
 		} else {
-			/* ROM switching */
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}			
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -224,20 +226,26 @@ static void scorpion_update_memory(running_machine *machine)
 
 static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {	
+	UINT16 pc = cpu_get_reg(space->machine->cpu[0], REG_PREVIOUSPC);
 	if (betadisk_is_active()) {
-		if (cpu_get_pc(space->machine->cpu[0]) >= 0x4000) {
+		if (pc >= 0x4000) {
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable();
-			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x010000 + 0x4000*ROMSelection); // Set BASIC ROM
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x010000 + (ROMSelection<<14));
 		} 	
-	} else if (((cpu_get_pc(space->machine->cpu[0]) & 0xff00) == 0x3d00) && (ROMSelection==1))
+	} else if (((pc & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
 		ROMSelection = 3;
 		betadisk_enable();
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x01c000); // Set TRDOS ROM			
-		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		
 	} 
+	if((address>=0x0000) && (address<=0x3fff)) {
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		direct->raw = direct->decrypted =  memory_region(space->machine, "main") + 0x010000 + (ROMSelection<<14);
+		memory_set_bankptr(space->machine, 1, direct->raw);
+		return ~0;
+	}
 	return address;
 }
 
@@ -290,9 +298,9 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( scorpion )
 {	
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);	
 	
-	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	
 	betadisk_disable();
 	betadisk_clear_status();
