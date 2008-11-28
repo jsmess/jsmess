@@ -1690,7 +1690,7 @@ static MACHINE_RESET( a2600 )
 	case modeF6:
 		memory_install_write8_handler(space, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_w);
 		memory_install_read8_handler(space, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_r);
-		memory_set_direct_update_handler( 0, modeF6_opbase );
+		memory_set_direct_update_handler(space, modeF6_opbase );
 		break;
 
 	case modeF4:
@@ -1746,7 +1746,7 @@ static MACHINE_RESET( a2600 )
 		memory_set_bankptr(machine, 2, bank_base[2] );
 		modeSS_write_enabled = 0;
 		modeSS_byte_started = 0;
-		memory_set_direct_update_handler( 0, modeSS_opbase );
+		memory_set_direct_update_handler(space, modeSS_opbase );
 		/* Already start the motor of the cassette for the user */
 		cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
@@ -1761,7 +1761,7 @@ static MACHINE_RESET( a2600 )
 		memory_install_write8_handler(space, 0x1040, 0x107f, 0, 0, modeDPC_w);
 		memory_install_write8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
 		memory_install_read8_handler(space, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
-		memory_set_direct_update_handler( 0, modeDPC_opbase_handler );
+		memory_set_direct_update_handler(space, modeDPC_opbase_handler );
 		{
 			int	data_fetcher;
 			for( data_fetcher = 0; data_fetcher < 8; data_fetcher++ ) {
