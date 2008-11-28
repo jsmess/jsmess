@@ -54,7 +54,7 @@ VIDEO_UPDATE( mekd2 )
 {
 	int width = video_screen_get_width(screen);
     int x, y;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
     for (x = 0; x < 6; x++)
     {

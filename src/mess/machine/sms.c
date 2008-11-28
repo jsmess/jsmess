@@ -29,7 +29,7 @@ static UINT8 sms_mapper[4];
 static UINT8 *sms_banking_bios[5]; /* we are going to use 1-4, same as bank numbers */
 static UINT8 *sms_banking_cart[5]; /* we are going to use 1-4, same as bank numbers */
 static UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
-static UINT8 ggSIO[5] = { 0x7F, 0xFF, 0x00, 0xFF, 0x00 };
+static UINT8 ggSIO[5];
 static UINT8 sms_store_control = 0;
 
 static UINT8 sms_input_port0;

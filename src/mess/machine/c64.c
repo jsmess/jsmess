@@ -1151,8 +1151,8 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	int value, i;
 	int controller1 = input_port_read(device->machine, "CTRLSEL") & 0x07;
 	int controller2 = input_port_read(device->machine, "CTRLSEL") & 0x70;
-	static const char *c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
-	static const char *c128ports[] = { "KP0", "KP1", "KP2" };
+	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
+	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
 
 	c64_nmi(device->machine);
 

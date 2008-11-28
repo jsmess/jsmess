@@ -191,7 +191,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 {
 	int row;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", 
 										"LINE6", "LINE7", "LINE8", "LINE9", "LINE10" };
 
 	row = svi.keyboard_row;

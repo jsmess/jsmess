@@ -473,7 +473,7 @@ static void x68k_keyboard_push_scancode(unsigned char code)
 static TIMER_CALLBACK(x68k_keyboard_poll)
 {
 	int x;
-	static const char *keynames[] = { "key1", "key2", "key3", "key4" };
+	static const char *const keynames[] = { "key1", "key2", "key3", "key4" };
 
 	for(x=0;x<0x80;x++)
 	{

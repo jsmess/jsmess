@@ -138,7 +138,7 @@ static READ8_DEVICE_HANDLER ( pio_port_a_r )
 static READ8_DEVICE_HANDLER ( pio_port_b_r )
 {
 	UINT8 demux_LS145, data = 0xff;
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", 
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", 
 										"ROW6", "ROW7", "ROW8", "ROW9", "ROW10" };
 
     demux_LS145 = pio_port_a_output & 15;

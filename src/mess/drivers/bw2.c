@@ -436,7 +436,7 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_b_r )
 	*/
 
 	UINT8 row;
-	static const char *rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
+	static const char *const rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
 	row = keyboard_row;
 

@@ -38,7 +38,7 @@ MACHINE_RESET( mz80k )
 
 READ8_DEVICE_HANDLER(mz80k_8255_portb_r)
 {
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	if (mz80k_keyboard_line > 9) {
 		return 0xff;
 	} else {
@@ -86,7 +86,7 @@ static PIT8253_OUTPUT_CHANGED( pit_out2_changed )
 	cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 }
 
-ppi8255_interface mz80k_8255_int =
+const ppi8255_interface mz80k_8255_int =
 {
 	NULL,
 	mz80k_8255_portb_r,
@@ -96,7 +96,7 @@ ppi8255_interface mz80k_8255_int =
 	mz80k_8255_portc_w,
 };
 
-struct pit8253_config mz80k_pit8253_config =
+const struct pit8253_config mz80k_pit8253_config =
 {
 	{
 		/* clockin	  irq callback	  */

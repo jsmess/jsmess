@@ -341,7 +341,7 @@ static void einstein_scan_keyboard(running_machine *machine)
 {
 	unsigned char data = 0x0ff;
 	int i;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	for (i=0; i<8; i++)
 	{
@@ -427,7 +427,7 @@ static WRITE8_DEVICE_HANDLER(einstein_serial_receive_clock)
 	msm8251_receive_clock();
 }
 
-static z80ctc_interface	einstein_ctc_intf =
+static const z80ctc_interface einstein_ctc_intf =
 {
 	"main",
 	EINSTEIN_SYSTEM_CLOCK,
@@ -435,7 +435,7 @@ static z80ctc_interface	einstein_ctc_intf =
 	einstein_ctc_interrupt,
 	einstein_serial_transmit_clock,
 	einstein_serial_receive_clock,
-    z80ctc_trg3_w
+	z80ctc_trg3_w
 };
 
 static Z80PIO_ON_ARDY_CHANGED( einstein_pio_ardy )

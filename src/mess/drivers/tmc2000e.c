@@ -189,7 +189,7 @@ static CDP1802_EF_READ( tmc2000e_ef_r )
 	tmc2000e_state *state = device->machine->driver_data;
 
 	UINT8 flags = 0x0f;
-	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	/*
         EF1     CDP1864

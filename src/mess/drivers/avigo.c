@@ -180,7 +180,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 	static int ox = 0, oy = 0;
 	int nx,ny;
 	int dx, dy;
-	static const char *linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
+	static const char *const linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
 	for (i = 0; i < 4; i++)
 	{
@@ -403,7 +403,7 @@ static MACHINE_RESET( avigo )
 {
 	int i;
 	unsigned char *addr;
-	static const char *linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
+	static const char *const linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
 	memset(avigo_banked_opbase, 0, sizeof(avigo_banked_opbase));
 

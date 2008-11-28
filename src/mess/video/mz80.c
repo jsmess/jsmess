@@ -11,7 +11,7 @@
 #include "machine/pit8253.h"
 #include "includes/mz80.h"
 
-gfx_layout mz80k_charlayout =
+const gfx_layout mz80k_charlayout =
 {
 	8, 8,				/* 8x8 characters */
 	256,				/* 256 characters */
@@ -22,7 +22,7 @@ gfx_layout mz80k_charlayout =
 	8*8					/* size of one char */
 };
 
-gfx_layout mz80kj_charlayout =
+const gfx_layout mz80kj_charlayout =
 {
 	8, 8,				/* 8x8 characters */
 	256,				/* 256 characters */

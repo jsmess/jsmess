@@ -355,7 +355,7 @@ static char cartridge_mbx = FALSE;
 static UINT16 *current_page_ptr;
 static UINT8 *current_page_ptr_8;
 /* keep track of cart file types - required for cleanup... */
-typedef enum slot_type_t { SLOT_EMPTY = -1, SLOT_GROM = 0, SLOT_CROM = 1, SLOT_DROM = 2, SLOT_MINIMEM = 3, SLOT_MBX = 4 } slot_type_t;
+typedef enum _slot_type_t { SLOT_EMPTY = -1, SLOT_GROM = 0, SLOT_CROM = 1, SLOT_DROM = 2, SLOT_MINIMEM = 3, SLOT_MBX = 4 } slot_type_t;
 static slot_type_t slot_type[3] = { SLOT_EMPTY, SLOT_EMPTY, SLOT_EMPTY};
 
 /* true if 99/4p rom6 is enabled */
@@ -1857,7 +1857,7 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 	UINT32 key_buf;
 	UINT8 current_key;
 	int i;
-	static const char *keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
+	static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 
 	/* read current key state */
 	key_buf = ( input_port_read(machine, keynames[num]) | (input_port_read(machine, keynames[num + 1]) << 16) ) >> (4*num);
@@ -2261,7 +2261,7 @@ static int ti99_R9901_0(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	if ((ti99_model == model_99_4) && (KeyCol == 7))
 		answer = (ti99_handset_poll_bus() << 3) | 0x80;
@@ -2305,7 +2305,7 @@ static int ti99_R9901_1(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	if (/*(ti99_model == model_99_4) &&*/ (KeyCol == 7))
 		answer = 0x07;
@@ -2401,7 +2401,7 @@ static int ti99_8_R9901_0(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
 										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
 
 	if (has_mecmouse && (KeyCol == 15))
@@ -2435,7 +2435,7 @@ static int ti99_8_R9901_1(int offset)
 {
 	running_machine *machine = Machine;
 	int answer;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
 										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
 
 	if (has_mecmouse && (KeyCol == 15))

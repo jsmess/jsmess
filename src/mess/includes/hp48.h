@@ -62,10 +62,10 @@ extern void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data );
 
 struct hp48_port_config;
 
-extern struct hp48_port_config hp48sx_port1_config;
-extern struct hp48_port_config hp48sx_port2_config;
-extern struct hp48_port_config hp48gx_port1_config;
-extern struct hp48_port_config hp48gx_port2_config;
+extern const struct hp48_port_config hp48sx_port1_config;
+extern const struct hp48_port_config hp48sx_port2_config;
+extern const struct hp48_port_config hp48gx_port1_config;
+extern const struct hp48_port_config hp48gx_port2_config;
 
 extern DEVICE_GET_INFO( hp48_port );
 

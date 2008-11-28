@@ -148,7 +148,7 @@ READ8_HANDLER( odyssey2_getp2 )
 {
     UINT8 h = 0xFF;
     int i, j;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
     if (!(p1 & P1_KEYBOARD_SCAN_ENABLE))
 	{

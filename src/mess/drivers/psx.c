@@ -199,7 +199,7 @@ static void psx_pad( running_machine *machine, int n_port, int n_data )
 	int b_data;
 	int b_ack;
 	int b_ready;
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	b_sel = ( n_data & PSX_SIO_OUT_DTR ) / PSX_SIO_OUT_DTR;
 	b_clock = ( n_data & PSX_SIO_OUT_CLOCK ) / PSX_SIO_OUT_CLOCK;

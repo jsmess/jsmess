@@ -133,7 +133,7 @@ void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit 
 
 UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata)
 {
-	static const char *keynames[] =
+	static const char *const keynames[] =
 	{
 		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
 		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"

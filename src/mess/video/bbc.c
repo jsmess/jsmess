@@ -533,8 +533,8 @@ static void BBC_Set_CRE(int offset, int data)
 }
 
 
-static struct m6845_interface
-BBC6845= {
+static const struct m6845_interface BBC6845 =
+{
 	0,// Memory Address register
 	BBC_Set_Character_Row,// Row Address register
 	BBC_Set_HSync,// Horizontal status

@@ -29,7 +29,7 @@ static UINT8 super80v_rom_pcg=1;			// 0 = prom ; 1 = pcg
 static UINT8 mc6845_cursor[16];				// cursor shape
 static UINT8 mc6845_reg[20];				/* registers */
 static UINT8 mc6845_ind;				/* register index */
-static UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
+static const UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
 #define MASTER_CLOCK			(XTAL_12MHz)
 #define PIXEL_CLOCK			(MASTER_CLOCK/2)
@@ -359,7 +359,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	int bit;
 	UINT8 data = 0xff;

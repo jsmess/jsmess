@@ -81,7 +81,7 @@ static void primo_update_memory(running_machine *machine)
 READ8_HANDLER( primo_be_1_r )
 {
 	UINT8 data = 0x00;
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	// bit 7, 6 - not used
 

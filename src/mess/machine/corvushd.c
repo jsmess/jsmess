@@ -1173,7 +1173,7 @@ static UINT8 corvus_format_drive(running_machine *machine, UINT8 *pattern, UINT1
 //		hard_disk_file object
 //
 static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
-	const char *tags[] = {
+	static const char *const tags[] = {
 		"harddisk1"
 	};
 	const device_config *img;

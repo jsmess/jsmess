@@ -145,7 +145,7 @@ static void scan_keyboard(running_machine *machine)
 	UINT8 keycode = 0;
 	UINT8 data;
 	int table = 0, row, col;
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
 
 	// shift, upper case
 	if (input_port_read(machine, "ROW7") & 0x07)
@@ -884,7 +884,7 @@ static int sio_serial_receive( const device_config *device, int channel )
 	return -1;
 }
 
-static z80sio_interface sio_intf =
+static const z80sio_interface sio_intf =
 {
 	Z80_TAG,				/* cpu */
 	ABC800_X01/2/2,			/* clock */

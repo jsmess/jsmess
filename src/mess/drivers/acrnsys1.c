@@ -25,7 +25,7 @@ static UINT8 key_digit;
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
 	UINT8 data;
-	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
+	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 
 	data = input_port_read(device->machine, keynames[key_digit]);

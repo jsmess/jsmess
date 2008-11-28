@@ -174,7 +174,7 @@ static void poll_keyboard(running_machine *machine)
 	UINT32 key_transitions;
 	int i, j;
 	int keycode;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
 	for(i = 0; (i < /*4*/3) && (KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{

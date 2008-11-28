@@ -730,7 +730,7 @@ static READ8_DEVICE_HANDLER( msx_ppi_port_b_r )
 {
 	UINT8 result = 0xff;
 	int row, data;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
 	row = ppi8255_r(device, 2) & 0x0f;
 	if (row <= 10)

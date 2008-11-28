@@ -899,7 +899,7 @@ static void kc_keyboard_add_pulse_to_transmit_buffer(int pulse_state)
 static void kc_keyboard_init(running_machine *machine)
 {
 	int i;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	/* head and tail of list is at beginning */
 	keyboard_data.head = (keyboard_data.tail = 0);
@@ -1040,7 +1040,7 @@ static void kc_keyboard_attempt_transmit(running_machine *machine)
 static TIMER_CALLBACK(kc_keyboard_update)
 {
 	int i;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	/* scan all lines (excluding shift) */
 	for (i=0; i<KC_KEYBOARD_NUM_LINES-1; i++)

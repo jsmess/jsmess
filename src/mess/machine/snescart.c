@@ -16,7 +16,7 @@
 #define UNK "Unknown"
 
 /* Some known type of cart */
-static const char *types[] =
+static const char *const types[] =
 {
 	"ROM",
 	"ROM, DSP-1",
@@ -39,7 +39,7 @@ static const char *types[] =
 };
 
 /* Some known countries */
-static const char *countries[] =
+static const char *const countries[] =
 {
 /* 0*/	"Japan (NTSC)", "USA & Canada (NTSC)", "Europe, Oceania & Asia (PAL)", "Sweden (PAL)", 
 /* 4*/	"Finland (PAL)", "Denmark (PAL)", "France (PAL)", "Holland (PAL)", 
@@ -48,7 +48,7 @@ static const char *countries[] =
 };
 
 /* Some known companies (integrations to the list from Snes9x) */
-static const char *companies[] =
+static const char *const companies[] =
 {
 /* 0*/	"Invalid", "Nintendo", "Ajinomoto", "Imagineer-Zoom", "Chris Gray Enterprises Inc.", "Zamuse", "Falcom", UNK, 
 /* 8*/	"Capcom", "HOT-B", "Jaleco", "Coconuts", "Rage Software", "Micronet", "Technos", "Mebio Software", 

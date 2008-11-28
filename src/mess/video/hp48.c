@@ -31,8 +31,8 @@
 ***************************************************************************/
 
 /* base colors */
-static int hp48_bg_color[3] = { 136, 147, 109 };  /* yellow */
-static int hp48_fg_color[3] = {   0,   0,  64 };  /* dark blue */
+static const int hp48_bg_color[3] = { 136, 147, 109 };  /* yellow */
+static const int hp48_fg_color[3] = {   0,   0,  64 };  /* dark blue */
 
 /* color mixing */
 #define mix(c1,c2,x) (c1)*(1-(x))+(c2)*(x)

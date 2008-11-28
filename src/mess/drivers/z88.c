@@ -77,7 +77,7 @@ static void z88_update_rtc_interrupt(void)
 static TIMER_CALLBACK(z88_rtc_timer_callback)
 {
 	int refresh_ints = 0;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	/* is z88 in snooze state? */
 	if (blink.z88_state == Z88_SNOOZE)

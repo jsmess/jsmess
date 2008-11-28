@@ -380,7 +380,7 @@ static int scan_keyboard(running_machine *machine)
 	int i, j;
 	int keybuf;
 	int keycode;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
 
 	if (keycode_buf_index)
 	{

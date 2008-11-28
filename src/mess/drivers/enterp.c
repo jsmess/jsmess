@@ -120,7 +120,7 @@ static void enterprise_dave_reg_write(running_machine *machine, int RegIndex, in
 
 static void enterprise_dave_reg_read(running_machine *machine, int RegIndex)
 {
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", 
 										"LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	switch (RegIndex)
 	{

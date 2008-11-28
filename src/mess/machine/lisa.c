@@ -395,7 +395,7 @@ static void scan_keyboard(running_machine *machine)
 	int i, j;
 	int keybuf;
 	UINT8 keycode;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	if (! COPS_force_unplug)
 		for (i=0; i<8; i++)

@@ -227,7 +227,7 @@ void v_via_irq(running_machine *machine, int level)
 READ8_HANDLER(v_via_pb_r)
 {
 	int pot;
-	static const char *ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
+	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
 	pot = input_port_read(space->machine, ctrlnames[(vectrex_via_out[PORTB] & 0x6) >> 1]) - 0x80; 
 	

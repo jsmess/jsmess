@@ -247,7 +247,7 @@ static WRITE8_HANDLER ( ti99_2_write_misc_cru )
 /* read keys in the current row */
 static  READ8_HANDLER ( ti99_2_read_kbd )
 {
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	return input_port_read(space->machine, keynames[KeyRow]);
 }

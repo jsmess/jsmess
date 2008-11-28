@@ -173,7 +173,7 @@ static void abc80_keyboard_scan(running_machine *machine)
 {
 	abc80_state *state = machine->driver_data;
 
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6" };
 	int table = 0, row, col;
 
 	if (input_port_read(machine, "ROW7") & 0x07)

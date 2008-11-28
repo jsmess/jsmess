@@ -62,7 +62,7 @@ static UINT8 dai_keyboard_read (void)
 {
 	UINT8 data = 0x00;
 	int i;
-	static const char *keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	for (i = 0; i < 8; i++)
 	{

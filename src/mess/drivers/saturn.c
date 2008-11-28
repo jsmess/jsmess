@@ -479,7 +479,7 @@ static void system_reset()
 static void smpc_intbackhelper(running_machine *machine)
 {
 	int pad;
-	static const char *padnames[] = { "JOY1", "JOY2" };
+	static const char *const padnames[] = { "JOY1", "JOY2" };
 
 	if (intback_stage == 1)
 	{

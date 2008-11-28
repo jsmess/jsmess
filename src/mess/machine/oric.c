@@ -119,7 +119,7 @@ static void oric_keyboard_sense_refresh(running_machine *machine)
 
 	/* what if data is 0, can it sense if any of the keys on a line are pressed? */
 	int input_port_data;
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
  	input_port_data = input_port_read(machine, keynames[oric_keyboard_line]);
 

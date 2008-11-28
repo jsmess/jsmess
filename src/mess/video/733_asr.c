@@ -625,7 +625,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 	modifier_state_t modifier_state;
 	int repeat_mode;
 
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* read current key state */
 	/* 2008-05 FP: in 733_asr.h there are only 4 input ports defined... */

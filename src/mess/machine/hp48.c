@@ -101,7 +101,7 @@ static UINT8 hp48_kdn;
 /* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
 static hp48_module hp48_modules[6];
 
-static const char* hp48_module_names[6] = 
+static const char *const hp48_module_names[6] = 
   { "HDW (I/O)", "NCE2 (RAM)", "CE1", "CE2", "NCE3", "NCE1 (ROM)" };
 
 /* values returned by C=ID */
@@ -989,10 +989,10 @@ static void hp48_encode_nibble( UINT8* dst, UINT8* src, int size )
 /* ----- card images ------ */
 
 /* port information configurations */
-struct hp48_port_config hp48sx_port1_config = { 0, 2,    128*1024, "p1", "port1" };
-struct hp48_port_config hp48sx_port2_config = { 1, 3,    128*1024, "p2", "port2" };
-struct hp48_port_config hp48gx_port1_config = { 0, 3,    128*1024, "p1", "port1" };
-struct hp48_port_config hp48gx_port2_config = { 1, 4, 4*1024*1024, "p2", "port2" };
+const struct hp48_port_config hp48sx_port1_config = { 0, 2,    128*1024, "p1", "port1" };
+const struct hp48_port_config hp48sx_port2_config = { 1, 3,    128*1024, "p2", "port2" };
+const struct hp48_port_config hp48gx_port1_config = { 0, 3,    128*1024, "p1", "port1" };
+const struct hp48_port_config hp48gx_port2_config = { 1, 4, 4*1024*1024, "p2", "port2" };
 
 /* helper for load and create */
 static void hp48_fill_port( const device_config* image )

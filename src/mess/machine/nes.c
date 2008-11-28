@@ -306,7 +306,7 @@ static void nes_machine_stop(running_machine *machine)
 static void nes_read_input_device(running_machine *machine, int cfg, nes_input *vals, int pad_port,
 	int supports_zapper, int paddle_port)
 {
-	static const char *padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4" };
+	static const char *const padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4" };
 
 	vals->i0 = 0;
 	vals->i1 = 0;

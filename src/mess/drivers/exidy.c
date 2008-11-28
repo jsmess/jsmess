@@ -558,7 +558,7 @@ static READ8_HANDLER(exidy_fe_port_r)
      - tied high, allowing PARIN and PAROUT bios routines to run */
 
 	UINT8 data = 0xc0;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", 
 										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15" };
 
 	/* bit 5 - vsync (inverted) */

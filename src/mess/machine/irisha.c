@@ -39,7 +39,7 @@ MACHINE_RESET( irisha )
   irisha_keypressed = 0;
 }
 
-static const char *keynames[] = {
+static const char *const keynames[] = {
 							"LINE0", "LINE1", "LINE2", "LINE3",
 							"LINE4", "LINE5", "LINE6", "LINE7",
 							"LINE8", "LINE9"};

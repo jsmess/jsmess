@@ -289,7 +289,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	int port, bit;
 	int key_pressed;
 	UINT32 shiftkeys, ctrlkeys;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
 	   seen during the last scan. */

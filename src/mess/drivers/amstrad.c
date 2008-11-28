@@ -2282,7 +2282,7 @@ static READ8_HANDLER ( amstrad_psg_porta_read )
    If keyboard matrix line 11-14 are selected, the byte is always &ff.
    After testing on a real CPC, it is found that these never change, they always return &FF. */
 
-	static const char *keynames[] = { "keyboard_row_0", "keyboard_row_1", "keyboard_row_2", "keyboard_row_3", "keyboard_row_4", 
+	static const char *const keynames[] = { "keyboard_row_0", "keyboard_row_1", "keyboard_row_2", "keyboard_row_3", "keyboard_row_4", 
 										"keyboard_row_5", "keyboard_row_6", "keyboard_row_7", "keyboard_row_8", "keyboard_row_9",
 										"keyboard_row_10" };
 

@@ -367,7 +367,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	static unsigned int time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
 
-	static const char *portnames[] = { "keyb_0", "keyb_1", "keyb_2", "keyb_3", "keyb_4", "keyb_5", "keyb_6", 
+	static const char *const portnames[] = { "keyb_0", "keyb_1", "keyb_2", "keyb_3", "keyb_4", "keyb_5", "keyb_6", 
 										"keypad_1", "keypad_2" };
 
 	/* check for these special cases because they affect the emulated key codes */

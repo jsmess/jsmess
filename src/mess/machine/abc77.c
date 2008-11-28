@@ -99,7 +99,7 @@ static READ8_HANDLER( abc77_data_r )
 	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
-	static const char *keynames[] = { "ABC77_X0", "ABC77_X1", "ABC77_X2", "ABC77_X3", "ABC77_X4", "ABC77_X5", "ABC77_X6", "ABC77_X7", "ABC77_X8", "ABC77_X9", "ABC77_X10", "ABC77_X11" };
+	static const char *const keynames[] = { "ABC77_X0", "ABC77_X1", "ABC77_X2", "ABC77_X3", "ABC77_X4", "ABC77_X5", "ABC77_X6", "ABC77_X7", "ABC77_X8", "ABC77_X9", "ABC77_X10", "ABC77_X11" };
 
 	return input_port_read(device->machine, keynames[abc77->keylatch]);
 }

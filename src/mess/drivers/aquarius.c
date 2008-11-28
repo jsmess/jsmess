@@ -145,7 +145,7 @@ static READ8_HANDLER( keyboard_r )
 
 	UINT8 keylatch = offset >> 8;
 	int row;
-	static const char *rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
+	static const char *const rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
 	if (keylatch == 0) return 0;
 

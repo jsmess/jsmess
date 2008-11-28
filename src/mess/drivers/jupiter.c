@@ -292,7 +292,7 @@ static VIDEO_UPDATE( jupiter )
 }
 
 
-static cassette_config jupiter_cassette_config =
+static const cassette_config jupiter_cassette_config =
 {
 	jupiter_cassette_formats,
 	NULL,

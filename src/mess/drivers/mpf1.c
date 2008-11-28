@@ -303,7 +303,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 static READ8_DEVICE_HANDLER( mpf1_porta_r )
 {
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5" };
 
 	UINT8 retval;
 	for(keycol = 0; keycol < 6; keycol++)

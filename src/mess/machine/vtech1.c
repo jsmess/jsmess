@@ -484,7 +484,7 @@ READ8_HANDLER(vtech1_keyboard_r)
 	static int cassette_bit = 0;
 	int row, data = 0xff;
 	double level;
-	static const char *keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
+	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 
 	/* scan keyboard rows */
@@ -528,7 +528,7 @@ WRITE8_HANDLER(vtech1_latch_w)
 	/* cassette data bits toggle? */
 	if ((vtech1_latch ^ data ) & 0x06)
 	{
-		static double amp[4] = { +1.0, +0.5, -0.5, -1.0 };
+		static const double amp[4] = { +1.0, +0.5, -0.5, -1.0 };
 		cassette_output(cassette_device_image(space->machine), amp[(data >> 1) & 3]);
 	}
 

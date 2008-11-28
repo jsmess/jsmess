@@ -406,7 +406,7 @@ static void sys9901_interrupt_callback(int intreq, int ic)
 static int sys9901_r0(int offset)
 {
 	int reply = 0x00;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
 
 	/* keyboard read */
 	if (digitsel < 9)

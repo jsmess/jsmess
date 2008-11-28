@@ -103,7 +103,7 @@ static int keyboard_matrix_r(running_machine *machine, int offs)
 	int bit = (offs >> 4) & 7;
 	int extra = input_port_read(machine, "EXTRA");
 	int data = 0;
-	static const char *keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 
 	data = (input_port_read(machine, keynames[port]) >> bit) & 1;

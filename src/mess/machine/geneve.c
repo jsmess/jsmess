@@ -1037,7 +1037,7 @@ static void poll_keyboard(running_machine *machine)
 	int i, j;
 	int keycode;
 	int pressed;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	static const UINT8 keyboard_mf1_code[0xe] =
 	{

@@ -106,7 +106,7 @@ static WRITE8_HANDLER ( pet_pia0_port_a_write )
 static  READ8_HANDLER ( pet_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 	
 	if (pet_keyline_select < 10) 
@@ -123,7 +123,7 @@ static  READ8_HANDLER ( pet_pia0_port_b_read )
 static READ8_HANDLER( petb_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 	
 	if (pet_keyline_select < 10) 

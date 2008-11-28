@@ -344,7 +344,7 @@ PORT_START("JOY")
 INPUT_PORTS_END
 
 /* palette in red, green, blue tribles */
-static unsigned char pasogo_palette[][3] =
+static const unsigned char pasogo_palette[][3] =
 {
 	{ 0, 0, 0 },
 	{ 45,45,43 },

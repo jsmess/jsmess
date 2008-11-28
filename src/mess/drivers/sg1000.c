@@ -483,7 +483,7 @@ static int keylatch;
 
 static READ8_DEVICE_HANDLER( sc3000_ppi8255_a_r )
 {
-	static const char *keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
+	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
 	/*
         Signal  Description
@@ -503,7 +503,7 @@ static READ8_DEVICE_HANDLER( sc3000_ppi8255_a_r )
 
 static READ8_DEVICE_HANDLER( sc3000_ppi8255_b_r )
 {
-	static const char *keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
+	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
 	/*
         Signal  Description

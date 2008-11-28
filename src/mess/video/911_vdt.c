@@ -576,7 +576,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 	modifier_state_t modifier_state;
 	int repeat_mode;
 
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
 	/* read current key state */
 	for (i = 0; i < 6; i++)

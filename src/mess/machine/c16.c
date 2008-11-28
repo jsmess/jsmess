@@ -600,7 +600,7 @@ MACHINE_RESET( c16 )
 INTERRUPT_GEN( c16_frame_interrupt )
 {
 	int value, i;
-	static const char *c16ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
+	static const char *const c16ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
 	/* Lines 0-7 : common keyboard */
 	for (i = 0; i < 8; i++)

@@ -296,7 +296,7 @@ READ8_HANDLER ( ti85_port_0001_r )
 	int data = 0xff;
 	int port;
 	int bit;
-	static const char *bitnames[] = { "BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5", "BIT6", "BIT7" };
+	static const char *const bitnames[] = { "BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5", "BIT6", "BIT7" };
 
 	if (ti85_keypad_mask == 0x7f) return data;
 

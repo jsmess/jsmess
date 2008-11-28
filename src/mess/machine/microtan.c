@@ -608,7 +608,7 @@ INTERRUPT_GEN( microtan_interrupt )
 {
     int mod, row, col, chg, new;
     static int lastrow = 0, mask = 0x00, key = 0x00, repeat = 0, repeater = 0;
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
     if( repeat )
     {
@@ -923,7 +923,7 @@ DRIVER_INIT( microtan )
 MACHINE_RESET( microtan )
 {
     int i;
-	static const char *keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 	
 	for (i = 1; i < 10;  i++)
 	{

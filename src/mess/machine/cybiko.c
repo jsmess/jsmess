@@ -418,7 +418,7 @@ static READ8_HANDLER( cybiko_key_r_byte )
 {
 	UINT8 data = 0xFF;
 	int i;
-	static const char *keynames[] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" };
+	static const char *const keynames[] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" };
 	
 	_logerror( 2, ("cybiko_key_r_byte (%08X)\n", offset));
 	// A11

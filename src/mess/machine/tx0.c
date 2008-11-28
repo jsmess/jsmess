@@ -1120,7 +1120,7 @@ static void tx0_keyboard(running_machine *machine)
 
 	int typewriter_transitions;
 	int charcode, lr;
-	static const char *twrnames[] = { "TWR0", "TWR1", "TWR2", "TWR3" };
+	static const char *const twrnames[] = { "TWR0", "TWR1", "TWR2", "TWR3" };
 
 	for (i=0; i<4; i++)
 	{

@@ -369,7 +369,7 @@ static const UINT8 pdp1_palette[] =
 	pen_typewriter_bg, pen_red
 };
 
-static UINT8 total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
+static const UINT8 total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
 
 static GFXDECODE_START( pdp1 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(pdp1_colors) / 3, 3 )
