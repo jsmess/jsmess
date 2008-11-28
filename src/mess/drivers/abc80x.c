@@ -822,7 +822,7 @@ static WRITE8_DEVICE_HANDLER( ctc_z1_w )
 		//z80sio_rxca_w(z80sio, data);
 	}
 
-	if (BIT(sb, 8))
+	if (BIT(sb, 4))
 	{
 		/* connected to SIO/2 TxCA, CTC CLK/TRG3 */
 		//z80sio_txca_w(z80sio, data);

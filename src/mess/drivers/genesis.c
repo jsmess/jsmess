@@ -484,7 +484,7 @@ SYSTEM_CONFIG_END
 
 static UINT16 pico_read_penpos(int pen)
 {
-  UINT16 penpos;
+  UINT16 penpos = 0;
 
   switch (pen)
     {
