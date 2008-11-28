@@ -154,10 +154,10 @@ static int vdusel=0;
 	PC is in the range c000 to dfff
 	or if pagedRAM set and PC is in the range a000 to afff
 */
-static int vdudriverset(void)
+static int vdudriverset(running_machine *machine)
 {
 	int PC;
-	PC=cpu_get_pc( Machine->activecpu ); // this needs to be set to the 6502 program counter
+	PC=cpu_get_pc( machine->cpu[0] ); // this needs to be set to the 6502 program counter
 	return (((PC>=0xc000) && (PC<=0xdfff)) || ((pagedRAM) && ((PC>=0xa000) && (PC<=0xafff))));
 }
 
@@ -228,7 +228,7 @@ static DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 		// not in shadow ram mode so just read normal ram
 		memory_set_bankptr(space->machine, 2, ram+0x3000);
 	} else {
-		if (vdudriverset())
+		if (vdudriverset(space->machine))
 		{
 			// if VDUDriver set then read from shadow ram
 			memory_set_bankptr(space->machine, 2, ram+0xb000);
@@ -250,7 +250,7 @@ WRITE8_HANDLER ( memorybp2_w )
 		ram[offset+0x3000]=data;
 		vidmem[offset+0x3000]=1;
 	} else {
-		if (vdudriverset())
+		if (vdudriverset(space->machine))
 		{
 			// if VDUDriver set then write to shadow ram
 			ram[offset+0xb000]=data;
@@ -434,10 +434,10 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 }
 
 
-static int bbcm_vdudriverset(void)
+static int bbcm_vdudriverset(running_machine *machine)
 {
 	int PC;
-	PC=cpu_get_pc( Machine->activecpu );
+	PC=cpu_get_pc( machine->cpu[0] );
 	return ((PC>=0xc000) && (PC<=0xdfff));
 }
 
@@ -472,7 +472,7 @@ static DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 	{
 		memory_set_bankptr( space->machine, 2, memory_region( space->machine, "main" ) + 0xb000 );
 	} else {
-		if (ACCCON_E && bbcm_vdudriverset())
+		if (ACCCON_E && bbcm_vdudriverset(space->machine))
 		{
 			memory_set_bankptr( space->machine, 2, memory_region( space->machine, "main" ) + 0xb000 );
 		} else {
@@ -493,7 +493,7 @@ WRITE8_HANDLER ( memorybm2_w )
 		ram[offset+0xb000]=data;
 		vidmem[offset+0xb000]=1;
 	} else {
-		if (ACCCON_E && bbcm_vdudriverset())
+		if (ACCCON_E && bbcm_vdudriverset(space->machine))
 		{
 			ram[offset+0xb000]=data;
 			vidmem[offset+0xb000]=1;

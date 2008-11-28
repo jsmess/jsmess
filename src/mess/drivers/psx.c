@@ -81,13 +81,13 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 		free( m_p_psxexe );
 
-		cpu_set_reg(machine->activecpu,  MIPS_PC, m_psxexe_header.pc0 );
-		cpu_set_reg(machine->activecpu,  MIPS_R28, m_psxexe_header.gp0 );
+		cpu_set_reg(machine->cpu[0],  MIPS_PC, m_psxexe_header.pc0 );
+		cpu_set_reg(machine->cpu[0],  MIPS_R28, m_psxexe_header.gp0 );
 		n_stack = m_psxexe_header.s_addr + m_psxexe_header.s_size;
 		if( n_stack != 0 )
 		{
-			cpu_set_reg(machine->activecpu,  MIPS_R29, n_stack );
-			cpu_set_reg(machine->activecpu,  MIPS_R30, n_stack );
+			cpu_set_reg(machine->cpu[0],  MIPS_R29, n_stack );
+			cpu_set_reg(machine->cpu[0],  MIPS_R30, n_stack );
 		}
 
 		memory_set_direct_update_handler( 0, NULL );

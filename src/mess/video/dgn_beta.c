@@ -230,7 +230,7 @@ void vid_set_gctrl(int data)
 				     data & GCtrlHiLo		? "Hi" : "Lo",
 				     data & GCtrlSWChar		? "C0" : "C1",
 				     data & GCtrlWI		? "Wi" : "  ",
-				     cpu_get_pc( Machine->activecpu ));
+				     cpu_get_pc( Machine->cpu[0] ));
 }
 
 // called when the 6845 changes the character row

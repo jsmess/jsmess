@@ -194,11 +194,13 @@ READ64_HANDLER( bebox_crossproc_interrupts_r )
 {
 	UINT32 result;
 	result = bebox_crossproc_interrupts;
-	/* TODO: This test needs to be really fixed */
-	if ( space->machine->activecpu != space->machine->cpu[0] )
+
+	/* return a different result depending on which CPU is accessing this handler */
+	if (space != cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM))
 		result |= 0x02000000;
 	else
 		result &= ~0x02000000;
+
 	return ((UINT64) result) << 32;
 }
 

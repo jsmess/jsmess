@@ -123,7 +123,7 @@ static UINT8 sym1_riot_b_r(const device_config *device, UINT8 olddata)
 
 static void sym1_riot_a_w(const device_config *device, UINT8 newdata, UINT8 data)
 {
-	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine->activecpu ), data);
+	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine->cpu[0] ), data);
 
 	/* save for later use */
 	riot_port_a = data;
@@ -132,7 +132,7 @@ static void sym1_riot_a_w(const device_config *device, UINT8 newdata, UINT8 data
 
 static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data)
 {
-	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine->activecpu ), data);
+	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine->cpu[0] ), data);
 
 	/* save for later use */
 	riot_port_b = data;

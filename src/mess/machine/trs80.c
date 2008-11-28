@@ -130,7 +130,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			quickload_size--;
 		}
 	}
-	cpu_set_reg(image->machine->activecpu, Z80_PC, entry);
+	cpu_set_reg(image->machine->cpu[0], Z80_PC, entry);
 
 	free(cmd_buff);
 	return INIT_PASS;
