@@ -3,10 +3,12 @@
 #include "includes/serial.h"
 
 
-static void acia_6551_receive_char(unsigned char ch);
-static void acia_6551_refresh_ints(void);
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-struct acia6551
+typedef struct _acia6551 acia6551;
+struct _acia6551
 {
 	unsigned char transmit_data_register;
 	unsigned char receive_data_register;
@@ -15,7 +17,7 @@ struct acia6551
 	unsigned char control_register;
 
 	/* internal baud rate timer */
-	void	*timer;
+	emu_timer	*timer;
 	/* callback for internal baud rate timer */
 	void (*acia_updated_callback)(int id, unsigned long State);
 
@@ -32,7 +34,19 @@ struct acia6551
 };
 
 
-static struct acia6551 acia;
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static void acia_6551_receive_char(unsigned char ch);
+static void acia_6551_refresh_ints(void);
+
+static acia6551 acia;
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 /*
 A1 A0     Write                    Read
@@ -87,7 +101,7 @@ void acia_6551_init(void)
 {
 	serial_helper_setup();
 
-	memset(&acia, 0, sizeof(struct acia6551));
+	memset(&acia, 0, sizeof(acia));
 	/* transmit data reg is empty */
 	acia.status_register |= (1<<4);
 	acia.timer = timer_alloc(acia_6551_timer_callback, NULL);
