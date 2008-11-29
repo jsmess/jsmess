@@ -336,7 +336,7 @@ WRITE8_DEVICE_HANDLER(scc_w)
 
 
 /*-------------------------------------------------
-    DEVICE_GET_INFO( scc8530 )
+    DEVICE_SET_INFO( scc8530 )
 -------------------------------------------------*/
 
 static DEVICE_SET_INFO( scc8530 )
