@@ -41,7 +41,6 @@
 
 
     These early colour computers have a PROM to create the foreground palette.
-	This PROM (82s123.ic7) is now dumped, but not yet merged into the code.
 
 ***************************************************************************/
 
