@@ -172,9 +172,10 @@ I/O ports
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
-#include "machine/8255ppi.h"
 #include "includes/pmd85.h"
+#include "machine/8255ppi.h"
 #include "machine/pit8253.h"
+#include "machine/msm8251.h"
 #include "formats/pmd_pmd.h"
 
 /* I/O ports */
@@ -569,7 +570,11 @@ static MACHINE_DRIVER_START( pmd85 )
 	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", pmd85_cassette_config )
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmd851 )
@@ -625,6 +630,8 @@ static MACHINE_DRIVER_START( mato )
 	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
 	MDRV_DEVICE_CONFIG( mato_ppi8255_interface )
 
+	/* no uart */
+	MDRV_DEVICE_REMOVE( "uart", MSM8251 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c2717 )

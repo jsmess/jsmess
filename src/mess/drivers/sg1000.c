@@ -194,8 +194,8 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_READ(nec765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(nec765_data_r, nec765_data_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xe8, 0xe8) AM_READWRITE(msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xe9, 0xe9) AM_READWRITE(msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -701,13 +701,6 @@ static const struct nec765_interface sf7000_nec765_interface =
 	NULL
 };
 
-static const struct msm8251_interface sf7000_uart_interface =
-{
-	NULL,
-	NULL,
-	NULL
-};
-
 static const CENTRONICS_CONFIG sf7000_centronics_config[1] = {
 	{
 		PRINTER_IBM,
@@ -725,7 +718,6 @@ static MACHINE_START( sf7000 )
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 
 	/* configure PPI */
-	msm8251_init(&sf7000_uart_interface);
 	centronics_config(1, sf7000_centronics_config);
 
 	/* configure memory banking */
@@ -842,6 +834,9 @@ static MACHINE_DRIVER_START( sf7000 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", sc3000_cassette_config )
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
 MACHINE_DRIVER_END
 
 /* ROMs */

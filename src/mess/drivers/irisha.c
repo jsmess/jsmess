@@ -22,9 +22,9 @@ static ADDRESS_MAP_START(irisha_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( irisha_io , ADDRESS_SPACE_IO, 8)
-  AM_RANGE( 0x04, 0x05) AM_READ(irisha_keyboard_r)
-	AM_RANGE( 0x06, 0x06) AM_READWRITE(msm8251_data_r,msm8251_data_w)
-	AM_RANGE( 0x07, 0x07) AM_READWRITE(msm8251_status_r,msm8251_control_w)
+	AM_RANGE( 0x04, 0x05) AM_READ(irisha_keyboard_r)
+	AM_RANGE( 0x06, 0x06) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE( 0x07, 0x07) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE( 0x08, 0x0B) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0x0C, 0x0F) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w ) AM_MASK( 0x01 )
 	AM_RANGE( 0x10, 0x13) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w )
@@ -156,6 +156,9 @@ static MACHINE_DRIVER_START( irisha )
 
 		MDRV_VIDEO_START(irisha)
     MDRV_VIDEO_UPDATE(irisha)
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
 MACHINE_DRIVER_END
 
 /* ROM definition */

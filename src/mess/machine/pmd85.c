@@ -391,13 +391,6 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portc_w )
 
 *******************************************************************************/
 
-static const struct msm8251_interface pmd85_msm8251_interface =
-{
-	NULL,
-	NULL,
-	NULL
-};
-
 /*******************************************************************************
 
 	I/O board 8253
@@ -542,8 +535,8 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: return msm8251_data_r(space, offset & 0x01);
-											case 0x01: return msm8251_status_r(space, offset & 0x01);
+											case 0x00: return msm8251_data_r(device_list_find_by_tag( space->machine->config->devicelist, MSM8251, "uart" ), offset & 0x01);
+											case 0x01: return msm8251_status_r(device_list_find_by_tag( space->machine->config->devicelist, MSM8251, "uart" ), offset & 0x01);
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
@@ -617,8 +610,8 @@ WRITE8_HANDLER ( pmd85_io_w )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: msm8251_data_w(space, offset & 0x01, data); break;
-											case 0x01: msm8251_control_w(space, offset & 0x01, data); break;
+											case 0x00: msm8251_data_w(device_list_find_by_tag( space->machine->config->devicelist, MSM8251, "uart" ), offset & 0x01, data); break;
+											case 0x01: msm8251_control_w(device_list_find_by_tag( space->machine->config->devicelist, MSM8251, "uart" ), offset & 0x01, data); break;
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
@@ -805,7 +798,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 
 							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
 							serial_connection_out(&pmd85_cassette_serial_connection);
-							msm8251_receive_clock();
+							msm8251_receive_clock(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ));
 
 							clk_level_tape = 1;
 						}
@@ -829,7 +822,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), data&0x01 ? 1 : -1);
 
 			if (!clk_level_tape)
-				msm8251_transmit_clock();
+				msm8251_transmit_clock(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ));
 
 			clk_level_tape = clk_level_tape ? 0 : 1;
 
@@ -839,7 +832,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		clk_level_tape = 1;
 
 		if (!clk_level)
-			msm8251_transmit_clock();
+			msm8251_transmit_clock(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ));
 		clk_level = clk_level ? 0 : 1;
 	}
 }
@@ -858,15 +851,13 @@ static DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 
 static void pmd85_common_driver_init (running_machine *machine)
 {
-	msm8251_init(&pmd85_msm8251_interface);
-
 	pmd85_cassette_timer = timer_alloc(pmd85_cassette_timer_callback, NULL);
 	timer_adjust_periodic(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 
 	serial_connection_init(&pmd85_cassette_serial_connection);
 	serial_connection_set_in_callback(&pmd85_cassette_serial_connection, pmd85_cassette_write);
 
-	msm8251_connect(&pmd85_cassette_serial_connection);
+	msm8251_connect(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ), &pmd85_cassette_serial_connection);
 }
 
 DRIVER_INIT ( pmd851 )
@@ -939,20 +930,6 @@ MACHINE_RESET( pmd85 )
 	memset(mess_ram, 0, sizeof(unsigned char)*0x10000);
 	pmd85_startup_mem_map = 1;
 	pmd85_update_memory(machine);
-
-	/* io devices initialization */
-	switch (pmd85_model)
-	{
-		case PMD85_1:
-		case PMD85_2A:
-		case PMD85_3:
-		case C2717:
-		case ALFA:
-			msm8251_reset();
-			break;
-		case MATO:
-			break;
-	}
 
 	timer_set( attotime_zero, NULL, 0, setup_pit8253_gates );
 

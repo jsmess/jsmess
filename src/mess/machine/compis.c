@@ -537,7 +537,7 @@ WRITE16_HANDLER ( compis_rtc_w )
 /*-------------------------------------------------------------------------*/
 /*  USART 8251                                                             */
 /*-------------------------------------------------------------------------*/
-static void compis_usart_rxready(int state)
+static void compis_usart_rxready(const device_config *device, int state)
 {
 /*
 	if (state)
@@ -545,7 +545,7 @@ static void compis_usart_rxready(int state)
 */
 }
 
-static const struct msm8251_interface compis_usart_interface=
+const msm8251_interface compis_usart_interface=
 {
 	NULL,
 	NULL,
@@ -554,18 +554,20 @@ static const struct msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	return msm8251_data_r(space, offset);
+	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
+	return msm8251_data_r(uart, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
 {
+	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
 	switch (offset)
 	{
 		case 0x00:
-			msm8251_data_w(space, 0, data);
+			msm8251_data_w(uart, 0, data);
 			break;
 		case 0x01:
-			msm8251_control_w(space, 0, data);
+			msm8251_control_w(uart, 0, data);
 			break;
 		default:
 			logerror("USART Unknown Port Write %04X = %04X\n", offset, data);
@@ -1548,9 +1550,6 @@ MACHINE_RESET( compis )
 
 	/* RTC */
 	mm58274c_init(machine, 0, 0, 1);
-
-	/* Setup the USART */
-	msm8251_init(&compis_usart_interface);
 
 	/* Keyboard */
 	compis_keyb_init();

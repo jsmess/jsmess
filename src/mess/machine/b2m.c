@@ -354,18 +354,10 @@ READ8_HANDLER ( b2m_localmachine_r )
 	return b2m_localmachine;
 }
 
-static const struct msm8251_interface b2m_msm8251_interface =
-{
-	NULL,
-	NULL,
-	NULL
-};
-
 MACHINE_START(b2m)
 {
 	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);	
 	wd17xx_set_pause_time(10);
-	msm8251_init(&b2m_msm8251_interface);
 }
 
 static IRQ_CALLBACK(b2m_irq_callback)
@@ -392,7 +384,6 @@ MACHINE_RESET(b2m)
 	b2m_sound_input = 0;
 	
 	wd17xx_reset(machine);
-	msm8251_reset();
 	
 	b2m_side = 0;
 	b2m_drive = 0;

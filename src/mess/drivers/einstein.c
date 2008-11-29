@@ -419,12 +419,14 @@ static Z80PIO_ON_INT_CHANGED( einstein_pio_interrupt )
 
 static WRITE8_DEVICE_HANDLER(einstein_serial_transmit_clock)
 {
-	msm8251_transmit_clock();
+	const device_config *uart = device_list_find_by_tag(device->machine->config->devicelist, MSM8251, "uart");
+	msm8251_transmit_clock(uart);
 }
 
 static WRITE8_DEVICE_HANDLER(einstein_serial_receive_clock)
 {
-	msm8251_receive_clock();
+	const device_config *uart = device_list_find_by_tag(device->machine->config->devicelist, MSM8251, "uart");
+	msm8251_receive_clock(uart);
 }
 
 static const z80ctc_interface einstein_ctc_intf =
@@ -693,32 +695,34 @@ static WRITE8_DEVICE_HANDLER(einstein_ctc_w)
 
 static WRITE8_HANDLER(einstein_serial_w)
 {
+	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
 	int reg = offset & 0x01;
 
 	/* logerror("serial w: %04x %02x\n",offset,data); */
 
 	if ((reg)==0)
 	{
-		msm8251_data_w(space, reg,data);
+		msm8251_data_w(uart, reg,data);
 		return;
 	}
 
-	msm8251_control_w(space, reg,data);
+	msm8251_control_w(uart, reg,data);
 }
 
 
-static  READ8_HANDLER(einstein_serial_r)
+static READ8_HANDLER(einstein_serial_r)
 {
+	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
 	int reg = offset & 0x01;
 
 	/* logerror("serial r: %04x\n",offset); */
 
 	if ((reg)==0)
 	{
-		return msm8251_data_r(space, reg);
+		return msm8251_data_r(uart, reg);
 	}
 
-	return msm8251_status_r(space, reg);
+	return msm8251_status_r(uart, reg);
 }
 
 /*
@@ -1358,14 +1362,6 @@ ADDRESS_MAP_END
 
 
 
-static const struct msm8251_interface einstein_msm8251_intf=
-{
-	NULL,
-	NULL,
-	NULL
-};
-
-
 static void einstein_printer_handshake_in(int number, int data, int mask)
 {
 	if (mask & CENTRONICS_ACKNOWLEDGE)
@@ -1439,8 +1435,6 @@ static MACHINE_RESET( einstein )
 	memory_set_bankptr(machine, 2, mess_ram+0x02000);
 	memory_set_bankptr(machine, 3, mess_ram);
 	memory_set_bankptr(machine, 4, mess_ram+0x02000);
-
-	msm8251_init(&einstein_msm8251_intf);
 
 	TMS9928A_reset ();
 
@@ -1748,6 +1742,9 @@ static MACHINE_DRIVER_START( einstein )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
 MACHINE_DRIVER_END
 
 

@@ -146,6 +146,8 @@ DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 
 DEVICE_IMAGE_LOAD( nc_serial )
 {
+	const device_config *uart = device_list_find_by_tag(image->machine->config->devicelist, MSM8251, "uart");
+
 	/* filename specified */
 	if (device_load_serial_device(image)==INIT_PASS)
 	{
@@ -153,7 +155,7 @@ DEVICE_IMAGE_LOAD( nc_serial )
 		serial_device_setup(image, 9600, 8, 1,SERIAL_PARITY_NONE);
 
 		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(image);
+		msm8251_connect_to_serial_device(uart, image);
 
 		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
 

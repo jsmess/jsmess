@@ -784,8 +784,10 @@ static const unsigned long baud_rate_table[]=
 
 static TIMER_CALLBACK(nc_serial_timer_callback)
 {
-	msm8251_transmit_clock();
-	msm8251_receive_clock();
+	const device_config *uart = device_list_find_by_tag(machine->config->devicelist, MSM8251, "uart");
+
+	msm8251_transmit_clock(uart);
+	msm8251_receive_clock(uart);
 }
 
 static WRITE8_HANDLER(nc_uart_control_w)
@@ -799,7 +801,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 		/* changed uart from off to on */
 		if ((data & (1<<3))==0)
 		{
-			msm8251_reset();
+			devtag_reset(space->machine, MSM8251, "uart");
 		}
 	}
 
@@ -887,7 +889,7 @@ static void	nc100_tc8521_alarm_callback(int state)
 	previous_alarm_state = state;
 }
 
-static void nc100_txrdy_callback(int state)
+static void nc100_txrdy_callback(const device_config *device, int state)
 {
 	nc_irq_latch &= ~(1<<1);
 
@@ -901,10 +903,10 @@ static void nc100_txrdy_callback(int state)
 		}
 	}
 
-	nc_update_interrupts(Machine);
+	nc_update_interrupts(device->machine);
 }
 
-static void nc100_rxrdy_callback(int state)
+static void nc100_rxrdy_callback(const device_config *device, int state)
 {
 	nc_irq_latch &= ~(1<<0);
 
@@ -917,7 +919,7 @@ static void nc100_rxrdy_callback(int state)
 		}
 	}
 
-	nc_update_interrupts(Machine);
+	nc_update_interrupts(device->machine);
 }
 
 
@@ -926,7 +928,7 @@ static const struct tc8521_interface nc100_tc8521_interface=
 	nc100_tc8521_alarm_callback,
 };
 
-static const struct msm8251_interface nc100_uart_interface=
+static const msm8251_interface nc100_uart_interface=
 {
 	nc100_txrdy_callback,
 	NULL,
@@ -967,8 +969,6 @@ static MACHINE_RESET( nc100 )
     nc_common_init_machine(machine);
 
 	tc8521_init(&nc100_tc8521_interface);
-
-	msm8251_init(&nc100_uart_interface);
 
 	centronics_config(0, nc100_cent_config);
 	/* assumption: select is tied low */
@@ -1080,8 +1080,8 @@ static ADDRESS_MAP_START(nc100_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x91, 0x9f) AM_READ(nc_irq_status_r)
 	AM_RANGE(0xa0, 0xaf) AM_READ(nc100_card_battery_status_r)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE(tc8521_r, tc8521_w)
 ADDRESS_MAP_END
 
@@ -1285,7 +1285,7 @@ static void nc200_refresh_uart_interrupt(running_machine *machine)
 	nc_update_interrupts(machine);
 }
 
-static void nc200_txrdy_callback(int state)
+static void nc200_txrdy_callback(const device_config *device, int state)
 {
 //  nc200_uart_interrupt_irq &=~(1<<0);
 //
@@ -1297,7 +1297,7 @@ static void nc200_txrdy_callback(int state)
 //  nc200_refresh_uart_interrupt(Machine);
 }
 
-static void nc200_rxrdy_callback(int state)
+static void nc200_rxrdy_callback(const device_config *device, int state)
 {
 	nc200_uart_interrupt_irq &=~(1<<1);
 
@@ -1306,10 +1306,10 @@ static void nc200_rxrdy_callback(int state)
 		nc200_uart_interrupt_irq |=(1<<1);
 	}
 
-	nc200_refresh_uart_interrupt(Machine);
+	nc200_refresh_uart_interrupt(device->machine);
 }
 
-static const struct msm8251_interface nc200_uart_interface=
+static const msm8251_interface nc200_uart_interface=
 {
 	nc200_rxrdy_callback,
 	NULL,
@@ -1372,7 +1372,6 @@ static MACHINE_RESET( nc200 )
 	mc146818_init(machine, MC146818_STANDARD);
 
 	nc200_uart_interrupt_irq = 0;
-	msm8251_init(&nc200_uart_interface);
 
 	centronics_config(0, nc200_cent_config);
 	/* assumption: select is tied low */
@@ -1547,8 +1546,8 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nc200_card_battery_status_r)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd1) AM_READWRITE(mc146818_port_r, mc146818_port_w)
 	AM_RANGE(0xe0, 0xe0) AM_READ(nec765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(nec765_data_r, nec765_data_w)
@@ -1701,11 +1700,16 @@ static MACHINE_DRIVER_START( nc100 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_DEVICE_CONFIG(nc100_uart_interface)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( nc200 )
 	MDRV_IMPORT_FROM( nc100 )
+
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_IO_MAP(nc200_io, 0)
 
@@ -1718,6 +1722,10 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
 	MDRV_PALETTE_LENGTH(NC200_NUM_COLOURS)
 	MDRV_DEFAULT_LAYOUT(layout_nc200)
+
+	/* uart */
+	MDRV_DEVICE_MODIFY("uart", MSM8251)
+	MDRV_DEVICE_CONFIG(nc200_uart_interface)
 MACHINE_DRIVER_END
 
 

@@ -1,14 +1,22 @@
-/*****************************************************************************
- *
- * machine/msm8251.h
- *
- ****************************************************************************/
+/*********************************************************************
 
-#ifndef MSM8251_H_
-#define MSM8251_H_
+	msm8251.h
+
+	MSM/Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
+
+*********************************************************************/
+
+#ifndef __MSM8251_H__
+#define __MSM8251_H__
 
 #include "includes/serial.h"
 
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define MSM8251			DEVICE_GET_INFO_NAME(msm8251)
 
 #define MSM8251_EXPECTING_MODE 0x01
 #define MSM8251_EXPECTING_SYNC_BYTE 0x02
@@ -20,84 +28,51 @@
 #define MSM8251_STATUS_RX_READY	0x02
 #define MSM8251_STATUS_TX_READY	0x01
 
-struct msm8251_interface
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _msm8251_interface msm8251_interface;
+struct _msm8251_interface
 {
 	/* state of txrdy output */
-	void	(*tx_ready_callback)(int state);
+	void	(*tx_ready_callback)(const device_config *device, int state);
 	/* state of txempty output */
-	void	(*tx_empty_callback)(int state);
+	void	(*tx_empty_callback)(const device_config *device, int state);
 	/* state of rxrdy output */
-	void	(*rx_ready_callback)(int state);
-};
-
-struct msm8251
-{
-	/* flags controlling how msm8251_control_w operates */
-	UINT8 flags;
-	/* offset into sync_bytes used during sync byte transfer */
-	UINT8 sync_byte_offset;
-	/* number of sync bytes written so far */
-	UINT8 sync_byte_count;
-	/* the sync bytes written */
-	UINT8 sync_bytes[2];
-	/* status of msm8251 */
-	UINT8 status;
-	UINT8 command;
-	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
-	UINT8 mode_byte;
-
-	/* data being received */
-	UINT8 data;
-
-	/* receive reg */
-	struct serial_receive_register receive_reg;
-	/* transmit reg */
-	struct serial_transmit_register transmit_reg;
-
-	struct data_form data_form;
-
-	/* contains callback for txrdy, rxrdy and tx empty which connect
-    to host system */
-	struct msm8251_interface interface;
-
-	/* the serial connection that data is transfered over */
-	/* this is usually connected to the serial device */
-	struct serial_connection connection;
+	void	(*rx_ready_callback)(const device_config *device, int state);
 };
 
 
-/*----------- defined in machine/msm8251.c -----------*/
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
-/* reading and writing data register share the same address,
-and reading status and writing control share the same address */
+/* device get info function */
+DEVICE_GET_INFO(msm8251);
 
 /* read data register */
- READ8_HANDLER(msm8251_data_r);
+READ8_DEVICE_HANDLER(msm8251_data_r);
+
 /* read status register */
- READ8_HANDLER(msm8251_status_r);
+READ8_DEVICE_HANDLER(msm8251_status_r);
+
 /* write data register */
-WRITE8_HANDLER(msm8251_data_w);
+WRITE8_DEVICE_HANDLER(msm8251_data_w);
+
 /* write control word */
-WRITE8_HANDLER(msm8251_control_w);
-
-
-/* init chip, set interface, and do main setup */
-void msm8251_init(const struct msm8251_interface *);
-/* reset the chip */
-void msm8251_reset(void);
-
+WRITE8_DEVICE_HANDLER(msm8251_control_w);
 
 /* The 8251 has seperate transmit and receive clocks */
 /* use these two functions to update the msm8251 for each clock */
 /* on NC100 system, the clocks are the same */
+void msm8251_transmit_clock(const device_config *device);
+void msm8251_receive_clock(const device_config *device);
 
-void msm8251_transmit_clock(void);
-void msm8251_receive_clock(void);
+/* connecting to serial output */
+void msm8251_connect_to_serial_device(const device_config *device, const device_config *image);
+void msm8251_connect(const device_config *device, struct serial_connection *other_connection);
 
-
-void msm8251_connect_to_serial_device(const device_config *image);
-
-void msm8251_connect(struct serial_connection *other_connection);
-
-
-#endif /* MSM8251_H_ */
+#endif /* __MSM8251_H__ */

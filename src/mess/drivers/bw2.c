@@ -253,6 +253,8 @@ static WRITE8_HANDLER( ramcard_bank_w )
 
 static DEVICE_IMAGE_LOAD( bw2_serial )
 {
+	const device_config *uart = device_list_find_by_tag(image->machine->config->devicelist, MSM8251, "uart");
+
 	/* filename specified */
 	if (device_load_serial_device(image) == INIT_PASS)
 	{
@@ -260,7 +262,7 @@ static DEVICE_IMAGE_LOAD( bw2_serial )
 		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
 		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(image);
+		msm8251_connect_to_serial_device(uart, image);
 
 		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
 
@@ -505,8 +507,10 @@ static const ppi8255_interface bw2_ppi8255_interface =
 /* PIT */
 static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
 {
-	msm8251_transmit_clock();
-	msm8251_receive_clock();
+	const device_config *uart = device_list_find_by_tag(device->machine->config->devicelist, MSM8251, "uart");
+
+	msm8251_transmit_clock(uart);
+	msm8251_receive_clock(uart);
 }
 
 static PIT8253_OUTPUT_CHANGED( bw2_timer1_w )
@@ -542,16 +546,6 @@ static const struct pit8253_config bw2_pit8253_interface =
 			bw2_timer2_w
 		}
 	}
-};
-
-
-/* USART */
-
-static const struct msm8251_interface bw2_msm8251_interface =
-{
-	NULL,
-	NULL,
-	NULL
 };
 
 
@@ -637,8 +631,6 @@ static MACHINE_START( bw2 )
 {
 	centronics_config(0, bw2_centronics_config);
 
-	msm8251_init(&bw2_msm8251_interface);
-
 	wd17xx_init(machine, WD_TYPE_179X, bw2_wd17xx_callback, NULL); // really WD2797
 	wd17xx_set_density(DEN_MFM_LO);
 }
@@ -656,8 +648,8 @@ static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE( PIT8253, PIT8253_TAG, pit8253_r, pit8253_w )
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE( MSM6255, MSM6255_TAG, msm6255_register_r, msm6255_register_w )
 //	AM_RANGE( 0x30, 0x3f ) SLOT
-	AM_RANGE( 0x40, 0x40 ) AM_READWRITE( msm8251_data_r, msm8251_data_w )
-	AM_RANGE( 0x41, 0x41 ) AM_READWRITE( msm8251_status_r, msm8251_control_w )
+	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE( MSM8251, "uart", msm8251_data_r, msm8251_data_w )
+	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE( MSM8251, "uart", msm8251_status_r, msm8251_control_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( bw2_centronics_data_w )
 	AM_RANGE( 0x60, 0x63 ) AM_READWRITE( bw2_wd2797_r, bw2_wd2797_w )
 //	AM_RANGE( 0x70, 0x7f ) MODEMSEL
@@ -852,6 +844,9 @@ static MACHINE_DRIVER_START( bw2 )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
 MACHINE_DRIVER_END
 
 /***************************************************************************

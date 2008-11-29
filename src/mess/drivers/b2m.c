@@ -36,8 +36,8 @@ static ADDRESS_MAP_START( b2m_io, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w) 
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w) 	
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w )
-	AM_RANGE(0x18, 0x18) AM_READWRITE(msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x19, 0x19) AM_READWRITE(msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r,msm8251_control_w)
   	AM_RANGE(0x1c, 0x1c) AM_READWRITE(wd17xx_status_r,wd17xx_command_w) 
   	AM_RANGE(0x1d, 0x1d) AM_READWRITE(wd17xx_track_r,wd17xx_track_w) 
   	AM_RANGE(0x1e, 0x1e) AM_READWRITE(wd17xx_sector_r,wd17xx_sector_w) 
@@ -52,8 +52,8 @@ static ADDRESS_MAP_START( b2m_rom_io, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w) 
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w) 	
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w )
-	AM_RANGE(0x18, 0x18) AM_READWRITE(msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x19, 0x19) AM_READWRITE(msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
 
 
@@ -202,10 +202,14 @@ static MACHINE_DRIVER_START( b2m )
 	MDRV_VIDEO_START(b2m)
     MDRV_VIDEO_UPDATE(b2m)    	
     
+	/* sound */
     MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(b2m_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( b2mrom )

@@ -266,6 +266,10 @@ static MACHINE_DRIVER_START( compis )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* uart */
+	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_DEVICE_CONFIG(compis_usart_interface)
 MACHINE_DRIVER_END
 
 /***************************************************************************
