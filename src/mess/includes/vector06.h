@@ -7,6 +7,7 @@
 #ifndef VECTOR06_H_
 #define VECTOR06_H_
 
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/vector06.c -----------*/
 

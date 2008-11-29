@@ -8,7 +8,7 @@
 
 
 #include "driver.h"
-#include "video/i8275.h"
+#include "includes/rt1715.h"
 
 VIDEO_UPDATE( rt1715 )
 {
@@ -16,7 +16,7 @@ VIDEO_UPDATE( rt1715 )
 	return 0;
 }
 
-const rgb_t rt1715_palette[3] = {
+static const rgb_t rt1715_palette[3] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // black
 	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
 	MAKE_RGB(0xff, 0xff, 0xff)	// highlight

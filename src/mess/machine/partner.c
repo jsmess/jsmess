@@ -104,7 +104,7 @@ static void partner_window_2(running_machine *machine, UINT8 bank, UINT16 offset
 	}
 }
 
-READ8_HANDLER ( partner_floppy_r ) {
+static READ8_HANDLER ( partner_floppy_r ) {
 	if (offset<0x100) {
 		switch(offset & 3) {
 			case 0x00 : return wd17xx_status_r(space,0); 
@@ -118,7 +118,7 @@ READ8_HANDLER ( partner_floppy_r ) {
 	}	
 }
 
-WRITE8_HANDLER ( partner_floppy_w ) {
+static WRITE8_HANDLER ( partner_floppy_w ) {
 	if (offset<0x100) {
 		switch(offset & 3) {
 			case 0x00 : wd17xx_command_w(space,0,data); break;
@@ -369,7 +369,7 @@ WRITE8_HANDLER (partner_mem_page_w )
 	partner_bank_switch(space->machine);
 }
 
-WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
+static WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
 {
 	cpu_push_context(device->machine->cpu[0]);
 	memory_write_byte(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),offset,data);

@@ -92,7 +92,7 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 /* Discrete Sound */
 
-DISCRETE_SOUND_START( abc800 )
+static DISCRETE_SOUND_START( abc800 )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END

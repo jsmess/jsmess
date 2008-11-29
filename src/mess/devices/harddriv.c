@@ -148,7 +148,7 @@ done:
 
 
 
-DEVICE_IMAGE_LOAD( mess_hd )
+static DEVICE_IMAGE_LOAD( mess_hd )
 {
 	dev_harddisk_t	*harddisk = get_safe_token( image );
 	int our_result;
@@ -202,7 +202,7 @@ error:
  *
  *************************************/
 
-DEVICE_IMAGE_UNLOAD( mess_hd )
+static DEVICE_IMAGE_UNLOAD( mess_hd )
 {
 	dev_harddisk_t	*harddisk = get_safe_token( image );
 

@@ -485,7 +485,7 @@ static void c16_common_driver_init (running_machine *machine)
 		drive_config (type_1541, 0, 0, 1, 8);
 }
 
-void c16_driver_init(running_machine *machine)
+static void c16_driver_init(running_machine *machine)
 {
 	c16_common_driver_init (machine);
 	ted7360_init ((read_cfg1(machine) & 0x10 ) == 0x00);		/* is it PAL? */
@@ -666,7 +666,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 ***********************************************/
 
-DEVICE_IMAGE_LOAD(c16_cart)
+static DEVICE_IMAGE_LOAD(c16_cart)
 {
 	UINT8 *mem = memory_region(image->machine, "main");
 	int size = image_length (image), test;

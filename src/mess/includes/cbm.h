@@ -13,6 +13,8 @@
 
 /* global header file for c16, c64, c65, c128, vc20 */
 
+/*----------- defined in machine/cbm.c -----------*/
+
 /***********************************************
 
 	CBM Quickloads

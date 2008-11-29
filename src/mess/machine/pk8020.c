@@ -9,6 +9,8 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "includes/pk8020.h"
+
 
 /* Driver initialization */
 DRIVER_INIT(pk8020)

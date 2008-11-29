@@ -2082,7 +2082,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 //	win_resource_module
 //============================================================
 
-HMODULE win_resource_module(void)
+static HMODULE win_resource_module(void)
 {
 	static HMODULE module;
 	if (module == NULL)

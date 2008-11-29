@@ -24,7 +24,7 @@ DRIVER_INIT(irisha)
 
 
 static UINT8 irisha_keypressed;
-UINT8 irisha_keyboard_cnt = 0;
+static UINT8 irisha_keyboard_cnt = 0;
 
 static TIMER_CALLBACK( irisha_key )
 {
@@ -44,7 +44,7 @@ static const char *const keynames[] = {
 							"LINE4", "LINE5", "LINE6", "LINE7",
 							"LINE8", "LINE9"};
 
-READ8_DEVICE_HANDLER (irisha_8255_portb_r )
+static READ8_DEVICE_HANDLER (irisha_8255_portb_r )
 {
   if (irisha_keypressed==1) {
   	irisha_keypressed =0;
@@ -54,7 +54,7 @@ READ8_DEVICE_HANDLER (irisha_8255_portb_r )
 	return 0x00;
 }
 
-READ8_DEVICE_HANDLER (irisha_8255_portc_r )
+static READ8_DEVICE_HANDLER (irisha_8255_portc_r )
 {
 	logerror("irisha_8255_portc_r\n");
 	return 0;
@@ -72,17 +72,17 @@ READ8_HANDLER (irisha_keyboard_r)
 	return keycode;
 }
 
-WRITE8_DEVICE_HANDLER (irisha_8255_porta_w )
+static WRITE8_DEVICE_HANDLER (irisha_8255_porta_w )
 {
 	logerror("irisha_8255_porta_w %02x\n",data);
 }
 
-WRITE8_DEVICE_HANDLER (irisha_8255_portb_w )
+static WRITE8_DEVICE_HANDLER (irisha_8255_portb_w )
 {
 	logerror("irisha_8255_portb_w %02x\n",data);
 }
 
-WRITE8_DEVICE_HANDLER (irisha_8255_portc_w )
+static WRITE8_DEVICE_HANDLER (irisha_8255_portc_w )
 {
 	//logerror("irisha_8255_portc_w %02x\n",data);
 }

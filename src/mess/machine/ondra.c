@@ -18,9 +18,9 @@ DRIVER_INIT(ondra)
 	memset(mess_ram,0,64*1024);
 }
 
-UINT8 ondra_video_enable;
-UINT8 ondra_bank1_status;
-UINT8 ondra_bank2_status;
+static UINT8 ondra_video_enable;
+static UINT8 ondra_bank1_status;
+static UINT8 ondra_bank2_status;
 
 static void ondra_update_banks(running_machine *machine)
 {

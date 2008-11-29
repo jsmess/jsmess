@@ -96,7 +96,7 @@ static	char *oric_ram_0x0c000 = NULL;
 
 
 /* index of keyboard line to scan */
-int oric_keyboard_line;
+static int oric_keyboard_line;
 /* sense result */
 static char oric_key_sense_bit;
 /* mask to read keys */

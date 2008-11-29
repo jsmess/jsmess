@@ -226,7 +226,7 @@ static void mess_md_io_write_data_port(int portnum, UINT16 data)
  *************************************/
 
 
-INPUT_PORTS_START( md )
+static INPUT_PORTS_START( md )
 	PORT_START("CTRLSEL")	/* Controller selection */
 	PORT_CATEGORY_CLASS( 0x0f, 0x00, "Player 1 Controller" )
 	PORT_CATEGORY_ITEM( 0x00, "Joystick 3 Buttons", 10 )
@@ -300,7 +300,7 @@ INPUT_PORTS_START( md )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( md_svp )
+static INPUT_PORTS_START( md_svp )
 	PORT_INCLUDE( md )
 
 	/* We need this as long as we only have the US version of the SVP add-on,
@@ -604,7 +604,7 @@ static ADDRESS_MAP_START( _pico_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( pico )
+static INPUT_PORTS_START( pico )
 	PORT_START("PAD")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -633,7 +633,7 @@ INPUT_PORTS_START( pico )
 INPUT_PORTS_END
 
 
-MACHINE_DRIVER_START( pico )
+static MACHINE_DRIVER_START( pico )
 	MDRV_IMPORT_FROM(megadriv)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(_pico_readmem,_pico_writemem)

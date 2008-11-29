@@ -193,7 +193,7 @@ static int get_id_from_device( const device_config *device )
 /*
 	Initialize hard disk unit and open a hard disk image
 */
-DEVICE_IMAGE_LOAD( ti990_hd )
+static DEVICE_IMAGE_LOAD( ti990_hd )
 {
 	int id = get_id_from_device( image );
 	hd_unit_t *d;
@@ -270,7 +270,7 @@ DEVICE_IMAGE_LOAD( ti990_hd )
 /*
 	close a hard disk image
 */
-DEVICE_IMAGE_UNLOAD( ti990_hd )
+static DEVICE_IMAGE_UNLOAD( ti990_hd )
 {
 	int id = get_id_from_device( image );
 	hd_unit_t *d;

@@ -18,7 +18,6 @@ extern UINT8 orion_video_mode_mask ;
 extern UINT8 orionpro_pseudo_color;
 
 extern const ppi8255_interface orion128_ppi8255_interface_1;
-extern const ppi8255_interface orion128_ppi8255_interface_2;
 
 extern DRIVER_INIT( orion128 );
 extern MACHINE_START( orion128 );

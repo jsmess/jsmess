@@ -18,6 +18,7 @@
 #include "cpu/m6502/m6502.h"
 
 #include "machine/tpi6525.h"
+#include "includes/c16.h"
 
 
 #define VERBOSE_LEVEL 0

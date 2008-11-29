@@ -11,11 +11,11 @@
 #include "cpu/z80/z80.h"
 #include "includes/homelab.h"
 
-WRITE8_HANDLER (homelab_keyboard_w)
+static WRITE8_HANDLER (homelab_keyboard_w)
 {
 }
 
-READ8_HANDLER (homelab_keyboard_r)
+static READ8_HANDLER (homelab_keyboard_r)
 {
 	UINT8 key_mask = (offset ^ 0xff) & 0xff;
 	UINT8 key = 0xff;

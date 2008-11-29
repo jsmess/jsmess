@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/sapi1.h"
 
-UINT8 sapi1_keyboard_mask;
+static UINT8 sapi1_keyboard_mask;
 
 /* Driver initialization */
 DRIVER_INIT(sapi1)

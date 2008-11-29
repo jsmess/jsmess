@@ -19,6 +19,8 @@
 #include "cpu/m68000/m68000.h"
 
 #include "devices/cartslot.h"
+#include "includes/genesis.h"
+
 
 static UINT16 squirrel_king_extra = 0;
 static UINT16 lion2_prot1_data, lion2_prot2_data;

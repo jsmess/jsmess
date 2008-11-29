@@ -24,11 +24,4 @@ struct _tmc2000e_state
 	const device_config *cdp1864;
 };
 
-/* ---------- defined in video/tmc1800.c ---------- */
-
-MACHINE_DRIVER_EXTERN( tmc1800_video );
-MACHINE_DRIVER_EXTERN( osc1000b_video );
-MACHINE_DRIVER_EXTERN( tmc2000_video );
-MACHINE_DRIVER_EXTERN( oscnano_video );
-
 #endif

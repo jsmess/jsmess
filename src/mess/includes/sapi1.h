@@ -21,6 +21,5 @@ extern UINT8* sapi_video_ram;
 
 extern VIDEO_START( sapi1 );
 extern VIDEO_UPDATE( sapi1 );
-extern PALETTE_INIT( sapi1 );
 
 #endif

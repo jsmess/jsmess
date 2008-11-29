@@ -307,7 +307,7 @@ static int get_id_from_device( const device_config *device )
 }
 
 
-DEVICE_IMAGE_LOAD(smc92x4_hd)
+static DEVICE_IMAGE_LOAD(smc92x4_hd)
 {
 	const hard_disk_info *info;
 
@@ -342,7 +342,7 @@ DEVICE_IMAGE_LOAD(smc92x4_hd)
 	return INIT_FAIL;
 }
 
-DEVICE_IMAGE_UNLOAD(smc92x4_hd)
+static DEVICE_IMAGE_UNLOAD(smc92x4_hd)
 {
 	int disk_unit = get_id_from_device( image );
 

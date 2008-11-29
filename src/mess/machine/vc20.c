@@ -686,7 +686,7 @@ INTERRUPT_GEN( vic20_frame_interrupt )
 
 ***********************************************/
 
-DEVICE_START(vic20_cart)
+static DEVICE_START(vic20_cart)
 {
 	vc20_memory_init(device->machine);
 	vc20_rom_2000 = NULL;
@@ -696,7 +696,7 @@ DEVICE_START(vic20_cart)
 	return DEVICE_START_OK;
 }
 
-DEVICE_IMAGE_LOAD(vic20_cart)
+static DEVICE_IMAGE_LOAD(vic20_cart)
 {
 	int size = image_length(image), test;
 	const char *filetype;

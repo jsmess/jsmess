@@ -932,7 +932,7 @@ static void bw2_serial_getinfo(const mess_device_class *devclass, UINT32 state, 
 	}
 }
 
-SYSTEM_CONFIG_START( bw2 )
+static SYSTEM_CONFIG_START( bw2 )
 	CONFIG_DEVICE( bw2_floppy_getinfo )
 	CONFIG_DEVICE( bw2_serial_getinfo )
 	CONFIG_RAM_DEFAULT( 64 * 1024 )

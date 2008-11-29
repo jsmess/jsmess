@@ -157,7 +157,7 @@ static PIT8253_OUTPUT_CHANGED(mikrosha_pit_out2)
 
 }
 
-const struct pit8253_config mikrosha_pit8253_intf =
+static const struct pit8253_config mikrosha_pit8253_intf =
 {
 	{
 		{

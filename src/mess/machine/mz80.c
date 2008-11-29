@@ -13,11 +13,11 @@
 #include "sound/speaker.h"
 #include "includes/mz80.h"
  
-UINT8 mz80k_tempo_strobe = 0;
-UINT8 mz80k_8255_portc = 0;
+static UINT8 mz80k_tempo_strobe = 0;
+static UINT8 mz80k_8255_portc = 0;
 UINT8 mz80k_vertical = 0;
 UINT8 mz80k_cursor_cnt = 0;
-UINT8 mz80k_keyboard_line = 0;
+static UINT8 mz80k_keyboard_line = 0;
 
 
 /* Driver initialization */
@@ -36,7 +36,7 @@ MACHINE_RESET( mz80k )
 }
 
 
-READ8_DEVICE_HANDLER(mz80k_8255_portb_r)
+static READ8_DEVICE_HANDLER(mz80k_8255_portb_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	if (mz80k_keyboard_line > 9) {
@@ -46,7 +46,7 @@ READ8_DEVICE_HANDLER(mz80k_8255_portb_r)
 	}
 }
 
-READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
+static READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
 {
 	UINT8 val = 0;
 	val |= mz80k_vertical ? 0x80 : 0x00;
@@ -59,12 +59,12 @@ READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
 	return val;
 }
 
-WRITE8_DEVICE_HANDLER(mz80k_8255_porta_w) 
+static WRITE8_DEVICE_HANDLER(mz80k_8255_porta_w) 
 {	
 	mz80k_keyboard_line = data & 0x0f;	
 }
 
-WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w) 
+static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w) 
 {	
 //	logerror("mz80k_8255_portc_w %02x\n",data);
 }

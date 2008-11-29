@@ -1170,10 +1170,10 @@ typedef struct {
 	UINT8 data[0x100];
 } MIKEY;
 
-MIKEY mikey={ { 0 } };
+static MIKEY mikey={ { 0 } };
 
 
-UINT8 lynx_read_vram(UINT16 address)
+static UINT8 lynx_read_vram(UINT16 address)
 {
 	UINT8 result = 0x00;
 	if (address <= 0xfbff)
@@ -1199,7 +1199,7 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 ; B1    1 EQU flip screen
 ; B0    1 EQU video DMA enabled
 */
-void lynx_draw_lines(running_machine *machine, int newline)
+static void lynx_draw_lines(running_machine *machine, int newline)
 {
 	static int height = -1, width = -1;
 	int h,w;

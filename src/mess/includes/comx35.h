@@ -69,9 +69,6 @@ struct _comx35_state
 
 /* ---------- defined in machine/comx35.c ---------- */
 
-WRITE8_HANDLER( comx35_videoram_w );
-READ8_HANDLER( comx35_videoram_r );
-
 WRITE8_HANDLER( comx35_bank_select_w );
 READ8_HANDLER( comx35_io_r );
 READ8_HANDLER( comx35_io2_r );
@@ -86,6 +83,9 @@ DEVICE_IMAGE_LOAD( comx35_floppy );
 QUICKLOAD_LOAD( comx35 );
 
 /* ---------- defined in video/comx35.c ---------- */
+
+WRITE8_HANDLER( comx35_videoram_w );
+READ8_HANDLER( comx35_videoram_r );
 
 MACHINE_DRIVER_EXTERN( comx35p_video );
 MACHINE_DRIVER_EXTERN( comx35n_video );

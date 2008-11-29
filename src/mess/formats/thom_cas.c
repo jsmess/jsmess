@@ -781,11 +781,11 @@ static const struct CassetteFormat mo5_wav =
 /********************* formats ************************/
 
 
-const struct CassetteFormat *const to7_cassette_formats[] =
+static const struct CassetteFormat *const to7_cassette_formats[] =
 { &to7_wav, &to7_k7, NULL };
 
 
-const struct CassetteFormat *const mo5_cassette_formats[] =
+static const struct CassetteFormat *const mo5_cassette_formats[] =
 { &mo5_wav, &mo5_k5, NULL };
 
 

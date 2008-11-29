@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  snes.c
+  snescart.c
 
   Machine file to handle cart loading in the Nintendo Super NES emulation.
 
@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "includes/snes.h"
 #include "devices/cartslot.h"
+#include "snescart.h"
 
 
 /****** Strings for Cart Header Logging ******/

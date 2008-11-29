@@ -57,6 +57,8 @@ Source Changes:
 
 - Changed the MSM8251 implementation to be a device.  [Nathan Woods]
 
+- Various code cleanups.  [Atari Ace]
+
 
 
 0.128

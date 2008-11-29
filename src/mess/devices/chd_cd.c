@@ -70,12 +70,14 @@ INLINE dev_cdrom_t *get_safe_token(const device_config *device) {
 }
 
 
+#ifdef UNUSED_FUNCTION
 cdrom_file *mess_cd_get_cdrom_file_by_number(const char *diskregion)
 {
 	const device_config *device;
 	device = device_list_find_by_tag(Machine->config->devicelist, DEVICE_TYPE_WILDCARD, diskregion);
 	return mess_cd_get_cdrom_file(device);
 }
+#endif
 
 
 static DEVICE_IMAGE_LOAD(cdrom)

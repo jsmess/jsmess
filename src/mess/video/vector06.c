@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "includes/vector06.h"
 
 VIDEO_START( vector06 )
 {

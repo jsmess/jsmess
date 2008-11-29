@@ -11,6 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "devices/cassette.h"
 #include "machine/8255ppi.h"
+#include "includes/vector06.h"
 
 static int vector06_keyboard_mask;
 static UINT8 vector_color_index;
@@ -21,7 +22,7 @@ DRIVER_INIT(vector06)
 	memset(mess_ram,0,64*1024);
 }
 
-READ8_DEVICE_HANDLER (vector06_8255_portb_r )
+static READ8_DEVICE_HANDLER (vector06_8255_portb_r )
 {
 	UINT8 key = 0xff;
 	if ((vector06_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"LINE0"); }
@@ -35,17 +36,17 @@ READ8_DEVICE_HANDLER (vector06_8255_portb_r )
 	return key;
 }
 
-READ8_DEVICE_HANDLER (vector06_8255_portc_r )
+static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
 {
 	return input_port_read(device->machine, "LINE8");
 }
 
-WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
+static WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
 {
 	vector06_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )
+static WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )
 {
 	vector_color_index = data;
 }
