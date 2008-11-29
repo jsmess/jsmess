@@ -118,6 +118,9 @@ static void apple3_profile_w(offs_t offset, UINT8 data)
 
 static READ8_HANDLER( apple3_c0xx_r )
 {
+	const device_config *acia = device_list_find_by_tag(space->machine->config->devicelist,
+		ACIA6551,
+		"acia");
 	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
 		APPLEFDC,
 		"fdc");
@@ -194,7 +197,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			result = acia_6551_r(space, offset & 0x03);
+			result = acia_6551_r(acia, offset & 0x03);
 			break;
 	}
 	return result;
@@ -204,8 +207,11 @@ static READ8_HANDLER( apple3_c0xx_r )
 
 static WRITE8_HANDLER( apple3_c0xx_w )
 {
+	const device_config *acia = device_list_find_by_tag(space->machine->config->devicelist,
+		ACIA6551,
+		"acia");
 	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
-		IWM,
+		APPLEFDC,
 		"fdc");
 	switch(offset)
 	{
@@ -258,7 +264,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			acia_6551_w(space, offset & 0x03, data);
+			acia_6551_w(acia, offset & 0x03, data);
 			break;
 	}
 }
@@ -712,8 +718,6 @@ DRIVER_INIT( apple3 )
 
 	apple3_enable_mask = 0;
 	apple3_update_drives();
-
-	acia_6551_init();
 
 	AY3600_init();
 

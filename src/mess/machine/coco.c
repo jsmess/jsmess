@@ -2961,36 +2961,7 @@ MACHINE_START( dragon64 )
 	init.fdc_cart_hardware	= "dragon_fdc";
 
 	generic_coco12_dragon_init(machine, &init);
-
-	/* Init Serial port */
-	acia_6551_init();
 }
-
-#ifdef UNUSED_FUNCTION
-MACHINE_START( d64plus )
-{
-	machine_init_interface init;
-
-	/* Setup machine initialization */
-	memset(&init, 0, sizeof(init));
-	init.piaintf			= dragon64_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(dragon64_pia_intf);
-	init.recalc_interrupts_	= d_recalc_interrupts;
-	init.printer_out_		= printer_out_dragon;
-	init.cart_timer_proc	= coco_cart_timer_proc;
-	init.map_memory			= coco_mapmemory;
-	init.fdc_cart_hardware	= "dragon_fdc";
-
-	generic_coco12_dragon_init(machine, &init);
-
-	/* Init Serial port */
-	acia_6551_init();
-
-	/* Init Dragon plus registers */
-	dragon_plus_reg = 0;
-	plus_reg_w(0,0);
-}
-#endif
 
 MACHINE_START( tanodr64 )
 {
@@ -3007,9 +2978,6 @@ MACHINE_START( tanodr64 )
 	init.fdc_cart_hardware	= "coco_fdc";
 
 	generic_coco12_dragon_init(machine, &init);
-
-	/* Init Serial port */
-	acia_6551_init();
 }
 
 MACHINE_START( dgnalpha )
@@ -3027,9 +2995,6 @@ MACHINE_START( dgnalpha )
 	init.fdc_cart_hardware	= "dragon_fdc";
 
 	generic_coco12_dragon_init(machine, &init);
-
-	/* Init Serial port */
-	acia_6551_init();
 
 	/* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
 	/* by the WD2797, it is reset to 0 after the first inurrupt */

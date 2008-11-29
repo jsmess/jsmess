@@ -15,9 +15,9 @@
 #include "includes/apple2.h"
 #include "devices/mflopimg.h"
 #include "formats/ap2_dsk.h"
+#include "machine/6551.h"
 #include "machine/6522via.h"
 #include "devices/appldriv.h"
-
 
 static ADDRESS_MAP_START( apple3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00FF) AM_READWRITE(apple3_00xx_r, apple3_00xx_w)
@@ -53,8 +53,12 @@ static MACHINE_DRIVER_START( apple3 )
 	MDRV_VIDEO_START( apple3 )
 	MDRV_VIDEO_UPDATE( apple3 )
 
+	/* fdc */
 	MDRV_DEVICE_ADD("fdc", APPLEFDC)
 	MDRV_DEVICE_CONFIG(apple3_fdc_interface)
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia", ACIA6551)
 MACHINE_DRIVER_END
 
 

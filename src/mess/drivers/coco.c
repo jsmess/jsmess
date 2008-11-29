@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( d64_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
 	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,				pia_0_w)		AM_MIRROR(0x0018)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
+	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,				coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,		coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
 	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,pia_0_w)		AM_MIRROR(0x0018)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(acia_6551_r,acia_6551_w)	AM_MIRROR(0x0018)
+	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,acia_6551_w)	AM_MIRROR(0x0018)
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
 	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,			pia_0_w)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(acia_6551_r,		acia_6551_w)
+	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,		acia_6551_w)
 	AM_RANGE(0xff20, 0xff23) AM_READWRITE(pia_1_r,			coco_pia_1_w)
 	AM_RANGE(0xff24, 0xff27) AM_READWRITE(pia_2_r,			pia_2_w) 	/* Third PIA on Dragon Alpha */
 	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(alpha_modem_r,	alpha_modem_w)	/* Modem, dummy to stop eror log ! */
@@ -694,7 +694,11 @@ static MACHINE_DRIVER_START( dragon64 )
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia", ACIA6551)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -722,7 +726,11 @@ static MACHINE_DRIVER_START( d64plus )
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia", ACIA6551)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -753,7 +761,11 @@ static MACHINE_DRIVER_START( dgnalpha )
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia", ACIA6551)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -781,7 +793,11 @@ static MACHINE_DRIVER_START( tanodr64 )
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia", ACIA6551)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -813,6 +829,7 @@ static MACHINE_DRIVER_START( coco )
 	/* devices */
 	MDRV_DEVICE_ADD("disto", MSM6242)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
@@ -845,6 +862,7 @@ static MACHINE_DRIVER_START( coco2 )
 	/* devices */
 	MDRV_DEVICE_ADD("disto", MSM6242)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
@@ -877,6 +895,7 @@ static MACHINE_DRIVER_START( coco2b )
 	/* devices */
 	MDRV_DEVICE_ADD("disto", MSM6242)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 
@@ -919,6 +938,7 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_DEVICE_ADD("vhd", COCO_VHD)
 	MDRV_DEVICE_ADD("disto", MSM6242)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 MACHINE_DRIVER_END
 

@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbc02, 0xbc02) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xbc03, 0xbc03) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 	AM_RANGE(0xbfc0, 0xbfcf) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0xbfd0, 0xbfd3) AM_READWRITE(acia_6551_r, acia_6551_w)
+	AM_RANGE(0xbfd0, 0xbfd3) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r, acia_6551_w)
 	AM_RANGE(0xbfe0, 0xbfef) AM_READWRITE(via_1_r, via_1_w)
 	AM_RANGE(0xbff0, 0xbfff) AM_READWRITE(microtan_bffx_r, microtan_bffx_w)
 	AM_RANGE(0xc000, 0xe7ff) AM_ROM
@@ -212,14 +212,14 @@ static const ay8910_interface microtan_ay8910_interface =
 };
 
 static MACHINE_DRIVER_START( microtan )
-	// basic machine hardware
+	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map, 0)
 	MDRV_CPU_VBLANK_INT("main", microtan_interrupt)
 
 	MDRV_MACHINE_RESET(microtan)
 
-    // video hardware - include overscan
+    /* video hardware - include overscan */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -233,7 +233,7 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_VIDEO_START(microtan)
 	MDRV_VIDEO_UPDATE(microtan)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -246,11 +246,15 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_SOUND_CONFIG(microtan_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	// snapshot/quickload
+	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(microtan, "m65", 0.5)
 	MDRV_QUICKLOAD_ADD(microtan_hexfile, "hex", 0.5)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia", ACIA6551)
 MACHINE_DRIVER_END
 
 ROM_START( microtan )

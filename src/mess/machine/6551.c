@@ -1,4 +1,19 @@
+/*********************************************************************
+
+	6551.h
+
+	MOS Technology 6551 Asynchronous Communications Interface Adapter
+
+	A1 A0  Write                    Read
+	 0  0  Transmit Data Register   Receiver Data Register
+	 0  1  Programmed Reset         Status Register
+	 1  0              Command Register
+	 1  1              Control Register
+
+*********************************************************************/
+
 #include "driver.h"
+#include "deprecat.h"
 #include "6551.h"
 #include "includes/serial.h"
 
@@ -7,8 +22,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _acia6551 acia6551;
-struct _acia6551
+typedef struct _acia6551_t acia6551_t;
+struct _acia6551_t
 {
 	unsigned char transmit_data_register;
 	unsigned char receive_data_register;
@@ -38,89 +53,120 @@ struct _acia6551
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void acia_6551_receive_char(unsigned char ch);
-static void acia_6551_refresh_ints(void);
+static void acia_6551_receive_char(const device_config *device, unsigned char ch);
+static void acia_6551_refresh_ints(const device_config *device);
 
-static acia6551 acia;
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE acia6551_t *get_token(const device_config *device)
+{
+	assert(device->type == ACIA6551);
+	return (acia6551_t *) device->token;
+}
+
 
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-/*
-A1 A0     Write                    Read
- 0 0  Transmit Data Register  Receiver Data Register
- 0 1  Programmed Reset        Status Register
- 1 0              Command Register
- 1 1              Control Register
-*/
+/*-------------------------------------------------
+    acia_6551_in_callback - called when other side
+	has updated state
+-------------------------------------------------*/
 
-/* called when other side has updated state */
 static void acia_6551_in_callback(int id, unsigned long state)
 {
-	acia.connection.input_state = state;
+	const device_config *device;
+	acia6551_t *acia;
+
+	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
+	device = device_list_find_by_tag(Machine->config->devicelist, ACIA6551, "acia");
+	acia = get_token(device);
+
+	acia->connection.input_state = state;
 }
 
 
+
+/*-------------------------------------------------
+    TIMER_CALLBACK(acia_6551_timer_callback)
+-------------------------------------------------*/
+
 static TIMER_CALLBACK(acia_6551_timer_callback)
 {
-	/* get bit received from other side and update receive register */
-	receive_register_update_bit(&acia.receive_reg, get_in_data_bit(acia.connection.input_state));
+	const device_config *device = ptr;
+	acia6551_t *acia = get_token(device);
 
-	if (acia.receive_reg.flags & RECEIVE_REGISTER_FULL)
+	/* get bit received from other side and update receive register */
+	receive_register_update_bit(&acia->receive_reg, get_in_data_bit(acia->connection.input_state));
+
+	if (acia->receive_reg.flags & RECEIVE_REGISTER_FULL)
 	{
-		receive_register_extract(&acia.receive_reg, &acia.data_form);
-		acia_6551_receive_char(acia.receive_reg.byte_received);
+		receive_register_extract(&acia->receive_reg, &acia->data_form);
+		acia_6551_receive_char(device, acia->receive_reg.byte_received);
 	}
 
 	/* transmit register full? */
-	if ((acia.status_register & (1<<4))==0)
+	if ((acia->status_register & (1<<4))==0)
 	{
 		/* if transmit reg is empty */
-		if (acia.transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
+		if (acia->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
 		{
 			/* set it up */
-			transmit_register_setup(&acia.transmit_reg, &acia.data_form, acia.transmit_data_register);
+			transmit_register_setup(&acia->transmit_reg, &acia->data_form, acia->transmit_data_register);
 			/* acia transmit reg now empty */
-			acia.status_register |=(1<<4);
+			acia->status_register |=(1<<4);
 			/* and refresh ints */
-			acia_6551_refresh_ints();
+			acia_6551_refresh_ints(device);
 		}
 	}
 
 	/* if transmit is not empty... transmit data */
-	if ((acia.transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
+	if ((acia->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 	{
 	//	logerror("UART6551\n");
-		transmit_register_send_bit(&acia.transmit_reg, &acia.connection);
+		transmit_register_send_bit(&acia->transmit_reg, &acia->connection);
 	}
 }
 
-void acia_6551_init(void)
+
+
+/*-------------------------------------------------
+    DEVICE_START( acia6551 )
+-------------------------------------------------*/
+
+DEVICE_START( acia6551 )
 {
+	acia6551_t *acia = get_token(device);
+
 	serial_helper_setup();
 
-	memset(&acia, 0, sizeof(acia));
+	memset(acia, 0, sizeof(*acia));
 	/* transmit data reg is empty */
-	acia.status_register |= (1<<4);
-	acia.timer = timer_alloc(acia_6551_timer_callback, NULL);
+	acia->status_register |= (1<<4);
+	acia->timer = timer_alloc(acia_6551_timer_callback, (void *) device);
 
-	serial_connection_init(&acia.connection);
-	serial_connection_set_in_callback(&acia.connection, acia_6551_in_callback);
-	transmit_register_reset(&acia.transmit_reg);
-	receive_register_reset(&acia.receive_reg);
+	serial_connection_init(&acia->connection);
+	serial_connection_set_in_callback(&acia->connection, acia_6551_in_callback);
+	transmit_register_reset(&acia->transmit_reg);
+	receive_register_reset(&acia->receive_reg);
+	return DEVICE_START_OK;
 }
 
-/* set callback for interrupt request */
-void acia_6551_set_irq_callback(void (*callback)(int))
-{
-	acia.irq_callback = callback;
-}
 
-/* update interrupt output */
-static void acia_6551_refresh_ints(void)
+
+/*-------------------------------------------------
+    acia_6551_refresh_ints - update interrupt output
+-------------------------------------------------*/
+
+static void acia_6551_refresh_ints(const device_config *device)
 {
+	acia6551_t *acia = get_token(device);
 	int interrupt_state;
 
 	interrupt_state = 0;
@@ -128,10 +174,10 @@ static void acia_6551_refresh_ints(void)
 	/* receive interrupts */
 
 	/* receive data register full? */
-	if (acia.status_register & (1<<3))
+	if (acia->status_register & (1<<3))
 	{
 		/* receiver interrupt enable? */
-		if ((acia.command_register & (1<<1))==0)
+		if ((acia->command_register & (1<<1))==0)
 		{
 			/* trigger a interrupt */
 			interrupt_state = 1;
@@ -139,38 +185,53 @@ static void acia_6551_refresh_ints(void)
 	}
 
 	/* set state of irq bit in status register */
-	acia.status_register &= ~(1<<7);
+	acia->status_register &= ~(1<<7);
 
 	if (interrupt_state)
 	{
-		acia.status_register |=(1<<7);
+		acia->status_register |=(1<<7);
 	}
 
-	if (acia.irq_callback)
-        acia.irq_callback(interrupt_state);
+	if (acia->irq_callback != NULL)
+        (*acia->irq_callback)(interrupt_state);
 }
 
 
-static void acia_6551_receive_char(unsigned char ch)
+
+/*-------------------------------------------------
+    acia_6551_receive_char
+-------------------------------------------------*/
+
+static void acia_6551_receive_char(const device_config *device, unsigned char ch)
 {
+	acia6551_t *acia = get_token(device);
+
 	/* receive register full? */
-	if (acia.status_register & (1<<3))
+	if (acia->status_register & (1<<3))
 	{
 		/* set overrun error */
-		acia.status_register |= (1<<2);
+		acia->status_register |= (1<<2);
 		return;
 	}
 
 	/* set new byte */
-	acia.receive_data_register = ch;
+	acia->receive_data_register = ch;
 	/* receive register is full */
-	acia.status_register |= (1<<3);
+	acia->status_register |= (1<<3);
 	/* update ints */
-	acia_6551_refresh_ints();
+	acia_6551_refresh_ints(device);
 }
 
- READ8_HANDLER(acia_6551_r)
+
+
+/*-------------------------------------------------
+    acia_6551_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER(acia_6551_r)
 {
+	acia6551_t *acia = get_token(device);
+
 	unsigned char data;
 
 	data = 0x0ff;
@@ -180,11 +241,11 @@ static void acia_6551_receive_char(unsigned char ch)
 		{
 			/*  clear parity error, framing error and overrun error */
 			/* when read of data reigster is done */
-			acia.status_register &=~((1<<0) | (1<<1) | (1<<2));
+			acia->status_register &=~((1<<0) | (1<<1) | (1<<2));
 			/* clear receive data register full flag */
-			acia.status_register &=~(1<<3);
+			acia->status_register &=~(1<<3);
 			/* return data */
-			data = acia.receive_data_register;
+			data = acia->receive_data_register;
 		}
 		break;
 
@@ -201,18 +262,18 @@ static void acia_6551_receive_char(unsigned char ch)
     */
 		case 1:
         {
-            data = acia.status_register;
+            data = acia->status_register;
 			/* clear interrupt */
-			acia.status_register &= ~(1<<7);
+			acia->status_register &= ~(1<<7);
 		}
         break;
 
         case 2:
-			data = acia.command_register;
+			data = acia->command_register;
 			break;
 
 		case 3:
-			data = acia.control_register;
+			data = acia->control_register;
 			break;
 
 		default:
@@ -224,26 +285,41 @@ static void acia_6551_receive_char(unsigned char ch)
 	return data;
 }
 
-static void acia_6551_update_data_form(void)
-{
-	acia.data_form.word_length = 8-((acia.control_register>>5) & 0x03);
-	acia.data_form.stop_bit_count = (acia.control_register>>7)+1;
 
-	if (acia.command_register & (1<<5))
+
+/*-------------------------------------------------
+    acia_6551_update_data_form
+-------------------------------------------------*/
+
+static void acia_6551_update_data_form(const device_config *device)
+{
+	acia6551_t *acia = get_token(device);
+
+	acia->data_form.word_length = 8-((acia->control_register>>5) & 0x03);
+	acia->data_form.stop_bit_count = (acia->control_register>>7)+1;
+
+	if (acia->command_register & (1<<5))
 	{
-		acia.data_form.parity = SERIAL_PARITY_ODD;
+		acia->data_form.parity = SERIAL_PARITY_ODD;
 	}
 	else
 	{
-		acia.data_form.parity = SERIAL_PARITY_NONE;
+		acia->data_form.parity = SERIAL_PARITY_NONE;
 	}
 
-	receive_register_setup(&acia.receive_reg, &acia.data_form);
+	receive_register_setup(&acia->receive_reg, &acia->data_form);
 }
 
 
-WRITE8_HANDLER(acia_6551_w)
+
+/*-------------------------------------------------
+    acia_6551_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(acia_6551_w)
 {
+	acia6551_t *acia = get_token(device);
+
 	logerror("6551 W %04x %02x\n",offset & 0x03, data);
 
 	switch (offset & 0x03)
@@ -251,9 +327,9 @@ WRITE8_HANDLER(acia_6551_w)
 		case 0:
 		{
 			/* clear transmit data register empty */
-			acia.status_register &= ~(1<<4);
+			acia->status_register &= ~(1<<4);
 			/* store byte */
-			acia.transmit_data_register = data;
+			acia->transmit_data_register = data;
 
 		}
 		break;
@@ -295,21 +371,21 @@ WRITE8_HANDLER(acia_6551_w)
 
 		case 2:
 		{
-			acia.command_register = data;
+			acia->command_register = data;
 
 			/* update state of dtr */
-			acia.connection.State &=~SERIAL_STATE_DTR;
-			if (acia.command_register & (1<<0))
+			acia->connection.State &=~SERIAL_STATE_DTR;
+			if (acia->command_register & (1<<0))
 			{
-				acia.connection.State |=SERIAL_STATE_DTR;
+				acia->connection.State |=SERIAL_STATE_DTR;
 			}
 
 			/* update state of rts */
-			switch ((acia.command_register>>2) & 0x03)
+			switch ((acia->command_register>>2) & 0x03)
 			{
 				case 0:
 				{
-					acia.connection.State &=~SERIAL_STATE_RTS;
+					acia->connection.State &=~SERIAL_STATE_RTS;
 				}
 				break;
 
@@ -317,14 +393,14 @@ WRITE8_HANDLER(acia_6551_w)
 				case 2:
 				case 3:
 				{
-					acia.connection.State |=SERIAL_STATE_RTS;
+					acia->connection.State |=SERIAL_STATE_RTS;
 				}
 				break;
 			}
 
-			serial_connection_out(&acia.connection);
+			serial_connection_out(&acia->connection);
 
-			acia_6551_update_data_form();
+			acia_6551_update_data_form(device);
 		}
 		break;
 
@@ -366,7 +442,7 @@ WRITE8_HANDLER(acia_6551_w)
 		{
 			unsigned char previous_control_register;
 
-            previous_control_register = acia.control_register;
+            previous_control_register = acia->control_register;
 
             if (((previous_control_register^data) & 0x07)!=0)
 			{
@@ -375,7 +451,7 @@ WRITE8_HANDLER(acia_6551_w)
                 rate = data & 0x07;
 
 				/* baud rate changed? */
-				timer_reset(acia.timer, attotime_never);
+				timer_reset(acia->timer, attotime_never);
 
 				if (rate==0)
 				{
@@ -481,12 +557,12 @@ WRITE8_HANDLER(acia_6551_w)
 						break;
 					}
 
-					timer_adjust_periodic(acia.timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
+					timer_adjust_periodic(acia->timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate));
 				}
 			}
 
-			acia.control_register = data;
-			acia_6551_update_data_form();
+			acia->control_register = data;
+			acia_6551_update_data_form(device);
 		}
 		break;
 
@@ -497,7 +573,56 @@ WRITE8_HANDLER(acia_6551_w)
 }
 
 
-void acia_6551_connect_to_serial_device(const device_config *image)
+/*-------------------------------------------------
+    acia_6551_connect_to_serial_device
+-------------------------------------------------*/
+
+void acia_6551_connect_to_serial_device(const device_config *device, const device_config *image)
 {
-	serial_device_connect(image, &acia.connection);
+	acia6551_t *acia = get_token(device);
+	serial_device_connect(image, &acia->connection);
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( acia6551 )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( acia6551 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( acia6551 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( acia6551 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(acia6551_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(acia6551); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(acia6551);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "MOS Technology 6551 ACIA";		break;
+		case DEVINFO_STR_FAMILY:						info->s = "MOS Technology 6551 ACIA";		break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
 }

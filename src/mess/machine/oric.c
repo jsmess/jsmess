@@ -1532,8 +1532,6 @@ MACHINE_START( telestrat )
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
     port_314_w = 0x0ff^((1<<7) | (1<<1));
 
-	acia_6551_init();
-
 	via_config(1, &telestrat_via2_interface);
 	via_set_clock(1,1000000);
 

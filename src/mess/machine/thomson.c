@@ -382,6 +382,9 @@ static struct serial_connection to7_io_line;
 
 DEVICE_START( thom_serial )
 {
+	const device_config *acia = device_list_find_by_tag(device->machine->config->devicelist,
+		ACIA6551,
+		"acia");
 	int idx = image_index_in_device(device);
 
 	DEVICE_START_CALL(serial_device);
@@ -390,12 +393,12 @@ DEVICE_START( thom_serial )
 
 	case THOM_SERIAL_CC90323:
 		LOG(( "thom_serial_init: init CD 90-320 RS232 device\n" ));
-		serial_device_connect( device , &to7_io_line );
+		serial_device_connect( device, &to7_io_line );
 		break;
 
 	case THOM_SERIAL_RF57232:
 		LOG(( "thom_serial_init: init RF 57-232 RS232 device\n" ));
-		acia_6551_connect_to_serial_device( device );
+		acia_6551_connect_to_serial_device( acia, device );
 		break;
 
 	case THOM_SERIAL_MODEM:
@@ -891,14 +894,6 @@ static void to7_io_init( void )
 static void to7_rf57932_reset( void )
 {
 	LOG (( "to7_rf57932_reset called\n" ));
-}
-
-
-
-static void to7_rf57932_init( void )
-{
-	LOG (( "to7_rf57932_init: RD 57-932 RS232 extension\n" ));
-	acia_6551_init();
 }
 
 
@@ -1511,7 +1506,6 @@ MACHINE_START ( to7 )
 	to7_io_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -1762,7 +1756,6 @@ MACHINE_START ( to770 )
 	to7_io_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -2122,7 +2115,6 @@ MACHINE_START ( mo5 )
 	to7_io_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
@@ -3092,7 +3084,6 @@ MACHINE_START ( to9 )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -4063,7 +4054,6 @@ MACHINE_START ( to8 )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -4230,7 +4220,6 @@ MACHINE_START ( to9p )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -4817,7 +4806,6 @@ MACHINE_START ( mo6 )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
@@ -5091,7 +5079,6 @@ MACHINE_START ( mo5nr )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	to7_rf57932_init();
 	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 

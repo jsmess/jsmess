@@ -11,16 +11,23 @@
 
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define ACIA6551		DEVICE_GET_INFO_NAME(acia6551)
+
+
+
+/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-WRITE8_HANDLER(acia_6551_w);
-READ8_HANDLER(acia_6551_r);
+DEVICE_GET_INFO(acia6551);
 
-void acia_6551_init(void);
-void acia_6551_set_irq_callback(void (*callback)(int));
+READ8_DEVICE_HANDLER(acia_6551_r);
+WRITE8_DEVICE_HANDLER(acia_6551_w);
 
-void acia_6551_connect_to_serial_device(const device_config *image);
+void acia_6551_connect_to_serial_device(const device_config *device, const device_config *image);
 
 
 #endif /* __6551_H__ */

@@ -934,7 +934,5 @@ MACHINE_RESET( microtan )
     via_config(0, &via6522[0]);
     via_config(1, &via6522[1]);
 
-	acia_6551_init();
-
 	microtan_timer = timer_alloc(microtan_read_cassette, NULL);
 }

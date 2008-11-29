@@ -55,7 +55,9 @@ Source Changes:
 - The core is based on MAME 0.128u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- Changed the MSM8251 implementation to be a device.  [Nathan Woods]
+- Changed the 8251 UART implementation to be a device.  [Nathan Woods]
+
+- Changed the 6551 ACIA implementation to be a device.  [Nathan Woods]
 
 - Various code cleanups.  [Atari Ace]
 
