@@ -18,6 +18,7 @@ extern WRITE8_HANDLER( ondra_port_09_w );
 extern WRITE8_HANDLER( ondra_port_0a_w );
 /*----------- defined in video/ondra.c -----------*/
 
+extern UINT8 ondra_video_enable;
 extern VIDEO_START( ondra );
 extern VIDEO_UPDATE( ondra );
 

@@ -10,8 +10,12 @@
 #include "driver.h"
 #include "includes/ondra.h"
 
+UINT8 ondra_video_enable;
+
+
 VIDEO_START( ondra )
 {
+	ondra_video_enable = 0;
 }
 
 VIDEO_UPDATE( ondra )
@@ -20,20 +24,22 @@ VIDEO_UPDATE( ondra )
 	int y, x, b;
 	int Vaddr = 0x2800;
 
-	for (x = 0; x < 40; x++)
-	{
-		for (y = 127; y >=0; y--)
+	if (ondra_video_enable==1) {
+		for (x = 0; x < 40; x++)
 		{
-			code1 = mess_ram[0xd700 + Vaddr + 0x80];
-			code2 = mess_ram[0xd700 + Vaddr + 0x00];
-			for (b = 0; b < 8; b++)
+			for (y = 127; y >=0; y--)
 			{
-				*BITMAP_ADDR16(bitmap, 2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;
-				*BITMAP_ADDR16(bitmap, 2*y+1,   x*8+b) =  ((code2 << b) & 0x80) ? 1 : 0;
+				code1 = mess_ram[0xd700 + Vaddr + 0x80];
+				code2 = mess_ram[0xd700 + Vaddr + 0x00];
+				for (b = 0; b < 8; b++)
+				{
+					*BITMAP_ADDR16(bitmap, 2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;
+					*BITMAP_ADDR16(bitmap, 2*y+1,   x*8+b) =  ((code2 << b) & 0x80) ? 1 : 0;
+				}
+				Vaddr++;
 			}
-			Vaddr++;
+			Vaddr = (Vaddr - 128) - 256;
 		}
-		Vaddr = (Vaddr - 128) - 256;
 	}
 	return 0;
 }

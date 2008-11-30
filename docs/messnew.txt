@@ -36,7 +36,7 @@ System Driver Changes:
 
 - [NES] Fixed bug #1672.  [Wilbert Pol]
 
-
+- [ONDRA] Both computers now work, cassette supported  [Miodrag Milanovic]
 
 User Interface Changes:
 -----------------------
