@@ -43,7 +43,7 @@ WRITE8_DEVICE_HANDLER( svi318_ppi_w );
 WRITE8_HANDLER( svi318_psg_port_b_w );
 READ8_HANDLER( svi318_psg_port_a_r );
 
-int svi318_cassette_present(int id);
+int svi318_cassette_present(running_machine *machine, int id);
 
 DEVICE_IMAGE_LOAD( svi318_floppy );
 

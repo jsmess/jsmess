@@ -19,7 +19,6 @@
 #include "machine/6532riot.h"
 #include "machine/74145.h"
 #include "sound/speaker.h"
-#include "deprecat.h"
 
 #define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
 
@@ -196,18 +195,20 @@ static WRITE8_HANDLER( sym1_via0_b_w )
  */
 static WRITE8_HANDLER( sym1_via2_a_w )
 {
+	const address_space *cpu0space = cpu_get_address_space( space->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0xa600, 0xa67f, 0, 0,
+	memory_install_write8_handler(cpu0space, 0xa600, 0xa67f, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
 
-	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x0400, 0x07ff, 0, 0,
+	memory_install_write8_handler(cpu0space, 0x0400, 0x07ff, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
 
-	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x0800, 0x0bff, 0, 0,
+	memory_install_write8_handler(cpu0space, 0x0800, 0x0bff, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
 
-	memory_install_write8_handler(cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x0c00, 0x0fff, 0, 0,
+	memory_install_write8_handler(cpu0space, 0x0c00, 0x0fff, 0, 0,
 		((input_port_read(space->machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
 }
 

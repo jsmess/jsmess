@@ -10,7 +10,6 @@
 #include "driver.h"
 #include "z80bin.h"
 #include "snapquik.h"
-#include "deprecat.h"
 
 
 
@@ -85,7 +84,7 @@ static int z80bin_load_file(const device_config *image, const char *file_type, U
 			image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, message);
 			return INIT_FAIL;
 		}
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), j, data);
+		memory_write_byte(cputag_get_address_space(image->machine,"main",ADDRESS_SPACE_PROGRAM), j, data);
 	}
 
 	return INIT_PASS;
@@ -118,12 +117,12 @@ static QUICKLOAD_LOAD( z80bin )
 		/* start program */
 		if (config->execute != NULL)
 		{
-			(*config->execute)(start_addr, end_addr, exec_addr, autorun);
+			(*config->execute)(image->machine, start_addr, end_addr, exec_addr, autorun);
 		}
 		else
 		{
 			if (autorun)
-				cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, exec_addr);	
+				cpu_set_reg(cputag_get_cpu(image->machine, "main"), REG_PC, exec_addr);	
 		}
 	}
 

@@ -19,7 +19,6 @@
 #include "formats/svi_cas.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "deprecat.h"
 
 enum {
 	SVI_INTERNAL	= 0,
@@ -168,7 +167,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 
 	if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
 		data |= 0x80;
-	if (!svi318_cassette_present(0))
+	if (!svi318_cassette_present(device->machine, 0))
 		data |= 0x40;
 	data |= input_port_read(device->machine, "BUTTONS") & 0x30;
 
@@ -224,7 +223,7 @@ static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 	dac_signed_data_w (0, val);
 
 	/* cassette motor on/off */
-	if (svi318_cassette_present(0))
+	if (svi318_cassette_present(device->machine, 0))
 	{
 		cassette_change_state(
 			device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
@@ -808,9 +807,9 @@ static void svi318_set_banks(running_machine *machine)
 
 /* Cassette */
 
-int svi318_cassette_present(int id)
+int svi318_cassette_present(running_machine *machine, int id)
 {
-	const device_config *img = device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" );
+	const device_config *img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 
 	if ( img == NULL )
 		return FALSE;

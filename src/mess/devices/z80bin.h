@@ -21,7 +21,7 @@
 #define Z80BIN	DEVICE_GET_INFO_NAME(z80bin)
 
 #define Z80BIN_EXECUTE_NAME(name)	z80bin_execute_##name
-#define Z80BIN_EXECUTE(name)		void Z80BIN_EXECUTE_NAME(name)(UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun)
+#define Z80BIN_EXECUTE(name)		void Z80BIN_EXECUTE_NAME(name)(running_machine *machine, UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun)
 
 #define z80bin_execute_default		NULL
 
@@ -31,7 +31,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*z80bin_execute_func)(UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun);
+typedef void (*z80bin_execute_func)(running_machine *machine, UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun);
 
 typedef struct _z80bin_config z80bin_config;
 struct _z80bin_config

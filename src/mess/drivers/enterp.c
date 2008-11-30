@@ -16,7 +16,6 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "audio/dave.h"
 #include "includes/enterp.h"
 #include "video/epnick.h"
@@ -157,9 +156,9 @@ static void enterprise_dave_reg_read(running_machine *machine, int RegIndex)
 static void enterprise_dave_interrupt(running_machine *machine, int state)
 {
 	if (state)
-		cpu_set_input_line(Machine->cpu[0],0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0],0,HOLD_LINE);
 	else
-		cpu_set_input_line(Machine->cpu[0],0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
 }
 
 /* enterprise interface to dave - ok, so Dave chip is unique

@@ -148,7 +148,6 @@ So far, it has been tested to work at 300 baud.
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
 #include "machine/ay31015.h"
-#include "deprecat.h"
 
 
 static const device_config *exidy_ay31015;
@@ -348,6 +347,8 @@ static MACHINE_START( exidy )
 
 static MACHINE_RESET( exidyd )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+
 	/* Initialize cassette interface */
 	cass_data.output.length = 0;
 	cass_data.output.level = 1;
@@ -359,7 +360,7 @@ static MACHINE_RESET( exidyd )
 	centronics_config(0, exidy_cent_config);
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	exidy_fe_port_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
+	exidy_fe_port_w(space, 0, 0);
 
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
 	memory_set_bank(machine, 1, 1);
@@ -873,7 +874,9 @@ ROM_END
 
 static Z80BIN_EXECUTE( exidy )
 {
-	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xdffa) != 0xc3))
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+
+	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (memory_read_byte(space, 0xdffa) != 0xc3))
 		return;					/* can't run a program if the cartridge isn't in */
 
 	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
@@ -893,24 +896,24 @@ static Z80BIN_EXECUTE( exidy )
 			0xc3, 0x89, 0xc6,};	// JP C689	;run program
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xf01f + i, data[i]);
+			memory_write_byte(space, 0xf01f + i, data[i]);
 
 		if (!autorun)
-			memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xf028,0xc3dd);
+			memory_write_word_16le(space, 0xf028,0xc3dd);
 
 		/* tell BASIC where program ends */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x1b7, (end_address >> 0) & 0xff);
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x1b8, (end_address >> 8) & 0xff);
+		memory_write_byte(space, 0x1b7, (end_address >> 0) & 0xff);
+		memory_write_byte(space, 0x1b8, (end_address >> 8) & 0xff);
 
 		if ((execute_address != 0xc858) && autorun)
-			memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xf028, execute_address);
+			memory_write_word_16le(space, 0xf028, execute_address);
 
-		cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, 0xf01f);
+		cpu_set_reg(cputag_get_cpu(machine, "main"), REG_PC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, execute_address);
+			cpu_set_reg(cputag_get_cpu(machine, "main"), REG_PC, execute_address);
 	}
 }
 
