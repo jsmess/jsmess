@@ -53,7 +53,6 @@ Todo:
 #include "devices/printer.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
-#include "deprecat.h"
 
 #define LOG_VTECH1_LATCH 0
 #define LOG_VTECH1_FDC   0
@@ -177,6 +176,7 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 SNAPSHOT_LOAD(vtech1)
 {
+	const address_space *space = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
@@ -207,22 +207,22 @@ SNAPSHOT_LOAD(vtech1)
 	switch (header[21])
 	{
 	case VZ_BASIC:		/* 0xF0 */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78a4, start % 256); /* start of basic program */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78a5, start / 256);
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78f9, end % 256); /* end of basic program */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fa, end / 256);
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fb, end % 256); /* start variable table */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fc, end / 256);
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fd, end % 256); /* start free mem, end variable table */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x78fe, end / 256);
+		memory_write_byte(space, 0x78a4, start % 256); /* start of basic program */
+		memory_write_byte(space, 0x78a5, start / 256);
+		memory_write_byte(space, 0x78f9, end % 256); /* end of basic program */
+		memory_write_byte(space, 0x78fa, end / 256);
+		memory_write_byte(space, 0x78fb, end % 256); /* start variable table */
+		memory_write_byte(space, 0x78fc, end / 256);
+		memory_write_byte(space, 0x78fd, end % 256); /* start free mem, end variable table */
+		memory_write_byte(space, 0x78fe, end / 256);
 		image_message(image, " %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
 	case VZ_MCODE:		/* 0xF1 */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x788e, start % 256); /* usr subroutine address */
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x788f, start / 256);
+		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
+		memory_write_byte(space, 0x788f, start / 256);
 		image_message(image, " %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, start);				/* start program */
+		cpu_set_reg(cputag_get_cpu(image->machine, "main"), REG_PC, start);				/* start program */
 		break;
 
 	default:

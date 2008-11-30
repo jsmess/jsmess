@@ -476,8 +476,9 @@ int vic6560_dma_read_color (int offset)
 
 int vic6560_dma_read (int offset)
 {
+	const address_space *space = cputag_get_address_space(Machine, "main", ADDRESS_SPACE_PROGRAM);
 	/* should read real system bus between 0x9000 and 0xa000 */
-	return memory_read_byte(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), VIC6560ADDR2VC20ADDR (offset));
+	return memory_read_byte(space, VIC6560ADDR2VC20ADDR (offset));
 }
 
 WRITE8_HANDLER( vc20_0400_w ) 
@@ -553,8 +554,9 @@ static void vc20_memory_init(running_machine *machine)
 
 static TIMER_CALLBACK( vic20_tape_timer )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
-	via_1_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
+	via_1_ca1_w(space, 0, data);
 }
 
 static void vc20_common_driver_init (running_machine *machine)
@@ -613,6 +615,8 @@ DRIVER_INIT( vic20i )
 
 MACHINE_RESET( vic20 )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+
 	if (has_vc1541)
 	{
 		serial_config(machine, &fake_drive_interface);
@@ -636,7 +640,7 @@ MACHINE_RESET( vic20 )
 	}
 
 	via_reset ();
-	via_0_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, vc20_via0_read_ca1(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0));
+	via_0_ca1_w(space, 0, vc20_via0_read_ca1(space, 0));
 
 	/* Set up memory banks */
 	memory_set_bankptr (machine,  1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x0400 );
@@ -663,7 +667,9 @@ static TIMER_CALLBACK( lightpen_tick )
 
 INTERRUPT_GEN( vic20_frame_interrupt )
 {
-	via_0_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, vc20_via0_read_ca1 (cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0));
+	const address_space *space = cputag_get_address_space(device->machine, "main", ADDRESS_SPACE_PROGRAM);
+
+	via_0_ca1_w(space, 0, vc20_via0_read_ca1(space, 0));
 	keyboard[0] = input_port_read(device->machine, "ROW0");
 	keyboard[1] = input_port_read(device->machine, "ROW1");
 	keyboard[2] = input_port_read(device->machine, "ROW2");

@@ -1140,7 +1140,7 @@ static void tx0_keyboard(running_machine *machine)
 			previous LR */
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
-			cpu_set_reg(Machine->cpu[0], TX0_LR, lr);
+			cpu_set_reg(machine->cpu[0], TX0_LR, lr);
 			tx0_typewriter_drawchar(machine, charcode);	/* we want to echo input */
 			break;
 		}
@@ -1198,7 +1198,7 @@ INTERRUPT_GEN( tx0_interrupt )
 		}
 		if (control_transitions & tx0_read_in)
 		{	/* set cpu to read instructions from perforated tape */
-			cpu_set_reg(Machine->cpu[0], TX0_RESET, 0);
+			cpu_set_reg(device->machine->cpu[0], TX0_RESET, 0);
 			cpu_set_reg(device->machine->cpu[0], TX0_RUN, 0);
 			cpu_set_reg(device->machine->cpu[0], TX0_RIM, 1);
 		}
