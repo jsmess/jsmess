@@ -203,18 +203,23 @@ DRIVER_INIT( genmod )
 
 MACHINE_START( geneve )
 {
-    	tms9901_init(0, & tms9901reset_param_ti99);
+	tms9901_init(0, & tms9901reset_param_ti99);
 
-        /* Initialize all. Actually, at this point, we don't know
-           how the switches are set. Later we use the configuration switches to
-           determine which one to use. */
+	/* Initialize all. Actually, at this point, we don't know
+	   how the switches are set. Later we use the configuration switches to
+	   determine which one to use. */
 	ti99_peb_init();
-        ti99_floppy_controllers_init_all(machine);
-        ti99_ide_init(machine);
-        ti99_rs232_init(machine);
+	ti99_floppy_controllers_init_all(machine);
+	ti99_ide_init(machine);
+	ti99_rs232_init(machine);
 	ti99_usbsm_init(machine);
 	mm58274c_init(machine, 0, 1, 0);
 	add_exit_callback(machine, machine_stop_geneve);
+
+	/* set up RAM pointers */
+	ROM_ptr = memory_region(machine, "main") + offset_rom_geneve;
+	SRAM_ptr = memory_region(machine, "main") + offset_sram_geneve;
+	DRAM_ptr = memory_region(machine, "main") + offset_dram_geneve;
 }
 
 MACHINE_RESET( geneve )
@@ -223,11 +228,6 @@ MACHINE_RESET( geneve )
 	/* initialize page lookup */
 	memset(page_lookup, 0, sizeof(page_lookup));
 
-	/* set up RAM pointers */
-	ROM_ptr = memory_region(machine, "main") + offset_rom_geneve;
-	SRAM_ptr = memory_region(machine, "main") + offset_sram_geneve;
-	DRAM_ptr = memory_region(machine, "main") + offset_dram_geneve;
-
 	/* Initialize GROMs */
 	memset(& GPL_port, 0, sizeof(GPL_port));
 
@@ -235,7 +235,7 @@ MACHINE_RESET( geneve )
 	cartridge_page = 0;
 
 	/* init tms9901 */
-        tms9901_reset(0);
+	tms9901_reset(0);
 
 	v9938_reset(0);
 
