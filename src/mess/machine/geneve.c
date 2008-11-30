@@ -301,6 +301,9 @@ MACHINE_RESET( geneve )
 
 	if (has_usb_sm)
 		ti99_usbsm_reset(machine, TRUE);
+
+	/* reset CPU */
+	cputag_reset(machine, "main");
 }
 
 static void machine_stop_geneve(running_machine *machine)
