@@ -113,7 +113,6 @@ Notes:
 #include "devices/printer.h"
 #include "devices/z80bin.h"
 #include "formats/vt_cas.h"
-#include "deprecat.h"
 
 static Z80BIN_EXECUTE(vtech1);
 
@@ -423,6 +422,9 @@ ROM_END
 
 static Z80BIN_EXECUTE( vtech1 )
 {
+	const device_config *cpu = cputag_get_cpu(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+
 	/* A Microsoft Basic program needs some manipulation before it can be run.
 	1. A start address of 7ae9 indicates a basic program which needs its pointers fixed up.
 	2. If autorun is turned off, the pointers still need fixing, but then display READY.
@@ -430,8 +432,8 @@ static Z80BIN_EXECUTE( vtech1 )
 		7ae9 = start (load) address of a conventional basic program
 		791e = custom routine to fix basic pointers */
 
-	memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x791c, end_address + 1);
-	memory_write_word_16le(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x781e, execute_address);
+	memory_write_word_16le(space, 0x791c, end_address + 1);
+	memory_write_word_16le(space, 0x781e, execute_address);
 
 	if (start_address == 0x7ae9)
 	{
@@ -445,17 +447,17 @@ static Z80BIN_EXECUTE( vtech1 )
 			0xc3, 0xcf, 0x36,};	// JP 36CF	;enter bios at autorun point
 
 		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x791e + i, data[i]);
+			memory_write_byte(space, 0x791e + i, data[i]);
 
 		if (!autorun)
-			memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0x7929, 0xb6);	/* turn off autorun */
+			memory_write_byte(space, 0x7929, 0xb6);	/* turn off autorun */
 
-		cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, 0x791e);
+		cpu_set_reg(cpu, REG_PC, 0x791e);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(cputag_get_cpu(Machine, "main"), REG_PC, execute_address);
+			cpu_set_reg(cpu, REG_PC, execute_address);
 	}
 }
 
