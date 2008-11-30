@@ -336,9 +336,7 @@ const ppi8255_interface msx_ppi8255_interface =
 	msx_ppi_port_c_w
 };
 
-static const struct tc8521_interface tc = { NULL };
-
-static void msx_init(running_machine *machine)
+DRIVER_INIT( msx )
 {
 	int i, n;
 
@@ -387,17 +385,6 @@ static void msx_init(running_machine *machine)
 					CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i],
 					(void*)table);
 	}
-}
-
-DRIVER_INIT( msx )
-{
-	msx_init(machine);
-}
-
-DRIVER_INIT( msx2 )
-{
-	msx_init(machine);
-	tc8521_init (&tc);
 }
 
 INTERRUPT_GEN( msx2_interrupt )
@@ -594,24 +581,25 @@ WRITE8_HANDLER (msx_rtc_latch_w)
 
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
-	tc8521_w(space, msx1.rtc_latch, data);
+	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, TC8521, "rtc");
+	tc8521_w(rtc, msx1.rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
-	return tc8521_r(space, msx1.rtc_latch);
+	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, TC8521, "rtc");
+	return tc8521_r(rtc, msx1.rtc_latch);
 }
 
 NVRAM_HANDLER( msx2 )
 {
-	if (file) {
-
-		if (read_or_write) {
-			tc8521_save_stream (file);
-		}
-		else {
-			tc8521_load_stream (file);
-		}
+	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, TC8521, "rtc");
+	if (file)
+	{
+		if (read_or_write)
+			tc8521_save_stream (rtc, file);
+		else
+			tc8521_load_stream (rtc, file);
 	}
 }
 

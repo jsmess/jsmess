@@ -868,7 +868,7 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 }
 
 
-static void	nc100_tc8521_alarm_callback(int state)
+static void	nc100_tc8521_alarm_callback(const device_config *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -882,7 +882,7 @@ static void	nc100_tc8521_alarm_callback(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cpu_set_input_line(Machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
@@ -923,12 +923,12 @@ static void nc100_rxrdy_callback(const device_config *device, int state)
 }
 
 
-static const struct tc8521_interface nc100_tc8521_interface=
+static const tc8521_interface nc100_tc8521_interface =
 {
 	nc100_tc8521_alarm_callback,
 };
 
-static const msm8251_interface nc100_uart_interface=
+static const msm8251_interface nc100_uart_interface =
 {
 	nc100_txrdy_callback,
 	NULL,
@@ -968,14 +968,16 @@ static MACHINE_RESET( nc100 )
 
     nc_common_init_machine(machine);
 
-	tc8521_init(&nc100_tc8521_interface);
-
 	centronics_config(0, nc100_cent_config);
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
 	nc_common_open_stream_for_reading(machine);
-	tc8521_load_stream(file);
+
+	{
+		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, TC8521, "rtc");
+		tc8521_load_stream(rtc, file);
+	}
 
 	nc_common_restore_memory_from_stream();
 
@@ -988,7 +990,10 @@ static MACHINE_RESET( nc100 )
 static void nc100_machine_stop(running_machine *machine)
 {
 	nc_common_open_stream_for_writing(machine);
-	tc8521_save_stream(file);
+	{
+		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, TC8521, "rtc");
+		tc8521_save_stream(rtc, file);
+	}
 	nc_common_store_memory_to_stream();
 	nc_common_close_stream();
 }
@@ -1082,7 +1087,7 @@ static ADDRESS_MAP_START(nc100_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(tc8521_r, tc8521_w)
+	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE(TC8521, "rtc", tc8521_r, tc8521_w)
 ADDRESS_MAP_END
 
 
@@ -1294,7 +1299,7 @@ static void nc200_txrdy_callback(const device_config *device, int state)
 //      nc200_uart_interrupt_irq |=(1<<0);
 //  }
 //
-//  nc200_refresh_uart_interrupt(Machine);
+//  nc200_refresh_uart_interrupt(device->machine);
 }
 
 static void nc200_rxrdy_callback(const device_config *device, int state)
@@ -1704,6 +1709,10 @@ static MACHINE_DRIVER_START( nc100 )
 	/* uart */
 	MDRV_DEVICE_ADD("uart", MSM8251)
 	MDRV_DEVICE_CONFIG(nc100_uart_interface)
+
+	/* rtc */
+	MDRV_DEVICE_ADD("rtc", TC8521)
+	MDRV_DEVICE_CONFIG(nc100_tc8521_interface)
 MACHINE_DRIVER_END
 
 
@@ -1726,6 +1735,9 @@ static MACHINE_DRIVER_START( nc200 )
 	/* uart */
 	MDRV_DEVICE_MODIFY("uart", MSM8251)
 	MDRV_DEVICE_CONFIG(nc200_uart_interface)
+
+	/* no rtc */
+	MDRV_DEVICE_REMOVE("rtc", TC8521)
 MACHINE_DRIVER_END
 
 

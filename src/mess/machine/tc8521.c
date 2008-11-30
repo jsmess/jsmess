@@ -121,26 +121,46 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct tc8521
+typedef struct _tc8521_t tc8521_t;
+struct _tc8521_t
 {
 	/* 4 register pages (timer, alarm, ram1 and ram2) */
     unsigned char registers[16*4];
-	/* interface for 1hz/16hz and alarm outputs */
-    struct tc8521_interface interface;
-
 	UINT32 alarm_outputs;
 	UINT32 thirty_two_hz_counter;
 };
 
 
 /***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE tc8521_t *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == TC8521);
+	return (tc8521_t *) device->token;
+}
+
+
+INLINE const tc8521_interface *get_interface(const device_config *device)
+{
+	static const tc8521_interface dummy_config = {0, };
+
+	assert(device != NULL);
+	assert(device->type == TC8521);
+	return (device->static_config != NULL)
+		? (tc8521_interface *) device->static_config
+		: &dummy_config;
+}
+
+
+/***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
-static struct tc8521 rtc;
-
 /* mask data with these values when writing */
-static const unsigned char rtc_write_masks[16*4]=
+static const UINT8 rtc_write_masks[16*4]=
 {
 	0x0f,0x07,0x0f,0x07,0x0f,0x03,0x07,0x0f,0x03,0x0f,0x03,0x0f,0x0f,0x0f, 0x0f, 0x0f,
 	0x00,0x00,0x0f,0x07,0x0f,0x03,0x07,0x0f,0x03,0x00,0x01,0x03,0x00,0x0f, 0x0f, 0x0f,
@@ -159,13 +179,15 @@ static const unsigned char rtc_write_masks[16*4]=
 	supplied file
 -------------------------------------------------*/
 
-void tc8521_load_stream(mame_file *file)
+void tc8521_load_stream(const device_config *device, mame_file *file)
 {
+	tc8521_t *rtc = get_token(device);
+
 	if (file)
 	{
-		mame_fread(file, &rtc.registers[0], sizeof(unsigned char)*16*4);
-		mame_fread(file, &rtc.alarm_outputs, sizeof(UINT32));
-		mame_fread(file, &rtc.thirty_two_hz_counter, sizeof(UINT32));
+		mame_fread(file, &rtc->registers[0], sizeof(unsigned char)*16*4);
+		mame_fread(file, &rtc->alarm_outputs, sizeof(UINT32));
+		mame_fread(file, &rtc->thirty_two_hz_counter, sizeof(UINT32));
 	}
 }
 
@@ -176,13 +198,15 @@ void tc8521_load_stream(mame_file *file)
 	supplied file
 -------------------------------------------------*/
 
-void tc8521_save_stream(mame_file *file)
+void tc8521_save_stream(const device_config *device, mame_file *file)
 {
+	tc8521_t *rtc = get_token(device);
+
 	if (file)
 	{
-		mame_fwrite(file, &rtc.registers[0], sizeof(unsigned char)*16*4);
-		mame_fwrite(file, &rtc.alarm_outputs, sizeof(UINT32));
-		mame_fwrite(file, &rtc.thirty_two_hz_counter, sizeof(UINT32));
+		mame_fwrite(file, &rtc->registers[0], sizeof(unsigned char)*16*4);
+		mame_fwrite(file, &rtc->alarm_outputs, sizeof(UINT32));
+		mame_fwrite(file, &rtc->thirty_two_hz_counter, sizeof(UINT32));
 	}
 }
 
@@ -192,8 +216,10 @@ void tc8521_save_stream(mame_file *file)
     tc8521_set_alarm_output
 -------------------------------------------------*/
 
-static void tc8521_set_alarm_output(void)
+static void tc8521_set_alarm_output(const device_config *device)
 {
+	tc8521_t *rtc = get_token(device);
+	const tc8521_interface *rtc_interface = get_interface(device);
 	unsigned char alarm_output;
 
 	alarm_output = 0;
@@ -201,33 +227,33 @@ static void tc8521_set_alarm_output(void)
 	/* what happens when all are enabled? I assume they are all or'd together */
 
 	/* 16hz enabled? */
-    if ((rtc.registers[TC8521_RESET_REGISTER] & (1<<2))==0)
+    if ((rtc->registers[TC8521_RESET_REGISTER] & (1<<2))==0)
     {
 		/* yes */
 
 		/* add in state of 16hz output */
-		alarm_output |= (rtc.alarm_outputs & ALARM_OUTPUT_16HZ);
+		alarm_output |= (rtc->alarm_outputs & ALARM_OUTPUT_16HZ);
 	}
 
-	if ((rtc.registers[TC8521_RESET_REGISTER] & (1<<3))==0)
+	if ((rtc->registers[TC8521_RESET_REGISTER] & (1<<3))==0)
 	{
 		/* yes */
 		/* add in stat of 1hz output */
-		alarm_output |= ((rtc.alarm_outputs & ALARM_OUTPUT_1HZ)>>1);
+		alarm_output |= ((rtc->alarm_outputs & ALARM_OUTPUT_1HZ)>>1);
 	}
 
-	alarm_output |= ((rtc.alarm_outputs & ALARM_OUTPUT_ALARM)>>2);
+	alarm_output |= ((rtc->alarm_outputs & ALARM_OUTPUT_ALARM)>>2);
 
 	/* if it's not enabled, then there is no output */
-	if (!((rtc.registers[TC8521_MODE_REGISTER] & (1<<2))!=0))
+	if (!((rtc->registers[TC8521_MODE_REGISTER] & (1<<2))!=0))
 	{
 		/* alarm output enabled? */
 		alarm_output &= ~1;
 	}
 
-    if (rtc.interface.alarm_output_callback!=NULL)
+    if (rtc_interface->alarm_output_callback != NULL)
     {
-		rtc.interface.alarm_output_callback(alarm_output);
+		(*rtc_interface->alarm_output_callback)(device, alarm_output);
 	}
 }
 
@@ -237,23 +263,25 @@ static void tc8521_set_alarm_output(void)
     tc8521_alarm_check
 -------------------------------------------------*/
 
-static void tc8521_alarm_check(void)
+static void tc8521_alarm_check(const device_config *device)
 {
-	rtc.alarm_outputs &= ~ALARM_OUTPUT_ALARM;
+	tc8521_t *rtc = get_token(device);
+
+	rtc->alarm_outputs &= ~ALARM_OUTPUT_ALARM;
 	if (
-		(rtc.registers[TC8521_TIMER_1_MINUTE_COUNTER]==rtc.registers[TC8521_ALARM_1_MINUTE_REGISTER]) &&
-		(rtc.registers[TC8521_TIMER_10_MINUTE_COUNTER]==rtc.registers[TC8521_ALARM_10_MINUTE_REGISTER]) &&
-		(rtc.registers[TC8521_TIMER_1_HOUR_COUNTER]==rtc.registers[TC8521_ALARM_1_HOUR_REGISTER]) &&
-		(rtc.registers[TC8521_TIMER_10_HOUR_COUNTER]==rtc.registers[TC8521_ALARM_10_HOUR_REGISTER]) &&
-		(rtc.registers[TC8521_TIMER_1_DAY_COUNTER]==rtc.registers[TC8521_ALARM_1_DAY_REGISTER]) &&
-		(rtc.registers[TC8521_TIMER_10_DAY_COUNTER]==rtc.registers[TC8521_ALARM_10_DAY_REGISTER]) &&
-		(rtc.registers[TC8521_TIMER_DAY_OF_THE_WEEK_COUNTER]==rtc.registers[TC8521_ALARM_DAY_OF_THE_WEEK_REGISTER])
+		(rtc->registers[TC8521_TIMER_1_MINUTE_COUNTER]==rtc->registers[TC8521_ALARM_1_MINUTE_REGISTER]) &&
+		(rtc->registers[TC8521_TIMER_10_MINUTE_COUNTER]==rtc->registers[TC8521_ALARM_10_MINUTE_REGISTER]) &&
+		(rtc->registers[TC8521_TIMER_1_HOUR_COUNTER]==rtc->registers[TC8521_ALARM_1_HOUR_REGISTER]) &&
+		(rtc->registers[TC8521_TIMER_10_HOUR_COUNTER]==rtc->registers[TC8521_ALARM_10_HOUR_REGISTER]) &&
+		(rtc->registers[TC8521_TIMER_1_DAY_COUNTER]==rtc->registers[TC8521_ALARM_1_DAY_REGISTER]) &&
+		(rtc->registers[TC8521_TIMER_10_DAY_COUNTER]==rtc->registers[TC8521_ALARM_10_DAY_REGISTER]) &&
+		(rtc->registers[TC8521_TIMER_DAY_OF_THE_WEEK_COUNTER]==rtc->registers[TC8521_ALARM_DAY_OF_THE_WEEK_REGISTER])
 		)
 	{
-		rtc.alarm_outputs |= ALARM_OUTPUT_ALARM;
+		rtc->alarm_outputs |= ALARM_OUTPUT_ALARM;
 	}
 
-	tc8521_set_alarm_output();
+	tc8521_set_alarm_output(device);
 }
 
 
@@ -264,78 +292,81 @@ static void tc8521_alarm_check(void)
 
 static TIMER_CALLBACK(tc8521_timer_callback)
 {
+	const device_config *device = ptr;
+	tc8521_t *rtc = get_token(device);
+
 	/* Assumption how it works */
 	/* 16hz output = 16 cycles per second, 16 cycles of high-low from counter */
 
 	/* toggle 16hz wave state */
-	rtc.alarm_outputs ^= ALARM_OUTPUT_16HZ;
+	rtc->alarm_outputs ^= ALARM_OUTPUT_16HZ;
 	/* set in alarm output */
-	tc8521_set_alarm_output();
+	tc8521_set_alarm_output(device);
 
-	rtc.thirty_two_hz_counter++;
+	rtc->thirty_two_hz_counter++;
 
-	if (rtc.thirty_two_hz_counter==16)
+	if (rtc->thirty_two_hz_counter==16)
 	{
-		rtc.thirty_two_hz_counter = 0;
+		rtc->thirty_two_hz_counter = 0;
 
 		/* toggle 1hz output */
-		rtc.alarm_outputs ^= ALARM_OUTPUT_1HZ;
+		rtc->alarm_outputs ^= ALARM_OUTPUT_1HZ;
 		/* set in alarm output */
-		tc8521_set_alarm_output();
+		tc8521_set_alarm_output(device);
 
-		if ((rtc.alarm_outputs & ALARM_OUTPUT_1HZ)==0)
+		if ((rtc->alarm_outputs & ALARM_OUTPUT_1HZ)==0)
 		{
 			/* timer enable? */
-			if ((rtc.registers[0x0d] & (1<<3))!=0)
+			if ((rtc->registers[0x0d] & (1<<3))!=0)
 			{
 			   /* seconds; units */
-			   rtc.registers[0]++;
+			   rtc->registers[0]++;
 
-			   if (rtc.registers[0]==10)
+			   if (rtc->registers[0]==10)
 			   {
-				   rtc.registers[0] = 0;
+				   rtc->registers[0] = 0;
 
 				   /* seconds; tens */
-				   rtc.registers[1]++;
+				   rtc->registers[1]++;
 
-				   if (rtc.registers[1]==6)
+				   if (rtc->registers[1]==6)
 				   {
-					  rtc.registers[1] = 0;
+					  rtc->registers[1] = 0;
 
 					  /* minutes; units */
-					  rtc.registers[2]++;
+					  rtc->registers[2]++;
 
-					  if (rtc.registers[2]==10)
+					  if (rtc->registers[2]==10)
 					  {
-						  rtc.registers[2] = 0;
+						  rtc->registers[2] = 0;
 
 						  /* minutes; tens */
-						  rtc.registers[3]++;
+						  rtc->registers[3]++;
 
-						  if (rtc.registers[3] == 6)
+						  if (rtc->registers[3] == 6)
 						  {
-							 rtc.registers[3] = 0;
+							 rtc->registers[3] = 0;
 
 							 /* hours; units */
-							 rtc.registers[4]++;
+							 rtc->registers[4]++;
 
-							 if (rtc.registers[4] == 10)
+							 if (rtc->registers[4] == 10)
 							 {
-								rtc.registers[4] = 0;
+								rtc->registers[4] = 0;
 
 								/* hours; tens */
-								rtc.registers[4]++;
+								rtc->registers[4]++;
 
-								if (rtc.registers[4] == 24)
+								if (rtc->registers[4] == 24)
 								{
 									/* TODO: finish rest of increments here! */
-									rtc.registers[4] = 0;
+									rtc->registers[4] = 0;
 								}
 							 }
 						  }
 						}
 
-						tc8521_alarm_check();
+						tc8521_alarm_check(device);
 					}
 				}
 			}
@@ -346,25 +377,26 @@ static TIMER_CALLBACK(tc8521_timer_callback)
 
 
 /*-------------------------------------------------
-    tc8521_init
+    DEVICE_START( tc8521 )
 -------------------------------------------------*/
 
-void tc8521_init(const struct tc8521_interface *intf)
+DEVICE_START( tc8521 )
 {
-	memset(&rtc, 0, sizeof(struct tc8521));
-	if (intf)
-		memcpy(&rtc.interface, intf, sizeof(struct tc8521_interface));
-	timer_pulse(ATTOTIME_IN_HZ(32), NULL, 0, tc8521_timer_callback);
+	tc8521_t *rtc = get_token(device);
+	memset(rtc, 0, sizeof(*rtc));
+	timer_pulse(ATTOTIME_IN_HZ(32), (void *) device, 0, tc8521_timer_callback);
+	return DEVICE_START_OK;
 }
 
 
 
 /*-------------------------------------------------
-    READ8_HANDLER(tc8521_r)
+    tc8521_r
 -------------------------------------------------*/
 
-READ8_HANDLER(tc8521_r)
+READ8_DEVICE_HANDLER(tc8521_r)
 {
+	tc8521_t *rtc = get_token(device);
 	UINT32 register_index;
 
 	switch (offset)
@@ -373,28 +405,29 @@ READ8_HANDLER(tc8521_r)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[offset]));
-			return rtc.registers[offset];
+			LOG(("8521 RTC R: %04x %02x\n", offset, rtc->registers[offset]));
+			return rtc->registers[offset];
 
 		default:
 			break;
 	}
 
 	/* register in selected page */
-	register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
-	LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[register_index]));
+	register_index = ((rtc->registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
+	LOG(("8521 RTC R: %04x %02x\n", offset, rtc->registers[register_index]));
 	/* data from selected page */
-	return rtc.registers[register_index];
+	return rtc->registers[register_index];
 }
 
 
 
 /*-------------------------------------------------
-    WRITE8_HANDLER(tc8521_w)
+    tc8521_w
 -------------------------------------------------*/
 
-WRITE8_HANDLER(tc8521_w)
+WRITE8_DEVICE_HANDLER(tc8521_w)
 {
+	tc8521_t *rtc = get_token(device);
 	UINT32 register_index;
 
 	LOG(("8521 RTC W: %04x %02x\n", offset, data));
@@ -475,15 +508,59 @@ WRITE8_HANDLER(tc8521_w)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			rtc.registers[offset] = data & rtc_write_masks[offset];
+			rtc->registers[offset] = data & rtc_write_masks[offset];
 			return;
 		default:
 			break;
 	}
 
 	/* register in selected page */
-	register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
+	register_index = ((rtc->registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
 
 	/* write and mask data */
-	rtc.registers[register_index] = data & rtc_write_masks[register_index];
+	rtc->registers[register_index] = data & rtc_write_masks[register_index];
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( tc8521 )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( tc8521 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( tc8521 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( tc8521 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tc8521_t);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(tc8521); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tc8521);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Toshiba 8521 RTC";				break;
+		case DEVINFO_STR_FAMILY:						info->s = "Toshiba 8521 RTC";				break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
 }

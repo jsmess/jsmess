@@ -39,7 +39,6 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/avigo.h"
 #include "machine/intelfsh.h"
 #include "machine/tc8521.h"
@@ -272,7 +271,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 }
 
 /* does not do anything yet */
-static void avigo_tc8521_alarm_int(int state)
+static void avigo_tc8521_alarm_int(const device_config *device, int state)
 {
 //#if 0
 	avigo_irq &=~(1<<5);
@@ -282,12 +281,12 @@ static void avigo_tc8521_alarm_int(int state)
 		avigo_irq |= (1<<5);
 	}
 
-	avigo_refresh_ints(Machine);
+	avigo_refresh_ints(device->machine);
 //#endif
 }
 
 
-static const struct tc8521_interface avigo_tc8521_interface =
+static const tc8521_interface avigo_tc8521_interface =
 {
 	avigo_tc8521_alarm_int
 };
@@ -431,9 +430,6 @@ static MACHINE_RESET( avigo )
 	avigo_ram_bank_h = 0;
 	avigo_flash_at_0x4000 = 0;
 	avigo_flash_at_0x8000 = 0;
-
-	/* real time clock */
-	tc8521_init(&avigo_tc8521_interface);
 
 	/* clear */
 	memset(mess_ram, 0, 128*1024);
@@ -814,7 +810,7 @@ static ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x008, 0x008) AM_READWRITE( avigo_ram_bank_h_r, avigo_ram_bank_h_w )
 	AM_RANGE(0x009, 0x009) AM_READWRITE( avigo_ad_control_status_r, avigo_ad_control_status_w )
 	AM_RANGE(0x00a, 0x00f) AM_READ( avigo_unmapped_r)
-	AM_RANGE(0x010, 0x01f) AM_READWRITE( tc8521_r, tc8521_w )
+	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE( TC8521, "rtc", tc8521_r, tc8521_w )
 	AM_RANGE(0x020, 0x02c) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x028, 0x028) AM_WRITE( avigo_speaker_w)
 	AM_RANGE(0x02d, 0x02d) AM_READ( avigo_ad_data_r)
@@ -889,6 +885,10 @@ static MACHINE_DRIVER_START( avigo )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* real time clock */
+	MDRV_DEVICE_ADD("rtc", TC8521)
+	MDRV_DEVICE_CONFIG(avigo_tc8521_interface)
 MACHINE_DRIVER_END
 
 

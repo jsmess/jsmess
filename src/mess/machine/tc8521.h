@@ -11,13 +11,22 @@
 
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define TC8521			DEVICE_GET_INFO_NAME(tc8521)
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct tc8521_interface
+typedef struct _tc8521_interface tc8521_interface;
+struct _tc8521_interface
 {
 	/* output of alarm */
-	void (*alarm_output_callback)(int);
+	void (*alarm_output_callback)(const device_config *device, int);
 };
 
 
@@ -26,13 +35,13 @@ struct tc8521_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-READ8_HANDLER(tc8521_r);
-WRITE8_HANDLER(tc8521_w);
+DEVICE_GET_INFO(tc8521);
 
-void tc8521_init(const struct tc8521_interface *);
+READ8_DEVICE_HANDLER(tc8521_r);
+WRITE8_DEVICE_HANDLER(tc8521_w);
 
-void tc8521_load_stream(mame_file *file);
-void tc8521_save_stream(mame_file *file);
+void tc8521_load_stream(const device_config *device, mame_file *file);
+void tc8521_save_stream(const device_config *device, mame_file *file);
 
 
 #endif /* __TC8521_H__ */

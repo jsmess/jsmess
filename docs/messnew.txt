@@ -59,6 +59,8 @@ Source Changes:
 
 - Changed the 6551 ACIA implementation to be a device.  [Nathan Woods]
 
+- Changed the 8521 RTC implementation to be a device.  [Nathan Woods]
+
 - Various code cleanups.  [Atari Ace]
 
 
