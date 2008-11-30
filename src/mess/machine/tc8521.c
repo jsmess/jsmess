@@ -1,77 +1,87 @@
-/* Toshiba TC8521 Real-Time Clock or RICOH RF5C01A*/
+/*********************************************************************
 
+	tc8521.h
+
+	Toshiba TC8251 Real Time Clock code
+
+	(or RICOH RF5C01A)
+
+	Registers:
+
+		Page 0/Mode 0 (timer):
+
+		0x00: 1-second counter
+		0x01: 10-second counter
+		0x02: 1-minute counter
+		0x03: 10-minute counter
+		0x04: 1-hour counter
+		0x05: 10-hour counter
+		0x06: day-of-the-week counter
+		0x07: 1-day counter
+		0x08: 10-day counter
+		0x09: 1-month counter
+		0x0A: 10-month counter
+		0x0b: 1-year counter
+		0x0c: 10-year counter
+
+		Page 1/Mode 1 (alarm):
+		0x00: unused
+		0x01: unused
+		0x02: 1-minute alarm
+		0x03: 10-minute alarm
+		0x04: 1-hour alarm
+		0x05: 10-hour alarm
+		0x06: day-of-the-week alarm
+		0x07: 1-day alarm
+		0x08: 10-day alarm
+		0x09: unused
+		0x0a: 12/24 hour select register
+		0x0b: leap year counter
+		0x0c: unused
+
+		Page 2/Mode 2 (ram block 1) and
+		Page 3/Mode 3 (ram block 2):
+		0x00: ram
+		0x01: ram
+		0x02: ram
+		0x03: ram
+		0x04: ram
+		0x05: ram
+		0x06: ram
+		0x07: ram
+		0x08: ram
+		0x09: ram
+		0x0a: ram
+		0x0b: ram
+		0x0c: ram
+
+
+		registers common to all modes:
+
+		0x0d: MODE register
+			bit 3: timer enable
+			bit 2: alarm enable
+			bit 1,0: mode/page select
+		0x0e: test register
+			bit 3: test 3
+			bit 2: test 2
+			bit 1: test 1
+			bit 0: test 0
+		0x0f: RESET etc
+			bit 3: 1hz enable
+			bit 2: 16hz enable
+			bit 1: timer reset
+			bit 0: alarm reset
+
+*********************************************************************/
 
 #include "driver.h"
 #include "tc8521.h"
 
 
-/* Registers:
-
-Page 0/Mode 0 (timer):
-
-0x00: 1-second counter
-0x01: 10-second counter
-0x02: 1-minute counter
-0x03: 10-minute counter
-0x04: 1-hour counter
-0x05: 10-hour counter
-0x06: day-of-the-week counter
-0x07: 1-day counter
-0x08: 10-day counter
-0x09: 1-month counter
-0x0A: 10-month counter
-0x0b: 1-year counter
-0x0c: 10-year counter
-
-Page 1/Mode 1 (alarm):
-0x00: unused
-0x01: unused
-0x02: 1-minute alarm
-0x03: 10-minute alarm
-0x04: 1-hour alarm
-0x05: 10-hour alarm
-0x06: day-of-the-week alarm
-0x07: 1-day alarm
-0x08: 10-day alarm
-0x09: unused
-0x0a: 12/24 hour select register
-0x0b: leap year counter
-0x0c: unused
-
-Page 2/Mode 2 (ram block 1) and
-Page 3/Mode 3 (ram block 2):
-0x00: ram
-0x01: ram
-0x02: ram
-0x03: ram
-0x04: ram
-0x05: ram
-0x06: ram
-0x07: ram
-0x08: ram
-0x09: ram
-0x0a: ram
-0x0b: ram
-0x0c: ram
-
-
-registers common to all modes:
-
-0x0d: MODE register
-	bit 3: timer enable
-	bit 2: alarm enable
-	bit 1,0: mode/page select
-0x0e: test register
-	bit 3: test 3
-	bit 2: test 2
-	bit 1: test 1
-	bit 0: test 0
-0x0f: RESET etc
-	bit 3: 1hz enable
-	bit 2: 16hz enable
-	bit 1: timer reset
-	bit 0: alarm reset
-*/
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 #define TC8521_TIMER_1_SECOND_COUNTER 0x00
 #define TC8521_TIMER_10_SECOND_COUNTER 0x01
@@ -102,6 +112,33 @@ registers common to all modes:
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
+#define ALARM_OUTPUT_16HZ	0x01
+#define ALARM_OUTPUT_1HZ	0x02
+#define ALARM_OUTPUT_ALARM	0X04
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+struct tc8521
+{
+	/* 4 register pages (timer, alarm, ram1 and ram2) */
+    unsigned char registers[16*4];
+	/* interface for 1hz/16hz and alarm outputs */
+    struct tc8521_interface interface;
+
+	UINT32 alarm_outputs;
+	UINT32 thirty_two_hz_counter;
+};
+
+
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
+
+static struct tc8521 rtc;
+
 /* mask data with these values when writing */
 static const unsigned char rtc_write_masks[16*4]=
 {
@@ -111,45 +148,49 @@ static const unsigned char rtc_write_masks[16*4]=
 	0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f, 0x0f, 0x0f,
 };
 
-#define ALARM_OUTPUT_16HZ	0x01
-#define ALARM_OUTPUT_1HZ	0x02
-#define ALARM_OUTPUT_ALARM	0X04
-
-struct tc8521
-{
-	/* 4 register pages (timer, alarm, ram1 and ram2) */
-    unsigned char registers[16*4];
-	/* interface for 1hz/16hz and alarm outputs */
-    struct tc8521_interface interface;
-
-	unsigned long alarm_outputs;
-	unsigned long thirty_two_hz_counter;
-};
-
-static struct tc8521 rtc;
 
 
-/* read tc8521 data from supplied file */
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    tc8521_load_stream - read tc8521 data from
+	supplied file
+-------------------------------------------------*/
+
 void tc8521_load_stream(mame_file *file)
 {
 	if (file)
 	{
 		mame_fread(file, &rtc.registers[0], sizeof(unsigned char)*16*4);
-		mame_fread(file, &rtc.alarm_outputs, sizeof(unsigned long));
-		mame_fread(file, &rtc.thirty_two_hz_counter, sizeof(unsigned long));
+		mame_fread(file, &rtc.alarm_outputs, sizeof(UINT32));
+		mame_fread(file, &rtc.thirty_two_hz_counter, sizeof(UINT32));
 	}
 }
 
-/* write tc8521 data to supplied file */
+
+
+/*-------------------------------------------------
+    tc8521_save_stream - write tc8521 data to
+	supplied file
+-------------------------------------------------*/
+
 void tc8521_save_stream(mame_file *file)
 {
 	if (file)
 	{
 		mame_fwrite(file, &rtc.registers[0], sizeof(unsigned char)*16*4);
-		mame_fwrite(file, &rtc.alarm_outputs, sizeof(unsigned long));
-		mame_fwrite(file, &rtc.thirty_two_hz_counter, sizeof(unsigned long));
+		mame_fwrite(file, &rtc.alarm_outputs, sizeof(UINT32));
+		mame_fwrite(file, &rtc.thirty_two_hz_counter, sizeof(UINT32));
 	}
 }
+
+
+
+/*-------------------------------------------------
+    tc8521_set_alarm_output
+-------------------------------------------------*/
 
 static void tc8521_set_alarm_output(void)
 {
@@ -190,9 +231,14 @@ static void tc8521_set_alarm_output(void)
 	}
 }
 
+
+
+/*-------------------------------------------------
+    tc8521_alarm_check
+-------------------------------------------------*/
+
 static void tc8521_alarm_check(void)
 {
-
 	rtc.alarm_outputs &= ~ALARM_OUTPUT_ALARM;
 	if (
 		(rtc.registers[TC8521_TIMER_1_MINUTE_COUNTER]==rtc.registers[TC8521_ALARM_1_MINUTE_REGISTER]) &&
@@ -209,6 +255,12 @@ static void tc8521_alarm_check(void)
 
 	tc8521_set_alarm_output();
 }
+
+
+
+/*-------------------------------------------------
+    tc8521_timer_callback
+-------------------------------------------------*/
 
 static TIMER_CALLBACK(tc8521_timer_callback)
 {
@@ -293,6 +345,10 @@ static TIMER_CALLBACK(tc8521_timer_callback)
 
 
 
+/*-------------------------------------------------
+    tc8521_init
+-------------------------------------------------*/
+
 void tc8521_init(const struct tc8521_interface *intf)
 {
 	memset(&rtc, 0, sizeof(struct tc8521));
@@ -301,125 +357,133 @@ void tc8521_init(const struct tc8521_interface *intf)
 	timer_pulse(ATTOTIME_IN_HZ(32), NULL, 0, tc8521_timer_callback);
 }
 
- READ8_HANDLER(tc8521_r)
+
+
+/*-------------------------------------------------
+    READ8_HANDLER(tc8521_r)
+-------------------------------------------------*/
+
+READ8_HANDLER(tc8521_r)
 {
-		unsigned long register_index;
+	UINT32 register_index;
 
-		switch (offset)
-		{
-			/* control registers */
-			case 0x0d:
-			case 0x0e:
-			case 0x0f:
-				LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[offset]));
-        		return rtc.registers[offset];
+	switch (offset)
+	{
+		/* control registers */
+		case 0x0d:
+		case 0x0e:
+		case 0x0f:
+			LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[offset]));
+			return rtc.registers[offset];
 
-			default:
-				break;
-		}
+		default:
+			break;
+	}
 
-		/* register in selected page */
-		register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
-		LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[register_index]));
-		/* data from selected page */
-		return rtc.registers[register_index];
+	/* register in selected page */
+	register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
+	LOG(("8521 RTC R: %04x %02x\n", offset, rtc.registers[register_index]));
+	/* data from selected page */
+	return rtc.registers[register_index];
 }
 
+
+
+/*-------------------------------------------------
+    WRITE8_HANDLER(tc8521_w)
+-------------------------------------------------*/
 
 WRITE8_HANDLER(tc8521_w)
 {
-	unsigned long register_index;
+	UINT32 register_index;
 
 	LOG(("8521 RTC W: %04x %02x\n", offset, data));
 
-		switch (offset)
-        {
-                case 0x0D:
-                {
-                        if (data & 0x08)
-                        {
-                            LOG(("timer enable\n"));
-                        }
-
-                        if (data & 0x04)
-                        {
-                            LOG(("alarm enable\n"));
-                        }
-
-						logerror("page %02x selected\n", data & 0x03);
-	              }
-                break;
-
-                case 0x0e:
-                {
-                        if (data & 0x08)
-                        {
-                            LOG(("test 3\n"));
-                        }
-
-                        if (data & 0x04)
-                        {
-                            LOG(("test 2\n"));
-                        }
-
-                        if (data & 0x02)
-                        {
-                            LOG(("test 1\n"));
-                        }
-
-                        if (data & 0x01)
-                        {
-                            LOG(("test 0\n"));
-                        }
-                }
-                break;
-
-                case 0x0f:
-                {
-                        if ((data & 0x08)==0)
-                        {
-                           LOG(("1hz enable\n"));
-                        }
-
-                        if ((data & 0x04)==0)
-                        {
-                           LOG(("16hz enable\n"));
-                        }
-
-                        if (data & 0x02)
-                        {
-                           LOG(("reset timer\n"));
-                        }
-
-                        if (data & 0x01)
-                        {
-                           LOG(("reset alarm\n"));
-                        }
-                }
-                break;
-
-                default:
-                  break;
-        }
-
-		switch (offset)
+	switch (offset)
+	{
+		case 0x0D:
 		{
-			/* control registers */
-			case 0x0d:
-			case 0x0e:
-			case 0x0f:
-				rtc.registers[offset] = data & rtc_write_masks[offset];
-				return;
-			default:
-				break;
+			if (data & 0x08)
+			{
+				LOG(("timer enable\n"));
+			}
+
+			if (data & 0x04)
+			{
+				LOG(("alarm enable\n"));
+			}
+
+			logerror("page %02x selected\n", data & 0x03);
 		}
+		break;
 
-		/* register in selected page */
-        register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
+		case 0x0e:
+		{
+			if (data & 0x08)
+			{
+				LOG(("test 3\n"));
+			}
 
-		/* write and mask data */
-		rtc.registers[register_index] = data & rtc_write_masks[register_index];
+			if (data & 0x04)
+			{
+				LOG(("test 2\n"));
+			}
+
+			if (data & 0x02)
+			{
+				LOG(("test 1\n"));
+			}
+
+			if (data & 0x01)
+			{
+				LOG(("test 0\n"));
+			}
+		}
+		break;
+
+		case 0x0f:
+		{
+			if ((data & 0x08)==0)
+			{
+			   LOG(("1hz enable\n"));
+			}
+
+			if ((data & 0x04)==0)
+			{
+			   LOG(("16hz enable\n"));
+			}
+
+			if (data & 0x02)
+			{
+			   LOG(("reset timer\n"));
+			}
+
+			if (data & 0x01)
+			{
+			   LOG(("reset alarm\n"));
+			}
+		}
+		break;
+
+		default:
+			break;
+	}
+
+	switch (offset)
+	{
+		/* control registers */
+		case 0x0d:
+		case 0x0e:
+		case 0x0f:
+			rtc.registers[offset] = data & rtc_write_masks[offset];
+			return;
+		default:
+			break;
+	}
+
+	/* register in selected page */
+	register_index = ((rtc.registers[TC8521_MODE_REGISTER] & 0x03)<<4) | (offset & 0x0f);
+
+	/* write and mask data */
+	rtc.registers[register_index] = data & rtc_write_masks[register_index];
 }
-
-
-
