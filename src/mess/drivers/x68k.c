@@ -80,7 +80,6 @@
               Extra uPD72065 commands not yet implemented, although I have yet to see them used.
 
     MFP : Largely works, as far as the X68000 goes.  Timers appear to work fine.
-          Keyboard scancodes (via the MFP's USART) work, but there are some issues with in-game use.
 
     PPI : Joystick controls work okay.
 
@@ -91,7 +90,7 @@
     DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often
           used to copy data to video RAM or the palette in the background).
 
-    Sound : FM works, ADPCM is unimplemented as yet.
+    Sound : FM works, ADPCM mostly works.
 
     SCC : Works enough to get the mouse running
 
@@ -105,15 +104,11 @@
       Keyboard doesn't work (MFP USART).
       Supervisor area set isn't implemented.
 
-    Some minor game-specific issues (at 14/05/08):
+    Some minor game-specific issues (at 02/12/08):
       Pacmania:      Black squares on the maze (transparency?).
-      Nemesis '94:   Menu system doesn't work except for start buttons.
-      Flying Shark:  Appears to lock up at main menu.
       Salamander:    System error when using keys in-game.  No error if a joystick is used.
       Kyukyoku Tiger:Sprites offset by a looooong way.
-      Dragon Buster: Text is black and unreadable (text palette should be loaded from disk, but it reads all zeroes).
-      Baraduke:      Corrupt background, locks up on demo mode.
-      Viewpoint:     Corrupt graphics on title screen, phantom movements on title screen, corrupt sprites, locks up.
+      Dragon Buster: Text is black and unreadable.
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
 
@@ -1548,25 +1543,6 @@ static IRQ_CALLBACK(x68k_int_ack)
 
 	if(irqline == 6)  // MFP
 	{
-//      if(sys.mfp.isra & 0x10)
-//          sys.mfp.rsr &= ~0x80;
-//      if(sys.mfp.isra & 0x04)
-//          sys.mfp.tsr &= ~0x80;
-
-//      if(sys.mfp.current_irq < 8)
-//      {
-//          sys.mfp.iprb &= ~(1 << sys.mfp.current_irq);
-			// IRQ is in service
-//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-//              sys.mfp.isrb |= (1 << sys.mfp.current_irq);
-//      }
-//      else
-//      {
-//          sys.mfp.ipra &= ~(1 << (sys.mfp.current_irq - 8));
-			// IRQ is in service
-//          if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-//              sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
-//      }
 		sys.mfp.current_irq = -1;
 		current_vector[6] = mc68901_get_vector(x68k_mfp);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
@@ -2044,6 +2020,9 @@ static MACHINE_RESET( x68000 )
 		output_set_indexed_value("ctrl_drv",drive,1);
 		output_set_indexed_value("access_drv",drive,1);
 	}
+	
+	// reset CPU
+	cpu_reset(machine->cpu[0]);
 }
 
 static MACHINE_START( x68000 )
