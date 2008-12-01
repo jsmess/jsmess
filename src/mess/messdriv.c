@@ -36,10 +36,6 @@ const game_driver * const drivers[] =
 
 /****************CONSOLES****************************************************/
 
-// 128u4 NOTE - All drivers that start with "//128u4" were disabled as of that MAME release.
-// Any driver with just // was disabled prior to that release. - HT
-
-
 	/* 3DO */
 	DRIVER( 3do )		/* 3DO consoles										*/
 	DRIVER( 3do_pal )
