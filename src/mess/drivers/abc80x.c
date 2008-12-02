@@ -1551,31 +1551,17 @@ ROM_START( abc806 )
 ROM_END
 
 ROM_START( floppy_roms )
-	/* MyAB Turbo-Kontroller */
-
-	ROM_REGION( 0x3000, "myab", 0 )
+	ROM_REGION( 0x3000, "myab", 0 ) /* MyAB Turbo-Kontroller */
 	ROM_LOAD( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
 	ROM_LOAD( "unidiskh.bin", 0x1000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
 	ROM_LOAD( "unidisk8.bin", 0x2000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
+ROM_END
 
-	/* Luxor "slow" controller with separate ROMs for each drive type */
-
-	ROM_REGION( 0x800, "abc830", 0 )
-	ROM_LOAD( "mpi02.bin",    0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // ABC830 with MPI drives. Styrkort Artnr 5510760-01
-
-	ROM_REGION( 0x1800, "abc832", 0 )
-	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
-	ROM_LOAD( "micr1115.bin", 0x0800, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115
-	ROM_LOAD( "basf6118.bin", 0x1000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118
-
-	ROM_REGION( 0x1000, "abc850", 0 )
-	ROM_LOAD( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime 202
-	ROM_LOAD( "basf6185.bin", 0x0800, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185
-
-	ROM_REGION( 0x1000, "abc852", 0 )
+ROM_START( hard_disk_roms )
+	ROM_REGION( 0x1000, "abc852", 0 ) /* Winchester adapter card */
 	ROM_LOAD( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d) ) // NEC 5126
 
-	ROM_REGION( 0x800, "abc856", 0 )
+	ROM_REGION( 0x800, "abc856", 0 ) /* Winchester adapter card */
 	ROM_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3) ) // Micropolis 1325
 
 	ROM_REGION( 0x1000, "xebec", 0 )
