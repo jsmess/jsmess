@@ -16,9 +16,10 @@
 enum
 {
 	offset_rom_geneve = 0x0000,			/* boot ROM (16 kbytes) */
-	offset_sram_geneve = 0x4000,		/* static RAM (32 or 64 kbytes) */
-	offset_dram_geneve = 0x14000,		/* dynamic RAM (512 kbytes) or SRAM (2MBytes) with Memex board and GenMod extension */
-	region_cpu1_len_geneve = 0x214000	/* total len */
+	offset_altrom_geneve = 0x4000,			/* alternative boot ROM (16 kbytes) */
+	offset_sram_geneve = 0x8000,		/* static RAM (32 or 64 kbytes) */
+	offset_dram_geneve = 0x18000,		/* dynamic RAM (512 kbytes) or SRAM (2MBytes) with Memex board and GenMod extension */
+	region_cpu1_len_geneve = 0x218000	/* total len */
 };
 
 

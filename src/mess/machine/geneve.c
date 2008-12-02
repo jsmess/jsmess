@@ -49,6 +49,8 @@ static void W9901_VDP_wait_states(int offset, int data);
 */
 /* pointer to boot ROM */
 static UINT8 *ROM_ptr;
+/* pointer to alternative boot ROM */
+static UINT8 *AROM_ptr;
 /* pointer to static RAM */
 static UINT8 *SRAM_ptr;
 /* pointer to dynamic RAM */
@@ -70,6 +72,8 @@ static char has_rs232;
 /* TRUE if usb-sm card present */
 static char has_usb_sm;
 
+/* TRUE if we are using the alternative boot ROM */
+static char has_alt_boot;
 
 /* tms9901 setup */
 static const tms9901reset_param tms9901reset_param_ti99 =
@@ -218,6 +222,7 @@ MACHINE_START( geneve )
 
 	/* set up RAM pointers */
 	ROM_ptr = memory_region(machine, "main") + offset_rom_geneve;
+	AROM_ptr = memory_region(machine, "main") + offset_altrom_geneve;
 	SRAM_ptr = memory_region(machine, "main") + offset_sram_geneve;
 	DRAM_ptr = memory_region(machine, "main") + offset_dram_geneve;
 }
@@ -259,6 +264,7 @@ MACHINE_RESET( geneve )
 	has_ide = (input_port_read(machine, "CFG") >> config_ide_bit) & config_ide_mask;
 	has_rs232 = (input_port_read(machine, "CFG") >> config_rs232_bit) & config_rs232_mask;
 	has_usb_sm = (input_port_read(machine, "CFG") >> config_usbsm_bit) & config_usbsm_mask;
+	has_alt_boot = (input_port_read(machine, "CFG") >> config_boot_bit) & config_boot_mask;
 
 	/* set up optional expansion hardware */
 	ti99_peb_reset(0, inta_callback, intb_callback);
@@ -627,7 +633,8 @@ READ8_HANDLER ( geneve_r )
 	case 0xf0:
 	case 0xf1:
 		/* Boot ROM */
-		return ROM_ptr[(page-0xf0)*0x2000 + offset];
+		if (has_alt_boot) return AROM_ptr[(page-0xf0)*0x2000 + offset];
+		else return ROM_ptr[(page-0xf0)*0x2000 + offset];
 
 	case 0xe8:
 	case 0xe9:

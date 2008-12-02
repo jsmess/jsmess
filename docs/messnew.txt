@@ -34,9 +34,16 @@ System Driver Changes:
 
 - [GAMECOM] Fixed aspect ratio. [Justin Kerk]
 
+- [GENEVE] Adds dip switch to select boot eprom version (0.9 or 1.0). Default
+  is 1.0, making it behave as before. To use the old eprom, geneve.zip must
+  contain a file genbt090.bin.  Release dates of Geneve and GenMod adjusted.
+  [Michael Zapf]
+
 - [NES] Fixed bug #1672.  [Wilbert Pol]
 
 - [ONDRA] Both computers now work, cassette supported  [Miodrag Milanovic]
+
+
 
 User Interface Changes:
 -----------------------

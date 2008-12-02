@@ -253,6 +253,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(geneve)
 
 	PORT_START("CFG")	/* config */
+		PORT_DIPNAME( config_boot_mask << config_boot_bit, 0x0000, "Boot ROM")
+			PORT_DIPSETTING( 0x0000, "1.0" )
+			PORT_DIPSETTING( 1 << config_boot_bit, "0.9" )
 		PORT_DIPNAME( config_speech_mask << config_speech_bit, 1 << config_speech_bit, "Speech synthesis")
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_speech_bit, DEF_STR( On ) )
@@ -499,6 +502,7 @@ ROM_START(geneve)
 	/*CPU memory space*/
 	ROM_REGION(region_cpu1_len_geneve, "main", 0)
 	ROM_LOAD("genbt100.bin", offset_rom_geneve, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
+	ROM_LOAD_OPTIONAL("genbt090.bin", offset_altrom_geneve, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
 
 	/*DSR ROM space*/
 	ROM_REGION(region_dsr_len, region_dsr, 0)
@@ -625,5 +629,5 @@ static SYSTEM_CONFIG_START(geneve)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT      CONFIG  COMPANY     FULLNAME */
-COMP( 1987?,geneve,   0,		0,		geneve_60hz,  geneve,  geneve,	geneve,	"Myarc",	"Geneve 9640" , 0)
-COMP( 199??,genmod,   geneve,	0,		geneve_60hz,  geneve,  genmod,	geneve,	"Myarc",	"Geneve 9640 (with Genmod modification)" , 0)
+COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve,  geneve,	geneve,	"Myarc",	"Geneve 9640" , 0)
+COMP( 1990,genmod,   geneve,	0,		geneve_60hz,  geneve,  genmod,	geneve,	"Myarc",	"Geneve 9640 (with Genmod modification)" , 0)
