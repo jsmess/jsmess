@@ -94,7 +94,7 @@ static struct {
   254..257 r/w memory ? JIM asic? ram behaviour
 
 */
-extern WRITE8_HANDLER ( europc_jim_w )
+WRITE8_HANDLER ( europc_jim_w )
 {
 	switch (offset) {
 	case 2:
@@ -140,7 +140,7 @@ READ8_HANDLER ( europc_jim_r )
 	return data;
 }
 
-extern  READ8_HANDLER ( europc_jim2_r )
+READ8_HANDLER ( europc_jim2_r )
 {
 	switch (europc_jim.state) {
 	case 0: europc_jim.state++; return 0;

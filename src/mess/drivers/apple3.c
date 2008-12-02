@@ -29,8 +29,6 @@ ADDRESS_MAP_END
 
 
 
-extern PALETTE_INIT( apple2 );
-
 static MACHINE_DRIVER_START( apple3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 2000000)        /* 2 MHz */

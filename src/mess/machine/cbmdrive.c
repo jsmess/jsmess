@@ -1474,8 +1474,6 @@ void c2031_state(CBM_Drive *drive)
 
 ***********************************************/
 
-void drive_reset_write (CBM_Drive * drive, int level);
-
 CBM_Drive cbm_drive[2];
 
 CBM_Serial cbm_serial;

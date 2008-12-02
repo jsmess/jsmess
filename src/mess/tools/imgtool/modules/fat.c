@@ -137,6 +137,7 @@
 
 #include "imgtool.h"
 #include "unicode.h"
+#include "fat.h"
 
 #define FAT_DIRENT_SIZE			32
 #define FAT_SECLEN				512

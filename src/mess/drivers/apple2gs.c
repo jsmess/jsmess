@@ -103,9 +103,6 @@ static const unsigned char apple2gs_palette[] =
 	0xF, 0xF, 0xF	/* White         $F              $0FFF */
 };
 
-MACHINE_DRIVER_EXTERN( apple2e );
-INPUT_PORTS_EXTERN( apple2ep );
-
 static INPUT_PORTS_START( apple2gs )
 	PORT_INCLUDE( apple2ep )
 

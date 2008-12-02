@@ -75,10 +75,6 @@ static ADDRESS_MAP_START( orionpro_io , ADDRESS_SPACE_IO, 8)
     AM_RANGE( 0x0000, 0xffff) AM_READWRITE ( orionpro_io_r, orionpro_io_w )
 ADDRESS_MAP_END
 
-/* Input ports */
-INPUT_PORTS_EXTERN( radio86 );
-INPUT_PORTS_EXTERN( ms7007 );
-
 static const cassette_config orion_cassette_config =
 {
 	rko_cassette_formats,

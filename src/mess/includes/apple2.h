@@ -57,6 +57,13 @@
     OTHER
 ***************************************************************************/
 
+/*----------- defined in drivers/apple2.c -----------*/
+
+MACHINE_DRIVER_EXTERN( apple2e );
+INPUT_PORTS_EXTERN( apple2ep );
+PALETTE_INIT( apple2 );
+
+
 /*----------- defined in machine/apple2.c -----------*/
 
 extern UINT32 a2;

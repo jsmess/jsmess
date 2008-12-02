@@ -291,9 +291,6 @@ static WRITE8_HANDLER ( orionz80_sound_fe_w )
 }
 
 
-WRITE8_HANDLER ( orionz80_memory_page_w );
-WRITE8_HANDLER ( orionz80_dispatcher_w );
-
 static void orionz80_switch_bank(running_machine *machine)
 {
 	UINT8 bank_select;

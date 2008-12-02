@@ -91,9 +91,6 @@ static  READ8_HANDLER(c128_dma8726_port_r)
 	return 0xff;
 }
 
-WRITE8_HANDLER( c128_mmu8722_port_w );
-READ8_HANDLER( c128_mmu8722_port_r );
-
 WRITE8_HANDLER( c128_write_d000 )
 {
 	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(space->machine->cpu[0], CPUINFO_INT_M6510_PORT);

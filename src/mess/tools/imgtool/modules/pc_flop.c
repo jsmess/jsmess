@@ -8,13 +8,10 @@
 
 #include "imgtool.h"
 #include "formats/pc_dsk.h"
+#include "fat.h"
 #include "iflopimg.h"
 
 #define FAT_SECLEN				512
-
-/* imports from fat.c */
-extern void fat_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info);
-
 
 
 static imgtoolerr_t fat_image_create(imgtool_image *image, imgtool_stream *stream, option_resolution *opts)

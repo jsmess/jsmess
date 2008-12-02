@@ -52,7 +52,6 @@ static int sprite_shift;
 
 static void x68k_render_video_word(int offset);
 static void x68k_crtc_refresh_mode(running_machine *machine);
-void x68k_scanline_check(int);
 
 INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {

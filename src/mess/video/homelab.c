@@ -42,7 +42,7 @@ VIDEO_UPDATE( homelab3 )
 {
 	int x,y,j,b;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 25; y++ )
 	{

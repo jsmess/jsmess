@@ -11,6 +11,12 @@
 #include "machine/8257dma.h"
 #include "video/i8275.h"
 
+/*----------- defined in drivers/radio86.c -----------*/
+
+INPUT_PORTS_EXTERN( radio86 );
+INPUT_PORTS_EXTERN( ms7007 );
+
+
 /*----------- defined in machine/radio86.c -----------*/
 
 extern DRIVER_INIT( radio86 );
@@ -42,7 +48,10 @@ extern const dma8257_interface radio86_dma;
 extern UINT8 radio86_tape_value;
 
 extern void radio86_init_keyboard(void);
+
+
 /*----------- defined in video/radio86.c -----------*/
+
 extern UINT8 mikrosha_font_page;
 
 extern I8275_DISPLAY_PIXELS(radio86_display_pixels);
