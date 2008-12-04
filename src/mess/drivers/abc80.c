@@ -564,22 +564,22 @@ ROM_START( abc80 )
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.rom", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x0a00, "chargen", ROMREGION_DISPOSE )
+	ROM_REGION( 0xa00, "chargen", ROMREGION_DISPOSE )
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
 
-	ROM_REGION( 0x400, "hsync", 0 )
+	ROM_REGION( 0x80, "hsync", 0 )
 	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0080, NO_DUMP ) // "64 40029-01" 82S129 256x4 horizontal sync
 
-	ROM_REGION( 0x400, "vsync", 0 )
+	ROM_REGION( 0x100, "vsync", 0 )
 	ROM_LOAD( "abc80_21.k2", 0x0000, 0x0100, NO_DUMP ) // "64 40030-01" 82S131 512x4 vertical sync
 
-	ROM_REGION( 0x400, "attr", 0 )
+	ROM_REGION( 0x80, "attr", 0 )
 	ROM_LOAD( "abc80_12.j3", 0x0000, 0x0080, NO_DUMP ) // "64 40056-01" 82S129 256x4 attribute
 
-	ROM_REGION( 0x400, "line", 0 )
+	ROM_REGION( 0x100, "line", 0 )
 	ROM_LOAD( "abc80_22.k1", 0x0000, 0x0100, NO_DUMP ) // "64 40058-01" 82S131 512x4 chargen 74S263 row address
 
-	ROM_REGION( 0x400, "mmu", 0 )
+	ROM_REGION( 0x80, "mmu", 0 )
 	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0080, NO_DUMP ) // "64 40057-01" 82S129 256x4 address decoder
 ROM_END
 
@@ -602,22 +602,22 @@ ROM_START( abc80h )
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.rom", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x0a00, "chargen", ROMREGION_DISPOSE )
+	ROM_REGION( 0xa00, "chargen", ROMREGION_DISPOSE )
 	ROM_LOAD( "sn74s262.h2", 0x0000, 0x0a00, NO_DUMP ) // UK charset
 
-	ROM_REGION( 0x400, "hsync", 0 )
+	ROM_REGION( 0x80, "hsync", 0 )
 	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0080, NO_DUMP ) // "64 40029-01" 82S129 256x4 horizontal sync
 
-	ROM_REGION( 0x400, "vsync", 0 )
+	ROM_REGION( 0x100, "vsync", 0 )
 	ROM_LOAD( "abc80_21.k2", 0x0000, 0x0100, NO_DUMP ) // "64 40030-01" 82S131 512x4 vertical sync
 
-	ROM_REGION( 0x400, "attr", 0 )
+	ROM_REGION( 0x80, "attr", 0 )
 	ROM_LOAD( "abc80_12.j3", 0x0000, 0x0080, NO_DUMP ) // "64 40056-01" 82S129 256x4 attribute
 
-	ROM_REGION( 0x400, "line", 0 )
-	ROM_LOAD( "abc80_22.k1", 0x0000, 0x0100, NO_DUMP ) // "64 40058-01" 82S131 512x4 chargen row address
+	ROM_REGION( 0x100, "line", 0 )
+	ROM_LOAD( "abc80_22.k1", 0x0000, 0x0100, NO_DUMP ) // "64 40058-01" 82S131 512x4 chargen 74S263 row address
 
-	ROM_REGION( 0x400, "mmu", 0 )
+	ROM_REGION( 0x80, "mmu", 0 )
 	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0080, NO_DUMP ) // "64 40057-01" 82S129 256x4 address decoder
 ROM_END
 
