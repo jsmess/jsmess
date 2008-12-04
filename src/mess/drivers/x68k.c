@@ -1412,7 +1412,14 @@ static READ16_HANDLER( x68k_rom0_r )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
+//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,HOLD_LINE,current_vector[2]);
+	if(input_port_read(space->machine, "options") & 0x02)
+	{
+		offset *= 2;
+		if(ACCESSING_BITS_0_7)
+			offset++;
+		timer_set(ATTOTIME_IN_CYCLES(4,0), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+	}
 	return 0xff;
 }
 
@@ -1422,7 +1429,14 @@ static WRITE16_HANDLER( x68k_rom0_w )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
+//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,HOLD_LINE,current_vector[2]);
+	if(input_port_read(space->machine, "options") & 0x02)
+	{
+		offset *= 2;
+		if(ACCESSING_BITS_0_7)
+			offset++;
+		timer_set(ATTOTIME_IN_CYCLES(4,0), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+	}
 }
 
 static READ16_HANDLER( x68k_exp_r )
@@ -1901,7 +1915,7 @@ static DEVICE_IMAGE_LOAD( x68k_floppy )
 			current_vector[1] = 0x61;
 			sys.ioc.irqstatus |= 0x40;
 			current_irq_line = 1;
-			cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+			cpu_set_input_line_and_vector(image->machine->cpu[0],1,HOLD_LINE,current_vector[1]);  // Disk insert/eject interrupt
 			logerror("IOC: Disk image inserted\n");
 		}
 		sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
@@ -1918,7 +1932,7 @@ static DEVICE_IMAGE_UNLOAD( x68k_floppy )
 		current_vector[1] = 0x61;
 		sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cpu_set_input_line_and_vector(image->machine->cpu[0],1,HOLD_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
 	sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }
