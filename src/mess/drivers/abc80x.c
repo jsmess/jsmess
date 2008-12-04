@@ -1550,25 +1550,6 @@ ROM_START( abc806 )
 	ROM_LOAD( "64 90240-01.2d", 0x0000, 0x0400, NO_DUMP ) // "ABC P4-11" PAL16L8, memory mapper
 ROM_END
 
-ROM_START( floppy_roms )
-	ROM_REGION( 0x3000, "myab", 0 ) /* MyAB Turbo-Kontroller */
-	ROM_LOAD( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
-	ROM_LOAD( "unidiskh.bin", 0x1000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
-	ROM_LOAD( "unidisk8.bin", 0x2000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
-ROM_END
-
-ROM_START( hard_disk_roms )
-	ROM_REGION( 0x1000, "abc852", 0 ) /* Winchester adapter card */
-	ROM_LOAD( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d) ) // NEC 5126
-
-	ROM_REGION( 0x800, "abc856", 0 ) /* Winchester adapter card */
-	ROM_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3) ) // Micropolis 1325
-
-	ROM_REGION( 0x1000, "xebec", 0 )
-	ROM_LOAD( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038
-	ROM_LOAD( "st225.bin",    0x0800, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225
-ROM_END
-
 /* System Configuration */
 
 static void abc800_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

@@ -779,6 +779,13 @@ ROM_START( luxor_55_21046 )
 //	ROM_LOAD( "fast207.bin",	0x4000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
 ROM_END
 
+ROM_START( myab_turbo_kontroller )
+	ROM_REGION( 0x3000, "myab", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
+	ROM_LOAD( "unidiskh.bin", 0x1000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
+	ROM_LOAD( "unidisk8.bin", 0x2000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
+ROM_END
+
 ROM_START( hdd_controller ) // TODO: remove this!
 	ROM_REGION( 0x1000, "abc850", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime RO202 (http://artofhacking.com/th99/h/txt/3699.txt)
