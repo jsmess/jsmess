@@ -129,8 +129,8 @@ static const cassette_config vector_cassette_config =
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
   /* basic machine hardware */
-//  	MDRV_CPU_ADD("main", 8080, 3000000)
-	MDRV_CPU_ADD("main", Z80, 3000000)
+  	MDRV_CPU_ADD("main", 8080, 3000000)
+//	MDRV_CPU_ADD("main", Z80, 3000000)
   	MDRV_CPU_PROGRAM_MAP(vector06_mem, 0)
   	MDRV_CPU_IO_MAP(vector06_io, 0)
   	MDRV_CPU_VBLANK_INT("main", vector06_interrupt)

@@ -25,6 +25,8 @@ extern READ8_HANDLER(vector_8255_2_r);
 extern WRITE8_HANDLER(vector_8255_2_w);
 
 extern WRITE8_HANDLER(vector06_color_set);
+extern UINT8 vector_color_index;
+extern UINT8 vector_video_mode;
 /*----------- defined in video/vector06.c -----------*/
 
 extern PALETTE_INIT( vector06 );

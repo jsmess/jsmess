@@ -14,7 +14,8 @@
 #include "includes/vector06.h"
 
 static int vector06_keyboard_mask;
-static UINT8 vector_color_index;
+UINT8 vector_color_index;
+UINT8 vector_video_mode;
 
 /* Driver initialization */
 DRIVER_INIT(vector06)
@@ -33,7 +34,6 @@ static READ8_DEVICE_HANDLER (vector06_8255_portb_r )
 	if ((vector06_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"LINE5"); }
 	if ((vector06_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"LINE6"); }
 	if ((vector06_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"LINE7"); }
-		logerror("vector06_8255_portb_r %02x %02x\n",vector06_keyboard_mask,key);
 	return key;
 }
 
@@ -52,16 +52,31 @@ static WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
 	vector06_keyboard_mask = data ^ 0xff;
 }
 
+static void vector_set_video_mode(running_machine *machine, int width) {
+	rectangle visarea;
+	
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = width+64-1;
+	visarea.max_y = 256+64-1;
+	video_screen_configure(machine->primary_screen, width+64, 256+64, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);	
+}
+
 static WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )
 {
-	vector_color_index = data;
+	vector_color_index = data & 0x0f;
+	if ((data & 0x10) != vector_video_mode) 
+	{
+		vector_video_mode = data & 0x10;
+		vector_set_video_mode(device->machine,(vector_video_mode==0x10) ? 512 : 256);
+	}	
 }
 
 WRITE8_HANDLER(vector06_color_set)
 {
-	UINT8 r = (data & 7) << 4;
-	UINT8 g = ((data >> 3) & 7) << 4;
-	UINT8 b = ((data >>6) & 3) << 5;
+	UINT8 r = (data & 7) << 5;
+	UINT8 g = ((data >> 3) & 7) << 5;
+	UINT8 b = ((data >>6) & 3) << 6;
 	palette_set_color( space->machine, vector_color_index, MAKE_RGB(r,g,b) );
 }
 
@@ -168,7 +183,8 @@ MACHINE_RESET( vector06 )
 	memory_set_bankptr(machine, 4, mess_ram + 0x8000);
 
 	vector06_keyboard_mask = 0;
-	
+	vector_color_index = 0;
+	vector_video_mode = 0;
 	timer_pulse(ATTOTIME_IN_HZ(10), NULL, 0, reset_check_callback);
 
 }

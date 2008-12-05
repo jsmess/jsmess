@@ -17,12 +17,13 @@ VIDEO_START( vector06 )
 VIDEO_UPDATE( vector06 )
 {
  	UINT8 code1,code2,code3,code4;
- 	UINT8 col;
+ 	UINT8 col;//,col1,col2;
 	int y, x, b;
 
-	rectangle screen_area = {0,256+64-1,0,256+64-1};
+	int width = (vector_video_mode==0x00) ? 256 : 512;		
+	rectangle screen_area = {0,width+64-1,0,256+64-1};
 	// fill border color
-	fillbitmap(bitmap, 0, &screen_area);
+	fillbitmap(bitmap, vector_color_index, &screen_area);
 
 	// draw image
 	for (x = 0; x < 32; x++)
@@ -36,12 +37,15 @@ VIDEO_UPDATE( vector06 )
 			for (b = 0; b < 8; b++)
 			{
 				col = ((code1 >> b) & 0x01) * 8 + ((code2 >> b) & 0x01) * 4 + ((code3 >> b) & 0x01)* 2+ ((code4 >> b) & 0x01);
-				*BITMAP_ADDR16(bitmap, 255-y+32, x*8+(7-b)+32) =  col;
+				if (vector_video_mode==0x00) {
+					*BITMAP_ADDR16(bitmap, 255-y+32, x*8+(7-b)+32) =  col;
+				} else {
+					*BITMAP_ADDR16(bitmap, 255-y+32, x*16+(7-b)*2+1+32) =  ((code2 >> b) & 0x01) * 2;
+					*BITMAP_ADDR16(bitmap, 255-y+32, x*16+(7-b)*2+32)   =  ((code3 >> b) & 0x01) * 2;
+				}
 			}
 		}
 	}
-
-
 	return 0;
 }
 
