@@ -12,6 +12,7 @@
 /*----------- defined in machine/vector06.c -----------*/
 
 extern const ppi8255_interface vector06_ppi8255_interface;
+extern const ppi8255_interface vector06_ppi8255_2_interface;
 
 extern DRIVER_INIT( vector06 );
 extern MACHINE_RESET( vector06 );
@@ -20,6 +21,9 @@ extern INTERRUPT_GEN( vector06_interrupt );
 
 extern READ8_HANDLER(vector_8255_1_r);
 extern WRITE8_HANDLER(vector_8255_1_w);
+extern READ8_HANDLER(vector_8255_2_r);
+extern WRITE8_HANDLER(vector_8255_2_w);
+
 extern WRITE8_HANDLER(vector06_color_set);
 /*----------- defined in video/vector06.c -----------*/
 

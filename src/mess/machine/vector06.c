@@ -33,12 +33,18 @@ static READ8_DEVICE_HANDLER (vector06_8255_portb_r )
 	if ((vector06_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine,"LINE5"); }
 	if ((vector06_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine,"LINE6"); }
 	if ((vector06_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine,"LINE7"); }
+		logerror("vector06_8255_portb_r %02x %02x\n",vector06_keyboard_mask,key);
 	return key;
 }
 
 static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
-{
-	return input_port_read(device->machine, "LINE8");
+{	
+	double level = cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ));
+	UINT8 retVal = input_port_read(device->machine, "LINE8");
+	if (level >  0) { 
+		retVal |= 0x10; 
+ 	}
+	return retVal;
 }
 
 static WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
@@ -59,6 +65,37 @@ WRITE8_HANDLER(vector06_color_set)
 	palette_set_color( space->machine, vector_color_index, MAKE_RGB(r,g,b) );
 }
 
+UINT8 romdisk_msb;
+UINT8 romdisk_lsb;
+
+static READ8_DEVICE_HANDLER (vector06_romdisk_portb_r )
+{
+	UINT8 *romdisk = memory_region(device->machine, "main") + 0x18000;		
+	UINT16 addr = (romdisk_msb*256+romdisk_lsb) & 0x7fff;
+	return romdisk[addr];	
+}
+
+static WRITE8_DEVICE_HANDLER (vector06_romdisk_porta_w )
+{	
+	romdisk_lsb = data;
+}
+
+static WRITE8_DEVICE_HANDLER (vector06_romdisk_portc_w )
+{		
+	romdisk_msb = data;	
+}
+
+const ppi8255_interface vector06_ppi8255_2_interface =
+{
+	NULL,
+	vector06_romdisk_portb_r,
+	NULL,
+	vector06_romdisk_porta_w,
+	NULL,
+	vector06_romdisk_portc_w
+};
+
+
 const ppi8255_interface vector06_ppi8255_interface =
 {
 	NULL,
@@ -78,16 +115,41 @@ WRITE8_HANDLER(vector_8255_1_w) {
 
 }
 
+READ8_HANDLER(vector_8255_2_r) {
+	return ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_2" ), (offset ^ 0x03));
+}
 
+WRITE8_HANDLER(vector_8255_2_w) {
+	ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_2" ), (offset ^0x03) , data );
+
+}
+
+UINT8 vblank_state = 0;
 INTERRUPT_GEN( vector06_interrupt )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	vblank_state++;
+	if (vblank_state>1) vblank_state=0;
+	cpu_set_input_line(device,0,vblank_state ? HOLD_LINE : CLEAR_LINE);		
+	
 }
 
 static IRQ_CALLBACK (  vector06_irq_callback )
 {
 	// Interupt is RST 7
-	return 0xcd0038;
+	return 0xff;
+}
+
+static TIMER_CALLBACK(reset_check_callback)
+{
+	UINT8 val = input_port_read(machine, "RESET");
+	if ((val & 1)==1) {
+		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
+		cpu_reset(machine->cpu[0]);
+	}
+	if ((val & 2)==2) {
+		memory_set_bankptr(machine, 1, mess_ram + 0x0000);
+		cpu_reset(machine->cpu[0]);
+	}
 }
 
 MACHINE_RESET( vector06 )
@@ -106,4 +168,7 @@ MACHINE_RESET( vector06 )
 	memory_set_bankptr(machine, 4, mess_ram + 0x8000);
 
 	vector06_keyboard_mask = 0;
+	
+	timer_pulse(ATTOTIME_IN_HZ(10), NULL, 0, reset_check_callback);
+
 }
