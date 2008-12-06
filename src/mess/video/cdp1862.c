@@ -119,7 +119,7 @@ void cdp1862_update(const device_config *device, bitmap_t *bitmap, const rectang
 	cdp1862_t *cdp1862 = get_safe_token(device);
 
 	copybitmap(bitmap, cdp1862->bitmap, 0, 0, 0, 0, cliprect);
-	fillbitmap(cdp1862->bitmap, CDP1862_BACKGROUND_COLOR_SEQUENCE[cdp1862->bgcolor] + 8, cliprect);
+	bitmap_fill(cdp1862->bitmap, cliprect, CDP1862_BACKGROUND_COLOR_SEQUENCE[cdp1862->bgcolor] + 8);
 }
 
 /* Device Interface */

@@ -465,22 +465,22 @@ WRITE16_HANDLER( x68k_crtc_w )
 			rect.max_y = 512;
 			if(sys.crtc.reg[21] & 0x01)
 			{
-				fillbitmap(x68k_gfx_0_bitmap_16,0,&rect);
-				fillbitmap(x68k_gfx_0_bitmap_256,0,&rect);
-				fillbitmap(x68k_gfx_0_bitmap_65536,0,&rect);
+				bitmap_fill(x68k_gfx_0_bitmap_16,&rect,0);
+				bitmap_fill(x68k_gfx_0_bitmap_256,&rect,0);
+				bitmap_fill(x68k_gfx_0_bitmap_65536,&rect,0);
 			}
 			if(sys.crtc.reg[21] & 0x02)
 			{
-				fillbitmap(x68k_gfx_1_bitmap_16,0,&rect);
-				fillbitmap(x68k_gfx_1_bitmap_256,0,&rect);
+				bitmap_fill(x68k_gfx_1_bitmap_16,&rect,0);
+				bitmap_fill(x68k_gfx_1_bitmap_256,&rect,0);
 			}
 			if(sys.crtc.reg[21] & 0x04)
 			{
-				fillbitmap(x68k_gfx_2_bitmap_16,0,&rect);
+				bitmap_fill(x68k_gfx_2_bitmap_16,&rect,0);
 			}
 			if(sys.crtc.reg[21] & 0x08)
 			{
-				fillbitmap(x68k_gfx_3_bitmap_16,0,&rect);
+				bitmap_fill(x68k_gfx_3_bitmap_16,&rect,0);
 			}
 			timer_set(ATTOTIME_IN_MSEC(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 //			popmessage("CRTC: High-speed gfx screen clear [0x%02x]",sys.crtc.reg[21] & 0x0f);
@@ -1000,7 +1000,7 @@ VIDEO_UPDATE( x68000 )
 	}
 //	rect.max_x=sys.crtc.width;
 //	rect.max_y=sys.crtc.height;
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	rect.min_x=sys.crtc.hbegin;
 	rect.min_y=sys.crtc.vbegin;

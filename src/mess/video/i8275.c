@@ -470,7 +470,7 @@ void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle
 	i8275->fifo_write = 0;
 
 	if ((i8275->status_reg & I8275_STATUS_VIDEO_ENABLE)==0) {
-		fillbitmap(bitmap, get_black_pen(device->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine));
 	} else {
 		// if value < 16 it is visible otherwise not
 		i8275->cursor_blink_cnt++;

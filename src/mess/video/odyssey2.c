@@ -305,7 +305,7 @@ static TIMER_CALLBACK( i824x_scanline_callback ) {
 		rect.min_y = rect.max_y = vpos;
 		rect.min_x = I824X_START_ACTIVE_SCAN;
 		rect.max_x = I824X_END_ACTIVE_SCAN - 1;
-		fillbitmap( tmp_bitmap, ( (o2_vdc.s.color >> 3) & 0x7 ) | ( ( lum << 3 ) ^ 0x08 ), &rect );
+		bitmap_fill( tmp_bitmap, &rect , ( (o2_vdc.s.color >> 3) & 0x7 ) | ( ( lum << 3 ) ^ 0x08 ));
 
 		/* Clear collision map */
 		memset( collision_map, 0, sizeof( collision_map ) );

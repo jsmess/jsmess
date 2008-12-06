@@ -23,7 +23,7 @@ VIDEO_UPDATE( vector06 )
 	int width = (vector_video_mode==0x00) ? 256 : 512;		
 	rectangle screen_area = {0,width+64-1,0,256+64-1};
 	// fill border color
-	fillbitmap(bitmap, vector_color_index, &screen_area);
+	bitmap_fill(bitmap, &screen_area, vector_color_index);
 
 	// draw image
 	for (x = 0; x < 32; x++)

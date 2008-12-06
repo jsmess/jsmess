@@ -725,7 +725,7 @@ void stic_screenrefresh(running_machine *machine)
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		fillbitmap(tmpbitmap, (intv_border_color<<1)+1, NULL);
+		bitmap_fill(tmpbitmap, NULL, (intv_border_color<<1)+1);
 	}
 	col_delay = intv_col_delay;
 	row_delay = intv_row_delay;

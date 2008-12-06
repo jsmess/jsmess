@@ -41,9 +41,9 @@ INLINE void wswan_fillbitmap( int pen, rectangle *rec ) {
 		rec2.max_y = 28*8 - 1 - rec->min_x;
 		rec2.min_x = rec->min_y;
 		rec2.max_x = rec->max_y;
-		fillbitmap( tmpbitmap, pen, &rec2 );
+		bitmap_fill( tmpbitmap, &rec2 , pen);
 	} else {
-		fillbitmap( tmpbitmap, pen, rec );
+		bitmap_fill( tmpbitmap, rec , pen);
 	}
 }
 

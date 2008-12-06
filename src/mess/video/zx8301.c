@@ -222,7 +222,7 @@ void zx8301_update(const device_config *device, bitmap_t *bitmap, const rectangl
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(zx8301->screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(zx8301->screen->machine));
 	}
 }
 

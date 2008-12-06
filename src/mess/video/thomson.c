@@ -932,7 +932,7 @@ VIDEO_UPDATE ( thom )
 		}
 		while ( y < THOM_BORDER_HEIGHT && thom_border_l[ y ] == -1 );
 		wrect.max_y = ypos - 1;
-		fillbitmap( bitmap,  border, &wrect );
+		bitmap_fill( bitmap,  &wrect , border);
 	}
 
 	/* left border */
@@ -948,7 +948,7 @@ VIDEO_UPDATE ( thom )
 		}
 		while ( y < yup && thom_border_l[ y ] == -1 );
 		lrect.max_y = ypos - 1;
-		fillbitmap( bitmap, border, &lrect );
+		bitmap_fill( bitmap, &lrect , border);
 	}
 
 	/* lower border */
@@ -963,7 +963,7 @@ VIDEO_UPDATE ( thom )
 			ypos ++ /* += scale */; }
 		while ( y < ybot && thom_border_l[ y ] == -1 );
 		wrect.max_y = ypos - 1;
-		fillbitmap( bitmap, border, &wrect );
+		bitmap_fill( bitmap, &wrect , border);
 	}
 
 	/* right border */
@@ -984,7 +984,7 @@ VIDEO_UPDATE ( thom )
 		}
 		while ( y < yup && thom_border_r[ y ] == -1 );
 		rrect.max_y = ypos - 1;
-		fillbitmap( bitmap, border, &rrect );
+		bitmap_fill( bitmap, &rrect , border);
 	}
 
 	/* active area */

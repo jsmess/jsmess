@@ -139,7 +139,7 @@ VIDEO_UPDATE( electron )
 		break;
 	case 3:
 		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
-			fillbitmap( bitmap, 7, &r );
+			bitmap_fill( bitmap, &r , 7);
 		else
 		{
 			for( i = 0; i < 80; i++ )
@@ -212,7 +212,7 @@ VIDEO_UPDATE( electron )
 		break;
 	case 6:
 		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) ) {
-			fillbitmap( bitmap, 7, &r );
+			bitmap_fill( bitmap, &r , 7);
 		} else {
 			for( i = 0; i < 40; i++ ) {
 				UINT8 pattern = read_vram( ula.screen_addr + i * 8 );

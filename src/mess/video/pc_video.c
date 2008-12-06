@@ -103,7 +103,7 @@ VIDEO_UPDATE( pc_video )
 			if ((pc_current_width > 100) && (pc_current_height > 100))
 				video_screen_set_visarea(screen, 0, pc_current_width-1, 0, pc_current_height-1);
 
-			fillbitmap(bitmap, 0, cliprect);
+			bitmap_fill(bitmap, cliprect, 0);
 		}
 
 		video_update(tmpbitmap ? tmpbitmap : bitmap, pc_crtc);

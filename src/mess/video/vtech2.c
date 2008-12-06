@@ -127,7 +127,7 @@ VIDEO_UPDATE( laser )
 	int full_refresh = 1;
 
 	if( full_refresh )
-		fillbitmap(bitmap, ((laser_bg_mode >> 4) & 15)<<1, cliprect);
+		bitmap_fill(bitmap, cliprect, ((laser_bg_mode >> 4) & 15)<<1);
 
 	if (laser_latch & 0x08)
 	{

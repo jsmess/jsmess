@@ -50,7 +50,7 @@ VIDEO_UPDATE( mz700 )
 {
 	int offs;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	for(offs = 0; offs < 40*25; offs++)
 	{

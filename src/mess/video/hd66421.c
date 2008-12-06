@@ -177,7 +177,7 @@ VIDEO_UPDATE( hd66421 )
 		rect.max_x = HD66421_WIDTH - 1;
 		rect.min_y = 0;
 		rect.max_y = HD66421_HEIGHT - 1;
-		fillbitmap( bitmap, get_white_pen(screen->machine), &rect);
+		bitmap_fill( bitmap, &rect, get_white_pen(screen->machine));
 	}
 	// flags
 	return 0;

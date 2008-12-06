@@ -501,7 +501,7 @@ void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x,
 		my_rect.min_y = y;
 		my_rect.max_y = y + height*10 - 1;
 
-		fillbitmap(bitmap, 0, &my_rect);
+		bitmap_fill(bitmap, &my_rect, 0);
 	}
 	else
 		for (i=0; i<height; i++)

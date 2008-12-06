@@ -62,7 +62,7 @@ VIDEO_START( pdp1 )
 	/* set up out bitmaps */
 	pdp1_draw_panel_backdrop(machine, panel_bitmap);
 
-	fillbitmap(typewriter_bitmap, pen_typewriter_bg, &typewriter_bitmap_bounds);
+	bitmap_fill(typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
 
 	/* initialize CRT */
 	video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
@@ -252,7 +252,7 @@ static void pdp1_draw_string(running_machine *machine, bitmap_t *bitmap, const c
 static void pdp1_draw_panel_backdrop(running_machine *machine, bitmap_t *bitmap)
 {
 	/* fill with black */
-	fillbitmap(panel_bitmap, pen_panel_bg, &panel_bitmap_bounds);
+	bitmap_fill(panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
 
 	/* column 1: registers, test word, test address */
 	pdp1_draw_string(machine, bitmap, "program counter", x_panel_col1_offset, y_panel_pc_offset, color_panel_caption);
@@ -381,7 +381,7 @@ static void pdp1_typewriter_linefeed(running_machine *machine)
 		draw_scanline8(typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens, -1);
 	}
 
-	fillbitmap(typewriter_bitmap, pen_typewriter_bg, &typewriter_scroll_clear_window);
+	bitmap_fill(typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
 }
 
 void pdp1_typewriter_drawchar(running_machine *machine, int character)

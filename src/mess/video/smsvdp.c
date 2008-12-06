@@ -280,11 +280,11 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		bitmap_fill( tmpbitmap, &rec , machine->pens[smsvdp.current_palette[BACKDROP_COLOR]]);
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		bitmap_fill( tmpbitmap, &rec , machine->pens[smsvdp.current_palette[BACKDROP_COLOR]]);
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
@@ -320,16 +320,16 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 			/* set whole line to backdrop color */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
-			fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+			bitmap_fill( tmpbitmap, &rec , machine->pens[smsvdp.current_palette[BACKDROP_COLOR]]);
 		} else {
 			/* Draw left border */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-			fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+			bitmap_fill( tmpbitmap, &rec , machine->pens[smsvdp.current_palette[BACKDROP_COLOR]]);
 			/* Draw right border */
 			rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 			rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-			fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+			bitmap_fill( tmpbitmap, &rec , machine->pens[smsvdp.current_palette[BACKDROP_COLOR]]);
 			sms_refresh_line( machine, tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
 		}
 		return;
@@ -346,11 +346,11 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 		/* Draw left border */
 		rec.min_x = LBORDER_START;
 		rec.max_x = LBORDER_START + LBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		bitmap_fill( tmpbitmap, &rec , machine->pens[smsvdp.current_palette[BACKDROP_COLOR]]);
 		/* Draw right border */
 		rec.min_x = LBORDER_START + LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( tmpbitmap, machine->pens[smsvdp.current_palette[BACKDROP_COLOR]], &rec );
+		bitmap_fill( tmpbitmap, &rec , machine->pens[smsvdp.current_palette[BACKDROP_COLOR]]);
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */

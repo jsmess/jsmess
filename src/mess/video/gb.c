@@ -385,7 +385,7 @@ static void gb_update_scanline( running_machine *machine ) {
 				r.min_y = r.max_y = gb_lcd.current_line;
 				r.min_x = gb_lcd.start_x;
 				r.max_x = gb_lcd.end_x - 1;
-				fillbitmap( bitmap, gb_bpal[0], &r );
+				bitmap_fill( bitmap, &r , gb_bpal[0]);
 			}
 			while ( l < 2 ) {
 				UINT8	xindex, *map, *tiles;
@@ -449,7 +449,7 @@ static void gb_update_scanline( running_machine *machine ) {
 					const device_config *screen = video_screen_first(machine->config);
 					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_y = r.max_y = gb_lcd.current_line;
-					fillbitmap( bitmap, 0, &r );
+					bitmap_fill( bitmap, &r , 0);
 				}
 				gb_lcd.previous_line = gb_lcd.current_line;
 			}
@@ -682,7 +682,7 @@ static void sgb_update_scanline( running_machine *machine ) {
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = SGB_YOFFSET;
 					r.max_y -= SGB_YOFFSET;
-					fillbitmap( bitmap, 0, &r );
+					bitmap_fill( bitmap, &r , 0);
 				} return;
 			case 3: /* Blank screen (white - or should it be color 0?) */
 				{
@@ -692,7 +692,7 @@ static void sgb_update_scanline( running_machine *machine ) {
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = SGB_YOFFSET;
 					r.max_y -= SGB_YOFFSET;
-					fillbitmap( bitmap, 32767, &r );
+					bitmap_fill( bitmap, &r , 32767);
 				} return;
 			}
 
@@ -711,7 +711,7 @@ static void sgb_update_scanline( running_machine *machine ) {
 				r.min_x = SGB_XOFFSET;
 				r.max_x -= SGB_XOFFSET;
 				r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
-				fillbitmap( bitmap, 0, &r );
+				bitmap_fill( bitmap, &r , 0);
 			}
 			while( l < 2 ) {
 				UINT8	xindex, sgb_palette, *map, *tiles;
@@ -782,7 +782,7 @@ static void sgb_update_scanline( running_machine *machine ) {
 					r.min_x = SGB_XOFFSET;
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
-					fillbitmap(bitmap, 0, &r);
+					bitmap_fill(bitmap, &r, 0);
 				}
 				gb_lcd.previous_line = gb_lcd.current_line;
 			}
@@ -947,7 +947,7 @@ static void cgb_update_scanline ( running_machine *machine ) {
 				r.min_y = r.max_y = gb_lcd.current_line;
 				r.min_x = gb_lcd.start_x;
 				r.max_x = gb_lcd.end_x - 1;
-				fillbitmap( bitmap, ( gbc_mode == GBC_MODE_MONO ) ? 0 : 32767, &r );
+				bitmap_fill( bitmap, &r , ( gbc_mode == GBC_MODE_MONO ) ? 0 : 32767);
 			}
 			while ( l < 2 ) {
 				UINT8	xindex, *map, *tiles, *gbcmap;
@@ -1039,7 +1039,7 @@ static void cgb_update_scanline ( running_machine *machine ) {
 					const device_config *screen = video_screen_first(machine->config);
 					rectangle r = *video_screen_get_visible_area(screen);
 					r.min_y = r.max_y = gb_lcd.current_line;
-					fillbitmap( bitmap, ( gbc_mode == GBC_MODE_MONO ) ? 0 : 32767, &r );
+					bitmap_fill( bitmap, &r , ( gbc_mode == GBC_MODE_MONO ) ? 0 : 32767);
 				}
 				gb_lcd.previous_line = gb_lcd.current_line;
 			}

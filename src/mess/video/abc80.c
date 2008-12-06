@@ -234,7 +234,7 @@ static VIDEO_UPDATE( abc80 )
 	rect.min_y = ABC80_VDSTART;
 	rect.max_y = ABC80_VDSTART + 240 - 1;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	tilemap_mark_all_tiles_dirty(state->tx_tilemap);
 	tilemap_draw(bitmap, &rect, state->tx_tilemap, 0, 0);

@@ -342,11 +342,11 @@ void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectang
 	if (cdp1864->disp)
 	{
 		copybitmap(bitmap, cdp1864->bitmap, 0, 0, 0, 0, cliprect);
-		fillbitmap(cdp1864->bitmap, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8, cliprect);
+		bitmap_fill(cdp1864->bitmap, cliprect, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8);
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(device->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(device->machine));
 	}
 }
 
@@ -375,7 +375,7 @@ static DEVICE_START( cdp1864 )
 
 	/* allocate the temporary bitmap */
 	cdp1864->bitmap = auto_bitmap_alloc(video_screen_get_width(cdp1864->screen), video_screen_get_height(cdp1864->screen), video_screen_get_format(cdp1864->screen));
-	fillbitmap(cdp1864->bitmap, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8, 0);
+	bitmap_fill(cdp1864->bitmap, 0, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8);
 
 	/* initialize the palette */
 	cdp1864_init_palette(device);

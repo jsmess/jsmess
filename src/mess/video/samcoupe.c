@@ -168,7 +168,7 @@ VIDEO_UPDATE( samcoupe )
 	if ((asic->vmpr & 0x40) && (asic->border & 0x80))
 	{
 		/* display is disabled, draw a black screen */
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 	}
 	else
 	{

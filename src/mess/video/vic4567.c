@@ -756,14 +756,14 @@ static void vic3_draw_bitplanes(running_machine *machine)
 		vis.max_x = XPOS-1;
 		vis.min_y = 0;
 		vis.max_y = visarea->max_y;
-		fillbitmap(vic2.bitmap, FRAMECOLOR,&vis);
+		bitmap_fill(vic2.bitmap, &vis,FRAMECOLOR);
 	}
 	if (XPOS+VIC3_BITPLANES_WIDTH<visarea->max_x) {
 		vis.min_x = XPOS+VIC3_BITPLANES_WIDTH;
 		vis.max_x = visarea->max_x;
 		vis.min_y = 0;
 		vis.max_y = visarea->max_y;
-		fillbitmap(vic2.bitmap, FRAMECOLOR,&vis);
+		bitmap_fill(vic2.bitmap, &vis,FRAMECOLOR);
 	}
 	if (YPOS>0)
 	{
@@ -771,14 +771,14 @@ static void vic3_draw_bitplanes(running_machine *machine)
 		vis.max_y = YPOS-1;
 		vis.min_x = 0;
 		vis.max_x = visarea->max_x;
-		fillbitmap(vic2.bitmap, FRAMECOLOR,&vis);
+		bitmap_fill(vic2.bitmap, &vis,FRAMECOLOR);
 	}
 	if (YPOS+VIC3_LINES<visarea->max_y) {
 		vis.min_y = YPOS+VIC3_LINES;
 		vis.max_y = visarea->max_y;
 		vis.min_x = 0;
 		vis.max_x = visarea->max_x;
-		fillbitmap(vic2.bitmap, FRAMECOLOR,&vis);
+		bitmap_fill(vic2.bitmap, &vis,FRAMECOLOR);
 	}
 }
 

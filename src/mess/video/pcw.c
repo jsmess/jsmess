@@ -75,14 +75,14 @@ VIDEO_UPDATE( pcw )
 		rect.min_y = 0;
 		rect.max_x = PCW_SCREEN_WIDTH;
 		rect.max_y = PCW_BORDER_HEIGHT;
-		fillbitmap(bitmap, pen0, &rect);
+		bitmap_fill(bitmap, &rect, pen0);
 
 		/* render bottom border */
 		rect.min_x = 0;
 		rect.min_y = PCW_BORDER_HEIGHT + PCW_DISPLAY_HEIGHT;
 		rect.max_x = PCW_SCREEN_WIDTH;
 		rect.max_y = rect.min_y + PCW_BORDER_HEIGHT;
-		fillbitmap(bitmap, pen0, &rect);
+		bitmap_fill(bitmap, &rect, pen0);
 
 		/* yes */
 
@@ -172,7 +172,7 @@ VIDEO_UPDATE( pcw )
 		rect.max_x = PCW_SCREEN_WIDTH;
 		rect.max_y = PCW_SCREEN_HEIGHT;
 
-		fillbitmap(bitmap, pen0, &rect);
+		bitmap_fill(bitmap, &rect, pen0);
 	}
 	return 0;
 }

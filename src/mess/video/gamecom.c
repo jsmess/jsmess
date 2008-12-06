@@ -22,7 +22,7 @@ INTERRUPT_GEN( gamecom_scanline ) {
 		rec.min_x = 0;
 		rec.max_x = Y_PIXELS - 1;
 		rec.min_y = rec.max_y = scanline;
-		fillbitmap( tmpbitmap, 0, &rec );
+		bitmap_fill( tmpbitmap, &rec , 0);
 		return;
 	} else {
 		UINT8 *line = &gamecom_vram[ base_address + 40 * scanline ];

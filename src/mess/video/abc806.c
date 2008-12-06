@@ -485,7 +485,7 @@ static VIDEO_UPDATE( abc806 )
 	video_screen_set_visarea(screen, 0, 767, 0, 311);
 
 	/* clear screen */
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	
 	if (!state->txoff)
 	{

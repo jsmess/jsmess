@@ -246,7 +246,7 @@ static void cgenie_refresh_monitor(running_machine *machine, bitmap_t * bitmap, 
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(machine));
 
 	if(crt.vertical_displayed || crt.horizontal_displayed)
 	{
@@ -324,8 +324,8 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 
-	fillbitmap(tmpbitmap, get_black_pen(machine), cliprect);
-	fillbitmap(dlybitmap, get_black_pen(machine), cliprect);
+	bitmap_fill(tmpbitmap, cliprect, get_black_pen(machine));
+	bitmap_fill(dlybitmap, cliprect, get_black_pen(machine));
 
     if(crt.vertical_displayed || crt.horizontal_displayed)
 	{

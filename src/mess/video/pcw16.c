@@ -186,7 +186,7 @@ VIDEO_UPDATE( pcw16 )
 		rect.max_x = PCW16_SCREEN_WIDTH;
 		rect.max_y = PCW16_SCREEN_HEIGHT;
 
-		fillbitmap(bitmap, border_colour, &rect);
+		bitmap_fill(bitmap, &rect, border_colour);
 	}
 	else
 	{
@@ -199,14 +199,14 @@ VIDEO_UPDATE( pcw16 )
 		rect.min_y = 0;
 		rect.max_x = PCW16_SCREEN_WIDTH;
 		rect.max_y = PCW16_BORDER_HEIGHT;
-		fillbitmap(bitmap, border_colour, &rect);
+		bitmap_fill(bitmap, &rect, border_colour);
 
 		/* render bottom border */
 		rect.min_x = 0;
 		rect.min_y = PCW16_BORDER_HEIGHT + PCW16_DISPLAY_HEIGHT;
 		rect.max_x = PCW16_SCREEN_WIDTH;
 		rect.max_y = rect.min_y + PCW16_BORDER_HEIGHT;
-		fillbitmap(bitmap, border_colour, &rect);
+		bitmap_fill(bitmap, &rect, border_colour);
 
 		/* render border on either side of display */
 		plot_box(bitmap, 0,											PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);

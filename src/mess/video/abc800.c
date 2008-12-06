@@ -256,7 +256,7 @@ static VIDEO_UPDATE( abc800m )
 	video_screen_set_visarea(screen, 0, 767, 0, 311);
 
 	/* clear screen */
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* draw HR graphics */
 	abc800m_hr_update(screen->machine, bitmap, cliprect);
@@ -275,7 +275,7 @@ static VIDEO_UPDATE( abc800c )
 	abc800_state *state = screen->machine->driver_data;
 
 	/* clear screen */
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* draw HR graphics */
 	abc800c_hr_update(screen->machine, bitmap, cliprect);

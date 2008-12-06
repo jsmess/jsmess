@@ -99,7 +99,7 @@ VIDEO_UPDATE( galaxy )
 	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
 	if (galaxy_interrupts_enabled == FALSE) {
 		rectangle black_area = {0,384-1,0,208-1};
-		fillbitmap(tmpbitmap, 0, &black_area);
+		bitmap_fill(tmpbitmap, &black_area, 0);
 	}
 	galaxy_interrupts_enabled = FALSE;
 	return VIDEO_UPDATE_CALL ( generic_bitmapped );
