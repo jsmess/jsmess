@@ -319,7 +319,7 @@ INLINE int a2_no_ctrl_reset(running_machine *machine)
   AY3600_init
 ***************************************************************************/
 
-int AY3600_init()
+int AY3600_init(running_machine *machine)
 {
 	/* Init the key remapping table */
 	ay3600_keys = auto_malloc(AY3600_KEYS_LENGTH * sizeof(*ay3600_keys));

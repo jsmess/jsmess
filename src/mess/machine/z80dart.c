@@ -1304,7 +1304,7 @@ static DEVICE_START( z80dart )
 {
 	const z80dart_interface *intf = device->static_config;
 	z80dart_t *z80dart = get_safe_token(device);
-	int cpunum = -1;
+	const device_config *cpu = NULL;
 
 	assert(intf != NULL);
 	z80dart->intf = intf;
@@ -1313,12 +1313,12 @@ static DEVICE_START( z80dart )
 
 	if (intf->cpu != NULL)
 	{
-		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
+		cpu = cputag_get_cpu(device->machine, intf->cpu);
 	}
 
-	if (cpunum != -1)
+	if (cpu != NULL)
 	{
-		z80dart->clock = device->machine->config->cpu[cpunum].clock;
+		z80dart->clock = cpu_get_clock(cpu);
 	}
 	else
 	{

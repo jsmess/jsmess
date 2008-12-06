@@ -101,7 +101,7 @@ Notes:
 typedef struct _slow_t slow_t;
 struct _slow_t
 {
-	int cpunum;				/* CPU index of the Z80 */
+	const device_config *cpu;	/* CPU of the Z80 */
 
 	UINT8 status;			/* ABC BUS status */
 	UINT8 data;				/* ABC BUS data */
@@ -115,7 +115,7 @@ struct _slow_t
 typedef struct _fast_t fast_t;
 struct _fast_t
 {
-	int cpunum;				/* CPU index of the Z80 */
+	const device_config *cpu;	/* CPU of the Z80 */
 
 	UINT8 status;			/* ABC BUS status */
 	UINT8 data;				/* ABC BUS data */
@@ -203,14 +203,14 @@ static WRITE8_HANDLER( slow_bus_c1_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
 
-	cpu_set_input_line(space->machine->cpu[conkort->cpunum], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( slow_bus_c3_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
 
-	cpu_set_input_line(space->machine->cpu[conkort->cpunum], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static ABCBUS_CARD_SELECT( luxor_55_10828 )
@@ -227,7 +227,7 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
 	}
 
-	cpu_set_input_line(device->machine->cpu[conkort->cpunum], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( slow_ctrl_w )
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( slow_status_w )
 	conkort->status = data;
 
 	/* interrupt to main CPU */
-	cpu_set_input_line(space->machine->cpu[conkort->cpunum], INPUT_LINE_IRQ0, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Fast Controller */
@@ -330,14 +330,14 @@ static WRITE8_HANDLER( fast_bus_c1_w )
 {
 	fast_t *conkort = get_safe_token_machine_fast(space->machine);
 
-	cpu_set_input_line(space->machine->cpu[conkort->cpunum], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( fast_bus_c3_w )
 {
 	fast_t *conkort = get_safe_token_machine_fast(space->machine);
 
-	cpu_set_input_line(space->machine->cpu[conkort->cpunum], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static ABCBUS_CARD_SELECT( luxor_55_21046 )
@@ -354,7 +354,7 @@ static ABCBUS_CARD_SELECT( luxor_55_21046 )
 		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
 	}
 
-	cpu_set_input_line(device->machine->cpu[conkort->cpunum], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static READ8_HANDLER( fast_ctrl_r )
@@ -477,7 +477,7 @@ static Z80PIO_ON_INT_CHANGED( pio_interrupt )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
-	cpu_set_input_line(device->machine->cpu[conkort->cpunum], INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, state);
 }
 
 static READ8_DEVICE_HANDLER( pio_port_a_r )
@@ -614,17 +614,17 @@ static void dma_irq_callback(const device_config *device, int state)
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
 
-	cpu_set_input_line(device->machine->cpu[conkort->cpunum], INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, state);
 }
 
 static READ8_DEVICE_HANDLER( dma_port_a_r )
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *program = cpu_get_address_space(device->machine->cpu[conkort->cpunum], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 data = 0xff;
 
-	cpu_push_context(device->machine->cpu[conkort->cpunum]);
+	cpu_push_context(conkort->cpu);
 
 	data = memory_read_byte_8le(program, offset);
 	
@@ -636,9 +636,9 @@ static READ8_DEVICE_HANDLER( dma_port_a_r )
 static WRITE8_DEVICE_HANDLER( dma_port_a_w )
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *program = cpu_get_address_space(device->machine->cpu[conkort->cpunum], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_PROGRAM);
 
-	cpu_push_context(device->machine->cpu[conkort->cpunum]);
+	cpu_push_context(conkort->cpu);
 	
 	memory_write_byte_8le(program, offset, data);
 	
@@ -648,11 +648,11 @@ static WRITE8_DEVICE_HANDLER( dma_port_a_w )
 static READ8_DEVICE_HANDLER( dma_port_b_r )
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *io = cpu_get_address_space(device->machine->cpu[conkort->cpunum], ADDRESS_SPACE_IO);
+	const address_space *io = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_IO);
 
 	UINT8 data = 0xff;
 
-	cpu_push_context(device->machine->cpu[conkort->cpunum]);
+	cpu_push_context(conkort->cpu);
 
 	data = memory_read_byte_8le(io, offset);
 
@@ -664,9 +664,9 @@ static READ8_DEVICE_HANDLER( dma_port_b_r )
 static WRITE8_DEVICE_HANDLER( dma_port_b_w )
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
-	const address_space *io = cpu_get_address_space(device->machine->cpu[conkort->cpunum], ADDRESS_SPACE_IO);
+	const address_space *io = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_IO);
 
-	cpu_push_context(device->machine->cpu[conkort->cpunum]);
+	cpu_push_context(conkort->cpu);
 
 	memory_write_byte_8le(io, offset, data);
 
@@ -816,7 +816,7 @@ static DEVICE_START( luxor_55_10828 )
 
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
-	conkort->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
+	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
 
 	/* find devices */
@@ -884,7 +884,7 @@ static DEVICE_START( luxor_55_21046 )
 
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
-	conkort->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
+	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
 
 	/* find devices */

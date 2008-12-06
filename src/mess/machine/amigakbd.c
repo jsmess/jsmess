@@ -97,7 +97,7 @@ static INPUT_CHANGED( kbd_update )
 	}
 }
 
-void amigakbd_init( void )
+void amigakbd_init( running_machine *machine )
 {
 	/* allocate a keyboard buffer */
 	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );

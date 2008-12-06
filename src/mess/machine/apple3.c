@@ -719,7 +719,7 @@ DRIVER_INIT( apple3 )
 	apple3_enable_mask = 0;
 	apple3_update_drives();
 
-	AY3600_init();
+	AY3600_init(machine);
 
 	via_config(0, &via_0_intf);
 	via_config(1, &via_1_intf);

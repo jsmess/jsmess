@@ -1269,7 +1269,7 @@ void apple2_init_common(running_machine *machine)
 	a2 = 0;
 	apple2_fdc_diskreg = 0;
 
-	AY3600_init();
+	AY3600_init(machine);
 	add_reset_callback(machine, apple2_reset);
 
 	/* state save registers */

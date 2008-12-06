@@ -80,7 +80,7 @@ static struct {
 	UINT8					data_signal;
 	write8_space_func		clock_callback;
 	write8_space_func		data_callback;
-	int						cpunum;
+	const device_config *	cpu;
 	UINT16					last_write_addr;
 } kb_keytronic;
 
@@ -294,7 +294,7 @@ INPUT_PORTS_END
 WRITE8_HANDLER( kb_keytronic_set_clock_signal )
 {
 	kb_keytronic.clock_signal = data;
-	cpu_set_input_line( space->machine->cpu[kb_keytronic.cpunum], MCS51_INT0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line( kb_keytronic.cpu, MCS51_INT0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -302,7 +302,7 @@ WRITE8_HANDLER( kb_keytronic_set_clock_signal )
 WRITE8_HANDLER( kb_keytronic_set_data_signal )
 {
 	kb_keytronic.data_signal = data;
-	cpu_set_input_line( space->machine->cpu[kb_keytronic.cpunum], MCS51_T0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line( kb_keytronic.cpu, MCS51_T0_LINE, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -311,7 +311,7 @@ void kb_keytronic_set_host_interface( running_machine *machine, write8_space_fun
 	kb_keytronic.clock_callback = clock_cb;
 	kb_keytronic.data_callback = data_cb;
 	kb_keytronic.p3 = 0xff;
-	kb_keytronic.cpunum = mame_find_cpu_index( machine, KEYTRONIC_KB3270PC_CPU );
+	kb_keytronic.cpu = cputag_get_cpu( machine, KEYTRONIC_KB3270PC_CPU );
 }
 
 

@@ -8,7 +8,7 @@ struct _abc77_t
 {
 	const abc77_interface *intf;	/* interface */
 
-	int cpunum;						/* CPU index of the 8035 */
+	const device_config *cpu;		/* CPU of the 8035 */
 
 	int keylatch;					/* keyboard row latch */
 	int clock;						/* transmit clock */
@@ -48,7 +48,7 @@ void abc77_rxd_w(const device_config *device, int level)
 {
 	abc77_t *abc77 = get_safe_token(device);
 
-	cpu_set_input_line(device->machine->cpu[abc77->cpunum], MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(abc77->cpu, MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( clock_tick )
@@ -64,7 +64,7 @@ static TIMER_CALLBACK( reset_tick )
 	const device_config *device = ptr;
 	abc77_t *abc77 = get_safe_token(device);
 
-	cpu_set_input_line(device->machine->cpu[abc77->cpunum], INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 void abc77_reset_w(const device_config *device, int level)
@@ -77,10 +77,10 @@ void abc77_reset_w(const device_config *device, int level)
 		int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
 		int ea = BIT(input_port_read(device->machine, "ABC77_DSW"), 7);
 
-		cpu_set_input_line(device->machine->cpu[abc77->cpunum], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, ASSERT_LINE);
 		timer_adjust_oneshot(abc77->reset_timer, ATTOTIME_IN_MSEC(t), 0);
 		
-		cpu_set_input_line(device->machine->cpu[abc77->cpunum], MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(abc77->cpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	abc77->reset = level;
@@ -333,7 +333,7 @@ static DEVICE_START( abc77 )
 	/* find our CPU */
 
 	astring_printf(tempstring, "%s:%s", device->tag, I8035_TAG);
-	abc77->cpunum = mame_find_cpu_index(device->machine, astring_c(tempstring));
+	abc77->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
 
 	/* allocate reset timer */

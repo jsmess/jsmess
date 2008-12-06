@@ -418,7 +418,7 @@ static DRIVER_INIT( amiga )
 	amiga_cart_init(machine);
 
 	/* initialize keyboard */
-	amigakbd_init();
+	amigakbd_init(machine);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -481,7 +481,7 @@ static DRIVER_INIT( cdtv )
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
-	amigakbd_init();
+	amigakbd_init(machine);
 }
 
 /***************************************************************************

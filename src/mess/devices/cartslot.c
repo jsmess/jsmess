@@ -38,7 +38,8 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 	offs_t offset, length, read_length, pos = 0, len;
 	UINT8 *ptr;
 	UINT8 clear_val;
-	int datawidth, littleendian, cpunum, i, j;
+	int datawidth, littleendian, i, j;
+	const device_config *cpu;
 
 	region = ROMREGION_GETTAG(romrgn);
 	offset = ROM_GETOFFSET(roment);
@@ -75,15 +76,11 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 		datawidth = ROMREGION_GETWIDTH(romrgn) / 8;
 
 		/* if the region is inverted, do that now */
-		cpunum = mame_find_cpu_index(machine, type);
-		if (cpunum >= 0)
+		cpu = cputag_get_cpu(machine, type);
+		if (cpu != NULL)
 		{
-			int cputype = image->machine->config->cpu[cpunum].type;
-			if (cputype != 0)
-			{
-				datawidth = cputype_get_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;
-				littleendian = (cputype_get_endianness(cputype) == CPU_IS_LE);
-			}
+			datawidth = cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8;
+			littleendian = (cpu_get_endianness(cpu) == CPU_IS_LE);
 		}
 
 		/* swap the endianness if we need to */

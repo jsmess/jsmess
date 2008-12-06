@@ -75,9 +75,9 @@ static UINT8 c64_port_data;
 
 static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, UINT16 end, read8_space_func rh)
 {
-	int cpunum;
-	cpunum = mame_find_cpu_index(machine, "m8502");
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), start, end, 0, 0, rh);
+	const device_config *cpu;
+	cpu = cputag_get_cpu(machine, "m8502");
+	memory_install_read8_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), start, end, 0, 0, rh);
 }
 
 static WRITE8_HANDLER(c128_dma8726_port_w)
