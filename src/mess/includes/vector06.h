@@ -15,6 +15,7 @@ extern const ppi8255_interface vector06_ppi8255_interface;
 extern const ppi8255_interface vector06_ppi8255_2_interface;
 
 extern DRIVER_INIT( vector06 );
+extern MACHINE_START( vector06 );
 extern MACHINE_RESET( vector06 );
 
 extern INTERRUPT_GEN( vector06_interrupt );
@@ -25,8 +26,14 @@ extern READ8_HANDLER(vector_8255_2_r);
 extern WRITE8_HANDLER(vector_8255_2_w);
 
 extern WRITE8_HANDLER(vector06_color_set);
+extern WRITE8_HANDLER(vector_disc_w);
+
+extern UINT8 vector06_keyboard_mask;
 extern UINT8 vector_color_index;
 extern UINT8 vector_video_mode;
+
+extern DEVICE_IMAGE_LOAD( vector_floppy );
+
 /*----------- defined in video/vector06.c -----------*/
 
 extern PALETTE_INIT( vector06 );

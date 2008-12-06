@@ -10,8 +10,10 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8255ppi.h"
+#include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
+#include "devices/basicdsk.h"
 #include "includes/vector06.h"
 
 /* Address maps */
@@ -26,6 +28,11 @@ static ADDRESS_MAP_START( vector06_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector_8255_1_r, vector_8255_1_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector_8255_2_r, vector_8255_2_w )
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE ( vector06_color_set )
+	AM_RANGE( 0x18, 0x18) AM_READWRITE(wd17xx_data_r,wd17xx_data_w) 		
+	AM_RANGE( 0x19, 0x19) AM_READWRITE(wd17xx_sector_r,wd17xx_sector_w) 
+	AM_RANGE( 0x1A, 0x1A) AM_READWRITE(wd17xx_track_r,wd17xx_track_w) 
+  	AM_RANGE( 0x1B, 0x1B) AM_READWRITE(wd17xx_status_r,wd17xx_command_w) 
+  	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector_disc_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -125,6 +132,24 @@ static const cassette_config vector_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static void vector_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case MESS_DEVINFO_INT_COUNT:					info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case MESS_DEVINFO_PTR_LOAD:						info->load = device_load_vector_floppy; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "fdd"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}	
+}
+
 
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
@@ -135,6 +160,7 @@ static MACHINE_DRIVER_START( vector06 )
   	MDRV_CPU_IO_MAP(vector06_io, 0)
   	MDRV_CPU_VBLANK_INT("main", vector06_interrupt)
 
+	MDRV_MACHINE_START( vector06 )
   	MDRV_MACHINE_RESET( vector06 )
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
@@ -186,6 +212,7 @@ ROM_END
 static SYSTEM_CONFIG_START(vector06)
  	CONFIG_RAM_DEFAULT(64 * 1024)
  	CONFIG_DEVICE(cartslot_device_getinfo)
+ 	CONFIG_DEVICE(vector_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 /* Driver */

@@ -9,11 +9,13 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "devices/cassette.h"
 #include "machine/8255ppi.h"
+#include "machine/wd17xx.h"
+#include "devices/cassette.h"
+#include "devices/basicdsk.h"
 #include "includes/vector06.h"
 
-static int vector06_keyboard_mask;
+UINT8 vector06_keyboard_mask;
 UINT8 vector_color_index;
 UINT8 vector_video_mode;
 
@@ -167,6 +169,45 @@ static TIMER_CALLBACK(reset_check_callback)
 	}
 }
 
+WRITE8_HANDLER(vector_disc_w)
+{
+	wd17xx_set_side (((data & 4) >> 2) ^ 1);
+ 	wd17xx_set_drive(data & 1);					
+}
+
+DEVICE_IMAGE_LOAD( vector_floppy )
+{
+	int size;
+
+	if (! image_has_been_created(image))
+		{
+		size = image_length(image);
+
+		switch (size)
+			{
+			case 820*1024:
+				break;
+			default:
+				return INIT_FAIL;
+			}
+		}
+	else
+		return INIT_FAIL;
+
+	if (device_load_basicdsk_floppy (image) != INIT_PASS)
+		return INIT_FAIL;
+
+	basicdsk_set_geometry (image, 82, 2, 5, 1024, 1, 0, FALSE);	
+	return INIT_PASS;
+}
+
+
+MACHINE_START( vector06 )
+{
+	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
+	wd17xx_set_density (DEN_FM_HI);
+}
+
 MACHINE_RESET( vector06 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
@@ -185,6 +226,8 @@ MACHINE_RESET( vector06 )
 	vector06_keyboard_mask = 0;
 	vector_color_index = 0;
 	vector_video_mode = 0;
-	timer_pulse(ATTOTIME_IN_HZ(10), NULL, 0, reset_check_callback);
-
+	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
+	
+	wd17xx_reset(machine);
+	wd17xx_set_pause_time(0);
 }
