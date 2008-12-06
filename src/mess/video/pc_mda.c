@@ -14,7 +14,14 @@
 #define MDA_CLOCK	16257000
 
 #define MDA_LOG(N,M,A) \
-	if(VERBOSE_MDA>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
+	do { \
+		if(VERBOSE_MDA>=N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
 
 static const unsigned char mda_palette[4][3] =
 {

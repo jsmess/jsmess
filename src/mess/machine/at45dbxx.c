@@ -13,7 +13,7 @@
 #include "at45dbxx.h"
 
 #define LOG_LEVEL  1
-#define _logerror(level,x)  if (LOG_LEVEL > level) logerror x
+#define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
 
 #define FLASH_CMD_52  0x52
 #define FLASH_CMD_57  0x57

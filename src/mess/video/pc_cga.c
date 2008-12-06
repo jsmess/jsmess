@@ -87,7 +87,14 @@
 #define	NTSC_FILTER	0
 
 #define CGA_LOG(N,M,A) \
-	if(VERBOSE_CGA>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
+	do { \
+		if(VERBOSE_CGA>=N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
 
 /***************************************************************************
 

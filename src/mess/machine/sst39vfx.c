@@ -12,7 +12,7 @@
 #include "sst39vfx.h"
 
 #define LOG_LEVEL  1
-#define _logerror(level,x)  if (LOG_LEVEL > level) logerror x
+#define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
 
 typedef struct
 {

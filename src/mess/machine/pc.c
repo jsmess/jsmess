@@ -54,7 +54,14 @@
 #define VERBOSE_PIO 0	/* PIO (keyboard controller) */
 
 #define PIO_LOG(N,M,A) \
-	if(VERBOSE_PIO>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
+	do { \
+		if(VERBOSE_PIO>=N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
 
 static struct {
 	const device_config	*pic8259_master;

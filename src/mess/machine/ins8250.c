@@ -26,7 +26,7 @@ the same problems as the original INS8250.
 INS8250A
 An improved version of the INS8250 using XMOS technology with various functional
 flaws corrected. The INS8250A was used initially in PC clone computers by vendors
-who used “clean” BIOS designs. Because of the corrections in the chip, this part
+who used "clean" BIOS designs. Because of the corrections in the chip, this part
 could not be used with a BIOS compatible with the INS8250 or INS8250B.
 
 INS82C50A
@@ -80,7 +80,11 @@ History:
 
 
 #define LOG(LEVEL,N,M,A)  \
-if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A;
+	do { \
+		if( M ) \
+			logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+		logerror A; \
+	} while (0)
 
 
 /* device types */

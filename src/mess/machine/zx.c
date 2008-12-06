@@ -16,9 +16,9 @@
 #define	DEBUG_ZX81_PORTS	1
 #define DEBUG_ZX81_VSYNC	1
 
-#define LOG_ZX81_IOR(_comment) { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(space->machine->primary_screen), _comment); }
-#define LOG_ZX81_IOW(_comment) { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(space->machine->primary_screen), _comment); }
-#define LOG_ZX81_VSYNC { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", video_screen_get_vpos(machine->primary_screen)); }
+#define LOG_ZX81_IOR(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(space->machine->primary_screen), _comment); } while (0)
+#define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(space->machine->primary_screen), _comment); } while (0)
+#define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", video_screen_get_vpos(space->machine->primary_screen)); } while (0)
 
 static UINT8 zx_tape_bit = 0x80;
 

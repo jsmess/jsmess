@@ -29,7 +29,14 @@
 #endif
 
 #define LOG(N,M,A)	\
-	if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()), (const char*)M ); logerror A; }
+	do { \
+		if(VERBOSE>=N) \
+		{ \
+			if( M ) \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()), (const char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
 
 typedef UINT32 data_t;
 

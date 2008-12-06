@@ -54,7 +54,7 @@
 
 #define	VERBOSE			1
 
-#define	LOG(msg)		{ if (VERBOSE >= 1) logerror msg; }
+#define	LOG(x)		do { if (VERBOSE) logerror x; } while (0)
 
 
 typedef struct _i8275_t i8275_t;

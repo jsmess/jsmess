@@ -31,14 +31,14 @@
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
-	{ \
+	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
 				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
 			logerror A; \
 		} \
-	}
+	} while (0)
 
 /*
  two cpus share 1 memory system, only 1 cpu can run
