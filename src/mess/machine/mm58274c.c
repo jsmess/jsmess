@@ -98,8 +98,8 @@ static attotime interrupt_period_table(int val)
 void mm58274c_init(running_machine *machine, int which, int mode24, int day1)
 {
 	memset(&rtc[which], 0, sizeof(rtc[which]));
-	timer_pulse(ATTOTIME_IN_MSEC(100), NULL, which, increment_rtc);
-	rtc[which].interrupt_timer = timer_alloc(rtc_interrupt_callback, NULL);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(100), NULL, which, increment_rtc);
+	rtc[which].interrupt_timer = timer_alloc(machine, rtc_interrupt_callback, NULL);
 
 	{
 		mame_system_time systime;

@@ -12,7 +12,7 @@
         - Only memory to memory is tested!
 
     TODO:
-		- refactor according to new memory system
+        - refactor according to new memory system
         - implement interrupt support (not used in dkong3 and mario)
         - implement missing features
         - implement more asserts
@@ -411,7 +411,7 @@ WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
 
 	param = (data ? 1 : 0);
 	LOG(("RDY: %d Active High: %d\n", data, READY_ACTIVE_HIGH(z80dma)));
-	timer_call_after_resynch((void *) device, param, z80dma_rdy_write_callback);
+	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
 }
 
 
@@ -449,23 +449,23 @@ static DEVICE_START( z80dma )
 
 	z80dma->intf = device->static_config;
 
-	z80dma->timer = timer_alloc(z80dma_timerproc, (void *) device);
+	z80dma->timer = timer_alloc(device->machine, z80dma_timerproc, (void *) device);
 
-	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs);
-	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs_follow);
+	state_save_register_device_item_array(device, 0, z80dma->regs);
+	state_save_register_device_item_array(device, 0, z80dma->regs_follow);
 
-	state_save_register_item("z80dma", device->tag, 0, z80dma->num_follow);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->cur_follow);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->status);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->dma_enabled);
+	state_save_register_device_item(device, 0, z80dma->num_follow);
+	state_save_register_device_item(device, 0, z80dma->cur_follow);
+	state_save_register_device_item(device, 0, z80dma->status);
+	state_save_register_device_item(device, 0, z80dma->dma_enabled);
 
-	state_save_register_item("z80dma", device->tag, 0, z80dma->addressA);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->addressB);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->count);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->rdy);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->is_read);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->cur_cycle);
-	state_save_register_item("z80dma", device->tag, 0, z80dma->latch);
+	state_save_register_device_item(device, 0, z80dma->addressA);
+	state_save_register_device_item(device, 0, z80dma->addressB);
+	state_save_register_device_item(device, 0, z80dma->count);
+	state_save_register_device_item(device, 0, z80dma->rdy);
+	state_save_register_device_item(device, 0, z80dma->is_read);
+	state_save_register_device_item(device, 0, z80dma->cur_cycle);
+	state_save_register_device_item(device, 0, z80dma->latch);
 
 	return DEVICE_START_OK;
 }

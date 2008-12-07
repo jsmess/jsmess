@@ -21,9 +21,7 @@ enum
 };
 
 // init/exit/reset
-void sst39vfx_init( int type, int cpu_datawidth, int cpu_endianess);
-void sst39vfx_exit( void);
-void sst39vfx_reset( void);
+void sst39vfx_init(running_machine *machine, int type, int cpu_datawidth, int cpu_endianess);
 
 // get base/size
 UINT8* sst39vfx_get_base( void);
@@ -36,8 +34,8 @@ WRITE8_HANDLER( sst39vfx_w );
 */
 
 // load/save
-void sst39vfx_load( mame_file *file);
-void sst39vfx_save( mame_file *file);
+void sst39vfx_load(running_machine *machine, mame_file *file);
+void sst39vfx_save(running_machine *machine, mame_file *file);
 
 // non-volatile ram handler
 /*

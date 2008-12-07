@@ -259,8 +259,8 @@ static TIMER_CALLBACK( jupiter_clear_irq_callback )
 
 static VIDEO_START( jupiter )
 {
-	jupiter_set_irq_timer = timer_alloc( jupiter_set_irq_callback, NULL );
-	jupiter_clear_irq_timer = timer_alloc( jupiter_clear_irq_callback, NULL );
+	jupiter_set_irq_timer = timer_alloc(machine,  jupiter_set_irq_callback, NULL );
+	jupiter_clear_irq_timer = timer_alloc(machine,  jupiter_clear_irq_callback, NULL );
 
 	timer_adjust_periodic( jupiter_set_irq_timer,
 		video_screen_get_time_until_pos( machine->primary_screen, 31*8, 0 ),

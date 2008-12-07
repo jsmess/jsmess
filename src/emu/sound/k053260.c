@@ -64,8 +64,7 @@ static void InitDeltaTable( struct k053260_chip_def *ic, int rate, int clock ) {
 	}
 }
 
-static SND_RESET( k053260 ) {
-	struct k053260_chip_def *ic = token;
+static void k053260_reset(struct k053260_chip_def *ic) {
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
@@ -82,6 +81,11 @@ static SND_RESET( k053260 ) {
 		ic->channels[i].ppcm_data = 0;
 	}
 }
+
+static SND_RESET( k053260 ) {
+	k053260_reset(device->token);
+}
+
 
 INLINE int limit( int val, int max, int min ) {
 	if ( val > max )
@@ -208,10 +212,15 @@ static SND_START( k053260 )
 	ic->intf = (config != NULL) ? config : &defintrf;
 
 	ic->mode = 0;
-	ic->rom = memory_region(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag);
-	ic->rom_size = memory_region_length(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag) - 1;
+	ic->rom = device->region;
+	ic->rom_size = device->regionbytes;
+	if (ic->intf->rgnoverride != NULL)
+	{
+		ic->rom = memory_region(device->machine, ic->intf->rgnoverride);
+		ic->rom_size = memory_region_length(device->machine, ic->intf->rgnoverride);
+	}
 
-	SND_RESET_NAME( k053260 )( ic );
+	k053260_reset( ic );
 
 	for ( i = 0; i < 0x30; i++ )
 		ic->regs[i] = 0;
@@ -224,7 +233,7 @@ static SND_START( k053260 )
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
-		timer_pulse( attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
+		timer_pulse( Machine, attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
 
     return ic;
 }

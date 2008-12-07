@@ -273,14 +273,14 @@ const z80sio_interface nflfoot_sio_intf =
 
 MACHINE_START( mcr )
 {
-	state_save_register_global(mcr_cocktail_flip);
+	state_save_register_global(machine, mcr_cocktail_flip);
 }
 
 
 MACHINE_START( nflfoot )
 {
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = timer_alloc(ipu_watchdog_reset, NULL);
+	ipu_watchdog_timer = timer_alloc(machine, ipu_watchdog_reset, NULL);
 }
 
 
@@ -309,23 +309,23 @@ MACHINE_START( mcr68 )
 	{
 		struct counter_state *m6840 = &m6840_state[i];
 
-		m6840->timer = timer_alloc(counter_fired_callback, NULL);
+		m6840->timer = timer_alloc(machine, counter_fired_callback, NULL);
 
-		state_save_register_item("m6840", NULL, i, m6840->control);
-		state_save_register_item("m6840", NULL, i, m6840->latch);
-		state_save_register_item("m6840", NULL, i, m6840->count);
-		state_save_register_item("m6840", NULL, i, m6840->timer_active);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->control);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->latch);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->count);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->timer_active);
 	}
 
-	state_save_register_global(m6840_status);
-	state_save_register_global(m6840_status_read_since_int);
-	state_save_register_global(m6840_msb_buffer);
-	state_save_register_global(m6840_lsb_buffer);
-	state_save_register_global(m6840_irq_state);
-	state_save_register_global(v493_irq_state);
-	state_save_register_global(zwackery_sound_data);
+	state_save_register_global(machine, m6840_status);
+	state_save_register_global(machine, m6840_status_read_since_int);
+	state_save_register_global(machine, m6840_msb_buffer);
+	state_save_register_global(machine, m6840_lsb_buffer);
+	state_save_register_global(machine, m6840_irq_state);
+	state_save_register_global(machine, v493_irq_state);
+	state_save_register_global(machine, zwackery_sound_data);
 
-	state_save_register_global(mcr_cocktail_flip);
+	state_save_register_global(machine, mcr_cocktail_flip);
 }
 
 
@@ -453,7 +453,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	timer_set(attotime_sub(ATTOTIME_IN_HZ(30), mcr68_timing_factor), NULL, 0, v493_callback);
+	timer_set(device->machine, attotime_sub(ATTOTIME_IN_HZ(30), mcr68_timing_factor), NULL, 0, v493_callback);
 }
 
 
@@ -482,7 +482,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
 	update_mcr68_interrupts(machine);
-	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 0, mcr68_493_off_callback);
+	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, mcr68_493_off_callback);
 	logerror("--- (INT1) ---\n");
 }
 
@@ -606,7 +606,7 @@ static TIMER_CALLBACK( zwackery_493_callback )
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	pia_2_ca1_w(space, 0, 1);
-	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
+	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
 }
 
 

@@ -845,13 +845,13 @@ static TIMER_CALLBACK( pmd_reset )
 static DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 {
 	if (input_port_read(space->machine, "RESET") & 0x01) 
-		timer_set(ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
+		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
 	return address;
 }
 
 static void pmd85_common_driver_init (running_machine *machine)
 {
-	pmd85_cassette_timer = timer_alloc(pmd85_cassette_timer_callback, NULL);
+	pmd85_cassette_timer = timer_alloc(machine, pmd85_cassette_timer_callback, NULL);
 	timer_adjust_periodic(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 
 	serial_connection_init(&pmd85_cassette_serial_connection);
@@ -931,7 +931,7 @@ MACHINE_RESET( pmd85 )
 	pmd85_startup_mem_map = 1;
 	pmd85_update_memory(machine);
 
-	timer_set( attotime_zero, NULL, 0, setup_pit8253_gates );
+	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
 
 	memory_set_direct_update_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);	
 }

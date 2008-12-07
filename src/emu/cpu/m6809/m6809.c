@@ -358,16 +358,12 @@ static void check_irq_lines(m68_state_t *m68_state)
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static CPU_GET_CONTEXT( m6809 )
-{
-}
+static CPU_GET_CONTEXT( m6809 ) { }
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static CPU_SET_CONTEXT( m6809 )
-{
-}
+static CPU_SET_CONTEXT( m6809 ) { }
 
 
 /****************************************************************************/
@@ -392,18 +388,18 @@ static CPU_INIT( m6809 )
 
 	/* setup regtable */
 
-	state_save_register_item("m6809", device->tag, 0, PC);
-	state_save_register_item("m6809", device->tag, 0, PPC);
-	state_save_register_item("m6809", device->tag, 0, D);
-	state_save_register_item("m6809", device->tag, 0, DP);
-	state_save_register_item("m6809", device->tag, 0, U);
-	state_save_register_item("m6809", device->tag, 0, S);
-	state_save_register_item("m6809", device->tag, 0, X);
-	state_save_register_item("m6809", device->tag, 0, Y);
-	state_save_register_item("m6809", device->tag, 0, CC);
-	state_save_register_item_array("m6809", device->tag, 0, m68_state->irq_state);
-	state_save_register_item("m6809", device->tag, 0, m68_state->int_state);
-	state_save_register_item("m6809", device->tag, 0, m68_state->nmi_state);
+	state_save_register_device_item(device, 0, PC);
+	state_save_register_device_item(device, 0, PPC);
+	state_save_register_device_item(device, 0, D);
+	state_save_register_device_item(device, 0, DP);
+	state_save_register_device_item(device, 0, U);
+	state_save_register_device_item(device, 0, S);
+	state_save_register_device_item(device, 0, X);
+	state_save_register_device_item(device, 0, Y);
+	state_save_register_device_item(device, 0, CC);
+	state_save_register_device_item_array(device, 0, m68_state->irq_state);
+	state_save_register_device_item(device, 0, m68_state->int_state);
+	state_save_register_device_item(device, 0, m68_state->nmi_state);
 
 }
 
@@ -442,7 +438,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	{
 		if (m68_state->nmi_state == state) return;
 		m68_state->nmi_state = state;
-		LOG(("M6809#%d set_irq_line (NMI) %d\n", cpunum_get_active(), state));
+		LOG(("M6809 '%s' set_irq_line (NMI) %d\n", m68_state->device->tag, state));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
@@ -473,7 +469,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	}
 	else if (irqline < 2)
 	{
-	    LOG(("M6809#%d set_irq_line %d, %d\n", cpunum_get_active(), irqline, state));
+	    LOG(("M6809 '%s' set_irq_line %d, %d\n", m68_state->device->tag, irqline, state));
 		m68_state->irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
 		check_irq_lines(m68_state);
@@ -1114,7 +1110,7 @@ CPU_GET_INFO( m6809 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68_state_t);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

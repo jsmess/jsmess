@@ -707,11 +707,11 @@ static void reset_reset(running_machine *machine)
 	prev_resetcontrol = resetcontrol;
 }
 
-static void resetcontrol_w(UINT8 data)
+static void resetcontrol_w(const address_space *space, UINT8 data)
 {
 	resetcontrol = data;
-	logerror("Reset control %02x (%x:%x)\n", resetcontrol, cpunum_get_active(), cpu_get_pc(Machine->activecpu));
-	reset_reset(Machine);
+	logerror("Reset control %02x ('%s':%x)\n", resetcontrol, space->cpu->tag, cpu_get_pc(space->cpu));
+	reset_reset(space->machine);
 }
 
 
@@ -786,7 +786,7 @@ static WRITE16_HANDLER( mlatch_w )
 		int i;
 		UINT8 mxor = 0;
 		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%d:%x)\n", cpunum_get_active(), cpu_get_pc(space->cpu));
+			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space->cpu->tag, cpu_get_pc(space->cpu));
 			return;
 		}
 
@@ -797,9 +797,9 @@ static WRITE16_HANDLER( mlatch_w )
 				if(mlatch & (1<<i))
 					mxor |= 1 << mlatch_table[i];
 			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%d:%x)\n", data & 0xff, mxor, mlatch, cpunum_get_active(), cpu_get_pc(space->cpu));
+			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space->cpu->tag, cpu_get_pc(space->cpu));
 		} else {
-			logerror("Magic latch reset (%d:%x)\n", cpunum_get_active(), cpu_get_pc(space->cpu));
+			logerror("Magic latch reset (%s:%x)\n", space->cpu->tag, cpu_get_pc(space->cpu));
 			mlatch = 0x00;
 		}
 	}
@@ -839,7 +839,7 @@ static TIMER_CALLBACK( irq_timer_clear_cb )
 	cpu_set_input_line(machine->cpu[1], IRQ_SPRITE+1, CLEAR_LINE);
 }
 
-static void irq_init(void)
+static void irq_init(running_machine *machine)
 {
 	irq_timera = 0;
 	irq_timerb = 0;
@@ -849,8 +849,8 @@ static void irq_init(void)
 	irq_timer_pend1 = 0;
 	irq_vblank = 0;
 	irq_sprite = 0;
-	irq_timer = timer_alloc(irq_timer_cb, NULL);
-	irq_timer_clear = timer_alloc(irq_timer_clear_cb, NULL);
+	irq_timer = timer_alloc(machine, irq_timer_cb, NULL);
+	irq_timer_clear = timer_alloc(machine, irq_timer_clear_cb, NULL);
 }
 
 static void irq_timer_reset(void)
@@ -1125,7 +1125,7 @@ static MACHINE_RESET( system24 )
 	fdc_init();
 	curbank = 0;
 	reset_bank(machine);
-	irq_init();
+	irq_init(machine);
 	mlatch = 0x00;
 }
 

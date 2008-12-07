@@ -49,7 +49,7 @@ static TIMER_CALLBACK( lviv_reset )
 static DIRECT_UPDATE_HANDLER(lviv_directoverride)
 {
 	if (input_port_read(space->machine, "RESET") & 0x01)
-		timer_set(ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
+		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
 	return address;
 }
 
@@ -239,7 +239,7 @@ MACHINE_RESET( lviv )
 	memory_set_bankptr(machine,3, memory_region(machine, "main") + 0x010000);
 	memory_set_bankptr(machine,4, memory_region(machine, "main") + 0x010000);
 
-	/*timer_pulse(TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
+	/*timer_pulse(machine, TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
 
 	/*memset(mess_ram, 0, sizeof(unsigned char)*0xffff);*/
 }

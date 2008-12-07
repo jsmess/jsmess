@@ -38,16 +38,16 @@ VIDEO_START( changela )
 	tree0_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	tree1_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	changela_scanline_timer = timer_alloc(changela_scanline_callback, NULL);
+	changela_scanline_timer = timer_alloc(machine, changela_scanline_callback, NULL);
 	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 30, 0), 30);
 
-	state_save_register_global(slopeROM_bank);
-	state_save_register_global(tree_en);
-	state_save_register_global(horizon);
-	state_save_register_global(mem_dev_selected);
+	state_save_register_global(machine, slopeROM_bank);
+	state_save_register_global(machine, tree_en);
+	state_save_register_global(machine, horizon);
+	state_save_register_global(machine, mem_dev_selected);
 
-	state_save_register_global_pointer(memory_devices, 4*0x800);
-	state_save_register_global_pointer(tree_ram, 2*0x20);
+	state_save_register_global_pointer(machine, memory_devices, 4*0x800);
+	state_save_register_global_pointer(machine, tree_ram, 2*0x20);
 }
 
 /**************************************************************************
@@ -663,10 +663,10 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 	/* clear the current scanline first */
 	rectangle rect = { 0, 255, sy, sy };
-	fillbitmap(river_bitmap, 0x00, &rect);
-	fillbitmap(obj0_bitmap, 0x00, &rect);
-	fillbitmap(tree0_bitmap, 0x00, &rect);
-	fillbitmap(tree1_bitmap, 0x00, &rect);
+	bitmap_fill(river_bitmap, &rect, 0x00);
+	bitmap_fill(obj0_bitmap, &rect, 0x00);
+	bitmap_fill(tree0_bitmap, &rect, 0x00);
+	bitmap_fill(tree1_bitmap, &rect, 0x00);
 
 	draw_river(machine, river_bitmap, sy);
 	draw_obj0(machine, obj0_bitmap, sy);

@@ -21,6 +21,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "ncr5380.h"
 
 #define VERBOSE	(0)
@@ -375,13 +376,13 @@ void ncr5380_init( const struct NCR5380interface *interface )
 		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
 	}
 
-	state_save_register_item_array("ncr5380", NULL, 0, n5380_Registers);
-	state_save_register_item_array("ncr5380", NULL, 0, n5380_Command);
-	state_save_register_item_array("ncr5380", NULL, 0, n5380_Data);
-	state_save_register_item("ncr5380", NULL, 0, last_id);
-	state_save_register_item("ncr5380", NULL, 0, cmd_ptr);
-	state_save_register_item("ncr5380", NULL, 0, d_ptr);
-	state_save_register_item("ncr5380", NULL, 0, d_limit);
+	state_save_register_item_array(Machine, "ncr5380", NULL, 0, n5380_Registers);
+	state_save_register_item_array(Machine, "ncr5380", NULL, 0, n5380_Command);
+	state_save_register_item_array(Machine, "ncr5380", NULL, 0, n5380_Data);
+	state_save_register_item(Machine, "ncr5380", NULL, 0, last_id);
+	state_save_register_item(Machine, "ncr5380", NULL, 0, cmd_ptr);
+	state_save_register_item(Machine, "ncr5380", NULL, 0, d_ptr);
+	state_save_register_item(Machine, "ncr5380", NULL, 0, d_limit);
 }
 
 void ncr5380_exit( const struct NCR5380interface *interface )

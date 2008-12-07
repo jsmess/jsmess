@@ -18,7 +18,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE		1
+#define VERBOSE		0
 
 #define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
 
@@ -561,7 +561,7 @@ WRITE8_DEVICE_HANDLER( z80sio_set_cts )
 {
 	/* operate deferred */
 	void *ptr = (void *)device;
-	timer_call_after_resynch(ptr, (SIO_RR0_CTS << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
+	timer_call_after_resynch(device->machine, ptr, (SIO_RR0_CTS << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
 }
 
 
@@ -574,7 +574,7 @@ WRITE8_DEVICE_HANDLER( z80sio_set_dcd )
 {
 	/* operate deferred */
 	void *ptr = (void *)device;
-	timer_call_after_resynch(ptr, (SIO_RR0_DCD << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
+	timer_call_after_resynch(device->machine, ptr, (SIO_RR0_DCD << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
 }
 
 
@@ -786,22 +786,22 @@ static DEVICE_START( z80sio )
 	const z80sio_interface *intf = device->static_config;
 	astring *tempstring = astring_alloc();
 	z80sio *sio = get_safe_token(device);
+	const device_config *cpu = NULL;
 	void *ptr = (void *)device;
-	int cpunum = -1;
 
 	if (intf->cpu != NULL)
 	{
-		cpunum = mame_find_cpu_index(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
-		if (cpunum == -1)
+		cpu = cputag_get_cpu(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
+		if (cpu == NULL)
 			fatalerror("Z80SIO:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
 	}
-	if (cpunum != -1)
-		sio->clock = device->machine->config->cpu[cpunum].clock;
+	if (cpu != NULL)
+		sio->clock = cpu_get_clock(cpu);
 	else
 		sio->clock = intf->baseclock;
 
-	sio->chan[0].receive_timer = timer_alloc(serial_callback, ptr);
-	sio->chan[1].receive_timer = timer_alloc(serial_callback, ptr);
+	sio->chan[0].receive_timer = timer_alloc(device->machine, serial_callback, ptr);
+	sio->chan[1].receive_timer = timer_alloc(device->machine, serial_callback, ptr);
 
 	sio->irq_cb = intf->irq_cb;
 	sio->dtr_changed_cb = intf->dtr_changed_cb;

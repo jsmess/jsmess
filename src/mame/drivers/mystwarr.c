@@ -863,8 +863,8 @@ static MACHINE_START( mystwarr )
 
 	mw_irq_control = 0;
 
-	state_save_register_global(mw_irq_control);
-	state_save_register_global(cur_sound_region);
+	state_save_register_global(machine, mw_irq_control);
+	state_save_register_global(machine, cur_sound_region);
 	state_save_register_postload(machine, mystwarr_postload, NULL);
 }
 
@@ -1546,7 +1546,7 @@ ROM_START( viostrmu )
 	/* main program */
 	ROM_REGION( 0x200000, "main", 0)
 	ROM_LOAD16_BYTE( "168uac01.15h", 0x000001, 0x80000, CRC(49853530) SHA1(dc8fa1a929848949cb0ad02f5a2a8a5f820fd6c1) )
-	ROM_LOAD16_BYTE( "168uac01.15h", 0x000000, 0x80000, CRC(055ca6fe) SHA1(31565ea515120555f94c4358b8e1a719c7d092d7) )
+	ROM_LOAD16_BYTE( "168uac02.15f", 0x000000, 0x80000, CRC(055ca6fe) SHA1(31565ea515120555f94c4358b8e1a719c7d092d7) )
 
 	/* sound program */
 	ROM_REGION( 0x030000, "sound", 0 )

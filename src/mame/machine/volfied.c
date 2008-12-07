@@ -393,12 +393,12 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (current_cmd >= 0x1 && current_cmd < 0x12)
 			{
-				timer_set(ATTOTIME_IN_CYCLES(122242,0), NULL, 0, volfied_timer_callback);
+				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,122242), NULL, 0, volfied_timer_callback);
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (current_cmd >= 0x81 && current_cmd < 0x92)
 			{
-				timer_set(ATTOTIME_IN_CYCLES(105500,0), NULL, 0, volfied_timer_callback);
+				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,105500), NULL, 0, volfied_timer_callback);
 			}
 			else
 			{
@@ -484,13 +484,13 @@ READ16_HANDLER( volfied_cchip_ram_r )
  *
  *************************************/
 
-void volfied_cchip_init(void)
+void volfied_cchip_init(running_machine *machine)
 {
 	cchip_ram=auto_malloc(0x400 * 8);
 
-	state_save_register_global(current_bank);
-	state_save_register_global(current_cmd);
-	state_save_register_global(current_flag);
-	state_save_register_global(cc_port);
-	state_save_register_global_pointer(cchip_ram, 0x400 * 8);
+	state_save_register_global(machine, current_bank);
+	state_save_register_global(machine, current_cmd);
+	state_save_register_global(machine, current_flag);
+	state_save_register_global(machine, cc_port);
+	state_save_register_global_pointer(machine, cchip_ram, 0x400 * 8);
 }

@@ -1317,6 +1317,27 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 
 /***************************************************************************
+    MISCELLANEOUS UTILITIES
+***************************************************************************/
+
+/*-------------------------------------------------
+    memory_address_physical - return the physical
+    address corresponding to the given logical
+    address
+-------------------------------------------------*/
+
+int memory_address_physical(const address_space *space, int intention, offs_t *address)
+{
+	cpu_class_header *classheader = space->cpu->classtoken;
+	if (classheader->translate != NULL)
+		return (*classheader->translate)(space->cpu, space->spacenum, intention, address);
+	else
+		return TRUE;
+}
+
+
+
+/***************************************************************************
     DEBUGGER HELPERS
 ***************************************************************************/
 
@@ -1473,24 +1494,36 @@ static void memory_init_spaces(running_machine *machine)
 				if (cputype_get_addrbus_width(cputype, spacenum) > 0)
 				{
 					address_space *space = malloc_or_die(sizeof(*space));
-					int accessorindex;
+					int logbits = cputype_get_logaddr_width(cputype, spacenum);
+					int ashift = cputype_get_addrbus_shift(cputype, spacenum);
+					int abits = cputype_get_addrbus_width(cputype, spacenum);
+					int dbits = cputype_get_databus_width(cputype, spacenum);
+					int endianness = cputype_get_endianness(cputype);
+					int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
 					int entrynum;
+
+					/* if logbits is 0, revert to abits */
+					if (logbits == 0)
+						logbits = abits;
 
 					/* determine the address and data bits */
 					memset(space, 0, sizeof(*space));
 					space->machine = machine;
 					space->cpu = machine->cpu[cpunum];
-					space->spacenum = spacenum;
 					space->name = address_space_names[spacenum];
-					space->endianness = cputype_get_endianness(cputype);
-					space->ashift = cputype_get_addrbus_shift(cputype, spacenum);
-					space->abits = cputype_get_addrbus_width(cputype, spacenum);
-					space->dbits = cputype_get_databus_width(cputype, spacenum);
-					space->addrmask = 0xffffffffUL >> (32 - space->abits);
-					space->bytemask = ADDR2BYTE_END(space, space->addrmask);
-					accessorindex = (space->dbits == 8) ? 0 : (space->dbits == 16) ? 1 : (space->dbits == 32) ? 2 : 3;
-					space->accessors = memory_accessors[accessorindex][(space->endianness == CPU_IS_LE) ? 0 : 1];
-					space->map = NULL;
+					space->accessors = memory_accessors[accessorindex][(endianness == ENDIANNESS_LITTLE) ? 0 : 1];
+					space->addrmask = 0xffffffffUL >> (32 - abits);
+					space->bytemask = (ashift < 0) ? ((space->addrmask << -ashift) | ((1 << -ashift) - 1)) : (space->addrmask >> ashift);
+					space->logaddrmask = 0xffffffffUL >> (32 - logbits);
+					space->logbytemask = (ashift < 0) ? ((space->logaddrmask << -ashift) | ((1 << -ashift) - 1)) : (space->logaddrmask >> ashift);
+					space->spacenum = spacenum;
+					space->endianness = endianness;
+					space->ashift = ashift;
+					space->pageshift = cputype_get_page_shift(cputype, spacenum);
+					space->abits = abits;
+					space->dbits = dbits;
+					space->addrchars = (abits + 3) / 4;
+					space->logaddrchars = (logbits + 3) / 4;
 					space->log_unmap = TRUE;
 
 					/* allocate subtable information; we malloc this manually because it will be realloc'ed */
@@ -1692,7 +1725,7 @@ static void memory_init_populate(running_machine *machine)
 					{
 						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtype, entry->read_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
+							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->read_devtype), entry->read_devtag);
 					}
 					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
 				}
@@ -1706,7 +1739,7 @@ static void memory_init_populate(running_machine *machine)
 					{
 						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtype, entry->write_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
+							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->write_devtype), entry->write_devtag);
 					}
 					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
 				}
@@ -2299,8 +2332,8 @@ static void bank_assign_static(int banknum, const address_space *space, read_or_
 	if (!bank->used)
 	{
 		/* if we're allowed to, wire up state saving for the entry */
-		if (state_save_registration_allowed())
-			state_save_register_item("memory", NULL, banknum, bank->curentry);
+		if (state_save_registration_allowed(space->machine))
+			state_save_register_item(space->machine, "memory", NULL, banknum, bank->curentry);
 
 		/* fill in information about the bank */
 		bank->used = TRUE;
@@ -2459,7 +2492,7 @@ static void table_compute_subhandler(handler_data **table, UINT8 entry, read_or_
 	assert_always(hdata->subunits > 0, "table_compute_subhandler called with no bytes specified in mask");
 
 	/* then fill in the shifts based on the endianness */
-	if (spaceendian == CPU_IS_LE)
+	if (spaceendian == ENDIANNESS_LITTLE)
 	{
 		UINT8 *unitshift = &hdata->subshift[0];
 		for (unitnum = 0; unitnum < maxunits; unitnum++)
@@ -2858,7 +2891,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 		char name[256];
 
 		sprintf(name, "%08x-%08x", bytestart, byteend);
-		state_save_register_memory("memory", space->cpu->tag, space->spacenum, name, memory, bytes_per_element, (UINT32)(byteend - bytestart + 1) / bytes_per_element);
+		state_save_register_memory(space->machine, "memory", space->cpu->tag, space->spacenum, name, memory, bytes_per_element, (UINT32)(byteend - bytestart + 1) / bytes_per_element);
 	}
 
 	/* fill in the tracking block */
@@ -2931,40 +2964,40 @@ static address_map_entry *block_assign_intersecting(address_space *space, offs_t
 
 static READ8_HANDLER( unmap_read8 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte read from %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset));
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte read from %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset));
 	return space->unmap;
 }
 static READ16_HANDLER( unmap_read16 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word read from %08X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*2), mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word read from %08X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*2), mem_mask);
 	return space->unmap;
 }
 static READ32_HANDLER( unmap_read32 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword read from %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*4), mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword read from %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*4), mem_mask);
 	return space->unmap;
 }
 static READ64_HANDLER( unmap_read64 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword read from %08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword read from %08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 	return space->unmap;
 }
 
 static WRITE8_HANDLER( unmap_write8 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte write to %08X = %02X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset), data);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte write to %08X = %02X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset), data);
 }
 static WRITE16_HANDLER( unmap_write16 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word write to %08X = %04X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*2), data, mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word write to %08X = %04X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*2), data, mem_mask);
 }
 static WRITE32_HANDLER( unmap_write32 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword write to %08X = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*4), data, mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword write to %08X = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*4), data, mem_mask);
 }
 static WRITE64_HANDLER( unmap_write64 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 }
 
 
@@ -3742,8 +3775,8 @@ UINT64 memory_read_qword_masked_8le(const address_space *space, offs_t address, 
 
 UINT64 memory_read_qword_8be(const address_space *space, offs_t address)
 {
-	UINT64 result = (UINT64)memory_read_dword_8le(space, address + 0) << 32;
-	return result | ((UINT64)memory_read_dword_8le(space, address + 4) << 0);
+	UINT64 result = (UINT64)memory_read_dword_8be(space, address + 0) << 32;
+	return result | ((UINT64)memory_read_dword_8be(space, address + 4) << 0);
 }
 
 UINT64 memory_read_qword_masked_8be(const address_space *space, offs_t address, UINT64 mask)
@@ -3924,8 +3957,8 @@ UINT64 memory_read_qword_masked_16le(const address_space *space, offs_t address,
 
 UINT64 memory_read_qword_16be(const address_space *space, offs_t address)
 {
-	UINT64 result = (UINT64)memory_read_dword_16le(space, address + 0) << 32;
-	return result | ((UINT64)memory_read_dword_16le(space, address + 4) << 0);
+	UINT64 result = (UINT64)memory_read_dword_16be(space, address + 0) << 32;
+	return result | ((UINT64)memory_read_dword_16be(space, address + 4) << 0);
 }
 
 UINT64 memory_read_qword_masked_16be(const address_space *space, offs_t address, UINT64 mask)
@@ -4100,8 +4133,8 @@ UINT64 memory_read_qword_masked_32le(const address_space *space, offs_t address,
 
 UINT64 memory_read_qword_32be(const address_space *space, offs_t address)
 {
-	UINT64 result = (UINT64)memory_read_dword_32le(space, address + 0) << 32;
-	return result | ((UINT64)memory_read_dword_32le(space, address + 4) << 0);
+	UINT64 result = (UINT64)memory_read_dword_32be(space, address + 0) << 32;
+	return result | ((UINT64)memory_read_dword_32be(space, address + 4) << 0);
 }
 
 UINT64 memory_read_qword_masked_32be(const address_space *space, offs_t address, UINT64 mask)

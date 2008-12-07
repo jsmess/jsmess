@@ -1077,7 +1077,7 @@ MACHINE_RESET( bebox )
 	bebox_devices.dma8237_1 = NULL;
 	bebox_devices.dma8237_2 = NULL;
 
-	timer_set( attotime_zero, NULL, 0, bebox_get_devices );
+	timer_set(machine,  attotime_zero, NULL, 0, bebox_get_devices );
 
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);

@@ -27,7 +27,7 @@
 		if(VERBOSE>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -239,6 +239,7 @@ VIDEO_START( vdc8563 )
 
 WRITE8_HANDLER ( vdc8563_port_w )
 {
+	running_machine *machine = space->machine;
 	UINT8 i;
 
 	if (offset & 1)
@@ -328,8 +329,9 @@ WRITE8_HANDLER ( vdc8563_port_w )
 	}
 }
 
- READ8_HANDLER ( vdc8563_port_r )
+READ8_HANDLER ( vdc8563_port_r )
 {
+	running_machine *machine = space->machine;
 	int val;
 
 	val = 0xff;
@@ -384,10 +386,10 @@ static int vdc8563_clocks_in_frame(void)
 	}
 }
 
-static void vdc8563_time(void)
+static void vdc8563_time(running_machine *machine)
 {
 	double neu, ftime;
-	neu=attotime_to_double(timer_get_time());
+	neu=attotime_to_double(timer_get_time(machine));
 
 	if (vdc8563_clocks_in_frame()==0.0) return;
 	ftime=16*vdc8563_clocks_in_frame()/2000000.0;
@@ -550,7 +552,7 @@ VIDEO_UPDATE( vdc8563 )
 	int full_refresh = 1;
 
 	if (!vdc.rastering) return 0;
-	vdc8563_time();
+	vdc8563_time(screen->machine);
 
 	full_refresh|=vdc.changed;
 	if (GRAPHIC)

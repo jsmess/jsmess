@@ -80,7 +80,7 @@ static void machine_reset_common(running_machine *machine, int line)
 	TTL7474_preset_w(1, 0);
 
 	/* start a timer to generate interrupts */
-	int_timer = timer_alloc(interrupt_timer, NULL);
+	int_timer = timer_alloc(machine, interrupt_timer, NULL);
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
@@ -400,7 +400,7 @@ DRIVER_INIT( 4in1 )
 
 	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 
-	state_save_register_global(_4in1_bank);
+	state_save_register_global(machine, _4in1_bank);
 }
 
 INTERRUPT_GEN( hunchbks_vh_interrupt )

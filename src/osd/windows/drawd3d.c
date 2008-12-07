@@ -508,7 +508,7 @@ static int drawd3d_window_init(win_window_info *window)
 	d3d->vector_bitmap = render_load_png(NULL, "vector.png", NULL, NULL);
 	if (d3d->vector_bitmap != NULL)
 	{
-		fillbitmap(d3d->vector_bitmap, MAKE_ARGB(0xff,0xff,0xff,0xff), NULL);
+		bitmap_fill(d3d->vector_bitmap, NULL, MAKE_ARGB(0xff,0xff,0xff,0xff));
 		d3d->vector_bitmap = render_load_png(NULL, "vector.png", d3d->vector_bitmap, NULL);
 	}
 
@@ -2146,20 +2146,11 @@ INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, co
 	else
 	{
 		if (borderpix)
-		{
-			UINT16 srcpix = *src;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
-		}
+			*dst++ = *src;
 		for (x = 0; x < width; x++)
-		{
-			UINT16 srcpix = *src++;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
-		}
+			*dst++ = *src++;
 		if (borderpix)
-		{
-			UINT16 srcpix = *--src;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
-		}
+			*dst++ = *--src;
 	}
 }
 

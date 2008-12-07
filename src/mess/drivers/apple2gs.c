@@ -269,7 +269,7 @@ static void apple2gs_floppy525_getinfo(const mess_device_class *devclass, UINT32
 
 static DRIVER_INIT(apple2gs)
 {
-	state_save_register_global_array(apple2gs_docram);
+	state_save_register_global_array(machine, apple2gs_docram);
 }
 
 /* ----------------------------------------------------------------------- */

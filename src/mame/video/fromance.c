@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_nekkyoku_fg_tile_info ) { get_nekkyoku_tile_info(machi
  *
  *************************************/
 
-static void init_common(void)
+static void init_common(running_machine *machine)
 {
 	flipscreen_old = -1;
 
@@ -88,26 +88,26 @@ static void init_common(void)
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
 	/* reset the timer */
-	crtc_timer = timer_alloc(crtc_interrupt_gen, NULL);
+	crtc_timer = timer_alloc(machine, crtc_interrupt_gen, NULL);
 
 	scrollx_ofs = 0x159;
 	scrolly_ofs = 0x10;
 
 	/* state save */
-	state_save_register_global(selected_videoram);
-	state_save_register_global_pointer(local_videoram[0], 0x1000 * 3);
-	state_save_register_global_pointer(local_videoram[1], 0x1000 * 3);
-	state_save_register_global(selected_paletteram);
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
-	state_save_register_global(gfxreg);
-	state_save_register_global(flipscreen);
-	state_save_register_global(flipscreen_old);
-	state_save_register_global(scrollx_ofs);
-	state_save_register_global(scrolly_ofs);
-	state_save_register_global(crtc_register);
-	state_save_register_global_array(crtc_data);
-	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
+	state_save_register_global(machine, selected_videoram);
+	state_save_register_global_pointer(machine, local_videoram[0], 0x1000 * 3);
+	state_save_register_global_pointer(machine, local_videoram[1], 0x1000 * 3);
+	state_save_register_global(machine, selected_paletteram);
+	state_save_register_global_array(machine, scrollx);
+	state_save_register_global_array(machine, scrolly);
+	state_save_register_global(machine, gfxreg);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, flipscreen_old);
+	state_save_register_global(machine, scrollx_ofs);
+	state_save_register_global(machine, scrolly_ofs);
+	state_save_register_global(machine, crtc_register);
+	state_save_register_global_array(machine, crtc_data);
+	state_save_register_global_pointer(machine, local_paletteram, 0x800 * 2);
 }
 
 VIDEO_START( fromance )
@@ -116,7 +116,7 @@ VIDEO_START( fromance )
 	bg_tilemap = tilemap_create(get_fromance_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
 	fg_tilemap = tilemap_create(get_fromance_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
-	init_common();
+	init_common(machine);
 }
 
 VIDEO_START( nekkyoku )
@@ -125,7 +125,7 @@ VIDEO_START( nekkyoku )
 	bg_tilemap = tilemap_create(get_nekkyoku_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
 	fg_tilemap = tilemap_create(get_nekkyoku_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
-	init_common();
+	init_common(machine);
 }
 
 VIDEO_START( pipedrm )

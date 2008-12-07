@@ -82,7 +82,7 @@ static void mess_init_6buttons_pad(void)
 
 	for (i = 0; i < 3; i++)
 	{
-		mess_io_timeout[i] = timer_alloc(mess_io_timeout_timer_callback, (void*)(FPTR)i);
+		mess_io_timeout[i] = timer_alloc(machine, mess_io_timeout_timer_callback, (void*)(FPTR)i);
 		mess_io_stage[i] = -1;
 	}
 }
@@ -209,7 +209,7 @@ static void mess_md_io_write_data_port(int portnum, UINT16 data)
 			if (((megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
 			{
 				mess_io_stage[portnum]++;
-				timer_adjust_oneshot(mess_io_timeout[portnum], ATTOTIME_IN_CYCLES(8192,0), 0);
+				timer_adjust_oneshot(mess_io_timeout[portnum], cpu_clocks_to_attotime(machine->cpu[0], 8192), 0);
 			}
 
 		}

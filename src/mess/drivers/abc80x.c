@@ -1106,9 +1106,9 @@ static MACHINE_START( abc800 )
 
 	/* register for state saving */
 
-	state_save_register_global(state->fetch_charram);
-	state_save_register_global(state->abc77_txd);
-	state_save_register_global(state->pling);
+	state_save_register_global(machine, state->fetch_charram);
+	state_save_register_global(machine, state->abc77_txd);
+	state_save_register_global(machine, state->pling);
 }
 
 static MACHINE_RESET( abc800 )
@@ -1139,9 +1139,9 @@ static MACHINE_START( abc802 )
 
 	/* register for state saving */
 
-	state_save_register_global(state->lrs);
-	state_save_register_global(state->abc77_txd);
-	state_save_register_global(state->pling);
+	state_save_register_global(machine, state->lrs);
+	state_save_register_global(machine, state->abc77_txd);
+	state_save_register_global(machine, state->pling);
 }
 
 static MACHINE_RESET( abc802 )
@@ -1199,11 +1199,11 @@ static MACHINE_START( abc806 )
 
 	/* register for state saving */
 
-	state_save_register_global(state->abc77_txd);
-	state_save_register_global(state->keydtr);
-	state_save_register_global(state->eme);
-	state_save_register_global(state->fetch_charram);
-	state_save_register_global_array(state->map);
+	state_save_register_global(machine, state->abc77_txd);
+	state_save_register_global(machine, state->keydtr);
+	state_save_register_global(machine, state->eme);
+	state_save_register_global(machine, state->fetch_charram);
+	state_save_register_global_array(machine, state->map);
 }
 
 static MACHINE_RESET( abc806 )

@@ -321,8 +321,8 @@ struct _dcs_state
 	UINT16 		progflags;
 	void		(*output_full_cb)(int);
 	void		(*input_empty_cb)(int);
-	UINT16		(*fifo_data_r)(void);
-	UINT16		(*fifo_status_r)(void);
+	UINT16		(*fifo_data_r)(const device_config *device);
+	UINT16		(*fifo_status_r)(const device_config *device);
 
 	/* timers */
 	UINT8		timer_enable;
@@ -852,54 +852,54 @@ static TIMER_CALLBACK( dcs_reset )
  *
  *************************************/
 
-static void dcs_register_state(void)
+static void dcs_register_state(running_machine *machine)
 {
-	state_save_register_global_array(sdrc.reg);
-	state_save_register_global(sdrc.seed);
+	state_save_register_global_array(machine, sdrc.reg);
+	state_save_register_global(machine, sdrc.seed);
 
-	state_save_register_global_array(dsio.reg);
-	state_save_register_global(dsio.start_on_next_write);
-	state_save_register_global(dsio.channelbits);
+	state_save_register_global_array(machine, dsio.reg);
+	state_save_register_global(machine, dsio.start_on_next_write);
+	state_save_register_global(machine, dsio.channelbits);
 
-	state_save_register_global(dcs.channels);
-	state_save_register_global(dcs.size);
-	state_save_register_global(dcs.incs);
-	state_save_register_global(dcs.ireg);
-	state_save_register_global(dcs.ireg_base);
-	state_save_register_global_array(dcs.control_regs);
+	state_save_register_global(machine, dcs.channels);
+	state_save_register_global(machine, dcs.size);
+	state_save_register_global(machine, dcs.incs);
+	state_save_register_global(machine, dcs.ireg);
+	state_save_register_global(machine, dcs.ireg_base);
+	state_save_register_global_array(machine, dcs.control_regs);
 
-	state_save_register_global(dcs.sounddata_bank);
+	state_save_register_global(machine, dcs.sounddata_bank);
 
-	state_save_register_global(dcs.auto_ack);
-	state_save_register_global(dcs.latch_control);
-	state_save_register_global(dcs.input_data);
-	state_save_register_global(dcs.output_data);
-	state_save_register_global(dcs.output_control);
-	state_save_register_global(dcs.output_control_cycles);
-	state_save_register_global(dcs.last_output_full);
-	state_save_register_global(dcs.last_input_empty);
-	state_save_register_global(dcs.progflags);
+	state_save_register_global(machine, dcs.auto_ack);
+	state_save_register_global(machine, dcs.latch_control);
+	state_save_register_global(machine, dcs.input_data);
+	state_save_register_global(machine, dcs.output_data);
+	state_save_register_global(machine, dcs.output_control);
+	state_save_register_global(machine, dcs.output_control_cycles);
+	state_save_register_global(machine, dcs.last_output_full);
+	state_save_register_global(machine, dcs.last_input_empty);
+	state_save_register_global(machine, dcs.progflags);
 
-	state_save_register_global(dcs.timer_enable);
-	state_save_register_global(dcs.timer_ignore);
-	state_save_register_global(dcs.timer_start_cycles);
-	state_save_register_global(dcs.timer_start_count);
-	state_save_register_global(dcs.timer_scale);
-	state_save_register_global(dcs.timer_period);
-	state_save_register_global(dcs.timers_fired);
+	state_save_register_global(machine, dcs.timer_enable);
+	state_save_register_global(machine, dcs.timer_ignore);
+	state_save_register_global(machine, dcs.timer_start_cycles);
+	state_save_register_global(machine, dcs.timer_start_count);
+	state_save_register_global(machine, dcs.timer_scale);
+	state_save_register_global(machine, dcs.timer_period);
+	state_save_register_global(machine, dcs.timers_fired);
 
-	state_save_register_global(transfer.dcs_state);
-	state_save_register_global(transfer.state);
-	state_save_register_global(transfer.start);
-	state_save_register_global(transfer.stop);
-	state_save_register_global(transfer.type);
-	state_save_register_global(transfer.temp);
-	state_save_register_global(transfer.writes_left);
-	state_save_register_global(transfer.sum);
-	state_save_register_global(transfer.fifo_entries);
+	state_save_register_global(machine, transfer.dcs_state);
+	state_save_register_global(machine, transfer.state);
+	state_save_register_global(machine, transfer.start);
+	state_save_register_global(machine, transfer.stop);
+	state_save_register_global(machine, transfer.type);
+	state_save_register_global(machine, transfer.temp);
+	state_save_register_global(machine, transfer.writes_left);
+	state_save_register_global(machine, transfer.sum);
+	state_save_register_global(machine, transfer.fifo_entries);
 
 	if (dcs_sram != NULL)
-		state_save_register_global_pointer(dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
+		state_save_register_global_pointer(machine, dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
 
 	if (dcs.rev == 2)
 		state_save_register_postload(Machine, sdrc_postload, NULL);
@@ -931,14 +931,14 @@ void dcs_init(running_machine *machine)
 	memory_configure_bank(machine, 20, 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
 
 	/* create the timers */
-	dcs.internal_timer = timer_alloc(internal_timer_callback, NULL);
-	dcs.reg_timer = timer_alloc(dcs_irq, NULL);
+	dcs.internal_timer = timer_alloc(machine, internal_timer_callback, NULL);
+	dcs.reg_timer = timer_alloc(machine, dcs_irq, NULL);
 
 	/* non-RAM based automatically acks */
 	dcs.auto_ack = TRUE;
 
 	/* register for save states */
-	dcs_register_state();
+	dcs_register_state(Machine);
 
 	/* reset the system */
 	dcs_reset(Machine, NULL, 0);
@@ -998,9 +998,9 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs_sram = auto_malloc(0x8000*4);
 
 	/* create the timers */
-	dcs.internal_timer = timer_alloc(internal_timer_callback, NULL);
-	dcs.reg_timer = timer_alloc(dcs_irq, NULL);
-	dcs.sport_timer = timer_alloc(sport0_irq, NULL);
+	dcs.internal_timer = timer_alloc(machine, internal_timer_callback, NULL);
+	dcs.reg_timer = timer_alloc(machine, dcs_irq, NULL);
+	dcs.sport_timer = timer_alloc(machine, sport0_irq, NULL);
 
 	/* we don't do auto-ack by default */
 	dcs.auto_ack = FALSE;
@@ -1012,10 +1012,10 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	/* allocate a watchdog timer for HLE transfers */
 	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
 	if (transfer.hle_enabled)
-		transfer.watchdog = timer_alloc(transfer_watchdog_callback, NULL);
+		transfer.watchdog = timer_alloc(machine, transfer_watchdog_callback, NULL);
 
 	/* register for save states */
-	dcs_register_state();
+	dcs_register_state(machine);
 
 	/* reset the system */
 	dcs_reset(machine, NULL, 0);
@@ -1471,7 +1471,7 @@ void dcs_set_io_callbacks(void (*output_full_cb)(int), void (*input_empty_cb)(in
 }
 
 
-void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(void), UINT16 (*fifo_status_r)(void))
+void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(const device_config *device), UINT16 (*fifo_status_r)(const device_config *device))
 {
 	dcs.fifo_data_r = fifo_data_r;
 	dcs.fifo_status_r = fifo_status_r;
@@ -1495,7 +1495,7 @@ void dcs_reset_w(int state)
 		logerror("%08x: DCS reset = %d\n", safe_cpu_get_pc(Machine->activecpu), state);
 
 		/* just run through the init code again */
-		timer_call_after_resynch(NULL, 0, dcs_reset);
+		timer_call_after_resynch(Machine, NULL, 0, dcs_reset);
 		cpu_set_input_line(dcs.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
@@ -1513,7 +1513,7 @@ static READ16_HANDLER( latch_status_r )
 	if (IS_OUTPUT_EMPTY())
 		result |= 0x40;
 	if (dcs.fifo_status_r != NULL && (!transfer.hle_enabled || transfer.state == 0))
-		result |= (*dcs.fifo_status_r)() & 0x38;
+		result |= (*dcs.fifo_status_r)(NULL) & 0x38;
 	if (transfer.hle_enabled && transfer.state != 0)
 		result |= 0x08;
 	return result;
@@ -1523,7 +1523,7 @@ static READ16_HANDLER( latch_status_r )
 static READ16_HANDLER( fifo_input_r )
 {
 	if (dcs.fifo_data_r)
-		return (*dcs.fifo_data_r)();
+		return (*dcs.fifo_data_r)(NULL);
 	else
 		return 0xffff;
 }
@@ -1569,7 +1569,7 @@ void dcs_data_w(int data)
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (!dcs.sport_timer)
-		timer_call_after_resynch(NULL, data, dcs_delayed_data_w_callback);
+		timer_call_after_resynch(Machine, NULL, data, dcs_delayed_data_w_callback);
 	else
 	 	dcs_delayed_data_w(Machine, data);
 }
@@ -1612,7 +1612,7 @@ static WRITE16_HANDLER( output_latch_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", cpu_get_pc(space->cpu), data, IS_OUTPUT_EMPTY());
-	timer_call_after_resynch(NULL, data, latch_delayed_w);
+	timer_call_after_resynch(space->machine, NULL, data, latch_delayed_w);
 }
 
 
@@ -1630,7 +1630,7 @@ static TIMER_CALLBACK( delayed_ack_w_callback )
 
 void dcs_ack_w(void)
 {
-	timer_call_after_resynch(NULL, 0, delayed_ack_w_callback);
+	timer_call_after_resynch(Machine, NULL, 0, delayed_ack_w_callback);
 }
 
 
@@ -1666,7 +1666,7 @@ static WRITE16_HANDLER( output_control_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%04X:output_control = %04X\n", cpu_get_pc(space->cpu), data);
-	timer_call_after_resynch(NULL, data, output_control_delayed_w);
+	timer_call_after_resynch(space->machine, NULL, data, output_control_delayed_w);
 }
 
 
@@ -1731,7 +1731,7 @@ static TIMER_CALLBACK( internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer_adjust_oneshot(dcs.internal_timer, ATTOTIME_IN_CYCLES(target_cycles, cpu_get_index(dcs.cpu)), 0);
+		timer_adjust_oneshot(dcs.internal_timer, cpu_clocks_to_attotime(dcs.cpu, target_cycles), 0);
 	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, PULSE_LINE);
 }
 
@@ -1766,7 +1766,7 @@ static void reset_timer(running_machine *machine)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		timer_adjust_oneshot(dcs.internal_timer, ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), cpu_get_index(dcs.cpu)), 0);
+		timer_adjust_oneshot(dcs.internal_timer, cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_start_count + 1)), 0);
 }
 
 
@@ -1776,7 +1776,7 @@ static void timer_enable_callback(int enable)
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_period + 1), cpu_get_index(dcs.cpu)));
+//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_period + 1)));
 		reset_timer(Machine);
 	}
 	else
@@ -2068,7 +2068,7 @@ void dcs_fifo_notify(int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(Machine, (*dcs.fifo_data_r)());
+			preprocess_write(Machine, (*dcs.fifo_data_r)(NULL));
 	}
 }
 
@@ -2080,7 +2080,7 @@ static TIMER_CALLBACK( transfer_watchdog_callback )
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(machine, (*dcs.fifo_data_r)());
+			preprocess_write(machine, (*dcs.fifo_data_r)(NULL));
 	}
 	timer_adjust_oneshot(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left);
 }
@@ -2091,7 +2091,7 @@ static TIMER_CALLBACK( s1_ack_callback2 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(ATTOTIME_IN_USEC(1), NULL, param, s1_ack_callback2);
+		timer_set(machine, ATTOTIME_IN_USEC(1), NULL, param, s1_ack_callback2);
 		return;
 	}
 	output_latch_w(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM), 0, 0x000a, 0xffff);
@@ -2103,13 +2103,13 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(ATTOTIME_IN_USEC(1), NULL, param, s1_ack_callback1);
+		timer_set(machine, ATTOTIME_IN_USEC(1), NULL, param, s1_ack_callback1);
 		return;
 	}
 	output_latch_w(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM), 0, param, 0xffff);
 
 	/* chain to the next word we need to write back */
-	timer_set(ATTOTIME_IN_USEC(1), NULL, 0, s1_ack_callback2);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, 0, s1_ack_callback2);
 }
 
 
@@ -2227,7 +2227,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
-					timer_set(ATTOTIME_IN_USEC(1), NULL, transfer.sum, s1_ack_callback1);
+					timer_set(machine, ATTOTIME_IN_USEC(1), NULL, transfer.sum, s1_ack_callback1);
 				return 1;
 			}
 			break;
@@ -2243,7 +2243,7 @@ static TIMER_CALLBACK( s2_ack_callback )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(ATTOTIME_IN_USEC(1), NULL, param, s2_ack_callback);
+		timer_set(machine, ATTOTIME_IN_USEC(1), NULL, param, s2_ack_callback);
 		return;
 	}
 	output_latch_w(space, 0, param, 0xffff);
@@ -2340,7 +2340,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
 				{
-					timer_set(ATTOTIME_IN_USEC(1), NULL, transfer.sum, s2_ack_callback);
+					timer_set(machine, ATTOTIME_IN_USEC(1), NULL, transfer.sum, s2_ack_callback);
 					timer_adjust_oneshot(transfer.watchdog, attotime_never, 0);
 				}
 				return 1;

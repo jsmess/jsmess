@@ -143,10 +143,10 @@ VIDEO_START( gunsmoke )
 	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0x4f);
 
 	/* register for saving */
-	state_save_register_global(chon);
-	state_save_register_global(objon);
-	state_save_register_global(bgon);
-	state_save_register_global(sprite3bank);
+	state_save_register_global(machine, chon);
+	state_save_register_global(machine, objon);
+	state_save_register_global(machine, bgon);
+	state_save_register_global(machine, sprite3bank);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -188,7 +188,7 @@ VIDEO_UPDATE( gunsmoke )
 	if (bgon)
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if (objon) draw_sprites(screen->machine, bitmap, cliprect);
 	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);

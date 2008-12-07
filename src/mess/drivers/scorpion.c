@@ -322,7 +322,7 @@ static MACHINE_RESET( scorpion )
 		
 	wd17xx_reset(machine);	
 	
-	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
 }
 
 static MACHINE_DRIVER_START( scorpion )

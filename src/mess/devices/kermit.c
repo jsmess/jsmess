@@ -634,7 +634,7 @@ static DEVICE_START( kermit )
 	state->image = NULL;
 	state->conf = (kermit_config*) device->static_config;
 	state->machine = device->machine;
-	state->resend = timer_alloc( kermit_resend_cb, state );
+	state->resend = timer_alloc(machine,  kermit_resend_cb, state );
 	kermit_reset( state );
 	return DEVICE_START_OK;
 }

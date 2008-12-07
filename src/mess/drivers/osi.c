@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( sb2m600_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc011, 0xc011) AM_READWRITE(acia6850_1_data_r, acia6850_1_data_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(osi_keyboard_r, sb2m600b_keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0xf001, 0xf001) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( uk101_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(sb2m600_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xdf00, 0xdf00) AM_MIRROR(0x03ff) AM_READWRITE(osi_keyboard_r, uk101_keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
+	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -311,7 +311,7 @@ GFXDECODE_END
 static UINT8 rx_cassette;
 static UINT8 rx, tx;
 
-static const struct acia6850_interface sb2m600_acia_intf =
+static const acia6850_interface sb2m600_acia_intf =
 {
 	500000, //
 	500000, //
@@ -323,7 +323,7 @@ static const struct acia6850_interface sb2m600_acia_intf =
 	NULL
 };
 
-static const struct acia6850_interface osi470_acia_intf =
+static const acia6850_interface osi470_acia_intf =
 {
 	500000, //
 	500000, //
@@ -335,7 +335,7 @@ static const struct acia6850_interface osi470_acia_intf =
 	NULL
 };
 
-static const struct acia6850_interface uk101_acia_intf =
+static const acia6850_interface uk101_acia_intf =
 {
 	500000, //
 	500000, //
@@ -359,14 +359,14 @@ static MACHINE_START( sb2m600 )
 	// TODO: save states
 	acia6850_config(0, &sb2m600_acia_intf);
 	acia6850_config(1, &osi470_acia_intf);
-	timer_pulse( ATTOTIME_IN_HZ(4800), NULL, 0, sb2m600_cassette_callback );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(4800), NULL, 0, sb2m600_cassette_callback );
 }
 
 static MACHINE_START( uk101 )
 {
 	// TODO: save states
 	acia6850_config(0, &uk101_acia_intf);
-	timer_pulse( ATTOTIME_IN_HZ(4800), NULL, 0, sb2m600_cassette_callback );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(4800), NULL, 0, sb2m600_cassette_callback );
 }
 
 /* Machine Drivers */

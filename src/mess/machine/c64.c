@@ -46,7 +46,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -110,7 +110,8 @@ static int is_c128(running_machine *machine)
 static void c64_nmi(running_machine *machine)
 {
 	static int nmilevel = 0;
-	int cia1irq = cia_get_irq(1);
+	const device_config *cia_1 = device_list_find_by_tag(machine->config->devicelist, CIA6526R1, "cia_1");
+	int cia1irq = cia_get_irq(cia_1);
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
@@ -153,7 +154,7 @@ static void c64_nmi(running_machine *machine)
  * flag cassette read input, serial request in
  * irq to irq connected
  */
-static UINT8 c64_cia0_port_a_r (void)
+static UINT8 c64_cia0_port_a_r (const device_config *device)
 {
 	UINT8 value = 0xff;
 	UINT8 cia0portb = cia_get_output_b(0);
@@ -278,7 +279,7 @@ static UINT8 c64_cia0_port_a_r (void)
 	return value;
 }
 
-static UINT8 c64_cia0_port_b_r (void)
+static UINT8 c64_cia0_port_b_r (const device_config *device)
 {
     UINT8 value = 0xff;
 	UINT8 cia0porta = cia_get_output_a(0);
@@ -315,7 +316,7 @@ static UINT8 c64_cia0_port_b_r (void)
     return value;
 }
 
-static void c64_cia0_port_b_w (UINT8 data)
+static void c64_cia0_port_b_w (const device_config *device, UINT8 data)
 {
     vic2_lightpen_write (data & 0x10);
 }
@@ -346,9 +347,9 @@ static void c64_irq (running_machine *machine, int level)
 	}
 }
 
-static void c64_cia0_interrupt (running_machine *machine, int level)
+static void c64_cia0_interrupt (const device_config *device, int level)
 {
-	c64_irq (machine, level || vicirq);
+	c64_irq (device->machine, level || vicirq);
 }
 
 void c64_vic_interrupt (int level)
@@ -385,7 +386,7 @@ void c64_vic_interrupt (int level)
  * flag restore key or rs232 received data input
  * irq to nmi connected ?
  */
-static UINT8 c64_cia1_port_a_r (void)
+static UINT8 c64_cia1_port_a_r (const device_config *device)
 {
 	UINT8 value = 0xff;
 
@@ -398,7 +399,7 @@ static UINT8 c64_cia1_port_a_r (void)
 	return value;
 }
 
-static void c64_cia1_port_a_w (UINT8 data)
+static void c64_cia1_port_a_w (const device_config *device, UINT8 data)
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
@@ -412,16 +413,16 @@ static void c64_cia1_port_a_w (UINT8 data)
 	}
 }
 
-static void c64_cia1_interrupt (running_machine *machine, int level)
+static void c64_cia1_interrupt (const device_config *device, int level)
 {
-	c64_nmi(machine);
+	c64_nmi(device->machine);
 }
 
-const cia6526_interface c64_cia0 =
+const cia6526_interface c64_ntsc_cia0 =
 {
-	CIA6526,
 	c64_cia0_interrupt,
-	0.0, 60,
+	0.0,
+	60,
 
 	{
 		{ c64_cia0_port_a_r, NULL },
@@ -429,11 +430,23 @@ const cia6526_interface c64_cia0 =
 	}
 };
 
-const cia6526_interface c64_cia1 =
+const cia6526_interface c64_pal_cia0 =
 {
-	CIA6526,
+	c64_cia0_interrupt,
+	0.0,
+	50,
+
+	{
+		{ c64_cia0_port_a_r, NULL },
+		{ c64_cia0_port_b_r, c64_cia0_port_b_w }
+	}
+};
+
+const cia6526_interface c64_ntsc_cia1 =
+{
 	c64_cia1_interrupt,
-	0.0, 60,
+	0.0,
+	60,
 
 	{
 		{ c64_cia1_port_a_r, c64_cia1_port_a_w },
@@ -441,12 +454,26 @@ const cia6526_interface c64_cia1 =
 	}
 };
 
+const cia6526_interface c64_pal_cia1 =
+{
+	c64_cia1_interrupt,
+	0.0,
+	50,
+
+	{
+		{ c64_cia1_port_a_r, c64_cia1_port_a_w },
+		{ 0, 0 }
+	}
+};
 
 static UINT8 *c64_io_ram_w_ptr;
 static UINT8 *c64_io_ram_r_ptr;
 
 WRITE8_HANDLER( c64_write_io )
 {
+	running_machine *machine = space->machine;
+	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
+
 	c64_io_mirror[ offset ] = data;
 	if (offset < 0x400) {
 		vic2_port_w (space, offset & 0x3ff, data);
@@ -455,11 +482,11 @@ WRITE8_HANDLER( c64_write_io )
 	} else if (offset < 0xc00)
 		c64_colorram[offset & 0x3ff] = data | 0xf0;
 	else if (offset < 0xd00)
-		cia_0_w(space, offset, data);
+		cia_w(cia_0, offset, data);
 	else if (offset < 0xe00)
 	{
 		if (c64_cia1_on)
-			cia_1_w(space, offset, data);
+			cia_w(cia_0, offset, data);
 		else
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 	}
@@ -489,6 +516,10 @@ WRITE8_HANDLER(c64_ioarea_w)
 
 READ8_HANDLER( c64_read_io )
 {
+	running_machine *machine = space->machine;
+	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
+	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+
 	if (offset < 0x400)
 		return vic2_port_r (space, offset & 0x3ff);
 
@@ -501,20 +532,20 @@ READ8_HANDLER( c64_read_io )
 	else if (offset == 0xc00)
 		{
 			cia_set_port_mask_value(0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return cia_0_r(space, offset);
+			return cia_r(cia_0, offset);
 		}
 
 	else if (offset == 0xc01)
 		{
 			cia_set_port_mask_value(0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return cia_0_r(space, offset);
+			return cia_r(cia_0, offset);
 		}
 
 	else if (offset < 0xd00)
-		return cia_0_r(space, offset);
+		return cia_r(cia_0, offset);
 
 	else if (c64_cia1_on && (offset < 0xe00))
-		return cia_1_r(space, offset);
+		return cia_r(cia_1, offset);
 
 	DBG_LOG (1, "io read", ("%.3x\n", offset));
 
@@ -982,17 +1013,16 @@ double last = 0;
 TIMER_CALLBACK( c64_tape_timer )
 {
 	double tmp = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
+	const device_config *cia_0 = device_list_find_by_tag(machine->config->devicelist, CIA6526R1, "cia_0");
 
 	if((last > +0.0) && (tmp < +0.0))
-		cia_issue_index(machine, 0);
+		cia_issue_index(cia_0);
 
 	last = tmp;
 }
 
 static void c64_common_driver_init (running_machine *machine)
 {
-	cia6526_interface cia_intf[2];
-
 	/* configure the M6510 port */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
@@ -1009,27 +1039,12 @@ static void c64_common_driver_init (running_machine *machine)
 	}
 
 	if (c64_tape_on)
-		datasette_timer = timer_alloc(c64_tape_timer, NULL);
+		datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
 
-	/* CIA initialization */
-	cia_intf[0] = c64_cia0;
-	cia_intf[0].tod_clock = c64_pal ? 50 : 60;
-	cia_config(machine, 0, &cia_intf[0]);
-	
-	if (c64_cia1_on)
-	{
-		cia_intf[1] = c64_cia1;
-		cia_intf[1].tod_clock = c64_pal ? 50 : 60;
-		cia_config(machine, 1, &cia_intf[1]);
-	}
-	
-	
 	if (ultimax)
 		vic6567_init (0, c64_pal, c64_dma_read_ultimax, c64_dma_read_color, c64_vic_interrupt);
 	else
 		vic6567_init (0, c64_pal, c64_dma_read, c64_dma_read_color, c64_vic_interrupt);
-
-	cia_reset();
 }
 
 DRIVER_INIT( c64 )
@@ -1300,7 +1315,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 //	vic2_frame_interrupt (device);
 
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
-	timer_set(attotime_zero, NULL, 0, lightpen_tick);
+	timer_set(device->machine, attotime_zero, NULL, 0, lightpen_tick);
 
 	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
 	set_led_status (0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */ 

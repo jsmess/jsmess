@@ -168,7 +168,7 @@ void Dave_Init(running_machine *machine)
 	dave.one_khz_state = 0;
 	dave.fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
 	dave.one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
-	timer_pulse(ATTOTIME_IN_HZ(1000), NULL, 0, dave_1khz_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(1000), NULL, 0, dave_1khz_callback);
 
 	for (i=0; i<3; i++)
 	{

@@ -151,7 +151,7 @@ VIDEO_UPDATE ( hp48 )
 
 	int fg = contrast + 1;
 
-	LOG(( "%f hp48 video_update called: ", attotime_to_double(timer_get_time()) ));
+	LOG(( "%f hp48 video_update called: ", attotime_to_double(timer_get_time(machine)) ));
 
 	if ( !display || refresh ) 
 	{ 

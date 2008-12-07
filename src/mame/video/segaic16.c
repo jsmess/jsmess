@@ -1182,14 +1182,14 @@ static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
 	}
 
 	/* set a timer to do this again next frame */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 261, 0), NULL, param, segaic16_tilemap_16b_latch_values);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 261, 0), NULL, param, segaic16_tilemap_16b_latch_values);
 }
 
 
 static void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
-	timer_set(video_screen_get_time_until_pos(Machine->primary_screen, 261, 0), NULL, info->index, segaic16_tilemap_16b_latch_values);
+	timer_set(Machine, video_screen_get_time_until_pos(Machine->primary_screen, 261, 0), NULL, info->index, segaic16_tilemap_16b_latch_values);
 }
 
 
@@ -2727,13 +2727,13 @@ void segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
 	if (buffer)
 		info->buffer = auto_malloc(info->ramsize);
 
-	state_save_register_item("segaic16_sp", NULL, which, info->flip);
-	state_save_register_item("segaic16_sp", NULL, which, info->shadow);
-	state_save_register_item_array("segaic16_sp", NULL, which, info->bank);
-	state_save_register_item("segaic16_sp", NULL, which, info->colorbase);
-	state_save_register_item("segaic16_sp", NULL, which, info->xoffs);
+	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->flip);
+	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->shadow);
+	state_save_register_item_array(Machine, "segaic16_sp", NULL, which, info->bank);
+	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->colorbase);
+	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->xoffs);
 	if (buffer)
-		state_save_register_item_pointer("segaic16_sp", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
+		state_save_register_item_pointer(Machine, "segaic16_sp", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
 }
 
 
@@ -3498,8 +3498,8 @@ void segaic16_rotate_init(int which, int type, int colorbase)
 	/* allocate a buffer for swapping */
 	info->buffer = auto_malloc(info->ramsize);
 
-	state_save_register_item("segaic16_rot", NULL, which, info->colorbase);
-	state_save_register_item_pointer("segaic16_rot", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
+	state_save_register_item(Machine, "segaic16_rot", NULL, which, info->colorbase);
+	state_save_register_item_pointer(Machine, "segaic16_rot", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
 }
 
 

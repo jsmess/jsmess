@@ -497,16 +497,12 @@ static void check_irq_lines( m68_state_t *m68_state )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static CPU_GET_CONTEXT( hd6309 )
-{
-}
+static CPU_GET_CONTEXT( hd6309 ) { }
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static CPU_SET_CONTEXT( hd6309 )
-{
-}
+static CPU_SET_CONTEXT( hd6309 ) { }
 
 static STATE_POSTLOAD( hd6309_postload )
 {
@@ -536,20 +532,20 @@ static CPU_INIT( hd6309 )
 	m68_state->regTable[2] = &(B);
 	m68_state->regTable[3] = &m68_state->dummy_byte;
 
-	state_save_register_item("hd6309", device->tag, 0, PC);
-	state_save_register_item("hd6309", device->tag, 0, U);
-	state_save_register_item("hd6309", device->tag, 0, S);
-	state_save_register_item("hd6309", device->tag, 0, X);
-	state_save_register_item("hd6309", device->tag, 0, Y);
-	state_save_register_item("hd6309", device->tag, 0, V);
-	state_save_register_item("hd6309", device->tag, 0, DP);
-	state_save_register_item("hd6309", device->tag, 0, CC);
-	state_save_register_item("hd6309", device->tag, 0, MD);
+	state_save_register_device_item(device, 0, PC);
+	state_save_register_device_item(device, 0, U);
+	state_save_register_device_item(device, 0, S);
+	state_save_register_device_item(device, 0, X);
+	state_save_register_device_item(device, 0, Y);
+	state_save_register_device_item(device, 0, V);
+	state_save_register_device_item(device, 0, DP);
+	state_save_register_device_item(device, 0, CC);
+	state_save_register_device_item(device, 0, MD);
 	state_save_register_postload(device->machine, hd6309_postload, (void *) device);
-	state_save_register_item("hd6309", device->tag, 0, m68_state->int_state);
-	state_save_register_item("hd6309", device->tag, 0, m68_state->nmi_state);
-	state_save_register_item("hd6309", device->tag, 0, m68_state->irq_state[0]);
-	state_save_register_item("hd6309", device->tag, 0, m68_state->irq_state[1]);
+	state_save_register_device_item(device, 0, m68_state->int_state);
+	state_save_register_device_item(device, 0, m68_state->nmi_state);
+	state_save_register_device_item(device, 0, m68_state->irq_state[0]);
+	state_save_register_device_item(device, 0, m68_state->irq_state[1]);
 }
 
 /****************************************************************************/
@@ -588,7 +584,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	{
 		if (m68_state->nmi_state == state) return;
 		m68_state->nmi_state = state;
-		LOG(("HD6309#%d set_irq_line (NMI) %d (PC=%4.4X)\n", cpunum_get_active(), state, pPC.d));
+		LOG(("HD6309 '%s' set_irq_line (NMI) %d (PC=%4.4X)\n", m68_state->device->tag, state, pPC.d));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
@@ -626,7 +622,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	}
 	else if (irqline < 2)
 	{
-		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpunum_get_active(), irqline, state, pPC.d));
+		LOG(("HD6309 '%s' set_irq_line %d, %d (PC=%4.4X)\n", m68_state->device->tag, irqline, state, pPC.d));
 		m68_state->irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
 		check_irq_lines(m68_state);
@@ -1271,7 +1267,7 @@ CPU_GET_INFO( hd6309 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68_state_t);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

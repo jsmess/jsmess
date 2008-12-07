@@ -108,12 +108,12 @@ static VIDEO_START( comx35 )
 
 	// register for save state
 
-	state_save_register_global(state->pal_ntsc);
-	state_save_register_global(state->cdp1869_prd);
+	state_save_register_global(machine, state->pal_ntsc);
+	state_save_register_global(machine, state->cdp1869_prd);
 
-	state_save_register_global_pointer(state->pageram, COMX35_PAGERAM_SIZE);
-	state_save_register_global_pointer(state->charram, COMX35_CHARRAM_SIZE);
-	state_save_register_global_pointer(state->videoram, COMX35_VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->pageram, COMX35_PAGERAM_SIZE);
+	state_save_register_global_pointer(machine, state->charram, COMX35_CHARRAM_SIZE);
+	state_save_register_global_pointer(machine, state->videoram, COMX35_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( comx35 )

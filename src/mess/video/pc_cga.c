@@ -91,7 +91,7 @@
 		if(VERBOSE_CGA>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -453,10 +453,10 @@ static int internal_pc_cga_video_start(running_machine *machine, int personality
 
 	cga.chr_gen = memory_region( machine, "gfx1" ) + 0x1000;
 
-	state_save_register_item("pccga", NULL, 0, cga.mode_control);
-	state_save_register_item("pccga", NULL, 0, cga.color_select);
-	state_save_register_item("pccga", NULL, 0, cga.status);
-	state_save_register_item("pccga", NULL, 0, cga.plantronics);
+	state_save_register_item(machine, "pccga", NULL, 0, cga.mode_control);
+	state_save_register_item(machine, "pccga", NULL, 0, cga.color_select);
+	state_save_register_item(machine, "pccga", NULL, 0, cga.status);
+	state_save_register_item(machine, "pccga", NULL, 0, cga.plantronics);
 
 	cga.config_input_port = input_port_by_tag(machine->portconfig, "pcvideo_cga_config" );
 

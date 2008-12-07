@@ -22,7 +22,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpunum_get_active() != -1 )
+		if( Machine->activecpu == NULL )
 		{
 			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
@@ -1565,19 +1565,19 @@ void psx_driver_init( running_machine *machine )
 
 	for( n = 0; n < 7; n++ )
 	{
-		m_p_timer_dma[ n ] = timer_alloc( dma_finished_callback , NULL);
+		m_p_timer_dma[ n ] = timer_alloc( machine, dma_finished_callback , NULL);
 		m_p_fn_dma_read[ n ] = NULL;
 		m_p_fn_dma_write[ n ] = NULL;
 	}
 
 	for( n = 0; n < 3; n++ )
 	{
-		m_p_timer_root[ n ] = timer_alloc( root_finished , NULL);
+		m_p_timer_root[ n ] = timer_alloc( machine, root_finished , NULL);
 	}
 
 	for( n = 0; n < 2; n++ )
 	{
-		m_p_timer_sio[ n ] = timer_alloc( sio_clock , NULL);
+		m_p_timer_sio[ n ] = timer_alloc( machine, sio_clock , NULL);
 	}
 
 	for( n = 0; n < 256; n++ )
@@ -1610,43 +1610,43 @@ void psx_driver_init( running_machine *machine )
 	psx_dma_install_write_handler( 0, mdec0_write );
 	psx_dma_install_write_handler( 2, gpu_write );
 
-	state_save_register_global( m_n_irqdata );
-	state_save_register_global( m_n_irqmask );
-	state_save_register_global_array( m_p_n_dmabase );
-	state_save_register_global_array( m_p_n_dmablockcontrol );
-	state_save_register_global_array( m_p_n_dmachannelcontrol );
-	state_save_register_global_array( m_p_n_dma_ticks );
-	state_save_register_global_array( m_p_b_dma_running );
-	state_save_register_global( m_n_dpcp );
-	state_save_register_global( m_n_dicr );
-	state_save_register_global_array( m_p_n_root_count );
-	state_save_register_global_array( m_p_n_root_mode );
-	state_save_register_global_array( m_p_n_root_target );
-	state_save_register_global_array( m_p_n_root_start );
+	state_save_register_global(machine,  m_n_irqdata );
+	state_save_register_global(machine,  m_n_irqmask );
+	state_save_register_global_array(machine,  m_p_n_dmabase );
+	state_save_register_global_array(machine,  m_p_n_dmablockcontrol );
+	state_save_register_global_array(machine,  m_p_n_dmachannelcontrol );
+	state_save_register_global_array(machine,  m_p_n_dma_ticks );
+	state_save_register_global_array(machine,  m_p_b_dma_running );
+	state_save_register_global(machine,  m_n_dpcp );
+	state_save_register_global(machine,  m_n_dicr );
+	state_save_register_global_array(machine,  m_p_n_root_count );
+	state_save_register_global_array(machine,  m_p_n_root_mode );
+	state_save_register_global_array(machine,  m_p_n_root_target );
+	state_save_register_global_array(machine,  m_p_n_root_start );
 
-	state_save_register_global_array( m_p_n_sio_status );
-	state_save_register_global_array( m_p_n_sio_mode );
-	state_save_register_global_array( m_p_n_sio_control );
-	state_save_register_global_array( m_p_n_sio_baud );
-	state_save_register_global_array( m_p_n_sio_tx );
-	state_save_register_global_array( m_p_n_sio_rx );
-	state_save_register_global_array( m_p_n_sio_tx_prev );
-	state_save_register_global_array( m_p_n_sio_rx_prev );
-	state_save_register_global_array( m_p_n_sio_rx_data );
-	state_save_register_global_array( m_p_n_sio_tx_data );
-	state_save_register_global_array( m_p_n_sio_rx_shift );
-	state_save_register_global_array( m_p_n_sio_tx_shift );
-	state_save_register_global_array( m_p_n_sio_rx_bits );
-	state_save_register_global_array( m_p_n_sio_tx_bits );
+	state_save_register_global_array(machine,  m_p_n_sio_status );
+	state_save_register_global_array(machine,  m_p_n_sio_mode );
+	state_save_register_global_array(machine,  m_p_n_sio_control );
+	state_save_register_global_array(machine,  m_p_n_sio_baud );
+	state_save_register_global_array(machine,  m_p_n_sio_tx );
+	state_save_register_global_array(machine,  m_p_n_sio_rx );
+	state_save_register_global_array(machine,  m_p_n_sio_tx_prev );
+	state_save_register_global_array(machine,  m_p_n_sio_rx_prev );
+	state_save_register_global_array(machine,  m_p_n_sio_rx_data );
+	state_save_register_global_array(machine,  m_p_n_sio_tx_data );
+	state_save_register_global_array(machine,  m_p_n_sio_rx_shift );
+	state_save_register_global_array(machine,  m_p_n_sio_tx_shift );
+	state_save_register_global_array(machine,  m_p_n_sio_rx_bits );
+	state_save_register_global_array(machine,  m_p_n_sio_tx_bits );
 
-	state_save_register_global( m_n_mdec0_command );
-	state_save_register_global( m_n_mdec0_address );
-	state_save_register_global( m_n_mdec0_size );
-	state_save_register_global( m_n_mdec1_command );
-	state_save_register_global( m_n_mdec1_status );
-	state_save_register_global_array( m_p_n_mdec_quantize_y );
-	state_save_register_global_array( m_p_n_mdec_quantize_uv );
-	state_save_register_global_array( m_p_n_mdec_cos );
+	state_save_register_global(machine,  m_n_mdec0_command );
+	state_save_register_global(machine,  m_n_mdec0_address );
+	state_save_register_global(machine,  m_n_mdec0_size );
+	state_save_register_global(machine,  m_n_mdec1_command );
+	state_save_register_global(machine,  m_n_mdec1_status );
+	state_save_register_global_array(machine,  m_p_n_mdec_quantize_y );
+	state_save_register_global_array(machine,  m_p_n_mdec_quantize_uv );
+	state_save_register_global_array(machine,  m_p_n_mdec_cos );
 
 	state_save_register_postload( machine, psx_postload, NULL );
 }

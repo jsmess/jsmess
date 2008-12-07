@@ -31,7 +31,7 @@ static UINT8 timeplt_last_irq_state;
 static SOUND_START( timeplt )
 {
 	timeplt_last_irq_state = 0;
-	state_save_register_global(timeplt_last_irq_state);
+	state_save_register_global(machine, timeplt_last_irq_state);
 }
 
 
@@ -65,7 +65,7 @@ static READ8_HANDLER( timeplt_portB_r )
 	{
 		0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 	};
-	return timeplt_timer[(cpu_get_total_cycles(space->cpu) / 512) % 10];
+	return timeplt_timer[(cputag_get_total_cycles(space->machine, "tpsound") / 512) % 10];
 }
 
 

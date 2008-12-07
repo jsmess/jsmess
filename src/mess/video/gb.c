@@ -1198,8 +1198,8 @@ void gb_video_init( running_machine *machine, int mode ) {
 
 	switch( mode ) {
 	case GB_VIDEO_DMG:
-		gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
-		timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0);
+		gb_lcd.lcd_timer = timer_alloc(machine,  gb_lcd_timer_proc , NULL);
+		timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 456), 0);
 
 		/* set the scanline update function */
 		update_scanline = gb_update_scanline;
@@ -1208,7 +1208,7 @@ void gb_video_init( running_machine *machine, int mode ) {
 
 		break;
 	case GB_VIDEO_MGB:
-		gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
+		gb_lcd.lcd_timer = timer_alloc(machine,  gb_lcd_timer_proc , NULL);
 
 		/* set the scanline update function */
 		update_scanline = gb_update_scanline;
@@ -1223,7 +1223,7 @@ void gb_video_init( running_machine *machine, int mode ) {
 		memcpy( gb_oam, mgb_oam_fingerprint, 0x100 );
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
+		timer_set(machine,  cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
  		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
@@ -1234,11 +1234,11 @@ void gb_video_init( running_machine *machine, int mode ) {
 		CURLINE = gb_lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
 		gb_lcd.mode = 1;
-		timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(60,0), GB_LCD_STATE_LY00_M0);
+		timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 60), GB_LCD_STATE_LY00_M0);
 
 		break;
 	case GB_VIDEO_SGB:
-		gb_lcd.lcd_timer = timer_alloc( gb_lcd_timer_proc , NULL);
+		gb_lcd.lcd_timer = timer_alloc(machine,  gb_lcd_timer_proc , NULL);
 
 		/* set the scanline update function */
 		update_scanline = sgb_update_scanline;
@@ -1251,7 +1251,7 @@ void gb_video_init( running_machine *machine, int mode ) {
 		gb_vram[ 0x1910 ] = 0x19;
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
+		timer_set(machine,  cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
 		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
@@ -1262,11 +1262,11 @@ void gb_video_init( running_machine *machine, int mode ) {
 		CURLINE = gb_lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
 		gb_lcd.mode = 1;
-		timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(60,0), GB_LCD_STATE_LY00_M0);
+		timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 60), GB_LCD_STATE_LY00_M0);
 
 		break;
 	case GB_VIDEO_CGB:
-		gb_lcd.lcd_timer = timer_alloc( gbc_lcd_timer_proc , NULL);
+		gb_lcd.lcd_timer = timer_alloc(machine,  gbc_lcd_timer_proc , NULL);
 
 		/* set the scanline update function */
 		update_scanline = cgb_update_scanline;
@@ -1283,7 +1283,7 @@ void gb_video_init( running_machine *machine, int mode ) {
 		gb_lcd.hdma_possible = 0;
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-		timer_set( ATTOTIME_IN_CYCLES(1,0), NULL, 0, gb_video_init_vbl );
+		timer_set(machine,  cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
 		gbc_video_w( space, 0x0, 0x91 );    /* LCDCONT */
@@ -1294,7 +1294,7 @@ void gb_video_init( running_machine *machine, int mode ) {
 		CURLINE = gb_lcd.current_line = 0x90;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x01;
 		gb_lcd.mode = 1;
-		timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(292,0), GB_LCD_STATE_LY9X_M1_INC);
+		timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 292), GB_LCD_STATE_LY9X_M1_INC);
 		gb_lcd.oam_locked = UNLOCKED;
 		gb_lcd.vram_locked = UNLOCKED;
 		gb_lcd.pal_locked = UNLOCKED;
@@ -1354,7 +1354,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					gb_lcd.mode_irq = 0;
 				}
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M0);
 			break;
 		case GB_LCD_STATE_LYXX_M0:		/* Switch to mode 0 */
 			/* update current scanline */
@@ -1377,7 +1377,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			*/
 			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
 				gb_lcd.scrollx_adjust += 4;
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_SCX3);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M0_SCX3);
 				break;
 			}
 		case GB_LCD_STATE_LYXX_M0_SCX3:
@@ -1386,7 +1386,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
 				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			if ( CURLINE < 143 ) {
@@ -1403,7 +1403,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					}
 				}
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_INC);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M0_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
 			gb_increment_scanline();
@@ -1418,7 +1418,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			LCDSTAT &= 0xFB;
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 ) {
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY9X_M1);
 			} else {
 				/* Internally switch to mode 2 */
 				gb_lcd.mode = 2;
@@ -1428,7 +1428,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					gb_lcd.mode_irq = 1;
 					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M2);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
@@ -1443,7 +1443,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 lasts approximately 80 clock cycles */
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
@@ -1463,7 +1463,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 last for approximately 80 clock cycles */
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
 			gb_select_sprites();
@@ -1474,7 +1474,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.vram_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
 			gb_lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
@@ -1496,7 +1496,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 452), GB_LCD_STATE_LY9X_M1_INC);
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
 			gb_increment_scanline();
@@ -1510,9 +1510,9 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Reset LY==LYC STAT bit */
 			LCDSTAT &= 0xFB;
 			if ( gb_lcd.current_line == 153 ) {
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY00_M1);
 			} else {
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY9X_M1);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
@@ -1530,14 +1530,14 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
 			gb_lcd.line_irq = 0;
 			LCDSTAT &= 0xFB;
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4/*8*/,0), GB_LCD_STATE_LY00_M1_1);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4/*8*/), GB_LCD_STATE_LY00_M1_1);
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
 				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_2);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
@@ -1547,13 +1547,13 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( CURLINE == CMPLINE ) {
 				LCDSTAT |= 0x04;
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(444,0), GB_LCD_STATE_LY00_M0);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 444), GB_LCD_STATE_LY00_M0);
 			break;
 		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
 			/* Set Mode 0 lcdstat */
 			gb_lcd.mode = 0;
 			LCDSTAT = ( LCDSTAT & 0xFC );
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M2);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY00_M2);
 			break;
 		}
 	} else {
@@ -1561,7 +1561,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		if ( gb_lcd.current_line < 144 ) {
 			update_scanline( machine );
 		}
-		timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0);
+		timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 456), 0);
 	}
 }
 
@@ -1585,7 +1585,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 					gb_lcd.mode_irq = 0;
 				}
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M0);
 			break;
 		case GB_LCD_STATE_LYXX_M0:		/* Switch to mode 0 */
 			/* update current scanline */
@@ -1609,7 +1609,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.triggering_mode_irq = ( LCDSTAT & 0x08 ) ? 1 : 0;
 			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
 				gb_lcd.scrollx_adjust += 4;
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_SCX3);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M0_SCX3);
 				break;
 			}
 		case GB_LCD_STATE_LYXX_M0_SCX3:
@@ -1622,7 +1622,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			if ( ( SCROLLX & 0x03 ) == 0x03 ) {
 				gb_lcd.pal_locked = UNLOCKED;
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_GBC_PAL);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M0_GBC_PAL);
 			break;
 		case GB_LCD_STATE_LYXX_M0_GBC_PAL:
 			gb_lcd.pal_locked = UNLOCKED;
@@ -1633,7 +1633,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			} else {
 				gb_lcd.hdma_possible = 1;
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(192 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 192 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			gb_lcd.cmp_line = CMPLINE;
@@ -1650,7 +1650,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 					}
 				}
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M0_INC);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M0_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
 			gb_increment_scanline();
@@ -1664,7 +1664,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.hdma_possible = 0;
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 ) {
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY9X_M1);
 			} else {
 				/* Internally switch to mode 2 */
 				gb_lcd.mode = 2;
@@ -1674,7 +1674,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 					gb_lcd.mode_irq = 1;
 					cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 				}
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LYXX_M2);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LYXX_M2);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
@@ -1689,7 +1689,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 lasts approximately 80 clock cycles */
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
@@ -1710,7 +1710,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			gb_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 last for approximately 80 clock cycles */
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
 			gb_select_sprites();
@@ -1722,7 +1722,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.pal_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_PRE_M0);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 168 + gb_lcd.scrollx_adjust + gb_lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
 			gb_lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
@@ -1746,7 +1746,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(452,0), GB_LCD_STATE_LY9X_M1_INC);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 452), GB_LCD_STATE_LY9X_M1_INC);
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
 			gb_increment_scanline();
@@ -1758,9 +1758,9 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
 			if ( gb_lcd.current_line == 153 ) {
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY00_M1);
 			} else {
-				timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY9X_M1);
+				timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY9X_M1);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
@@ -1780,14 +1780,14 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
 			gb_lcd.line_irq = 0;
 			LCDSTAT &= 0xFB;
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_1);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY00_M1_1);
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
 				gb_lcd.line_irq = gb_lcd.triggering_line_irq;
 				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M1_2);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
 			if ( gb_lcd.delayed_line_irq && gb_lcd.triggering_line_irq ) {
@@ -1799,12 +1799,12 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			} else {
 				LCDSTAT &= ~0x04;
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(444,0), GB_LCD_STATE_LY00_M0);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 444), GB_LCD_STATE_LY00_M0);
 			break;
 		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
 			/* Set Mode 0 lcdstat */
 			gb_lcd.mode = 0;
-			timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(4,0), GB_LCD_STATE_LY00_M2);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), GB_LCD_STATE_LY00_M2);
 			break;
 		}
 	} else {
@@ -1812,7 +1812,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		if ( gb_lcd.current_line < 144 ) {
 			update_scanline( machine );
 		}
-		timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(456,0), 0);
+		timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 456), 0);
 	}
 }
 
@@ -1833,7 +1833,7 @@ static void gb_lcd_switch_on( running_machine *machine ) {
 		}
 	}
 	gb_lcd.state = GB_LCD_STATE_LY00_M2;
-	timer_adjust_oneshot(gb_lcd.lcd_timer, ATTOTIME_IN_CYCLES(80,0), GB_LCD_STATE_LYXX_M3);
+	timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 80), GB_LCD_STATE_LYXX_M3);
 }
 
 READ8_HANDLER( gb_video_r ) {

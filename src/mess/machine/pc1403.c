@@ -128,7 +128,7 @@ int pc1403_inb(void)
 void pc1403_outc(int data)
 {
     pc1403_portc = data;
-    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time()), cpu_get_pc(Machine->cpu[0]), data);
+    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(machine)), cpu_get_pc(Machine->cpu[0]), data);
 }
 
 
@@ -180,7 +180,7 @@ DRIVER_INIT( pc1403 )
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
+	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
 	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 	/* NPW 28-Jun-2006 - Input ports can't be read at init time! Even then, this should use mess_ram */

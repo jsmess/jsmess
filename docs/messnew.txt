@@ -1,4 +1,8 @@
-﻿0.128.1
+﻿NOTE - WITH THE 0.128u5 UPDATE FROM MAME, SOME DRIVERS HAVE BEEN TEMPORARILY
+DISABLED.  THEY WILL BE REENABLED AS THE 0.129 DEV CYCLE PROGRESSES
+
+
+0.128.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -59,7 +63,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.128u4.  This incorporates all features of the
+- The core is based on MAME 0.128u5.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Changed the 8251 UART implementation to be a device.  [Nathan Woods]
@@ -67,6 +71,10 @@ Source Changes:
 - Changed the 6551 ACIA implementation to be a device.  [Nathan Woods]
 
 - Changed the 8521 RTC implementation to be a device.  [Nathan Woods]
+
+- Changed the 8593 RTC implementation to be a device.  [Nathan Woods]
+
+- Changed the TMS5501 implementation to be a device.  [Nathan Woods]
 
 - Various code cleanups.  [Atari Ace]
 

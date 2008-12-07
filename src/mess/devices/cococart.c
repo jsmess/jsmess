@@ -14,8 +14,8 @@ struct _coco_cartridge
 {
 	UINT8				(*rh)(coco_cartridge *cartridge, UINT16 addr);
 	void				(*wh)(coco_cartridge *cartridge, UINT16 addr, UINT8 data);
-	void				(*set_line)(coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
-	void				(*map_memory)(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
+	void				(*set_line)(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
+	void				(*map_memory)(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 	void				*extra_data;
 	cococart_line_value	line[3];
 	char				dummy[1];
@@ -103,7 +103,7 @@ coco_cartridge *cococart_init(running_machine *machine, const char *carttype, co
     cococart_read
 -------------------------------------------------*/
 
-UINT8 cococart_read(coco_cartridge *cartridge, UINT16 address)
+UINT8 cococart_read(running_machine *machine, coco_cartridge *cartridge, UINT16 address)
 {
 	return cartridge->rh ? cartridge->rh(cartridge, address) : 0xFF;
 }
@@ -114,7 +114,7 @@ UINT8 cococart_read(coco_cartridge *cartridge, UINT16 address)
     cococart_write
 -------------------------------------------------*/
 
-void cococart_write(coco_cartridge *cartridge, UINT16 address, UINT8 data)
+void cococart_write(running_machine *machine, coco_cartridge *cartridge, UINT16 address, UINT8 data)
 {
 	if (cartridge->wh)
 		cartridge->wh(cartridge, address, data);
@@ -126,7 +126,7 @@ void cococart_write(coco_cartridge *cartridge, UINT16 address, UINT8 data)
     cococart_set_line
 -------------------------------------------------*/
 
-void cococart_set_line(coco_cartridge *cartridge, cococart_line line, cococart_line_value value)
+void cococart_set_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value)
 {
 	assert_always((0 <= line) && (line < ARRAY_LENGTH(cartridge->line)), "Invalid line value");
 
@@ -134,7 +134,7 @@ void cococart_set_line(coco_cartridge *cartridge, cococart_line line, cococart_l
 	{
 		cartridge->line[line] = value;
 		if (cartridge->set_line != NULL)
-			(*cartridge->set_line)(cartridge, line, value);
+			(*cartridge->set_line)(machine, cartridge, line, value);
 	}
 }
 
@@ -144,7 +144,7 @@ void cococart_set_line(coco_cartridge *cartridge, cococart_line line, cococart_l
     cococart_get_line
 -------------------------------------------------*/
 
-cococart_line_value cococart_get_line(coco_cartridge *cartridge, cococart_line line)
+cococart_line_value cococart_get_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line)
 {
 	assert_always((0 <= line) && (line < ARRAY_LENGTH(cartridge->line)), "Invalid line value");
 	return cartridge->line[line];
@@ -156,10 +156,10 @@ cococart_line_value cococart_get_line(coco_cartridge *cartridge, cococart_line l
     cococart_map_memory
 -------------------------------------------------*/
 
-void cococart_map_memory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
+void cococart_map_memory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
 {
 	if (cartridge->map_memory != NULL)
-		(*cartridge->map_memory)(cartridge, offset, mask);
+		(*cartridge->map_memory)(machine, cartridge, offset, mask);
 }
 
 
@@ -168,7 +168,7 @@ void cococart_map_memory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
     cococart_enable_sound
 -------------------------------------------------*/
 
-void cococart_enable_sound(coco_cartridge *cartridge, int enable)
+void cococart_enable_sound(running_machine *machine, coco_cartridge *cartridge, int enable)
 {
 	/* NYI */
 }

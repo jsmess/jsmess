@@ -1038,19 +1038,19 @@ READ8_HANDLER ( apple2_c06x_r )
 			break;
 		case 0x04:
 			/* X Joystick 1 axis */
-			result = attotime_to_double(timer_get_time()) < joystick_x1_time;
+			result = attotime_to_double(timer_get_time(space->machine)) < joystick_x1_time;
 			break;
 		case 0x05:
 			/* Y Joystick 1 axis */
-			result = attotime_to_double(timer_get_time()) < joystick_y1_time;
+			result = attotime_to_double(timer_get_time(space->machine)) < joystick_y1_time;
 			break;
 		case 0x06:
 			/* X Joystick 2 axis */
-			result = attotime_to_double(timer_get_time()) < joystick_x2_time;
+			result = attotime_to_double(timer_get_time(space->machine)) < joystick_x2_time;
 			break;
 		case 0x07:
 			/* Y Joystick 2 axis */
-			result = attotime_to_double(timer_get_time()) < joystick_y2_time;
+			result = attotime_to_double(timer_get_time(space->machine)) < joystick_y2_time;
 			break;
 		default:
 			/* c060 Empty Cassette head read
@@ -1075,10 +1075,10 @@ READ8_HANDLER ( apple2_c07x_r )
 
 	if (offset == 0)
 	{
-		joystick_x1_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(space->machine, "joystick_1_x");
-		joystick_y1_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(space->machine, "joystick_1_y");
-		joystick_x2_time = attotime_to_double(timer_get_time()) + x_calibration * input_port_read(space->machine, "joystick_2_x");
-		joystick_y2_time = attotime_to_double(timer_get_time()) + y_calibration * input_port_read(space->machine, "joystick_2_y");
+		joystick_x1_time = attotime_to_double(timer_get_time(space->machine)) + x_calibration * input_port_read(space->machine, "joystick_1_x");
+		joystick_y1_time = attotime_to_double(timer_get_time(space->machine)) + y_calibration * input_port_read(space->machine, "joystick_1_y");
+		joystick_x2_time = attotime_to_double(timer_get_time(space->machine)) + x_calibration * input_port_read(space->machine, "joystick_2_x");
+		joystick_y2_time = attotime_to_double(timer_get_time(space->machine)) + y_calibration * input_port_read(space->machine, "joystick_2_y");
 	}
 	return 0;
 }
@@ -1273,7 +1273,7 @@ void apple2_init_common(running_machine *machine)
 	add_reset_callback(machine, apple2_reset);
 
 	/* state save registers */
-	state_save_register_global(a2);
+	state_save_register_global(machine, a2);
 	state_save_register_postload(machine, apple2_update_memory_postload, NULL);
 
 	/* apple2 behaves much better when the default memory is zero */

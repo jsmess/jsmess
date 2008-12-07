@@ -950,7 +950,7 @@ MACHINE_RESET(sms)
 
 	rapid_fire_state_1 = 0;
 	rapid_fire_state_2 = 0;
-	rapid_fire_timer = timer_alloc( rapid_fire_callback , NULL);
+	rapid_fire_timer = timer_alloc(machine,  rapid_fire_callback , NULL);
 	timer_adjust_periodic(rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
 
 	last_paddle_read_time = 0;

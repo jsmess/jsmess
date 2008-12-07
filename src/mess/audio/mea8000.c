@@ -499,27 +499,27 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 		if (mea8000.bufpos == 4)
 		{
 			/* we have a successor */
-			LOG(( "%f mea8000_timer_expire: new frame\n", attotime_to_double(timer_get_time()) ));
+			LOG(( "%f mea8000_timer_expire: new frame\n", attotime_to_double(timer_get_time(machine)) ));
 			mea8000_decode_frame();
 			mea8000_start_frame();
 		}
 		else if (mea8000.cont)
 		{
 			/* repeat mode */
-			LOG(( "%f mea8000_timer_expire: repeat frame\n", attotime_to_double(timer_get_time()) ));
+			LOG(( "%f mea8000_timer_expire: repeat frame\n", attotime_to_double(timer_get_time(machine)) ));
 			mea8000_start_frame();
 		}
 		/* slow stop */
 		else if (mea8000.state == MEA8000_STARTED)
 		{
 			mea8000.ampl = 0;
-			LOG(( "%f mea8000_timer_expire: fade frame\n", attotime_to_double(timer_get_time()) ));
+			LOG(( "%f mea8000_timer_expire: fade frame\n", attotime_to_double(timer_get_time(machine)) ));
 			mea8000_start_frame();
 			mea8000.state = MEA8000_SLOWING;
 		}
 		else if (mea8000.state == MEA8000_SLOWING)
 		{
-			LOG(( "%f mea8000_timer_expire: stop frame\n", attotime_to_double(timer_get_time()) ));
+			LOG(( "%f mea8000_timer_expire: stop frame\n", attotime_to_double(timer_get_time(machine)) ));
 			mea8000_stop_frame();
 		}
 		mea8000_update_req(machine);
@@ -546,7 +546,7 @@ READ8_HANDLER ( mea8000_r )
 	case 1:
 		/* ready to accept next frame */
 #if 0
-		LOG(( "$%04x %f: mea8000_r ready=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time()), mea8000_accept_byte() ));
+		LOG(( "$%04x %f: mea8000_r ready=%i\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)), mea8000_accept_byte() ));
 #endif
 		return mea8000_accept_byte() << 7;
 
@@ -566,19 +566,19 @@ WRITE8_HANDLER ( mea8000_w )
 		{
 			/* got pitch byte before first frame */
 			mea8000.pitch = 2 * data;
-			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), mea8000.pitch ));
+			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mea8000.pitch ));
 			mea8000.state = MEA8000_WAIT_FIRST;
 			mea8000.bufpos = 0;
 		}
 		else if (mea8000.bufpos == 4)
 		{
 			/* overflow */
-			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 		}
 		else
 		{
 			/* enqueue frame byte */
-			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 			      data, mea8000.bufpos ));
 			mea8000.buf[mea8000.bufpos] = data;
 			mea8000.bufpos++;
@@ -612,7 +612,7 @@ WRITE8_HANDLER ( mea8000_w )
 			mea8000_stop_frame();
 
 		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
-		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data,
+		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data,
 		      stop, mea8000.cont, mea8000.roe ));
 
 		mea8000_update_req(space->machine);
@@ -660,7 +660,7 @@ void mea8000_config ( running_machine *machine, int channel, write8_space_func r
 	mea8000_init_tables(machine);
 	mea8000.channel = channel;
 	mea8000.req_out_func = req_out_func;
-	mea8000.timer = timer_alloc( mea8000_timer_expire , NULL);
+	mea8000.timer = timer_alloc(machine,  mea8000_timer_expire , NULL);
 
 	state_save_register_item( "mea8000", NULL, 0, mea8000.state );
 	state_save_register_item_array( "mea8000", NULL, 0, mea8000.buf );

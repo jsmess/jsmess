@@ -405,7 +405,7 @@ void ti99_floppy_controllers_init_all(running_machine *machine)
 
 	ti99_install_tracktranslate_procs();
 
-	motor_on_timer = timer_alloc(motor_on_timer_callback, NULL);
+	motor_on_timer = timer_alloc(machine, motor_on_timer_callback, NULL);
 	
 	/* initialize the RTC for BwG and HFDC */
 	mm58274c_init(machine, 1, 1, 0);

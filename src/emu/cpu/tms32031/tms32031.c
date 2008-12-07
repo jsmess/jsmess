@@ -357,14 +357,10 @@ static void set_irq_line(tms32031_state *tms, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( tms32031 )
-{
-}
+static CPU_GET_CONTEXT( tms32031 ) { }
 
 
-static CPU_SET_CONTEXT( tms32031 )
-{
-}
+static CPU_SET_CONTEXT( tms32031 ) { }
 
 
 
@@ -391,15 +387,15 @@ static CPU_INIT( tms32031 )
 		tms->iack_w = configdata->iack_w;
 	}
 
-	state_save_register_item("tms32031", device->tag, 0, tms->pc);
+	state_save_register_device_item(device, 0, tms->pc);
 	for (i = 0; i < 36; i++)
-		state_save_register_generic("tms32031", device->tag, i, "reg", tms->r[i].i8, UINT8, 8);
-	state_save_register_item("tms32031", device->tag, 0, tms->bkmask);
-	state_save_register_item("tms32031", device->tag, 0, tms->irq_state);
-	state_save_register_item("tms32031", device->tag, 0, tms->delayed);
-	state_save_register_item("tms32031", device->tag, 0, tms->irq_pending);
-	state_save_register_item("tms32031", device->tag, 0, tms->mcu_mode);
-	state_save_register_item("tms32031", device->tag, 0, tms->is_idling);
+		state_save_register_generic(device->machine, "tms32031", device->tag, i, "reg", tms->r[i].i8, UINT8, 8);
+	state_save_register_device_item(device, 0, tms->bkmask);
+	state_save_register_device_item(device, 0, tms->irq_state);
+	state_save_register_device_item(device, 0, tms->delayed);
+	state_save_register_device_item(device, 0, tms->irq_pending);
+	state_save_register_device_item(device, 0, tms->mcu_mode);
+	state_save_register_device_item(device, 0, tms->is_idling);
 }
 
 static CPU_RESET( tms32031 )
@@ -716,7 +712,7 @@ CPU_GET_INFO( tms32031 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms32031_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 11;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;

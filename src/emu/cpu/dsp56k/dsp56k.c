@@ -276,7 +276,7 @@ INLINE void invalid_instruction(UINT32 op)
 ***************************************************************************/
 static void check_irqs(void)
 {
-	logerror("Dsp56k check irqs\n");
+	//logerror("Dsp56k check irqs\n");
 }
 
 static void set_irq_line(int irqline, int state)
@@ -397,7 +397,7 @@ static CPU_INIT( dsp56k )
 	core.reset_state = FALSE;
 
 	/* Save the core's state */
-	// state_save_register_item("dsp56k", device->tag, 0, modA_state);
+	// state_save_register_device_item(device, 0, modA_state);
 	// ...
 
 	//core.config = device->static_config;
@@ -600,7 +600,7 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(core);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0x0000;						break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;

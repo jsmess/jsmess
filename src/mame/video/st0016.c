@@ -435,15 +435,15 @@ static STATE_POSTLOAD( st0016_postload )
 
 void st0016_save_init(running_machine *machine)
 {
-	state_save_register_global(st0016_spr_bank);
-	state_save_register_global(st0016_spr2_bank);
-	state_save_register_global(st0016_pal_bank);
-	state_save_register_global(st0016_char_bank);
-	state_save_register_global(st0016_rom_bank);
-	state_save_register_global_array(st0016_vregs);
-	state_save_register_global_pointer(st0016_charram, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	state_save_register_global_pointer(st0016_paletteram, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
-	state_save_register_global_pointer(st0016_spriteram, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	state_save_register_global(machine, st0016_spr_bank);
+	state_save_register_global(machine, st0016_spr2_bank);
+	state_save_register_global(machine, st0016_pal_bank);
+	state_save_register_global(machine, st0016_char_bank);
+	state_save_register_global(machine, st0016_rom_bank);
+	state_save_register_global_array(machine, st0016_vregs);
+	state_save_register_global_pointer(machine, st0016_charram, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	state_save_register_global_pointer(machine, st0016_paletteram, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	state_save_register_global_pointer(machine, st0016_spriteram, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 	state_save_register_postload(machine, st0016_postload, NULL);
 }
 
@@ -649,7 +649,7 @@ VIDEO_UPDATE( st0016 )
 		//super eagle shot
 		int x,y,dy;
 
-		fillbitmap(speglsht_bitmap,0,NULL);
+		bitmap_fill(speglsht_bitmap,NULL,0);
 		dy=(speglsht_videoreg&0x20)?(256*512):0; //visible frame
 
 		for(y=0;y<256;y++)
@@ -690,7 +690,7 @@ VIDEO_UPDATE( st0016 )
 			}
 		}
 
-		fillbitmap(bitmap,UNUSED_PEN,cliprect);
+		bitmap_fill(bitmap,cliprect,UNUSED_PEN);
 		draw_bgmap(screen->machine, bitmap,cliprect,0);
  		draw_sprites(screen->machine, bitmap,cliprect);
 		draw_bgmap(screen->machine, bitmap,cliprect,1);

@@ -168,10 +168,10 @@ MACHINE_START( tx0 )
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	memory_set_direct_update_handler(space, setOPbasefunc);;
 
-	tape_reader.timer = timer_alloc(reader_callback, NULL);
-	tape_puncher.timer = timer_alloc(puncher_callback, NULL);
-	typewriter.prt_timer = timer_alloc(prt_callback, NULL);
-	dis_timer = timer_alloc(dis_callback, NULL);
+	tape_reader.timer = timer_alloc(machine, reader_callback, NULL);
+	tape_puncher.timer = timer_alloc(machine, puncher_callback, NULL);
+	typewriter.prt_timer = timer_alloc(machine, prt_callback, NULL);
+	dis_timer = timer_alloc(machine, dis_callback, NULL);
 
 	add_exit_callback(machine, tx0_machine_stop);
 }

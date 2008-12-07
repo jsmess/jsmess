@@ -412,7 +412,7 @@ static WRITE16_HANDLER( othunder_lightgun_w )
        The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
        cycles, so would end in a maximum of 15.625us. We'll use 10. */
 
-	timer_set(ATTOTIME_IN_USEC(10), NULL,0, ad_interrupt);
+	timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL,0, ad_interrupt);
 }
 
 
@@ -435,7 +435,7 @@ static STATE_POSTLOAD( othunder_postload )
 static MACHINE_START( othunder )
 {
 	banknum = -1;
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, othunder_postload, NULL);
 }
 

@@ -247,7 +247,7 @@ static void pastelg_gfxdraw(running_machine *machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	timer_set(attotime_mul(ATTOTIME_IN_HZ(400000), nb1413m3_busyctr), NULL, 0, blitter_timer_callback);
+	timer_set(machine, attotime_mul(ATTOTIME_IN_HZ(400000), nb1413m3_busyctr), NULL, 0, blitter_timer_callback);
 }
 
 /******************************************************************************
@@ -281,7 +281,7 @@ VIDEO_UPDATE( pastelg )
 				*BITMAP_ADDR16(bitmap, y, x) = pastelg_videoram[(y * width) + x];
 	}
 	else
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 
 	return 0;
 }

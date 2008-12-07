@@ -498,9 +498,9 @@ static MACHINE_START( abc80 )
 
 	/* register for state saving */
 
-	state_save_register_global(state->key_data);
-	state_save_register_global(state->key_strobe);
-	state_save_register_global(state->z80pio_astb);
+	state_save_register_global(machine, state->key_data);
+	state_save_register_global(machine, state->key_strobe);
+	state_save_register_global(machine, state->z80pio_astb);
 }
 
 /* Machine Drivers */

@@ -349,7 +349,7 @@ static ADDRESS_MAP_START(ultimax_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)
 	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, c64_colorram_write) AM_BASE(&c64_colorram) /* colorram  */
-	AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(cia_0_r, cia_0_w)
+	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE(CIA6526R1, "cia", cia_r, cia_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE(&c64_romh)				/* ram or kernel rom */
 ADDRESS_MAP_END
 
@@ -473,7 +473,6 @@ static const sid6581_interface c64_sound_interface =
  *
  *************************************/
 
-
 static MACHINE_DRIVER_START( c64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6510, VIC6567_CLOCK)
@@ -498,10 +497,17 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* devices */
+	/* quickload */
 	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_ntsc_cia0)
+	MDRV_DEVICE_ADD("cia_1", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_ntsc_cia1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c64pal )
@@ -527,10 +533,17 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* devices */
+	/* quickload */
 	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
+
+	/* cia */
+	MDRV_DEVICE_MODIFY("cia_0", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_pal_cia0)
+	MDRV_DEVICE_MODIFY("cia_1", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_pal_cia1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ultimax )

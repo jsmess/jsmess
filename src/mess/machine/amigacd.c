@@ -505,8 +505,8 @@ MACHINE_START( amigacd )
 	/* initialize the dmac */
 	memset( &dmac_data, 0, sizeof( dmac_data ) );
 
-	dmac_data.dma_timer = timer_alloc(dmac_dma_proc, NULL);
-	tp6525_delayed_timer = timer_alloc(tp6525_delayed_irq, NULL);
+	dmac_data.dma_timer = timer_alloc(machine, dmac_dma_proc, NULL);
+	tp6525_delayed_timer = timer_alloc(machine, tp6525_delayed_irq, NULL);
 
 	/* initialize the 6525 TPI */
 	tpi6525_0_reset();

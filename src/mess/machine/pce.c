@@ -953,9 +953,9 @@ static void pce_cd_init( running_machine *machine )
 		}
 	}
 
-	pce_cd.data_timer = timer_alloc( pce_cd_data_timer_callback , NULL);
+	pce_cd.data_timer = timer_alloc(machine,  pce_cd_data_timer_callback , NULL);
 	timer_adjust_oneshot(pce_cd.data_timer, attotime_never, 0);
-	pce_cd.adpcm_dma_timer = timer_alloc( pce_cd_adpcm_dma_timer_callback , NULL);
+	pce_cd.adpcm_dma_timer = timer_alloc(machine,  pce_cd_adpcm_dma_timer_callback , NULL);
 	timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime_never, 0);
 }
 
@@ -1079,7 +1079,7 @@ static UINT8 pce_cd_get_cd_data_byte( void )
 		if ( pce_cd.scsi_IO ) 
 		{
 			pce_cd.scsi_ACK = 1;
-			timer_set( ATTOTIME_IN_CYCLES( 15, 0 ), NULL, 0, pce_cd_clear_ack );
+			timer_set(machine,  cpu_clocks_to_attotime(machine->cpu[0], 15), NULL, 0, pce_cd_clear_ack );
 		}
 	}
 	return data;

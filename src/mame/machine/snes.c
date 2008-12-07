@@ -170,7 +170,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if( snes_ram[NMITIMEN] & 0x80 )	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			timer_adjust_oneshot(snes_nmi_timer, ATTOTIME_IN_CYCLES(12, 0), 0);
+			timer_adjust_oneshot(snes_nmi_timer, cpu_clocks_to_attotime(machine->cpu[0], 12), 0);
 		}
 	}
 
@@ -1569,13 +1569,13 @@ static void snes_init_ram(running_machine *machine)
 	snes_ram[VMAIN] = 0x80;
 
 	/* init timers and stop them */
-	snes_scanline_timer = timer_alloc(snes_scanline_tick, NULL);
+	snes_scanline_timer = timer_alloc(machine, snes_scanline_tick, NULL);
 	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
-	snes_hblank_timer = timer_alloc(snes_hblank_tick, NULL);
+	snes_hblank_timer = timer_alloc(machine, snes_hblank_tick, NULL);
 	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
-	snes_nmi_timer = timer_alloc(snes_nmi_tick, NULL);
+	snes_nmi_timer = timer_alloc(machine, snes_nmi_tick, NULL);
 	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
-	snes_hirq_timer = timer_alloc(snes_hirq_tick_callback, NULL);
+	snes_hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
 	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.

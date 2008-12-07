@@ -192,11 +192,11 @@ VIDEO_START( galivan )
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
 	/* register for saving */
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
-	state_save_register_global(flipscreen);
-	state_save_register_global(write_layers);
-	state_save_register_global(layers);
+	state_save_register_global_array(machine, scrollx);
+	state_save_register_global_array(machine, scrolly);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, write_layers);
+	state_save_register_global(machine, layers);
 }
 
 VIDEO_START( ninjemak )
@@ -211,10 +211,10 @@ VIDEO_START( ninjemak )
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
 	/* register for saving */
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
-	state_save_register_global(flipscreen);
-	state_save_register_global(ninjemak_dispdisable);
+	state_save_register_global_array(machine, scrollx);
+	state_save_register_global_array(machine, scrolly);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, ninjemak_dispdisable);
 }
 
 
@@ -392,7 +392,7 @@ VIDEO_UPDATE( galivan )
 	tilemap_set_scrolly(bg_tilemap,0,scrolly[0] + 256 * (scrolly[1] & 0x07));
 
 	if (layers & 0x40)
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
@@ -416,7 +416,7 @@ VIDEO_UPDATE( ninjemak )
 	tilemap_set_scrolly(bg_tilemap,0,scrolly[0] + 256 * (scrolly[1] & 0xff));
 
 	if (ninjemak_dispdisable)
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 

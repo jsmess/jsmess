@@ -121,7 +121,7 @@ MACHINE_START( pc1350 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	
-	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
+	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
 	memory_install_read8_handler(space, 0x6000, 0x6fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(space, 0x6000, 0x6fff, 0, 0, SMH_BANK1);

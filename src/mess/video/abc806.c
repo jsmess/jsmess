@@ -456,23 +456,23 @@ static VIDEO_START(abc806)
 
 	/* register for state saving */
 
-	state_save_register_global_pointer(state->charram, ABC806_CHAR_RAM_SIZE);
-	state_save_register_global_pointer(state->colorram, ABC806_ATTR_RAM_SIZE);
-	state_save_register_global_pointer(state->videoram, ABC806_VIDEO_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->charram, ABC806_CHAR_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->colorram, ABC806_ATTR_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->videoram, ABC806_VIDEO_RAM_SIZE);
 
-	state_save_register_global(state->txoff);
-	state_save_register_global(state->_40);
-	state_save_register_global(state->flshclk_ctr);
-	state_save_register_global(state->flshclk);
-	state_save_register_global(state->attr_data);
-	state_save_register_global(state->hrs);
-	state_save_register_global_array(state->hrc);
-	state_save_register_global(state->sync);
-	state_save_register_global(state->v50_addr);
-	state_save_register_global(state->hru2_a8);
-	state_save_register_global(state->vsync_shift);
-	state_save_register_global(state->vsync);
-	state_save_register_global(state->d_vsync);
+	state_save_register_global(machine, state->txoff);
+	state_save_register_global(machine, state->_40);
+	state_save_register_global(machine, state->flshclk_ctr);
+	state_save_register_global(machine, state->flshclk);
+	state_save_register_global(machine, state->attr_data);
+	state_save_register_global(machine, state->hrs);
+	state_save_register_global_array(machine, state->hrc);
+	state_save_register_global(machine, state->sync);
+	state_save_register_global(machine, state->v50_addr);
+	state_save_register_global(machine, state->hru2_a8);
+	state_save_register_global(machine, state->vsync_shift);
+	state_save_register_global(machine, state->vsync);
+	state_save_register_global(machine, state->d_vsync);
 }
 
 /* Video Update */

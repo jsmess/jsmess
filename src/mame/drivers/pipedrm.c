@@ -131,8 +131,8 @@ static MACHINE_RESET( pipedrm )
 	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x10000, 0x8000);
 	memory_set_bank(machine, 2, 0);
 	/* state save */
-	state_save_register_global(pending_command);
-	state_save_register_global(sound_command);
+	state_save_register_global(machine, pending_command);
+	state_save_register_global(machine, sound_command);
 
 }
 
@@ -187,13 +187,13 @@ static TIMER_CALLBACK( delayed_command_w	)
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	timer_call_after_resynch(NULL, data | 0x100, delayed_command_w);
+	timer_call_after_resynch(space->machine, NULL, data | 0x100, delayed_command_w);
 }
 
 
 static WRITE8_HANDLER( sound_command_nonmi_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_command_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_command_w);
 }
 
 

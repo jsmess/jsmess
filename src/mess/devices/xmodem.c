@@ -299,7 +299,7 @@ static DEVICE_START( xmodem )
 	state->image = NULL;
 	state->conf = (xmodem_config*) device->static_config;
 	state->machine = device->machine;
-	state->timer = timer_alloc( xmodem_nak_cb, state );
+	state->timer = timer_alloc(machine,  xmodem_nak_cb, state );
 	return DEVICE_START_OK;
 }
 

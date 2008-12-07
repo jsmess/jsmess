@@ -28,7 +28,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( pet_mc6845_address_w )
   cb1 video sync in
   cb2 cassette 1 motor out
 */
-static  READ8_HANDLER ( pet_pia0_port_a_read )
+static READ8_HANDLER ( pet_pia0_port_a_read )
 {
 	int data = 0xf0 | pet_keyline_select;
 
@@ -91,7 +91,7 @@ static  READ8_HANDLER ( pet_pia0_port_a_read )
 	if ((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x20;
 
-	if (!cbm_ieee_eoi_r()) 
+	if (!cbm_ieee_eoi_r(space->machine)) 
 		data &= ~0x40;
 
 	return data;
@@ -196,9 +196,9 @@ static void pet_irq (running_machine *machine, int level)
   cb1 srq in
   cb2 dav out
  */
-static  READ8_HANDLER ( pet_pia1_port_a_read )
+static READ8_HANDLER ( pet_pia1_port_a_read )
 {
-	return cbm_ieee_data_r();
+	return cbm_ieee_data_r(space->machine);
 }
 
 static WRITE8_HANDLER ( pet_pia1_port_b_write )
@@ -206,9 +206,9 @@ static WRITE8_HANDLER ( pet_pia1_port_b_write )
 	cbm_ieee_data_w(0, data);
 }
 
-static  READ8_HANDLER ( pet_pia1_ca1_read )
+static READ8_HANDLER ( pet_pia1_ca1_read )
 {
-	return cbm_ieee_atn_r();
+	return cbm_ieee_atn_r(space->machine);
 }
 
 static WRITE8_HANDLER ( pet_pia1_ca2_write )
@@ -221,9 +221,9 @@ static WRITE8_HANDLER ( pet_pia1_cb2_write )
 	cbm_ieee_dav_w(0, data);
 }
 
-static  READ8_HANDLER ( pet_pia1_cb1_read )
+static READ8_HANDLER ( pet_pia1_cb1_read )
 {
-	return cbm_ieee_srq_r();
+	return cbm_ieee_srq_r(space->machine);
 }
 
 static const pia6821_interface pet_pia0 =
@@ -274,6 +274,7 @@ static const pia6821_interface pet_pia1 =
 
 static WRITE8_HANDLER( pet_address_line_11 )
 {
+	running_machine *machine = space->machine;
 	DBG_LOG (1, "address line", ("%d\n", data));
 	if (data) pet_font |= 1;
 	else pet_font &= ~1;
@@ -296,11 +297,11 @@ static WRITE8_HANDLER( pet_address_line_11 )
    cb1 cassettes
    cb2 user port
  */
-static  READ8_HANDLER( pet_via_port_b_r )
+static READ8_HANDLER( pet_via_port_b_r )
 {
 	UINT8 data = 0;
 
-	if (cbm_ieee_ndac_r()) data |= 0x01;
+	if (cbm_ieee_ndac_r(space->machine)) data |= 0x01;
 
 	//	data & 0x08 -> cassette write (it seems to BOTH cassettes from schematics)
 
@@ -315,9 +316,9 @@ static  READ8_HANDLER( pet_via_port_b_r )
 		timer_reset(datasette2_timer, attotime_never);
 	}
 
-	if (cbm_ieee_nrfd_r()) data |= 0x40;
+	if (cbm_ieee_nrfd_r(space->machine)) data |= 0x40;
 
-	if (cbm_ieee_dav_r()) data |= 0x80;
+	if (cbm_ieee_dav_r(space->machine)) data |= 0x80;
 
 	return data;
 }
@@ -601,11 +602,11 @@ static void pet_common_driver_init(running_machine *machine)
 	}
 
 	/* pet clock */
-	timer_pulse(ATTOTIME_IN_MSEC(10), NULL, 0, pet_interrupt);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(10), NULL, 0, pet_interrupt);
 
 	/* datasette */
-	datasette1_timer = timer_alloc(pet_tape1_timer, NULL);
-	datasette2_timer = timer_alloc(pet_tape2_timer, NULL);
+	datasette1_timer = timer_alloc(machine, pet_tape1_timer, NULL);
+	datasette2_timer = timer_alloc(machine, pet_tape2_timer, NULL);
 
 
 	via_config(0, &pet_via);

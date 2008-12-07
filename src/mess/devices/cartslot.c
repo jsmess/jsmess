@@ -80,7 +80,7 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 		if (cpu != NULL)
 		{
 			datawidth = cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8;
-			littleendian = (cpu_get_endianness(cpu) == CPU_IS_LE);
+			littleendian = (cpu_get_endianness(cpu) == ENDIANNESS_LITTLE);
 		}
 
 		/* swap the endianness if we need to */

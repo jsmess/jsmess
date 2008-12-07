@@ -77,7 +77,7 @@ static void cassette_update(const device_config *device)
 	dev_cassette_t	*cassette = get_safe_token( device );
 	double cur_time;
 
-	cur_time = attotime_to_double(timer_get_time());
+	cur_time = attotime_to_double(timer_get_time(device->machine));
 
 	if (cassette_is_motor_on(device))
 	{
@@ -184,7 +184,7 @@ double cassette_get_position(const device_config *device)
 	position = cassette->position;
 
 	if (cassette_is_motor_on(device))
-		position += attotime_to_double(timer_get_time()) - cassette->position_time;
+		position += attotime_to_double(timer_get_time(device->machine)) - cassette->position_time;
 	return position;
 }
 
@@ -289,7 +289,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 
 	/* reset the position */
 	cassette->position = 0.0;
-	cassette->position_time = attotime_to_double(timer_get_time());
+	cassette->position_time = attotime_to_double(timer_get_time(image->machine));
 
 	return INIT_PASS;
 

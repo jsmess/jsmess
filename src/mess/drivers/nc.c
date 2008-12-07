@@ -593,14 +593,14 @@ static void nc_common_init_machine(running_machine *machine)
 	nc_update_interrupts(machine);
 
 	/* keyboard timer */
-	nc_keyboard_timer = timer_alloc(nc_keyboard_timer_callback, NULL);
+	nc_keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);
 	timer_adjust_oneshot(nc_keyboard_timer, ATTOTIME_IN_MSEC(10), 0);
 
 	/* dummy timer */
-	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, dummy_timer_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, dummy_timer_callback);
 
 	/* serial timer */
-	nc_serial_timer = timer_alloc(nc_serial_timer_callback, NULL);
+	nc_serial_timer = timer_alloc(machine, nc_serial_timer_callback, NULL);
 
 	/* at reset set to 0x0ff */
 	nc_uart_control = 0x0ff;

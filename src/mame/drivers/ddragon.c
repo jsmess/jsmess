@@ -100,7 +100,8 @@ static emu_timer *scanline_timer;
 
 /* private globals */
 static UINT8 dd_sub_cpu_busy;
-static UINT8 sprite_irq, sound_irq, ym_irq, snd_cpu;
+static UINT8 sprite_irq, sound_irq, ym_irq;
+static const device_config *snd_cpu;
 static UINT32 adpcm_pos[2], adpcm_end[2];
 static UINT8 adpcm_idle[2];
 static int adpcm_data[2];
@@ -179,16 +180,16 @@ static MACHINE_START( ddragon )
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	/* allocate timer for scanlines */
-	scanline_timer = timer_alloc(ddragon_scanline_callback, NULL);
+	scanline_timer = timer_alloc(machine, ddragon_scanline_callback, NULL);
 
 	/* determine the sound CPU index */
-	snd_cpu = mame_find_cpu_index(machine, "sound");
+	snd_cpu = cputag_get_cpu(machine, "sound");
 
 	/* register for save states */
-	state_save_register_global(dd_sub_cpu_busy);
-	state_save_register_global_array(adpcm_pos);
-	state_save_register_global_array(adpcm_end);
-	state_save_register_global_array(adpcm_idle);
+	state_save_register_global(machine, dd_sub_cpu_busy);
+	state_save_register_global_array(machine, adpcm_pos);
+	state_save_register_global_array(machine, adpcm_end);
+	state_save_register_global_array(machine, adpcm_idle);
 }
 
 
@@ -331,7 +332,7 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 
 		case 3: /* 380e - SND irq */
 			soundlatch_w(space, 0, data);
-			cpu_set_input_line(space->machine->cpu[snd_cpu], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			cpu_set_input_line(snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */
@@ -355,7 +356,7 @@ static WRITE8_HANDLER( ddragon2_sub_irq_w )
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpu_set_input_line(machine->cpu[snd_cpu], ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -422,7 +423,7 @@ static READ8_HANDLER( ddragon_spriteram_r )
 
 static WRITE8_HANDLER( ddragon_spriteram_w )
 {
-	if (cpunum_get_active() == 1 && offset == 0)
+	if (space->cpu == space->machine->cpu[1] && offset == 0)
 		dd_sub_cpu_busy = 1;
 
 	ddragon_spriteram[offset] = data;
@@ -463,8 +464,9 @@ static WRITE8_HANDLER( dd_adpcm_w )
 }
 
 
-static void dd_adpcm_int(running_machine *machine, int chip)
+static void dd_adpcm_int(const device_config *device)
 {
+	int chip = (strcmp(device->tag, "adpcm1") == 0) ? 0 : 1;
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;
@@ -477,7 +479,7 @@ static void dd_adpcm_int(running_machine *machine, int chip)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * chip;
+		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
 		msm5205_data_w(chip,adpcm_data[chip] >> 4);

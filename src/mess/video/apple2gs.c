@@ -21,7 +21,7 @@ VIDEO_START( apple2gs )
 	apple2_video_start(machine, apple2gs_slowmem, 0x20000, 0, 8);
 	apple2gs_legacy_gfx = auto_bitmap_alloc(560, 192, BITMAP_FORMAT_INDEXED16);
 
-	state_save_register_item("BORDERCLR", NULL, 0, apple2gs_bordercolor);
+	state_save_register_item(machine, "BORDERCLR", NULL, 0, apple2gs_bordercolor);
 }
 
 

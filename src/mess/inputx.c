@@ -649,7 +649,7 @@ static void clear_keybuffer(running_machine *machine)
 
 static void setup_keybuffer(running_machine *machine)
 {
-	inputx_timer = timer_alloc(inputx_timerproc, NULL);
+	inputx_timer = timer_alloc(machine, inputx_timerproc, NULL);
 	keybuffer = auto_malloc(sizeof(key_buffer));
 	memset(keybuffer, 0, sizeof(*keybuffer));
 	add_exit_callback(machine, clear_keybuffer);
@@ -1540,7 +1540,7 @@ static void execute_dumpkbd(running_machine *machine, int ref, int params, const
 		file = fopen(filename, "w");
 		if (file == NULL)
 		{
-			debug_console_printf("Cannot open \"%s\"\n", filename);
+			debug_console_printf(machine, "Cannot open \"%s\"\n", filename);
 			return;
 		}
 	}
@@ -1575,12 +1575,12 @@ static void execute_dumpkbd(running_machine *machine, int ref, int params, const
 			if (file != NULL)
 				fprintf(file, "%s\n", buffer);
 			else
-				debug_console_printf("%s\n", buffer);
+				debug_console_printf(machine, "%s\n", buffer);
 		}
 	}
 	else
 	{
-		debug_console_printf("No natural keyboard support\n");
+		debug_console_printf(machine, "No natural keyboard support\n");
 	}
 
 	/* cleanup */

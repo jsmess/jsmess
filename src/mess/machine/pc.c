@@ -58,7 +58,7 @@
 		if(VERBOSE_PIO>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -229,7 +229,7 @@ static PIC8259_SET_INT_LINE( pcjr_pic8259_master_set_int_line )
 {
 	if ( cpu_get_reg( device->machine->cpu[0], REG_PC ) == 0xF0454 )
 	{
-		timer_adjust_oneshot( pc_int_delay_timer, ATTOTIME_IN_CYCLES(1,0), interrupt );
+		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(machine->cpu[0], 1), interrupt );
 	}
 	else
 	{
@@ -579,7 +579,7 @@ static void pcjr_keyb_init(void)
 	pcjr_keyb.transferring = 0;
 	pcjr_keyb.latch = 0;
 	pcjr_keyb.raw_keyb_data = 0;
-	pcjr_keyb.keyb_signal_timer = timer_alloc( pcjr_keyb_signal_callback, NULL );
+	pcjr_keyb.keyb_signal_timer = timer_alloc(machine,  pcjr_keyb_signal_callback, NULL );
 	pc_keyb_set_clock( 1 );
 }
 
@@ -1334,7 +1334,7 @@ MACHINE_RESET( pcjr )
 {
 	MACHINE_RESET_CALL( pc );
 	pcjr_keyb_init();
-	pc_int_delay_timer = timer_alloc( pcjr_delayed_pic8259_irq, NULL );
+	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
 }
 
 

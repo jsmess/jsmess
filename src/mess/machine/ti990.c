@@ -85,7 +85,7 @@ static TIMER_CALLBACK(clear_load)
 void ti990_hold_load(running_machine *machine)
 {
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
+	timer_set(machine, ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
 }
 
 /*

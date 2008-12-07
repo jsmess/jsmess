@@ -467,7 +467,7 @@ static MACHINE_START( sord_m5 )
 
 static MACHINE_RESET( sord_m5 )
 {
-//  cassette_timer = timer_pulse(TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
+//  cassette_timer = timer_pulse(machine, TIME_IN_HZ(11025), NULL, 0, cassette_timer_callback);
 	TMS9928A_reset ();
 
 	/* should be done in a special callback to work properly! */

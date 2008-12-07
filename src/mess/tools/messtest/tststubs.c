@@ -14,7 +14,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 {
 }
 
-void osd_wait_for_debugger(running_machine *machine, int firststop)
+void osd_wait_for_debugger(const device_config *device, int firststop)
 {
 }
 

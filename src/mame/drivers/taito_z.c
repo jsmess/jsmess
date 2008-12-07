@@ -1000,7 +1000,7 @@ static INTERRUPT_GEN( sci_interrupt )
 	sci_int6 = !sci_int6;
 
 	if (sci_int6)
-		timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, taitoz_interrupt6);
+		timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, taitoz_interrupt6);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -1015,7 +1015,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 	dblaxle_int6 = !dblaxle_int6;
 
 	if (dblaxle_int6)
-		timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, taitoz_interrupt6);
+		timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, taitoz_interrupt6);
 
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
@@ -1023,7 +1023,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 static INTERRUPT_GEN( dblaxle_cpub_interrupt )
 {
 	// Unsure how many int6's per frame
-	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL,  0, taitoz_interrupt6);
+	timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL,  0, taitoz_interrupt6);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -1254,7 +1254,7 @@ static WRITE16_HANDLER( bshark_stick_w )
        but we don't want CPUA to have an int6 before int4 is over (?)
     */
 
-	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, taitoz_interrupt6);
+	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,10000), NULL, 0, taitoz_interrupt6);
 }
 
 
@@ -1337,7 +1337,7 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, taitoz_sg_cpub_interrupt5);
+	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,10000), NULL, 0, taitoz_sg_cpub_interrupt5);
 }
 
 
@@ -1516,14 +1516,14 @@ static MACHINE_START( taitoz )
 	dblaxle_int6 = 0;
 	ioc220_port = 0;
 
-	state_save_register_global(cpua_ctrl);
+	state_save_register_global(machine, cpua_ctrl);
 
 	/* these are specific to various games: we ought to split the inits */
-	state_save_register_global(sci_int6);
-	state_save_register_global(dblaxle_int6);
-	state_save_register_global(ioc220_port);
+	state_save_register_global(machine, sci_int6);
+	state_save_register_global(machine, dblaxle_int6);
+	state_save_register_global(machine, ioc220_port);
 
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, taitoz_postload, NULL);
 }
 
@@ -4781,7 +4781,7 @@ static DRIVER_INIT( bshark )
 	eep_latch = 0;
 	state_save_register_postload(machine, bshark_postload, NULL);
 
-	state_save_register_global(eep_latch);
+	state_save_register_global(machine, eep_latch);
 }
 
 

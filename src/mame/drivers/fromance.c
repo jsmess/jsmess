@@ -99,14 +99,14 @@ static TIMER_CALLBACK( deferred_commanddata_w )
 static WRITE8_HANDLER( fromance_commanddata_w )
 {
 	/* do this on a timer to let the slave CPU synchronize */
-	timer_call_after_resynch(NULL, data, deferred_commanddata_w);
+	timer_call_after_resynch(space->machine, NULL, data, deferred_commanddata_w);
 }
 
 
 static READ8_HANDLER( fromance_busycheck_main_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
 	if (!fromance_directionflag) return 0x00;		// standby
 	else return 0xff;								// busy
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( fromance_adpcm_w )
 }
 
 
-static void fromance_adpcm_int(running_machine *machine, int irq)
+static void fromance_adpcm_int(const device_config *device)
 {
 	/* skip if we're reset */
 	if (!fromance_adpcm_reset)
@@ -180,7 +180,7 @@ static void fromance_adpcm_int(running_machine *machine, int irq)
 
 	/* generate an NMI if we're out of data */
 	if (!fromance_vclk_left)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

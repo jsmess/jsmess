@@ -200,7 +200,7 @@ static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 		struct YMZ280BVoice *voice = &chip->voice[j];
 		update_step(chip, voice);
 		if(voice->irq_schedule)
-			timer_set(attotime_zero, chip, 0, update_irq_state_cb[j]);
+			timer_set(machine, attotime_zero, chip, 0, update_irq_state_cb[j]);
 	}
 }
 
@@ -576,7 +576,7 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 				voice->playing = 0;
 
 				/* set update_irq_state_timer. IRQ is signaled on next CPU execution. */
-				timer_set(attotime_zero, chip, 0, update_irq_state_cb[v]);
+				timer_set(Machine, attotime_zero, chip, 0, update_irq_state_cb[v]);
 				voice->irq_schedule = 1;
 			}
 		}
@@ -644,7 +644,7 @@ static SND_START( ymz280b )
 
 	/* initialize the rest of the structure */
 	chip->master_clock = (double)clock / 384.0;
-	chip->region_base = memory_region(Machine, tag);
+	chip->region_base = device->region;
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */
@@ -656,42 +656,42 @@ static SND_START( ymz280b )
 	/* state save */
 	{
 		int j;
-		state_save_register_item("ymz280b", tag, 0, chip->current_register);
-		state_save_register_item("ymz280b", tag, 0, chip->status_register);
-		state_save_register_item("ymz280b", tag, 0, chip->irq_state);
-		state_save_register_item("ymz280b", tag, 0, chip->irq_mask);
-		state_save_register_item("ymz280b", tag, 0, chip->irq_enable);
-		state_save_register_item("ymz280b", tag, 0, chip->keyon_enable);
-		state_save_register_item("ymz280b", tag, 0, chip->rom_readback_addr);
+		state_save_register_device_item(device, 0, chip->current_register);
+		state_save_register_device_item(device, 0, chip->status_register);
+		state_save_register_device_item(device, 0, chip->irq_state);
+		state_save_register_device_item(device, 0, chip->irq_mask);
+		state_save_register_device_item(device, 0, chip->irq_enable);
+		state_save_register_device_item(device, 0, chip->keyon_enable);
+		state_save_register_device_item(device, 0, chip->rom_readback_addr);
 		for (j = 0; j < 8; j++)
 		{
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].playing);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].keyon);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].looping);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].mode);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].fnum);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].level);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].pan);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].start);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].stop);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].loop_start);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].loop_end);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].position);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].signal);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].step);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].loop_signal);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].loop_step);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].loop_count);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].output_left);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].output_right);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].output_pos);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].last_sample);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].curr_sample);
-			state_save_register_item("ymz280b", tag, j, chip->voice[j].irq_schedule);
+			state_save_register_device_item(device, j, chip->voice[j].playing);
+			state_save_register_device_item(device, j, chip->voice[j].keyon);
+			state_save_register_device_item(device, j, chip->voice[j].looping);
+			state_save_register_device_item(device, j, chip->voice[j].mode);
+			state_save_register_device_item(device, j, chip->voice[j].fnum);
+			state_save_register_device_item(device, j, chip->voice[j].level);
+			state_save_register_device_item(device, j, chip->voice[j].pan);
+			state_save_register_device_item(device, j, chip->voice[j].start);
+			state_save_register_device_item(device, j, chip->voice[j].stop);
+			state_save_register_device_item(device, j, chip->voice[j].loop_start);
+			state_save_register_device_item(device, j, chip->voice[j].loop_end);
+			state_save_register_device_item(device, j, chip->voice[j].position);
+			state_save_register_device_item(device, j, chip->voice[j].signal);
+			state_save_register_device_item(device, j, chip->voice[j].step);
+			state_save_register_device_item(device, j, chip->voice[j].loop_signal);
+			state_save_register_device_item(device, j, chip->voice[j].loop_step);
+			state_save_register_device_item(device, j, chip->voice[j].loop_count);
+			state_save_register_device_item(device, j, chip->voice[j].output_left);
+			state_save_register_device_item(device, j, chip->voice[j].output_right);
+			state_save_register_device_item(device, j, chip->voice[j].output_pos);
+			state_save_register_device_item(device, j, chip->voice[j].last_sample);
+			state_save_register_device_item(device, j, chip->voice[j].curr_sample);
+			state_save_register_device_item(device, j, chip->voice[j].irq_schedule);
 		}
 	}
 
-	state_save_register_postload(Machine, YMZ280B_state_save_update_step, chip);
+	state_save_register_postload(device->machine, YMZ280B_state_save_update_step, chip);
 
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);

@@ -809,7 +809,7 @@ static STATE_POSTLOAD( cojag_postload )
 
 VIDEO_START( cojag )
 {
-	object_timer = timer_alloc(cojag_scanline_update, NULL);
+	object_timer = timer_alloc(machine, cojag_scanline_update, NULL);
 	adjust_object_timer(machine, 0);
 
 	screen_bitmap = auto_bitmap_alloc(720, 512, BITMAP_FORMAT_RGB32);
@@ -818,10 +818,10 @@ VIDEO_START( cojag )
 
 	pen_table = auto_malloc(65536 * sizeof(pen_t));
 
-	state_save_register_global_pointer(pen_table, 65536);
-	state_save_register_global_array(blitter_regs);
-	state_save_register_global_array(gpu_regs);
-	state_save_register_global(cpu_irq_state);
+	state_save_register_global_pointer(machine, pen_table, 65536);
+	state_save_register_global_array(machine, blitter_regs);
+	state_save_register_global_array(machine, gpu_regs);
+	state_save_register_global(machine, cpu_irq_state);
 	state_save_register_postload(machine, cojag_postload, NULL);
 }
 
@@ -838,7 +838,7 @@ VIDEO_UPDATE( cojag )
 	/* if not enabled, just blank */
 	if (!(gpu_regs[VMODE] & 1))
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return 0;
 	}
 

@@ -204,7 +204,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static VIDEO_UPDATE( gpworld )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
 	gpworld_draw_sprites(screen->machine, bitmap, cliprect);
@@ -420,7 +420,7 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
+	timer_set(device->machine, ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
 }
 
 static const gfx_layout gpworld_tile_layout =

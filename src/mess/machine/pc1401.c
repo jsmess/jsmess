@@ -36,7 +36,7 @@ void pc1401_outb(int data)
 
 void pc1401_outc(int data)
 {
-	logerror("%g outc %.2x\n", attotime_to_double(timer_get_time()), data);
+	logerror("%g outc %.2x\n", attotime_to_double(timer_get_time(machine)), data);
 	pc1401_portc=data;
 }
 
@@ -248,7 +248,7 @@ DRIVER_INIT( pc1401 )
 	for (i=0; i<128; i++) 
 		gfx[i]=i;
 
-	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);
+	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1401_power_up);
 
 	/* NPW 28-Jun-2006 - Input ports can't be read at init time! Even then, this should use mess_ram */
 	if (0 && (input_port_read(machine, "DSW0") & 0xc0) == 0x80)

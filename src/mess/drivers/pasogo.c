@@ -73,7 +73,7 @@ static void vg230_reset(running_machine *machine)
 
 	memset(&vg230, 0, sizeof(vg230));
 	vg230.pmu.write_protected=TRUE;
-	timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, vg230_timer);
+	timer_pulse(machine, ATTOTIME_IN_HZ(1), NULL, 0, vg230_timer);
 
 
 	mame_get_base_datetime(machine, &systime);

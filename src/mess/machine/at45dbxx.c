@@ -11,6 +11,7 @@
 */
 
 #include "at45dbxx.h"
+#include "deprecat.h"
 
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
@@ -60,9 +61,10 @@ typedef struct
 
 static AT45DBXX flash;
 
-static void at45dbxx_state_save( void);
+static void at45dbxx_state_save(running_machine *machine);
+static void at45dbxx_reset(running_machine *machine);
 
-void at45dbxx_init( int type)
+void at45dbxx_init(running_machine *machine, int type)
 {
 	_logerror( 0, ("at45dbxx_init (%d)\n", type));
 	memset( &flash, 0, sizeof( flash));
@@ -73,21 +75,15 @@ void at45dbxx_init( int type)
 		case AT45DB161 : flash.pages = 4096; flash.page_size = 528; flash.devid = 0x28; break;
 	}
 	flash.size = flash.pages * flash.page_size;
-	flash.data = malloc_or_die( flash.size);
-	flash.buffer1 = malloc_or_die( flash.page_size);
-	flash.buffer2 = malloc_or_die( flash.page_size);
-	at45dbxx_state_save();
+	flash.data = auto_malloc( flash.size);
+	flash.buffer1 = auto_malloc( flash.page_size);
+	flash.buffer2 = auto_malloc( flash.page_size);
+	at45dbxx_state_save(machine);
+
+	add_reset_callback(machine, at45dbxx_reset);
 }
 
-void at45dbxx_exit( void)
-{
-	_logerror( 0, ("at45dbxx_exit\n"));
-	free( flash.buffer2);
-	free( flash.buffer1);
-	free( flash.data);
-}
-
-void at45dbxx_reset( void)
+static void at45dbxx_reset(running_machine *machine)
 {
 	_logerror( 1, ("at45dbxx_reset\n"));
 	// mode
@@ -115,19 +111,19 @@ void at45dbxx_reset( void)
 	flash.si_bits = 0;
 }
 
-static void at45dbxx_state_save( void)
+static void at45dbxx_state_save(running_machine *machine)
 {
 	const char *name = "at45dbxx";
 	// data
-	state_save_register_item_pointer( name, NULL, 0, flash.data, flash.size);
+	state_save_register_item_pointer(machine, name, NULL, 0, flash.data, flash.size);
 	// pins
-	state_save_register_item( name, NULL, 0, flash.pin.cs);
-	state_save_register_item( name, NULL, 0, flash.pin.sck);
-	state_save_register_item( name, NULL, 0, flash.pin.si);
-	state_save_register_item( name, NULL, 0, flash.pin.so);
-	state_save_register_item( name, NULL, 0, flash.pin.wp);
-	state_save_register_item( name, NULL, 0, flash.pin.reset);
-	state_save_register_item( name, NULL, 0, flash.pin.busy);
+	state_save_register_item(machine, name, NULL, 0, flash.pin.cs);
+	state_save_register_item(machine, name, NULL, 0, flash.pin.sck);
+	state_save_register_item(machine, name, NULL, 0, flash.pin.si);
+	state_save_register_item(machine, name, NULL, 0, flash.pin.so);
+	state_save_register_item(machine, name, NULL, 0, flash.pin.wp);
+	state_save_register_item(machine, name, NULL, 0, flash.pin.reset);
+	state_save_register_item(machine, name, NULL, 0, flash.pin.busy);
 }
 
 static UINT8 at45dbxx_read_byte( void)
@@ -300,7 +296,7 @@ void at45dbxx_pin_cs( int data)
 			memcpy( flash.data + page * flash.page_size, flash.buffer1, flash.page_size);
 		}
 		// reset
-		at45dbxx_reset();
+		at45dbxx_reset(Machine);
 	}
 	// save cs
 	flash.pin.cs = data;
@@ -336,13 +332,13 @@ void at45dbxx_pin_sck( int data)
 	flash.pin.sck = data;
 }
 
-void at45dbxx_load( mame_file *file)
+void at45dbxx_load(running_machine *machine, mame_file *file)
 {
 	_logerror( 0, ("at45dbxx_load (%p)\n", file));
 	mame_fread( file, flash.data, flash.size);
 }
 
-void at45dbxx_save( mame_file *file)
+void at45dbxx_save(running_machine *machine, mame_file *file)
 {
 	_logerror( 0, ("at45dbxx_save (%p)\n", file));
 	mame_fwrite( file, flash.data, flash.size);

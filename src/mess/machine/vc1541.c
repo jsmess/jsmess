@@ -153,7 +153,7 @@ GCR - http://www.baltissen.org/newhtm/1541c.htm
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -706,6 +706,8 @@ static READ8_HANDLER( vc1541_via0_read_portb )
 
 static WRITE8_HANDLER( vc1541_via0_write_portb )
 {
+	running_machine *machine = space->machine;
+
 	DBG_LOG(2, "vc1541 serial write",("%s %s %s\n",
 									 data & 0x10 ? "ATN"   : "atn",
 									 data & 0x08 ? "CLOCK" : "clock",
@@ -766,6 +768,7 @@ static void vc1541_via1_irq (running_machine *machine, int level)
 
 static READ8_HANDLER( vc1541_via1_read_porta )
 {
+	running_machine *machine = space->machine;
 	int data = drive->gcr.data[drive->pos];
 	DBG_LOG(2, "vc1541 drive", ("port a read %.2x\n", data));
 	return data;
@@ -773,6 +776,7 @@ static READ8_HANDLER( vc1541_via1_read_porta )
 
 static WRITE8_HANDLER( vc1541_via1_write_porta )
 {
+	running_machine *machine = space->machine;
 	DBG_LOG(1, "vc1541 drive", ("port a write %.2x\n", data));
 }
 
@@ -797,6 +801,7 @@ static int old = 0;
 
 static WRITE8_HANDLER( vc1541_via1_write_portb )
 {
+	running_machine *machine = space->machine;
 	if (data != old) 
 	{
 		DBG_LOG(1, "vc1541 drive",("%.2x\n", data));
@@ -1104,6 +1109,7 @@ static TIMER_CALLBACK(c1551_irq_timer)
 
 static WRITE8_HANDLER ( c1551_port_w )
 {
+	running_machine *machine = space->machine;
 	if (offset) 
 	{
 		DBG_LOG(1, "c1551 port",("write %.2x\n", data));
@@ -1183,8 +1189,9 @@ static WRITE8_HANDLER ( c1551_port_w )
 	}
 }
 
-static  READ8_HANDLER ( c1551_port_r )
+static READ8_HANDLER ( c1551_port_r )
 {
+	running_machine *machine = space->machine;
 	int data;
 
 	if (offset) 
@@ -1242,6 +1249,7 @@ static int c1551_port_c_r(void)
 
 static int c1551_port_b_r (void)
 {
+	running_machine *machine = Machine;
 	int data = drive->gcr.data[drive->pos];
 	DBG_LOG(2, "c1551 drive",("port a read %.2x\n", data));
 	return data;
@@ -1348,7 +1356,7 @@ int drive_config (int type, int id, int mode, int cpunr, int devicenr)
 	drive->type = type;
 	drive->cpunumber = cpunr;
 	drive->drive.serial.deviceid = devicenr;
-	drive->timer = timer_alloc(drive_timer, NULL);
+	drive->timer = timer_alloc(Machine, drive_timer, NULL);
 
 	if ((drive->type == type_1541) || (drive->type == type_2031)) 
 	{
@@ -1363,7 +1371,7 @@ int drive_config (int type, int id, int mode, int cpunr, int devicenr)
 
 		/* time should be small enough to allow quitting of the irq
 		line before the next interrupt is triggered */
-		drive->drive.c1551.irq_timer = timer_alloc(c1551_irq_timer, NULL);
+		drive->drive.c1551.irq_timer = timer_alloc(Machine, c1551_irq_timer, NULL);
 		timer_adjust_periodic(drive->drive.c1551.irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
 	}
 

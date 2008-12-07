@@ -371,15 +371,13 @@ DRVLIBS = \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
-	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apexc.a \
 	$(MESSOBJ)/apf.a \
 	$(MESSOBJ)/apple.a \
-	$(MESSOBJ)/arcadia.a \
-	$(MESSOBJ)/at.a \
-	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/aquarius.a \
+	$(MESSOBJ)/arcadia.a \
 	$(MESSOBJ)/ascii.a \
+	$(MESSOBJ)/at.a \
 	$(MESSOBJ)/avigo.a \
 	$(MESSOBJ)/b2m.a \
 	$(MESSOBJ)/bally.a \
@@ -398,93 +396,96 @@ DRVLIBS = \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
-	$(MESSOBJ)/dgn_beta.a \
-	$(MESSOBJ)/einis.a \
-	$(MESSOBJ)/ep128.a \
-	$(MESSOBJ)/epoch.a \
-	$(MESSOBJ)/epson.a \
-	$(MESSOBJ)/exeltel.a \
-	$(MESSOBJ)/exidy.a \
-	$(MESSOBJ)/fairch.a \
-	$(MESSOBJ)/gce.a \
-	$(MESSOBJ)/galaxy.a \
-	$(MESSOBJ)/glasgow.a \
-	$(MESSOBJ)/gmaster.a \
-	$(MESSOBJ)/grundy.a \
-	$(MESSOBJ)/homelab.a \
-	$(MESSOBJ)/hp48.a \
-	$(MESSOBJ)/intv.a \
-	$(MESSOBJ)/irisha.a \
-	$(MESSOBJ)/jupiter.a \
-	$(MESSOBJ)/kaypro.a \
-	$(MESSOBJ)/kim1.a \
-	$(MESSOBJ)/kramermc.a \
-	$(MESSOBJ)/luxor.a \
-	$(MESSOBJ)/lviv.a \
-	$(MESSOBJ)/lynx.a \
-	$(MESSOBJ)/magnavox.a \
-	$(MESSOBJ)/mbee.a \
-	$(MESSOBJ)/mc10.a \
-	$(MESSOBJ)/memotech.a \
-	$(MESSOBJ)/mephisto.a \
-	$(MESSOBJ)/mikro80.a \
-	$(MESSOBJ)/mk1.a \
-	$(MESSOBJ)/mk2.a \
-	$(MESSOBJ)/motorola.a \
-	$(MESSOBJ)/multitch.a \
-	$(MESSOBJ)/nascom1.a \
-	$(MESSOBJ)/nec.a \
-	$(MESSOBJ)/necpc.a \
-	$(MESSOBJ)/nintendo.a \
-	$(MESSOBJ)/ondra.a \
-	$(MESSOBJ)/orion.a \
-	$(MESSOBJ)/osborne.a \
-	$(MESSOBJ)/p2000.a \
-	$(MESSOBJ)/pasogo.a \
-	$(MESSOBJ)/pc.a \
-	$(MESSOBJ)/sgi.a \
-	$(MESSOBJ)/pcshare.a \
-	$(MESSOBJ)/pdp1.a \
-	$(MESSOBJ)/pel.a \
-	$(MESSOBJ)/pk8020.a \
-	$(MESSOBJ)/pmd85.a \
-	$(MESSOBJ)/pp01.a \
-	$(MESSOBJ)/primo.a \
-	$(MESSOBJ)/radio.a \
-	$(MESSOBJ)/rca.a \
-	$(MESSOBJ)/rockwell.a \
-	$(MESSOBJ)/rt1715.a \
-	$(MESSOBJ)/samcoupe.a \
-	$(MESSOBJ)/sapi1.a \
-	$(MESSOBJ)/sega.a \
-	$(MESSOBJ)/sharp.a \
-	$(MESSOBJ)/sony.a \
-	$(MESSOBJ)/sord.a \
-	$(MESSOBJ)/sinclair.a \
-	$(MESSOBJ)/special.a \
-	$(MESSOBJ)/ssystem3.a \
-	$(MESSOBJ)/super80.a \
-	$(MESSOBJ)/svi.a \
-	$(MESSOBJ)/svision.a \
-	$(MESSOBJ)/synertec.a \
-	$(MESSOBJ)/tangerin.a \
-	$(MESSOBJ)/tatung.a \
-	$(MESSOBJ)/teamconc.a \
-	$(MESSOBJ)/telmac.a \
-	$(MESSOBJ)/thomson.a \
-	$(MESSOBJ)/ti85.a \
-	$(MESSOBJ)/tiger.a \
-	$(MESSOBJ)/ti99.a \
-	$(MESSOBJ)/trs80.a \
-	$(MESSOBJ)/tutor.a \
-	$(MESSOBJ)/tx0.a \
-	$(MESSOBJ)/ut88.a \
-	$(MESSOBJ)/vc4000.a \
-	$(MESSOBJ)/veb.a \
-	$(MESSOBJ)/vector06.a \
-	$(MESSOBJ)/votrax.a \
-	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
+
+#	$(MESSOBJ)/amstrad.a \
+#	$(MESSOBJ)/atari.a \
+#	$(MESSOBJ)/dgn_beta.a \
+#	$(MESSOBJ)/einis.a \
+#	$(MESSOBJ)/ep128.a \
+#	$(MESSOBJ)/epoch.a \
+#	$(MESSOBJ)/epson.a \
+#	$(MESSOBJ)/exeltel.a \
+#	$(MESSOBJ)/exidy.a \
+#	$(MESSOBJ)/fairch.a \
+#	$(MESSOBJ)/galaxy.a \
+#	$(MESSOBJ)/gce.a \
+#	$(MESSOBJ)/glasgow.a \
+#	$(MESSOBJ)/gmaster.a \
+#	$(MESSOBJ)/grundy.a \
+#	$(MESSOBJ)/homelab.a \
+#	$(MESSOBJ)/hp48.a \
+#	$(MESSOBJ)/intv.a \
+#	$(MESSOBJ)/irisha.a \
+#	$(MESSOBJ)/jupiter.a \
+#	$(MESSOBJ)/kaypro.a \
+#	$(MESSOBJ)/kim1.a \
+#	$(MESSOBJ)/kramermc.a \
+#	$(MESSOBJ)/luxor.a \
+#	$(MESSOBJ)/lviv.a \
+#	$(MESSOBJ)/lynx.a \
+#	$(MESSOBJ)/magnavox.a \
+#	$(MESSOBJ)/mbee.a \
+#	$(MESSOBJ)/mc10.a \
+#	$(MESSOBJ)/memotech.a \
+#	$(MESSOBJ)/mephisto.a \
+#	$(MESSOBJ)/mikro80.a \
+#	$(MESSOBJ)/mk1.a \
+#	$(MESSOBJ)/mk2.a \
+#	$(MESSOBJ)/motorola.a \
+#	$(MESSOBJ)/multitch.a \
+#	$(MESSOBJ)/nascom1.a \
+#	$(MESSOBJ)/nec.a \
+#	$(MESSOBJ)/necpc.a \
+#	$(MESSOBJ)/nintendo.a \
+#	$(MESSOBJ)/ondra.a \
+#	$(MESSOBJ)/orion.a \
+#	$(MESSOBJ)/osborne.a \
+#	$(MESSOBJ)/p2000.a \
+#	$(MESSOBJ)/pasogo.a \
+#	$(MESSOBJ)/pc.a \
+#	$(MESSOBJ)/pcshare.a \
+#	$(MESSOBJ)/pdp1.a \
+#	$(MESSOBJ)/pel.a \
+#	$(MESSOBJ)/pk8020.a \
+#	$(MESSOBJ)/pmd85.a \
+#	$(MESSOBJ)/pp01.a \
+#	$(MESSOBJ)/primo.a \
+#	$(MESSOBJ)/radio.a \
+#	$(MESSOBJ)/rca.a \
+#	$(MESSOBJ)/rockwell.a \
+#	$(MESSOBJ)/rt1715.a \
+#	$(MESSOBJ)/samcoupe.a \
+#	$(MESSOBJ)/sapi1.a \
+#	$(MESSOBJ)/sega.a \
+#	$(MESSOBJ)/sgi.a \
+#	$(MESSOBJ)/sharp.a \
+#	$(MESSOBJ)/sinclair.a \
+#	$(MESSOBJ)/sony.a \
+#	$(MESSOBJ)/sord.a \
+#	$(MESSOBJ)/special.a \
+#	$(MESSOBJ)/ssystem3.a \
+#	$(MESSOBJ)/super80.a \
+#	$(MESSOBJ)/svi.a \
+#	$(MESSOBJ)/svision.a \
+#	$(MESSOBJ)/synertec.a \
+#	$(MESSOBJ)/tangerin.a \
+#	$(MESSOBJ)/tatung.a \
+#	$(MESSOBJ)/teamconc.a \
+#	$(MESSOBJ)/telmac.a \
+#	$(MESSOBJ)/thomson.a \
+#	$(MESSOBJ)/ti85.a \
+#	$(MESSOBJ)/ti99.a \
+#	$(MESSOBJ)/tiger.a \
+#	$(MESSOBJ)/trs80.a \
+#	$(MESSOBJ)/tutor.a \
+#	$(MESSOBJ)/tx0.a \
+#	$(MESSOBJ)/ut88.a \
+#	$(MESSOBJ)/vc4000.a \
+#	$(MESSOBJ)/veb.a \
+#	$(MESSOBJ)/vector06.a \
+#	$(MESSOBJ)/votrax.a \
+#	$(MESSOBJ)/vtech.a \
 
 
 
@@ -540,6 +541,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/z80dart.o	\
 	$(MESS_VIDEO)/msm6255.o	\
 	$(MESS_MACHINE)/mc6850.o	\
+	$(MESS_MACHINE)/8530scc.o		\
 
 
 

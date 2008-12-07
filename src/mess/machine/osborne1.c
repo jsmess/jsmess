@@ -494,11 +494,11 @@ MACHINE_RESET( osborne1 )
 
 	memset( mess_ram + 0x10000, 0xFF, 0x1000 );
 
-	osborne1.video_timer = timer_alloc( osborne1_video_callback , NULL);
+	osborne1.video_timer = timer_alloc(machine,  osborne1_video_callback , NULL);
 	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0 ), 0);
 	pia_1_ca1_w( space, 0, 0 );
 
-	timer_set( attotime_zero, NULL, 0, setup_beep );
+	timer_set(machine,  attotime_zero, NULL, 0, setup_beep );
 
 	memory_set_direct_update_handler( space, osborne1_opbase );
 }

@@ -531,7 +531,7 @@ static void check_interrupt(tms34010_state *tms)
 	/* check for NMI first */
 	if (IOREG(tms, REG_HSTCTLH) & 0x0100)
 	{
-		LOG(("TMS34010#%d takes NMI\n", cpunum_get_active()));
+		LOG(("TMS34010 '%s' takes NMI\n", tms->device->tag));
 
 		/* ack the NMI */
 		IOREG(tms, REG_HSTCTLH) &= ~0x0100;
@@ -558,28 +558,28 @@ static void check_interrupt(tms34010_state *tms)
 	/* host interrupt */
 	if (irq & TMS34010_HI)
 	{
-		LOG(("TMS34010#%d takes HI\n", cpunum_get_active()));
+		LOG(("TMS34010 '%s' takes HI\n", tms->device->tag));
 		vector = 0xfffffec0;
 	}
 
 	/* display interrupt */
 	else if (irq & TMS34010_DI)
 	{
-		LOG(("TMS34010#%d takes DI\n", cpunum_get_active()));
+		LOG(("TMS34010 '%s' takes DI\n", tms->device->tag));
 		vector = 0xfffffea0;
 	}
 
 	/* window violation interrupt */
 	else if (irq & TMS34010_WV)
 	{
-		LOG(("TMS34010#%d takes WV\n", cpunum_get_active()));
+		LOG(("TMS34010 '%s' takes WV\n", tms->device->tag));
 		vector = 0xfffffe80;
 	}
 
 	/* external 1 interrupt */
 	else if (irq & TMS34010_INT1)
 	{
-		LOG(("TMS34010#%d takes INT1\n", cpunum_get_active()));
+		LOG(("TMS34010 '%s' takes INT1\n", tms->device->tag));
 		vector = 0xffffffc0;
 		irqline = 0;
 	}
@@ -587,7 +587,7 @@ static void check_interrupt(tms34010_state *tms)
 	/* external 2 interrupt */
 	else if (irq & TMS34010_INT2)
 	{
-		LOG(("TMS34010#%d takes INT2\n", cpunum_get_active()));
+		LOG(("TMS34010 '%s' takes INT2\n", tms->device->tag));
 		vector = 0xffffffa0;
 		irqline = 1;
 	}
@@ -627,23 +627,23 @@ static CPU_INIT( tms34010 )
 	tms->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, configdata->screen_tag);
 
 	/* allocate a scanline timer and set it to go off at the start */
-	tms->scantimer = timer_alloc(scanline_callback, tms);
+	tms->scantimer = timer_alloc(device->machine, scanline_callback, tms);
 	timer_adjust_oneshot(tms->scantimer, attotime_zero, index);
 
 	/* allocate the shiftreg */
 	tms->shiftreg = auto_malloc(SHIFTREG_SIZE);
 
-	state_save_register_item("tms34010", device->tag, 0, tms->pc);
-	state_save_register_item("tms34010", device->tag, 0, tms->st);
-	state_save_register_item("tms34010", device->tag, 0, tms->reset_deferred);
-	state_save_register_item_pointer("tms34010", device->tag, 0, tms->shiftreg, SHIFTREG_SIZE / 2);
-	state_save_register_item_array("tms34010", device->tag, 0, tms->IOregs);
-	state_save_register_item("tms34010", device->tag, 0, tms->convsp);
-	state_save_register_item("tms34010", device->tag, 0, tms->convdp);
-	state_save_register_item("tms34010", device->tag, 0, tms->convmp);
-	state_save_register_item("tms34010", device->tag, 0, tms->pixelshift);
-	state_save_register_item("tms34010", device->tag, 0, tms->gfxcycles);
-	state_save_register_item_pointer("tms34010", device->tag, 0, (&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
+	state_save_register_device_item(device, 0, tms->pc);
+	state_save_register_device_item(device, 0, tms->st);
+	state_save_register_device_item(device, 0, tms->reset_deferred);
+	state_save_register_device_item_pointer(device, 0, tms->shiftreg, SHIFTREG_SIZE / 2);
+	state_save_register_device_item_array(device, 0, tms->IOregs);
+	state_save_register_device_item(device, 0, tms->convsp);
+	state_save_register_device_item(device, 0, tms->convdp);
+	state_save_register_device_item(device, 0, tms->convmp);
+	state_save_register_device_item(device, 0, tms->pixelshift);
+	state_save_register_device_item(device, 0, tms->gfxcycles);
+	state_save_register_device_item_pointer(device, 0, (&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
 	state_save_register_postload(device->machine, tms34010_state_postload, tms);
 }
 
@@ -704,14 +704,10 @@ static CPU_EXIT( tms34010 )
     Get all registers in given buffer
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( tms34010 )
-{
-}
+static CPU_GET_CONTEXT( tms34010 ) { }
 
 
-static CPU_GET_CONTEXT( tms34020 )
-{
-}
+static CPU_GET_CONTEXT( tms34020 ) { }
 
 
 
@@ -736,7 +732,7 @@ static CPU_SET_CONTEXT( tms34020 )
 
 static void set_irq_line(tms34010_state *tms, int irqline, int linestate)
 {
-	LOG(("TMS34010#%d set irq line %d state %d\n", cpunum_get_active(), irqline, linestate));
+	LOG(("TMS34010 '%s' set irq line %d state %d\n", tms->device->tag, irqline, linestate));
 
 	/* set the pending interrupt */
 	switch (irqline)
@@ -771,7 +767,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 
 	/* call through to the CPU to generate the int */
 	IOREG(tms, REG_INTPEND) |= type;
-	LOG(("TMS34010#%d set internal interrupt $%04x\n", cpunum_get_active(), type));
+	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tms->device->tag, type));
 
 	/* generate triggers so that spin loops can key off them */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
@@ -1111,12 +1107,16 @@ VIDEO_UPDATE( tms340x0 )
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(screen->machine->cpu); cpunum++)
 	{
 		const device_config *cpudevice = screen->machine->cpu[cpunum];
-		if (cpudevice != NULL && (cpudevice->type == (device_type)CPU_TMS34010 || cpudevice->type == (device_type)CPU_TMS34020))
+		if (cpudevice != NULL)
 		{
-			tms = cpudevice->token;
-			if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
-				break;
-			tms = NULL;
+			const cpu_class_header *classdata = cpudevice->classtoken;
+			if (classdata->cputype == CPU_TMS34010 || classdata->cputype == CPU_TMS34020)
+			{
+				tms = cpudevice->token;
+				if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
+					break;
+				tms = NULL;
+			}
 		}
 	}
 	if (tms == NULL)
@@ -1221,7 +1221,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_call_after_resynch(tms, 0, internal_interrupt_callback);
+				timer_call_after_resynch(tms->device->machine, tms, 0, internal_interrupt_callback);
 			break;
 
 		case REG_HSTCTLL:
@@ -1256,7 +1256,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_call_after_resynch(tms, TMS34010_HI, internal_interrupt_callback);
+				timer_call_after_resynch(tms->device->machine, tms, TMS34010_HI, internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(tms, REG_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1372,7 +1372,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_call_after_resynch(tms, 0, internal_interrupt_callback);
+				timer_call_after_resynch(tms->device->machine, tms, 0, internal_interrupt_callback);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1407,7 +1407,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_call_after_resynch(tms, TMS34010_HI, internal_interrupt_callback);
+				timer_call_after_resynch(tms->device->machine, tms, TMS34010_HI, internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(tms, REG020_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1763,7 +1763,7 @@ CPU_GET_INFO( tms34010 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms34010_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 8;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;

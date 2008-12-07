@@ -620,9 +620,9 @@ static const k054539_interface k054539_config =
 
 static MACHINE_START( qdrmfgp )
 {
-	state_save_register_global(control);
-	state_save_register_global(qdrmfgp_pal);
-	state_save_register_global(gp2_irq_control);
+	state_save_register_global(machine, control);
+	state_save_register_global(machine, qdrmfgp_pal);
+	state_save_register_global(machine, gp2_irq_control);
 }
 
 static MACHINE_RESET( qdrmfgp )
@@ -639,7 +639,7 @@ static MACHINE_RESET( qdrmfgp2 )
 	sndram = memory_region(machine, "konami") + 0x100000;
 
 	/* sound irq (CCU? 240Hz) */
-	timer_pulse(ATTOTIME_IN_HZ(18432000/76800), NULL, 0, gp2_timer_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(18432000/76800), NULL, 0, gp2_timer_callback);
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;

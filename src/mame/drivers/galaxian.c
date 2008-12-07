@@ -2290,6 +2290,7 @@ static void common_init(
 	galaxian_extend_tile_info_func extend_tile_info,
 	galaxian_extend_sprite_info_func extend_sprite_info)
 {
+	irq_enabled = 0;
 	irq_line = INPUT_LINE_NMI;
 	galaxian_frogger_adjust = FALSE;
 	galaxian_sfx_tilemap = FALSE;
@@ -2354,7 +2355,7 @@ static DRIVER_INIT( gmgalax )
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine->portconfig->fieldlist, NULL, 0, 0);
-	state_save_register_global(gmgalax_selected_game);
+	state_save_register_global(machine, gmgalax_selected_game);
 }
 
 
@@ -2612,8 +2613,8 @@ static DRIVER_INIT( kingball )
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0x7f8, kingball_sound2_w);
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb003, 0xb003, 0, 0x7f8, kingball_speech_dip_w);
 
-	state_save_register_global(kingball_speech_dip);
-	state_save_register_global(kingball_sound);
+	state_save_register_global(machine, kingball_speech_dip);
+	state_save_register_global(machine, kingball_sound);
 }
 
 
@@ -2848,7 +2849,7 @@ static DRIVER_INIT( moonwar )
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
-	state_save_register_global(moonwar_port_select);
+	state_save_register_global(machine, moonwar_port_select);
 }
 
 

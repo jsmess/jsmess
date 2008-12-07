@@ -943,18 +943,17 @@ void CreateSoundFolders(int parent_index)
 	// no games in top level folder
 	SetAllBits(lpFolder->m_lpGameBits,FALSE);
 
-	for (i = 1 ; i < MAX_SOUND ; i++)
+	for (i = 1 ; i < SOUND_COUNT ; i++)
 	{
 		LPTREEFOLDER lpTemp;
 		// Init to NULL here in case it doesn't get assigned below.		
 		map[i] = NULL;
 		// empty fields get filled in with SOUND_DUMMY, so check for this and
 		// don't add it
-		if (strcmp(sndtype_name(SOUND_DUMMY),sndtype_name(i)) == 0)
+		if (strcmp(sndtype_get_name(SOUND_DUMMY), sndtype_get_name(i)) == 0)
 			continue;
 
-		//dprintf("%i %s\n",i,sndtype_name(i));
-		lpTemp = NewFolder(sndtype_name(i), next_folder_id, parent_index, IDI_SOUND,
+		lpTemp = NewFolder(sndtype_get_name(i), next_folder_id, parent_index, IDI_SOUND,
  						   GetFolderFlags(numFolders));
 		ExtraFolderData[next_folder_id] = malloc(sizeof(EXFOLDERDATA) );
 		memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
@@ -963,27 +962,26 @@ void CreateSoundFolders(int parent_index)
 		ExtraFolderData[next_folder_id]->m_nIconId = IDI_SOUND;
 		ExtraFolderData[next_folder_id]->m_nParent = lpFolder->m_nFolderId;
 		ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
-		strcpy( ExtraFolderData[next_folder_id]->m_szTitle, sndtype_name(i) );
+		strcpy( ExtraFolderData[next_folder_id]->m_szTitle, sndtype_get_name(i) );
 		ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
 		AddFolder(lpTemp);
 		map[i] = treeFolders[nFolder++];
 	}
+
 	for (jj = 0; jj < nGames; jj++)
 	{
 		int n;
 		machine_config *config;
 
 		config = machine_config_alloc(drivers[jj]->machine_config);
-		// Additional range and null checking.
 		for (n = 0; n < MAX_SOUND ; n++) {
-			if (config->sound[n].type > SOUND_DUMMY &&
-				config->sound[n].type < MAX_SOUND)
-			{
-				if (map[config->sound[n].type] != NULL) {
+			if (config->sound[n].type != SOUND_DUMMY)
+//			{
+//				if (map[config->sound[n].type] != NULL) {
 					// sound type #'s are one-based, though that doesn't affect us here
 					AddGame(map[config->sound[n].type],jj);
-				}
-			}
+//				}
+//			}
 		}
 		machine_config_free(config);
 	}

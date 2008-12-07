@@ -209,7 +209,7 @@ static void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, v
 MACHINE_RESET( trs80 )
 {
 	cassette_data = 0x00;
-	cassette_data_timer = timer_alloc( cassette_data_callback, NULL );
+	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
 	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
 }
 

@@ -434,6 +434,7 @@ static MACHINE_RESET( mpu4 )
 		memory_configure_bank(machine, 1, 0, 8, &rom[0x01000], 0x10000);
 
 		memory_set_bank(machine, 1,0);
+		cpu_reset(machine->cpu[0]);
 	}
 
 }
@@ -887,7 +888,7 @@ static WRITE8_HANDLER( pia_ic7_porta_w )
 static WRITE8_HANDLER( pia_ic7_portb_w )
 {
 	int meter;
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles = cpu_get_total_cycles(space->cpu);
 
 /* The meters are connected to a voltage drop sensor, where current
 flowing through them also passes through pin B7, meaning that when
@@ -928,7 +929,7 @@ static WRITE8_HANDLER( pia_ic7_cb2_w )
 {
 /* The eighth meter is connected here, because the voltage sensor
 is on PB7. */
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles = cpu_get_total_cycles(space->cpu);
 	if (data)
 	{
 		pia_set_input_b(4,mmtr_data|0x80);
@@ -1247,7 +1248,7 @@ static void mpu4_config_common(running_machine *machine)
 	pia_config(4,&pia_ic7_intf);
 	pia_config(5,&pia_ic8_intf);
 
-	ic24_timer = timer_alloc(ic24_timeout, NULL);
+	ic24_timer = timer_alloc(machine, ic24_timeout, NULL);
 	/* setup 6840ptm */
 	ptm6840_config(machine, 0, &ptm_ic2_intf );
 }

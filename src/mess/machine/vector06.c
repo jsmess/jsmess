@@ -226,7 +226,7 @@ MACHINE_RESET( vector06 )
 	vector06_keyboard_mask = 0;
 	vector_color_index = 0;
 	vector_video_mode = 0;
-	timer_pulse(ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
 	
 	wd17xx_reset(machine);
 	wd17xx_set_pause_time(0);

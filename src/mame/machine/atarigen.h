@@ -145,7 +145,7 @@ READ16_HANDLER( atarigen_slapstic_r );
     SOUND I/O
 ---------------------------------------------------------------*/
 
-void atarigen_sound_io_reset(int cpu_num);
+void atarigen_sound_io_reset(const device_config *device);
 
 INTERRUPT_GEN( atarigen_6502_irq_gen );
 READ8_HANDLER( atarigen_6502_irq_ack_r );
@@ -161,7 +161,7 @@ READ16_HANDLER( atarigen_sound_upper_r );
 WRITE32_HANDLER( atarigen_sound_upper32_w );
 READ32_HANDLER( atarigen_sound_upper32_r );
 
-void atarigen_sound_reset(void);
+void atarigen_sound_reset(running_machine *machine);
 WRITE16_HANDLER( atarigen_sound_reset_w );
 WRITE8_HANDLER( atarigen_6502_sound_w );
 READ8_HANDLER( atarigen_6502_sound_r );

@@ -170,22 +170,22 @@ static MACHINE_RESET( jpmimpct )
 {
 	memset(&duart_1, 0, sizeof(duart_1));
 
-	duart_1_timer = timer_alloc(duart_1_timer_event, NULL);
+	duart_1_timer = timer_alloc(machine, duart_1_timer_event, NULL);
 
 	/* Reset states */
 	duart_1_irq = tms_irq = 0;
 	touch_cnt = 0;
 
 //  duart_1.IVR=0x0f;
-	state_save_register_global(tms_irq);
-	state_save_register_global(duart_1_irq);
-	state_save_register_global(touch_cnt);
-	state_save_register_global_array(touch_data);
+	state_save_register_global(machine, tms_irq);
+	state_save_register_global(machine, duart_1_irq);
+	state_save_register_global(machine, touch_cnt);
+	state_save_register_global_array(machine, touch_data);
 
 	/* TODO! */
-	state_save_register_global(duart_1.ISR);
-	state_save_register_global(duart_1.IMR);
-	state_save_register_global(duart_1.CT);
+	state_save_register_global(machine, duart_1.ISR);
+	state_save_register_global(machine, duart_1.IMR);
+	state_save_register_global(machine, duart_1.CT);
 }
 
 
@@ -558,7 +558,7 @@ static READ16_HANDLER( jpmio_r )
 
 static WRITE16_HANDLER( jpmio_w )
 {
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles = cpu_get_total_cycles(space->cpu);
 	switch (offset)
 	{
 		case 0x02:

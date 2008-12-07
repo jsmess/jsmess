@@ -1008,7 +1008,7 @@ static WRITE8_HANDLER( blitter_w )
 		else
 		{
 			blitter_busy = 1;
-			timer_adjust_oneshot(blitter_reset_timer, ATTOTIME_IN_CYCLES(100, 0), 0); // free blitter if no updates in 100 cycles
+			timer_adjust_oneshot(blitter_reset_timer, cpu_clocks_to_attotime(space->cpu, 100), 0); // free blitter if no updates in 100 cycles
 		}
 	}
 }
@@ -1429,7 +1429,7 @@ static VIDEO_UPDATE( halleys )
 		copy_scroll_xp(bitmap, render_layer[4], *scrollx1, *scrolly1);
 	}
 	else
-		fillbitmap(bitmap, bgcolor, cliprect);
+		bitmap_fill(bitmap, cliprect, bgcolor);
 
 #ifdef MAME_DEBUG
 	if (input_port_read(screen->machine, "DEBUG")) copy_scroll_xp(bitmap, render_layer[3], *scrollx0, *scrolly0); // not used???
@@ -1452,7 +1452,7 @@ static VIDEO_UPDATE( benberob )
 	if (io_ram[0xa0] & 0x80)
 		copy_scroll_op(bitmap, render_layer[2], *scrollx1, *scrolly1);
 	else
-		fillbitmap(bitmap, bgcolor, cliprect);
+		bitmap_fill(bitmap, cliprect, bgcolor);
 
 	copy_fixed_xp (bitmap, render_layer[1]);
 	copy_fixed_xp (bitmap, render_layer[0]);
@@ -2228,7 +2228,7 @@ static DRIVER_INIT( benberob )
 
 	init_common(machine);
 
-	blitter_reset_timer = timer_alloc(blitter_reset, NULL);
+	blitter_reset_timer = timer_alloc(machine, blitter_reset, NULL);
 }
 
 

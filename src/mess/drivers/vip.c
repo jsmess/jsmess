@@ -605,12 +605,12 @@ static MACHINE_START( vip )
 
 	/* register for state saving */
 
-	state_save_register_global_pointer(state->colorram, VP590_COLOR_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->colorram, VP590_COLOR_RAM_SIZE);
 
-	state_save_register_global(state->reset);
-	state_save_register_global(state->cdp1861_efx);
-	state_save_register_global(state->colorram_mwr);
-	state_save_register_global(state->keylatch);
+	state_save_register_global(machine, state->reset);
+	state_save_register_global(machine, state->cdp1861_efx);
+	state_save_register_global(machine, state->colorram_mwr);
+	state_save_register_global(machine, state->keylatch);
 }
 
 static MACHINE_RESET( vip )
@@ -806,7 +806,7 @@ static TIMER_CALLBACK( setup_beep )
 
 static DRIVER_INIT( vip )
 {
-	timer_set(attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
 }
 
 /* System Drivers */

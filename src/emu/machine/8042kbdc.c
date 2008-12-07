@@ -174,6 +174,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 
 #include "machine/pckeybrd.h"
@@ -279,7 +280,7 @@ void kbdc8042_init(const struct kbdc8042_interface *intf)
 	kbdc8042.inport = 0xa0;
 	at_8042_set_outport(0xfe, 1);
 
-	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, kbdc8042_time);
+	timer_pulse(Machine, ATTOTIME_IN_HZ(60), NULL, 0, kbdc8042_time);
 }
 
 static void at_8042_receive(int data)
@@ -517,7 +518,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			break;
 		case 0xaa:	/* selftest */
 			if (space->machine->config->cpu[0].type == CPU_I486)
-				timer_set(ATTOTIME_IN_MSEC(10), NULL, 0x55, at_8042_receive_timer); /* HACK */
+				timer_set(space->machine, ATTOTIME_IN_MSEC(10), NULL, 0x55, at_8042_receive_timer); /* HACK */
 			else
 				at_8042_receive(0x55);
 			break;

@@ -121,9 +121,9 @@ static UINT8		sound_banks;		/* number of sound banks */
 
 static MACHINE_START( segac2 )
 {
-	state_save_register_global_array(misc_io_data);
-	state_save_register_global(prot_write_buf);
-	state_save_register_global(prot_read_buf);
+	state_save_register_global_array(machine, misc_io_data);
+	state_save_register_global(machine, prot_write_buf);
+	state_save_register_global(machine, prot_read_buf);
 
 //  MACHINE_START_CALL(genesis);
 }
@@ -1392,7 +1392,7 @@ VIDEO_UPDATE(segac2_new)
 {
 	if (!segac2_enable_display)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), NULL);
+		bitmap_fill(bitmap, NULL, get_black_pen(screen->machine));
 		return 0;
 	}
 

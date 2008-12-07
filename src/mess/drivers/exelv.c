@@ -211,7 +211,7 @@ static void io_iterate(running_machine *machine)
 			io_state = IOS_NOP;
 			break;
 		case IOS_RESET:
-			timer_set(ATTOTIME_IN_USEC(100), NULL, 0, io_reset_timer);
+			timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, io_reset_timer);
 			break;
 		case IOS_STSPEECH1:
 			io_state = IOS_STSPEECH2;

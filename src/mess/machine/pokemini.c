@@ -490,7 +490,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( pm_reg[0x19] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer1, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer1, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -499,7 +499,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( pm_reg[0x19] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer1_hi, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer1_hi, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		/* Check if timer1 low should be enabled */
@@ -540,7 +540,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = pm_reg[0x18] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer1, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer1, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		/* Check for prescaler change for the low counter */
@@ -549,7 +549,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = ( pm_reg[0x18] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer1_hi, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer1_hi, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		{
@@ -619,7 +619,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( pm_reg[0x1B] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer2, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer2, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -628,7 +628,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( pm_reg[0x1B] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer2_hi, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer2_hi, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -665,7 +665,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = pm_reg[0x1A] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer2, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer2, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 
 			if ( ( pm_reg[0x1A] & 0x08 ) && ( pm_reg[0x38] & 0x04 ) &&
 			     ( ( ( pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
@@ -685,7 +685,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = ( pm_reg[0x1A] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer2_hi, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer2_hi, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 
 			if ( ( pm_reg[0x1A] & 0x80 ) && ( pm_reg[0x39] & 0x04 ) && ! ( pm_reg[0x38] & 0x80 ) &&
 			     ( ( ( pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
@@ -719,7 +719,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( pm_reg[0x1D] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer3, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer3, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -728,7 +728,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( pm_reg[0x1D] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer3_hi, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer3_hi, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -765,7 +765,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = pm_reg[0x1C] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer3, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer3, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 
 			if ( ( pm_reg[0x1C] & 0x08 ) && ( pm_reg[0x48] & 0x04 ) &&
 			     ( ( ( pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
@@ -785,7 +785,7 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			int index = ( pm_reg[0x1C] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(timers.timer3_hi, attotime_zero, 0, ATTOTIME_IN_CYCLES( cycles, 0 ));
+			timer_adjust_periodic(timers.timer3_hi, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], cycles));
 
 			if ( ( pm_reg[0x1C] & 0x80 ) && ( pm_reg[0x49] & 0x04 ) && ! ( pm_reg[0x48] & 0x80 ) &&
 			     ( ( ( pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
@@ -1585,22 +1585,22 @@ MACHINE_RESET( pokemini )
 	memset( pm_reg, 0, sizeof(pm_reg) );
 
 	/* Set up timers */
-	timers.seconds_timer = timer_alloc( pokemini_seconds_timer_callback , NULL );
+	timers.seconds_timer = timer_alloc(machine,  pokemini_seconds_timer_callback , NULL );
 	timer_adjust_periodic( timers.seconds_timer, attotime_zero, 0, ATTOTIME_IN_SEC( 1 ) );
 
-	timers.hz256_timer = timer_alloc( pokemini_256hz_timer_callback , NULL );
+	timers.hz256_timer = timer_alloc(machine,  pokemini_256hz_timer_callback , NULL );
 	timer_adjust_periodic( timers.hz256_timer, attotime_zero, 0, ATTOTIME_IN_HZ( 256 ) );
 
-	timers.timer1 = timer_alloc( pokemini_timer1_callback , NULL );
-	timers.timer1_hi = timer_alloc( pokemini_timer1_hi_callback, NULL );
-	timers.timer2 = timer_alloc( pokemini_timer2_callback , NULL );
-	timers.timer2_hi = timer_alloc( pokemini_timer2_hi_callback, NULL );
-	timers.timer3 = timer_alloc( pokemini_timer3_callback , NULL );
-	timers.timer3_hi = timer_alloc( pokemini_timer3_hi_callback, NULL );
+	timers.timer1 = timer_alloc(machine,  pokemini_timer1_callback , NULL );
+	timers.timer1_hi = timer_alloc(machine,  pokemini_timer1_hi_callback, NULL );
+	timers.timer2 = timer_alloc(machine,  pokemini_timer2_callback , NULL );
+	timers.timer2_hi = timer_alloc(machine,  pokemini_timer2_hi_callback, NULL );
+	timers.timer3 = timer_alloc(machine,  pokemini_timer3_callback , NULL );
+	timers.timer3_hi = timer_alloc(machine,  pokemini_timer3_hi_callback, NULL );
 
 	/* Set up the PRC */
 	prc.max_frame_count = 2;
-	prc.count_timer = timer_alloc( pokemini_prc_counter_callback, NULL );
-	timer_adjust_periodic( prc.count_timer, attotime_zero, 0, ATTOTIME_IN_CYCLES( 55640 / 65, 0 ) );
+	prc.count_timer = timer_alloc(machine,  pokemini_prc_counter_callback, NULL );
+	timer_adjust_periodic( prc.count_timer, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], 55640 / 65) );
 }
 

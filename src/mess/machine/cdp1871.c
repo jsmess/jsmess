@@ -308,19 +308,19 @@ static DEVICE_START( cdp1871 )
 	change_output_lines(device);
 	
 	/* create the timers */
-	cdp1871->scan_timer = timer_alloc(cdp1871_scan_tick, (void *)device);
+	cdp1871->scan_timer = timer_alloc(device->machine, cdp1871_scan_tick, (void *)device);
 	timer_adjust_periodic(cdp1871->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cdp1871->intf->clock));
 
 	/* register for state saving */
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->inhibit);
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->sense);
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->drive);
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->modifiers);
+	state_save_register_device_item(device, 0, cdp1871->inhibit);
+	state_save_register_device_item(device, 0, cdp1871->sense);
+	state_save_register_device_item(device, 0, cdp1871->drive);
+	state_save_register_device_item(device, 0, cdp1871->modifiers);
 
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->da);
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->next_da);
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->rpt);
-	state_save_register_item("cdp1871", device->tag, 0, cdp1871->next_rpt);
+	state_save_register_device_item(device, 0, cdp1871->da);
+	state_save_register_device_item(device, 0, cdp1871->next_da);
+	state_save_register_device_item(device, 0, cdp1871->rpt);
+	state_save_register_device_item(device, 0, cdp1871->next_rpt);
 	return DEVICE_START_OK;
 }
 

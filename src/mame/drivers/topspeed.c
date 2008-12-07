@@ -310,14 +310,14 @@ static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 static INTERRUPT_GEN( topspeed_interrupt )
 {
 	/* Unsure how many int6's per frame */
-	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, topspeed_interrupt6);
+	timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, topspeed_interrupt6);
 	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( topspeed_cpub_interrupt )
 {
 	/* Unsure how many int6's per frame */
-	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, topspeed_cpub_interrupt6);
+	timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, topspeed_cpub_interrupt6);
 	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -414,7 +414,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68
 	reset_sound_region(space->machine);
 }
 
-static void topspeed_msm5205_vck(running_machine *machine, int chip)
+static void topspeed_msm5205_vck(const device_config *device)
 {
 	if (adpcm_data != -1)
 	{
@@ -423,7 +423,7 @@ static void topspeed_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos];
+		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(0, adpcm_data >> 4);
 	}
@@ -683,9 +683,9 @@ static STATE_POSTLOAD( topspeed_postload )
 
 static MACHINE_START( topspeed )
 {
-	state_save_register_global(cpua_ctrl);
-	state_save_register_global(ioc220_port);
-	state_save_register_global(banknum);
+	state_save_register_global(machine, cpua_ctrl);
+	state_save_register_global(machine, ioc220_port);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, topspeed_postload, NULL);
 }
 

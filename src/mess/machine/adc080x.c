@@ -150,18 +150,18 @@ static DEVICE_START( adc080x )
 	adc080x->eoc = 1;
 
 	/* allocate cycle timer */
-	adc080x->cycle_timer = timer_alloc(cycle_tick, (void *)device);
+	adc080x->cycle_timer = timer_alloc(machine, cycle_tick, (void *)device);
 	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(adc080x->intf->clock));
 
 	/* register for state saving */
-	state_save_register_item("adc080x", device->tag, 0, adc080x->address);
-	state_save_register_item("adc080x", device->tag, 0, adc080x->ale);
-	state_save_register_item("adc080x", device->tag, 0, adc080x->start);
-	state_save_register_item("adc080x", device->tag, 0, adc080x->eoc);
-	state_save_register_item("adc080x", device->tag, 0, adc080x->next_eoc);
-	state_save_register_item("adc080x", device->tag, 0, adc080x->sar);
-	state_save_register_item("adc080x", device->tag, 0, adc080x->cycle);
-	state_save_register_item("adc080x", device->tag, 0, adc080x->bit);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->address);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->ale);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->start);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->eoc);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->next_eoc);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->sar);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->cycle);
+	state_save_register_item(machine, "adc080x", device->tag, 0, adc080x->bit);
 	return DEVICE_START_OK;
 }
 

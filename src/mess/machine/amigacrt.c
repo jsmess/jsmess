@@ -102,7 +102,7 @@ static void amiga_ar1_nmi( running_machine *machine )
 
 		/* trigger NMI irq */
 		amiga_ar1_spurious = 0;
-		timer_set( ATTOTIME_IN_CYCLES(28,0), NULL, 0, amiga_ar1_delayed_nmi );
+		timer_set(machine,  cpu_clocks_to_attotime(machine->cpu[0], 28), NULL, 0, amiga_ar1_delayed_nmi );
 	}
 }
 
@@ -119,7 +119,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		{
 			/* trigger an NMI or spurious irq */
 			amiga_ar1_spurious = (offset == 0x60/2) ? 0 : 1;
-			timer_set( ATTOTIME_IN_CYCLES(28,0), NULL, 0, amiga_ar1_delayed_nmi );
+			timer_set(space->machine,  cpu_clocks_to_attotime(space->machine->cpu[0], 28), NULL, 0, amiga_ar1_delayed_nmi );
 		}
 	}
 

@@ -48,12 +48,12 @@ static TIMER_CALLBACK( vblank_latch_clear )
 }
 
 
-static void vblank_latch_set(void)
+static void vblank_latch_set(running_machine *machine)
 {
 	/* set a timer to mimic the 555 timer that drives the EDGINT signal */
 	/* the 555 is run in monostable mode with R=56000 and C=1000pF */
 	vblank_latch = 1;
-	timer_set(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), NULL, 0, vblank_latch_clear);
+	timer_set(machine, PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), NULL, 0, vblank_latch_clear);
 
 	/* latch the current flip state at the same time */
 	video_flip = video_control & 1;
@@ -62,7 +62,7 @@ static void vblank_latch_set(void)
 
 INTERRUPT_GEN( segag80r_vblank_start )
 {
-	vblank_latch_set();
+	vblank_latch_set(device->machine);
 
 	/* if interrupts are enabled, clock one */
 	if (video_control & 0x04)
@@ -72,7 +72,7 @@ INTERRUPT_GEN( segag80r_vblank_start )
 
 INTERRUPT_GEN( sindbadm_vblank_start )
 {
-	vblank_latch_set();
+	vblank_latch_set(device->machine);
 
 	/* interrupts appear to always be enabled, but they have a manual */
 	/* acknowledge rather than an automatic ack; they are also not masked */
@@ -244,24 +244,24 @@ VIDEO_START( segag80r )
 	}
 
 	/* register for save states */
-	state_save_register_global_pointer(paletteram, 0x80);
+	state_save_register_global_pointer(machine, paletteram, 0x80);
 
-	state_save_register_global(video_control);
-	state_save_register_global(video_flip);
-	state_save_register_global(vblank_latch);
+	state_save_register_global(machine, video_control);
+	state_save_register_global(machine, video_flip);
+	state_save_register_global(machine, vblank_latch);
 
-	state_save_register_global(spaceod_hcounter);
-	state_save_register_global(spaceod_vcounter);
-	state_save_register_global(spaceod_fixed_color);
-	state_save_register_global(spaceod_bg_control);
-	state_save_register_global(spaceod_bg_detect);
+	state_save_register_global(machine, spaceod_hcounter);
+	state_save_register_global(machine, spaceod_vcounter);
+	state_save_register_global(machine, spaceod_fixed_color);
+	state_save_register_global(machine, spaceod_bg_control);
+	state_save_register_global(machine, spaceod_bg_detect);
 
-	state_save_register_global(bg_enable);
-	state_save_register_global(bg_char_bank);
-	state_save_register_global(bg_scrollx);
-	state_save_register_global(bg_scrolly);
+	state_save_register_global(machine, bg_enable);
+	state_save_register_global(machine, bg_char_bank);
+	state_save_register_global(machine, bg_scrollx);
+	state_save_register_global(machine, bg_scrolly);
 
-	state_save_register_global(pignewt_bg_color_offset);
+	state_save_register_global(machine, pignewt_bg_color_offset);
 }
 
 
@@ -747,7 +747,7 @@ static void draw_background_page_scroll(bitmap_t *bitmap, const rectangle *clipr
 	/* if disabled, draw nothing */
 	if (!bg_enable)
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return;
 	}
 
@@ -787,7 +787,7 @@ static void draw_background_full_scroll(bitmap_t *bitmap, const rectangle *clipr
 	/* if disabled, draw nothing */
 	if (!bg_enable)
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return;
 	}
 

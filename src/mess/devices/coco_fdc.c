@@ -195,12 +195,14 @@ static void fdc_coco_update_lines(coco_cartridge *cartridge)
 
 	/* set the NMI line */
 	cococart_set_line(
+		Machine,
 		cartridge,
 		COCOCART_LINE_NMI,
 		((info->intrq != 0) && (info->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 
 	/* set the HALT line */
 	cococart_set_line(
+		Machine,
 		cartridge,
 		COCOCART_LINE_HALT,
 		((info->drq == 0) && (info->dskreg & 0x80)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
@@ -516,12 +518,14 @@ static void fdc_dragon_update_lines(coco_cartridge *cartridge)
 
 	/* set the NMI line */
 	cococart_set_line(
+		Machine,
 		cartridge,
 		COCOCART_LINE_NMI,
 		((info->intrq != 0) && (info->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 
 	/* set the CART line */
 	cococart_set_line(
+		Machine,
 		cartridge,
 		COCOCART_LINE_CART,
 		(info->drq != 0) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);

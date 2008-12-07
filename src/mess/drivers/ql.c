@@ -591,15 +591,15 @@ static MACHINE_START( ql )
 
 	// register for state saving
 
-	state_save_register_global(state->keylatch);
-	state_save_register_global(state->ser1_txd);
-	state_save_register_global(state->ser1_dtr);
-	state_save_register_global(state->ser2_rxd);
-	state_save_register_global(state->ser2_cts);
-	state_save_register_global(state->ipl);
-	state_save_register_global(state->comdata);
-	state_save_register_global(state->comctl);
-	state_save_register_global(state->baudx4);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->ser1_txd);
+	state_save_register_global(machine, state->ser1_dtr);
+	state_save_register_global(machine, state->ser2_rxd);
+	state_save_register_global(machine, state->ser2_cts);
+	state_save_register_global(machine, state->ipl);
+	state_save_register_global(machine, state->comdata);
+	state_save_register_global(machine, state->comctl);
+	state_save_register_global(machine, state->baudx4);
 }
 
 static MACHINE_DRIVER_START( ql )

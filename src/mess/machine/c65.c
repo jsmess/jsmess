@@ -25,7 +25,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -326,7 +326,7 @@ static void c65_fdc_state(void)
 {
 	switch (c65_fdc.state) {
 	case FDC_CMD_MOTOR_SPIN_UP:
-		if (timer_get_time()-c65_fdc.time) {
+		if (timer_get_time(machine)-c65_fdc.time) {
 			c65_fdc.state=0;
 			c65_fdc.status&=~FDC_BUSY;
 		}
@@ -348,7 +348,7 @@ static void c65_fdc_w(running_machine *machine, int offset, int data)
 		case 0x20: // wait for motor spin up
 			c65_fdc.status&=~(FDC_IRQ|FDC_LOST|FDC_CRC|FDC_RNF);
 			c65_fdc.status|=FDC_BUSY;
-			c65_fdc.time=timer_get_time();
+			c65_fdc.time=timer_get_time(machine);
 			c65_fdc.state=FDC_CMD_MOTOR_SPIN_UP;
 			break;
 		case 0: // cancel
@@ -473,6 +473,7 @@ static WRITE8_HANDLER(c65_ram_expansion_w)
 
 static WRITE8_HANDLER ( c65_write_io )
 {
+	running_machine *machine = space->machine;
 	switch(offset&0xf00) {
 	case 0x000:
 		if (offset < 0x80)
@@ -509,12 +510,16 @@ static WRITE8_HANDLER ( c65_write_io )
 
 static WRITE8_HANDLER ( c65_write_io_dc00 )
 {
+	running_machine *machine = space->machine;
+	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
+	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+
 	switch(offset&0xf00) {
 	case 0x000:
-		cia_0_w(space, offset, data);
+		cia_w(cia_0, offset, data);
 		break;
 	case 0x100:
-		cia_1_w(space, offset, data);
+		cia_w(cia_1, offset, data);
 		break;
 	case 0x200:
 	case 0x300:
@@ -525,6 +530,7 @@ static WRITE8_HANDLER ( c65_write_io_dc00 )
 
 static READ8_HANDLER ( c65_read_io )
 {
+	running_machine *machine = space->machine;
 	switch(offset&0xf00) {
 	case 0x000:
 		if (offset < 0x80)
@@ -560,11 +566,15 @@ static READ8_HANDLER ( c65_read_io )
 
 static READ8_HANDLER ( c65_read_io_dc00 )
 {
+	running_machine *machine = space->machine;
+	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
+	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+
 	switch(offset&0x300) {
 	case 0x000:
-		return cia_0_r(space, offset);
+		return cia_r(cia_0, offset);
 	case 0x100:
-		return cia_1_r(space, offset);
+		return cia_r(cia_1, offset);
 	case 0x200:
 	case 0x300:
 		DBG_LOG (1, "io read", ("%.3x\n", offset+0xc00));
@@ -587,6 +597,7 @@ static int c65_io_on=0, c65_io_dc00_on=0;
 static void c65_bankswitch_interface(int value)
 {
 	static int old=0;
+	running_machine *machine = Machine;
 	read8_space_func rh;
 	write8_space_func wh;
 
@@ -596,8 +607,8 @@ static void c65_bankswitch_interface(int value)
 	{
 		if (value&1)
 		{
-			memory_set_bankptr (Machine, 8, c64_colorram + 0x400);
-			memory_set_bankptr (Machine, 9, c64_colorram + 0x400);
+			memory_set_bankptr (machine, 8, c64_colorram + 0x400);
+			memory_set_bankptr (machine, 9, c64_colorram + 0x400);
 			rh = SMH_BANK8;
 			wh = SMH_BANK9;
 		}
@@ -606,38 +617,38 @@ static void c65_bankswitch_interface(int value)
 			rh = c65_read_io_dc00;
 			wh = c65_write_io_dc00;
 		}
-		memory_install_read8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh);
-		memory_install_write8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh);
+		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh);
 	}
 
 	c65_io_dc00_on=!(value&1);
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x08)
-		memory_set_bankptr (Machine, 1, c64_roml);
+		memory_set_bankptr (machine, 1, c64_roml);
 	else
-		memory_set_bankptr (Machine, 1, c64_memory + 0x8000);
+		memory_set_bankptr (machine, 1, c64_memory + 0x8000);
 
 	if (value & 0x10)
-		memory_set_bankptr (Machine, 2, c64_basic);
+		memory_set_bankptr (machine, 2, c64_basic);
 	else
-		memory_set_bankptr (Machine, 2, c64_memory + 0xa000);
+		memory_set_bankptr (machine, 2, c64_memory + 0xa000);
 #endif
 	if ((old^value) & 0x20) 
 	{ 
 	/* bankswitching faulty when doing actual page */
 		if (value & 0x20) 
-			memory_set_bankptr (Machine, 3, c65_interface);
+			memory_set_bankptr (machine, 3, c65_interface);
 		else
-			memory_set_bankptr (Machine, 3, c64_memory + 0xc000);
+			memory_set_bankptr (machine, 3, c64_memory + 0xc000);
 	}
 	c65_charset_select=value&0x40;
 #if 0
 	/* cartridge roms !?*/
 	if (value & 0x80)
-		memory_set_bankptr (Machine, 8, c64_kernal);
+		memory_set_bankptr (machine, 8, c64_kernal);
 	else
-		memory_set_bankptr (Machine, 6, c64_memory + 0xe000);
+		memory_set_bankptr (machine, 6, c64_memory + 0xe000);
 #endif
 	old=value;
 }
@@ -802,18 +813,7 @@ static void c65_common_driver_init (running_machine *machine)
 
 	/*memset(c64_memory+0x40000, 0, 0x800000-0x40000); */
 
-	{
-		cia6526_interface cia_intf[2];
-		cia_intf[0] = c64_cia0;
-		cia_intf[1] = c64_cia1;
-		cia_intf[0].tod_clock = c64_pal ? 50 : 60;
-		cia_intf[1].tod_clock = c64_pal ? 50 : 60;
-
-		cia_config(machine, 0, &cia_intf[0]);
-		cia_config(machine, 1, &cia_intf[1]);
-	}
-
-	vic4567_init (c64_pal, c65_dma_read, c65_dma_read_color,
+	vic4567_init (machine, c64_pal, c65_dma_read, c65_dma_read_color,
 				  c64_vic_interrupt, c65_bankswitch_interface);
 }
 
@@ -840,7 +840,6 @@ MACHINE_START( c65 )
 	cbm_serial_reset_write (0);
 	cbm_drive_0_config (SERIAL, 10);
 	cbm_drive_1_config (SERIAL, 11);
-	cia_reset();
 	c64_vicaddr = c64_memory;
 
 	c64mode = 0;

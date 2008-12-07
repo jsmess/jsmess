@@ -113,13 +113,13 @@ PALETTE_INIT( hd66421 )
 	}
 }
 
-static void hd66421_state_save( void)
+static void hd66421_state_save(running_machine *machine)
 {
 	const char *name = "hd66421";
-	state_save_register_item( name, NULL, 0, lcd.idx);
-	state_save_register_item_array( name, NULL, 0, lcd.dat);
-	state_save_register_item( name, NULL, 0, lcd.pos);
-	state_save_register_item_pointer( name, NULL, 0, lcd.ram, HD66421_RAM_SIZE);
+	state_save_register_item(machine, name, NULL, 0, lcd.idx);
+	state_save_register_item_array(machine, name, NULL, 0, lcd.dat);
+	state_save_register_item(machine, name, NULL, 0, lcd.pos);
+	state_save_register_item_pointer(machine, name, NULL, 0, lcd.ram, HD66421_RAM_SIZE);
 }
 
 VIDEO_START( hd66421 )
@@ -127,7 +127,7 @@ VIDEO_START( hd66421 )
 	_logerror( 0, ("video_start_hd66421\n"));
 	memset( &lcd, 0, sizeof( lcd));
 	lcd.ram = auto_malloc( HD66421_RAM_SIZE);
-	hd66421_state_save();
+	hd66421_state_save(machine);
 }
 
 VIDEO_UPDATE( hd66421 )

@@ -12,6 +12,7 @@
 #define CBMB_H_
 
 #include "video/mc6845.h"
+#include "machine/6526cia.h"
 
 
 /*----------- defined in machine/cbmb.c -----------*/
@@ -22,6 +23,8 @@ extern UINT8 *cbmb_kernal;
 extern UINT8 *cbmb_memory;
 extern UINT8 *cbmb_videoram;
 extern UINT8 *cbmb_colorram;
+
+extern const cia6526_interface cbmb_cia;
 
 WRITE8_HANDLER ( cbmb_colorram_w );
 

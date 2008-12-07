@@ -1453,9 +1453,9 @@ VIDEO_START(model1)
 	quadpt = quaddb;
 	listctl[0] = listctl[1] = 0;
 
-	state_save_register_global_pointer(tgp_ram, 0x100000-0x40000);
-	state_save_register_global_pointer(poly_ram, 0x40000);
-	state_save_register_global_array(listctl);
+	state_save_register_global_pointer(machine, tgp_ram, 0x100000-0x40000);
+	state_save_register_global_pointer(machine, poly_ram, 0x40000);
+	state_save_register_global_array(machine, listctl);
 }
 
 VIDEO_UPDATE(model1)
@@ -1507,8 +1507,8 @@ VIDEO_UPDATE(model1)
 	ayyc = cos(ayy);
 	ayys = sin(ayy);
 
-	fillbitmap(priority_bitmap, 0, NULL);
-	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
+	bitmap_fill(priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	sys24_tile_draw(screen->machine, bitmap, cliprect, 6, 0, 0);
 	sys24_tile_draw(screen->machine, bitmap, cliprect, 4, 0, 0);

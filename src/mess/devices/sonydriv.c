@@ -347,7 +347,7 @@ int sony_read_status(void)
 			break;
 		case 0x0e:	/* Tachometer */
 			/* (time in seconds) / (60 sec/minute) * (rounds/minute) * (60 pulses) * (2 pulse phases) */
-			result = ((int) (attotime_to_double(timer_get_time()) / 60.0 * sony_rpm(f, cur_image) * 60.0 * 2.0)) & 1;
+			result = ((int) (attotime_to_double(timer_get_time(Machine)) / 60.0 * sony_rpm(f, cur_image) * 60.0 * 2.0)) & 1;
 			break;
 		case 0x0f:	/* Drive installed: 0=drive connected, 1=drive not connected */
 			result = 0;

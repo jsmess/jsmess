@@ -703,7 +703,7 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 			if ((data >> 8) & ATARIST_BLITTER_CTRL_BUSY)
 			{
 				int nops = BLITTER_NOPS[blitter.op][blitter.hop]; // each NOP takes 4 cycles
-				timer_set(ATTOTIME_IN_HZ((Y2/4)/(4*nops)), NULL, 0, atarist_blitter_tick);
+				timer_set(space->machine, ATTOTIME_IN_HZ((Y2/4)/(4*nops)), NULL, 0, atarist_blitter_tick);
 			}
 		}
 	}
@@ -719,46 +719,46 @@ VIDEO_START( atarist )
 {
 	mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
 
-	atarist_shifter_timer = timer_alloc(atarist_shifter_tick, NULL);
-	atarist_glue_timer = timer_alloc(atarist_glue_tick, NULL);
+	atarist_shifter_timer = timer_alloc(machine, atarist_shifter_tick, NULL);
+	atarist_glue_timer = timer_alloc(machine, atarist_glue_tick, NULL);
 
 	timer_adjust_periodic(atarist_shifter_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
 	timer_adjust_periodic(atarist_glue_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
 
 	memset(&shifter, 0, sizeof(shifter));
 
-	state_save_register_global(shifter.base);
-	state_save_register_global(shifter.ofs);
-	state_save_register_global(shifter.sync);
-	state_save_register_global(shifter.mode);
-	state_save_register_global_array(shifter.palette);
-	state_save_register_global(shifter.lineofs);
-	state_save_register_global(shifter.pixelofs);
-	state_save_register_global_array(shifter.rr);
-	state_save_register_global_array(shifter.ir);
-	state_save_register_global(shifter.bitplane);
-	state_save_register_global(shifter.shift);
-	state_save_register_global(shifter.h);
-	state_save_register_global(shifter.v);
-	state_save_register_global(shifter.de);
+	state_save_register_global(machine, shifter.base);
+	state_save_register_global(machine, shifter.ofs);
+	state_save_register_global(machine, shifter.sync);
+	state_save_register_global(machine, shifter.mode);
+	state_save_register_global_array(machine, shifter.palette);
+	state_save_register_global(machine, shifter.lineofs);
+	state_save_register_global(machine, shifter.pixelofs);
+	state_save_register_global_array(machine, shifter.rr);
+	state_save_register_global_array(machine, shifter.ir);
+	state_save_register_global(machine, shifter.bitplane);
+	state_save_register_global(machine, shifter.shift);
+	state_save_register_global(machine, shifter.h);
+	state_save_register_global(machine, shifter.v);
+	state_save_register_global(machine, shifter.de);
 
-	state_save_register_global_array(blitter.halftone);
-	state_save_register_global(blitter.src_inc_x);
-	state_save_register_global(blitter.src_inc_y);
-	state_save_register_global(blitter.dst_inc_x);
-	state_save_register_global(blitter.dst_inc_y);
-	state_save_register_global(blitter.src);
-	state_save_register_global(blitter.dst);
-	state_save_register_global(blitter.endmask1);
-	state_save_register_global(blitter.endmask2);
-	state_save_register_global(blitter.endmask3);
-	state_save_register_global(blitter.xcount);
-	state_save_register_global(blitter.ycount);
-	state_save_register_global(blitter.xcountl);
-	state_save_register_global(blitter.hop);
-	state_save_register_global(blitter.op);
-	state_save_register_global(blitter.ctrl);
-	state_save_register_global(blitter.skew);
+	state_save_register_global_array(machine, blitter.halftone);
+	state_save_register_global(machine, blitter.src_inc_x);
+	state_save_register_global(machine, blitter.src_inc_y);
+	state_save_register_global(machine, blitter.dst_inc_x);
+	state_save_register_global(machine, blitter.dst_inc_y);
+	state_save_register_global(machine, blitter.src);
+	state_save_register_global(machine, blitter.dst);
+	state_save_register_global(machine, blitter.endmask1);
+	state_save_register_global(machine, blitter.endmask2);
+	state_save_register_global(machine, blitter.endmask3);
+	state_save_register_global(machine, blitter.xcount);
+	state_save_register_global(machine, blitter.ycount);
+	state_save_register_global(machine, blitter.xcountl);
+	state_save_register_global(machine, blitter.hop);
+	state_save_register_global(machine, blitter.op);
+	state_save_register_global(machine, blitter.ctrl);
+	state_save_register_global(machine, blitter.skew);
 
 	atarist_set_screen_parameters();
 

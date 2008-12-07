@@ -457,9 +457,9 @@ static int K037122_vh_start(running_machine *machine, int chip)
 
 	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
 
-	state_save_register_item_pointer("K037122", NULL, chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
-	state_save_register_item_pointer("K037122", NULL, chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
-	state_save_register_item_pointer("K037122", NULL, chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
+	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
+	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
+	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
 	state_save_register_postload(machine, K037122_postload, (void *)(FPTR)chip);
 
 	return 0;
@@ -1016,10 +1016,10 @@ static MACHINE_START( hornet )
 	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 
-	state_save_register_global(led_reg0);
-	state_save_register_global(led_reg1);
-	state_save_register_global_pointer(jvs_sdata, 1024);
-	state_save_register_global(jvs_sdata_ptr);
+	state_save_register_global(machine, led_reg0);
+	state_save_register_global(machine, led_reg1);
+	state_save_register_global_pointer(machine, jvs_sdata, 1024);
+	state_save_register_global(machine, jvs_sdata_ptr);
 }
 
 static MACHINE_RESET( hornet )
@@ -1314,7 +1314,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
 static DRIVER_INIT(hornet)
@@ -1322,7 +1322,7 @@ static DRIVER_INIT(hornet)
 	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 	K033906_init();
 
 	led_reg0 = led_reg1 = 0x7f;
@@ -1336,7 +1336,7 @@ static DRIVER_INIT(hornet_2board)
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
 	set_cgboard_texture_bank(1, 6, memory_region(machine, "user5"));
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 	K033906_init();
 
 	led_reg0 = led_reg1 = 0x7f;

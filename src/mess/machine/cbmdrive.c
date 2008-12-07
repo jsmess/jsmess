@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+
 #include "driver.h"
+#include "deprecat.h"
 
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
@@ -15,7 +17,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(Machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -699,7 +701,7 @@ void c1551_state (CBM_Drive * drive)
 static int vc1541_time_greater(CBM_Drive * drive, attotime threshold)
 {
 	return attotime_compare(
-		attotime_sub(timer_get_time (), drive->i.serial.time),
+		attotime_sub(timer_get_time(Machine), drive->i.serial.time),
 		threshold) > 0;
 }
 
@@ -736,7 +738,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.state = 100;
 			drive->i.serial.last = 0;
 			drive->i.serial.value = 0;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -748,7 +750,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.state = 100;
 			drive->i.serial.last = 0;
 			drive->i.serial.value = 0;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -860,7 +862,7 @@ void vc1541_state (CBM_Drive * drive)
 			{
 				cbm_command (drive);
 			}
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			drive->i.serial.data = 0;
 			break;
 		}
@@ -890,7 +892,7 @@ void vc1541_state (CBM_Drive * drive)
 		}
 		if (cbm_serial.clock[0])
 		{
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			drive->i.serial.broadcast = !cbm_serial.atn[0];
 			drive->i.serial.data = 1;
 			drive->i.serial.value = 0;
@@ -913,7 +915,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = 0;
 			drive->i.serial.last = 1;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -954,7 +956,7 @@ void vc1541_state (CBM_Drive * drive)
 		if (cbm_serial.atn[0])
 		{
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -963,7 +965,7 @@ void vc1541_state (CBM_Drive * drive)
 		{
 			drive->i.serial.state++;
 			drive->i.serial.clock = 0;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -986,7 +988,7 @@ void vc1541_state (CBM_Drive * drive)
 		if (cbm_serial.atn[0])
 		{
 			drive->i.serial.state = 0;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -996,7 +998,7 @@ void vc1541_state (CBM_Drive * drive)
 		{
 			drive->i.serial.state++;
 			drive->i.serial.clock = 0;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1024,7 +1026,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.clock = 0;
 			drive->i.serial.data = (drive->i.serial.value & 1) ? 1 : 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1040,7 +1042,7 @@ void vc1541_state (CBM_Drive * drive)
 		{
 			drive->i.serial.clock = 1;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1062,7 +1064,7 @@ void vc1541_state (CBM_Drive * drive)
 		{
 			drive->i.serial.clock = 1;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1079,7 +1081,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = drive->i.serial.value & 2 ? 1 : 0;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1096,7 +1098,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = drive->i.serial.value & 4 ? 1 : 0;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1113,7 +1115,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = drive->i.serial.value & 8 ? 1 : 0;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1130,7 +1132,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = drive->i.serial.value & 0x10 ? 1 : 0;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1147,7 +1149,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = drive->i.serial.value & 0x20 ? 1 : 0;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1164,7 +1166,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = drive->i.serial.value & 0x40 ? 1 : 0;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1181,7 +1183,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = drive->i.serial.value & 0x80 ? 1 : 0;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1199,7 +1201,7 @@ void vc1541_state (CBM_Drive * drive)
 			drive->i.serial.data = 1;
 			drive->i.serial.clock = 0;
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1214,7 +1216,7 @@ void vc1541_state (CBM_Drive * drive)
 		if (!cbm_serial.data[0])
 		{
 			drive->i.serial.state++;
-			drive->i.serial.time = timer_get_time ();
+			drive->i.serial.time = timer_get_time(Machine);
 			break;
 		}
 		break;
@@ -1326,9 +1328,9 @@ void c2031_state(CBM_Drive *drive)
 	switch (drive->i.ieee.state)
 	{
 	case 0:
-		if (!cbm_ieee_dav_r()) {
+		if (!cbm_ieee_dav_r(Machine)) {
 			drive->i.ieee.state=10;
-		} else if (!cbm_ieee_atn_r()) {
+		} else if (!cbm_ieee_atn_r(Machine)) {
 			drive->i.ieee.state=11;
 			cbm_ieee_ndac_w(1,0);
 			logerror("arsch\n");
@@ -1337,19 +1339,19 @@ void c2031_state(CBM_Drive *drive)
 	case 1:
 		break;
 	case 10:
-		if (cbm_ieee_dav_r()) {
+		if (cbm_ieee_dav_r(Machine)) {
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(1,1);
 			cbm_ieee_ndac_w(1,0);
 		}
 		break;
 	case 11:
-		if (!cbm_ieee_dav_r()) {
+		if (!cbm_ieee_dav_r(Machine)) {
 			cbm_ieee_nrfd_w(1,0);
-			data=cbm_ieee_data_r()^0xff;
+			data=cbm_ieee_data_r(Machine)^0xff;
 			cbm_ieee_ndac_w(1,1);
 			logerror("byte received %.2x\n",data);
-			if (!cbm_ieee_atn_r()&&((data&0x0f)==drive->i.ieee.device) ) {
+			if (!cbm_ieee_atn_r(Machine)&&((data&0x0f)==drive->i.ieee.device) ) {
 				if ((data&0xf0)==0x40)
 					drive->i.ieee.state=30;
 				else
@@ -1365,13 +1367,13 @@ void c2031_state(CBM_Drive *drive)
 		break;
 		/* wait until atn is released */
 	case 12:
-		if (cbm_ieee_atn_r()) {
+		if (cbm_ieee_atn_r(Machine)) {
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(1,0);
 		}
 		break;
 	case 13:
-		if (!cbm_ieee_atn_r()) {
+		if (!cbm_ieee_atn_r(Machine)) {
 			drive->i.ieee.state=10;
 /*			cbm_ieee_nrfd_w(1,0); */
 		}
@@ -1379,20 +1381,20 @@ void c2031_state(CBM_Drive *drive)
 
 		/* receiving rest of command */
 	case 20:
-		if (cbm_ieee_dav_r()) {
+		if (cbm_ieee_dav_r(Machine)) {
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(1,1);
 			cbm_ieee_ndac_w(1,0);
 		}
 		break;
 	case 21:
-		if (!cbm_ieee_dav_r()) {
+		if (!cbm_ieee_dav_r(Machine)) {
 			cbm_ieee_nrfd_w(1,0);
-			data=cbm_ieee_data_r()^0xff;
+			data=cbm_ieee_data_r(Machine)^0xff;
 			logerror("byte received %.2x\n",data);
 			if (drive->cmdpos < sizeof (drive->cmdbuffer))
 				drive->cmdbuffer[drive->cmdpos++] = data;
-			if (!cbm_ieee_atn_r()&&((data&0xf)==0xf)) {
+			if (!cbm_ieee_atn_r(Machine)&&((data&0xf)==0xf)) {
 				cbm_command(drive);
 				drive->i.ieee.state=10;
 			} else
@@ -1403,16 +1405,16 @@ void c2031_state(CBM_Drive *drive)
 
 		/* read command */
 	case 30:
-		if (cbm_ieee_dav_r()) {
+		if (cbm_ieee_dav_r(Machine)) {
 			drive->i.ieee.state++;
 			cbm_ieee_nrfd_w(1,1);
 			cbm_ieee_ndac_w(1,0);
 		}
 		break;
 	case 31:
-		if (!cbm_ieee_dav_r()) {
+		if (!cbm_ieee_dav_r(Machine)) {
 			cbm_ieee_nrfd_w(1,0);
-			data=cbm_ieee_data_r()^0xff;
+			data=cbm_ieee_data_r(Machine)^0xff;
 			logerror("byte received %.2x\n",data);
 			if (drive->cmdpos < sizeof (drive->cmdbuffer))
 				drive->cmdbuffer[drive->cmdpos++] = data;
@@ -1425,13 +1427,13 @@ void c2031_state(CBM_Drive *drive)
 		}
 		break;
 	case 32:
-		if (cbm_ieee_dav_r()) {
+		if (cbm_ieee_dav_r(Machine)) {
 			cbm_ieee_nrfd_w(1,1);
 			drive->i.ieee.state=40;
 		}
 		break;
 	case 40:
-		if (!cbm_ieee_ndac_r()) {
+		if (!cbm_ieee_ndac_r(Machine)) {
 			cbm_ieee_data_w(1,drive->buffer[drive->pos++]^0xff);
 			if (drive->pos>=drive->size)
 				cbm_ieee_eoi_w(1,0);
@@ -1440,13 +1442,13 @@ void c2031_state(CBM_Drive *drive)
 		}
 		break;
 	case 41:
-		if (!cbm_ieee_nrfd_r()) {
+		if (!cbm_ieee_nrfd_r(Machine)) {
 			drive->i.ieee.state++;
 		}
 		break;
 	case 42:
-		if (cbm_ieee_ndac_r()) {
-			if (cbm_ieee_eoi_r())
+		if (cbm_ieee_ndac_r(Machine)) {
+			if (cbm_ieee_eoi_r(Machine))
 				drive->i.ieee.state=40;
 			else {
 				cbm_ieee_data_w(1,0xff);

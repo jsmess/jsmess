@@ -299,8 +299,8 @@ static MACHINE_RESET( kim1 )
 {
 	int i;
 
-	timer_pulse( ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
-	timer_pulse( ATTOTIME_IN_HZ(44100), NULL, 0, kim1_cassette_input );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(44100), NULL, 0, kim1_cassette_input );
 
 	for ( i = 0; i < 6; i++ )
 	{

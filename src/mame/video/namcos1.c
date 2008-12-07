@@ -120,10 +120,10 @@ VIDEO_START( namcos1 )
 	tilemap_set_scrolldy(bg_tilemap[5],0x10,0x110);
 
 	/* register videoram to the save state system (post-allocation) */
-	state_save_register_global_pointer(namcos1_videoram, 0x8000);
-	state_save_register_global_array(namcos1_cus116);
-	state_save_register_global_pointer(namcos1_spriteram, 0x1000);
-	state_save_register_global_array(namcos1_playfield_control);
+	state_save_register_global_pointer(machine, namcos1_videoram, 0x8000);
+	state_save_register_global_array(machine, namcos1_cus116);
+	state_save_register_global_pointer(machine, namcos1_spriteram, 0x1000);
+	state_save_register_global_array(machine, namcos1_playfield_control);
 
 	/* set table for sprite color == 0x7f */
 	for (i = 0;i <= 15;i++)
@@ -349,7 +349,7 @@ VIDEO_UPDATE( namcos1 )
 
 
 	/* background color */
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((namcos1_cus116[0] << 8) | namcos1_cus116[1]) - 1;			// min x
@@ -388,7 +388,7 @@ VIDEO_UPDATE( namcos1 )
 	}
 
 
-	fillbitmap(priority_bitmap, 0, &new_clip);
+	bitmap_fill(priority_bitmap, &new_clip, 0);
 
 	/* bit 0-2 priority */
 	/* bit 3   disable  */

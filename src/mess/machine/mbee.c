@@ -47,7 +47,7 @@ static TIMER_CALLBACK( mbee_reset )
 
 MACHINE_RESET( mbee )
 {
-	timer_set(ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
+	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 	memory_set_bank(machine, 1, 1);
 }
 

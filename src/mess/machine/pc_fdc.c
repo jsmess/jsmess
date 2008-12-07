@@ -100,7 +100,7 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 	/* setup nec765 interface */
 	nec765_init(machine, &pc_fdc_nec765_interface, iface->nec765_type, iface->nec765_rdy_pin);
 
-	fdc->watchdog = timer_alloc( watchdog_timeout, NULL );
+	fdc->watchdog = timer_alloc(machine,  watchdog_timeout, NULL );
 
 	pc_fdc_reset(machine);
 

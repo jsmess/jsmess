@@ -604,7 +604,7 @@ MACHINE_START( comx35p )
 
 	/* allocate reset timer */
 	
-	state->reset_timer = timer_alloc(reset_tick, NULL);
+	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
 
 	/* screen format */
 
@@ -618,21 +618,21 @@ MACHINE_START( comx35p )
 
 	state_save_register_postload(machine, comx35_state_save_postload, NULL);
 
-	state_save_register_global(state->cdp1802_mode);
-	state_save_register_global(state->cdp1802_q);
-	state_save_register_global(state->cdp1802_ef4);
-	state_save_register_global(state->iden);
-	state_save_register_global(state->slot);
-	state_save_register_global(state->bank);
-	state_save_register_global(state->rambank);
-	state_save_register_global(state->dma);
+	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->cdp1802_q);
+	state_save_register_global(machine, state->cdp1802_ef4);
+	state_save_register_global(machine, state->iden);
+	state_save_register_global(machine, state->slot);
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->rambank);
+	state_save_register_global(machine, state->dma);
 
-	state_save_register_global(state->cdp1871_efxa);
-	state_save_register_global(state->cdp1871_efxb);
+	state_save_register_global(machine, state->cdp1871_efxa);
+	state_save_register_global(machine, state->cdp1871_efxb);
 
-	state_save_register_global(state->fdc_addr);
-	state_save_register_global(state->fdc_irq);
-	state_save_register_global(state->fdc_drq_enable);
+	state_save_register_global(machine, state->fdc_addr);
+	state_save_register_global(machine, state->fdc_irq);
+	state_save_register_global(machine, state->fdc_drq_enable);
 }
 
 MACHINE_START( comx35n )

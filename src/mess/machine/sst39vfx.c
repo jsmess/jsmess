@@ -23,9 +23,9 @@ typedef struct
 
 static SST39VFX flash;
 
-static void sst39vfx_state_save( void);
+static void sst39vfx_state_save(running_machine *machine);
 
-void sst39vfx_init( int type, int cpu_datawidth, int cpu_endianess)
+void sst39vfx_init(running_machine *machine, int type, int cpu_datawidth, int cpu_endianess)
 {
 	_logerror( 0, ("sst39vfx_init (%d)\n", type));
 	memset( &flash, 0, sizeof( flash));
@@ -34,31 +34,20 @@ void sst39vfx_init( int type, int cpu_datawidth, int cpu_endianess)
 		case SST39VF020  : flash.size = 256 * 1024; break;
 		case SST39VF400A : flash.size = 512 * 1024; break;
 	}
-	flash.data = malloc_or_die( flash.size);
+	flash.data = auto_malloc( flash.size);
 #ifdef LSB_FIRST
-	if (cpu_endianess != CPU_IS_LE) flash.swap = cpu_datawidth / 8; else flash.swap = 0;
+	if (cpu_endianess != ENDIANNESS_LITTLE) flash.swap = cpu_datawidth / 8; else flash.swap = 0;
 #else
-	if (cpu_endianess != CPU_IS_BE) flash.swap = cpu_datawidth / 8; else flash.swap = 0;
+	if (cpu_endianess != ENDIANNESS_BIG) flash.swap = cpu_datawidth / 8; else flash.swap = 0;
 #endif
-	sst39vfx_state_save();
+	sst39vfx_state_save(machine);
 }
 
-void sst39vfx_exit( void)
-{
-	_logerror( 0, ("sst39vfx_exit\n"));
-	free( flash.data);
-}
-
-void sst39vfx_reset( void)
-{
-	_logerror( 0, ("sst39vfx_reset\n"));
-}
-
-static void sst39vfx_state_save( void)
+static void sst39vfx_state_save(running_machine *machine)
 {
 	const char *name = "sst39vfx";
-	state_save_register_item_pointer( name, NULL, 0, flash.data, flash.size);
-	state_save_register_item( name, NULL, 0, flash.swap);
+	state_save_register_item_pointer(machine, name, NULL, 0, flash.data, flash.size);
+	state_save_register_item(machine, name, NULL, 0, flash.swap);
 }
 
 UINT8* sst39vfx_get_base( void)
@@ -105,14 +94,14 @@ static void sst39vfx_swap( void)
 	}
 }
 
-void sst39vfx_load( mame_file *file)
+void sst39vfx_load(running_machine *machine, mame_file *file)
 {
 	_logerror( 0, ("sst39vfx_load (%p)\n", file));
 	mame_fread( file, flash.data, flash.size);
 	if (flash.swap) sst39vfx_swap();
 }
 
-void sst39vfx_save( mame_file *file)
+void sst39vfx_save(running_machine *machine, mame_file *file)
 {
 	_logerror( 0, ("sst39vfx_save (%p)\n", file));
 	if (flash.swap) sst39vfx_swap();

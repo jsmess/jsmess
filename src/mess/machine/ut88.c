@@ -67,7 +67,7 @@ static TIMER_CALLBACK( ut88_reset )
 
 MACHINE_RESET( ut88 )
 {
-	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, ut88_reset);
+	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, ut88_reset);
 	memory_set_bank(machine, 1, 1);	
 	ut88_keyboard_mask = 0;
 }
@@ -158,7 +158,7 @@ DRIVER_INIT(ut88mini)
 }
 MACHINE_START( ut88mini )
 {
-	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, update_display);
+	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_display);
 }
 
 MACHINE_RESET( ut88mini )

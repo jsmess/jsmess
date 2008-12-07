@@ -511,10 +511,10 @@ static CPU_INIT( arm )
 	arm.device = device;
 	arm.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item_array("arm", device->tag, 0, arm.sArmRegister);
-	state_save_register_item_array("arm", device->tag, 0, arm.coproRegister);
-	state_save_register_item("arm", device->tag, 0, arm.pendingIrq);
-	state_save_register_item("arm", device->tag, 0, arm.pendingFiq);
+	state_save_register_device_item_array(device, 0, arm.sArmRegister);
+	state_save_register_device_item_array(device, 0, arm.coproRegister);
+	state_save_register_device_item(device, 0, arm.pendingIrq);
+	state_save_register_device_item(device, 0, arm.pendingFiq);
 }
 
 /***************************************************************************/
@@ -1461,7 +1461,7 @@ CPU_GET_INFO( arm )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(arm);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;

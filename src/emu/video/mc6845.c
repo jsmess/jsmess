@@ -165,7 +165,7 @@ INLINE void call_on_update_address(const device_config *device, int strobe)
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->intf->on_update_addr_changed)
-		timer_set(attotime_zero, (void *) device, (mc6845->update_addr << 8) | strobe, on_update_address_cb);
+		timer_set(device->machine, attotime_zero, (void *) device, (mc6845->update_addr << 8) | strobe, on_update_address_cb);
 	else
 		fatalerror("M6845: transparent memory mode without handler\n");
 }
@@ -761,48 +761,48 @@ static device_start_err common_start(const device_config *device, int device_typ
 
 		/* create the timers */
 		if (mc6845->intf->on_de_changed != NULL)
-			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, (void *)device);
+			mc6845->de_changed_timer = timer_alloc(device->machine, de_changed_timer_cb, (void *)device);
 
 		if (mc6845->intf->on_hsync_changed != NULL)
 		{
-			mc6845->hsync_on_timer = timer_alloc(hsync_on_timer_cb, (void *)device);
-			mc6845->hsync_off_timer = timer_alloc(hsync_off_timer_cb, (void *)device);
+			mc6845->hsync_on_timer = timer_alloc(device->machine, hsync_on_timer_cb, (void *)device);
+			mc6845->hsync_off_timer = timer_alloc(device->machine, hsync_off_timer_cb, (void *)device);
 		}
 
 		if (mc6845->intf->on_vsync_changed != NULL)
 		{
-			mc6845->vsync_on_timer = timer_alloc(vsync_on_timer_cb, (void *)device);
-			mc6845->vsync_off_timer = timer_alloc(vsync_off_timer_cb, (void *)device);
+			mc6845->vsync_on_timer = timer_alloc(device->machine, vsync_on_timer_cb, (void *)device);
+			mc6845->vsync_off_timer = timer_alloc(device->machine, vsync_off_timer_cb, (void *)device);
 		}
 	}
 
-	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, (void *)device);
+	mc6845->light_pen_latch_timer = timer_alloc(device->machine, light_pen_latch_timer_cb, (void *)device);
 
 	/* register for state saving */
 	state_save_register_postload(device->machine, mc6845_state_save_postload, mc6845);
 
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->clock);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->hpixels_per_column);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->register_address_latch);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->horiz_char_total);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->horiz_disp);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->horiz_sync_pos);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->sync_width);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_char_total);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_total_adj);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_disp);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_sync_pos);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->mode_control);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->max_ras_addr);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_start_ras);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_end_ras);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->disp_start_addr);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_addr);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->light_pen_addr);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->light_pen_latched);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_state);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_blink_count);
-	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->update_addr);
+	state_save_register_device_item(device, 0, mc6845->clock);
+	state_save_register_device_item(device, 0, mc6845->hpixels_per_column);
+	state_save_register_device_item(device, 0, mc6845->register_address_latch);
+	state_save_register_device_item(device, 0, mc6845->horiz_char_total);
+	state_save_register_device_item(device, 0, mc6845->horiz_disp);
+	state_save_register_device_item(device, 0, mc6845->horiz_sync_pos);
+	state_save_register_device_item(device, 0, mc6845->sync_width);
+	state_save_register_device_item(device, 0, mc6845->vert_char_total);
+	state_save_register_device_item(device, 0, mc6845->vert_total_adj);
+	state_save_register_device_item(device, 0, mc6845->vert_disp);
+	state_save_register_device_item(device, 0, mc6845->vert_sync_pos);
+	state_save_register_device_item(device, 0, mc6845->mode_control);
+	state_save_register_device_item(device, 0, mc6845->max_ras_addr);
+	state_save_register_device_item(device, 0, mc6845->cursor_start_ras);
+	state_save_register_device_item(device, 0, mc6845->cursor_end_ras);
+	state_save_register_device_item(device, 0, mc6845->disp_start_addr);
+	state_save_register_device_item(device, 0, mc6845->cursor_addr);
+	state_save_register_device_item(device, 0, mc6845->light_pen_addr);
+	state_save_register_device_item(device, 0, mc6845->light_pen_latched);
+	state_save_register_device_item(device, 0, mc6845->cursor_state);
+	state_save_register_device_item(device, 0, mc6845->cursor_blink_count);
+	state_save_register_device_item(device, 0, mc6845->update_addr);
 
 	return DEVICE_START_OK;
 }

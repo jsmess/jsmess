@@ -33,7 +33,7 @@
 		if(VERBOSE>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()), (const char*)M ); \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)), (const char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -98,12 +98,12 @@ DRIVER_INIT( mz700 )
 
 MACHINE_RESET( mz700 )
 {
-	ne556_timer[0] = timer_alloc(ne556_callback, NULL);
+	ne556_timer[0] = timer_alloc(machine, ne556_callback, NULL);
 	timer_adjust_periodic(ne556_timer[0], ATTOTIME_IN_HZ(1.5), 0, ATTOTIME_IN_HZ(1.5));
-	/*timer_pulse(ATTOTIME_IN_HZ(1.5), NULL, 0, ne556_callback)*/
-	ne556_timer[1] = timer_alloc(ne556_callback, NULL);
+	/*timer_pulse(machine, ATTOTIME_IN_HZ(1.5), NULL, 0, ne556_callback)*/
+	ne556_timer[1] = timer_alloc(machine, ne556_callback, NULL);
 	timer_adjust_periodic(ne556_timer[1], ATTOTIME_IN_HZ(34.5), 1, ATTOTIME_IN_HZ(34.5));
-	/*timer_pulse(ATTOTIME_IN_HZ(34.5), NULL, 1, ne556_callback)*/
+	/*timer_pulse(machine, ATTOTIME_IN_HZ(34.5), NULL, 1, ne556_callback)*/
 }
 
 

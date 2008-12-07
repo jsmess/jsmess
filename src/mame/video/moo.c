@@ -48,7 +48,7 @@ VIDEO_START(moo)
 	alpha_enabled = 0;
 
 	K053251_vh_start(machine);
-	K054338_vh_start();
+	K054338_vh_start(machine);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
 
@@ -146,7 +146,7 @@ VIDEO_UPDATE(moo)
 	K054338_update_all_shadows(screen->machine);
 	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (layerpri[0] < K053251_get_priority(K053251_CI1))	/* bucky hides back layer behind background */
 		K056832_tilemap_draw(screen->machine, bitmap, cliprect, layers[0], 0, 1);

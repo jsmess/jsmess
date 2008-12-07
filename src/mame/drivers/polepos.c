@@ -328,13 +328,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 
 static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 {
-	int which = cpunum_get_active();
-
 	data &= 1;
 
-	cpu_interrupt_enable(which,data);
+	cpu_interrupt_enable(cpu_get_index(space->cpu),data);
 	if (!data)
-		cpu_set_input_line(space->machine->cpu[which], 0, CLEAR_LINE);
+		cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
 }
 
 
@@ -381,7 +379,7 @@ static MACHINE_RESET( polepos )
 	for (i = 0;i < 8;i++)
 		polepos_latch_w(space,i,0);
 
-	namco_06xx_init(0, 0,
+	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0,
 		NAMCOIO_53XX_POLEPOS, &intf1,
 		NAMCOIO_52XX, NULL,

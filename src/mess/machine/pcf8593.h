@@ -1,31 +1,38 @@
-/*
+/*********************************************************************
 
 	Philips PCF8593 CMOS clock/calendar circuit
 
 	(c) 2001-2007 Tim Schuerewegen
 
-*/
+*********************************************************************/
 
-#ifndef _PCF8593_H_
-#define _PCF8593_H_
+#ifndef __PCF8593_H__
+#define __PCF8593_H__
 
 #include "driver.h"
 
-// init/exit/reset
-void pcf8593_init( void);
-void pcf8593_exit( void);
-void pcf8593_reset( void);
 
-// pins
-void pcf8593_pin_scl( int data);
-void pcf8593_pin_sda_w( int data);
-int  pcf8593_pin_sda_r( void);
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
-// load/save
-void pcf8593_load( mame_file *file);
-void pcf8593_save( mame_file *file);
+#define PCF8593		DEVICE_GET_INFO_NAME(pcf8593)
 
-// non-volatile ram handler
-//NVRAM_HANDLER( pcf8593 );
 
-#endif
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO(pcf8593);
+
+/* pins */
+void pcf8593_pin_scl(const device_config *device, int data);
+void pcf8593_pin_sda_w(const device_config *device, int data);
+int  pcf8593_pin_sda_r(const device_config *device);
+
+/* load/save */
+void pcf8593_load(const device_config *device, mame_file *file);
+void pcf8593_save(const device_config *device, mame_file *file);
+
+#endif /* __PCF8593_H__ */

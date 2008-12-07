@@ -32,6 +32,7 @@
 struct MSM5205Voice
 {
 	const msm5205_interface *intf;
+	const device_config *device;
 	sound_stream * stream;  /* number of stream system      */
 	INT32 index;
 	INT32 clock;				/* clock rate */
@@ -116,7 +117,7 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 	int val;
 	int new_signal;
 	/* callback user handler and latch next data */
-	if(voice->intf->vclk_callback) (*voice->intf->vclk_callback)(machine, voice->index);
+	if(voice->intf->vclk_callback) (*voice->intf->vclk_callback)(voice->device);
 
 	/* reset check at last hieddge of VCLK */
 	if(voice->reset)
@@ -147,10 +148,8 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 /*
  *    Reset emulation of an MSM5205-compatible chip
  */
-static SND_RESET( msm5205 )
+static void msm5205_reset(struct MSM5205Voice *voice)
 {
-	struct MSM5205Voice *voice = token;
-
 	/* initialize work */
 	voice->data    = 0;
 	voice->vclk    = 0;
@@ -159,6 +158,12 @@ static SND_RESET( msm5205 )
 	voice->step    = 0;
 	/* timer and bitwidth set */
 	msm5205_playmode_w(voice->index,voice->intf->select);
+}
+
+
+static SND_RESET( msm5205 )
+{
+	msm5205_reset(device->token);
 }
 
 /*
@@ -175,6 +180,7 @@ static SND_START( msm5205 )
 
 	/* save a global pointer to our interface */
 	voice->intf = config;
+	voice->device = device;
 	voice->index = sndindex;
 	voice->clock = clock;
 
@@ -183,20 +189,20 @@ static SND_START( msm5205 )
 
 	/* stream system initialize */
 	voice->stream = stream_create(0,1,clock,voice,MSM5205_update);
-	voice->timer = timer_alloc(MSM5205_vclk_callback, voice);
+	voice->timer = timer_alloc(Machine, MSM5205_vclk_callback, voice);
 
 	/* initialize */
-	SND_RESET_NAME( msm5205 )(voice);
+	msm5205_reset(voice);
 
 	/* register for save states */
-	state_save_register_item("msm5205", tag, 0, voice->clock);
-	state_save_register_item("msm5205", tag, 0, voice->data);
-	state_save_register_item("msm5205", tag, 0, voice->vclk);
-	state_save_register_item("msm5205", tag, 0, voice->reset);
-	state_save_register_item("msm5205", tag, 0, voice->prescaler);
-	state_save_register_item("msm5205", tag, 0, voice->bitwidth);
-	state_save_register_item("msm5205", tag, 0, voice->signal);
-	state_save_register_item("msm5205", tag, 0, voice->step);
+	state_save_register_device_item(device, 0, voice->clock);
+	state_save_register_device_item(device, 0, voice->data);
+	state_save_register_device_item(device, 0, voice->vclk);
+	state_save_register_device_item(device, 0, voice->reset);
+	state_save_register_device_item(device, 0, voice->prescaler);
+	state_save_register_device_item(device, 0, voice->bitwidth);
+	state_save_register_device_item(device, 0, voice->signal);
+	state_save_register_device_item(device, 0, voice->step);
 
 	/* success */
 	return voice;

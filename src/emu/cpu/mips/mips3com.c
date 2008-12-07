@@ -95,23 +95,23 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	mips->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, 2 * MIPS3_TLB_ENTRIES + 2, 0);
 
 	/* allocate a timer for the compare interrupt */
-	mips->compare_int_timer = timer_alloc(compare_int_callback, (void *)device);
+	mips->compare_int_timer = timer_alloc(device->machine, compare_int_callback, (void *)device);
 
 	/* reset the state */
 	mips3com_reset(mips);
 
 	/* register for save states */
-	state_save_register_item("mips3", device->tag, 0, mips->pc);
-	state_save_register_item_array("mips3", device->tag, 0, mips->r);
-	state_save_register_item_2d_array("mips3", device->tag, 0, mips->cpr);
-	state_save_register_item_2d_array("mips3", device->tag, 0, mips->ccr);
-	state_save_register_item("mips3", device->tag, 0, mips->llbit);
-	state_save_register_item("mips3", device->tag, 0, mips->count_zero_time);
+	state_save_register_device_item(device, 0, mips->pc);
+	state_save_register_device_item_array(device, 0, mips->r);
+	state_save_register_device_item_2d_array(device, 0, mips->cpr);
+	state_save_register_device_item_2d_array(device, 0, mips->ccr);
+	state_save_register_device_item(device, 0, mips->llbit);
+	state_save_register_device_item(device, 0, mips->count_zero_time);
 	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
 	{
-		state_save_register_item("mips3", device->tag, tlbindex, mips->tlb[tlbindex].page_mask);
-		state_save_register_item("mips3", device->tag, tlbindex, mips->tlb[tlbindex].entry_hi);
-		state_save_register_item_array("mips3", device->tag, tlbindex, mips->tlb[tlbindex].entry_lo);
+		state_save_register_device_item(device, tlbindex, mips->tlb[tlbindex].page_mask);
+		state_save_register_device_item(device, tlbindex, mips->tlb[tlbindex].entry_hi);
+		state_save_register_device_item_array(device, tlbindex, mips->tlb[tlbindex].entry_lo);
 	}
 }
 
@@ -194,7 +194,7 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 		UINT32 count = (cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
 		UINT32 delta = compare - count;
-		attotime newtime = ATTOTIME_IN_CYCLES(((UINT64)delta * 2), cpu_get_index(mips->device));
+		attotime newtime = cpu_clocks_to_attotime(mips->device, (UINT64)delta * 2);
 		timer_adjust_oneshot(mips->compare_int_timer, newtime, 0);
 		return;
 	}
@@ -450,7 +450,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CONTEXT_SIZE:					/* provided by core */					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = mips->bigendian ? CPU_IS_BE : CPU_IS_LE; break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = mips->bigendian ? ENDIANNESS_BIG : ENDIANNESS_LITTLE; break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;

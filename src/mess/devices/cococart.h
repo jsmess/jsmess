@@ -80,10 +80,10 @@ typedef struct _coco_cartridge_config coco_cartridge_config;
 struct _coco_cartridge_config
 {
 	/* callback to set a line */
-	void (*set_line)(coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
+	void (*set_line)(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
 
 	/* callback to map memory */
-	void (*map_memory)(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
+	void (*map_memory)(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 };
 
 
@@ -94,14 +94,14 @@ struct _coco_cartridge_config
 
 char *cococart_temp_str(void);
 void *cococart_get_extra_data(coco_cartridge *cartridge);
-void cococart_set_line(coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
-cococart_line_value cococart_get_line(coco_cartridge *cartridge, cococart_line line);
-void cococart_map_memory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
+void cococart_set_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
+cococart_line_value cococart_get_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line);
+void cococart_map_memory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 
 coco_cartridge *cococart_init(running_machine *machine, const char *carttype, const coco_cartridge_config *callbacks);
-UINT8 cococart_read(coco_cartridge *cartridge, UINT16 address);
-void cococart_write(coco_cartridge *cartridge, UINT16 address, UINT8 data);
-void cococart_enable_sound(coco_cartridge *cartridge, int enable);
+UINT8 cococart_read(running_machine *machine, coco_cartridge *cartridge, UINT16 address);
+void cococart_write(running_machine *machine, coco_cartridge *cartridge, UINT16 address, UINT8 data);
+void cococart_enable_sound(running_machine *machine, coco_cartridge *cartridge, int enable);
 
 
 

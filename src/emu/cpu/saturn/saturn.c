@@ -107,29 +107,29 @@ static CPU_INIT( saturn )
 	saturn.device = device;
 	saturn.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[R0]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[R1]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[R2]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[R3]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[R4]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[A]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[B]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[C]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[D]);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.d);
-	state_save_register_item("saturn",device->tag, 0,saturn.pc);
-	state_save_register_item("saturn",device->tag, 0,saturn.oldpc);
-	state_save_register_item_array("saturn",device->tag, 0,saturn.rstk);
-	state_save_register_item("saturn",device->tag, 0,saturn.out);
-	state_save_register_item("saturn",device->tag, 0,saturn.carry);
-	state_save_register_item("saturn",device->tag, 0,saturn.st);
-	state_save_register_item("saturn",device->tag, 0,saturn.hst);
-	state_save_register_item("saturn",device->tag, 0,saturn.nmi_state);
-	state_save_register_item("saturn",device->tag, 0,saturn.irq_state);
-	state_save_register_item("saturn",device->tag, 0,saturn.irq_enable);
-	state_save_register_item("saturn",device->tag, 0,saturn.in_irq);
-	state_save_register_item("saturn",device->tag, 0,saturn.pending_irq);
-	state_save_register_item("saturn",device->tag, 0,saturn.sleeping);
+	state_save_register_device_item_array(device, 0,saturn.reg[R0]);
+	state_save_register_device_item_array(device, 0,saturn.reg[R1]);
+	state_save_register_device_item_array(device, 0,saturn.reg[R2]);
+	state_save_register_device_item_array(device, 0,saturn.reg[R3]);
+	state_save_register_device_item_array(device, 0,saturn.reg[R4]);
+	state_save_register_device_item_array(device, 0,saturn.reg[A]);
+	state_save_register_device_item_array(device, 0,saturn.reg[B]);
+	state_save_register_device_item_array(device, 0,saturn.reg[C]);
+	state_save_register_device_item_array(device, 0,saturn.reg[D]);
+	state_save_register_device_item_array(device, 0,saturn.d);
+	state_save_register_device_item(device, 0,saturn.pc);
+	state_save_register_device_item(device, 0,saturn.oldpc);
+	state_save_register_device_item_array(device, 0,saturn.rstk);
+	state_save_register_device_item(device, 0,saturn.out);
+	state_save_register_device_item(device, 0,saturn.carry);
+	state_save_register_device_item(device, 0,saturn.st);
+	state_save_register_device_item(device, 0,saturn.hst);
+	state_save_register_device_item(device, 0,saturn.nmi_state);
+	state_save_register_device_item(device, 0,saturn.irq_state);
+	state_save_register_device_item(device, 0,saturn.irq_enable);
+	state_save_register_device_item(device, 0,saturn.in_irq);
+	state_save_register_device_item(device, 0,saturn.pending_irq);
+	state_save_register_device_item(device, 0,saturn.sleeping);
 }
 
 static CPU_RESET( saturn )
@@ -164,7 +164,7 @@ INLINE void saturn_take_irq(void)
 	saturn_push(saturn.pc);
 	saturn.pc=IRQ_ADDRESS;
 
-	LOG(("Saturn#%d takes IRQ ($%04x)\n", cpunum_get_active(), saturn.pc));
+	LOG(("Saturn '%s' takes IRQ ($%04x)\n", saturn.device->tag, saturn.pc));
 
 	if (saturn.irq_callback) (*saturn.irq_callback)(saturn.device, SATURN_IRQ_LINE);
 }
@@ -206,7 +206,7 @@ static void saturn_set_nmi_line(int state)
 	saturn.nmi_state = state;
 	if ( state != CLEAR_LINE )
 	{
-		LOG(( "SATURN#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
+		LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", saturn.device->tag));
 		saturn.pending_irq = 1;
 	}
 }
@@ -217,7 +217,7 @@ static void saturn_set_irq_line(int state)
 	saturn.irq_state = state;
 	if ( state != CLEAR_LINE && saturn.irq_enable )
 	{
-		LOG(( "SATURN#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
+		LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", saturn.device->tag));
 		saturn.pending_irq = 1;
 	}
 }
@@ -226,7 +226,7 @@ static void saturn_set_wakeup_line(int state)
 {
 	if (saturn.sleeping && state==1)
 	{
-		LOG(( "SATURN#%d set_wakeup_line(ASSERT)\n", cpunum_get_active()));
+		LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", saturn.device->tag));
 		if (saturn.irq_callback) (*saturn.irq_callback)(saturn.device, SATURN_WAKEUP_LINE);
 		saturn.sleeping = 0;
 	}
@@ -309,7 +309,7 @@ CPU_GET_INFO( saturn )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(saturn);				break;
 		case CPUINFO_INT_INPUT_LINES:						info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

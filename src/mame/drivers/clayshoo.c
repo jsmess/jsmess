@@ -91,11 +91,11 @@ static TIMER_CALLBACK( reset_analog_bit )
 }
 
 
-static attotime compute_duration(int analog_pos)
+static attotime compute_duration(const device_config *device, int analog_pos)
 {
 	/* the 58 comes from the length of the loop used to
        read the analog position */
-	return ATTOTIME_IN_CYCLES(58 * analog_pos, 0);
+	return cpu_clocks_to_attotime(device, 58 * analog_pos);
 }
 
 
@@ -107,8 +107,8 @@ static WRITE8_HANDLER( analog_reset_w )
 
 	analog_port_val = 0xff;
 
-	timer_adjust_oneshot(analog_timer_1, compute_duration(input_port_read(space->machine, "AN1")), 0x02);
-	timer_adjust_oneshot(analog_timer_2, compute_duration(input_port_read(space->machine, "AN2")), 0x01);
+	timer_adjust_oneshot(analog_timer_1, compute_duration(space->cpu, input_port_read(space->machine, "AN1")), 0x02);
+	timer_adjust_oneshot(analog_timer_2, compute_duration(space->cpu, input_port_read(space->machine, "AN2")), 0x01);
 }
 
 
@@ -118,10 +118,10 @@ static READ8_HANDLER( analog_r )
 }
 
 
-static void create_analog_timers(void)
+static void create_analog_timers(running_machine *machine)
 {
-	analog_timer_1 = timer_alloc(reset_analog_bit, NULL);
-	analog_timer_2 = timer_alloc(reset_analog_bit, NULL);
+	analog_timer_1 = timer_alloc(machine, reset_analog_bit, NULL);
+	analog_timer_2 = timer_alloc(machine, reset_analog_bit, NULL);
 }
 
 
@@ -155,11 +155,11 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static MACHINE_START( clayshoo )
 {
-	create_analog_timers();
+	create_analog_timers(machine);
 
 	/* register for state saving */
-	state_save_register_global(input_port_select);
-	state_save_register_global(analog_port_val);
+	state_save_register_global(machine, input_port_select);
+	state_save_register_global(machine, analog_port_val);
 }
 
 

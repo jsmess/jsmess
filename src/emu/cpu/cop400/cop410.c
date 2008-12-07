@@ -199,7 +199,7 @@ static CPU_INIT( cop410 )
 
 	/* allocate serial timer */
 
-	cop400->serial_timer = timer_alloc(cop400_serial_tick, cop400);
+	cop400->serial_timer = timer_alloc(device->machine, cop400_serial_tick, cop400);
 	timer_adjust_periodic(cop400->serial_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
 
 	/* initialize instruction length array */
@@ -218,25 +218,25 @@ static CPU_INIT( cop410 )
 
 	/* register for state saving */
 
-	state_save_register_item("cop410", device->tag, 0, cop400->pc);
-	state_save_register_item("cop410", device->tag, 0, cop400->prevpc);
-	state_save_register_item("cop410", device->tag, 0, cop400->a);
-	state_save_register_item("cop410", device->tag, 0, cop400->b);
-	state_save_register_item("cop410", device->tag, 0, cop400->c);
-	state_save_register_item("cop410", device->tag, 0, cop400->en);
-	state_save_register_item("cop410", device->tag, 0, cop400->g);
-	state_save_register_item("cop410", device->tag, 0, cop400->q);
-	state_save_register_item("cop410", device->tag, 0, cop400->sa);
-	state_save_register_item("cop410", device->tag, 0, cop400->sb);
-	state_save_register_item("cop410", device->tag, 0, cop400->sio);
-	state_save_register_item("cop410", device->tag, 0, cop400->skl);
-	state_save_register_item("cop410", device->tag, 0, cop400->skip);
-	state_save_register_item("cop410", device->tag, 0, cop400->skip_lbi);
-	state_save_register_item("cop410", device->tag, 0, cop400->g_mask);
-	state_save_register_item("cop410", device->tag, 0, cop400->d_mask);
-	state_save_register_item("cop410", device->tag, 0, cop400->si);
-	state_save_register_item("cop410", device->tag, 0, cop400->microbus_int);
-	state_save_register_item("cop410", device->tag, 0, cop400->halt);
+	state_save_register_device_item(device, 0, cop400->pc);
+	state_save_register_device_item(device, 0, cop400->prevpc);
+	state_save_register_device_item(device, 0, cop400->a);
+	state_save_register_device_item(device, 0, cop400->b);
+	state_save_register_device_item(device, 0, cop400->c);
+	state_save_register_device_item(device, 0, cop400->en);
+	state_save_register_device_item(device, 0, cop400->g);
+	state_save_register_device_item(device, 0, cop400->q);
+	state_save_register_device_item(device, 0, cop400->sa);
+	state_save_register_device_item(device, 0, cop400->sb);
+	state_save_register_device_item(device, 0, cop400->sio);
+	state_save_register_device_item(device, 0, cop400->skl);
+	state_save_register_device_item(device, 0, cop400->skip);
+	state_save_register_device_item(device, 0, cop400->skip_lbi);
+	state_save_register_device_item(device, 0, cop400->g_mask);
+	state_save_register_device_item(device, 0, cop400->d_mask);
+	state_save_register_device_item(device, 0, cop400->si);
+	state_save_register_device_item(device, 0, cop400->microbus_int);
+	state_save_register_device_item(device, 0, cop400->halt);
 }
 
 static CPU_INIT( cop411 )
@@ -350,16 +350,12 @@ static CPU_EXECUTE( cop410 )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static CPU_GET_CONTEXT( cop410 )
-{
-}
+static CPU_GET_CONTEXT( cop410 ) { }
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static CPU_SET_CONTEXT( cop410 )
-{
-}
+static CPU_SET_CONTEXT( cop410 ) { }
 
 /**************************************************************************
  * Validity check
@@ -419,7 +415,7 @@ CPU_GET_INFO( cop410 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cop400_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 16;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

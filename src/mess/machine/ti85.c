@@ -197,7 +197,7 @@ MACHINE_START( ti81 )
 
 	ti_calculator_model = TI_81;
 
-	timer_pulse(ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
@@ -230,7 +230,7 @@ MACHINE_START( ti85 )
 
 	ti_calculator_model = TI_85;
 
-	timer_pulse(ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
@@ -277,7 +277,7 @@ MACHINE_START( ti86 )
 
 		ti_calculator_model = TI_86;
 
-		timer_pulse(ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
+		timer_pulse(machine, ATTOTIME_IN_HZ(200), NULL, 0, ti85_timer_callback);
 	}
 
 	add_reset_callback(machine, ti85_reset_serial);

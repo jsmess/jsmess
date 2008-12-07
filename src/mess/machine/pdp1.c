@@ -165,10 +165,10 @@ MACHINE_RESET( pdp1 )
 	pdp1_reset_param.hw_mul_div = (config >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
 	pdp1_reset_param.type_20_sbs = (config >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
 
-	tape_reader.timer = timer_alloc(reader_callback, NULL);
-	tape_puncher.timer = timer_alloc(puncher_callback, NULL);
-	typewriter.tyo_timer = timer_alloc(tyo_callback, NULL);
-	dpy_timer = timer_alloc(dpy_callback, NULL);
+	tape_reader.timer = timer_alloc(machine, reader_callback, NULL);
+	tape_puncher.timer = timer_alloc(machine, puncher_callback, NULL);
+	typewriter.tyo_timer = timer_alloc(machine, tyo_callback, NULL);
+	dpy_timer = timer_alloc(machine, dpy_callback, NULL);
 
 	/* reset device state */
 	tape_reader.rcl = tape_reader.rc = 0;
@@ -1041,10 +1041,10 @@ static TIMER_CALLBACK(il_timer_callback)
 
 static void parallel_drum_init(void)
 {
-	parallel_drum.rotation_timer = timer_alloc(NULL, NULL);
+	parallel_drum.rotation_timer = timer_alloc(machine, NULL, NULL);
 	timer_adjust_periodic(parallel_drum.rotation_timer, PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	parallel_drum.il_timer = timer_alloc(il_timer_callback, NULL);
+	parallel_drum.il_timer = timer_alloc(machine, il_timer_callback, NULL);
 	parallel_drum_set_il(0);
 }
 #endif

@@ -319,7 +319,7 @@ static void draw_cga(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 static VIDEO_UPDATE(mediagx)
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	draw_framebuffer(screen->machine, bitmap, cliprect);
 
@@ -968,7 +968,7 @@ static MACHINE_RESET(mediagx)
 	dacl = auto_malloc(65536 * sizeof(INT16));
 	dacr = auto_malloc(65536 * sizeof(INT16));
 
-	sound_timer = timer_alloc(sound_timer_callback, NULL);
+	sound_timer = timer_alloc(machine, sound_timer_callback, NULL);
 	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
 	dmadac_enable(0, 2, 1);

@@ -151,7 +151,7 @@ static mame_file *nvram_system_fopen( running_machine *machine, UINT32 openflags
 	return (filerr == FILERR_NONE) ? file : NULL;
 }
 
-typedef void (nvram_load_func)( mame_file *file);
+typedef void (nvram_load_func)(running_machine *machine,  mame_file *file);
 
 static int nvram_system_load( running_machine *machine, const char *name, nvram_load_func _nvram_load, int required)
 {
@@ -162,12 +162,12 @@ static int nvram_system_load( running_machine *machine, const char *name, nvram_
 		if (required) mame_printf_error( "nvram load failed (%s)\n", name);
 		return FALSE;
 	}
-	_nvram_load( file);
+	(*_nvram_load)(machine, file);
 	mame_fclose( file);
 	return TRUE;
 }
 
-typedef void (nvram_save_func)( mame_file *file);
+typedef void (nvram_save_func)(running_machine *machine,  mame_file *file);
 
 static int nvram_system_save( running_machine *machine, const char *name, nvram_save_func _nvram_save)
 {
@@ -178,19 +178,30 @@ static int nvram_system_save( running_machine *machine, const char *name, nvram_
 		mame_printf_error( "nvram save failed (%s)\n", name);
 		return FALSE;
 	}
-	_nvram_save( file);
+	(*_nvram_save)(machine, file);
 	mame_fclose( file);
 	return TRUE;
+}
+
+static void cybiko_pcf8593_load(running_machine *machine, mame_file *file)
+{
+	const device_config *device = device_list_find_by_tag(machine->config->devicelist, PCF8593, "rtc");
+	pcf8593_load(device, file);
+}
+
+static void cybiko_pcf8593_save(running_machine *machine, mame_file *file)
+{
+	const device_config *device = device_list_find_by_tag(machine->config->devicelist, PCF8593, "rtc");
+	pcf8593_save(device, file);
 }
 
 MACHINE_START( cybikov1 )
 {
 	_logerror( 0, ("machine_start_cybikov1\n"));
 	// real-time clock
-	pcf8593_init();
-	nvram_system_load( machine, "rtc", pcf8593_load, 0);
+	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
 	// serial dataflash
-	at45dbxx_init( AT45DB041);
+	at45dbxx_init(machine, AT45DB041);
 	nvram_system_load( machine, "flash1", &at45dbxx_load, 1);
 	// serial port
 	cybiko_rs232_init();
@@ -202,13 +213,12 @@ MACHINE_START( cybikov2 )
 {
 	_logerror( 0, ("machine_start_cybikov2\n"));
 	// real-time clock
-	pcf8593_init();
-	nvram_system_load( machine, "rtc", pcf8593_load, 0);
+	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
 	// serial dataflash
-	at45dbxx_init( AT45DB041);
+	at45dbxx_init(machine, AT45DB041);
 	nvram_system_load( machine, "flash1", &at45dbxx_load, 1);
 	// multi-purpose flash
-	sst39vfx_init( SST39VF020, 16, CPU_IS_BE);
+	sst39vfx_init(machine, SST39VF020, 16, ENDIANNESS_BIG);
 	nvram_system_load( machine, "flash2", &sst39vfx_load, 1);
 	memory_set_bankptr( machine, 2, sst39vfx_get_base());
 	// serial port
@@ -221,10 +231,9 @@ MACHINE_START( cybikoxt )
 {
 	_logerror( 0, ("machine_start_cybikoxt\n"));
 	// real-time clock
-	pcf8593_init();
-	nvram_system_load( machine, "rtc", pcf8593_load, 0);
+	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
 	// multi-purpose flash
-	sst39vfx_init( SST39VF400A, 16, CPU_IS_BE);
+	sst39vfx_init(machine, SST39VF400A, 16, ENDIANNESS_BIG);
 	nvram_system_load( machine, "flash1", &sst39vfx_load, 1);
 	memory_set_bankptr( machine, 2, sst39vfx_get_base());
 	// serial port
@@ -240,25 +249,18 @@ MACHINE_START( cybikoxt )
 MACHINE_RESET( cybikov1 )
 {
 	_logerror( 0, ("machine_reset_cybikov1\n"));
-	pcf8593_reset();
-	at45dbxx_reset();
 	cybiko_rs232_reset();
 }
 
 MACHINE_RESET( cybikov2 )
 {
 	_logerror( 0, ("machine_reset_cybikov2\n"));
-	pcf8593_reset();
-	at45dbxx_reset();
-	sst39vfx_reset();
 	cybiko_rs232_reset();
 }
 
 MACHINE_RESET( cybikoxt )
 {
 	_logerror( 0, ("machine_reset_cybikoxt\n"));
-	pcf8593_reset();
-	sst39vfx_reset();
 	cybiko_rs232_reset();
 }
 
@@ -270,11 +272,9 @@ MACHINE_STOP( cybikov1 )
 {
 	_logerror( 0, ("machine_stop_cybikov1\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", pcf8593_save);
-	pcf8593_exit();
+	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
 	// serial dataflash
 	nvram_system_save( machine, "flash1", &at45dbxx_save);
-	at45dbxx_exit();
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -283,14 +283,11 @@ MACHINE_STOP( cybikov2 )
 {
 	_logerror( 0, ("machine_stop_cybikov2\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", pcf8593_save);
-	pcf8593_exit();
+	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
 	// serial dataflash
 	nvram_system_save( machine, "flash1", &at45dbxx_save);
-	at45dbxx_exit();
 	// multi-purpose flash
 	nvram_system_save( machine, "flash2", &sst39vfx_save);
-	sst39vfx_exit();
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -299,11 +296,9 @@ MACHINE_STOP( cybikoxt )
 {
 	_logerror( 0, ("machine_stop_cybikoxt\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", pcf8593_save);
-	pcf8593_exit();
+	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
 	// multi-purpose flash
 	nvram_system_save( machine, "flash1", &sst39vfx_save);
-	sst39vfx_exit();
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -331,7 +326,7 @@ static void cybiko_rs232_init( void)
 {
 	_logerror( 0, ("cybiko_rs232_init\n"));
 	memset( &rs232, 0, sizeof( rs232));
-//	timer_pulse( TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
+//	timer_pulse(machine,  TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
 }
 
 static void cybiko_rs232_exit( void)
@@ -467,8 +462,9 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		// real-time clock
 		case H8S_IO_PORTF :
 		{
+			const device_config *device = device_list_find_by_tag(space->machine->config->devicelist, PCF8593, "rtc");
 			data = H8S_PF_PF2;
-			if (pcf8593_pin_sda_r()) data |= H8S_PF_PF0;
+			if (pcf8593_pin_sda_r(device)) data |= H8S_PF_PF0;
 		}
 		break;
 		// serial 2
@@ -483,6 +479,8 @@ static READ8_HANDLER( cybiko_io_reg_r )
 
 static WRITE8_HANDLER( cybiko_io_reg_w )
 {
+	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, PCF8593, "rtc");
+
 	_logerror( 2, ("cybiko_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
@@ -504,8 +502,8 @@ static WRITE8_HANDLER( cybiko_io_reg_w )
 		}
 		break;
 		// real-time clock
-		case H8S_IO_PFDR  : pcf8593_pin_scl( (data & H8S_PF_PF1) ? 1 : 0); break;
-		case H8S_IO_PFDDR : pcf8593_pin_sda_w( (data & H8S_PF_PF0) ? 0 : 1); break;
+		case H8S_IO_PFDR  : pcf8593_pin_scl(rtc, (data & H8S_PF_PF1) ? 1 : 0); break;
+		case H8S_IO_PFDDR : pcf8593_pin_sda_w(rtc, (data & H8S_PF_PF0) ? 0 : 1); break;
 	}
 }
 

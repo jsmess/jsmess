@@ -73,7 +73,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -261,7 +261,7 @@ static void vic2_setforeground (int y, int x, int value)
 }
 #endif
 
-static void vic2_drawlines (int first, int last, int start_x, int end_x);
+static void vic2_drawlines (running_machine *machine, int first, int last, int start_x, int end_x);
 
 void vic6567_init (int chip_vic2e, int pal,
 				   int (*dma_read) (int), int (*dma_read_color) (int),
@@ -308,7 +308,7 @@ int vic3_p5_r (void)
 }
 #endif
 
-static void vic2_set_interrupt (int mask)
+static void vic2_set_interrupt(running_machine *machine, int mask)
 {
 	if (((vic2.reg[0x19] ^ mask) & vic2.reg[0x1a] & 0xf))
 	{
@@ -322,7 +322,7 @@ static void vic2_set_interrupt (int mask)
 	vic2.reg[0x19] |= mask;
 }
 
-static void vic2_clear_interrupt (int mask)
+static void vic2_clear_interrupt (running_machine *machine, int mask)
 {
 	vic2.reg[0x19] &= ~mask;
 	if ((vic2.reg[0x19] & 0x80) && !(vic2.reg[0x19] & vic2.reg[0x1a] & 0xf))
@@ -351,7 +351,7 @@ static TIMER_CALLBACK(vic2_timer_timeout)
 			vic2.reg[0x13] = VIC2_X_VALUE;
 			vic2.reg[0x14] = VIC2_Y_VALUE;
 		}
-		vic2_set_interrupt (8);
+		vic2_set_interrupt(machine, 8);
 		break;
 	}
 }
@@ -362,6 +362,7 @@ INTERRUPT_GEN( vic2_frame_interrupt )
 
 WRITE8_HANDLER ( vic2_port_w )
 {
+	running_machine *machine = space->machine;
 	int startx, cycles;
 	// printf("vic write %04x %04x %04x\n", offset, data, vic2.rasterline);
 	DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
@@ -445,11 +446,11 @@ WRITE8_HANDLER ( vic2_port_w )
 		}
 		break;
 	case 0x19:
-		vic2_clear_interrupt (data & 0xf);
+		vic2_clear_interrupt(space->machine, data & 0xf);
 		break;
 	case 0x1a:						   /* irq mask */
 		vic2.reg[offset] = data;
-		vic2_set_interrupt(0); 			//beamrider needs this
+		vic2_set_interrupt(space->machine, 0); 			//beamrider needs this
 		break;
 	case 0x11:
 		if (vic2.reg[offset] != data)
@@ -582,15 +583,15 @@ WRITE8_HANDLER ( vic2_port_w )
 				{
 					if (startx < VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)
 						{
-							vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
+							vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, startx, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - 1);
 						}
-					vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
+					vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
 				}
 				else
 				{
 					if (startx >= VIC2_STARTVISIBLECOLUMNS)
 					{
-						vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
+						vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, startx, VIC2_FIRSTRASTERCOLUMNS + 8 - 1);
 					}
 				}
 			}
@@ -598,6 +599,7 @@ WRITE8_HANDLER ( vic2_port_w )
 
 READ8_HANDLER ( vic2_port_r )
 {
+	running_machine *machine = space->machine;
 	int val = 0;
 	offset &= 0x3f;
 	switch (offset)
@@ -624,12 +626,12 @@ READ8_HANDLER ( vic2_port_r )
 	case 0x1e:						   /* sprite to sprite collision detect */
 		val = vic2.reg[offset];
 		vic2.reg[offset] = 0;
-		vic2_clear_interrupt (4);
+		vic2_clear_interrupt(space->machine, 4);
 		break;
 	case 0x1f:						   /* sprite to background collision detect */
 		val = vic2.reg[offset];
 		vic2.reg[offset] = 0;
-		vic2_clear_interrupt (2);
+		vic2_clear_interrupt(space->machine, 2);
 		break;
 	case 0x20:
 	case 0x21:
@@ -869,7 +871,7 @@ static void vic2_draw_bitmap_multi (int ybegin, int yend, int ch, int yoff, int 
 	}
 }
 
-static void vic2_draw_sprite_code_multi (int y, int xbegin, int code, int prior, int start_x, int end_x)
+static void vic2_draw_sprite_code_multi(running_machine *machine, int y, int xbegin, int code, int prior, int start_x, int end_x)
 {
 	register int x, mask, shift;
 
@@ -920,7 +922,7 @@ static void vic2_draw_sprite_code (int y, int xbegin, int code, int color, int s
 	}
 }
 
-static void vic2_sprite_collision (int nr, int y, int x, int mask)
+static void vic2_sprite_collision (running_machine *machine, int nr, int y, int x, int mask)
 {
 	int i, value, xdiff;
 
@@ -946,12 +948,12 @@ static void vic2_sprite_collision (int nr, int y, int x, int mask)
 		{
 			SPRITE_SET_COLLISION (i);
 			SPRITE_SET_COLLISION (nr);
-			vic2_set_interrupt (4);
+			vic2_set_interrupt(machine, 4);
 		}
 	}
 }
 
-static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int start_x, int end_x)
+static void vic2_draw_sprite_multi(running_machine *machine, int nr, int yoff, int ybegin, int yend, int start_x, int end_x)
 {
 	int y, i, prior, addr, xbegin, collision;
 	int value, value2, value3 = 0, bg, color[2];
@@ -975,8 +977,8 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int 
 				value2 = vic2.expandx[vic2.multi_collision[bg]];
 				vic2.sprites[nr].bitmap[y][i*2] = value2 >> 8;
 				vic2.sprites[nr].bitmap[y][i*2+1] = value2 & 0xff;
-				vic2_sprite_collision (nr, y, xbegin + i * 16, value2 >> 8);
-				vic2_sprite_collision (nr, y, xbegin + i * 16 + 8, value2 & 0xff);
+				vic2_sprite_collision(machine, nr, y, xbegin + i * 16, value2 >> 8);
+				vic2_sprite_collision(machine, nr, y, xbegin + i * 16 + 8, value2 & 0xff);
 				if (prior || !collision)
 				{
 					value3 = vic2_getforeground16 (yoff + y, xbegin + i * 16 - 7);
@@ -985,17 +987,17 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int 
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION (nr);
-					vic2_set_interrupt (2);
+					vic2_set_interrupt(machine, 2);
 				}
 				if (prior)
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16, value >> 8, (value3 >> 8) ^ 0xff, start_x, end_x);
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16 + 8, value & 0xff, (value3 & 0xff) ^ 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi (machine, yoff + y, xbegin + i * 16, value >> 8, (value3 >> 8) ^ 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi (machine, yoff + y, xbegin + i * 16 + 8, value & 0xff, (value3 & 0xff) ^ 0xff, start_x, end_x);
 				}
 				else
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16, value >> 8, 0xff, start_x, end_x);
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 16 + 8, value & 0xff, 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi (machine, yoff + y, xbegin + i * 16, value >> 8, 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi (machine, yoff + y, xbegin + i * 16 + 8, value & 0xff, 0xff, start_x, end_x);
 				}
 			}
 			vic2.sprites[nr].bitmap[y][i*2]=0; //easier sprite collision detection
@@ -1025,7 +1027,7 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int 
 				value = vic2.dma_read (addr + vic2.sprites[nr].line * 3 + i);
 				vic2.sprites[nr].bitmap[y][i] =
 					value2 = vic2.multi_collision[value];
-				vic2_sprite_collision (nr, y, xbegin + i * 8, value2);
+				vic2_sprite_collision(machine, nr, y, xbegin + i * 8, value2);
 				if (prior || !collision)
 				{
 					value3 = vic2_getforeground (yoff + y, xbegin + i * 8 - 7);
@@ -1034,15 +1036,15 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int 
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION (nr);
-					vic2_set_interrupt (2);
+					vic2_set_interrupt(machine, 2);
 				}
 				if (prior)
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 8, value, value3 ^ 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi(machine, yoff + y, xbegin + i * 8, value, value3 ^ 0xff, start_x, end_x);
 				}
 				else
 				{
-					vic2_draw_sprite_code_multi (yoff + y, xbegin + i * 8, value, 0xff, start_x, end_x);
+					vic2_draw_sprite_code_multi(machine, yoff + y, xbegin + i * 8, value, 0xff, start_x, end_x);
 				}
 			}
 			vic2.sprites[nr].bitmap[y][i]=0; //easier sprite collision detection
@@ -1064,7 +1066,7 @@ static void vic2_draw_sprite_multi (int nr, int yoff, int ybegin, int yend, int 
 	}
 }
 
-static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend, int start_x, int end_x)
+static void vic2_draw_sprite(running_machine *machine, int nr, int yoff, int ybegin, int yend, int start_x, int end_x)
 {
 	int y, i, addr, xbegin, color, prior, collision;
 	int value, value3 = 0;
@@ -1085,15 +1087,15 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend, int start_
 				value = vic2.expandx[vic2.dma_read (addr + vic2.sprites[nr].line * 3 + i)];
 				vic2.sprites[nr].bitmap[y][i*2] = value>>8;
 				vic2.sprites[nr].bitmap[y][i*2+1] = value&0xff;
-				vic2_sprite_collision (nr, y, xbegin + i * 16, value >> 8);
-				vic2_sprite_collision (nr, y, xbegin + i * 16 + 8, value & 0xff);
+				vic2_sprite_collision(machine, nr, y, xbegin + i * 16, value >> 8);
+				vic2_sprite_collision(machine, nr, y, xbegin + i * 16 + 8, value & 0xff);
 				if (prior || !collision)
 					value3 = vic2_getforeground16 (yoff + y, xbegin + i * 16 - 7);
 				if (!collision && (value & value3))
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION (nr);
-					vic2_set_interrupt (2);
+					vic2_set_interrupt(machine, 2);
 				}
 				if (prior)
 					value &= ~value3;
@@ -1126,14 +1128,14 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend, int start_
 			{
 				value = vic2.dma_read (addr + vic2.sprites[nr].line * 3 + i);
 				vic2.sprites[nr].bitmap[y][i] = value;
-				vic2_sprite_collision (nr, y, xbegin + i * 8, value);
+				vic2_sprite_collision(machine, nr, y, xbegin + i * 8, value);
 				if (prior || !collision)
 					value3 = vic2_getforeground (yoff + y, xbegin + i * 8 - 7);
 				if (!collision && (value & value3))
 				{
 					collision = 1;
 					SPRITE_SET_BG_COLLISION (nr);
-					vic2_set_interrupt (2);
+					vic2_set_interrupt(machine, 2);
 				}
 				if (prior)
 					value &= ~value3;
@@ -1158,9 +1160,9 @@ static void vic2_draw_sprite (int nr, int yoff, int ybegin, int yend, int start_
 	}
 }
 
-static void vic3_drawlines (int first, int last, int start_x, int end_x);
+static void vic3_drawlines (running_machine *machine, int first, int last, int start_x, int end_x);
 
-static void vic2_drawlines (int first, int last, int start_x, int end_x)
+static void vic2_drawlines (running_machine *machine, int first, int last, int start_x, int end_x)
 {
 	int line, vline, end;
 	int attr, ch, ecm;
@@ -1173,7 +1175,7 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 	/* temporary allowing vic3 displaying 80 columns */
 	if (vic2.vic3 && (vic2.reg[0x31] & 0x80))
 	{
-		vic3_drawlines(first, first + 1, start_x, end_x);
+		vic3_drawlines(machine, first, first + 1, start_x, end_x);
 		return;
 	}
 
@@ -1319,9 +1321,9 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 				vic2.sprites[i].line = wrapped;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, 0, 0 , syend, start_x, end_x);
+					vic2_draw_sprite_multi(machine, i, 0, 0 , syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, 0, 0 , syend, start_x, end_x);
+					vic2_draw_sprite(machine, i, 0, 0 , syend, start_x, end_x);
 			}
 			else if 	(SPRITEON (i) &&
 					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
@@ -1348,9 +1350,9 @@ static void vic2_drawlines (int first, int last, int start_x, int end_x)
 				vic2.sprites[i].line = wrapped;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff + ybegin, 0, 0, start_x, end_x);
+					vic2_draw_sprite_multi(machine, i, yoff + ybegin, 0, 0, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff + ybegin, 0, 0, start_x, end_x);
+					vic2_draw_sprite(machine, i, yoff + ybegin, 0, 0, start_x, end_x);
 			}
 			else
 			{
@@ -1510,22 +1512,22 @@ INTERRUPT_GEN( vic2_raster_irq )
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer starten */
-			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
+			timer_set (machine, attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 	}
 
 	if (vic2.rasterline == C64_2_RASTERLINE(RASTERLINE))
 	{
-		vic2_set_interrupt (1);
+		vic2_set_interrupt(machine, 1);
 	}
 	if (!c64_pal)
 		if (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES - vic2.lines)
-			vic2_drawlines (vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+			vic2_drawlines (machine, vic2.rasterline + vic2.lines - 1, vic2.rasterline + vic2.lines, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
 // if (vic2.rasterline == 0x80)
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES))
-			vic2_drawlines (vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
+			vic2_drawlines (machine, vic2.rasterline - 1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS);
 
 //	timer_adjust_oneshot(vicii_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }

@@ -146,10 +146,10 @@ static DEVICE_START( cdp1863 )
 	cdp1863->oe = 1;
 
 	/* register for state saving */
-	state_save_register_item("cdp1863", device->tag, 0, cdp1863->oe);
-	state_save_register_item("cdp1863", device->tag, 0, cdp1863->latch);
-	state_save_register_item("cdp1863", device->tag, 0, cdp1863->signal);
-	state_save_register_item("cdp1863", device->tag, 0, cdp1863->incr);
+	state_save_register_item(machine, "cdp1863", device->tag, 0, cdp1863->oe);
+	state_save_register_item(machine, "cdp1863", device->tag, 0, cdp1863->latch);
+	state_save_register_item(machine, "cdp1863", device->tag, 0, cdp1863->signal);
+	state_save_register_item(machine, "cdp1863", device->tag, 0, cdp1863->incr);
 
 	return DEVICE_START_OK;
 }

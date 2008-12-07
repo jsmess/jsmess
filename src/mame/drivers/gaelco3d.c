@@ -198,7 +198,7 @@ static MACHINE_RESET( common )
 	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)adsp_tx_callback);
 
 	/* allocate a timer for feeding the autobuffer */
-	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq, NULL);
+	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
 
 	memory_configure_bank(machine, 1, 0, 256, memory_region(machine, "user1"), 0x4000);
 	memory_set_bank(machine, 1, 0);
@@ -207,14 +207,14 @@ static MACHINE_RESET( common )
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* Save state support */
-	state_save_register_global(sound_data);
-	state_save_register_global(sound_status);
-	state_save_register_global_array(analog_ports);
-	state_save_register_global(framenum);
-	state_save_register_global(adsp_ireg);
-	state_save_register_global(adsp_ireg_base);
-	state_save_register_global(adsp_incs);
-	state_save_register_global(adsp_size);
+	state_save_register_global(machine, sound_data);
+	state_save_register_global(machine, sound_status);
+	state_save_register_global_array(machine, analog_ports);
+	state_save_register_global(machine, framenum);
+	state_save_register_global(machine, adsp_ireg);
+	state_save_register_global(machine, adsp_ireg_base);
+	state_save_register_global(machine, adsp_incs);
+	state_save_register_global(machine, adsp_size);
 }
 
 
@@ -222,7 +222,7 @@ static MACHINE_RESET( gaelco3d )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = 0;
-	state_save_register_global(tms_offset_xor);
+	state_save_register_global(machine, tms_offset_xor);
 }
 
 
@@ -230,7 +230,7 @@ static MACHINE_RESET( gaelco3d2 )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = BYTE_XOR_BE(0);
-	state_save_register_global(tms_offset_xor);
+	state_save_register_global(machine, tms_offset_xor);
 }
 
 
@@ -311,7 +311,7 @@ static WRITE16_HANDLER( sound_data_w )
 {
 	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 
@@ -1048,6 +1048,39 @@ ROM_START( surfplnt )
 ROM_END
 
 
+ROM_START( surfpl40 )
+	ROM_REGION( 0x200000, "main", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "surfpl40.u5",  0x000000, 0x80000, CRC(572e0343) SHA1(badb08a5a495611b5fd2d821d4299348b2c9f308) )
+	ROM_LOAD16_BYTE( "surfpl40.u11", 0x000001, 0x80000, CRC(6056edaa) SHA1(9bc2df54d1367b9d58272a8f506e523e74110361) )
+	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "surfplnt.u13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_LOAD( "pls.18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) )
+
+	ROM_REGION32_LE( 0x800000, "user2", 0 )
+	ROM_LOAD32_WORD( "pls.40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) )
+	ROM_LOAD32_WORD( "pls.37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "pls.7",  0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) )
+	ROM_LOAD( "pls.9",  0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) )
+	ROM_LOAD( "pls.12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) )
+	ROM_LOAD( "pls.15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) )
+
+	ROM_REGION( 0x0080000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "surfplnt.u19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "surfplnt.u20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "surfplnt.u21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "surfplnt.u22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	/* these 4 are copies of the previous 4 */
+//  ROM_LOAD( "surfplnt.u27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+//  ROM_LOAD( "surfplnt.u28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+//  ROM_LOAD( "surfplnt.u29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+//  ROM_LOAD( "surfplnt.u30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+ROM_END
+
+
 ROM_START( radikalb )
 	ROM_REGION( 0x200000, "main", 0 )	/* 68020 code */
 	ROM_LOAD32_BYTE( "rab.6",  0x000000, 0x80000, CRC(ccac98c5) SHA1(43a30caf9880f48aba79676f9e746fdc6258139d) )
@@ -1132,6 +1165,7 @@ static DRIVER_INIT( gaelco3d )
  *
  *************************************/
 
-GAME( 1996, speedup,  0,        gaelco3d,  speedup,  gaelco3d, ROT0, "Gaelco", "Speed Up", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1997, surfplnt, 0,        gaelco3d,  surfplnt, gaelco3d, ROT0, "Gaelco", "Surf Planet", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
-GAME( 1998, radikalb, 0,        gaelco3d2, radikalb, gaelco3d, ROT0, "Gaelco", "Radikal Bikers", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 1996, speedup,  0,        gaelco3d,  speedup,  gaelco3d, ROT0, "Gaelco", "Speed Up (Version 1.20)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1997, surfplnt, 0,        gaelco3d,  surfplnt, gaelco3d, ROT0, "Gaelco", "Surf Planet (Version 4.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 1997, surfpl40, surfplnt, gaelco3d,  surfplnt, gaelco3d, ROT0, "Gaelco", "Surf Planet (Version 4.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 1998, radikalb, 0,        gaelco3d2, radikalb, gaelco3d, ROT0, "Gaelco", "Radikal Bikers (Version 2.02)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)

@@ -50,7 +50,7 @@ static SND_START( tms5220 )
 	memset(info, 0, sizeof(*info));
 	info->intf = config ? config : &dummy;
 
-	info->chip = tms5220_create(tag);
+	info->chip = tms5220_create(device);
 	if (!info->chip)
 		return NULL;
 	sndintrf_register_token(info);
@@ -92,7 +92,7 @@ static SND_START( tms5200 )
 
 static SND_STOP( tms5220 )
 {
-	struct tms5220_info *info = token;
+	struct tms5220_info *info = device->token;
 	tms5220_destroy(info->chip);
 }
 
@@ -100,7 +100,7 @@ static SND_STOP( tms5220 )
 
 static SND_RESET( tms5220 )
 {
-	struct tms5220_info *info = token;
+	struct tms5220_info *info = device->token;
 	tms5220_reset_chip(info->chip);
 }
 
@@ -240,7 +240,7 @@ void tms5220_set_frequency(int frequency)
 
 static SND_SET_INFO( tms5220 )
 {
-	struct tms5220_info *ti = token;
+	struct tms5220_info *ti = device->token;
 
 	switch (state)
 	{

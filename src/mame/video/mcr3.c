@@ -129,10 +129,10 @@ VIDEO_START( spyhunt )
 	tilemap_set_transparent_pen(alpha_tilemap, 0);
 	tilemap_set_scrollx(alpha_tilemap, 0, 16);
 
-	state_save_register_global(spyhunt_sprite_color_mask);
-	state_save_register_global(spyhunt_scrollx);
-	state_save_register_global(spyhunt_scrolly);
-	state_save_register_global(spyhunt_scroll_offset);
+	state_save_register_global(machine, spyhunt_sprite_color_mask);
+	state_save_register_global(machine, spyhunt_scrollx);
+	state_save_register_global(machine, spyhunt_scrolly);
+	state_save_register_global(machine, spyhunt_scroll_offset);
 }
 
 
@@ -192,7 +192,7 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 {
 	int offs;
 
-	fillbitmap(priority_bitmap, 1, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 1);
 
 	/* loop over sprite RAM */
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)

@@ -23,6 +23,7 @@ would commence ($C00000).
 
 /* Components */
 #include "sound/custom.h"
+#include "machine/6526cia.h"
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
 #include "machine/amigacd.h"
@@ -33,6 +34,9 @@ would commence ($C00000).
 #include "devices/chd_cd.h"
 #include "devices/cartslot.h"
 
+
+static UINT8 amiga_cia_0_portA_r(const device_config *device);
+static void amiga_cia_0_portA_w(const device_config *device, UINT8 data);
 
 /***************************************************************************
   Battery Backed-Up Clock (MSM6264)
@@ -216,6 +220,61 @@ static const custom_sound_interface amiga_custom_interface =
 	amiga_sh_start
 };
 
+static const cia6526_interface cia_0_ntsc_intf =
+{
+	amiga_cia_0_irq,									/* irq_func */
+	AMIGA_68000_NTSC_CLOCK / 10,						/* clock */
+	60,													/* tod_clock */
+	{
+		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
+		{ NULL, NULL }									/* port B */
+	}
+};
+
+static const cia6526_interface cia_0_pal_intf =
+{
+	amiga_cia_0_irq,									/* irq_func */
+	AMIGA_68000_PAL_CLOCK / 10,							/* clock */
+	50,													/* tod_clock */
+	{
+		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
+		{ NULL, NULL }									/* port B */
+	}
+};
+
+static const cia6526_interface cia_1_intf =
+{
+	amiga_cia_1_irq,									/* irq_func */
+	0,													/* clock */
+	0,													/* tod_clock */
+	{
+		{ NULL, NULL, },								/* port A */
+		{ NULL, amiga_fdc_control_w }					/* port B */
+	}
+};
+
+static const cia6526_interface cia_0_cdtv_intf =
+{
+	amiga_cia_0_irq,									/* irq_func */
+	CDTV_CLOCK_X1 / 40,									/* clock */
+	0,													/* tod_clock */
+	{
+		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
+		{ NULL, NULL }									/* port B */
+	}
+};
+
+static const cia6526_interface cia_1_cdtv_intf =
+{
+	amiga_cia_1_irq,									/* irq_func */
+	0,													/* clock */
+	0,													/* tod_clock */
+	{
+		{ NULL, NULL, },								/* port A */
+		{ NULL, amiga_fdc_control_w }					/* port B */
+	}
+};
+
 static MACHINE_DRIVER_START( ntsc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, AMIGA_68000_NTSC_CLOCK)
@@ -250,6 +309,12 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "right", 0.50)
 	MDRV_SOUND_ROUTE(3, "left", 0.50)
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_ntsc_intf)
+	MDRV_DEVICE_ADD("cia_1", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_1_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cdtv )
@@ -266,7 +331,14 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
 
+	/* cdrom */
 	MDRV_DEVICE_ADD( "cdrom", CDROM )
+
+	/* cia */
+	MDRV_DEVICE_MODIFY("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_cdtv_intf)
+	MDRV_DEVICE_MODIFY("cia_1", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_1_cdtv_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000n )
@@ -285,6 +357,10 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_SIZE(228*4, 312)
 	MDRV_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 312-1)
+
+	/* cia */
+	MDRV_DEVICE_MODIFY("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_pal_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000p )
@@ -300,17 +376,17 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static UINT8 amiga_cia_0_portA_r( void )
+static UINT8 amiga_cia_0_portA_r(const device_config *device)
 {
-	UINT8 ret = input_port_read(Machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	UINT8 ret = input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
 	ret |= amiga_fdc_status_r();
 	return ret;
 }
 
-static void amiga_cia_0_portA_w( UINT8 data )
+static void amiga_cia_0_portA_w(const device_config *device, UINT8 data)
 {
 	/* switch banks as appropriate */
-	memory_set_bank(Machine, 1, data & 1);
+	memory_set_bank(device->machine, 1, data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
@@ -321,13 +397,13 @@ static void amiga_cia_0_portA_w( UINT8 data )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK1);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK1);
 
 		amiga_cart_check_overlay(Machine);
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, SMH_UNMAP);
 
 	set_led_status( 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
@@ -394,10 +470,6 @@ static DRIVER_INIT( amiga )
 	static const amiga_machine_interface amiga_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
-		amiga_cia_0_portA_r, NULL,               /* CIA0 port A & B read */
-		amiga_cia_0_portA_w, NULL,               /* CIA0 port A & B write */
-		NULL, NULL,                              /* CIA1 port A & B read */
-		NULL, amiga_fdc_control_w,               /* CIA1 port A & B write */
 		amiga_read_joy0dat,	amiga_read_joy1dat,  /* joy0dat_r & joy1dat_r */
 		NULL,                                    /* potgo_w */
 		amiga_read_dskbytr,	amiga_write_dsklen,  /* dskbytr_r & dsklen_w */
@@ -451,7 +523,7 @@ static DRIVER_INIT( amiga_ecs )
 	amiga_cart_init(machine);
 
 	/* initialize keyboard */
-	amigakbd_init();
+	amigakbd_init(machine);
 }
 #endif
 
@@ -460,10 +532,6 @@ static DRIVER_INIT( cdtv )
 	static const amiga_machine_interface amiga_intf =
 	{
 		ECS_CHIP_RAM_MASK,
-		amiga_cia_0_portA_r, NULL,               /* CIA0 port A & B read */
-		amiga_cia_0_portA_w, NULL,               /* CIA0 port A & B write */
-		NULL, NULL,                              /* CIA1 port A & B read */
-		NULL, NULL,                              /* CIA1 port A & B write */
 		amiga_read_joy0dat,	amiga_read_joy1dat,  /* joy0dat_r & joy1dat_r */
 		NULL,                                    /* potgo_w */
 		amiga_read_dskbytr,	amiga_write_dsklen,  /* dskbytr_r & dsklen_w */

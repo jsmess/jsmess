@@ -142,13 +142,13 @@ static VIDEO_START( tmc600 )
 
 	/* register for state saving */
 
-	state_save_register_global_pointer(state->page_ram, TMC600_PAGE_RAM_SIZE);
-	state_save_register_global_pointer(state->color_ram, TMC600_PAGE_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->page_ram, TMC600_PAGE_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->color_ram, TMC600_PAGE_RAM_SIZE);
 
-	state_save_register_global(state->vismac_reg_latch);
-	state_save_register_global(state->vismac_color_latch);
-	state_save_register_global(state->vismac_bkg_latch);
-	state_save_register_global(state->blink);
+	state_save_register_global(machine, state->vismac_reg_latch);
+	state_save_register_global(machine, state->vismac_color_latch);
+	state_save_register_global(machine, state->vismac_bkg_latch);
+	state_save_register_global(machine, state->blink);
 }
 
 static VIDEO_UPDATE( tmc600 )

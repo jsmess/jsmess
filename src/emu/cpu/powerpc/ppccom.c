@@ -123,7 +123,7 @@ INLINE void set_xer(powerpc_state *ppc, UINT32 value)
 
 INLINE UINT64 get_timebase(powerpc_state *ppc)
 {
-	return (cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) - ppc->tb_zero_cycles) / ppc->tb_divisor;
+	return (cpu_get_total_cycles(ppc->device) - ppc->tb_zero_cycles) / ppc->tb_divisor;
 }
 
 
@@ -133,7 +133,7 @@ INLINE UINT64 get_timebase(powerpc_state *ppc)
 
 INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 {
-	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->activecpu) - newtb * ppc->tb_divisor;
+	ppc->tb_zero_cycles = cpu_get_total_cycles(ppc->device) - newtb * ppc->tb_divisor;
 }
 
 
@@ -144,7 +144,7 @@ INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 
 INLINE UINT32 get_decrementer(powerpc_state *ppc)
 {
-	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpu_get_total_cycles(ppc->device);
 	cycles_until_zero = MAX(cycles_until_zero, 0);
 	return cycles_until_zero / ppc->tb_divisor;
 }
@@ -161,14 +161,14 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 
 	if (PRINTF_DECREMENTER)
 	{
-		UINT64 total = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+		UINT64 total = cpu_get_total_cycles(ppc->device);
 		mame_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
 				curdec, newdec, ppc->tb_divisor,
 				(UINT32)(total >> 32), (UINT32)total, (UINT32)(cycles_until_done >> 32), (UINT32)cycles_until_done);
 	}
 
-	ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) + cycles_until_done;
-	timer_adjust_oneshot(ppc->decrementer_int_timer, ATTOTIME_IN_CYCLES(cycles_until_done, ppc->cpunum), 0);
+	ppc->dec_zero_cycles = cpu_get_total_cycles(ppc->device) + cycles_until_done;
+	timer_adjust_oneshot(ppc->decrementer_int_timer, cpu_clocks_to_attotime(ppc->device, cycles_until_done), 0);
 
 	if ((INT32)curdec >= 0 && (INT32)newdec < 0)
 		ppc->irq_pending |= 0x02;
@@ -191,7 +191,6 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
-	ppc->cpunum = cpunum_get_active();
 	ppc->flavor = flavor;
 	ppc->cap = cap;
 	ppc->cache_line_size = 32;
@@ -208,47 +207,47 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* allocate a timer for the compare interrupt */
 	if (cap & PPCCAP_OEA)
-		ppc->decrementer_int_timer = timer_alloc(decrementer_int_callback, ppc);
+		ppc->decrementer_int_timer = timer_alloc(device->machine, decrementer_int_callback, ppc);
 
 	/* and for the 4XX interrupts if needed */
 	if (cap & PPCCAP_4XX)
 	{
-		ppc->fit_timer = timer_alloc(ppc4xx_fit_callback, ppc);
-		ppc->pit_timer = timer_alloc(ppc4xx_pit_callback, ppc);
-		ppc->spu.timer = timer_alloc(ppc4xx_spu_callback, ppc);
+		ppc->fit_timer = timer_alloc(device->machine, ppc4xx_fit_callback, ppc);
+		ppc->pit_timer = timer_alloc(device->machine, ppc4xx_pit_callback, ppc);
+		ppc->spu.timer = timer_alloc(device->machine, ppc4xx_spu_callback, ppc);
 	}
 
 	/* register for save states */
-	state_save_register_item("ppc", device->tag, 0, ppc->pc);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->r);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->f);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->cr);
-	state_save_register_item("ppc", device->tag, 0, ppc->xerso);
-	state_save_register_item("ppc", device->tag, 0, ppc->fpscr);
-	state_save_register_item("ppc", device->tag, 0, ppc->msr);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->sr);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->spr);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->dcr);
+	state_save_register_device_item(device, 0, ppc->pc);
+	state_save_register_device_item_array(device, 0, ppc->r);
+	state_save_register_device_item_array(device, 0, ppc->f);
+	state_save_register_device_item_array(device, 0, ppc->cr);
+	state_save_register_device_item(device, 0, ppc->xerso);
+	state_save_register_device_item(device, 0, ppc->fpscr);
+	state_save_register_device_item(device, 0, ppc->msr);
+	state_save_register_device_item_array(device, 0, ppc->sr);
+	state_save_register_device_item_array(device, 0, ppc->spr);
+	state_save_register_device_item_array(device, 0, ppc->dcr);
 	if (cap & PPCCAP_4XX)
 	{
-		state_save_register_item_array("ppc", device->tag, 0, ppc->spu.regs);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.txbuf);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxbuf);
-		state_save_register_item_array("ppc", device->tag, 0, ppc->spu.rxbuffer);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxin);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxout);
-		state_save_register_item("ppc", device->tag, 0, ppc->pit_reload);
-		state_save_register_item("ppc", device->tag, 0, ppc->irqstate);
+		state_save_register_device_item_array(device, 0, ppc->spu.regs);
+		state_save_register_device_item(device, 0, ppc->spu.txbuf);
+		state_save_register_device_item(device, 0, ppc->spu.rxbuf);
+		state_save_register_device_item_array(device, 0, ppc->spu.rxbuffer);
+		state_save_register_device_item(device, 0, ppc->spu.rxin);
+		state_save_register_device_item(device, 0, ppc->spu.rxout);
+		state_save_register_device_item(device, 0, ppc->pit_reload);
+		state_save_register_device_item(device, 0, ppc->irqstate);
 	}
 	if (cap & PPCCAP_603_MMU)
 	{
-		state_save_register_item("ppc", device->tag, 0, ppc->mmu603_cmp);
-		state_save_register_item_array("ppc", device->tag, 0, ppc->mmu603_hash);
-		state_save_register_item_array("ppc", device->tag, 0, ppc->mmu603_r);
+		state_save_register_device_item(device, 0, ppc->mmu603_cmp);
+		state_save_register_device_item_array(device, 0, ppc->mmu603_hash);
+		state_save_register_device_item_array(device, 0, ppc->mmu603_r);
 	}
-	state_save_register_item("ppc", device->tag, 0, ppc->irq_pending);
-	state_save_register_item("ppc", device->tag, 0, ppc->tb_zero_cycles);
-	state_save_register_item("ppc", device->tag, 0, ppc->dec_zero_cycles);
+	state_save_register_device_item(device, 0, ppc->irq_pending);
+	state_save_register_device_item(device, 0, ppc->tb_zero_cycles);
+	state_save_register_device_item(device, 0, ppc->dec_zero_cycles);
 }
 
 
@@ -280,7 +279,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->msr = MSROEA_IP;
 
 		/* reset the decrementer */
-		ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+		ppc->dec_zero_cycles = cpu_get_total_cycles(ppc->device);
 		decrementer_int_callback(Machine, ppc, 0);
 	}
 
@@ -301,7 +300,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->spr[SPR603_HID0] = 1;
 
 	/* time base starts here */
-	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+	ppc->tb_zero_cycles = cpu_get_total_cycles(ppc->device);
 
 	/* clear interrupts */
 	ppc->irq_pending = 0;
@@ -428,7 +427,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	for (hashnum = 0; hashnum < 2; hashnum++)
 	{
 		offs_t ptegaddr = hashbase | ((hash << 6) & hashmask);
-		UINT32 *ptegptr = memory_get_read_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), ptegaddr);
+		UINT32 *ptegptr = memory_get_read_ptr(ppc->program, ptegaddr);
 
 		/* should only have valid memory here, but make sure */
 		if (ptegptr != NULL)
@@ -1083,7 +1082,7 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CONTEXT_SIZE:					/* provided by core */					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -1255,8 +1254,8 @@ static TIMER_CALLBACK( decrementer_int_callback )
 
 	/* advance by another full rev */
 	ppc->dec_zero_cycles += (UINT64)ppc->tb_divisor << 32;
-	cycles_until_next = ppc->dec_zero_cycles - cpu_get_total_cycles(machine->cpu[ppc->cpunum]);
-	timer_adjust_oneshot(ppc->decrementer_int_timer, ATTOTIME_IN_CYCLES(cycles_until_next, ppc->cpunum), 0);
+	cycles_until_next = ppc->dec_zero_cycles - cpu_get_total_cycles(ppc->device);
+	timer_adjust_oneshot(ppc->decrementer_int_timer, cpu_clocks_to_attotime(ppc->device, cycles_until_next), 0);
 }
 
 
@@ -1377,7 +1376,7 @@ static int ppc4xx_dma_fetch_transmit_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* fetch the data */
-	cpu_push_context(Machine->cpu[ppc->cpunum]);
+	cpu_push_context(ppc->device);
 	*byte = memory_read_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
 	cpu_pop_context();
@@ -1403,7 +1402,7 @@ static int ppc4xx_dma_handle_receive_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* store the data */
-	cpu_push_context(Machine->cpu[ppc->cpunum]);
+	cpu_push_context(ppc->device);
 	memory_write_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++, byte);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
 	cpu_pop_context();
@@ -1526,7 +1525,7 @@ static TIMER_CALLBACK( ppc4xx_fit_callback )
 		UINT32 timebase = get_timebase(ppc);
 		UINT32 interval = 0x200 << (4 * ((ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_FP_MASK) >> 24));
 		UINT32 target = (timebase + interval) & ~(interval - 1);
-		timer_adjust_oneshot(ppc->fit_timer, ATTOTIME_IN_CYCLES((target + 1 - timebase) / ppc->tb_divisor, ppc->cpunum), TRUE);
+		timer_adjust_oneshot(ppc->fit_timer, cpu_clocks_to_attotime(ppc->device, (target + 1 - timebase) / ppc->tb_divisor), TRUE);
 	}
 
 	/* otherwise, turn ourself off */
@@ -1557,7 +1556,7 @@ static TIMER_CALLBACK( ppc4xx_pit_callback )
 		UINT32 timebase = get_timebase(ppc);
 		UINT32 interval = ppc->pit_reload;
 		UINT32 target = timebase + interval;
-		timer_adjust_oneshot(ppc->pit_timer, ATTOTIME_IN_CYCLES((target + 1 - timebase) / ppc->tb_divisor, ppc->cpunum), TRUE);
+		timer_adjust_oneshot(ppc->pit_timer, cpu_clocks_to_attotime(ppc->device, (target + 1 - timebase) / ppc->tb_divisor), TRUE);
 	}
 
 	/* otherwise, turn ourself off */

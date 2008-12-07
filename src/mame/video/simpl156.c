@@ -113,11 +113,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( simpl156 )
 {
-	fillbitmap(priority_bitmap,0,NULL);
+	bitmap_fill(priority_bitmap,NULL,0);
 
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,256,cliprect);
+	bitmap_fill(bitmap,cliprect,256);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);
@@ -143,12 +143,12 @@ VIDEO_START( simpl156 )
 	paletteram16 =  auto_malloc(0x1000);
 
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(deco16_pf1_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf2_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf2_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
-	state_save_register_global_pointer(paletteram16, 0x1000/2);
+	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf2_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
+	state_save_register_global_pointer(machine, paletteram16, 0x1000/2);
 
 	deco16_1_video_init(machine);
 

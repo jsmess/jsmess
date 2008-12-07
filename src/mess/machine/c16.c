@@ -33,7 +33,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -359,13 +359,15 @@ READ8_HANDLER(c16_fd1x_r)
   */
 WRITE8_HANDLER(c16_6551_port_w)
 {
+	running_machine *machine = space->machine;
 	offset &= 0x03;
 	DBG_LOG (3, "6551", ("port write %.2x %.2x\n", offset, data));
 	port6529 = data;
 }
 
- READ8_HANDLER(c16_6551_port_r)
+READ8_HANDLER(c16_6551_port_r)
 {
+	running_machine *machine = space->machine;
 	int data = 0x00;
 
 	offset &= 0x03;
@@ -488,7 +490,7 @@ static void c16_common_driver_init (running_machine *machine)
 static void c16_driver_init(running_machine *machine)
 {
 	c16_common_driver_init (machine);
-	ted7360_init ((read_cfg1(machine) & 0x10 ) == 0x00);		/* is it PAL? */
+	ted7360_init (machine, (read_cfg1(machine) & 0x10 ) == 0x00);		/* is it PAL? */
 	ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
 }
 
@@ -515,7 +517,7 @@ MACHINE_RESET( c16 )
 {
 	tpi6525_2_reset();
 	tpi6525_3_reset();
-	c364_speech_init();
+	c364_speech_init(machine);
 
 	sndti_reset(SOUND_SID8580, 0);
 

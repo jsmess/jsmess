@@ -99,7 +99,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 		/* Pixel clock is 26.6666 MHz, we have 0x800 bytes, or 0x400 words
            to copy from spriteram to the buffer.  It seems safe to assume 1
            word can be copied per clock.*/
-		timer_set(attotime_mul(ATTOTIME_IN_HZ(26666000), 0x400), NULL, 0, spritebuffer_callback);
+		timer_set(space->machine, attotime_mul(ATTOTIME_IN_HZ(26666000), 0x400), NULL, 0, spritebuffer_callback);
 	}
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(space->cpu),offset,data);
 }
@@ -275,8 +275,8 @@ VIDEO_START( m92 )
 		tilemap_set_transmask(layer->tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 		tilemap_set_transmask(layer->wide_tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 
-		state_save_register_item("layer", NULL, laynum, layer->vram_base);
-		state_save_register_item_array("layer", NULL, laynum, layer->control);
+		state_save_register_item(machine, "layer", NULL, laynum, layer->vram_base);
+		state_save_register_item_array(machine, "layer", NULL, laynum, layer->control);
 	}
 
 	paletteram16 = auto_malloc(0x1000);
@@ -284,14 +284,14 @@ VIDEO_START( m92 )
 	memset(spriteram16,0,0x800);
 	memset(buffered_spriteram16,0,0x800);
 
-	state_save_register_global_array(pf_master_control);
+	state_save_register_global_array(machine, pf_master_control);
 
-	state_save_register_global(m92_sprite_list);
-	state_save_register_global(m92_raster_irq_position);
-	state_save_register_global(m92_sprite_buffer_busy);
-	state_save_register_global(m92_palette_bank);
+	state_save_register_global(machine, m92_sprite_list);
+	state_save_register_global(machine, m92_raster_irq_position);
+	state_save_register_global(machine, m92_sprite_buffer_busy);
+	state_save_register_global(machine, m92_palette_bank);
 
-	state_save_register_global_pointer(paletteram16, 0x1000);
+	state_save_register_global_pointer(machine, paletteram16, 0x1000);
 }
 
 /*****************************************************************************/
@@ -430,7 +430,7 @@ static void m92_update_scroll_positions(void)
 
 static void m92_screenrefresh(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	if ((~pf_master_control[2] >> 4) & 1)
 	{
@@ -440,7 +440,7 @@ static void m92_screenrefresh(running_machine *machine, bitmap_t *bitmap,const r
 		tilemap_draw(bitmap, cliprect, pf_layer[2].tmap,      TILEMAP_DRAW_LAYER0, 1);
 	}
 	else
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, pf_layer[1].wide_tmap, TILEMAP_DRAW_LAYER1, 0);
 	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap,      TILEMAP_DRAW_LAYER1, 0);

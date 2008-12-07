@@ -173,7 +173,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
-	atarigen_sound_io_reset(1);
+	atarigen_sound_io_reset(machine->cpu[1]);
 }
 
 
@@ -210,7 +210,7 @@ static WRITE16_HANDLER( sound_reset_w )
 		if ((oldword ^ sound_reset_val) & 1)
 		{
 			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
-			atarigen_sound_reset();
+			atarigen_sound_reset(space->machine);
 		}
 	}
 }

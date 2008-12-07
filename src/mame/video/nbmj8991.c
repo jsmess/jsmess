@@ -294,7 +294,7 @@ static void nbmj8991_gfxdraw(running_machine *machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	timer_set(attotime_mul(ATTOTIME_IN_NSEC(1650), nb1413m3_busyctr), NULL, 0, blitter_timer_callback);
+	timer_set(machine, attotime_mul(ATTOTIME_IN_NSEC(1650), nb1413m3_busyctr), NULL, 0, blitter_timer_callback);
 }
 
 /******************************************************************************
@@ -346,7 +346,7 @@ VIDEO_UPDATE( nbmj8991_type1 )
 		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-		fillbitmap(bitmap, 0, 0);
+		bitmap_fill(bitmap, 0, 0);
 
 	return 0;
 }
@@ -385,7 +385,7 @@ VIDEO_UPDATE( nbmj8991_type2 )
 		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-		fillbitmap(bitmap, 0, 0);
+		bitmap_fill(bitmap, 0, 0);
 
 	return 0;
 }

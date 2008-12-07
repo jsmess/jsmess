@@ -251,8 +251,8 @@ static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(c128_mmu8722_port_r, c128_mmu8722_port_w)
 	AM_RANGE(0xd600, 0xd7ff) AM_READWRITE(vdc8563_port_r, vdc8563_port_w)
-	AM_RANGE(0xdc00, 0xdcff) AM_READWRITE(cia_0_r, cia_0_w)
-	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(cia_1_r, cia_1_w)
+	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE(CIA6526R1, "cia", cia_r, cia_w)
+	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE(CIA6526R1, "cia", cia_r, cia_w)
 /*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(dma_port_r, dma_port_w) */
 ADDRESS_MAP_END
 
@@ -614,10 +614,17 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* devices */
+	/* quickload */
 	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_ntsc_cia0)
+	MDRV_DEVICE_ADD("cia_1", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_ntsc_cia1)
 MACHINE_DRIVER_END
 
 
@@ -639,6 +646,12 @@ static MACHINE_DRIVER_START( c128pal )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("sid6581", SID6581, VIC6569_CLOCK)
 	MDRV_SOUND_CONFIG(c128_sound_interface)
+
+	/* cia */
+	MDRV_DEVICE_MODIFY("cia_0", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_pal_cia0)
+	MDRV_DEVICE_MODIFY("cia_1", CIA6526R1)
+	MDRV_DEVICE_CONFIG(c64_pal_cia1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c128dpal )

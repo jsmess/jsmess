@@ -7,7 +7,7 @@ static VIDEO_START( newbrain )
 
 	/* register for state saving */
 
-//	state_save_register_global(state->);
+//	state_save_register_global(machine, state->);
 }
 
 static VIDEO_UPDATE( newbrain )

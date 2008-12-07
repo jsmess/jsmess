@@ -90,7 +90,7 @@ static UINT8 profpac_vw;
  *
  *************************************/
 
-static void init_savestate(void);
+static void init_savestate(running_machine *machine);
 static TIMER_CALLBACK( scanline_callback );
 static void init_sparklestar(void);
 
@@ -222,11 +222,11 @@ PALETTE_INIT( profpac )
 VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(scanline_callback, NULL);
+	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
 
 	/* register for save states */
-	init_savestate();
+	init_savestate(machine);
 
 	/* initialize the sparkle and stars */
 	if (astrocade_video_config & AC_STARS)
@@ -237,60 +237,60 @@ VIDEO_START( astrocde )
 VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(scanline_callback, NULL);
+	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
 
 	/* allocate videoram */
 	profpac_videoram = auto_malloc(0x4000 * 4 * sizeof(*profpac_videoram));
 
 	/* register for save states */
-	init_savestate();
+	init_savestate(machine);
 
 	/* register our specific save state data */
-	state_save_register_global_pointer(profpac_videoram, 0x4000 * 4);
-	state_save_register_global_array(profpac_palette);
-	state_save_register_global_array(profpac_colormap);
-	state_save_register_global(profpac_intercept);
-	state_save_register_global(profpac_vispage);
-	state_save_register_global(profpac_readpage);
-	state_save_register_global(profpac_readshift);
-	state_save_register_global(profpac_writepage);
-	state_save_register_global(profpac_writemode);
-	state_save_register_global(profpac_writemask);
-	state_save_register_global(profpac_vw);
+	state_save_register_global_pointer(machine, profpac_videoram, 0x4000 * 4);
+	state_save_register_global_array(machine, profpac_palette);
+	state_save_register_global_array(machine, profpac_colormap);
+	state_save_register_global(machine, profpac_intercept);
+	state_save_register_global(machine, profpac_vispage);
+	state_save_register_global(machine, profpac_readpage);
+	state_save_register_global(machine, profpac_readshift);
+	state_save_register_global(machine, profpac_writepage);
+	state_save_register_global(machine, profpac_writemode);
+	state_save_register_global(machine, profpac_writemask);
+	state_save_register_global(machine, profpac_vw);
 }
 
 
-static void init_savestate(void)
+static void init_savestate(running_machine *machine)
 {
-	state_save_register_global_array(astrocade_sparkle);
+	state_save_register_global_array(machine, astrocade_sparkle);
 
-	state_save_register_global(interrupt_enable);
-	state_save_register_global(interrupt_vector);
-	state_save_register_global(interrupt_scanline);
-	state_save_register_global(vertical_feedback);
-	state_save_register_global(horizontal_feedback);
+	state_save_register_global(machine, interrupt_enable);
+	state_save_register_global(machine, interrupt_vector);
+	state_save_register_global(machine, interrupt_scanline);
+	state_save_register_global(machine, vertical_feedback);
+	state_save_register_global(machine, horizontal_feedback);
 
-	state_save_register_global_array(colors);
-	state_save_register_global(colorsplit);
-	state_save_register_global(bgdata);
-	state_save_register_global(vblank);
-	state_save_register_global(video_mode);
+	state_save_register_global_array(machine, colors);
+	state_save_register_global(machine, colorsplit);
+	state_save_register_global(machine, bgdata);
+	state_save_register_global(machine, vblank);
+	state_save_register_global(machine, video_mode);
 
-	state_save_register_global_array(funcgen_expand_color);
-	state_save_register_global(funcgen_control);
-	state_save_register_global(funcgen_expand_count);
-	state_save_register_global(funcgen_rotate_count);
-	state_save_register_global_array(funcgen_rotate_data);
-	state_save_register_global(funcgen_shift_prev_data);
-	state_save_register_global(funcgen_intercept);
+	state_save_register_global_array(machine, funcgen_expand_color);
+	state_save_register_global(machine, funcgen_control);
+	state_save_register_global(machine, funcgen_expand_count);
+	state_save_register_global(machine, funcgen_rotate_count);
+	state_save_register_global_array(machine, funcgen_rotate_data);
+	state_save_register_global(machine, funcgen_shift_prev_data);
+	state_save_register_global(machine, funcgen_intercept);
 
-	state_save_register_global(pattern_source);
-	state_save_register_global(pattern_mode);
-	state_save_register_global(pattern_dest);
-	state_save_register_global(pattern_skip);
-	state_save_register_global(pattern_width);
-	state_save_register_global(pattern_height);
+	state_save_register_global(machine, pattern_source);
+	state_save_register_global(machine, pattern_mode);
+	state_save_register_global(machine, pattern_dest);
+	state_save_register_global(machine, pattern_skip);
+	state_save_register_global(machine, pattern_width);
+	state_save_register_global(machine, pattern_height);
 }
 
 
@@ -441,14 +441,14 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		if ((interrupt_enable & 0x01) == 0)
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector & 0xf0);
-			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
+			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
 		}
 
 		/* latch the feedback registers */
@@ -481,14 +481,14 @@ static TIMER_CALLBACK( scanline_callback )
 		if ((interrupt_enable & 0x04) == 0)
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector);
-			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector);
-			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
+			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
 		}
 	}
 

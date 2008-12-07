@@ -134,27 +134,27 @@ static CPU_INIT( mb88 )
 	mb88.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	mb88.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("mb88", device->tag, 0, mb88.PC);
-	state_save_register_item("mb88", device->tag, 0, mb88.PA);
-	state_save_register_item("mb88", device->tag, 0, mb88.SP[0]);
-	state_save_register_item("mb88", device->tag, 0, mb88.SP[1]);
-	state_save_register_item("mb88", device->tag, 0, mb88.SP[2]);
-	state_save_register_item("mb88", device->tag, 0, mb88.SP[3]);
-	state_save_register_item("mb88", device->tag, 0, mb88.SI);
-	state_save_register_item("mb88", device->tag, 0, mb88.A);
-	state_save_register_item("mb88", device->tag, 0, mb88.X);
-	state_save_register_item("mb88", device->tag, 0, mb88.Y);
-	state_save_register_item("mb88", device->tag, 0, mb88.st);
-	state_save_register_item("mb88", device->tag, 0, mb88.zf);
-	state_save_register_item("mb88", device->tag, 0, mb88.cf);
-	state_save_register_item("mb88", device->tag, 0, mb88.vf);
-	state_save_register_item("mb88", device->tag, 0, mb88.sf);
-	state_save_register_item("mb88", device->tag, 0, mb88.nf);
-	state_save_register_item("mb88", device->tag, 0, mb88.pio);
-	state_save_register_item("mb88", device->tag, 0, mb88.TH);
-	state_save_register_item("mb88", device->tag, 0, mb88.TL);
-	state_save_register_item("mb88", device->tag, 0, mb88.SB);
-	state_save_register_item("mb88", device->tag, 0, mb88.pending_interrupt);
+	state_save_register_device_item(device, 0, mb88.PC);
+	state_save_register_device_item(device, 0, mb88.PA);
+	state_save_register_device_item(device, 0, mb88.SP[0]);
+	state_save_register_device_item(device, 0, mb88.SP[1]);
+	state_save_register_device_item(device, 0, mb88.SP[2]);
+	state_save_register_device_item(device, 0, mb88.SP[3]);
+	state_save_register_device_item(device, 0, mb88.SI);
+	state_save_register_device_item(device, 0, mb88.A);
+	state_save_register_device_item(device, 0, mb88.X);
+	state_save_register_device_item(device, 0, mb88.Y);
+	state_save_register_device_item(device, 0, mb88.st);
+	state_save_register_device_item(device, 0, mb88.zf);
+	state_save_register_device_item(device, 0, mb88.cf);
+	state_save_register_device_item(device, 0, mb88.vf);
+	state_save_register_device_item(device, 0, mb88.sf);
+	state_save_register_device_item(device, 0, mb88.nf);
+	state_save_register_device_item(device, 0, mb88.pio);
+	state_save_register_device_item(device, 0, mb88.TH);
+	state_save_register_device_item(device, 0, mb88.TL);
+	state_save_register_device_item(device, 0, mb88.SB);
+	state_save_register_device_item(device, 0, mb88.pending_interrupt);
 }
 
 static CPU_RESET( mb88 )
@@ -797,7 +797,7 @@ CPU_GET_INFO( mb88 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mb88Regs);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

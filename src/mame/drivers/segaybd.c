@@ -174,13 +174,13 @@ static TIMER_CALLBACK( scanline_callback )
 
 static MACHINE_RESET( yboard )
 {
-    interrupt_timer = timer_alloc(scanline_callback, NULL);
+    interrupt_timer = timer_alloc(machine, scanline_callback, NULL);
     timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), 223);
 
-	state_save_register_global_array(misc_io_data);
-	state_save_register_global_array(analog_data);
-	state_save_register_global(vblank_irq_state);
-	state_save_register_global(timer_irq_state);
+	state_save_register_global_array(machine, misc_io_data);
+	state_save_register_global_array(machine, analog_data);
+	state_save_register_global(machine, vblank_irq_state);
+	state_save_register_global(machine, timer_irq_state);
 }
 
 
@@ -209,7 +209,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_data_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_data_w);
 }
 
 

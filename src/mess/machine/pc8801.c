@@ -175,7 +175,7 @@ static void pc8801_init_interrupt(running_machine *machine)
 	interrupt_mask_reg=0xf8;
 	interrupt_trig_reg=0x0;
 	cpu_set_irq_callback(machine->cpu[0],pc8801_interrupt_callback);
-	timer_pulse(ATTOTIME_IN_HZ(600),NULL, 0,pc8801_timer_interrupt);
+	timer_pulse(machine, ATTOTIME_IN_HZ(600),NULL, 0,pc8801_timer_interrupt);
 }
 
 WRITE8_HANDLER(pc88sr_outport_30)

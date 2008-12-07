@@ -23,9 +23,7 @@ enum
 };
 
 // init/exit/reset
-void at45dbxx_init( int type);
-void at45dbxx_exit( void);
-void at45dbxx_reset( void);
+void at45dbxx_init(running_machine *machine, int type);
 
 // pins
 void at45dbxx_pin_cs( int data);
@@ -34,8 +32,8 @@ void at45dbxx_pin_si( int data);
 int  at45dbxx_pin_so( void);
 
 // load/save
-void at45dbxx_load( mame_file *file);
-void at45dbxx_save( mame_file *file);
+void at45dbxx_load(running_machine *machine, mame_file *file);
+void at45dbxx_save(running_machine *machine, mame_file *file);
 
 // non-volatile ram handler
 /*

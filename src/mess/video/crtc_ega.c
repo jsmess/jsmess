@@ -705,22 +705,22 @@ static void common_start(const device_config *device, int device_type)
 
 		/* create the timers */
 		if (crtc_ega->intf->on_de_changed != NULL)
-			crtc_ega->de_changed_timer = timer_alloc(de_changed_timer_cb, (void *)device);
+			crtc_ega->de_changed_timer = timer_alloc(machine, de_changed_timer_cb, (void *)device);
 
 		if (crtc_ega->intf->on_hsync_changed != NULL)
 		{
-			crtc_ega->hsync_on_timer = timer_alloc(hsync_on_timer_cb, (void *)device);
-			crtc_ega->hsync_off_timer = timer_alloc(hsync_off_timer_cb, (void *)device);
+			crtc_ega->hsync_on_timer = timer_alloc(machine, hsync_on_timer_cb, (void *)device);
+			crtc_ega->hsync_off_timer = timer_alloc(machine, hsync_off_timer_cb, (void *)device);
 		}
 
 		if (crtc_ega->intf->on_vsync_changed != NULL)
 		{
-			crtc_ega->vsync_on_timer = timer_alloc(vsync_on_timer_cb, (void *)device);
-			crtc_ega->vsync_off_timer = timer_alloc(vsync_off_timer_cb, (void *)device);
+			crtc_ega->vsync_on_timer = timer_alloc(machine, vsync_on_timer_cb, (void *)device);
+			crtc_ega->vsync_off_timer = timer_alloc(machine, vsync_off_timer_cb, (void *)device);
 		}
 	}
 
-	crtc_ega->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, (void *)device);
+	crtc_ega->light_pen_latch_timer = timer_alloc(machine, light_pen_latch_timer_cb, (void *)device);
 
 	/* register for state saving */
 

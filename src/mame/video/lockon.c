@@ -945,10 +945,10 @@ VIDEO_START( lockon )
 	obj_pal_ram = auto_malloc(2048);
 
 	/* Timer for ground display list callback */
-	bufend_timer = timer_alloc(bufend_callback, NULL);
+	bufend_timer = timer_alloc(machine, bufend_callback, NULL);
 
 	/* Timer for the CRTC cursor pulse */
-	cursor_timer = timer_alloc(cursor_callback, NULL);
+	cursor_timer = timer_alloc(machine, cursor_callback, NULL);
 	timer_adjust_oneshot(cursor_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
@@ -957,7 +957,7 @@ VIDEO_UPDATE( lockon )
 	/* If screen output is disabled, fill with black */
 	if ( !BIT(lockon_ctrl_reg, 7) )
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 

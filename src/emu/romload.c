@@ -1170,15 +1170,15 @@ static void process_disk_entries(running_machine *machine, rom_load_data *romdat
 
 static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
-	int cpunum = mame_find_cpu_index(machine, rgntag);
-	if (cpunum >= 0)
+	const device_config *device = cputag_get_cpu(machine, rgntag);
+	if (device != NULL)
 	{
-		int cputype = machine->config->cpu[cpunum].type;
+		int cputype = ((const cpu_config *)device->inline_config)->type;
 		int buswidth;
 
 		/* set the endianness */
 		startflags &= ~ROMREGION_ENDIANMASK;
-		if (cputype_get_endianness(cputype) == CPU_IS_LE)
+		if (cputype_get_endianness(cputype) == ENDIANNESS_LITTLE)
 			startflags |= ROMREGION_LE;
 		else
 			startflags |= ROMREGION_BE;
@@ -1223,7 +1223,7 @@ static void process_region_list(running_machine *machine, rom_load_data *romdata
 			assert(ROMENTRY_ISREGION(region));
 
 			/* if this is a CPU region, override with the CPU width and endianness */
-			if (mame_find_cpu_index(machine, astring_c(regiontag)) >= 0)
+			if (cputag_get_cpu(machine, astring_c(regiontag)) != NULL)
 				regionflags = normalize_flags_for_cpu(machine, regionflags, astring_c(regiontag));
 
 			/* remember the base and length */

@@ -123,7 +123,7 @@ static TIMER_CALLBACK( special_reset )
 
 MACHINE_RESET( special )
 {
-	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, special_reset);
+	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, special_reset);
 	memory_set_bank(machine, 1, 1);	
 }
 
@@ -264,7 +264,7 @@ MACHINE_RESET( specimx )
 	specimx_color = 0x70;	
 	wd17xx_reset(machine);
 	wd17xx_set_side(0);
-	timer_set( attotime_zero, NULL, 0, setup_pit8253_gates );
+	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
 }
 
 READ8_HANDLER ( specimx_disk_ctrl_r )

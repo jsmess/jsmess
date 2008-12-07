@@ -597,7 +597,7 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 	{
 		attotime next_fire_time = attotime_add( timer->last_updated, double_to_attotime( cycles_to_output / timer->clockin ) );
 
-		timer_adjust_oneshot(timer->updatetimer, attotime_sub( next_fire_time, timer_get_time() ), timer->index );
+		timer_adjust_oneshot(timer->updatetimer, attotime_sub( next_fire_time, timer_get_time(device->machine) ), timer->index );
 	}
 
     LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
@@ -637,7 +637,7 @@ static void	update(const device_config *device, struct pit8253_timer *timer)
 {
 	/* With the 82C54's maximum clockin of 10MHz, 64 bits is nearly 60,000
        years of time. Should be enough for now. */
-	attotime now =	timer_get_time();
+	attotime now =	timer_get_time(device->machine);
 	attotime elapsed_time = attotime_sub(now,timer->last_updated);
 	INT64 elapsed_cycles =	attotime_to_double(elapsed_time) * timer->clockin;
 
@@ -904,7 +904,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 
 		update(device, timer);
 
-		if ( attotime_compare( timer_get_time(), timer->last_updated ) > 0 && timer->clockin != 0 )
+		if ( attotime_compare( timer_get_time(device->machine), timer->last_updated ) > 0 && timer->clockin != 0 )
 		{
 			middle_of_a_cycle = 1;
 		}
@@ -1059,30 +1059,30 @@ static device_start_err common_start( const device_config *device, int device_ty
 		timer->clockin = pit8253->config->timer[timerno].clockin;
 		timer->output_changed = pit8253->config->timer[timerno].output_changed;
 
-		timer->updatetimer = timer_alloc(update_timer_cb, (void *)device);
+		timer->updatetimer = timer_alloc(device->machine, update_timer_cb, (void *)device);
 		timer_adjust_oneshot(timer->updatetimer, attotime_never, timerno);
 
 		/* set up state save values */
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->clockin);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->control);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->status);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->lowcount);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latch);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->count);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->value);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->wmsb);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->rmsb);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->output);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->gate);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latched_count);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latched_status);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->null_count);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->phase);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->cycles_to_output);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->last_updated.seconds);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->last_updated.attoseconds);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->programmed);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->clock);
+		state_save_register_device_item(device, timerno, timer->clockin);
+		state_save_register_device_item(device, timerno, timer->control);
+		state_save_register_device_item(device, timerno, timer->status);
+		state_save_register_device_item(device, timerno, timer->lowcount);
+		state_save_register_device_item(device, timerno, timer->latch);
+		state_save_register_device_item(device, timerno, timer->count);
+		state_save_register_device_item(device, timerno, timer->value);
+		state_save_register_device_item(device, timerno, timer->wmsb);
+		state_save_register_device_item(device, timerno, timer->rmsb);
+		state_save_register_device_item(device, timerno, timer->output);
+		state_save_register_device_item(device, timerno, timer->gate);
+		state_save_register_device_item(device, timerno, timer->latched_count);
+		state_save_register_device_item(device, timerno, timer->latched_status);
+		state_save_register_device_item(device, timerno, timer->null_count);
+		state_save_register_device_item(device, timerno, timer->phase);
+		state_save_register_device_item(device, timerno, timer->cycles_to_output);
+		state_save_register_device_item(device, timerno, timer->last_updated.seconds);
+		state_save_register_device_item(device, timerno, timer->last_updated.attoseconds);
+		state_save_register_device_item(device, timerno, timer->programmed);
+		state_save_register_device_item(device, timerno, timer->clock);
 	}
 
 	return DEVICE_START_OK;
@@ -1121,7 +1121,7 @@ static DEVICE_RESET( pit8253 ) {
 		timer->null_count = 1;
 		timer->cycles_to_output = CYCLES_NEVER;
 
-		timer->last_updated = timer_get_time();
+		timer->last_updated = timer_get_time(device->machine);
 
 		update(device, timer);
 	}

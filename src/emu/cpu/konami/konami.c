@@ -390,18 +390,18 @@ static CPU_INIT( konami )
 	konami.device = device;
 	konami.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("KONAMI", device->tag, 0, PC);
-	state_save_register_item("KONAMI", device->tag, 0, U);
-	state_save_register_item("KONAMI", device->tag, 0, S);
-	state_save_register_item("KONAMI", device->tag, 0, X);
-	state_save_register_item("KONAMI", device->tag, 0, Y);
-	state_save_register_item("KONAMI", device->tag, 0, D);
-	state_save_register_item("KONAMI", device->tag, 0, DP);
-	state_save_register_item("KONAMI", device->tag, 0, CC);
-	state_save_register_item("KONAMI", device->tag, 0, konami.int_state);
-	state_save_register_item("KONAMI", device->tag, 0, konami.nmi_state);
-	state_save_register_item("KONAMI", device->tag, 0, konami.irq_state[0]);
-	state_save_register_item("KONAMI", device->tag, 0, konami.irq_state[1]);
+	state_save_register_device_item(device, 0, PC);
+	state_save_register_device_item(device, 0, U);
+	state_save_register_device_item(device, 0, S);
+	state_save_register_device_item(device, 0, X);
+	state_save_register_device_item(device, 0, Y);
+	state_save_register_device_item(device, 0, D);
+	state_save_register_device_item(device, 0, DP);
+	state_save_register_device_item(device, 0, CC);
+	state_save_register_device_item(device, 0, konami.int_state);
+	state_save_register_device_item(device, 0, konami.nmi_state);
+	state_save_register_device_item(device, 0, konami.irq_state[0]);
+	state_save_register_device_item(device, 0, konami.irq_state[1]);
 }
 
 static CPU_RESET( konami )
@@ -433,7 +433,7 @@ static void set_irq_line(int irqline, int state)
 	{
 		if (konami.nmi_state == state) return;
 		konami.nmi_state = state;
-		LOG(("KONAMI#%d set_nmi_line %d\n", cpunum_get_active(), state));
+		LOG(("KONAMI '%s' set_nmi_line %d\n", konami.device->tag, state));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
@@ -464,7 +464,7 @@ static void set_irq_line(int irqline, int state)
 	}
 	else if (irqline < 2)
 	{
-	    LOG(("KONAMI#%d set_irq_line %d, %d\n", cpunum_get_active(), irqline, state));
+	    LOG(("KONAMI '%s' set_irq_line %d, %d\n", konami.device->tag, irqline, state));
 		konami.irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
 		CHECK_IRQ_LINES;
@@ -556,7 +556,7 @@ CPU_GET_INFO( konami )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(konami);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

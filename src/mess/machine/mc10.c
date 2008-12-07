@@ -46,8 +46,8 @@ MACHINE_START( mc10 )
 			0x4000,	0x4000 + mess_ram_size - 1,	0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(machine, 1, mess_ram);
 
-	state_save_register_global(mc10_bfff);
-	state_save_register_global(mc10_keyboard_strobe);
+	state_save_register_global(machine, mc10_bfff);
+	state_save_register_global(machine, mc10_keyboard_strobe);
 }
 
 

@@ -450,10 +450,10 @@ VIDEO_START( galaga )
 	spriteram_3 = galaga_ram3 + 0x380;
 
 
-	state_save_register_global_array(galaga_starcontrol);
-	state_save_register_global(stars_scrollx);
-	state_save_register_global(stars_scrolly);
-	state_save_register_global(galaga_gfxbank);
+	state_save_register_global_array(machine, galaga_starcontrol);
+	state_save_register_global(machine, stars_scrollx);
+	state_save_register_global(machine, stars_scrolly);
+	state_save_register_global(machine, galaga_gfxbank);
 }
 
 
@@ -581,7 +581,7 @@ static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
 
 VIDEO_UPDATE( galaga )
 {
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_stars(bitmap,cliprect);
 	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);

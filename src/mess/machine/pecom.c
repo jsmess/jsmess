@@ -31,7 +31,7 @@ static TIMER_CALLBACK( reset_tick )
 MACHINE_START( pecom )
 {
 	pecom_state *state = machine->driver_data;
-	state->reset_timer = timer_alloc(reset_tick, NULL);
+	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
 }
 
 MACHINE_RESET( pecom )

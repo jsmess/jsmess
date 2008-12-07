@@ -87,11 +87,11 @@ static VIDEO_START( common )
 	memset(&dma_state, 0, sizeof(dma_state));
 
 	/* register for state saving */
-	state_save_register_global(autoerase_enable);
-	state_save_register_global_pointer(local_videoram, 0x80000/sizeof(local_videoram[0]));
-	state_save_register_global_pointer(midyunit_cmos_ram, (0x2000 * 4)/sizeof(midyunit_cmos_ram[0]));
-	state_save_register_global(videobank_select);
-	state_save_register_global_array(dma_register);
+	state_save_register_global(machine, autoerase_enable);
+	state_save_register_global_pointer(machine, local_videoram, 0x80000/sizeof(local_videoram[0]));
+	state_save_register_global_pointer(machine, midyunit_cmos_ram, (0x2000 * 4)/sizeof(midyunit_cmos_ram[0]));
+	state_save_register_global(machine, videobank_select);
+	state_save_register_global_array(machine, dma_register);
 }
 
 
@@ -542,7 +542,7 @@ if (LOG_DMA)
 	}
 
 	/* signal we're done */
-	timer_set(ATTOTIME_IN_NSEC(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
+	timer_set(space->machine, ATTOTIME_IN_NSEC(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
 
 	profiler_mark(PROFILER_END);
 }
@@ -581,5 +581,5 @@ void midyunit_scanline_update(const device_config *screen, bitmap_t *bitmap, int
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == video_screen_get_visible_area(screen)->max_y)
-		timer_set(video_screen_get_time_until_pos(screen, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
+		timer_set(screen->machine, video_screen_get_time_until_pos(screen, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
 }

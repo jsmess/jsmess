@@ -64,6 +64,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "m6847.h"
 
 #include "debug/debugcpu.h"
@@ -1576,7 +1577,7 @@ void m6847_video_changed(void)
 int m6847_get_horizontal_sync(void)
 {
 	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
-	return attotime_compare(fire_time, timer_get_time()) > 0;
+	return attotime_compare(fire_time, timer_get_time(Machine)) > 0;
 }
 
 
@@ -1584,7 +1585,7 @@ int m6847_get_horizontal_sync(void)
 static void set_horizontal_sync(void)
 {
 	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
-	int horizontal_sync = attotime_compare(fire_time, timer_get_time()) > 0;
+	int horizontal_sync = attotime_compare(fire_time, timer_get_time(Machine)) > 0;
 	if (m6847->horizontal_sync_callback)
 		m6847->horizontal_sync_callback(!horizontal_sync);
 }
@@ -1594,7 +1595,7 @@ static void set_horizontal_sync(void)
 int m6847_get_field_sync(void)
 {
 	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
-	return attotime_compare(fire_time, timer_get_time()) > 0;
+	return attotime_compare(fire_time, timer_get_time(Machine)) > 0;
 }
 
 
@@ -1602,7 +1603,7 @@ int m6847_get_field_sync(void)
 static void set_field_sync(void)
 {
 	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
-	int field_sync = attotime_compare(fire_time, timer_get_time()) > 0;
+	int field_sync = attotime_compare(fire_time, timer_get_time(Machine)) > 0;
 	if (m6847->field_sync_callback)
 		m6847->field_sync_callback(field_sync);
 }
@@ -1618,7 +1619,7 @@ static void set_field_sync(void)
 static TIMER_CALLBACK(hs_fall)
 {
 	if (LOG_HS)
-		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION));
+		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION));
 
 	set_horizontal_sync();
 }
@@ -1626,7 +1627,7 @@ static TIMER_CALLBACK(hs_fall)
 static TIMER_CALLBACK(hs_rise)
 {
 	if (LOG_HS)
-		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION));
+		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION));
 
 	timer_adjust_oneshot(m6847->hs_rise_timer,
 		attotime_make(0, m6847->scanline_period), 0);
@@ -1640,7 +1641,7 @@ static TIMER_CALLBACK(hs_rise)
 static TIMER_CALLBACK(fs_fall)
 {
 	if (LOG_FS)
-		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION), get_scanline());
+		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION), get_scanline());
 
 	set_field_sync();
 }
@@ -1648,7 +1649,7 @@ static TIMER_CALLBACK(fs_fall)
 static TIMER_CALLBACK(fs_rise)
 {
 	if (LOG_FS)
-		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(), ATTOTIME_STRING_PRECISION), get_scanline());
+		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION), get_scanline());
 
 	/* adjust field sync falling edge timer */
 	timer_adjust_oneshot(m6847->fs_fall_timer,
@@ -1682,18 +1683,18 @@ static void execute_m6847_dumpscanline(running_machine *machine, int ref, int pa
 
 	for (i = 0; i < beamx; i++)
 	{
-		debug_console_printf("[%02d]: 0x%02X (", i, pixel[i].data);
+		debug_console_printf(machine, "[%02d]: 0x%02X (", i, pixel[i].data);
 
-		if (pixel[i].attr & M6847_AG)		debug_console_printf(" AG");
-		if (pixel[i].attr & M6847_AS)		debug_console_printf(" AS");
-		if (pixel[i].attr & M6847_INTEXT)	debug_console_printf(" INTEXT");
-		if (pixel[i].attr & M6847_INV)		debug_console_printf(" INV");
-		if (pixel[i].attr & M6847_CSS)		debug_console_printf(" CSS");
-		if (pixel[i].attr & M6847_GM2)		debug_console_printf(" GM2");
-		if (pixel[i].attr & M6847_GM1)		debug_console_printf(" GM1");
-		if (pixel[i].attr & M6847_GM0)		debug_console_printf(" GM0");
+		if (pixel[i].attr & M6847_AG)		debug_console_printf(machine, " AG");
+		if (pixel[i].attr & M6847_AS)		debug_console_printf(machine, " AS");
+		if (pixel[i].attr & M6847_INTEXT)	debug_console_printf(machine, " INTEXT");
+		if (pixel[i].attr & M6847_INV)		debug_console_printf(machine, " INV");
+		if (pixel[i].attr & M6847_CSS)		debug_console_printf(machine, " CSS");
+		if (pixel[i].attr & M6847_GM2)		debug_console_printf(machine, " GM2");
+		if (pixel[i].attr & M6847_GM1)		debug_console_printf(machine, " GM1");
+		if (pixel[i].attr & M6847_GM0)		debug_console_printf(machine, " GM0");
 
-		debug_console_printf(" )\n");
+		debug_console_printf(machine, " )\n");
 	}
 }
 
@@ -1852,10 +1853,10 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 	}
 
 	/* allocate timers */
-	m6847->fs_rise_timer = timer_alloc(fs_rise, NULL);
-	m6847->fs_fall_timer = timer_alloc(fs_fall, NULL);
-	m6847->hs_rise_timer = timer_alloc(hs_rise, NULL);
-	m6847->hs_fall_timer = timer_alloc(hs_fall, NULL);
+	m6847->fs_rise_timer = timer_alloc(machine, fs_rise, NULL);
+	m6847->fs_fall_timer = timer_alloc(machine, fs_fall, NULL);
+	m6847->hs_rise_timer = timer_alloc(machine, hs_rise, NULL);
+	m6847->hs_fall_timer = timer_alloc(machine, hs_fall, NULL);
 
 	/* setup dimensions */
 	m6847->top_border_scanlines = v->top_border_scanlines;
@@ -2003,7 +2004,7 @@ static attotime interval(m6847_timing_type timing)
 
 UINT64 m6847_time(m6847_timing_type timing)
 {
-	attotime current_time = timer_get_time();
+	attotime current_time = timer_get_time(Machine);
 	attotime divisor = interval(timing);
 	return divide_mame_time(current_time, divisor);
 }
@@ -2014,7 +2015,7 @@ attotime m6847_time_until(m6847_timing_type timing, UINT64 target_time)
 {
 	attotime target_mame_time, current_time;
 	target_mame_time = attotime_mul(interval(timing), target_time);
-	current_time = timer_get_time();
+	current_time = timer_get_time(Machine);
 
 	if (attotime_compare(target_mame_time, current_time) < 0)
 		fatalerror("m6847_time_until(): cannot target past times");

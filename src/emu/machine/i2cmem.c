@@ -35,7 +35,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpunum_get_active() != -1 )
+		if( Machine->activecpu != NULL )
 		{
 			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
@@ -121,19 +121,19 @@ void i2cmem_init( int chip, int slave_address, int page_size, int data_size, uns
 	c->data = data;
 	c->page = page;
 
-	state_save_register_item( "i2cmem", NULL, chip, c->scl );
-	state_save_register_item( "i2cmem", NULL, chip, c->sdaw );
-	state_save_register_item( "i2cmem", NULL, chip, c->e0 );
-	state_save_register_item( "i2cmem", NULL, chip, c->e1 );
-	state_save_register_item( "i2cmem", NULL, chip, c->e2 );
-	state_save_register_item( "i2cmem", NULL, chip, c->wc );
-	state_save_register_item( "i2cmem", NULL, chip, c->sdar );
-	state_save_register_item( "i2cmem", NULL, chip, c->state );
-	state_save_register_item( "i2cmem", NULL, chip, c->bits );
-	state_save_register_item( "i2cmem", NULL, chip, c->shift );
-	state_save_register_item( "i2cmem", NULL, chip, c->devsel );
-	state_save_register_item( "i2cmem", NULL, chip, c->byteaddr );
-	state_save_register_item_pointer( "i2cmem", NULL, chip, c->data, c->data_size );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->scl );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->sdaw );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->e0 );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->e1 );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->e2 );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->wc );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->sdar );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->state );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->bits );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->shift );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->devsel );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->byteaddr );
+	state_save_register_item_pointer( Machine, "i2cmem", NULL, chip, c->data, c->data_size );
 }
 
 static int select_device( struct i2cmem_chip *c )

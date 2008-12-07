@@ -1277,7 +1277,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 			/* interpolate if appropriate and if time has passed since the last update */
 			if (analog->interpolate && !(analog->field->flags & ANALOG_FLAG_RESET) && portdata->last_delta_nsec != 0)
 			{
-				attoseconds_t nsec_since_last = attotime_to_attoseconds(attotime_sub(timer_get_time(), portdata->last_frame_time)) / ATTOSECONDS_PER_NANOSECOND;
+				attoseconds_t nsec_since_last = attotime_to_attoseconds(attotime_sub(timer_get_time(port->machine), portdata->last_frame_time)) / ATTOSECONDS_PER_NANOSECOND;
 				value = analog->previous + ((INT64)(analog->accum - analog->previous) * nsec_since_last / portdata->last_delta_nsec);
 			}
 
@@ -2008,7 +2008,7 @@ static void frame_update(running_machine *machine)
 	input_port_private *portdata = machine->input_port_data;
 	const input_field_config *mouse_field = NULL;
 	int ui_visible = ui_is_menu_active();
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(machine);
 	const input_port_config *port;
 	render_target *mouse_target;
 	INT32 mouse_target_x;
@@ -3973,6 +3973,9 @@ static time_t playback_init(running_machine *machine)
 	if (memcmp(machine->gamedrv->name, header + 0x14, strlen(machine->gamedrv->name) + 1) != 0)
 		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->gamedrv->name);
 
+	/* enable compression */
+	mame_fcompress(portdata->playback_file, TRUE);
+
 	return basetime;
 }
 
@@ -4044,7 +4047,8 @@ static void playback_port(const input_port_config *port)
 	{
 		analog_field_state *analog;
 
-		/* read the digital value */
+		/* read the default value and the digital state */
+		port->state->defvalue = playback_read_uint32(port->machine);
 		port->state->digital = playback_read_uint32(port->machine);
 
 		/* loop over analog ports and save their data */
@@ -4168,6 +4172,9 @@ static void record_init(running_machine *machine)
 
 	/* write it */
 	mame_fwrite(portdata->record_file, header, sizeof(header));
+
+	/* enable compression */
+	mame_fcompress(portdata->record_file, TRUE);
 }
 
 
@@ -4228,7 +4235,8 @@ static void record_port(const input_port_config *port)
 	{
 		analog_field_state *analog;
 
-		/* store the digital value */
+		/* store the default value and digital state */
+		record_write_uint32(port->machine, port->state->defvalue);
 		record_write_uint32(port->machine, port->state->digital);
 
 		/* loop over analog ports and save their data */

@@ -531,15 +531,15 @@ static MACHINE_START( vegas )
 	voodoo_device = device_list_find_by_tag(machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
 
 	/* allocate timers for the NILE */
-	timer[0] = timer_alloc(NULL, NULL);
-	timer[1] = timer_alloc(NULL, NULL);
-	timer[2] = timer_alloc(nile_timer_callback, NULL);
-	timer[3] = timer_alloc(nile_timer_callback, NULL);
+	timer[0] = timer_alloc(machine, NULL, NULL);
+	timer[1] = timer_alloc(machine, NULL, NULL);
+	timer[2] = timer_alloc(machine, nile_timer_callback, NULL);
+	timer[3] = timer_alloc(machine, nile_timer_callback, NULL);
 
 	/* identify our sound board */
-	if (mame_find_cpu_index(machine, "dsio") != -1)
+	if (cputag_get_cpu(machine, "dsio") != NULL)
 		dcs_idma_cs = 6;
-	else if (mame_find_cpu_index(machine, "denver") != -1)
+	else if (cputag_get_cpu(machine, "denver") != NULL)
 		dcs_idma_cs = 7;
 	else
 		dcs_idma_cs = 0;
@@ -561,19 +561,19 @@ static MACHINE_START( vegas )
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* register for save states */
-	state_save_register_global(nile_irq_state);
-	state_save_register_global(ide_irq_state);
-	state_save_register_global_array(pci_bridge_regs);
-	state_save_register_global_array(pci_ide_regs);
-	state_save_register_global_array(pci_3dfx_regs);
-	state_save_register_global(vblank_state);
-	state_save_register_global_array(sio_data);
-	state_save_register_global(sio_irq_clear);
-	state_save_register_global(sio_irq_enable);
-	state_save_register_global(sio_irq_state);
-	state_save_register_global(sio_led_state);
-	state_save_register_global(pending_analog_read);
-	state_save_register_global(cmos_unlocked);
+	state_save_register_global(machine, nile_irq_state);
+	state_save_register_global(machine, ide_irq_state);
+	state_save_register_global_array(machine, pci_bridge_regs);
+	state_save_register_global_array(machine, pci_ide_regs);
+	state_save_register_global_array(machine, pci_3dfx_regs);
+	state_save_register_global(machine, vblank_state);
+	state_save_register_global_array(machine, sio_data);
+	state_save_register_global(machine, sio_irq_clear);
+	state_save_register_global(machine, sio_irq_enable);
+	state_save_register_global(machine, sio_irq_state);
+	state_save_register_global(machine, sio_led_state);
+	state_save_register_global(machine, pending_analog_read);
+	state_save_register_global(machine, cmos_unlocked);
 	state_save_register_postload(machine, vegas_postload, NULL);
 }
 
@@ -586,7 +586,7 @@ static MACHINE_RESET( vegas )
 	memset(pci_3dfx_regs, 0, sizeof(pci_3dfx_regs));
 
 	/* reset the DCS system if we have one */
-	if (mame_find_cpu_index(machine, "dcs2") != -1 || mame_find_cpu_index(machine, "dsio") != -1 || mame_find_cpu_index(machine, "denver") != -1)
+	if (cputag_get_cpu(machine, "dcs2") != NULL || cputag_get_cpu(machine, "dsio") != NULL || cputag_get_cpu(machine, "denver") != NULL)
 	{
 		dcs_reset_w(1);
 		dcs_reset_w(0);
@@ -2230,6 +2230,7 @@ static MACHINE_DRIVER_START( vegascore )
 	MDRV_NVRAM_HANDLER(timekeeper_save)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MDRV_IDE_BUS_MASTER_SPACE("main", PROGRAM)
 
 	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
 

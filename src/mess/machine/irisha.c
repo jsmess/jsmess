@@ -35,7 +35,7 @@ static TIMER_CALLBACK( irisha_key )
 
 MACHINE_RESET( irisha )
 {
-	timer_pulse(ATTOTIME_IN_MSEC(30), NULL, 0, irisha_key);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(30), NULL, 0, irisha_key);
   irisha_keypressed = 0;
 }
 

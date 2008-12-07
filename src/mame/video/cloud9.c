@@ -56,9 +56,9 @@ VIDEO_START( cloud9 )
 	spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* register for savestates */
-	state_save_register_global_pointer(videoram, 0x8000);
-	state_save_register_global_array(video_control);
-	state_save_register_global_array(bitmode_addr);
+	state_save_register_global_pointer(machine, videoram, 0x8000);
+	state_save_register_global_array(machine, video_control);
+	state_save_register_global_array(machine, bitmode_addr);
 }
 
 
@@ -260,7 +260,7 @@ VIDEO_UPDATE( cloud9 )
 	int x, y, offs;
 
 	/* draw the sprites */
-	fillbitmap(spritebitmap, 0x00, cliprect);
+	bitmap_fill(spritebitmap, cliprect, 0x00);
 	for (offs = 0; offs < 0x20; offs++)
 		if (spriteaddr[offs + 0x00] != 0)
 		{

@@ -249,8 +249,8 @@ static WRITE8_HANDLER( laserdisc_command_w );
 static MACHINE_START( gottlieb )
 {
 	/* register for save states */
-	state_save_register_global(joystick_select);
-	state_save_register_global_array(track);
+	state_save_register_global(machine, joystick_select);
+	state_save_register_global_array(machine, track);
 
 	/* see if we have a laserdisc */
 	laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
@@ -262,28 +262,28 @@ static MACHINE_START( gottlieb )
 		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		laserdisc_bit_timer = timer_alloc(laserdisc_bit_callback, NULL);
-		laserdisc_philips_timer = timer_alloc(laserdisc_philips_callback, NULL);
+		laserdisc_bit_timer = timer_alloc(machine, laserdisc_bit_callback, NULL);
+		laserdisc_philips_timer = timer_alloc(machine, laserdisc_philips_callback, NULL);
 
 		/* create some audio RAM */
 		laserdisc_audio_buffer = auto_malloc(AUDIORAM_SIZE);
 		laserdisc_status = 0x38;
 
 		/* more save state registration */
-		state_save_register_global(laserdisc_select);
-		state_save_register_global(laserdisc_status);
-		state_save_register_global(laserdisc_philips_code);
+		state_save_register_global(machine, laserdisc_select);
+		state_save_register_global(machine, laserdisc_status);
+		state_save_register_global(machine, laserdisc_philips_code);
 
-		state_save_register_global_pointer(laserdisc_audio_buffer, AUDIORAM_SIZE);
-		state_save_register_global(laserdisc_audio_address);
-		state_save_register_global_array(laserdisc_last_samples);
-		state_save_register_global(laserdisc_last_time.seconds);
-		state_save_register_global(laserdisc_last_time.attoseconds);
-		state_save_register_global(laserdisc_last_clock.seconds);
-		state_save_register_global(laserdisc_last_clock.attoseconds);
-		state_save_register_global(laserdisc_zero_seen);
-		state_save_register_global(laserdisc_audio_bits);
-		state_save_register_global(laserdisc_audio_bit_count);
+		state_save_register_global_pointer(machine, laserdisc_audio_buffer, AUDIORAM_SIZE);
+		state_save_register_global(machine, laserdisc_audio_address);
+		state_save_register_global_array(machine, laserdisc_last_samples);
+		state_save_register_global(machine, laserdisc_last_time.seconds);
+		state_save_register_global(machine, laserdisc_last_time.attoseconds);
+		state_save_register_global(machine, laserdisc_last_clock.seconds);
+		state_save_register_global(machine, laserdisc_last_clock.attoseconds);
+		state_save_register_global(machine, laserdisc_zero_seen);
+		state_save_register_global(machine, laserdisc_audio_bits);
+		state_save_register_global(machine, laserdisc_audio_bit_count);
 	}
 }
 
@@ -470,7 +470,7 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 
 	/* assert the line and set a timer for deassertion */
    	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
-	timer_set(attotime_mul(LASERDISC_CLOCK, 10), NULL, 0, laserdisc_bit_off_callback);
+	timer_set(machine, attotime_mul(LASERDISC_CLOCK, 10), NULL, 0, laserdisc_bit_off_callback);
 
 	/* determine how long for the next command; there is a 555 timer with a
        variable resistor controlling the timing of the pulses. Nominally, the
@@ -672,7 +672,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
+	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
 
 	/* if we have a laserdisc, update it */
 	if (laserdisc != NULL)

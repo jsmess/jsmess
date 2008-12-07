@@ -15,7 +15,7 @@
 		if(LEVEL>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -112,7 +112,7 @@ static TIMER_CALLBACK(pc_rtc_timer)
 void pc_rtc_init(void)
 {
 	memset(&pc_rtc,0,sizeof(pc_rtc));
-	pc_rtc.timer = timer_alloc(pc_rtc_timer, NULL);
+	pc_rtc.timer = timer_alloc(machine, pc_rtc_timer, NULL);
 	timer_adjust_periodic(pc_rtc.timer, attotime_zero, 0, attotime_make(1, 0));
 }
 

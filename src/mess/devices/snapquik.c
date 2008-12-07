@@ -101,7 +101,7 @@ static DEVICE_START( snapquick )
 	snapquick_token *token = get_token(device);
 
 	/* allocate a timer */
-	token->timer = timer_alloc(process_snapshot_or_quickload, (void *) device);
+	token->timer = timer_alloc(device->machine, process_snapshot_or_quickload, (void *) device);
 
 	/* locate the load function */
 	token->load = (snapquick_load_func) device_get_info_fct(device, DEVINFO_FCT_SNAPSHOT_QUICKLOAD_LOAD);

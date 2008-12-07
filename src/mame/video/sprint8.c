@@ -183,7 +183,7 @@ VIDEO_EOF( sprint8 )
 
 	tilemap_draw(helper2, visarea, tilemap2, 0, 0);
 
-	fillbitmap(helper1, 0x20, visarea);
+	bitmap_fill(helper1, visarea, 0x20);
 
 	draw_sprites(machine, helper1, visarea);
 
@@ -194,7 +194,7 @@ VIDEO_EOF( sprint8 )
 
 		for (x = visarea->min_x; x <= visarea->max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)
-				timer_set(video_screen_get_time_until_pos(machine->primary_screen, y + 24, x), NULL,
+				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, y + 24, x), NULL,
 						  colortable_entry_get_value(machine->colortable, p1[x]),
 						  sprint8_collision_callback);
 	}

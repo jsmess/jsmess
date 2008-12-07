@@ -544,12 +544,12 @@ INLINE void dma_store(void)
 }
 
 
-void dsp32c_pio_w(int cpunum, int reg, int data)
+void dsp32c_pio_w(const device_config *device, int reg, int data)
 {
 	UINT16 mask;
 	UINT8 mode;
 
-	cpu_push_context(Machine->cpu[cpunum]);
+	cpu_push_context(device);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
@@ -626,12 +626,12 @@ void dsp32c_pio_w(int cpunum, int reg, int data)
     PARALLEL INTERFACE READS
 ***************************************************************************/
 
-int dsp32c_pio_r(int cpunum, int reg)
+int dsp32c_pio_r(const device_config *device, int reg)
 {
 	UINT16 mask, result = 0xffff;
 	UINT8 mode, shift = 0;
 
-	cpu_push_context(Machine->cpu[cpunum]);
+	cpu_push_context(device);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
@@ -780,7 +780,7 @@ CPU_GET_INFO( dsp32c )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(dsp32);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;

@@ -190,7 +190,7 @@ static emu_timer *rs232_input_timer;
 
 static MACHINE_RESET( tm990_189 )
 {
-	displayena_timer = timer_alloc(NULL, NULL);
+	displayena_timer = timer_alloc(machine, NULL, NULL);
 
 	hold_load(machine);
 
@@ -217,12 +217,12 @@ static MACHINE_START( tm990_189_v )
 
 static MACHINE_RESET( tm990_189_v )
 {
-	displayena_timer = timer_alloc(NULL, NULL);
+	displayena_timer = timer_alloc(machine, NULL, NULL);
 
-	joy1x_timer = timer_alloc(NULL, NULL);
-	joy1y_timer = timer_alloc(NULL, NULL);
-	joy2x_timer = timer_alloc(NULL, NULL);
-	joy2y_timer = timer_alloc(NULL, NULL);
+	joy1x_timer = timer_alloc(machine, NULL, NULL);
+	joy1y_timer = timer_alloc(machine, NULL, NULL);
+	joy2x_timer = timer_alloc(machine, NULL, NULL);
+	joy2y_timer = timer_alloc(machine, NULL, NULL);
 
 	hold_load(machine);
 
@@ -373,7 +373,7 @@ static void hold_load(running_machine *machine)
 {
 	load_state = TRUE;
 	field_interrupts(machine);
-	timer_set(ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
+	timer_set(machine, ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
 }
 
 /*
@@ -494,7 +494,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 	rs232_fp = image;
 
 	tms9902_set_dsr(id, 1);
-	rs232_input_timer = timer_alloc(rs232_input_callback, NULL);
+	rs232_input_timer = timer_alloc(machine, rs232_input_callback, NULL);
 	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
 	return INIT_PASS;

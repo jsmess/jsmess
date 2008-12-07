@@ -196,7 +196,7 @@ static MACHINE_START( cloud9 )
 	video_screen_configure(machine->primary_screen, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(clock_irq, NULL);
+	irq_timer = timer_alloc(machine, clock_irq, NULL);
 	irq_state = 0;
 	schedule_next_irq(machine, 0-64);
 
@@ -204,8 +204,8 @@ static MACHINE_START( cloud9 )
 	generic_nvram = auto_malloc(generic_nvram_size);
 
 	/* setup for save states */
-	state_save_register_global(irq_state);
-	state_save_register_global_pointer(generic_nvram, generic_nvram_size);
+	state_save_register_global(machine, irq_state);
+	state_save_register_global_pointer(machine, generic_nvram, generic_nvram_size);
 }
 
 

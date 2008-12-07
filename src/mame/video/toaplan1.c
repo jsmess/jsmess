@@ -344,30 +344,30 @@ VIDEO_START( rallybik )
 	bcu_flipscreen = -1;
 	toaplan1_reset = 0;
 
-	state_save_register_global_pointer(paletteram16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
-	state_save_register_global_pointer(pf1_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(pf2_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(pf3_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(pf4_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, paletteram16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
+	state_save_register_global_pointer(machine, pf1_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, pf2_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, pf3_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, pf4_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
 
-	state_save_register_global(scrollx_offs1);
-	state_save_register_global(scrollx_offs2);
-	state_save_register_global(scrollx_offs3);
-	state_save_register_global(scrollx_offs4);
-	state_save_register_global(scrolly_offs);
-	state_save_register_global(bcu_flipscreen);
-	state_save_register_global(pf1_scrollx);
-	state_save_register_global(pf1_scrolly);
-	state_save_register_global(pf2_scrollx);
-	state_save_register_global(pf2_scrolly);
-	state_save_register_global(pf3_scrollx);
-	state_save_register_global(pf3_scrolly);
-	state_save_register_global(pf4_scrollx);
-	state_save_register_global(pf4_scrolly);
-	state_save_register_global(tiles_offsetx);
-	state_save_register_global(tiles_offsety);
-	state_save_register_global(pf_voffs);
-	state_save_register_global(spriteram_offs);
+	state_save_register_global(machine, scrollx_offs1);
+	state_save_register_global(machine, scrollx_offs2);
+	state_save_register_global(machine, scrollx_offs3);
+	state_save_register_global(machine, scrollx_offs4);
+	state_save_register_global(machine, scrolly_offs);
+	state_save_register_global(machine, bcu_flipscreen);
+	state_save_register_global(machine, pf1_scrollx);
+	state_save_register_global(machine, pf1_scrolly);
+	state_save_register_global(machine, pf2_scrollx);
+	state_save_register_global(machine, pf2_scrolly);
+	state_save_register_global(machine, pf3_scrollx);
+	state_save_register_global(machine, pf3_scrolly);
+	state_save_register_global(machine, pf4_scrollx);
+	state_save_register_global(machine, pf4_scrolly);
+	state_save_register_global(machine, tiles_offsetx);
+	state_save_register_global(machine, tiles_offsety);
+	state_save_register_global(machine, pf_voffs);
+	state_save_register_global(machine, spriteram_offs);
 
 	state_save_register_postload(machine, rallybik_flipscreen, NULL);
 }
@@ -389,35 +389,35 @@ VIDEO_START( toaplan1 )
 	fcu_flipscreen = 0;
 	toaplan1_reset = 1;
 
-	state_save_register_global_pointer(paletteram16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
-	state_save_register_global_pointer(pf1_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(pf2_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(pf3_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(pf4_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(spriteram16, TOAPLAN1_SPRITERAM_SIZE/2);
-	state_save_register_global_pointer(buffered_spriteram16, TOAPLAN1_SPRITERAM_SIZE/2);
-	state_save_register_global_pointer(toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
-	state_save_register_global_pointer(toaplan1_buffered_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	state_save_register_global_pointer(machine, paletteram16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
+	state_save_register_global_pointer(machine, pf1_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, pf2_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, pf3_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, pf4_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state_save_register_global_pointer(machine, spriteram16, TOAPLAN1_SPRITERAM_SIZE/2);
+	state_save_register_global_pointer(machine, buffered_spriteram16, TOAPLAN1_SPRITERAM_SIZE/2);
+	state_save_register_global_pointer(machine, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	state_save_register_global_pointer(machine, toaplan1_buffered_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
-	state_save_register_global(scrollx_offs1);
-	state_save_register_global(scrollx_offs2);
-	state_save_register_global(scrollx_offs3);
-	state_save_register_global(scrollx_offs4);
-	state_save_register_global(scrolly_offs);
-	state_save_register_global(bcu_flipscreen);
-	state_save_register_global(fcu_flipscreen);
-	state_save_register_global(pf1_scrollx);
-	state_save_register_global(pf1_scrolly);
-	state_save_register_global(pf2_scrolly);
-	state_save_register_global(pf2_scrollx);
-	state_save_register_global(pf3_scrollx);
-	state_save_register_global(pf3_scrolly);
-	state_save_register_global(pf4_scrollx);
-	state_save_register_global(pf4_scrolly);
-	state_save_register_global(tiles_offsetx);
-	state_save_register_global(tiles_offsety);
-	state_save_register_global(pf_voffs);
-	state_save_register_global(spriteram_offs);
+	state_save_register_global(machine, scrollx_offs1);
+	state_save_register_global(machine, scrollx_offs2);
+	state_save_register_global(machine, scrollx_offs3);
+	state_save_register_global(machine, scrollx_offs4);
+	state_save_register_global(machine, scrolly_offs);
+	state_save_register_global(machine, bcu_flipscreen);
+	state_save_register_global(machine, fcu_flipscreen);
+	state_save_register_global(machine, pf1_scrollx);
+	state_save_register_global(machine, pf1_scrolly);
+	state_save_register_global(machine, pf2_scrolly);
+	state_save_register_global(machine, pf2_scrollx);
+	state_save_register_global(machine, pf3_scrollx);
+	state_save_register_global(machine, pf3_scrolly);
+	state_save_register_global(machine, pf4_scrollx);
+	state_save_register_global(machine, pf4_scrolly);
+	state_save_register_global(machine, tiles_offsetx);
+	state_save_register_global(machine, tiles_offsety);
+	state_save_register_global(machine, pf_voffs);
+	state_save_register_global(machine, spriteram_offs);
 
 	state_save_register_postload(machine, toaplan1_flipscreen, NULL);
 }
@@ -1153,7 +1153,7 @@ VIDEO_UPDATE( rallybik )
 	toaplan1_log_vram();
 #endif
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_DRAW_OPAQUE | 0,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_DRAW_OPAQUE | 1,0);
@@ -1177,8 +1177,8 @@ VIDEO_UPDATE( toaplan1 )
 	toaplan1_log_vram();
 #endif
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0x120,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0x120);
 
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	for (priority = 8; priority < 16; priority++)
@@ -1204,8 +1204,8 @@ VIDEO_UPDATE( demonwld )
 	toaplan1_log_vram();
 #endif
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0x120,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0x120);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_DRAW_OPAQUE | 0,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_DRAW_OPAQUE | 1,0);

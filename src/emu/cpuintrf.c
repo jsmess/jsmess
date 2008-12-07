@@ -1105,17 +1105,6 @@ void cpu_pop_context(void)
 
 
 /*-------------------------------------------------
-    cpunum_get_active - return the index of the
-    active CPU (deprecated soon)
--------------------------------------------------*/
-
-int cpunum_get_active(void)
-{
-	return (Machine->activecpu == NULL) ? -1 : cpu_get_index(Machine->activecpu);
-}
-
-
-/*-------------------------------------------------
     cpu_get_index_slow - find a CPU in the machine
     by searching
 -------------------------------------------------*/
@@ -1308,11 +1297,12 @@ void cpu_reset(const device_config *device)
 
 offs_t cpu_get_physical_pc_byte(const device_config *device)
 {
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	offs_t pc;
 
 	cpu_push_context(device);
-	pc = cpu_address_to_byte(device, ADDRESS_SPACE_PROGRAM, cpu_get_info_int(device, CPUINFO_INT_PC));
-	pc = cpu_address_physical(device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, pc);
+	pc = memory_address_to_byte(space, cpu_get_info_int(device, CPUINFO_INT_PC));
+	memory_address_physical(space, TRANSLATE_FETCH, &pc);
 	cpu_pop_context();
 	return pc;
 }
@@ -1367,7 +1357,8 @@ offs_t cpu_dasm(const device_config *device, char *buffer, offs_t pc, const UINT
 	assert((result & DASMFLAG_LENGTHMASK) != 0);
 #ifdef MAME_DEBUG
 {
-	int bytes = cpu_address_to_byte(device, ADDRESS_SPACE_PROGRAM, result & DASMFLAG_LENGTHMASK);
+	const address_space *space = classheader->space[ADDRESS_SPACE_PROGRAM];
+	int bytes = memory_address_to_byte(space, result & DASMFLAG_LENGTHMASK);
 	assert(bytes >= cpu_get_min_opcode_bytes(device));
 	assert(bytes <= cpu_get_max_opcode_bytes(device));
 	(void) bytes; /* appease compiler */
@@ -1496,7 +1487,7 @@ CPU_GET_INFO( dummy )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(dummy_state); 			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

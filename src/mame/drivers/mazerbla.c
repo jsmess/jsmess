@@ -134,7 +134,7 @@ VIDEO_UPDATE( test_vcu )
 		color_base = 0x0;
 
 
-	fillbitmap(bitmap,0,NULL);
+	bitmap_fill(bitmap,NULL,0);
 //logerror("-->frame\n");
 
 
@@ -144,17 +144,17 @@ VIDEO_UPDATE( test_vcu )
 
 	if (planes_enabled[2])
 		copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,color_base);
-	fillbitmap(tmpbitmaps[2],color_base,NULL);
+	bitmap_fill(tmpbitmaps[2],NULL,color_base);
 
 
 	if (planes_enabled[1])
 		copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,color_base);
-	fillbitmap(tmpbitmaps[1],color_base,NULL);
+	bitmap_fill(tmpbitmaps[1],NULL,color_base);
 
 
 	if (planes_enabled[0])
 		copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,color_base);
-	fillbitmap(tmpbitmaps[0],color_base,NULL);
+	bitmap_fill(tmpbitmaps[0],NULL,color_base);
 
 	if (input_code_pressed_once(KEYCODE_1))	/* plane 1 */
 	{
@@ -247,7 +247,7 @@ static VIDEO_UPDATE( greatgun )
 	if (game_id==GREATGUN)
 		color_base = 0x0;
 
-//fillbitmap(bitmap,0,NULL);
+//bitmap_fill(bitmap,NULL,0);
 
 	copybitmap      (bitmap,tmpbitmaps[3],0,0,0,0,cliprect);
 	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,color_base);
@@ -267,7 +267,7 @@ static VIDEO_UPDATE( mazerbla )
 	if (game_id==GREATGUN)
 		color_base = 0x0;
 
-//fillbitmap(bitmap,0,NULL);
+//bitmap_fill(bitmap,NULL,0);
 
 	copybitmap      (bitmap,tmpbitmaps[3],0,0,0,0,cliprect); //text
 	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,0);
@@ -335,7 +335,7 @@ static UINT8 ls670_1[4];
 static READ8_HANDLER( ls670_0_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
 	return ls670_0[offset];
 }
@@ -351,7 +351,7 @@ static TIMER_CALLBACK( deferred_ls670_0_w )
 static WRITE8_HANDLER( ls670_0_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(NULL, (offset<<8) | data, deferred_ls670_0_w);
+	timer_call_after_resynch(space->machine, NULL, (offset<<8) | data, deferred_ls670_0_w);
 }
 
 
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( ls670_0_w )
 static READ8_HANDLER( ls670_1_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
 	return ls670_1[offset];
 }
@@ -375,7 +375,7 @@ static TIMER_CALLBACK( deferred_ls670_1_w )
 static WRITE8_HANDLER( ls670_1_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(NULL, (offset<<8) | data, deferred_ls670_1_w);
+	timer_call_after_resynch(space->machine, NULL, (offset<<8) | data, deferred_ls670_1_w);
 }
 
 
@@ -1070,7 +1070,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE8_HANDLER( main_sound_w )
 {
-	timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+	timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 

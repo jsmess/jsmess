@@ -168,7 +168,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region)
 		for (y = charline_ptr; y < ARRAY_LENGTH(charline); y++)
 			charline[y] = 0;
 
-		timer_set(ATTOTIME_IN_CYCLES(((32 - charline_ptr) << 2), 0), NULL, 0, zx_ula_irq);
+		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], ((32 - charline_ptr) << 2)), NULL, 0, zx_ula_irq);
 		ula_irq_active++;
 
 		scanline = BITMAP_ADDR16(bitmap, ula_scanline_count, 0);
@@ -197,7 +197,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region)
 
 VIDEO_START( zx )
 {
-	ula_nmi = timer_alloc(zx_ula_nmi, NULL);
+	ula_nmi = timer_alloc(machine, zx_ula_nmi, NULL);
 	ula_irq_active = 0;
 	VIDEO_START_CALL(generic_bitmapped);
 }

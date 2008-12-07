@@ -128,7 +128,7 @@ DRIVER_INIT( pc1251 )
 	UINT8 *gfx = memory_region(machine, "gfx1");
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	timer_set(ATTOTIME_IN_SEC(1), NULL, 0, pc1251_power_up);
+	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1251_power_up);
 
 	// c600 b800 b000 a000 8000 tested
 	// 4 kb memory feedback 512 bytes too few???

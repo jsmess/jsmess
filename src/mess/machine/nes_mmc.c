@@ -634,7 +634,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 		{
 			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
 			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
-//			timer_adjust_oneshot(nes_irq_timer, ATTOTIME_IN_CYCLES(4, 0), 0);
+//			timer_adjust_oneshot(nes_irq_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), 0);
 		}
 	}
 }
@@ -2873,7 +2873,7 @@ static WRITE8_HANDLER( mapper42_w )
 			/* Check if IRQ is being enabled */
 			if ( ! IRQ_enable && ( data & 0x02 ) ) {
 				IRQ_enable = 1;
-				timer_adjust_oneshot(nes_irq_timer, ATTOTIME_IN_CYCLES(24576, 0), 0);
+				timer_adjust_oneshot(nes_irq_timer, cpu_clocks_to_attotime(machine->cpu[0], 24576), 0);
 			}
 			if ( ! ( data & 0x02 ) ) {
 				IRQ_enable = 0;
@@ -4861,7 +4861,7 @@ int mapper_reset (int mapperNum)
 	ppu2c0x_set_hblank_callback (0, mapper ? mapper->mmc_hblank :  NULL);
 
 	if (!nes_irq_timer)
-		nes_irq_timer = timer_alloc(nes_irq_callback, NULL);
+		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
 
 	mapper_warning = 0;
 	/* 8k mask */

@@ -479,7 +479,7 @@ VIDEO_UPDATE( apple2 )
 	running_machine *machine = screen->machine;
 
 	/* calculate the flash value */
-	flash = (attotime_mul(timer_get_time(), 4).seconds & 1) ? 1 : 0;
+	flash = (attotime_mul(timer_get_time(screen->machine), 4).seconds & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
 	new_a2 = effective_a2();

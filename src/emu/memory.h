@@ -280,13 +280,18 @@ struct _address_space
 	direct_read_data		direct;				/* fast direct-access read info */
 	direct_update_func 		directupdate;		/* fast direct-access update callback */
 	UINT64					unmap;				/* unmapped value */
-	offs_t					addrmask;			/* global address mask */
-	offs_t					bytemask;			/* byte-converted global address mask */
+	offs_t					addrmask;			/* physical address mask */
+	offs_t					bytemask;			/* byte-converted physical address mask */
+	offs_t					logaddrmask;		/* logical address mask */
+	offs_t					logbytemask;		/* byte-converted logical address mask */
 	UINT8					spacenum;			/* address space index */
 	UINT8					endianness;			/* endianness of this space */
 	INT8					ashift;				/* address shift */
+	UINT8					pageshift;			/* page shift */
 	UINT8					abits;				/* address bits */
 	UINT8 					dbits;				/* data bits */
+	UINT8					addrchars;			/* number of characters to use for physical addresses */
+	UINT8					logaddrchars;		/* number of characters to use for logical addresses */
 	UINT8					debugger_access;	/* treat accesses as coming from the debugger */
 	UINT8					log_unmap;			/* log unmapped accesses in this space? */
 	address_table			read;				/* memory read lookup table */
@@ -866,72 +871,79 @@ void address_map_free(address_map *map);
 /* ----- direct access control ----- */
 
 /* registers an address range as having a decrypted data pointer */
-void memory_set_decrypted_region(const address_space *space, offs_t addrstart, offs_t addrend, void *base);
+void memory_set_decrypted_region(const address_space *space, offs_t addrstart, offs_t addrend, void *base) ATTR_NONNULL;
 
 /* register a handler for opcode base changes on a given CPU */
-direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function);
+direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function) ATTR_NONNULL;
 
 /* called by CPU cores to update the opcode base for the given address */
-int memory_set_direct_region(const address_space *space, offs_t byteaddress);
+int memory_set_direct_region(const address_space *space, offs_t byteaddress) ATTR_NONNULL;
 
 /* return a pointer the memory byte provided in the given address space, or NULL if it is not mapped to a bank */
-void *memory_get_read_ptr(const address_space *space, offs_t byteaddress);
+void *memory_get_read_ptr(const address_space *space, offs_t byteaddress) ATTR_NONNULL;
 
 /* return a pointer the memory byte provided in the given address space, or NULL if it is not mapped to a writeable bank */
-void *memory_get_write_ptr(const address_space *space, offs_t byteaddress);
+void *memory_get_write_ptr(const address_space *space, offs_t byteaddress) ATTR_NONNULL;
 
 
 
 /* ----- memory banking ----- */
 
 /* configure the addresses for a bank */
-void memory_configure_bank(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride);
+void memory_configure_bank(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL;
 
 /* configure the decrypted addresses for a bank */
-void memory_configure_bank_decrypted(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride);
+void memory_configure_bank_decrypted(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL;
 
 /* select one pre-configured entry to be the new bank base */
-void memory_set_bank(running_machine *machine, int banknum, int entrynum);
+void memory_set_bank(running_machine *machine, int banknum, int entrynum) ATTR_NONNULL;
 
 /* return the currently selected bank */
-int memory_get_bank(running_machine *machine, int banknum);
+int memory_get_bank(running_machine *machine, int banknum) ATTR_NONNULL;
 
 /* set the absolute address of a bank base */
-void memory_set_bankptr(running_machine *machine, int banknum, void *base);
+void memory_set_bankptr(running_machine *machine, int banknum, void *base) ATTR_NONNULL;
 
 
 
 /* ----- dynamic address space mapping ----- */
 
 /* install a new memory handler into the given address space, returning a pointer to the memory backing it, if present */
-void *_memory_install_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
+void *_memory_install_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 8-bit handlers */
-UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, write8_space_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, write8_space_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 16-bit handlers */
-UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, write16_space_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, write16_space_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 32-bit handlers */
-UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, write32_space_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, write32_space_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 64-bit handlers */
-UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, write64_space_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, write64_space_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* install a new device memory handler into the given address space, returning a pointer to the memory backing it, if present */
-void *_memory_install_device_handler(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
+void *_memory_install_device_handler(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 8-bit handlers */
-UINT8 *_memory_install_device_handler8(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT8 *_memory_install_device_handler8(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 16-bit handlers */
-UINT16 *_memory_install_device_handler16(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT16 *_memory_install_device_handler16(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 32-bit handlers */
-UINT32 *_memory_install_device_handler32(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT32 *_memory_install_device_handler32(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
 /* same as above but explicitly for 64-bit handlers */
-UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
+
+
+
+/* ----- miscellaneous utilities ----- */
+
+/* return the physical address corresponding to the given logical address */
+int memory_address_physical(const address_space *space, int intention, offs_t *address);
 
 
 
@@ -963,6 +975,54 @@ void memory_dump(running_machine *machine, FILE *file);
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    memory_address_to_byte - convert an address in
+    the specified address space to a byte offset
+-------------------------------------------------*/
+
+INLINE offs_t memory_address_to_byte(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? (address << -space->ashift) : (address >> space->ashift);
+}
+
+
+/*-------------------------------------------------
+    memory_address_to_byte_end - convert an address
+    in the specified address space to a byte
+    offset specifying the last byte covered by
+    the address
+-------------------------------------------------*/
+
+INLINE offs_t memory_address_to_byte_end(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? ((address << -space->ashift) | ((1 << -space->ashift) - 1)) : (address >> space->ashift);
+}
+
+
+/*-------------------------------------------------
+    memory_byte_to_address - convert a byte offset
+    to an address in the specified address space
+-------------------------------------------------*/
+
+INLINE offs_t memory_byte_to_address(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? (address >> -space->ashift) : (address << space->ashift);
+}
+
+
+/*-------------------------------------------------
+    memory_byte_to_address_end - convert a byte
+    offset to an address in the specified address
+    space specifying the last address covered by
+    the byte
+-------------------------------------------------*/
+
+INLINE offs_t memory_byte_to_address_end(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? (address >> -space->ashift) : ((address << space->ashift) | ((1 << space->ashift) - 1));
+}
+
 
 /*-------------------------------------------------
     memory_read_byte/word/dword/qword - read a

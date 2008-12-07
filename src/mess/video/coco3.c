@@ -827,7 +827,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	}
 
 	/* GIME field sync timer */
-	video->gime_fs_timer = timer_alloc(gime_fs, NULL);
+	video->gime_fs_timer = timer_alloc(machine, gime_fs, NULL);
 
 	/* initialize the CoCo video code */
 	memset(&cfg, 0, sizeof(cfg));
@@ -843,10 +843,10 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	m6847_init(machine, &cfg);
 
 	/* save state stuff */
-	state_save_register_global_array(video->palette_ram);
-	state_save_register_global(video->legacy_video);
-	state_save_register_global(video->top_border_scanlines);
-	state_save_register_global(video->display_scanlines);
+	state_save_register_global_array(machine, video->palette_ram);
+	state_save_register_global(machine, video->legacy_video);
+	state_save_register_global(machine, video->top_border_scanlines);
+	state_save_register_global(machine, video->display_scanlines);
 	state_save_register_postload(machine, coco3_video_postload, NULL);
 }
 

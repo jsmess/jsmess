@@ -21,7 +21,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -152,6 +152,7 @@ VIDEO_START( vic6560 )
 
 WRITE8_HANDLER ( vic6560_port_w )
 {
+	running_machine *machine = space->machine;
 	DBG_LOG (1, "vic6560_port_w", ("%.4x:%.2x\n", offset, data));
 	switch (offset)
 	{
@@ -216,8 +217,9 @@ WRITE8_HANDLER ( vic6560_port_w )
 	}
 }
 
- READ8_HANDLER ( vic6560_port_r )
+READ8_HANDLER ( vic6560_port_r )
 {
+	running_machine *machine = space->machine;
 	static double lightpenreadtime = 0.0;
 	int val;
 
@@ -233,7 +235,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 	case 6:						   /*lightpen horizontal */
 	case 7:						   /*lightpen vertical */
 		if (LIGHTPEN_BUTTON
-			&& ((attotime_to_double(timer_get_time ()) - lightpenreadtime) * VIC6560_VRETRACERATE >= 1))
+			&& ((attotime_to_double(timer_get_time(space->machine)) - lightpenreadtime) * VIC6560_VRETRACERATE >= 1))
 		{
 			/* only 1 update each frame */
 			/* and diode must recognize light */
@@ -242,7 +244,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 				vic6560[6] = VIC6560_X_VALUE;
 				vic6560[7] = VIC6560_Y_VALUE;
 			}
-			lightpenreadtime = attotime_to_double(timer_get_time ());
+			lightpenreadtime = attotime_to_double(timer_get_time(space->machine));
 		}
 		val = vic6560[offset];
 		break;

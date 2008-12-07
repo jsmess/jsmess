@@ -21,20 +21,20 @@ VIDEO_START( rastan )
 {
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
 	PC080SN_vh_start(machine,1,0,0,0,0,0,0);
-	PC090OJ_vh_start(1,0,0,0);
+	PC090OJ_vh_start(machine,1,0,0,0);
 }
 
 VIDEO_START( opwolf )
 {
 	PC080SN_vh_start(machine,1,1,0,0,0,0,0);
-	PC090OJ_vh_start(0,0,0,0);
+	PC090OJ_vh_start(machine,0,0,0,0);
 }
 
 VIDEO_START( rainbow )
 {
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
 	PC080SN_vh_start(machine,1,1,0,0,0,0,0);
-	PC090OJ_vh_start(0,0,0,0);
+	PC090OJ_vh_start(machine,0,0,0,0);
 }
 
 VIDEO_START( jumping )
@@ -44,8 +44,8 @@ VIDEO_START( jumping )
 	PC080SN_set_trans_pen(0,1,15);
 
 	/* not 100% sure Jumping needs to save both... */
-	state_save_register_global(sprite_ctrl);
-	state_save_register_global(sprites_flipscreen);
+	state_save_register_global(machine, sprite_ctrl);
+	state_save_register_global(machine, sprites_flipscreen);
 }
 
 
@@ -102,7 +102,7 @@ VIDEO_UPDATE( rastan )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
@@ -122,7 +122,7 @@ VIDEO_UPDATE( opwolf )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
@@ -146,7 +146,7 @@ VIDEO_UPDATE( rainbow )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
@@ -178,7 +178,7 @@ VIDEO_UPDATE( jumping )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 

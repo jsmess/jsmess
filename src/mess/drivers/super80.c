@@ -1004,7 +1004,7 @@ static MACHINE_RESET( super80 )
 	centronics_config(0, super80_cent_config);
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
+	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(machine, 1, 1);
 }
 
@@ -1118,12 +1118,12 @@ static void driver_init_common( running_machine *machine )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xc000);
-	timer_pulse(ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
+	timer_pulse(machine, ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
 }
 
 static DRIVER_INIT( super80 )
 {
-	timer_pulse(ATTOTIME_IN_HZ(100),NULL,0,super80_halfspeed);	/* timer for 1mhz slowdown */
+	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,super80_halfspeed);	/* timer for 1mhz slowdown */
 	driver_init_common(machine);
 }
 

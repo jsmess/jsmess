@@ -273,15 +273,15 @@ static TIMER_CALLBACK( nitedrvr_crash_toggle_callback )
 
 MACHINE_START( nitedrvr )
 {
-	state_save_register_global(nitedrvr_gear);
-	state_save_register_global(nitedrvr_track);
-	state_save_register_global(nitedrvr_steering_buf);
-	state_save_register_global(nitedrvr_steering_val);
-	state_save_register_global(nitedrvr_crash_en);
-	state_save_register_global(nitedrvr_crash_data);
-	state_save_register_global(nitedrvr_crash_data_en);
-	state_save_register_global(ac_line);
-	state_save_register_global(last_steering_val);
+	state_save_register_global(machine, nitedrvr_gear);
+	state_save_register_global(machine, nitedrvr_track);
+	state_save_register_global(machine, nitedrvr_steering_buf);
+	state_save_register_global(machine, nitedrvr_steering_val);
+	state_save_register_global(machine, nitedrvr_crash_en);
+	state_save_register_global(machine, nitedrvr_crash_data);
+	state_save_register_global(machine, nitedrvr_crash_data_en);
+	state_save_register_global(machine, ac_line);
+	state_save_register_global(machine, last_steering_val);
 }
 
 MACHINE_RESET( nitedrvr )
@@ -296,5 +296,5 @@ MACHINE_RESET( nitedrvr )
 	ac_line = 0;
 	last_steering_val = 0;
 
-	timer_pulse(PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), NULL, 0, nitedrvr_crash_toggle_callback);
+	timer_pulse(machine, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), NULL, 0, nitedrvr_crash_toggle_callback);
 }

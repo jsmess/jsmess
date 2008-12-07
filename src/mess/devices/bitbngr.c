@@ -91,7 +91,7 @@ static DEVICE_START(bitbanger)
 	bi->last_pulse_time = 0.0;
 	bi->recorded_pulses = 0;
 	bi->value = config->initial_value;
-	bi->timeout_timer = timer_alloc(bitbanger_overthreshhold, (void *) device);
+	bi->timeout_timer = timer_alloc(device->machine, bitbanger_overthreshhold, (void *) device);
 	bi->over_threshhold = 1;
 	return DEVICE_START_OK;
 }
@@ -178,7 +178,7 @@ static TIMER_CALLBACK(bitbanger_overthreshhold)
 	const device_config *device = (const device_config *) ptr;
 	bitbanger_token *bi = get_token(device);
 
-	bitbanger_addpulse(device, attotime_to_double(timer_get_time()) - bi->last_pulse_time);
+	bitbanger_addpulse(device, attotime_to_double(timer_get_time(machine)) - bi->last_pulse_time);
 	bi->over_threshhold = 1;
 	bi->recorded_pulses = 0;
 }
@@ -204,7 +204,7 @@ void bitbanger_output(const device_config *device, int value)
 	/* only meaningful if we change */
 	if (bi->value != value)
 	{
-		current_time = attotime_to_double(timer_get_time());
+		current_time = attotime_to_double(timer_get_time(device->machine));
 		pulse_width = current_time - bi->last_pulse_time;
 
 		assert(pulse_width >= 0);

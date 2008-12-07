@@ -47,7 +47,6 @@
 #include "sndintrf.h"
 #include "cpuexec.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "nes_apu.h"
 #include "cpu/m6502/m6502.h"
 
@@ -681,9 +680,9 @@ static SND_START( nesapu )
 	memset(info, 0, sizeof(*info));
 
 	/* Initialize global variables */
-	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
 	info->buffer_size = info->samps_per_sync;
-	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
 	info->apu_incsize = (float) (clock / (float) info->real_rate);
 
 	/* Use initializer calls */
@@ -695,63 +694,63 @@ static SND_START( nesapu )
 	info->buffer_size+=info->samps_per_sync;
 
 	/* Initialize individual chips */
-	(info->APU.dpcm).memory = cputag_get_address_space(Machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
+	(info->APU.dpcm).memory = cputag_get_address_space(device->machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
 
 	info->stream = stream_create(0, 1, rate, info, nes_psg_update_sound);
 
 	/* register for save */
 	for (i = 0; i < 2; i++)
 	{
-		state_save_register_item_array("apu", tag, i, info->APU.squ[i].regs);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].vbl_length);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].freq);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].phaseacc);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].output_vol);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].env_phase);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].sweep_phase);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].adder);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].env_vol);
-		state_save_register_item("apu", tag, i, info->APU.squ[i].enabled);
+		state_save_register_device_item_array(device, i, info->APU.squ[i].regs);
+		state_save_register_device_item(device, i, info->APU.squ[i].vbl_length);
+		state_save_register_device_item(device, i, info->APU.squ[i].freq);
+		state_save_register_device_item(device, i, info->APU.squ[i].phaseacc);
+		state_save_register_device_item(device, i, info->APU.squ[i].output_vol);
+		state_save_register_device_item(device, i, info->APU.squ[i].env_phase);
+		state_save_register_device_item(device, i, info->APU.squ[i].sweep_phase);
+		state_save_register_device_item(device, i, info->APU.squ[i].adder);
+		state_save_register_device_item(device, i, info->APU.squ[i].env_vol);
+		state_save_register_device_item(device, i, info->APU.squ[i].enabled);
 	}
 
-	state_save_register_item_array("apu", tag, 0, info->APU.tri.regs);
-	state_save_register_item("apu", tag, 0, info->APU.tri.linear_length);
-	state_save_register_item("apu", tag, 0, info->APU.tri.vbl_length);
-	state_save_register_item("apu", tag, 0, info->APU.tri.write_latency);
-	state_save_register_item("apu", tag, 0, info->APU.tri.phaseacc);
-	state_save_register_item("apu", tag, 0, info->APU.tri.output_vol);
-	state_save_register_item("apu", tag, 0, info->APU.tri.adder);
-	state_save_register_item("apu", tag, 0, info->APU.tri.counter_started);
-	state_save_register_item("apu", tag, 0, info->APU.tri.enabled);
+	state_save_register_device_item_array(device, 0, info->APU.tri.regs);
+	state_save_register_device_item(device, 0, info->APU.tri.linear_length);
+	state_save_register_device_item(device, 0, info->APU.tri.vbl_length);
+	state_save_register_device_item(device, 0, info->APU.tri.write_latency);
+	state_save_register_device_item(device, 0, info->APU.tri.phaseacc);
+	state_save_register_device_item(device, 0, info->APU.tri.output_vol);
+	state_save_register_device_item(device, 0, info->APU.tri.adder);
+	state_save_register_device_item(device, 0, info->APU.tri.counter_started);
+	state_save_register_device_item(device, 0, info->APU.tri.enabled);
 
-	state_save_register_item_array("apu", tag, 0, info->APU.noi.regs);
-	state_save_register_item("apu", tag, 0, info->APU.noi.cur_pos);
-	state_save_register_item("apu", tag, 0, info->APU.noi.vbl_length);
-	state_save_register_item("apu", tag, 0, info->APU.noi.phaseacc);
-	state_save_register_item("apu", tag, 0, info->APU.noi.output_vol);
-	state_save_register_item("apu", tag, 0, info->APU.noi.env_phase);
-	state_save_register_item("apu", tag, 0, info->APU.noi.env_vol);
-	state_save_register_item("apu", tag, 0, info->APU.noi.enabled);
+	state_save_register_device_item_array(device, 0, info->APU.noi.regs);
+	state_save_register_device_item(device, 0, info->APU.noi.cur_pos);
+	state_save_register_device_item(device, 0, info->APU.noi.vbl_length);
+	state_save_register_device_item(device, 0, info->APU.noi.phaseacc);
+	state_save_register_device_item(device, 0, info->APU.noi.output_vol);
+	state_save_register_device_item(device, 0, info->APU.noi.env_phase);
+	state_save_register_device_item(device, 0, info->APU.noi.env_vol);
+	state_save_register_device_item(device, 0, info->APU.noi.enabled);
 
-	state_save_register_item_array("apu", tag, 0, info->APU.dpcm.regs);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.address);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.length);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.bits_left);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.phaseacc);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.output_vol);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.cur_byte);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.enabled);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.irq_occurred);
-	state_save_register_item("apu", tag, 0, info->APU.dpcm.vol);
+	state_save_register_device_item_array(device, 0, info->APU.dpcm.regs);
+	state_save_register_device_item(device, 0, info->APU.dpcm.address);
+	state_save_register_device_item(device, 0, info->APU.dpcm.length);
+	state_save_register_device_item(device, 0, info->APU.dpcm.bits_left);
+	state_save_register_device_item(device, 0, info->APU.dpcm.phaseacc);
+	state_save_register_device_item(device, 0, info->APU.dpcm.output_vol);
+	state_save_register_device_item(device, 0, info->APU.dpcm.cur_byte);
+	state_save_register_device_item(device, 0, info->APU.dpcm.enabled);
+	state_save_register_device_item(device, 0, info->APU.dpcm.irq_occurred);
+	state_save_register_device_item(device, 0, info->APU.dpcm.vol);
 
-	state_save_register_item_array("apu", tag, 0, info->APU.regs);
+	state_save_register_device_item_array(device, 0, info->APU.regs);
 
 #ifdef USE_QUEUE
-	state_save_register_item_array("apu", tag, 0, info->APU.queue);
-	state_save_register_item("apu", tag, 0, info->APU.head);
-	state_save_register_item("apu", tag, 0, info->APU.tail);
+	state_save_register_device_item_array(device, 0, info->APU.queue);
+	state_save_register_device_item(device, 0, info->APU.head);
+	state_save_register_device_item(device, 0, info->APU.tail);
 #else
-	state_save_register_item("apu", tag, 0, info->APU.buf_pos);
+	state_save_register_device_item(device, 0, info->APU.buf_pos);
 #endif
 
 	return info;

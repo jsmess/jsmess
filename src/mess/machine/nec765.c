@@ -682,9 +682,9 @@ void nec765_init(running_machine *machine, const nec765_interface *iface, NEC765
 
 	fdc.version = version;
 	fdc.rdy_pin = rdy_pin;
-	fdc.timer = timer_alloc(nec765_timer_callback, NULL);
-	fdc.seek_timer = timer_alloc(nec765_seek_timer_callback, NULL);
-	fdc.command_timer = timer_alloc(nec765_continue_command, NULL);
+	fdc.timer = timer_alloc(machine, nec765_timer_callback, NULL);
+	fdc.seek_timer = timer_alloc(machine, nec765_seek_timer_callback, NULL);
+	fdc.command_timer = timer_alloc(machine, nec765_continue_command, NULL);
 	memset(&nec765_iface, 0, sizeof(nec765_interface));
 
 	if (iface)

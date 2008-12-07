@@ -231,8 +231,8 @@ void streams_init(running_machine *machine, attoseconds_t update_attoseconds)
 	machine->streams_data = strdata;
 
 	/* register global states */
-	state_save_register_global(strdata->last_update.seconds);
-	state_save_register_global(strdata->last_update.attoseconds);
+	state_save_register_global(machine, strdata->last_update.seconds);
+	state_save_register_global(machine, strdata->last_update.attoseconds);
 }
 
 
@@ -256,7 +256,7 @@ void streams_set_tag(running_machine *machine, void *streamtag)
 void streams_update(running_machine *machine)
 {
 	streams_private *strdata = machine->streams_data;
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(machine);
 	int second_tick = FALSE;
 	sound_stream *stream;
 
@@ -373,7 +373,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 
 	/* create a unique tag for saving */
 	sprintf(statetag, "%d", stream->index);
-	state_save_register_item("stream", statetag, 0, stream->sample_rate);
+	state_save_register_item(Machine, "stream", statetag, 0, stream->sample_rate);
 	state_save_register_postload(Machine, stream_postload, stream);
 
 	/* allocate space for the inputs */
@@ -390,7 +390,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	{
 		stream->input[inputnum].owner = stream;
 		stream->input[inputnum].gain = 0x100;
-		state_save_register_item("stream", statetag, inputnum, stream->input[inputnum].gain);
+		state_save_register_item(Machine, "stream", statetag, inputnum, stream->input[inputnum].gain);
 	}
 
 	/* allocate space for the outputs */
@@ -407,7 +407,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	{
 		stream->output[outputnum].owner = stream;
 		stream->output[outputnum].gain = 0x100;
-		state_save_register_item("stream", statetag, outputnum, stream->output[outputnum].gain);
+		state_save_register_item(Machine, "stream", statetag, outputnum, stream->output[outputnum].gain);
 	}
 
 	/* hook us into the master stream list */
@@ -469,7 +469,7 @@ void stream_set_input(sound_stream *stream, int index, sound_stream *input_strea
 void stream_update(sound_stream *stream)
 {
 	streams_private *strdata = stream->machine->streams_data;
-	INT32 update_sampindex = time_to_sampindex(strdata, stream, timer_get_time());
+	INT32 update_sampindex = time_to_sampindex(strdata, stream, timer_get_time(stream->machine));
 
 	/* generate samples to get us up to the appropriate time */
 	assert(stream->output_sampindex - stream->output_base_sampindex >= 0);

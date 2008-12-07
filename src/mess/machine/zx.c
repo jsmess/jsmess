@@ -114,7 +114,7 @@ WRITE8_HANDLER ( zx_io_w )
 	}
 	else if ((offset & 1) == 0)
 	{
-		timer_adjust_periodic(ula_nmi, attotime_zero, 0, ATTOTIME_IN_CYCLES(207, 0));
+		timer_adjust_periodic(ula_nmi, attotime_zero, 0, cpu_clocks_to_attotime(machine->cpu[0], 207));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 
@@ -182,7 +182,7 @@ READ8_HANDLER ( zx_io_r )
 			if ((cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
-				timer_set(ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
+				timer_set(machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~zx_tape_bit;
@@ -247,7 +247,7 @@ READ8_HANDLER ( pow3000_io_r )
 			if ((cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
-				timer_set(ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
+				timer_set(machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~zx_tape_bit;

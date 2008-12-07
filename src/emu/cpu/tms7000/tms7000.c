@@ -47,7 +47,7 @@ static void tms7000_check_IRQ_lines( void );
 static void tms7000_do_interrupt( UINT16 address, UINT8 line );
 static CPU_EXECUTE( tms7000 );
 static CPU_EXECUTE( tms7000_exl );
-static void tms7000_service_timer1( void );
+static void tms7000_service_timer1( const device_config *device );
 static UINT16 bcd_add( UINT16 a, UINT16 b );
 static UINT16 bcd_tencomp( UINT16 a );
 static UINT16 bcd_sub( UINT16 a, UINT16 b);
@@ -195,23 +195,23 @@ static CPU_INIT( tms7000 )
 	memset(tms7000.rf, 0, 0x80);
 
 	/* Save register state */
-	state_save_register_item("tms7000", device->tag, 0, pPC);
-	state_save_register_item("tms7000", device->tag, 0, pSP);
-	state_save_register_item("tms7000", device->tag, 0, pSR);
+	state_save_register_device_item(device, 0, pPC);
+	state_save_register_device_item(device, 0, pSP);
+	state_save_register_device_item(device, 0, pSR);
 
 	/* Save Interrupt state */
-	state_save_register_item_array("tms7000", device->tag, 0, tms7000.irq_state);
+	state_save_register_device_item_array(device, 0, tms7000.irq_state);
 
 	/* Save register and perpherial file state */
-	state_save_register_item_array("tms7000", device->tag, 0, tms7000.rf);
-	state_save_register_item_array("tms7000", device->tag, 0, tms7000.pf);
+	state_save_register_device_item_array(device, 0, tms7000.rf);
+	state_save_register_device_item_array(device, 0, tms7000.pf);
 
 	/* Save timer state */
-	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_prescaler);
-	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_capture_latch);
-	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_decrementer);
+	state_save_register_device_item(device, 0, tms7000.t1_prescaler);
+	state_save_register_device_item(device, 0, tms7000.t1_capture_latch);
+	state_save_register_device_item(device, 0, tms7000.t1_decrementer);
 
-	state_save_register_item("tms7000", device->tag, 0, tms7000.idle_state);
+	state_save_register_device_item(device, 0, tms7000.idle_state);
 }
 
 static CPU_RESET( tms7000 )
@@ -290,7 +290,7 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_INT_CONTEXT_SIZE:	info->i = sizeof(tms7000);	break;
         case CPUINFO_INT_INPUT_LINES:	info->i = 3;	break;
         case CPUINFO_INT_DEFAULT_IRQ_VECTOR:	info->i = 0;	break;
-        case CPUINFO_INT_ENDIANNESS:	info->i = CPU_IS_BE;	break;
+        case CPUINFO_INT_ENDIANNESS:	info->i = ENDIANNESS_BIG;	break;
         case CPUINFO_INT_CLOCK_MULTIPLIER:	info->i = 1;	break;
         case CPUINFO_INT_CLOCK_DIVIDER:	info->i = 1;	break;
         case CPUINFO_INT_MIN_INSTRUCTION_BYTES:	info->i = 1;	break;
@@ -385,7 +385,7 @@ void tms7000_set_irq_line(int irqline, int state)
 	{	/* check for transition */
 		tms7000.irq_state[irqline] = state;
 
-		LOG(("tms7000: (cpu #%d) set_irq_line (INT%d, state %d)\n", cpunum_get_active(), irqline+1, state));
+		LOG(("tms7000: (cpu '%s') set_irq_line (INT%d, state %d)\n", tms7000.device->tag, irqline+1, state));
 
 		if (state == CLEAR_LINE)
 		{
@@ -489,7 +489,7 @@ static CPU_EXECUTE( tms7000 )
 			if( (tms7000.pf[0x03] & 0x80) == 0x80 ) /* Is timer system active? */
 			{
 				if( (tms7000.pf[0x03] & 0x40) != 0x40) /* Is system clock (divided by 16) the timer source? */
-					tms7000_service_timer1();
+					tms7000_service_timer1(device);
 			}
 		}
 
@@ -529,7 +529,7 @@ static CPU_EXECUTE( tms7000_exl )
 			if( (tms7000.pf[0x03] & 0x80) == 0x80 ) /* Is timer system active? */
 			{
 				if( (tms7000.pf[0x03] & 0x40) != 0x40) /* Is system clock (divided by 16) the timer source? */
-					tms7000_service_timer1();
+					tms7000_service_timer1(device);
 			}
 		}
 
@@ -542,16 +542,16 @@ static CPU_EXECUTE( tms7000_exl )
 /****************************************************************************
  * Trigger the event counter
  ****************************************************************************/
-void tms7000_A6EC1( void )
+void tms7000_A6EC1( const device_config *device )
 {
     if( (tms7000.pf[0x03] & 0x80) == 0x80 ) /* Is timer system active? */
     {
         if( (tms7000.pf[0x03] & 0x40) == 0x40) /* Is event counter the timer source? */
-            tms7000_service_timer1();
+            tms7000_service_timer1(device);
     }
 }
 
-static void tms7000_service_timer1( void )
+static void tms7000_service_timer1( const device_config *device )
 {
     if( --tms7000.t1_prescaler < 0 ) /* Decrement prescaler and check for underflow */
     {
@@ -560,14 +560,14 @@ static void tms7000_service_timer1( void )
         if( --tms7000.t1_decrementer < 0 ) /* Decrement timer1 register and check for underflow */
         {
             tms7000.t1_decrementer = tms7000.pf[2]; /* Reload decrementer (8 bit) */
-			cpu_set_input_line(Machine->activecpu, TMS7000_IRQ2_LINE, HOLD_LINE);
-            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", cpu_get_total_cycles(machine->activecpu), cpu_get_total_cycles(machine->activecpu) - tick, tms7000_cycles_per_INT2-(cpu_get_total_cycles(machine->activecpu) - tick) );
-			//tick = cpu_get_total_cycles(machine->activecpu) );
+			cpu_set_input_line(device, TMS7000_IRQ2_LINE, HOLD_LINE);
+            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", cpu_get_total_cycles(device), cpu_get_total_cycles(device) - tick, tms7000_cycles_per_INT2-(cpu_get_total_cycles(device) - tick) );
+			//tick = cpu_get_total_cycles(device) );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */
         }
     }
-//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", tms7000.t1_prescaler, tms7000.t1_decrementer, cpu_get_total_cycles(machine->activecpu), cpu_get_total_cycles(machine->activecpu) - tick2 ) );
-//  tick2 = cpu_get_total_cycles(machine->activecpu);
+//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", tms7000.t1_prescaler, tms7000.t1_decrementer, cpu_get_total_cycles(device), cpu_get_total_cycles(device) - tick2 ) );
+//  tick2 = cpu_get_total_cycles(device);
 }
 
 static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */

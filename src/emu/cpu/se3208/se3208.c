@@ -1793,13 +1793,9 @@ static CPU_EXIT( SE3208 )
 }
 
 
-static CPU_GET_CONTEXT( SE3208 )
-{
-}
+static CPU_GET_CONTEXT( SE3208 ) { }
 
-static CPU_SET_CONTEXT( SE3208 )
-{
-}
+static CPU_SET_CONTEXT( SE3208 ) { }
 
 static void set_irq_line(se3208_state_t *se3208_state, int line,int state)
 {
@@ -1848,7 +1844,7 @@ CPU_GET_INFO( SE3208 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(se3208_state_t);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;

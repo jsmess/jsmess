@@ -90,22 +90,22 @@ static SND_START( ymf262 )
 	ymf262_set_irq_handler   (info->chip, IRQHandler_262, info);
 	ymf262_set_update_handler(info->chip, _stream_update, info);
 
-	info->timer[0] = timer_alloc(timer_callback_262_0, info);
-	info->timer[1] = timer_alloc(timer_callback_262_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_262_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_262_1, info);
 
 	return info;
 }
 
 static SND_STOP( ymf262 )
 {
-	struct ymf262_info *info = token;
+	struct ymf262_info *info = device->token;
 	ymf262_shutdown(info->chip);
 }
 
 /* reset */
 static SND_RESET( ymf262 )
 {
-	struct ymf262_info *info = token;
+	struct ymf262_info *info = device->token;
 	ymf262_reset_chip(info->chip);
 }
 

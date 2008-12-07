@@ -78,7 +78,7 @@ MACHINE_RESET( gamecom )
 	memory_set_bankptr( machine, 4, rom );
 
 	/* should possibly go in a DRIVER_INIT piece? */
-	gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback , NULL);
+	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 
 	/* intialize the empty dummy bank */
 	if ( dummy_bank == NULL ) 

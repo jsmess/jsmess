@@ -140,7 +140,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 			}
 		}
 
-		timer_adjust_oneshot(cdp1864->dma_timer, ATTOTIME_IN_CYCLES(CDP1864_CYCLES_DMA_WAIT, 0), 0);
+		timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(machine->cpu[0], CDP1864_CYCLES_DMA_WAIT), 0);
 
 		cdp1864->dmaout = 0;
 	}
@@ -154,7 +154,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 			}
 		}
 
-		timer_adjust_oneshot(cdp1864->dma_timer, ATTOTIME_IN_CYCLES(CDP1864_CYCLES_DMA_ACTIVE, 0), 0);
+		timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(machine->cpu[0], CDP1864_CYCLES_DMA_ACTIVE), 0);
 
 		cdp1864->dmaout = 1;
 	}
@@ -381,21 +381,21 @@ static DEVICE_START( cdp1864 )
 	cdp1864_init_palette(device);
 
 	/* create the timers */
-	cdp1864->int_timer = timer_alloc(cdp1864_int_tick, (void *)device);
-	cdp1864->efx_timer = timer_alloc(cdp1864_efx_tick, (void *)device);
-	cdp1864->dma_timer = timer_alloc(cdp1864_dma_tick, (void *)device);
+	cdp1864->int_timer = timer_alloc(device->machine, cdp1864_int_tick, (void *)device);
+	cdp1864->efx_timer = timer_alloc(device->machine, cdp1864_efx_tick, (void *)device);
+	cdp1864->dma_timer = timer_alloc(device->machine, cdp1864_dma_tick, (void *)device);
 
 	/* register for state saving */
-	state_save_register_item("cdp1864", device->tag, 0, cdp1864->disp);
-	state_save_register_item("cdp1864", device->tag, 0, cdp1864->dmaout);
-	state_save_register_item("cdp1864", device->tag, 0, cdp1864->bgcolor);
+	state_save_register_device_item(device, 0, cdp1864->disp);
+	state_save_register_device_item(device, 0, cdp1864->dmaout);
+	state_save_register_device_item(device, 0, cdp1864->bgcolor);
 
-	state_save_register_item("cdp1864", device->tag, 0, cdp1864->audio);
-	state_save_register_item("cdp1864", device->tag, 0, cdp1864->latch);
-	state_save_register_item("cdp1864", device->tag, 0, cdp1864->signal);
-	state_save_register_item("cdp1864", device->tag, 0, cdp1864->incr);
+	state_save_register_device_item(device, 0, cdp1864->audio);
+	state_save_register_device_item(device, 0, cdp1864->latch);
+	state_save_register_device_item(device, 0, cdp1864->signal);
+	state_save_register_device_item(device, 0, cdp1864->incr);
 
-	state_save_register_bitmap("cdp1864", device->tag, 0, "cdp1864->bitmap", cdp1864->bitmap);
+	state_save_register_bitmap(device->machine, "cdp1864", device->tag, 0, "cdp1864->bitmap", cdp1864->bitmap);
 	return DEVICE_START_OK;
 }
 
@@ -405,7 +405,7 @@ static DEVICE_RESET( cdp1864 )
 
 	timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_START, 0), 0);
 	timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_TOP_START, 0), 0);
-	timer_adjust_oneshot(cdp1864->dma_timer, ATTOTIME_IN_CYCLES(CDP1864_CYCLES_DMA_START, 0), 0);
+	timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(device->machine->cpu[0], CDP1864_CYCLES_DMA_START), 0);
 	
 	cdp1864->disp = 0;
 	cdp1864->dmaout = 0;

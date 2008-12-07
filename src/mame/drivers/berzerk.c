@@ -171,9 +171,9 @@ static TIMER_CALLBACK( irq_callback )
 }
 
 
-static void create_irq_timer(void)
+static void create_irq_timer(running_machine *machine)
 {
-	irq_timer = timer_alloc(irq_callback, NULL);
+	irq_timer = timer_alloc(machine, irq_callback, NULL);
 }
 
 
@@ -248,9 +248,9 @@ static TIMER_CALLBACK( nmi_callback )
 }
 
 
-static void create_nmi_timer(void)
+static void create_nmi_timer(running_machine *machine)
 {
-	nmi_timer = timer_alloc(nmi_callback, NULL);
+	nmi_timer = timer_alloc(machine, nmi_callback, NULL);
 }
 
 
@@ -270,15 +270,15 @@ static void start_nmi_timer(running_machine *machine)
 
 static MACHINE_START( berzerk )
 {
-	create_irq_timer();
-	create_nmi_timer();
+	create_irq_timer(machine);
+	create_nmi_timer(machine);
 
 	/* register for state saving */
-	state_save_register_global(magicram_control);
-	state_save_register_global(last_shift_data);
-	state_save_register_global(intercept);
-	state_save_register_global(irq_enabled);
-	state_save_register_global(nmi_enabled);
+	state_save_register_global(machine, magicram_control);
+	state_save_register_global(machine, last_shift_data);
+	state_save_register_global(machine, intercept);
+	state_save_register_global(machine, irq_enabled);
+	state_save_register_global(machine, nmi_enabled);
 }
 
 

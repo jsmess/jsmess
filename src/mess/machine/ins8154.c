@@ -55,13 +55,13 @@ static DEVICE_START( ins8154 )
 	ins8154->intf = device->static_config;
 
 	/* register for state saving */
-	state_save_register_item("ins8154", device->tag, 0, ins8154->in_a);
-	state_save_register_item("ins8154", device->tag, 0, ins8154->in_b);
-	state_save_register_item("ins8154", device->tag, 0, ins8154->out_a);
-	state_save_register_item("ins8154", device->tag, 0, ins8154->out_b);
-	state_save_register_item("ins8154", device->tag, 0, ins8154->mdr);
-	state_save_register_item("ins8154", device->tag, 0, ins8154->odra);
-	state_save_register_item("ins8154", device->tag, 0, ins8154->odrb);
+	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->in_a);
+	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->in_b);
+	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->out_a);
+	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->out_b);
+	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->mdr);
+	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->odra);
+	state_save_register_item(device->machine, "ins8154", device->tag, 0, ins8154->odrb);
 	return DEVICE_START_OK;
 }
 

@@ -849,14 +849,14 @@ static VIDEO_START(cps3)
 	cps3_ss_ram_is_dirty = 1;
 	memset(cps3_ss_ram, 0x00, 0x10000);
 	memset(cps3_ss_ram_dirty, 1, 0x400);
-	state_save_register_global_pointer(cps3_ss_ram, 0x10000/4);
+	state_save_register_global_pointer(machine, cps3_ss_ram, 0x10000/4);
 
 	cps3_char_ram = auto_malloc(0x800000);
 	cps3_char_ram_dirty = auto_malloc(0x800000/256);
 	cps3_char_ram_is_dirty = 1;
 	memset(cps3_char_ram, 0x00, 0x800000);
 	memset(cps3_char_ram_dirty, 1, 0x8000);
-	state_save_register_global_pointer(cps3_char_ram, 0x800000 /4);
+	state_save_register_global_pointer(machine, cps3_char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[0] = allocgfx(&cps3_tiles8x8_layout);
@@ -885,7 +885,7 @@ static VIDEO_START(cps3)
 	renderbuffer_clip.min_y = 0;
 	renderbuffer_clip.max_y = 224-1;
 
-	fillbitmap(renderbuffer_bitmap,0x3f,&renderbuffer_clip);
+	bitmap_fill(renderbuffer_bitmap,&renderbuffer_clip,0x3f);
 
 }
 
@@ -1031,7 +1031,7 @@ static VIDEO_UPDATE(cps3)
 	renderbuffer_clip.min_y = 0;
 	renderbuffer_clip.max_y = ((224*fszx)>>16)-1;
 
-	fillbitmap(renderbuffer_bitmap,0,&renderbuffer_clip);
+	bitmap_fill(renderbuffer_bitmap,&renderbuffer_clip,0);
 
 	/* Sprites */
 	{

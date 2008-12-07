@@ -52,9 +52,9 @@ void c16_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union
 /*----------- defined in audio/t6721.c -----------*/
 
 extern WRITE8_HANDLER(c364_speech_w);
-extern  READ8_HANDLER(c364_speech_r);
+extern READ8_HANDLER(c364_speech_r);
 
-extern void c364_speech_init(void);
+extern void c364_speech_init(running_machine *machine);
 
 
 #endif /* C16_H_ */

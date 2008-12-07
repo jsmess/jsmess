@@ -41,8 +41,8 @@ VIDEO_START( xexex )
 	cur_alpha = 0;
 
 	K053251_vh_start(machine);
-	K054338_vh_start();
-	K053250_vh_start(1, &region);
+	K054338_vh_start(machine);
+	K053250_vh_start(machine, 1, &region);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
 	K053247_vh_start(machine, "gfx2", -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);
@@ -112,7 +112,7 @@ VIDEO_UPDATE( xexex )
 	K054338_update_all_shadows(screen->machine);
 	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	for (plane=0; plane<4; plane++)
 	{

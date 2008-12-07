@@ -82,7 +82,7 @@ static TIMER_CALLBACK( mikro80_reset )
 
 MACHINE_RESET( mikro80 )
 {
-	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, mikro80_reset);
+	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, mikro80_reset);
 	memory_set_bank(machine, 1, 1);
 	mikro80_keyboard_mask = 0;
 }

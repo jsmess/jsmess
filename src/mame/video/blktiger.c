@@ -88,12 +88,12 @@ VIDEO_START( blktiger )
 	tilemap_set_transmask(bg_tilemap4x8,2,0xff00,0x80ff);
 	tilemap_set_transmask(bg_tilemap4x8,3,0xf000,0x8fff);
 
-	state_save_register_global(blktiger_scroll_bank);
-	state_save_register_global(screen_layout);
-	state_save_register_global(chon);
-	state_save_register_global(objon);
-	state_save_register_global(bgon);
-	state_save_register_global_pointer(scroll_ram, BGRAM_BANK_SIZE * BGRAM_BANKS);
+	state_save_register_global(machine, blktiger_scroll_bank);
+	state_save_register_global(machine, screen_layout);
+	state_save_register_global(machine, chon);
+	state_save_register_global(machine, objon);
+	state_save_register_global(machine, bgon);
+	state_save_register_global_pointer(machine, scroll_ram, BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
 
@@ -226,7 +226,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( blktiger )
 {
-	fillbitmap(bitmap,1023,cliprect);
+	bitmap_fill(bitmap,cliprect,1023);
 
 	if (bgon)
 		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_DRAW_LAYER1,0);

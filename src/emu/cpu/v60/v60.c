@@ -310,14 +310,14 @@ static void base_init(const char *type, const device_config *device, int index, 
 	v60.irq_line = CLEAR_LINE;
 	v60.nmi_line = CLEAR_LINE;
 
-	state_save_register_item_array(type, device->tag, 0, v60.reg);
-	state_save_register_item(type, device->tag, 0, v60.irq_line);
-	state_save_register_item(type, device->tag, 0, v60.nmi_line);
-	state_save_register_item(type, device->tag, 0, v60.PPC);
-	state_save_register_item(type, device->tag, 0, _CY);
-	state_save_register_item(type, device->tag, 0, _OV);
-	state_save_register_item(type, device->tag, 0, _S);
-	state_save_register_item(type, device->tag, 0, _Z);
+	state_save_register_device_item_array(device, 0, v60.reg);
+	state_save_register_device_item(device, 0, v60.irq_line);
+	state_save_register_device_item(device, 0, v60.nmi_line);
+	state_save_register_device_item(device, 0, v60.PPC);
+	state_save_register_device_item(device, 0, _CY);
+	state_save_register_device_item(device, 0, _OV);
+	state_save_register_device_item(device, 0, _S);
+	state_save_register_device_item(device, 0, _Z);
 }
 
 static CPU_INIT( v60 )
@@ -554,7 +554,7 @@ CPU_GET_INFO( v60 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(v60);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

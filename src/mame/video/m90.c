@@ -103,7 +103,7 @@ VIDEO_START( m90 )
 	tilemap_set_transparent_pen(pf1_layer,0);
 	tilemap_set_transparent_pen(pf1_wide_layer,0);
 
-	state_save_register_global_array(m90_video_control_data);
+	state_save_register_global_array(machine, m90_video_control_data);
 }
 
 VIDEO_START( bomblord )
@@ -118,7 +118,7 @@ VIDEO_START( bomblord )
 	tilemap_set_transparent_pen(pf1_layer,0);
 	tilemap_set_transparent_pen(pf1_wide_layer,0);
 
-	state_save_register_global_array(m90_video_control_data);
+	state_save_register_global_array(machine, m90_video_control_data);
 }
 
 VIDEO_START( dynablsb )
@@ -131,7 +131,7 @@ VIDEO_START( dynablsb )
 	tilemap_set_transparent_pen(pf2_layer,0);
 	tilemap_set_transparent_pen(pf2_wide_layer,0);
 
-	state_save_register_global_array(m90_video_control_data);
+	state_save_register_global_array(machine, m90_video_control_data);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
@@ -349,11 +349,11 @@ VIDEO_UPDATE( m90 )
 		tilemap_set_scrollx( pf2_wide_layer,0, m90_video_control_data[3]+256-2 );
 	}
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (video_enable) {
 		if (!pf2_enable)
-			fillbitmap(bitmap,0,cliprect);
+			bitmap_fill(bitmap,cliprect,0);
 
 		if (pf2_enable)
 		{
@@ -436,7 +436,7 @@ VIDEO_UPDATE( m90 )
 		draw_sprites(screen->machine,bitmap,cliprect);
 
 	} else {
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	}
 
 	return 0;
@@ -445,8 +445,8 @@ VIDEO_UPDATE( m90 )
 VIDEO_UPDATE( bomblord )
 {
 	int i;
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	/* Setup scrolling */
 	if (m90_video_control_data[6]&0x20) {
@@ -496,8 +496,8 @@ VIDEO_UPDATE( bomblord )
 
 VIDEO_UPDATE( dynablsb )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (!(m90_video_data[0xf008/2] & 0x4000)) {
 		tilemap_mark_all_tiles_dirty(pf1_wide_layer);

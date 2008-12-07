@@ -170,11 +170,11 @@ static MACHINE_RESET( atarisy1 )
 	atarigen_eeprom_reset();
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_sound_io_reset(1);
+	atarigen_sound_io_reset(machine->cpu[1]);
 
 	/* reset the joystick parameters */
 	joystick_value = 0;
-	joystick_timer = timer_alloc(delayed_joystick_int, NULL);
+	joystick_timer = timer_alloc(machine, delayed_joystick_int, NULL);
 	joystick_int = 0;
 	joystick_int_enable = 0;
 }

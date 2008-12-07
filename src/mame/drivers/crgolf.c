@@ -66,11 +66,11 @@ static MACHINE_START( crgolf )
 	memory_set_bank(machine, 1, 0);
 
 	/* register for save states */
-	state_save_register_global(port_select);
-	state_save_register_global(main_to_sound_data);
-	state_save_register_global(sound_to_main_data);
-	state_save_register_global(sample_offset);
-	state_save_register_global(sample_count);
+	state_save_register_global(machine, port_select);
+	state_save_register_global(machine, main_to_sound_data);
+	state_save_register_global(machine, sound_to_main_data);
+	state_save_register_global(machine, sample_offset);
+	state_save_register_global(machine, sample_count);
 }
 
 
@@ -129,7 +129,7 @@ static TIMER_CALLBACK( main_to_sound_callback )
 
 static WRITE8_HANDLER( main_to_sound_w )
 {
-	timer_call_after_resynch(NULL, data, main_to_sound_callback);
+	timer_call_after_resynch(space->machine, NULL, data, main_to_sound_callback);
 }
 
 
@@ -156,7 +156,7 @@ static TIMER_CALLBACK( sound_to_main_callback )
 
 static WRITE8_HANDLER( sound_to_main_w )
 {
-	timer_call_after_resynch(NULL, data, sound_to_main_callback);
+	timer_call_after_resynch(space->machine, NULL, data, sound_to_main_callback);
 }
 
 
@@ -174,12 +174,12 @@ static READ8_HANDLER( sound_to_main_r )
  *
  *************************************/
 
-static void vck_callback(running_machine *machine, int data)
+static void vck_callback(const device_config *device)
 {
 	/* only play back if we have data remaining */
 	if (sample_count != 0xff)
 	{
-		UINT8 data = memory_region(machine, "adpcm")[sample_offset >> 1];
+		UINT8 data = memory_region(device->machine, "adpcm")[sample_offset >> 1];
 
 		/* write the next nibble and advance */
 		msm5205_data_w(0, (data >> (4 * (~sample_offset & 1))) & 0x0f);

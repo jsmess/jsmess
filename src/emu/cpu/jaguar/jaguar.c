@@ -344,14 +344,9 @@ static void set_irq_line(jaguar_state *jaguar, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( jaguar )
-{
-}
+static CPU_GET_CONTEXT( jaguar ) { }
 
-
-static CPU_SET_CONTEXT( jaguar )
-{
-}
+static CPU_SET_CONTEXT( jaguar ) { }
 
 
 /***************************************************************************
@@ -427,10 +422,10 @@ static void init_common(int isdsp, const device_config *device, cpu_irq_callback
 	if (configdata != NULL)
 		jaguar->cpu_interrupt = configdata->cpu_int_callback;
 
-	state_save_register_item_array("jaguar", device->tag, 0, jaguar->r);
-	state_save_register_item_array("jaguar", device->tag, 0, jaguar->a);
-	state_save_register_item_array("jaguar", device->tag, 0, jaguar->ctrl);
-	state_save_register_item("jaguar", device->tag, 0, jaguar->ppc);
+	state_save_register_device_item_array(device, 0, jaguar->r);
+	state_save_register_device_item_array(device, 0, jaguar->a);
+	state_save_register_device_item_array(device, 0, jaguar->ctrl);
+	state_save_register_device_item(device, 0, jaguar->ppc);
 	state_save_register_postload(device->machine, jaguar_postload, (void *)device);
 }
 
@@ -1522,7 +1517,7 @@ CPU_GET_INFO( jaguargpu )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(jaguar_state);						break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;										break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;										break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;								break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;								break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;										break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;										break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;										break;

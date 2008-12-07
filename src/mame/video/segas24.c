@@ -5,8 +5,8 @@
 VIDEO_START(system24)
 {
 	sys24_tile_vh_start(machine, 0xfff);
-	sys24_sprite_vh_start();
-	sys24_mixer_vh_start();
+	sys24_sprite_vh_start(machine);
+	sys24_mixer_vh_start(machine);
 }
 
 static int layer_cmp(const void *pl1, const void *pl2)
@@ -27,14 +27,14 @@ VIDEO_UPDATE(system24)
 	int order[12], spri[4];
 
 	if(sys24_mixer_get_reg(13) & 1) {
-		fillbitmap(bitmap, get_black_pen(screen->machine), 0);
+		bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
 		return 0;
 	}
 
 	sys24_tile_update(screen->machine);
 
-	fillbitmap(priority_bitmap, 0, 0);
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, 0, 0);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	for(i=0; i<12; i++)
 		order[i] = i;

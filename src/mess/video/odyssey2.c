@@ -547,10 +547,10 @@ VIDEO_START( odyssey2 )
 
 	tmp_bitmap = auto_bitmap_alloc( width, height, video_screen_get_format(screen) );
 
-	i824x_line_timer = timer_alloc( i824x_scanline_callback, NULL );
+	i824x_line_timer = timer_alloc(machine,  i824x_scanline_callback, NULL );
 	timer_adjust_periodic( i824x_line_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, I824X_START_ACTIVE_SCAN ), 0, video_screen_get_scan_period( machine->primary_screen ) );
 
-	i824x_hblank_timer = timer_alloc( i824x_hblank_callback, NULL );
+	i824x_hblank_timer = timer_alloc(machine,  i824x_hblank_callback, NULL );
 	timer_adjust_periodic( i824x_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, I824X_END_ACTIVE_SCAN + 18 ), 0, video_screen_get_scan_period( machine->primary_screen ) );
 }
 

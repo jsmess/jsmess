@@ -92,7 +92,7 @@ static VIDEO_START( leland )
 	memset(leland_video_ram, 0, VRAM_SIZE);
 
 	/* scanline timer */
-	scanline_timer = timer_alloc(scanline_callback, NULL);
+	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 }
@@ -208,8 +208,8 @@ static int leland_vram_port_r(const address_space *space, int offset, int num)
 			break;
 
 		default:
-			logerror("CPU #%d %04x Warning: Unknown video port %02x read (address=%04x)\n",
-						cpunum_get_active(),cpu_get_pc(space->machine->activecpu), offset, addr);
+			logerror("CPU %s %04x Warning: Unknown video port %02x read (address=%04x)\n",
+						space->cpu->tag, cpu_get_pc(space->machine->activecpu), offset, addr);
 			ret = 0;
 			break;
 	}
@@ -294,8 +294,8 @@ static void leland_vram_port_w(const address_space *space, int offset, int data,
 			break;
 
 		default:
-			logerror("CPU #%d %04x Warning: Unknown video port write (address=%04x value=%02x)\n",
-						cpunum_get_active(),cpu_get_pc(space->machine->activecpu), offset, addr);
+			logerror("CPU %s %04x Warning: Unknown video port write (address=%04x value=%02x)\n",
+						space->cpu->tag, cpu_get_pc(space->machine->activecpu), offset, addr);
 			break;
 	}
 
@@ -330,7 +330,7 @@ static TIMER_CALLBACK( leland_delayed_mvram_w )
 
 WRITE8_HANDLER( leland_mvram_port_w )
 {
-	timer_call_after_resynch(NULL, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+	timer_call_after_resynch(space->machine, NULL, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
 }
 
 
@@ -375,7 +375,7 @@ READ8_HANDLER( leland_svram_port_r )
 WRITE8_HANDLER( ataxx_mvram_port_w )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	timer_call_after_resynch(NULL, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+	timer_call_after_resynch(space->machine, NULL, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
 }
 
 

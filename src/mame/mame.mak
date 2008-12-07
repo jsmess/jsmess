@@ -648,6 +648,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/btime.o $(MACHINE)/btime.o $(VIDEO)/btime.o \
 	$(DRIVERS)/chanbara.o \
 	$(DRIVERS)/bwing.o $(VIDEO)/bwing.o \
+	$(DRIVERS)/deshoros.o \
 	$(DRIVERS)/cbuster.o $(VIDEO)/cbuster.o \
 	$(DRIVERS)/cninja.o $(VIDEO)/cninja.o \
 	$(DRIVERS)/cntsteer.o \
@@ -953,7 +954,6 @@ $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/meadows.o $(AUDIO)/meadows.o $(VIDEO)/meadows.o \
 
 $(MAMEOBJ)/merit.a: \
-	$(DRIVERS)/couple.o \
 	$(DRIVERS)/merit.o \
 	$(DRIVERS)/meritm.o \
 
@@ -1019,6 +1019,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/namcos12.o \
 	$(DRIVERS)/namcos2.o $(MACHINE)/namcos2.o $(VIDEO)/namcos2.o \
 	$(DRIVERS)/namcos21.o $(VIDEO)/namcos21.o \
+	$(DRIVERS)/gal3.o \
 	$(DRIVERS)/namcos22.o $(VIDEO)/namcos22.o \
 	$(DRIVERS)/namcos23.o \
 	$(DRIVERS)/namcos86.o $(VIDEO)/namcos86.o \
@@ -1546,6 +1547,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/bmcbowl.o \
+	$(DRIVERS)/brasil.o \
 	$(DRIVERS)/koftball.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
@@ -1584,6 +1586,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gtipoker.o \
 	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
+	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
 	$(DRIVERS)/gstream.o \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
@@ -1591,6 +1594,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hexa.o $(VIDEO)/hexa.o \
 	$(DRIVERS)/homedata.o $(VIDEO)/homedata.o \
 	$(DRIVERS)/hotblock.o \
+	$(DRIVERS)/ilpag.o \
 	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/istellar.o \
@@ -1617,6 +1621,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o \
 	$(DRIVERS)/midas.o \
+	$(DRIVERS)/mil4000.o \
 	$(DRIVERS)/miniboy7.o \
 	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/mirax.o \
@@ -1635,7 +1640,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/peplus.o \
 	$(DRIVERS)/pipeline.o \
 	$(DRIVERS)/pkscram.o \
-	$(DRIVERS)/pmpoker.o \
 	$(DRIVERS)/pntnpuzl.o \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
@@ -1740,6 +1744,9 @@ $(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
 $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 						$(LAYOUT)/pulltabs.lh
 
+$(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
+						$(LAYOUT)/pmpoker.lh \
+
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 
 $(DRIVERS)/lucky74.o:	$(LAYOUT)/lucky74.lh
@@ -1770,10 +1777,6 @@ $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 						$(LAYOUT)/pe_bjack.lh \
 						$(LAYOUT)/pe_keno.lh \
 						$(LAYOUT)/pe_slots.lh
-
-$(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
-						$(LAYOUT)/goldnpkr.lh \
-						$(LAYOUT)/pottnpkr.lh
 
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 

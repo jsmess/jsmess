@@ -10,6 +10,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "am53cf96.h"
 
 static UINT8 scsi_regs[32], fifo[16], fptr = 0, xfer_state, last_id;
@@ -159,10 +160,10 @@ WRITE32_HANDLER( am53cf96_w )
 			case 3:	// reset SCSI bus
 				scsi_regs[REG_INTSTATE] = 4;	// command sent OK
 				xfer_state = 0;
-				timer_set( ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
+				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				break;
 			case 0x42:    	// select with ATN steps
-				timer_set( ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
+				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				if ((fifo[1] == 0) || (fifo[1] == 0x48) || (fifo[1] == 0x4b))
 				{
 					scsi_regs[REG_INTSTATE] = 6;
@@ -192,7 +193,7 @@ WRITE32_HANDLER( am53cf96_w )
 			case 0x10:	// information transfer (must not change xfer_state)
 			case 0x11:	// second phase of information transfer
 			case 0x12:	// message accepted
-				timer_set( ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
+				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				scsi_regs[REG_INTSTATE] = 6;	// command sent OK
 				break;
 			default:
@@ -224,11 +225,11 @@ void am53cf96_init( const struct AM53CF96interface *interface )
 		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
 	}
 
-	state_save_register_global_array(scsi_regs);
-	state_save_register_global_array(fifo);
-	state_save_register_global(fptr);
-	state_save_register_global(xfer_state);
-	state_save_register_global(last_id);
+	state_save_register_global_array(Machine, scsi_regs);
+	state_save_register_global_array(Machine, fifo);
+	state_save_register_global(Machine, fptr);
+	state_save_register_global(Machine, xfer_state);
+	state_save_register_global(Machine, last_id);
 }
 
 void am53cf96_exit( const struct AM53CF96interface *interface )

@@ -306,7 +306,7 @@ static MACHINE_START( tmc600 )
 
 	/* register for state saving */
 
-	state_save_register_global(state->keylatch);
+	state_save_register_global(machine, state->keylatch);
 }
 
 static MACHINE_RESET( tmc600 )

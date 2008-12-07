@@ -32,6 +32,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "crtc6845.h"
 
 
@@ -48,7 +49,7 @@
 		if(VERBOSE>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(Machine)),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -128,7 +129,7 @@ struct mscrtc6845 *mscrtc6845_init(const struct mscrtc6845_config *config)
 
 	crtc = auto_malloc(sizeof(struct mscrtc6845));
 	memset(crtc, 0, sizeof(*crtc));
-	crtc->cursor_time = attotime_to_double(timer_get_time());
+	crtc->cursor_time = attotime_to_double(timer_get_time(Machine));
 	crtc->config = *config;
 	mscrtc6845 = crtc;
 
@@ -141,8 +142,8 @@ struct mscrtc6845 *mscrtc6845_init(const struct mscrtc6845_config *config)
 		}
 	}
 
-	state_save_register_item_array("mscrtc6845", NULL, 0, crtc->reg);
-	state_save_register_item("mscrtc6845", NULL, 0, crtc->idx);
+	state_save_register_item_array(Machine, "mscrtc6845", NULL, 0, crtc->reg);
+	state_save_register_item(Machine, "mscrtc6845", NULL, 0, crtc->idx);
 	return crtc;
 }
 
@@ -171,7 +172,7 @@ void mscrtc6845_time(struct mscrtc6845 *crtc)
 	double neu, ftime;
 	struct mscrtc6845_cursor cursor;
 
-	neu = attotime_to_double(timer_get_time());
+	neu = attotime_to_double(timer_get_time(Machine));
 
 	if (mscrtc6845_clocks_in_frame(crtc) == 0.0)
 		return;

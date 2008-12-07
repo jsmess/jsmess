@@ -70,7 +70,7 @@ struct ioasic_state
 	UINT32	reg[16];
 	UINT8	has_dcs;
 	UINT8	has_cage;
-	UINT8	dcs_cpu;
+	const device_config *dcs_cpu;
 	UINT8	shuffle_type;
 	UINT8	shuffle_active;
 	const UINT8 *	shuffle_map;
@@ -171,20 +171,20 @@ static void generate_serial_data(running_machine *machine, int upper)
  *
  *************************************/
 
-static void serial_register_state(void)
+static void serial_register_state(running_machine *machine)
 {
-	state_save_register_global_array(serial.data);
-	state_save_register_global(serial.buffer);
-	state_save_register_global(serial.index);
-	state_save_register_global(serial.status);
-	state_save_register_global(serial.bits);
-	state_save_register_global(serial.ormask);
+	state_save_register_global_array(machine, serial.data);
+	state_save_register_global(machine, serial.buffer);
+	state_save_register_global(machine, serial.index);
+	state_save_register_global(machine, serial.status);
+	state_save_register_global(machine, serial.bits);
+	state_save_register_global(machine, serial.ormask);
 }
 
 
 void midway_serial_pic_init(running_machine *machine, int upper)
 {
-	serial_register_state();
+	serial_register_state(machine);
 	generate_serial_data(machine, upper);
 }
 
@@ -256,33 +256,33 @@ static TIMER_CALLBACK( reset_timer )
 }
 
 
-static void pic_register_state(void)
+static void pic_register_state(running_machine *machine)
 {
-	state_save_register_global(pic.latch);
-	state_save_register_global(pic.latch_expire_time.seconds);
-	state_save_register_global(pic.latch_expire_time.attoseconds);
-	state_save_register_global(pic.state);
-	state_save_register_global(pic.index);
-	state_save_register_global(pic.total);
-	state_save_register_global(pic.nvram_addr);
-	state_save_register_global_array(pic.buffer);
-	state_save_register_global_array(pic.nvram);
-	state_save_register_global_array(pic.default_nvram);
-	state_save_register_global_array(pic.time_buf);
-	state_save_register_global(pic.time_index);
-	state_save_register_global(pic.time_just_written);
-	state_save_register_global(pic.yearoffs);
+	state_save_register_global(machine, pic.latch);
+	state_save_register_global(machine, pic.latch_expire_time.seconds);
+	state_save_register_global(machine, pic.latch_expire_time.attoseconds);
+	state_save_register_global(machine, pic.state);
+	state_save_register_global(machine, pic.index);
+	state_save_register_global(machine, pic.total);
+	state_save_register_global(machine, pic.nvram_addr);
+	state_save_register_global_array(machine, pic.buffer);
+	state_save_register_global_array(machine, pic.nvram);
+	state_save_register_global_array(machine, pic.default_nvram);
+	state_save_register_global_array(machine, pic.time_buf);
+	state_save_register_global(machine, pic.time_index);
+	state_save_register_global(machine, pic.time_just_written);
+	state_save_register_global(machine, pic.yearoffs);
 }
 
 
 void midway_serial_pic2_init(running_machine *machine, int upper, int yearoffs)
 {
-	serial_register_state();
-	pic_register_state();
+	serial_register_state(machine);
+	pic_register_state(machine);
 
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
-	pic.time_write_timer = timer_alloc(reset_timer, NULL);
+	pic.time_write_timer = timer_alloc(machine, reset_timer, NULL);
 	memset(pic.default_nvram, 0xff, sizeof(pic.default_nvram));
 	generate_serial_data(machine, upper);
 }
@@ -301,7 +301,7 @@ UINT8 midway_serial_pic2_status_r(void)
 	/* if we're still holding the data ready bit high, do it */
 	if (pic.latch & 0xf00)
 	{
-		if (attotime_compare(timer_get_time(), pic.latch_expire_time) > 0)
+		if (attotime_compare(timer_get_time(Machine), pic.latch_expire_time) > 0)
 			pic.latch &= 0xff;
 		else
 			pic.latch -= 0x100;
@@ -347,7 +347,7 @@ void midway_serial_pic2_w(running_machine *machine, UINT8 data)
 
 	/* store in the latch, along with a bit to indicate we have data */
 	pic.latch = (data & 0x00f) | 0x480;
-	pic.latch_expire_time = attotime_add(timer_get_time(), ATTOTIME_IN_MSEC(1));
+	pic.latch_expire_time = attotime_add(timer_get_time(machine), ATTOTIME_IN_MSEC(1));
 	if (data & 0x10)
 	{
 		int cmd = pic.state ? (pic.state & 0x0f) : (pic.latch & 0x0f);
@@ -558,27 +558,27 @@ enum
 	IOASIC_INTCTL		/* f: interrupt control */
 };
 
-static UINT16 ioasic_fifo_r(void);
-static UINT16 ioasic_fifo_status_r(void);
+static UINT16 ioasic_fifo_r(const device_config *device);
+static UINT16 ioasic_fifo_status_r(const device_config *device);
 static void ioasic_input_empty(int state);
 static void ioasic_output_full(int state);
 static void update_ioasic_irq(running_machine *machine);
 static void cage_irq_handler(running_machine *machine, int state);
 
 
-static void ioasic_register_state(void)
+static void ioasic_register_state(running_machine *machine)
 {
-	state_save_register_global_array(ioasic.reg);
-	state_save_register_global(ioasic.shuffle_active);
-	state_save_register_global(ioasic.irq_state);
-	state_save_register_global(ioasic.sound_irq_state);
-	state_save_register_global(ioasic.auto_ack);
-	state_save_register_global(ioasic.force_fifo_full);
-	state_save_register_global_array(ioasic.fifo);
-	state_save_register_global(ioasic.fifo_in);
-	state_save_register_global(ioasic.fifo_out);
-	state_save_register_global(ioasic.fifo_bytes);
-	state_save_register_global(ioasic.fifo_force_buffer_empty_pc);
+	state_save_register_global_array(machine, ioasic.reg);
+	state_save_register_global(machine, ioasic.shuffle_active);
+	state_save_register_global(machine, ioasic.irq_state);
+	state_save_register_global(machine, ioasic.sound_irq_state);
+	state_save_register_global(machine, ioasic.auto_ack);
+	state_save_register_global(machine, ioasic.force_fifo_full);
+	state_save_register_global_array(machine, ioasic.fifo);
+	state_save_register_global(machine, ioasic.fifo_in);
+	state_save_register_global(machine, ioasic.fifo_out);
+	state_save_register_global(machine, ioasic.fifo_bytes);
+	state_save_register_global(machine, ioasic.fifo_force_buffer_empty_pc);
 }
 
 
@@ -597,16 +597,16 @@ void midway_ioasic_init(running_machine *machine, int shuffle, int upper, int ye
 		{ 0x1,0x2,0x3,0x0,0x4,0x5,0x6,0x7,0xa,0xb,0x8,0x9,0xc,0xd,0xe,0xf },	/* Hyperdrive */
 	};
 
-	ioasic_register_state();
+	ioasic_register_state(machine);
 
 	/* do we have a DCS2 sound chip connected? (most likely) */
-	ioasic.has_dcs = (mame_find_cpu_index(machine, "dcs2") != -1 || mame_find_cpu_index(machine, "dsio") != -1 || mame_find_cpu_index(machine, "denver") != -1);
-	ioasic.has_cage = (mame_find_cpu_index(machine, "cage") != -1);
-	ioasic.dcs_cpu = mame_find_cpu_index(machine, "dcs2");
-	if (ioasic.dcs_cpu == (UINT8)-1)
-		ioasic.dcs_cpu = mame_find_cpu_index(machine, "dsio");
-	if (ioasic.dcs_cpu == (UINT8)-1)
-		ioasic.dcs_cpu = mame_find_cpu_index(machine, "denver");
+	ioasic.has_dcs = (cputag_get_cpu(machine, "dcs2") != NULL || cputag_get_cpu(machine, "dsio") != NULL || cputag_get_cpu(machine, "denver") != NULL);
+	ioasic.has_cage = (cputag_get_cpu(machine, "cage") != NULL);
+	ioasic.dcs_cpu = cputag_get_cpu(machine, "dcs2");
+	if (ioasic.dcs_cpu == NULL)
+		ioasic.dcs_cpu = cputag_get_cpu(machine, "dsio");
+	if (ioasic.dcs_cpu == NULL)
+		ioasic.dcs_cpu = cputag_get_cpu(machine, "denver");
 	ioasic.shuffle_type = shuffle;
 	ioasic.shuffle_map = &shuffle_maps[shuffle][0];
 	ioasic.auto_ack = 0;
@@ -659,7 +659,7 @@ void midway_ioasic_reset(running_machine *machine)
 
 static void update_ioasic_irq(running_machine *machine)
 {
-	UINT16 fifo_state = ioasic_fifo_status_r();
+	UINT16 fifo_state = ioasic_fifo_status_r(NULL);
 	UINT16 irqbits = 0x2000;
 	UINT8 new_state;
 
@@ -724,7 +724,7 @@ static void ioasic_output_full(int state)
  *
  *************************************/
 
-static UINT16 ioasic_fifo_r(void)
+static UINT16 ioasic_fifo_r(const device_config *device)
 {
 	UINT16 result = 0;
 
@@ -759,7 +759,7 @@ static UINT16 ioasic_fifo_r(void)
 }
 
 
-static UINT16 ioasic_fifo_status_r(void)
+static UINT16 ioasic_fifo_status_r(const device_config *device)
 {
 	UINT16 result = 0;
 
@@ -773,9 +773,9 @@ static UINT16 ioasic_fifo_status_r(void)
 	/* kludge alert: if we're reading this from the DCS CPU itself, and we recently cleared */
 	/* the FIFO, and we're within 16 instructions of the read that cleared the FIFO, make */
 	/* sure the FIFO clear bit is set */
-	if (ioasic.fifo_force_buffer_empty_pc && cpunum_get_active() == ioasic.dcs_cpu)
+	if (ioasic.fifo_force_buffer_empty_pc && device == ioasic.dcs_cpu)
 	{
-		offs_t currpc = safe_cpu_get_pc(Machine->activecpu);
+		offs_t currpc = safe_cpu_get_pc(device);
 		if (currpc >= ioasic.fifo_force_buffer_empty_pc && currpc < ioasic.fifo_force_buffer_empty_pc + 0x10)
 		{
 			ioasic.fifo_force_buffer_empty_pc = 0;
@@ -896,7 +896,7 @@ READ32_HANDLER( midway_ioasic_r )
 			if (ioasic.has_dcs)
 			{
 				result |= ((dcs_control_r() >> 4) ^ 0x40) & 0x00c0;
-				result |= ioasic_fifo_status_r() & 0x0038;
+				result |= ioasic_fifo_status_r(space->cpu) & 0x0038;
 				result |= dcs_data2_r() & 0xff00;
 			}
 			else if (ioasic.has_cage)

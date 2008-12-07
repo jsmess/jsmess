@@ -37,11 +37,11 @@ static int palette_bank;
 
 VIDEO_START( wiz )
 {
-	state_save_register_global_array(char_bank);
-	state_save_register_global_array(palbank);
-	state_save_register_global(flipx);
-	state_save_register_global(flipy);
-	state_save_register_global(bgpen);
+	state_save_register_global_array(machine, char_bank);
+	state_save_register_global_array(machine, palbank);
+	state_save_register_global(machine, flipx);
+	state_save_register_global(machine, flipy);
+	state_save_register_global(machine, bgpen);
 }
 
 /***************************************************************************
@@ -226,7 +226,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,
 
 VIDEO_UPDATE( kungfut )
 {
-	fillbitmap(bitmap,bgpen,cliprect);
+	bitmap_fill(bitmap,cliprect,bgpen);
 	draw_background(screen->machine, bitmap, cliprect, 2 + char_bank[0] , 0);
 	draw_foreground(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(screen->machine, bitmap, cliprect, spriteram_2, 4);
@@ -239,7 +239,7 @@ VIDEO_UPDATE( wiz )
 	int bank;
 	const rectangle* visible_area;
 
-	fillbitmap(bitmap,bgpen,cliprect);
+	bitmap_fill(bitmap,cliprect,bgpen);
 	draw_background(screen->machine, bitmap, cliprect, 2 + ((char_bank[0] << 1) | char_bank[1]), 0);
 	draw_foreground(screen->machine, bitmap, cliprect, 0);
 
@@ -255,7 +255,7 @@ VIDEO_UPDATE( wiz )
 
 VIDEO_UPDATE( stinger )
 {
-	fillbitmap(bitmap,bgpen,cliprect);
+	bitmap_fill(bitmap,cliprect,bgpen);
 	draw_background(screen->machine, bitmap, cliprect, 2 + char_bank[0], 1);
 	draw_foreground(screen->machine, bitmap, cliprect, 1);
 	draw_sprites(screen->machine, bitmap, cliprect, spriteram_2, 4);

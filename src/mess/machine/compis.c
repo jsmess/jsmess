@@ -583,7 +583,7 @@ WRITE16_HANDLER ( compis_usart_w )
 static IRQ_CALLBACK(int_callback)
 {
 	if (LOG_INTERRUPTS)
-		logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time()), i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time(device->machine)), i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	cpu_set_input_line(device, 0, CLEAR_LINE);
@@ -698,7 +698,7 @@ generate_int:
 	i186.intr.pending = 1;
 	cpuexec_trigger(machine, CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time()), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time(machine)), new_vector);
 }
 
 
@@ -723,7 +723,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->cpu[0]), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time()), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -736,7 +736,7 @@ static void handle_eoi(running_machine *machine,int data)
 			if ((i186.intr.timer & 7) == i && (i186.intr.in_service & 0x01))
 			{
 				i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time()));
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time(machine)));
 				return;
 			}
 
@@ -745,7 +745,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((i186.intr.dma[j] & 7) == i && (i186.intr.in_service & (0x04 << j)))
 				{
 					i186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time()), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time(machine)), j);
 					return;
 				}
 
@@ -754,7 +754,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((i186.intr.ext[j] & 7) == i && (i186.intr.in_service & (0x10 << j)))
 				{
 					i186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time()), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time(machine)), j);
 					return;
 				}
 		}
@@ -1470,17 +1470,17 @@ WRITE16_HANDLER( i186_internal_port_w )
 /* Name: compis                                                            */
 /* Desc: CPU - Initialize the 80186 CPU                                    */
 /*-------------------------------------------------------------------------*/
-static void compis_cpu_init(void)
+static void compis_cpu_init(running_machine *machine)
 {
 	/* create timers here so they stick around */
-	i186.timer[0].int_timer = timer_alloc(internal_timer_int, NULL);
-	i186.timer[1].int_timer = timer_alloc(internal_timer_int, NULL);
-	i186.timer[2].int_timer = timer_alloc(internal_timer_int, NULL);
-	i186.timer[0].time_timer = timer_alloc(NULL, NULL);
-	i186.timer[1].time_timer = timer_alloc(NULL, NULL);
-	i186.timer[2].time_timer = timer_alloc(NULL, NULL);
-	i186.dma[0].finish_timer = timer_alloc(dma_timer_callback, NULL);
-	i186.dma[1].finish_timer = timer_alloc(dma_timer_callback, NULL);
+	i186.timer[0].int_timer = timer_alloc(machine, internal_timer_int, NULL);
+	i186.timer[1].int_timer = timer_alloc(machine, internal_timer_int, NULL);
+	i186.timer[2].int_timer = timer_alloc(machine, internal_timer_int, NULL);
+	i186.timer[0].time_timer = timer_alloc(machine, NULL, NULL);
+	i186.timer[1].time_timer = timer_alloc(machine, NULL, NULL);
+	i186.timer[2].time_timer = timer_alloc(machine, NULL, NULL);
+	i186.dma[0].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
+	i186.dma[1].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1542,7 +1542,7 @@ DRIVER_INIT( compis )
 MACHINE_RESET( compis )
 {
 	/* CPU */
-	compis_cpu_init();
+	compis_cpu_init(machine);
 
 	/* FDC */
 	nec765_init(machine, &compis_fdc_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);

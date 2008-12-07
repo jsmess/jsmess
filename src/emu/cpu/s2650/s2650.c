@@ -766,18 +766,18 @@ static CPU_INIT( s2650 )
 	s2650c->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	s2650c->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("s2650", device->tag, 0, s2650c->ppc);
-	state_save_register_item("s2650", device->tag, 0, s2650c->page);
-	state_save_register_item("s2650", device->tag, 0, s2650c->iar);
-	state_save_register_item("s2650", device->tag, 0, s2650c->ea);
-	state_save_register_item("s2650", device->tag, 0, s2650c->psl);
-	state_save_register_item("s2650", device->tag, 0, s2650c->psu);
-	state_save_register_item("s2650", device->tag, 0, s2650c->r);
-	state_save_register_item_array("s2650", device->tag, 0, s2650c->reg);
-	state_save_register_item("s2650", device->tag, 0, s2650c->halt);
-	state_save_register_item("s2650", device->tag, 0, s2650c->ir);
-	state_save_register_item_array("s2650", device->tag, 0, s2650c->ras);
-	state_save_register_item("s2650", device->tag, 0, s2650c->irq_state);
+	state_save_register_device_item(device, 0, s2650c->ppc);
+	state_save_register_device_item(device, 0, s2650c->page);
+	state_save_register_device_item(device, 0, s2650c->iar);
+	state_save_register_device_item(device, 0, s2650c->ea);
+	state_save_register_device_item(device, 0, s2650c->psl);
+	state_save_register_device_item(device, 0, s2650c->psu);
+	state_save_register_device_item(device, 0, s2650c->r);
+	state_save_register_device_item_array(device, 0, s2650c->reg);
+	state_save_register_device_item(device, 0, s2650c->halt);
+	state_save_register_device_item(device, 0, s2650c->ir);
+	state_save_register_device_item_array(device, 0, s2650c->ras);
+	state_save_register_device_item(device, 0, s2650c->irq_state);
 }
 
 static CPU_RESET( s2650 )
@@ -806,13 +806,9 @@ static CPU_EXIT( s2650 )
 	/* nothing to do */
 }
 
-static CPU_GET_CONTEXT( s2650 )
-{
-}
+static CPU_GET_CONTEXT( s2650 ) { }
 
-static CPU_SET_CONTEXT( s2650 )
-{
-}
+static CPU_SET_CONTEXT( s2650 ) { }
 
 static void set_irq_line(s2650_regs *s2650c, int irqline, int state)
 {
@@ -1522,7 +1518,7 @@ CPU_GET_INFO( s2650 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(s2650_regs);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

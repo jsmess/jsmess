@@ -888,7 +888,7 @@ static void lynx_blitter(void)
 	}
 
 	if (0)
-		timer_set(ATTOTIME_IN_CYCLES(blitter.memory_accesses*20,0), NULL, 0, lynx_blitter_timer);
+		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], blitter.memory_accesses*20), NULL, 0, lynx_blitter_timer);
 }
 
 
@@ -1007,7 +1007,7 @@ READ8_HANDLER( suzy_read )
 		case 0x92:	/* Better check this with docs! */
 			if (!attotime_compare(blitter.time, attotime_zero))
 			{
-				if (ATTOTIME_TO_CYCLES(0, attotime_sub(timer_get_time(), blitter.time)) > blitter.memory_accesses * 20)
+				if (ATTOTIME_TO_CYCLES(0, attotime_sub(timer_get_time(machine), blitter.time)) > blitter.memory_accesses * 20)
 				{
 					suzy.data[offset] &= ~0x01; //blitter finished
 					blitter.time = attotime_zero;
@@ -1139,7 +1139,7 @@ WRITE8_HANDLER(suzy_write)
 	case 0x91:
 		if (data & 0x01) 
 		{
-			blitter.time = timer_get_time();
+			blitter.time = timer_get_time(machine);
 			lynx_blitter();
 		}
 		break;
@@ -1358,7 +1358,7 @@ static TIMER_CALLBACK(lynx_timer_shot);
 static void lynx_timer_init(int which)
 {
 	memset( &lynx_timer[which], 0, sizeof(LYNX_TIMER) );
-	lynx_timer[which].timer = timer_alloc( lynx_timer_shot , NULL);
+	lynx_timer[which].timer = timer_alloc(machine,  lynx_timer_shot , NULL);
 }
 
 static void lynx_timer_signal_irq(running_machine *machine, int which)
@@ -1537,7 +1537,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 	{
 		uart.data_to_send = uart.buffer;
 		uart.buffer_loaded = FALSE;
-		timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+		timer_set(machine, ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
 	} 
 	else 
 		uart.sending = FALSE;
@@ -1591,7 +1591,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 			{
 				uart.sending = TRUE;
 				uart.data_to_send = data;
-				timer_set(ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+				timer_set(machine, ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
 			}
 			break;
 	}
@@ -1846,8 +1846,8 @@ static STATE_POSTLOAD( lynx_postload )
 
 MACHINE_START( lynx )
 {
-	state_save_register_global(lynx_memory_config);
-	state_save_register_global_pointer(lynx_mem_fe00, lynx_mem_fe00_size);
+	state_save_register_global(machine, lynx_memory_config);
+	state_save_register_global_pointer(machine, lynx_mem_fe00, lynx_mem_fe00_size);
 	state_save_register_postload(machine, lynx_postload, NULL);
 
 	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, "main") + 0x0000, 0);

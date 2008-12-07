@@ -207,7 +207,7 @@ static void (*thom_lightpen_cb) ( int );
 
 void thom_set_lightpen_callback ( int nb, void (*cb) ( int step ) )
 {
-	LOG (( "%f thom_set_lightpen_callback called\n", attotime_to_double(timer_get_time()) ));
+	LOG (( "%f thom_set_lightpen_callback called\n", attotime_to_double(timer_get_time(machine)) ));
 	thom_lightpen_nb = nb;
 	thom_lightpen_cb = cb;
 }
@@ -911,7 +911,7 @@ VIDEO_UPDATE ( thom )
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
 
-	LOG (( "%f thom: video update called\n", attotime_to_double(timer_get_time()) ));
+	LOG (( "%f thom: video update called\n", attotime_to_double(timer_get_time(machine)) ));
 
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
@@ -1023,7 +1023,7 @@ void thom_set_init_callback ( void (*cb) ( int init ) )
 static TIMER_CALLBACK( thom_set_init )
 {
 	int init = param;
-	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time()), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
+	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time(machine)), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
 
 	if ( thom_init_cb )
 		thom_init_cb( init );
@@ -1039,7 +1039,7 @@ VIDEO_EOF ( thom )
 	UINT16 b = 0;
 	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, 0, -1, 0 );
 
-	LOG (( "%f thom: video eof called\n", attotime_to_double(timer_get_time()) ));
+	LOG (( "%f thom: video eof called\n", attotime_to_double(timer_get_time(machine)) ));
 
 	/* floppy indicator count */
 	if ( thom_floppy_wcount )
@@ -1126,47 +1126,47 @@ VIDEO_START ( thom )
 	thom_border_index = 0;
 	thom_vstate_dirty = 1;
 	thom_vstate_last_dirty = 1;
-	state_save_register_global_array( thom_last_pal );
-	state_save_register_global_array( thom_pal );
-	state_save_register_global_array( thom_border_l );
-	state_save_register_global_array( thom_border_r );
-	state_save_register_global_array( thom_vbody );
-	state_save_register_global_array( thom_vmodepage );
-	state_save_register_global_array( thom_vmem_dirty );
-	state_save_register_global( thom_pal_changed );
-	state_save_register_global( thom_vmodepage_changed );
-	state_save_register_global( thom_vmode );
-	state_save_register_global( thom_vpage );
-	state_save_register_global( thom_border_index );
-	state_save_register_global( thom_vstate_dirty );
-	state_save_register_global( thom_vstate_last_dirty );
+	state_save_register_global_array(machine,  thom_last_pal );
+	state_save_register_global_array(machine,  thom_pal );
+	state_save_register_global_array(machine,  thom_border_l );
+	state_save_register_global_array(machine,  thom_border_r );
+	state_save_register_global_array(machine,  thom_vbody );
+	state_save_register_global_array(machine,  thom_vmodepage );
+	state_save_register_global_array(machine,  thom_vmem_dirty );
+	state_save_register_global(machine,  thom_pal_changed );
+	state_save_register_global(machine,  thom_vmodepage_changed );
+	state_save_register_global(machine,  thom_vmode );
+	state_save_register_global(machine,  thom_vpage );
+	state_save_register_global(machine,  thom_border_index );
+	state_save_register_global(machine,  thom_vstate_dirty );
+	state_save_register_global(machine,  thom_vstate_last_dirty );
 
 	thom_mode_point = 0;
-	state_save_register_global( thom_mode_point );
+	state_save_register_global(machine,  thom_mode_point );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 
 	thom_floppy_rcount = 0;
 	thom_floppy_wcount = 0;
-	state_save_register_global( thom_floppy_wcount );
-	state_save_register_global( thom_floppy_rcount );
+	state_save_register_global(machine,  thom_floppy_wcount );
+	state_save_register_global(machine,  thom_floppy_rcount );
 	output_set_value( "floppy", 0 );
 
-	thom_video_timer = timer_alloc( NULL , NULL);
+	thom_video_timer = timer_alloc(machine,  NULL , NULL);
 
-	thom_scanline_timer = timer_alloc( thom_scanline_start , NULL);
+	thom_scanline_timer = timer_alloc(machine,  thom_scanline_start , NULL);
 
 	thom_lightpen_nb = 0;
 	thom_lightpen_cb = NULL;
-	thom_lightpen_timer = timer_alloc( thom_lightpen_step , NULL);
-	state_save_register_global( thom_lightpen_nb );
+	thom_lightpen_timer = timer_alloc(machine,  thom_lightpen_step , NULL);
+	state_save_register_global(machine,  thom_lightpen_nb );
 
 	thom_init_cb = NULL;
-	thom_init_timer = timer_alloc( thom_set_init , NULL);
+	thom_init_timer = timer_alloc(machine,  thom_set_init , NULL);
 
-	state_save_register_global( thom_bwidth );
-	state_save_register_global( thom_bheight );
-	state_save_register_global( thom_hires );
-	state_save_register_global( thom_hires_better );
+	state_save_register_global(machine,  thom_bwidth );
+	state_save_register_global(machine,  thom_bheight );
+	state_save_register_global(machine,  thom_hires );
+	state_save_register_global(machine,  thom_hires_better );
 }
 
 

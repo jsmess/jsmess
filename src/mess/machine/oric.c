@@ -1124,7 +1124,7 @@ static void oric_common_init_machine(running_machine *machine)
 	oric_irqs = 0;
 	oric_ram_0x0c000 = NULL;
 
-    timer_pulse(ATTOTIME_IN_HZ(4800), NULL, 0, oric_refresh_tape);
+    timer_pulse(machine, ATTOTIME_IN_HZ(4800), NULL, 0, oric_refresh_tape);
 
 	via_reset();
 	via_config(0, &oric_6522_interface);

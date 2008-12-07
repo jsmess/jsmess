@@ -173,7 +173,7 @@ MACHINE_RESET( cgenie )
 
 	cass_level = 0;
 	cass_bit = 1;
-	timer_pulse( ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
 }
 
 MACHINE_START( cgenie )

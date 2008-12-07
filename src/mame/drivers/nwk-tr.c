@@ -517,7 +517,7 @@ void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *clipre
 {
 	int layer;
 	int num_layers;
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	num_layers = K001604_layer_size ? 2 : 1;
 
@@ -720,7 +720,7 @@ static VIDEO_UPDATE( nwktr )
 {
 	const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
 
-	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -1158,7 +1158,7 @@ static DRIVER_INIT(nwktr)
 	sharc_dataram = auto_malloc(0x100000);
 	led_reg0 = led_reg1 = 0x7f;
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 	K033906_init();
 
 //  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);

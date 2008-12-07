@@ -239,8 +239,8 @@ MACHINE_START( qixmcu )
 	pia_config(5, &qix_pia_5_intf);
 
 	/* set up save states */
-	state_save_register_global_array(state->_68705_port_in);
-	state_save_register_global(state->coinctrl);
+	state_save_register_global_array(machine, state->_68705_port_in);
+	state_save_register_global(machine, state->coinctrl);
 }
 
 MACHINE_START( slither )
@@ -365,7 +365,7 @@ static TIMER_CALLBACK( deferred_pia_4_porta_w )
 static WRITE8_HANDLER( sync_pia_4_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	timer_call_after_resynch(NULL, data, deferred_pia_4_porta_w);
+	timer_call_after_resynch(space->machine, NULL, data, deferred_pia_4_porta_w);
 }
 
 
@@ -425,7 +425,8 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 {
 	qix_state *state = space->machine->driver_data;
 
-	if (!(data & 0x04))
+	/* if (!(data & 0x04)) */
+	if (data & 0x04)
 	{
 		cpu_set_input_line(space->machine->cpu[3], M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
@@ -535,7 +536,7 @@ WRITE8_HANDLER( qix_pia_0_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	timer_call_after_resynch(NULL, data | (offset << 8), pia_0_w_callback);
+	timer_call_after_resynch(space->machine, NULL, data | (offset << 8), pia_0_w_callback);
 }
 
 

@@ -263,11 +263,11 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 }
 
 
-static void create_interrupt_timers(void)
+static void create_interrupt_timers(running_machine *machine)
 {
-	display_position_interrupt_timer = timer_alloc(display_position_interrupt_callback, NULL);
-	display_position_vblank_timer = timer_alloc(display_position_vblank_callback, NULL);
-	vblank_interrupt_timer = timer_alloc(vblank_interrupt_callback, NULL);
+	display_position_interrupt_timer = timer_alloc(machine, display_position_interrupt_callback, NULL);
+	display_position_vblank_timer = timer_alloc(machine, display_position_vblank_callback, NULL);
+	vblank_interrupt_timer = timer_alloc(machine, vblank_interrupt_callback, NULL);
 }
 
 
@@ -592,7 +592,7 @@ static CUSTOM_INPUT( get_audio_result )
 {
 	UINT32 ret = audio_result;
 
-//  if (LOG_CPU_COMM && (cpunum_get_active() >= 0)) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(machine->activecpu), ret);
+//  if (LOG_CPU_COMM && (field->port->machine->activecpu != NULL)) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->port->machine->activecpu), ret);
 
 	return ret;
 }
@@ -958,7 +958,7 @@ static MACHINE_START( neogeo )
 	/* set the initial audio CPU ROM banks */
 	audio_cpu_banking_init(machine);
 
-	create_interrupt_timers();
+	create_interrupt_timers(machine);
 
 	/* initialize the celander IC to 'right now' */
 	calendar_init(machine);
@@ -970,25 +970,25 @@ static MACHINE_START( neogeo )
 	irq3_pending = 1;
 
 	/* register state save */
-	state_save_register_global(display_position_interrupt_control);
-	state_save_register_global(display_counter);
-	state_save_register_global(vblank_interrupt_pending);
-	state_save_register_global(display_position_interrupt_pending);
-	state_save_register_global(irq3_pending);
-	state_save_register_global(audio_result);
-	state_save_register_global(controller_select);
-	state_save_register_global(main_cpu_bank_address);
-	state_save_register_global(main_cpu_vector_table_source);
-	state_save_register_global_array(audio_cpu_banks);
-	state_save_register_global(audio_cpu_rom_source);
-	state_save_register_global(audio_cpu_rom_source_last);
-	state_save_register_global(save_ram_unlocked);
-	state_save_register_global_pointer(memcard_data, 0x800);
-	state_save_register_global(output_data);
-	state_save_register_global(output_latch);
-	state_save_register_global(el_value);
-	state_save_register_global(led1_value);
-	state_save_register_global(led2_value);
+	state_save_register_global(machine, display_position_interrupt_control);
+	state_save_register_global(machine, display_counter);
+	state_save_register_global(machine, vblank_interrupt_pending);
+	state_save_register_global(machine, display_position_interrupt_pending);
+	state_save_register_global(machine, irq3_pending);
+	state_save_register_global(machine, audio_result);
+	state_save_register_global(machine, controller_select);
+	state_save_register_global(machine, main_cpu_bank_address);
+	state_save_register_global(machine, main_cpu_vector_table_source);
+	state_save_register_global_array(machine, audio_cpu_banks);
+	state_save_register_global(machine, audio_cpu_rom_source);
+	state_save_register_global(machine, audio_cpu_rom_source_last);
+	state_save_register_global(machine, save_ram_unlocked);
+	state_save_register_global_pointer(machine, memcard_data, 0x800);
+	state_save_register_global(machine, output_data);
+	state_save_register_global(machine, output_latch);
+	state_save_register_global(machine, el_value);
+	state_save_register_global(machine, led1_value);
+	state_save_register_global(machine, led2_value);
 
 	state_save_register_postload(machine, neogeo_postload, NULL);
 }

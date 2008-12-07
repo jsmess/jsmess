@@ -7,6 +7,7 @@
 */
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "cpu/apexc/apexc.h"
 
 

@@ -1387,64 +1387,64 @@ static DEVICE_START( mc68901 )
 	mc68901->tsr = MC68901_TSR_BUFFER_EMPTY;
 
 	/* create the timers */
-	mc68901->timer[MC68901_TIMER_A] = timer_alloc(timer_a, (void *)device);
-	mc68901->timer[MC68901_TIMER_B] = timer_alloc(timer_b, (void *)device);
-	mc68901->timer[MC68901_TIMER_C] = timer_alloc(timer_c, (void *)device);
-	mc68901->timer[MC68901_TIMER_D] = timer_alloc(timer_d, (void *)device);
+	mc68901->timer[MC68901_TIMER_A] = timer_alloc(device->machine, timer_a, (void *)device);
+	mc68901->timer[MC68901_TIMER_B] = timer_alloc(device->machine, timer_b, (void *)device);
+	mc68901->timer[MC68901_TIMER_C] = timer_alloc(device->machine, timer_c, (void *)device);
+	mc68901->timer[MC68901_TIMER_D] = timer_alloc(device->machine, timer_d, (void *)device);
 
 	if (mc68901->intf->rx_clock > 0)
 	{
-		mc68901->rx_timer = timer_alloc(rx_tick, (void *)device);
+		mc68901->rx_timer = timer_alloc(device->machine, rx_tick, (void *)device);
 		timer_adjust_periodic(mc68901->rx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(mc68901->intf->rx_clock));
 	}
 
 	if (mc68901->intf->tx_clock > 0)
 	{
-		mc68901->tx_timer = timer_alloc(tx_tick, (void *)device);
+		mc68901->tx_timer = timer_alloc(device->machine, tx_tick, (void *)device);
 		timer_adjust_periodic(mc68901->tx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(mc68901->intf->tx_clock));
 	}
 
 	if (mc68901->intf->gpio_r)
 	{
-		mc68901->poll_timer = timer_alloc(mc68901_gpio_poll_tick, (void *)device);
+		mc68901->poll_timer = timer_alloc(device->machine, mc68901_gpio_poll_tick, (void *)device);
 		timer_adjust_periodic(mc68901->poll_timer, attotime_zero, 0, ATTOTIME_IN_HZ(mc68901->intf->chip_clock / 4));
 	}
 
 	/* register for state saving */
-	state_save_register_item("MC68901",device->tag, 0, mc68901->gpip);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->aer);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->ddr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->ier);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->ipr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->isr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->imr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->vr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tacr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tbcr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tcdcr);
-	state_save_register_item_array("MC68901",device->tag, 0, mc68901->tdr);
-	state_save_register_item_array("MC68901",device->tag, 0, mc68901->tmc);
-	state_save_register_item_array("MC68901",device->tag, 0, mc68901->to);
-	state_save_register_item_array("MC68901",device->tag, 0, mc68901->ti);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->scr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->ucr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rsr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tsr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->udr);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_bits);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_bits);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_parity);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_parity);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_state);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_state);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rx_buffer);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->tx_buffer);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->xmit_state);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rxtx_word);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rxtx_start);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rxtx_stop);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->rsr_read);
-	state_save_register_item("MC68901",device->tag, 0, mc68901->next_rsr);
+	state_save_register_device_item(device, 0, mc68901->gpip);
+	state_save_register_device_item(device, 0, mc68901->aer);
+	state_save_register_device_item(device, 0, mc68901->ddr);
+	state_save_register_device_item(device, 0, mc68901->ier);
+	state_save_register_device_item(device, 0, mc68901->ipr);
+	state_save_register_device_item(device, 0, mc68901->isr);
+	state_save_register_device_item(device, 0, mc68901->imr);
+	state_save_register_device_item(device, 0, mc68901->vr);
+	state_save_register_device_item(device, 0, mc68901->tacr);
+	state_save_register_device_item(device, 0, mc68901->tbcr);
+	state_save_register_device_item(device, 0, mc68901->tcdcr);
+	state_save_register_device_item_array(device, 0, mc68901->tdr);
+	state_save_register_device_item_array(device, 0, mc68901->tmc);
+	state_save_register_device_item_array(device, 0, mc68901->to);
+	state_save_register_device_item_array(device, 0, mc68901->ti);
+	state_save_register_device_item(device, 0, mc68901->scr);
+	state_save_register_device_item(device, 0, mc68901->ucr);
+	state_save_register_device_item(device, 0, mc68901->rsr);
+	state_save_register_device_item(device, 0, mc68901->tsr);
+	state_save_register_device_item(device, 0, mc68901->udr);
+	state_save_register_device_item(device, 0, mc68901->rx_bits);
+	state_save_register_device_item(device, 0, mc68901->tx_bits);
+	state_save_register_device_item(device, 0, mc68901->rx_parity);
+	state_save_register_device_item(device, 0, mc68901->tx_parity);
+	state_save_register_device_item(device, 0, mc68901->rx_state);
+	state_save_register_device_item(device, 0, mc68901->tx_state);
+	state_save_register_device_item(device, 0, mc68901->rx_buffer);
+	state_save_register_device_item(device, 0, mc68901->tx_buffer);
+	state_save_register_device_item(device, 0, mc68901->xmit_state);
+	state_save_register_device_item(device, 0, mc68901->rxtx_word);
+	state_save_register_device_item(device, 0, mc68901->rxtx_start);
+	state_save_register_device_item(device, 0, mc68901->rxtx_stop);
+	state_save_register_device_item(device, 0, mc68901->rsr_read);
+	state_save_register_device_item(device, 0, mc68901->next_rsr);
 	return DEVICE_START_OK;
 }
 

@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "device.h"
 #include "cococart.h"
 
@@ -17,7 +18,7 @@
 
 static void pak_init(coco_cartridge *cartridge)
 {
-	cococart_set_line(cartridge, COCOCART_LINE_CART, COCOCART_LINE_VALUE_Q);
+	cococart_set_line(Machine, cartridge, COCOCART_LINE_CART, COCOCART_LINE_VALUE_Q);
 }
 
 
@@ -51,7 +52,7 @@ void cococart_pak(UINT32 state, cococartinfo *info)
 
 static void banked_pak_set_bank(coco_cartridge *cartridge, UINT32 bank)
 {
-	cococart_map_memory(cartridge, bank * 0x4000, 0x3FFF);
+	cococart_map_memory(Machine, cartridge, bank * 0x4000, 0x3FFF);
 }
 
 

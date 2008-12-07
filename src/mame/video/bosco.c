@@ -151,10 +151,10 @@ VIDEO_START( bosco )
 	bosco_radary = bosco_radarx + 0x0800;
 
 
-	state_save_register_global(stars_scrollx);
-	state_save_register_global(stars_scrolly);
-	state_save_register_global(bosco_starcontrol);
-	state_save_register_global_array(bosco_starblink);
+	state_save_register_global(machine, stars_scrollx);
+	state_save_register_global(machine, stars_scrolly);
+	state_save_register_global(machine, bosco_starcontrol);
+	state_save_register_global_array(machine, bosco_starblink);
 }
 
 
@@ -308,7 +308,7 @@ VIDEO_UPDATE( bosco )
 		fg_clip.min_x = 28*8;
 	}
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_stars(bitmap,cliprect);
 
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);

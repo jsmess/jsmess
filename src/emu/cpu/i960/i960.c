@@ -1958,13 +1958,9 @@ static CPU_EXECUTE( i960 )
 	return cycles - i960->icount;
 }
 
-static CPU_GET_CONTEXT( i960 )
-{
-}
+static CPU_GET_CONTEXT( i960 ) { }
 
-static CPU_SET_CONTEXT( i960 )
-{
-}
+static CPU_SET_CONTEXT( i960 ) { }
 
 static void set_irq_line(i960_state_t *i960, int irqline, int state)
 {
@@ -2064,16 +2060,16 @@ static CPU_INIT( i960 )
 	i960->device = device;
 	i960->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("i960", device->tag, 0, i960->PIP);
-	state_save_register_item("i960", device->tag, 0, i960->SAT);
-	state_save_register_item("i960", device->tag, 0, i960->PRCB);
-	state_save_register_item("i960", device->tag, 0, i960->PC);
-	state_save_register_item("i960", device->tag, 0, i960->AC);
-	state_save_register_item("i960", device->tag, 0, i960->ICR);
-	state_save_register_item_array("i960", device->tag, 0, i960->r);
- 	state_save_register_item_array("i960", device->tag, 0, i960->fp);
-	state_save_register_item_2d_array("i960", device->tag, 0, i960->rcache);
-	state_save_register_item_array("i960", device->tag, 0, i960->rcache_frame_addr);
+	state_save_register_device_item(device, 0, i960->PIP);
+	state_save_register_device_item(device, 0, i960->SAT);
+	state_save_register_device_item(device, 0, i960->PRCB);
+	state_save_register_device_item(device, 0, i960->PC);
+	state_save_register_device_item(device, 0, i960->AC);
+	state_save_register_device_item(device, 0, i960->ICR);
+	state_save_register_device_item_array(device, 0, i960->r);
+ 	state_save_register_device_item_array(device, 0, i960->fp);
+	state_save_register_device_item_2d_array(device, 0, i960->rcache);
+	state_save_register_device_item_array(device, 0, i960->rcache_frame_addr);
 }
 
 static CPU_DISASSEMBLE( i960  )
@@ -2158,7 +2154,7 @@ CPU_GET_INFO( i960 )
 	case CPUINFO_STR_NAME:					strcpy(info->s, "i960KB");							break;
 	case CPUINFO_STR_CORE_FILE:				strcpy(info->s, __FILE__);							break;
 	case CPUINFO_STR_FLAGS:					strcpy(info->s, i960_get_strflags(i960));			break;
-	case CPUINFO_INT_ENDIANNESS:			info->i = CPU_IS_LE;								break;
+	case CPUINFO_INT_ENDIANNESS:			info->i = ENDIANNESS_LITTLE;								break;
 	case CPUINFO_INT_INPUT_LINES:			info->i = 4;										break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:	info->i = -1;										break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:		info->i = 1;										break;

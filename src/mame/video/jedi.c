@@ -33,8 +33,8 @@ static VIDEO_START( jedi )
 	jedi_state *state = machine->driver_data;
 
 	/* register for saving */
-	state_save_register_global(state->vscroll);
-	state_save_register_global(state->hscroll);
+	state_save_register_global(machine, state->vscroll);
+	state_save_register_global(machine, state->hscroll);
 }
 
 
@@ -333,7 +333,7 @@ static VIDEO_UPDATE( jedi )
 
 	/* if no video, clear it all to black */
 	if (*state->video_off & 0x01)
-		fillbitmap(bitmap, RGB_BLACK, cliprect);
+		bitmap_fill(bitmap, cliprect, RGB_BLACK);
 	else
 	{
 		/* draw the background/text layers, followed by the sprites

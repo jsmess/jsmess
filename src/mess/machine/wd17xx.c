@@ -399,10 +399,10 @@ void wd17xx_init(running_machine *machine, wd17xx_type_t type, void (*callback)(
 	wd.callback_param = param;
 //	wd.status_ipl = STA_1_IPL;
 	wd.density = DEN_MFM_LO;
-	busy_timer = timer_alloc(wd17xx_busy_callback, &wd);
-	wd.timer = timer_alloc(wd17xx_misc_timer_callback, NULL);
-	wd.timer_rs = timer_alloc(wd17xx_read_sector_callback, NULL);
-	wd.timer_ws = timer_alloc(wd17xx_write_sector_callback, NULL);
+	busy_timer = timer_alloc(machine, wd17xx_busy_callback, &wd);
+	wd.timer = timer_alloc(machine, wd17xx_misc_timer_callback, NULL);
+	wd.timer_rs = timer_alloc(machine, wd17xx_read_sector_callback, NULL);
+	wd.timer_ws = timer_alloc(machine, wd17xx_write_sector_callback, NULL);
 	wd17xx_pause_time = 40;
 	wd17xx_reset(machine);
 }

@@ -117,7 +117,7 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 			}
 
 			#if BW_DEBUG
-				logerror("(%1d)%04x: w=%02x a=%04x f=%d\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,0x1b00+offset,video_screen_get_frame_number(space->machine->primary_screen));
+				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", space->cpu->tag, cpu_get_pc(space->cpu),data,0x1b00+offset,video_screen_get_frame_number(space->machine->primary_screen));
 			#endif
 		break;
 	}
@@ -274,7 +274,7 @@ VIDEO_UPDATE( bwing )
 		tilemap_draw(bitmap, cliprect, bgmap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	// draw low priority sprites
 	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram, 0);

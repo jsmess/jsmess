@@ -361,7 +361,7 @@ static WRITE8_HANDLER( pia_portb_w )
 	sn76489_ready = 0;
 
 	// wait 32 cycles of 2 MHz to synchronize CPU and SN76489
-	timer_set(ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
+	timer_set(machine, ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
 }
 
 static WRITE8_HANDLER( pia_cb2_w )
@@ -387,8 +387,8 @@ static const pia6821_interface crvision_pia_intf =
 
 static MACHINE_START( crvision )
 {
-	state_save_register_global(keylatch);
-	state_save_register_global(sn76489_ready);
+	state_save_register_global(machine, keylatch);
+	state_save_register_global(machine, sn76489_ready);
 
 	TMS9928A_configure(&tms9918_intf);
 	pia_config(0, &crvision_pia_intf);
@@ -396,8 +396,8 @@ static MACHINE_START( crvision )
 
 static MACHINE_START( fnvision )
 {
-	state_save_register_global(keylatch);
-	state_save_register_global(sn76489_ready);
+	state_save_register_global(machine, keylatch);
+	state_save_register_global(machine, sn76489_ready);
 
 	TMS9928A_configure(&tms9929_intf);
 	pia_config(0, &crvision_pia_intf);

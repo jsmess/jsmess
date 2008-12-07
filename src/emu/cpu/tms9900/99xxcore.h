@@ -86,6 +86,7 @@ Other references can be found on spies.com:
 */
 
 #include "debugger.h"
+#include "cpuexec.h"
 #include "deprecat.h"
 #include "tms9900.h"
 
@@ -933,7 +934,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			/* read decrementer */
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				return ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
+				return ceil(cpu_attotime_to_clocks(I.device, attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				return I.decrementer_count;
@@ -997,7 +998,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				value = ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
+				value = ceil(cpu_attotime_to_clocks(I.device, attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				value = I.decrementer_count;
@@ -1206,76 +1207,76 @@ static void set_flag1(int val);
 
 static void register_for_save_state(const device_config *device)
 {
-	state_save_register_item("tms99xx", device->tag, 0, I.WP);
-	state_save_register_item("tms99xx", device->tag, 0, I.PC);
-	state_save_register_item("tms99xx", device->tag, 0, I.STATUS);
-	state_save_register_item("tms99xx", device->tag, 0, I.interrupt_pending);
+	state_save_register_device_item(device, 0, I.WP);
+	state_save_register_device_item(device, 0, I.PC);
+	state_save_register_device_item(device, 0, I.STATUS);
+	state_save_register_device_item(device, 0, I.interrupt_pending);
 
 #if ! ((TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID))
-	state_save_register_item("tms99xx", device->tag, 0, I.load_state);
+	state_save_register_device_item(device, 0, I.load_state);
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID) || (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9980_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.irq_level);
-	state_save_register_item("tms99xx", device->tag, 0, I.irq_state);
+	state_save_register_device_item(device, 0, I.irq_level);
+	state_save_register_device_item(device, 0, I.irq_state);
 #elif (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.irq_level);
-	state_save_register_item("tms99xx", device->tag, 0, I.int_state);
-	state_save_register_item("tms99xx", device->tag, 0, I.int_latch);
+	state_save_register_device_item(device, 0, I.irq_level);
+	state_save_register_device_item(device, 0, I.int_state);
+	state_save_register_device_item(device, 0, I.int_latch);
 #endif
 
-	state_save_register_item("tms99xx", device->tag, 0, I.IDLE);
+	state_save_register_device_item(device, 0, I.IDLE);
 
 #if HAS_MAPPING
-	state_save_register_item("tms99xx", device->tag, 0, I.mapping_on);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].L);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].B);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].limit);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].bias);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].L);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].B);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].limit);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].bias);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].L);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].B);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].limit);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].bias);
-	state_save_register_item("tms99xx", device->tag, 0, I.cur_map);
-	state_save_register_item("tms99xx", device->tag, 0, I.cur_src_map);
-	state_save_register_item("tms99xx", device->tag, 0, I.cur_dst_map);
+	state_save_register_device_item(device, 0, I.mapping_on);
+	state_save_register_device_item_array(device, 0, I.map_files[0].L);
+	state_save_register_device_item_array(device, 0, I.map_files[0].B);
+	state_save_register_device_item_array(device, 0, I.map_files[0].limit);
+	state_save_register_device_item_array(device, 0, I.map_files[0].bias);
+	state_save_register_device_item_array(device, 0, I.map_files[1].L);
+	state_save_register_device_item_array(device, 0, I.map_files[1].B);
+	state_save_register_device_item_array(device, 0, I.map_files[1].limit);
+	state_save_register_device_item_array(device, 0, I.map_files[1].bias);
+	state_save_register_device_item_array(device, 0, I.map_files[2].L);
+	state_save_register_device_item_array(device, 0, I.map_files[2].B);
+	state_save_register_device_item_array(device, 0, I.map_files[2].limit);
+	state_save_register_device_item_array(device, 0, I.map_files[2].bias);
+	state_save_register_device_item(device, 0, I.cur_map);
+	state_save_register_device_item(device, 0, I.cur_src_map);
+	state_save_register_device_item(device, 0, I.cur_dst_map);
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.reset_maperr);
-	state_save_register_item("tms99xx", device->tag, 0, I.mapper_address_latch);
-	state_save_register_item("tms99xx", device->tag, 0, I.mapper_cru_read_register);
-	state_save_register_item("tms99xx", device->tag, 0, I.diaglat);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.latch_control);
+	state_save_register_device_item(device, 0, I.reset_maperr);
+	state_save_register_device_item(device, 0, I.mapper_address_latch);
+	state_save_register_device_item(device, 0, I.mapper_cru_read_register);
+	state_save_register_device_item(device, 0, I.diaglat);
+	state_save_register_device_item_array(device, 0, I.latch_control);
 #endif
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.error_interrupt_register);
+	state_save_register_device_item(device, 0, I.error_interrupt_register);
 #endif
 
 #if (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item_array("tms99xx", device->tag, 0, I.RAM);
+	state_save_register_device_item_array(device, 0, I.RAM);
 #endif
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_enabled);
-	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_interval);
-	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_count);
+	state_save_register_device_item(device, 0, I.decrementer_enabled);
+	state_save_register_device_item(device, 0, I.decrementer_interval);
+	state_save_register_device_item(device, 0, I.decrementer_count);
 #endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.flag);
-	state_save_register_item("tms99xx", device->tag, 0, I.MID_flag);
-	state_save_register_item("tms99xx", device->tag, 0, I.memory_wait_states_byte);
-	state_save_register_item("tms99xx", device->tag, 0, I.memory_wait_states_word);
-	state_save_register_item("tms99xx", device->tag, 0, I.is_mp9537);
+	state_save_register_device_item(device, 0, I.flag);
+	state_save_register_device_item(device, 0, I.MID_flag);
+	state_save_register_device_item(device, 0, I.memory_wait_states_byte);
+	state_save_register_device_item(device, 0, I.memory_wait_states_word);
+	state_save_register_device_item(device, 0, I.is_mp9537);
 #endif
 
-	state_save_register_item("tms99xx", device->tag, 0, I.disable_interrupt_recognition);
+	state_save_register_device_item(device, 0, I.disable_interrupt_recognition);
 }
 
 
@@ -1292,7 +1293,7 @@ static CPU_INIT( tms99xx )
 	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	I.timer = timer_alloc(decrementer_callback, NULL);
+	I.timer = timer_alloc(device->machine, decrementer_callback, NULL);
 #endif
 
 	I.idle_callback = param ? param->idle_callback : NULL;
@@ -1830,7 +1831,7 @@ static void reset_decrementer(void)
 
 	if (I.decrementer_enabled && ! (I.flag & 1))
 		{	/* timer */
-		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpunum_get_active());
+		attotime period = cpu_clocks_to_attotime(I.device, I.decrementer_interval * 16L);
 		timer_adjust_periodic(I.timer, period, 0, period);
 	}
 }
@@ -4690,7 +4691,7 @@ void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(I);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;

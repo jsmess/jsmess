@@ -100,16 +100,16 @@ static SND_START( ym2612 )
 
 	/* FM init */
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(timer_callback_2612_0, info);
-	info->timer[1] = timer_alloc(timer_callback_2612_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_2612_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_2612_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2612_stream_update);
 
 	/**** initialize YM2612 ****/
-	info->chip = ym2612_init(info,tag,clock,rate,timer_handler,IRQHandler);
+	info->chip = ym2612_init(info,device,clock,rate,timer_handler,IRQHandler);
 
-	state_save_register_postload(Machine, ym2612_intf_postload, info);
+	state_save_register_postload(device->machine, ym2612_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -120,13 +120,13 @@ static SND_START( ym2612 )
 
 static SND_STOP( ym2612 )
 {
-	struct ym2612_info *info = token;
+	struct ym2612_info *info = device->token;
 	ym2612_shutdown(info->chip);
 }
 
 static SND_RESET( ym2612 )
 {
-	struct ym2612_info *info = token;
+	struct ym2612_info *info = device->token;
 	ym2612_reset_chip(info->chip);
 }
 

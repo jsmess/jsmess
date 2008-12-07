@@ -27,7 +27,6 @@ Revisions:
 *********************************************************/
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "iremga20.h"
 
@@ -206,9 +205,8 @@ READ16_HANDLER( irem_ga20_r )
 	return 0;
 }
 
-static SND_RESET( iremga20 )
+static void iremga20_reset(struct IremGA20_chip_def *chip)
 {
-	struct IremGA20_chip_def *chip = token;
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
@@ -226,6 +224,11 @@ static SND_RESET( iremga20 )
 }
 
 
+static SND_RESET( iremga20 )
+{
+	iremga20_reset(device->token);
+}
+
 static SND_START( iremga20 )
 {
 	struct IremGA20_chip_def *chip;
@@ -235,28 +238,28 @@ static SND_START( iremga20 )
 	memset(chip, 0, sizeof(*chip));
 
 	/* Initialize our chip structure */
-	chip->rom = memory_region(Machine, tag);
-	chip->rom_size = memory_region_length(Machine, tag);
+	chip->rom = device->region;
+	chip->rom_size = device->regionbytes;
 
-	SND_RESET_NAME( iremga20 )(chip);
+	iremga20_reset(chip);
 
 	for ( i = 0; i < 0x40; i++ )
 		chip->regs[i] = 0;
 
 	chip->stream = stream_create( 0, 2, clock/4, chip, IremGA20_update );
 
-	state_save_register_item_array("irem_ga20", tag, sndindex, chip->regs);
+	state_save_register_device_item_array(device, sndindex, chip->regs);
 	for (i = 0; i < 4; i++)
 	{
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].rate);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].size);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].start);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].pos);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].end);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].volume);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].pan);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].effect);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].play);
+		state_save_register_device_item(device, i, chip->channel[i].rate);
+		state_save_register_device_item(device, i, chip->channel[i].size);
+		state_save_register_device_item(device, i, chip->channel[i].start);
+		state_save_register_device_item(device, i, chip->channel[i].pos);
+		state_save_register_device_item(device, i, chip->channel[i].end);
+		state_save_register_device_item(device, i, chip->channel[i].volume);
+		state_save_register_device_item(device, i, chip->channel[i].pan);
+		state_save_register_device_item(device, i, chip->channel[i].effect);
+		state_save_register_device_item(device, i, chip->channel[i].play);
 	}
 
 	return chip;

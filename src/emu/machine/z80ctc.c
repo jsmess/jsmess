@@ -465,17 +465,17 @@ static DEVICE_START( z80ctc )
 	const z80ctc_interface *intf = device->static_config;
 	astring *tempstring = astring_alloc();
 	z80ctc *ctc = get_safe_token(device);
-	int cpunum = -1;
+	const device_config *cpu = NULL;
 	int ch;
 
 	if (intf->cpu != NULL)
 	{
-		cpunum = mame_find_cpu_index(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
-		if (cpunum == -1)
+		cpu = cputag_get_cpu(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
+		if (cpu == NULL)
 			fatalerror("Z80CTC:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
 	}
-	if (cpunum != -1)
-		ctc->clock = device->machine->config->cpu[cpunum].clock;
+	if (cpu != NULL)
+		ctc->clock = cpu_get_clock(cpu);
 	else
 		ctc->clock = intf->baseclock;
 	ctc->period16 = attotime_mul(ATTOTIME_IN_HZ(ctc->clock), 16);
@@ -485,7 +485,7 @@ static DEVICE_START( z80ctc )
 		ctc_channel *channel = &ctc->channel[ch];
 		void *ptr = (void *)device;
 		channel->notimer = (intf->notimer >> ch) & 1;
-		channel->timer = timer_alloc(timercallback, ptr);
+		channel->timer = timer_alloc(device->machine, timercallback, ptr);
 	}
 	ctc->intr = intf->intr;
 	ctc->channel[0].zc = intf->zc0;
@@ -494,15 +494,15 @@ static DEVICE_START( z80ctc )
 	ctc->channel[3].zc = NULL;
 
 	/* register for save states */
-    state_save_register_item("z80ctc", device->tag, 0, ctc->vector);
+    state_save_register_device_item(device, 0, ctc->vector);
     for (ch = 0; ch < 4; ch++)
     {
 		ctc_channel *channel = &ctc->channel[ch];
-	    state_save_register_item("z80ctc", device->tag, ch, channel->mode);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->tconst);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->down);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->extclk);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->int_state);
+	    state_save_register_device_item(device, ch, channel->mode);
+	    state_save_register_device_item(device, ch, channel->tconst);
+	    state_save_register_device_item(device, ch, channel->down);
+	    state_save_register_device_item(device, ch, channel->extclk);
+	    state_save_register_device_item(device, ch, channel->int_state);
 	}
 
 	astring_free(tempstring);

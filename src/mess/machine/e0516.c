@@ -200,19 +200,19 @@ static DEVICE_START( e0516 )
 	assert(e0516->intf->clock > 0);
 
 	/* create the timers */
-	e0516->clock_timer = timer_alloc(clock_tick, (void *)device);
+	e0516->clock_timer = timer_alloc(machine, clock_tick, (void *)device);
 	timer_adjust_periodic(e0516->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(e0516->intf->clock / 32768));
 
 	/* register for state saving */
-	state_save_register_item("e0516", device->tag, 0, e0516->cs);
-	state_save_register_item("e0516", device->tag, 0, e0516->data_latch);
-	state_save_register_item("e0516", device->tag, 0, e0516->reg_latch);
-	state_save_register_item("e0516", device->tag, 0, e0516->read_write);
-	state_save_register_item("e0516", device->tag, 0, e0516->state);
-	state_save_register_item("e0516", device->tag, 0, e0516->bits);
-	state_save_register_item("e0516", device->tag, 0, e0516->dio);
+	state_save_register_item(machine, "e0516", device->tag, 0, e0516->cs);
+	state_save_register_item(machine, "e0516", device->tag, 0, e0516->data_latch);
+	state_save_register_item(machine, "e0516", device->tag, 0, e0516->reg_latch);
+	state_save_register_item(machine, "e0516", device->tag, 0, e0516->read_write);
+	state_save_register_item(machine, "e0516", device->tag, 0, e0516->state);
+	state_save_register_item(machine, "e0516", device->tag, 0, e0516->bits);
+	state_save_register_item(machine, "e0516", device->tag, 0, e0516->dio);
 
-	state_save_register_item_array("e0516", device->tag, 0, e0516->reg);
+	state_save_register_item_array(machine, "e0516", device->tag, 0, e0516->reg);
 	return DEVICE_START_OK;
 }
 

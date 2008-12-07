@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_READ( sid6581_0_port_r )
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_READ( cia_0_r )
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD( CIA6526R1, "cia", cia_r )
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_READ( tpi6525_0_port_r)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_READ( tpi6525_1_port_r)
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_WRITE( sid6581_0_port_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_WRITE( cia_0_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE( CIA6526R1, "cia", cia_w)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_WRITE( tpi6525_0_port_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_WRITE( tpi6525_1_port_w)
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( p500_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_READ( sid6581_0_port_r )
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_READ( cia_0_r )
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD( CIA6526R1, "cia", cia_r )
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_READ( tpi6525_0_port_r)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_READ( tpi6525_1_port_r)
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( p500_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_WRITE( sid6581_0_port_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_WRITE( cia_0_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE( CIA6526R1, "cia", cia_w)
 	/* dd00 acia */
 	AM_RANGE(0xfde00, 0xfdeff) AM_WRITE( tpi6525_0_port_w)
 	AM_RANGE(0xfdf00, 0xfdfff) AM_WRITE( tpi6525_1_port_w)
@@ -385,8 +385,12 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_SOUND_ADD("sid6581", SID6581, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	/* devices */
+	/* quickload */
 	MDRV_QUICKLOAD_ADD(cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia", CIA6526R1)
+	MDRV_DEVICE_CONFIG(cbmb_cia)
 MACHINE_DRIVER_END
 
 

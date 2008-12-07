@@ -523,7 +523,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 		blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
-		timer_set(attotime_mul(ATTOTIME_IN_HZ(12000000/4), BLITTER_WIDTH * BLITTER_HEIGHT + 12), NULL, 0, blitter_done);
+		timer_set(space->machine, attotime_mul(ATTOTIME_IN_HZ(12000000/4), BLITTER_WIDTH * BLITTER_HEIGHT + 12), NULL, 0, blitter_done);
 	}
 
 	/* debugging */
@@ -633,7 +633,7 @@ VIDEO_UPDATE( itech8_2layer )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -668,7 +668,7 @@ VIDEO_UPDATE( itech8_grmatch )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -716,7 +716,7 @@ VIDEO_UPDATE( itech8_2page )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -747,7 +747,7 @@ VIDEO_UPDATE( itech8_2page_large )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 

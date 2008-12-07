@@ -8,6 +8,7 @@ Sengoku Mahjong Video Hardware section
 
 static tilemap *bg_tilemap,*md_tilemap,*fg_tilemap,*tx_tilemap;
 UINT16 *sengokmj_bgvram,*sengokmj_mdvram,*sengokmj_fgvram,*sengokmj_txvram;
+static UINT16 sengokmj_layer_en;
 
 WRITE16_HANDLER( sengokmj_bgvram_w )
 {
@@ -33,6 +34,13 @@ WRITE16_HANDLER( sengokmj_txvram_w )
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
+WRITE16_HANDLER( sengokmj_layer_enable_w )
+{
+	/*---- ---- ---x ---- enable sprites?*/
+	/*---- ---- ---- xxxx enable layers*/
+	sengokmj_layer_en = data;
+}
+
 static TILE_GET_INFO( sengoku_bg_tile_info )
 {
 	int tile = sengokmj_bgvram[tile_index];
@@ -44,21 +52,21 @@ static TILE_GET_INFO( sengoku_md_tile_info )
 {
 	int tile = sengokmj_mdvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(1, (tile & 0xfff) + 0x1000, color + 0x10, 0);
+	SET_TILE_INFO(2, (tile & 0xfff), color, 0);
 }
 
 static TILE_GET_INFO( sengoku_fg_tile_info )
 {
 	int tile = sengokmj_fgvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(1, (tile & 0xfff) + 0x2000, color + 0x20, 0);
+	SET_TILE_INFO(3, (tile & 0xfff), color, 0);
 }
 
 static TILE_GET_INFO( sengoku_tx_tile_info )
 {
 	int tile = sengokmj_txvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(2, (tile & 0xfff) + 0x3000, color, 0);
+	SET_TILE_INFO(4, (tile & 0xfff), color, 0);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
@@ -105,7 +113,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START( sengokmj )
 {
-	bg_tilemap = tilemap_create(sengoku_bg_tile_info,tilemap_scan_rows,     16,16,32,16);
+	bg_tilemap = tilemap_create(sengoku_bg_tile_info,tilemap_scan_rows,16,16,32,16);
 	md_tilemap = tilemap_create(sengoku_md_tile_info,tilemap_scan_rows,16,16,32,16);
 	fg_tilemap = tilemap_create(sengoku_fg_tile_info,tilemap_scan_rows,16,16,32,16);
 	tx_tilemap = tilemap_create(sengoku_tx_tile_info,tilemap_scan_rows, 8, 8,64,32);
@@ -117,13 +125,21 @@ VIDEO_START( sengokmj )
 
 VIDEO_UPDATE( sengokmj )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x7ff]); //black pen
+
+	if(!(sengokmj_layer_en & 1))
+		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect, 2);
 	draw_sprites(screen->machine, bitmap,cliprect, 1);
-	tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	if(!(sengokmj_layer_en & 2))
+		tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
+	if(!(sengokmj_layer_en & 4))
+		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect, 0);
 	draw_sprites(screen->machine, bitmap,cliprect, 3);
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	if(!(sengokmj_layer_en & 8))
+		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+
+//  popmessage("%04x",sengokmj_layer_en);
 	return 0;
 }

@@ -106,7 +106,7 @@ static int to7_get_cassette ( running_machine *machine )
 			if ( bitpos >= to7_k7_bitsize )
 				bitpos = to7_k7_bitsize -1;
 //			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
-//				cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), state, pos, bitpos,
+//				cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
 //				to7_k7_bits[ bitpos ] ));
 			return to7_k7_bits[ bitpos ];
 		}
@@ -127,7 +127,7 @@ static int to7_get_cassette ( running_machine *machine )
 			}
 			k = ( chg >= 13 ) ? 1 : 0;
 //			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
-//				cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), state, pos, bitpos,
+//				cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
 //				k, chg ));
 			return k;
 		}
@@ -155,7 +155,7 @@ static WRITE8_HANDLER ( to7_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ? "off" : "on",
+	       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ? "off" : "on",
 	       (int) (pos / TO7_BIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
@@ -205,7 +205,7 @@ static int mo5_get_cassette ( running_machine *machine )
 		hbit = hbit >= 0;
 
 //		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
-//			cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), state, pos,
+//			cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), state, pos,
 //			(int) (pos / MO5_HBIT_LENGTH), hbit ));
 		return hbit;
 	}
@@ -230,7 +230,7 @@ static WRITE8_HANDLER ( mo5_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ? "off" : "on",
+	       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ? "off" : "on",
 	       (int) (pos / MO5_HBIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
@@ -270,9 +270,9 @@ static void thom_set_irq ( running_machine *machine, int line, int state )
 		thom_irq &= ~(1 << line);
 
 	if ( !old && thom_irq )
-		LOG_IRQ(( "%f thom_set_irq: irq line up %i\n", attotime_to_double(timer_get_time()), line ));
+		LOG_IRQ(( "%f thom_set_irq: irq line up %i\n", attotime_to_double(timer_get_time(machine)), line ));
 	if ( old && !thom_irq )
-		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time()), line ));
+		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time(machine)), line ));
 
 	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE );
 }
@@ -289,9 +289,9 @@ static void thom_set_firq ( running_machine *machine, int line, int state )
 		thom_firq &= ~(1 << line);
 
 	if ( !old && thom_firq )
-		LOG_IRQ(( "%f thom_set_firq: firq line up %i\n", attotime_to_double(timer_get_time()), line ));
+		LOG_IRQ(( "%f thom_set_firq: firq line up %i\n", attotime_to_double(timer_get_time(machine)), line ));
 	if ( old && !thom_firq )
-		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time()), line ));
+		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time(machine)), line ));
 
 	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE );
 }
@@ -310,8 +310,8 @@ static void thom_irq_reset ( running_machine *machine )
 
 static void thom_irq_init ( void )
 {
-	state_save_register_global( thom_irq );
-	state_save_register_global( thom_firq );
+	state_save_register_global(machine,  thom_irq );
+	state_save_register_global(machine,  thom_firq );
 }
 
 
@@ -623,7 +623,7 @@ static void to7_lightpen_cb ( int step )
 	if ( ! to7_lightpen )
 		return;
 
-	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time()), step ));
+	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time(machine)), step ));
 	pia_set_input_cb1( THOM_PIA_SYS, 1 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
 	to7_lightpen_step = step;
@@ -639,7 +639,7 @@ static void to7_set_init ( int init )
 {
 	/* INIT signal wired to system PIA 6821 */
 
-	LOG_VIDEO(( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time()), init ));
+	LOG_VIDEO(( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time(machine)), init ));
 	pia_set_input_ca1( THOM_PIA_SYS, init );
 }
 
@@ -756,7 +756,7 @@ static void to7_io_ack ( int n, int data, int mask )
 {
 	/* acknowledge from centronics printer to PIA */
 	int ack = (data & CENTRONICS_ACKNOWLEDGE) ? 1 : 0;
-	LOG (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", attotime_to_double(timer_get_time()), data, ack ));
+	LOG (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", attotime_to_double(timer_get_time(machine)), data, ack ));
 	pia_set_input_cb1( THOM_PIA_IO, ack );
 }
 
@@ -767,7 +767,7 @@ static WRITE8_HANDLER ( to7_io_porta_out )
 	int tx  = data & 1;
 	int dtr = ( data & 2 ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), tx, dtr ));
+	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), tx, dtr ));
 	if ( dtr )
 		to7_io_line.State |=  SERIAL_STATE_DTR;
 	else
@@ -790,7 +790,7 @@ static READ8_HANDLER ( to7_io_porta_in )
 	else
 		cts = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to7_io_mode(space->machine), cts, dsr, rd ));
+	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), to7_io_mode(space->machine), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
@@ -801,7 +801,7 @@ static WRITE8_HANDLER ( to7_io_portb_out )
 {
 	/* set 8-bit data */
 
-	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 
 	centronics_write_data( 0, data );
 }
@@ -812,7 +812,7 @@ static WRITE8_HANDLER ( to7_io_cb2_out )
 {
 	/* send STROBE to printer */
 
-	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 
 	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 }
@@ -824,7 +824,7 @@ static void to7_io_in_callback ( int id, unsigned long state )
 	/* our peer's state has changed */
 	to7_io_line.input_state = state;
 
-	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time()), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
+	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time(machine)), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
 }
 
 
@@ -932,7 +932,7 @@ static const pia6821_interface to7_pia_modem =
 
 
 
-static const struct acia6850_interface to7_acia_modem =
+static const acia6850_interface to7_acia_modem =
 {
 	1200, 1200, /* 1200 bauds, might be divided by 16 */
 	&to7_modem_rx, &to7_modem_tx,
@@ -958,8 +958,8 @@ static void to7_modem_init( void )
 	LOG (( "to7_modem_init: MODEM not implemented!\n" ));
 	pia_config( THOM_PIA_MODEM, &to7_pia_modem );
 	acia6850_config( 0, &to7_acia_modem );
-	state_save_register_global( to7_modem_rx );
-	state_save_register_global( to7_modem_tx );
+	state_save_register_global(machine,  to7_modem_rx );
+	state_save_register_global(machine,  to7_modem_tx );
 }
 
 
@@ -1183,10 +1183,10 @@ static void to7_game_init ( void )
 {
 	LOG (( "to7_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &to7_game );
-	to7_game_timer = timer_alloc( to7_game_update_cb , NULL);
+	to7_game_timer = timer_alloc(machine,  to7_game_update_cb , NULL);
 	timer_adjust_periodic(to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
-	state_save_register_global( to7_game_sound );
-	state_save_register_global( to7_game_mute );
+	state_save_register_global(machine,  to7_game_sound );
+	state_save_register_global(machine,  to7_game_mute );
 }
 
 
@@ -1290,7 +1290,7 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
 		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
-			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to7_midi_status,
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), to7_midi_status,
 			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -1308,7 +1308,7 @@ READ8_HANDLER ( to7_midi_r )
 			to7_midi_status &= ~ACIA_6850_OVRN;
 		to7_midi_overrun = 0;
 		LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
-			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 		to7_midi_update_irq();
 		return data;
 	}
@@ -1335,7 +1335,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		if ( (data & 3) == 3 )
 		{
 			/* reset */
-			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
 			to7_midi_intr = 0;
@@ -1352,7 +1352,7 @@ WRITE8_HANDLER ( to7_midi_w )
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
-					  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+					  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 					  data,
 					  bits[ (data >> 2) & 7 ],
 					  stop[ (data >> 2) & 7 ],
@@ -1366,7 +1366,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	case 1: /* output data */
-		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 		if ( data == 0x55 )
 			/* cable-detect: shortcut */
 			chardev_fake_in( to7_midi_chardev, 0x55 );
@@ -1409,9 +1409,9 @@ static void to7_midi_init( void )
 {
 	LOG (( "to7_midi_init\n" ));
 	to7_midi_chardev = chardev_open( Machine, "/dev/snd/midiC1D0", "/dev/snd/midiC1D1", &to7_midi_interface );
-	state_save_register_global( to7_midi_status );
-	state_save_register_global( to7_midi_overrun );
-	state_save_register_global( to7_midi_intr );
+	state_save_register_global(machine,  to7_midi_status );
+	state_save_register_global(machine,  to7_midi_overrun );
+	state_save_register_global(machine,  to7_midi_intr );
 }
 
 
@@ -1535,11 +1535,11 @@ MACHINE_START ( to7 )
 	memset( thom_vram + 0x2000, 0xc0, 0x2000 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  to7_update_cart_bank_postload, NULL );
 }
 
@@ -1771,11 +1771,11 @@ MACHINE_START ( to770 )
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  to770_update_ram_bank_postload, NULL );
 	state_save_register_postload(machine,  to7_update_cart_bank_postload, NULL );
 }
@@ -2115,7 +2115,7 @@ MACHINE_START ( mo5 )
 	to7_io_init();
 	to7_modem_init();
 	to7_midi_init();
-	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
+	mo5_periodic_timer = timer_alloc(machine,  mo5_periodic_cb , NULL);
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -2131,12 +2131,12 @@ MACHINE_START ( mo5 )
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global( mo5_reg_cart );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global(machine,  mo5_reg_cart );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  mo5_update_cart_bank_postload, NULL );
 }
 
@@ -2156,14 +2156,14 @@ MACHINE_START ( mo5 )
 
 WRITE8_HANDLER ( to9_ieee_w )
 {
-	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data, offset );
+	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data, offset );
 }
 
 
 
 READ8_HANDLER  ( to9_ieee_r )
 {
-	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset );
+	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset );
 	return 0;
 }
 
@@ -2289,7 +2289,7 @@ READ8_HANDLER  ( to9_vreg_r )
 
 WRITE8_HANDLER ( to9_vreg_w )
 {
-	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset, 0xe7da + offset, data ));
+	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -2330,8 +2330,8 @@ static void to9_palette_init ( void )
 {
 	to9_palette_idx = 0;
 	memset( to9_palette_data, 0, sizeof( to9_palette_data ) );
-	state_save_register_global( to9_palette_idx );
-	state_save_register_global_array( to9_palette_data );
+	state_save_register_global(machine,  to9_palette_idx );
+	state_save_register_global_array(machine,  to9_palette_data );
 }
 
 
@@ -2584,7 +2584,7 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 7:     interrupt */
 
 		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
-			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to9_kbd_status,
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), to9_kbd_status,
 			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -2599,7 +2599,7 @@ READ8_HANDLER ( to9_kbd_r )
 		else
 			to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 		to9_kbd_overrun = 0;
-		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), to9_kbd_in ));
+		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), to9_kbd_in ));
 		to9_kbd_update_irq(space->machine);
 		return to9_kbd_in;
 
@@ -2626,7 +2626,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_overrun = 0;
 			to9_kbd_status = ACIA_6850_TDRE;
 			to9_kbd_intr = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 		}
 		else
 		{
@@ -2640,7 +2640,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_intr = data >> 5;
 
 			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
-				  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+				  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 				  data, to9_kbd_parity, to9_kbd_intr >> 2,
 				  (to9_kbd_intr & 3) ? 1 : 0 ));
 		}
@@ -2671,13 +2671,13 @@ WRITE8_HANDLER ( to9_kbd_w )
 		case 0xFE: to9_kbd_periph = 0; break;
 
 		default:
-			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data );
+			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data );
 		}
 
 		thom_set_caps_led( ! to9_kbd_caps );
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
-		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data,
+		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data,
 		      to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
 
 		break;
@@ -2699,7 +2699,7 @@ static void to9_kbd_send ( running_machine *machine, UINT8 data, int parity )
 	{
 		/* overrun will be set when the current valid byte is read */
 		to9_kbd_overrun = 1;
-		LOG_KBD(( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", attotime_to_double(timer_get_time()), data, parity ));
+		LOG_KBD(( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", attotime_to_double(timer_get_time(machine)), data, parity ));
 	}
 	else
 	{
@@ -2710,7 +2710,7 @@ static void to9_kbd_send ( running_machine *machine, UINT8 data, int parity )
 			to9_kbd_status &= ~ACIA_6850_PE; /* parity OK */
 		else
 			to9_kbd_status |= ACIA_6850_PE;  /* parity error */
-		LOG_KBD(( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", attotime_to_double(timer_get_time()), data, parity, to9_kbd_status ));
+		LOG_KBD(( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", attotime_to_double(timer_get_time(machine)), data, parity, to9_kbd_status ));
 	}
 	to9_kbd_update_irq(machine);
 }
@@ -2924,20 +2924,20 @@ static void to9_kbd_reset ( running_machine *machine )
 static void to9_kbd_init ( void )
 {
 	LOG(( "to9_kbd_init called\n" ));
-	to9_kbd_timer = timer_alloc( to9_kbd_timer_cb , NULL);
-	state_save_register_global( to9_kbd_parity );
-	state_save_register_global( to9_kbd_intr );
-	state_save_register_global( to9_kbd_in );
-	state_save_register_global( to9_kbd_status );
-	state_save_register_global( to9_kbd_overrun );
-	state_save_register_global( to9_kbd_last_key );
-	state_save_register_global( to9_kbd_key_count );
-	state_save_register_global( to9_kbd_caps );
-	state_save_register_global( to9_kbd_periph );
-	state_save_register_global( to9_kbd_pad );
-	state_save_register_global( to9_kbd_byte_count );
-	state_save_register_global( to9_mouse_x );
-	state_save_register_global( to9_mouse_y );
+	to9_kbd_timer = timer_alloc(machine,  to9_kbd_timer_cb , NULL);
+	state_save_register_global(machine,  to9_kbd_parity );
+	state_save_register_global(machine,  to9_kbd_intr );
+	state_save_register_global(machine,  to9_kbd_in );
+	state_save_register_global(machine,  to9_kbd_status );
+	state_save_register_global(machine,  to9_kbd_overrun );
+	state_save_register_global(machine,  to9_kbd_last_key );
+	state_save_register_global(machine,  to9_kbd_key_count );
+	state_save_register_global(machine,  to9_kbd_caps );
+	state_save_register_global(machine,  to9_kbd_periph );
+	state_save_register_global(machine,  to9_kbd_pad );
+	state_save_register_global(machine,  to9_kbd_byte_count );
+	state_save_register_global(machine,  to9_mouse_x );
+	state_save_register_global(machine,  to9_mouse_y );
 }
 
 
@@ -2956,7 +2956,7 @@ static void to9_update_centronics ( running_machine *machine )
 	centronics_write_handshake( 0, (b & 2) ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 
 //	LOG_IO(( "$%04x %f to9_update_centronics: data=$%02X strobe=%i\n",
-//		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data,
+//		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data,
 //		  (b & 2) ? 1 : 0 ));
 }
 
@@ -3099,12 +3099,12 @@ MACHINE_START ( to9 )
 	memory_set_bank( machine, THOM_RAM_BANK,  0 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global( to9_soft_bank );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global(machine,  to9_soft_bank );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  to9_update_ram_bank_postload, NULL );
 	state_save_register_postload(machine,  to9_update_cart_bank_postload, NULL );
 }
@@ -3274,7 +3274,7 @@ static void to8_kbd_timer_func(running_machine *machine)
 {
 	attotime d;
 
-	LOG_KBD(( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_step, to8_kbd_ack, to8_kbd_data ));
+	LOG_KBD(( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", attotime_to_double(timer_get_time(machine)), to8_kbd_step, to8_kbd_ack, to8_kbd_data ));
 
 	if( ! to8_kbd_step )
 	{
@@ -3359,13 +3359,13 @@ static void to8_kbd_set_ack ( int data )
 	if ( data )
 	{
 		double len = attotime_to_double(timer_timeelapsed( to8_kbd_signal )) * 1000. - 2.;
-		LOG_KBD(( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", attotime_to_double(timer_get_time()), len ));
+		LOG_KBD(( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", attotime_to_double(timer_get_time(machine)), len ));
 		if ( to8_kbd_data == 0xfff )
 		{
 			/* end signal from CPU */
 			if ( len >= 0.6 && len <= 0.8 )
 			{
-				LOG (( "%f to8_kbd_set_ack: INIT signal\n", attotime_to_double(timer_get_time()) ));
+				LOG (( "%f to8_kbd_set_ack: INIT signal\n", attotime_to_double(timer_get_time(machine)) ));
 				to8_kbd_last_key = 0xff;
 				to8_kbd_key_count = 0;
 				to8_kbd_caps = 1;
@@ -3380,12 +3380,12 @@ static void to8_kbd_set_ack ( int data )
 				timer_adjust_oneshot(to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0);
 				if ( len >= 1.2 && len <= 1.4 )
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", attotime_to_double(timer_get_time()) ));
+					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", attotime_to_double(timer_get_time(machine)) ));
 					to8_kbd_caps = 1;
 				}
 				else if ( len >= 1.8 && len <= 2.0 )
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS off signal\n", attotime_to_double(timer_get_time()) ));
+					LOG (( "%f to8_kbd_set_ack: CAPS off signal\n", attotime_to_double(timer_get_time(machine)) ));
 					to8_kbd_caps = 0;
 				}
 			}
@@ -3415,7 +3415,7 @@ static void to8_kbd_set_ack ( int data )
 			timer_adjust_oneshot(to8_kbd_timer, ATTOTIME_IN_USEC( 400 ), 0);
 			timer_adjust_oneshot(to8_kbd_signal, attotime_never, 0);
 		}
-		LOG_KBD(( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", attotime_to_double(timer_get_time()), to8_kbd_data ));
+		LOG_KBD(( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", attotime_to_double(timer_get_time(machine)), to8_kbd_data ));
 	}
 }
 
@@ -3437,14 +3437,14 @@ static void to8_kbd_reset ( running_machine *machine )
 
 static void to8_kbd_init ( void )
 {
-	to8_kbd_timer = timer_alloc( to8_kbd_timer_cb , NULL);
-	to8_kbd_signal = timer_alloc( NULL , NULL);
-	state_save_register_global( to8_kbd_ack );
-	state_save_register_global( to8_kbd_data );
-	state_save_register_global( to8_kbd_step );
-	state_save_register_global( to8_kbd_last_key );
-	state_save_register_global( to8_kbd_key_count );
-	state_save_register_global( to8_kbd_caps );
+	to8_kbd_timer = timer_alloc(machine,  to8_kbd_timer_cb , NULL);
+	to8_kbd_signal = timer_alloc(machine,  NULL , NULL);
+	state_save_register_global(machine,  to8_kbd_ack );
+	state_save_register_global(machine,  to8_kbd_data );
+	state_save_register_global(machine,  to8_kbd_step );
+	state_save_register_global(machine,  to8_kbd_last_key );
+	state_save_register_global(machine,  to8_kbd_key_count );
+	state_save_register_global(machine,  to8_kbd_caps );
 }
 
 
@@ -3745,7 +3745,7 @@ READ8_HANDLER ( to8_gatearray_r )
 	}
 
 	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 		  offset, 0xe7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -3756,7 +3756,7 @@ READ8_HANDLER ( to8_gatearray_r )
 WRITE8_HANDLER ( to8_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 		  offset, 0xe7e4 + offset, data ));
 
 	switch ( offset )
@@ -3837,7 +3837,7 @@ READ8_HANDLER  ( to8_vreg_r )
 WRITE8_HANDLER ( to8_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 		  offset, 0xe7da + offset, data ));
 
 	switch ( offset )
@@ -3893,7 +3893,7 @@ static READ8_HANDLER ( to8_sys_porta_in )
 {
 	int ktest = to8_kbd_ktest (space->machine);
 
-	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), ktest ));
+	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), ktest ));
 
 	return ktest;
 }
@@ -4076,21 +4076,21 @@ MACHINE_START ( to8 )
 	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global( to8_reg_ram );
-	state_save_register_global( to8_reg_cart );
-	state_save_register_global( to8_reg_sys1 );
-	state_save_register_global( to8_reg_sys2 );
-	state_save_register_global( to8_soft_select );
-	state_save_register_global( to8_soft_bank );
-	state_save_register_global( to8_bios_bank );
-	state_save_register_global( to8_lightpen_intr );
-	state_save_register_global( to8_data_vpage );
-	state_save_register_global( to8_cart_vpage );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global(machine,  to8_reg_ram );
+	state_save_register_global(machine,  to8_reg_cart );
+	state_save_register_global(machine,  to8_reg_sys1 );
+	state_save_register_global(machine,  to8_reg_sys2 );
+	state_save_register_global(machine,  to8_soft_select );
+	state_save_register_global(machine,  to8_soft_bank );
+	state_save_register_global(machine,  to8_bios_bank );
+	state_save_register_global(machine,  to8_lightpen_intr );
+	state_save_register_global(machine,  to8_data_vpage );
+	state_save_register_global(machine,  to8_cart_vpage );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  to8_update_ram_bank_postload, NULL );
 	state_save_register_postload(machine,  to8_update_cart_bank_postload, NULL );
 	state_save_register_postload(machine,  to8_update_floppy_bank_postload, NULL );
@@ -4242,21 +4242,21 @@ MACHINE_START ( to9p )
 	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global( to8_reg_ram );
-	state_save_register_global( to8_reg_cart );
-	state_save_register_global( to8_reg_sys1 );
-	state_save_register_global( to8_reg_sys2 );
-	state_save_register_global( to8_soft_select );
-	state_save_register_global( to8_soft_bank );
-	state_save_register_global( to8_bios_bank );
-	state_save_register_global( to8_lightpen_intr );
-	state_save_register_global( to8_data_vpage );
-	state_save_register_global( to8_cart_vpage );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global(machine,  to8_reg_ram );
+	state_save_register_global(machine,  to8_reg_cart );
+	state_save_register_global(machine,  to8_reg_sys1 );
+	state_save_register_global(machine,  to8_reg_sys2 );
+	state_save_register_global(machine,  to8_soft_select );
+	state_save_register_global(machine,  to8_soft_bank );
+	state_save_register_global(machine,  to8_bios_bank );
+	state_save_register_global(machine,  to8_lightpen_intr );
+	state_save_register_global(machine,  to8_data_vpage );
+	state_save_register_global(machine,  to8_cart_vpage );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  to8_update_ram_bank_postload, NULL );
 	state_save_register_postload(machine,  to8_update_cart_bank_postload, NULL );
 	state_save_register_postload(machine,  to8_update_floppy_bank_postload, NULL );
@@ -4422,7 +4422,7 @@ WRITE8_HANDLER ( mo6_ext_w )
 static WRITE8_HANDLER ( mo6_game_porta_out )
 {
 	/* centronics data */
-	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 	centronics_write_data( 0, data );
 }
 
@@ -4432,7 +4432,7 @@ static READ8_HANDLER ( mo6_game_cb1_in )
 {
 	int dtr = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 0 : 1;
 	/* note: printer busy signal replaces button */
-	LOG (( "$%04x %f mo6_game_cb1_in: CENTRONICS get dtr=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), dtr ));
+	LOG (( "$%04x %f mo6_game_cb1_in: CENTRONICS get dtr=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), dtr ));
 	return dtr;
 }
 
@@ -4441,7 +4441,7 @@ static READ8_HANDLER ( mo6_game_cb1_in )
 static WRITE8_HANDLER ( mo6_game_cb2_out )
 {
 	/* centronics strobe */
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data ));
+	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
 	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0,
 				    CENTRONICS_STROBE );
 }
@@ -4482,10 +4482,10 @@ static void mo6_game_init ( void )
 {
 	LOG (( "mo6_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &mo6_game );
-	to7_game_timer = timer_alloc( mo6_game_update_cb , NULL);
+	to7_game_timer = timer_alloc(machine,  mo6_game_update_cb , NULL);
 	timer_adjust_periodic(to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
-	state_save_register_global( to7_game_sound );
-	state_save_register_global( to7_game_mute );
+	state_save_register_global(machine,  to7_game_sound );
+	state_save_register_global(machine,  to7_game_mute );
 }
 
 
@@ -4628,7 +4628,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 	}
 
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 		  offset, 0xa7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -4639,7 +4639,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 WRITE8_HANDLER ( mo6_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 		  offset, 0xa7e4 + offset, data ));
 
 	switch ( offset )
@@ -4706,7 +4706,7 @@ READ8_HANDLER ( mo6_vreg_r )
 WRITE8_HANDLER ( mo6_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()),
+		  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
 		  offset, 0xa7da + offset, data ));
 
 	switch ( offset )
@@ -4806,7 +4806,7 @@ MACHINE_START ( mo6 )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
+	mo5_periodic_timer = timer_alloc(machine,  mo5_periodic_cb , NULL);
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -4832,19 +4832,19 @@ MACHINE_START ( mo6 )
 	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global( to8_reg_ram );
-	state_save_register_global( to8_reg_cart );
-	state_save_register_global( to8_reg_sys1 );
-	state_save_register_global( to8_reg_sys2 );
-	state_save_register_global( to8_lightpen_intr );
-	state_save_register_global( to8_data_vpage );
-	state_save_register_global( to8_cart_vpage );
-	state_save_register_global( mo5_reg_cart );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global(machine,  to8_reg_ram );
+	state_save_register_global(machine,  to8_reg_cart );
+	state_save_register_global(machine,  to8_reg_sys1 );
+	state_save_register_global(machine,  to8_reg_sys2 );
+	state_save_register_global(machine,  to8_lightpen_intr );
+	state_save_register_global(machine,  to8_data_vpage );
+	state_save_register_global(machine,  to8_cart_vpage );
+	state_save_register_global(machine,  mo5_reg_cart );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  mo6_update_ram_bank_postload, NULL );
 	state_save_register_postload(machine,  mo6_update_cart_bank_postload, NULL );
 }
@@ -4864,7 +4864,7 @@ READ8_HANDLER ( mo5nr_net_r )
 	if ( to7_controller_type )
 		return to7_floppy_r ( space, offset );
 
-	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset );
+	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset );
 
 	if ( to7_controller_type )
 		return to7_floppy_r ( space, offset );
@@ -4880,7 +4880,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 		to7_floppy_w ( space, offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
-			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), data, offset );
+			  cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data, offset );
 }
 
 
@@ -4908,7 +4908,7 @@ READ8_HANDLER ( mo5nr_prn_r )
 			return 0x80;
 
 	default:
-		logerror( "$%04x %f mo5nr_prn_r: unhandled read from reg %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset );
+		logerror( "$%04x %f mo5nr_prn_r: unhandled read from reg %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset );
 		return 0;
 	}
 }
@@ -4930,7 +4930,7 @@ WRITE8_HANDLER ( mo5nr_prn_w )
 		break;
 
 	default:
-		logerror( "$%04x %f mo5nr_prn_w: unhandled to reg %i (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time()), offset, data );
+		logerror( "$%04x %f mo5nr_prn_w: unhandled to reg %i (data=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset, data );
 	}
 }
 
@@ -4998,10 +4998,10 @@ static void mo5nr_game_init ( void )
 {
 	LOG (( "mo5nr_game_init called\n" ));
 	pia_config( THOM_PIA_GAME, &mo5nr_game );
-	to7_game_timer = timer_alloc( mo6_game_update_cb , NULL);
+	to7_game_timer = timer_alloc(machine,  mo6_game_update_cb , NULL);
 	timer_adjust_periodic(to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
-	state_save_register_global( to7_game_sound );
-	state_save_register_global( to7_game_mute );
+	state_save_register_global(machine,  to7_game_sound );
+	state_save_register_global(machine,  to7_game_mute );
 }
 
 
@@ -5079,7 +5079,7 @@ MACHINE_START ( mo5nr )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	mo5_periodic_timer = timer_alloc( mo5_periodic_cb , NULL);
+	mo5_periodic_timer = timer_alloc(machine,  mo5_periodic_cb , NULL);
 	mea8000_config( machine, THOM_SOUND_SPEECH, NULL );
 
 	/* memory */
@@ -5105,19 +5105,19 @@ MACHINE_START ( mo5nr )
 	memory_set_bank( machine, TO8_BIOS_BANK, 0 );
 
 	/* save-state */
-	state_save_register_global( thom_cart_nb_banks );
-	state_save_register_global( thom_cart_bank );
-	state_save_register_global( to7_lightpen );
-	state_save_register_global( to7_lightpen_step );
-	state_save_register_global( to8_reg_ram );
-	state_save_register_global( to8_reg_cart );
-	state_save_register_global( to8_reg_sys1 );
-	state_save_register_global( to8_reg_sys2 );
-	state_save_register_global( to8_lightpen_intr );
-	state_save_register_global( to8_data_vpage );
-	state_save_register_global( to8_cart_vpage );
-	state_save_register_global( mo5_reg_cart );
-	state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
+	state_save_register_global(machine,  thom_cart_nb_banks );
+	state_save_register_global(machine,  thom_cart_bank );
+	state_save_register_global(machine,  to7_lightpen );
+	state_save_register_global(machine,  to7_lightpen_step );
+	state_save_register_global(machine,  to8_reg_ram );
+	state_save_register_global(machine,  to8_reg_cart );
+	state_save_register_global(machine,  to8_reg_sys1 );
+	state_save_register_global(machine,  to8_reg_sys2 );
+	state_save_register_global(machine,  to8_lightpen_intr );
+	state_save_register_global(machine,  to8_data_vpage );
+	state_save_register_global(machine,  to8_cart_vpage );
+	state_save_register_global(machine,  mo5_reg_cart );
+	state_save_register_global_pointer(machine,  (mem + 0x10000), 0x10000 );
 	state_save_register_postload(machine,  mo6_update_ram_bank_postload, NULL );
 	state_save_register_postload(machine,  mo6_update_cart_bank_postload, NULL );
 }

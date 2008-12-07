@@ -175,13 +175,13 @@ static seconds_t clock_curtime_interval;	/* second index at which clock_curtime 
 static UINT8 clock_bram[256];
 
 
-static void process_clock(void)
+static void process_clock(running_machine *machine)
 {
 	UINT8 operation;
 	seconds_t current_interval;
 
 	/* update clock_curtime */
-	current_interval = timer_get_time().seconds;
+	current_interval = timer_get_time(machine).seconds;
 	clock_curtime += current_interval - clock_curtime_interval;
 	clock_curtime_interval = current_interval;
 
@@ -1166,7 +1166,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			clock_control = data & 0x7F;
 			apple2gs_bordercolor = data & 0x0F;
 			if (data & 0x80)
-				process_clock();
+				process_clock(space->machine);
 			break;
 
 		case 0x35:	/* C035 - SHADOW */
@@ -1664,7 +1664,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 	apple2gs_slowmem = auto_malloc(128*1024);
 	memset(apple2gs_slowmem, 0, 128*1024);
 
-	state_save_register_item_array("APPLE2GS_SLOWMEM", NULL, 0, apple2gs_slowmem);
+	state_save_register_item_array(machine, "APPLE2GS_SLOWMEM", NULL, 0, apple2gs_slowmem);
 
 	/* install expanded memory */
 	memory_install_read8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
@@ -1724,13 +1724,13 @@ static READ8_HANDLER( apple2gs_read_vector )
 
 MACHINE_RESET( apple2gs )
 {
-	apple2gs_clock_timer = timer_alloc(apple2gs_clock_tick, NULL);
+	apple2gs_clock_timer = timer_alloc(machine, apple2gs_clock_tick, NULL);
 	timer_adjust_periodic(apple2gs_clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
 	
-	apple2gs_qsecond_timer = timer_alloc(apple2gs_qsecond_tick, NULL);
+	apple2gs_qsecond_timer = timer_alloc(machine, apple2gs_qsecond_tick, NULL);
 	timer_adjust_periodic(apple2gs_qsecond_timer, ATTOTIME_IN_USEC(266700), 0, ATTOTIME_IN_USEC(266700));
 	
-	apple2gs_scanline_timer = timer_alloc(apple2gs_scanline_tick, NULL);
+	apple2gs_scanline_timer = timer_alloc(machine, apple2gs_scanline_tick, NULL);
 	timer_adjust_oneshot(apple2gs_scanline_timer, attotime_never, 0);
 
 	// fire on scanline zero
@@ -1791,48 +1791,48 @@ MACHINE_START( apple2gs )
 	apple2gs_setup_memory(machine);
 
 	/* save state stuff.  note that the driver takes care of docram. */
-	state_save_register_global_array(mess_ram);
+	state_save_register_global_array(machine, mess_ram);
 
-	state_save_register_item("NEWVIDEO", NULL, 0, apple2gs_newvideo);
+	state_save_register_item(machine, "NEWVIDEO", NULL, 0, apple2gs_newvideo);
 
-	state_save_register_item("VGCINT", NULL,0, apple2gs_vgcint);
-	state_save_register_item("LANGSEL", NULL,0, apple2gs_langsel);
-	state_save_register_item("SLTROMSEL", NULL,0, apple2gs_sltromsel);
-	state_save_register_item("CYAREG", NULL,0, apple2gs_cyareg);
-	state_save_register_item("INTEN", NULL,0, apple2gs_inten);
-	state_save_register_item("INTFLAG", NULL,0, apple2gs_intflag);
-	state_save_register_item("SHADOW", NULL,0, apple2gs_shadow);
-	state_save_register_item("PENDIRQ", NULL,0, apple2gs_pending_irqs);
-	state_save_register_item("MX", NULL,0, apple2gs_mouse_x);
-	state_save_register_item("MY", NULL,0, apple2gs_mouse_y);
-	state_save_register_item("MDX", NULL,0, apple2gs_mouse_dx);
-	state_save_register_item("MDY", NULL,0, apple2gs_mouse_dy);
+	state_save_register_item(machine, "VGCINT", NULL,0, apple2gs_vgcint);
+	state_save_register_item(machine, "LANGSEL", NULL,0, apple2gs_langsel);
+	state_save_register_item(machine, "SLTROMSEL", NULL,0, apple2gs_sltromsel);
+	state_save_register_item(machine, "CYAREG", NULL,0, apple2gs_cyareg);
+	state_save_register_item(machine, "INTEN", NULL,0, apple2gs_inten);
+	state_save_register_item(machine, "INTFLAG", NULL,0, apple2gs_intflag);
+	state_save_register_item(machine, "SHADOW", NULL,0, apple2gs_shadow);
+	state_save_register_item(machine, "PENDIRQ", NULL,0, apple2gs_pending_irqs);
+	state_save_register_item(machine, "MX", NULL,0, apple2gs_mouse_x);
+	state_save_register_item(machine, "MY", NULL,0, apple2gs_mouse_y);
+	state_save_register_item(machine, "MDX", NULL,0, apple2gs_mouse_dx);
+	state_save_register_item(machine, "MDY", NULL,0, apple2gs_mouse_dy);
 
-	state_save_register_item("CLKDATA", NULL,0, clock_data);
-	state_save_register_item("CLKCTRL", NULL,0, clock_control);
-	state_save_register_item("CLKRD", NULL,0, clock_read);
-	state_save_register_item("CLKREG1", NULL,0, clock_reg1);
-	state_save_register_item("CLKCURTIME", NULL,0, clock_curtime);
-	state_save_register_item("CLKCURTIMEINT", NULL,0, clock_curtime_interval);
-	state_save_register_item("CLKMODE", NULL,0, clock_mode);
-	state_save_register_global_array(clock_bram);
+	state_save_register_item(machine, "CLKDATA", NULL,0, clock_data);
+	state_save_register_item(machine, "CLKCTRL", NULL,0, clock_control);
+	state_save_register_item(machine, "CLKRD", NULL,0, clock_read);
+	state_save_register_item(machine, "CLKREG1", NULL,0, clock_reg1);
+	state_save_register_item(machine, "CLKCURTIME", NULL,0, clock_curtime);
+	state_save_register_item(machine, "CLKCURTIMEINT", NULL,0, clock_curtime_interval);
+	state_save_register_item(machine, "CLKMODE", NULL,0, clock_mode);
+	state_save_register_global_array(machine, clock_bram);
 
-	state_save_register_global_array(adb_memory);
-	state_save_register_global_array(adb_command_bytes);
-	state_save_register_global_array(adb_response_bytes);
-	state_save_register_item("ADB", NULL,0, adb_state);
-	state_save_register_item("ADB", NULL,0, adb_command);
-	state_save_register_item("ADB", NULL,0, adb_mode);
-	state_save_register_item("ADB", NULL,0, adb_kmstatus);
-	state_save_register_item("ADB", NULL,0, adb_latent_result);
-	state_save_register_item("ADB", NULL,0, adb_command_length);
-	state_save_register_item("ADB", NULL,0, adb_command_pos);
-	state_save_register_item("ADB", NULL,0, adb_response_length);
-	state_save_register_item("ADB", NULL,0, adb_response_pos);
-	state_save_register_item("ADB", NULL,0, adb_address_keyboard);
-	state_save_register_item("ADB", NULL,0, adb_address_mouse);
+	state_save_register_global_array(machine, adb_memory);
+	state_save_register_global_array(machine, adb_command_bytes);
+	state_save_register_global_array(machine, adb_response_bytes);
+	state_save_register_item(machine, "ADB", NULL,0, adb_state);
+	state_save_register_item(machine, "ADB", NULL,0, adb_command);
+	state_save_register_item(machine, "ADB", NULL,0, adb_mode);
+	state_save_register_item(machine, "ADB", NULL,0, adb_kmstatus);
+	state_save_register_item(machine, "ADB", NULL,0, adb_latent_result);
+	state_save_register_item(machine, "ADB", NULL,0, adb_command_length);
+	state_save_register_item(machine, "ADB", NULL,0, adb_command_pos);
+	state_save_register_item(machine, "ADB", NULL,0, adb_response_length);
+	state_save_register_item(machine, "ADB", NULL,0, adb_response_pos);
+	state_save_register_item(machine, "ADB", NULL,0, adb_address_keyboard);
+	state_save_register_item(machine, "ADB", NULL,0, adb_address_mouse);
 
-	state_save_register_item("SNDGLUCTRL", NULL,0, sndglu_ctrl);
-	state_save_register_item("SNDGLUADDR", NULL,0, sndglu_addr);
-	state_save_register_item("SNDGLUDUMMYRD", NULL,0, sndglu_dummy_read);
+	state_save_register_item(machine, "SNDGLUCTRL", NULL,0, sndglu_ctrl);
+	state_save_register_item(machine, "SNDGLUADDR", NULL,0, sndglu_addr);
+	state_save_register_item(machine, "SNDGLUDUMMYRD", NULL,0, sndglu_dummy_read);
 }

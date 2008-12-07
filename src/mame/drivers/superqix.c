@@ -214,7 +214,7 @@ static TIMER_CALLBACK( mcu_acknowledge_callback )
 
 static READ8_HANDLER( mcu_acknowledge_r )
 {
-	timer_call_after_resynch(NULL, 0, mcu_acknowledge_callback);
+	timer_call_after_resynch(space->machine, NULL, 0, mcu_acknowledge_callback);
 	return 0;
 }
 
@@ -421,7 +421,7 @@ logerror("%04x: z80 reads command %02x\n",cpu_get_pc(space->cpu),from_z80);
 				break;
 
 			case 0x5:	// answer to Z80
-				timer_call_after_resynch(NULL, portB_out, delayed_mcu_z80_w);
+				timer_call_after_resynch(space->machine, NULL, portB_out, delayed_mcu_z80_w);
 				break;
 
 			case 0x6:
@@ -437,7 +437,7 @@ logerror("%04x: z80 reads command %02x\n",cpu_get_pc(space->cpu),from_z80);
 
 static WRITE8_HANDLER( hotsmash_z80_mcu_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_z80_mcu_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_z80_mcu_w);
 }
 
 static READ8_HANDLER(hotsmash_from_mcu_r)
@@ -490,22 +490,22 @@ static READ8_HANDLER(pbillian_ay_port_a_r)
 }
 
 
-static void machine_init_common(void)
+static void machine_init_common(running_machine *machine)
 {
-	state_save_register_global(invert_coin_lockout);
-	state_save_register_global(from_mcu_pending);
-	state_save_register_global(from_z80_pending);
-	state_save_register_global(port1);
-	state_save_register_global(port3);
-	state_save_register_global(port3_latch);
-	state_save_register_global(from_mcu);
-	state_save_register_global(from_z80);
-	state_save_register_global(portb);
+	state_save_register_global(machine, invert_coin_lockout);
+	state_save_register_global(machine, from_mcu_pending);
+	state_save_register_global(machine, from_z80_pending);
+	state_save_register_global(machine, port1);
+	state_save_register_global(machine, port3);
+	state_save_register_global(machine, port3_latch);
+	state_save_register_global(machine, from_mcu);
+	state_save_register_global(machine, from_z80);
+	state_save_register_global(machine, portb);
 
 	// hotsmash ???
-	state_save_register_global(portA_in);
-	state_save_register_global(portB_out);
-	state_save_register_global(portC);
+	state_save_register_global(machine, portA_in);
+	state_save_register_global(machine, portB_out);
+	state_save_register_global(machine, portC);
 }
 
 static MACHINE_START( superqix )
@@ -513,7 +513,7 @@ static MACHINE_START( superqix )
 	/* configure the banks */
 	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 
-	machine_init_common();
+	machine_init_common(machine);
 }
 
 static MACHINE_START( pbillian )
@@ -521,7 +521,7 @@ static MACHINE_START( pbillian )
 	/* configure the banks */
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
 
-	machine_init_common();
+	machine_init_common(machine);
 }
 
 

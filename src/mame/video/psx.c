@@ -34,7 +34,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpunum_get_active() != -1 )
+		if( Machine->activecpu != NULL )
 		{
 			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
@@ -307,7 +307,7 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 
 	if( m_b_debugclear )
 	{
-		fillbitmap( debugmesh, 0x0000, NULL );
+		bitmap_fill( debugmesh, NULL , 0x0000);
 		m_b_debugclear = 0;
 	}
 
@@ -738,39 +738,39 @@ static void psx_gpu_init( running_machine *machine )
 	}
 
 	// icky!!!
-	state_save_register_memory( "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	state_save_register_memory( machine, "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
-	state_save_register_global_pointer( m_p_vram, m_n_vram_size );
-	state_save_register_global( m_n_gpu_buffer_offset );
-	state_save_register_global( m_n_vramx );
-	state_save_register_global( m_n_vramy );
-	state_save_register_global( m_n_twy );
-	state_save_register_global( m_n_twx );
-	state_save_register_global( m_n_tww );
-	state_save_register_global( m_n_drawarea_x1 );
-	state_save_register_global( m_n_drawarea_y1 );
-	state_save_register_global( m_n_drawarea_x2 );
-	state_save_register_global( m_n_drawarea_y2 );
-	state_save_register_global( m_n_horiz_disstart );
-	state_save_register_global( m_n_horiz_disend );
-	state_save_register_global( m_n_vert_disstart );
-	state_save_register_global( m_n_vert_disend );
-	state_save_register_global( m_b_reverseflag );
-	state_save_register_global( m_n_drawoffset_x );
-	state_save_register_global( m_n_drawoffset_y );
-	state_save_register_global( m_n_displaystartx );
-	state_save_register_global( m_n_displaystarty );
-	state_save_register_global( m_n_gpustatus );
-	state_save_register_global( m_n_gpuinfo );
-	state_save_register_global( m_n_lightgun_x );
-	state_save_register_global( m_n_lightgun_y );
-	state_save_register_global( psxgpu.n_tx );
-	state_save_register_global( psxgpu.n_ty );
-	state_save_register_global( psxgpu.n_abr );
-	state_save_register_global( psxgpu.n_tp );
-	state_save_register_global( psxgpu.n_ix );
-	state_save_register_global( psxgpu.n_iy );
-	state_save_register_global( psxgpu.n_ti );
+	state_save_register_global_pointer(machine,  m_p_vram, m_n_vram_size );
+	state_save_register_global(machine,  m_n_gpu_buffer_offset );
+	state_save_register_global(machine,  m_n_vramx );
+	state_save_register_global(machine,  m_n_vramy );
+	state_save_register_global(machine,  m_n_twy );
+	state_save_register_global(machine,  m_n_twx );
+	state_save_register_global(machine,  m_n_tww );
+	state_save_register_global(machine,  m_n_drawarea_x1 );
+	state_save_register_global(machine,  m_n_drawarea_y1 );
+	state_save_register_global(machine,  m_n_drawarea_x2 );
+	state_save_register_global(machine,  m_n_drawarea_y2 );
+	state_save_register_global(machine,  m_n_horiz_disstart );
+	state_save_register_global(machine,  m_n_horiz_disend );
+	state_save_register_global(machine,  m_n_vert_disstart );
+	state_save_register_global(machine,  m_n_vert_disend );
+	state_save_register_global(machine,  m_b_reverseflag );
+	state_save_register_global(machine,  m_n_drawoffset_x );
+	state_save_register_global(machine,  m_n_drawoffset_y );
+	state_save_register_global(machine,  m_n_displaystartx );
+	state_save_register_global(machine,  m_n_displaystarty );
+	state_save_register_global(machine,  m_n_gpustatus );
+	state_save_register_global(machine,  m_n_gpuinfo );
+	state_save_register_global(machine,  m_n_lightgun_x );
+	state_save_register_global(machine,  m_n_lightgun_y );
+	state_save_register_global(machine,  psxgpu.n_tx );
+	state_save_register_global(machine,  psxgpu.n_ty );
+	state_save_register_global(machine,  psxgpu.n_abr );
+	state_save_register_global(machine,  psxgpu.n_tp );
+	state_save_register_global(machine,  psxgpu.n_ix );
+	state_save_register_global(machine,  psxgpu.n_iy );
+	state_save_register_global(machine,  psxgpu.n_ti );
 
 	state_save_register_postload( machine, updatevisiblearea, NULL );
 }
@@ -815,7 +815,7 @@ VIDEO_UPDATE( psx )
 	if( ( m_n_gpustatus & ( 1 << 0x17 ) ) != 0 )
 	{
 		/* todo: only draw to necessary area */
-		fillbitmap( bitmap, 0, cliprect );
+		bitmap_fill( bitmap, cliprect , 0);
 	}
 	else
 	{

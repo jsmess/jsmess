@@ -183,7 +183,7 @@ MACHINE_RESET( galaxy )
 	cpu_set_irq_callback(machine->cpu[0], galaxy_irq_callback);
 	galaxy_interrupts_enabled = TRUE;
 
-	gal_video_timer = timer_alloc(gal_video, NULL);
+	gal_video_timer = timer_alloc(machine, gal_video, NULL);
 	timer_adjust_periodic(gal_video_timer, attotime_zero, 0,attotime_never);
 }
 
@@ -209,7 +209,7 @@ MACHINE_RESET( galaxyp )
 	memory_set_bankptr(machine,11, memory_region(machine, "main") + 0xe000);
 	galaxy_interrupts_enabled = TRUE;
 
-	gal_video_timer = timer_alloc(gal_video, NULL);
+	gal_video_timer = timer_alloc(machine, gal_video, NULL);
 	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
 
 }

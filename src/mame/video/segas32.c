@@ -374,11 +374,11 @@ static TIMER_CALLBACK( update_sprites )
 }
 
 
-void system32_set_vblank(int state)
+void system32_set_vblank(running_machine *machine, int state)
 {
 	/* at the end of VBLANK is when automatic sprite rendering happens */
 	if (!state)
-		timer_set(ATTOTIME_IN_USEC(50), NULL, 1, update_sprites);
+		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 1, update_sprites);
 }
 
 
@@ -1570,11 +1570,11 @@ static UINT8 update_tilemaps(const device_config *screen, const rectangle *clipr
 static void sprite_erase_buffer(void)
 {
 	/* erase the visible sprite buffer and clear the checksums */
-	fillbitmap(layer_data[MIXER_LAYER_SPRITES].bitmap, 0xffff, NULL);
+	bitmap_fill(layer_data[MIXER_LAYER_SPRITES].bitmap, NULL, 0xffff);
 
 	/* for multi32, erase the other buffer as well */
 	if (is_multi32)
-		fillbitmap(layer_data[MIXER_LAYER_MULTISPR].bitmap, 0xffff, NULL);
+		bitmap_fill(layer_data[MIXER_LAYER_MULTISPR].bitmap, NULL, 0xffff);
 }
 
 
@@ -2460,7 +2460,7 @@ VIDEO_UPDATE( system32 )
 	/* if the display is off, punt */
 	if (!system32_displayenable[0])
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -2640,7 +2640,7 @@ VIDEO_UPDATE( multi32 )
 	/* if the display is off, punt */
 	if (!system32_displayenable[(screen == left_screen) ? 0 : 1])
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 

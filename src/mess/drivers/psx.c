@@ -187,7 +187,7 @@ static TIMER_CALLBACK(psx_pad_ack)
 		if( !m_pad[ n_port ].b_ack )
 		{
 			m_pad[ n_port ].b_ack = 1;
-			timer_set( ATTOTIME_IN_USEC( 2 ), NULL, n_port, psx_pad_ack );
+			timer_set(machine, ATTOTIME_IN_USEC( 2 ), NULL, n_port, psx_pad_ack );
 		}
 	}
 }
@@ -301,7 +301,7 @@ static void psx_pad( running_machine *machine, int n_port, int n_data )
 	if( b_ack )
 	{
 		m_pad[ n_port ].b_ack = 0;
-		timer_set( ATTOTIME_IN_USEC( 10 ), NULL, n_port, psx_pad_ack );
+		timer_set(machine, ATTOTIME_IN_USEC( 10 ), NULL, n_port, psx_pad_ack );
 	}
 }
 

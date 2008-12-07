@@ -60,16 +60,16 @@ static VIDEO_START(backfire)
 	deco16_pf34_control = auto_malloc(0x10);
 
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(deco16_pf1_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf2_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf3_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf4_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf2_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf3_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf4_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
-	state_save_register_global_pointer(deco16_pf34_control, 0x10/2);
+	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf2_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf3_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf4_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf3_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf4_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
+	state_save_register_global_pointer(machine, deco16_pf34_control, 0x10/2);
 
 	deco16_2_video_init(machine, 0);
 
@@ -181,8 +181,8 @@ static VIDEO_UPDATE(backfire)
 	if (screen == left_screen)
 	{
 
-		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,0x100,cliprect);
+		bitmap_fill(priority_bitmap,NULL,0);
+		bitmap_fill(bitmap,cliprect,0x100);
 
 		if (backfire_left_priority[0] == 0)
 		{
@@ -201,8 +201,8 @@ static VIDEO_UPDATE(backfire)
 	}
 	else if (screen == right_screen)
 	{
-		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,0x500,cliprect);
+		bitmap_fill(priority_bitmap,NULL,0);
+		bitmap_fill(bitmap,cliprect,0x500);
 
 		if (backfire_right_priority[0] == 0)
 		{

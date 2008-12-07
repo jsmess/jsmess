@@ -77,7 +77,7 @@ static offs_t					atarigen_slapstic_last_address;
 static offs_t					atarigen_slapstic_base;
 static offs_t					atarigen_slapstic_mirror;
 
-static UINT8 					sound_cpu_num;
+static const device_config *	sound_cpu;
 static UINT8 					atarigen_cpu_to_sound;
 static UINT8 					atarigen_sound_to_cpu;
 static UINT8 					timed_int;
@@ -200,7 +200,7 @@ static emu_timer *get_scanline_interrupt_timer_for_screen(const device_config *s
 	if (scanline_interrupt_timer_screens[i] == NULL)
 	{
 		scanline_interrupt_timer_screens[i] = screen;
-		scanline_interrupt_timers[i] = timer_alloc(scanline_interrupt_callback, (void *)screen);
+		scanline_interrupt_timers[i] = timer_alloc(screen->machine, scanline_interrupt_callback, (void *)screen);
 	}
 
 	/* found it */
@@ -617,10 +617,10 @@ READ16_HANDLER( atarigen_slapstic_r )
     atarigen_sound_io_reset: Resets the state of the sound I/O.
 ---------------------------------------------------------------*/
 
-void atarigen_sound_io_reset(int cpu_num)
+void atarigen_sound_io_reset(const device_config *device)
 {
 	/* remember which CPU is the sound CPU */
-	sound_cpu_num = cpu_num;
+	sound_cpu = device;
 
 	/* reset the internal interrupts states */
 	timed_int = ym2151_int = 0;
@@ -681,7 +681,7 @@ void atarigen_ym2151_irq_gen(running_machine *machine, int irq)
 
 WRITE16_HANDLER( atarigen_sound_reset_w )
 {
-	timer_call_after_resynch(NULL, 0, delayed_sound_reset);
+	timer_call_after_resynch(space->machine, NULL, 0, delayed_sound_reset);
 }
 
 
@@ -690,9 +690,9 @@ WRITE16_HANDLER( atarigen_sound_reset_w )
     manually.
 ---------------------------------------------------------------*/
 
-void atarigen_sound_reset(void)
+void atarigen_sound_reset(running_machine *machine)
 {
-	timer_call_after_resynch(NULL, 1, delayed_sound_reset);
+	timer_call_after_resynch(machine, NULL, 1, delayed_sound_reset);
 }
 
 
@@ -706,19 +706,19 @@ void atarigen_sound_reset(void)
 WRITE16_HANDLER( atarigen_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 WRITE16_HANDLER( atarigen_sound_upper_w )
 {
 	if (ACCESSING_BITS_8_15)
-		timer_call_after_resynch(NULL, (data >> 8) & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, (data >> 8) & 0xff, delayed_sound_w);
 }
 
 WRITE32_HANDLER( atarigen_sound_upper32_w )
 {
 	if (ACCESSING_BITS_24_31)
-		timer_call_after_resynch(NULL, (data >> 24) & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, (data >> 24) & 0xff, delayed_sound_w);
 }
 
 
@@ -758,7 +758,7 @@ READ32_HANDLER( atarigen_sound_upper32_r )
 
 WRITE8_HANDLER( atarigen_6502_sound_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_6502_sound_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_6502_sound_w);
 }
 
 
@@ -770,7 +770,7 @@ WRITE8_HANDLER( atarigen_6502_sound_w )
 READ8_HANDLER( atarigen_6502_sound_r )
 {
 	atarigen_cpu_to_sound_ready = 0;
-	cpu_set_input_line(space->machine->cpu[sound_cpu_num], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return atarigen_cpu_to_sound;
 }
 
@@ -785,9 +785,9 @@ READ8_HANDLER( atarigen_6502_sound_r )
 static void update_6502_irq(running_machine *machine)
 {
 	if (timed_int || ym2151_int)
-		cpu_set_input_line(machine->cpu[sound_cpu_num], M6502_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(sound_cpu, M6502_IRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[sound_cpu_num], M6502_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -798,13 +798,13 @@ static void update_6502_irq(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_reset )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[sound_cpu_num], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
 	{
-		cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* reset the sound write state */
@@ -831,7 +831,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	/* set up the states and signal an NMI to the sound CPU */
 	atarigen_cpu_to_sound = param;
 	atarigen_cpu_to_sound_ready = 1;
-	cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
@@ -947,7 +947,7 @@ static emu_timer *get_scanline_timer_for_screen(const device_config *screen)
 	if (scanline_timer_screens[i] == NULL)
 	{
 		scanline_timer_screens[i] = screen;
-		scanline_timers[i] = timer_alloc(scanline_timer_callback, (void *)screen);
+		scanline_timers[i] = timer_alloc(screen->machine, scanline_timer_callback, (void *)screen);
 	}
 
 	/* found it */
@@ -1035,7 +1035,7 @@ static emu_timer *get_atarivc_eof_update_timer_for_screen(const device_config *s
 	if (atarivc_eof_update_timer_screens[i] == NULL)
 	{
 		atarivc_eof_update_timer_screens[i] = screen;
-		atarivc_eof_update_timers[i] = timer_alloc(atarivc_eof_update, (void *)screen);
+		atarivc_eof_update_timers[i] = timer_alloc(screen->machine, atarivc_eof_update, (void *)screen);
 	}
 
 	/* found it */
@@ -1481,7 +1481,7 @@ void atarigen_halt_until_hblank_0(const device_config *screen)
 
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)width;
-	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), NULL, 0, unhalt_cpu);
+	timer_set(screen->machine, double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), NULL, 0, unhalt_cpu);
 	cpu_set_input_line(screen->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
@@ -1643,46 +1643,45 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
 
 void atarigen_init_save_state(running_machine *machine)
 {
-	state_save_register_global(atarigen_scanline_int_state);
-	state_save_register_global(atarigen_sound_int_state);
-	state_save_register_global(atarigen_video_int_state);
+	state_save_register_global(machine, atarigen_scanline_int_state);
+	state_save_register_global(machine, atarigen_sound_int_state);
+	state_save_register_global(machine, atarigen_video_int_state);
 
-	state_save_register_global(atarigen_cpu_to_sound_ready);
-	state_save_register_global(atarigen_sound_to_cpu_ready);
+	state_save_register_global(machine, atarigen_cpu_to_sound_ready);
+	state_save_register_global(machine, atarigen_sound_to_cpu_ready);
 
-	state_save_register_global(atarivc_state.latch1);				/* latch #1 value (-1 means disabled) */
-	state_save_register_global(atarivc_state.latch2);				/* latch #2 value (-1 means disabled) */
-	state_save_register_global(atarivc_state.rowscroll_enable);		/* true if row-scrolling is enabled */
-	state_save_register_global(atarivc_state.palette_bank);			/* which palette bank is enabled */
-	state_save_register_global(atarivc_state.pf0_xscroll);			/* playfield 1 xscroll */
-	state_save_register_global(atarivc_state.pf0_xscroll_raw);		/* playfield 1 xscroll raw value */
-	state_save_register_global(atarivc_state.pf0_yscroll);			/* playfield 1 yscroll */
-	state_save_register_global(atarivc_state.pf1_xscroll);			/* playfield 2 xscroll */
-	state_save_register_global(atarivc_state.pf1_xscroll_raw);		/* playfield 2 xscroll raw value */
-	state_save_register_global(atarivc_state.pf1_yscroll);			/* playfield 2 yscroll */
-	state_save_register_global(atarivc_state.mo_xscroll);			/* sprite xscroll */
-	state_save_register_global(atarivc_state.mo_yscroll);			/* sprite xscroll */
+	state_save_register_global(machine, atarivc_state.latch1);				/* latch #1 value (-1 means disabled) */
+	state_save_register_global(machine, atarivc_state.latch2);				/* latch #2 value (-1 means disabled) */
+	state_save_register_global(machine, atarivc_state.rowscroll_enable);		/* true if row-scrolling is enabled */
+	state_save_register_global(machine, atarivc_state.palette_bank);			/* which palette bank is enabled */
+	state_save_register_global(machine, atarivc_state.pf0_xscroll);			/* playfield 1 xscroll */
+	state_save_register_global(machine, atarivc_state.pf0_xscroll_raw);		/* playfield 1 xscroll raw value */
+	state_save_register_global(machine, atarivc_state.pf0_yscroll);			/* playfield 1 yscroll */
+	state_save_register_global(machine, atarivc_state.pf1_xscroll);			/* playfield 2 xscroll */
+	state_save_register_global(machine, atarivc_state.pf1_xscroll_raw);		/* playfield 2 xscroll raw value */
+	state_save_register_global(machine, atarivc_state.pf1_yscroll);			/* playfield 2 yscroll */
+	state_save_register_global(machine, atarivc_state.mo_xscroll);			/* sprite xscroll */
+	state_save_register_global(machine, atarivc_state.mo_yscroll);			/* sprite xscroll */
 
-	state_save_register_global(eeprom_unlocked);
+	state_save_register_global(machine, eeprom_unlocked);
 
-	state_save_register_global(atarigen_slapstic_num);
-	state_save_register_global(atarigen_slapstic_bank);
-	state_save_register_global(atarigen_slapstic_last_pc);
-	state_save_register_global(atarigen_slapstic_last_address);
+	state_save_register_global(machine, atarigen_slapstic_num);
+	state_save_register_global(machine, atarigen_slapstic_bank);
+	state_save_register_global(machine, atarigen_slapstic_last_pc);
+	state_save_register_global(machine, atarigen_slapstic_last_address);
 
-	state_save_register_global(sound_cpu_num);
-	state_save_register_global(atarigen_cpu_to_sound);
-	state_save_register_global(atarigen_sound_to_cpu);
-	state_save_register_global(timed_int);
-	state_save_register_global(ym2151_int);
+	state_save_register_global(machine, atarigen_cpu_to_sound);
+	state_save_register_global(machine, atarigen_sound_to_cpu);
+	state_save_register_global(machine, timed_int);
+	state_save_register_global(machine, ym2151_int);
 
-	state_save_register_global(scanlines_per_callback);
+	state_save_register_global(machine, scanlines_per_callback);
 
-	state_save_register_global(actual_vc_latch0);
-	state_save_register_global(actual_vc_latch1);
+	state_save_register_global(machine, actual_vc_latch0);
+	state_save_register_global(machine, actual_vc_latch1);
 
-	state_save_register_global(playfield_latch);
-	state_save_register_global(playfield2_latch);
+	state_save_register_global(machine, playfield_latch);
+	state_save_register_global(machine, playfield2_latch);
 
 	/* need a postload to reset the state */
 	state_save_register_postload(machine, slapstic_postload, NULL);

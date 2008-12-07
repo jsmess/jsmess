@@ -551,11 +551,11 @@ static MACHINE_START( cidelsa )
 	/* reset the CPU */
 
 	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
 	/* register for state saving */
 
-	state_save_register_global(state->cdp1802_mode);
+	state_save_register_global(machine, state->cdp1802_mode);
 }
 
 static MACHINE_START( draco )
@@ -571,8 +571,8 @@ static MACHINE_START( draco )
 
 	/* register for state saving */
 
-	state_save_register_global(state->draco_sound);
-	state_save_register_global(state->draco_ay_latch);
+	state_save_register_global(machine, state->draco_sound);
+	state_save_register_global(machine, state->draco_ay_latch);
 }
 
 /* Machine Reset */

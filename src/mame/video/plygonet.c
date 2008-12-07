@@ -82,13 +82,13 @@ VIDEO_START( polygonet )
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
-	state_save_register_global_array(ttl_vram);
+	state_save_register_global_array(machine, ttl_vram);
 }
 
 VIDEO_UPDATE( polygonet )
 {
-	fillbitmap(priority_bitmap, 0, NULL);
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	tilemap_draw(bitmap, cliprect, ttl_tilemap, 0, 1<<0);
 	return 0;

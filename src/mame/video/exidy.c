@@ -305,7 +305,7 @@ static void check_collision(running_machine *machine)
 		return;
 
 	/* draw sprite 1 */
-	fillbitmap(motion_object_1_vid, 0xff, &clip);
+	bitmap_fill(motion_object_1_vid, &clip, 0xff);
 	if (sprite_1_enabled())
 	{
 		org_1_x = 236 - *exidy_sprite1_xpos - 4;
@@ -316,7 +316,7 @@ static void check_collision(running_machine *machine)
 	}
 
 	/* draw sprite 2 */
-	fillbitmap(motion_object_2_vid, 0xff, &clip);
+	bitmap_fill(motion_object_2_vid, &clip, 0xff);
 	org_2_x = 236 - *exidy_sprite2_xpos - 4;
 	org_2_y = 244 - *exidy_sprite2_ypos - 4;
 	drawgfx(motion_object_2_vid, machine->gfx[0],
@@ -324,7 +324,7 @@ static void check_collision(running_machine *machine)
 			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 
 	/* draw sprite 2 clipped to sprite 1's location */
-	fillbitmap(motion_object_2_clip, 0xff, &clip);
+	bitmap_fill(motion_object_2_clip, &clip, 0xff);
 	if (sprite_1_enabled())
 	{
 		sx = org_2_x - org_1_x;
@@ -352,7 +352,7 @@ static void check_collision(running_machine *machine)
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & collision_mask) && (count++ < 128))
-					timer_set(video_screen_get_time_until_pos(machine->primary_screen, org_1_x + sx, org_1_y + sy), NULL, current_collision_mask, collision_irq_callback);
+					timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, org_1_x + sx, org_1_y + sy), NULL, current_collision_mask, collision_irq_callback);
 			}
 
 			if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
@@ -360,7 +360,7 @@ static void check_collision(running_machine *machine)
 				/* check for background collision (M2CHAR) */
 				if (*BITMAP_ADDR16(background_bitmap, org_2_y + sy, org_2_x + sx) != 0)
 					if ((collision_mask & 0x08) && (count++ < 128))
-						timer_set(video_screen_get_time_until_pos(machine->primary_screen, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
+						timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
 			}
 		}
 }

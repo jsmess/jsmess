@@ -566,43 +566,43 @@ static void rand_init(UINT8 *rng, int size, int left, int right, int add)
 }
 
 
-static void register_for_save(struct POKEYregisters *chip, const char *tag)
+static void register_for_save(struct POKEYregisters *chip, const device_config *device)
 {
-	state_save_register_item_array("pokey", tag, 0, chip->counter);
-	state_save_register_item_array("pokey", tag, 0, chip->divisor);
-	state_save_register_item_array("pokey", tag, 0, chip->volume);
-	state_save_register_item_array("pokey", tag, 0, chip->output);
-	state_save_register_item_array("pokey", tag, 0, chip->audible);
-	state_save_register_item("pokey", tag, 0, chip->samplepos_fract);
-	state_save_register_item("pokey", tag, 0, chip->samplepos_whole);
-	state_save_register_item("pokey", tag, 0, chip->polyadjust);
-	state_save_register_item("pokey", tag, 0, chip->p4);
-	state_save_register_item("pokey", tag, 0, chip->p5);
-	state_save_register_item("pokey", tag, 0, chip->p9);
-	state_save_register_item("pokey", tag, 0, chip->p17);
-	state_save_register_item("pokey", tag, 0, chip->r9);
-	state_save_register_item("pokey", tag, 0, chip->r17);
-	state_save_register_item("pokey", tag, 0, chip->clockmult);
-	state_save_register_item("pokey", tag, 0, chip->timer_period[0].seconds);
-	state_save_register_item("pokey", tag, 0, chip->timer_period[0].attoseconds);
-	state_save_register_item("pokey", tag, 0, chip->timer_period[1].seconds);
-	state_save_register_item("pokey", tag, 0, chip->timer_period[1].attoseconds);
-	state_save_register_item("pokey", tag, 0, chip->timer_period[2].seconds);
-	state_save_register_item("pokey", tag, 0, chip->timer_period[2].attoseconds);
-	state_save_register_item_array("pokey", tag, 0, chip->timer_param);
-	state_save_register_item_array("pokey", tag, 0, chip->AUDF);
-	state_save_register_item_array("pokey", tag, 0, chip->AUDC);
-	state_save_register_item_array("pokey", tag, 0, chip->POTx);
-	state_save_register_item("pokey", tag, 0, chip->AUDCTL);
-	state_save_register_item("pokey", tag, 0, chip->ALLPOT);
-	state_save_register_item("pokey", tag, 0, chip->KBCODE);
-	state_save_register_item("pokey", tag, 0, chip->RANDOM);
-	state_save_register_item("pokey", tag, 0, chip->SERIN);
-	state_save_register_item("pokey", tag, 0, chip->SEROUT);
-	state_save_register_item("pokey", tag, 0, chip->IRQST);
-	state_save_register_item("pokey", tag, 0, chip->IRQEN);
-	state_save_register_item("pokey", tag, 0, chip->SKSTAT);
-	state_save_register_item("pokey", tag, 0, chip->SKCTL);
+	state_save_register_device_item_array(device, 0, chip->counter);
+	state_save_register_device_item_array(device, 0, chip->divisor);
+	state_save_register_device_item_array(device, 0, chip->volume);
+	state_save_register_device_item_array(device, 0, chip->output);
+	state_save_register_device_item_array(device, 0, chip->audible);
+	state_save_register_device_item(device, 0, chip->samplepos_fract);
+	state_save_register_device_item(device, 0, chip->samplepos_whole);
+	state_save_register_device_item(device, 0, chip->polyadjust);
+	state_save_register_device_item(device, 0, chip->p4);
+	state_save_register_device_item(device, 0, chip->p5);
+	state_save_register_device_item(device, 0, chip->p9);
+	state_save_register_device_item(device, 0, chip->p17);
+	state_save_register_device_item(device, 0, chip->r9);
+	state_save_register_device_item(device, 0, chip->r17);
+	state_save_register_device_item(device, 0, chip->clockmult);
+	state_save_register_device_item(device, 0, chip->timer_period[0].seconds);
+	state_save_register_device_item(device, 0, chip->timer_period[0].attoseconds);
+	state_save_register_device_item(device, 0, chip->timer_period[1].seconds);
+	state_save_register_device_item(device, 0, chip->timer_period[1].attoseconds);
+	state_save_register_device_item(device, 0, chip->timer_period[2].seconds);
+	state_save_register_device_item(device, 0, chip->timer_period[2].attoseconds);
+	state_save_register_device_item_array(device, 0, chip->timer_param);
+	state_save_register_device_item_array(device, 0, chip->AUDF);
+	state_save_register_device_item_array(device, 0, chip->AUDC);
+	state_save_register_device_item_array(device, 0, chip->POTx);
+	state_save_register_device_item(device, 0, chip->AUDCTL);
+	state_save_register_device_item(device, 0, chip->ALLPOT);
+	state_save_register_device_item(device, 0, chip->KBCODE);
+	state_save_register_device_item(device, 0, chip->RANDOM);
+	state_save_register_device_item(device, 0, chip->SERIN);
+	state_save_register_device_item(device, 0, chip->SEROUT);
+	state_save_register_device_item(device, 0, chip->IRQST);
+	state_save_register_device_item(device, 0, chip->IRQEN);
+	state_save_register_device_item(device, 0, chip->SKSTAT);
+	state_save_register_device_item(device, 0, chip->SKCTL);
 }
 
 
@@ -648,15 +648,15 @@ static SND_START( pokey )
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
-	chip->rtimer = timer_alloc(NULL, NULL);
+	chip->rtimer = timer_alloc(Machine,  NULL, NULL);
 
-	chip->timer[0] = timer_alloc(pokey_timer_expire, chip);
-	chip->timer[1] = timer_alloc(pokey_timer_expire, chip);
-	chip->timer[2] = timer_alloc(pokey_timer_expire, chip);
+	chip->timer[0] = timer_alloc(Machine, pokey_timer_expire, chip);
+	chip->timer[1] = timer_alloc(Machine, pokey_timer_expire, chip);
+	chip->timer[2] = timer_alloc(Machine, pokey_timer_expire, chip);
 
 	for (i=0; i<8; i++)
 	{
-		chip->ptimer[i] = timer_alloc(pokey_pot_trigger, chip);
+		chip->ptimer[i] = timer_alloc(Machine, pokey_pot_trigger, chip);
 		chip->pot_r[i] = chip->intf.pot_r[i];
 	}
 	chip->allpot_r = chip->intf.allpot_r;
@@ -666,7 +666,7 @@ static SND_START( pokey )
 
 	chip->channel = stream_create(0, 1, sample_rate, chip, pokey_update);
 
-	register_for_save(chip, tag);
+	register_for_save(chip, device);
 
     return chip;
 }
@@ -1179,9 +1179,9 @@ static void pokey_register_w(int chip, int offs, int data)
          * loaders from Ballblazer and Escape from Fractalus
          * The real times are unknown
          */
-        timer_set(ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready);
+        timer_set(space->machine, ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready);
         /* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-        timer_set(ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
+        timer_set(space->machine, ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
         break;
 
     case IRQEN_C:
@@ -1395,25 +1395,25 @@ WRITE8_HANDLER( quad_pokey_w )
 void pokey1_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 0);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey2_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 1);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey3_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 2);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey4_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 3);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 static void pokey_break_w(int chip, int shift)

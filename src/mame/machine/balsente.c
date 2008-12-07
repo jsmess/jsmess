@@ -118,7 +118,7 @@ static TIMER_CALLBACK( interrupt_timer )
 	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
 
 	/* if this is Grudge Match, update the steering */
 	if (grudge_steering_result & 0x80)
@@ -155,14 +155,14 @@ MACHINE_RESET( balsente )
 
 	/* reset counters; counter 2's gate is tied high */
 	memset(counter, 0, sizeof(counter));
-	counter[1].timer = timer_alloc(counter_callback, NULL);
-	counter[2].timer = timer_alloc(counter_callback, NULL);
+	counter[1].timer = timer_alloc(machine, counter_callback, NULL);
+	counter[2].timer = timer_alloc(machine, counter_callback, NULL);
 	counter[2].gate = 1;
 
 	/* reset the manual counter 0 clock */
 	counter_control = 0x00;
 	counter_0_ff = 0;
-	counter_0_timer = timer_alloc(clock_counter_0_ff, NULL);
+	counter_0_timer = timer_alloc(machine, clock_counter_0_ff, NULL);
 	counter_0_timer_active = 0;
 
 	/* reset the ADC states */
@@ -191,52 +191,52 @@ MACHINE_RESET( balsente )
 	memory_set_bank(space->machine, 2, 0);
 
 	/* start a timer to generate interrupts */
-	scanline_timer = timer_alloc(interrupt_timer, NULL);
+	scanline_timer = timer_alloc(machine, interrupt_timer, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* register for saving */
 	for (i = 0; i < 3; i++)
 	{
-		state_save_register_item("8253counter", NULL, i, counter[i].timer_active);
-		state_save_register_item("8253counter", NULL, i, counter[i].initial);
-		state_save_register_item("8253counter", NULL, i, counter[i].count);
-		state_save_register_item("8253counter", NULL, i, counter[i].gate);
-		state_save_register_item("8253counter", NULL, i, counter[i].out);
-		state_save_register_item("8253counter", NULL, i, counter[i].mode);
-		state_save_register_item("8253counter", NULL, i, counter[i].readbyte);
-		state_save_register_item("8253counter", NULL, i, counter[i].writebyte);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].timer_active);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].initial);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].count);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].gate);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].out);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].mode);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].readbyte);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].writebyte);
 	}
 
-	state_save_register_global(counter_control);
-	state_save_register_global(counter_0_ff);
-	state_save_register_global(counter_0_timer_active);
+	state_save_register_global(machine, counter_control);
+	state_save_register_global(machine, counter_0_ff);
+	state_save_register_global(machine, counter_0_timer_active);
 
-	state_save_register_global_array(analog_input_data);
-	state_save_register_global(adc_value);
+	state_save_register_global_array(machine, analog_input_data);
+	state_save_register_global(machine, adc_value);
 
-	state_save_register_global(dac_value);
-	state_save_register_global(dac_register);
-	state_save_register_global(chip_select);
+	state_save_register_global(machine, dac_value);
+	state_save_register_global(machine, dac_register);
+	state_save_register_global(machine, chip_select);
 
-	state_save_register_global(m6850_status);
-	state_save_register_global(m6850_control);
-	state_save_register_global(m6850_input);
-	state_save_register_global(m6850_output);
-	state_save_register_global(m6850_data_ready);
+	state_save_register_global(machine, m6850_status);
+	state_save_register_global(machine, m6850_control);
+	state_save_register_global(machine, m6850_input);
+	state_save_register_global(machine, m6850_output);
+	state_save_register_global(machine, m6850_data_ready);
 
-	state_save_register_global(m6850_sound_status);
-	state_save_register_global(m6850_sound_control);
-	state_save_register_global(m6850_sound_input);
-	state_save_register_global(m6850_sound_output);
+	state_save_register_global(machine, m6850_sound_status);
+	state_save_register_global(machine, m6850_sound_control);
+	state_save_register_global(machine, m6850_sound_input);
+	state_save_register_global(machine, m6850_sound_output);
 
-	state_save_register_global_array(noise_position);
+	state_save_register_global_array(machine, noise_position);
 
-	state_save_register_global(nstocker_bits);
-	state_save_register_global(spiker_expand_color);
-	state_save_register_global(spiker_expand_bgcolor);
-	state_save_register_global(spiker_expand_bits);
-	state_save_register_global(grudge_steering_result);
-	state_save_register_global_array(grudge_last_steering);
+	state_save_register_global(machine, nstocker_bits);
+	state_save_register_global(machine, spiker_expand_color);
+	state_save_register_global(machine, spiker_expand_bgcolor);
+	state_save_register_global(machine, spiker_expand_bits);
+	state_save_register_global(machine, grudge_steering_result);
+	state_save_register_global_array(machine, grudge_last_steering);
 }
 
 
@@ -525,7 +525,7 @@ static TIMER_CALLBACK( m6850_w_callback )
 
 	/* set a timer for 500usec later to actually transmit the data */
 	/* (this is very important for several games, esp Snacks'n Jaxson) */
-	timer_set(ATTOTIME_IN_USEC(500), NULL, param, m6850_data_ready_callback);
+	timer_set(machine, ATTOTIME_IN_USEC(500), NULL, param, m6850_data_ready_callback);
 }
 
 
@@ -542,7 +542,7 @@ WRITE8_HANDLER( balsente_m6850_w )
 
 	/* output register is at offset 1; set a timer to synchronize the CPUs */
 	else
-		timer_call_after_resynch(NULL, data, m6850_w_callback);
+		timer_call_after_resynch(space->machine, NULL, data, m6850_w_callback);
 }
 
 
@@ -662,7 +662,7 @@ WRITE8_HANDLER( balsente_adc_select_w )
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
 logerror("adc_select %d\n", offset & 7);
-	timer_set(ATTOTIME_IN_USEC(50), NULL, offset & 7, adc_finished);
+	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, offset & 7, adc_finished);
 }
 
 

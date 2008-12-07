@@ -63,16 +63,16 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bankaddr]);
 }
 
-static void m5205_int1(running_machine *machine, int data)
+static void m5205_int1(const device_config *device)
 {
 	msm5205_data_w(0, sample_buffer1 & 0x0F);
 	sample_buffer1 >>= 4;
 	sample_select1 ^= 1;
 	if (sample_select1 == 0)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void m5205_int2(running_machine *machine, int data)
+static void m5205_int2(const device_config *device)
 {
 	msm5205_data_w(1, sample_buffer2 & 0x0F);
 	sample_buffer2 >>= 4;
@@ -254,9 +254,9 @@ static VIDEO_UPDATE( fcrash )
 	tilemap_set_enable(cps1_bg_tilemap[2],1);
 
 	/* Blank screen */
-	fillbitmap(bitmap,0xbff,cliprect);
+	bitmap_fill(bitmap,cliprect,0xbff);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
@@ -325,9 +325,9 @@ static VIDEO_UPDATE( kodb )
 	tilemap_set_enable(cps1_bg_tilemap[2],1);
 
 	/* Blank screen */
-	fillbitmap(bitmap,0xbff,cliprect);
+	bitmap_fill(bitmap,cliprect,0xbff);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;

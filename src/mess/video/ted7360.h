@@ -22,7 +22,7 @@
 /* call to init videodriver */
 /* pal version */
 /* dma_read: videochip fetched 1 byte data from system bus */
-extern void ted7360_init (int pal);
+extern void ted7360_init (running_machine *machine, int pal);
 extern void ted7360_set_dma (read8_space_func dma_read,
 							 read8_space_func dma_read_rom);
 

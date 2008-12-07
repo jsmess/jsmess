@@ -957,10 +957,10 @@ static CPU_INIT( v810 )
 	v810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	v810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item_array("v810", device->tag, 0, v810.reg);
-	state_save_register_item("v810", device->tag, 0, v810.irq_line);
-	state_save_register_item("v810", device->tag, 0, v810.nmi_line);
-	state_save_register_item("v810", device->tag, 0, v810.PPC);
+	state_save_register_device_item_array(device, 0, v810.reg);
+	state_save_register_device_item(device, 0, v810.irq_line);
+	state_save_register_device_item(device, 0, v810.nmi_line);
+	state_save_register_device_item(device, 0, v810.PPC);
 
 }
 
@@ -1109,7 +1109,7 @@ CPU_GET_INFO( v810 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(v810);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 9;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;

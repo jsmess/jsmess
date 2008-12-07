@@ -90,7 +90,7 @@ static CPU_RESET( sc61860 )
 static CPU_INIT( sc61860 )
 {
 	sc61860.config = (sc61860_cpu_core *) device->static_config;
-	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
+	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
 	sc61860.device = device;
 	sc61860.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
@@ -176,7 +176,7 @@ CPU_GET_INFO( sc61860 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sc61860);				break;
 		case CPUINFO_INT_INPUT_LINES:						info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

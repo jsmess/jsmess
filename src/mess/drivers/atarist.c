@@ -821,10 +821,10 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE8(ay8910_read_port_0_r, ay8910_control_port_0_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE8(ay8910_write_port_0_w, 0xff00)
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE8(acia6850_0_stat_r, acia6850_0_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE8(acia6850_0_data_r, acia6850_0_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE8(acia6850_1_stat_r, acia6850_1_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE8(acia6850_1_data_r, acia6850_1_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -859,10 +859,10 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 //  AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE8(acia6850_0_stat_r, acia6850_0_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE8(acia6850_0_data_r, acia6850_0_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE8(acia6850_1_stat_r, acia6850_1_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE8(acia6850_1_data_r, acia6850_1_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
@@ -915,10 +915,10 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff9220, 0xff9221) AM_READ_PORT("GUNX")
 	AM_RANGE(0xff9222, 0xff9223) AM_READ_PORT("GUNY")
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE8(acia6850_0_stat_r, acia6850_0_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE8(acia6850_0_data_r, acia6850_0_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE8(acia6850_1_stat_r, acia6850_1_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE8(acia6850_1_data_r, acia6850_1_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -965,10 +965,10 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8(SCC8530, "scc", scc_r, scc_w, 0xff00)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE8(acia6850_0_stat_r, acia6850_0_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE8(acia6850_0_data_r, acia6850_0_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE8(acia6850_1_stat_r, acia6850_1_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE8(acia6850_1_data_r, acia6850_1_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
@@ -1021,10 +1021,10 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(stbook_power_r, stbook_power_w)
     AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(stbook_reference_r, stbook_reference_w)*/
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE8(acia6850_0_stat_r, acia6850_0_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE8(acia6850_0_data_r, acia6850_0_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE8(acia6850_1_stat_r, acia6850_1_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE8(acia6850_1_data_r, acia6850_1_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -1307,12 +1307,12 @@ static const ay8910_interface ym2149_interface =
 static int acia_irq;
 static UINT8 acia_midi_rx = 1, acia_midi_tx = 1;
 
-static void acia_interrupt(int state)
+static void acia_interrupt(const device_config *device, int state)
 {
 	acia_irq = state;
 }
 
-static const struct acia6850_interface acia_ikbd_intf =
+static const acia6850_interface acia_ikbd_intf =
 {
 	Y2/64,
 	Y2/64,
@@ -1324,7 +1324,7 @@ static const struct acia6850_interface acia_ikbd_intf =
 	acia_interrupt
 };
 
-static const struct acia6850_interface acia_midi_intf =
+static const acia6850_interface acia_midi_intf =
 {
 	Y2/64,
 	Y2/64,
@@ -1445,7 +1445,7 @@ static void atarist_configure_memory(running_machine *machine)
 	memory_set_bank(machine, 3, 0);
 }
 
-static void atarist_state_save(void)
+static void atarist_state_save(running_machine *machine)
 {
 	memset(&fdc, 0, sizeof(fdc));
 
@@ -1453,37 +1453,35 @@ static void atarist_state_save(void)
 
 	memset(&ikbd, 0, sizeof(ikbd));
 
-	state_save_register_global(mmu);
-	state_save_register_global(fdc.dmabase);
-	state_save_register_global(fdc.status);
-	state_save_register_global(fdc.mode);
-	state_save_register_global(fdc.sectors);
-	state_save_register_global(fdc.dmabytes);
-	state_save_register_global(fdc.irq);
-	state_save_register_global(ikbd.keylatch);
-	state_save_register_global(ikbd.mouse_x);
-	state_save_register_global(ikbd.mouse_y);
-	state_save_register_global(ikbd.mouse_px);
-	state_save_register_global(ikbd.mouse_py);
-	state_save_register_global(ikbd.mouse_pc);
-	state_save_register_global(ikbd.rx);
-	state_save_register_global(ikbd.tx);
-	state_save_register_global(acia_irq);
-	state_save_register_global(acia_midi_rx);
-	state_save_register_global(acia_midi_tx);
-	state_save_register_global(mfp_rx);
-	state_save_register_global(mfp_tx);
+	state_save_register_global(machine, mmu);
+	state_save_register_global(machine, fdc.dmabase);
+	state_save_register_global(machine, fdc.status);
+	state_save_register_global(machine, fdc.mode);
+	state_save_register_global(machine, fdc.sectors);
+	state_save_register_global(machine, fdc.dmabytes);
+	state_save_register_global(machine, fdc.irq);
+	state_save_register_global(machine, ikbd.keylatch);
+	state_save_register_global(machine, ikbd.mouse_x);
+	state_save_register_global(machine, ikbd.mouse_y);
+	state_save_register_global(machine, ikbd.mouse_px);
+	state_save_register_global(machine, ikbd.mouse_py);
+	state_save_register_global(machine, ikbd.mouse_pc);
+	state_save_register_global(machine, ikbd.rx);
+	state_save_register_global(machine, ikbd.tx);
+	state_save_register_global(machine, acia_irq);
+	state_save_register_global(machine, acia_midi_rx);
+	state_save_register_global(machine, acia_midi_tx);
+	state_save_register_global(machine, mfp_rx);
+	state_save_register_global(machine, mfp_tx);
 }
 
 static MACHINE_START( atarist )
 {
 	atarist_configure_memory(machine);
-	atarist_state_save();
+	atarist_state_save(machine);
 
 	centronics_config(0, atarist_centronics_config);
 	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
-	acia6850_config(0, &acia_ikbd_intf);
-	acia6850_config(1, &acia_midi_intf);
 
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
 }
@@ -1539,49 +1537,47 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 	NULL
 };
 
-static void atariste_state_save(void)
+static void atariste_state_save(running_machine *machine)
 {
-	atarist_state_save();
+	atarist_state_save(machine);
 
 	memset(&mwire, 0, sizeof(mwire));
 	memset(&dmasound, 0, sizeof(dmasound));
 
-	state_save_register_global(dmasound.base);
-	state_save_register_global(dmasound.end);
-	state_save_register_global(dmasound.cntr);
-	state_save_register_global(dmasound.baselatch);
-	state_save_register_global(dmasound.endlatch);
-	state_save_register_global(dmasound.ctrl);
-	state_save_register_global(dmasound.mode);
-	state_save_register_global_array(dmasound.fifo);
-	state_save_register_global(dmasound.samples);
-	state_save_register_global(dmasound.active);
+	state_save_register_global(machine, dmasound.base);
+	state_save_register_global(machine, dmasound.end);
+	state_save_register_global(machine, dmasound.cntr);
+	state_save_register_global(machine, dmasound.baselatch);
+	state_save_register_global(machine, dmasound.endlatch);
+	state_save_register_global(machine, dmasound.ctrl);
+	state_save_register_global(machine, dmasound.mode);
+	state_save_register_global_array(machine, dmasound.fifo);
+	state_save_register_global(machine, dmasound.samples);
+	state_save_register_global(machine, dmasound.active);
 
-	state_save_register_global(mwire.data);
-	state_save_register_global(mwire.mask);
-	state_save_register_global(mwire.shift);
+	state_save_register_global(machine, mwire.data);
+	state_save_register_global(machine, mwire.mask);
+	state_save_register_global(machine, mwire.shift);
 }
 
 static MACHINE_START( atariste )
 {
 	atarist_configure_memory(machine);
-	atariste_state_save();
+	atariste_state_save(machine);
 
 	centronics_config(0, atarist_centronics_config);
 	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
-	acia6850_config(0, &acia_ikbd_intf);
-	acia6850_config(1, &acia_midi_intf);
 
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
 
-	dmasound_timer = timer_alloc(atariste_dmasound_tick, NULL);
-	microwire_timer = timer_alloc(atariste_microwire_tick, NULL);
+	dmasound_timer = timer_alloc(machine, atariste_dmasound_tick, NULL);
+	microwire_timer = timer_alloc(machine, atariste_microwire_tick, NULL);
 }
 
 static MACHINE_START( megaste )
 {
 	machine_start_atariste(machine);
-	state_save_register_global(megaste_cache);
+	state_save_register_global(machine, megaste_cache);
 	rp5c15_init(machine, &rtc_intf);
 }
 
@@ -1648,7 +1644,7 @@ static const ay8910_interface stbook_ym2149_interface =
 
 static UINT8 krxd, ktxd;
 
-static const struct acia6850_interface stbook_acia_ikbd_intf =
+static const acia6850_interface stbook_acia_ikbd_intf =
 {
 	U517/2/16, // 500kHz
 	U517/2/2, // 1MHZ
@@ -1702,15 +1698,13 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 static MACHINE_START( stbook )
 {
 	stbook_configure_memory(machine);
-	atariste_state_save();
+	atariste_state_save(machine);
 
-	state_save_register_global(krxd);
-	state_save_register_global(ktxd);
+	state_save_register_global(machine, krxd);
+	state_save_register_global(machine, ktxd);
 
 	centronics_config(0, atarist_centronics_config);
 	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
-	acia6850_config(0, &stbook_acia_ikbd_intf);
-	acia6850_config(1, &acia_midi_intf);
 	rp5c15_init(machine, &rtc_intf);
 
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
@@ -1751,6 +1745,12 @@ static MACHINE_DRIVER_START( atarist )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(acia_ikbd_intf)
+	MDRV_DEVICE_ADD("acia_1", ACIA6850)
+	MDRV_DEVICE_CONFIG(acia_midi_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1806,6 +1806,12 @@ static MACHINE_DRIVER_START( atariste )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(acia_ikbd_intf)
+	MDRV_DEVICE_ADD("acia_1", ACIA6850)
+	MDRV_DEVICE_CONFIG(acia_midi_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1853,6 +1859,12 @@ static MACHINE_DRIVER_START( stbook )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(stbook_acia_ikbd_intf)
+	MDRV_DEVICE_ADD("acia_1", ACIA6850)
+	MDRV_DEVICE_CONFIG(acia_midi_intf)
 MACHINE_DRIVER_END
 
 /* ROMs */

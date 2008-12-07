@@ -173,7 +173,7 @@ void sh4_exception(const char *message, int exception) // handle exception
 		sh4.m[INTEVT] = 0x1c0;
 		vector = 0x600;
 		sh4.irq_callback(sh4.device, INPUT_LINE_NMI);
-		LOG(("SH-4 #%d nmi exception after [%s]\n", cpunum_get_active(), message));
+		LOG(("SH-4 '%s' nmi exception after [%s]\n", sh4.device->tag, message));
 	} else {
 //      if ((sh4.m[ICR] & 0x4000) && (sh4.nmi_line_state == ASSERT_LINE))
 //          return;
@@ -187,7 +187,7 @@ void sh4_exception(const char *message, int exception) // handle exception
 			sh4.irq_callback(sh4.device, SH4_INTC_IRL0-exception+SH4_IRL0);
 		else
 			sh4.irq_callback(sh4.device, SH4_IRL3+1);
-		LOG(("SH-4 #%d interrupt exception #%d after [%s]\n", cpunum_get_active(), exception, message));
+		LOG(("SH-4 '%s' interrupt exception #%d after [%s]\n", sh4.device->tag, exception, message));
 	}
 	sh4_exception_checkunrequest(exception);
 
@@ -462,7 +462,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 	if (timermode == 1)
 	{
 		sh4.dma_timer_active[channel] = 1;
-		timer_adjust_oneshot(sh4.dma_timer[channel], ATTOTIME_IN_CYCLES(2*count+1, sh4.cpu_number), (sh4.cpu_number << 8) | channel);
+		timer_adjust_oneshot(sh4.dma_timer[channel], cpu_clocks_to_attotime(sh4.device, 2*count+1), (sh4.cpu_number << 8) | channel);
 	}
 	else if (timermode == 2)
 	{
@@ -965,16 +965,16 @@ READ32_HANDLER( sh4_internal_r )
 	return sh4.m[offset];
 }
 
-void sh4_set_frt_input(int cpunum, int state)
+void sh4_set_frt_input(const device_config *device, int state)
 {
 	if(state == PULSE_LINE)
 	{
-		sh4_set_frt_input(cpunum, ASSERT_LINE);
-		sh4_set_frt_input(cpunum, CLEAR_LINE);
+		sh4_set_frt_input(device, ASSERT_LINE);
+		sh4_set_frt_input(device, CLEAR_LINE);
 		return;
 	}
 
-	cpu_push_context(Machine->cpu[cpunum]);
+	cpu_push_context(device);
 
 	if(sh4.frt_input == state) {
 		cpu_pop_context();
@@ -1005,12 +1005,12 @@ void sh4_set_frt_input(int cpunum, int state)
 	cpu_pop_context();
 }
 
-void sh4_set_irln_input(int cpunum, int value)
+void sh4_set_irln_input(const device_config *device, int value)
 {
 	if (sh4.irln == value)
 		return;
 	sh4.irln = value;
-	cpu_set_input_line(Machine->cpu[cpunum], SH4_IRLn, PULSE_LINE);
+	cpu_set_input_line(device, SH4_IRLn, PULSE_LINE);
 }
 
 void sh4_set_irq_line(int irqline, int state) // set state of external interrupt line
@@ -1025,7 +1025,7 @@ int s;
 		{
 			if ((state == CLEAR_LINE) && (sh4.nmi_line_state == ASSERT_LINE))  // rising
 			{
-				LOG(("SH-4 #%d assert nmi\n", cpunum_get_active()));
+				LOG(("SH-4 '%s' assert nmi\n", sh4.device->tag));
 				sh4_exception_request(SH4_INTC_NMI);
 				sh4_dmac_nmi();
 			}
@@ -1034,7 +1034,7 @@ int s;
 		{
 			if ((state == ASSERT_LINE) && (sh4.nmi_line_state == CLEAR_LINE)) // falling
 			{
-				LOG(("SH-4 #%d assert nmi\n", cpunum_get_active()));
+				LOG(("SH-4 '%s' assert nmi\n", sh4.device->tag));
 				sh4_exception_request(SH4_INTC_NMI);
 				sh4_dmac_nmi();
 			}
@@ -1057,12 +1057,12 @@ int s;
 
 			if( state == CLEAR_LINE )
 			{
-				LOG(("SH-4 #%d cleared external irq IRL%d\n", cpunum_get_active(), irqline));
+				LOG(("SH-4 '%s' cleared external irq IRL%d\n", sh4.device->tag, irqline));
 				sh4_exception_unrequest(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 			else
 			{
-				LOG(("SH-4 #%d assert external irq IRL%d\n", cpunum_get_active(), irqline));
+				LOG(("SH-4 '%s' assert external irq IRL%d\n", sh4.device->tag, irqline));
 				sh4_exception_request(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 		}
@@ -1076,7 +1076,7 @@ int s;
 				sh4_exception_unrequest(SH4_INTC_IRLn0+s);
 			if (sh4.irln < 15)
 				sh4_exception_request(SH4_INTC_IRLn0+sh4.irln);
-			LOG(("SH-4 #%d IRLn0-IRLn3 level #%d\n", cpunum_get_active(), sh4.irln));
+			LOG(("SH-4 '%s' IRLn0-IRLn3 level #%d\n", sh4.device->tag, sh4.irln));
 		}
 	}
 	if (sh4.test_irq && (!sh4.delay))
@@ -1131,27 +1131,27 @@ void sh4_parse_configuration(const struct sh4_config *conf)
 	}
 }
 
-void sh4_common_init(void)
+void sh4_common_init(const device_config *device)
 {
 	int i;
 
 	for (i=0; i<3; i++)
 	{
-		sh4.timer[i] = timer_alloc(sh4_timer_callback, (void*)(FPTR)i);
+		sh4.timer[i] = timer_alloc(device->machine, sh4_timer_callback, (void*)(FPTR)i);
 		timer_adjust_oneshot(sh4.timer[i], attotime_never, 0);
 	}
 
 	for (i=0; i<4; i++)
 	{
-		sh4.dma_timer[i] = timer_alloc(sh4_dmac_callback, NULL);
+		sh4.dma_timer[i] = timer_alloc(device->machine, sh4_dmac_callback, NULL);
 		timer_adjust_oneshot(sh4.dma_timer[i], attotime_never, 0);
 	}
 
-	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback, NULL);
+	sh4.refresh_timer = timer_alloc(device->machine, sh4_refresh_timer_callback, NULL);
 	timer_adjust_oneshot(sh4.refresh_timer, attotime_never, 0);
 	sh4.refresh_timer_base = 0;
 
-	sh4.rtc_timer = timer_alloc(sh4_rtc_timer_callback, NULL);
+	sh4.rtc_timer = timer_alloc(device->machine, sh4_rtc_timer_callback, NULL);
 	timer_adjust_oneshot(sh4.rtc_timer, attotime_never, 0);
 
 	sh4.m = auto_malloc(16384*4);

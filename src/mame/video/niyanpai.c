@@ -347,7 +347,7 @@ static void niyanpai_gfxdraw(running_machine *machine, int vram)
 	}
 
 	nb19010_busyflag = 0;
-	timer_set(ATTOTIME_IN_NSEC(1650 * nb19010_busyctr), NULL, 0, blitter_timer_callback);
+	timer_set(machine, ATTOTIME_IN_NSEC(1650 * nb19010_busyctr), NULL, 0, blitter_timer_callback);
 }
 
 /******************************************************************************
@@ -444,7 +444,7 @@ VIDEO_UPDATE( niyanpai )
 	if (niyanpai_dispflag[0])
 		copyscrollbitmap(bitmap, niyanpai_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
 	else
-		fillbitmap(bitmap, 0x00ff, 0);
+		bitmap_fill(bitmap, 0, 0x00ff);
 
 	if (niyanpai_dispflag[1])
 		copyscrollbitmap_trans(bitmap, niyanpai_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);

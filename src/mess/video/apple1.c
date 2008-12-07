@@ -217,7 +217,7 @@ attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
 }
 
 /* Blink the cursor on or off, as appropriate. */
-static void apple1_vh_cursor_blink (void)
+static void apple1_vh_cursor_blink (running_machine *machine)
 {
 	static int blink_on = 1;		/* cursor is visible initially */
 	int new_blink_on;
@@ -228,7 +228,7 @@ static void apple1_vh_cursor_blink (void)
 	   number of one-third-cycles elapsed, then checking the result
 	   modulo 3. */
 
-	if (((int) (attotime_to_double(timer_get_time()) / CURSOR_OFF_LENGTH)) % 3 < 2)
+	if (((int) (attotime_to_double(timer_get_time(machine)) / CURSOR_OFF_LENGTH)) % 3 < 2)
 		new_blink_on = 1;
 	else
 		new_blink_on = 0;
@@ -244,7 +244,7 @@ static void apple1_vh_cursor_blink (void)
 
 VIDEO_UPDATE( apple1 )
 {
-	apple1_vh_cursor_blink();
+	apple1_vh_cursor_blink(screen->machine);
 	terminal_draw(bitmap, NULL, apple1_terminal);
 	return 0;
 }

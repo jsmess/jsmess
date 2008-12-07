@@ -42,11 +42,11 @@ static UINT8 sound_int_state;
 
 static MACHINE_START( btoads )
 {
-	state_save_register_global(main_to_sound_data);
-	state_save_register_global(main_to_sound_ready);
-	state_save_register_global(sound_to_main_data);
-	state_save_register_global(sound_to_main_ready);
-	state_save_register_global(sound_int_state);
+	state_save_register_global(machine, main_to_sound_data);
+	state_save_register_global(machine, main_to_sound_ready);
+	state_save_register_global(machine, sound_to_main_data);
+	state_save_register_global(machine, sound_to_main_ready);
+	state_save_register_global(machine, sound_int_state);
 }
 
 
@@ -70,14 +70,14 @@ static TIMER_CALLBACK( delayed_sound_w )
 	cpu_triggerint(machine->cpu[1]);
 
 	/* use a timer to make long transfers faster */
-	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, 0);
+	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 0, 0);
 }
 
 
 static WRITE16_HANDLER( main_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 

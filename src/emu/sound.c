@@ -197,7 +197,7 @@ void sound_init(running_machine *machine)
 	finalmix = auto_malloc(machine->sample_rate * sizeof(*finalmix));
 
 	/* allocate a global timer for sound timing */
-	sound_update_timer = timer_alloc(sound_update, NULL);
+	sound_update_timer = timer_alloc(machine, sound_update, NULL);
 	timer_adjust_periodic(sound_update_timer, update_frequency, 0, update_frequency);
 
 	/* initialize the streams engine */
@@ -292,18 +292,18 @@ static void start_sound_chips(running_machine *machine)
 
 		/* start the chip, tagging all its streams */
 		VPRINTF(("sndnum = %d -- sound_type = %d\n", sndnum, msound->type));
-		num_regs = state_save_get_reg_count();
+		num_regs = state_save_get_reg_count(machine);
 		streams_set_tag(machine, info);
 		if (sndintrf_init_sound(sndnum, msound->tag, msound->type, msound->clock, msound->config) != 0)
-			fatalerror("Sound chip #%d (%s) failed to initialize!", sndnum, sndnum_name(sndnum));
+			fatalerror("Sound chip #%d (%s) failed to initialize!", sndnum, sndnum_get_name(sndnum));
 
 		/* if no state registered for saving, we can't save */
-		num_regs = state_save_get_reg_count() - num_regs;
+		num_regs = state_save_get_reg_count(machine) - num_regs;
 		if (num_regs == 0)
 		{
-			logerror("Sound chip #%d (%s) did not register any state to save!\n", sndnum, sndnum_name(sndnum));
+			logerror("Sound chip #%d (%s) did not register any state to save!\n", sndnum, sndnum_get_name(sndnum));
 			if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-				fatalerror("Sound chip #%d (%s) did not register any state to save!", sndnum, sndnum_name(sndnum));
+				fatalerror("Sound chip #%d (%s) did not register any state to save!", sndnum, sndnum_get_name(sndnum));
 		}
 
 		/* now count the outputs */
@@ -440,7 +440,7 @@ static void route_sound(running_machine *machine)
 							sprintf(namebuf, "%sSpeaker '%s': ", namebuf, speaker->tag);
 
                         /* device name */
-						sprintf(namebuf, "%s%s ", namebuf, sndnum_name(sndnum));
+						sprintf(namebuf, "%s%s ", namebuf, sndnum_get_name(sndnum));
 
 						/* device index, if more than one of this type */
 						if (sndtype_count(sndtype) > 1)

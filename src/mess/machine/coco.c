@@ -140,8 +140,8 @@ static void d_sam_set_pageonemode(int val);
 static void d_sam_set_mpurate(int val);
 static void d_sam_set_memorysize(int val);
 static void d_sam_set_maptype(int val);
-static void coco_setcartline(coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
-static void twiddle_cart_line_if_q(void);
+static void coco_setcartline(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
+static void twiddle_cart_line_if_q(running_machine *machine);
 
 /* CoCo 1 specific */
 static READ8_HANDLER ( d_pia1_pb_r_coco );
@@ -951,7 +951,7 @@ void coco_set_halt_line(running_machine *machine, int halt_line)
 {
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
-		timer_set(ATTOTIME_IN_CYCLES(1,0), NULL, 0, recalc_interrupts);
+		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, recalc_interrupts);
 }
 #endif
 
@@ -1078,7 +1078,7 @@ static attotime coco_hiresjoy_computetransitiontime(running_machine *machine, co
 		val = val * 4160.0 + 592.0;
 	}
 
-	return attotime_add(timer_get_time(), attotime_mul(COCO_CPU_SPEED, val));
+	return attotime_add(timer_get_time(machine), attotime_mul(COCO_CPU_SPEED, val));
 }
 
 static void coco_hiresjoy_w(running_machine *machine, int data)
@@ -1099,19 +1099,19 @@ static void coco_hiresjoy_w(running_machine *machine, int data)
 	(*update_keyboard)(machine);
 }
 
-static int coco_hiresjoy_readone(attotime transitiontime)
+static int coco_hiresjoy_readone(running_machine *machine, attotime transitiontime)
 {
-	return attotime_compare(timer_get_time(), transitiontime) >= 0;
+	return attotime_compare(timer_get_time(machine), transitiontime) >= 0;
 }
 
-static int coco_hiresjoy_rx(void)
+static int coco_hiresjoy_rx(running_machine *machine)
 {
-	return coco_hiresjoy_readone(coco_hiresjoy_xtransitiontime);
+	return coco_hiresjoy_readone(machine, coco_hiresjoy_xtransitiontime);
 }
 
-static int coco_hiresjoy_ry(void)
+static int coco_hiresjoy_ry(running_machine *machine)
 {
-	return coco_hiresjoy_readone(coco_hiresjoy_ytransitiontime);
+	return coco_hiresjoy_readone(machine, coco_hiresjoy_ytransitiontime);
 }
 
 /***************************************************************************
@@ -1186,7 +1186,7 @@ static void soundmux_update(running_machine *machine)
 		break;
 	}
 
-	cococart_enable_sound(coco_cart, soundmux_status == (SOUNDMUX_STATUS_ENABLE|SOUNDMUX_STATUS_SEL2));
+	cococart_enable_sound(machine, coco_cart, soundmux_status == (SOUNDMUX_STATUS_ENABLE|SOUNDMUX_STATUS_SEL2));
 	cassette_change_state(cassette_device_image(machine), new_state, CASSETTE_MASK_SPEAKER);
 }
 
@@ -1287,10 +1287,10 @@ static TIMER_CALLBACK(coco_update_sel2_timerproc)
 }
 
 
-static attotime get_relative_time(attotime absolute_time)
+static attotime get_relative_time(running_machine *machine, attotime absolute_time)
 {
 	attotime result;
-	attotime now = timer_get_time();
+	attotime now = timer_get_time(machine);
 
 	if (attotime_compare(absolute_time, now) > 0)
 		result = attotime_sub(absolute_time, now);
@@ -1348,7 +1348,7 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 
 		case INPUTDEVICE_HIRES_INTERFACE:
 		case INPUTDEVICE_HIRES_CC3MAX_INTERFACE:
-			if (joystick_axis ? coco_hiresjoy_ry() : coco_hiresjoy_rx())
+			if (joystick_axis ? coco_hiresjoy_ry(machine) : coco_hiresjoy_rx(machine))
 				porta |= 0x80;
 			break;
 
@@ -1390,8 +1390,8 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	else
 	{
 		/* schedule hires joystick events */
-		attotime xtrans = get_relative_time(coco_hiresjoy_xtransitiontime);
-		attotime ytrans = get_relative_time(coco_hiresjoy_ytransitiontime);
+		attotime xtrans = get_relative_time(machine, coco_hiresjoy_xtransitiontime);
+		attotime ytrans = get_relative_time(machine, coco_hiresjoy_ytransitiontime);
 
 		timer_reset(update_keyboard_timer,
 			(attotime_compare(xtrans, ytrans) > 0) ? ytrans : xtrans);
@@ -2145,9 +2145,9 @@ static TIMER_CALLBACK(coco3_timer_proc)
 
 
 
-static void coco3_timer_init(void)
+static void coco3_timer_init(running_machine *machine)
 {
-	coco3_gime_timer = timer_alloc(coco3_timer_proc, NULL);
+	coco3_gime_timer = timer_alloc(machine, coco3_timer_proc, NULL);
 }
 
 
@@ -2450,7 +2450,7 @@ WRITE8_HANDLER(coco3_gime_w)
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
-			twiddle_cart_line_if_q();
+			twiddle_cart_line_if_q(space->machine);
 			break;
 
 		case 3:
@@ -2474,7 +2474,7 @@ WRITE8_HANDLER(coco3_gime_w)
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
-			twiddle_cart_line_if_q();
+			twiddle_cart_line_if_q(space->machine);
 			break;
 
 		case 4:
@@ -2607,7 +2607,7 @@ static void coco3_sam_set_maptype(int val)
 
 READ8_HANDLER(coco_cartridge_r)
 {
-	return cococart_read(coco_cart, offset);
+	return cococart_read(space->machine, coco_cart, offset);
 }
 
 
@@ -2618,7 +2618,7 @@ READ8_HANDLER(coco_cartridge_r)
 
 WRITE8_HANDLER(coco_cartridge_w)
 {
-	cococart_write(coco_cart, offset, data);
+	cococart_write(space->machine, coco_cart, offset, data);
 }
 
 
@@ -2722,7 +2722,7 @@ static TIMER_CALLBACK(nmi_timer_proc)
 	system to set a line specified by a cartridge
 -------------------------------------------------*/
 
-static void coco_setcartline(coco_cartridge *cartridge, cococart_line line, cococart_line_value value)
+static void coco_setcartline(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value)
 {
 	switch(line)
 	{
@@ -2735,7 +2735,7 @@ static void coco_setcartline(coco_cartridge *cartridge, cococart_line line, coco
 			break;
 
 		case COCOCART_LINE_HALT:
-			timer_adjust_oneshot(halt_timer, ATTOTIME_IN_CYCLES(7,0), (int) value);
+			timer_adjust_oneshot(halt_timer, cpu_clocks_to_attotime(machine->cpu[0], 7), (int) value);
 			break;
 	}
 }
@@ -2768,7 +2768,7 @@ static void generic_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 m
     coco_mapmemory
 -------------------------------------------------*/
 
-static void coco_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
+static void coco_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
 {
 	generic_mapmemory(cartridge, offset, mask, &coco_rom[0x4000], 0x3FFF);
 }
@@ -2779,7 +2779,7 @@ static void coco_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask
     coco3_mapmemory
 -------------------------------------------------*/
 
-static void coco3_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
+static void coco3_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
 {
 	generic_mapmemory(cartridge, offset, mask, &coco_rom[0xC000], 0x3FFF);
 }
@@ -2792,10 +2792,10 @@ static void coco3_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 mas
 	connected to Q
 -------------------------------------------------*/
 
-static void twiddle_cart_line_if_q(void)
+static void twiddle_cart_line_if_q(running_machine *machine)
 {
 	/* if the cartridge CART line is set to Q, trigger another round of pulses */
-	if ((coco_cart != NULL) && (cococart_get_line(coco_cart, COCOCART_LINE_CART) == COCOCART_LINE_VALUE_Q))
+	if ((coco_cart != NULL) && (cococart_get_line(machine, coco_cart, COCOCART_LINE_CART) == COCOCART_LINE_VALUE_Q))
 		timer_adjust_oneshot(cart_timer, ATTOTIME_IN_USEC(0), 0x02);
 }
 
@@ -2803,13 +2803,13 @@ static void twiddle_cart_line_if_q(void)
 
 /*-------------------------------------------------
     coco_pia_1_w - wrapper for pia_1_w() that will
-	also call twiddle_cart_line_if_q()
+	also call twiddle_cart_line_if_q(space->machine)
 -------------------------------------------------*/
 
 WRITE8_HANDLER(coco_pia_1_w)
 {
 	pia_1_w(space, offset, data);
-	twiddle_cart_line_if_q();
+	twiddle_cart_line_if_q(space->machine);
 }
 
 
@@ -2826,7 +2826,7 @@ struct _machine_init_interface
 	void (*printer_out_)(int data);				/* printer output callback */
 	timer_fired_func cart_timer_proc;				/* cartridge timer proc */
 	const char *fdc_cart_hardware;				/* normal cartridge hardware */
-	void (*map_memory)(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
+	void (*map_memory)(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 };
 
 
@@ -2854,11 +2854,11 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	recalc_interrupts = init->recalc_interrupts_;
 
 	/* this timer is used to schedule keyboard updating */
-	update_keyboard_timer = timer_alloc(coco_update_keyboard_timerproc, NULL);
+	update_keyboard_timer = timer_alloc(machine, coco_update_keyboard_timerproc, NULL);
 
 	/* these are the timers to delay the MUX switching */
-	mux_sel1_timer = timer_alloc(coco_update_sel1_timerproc, NULL);
-	mux_sel2_timer = timer_alloc(coco_update_sel2_timerproc, NULL);
+	mux_sel1_timer = timer_alloc(machine, coco_update_sel1_timerproc, NULL);
+	mux_sel2_timer = timer_alloc(machine, coco_update_sel2_timerproc, NULL);
 
 	/* setup ROM */
 	coco_rom = memory_region(machine, "main");
@@ -2878,9 +2878,9 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	pia_reset();
 
 	/* cartridge line timers */
-	cart_timer = timer_alloc(init->cart_timer_proc, NULL);
-	nmi_timer = timer_alloc(nmi_timer_proc, NULL);
-	halt_timer = timer_alloc(halt_timer_proc, NULL);
+	cart_timer = timer_alloc(machine, init->cart_timer_proc, NULL);
+	nmi_timer = timer_alloc(machine, nmi_timer_proc, NULL);
+	halt_timer = timer_alloc(machine, halt_timer_proc, NULL);
 
 	/* determine which cartridge hardware we should be using */
 	cart_image = cartslot_image();
@@ -2909,8 +2909,8 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	cpu_set_dasm_override(machine->cpu[0], coco_dasm_override);
 #endif
 
-	state_save_register_global(mux_sel1);
-	state_save_register_global(mux_sel2);
+	state_save_register_global(machine, mux_sel1);
+	state_save_register_global(machine, mux_sel2);
 }
 
 /* Setup for hardware common to CoCo 1/2 & Dragon machines, calls genertic_init_machine, to process */
@@ -3098,20 +3098,20 @@ MACHINE_START( coco3 )
 	/* CoCo 3 specific function pointers */
 	update_keyboard = coco3_update_keyboard;
 
-	coco3_timer_init();
+	coco3_timer_init(machine);
 
 	coco3_interupt_line = 0;
 
 	/* set up state save variables */
-	state_save_register_global_array(coco3_mmu);
-	state_save_register_global_array(coco3_gimereg);
-	state_save_register_global(coco3_interupt_line);
-	state_save_register_global(gime_irq);
-	state_save_register_global(gime_firq);
+	state_save_register_global_array(machine, coco3_mmu);
+	state_save_register_global_array(machine, coco3_gimereg);
+	state_save_register_global(machine, coco3_interupt_line);
+	state_save_register_global(machine, gime_irq);
+	state_save_register_global(machine, gime_firq);
 	state_save_register_postload(machine, coco3_state_postload, NULL);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 

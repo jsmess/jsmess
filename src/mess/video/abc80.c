@@ -219,9 +219,9 @@ static VIDEO_START( abc80 )
 
 	/* register for state saving */
 
-	state_save_register_global(state->blink);
-	state_save_register_global(state->char_bank);
-	state_save_register_global(state->char_row);
+	state_save_register_global(machine, state->blink);
+	state_save_register_global(machine, state->char_bank);
+	state_save_register_global(machine, state->char_row);
 }
 
 static VIDEO_UPDATE( abc80 )

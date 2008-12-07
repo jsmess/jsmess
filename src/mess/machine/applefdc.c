@@ -178,15 +178,15 @@ static void applefdc_start(const device_config *device, applefdc_t type)
 
 	memset(fdc, 0, sizeof(*fdc));
 	fdc->type = type;
-	fdc->motor_timer = timer_alloc(iwm_turnmotor_onoff, (void *) device);
+	fdc->motor_timer = timer_alloc(device->machine, iwm_turnmotor_onoff, (void *) device);
 	fdc->lines = 0x00;
 	fdc->mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
 
 	/* register save states */
-	state_save_register_item("applefdc", NULL, 0, fdc->write_byte);
-	state_save_register_item("applefdc", NULL, 0, fdc->lines);
-	state_save_register_item("applefdc", NULL, 0, fdc->mode);
-	state_save_register_item("applefdc", NULL, 0, fdc->handshake_hack);
+	state_save_register_item(device->machine, "applefdc", NULL, 0, fdc->write_byte);
+	state_save_register_item(device->machine, "applefdc", NULL, 0, fdc->lines);
+	state_save_register_item(device->machine, "applefdc", NULL, 0, fdc->mode);
+	state_save_register_item(device->machine, "applefdc", NULL, 0, fdc->handshake_hack);
 }
 
 

@@ -107,15 +107,15 @@ VIDEO_START(rng)
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
-	state_save_register_global_array(ttl_vram);
+	state_save_register_global_array(machine, ttl_vram);
 
 	sprite_colorbase = 0x20;
 }
 
 VIDEO_UPDATE(rng)
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	K053936_0_zoom_draw(bitmap, cliprect, rng_936_tilemap, 0, 0);
 

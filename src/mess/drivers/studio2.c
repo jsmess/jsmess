@@ -377,9 +377,9 @@ static CDP1802_INTERFACE( mpt02_config )
 
 static MACHINE_START( studio2 )
 {
-	state_save_register_global(cdp1861_efx);
-	state_save_register_global(cdp1802_mode);
-	state_save_register_global(keylatch);
+	state_save_register_global(machine, cdp1861_efx);
+	state_save_register_global(machine, cdp1802_mode);
+	state_save_register_global(machine, keylatch);
 }
 
 static MACHINE_RESET( studio2 )
@@ -391,9 +391,9 @@ static MACHINE_RESET( studio2 )
 
 static MACHINE_START( mpt02 )
 {
-	state_save_register_global(cdp1864_efx);
-	state_save_register_global(cdp1802_mode);
-	state_save_register_global(keylatch);
+	state_save_register_global(machine, cdp1864_efx);
+	state_save_register_global(machine, cdp1802_mode);
+	state_save_register_global(machine, keylatch);
 }
 
 static MACHINE_RESET( mpt02 )
@@ -603,8 +603,8 @@ static TIMER_CALLBACK(setup_beep)
 
 static DRIVER_INIT( studio2 )
 {
-	timer_set(attotime_zero, NULL, 0, setup_beep);
-	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 }
 
 static TIMER_CALLBACK(mpt02_setup_beep)
@@ -615,14 +615,14 @@ static TIMER_CALLBACK(mpt02_setup_beep)
 
 static DRIVER_INIT( mpt02 )
 {
-	timer_set(attotime_zero, NULL, 0, mpt02_setup_beep);
-	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+	timer_set(machine, attotime_zero, NULL, 0, mpt02_setup_beep);
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 }
 
 static DRIVER_INIT( visicom )
 {
-	timer_set(attotime_zero, NULL, 0, setup_beep);
-	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 }
 
 /* Game Drivers */

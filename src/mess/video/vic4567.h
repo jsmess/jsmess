@@ -12,7 +12,7 @@
 
 extern const unsigned char vic3_palette[0x100 * 3];
 
-extern void vic4567_init (int pal, int (*dma_read) (int),
+extern void vic4567_init (running_machine *machine, int pal, int (*dma_read) (int),
 						  int (*dma_read_color) (int), void (*irq) (int),
 						  void (*param_port_changed)(int));
 

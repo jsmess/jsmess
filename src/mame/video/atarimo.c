@@ -253,61 +253,61 @@ static emu_timer *force_update_timer;
     init_savestate: Initialize save states
 ---------------------------------------------------------------*/
 
-static void init_savestate(int index, atarimo_data *mo)
+static void init_savestate(running_machine *machine, int index, atarimo_data *mo)
 {
-	state_save_register_item("atarimo", NULL, index, mo->gfxchanged);
-	state_save_register_item("atarimo", NULL, index, mo->palettebase);
-	state_save_register_item("atarimo", NULL, index, mo->bank);
-	state_save_register_item("atarimo", NULL, index, mo->xscroll);
-	state_save_register_item("atarimo", NULL, index, mo->yscroll);
-	state_save_register_item("atarimo", NULL, index, mo->last_xpos);
-	state_save_register_item("atarimo", NULL, index, mo->next_xpos);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->gfxchanged);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->palettebase);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->bank);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->xscroll);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->yscroll);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->last_xpos);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->next_xpos);
 
 #if 0
 	// These are not modified in code
 	// Left in for completeness
-	state_save_register_item("atarimo", NULL, index, mo->reverse);
-	state_save_register_item("atarimo", NULL, index, mo->split);
-	state_save_register_item("atarimo", NULL, index, mo->linked);
-	state_save_register_item("atarimo", NULL, index, mo->swapxy);
-	state_save_register_item("atarimo", NULL, index, mo->nextneighbor);
-	state_save_register_item("atarimo", NULL, index, mo->slipshift);
-	state_save_register_item("atarimo", NULL, index, mo->slipoffset);
-	state_save_register_item("atarimo", NULL, index, mo->slipramsize);
-	state_save_register_item("atarimo", NULL, index, mo->sliprammask);
-	state_save_register_item("atarimo", NULL, index, mo->entrycount);
-	state_save_register_item("atarimo", NULL, index, mo->entrybits);
-	state_save_register_item("atarimo", NULL, index, mo->bankcount);
-	state_save_register_item("atarimo", NULL, index, mo->tilewidth);
-	state_save_register_item("atarimo", NULL, index, mo->tileheight);
-	state_save_register_item("atarimo", NULL, index, mo->tilexshift);
-	state_save_register_item("atarimo", NULL, index, mo->tileyshift);
-	state_save_register_item("atarimo", NULL, index, mo->bitmapwidth);
-	state_save_register_item("atarimo", NULL, index, mo->bitmapheight);
-	state_save_register_item("atarimo", NULL, index, mo->bitmapxmask);
-	state_save_register_item("atarimo", NULL, index, mo->bitmapymask);
-	state_save_register_item("atarimo", NULL, index, mo->spriteramsize);
-	state_save_register_item("atarimo", NULL, index, mo->spriterammask);
-	state_save_register_item("atarimo", NULL, index, mo->maxcolors);
-	state_save_register_item("atarimo", NULL, index, mo->transpen);
-	state_save_register_item("atarimo", NULL, index, mo->maxperline);
-	state_save_register_item("atarimo", NULL, index, mo->specialvalue);
-	state_save_register_item("atarimo", NULL, index, mo->codehighshift);
-	state_save_register_item("atarimo", NULL, index, mo->dirtywidth);
-	state_save_register_item("atarimo", NULL, index, mo->dirtyheight);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->reverse);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->split);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->linked);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->swapxy);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->nextneighbor);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->slipshift);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->slipoffset);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->slipramsize);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->sliprammask);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->entrycount);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->entrybits);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->bankcount);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->tilewidth);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->tileheight);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->tilexshift);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->tileyshift);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->bitmapwidth);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->bitmapheight);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->bitmapxmask);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->bitmapymask);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->spriteramsize);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->spriterammask);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->maxcolors);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->transpen);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->maxperline);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->specialvalue);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->codehighshift);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->dirtywidth);
+	state_save_register_item(machine, "atarimo", NULL, index, mo->dirtyheight);
 #endif
 
-	state_save_register_bitmap("atarimo", NULL, index, "bitmap", mo->bitmap);
+	state_save_register_bitmap(machine, "atarimo", NULL, index, "bitmap", mo->bitmap);
 
-	state_save_register_memory("atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize);
+	state_save_register_memory(machine, "atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize);
 
-	state_save_register_item_pointer("atarimo", NULL, index, mo->codelookup, round_to_powerof2(mo->codemask.mask));
+	state_save_register_item_pointer(machine, "atarimo", NULL, index, mo->codelookup, round_to_powerof2(mo->codemask.mask));
 
-	state_save_register_item_pointer("atarimo", NULL, index, mo->colorlookup, round_to_powerof2(mo->colormask.mask));
+	state_save_register_item_pointer(machine, "atarimo", NULL, index, mo->colorlookup, round_to_powerof2(mo->colormask.mask));
 
-	state_save_register_item_pointer("atarimo", NULL, index, mo->dirtygrid, mo->dirtywidth * mo->dirtyheight);
+	state_save_register_item_pointer(machine, "atarimo", NULL, index, mo->dirtygrid, mo->dirtywidth * mo->dirtyheight);
 
-	state_save_register_item_pointer("atarimo", NULL, index, mo->gfxlookup, round_to_powerof2(mo->gfxmask.mask));
+	state_save_register_item_pointer(machine, "atarimo", NULL, index, mo->gfxlookup, round_to_powerof2(mo->gfxmask.mask));
 
 }
 
@@ -407,7 +407,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 
 	/* allocate the temp bitmap */
 	mo->bitmap        = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
-	fillbitmap(mo->bitmap, desc->transpen, NULL);
+	bitmap_fill(mo->bitmap, NULL, desc->transpen);
 
 	/* allocate the spriteram */
 	mo->spriteram = auto_malloc(sizeof(mo->spriteram[0]) * mo->spriteramsize);
@@ -445,10 +445,10 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	init_gfxelement(mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
-	force_update_timer = timer_alloc(force_update, NULL);
+	force_update_timer = timer_alloc(machine, force_update, NULL);
 	timer_adjust_oneshot(force_update_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
-	init_savestate(map, mo);
+	init_savestate(machine, map, mo);
 
 	logerror("atarimo_init:\n");
 	logerror("  width=%d (shift=%d),  height=%d (shift=%d)\n", mo->tilewidth, mo->tilexshift, mo->tileheight, mo->tileyshift);

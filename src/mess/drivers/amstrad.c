@@ -2053,8 +2053,8 @@ static void amstrad_common_init(running_machine *machine)
 The CRTC generates a memory address using it's MA and RA signal outputs
 The Gate-Array fetches two bytes for each address*/
 
-//  timer_pulse(ATTOTIME_IN_USEC(AMSTRAD_US_PER_SCANLINE), NULL, 0, amstrad_vh_execute_crtc_cycles);
-	timer_pulse(ATTOTIME_IN_USEC(1), NULL, 0, amstrad_vh_execute_crtc_cycles_callback);
+//  timer_pulse(machine, ATTOTIME_IN_USEC(AMSTRAD_US_PER_SCANLINE), NULL, 0, amstrad_vh_execute_crtc_cycles);
+	timer_pulse(machine, ATTOTIME_IN_USEC(1), NULL, 0, amstrad_vh_execute_crtc_cycles_callback);
 
 	/* The opcode timing in the Amstrad is different to the opcode
     timing in the core for the Z80 CPU.

@@ -108,7 +108,7 @@ static TIMER_CALLBACK( m72_scanline_interrupt );
 
 static MACHINE_START( m72 )
 {
-	scanline_timer = timer_alloc(m72_scanline_interrupt, NULL);
+	scanline_timer = timer_alloc(machine, m72_scanline_interrupt, NULL);
 }
 
 static TIMER_CALLBACK( synch_callback )
@@ -125,11 +125,11 @@ static MACHINE_RESET( m72 )
 
 	MACHINE_RESET_CALL(m72_sound);
 
-	state_save_register_global(mcu_sample_addr);
-	state_save_register_global(mcu_snd_cmd_latch);
+	state_save_register_global(machine, mcu_sample_addr);
+	state_save_register_global(machine, mcu_snd_cmd_latch);
 
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
-	timer_call_after_resynch( NULL, 0, synch_callback);
+	timer_call_after_resynch(machine,  NULL, 0, synch_callback);
 }
 
 static MACHINE_RESET( xmultipl )
@@ -222,11 +222,11 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 		protection_ram[offset] = val;
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_clear);
-		//timer_set(ATTOTIME_IN_CYCLES(0, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_raise);
+		//timer_set(space->machine, cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 2), NULL, 0, mcu_irq0_clear);
+		//timer_set(space->machine, cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 0), NULL, 0, mcu_irq0_raise);
 	}
 	else
-		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
+		timer_call_after_resynch( space->machine, protection_ram, (offset<<16) | val, delayed_ram16_w);
 }
 
 static WRITE8_HANDLER( m72_mcu_data_w )
@@ -235,7 +235,7 @@ static WRITE8_HANDLER( m72_mcu_data_w )
 	if (offset&1) val = (protection_ram[offset/2] & 0x00ff) | (data << 8);
 	else val = (protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	timer_call_after_resynch( protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
+	timer_call_after_resynch( space->machine, protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
 }
 
 static READ8_HANDLER(m72_mcu_data_r )
@@ -321,20 +321,20 @@ static READ8_HANDLER( m72_snd_cpu_sample_r )
 
 INLINE DRIVER_INIT( loht_mcu )
 {
-	int cpunum = mame_find_cpu_index(machine, "main");
-	int sndnum = mame_find_cpu_index(machine, "sound");
+	const device_config *cpu = cputag_get_cpu(machine, "main");
+	const device_config *sndcpu = cputag_get_cpu(machine, "sound");
 
 	protection_ram = auto_malloc(0x10000);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_install_read16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
+	memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
 	memory_set_bankptr(machine, 1, protection_ram);
 
-	//memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
+	//memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
 
 	/* sound cpu */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[sndnum], ADDRESS_SPACE_IO), 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[sndnum], ADDRESS_SPACE_IO), 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
+	memory_install_write8_handler(cpu_get_address_space(sndcpu, ADDRESS_SPACE_IO), 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
+	memory_install_read8_handler (cpu_get_address_space(sndcpu, ADDRESS_SPACE_IO), 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
 
 #if 0
 	/* running the mcu at twice the speed, the following

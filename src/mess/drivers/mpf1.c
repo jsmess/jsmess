@@ -441,8 +441,8 @@ static MACHINE_RESET( mpf1 )
 {
 	lednum = 0;
 
-	timer_pulse( ATTOTIME_IN_HZ(1), NULL, 0, check_halt_callback );
-	timer_pulse( ATTOTIME_IN_HZ(60), NULL, 0, irq0_callback );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(1), NULL, 0, check_halt_callback );
+	timer_pulse(machine,  ATTOTIME_IN_HZ(60), NULL, 0, irq0_callback );
 }
 
 /* Machine Drivers */

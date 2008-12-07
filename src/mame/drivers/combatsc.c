@@ -248,7 +248,7 @@ static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
 		if (boost)
 		{
 			boost = 0;
-			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, ATTOTIME_IN_CYCLES(80,1));
+			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, cpu_clocks_to_attotime(space->cpu,80));
 		}
 		else if (status & 2)
 		{
@@ -814,14 +814,14 @@ ROM_END
 
 
 
-static void combasc_init_common(void)
+static void combasc_init_common(running_machine *machine)
 {
-	combasc_interleave_timer = timer_alloc(NULL, NULL);
+	combasc_interleave_timer = timer_alloc(machine, NULL, NULL);
 }
 
 static DRIVER_INIT( combasct )
 {
-	combasc_init_common();
+	combasc_init_common(machine);
 }
 
 static DRIVER_INIT( combasc )
@@ -829,12 +829,12 @@ static DRIVER_INIT( combasc )
 	/* joystick instead of trackball */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, input_port_read_handler8(machine->portconfig, "IN1"));
 
-	combasc_init_common();
+	combasc_init_common(machine);
 }
 
 static DRIVER_INIT( combascb )
 {
-	combasc_init_common();
+	combasc_init_common(machine);
 }
 
 

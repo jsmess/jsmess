@@ -940,7 +940,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpunum_get_active() != -1 )
+		if( Machine->activecpu != NULL )
 		{
 			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
@@ -1453,9 +1453,9 @@ static DRIVER_INIT( namcos12 )
 	m_n_bankoffset = 0;
 	memory_set_bank(machine,  1, 0 );
 
-	state_save_register_global( m_n_dmaoffset );
-	state_save_register_global( m_n_dmabias );
-	state_save_register_global( m_n_bankoffset );
+	state_save_register_global(machine,  m_n_dmaoffset );
+	state_save_register_global(machine,  m_n_dmabias );
+	state_save_register_global(machine,  m_n_bankoffset );
 }
 
 static DRIVER_INIT( ptblank2 )

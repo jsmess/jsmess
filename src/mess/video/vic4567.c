@@ -10,7 +10,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -46,7 +46,7 @@ WRITE8_HANDLER( vic3_palette_w )
 	vic3.palette_dirty=1;
 }
 
-void vic4567_init (int pal, int (*dma_read) (int),
+void vic4567_init (running_machine *machine, int pal, int (*dma_read) (int),
 						  int (*dma_read_color) (int), void (*irq) (int),
 						  void (*param_port_changed)(int))
 {
@@ -63,11 +63,12 @@ void vic4567_init (int pal, int (*dma_read) (int),
 	vic2.port_changed = param_port_changed;
 	vic2.on = TRUE;
 
-	state_save_register_global_array(vic2.reg);
+	state_save_register_global_array(machine, vic2.reg);
 }
 
 WRITE8_HANDLER ( vic3_port_w )
 {
+	running_machine *machine = space->machine;
 	DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x7f;
 	switch (offset)
@@ -132,6 +133,7 @@ WRITE8_HANDLER ( vic3_port_w )
 
 READ8_HANDLER ( vic3_port_r )
 {
+	running_machine *machine = space->machine;
 	int val = 0;
 	offset &= 0x7f;
 	switch (offset)
@@ -182,7 +184,7 @@ READ8_HANDLER ( vic3_port_r )
 	return val;
 }
 
-static void vic3_drawlines (int first, int last, int start_x, int end_x)
+static void vic3_drawlines (running_machine *machine, int first, int last, int start_x, int end_x)
 {
 	int line, vline, end;
 	int attr, ch, ecm;
@@ -310,9 +312,9 @@ static void vic3_drawlines (int first, int last, int start_x, int end_x)
 				if (yoff + syend > YPOS + 200)
 					syend = YPOS + 200 - yoff - 1;
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, ybegin, syend, start_x, end_x);
+					vic2_draw_sprite_multi (machine, i, yoff, ybegin, syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff, ybegin, syend, start_x, end_x);
+					vic2_draw_sprite (machine, i, yoff, ybegin, syend, start_x, end_x);
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
 					vic2.sprites[i].line = vic2.sprites[i].repeat = 0;
@@ -342,9 +344,9 @@ static void vic3_drawlines (int first, int last, int start_x, int end_x)
 				vic2.sprites[i].line = wrapped;
 
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, 0 , syend, start_x, end_x);
+					vic2_draw_sprite_multi (machine, i, yoff, 0 , syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff, 0 , syend, start_x, end_x);
+					vic2_draw_sprite (machine, i, yoff, 0 , syend, start_x, end_x);
 
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
@@ -372,9 +374,9 @@ static void vic3_drawlines (int first, int last, int start_x, int end_x)
 				for (j = 0; j < SPRITE_Y_POS (i) - yoff; j++)
 					vic2.sprites[i].paintedline[j] = 0;
 				if (SPRITE_MULTICOLOR (i))
-					vic2_draw_sprite_multi (i, yoff, SPRITE_Y_POS (i) - yoff, syend, start_x, end_x);
+					vic2_draw_sprite_multi (machine, i, yoff, SPRITE_Y_POS (i) - yoff, syend, start_x, end_x);
 				else
-					vic2_draw_sprite (i, yoff, SPRITE_Y_POS (i) - yoff, syend, start_x, end_x);
+					vic2_draw_sprite (machine, i, yoff, SPRITE_Y_POS (i) - yoff, syend, start_x, end_x);
 				if ((syend != yend) || (vic2.sprites[i].line > 20))
 				{
 					for (j = syend; j <= yend; j++)
@@ -842,15 +844,15 @@ INTERRUPT_GEN( vic3_raster_irq )
 		if (VIC3_BITPLANES)
 		{
 			if (!video_skip_this_frame ())
-				vic3_draw_bitplanes(machine);
+				vic3_draw_bitplanes(device->machine);
 		} else {
 			if (c64_pal)
 			{
-				if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
+				if (vic2.on) vic2_drawlines (device->machine, vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
 			}			
 			else
 			{
-				if (vic2.on) vic2_drawlines (vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
+				if (vic2.on) vic2_drawlines (device->machine, vic2.lastline, vic2.lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
 			}
 		}
 		for (i = 0; i < 8; i++)
@@ -859,24 +861,24 @@ INTERRUPT_GEN( vic3_raster_irq )
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer starten */
-			timer_set (attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
+			timer_set (device->machine, attotime_make(0, 0), NULL, 1, vic2_timer_timeout);
 		}
 		//state_display(vic2.bitmap);
 	}
 	if (vic2.rasterline == C64_2_RASTERLINE (RASTERLINE))
 	{
-		vic2_set_interrupt (1);
+		vic2_set_interrupt (device->machine, 1);
 	}
 	if (vic2.on)
 		if ((vic2.rasterline >= VIC2_FIRSTRASTERLINE) && (vic2.rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
 		{
 			if (c64_pal)
 			{
-				if (vic2.on) vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
+				if (vic2.on) vic2_drawlines (device->machine, vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + columns + 16 - 1);
 			}			
 			else
 			{
-				if (vic2.on) vic2_drawlines (vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
+				if (vic2.on) vic2_drawlines (device->machine, vic2.rasterline-1, vic2.rasterline, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + columns + 16 - 1);
 			}
 		}
 }

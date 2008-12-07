@@ -15,11 +15,11 @@ VIDEO_START( volfied )
 {
 	video_ram = auto_malloc(0x40000 * sizeof (UINT16));
 
-	state_save_register_global_pointer(video_ram, 0x40000);
-	state_save_register_global(video_ctrl);
-	state_save_register_global(video_mask);
+	state_save_register_global_pointer(machine, video_ram, 0x40000);
+	state_save_register_global(machine, video_ctrl);
+	state_save_register_global(machine, video_mask);
 
-	PC090OJ_vh_start(0, 0, 0, 0);
+	PC090OJ_vh_start(machine, 0, 0, 0, 0);
 }
 
 
@@ -126,7 +126,7 @@ static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
 
 VIDEO_UPDATE( volfied )
 {
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 	refresh_pixel_layer(screen->machine, bitmap);
 	PC090OJ_draw_sprites(screen->machine, bitmap, cliprect, 0);
 	return 0;

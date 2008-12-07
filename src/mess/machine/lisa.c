@@ -691,7 +691,7 @@ static TIMER_CALLBACK(set_COPS_ready)
 	COPS_Ready = 1;
 
 	/* impulsion width : +/- 20us */
-	timer_set(ATTOTIME_IN_USEC(20), NULL, 0, read_COPS_command);
+	timer_set(machine, ATTOTIME_IN_USEC(20), NULL, 0, read_COPS_command);
 }
 
 static void reset_COPS(void)
@@ -750,12 +750,12 @@ static void plug_keyboard(running_machine *machine)
 
 
 /* called at power-up */
-static void init_COPS(void)
+static void init_COPS(running_machine *machine)
 {
 	COPS_Ready = 0;
 
 	/* read command every ms (don't know the real value) */
-	timer_pulse(ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);
 
 	reset_COPS();
 }
@@ -1124,7 +1124,7 @@ DRIVER_INIT( mac_xl )
 
 MACHINE_RESET( lisa )
 {
-	mouse_timer = timer_alloc(handle_mouse, NULL);
+	mouse_timer = timer_alloc(machine, handle_mouse, NULL);
 
 	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
 	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
@@ -1160,7 +1160,7 @@ MACHINE_RESET( lisa )
 	videoram_ptr = (UINT16 *) lisa_ram_ptr;
 
 	/* reset COPS keyboard/mouse controller */
-	init_COPS();
+	init_COPS(machine);
 
 	/* configure vias */
 	via_config(0, & lisa_via6522_intf[0]);

@@ -11,7 +11,6 @@
 
 #include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "devices/cassette.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8255ppi.h"
@@ -58,7 +57,7 @@ static TIMER_CALLBACK(dai_bootstrap_callback)
 
 static UINT8 dai_keyboard_scan_mask = 0;
 
-static UINT8 dai_keyboard_read (void)
+static UINT8 dai_keyboard_read (const device_config *device)
 {
 	UINT8 data = 0x00;
 	int i;
@@ -67,25 +66,25 @@ static UINT8 dai_keyboard_read (void)
 	for (i = 0; i < 8; i++)
 	{
 		if (dai_keyboard_scan_mask & (1 << i))
-			data |= input_port_read(Machine, keynames[i]);
+			data |= input_port_read(device->machine, keynames[i]);
 	}
 	return data;
 }
 
-static void dai_keyboard_write (UINT8 data)
+static void dai_keyboard_write (const device_config *device, UINT8 data)
 {
 	dai_keyboard_scan_mask = data;
 }
 
-static void dai_interrupt_callback(int intreq, UINT8 vector)
+static void dai_interrupt_callback(const device_config *device, int intreq, UINT8 vector)
 {
 	if (intreq)
-		cpu_set_input_line_and_vector(Machine->cpu[0], 0, HOLD_LINE, vector);
+		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, HOLD_LINE, vector);
 	else
-		cpu_set_input_line(Machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
 }
 
-static const tms5501_init_param dai_tms5501_init_param =
+const tms5501_interface dai_tms5501_interface =
 {
 	dai_keyboard_read,
 	dai_keyboard_write,
@@ -148,9 +147,7 @@ MACHINE_START( dai )
 	memory_set_bankptr(machine, 1, mess_ram);
 	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "main") + 0x010000, 0x1000);
 
-	tms5501_init(0, &dai_tms5501_init_param);
-
-	timer_set(attotime_zero, NULL, 0, dai_bootstrap_callback);
+	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
 }
 
 /***************************************************************************

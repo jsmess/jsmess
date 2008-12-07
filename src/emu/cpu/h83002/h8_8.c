@@ -225,18 +225,18 @@ static CPU_INIT(h8bit)
 	h8->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	h8->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("H8/300", device->tag, 0, h8->h8err);
-	state_save_register_item_array("H8/300", device->tag, 0, h8->regs);
-	state_save_register_item("H8/300", device->tag, 0, h8->pc);
-	state_save_register_item("H8/300", device->tag, 0, h8->ppc);
-	state_save_register_item("H8/300", device->tag, 0, h8->h8_IRQrequestH);
-	state_save_register_item("H8/300", device->tag, 0, h8->h8_IRQrequestL);
-	state_save_register_item("H8/300", device->tag, 0, h8->ccr);
-	state_save_register_item("H8/300", device->tag, 0, h8->mode_8bit);
+	state_save_register_device_item(device, 0, h8->h8err);
+	state_save_register_device_item_array(device, 0, h8->regs);
+	state_save_register_device_item(device, 0, h8->pc);
+	state_save_register_device_item(device, 0, h8->ppc);
+	state_save_register_device_item(device, 0, h8->h8_IRQrequestH);
+	state_save_register_device_item(device, 0, h8->h8_IRQrequestL);
+	state_save_register_device_item(device, 0, h8->ccr);
+	state_save_register_device_item(device, 0, h8->mode_8bit);
 
-	state_save_register_item_array("H8/300", device->tag, 0, h8->per_regs);
-	state_save_register_item("H8/300", device->tag, 0, h8->h8TSTR);
-	state_save_register_item_array("H8/300", device->tag, 0, h8->h8TCNT);
+	state_save_register_device_item_array(device, 0, h8->per_regs);
+	state_save_register_device_item(device, 0, h8->h8TSTR);
+	state_save_register_device_item_array(device, 0, h8->h8TCNT);
 
 	state_save_register_postload(h8->device->machine, h8_onstateload, h8);
 }
@@ -349,13 +349,9 @@ static void h8_check_irqs(h83xx_state *h8)
 
 // MAME interface stuff
 
-static CPU_GET_CONTEXT( h8 )
-{
-}
+static CPU_GET_CONTEXT( h8 ) { }
 
-static CPU_SET_CONTEXT( h8 )
-{
-}
+static CPU_SET_CONTEXT( h8 ) { }
 
 static CPU_SET_INFO( h8 )
 {
@@ -559,7 +555,7 @@ CPU_GET_INFO( h8_3334 )
 	case CPUINFO_STR_NAME:					strcpy(info->s, "H8/3334");						break;
 	case CPUINFO_STR_CORE_FILE:				strcpy(info->s, __FILE__);						break;
 	case CPUINFO_STR_FLAGS:					strcpy(info->s, h8_get_ccr_str(h8));				break;
-	case CPUINFO_INT_ENDIANNESS:				info->i = CPU_IS_BE;							break;
+	case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;							break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
 	case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
 	case CPUINFO_INT_INPUT_LINES:				info->i = 16;									break;

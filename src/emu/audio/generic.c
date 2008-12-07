@@ -33,7 +33,7 @@ static UINT8 latch_read[4];
     register for save states
 -------------------------------------------------*/
 
-int generic_sound_init(void)
+int generic_sound_init(running_machine *machine)
 {
 	/* reset latches */
 	latch_clear_value = 0;
@@ -41,8 +41,8 @@ int generic_sound_init(void)
 	memset(latch_read, 0, sizeof(latch_read));
 
 	/* register globals with the save state system */
-	state_save_register_global_array(latched_value);
-	state_save_register_global_array(latch_read);
+	state_save_register_global_array(machine, latched_value);
+	state_save_register_global_array(machine, latch_read);
 
 	return 0;
 }
@@ -83,9 +83,9 @@ static TIMER_CALLBACK( latch_callback )
     latch_w - handle a write to a given latch
 -------------------------------------------------*/
 
-INLINE void latch_w(int which, UINT16 value)
+INLINE void latch_w(const address_space *space, int which, UINT16 value)
 {
-	timer_call_after_resynch(NULL, which | (value << 8), latch_callback);
+	timer_call_after_resynch(space->machine, NULL, which | (value << 8), latch_callback);
 }
 
 
@@ -115,14 +115,14 @@ INLINE void latch_clear(int which)
     writing to sound latches
 -------------------------------------------------*/
 
-WRITE8_HANDLER( soundlatch_w )        { latch_w(0, data); }
-WRITE16_HANDLER( soundlatch_word_w )  { latch_w(0, data); }
-WRITE8_HANDLER( soundlatch2_w )       { latch_w(1, data); }
-WRITE16_HANDLER( soundlatch2_word_w ) { latch_w(1, data); }
-WRITE8_HANDLER( soundlatch3_w )       { latch_w(2, data); }
-WRITE16_HANDLER( soundlatch3_word_w ) { latch_w(2, data); }
-WRITE8_HANDLER( soundlatch4_w )       { latch_w(3, data); }
-WRITE16_HANDLER( soundlatch4_word_w ) { latch_w(3, data); }
+WRITE8_HANDLER( soundlatch_w )        { latch_w(space, 0, data); }
+WRITE16_HANDLER( soundlatch_word_w )  { latch_w(space, 0, data); }
+WRITE8_HANDLER( soundlatch2_w )       { latch_w(space, 1, data); }
+WRITE16_HANDLER( soundlatch2_word_w ) { latch_w(space, 1, data); }
+WRITE8_HANDLER( soundlatch3_w )       { latch_w(space, 2, data); }
+WRITE16_HANDLER( soundlatch3_word_w ) { latch_w(space, 2, data); }
+WRITE8_HANDLER( soundlatch4_w )       { latch_w(space, 3, data); }
+WRITE16_HANDLER( soundlatch4_word_w ) { latch_w(space, 3, data); }
 
 
 /*-------------------------------------------------

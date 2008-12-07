@@ -848,21 +848,21 @@ static CPU_INIT( i8x41 )
 	upi41_state->subtype = 8041;
 	upi41_state->ram_mask = I8X41_intRAM_MASK;
 
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->ppc);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->pc);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->timer);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->prescaler);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->subtype);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->a);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->psw);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->state);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->enable);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->control);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->dbbi);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->dbbo);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->p1);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->p2);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->p2_hs);
+	state_save_register_device_item(device, 0, upi41_state->ppc);
+	state_save_register_device_item(device, 0, upi41_state->pc);
+	state_save_register_device_item(device, 0, upi41_state->timer);
+	state_save_register_device_item(device, 0, upi41_state->prescaler);
+	state_save_register_device_item(device, 0, upi41_state->subtype);
+	state_save_register_device_item(device, 0, upi41_state->a);
+	state_save_register_device_item(device, 0, upi41_state->psw);
+	state_save_register_device_item(device, 0, upi41_state->state);
+	state_save_register_device_item(device, 0, upi41_state->enable);
+	state_save_register_device_item(device, 0, upi41_state->control);
+	state_save_register_device_item(device, 0, upi41_state->dbbi);
+	state_save_register_device_item(device, 0, upi41_state->dbbo);
+	state_save_register_device_item(device, 0, upi41_state->p1);
+	state_save_register_device_item(device, 0, upi41_state->p2);
+	state_save_register_device_item(device, 0, upi41_state->p2_hs);
 }
 
 static CPU_INIT( i8042 )
@@ -1012,18 +1012,14 @@ static CPU_EXECUTE( i8x41 )
  *  Get all registers in given buffer
  ****************************************************************************/
 
-static CPU_GET_CONTEXT( i8x41 )
-{
-}
+static CPU_GET_CONTEXT( i8x41 ) { }
 
 
 /****************************************************************************
  *  Set all registers to given values
  ****************************************************************************/
 
-static CPU_SET_CONTEXT( i8x41 )
-{
-}
+static CPU_SET_CONTEXT( i8x41 ) { }
 
 /****************************************************************************
  *  Set IRQ line state
@@ -1179,7 +1175,7 @@ static CPU_SET_INFO( i8x41 )
 			break;
 
 		case CPUINFO_INT_REGISTER + I8X41_STAT:
-			logerror("i8x41 #%d:%03x  Setting STAT DBBI to %02x\n", cpunum_get_active(), PC, (UINT8)info->i);
+			logerror("i8x41 '%s':%03x  Setting STAT DBBI to %02x\n", upi41_state->device->tag, PC, (UINT8)info->i);
 			/* writing status.. hmm, should we issue interrupts here too? */
 			STATE = info->i;
 			break;
@@ -1202,7 +1198,7 @@ CPU_GET_INFO( i8041 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(upi41_state_t);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = I8X41_CLOCK_DIVIDER;			break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -1265,7 +1261,7 @@ CPU_GET_INFO( i8041 )
 			break;
 
 		case CPUINFO_INT_REGISTER + I8X41_STAT:
-			logerror("i8x41 #%d:%03x  Reading STAT %02x\n", cpunum_get_active(), PC, STATE);
+			logerror("i8x41 '%s':%03x  Reading STAT %02x\n", upi41_state->device->tag, PC, STATE);
 			info->i = STATE;
 			break;
 

@@ -48,7 +48,7 @@ VIDEO_START( foodf )
 	/* adjust the playfield for the 8 pixel offset */
 	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, -8);
 	playfield_flip = 0;
-	state_save_register_global(playfield_flip);
+	state_save_register_global(machine, playfield_flip);
 
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0,	255, -1.0,
@@ -126,7 +126,7 @@ VIDEO_UPDATE( foodf )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* then draw the non-transparent parts with a priority of 1 */
-	fillbitmap(priority_bitmap, 0, 0);
+	bitmap_fill(priority_bitmap, 0, 0);
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 1);
 
 	/* draw the motion objects front-to-back */

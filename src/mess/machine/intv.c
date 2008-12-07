@@ -314,7 +314,7 @@ READ16_HANDLER( intv_ram16_r )
 
 WRITE16_HANDLER( intv_ram16_w )
 {
-	//logerror("%g: WRITING TO GRAM offset = %d\n",timer_get_time(),offset);
+	//logerror("%g: WRITING TO GRAM offset = %d\n",timer_get_time(machine),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
 	intv_ram16[offset] = data&0xffff;
 }
@@ -526,7 +526,7 @@ INTERRUPT_GEN( intv_interrupt )
 {
 	cpu_set_input_line(device->machine->cpu[0], CP1610_INT_INTRM, ASSERT_LINE);
 	sr1_int_pending = 1;
-	timer_set(ATTOTIME_IN_CYCLES(3791, 0), NULL, 0, intv_interrupt_complete);
+	timer_set(cpu_clocks_to_attotime(device->machine->cpu[0], 3791), NULL, 0, intv_interrupt_complete);
 	stic_screenrefresh(device->machine);
 }
 

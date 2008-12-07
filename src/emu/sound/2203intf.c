@@ -124,20 +124,20 @@ static SND_START( ym2203 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2203, tag, clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(SOUND_YM2203, device, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(timer_callback_2203_0, info);
-	info->timer[1] = timer_alloc(timer_callback_2203_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_2203_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_2203_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
-	info->chip = ym2203_init(info,tag,clock,rate,timer_handler,IRQHandler,&psgintf);
+	info->chip = ym2203_init(info,device,clock,rate,timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_postload(Machine, ym2203_intf_postload, info);
+	state_save_register_postload(device->machine, ym2203_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -149,14 +149,14 @@ static SND_START( ym2203 )
 
 static SND_STOP( ym2203 )
 {
-	struct ym2203_info *info = token;
+	struct ym2203_info *info = device->token;
 	ym2203_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
 static SND_RESET( ym2203 )
 {
-	struct ym2203_info *info = token;
+	struct ym2203_info *info = device->token;
 	ym2203_reset_chip(info->chip);
 }
 

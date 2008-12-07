@@ -49,6 +49,6 @@ int pc_turbo_setup(int cpunum, const char *port, int mask, double off_speed, dou
 	ti->cur_val = -1;
 	ti->off_speed = off_speed;
 	ti->on_speed = on_speed;
-	timer_pulse(ATTOTIME_IN_MSEC(100), ti, 0, pc_turbo_callback);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(100), ti, 0, pc_turbo_callback);
 	return 0;
 }

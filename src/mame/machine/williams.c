@@ -286,7 +286,7 @@ static TIMER_CALLBACK( williams_count240_callback )
 	pia_1_ca1_w(space, 0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
 
 	/* set a timer for next frame */
 	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
@@ -356,17 +356,17 @@ static MACHINE_RESET( williams_common )
 	pia_reset();
 
 	/* reset the ticket dispenser (Lotto Fun) */
-	ticket_dispenser_init(70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	ticket_dispenser_init(machine, 70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(williams_va11_callback, NULL);
+	scanline_timer = timer_alloc(machine, williams_va11_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 240 */
-	scan240_timer = timer_alloc(williams_count240_callback, NULL);
+	scan240_timer = timer_alloc(machine, williams_count240_callback, NULL);
 	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
 
-	state_save_register_global(vram_bank);
+	state_save_register_global(machine, vram_bank);
 }
 
 
@@ -420,7 +420,7 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 	pia_0_ca1_w(space, 0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
 
 	/* set a timer for next frame */
 	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
@@ -456,14 +456,14 @@ MACHINE_RESET( williams2 )
 	williams2_bank_select_w(space, 0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(williams2_va11_callback, NULL);
+	scanline_timer = timer_alloc(machine, williams2_va11_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 254 */
-	scan254_timer = timer_alloc(williams2_endscreen_callback, NULL);
+	scan254_timer = timer_alloc(machine, williams2_endscreen_callback, NULL);
 	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 
-	state_save_register_global(vram_bank);
+	state_save_register_global(machine, vram_bank);
 	state_save_register_postload(machine, williams2_postload, NULL);
 }
 
@@ -537,12 +537,12 @@ static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 WRITE8_HANDLER( williams_snd_cmd_w )
 {
 	/* the high two bits are set externally, and should be 1 */
-	timer_call_after_resynch((void *)space, data | 0xc0, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch(space->machine, (void *)space, data | 0xc0, williams_deferred_snd_cmd_w);
 }
 
 WRITE8_HANDLER( playball_snd_cmd_w )
 {
-	timer_call_after_resynch((void *)space, data, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch(space->machine, (void *)space, data, williams_deferred_snd_cmd_w);
 }
 
 
@@ -554,7 +554,7 @@ static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 
 static WRITE8_HANDLER( williams2_snd_cmd_w )
 {
-	timer_call_after_resynch((void *)space, data, williams2_deferred_snd_cmd_w);
+	timer_call_after_resynch(space->machine, (void *)space, data, williams2_deferred_snd_cmd_w);
 }
 
 
@@ -827,7 +827,7 @@ MACHINE_RESET( blaster )
 	memory_configure_bank(machine, 2, 0, 1, williams_videoram + 0x4000, 0);
 	memory_configure_bank(machine, 2, 1, 16, memory_region(machine, "main") + 0x10000, 0x0000);
 
-	state_save_register_global(blaster_bank);
+	state_save_register_global(machine, blaster_bank);
 }
 
 
@@ -942,7 +942,7 @@ MACHINE_RESET( joust2 )
 	/* standard init */
 	MACHINE_RESET_CALL(williams2);
 	pia_set_input_ca1(3, 1);
-	state_save_register_global(joust2_current_sound_data);
+	state_save_register_global(machine, joust2_current_sound_data);
 }
 
 
@@ -964,5 +964,5 @@ static WRITE8_HANDLER( joust2_snd_cmd_w )
 {
 	joust2_current_sound_data = (joust2_current_sound_data & ~0xff) | (data & 0xff);
 	williams_cvsd_data_w(joust2_current_sound_data);
-	timer_call_after_resynch(NULL, joust2_current_sound_data, joust2_deferred_snd_cmd_w);
+	timer_call_after_resynch(space->machine, NULL, joust2_current_sound_data, joust2_deferred_snd_cmd_w);
 }

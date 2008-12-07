@@ -349,7 +349,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb1_TriggerPOSIRQ );
+		timer_set( device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb1_TriggerPOSIRQ );
 	}
 } /* namconb1_interrupt */
 
@@ -418,7 +418,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
 		scanline = 0;
 
 	if( scanline < NAMCONB1_VBSTART )
-		timer_set( video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
+		timer_set( device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
 } /* namconb2_interrupt */
 
 static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
@@ -893,7 +893,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(300, 1));	// was 300
+		cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->cpu, 300));	// was 300
 	}
 }
 

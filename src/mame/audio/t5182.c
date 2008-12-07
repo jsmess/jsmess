@@ -166,7 +166,7 @@ static int irqstate;
 
 static TIMER_CALLBACK( setirq_callback )
 {
-	int cpunum;
+	const device_config *cpu;
 
 	switch(param)
 	{
@@ -191,40 +191,40 @@ static TIMER_CALLBACK( setirq_callback )
 			break;
 	}
 
-	cpunum = mame_find_cpu_index(machine, CPUTAG_T5182);
+	cpu = cputag_get_cpu(machine, CPUTAG_T5182);
 
-	if (cpunum == -1)
+	if (cpu == NULL)
 		return;
 
 	if (irqstate == 0)	/* no IRQs pending */
-		cpu_set_input_line(machine->cpu[cpunum],0,CLEAR_LINE);
+		cpu_set_input_line(cpu,0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpu_set_input_line(machine->cpu[cpunum],0,ASSERT_LINE);
+		cpu_set_input_line(cpu,0,ASSERT_LINE);
 }
 
 
 
 WRITE8_HANDLER( t5182_sound_irq_w )
 {
-	timer_call_after_resynch(NULL, CPU_ASSERT,setirq_callback);
+	timer_call_after_resynch(space->machine, NULL, CPU_ASSERT,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_ym2151_irq_ack_w )
 {
-	timer_call_after_resynch(NULL, YM2151_ACK,setirq_callback);
+	timer_call_after_resynch(space->machine, NULL, YM2151_ACK,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 {
-	timer_call_after_resynch(NULL, CPU_CLEAR,setirq_callback);
+	timer_call_after_resynch(space->machine, NULL, CPU_CLEAR,setirq_callback);
 }
 
 static void t5182_ym2151_irq_handler(running_machine *machine, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(NULL, YM2151_ASSERT,setirq_callback);
+		timer_call_after_resynch(machine, NULL, YM2151_ASSERT,setirq_callback);
 	else
-		timer_call_after_resynch(NULL, YM2151_CLEAR,setirq_callback);
+		timer_call_after_resynch(machine, NULL, YM2151_CLEAR,setirq_callback);
 }
 
 
@@ -289,8 +289,8 @@ const ym2151_interface t5182_ym2151_interface =
 	// rest unused
 ADDRESS_MAP_START( t5182_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM	// internal ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM	// internal RAM
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE(&t5182_sharedram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM	AM_MIRROR(0x1800) // internal RAM
+	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_MIRROR(0x3F00) AM_BASE(&t5182_sharedram) // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
 	AM_RANGE(0x8000, 0xffff) AM_ROM	// external ROM
 ADDRESS_MAP_END
 

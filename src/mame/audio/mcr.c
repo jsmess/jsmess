@@ -121,12 +121,12 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	{
 		ssio_sound_cpu = sound_cpu++;
 		ssio_compute_ay8910_modulation();
-		state_save_register_global_array(ssio_data);
-		state_save_register_global(ssio_status);
-		state_save_register_global(ssio_14024_count);
-		state_save_register_global(ssio_mute);
-		state_save_register_global_array(ssio_overall);
-		state_save_register_global_2d_array(ssio_duty_cycle);
+		state_save_register_global_array(machine, ssio_data);
+		state_save_register_global(machine, ssio_status);
+		state_save_register_global(machine, ssio_14024_count);
+		state_save_register_global(machine, ssio_mute);
+		state_save_register_global_array(machine, ssio_overall);
+		state_save_register_global_2d_array(machine, ssio_duty_cycle);
 	}
 
 	/* Turbo Chip Squeak */
@@ -135,7 +135,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 		pia_config(0, &turbocs_pia_intf);
 		turbocs_dac_index = dac_index++;
 		turbocs_sound_cpu = sound_cpu++;
-		state_save_register_global(turbocs_status);
+		state_save_register_global(machine, turbocs_status);
 	}
 
 	/* Chip Squeak Deluxe */
@@ -144,7 +144,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 		pia_config(0, &csdeluxe_pia_intf);
 		csdeluxe_dac_index = dac_index++;
 		csdeluxe_sound_cpu = sound_cpu++;
-		state_save_register_global(csdeluxe_status);
+		state_save_register_global(machine, csdeluxe_status);
 	}
 
 	/* Sounds Good */
@@ -154,7 +154,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 		pia_config(1, &soundsgood_pia_intf);
 		soundsgood_dac_index = dac_index++;
 		soundsgood_sound_cpu = sound_cpu++;
-		state_save_register_global(soundsgood_status);
+		state_save_register_global(machine, soundsgood_status);
 	}
 
 	/* Squawk n Talk */
@@ -163,8 +163,8 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 		pia_config(0, &squawkntalk_pia0_intf);
 		pia_config(1, &squawkntalk_pia1_intf);
 		squawkntalk_sound_cpu = sound_cpu++;
-		state_save_register_global(squawkntalk_tms_command);
-		state_save_register_global(squawkntalk_tms_strobes);
+		state_save_register_global(machine, squawkntalk_tms_command);
+		state_save_register_global(machine, squawkntalk_tms_strobes);
 	}
 
 	/* Advanced Audio */
@@ -383,7 +383,7 @@ static WRITE8_HANDLER( ssio_portb1_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( ssio_data_w )
 {
-	timer_call_after_resynch(NULL, (offset << 8) | (data & 0xff), ssio_delayed_data_w);
+	timer_call_after_resynch(space->machine, NULL, (offset << 8) | (data & 0xff), ssio_delayed_data_w);
 }
 
 READ8_HANDLER( ssio_status_r )
@@ -573,7 +573,7 @@ static WRITE16_HANDLER( csdeluxe_pia_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( csdeluxe_data_w )
 {
-	timer_call_after_resynch(NULL, data, csdeluxe_delayed_data_w);
+	timer_call_after_resynch(space->machine, NULL, data, csdeluxe_delayed_data_w);
 }
 
 READ8_HANDLER( csdeluxe_status_r )
@@ -678,7 +678,7 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( soundsgood_data_w )
 {
-	timer_call_after_resynch(NULL, data, soundsgood_delayed_data_w);
+	timer_call_after_resynch(space->machine, NULL, data, soundsgood_delayed_data_w);
 }
 
 READ8_HANDLER( soundsgood_status_r )
@@ -774,7 +774,7 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( turbocs_data_w )
 {
-	timer_call_after_resynch(NULL, data, turbocs_delayed_data_w);
+	timer_call_after_resynch(space->machine, NULL, data, turbocs_delayed_data_w);
 }
 
 READ8_HANDLER( turbocs_status_r )
@@ -905,7 +905,7 @@ static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( squawkntalk_data_w )
 {
-	timer_call_after_resynch(NULL, data, squawkntalk_delayed_data_w);
+	timer_call_after_resynch(space->machine, NULL, data, squawkntalk_delayed_data_w);
 }
 
 void squawkntalk_reset_w(int state)

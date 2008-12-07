@@ -672,7 +672,7 @@ static char *GameInfoSound(UINT nIndex)
 				sprintf(&buf[strlen(buf)],"%dx",count);
 			}
 
-			sprintf(&buf[strlen(buf)],"%s",sndtype_name(sound_type));
+			sprintf(&buf[strlen(buf)],"%s",sndtype_get_name(sound_type));
 
 			if (clock)
 			{

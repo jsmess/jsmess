@@ -219,7 +219,7 @@ static VIDEO_UPDATE( guab )
 	/* If blanked, fill with black */
 	if (state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -734,7 +734,7 @@ INPUT_PORTS_END
 
  static MACHINE_START( guab )
 {
-	fdc_timer = timer_alloc(fdc_data_callback, NULL);
+	fdc_timer = timer_alloc(machine, fdc_data_callback, NULL);
 	ptm6840_config(machine, 0, &ptm_intf);
 }
 

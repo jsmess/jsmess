@@ -834,7 +834,7 @@ static DEVICE_START( z80pio )
 {
 	const z80pio_interface *intf = device->static_config;
 	z80pio_t *z80pio = get_safe_token( device );
-	int cpunum = -1;
+	const device_config *cpu = NULL;
 
 	assert(intf != NULL);
 	z80pio->intf = intf;
@@ -843,12 +843,12 @@ static DEVICE_START( z80pio )
 
 	if (intf->cpu != NULL)
 	{
-		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
+		cpu = cputag_get_cpu(device->machine, intf->cpu);
 	}
 
-	if (cpunum != -1)
+	if (cpu != NULL)
 	{
-		z80pio->clock = device->machine->config->cpu[cpunum].clock;
+		z80pio->clock = cpu_get_clock(cpu);
 	}
 	else
 	{
@@ -858,28 +858,28 @@ static DEVICE_START( z80pio )
 
 	/* allocate poll timer */
 
-	z80pio->poll_timer = timer_alloc(z80pio_poll_tick, (void *)device);
+	z80pio->poll_timer = timer_alloc(device->machine, z80pio_poll_tick, (void *)device);
 	timer_adjust_periodic(z80pio->poll_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80pio->clock / 16));
 
 	/* allocate interrupt enable timer */
 
-	z80pio->irq_timer = timer_alloc(z80pio_irq_tick, (void *)device);
+	z80pio->irq_timer = timer_alloc(device->machine, z80pio_irq_tick, (void *)device);
 
 	/* register for state saving */
 
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->state);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->mode);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->irq_enable);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->irq_pending);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->int_state);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->enable);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->input);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->output);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->vector);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->mask);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->ddr);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->strobe);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->match);
+	state_save_register_device_item_array(device, 0, z80pio->state);
+	state_save_register_device_item_array(device, 0, z80pio->mode);
+	state_save_register_device_item_array(device, 0, z80pio->irq_enable);
+	state_save_register_device_item_array(device, 0, z80pio->irq_pending);
+	state_save_register_device_item_array(device, 0, z80pio->int_state);
+	state_save_register_device_item_array(device, 0, z80pio->enable);
+	state_save_register_device_item_array(device, 0, z80pio->input);
+	state_save_register_device_item_array(device, 0, z80pio->output);
+	state_save_register_device_item_array(device, 0, z80pio->vector);
+	state_save_register_device_item_array(device, 0, z80pio->mask);
+	state_save_register_device_item_array(device, 0, z80pio->ddr);
+	state_save_register_device_item_array(device, 0, z80pio->strobe);
+	state_save_register_device_item_array(device, 0, z80pio->match);
 
 	return DEVICE_START_OK;
 }

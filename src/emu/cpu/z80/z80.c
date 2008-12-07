@@ -3358,31 +3358,31 @@ static CPU_INIT( z80 )
 		if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
 	}
 
-	state_save_register_item("z80", device->tag, 0, z80->prvpc.w.l);
-	state_save_register_item("z80", device->tag, 0, z80->PC);
-	state_save_register_item("z80", device->tag, 0, z80->SP);
-	state_save_register_item("z80", device->tag, 0, z80->AF);
-	state_save_register_item("z80", device->tag, 0, z80->BC);
-	state_save_register_item("z80", device->tag, 0, z80->DE);
-	state_save_register_item("z80", device->tag, 0, z80->HL);
-	state_save_register_item("z80", device->tag, 0, z80->IX);
-	state_save_register_item("z80", device->tag, 0, z80->IY);
-	state_save_register_item("z80", device->tag, 0, z80->MEMPTR);
-	state_save_register_item("z80", device->tag, 0, z80->af2.w.l);
-	state_save_register_item("z80", device->tag, 0, z80->bc2.w.l);
-	state_save_register_item("z80", device->tag, 0, z80->de2.w.l);
-	state_save_register_item("z80", device->tag, 0, z80->hl2.w.l);
-	state_save_register_item("z80", device->tag, 0, z80->r);
-	state_save_register_item("z80", device->tag, 0, z80->r2);
-	state_save_register_item("z80", device->tag, 0, z80->iff1);
-	state_save_register_item("z80", device->tag, 0, z80->iff2);
-	state_save_register_item("z80", device->tag, 0, z80->halt);
-	state_save_register_item("z80", device->tag, 0, z80->im);
-	state_save_register_item("z80", device->tag, 0, z80->i);
-	state_save_register_item("z80", device->tag, 0, z80->nmi_state);
-	state_save_register_item("z80", device->tag, 0, z80->nmi_pending);
-	state_save_register_item("z80", device->tag, 0, z80->irq_state);
-	state_save_register_item("z80", device->tag, 0, z80->after_ei);
+	state_save_register_device_item(device, 0, z80->prvpc.w.l);
+	state_save_register_device_item(device, 0, z80->PC);
+	state_save_register_device_item(device, 0, z80->SP);
+	state_save_register_device_item(device, 0, z80->AF);
+	state_save_register_device_item(device, 0, z80->BC);
+	state_save_register_device_item(device, 0, z80->DE);
+	state_save_register_device_item(device, 0, z80->HL);
+	state_save_register_device_item(device, 0, z80->IX);
+	state_save_register_device_item(device, 0, z80->IY);
+	state_save_register_device_item(device, 0, z80->MEMPTR);
+	state_save_register_device_item(device, 0, z80->af2.w.l);
+	state_save_register_device_item(device, 0, z80->bc2.w.l);
+	state_save_register_device_item(device, 0, z80->de2.w.l);
+	state_save_register_device_item(device, 0, z80->hl2.w.l);
+	state_save_register_device_item(device, 0, z80->r);
+	state_save_register_device_item(device, 0, z80->r2);
+	state_save_register_device_item(device, 0, z80->iff1);
+	state_save_register_device_item(device, 0, z80->iff2);
+	state_save_register_device_item(device, 0, z80->halt);
+	state_save_register_device_item(device, 0, z80->im);
+	state_save_register_device_item(device, 0, z80->i);
+	state_save_register_device_item(device, 0, z80->nmi_state);
+	state_save_register_device_item(device, 0, z80->nmi_pending);
+	state_save_register_device_item(device, 0, z80->irq_state);
+	state_save_register_device_item(device, 0, z80->after_ei);
 
 	/* Reset registers to their initial values */
 	memset(z80, 0, sizeof(*z80));
@@ -3487,16 +3487,12 @@ static CPU_BURN( z80 )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static CPU_GET_CONTEXT( z80 )
-{
-}
+static CPU_GET_CONTEXT( z80 ) { }
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static CPU_SET_CONTEXT( z80 )
-{
-}
+static CPU_SET_CONTEXT( z80 ) { }
 
 /****************************************************************************
  * Set IRQ line state
@@ -3590,7 +3586,7 @@ CPU_GET_INFO( z80 )
 		case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(z80_state);					break;
 		case CPUINFO_INT_INPUT_LINES:				info->i = 1;									break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:		info->i = 0xff;									break;
-		case CPUINFO_INT_ENDIANNESS:				info->i = CPU_IS_LE;							break;
+		case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_LITTLE;							break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
 		case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i = 1;									break;

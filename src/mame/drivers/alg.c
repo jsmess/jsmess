@@ -22,9 +22,9 @@
 
 #include "driver.h"
 #include "render.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
+#include "machine/6526cia.h"
 
 
 static const device_config *laserdisc;
@@ -87,7 +87,7 @@ static MACHINE_START( alg )
 {
 	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
 
-	serial_timer = timer_alloc(response_timer, NULL);
+	serial_timer = timer_alloc(machine, response_timer, NULL);
 	serial_timer_active = FALSE;
 }
 
@@ -195,52 +195,52 @@ static CUSTOM_INPUT( lightgun_holster_r )
  *
  *************************************/
 
-static void alg_cia_0_porta_w(UINT8 data)
+static void alg_cia_0_porta_w(const device_config *device, UINT8 data)
 {
 	/* switch banks as appropriate */
-	memory_set_bank(Machine, 1, data & 1);
+	memory_set_bank(device->machine, 1, data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
 }
 
 
-static UINT8 alg_cia_0_porta_r(void)
+static UINT8 alg_cia_0_porta_r(const device_config *device)
 {
-	return input_port_read(Machine, "FIRE") | 0x3f;
+	return input_port_read(device->machine, "FIRE") | 0x3f;
 }
 
 
-static UINT8 alg_cia_0_portb_r(void)
+static UINT8 alg_cia_0_portb_r(const device_config *device)
 {
-	logerror("%06x:alg_cia_0_portb_r\n", cpu_get_pc(Machine->activecpu));
+	logerror("%06x:alg_cia_0_portb_r\n", cpu_get_pc(device->machine->activecpu));
 	return 0xff;
 }
 
 
-static void alg_cia_0_portb_w(UINT8 data)
+static void alg_cia_0_portb_w(const device_config *device, UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:alg_cia_0_portb_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
+	logerror("%06x:alg_cia_0_portb_w(%02x)\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 
-static UINT8 alg_cia_1_porta_r(void)
+static UINT8 alg_cia_1_porta_r(const device_config *device)
 {
-	logerror("%06x:alg_cia_1_porta_r\n", cpu_get_pc(Machine->activecpu));
+	logerror("%06x:alg_cia_1_porta_r\n", cpu_get_pc(device->machine->activecpu));
 	return 0xff;
 }
 
 
-static void alg_cia_1_porta_w(UINT8 data)
+static void alg_cia_1_porta_w(const device_config *device, UINT8 data)
 {
-	logerror("%06x:alg_cia_1_porta_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
+	logerror("%06x:alg_cia_1_porta_w(%02x)\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 
@@ -387,6 +387,28 @@ static const custom_sound_interface amiga_custom_interface =
  *
  *************************************/
 
+static const cia6526_interface cia_0_intf =
+{
+	amiga_cia_0_irq,								/* irq_func */
+	AMIGA_68000_NTSC_CLOCK / 10,					/* clock */
+	0,												/* tod_clock */
+	{
+		{ alg_cia_0_porta_r, alg_cia_0_porta_w },	/* port A */
+		{ alg_cia_0_portb_r, alg_cia_0_portb_w }	/* port B */
+	}
+};
+
+static const cia6526_interface cia_1_intf =
+{
+	amiga_cia_1_irq,								/* irq_func */
+	0,												/* clock */
+	0,												/* tod_clock */
+	{
+		{ alg_cia_1_porta_r, alg_cia_1_porta_w, },	/* port A */
+		{ NULL, NULL }								/* port B */
+	}
+};
+
 static MACHINE_DRIVER_START( alg_r1 )
 
 	/* basic machine hardware */
@@ -426,6 +448,12 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_intf)
+	MDRV_DEVICE_ADD("cia_1", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_1_intf)
 MACHINE_DRIVER_END
 
 
@@ -644,10 +672,6 @@ static void alg_init(running_machine *machine)
 	static const amiga_machine_interface alg_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
-		alg_cia_0_porta_r, alg_cia_0_portb_r,
-		alg_cia_0_porta_w, alg_cia_0_portb_w,
-		alg_cia_1_porta_r, NULL,
-		alg_cia_1_porta_w, NULL,
 		NULL, NULL, alg_potgo_w,
 		NULL, NULL, serial_w,
 

@@ -232,7 +232,7 @@ static MACHINE_START( ccastles )
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(clock_irq, NULL);
+	irq_timer = timer_alloc(machine, clock_irq, NULL);
 	irq_state = 0;
 	schedule_next_irq(machine, 0);
 
@@ -240,9 +240,9 @@ static MACHINE_START( ccastles )
 	generic_nvram = auto_malloc(generic_nvram_size);
 
 	/* setup for save states */
-	state_save_register_global(irq_state);
-	state_save_register_global_array(nvram_store);
-	state_save_register_global_pointer(generic_nvram, generic_nvram_size);
+	state_save_register_global(machine, irq_state);
+	state_save_register_global_array(machine, nvram_store);
+	state_save_register_global_pointer(machine, generic_nvram, generic_nvram_size);
 }
 
 

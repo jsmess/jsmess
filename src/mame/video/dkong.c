@@ -931,13 +931,13 @@ static VIDEO_START( dkong_base )
 	state->sprite_bank = 0;
 	state->vidhw = -1;
 
-	state_save_register_global(state->gfx_bank);
-	state_save_register_global(state->palette_bank);
-	state_save_register_global(state->sprite_bank);
-	state_save_register_global(state->grid_on);
+	state_save_register_global(machine, state->gfx_bank);
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->sprite_bank);
+	state_save_register_global(machine, state->grid_on);
 
-	state_save_register_global(state->grid_col);
-	state_save_register_global(state->flip);
+	state_save_register_global(machine, state->grid_col);
+	state_save_register_global(machine, state->flip);
 }
 
 VIDEO_START( dkong )
@@ -946,7 +946,7 @@ VIDEO_START( dkong )
 
 	VIDEO_START_CALL(dkong_base);
 
-	state->scanline_timer = timer_alloc(scanline_callback, NULL);
+	state->scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	switch (state->hardware_type)

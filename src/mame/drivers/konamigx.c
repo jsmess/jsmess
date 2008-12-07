@@ -3232,9 +3232,9 @@ ROM_END
 
 static MACHINE_START( konamigx )
 {
-	state_save_register_global(konamigx_wrport1_1);
-	state_save_register_global_array(sndto020);
-	state_save_register_global_array(sndto000);
+	state_save_register_global(machine, konamigx_wrport1_1);
+	state_save_register_global_array(machine, sndto020);
+	state_save_register_global_array(machine, sndto000);
 }
 
 static MACHINE_RESET(konamigx)
@@ -3341,7 +3341,7 @@ static DRIVER_INIT(konamigx)
 	snd020_hack = 0;
 	resume_trigger = 0;
 
-	dmadelay_timer = timer_alloc(dmaend_callback, NULL);
+	dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
 
 	i = match = 0;
 	while ((gameDefs[i].cfgport != -1) && (!match))

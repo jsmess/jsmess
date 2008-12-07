@@ -184,8 +184,8 @@ static TIMER_CALLBACK( update_nmi )
 static MACHINE_START( mephisto )
 {
 	lcd_shift_counter=3;
-	// timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
-	timer_pulse(ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
+	// timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
+	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
 	// cpu_set_input_line(machine->cpu[0], M65C02_IRQ_LINE,CLEAR_LINE);
 	//beep_set_frequency(0, 4000);
 }

@@ -722,9 +722,9 @@ static MACHINE_START( tmc1800 )
 
 	/* register for state saving */
 
-	state_save_register_global(state->cdp1861_efx);
-	state_save_register_global(state->keylatch);
-	state_save_register_global(state->reset);
+	state_save_register_global(machine, state->cdp1861_efx);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_RESET( tmc1800 )
@@ -744,8 +744,8 @@ static MACHINE_START( osc1000b )
 
 	/* register for state saving */
 
-	state_save_register_global(state->keylatch);
-	state_save_register_global(state->reset);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_RESET( osc1000b )
@@ -784,10 +784,10 @@ static MACHINE_START( tmc2000 )
 
 	/* register for state saving */
 
-	state_save_register_global_pointer(state->colorram, TMC2000_COLORRAM_SIZE);
-	state_save_register_global(state->cdp1864_efx);
-	state_save_register_global(state->keylatch);
-	state_save_register_global(state->reset);
+	state_save_register_global_pointer(machine, state->colorram, TMC2000_COLORRAM_SIZE);
+	state_save_register_global(machine, state->cdp1864_efx);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_RESET( tmc2000 )
@@ -822,7 +822,7 @@ static MACHINE_START( oscnano )
 
 	/* allocate monitor timer */
 	
-	state->ef4_timer = timer_alloc(oscnano_ef4_tick, NULL);
+	state->ef4_timer = timer_alloc(machine, oscnano_ef4_tick, NULL);
 
 	/* initialize variables */
 	
@@ -834,10 +834,10 @@ static MACHINE_START( oscnano )
 
 	/* register for state saving */
 
-	state_save_register_global(state->monitor_ef4);
-	state_save_register_global(state->cdp1864_efx);
-	state_save_register_global(state->keylatch);
-	state_save_register_global(state->reset);
+	state_save_register_global(machine, state->monitor_ef4);
+	state_save_register_global(machine, state->cdp1864_efx);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_RESET( oscnano )
@@ -1066,7 +1066,7 @@ static TIMER_CALLBACK(setup_beep)
 
 static DRIVER_INIT( tmc1800 )
 {
-	timer_set(attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
 }
 
 /* System Drivers */

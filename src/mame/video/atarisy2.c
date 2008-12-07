@@ -133,13 +133,13 @@ VIDEO_START( atarisy2 )
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* reset the statics */
-	yscroll_reset_timer = timer_alloc(reset_yscroll_callback, NULL);
+	yscroll_reset_timer = timer_alloc(machine, reset_yscroll_callback, NULL);
 	videobank = 0;
 
 	/* save states */
-	state_save_register_global_array(playfield_tile_bank);
-	state_save_register_global(videobank);
-	state_save_register_global_pointer(vram, 0x8000/2);
+	state_save_register_global_array(machine, playfield_tile_bank);
+	state_save_register_global(machine, videobank);
+	state_save_register_global_pointer(machine, vram, 0x8000/2);
 }
 
 
@@ -334,7 +334,7 @@ VIDEO_UPDATE( atarisy2 )
 	int x, y, r;
 
 	/* draw the playfield */
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 1, 1);
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 2, 2);

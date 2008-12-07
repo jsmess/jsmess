@@ -1328,27 +1328,27 @@ static DEVICE_START( z80dart )
 
 	/* allocate channel A receive timer */
 
-	z80dart->rxca_timer = timer_alloc(rxca_tick, (void *)device);
+	z80dart->rxca_timer = timer_alloc(device->machine, rxca_tick, (void *)device);
 
 	if (z80dart->intf->rx_clock_a)
 		timer_adjust_periodic(z80dart->rxca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->rx_clock_a));
 
 	/* allocate channel A transmit timer */
 
-	z80dart->txca_timer = timer_alloc(txca_tick, (void *)device);
+	z80dart->txca_timer = timer_alloc(device->machine, txca_tick, (void *)device);
 
 	if (z80dart->intf->tx_clock_a)
 		timer_adjust_periodic(z80dart->txca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->tx_clock_a));
 
 	/* allocate channel B receive/transmit timer */
 
-	z80dart->rxtxcb_timer = timer_alloc(rxtxcb_tick, (void *)device);
+	z80dart->rxtxcb_timer = timer_alloc(device->machine, rxtxcb_tick, (void *)device);
 
 	if (z80dart->intf->rx_tx_clock_b)
 		timer_adjust_periodic(z80dart->rxtxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->rx_tx_clock_b));
 
 	/* register for state saving */
-	//state_save_register_item_array("z80dart", device->tag, 0, z80dart->);
+	//state_save_register_item_array(machine, "z80dart", device->tag, 0, z80dart->);
 
 	return DEVICE_START_OK;
 }

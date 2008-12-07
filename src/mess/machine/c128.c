@@ -35,7 +35,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -82,17 +82,23 @@ static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, 
 
 static WRITE8_HANDLER(c128_dma8726_port_w)
 {
+	running_machine *machine = space->machine;
 	DBG_LOG(1,"dma write",("%.3x %.2x\n",offset,data));
 }
 
-static  READ8_HANDLER(c128_dma8726_port_r)
+static READ8_HANDLER(c128_dma8726_port_r)
 {
+	running_machine *machine = space->machine;
 	DBG_LOG(1,"dma read",("%.3x\n",offset));
 	return 0xff;
 }
 
 WRITE8_HANDLER( c128_write_d000 )
 {
+	running_machine *machine = space->machine;
+	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
+	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+
 	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(space->machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	if (!c128_write_io)
@@ -125,10 +131,10 @@ WRITE8_HANDLER( c128_write_d000 )
 				c64_colorram[(offset & 0x3ff)|((c64_port6510&3)<<10)] = data | 0xf0; // maybe all 8 bit connected!
 		    break;
 		case 0xc:
-			cia_0_w(space, offset, data);
+			cia_w(cia_0, offset, data);
 			break;
 		case 0xd:
-			cia_1_w(space, offset, data);
+			cia_w(cia_1, offset, data);
 			break;
 		case 0xf:
 			c128_dma8726_port_w(space, offset&0xff,data);
@@ -144,6 +150,10 @@ WRITE8_HANDLER( c128_write_d000 )
 
 static READ8_HANDLER( c128_read_io )
 {
+	running_machine *machine = space->machine;
+	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
+	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+
 	if (offset < 0x400)
 		return vic2_port_r (space, offset & 0x3ff);
 	else if (offset < 0x500)
@@ -156,18 +166,18 @@ static READ8_HANDLER( c128_read_io )
 		return c64_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return cia_0_r(space, offset);
+			cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+			return cia_r(cia_0, offset);
 		}
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return cia_0_r(space, offset);
+			cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+			return cia_r(cia_0, offset);
 		}
 	else if (offset < 0xd00)
-		return cia_0_r(space, offset);
+		return cia_r(cia_0, offset);
 	else if (offset < 0xe00)
-		return cia_1_r(space, offset);
+		return cia_r(cia_1, offset);
 	else if ((offset >= 0xf00) & (offset <= 0xfff))
 		return c128_dma8726_port_r(space, offset&0xff);
 	DBG_LOG (1, "io read", ("%.3x\n", offset));
@@ -885,8 +895,6 @@ static void c128_common_driver_init(running_machine *machine)
 	UINT8 *ram = memory_region(machine, "main");
 	int i;
 
-	cia6526_interface cia_intf[2];
-
 	/* configure the M6510 port */
 	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTREAD, (genf *) c128_m6510_port_read);
 	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
@@ -910,16 +918,7 @@ static void c128_common_driver_init(running_machine *machine)
 		gfx[i]=i;
 
 	if (c64_tape_on)
-		datasette_timer = timer_alloc(c64_tape_timer, NULL);
-
-	/* CIA initialization */
-	cia_intf[0] = c64_cia0;
-	cia_intf[1] = c64_cia1;
-	cia_intf[0].tod_clock = c64_pal ? 50 : 60;
-	cia_intf[1].tod_clock = c64_pal ? 50 : 60;
-
-	cia_config(machine, 0, &cia_intf[0]);
-	cia_config(machine, 1, &cia_intf[1]);
+		datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
 }
 
 DRIVER_INIT( c128 )

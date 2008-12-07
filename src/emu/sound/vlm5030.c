@@ -494,9 +494,8 @@ static STATE_POSTLOAD( vlm5030_restore_state )
 }
 
 
-static SND_RESET( vlm5030 )
+static void vlm5030_reset(struct vlm5030_info *chip)
 {
-	struct vlm5030_info *chip = token;
 	chip->phase = PH_RESET;
 	chip->address = 0;
 	chip->vcu_addr_h = 0;
@@ -515,6 +514,12 @@ static SND_RESET( vlm5030 )
 	/* reset parameters */
 	vlm5030_setup_parameter(chip, 0x00);
 }
+
+static SND_RESET( vlm5030 )
+{
+	vlm5030_reset(device->token);
+}
+
 
 /* set speech rom address */
 void vlm5030_set_rom(void *speech_rom)
@@ -557,7 +562,7 @@ void vlm5030_rst (int pin )
 			chip->pin_RST = 1;
 			if( chip->pin_BSY )
 			{
-				SND_RESET_NAME( vlm5030 )(chip);
+				vlm5030_reset(chip);
 			}
 		}
 	}
@@ -649,13 +654,13 @@ static SND_START( vlm5030 )
 	chip->pin_RST = chip->pin_ST = chip->pin_VCU= 0;
 	chip->latch_data = 0;
 
-	SND_RESET_NAME( vlm5030 )(chip);
+	vlm5030_reset(chip);
 	chip->phase = PH_IDLE;
 
-	chip->rom = memory_region(Machine, tag);
+	chip->rom = device->region;
 	/* memory size */
 	if( chip->intf->memory_size == 0)
-		chip->address_mask = memory_region_length(Machine, tag)-1;
+		chip->address_mask = device->regionbytes-1;
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 
@@ -663,26 +668,26 @@ static SND_START( vlm5030 )
 
 	/* don't restore "UINT8 *chip->rom" when use vlm5030_set_rom() */
 
-	state_save_register_item(VLM_NAME,tag,0,chip->address);
-	state_save_register_item(VLM_NAME,tag,0,chip->pin_BSY);
-	state_save_register_item(VLM_NAME,tag,0,chip->pin_ST);
-	state_save_register_item(VLM_NAME,tag,0,chip->pin_VCU);
-	state_save_register_item(VLM_NAME,tag,0,chip->pin_RST);
-	state_save_register_item(VLM_NAME,tag,0,chip->latch_data);
-	state_save_register_item(VLM_NAME,tag,0,chip->vcu_addr_h);
-	state_save_register_item(VLM_NAME,tag,0,chip->parameter);
-	state_save_register_item(VLM_NAME,tag,0,chip->phase);
-	state_save_register_item(VLM_NAME,tag,0,chip->interp_count);
-	state_save_register_item(VLM_NAME,tag,0,chip->sample_count);
-	state_save_register_item(VLM_NAME,tag,0,chip->pitch_count);
-	state_save_register_item(VLM_NAME,tag,0,chip->old_energy);
-	state_save_register_item(VLM_NAME,tag,0,chip->old_pitch);
-	state_save_register_item_array(VLM_NAME,tag,0,chip->old_k);
-	state_save_register_item(VLM_NAME,tag,0,chip->target_energy);
-	state_save_register_item(VLM_NAME,tag,0,chip->target_pitch);
-	state_save_register_item_array(VLM_NAME,tag,0,chip->target_k);
-	state_save_register_item_array(VLM_NAME,tag,0,chip->x);
-	state_save_register_postload(Machine, vlm5030_restore_state, chip);
+	state_save_register_device_item(device,0,chip->address);
+	state_save_register_device_item(device,0,chip->pin_BSY);
+	state_save_register_device_item(device,0,chip->pin_ST);
+	state_save_register_device_item(device,0,chip->pin_VCU);
+	state_save_register_device_item(device,0,chip->pin_RST);
+	state_save_register_device_item(device,0,chip->latch_data);
+	state_save_register_device_item(device,0,chip->vcu_addr_h);
+	state_save_register_device_item(device,0,chip->parameter);
+	state_save_register_device_item(device,0,chip->phase);
+	state_save_register_device_item(device,0,chip->interp_count);
+	state_save_register_device_item(device,0,chip->sample_count);
+	state_save_register_device_item(device,0,chip->pitch_count);
+	state_save_register_device_item(device,0,chip->old_energy);
+	state_save_register_device_item(device,0,chip->old_pitch);
+	state_save_register_device_item_array(device,0,chip->old_k);
+	state_save_register_device_item(device,0,chip->target_energy);
+	state_save_register_device_item(device,0,chip->target_pitch);
+	state_save_register_device_item_array(device,0,chip->target_k);
+	state_save_register_device_item_array(device,0,chip->x);
+	state_save_register_postload(device->machine, vlm5030_restore_state, chip);
 
 	return chip;
 }

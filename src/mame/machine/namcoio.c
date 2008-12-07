@@ -133,6 +133,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/namcoio.h"
 #include "machine/namco50.h"
 #include "sound/namco52.h"
@@ -785,30 +786,30 @@ static TIMER_CALLBACK( namcoio_run )
 	}
 }
 
-void namcoio_set_irq_line(int chipnum, int state)
+void namcoio_set_irq_line(running_machine *machine, int chipnum, int state)
 {
 	if (chipnum < MAX_NAMCOIO && state != CLEAR_LINE && !io[chipnum].reset)
 	{
 		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(ATTOTIME_IN_USEC(50), NULL, chipnum, namcoio_run);
+		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, chipnum, namcoio_run);
 	}
 }
 
 static void namcoio_state_save(int chipnum)
 {
 
-	state_save_register_item_pointer("namcoio", NULL, chipnum, ((UINT8 *) (&namcoio_ram[chipnum * 16])), 16);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].reset);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].lastcoins);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].lastbuttons);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].credits);
-	state_save_register_item_array("namcoio", NULL, chipnum, io[chipnum].coins);
-	state_save_register_item_array("namcoio", NULL, chipnum, io[chipnum].coins_per_cred);
-	state_save_register_item_array("namcoio", NULL, chipnum, io[chipnum].creds_per_coin);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].in_count);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].mode);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].coincred_mode);
-	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].remap_joy);
+	state_save_register_item_pointer(Machine, "namcoio", NULL, chipnum, ((UINT8 *) (&namcoio_ram[chipnum * 16])), 16);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].reset);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].lastcoins);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].lastbuttons);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].credits);
+	state_save_register_item_array(Machine, "namcoio", NULL, chipnum, io[chipnum].coins);
+	state_save_register_item_array(Machine, "namcoio", NULL, chipnum, io[chipnum].coins_per_cred);
+	state_save_register_item_array(Machine, "namcoio", NULL, chipnum, io[chipnum].creds_per_coin);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].in_count);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].mode);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].coincred_mode);
+	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].remap_joy);
 }
 
 void namcoio_init(int chipnum, int type, const struct namcoio_interface *intf)
@@ -850,12 +851,12 @@ static UINT8 customio_command[MAX_06XX];
 static void namco_06xx_state_save(int chipnum)
 {
 
-		//state_save_register_item("namcoio06xx", NULL, chipnum, nmi_cpu[chipnum]);
-		state_save_register_item("namcoio06xx", NULL, chipnum, customio_command[chipnum]);
+		//state_save_register_item(Machine, "namcoio06xx", NULL, chipnum, nmi_cpu[chipnum]);
+		state_save_register_item(Machine, "namcoio06xx", NULL, chipnum, customio_command[chipnum]);
 }
 
 
-void namco_06xx_init(int chipnum, int cpu,
+void namco_06xx_init(running_machine *machine, int chipnum, int cpu,
 	int type0, const struct namcoio_interface *intf0,
 	int type1, const struct namcoio_interface *intf1,
 	int type2, const struct namcoio_interface *intf2,
@@ -868,7 +869,7 @@ void namco_06xx_init(int chipnum, int cpu,
 		namcoio_init(4*chipnum + 2, type2, intf2);
 		namcoio_init(4*chipnum + 3, type3, intf3);
 		nmi_cpu[chipnum] = cpu;
-		nmi_timer[chipnum] = timer_alloc(nmi_generate, NULL);
+		nmi_timer[chipnum] = timer_alloc(machine, nmi_generate, NULL);
 		namco_06xx_state_save(chipnum);
 	}
 }

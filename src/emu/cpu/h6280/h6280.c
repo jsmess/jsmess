@@ -162,32 +162,32 @@ static void set_irq_line(int irqline, int state);
 /*****************************************************************************/
 static CPU_INIT( h6280 )
 {
-	state_save_register_item("h6280", device->tag, 0, h6280.ppc.w.l);
-	state_save_register_item("h6280", device->tag, 0, h6280.pc.w.l);
-	state_save_register_item("h6280", device->tag, 0, h6280.sp.w.l);
-	state_save_register_item("h6280", device->tag, 0, h6280.zp.w.l);
-	state_save_register_item("h6280", device->tag, 0, h6280.ea.w.l);
-	state_save_register_item("h6280", device->tag, 0, h6280.a);
-	state_save_register_item("h6280", device->tag, 0, h6280.x);
-	state_save_register_item("h6280", device->tag, 0, h6280.y);
-	state_save_register_item("h6280", device->tag, 0, h6280.p);
-	state_save_register_item_array("h6280", device->tag, 0, h6280.mmr);
-	state_save_register_item("h6280", device->tag, 0, h6280.irq_mask);
-	state_save_register_item("h6280", device->tag, 0, h6280.timer_status);
-	state_save_register_item("h6280", device->tag, 0, h6280.timer_ack);
-	state_save_register_item("h6280", device->tag, 0, h6280.clocks_per_cycle);
-	state_save_register_item("h6280", device->tag, 0, h6280.timer_value);
-	state_save_register_item("h6280", device->tag, 0, h6280.timer_load);
-	state_save_register_item("h6280", device->tag, 0, h6280.nmi_state);
-	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[0]);
-	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[1]);
-	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[2]);
-	state_save_register_item("h6280", device->tag, 0, h6280.irq_pending);
+	state_save_register_device_item(device, 0, h6280.ppc.w.l);
+	state_save_register_device_item(device, 0, h6280.pc.w.l);
+	state_save_register_device_item(device, 0, h6280.sp.w.l);
+	state_save_register_device_item(device, 0, h6280.zp.w.l);
+	state_save_register_device_item(device, 0, h6280.ea.w.l);
+	state_save_register_device_item(device, 0, h6280.a);
+	state_save_register_device_item(device, 0, h6280.x);
+	state_save_register_device_item(device, 0, h6280.y);
+	state_save_register_device_item(device, 0, h6280.p);
+	state_save_register_device_item_array(device, 0, h6280.mmr);
+	state_save_register_device_item(device, 0, h6280.irq_mask);
+	state_save_register_device_item(device, 0, h6280.timer_status);
+	state_save_register_device_item(device, 0, h6280.timer_ack);
+	state_save_register_device_item(device, 0, h6280.clocks_per_cycle);
+	state_save_register_device_item(device, 0, h6280.timer_value);
+	state_save_register_device_item(device, 0, h6280.timer_load);
+	state_save_register_device_item(device, 0, h6280.nmi_state);
+	state_save_register_device_item(device, 0, h6280.irq_state[0]);
+	state_save_register_device_item(device, 0, h6280.irq_state[1]);
+	state_save_register_device_item(device, 0, h6280.irq_state[2]);
+	state_save_register_device_item(device, 0, h6280.irq_pending);
 
 	#if LAZY_FLAGS
-	state_save_register_item("h6280", device->tag, 0, h6280.NZ);
+	state_save_register_device_item(device, 0, h6280.NZ);
 	#endif
-	state_save_register_item("h6280", device->tag, 0, h6280.io_buffer);
+	state_save_register_device_item(device, 0, h6280.io_buffer);
 
 	h6280.irq_callback = irqcallback;
 	h6280.device = device;
@@ -206,6 +206,7 @@ static CPU_RESET( h6280 )
 	h6280.irq_callback = save_irqcallback;
 	h6280.device = device;
 	h6280.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	h6280.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* set I and B flags */
 	P = _fI | _fB;
@@ -461,7 +462,7 @@ CPU_GET_INFO( h6280 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(h6280);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;

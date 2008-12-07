@@ -512,8 +512,8 @@ ROM_END
 
 static DRIVER_INIT( jaguar )
 {
-	state_save_register_global(joystick_data);
-	state_save_register_global(eeprom_enable);
+	state_save_register_global(machine, joystick_data);
+	state_save_register_global(machine, eeprom_enable);
 
 	/* init the sound system and install DSP speedups */
 	cojag_sound_init(machine);

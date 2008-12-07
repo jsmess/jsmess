@@ -471,10 +471,10 @@ static MACHINE_START( sg1000 )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* toggle light gun crosshair */
-	timer_set(attotime_zero, NULL, 0, lightgun_tick);
+	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
 
 	/* register for state saving */
-	state_save_register_global(tvdraw_data);
+	state_save_register_global(machine, tvdraw_data);
 }
 
 // SC-3000
@@ -573,11 +573,11 @@ static MACHINE_START( sc3000 )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* toggle light gun crosshair */
-	timer_set(attotime_zero, NULL, 0, lightgun_tick);
+	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
 
 	/* register for state saving */
-	state_save_register_global(tvdraw_data);
-	state_save_register_global(keylatch);
+	state_save_register_global(machine, tvdraw_data);
+	state_save_register_global(machine, keylatch);
 }
 
 // SF-7000
@@ -726,9 +726,9 @@ static MACHINE_START( sf7000 )
 	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
 
 	/* register for state saving */
-	state_save_register_global(keylatch);
-	state_save_register_global(sf7000_fdc_int);
-	state_save_register_global(sf7000_fdc_index);
+	state_save_register_global(machine, keylatch);
+	state_save_register_global(machine, sf7000_fdc_int);
+	state_save_register_global(machine, sf7000_fdc_index);
 }
 
 static MACHINE_RESET( sf7000 )

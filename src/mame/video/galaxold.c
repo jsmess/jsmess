@@ -458,22 +458,22 @@ PALETTE_INIT( turtles )
 
 ***************************************************************************/
 
-static void state_save_register(void)
+static void state_save_register(running_machine *machine)
 {
-	state_save_register_global_array(gfxbank);
-	state_save_register_global(flipscreen_x);
-	state_save_register_global(flipscreen_y);
+	state_save_register_global_array(machine, gfxbank);
+	state_save_register_global(machine, flipscreen_x);
+	state_save_register_global(machine, flipscreen_y);
 
-	state_save_register_global(galaxold_stars_on);
-	state_save_register_global(stars_scrollpos);
-	state_save_register_global(stars_blink_state);
+	state_save_register_global(machine, galaxold_stars_on);
+	state_save_register_global(machine, stars_scrollpos);
+	state_save_register_global(machine, stars_blink_state);
 
-	state_save_register_global(darkplnt_bullet_color);
+	state_save_register_global(machine, darkplnt_bullet_color);
 
-	state_save_register_global(background_enable);
-	state_save_register_global(background_red);
-	state_save_register_global(background_green);
-	state_save_register_global(background_blue);
+	state_save_register_global(machine, background_enable);
+	state_save_register_global(machine, background_red);
+	state_save_register_global(machine, background_green);
+	state_save_register_global(machine, background_blue);
 }
 
 static void video_start_common(running_machine *machine, tilemap_mapper_func get_memory_offset)
@@ -510,7 +510,7 @@ static void video_start_common(running_machine *machine, tilemap_mapper_func get
 
 	color_mask = (machine->gfx[0]->color_granularity == 4) ? 7 : 3;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 VIDEO_START( galaxold_plain )
@@ -720,8 +720,8 @@ VIDEO_START( rockclim )
 	modify_charcode = mooncrst_modify_charcode;
 	modify_spritecode = rockclim_modify_spritecode;
 	rockclim_v = rockclim_h = 0;
-	state_save_register_global(rockclim_v);
-	state_save_register_global(rockclim_h);
+	state_save_register_global(machine, rockclim_v);
+	state_save_register_global(machine, rockclim_h);
 }
 
 static TILE_GET_INFO( drivfrcg_get_tile_info )
@@ -772,7 +772,7 @@ VIDEO_START( drivfrcg )
 
 	color_mask = 0xff;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 VIDEO_START( ad2083 )
@@ -810,7 +810,7 @@ VIDEO_START( ad2083 )
 
 	color_mask = 7;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 UINT8 *racknrol_tiles_bank;
@@ -868,7 +868,7 @@ VIDEO_START( racknrol )
 
 	color_mask = 0xff;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 VIDEO_START( bongo )
@@ -1269,22 +1269,22 @@ static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, cons
 static void galaxold_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* plain black background */
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 }
 
 static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (background_enable)
-		fillbitmap(bitmap,BACKGROUND_COLOR_BASE,cliprect);
+		bitmap_fill(bitmap,cliprect,BACKGROUND_COLOR_BASE);
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 }
 
 static void turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int color = (background_blue << 2) | (background_green << 1) | background_red;
 
-	fillbitmap(bitmap,BACKGROUND_COLOR_BASE + color,cliprect);
+	bitmap_fill(bitmap,cliprect,BACKGROUND_COLOR_BASE + color);
 }
 
 static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
@@ -1338,7 +1338,7 @@ static void minefld_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 }
 
 static void rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
@@ -1356,7 +1356,7 @@ static void rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 }
 
 static void mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
@@ -1455,8 +1455,8 @@ void galaxold_init_stars(running_machine *machine, int colors_offset)
 
 	galaxold_stars_on = 0;
 	stars_blink_state = 0;
-	stars_blink_timer = timer_alloc(stars_blink_callback, NULL);
-	stars_scroll_timer = timer_alloc(stars_scroll_callback, NULL);
+	stars_blink_timer = timer_alloc(machine, stars_blink_callback, NULL);
+	stars_scroll_timer = timer_alloc(machine, stars_scroll_callback, NULL);
 	timer_adjusted = 0;
 	stars_colors_start = colors_offset;
 

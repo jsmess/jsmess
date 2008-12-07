@@ -195,7 +195,7 @@ int pc_hdc_setup(void (*hdc_set_irq_func)(int,int))
 		error[i] = 0;
 		dip[i] = 0xff;
 		pc_hdc_dma8237 = NULL;
-		timer[i] = timer_alloc(pc_hdc_command, NULL);
+		timer[i] = timer_alloc(machine, pc_hdc_command, NULL);
 		if (!timer[i])
 			return -1;
 	}

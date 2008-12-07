@@ -1,15 +1,18 @@
-/*
+/*********************************************************************
 
 	Philips PCF8593 CMOS clock/calendar circuit
 
 	(c) 2001-2007 Tim Schuerewegen
 
-*/
-
-#include "pcf8593.h"
-#include "deprecat.h"
+*********************************************************************/
 
 #include <time.h>
+#include "pcf8593.h"
+
+
+/***************************************************************************
+    PARAMETERS/CONSTANTS/MACROS
+***************************************************************************/
 
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
@@ -19,107 +22,145 @@
 #define RTC_MODE_RECV  2
 
 // get/set date
-#define RTC_GET_DATE_YEAR       ((rtc.data[5] >> 6) & 3)
-#define RTC_SET_DATE_YEAR(x)    rtc.data[5] = (rtc.data[5] & 0x3F) | (((x) % 4) << 6)
-#define RTC_GET_DATE_MONTH      bcd_to_dec( rtc.data[6])
-#define RTC_SET_DATE_MONTH(x)   rtc.data[6] = dec_to_bcd( x)
-#define RTC_GET_DATE_DAY        (bcd_to_dec( rtc.data[5] & 0x3F))
-#define RTC_SET_DATE_DAY(x)     rtc.data[5] = (rtc.data[5] & 0xC0) | dec_to_bcd( x)
+#define RTC_GET_DATE_YEAR       ((rtc->data[5] >> 6) & 3)
+#define RTC_SET_DATE_YEAR(x)    rtc->data[5] = (rtc->data[5] & 0x3F) | (((x) % 4) << 6)
+#define RTC_GET_DATE_MONTH      bcd_to_dec( rtc->data[6])
+#define RTC_SET_DATE_MONTH(x)   rtc->data[6] = dec_to_bcd( x)
+#define RTC_GET_DATE_DAY        (bcd_to_dec( rtc->data[5] & 0x3F))
+#define RTC_SET_DATE_DAY(x)     rtc->data[5] = (rtc->data[5] & 0xC0) | dec_to_bcd( x)
 
 // get/set time
-#define RTC_GET_TIME_HOUR       bcd_to_dec( rtc.data[4])
-#define RTC_SET_TIME_HOUR(x)    rtc.data[4] = dec_to_bcd( x)
-#define RTC_GET_TIME_MINUTE     bcd_to_dec( rtc.data[3])
-#define RTC_SET_TIME_MINUTE(x)  rtc.data[3] = dec_to_bcd( x)
-#define RTC_GET_TIME_SECOND     bcd_to_dec( rtc.data[2])
-#define RTC_SET_TIME_SECOND(x)  rtc.data[2] = dec_to_bcd( x)
+#define RTC_GET_TIME_HOUR       bcd_to_dec( rtc->data[4])
+#define RTC_SET_TIME_HOUR(x)    rtc->data[4] = dec_to_bcd( x)
+#define RTC_GET_TIME_MINUTE     bcd_to_dec( rtc->data[3])
+#define RTC_SET_TIME_MINUTE(x)  rtc->data[3] = dec_to_bcd( x)
+#define RTC_GET_TIME_SECOND     bcd_to_dec( rtc->data[2])
+#define RTC_SET_TIME_SECOND(x)  rtc->data[2] = dec_to_bcd( x)
 
-static void pcf8593_clear_buffer_rx( void);
-static TIMER_CALLBACK( pcf8593_timer_callback );
 
-typedef struct
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _pcf8593_t pcf8593_t;
+struct _pcf8593_t
 {
-	UINT8 *data;
-	UINT32 size;
+	UINT8 data[16];
 	int pin_scl, pin_sda, inp;
 	int active;
 	int bits;
 	UINT8 data_recv_index, data_recv[50];
 	UINT8 mode, pos;
 	emu_timer *timer;
-} PCF8593;
+};
 
-static PCF8593 rtc;
 
-void pcf8593_init( void)
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static void pcf8593_clear_buffer_rx(const device_config *device);
+static TIMER_CALLBACK( pcf8593_timer_callback );
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE pcf8593_t *get_token(const device_config *device)
 {
+	assert(device->type == PCF8593);
+	return (pcf8593_t *) device->token;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    DEVICE_START( pcf8593 )
+-------------------------------------------------*/
+
+static DEVICE_START( pcf8593 )
+{
+	pcf8593_t *rtc = get_token(device);
+
 	_logerror( 0, ("pcf8593_init\n"));
-	memset( &rtc, 0, sizeof( rtc));
-	rtc.size = 16;
-	rtc.data = malloc_or_die( rtc.size);
-	rtc.timer = timer_alloc( pcf8593_timer_callback , NULL);
-	timer_adjust_periodic(rtc.timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
-	pcf8593_reset();
+	memset( rtc, 0, sizeof(*rtc));
+	rtc->timer = timer_alloc(device->machine,  pcf8593_timer_callback , (void *) device);
+	timer_adjust_periodic(rtc->timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+	return DEVICE_START_OK;
 }
 
-void pcf8593_exit( void)
-{
-	_logerror( 0, ("pcf8593_exit\n"));
-	free( rtc.data);
-}
 
-void pcf8593_reset( void)
+
+/*-------------------------------------------------
+    DEVICE_RESET( pcf8593 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( pcf8593 )
 {
+	pcf8593_t *rtc = get_token(device);
+
 	_logerror( 0, ("pcf8593_reset\n"));
-	rtc.pin_scl = 1;
-	rtc.pin_sda = 1;
-	rtc.active  = FALSE;
-	rtc.inp     = 0;
-	rtc.mode    = RTC_MODE_RECV;
-	rtc.bits    = 0;
-	pcf8593_clear_buffer_rx();
-	rtc.pos     = 0;
+	rtc->pin_scl = 1;
+	rtc->pin_sda = 1;
+	rtc->active  = FALSE;
+	rtc->inp     = 0;
+	rtc->mode    = RTC_MODE_RECV;
+	rtc->bits    = 0;
+	pcf8593_clear_buffer_rx(device);
+	rtc->pos     = 0;
 }
 
-void pcf8593_pin_scl( int data)
+
+
+/*-------------------------------------------------
+    pcf8593_pin_scl
+-------------------------------------------------*/
+
+void pcf8593_pin_scl(const device_config *device, int data)
 {
+	pcf8593_t *rtc = get_token(device);
+
 	// send bit
-	if ((rtc.active) && (!rtc.pin_scl) && (data))
+	if ((rtc->active) && (!rtc->pin_scl) && (data))
 	{
-		switch (rtc.mode)
+		switch (rtc->mode)
 		{
 			// HOST -> RTC
 			case RTC_MODE_RECV :
 			{
 				// get bit
-	    		if (rtc.pin_sda) rtc.data_recv[rtc.data_recv_index] = rtc.data_recv[rtc.data_recv_index] | (0x80 >> rtc.bits);
-				rtc.bits++;
+	    		if (rtc->pin_sda) rtc->data_recv[rtc->data_recv_index] = rtc->data_recv[rtc->data_recv_index] | (0x80 >> rtc->bits);
+				rtc->bits++;
 				// bit 9 = end
-				if (rtc.bits > 8)
+				if (rtc->bits > 8)
 				{
-					_logerror( 2, ("pcf8593_write_byte(%02X)\n", rtc.data_recv[rtc.data_recv_index]));
+					_logerror( 2, ("pcf8593_write_byte(%02X)\n", rtc->data_recv[rtc->data_recv_index]));
 					// enter receive mode when 1st byte = 0xA3
-					if ((rtc.data_recv[0] == 0xA3) && (rtc.data_recv_index == 0))
+					if ((rtc->data_recv[0] == 0xA3) && (rtc->data_recv_index == 0))
 					{
-  						rtc.mode = RTC_MODE_SEND;
+  						rtc->mode = RTC_MODE_SEND;
 					}
 					// A2 + xx = "read from pos xx" command
-					if ((rtc.data_recv[0] == 0xA2) && (rtc.data_recv_index == 1))
+					if ((rtc->data_recv[0] == 0xA2) && (rtc->data_recv_index == 1))
 					{
-						rtc.pos = rtc.data_recv[1];
+						rtc->pos = rtc->data_recv[1];
 					}
 					// A2 + xx + .. = write byte
-					if ((rtc.data_recv[0] == 0xA2) && (rtc.data_recv_index >= 2))
+					if ((rtc->data_recv[0] == 0xA2) && (rtc->data_recv_index >= 2))
 					{
 						UINT8 rtc_pos, rtc_val;
-						rtc_pos = rtc.data_recv[1] + (rtc.data_recv_index - 2);
-						rtc_val = rtc.data_recv[rtc.data_recv_index];
+						rtc_pos = rtc->data_recv[1] + (rtc->data_recv_index - 2);
+						rtc_val = rtc->data_recv[rtc->data_recv_index];
 						//if (rtc_pos == 0) rtc_val = rtc_val & 3; // what is this doing here?
-						rtc.data[rtc_pos] = rtc_val;
+						rtc->data[rtc_pos] = rtc_val;
 					}
 					// next byte
-					rtc.bits = 0;
-  					rtc.data_recv_index++;
+					rtc->bits = 0;
+  					rtc->data_recv_index++;
 				}
 			}
 			break;
@@ -127,74 +168,108 @@ void pcf8593_pin_scl( int data)
 			case RTC_MODE_SEND :
 			{
 				// set bit
-				rtc.inp = (rtc.data[rtc.pos] >> (7 - rtc.bits)) & 1;
-				rtc.bits++;
+				rtc->inp = (rtc->data[rtc->pos] >> (7 - rtc->bits)) & 1;
+				rtc->bits++;
 				// bit 9 = end
-				if (rtc.bits > 8)
+				if (rtc->bits > 8)
 				{
-					_logerror( 2, ("pcf8593_read_byte(%02X)\n", rtc.data[rtc.pos]));
+					_logerror( 2, ("pcf8593_read_byte(%02X)\n", rtc->data[rtc->pos]));
 					// end ?
-  					if (rtc.pin_sda)
+  					if (rtc->pin_sda)
 					{
 						_logerror( 2, ("pcf8593 end\n"));
-  						rtc.mode = RTC_MODE_RECV;
-           				pcf8593_clear_buffer_rx();
+  						rtc->mode = RTC_MODE_RECV;
+           				pcf8593_clear_buffer_rx(device);
 					}
 					// next byte
-					rtc.bits = 0;
-					rtc.pos++;
+					rtc->bits = 0;
+					rtc->pos++;
 				}
 			}
 			break;
 		}
 	}
 	// save scl
-	rtc.pin_scl = data;
+	rtc->pin_scl = data;
 }
 
-void pcf8593_pin_sda_w( int data)
+
+
+/*-------------------------------------------------
+    pcf8593_pin_sda_w
+-------------------------------------------------*/
+
+void pcf8593_pin_sda_w(const device_config *device, int data)
 {
+	pcf8593_t *rtc = get_token(device);
+
 	// clock is high
-	if (rtc.pin_scl)
+	if (rtc->pin_scl)
 	{
 		// log init I2C
 		if (data) _logerror( 1, ("pcf8593 init i2c\n"));
 		// start condition (high to low when clock is high)
-		if ((!data) && (rtc.pin_sda))
+		if ((!data) && (rtc->pin_sda))
 		{
 			_logerror( 1, ("pcf8593 start condition\n"));
-			rtc.active          = TRUE;
-			rtc.bits            = 0;
-			rtc.data_recv_index = 0;
-			pcf8593_clear_buffer_rx();
-			//rtc.pos = 0;
+			rtc->active          = TRUE;
+			rtc->bits            = 0;
+			rtc->data_recv_index = 0;
+			pcf8593_clear_buffer_rx(device);
+			//rtc->pos = 0;
 		}
 		// stop condition (low to high when clock is high)
-		if ((data) && (!rtc.pin_sda))
+		if ((data) && (!rtc->pin_sda))
 		{
 			_logerror( 1, ("pcf8593 stop condition\n"));
-			rtc.active = FALSE;
+			rtc->active = FALSE;
 		}
 	}
 	// save sda
-	rtc.pin_sda = data;
+	rtc->pin_sda = data;
 }
 
-int pcf8593_pin_sda_r( void)
+
+
+/*-------------------------------------------------
+    pcf8593_pin_sda_r
+-------------------------------------------------*/
+
+int pcf8593_pin_sda_r(const device_config *device)
 {
-	return rtc.inp;
+	pcf8593_t *rtc = get_token(device);
+	return rtc->inp;
 }
 
-void pcf8593_clear_buffer_rx( void)
+
+
+/*-------------------------------------------------
+    pcf8593_clear_buffer_rx
+-------------------------------------------------*/
+
+void pcf8593_clear_buffer_rx(const device_config *device)
 {
-	memset( &rtc.data_recv[0], 0, sizeof( rtc.data_recv));
-	rtc.data_recv_index = 0;
+	pcf8593_t *rtc = get_token(device);
+	memset( &rtc->data_recv[0], 0, sizeof( rtc->data_recv));
+	rtc->data_recv_index = 0;
 }
+
+
+
+/*-------------------------------------------------
+    dec_to_bcd
+-------------------------------------------------*/
 
 static UINT8 dec_to_bcd( UINT8 data)
 {
 	return ((data / 10) << 4) | ((data % 10) << 0);
 }
+
+
+
+/*-------------------------------------------------
+    bcd_to_dec
+-------------------------------------------------*/
 
 static UINT8 bcd_to_dec( UINT8 data)
 {
@@ -203,20 +278,40 @@ static UINT8 bcd_to_dec( UINT8 data)
 	return (data & 0x0F) + (((data & 0xF0) >> 4) * 10);
 }
 
-static void pcf8593_set_time( int hour, int minute, int second)
+
+
+/*-------------------------------------------------
+    bcd_to_dec
+-------------------------------------------------*/
+
+static void pcf8593_set_time(const device_config *device, int hour, int minute, int second)
 {
+	pcf8593_t *rtc = get_token(device);
 	RTC_SET_TIME_HOUR( hour);
 	RTC_SET_TIME_MINUTE( minute);
 	RTC_SET_TIME_SECOND( second);
-	rtc.data[1] = 0; // hundreds of a seconds
+	rtc->data[1] = 0; // hundreds of a seconds
 }
 
-static void pcf8593_set_date( int year, int month, int day)
+
+
+/*-------------------------------------------------
+    pcf8593_set_date
+-------------------------------------------------*/
+
+static void pcf8593_set_date(const device_config *device, int year, int month, int day)
 {
+	pcf8593_t *rtc = get_token(device);
 	RTC_SET_DATE_YEAR( year);
 	RTC_SET_DATE_MONTH( month);
 	RTC_SET_DATE_DAY( day);
 }
+
+
+
+/*-------------------------------------------------
+    get_days_in_month
+-------------------------------------------------*/
 
 static int get_days_in_month( int year, int month)
 {
@@ -225,12 +320,21 @@ static int get_days_in_month( int year, int month)
 	return table[month-1];
 }
 
+
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( pcf8593_timer_callback )
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( pcf8593_timer_callback )
 {
+	const device_config *device = (const device_config *) ptr;
+	pcf8593_t *rtc = get_token(device);
 	int value;
+
 	_logerror( 2, ("pcf8593_timer_callback (%d)\n", param));
 	// check if counting is enabled
-	if (rtc.data[0] & 0x80) return;
+	if (rtc->data[0] & 0x80) return;
 	// increment second
 	value = RTC_GET_TIME_SECOND;
 	if (value < 59)
@@ -285,20 +389,36 @@ static TIMER_CALLBACK( pcf8593_timer_callback )
 	}
 }
 
-void pcf8593_load( mame_file *file)
+
+
+/*-------------------------------------------------
+    pcf8593_load
+-------------------------------------------------*/
+
+void pcf8593_load(const device_config *device, mame_file *file)
 {
+	pcf8593_t *rtc = get_token(device);
 	mame_system_time systime;
+
 	_logerror( 0, ("pcf8593_load (%p)\n", file));
-	mame_fread( file, rtc.data, rtc.size);
-	mame_get_current_datetime( Machine, &systime);
-	pcf8593_set_date( systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday);
-	pcf8593_set_time( systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
+	mame_fread( file, rtc->data, sizeof(rtc->data));
+	mame_get_current_datetime(device->machine, &systime);
+	pcf8593_set_date(device, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday);
+	pcf8593_set_time(device, systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
 }
 
-void pcf8593_save( mame_file *file)
+
+
+/*-------------------------------------------------
+    pcf8593_save
+-------------------------------------------------*/
+
+void pcf8593_save(const device_config *device, mame_file *file)
 {
+	pcf8593_t *rtc = get_token(device);
+
 	_logerror( 0, ("pcf8593_save (%p)\n", file));
-	mame_fwrite( file, rtc.data, rtc.size);
+	mame_fwrite( file, rtc->data, sizeof(rtc->data));
 }
 
 /*
@@ -317,8 +437,51 @@ NVRAM_HANDLER( pcf8593 )
 		}
 		else
 		{
-			memset( rtc.data, 0, rtc.size);
+			memset( rtc->data, 0, rtc->size);
 		}
 	}
 }
 */
+
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( pcf8593 )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( pcf8593 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( pcf8593 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( pcf8593 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(pcf8593_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(pcf8593); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(pcf8593);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(pcf8593);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "PCF8593 RTC";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "PCF8593 RTC";					break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}

@@ -548,14 +548,9 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( adsp21xx )
-{
-}
+static CPU_GET_CONTEXT( adsp21xx ) { }
 
-
-static CPU_SET_CONTEXT( adsp21xx )
-{
-}
+static CPU_SET_CONTEXT( adsp21xx ) { }
 
 
 
@@ -620,85 +615,85 @@ static adsp2100_state *adsp21xx_init(const device_config *device, int index, int
 	adsp->shift_xregs[7] = &adsp->core.sr.srx.sr1;
 
 	/* "core" */
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.ax0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.ax1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.ay0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.ay1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.ar.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.af.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.mx0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.mx1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.my0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.my1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.mr.mr);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.mf.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.si.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.se.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.sb.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.sr.sr);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->core.zero.u);
+	state_save_register_device_item(device, 0, adsp->core.ax0.u);
+	state_save_register_device_item(device, 0, adsp->core.ax1.u);
+	state_save_register_device_item(device, 0, adsp->core.ay0.u);
+	state_save_register_device_item(device, 0, adsp->core.ay1.u);
+	state_save_register_device_item(device, 0, adsp->core.ar.u);
+	state_save_register_device_item(device, 0, adsp->core.af.u);
+	state_save_register_device_item(device, 0, adsp->core.mx0.u);
+	state_save_register_device_item(device, 0, adsp->core.mx1.u);
+	state_save_register_device_item(device, 0, adsp->core.my0.u);
+	state_save_register_device_item(device, 0, adsp->core.my1.u);
+	state_save_register_device_item(device, 0, adsp->core.mr.mr);
+	state_save_register_device_item(device, 0, adsp->core.mf.u);
+	state_save_register_device_item(device, 0, adsp->core.si.u);
+	state_save_register_device_item(device, 0, adsp->core.se.u);
+	state_save_register_device_item(device, 0, adsp->core.sb.u);
+	state_save_register_device_item(device, 0, adsp->core.sr.sr);
+	state_save_register_device_item(device, 0, adsp->core.zero.u);
 
 	/* "alt" */
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.ax0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.ax1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.ay0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.ay1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.ar.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.af.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.mx0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.mx1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.my0.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.my1.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.mr.mr);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.mf.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.si.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.se.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.sb.u);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.sr.sr);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->alt.zero.u);
+	state_save_register_device_item(device, 0, adsp->alt.ax0.u);
+	state_save_register_device_item(device, 0, adsp->alt.ax1.u);
+	state_save_register_device_item(device, 0, adsp->alt.ay0.u);
+	state_save_register_device_item(device, 0, adsp->alt.ay1.u);
+	state_save_register_device_item(device, 0, adsp->alt.ar.u);
+	state_save_register_device_item(device, 0, adsp->alt.af.u);
+	state_save_register_device_item(device, 0, adsp->alt.mx0.u);
+	state_save_register_device_item(device, 0, adsp->alt.mx1.u);
+	state_save_register_device_item(device, 0, adsp->alt.my0.u);
+	state_save_register_device_item(device, 0, adsp->alt.my1.u);
+	state_save_register_device_item(device, 0, adsp->alt.mr.mr);
+	state_save_register_device_item(device, 0, adsp->alt.mf.u);
+	state_save_register_device_item(device, 0, adsp->alt.si.u);
+	state_save_register_device_item(device, 0, adsp->alt.se.u);
+	state_save_register_device_item(device, 0, adsp->alt.sb.u);
+	state_save_register_device_item(device, 0, adsp->alt.sr.sr);
+	state_save_register_device_item(device, 0, adsp->alt.zero.u);
 
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->i);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->m);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->l);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->lmask);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->base);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->px);
+	state_save_register_device_item_array(device, 0, adsp->i);
+	state_save_register_device_item_array(device, 0, adsp->m);
+	state_save_register_device_item_array(device, 0, adsp->l);
+	state_save_register_device_item_array(device, 0, adsp->lmask);
+	state_save_register_device_item_array(device, 0, adsp->base);
+	state_save_register_device_item(device, 0, adsp->px);
 
-	state_save_register_item("adsp2100", device->tag, 0, adsp->pc);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->ppc);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->loop);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->loop_condition);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->cntr);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->astat);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->sstat);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->mstat);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->astat_clear);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->idle);
+	state_save_register_device_item(device, 0, adsp->pc);
+	state_save_register_device_item(device, 0, adsp->ppc);
+	state_save_register_device_item(device, 0, adsp->loop);
+	state_save_register_device_item(device, 0, adsp->loop_condition);
+	state_save_register_device_item(device, 0, adsp->cntr);
+	state_save_register_device_item(device, 0, adsp->astat);
+	state_save_register_device_item(device, 0, adsp->sstat);
+	state_save_register_device_item(device, 0, adsp->mstat);
+	state_save_register_device_item(device, 0, adsp->astat_clear);
+	state_save_register_device_item(device, 0, adsp->idle);
 
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->loop_stack);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->cntr_stack);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->pc_stack);
-	state_save_register_item_2d_array("adsp2100", device->tag, 0, adsp->stat_stack);
+	state_save_register_device_item_array(device, 0, adsp->loop_stack);
+	state_save_register_device_item_array(device, 0, adsp->cntr_stack);
+	state_save_register_device_item_array(device, 0, adsp->pc_stack);
+	state_save_register_device_item_2d_array(device, 0, adsp->stat_stack);
 
-	state_save_register_item("adsp2100", device->tag, 0, adsp->pc_sp);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->cntr_sp);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->stat_sp);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->loop_sp);
+	state_save_register_device_item(device, 0, adsp->pc_sp);
+	state_save_register_device_item(device, 0, adsp->cntr_sp);
+	state_save_register_device_item(device, 0, adsp->stat_sp);
+	state_save_register_device_item(device, 0, adsp->loop_sp);
 
-	state_save_register_item("adsp2100", device->tag, 0, adsp->flagout);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->flagin);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->fl0);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->fl1);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->fl2);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->idma_addr);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->idma_cache);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->idma_offs);
+	state_save_register_device_item(device, 0, adsp->flagout);
+	state_save_register_device_item(device, 0, adsp->flagin);
+	state_save_register_device_item(device, 0, adsp->fl0);
+	state_save_register_device_item(device, 0, adsp->fl1);
+	state_save_register_device_item(device, 0, adsp->fl2);
+	state_save_register_device_item(device, 0, adsp->idma_addr);
+	state_save_register_device_item(device, 0, adsp->idma_cache);
+	state_save_register_device_item(device, 0, adsp->idma_offs);
 
-	state_save_register_item("adsp2100", device->tag, 0, adsp->imask);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->icntl);
-	state_save_register_item("adsp2100", device->tag, 0, adsp->ifc);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->irq_state);
-	state_save_register_item_array("adsp2100", device->tag, 0, adsp->irq_latch);
+	state_save_register_device_item(device, 0, adsp->imask);
+	state_save_register_device_item(device, 0, adsp->icntl);
+	state_save_register_device_item(device, 0, adsp->ifc);
+	state_save_register_device_item_array(device, 0, adsp->irq_state);
+	state_save_register_device_item_array(device, 0, adsp->irq_latch);
 
 	return adsp;
 }
@@ -961,8 +956,8 @@ static CPU_EXECUTE( adsp21xx )
 				/* 00000000 00000000 00000000  NOP */
 				break;
 			case 0x01:
-				/* 00000000 0xxxxxxx xxxxxxxx  dst = IO(x) */
-				/* 00000000 1xxxxxxx xxxxxxxx  IO(x) = dst */
+				/* 00000001 0xxxxxxx xxxxxxxx  dst = IO(x) */
+				/* 00000001 1xxxxxxx xxxxxxxx  IO(x) = dst */
 				/* ADSP-218x only */
 				if (adsp->chip_type >= CHIP_TYPE_ADSP2181)
 				{
@@ -1786,7 +1781,7 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(adsp2100_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					/* set per CPU */						break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;

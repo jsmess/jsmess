@@ -5803,7 +5803,7 @@ static void MameLoadState()
 		}
 
 		// call the MAME core function to check the save state file
-		rc = state_save_check_file(pSaveState, selected_filename, TRUE, MameMessageBox);
+		rc = state_save_check_file(NULL, pSaveState, selected_filename, MameMessageBox);
 		mame_fclose(pSaveState);
 		if (rc)
 			return;

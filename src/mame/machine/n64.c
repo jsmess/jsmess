@@ -125,7 +125,6 @@ static void sp_dma(int direction)
 {
 	UINT8 *src, *dst;
 	int i, c;
-	//int cpu = cpunum_get_active();
 
 	if (sp_dma_length == 0)
 	{
@@ -858,7 +857,7 @@ READ32_HANDLER( n64_ai_reg_r )
             }
             else if (ai_status & 0x40000000)
             {
-                double secs_left = attotime_to_double(attotime_sub(timer_firetime(audio_timer),timer_get_time()));
+                double secs_left = attotime_to_double(attotime_sub(timer_firetime(audio_timer),timer_get_time(space->machine)));
                 unsigned int samples_left = secs_left * DACRATE_NTSC / (ai_dacrate + 1);
                 return samples_left * 4;
             }
@@ -1639,7 +1638,7 @@ void n64_machine_reset(running_machine *machine)
 	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rdram);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	audio_timer = timer_alloc(audio_timer_callback, NULL);
+	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 	timer_adjust_oneshot(audio_timer, attotime_never, 0);
 
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);

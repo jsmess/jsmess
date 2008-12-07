@@ -192,14 +192,14 @@ VIDEO_START( amazon )
 	tilemap_set_transparent_pen(foreground,0xf);
 
 	/* register for saving */
-	state_save_register_global(xscroll);
-	state_save_register_global(yscroll);
+	state_save_register_global(machine, xscroll);
+	state_save_register_global(machine, yscroll);
 }
 
 VIDEO_UPDATE( amazon )
 {
 	if( xscroll&0x2000 )
-		fillbitmap( bitmap,get_black_pen(screen->machine),cliprect );
+		bitmap_fill( bitmap,cliprect ,get_black_pen(screen->machine));
 	else
 		tilemap_draw( bitmap,cliprect, background, 0, 0 );
 

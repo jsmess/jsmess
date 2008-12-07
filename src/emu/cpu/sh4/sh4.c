@@ -3392,7 +3392,7 @@ static CPU_INIT( sh4 )
 {
 	const struct sh4_config *conf = device->static_config;
 
-	sh4_common_init();
+	sh4_common_init(device);
 
 	sh4_parse_configuration(conf);
 
@@ -3406,70 +3406,70 @@ static CPU_INIT( sh4 )
 	sh4.irln = 15;
 	sh4.test_irq = 0;
 
-	state_save_register_item("sh4", device->tag, 0, sh4.pc);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[15]);
-	state_save_register_item("sh4", device->tag, 0, sh4.sr);
-	state_save_register_item("sh4", device->tag, 0, sh4.pr);
-	state_save_register_item("sh4", device->tag, 0, sh4.gbr);
-	state_save_register_item("sh4", device->tag, 0, sh4.vbr);
-	state_save_register_item("sh4", device->tag, 0, sh4.mach);
-	state_save_register_item("sh4", device->tag, 0, sh4.macl);
-	state_save_register_item("sh4", device->tag, 0, sh4.spc);
-	state_save_register_item("sh4", device->tag, 0, sh4.ssr);
-	state_save_register_item("sh4", device->tag, 0, sh4.sgr);
-	state_save_register_item("sh4", device->tag, 0, sh4.fpscr);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 0]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 1]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 2]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 3]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 4]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 5]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 6]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 7]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 8]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[ 9]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[10]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[11]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[12]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[13]);
-	state_save_register_item("sh4", device->tag, 0, sh4.r[14]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 0]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 1]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 2]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 3]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 4]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 5]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 6]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 7]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 8]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[ 9]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[10]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[11]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[12]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[13]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[14]);
-	state_save_register_item("sh4", device->tag, 0, sh4.fr[15]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 0]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 1]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 2]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 3]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 4]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 5]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 6]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 7]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 8]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[ 9]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[10]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[11]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[12]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[13]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[14]);
-	state_save_register_item("sh4", device->tag, 0, sh4.xf[15]);
-	state_save_register_item("sh4", device->tag, 0, sh4.ea);
-	state_save_register_item("sh4", device->tag, 0, sh4.fpul);
-	state_save_register_item("sh4", device->tag, 0, sh4.dbr);
-	state_save_register_item_array("sh4", device->tag, 0, sh4.exception_priority);
-	state_save_register_item_array("sh4", device->tag, 0, sh4.exception_requesting);
+	state_save_register_device_item(device, 0, sh4.pc);
+	state_save_register_device_item(device, 0, sh4.r[15]);
+	state_save_register_device_item(device, 0, sh4.sr);
+	state_save_register_device_item(device, 0, sh4.pr);
+	state_save_register_device_item(device, 0, sh4.gbr);
+	state_save_register_device_item(device, 0, sh4.vbr);
+	state_save_register_device_item(device, 0, sh4.mach);
+	state_save_register_device_item(device, 0, sh4.macl);
+	state_save_register_device_item(device, 0, sh4.spc);
+	state_save_register_device_item(device, 0, sh4.ssr);
+	state_save_register_device_item(device, 0, sh4.sgr);
+	state_save_register_device_item(device, 0, sh4.fpscr);
+	state_save_register_device_item(device, 0, sh4.r[ 0]);
+	state_save_register_device_item(device, 0, sh4.r[ 1]);
+	state_save_register_device_item(device, 0, sh4.r[ 2]);
+	state_save_register_device_item(device, 0, sh4.r[ 3]);
+	state_save_register_device_item(device, 0, sh4.r[ 4]);
+	state_save_register_device_item(device, 0, sh4.r[ 5]);
+	state_save_register_device_item(device, 0, sh4.r[ 6]);
+	state_save_register_device_item(device, 0, sh4.r[ 7]);
+	state_save_register_device_item(device, 0, sh4.r[ 8]);
+	state_save_register_device_item(device, 0, sh4.r[ 9]);
+	state_save_register_device_item(device, 0, sh4.r[10]);
+	state_save_register_device_item(device, 0, sh4.r[11]);
+	state_save_register_device_item(device, 0, sh4.r[12]);
+	state_save_register_device_item(device, 0, sh4.r[13]);
+	state_save_register_device_item(device, 0, sh4.r[14]);
+	state_save_register_device_item(device, 0, sh4.fr[ 0]);
+	state_save_register_device_item(device, 0, sh4.fr[ 1]);
+	state_save_register_device_item(device, 0, sh4.fr[ 2]);
+	state_save_register_device_item(device, 0, sh4.fr[ 3]);
+	state_save_register_device_item(device, 0, sh4.fr[ 4]);
+	state_save_register_device_item(device, 0, sh4.fr[ 5]);
+	state_save_register_device_item(device, 0, sh4.fr[ 6]);
+	state_save_register_device_item(device, 0, sh4.fr[ 7]);
+	state_save_register_device_item(device, 0, sh4.fr[ 8]);
+	state_save_register_device_item(device, 0, sh4.fr[ 9]);
+	state_save_register_device_item(device, 0, sh4.fr[10]);
+	state_save_register_device_item(device, 0, sh4.fr[11]);
+	state_save_register_device_item(device, 0, sh4.fr[12]);
+	state_save_register_device_item(device, 0, sh4.fr[13]);
+	state_save_register_device_item(device, 0, sh4.fr[14]);
+	state_save_register_device_item(device, 0, sh4.fr[15]);
+	state_save_register_device_item(device, 0, sh4.xf[ 0]);
+	state_save_register_device_item(device, 0, sh4.xf[ 1]);
+	state_save_register_device_item(device, 0, sh4.xf[ 2]);
+	state_save_register_device_item(device, 0, sh4.xf[ 3]);
+	state_save_register_device_item(device, 0, sh4.xf[ 4]);
+	state_save_register_device_item(device, 0, sh4.xf[ 5]);
+	state_save_register_device_item(device, 0, sh4.xf[ 6]);
+	state_save_register_device_item(device, 0, sh4.xf[ 7]);
+	state_save_register_device_item(device, 0, sh4.xf[ 8]);
+	state_save_register_device_item(device, 0, sh4.xf[ 9]);
+	state_save_register_device_item(device, 0, sh4.xf[10]);
+	state_save_register_device_item(device, 0, sh4.xf[11]);
+	state_save_register_device_item(device, 0, sh4.xf[12]);
+	state_save_register_device_item(device, 0, sh4.xf[13]);
+	state_save_register_device_item(device, 0, sh4.xf[14]);
+	state_save_register_device_item(device, 0, sh4.xf[15]);
+	state_save_register_device_item(device, 0, sh4.ea);
+	state_save_register_device_item(device, 0, sh4.fpul);
+	state_save_register_device_item(device, 0, sh4.dbr);
+	state_save_register_device_item_array(device, 0, sh4.exception_priority);
+	state_save_register_device_item_array(device, 0, sh4.exception_requesting);
 
 }
 
@@ -3609,8 +3609,8 @@ static CPU_SET_INFO( sh4 )
 		case CPUINFO_STR_REGISTER + SH4_XF15:			sh4.xf[15] = info->i; break;
 #endif
 
-		case CPUINFO_INT_SH4_IRLn_INPUT:				sh4_set_irln_input(cpunum_get_active(), info->i); break;
-		case CPUINFO_INT_SH4_FRT_INPUT:					sh4_set_frt_input(cpunum_get_active(), info->i); break;
+		case CPUINFO_INT_SH4_IRLn_INPUT:				sh4_set_irln_input(device, info->i); break;
+		case CPUINFO_INT_SH4_FRT_INPUT:					sh4_set_frt_input(device, info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_SH4_FTCSR_READ_CALLBACK:		sh4.ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;
@@ -3647,7 +3647,7 @@ CPU_GET_INFO( sh4 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sh4);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;						break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;						break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;				break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;						break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;						break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;						break;

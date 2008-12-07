@@ -32,7 +32,7 @@ drivers 8 & 9 as in pet.c ? */
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -75,13 +75,14 @@ UINT8 *cbmb_memory;
  */
 static int cbmb_tpi0_port_a_r(void)
 {
+	running_machine *machine = Machine;
 	int data = 0;
-	if (cbm_ieee_nrfd_r()) data |= 0x80;
-	if (cbm_ieee_ndac_r()) data |= 0x40;
-	if (cbm_ieee_eoi_r()) data |= 0x20;
-	if (cbm_ieee_dav_r()) data |= 0x10;
-	if (cbm_ieee_atn_r()) data |= 0x08;
-/*	if (cbm_ieee_ren_r()) data |= 0x04; */
+	if (cbm_ieee_nrfd_r(machine)) data |= 0x80;
+	if (cbm_ieee_ndac_r(machine)) data |= 0x40;
+	if (cbm_ieee_eoi_r(machine)) data |= 0x20;
+	if (cbm_ieee_dav_r(machine)) data |= 0x10;
+	if (cbm_ieee_atn_r(machine)) data |= 0x08;
+/*	if (cbm_ieee_ren_r(machine)) data |= 0x04; */
 	return data;
 }
 
@@ -233,24 +234,23 @@ static void cbmb_irq (running_machine *machine, int level)
   pb7 .. 4 gameport 2
   pb3 .. 0 gameport 1
  */
-static UINT8 cbmb_cia_port_a_r(void)
+static UINT8 cbmb_cia_port_a_r(const device_config *device)
 {
-	return cbm_ieee_data_r();
+	return cbm_ieee_data_r(device->machine);
 }
 
-static void cbmb_cia_port_a_w(UINT8 data)
+static void cbmb_cia_port_a_w(const device_config *device, UINT8 data)
 {
 	cbm_ieee_data_w(0, data);
 }
 
-static void cbmb_tpi6525_0_irq2_level( running_machine *machine, int level )
+static void cbmb_tpi6525_0_irq2_level( const device_config *device, int level )
 {
-	tpi6525_0_irq2_level(machine, level);
+	tpi6525_0_irq2_level(device->machine, level);
 }
 
-static const cia6526_interface cbmb_cia =
+const cia6526_interface cbmb_cia =
 {
-	CIA6526,
 	cbmb_tpi6525_0_irq2_level,
 	0.0, 60,
 
@@ -288,8 +288,6 @@ static void cbmb_common_driver_init(running_machine *machine)
 	cbmb_chargen=memory_region(machine, "main") + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
-	cia_config(machine, 0, &cbmb_cia);
-
 	tpi6525[0].a.read = cbmb_tpi0_port_a_r;
 	tpi6525[0].a.output = cbmb_tpi0_port_a_w;
 	tpi6525[0].ca.output = cbmb_change_font;
@@ -301,7 +299,7 @@ static void cbmb_common_driver_init(running_machine *machine)
 	tpi6525[1].b.output = cbmb_keyboard_line_select_b;
 	tpi6525[1].c.output = cbmb_keyboard_line_select_c;
 
-	timer_pulse(ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);
+	timer_pulse(machine, ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);
 
 	p500 = 0;
 	cbm700 = 0;
@@ -347,7 +345,6 @@ DRIVER_INIT( p500 )
 MACHINE_RESET( cbmb )
 {
 	sndti_reset(SOUND_SID6581, 0);
-	cia_reset();
 	tpi6525_0_reset();
 	tpi6525_1_reset();
 

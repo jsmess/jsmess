@@ -2003,7 +2003,7 @@ static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_SCON:
 			break;
 		default:
-			LOG(("mcs51 #%d: attemping to write to an invalid/non-implemented SFR address: %zx at 0x%04x, data=%x\n", cpunum_get_active(), offset,PC,data));
+			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %zx at 0x%04x, data=%x\n", mcs51_state->device->tag, offset,PC,data));
 			/* no write in this case according to manual */
 			return;
 	}
@@ -2043,7 +2043,7 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 			return memory_read_byte_8le(mcs51_state->data, (size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("mcs51 #%d: attemping to read an invalid/non-implemented SFR address: %zx at 0x%04x\n", cpunum_get_active(), offset,PC));
+			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %zx at 0x%04x\n", mcs51_state->device->tag, offset,PC));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
@@ -2067,20 +2067,23 @@ static CPU_INIT( mcs51 )
 	mcs51_state->sfr_read = mcs51_sfr_read;
 	mcs51_state->sfr_write = mcs51_sfr_write;
 
+	/* ensure these pointers are set before get_info is called */
+	update_ptrs(mcs51_state);
+
 	/* Save states */
 
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ppc);
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->pc);
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->rwm );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->cur_irq_prio );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->last_line_state );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t0_cnt );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t1_cnt );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t2_cnt );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t2ex_cnt );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->recalc_parity );
-	state_save_register_item_array("mcs51", device->tag, 0, mcs51_state->irq_prio );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->irq_active );
+	state_save_register_device_item(device, 0, mcs51_state->ppc);
+	state_save_register_device_item(device, 0, mcs51_state->pc);
+	state_save_register_device_item(device, 0, mcs51_state->rwm );
+	state_save_register_device_item(device, 0, mcs51_state->cur_irq_prio );
+	state_save_register_device_item(device, 0, mcs51_state->last_line_state );
+	state_save_register_device_item(device, 0, mcs51_state->t0_cnt );
+	state_save_register_device_item(device, 0, mcs51_state->t1_cnt );
+	state_save_register_device_item(device, 0, mcs51_state->t2_cnt );
+	state_save_register_device_item(device, 0, mcs51_state->t2ex_cnt );
+	state_save_register_device_item(device, 0, mcs51_state->recalc_parity );
+	state_save_register_device_item_array(device, 0, mcs51_state->irq_prio );
+	state_save_register_device_item(device, 0, mcs51_state->irq_active );
 }
 
 static CPU_INIT( i80c51 )
@@ -2297,8 +2300,8 @@ static CPU_INIT( i80c31 )
  ****************************************************************************/
 
 
-#define DS5_LOGW(a, d) 	LOG(("ds5002fp #%d: write to  " # a " register at 0x%04x, data=%x\n", cpunum_get_active(), PC, d))
-#define DS5_LOGR(a, d) 	LOG(("ds5002fp #%d: read from " # a " register at 0x%04x\n", cpunum_get_active(), PC))
+#define DS5_LOGW(a, d) 	LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", mcs51_state->device->tag, PC, d))
+#define DS5_LOGR(a, d) 	LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", mcs51_state->device->tag, PC))
 
 INLINE UINT8 ds5002fp_protected(mcs51_state_t *mcs51_state, size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask)
 {
@@ -2324,7 +2327,7 @@ static void ds5002fp_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 
 			if ((data == 0xaa) && (mcs51_state->ds5002fp.ta_window == 0))
 			{
 				mcs51_state->ds5002fp.ta_window = 6; /* 4*12 + 2*12 */
-				LOG(("ds5002fp #%d: TA window initiated at 0x%04x\n", cpunum_get_active(), PC));
+				LOG(("ds5002fp '%s': TA window initiated at 0x%04x\n", mcs51_state->device->tag, PC));
 			}
 			break;
 		case ADDR_MCON: 	data = ds5002fp_protected(mcs51_state, ADDR_MCON, data, 0x0f, 0xf7);	DS5_LOGW(MCON, data); break;
@@ -2378,9 +2381,9 @@ static CPU_INIT( ds5002fp )
 	mcs51_state->sfr_read = ds5002fp_sfr_read;
 	mcs51_state->sfr_write = ds5002fp_sfr_write;
 
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ds5002fp.previous_ta );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ds5002fp.ta_window );
-	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ds5002fp.range );
+	state_save_register_device_item(device, 0, mcs51_state->ds5002fp.previous_ta );
+	state_save_register_device_item(device, 0, mcs51_state->ds5002fp.ta_window );
+	state_save_register_device_item(device, 0, mcs51_state->ds5002fp.range );
 
 }
 
@@ -2411,13 +2414,9 @@ ADDRESS_MAP_END
     GENERAL CONTEXT ACCESS
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( mcs51 )
-{
-}
+static CPU_GET_CONTEXT( mcs51 ) { }
 
-static CPU_SET_CONTEXT( mcs51 )
-{
-}
+static CPU_SET_CONTEXT( mcs51 ) { }
 
 /**************************************************************************
  * Generic set_info
@@ -2474,7 +2473,7 @@ static CPU_GET_INFO( mcs51 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs51_state_t);				break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;								break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;						break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;						break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;								break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 12;								break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;								break;

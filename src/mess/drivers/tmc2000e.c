@@ -271,9 +271,9 @@ static MACHINE_START( tmc2000e )
 
 	/* register for state saving */
 
-	state_save_register_global_pointer(state->colorram, TMC2000E_COLORRAM_SIZE);
-	state_save_register_global(state->cdp1864_efx);
-	state_save_register_global(state->keylatch);
+	state_save_register_global_pointer(machine, state->colorram, TMC2000E_COLORRAM_SIZE);
+	state_save_register_global(machine, state->cdp1864_efx);
+	state_save_register_global(machine, state->keylatch);
 }
 
 static MACHINE_RESET( tmc2000e )
@@ -382,7 +382,7 @@ static DRIVER_INIT( tmc2000e )
 	// enable power led
 	set_led_status(2, 1);
 
-	timer_set(attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
 }
 
 //    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT        CONFIG    COMPANY        FULLNAME

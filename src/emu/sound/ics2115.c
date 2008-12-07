@@ -450,9 +450,9 @@ static SND_START( ics2115 )
 
 	chip->intf = config;
 	chip->index = sndindex;
-	chip->rom = memory_region(Machine, tag);
-	chip->timer[0].timer = timer_alloc(timer_cb_0, chip);
-	chip->timer[1].timer = timer_alloc(timer_cb_1, chip);
+	chip->rom = device->region;
+	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
+	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);
 	chip->ulaw = auto_malloc(256*sizeof(INT16));
 	chip->stream = stream_create(0, 2, 33075, chip, update);
 
@@ -521,7 +521,7 @@ WRITE8_HANDLER( ics2115_w )
 
 static SND_RESET( ics2115 )
 {
-	struct ics2115 *chip = token;
+	struct ics2115 *chip = device->token;
 	chip->irq_en = 0;
 	chip->irq_pend = 0;
 	memset(chip->voice, 0, sizeof(chip->voice));

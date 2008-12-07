@@ -91,10 +91,10 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
     playfield.bit=0;
     playfield.started=FALSE;
     playfield.signal=signal;
-    playfield.time=timer_get_time();
+    playfield.time=timer_get_time(machine);
   }
   if (!signal && playfield.signal) {
-    attotime t=timer_get_time();
+    attotime t=timer_get_time(machine);
     playfield.high_time=attotime_sub(t, playfield.time);
     playfield.time=t;
 
@@ -119,7 +119,7 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
     }
 
   } else if (signal && !playfield.signal) {
-    attotime t=timer_get_time();
+    attotime t=timer_get_time(machine);
     playfield.low_time=attotime_sub(t, playfield.time);
     playfield.time=t;
     playfield.started=TRUE;

@@ -98,7 +98,7 @@ static void sh2_timer_activate(void)
 		if(divider) {
 			max_delta <<= divider;
 			sh2->frc_base = cpu_get_total_cycles(sh2->device);
-			timer_adjust_oneshot(sh2->timer, ATTOTIME_IN_CYCLES(max_delta, cpu_get_index(sh2->device)), 0);
+			timer_adjust_oneshot(sh2->timer, cpu_clocks_to_attotime(sh2->device, max_delta), 0);
 		} else {
 			logerror("SH2.%d: Timer event in %d cycles of external clock", cpu_get_index(sh2->device), max_delta);
 		}
@@ -176,7 +176,7 @@ static void sh2_dmac_check(int dma)
 			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, src, dst, count, sh2->m[0x63+4*dma], incs, incd, size));
 
 			sh2->dma_timer_active[dma] = 1;
-			timer_adjust_oneshot(sh2->dma_timer[dma], ATTOTIME_IN_CYCLES(2*count+1, cpu_get_index(sh2->device)), dma);
+			timer_adjust_oneshot(sh2->dma_timer[dma], cpu_clocks_to_attotime(sh2->device, 2*count+1), dma);
 
 			src &= AM;
 			dst &= AM;
@@ -363,7 +363,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT32 a = sh2->m[0x41];
 			INT32 b = sh2->m[0x40];
-			LOG(("SH2 #%d div+mod %d/%d\n", cpunum_get_active(), a, b));
+			LOG(("SH2 '%s' div+mod %d/%d\n", sh2->device->tag, a, b));
 			if (b)
 			{
 				sh2->m[0x45] = a / b;
@@ -391,7 +391,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT64 a = sh2->m[0x45] | ((UINT64)(sh2->m[0x44]) << 32);
 			INT64 b = (INT32)sh2->m[0x40];
-			LOG(("SH2 #%d div+mod %lld/%lld\n", cpunum_get_active(), a, b));
+			LOG(("SH2 '%s' div+mod %lld/%lld\n", sh2->device->tag, a, b));
 			if (b)
 			{
 				INT64 q = a / b;
@@ -503,16 +503,16 @@ READ32_HANDLER( sh2_internal_r )
 	return sh2->m[offset];
 }
 
-void sh2_set_frt_input(int cpunum, int state)
+void sh2_set_frt_input(const device_config *device, int state)
 {
 	if(state == PULSE_LINE)
 	{
-		sh2_set_frt_input(cpunum, ASSERT_LINE);
-		sh2_set_frt_input(cpunum, CLEAR_LINE);
+		sh2_set_frt_input(device, ASSERT_LINE);
+		sh2_set_frt_input(device, CLEAR_LINE);
 		return;
 	}
 
-	cpu_push_context(Machine->cpu[cpunum]);
+	cpu_push_context(device);
 
 	if(sh2->frt_input == state) {
 		cpu_pop_context();
@@ -551,11 +551,11 @@ void sh2_set_irq_line(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 #%d cleared nmi\n", cpunum_get_active()));
+			LOG(("SH-2 '%s' cleared nmi\n", sh2->device->tag));
 		}
 		else
 		{
-			LOG(("SH-2 #%d assert nmi\n", cpunum_get_active()));
+			LOG(("SH-2 '%s' assert nmi\n", sh2->device->tag));
 
 			sh2_exception("Set IRQ line", 16);
 
@@ -572,12 +572,12 @@ void sh2_set_irq_line(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 #%d cleared irq #%d\n", cpunum_get_active(), irqline));
+			LOG(("SH-2 '%s' cleared irq #%d\n", sh2->device->tag, irqline));
 			sh2->pending_irq &= ~(1 << irqline);
 		}
 		else
 		{
-			LOG(("SH-2 #%d assert irq #%d\n", cpunum_get_active(), irqline));
+			LOG(("SH-2 '%s' assert irq #%d\n", sh2->device->tag, irqline));
 			sh2->pending_irq |= 1 << irqline;
 			#ifdef USE_SH2DRC
 			sh2->test_irq = 1;
@@ -648,27 +648,27 @@ void sh2_exception(const char *message, int irqline)
 		if (sh2->internal_irq_level == irqline)
 		{
 			vector = sh2->internal_irq_vector;
-			LOG(("SH-2 #%d exception #%d (internal vector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
+			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", sh2->device->tag, irqline, vector, message));
 		}
 		else
 		{
 			if(sh2->m[0x38] & 0x00010000)
 			{
 				vector = sh2->irq_callback(sh2->device, irqline);
-				LOG(("SH-2 #%d exception #%d (external vector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", sh2->device->tag, irqline, vector, message));
 			}
 			else
 			{
 				sh2->irq_callback(sh2->device, irqline);
 				vector = 64 + irqline/2;
-				LOG(("SH-2 #%d exception #%d (autovector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", sh2->device->tag, irqline, vector, message));
 			}
 		}
 	}
 	else
 	{
 		vector = 11;
-		LOG(("SH-2 #%d nmi exception (autovector: $%x) after [%s]\n", cpunum_get_active(), vector, message));
+		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", sh2->device->tag, vector, message));
 	}
 
 	#ifdef USE_SH2DRC
@@ -710,13 +710,13 @@ void sh2_common_init(int alloc, const device_config *device, int index, int cloc
 		memset(sh2, 0, sizeof(SH2));
 	}
 
-	sh2->timer = timer_alloc(sh2_timer_callback, sh2);
+	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
 
-	sh2->dma_timer[0] = timer_alloc(sh2_dmac_callback, sh2);
+	sh2->dma_timer[0] = timer_alloc(device->machine, sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[0], attotime_never, 0);
 
-	sh2->dma_timer[1] = timer_alloc(sh2_dmac_callback, sh2);
+	sh2->dma_timer[1] = timer_alloc(device->machine, sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[1], attotime_never, 0);
 
 	sh2->m = auto_malloc(0x200);
@@ -737,29 +737,29 @@ void sh2_common_init(int alloc, const device_config *device, int index, int cloc
 	sh2->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	sh2->internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("sh2", device->tag, 0, sh2->pc);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[15]);
-	state_save_register_item("sh2", device->tag, 0, sh2->sr);
-	state_save_register_item("sh2", device->tag, 0, sh2->pr);
-	state_save_register_item("sh2", device->tag, 0, sh2->gbr);
-	state_save_register_item("sh2", device->tag, 0, sh2->vbr);
-	state_save_register_item("sh2", device->tag, 0, sh2->mach);
-	state_save_register_item("sh2", device->tag, 0, sh2->macl);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 0]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 1]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 2]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 3]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 4]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 5]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 6]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 7]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 8]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[ 9]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[10]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[11]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[12]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[13]);
-	state_save_register_item("sh2", device->tag, 0, sh2->r[14]);
-	state_save_register_item("sh2", device->tag, 0, sh2->ea);
+	state_save_register_device_item(device, 0, sh2->pc);
+	state_save_register_device_item(device, 0, sh2->r[15]);
+	state_save_register_device_item(device, 0, sh2->sr);
+	state_save_register_device_item(device, 0, sh2->pr);
+	state_save_register_device_item(device, 0, sh2->gbr);
+	state_save_register_device_item(device, 0, sh2->vbr);
+	state_save_register_device_item(device, 0, sh2->mach);
+	state_save_register_device_item(device, 0, sh2->macl);
+	state_save_register_device_item(device, 0, sh2->r[ 0]);
+	state_save_register_device_item(device, 0, sh2->r[ 1]);
+	state_save_register_device_item(device, 0, sh2->r[ 2]);
+	state_save_register_device_item(device, 0, sh2->r[ 3]);
+	state_save_register_device_item(device, 0, sh2->r[ 4]);
+	state_save_register_device_item(device, 0, sh2->r[ 5]);
+	state_save_register_device_item(device, 0, sh2->r[ 6]);
+	state_save_register_device_item(device, 0, sh2->r[ 7]);
+	state_save_register_device_item(device, 0, sh2->r[ 8]);
+	state_save_register_device_item(device, 0, sh2->r[ 9]);
+	state_save_register_device_item(device, 0, sh2->r[10]);
+	state_save_register_device_item(device, 0, sh2->r[11]);
+	state_save_register_device_item(device, 0, sh2->r[12]);
+	state_save_register_device_item(device, 0, sh2->r[13]);
+	state_save_register_device_item(device, 0, sh2->r[14]);
+	state_save_register_device_item(device, 0, sh2->ea);
 }
 

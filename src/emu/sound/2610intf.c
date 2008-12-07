@@ -142,21 +142,21 @@ static SND_START( ym2610 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610, tag, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610, device, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(timer_callback_0, info);
-	info->timer[1] = timer_alloc(timer_callback_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, tag));
-	pcmsizea = memory_region_length(Machine, tag);
-	astring_printf(name, "%s.deltat", tag);
-	pcmbufb  = (void *)(memory_region(Machine, astring_c(name)));
-	pcmsizeb = memory_region_length(Machine, astring_c(name));
+	pcmbufa  = device->region;
+	pcmsizea = device->regionbytes;
+	astring_printf(name, "%s.deltat", device->tag);
+	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
+	pcmsizeb = memory_region_length(device->machine, astring_c(name));
 	astring_free(name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
@@ -165,11 +165,11 @@ static SND_START( ym2610 )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,tag,clock,rate,
+	info->chip = ym2610_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_postload(Machine, ym2610_intf_postload, info);
+	state_save_register_postload(device->machine, ym2610_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -208,21 +208,21 @@ static SND_START( ym2610b )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610B, tag, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610B, device, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] =timer_alloc(timer_callback_0, info);
-	info->timer[1] =timer_alloc(timer_callback_1, info);
+	info->timer[0] =timer_alloc(Machine, timer_callback_0, info);
+	info->timer[1] =timer_alloc(Machine, timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, tag));
-	pcmsizea = memory_region_length(Machine, tag);
-	astring_printf(name, "%s.deltat", tag);
-	pcmbufb  = (void *)(memory_region(Machine, astring_c(name)));
-	pcmsizeb = memory_region_length(Machine, astring_c(name));
+	pcmbufa  = device->region;
+	pcmsizea = device->regionbytes;
+	astring_printf(name, "%s.deltat", device->tag);
+	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
+	pcmsizeb = memory_region_length(device->machine, astring_c(name));
 	astring_free(name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
@@ -231,7 +231,7 @@ static SND_START( ym2610b )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,tag,clock,rate,
+	info->chip = ym2610_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 	if (info->chip)
@@ -244,14 +244,14 @@ static SND_START( ym2610b )
 
 static SND_STOP( ym2610 )
 {
-	struct ym2610_info *info = token;
+	struct ym2610_info *info = device->token;
 	ym2610_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
 static SND_RESET( ym2610 )
 {
-	struct ym2610_info *info = token;
+	struct ym2610_info *info = device->token;
 	ym2610_reset_chip(info->chip);
 }
 

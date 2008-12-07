@@ -114,18 +114,18 @@ MACHINE_RESET( mhavoc )
 	gamma_irq_clock = 0;
 
 	/* set a timer going for the CPU interrupt generators */
-	timer_pulse(ATTOTIME_IN_HZ(MHAVOC_CLOCK_5K), NULL, 0, cpu_irq_clock);
+	timer_pulse(machine, ATTOTIME_IN_HZ(MHAVOC_CLOCK_5K), NULL, 0, cpu_irq_clock);
 
-	state_save_register_item("misc", NULL, 0, alpha_data);
-	state_save_register_item("misc", NULL, 0, alpha_rcvd);
-	state_save_register_item("misc", NULL, 0, alpha_xmtd);
-	state_save_register_item("misc", NULL, 0, gamma_data);
-	state_save_register_item("misc", NULL, 0, gamma_rcvd);
-	state_save_register_item("misc", NULL, 0, gamma_xmtd);
-	state_save_register_item("misc", NULL, 0, player_1);
-	state_save_register_item("misc", NULL, 0, alpha_irq_clock);
-	state_save_register_item("misc", NULL, 0, alpha_irq_clock_enable);
-	state_save_register_item("misc", NULL, 0, gamma_irq_clock);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_data);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_rcvd);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_xmtd);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_data);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_rcvd);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_xmtd);
+	state_save_register_item(machine, "misc", NULL, 0, player_1);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock_enable);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_irq_clock);
 }
 
 
@@ -147,14 +147,14 @@ static TIMER_CALLBACK( delayed_gamma_w )
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	timer_set(ATTOTIME_IN_USEC(250), NULL, 0, 0);
+	timer_set(machine, ATTOTIME_IN_USEC(250), NULL, 0, 0);
 }
 
 
 WRITE8_HANDLER( mhavoc_gamma_w )
 {
 	logerror("  writing to gamma processor: %02x (%d %d)\n", data, gamma_rcvd, alpha_xmtd);
-	timer_call_after_resynch(NULL, data, delayed_gamma_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_gamma_w);
 }
 
 

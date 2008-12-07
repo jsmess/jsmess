@@ -316,7 +316,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (!mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		tmp = attotime_to_double(timer_get_time());
+		tmp = attotime_to_double(timer_get_time(machine));
 		wavel = tmp - sl;
 		sl = tmp;
 
@@ -343,7 +343,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		pwl = attotime_to_double(timer_get_time()) - sl;
+		pwl = attotime_to_double(timer_get_time(machine)) - sl;
 	}
 }
 

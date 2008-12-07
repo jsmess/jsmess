@@ -93,7 +93,7 @@ static TIMER_CALLBACK( update_leds )
 
 static MACHINE_START( mk2 )
 {
-	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
+	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
 }
 
 

@@ -269,7 +269,7 @@ static void gb_init(running_machine *machine) {
 	gb_sound_w( space, 0x16, 0x00 );       /* Initialize sound hardware */
 
 	/* Allocate the serial timer, and disable it */
-	gb_serial_timer = timer_alloc( gb_serial_timer_proc , NULL);
+	gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
 	timer_enable( gb_serial_timer, 0 );
 
 	gb_timer.divcount = 0;
@@ -775,7 +775,7 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
 			SIOCount = 8;
-			timer_adjust_periodic(gb_serial_timer, ATTOTIME_IN_CYCLES( 512, 0 ), 0, ATTOTIME_IN_CYCLES( 512, 0 ));
+			timer_adjust_periodic(gb_serial_timer, cpu_clocks_to_attotime(machine->cpu[0], 512), 0, cpu_clocks_to_attotime(machine->cpu[0], 512));
 			timer_enable( gb_serial_timer, 1 );
 			break;
 		}

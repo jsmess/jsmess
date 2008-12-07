@@ -487,12 +487,12 @@ static STATE_POSTLOAD( ygv608_postload )
 
 static void ygv608_register_state_save(running_machine *machine)
 {
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.ports.b);
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.regs.b);
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.pattern_name_table);
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.sprite_attribute_table.b);
-	state_save_register_item_2d_array("ygv608", NULL, 0, ygv608.scroll_data_table);
-	state_save_register_item_2d_array("ygv608", NULL, 0, ygv608.colour_palette);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.ports.b);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.regs.b);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.pattern_name_table);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.sprite_attribute_table.b);
+	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.scroll_data_table);
+	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.colour_palette);
 
 	state_save_register_postload(machine, ygv608_postload, NULL);
 }
@@ -756,7 +756,7 @@ VIDEO_UPDATE( ygv608 )
 	// punt if not initialized
 	if (ygv608.page_x == 0 || ygv608.page_y == 0)
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return 0;
 	}
 
@@ -809,7 +809,7 @@ VIDEO_UPDATE( ygv608 )
 		tilemap_set_scroll_cols( tilemap_B, ygv608.page_x );
 
 		// now clear the screen in case we change to 1-plane mode
-		fillbitmap( work_bitmap, 0, cliprect );
+		bitmap_fill( work_bitmap, cliprect , 0);
 
 		// reset resize flag
 		ygv608.tilemap_resize = 0;
@@ -862,8 +862,8 @@ VIDEO_UPDATE( ygv608 )
 	if ((ygv608.regs.s.r7 & r7_md) & MD_1PLANE)
 	{
 		// If the background tilemap is disabled, we need to clear the bitmap to black
-		fillbitmap (work_bitmap,0,cliprect);
-//      fillbitmap (work_bitmap,1,visarea);
+		bitmap_fill (work_bitmap,cliprect,0);
+//      bitmap_fill (work_bitmap,visarea,1);
 	}
 	else
 #endif
@@ -900,7 +900,7 @@ VIDEO_UPDATE( ygv608 )
   // for some reason we can't use an opaque tilemap_A
   // so use a transparent but clear the work bitmap first
   // - look at why this is the case?!?
-  fillbitmap( work_bitmap,0,visarea );
+  bitmap_fill( work_bitmap,visarea ,0);
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_ASBDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )

@@ -185,7 +185,7 @@ WRITE8_HANDLER(radio_io_w )
 
 MACHINE_RESET( radio86 )
 {
-	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);
+	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, radio86_reset);
 	memory_set_bank(machine, 1, 1);
 
 	radio86_keyboard_mask = 0;

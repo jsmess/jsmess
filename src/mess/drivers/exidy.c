@@ -335,8 +335,8 @@ static TIMER_CALLBACK( exidy_reset )
 
 static MACHINE_START( exidyd )
 {
-//	serial_timer = timer_alloc(exidy_serial_timer_callback, NULL);
-	cassette_timer = timer_alloc(exidy_cassette_tc, NULL);
+//	serial_timer = timer_alloc(machine, exidy_serial_timer_callback, NULL);
+	cassette_timer = timer_alloc(machine, exidy_cassette_tc, NULL);
 }
 
 static MACHINE_START( exidy )
@@ -362,7 +362,7 @@ static MACHINE_RESET( exidyd )
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	exidy_fe_port_w(space, 0, 0);
 
-	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
+	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
 	memory_set_bank(machine, 1, 1);
 }
 

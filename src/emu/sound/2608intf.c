@@ -141,25 +141,25 @@ static SND_START( ym2608 )
 
 	info->intf = intf;
 	/* FIXME: Force to use simgle output */
-	info->psg = ay8910_start_ym(SOUND_YM2608, tag, clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(SOUND_YM2608, device, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(timer_callback_2608_0, info);
-	info->timer[1] = timer_alloc(timer_callback_2608_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_2608_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_2608_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, tag));
-	pcmsizea = memory_region_length(Machine, tag);
+	pcmbufa  = device->region;
+	pcmsizea = device->regionbytes;
 
 	/* initialize YM2608 */
-	info->chip = ym2608_init(info,tag,clock,rate,
+	info->chip = ym2608_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,
 		           timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_postload(Machine, ym2608_intf_postload, info);
+	state_save_register_postload(device->machine, ym2608_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -170,14 +170,14 @@ static SND_START( ym2608 )
 
 static SND_STOP( ym2608 )
 {
-	struct ym2608_info *info = token;
+	struct ym2608_info *info = device->token;
 	ym2608_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
 static SND_RESET( ym2608 )
 {
-	struct ym2608_info *info = token;
+	struct ym2608_info *info = device->token;
 	ym2608_reset_chip(info->chip);
 }
 

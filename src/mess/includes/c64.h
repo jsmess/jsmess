@@ -64,7 +64,8 @@ extern UINT8 c64_keyline[10];
 extern int c128_va1617;
 extern UINT8 *c64_vicaddr, *c128_vicaddr;
 extern UINT8 c64_game, c64_exrom;
-extern const cia6526_interface c64_cia0, c64_cia1;
+extern const cia6526_interface c64_ntsc_cia0, c64_pal_cia0;
+extern const cia6526_interface c64_ntsc_cia1, c64_pal_cia1;
 
 void c64_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 void ultimax_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);

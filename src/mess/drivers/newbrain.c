@@ -901,8 +901,8 @@ static ADDRESS_MAP_START( newbrain_ei_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xff00) AM_READ(ei_st1_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xff00) AM_READ(ei_st2_r)
 	AM_RANGE(0x17, 0x17) AM_MIRROR(0xff00) AM_READWRITE(ei_usbs_r, ei_usbs_w)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(ei_paging_w)
 ADDRESS_MAP_END
@@ -920,7 +920,7 @@ static ADDRESS_MAP_START( newbrain_m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(ust_r)
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xffc2) AM_READ(user_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xffc0) AM_READ(ust2_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
@@ -949,7 +949,7 @@ static ADDRESS_MAP_START( newbrain_v_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xffc3) AM_WRITE(tvctl_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(ust_r)
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xffc2) AM_READ(user_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
@@ -1087,7 +1087,7 @@ static void acia_interrupt(int state)
 	driver_state->aciaint = state;
 }
 
-static const struct acia6850_interface newbrain_acia_intf =
+static const acia6850_interface newbrain_acia_intf =
 {
 	500000, // ???
 	500000, // ???
@@ -1173,12 +1173,12 @@ static MACHINE_START( newbrain )
 
 	/* allocate reset timer */
 	
-	state->reset_timer = timer_alloc(reset_tick, NULL);
+	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
 	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_USEC(get_reset_t()), 0);
 
 	/* allocate power up timer */
 
-	state->pwrup_timer = timer_alloc(pwrup_tick, NULL);
+	state->pwrup_timer = timer_alloc(machine, pwrup_tick, NULL);
 	timer_adjust_oneshot(state->pwrup_timer, ATTOTIME_IN_USEC(get_pwrup_t()), 0);
 	state->pwrup = 0;
 

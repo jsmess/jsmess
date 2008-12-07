@@ -369,7 +369,7 @@ Video part
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time()), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -536,15 +536,15 @@ static gfx_element *cursorelement;
 
 static TIMER_CALLBACK(ted7360_timer_timeout);
 
-void ted7360_init (int pal)
+void ted7360_init (running_machine *machine, int pal)
 {
 	ted7360_pal = pal;
 	lines = TED7360_LINES;
 	chargenaddr = bitmapaddr = videoaddr = 0;
 	timer1_active = timer2_active = timer3_active = 0;
-	timer1 = timer_alloc(ted7360_timer_timeout, NULL);
-	timer2 = timer_alloc(ted7360_timer_timeout, NULL);
-	timer3 = timer_alloc(ted7360_timer_timeout, NULL);
+	timer1 = timer_alloc(machine, ted7360_timer_timeout, NULL);
+	timer2 = timer_alloc(machine, ted7360_timer_timeout, NULL);
+	timer3 = timer_alloc(machine, ted7360_timer_timeout, NULL);
 }
 
 void ted7360_set_dma (read8_space_func dma_read,
@@ -582,9 +582,9 @@ static void ted7360_clear_interrupt (running_machine *machine, int mask)
 	}
 }
 
-static int ted7360_rastercolumn (void)
+static int ted7360_rastercolumn (running_machine *machine)
 {
-	return (int) ((attotime_to_double(timer_get_time ()) - rastertime)
+	return (int) ((attotime_to_double(timer_get_time(machine)) - rastertime)
 				  * TED7360_VRETRACERATE * lines * 57 * 8 + 0.5);
 }
 
@@ -630,6 +630,7 @@ INTERRUPT_GEN( ted7360_frame_interrupt )
 
 WRITE8_HANDLER ( ted7360_port_w )
 {
+	running_machine *machine = space->machine;
 	int old;
 
 	if ((offset != 8) && ((offset < 0x15) || (offset > 0x19)))
@@ -858,8 +859,9 @@ WRITE8_HANDLER ( ted7360_port_w )
 	}
 }
 
- READ8_HANDLER ( ted7360_port_r )
+READ8_HANDLER ( ted7360_port_r )
 {
+	running_machine *machine = space->machine;
 	int val = 0;
 
 	switch (offset)
@@ -931,7 +933,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		val = RASTERLINE_2_C16 (rasterline) & 0xff;
 		break;
 	case 0x1e:						   /*rastercolumn */
-		val = ted7360_rastercolumn () / 2;	/* pengo >=0x99 */
+		val = ted7360_rastercolumn(space->machine) / 2;	/* pengo >=0x99 */
 		break;
 	case 0x1f:
 		val = ((rasterline & 7) << 4) | (ted7360[offset] & 0x0f);
@@ -1222,7 +1224,7 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 INTERRUPT_GEN( ted7360_raster_interrupt )
 {
 	rasterline++;
-	rastertime = attotime_to_double(timer_get_time ());
+	rastertime = attotime_to_double(timer_get_time(device->machine));
 	if (rasterline >= lines)
 	{
 		rasterline = 0;

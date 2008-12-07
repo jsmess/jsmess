@@ -102,7 +102,7 @@ enum
 
 static DRIVER_INIT(tutor)
 {
-	tape_interrupt_timer = timer_alloc(tape_interrupt_handler, NULL);
+	tape_interrupt_timer = timer_alloc(machine, tape_interrupt_handler, NULL);
 
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + basic_base, 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + cartridge_base, 0);

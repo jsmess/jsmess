@@ -971,7 +971,7 @@ static INTERRUPT_GEN( stv_interrupt )
 
 	/*TODO: timing of this one (related to the VDP1 speed)*/
 	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
-	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
+	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
 }
 
 static UINT8 port_sel,mux_data;
@@ -1550,7 +1550,7 @@ static void dma_direct_lv0(const address_space *space)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
 	/*TODO: timing of this*/
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1651,7 +1651,7 @@ static void dma_direct_lv1(const address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1752,7 +1752,7 @@ static void dma_direct_lv2(const address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1827,7 +1827,7 @@ static void dma_indirect_lv0(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 }
 
 static void dma_indirect_lv1(const address_space *space)
@@ -1896,7 +1896,7 @@ static void dma_indirect_lv1(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 }
 
 static void dma_indirect_lv2(const address_space *space)
@@ -1964,7 +1964,7 @@ static void dma_indirect_lv2(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 }
 
 
@@ -2232,30 +2232,30 @@ static MACHINE_START( saturn )
 	SCSP_set_ram_base(0, sound_ram);
 
 	// save states
-	state_save_register_global_pointer(smpc_ram, 0x80);
-	state_save_register_global_pointer(stv_scu, 0x100/4);
-	state_save_register_global_pointer(scsp_regs, 0x1000/2);
-	state_save_register_global(stv_vblank);
-	state_save_register_global(stv_hblank);
-	state_save_register_global(stv_enable_slave_sh2);
-	state_save_register_global(NMI_reset);
-	state_save_register_global(en_68k);
-	state_save_register_global(timer_0);
-	state_save_register_global(timer_1);
-	state_save_register_global(scanline);
-	state_save_register_global(IOSEL1);
-	state_save_register_global(IOSEL2);
-	state_save_register_global(EXLE1);
-	state_save_register_global(EXLE2);
-	state_save_register_global(PDR1);
-	state_save_register_global(PDR2);
-	state_save_register_global(port_sel);
-	state_save_register_global(mux_data);
-	state_save_register_global(scsp_last_line);
-	state_save_register_global(intback_stage);
-	state_save_register_global(pmode);
-	state_save_register_global(smpcSR);
-	state_save_register_global_array(SMEM);
+	state_save_register_global_pointer(machine, smpc_ram, 0x80);
+	state_save_register_global_pointer(machine, stv_scu, 0x100/4);
+	state_save_register_global_pointer(machine, scsp_regs, 0x1000/2);
+	state_save_register_global(machine, stv_vblank);
+	state_save_register_global(machine, stv_hblank);
+	state_save_register_global(machine, stv_enable_slave_sh2);
+	state_save_register_global(machine, NMI_reset);
+	state_save_register_global(machine, en_68k);
+	state_save_register_global(machine, timer_0);
+	state_save_register_global(machine, timer_1);
+	state_save_register_global(machine, scanline);
+	state_save_register_global(machine, IOSEL1);
+	state_save_register_global(machine, IOSEL2);
+	state_save_register_global(machine, EXLE1);
+	state_save_register_global(machine, EXLE2);
+	state_save_register_global(machine, PDR1);
+	state_save_register_global(machine, PDR2);
+	state_save_register_global(machine, port_sel);
+	state_save_register_global(machine, mux_data);
+	state_save_register_global(machine, scsp_last_line);
+	state_save_register_global(machine, intback_stage);
+	state_save_register_global(machine, pmode);
+	state_save_register_global(machine, smpcSR);
+	state_save_register_global_array(machine, SMEM);
 
 	add_exit_callback(machine, stvcd_exit);
 }
@@ -2287,9 +2287,9 @@ static MACHINE_RESET( saturn )
 	stvcd_reset( machine );
 
 	/* set the first scanline 0 timer to go off */
-	scan_timer = timer_alloc(hblank_in_irq, NULL);
-	t1_timer = timer_alloc(timer1_irq,NULL);
-	vblank_in_timer = timer_alloc(vblank_in_irq,NULL);
+	scan_timer = timer_alloc(machine, hblank_in_irq, NULL);
+	t1_timer = timer_alloc(machine, timer1_irq,NULL);
+	vblank_in_timer = timer_alloc(machine, vblank_in_irq,NULL);
 	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
 }

@@ -130,7 +130,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
     cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7);
-    timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
+    timer_set(device->machine, ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 
 /*
@@ -197,9 +197,9 @@ static const int sampleLimits[] =
     0x7200      // (end of samples)
 };
 
-void stfight_adpcm_int( running_machine *machine, int data )
+void stfight_adpcm_int(const device_config *device)
 {
-	UINT8 *SAMPLES = memory_region(machine, "adpcm");
+	UINT8 *SAMPLES = memory_region(device->machine, "adpcm");
 	int adpcm_data = SAMPLES[adpcm_data_offs & 0x7fff];
 
     // finished playing sample?

@@ -1740,38 +1740,38 @@ static CPU_INIT( tms32025 )
 	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("tms32025", device->tag, 0, R.PC);
-	state_save_register_item("tms32025", device->tag, 0, R.STR0);
-	state_save_register_item("tms32025", device->tag, 0, R.STR1);
-	state_save_register_item("tms32025", device->tag, 0, R.PFC);
-	state_save_register_item("tms32025", device->tag, 0, R.IFR);
-	state_save_register_item("tms32025", device->tag, 0, R.RPTC);
-	state_save_register_item("tms32025", device->tag, 0, R.ACC.d);
-	state_save_register_item("tms32025", device->tag, 0, R.ALU.d);
-	state_save_register_item("tms32025", device->tag, 0, R.Preg.d);
-	state_save_register_item("tms32025", device->tag, 0, R.Treg);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[0]);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[1]);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[2]);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[3]);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[4]);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[5]);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[6]);
-	state_save_register_item("tms32025", device->tag, 0, R.AR[7]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[0]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[1]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[2]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[3]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[4]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[5]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[6]);
-	state_save_register_item("tms32025", device->tag, 0, R.STACK[7]);
+	state_save_register_device_item(device, 0, R.PC);
+	state_save_register_device_item(device, 0, R.STR0);
+	state_save_register_device_item(device, 0, R.STR1);
+	state_save_register_device_item(device, 0, R.PFC);
+	state_save_register_device_item(device, 0, R.IFR);
+	state_save_register_device_item(device, 0, R.RPTC);
+	state_save_register_device_item(device, 0, R.ACC.d);
+	state_save_register_device_item(device, 0, R.ALU.d);
+	state_save_register_device_item(device, 0, R.Preg.d);
+	state_save_register_device_item(device, 0, R.Treg);
+	state_save_register_device_item(device, 0, R.AR[0]);
+	state_save_register_device_item(device, 0, R.AR[1]);
+	state_save_register_device_item(device, 0, R.AR[2]);
+	state_save_register_device_item(device, 0, R.AR[3]);
+	state_save_register_device_item(device, 0, R.AR[4]);
+	state_save_register_device_item(device, 0, R.AR[5]);
+	state_save_register_device_item(device, 0, R.AR[6]);
+	state_save_register_device_item(device, 0, R.AR[7]);
+	state_save_register_device_item(device, 0, R.STACK[0]);
+	state_save_register_device_item(device, 0, R.STACK[1]);
+	state_save_register_device_item(device, 0, R.STACK[2]);
+	state_save_register_device_item(device, 0, R.STACK[3]);
+	state_save_register_device_item(device, 0, R.STACK[4]);
+	state_save_register_device_item(device, 0, R.STACK[5]);
+	state_save_register_device_item(device, 0, R.STACK[6]);
+	state_save_register_device_item(device, 0, R.STACK[7]);
 
-	state_save_register_item("tms32025", device->tag, 0, R.idle);
-	state_save_register_item("tms32025", device->tag, 0, R.hold);
-	state_save_register_item("tms32025", device->tag, 0, R.external_mem_access);
-	state_save_register_item("tms32025", device->tag, 0, R.init_load_addr);
-	state_save_register_item("tms32025", device->tag, 0, R.PREVPC);
+	state_save_register_device_item(device, 0, R.idle);
+	state_save_register_device_item(device, 0, R.hold);
+	state_save_register_device_item(device, 0, R.external_mem_access);
+	state_save_register_device_item(device, 0, R.init_load_addr);
+	state_save_register_device_item(device, 0, R.PREVPC);
 }
 
 /****************************************************************************
@@ -2324,7 +2324,7 @@ CPU_GET_INFO( tms32025 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(R);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;

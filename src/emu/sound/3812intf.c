@@ -91,7 +91,7 @@ static SND_START( ym3812 )
 	info->intf = config ? config : &dummy;
 
 	/* stream system initialize */
-	info->chip = ym3812_init(tag,clock,rate);
+	info->chip = ym3812_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
@@ -102,21 +102,21 @@ static SND_START( ym3812 )
 	ym3812_set_irq_handler   (info->chip, IRQHandler_3812, info);
 	ym3812_set_update_handler(info->chip, _stream_update_3812, info);
 
-	info->timer[0] = timer_alloc(timer_callback_3812_0, info);
-	info->timer[1] = timer_alloc(timer_callback_3812_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_3812_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_3812_1, info);
 
 	return info;
 }
 
 static SND_STOP( ym3812 )
 {
-	struct ym3812_info *info = token;
+	struct ym3812_info *info = device->token;
 	ym3812_shutdown(info->chip);
 }
 
 static SND_RESET( ym3812 )
 {
-	struct ym3812_info *info = token;
+	struct ym3812_info *info = device->token;
 	ym3812_reset_chip(info->chip);
 }
 
@@ -260,7 +260,7 @@ static SND_START( ym3526 )
 	info->intf = config ? config : &dummy;
 
 	/* stream system initialize */
-	info->chip = ym3526_init(tag,clock,rate);
+	info->chip = ym3526_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
@@ -270,21 +270,21 @@ static SND_START( ym3526 )
 	ym3526_set_irq_handler   (info->chip, IRQHandler_3526, info);
 	ym3526_set_update_handler(info->chip, _stream_update_3526, info);
 
-	info->timer[0] = timer_alloc(timer_callback_3526_0, info);
-	info->timer[1] = timer_alloc(timer_callback_3526_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_3526_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_3526_1, info);
 
 	return info;
 }
 
 static SND_STOP( ym3526 )
 {
-	struct ym3526_info *info = token;
+	struct ym3526_info *info = device->token;
 	ym3526_shutdown(info->chip);
 }
 
 static SND_RESET( ym3526 )
 {
-	struct ym3526_info *info = token;
+	struct ym3526_info *info = device->token;
 	ym3526_reset_chip(info->chip);
 }
 
@@ -464,14 +464,12 @@ static SND_START( y8950 )
 	info->index = sndindex;
 
 	/* stream system initialize */
-	info->chip = y8950_init(tag,clock,rate);
+	info->chip = y8950_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(info->chip,
-		(void *)(memory_region(Machine, tag)),
-			memory_region_length(Machine, tag) );
+	y8950_set_delta_t_memory(info->chip, device->region, device->regionbytes);
 
 	info->stream = stream_create(0,1,rate,info,y8950_stream_update);
 
@@ -484,21 +482,21 @@ static SND_START( y8950 )
 	y8950_set_irq_handler   (info->chip, IRQHandler_8950, info);
 	y8950_set_update_handler(info->chip, _stream_update_8950, info);
 
-	info->timer[0] = timer_alloc(timer_callback_8950_0, info);
-	info->timer[1] = timer_alloc(timer_callback_8950_1, info);
+	info->timer[0] = timer_alloc(Machine, timer_callback_8950_0, info);
+	info->timer[1] = timer_alloc(Machine, timer_callback_8950_1, info);
 
 	return info;
 }
 
 static SND_STOP( y8950 )
 {
-	struct y8950_info *info = token;
+	struct y8950_info *info = device->token;
 	y8950_shutdown(info->chip);
 }
 
 static SND_RESET( y8950 )
 {
-	struct y8950_info *info = token;
+	struct y8950_info *info = device->token;
 	y8950_reset_chip(info->chip);
 }
 

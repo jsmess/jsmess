@@ -110,7 +110,7 @@ static VIDEO_START( pecom )
 	/* register for state saving */
 	state_save_register_global(state->cdp1802_mode);
 	state_save_register_global(state->dma);
-	state_save_register_global_pointer(state->page_ram, PECOM_PAGE_RAM_SIZE);	
+	state_save_register_global_pointer(machine, state->page_ram, PECOM_PAGE_RAM_SIZE);	
 }
 
 static VIDEO_UPDATE( pecom )

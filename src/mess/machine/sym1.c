@@ -291,7 +291,7 @@ DRIVER_INIT( sym1 )
 	ttl74145_config(machine, 0, &ttl74145_intf);
 
 	/* allocate a timer to refresh the led display */
-	led_update = timer_alloc(led_refresh, NULL);
+	led_update = timer_alloc(machine, led_refresh, NULL);
 }
 
 

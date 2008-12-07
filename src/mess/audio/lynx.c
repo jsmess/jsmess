@@ -215,7 +215,7 @@ UINT8 lynx_audio_read(int offset)
 
 void lynx_audio_write(int offset, UINT8 data)
 {
-//	logerror("%.6f audio write %.2x %.2x\n", timer_get_time(), offset, data);
+//	logerror("%.6f audio write %.2x %.2x\n", timer_get_time(machine), offset, data);
     LYNX_AUDIO *channel=lynx_audio+((offset>>3)&3);
     stream_update(mixer_channel);
     switch (offset) {

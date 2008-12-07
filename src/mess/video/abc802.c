@@ -232,7 +232,7 @@ static VIDEO_START( abc802 )
 
 	/* register for state saving */
 
-	state_save_register_global_pointer(state->charram, ABC802_CHAR_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->charram, ABC802_CHAR_RAM_SIZE);
 
 	state_save_register_global(state->flshclk_ctr);
 	state_save_register_global(state->flshclk);
