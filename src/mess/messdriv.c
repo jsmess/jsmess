@@ -132,7 +132,7 @@ const game_driver * const drivers[] =
 //	DRIVER( shmc1200 )
 
 	/* FAIRCHILD */
-//0128u5	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/
+	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/
 
 	/* COLECO */
 	DRIVER( coleco )	/* ColecoVision (Original BIOS)						*/
@@ -302,7 +302,7 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
 
 	/* COMMODORE */
-//0128u5	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
+	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
 //0128u5	DRIVER( sym1 )		/* Synertek SYM-1									*/
 //0128u5	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
@@ -583,11 +583,11 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
-//0128u5	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
-//0128u5	DRIVER( mbeeic )	/* Microbee 32 IC									*/
-//0128u5	DRIVER( mbeepc )	/* Microbee 32 PC									*/
-//0128u5	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
-//0128u5	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
+	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
+	DRIVER( mbeeic )	/* Microbee 32 IC									*/
+	DRIVER( mbeepc )	/* Microbee 32 PC									*/
+	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
+	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
 //0128u5	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
@@ -813,8 +813,8 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( exidyd )	/* Sorcerer (cassette only)								*/
 
 	/* GALAKSIJA */
-//0128u5	DRIVER( galaxy )
-//0128u5	DRIVER( galaxyp )
+	DRIVER( galaxy )
+	DRIVER( galaxyp )
 
 	/* Lviv/L'vov */
 //0128u5	DRIVER( lviv )		/* Lviv/L'vov										*/
@@ -1064,7 +1064,7 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( bw2 )
 
 	/* Exeltel */
-//0128u5	DRIVER( exl100 )
+	DRIVER( exl100 )
 //	DRIVER( exeltel )
 
 	/* Comx World Operations Ltd */

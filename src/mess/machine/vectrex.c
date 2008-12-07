@@ -286,19 +286,19 @@ TIMER_CALLBACK(vectrex_imager_eye)
 	{
 		vectrex_imager_status = param;
 		coffset = param > 1? 3: 0;
-		timer_set (double_to_attotime(rtime * vectrex_imager_angles[0]), NULL, imager_colors[coffset+2], vectrex_imager_change_color);
-		timer_set (double_to_attotime(rtime * vectrex_imager_angles[1]), NULL, imager_colors[coffset+1], vectrex_imager_change_color);
-		timer_set (double_to_attotime(rtime * vectrex_imager_angles[2]), NULL, imager_colors[coffset], vectrex_imager_change_color);
+		timer_set (machine, double_to_attotime(rtime * vectrex_imager_angles[0]), NULL, imager_colors[coffset+2], vectrex_imager_change_color);
+		timer_set (machine, double_to_attotime(rtime * vectrex_imager_angles[1]), NULL, imager_colors[coffset+1], vectrex_imager_change_color);
+		timer_set (machine, double_to_attotime(rtime * vectrex_imager_angles[2]), NULL, imager_colors[coffset], vectrex_imager_change_color);
 
 		if (param == 2)
 		{
-			timer_set (double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_eye);
+			timer_set (machine, double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			via_set_input_ca1(machine, 0, 1);
 			via_set_input_ca1(machine, 0, 0);
 			vectrex_imager_pinlevel |= 0x80;
-			timer_set (double_to_attotime(rtime / 360.0), &vectrex_imager_pinlevel, 0, update_level);
+			timer_set (machine, double_to_attotime(rtime / 360.0), &vectrex_imager_pinlevel, 0, update_level);
 		}
 	}
 }
@@ -316,7 +316,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (!mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		tmp = attotime_to_double(timer_get_time(machine));
+		tmp = attotime_to_double(timer_get_time(space->machine));
 		wavel = tmp - sl;
 		sl = tmp;
 
@@ -343,7 +343,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		pwl = attotime_to_double(timer_get_time(machine)) - sl;
+		pwl = attotime_to_double(timer_get_time(space->machine)) - sl;
 	}
 }
 

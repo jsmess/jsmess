@@ -321,7 +321,7 @@ VIDEO_START(vectrex)
 
 *********************************************************************/
 
-static void vectrex_multiplexer(int mux)
+static void vectrex_multiplexer(running_machine *machine, int mux)
 {
 	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[mux], vectrex_via_out[PORTA], update_signal);
 
@@ -378,7 +378,7 @@ static WRITE8_HANDLER(v_via_pb_w)
 		if (!(data & 0x1) && (vectrex_via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, update_signal);
+			timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, update_signal);
 		}
 	}
 	else
@@ -402,10 +402,10 @@ static WRITE8_HANDLER(v_via_pb_w)
 	}
 
 	if (!(data & 0x1) && (vectrex_via_out[PORTB] & 0x1))
-		vectrex_multiplexer ((data >> 1) & 0x3);
+		vectrex_multiplexer (space->machine, (data >> 1) & 0x3);
 
 	vectrex_via_out[PORTB] = data;
-	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &ramp, data & 0x80, update_signal);
+	timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &ramp, data & 0x80, update_signal);
 }
 
 
@@ -413,17 +413,17 @@ static WRITE8_HANDLER(v_via_pa_w)
 {
 	/* DAC output always goes to Y integrator */
 	vectrex_via_out[PORTA] = data;
-	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[A_Y], data, update_signal);
+	timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[A_Y], data, update_signal);
 
 	if (!(vectrex_via_out[PORTB] & 0x1))
-		vectrex_multiplexer ((vectrex_via_out[PORTB] >> 1) & 0x3);
+		vectrex_multiplexer (space->machine, (vectrex_via_out[PORTB] >> 1) & 0x3);
 }
 
 
 static WRITE8_HANDLER(v_via_ca2_w)
 {
 	if (data == 0)
-		timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, vectrex_zero_integrators);
+		timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, vectrex_zero_integrators);
 }
 
 
@@ -448,11 +448,11 @@ static WRITE8_HANDLER(v_via_cb2_w)
 				dx = abs(pen_x - x_int);
 				dy = abs(pen_y - y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)
-					timer_set(machine, attotime_zero, NULL, 0, lightpen_trigger);
+					timer_set(space->machine, attotime_zero, NULL, 0, lightpen_trigger);
 			}
 		}
 
-		timer_set(machine, attotime_zero, &blank, data, update_signal);
+		timer_set(space->machine, attotime_zero, &blank, data, update_signal);
 		cb2 = data;
 	}
 }
