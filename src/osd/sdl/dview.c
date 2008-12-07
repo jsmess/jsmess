@@ -6,17 +6,18 @@ G_DEFINE_TYPE(DView, dview, GTK_TYPE_CONTAINER);
 
 static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 {
-	debug_view_char *viewdata;
+	const debug_view_char *viewdata;
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
-	//UINT32 trow = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_ROWS);
-	//UINT32 tcol = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_COLS);
-	//UINT32 prow = debug_view_get_property_UINT32(dv->dw, DVP_TOP_ROW);
-	//UINT32 pcol = debug_view_get_property_UINT32(dv->dw, DVP_LEFT_COL);
-	UINT32 vrow = debug_view_get_property_UINT32(dv->dw, DVP_VISIBLE_ROWS);
-	UINT32 vcol = debug_view_get_property_UINT32(dv->dw, DVP_VISIBLE_COLS);
+	debug_view_xy vsize;
+	UINT32 vrow;
+	UINT32 vcol;
 	UINT32 i, j, xx, yy;
 	GdkColor bg, fg;
+
+	vsize = debug_view_get_visible_size(dv->dw);
+	vrow = vsize.y;
+	vcol = vsize.x;
 
 	bg.red = bg.green = bg.blue = 0xffff;
 	gdk_gc_set_rgb_fg_color(dv->gc, &bg);
@@ -29,7 +30,7 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 						   dv->vsz, dv->hsz);
 	}
 
-	viewdata = debug_view_get_property_ptr(dv->dw, DVP_VIEW_DATA);
+	viewdata = debug_view_get_chars(dv->dw);
 
 	yy = wdv->style->ythickness;
 	for(j=0; j<vrow; j++) {
@@ -104,23 +105,38 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 
 static void dview_hadj_changed(GtkAdjustment *adj, DView *dv)
 {
-	UINT32 pcol = debug_view_get_property_UINT32(dv->dw, DVP_LEFT_COL);
+	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
-	if(v != pcol) {
-		debug_view_set_property_UINT32(dv->dw, DVP_LEFT_COL, v);
+
+	pos = debug_view_get_visible_position(dv->dw); 
+
+	if (v != pos.x) 
+	{
+		pos.x = v;
+		debug_view_set_visible_position(dv->dw, pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
 
 static void dview_vadj_changed(GtkAdjustment *adj, DView *dv)
 {
-	UINT32 pcol = debug_view_get_property_UINT32(dv->dw, DVP_TOP_ROW);
+	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
-	if(v != pcol) {
+
+	pos = debug_view_get_visible_position(dv->dw); 
+
+	if (v != pos.y) 
+	{
 		if(dv->this_one_is_stupidly_autoscrolling)
-			debug_view_set_property_UINT32(dv->dw, DVP_TEXTBUF_LINE_LOCK, v);
+		{
+// what is new equivalent here?
+//			debug_view_set_(dv->dw, DVP_TEXTBUF_LINE_LOCK, v);
+		}
 		else
-			debug_view_set_property_UINT32(dv->dw, DVP_TOP_ROW, v);
+		{
+			pos.y = v;
+			debug_view_set_visible_position(dv->dw, pos);
+		}
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -156,15 +172,23 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 {
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
-	UINT32 trow = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_ROWS);
-	UINT32 tcol = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_COLS);
-	int    prow = debug_view_get_property_UINT32(dv->dw, DVP_TOP_ROW);
-	int    pcol = debug_view_get_property_UINT32(dv->dw, DVP_LEFT_COL);
+	UINT32 trow;
+	UINT32 tcol;
+	int    prow;
+	int    pcol;
 	UINT32 ah   = allocation->height-2*wdv->style->ythickness;
 	UINT32 aw   = allocation->width-2*wdv->style->xthickness;
 	UINT32 crow, ccol, vrow, vcol;
 	int ohs = dv->hs;
 	int ovs = dv->vs;
+	debug_view_xy size, pos;
+
+	pos = debug_view_get_visible_position(dv->dw); 
+	size = debug_view_get_total_size(dv->dw);
+	trow = size.y;
+	tcol = size.x;
+	prow = pos.y;
+	pcol = pos.x;
 
 	dv->tr = trow;
 	dv->tc = tcol;
@@ -207,10 +231,13 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		vcol = tcol-pcol;
 	}
 
-	debug_view_set_property_UINT32(dv->dw, DVP_VISIBLE_ROWS, vrow);
-	debug_view_set_property_UINT32(dv->dw, DVP_VISIBLE_COLS, vcol);
-	debug_view_set_property_UINT32(dv->dw, DVP_TOP_ROW,  prow);
-	debug_view_set_property_UINT32(dv->dw, DVP_LEFT_COL, pcol);
+	size.y = trow;
+	size.x = tcol;
+	pos.y = prow;
+	pos.x = pcol;
+
+	debug_view_set_visible_position(dv->dw, pos); 
+	debug_view_set_visible_size(dv->dw, size);
 
 	if(GTK_WIDGET_REALIZED(wdv))
 		gdk_window_move_resize(wdv->window,
@@ -239,7 +266,9 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->hadj->page_increment = span;
 		dv->hadj->page_size = span;
 		gtk_adjustment_changed(dv->hadj);
-		debug_view_set_property_UINT32(dv->dw, DVP_LEFT_COL, pcol);
+		pos.y = prow;
+		pos.x = pcol;
+		debug_view_set_visible_position(dv->dw, pos); 
 	} else {
 		if(ohs)
 			gtk_widget_hide(dv->hscrollbar);
@@ -267,7 +296,9 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->vadj->page_increment = span;
 		dv->vadj->page_size = span;
 		gtk_adjustment_changed(dv->vadj);
-		debug_view_set_property_UINT32(dv->dw, DVP_TOP_ROW, prow);
+		pos.y = prow;
+		pos.x = pcol;
+		debug_view_set_visible_position(dv->dw, pos); 
 	} else {
 		if(ovs)
 			gtk_widget_hide(dv->vscrollbar);
@@ -279,9 +310,14 @@ static void dview_size_request(GtkWidget *wdv, GtkRequisition *req)
 	GtkRequisition req2;
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
-	UINT32 trow = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_ROWS);
-	UINT32 tcol = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_COLS);
+	UINT32 trow;
+	UINT32 tcol;
 	int vs = 0, hs = 0;
+	debug_view_xy size;
+
+	size = debug_view_get_total_size(dv->dw);
+	trow = size.y;
+	tcol = size.x;
 
 	if(tcol > 50) {
 		tcol = 50;
@@ -380,18 +416,6 @@ static void dview_init(DView *dv)
 	g_signal_connect(dv->vadj, "value-changed", G_CALLBACK(dview_vadj_changed), dv);
 }
 
-static void dview_view_update(debug_view *dw)
-{
-	DView *dv = debug_view_get_property_ptr(dw, DVP_OSD_PRIVATE);
-	UINT32 trow = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_ROWS);
-	UINT32 tcol = debug_view_get_property_UINT32(dv->dw, DVP_TOTAL_COLS);
-
-	if(dv->tr != trow || dv->tc != tcol)
-		gtk_widget_queue_resize(GTK_WIDGET(dv));
-	else
-		gtk_widget_queue_draw(GTK_WIDGET(dv));
-}
-
 GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar *string2, gint int1, gint int2)
 {
 	GtkWidget *wdv = g_object_new(DVIEW_TYPE, NULL);
@@ -404,8 +428,6 @@ GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar
 void dview_set_debug_view(DView *dv, debug_view *dw)
 {
 	dv->dw = dw;
-	debug_view_set_property_ptr(dw, DVP_OSD_PRIVATE, dv);
-	debug_view_set_property_fct(dw, DVP_UPDATE_CALLBACK, (void *)dview_view_update);
 }
 
 void dview_this_one_is_stupidly_autoscrolling(DView *dv)

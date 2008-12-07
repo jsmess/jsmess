@@ -41,8 +41,8 @@ typedef struct {
 	debug_view *console;
 	debug_view *disasm;
 	debug_view *registers;
-	int cpu;
-	running_machine *machine;
+	const device_config *cpu;	// current CPU
+	running_machine *machine;	// machine
 } debugmain_i;
 
 typedef struct memorywin_i {
@@ -53,6 +53,7 @@ typedef struct memorywin_i {
 	GtkComboBox *zone_w;
 	debug_view *memory;
 	running_machine *machine;
+
 } memorywin_i;
 
 typedef struct disasmwin_i {
@@ -77,14 +78,10 @@ typedef struct memorycombo_item
 {
 	struct memorycombo_item *next;
 	char					name[256];
-	UINT8					cpunum;
-	UINT8					spacenum;
-	void *					base;
-	UINT32					length;
-	UINT8					offset_xor;
-	UINT8					little_endian;
 	UINT8					prefsize;
-	running_machine *machine;
+	running_machine 			*machine;	// machine
+	const memory_subview_item		*subview;	// subview 
+	const device_config			*device;	// CPU device
 } memorycombo_item;
 
 
@@ -114,96 +111,6 @@ static void debugwin_show(int show)
 	for(p3 = logwin_list; p3; p3 = p3->next)
 		f(p3->win);
 }
-
-//============================================================
-//  memory_determine_combo_items
-//============================================================
-
-static void memory_determine_combo_items(running_machine *machine)
-{
-	memorycombo_item **tail = &memorycombo;
-	UINT32 cpunum, spacenum;
-	const char *rgntag;
-	int itemnum;
-
-	// first add all the CPUs' address spaces
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		if (machine->cpu[cpunum] != NULL)
-		{
-       			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
-
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			{
-				if (cpuinfo->space[spacenum].databytes)
-				{
-					memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-					memset(ci, 0, sizeof(*ci));
-					ci->cpunum = cpunum;
-					ci->spacenum = spacenum;
-					ci->machine = machine;
-					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
-
-					snprintf(ci->name, ARRAY_LENGTH(ci->name), "CPU #%d \"%s\" (%s) %s memory", cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]), address_space_names[spacenum]);
-
-					*tail = ci;
-					tail = &ci->next;
-				}
-			}
-		}
-	}
-
-	// then add all the memory regions
-	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
-	{
-		memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-		UINT32 flags = memory_region_flags(machine, rgntag);
-		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
-
-		memset(ci, 0, sizeof(*ci));
-		ci->base = memory_region(machine, rgntag);
-		ci->length = memory_region_length(machine, rgntag);
-		ci->prefsize = MIN(width, 8);
-		ci->offset_xor = width - 1;
-		ci->little_endian = little_endian;
-		ci->machine = machine;
-
-		snprintf(ci->name, ARRAY_LENGTH(ci->name), "Region \"%s\"", rgntag);
-
-		*tail = ci;
-		tail = &ci->next;
-	}
-
-	// finally add all global array symbols
-	for (itemnum = 0; itemnum < 10000; itemnum++)
-	{
-		UINT32 valsize, valcount;
-		const char *name;
-		void *base;
-
-		/* stop when we run out of items */
-		name = state_save_get_indexed_item(itemnum, &base, &valsize, &valcount);
-		if (name == NULL)
-			break;
-
-		/* if this is a single-entry global, add it */
-		if (valcount > 1 && strstr(name, "/globals/"))
-		{
-			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			memset(ci, 0, sizeof(*ci));
-			ci->base = base;
-			ci->length = valcount * valsize;
-			ci->prefsize = MIN(valsize, 8);
-			ci->little_endian = TRUE;
-			ci->machine = machine;
-			strcpy(ci->name, strrchr(name, '/') + 1);
-			*tail = ci;
-			tail = &ci->next;
-		}
-	}
-}
-
 
 static void edit_add_hist(edit *e, const char *text)
 {
@@ -338,10 +245,10 @@ static void edit_del(edit *e)
 
 static void debugmain_update_checks(debugmain_i *info)
 {
-	int rc = debug_view_get_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "raw_opcodes")), rc == DVP_DASM_RIGHTCOL_RAW);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "enc_opcodes")), rc == DVP_DASM_RIGHTCOL_ENCRYPTED);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "comments")), rc == DVP_DASM_RIGHTCOL_COMMENTS);
+	int rc = disasm_view_get_right_column(info->disasm);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "raw_opcodes")), rc == DASM_RIGHTCOL_RAW);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "enc_opcodes")), rc == DASM_RIGHTCOL_ENCRYPTED);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "comments")), rc == DASM_RIGHTCOL_COMMENTS);
 }
 
 void debugmain_raw_opcodes_activate(GtkMenuItem *item, gpointer user_data)
@@ -349,7 +256,7 @@ void debugmain_raw_opcodes_activate(GtkMenuItem *item, gpointer user_data)
 	debugmain_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "raw_opcodes")))) {
 		debug_view_begin_update(info->disasm);
-		debug_view_set_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN, DVP_DASM_RIGHTCOL_RAW);
+		disasm_view_set_right_column(info->disasm, DASM_RIGHTCOL_RAW);
 		debug_view_end_update(info->disasm);
 	}
 }
@@ -359,7 +266,7 @@ void debugmain_enc_opcodes_activate(GtkMenuItem *item, gpointer user_data)
 	debugmain_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "enc_opcodes")))) {
 		debug_view_begin_update(info->disasm);
-		debug_view_set_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN, DVP_DASM_RIGHTCOL_ENCRYPTED);
+		disasm_view_set_right_column(info->disasm, DASM_RIGHTCOL_ENCRYPTED);
 		debug_view_end_update(info->disasm);
 	}
 }
@@ -369,42 +276,57 @@ void debugmain_comments_activate(GtkMenuItem *item, gpointer user_data)
 	debugmain_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "comments")))) {
 		debug_view_begin_update(info->disasm);
-		debug_view_set_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN, DVP_DASM_RIGHTCOL_COMMENTS);
+		disasm_view_set_right_column(info->disasm, DASM_RIGHTCOL_COMMENTS);
 		debug_view_end_update(info->disasm);
 	}
 }
 
-static void debugmain_set_cpunum(running_machine *machine, int cpunum)
+static void debugmain_set_cpu(const device_config *cpu)
 {
-	if(cpunum != dmain->cpu) {
+	if (cpu != dmain->cpu) 
+	{
 		char title[256];
-		dmain->cpu = cpunum;
+		const registers_subview_item *regsubitem;
+		const disasm_subview_item *dasmsubitem;
+
+		dmain->cpu = cpu;
 		
-		// first set all the views to the new cpu number
-		debug_view_set_property_UINT32(dmain->disasm, DVP_DASM_CPUNUM, cpunum);
-		debug_view_set_property_UINT32(dmain->registers, DVP_REGS_CPUNUM, cpunum);
+		// first set all the views to the new cpu
+		for (dasmsubitem = disasm_view_get_subview_list(dmain->disasm); dasmsubitem != NULL; dasmsubitem = dasmsubitem->next)
+			if (dasmsubitem->space->cpu == cpu)
+			{
+				disasm_view_set_subview(dmain->disasm, dasmsubitem->index);
+				break;
+			}
+
+		for (regsubitem = registers_view_get_subview_list(dmain->registers); regsubitem != NULL; regsubitem = regsubitem->next)
+			if (regsubitem->device == cpu)
+			{
+				registers_view_set_subview(dmain->registers, regsubitem->index);
+				break;
+			}
 
 		// then update the caption
-		sprintf(title, "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
+		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", cpu->machine->gamedrv->name, regsubitem->name);
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		debugmain_update_checks(dmain);
 	}
 }
 
-
 // The entry point
 
-void osd_wait_for_debugger(running_machine *machine, int firststop)
+void osd_wait_for_debugger(const device_config *device, int firststop)
 {
 	// create a console window
-	if(!dmain) {
+	if(!dmain) 
+	{
 		// GTK init should probably be done earlier
 		gtk_init(0, 0);
-		debugmain_init(machine);
+		debugmain_init(device->machine);
 	}
 
 	// update the views in the console to reflect the current CPU
-	debugmain_set_cpunum(machine, cpunum_get_active());
+	debugmain_set_cpu(device);
 
 	debugwin_show(1);
 	gtk_main_iteration();
@@ -431,21 +353,81 @@ static void debugmain_destroy(GtkObject *obj, gpointer user_data)
 	mame_schedule_exit(dmain->machine);
 }
 
+//============================================================
+//  debugwin_console_update
+//============================================================
+
+static void debugwin_console_update(debug_view *view, void *osdprivate)
+{
+	debugmain_i *dbg_main = (debugmain_i *)osdprivate;
+	debug_view_xy size;
+
+	size = debug_view_get_total_size(dbg_main->console);
+	if ((dbg_main->console_w->tr != size.y) || (dbg_main->console_w->tc != size.x))
+	{
+		gtk_widget_queue_resize(GTK_WIDGET(dbg_main->console_w));
+	}
+	else
+	{
+		gtk_widget_queue_draw(GTK_WIDGET(dbg_main->console_w));
+	}
+}
+
+//============================================================
+//  debugwin_disasm_update
+//============================================================
+
+static void debugwin_disasm_update(debug_view *view, void *osdprivate)
+{
+	debugmain_i *dbg_main = (debugmain_i *)osdprivate;
+	debug_view_xy size;
+
+	size = debug_view_get_total_size(dbg_main->disasm);
+	if ((dbg_main->disasm_w->tr != size.y) || (dbg_main->disasm_w->tc != size.x))
+	{
+		gtk_widget_queue_resize(GTK_WIDGET(dbg_main->disasm_w));
+	}
+	else
+	{
+		gtk_widget_queue_draw(GTK_WIDGET(dbg_main->disasm_w));
+	}
+}
+
+//============================================================
+//  debugwin_register_update
+//============================================================
+
+static void debugwin_register_update(debug_view *view, void *osdprivate)
+{
+	debugmain_i *dbg_main = (debugmain_i *)osdprivate;
+	debug_view_xy size;
+
+	size = debug_view_get_total_size(dbg_main->registers);
+	if ((dbg_main->registers_w->tr != size.y) || (dbg_main->registers_w->tc != size.x))
+	{
+		gtk_widget_queue_resize(GTK_WIDGET(dbg_main->registers_w));
+	}
+	else
+	{
+		gtk_widget_queue_draw(GTK_WIDGET(dbg_main->registers_w));
+	}
+}
+
 static void debugmain_init(running_machine *machine)
 {
 	dmain = malloc(sizeof(*dmain));
 	memset(dmain, 0, sizeof(*dmain));
 	dmain->win = create_debugmain(machine);
-	dmain->cpu = -1;
+	dmain->cpu = NULL;
 	dmain->machine = machine;
 
 	dmain->console_w   = DVIEW(lookup_widget(dmain->win, "console"));
 	dmain->disasm_w    = DVIEW(lookup_widget(dmain->win, "disasm"));
 	dmain->registers_w = DVIEW(lookup_widget(dmain->win, "registers"));
 
-	dmain->console   = debug_view_alloc(machine, DVT_CONSOLE);
-	dmain->disasm    = debug_view_alloc(machine, DVT_DISASSEMBLY);
-	dmain->registers = debug_view_alloc(machine, DVT_REGISTERS);
+	dmain->console   = debug_view_alloc(machine, DVT_CONSOLE, debugwin_console_update, dmain);
+	dmain->disasm    = debug_view_alloc(machine, DVT_DISASSEMBLY, debugwin_disasm_update, dmain);
+	dmain->registers = debug_view_alloc(machine, DVT_REGISTERS, debugwin_register_update, dmain);
 
 	dview_set_debug_view(dmain->console_w,   dmain->console);
 	dview_set_debug_view(dmain->disasm_w,    dmain->disasm);
@@ -456,8 +438,8 @@ static void debugmain_init(running_machine *machine)
 	edit_init(machine, &dmain->ed, lookup_widget(dmain->win, "edit"), 0, 0, debugmain_process_string, &dmain);
 
 	debug_view_begin_update(dmain->disasm);
-	debug_view_set_property_string(dmain->disasm, DVP_DASM_EXPRESSION, "curpc");
-	debug_view_set_property_UINT32(dmain->disasm, DVP_DASM_TRACK_LIVE, 1);
+	disasm_view_set_expression(dmain->disasm, "curpc");
+//	debug_view_set_property_UINT32(dmain->disasm, DVP_DASM_TRACK_LIVE, 1);
 	debug_view_end_update(dmain->disasm);
 
 	g_signal_connect(dmain->win, "destroy", G_CALLBACK(debugmain_destroy), dmain);
@@ -470,41 +452,37 @@ static void debugmain_init(running_machine *machine)
 
 static void memorywin_update_checks(memorywin_i *info)
 {
-	int bpc = debug_view_get_property_UINT32(info->memory, DVP_MEM_BYTES_PER_CHUNK);
-	int rev = debug_view_get_property_UINT32(info->memory, DVP_MEM_REVERSE_VIEW);
+	int bpc = memory_view_get_bytes_per_chunk(info->memory);
+	int rev = memory_view_get_reverse(info->memory);
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "chunks_1")), bpc == 1);
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "chunks_2")), bpc == 2);
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "chunks_4")), bpc == 4);
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "reverse")), rev);
 }
 
-static void memorywin_update_selection(memorywin_i *info, memorycombo_item *ci)
-{
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_CPUNUM, ci->cpunum);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_SPACENUM, ci->spacenum);
-	debug_view_set_property_ptr(info->memory, DVP_MEM_RAW_BASE, ci->base);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_RAW_LENGTH, ci->length);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_RAW_OFFSET_XOR, ci->offset_xor);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_RAW_LITTLE_ENDIAN, ci->little_endian);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_BYTES_PER_CHUNK, ci->prefsize);
-	memorywin_update_checks(info);
-	gtk_window_set_title(GTK_WINDOW(info->win), ci->name);
-}
-
 static void memorywin_zone_changed(GtkComboBox *zone_w, memorywin_i *mem)
 {
 	int sel = gtk_combo_box_get_active(mem->zone_w);
-	int i;
-	memorycombo_item *ci;
-	for(i=0, ci=memorycombo; i != sel; i++)
-		ci = ci->next;
-	memorywin_update_selection(mem, ci);
+	char title[256];
+	const memory_subview_item *subview;
+
+	// update the subview
+	memory_view_set_subview(mem->memory, sel);
+
+	// change the checkmarks in the menu
+	memorywin_update_checks(mem);
+
+	// update the window title
+	subview = memory_view_get_current_subview(mem->memory); 
+	sprintf(title, "Memory: %s", subview->name);
+	gtk_window_set_title(GTK_WINDOW(mem->win), title);
+
 }
 
 static void memorywin_process_string(running_machine *machine, const char *str, void *memp)
 {
 	memorywin_i *mem = memp;
-	debug_view_set_property_string(mem->memory, DVP_MEM_EXPRESSION, str);
+	memory_view_set_expression(mem->memory, str);
 }
 
 static void memorywin_destroy(GtkObject *obj, gpointer user_data)
@@ -521,11 +499,28 @@ static void memorywin_destroy(GtkObject *obj, gpointer user_data)
 	free(mem);
 }
 
+static void memorywin_view_update(debug_view *view, void *osdprivate)
+{
+	memorywin_i *mem = (memorywin_i *)osdprivate;
+	debug_view_xy size;
+
+	size = debug_view_get_total_size(mem->memory);
+	if ((mem->memory_w->tr != size.y) || (mem->memory_w->tc != size.x))
+	{
+		gtk_widget_queue_resize(GTK_WIDGET(mem->memory_w));
+	}
+	else
+	{
+		gtk_widget_queue_draw(GTK_WIDGET(mem->memory_w));
+	}
+}
+
 static void memorywin_new(running_machine *machine)
 {
 	memorywin_i *mem;
-	int item, cursel, curcpu = cpunum_get_active();
-	memorycombo_item *ci, *selci = NULL;
+	int item, cursel;
+	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
+	const memory_subview_item *subview;
 
 	mem = malloc(sizeof(*mem));
 	memset(mem, 0, sizeof(*mem));
@@ -537,36 +532,48 @@ static void memorywin_new(running_machine *machine)
 	mem->memory_w = DVIEW(lookup_widget(mem->win, "memoryview"));
 	mem->zone_w   = GTK_COMBO_BOX(lookup_widget(mem->win, "zone"));
 
-	mem->memory = debug_view_alloc(machine, DVT_MEMORY);
+	mem->memory = debug_view_alloc(machine, DVT_MEMORY, memorywin_view_update, mem);
 
 	dview_set_debug_view(mem->memory_w, mem->memory);
 
 	edit_init(machine, &mem->ed, lookup_widget(mem->win, "edit"), "0", 1, memorywin_process_string, mem);
 
 	debug_view_begin_update(mem->memory);
-	debug_view_set_property_string(mem->memory, DVP_MEM_EXPRESSION, "0");
-	debug_view_set_property_UINT32(mem->memory, DVP_MEM_TRACK_LIVE, 1);
+	memory_view_set_expression(mem->memory, "0");
+//	debug_view_set_property_UINT32(mem->memory, DVP_MEM_TRACK_LIVE, 1);
 	debug_view_end_update(mem->memory);
 
 
 	// populate the combobox
 	if (!memorycombo)
-		memory_determine_combo_items(machine);
-	item = 0;
-	cursel = 0;
-	for (ci = memorycombo; ci; ci = ci->next)
 	{
-		gtk_combo_box_append_text(mem->zone_w, ci->name);
-		if (ci->base == NULL && ci->cpunum == curcpu && ci->spacenum == ADDRESS_SPACE_PROGRAM)
-		{
-			cursel = item;
-			selci = ci;
-		}
-		item++;
+		memorycombo_item **tail = &memorycombo;
 
+		cursel = item = 0;
+
+		for (subview = memory_view_get_subview_list(mem->memory); subview != NULL; subview = subview->next)
+		{
+			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
+			memset(ci, 0, sizeof(*ci));
+			ci->machine = machine;
+			ci->prefsize = 4;
+			ci->subview = subview;
+			ci->device = curcpu;
+
+			strncpy(ci->name, subview->name, sizeof(ci->name));
+		
+			*tail = ci;
+			tail = &ci->next;
+
+			if (cursel == 0 && subview->space != NULL && subview->space->cpu == curcpu)
+				cursel = item;
+
+			item++;
+		}
+
+		memory_view_set_subview(mem->memory, cursel);
+		gtk_combo_box_set_active(mem->zone_w, cursel);
 	}
-	gtk_combo_box_set_active(mem->zone_w, cursel);
-	memorywin_update_selection(mem, selci);
 
 	g_signal_connect(mem->zone_w, "changed", G_CALLBACK(memorywin_zone_changed), mem);
 	g_signal_connect(lookup_widget(mem->win, "chunks_1"), "activate", G_CALLBACK(on_chunks_1_activate), mem);
@@ -582,46 +589,24 @@ static void memorywin_new(running_machine *machine)
 
 static void disasmwin_update_checks(disasmwin_i *info)
 {
-	int rc = debug_view_get_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "raw_opcodes")), rc == DVP_DASM_RIGHTCOL_RAW);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "enc_opcodes")), rc == DVP_DASM_RIGHTCOL_ENCRYPTED);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "comments")), rc == DVP_DASM_RIGHTCOL_COMMENTS);
-}
-
-static void disasmwin_update_selection(disasmwin_i *info, int cpunum)
-{
-	char title[4096];
-	debug_view_begin_update(info->disasm);
-	debug_view_set_property_UINT32(info->disasm, DVP_DASM_CPUNUM, (cpunum == -1) ? 0 : cpunum);
-	debug_view_end_update(info->disasm);
-
-	disasmwin_update_checks(info);
-
-	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, info->machine->config->cpu[cpunum].tag, cpu_get_name(info->machine->cpu[cpunum]));
-	gtk_window_set_title(GTK_WINDOW(info->win), title);
+	int rc = disasm_view_get_right_column(info->disasm);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "raw_opcodes")), rc == DASM_RIGHTCOL_RAW);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "enc_opcodes")), rc == DASM_RIGHTCOL_ENCRYPTED);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "comments")), rc == DASM_RIGHTCOL_COMMENTS);
 }
 
 static void disasmwin_cpu_changed(GtkComboBox *cpu_w, disasmwin_i *dis)
 {
-	int sel = gtk_combo_box_get_active(dis->cpu_w);
-	int cpunum, item;
-	item = 0;
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		if (dis->machine->cpu[cpunum] != NULL)
-		{
-			const cpu_debug_data *cpuinfo = cpu_get_debug_data(dis->machine->cpu[cpunum]);
+	char title[256];
+	const disasm_subview_item *subview;
 
-			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
-			{
-				if(item == sel) {
-					disasmwin_update_selection(dis, cpunum);
-					return;
-				}
-				item++;
-			}
-		}
-	}
+	disasm_view_set_subview(dis->disasm, gtk_combo_box_get_active(dis->cpu_w));
+
+	disasmwin_update_checks(dis);
+
+	subview = disasm_view_get_current_subview(dis->disasm); 
+	sprintf(title, "Disassembly: %s", subview->name);
+	gtk_window_set_title(GTK_WINDOW(dis->win), title);
 }
 
 void disasmwin_raw_opcodes_activate(GtkMenuItem *item, gpointer user_data)
@@ -629,7 +614,7 @@ void disasmwin_raw_opcodes_activate(GtkMenuItem *item, gpointer user_data)
 	disasmwin_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "raw_opcodes")))) {
 		debug_view_begin_update(info->disasm);
-		debug_view_set_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN, DVP_DASM_RIGHTCOL_RAW);
+		disasm_view_set_right_column(info->disasm,  DASM_RIGHTCOL_RAW);
 		debug_view_end_update(info->disasm);
 	}
 }
@@ -639,7 +624,7 @@ void disasmwin_enc_opcodes_activate(GtkMenuItem *item, gpointer user_data)
 	disasmwin_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "enc_opcodes")))) {
 		debug_view_begin_update(info->disasm);
-		debug_view_set_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN, DVP_DASM_RIGHTCOL_ENCRYPTED);
+		disasm_view_set_right_column(info->disasm, DASM_RIGHTCOL_ENCRYPTED);
 		debug_view_end_update(info->disasm);
 	}
 }
@@ -649,7 +634,7 @@ void disasmwin_comments_activate(GtkMenuItem *item, gpointer user_data)
 	disasmwin_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "comments")))) {
 		debug_view_begin_update(info->disasm);
-		debug_view_set_property_UINT32(info->disasm, DVP_DASM_RIGHT_COLUMN, DVP_DASM_RIGHTCOL_COMMENTS);
+		disasm_view_set_right_column(info->disasm, DASM_RIGHTCOL_COMMENTS);
 		debug_view_end_update(info->disasm);
 	}
 }
@@ -657,7 +642,7 @@ void disasmwin_comments_activate(GtkMenuItem *item, gpointer user_data)
 static void disasmwin_process_string(running_machine *machine, const char *str, void *disp)
 {
 	disasmwin_i *dis = disp;
-	debug_view_set_property_string(dis->disasm, DVP_DASM_EXPRESSION, str);
+	disasm_view_set_expression(dis->disasm, str);
 }
 
 static void disasmwin_destroy(GtkObject *obj, gpointer user_data)
@@ -674,11 +659,29 @@ static void disasmwin_destroy(GtkObject *obj, gpointer user_data)
 	free(dis);
 }
 
+static void disasmwin_view_update(debug_view *view, void *osdprivate)
+{
+	disasmwin_i *dis = (disasmwin_i *)osdprivate;
+	debug_view_xy size;
+
+	size = debug_view_get_total_size(dis->disasm);
+	if ((dis->disasm_w->tr != size.y) || (dis->disasm_w->tc != size.x))
+	{
+		gtk_widget_queue_resize(GTK_WIDGET(dis->disasm_w));
+	}
+	else
+	{
+		gtk_widget_queue_draw(GTK_WIDGET(dis->disasm_w));
+	}
+}
+
 static void disasmwin_new(running_machine *machine)
 {
 	disasmwin_i *dis;
-	int cpunum, curcpu = cpunum_get_active();
-	int item, citem;
+	int item, cursel;
+	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
+	const disasm_subview_item *subview;
+	char title[256];
 
 	dis = malloc(sizeof(*dis));
 	memset(dis, 0, sizeof(*dis));
@@ -690,44 +693,34 @@ static void disasmwin_new(running_machine *machine)
 	dis->disasm_w = DVIEW(lookup_widget(dis->win, "disasmview"));
 	dis->cpu_w    = GTK_COMBO_BOX(lookup_widget(dis->win, "cpu"));
 
-	dis->disasm = debug_view_alloc(machine, DVT_DISASSEMBLY);
+	dis->disasm = debug_view_alloc(machine, DVT_DISASSEMBLY, disasmwin_view_update, dmain);
 
 	dview_set_debug_view(dis->disasm_w, dis->disasm);
 
 	edit_init(machine, &dis->ed, lookup_widget(dis->win, "edit"), "curpc", 1, disasmwin_process_string, dis);
 
 	debug_view_begin_update(dis->disasm);
-	debug_view_set_property_string(dis->disasm, DVP_DASM_EXPRESSION, "curpc");
-	debug_view_set_property_UINT32(dis->disasm, DVP_DASM_TRACK_LIVE, 1);
+	disasm_view_set_expression(dis->disasm, "curpc");
+//	debug_view_set_property_UINT32(dis->disasm, DVP_DASM_TRACK_LIVE, 1);
 	debug_view_end_update(dis->disasm);
 
 	// populate the combobox
-	item = 0;
-	citem = -1;
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
+	cursel = item = 0;
+	for (subview = disasm_view_get_subview_list(dis->disasm); subview != NULL; subview = subview->next)
 	{
-		if (machine->cpu[cpunum] != NULL)
-		{
-			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
-			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
-			{
-				char name[100];
-				sprintf(name, "CPU #%d \"%s\" (%s)", cpunum, machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
-				gtk_combo_box_append_text(dis->cpu_w, name);
-				if(cpunum == curcpu)
-					citem = item;
-				item++;
-			}
-		}
+		gtk_combo_box_append_text(dis->cpu_w, subview->name);
+		if (cursel == 0 && subview->space->cpu == curcpu)
+			cursel = item;
+
+		item++;
 	}
 
-	if(citem == -1) {
-		citem = 0;
-		curcpu = 0;
-	}
+	gtk_combo_box_set_active(dis->cpu_w, cursel);
+	disasm_view_set_subview(dis->disasm, cursel);
 
-	gtk_combo_box_set_active(dis->cpu_w, citem);
-	disasmwin_update_selection(dis, curcpu);
+	subview = disasm_view_get_current_subview(dis->disasm); 
+	sprintf(title, "Disassembly: %s", subview->name);
+	gtk_window_set_title(GTK_WINDOW(dis->win), title);
 
 	g_signal_connect(dis->cpu_w, "changed", G_CALLBACK(disasmwin_cpu_changed), dis);
 	g_signal_connect(lookup_widget(dis->win, "raw_opcodes"), "activate", G_CALLBACK(disasmwin_raw_opcodes_activate), dis);
@@ -752,6 +745,22 @@ static void logwin_destroy(GtkObject *obj, gpointer user_data)
 	free(log);
 }
 
+static void logwin_view_update(debug_view *view, void *osdprivate)
+{
+	logwin_i *log = (logwin_i *)osdprivate;
+	debug_view_xy size;
+
+	size = debug_view_get_total_size(log->log);
+	if ((log->log_w->tr != size.y) || (log->log_w->tc != size.x))
+	{
+		gtk_widget_queue_resize(GTK_WIDGET(log->log_w));
+	}
+	else
+	{
+		gtk_widget_queue_draw(GTK_WIDGET(log->log_w));
+	}
+}
+
 static void logwin_new(running_machine *machine)
 {
 	logwin_i *log;
@@ -765,10 +774,11 @@ static void logwin_new(running_machine *machine)
 
 	log->log_w = DVIEW(lookup_widget(log->win, "logview"));
 
-	log->log = debug_view_alloc(machine, DVT_LOG);
+	log->log = debug_view_alloc(machine, DVT_LOG, logwin_view_update, dmain);
+
+	dview_set_debug_view(log->log_w, log->log);
 
 	dview_this_one_is_stupidly_autoscrolling(log->log_w);
-	dview_set_debug_view(log->log_w, log->log);
 	g_signal_connect(log->win, "destroy", G_CALLBACK(logwin_destroy), log);
 
 	gtk_widget_show_all(log->win);
@@ -851,7 +861,7 @@ void on_chunks_1_activate(GtkMenuItem *item, gpointer user_data)
 	memorywin_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "chunks_1")))) {
 		debug_view_begin_update(info->memory);
-		debug_view_set_property_UINT32(info->memory, DVP_MEM_BYTES_PER_CHUNK, 1);
+		memory_view_set_bytes_per_chunk(info->memory, 1);
 		debug_view_end_update(info->memory);
 	}
 }
@@ -861,7 +871,7 @@ void on_chunks_2_activate(GtkMenuItem *item, gpointer user_data)
 	memorywin_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "chunks_2")))) {
 		debug_view_begin_update(info->memory);
-		debug_view_set_property_UINT32(info->memory, DVP_MEM_BYTES_PER_CHUNK, 2);
+		memory_view_set_bytes_per_chunk(info->memory, 2);
 		debug_view_end_update(info->memory);
 	}
 }
@@ -871,7 +881,7 @@ void on_chunks_4_activate(GtkMenuItem *item, gpointer user_data)
 	memorywin_i *info = user_data;
 	if(gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "chunks_4")))) {
 		debug_view_begin_update(info->memory);
-		debug_view_set_property_UINT32(info->memory, DVP_MEM_BYTES_PER_CHUNK, 4);
+		memory_view_set_bytes_per_chunk(info->memory, 4);
 		debug_view_end_update(info->memory);
 	}
 }
@@ -880,8 +890,8 @@ void on_reverse_activate(GtkMenuItem *item, gpointer user_data)
 {
 	memorywin_i *info = user_data;
 	debug_view_begin_update(info->memory);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_REVERSE_VIEW,
-								   gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "reverse"))));
+	memory_view_set_reverse(info->memory, gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(info->win, "reverse"))));
+								   
 	debug_view_end_update(info->memory);
 }
 
@@ -889,8 +899,7 @@ void on_ibpl_activate(GtkMenuItem *item, gpointer user_data)
 {
 	memorywin_i *info = user_data;
 	debug_view_begin_update(info->memory);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_WIDTH,
-								   debug_view_get_property_UINT32(info->memory, DVP_MEM_WIDTH) + 1);
+	memory_view_set_chunks_per_row(info->memory, memory_view_get_chunks_per_row(info->memory) + 1);
 	debug_view_end_update(info->memory);
 }
 
@@ -898,8 +907,7 @@ void on_dbpl_activate(GtkMenuItem *item, gpointer user_data)
 {
 	memorywin_i *info = user_data;
 	debug_view_begin_update(info->memory);
-	debug_view_set_property_UINT32(info->memory, DVP_MEM_WIDTH,
-								   debug_view_get_property_UINT32(info->memory, DVP_MEM_WIDTH) - 1);
+	memory_view_set_chunks_per_row(info->memory, memory_view_get_chunks_per_row(info->memory) - 1);
 	debug_view_end_update(info->memory);
 }
 
