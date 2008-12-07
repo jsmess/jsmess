@@ -1308,7 +1308,7 @@ static int frameskip_level_count(void)
 //	prepare_menus
 //============================================================
 
-static void prepare_menus(running_machine *machine, HWND wnd)
+static void prepare_menus(HWND wnd)
 {
 	int i;
 	char buf[MAX_PATH];
@@ -1343,7 +1343,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 
 	if (!joystick_menu_setup)
 	{
-		setup_joystick_menu(machine, menu_bar);
+		setup_joystick_menu(window->machine, menu_bar);
 		joystick_menu_setup = 1;
 	}
 
@@ -1353,13 +1353,13 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 
 	speed = video_get_throttle() ? video_get_speed_factor() : 0;
 
-	has_config		= input_has_input_class(machine, INPUT_CLASS_CONFIG);
-	has_dipswitch	= input_has_input_class(machine, INPUT_CLASS_DIPSWITCH);
-	has_keyboard	= input_has_input_class(machine, INPUT_CLASS_KEYBOARD);
-	has_misc		= input_has_input_class(machine, INPUT_CLASS_MISC);
+	has_config		= input_has_input_class(window->machine, INPUT_CLASS_CONFIG);
+	has_dipswitch	= input_has_input_class(window->machine, INPUT_CLASS_DIPSWITCH);
+	has_keyboard	= input_has_input_class(window->machine, INPUT_CLASS_KEYBOARD);
+	has_misc		= input_has_input_class(window->machine, INPUT_CLASS_MISC);
 
 	has_analog = 0;
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = window->machine->portconfig; port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1373,9 +1373,9 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 
 	set_command_state(menu_bar, ID_FILE_SAVESTATE,			state_filename[0] != '\0'					? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post(machine)					? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post(window->machine)			? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused(machine)				? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused(window->machine)		? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION,	has_config									? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES,		has_dipswitch								? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT,		has_misc									? MFS_ENABLED : MFS_GRAYED);
@@ -1389,9 +1389,9 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 #endif
 
 	set_command_state(menu_bar, ID_KEYBOARD_EMULATED,		(has_keyboard) ?
-																(!ui_mess_get_use_natural_keyboard(machine)					? MFS_CHECKED : MFS_ENABLED)
+																(!ui_mess_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
-	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(machine)) ?																(ui_mess_get_use_natural_keyboard(machine)					? MFS_CHECKED : MFS_ENABLED)
+	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(window->machine)) ?																(ui_mess_get_use_natural_keyboard(window->machine)					? MFS_CHECKED : MFS_ENABLED)
 																												: MFS_GRAYED);
 	set_command_state(menu_bar, ID_KEYBOARD_CUSTOMIZE,		has_keyboard								? MFS_ENABLED : MFS_GRAYED);
 
@@ -1414,7 +1414,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	// if we are using categorized input, we need to properly checkmark the categories
 	if (use_input_categories)
 	{
-		for (port = machine->portconfig; port != NULL; port = port->next)
+		for (port = window->machine->portconfig; port != NULL; port = port->next)
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1423,7 +1423,7 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 					input_field_get_user_settings(field, &settings);
 					for (setting = field->settinglist; setting != NULL; setting = setting->next)
 					{
-						command = ID_INPUT_0 + serial_number_from_input_item(machine, port, field, setting);
+						command = ID_INPUT_0 + serial_number_from_input_item(window->machine, port, field, setting);
 						set_command_state(menu_bar, command, (setting->value == settings.value) ? MFS_CHECKED : MFS_ENABLED);
 					}
 				}
@@ -1456,9 +1456,9 @@ static void prepare_menus(running_machine *machine, HWND wnd)
 	remove_menu_items(device_menu);
 
 	// then set up the actual devices
-	for (img = image_device_first(machine->config); img != NULL; img = image_device_next(img))
+	for (img = image_device_first(window->machine->config); img != NULL; img = image_device_next(img))
 	{
-		image_device_info info = image_device_getinfo(machine->config, img);
+		image_device_info info = image_device_getinfo(window->machine->config, img);
 
 		new_item = ID_DEVICE_0 + (image_absolute_index(img) * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;
@@ -1745,7 +1745,7 @@ static int pause_for_command(UINT command)
 //	invoke_command
 //============================================================
 
-static int invoke_command(running_machine *machine, HWND wnd, UINT command)
+static int invoke_command(HWND wnd, UINT command)
 {
 	int handled = 1;
 	int dev_command;
@@ -1760,28 +1760,28 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 
 	// pause while invoking certain commands
 	if (pause_for_command(command))
-		winwindow_ui_pause_from_window_thread(machine, TRUE);
+		winwindow_ui_pause_from_window_thread(window->machine, TRUE);
 
 	switch(command)
 	{
 		case ID_FILE_LOADSTATE:
-			state_load(wnd, machine);
+			state_load(wnd, window->machine);
 			break;
 
 		case ID_FILE_SAVESTATE:
-			state_save(machine);
+			state_save(window->machine);
 			break;
 
 		case ID_FILE_SAVESTATE_AS:
-			state_save_as(wnd, machine);
+			state_save_as(wnd, window->machine);
 			break;
 
 		case ID_FILE_SAVESCREENSHOT:
-			video_save_active_screen_snapshots(machine);
+			video_save_active_screen_snapshots(window->machine);
 			break;
 
 		case ID_FILE_EXIT:
-			mame_schedule_exit(machine);
+			mame_schedule_exit(window->machine);
 			break;
 
 		case ID_EDIT_PASTE:
@@ -1789,15 +1789,15 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			break;
 
 		case ID_KEYBOARD_NATURAL:
-			ui_mess_set_use_natural_keyboard(machine, TRUE);
+			ui_mess_set_use_natural_keyboard(window->machine, TRUE);
 			break;
 
 		case ID_KEYBOARD_EMULATED:
-			ui_mess_set_use_natural_keyboard(machine, FALSE);
+			ui_mess_set_use_natural_keyboard(window->machine, FALSE);
 			break;
 
 		case ID_KEYBOARD_CUSTOMIZE:
-			customize_keyboard(machine, wnd);
+			customize_keyboard(window->machine, wnd);
 			break;
 
 		case ID_VIDEO_ROTATE_0:
@@ -1817,15 +1817,15 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			break;
 
 		case ID_OPTIONS_PAUSE:
-			pause(machine);
+			pause(window->machine);
 			break;
 
 		case ID_OPTIONS_HARDRESET:
-			mame_schedule_hard_reset(machine);
+			mame_schedule_hard_reset(window->machine);
 			break;
 
 		case ID_OPTIONS_SOFTRESET:
-			mame_schedule_soft_reset(machine);
+			mame_schedule_soft_reset(window->machine);
 			break;
 
 #if HAS_PROFILER
@@ -1835,23 +1835,23 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 #endif // HAS_PROFILER
 
 		case ID_OPTIONS_DEBUGGER:
-			debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(machine), "User-initiated break\n");
+			debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(window->machine), "User-initiated break\n");
 			break;
 
 		case ID_OPTIONS_CONFIGURATION:
-			customize_configuration(machine, wnd);
+			customize_configuration(window->machine, wnd);
 			break;
 
 		case ID_OPTIONS_DIPSWITCHES:
-			customize_dipswitches(machine, wnd);
+			customize_dipswitches(window->machine, wnd);
 			break;
 
 		case ID_OPTIONS_MISCINPUT:
-			customize_miscinput(machine, wnd);
+			customize_miscinput(window->machine, wnd);
 			break;
 
 		case ID_OPTIONS_ANALOGCONTROLS:
-			customize_analogcontrols(machine, wnd);
+			customize_analogcontrols(window->machine, wnd);
 			break;
 
 #if HAS_TOGGLEFULLSCREEN
@@ -1887,7 +1887,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			break;
 
 		case ID_HELP_ABOUTSYSTEM:
-			help_about_thissystem(machine, wnd);
+			help_about_thissystem(window->machine, wnd);
 			break;
 
 		case ID_THROTTLE_50:
@@ -1923,20 +1923,20 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (MAX_DEV_INSTANCES*IO_COUNT*DEVOPTION_MAX)))
 			{
 				// change device
-				img = decode_deviceoption(machine, command, &dev_command);
+				img = decode_deviceoption(window->machine, command, &dev_command);
 				device_command(wnd, img, dev_command);
 			}
 			else if ((command >= ID_JOYSTICK_0) && (command < ID_JOYSTICK_0 + MAX_JOYSTICKS))
 			{
 				// customize joystick
-				customize_joystick(machine, wnd, command - ID_JOYSTICK_0);
+				customize_joystick(window->machine, wnd, command - ID_JOYSTICK_0);
 			}
 			else if ((command >= ID_VIDEO_VIEW_0) && (command < ID_VIDEO_VIEW_0 + 1000))
 			{
 				// render views
 				render_target_set_view(window->target, command - ID_VIDEO_VIEW_0);
 			}
-			else if (input_item_from_serial_number(machine, command - ID_INPUT_0, NULL, &field, &setting))
+			else if (input_item_from_serial_number(window->machine, command - ID_INPUT_0, NULL, &field, &setting))
 			{
 				if ((field != NULL) && (field->type == IPT_CATEGORY) && (setting != NULL))
 				{
@@ -1960,7 +1960,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 							section = setting->name;
 						}
 					}
-					customize_categorizedinput(machine, wnd, section, category);
+					customize_categorizedinput(window->machine, wnd, section, category);
 				}
 				else
 				{
@@ -1978,7 +1978,7 @@ static int invoke_command(running_machine *machine, HWND wnd, UINT command)
 
 	// resume emulation
 	if (pause_for_command(command))
-		winwindow_ui_pause_from_window_thread(machine, FALSE);
+		winwindow_ui_pause_from_window_thread(window->machine, FALSE);
 
 	return handled;
 }
@@ -2144,7 +2144,7 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 	switch(message)
 	{
 		case WM_INITMENU:
-			prepare_menus(Machine, wnd);
+			prepare_menus(wnd);
 			break;
 
 		case WM_PASTE:
@@ -2152,7 +2152,7 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 			break;
 
 		case WM_COMMAND:
-			if (invoke_command(Machine, wnd, wparam))
+			if (invoke_command(wnd, wparam))
 				break;
 			/* fall through */
 
