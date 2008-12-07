@@ -845,7 +845,7 @@ static TIMER_CALLBACK( pmd_reset )
 static DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 {
 	if (input_port_read(space->machine, "RESET") & 0x01) 
-		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
+		timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, pmd_reset);
 	return address;
 }
 

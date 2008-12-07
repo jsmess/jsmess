@@ -49,7 +49,7 @@ static TIMER_CALLBACK( lviv_reset )
 static DIRECT_UPDATE_HANDLER(lviv_directoverride)
 {
 	if (input_port_read(space->machine, "RESET") & 0x01)
-		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
+		timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, lviv_reset);
 	return address;
 }
 

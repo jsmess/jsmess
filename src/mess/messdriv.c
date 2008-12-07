@@ -41,21 +41,21 @@ const game_driver * const drivers[] =
 	DRIVER( 3do_pal )
 
 	/* ATARI */
-//0128u5	DRIVER( a2600 )		/* Atari 2600										*/
-//0128u5	DRIVER( a2600p )	/* Atari 2600 PAL									*/
-//0128u5	DRIVER( a5200 )		/* Atari 5200										*/
-//0128u5	DRIVER( a5200a )	/* Atari 5200 alt									*/
-//0128u5	DRIVER( a7800 )		/* Atari 7800 NTSC									*/
-//0128u5	DRIVER( a7800p )	/* Atari 7800 PAL									*/
+	DRIVER( a2600 )		/* Atari 2600										*/
+	DRIVER( a2600p )	/* Atari 2600 PAL									*/
+	DRIVER( a5200 )		/* Atari 5200										*/
+	DRIVER( a5200a )	/* Atari 5200 alt									*/
+	DRIVER( a7800 )		/* Atari 7800 NTSC									*/
+	DRIVER( a7800p )	/* Atari 7800 PAL									*/
 	DRIVER( lynx )		/* Atari Lynx Handheld								*/
 	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
-//0128u5	DRIVER( jaguar )	/* Atari Jaguar										*/
-//0128u5	DRIVER( atarist )	/* Atari ST											*/
-//0128u5	DRIVER( megast )	/* Atari Mega ST									*/
+	DRIVER( jaguar )	/* Atari Jaguar										*/
+	DRIVER( atarist )	/* Atari ST											*/
+	DRIVER( megast )	/* Atari Mega ST									*/
 //	DRIVER( stacy )		/* Atari STacy										*/
-//0128u5	DRIVER( atariste )	/* Atari STe										*/
-//0128u5	DRIVER( stbook )	/* Atari STBook										*/
-//0128u5	DRIVER( megaste )	/* Atari Mega STe									*/
+	DRIVER( atariste )	/* Atari STe										*/
+	DRIVER( stbook )	/* Atari STBook										*/
+	DRIVER( megaste )	/* Atari Mega STe									*/
 //	DRIVER( stpad )		/* Atari STPad (prototype)							*/
 //	DRIVER( tt030 )		/* Atari TT030										*/
 //	DRIVER( fx1 )		/* Atari FX-1 (prototype)							*/
@@ -153,9 +153,9 @@ const game_driver * const drivers[] =
 	DRIVER( vcg )		/* Palladium Video-Computer-Game					*/
 
 	/* GCE */
-//0128u5	DRIVER( vectrex )	/* General Consumer Electric Vectrex - 1982-1984	*/
+	DRIVER( vectrex )	/* General Consumer Electric Vectrex - 1982-1984	*/
 						/* (aka Milton-Bradley Vectrex)						*/
-//0128u5	DRIVER( raaspec )	/* RA+A Spectrum - Modified Vectrex					*/
+	DRIVER( raaspec )	/* RA+A Spectrum - Modified Vectrex					*/
 
 	/* MATTEL */
 //0128u5	DRIVER( intv )		/* Mattel Intellivision - 1979 AKA INTV				*/
@@ -188,7 +188,7 @@ const game_driver * const drivers[] =
 //0128u5	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
 
 	/* EPOCH */
-//0128u5	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
+	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
 	/* KOEI */
 //0128u5	DRIVER( pasogo )	/* KOEI PasoGo										*/
@@ -295,11 +295,11 @@ XL/XE 16kB OS roms
 4    XEGS    05/07/1987  0x1eaf4002  C101687
 */
 
-//0128u5	DRIVER( a400 )		/* 1979 Atari 400									*/
-//0128u5	DRIVER( a400pal )	/* 1979 Atari 400 PAL								*/
-//0128u5	DRIVER( a800 )		/* 1979 Atari 800									*/
-//0128u5	DRIVER( a800pal )	/* 1979 Atari 800 PAL								*/
-//0128u5	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
+	DRIVER( a400 )		/* 1979 Atari 400									*/
+	DRIVER( a400pal )	/* 1979 Atari 400 PAL								*/
+	DRIVER( a800 )		/* 1979 Atari 800									*/
+	DRIVER( a800pal )	/* 1979 Atari 800 PAL								*/
+	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
 
 	/* COMMODORE */
 	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
@@ -809,40 +809,40 @@ XL/XE 16kB OS roms
 //	DRIVER( aquariu2 )	/* 1984 Aquarius II									*/
 
 	/*EXIDY INC */
-//0128u5	DRIVER( exidy )		/* Sorcerer											*/
-//0128u5	DRIVER( exidyd )	/* Sorcerer (cassette only)								*/
+	DRIVER( exidy )		/* Sorcerer											*/
+	DRIVER( exidyd )	/* Sorcerer (cassette only)								*/
 
 	/* GALAKSIJA */
 	DRIVER( galaxy )
 	DRIVER( galaxyp )
 
 	/* Lviv/L'vov */
-//0128u5	DRIVER( lviv )		/* Lviv/L'vov										*/
+	DRIVER( lviv )		/* Lviv/L'vov										*/
 
 	/* Tesla */
-//0128u5	DRIVER( pmd851 )	/* PMD-85.1											*/
-//0128u5	DRIVER( pmd852 )	/* PMD-85.2											*/
-//0128u5	DRIVER( pmd852a )	/* PMD-85.2A										*/
-//0128u5	DRIVER( pmd852b )	/* PMD-85.2B										*/
-//0128u5	DRIVER( pmd853 )	/* PMD-85.3											*/
+	DRIVER( pmd851 )	/* PMD-85.1											*/
+	DRIVER( pmd852 )	/* PMD-85.2											*/
+	DRIVER( pmd852a )	/* PMD-85.2A										*/
+	DRIVER( pmd852b )	/* PMD-85.2B										*/
+	DRIVER( pmd853 )	/* PMD-85.3											*/
 
 	/* Didaktik */
-//0128u5	DRIVER( alfa )		/* Alfa (PMD-85.1 clone)							*/
+	DRIVER( alfa )		/* Alfa (PMD-85.1 clone)							*/
 
 	/* Statny */
-//0128u5	DRIVER( mato )		/* Mato (PMD-85.2 clone)							*/
+	DRIVER( mato )		/* Mato (PMD-85.2 clone)							*/
 	
 	/* Zbrojovka Brno */
-//0128u5	DRIVER( c2717 )		/* Consul 2717 (PMD-85.2 clone)				*/
+	DRIVER( c2717 )		/* Consul 2717 (PMD-85.2 clone)				*/
 	
 	/* Microkey */
-//0128u5	DRIVER( primoa32 )	/* Primo A-32										*/
-//0128u5	DRIVER( primoa48 )	/* Primo A-48										*/
-//0128u5	DRIVER( primoa64 )	/* Primo A-64										*/
-//0128u5	DRIVER( primob32 )	/* Primo B-32										*/
-//0128u5	DRIVER( primob48 )	/* Primo B-48										*/
-//0128u5	DRIVER( primob64 )	/* Primo B-64										*/
-//0128u5	DRIVER( primoc64 )	/* Primo C-64										*/
+	DRIVER( primoa32 )	/* Primo A-32										*/
+	DRIVER( primoa48 )	/* Primo A-48										*/
+	DRIVER( primoa64 )	/* Primo A-64										*/
+	DRIVER( primob32 )	/* Primo B-32										*/
+	DRIVER( primob48 )	/* Primo B-48										*/
+	DRIVER( primob64 )	/* Primo B-64										*/
+	DRIVER( primoc64 )	/* Primo C-64										*/
 
 	/* Team Concepts */
 	/* CPU not known, else should be easy, look into drivers/comquest.c */
