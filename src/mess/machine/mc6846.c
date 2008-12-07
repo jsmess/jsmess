@@ -570,22 +570,22 @@ void mc6846_config ( const mc6846_interface* iface )
 	mc6846.interval = timer_alloc(machine,  mc6846_timer_expire , NULL);
 	mc6846.one_shot = timer_alloc(machine,  mc6846_timer_one_shot , NULL);
 
-	state_save_register_item( "mc6846", NULL, 0, mc6846.csr );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.pcr );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.ddr );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.pdr );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.tcr );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.cp1 );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.cp2 );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.cp2_cpu );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.cto );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.time_MSB );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.csr0_to_be_cleared );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.csr1_to_be_cleared );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.csr2_to_be_cleared );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.latch );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.preset );
-	state_save_register_item( "mc6846", NULL, 0, mc6846.timer_started );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.csr );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.pcr );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.ddr );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.pdr );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.tcr );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.cp1 );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.cp2 );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.cp2_cpu );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.cto );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.time_MSB );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.csr0_to_be_cleared );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.csr1_to_be_cleared );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.csr2_to_be_cleared );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.latch );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.preset );
+	state_save_register_item(machine, "mc6846", NULL, 0, mc6846.timer_started );
 
 	mc6846_reset();
 }

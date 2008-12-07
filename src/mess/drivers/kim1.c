@@ -289,9 +289,9 @@ static TIMER_CALLBACK( kim1_update_leds )
 
 static MACHINE_START( kim1 )
 {
-	state_save_register_item( "kim1", NULL, 0, kim1_u2_port_b );
-	state_save_register_item( "kim1", NULL, 0, kim1_311_output );
-	state_save_register_item( "kim1", NULL, 0, kim1_cassette_high_count );
+	state_save_register_item(machine, "kim1", NULL, 0, kim1_u2_port_b );
+	state_save_register_item(machine, "kim1", NULL, 0, kim1_311_output );
+	state_save_register_item(machine, "kim1", NULL, 0, kim1_cassette_high_count );
 }
 
 

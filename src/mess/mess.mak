@@ -397,6 +397,11 @@ DRVLIBS = \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/shared.a \
+	$(MESSOBJ)/kaypro.a \
+	$(MESSOBJ)/kim1.a \
+	$(MESSOBJ)/lynx.a \
+	$(MESSOBJ)/magnavox.a \
+	$(MESSOBJ)/mbee.a \
 
 #	$(MESSOBJ)/amstrad.a \
 #	$(MESSOBJ)/atari.a \
@@ -418,14 +423,9 @@ DRVLIBS = \
 #	$(MESSOBJ)/intv.a \
 #	$(MESSOBJ)/irisha.a \
 #	$(MESSOBJ)/jupiter.a \
-#	$(MESSOBJ)/kaypro.a \
-#	$(MESSOBJ)/kim1.a \
 #	$(MESSOBJ)/kramermc.a \
 #	$(MESSOBJ)/luxor.a \
 #	$(MESSOBJ)/lviv.a \
-#	$(MESSOBJ)/lynx.a \
-#	$(MESSOBJ)/magnavox.a \
-#	$(MESSOBJ)/mbee.a \
 #	$(MESSOBJ)/mc10.a \
 #	$(MESSOBJ)/memotech.a \
 #	$(MESSOBJ)/mephisto.a \

@@ -1283,7 +1283,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	if (! tms5220_ready_r())
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-		int cycles_to_ready = ceil(ATTOTIME_TO_CYCLES(0, time_to_ready));
+		int cycles_to_ready = ceil(cpu_attotime_to_clocks(machine->cpu[0], time_to_ready));
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
@@ -1644,7 +1644,7 @@ WRITE8_HANDLER ( ti99_8_w )
 					if (! tms5220_ready_r())
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-						double d = ceil(ATTOTIME_TO_CYCLES(0, time_to_ready));
+						double d = ceil(cpu_attotime_to_clocks(machine->cpu[0], time_to_ready));
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
 						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)

@@ -413,7 +413,7 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	if (! tms5220_ready_r())
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-		int cycles_to_ready = ceil(ATTOTIME_TO_CYCLES(0, time_to_ready));
+		int cycles_to_ready = ceil(cpu_attotime_to_clocks(machine->cpu[0], time_to_ready));
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 

@@ -47,8 +47,8 @@ const game_driver * const drivers[] =
 //0128u5	DRIVER( a5200a )	/* Atari 5200 alt									*/
 //0128u5	DRIVER( a7800 )		/* Atari 7800 NTSC									*/
 //0128u5	DRIVER( a7800p )	/* Atari 7800 PAL									*/
-//0128u5	DRIVER( lynx )		/* Atari Lynx Handheld								*/
-//0128u5	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
+	DRIVER( lynx )		/* Atari Lynx Handheld								*/
+	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
 //0128u5	DRIVER( jaguar )	/* Atari Jaguar										*/
 //0128u5	DRIVER( atarist )	/* Atari ST											*/
 //0128u5	DRIVER( megast )	/* Atari Mega ST									*/
@@ -168,7 +168,7 @@ const game_driver * const drivers[] =
 //0128u5	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/
 
 	/* MAGNAVOX */
-//0128u5	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
+	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
 	/* Hartung, Watara, ...*/
 //0128u5	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
@@ -574,7 +574,7 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( ep128 )		/* Enterprise 128 k									*/
 
 	/* NON LINEAR SYSTEMS */
-//0128u5	DRIVER( kaypro )	/* Kaypro 2X										*/
+	DRIVER( kaypro )	/* Kaypro 2X										*/
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */

@@ -767,7 +767,7 @@ static TIMER_CALLBACK(lynx_blitter_timer)
 
 */
 
-static void lynx_blitter(void)
+static void lynx_blitter(running_machine *machine)
 {
 	static const int lynx_colors[4]={2,4,8,16};
 
@@ -1007,7 +1007,7 @@ READ8_HANDLER( suzy_read )
 		case 0x92:	/* Better check this with docs! */
 			if (!attotime_compare(blitter.time, attotime_zero))
 			{
-				if (ATTOTIME_TO_CYCLES(0, attotime_sub(timer_get_time(machine), blitter.time)) > blitter.memory_accesses * 20)
+				if (cpu_attotime_to_clocks(space->machine->cpu[0], attotime_sub(timer_get_time(space->machine), blitter.time)) > blitter.memory_accesses * 20)
 				{
 					suzy.data[offset] &= ~0x01; //blitter finished
 					blitter.time = attotime_zero;
@@ -1139,8 +1139,8 @@ WRITE8_HANDLER(suzy_write)
 	case 0x91:
 		if (data & 0x01) 
 		{
-			blitter.time = timer_get_time(machine);
-			lynx_blitter();
+			blitter.time = timer_get_time(space->machine);
+			lynx_blitter(space->machine);
 		}
 		break;
 //	case 0xb2: case 0xb3: /* Cart Bank 0 & 1 */
@@ -1355,7 +1355,7 @@ static LYNX_TIMER lynx_timer[NR_LYNX_TIMERS];
 
 static TIMER_CALLBACK(lynx_timer_shot);
 
-static void lynx_timer_init(int which)
+static void lynx_timer_init(running_machine *machine, int which)
 {
 	memset( &lynx_timer[which], 0, sizeof(LYNX_TIMER) );
 	lynx_timer[which].timer = timer_alloc(machine,  lynx_timer_shot , NULL);
@@ -1591,7 +1591,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 			{
 				uart.sending = TRUE;
 				uart.data_to_send = data;
-				timer_set(machine, ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+				timer_set(space->machine, ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
 			}
 			break;
 	}
@@ -1826,7 +1826,7 @@ static void lynx_reset(running_machine *machine)
 	lynx_uart_reset();
 
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
-		lynx_timer_init( i );
+		lynx_timer_init(machine, i);
 
 	lynx_audio_reset();
 

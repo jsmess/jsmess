@@ -1210,9 +1210,9 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	state_save_register_global(machine,  hp48_bank_switch );
 	for ( i = 0; i < 6; i++ ) 
 	{
-		state_save_register_item( "globals", NULL, i, hp48_modules[i].state );
-		state_save_register_item( "globals", NULL, i, hp48_modules[i].base );
-		state_save_register_item( "globals", NULL, i, hp48_modules[i].mask );
+		state_save_register_item(machine, "globals", NULL, i, hp48_modules[i].state );
+		state_save_register_item(machine, "globals", NULL, i, hp48_modules[i].base );
+		state_save_register_item(machine, "globals", NULL, i, hp48_modules[i].mask );
 	}
 	state_save_register_global_array(machine,  hp48_io );
 	state_save_register_global_pointer(machine,  generic_nvram, generic_nvram_size );

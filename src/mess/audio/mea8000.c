@@ -662,31 +662,31 @@ void mea8000_config ( running_machine *machine, int channel, write8_space_func r
 	mea8000.req_out_func = req_out_func;
 	mea8000.timer = timer_alloc(machine,  mea8000_timer_expire , NULL);
 
-	state_save_register_item( "mea8000", NULL, 0, mea8000.state );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.state );
 	state_save_register_item_array( "mea8000", NULL, 0, mea8000.buf );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.bufpos );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.cont );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.roe );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.framelength );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.framepos );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.framelog );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.lastsample );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.sample );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.phi );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.bufpos );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.cont );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.roe );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.framelength );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.framepos );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.framelog );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.lastsample );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.sample );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.phi );
 	for (i=0; i<4; i++)
 	{
-		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].fm );
-		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].last_fm );
-		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].bw );
-		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].last_bw );
-		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].output );
-		state_save_register_item( "mea8000", NULL, i, mea8000.f[i].last_output );
+		state_save_register_item(machine, "mea8000", NULL, i, mea8000.f[i].fm );
+		state_save_register_item(machine, "mea8000", NULL, i, mea8000.f[i].last_fm );
+		state_save_register_item(machine, "mea8000", NULL, i, mea8000.f[i].bw );
+		state_save_register_item(machine, "mea8000", NULL, i, mea8000.f[i].last_bw );
+		state_save_register_item(machine, "mea8000", NULL, i, mea8000.f[i].output );
+		state_save_register_item(machine, "mea8000", NULL, i, mea8000.f[i].last_output );
 	}
-	state_save_register_item( "mea8000", NULL, 0, mea8000.last_ampl );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.ampl );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.last_pitch );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.pitch );
-	state_save_register_item( "mea8000", NULL, 0, mea8000.noise );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.last_ampl );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.ampl );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.last_pitch );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.pitch );
+	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.noise );
 
 	mea8000_reset(machine);
 }
