@@ -4563,7 +4563,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 	case ID_OPTIONS_HISTORY:
 		{
 			char filename[MAX_PATH];
-			strcpy(filename, GetHistoryFileName());
+			_tcscpy(filename, GetHistoryFileName());
 			if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_HISTORY_FILE))
 			{
 				SetHistoryFileName(filename);
@@ -4573,7 +4573,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 	case ID_OPTIONS_MAMEINFO:
 		{
 			char filename[MAX_PATH];
-			strcpy(filename, GetMAMEInfoFileName());
+			_tcscpy(filename, GetMAMEInfoFileName());
 			if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_MAMEINFO_FILE))
 			{
 				SetMAMEInfoFileName(filename);
@@ -5170,6 +5170,8 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 	int value = 0;  /* Default to 0, for unknown case */
 	const char *name1 = NULL;
 	const char *name2 = NULL;
+	char file1[20];
+	char file2[20];
 	int nTemp1, nTemp2;
 
 #ifdef DEBUG
@@ -5267,7 +5269,9 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 		break;
 
    	case COLUMN_SRCDRIVERS:
-		value = mame_stricmp(drivers[index1]->source_file, drivers[index2]->source_file);
+		strcpy(file1, GetDriverFilename(index1));
+		strcpy(file2, GetDriverFilename(index2));
+		value = mame_stricmp(file1, file2);
 		break;
 
 	case COLUMN_PLAYTIME:

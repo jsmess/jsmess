@@ -298,8 +298,16 @@ const char * GetDriverFilename(int nIndex)
 	tmp[0] = '\0';
 
 	ptmp = strrchr(s, '\\');
-	if (ptmp == NULL)
+	if (ptmp == NULL) {
 		ptmp = strrchr(s, '/');
+	}
+	else {
+		char *ptmp2;
+		ptmp2 = strrchr(ptmp, '/');
+		if (ptmp2 != NULL) {
+			ptmp = ptmp2;
+		}
+	}
 	if (ptmp == NULL)
 		return s;
 
