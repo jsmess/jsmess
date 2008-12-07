@@ -4563,7 +4563,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 	case ID_OPTIONS_HISTORY:
 		{
 			char filename[MAX_PATH];
-			_tcscpy(filename, GetHistoryFileName());
+			strcpy(filename, GetHistoryFileName());
 			if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_HISTORY_FILE))
 			{
 				SetHistoryFileName(filename);
@@ -4573,7 +4573,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 	case ID_OPTIONS_MAMEINFO:
 		{
 			char filename[MAX_PATH];
-			_tcscpy(filename, GetMAMEInfoFileName());
+			strcpy(filename, GetMAMEInfoFileName());
 			if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_MAMEINFO_FILE))
 			{
 				SetMAMEInfoFileName(filename);
