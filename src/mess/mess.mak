@@ -417,6 +417,7 @@ DRVLIBS = \
 	$(MESSOBJ)/lynx.a \
 	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/mbee.a \
+	$(MESSOBJ)/mc10.a \
 	$(MESSOBJ)/mikro80.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
@@ -432,6 +433,14 @@ DRVLIBS = \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vector06.a \
+	$(MESSOBJ)/tiger.a \
+	$(MESSOBJ)/trs80.a \
+	$(MESSOBJ)/tutor.a \
+	$(MESSOBJ)/tx0.a \
+	$(MESSOBJ)/vc4000.a \
+	$(MESSOBJ)/veb.a \
+	$(MESSOBJ)/votrax.a \
+	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/amstrad.a \
@@ -441,7 +450,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/intv.a \
 #	$(MESSOBJ)/jupiter.a \
 #	$(MESSOBJ)/luxor.a \
-#	$(MESSOBJ)/mc10.a \
 #	$(MESSOBJ)/memotech.a \
 #	$(MESSOBJ)/mephisto.a \
 #	$(MESSOBJ)/mk1.a \
@@ -478,14 +486,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/thomson.a \
 #	$(MESSOBJ)/ti85.a \
 #	$(MESSOBJ)/ti99.a \
-#	$(MESSOBJ)/tiger.a \
-#	$(MESSOBJ)/trs80.a \
-#	$(MESSOBJ)/tutor.a \
-#	$(MESSOBJ)/tx0.a \
-#	$(MESSOBJ)/vc4000.a \
-#	$(MESSOBJ)/veb.a \
-#	$(MESSOBJ)/votrax.a \
-#	$(MESSOBJ)/vtech.a \
 
 
 

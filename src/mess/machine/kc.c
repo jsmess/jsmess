@@ -411,7 +411,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 	z80pio_astb_w(kc85_z80pio,bit & kc_ardy);
 }
 
-static void	kc_cassette_init(void)
+static void	kc_cassette_init(running_machine *machine)
 {
 	kc_cassette_timer = timer_alloc(machine, kc_cassette_timer_callback, NULL);
 }
@@ -1846,7 +1846,7 @@ const z80ctc_interface	kc85_ctc_intf =
 
 static void	kc85_common_init(running_machine *machine)
 {
-	kc_cassette_init();
+	kc_cassette_init(machine);
 	kc_keyboard_init(machine);
 
 	/* kc85 has a 50 Hz input to the ctc channel 2 and 3 */

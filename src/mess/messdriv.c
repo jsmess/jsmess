@@ -181,7 +181,7 @@ const game_driver * const drivers[] =
 //0128u5	DRIVER( tvlinkp )
 
 	/* INTERTON */
-//0128u5	DRIVER( vc4000 )	/* Interton vc4000									*/
+	DRIVER( vc4000 )	/* Interton vc4000									*/
 
 	/* BANDAI */
 //0128u5	DRIVER( wswan )		/* Bandai WonderSwan Handheld						*/
@@ -571,16 +571,16 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( einstei2 )
 
 	/* INTELLIGENT SOFTWARE */
-//0128u5	DRIVER( ep128 )		/* Enterprise 128 k									*/
+	DRIVER( ep128 )		/* Enterprise 128 k									*/
 
 	/* NON LINEAR SYSTEMS */
 	DRIVER( kaypro )	/* Kaypro 2X										*/
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */
-//0128u5	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
-//0128u5	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
-//0128u5	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
+	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
+	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
+	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
 	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
@@ -590,15 +590,15 @@ XL/XE 16kB OS roms
 	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
-//0128u5	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
-//0128u5	DRIVER( trs80l2 )	/* TRS-80 Model I - Level II BASIC					*/
-//0128u5	DRIVER( sys80 )		/* EACA System 80									*/
-//0128u5	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
-//0128u5	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
-//0128u5	DRIVER( trs80m4 )
-//0128u5	DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
-//0128u5	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
-//0128u5	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
+	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
+	DRIVER( trs80l2 )	/* TRS-80 Model I - Level II BASIC					*/
+	DRIVER( sys80 )		/* EACA System 80									*/
+	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
+	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
+	DRIVER( trs80m4 )
+	DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
+	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
+	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
 
 	DRIVER( coco )		/* Color Computer									*/
 	DRIVER( cocoe )		/* Color Computer (Extended BASIC 1.0)				*/
@@ -614,30 +614,30 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( dgnbeta )	/* Dragon Beta										*/
 	DRIVER( tanodr64 )	/* Tano Dragon 64 (NTSC)							*/
 	DRIVER( cp400 )		/* Prologica CP400									*/
-//0128u5	DRIVER( mc10 )		/* MC-10											*/
-//0128u5	DRIVER( alice )		/* Matra & Hachette Ordinateur Alice				*/
+	DRIVER( mc10 )		/* MC-10											*/
+	DRIVER( alice )		/* Matra & Hachette Ordinateur Alice				*/
 
 	/* EACA */
 	DRIVER( cgenie )	/* Colour Genie EG2000								*/
 	/* system 80 trs80 compatible */
 
 	/* VIDEO TECHNOLOGY */
-//0128u5	DRIVER( crvision )	/* 1981 creatiVision								*/
-//0128u5	DRIVER( fnvision )	/* 1983 FunVision									*/
-//0128u5	DRIVER( laser110 )	/* 1983 Laser 110									*/
-//0128u5	DRIVER( las110de )	/* 1983 Sanyo Laser 110 (Germany)					*/
-//0128u5	DRIVER( laser200 )	/* 1983 Laser 200 (color version of 110)			*/
+	DRIVER( crvision )	/* 1981 creatiVision								*/
+	DRIVER( fnvision )	/* 1983 FunVision									*/
+	DRIVER( laser110 )	/* 1983 Laser 110									*/
+	DRIVER( las110de )	/* 1983 Sanyo Laser 110 (Germany)					*/
+	DRIVER( laser200 )	/* 1983 Laser 200 (color version of 110)			*/
 //	DRIVER( vz200de )	/* 1983 VZ-200 (Germany)							*/
-//0128u5	DRIVER( fellow )	/* 1983 Salora Fellow (Finland) 					*/
-//0128u5	DRIVER( tx8000 )	/* 1983 Texet TX-8000 (U.K.)						*/
-//0128u5	DRIVER( laser210 )	/* 1984 Laser 210 (200 with more memory)			*/
-//0128u5	DRIVER( las210de )	/* 1984 Sanyo Laser 210 (Germany)					*/
-//0128u5	DRIVER( vz200 )		/* 1984 Dick Smith Electronics VZ-200				*/
-//0128u5	DRIVER( laser310 )	/* 1984 Laser 310 (210 with diff. keyboard and RAM)	*/
-//0128u5	DRIVER( vz300 )		/* 1984 Dick Smith Electronics VZ-300				*/
-//0128u5	DRIVER( laser350 )	/* 1984? Laser 350									*/
-//0128u5	DRIVER( laser500 )	/* 1984? Laser 500									*/
-//0128u5	DRIVER( laser700 )	/* 1984? Laser 700									*/
+	DRIVER( fellow )	/* 1983 Salora Fellow (Finland) 					*/
+	DRIVER( tx8000 )	/* 1983 Texet TX-8000 (U.K.)						*/
+	DRIVER( laser210 )	/* 1984 Laser 210 (200 with more memory)			*/
+	DRIVER( las210de )	/* 1984 Sanyo Laser 210 (Germany)					*/
+	DRIVER( vz200 )		/* 1984 Dick Smith Electronics VZ-200				*/
+	DRIVER( laser310 )	/* 1984 Laser 310 (210 with diff. keyboard and RAM)	*/
+	DRIVER( vz300 )		/* 1984 Dick Smith Electronics VZ-300				*/
+	DRIVER( laser350 )	/* 1984? Laser 350									*/
+	DRIVER( laser500 )	/* 1984? Laser 500									*/
+	DRIVER( laser700 )	/* 1984? Laser 700									*/
 
 	/* TANGERINE */
 //0128u5	DRIVER( microtan )	/* 1979 Microtan 65									*/
@@ -1080,7 +1080,7 @@ XL/XE 16kB OS roms
 
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
-//0128u5	DRIVER( votrpss ) /* Votrax Personal Speech System */
+	DRIVER( votrpss ) /* Votrax Personal Speech System */
 
 /****************Games*******************************************************/
 	/* Computer Electronic */

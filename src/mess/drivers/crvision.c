@@ -361,7 +361,7 @@ static WRITE8_HANDLER( pia_portb_w )
 	sn76489_ready = 0;
 
 	// wait 32 cycles of 2 MHz to synchronize CPU and SN76489
-	timer_set(machine, ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
+	timer_set(space->machine, ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
 }
 
 static WRITE8_HANDLER( pia_cb2_w )
