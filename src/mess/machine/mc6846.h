@@ -36,7 +36,7 @@ struct _mc6846_interface
 
 /* ---------- functions ------------ */
 
-extern void mc6846_config ( const mc6846_interface *func );
+extern void mc6846_config ( running_machine *machine, const mc6846_interface *func );
 
 /* reset by external signal */
 extern void mc6846_reset ( void );

@@ -86,12 +86,12 @@ static struct
 
 
 
-INLINE UINT16 mc6846_counter ( void )
+INLINE UINT16 mc6846_counter ( running_machine *machine )
 {
 	if ( mc6846.timer_started )
 	{
 		attotime delay = timer_timeleft( mc6846.interval );
-		return ATTOTIME_TO_CYCLES( mc6846.iface->cpunum, delay ) / FACTOR;
+		return cpu_attotime_to_clocks( machine->cpu[mc6846.iface->cpunum], delay ) / FACTOR;
 	}
 	else
 		return mc6846.preset;
@@ -148,7 +148,7 @@ INLINE void mc6846_update_cto ( running_machine *machine )
 
 INLINE void mc6846_timer_launch ( running_machine *machine )
 {
-	int delay = FACTOR * (mc6846.preset+1);
+//	int delay = FACTOR * (mc6846.preset+1);
 	LOG (( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", attotime_to_double(timer_get_time(machine)), MODE, mc6846.preset, FACTOR ));
 
 	if ( ! (mc6846.tcr & 2) )
@@ -193,7 +193,7 @@ INLINE void mc6846_timer_launch ( running_machine *machine )
 
 static TIMER_CALLBACK(mc6846_timer_expire)
 {
-	int delay = FACTOR * (mc6846.latch+1);
+//	int delay = FACTOR * (mc6846.latch+1);
 
 	LOG (( "%f: mc6846 timer expire called, mode=%i, latch=%i (x%i)\n", attotime_to_double(timer_get_time(machine)), MODE, mc6846.latch, FACTOR ));
 
@@ -256,7 +256,7 @@ READ8_HANDLER ( mc6846_r )
 	case 0:
 	case 4:
 		LOG (( "$%04x %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
-		       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
+		       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)),
 		       mc6846.csr, (mc6846.csr >> 7) & 1,
 		       mc6846.csr & 1, (mc6846.csr >> 1) & 1, (mc6846.csr >> 2) & 1 ));
 		mc6846.csr0_to_be_cleared = mc6846.csr & 1;
@@ -265,15 +265,15 @@ READ8_HANDLER ( mc6846_r )
 		return mc6846.csr;
 
 	case 1:
-		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mc6846.pcr ));
+		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), mc6846.pcr ));
 		return mc6846.pcr;
 
 	case 2:
-		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mc6846.ddr ));
+		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), mc6846.ddr ));
 		return mc6846.ddr;
 
 	case 3:
-		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), PORT_SPACE ));
+		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), PORT_SPACE ));
 		if ( ! (mc6846.pcr & 0x80) )
 		{
 			if ( mc6846.csr1_to_be_cleared )
@@ -287,28 +287,28 @@ READ8_HANDLER ( mc6846_r )
 		return PORT_SPACE;
 
 	case 5:
-		LOG (( "$%04x %f: mc6846 TCR read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mc6846.tcr ));
+		LOG (( "$%04x %f: mc6846 TCR read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), mc6846.tcr ));
 		return mc6846.tcr;
 
 	case 6:
-		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mc6846_counter() >> 8 ));
+		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), mc6846_counter(space->machine) >> 8 ));
 		if ( mc6846.csr0_to_be_cleared )
 		{
 			mc6846.csr &= ~1;
 			mc6846_update_irq(space->machine);
 		}
 		mc6846.csr0_to_be_cleared = 0;
-		return mc6846_counter() >> 8;
+		return mc6846_counter(space->machine) >> 8;
 
 	case 7:
-		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mc6846_counter() & 0xff ));
+		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), mc6846_counter(space->machine) & 0xff ));
 		if ( mc6846.csr0_to_be_cleared )
 		{
 			mc6846.csr &= ~1;
 			mc6846_update_irq(space->machine);
 		}
 		mc6846.csr0_to_be_cleared = 0;
-		return mc6846_counter() & 0xff;
+		return mc6846_counter(space->machine) & 0xff;
 
 	default:
 		logerror( "$%04x mc6846 invalid read offset %i\n", cpu_get_previouspc(space->cpu), offset );
@@ -340,7 +340,7 @@ WRITE8_HANDLER ( mc6846_w )
 			"latcged,pos-edge", "latcged,pos-edge,intr"
 		};
 		LOG (( "$%04x %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n",
-		       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data,
+		       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), data,
 		       (data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
 
 	}
@@ -368,7 +368,7 @@ WRITE8_HANDLER ( mc6846_w )
 	break;
 
 	case 2:
-		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
+		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), data ));
 		if ( ! (mc6846.pcr & 0x80) )
 		{
 			mc6846.ddr = data;
@@ -378,7 +378,7 @@ WRITE8_HANDLER ( mc6846_w )
 		break;
 
 	case 3:
-		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data,mc6846.ddr ));
+		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), data,mc6846.ddr ));
 		if ( ! (mc6846.pcr & 0x80) )
 		{
 			mc6846.pdr = data;
@@ -387,12 +387,12 @@ WRITE8_HANDLER ( mc6846_w )
 			if ( mc6846.csr1_to_be_cleared && (mc6846.csr & 2) )
 			{
 				mc6846.csr &= ~2;
-				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)) ));
+				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)) ));
 			}
 			if ( mc6846.csr2_to_be_cleared && (mc6846.csr & 4) )
 			{
 				mc6846.csr &= ~4;
-				LOG (( "$%04x %f: mc6846 CP2 intr reset\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)) ));
+				LOG (( "$%04x %f: mc6846 CP2 intr reset\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)) ));
 			}
 			mc6846.csr1_to_be_cleared = 0;
 			mc6846.csr2_to_be_cleared = 0;
@@ -408,7 +408,7 @@ WRITE8_HANDLER ( mc6846_w )
 				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
 			};
 		LOG (( "$%04x %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n",
-		       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data,
+		       cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), data,
 		       (data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
 		       (data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
 		       (data & 1) ? "enabled" : "0" ));
@@ -442,7 +442,7 @@ WRITE8_HANDLER ( mc6846_w )
 
 	case 7:
 		mc6846.latch = ( ((UINT16) mc6846.time_MSB) << 8 ) + data;
-		LOG (( "$%04x %f: mc6846 COUNT write %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mc6846.latch  ));
+		LOG (( "$%04x %f: mc6846 COUNT write %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), mc6846.latch  ));
 		if (!(mc6846.tcr & 0x38))
 		{
 			/* timer initialization */
@@ -564,7 +564,7 @@ void mc6846_reset ( void )
 
 /************************** configuration ****************************/
 
-void mc6846_config ( const mc6846_interface* iface )
+void mc6846_config ( running_machine *machine, const mc6846_interface* iface )
 {
 	mc6846.iface = iface;
 	mc6846.interval = timer_alloc(machine,  mc6846_timer_expire , NULL);

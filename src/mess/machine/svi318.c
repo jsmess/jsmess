@@ -515,7 +515,7 @@ static void svi318_80col_init(running_machine *machine)
 	memset( svi.svi806_ram + 0x800, 0xFF, 0x800 );
 	svi.svi806_gfx = memory_region(machine, "gfx1");
 
-	timer_set( attotime_zero, NULL, 0, svi318_80col_init_registers );
+	timer_set( machine, attotime_zero, NULL, 0, svi318_80col_init_registers );
 }
 
 static WRITE8_HANDLER( svi806_ram_enable_w )

@@ -1500,7 +1500,7 @@ MACHINE_START ( to7 )
 	/* subsystems */
 	thom_irq_init();
 	pia_config( THOM_PIA_SYS, &to7_sys );
-	mc6846_config( &to7_timer );
+	mc6846_config( machine, &to7_timer );
 	to7_game_init();
 	to7_floppy_init( machine, mem + 0x20000 );
 	to7_io_init();
@@ -1750,7 +1750,7 @@ MACHINE_START ( to770 )
 	/* subsystems */
 	thom_irq_init();
 	pia_config( THOM_PIA_SYS, &to770_sys );
-	mc6846_config( &to770_timer );
+	mc6846_config( machine, &to770_timer );
 	to7_game_init();
 	to7_floppy_init( machine, mem + 0x20000 );
 	to7_io_init();
@@ -3077,7 +3077,7 @@ MACHINE_START ( to9 )
 	thom_irq_init();
 	pia_config( THOM_PIA_SYS, &to9_sys );
 	centronics_config( 0, &to9_centronics );
-	mc6846_config( &to9_timer );
+	mc6846_config( machine, &to9_timer );
 	to7_game_init();
 	to9_floppy_init( machine, mem + 0xe000, mem + 0x40000 );
 	to9_kbd_init();
@@ -4047,7 +4047,7 @@ MACHINE_START ( to8 )
 	thom_irq_init();
 	pia_config( THOM_PIA_SYS, &to8_sys );
 	centronics_config( 0, &to9_centronics );
-	mc6846_config( &to8_timer );
+	mc6846_config( machine, &to8_timer );
 	to7_game_init();
 	to8_floppy_init( machine );
 	to8_kbd_init();
@@ -4213,7 +4213,7 @@ MACHINE_START ( to9p )
 	thom_irq_init();
 	pia_config( THOM_PIA_SYS, &to9p_sys );
 	centronics_config( 0, &to9_centronics );
-	mc6846_config( &to9p_timer );
+	mc6846_config( machine, &to9p_timer );
 	to7_game_init();
 	to8_floppy_init( machine );
 	to9_kbd_init();

@@ -122,7 +122,7 @@ static READ8_HANDLER(svision_r)
 			svision_irq( space->machine );
 			break;
 		default:
-			logerror("%.6f svision read %04x %02x\n", attotime_to_double(timer_get_time(machine)),offset,data);
+			logerror("%.6f svision read %04x %02x\n", attotime_to_double(timer_get_time(space->machine)),offset,data);
 			break;
 	}
 
@@ -142,7 +142,7 @@ static WRITE8_HANDLER(svision_w)
 		case 3:
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
-			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(machine)),offset,data);
+			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(space->machine)),offset,data);
 			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user1") + ((svision_reg[0x26] & 0xe0) << 9));
 			svision_irq( space->machine );
 			break;
@@ -155,7 +155,7 @@ static WRITE8_HANDLER(svision_w)
 			else
 				delay = 256;
 			timer_enable(svision.timer1, TRUE);
-			timer_reset(svision.timer1, cpu_clocks_to_attotime(machine->cpu[0], value * delay));
+			timer_reset(svision.timer1, cpu_clocks_to_attotime(space->machine->cpu[0], value * delay));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
 			svision_soundport_w(space->machine, svision_channel + 0, offset & 3, data);
@@ -170,7 +170,7 @@ static WRITE8_HANDLER(svision_w)
 			svision_noise_w(space, offset - 0x28, data);
 			break;
 		default:
-			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(machine)), offset, data);
+			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(space->machine)), offset, data);
 			break;
 	}
 }

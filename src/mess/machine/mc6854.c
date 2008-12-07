@@ -269,7 +269,7 @@ static void mc6854_send_bits( UINT32 data, int len, int zi )
 
 
 /* CPU push -> tfifo[0] -> ... -> tfifo[FIFO_SIZE-1] -> pop */
-static void mc6854_tfifo_push( UINT8 data )
+static void mc6854_tfifo_push( running_machine *machine, UINT8 data )
 {
 	int i;
 
@@ -436,7 +436,7 @@ static void mc6854_tfifo_clear( void )
 
 
 /* MC6854 pushes a field in the FIFO */
-static void mc6854_rfifo_push( UINT8 d )
+static void mc6854_rfifo_push( running_machine *machine, UINT8 d )
 {
 	int i, blen = 8;
 	unsigned data = d;
