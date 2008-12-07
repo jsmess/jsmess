@@ -128,7 +128,7 @@ int pc1403_inb(void)
 void pc1403_outc(int data)
 {
     pc1403_portc = data;
-    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(machine)), cpu_get_pc(Machine->cpu[0]), data);
+//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(machine)), cpu_get_pc(Machine->cpu[0]), data);
 }
 
 

@@ -108,8 +108,8 @@ static VIDEO_START( pecom )
 	state->cdp1869 = devtag_get_device(machine, CDP1869_VIDEO, CDP1869_TAG);
 
 	/* register for state saving */
-	state_save_register_global(state->cdp1802_mode);
-	state_save_register_global(state->dma);
+	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->dma);
 	state_save_register_global_pointer(machine, state->page_ram, PECOM_PAGE_RAM_SIZE);	
 }
 

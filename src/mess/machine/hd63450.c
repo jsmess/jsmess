@@ -23,7 +23,7 @@ DEVICE_START(hd63450)
 	// Initialise timers and registers
 	for(x=0;x<4;x++)
 	{
-		dmac->timer[x] = timer_alloc(machine, dma_transfer_timer, (void*)device);
+		dmac->timer[x] = timer_alloc(device->machine, dma_transfer_timer, (void*)device);
 		dmac->reg[x].niv = 0x0f;  // defaults?
 		dmac->reg[x].eiv = 0x0f;
 		dmac->clock[x] = dmac->intf->clock[x];

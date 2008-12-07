@@ -1418,7 +1418,7 @@ static READ16_HANDLER( x68k_rom0_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(machine, cpu_clocks_to_attotime(space->machine->cpu[0], 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
 	}
 	return 0xff;
 }
@@ -1435,7 +1435,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
 	}
 }
 
@@ -1449,7 +1449,7 @@ static READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //      cpu_set_input_line_and_vector(machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
@@ -1465,7 +1465,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //      cpu_set_input_line_and_vector(machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 	}
 }

@@ -28,12 +28,12 @@
 #define VERBOSE 0
 #endif
 
-#define LOG(N,M,A)	\
+#define LOG(N,M,A,mac)	\
 	do { \
 		if(VERBOSE>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)), (const char*)M ); \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(mac)), (const char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -137,7 +137,7 @@ static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
 static READ8_DEVICE_HANDLER ( pio_port_a_r )
 {
 	UINT8 data = pio_port_a_output;
-	LOG(2,"mz700_pio_port_a_r",("%02X\n", data));
+	LOG(2,"mz700_pio_port_a_r",("%02X\n", data),device->machine);
 	return data;
 }
 
@@ -150,7 +150,7 @@ static READ8_DEVICE_HANDLER ( pio_port_b_r )
 
     demux_LS145 = pio_port_a_output & 15;
     data = input_port_read(device->machine, keynames[demux_LS145]);
-	LOG(2,"mz700_pio_port_b_r",("%02X\n", data));
+	LOG(2,"mz700_pio_port_b_r",("%02X\n", data),device->machine);
 
     return data;
 }
@@ -176,14 +176,14 @@ static READ8_DEVICE_HANDLER (pio_port_c_r )
 
     data |= input_port_read(device->machine, "STATUS");   /* get VBLANK in bit 7 */
 
-	LOG(2,"mz700_pio_port_c_r",("%02X\n", data));
+	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),device->machine);
 
     return data;
 }
 
 static WRITE8_DEVICE_HANDLER (pio_port_a_w )
 {
-	LOG(2,"mz700_pio_port_a_w",("%02X\n", data));
+	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine);
 	pio_port_a_output = data;
 }
 
@@ -199,7 +199,7 @@ static WRITE8_DEVICE_HANDLER ( pio_port_b_w )
 	 * bit 1	demux LS145 B
 	 * bit 0	demux LS145 A
      */
-	LOG(2,"mz700_pio_port_b_w",("%02X\n", data));
+	LOG(2,"mz700_pio_port_b_w",("%02X\n", data),device->machine);
 
 	/* enable/disable NE556 cursor flash timer */
     timer_enable(ne556_timer[0], (data & 0x80) ? 0 : 1);
@@ -213,7 +213,7 @@ static WRITE8_DEVICE_HANDLER ( pio_port_c_w )
      * bit 1 out    tape data (WDATA)
      * bit 0 out    unused
      */
-	LOG(2,"mz700_pio_port_c_w",("%02X\n", data));
+	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine);
 	pio_port_c_output = data;
 
 	cassette_change_state(
@@ -248,7 +248,7 @@ READ8_HANDLER ( mz700_mmio_r )
 		data |= input_port_read(space->machine, "JOY");	/* get joystick ports */
 		if (video_screen_get_hpos(space->machine->primary_screen) >= visarea->max_x - 32)
 			data |= 0x80;
-		LOG(1,"mz700_e008_r",("%02X\n", data));
+		LOG(1,"mz700_e008_r",("%02X\n", data),space->machine);
         break;
     }
     return data;
@@ -269,7 +269,7 @@ WRITE8_HANDLER ( mz700_mmio_w )
 		break;
 
 	case 8:
-		LOG(1,"mz700_e008_w",("%02X\n", data));
+		LOG(1,"mz700_e008_w",("%02X\n", data),space->machine);
 		pit8253_gate_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 0, data & 1);
         break;
 	}
@@ -430,13 +430,13 @@ WRITE8_HANDLER ( mz700_bank_w )
     switch (offset)
 	{
 	case 0: /* 0000-0FFF RAM */
-		LOG(1,"mz700_bank_w",("0: 0000-0FFF RAM\n"));
+		LOG(1,"mz700_bank_w",("0: 0000-0FFF RAM\n"),space->machine);
 		bank1_RAM(space->machine, mem);
 		mz700_locked = 0;
         break;
 
 	case 1: /* D000-FFFF RAM */
-		LOG(1,"mz700_bank_w",("1: D000-FFFF RAM\n"));
+		LOG(1,"mz700_bank_w",("1: D000-FFFF RAM\n"),space->machine);
 		bank6_RAM(space->machine, mem);
 		bank7_RAM(space->machine, mem);
 		bank8_RAM(space->machine, mem);
@@ -445,13 +445,13 @@ WRITE8_HANDLER ( mz700_bank_w )
         break;
 
 	case 2: /* 0000-0FFF ROM */
-		LOG(1,"mz700_bank_w",("2: 0000-0FFF ROM\n"));
+		LOG(1,"mz700_bank_w",("2: 0000-0FFF ROM\n"),space->machine);
 		bank1_ROM(space->machine, mem);
 		mz700_locked = 0;
         break;
 
 	case 3: /* D000-FFFF videoram, memory mapped io */
-		LOG(1,"mz700_bank_w",("3: D000-FFFF videoram, memory mapped io\n"));
+		LOG(1,"mz700_bank_w",("3: D000-FFFF videoram, memory mapped io\n"),space->machine);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
 		bank8_VIO(space->machine, mem);
@@ -460,7 +460,7 @@ WRITE8_HANDLER ( mz700_bank_w )
         break;
 
 	case 4: /* 0000-0FFF ROM	D000-FFFF videoram, memory mapped io */
-		LOG(1,"mz700_bank_w",("4: 0000-0FFF ROM; D000-FFFF videoram, memory mapped io\n"));
+		LOG(1,"mz700_bank_w",("4: 0000-0FFF ROM; D000-FFFF videoram, memory mapped io\n"),space->machine);
 		bank1_ROM(space->machine, mem);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
@@ -470,7 +470,7 @@ WRITE8_HANDLER ( mz700_bank_w )
         break;
 
 	case 5: /* 0000-0FFF no chg D000-FFFF locked */
-		LOG(1,"mz700_bank_w",("5: D000-FFFF locked\n"));
+		LOG(1,"mz700_bank_w",("5: D000-FFFF locked\n"),space->machine);
 		if (mz700_locked == 0)
 		{
 			vio_lock = vio_mode;
@@ -482,7 +482,7 @@ WRITE8_HANDLER ( mz700_bank_w )
         break;
 
 	case 6: /* 0000-0FFF no chg D000-FFFF unlocked */
-		LOG(1,"mz700_bank_w",("6: D000-FFFF unlocked\n"));
+		LOG(1,"mz700_bank_w",("6: D000-FFFF unlocked\n"),space->machine);
 		if (mz700_locked == 1)
 			mz700_bank_w(space, vio_lock, 0); /* old config for D000-DFFF */
         break;
@@ -505,7 +505,7 @@ static UINT8 mz800_palette_bank;
  READ8_HANDLER( mz800_crtc_r )
 {
 	UINT8 data = 0x00;
-	LOG(1,"mz800_crtc_r",("%02X\n",data));
+	LOG(1,"mz800_crtc_r",("%02X\n",data),space->machine);
     return data;
 }
 
@@ -541,7 +541,7 @@ READ8_HANDLER( mz800_bank_r )
     switch (offset)
     {
 	case 0: /* 1000-1FFF PCG ROM */
-		LOG(1,"mz800_bank_r",("0: 1000-1FFF PCG ROM"));
+		LOG(1,"mz800_bank_r",("0: 1000-1FFF PCG ROM"),space->machine);
         bank2_ROM(space->machine, mem);
 		if ((mz800_display_mode & 0x08) == 0)
 		{
@@ -569,7 +569,7 @@ READ8_HANDLER( mz800_bank_r )
         break;
 
     case 1: /* make 1000-1FFF and C000-CFFF RAM */
-		LOG(1,"mz800_bank_r",("1: 1000-1FFF RAM"));
+		LOG(1,"mz800_bank_r",("1: 1000-1FFF RAM"),space->machine);
         bank2_RAM(space->machine, mem);
 		if ((mz800_display_mode & 0x08) == 0)
 		{
@@ -599,22 +599,22 @@ READ8_HANDLER( mz800_bank_r )
 {
 	UINT8 *mem = memory_region(space->machine, "user1");
 	UINT8 data = mem[mz800_ramaddr];
-	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", mz800_ramaddr, data));
+	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", mz800_ramaddr, data),space->machine);
 	if (mz800_ramaddr++ == 0)
-		LOG(1,"mz800_ramdisk_r",("address wrap 0000\n"));
+		LOG(1,"mz800_ramdisk_r",("address wrap 0000\n"),space->machine);
     return data;
 }
 
 /* port CC */
 WRITE8_HANDLER( mz800_write_format_w )
 {
-	LOG(1,"mz800_write_format_w",("%02X\n", data));
+	LOG(1,"mz800_write_format_w",("%02X\n", data),space->machine);
 }
 
 /* port CD */
 WRITE8_HANDLER( mz800_read_format_w )
 {
-	LOG(1,"mz800_read_format_w",("%02X\n", data));
+	LOG(1,"mz800_read_format_w",("%02X\n", data),space->machine);
 }
 
 /* port CE
@@ -626,7 +626,7 @@ WRITE8_HANDLER( mz800_read_format_w )
 WRITE8_HANDLER( mz800_display_mode_w )
 {
 	UINT8 *mem = memory_region(space->machine, "main");
-	LOG(1,"mz800_display_mode_w",("%02X\n", data));
+	LOG(1,"mz800_display_mode_w",("%02X\n", data),space->machine);
     mz800_display_mode = data;
 	if ((mz800_display_mode & 0x08) == 0)
 	{
@@ -637,7 +637,7 @@ WRITE8_HANDLER( mz800_display_mode_w )
 /* port CF */
 WRITE8_HANDLER( mz800_scroll_border_w )
 {
-	LOG(1,"mz800_scroll_border_w",("%02X\n", data));
+	LOG(1,"mz800_scroll_border_w",("%02X\n", data),space->machine);
 }
 
 /* port D0-D7 */
@@ -658,13 +658,13 @@ WRITE8_HANDLER ( mz800_bank_w )
     switch (offset)
     {
     case 0: /* 0000-0FFF RAM */
-		LOG(1,"mz800_bank_w",("0: 0000-0FFF RAM\n"));
+		LOG(1,"mz800_bank_w",("0: 0000-0FFF RAM\n"),space->machine);
         bank1_RAM(space->machine, mem);
         mz800_locked = 0;
         break;
 
     case 1: /* D000-FFFF RAM */
-		LOG(1,"mz800_bank_w",("1: D000-FFFF RAM\n"));
+		LOG(1,"mz800_bank_w",("1: D000-FFFF RAM\n"),space->machine);
 		bank6_RAM(space->machine, mem);
 		bank7_RAM(space->machine, mem);
 		bank8_RAM(space->machine, mem);
@@ -673,13 +673,13 @@ WRITE8_HANDLER ( mz800_bank_w )
         break;
 
     case 2: /* 0000-0FFF ROM */
-		LOG(1,"mz800_bank_w",("2: 0000-0FFF ROM\n"));
+		LOG(1,"mz800_bank_w",("2: 0000-0FFF ROM\n"),space->machine);
         bank1_ROM(space->machine, mem);
         mz800_locked = 0;
         break;
 
     case 3: /* D000-FFFF videoram, memory mapped io */
-		LOG(1,"mz800_bank_w",("3: D000-FFFF videoram, memory mapped io\n"));
+		LOG(1,"mz800_bank_w",("3: D000-FFFF videoram, memory mapped io\n"),space->machine);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
 		bank8_VIO(space->machine, mem);
@@ -688,7 +688,7 @@ WRITE8_HANDLER ( mz800_bank_w )
         break;
 
     case 4: /* 0000-0FFF ROM    D000-FFFF videoram, memory mapped io */
-		LOG(1,"mz800_bank_w",("4: 0000-0FFF ROM; D000-FFFF videoram, memory mapped io\n"));
+		LOG(1,"mz800_bank_w",("4: 0000-0FFF ROM; D000-FFFF videoram, memory mapped io\n"),space->machine);
         bank1_ROM(space->machine, mem);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
@@ -698,7 +698,7 @@ WRITE8_HANDLER ( mz800_bank_w )
         break;
 
     case 5: /* 0000-0FFF no chg D000-FFFF locked */
-		LOG(1,"mz800_bank_w",("5: D000-FFFF locked\n"));
+		LOG(1,"mz800_bank_w",("5: D000-FFFF locked\n"),space->machine);
         if (mz800_locked == 0)
         {
             vio_lock = vio_mode;
@@ -710,7 +710,7 @@ WRITE8_HANDLER ( mz800_bank_w )
         break;
 
     case 6: /* 0000-0FFF no chg D000-FFFF unlocked */
-		LOG(1,"mz800_bank_w",("6: D000-FFFF unlocked\n"));
+		LOG(1,"mz800_bank_w",("6: D000-FFFF unlocked\n"),space->machine);
         if (mz800_locked == 1)
             mz800_bank_w(space, vio_lock, 0); /* old config for D000-DFFF */
         break;
@@ -737,17 +737,17 @@ WRITE8_HANDLER ( mz800_bank_w )
 WRITE8_HANDLER( mz800_ramdisk_w )
 {
 	UINT8 *mem = memory_region(space->machine, "user1");
-	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", mz800_ramaddr, data));
+	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", mz800_ramaddr, data),space->machine);
 	mem[mz800_ramaddr] = data;
 	if (mz800_ramaddr++ == 0)
-		LOG(1,"mz800_ramdisk_w",("address wrap 0000\n"));
+		LOG(1,"mz800_ramdisk_w",("address wrap 0000\n"),space->machine);
 }
 
 /* port EB */
 WRITE8_HANDLER( mz800_ramaddr_w )
 {
 	mz800_ramaddr = (cpu_get_reg(space->machine->cpu[0], Z80_BC) & 0xff00) | (data & 0xff);
-	LOG(1,"mz800_ramaddr_w",("%04X\n", mz800_ramaddr));
+	LOG(1,"mz800_ramaddr_w",("%04X\n", mz800_ramaddr),space->machine);
 }
 
 /* port F0 */
@@ -756,13 +756,13 @@ WRITE8_HANDLER( mz800_palette_w )
 	if (data & 0x40)
 	{
         mz800_palette_bank = data & 3;
-		LOG(1,"mz800_palette_w",("bank: %d\n", mz800_palette_bank));
+		LOG(1,"mz800_palette_w",("bank: %d\n", mz800_palette_bank),space->machine);
     }
 	else
 	{
 		int idx = (data >> 4) & 3;
 		int val = data & 15;
-		LOG(1,"mz800_palette_w",("palette[%d] <- %d\n", idx, val));
+		LOG(1,"mz800_palette_w",("palette[%d] <- %d\n", idx, val),space->machine);
 		mz800_palette[idx] = val;
 	}
 }

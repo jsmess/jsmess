@@ -396,40 +396,53 @@ DRVLIBS = \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
+	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/epson.a \
 	$(MESSOBJ)/exeltel.a \
 	$(MESSOBJ)/exidy.a \
 	$(MESSOBJ)/fairch.a \
 	$(MESSOBJ)/galaxy.a \
 	$(MESSOBJ)/gce.a \
+	$(MESSOBJ)/homelab.a \
+	$(MESSOBJ)/irisha.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
+	$(MESSOBJ)/kramermc.a \
 	$(MESSOBJ)/lynx.a \
 	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/mbee.a \
+	$(MESSOBJ)/mikro80.a \
+	$(MESSOBJ)/ondra.a \
+	$(MESSOBJ)/orion.a \
+	$(MESSOBJ)/pel.a \
+	$(MESSOBJ)/pk8020.a \
+	$(MESSOBJ)/pp01.a \
+	$(MESSOBJ)/primo.a \
+	$(MESSOBJ)/radio.a \
+	$(MESSOBJ)/rt1715.a \
+	$(MESSOBJ)/sapi1.a \
+	$(MESSOBJ)/sharp.a \
+	$(MESSOBJ)/special.a \
+	$(MESSOBJ)/ut88.a \
+	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/shared.a \
 
 #	$(MESSOBJ)/amstrad.a \
 #	$(MESSOBJ)/atari.a \
 #	$(MESSOBJ)/dgn_beta.a \
-#	$(MESSOBJ)/einis.a \
 #	$(MESSOBJ)/ep128.a \
 #	$(MESSOBJ)/epoch.a \
 #	$(MESSOBJ)/glasgow.a \
 #	$(MESSOBJ)/gmaster.a \
 #	$(MESSOBJ)/grundy.a \
-#	$(MESSOBJ)/homelab.a \
 #	$(MESSOBJ)/hp48.a \
 #	$(MESSOBJ)/intv.a \
-#	$(MESSOBJ)/irisha.a \
 #	$(MESSOBJ)/jupiter.a \
-#	$(MESSOBJ)/kramermc.a \
 #	$(MESSOBJ)/luxor.a \
 #	$(MESSOBJ)/lviv.a \
 #	$(MESSOBJ)/mc10.a \
 #	$(MESSOBJ)/memotech.a \
 #	$(MESSOBJ)/mephisto.a \
-#	$(MESSOBJ)/mikro80.a \
 #	$(MESSOBJ)/mk1.a \
 #	$(MESSOBJ)/mk2.a \
 #	$(MESSOBJ)/motorola.a \
@@ -438,32 +451,21 @@ DRVLIBS = \
 #	$(MESSOBJ)/nec.a \
 #	$(MESSOBJ)/necpc.a \
 #	$(MESSOBJ)/nintendo.a \
-#	$(MESSOBJ)/ondra.a \
-#	$(MESSOBJ)/orion.a \
 #	$(MESSOBJ)/osborne.a \
 #	$(MESSOBJ)/p2000.a \
 #	$(MESSOBJ)/pasogo.a \
 #	$(MESSOBJ)/pc.a \
 #	$(MESSOBJ)/pcshare.a \
 #	$(MESSOBJ)/pdp1.a \
-#	$(MESSOBJ)/pel.a \
-#	$(MESSOBJ)/pk8020.a \
 #	$(MESSOBJ)/pmd85.a \
-#	$(MESSOBJ)/pp01.a \
-#	$(MESSOBJ)/primo.a \
-#	$(MESSOBJ)/radio.a \
 #	$(MESSOBJ)/rca.a \
 #	$(MESSOBJ)/rockwell.a \
-#	$(MESSOBJ)/rt1715.a \
 #	$(MESSOBJ)/samcoupe.a \
-#	$(MESSOBJ)/sapi1.a \
 #	$(MESSOBJ)/sega.a \
 #	$(MESSOBJ)/sgi.a \
-#	$(MESSOBJ)/sharp.a \
 #	$(MESSOBJ)/sinclair.a \
 #	$(MESSOBJ)/sony.a \
 #	$(MESSOBJ)/sord.a \
-#	$(MESSOBJ)/special.a \
 #	$(MESSOBJ)/ssystem3.a \
 #	$(MESSOBJ)/super80.a \
 #	$(MESSOBJ)/svi.a \
@@ -480,10 +482,8 @@ DRVLIBS = \
 #	$(MESSOBJ)/trs80.a \
 #	$(MESSOBJ)/tutor.a \
 #	$(MESSOBJ)/tx0.a \
-#	$(MESSOBJ)/ut88.a \
 #	$(MESSOBJ)/vc4000.a \
 #	$(MESSOBJ)/veb.a \
-#	$(MESSOBJ)/vector06.a \
 #	$(MESSOBJ)/votrax.a \
 #	$(MESSOBJ)/vtech.a \
 

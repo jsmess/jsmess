@@ -36,7 +36,7 @@ void pc1401_outb(int data)
 
 void pc1401_outc(int data)
 {
-	logerror("%g outc %.2x\n", attotime_to_double(timer_get_time(machine)), data);
+	//logerror("%g outc %.2x\n", attotime_to_double(timer_get_time(machine)), data);
 	pc1401_portc=data;
 }
 

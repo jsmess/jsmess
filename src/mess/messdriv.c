@@ -493,22 +493,22 @@ XL/XE 16kB OS roms
 //	DRIVER( megaopd )
 
 	/* SHARP */
-//0128u5	DRIVER( pc1251 )	/* Pocket Computer 1251								*/
-//0128u5	DRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
-//0128u5	DRIVER( pc1401 )	/* Pocket Computer 1401								*/
-//0128u5	DRIVER( pc1402 )	/* Pocket Computer 1402								*/
-//0128u5	DRIVER( pc1350 )	/* Pocket Computer 1350								*/
-//0128u5	DRIVER( pc1403 )	/* Pocket Computer 1403								*/
-//0128u5	DRIVER( pc1403h )	/* Pocket Computer 1403H							*/
+	DRIVER( pc1251 )	/* Pocket Computer 1251								*/
+	DRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
+	DRIVER( pc1401 )	/* Pocket Computer 1401								*/
+	DRIVER( pc1402 )	/* Pocket Computer 1402								*/
+	DRIVER( pc1350 )	/* Pocket Computer 1350								*/
+	DRIVER( pc1403 )	/* Pocket Computer 1403								*/
+	DRIVER( pc1403h )	/* Pocket Computer 1403H							*/
 
-//0128u5	DRIVER( mz700 )		/* 1982 Sharp MZ700									*/
-//0128u5	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
-//0128u5	DRIVER( mz800 )		/* 1982 Sharp MZ800									*/
-	
-//0128u5	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
-//0128u5	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
+	DRIVER( mz700 )		/* 1982 Sharp MZ700									*/
+	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
+	DRIVER( mz800 )		/* 1982 Sharp MZ800									*/
 
-//0128u5	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
+	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
+	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
+
+	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
 
 	/* SILICON GRAPHICS */
 //0128u5	DRIVER( ip204415 )	/* IP20 Indigo2										*/
@@ -943,85 +943,85 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( super80v )
 
 	/* Galeb */
-//0128u5	DRIVER( galeb )
+	DRIVER( galeb )
 
 	/* Orao */
-//0128u5	DRIVER( orao )
-//0128u5	DRIVER( orao103 )
+	DRIVER( orao )
+	DRIVER( orao103 )
 
 	/* UT-88 */
-//0128u5	DRIVER( ut88 )
-//0128u5	DRIVER( ut88mini )
+	DRIVER( ut88 )
+	DRIVER( ut88mini )
 
 	/* Mikro-80 */
-//0128u5	DRIVER( mikro80 )
-//0128u5	DRIVER( radio99 )
+	DRIVER( mikro80 )
+	DRIVER( radio99 )
 
 	/* Specialist */
-//0128u5	DRIVER( special )
-//0128u5	DRIVER( specialp )
-//0128u5	DRIVER( lik )
-//0128u5	DRIVER( erik )
-//0128u5	DRIVER( specimx )
+	DRIVER( special )
+	DRIVER( specialp )
+	DRIVER( lik )
+	DRIVER( erik )
+	DRIVER( specimx )
 
 	/* Orion */
-//0128u5	DRIVER( orion128 )
-//0128u5	DRIVER( orionms )
-//0128u5	DRIVER( orionz80 )
-//0128u5	DRIVER( orionide )
-//0128u5	DRIVER( orionzms )
-//0128u5	DRIVER( orionidm )
-//0128u5	DRIVER( orionpro )
+	DRIVER( orion128 )
+	DRIVER( orionms )
+	DRIVER( orionz80 )
+	DRIVER( orionide )
+	DRIVER( orionzms )
+	DRIVER( orionidm )
+	DRIVER( orionpro )
 
 	/* BK */
-//0128u5	DRIVER( bk0010 )
-//0128u5	DRIVER( bk001001 )
-//0128u5	DRIVER( bk0010fd )
+	DRIVER( bk0010 )
+	DRIVER( bk001001 )
+	DRIVER( bk0010fd )
 
 	/* Bashkiria-2M */
-//0128u5	DRIVER( b2m )
-//0128u5	DRIVER( b2mrom )
+	DRIVER( b2m )
+	DRIVER( b2mrom )
 
 	/* Radio-86RK */
-//0128u5	DRIVER( radio86 )
-//0128u5	DRIVER( radio16 )
-//0128u5	DRIVER( radio4k )
-//0128u5	DRIVER( rk7007 )
-//0128u5	DRIVER( rk700716 )
-//0128u5	DRIVER( radiorom )
-//0128u5	DRIVER( radioram )
-//0128u5	DRIVER( spektr01 )
-//0128u5	DRIVER( apogee )
-//0128u5	DRIVER( mikrosha )
-//0128u5	DRIVER( partner )
+	DRIVER( radio86 )
+	DRIVER( radio16 )
+	DRIVER( radio4k )
+	DRIVER( rk7007 )
+	DRIVER( rk700716 )
+	DRIVER( radiorom )
+	DRIVER( radioram )
+	DRIVER( spektr01 )
+	DRIVER( apogee )
+	DRIVER( mikrosha )
+	DRIVER( partner )
 
   	/* Homelab */  
-//0128u5	DRIVER (homelab2)
-//0128u5	DRIVER (homelab3)
-//0128u5	DRIVER (homelab4)
+	DRIVER (homelab2)
+	DRIVER (homelab3)
+	DRIVER (homelab4)
 	
 	/* Irisha */
-//0128u5	DRIVER (irisha)
+	DRIVER (irisha)
 	
 	/* PK-8020 */
-//0128u5	DRIVER (korvet)
+	DRIVER (korvet)
 
 	/* Vector-06c */
-//0128u5	DRIVER (vector06)
+	DRIVER (vector06)
 
 	/* Robotron 1715 */
-//0128u5	DRIVER (rt1715)
-//0128u5	DRIVER (rt1715w)
+	DRIVER (rt1715)
+	DRIVER (rt1715w)
 
 	/* PP-01 */
-//0128u5	DRIVER (pp01)
+	DRIVER (pp01)
 
 	/* Ondra */
-//0128u5	DRIVER (ondrat)
-//0128u5	DRIVER (ondrav)
+	DRIVER (ondrat)
+	DRIVER (ondrav)
 
 	/* SAPI-1 */
-//0128u5	DRIVER (sapi1)
+	DRIVER (sapi1)
 
   /* Spectrum clones */
   	
@@ -1055,10 +1055,10 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
-//0128u5	DRIVER(kramermc) /* 1987 Kramer MC				*/
+	DRIVER(kramermc) /* 1987 Kramer MC				*/
 
 	/* Ei Nis */
-//0128u5	DRIVER(pecom64)
+	DRIVER(pecom64)
 		
 	/* Bondwell */
 //0128u5	DRIVER( bw2 )
