@@ -145,6 +145,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "includes/studio2.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 #include "video/cdp1864.h"
@@ -152,17 +153,13 @@ Notes:
 #include "sound/beep.h"
 #include "sound/discrete.h"
 
-#define SCREEN_TAG "main"
-#define CDP1861_TAG "cdp1861"
-#define CDP1864_TAG "cdp1864"
-
 /* Read/Write Handlers */
-
-static UINT8 keylatch;
 
 static WRITE8_HANDLER( keylatch_w )
 {
-	keylatch = data & 0x0f;
+	studio2_state *state = space->machine->driver_data;
+
+	state->keylatch = data & 0x0f;
 }
 
 /* Memory Maps */
@@ -181,7 +178,7 @@ static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0dff) AM_ROM
-	AM_RANGE(0x0e00, 0x0eff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0x0e00, 0x0eff) AM_RAM AM_BASE_MEMBER(studio2_state, color_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8 )
@@ -220,21 +217,21 @@ INPUT_PORTS_END
 
 /* Video */
 
-static int cdp1861_efx;
-
 static CDP1861_ON_INT_CHANGED( studio2_int_w )
 {
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
+	cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1861_ON_DMAO_CHANGED( studio2_dmao_w )
 {
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
+	cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1861_ON_EFX_CHANGED( studio2_efx_w )
 {
-	cdp1861_efx = level;
+	studio2_state *state = device->machine->driver_data;
+
+	state->cdp1861_efx = level;
 }
 
 static CDP1861_INTERFACE( studio2_cdp1861_intf )
@@ -248,28 +245,28 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 
 static VIDEO_UPDATE( studio2 )
 {
-	const device_config *cdp1861 = devtag_get_device(screen->machine, CDP1861, CDP1861_TAG);
+	studio2_state *state = screen->machine->driver_data;
 
-	cdp1861_update(cdp1861, bitmap, cliprect);
+	cdp1861_update(state->cdp1861, bitmap, cliprect);
 
 	return 0;
 }
 
-static int cdp1864_efx;
-
 static CDP1864_ON_INT_CHANGED( mpt02_int_w )
 {
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
+	cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, level);
 }
 
 static CDP1864_ON_DMAO_CHANGED( mpt02_dmao_w )
 {
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
+	cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT, level);
 }
 
 static CDP1864_ON_EFX_CHANGED( mpt02_efx_w )
 {
-	cdp1864_efx = level;
+	studio2_state *state = device->machine->driver_data;
+
+	state->cdp1864_efx = level;
 }
 
 static CDP1864_INTERFACE( mpt02_cdp1864_intf )
@@ -288,30 +285,32 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 static VIDEO_UPDATE( mpt02 )
 {
-	const device_config *cdp1864 = devtag_get_device(screen->machine, CDP1864, CDP1864_TAG);
+	studio2_state *state = screen->machine->driver_data;
 
-	cdp1864_update(cdp1864, bitmap, cliprect);
+	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
 	return 0;
 }
 
 /* CDP1802 Configuration */
 
-static int cdp1802_mode = CDP1802_MODE_RESET;
-
 static CDP1802_MODE_READ( studio2_mode_r )
 {
-	return cdp1802_mode;
+	studio2_state *state = device->machine->driver_data;
+
+	return state->cdp1802_mode;
 }
 
 static CDP1802_EF_READ( studio2_ef_r )
 {
+	studio2_state *state = device->machine->driver_data;
+
 	int ef = 0x0f;
 
-	if (cdp1861_efx) ef -= EF1;
+	if (state->cdp1861_efx) ef -= EF1;
 
-	if (input_port_read(device->machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (input_port_read(device->machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(device->machine, "KEYPAD_L") & (1 << state->keylatch)) ef -= EF3;
+	if (input_port_read(device->machine, "KEYPAD_R") & (1 << state->keylatch)) ef -= EF4;
 
 	return ef;
 }
@@ -323,9 +322,9 @@ static CDP1802_Q_WRITE( studio2_q_w )
 
 static CDP1802_DMA_WRITE( studio2_dma_w )
 {
-	const device_config *cdp1861 = devtag_get_device(device->machine, CDP1861, CDP1861_TAG);
+	studio2_state *state = device->machine->driver_data;
 
-	cdp1861_dma_w(cdp1861, data);
+	cdp1861_dma_w(state->cdp1861, data);
 }
 
 static CDP1802_INTERFACE( studio2_config )
@@ -340,27 +339,29 @@ static CDP1802_INTERFACE( studio2_config )
 
 static CDP1802_EF_READ( mpt02_ef_r )
 {
+	studio2_state *state = device->machine->driver_data;
+
 	int ef = 0x0f;
 
-	if (cdp1864_efx) ef -= EF1;
+	if (state->cdp1864_efx) ef -= EF1;
 
-	if (input_port_read(device->machine, "KEYPAD_L") & (1 << keylatch)) ef -= EF3;
-	if (input_port_read(device->machine, "KEYPAD_R") & (1 << keylatch)) ef -= EF4;
+	if (input_port_read(device->machine, "KEYPAD_L") & (1 << state->keylatch)) ef -= EF3;
+	if (input_port_read(device->machine, "KEYPAD_R") & (1 << state->keylatch)) ef -= EF4;
 
 	return ef;
 }
 
 static CDP1802_DMA_WRITE( mpt02_dma_w )
 {
-	const device_config *cdp1864 = devtag_get_device(device->machine, CDP1864, CDP1864_TAG);
+	studio2_state *state = device->machine->driver_data;
 
-	UINT8 color = colorram[ma / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
+	UINT8 color = state->color_ram[ma / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
 
 	int rdata = BIT(color, 2);
 	int gdata = BIT(color, 0);
 	int bdata = BIT(color, 1);
 
-	cdp1864_dma_w(cdp1864, data, ASSERT_LINE, rdata, gdata, bdata);
+	cdp1864_dma_w(state->cdp1864, data, ASSERT_LINE, rdata, gdata, bdata);
 }
 
 static CDP1802_INTERFACE( mpt02_config )
@@ -375,42 +376,71 @@ static CDP1802_INTERFACE( mpt02_config )
 
 /* Machine Initialization */
 
+static TIMER_CALLBACK( set_cpu_mode )
+{
+	studio2_state *state = machine->driver_data;
+
+	state->cdp1802_mode = CDP1802_MODE_RUN;
+}
+
 static MACHINE_START( studio2 )
 {
-	state_save_register_global(machine, cdp1861_efx);
-	state_save_register_global(machine, cdp1802_mode);
-	state_save_register_global(machine, keylatch);
+	studio2_state *state = machine->driver_data;
+
+	/* find devices */
+	state->cdp1861 = devtag_get_device(machine, CDP1861, CDP1861_TAG);
+
+	/* register for state saving */
+	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->cdp1861_efx);
 }
 
 static MACHINE_RESET( studio2 )
 {
-	const device_config *cdp1861 = devtag_get_device(machine, CDP1861, CDP1861_TAG);
-	
-	cdp1861->reset(cdp1861);
+	studio2_state *state = machine->driver_data;
+
+	/* reset CPU */
+	state->cdp1802_mode = CDP1802_MODE_RESET;
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+
+	/* reset CDP1861 */
+	device_reset(state->cdp1861);
 }
 
 static MACHINE_START( mpt02 )
 {
-	state_save_register_global(machine, cdp1864_efx);
-	state_save_register_global(machine, cdp1802_mode);
-	state_save_register_global(machine, keylatch);
+	studio2_state *state = machine->driver_data;
+
+	/* find devices */
+	state->cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
+	
+	/* register for state saving */
+	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->cdp1864_efx);
 }
 
 static MACHINE_RESET( mpt02 )
 {
-	const device_config *cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
-	
-	cdp1864->reset(cdp1864);
+	studio2_state *state = machine->driver_data;
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+	/* reset CPU */
+	state->cdp1802_mode = CDP1802_MODE_RESET;
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+
+	/* reset CDP1864 */
+	device_reset(state->cdp1864);
 }
 
-/* machine Drivers */
+/* Machine Drivers */
 
 static MACHINE_DRIVER_START( studio2 )
+	MDRV_DRIVER_DATA(studio2_state)
+
 	// basic machine hardware
 
-	MDRV_CPU_ADD("main", CDP1802, 3579545/2) // the real clock is derived from an oscillator circuit
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 3579545/2) // the real clock is derived from an oscillator circuit
 	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
 	MDRV_CPU_IO_MAP(studio2_io_map, 0)
 	MDRV_CPU_CONFIG(studio2_config)
@@ -439,9 +469,11 @@ static MACHINE_DRIVER_START( studio2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( visicom )
+	MDRV_DRIVER_DATA(studio2_state)
+
 	// basic machine hardware
 
-	MDRV_CPU_ADD("main", CDP1802, 3579545/2) // ???
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 3579545/2) // ???
 	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
 	MDRV_CPU_IO_MAP(studio2_io_map, 0)
 	MDRV_CPU_CONFIG(studio2_config)
@@ -470,9 +502,11 @@ static MACHINE_DRIVER_START( visicom )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mpt02 )
+	MDRV_DRIVER_DATA(studio2_state)
+
 	// basic machine hardware
 
-	MDRV_CPU_ADD("main", CDP1802, CDP1864_CLOCK)
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mpt02_map, 0)
 	MDRV_CPU_IO_MAP(mpt02_io_map, 0)
 	MDRV_CPU_CONFIG(mpt02_config)
@@ -482,7 +516,7 @@ static MACHINE_DRIVER_START( mpt02 )
 
     // video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLOCK, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
@@ -502,7 +536,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( studio2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "84932", 0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "84933", 0x0200, 0x0200, NO_DUMP )
 	ROM_LOAD( "85456", 0x0400, 0x0200, NO_DUMP )
@@ -511,33 +545,44 @@ ROM_START( studio2 )
 ROM_END
 
 ROM_START( mtc9016 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "86676.ic13",  0x0000, 0x0400, NO_DUMP )
 	ROM_LOAD( "86677b.ic14", 0x0400, 0x0400, NO_DUMP )
 	ROM_LOAD( "87201.ic12",  0x0a00, 0x0400, NO_DUMP )
 ROM_END
 
 ROM_START( shmc1200 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "shmc1200.bin",  0x0000, 0x0800, NO_DUMP )
 ROM_END
 
 ROM_START( mpt02s )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 ROM_END
 
 ROM_START( mpt02h )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 ROM_END
 
 ROM_START( visicom )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "visicom.bin",  0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-/* System Configuration */
+/* Driver Initialization */
 
-#define ST2_HEADER_SIZE		256
+static TIMER_CALLBACK( setup_beep )
+{
+	beep_set_state(0, 0);
+	beep_set_frequency(0, 300);
+}
+
+static DRIVER_INIT( studio2 )
+{
+	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
+}
+
+/* System Configuration */
 
 static DEVICE_IMAGE_LOAD( studio2_cart )
 {
@@ -558,7 +603,7 @@ static DEVICE_IMAGE_LOAD( studio2_cart )
 	}
 	filesize -= ST2_HEADER_SIZE;
 	/* Read ST2 cartridge contents */
-	ptr = ((UINT8 *)memory_region(image->machine,  "main" ) ) + 0x0400;
+	ptr = ((UINT8 *)memory_region(image->machine,  CDP1802_TAG ) ) + 0x0400;
 	if ( image_fread(image, ptr, filesize ) != filesize ) {
 		logerror( "Error loading cartridge: Unable to read contents from file: %s.\n", image_filename( image ) );
 		return INIT_FAIL;
@@ -588,49 +633,12 @@ static SYSTEM_CONFIG_START( studio2 )
 	CONFIG_DEVICE( studio2_cartslot_getinfo )
 SYSTEM_CONFIG_END
 
-/* Driver Initialization */
-
-static TIMER_CALLBACK(set_cpu_mode)
-{
-	cdp1802_mode = CDP1802_MODE_RUN;
-}
-
-static TIMER_CALLBACK(setup_beep)
-{
-	beep_set_state(0, 0);
-	beep_set_frequency(0, 300);
-}
-
-static DRIVER_INIT( studio2 )
-{
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
-}
-
-static TIMER_CALLBACK(mpt02_setup_beep)
-{
-	beep_set_state( 0, 0 );
-	beep_set_frequency( 0, 0 );
-}
-
-static DRIVER_INIT( mpt02 )
-{
-	timer_set(machine, attotime_zero, NULL, 0, mpt02_setup_beep);
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
-}
-
-static DRIVER_INIT( visicom )
-{
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
-}
-
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	visicom,	studio2,	"Toshiba",	"Visicom (Japan)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
-CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
-CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
+CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	studio2,	"Toshiba",	"Visicom (Japan)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
+CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
+CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
