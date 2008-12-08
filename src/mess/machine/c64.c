@@ -282,7 +282,7 @@ static UINT8 c64_cia0_port_a_r (const device_config *device)
 static UINT8 c64_cia0_port_b_r (const device_config *device)
 {
     UINT8 value = 0xff;
-	UINT8 cia0porta = cia_get_output_a(0);
+	UINT8 cia0porta = cia_get_output_a(device_list_find_by_tag(device->machine->config->devicelist, CIA6526R1, "cia_0"));
 
     if (!(cia0porta & 0x80)) value &= c64_keyline[7];
     if (!(cia0porta & 0x40)) value &= c64_keyline[6];
@@ -354,10 +354,11 @@ static void c64_cia0_interrupt (const device_config *device, int level)
 
 void c64_vic_interrupt (int level)
 {
+	const device_config *cia_0 = device_list_find_by_tag(Machine->config->devicelist, CIA6526R1, "cia_0");
 #if 1
 	if (level != vicirq)
 	{
-		c64_irq (Machine, level || cia_get_irq(0));
+		c64_irq (Machine, level || cia_get_irq(cia_0));
 		vicirq = level;
 	}
 #endif
@@ -531,13 +532,13 @@ READ8_HANDLER( c64_read_io )
 
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+			cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 			return cia_r(cia_0, offset);
 		}
 
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+			cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 			return cia_r(cia_0, offset);
 		}
 
@@ -866,7 +867,7 @@ UINT8 c64_m6510_port_read(UINT8 direction)
 int c64_paddle_read (int which)
 {
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = cia_get_output_a(0);
+	UINT8 cia0porta = cia_get_output_a(device_list_find_by_tag(Machine->config->devicelist, CIA6526R1, "cia_0"));
 	int controller1 = input_port_read(Machine, "CTRLSEL") & 0x07;
 	int controller2 = input_port_read(Machine, "CTRLSEL") & 0x70;
 
