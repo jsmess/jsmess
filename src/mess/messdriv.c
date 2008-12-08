@@ -144,10 +144,10 @@ const game_driver * const drivers[] =
 	DRIVER( adam )		/* Coleco Adam										*/
 
 	/* NEC */
-//0128u5	DRIVER( pce )		/* PC/Engine NEC 1987-1993							*/
-//0128u5	DRIVER( tg16 )		/* Turbo Grafix-16  NEC 1989-1993					*/
-//0128u5	DRIVER( sgx )		/* SuperGrafX NEC 1989								*/
-//0128u5	DRIVER( pcfx)		/* PC-FX NEC 1994									*/
+	DRIVER( pce )		/* PC/Engine NEC 1987-1993							*/
+	DRIVER( tg16 )		/* Turbo Grafix-16  NEC 1989-1993					*/
+	DRIVER( sgx )		/* SuperGrafX NEC 1989								*/
+	DRIVER( pcfx )		/* PC-FX NEC 1994									*/
 
 	DRIVER( arcadia )	/* Emerson Arcadia 2001								*/
 	DRIVER( vcg )		/* Palladium Video-Computer-Game					*/
@@ -803,7 +803,7 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( rs128 )		/* 1984 Memotech RS 128								*/
 
 	/* MATTEL */
-//0128u5	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
+	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
 						/* (Test marketed, later recalled)					*/
 	DRIVER( aquarius )	/* 1983 Aquarius									*/
 //	DRIVER( aquariu2 )	/* 1984 Aquarius II									*/

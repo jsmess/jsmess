@@ -420,6 +420,7 @@ DRVLIBS = \
 	$(MESSOBJ)/mbee.a \
 	$(MESSOBJ)/mc10.a \
 	$(MESSOBJ)/mikro80.a \
+	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
@@ -473,7 +474,6 @@ DRVLIBS = \
 #	$(MESSOBJ)/motorola.a \
 #	$(MESSOBJ)/multitch.a \
 #	$(MESSOBJ)/nascom1.a \
-#	$(MESSOBJ)/nec.a \
 #	$(MESSOBJ)/nintendo.a \
 #	$(MESSOBJ)/osborne.a \
 #	$(MESSOBJ)/p2000.a \

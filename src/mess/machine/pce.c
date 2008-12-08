@@ -75,7 +75,7 @@ static struct {
 } pce_cd;
 
 /* MSM5205 ADPCM decoder definition */
-static void pce_cd_msm5205_int( running_machine *machine, int data );
+static void pce_cd_msm5205_int(const device_config *device);
 const msm5205_interface pce_cd_msm5205_interface = {
 	pce_cd_msm5205_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 1/48 prescaler, 4bit data */
@@ -303,7 +303,7 @@ static void pce_set_cd_bram( running_machine *machine )
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-static void pce_cd_msm5205_int( running_machine *machine, int chip ) 
+static void pce_cd_msm5205_int(const device_config *device)
 {
 	pce_cd.adpcm_clock_count = ( pce_cd.adpcm_clock_count + 1 ) % pce_cd.adpcm_clock_divider;
 	if ( ! pce_cd.adpcm_clock_count ) 
@@ -1071,7 +1071,7 @@ static TIMER_CALLBACK( pce_cd_clear_ack )
 	}
 }
 
-static UINT8 pce_cd_get_cd_data_byte( void ) 
+static UINT8 pce_cd_get_cd_data_byte(running_machine *machine) 
 {
 	UINT8 data = pce_cd.regs[0x01];
 	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD ) 
@@ -1089,8 +1089,8 @@ static UINT8 pce_cd_get_cd_data_byte( void )
 static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback ) 
 {
 	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD && pce_cd.scsi_IO ) 
-	{
-		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = pce_cd_get_cd_data_byte();
+	{	
+		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = pce_cd_get_cd_data_byte(machine);
 		pce_cd.adpcm_write_ptr = ( pce_cd.adpcm_write_ptr + 1 ) & 0xFFFF;
 	}
 }
@@ -1133,7 +1133,7 @@ READ8_HANDLER( pce_cd_intf_r )
 		data = ( pce_cd.bram_locked ? ( data & 0x7F ) : ( data | 0x80 ) );
 		break;
 	case 0x08:	/* ADPCM address (LSB) / CD data */
-		data = pce_cd_get_cd_data_byte();
+		data = pce_cd_get_cd_data_byte(space->machine);
 		break;
 	case 0x09:	/* ADPCM address (MSB) */
 	case 0x0A:	/* ADPCM RAM data port */
