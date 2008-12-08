@@ -511,10 +511,10 @@ XL/XE 16kB OS roms
 	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
 
 	/* SILICON GRAPHICS */
-//0128u5	DRIVER( ip204415 )	/* IP20 Indigo2										*/
-//0128u5	DRIVER( ip225015 )
-//0128u5	DRIVER( ip224613 )
-//0128u5	DRIVER( ip244415 )
+	DRIVER( ip204415 )	/* IP20 Indigo2										*/
+	DRIVER( ip225015 )
+	DRIVER( ip224613 )
+	DRIVER( ip244415 )
 
 	/* TEXAS INSTRUMENTS */
 //0128u5	DRIVER( ti990_10 )	/* 1975 TI 990/10									*/

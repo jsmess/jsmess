@@ -422,6 +422,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/pc.a \
+	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pk8020.a \
@@ -431,7 +432,6 @@ DRVLIBS = \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
-	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/sony.a \
