@@ -4,20 +4,14 @@
     Raphael Nabet, 2004
 */
 
-#include <math.h>
 #include "driver.h"
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"
 
 
-/* pointer to TX-0 RAM */
-static UINT32 *tx0_memory;
-
 /*
     driver init function
-
-    Set up the tx0_memory pointer
 */
 static DRIVER_INIT( tx0 )
 {
@@ -75,9 +69,6 @@ static DRIVER_INIT( tx0 )
 		0x00,0x68,0xb0,0x00,0x00,0x00,0x00,0x00,0x20,0x50,0x20,0x50,0xa8,0x50,0x00,0x00,
 	};
 
-	/* set up memory regions */
-	tx0_memory = (UINT32 *) memory_region(machine, "main");
-
 	/* set up our font */
 	dst = memory_region(machine, "gfx1");
 
@@ -85,24 +76,13 @@ static DRIVER_INIT( tx0 )
 }
 
 
-static READ18_HANDLER(tx0_read_mem)
-{
-	return tx0_memory ? tx0_memory[offset] : 0;
-}
-
-static WRITE18_HANDLER(tx0_write_mem)
-{
-	if (tx0_memory)
-		tx0_memory[offset] = data;
-}
-
-
 static ADDRESS_MAP_START(tx0_64kw_map, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(tx0_read_mem, tx0_write_mem)
+	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START(tx0_8kw_map, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(tx0_read_mem, tx0_write_mem)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
 

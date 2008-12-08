@@ -21,20 +21,20 @@ void tx0_tape_get_open_mode(int id,	unsigned int *readable, unsigned int *writea
 DEVICE_START( tx0_tape );
 DEVICE_IMAGE_LOAD( tx0_tape );
 DEVICE_IMAGE_UNLOAD( tx0_tape );
-void tx0_io_r1l(void);
-void tx0_io_r3l(void);
-void tx0_io_p6h(void);
-void tx0_io_p7h(void);
+void tx0_io_r1l(const device_config *device);
+void tx0_io_r3l(const device_config *device);
+void tx0_io_p6h(const device_config *device);
+void tx0_io_p7h(const device_config *device);
 DEVICE_IMAGE_LOAD(tx0_typewriter);
 DEVICE_IMAGE_UNLOAD(tx0_typewriter);
-void tx0_io_prt(void);
-void tx0_io_dis(void);
+void tx0_io_prt(const device_config *device);
+void tx0_io_dis(const device_config *device);
 DEVICE_START( tx0_magtape );
 DEVICE_IMAGE_LOAD( tx0_magtape );
 DEVICE_IMAGE_UNLOAD( tx0_magtape );
-void tx0_sel(void);
-void tx0_io_cpy(void);
-void tx0_io_reset_callback(void);
+void tx0_sel(const device_config *device);
+void tx0_io_cpy(const device_config *device);
+void tx0_io_reset_callback(const device_config *device);
 INTERRUPT_GEN( tx0_interrupt );
 
 
