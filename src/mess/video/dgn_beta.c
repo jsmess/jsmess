@@ -221,7 +221,7 @@ void vid_set_gctrl(int data)
 {
 	GCtrl=data;
 	if (LogRegWrites)
-		debug_console_printf("I28-PB=$%2X, %2X-%s-%s-%s-%s-%s-%s PC=%4X\n",
+		debug_console_printf(Machine, "I28-PB=$%2X, %2X-%s-%s-%s-%s-%s-%s PC=%4X\n",
 				     data,
 				     data & GCtrlAddrLines,
 				     data & GCtrlFS 		? "FS" : "  ",
@@ -261,8 +261,8 @@ static void beta_Set_HSync(int offset, int data)
 //		beta_scr_x=0-(((HT-HS)-HW)*8);	// Number of dots after HS to wait before start of next line
 		beta_scr_x=0-((HT-(HS+HW))*Dots);
 
-//debug_console_printf("HT=%d, HS=%d, HW=%d, (HS+HW)=%d, HT-(HS+HW)=%d\n",HT,HS,HW,(HS+HW),(HT-(HS+HW)));
-//debug_console_printf("Scanline=%d, row=%d\n",m6845_get_scanline_counter(),m6845_get_row_counter());
+//debug_console_printf(machine, "HT=%d, HS=%d, HW=%d, (HS+HW)=%d, HT-(HS+HW)=%d\n",HT,HS,HW,(HS+HW),(HT-(HS+HW)));
+//debug_console_printf(machine, "Scanline=%d, row=%d\n",m6845_get_scanline_counter(),m6845_get_row_counter());
 		HSyncMin=beta_scr_x;
 	}
 }
@@ -289,7 +289,7 @@ static void beta_Set_VSync(int offset, int data)
 		else if (DrawInterlace==INTERLACE_ON)
 		{
 			Field=(Field+1) & 0x01;	/* Invert field */
-//			debug_console_printf("Invert field=%d\n",Field);
+//			debug_console_printf(machine, "Invert field=%d\n",Field);
 		}
 		VSyncMin=beta_scr_y;
 	}
@@ -499,7 +499,7 @@ static void plot_gfx_pixel(int x, int y, int Dot, int Colour, bitmap_t *bitmap)
 	{
 		PlotY=(y*2);//+Field;
 		DoubleY=0;
-//		debug_console_printf("Field=%d\n",Field);
+//		debug_console_printf(machine, "Field=%d\n",Field);
 	}
 
 	/* Error check, make sure we're drawing on the actual bitmap ! */
@@ -729,7 +729,7 @@ static void execute_beta_vid_log(running_machine *machine, int ref, int params, 
 {
 	LogRegWrites=!LogRegWrites;
 
-	debug_console_printf("6845 register write info set : %d\n",LogRegWrites);
+	debug_console_printf(machine, "6845 register write info set : %d\n",LogRegWrites);
 }
 
 
@@ -758,7 +758,7 @@ static void RegLog(int offset, int data)
 	}
 
 	if(offset&0x1)
-		debug_console_printf("6845 write Reg %s Addr=%3d Data=%3d ($%2.2X) \n",RegName,VidAddr,data,data);
+		debug_console_printf(Machine, "6845 write Reg %s Addr=%3d Data=%3d ($%2.2X) \n",RegName,VidAddr,data,data);
 }
 
 static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[])
@@ -793,7 +793,7 @@ static void execute_beta_vid_box(running_machine *machine, int ref, int params, 
 		*BITMAP_ADDR16(bit, y, BoxMinX) = BoxColour;
 		*BITMAP_ADDR16(bit, y, BoxMaxX) = BoxColour;
 	}
-	debug_console_printf("ScreenBox()\n");
+	debug_console_printf(machine, "ScreenBox()\n");
 }
 
 
@@ -804,18 +804,18 @@ static void execute_beta_vid(running_machine *machine, int ref, int params, cons
 
 static void execute_beta_vid_limits(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_console_printf("Min X     =$%4X, Max X     =$%4X\n",MinX,MaxX);
-	debug_console_printf("Min Y     =$%4X, Max Y     =$%4X\n",MinY,MaxY);
-	debug_console_printf("MinVidAddr=$%5X, MaxVidAddr=$%5X\n",MinAddr,MaxAddr);
-	debug_console_printf("HsyncMin  =%d, VSyncMin=%d\n",HSyncMin, VSyncMin);
-	debug_console_printf("Interlace =%d\n",DrawInterlace);
-	debug_console_printf("DEPos=%d\n",DEPos);
+	debug_console_printf(machine, "Min X     =$%4X, Max X     =$%4X\n",MinX,MaxX);
+	debug_console_printf(machine, "Min Y     =$%4X, Max Y     =$%4X\n",MinY,MaxY);
+	debug_console_printf(machine, "MinVidAddr=$%5X, MaxVidAddr=$%5X\n",MinAddr,MaxAddr);
+	debug_console_printf(machine, "HsyncMin  =%d, VSyncMin=%d\n",HSyncMin, VSyncMin);
+	debug_console_printf(machine, "Interlace =%d\n",DrawInterlace);
+	debug_console_printf(machine, "DEPos=%d\n",DEPos);
 	if (IsGfx16)
-		debug_console_printf("Gfx16\n");
+		debug_console_printf(machine, "Gfx16\n");
 	else if (IsGfx2)
-		debug_console_printf("Gfx2\n");
+		debug_console_printf(machine, "Gfx2\n");
 	else
-		debug_console_printf("Gfx4/Text\n");
+		debug_console_printf(machine, "Gfx4/Text\n");
 }
 
 static void execute_beta_vid_clkmax(running_machine *machine, int ref, int params, const char *param[])

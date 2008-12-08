@@ -371,6 +371,7 @@ DRVLIBS = \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
+	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apexc.a \
 	$(MESSOBJ)/apf.a \
 	$(MESSOBJ)/apple.a \
@@ -397,6 +398,7 @@ DRVLIBS = \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
+	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/epson.a \
 	$(MESSOBJ)/ep128.a \
@@ -409,6 +411,7 @@ DRVLIBS = \
 	$(MESSOBJ)/glasgow.a \
 	$(MESSOBJ)/gmaster.a \
 	$(MESSOBJ)/homelab.a \
+	$(MESSOBJ)/hp48.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/irisha.a \
 	$(MESSOBJ)/kaypro.a \
@@ -462,10 +465,7 @@ DRVLIBS = \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/amstrad.a \
-#	$(MESSOBJ)/dgn_beta.a \
 #	$(MESSOBJ)/grundy.a \
-#	$(MESSOBJ)/hp48.a \
 #	$(MESSOBJ)/jupiter.a \
 #	$(MESSOBJ)/luxor.a \
 #	$(MESSOBJ)/memotech.a \

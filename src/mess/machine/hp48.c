@@ -179,7 +179,7 @@ void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data )
 	}
 
 	/* schedule end of reception */
-	timer_set( RS232_DELAY, NULL, data, hp48_rs232_byte_recv_cb );
+	timer_set( machine, RS232_DELAY, NULL, data, hp48_rs232_byte_recv_cb );
 }
 
 
@@ -224,7 +224,7 @@ static void hp48_rs232_send_byte( running_machine *machine )
 	/* schedule transmission */
 	if ( (xmodem && image_exists( xmodem )) || (kermit && image_exists( kermit )) )
 	{
-		timer_set( RS232_DELAY, NULL, data, hp48_rs232_byte_sent_cb );
+		timer_set( machine, RS232_DELAY, NULL, data, hp48_rs232_byte_sent_cb );
 	}
 #ifdef CHARDEV
 	else
@@ -420,7 +420,7 @@ static void hp48_update_annunciators( running_machine *machine, void* param )
 static WRITE8_HANDLER ( hp48_io_w )
 {
 	LOG(( "%05x %f hp48_io_w: off=%02x data=%x\n", 
-	      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset, data ));
+	      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), offset, data ));
 
 	switch( offset )
 	{
@@ -468,7 +468,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 		if ( data & 1 )
 		{
 			LOG(( "%f hp48_io_w: software interrupt requested\n", 
-			      attotime_to_double(timer_get_time(machine)) ));
+			      attotime_to_double(timer_get_time(space->machine)) ));
 			cpu_set_input_line( space->machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
 			data &= ~1;
 		}
@@ -637,7 +637,7 @@ static READ8_HANDLER ( hp48_io_r )
 	}
 
 	LOG(( "%05x %f hp48_io_r: off=%02x data=%x\n", 
-	      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset, data ));
+	      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), offset, data ));
 	return data;
 }
 
@@ -650,7 +650,7 @@ static READ8_HANDLER ( hp48_bank_r )
 	offset &= 0x7e;
 	if ( hp48_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp48_bank_r: off=%03x\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), offset ));
+		LOG(( "%05x %f hp48_bank_r: off=%03x\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), offset ));
 		hp48_bank_switch = offset;
 		hp48_apply_modules( space->machine, NULL );
 	}

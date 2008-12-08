@@ -262,7 +262,7 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 			{
 				readbank = &mess_ram[MapPage*RamPageSize];
 				if(LogDatWrites)
-					debug_console_printf("Mapping page %X, pageno=%X, mess_ram[%X]\n",Page,MapPage,(MapPage*RamPageSize));
+					debug_console_printf(machine, "Mapping page %X, pageno=%X, mess_ram[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 			}
 			else
 			{
@@ -305,7 +305,7 @@ static void SetDefaultTask(running_machine *machine)
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
-	if (VERBOSE) debug_console_printf("Set Default task\n");
+	if (VERBOSE) debug_console_printf(machine, "Set Default task\n");
 
 	TaskReg=NoPagingTask;
 
@@ -622,7 +622,7 @@ static WRITE8_HANDLER(d_pia0_cb2_w)
 		RowShifter = (RowShifter<<1) | ((d_pia0_pb_last & KOutDat)>>4);
 		RowShifter &= 0x3FF;
 		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",RowShifter,Keyrow));
-		if (VERBOSE) debug_console_printf("rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
+		if (VERBOSE) debug_console_printf(space->machine, "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",RowShifter,RowNo,Keyrow);
 	}
 
 	d_pia0_cb2_last=data;
@@ -1269,7 +1269,7 @@ static void execute_beta_dat_log(running_machine *machine, int ref, int params, 
 {
 	LogDatWrites=!LogDatWrites;
 
-	debug_console_printf("DAT register write info set : %d\n",LogDatWrites);
+	debug_console_printf(machine, "DAT register write info set : %d\n",LogDatWrites);
 }
 
 static void execute_beta_key_dump(running_machine *machine, int ref, int params, const char *param[])
@@ -1278,6 +1278,6 @@ static void execute_beta_key_dump(running_machine *machine, int ref, int params,
 
 	for(Idx=0;Idx<NoKeyrows;Idx++)
 	{
-		debug_console_printf("KeyRow[%d]=%2X\n",Idx,Keyboard[Idx]);
+		debug_console_printf(machine, "KeyRow[%d]=%2X\n",Idx,Keyboard[Idx]);
 	}
 }

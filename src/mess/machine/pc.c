@@ -1110,7 +1110,7 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 		memory_set_bankptr( machine, 10, mess_ram );
 
 	/* FDC/HDC hardware */
-	pc_hdc_setup(set_hdc_int_func);
+	pc_hdc_setup(machine, set_hdc_int_func);
 
 	pc_lpt_config(0, lpt_config);
 	centronics_config(0, cent_config);
@@ -1148,7 +1148,7 @@ DRIVER_INIT( pccga )
 DRIVER_INIT( bondwell )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(0, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, 0, "DSW2", 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pcmda )
@@ -1186,7 +1186,7 @@ DRIVER_INIT( europc )
 DRIVER_INIT( t1000hx )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(0, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(machine, 0, "DSW2", 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT( pc200 )

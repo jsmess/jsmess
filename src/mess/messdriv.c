@@ -611,7 +611,7 @@ XL/XE 16kB OS roms
 	DRIVER( dragon64 )	/* Dragon 64										*/
 	DRIVER( d64plus )	/* Dragon 64 + Compusense Plus addon				*/
 	DRIVER( dgnalpha )	/* Dragon Alpha										*/
-//0128u5	DRIVER( dgnbeta )	/* Dragon Beta										*/
+	DRIVER( dgnbeta )	/* Dragon Beta										*/
 	DRIVER( tanodr64 )	/* Tano Dragon 64 (NTSC)							*/
 	DRIVER( cp400 )		/* Prologica CP400									*/
 	DRIVER( mc10 )		/* MC-10											*/
@@ -849,10 +849,10 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( comquest )	/* Comquest Plus German								*/
 
 	/* Hewlett Packard */
-//0128u5	DRIVER( hp48s )		/* HP48 S */
-//0128u5	DRIVER( hp48sx )	/* HP48 SX */
-//0128u5	DRIVER( hp48g )		/* HP48 G */
-//0128u5	DRIVER( hp48gx )	/* HP48 GX */
+	DRIVER( hp48s )		/* HP48 S */
+	DRIVER( hp48sx )	/* HP48 SX */
+	DRIVER( hp48g )		/* HP48 G */
+	DRIVER( hp48gx )	/* HP48 GX */
 
 	/* SpectraVideo */
 //0128u5	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
