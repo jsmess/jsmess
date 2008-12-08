@@ -158,8 +158,8 @@ const game_driver * const drivers[] =
 	DRIVER( raaspec )	/* RA+A Spectrum - Modified Vectrex					*/
 
 	/* MATTEL */
-//0128u5	DRIVER( intv )		/* Mattel Intellivision - 1979 AKA INTV				*/
-//0128u5	DRIVER( intvsrs )	/* Intellivision (Sears License) - 19??				*/
+	DRIVER( intv )		/* Mattel Intellivision - 1979 AKA INTV				*/
+	DRIVER( intvsrs )	/* Intellivision (Sears License) - 19??				*/
 
 	/* ENTEX */
 //0128u5	DRIVER( advision )	/* Adventurevision									*/

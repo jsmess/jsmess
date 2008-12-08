@@ -526,7 +526,7 @@ INTERRUPT_GEN( intv_interrupt )
 {
 	cpu_set_input_line(device->machine->cpu[0], CP1610_INT_INTRM, ASSERT_LINE);
 	sr1_int_pending = 1;
-	timer_set(cpu_clocks_to_attotime(device->machine->cpu[0], 3791), NULL, 0, intv_interrupt_complete);
+	timer_set(device->machine, cpu_clocks_to_attotime(device->machine->cpu[0], 3791), NULL, 0, intv_interrupt_complete);
 	stic_screenrefresh(device->machine);
 }
 
