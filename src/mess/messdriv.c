@@ -789,7 +789,7 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
 
 	/* MILES GORDON TECHNOLOGY */
-//0128u5	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
+	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
 
 	/* MOTOROLA */
 //0128u5	DRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/

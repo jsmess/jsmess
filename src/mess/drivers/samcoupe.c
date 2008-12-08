@@ -342,7 +342,7 @@ void samcoupe_irq(const device_config *device, UINT8 src)
 
 	/* set irq and a timer to set it off again */
 	cpu_set_input_line(device, 0, HOLD_LINE);
-	timer_set(machine, ATTOTIME_IN_USEC(20), NULL, src, irq_off);
+	timer_set(device->machine, ATTOTIME_IN_USEC(20), NULL, src, irq_off);
 
 	/* adjust STATUS register */
 	asic->status &= ~src;
