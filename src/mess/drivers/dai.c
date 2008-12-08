@@ -223,8 +223,7 @@ static MACHINE_DRIVER_START( dai )
 	MDRV_CASSETTE_ADD( "cassette", dai_cassette_config )
 
 	/* tms5501 */
-	MDRV_DEVICE_ADD( "tms5501", TMS5501 )
-	MDRV_DEVICE_CONFIG( dai_tms5501_interface )
+	MDRV_TMS5501_ADD( "tms5501", dai_tms5501_interface )
 MACHINE_DRIVER_END
 
 #define io_dai		io_NULL
