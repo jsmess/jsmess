@@ -1038,7 +1038,6 @@ $(MESSOBJ)/sharp.a:    \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/rp5c15.o	\
 	$(MESS_MACHINE)/x68k_hdc.o	\
-	$(MESS_MACHINE)/8530scc.o		\
 	$(MESS_DRIVERS)/mz80.o		\
 	$(MESS_VIDEO)/mz80.o		\
 	$(MESS_MACHINE)/mz80.o	\
