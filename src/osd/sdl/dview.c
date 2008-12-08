@@ -10,14 +10,10 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
 	debug_view_xy vsize;
-	UINT32 vrow;
-	UINT32 vcol;
 	UINT32 i, j, xx, yy;
 	GdkColor bg, fg;
 
 	vsize = debug_view_get_visible_size(dv->dw);
-	vrow = vsize.y;
-	vcol = vsize.x;
 
 	bg.red = bg.green = bg.blue = 0xffff;
 	gdk_gc_set_rgb_fg_color(dv->gc, &bg);
@@ -33,9 +29,9 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	viewdata = debug_view_get_chars(dv->dw);
 
 	yy = wdv->style->ythickness;
-	for(j=0; j<vrow; j++) {
+	for(j=0; j<vsize.y; j++) {
 		xx = wdv->style->xthickness;
-		for(i=0; i<vcol; i++) {
+		for(i=0; i<vsize.x; i++) {
 			unsigned char attr = viewdata->attrib;
 			char s[3];
 			unsigned char v = viewdata->byte;
@@ -127,16 +123,8 @@ static void dview_vadj_changed(GtkAdjustment *adj, DView *dv)
 
 	if (v != pos.y) 
 	{
-		if(dv->this_one_is_stupidly_autoscrolling)
-		{
-// what is new equivalent here?
-//			debug_view_set_(dv->dw, DVP_TEXTBUF_LINE_LOCK, v);
-		}
-		else
-		{
-			pos.y = v;
-			debug_view_set_visible_position(dv->dw, pos);
-		}
+		pos.y = v;
+		debug_view_set_visible_position(dv->dw, pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -172,72 +160,58 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 {
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
-	UINT32 trow;
-	UINT32 tcol;
-	int    prow;
-	int    pcol;
 	UINT32 ah   = allocation->height-2*wdv->style->ythickness;
 	UINT32 aw   = allocation->width-2*wdv->style->xthickness;
-	UINT32 crow, ccol, vrow, vcol;
 	int ohs = dv->hs;
 	int ovs = dv->vs;
-	debug_view_xy size, pos;
+	debug_view_xy size, pos, col, vsize;
 
 	pos = debug_view_get_visible_position(dv->dw); 
 	size = debug_view_get_total_size(dv->dw);
-	trow = size.y;
-	tcol = size.x;
-	prow = pos.y;
-	pcol = pos.x;
 
-	dv->tr = trow;
-	dv->tc = tcol;
+	dv->tr = size.y;
+	dv->tc = size.x;
 
-	dv->hs = tcol*dvc->fixedfont_width > aw;
-	dv->vs = trow*dvc->fixedfont_height > ah;
+	dv->hs = size.x*dvc->fixedfont_width > aw;
+	dv->vs = size.y*dvc->fixedfont_height > ah;
 
 	if(dv->hs)
 		ah -= dv->hsz;
 	if(dv->vs)
 		aw -= dv->vsz;
 
-	dv->hs = tcol*dvc->fixedfont_width > aw;
-	dv->vs = trow*dvc->fixedfont_height > ah;
+	dv->hs = size.x*dvc->fixedfont_width > aw;
+	dv->vs = size.y*dvc->fixedfont_height > ah;
 
 	ah = allocation->height - (dv->hs ? dv->hsz : 0);
 	aw = allocation->width  - (dv->vs ? dv->vsz : 0);
 
-	crow = (ah-2*wdv->style->ythickness+dvc->fixedfont_height-1) / dvc->fixedfont_height;
-	ccol = (aw-2*wdv->style->xthickness+dvc->fixedfont_width-1) / dvc->fixedfont_width;
+	col.y = (ah-2*wdv->style->ythickness+dvc->fixedfont_height-1) / dvc->fixedfont_height;
+	col.x = (aw-2*wdv->style->xthickness+dvc->fixedfont_width-1) / dvc->fixedfont_width;
 
 	wdv->allocation = *allocation;
 
-	vrow = trow-prow;
-	vcol = tcol-pcol;
-	if(vrow > crow)
-		vrow = crow;
-	else if(vrow < crow) {
-		prow = trow-crow;
-		if(prow < 0)
-			prow = 0;
-		vrow = trow-prow;
+	vsize.y = size.y-pos.y;
+	vsize.x = size.x-pos.x;
+	if(vsize.y > col.y)
+		vsize.y = col.y;
+	else if(vsize.y < col.y) {
+		pos.y = size.y-col.y;
+		if(pos.y < 0)
+			pos.y = 0;
+		vsize.y = size.y-pos.y;
 	}
-	if(vcol > ccol)
-		vcol = ccol;
-	else if(vcol < ccol) {
-		pcol = tcol-ccol;
-		if(pcol < 0)
-			pcol = 0;
-		vcol = tcol-pcol;
+	if(vsize.x > col.x)
+		vsize.x = col.x;
+	else if(vsize.x < col.x) {
+		pos.x = size.x-col.x;
+		if(pos.x < 0)
+			pos.x = 0;
+		vsize.x = size.x-pos.x;
 	}
-
-	size.y = trow;
-	size.x = tcol;
-	pos.y = prow;
-	pos.x = pcol;
 
 	debug_view_set_visible_position(dv->dw, pos); 
-	debug_view_set_visible_size(dv->dw, size);
+	debug_view_set_visible_size(dv->dw, vsize);
 
 	if(GTK_WIDGET_REALIZED(wdv))
 		gdk_window_move_resize(wdv->window,
@@ -255,19 +229,17 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		al.width = aw;
 		al.height = dv->hsz;
 		gtk_widget_size_allocate(dv->hscrollbar, &al);
-		if(pcol+span > tcol)
-			pcol = tcol-span;
-		if(pcol < 0)
-			pcol = 0;
+		if(pos.x+span > size.x)
+			pos.x = size.x-span;
+		if(pos.x < 0)
+			pos.x = 0;
 		dv->hadj->lower = 0;
-		dv->hadj->upper = tcol;
-		dv->hadj->value = pcol;
+		dv->hadj->upper = size.x;
+		dv->hadj->value = pos.x;
 		dv->hadj->step_increment = 1;
 		dv->hadj->page_increment = span;
 		dv->hadj->page_size = span;
 		gtk_adjustment_changed(dv->hadj);
-		pos.y = prow;
-		pos.x = pcol;
 		debug_view_set_visible_position(dv->dw, pos); 
 	} else {
 		if(ohs)
@@ -285,19 +257,17 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		al.width = dv->vsz;
 		al.height = ah;
 		gtk_widget_size_allocate(dv->vscrollbar, &al);
-		if(prow+span > trow)
-			prow = trow-span;
-		if(prow < 0)
-			prow = 0;
+		if(pos.y+span > size.y)
+			pos.y = size.y-span;
+		if(pos.y < 0)
+			pos.y = 0;
 		dv->vadj->lower = 0;
-		dv->vadj->upper = trow;
-		dv->vadj->value = prow;
+		dv->vadj->upper = size.y;
+		dv->vadj->value = pos.y;
 		dv->vadj->step_increment = 1;
 		dv->vadj->page_increment = span;
 		dv->vadj->page_size = span;
 		gtk_adjustment_changed(dv->vadj);
-		pos.y = prow;
-		pos.x = pcol;
 		debug_view_set_visible_position(dv->dw, pos); 
 	} else {
 		if(ovs)
@@ -310,25 +280,21 @@ static void dview_size_request(GtkWidget *wdv, GtkRequisition *req)
 	GtkRequisition req2;
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
-	UINT32 trow;
-	UINT32 tcol;
 	int vs = 0, hs = 0;
 	debug_view_xy size;
 
 	size = debug_view_get_total_size(dv->dw);
-	trow = size.y;
-	tcol = size.x;
 
-	if(tcol > 50) {
-		tcol = 50;
+	if(size.x > 50) {
+		size.x = 50;
 		hs = 1;
 	}
-	if(trow > 20) {
-		trow = 20;
+	if(size.y > 20) {
+		size.y = 20;
 		vs = 1;
 	}
-	req->width = tcol*dvc->fixedfont_width+2*wdv->style->xthickness;
-	req->height = trow*dvc->fixedfont_height+2*wdv->style->ythickness;
+	req->width = size.x*dvc->fixedfont_width+2*wdv->style->xthickness;
+	req->height = size.y*dvc->fixedfont_height+2*wdv->style->ythickness;
 
 	gtk_widget_size_request(dv->hscrollbar, &req2);
 	dv->hsz = req2.height;
@@ -416,22 +382,27 @@ static void dview_init(DView *dv)
 	g_signal_connect(dv->vadj, "value-changed", G_CALLBACK(dview_vadj_changed), dv);
 }
 
+static void dview_update(debug_view *dw, void *osdprivate)
+{
+	DView *dv = osdprivate;
+	debug_view_xy size = debug_view_get_total_size(dw);
+
+	if((dv->tr != size.y) || (dv->tc != size.x))
+		gtk_widget_queue_resize(GTK_WIDGET(dv));
+	else
+		gtk_widget_queue_draw(GTK_WIDGET(dv));
+}
+
 GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar *string2, gint int1, gint int2)
 {
 	GtkWidget *wdv = g_object_new(DVIEW_TYPE, NULL);
 	DView *dv = DVIEW(wdv);
 	dv->name = (gchar *) widget_name;
-	dv->this_one_is_stupidly_autoscrolling = 0;
 	return wdv;
 }
 
-void dview_set_debug_view(DView *dv, debug_view *dw)
+void dview_set_debug_view(DView *dv, running_machine *machine, int type, debug_view **dwp)
 {
-	dv->dw = dw;
+	dv->dw = debug_view_alloc(machine, type, dview_update, dv);
+	*dwp = dv->dw;
 }
-
-void dview_this_one_is_stupidly_autoscrolling(DView *dv)
-{
-	dv->this_one_is_stupidly_autoscrolling = 1;
-}
-

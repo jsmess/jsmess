@@ -335,7 +335,9 @@ void osd_wait_for_debugger(const device_config *device, int firststop)
 void debugwin_update_during_game(running_machine *machine)
 {
 	if(dmain)
+	{
 		gtk_main_iteration_do(FALSE);
+	}
 }
 
 static void debugmain_process_string(running_machine *machine, const char *str, void *dmp)
@@ -353,66 +355,6 @@ static void debugmain_destroy(GtkObject *obj, gpointer user_data)
 	mame_schedule_exit(dmain->machine);
 }
 
-//============================================================
-//  debugwin_console_update
-//============================================================
-
-static void debugwin_console_update(debug_view *view, void *osdprivate)
-{
-	debugmain_i *dbg_main = (debugmain_i *)osdprivate;
-	debug_view_xy size;
-
-	size = debug_view_get_total_size(dbg_main->console);
-	if ((dbg_main->console_w->tr != size.y) || (dbg_main->console_w->tc != size.x))
-	{
-		gtk_widget_queue_resize(GTK_WIDGET(dbg_main->console_w));
-	}
-	else
-	{
-		gtk_widget_queue_draw(GTK_WIDGET(dbg_main->console_w));
-	}
-}
-
-//============================================================
-//  debugwin_disasm_update
-//============================================================
-
-static void debugwin_disasm_update(debug_view *view, void *osdprivate)
-{
-	debugmain_i *dbg_main = (debugmain_i *)osdprivate;
-	debug_view_xy size;
-
-	size = debug_view_get_total_size(dbg_main->disasm);
-	if ((dbg_main->disasm_w->tr != size.y) || (dbg_main->disasm_w->tc != size.x))
-	{
-		gtk_widget_queue_resize(GTK_WIDGET(dbg_main->disasm_w));
-	}
-	else
-	{
-		gtk_widget_queue_draw(GTK_WIDGET(dbg_main->disasm_w));
-	}
-}
-
-//============================================================
-//  debugwin_register_update
-//============================================================
-
-static void debugwin_register_update(debug_view *view, void *osdprivate)
-{
-	debugmain_i *dbg_main = (debugmain_i *)osdprivate;
-	debug_view_xy size;
-
-	size = debug_view_get_total_size(dbg_main->registers);
-	if ((dbg_main->registers_w->tr != size.y) || (dbg_main->registers_w->tc != size.x))
-	{
-		gtk_widget_queue_resize(GTK_WIDGET(dbg_main->registers_w));
-	}
-	else
-	{
-		gtk_widget_queue_draw(GTK_WIDGET(dbg_main->registers_w));
-	}
-}
-
 static void debugmain_init(running_machine *machine)
 {
 	dmain = malloc(sizeof(*dmain));
@@ -425,15 +367,9 @@ static void debugmain_init(running_machine *machine)
 	dmain->disasm_w    = DVIEW(lookup_widget(dmain->win, "disasm"));
 	dmain->registers_w = DVIEW(lookup_widget(dmain->win, "registers"));
 
-	dmain->console   = debug_view_alloc(machine, DVT_CONSOLE, debugwin_console_update, dmain);
-	dmain->disasm    = debug_view_alloc(machine, DVT_DISASSEMBLY, debugwin_disasm_update, dmain);
-	dmain->registers = debug_view_alloc(machine, DVT_REGISTERS, debugwin_register_update, dmain);
-
-	dview_set_debug_view(dmain->console_w,   dmain->console);
-	dview_set_debug_view(dmain->disasm_w,    dmain->disasm);
-	dview_set_debug_view(dmain->registers_w, dmain->registers);
-
-	dview_this_one_is_stupidly_autoscrolling(dmain->console_w);
+	dview_set_debug_view(dmain->console_w,   machine, DVT_CONSOLE, &dmain->console);
+	dview_set_debug_view(dmain->disasm_w,    machine, DVT_DISASSEMBLY, &dmain->disasm);
+	dview_set_debug_view(dmain->registers_w, machine, DVT_REGISTERS, &dmain->registers);
 
 	edit_init(machine, &dmain->ed, lookup_widget(dmain->win, "edit"), 0, 0, debugmain_process_string, &dmain);
 
@@ -499,22 +435,6 @@ static void memorywin_destroy(GtkObject *obj, gpointer user_data)
 	free(mem);
 }
 
-static void memorywin_view_update(debug_view *view, void *osdprivate)
-{
-	memorywin_i *mem = (memorywin_i *)osdprivate;
-	debug_view_xy size;
-
-	size = debug_view_get_total_size(mem->memory);
-	if ((mem->memory_w->tr != size.y) || (mem->memory_w->tc != size.x))
-	{
-		gtk_widget_queue_resize(GTK_WIDGET(mem->memory_w));
-	}
-	else
-	{
-		gtk_widget_queue_draw(GTK_WIDGET(mem->memory_w));
-	}
-}
-
 static void memorywin_new(running_machine *machine)
 {
 	memorywin_i *mem;
@@ -530,11 +450,9 @@ static void memorywin_new(running_machine *machine)
 	mem->machine = machine;
 
 	mem->memory_w = DVIEW(lookup_widget(mem->win, "memoryview"));
+	dview_set_debug_view(mem->memory_w, machine, DVT_MEMORY, &mem->memory);
+
 	mem->zone_w   = GTK_COMBO_BOX(lookup_widget(mem->win, "zone"));
-
-	mem->memory = debug_view_alloc(machine, DVT_MEMORY, memorywin_view_update, mem);
-
-	dview_set_debug_view(mem->memory_w, mem->memory);
 
 	edit_init(machine, &mem->ed, lookup_widget(mem->win, "edit"), "0", 1, memorywin_process_string, mem);
 
@@ -659,22 +577,6 @@ static void disasmwin_destroy(GtkObject *obj, gpointer user_data)
 	free(dis);
 }
 
-static void disasmwin_view_update(debug_view *view, void *osdprivate)
-{
-	disasmwin_i *dis = (disasmwin_i *)osdprivate;
-	debug_view_xy size;
-
-	size = debug_view_get_total_size(dis->disasm);
-	if ((dis->disasm_w->tr != size.y) || (dis->disasm_w->tc != size.x))
-	{
-		gtk_widget_queue_resize(GTK_WIDGET(dis->disasm_w));
-	}
-	else
-	{
-		gtk_widget_queue_draw(GTK_WIDGET(dis->disasm_w));
-	}
-}
-
 static void disasmwin_new(running_machine *machine)
 {
 	disasmwin_i *dis;
@@ -691,11 +593,10 @@ static void disasmwin_new(running_machine *machine)
 	dis->machine = machine;
 
 	dis->disasm_w = DVIEW(lookup_widget(dis->win, "disasmview"));
+
+	dview_set_debug_view(dis->disasm_w, machine, DVT_DISASSEMBLY, &dis->disasm);
+
 	dis->cpu_w    = GTK_COMBO_BOX(lookup_widget(dis->win, "cpu"));
-
-	dis->disasm = debug_view_alloc(machine, DVT_DISASSEMBLY, disasmwin_view_update, dmain);
-
-	dview_set_debug_view(dis->disasm_w, dis->disasm);
 
 	edit_init(machine, &dis->ed, lookup_widget(dis->win, "edit"), "curpc", 1, disasmwin_process_string, dis);
 
@@ -745,22 +646,6 @@ static void logwin_destroy(GtkObject *obj, gpointer user_data)
 	free(log);
 }
 
-static void logwin_view_update(debug_view *view, void *osdprivate)
-{
-	logwin_i *log = (logwin_i *)osdprivate;
-	debug_view_xy size;
-
-	size = debug_view_get_total_size(log->log);
-	if ((log->log_w->tr != size.y) || (log->log_w->tc != size.x))
-	{
-		gtk_widget_queue_resize(GTK_WIDGET(log->log_w));
-	}
-	else
-	{
-		gtk_widget_queue_draw(GTK_WIDGET(log->log_w));
-	}
-}
-
 static void logwin_new(running_machine *machine)
 {
 	logwin_i *log;
@@ -773,12 +658,8 @@ static void logwin_new(running_machine *machine)
 	log->machine = machine;
 
 	log->log_w = DVIEW(lookup_widget(log->win, "logview"));
+	dview_set_debug_view(log->log_w, machine, DVT_LOG, &log->log);
 
-	log->log = debug_view_alloc(machine, DVT_LOG, logwin_view_update, dmain);
-
-	dview_set_debug_view(log->log_w, log->log);
-
-	dview_this_one_is_stupidly_autoscrolling(log->log_w);
 	g_signal_connect(log->win, "destroy", G_CALLBACK(logwin_destroy), log);
 
 	gtk_widget_show_all(log->win);
@@ -916,7 +797,7 @@ void on_dbpl_activate(GtkMenuItem *item, gpointer user_data)
 #include "driver.h"
 
 // win32 stubs for linking
-void osd_wait_for_debugger(running_machine *machine, int firststop)
+void osd_wait_for_debugger(const device_config *device, int firststop)
 {
 }
 
