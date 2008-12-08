@@ -529,7 +529,7 @@ static TIMER_CALLBACK(reader_callback)
 					tape_reader.rcl = 0;
 					if (tape_reader.rcp)
 					{
-						cpu_set_reg(Machine->cpu[0], PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
+						cpu_set_reg(machine->cpu[0], PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
 						pdp1_pulse_iot_done();
 					}
 					else
