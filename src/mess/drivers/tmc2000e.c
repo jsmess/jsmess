@@ -280,7 +280,7 @@ static MACHINE_RESET( tmc2000e )
 {
 	tmc2000e_state *state = machine->driver_data;
 
-	state->cdp1864->reset(state->cdp1864);
+	device_reset(state->cdp1864);
 
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 
